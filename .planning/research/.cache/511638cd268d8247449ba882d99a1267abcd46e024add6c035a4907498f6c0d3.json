@@ -1,0 +1,1 @@
+{"content":"Beam search branches on unreliable variables, runs masked BP per path, prunes by beam width, and reports mean and 99.9-percentile runtime.","source":"web","provider":"websearch","confidence":"MEDIUM","fetched_at":"2026-09-21T22:54:12.141Z","ttl":86400000,"kind":"web"}
