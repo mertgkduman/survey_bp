@@ -172,13 +172,101 @@ Documentation, algebraic correctness checks, provenance, and evidence status acc
 
 ## Traceability
 
-Phase assignments are populated during roadmap construction. Every v1 requirement must have exactly one owning phase; later phases may use or strengthen it without changing ownership.
+Every v1 requirement has exactly one owning phase; later phases may use or strengthen it without changing ownership.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
+| MAP-01 | Phase 1 | Pending |
+| MAP-02 | Phase 1 | Pending |
+| MAP-03 | Phase 1 | Pending |
+| MAP-04 | Phase 14 | Pending |
+| REG-01 | Phase 1 | Pending |
+| REG-02 | Phase 1 | Pending |
+| REG-03 | Phase 1 | Pending |
+| REG-04 | Phase 1 | Pending |
+| REG-05 | Phase 14 | Pending |
+| CSS-01 | Phase 1 | Pending |
+| CSS-02 | Phase 1 | Pending |
+| CSS-03 | Phase 1 | Pending |
+| CSS-04 | Phase 1 | Pending |
+| ENG-01 | Phase 2 | Pending |
+| ENG-02 | Phase 2 | Pending |
+| ENG-03 | Phase 2 | Pending |
+| ENG-04 | Phase 2 | Pending |
+| ENG-05 | Phase 2 | Pending |
+| ENG-06 | Phase 2 | Pending |
+| UPD-01 | Phase 3 | Pending |
+| UPD-02 | Phase 3 | Pending |
+| UPD-03 | Phase 3 | Pending |
+| SCH-01 | Phase 2 | Pending |
+| SCH-02 | Phase 3 | Pending |
+| SCH-03 | Phase 3 | Pending |
+| SCH-04 | Phase 3 | Pending |
+| SCH-05 | Phase 3 | Pending |
+| SCH-06 | Phase 3 | Pending |
+| MEM-01 | Phase 4 | Pending |
+| MEM-02 | Phase 4 | Pending |
+| MEM-03 | Phase 4 | Pending |
+| MEM-04 | Phase 4 | Pending |
+| MEM-05 | Phase 4 | Pending |
+| MOD-01 | Phase 4 | Pending |
+| MOD-02 | Phase 5 | Pending |
+| MOD-03 | Phase 5 | Pending |
+| MOD-04 | Phase 6 | Pending |
+| INT-01 | Phase 5 | Pending |
+| INT-02 | Phase 5 | Pending |
+| INT-03 | Phase 5 | Pending |
+| INT-04 | Phase 5 | Pending |
+| INT-05 | Phase 6 | Pending |
+| CAN-01 | Phase 6 | Pending |
+| CAN-02 | Phase 6 | Pending |
+| POST-01 | Phase 7 | Pending |
+| POST-02 | Phase 7 | Pending |
+| POST-03 | Phase 7 | Pending |
+| POST-04 | Phase 7 | Pending |
+| POST-05 | Phase 7 | Pending |
+| LED-01 | Phase 1 | Pending |
+| LED-02 | Phase 2 | Pending |
+| LED-03 | Phase 2 | Pending |
+| LED-04 | Phase 2 | Pending |
+| LED-05 | Phase 8 | Pending |
+| SIM-01 | Phase 8 | Pending |
+| SIM-02 | Phase 8 | Pending |
+| SIM-03 | Phase 8 | Pending |
+| STAT-01 | Phase 8 | Pending |
+| STAT-02 | Phase 8 | Pending |
+| STAT-03 | Phase 8 | Pending |
+| STAT-04 | Phase 8 | Pending |
+| STAT-05 | Phase 8 | Pending |
+| EVAL-01 | Phase 9 | Pending |
+| EVAL-02 | Phase 9 | Pending |
+| EVAL-03 | Phase 9 | Pending |
+| QBP-01 | Phase 10 | Pending |
+| QBP-02 | Phase 10 | Pending |
+| QBP-03 | Phase 10 | Pending |
+| QBP-04 | Phase 10 | Pending |
+| QEV-01 | Phase 11 | Pending |
+| QEV-02 | Phase 11 | Pending |
+| CIR-01 | Phase 12 | Pending |
+| CIR-02 | Phase 12 | Pending |
+| CIR-03 | Phase 12 | Pending |
+| CIR-04 | Phase 12 | Pending |
+| CIR-05 | Phase 12 | Pending |
+| CEV-01 | Phase 13 | Pending |
+| CEV-02 | Phase 13 | Pending |
+| CEV-03 | Phase 13 | Pending |
+| DOC-01 | Phase 2 | Pending |
+| DOC-02 | Phase 14 | Pending |
+| PUB-01 | Phase 14 | Pending |
+| PUB-02 | Phase 14 | Pending |
+| PUB-03 | Phase 14 | Pending |
 
-**Coverage:** Pending roadmap construction.
+**Coverage:**
+- v1 requirements: 84 total
+- Mapped to phases: 84
+- Unmapped: 0
+- Duplicate phase owners: 0
 
 ---
 *Requirements defined: 2026-09-21*
-*Last updated: 2026-09-21 after approved scope and initial research; autonomous mode*
+*Last updated: 2026-09-21 after roadmap traceability assignment; autonomous mode*
