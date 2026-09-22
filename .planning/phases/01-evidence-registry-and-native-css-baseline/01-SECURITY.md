@@ -59,8 +59,10 @@ No accepted risks.
 |---|---:|---:|---:|---|
 | 2026-09-22 | 24 | 23 | 1 | `gsd-security-auditor`, initial audit |
 | 2026-09-22 | 24 | 24 | 0 | `gsd-security-auditor`, after T-01-12 fix |
+| 2026-09-22 | 24 | 23 | 1 | `gsd-security-auditor`, post-gap-fix T-01-21 re-audit |
+| 2026-09-22 | 24 | 24 | 0 | `gsd-security-auditor`, after T-01-21 hardening |
 
-The final audit checked the registered threat controls against code and tests. The full suite passed 68 tests; public preflight, evidence validation, and run verification passed. The audit found no unregistered threat flags in the phase summaries. T-01-12 was closed by commits `50261cc` and `08d4ce7`, which reject claims naming an unknown work or a revision other than that work's pinned revision.
+The final audit checked the registered threat controls against code and tests. The full suite passed 71 tests; public preflight, evidence validation, and run verification passed. The audit found no unregistered threat flags in the phase summaries. T-01-12 was closed by commits `50261cc` and `08d4ce7`, which reject claims naming an unknown work or a revision other than that work's pinned revision. T-01-21 was reopened after unsuccessful shot rows became publishable, then closed by commit `2022257`, which rejects fabricated native and sample fields in those rows.
 
 ## Sign-Off
 
