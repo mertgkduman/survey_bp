@@ -98,7 +98,7 @@ def run_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path)
     decoder_version = manifest.decoder.version
     artifact_raw_sha256 = manifest.artifact.raw_sha256
     artifact_semantic_sha256 = manifest.artifact.semantic_sha256
-    artifact_path = str((Path(manifest.artifact.root) / manifest.artifact.path).resolve())
+    artifact_path = str(Path(manifest.artifact.root) / manifest.artifact.path)
     common = {
         "manifest_sha256": digest,
         "source_uri": source_uri,

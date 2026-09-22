@@ -24,7 +24,7 @@
   "paper_experiment_id": "bhatnagar-impulse:Figure 6",
   "relation": "pilot_adaptation",
   "resource_context": {
-    "elapsed_seconds_this_invocation": 5.162252207053825,
+    "elapsed_seconds_this_invocation": 4.910094327991828,
     "host": "dcc-core-ferc-u-ac39-4-1",
     "native_internals": "edge-update counts unavailable; each final row records the reason",
     "omp_num_threads": 1

@@ -73,7 +73,7 @@ def _validate_pilot_ledger(manifest_path: Path, ledger_path: Path, rows: list[di
         "decoder_version": manifest.decoder.version,
         "artifact_raw_sha256": manifest.artifact.raw_sha256,
         "artifact_semantic_sha256": manifest.artifact.semantic_sha256,
-        "artifact_path": str((Path(manifest.artifact.root) / manifest.artifact.path).resolve()),
+        "artifact_path": str(Path(manifest.artifact.root) / manifest.artifact.path),
     }
     events = _ledger_events(ledger_path)
     begins = {
