@@ -234,3 +234,21 @@ def test_runner_consumes_the_verified_resolved_experiment(tmp_path):
     assert result.shot_id == 2
     assert events[0]["kind"] == "begin"
     assert events[0]["decoder_config"]["error_rate"] == 0.0
+
+
+def test_run_one_rejects_legacy_manifests(tmp_path):
+    from bp_registry.runner import run_one
+
+    legacy = {
+        "schema_version": 1, "run_id": "legacy", "source_uri": "https://example.test/paper",
+        "source_revision": "v1", "source_anchor": "table", "code_id": "project-three-qubit-css-fixture",
+        "experiment_relation": "pilot_adaptation", "expected_output_status": "not_assessed",
+        "x_error_rate": 0.0, "seed": 12, "max_iter": 10, "bp_method": "product_sum",
+        "schedule": "parallel", "input_vector_type": "syndrome",
+    }
+    legacy_path = tmp_path / "legacy.json"
+    legacy_ledger = tmp_path / "legacy-events.jsonl"
+    legacy_path.write_text(json.dumps(legacy))
+    with pytest.raises(ValueError, match="read-only"):
+        run_one(legacy_path, shot_id=0, ledger_path=legacy_ledger)
+    assert not legacy_ledger.exists()

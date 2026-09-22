@@ -76,7 +76,7 @@ def test_duplicate_or_out_of_order_events_are_rejected_without_double_counting(t
     assert len(reconcile(path)) == 1
 
 
-def test_runner_records_begin_before_sampling_and_an_error_terminal(tmp_path, monkeypatch):
+def test_legacy_manifest_never_opens_a_ledger(tmp_path, monkeypatch):
     import json
 
     from bp_registry import runner
@@ -91,25 +91,10 @@ def test_runner_records_begin_before_sampling_and_an_error_terminal(tmp_path, mo
     manifest_path, journal = tmp_path / "fixture.json", tmp_path / "events.jsonl"
     manifest_path.write_text(json.dumps(manifest))
 
-    def exploding_sample(*_args, **_kwargs):
-        events = [json.loads(line) for line in journal.read_text().splitlines()]
-        assert len(events) == 1
-        assert events[0]["kind"] == "begin"
-        assert events[0]["sample_seed_identity"]
-        raise RuntimeError("synthetic sampling failure")
-
-    monkeypatch.setattr(runner.sampling, "sample_shot", exploding_sample)
-    with pytest.raises(RuntimeError, match="synthetic sampling failure"):
+    monkeypatch.setattr(runner.sampling, "sample_shot", lambda *_args, **_kwargs: pytest.fail("sampled"))
+    with pytest.raises(ValueError, match="read-only"):
         runner.run_one(manifest_path, shot_id=4, ledger_path=journal)
-
-    events = [json.loads(line) for line in journal.read_text().splitlines()]
-    assert [event["kind"] for event in events] == ["begin", "terminal"]
-    terminal = events[-1]
-    assert terminal["termination"] == "exception"
-    assert terminal["exception_stage"] == "sampling"
-    assert terminal["outcome"] is None
-    assert terminal["native_iterations"] is None
-    assert terminal["native_internals_unavailable_reason"]
+    assert not journal.exists()
 
 
 def test_active_owner_stays_pending_then_dead_owner_is_repaired_once(tmp_path):
