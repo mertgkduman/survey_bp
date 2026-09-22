@@ -20,7 +20,7 @@ def test_inventory_distinguishes_b1_c2_and_gross_and_records_d04_gate():
     assert by_id["b1-lifted-product-882"]["family"] == "lifted_product"
     assert by_id["bpgd-c2-hgp-1922"]["family"] == "hypergraph_product"
     assert by_id["gross-bb-144"]["implementation"]["revision"]
-    assert inventory["selection"]["decision"] == "conditional_gross_pending_artifact_validation"
+    assert inventory["selection"]["decision"] == "selected_verified_gross_bb_144"
     assert "exact source rows" in inventory["selection"]["d04_rule"]
 
 
@@ -39,7 +39,7 @@ def test_decisions_report_has_conditional_selection_and_rejection_rationale():
     report = DECISIONS.read_text()
     assert "## Conditional ranking before the source probe" in report
     assert "## Final D-04 decision and rejected candidates" in report
-    assert "conditionally selected for Task 2" in report
+    assert "selected as the verified artifact" in report
     assert "Gross/BB-144" in report and "B1" in report and "C2" in report
 
 
@@ -91,7 +91,9 @@ def test_selected_identity_rejects_row_bit_and_logical_pair_mutations(tmp_path):
         mutate(changed)
         path = tmp_path / f"{name}.json"
         path.write_text(json.dumps(changed, separators=(",", ":")))
-        with pytest.raises(ValueError, match="SHA-256"):
+        # A semantic identity mismatch may be detected after algebra (a bit
+        # mutation can break commutation before its digest is compared).
+        with pytest.raises(ValueError):
             load_artifact(
                 tmp_path, path.name,
                 expected_semantic_sha256=provenance["artifact"]["semantic_sha256"],

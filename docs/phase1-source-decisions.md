@@ -52,16 +52,25 @@ validate the resulting ordered paired basis.
 
 ## Final D-04 decision and rejected candidates
 
-**Gross/BB-144 is conditionally selected for Task 2, not yet promoted as a
-verified artifact.** B1 is rejected for this pilot because its exact matrix
+**Gross/BB-144 is selected as the verified artifact for the first native
+pilot adaptation.** Task 2 regenerated the exact source rows and wrote
+`data/artifacts/selected-css.json` with raw SHA-256
+`2c02a3b99bf7267acf35efe28e0a2ef0d3827e5a22b948d53da14ae8df68ceb0`
+and semantic SHA-256
+`e175e67c0f9ae6f4e0968461ad2f87ba38ad5344166b793c53dd038976d4f427`.
+The provenance file preserves bposd's source Lx/Lz fingerprints and records
+the explicit GF(2) Lz pairing normalization; project-owned validation then
+checks commutation, ranks, quotient independence, and identity pairing.
+
+B1 is rejected for this pilot because its exact matrix
 source and ordered logical rows are absent. C2 is rejected for this pilot
 because its source matrices, HGP construction ordering, and ordered logical
 rows are absent.
 
-Task 2 may create the selected artifact only if exact Gross rows regenerate
-from the cited commit, the source-provider row fingerprints are retained, and
-project-owned GF(2) pairing and quotient checks pass. A parameter label or
-guessed source identity cannot substitute for this gate.
+The selected code remains a **pilot adaptation**. Bravyi's repository is
+circuit-level BP-OSD software and the impulse Figure 6 lead is code-capacity;
+this shared code construction does not claim either source's decoding run or
+statistical curve has been reproduced.
 
 ## Relation to the Phase 1 native pilot
 
