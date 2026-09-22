@@ -28,6 +28,14 @@ def test_empty_journal_has_no_final_rows_or_denominators(tmp_path):
     assert summarize(path)["total_final"] == 0
 
 
+def test_begin_requires_replayable_sample_identity(tmp_path):
+    from bp_registry.ledger import LedgerWriter
+
+    with LedgerWriter(tmp_path / "events.jsonl") as writer:
+        with pytest.raises(ValueError, match="sample_seed_identity"):
+            writer.begin(run_id="r1", shot_id=1)
+
+
 def test_terminal_row_is_durable_and_summary_counts_only_final_rows(tmp_path):
     from bp_registry.ledger import LedgerWriter, reconcile, summarize
 

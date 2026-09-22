@@ -84,6 +84,8 @@ def _validate_event(event: Mapping[str, Any]) -> None:
         ) and type(owner.get("pid")) is int
         if not valid_owner:
             raise ValueError("begin event requires owner nonce, node, and pid")
+        if not isinstance(event.get("sample_seed_identity"), str) or not event["sample_seed_identity"]:
+            raise ValueError("begin event requires a nonempty sample_seed_identity")
     elif not isinstance(event.get("termination"), str) or not event["termination"]:
         raise ValueError("terminal event requires a termination status")
 
@@ -247,8 +249,10 @@ class LedgerWriter:
 
         data = dict(event)
         kind = data.pop("kind", None)
-        data.pop("ledger_version", None)
-        data.pop("owner", None)
+        if data.pop("ledger_version", LEDGER_VERSION) != LEDGER_VERSION:
+            raise ValueError("append cannot alter ledger_version")
+        if "owner" in data:
+            raise ValueError("append cannot alter ownership metadata")
         try:
             run_id, shot_id = data.pop("run_id"), data.pop("shot_id")
         except KeyError as error:
