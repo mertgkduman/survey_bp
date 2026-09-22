@@ -164,7 +164,8 @@ def _interrupted_terminal(begin: Mapping[str, Any]) -> dict[str, Any]:
         for field in (
             "manifest_sha256", "source_uri", "source_revision", "source_anchor", "code_id",
             "experiment_relation", "expected_output_status", "sample_seed_identity",
-            "decoder_config", "decoder_version",
+            "decoder_config", "decoder_version", "paper_uri", "paper_revision", "paper_anchor",
+            "implementation_source_artifact_sha256",
         ) if field in begin
     }
     return {

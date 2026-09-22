@@ -3,9 +3,14 @@
   "run_id": "gross-bb144-pilot",
   "paper": {
     "uri": "https://arxiv.org/html/2606.18240v1",
-    "revision": "fa77e3333d3ec44c79d8f914dd24c040d1da471b",
+    "revision": "v1",
     "experiment_anchor": "bhatnagar-impulse:Figure 6",
-    "relation": "pilot_adaptation",
+    "relation": "pilot_adaptation"
+  },
+  "implementation": {
+    "repository_uri": "https://github.com/sbravyi/BivariateBicycleCodes",
+    "revision": "fa77e3333d3ec44c79d8f914dd24c040d1da471b",
+    "source_path": "decoder_setup.py",
     "source_artifact_sha256": "e919e1830b88468c5d257c0119656576a7999f92743dfeccd389a967524b3d2c",
     "source_artifact_status": "verified"
   },

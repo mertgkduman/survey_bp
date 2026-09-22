@@ -45,8 +45,12 @@ def preflight_pilot(manifest_path: str | Path) -> dict[str, Any]:
         or actual_path != expected_path.resolve()
         or manifest.artifact.raw_sha256 != artifact["raw_sha256"]
         or manifest.artifact.semantic_sha256 != artifact["semantic_sha256"]
-        or manifest.paper.revision != source["revision"]
-        or manifest.paper.source_artifact_sha256 != source["source_file_sha256"]
+        or manifest.paper.uri != "https://arxiv.org/html/2606.18240v1"
+        or manifest.paper.revision != "v1"
+        or manifest.implementation.repository_uri != source["repository"]
+        or manifest.implementation.revision != source["revision"]
+        or manifest.implementation.source_path != source["source_file"]
+        or manifest.implementation.source_artifact_sha256 != source["source_file_sha256"]
     ):
         raise ValueError("manifest is not bound to the selected artifact provenance")
     if manifest.paper.relation != "pilot_adaptation":
@@ -59,8 +63,10 @@ def preflight_pilot(manifest_path: str | Path) -> dict[str, Any]:
         "relation": manifest.paper.relation,
         "assessment_status": manifest.expected_output.status,
         "assessment_reason": manifest.expected_output.reason,
-        "source_revision": manifest.paper.revision,
-        "source_uri": manifest.paper.uri,
+        "paper_revision": manifest.paper.revision,
+        "paper_uri": manifest.paper.uri,
+        "implementation_revision": manifest.implementation.revision,
+        "implementation_uri": manifest.implementation.repository_uri,
         "artifact_raw_sha256": manifest.artifact.raw_sha256,
         "artifact_semantic_sha256": manifest.artifact.semantic_sha256,
         "shot_budget": manifest.budget.max_shots,
@@ -77,9 +83,9 @@ def run_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path)
         raise ValueError("shot_id is outside the manifest budget")
     code = resolved.code
     digest = manifest_digest(manifest)
-    source_uri = manifest.paper.uri
-    source_revision = manifest.paper.revision
-    source_anchor = manifest.paper.experiment_anchor
+    source_uri = manifest.implementation.repository_uri
+    source_revision = manifest.implementation.revision
+    source_anchor = manifest.implementation.source_path
     code_id = manifest.artifact.code_id
     experiment_relation = manifest.paper.relation
     expected_output_status = manifest.expected_output.status
@@ -98,6 +104,10 @@ def run_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path)
         "source_uri": source_uri,
         "source_revision": source_revision,
         "source_anchor": source_anchor,
+        "paper_uri": manifest.paper.uri,
+        "paper_revision": manifest.paper.revision,
+        "paper_anchor": manifest.paper.experiment_anchor,
+        "implementation_source_artifact_sha256": manifest.implementation.source_artifact_sha256,
         "code_id": code_id,
         "experiment_relation": experiment_relation,
         "expected_output_status": expected_output_status,

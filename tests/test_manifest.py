@@ -39,7 +39,12 @@ def _manifest(tmp_path: Path, **changes: object) -> dict[str, object]:
             "uri": "https://arxiv.org/abs/2312.10950",
             "revision": "v2",
             "experiment_anchor": "Figure 2",
-            "relation": "pilot_adaptation",
+            "relation": "pilot_adaptation"
+        },
+        "implementation": {
+            "repository_uri": "https://example.test/decoder",
+            "revision": "fixture-v1",
+            "source_path": "decoder.py",
             "source_artifact_sha256": "a" * 64,
             "source_artifact_status": "verified",
         },
@@ -192,7 +197,7 @@ def test_invalid_preflight_never_reaches_sampling_or_native_decode(tmp_path, mon
     monkeypatch.setattr(runner.sampling, "sample_shot", lambda *args, **kwargs: calls.append("sample"))
     monkeypatch.setattr(runner.reference, "decode", lambda *args, **kwargs: calls.append("decode"))
     bad = _manifest(tmp_path)
-    bad["paper"] = {**bad["paper"], "source_artifact_status": "unverified"}
+    bad["implementation"] = {**bad["implementation"], "source_artifact_status": "unverified"}
     path = tmp_path / "invalid.json"
     path.write_text(json.dumps(bad))
     with pytest.raises(ValueError, match="source artifact"):

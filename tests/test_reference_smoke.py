@@ -98,10 +98,14 @@ def test_selected_pilot_preflight_is_bound_and_transparent(tmp_path):
     assert report["relation"] == "pilot_adaptation"
     assert report["assessment_status"] == "not_assessed"
     assert report["assessment_reason"]
+    assert report["paper_revision"] == "v1"
+    assert report["implementation_revision"] == "fa77e3333d3ec44c79d8f914dd24c040d1da471b"
+    assert report["paper_uri"].startswith("https://arxiv.org/")
+    assert report["implementation_uri"].startswith("https://github.com/")
     assert "curve pass" not in json.dumps(report).lower()
 
     altered = json.loads(manifest_path.read_text())
-    altered["paper"]["revision"] = "not-the-pinned-source"
+    altered["implementation"]["revision"] = "not-the-pinned-source"
     invalid = tmp_path / "invalid-selected-pilot.json"
     invalid.write_text(json.dumps(altered))
     with pytest.raises(ValueError, match="selected artifact"):

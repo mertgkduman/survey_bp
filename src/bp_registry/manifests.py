@@ -34,14 +34,29 @@ class PaperV1(StrictModel):
     revision: str = Field(min_length=1)
     experiment_anchor: str = Field(min_length=1)
     relation: Literal["pilot_adaptation", "source_faithful"]
-    source_artifact_sha256: str = Field(pattern=_SHA256)
-    source_artifact_status: Literal["verified", "unverified"]
 
     @field_validator("uri")
     @classmethod
     def https_uri(cls, value: str) -> str:
         if not value.startswith("https://"):
             raise ValueError("paper URI must use HTTPS")
+        return value
+
+
+class ImplementationV1(StrictModel):
+    """Pinned executable source, recorded independently from paper evidence."""
+
+    repository_uri: str = Field(min_length=1)
+    revision: str = Field(min_length=1)
+    source_path: str = Field(min_length=1)
+    source_artifact_sha256: str = Field(pattern=_SHA256)
+    source_artifact_status: Literal["verified", "unverified"]
+
+    @field_validator("repository_uri")
+    @classmethod
+    def https_repository_uri(cls, value: str) -> str:
+        if not value.startswith("https://"):
+            raise ValueError("implementation repository URI must use HTTPS")
         return value
 
 
@@ -160,6 +175,7 @@ class ManifestV1(StrictModel):
     schema_version: Literal[1]
     run_id: str = Field(min_length=1)
     paper: PaperV1
+    implementation: ImplementationV1
     artifact: ArtifactV1
     decoder: DecoderV1
     noise: NoiseV1
@@ -323,7 +339,7 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
         # Original minimal v1 tracer records are immutable historical evidence.
         # They are retained for replay only; new records must use ManifestV1.
         return ResolvedExperiment(manifest=manifest, code=fixture_code(), artifact=None)
-    if manifest.paper.source_artifact_status != "verified":
+    if manifest.implementation.source_artifact_status != "verified":
         raise ValueError("source artifact is not verified")
     _verify_environment(manifest.environment, manifest.decoder)
     artifact = load_artifact(
