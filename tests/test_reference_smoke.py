@@ -1,5 +1,7 @@
 """Native BP is a reference; syndrome fit is independently checked."""
 
+import pytest
+
 
 def test_native_bp_fits_tiny_syndrome():
     import numpy as np
@@ -90,3 +92,29 @@ def test_runner_uses_sampling_and_independent_evaluator(tmp_path, monkeypatch):
     assert result.outcome == "logical_failure"
     assert terminal["sample_identity"] == "sentinel-sample"
     assert terminal["outcome"] == "logical_failure"
+
+
+def test_selected_pilot_preflight_is_bound_and_transparent(tmp_path):
+    """The public pilot path accepts only the Plan 08 selected artifact."""
+    import json
+    from pathlib import Path
+
+    from bp_registry import runner
+
+    manifest_path = Path("data/manifests/selected-css-pilot_adaptation-not_assessed.json")
+    assert manifest_path.exists(), "the selected CSS pilot manifest must be checked in"
+
+    report = runner.preflight_pilot(manifest_path)
+    assert report["run_id"] == "gross-bb144-pilot"
+    assert report["code_id"] == "gross-bb-144"
+    assert report["relation"] == "pilot_adaptation"
+    assert report["assessment_status"] == "not_assessed"
+    assert report["assessment_reason"]
+    assert "curve pass" not in json.dumps(report).lower()
+
+    altered = json.loads(manifest_path.read_text())
+    altered["paper"]["revision"] = "not-the-pinned-source"
+    invalid = tmp_path / "invalid-selected-pilot.json"
+    invalid.write_text(json.dumps(altered))
+    with pytest.raises(ValueError, match="selected artifact"):
+        runner.preflight_pilot(invalid)
