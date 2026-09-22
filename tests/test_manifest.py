@@ -252,3 +252,14 @@ def test_run_one_rejects_legacy_manifests(tmp_path):
     with pytest.raises(ValueError, match="read-only"):
         run_one(legacy_path, shot_id=0, ledger_path=legacy_ledger)
     assert not legacy_ledger.exists()
+
+
+def test_run_one_rejects_shots_outside_the_complete_manifest_budget(tmp_path):
+    from bp_registry.runner import run_one
+
+    manifest_path = tmp_path / "complete.json"
+    ledger_path = tmp_path / "events.jsonl"
+    manifest_path.write_text(json.dumps(_manifest(tmp_path)))
+    with pytest.raises(ValueError, match="outside the manifest budget"):
+        run_one(manifest_path, shot_id=32, ledger_path=ledger_path)
+    assert not ledger_path.exists()

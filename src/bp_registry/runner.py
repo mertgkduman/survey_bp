@@ -73,6 +73,8 @@ def run_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path)
     manifest = resolved.manifest
     if not isinstance(manifest, ManifestV1):
         raise ValueError("legacy manifests are read-only and cannot execute")
+    if not 0 <= shot_id < manifest.budget.max_shots:
+        raise ValueError("shot_id is outside the manifest budget")
     code = resolved.code
     digest = manifest_digest(manifest)
     source_uri = manifest.paper.uri
