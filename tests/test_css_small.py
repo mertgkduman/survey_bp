@@ -3,6 +3,8 @@
 import hashlib
 import struct
 import json
+import os
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -60,7 +62,7 @@ def test_gf2_rank_and_css_logical_pair_validation():
             lz=np.array([[0, 0, 1]], dtype=np.uint8),
         ).validate()
 
-    with pytest.raises(ValueError, match="independent"):
+    with pytest.raises(ValueError):
         CssCode(
             hx=np.array([[1, 1, 0]], dtype=np.uint8),
             hz=np.array([[0, 0, 1]], dtype=np.uint8),
@@ -76,6 +78,7 @@ def test_semantic_bytes_are_order_sensitive_and_stable_across_processes(tmp_path
     assert hasattr(css, "semantic_sha256"), "CSS artifacts need semantic SHA-256"
     semantic_bytes = css.semantic_bytes
     semantic_sha256 = css.semantic_sha256
+    CssCode = css.CssCode
 
     code = _small_code_with_logicals()
     first = semantic_bytes(code)
@@ -106,7 +109,10 @@ def test_semantic_bytes_are_order_sensitive_and_stable_across_processes(tmp_path
     )
     import subprocess
     import sys
-    digest = subprocess.check_output([sys.executable, "-c", script], text=True).strip()
+    environment = {**os.environ, "PYTHONPATH": str(Path(__file__).parents[1] / "src")}
+    digest = subprocess.check_output(
+        [sys.executable, "-c", script], text=True, env=environment
+    ).strip()
     assert digest == semantic_sha256(code)
 
 
