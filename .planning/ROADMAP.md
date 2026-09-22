@@ -52,7 +52,7 @@ Build a provenance-preserving research platform from paper evidence through nati
 5. Registry evidence statuses distinguish mapped records, executable references, canonical implementations, and assessed results, including unavailable original code or missing source settings.
 
 **Research focus:** Mapping protocol and initial corpus; exact source/reference selection and installation; CSS code/logical serialization; mathematical oracle; manifest/ledger contracts.
-**Plans:** 7/9 plans executed
+**Plans:** 8/9 plans executed
 
 Plans:
 **Wave 1**
@@ -76,7 +76,7 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 01-07-PLAN.md — Strict manifest and immutable-input preflight
+- [x] 01-07-PLAN.md — Strict manifest and immutable-input preflight
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
@@ -301,7 +301,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Evidence Registry and Native CSS Baseline | 7/9 | In Progress|  |
+| 1. Evidence Registry and Native CSS Baseline | 8/9 | In Progress|  |
 | 2. Canonical CSS Execution and Policy Contracts | 0/TBD | Not started | - |
 | 3. Update Rules and Scheduling | 0/TBD | Not started | - |
 | 4. Memory Policies and Relay-BP | 0/TBD | Not started | - |
