@@ -38,201 +38,260 @@ Build a provenance-preserving research platform from paper evidence through nati
 ## Phase Details
 
 ### Phase 1: Evidence Registry and Native CSS Baseline
+
 **Goal:** A researcher can go from a source-linked paper record to a validated, pinned native CSS experiment and inspect its outcomes and provenance.
 **Mode:** mvp
 **Depends on:** Nothing (first phase)
 **Requirements:** MAP-01, MAP-02, MAP-03, REG-01, REG-02, REG-03, REG-04, CSS-01, CSS-02, CSS-03, CSS-04, LED-01
 **Success Criteria:**
+
 1. A versioned search/screening/extraction protocol and seed records expose inclusion decisions, source revisions, taxonomy, and unresolved identities without claiming a completed systematic map.
 2. A complete manifest schema resolves exact decoder settings, artifact hashes, noise/rates, seeds, budgets/stopping, versions, expected outputs, tolerances, sources, and discrepancies; malformed or changed inputs are rejected before execution.
 3. Small CSS fixtures validate check/logical algebra, stable ordered hashes, separate X/Z and bit-flip conventions, and independently distinguish exact, degenerate, logical, and syndrome-invalid outcomes.
 4. A documented local command runs a pinned native binary BP baseline on identified shots and writes linked outcomes/provenance, including nonconvergence and termination; no pilot is mislabeled statistically reproduced.
 5. Registry evidence statuses distinguish mapped records, executable references, canonical implementations, and assessed results, including unavailable original code or missing source settings.
+
 **Research focus:** Mapping protocol and initial corpus; exact source/reference selection and installation; CSS code/logical serialization; mathematical oracle; manifest/ledger contracts.
 **Plans:** 9 plans
 
 Plans:
+**Wave 1**
+
 - [ ] 01-01-PLAN.md — Wave 0 Python tests and observed environment identity
 - [ ] 01-02-PLAN.md — Blocking package legitimacy gate before new installs
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 01-03-PLAN.md — End-to-end source-linked CSS native tracer
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 01-04-PLAN.md — CSS algebra, artifact hashes, sampling, and outcome oracle
-- [ ] 01-05-PLAN.md — Durable per-shot ledger and interruption reconciliation
 - [ ] 01-06-PLAN.md — Mapping protocol and BPGD/impulse CSS evidence extraction
-- [ ] 01-07-PLAN.md — Strict manifest and immutable-input preflight
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 01-05-PLAN.md — Durable per-shot ledger and interruption reconciliation
 - [ ] 01-08-PLAN.md — Candidate inventory and verified source-artifact freeze
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
+- [ ] 01-07-PLAN.md — Strict manifest and immutable-input preflight
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
 - [ ] 01-09-PLAN.md — Pinned 32-shot native CSS pilot and linked results
 
 ### Phase 2: Canonical CSS Execution and Policy Contracts
+
 **Goal:** A researcher can inspect and run a canonical binary BP policy composition with trustworthy outcomes and computational attribution.
 **Mode:** mvp
 **Depends on:** Phase 1
 **Requirements:** ENG-01, ENG-02, ENG-03, ENG-04, ENG-05, ENG-06, SCH-01, LED-02, LED-03, LED-04, DOC-01
 **Success Criteria:**
+
 1. A manifest runs project-owned sum-product BP with flooding from CSS observations through the independent evaluator, a ledger, and a small result artifact.
 2. The policy lifecycle defines typed interfaces, composition compatibility, original-problem preservation, hidden-truth isolation, numerical conventions, message order, and scoped stopping; invalid compositions and truth access are prevented by the execution boundary.
 3. Deterministic small cases verify the update equation and policy transitions independently of curves; the source-to-specification and fixture pattern is reusable by later policies.
 4. Canonical control-flow/candidate events and work/runtime counters are queryable by shot and attempt; native reference counters that cannot be observed carry explicit missingness reasons.
 5. A researcher can install the package, run the tutorial, and inspect mathematical conventions, lifecycle contracts, and compatibility examples.
+
 **Research focus:** Numerical stability, trace vocabulary, policy ownership, scoped budgets, and kernel-level work definitions.
 **Plans:** TBD
 
 ### Phase 3: Update Rules and Scheduling
+
 **Goal:** A researcher can vary requested message-update and scheduling policies without changing the canonical engine or losing semantic and cost visibility.
 **Mode:** mvp
 **Depends on:** Phase 2
 **Requirements:** UPD-01, UPD-02, UPD-03, SCH-02, SCH-03, SCH-04, SCH-05, SCH-06
 **Success Criteria:**
+
 1. Min-sum, normalized min-sum, and offset min-sum have explicit parameters/equations and pass small-graph reference calculations alongside sum-product.
 2. Layered and serial schedules expose their update unit, partition/traversal order, and fresh/stale-message semantics in executable fixtures.
 3. Residual scheduling records residual definition, priority invalidation and selection work; randomized scheduling replays without modifying physical-error samples.
 4. Cluster-sequential scheduling implements a pinned source-defined construction/order and records any learned/fixed parameters rather than substituting an unspecified clustering heuristic.
 5. Researchers can run matched pilot comparisons of supported update/schedule combinations with raw work counters and explicit rejection of undefined combinations.
+
 **Research focus:** Source definitions for offset min-sum and cluster sequencing, residual/cache semantics, and intervention-sensitive schedule state.
 **Plans:** TBD
 
 ### Phase 4: Memory Policies and Relay-BP
+
 **Goal:** A researcher can inspect state/history effects and execute a source-linked Relay-BP policy composition with faithful state transfer and accounting.
 **Mode:** mvp
 **Depends on:** Phase 3
 **Requirements:** MEM-01, MEM-02, MEM-03, MEM-04, MEM-05, MOD-01
 **Success Criteria:**
+
 1. Damping, mixing, momentum, iteration memory, and disordered memory each have a precise equation/procedure, application order, state lifetime, reset semantics, and deterministic verification fixtures.
 2. Relay-BP explicitly records leg/member identity, disordered-memory draws, transferred posterior state, scoped stopping, and selected solutions.
 3. A pinned original Relay-BP reference and canonical realization can run eligible pilot inputs with documented configuration translations, numerical differences, and native instrumentation limits.
 4. A researcher can isolate memory/relay effects in pilot ablations and recover all leg work from the ledger; an adaptation is clearly labeled when it differs from source experiment settings.
+
 **Research focus:** Exact mixing/memory definitions, source equations and code defaults, warm-state inheritance, and candidate stopping/selection.
 **Plans:** TBD
 
 ### Phase 5: Guided and Perturbative BP Interventions
+
 **Goal:** A researcher can run and inspect guided fixation, impulse attempts, and perturbative BP interventions against the original decoding problem.
 **Mode:** mvp
 **Depends on:** Phase 4
 **Requirements:** MOD-02, MOD-03, INT-01, INT-02, INT-03, INT-04
 **Success Criteria:**
+
 1. Canonical BPGD implements source-defined reliability selection, decimation/fixation, BP rounds, and state transitions, with fixtures and an explicit original-code availability record.
 2. Impulse decoding preserves its source-defined failure trigger, shortening attempts, budgets, candidate lift, and selection; per-attempt work and unavailable native references remain visible.
 3. Freezing, syndrome flipping, sign flipping, and restarting have explicit eligibility/trigger, changed versus preserved state, and source-linked semantics.
 4. Constructed cases show that convergence on a modified working syndrome/graph cannot bypass validation against the original observation, and every restart/attempt is included in resource totals.
 5. Researchers can enable/disable these interventions on eligible CSS pilots and inspect pre-intervention, attempted, and selected outcomes without claiming new settings reproduce a source curve.
+
 **Research focus:** Original BPGD/impulse code discovery; perturbation semantics; lifting; random-stream and cache invalidation rules.
 **Plans:** TBD
 
 ### Phase 6: Beam Search, Ensembles, and Candidate Selection
+
 **Goal:** A researcher can execute branching/ensemble searches and inspect how candidate generation, pruning, selection, and voting affect outputs and cost.
 **Mode:** mvp
 **Depends on:** Phase 5
 **Requirements:** MOD-04, INT-05, CAN-01, CAN-02
 **Success Criteria:**
+
 1. Canonical BeamSearch exposes masked BP, branch decisions, beam width, ranking/pruning, budgets, and selection, with source-linked fixtures and a pinned executable reference where available.
 2. Generic branching/ensemble compositions declare member identity, inherited versus independent state, resource limits, and work aggregation without double-counting or hiding discarded paths.
 3. List selection preserves candidate origin and eligibility with declared scores/ties; voting defines its object and electorate and validates its final output against original constraints.
 4. Researchers can replay a small search tree and account for accepted, rejected, pruned and budget-exhausted paths through the ledger.
+
 **Research focus:** Source beam/masking/ranking rules, reference integration terms and interface, voting semantics, search work versus parallel latency.
 **Plans:** TBD
 
 ### Phase 7: Optional Postprocessing
+
 **Goal:** A researcher can attach independently configurable additional processing to canonical BP nonconvergence while retaining clear BP-only evidence.
 **Mode:** mvp
 **Depends on:** Phase 6
 **Requirements:** POST-01, POST-02, POST-03, POST-04, POST-05
 **Success Criteria:**
+
 1. Canonical BP reliability/output state can feed optional OSD and LSD through verified interfaces with explicit order/method, trigger, and separate work accounting.
 2. Source-resolved SI and OTF implementations preserve their actual inactivation/graph/BP/solve procedures, candidate reconstruction, and kernel compatibility, with acronym choices documented.
 3. Disabling additional processing yields BP-only results; enabling declared nonconvergence fallback preserves those results plus final outcome, fallback origin, and cost.
 4. Pinned native BP-OSD/BP-LSD composites run as references with tested APIs and metadata; their internal BP does not replace the canonical engine under an adapter label.
+
 **Research focus:** Standalone fallback interfaces, reliability conventions, exact SI/OTF variants, and source numerical/API drift.
 **Plans:** TBD
 
 ### Phase 8: Reproducible Campaigns and Statistical Assessment
+
 **Goal:** A researcher can run, resume, and statistically assess paired experiments without losing samples, changing stopping semantics, or hiding uncertainty.
 **Mode:** mvp
 **Depends on:** Phase 7
 **Requirements:** LED-05, SIM-01, SIM-02, SIM-03, STAT-01, STAT-02, STAT-03, STAT-04, STAT-05
 **Success Criteria:**
+
 1. Matched comparison arms consume identical identified samples regardless of worker/branch count, or replay persisted samples when the backend cannot provide that invariance.
 2. The same manifest runs locally and in bounded parallel/HPC jobs; checkpoint/resume and shard merging detect duplicates, incomplete work, and changed configurations/versions.
 3. Before launch, the manifest fixes targets, tolerances, interval procedures, comparison families, stopping rules, and pass/fail/inconclusive criteria; imported/digitized targets retain their uncertainty and provenance.
 4. Synthetic assessment fixtures cover zero/rare failures, fixed-shot and justified adaptive stopping, batch overshoot, insufficient precision, and paired comparisons.
 5. Reports explicitly account for timeout, nonconvergence, partial runs and post-selection, including acceptance probability, conditional denominators, actual work, and environment/timing context.
+
 **Research focus:** Paper-specific precision and budgets, sequential inference, digitization, multiplicity, sample replay, durable shard protocol, and site execution limits.
 **Plans:** TBD
 
 ### Phase 9: CSS Reproduction and Controlled Comparisons
+
 **Goal:** A researcher can assess the selected published CSS results and compare BP mechanisms under shared conditions with trustworthy uncertainty and cost attribution.
 **Mode:** mvp
 **Depends on:** Phase 8
 **Requirements:** EVAL-01, EVAL-02, EVAL-03
 **Success Criteria:**
+
 1. The selected CSS source experiments have pinned faithful configurations and native assessment reports, with original-code/settings gaps retained rather than silently defaulted.
 2. Canonical CSS realizations are assessed against declared published targets; source-faithful passes, discrepancies, inconclusive points, and adaptations are distinguishable in the registry.
 3. Controlled experiments and ablations share codes/noise/samples and explicit budgets, isolating update/schedule, memory/intervention, search/selection, and optional-fallback effects across eligible compositions.
 4. Generated results report outcome classes and aggregate denominators, convergence, iterations, work, runtime and resource context separately, without asserting superiority beyond the observed evidence.
+
 **Research focus:** Final CSS paper/code/rate grid, faithful parameter extraction, meaningful ablation design, precision/power, and cost calibration.
 **Plans:** TBD
 
 ### Phase 10: Correlated Quaternary Execution
+
 **Goal:** A researcher can decode joint Pauli errors through a canonical quaternary BP kernel with verified correlation semantics and explicitly compatible policies.
 **Mode:** mvp
 **Depends on:** Phase 9
 **Requirements:** QBP-01, QBP-02, QBP-03, QBP-04
 **Success Criteria:**
+
 1. A source-defined four-state Pauli kernel uses commutation factors, declared message/numerical conventions, and joint X/Z inference through the shared execution lifecycle.
 2. Joint I/X/Y/Z sampling and analytical/small-code fixtures verify Y errors, correlation, prior normalization, and physical-error-rate conventions.
 3. The independent code-capacity evaluator correctly classifies quaternary candidates and produces the same outcome meanings as the CSS foundation.
 4. Compatible source-backed policy compositions, including quaternary BPGD, execute with traceable semantics; unsupported ports are rejected and new adaptations are labeled.
+
 **Research focus:** Quaternary factor equations, scalar/vector message representations, memory/numeric choices, and policy-specific compatibility derivations.
 **Plans:** TBD
 
 ### Phase 11: Quaternary Reproduction and Comparisons
+
 **Goal:** A researcher can qualify selected correlated code-capacity results and compare joint versus separate inference on identical physical samples.
 **Mode:** mvp
 **Depends on:** Phase 10
 **Requirements:** QEV-01, QEV-02
 **Success Criteria:**
+
 1. Selected quaternary publication experiments have exact source settings, manifests, reference availability records, and canonical reproduction assessments with declared uncertainty/tolerances.
 2. Joint quaternary and separate binary decoders receive the same sampled joint Pauli channel and explicit work/resource budgets; differing inference assumptions remain documented.
 3. Source-backed compatible policy ablations produce replayable results, outcome/work analysis and discrepancy records, with no forced assumption that every binary policy has a faithful quaternary counterpart.
+
 **Research focus:** Quaternary paper targets and native-code availability, matched baseline priors, correlated-noise ablations, and kernel-aware cost comparisons.
 **Plans:** TBD
 
 ### Phase 12: Circuit Models and Canonical Integration
+
 **Goal:** A researcher can run eligible native and canonical decoders on noisy extraction circuits and evaluate detector and logical-observable behavior correctly.
 **Mode:** mvp
 **Depends on:** Phase 11
 **Requirements:** CIR-01, CIR-02, CIR-03, CIR-04, CIR-05
 **Success Criteria:**
+
 1. Circuit manifests identify and hash the noisy circuit, rounds/boundaries, detector/fault representation, observables, extraction/conversion options, and any correlation approximations.
 2. Known injected-fault fixtures verify detector and logical-observable maps; a detector-fitting candidate with wrong logical prediction fails the appropriate observable check.
 3. Eligible canonical policies execute using mathematically compatible factors, with binary reuse justified and richer representations introduced only when required by the selected model.
 4. Pinned circuit references consume matched observations through documented transforms and expose any instrumentation limits.
 5. The ledger distinguishes detector fit and observable correctness and explicitly marks static exact/degenerate recovery fields not applicable when undefined; channel dependencies cannot be silently dropped.
+
 **Research focus:** Extraction circuits, detector/fault factorization, exclusive/correlated mechanisms, rounds/windows, observables, and source reference settings.
 **Plans:** TBD
 
 ### Phase 13: Circuit Reproduction and Comparisons
+
 **Goal:** A researcher can qualify selected published circuit results and compare eligible policy compositions using shared circuit samples and explicit computational budgets.
 **Mode:** mvp
 **Depends on:** Phase 12
 **Requirements:** CEV-01, CEV-02, CEV-03
 **Success Criteria:**
+
 1. Selected circuit source experiments run under pinned source-faithful conditions and produce native-reference assessments with complete model provenance.
 2. Canonical circuit realizations are assessed against the source targets with declared tolerances, stopping/uncertainty procedures, and explicit pass/fail/inconclusive status.
 3. Controlled policy comparisons share circuit samples and budgets and report observable failure, convergence, work, runtime distributions, resources, and post-selection separately.
 4. Circuit-first paper claims deferred during CSS adaptation work are addressed in their original setting; remaining limitations are linked to experiment records and manuscript evidence.
+
 **Research focus:** Circuit paper/figure selection, exact source settings, correlation sensitivity, native/canonical timing comparability, and rare-event precision.
 **Plans:** TBD
 
 ### Phase 14: Completed Mapping Study and Journal Evidence
+
 **Goal:** A reader can audit the full literature map and reproduce the paper's evidence across all three regimes from documented, versioned artifacts.
 **Mode:** mvp
 **Depends on:** Phase 13
 **Requirements:** MAP-04, REG-05, DOC-02, PUB-01, PUB-02, PUB-03
 **Success Criteria:**
+
 1. The systematic map contains the final search update/cutoff, screening flow/counts, source-linked extraction dataset, data dictionary, and limitations.
 2. The enumerated supported paper experiments all have complete manifests, executable entries, assessment/discrepancy reports, and honest evidence status; mapped-only exclusions remain identifiable.
 3. Detailed installation, extension, reference-environment, manifest, sampling, ledger, statistical and HPC guides let a reader reproduce representative evidence through documented commands.
 4. Manuscript tables/figures and quantitative claims regenerate from versioned analyses and linked manifests/ledgers, with uncertainty and failed/inconclusive attempts represented honestly.
 5. A journal manuscript and accessible release bundle cover the canonical policy model, completed mapping study, reproduction evidence, and controlled results from CSS, quaternary, and circuit stages; artifact hashes and environment specifications are included.
+
 **Research focus:** Final map completeness, claim-to-evidence audit, release usability, source/version freeze, and venue-specific manuscript requirements.
 **Plans:** TBD
 
