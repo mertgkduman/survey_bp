@@ -279,6 +279,11 @@ def load_seed_records(path: str | Path) -> dict[str, Any]:
     records = json.loads(Path(path).read_text(encoding="utf-8"))
     if records.get("schema_version") != "1.0":
         raise ValueError("unsupported seed-record schema version")
+    works = records.get("works")
+    paper_experiments = records.get("paper_experiments")
+    execution_events = records.get("execution_events")
+    if not all(isinstance(value, dict) for value in (works, paper_experiments, execution_events)):
+        raise ValueError("seed records require works, paper_experiments, and execution_events objects")
     for work_id, work in records.get("works", {}).items():
         revision = work.get("revision", {})
         if not revision.get("id") or not revision.get("uri"):
@@ -296,10 +301,47 @@ def load_seed_records(path: str | Path) -> dict[str, Any]:
             claim_state=claim.get("claim_state", ""),
             evidence_maturity=claim.get("evidence_maturity", ""),
         )
-    for event in records.get("execution_events", {}).values():
+    for paper_id, paper in paper_experiments.items():
+        if not isinstance(paper, Mapping) or paper.get("work_id") not in works:
+            raise ValueError("paper experiment must reference a known work")
+        work = works[paper["work_id"]]
+        if paper.get("revision_id") != work.get("revision", {}).get("id"):
+            raise ValueError("paper experiment revision does not match its pinned work")
+        result_ids = {result.get("result_id") for result in work.get("css_results", [])}
+        if paper.get("result_id") not in result_ids:
+            raise ValueError("paper experiment must reference an anchored CSS result")
+        if paper.get("evidence_maturity") != "mapped_only" or paper.get("assessment_status") != "not_assessed":
+            raise ValueError("a pilot adaptation cannot promote a linked paper experiment")
+        if not isinstance(paper.get("pilot_run_ids"), list):
+            raise ValueError("paper experiment requires an explicit pilot run list")
+    for run_id, event in execution_events.items():
+        if not isinstance(event, Mapping) or event.get("run_id") != run_id:
+            raise ValueError("execution event key and run_id must agree")
         paper_id = event.get("paper_experiment_id")
-        if paper_id not in records.get("paper_experiments", {}):
+        if paper_id not in paper_experiments:
             raise ValueError("execution event must reference a distinct known paper experiment")
-        if event.get("status") != "completed" and event.get("evidence_maturity") != "mapped_only":
-            raise ValueError("an uncompleted execution cannot be promoted")
+        paper = paper_experiments[paper_id]
+        if run_id not in paper["pilot_run_ids"]:
+            raise ValueError("execution event must be reciprocally linked by its paper experiment")
+        required = {
+            "status", "relation", "evidence_maturity", "assessment_status", "assessment_reason",
+            "manifest_path", "events_path", "result_path", "artifact_raw_sha256", "artifact_semantic_sha256",
+        }
+        if any(not event.get(field) for field in required):
+            raise ValueError("execution event lacks required provenance fields")
+        if event.get("relation") != "pilot_adaptation" or event.get("assessment_status") != "not_assessed":
+            raise ValueError("Phase 1 execution evidence must remain a not_assessed pilot_adaptation")
+        if event.get("status") != "completed" or event.get("evidence_maturity") != "reference_executable":
+            raise ValueError("only a completed verified pilot may be reference_executable")
+        from .cli import verify_run
+
+        verified = verify_run(Path(event["result_path"]).parent)
+        if verified["run_id"] != run_id:
+            raise ValueError("verified run ID does not match execution evidence")
+        result = json.loads(Path(event["result_path"]).read_text(encoding="utf-8"))
+        if (result.get("relation") != event["relation"]
+                or result.get("assessment_status") != event["assessment_status"]
+                or result.get("artifact", {}).get("raw_sha256") != event["artifact_raw_sha256"]
+                or result.get("artifact", {}).get("semantic_sha256") != event["artifact_semantic_sha256"]):
+            raise ValueError("execution evidence does not match its verified result artifact")
     return records

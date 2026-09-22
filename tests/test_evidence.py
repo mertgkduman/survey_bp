@@ -256,3 +256,14 @@ def test_verify_run_rejects_terminal_provenance_tampering(tmp_path):
     (output / "events.jsonl").write_text("\n".join(lines) + "\n")
     with pytest.raises(ValueError, match="provenance"):
         verify_run(output)
+
+
+def test_seed_records_reject_pilot_maturity_promotion(tmp_path):
+    from bp_registry import evidence
+
+    records = json.loads(Path("data/evidence/seed-records.json").read_text())
+    records["paper_experiments"]["bhatnagar-impulse:Figure 6"]["evidence_maturity"] = "statistically_assessed"
+    path = tmp_path / "promoted.json"
+    path.write_text(json.dumps(records))
+    with pytest.raises(ValueError, match="cannot promote"):
+        evidence.load_seed_records(path)
