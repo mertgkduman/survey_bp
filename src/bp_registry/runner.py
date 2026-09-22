@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import argparse
 from dataclasses import dataclass
+from hashlib import sha256
+from importlib.metadata import version
 from pathlib import Path
 
 from .css import fixture_code
@@ -33,19 +35,36 @@ def run_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path)
         "code_id": manifest.code_id,
         "experiment_relation": manifest.experiment_relation,
         "expected_output_status": manifest.expected_output_status,
+        "decoder_config": {
+            "bp_method": manifest.bp_method,
+            "schedule": manifest.schedule,
+            "input_vector_type": manifest.input_vector_type,
+            "error_rate": manifest.x_error_rate,
+            "max_iter": manifest.max_iter,
+        },
+        "decoder_version": version("ldpc"),
     }
+    sample_seed_identity = sha256(
+        f"bp-registry-sample-v1\0{digest}\0{shot_id}".encode()
+    ).hexdigest()
     with Writer(ledger_path) as ledger:
-        ledger.begin(run_id=manifest.run_id, shot_id=shot_id, **common)
+        ledger.begin(
+            run_id=manifest.run_id, shot_id=shot_id,
+            sample_seed_identity=sample_seed_identity, **common,
+        )
+        stage = "sampling"
         try:
             sample = sampling.sample_shot(
                 code, manifest_identity=digest, seed=manifest.seed, shot_id=shot_id,
                 x_error_rate=manifest.x_error_rate,
             )
+            stage = "decoding"
             native = reference.decode(
                 code.hz, sample.observation.syndrome, error_rate=manifest.x_error_rate,
                 max_iter=manifest.max_iter, bp_method=manifest.bp_method,
                 schedule=manifest.schedule, input_vector_type=manifest.input_vector_type,
             )
+            stage = "evaluation"
             evaluation = evaluator.evaluate_candidate(
                 code, true_x=sample.hidden.x, true_z=sample.hidden.z,
                 candidate_x=native.candidate,
@@ -58,16 +77,29 @@ def run_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path)
                 candidate=native.candidate.tolist(), native_converged=native.converged,
                 native_iterations=native.iterations, native_edge_updates=None,
                 native_edge_updates_missing_reason=native.edge_updates_missing_reason,
+                native_internals_unavailable_reason=native.edge_updates_missing_reason,
                 outcome=evaluation.outcome, logical_action_agrees=evaluation.logical_action_agrees,
-                postselection="none",
+                selected_output=native.candidate.tolist(), selection_status="native_bp_candidate",
+                postselection="none", postselection_status="not_requested",
             )
             return ShotResult(
                 manifest.run_id, shot_id, evaluation.outcome, native.converged, native.iterations
             )
         except Exception as exc:
-            ledger.terminal(run_id=manifest.run_id, shot_id=shot_id, **common,
-                            termination="exception", exception_type=type(exc).__name__,
-                            exception_message=str(exc), outcome=None)
+            ledger.terminal(
+                run_id=manifest.run_id, shot_id=shot_id, **common,
+                termination="exception", exception_stage=stage,
+                exception_type=type(exc).__name__, exception_message=str(exc),
+                native_converged=None, native_iterations=None, native_edge_updates=None,
+                native_internals_unavailable_reason=(
+                    f"native internals unavailable because {stage} raised before terminal evaluation"
+                ),
+                outcome=None, outcome_unavailable_reason=(
+                    f"independent outcome unavailable because {stage} raised"
+                ),
+                selected_output=None, selection_status="unavailable_due_to_exception",
+                postselection="unavailable",
+            )
             raise
 
 
