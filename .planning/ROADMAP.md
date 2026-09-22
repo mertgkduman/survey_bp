@@ -49,7 +49,18 @@ Build a provenance-preserving research platform from paper evidence through nati
 4. A documented local command runs a pinned native binary BP baseline on identified shots and writes linked outcomes/provenance, including nonconvergence and termination; no pilot is mislabeled statistically reproduced.
 5. Registry evidence statuses distinguish mapped records, executable references, canonical implementations, and assessed results, including unavailable original code or missing source settings.
 **Research focus:** Mapping protocol and initial corpus; exact source/reference selection and installation; CSS code/logical serialization; mathematical oracle; manifest/ledger contracts.
-**Plans:** TBD
+**Plans:** 9 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Wave 0 Python tests and observed environment identity
+- [ ] 01-02-PLAN.md — Blocking package legitimacy gate before new installs
+- [ ] 01-03-PLAN.md — End-to-end source-linked CSS native tracer
+- [ ] 01-04-PLAN.md — CSS algebra, artifact hashes, sampling, and outcome oracle
+- [ ] 01-05-PLAN.md — Durable per-shot ledger and interruption reconciliation
+- [ ] 01-06-PLAN.md — Mapping protocol and BPGD/impulse CSS evidence extraction
+- [ ] 01-07-PLAN.md — Strict manifest and immutable-input preflight
+- [ ] 01-08-PLAN.md — Candidate inventory and verified source-artifact freeze
+- [ ] 01-09-PLAN.md — Pinned 32-shot native CSS pilot and linked results
 
 ### Phase 2: Canonical CSS Execution and Policy Contracts
 **Goal:** A researcher can inspect and run a canonical binary BP policy composition with trustworthy outcomes and computational attribution.
