@@ -11,6 +11,7 @@ from pathlib import Path
 import sys
 from typing import Any, Literal, TypeAlias
 
+import numpy as np
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from .artifacts import LoadedArtifact, load_artifact
@@ -44,11 +45,25 @@ class PaperV1(StrictModel):
         return value
 
 
+class MatrixHashesV1(StrictModel):
+    """Separate role- and order-sensitive identities for each CSS object."""
+
+    hx_raw_sha256: str = Field(pattern=_SHA256)
+    hz_raw_sha256: str = Field(pattern=_SHA256)
+    lx_raw_sha256: str = Field(pattern=_SHA256)
+    lz_raw_sha256: str = Field(pattern=_SHA256)
+    hx_semantic_sha256: str = Field(pattern=_SHA256)
+    hz_semantic_sha256: str = Field(pattern=_SHA256)
+    lx_semantic_sha256: str = Field(pattern=_SHA256)
+    lz_semantic_sha256: str = Field(pattern=_SHA256)
+
+
 class ArtifactV1(StrictModel):
     root: str = Field(min_length=1)
     path: str = Field(min_length=1)
     raw_sha256: str = Field(pattern=_SHA256)
     semantic_sha256: str = Field(pattern=_SHA256)
+    matrix_hashes: MatrixHashesV1
     format_version: Literal[1]
     code_id: str = Field(min_length=1)
 
@@ -264,6 +279,35 @@ def _actual_environment() -> dict[str, str]:
     }
 
 
+def _matrix_raw_bytes(matrix: np.ndarray) -> bytes:
+    """Stable JSON-value bytes preserve each artifact matrix's stored row order."""
+    return json.dumps(matrix.tolist(), separators=(",", ":")).encode("utf-8")
+
+
+def _matrix_semantic_bytes(role: str, matrix: np.ndarray) -> bytes:
+    """Role, shape, and bit ordering make the semantic identity unambiguous."""
+    return b"BPREG-MATRIX-V1\0" + role.encode("ascii") + b"\0" + (
+        f"{matrix.shape[0]}x{matrix.shape[1]}\0".encode("ascii")
+    ) + np.packbits(matrix.reshape(-1), bitorder="little").tobytes()
+
+
+def matrix_hashes(code: CssCode) -> dict[str, str]:
+    """Return v1 raw and semantic digests for Hx, Hz, Lx, and Lz in order."""
+    validated = code.validate()
+    if validated.lx is None or validated.lz is None:
+        raise ValueError("matrix identities require the ordered paired logical basis")
+    values: dict[str, str] = {}
+    for name, role, matrix in (
+        ("hx", "Hx", validated.hx), ("hz", "Hz", validated.hz),
+        ("lx", "Lx", validated.lx), ("lz", "Lz", validated.lz),
+    ):
+        values[f"{name}_raw_sha256"] = hashlib.sha256(_matrix_raw_bytes(matrix)).hexdigest()
+        values[f"{name}_semantic_sha256"] = hashlib.sha256(
+            _matrix_semantic_bytes(role, matrix)
+        ).hexdigest()
+    return values
+
+
 def _verify_environment(environment: EnvironmentV1, decoder: DecoderV1) -> None:
     actual = _actual_environment()
     if actual != environment.model_dump():
@@ -292,6 +336,13 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
         raise ValueError("artifact format version does not match manifest")
     # Explicitly validate again at the trust boundary even though the loader does.
     code = artifact.code.validate()
+    expected_hashes = manifest.artifact.matrix_hashes.model_dump()
+    actual_hashes = matrix_hashes(code)
+    for name, expected in expected_hashes.items():
+        if actual_hashes[name] != expected:
+            matrix, hash_kind, _ = name.split("_", 2)
+            label = f"{matrix.upper()[0]}{matrix[1:]} {hash_kind} SHA-256"
+            raise ValueError(f"{label} does not match the artifact")
     return ResolvedExperiment(manifest=manifest, code=code, artifact=artifact)
 
 

@@ -28,8 +28,10 @@ def _manifest(tmp_path: Path, **changes: object) -> dict[str, object]:
     artifact.write_text(json.dumps(_artifact_payload(), separators=(",", ":")))
     raw = hashlib.sha256(artifact.read_bytes()).hexdigest()
     from bp_registry.artifacts import load_artifact
+    from bp_registry.manifests import matrix_hashes
 
-    semantic = load_artifact(root, artifact.name).semantic_sha256
+    loaded = load_artifact(root, artifact.name)
+    semantic = loaded.semantic_sha256
     manifest: dict[str, object] = {
         "schema_version": 1,
         "run_id": "strict-fixture",
@@ -46,6 +48,7 @@ def _manifest(tmp_path: Path, **changes: object) -> dict[str, object]:
             "path": artifact.name,
             "raw_sha256": raw,
             "semantic_sha256": semantic,
+            "matrix_hashes": matrix_hashes(loaded.code),
             "format_version": 1,
             "code_id": "project-three-qubit-css-fixture",
         },
@@ -167,6 +170,14 @@ def test_preflight_confines_and_verifies_artifact_and_environment(tmp_path):
     changed["artifact"] = {**changed["artifact"], "raw_sha256": "0" * 64}
     with pytest.raises(ValueError, match="raw SHA-256"):
         preflight(changed)
+
+    changed_matrix = _manifest(tmp_path)
+    changed_matrix["artifact"] = {
+        **changed_matrix["artifact"],
+        "matrix_hashes": {**changed_matrix["artifact"]["matrix_hashes"], "hx_semantic_sha256": "0" * 64},
+    }
+    with pytest.raises(ValueError, match="Hx semantic SHA-256"):
+        preflight(changed_matrix)
 
     wrong_environment = _manifest(tmp_path)
     wrong_environment["environment"] = {**wrong_environment["environment"], "ldpc": "0.0.0"}
