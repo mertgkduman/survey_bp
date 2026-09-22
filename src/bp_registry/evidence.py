@@ -294,7 +294,7 @@ def load_seed_records(path: str | Path) -> dict[str, Any]:
             if not result.get("result_id") or not result.get("anchor"):
                 raise ValueError(f"work {work_id!r} has an unanchored CSS result")
     for claim in records.get("claims", []):
-        Claim(
+        validated_claim = Claim(
             work_id=claim.get("work_id", ""),
             revision_id=claim.get("revision_id", ""),
             anchor=claim.get("anchor", ""),
@@ -303,6 +303,13 @@ def load_seed_records(path: str | Path) -> dict[str, Any]:
             claim_state=claim.get("claim_state", ""),
             evidence_maturity=claim.get("evidence_maturity", ""),
         )
+        work = works.get(validated_claim.work_id)
+        if work is None:
+            raise ValueError(f"claim references unknown work: {validated_claim.work_id}")
+        if validated_claim.revision_id != work["revision"]["id"]:
+            raise ValueError(
+                f"claim revision does not match pinned work: {validated_claim.work_id}"
+            )
     for paper_id, paper in paper_experiments.items():
         if not isinstance(paper, Mapping) or paper.get("work_id") not in works:
             raise ValueError("paper experiment must reference a known work")
