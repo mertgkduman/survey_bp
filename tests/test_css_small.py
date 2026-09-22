@@ -162,6 +162,11 @@ def test_artifact_loader_confines_paths_and_verifies_both_identities(tmp_path):
 def test_evaluator_separates_exact_from_degenerate(small_css_checks):
     import numpy as np
     from bp_registry.css import CssCode
+    import importlib.util
+
+    assert importlib.util.find_spec("bp_registry.evaluator") is not None, (
+        "outcomes must be evaluated outside the native adapter"
+    )
     from bp_registry.evaluator import evaluate_candidate
 
     hx, hz = small_css_checks
@@ -169,4 +174,28 @@ def test_evaluator_separates_exact_from_degenerate(small_css_checks):
     zero = np.zeros(3, dtype=np.uint8)
     stabilizer = hx[0]
     assert evaluate_candidate(code, true_error=zero, candidate=zero).outcome == "exact"
-    assert evaluate_candidate(code, true_error=zero, candidate=stabilizer).outcome == "degenerate"
+    assert evaluate_candidate(code, true_error=zero, candidate=stabilizer).outcome == "stabilizer_equivalent"
+
+
+def test_evaluator_has_four_disjoint_x_outcomes(small_css_checks):
+    import numpy as np
+    import importlib.util
+    from bp_registry.css import CssCode
+
+    assert importlib.util.find_spec("bp_registry.evaluator") is not None, (
+        "outcomes must be evaluated outside the native adapter"
+    )
+    from bp_registry.evaluator import evaluate_candidate
+
+    hx, hz = small_css_checks
+    code = CssCode(hx=hx, hz=hz, lx=np.array([[1, 0, 0]], dtype=np.uint8),
+                   lz=np.array([[1, 1, 0]], dtype=np.uint8)).validate()
+    zero = np.zeros(3, dtype=np.uint8)
+    assert evaluate_candidate(code, true_error=zero, candidate=np.array([0, 0, 1])).outcome == "invalid_syndrome"
+    assert evaluate_candidate(code, true_error=zero, candidate=zero).outcome == "exact"
+    stabilizer = evaluate_candidate(code, true_error=zero, candidate=hx[0])
+    assert stabilizer.outcome == "stabilizer_equivalent"
+    assert stabilizer.logical_action_agrees is True
+    logical = evaluate_candidate(code, true_error=zero, candidate=np.array([1, 0, 0]))
+    assert logical.outcome == "logical_failure"
+    assert logical.logical_action_agrees is True
