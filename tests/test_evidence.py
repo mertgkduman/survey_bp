@@ -219,6 +219,24 @@ def test_seed_claims_remain_anchored_queryable_and_maturity_safe():
     assert records["paper_experiments"][pilot["paper_experiment_id"]]["evidence_maturity"] == "mapped_only"
 
 
+@pytest.mark.parametrize(
+    "change",
+    [
+        {"work_id": "unregistered-paper"},
+        {"revision_id": "unregistered-revision"},
+    ],
+)
+def test_seed_claim_must_resolve_to_registered_work_revision(tmp_path, change):
+    from bp_registry import evidence
+
+    records = json.loads(Path("data/evidence/seed-records.json").read_text())
+    records["claims"][0].update(change)
+    altered = tmp_path / "seed-records.json"
+    altered.write_text(json.dumps(records))
+    with pytest.raises(ValueError, match="claim.*(work|revision)"):
+        evidence.load_seed_records(altered)
+
+
 def test_completed_selected_pilot_preserves_final_rows_and_paper_maturity():
     from bp_registry import evidence
     from bp_registry.cli import run_pilot, verify_run
