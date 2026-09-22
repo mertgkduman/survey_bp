@@ -187,3 +187,39 @@ def test_invalid_preflight_never_reaches_sampling_or_native_decode(tmp_path, mon
     with pytest.raises(ValueError, match="source artifact"):
         runner.run_one(path, shot_id=0, ledger_path=tmp_path / "ledger.jsonl")
     assert calls == []
+
+
+@pytest.mark.parametrize("mutation", [
+    lambda manifest: manifest["artifact"].update({"path": "missing.json"}),
+    lambda manifest: manifest["artifact"].update({"path": "../fixture.json"}),
+    lambda manifest: manifest["artifact"].update({"semantic_sha256": "0" * 64}),
+    lambda manifest: manifest["artifact"].update({"format_version": 2}),
+])
+def test_every_invalid_artifact_is_rejected_before_sampling_or_native_decode(
+    tmp_path, monkeypatch, mutation
+):
+    from bp_registry import runner
+
+    calls: list[str] = []
+    monkeypatch.setattr(runner.sampling, "sample_shot", lambda *args, **kwargs: calls.append("sample"))
+    monkeypatch.setattr(runner.reference, "decode", lambda *args, **kwargs: calls.append("decode"))
+    manifest = _manifest(tmp_path)
+    mutation(manifest)
+    path = tmp_path / "invalid-artifact.json"
+    path.write_text(json.dumps(manifest))
+    with pytest.raises((ValueError, FileNotFoundError)):
+        runner.run_one(path, shot_id=0, ledger_path=tmp_path / "ledger.jsonl")
+    assert calls == []
+
+
+def test_runner_consumes_the_verified_resolved_experiment(tmp_path):
+    from bp_registry.runner import run_one
+
+    path = tmp_path / "complete.json"
+    ledger = tmp_path / "ledger.jsonl"
+    path.write_text(json.dumps(_manifest(tmp_path)))
+    result = run_one(path, shot_id=2, ledger_path=ledger)
+    events = [json.loads(line) for line in ledger.read_text().splitlines()]
+    assert result.shot_id == 2
+    assert events[0]["kind"] == "begin"
+    assert events[0]["decoder_config"]["error_rate"] == 0.0
