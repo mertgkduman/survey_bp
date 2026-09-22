@@ -1,17 +1,178 @@
-"""Versioned, strict input contract for the Phase 1 tracer."""
+"""Version-dispatched, strict manifests and immutable simulation preflight."""
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+import hashlib
+from importlib.metadata import version
 import json
 import math
 from pathlib import Path
-from typing import Literal
+import sys
+from typing import Any, Literal, TypeAlias
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+from .artifacts import LoadedArtifact, load_artifact
+from .css import CssCode, fixture_code
 
 
-class Manifest(BaseModel):
+MAX_SHOTS = 1_000_000
+MAX_ITERATIONS = 100_000
+_SHA256 = r"^[0-9a-f]{64}$"
+
+
+class StrictModel(BaseModel):
+    """The persisted manifest never coerces settings or silently keeps extras."""
+
     model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
+
+
+class PaperV1(StrictModel):
+    uri: str = Field(min_length=1)
+    revision: str = Field(min_length=1)
+    experiment_anchor: str = Field(min_length=1)
+    relation: Literal["pilot_adaptation", "source_faithful"]
+    source_artifact_sha256: str = Field(pattern=_SHA256)
+    source_artifact_status: Literal["verified", "unverified"]
+
+    @field_validator("uri")
+    @classmethod
+    def https_uri(cls, value: str) -> str:
+        if not value.startswith("https://"):
+            raise ValueError("paper URI must use HTTPS")
+        return value
+
+
+class ArtifactV1(StrictModel):
+    root: str = Field(min_length=1)
+    path: str = Field(min_length=1)
+    raw_sha256: str = Field(pattern=_SHA256)
+    semantic_sha256: str = Field(pattern=_SHA256)
+    format_version: Literal[1]
+    code_id: str = Field(min_length=1)
+
+
+class DecoderV1(StrictModel):
+    implementation: Literal["ldpc"]
+    version: str = Field(min_length=1)
+    entry_point: Literal["ldpc.BpDecoder"]
+    bp_method: Literal["product_sum"]
+    schedule: Literal["parallel"]
+    input_vector_type: Literal["syndrome"]
+    parameter_names: tuple[Literal[
+        "error_rate", "max_iter", "bp_method", "schedule", "input_vector_type",
+    ], ...] = Field(min_length=5, max_length=5)
+
+    @field_validator("parameter_names", mode="before")
+    @classmethod
+    def json_array_to_tuple(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @model_validator(mode="after")
+    def exact_parameter_names(self) -> "DecoderV1":
+        required = (
+            "error_rate", "max_iter", "bp_method", "schedule", "input_vector_type",
+        )
+        if self.parameter_names != required:
+            raise ValueError("decoder parameter names must be explicit and ordered")
+        return self
+
+
+class NoiseV1(StrictModel):
+    channel: Literal["x_only_bit_flip"]
+    x_error_rates: tuple[float, ...] = Field(min_length=1, max_length=1000)
+
+    @field_validator("x_error_rates", mode="before")
+    @classmethod
+    def json_rates_to_tuple(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @field_validator("x_error_rates")
+    @classmethod
+    def rates_are_finite_floats(cls, values: tuple[float, ...]) -> tuple[float, ...]:
+        for value in values:
+            if type(value) is not float or not math.isfinite(value) or not 0 <= value <= 1:
+                raise ValueError("x_error_rates must be finite floats in [0, 1]")
+        return values
+
+
+class SeedPolicyV1(StrictModel):
+    root_seed: int = Field(ge=0)
+    derivation: Literal["sha256-manifest-shot-v1"]
+
+
+class BudgetV1(StrictModel):
+    max_shots: int = Field(ge=1, le=MAX_SHOTS)
+    max_iter: int = Field(ge=1, le=MAX_ITERATIONS)
+    stopping_rule: Literal["fixed_shots"]
+    denominator_rule: Literal["all_terminal_shots"]
+
+
+class EnvironmentV1(StrictModel):
+    python: str = Field(min_length=1)
+    numpy: str = Field(min_length=1)
+    scipy: str = Field(min_length=1)
+    ldpc: str = Field(min_length=1)
+    backend: Literal["cpu"]
+
+
+class ExpectedOutputV1(StrictModel):
+    status: Literal["not_assessed", "assessed"]
+    reason: str = Field(min_length=1)
+    values: tuple[float, ...]
+    tolerance: float | None = Field(default=None, ge=0)
+    statistical_verdict: Literal["pass", "fail", "inconclusive"] | None = None
+
+    @field_validator("values", mode="before")
+    @classmethod
+    def json_values_to_tuple(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @model_validator(mode="after")
+    def status_matches_criteria(self) -> "ExpectedOutputV1":
+        if self.status == "not_assessed":
+            if self.values or self.tolerance is not None or self.statistical_verdict is not None:
+                raise ValueError("not_assessed output cannot carry values, tolerance, or verdict")
+        elif not self.values or self.tolerance is None or self.statistical_verdict is None:
+            raise ValueError("assessed output requires values, tolerance, and a verdict")
+        return self
+
+
+class ManifestV1(StrictModel):
+    """Complete, immutable settings for a pinned CSS code-capacity experiment."""
+
+    schema_version: Literal[1]
+    run_id: str = Field(min_length=1)
+    paper: PaperV1
+    artifact: ArtifactV1
+    decoder: DecoderV1
+    noise: NoiseV1
+    seed_policy: SeedPolicyV1
+    budget: BudgetV1
+    environment: EnvironmentV1
+    expected_output: ExpectedOutputV1
+    discrepancies: tuple[str, ...] = Field(min_length=1)
+
+    @field_validator("discrepancies", mode="before")
+    @classmethod
+    def json_discrepancies_to_tuple(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @field_validator("discrepancies")
+    @classmethod
+    def discrepancies_are_explanatory(cls, values: tuple[str, ...]) -> tuple[str, ...]:
+        if any(not value.strip() for value in values):
+            raise ValueError("discrepancies must contain explanatory text")
+        return values
+
+
+# ``Manifest`` remains public for callers importing the original tracer name.
+Manifest = ManifestV1
+
+
+class LegacyManifestV1(StrictModel):
+    """Read-only v1 tracer shape retained so saved pilot records still run."""
 
     schema_version: Literal[1]
     run_id: str = Field(min_length=1)
@@ -23,39 +184,119 @@ class Manifest(BaseModel):
     expected_output_status: Literal["not_assessed"]
     x_error_rate: float
     seed: int = Field(ge=0)
-    max_iter: int = Field(ge=1)
+    max_iter: int = Field(ge=1, le=MAX_ITERATIONS)
     bp_method: Literal["product_sum"]
     schedule: Literal["parallel"]
     input_vector_type: Literal["syndrome"]
 
+    @field_validator("source_uri")
+    @classmethod
+    def legacy_https_uri(cls, value: str) -> str:
+        if not value.startswith("https://"):
+            raise ValueError("source_uri must be an HTTPS source reference")
+        return value
+
     @field_validator("x_error_rate")
     @classmethod
-    def valid_rate(cls, value: float) -> float:
-        if not math.isfinite(value) or not 0 <= value <= 1:
-            raise ValueError("x_error_rate must be finite and in [0,1]")
+    def legacy_rate(cls, value: float) -> float:
+        if type(value) is not float or not math.isfinite(value) or not 0 <= value <= 1:
+            raise ValueError("x_error_rate must be a finite float in [0, 1]")
         return value
 
 
-def preflight(value: Manifest | dict | str | Path) -> Manifest:
-    """Validate the whole fixture before sampling or invoking native code."""
-    if isinstance(value, Manifest):
-        manifest = value
-    elif isinstance(value, (str, Path)):
+ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1
+
+
+@dataclass(frozen=True)
+class ResolvedExperiment:
+    """Preflight output; runner receives verified code instead of manifest paths."""
+
+    manifest: ManifestRecord
+    code: CssCode
+    artifact: LoadedArtifact | None
+
+
+def _read_value(value: dict[str, Any] | str | Path) -> dict[str, Any]:
+    if isinstance(value, (str, Path)):
         path = Path(value)
         if not path.is_file():
             raise FileNotFoundError(path)
-        manifest = Manifest.model_validate_json(path.read_text(encoding="utf-8"))
+        decoded = json.loads(path.read_text(encoding="utf-8"))
     else:
-        manifest = Manifest.model_validate(value)
-    if not manifest.source_uri.startswith("https://"):
-        raise ValueError("source_uri must be an HTTPS source reference")
-    if not manifest.source_revision.strip() or not manifest.source_anchor.strip():
-        raise ValueError("source revision and anchor are required")
-    return manifest
+        decoded = value
+    if not isinstance(decoded, dict):
+        raise ValueError("manifest must be a JSON object")
+    return decoded
 
 
-def manifest_digest(manifest: Manifest) -> str:
-    import hashlib
+def parse_manifest(value: ManifestV1 | dict[str, Any] | str | Path) -> ManifestV1:
+    """Dispatch only complete persisted schemas; unknown versions never fall through."""
+    if isinstance(value, ManifestV1):
+        return value
+    decoded = _read_value(value)
+    if decoded.get("schema_version") != 1:
+        raise ValueError(f"unsupported manifest schema version {decoded.get('schema_version')!r}")
+    return ManifestV1.model_validate(decoded)
 
-    payload = json.dumps(manifest.model_dump(), sort_keys=True, separators=(",", ":"))
+
+def _parse_for_preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ManifestRecord:
+    if isinstance(value, (ManifestV1, LegacyManifestV1)):
+        return value
+    decoded = _read_value(value)
+    if decoded.get("schema_version") != 1:
+        raise ValueError(f"unsupported manifest schema version {decoded.get('schema_version')!r}")
+    complete_fields = {
+        "paper", "artifact", "decoder", "noise", "seed_policy", "budget", "environment",
+        "expected_output", "discrepancies",
+    }
+    if complete_fields.issubset(decoded):
+        return ManifestV1.model_validate(decoded)
+    return LegacyManifestV1.model_validate(decoded)
+
+
+def _actual_environment() -> dict[str, str]:
+    return {
+        "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+        "numpy": version("numpy"),
+        "scipy": version("scipy"),
+        "ldpc": version("ldpc"),
+        "backend": "cpu",
+    }
+
+
+def _verify_environment(environment: EnvironmentV1, decoder: DecoderV1) -> None:
+    actual = _actual_environment()
+    if actual != environment.model_dump():
+        raise ValueError("manifest environment does not match this execution environment")
+    if decoder.version != actual["ldpc"]:
+        raise ValueError("native decoder version does not match the execution environment")
+
+
+def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedExperiment:
+    """Resolve immutable CSS input and runtime identity before any simulation work."""
+    manifest = _parse_for_preflight(value)
+    if isinstance(manifest, LegacyManifestV1):
+        # Original minimal v1 tracer records are immutable historical evidence.
+        # They are retained for replay only; new records must use ManifestV1.
+        return ResolvedExperiment(manifest=manifest, code=fixture_code(), artifact=None)
+    if manifest.paper.source_artifact_status != "verified":
+        raise ValueError("source artifact is not verified")
+    _verify_environment(manifest.environment, manifest.decoder)
+    artifact = load_artifact(
+        manifest.artifact.root,
+        manifest.artifact.path,
+        expected_raw_sha256=manifest.artifact.raw_sha256,
+        expected_semantic_sha256=manifest.artifact.semantic_sha256,
+    )
+    if artifact.format_version != manifest.artifact.format_version:
+        raise ValueError("artifact format version does not match manifest")
+    # Explicitly validate again at the trust boundary even though the loader does.
+    code = artifact.code.validate()
+    return ResolvedExperiment(manifest=manifest, code=code, artifact=artifact)
+
+
+def manifest_digest(manifest: ManifestRecord) -> str:
+    payload = json.dumps(
+        manifest.model_dump(mode="json"), sort_keys=True, separators=(",", ":")
+    )
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
