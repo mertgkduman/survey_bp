@@ -1,9 +1,9 @@
 ---
 phase: "1"
 slug: "evidence-registry-and-native-css-baseline"
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: validated
+nyquist_compliant: true
+wave_0_complete: true
 created: "2026-09-22"
 ---
 
@@ -16,10 +16,10 @@ created: "2026-09-22"
 | Property | Value |
 |---|---|
 | Framework | `pytest 9.0.3` locally; capture exact environment at execution |
-| Config file | `pyproject.toml` to create in Wave 0 |
-| Quick run | `python -m pytest -q tests/test_css_small.py tests/test_manifest.py tests/test_reference_smoke.py` after Wave 0 |
-| Full suite | `python -m pytest -q` |
-| Feedback target | Local quick suite under 60 seconds; measure during execution |
+| Config file | `pyproject.toml` |
+| Quick run | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_css_small.py tests/test_manifest.py tests/test_reference_smoke.py` |
+| Full suite | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q` |
+| Observed full run | 66 passed in 24.22 seconds on 2026-09-22 |
 
 ## Sampling Rate
 
@@ -32,19 +32,19 @@ created: "2026-09-22"
 
 | Requirement | Automated evidence | Planned test file | Exists |
 |---|---|---|---|
-| MAP-01–03 | Protocol required fields, dedup/revision/screening history reload, taxonomy and unresolved claims | `tests/test_evidence.py` | No — Wave 0 |
-| REG-01–02 | Strict schema and preflight reject missing settings, extra fields, bad rates, missing files, changed hashes before decoder invocation | `tests/test_manifest.py` | No — Wave 0 |
-| REG-03–04 | Pinned native BP syndrome smoke; pilot lineage cannot become statistically assessed merely by execution | `tests/test_reference_smoke.py` | No — Wave 0 |
-| CSS-01–02 | GF(2) checks/logicals, pairing, dimensions, ordered semantic hashes, row/bit mutation rejection | `tests/test_css_small.py` | No — Wave 0 |
-| CSS-03 | Fixed-seed X-only and separate X/Z syndrome conventions; decoder receives no hidden truth | `tests/test_sampling.py` | No — Wave 0 |
-| CSS-04 | Exact, stabilizer-equivalent, logical-failure, invalid-syndrome outcomes checked against independent row-space and logical-action methods | `tests/test_css_small.py` | No — Wave 0 |
-| LED-01 | Success, nonconvergence, exception, and interrupted begin reconcile to one terminal shot row each | `tests/test_ledger.py` | No — Wave 0 |
+| MAP-01–03 | Protocol, event history, anchored source inventory, taxonomy, and maturity-safe queries | `tests/test_evidence.py`, `tests/test_source_artifact.py` | Yes — passing |
+| REG-01–02 | Strict schema, immutable preflight, identity and path mutation rejection | `tests/test_manifest.py` | Yes — passing |
+| REG-03–04 | Native BP smoke, public CLI subprocess, pilot labels and maturity constraints | `tests/test_reference_smoke.py`, `tests/test_phase1_cli.py`, `tests/test_evidence.py` | Yes — passing |
+| CSS-01–02 | GF(2) checks/logicals, pairing, ordered hashes, frozen source artifact | `tests/test_css_small.py`, `tests/test_source_artifact.py` | Yes — passing |
+| CSS-03 | Identified deterministic sampling, X/Z orientation and decoder-visible boundary | `tests/test_sampling.py`, `tests/test_reference_smoke.py` | Yes — passing |
+| CSS-04 | Four independent evaluator outcomes and pilot ledger outcome reconstruction | `tests/test_css_small.py`, `tests/test_phase1_cli.py` | Yes — passing |
+| LED-01 | Durable final records, interruption repair, idempotency and 32-shot reconciliation | `tests/test_ledger.py`, `tests/test_phase1_cli.py` | Yes — passing |
 
 ## Wave 0 Requirements
 
-- [ ] Create `pyproject.toml`, the package skeleton, small CSS fixtures, and the seven listed test files before referencing runnable verify commands.
-- [ ] Pin and record the environment actually used; verify the native adapter API against the installed version.
-- [ ] Use an isolated install only after the package legitimacy checkpoint recorded in RESEARCH.md.
+- [x] Create `pyproject.toml`, the package skeleton, and contract tests before implementation.
+- [x] Record the observed environment and verify the installed native adapter API.
+- [x] Install new packages in the isolated environment only after the Plan 02 human checkpoint.
 
 ## Manual-Only Verifications
 
@@ -56,9 +56,21 @@ created: "2026-09-22"
 
 ## Validation Sign-Off
 
-- [ ] Every task has an automated check or a declared Wave 0 dependency.
-- [ ] No three consecutive tasks lack automated verification.
-- [ ] Full suite and pilot evidence review pass.
-- [ ] Set `nyquist_compliant: true` only after validation audit.
+- [x] Every task has an automated check or a declared Wave 0 dependency.
+- [x] No three consecutive tasks lack automated verification.
+- [x] Full suite and pilot `verify-run` pass.
+- [x] Nyquist audit completed; manual source judgments remain listed above.
 
-**Approval:** pending execution and audit
+**Approval:** automated coverage validated 2026-09-22; source-fidelity judgments remain manual.
+
+## Validation Audit 2026-09-22
+
+| Metric | Count |
+|---|---:|
+| Phase requirements with automated coverage | 12 |
+| Gaps found | 1 |
+| Resolved | 1 |
+| Escalated | 0 |
+
+The audit added `tests/test_phase1_cli.py` to exercise documented preflight and
+run verification in fresh subprocesses. The resulting full suite passed 66 tests.
