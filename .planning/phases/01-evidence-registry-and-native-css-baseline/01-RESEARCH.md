@@ -91,6 +91,8 @@ This mapping implements the project architecture boundary rather than a claim ab
 
 **Revision and result anchors:** BPGD v2 is dated 21 June 2024; impulse v1 is dated 16 June 2026. BPGD says its B1/C2 BP/BP-OSD/BPGD data points run until 100 errors, with comparison data for BP-SI taken from another paper. Impulse says plots use at least 100 failures, BP runs use `T=100`, messages are clipped to `[-25,25]`, and simulation data are available from authors on reasonable request. Record these as source-specific fields, including denominator and provenance, rather than pooling them into one generic result. [CITED: https://arxiv.org/abs/2312.10950] [CITED: https://arxiv.org/abs/2606.18240] [CITED: https://arxiv.org/html/2312.10950v2] [CITED: https://arxiv.org/html/2606.18240v1]
 
+**Seed extraction coverage gate:** For BPGD, extract bit-flip Figures 2–6 and Table 1 as distinct experiment/result records, including B1 versus C2, BP/BP-OSD/BP-SI comparison provenance, decimation variant and round cap. Mark Figures 7–8 as identified quaternary material for later extraction. For impulse, extract code-capacity Figures 1–7 and Table I, including BB-288, B1, BB-144, B2, shortening value/order, candidate selection, iteration budgets, and conditional latency denominator. Mark Figures 8–9 as identified circuit material for later extraction. A figure can contain multiple curves, so record curve-level configurations instead of one row per caption. [CITED: https://arxiv.org/html/2312.10950v2] [CITED: https://arxiv.org/html/2606.18240v1]
+
 ## Standard Stack
 
 Use the locally probed Python 3.12.2 environment for initial development, with exact environment capture in each run. Installed `numpy 2.2.6`, `scipy 1.17.1`, `ldpc 2.4.1`, and `pytest 9.0.3` were found via package metadata; a direct `ldpc.BpDecoder` syndrome smoke test succeeded with `product_sum`, `parallel`, and explicit syndrome input. `pydantic` is absent. These observations establish local availability, not publication configuration or binary portability to every HPC node. [VERIFIED: local Python metadata/import/BpDecoder probe, 2026-09-22]
@@ -120,7 +122,7 @@ The GSD PyPI legitimacy seam returned **SUS for all six candidates**: its PyPI c
 | pydantic | PyPI | latest release marked too new | unknown | github.com/pydantic/pydantic | SUS | Checkpoint before install |
 | pytest | PyPI | no age concern returned | unknown | github.com/pytest-dev/pytest | SUS | Installed pin; checkpoint before new install |
 
-**Packages removed due to SLOP:** none. **Packages flagged SUS:** all six above. PyPI existence and a local import do not turn an unverified package-name provenance into `[VERIFIED: npm registry]`; use the official links and checkpoint. [CITED: https://pypi.org/]
+**Packages removed due to SLOP:** none. **Packages flagged SUS:** all six above. PyPI existence and a local import do not by themselves establish package provenance; use the official links and checkpoint. [CITED: https://pypi.org/]
 
 ## Architecture Patterns
 
@@ -168,7 +170,7 @@ Define one **project format** before producing hashes: explicit format version; 
 
 ### Ledger and evidence transitions
 
-Use typed JSONL for Phase 1 (one final shot record plus begin/finish control events), with a documented schema version and an idempotent `run_id/shot_id` key. Write begin before sampling; after evaluation write one terminal record. On catchable interruption or restart, reconcile any begin without finish to an `interrupted` final record; leave decoder internals null with `unavailable_reason`. Do not treat SIGKILL as an observed decoder termination. Proposed result aggregates count *all* final classes and nonconverged/interrupted/postselected denominators separately. [CITED: .planning/REQUIREMENTS.md] [ASSUMED]
+Use typed JSONL for Phase 1 (one final shot record plus begin/finish control events), with a documented schema version and an idempotent `run_id/shot_id` key. Derive the physical sample seed from the manifest and stable shot ID; write a begin record containing that identity **before sampling**, so interrupted samples can be regenerated and reconciled. After evaluation write one terminal record. On catchable interruption or restart, reconcile any begin without finish to an `interrupted` final record; leave decoder internals null with `unavailable_reason`. Do not treat SIGKILL as an observed decoder termination. Proposed result aggregates count *all* final classes and nonconverged/interrupted/postselected denominators separately. [CITED: .planning/REQUIREMENTS.md] [ASSUMED]
 
 Evidence promotion is explicit: `mapped_only` means extracted source claims; `reference_executable` means a manifest and pinned native entry run; `canonical_implemented` awaits later policy engine work; `statistically_assessed` awaits a prespecified curve test. Record `pilot_adaptation` as an orthogonal relation to the paper experiment; executing the Gross pilot never promotes the impulse or Bravyi experiment to faithful reproduction. These labels are proposed schema values, **not existing in-repo enums**. [ASSUMED]
 
@@ -285,7 +287,7 @@ Availability is from local command and import probes on the login environment; n
 
 **Per task commit:** run the relevant quick file(s). **Per wave merge and phase gate:** run `python -m pytest -q`, plus one documented 32-shot pilot and inspect its ledger/manifest/artifact links. Phase 1 does not compare a published curve. [ASSUMED]
 
-**Wave 0 gaps:** all listed tests and `pyproject.toml` are absent; create the package skeleton, test fixtures, pinned environment metadata, strict manifest model, and tiny CSS code fixture before the native pilot task. [VERIFIED: repository file listing, 2026-09-22]
+**Wave 0 gaps:** this greenfield project has no implementation/test infrastructure according to its phase context; create the package skeleton, test fixtures, pinned environment metadata, strict manifest model, and tiny CSS code fixture before the native pilot task. Treat exact filenames as proposed until the planner fixes the layout. [CITED: .planning/phases/01-evidence-registry-and-native-css-baseline/01-CONTEXT.md] [ASSUMED]
 
 ## Security Domain
 
