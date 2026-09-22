@@ -8,9 +8,8 @@ from hashlib import sha256
 from importlib.metadata import version
 from pathlib import Path
 
-from .css import fixture_code
 from .ledger import Writer
-from .manifests import manifest_digest, preflight
+from .manifests import ManifestV1, manifest_digest, preflight
 from . import evaluator, reference, sampling
 
 
@@ -24,25 +23,54 @@ class ShotResult:
 
 
 def run_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path) -> ShotResult:
-    manifest = preflight(manifest_path)
-    code = fixture_code()
+    resolved = preflight(manifest_path)
+    manifest = resolved.manifest
+    code = resolved.code
     digest = manifest_digest(manifest)
+    if isinstance(manifest, ManifestV1):
+        source_uri = manifest.paper.uri
+        source_revision = manifest.paper.revision
+        source_anchor = manifest.paper.experiment_anchor
+        code_id = manifest.artifact.code_id
+        experiment_relation = manifest.paper.relation
+        expected_output_status = manifest.expected_output.status
+        x_error_rate = manifest.noise.x_error_rates[0]
+        seed = manifest.seed_policy.root_seed
+        max_iter = manifest.budget.max_iter
+        bp_method = manifest.decoder.bp_method
+        schedule = manifest.decoder.schedule
+        input_vector_type = manifest.decoder.input_vector_type
+        decoder_version = manifest.decoder.version
+    else:
+        source_uri = manifest.source_uri
+        source_revision = manifest.source_revision
+        source_anchor = manifest.source_anchor
+        code_id = manifest.code_id
+        experiment_relation = manifest.experiment_relation
+        expected_output_status = manifest.expected_output_status
+        x_error_rate = manifest.x_error_rate
+        seed = manifest.seed
+        max_iter = manifest.max_iter
+        bp_method = manifest.bp_method
+        schedule = manifest.schedule
+        input_vector_type = manifest.input_vector_type
+        decoder_version = version("ldpc")
     common = {
         "manifest_sha256": digest,
-        "source_uri": manifest.source_uri,
-        "source_revision": manifest.source_revision,
-        "source_anchor": manifest.source_anchor,
-        "code_id": manifest.code_id,
-        "experiment_relation": manifest.experiment_relation,
-        "expected_output_status": manifest.expected_output_status,
+        "source_uri": source_uri,
+        "source_revision": source_revision,
+        "source_anchor": source_anchor,
+        "code_id": code_id,
+        "experiment_relation": experiment_relation,
+        "expected_output_status": expected_output_status,
         "decoder_config": {
-            "bp_method": manifest.bp_method,
-            "schedule": manifest.schedule,
-            "input_vector_type": manifest.input_vector_type,
-            "error_rate": manifest.x_error_rate,
-            "max_iter": manifest.max_iter,
+            "bp_method": bp_method,
+            "schedule": schedule,
+            "input_vector_type": input_vector_type,
+            "error_rate": x_error_rate,
+            "max_iter": max_iter,
         },
-        "decoder_version": version("ldpc"),
+        "decoder_version": decoder_version,
     }
     sample_seed_identity = sha256(
         f"bp-registry-sample-v1\0{digest}\0{shot_id}".encode()
@@ -55,14 +83,14 @@ def run_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path)
         stage = "sampling"
         try:
             sample = sampling.sample_shot(
-                code, manifest_identity=digest, seed=manifest.seed, shot_id=shot_id,
-                x_error_rate=manifest.x_error_rate,
+                code, manifest_identity=digest, seed=seed, shot_id=shot_id,
+                x_error_rate=x_error_rate,
             )
             stage = "decoding"
             native = reference.decode(
-                code.hz, sample.observation.syndrome, error_rate=manifest.x_error_rate,
-                max_iter=manifest.max_iter, bp_method=manifest.bp_method,
-                schedule=manifest.schedule, input_vector_type=manifest.input_vector_type,
+                code.hz, sample.observation.syndrome, error_rate=x_error_rate,
+                max_iter=max_iter, bp_method=bp_method,
+                schedule=schedule, input_vector_type=input_vector_type,
             )
             stage = "evaluation"
             evaluation = evaluator.evaluate_candidate(
