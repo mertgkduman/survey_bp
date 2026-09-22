@@ -1,0 +1,63 @@
+{
+  "format_version": 1,
+  "selection": {
+    "decision": "conditional_gross_pending_artifact_validation",
+    "d04_rule": "A candidate may be selected only after exact source rows, ordered logical identity, pinned implementation identity, and independent CSS validation agree.",
+    "conditional_first_choice_before_probe": "gross-bb-144",
+    "final_reason": "Gross has the strongest complete pinned construction and logical-provider evidence. It can be promoted only after Task 2 freezes exact rows and independently validates the ordered paired basis; B1 and C2 remain unresolved."
+  },
+  "candidates": [
+    {
+      "code_id": "gross-bb-144",
+      "family": "bivariate_bicycle",
+      "parameters": "[[144,12,12]]",
+      "paper_relations": [
+        {"work_id": "bhatnagar-impulse", "revision": "v1", "anchor": "Figure 6", "relation": "parameter-level BB-144 lead"},
+        {"work_id": "bravyi-et-al-bcg mry", "revision": "arXiv:2308.07915", "anchor": "Section 4", "relation": "BB construction family"}
+      ],
+      "implementation": {
+        "repository": "https://github.com/sbravyi/BivariateBicycleCodes",
+        "revision": "fa77e3333d3ec44c79d8f914dd24c040d1da471b",
+        "source_file": "decoder_setup.py",
+        "source_file_sha256": "e919e1830b88468c5d257c0119656576a7999f92743dfeccd389a967524b3d2c"
+      },
+      "matrix_identity": {"status": "established", "construction": "Hx=[A|B], Hz=[B^T|A^T]; columns are left block then right block", "ordered_rows": "Task 2 freeze pending"},
+      "ordered_logical_identity": {"status": "pending_freeze", "provider": "bposd.css.css_code", "package_version": "2.1", "module_sha256": "d1e0c238d81c9b023bffa7bd355cfe305f8da3a6233a0af2edc1187f4807d6b1", "reason": "provider reported K=12 with 12 Lx and 12 Lz rows; exact row hashes await freeze"},
+      "independent_validation": {"status": "passed_for_checks", "hx_shape": [72, 144], "hz_shape": [72, 144], "hx_rank_gf2": 66, "hz_rank_gf2": 66, "k_gf2": 12, "commutator_nonzero_entries": 0, "reason": "ordered logical validation remains Task 2 gate"},
+      "noise_settings": {"status": "incomplete", "reason": "repository README describes circuit-level BP-OSD, while impulse Figure 6 is code-capacity"},
+      "verification_status": "conditional",
+      "rejection_reason": "Not rejected; promotion is withheld until exact frozen row and paired-logical checks pass."
+    },
+    {
+      "code_id": "b1-lifted-product-882",
+      "family": "lifted_product",
+      "parameters": "[[882,24,18<=d<=24]]",
+      "paper_relations": [
+        {"work_id": "yao-bpgd", "revision": "v2", "anchor": "Figures 2-4", "relation": "BPGD CSS experiment"},
+        {"work_id": "bhatnagar-impulse", "revision": "v1", "anchor": "Figure 5", "relation": "explicitly identified as lifted-product B1"}
+      ],
+      "implementation": {"status": "unresolved", "reason": "no exact original implementation commit was established"},
+      "matrix_identity": {"status": "unresolved", "reason": "exact rows and column ordering unavailable"},
+      "ordered_logical_identity": {"status": "unresolved", "reason": "ordered logical-basis rows unavailable"},
+      "independent_validation": {"status": "not_run", "reason": "requires exact source rows"},
+      "noise_settings": {"status": "paper_reported_but_not_executable", "reason": "artifact identity gate is incomplete"},
+      "verification_status": "unresolved",
+      "rejection_reason": "Cannot promote a parameter label without exact source matrices and ordered logicals."
+    },
+    {
+      "code_id": "bpgd-c2-hgp-1922",
+      "family": "hypergraph_product",
+      "parameters": "[[1922,50,16]]",
+      "paper_relations": [
+        {"work_id": "yao-bpgd", "revision": "v2", "anchor": "Figure 5", "relation": "explicitly identified as C2 hypergraph-product code"}
+      ],
+      "implementation": {"status": "unresolved", "reason": "no pinned original code artifact or commit was established"},
+      "matrix_identity": {"status": "unresolved", "reason": "seed classical matrices and tensor/product ordering unavailable"},
+      "ordered_logical_identity": {"status": "unresolved", "reason": "ordered logical-basis rows unavailable"},
+      "independent_validation": {"status": "not_run", "reason": "requires exact source rows"},
+      "noise_settings": {"status": "paper_reported_but_not_executable", "reason": "artifact identity gate is incomplete"},
+      "verification_status": "unresolved",
+      "rejection_reason": "The HGP family relation does not identify a particular matrix or logical basis."
+    }
+  ]
+}
