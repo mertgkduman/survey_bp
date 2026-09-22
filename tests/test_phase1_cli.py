@@ -8,6 +8,8 @@ from pathlib import Path
 import subprocess
 import sys
 
+import pytest
+
 
 def _run_cli(*args: str) -> dict[str, object]:
     completed = subprocess.run(
@@ -35,3 +37,53 @@ def test_researcher_can_inspect_the_pinned_pilot_from_documented_cli_commands():
     assert preflight["shot_budget"] == 32
     assert verified["run_id"] == preflight["run_id"]
     assert verified["final_row_count"] == preflight["shot_budget"]
+
+
+def test_public_pilot_counts_reconciled_interruption(tmp_path):
+    from bp_registry.cli import run_pilot, verify_run
+
+    manifest = Path("data/manifests/selected-css-pilot_adaptation-not_assessed.json")
+    source = Path("data/results/pilot_adaptation-not_assessed/events.jsonl")
+    output = tmp_path / "pilot"
+    output.mkdir()
+    events = [json.loads(line) for line in source.read_text().splitlines()]
+    # Simulate an owner dying after its durable begin, before its terminal.
+    events = [event for event in events if not (
+        event["shot_id"] == 0 and event["kind"] == "terminal"
+    )]
+    (output / "events.jsonl").write_text("".join(json.dumps(event) + "\n" for event in events))
+
+    assert run_pilot(manifest, output)["final_row_count"] == 32
+    assert verify_run(output)["final_row_count"] == 32
+    result = json.loads((output / "result.json").read_text())
+    assert result["denominators"]["all_terminal_shots"] == 32
+    assert result["denominators"]["interrupted"] == 1
+    assert result["denominators"]["outcome_unavailable"] == 1
+
+
+def test_public_pilot_counts_recorded_native_exception(tmp_path, monkeypatch):
+    from bp_registry import reference, runner
+    from bp_registry.cli import run_pilot, verify_run
+
+    manifest = Path("data/manifests/selected-css-pilot_adaptation-not_assessed.json")
+    source = Path("data/results/pilot_adaptation-not_assessed/events.jsonl")
+    output = tmp_path / "pilot"
+    output.mkdir()
+    events = [json.loads(line) for line in source.read_text().splitlines()]
+    (output / "events.jsonl").write_text("".join(
+        json.dumps(event) + "\n" for event in events if event["shot_id"] != 0
+    ))
+
+    def unavailable_decoder(*_args, **_kwargs):
+        raise RuntimeError("native decoder unavailable")
+
+    monkeypatch.setattr(reference, "decode", unavailable_decoder)
+    with pytest.raises(RuntimeError, match="native decoder unavailable"):
+        runner.run_one(manifest, shot_id=0, ledger_path=output / "events.jsonl")
+
+    assert run_pilot(manifest, output)["final_row_count"] == 32
+    assert verify_run(output)["final_row_count"] == 32
+    result = json.loads((output / "result.json").read_text())
+    assert result["denominators"]["all_terminal_shots"] == 32
+    assert result["denominators"]["outcome_unavailable"] == 1
+    assert result["terminations"]["exception"] == 1

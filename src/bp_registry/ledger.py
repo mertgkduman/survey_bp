@@ -165,7 +165,8 @@ def _interrupted_terminal(begin: Mapping[str, Any]) -> dict[str, Any]:
             "manifest_sha256", "source_uri", "source_revision", "source_anchor", "code_id",
             "experiment_relation", "expected_output_status", "sample_seed_identity",
             "decoder_config", "decoder_version", "paper_uri", "paper_revision", "paper_anchor",
-            "implementation_source_artifact_sha256",
+            "implementation_source_artifact_sha256", "artifact_raw_sha256",
+            "artifact_semantic_sha256", "artifact_path",
         ) if field in begin
     }
     return {

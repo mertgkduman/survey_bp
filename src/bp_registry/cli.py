@@ -98,8 +98,24 @@ def _validate_pilot_ledger(manifest_path: Path, ledger_path: Path, rows: list[di
                 raise ValueError("pilot ledger provenance differs from the resolved manifest")
             if event.get("sample_seed_identity") != identity:
                 raise ValueError("pilot ledger sample identity is not deterministic for its manifest and shot")
-        if terminal.get("termination") != "completed":
-            raise ValueError("pilot ledger contains a non-completed terminal row")
+        termination = terminal.get("termination")
+        if termination in {"interrupted", "exception"}:
+            if (terminal.get("outcome") is not None
+                    or not terminal.get("outcome_unavailable_reason")
+                    or terminal.get("selected_output") is not None
+                    or terminal.get("native_converged") is not None
+                    or terminal.get("postselection") != "unavailable"):
+                raise ValueError("pilot unsuccessful terminal lacks explicit unavailable fields")
+            if termination == "interrupted":
+                if (terminal.get("termination_inference") != "reconciled_after_owner_release"
+                        or terminal.get("observed_termination") is not False):
+                    raise ValueError("pilot interruption lacks reconciliation provenance")
+            elif (terminal.get("exception_stage") not in {"sampling", "decoding", "evaluation"}
+                    or not terminal.get("exception_type")):
+                raise ValueError("pilot exception lacks stage and type provenance")
+            continue
+        if termination != "completed":
+            raise ValueError("pilot ledger has an unknown termination status")
         sample = sampling.sample_shot(
             resolved.code, manifest_identity=digest, seed=manifest.seed_policy.root_seed,
             shot_id=shot_id, x_error_rate=manifest.noise.x_error_rates[0],
@@ -183,7 +199,13 @@ def run_pilot(manifest_path: str | Path, output: str | Path) -> dict[str, Any]:
     existing = {row["shot_id"] for row in _terminal_rows(ledger_path, manifest.run_id)}
     missing = [shot_id for shot_id in range(manifest.budget.max_shots) if shot_id not in existing]
     for shot_id in missing:
-        run_one(manifest_path, shot_id=shot_id, ledger_path=ledger_path)
+        try:
+            run_one(manifest_path, shot_id=shot_id, ledger_path=ledger_path)
+        except Exception:
+            # A recorded per-shot exception is a terminal observation and belongs
+            # in the denominator. Unrecorded failures still abort this invocation.
+            if shot_id not in {row["shot_id"] for row in _terminal_rows(ledger_path, manifest.run_id)}:
+                raise
     rows = _terminal_rows(ledger_path, manifest.run_id)
     _validate_pilot_ledger(manifest_path, ledger_path, rows)
     expected = list(range(manifest.budget.max_shots))
