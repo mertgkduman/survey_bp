@@ -39,7 +39,7 @@ Build a provenance-preserving research platform from paper evidence through nati
 
 ### Phase 1: Evidence Registry and Native CSS Baseline
 
-**Goal:** A researcher can go from a source-linked paper record to a validated, pinned native CSS experiment and inspect its outcomes and provenance.
+**Goal:** As a researcher, I want to trace a source-linked paper record to a validated native CSS experiment, so that I can inspect its outcomes and provenance.
 **Mode:** mvp
 **Depends on:** Nothing (first phase)
 **Requirements:** MAP-01, MAP-02, MAP-03, REG-01, REG-02, REG-03, REG-04, CSS-01, CSS-02, CSS-03, CSS-04, LED-01
