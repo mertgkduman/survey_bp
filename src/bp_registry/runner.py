@@ -6,7 +6,9 @@ import argparse
 from dataclasses import dataclass
 from hashlib import sha256
 from importlib.metadata import version
+import json
 from pathlib import Path
+from typing import Any
 
 from .ledger import Writer
 from .manifests import ManifestV1, manifest_digest, preflight
@@ -20,6 +22,50 @@ class ShotResult:
     outcome: str
     converged: bool
     iterations: int
+
+
+_REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+_SELECTED_PROVENANCE = _REPOSITORY_ROOT / "data/artifacts/selected-css.provenance.json"
+
+
+def preflight_pilot(manifest_path: str | Path) -> dict[str, Any]:
+    """Resolve the one Phase 1 selected-artifact pilot before native execution."""
+
+    manifest = preflight(manifest_path).manifest
+    if not isinstance(manifest, ManifestV1):
+        raise ValueError("selected artifact pilot requires a complete ManifestV1")
+    provenance = json.loads(_SELECTED_PROVENANCE.read_text(encoding="utf-8"))
+    artifact = provenance["artifact"]
+    source = provenance["source"]
+    expected_path = _REPOSITORY_ROOT / artifact["path"]
+    actual_path = (Path(manifest.artifact.root) / manifest.artifact.path).resolve()
+    if (
+        manifest.run_id != "gross-bb144-pilot"
+        or manifest.artifact.code_id != provenance["code_id"]
+        or actual_path != expected_path.resolve()
+        or manifest.artifact.raw_sha256 != artifact["raw_sha256"]
+        or manifest.artifact.semantic_sha256 != artifact["semantic_sha256"]
+        or manifest.paper.revision != source["revision"]
+        or manifest.paper.source_artifact_sha256 != source["source_file_sha256"]
+    ):
+        raise ValueError("manifest is not bound to the selected artifact provenance")
+    if manifest.paper.relation != "pilot_adaptation":
+        raise ValueError("selected artifact run must remain a pilot_adaptation")
+    if manifest.expected_output.status != "not_assessed":
+        raise ValueError("selected artifact run must remain not_assessed")
+    return {
+        "run_id": manifest.run_id,
+        "code_id": manifest.artifact.code_id,
+        "relation": manifest.paper.relation,
+        "assessment_status": manifest.expected_output.status,
+        "assessment_reason": manifest.expected_output.reason,
+        "source_revision": manifest.paper.revision,
+        "source_uri": manifest.paper.uri,
+        "artifact_raw_sha256": manifest.artifact.raw_sha256,
+        "artifact_semantic_sha256": manifest.artifact.semantic_sha256,
+        "shot_budget": manifest.budget.max_shots,
+        "max_iter": manifest.budget.max_iter,
+    }
 
 
 def run_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path) -> ShotResult:
@@ -41,6 +87,9 @@ def run_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path)
         schedule = manifest.decoder.schedule
         input_vector_type = manifest.decoder.input_vector_type
         decoder_version = manifest.decoder.version
+        artifact_raw_sha256 = manifest.artifact.raw_sha256
+        artifact_semantic_sha256 = manifest.artifact.semantic_sha256
+        artifact_path = str((Path(manifest.artifact.root) / manifest.artifact.path).resolve())
     else:
         source_uri = manifest.source_uri
         source_revision = manifest.source_revision
@@ -55,6 +104,9 @@ def run_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path)
         schedule = manifest.schedule
         input_vector_type = manifest.input_vector_type
         decoder_version = version("ldpc")
+        artifact_raw_sha256 = None
+        artifact_semantic_sha256 = None
+        artifact_path = None
     common = {
         "manifest_sha256": digest,
         "source_uri": source_uri,
@@ -71,6 +123,9 @@ def run_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path)
             "max_iter": max_iter,
         },
         "decoder_version": decoder_version,
+        "artifact_raw_sha256": artifact_raw_sha256,
+        "artifact_semantic_sha256": artifact_semantic_sha256,
+        "artifact_path": artifact_path,
     }
     sample_seed_identity = sha256(
         f"bp-registry-sample-v1\0{digest}\0{shot_id}".encode()

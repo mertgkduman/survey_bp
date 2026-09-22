@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "run_id": "gross-bb144-pilot",
+  "paper": {
+    "uri": "https://arxiv.org/html/2606.18240v1",
+    "revision": "fa77e3333d3ec44c79d8f914dd24c040d1da471b",
+    "experiment_anchor": "bhatnagar-impulse:Figure 6",
+    "relation": "pilot_adaptation",
+    "source_artifact_sha256": "e919e1830b88468c5d257c0119656576a7999f92743dfeccd389a967524b3d2c",
+    "source_artifact_status": "verified"
+  },
+  "artifact": {
+    "root": "data/artifacts",
+    "path": "selected-css.json",
+    "raw_sha256": "2c02a3b99bf7267acf35efe28e0a2ef0d3827e5a22b948d53da14ae8df68ceb0",
+    "semantic_sha256": "e175e67c0f9ae6f4e0968461ad2f87ba38ad5344166b793c53dd038976d4f427",
+    "matrix_hashes": {
+      "hx_raw_sha256": "c1700ef674d1682cba2620523eaca7fa475826644f28295de46b9fc742d3729b",
+      "hz_raw_sha256": "ab9cc0bafc2eee02d026aea9f3500b809caad7e7d0708a9ac997719e99c4ae71",
+      "lx_raw_sha256": "6ed70f72141fd5a499f3a6da6c44a578229fa97d28e5e927d353dba62bef1c16",
+      "lz_raw_sha256": "40dbe2f12c82a87bcfb58f9058432849afc64e9e1d06669803c753eba1888543",
+      "hx_semantic_sha256": "8ce200c0f0216d8701dd40e399198d7d97663d5e59f9fd216b5cde756bcad221",
+      "hz_semantic_sha256": "85b850d21d354fa0c4ced2d18ec0ac429b3961f53545bb5f152e8b46e77ab38c",
+      "lx_semantic_sha256": "058a41f65842e9071c2ace12520b796d162eb431e8cf031192be4ffc0177f7bc",
+      "lz_semantic_sha256": "40b1742c12ef8051719e7a890219642ed3d93c118405ad1fea7c94265a1b8d28"
+    },
+    "format_version": 1,
+    "code_id": "gross-bb-144"
+  },
+  "decoder": {
+    "implementation": "ldpc",
+    "version": "2.4.1",
+    "entry_point": "ldpc.BpDecoder",
+    "bp_method": "product_sum",
+    "schedule": "parallel",
+    "input_vector_type": "syndrome",
+    "parameter_names": ["error_rate", "max_iter", "bp_method", "schedule", "input_vector_type"]
+  },
+  "noise": {"channel": "x_only_bit_flip", "x_error_rates": [0.01]},
+  "seed_policy": {"root_seed": 20260922, "derivation": "sha256-manifest-shot-v1"},
+  "budget": {"max_shots": 32, "max_iter": 30, "stopping_rule": "fixed_shots", "denominator_rule": "all_terminal_shots"},
+  "environment": {"python": "3.12.2", "numpy": "2.2.6", "scipy": "1.17.1", "ldpc": "2.4.1", "backend": "cpu"},
+  "expected_output": {"status": "not_assessed", "reason": "This fixed 32-shot local pilot has no prespecified source-faithful curve criterion or statistical tolerance.", "values": [], "tolerance": null, "statistical_verdict": null},
+  "discrepancies": ["The verified Bravyi construction source is not the impulse paper's source-faithful decoder implementation.", "This run uses one native binary BP product-sum decoder and no impulse or OSD postprocessing.", "The fixed 32-shot local smoke budget is not a statistical reproduction or curve assessment."]
+}
