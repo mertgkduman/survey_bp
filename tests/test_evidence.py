@@ -199,3 +199,39 @@ def test_seed_claims_remain_anchored_queryable_and_maturity_safe():
     assert pilot["status"] == "not_run"
     assert pilot["evidence_maturity"] == "mapped_only"
     assert records["paper_experiments"][pilot["paper_experiment_id"]]["evidence_maturity"] == "mapped_only"
+
+
+def test_completed_selected_pilot_preserves_final_rows_and_paper_maturity():
+    from bp_registry import evidence
+    from bp_registry.cli import run_pilot, verify_run
+    from bp_registry.ledger import reconcile
+
+    output = Path("data/results/pilot_adaptation-not_assessed")
+    manifest = Path("data/manifests/selected-css-pilot_adaptation-not_assessed.json")
+    result_path = output / "result.json"
+    assert result_path.exists(), "the inspected 32-shot pilot result must be checked in"
+    result = json.loads(result_path.read_text())
+    report = verify_run(output)
+    rows = reconcile(output / "events.jsonl")
+    assert report["final_row_count"] == 32
+    assert [row["shot_id"] for row in rows] == list(range(32))
+    assert all(row["manifest_sha256"] == result["manifest_sha256"] for row in rows)
+    assert all(row["artifact_raw_sha256"] == result["artifact"]["raw_sha256"] for row in rows)
+    assert all("selected_output" in row and "termination" in row for row in rows)
+    assert result["denominators"]["all_terminal_shots"] == len(rows)
+
+    original_events = (output / "events.jsonl").read_text()
+    run_pilot(manifest, output)
+    assert (output / "events.jsonl").read_text() == original_events
+
+    records = evidence.load_seed_records("data/evidence/seed-records.json")
+    paper = records["paper_experiments"]["bhatnagar-impulse:Figure 6"]
+    pilot = records["execution_events"]["gross-bb144-pilot"]
+    assert paper["evidence_maturity"] == "mapped_only"
+    assert paper["pilot_run_ids"] == [pilot["run_id"]]
+    assert pilot["status"] == "completed"
+    assert pilot["evidence_maturity"] == "reference_executable"
+    assert pilot["relation"] == "pilot_adaptation"
+    assert pilot["assessment_status"] == "not_assessed"
+    assert pilot["manifest_path"] == str(manifest)
+    assert pilot["result_path"] == str(result_path)
