@@ -196,5 +196,6 @@ def test_seed_claims_remain_anchored_queryable_and_maturity_safe():
     assert paper["evidence_maturity"] == "mapped_only"
     assert pilot["paper_experiment_id"] == "bhatnagar-impulse:Figure 6"
     assert pilot["relation"] == "pilot_adaptation"
-    assert pilot["evidence_maturity"] == "reference_executable"
+    assert pilot["status"] == "not_run"
+    assert pilot["evidence_maturity"] == "mapped_only"
     assert records["paper_experiments"][pilot["paper_experiment_id"]]["evidence_maturity"] == "mapped_only"

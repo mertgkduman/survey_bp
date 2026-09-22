@@ -271,3 +271,35 @@ def query_claims(claims: Iterable[Mapping[str, Any] | Claim], **filters: Any) ->
         if all(direct.get(key, taxonomy.get(key)) == value for key, value in filters.items()):
             matches.append(claim)
     return matches
+
+
+def load_seed_records(path: str | Path) -> dict[str, Any]:
+    """Load the versioned paper records while checking source and maturity invariants."""
+
+    records = json.loads(Path(path).read_text(encoding="utf-8"))
+    if records.get("schema_version") != "1.0":
+        raise ValueError("unsupported seed-record schema version")
+    for work_id, work in records.get("works", {}).items():
+        revision = work.get("revision", {})
+        if not revision.get("id") or not revision.get("uri"):
+            raise ValueError(f"work {work_id!r} lacks a pinned revision")
+        for result in work.get("css_results", []):
+            if not result.get("result_id") or not result.get("anchor"):
+                raise ValueError(f"work {work_id!r} has an unanchored CSS result")
+    for claim in records.get("claims", []):
+        Claim(
+            work_id=claim.get("work_id", ""),
+            revision_id=claim.get("revision_id", ""),
+            anchor=claim.get("anchor", ""),
+            statement=claim.get("statement", ""),
+            taxonomy=claim.get("taxonomy", {}),
+            claim_state=claim.get("claim_state", ""),
+            evidence_maturity=claim.get("evidence_maturity", ""),
+        )
+    for event in records.get("execution_events", {}).values():
+        paper_id = event.get("paper_experiment_id")
+        if paper_id not in records.get("paper_experiments", {}):
+            raise ValueError("execution event must reference a distinct known paper experiment")
+        if event.get("status") != "completed" and event.get("evidence_maturity") != "mapped_only":
+            raise ValueError("an uncompleted execution cannot be promoted")
+    return records
