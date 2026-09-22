@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "run_id": "project-three-qubit-css-smoke",
+  "source_uri": "https://arxiv.org/abs/2312.10950",
+  "source_revision": "v2",
+  "source_anchor": "Figure 2 (methodological context only)",
+  "code_id": "project-three-qubit-css-fixture",
+  "experiment_relation": "pilot_adaptation",
+  "expected_output_status": "not_assessed",
+  "x_error_rate": 0.0,
+  "seed": 12,
+  "max_iter": 10,
+  "bp_method": "product_sum",
+  "schedule": "parallel",
+  "input_vector_type": "syndrome"
+}

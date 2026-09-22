@@ -7,6 +7,7 @@ name = "bp-registry"
 version = "0.0.0"
 description = "Evidence-linked QLDPC BP research platform"
 requires-python = ">=3.12"
+dependencies = ["numpy==2.2.6", "scipy==1.17.1", "ldpc==2.4.1", "pydantic==2.13.5"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -15,4 +16,3 @@ namespaces = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
-

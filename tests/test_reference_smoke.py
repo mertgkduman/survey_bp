@@ -47,3 +47,8 @@ def test_fixture_shot_links_manifest_source_and_terminal(tmp_path):
     assert events[1]["experiment_relation"] == "pilot_adaptation"
     assert events[1]["expected_output_status"] == "not_assessed"
     assert events[1]["outcome"] == result.outcome
+    assert isinstance(events[1]["native_converged"], bool)
+    assert isinstance(events[1]["native_iterations"], int)
+    assert events[1]["native_edge_updates"] is None
+    assert events[1]["native_edge_updates_missing_reason"]
+    assert events[1]["postselection"] == "none"

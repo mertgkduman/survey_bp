@@ -1,0 +1,69 @@
+anaconda-anon-usage @ file:///croot/anaconda-anon-usage_1710965072196/work
+annotated-types==0.8.0
+archspec @ file:///croot/archspec_1709217642129/work
+beliefmatching==0.2.0
+boltons @ file:///work/perseverance-python-buildout/croot/boltons_1698851177130/work
+# Editable Git install with no remote (bp-registry==0.0.0)
+-e /hpc/group/pfisterlab/mg551/storage/survey_bp
+bposd==2.1
+Brotli @ file:///work/perseverance-python-buildout/croot/brotli-split_1698805593785/work
+certifi @ file:///home/task_176765899978398/croot/certifi_1767659142032/work/certifi
+cffi @ file:///croot/cffi_1700254295673/work
+charset-normalizer @ file:///tmp/build/80754af9/charset-normalizer_1630003229654/work
+conda @ file:///croot/conda_1736277811838/work
+conda-content-trust @ file:///work/perseverance-python-buildout/croot/conda-content-trust_1698882886606/work
+conda-libmamba-solver @ file:///croot/conda-libmamba-solver_1706733287605/work/src
+conda-package-handling @ file:///work/perseverance-python-buildout/croot/conda-package-handling_1698851267218/work
+conda_package_streaming @ file:///work/perseverance-python-buildout/croot/conda-package-streaming_1698847176583/work
+contourpy==1.3.3
+cryptography @ file:///croot/cryptography_1710350347627/work
+cycler==0.12.1
+distro @ file:///work/perseverance-python-buildout/croot/distro_1701732366176/work
+fonttools==4.62.1
+frozendict @ file:///home/task_176175050888873/conda-bld/frozendict_1761750665347/work
+idna @ file:///work/perseverance-python-buildout/croot/idna_1698845632828/work
+iniconfig==2.3.0
+jsonpatch @ file:///croot/jsonpatch_1710807507480/work
+jsonpointer==2.1
+kiwisolver==1.5.0
+ldpc==2.4.1
+libmambapy @ file:///croot/mamba-split_1734469461757/work/libmambapy
+llvmlite @ file:///home/task_176587366193645/conda-bld/llvmlite_1765874163225/work
+matplotlib==3.10.9
+menuinst @ file:///croot/menuinst_1706732933928/work
+mkl-service==2.5.2
+mkl_fft @ file:///home/task_176159252635933/conda-bld/mkl_fft_1761592902019/work
+mkl_random @ file:///home/task_176159299715632/conda-bld/mkl_random_1761593011445/work
+networkx==3.6.1
+numba @ file:///home/task_177272443294397/croot/numba_1772724625571/work
+numpy==2.2.6
+packaging==26.2
+pandas==3.0.2
+pillow==12.2.0
+platformdirs @ file:///work/perseverance-python-buildout/croot/platformdirs_1701732573265/work
+pluggy==1.6.0
+pycosat @ file:///work/perseverance-python-buildout/croot/pycosat_1698863456259/work
+pycparser @ file:///tmp/build/80754af9/pycparser_1636541352034/work
+pydantic==2.13.5
+pydantic_core==2.46.5
+Pygments==2.20.0
+PyMatching==2.3.1
+pyparsing==3.3.2
+PySocks @ file:///work/perseverance-python-buildout/croot/pysocks_1698845478203/work
+pytest==9.0.3
+python-dateutil==2.9.0.post0
+-e git+https://github.com/mg551-duke/relay.git@8216aca3153642044e2cdccbaa41547d15551bb0#egg=relay_bp
+requests @ file:///croot/requests_1707355572290/work
+ruamel.yaml @ file:///work/perseverance-python-buildout/croot/ruamel.yaml_1698863605521/work
+scipy==1.17.1
+setuptools==68.2.2
+sinter==1.15.0
+six==1.17.0
+stim==1.15.0
+tqdm==4.67.3
+truststore @ file:///work/perseverance-python-buildout/croot/truststore_1701735771625/work
+typing-inspection==0.4.4
+typing_extensions==4.16.0
+urllib3 @ file:///croot/urllib3_1707770551213/work
+wheel==0.41.2
+zstandard @ file:///work/perseverance-python-buildout/croot/zstandard_1698847073368/work

@@ -44,3 +44,23 @@ r = b.decode(s)
 print(r.tolist(), bool(b.converge), int(b.iter))
 PY
 ```
+
+## Approved isolated development environment
+
+On 2026-09-22, after the Plan 02 human package gate, `.venv` was created with
+`python -m venv --system-site-packages .venv`. The user approved exact PyPI
+versions `pydantic==2.13.5` and `bposd==2.1`; those were installed with
+`.venv/bin/python -m pip install 'pydantic==2.13.5' 'bposd==2.1'`.
+Their resolved dependencies were `pydantic-core==2.46.5`,
+`annotated-types==0.8.0`, `typing-extensions==4.16.0`, and
+`typing-inspection==0.4.4`. Existing NumPy, SciPy, ldpc, and pytest were
+reused from the Anaconda site-packages directory and were not reinstalled.
+
+`pydantic`, `pydantic-core`, and `bposd` import from
+`/hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/lib/python3.12/site-packages`;
+NumPy, SciPy, ldpc, and pytest import from
+`/hpc/home/mg551/miniconda3/lib/python3.12/site-packages`.
+The full observed `pip freeze` is in `docs/environment-freeze.txt`.
+Because this environment inherits system packages, reproduce it only on a
+node with the same observed base package identities; a clean lock will be
+needed before a portable release.
