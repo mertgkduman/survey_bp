@@ -9,25 +9,25 @@
 
 ### Literature mapping
 
-- [ ] **MAP-01**: A researcher can inspect a versioned mapping protocol specifying research questions, search sources/queries, date cutoff, inclusion/exclusion, screening/adjudication, snowballing, and extraction procedures.
-- [ ] **MAP-02**: A researcher can trace each corpus record through deduplication and screening decisions, with source identifiers, paper revisions, decisions, reasons, and search provenance.
-- [ ] **MAP-03**: A researcher can query a source-linked taxonomy covering kernel, update rule, schedule, state/memory, intervention, stopping, candidate processing, code/noise regime, metrics, implementation, and evidence type, with ambiguities distinguished from established facts.
+- [x] **MAP-01**: A researcher can inspect a versioned mapping protocol specifying research questions, search sources/queries, date cutoff, inclusion/exclusion, screening/adjudication, snowballing, and extraction procedures.
+- [x] **MAP-02**: A researcher can trace each corpus record through deduplication and screening decisions, with source identifiers, paper revisions, decisions, reasons, and search provenance.
+- [x] **MAP-03**: A researcher can query a source-linked taxonomy covering kernel, update rule, schedule, state/memory, intervention, stopping, candidate processing, code/noise regime, metrics, implementation, and evidence type, with ambiguities distinguished from established facts.
 - [ ] **MAP-04**: A reader can inspect the completed mapping dataset, selection flow/counts, extraction dictionary, limitations, and documented search update through the declared publication cutoff.
 
 ### Reproduction registry and reference execution
 
-- [ ] **REG-01**: A researcher can validate a machine-readable manifest containing the exact decoder specification; code and logical-operator hashes; noise model; physical-error rates; seed policy; simulation budget/stopping; software/backend versions; expected outputs; statistical/numerical tolerances; source paper/implementation links; and discrepancies or interpretive decisions.
-- [ ] **REG-02**: A researcher can resolve a versioned manifest to immutable input artifacts and detect schema errors, missing required settings, or mismatched hashes before simulation.
-- [ ] **REG-03**: A researcher can execute one pinned published binary BP reference from a manifest and obtain a linked ledger and result artifact through a documented local command.
-- [ ] **REG-04**: A researcher can distinguish mapped-only, reference-executable, canonical-implemented, and statistically assessed evidence for a paper experiment; unavailable original code and unassessed reproduction remain explicit.
+- [x] **REG-01**: A researcher can validate a machine-readable manifest containing the exact decoder specification; code and logical-operator hashes; noise model; physical-error rates; seed policy; simulation budget/stopping; software/backend versions; expected outputs; statistical/numerical tolerances; source paper/implementation links; and discrepancies or interpretive decisions.
+- [x] **REG-02**: A researcher can resolve a versioned manifest to immutable input artifacts and detect schema errors, missing required settings, or mismatched hashes before simulation.
+- [x] **REG-03**: A researcher can execute one pinned published binary BP reference from a manifest and obtain a linked ledger and result artifact through a documented local command.
+- [x] **REG-04**: A researcher can distinguish mapped-only, reference-executable, canonical-implemented, and statistically assessed evidence for a paper experiment; unavailable original code and unassessed reproduction remain explicit.
 - [ ] **REG-05**: Each paper experiment claimed as supported in the release has a complete manifest, executable entry, assessment report, and known-discrepancy record; the supported set and exclusions are explicitly enumerated.
 
 ### CSS mathematical and sampling foundation
 
-- [ ] **CSS-01**: A researcher can load CSS check matrices and an ordered logical basis, validate dimensions, binary entries, commutation, stabilizer/logical independence and pairing, and detect malformed inputs.
-- [ ] **CSS-02**: A researcher can reproduce code/logical artifact hashes from a documented serialization preserving matrix shape, ordering, field conventions, and logical-basis identity.
-- [ ] **CSS-03**: A researcher can generate identified bit-flip code-capacity shots and separate X/Z observations under explicit error-rate and check-orientation conventions, retaining hidden truth for evaluation.
-- [ ] **CSS-04**: An independent tested evaluator distinguishes syndrome invalidity, exact recovery, non-exact stabilizer-equivalent recovery, and syndrome-valid logical failure on constructed small-code cases.
+- [x] **CSS-01**: A researcher can load CSS check matrices and an ordered logical basis, validate dimensions, binary entries, commutation, stabilizer/logical independence and pairing, and detect malformed inputs.
+- [x] **CSS-02**: A researcher can reproduce code/logical artifact hashes from a documented serialization preserving matrix shape, ordering, field conventions, and logical-basis identity.
+- [x] **CSS-03**: A researcher can generate identified bit-flip code-capacity shots and separate X/Z observations under explicit error-rate and check-orientation conventions, retaining hidden truth for evaluation.
+- [x] **CSS-04**: An independent tested evaluator distinguishes syndrome invalidity, exact recovery, non-exact stabilizer-equivalent recovery, and syndrome-valid logical failure on constructed small-code cases.
 
 ### Canonical execution model
 
@@ -91,7 +91,7 @@
 
 ### Event ledger and computational work
 
-- [ ] **LED-01**: Every simulated shot produces an identified final record linking the manifest, input/sample, decoder configuration, versions, selected output, termination, outcome, and post-selection status, including unsuccessful and interrupted shots.
+- [x] **LED-01**: Every simulated shot produces an identified final record linking the manifest, input/sample, decoder configuration, versions, selected output, termination, outcome, and post-selection status, including unsuccessful and interrupted shots.
 - [ ] **LED-02**: Canonical runs record linked control-flow events for attempts, interventions, branches/pruning, relay transfers, candidates, fallback, and selection; per-edge message tracing can be selectively enabled without removing required shot/control-flow evidence.
 - [ ] **LED-03**: A researcher can jointly analyze iterations, BP calls/message work, branch/relay work, candidate checks, fallback work, runtime, and parallel-resource context, without equating them to one universal iteration count.
 - [ ] **LED-04**: Native-reference results explicitly mark unavailable internal events or counters and their reasons; missing instrumentation is never reported as zero or reconstructed as observed fact.
@@ -176,19 +176,19 @@ Every v1 requirement has exactly one owning phase; later phases may use or stren
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MAP-01 | Phase 1 | Pending |
-| MAP-02 | Phase 1 | Pending |
-| MAP-03 | Phase 1 | Pending |
+| MAP-01 | Phase 1 | Complete |
+| MAP-02 | Phase 1 | Complete |
+| MAP-03 | Phase 1 | Complete |
 | MAP-04 | Phase 14 | Pending |
-| REG-01 | Phase 1 | Pending |
-| REG-02 | Phase 1 | Pending |
-| REG-03 | Phase 1 | Pending |
-| REG-04 | Phase 1 | Pending |
+| REG-01 | Phase 1 | Complete |
+| REG-02 | Phase 1 | Complete |
+| REG-03 | Phase 1 | Complete |
+| REG-04 | Phase 1 | Complete |
 | REG-05 | Phase 14 | Pending |
-| CSS-01 | Phase 1 | Pending |
-| CSS-02 | Phase 1 | Pending |
-| CSS-03 | Phase 1 | Pending |
-| CSS-04 | Phase 1 | Pending |
+| CSS-01 | Phase 1 | Complete |
+| CSS-02 | Phase 1 | Complete |
+| CSS-03 | Phase 1 | Complete |
+| CSS-04 | Phase 1 | Complete |
 | ENG-01 | Phase 2 | Pending |
 | ENG-02 | Phase 2 | Pending |
 | ENG-03 | Phase 2 | Pending |
@@ -225,7 +225,7 @@ Every v1 requirement has exactly one owning phase; later phases may use or stren
 | POST-03 | Phase 7 | Pending |
 | POST-04 | Phase 7 | Pending |
 | POST-05 | Phase 7 | Pending |
-| LED-01 | Phase 1 | Pending |
+| LED-01 | Phase 1 | Complete |
 | LED-02 | Phase 2 | Pending |
 | LED-03 | Phase 2 | Pending |
 | LED-04 | Phase 2 | Pending |
@@ -262,6 +262,7 @@ Every v1 requirement has exactly one owning phase; later phases may use or stren
 | PUB-03 | Phase 14 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 84 total
 - Mapped to phases: 84
 - Unmapped: 0

@@ -12,7 +12,9 @@ Make BP decoder differences explicit, reproducible, and fairly comparable by exp
 
 ### Validated
 
-(None yet — the workspace is new. Existing third-party implementations are reference sources, not capabilities already delivered by this project.)
+- ✓ Versioned mapping protocol, initial source-linked screening records, and CSS evidence taxonomy — Phase 1. This is an initial mapped set, not the completed literature study.
+- ✓ Strict manifest and immutable CSS artifact preflight, with independently checked algebra and ordered hashes — Phase 1.
+- ✓ Pinned native binary BP CSS pilot with a durable shot ledger and independent outcome evaluation — Phase 1. The 32-shot run is `pilot_adaptation` and `not_assessed`, not a statistical paper reproduction.
 
 ### Active
 
@@ -55,7 +57,7 @@ The intended users are researchers studying, reproducing, and comparing BP-famil
 
 ### Existing work and reference implementations
 
-The user identified existing BP-LSD, BP-OSD, and RelayBP implementations as important references. No repositories, versions, paper identifiers, local code, experiment results, or manuscript drafts have been supplied yet. Research must identify and pin authoritative sources before implementation-specific claims or reproduction configurations are treated as established.
+The user identified existing BP-LSD, BP-OSD, and RelayBP implementations as important references. Phase 1 pinned initial BPGD and impulse paper revisions, selected and froze a Bravyi BB-144 CSS artifact, and ran a 32-shot pilot through `ldpc.BpDecoder`. The pilot is an adaptation with no statistical reproduction assessment. Author-code identities and some paper-specific CSS code identities remain unresolved; future reproduction configurations still need source qualification.
 
 Reference execution and canonical execution are complementary: the first preserves access to published implementations, and the second exposes behavior through common policy semantics for controlled comparison. Neither access to a reference implementation nor a superficial API match alone establishes successful reproduction.
 
@@ -75,7 +77,7 @@ Each supported paper's machine-readable reproduction manifest must contain:
 - Links to the source paper and original implementation.
 - Known discrepancies or interpretive decisions.
 
-Here, code and logical-operator identity must be represented explicitly; software versions are a separate provenance requirement. Concrete hashing and serialization conventions remain to be specified.
+Here, code and logical-operator identity must be represented explicitly; software versions are a separate provenance requirement. Phase 1 specifies binary CSS matrix and ordered-logical hashing for its versioned artifact format; later regimes will define their own compatible identity contracts.
 
 ### Evaluation contract
 
@@ -84,7 +86,7 @@ Two evaluation views are required:
 1. **Faithful reproduction:** use each paper's settings and compare with its reported results within declared statistical tolerances. Document missing information, numerical differences, and interpretive choices.
 2. **Controlled comparison:** compare eligible decoder configurations using shared codes, noise, error samples, and explicit computational budgets. Report logical performance, convergence, iteration counts, computational work, and runtime separately.
 
-Every simulation must retain the provenance needed to relate decoding outcomes to work and termination behavior. The ledger must support distinctions among syndrome validity, exact recovery, degenerate recovery, and logical failure, as well as the effects of post-selection. Exact mathematical outcome definitions, ledger schemas, work-accounting units, and statistical acceptance procedures will be specified and validated in subsequent work.
+Every simulation must retain the provenance needed to relate decoding outcomes to work and termination behavior. Phase 1 defines and tests CSS outcome classes and a durable begin/terminal shot ledger; native counters unavailable from `ldpc.BpDecoder` are recorded as missing with a reason. Canonical control-flow events, common work-accounting units, and statistical acceptance procedures remain subsequent work.
 
 ### Development and publication sequence
 
@@ -119,6 +121,8 @@ All three stages belong to the same intended journal-paper scope. The literature
 | Accept reproduction through statistical agreement with reported curves | Meet the research objective without requiring identical numerical trajectories | — Pending |
 | Maintain faithful and controlled evaluation views | Support both literature reproduction and fair comparison | — Pending |
 | Require manifests, event ledgers, and detailed discrepancy documentation | Preserve provenance and make results interpretable and auditable | — Pending |
+| Treat the Phase 1 native BB-144 run as a pilot adaptation | Source paper and selected native decoder do not specify the same experiment | 32 shots retained as `not_assessed`; no reproduction claim |
+| Freeze source-derived CSS matrices and ordered logicals with independent checks | Prevent matching code parameters from standing in for exact artifact identity | Bravyi revision and `bposd` provider bytes pinned for the selected artifact |
 
 ## Evolution
 
@@ -138,4 +142,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with the current software, evidence, and research state.
 
 ---
-*Last updated: 2026-09-21 after project-definition approval*
+*Last updated: 2026-09-22 after Phase 1*

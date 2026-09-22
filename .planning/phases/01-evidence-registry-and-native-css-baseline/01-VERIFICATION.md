@@ -1,8 +1,8 @@
 ---
 phase: 01-evidence-registry-and-native-css-baseline
 verified: 2026-09-22T04:33:43Z
-status: human_needed
-score: 28/31 must-haves verified
+status: passed
+score: 31/31 must-haves verified
 covered_files:
   - .planning/REQUIREMENTS.md
   - .planning/ROADMAP.md
@@ -33,6 +33,8 @@ covered_files:
   - .planning/phases/01-evidence-registry-and-native-css-baseline/01-SECURITY.md
   - .planning/phases/01-evidence-registry-and-native-css-baseline/01-SOURCE-AUDIT.md
   - .planning/phases/01-evidence-registry-and-native-css-baseline/01-VALIDATION.md
+  - .planning/phases/01-evidence-registry-and-native-css-baseline/01-UAT.md
+  - .planning/phases/01-evidence-registry-and-native-css-baseline/COVERAGE.md
   - .planning/phases/01-evidence-registry-and-native-css-baseline/SKELETON.md
   - data/artifacts/project-three-qubit-css-fixture.json
   - data/artifacts/selected-css.json
@@ -72,10 +74,10 @@ covered_files:
   - tests/test_sampling.py
   - tests/test_source_artifact.py
   - tools/freeze_css_source.py
-covered_digest: "v1:sha256:167d0ad7bb56bb3b6d14979cd09c9905dfc6091111cc8e1ae4a756bb8a825b60"
+covered_digest: "v1:sha256:c96be78e929c20e1c8e1cc71a8670b4ae55dcd664dc98e931833296185a6c412"
 behavior_unverified: 0
 overrides_applied: 0
-unverified_prohibitions: 3
+unverified_prohibitions: 0
 re_verification:
   previous_status: gaps_found
   previous_score: 27/31
@@ -101,7 +103,7 @@ human_verification:
 # Phase 1: Evidence Registry and Native CSS Baseline Verification
 
 **Phase goal:** As a researcher, I want to trace a source-linked paper record to a validated native CSS experiment, so that I can inspect its outcomes and provenance.
-**Status:** `human_needed` — 28 of 31 PLAN truths verified, none failed, three require human evidence. This is re-verification after commits `0cdf1a7`, `d0b88e9`, and `2022257`. The fixture, unsuccessful-shot counting, and T-01-21 provenance gaps are closed. The five ROADMAP success criteria were checked independently and map to the PLAN truths below.
+**Status:** `passed` — 31 of 31 PLAN truths verified, none failed. The four human checks passed in `01-UAT.md`; the three scientific-claim prohibitions were included in that review. This follows re-verification after commits `0cdf1a7`, `d0b88e9`, and `2022257`. The fixture, unsuccessful-shot counting, and T-01-21 provenance gaps are closed. The five ROADMAP success criteria were checked independently and map to the PLAN truths below.
 
 ## User Flow Coverage
 
@@ -160,7 +162,7 @@ The Gross construction is a verified local code artifact for this **pilot adapta
 | 01-09.3 | Every selected outcome, including unsuccessful/interrupted, reaches trustworthy denominators | VERIFIED | Named tests prove interrupted/exception counts; hardened `_validate_pilot_ledger` rejects fabricated candidate, sample, native work and selection fields (T-01-21 closed). |
 | 01-09.4 | Pilot maturity does not promote paper experiment | VERIFIED | `load_seed_records` keeps Bhatnagar Figure 6 `mapped_only`, pilot `reference_executable`; promotion test passed. |
 
-**Score:** 28/31 verified; 0 failed; 3 uncertain. The prior fixture, counting, and T-01-21 gaps are now closed. No accepted overrides exist.
+**Score:** 31/31 verified; 0 failed; 0 uncertain after the four human checks in `01-UAT.md`. The prior fixture, counting, and T-01-21 gaps are now closed. No accepted overrides exist.
 
 ### Advisory (New Scope, Unevidenced)
 

@@ -1,50 +1,50 @@
 ---
 gsd_state_version: "1.0"
 milestone: v1.0
-current_phase: 01
-current_phase_name: Evidence Registry and Native CSS Baseline
-current_plan: 9 of 9
-status: Executing Phase 1; package gate approved
-stopped_at: Phase 1 context gathered
-last_updated: "2026-09-22T03:07:55.984Z"
-last_activity: 2026-09-21
-last_activity_desc: Phase 01 execution started
-state_head: caa705d0fba463f9db1723dc469a42ea09dcdffa
+current_phase: 2
+current_phase_name: Canonical CSS Execution and Policy Contracts
+current_plan: Not started
+status: planning
+stopped_at: Phase 1 complete, ready to plan Phase 2
+last_updated: "2026-09-22T16:34:24.492Z"
+last_activity: 2026-09-22
+last_activity_desc: Phase 1 complete, transitioned to Phase 2
+state_head: 70fef7a56f078d227ddcccd7c560a3233da45cf5
 progress:
   total_phases: 14
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 9
-  completed_plans: 0
+  completed_plans: 9
+  percent: 7
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-09-21)
+See: .planning/PROJECT.md (updated 2026-09-22)
 
 **Core value:** Make BP decoder differences explicit, reproducible, and fairly comparable through canonical policy execution and published evidence.
-**Current focus:** Phase 01 — Evidence Registry and Native CSS Baseline
+**Current focus:** Phase 2 — Canonical CSS Execution and Policy Contracts
 
 ## Current Position
 
-Phase: 01 (Evidence Registry and Native CSS Baseline) — EXECUTING
-Plan: 1 of 9
+Phase: 2 — Canonical CSS Execution and Policy Contracts
+Plan: Not started
 Total Phases: 14
-Current Plan: 9 of 9
-Total Plans in Phase: 9
-Planned plan count: TBD during Phase 1 planning
-Status: Executing Phase 1; package gate approved
-Last activity: 2026-09-22 — Completed quick task 260922-21z: Document Phase 1 ldpc SDK coverage and unblock UAT
+Current Plan: Not started
+Total Plans in Phase: TBD during Phase 2 planning
+Status: Ready to plan
+Last activity: 2026-09-22 — Phase 1 complete, transitioned to Phase 2
 
-Progress: 0% [░░░░░░░░░░]
+Progress: 7% [█░░░░░░░░░]
 
 ## Performance Metrics
 
-- Total plans completed: 0
+- Total plans completed: 9
 - Average duration: N/A
 - Total execution time: 0 hours
-- Recent trend: Not applicable — no implementation plans executed.
+- Recent trend: Phase 1 delivered all 9 planned executions and passed UAT.
 
 ## Accumulated Context
 
@@ -57,6 +57,8 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - Reproduction requires declared statistical agreement, not bitwise identity; source semantics and outcome correctness require separate checks.
 - Preserve faithful source configurations and controlled shared-sample/work-budget comparisons as separate evaluation views.
 - Autonomous execution, fine phases, parallel independent agents, Git-tracked planning, full instructions, research/checking/verification enabled; saved Codex model/effort overrides retained.
+- Phase 1 selected a source-pinned Bravyi BB-144 artifact and kept its 32-shot native BP pilot labeled `pilot_adaptation` and `not_assessed`.
+- Phase 1 preserves ordered CSS matrix/logical identity, strict manifest preflight, and a durable shot ledger with independent outcome evaluation.
 
 ### Pending Todos
 
@@ -64,11 +66,11 @@ None outside the roadmap.
 
 ### Blockers/Concerns
 
-No blocker to planning Phase 1. Phase research must resolve:
+No blocker to planning Phase 2. Remaining research concerns:
 
-- Supported paper/experiment set, source revisions, initial CSS codes/logicals, exact statistical targets, and compute budgets.
 - Original BPGD/impulse code identities remain unverified; exact SI/OTF variants and generic mixing/memory/voting definitions need source specifications.
-- Stack candidates are not dependency locks; validate HPC compatibility and reference APIs before installation/integration.
+- Statistical targets and compute budgets for publication campaigns remain to be prespecified.
+- The observed development environment is node-specific; recheck package and backend identity before interpreting runs elsewhere.
 - Circuit fault correlations and observable semantics require dedicated qualification; a CSS adaptation does not reproduce a circuit paper.
 
 ### Quick Tasks Completed
@@ -83,7 +85,7 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Last session: 2026-09-22T00:25:30.534Z
-Stopped at: Phase 1 context gathered
-Resume file: .planning/phases/01-evidence-registry-and-native-css-baseline/01-CONTEXT.md
-Next command: $gsd-plan-phase 1
+Last session: 2026-09-22T16:34:24Z
+Stopped at: Phase 1 complete, ready to plan Phase 2
+Resume file: None
+Next command: $gsd-discuss-phase 2
