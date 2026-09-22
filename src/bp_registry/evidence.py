@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from hashlib import sha256
 import json
+import os
 from pathlib import Path
 import threading
 from typing import Any, Iterable, Mapping
@@ -199,6 +200,7 @@ class EvidenceRegistry:
                     with self.event_path.open("a", encoding="utf-8") as event_file:
                         event_file.write(json.dumps(candidate, sort_keys=True, ensure_ascii=False) + "\n")
                         event_file.flush()
+                        os.fsync(event_file.fileno())
                     self._reload()
                     return dict(self._history[-1])
                 finally:

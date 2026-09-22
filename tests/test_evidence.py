@@ -112,6 +112,21 @@ def test_repeated_and_concurrent_identical_imports_are_idempotent(tmp_path):
     assert len(registry.history()) == 1
 
 
+def test_source_event_append_fsyncs_before_reporting_success(tmp_path, monkeypatch):
+    from bp_registry import evidence
+
+    synced: list[int] = []
+    monkeypatch.setattr(evidence.os, "fsync", lambda descriptor: synced.append(descriptor))
+    registry = evidence.EvidenceRegistry(tmp_path / "events.jsonl")
+    registry.import_search_event(
+        {
+            "kind": "search", "source_uri": "https://example.org", "query": "durable",
+            "cutoff": "2026-09-21", "raw_hits": [], "timestamp": "2026-09-21T00:00:00Z",
+        }
+    )
+    assert len(synced) == 1
+
+
 def test_same_event_id_with_different_content_is_a_conflict(tmp_path):
     from bp_registry import evidence
 
