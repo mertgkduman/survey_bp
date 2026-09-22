@@ -7,6 +7,7 @@ import hashlib
 from importlib.metadata import version
 import json
 import math
+import os
 from pathlib import Path
 import sys
 from typing import Any, Literal, TypeAlias
@@ -145,6 +146,7 @@ class EnvironmentV1(StrictModel):
     scipy: str = Field(min_length=1)
     ldpc: str = Field(min_length=1)
     backend: Literal["cpu"]
+    omp_num_threads: Literal[1]
 
 
 class ExpectedOutputV1(StrictModel):
@@ -326,8 +328,11 @@ def matrix_hashes(code: CssCode) -> dict[str, str]:
 
 def _verify_environment(environment: EnvironmentV1, decoder: DecoderV1) -> None:
     actual = _actual_environment()
-    if actual != environment.model_dump():
+    expected = environment.model_dump(exclude={"omp_num_threads"})
+    if actual != expected:
         raise ValueError("manifest environment does not match this execution environment")
+    if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+        raise ValueError("OMP_NUM_THREADS does not match the manifest requirement")
     if decoder.version != actual["ldpc"]:
         raise ValueError("native decoder version does not match the execution environment")
 

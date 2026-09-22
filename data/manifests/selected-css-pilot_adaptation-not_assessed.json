@@ -44,7 +44,7 @@
   "noise": {"channel": "x_only_bit_flip", "x_error_rates": [0.01]},
   "seed_policy": {"root_seed": 20260922, "derivation": "sha256-manifest-shot-v1"},
   "budget": {"max_shots": 32, "max_iter": 30, "stopping_rule": "fixed_shots", "denominator_rule": "all_terminal_shots"},
-  "environment": {"python": "3.12.2", "numpy": "2.2.6", "scipy": "1.17.1", "ldpc": "2.4.1", "backend": "cpu"},
+  "environment": {"python": "3.12.2", "numpy": "2.2.6", "scipy": "1.17.1", "ldpc": "2.4.1", "backend": "cpu", "omp_num_threads": 1},
   "expected_output": {"status": "not_assessed", "reason": "This fixed 32-shot local pilot has no prespecified source-faithful curve criterion or statistical tolerance.", "values": [], "tolerance": null, "statistical_verdict": null},
   "discrepancies": ["The verified Bravyi construction source is not the impulse paper's source-faithful decoder implementation.", "This run uses one native binary BP product-sum decoder and no impulse or OSD postprocessing.", "The fixed 32-shot local smoke budget is not a statistical reproduction or curve assessment."]
 }

@@ -82,6 +82,7 @@ def _manifest(tmp_path: Path, **changes: object) -> dict[str, object]:
             "scipy": version("scipy"),
             "ldpc": version("ldpc"),
             "backend": "cpu",
+            "omp_num_threads": 1,
         },
         "expected_output": {
             "status": "not_assessed",
@@ -188,6 +189,14 @@ def test_preflight_confines_and_verifies_artifact_and_environment(tmp_path):
     wrong_environment["environment"] = {**wrong_environment["environment"], "ldpc": "0.0.0"}
     with pytest.raises(ValueError, match="environment"):
         preflight(wrong_environment)
+
+
+def test_preflight_requires_the_pinned_openmp_thread_count(tmp_path, monkeypatch):
+    from bp_registry.manifests import preflight
+
+    monkeypatch.setenv("OMP_NUM_THREADS", "7")
+    with pytest.raises(ValueError, match="OMP_NUM_THREADS"):
+        preflight(_manifest(tmp_path))
 
 
 def test_invalid_preflight_never_reaches_sampling_or_native_decode(tmp_path, monkeypatch):

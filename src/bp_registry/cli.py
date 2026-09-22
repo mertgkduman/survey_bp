@@ -6,6 +6,7 @@ import argparse
 from collections import Counter
 from datetime import datetime, timezone
 import json
+import os
 from pathlib import Path
 import socket
 from time import perf_counter
@@ -75,7 +76,7 @@ def _result_from_final_rows(
         },
         "terminations": dict(sorted(terminations.items())),
         "resource_context": {
-            "omp_num_threads": 1,
+            "omp_num_threads": manifest.environment.omp_num_threads,
             "host": socket.gethostname(),
             "elapsed_seconds_this_invocation": elapsed_seconds,
             "native_internals": "edge-update counts unavailable; each final row records the reason",
@@ -126,8 +127,22 @@ def verify_run(output: str | Path) -> dict[str, Any]:
     report = preflight_pilot(manifest_path)
     rows = _terminal_rows(output / "events.jsonl", report["run_id"])
     expected_result = _result_from_final_rows(manifest_path, output, rows, 0.0)
-    comparable = {key: value for key, value in result.items() if key != "resource_context"}
-    expected_comparable = {key: value for key, value in expected_result.items() if key != "resource_context"}
+    comparable = {
+        key: value for key, value in result.items() if key != "resource_context"
+    }
+    expected_comparable = {
+        key: value for key, value in expected_result.items() if key != "resource_context"
+    }
+    for value in (result.get("resource_context"), expected_result.get("resource_context")):
+        if not isinstance(value, dict):
+            raise ValueError("result resource context is missing")
+    actual_resource = dict(result["resource_context"])
+    expected_resource = dict(expected_result["resource_context"])
+    for key in ("elapsed_seconds_this_invocation", "host"):
+        actual_resource.pop(key, None)
+        expected_resource.pop(key, None)
+    if actual_resource != expected_resource:
+        raise ValueError("result resource context does not match the manifest requirement")
     if comparable != expected_comparable:
         raise ValueError("result JSON does not equal counts reconstructed from final ledger rows")
     if len(rows) != report["shot_budget"]:
