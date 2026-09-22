@@ -1,6 +1,7 @@
 """Contracts for source-linked records and event-sourced screening."""
 
 import json
+import shutil
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -237,3 +238,21 @@ def test_completed_selected_pilot_preserves_final_rows_and_paper_maturity():
     assert pilot["assessment_status"] == "not_assessed"
     assert pilot["manifest_path"] == str(manifest)
     assert pilot["result_path"] == str(result_path)
+
+
+def test_verify_run_rejects_terminal_provenance_tampering(tmp_path):
+    from bp_registry.cli import verify_run
+
+    source = Path("data/results/pilot_adaptation-not_assessed")
+    output = tmp_path / "pilot"
+    shutil.copytree(source, output)
+    lines = (output / "events.jsonl").read_text().splitlines()
+    for index, line in enumerate(lines):
+        event = json.loads(line)
+        if event["kind"] == "terminal":
+            event["manifest_sha256"] = "0" * 64
+            lines[index] = json.dumps(event, sort_keys=True, separators=(",", ":"))
+            break
+    (output / "events.jsonl").write_text("\n".join(lines) + "\n")
+    with pytest.raises(ValueError, match="provenance"):
+        verify_run(output)

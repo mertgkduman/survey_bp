@@ -20,11 +20,11 @@
   "final_row_count": 32,
   "ledger_path": "data/results/pilot_adaptation-not_assessed/events.jsonl",
   "manifest_path": "data/manifests/selected-css-pilot_adaptation-not_assessed.json",
-  "manifest_sha256": "c688e7f561aaaba7d2ebcfae8d02e29c4c5708ba98d896aef46a833521e9eb60",
+  "manifest_sha256": "14e3245dc45cd98376e9504887dc5ebfdcffe138f5834b2ff8083e6a0a6c526b",
   "paper_experiment_id": "bhatnagar-impulse:Figure 6",
   "relation": "pilot_adaptation",
   "resource_context": {
-    "elapsed_seconds_this_invocation": 4.220749882049859,
+    "elapsed_seconds_this_invocation": 5.162252207053825,
     "host": "dcc-core-ferc-u-ac39-4-1",
     "native_internals": "edge-update counts unavailable; each final row records the reason",
     "omp_num_threads": 1

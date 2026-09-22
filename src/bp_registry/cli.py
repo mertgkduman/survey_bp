@@ -5,14 +5,16 @@ from __future__ import annotations
 import argparse
 from collections import Counter
 from datetime import datetime, timezone
+from hashlib import sha256
 import json
-import os
 from pathlib import Path
 import socket
 from time import perf_counter
 from typing import Any
 
-from . import evidence
+import numpy as np
+
+from . import evaluator, evidence, sampling
 from .ledger import reconcile
 from .manifests import ManifestV1, manifest_digest, preflight
 from .runner import preflight_pilot, run_one
@@ -34,6 +36,88 @@ def _terminal_rows(ledger_path: Path, run_id: str) -> list[dict[str, Any]]:
         (row for row in reconcile(ledger_path) if row["run_id"] == run_id),
         key=lambda row: row["shot_id"],
     )
+
+
+def _ledger_events(ledger_path: Path) -> list[dict[str, Any]]:
+    if not ledger_path.exists():
+        return []
+    return [json.loads(line) for line in ledger_path.read_text(encoding="utf-8").splitlines() if line]
+
+
+def _validate_pilot_ledger(manifest_path: Path, ledger_path: Path, rows: list[dict[str, Any]]) -> None:
+    """Validate immutable manifest identity and begin-to-terminal lineage."""
+    resolved = preflight(manifest_path)
+    manifest = resolved.manifest
+    if not isinstance(manifest, ManifestV1):
+        raise ValueError("pilot ledger requires a complete manifest")
+    digest = manifest_digest(manifest)
+    expected_common = {
+        "manifest_sha256": digest,
+        "source_uri": manifest.implementation.repository_uri,
+        "source_revision": manifest.implementation.revision,
+        "source_anchor": manifest.implementation.source_path,
+        "paper_uri": manifest.paper.uri,
+        "paper_revision": manifest.paper.revision,
+        "paper_anchor": manifest.paper.experiment_anchor,
+        "implementation_source_artifact_sha256": manifest.implementation.source_artifact_sha256,
+        "code_id": manifest.artifact.code_id,
+        "experiment_relation": manifest.paper.relation,
+        "expected_output_status": manifest.expected_output.status,
+        "decoder_config": {
+            "bp_method": manifest.decoder.bp_method,
+            "schedule": manifest.decoder.schedule,
+            "input_vector_type": manifest.decoder.input_vector_type,
+            "error_rate": manifest.noise.x_error_rates[0],
+            "max_iter": manifest.budget.max_iter,
+        },
+        "decoder_version": manifest.decoder.version,
+        "artifact_raw_sha256": manifest.artifact.raw_sha256,
+        "artifact_semantic_sha256": manifest.artifact.semantic_sha256,
+        "artifact_path": str((Path(manifest.artifact.root) / manifest.artifact.path).resolve()),
+    }
+    events = _ledger_events(ledger_path)
+    begins = {
+        (event.get("run_id"), event.get("shot_id")): event
+        for event in events if event.get("kind") == "begin"
+    }
+    terminals = {
+        (event.get("run_id"), event.get("shot_id")): event
+        for event in events if event.get("kind") == "terminal"
+    }
+    for row in rows:
+        key = (row.get("run_id"), row.get("shot_id"))
+        begin, terminal = begins.get(key), terminals.get(key)
+        if begin is None or terminal is None or terminal != row:
+            raise ValueError("pilot terminal row lacks an unmodified begin-to-terminal lineage")
+        shot_id = row["shot_id"]
+        if type(shot_id) is not int or not 0 <= shot_id < manifest.budget.max_shots:
+            raise ValueError("pilot ledger shot ID is outside the manifest budget")
+        identity = sha256(f"bp-registry-sample-v1\0{digest}\0{shot_id}".encode()).hexdigest()
+        for event in (begin, terminal):
+            if any(event.get(key) != value for key, value in expected_common.items()):
+                raise ValueError("pilot ledger provenance differs from the resolved manifest")
+            if event.get("sample_seed_identity") != identity:
+                raise ValueError("pilot ledger sample identity is not deterministic for its manifest and shot")
+        if terminal.get("termination") != "completed":
+            raise ValueError("pilot ledger contains a non-completed terminal row")
+        sample = sampling.sample_shot(
+            resolved.code, manifest_identity=digest, seed=manifest.seed_policy.root_seed,
+            shot_id=shot_id, x_error_rate=manifest.noise.x_error_rates[0],
+        )
+        if (terminal.get("sample_identity") != sample.sample_identity
+                or terminal.get("syndrome") != sample.observation.syndrome.tolist()
+                or terminal.get("hidden_x") != sample.hidden.x.tolist()
+                or terminal.get("hidden_z") != sample.hidden.z.tolist()):
+            raise ValueError("pilot ledger sample fields do not reproduce from the manifest")
+        candidate = np.asarray(terminal.get("candidate"), dtype=np.uint8)
+        if terminal.get("selected_output") != terminal.get("candidate"):
+            raise ValueError("pilot ledger selected output is not linked to its native candidate")
+        evaluation = evaluator.evaluate_candidate(
+            resolved.code, true_x=sample.hidden.x, true_z=sample.hidden.z, candidate_x=candidate,
+        )
+        if (terminal.get("outcome") != evaluation.outcome
+                or terminal.get("logical_action_agrees") != evaluation.logical_action_agrees):
+            raise ValueError("pilot ledger outcome is not linked to its independently evaluated candidate")
 
 
 def _result_from_final_rows(
@@ -101,6 +185,7 @@ def run_pilot(manifest_path: str | Path, output: str | Path) -> dict[str, Any]:
     for shot_id in missing:
         run_one(manifest_path, shot_id=shot_id, ledger_path=ledger_path)
     rows = _terminal_rows(ledger_path, manifest.run_id)
+    _validate_pilot_ledger(manifest_path, ledger_path, rows)
     expected = list(range(manifest.budget.max_shots))
     if [row["shot_id"] for row in rows] != expected:
         raise ValueError("pilot ledger does not contain exactly the pinned final shot IDs")
@@ -126,6 +211,7 @@ def verify_run(output: str | Path) -> dict[str, Any]:
     manifest_path = Path(result["manifest_path"])
     report = preflight_pilot(manifest_path)
     rows = _terminal_rows(output / "events.jsonl", report["run_id"])
+    _validate_pilot_ledger(manifest_path, output / "events.jsonl", rows)
     expected_result = _result_from_final_rows(manifest_path, output, rows, 0.0)
     comparable = {
         key: value for key, value in result.items() if key != "resource_context"
