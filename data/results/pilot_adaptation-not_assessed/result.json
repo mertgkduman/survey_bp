@@ -1,0 +1,73 @@
+{
+  "artifact": {
+    "code_id": "gross-bb-144",
+    "raw_sha256": "2c02a3b99bf7267acf35efe28e0a2ef0d3827e5a22b948d53da14ae8df68ceb0",
+    "semantic_sha256": "e175e67c0f9ae6f4e0968461ad2f87ba38ad5344166b793c53dd038976d4f427"
+  },
+  "assessment_reason": "This fixed 32-shot local pilot has no prespecified source-faithful curve criterion or statistical tolerance.",
+  "assessment_status": "not_assessed",
+  "denominators": {
+    "all_terminal_shots": 32,
+    "exact": 32,
+    "interrupted": 0,
+    "invalid_syndrome": 0,
+    "logical_failure": 0,
+    "nonconverged": 0,
+    "outcome_unavailable": 0,
+    "postselected": 0,
+    "stabilizer_equivalent": 0
+  },
+  "final_row_count": 32,
+  "ledger_path": "data/results/pilot_adaptation-not_assessed/events.jsonl",
+  "manifest_path": "data/manifests/selected-css-pilot_adaptation-not_assessed.json",
+  "manifest_sha256": "c688e7f561aaaba7d2ebcfae8d02e29c4c5708ba98d896aef46a833521e9eb60",
+  "paper_experiment_id": "bhatnagar-impulse:Figure 6",
+  "relation": "pilot_adaptation",
+  "resource_context": {
+    "elapsed_seconds_this_invocation": 4.220749882049859,
+    "host": "dcc-core-ferc-u-ac39-4-1",
+    "native_internals": "edge-update counts unavailable; each final row records the reason",
+    "omp_num_threads": 1
+  },
+  "run_id": "gross-bb144-pilot",
+  "schema_version": 1,
+  "shot_ids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31
+  ],
+  "statistical_claim": "not_assessed; this fixed 32-shot local smoke budget is not a curve comparison",
+  "terminations": {
+    "completed": 32
+  },
+  "title": "gross-bb-144 pilot_adaptation \u2014 not_assessed"
+}

@@ -96,16 +96,17 @@ def run_pilot(manifest_path: str | Path, output: str | Path) -> dict[str, Any]:
     ledger_path = output / "events.jsonl"
     started = perf_counter()
     existing = {row["shot_id"] for row in _terminal_rows(ledger_path, manifest.run_id)}
-    for shot_id in range(manifest.budget.max_shots):
-        if shot_id not in existing:
-            run_one(manifest_path, shot_id=shot_id, ledger_path=ledger_path)
+    missing = [shot_id for shot_id in range(manifest.budget.max_shots) if shot_id not in existing]
+    for shot_id in missing:
+        run_one(manifest_path, shot_id=shot_id, ledger_path=ledger_path)
     rows = _terminal_rows(ledger_path, manifest.run_id)
     expected = list(range(manifest.budget.max_shots))
     if [row["shot_id"] for row in rows] != expected:
         raise ValueError("pilot ledger does not contain exactly the pinned final shot IDs")
-    result = _result_from_final_rows(manifest_path, output, rows, perf_counter() - started)
     result_path = output / "result.json"
-    result_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    if missing or not result_path.exists():
+        result = _result_from_final_rows(manifest_path, output, rows, perf_counter() - started)
+        result_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return {**report, "output": str(output), "final_row_count": len(rows)}
 
 
@@ -114,8 +115,12 @@ def verify_run(output: str | Path) -> dict[str, Any]:
 
     output = Path(output)
     result = _read_json(output / "result.json")
-    labels = ("pilot_adaptation", "not_assessed")
-    if any(label not in str(result.get(field, "")) for label in labels for field in ("title", "relation", "assessment_status")):
+    if (
+        "pilot_adaptation" not in str(result.get("title", ""))
+        or "not_assessed" not in str(result.get("title", ""))
+        or result.get("relation") != "pilot_adaptation"
+        or result.get("assessment_status") != "not_assessed"
+    ):
         raise ValueError("pilot result is missing pilot_adaptation/not_assessed labels")
     manifest_path = Path(result["manifest_path"])
     report = preflight_pilot(manifest_path)
