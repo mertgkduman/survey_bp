@@ -21,6 +21,24 @@ logical hashes, package versions, decoder settings, and finite budget before a
 native call. Flags cannot replace those scientific fields. The command rejects
 another BB artifact, source revision, environment, or decoder API contract.
 
+## Project-owned three-qubit tracer fixture
+
+The original Phase 1 local tracer command is retained as a one-shot smoke
+fixture with a complete current manifest. It verifies the project-owned
+three-qubit CSS artifact, current environment, and native BP boundary before
+writing a begin and terminal event:
+
+```bash
+OMP_NUM_THREADS=1 .venv/bin/python -m bp_registry.runner \
+  data/manifests/project-three-qubit-fixture.json \
+  --ledger /tmp/project-three-qubit-fixture-events.jsonl
+```
+
+The fixture is a `pilot_adaptation` with `not_assessed` output. Its linked
+paper gives only bit-flip methodological context; the code, logical basis,
+and one-shot budget are project-owned test data. It is neither a paper result
+nor a source-faithful reproduction.
+
 Every displayed surface calls this a **pilot_adaptation** and
 **not_assessed**. The ledger and result preserve successful, nonconverged,
 invalid-syndrome, interrupted, and unavailable-outcome rows. `result.json`

@@ -1,16 +1,86 @@
 {
   "schema_version": 1,
   "run_id": "project-three-qubit-css-smoke",
-  "source_uri": "https://arxiv.org/abs/2312.10950",
-  "source_revision": "v2",
-  "source_anchor": "Figure 2 (methodological context only)",
-  "code_id": "project-three-qubit-css-fixture",
-  "experiment_relation": "pilot_adaptation",
-  "expected_output_status": "not_assessed",
-  "x_error_rate": 0.0,
-  "seed": 12,
-  "max_iter": 10,
-  "bp_method": "product_sum",
-  "schedule": "parallel",
-  "input_vector_type": "syndrome"
+  "paper": {
+    "uri": "https://arxiv.org/html/2312.10950v2",
+    "revision": "v2",
+    "experiment_anchor": "Section 4 (bit-flip methodological context only)",
+    "relation": "pilot_adaptation"
+  },
+  "implementation": {
+    "repository_uri": "https://github.com/quantumgizmos/ldpc",
+    "revision": "2.4.1",
+    "source_path": "src_python/ldpc/__init__.py",
+    "source_artifact_sha256": "ad884f859ccf929ab996b5bc8043adba6646f92877d44805ac5f2f0c816837a5",
+    "source_artifact_status": "verified"
+  },
+  "artifact": {
+    "root": "data/artifacts",
+    "path": "project-three-qubit-css-fixture.json",
+    "raw_sha256": "87328ebbe70907d74a5dd3ee67d6a4b8e87b2c82b66270aee1b71594b4a78d25",
+    "semantic_sha256": "6ee26cb7bf253c42265a326821219b057ceca35cad64fb382f2c4117141e6f4e",
+    "matrix_hashes": {
+      "hx_raw_sha256": "fa81a63939636a8d6184ff498c46e93fc2ab837d080c5852d691bb4f23b8920d",
+      "hz_raw_sha256": "7cbf797444cc052926f6dd17990f417a61ee2340377d7e3f89ff1e66c895abb3",
+      "lx_raw_sha256": "9995179b267ee1c40c900fe8212f5f64cf8a8daf9c69732ddb20826a56ff25ca",
+      "lz_raw_sha256": "fa81a63939636a8d6184ff498c46e93fc2ab837d080c5852d691bb4f23b8920d",
+      "hx_semantic_sha256": "c0ff96e5b6433755fb67cb5280ed266d8c27fc211cc9f76cb9099489100d6edd",
+      "hz_semantic_sha256": "a3ee6a716269bd21164dfcb5b52554c185a70db554c7040120ce224317667fe2",
+      "lx_semantic_sha256": "72ec5303a315712d4046ebeaeb3bf479ff2bfa98b40d9c2aad29ed63134837bf",
+      "lz_semantic_sha256": "bc4640878fdd40fe9d3d355070f5982703b8e2da039c169054ba386bb5552e08"
+    },
+    "format_version": 1,
+    "code_id": "project-three-qubit-css-fixture"
+  },
+  "decoder": {
+    "implementation": "ldpc",
+    "version": "2.4.1",
+    "entry_point": "ldpc.BpDecoder",
+    "bp_method": "product_sum",
+    "schedule": "parallel",
+    "input_vector_type": "syndrome",
+    "parameter_names": [
+      "error_rate",
+      "max_iter",
+      "bp_method",
+      "schedule",
+      "input_vector_type"
+    ]
+  },
+  "noise": {
+    "channel": "x_only_bit_flip",
+    "x_error_rates": [
+      0.0
+    ]
+  },
+  "seed_policy": {
+    "root_seed": 12,
+    "derivation": "sha256-manifest-shot-v1"
+  },
+  "budget": {
+    "max_shots": 1,
+    "max_iter": 10,
+    "stopping_rule": "fixed_shots",
+    "denominator_rule": "all_terminal_shots"
+  },
+  "environment": {
+    "python": "3.12.2",
+    "numpy": "2.2.6",
+    "scipy": "1.17.1",
+    "ldpc": "2.4.1",
+    "backend": "cpu",
+    "omp_num_threads": 1
+  },
+  "expected_output": {
+    "status": "not_assessed",
+    "reason": "This one-shot project-owned algebra fixture checks the local tracer path and has no source-faithful or statistical criterion.",
+    "values": [],
+    "tolerance": null,
+    "statistical_verdict": null
+  },
+  "discrepancies": [
+    "The three-qubit CSS matrices and logical basis are project-owned fixture data, not a code artifact from the linked paper.",
+    "The native ldpc product-sum call is a BP-only adapter, not the paper's BPGD implementation.",
+    "One deterministic fixture shot is execution evidence only and cannot support a curve or source-faithful reproduction claim."
+  ]
 }

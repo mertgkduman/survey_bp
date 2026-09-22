@@ -53,6 +53,30 @@ def test_legacy_fixture_cannot_create_execution_evidence(tmp_path):
     assert not ledger_path.exists()
 
 
+def test_checked_in_three_qubit_fixture_is_a_current_executable_manifest(tmp_path):
+    """The documented project fixture must not silently fall back to legacy mode."""
+    import json
+    from pathlib import Path
+
+    from bp_registry.manifests import ManifestV1, parse_manifest
+    from bp_registry.runner import run_one
+
+    manifest_path = Path("data/manifests/project-three-qubit-fixture.json")
+    manifest = parse_manifest(manifest_path)
+    assert isinstance(manifest, ManifestV1)
+    assert manifest.artifact.code_id == "project-three-qubit-css-fixture"
+    assert manifest.paper.relation == "pilot_adaptation"
+    assert manifest.expected_output.status == "not_assessed"
+
+    ledger_path = tmp_path / "fixture-events.jsonl"
+    result = run_one(manifest_path, shot_id=0, ledger_path=ledger_path)
+    events = [json.loads(line) for line in ledger_path.read_text().splitlines()]
+    assert result.run_id == manifest.run_id
+    assert [event["kind"] for event in events] == ["begin", "terminal"]
+    assert events[1]["manifest_sha256"]
+    assert events[1]["code_id"] == "project-three-qubit-css-fixture"
+
+
 def test_runner_uses_sampling_and_independent_evaluator(tmp_path, monkeypatch):
     import json
     import numpy as np
