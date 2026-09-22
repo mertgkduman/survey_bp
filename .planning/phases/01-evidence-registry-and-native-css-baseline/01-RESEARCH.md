@@ -109,6 +109,8 @@ Use the locally probed Python 3.12.2 environment for initial development, with e
 
 **Installation:** Prefer a project-isolated Python 3.12 environment and lock the versions actually tested; `python -m pip` is available, while `conda` emits a `conda-libmamba-solver` entry-point error on this host. A fresh `python -m pip install pydantic==2.13.5` needs the package-legitimacy checkpoint first. Existing global packages should be treated as a probe, not a reproducible lock. [VERIFIED: local CLI probes, 2026-09-22]
 
+**Registry verification:** `python3 -m pip index versions` completed successfully for all six package names on 2026-09-22 and reported the current releases in the table; official PyPI JSON supplied upload timestamps. Registry existence is separate from the legitimacy verdict. [VERIFIED: PyPI CLI/JSON probes, 2026-09-22]
+
 ### Package Legitimacy Audit
 
 The GSD PyPI legitimacy seam returned **SUS for all six candidates**: its PyPI check reported unknown weekly downloads for each; repository metadata was missing for `numpy`, `scipy`, and `ldpc`, and it marked recent releases as too new for `numpy` and `pydantic`. PyPI JSON independently confirmed the versions and upload dates above. A missing seam repository URL is not proof the projects lack repositories. The planner must insert `checkpoint:human-verify` before *new installation* of each flagged package; installed packages can be retained after their environment identity is recorded. [VERIFIED: `package-legitimacy check --ecosystem pypi numpy scipy pydantic ldpc pytest` and `... bposd`, 2026-09-22] [CITED: https://pypi.org/]
