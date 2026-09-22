@@ -155,3 +155,46 @@ def test_screening_history_reloads_in_original_order(tmp_path):
         ("work-a", "v2", "include"),
         ("work-b", "v1", "exclude"),
     ]
+
+
+def test_seed_records_cover_named_css_figures_tables_and_deferred_regimes():
+    seed_path = Path("data/evidence/seed-records.json")
+    assert seed_path.exists(), "pinned CSS seed records must be present"
+    from bp_registry import evidence
+
+    records = evidence.load_seed_records(seed_path)
+    bpgd = records["works"]["yao-bpgd"]
+    impulse = records["works"]["bhatnagar-impulse"]
+    assert bpgd["revision"]["id"] == "v2"
+    assert impulse["revision"]["id"] == "v1"
+    assert {item["result_id"] for item in bpgd["css_results"]} == {
+        "Figure 2", "Figure 3", "Figure 4", "Figure 5", "Figure 6", "Table 1"
+    }
+    assert {item["result_id"] for item in impulse["css_results"]} == {
+        "Figure 1", "Figure 2", "Figure 3", "Figure 4", "Figure 5", "Figure 6", "Figure 7", "Table I"
+    }
+    assert all(item["anchor"] and item["curve_data"]["status"] for work in (bpgd, impulse) for item in work["css_results"])
+    assert bpgd["identified_later_regimes"] == [{"result_ids": ["Figure 7", "Figure 8"], "regime": "quaternary", "status": "identified_not_extracted"}]
+    assert impulse["identified_later_regimes"] == [{"result_ids": ["Figure 8", "Figure 9"], "regime": "circuit", "status": "identified_not_extracted"}]
+
+
+def test_seed_claims_remain_anchored_queryable_and_maturity_safe():
+    from bp_registry import evidence
+
+    records = evidence.load_seed_records("data/evidence/seed-records.json")
+    claims = records["claims"]
+    assert all(claim["work_id"] and claim["revision_id"] and claim["anchor"] for claim in claims)
+    assert evidence.query_claims(claims, kernel="binary_bp", claim_state="unresolved")
+    assert evidence.query_claims(claims, code_noise="css_code_capacity")
+    b1 = evidence.query_claims(claims, code_label="B1")
+    assert {claim["claim_state"] for claim in b1} >= {"established", "unresolved"}
+    assert evidence.query_claims(claims, code_label="C2", code_family="hypergraph_product")
+    assert evidence.query_claims(claims, code_label="B1", code_family="lifted_product")
+
+    paper = records["paper_experiments"]["bhatnagar-impulse:Figure 6"]
+    pilot = records["execution_events"]["gross-bb144-pilot"]
+    assert paper["evidence_maturity"] == "mapped_only"
+    assert pilot["paper_experiment_id"] == "bhatnagar-impulse:Figure 6"
+    assert pilot["relation"] == "pilot_adaptation"
+    assert pilot["evidence_maturity"] == "reference_executable"
+    assert records["paper_experiments"][pilot["paper_experiment_id"]]["evidence_maturity"] == "mapped_only"
