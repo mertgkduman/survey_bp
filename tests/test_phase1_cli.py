@@ -60,6 +60,21 @@ def test_public_pilot_counts_reconciled_interruption(tmp_path):
     assert result["denominators"]["interrupted"] == 1
     assert result["denominators"]["outcome_unavailable"] == 1
 
+    ledger = output / "events.jsonl"
+    original = [json.loads(line) for line in ledger.read_text().splitlines()]
+    for field, value in (
+        ("native_iterations", 8), ("native_edge_updates", 144),
+        ("candidate", [0] * 144), ("syndrome", [0] * 72),
+        ("hidden_x", [0] * 144), ("selection_status", "native_bp_candidate"),
+    ):
+        tampered = [dict(event) for event in original]
+        terminal = next(event for event in tampered if event["shot_id"] == 0 and event["kind"] == "terminal")
+        terminal[field] = value
+        ledger.write_text("".join(json.dumps(event) + "\n" for event in tampered))
+        with pytest.raises(ValueError, match="unavailable|reconciliation"):
+            verify_run(output)
+    ledger.write_text("".join(json.dumps(event) + "\n" for event in original))
+
 
 def test_public_pilot_counts_recorded_native_exception(tmp_path, monkeypatch):
     from bp_registry import reference, runner

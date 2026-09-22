@@ -104,14 +104,29 @@ def _validate_pilot_ledger(manifest_path: Path, ledger_path: Path, rows: list[di
                     or not terminal.get("outcome_unavailable_reason")
                     or terminal.get("selected_output") is not None
                     or terminal.get("native_converged") is not None
+                    or terminal.get("native_iterations") is not None
+                    or terminal.get("native_edge_updates") is not None
+                    or not terminal.get("native_internals_unavailable_reason")
+                    or any(terminal.get(field) is not None for field in (
+                        "candidate", "syndrome", "hidden_x", "hidden_z",
+                        "sample_identity", "logical_action_agrees", "observation_check_type",
+                        "native_edge_updates_missing_reason",
+                    ))
                     or terminal.get("postselection") != "unavailable"):
                 raise ValueError("pilot unsuccessful terminal lacks explicit unavailable fields")
             if termination == "interrupted":
                 if (terminal.get("termination_inference") != "reconciled_after_owner_release"
-                        or terminal.get("observed_termination") is not False):
+                        or terminal.get("observed_termination") is not False
+                        or terminal.get("selection_status") != "unavailable"
+                        or any(terminal.get(field) is not None for field in (
+                            "exception_stage", "exception_type", "exception_message",
+                        ))):
                     raise ValueError("pilot interruption lacks reconciliation provenance")
             elif (terminal.get("exception_stage") not in {"sampling", "decoding", "evaluation"}
-                    or not terminal.get("exception_type")):
+                    or not terminal.get("exception_type")
+                    or terminal.get("observed_termination") is not True
+                    or terminal.get("selection_status") != "unavailable_due_to_exception"
+                    or terminal.get("termination_inference") is not None):
                 raise ValueError("pilot exception lacks stage and type provenance")
             continue
         if termination != "completed":
