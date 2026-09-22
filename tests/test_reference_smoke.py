@@ -15,6 +15,16 @@ def test_native_bp_fits_tiny_syndrome():
     assert result.iterations >= 1
 
 
+def test_native_adapter_rejects_fractional_inputs_before_uint8_coercion():
+    import numpy as np
+    from bp_registry.reference import decode
+
+    with pytest.raises(ValueError, match="dtype"):
+        decode(np.array([[1.5, 0.0]]), np.array([0.0]), error_rate=0.1, max_iter=10)
+    with pytest.raises(ValueError, match="dtype"):
+        decode(np.array([[1, 0]], dtype=np.uint8), np.array([0.5]), error_rate=0.1, max_iter=10)
+
+
 def test_legacy_fixture_cannot_create_execution_evidence(tmp_path):
     import json
     from bp_registry.runner import run_one

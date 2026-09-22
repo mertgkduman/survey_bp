@@ -16,6 +16,15 @@ class NativeResult:
     edge_updates_missing_reason: str = "ldpc.BpDecoder does not expose edge-update counts"
 
 
+def _binary_uint8(value: np.ndarray, *, name: str) -> np.ndarray:
+    array = np.asarray(value)
+    if array.dtype.kind not in {"b", "i", "u"}:
+        raise ValueError(f"{name} must have a binary integer or bool dtype")
+    if np.any((array != 0) & (array != 1)):
+        raise ValueError(f"{name} must contain only binary values")
+    return array.astype(np.uint8, copy=False)
+
+
 def decode(
     check_matrix: np.ndarray,
     syndrome: np.ndarray,
@@ -27,12 +36,11 @@ def decode(
     input_vector_type: str = "syndrome",
 ) -> NativeResult:
     """Decode only visible checks/syndrome/prior; hidden truth is excluded."""
-    h = np.asarray(check_matrix, dtype=np.uint8)
-    s = np.asarray(syndrome, dtype=np.uint8)
-    if h.ndim != 2 or s.shape != (h.shape[0],):
+    raw_h, raw_s = np.asarray(check_matrix), np.asarray(syndrome)
+    if raw_h.ndim != 2 or raw_s.shape != (raw_h.shape[0],):
         raise ValueError("check matrix and syndrome dimensions disagree")
-    if np.any(h > 1) or np.any(s > 1):
-        raise ValueError("native reference requires binary inputs")
+    h = _binary_uint8(raw_h, name="check matrix")
+    s = _binary_uint8(raw_s, name="syndrome")
     if bp_method != "product_sum" or schedule != "parallel" or input_vector_type != "syndrome":
         raise ValueError("unsupported pinned native BP settings")
     if max_iter < 1 or not 0 <= error_rate <= 1:
@@ -42,9 +50,10 @@ def decode(
         input_vector_type=input_vector_type, max_iter=max_iter,
         error_rate=error_rate,
     )
-    candidate = np.asarray(decoder.decode(s), dtype=np.uint8)
-    if candidate.shape != (h.shape[1],):
+    raw_candidate = np.asarray(decoder.decode(s))
+    if raw_candidate.shape != (h.shape[1],):
         raise RuntimeError("native reference returned wrong candidate shape")
+    candidate = _binary_uint8(raw_candidate, name="native candidate")
     return NativeResult(candidate, bool(decoder.converge), int(decoder.iter))
 
 
