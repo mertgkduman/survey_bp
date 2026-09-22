@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "protocol_status": "seed-mapping protocol; no completed corpus count is claimed",
+  "research_questions": [
+    "Which BP-family decoder mechanisms, kernel assumptions, and policy dimensions are reported for QLDPC decoding?",
+    "Which CSS code-capacity experiments report reproducible code, noise, stopping, metric, implementation, and result evidence?",
+    "Which claims remain ambiguous because a paper revision, source artifact, implementation, or assessment is unavailable?"
+  ],
+  "searches": [
+    {
+      "interface": "arXiv HTML and abstract pages",
+      "source_uri": "https://arxiv.org/",
+      "query": "Targeted seed resolution: arXiv:2312.10950 and arXiv:2606.18240",
+      "purpose": "pin first CSS seed papers and their revision-specific anchors",
+      "result_count": null,
+      "count_status": "not collected; no corpus count inferred"
+    },
+    {
+      "interface": "GitHub pinned repository page",
+      "source_uri": "https://github.com/sbravyi/BivariateBicycleCodes/tree/fa77e3333d3ec44c79d8f914dd24c040d1da471b",
+      "query": "Targeted source lead: BivariateBicycleCodes pinned commit fa77e3333d3ec44c79d8f914dd24c040d1da471b",
+      "purpose": "record a Gross/bivariate-bicycle construction lead without asserting experiment identity",
+      "result_count": null,
+      "count_status": "not a corpus search"
+    }
+  ],
+  "cutoff": "2026-09-21",
+  "inclusion_criteria": [
+    "Primary paper or source-faithful supplement addresses BP-family QLDPC decoding.",
+    "Record has a resolvable work identity and revision or explicitly records the missing revision.",
+    "CSS code-capacity extraction records algorithm, code/noise, metric, and source anchor when the paper reports them."
+  ],
+  "exclusion_criteria": [
+    "Duplicate raw hit with no distinct work or revision is retained as provenance but not counted as a new work.",
+    "Material outside the stated QLDPC BP scope is screened out with a reason.",
+    "Quaternary and circuit material is identified in this seed pass but deferred from CSS extraction."
+  ],
+  "screening": {
+    "title_and_abstract": "One reviewer records scope, work identity, and an include/exclude/uncertain decision with timestamp.",
+    "full_text": "One reviewer records revision-specific eligibility, paper anchors, extraction readiness, and a reason; prior decisions remain immutable."
+  },
+  "adjudication": "A second reviewer or named adjudicator appends a new decision event when eligibility or interpretation is contested; no prior decision is overwritten.",
+  "snowballing": {
+    "backward": "Inspect cited algorithm, code-construction, and comparison sources from each included full text.",
+    "forward": "Inspect later works returned by the declared search interfaces and record query/date before screening.",
+    "status": "planned for corpus expansion; this seed pass does not report snowball counts"
+  },
+  "extraction_dictionary": {
+    "work_and_revision": ["work_id", "revision_id", "source_uri", "anchor"],
+    "taxonomy": ["kernel", "update", "schedule", "memory", "intervention", "stopping", "candidate_processing", "code_noise", "metrics", "implementation", "evidence_type"],
+    "experiment": ["code_identity", "artifact_identity_status", "noise_model", "algorithm_variant", "settings", "curve_or_table_id", "axes", "denominator", "reported_values", "data_availability"],
+    "evidence": ["claim_state", "evidence_maturity", "paper_experiment_id", "pilot_relation", "ambiguity_reason"]
+  },
+  "update_rule": "Re-run every declared search with the stored query and cutoff extension, append raw hits and decisions with stable identities, deduplicate at work and revision level, and report all changed counts and unresolved conflicts."
+}
