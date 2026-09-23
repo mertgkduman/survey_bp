@@ -15,6 +15,72 @@ def test_native_bp_fits_tiny_syndrome():
     assert result.iterations >= 1
 
 
+def test_native_metric_facts_qualify_public_sdk_observability():
+    import numpy as np
+
+    from bp_registry.reference import decode
+
+    result = decode(
+        np.eye(2, dtype=np.uint8), np.array([1, 0], dtype=np.uint8),
+        error_rate=0.1, max_iter=10,
+    )
+    assert hasattr(result, "metric_facts"), "native results must expose typed metric facts"
+    facts = {fact.metric: fact for fact in result.metric_facts}
+
+    iterations = facts["native_iterations"]
+    assert iterations.missingness.value == "observed"
+    assert iterations.value == result.iterations
+    assert iterations.method == "ldpc.BpDecoder.iter"
+    assert iterations.scope == "native_decoder_call"
+    assert iterations.unit == "native_iterations"
+
+    edge_updates = facts["native_edge_updates"]
+    assert edge_updates.missingness.value == "unavailable"
+    assert edge_updates.value is None
+    assert edge_updates.unavailable_reason == (
+        "ldpc.BpDecoder does not expose edge-update counts"
+    )
+    assert result.edge_updates is None
+
+
+def test_native_opaque_edge_work_cannot_be_claimed_as_observed_zero():
+    import numpy as np
+
+    from bp_registry.canonical.metrics import MetricFact
+    from bp_registry.reference import NativeResult
+
+    iteration = MetricFact.observed(
+        "native_iterations", 1, method="ldpc.BpDecoder.iter",
+        scope="native_decoder_call", unit="native_iterations",
+        qualification="public_sdk_counter",
+    )
+    fabricated_edge_work = MetricFact.observed(
+        "native_edge_updates", 0, method="ldpc.BpDecoder",
+        scope="native_decoder_call", unit="edge_messages",
+        qualification="fabricated",
+    )
+    with pytest.raises(ValueError, match="unavailable"):
+        NativeResult(
+            candidate=np.zeros(2, dtype=np.uint8), converged=True, iterations=1,
+            metric_facts=(iteration, fabricated_edge_work),
+        )
+
+
+def test_metric_facts_reject_nonfinite_or_negative_observations_and_reasonless_missingness():
+    from bp_registry.canonical.metrics import MetricFact, unavailable_metric
+
+    kwargs = {
+        "method": "test", "scope": "test_scope", "unit": "count",
+        "qualification": "test_only",
+    }
+    with pytest.raises(ValueError, match="nonnegative"):
+        MetricFact.observed("count", -1, **kwargs)
+    with pytest.raises(ValueError, match="finite"):
+        MetricFact.observed("count", float("inf"), **kwargs)
+    with pytest.raises(ValueError, match="reason"):
+        unavailable_metric("count", reason="", **kwargs)
+
+
 def test_native_adapter_rejects_fractional_inputs_before_uint8_coercion():
     import numpy as np
     from bp_registry.reference import decode
