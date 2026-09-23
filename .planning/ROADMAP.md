@@ -112,19 +112,22 @@ Plans:
 
 **Wave 3** *(after Wave 2)*
 
-- [ ] 02-04-PLAN.md — Hierarchical budgets, atomic work, and qualified resource accounting
 - [ ] 02-05-PLAN.md — Candidate lineage, sparse control-flow events, and bounded traces
 
-**Wave 4** *(after Wave 3)*
+**Wave 4** *(after Wave 3 lineage contracts)*
+
+- [ ] 02-04-PLAN.md — Hierarchical budgets, atomic work, and qualified resource accounting
+
+**Wave 5** *(after Wave 4)*
 
 - [ ] 02-06-PLAN.md — Honest native instrumentation missingness and summaries
 - [ ] 02-07-PLAN.md — Local profiling, representative cohorts, and replay agreement
 
-**Wave 5** *(after Waves 2–4)*
+**Wave 6** *(after Waves 2–5)*
 
 - [ ] 02-08-PLAN.md — Official canonical manifest, CLI integration, and verified result artifact
 
-**Wave 6** *(after Wave 5)*
+**Wave 7** *(after Wave 6)*
 
 - [ ] 02-09-PLAN.md — Executable tutorial, profiling strategy, and novelty/depth register
 

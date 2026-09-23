@@ -655,29 +655,17 @@ The tutorial must present the canonical run as `canonical-implemented`/developme
 
 All assumed choices fall under the explicit agent-discretion areas in CONTEXT.md; none changes a locked decision. [VERIFIED: `.planning/phases/02-canonical-css-execution-and-policy-contracts/02-CONTEXT.md:50-53`]
 
-## Open Questions
+## Resolved Questions
 
-1. **What exact persisted schema/version identifiers should the canonical manifest and richer ledger use?**
-   - What we know: v1 manifest/ledger meanings must remain replayable; ledger v1’s event kinds are exactly `"begin"` and `"terminal"`. [VERIFIED: `src/bp_registry/ledger.py:21,73-90`]
-   - What is unclear: whether project convention prefers a top-level v2 schema or an execution-kind-dispatched sibling schema.
-   - Recommendation: choose explicit new versions in the first contracts plan; never make a v1 record conditionally mean canonical execution.
+1. **RESOLVED — persisted schema/version identifiers:** use the strict `CanonicalManifestV2`/`schema-canonical-v2.json` contract and a separately versioned canonical ledger/event grammar v2. `ManifestV1` and ledger v1 retain their historical native meanings, and no v1 record is conditionally reinterpreted as canonical execution. [VERIFIED: `src/bp_registry/ledger.py:21,73-90`; PLANNED: `02-01-PLAN.md`, `02-05-PLAN.md`, `02-08-PLAN.md`]
 
-2. **Should `K=25` remain the first canonical profile after analytic fixture review?**
-   - What we know: finite clipping is locked and BPGD uses 25 with a numerical rationale. [CITED: https://arxiv.org/html/2312.10950v2]
-   - What is unclear: whether a selected binary reference experiment requires a different source-faithful clip.
-   - Recommendation: keep `K=25` for the canonical baseline profile; represent any paper-specific value as a separately named profile/explicit adaptation, not an invisible override.
+2. **RESOLVED — initial clipping profile:** the canonical baseline is the materialized `binary-spa-flooding-f64-v1` profile with symmetric `K=25`, exact-zero hard decision to bit 0, and ascending canonical-ID ties. Any paper-specific clipping value is a separately named profile or explicit adaptation, never an invisible override. [CITED: https://arxiv.org/html/2312.10950v2; PLANNED: `02-03-PLAN.md`, `02-08-PLAN.md`]
 
-3. **What exact RSS normalization should be recorded on non-Linux hosts?**
-   - What we know: `resource.ru_maxrss` means maximum resident set size, but Python directs users to platform documentation for field details. [CITED: https://docs.python.org/3.12/library/resource.html]
-   - What is unclear: future macOS/other POSIX units and whether process children should be included.
-   - Recommendation: Phase 2 adapter records platform, `RUSAGE_SELF`, raw value/unit, normalized bytes, and method version; unsupported normalization is missing, not guessed.
+3. **RESOLVED — RSS normalization:** Phase 2 records platform, `RUSAGE_SELF`, method version, raw value/unit, and normalized bytes only where platform semantics are known. It excludes child-process RSS from this fact; an unsupported or ambiguous normalization is explicit missingness rather than a guessed conversion. [CITED: https://docs.python.org/3.12/library/resource.html; PLANNED: `02-07-PLAN.md`]
 
-4. **What publication-scale trace/profile quotas and retention policy will be used?**
-   - What we know: the phase must provide explicit configurable local defaults and three separate cohorts. [VERIFIED: `.planning/phases/02-canonical-css-execution-and-policy-contracts/02-CONTEXT.md:38-40,50-53`]
-   - What is unclear: HPC allocation, campaign size, retention budget, and target journal requirements remain undecided. [VERIFIED: `AGENTS.md:19-21`]
-   - Recommendation: mark Phase 2 defaults “development only”; require preregistered campaign values in later manifests.
+4. **RESOLVED — trace/profile quotas:** Phase 2 adopts the configurable local defaults in Pattern 4 solely as development defaults and labels them non-campaign evidence. Publication campaigns must supply prespecified quota, cohort, and retention values in their later manifests after compute allocation and venue constraints are known; absence of those campaign values cannot inherit the Phase 2 defaults. [VERIFIED: `.planning/phases/02-canonical-css-execution-and-policy-contracts/02-CONTEXT.md:38-40,50-53`; VERIFIED: `AGENTS.md:19-21`; PLANNED: `02-05-PLAN.md`, `02-07-PLAN.md`, `02-09-PLAN.md`]
 
-No open question blocks Phase 2 planning.
+All Phase 2 research questions are resolved for execution planning; later campaign-specific values remain explicitly owned by the campaign-planning phase rather than by this phase.
 
 ## Environment Availability
 
