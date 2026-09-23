@@ -213,6 +213,8 @@ def _validate_event_envelopes(stream: Sequence[Mapping[str, Any]], context: Publ
     by_kind: dict[str, Mapping[str, Any]] = {}
     for event in stream:
         kind = event.get("kind")
+        if "sidecar" in event:
+            raise CanonicalStructuralVerificationError("trace evidence is forbidden by the public trace-off plan")
         top = {"ledger_version", "event_id", "kind", "run_id", "shot_id", "data"}
         if kind == "shot_begin":
             top.add("sample_seed_identity")
