@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import fields, is_dataclass
+import json
 
 import numpy as np
+import pytest
 
 
 def _walk(value, seen: set[int]) -> list[object]:
@@ -53,6 +55,83 @@ def test_identity_lift_and_stable_selection_have_typed_lineage():
     assert select_stable_candidate([]) is None
     assert first.working.original is original
     assert first.candidate.flags.writeable is False
+
+
+def test_working_problem_validates_complete_identity_edge():
+    from bp_registry.canonical.lineage import LineageEdge, LineageId
+    from bp_registry.canonical.problems import OriginalProblem, WorkingProblem
+
+    original = OriginalProblem(
+        "original-a",
+        np.array([[1, 0]], dtype=np.uint8),
+        np.array([[1, 0]], dtype=np.uint8),
+        np.array([1], dtype=np.uint8),
+    )
+    original_id = LineageId("original", original.lineage_id)
+    working_id = LineageId("working", "working-a")
+    invalid_edges = (
+        LineageEdge("transform", original_id, working_id),
+        LineageEdge("identity", LineageId("original", "original-other"), working_id),
+        LineageEdge("identity", original_id, LineageId("working", "working-other")),
+    )
+
+    for edge in invalid_edges:
+        with pytest.raises(ValueError, match="identity edge"):
+            WorkingProblem("working-a", original, edge)
+
+
+@pytest.mark.parametrize("hostile_kind", ("other-working", "other-attempt"))
+def test_engine_rejects_candidate_from_other_working_problem_or_attempt(tmp_path, hostile_kind):
+    from bp_registry import evaluator
+    from bp_registry.canonical.execution import run_canonical_shot
+    from bp_registry.canonical.lineage import LineageEdge, LineageId, stable_lineage_id
+    from bp_registry.canonical.problems import OriginalSpaceCandidate, WorkingProblem
+    from bp_registry.css import fixture_code
+    from bp_registry.sampling import DecoderObservation, HiddenTruth
+    from tests.test_canonical_cli import _manifest
+
+    code = fixture_code()
+    truth = HiddenTruth(np.array([1, 0, 0], dtype=np.uint8), np.zeros(3, dtype=np.uint8))
+    evaluator_called = False
+
+    def hostile(_original, working, candidates):
+        candidate = candidates[0].candidate
+        if hostile_kind == "other-working":
+            foreign_id = stable_lineage_id(
+                "working", {"original": working.original.lineage_id, "lift": "foreign"},
+            )
+            foreign = WorkingProblem(
+                foreign_id.value,
+                working.original,
+                LineageEdge(
+                    "identity",
+                    LineageId("original", working.original.lineage_id),
+                    foreign_id,
+                ),
+            )
+            return (OriginalSpaceCandidate("candidate-foreign", foreign, candidate, 0),)
+        return (OriginalSpaceCandidate("candidate-another-attempt", working, candidate, 0),)
+
+    def evaluate(*_args, **_kwargs):
+        nonlocal evaluator_called
+        evaluator_called = True
+        return evaluator.Evaluation("success", True)
+
+    path = tmp_path / "events.jsonl"
+    with pytest.raises(ValueError, match="current (working problem|attempt lineage)"):
+        run_canonical_shot(
+            _manifest(),
+            code=code,
+            observation=DecoderObservation("Z", code.hz @ truth.x % 2),
+            hidden_truth=truth,
+            shot_id=0,
+            ledger_path=path,
+            policy=hostile,
+            evaluate=evaluate,
+        )
+
+    assert evaluator_called is False
+    assert [json.loads(line)["kind"] for line in path.read_text().splitlines()] == ["begin"]
 
 
 def test_empty_policy_selection_is_terminal_without_evaluator(tmp_path):

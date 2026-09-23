@@ -78,6 +78,38 @@ def test_candidate_retention_keeps_rejected_evidence_and_selected_payload():
     assert tuple(item.lineage_id for item in record.candidates) == (selected.lineage_id, rejected.lineage_id)
 
 
+def test_candidate_payload_rejects_coercion_and_nonvectors():
+    from bp_registry.canonical.lineage import CandidateRecord, LineageGraph
+
+    graph = LineageGraph()
+    original = graph.append_node("original", {"sample": "seed"})
+    attempt = graph.append_node(
+        "attempt", {"ordinal": 0}, parent=original, relation="attempt",
+    )
+    invalid_payloads = (
+        np.array([0.0, 1.0]),
+        np.array(["0", "1"]),
+        np.array([False, True]),
+        np.array([0, 2], dtype=np.int64),
+        np.array(1, dtype=np.int64),
+        np.array([[0, 1]], dtype=np.int64),
+    )
+
+    for payload in invalid_payloads:
+        with pytest.raises(
+            ValueError, match="one-dimensional non-boolean integer binary vector",
+        ):
+            CandidateRecord.create(
+                graph=graph,
+                parent=attempt.id,
+                payload=payload,
+                score=None,
+                validations=(),
+                reason="invalid-input",
+                local_ordinal=0,
+            )
+
+
 def test_sparse_canonical_events_remain_when_semantic_tracing_is_off_or_empty(tmp_path):
     from bp_registry.ledger import CanonicalEventWriter, query_canonical_events, read_canonical_events
     from bp_registry.canonical.tracing import TracePlan, TraceSink
