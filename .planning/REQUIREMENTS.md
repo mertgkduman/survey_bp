@@ -139,7 +139,7 @@
 
 ### Documentation and publication
 
-- [ ] **DOC-01**: A researcher can follow an install/run tutorial and inspect mathematical conventions, policy contracts, compatibility, and executable small examples as the canonical engine develops.
+- [x] **DOC-01**: A researcher can follow an install/run tutorial and inspect mathematical conventions, policy contracts, compatibility, and executable small examples as the canonical engine develops.
 - [ ] **DOC-02**: A researcher can follow detailed reproduction and extension guides covering reference environments, manifests, sample/ledger schemas, statistical procedures, HPC execution, and known discrepancies.
 - [ ] **PUB-01**: Every manuscript table/figure and quantitative claim links to versioned analysis, experiment manifests, result/ledger artifacts, uncertainty, and an explicit evidence status.
 - [ ] **PUB-02**: The journal manuscript reports the completed systematic map, canonical policy model, reproducibility study, and controlled results from all three decoding regimes, including limitations and unsuccessful/inconclusive reproductions.
@@ -255,7 +255,7 @@ Every v1 requirement has exactly one owning phase; later phases may use or stren
 | CEV-01 | Phase 13 | Pending |
 | CEV-02 | Phase 13 | Pending |
 | CEV-03 | Phase 13 | Pending |
-| DOC-01 | Phase 2 | Pending |
+| DOC-01 | Phase 2 | Complete |
 | DOC-02 | Phase 14 | Pending |
 | PUB-01 | Phase 14 | Pending |
 | PUB-02 | Phase 14 | Pending |
