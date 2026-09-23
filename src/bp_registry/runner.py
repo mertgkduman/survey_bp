@@ -10,9 +10,11 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .ledger import Writer
+from .ledger import Writer, read_canonical_events
 from .canonical.metrics import unavailable_metric
-from .manifests import ManifestV1, manifest_digest, preflight
+from .canonical.execution import run_canonical_structural_shot
+from .canonical.contracts import validate_composition
+from .manifests import CanonicalExperimentV2, ManifestV1, manifest_digest, preflight
 from . import evaluator, reference, sampling
 
 
@@ -89,6 +91,79 @@ def preflight_pilot(manifest_path: str | Path) -> dict[str, Any]:
         "shot_budget": manifest.budget.max_shots,
         "max_iter": manifest.budget.max_iter,
     }
+
+
+def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
+    """Resolve all canonical external facts before sampling or durable evidence."""
+    resolved = preflight(manifest_path)
+    manifest = resolved.manifest
+    if not isinstance(manifest, CanonicalExperimentV2):
+        raise ValueError("canonical execution requires a strict CanonicalExperimentV2 manifest")
+    composition = validate_composition(manifest.policies)
+    return {
+        "run_id": manifest.run_id,
+        "code_id": manifest.artifact.code_id,
+        "manifest_sha256": manifest_digest(manifest),
+        "policy_identity": composition.semantic_identity,
+        "shot_budget": manifest.budgets.max_shots,
+        "max_iterations": manifest.budgets.attempt.max_iterations,
+        "relation": manifest.evidence.relation,
+        "fixture": manifest.evidence.fixture,
+        "assessment_status": manifest.evidence.assessment_status,
+    }
+
+
+def _canonical_kernel_manifest(manifest: CanonicalExperimentV2) -> dict[str, object]:
+    """Project-owned kernel receives only its compact execution policy contract."""
+    return {
+        "schema_version": 2,
+        "run_id": manifest.run_id,
+        "numerical_profile": manifest.numerical_profile,
+        "max_iterations": manifest.budgets.attempt.max_iterations,
+        "error_rate": manifest.error_rate,
+        "policies": manifest.policies.model_dump(mode="json"),
+    }
+
+
+def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path):
+    """Sample outside the engine, then evaluate only a frozen original-space candidate."""
+    resolved = preflight(manifest_path)
+    manifest = resolved.manifest
+    if not isinstance(manifest, CanonicalExperimentV2):
+        raise ValueError("canonical execution requires a strict CanonicalExperimentV2 manifest")
+    if type(shot_id) is not int or not 0 <= shot_id < manifest.budgets.max_shots:
+        raise ValueError("shot_id is outside the canonical manifest budget")
+    digest = manifest_digest(manifest)
+    sample = sampling.sample_shot(
+        resolved.code, manifest_identity=digest, seed=manifest.randomness.sample_seed,
+        shot_id=shot_id, x_error_rate=manifest.error_rate,
+    )
+    composition = validate_composition(manifest.policies)
+    return run_canonical_structural_shot(
+        _canonical_kernel_manifest(manifest), code=resolved.code, observation=sample.observation,
+        hidden_truth=sample.hidden, shot_id=shot_id, ledger_path=ledger_path,
+        sample_seed_identity=sample.sample_identity,
+        context={
+            "manifest_sha256": digest,
+            "artifact_raw_sha256": manifest.artifact.raw_sha256,
+            "artifact_semantic_sha256": manifest.artifact.semantic_sha256,
+            "code_id": manifest.artifact.code_id,
+            "evidence_relation": manifest.evidence.relation,
+            "fixture": manifest.evidence.fixture,
+            "assessment_status": manifest.evidence.assessment_status,
+            "decoder_seed_identity": manifest.randomness.decoder_seed_identity,
+            "composition_identity": composition.semantic_identity,
+        },
+    )
+
+
+def canonical_terminal_rows(ledger_path: str | Path, run_id: str) -> list[dict[str, Any]]:
+    """Return only terminal structural evidence for one canonical run."""
+    return sorted(
+        (event for event in read_canonical_events(ledger_path)
+         if event["run_id"] == run_id and event["kind"] == "termination"),
+        key=lambda event: event["shot_id"],
+    )
 
 
 def run_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path) -> ShotResult:

@@ -16,8 +16,8 @@ import numpy as np
 
 from . import evaluator, evidence, sampling
 from .ledger import reconcile, summarize
-from .manifests import ManifestV1, manifest_digest, preflight
-from .runner import preflight_pilot, run_one
+from .manifests import CanonicalExperimentV2, ManifestV1, manifest_digest, preflight
+from .runner import canonical_terminal_rows, preflight_canonical, preflight_pilot, run_canonical_one, run_one
 
 
 def _dump(value: dict[str, Any]) -> None:
@@ -204,6 +204,88 @@ def _result_from_final_rows(
     return result
 
 
+def _canonical_result_from_terminal_events(manifest_path: Path, output: Path, rows: list[dict[str, Any]]) -> dict[str, Any]:
+    report = preflight_canonical(manifest_path)
+    digest = manifest_digest(preflight(manifest_path).manifest)
+    outcomes = Counter((row["data"].get("outcome") or "outcome_unavailable") for row in rows)
+    terminations = Counter(row["termination"] for row in rows)
+    ledger_path = output / "events.jsonl"
+    return {
+        "schema_version": 2,
+        "title": "canonical-three-qubit-development — canonical_implemented development_fixture not_assessed",
+        "run_id": report["run_id"],
+        "relation": "canonical_implemented",
+        "fixture": "development_fixture",
+        "assessment_status": "not_assessed",
+        "manifest_path": str(manifest_path),
+        "manifest_sha256": digest,
+        "ledger_path": str(ledger_path),
+        "ledger_sha256": sha256(ledger_path.read_bytes()).hexdigest(),
+        "final_row_count": len(rows),
+        "shot_ids": [row["shot_id"] for row in rows],
+        "policy_identity": report["policy_identity"],
+        "denominators": {"all_terminal_shots": len(rows), **dict(sorted(outcomes.items()))},
+        "terminations": dict(sorted(terminations.items())),
+        "statistical_claim": "not_assessed; canonical development fixture, not a source-faithful or statistical reproduction",
+    }
+
+
+def run_canonical(manifest_path: str | Path, output: str | Path) -> dict[str, Any]:
+    """Run only missing canonical shots and reconstruct result solely from v2 terminals."""
+    manifest_path, output = Path(manifest_path), Path(output)
+    report = preflight_canonical(manifest_path)
+    output.mkdir(parents=True, exist_ok=True)
+    ledger_path = output / "events.jsonl"
+    rows = canonical_terminal_rows(ledger_path, report["run_id"])
+    present = {row["shot_id"] for row in rows}
+    for shot_id in range(report["shot_budget"]):
+        if shot_id not in present:
+            run_canonical_one(manifest_path, shot_id=shot_id, ledger_path=ledger_path)
+    rows = canonical_terminal_rows(ledger_path, report["run_id"])
+    expected = list(range(report["shot_budget"]))
+    if [row["shot_id"] for row in rows] != expected:
+        raise ValueError("canonical ledger does not contain exactly the pinned terminal shot IDs")
+    result_path = output / "result.json"
+    result = _canonical_result_from_terminal_events(manifest_path, output, rows)
+    if result_path.exists() and _read_json(result_path) != result:
+        raise ValueError("canonical result conflicts with terminal evidence")
+    if not result_path.exists():
+        result_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return {**report, "output": str(output), "final_row_count": len(rows)}
+
+
+def _verify_canonical_run(output: Path, result: dict[str, Any]) -> dict[str, Any]:
+    if (result.get("relation") != "canonical_implemented" or result.get("fixture") != "development_fixture"
+            or result.get("assessment_status") != "not_assessed"):
+        raise ValueError("canonical result is missing transparent development labels")
+    manifest_path = Path(result["manifest_path"])
+    report = preflight_canonical(manifest_path)
+    ledger_path = output / "events.jsonl"
+    if result.get("ledger_sha256") != sha256(ledger_path.read_bytes()).hexdigest():
+        raise ValueError("canonical result ledger hash does not match durable evidence")
+    rows = canonical_terminal_rows(ledger_path, report["run_id"])
+    if [row["shot_id"] for row in rows] != list(range(report["shot_budget"])):
+        raise ValueError("canonical terminal rows differ from the manifest shot budget")
+    resolved = preflight(manifest_path)
+    assert isinstance(resolved.manifest, CanonicalExperimentV2)
+    for row in rows:
+        data = row["data"]
+        if data.get("manifest_sha256") != manifest_digest(resolved.manifest):
+            raise ValueError("canonical terminal manifest identity differs from preflight")
+        if row["termination"] == "completed":
+            sample = sampling.sample_shot(resolved.code, manifest_identity=manifest_digest(resolved.manifest),
+                                          seed=resolved.manifest.randomness.sample_seed, shot_id=row["shot_id"],
+                                          x_error_rate=resolved.manifest.error_rate)
+            candidate = np.asarray(data.get("candidate"), dtype=np.uint8)
+            evaluation = evaluator.evaluate_candidate(resolved.code, true_x=sample.hidden.x, true_z=sample.hidden.z, candidate_x=candidate)
+            if data.get("outcome") != evaluation.outcome or data.get("logical_action_agrees") != evaluation.logical_action_agrees:
+                raise ValueError("canonical terminal outcome does not equal independent evaluation")
+    expected = _canonical_result_from_terminal_events(manifest_path, output, rows)
+    if result != expected:
+        raise ValueError("canonical result JSON does not equal terminal structural evidence")
+    return {**report, "output": str(output), "final_row_count": len(rows), "verified_at": datetime.now(timezone.utc).isoformat()}
+
+
 def run_pilot(manifest_path: str | Path, output: str | Path) -> dict[str, Any]:
     """Run only missing declared shot IDs, then reconstruct the result from finals."""
 
@@ -242,6 +324,8 @@ def verify_run(output: str | Path) -> dict[str, Any]:
 
     output = Path(output)
     result = _read_json(output / "result.json")
+    if result.get("relation") == "canonical_implemented":
+        return _verify_canonical_run(output, result)
     if (
         "pilot_adaptation" not in str(result.get("title", ""))
         or "not_assessed" not in str(result.get("title", ""))
@@ -287,6 +371,9 @@ def build_parser() -> argparse.ArgumentParser:
     pilot_command = commands.add_parser("pilot")
     pilot_command.add_argument("manifest", type=Path)
     pilot_command.add_argument("--output", type=Path, required=True)
+    canonical_command = commands.add_parser("canonical")
+    canonical_command.add_argument("manifest", type=Path)
+    canonical_command.add_argument("--output", type=Path, required=True)
     reconcile_command = commands.add_parser("reconcile")
     reconcile_command.add_argument("ledger", type=Path)
     verify_command = commands.add_parser("verify-run")
@@ -300,9 +387,11 @@ def main(argv: list[str] | None = None) -> None:
         records = evidence.load_seed_records(args.records)
         _dump({"records": str(args.records), "paper_experiments": sorted(records["paper_experiments"]), "status": "valid"})
     elif args.command == "preflight":
-        _dump(preflight_pilot(args.manifest))
+        _dump(preflight_canonical(args.manifest) if isinstance(preflight(args.manifest).manifest, CanonicalExperimentV2) else preflight_pilot(args.manifest))
     elif args.command == "pilot":
         _dump(run_pilot(args.manifest, args.output))
+    elif args.command == "canonical":
+        _dump(run_canonical(args.manifest, args.output))
     elif args.command == "reconcile":
         _dump({"ledger": str(args.ledger), "final_rows": reconcile(args.ledger)})
     elif args.command == "verify-run":

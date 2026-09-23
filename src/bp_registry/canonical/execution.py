@@ -14,7 +14,7 @@ import numpy as np
 
 from .. import evaluator
 from ..css import CssCode
-from ..ledger import LedgerWriter, ShotOwnershipError, reconcile
+from ..ledger import CanonicalEventWriter, LedgerWriter, ShotOwnershipError, read_canonical_events, reconcile
 from ..sampling import DecoderObservation, HiddenTruth
 from .contracts import (
     CanonicalManifestV2,
@@ -262,6 +262,87 @@ def run_canonical_shot(manifest: CanonicalManifestV2 | dict[str, object] | str, 
         except ShotOwnershipError:
             time.sleep(0.01)
             existing = _existing(path, parsed.run_id, shot_id, identity)
+            if existing is not None:
+                return existing
+    raise ShotOwnershipError("canonical shot remained owned beyond bounded retry window")
+
+
+def _existing_structural(path: Path, run_id: str, shot_id: int, identity: str) -> CanonicalExecutionResult | None:
+    for event in read_canonical_events(path):
+        if event["run_id"] == run_id and event["shot_id"] == shot_id and event["kind"] == "termination":
+            data = event["data"]
+            if data.get("canonical_identity") != identity:
+                raise CanonicalConflictError("conflicting canonical content for run/shot identity")
+            outcome = data.get("outcome")
+            evaluation = evaluator.Evaluation(outcome, data.get("logical_action_agrees")) if outcome else None
+            candidate = data.get("candidate")
+            return CanonicalExecutionResult(run_id, shot_id, event["termination"], evaluation,
+                                            None if candidate is None else np.asarray(candidate, dtype=np.uint8))
+    return None
+
+
+def run_canonical_structural_shot(
+    manifest: CanonicalManifestV2 | dict[str, object] | str, *, code: CssCode,
+    observation: DecoderObservation, hidden_truth: HiddenTruth, shot_id: int,
+    ledger_path: str | Path, sample_seed_identity: str, context: Mapping[str, Any],
+    evaluate: Callable[..., evaluator.Evaluation] = evaluator.evaluate_candidate,
+) -> CanonicalExecutionResult:
+    """Run the kernel with v2 structural evidence and an outer truth boundary."""
+    parsed = parse_canonical_manifest(manifest)
+    if type(shot_id) is not int or shot_id < 0 or observation.check_type != "Z":
+        raise ValueError("canonical tracer accepts a nonnegative Z-check shot")
+    validated = code.validate()
+    resolved = validate_composition(parsed.policies)
+    PolicyRuntime(resolved).traverse_lifecycle()
+    identity = _identity(parsed, observation)
+    path = Path(ledger_path)
+    existing = _existing_structural(path, parsed.run_id, shot_id, identity)
+    if existing is not None:
+        return existing
+    original_id = stable_lineage_id("original", {"identity": identity})
+    original = OriginalProblem(original_id.value, validated.hx, validated.hz, observation.syndrome)
+    working_id = stable_lineage_id("working", {"original": original_id.value, "lift": "identity"})
+    working = WorkingProblem(working_id.value, original, LineageEdge("identity", original_id, working_id))
+    for _attempt in range(30):
+        try:
+            with CanonicalEventWriter(path) as ledger:
+                common = {**dict(context), "canonical_identity": identity, "composition_identity": resolved.semantic_identity}
+                ledger.begin(run_id=parsed.run_id, shot_id=shot_id, sample_seed_identity=sample_seed_identity, **common)
+                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="attempt", data={**common, "scope": "attempt", "max_iterations": parsed.max_iterations})
+                try:
+                    kernel_result = BinarySpaKernel().run(validated.hz, observation.syndrome,
+                                                          error_rate=parsed.error_rate, max_iterations=parsed.max_iterations)
+                except NumericalFailure as error:
+                    ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="missingness", data={**common, "field": "candidate", "reason": "numerical_failure"})
+                    ledger.terminal(run_id=parsed.run_id, shot_id=shot_id, termination="numerical_failure",
+                                    data={**common, "numerical_failure": str(error), "selection_status": "unavailable_due_to_numerical_failure", "outcome": None})
+                    return CanonicalExecutionResult(parsed.run_id, shot_id, "numerical_failure", None, None)
+                candidate = np.array(kernel_result.candidate, dtype=np.uint8, copy=True)
+                candidate.setflags(write=False)
+                candidate_id = stable_lineage_id("candidate", {"working": working_id.value, "candidate": candidate.tolist()})
+                selected = select_stable_candidate((OriginalSpaceCandidate(candidate_id.value, working, candidate, 0),))
+                if selected is None:  # defensive; the identity composition always supplies one candidate.
+                    ledger.terminal(run_id=parsed.run_id, shot_id=shot_id, termination="no_eligible_candidate",
+                                    data={**common, "selection_status": "no_eligible_candidate", "outcome": None})
+                    return CanonicalExecutionResult(parsed.run_id, shot_id, "no_eligible_candidate", None, None)
+                frozen = selected.candidate
+                work = WorkVector.from_flooding_counts(edge_count=int(np.count_nonzero(validated.hz)), variable_count=validated.n)
+                work = WorkVector.sum(work for _ in range(kernel_result.iterations))
+                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="candidate", data={**common, "candidate": frozen.tolist(), "candidate_lineage_id": selected.lineage_id})
+                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="selection", data={**common, "selection_status": "frozen_decoder_visible_candidate", "original_lineage_id": original_id.value, "working_lineage_id": working_id.value, "candidate_lineage_id": selected.lineage_id})
+                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="work", data={**common, "qualified_iterations": {"count": kernel_result.iterations, "schedule": "flooding", "atomic_unit": "complete_double_buffered_sweep"}, "work_vector": work.as_evidence()})
+                evaluation_result = evaluate(validated, true_x=hidden_truth.x, true_z=hidden_truth.z, candidate_x=frozen)
+                ledger.terminal(run_id=parsed.run_id, shot_id=shot_id, termination="completed", data={
+                    **common, "candidate": frozen.tolist(), "iterations": kernel_result.iterations,
+                    "converged": kernel_result.converged, "selection_status": "frozen_decoder_visible_candidate",
+                    "outcome": evaluation_result.outcome, "logical_action_agrees": evaluation_result.logical_action_agrees,
+                    "original_lineage_id": original_id.value, "working_lineage_id": working_id.value,
+                    "candidate_lineage_id": selected.lineage_id, "work_vector": work.as_evidence(),
+                })
+                return CanonicalExecutionResult(parsed.run_id, shot_id, "completed", evaluation_result, frozen)
+        except ShotOwnershipError:
+            time.sleep(0.01)
+            existing = _existing_structural(path, parsed.run_id, shot_id, identity)
             if existing is not None:
                 return existing
     raise ShotOwnershipError("canonical shot remained owned beyond bounded retry window")

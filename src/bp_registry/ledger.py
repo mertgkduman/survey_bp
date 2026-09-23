@@ -491,6 +491,7 @@ class CanonicalEventWriter:
 
     def __init__(self, path: str | Path):
         self.path = Path(path)
+        self._owners: dict[ShotKey, Any] = {}
 
     def _append(self, event: dict[str, Any]) -> None:
         event["ledger_version"] = CANONICAL_LEDGER_VERSION
@@ -518,7 +519,18 @@ class CanonicalEventWriter:
                 os.fsync(handle.fileno())
 
     def begin(self, *, run_id: str, shot_id: int, sample_seed_identity: str, **data: Any) -> None:
-        self._append({"kind": "shot_begin", "run_id": run_id, "shot_id": shot_id, "sample_seed_identity": sample_seed_identity, "data": data})
+        key = _key(run_id, shot_id)
+        if key in self._owners:
+            return
+        owner = _try_owner_lock(self.path, key)
+        if owner is None:
+            raise ShotOwnershipError(f"canonical shot {key!r} is actively owned by another process")
+        try:
+            self._append({"kind": "shot_begin", "run_id": run_id, "shot_id": shot_id, "sample_seed_identity": sample_seed_identity, "data": data})
+            self._owners[key] = owner
+        except BaseException:
+            _release_owner(owner)
+            raise
 
     def event(self, *, run_id: str, shot_id: int, kind: str, data: Mapping[str, Any] | None = None, sidecar: Mapping[str, Any] | None = None) -> None:
         event: dict[str, Any] = {"kind": kind, "run_id": run_id, "shot_id": shot_id, "data": dict(data or {})}
@@ -527,10 +539,25 @@ class CanonicalEventWriter:
         self._append(event)
 
     def terminal(self, *, run_id: str, shot_id: int, termination: str, data: Mapping[str, Any] | None = None) -> None:
-        self._append({"kind": "termination", "run_id": run_id, "shot_id": shot_id, "termination": termination, "data": dict(data or {})})
+        key = _key(run_id, shot_id)
+        owner = self._owners.get(key)
+        try:
+            if owner is None:
+                raise ShotOwnershipError(f"canonical shot {key!r} is not owned by this writer")
+            self._append({"kind": "termination", "run_id": run_id, "shot_id": shot_id, "termination": termination, "data": dict(data or {})})
+        finally:
+            if owner is not None:
+                self._owners.pop(key, None)
+                _release_owner(owner)
+
+    def close(self) -> None:
+        for key, owner in list(self._owners.items()):
+            self._owners.pop(key, None)
+            _release_owner(owner)
 
     def __enter__(self) -> "CanonicalEventWriter":
         return self
 
     def __exit__(self, *_exc: object) -> None:
+        self.close()
         return None
