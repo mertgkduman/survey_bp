@@ -97,7 +97,7 @@ Plans:
 5. A researcher can install the package, run the tutorial, and inspect mathematical conventions, lifecycle contracts, and compatibility examples.
 
 **Research focus:** Numerical stability, trace vocabulary, policy ownership, scoped budgets, and kernel-level work definitions.
-**Plans:** 12/12 plans executed
+**Plans:** 12/13 plans executed
 
 Plans:
 
@@ -142,6 +142,10 @@ Plans:
 **Wave 10** *(after Waves 8–9)*
 
 - [x] 02-12-PLAN.md — Profiling, trace admission, native isolation, tutorial correction, and fresh evidence
+
+**Wave 11** *(after Wave 10)*
+
+- [ ] 02-13-PLAN.md — Full replay identity, structural verification, bounded profiling, and refreshed evidence
 
 ### Phase 3: Update Rules and Scheduling
 
