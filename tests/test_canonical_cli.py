@@ -99,6 +99,59 @@ def test_public_canonical_command_reconstructs_verified_structural_evidence(tmp_
     assert all(event["data"].get("evidence_relation") == "canonical_implemented" for event in events)
 
 
+def test_public_replay_rejects_same_run_changed_full_manifest_before_result(tmp_path):
+    """A full-manifest change must not reuse a same-run structural terminal."""
+    from bp_registry.canonical.execution import CanonicalConflictError
+    from bp_registry.cli import run_canonical
+    from bp_registry.runner import run_canonical_one
+    from bp_registry.sampling import sample_shot
+    from bp_registry.manifests import manifest_digest, preflight
+
+    output = tmp_path / "canonical-result"
+    ledger_path = output / "events.jsonl"
+    run_canonical(CANONICAL_MANIFEST, output)
+    changed = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text(encoding="utf-8"))
+    changed["evidence"]["procedure"] = "same baseline with a distinct documented procedure"
+    changed_path = tmp_path / "changed-procedure.json"
+    changed_path.write_text(json.dumps(changed), encoding="utf-8")
+
+    original = preflight(CANONICAL_MANIFEST)
+    altered = preflight(changed_path)
+    assert np.array_equal(
+        sample_shot(original.code, manifest_identity=manifest_digest(original.manifest), seed=original.manifest.randomness.sample_seed, shot_id=0, x_error_rate=original.manifest.error_rate).observation.syndrome,
+        sample_shot(altered.code, manifest_identity=manifest_digest(altered.manifest), seed=altered.manifest.randomness.sample_seed, shot_id=0, x_error_rate=altered.manifest.error_rate).observation.syndrome,
+    )
+    before_result = (output / "result.json").read_bytes()
+    with pytest.raises(CanonicalConflictError, match="conflicting canonical content"):
+        run_canonical_one(changed_path, shot_id=0, ledger_path=ledger_path)
+    with pytest.raises(CanonicalConflictError, match="conflicting canonical content"):
+        run_canonical(changed_path, output)
+    assert (output / "result.json").read_bytes() == before_result
+
+
+def test_public_execution_identity_binds_manifest_code_sample_and_shot():
+    from bp_registry.canonical.verification import public_execution_identity
+
+    common = {
+        "manifest_sha256": "m" * 64,
+        "artifact_raw_sha256": "r" * 64,
+        "artifact_semantic_sha256": "s" * 64,
+        "compact_manifest": {"schema_version": 2, "run_id": "run"},
+        "sample_seed_identity": "seed" * 16,
+        "run_id": "run",
+        "shot_id": 0,
+        "check_type": "Z",
+        "syndrome": [0, 1],
+    }
+    identity = public_execution_identity(**common)
+    assert identity.startswith("sha256:")
+    for field, changed in (("manifest_sha256", "x" * 64), ("artifact_raw_sha256", "y" * 64),
+                           ("sample_seed_identity", "other"), ("shot_id", 1)):
+        altered = dict(common)
+        altered[field] = changed
+        assert public_execution_identity(**altered) != identity
+
+
 def test_public_profile_plan_emits_typed_attempt_evidence(tmp_path):
     from bp_registry.ledger import read_canonical_events
     from bp_registry.runner import run_canonical_one
