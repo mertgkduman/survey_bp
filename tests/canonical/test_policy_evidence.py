@@ -30,6 +30,28 @@ def test_canonical_tutorial_has_required_contract_anchors():
     assert all(anchor in tutorial for anchor in required_anchors)
 
 
+def test_profiling_strategy_and_novelty_register_preserve_evidence_limits():
+    strategy = Path("docs/profiling-and-tracing-strategy.md").read_text(encoding="utf-8").lower()
+    register = Path("docs/research-novelty-and-depth-register.md").read_text(encoding="utf-8").lower()
+    strategy_anchors = (
+        "d-20", "scientific value", "cost", "sparse structural", "iteration", "edge",
+        "max_records", "max_bytes", "truncated", "development-only", "not a campaign default",
+        "clean", "representative", "diagnostic", "selected_before_outcome", "inclusion_probability",
+        "adapter_overhead", "clean_run_id", "profile_run_id", "semantic_agreement",
+        "candidate", "termination", "work", "lineage", "semantic_trace_digest",
+        "plot", "missingness", "retention", "race-sensitive", "content identity",
+    )
+    register_anchors = (
+        "d-26", "potential contribution", "executable evidence", "closest precedent",
+        "unresolved search", "claim maturity", "profiling", "selective tracing", "provisional",
+        "corpus recheck", "not_assessed", "not established methodological novelty",
+    )
+    assert all(anchor in strategy for anchor in strategy_anchors)
+    assert all(anchor in register for anchor in register_anchors)
+    assert "diagnostic evidence is not a population estimate" in strategy
+    assert "development evidence is not a reproduction claim" in strategy
+
+
 def test_policy_evidence_requires_a_primary_basis_and_ordered_invariants():
     evidence = PolicyEvidence(
         source_anchors=["https://example.test/paper#eq-1"],
