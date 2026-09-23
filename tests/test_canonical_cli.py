@@ -3,10 +3,53 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
+import subprocess
+import sys
 from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 import pytest
+
+
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+CANONICAL_MANIFEST = "data/manifests/canonical-three-qubit-development.json"
+
+
+def test_documented_tutorial(tmp_path):
+    """The public tutorial is executable from the approved environment, without fetching dependencies."""
+    import bp_registry
+
+    tutorial = (REPOSITORY_ROOT / "docs/canonical-engine.md").read_text(encoding="utf-8")
+    assert ".venv/bin/python -m pip install --no-deps -e ." in tutorial
+    assert "approved `.venv`" in tutorial
+    assert Path(bp_registry.__file__).resolve().is_relative_to(REPOSITORY_ROOT / "src")
+
+    output = tmp_path / "canonical-three-qubit-development"
+    commands = [
+        [sys.executable, "-m", "bp_registry.cli", "preflight", CANONICAL_MANIFEST],
+        [sys.executable, "-m", "bp_registry.cli", "canonical", CANONICAL_MANIFEST, "--output", str(output)],
+        [sys.executable, "-m", "bp_registry.cli", "reconcile", str(output / "events.jsonl")],
+        [sys.executable, "-m", "bp_registry.cli", "verify-run", str(output)],
+    ]
+    reports = [
+        json.loads(subprocess.run(command, cwd=REPOSITORY_ROOT, text=True, capture_output=True, check=True).stdout)
+        for command in commands
+    ]
+    checked = json.loads((REPOSITORY_ROOT / "data/results/canonical-three-qubit-development/result.json").read_text())
+    assert reports[0]["numerical_profile"] == "binary-spa-flooding-f64-v1"
+    assert reports[0]["policy_identity"] == checked["policy_identity"]
+    assert reports[1]["final_row_count"] == reports[2]["final_rows"] == reports[3]["final_row_count"] == 2
+
+    from bp_registry.ledger import read_canonical_events
+
+    events = read_canonical_events(output / "events.jsonl")
+    terminals = [event for event in events if event["kind"] == "termination"]
+    assert [event["data"]["outcome"] for event in terminals] == ["exact", "exact"]
+    assert all(event["data"]["selection_status"] == "frozen_decoder_visible_candidate" for event in terminals)
+    assert all(event["data"]["assessment_status"] == "not_assessed" for event in terminals)
+    assert len([event for event in events if event["kind"] == "runtime"]) == 2
+    assert len([event for event in events if event["kind"] == "missingness"]) == 2
 
 
 def test_checked_canonical_manifest_has_a_strict_public_preflight_contract():
