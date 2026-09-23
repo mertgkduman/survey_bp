@@ -204,3 +204,54 @@ def test_active_owner_stays_pending_then_dead_owner_is_repaired_once(tmp_path):
     assert repaired["native_iterations"] is None
     assert repaired["native_internals_unavailable_reason"]
     assert reconcile(path) == rows
+
+
+def test_canonical_intermediate_events_require_active_writer_ownership(tmp_path):
+    from bp_registry.ledger import (
+        CanonicalEventWriter,
+        ShotOwnershipError,
+        read_canonical_events,
+    )
+
+    path = tmp_path / "canonical-events.jsonl"
+    with CanonicalEventWriter(path) as owner, CanonicalEventWriter(path) as intruder:
+        owner.begin(run_id="canonical", shot_id=1, sample_seed_identity="seed-1")
+
+        for kind in (
+            "attempt",
+            "candidate",
+            "selection",
+            "work",
+            "runtime",
+            "missingness",
+            "trace_link",
+        ):
+            with pytest.raises(ShotOwnershipError, match="not owned"):
+                intruder.event(run_id="canonical", shot_id=1, kind=kind)
+        with pytest.raises(ShotOwnershipError, match="not owned"):
+            intruder.terminal(
+                run_id="canonical", shot_id=1, termination="forged",
+            )
+
+        owner.event(run_id="canonical", shot_id=1, kind="attempt")
+        owner.terminal(run_id="canonical", shot_id=1, termination="completed")
+
+    assert [event["kind"] for event in read_canonical_events(path)] == [
+        "shot_begin",
+        "attempt",
+        "termination",
+    ]
+
+
+def test_canonical_event_rejects_reserved_lifecycle_kinds(tmp_path):
+    from bp_registry.ledger import CanonicalEventWriter, read_canonical_events
+
+    path = tmp_path / "canonical-events.jsonl"
+    with CanonicalEventWriter(path) as writer:
+        writer.begin(run_id="canonical", shot_id=1, sample_seed_identity="seed-1")
+        with pytest.raises(ValueError, match="reserved lifecycle"):
+            writer.event(run_id="canonical", shot_id=1, kind="shot_begin")
+        with pytest.raises(ValueError, match="reserved lifecycle"):
+            writer.event(run_id="canonical", shot_id=1, kind="termination")
+
+    assert [event["kind"] for event in read_canonical_events(path)] == ["shot_begin"]
