@@ -15,7 +15,7 @@ from typing import Any
 import numpy as np
 
 from . import evaluator, evidence, sampling
-from .ledger import reconcile, summarize
+from .ledger import read_canonical_events, reconcile, summarize
 from .manifests import CanonicalExperimentV2, ManifestV1, manifest_digest, preflight
 from .runner import canonical_terminal_rows, preflight_canonical, preflight_pilot, run_canonical_one, run_one
 
@@ -42,6 +42,20 @@ def _ledger_events(ledger_path: Path) -> list[dict[str, Any]]:
     if not ledger_path.exists():
         return []
     return [json.loads(line) for line in ledger_path.read_text(encoding="utf-8").splitlines() if line]
+
+
+def _reconcile_report(ledger_path: Path) -> dict[str, Any]:
+    """Report final rows for either durable ledger version without weakening validation."""
+    events = _ledger_events(ledger_path)
+    if events and events[0].get("ledger_version") == 2:
+        canonical_events = read_canonical_events(ledger_path)
+        return {
+            "ledger": str(ledger_path),
+            "final_rows": sum(event["kind"] == "termination" for event in canonical_events),
+            "ledger_version": 2,
+            "mode": "canonical_query",
+        }
+    return {"ledger": str(ledger_path), "final_rows": reconcile(ledger_path), "ledger_version": 1}
 
 
 def _validate_pilot_ledger(manifest_path: Path, ledger_path: Path, rows: list[dict[str, Any]]) -> None:
@@ -393,7 +407,7 @@ def main(argv: list[str] | None = None) -> None:
     elif args.command == "canonical":
         _dump(run_canonical(args.manifest, args.output))
     elif args.command == "reconcile":
-        _dump({"ledger": str(args.ledger), "final_rows": reconcile(args.ledger)})
+        _dump(_reconcile_report(args.ledger))
     elif args.command == "verify-run":
         _dump(verify_run(args.output))
 

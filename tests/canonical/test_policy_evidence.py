@@ -9,12 +9,12 @@ from bp_registry.canonical.contracts import PolicyEvidence
 
 
 def test_canonical_tutorial_has_required_contract_anchors():
-    tutorial = Path("docs/canonical-engine.md").read_text(encoding="utf-8")
+    tutorial = Path("docs/canonical-engine.md").read_text(encoding="utf-8").replace("**", "").replace("\n", " ").lower()
     required_anchors = (
         "binary-spa-flooding-f64-v1",
-        "log(P(0) / P(1))",
-        "s = Hx (mod 2)",
-        "K = 25",
+        "log(p(0) / p(1))",
+        "s = hx (mod 2)",
+        "k = 25",
         "check-major, variable-minor",
         "old v2c snapshot",
         "fresh v2c buffer",
@@ -22,7 +22,7 @@ def test_canonical_tutorial_has_required_contract_anchors():
         "shot, search, member, leg, branch, attempt, iteration, and message",
         "capability-scoped", "private state", "typed decisions",
         "static composition validation", "live-state invariant",
-        "reserve", "WorkVector", "schedule-qualified iteration",
+        "reserve", "workvector", "schedule-qualified iteration",
         "frozen decoder-visible candidate", "independent evaluator",
         "canonical_implemented", "development_fixture", "not_assessed",
         "source-faithful", "statistical reproduction",

@@ -37,7 +37,11 @@ def test_documented_tutorial(tmp_path):
         for command in commands
     ]
     checked = json.loads((REPOSITORY_ROOT / "data/results/canonical-three-qubit-development/result.json").read_text())
-    assert reports[0]["numerical_profile"] == "binary-spa-flooding-f64-v1"
+    assert reports[0]["numerical_profile"] == "cpu-float64-spa-v1"
+    assert reports[0]["resolved_numerical_profile"]["profile_id"] == "binary-spa-flooding-f64-v1"
+    assert set(reports[0]["policies"]) == {
+        "update", "schedule", "state_memory", "intervention", "stopping", "selection", "postprocessing",
+    }
     assert reports[0]["policy_identity"] == checked["policy_identity"]
     assert reports[1]["final_row_count"] == reports[2]["final_rows"] == reports[3]["final_row_count"] == 2
 

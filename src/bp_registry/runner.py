@@ -14,6 +14,7 @@ from .ledger import Writer, read_canonical_events
 from .canonical.metrics import unavailable_metric
 from .canonical.execution import run_canonical_structural_shot
 from .canonical.contracts import validate_composition
+from .canonical.numerics import REFERENCE_CPU_F64
 from .manifests import CanonicalExperimentV2, ManifestV1, manifest_digest, preflight
 from . import evaluator, reference, sampling
 
@@ -104,6 +105,9 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
         "run_id": manifest.run_id,
         "code_id": manifest.artifact.code_id,
         "manifest_sha256": manifest_digest(manifest),
+        "numerical_profile": manifest.numerical_profile,
+        "resolved_numerical_profile": REFERENCE_CPU_F64.as_evidence(),
+        "policies": manifest.policies.model_dump(mode="json"),
         "policy_identity": composition.semantic_identity,
         "shot_budget": manifest.budgets.max_shots,
         "max_iterations": manifest.budgets.attempt.max_iterations,
