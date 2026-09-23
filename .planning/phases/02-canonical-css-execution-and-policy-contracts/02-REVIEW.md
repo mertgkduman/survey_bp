@@ -1,88 +1,74 @@
 ---
 phase: 02-canonical-css-execution-and-policy-contracts
-reviewed: 2026-09-23T22:42:38Z
-depth: standard
-files_reviewed: 24
+reviewed: 2026-09-23T23:21:33Z
+depth: deep
+files_reviewed: 9
 files_reviewed_list:
-  - data/manifests/canonical-three-qubit-development.json
-  - data/manifests/schema-canonical-v2.json
   - data/results/canonical-three-qubit-development/events.jsonl
   - data/results/canonical-three-qubit-development/result.json
-  - docs/canonical-engine.md
-  - src/bp_registry/canonical/budgets.py
   - src/bp_registry/canonical/execution.py
-  - src/bp_registry/canonical/lineage.py
-  - src/bp_registry/canonical/problems.py
   - src/bp_registry/canonical/profiling.py
-  - src/bp_registry/canonical/tracing.py
+  - src/bp_registry/canonical/verification.py
   - src/bp_registry/cli.py
-  - src/bp_registry/ledger.py
   - src/bp_registry/manifests.py
-  - src/bp_registry/reference.py
   - src/bp_registry/runner.py
-  - src/bp_registry/sampling.py
-  - tests/canonical/test_budgets.py
-  - tests/canonical/test_policy_evidence.py
-  - tests/canonical/test_profiling.py
-  - tests/canonical/test_tracing.py
-  - tests/canonical/test_truth_boundary.py
   - tests/test_canonical_cli.py
-  - tests/test_ledger.py
 findings:
-  critical: 2
+  critical: 3
   warning: 0
   info: 0
-  total: 2
+  total: 3
 status: issues_found
 ---
 
 # Phase 02: Code Review Report
 
-**Reviewed:** 2026-09-23T22:42:38Z
-**Depth:** standard
-**Files Reviewed:** 24
+**Reviewed:** 2026-09-23T23:21:33Z
+**Depth:** deep
+**Files Reviewed:** 9
 **Status:** issues_found
 
 ## Summary
 
-The normal public path closes all findings from the previous review: the public boundary admits only the implemented baseline; scoped reservations include one BP call; canonical appends require the live writer owner; profiler cleanup and replay identity checks are in place; unsupported tracing fails closed; the tutorial uses the Z-check convention; candidate payload/current-working validation is strict; and native `ldpc` loading is lazy.
+Wave 11 closes the former stale-full-manifest replay defect: reuse now binds the full manifest/artifact/sample/shot identity, and the changed-procedure regression rejects stale evidence before result mutation. It also makes `verify-run` re-execute the normal completed baseline path.
 
-Two new blockers remain in the provenance path. An existing terminal can be reused for a different fully preflighted manifest, and `verify-run` accepts structurally falsified policy/work evidence. Both contradict the project's requirement that checked simulation evidence remain traceable and independently verifiable.
-
-The repeated `candidate_lineage_id` in the checked shots is not an active finding. The two events have distinct `(run_id, shot_id)` and `sample_seed_identity` values, but identical decoder-visible syndrome, deterministic attempt ordinal, and candidate. The lineage IDs are deliberately semantic/content-addressed and cannot carry hidden truth; `_require_current_candidate()` additionally requires the current in-memory working object and derives the expected candidate ID before evaluation. Consumers that need an execution-instance key must use the ledger shot key, not a semantic candidate ID.
+The structural verifier remains incomplete for failure and resource evidence. I independently rehashed three disposable ledgers and updated their `result.json` ledger digest; all then passed `verify_run()`. Therefore the command can still certify falsified policy, work, iteration, budget, and profiling-method provenance. The passing checked-artifact command and 157-test suite do not demonstrate tamper resistance for these paths.
 
 ## Narrative Findings (AI reviewer)
 
-The 11 prior findings (`CR-01`–`CR-04`, `WR-01`–`WR-07`) were rechecked against the current code and checked evidence and are closed. The active findings below were discovered while tracing the repaired public execution and verification paths.
+The previous CR-01 (reusing a terminal from a changed full manifest) is closed by `PublicShotContext.execution_identity` and validated reuse. The previous CR-02 (structural verification trusting attacker-rehashed facts) remains open in the termination-specific and profile-validation branches below.
 
 ## Critical Issues
 
-### CR-01 [BLOCKER]: A changed canonical manifest can silently reuse a terminal from a different experiment
+### CR-01 [BLOCKER]: Numerical-failure evidence can claim false BP work and policy effects
 
-**File:** `src/bp_registry/canonical/execution.py:371`
+**File:** `src/bp_registry/canonical/verification.py:201`
+**Issue:** The numerical-failure branch returns at line 213 after inspecting only the terminal's own work vector and a five-kind grammar. It does not compare the separate `work` event to the terminal, require the expected `missingness` payload, or verify policy/composition facts on the attempt and work events. The common-event loop at lines 185-195 binds only manifest/artifact/execution identities.
 
-**Issue:** `run_canonical_structural_shot()` derives its idempotency identity solely from the compact kernel manifest and observed syndrome, then returns an existing terminal at lines 371–375. The compact manifest constructed by [`runner.py:147`](../../../src/bp_registry/runner.py:147) excludes the full manifest digest, artifact identity, public work caps, profile plan, evidence/source data, and sample identity. `run_canonical()` similarly treats any terminal with the same run/shot as present at [`cli.py:253`](../../../src/bp_registry/cli.py:253), without first validating it against the manifest now being run.
+Reproduction: in a disposable output, force shot 0 to raise `NumericalFailure`, restore the normal sweep, and let `run_canonical()` complete the run. Change the numerical shot's `work.data.work_vector.bp_calls` from `1` to `0` and its `attempt.data.policy_effects.update.effect` from `active` to `identity_only`; recompute every canonical event ID and `result.json.ledger_sha256`. `verify_run()` returned `final_row_count=2`.
 
-This was reproduced in a disposable output: a valid manifest differing only in `evidence.procedure` was selected with the same shot-0 observed syndrome. `run_canonical_one()` returned the old terminal, whose `data.manifest_sha256` remained the original digest; `run_canonical()` then wrote a result for the changed manifest, and only a later `verify-run` rejected it as stale. Thus the command that claims to construct a run can return success with an invalid ledger/result pair.
+**Fix:** Before returning from the numerical-failure branch, validate every event's composition identity and policy effects against `PublicShotContext`; require exactly one work event whose full `WorkVector` equals the terminal; require the exact candidate-missingness fact; and validate the zero-sweep qualified-iteration record. Add a rehashed numerical-failure test for each of these fields.
 
-**Fix:** Make terminal reuse conditional on the resolved full-manifest identity and deterministic sample identity, not the compact decoder contract alone. Pass the expected manifest SHA-256 and `sample_seed_identity` into `_existing_structural()` and reject a mismatch before returning a terminal. Before `run_canonical()` treats a shot as present, validate its terminal against the current manifest (or call the same helper), so it cannot write a result that immediately fails verification.
+### CR-02 [BLOCKER]: Budget-denial iteration and configured-cap evidence is not reconstructed
 
-Acceptance regression: create a valid same-run manifest variant with the same observable syndrome but a different full digest; reuse of its output path must raise a conflict before result creation, and no stale terminal may be returned.
+**File:** `src/bp_registry/canonical/verification.py:214`
+**Issue:** For every non-completed, non-numerical terminal, the verifier compares termination and work vector but never compares terminal `iterations`, the work event's `qualified_iterations`, or `budget_termination`. `_expected_attempt()` returns only the termination, work vector, and iteration count; the branch at lines 254-262 only checks candidate/outcome absence and event-kind order.
 
-### CR-02 [BLOCKER]: `verify-run` does not verify the structural evidence it claims to verify
+Reproduction: run a disposable manifest with `attempt.work_limits.check_to_variable_updates=0`. Then change shot 0's terminal `iterations` from `0` to `8`, its `budget_termination.configured_limit` from `0` to `999`, and the work event's `qualified_iterations.count` from `0` to `8`. After recomputing all event IDs and the result ledger digest, `verify_run()` again returned `final_row_count=2`.
 
-**File:** `src/bp_registry/cli.py:271`
+**Fix:** Have deterministic reconstruction produce the complete expected denial object (scope, resource, configured cap, consumed amount, reason, and iterations). Compare it to both terminal and work facts for all count-exhausted/max-iteration paths, including `qualified_iterations` schedule and atomic-unit fields. Add rehashed denial/max-iteration tampering regressions.
 
-**Issue:** `_verify_canonical_run()` checks the result labels/hash, terminal shot IDs, terminal manifest digest, and independent outcome only. It never verifies `sample_seed_identity`, policy composition/effects, `work_vector`, attempt/candidate lineage, profile presence/shape, or the required structural-event sequence. The generic reader at [`ledger.py:401`](../../../src/bp_registry/ledger.py:401) validates JSON/event IDs and open/terminal ordering, but deliberately permits arbitrary `data` objects and therefore cannot provide these missing guarantees.
+### CR-03 [BLOCKER]: Profile verifier accepts forged instrumentation methods
 
-The gap is reproducible without touching checked artifacts: in a disposable copy of the checked ledger, changing both terminal `work_vector.bp_calls` values to `0` and changing `policy_effects.update.effect` to `identity_only`, then recomputing the two event IDs and the result's `ledger_sha256`, made `verify_run()` return success. This means a result described as "verified" can contain false work and policy provenance—the exact classes of evidence Phase 2 is intended to protect.
+**File:** `src/bp_registry/canonical/profiling.py:105`
+**Issue:** `ProfileMeasurement.from_evidence()` checks exact field sets but only constrains the wall-clock method at line 121. `_validate_profile()` then only compares enabled/level to the plan (`src/bp_registry/canonical/verification.py:153-156`). Thus the CPU-time, RSS, concurrency, machine, device, overhead, and allocation method/scope/unit/precision claims are attacker-controlled if the runtime and terminal profile copies agree.
 
-**Fix:** Add a canonical-run ledger validator invoked by both `run_canonical()` (before accepting pre-existing terminals) and `verify-run()`. For every expected shot, derive the sample identity from the resolved manifest; require the expected begin/attempt/candidate/selection/runtime/work/termination structure and common manifest/artifact/composition facts; rederive deterministic candidate, lineage, termination, and work facts from the canonical engine contract; and validate the typed profile facts against the admitted profile plan. Reconstruct `result.json` only after that validator succeeds.
+Reproduction: generate a normal disposable public output, change both copies of `profile.runtime.process_cpu_time.method` to `attacker-declared`, recompute event IDs and `result.json.ledger_sha256`, then call `verify_run()`. It returned `final_row_count=2`.
 
-Acceptance regression: mutate a temporary ledger's BP-call count or policy effect, recompute the event/result hashes, and assert `verify-run` fails. Also reject missing or mismatched sample, profile, work, or lineage structural facts.
+**Fix:** Add a public low-overhead profile-evidence validator that enforces the admitted method/scope/unit/precision and observed-versus-unavailable status for every measurement while deliberately not requiring nondeterministic values to equal a replay. Invoke it after parsing both runtime and terminal evidence, and cover rehashed tampering of every profile metric family.
 
 ---
 
-_Reviewed: 2026-09-23T22:42:38Z_
+_Reviewed: 2026-09-23T23:21:33Z_
 _Reviewer: the agent (gsd-code-reviewer)_
-_Depth: standard_
+_Depth: deep_
