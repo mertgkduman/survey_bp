@@ -92,7 +92,7 @@
 ### Event ledger and computational work
 
 - [x] **LED-01**: Every simulated shot produces an identified final record linking the manifest, input/sample, decoder configuration, versions, selected output, termination, outcome, and post-selection status, including unsuccessful and interrupted shots.
-- [ ] **LED-02**: Canonical runs record linked control-flow events for attempts, interventions, branches/pruning, relay transfers, candidates, fallback, and selection; per-edge message tracing can be selectively enabled without removing required shot/control-flow evidence.
+- [x] **LED-02**: Canonical runs record linked control-flow events for attempts, interventions, branches/pruning, relay transfers, candidates, fallback, and selection; per-edge message tracing can be selectively enabled without removing required shot/control-flow evidence.
 - [ ] **LED-03**: A researcher can jointly analyze iterations, BP calls/message work, branch/relay work, candidate checks, fallback work, runtime, and parallel-resource context, without equating them to one universal iteration count.
 - [ ] **LED-04**: Native-reference results explicitly mark unavailable internal events or counters and their reasons; missing instrumentation is never reported as zero or reconstructed as observed fact.
 - [ ] **LED-05**: A researcher can validate and merge durable ledger shards, detect incomplete or duplicate contributions, and reconstruct reported results from the preserved evidence.
@@ -226,7 +226,7 @@ Every v1 requirement has exactly one owning phase; later phases may use or stren
 | POST-04 | Phase 7 | Pending |
 | POST-05 | Phase 7 | Pending |
 | LED-01 | Phase 1 | Complete |
-| LED-02 | Phase 2 | Pending |
+| LED-02 | Phase 2 | Complete |
 | LED-03 | Phase 2 | Pending |
 | LED-04 | Phase 2 | Pending |
 | LED-05 | Phase 8 | Pending |
