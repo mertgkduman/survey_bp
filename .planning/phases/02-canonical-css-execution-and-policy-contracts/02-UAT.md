@@ -114,39 +114,20 @@ blocked: 0
 
 ## Completion Blockers
 
-- type: commit_claim_mismatch
-  summary: 02-01-SUMMARY.md
-  claimed: 2
-  measured_from_plan_head_to_current_head: 50
-- type: commit_claim_mismatch
-  summary: 02-02-SUMMARY.md
-  claimed: 4
-  measured_from_plan_head_to_current_head: 47
-- type: commit_claim_mismatch
-  summary: 02-03-SUMMARY.md
-  claimed: 4
-  measured_from_plan_head_to_current_head: 42
-- type: commit_claim_mismatch
-  summary: 02-04-SUMMARY.md
-  claimed: 5
-  measured_from_plan_head_to_current_head: 30
-- type: commit_claim_mismatch
-  summary: 02-05-SUMMARY.md
-  claimed: 5
-  measured_from_plan_head_to_current_head: 36
-- type: commit_claim_mismatch
-  summary: 02-06-SUMMARY.md
-  claimed: 4
-  measured_from_plan_head_to_current_head: 24
-- type: commit_claim_mismatch
-  summary: 02-07-SUMMARY.md
-  claimed: 4
-  measured_from_plan_head_to_current_head: 19
-- type: commit_claim_mismatch
-  summary: 02-08-SUMMARY.md
-  claimed: 6
-  measured_from_plan_head_to_current_head: 14
-- type: commit_claim_mismatch
-  summary: 02-09-SUMMARY.md
-  claimed: 4
-  measured_from_plan_head_to_current_head: 6
+The generated measurements 50, 47, 42, 30, 36, 24, 19, 14, and 6 were cumulative-descendant counts from each moving `plan_head_before` through a later verification HEAD. They are not per-plan task-commit counts and do not invalidate the summaries' explicit task evidence.
+
+| Plan | Summary task commits | Explicit hashes audited with `git cat-file -e` and `git merge-base --is-ancestor` |
+| --- | ---: | --- |
+| 02-01 | 2 | `c78493a`, `925e5e5` |
+| 02-02 | 4 | `a643c69`, `c594a15`, `914be06`, `7857a55` |
+| 02-03 | 4 | `df5807b`, `1a0de3b`, `9f46257`, `75e6929` |
+| 02-04 | 5 | `bc5a0df`, `dbcc80d`, `99b30a0`, `b8acd43`, `7f14086` |
+| 02-05 | 5 | `d038dd1`, `59eed04`, `f01d5a7`, `eb2aed5`, `f408f12` |
+| 02-06 | 4 | `539d7ee`, `a115841`, `1824eb4`, `ad0c881` |
+| 02-07 | 4 | `31ebaa0`, `636c5d9`, `74090e6`, `b9890e7` |
+| 02-08 | 6 | `2871426`, `3a26782`, `7edee78`, `f67cf05`, `5a31764`, `d315072` |
+| 02-09 | 4 | `e38ab89`, `c58c01d`, `d173941`, `8754a19` |
+
+## Phase Verification Status
+
+This UAT session is complete with 15/15 passing checks, but UAT completion does not complete Phase 2. Phase 2 remains verifying because `02-REVIEW.md` reports four critical blockers (`CR-01` through `CR-04`) and seven warnings that require remediation and subsequent phase verification.
