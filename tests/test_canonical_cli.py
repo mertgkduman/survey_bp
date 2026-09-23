@@ -9,6 +9,28 @@ import numpy as np
 import pytest
 
 
+def test_checked_canonical_manifest_has_a_strict_public_preflight_contract():
+    """The development fixture is a public immutable experiment, not a kernel shortcut."""
+    from pathlib import Path
+
+    from bp_registry.manifests import CanonicalExperimentV2, preflight
+
+    manifest_path = Path("data/manifests/canonical-three-qubit-development.json")
+    schema_path = Path("data/manifests/schema-canonical-v2.json")
+    assert schema_path.exists()
+    assert manifest_path.exists()
+    assert schema_path.read_text(encoding="utf-8") == CanonicalExperimentV2.model_json_schema_json(indent=2) + "\n"
+
+    resolved = preflight(manifest_path)
+    assert isinstance(resolved.manifest, CanonicalExperimentV2)
+    assert resolved.manifest.evidence.relation == "canonical_implemented"
+    assert resolved.manifest.evidence.fixture == "development_fixture"
+    assert resolved.manifest.evidence.assessment_status == "not_assessed"
+    assert set(resolved.manifest.policies.model_fields) == {
+        "update", "schedule", "state_memory", "intervention", "stopping", "selection", "postprocessing",
+    }
+
+
 def _manifest(run_id: str = "canonical-tracer") -> dict[str, object]:
     def policy(role: str, kind: str) -> dict[str, object]:
         return {
