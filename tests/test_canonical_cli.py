@@ -206,3 +206,74 @@ def test_numerical_failure_is_terminal_and_skips_evaluation(tmp_path, monkeypatc
     assert result.termination == "numerical_failure"
     assert result.evaluation is None
     assert evaluated is False
+
+
+def test_public_preflight_rejects_nonbaseline_executable_bindings(tmp_path):
+    """Only the implemented Phase 2 baseline may cross the public boundary."""
+    from bp_registry.manifests import preflight
+    from bp_registry.runner import preflight_canonical
+
+    baseline = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text(encoding="utf-8"))
+    admitted = preflight_canonical(REPOSITORY_ROOT / CANONICAL_MANIFEST)
+    assert admitted["policy_effects"] == {
+        "update": {"binding_id": "update-binary-spa-v1", "effect": "active"},
+        "schedule": {"binding_id": "schedule-flooding-v1", "effect": "active"},
+        "state_memory": {"binding_id": "state-memory-stateless-v1", "effect": "identity_only"},
+        "intervention": {"binding_id": "intervention-identity-v1", "effect": "identity_only"},
+        "stopping": {"binding_id": "stopping-syndrome-budget-v1", "effect": "active"},
+        "selection": {"binding_id": "selection-stable-first-v1", "effect": "active"},
+        "postprocessing": {"binding_id": "postprocessing-identity-v1", "effect": "identity_only"},
+    }
+
+    for role, replacement in (("update", "identity"), ("schedule", "identity"),
+                              ("stopping", "identity"), ("selection", "identity")):
+        altered = json.loads(json.dumps(baseline))
+        altered["policies"][role]["kind"] = replacement
+        with pytest.raises(ValueError, match="executable canonical baseline"):
+            preflight(altered)
+
+    all_identity = json.loads(json.dumps(baseline))
+    for role in all_identity["policies"]:
+        all_identity["policies"][role]["kind"] = "identity"
+    with pytest.raises(ValueError, match="executable canonical baseline"):
+        preflight(all_identity)
+
+
+def test_public_budget_schema_uses_exact_work_resources():
+    """Persisted caps must name every WorkVector resource without a scalar proxy."""
+    from pydantic import ValidationError
+
+    from bp_registry.canonical.budgets import WorkVector
+    from bp_registry.manifests import CanonicalExperimentV2
+
+    manifest = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text(encoding="utf-8"))
+    expected_resources = set(WorkVector.zero().as_evidence())
+    schema = CanonicalExperimentV2.model_json_schema()
+    scope_schema = schema["$defs"]["CanonicalBudgetScopeV2"]["properties"]
+    assert "max_work_units" not in scope_schema
+    assert set(scope_schema["work_limits"]["properties"]) == expected_resources
+
+    for scope in ("shot", "search", "attempt"):
+        assert set(manifest["budgets"][scope]["work_limits"]) == expected_resources
+
+    missing = json.loads(json.dumps(manifest))
+    del missing["budgets"]["attempt"]["work_limits"]["bp_calls"]
+    with pytest.raises(ValidationError):
+        CanonicalExperimentV2.model_validate(missing)
+
+    extra = json.loads(json.dumps(manifest))
+    extra["budgets"]["attempt"]["work_limits"]["universal_work"] = 1
+    with pytest.raises(ValidationError):
+        CanonicalExperimentV2.model_validate(extra)
+
+    boolean_limit = json.loads(json.dumps(manifest))
+    boolean_limit["budgets"]["attempt"]["work_limits"]["bp_calls"] = True
+    with pytest.raises(ValidationError):
+        CanonicalExperimentV2.model_validate(boolean_limit)
+
+    expanding_child = json.loads(json.dumps(manifest))
+    expanding_child["budgets"]["attempt"]["work_limits"]["bp_calls"] = (
+        expanding_child["budgets"]["search"]["work_limits"]["bp_calls"] + 1
+    )
+    with pytest.raises(ValidationError):
+        CanonicalExperimentV2.model_validate(expanding_child)
