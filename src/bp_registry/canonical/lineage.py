@@ -165,10 +165,18 @@ class LineageGraph:
 
 
 def _payload_tuple(payload: np.ndarray | tuple[int, ...] | list[int]) -> tuple[int, ...]:
-    values = tuple(int(value) for value in np.asarray(payload).tolist())
-    if not values or any(value not in (0, 1) for value in values):
-        raise ValueError("candidate payload must be a nonempty binary vector")
-    return values
+    array = np.asarray(payload)
+    if (
+        array.ndim != 1
+        or array.size == 0
+        or np.issubdtype(array.dtype, np.bool_)
+        or not np.issubdtype(array.dtype, np.integer)
+        or np.any((array != 0) & (array != 1))
+    ):
+        raise ValueError(
+            "candidate payload must be a nonempty one-dimensional non-boolean integer binary vector"
+        )
+    return tuple(int(value) for value in array.tolist())
 
 
 @dataclass(frozen=True)

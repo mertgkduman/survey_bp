@@ -111,7 +111,12 @@ def test_candidate_payload_rejects_coercion_and_nonvectors():
 
 
 def test_sparse_canonical_events_remain_when_semantic_tracing_is_off_or_empty(tmp_path):
-    from bp_registry.ledger import CanonicalEventWriter, query_canonical_events, read_canonical_events
+    from bp_registry.ledger import (
+        CanonicalEventWriter,
+        ShotOwnershipError,
+        query_canonical_events,
+        read_canonical_events,
+    )
     from bp_registry.canonical.tracing import TracePlan, TraceSink
 
     trace = TraceSink(TracePlan.disabled(tmp_path))
@@ -127,7 +132,7 @@ def test_sparse_canonical_events_remain_when_semantic_tracing_is_off_or_empty(tm
     ]
     assert [event["kind"] for event in query_canonical_events(tmp_path / "canonical.jsonl", run_id="canonical", kind="candidate")] == ["candidate"]
     with CanonicalEventWriter(tmp_path / "bad-order.jsonl") as writer:
-        with pytest.raises(ValueError, match="prior open shot_begin"):
+        with pytest.raises(ShotOwnershipError, match="not owned"):
             writer.event(run_id="canonical", shot_id=3, kind="attempt")
 
 

@@ -219,6 +219,41 @@ def _identity(manifest: CanonicalManifestV2, observation: DecoderObservation) ->
     return sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 
+def _attempt_lineage_id(working: WorkingProblem, ordinal: int) -> LineageId:
+    """Identify an engine attempt independently of retry timing or append order."""
+    return stable_lineage_id(
+        "attempt", {"working": working.lineage_id, "ordinal": ordinal},
+    )
+
+
+def _candidate_lineage_id(
+    working: WorkingProblem, attempt_id: LineageId, candidate: np.ndarray,
+) -> LineageId:
+    return stable_lineage_id(
+        "candidate",
+        {
+            "working": working.lineage_id,
+            "attempt": attempt_id.value,
+            "candidate": candidate.tolist(),
+        },
+    )
+
+
+def _require_current_candidate(
+    candidate: OriginalSpaceCandidate,
+    *,
+    working: WorkingProblem,
+    attempt_id: LineageId,
+) -> OriginalSpaceCandidate:
+    """Reject selector output that is detached from the current engine lineage."""
+    if candidate.working is not working:
+        raise ValueError("selected candidate is detached from the current working problem")
+    expected_id = _candidate_lineage_id(working, attempt_id, candidate.candidate)
+    if candidate.lineage_id != expected_id.value:
+        raise ValueError("selected candidate is detached from the current attempt lineage")
+    return candidate
+
+
 def _existing(path: Path, run_id: str, shot_id: int, identity: str) -> CanonicalExecutionResult | None:
     if not path.exists():
         return None
@@ -255,7 +290,7 @@ def run_canonical_shot(manifest: CanonicalManifestV2 | dict[str, object] | str, 
     existing = _existing(path, parsed.run_id, shot_id, identity)
     if existing is not None:
         return existing
-    for attempt in range(30):
+    for attempt_ordinal in range(30):
         try:
             with LedgerWriter(path) as ledger:
                 ledger.begin(run_id=parsed.run_id, shot_id=shot_id, sample_seed_identity=identity,
@@ -270,7 +305,8 @@ def run_canonical_shot(manifest: CanonicalManifestV2 | dict[str, object] | str, 
                     return CanonicalExecutionResult(parsed.run_id, shot_id, "numerical_failure", None, None)
                 frozen_candidate = np.array(kernel_result.candidate, dtype=np.uint8, copy=True)
                 frozen_candidate.setflags(write=False)
-                candidate_id = stable_lineage_id("candidate", {"working": working_id.value, "candidate": frozen_candidate.tolist()})
+                attempt_id = _attempt_lineage_id(working, attempt_ordinal)
+                candidate_id = _candidate_lineage_id(working, attempt_id, frozen_candidate)
                 candidates = (OriginalSpaceCandidate(candidate_id.value, working, frozen_candidate, 0),)
                 eligible = tuple(policy(original, working, candidates)) if policy is not None else candidates
                 selected = select_stable_candidate(eligible)
@@ -280,6 +316,9 @@ def run_canonical_shot(manifest: CanonicalManifestV2 | dict[str, object] | str, 
                                     outcome=None, candidate=None, original_lineage_id=original_id.value,
                                     working_lineage_id=working_id.value)
                     return CanonicalExecutionResult(parsed.run_id, shot_id, "no_eligible_candidate", None, None)
+                selected = _require_current_candidate(
+                    selected, working=working, attempt_id=attempt_id,
+                )
                 frozen_candidate = selected.candidate
                 evaluation_result = evaluate(validated, true_x=hidden_truth.x, true_z=hidden_truth.z,
                                              candidate_x=frozen_candidate)
@@ -337,7 +376,7 @@ def run_canonical_structural_shot(
     original = OriginalProblem(original_id.value, validated.hx, validated.hz, observation.syndrome)
     working_id = stable_lineage_id("working", {"original": original_id.value, "lift": "identity"})
     working = WorkingProblem(working_id.value, original, LineageEdge("identity", original_id, working_id))
-    for _attempt in range(30):
+    for attempt_ordinal in range(30):
         try:
             with CanonicalEventWriter(path) as ledger:
                 policy_effects = None if execution_controls is None else execution_controls.get("policy_effects")
@@ -347,7 +386,8 @@ def run_canonical_structural_shot(
                     "policy_effects": policy_effects,
                 }
                 ledger.begin(run_id=parsed.run_id, shot_id=shot_id, sample_seed_identity=sample_seed_identity, **common)
-                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="attempt", data={**common, "scope": "attempt", "max_iterations": parsed.max_iterations})
+                attempt_id = _attempt_lineage_id(working, attempt_ordinal)
+                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="attempt", data={**common, "scope": "attempt", "attempt_lineage_id": attempt_id.value, "max_iterations": parsed.max_iterations})
                 started_ns = time.perf_counter_ns()
 
                 def terminal_with_work(termination: str, **data: Any) -> None:
@@ -428,15 +468,18 @@ def run_canonical_structural_shot(
                     return CanonicalExecutionResult(parsed.run_id, shot_id, "max_iterations", None, None)
                 candidate = np.array(candidate, dtype=np.uint8, copy=True)
                 candidate.setflags(write=False)
-                candidate_id = stable_lineage_id("candidate", {"working": working_id.value, "candidate": candidate.tolist()})
+                candidate_id = _candidate_lineage_id(working, attempt_id, candidate)
                 selected = select_stable_candidate((OriginalSpaceCandidate(candidate_id.value, working, candidate, 0),))
                 if selected is None:  # defensive; the identity composition always supplies one candidate.
                     terminal_with_work("no_eligible_candidate", iterations=iterations,
                                        selection_status="no_eligible_candidate", outcome=None)
                     return CanonicalExecutionResult(parsed.run_id, shot_id, "no_eligible_candidate", None, None)
+                selected = _require_current_candidate(
+                    selected, working=working, attempt_id=attempt_id,
+                )
                 frozen = selected.candidate
-                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="candidate", data={**common, "candidate": frozen.tolist(), "candidate_lineage_id": selected.lineage_id})
-                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="selection", data={**common, "selection_status": "frozen_decoder_visible_candidate", "original_lineage_id": original_id.value, "working_lineage_id": working_id.value, "candidate_lineage_id": selected.lineage_id})
+                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="candidate", data={**common, "attempt_lineage_id": attempt_id.value, "candidate": frozen.tolist(), "candidate_lineage_id": selected.lineage_id})
+                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="selection", data={**common, "selection_status": "frozen_decoder_visible_candidate", "original_lineage_id": original_id.value, "working_lineage_id": working_id.value, "attempt_lineage_id": attempt_id.value, "candidate_lineage_id": selected.lineage_id})
                 evaluation_result = evaluate(validated, true_x=hidden_truth.x, true_z=hidden_truth.z, candidate_x=frozen)
                 ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="runtime", data={**common, "wall_time_ns": time.perf_counter_ns() - started_ns, "method": "time.perf_counter_ns", "scope": "canonical_attempt", "unit": "ns"})
                 ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="missingness", data={**common, "field": "backend_device_time", "reason": "CPU canonical profile has no device timer", "scope": "canonical_attempt"})
@@ -445,6 +488,7 @@ def run_canonical_structural_shot(
                     selection_status="frozen_decoder_visible_candidate", outcome=evaluation_result.outcome,
                     logical_action_agrees=evaluation_result.logical_action_agrees,
                     original_lineage_id=original_id.value, working_lineage_id=working_id.value,
+                    attempt_lineage_id=attempt_id.value,
                     candidate_lineage_id=selected.lineage_id,
                 )
                 return CanonicalExecutionResult(parsed.run_id, shot_id, "completed", evaluation_result, frozen)

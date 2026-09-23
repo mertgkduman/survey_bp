@@ -39,8 +39,14 @@ class WorkingProblem:
     parent_edge: LineageEdge
 
     def __post_init__(self) -> None:
-        if self.parent_edge.parent != LineageId("original", self.original.lineage_id):
-            raise ValueError("working problem must directly name its original parent")
+        if (
+            self.parent_edge.relation != "identity"
+            or self.parent_edge.parent != LineageId("original", self.original.lineage_id)
+            or self.parent_edge.child != LineageId("working", self.lineage_id)
+        ):
+            raise ValueError(
+                "working problem requires an identity edge from its current original to itself"
+            )
 
 
 @dataclass(frozen=True)
