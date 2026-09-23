@@ -20,6 +20,11 @@ import numpy as np
 TRACE_VERSION = 1
 _MAX_RECORDS = 1_000_000
 _MAX_BYTES = 64 * 1024 * 1024
+_MEASUREMENT_ONLY_FIELDS = frozenset({
+    "adapter_overhead", "elapsed_ns", "measurement_time", "peak_host_memory",
+    "process_cpu_time", "profile_overhead", "runtime", "timestamp", "wall_time",
+    "wall_time_ns",
+})
 
 
 def _canonical_value(value: object) -> object:
@@ -49,6 +54,30 @@ def _json_bytes(value: object) -> bytes:
     except (TypeError, UnicodeError, json.JSONDecodeError) as error:
         raise ValueError("trace payload is not valid UTF-8 JSON") from error
     return encoded
+
+
+def _semantic_value(value: object) -> object:
+    """Remove observation-only timing/resource values from a trace identity."""
+    if isinstance(value, Mapping):
+        return {
+            str(key): _semantic_value(item)
+            for key, item in value.items()
+            if str(key) not in _MEASUREMENT_ONLY_FIELDS
+        }
+    if isinstance(value, (tuple, list)):
+        return [_semantic_value(item) for item in value]
+    return value
+
+
+def semantic_digest(records: Mapping[str, object] | tuple[Mapping[str, object], ...] | list[Mapping[str, object]]) -> str:
+    """Hash bounded trace semantics while intentionally excluding measurement fields.
+
+    This identity is for replay agreement only.  It neither suppresses the
+    raw measurement evidence nor gives a trace observer any control-flow role.
+    """
+    if not isinstance(records, (Mapping, tuple, list)):
+        raise ValueError("semantic trace digest requires a mapping or ordered mapping records")
+    return sha256(_json_bytes(_semantic_value(records))).hexdigest()
 
 
 def _relative_path(relative: str | Path) -> Path:

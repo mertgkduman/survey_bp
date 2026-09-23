@@ -10,6 +10,9 @@ def test_semantic_trace_digest_contract_exists():
     from bp_registry.canonical import tracing
 
     assert hasattr(tracing, "semantic_digest")
+    assert tracing.semantic_digest({"candidate": "a", "wall_time_ns": 1}) == tracing.semantic_digest(
+        {"candidate": "a", "wall_time_ns": 2}
+    )
 
 
 def test_profile_contract_module_exists():
@@ -27,6 +30,7 @@ def test_default_local_profile_records_qualified_local_facts_and_separate_overhe
     value, profile = LocalProfiler(plan, environment={
         "OMP_NUM_THREADS": "1",
         "SECRET_TOKEN": "must-not-be-recorded",
+        "OPENBLAS_NUM_THREADS": "secret-looking-but-not-a-count",
         "PATH": "/private/path/must-not-be-recorded",
     }).measure(lambda: "clean-result")
 
@@ -41,6 +45,7 @@ def test_default_local_profile_records_qualified_local_facts_and_separate_overhe
     assert profile.adapter_overhead.method == "profiling_adapter_empty_call:v1"
     assert profile.environment["OMP_NUM_THREADS"] == "1"
     assert "SECRET_TOKEN" not in profile.environment
+    assert "OPENBLAS_NUM_THREADS" not in profile.environment
     assert "PATH" not in profile.environment
     assert all("/" not in str(value) for value in profile.environment.values())
 

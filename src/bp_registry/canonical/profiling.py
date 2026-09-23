@@ -8,7 +8,6 @@ present instrumented duration as a clean-run estimate.
 from __future__ import annotations
 
 from dataclasses import dataclass
-import math
 import os
 import platform
 try:  # ``resource`` is intentionally optional on non-POSIX hosts.
@@ -79,8 +78,13 @@ class ProfileMeasurement:
         environment = dict(self.environment)
         if set(environment) - _ALLOWLISTED_ENVIRONMENT:
             raise ValueError("profile environment contains a non-allowlisted field")
-        if any(not isinstance(value, (str, int)) or "/" in str(value) for value in environment.values()):
-            raise ValueError("profile environment values must be scalar and path-free")
+        if any(
+            (isinstance(value, str) and (not value.isdecimal() or int(value) < 1))
+            or (isinstance(value, int) and (isinstance(value, bool) or value < 1))
+            or not isinstance(value, (str, int))
+            for value in environment.values()
+        ):
+            raise ValueError("profile environment values must be positive thread counts")
         raw_context = dict(self.raw_context)
         if any(not isinstance(key, str) or not isinstance(value, (str, int)) for key, value in raw_context.items()):
             raise ValueError("profile raw context must use scalar non-secret facts")
@@ -96,6 +100,174 @@ class ProfileMeasurement:
             "raw_context": dict(self.raw_context),
             "enabled": self.enabled,
             "level": self.level,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class CohortSelection:
+    """Declared meaning of an already selected clean/profile or diagnostic run."""
+
+    cohort: Literal["clean", "representative", "diagnostic"]
+    run_identity: str
+    stratum: str
+    inclusion_probability: float | None
+    selection_reason: str
+    selected_before_outcome: bool
+
+    def __post_init__(self) -> None:
+        if self.cohort not in {"clean", "representative", "diagnostic"}:
+            raise ValueError("profiling cohort must be clean, representative, or diagnostic")
+        if not isinstance(self.run_identity, str) or not self.run_identity or not isinstance(self.stratum, str) or not self.stratum:
+            raise ValueError("cohort run identity and decoder-independent stratum must be nonempty")
+        if not isinstance(self.selection_reason, str) or not self.selection_reason:
+            raise ValueError("cohort selection reason must be explicit")
+        if type(self.selected_before_outcome) is not bool:
+            raise ValueError("cohort outcome ordering must be explicit")
+        if self.cohort == "representative":
+            if not self.selected_before_outcome:
+                raise ValueError("representative profiling must be selected before outcomes")
+            if not isinstance(self.inclusion_probability, (int, float)) or isinstance(self.inclusion_probability, bool) or not 0 < float(self.inclusion_probability) <= 1:
+                raise ValueError("representative inclusion probability must be in (0, 1]")
+            object.__setattr__(self, "inclusion_probability", float(self.inclusion_probability))
+        elif self.inclusion_probability is not None:
+            raise ValueError("clean and diagnostic cohorts do not carry sampled inclusion probabilities")
+
+    @classmethod
+    def clean(cls, *, run_identity: str, stratum: str = "full_population") -> "CohortSelection":
+        return cls("clean", run_identity, stratum, None, "full_clean_population", True)
+
+    @classmethod
+    def representative(cls, *, run_identity: str, stratum: str, inclusion_probability: float) -> "CohortSelection":
+        # Callers create this record at selection time, before any outcome is available.
+        return cls("representative", run_identity, stratum, inclusion_probability, "prespecified_stratified_pair", True)
+
+    @classmethod
+    def diagnostic(cls, *, run_identity: str, stratum: str, reason: str) -> "CohortSelection":
+        return cls("diagnostic", run_identity, stratum, None, reason, False)
+
+    @property
+    def population_estimate_eligible(self) -> bool:
+        """Only a pre-outcome representative paired selection may estimate profiling population facts."""
+        return self.cohort == "representative" and self.selected_before_outcome
+
+    def as_evidence(self) -> dict[str, object]:
+        return {
+            "cohort": self.cohort,
+            "run_identity": self.run_identity,
+            "stratum": self.stratum,
+            "inclusion_probability": self.inclusion_probability,
+            "selection_reason": self.selection_reason,
+            "selected_before_outcome": self.selected_before_outcome,
+            "population_estimate_eligible": self.population_estimate_eligible,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class SemanticAgreement:
+    """A replay comparison with visible mismatch fields rather than silent exclusion."""
+
+    agrees: bool
+    mismatches: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        if type(self.agrees) is not bool or tuple(sorted(set(self.mismatches))) != self.mismatches:
+            raise ValueError("semantic agreement mismatches must be ordered and unique")
+        if self.agrees != (not self.mismatches):
+            raise ValueError("semantic agreement must match its mismatch fields")
+
+
+_SEMANTIC_FIELDS = ("candidate", "termination", "work", "lineage", "semantic_trace_digest")
+
+
+def compare_semantics(clean: Mapping[str, object], profiled: Mapping[str, object]) -> SemanticAgreement:
+    """Compare decoder semantics only; runtime and profiling facts are intentionally excluded."""
+    if not isinstance(clean, Mapping) or not isinstance(profiled, Mapping):
+        raise ValueError("replay semantics must be mappings")
+    mismatches: list[str] = []
+    for field in _SEMANTIC_FIELDS:
+        if field not in clean or field not in profiled or clean[field] != profiled[field]:
+            mismatches.append(field)
+    return SemanticAgreement(not mismatches, tuple(mismatches))
+
+
+@dataclass(frozen=True, slots=True)
+class ReplayLink:
+    """Immutable clean/profile pairing with truth-preserving divergent diagnostics."""
+
+    clean_run_id: str
+    profile_run_id: str
+    manifest_identity: str
+    sample_identity: str
+    decoder_randomness_identity: str
+    ordering_identity: str
+    cohort: CohortSelection
+    profiling_level: str
+    overhead_ns: int
+    retention: Literal["paired_summary", "bounded_trace", "retained_divergence"]
+    semantic_agreement: SemanticAgreement
+
+    def __post_init__(self) -> None:
+        for name in ("clean_run_id", "profile_run_id", "manifest_identity", "sample_identity", "decoder_randomness_identity", "ordering_identity", "profiling_level"):
+            if not isinstance(getattr(self, name), str) or not getattr(self, name):
+                raise ValueError("replay identities and profiling level must be nonempty strings")
+        if self.clean_run_id == self.profile_run_id:
+            raise ValueError("clean and profiled runs must have distinct run IDs")
+        if not isinstance(self.cohort, CohortSelection) or not isinstance(self.semantic_agreement, SemanticAgreement):
+            raise ValueError("replay link requires typed cohort and semantic agreement")
+        if type(self.overhead_ns) is not int or self.overhead_ns < 0:
+            raise ValueError("profile replay overhead must be a nonnegative integer nanosecond count")
+        if self.retention not in {"paired_summary", "bounded_trace", "retained_divergence"}:
+            raise ValueError("replay retention must be explicit and bounded")
+
+    @classmethod
+    def create(
+        cls,
+        *,
+        clean_run_id: str,
+        profile_run_id: str,
+        manifest_identity: str,
+        sample_identity: str,
+        decoder_randomness_identity: str,
+        ordering_identity: str,
+        cohort: CohortSelection,
+        profiling_level: str,
+        overhead_ns: int,
+        clean_semantics: Mapping[str, object],
+        profiled_semantics: Mapping[str, object],
+        retention: Literal["paired_summary", "bounded_trace", "retained_divergence"] = "paired_summary",
+    ) -> "ReplayLink":
+        agreement = compare_semantics(clean_semantics, profiled_semantics)
+        if not agreement.agrees:
+            retention = "retained_divergence"
+        return cls(
+            clean_run_id, profile_run_id, manifest_identity, sample_identity,
+            decoder_randomness_identity, ordering_identity, cohort, profiling_level,
+            overhead_ns, retention, agreement,
+        )
+
+    @property
+    def status(self) -> Literal["paired_agreement", "diagnostic_divergence"]:
+        return "paired_agreement" if self.semantic_agreement.agrees else "diagnostic_divergence"
+
+    @property
+    def population_estimate_eligible(self) -> bool:
+        return self.cohort.population_estimate_eligible and self.semantic_agreement.agrees
+
+    def as_evidence(self) -> dict[str, object]:
+        return {
+            "clean_run_id": self.clean_run_id,
+            "profile_run_id": self.profile_run_id,
+            "manifest_identity": self.manifest_identity,
+            "sample_identity": self.sample_identity,
+            "decoder_randomness_identity": self.decoder_randomness_identity,
+            "ordering_identity": self.ordering_identity,
+            "cohort": self.cohort.as_evidence(),
+            "profiling_level": self.profiling_level,
+            "overhead_ns": self.overhead_ns,
+            "retention": self.retention,
+            "semantic_agreement": {"agrees": self.semantic_agreement.agrees, "mismatches": list(self.semantic_agreement.mismatches)},
+            "status": self.status,
+            "population_estimate_eligible": self.population_estimate_eligible,
         }
 
 
@@ -130,7 +302,7 @@ class LocalProfiler:
     def _environment_context(self) -> dict[str, str | int]:
         return {
             key: value for key in sorted(_ALLOWLISTED_ENVIRONMENT)
-            if (value := self._environment.get(key)) is not None and "/" not in value
+            if (value := self._environment.get(key)) is not None and value.isdecimal() and int(value) >= 1
         }
 
     def _concurrency(self) -> Measurement:
