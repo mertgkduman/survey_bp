@@ -19,6 +19,7 @@ except ImportError as error:  # pragma: no cover - Phase 1 targets POSIX HPC hos
 
 
 LEDGER_VERSION = 1
+CANONICAL_LEDGER_VERSION = 2
 ShotKey = tuple[str, int]
 
 
@@ -318,3 +319,157 @@ def summarize(path: str | Path) -> dict[str, Any]:
         "interrupted": sum(row.get("termination") == "interrupted" for row in final_rows),
         "postselected": sum(row.get("postselection") not in {None, "none", "unavailable"} for row in final_rows),
     }
+
+
+# Canonical CSS structural evidence is a deliberately separate v2 grammar.  It
+# is not read by, or conditionally accepted by, the historical v1 shot journal.
+_CANONICAL_EVENT_KINDS = frozenset({
+    "shot_begin", "attempt", "intervention", "branch", "branch_pruned",
+    "relay_transfer", "candidate", "fallback", "selection", "termination",
+    "work", "runtime", "missingness", "trace_link", "trace_truncated",
+})
+
+
+def _canonical_event_bytes(event: Mapping[str, Any]) -> bytes:
+    try:
+        return json.dumps(dict(event), sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False).encode("utf-8")
+    except (TypeError, ValueError, UnicodeError) as error:
+        raise ValueError("canonical event must contain finite UTF-8 JSON values") from error
+
+
+def _validate_canonical_event(event: Mapping[str, Any]) -> None:
+    if event.get("ledger_version") != CANONICAL_LEDGER_VERSION:
+        raise ValueError("unsupported canonical ledger version")
+    if event.get("kind") not in _CANONICAL_EVENT_KINDS:
+        raise ValueError("unknown canonical structural event kind")
+    _key(event.get("run_id"), event.get("shot_id"))
+    if not isinstance(event.get("event_id"), str) or not event["event_id"]:
+        raise ValueError("canonical event requires a stable event_id")
+    if event["kind"] == "shot_begin" and (not isinstance(event.get("sample_seed_identity"), str) or not event["sample_seed_identity"]):
+        raise ValueError("canonical shot_begin requires a sample_seed_identity")
+    if event["kind"] == "termination" and (not isinstance(event.get("termination"), str) or not event["termination"]):
+        raise ValueError("canonical termination event requires a termination status")
+    data = event.get("data", {})
+    if not isinstance(data, dict):
+        raise ValueError("canonical event data must be an object")
+    sidecar = event.get("sidecar")
+    if sidecar is not None:
+        if not isinstance(sidecar, dict):
+            raise ValueError("canonical sidecar link must be an object")
+        path, digest = sidecar.get("path"), sidecar.get("sha256")
+        if not isinstance(path, str) or not path or Path(path).is_absolute() or ".." in Path(path).parts:
+            raise ValueError("canonical sidecar path must be relative and confined")
+        if not isinstance(digest, str) or len(digest) != 64 or any(char not in "0123456789abcdef" for char in digest):
+            raise ValueError("canonical sidecar link requires a lowercase SHA-256")
+    _canonical_event_bytes(event)
+
+
+def _canonical_event_id(event: Mapping[str, Any]) -> str:
+    content = dict(event)
+    content.pop("event_id", None)
+    return "canonical-" + sha256(_canonical_event_bytes(content)).hexdigest()[:20]
+
+
+def read_canonical_events(path: str | Path) -> list[dict[str, Any]]:
+    """Read validated v2 structural evidence without weakening v1 validation."""
+    journal = Path(path)
+    if not journal.exists():
+        return []
+    result: list[dict[str, Any]] = []
+    seen: dict[str, dict[str, Any]] = {}
+    states: dict[ShotKey, str] = {}
+    for number, line in enumerate(journal.read_text(encoding="utf-8").splitlines(), start=1):
+        if not line.strip():
+            continue
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError as error:
+            raise ValueError(f"invalid canonical JSONL at line {number}") from error
+        if not isinstance(event, dict):
+            raise ValueError(f"canonical event at line {number} is not an object")
+        _validate_canonical_event(event)
+        if event["event_id"] != _canonical_event_id(event):
+            raise ValueError(f"canonical event at line {number} has an invalid event_id")
+        previous = seen.get(event["event_id"])
+        if previous is not None:
+            if previous != event:
+                raise ValueError(f"conflicting canonical event ID at line {number}")
+            continue
+        key = _key(event["run_id"], event["shot_id"])
+        state = states.get(key)
+        if event["kind"] == "shot_begin":
+            if state is not None:
+                raise ValueError("canonical shot_begin is duplicated or follows a terminal event")
+            states[key] = "open"
+        elif state != "open":
+            raise ValueError("canonical structural event requires a prior open shot_begin")
+        if event["kind"] == "termination":
+            states[key] = "terminal"
+        seen[event["event_id"]] = event
+        result.append(event)
+    return result
+
+
+def query_canonical_events(
+    path: str | Path, *, run_id: str | None = None, shot_id: int | None = None,
+    kind: str | None = None,
+) -> list[dict[str, Any]]:
+    """Return a filtered view of validated v2 evidence without replaying it."""
+    if shot_id is not None and (type(shot_id) is not int or shot_id < 0):
+        raise ValueError("shot_id filter must be a nonnegative integer")
+    return [
+        event for event in read_canonical_events(path)
+        if (run_id is None or event["run_id"] == run_id)
+        and (shot_id is None or event["shot_id"] == shot_id)
+        and (kind is None or event["kind"] == kind)
+    ]
+
+
+class CanonicalEventWriter:
+    """Durably append sparse v2 control-flow facts for canonical CSS shots."""
+
+    def __init__(self, path: str | Path):
+        self.path = Path(path)
+
+    def _append(self, event: dict[str, Any]) -> None:
+        event["ledger_version"] = CANONICAL_LEDGER_VERSION
+        event["event_id"] = _canonical_event_id(event)
+        _validate_canonical_event(event)
+        with _journal_lock(self.path):
+            current = read_canonical_events(self.path)
+            if any(row["event_id"] == event["event_id"] for row in current):
+                return
+            key = _key(event["run_id"], event["shot_id"])
+            state = None
+            for row in current:
+                if _key(row["run_id"], row["shot_id"]) == key:
+                    state = "terminal" if row["kind"] == "termination" else "open"
+            if event["kind"] == "shot_begin":
+                if state is not None:
+                    raise ValueError("canonical shot_begin is duplicated or follows a terminal event")
+            elif state != "open":
+                raise ValueError("canonical structural event requires a prior open shot_begin")
+            _canonical_event_bytes(event)
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            with self.path.open("a", encoding="utf-8") as handle:
+                handle.write(_canonical_event_bytes(event).decode("utf-8") + "\n")
+                handle.flush()
+                os.fsync(handle.fileno())
+
+    def begin(self, *, run_id: str, shot_id: int, sample_seed_identity: str, **data: Any) -> None:
+        self._append({"kind": "shot_begin", "run_id": run_id, "shot_id": shot_id, "sample_seed_identity": sample_seed_identity, "data": data})
+
+    def event(self, *, run_id: str, shot_id: int, kind: str, data: Mapping[str, Any] | None = None, sidecar: Mapping[str, Any] | None = None) -> None:
+        event: dict[str, Any] = {"kind": kind, "run_id": run_id, "shot_id": shot_id, "data": dict(data or {})}
+        if sidecar is not None:
+            event["sidecar"] = dict(sidecar)
+        self._append(event)
+
+    def terminal(self, *, run_id: str, shot_id: int, termination: str, data: Mapping[str, Any] | None = None) -> None:
+        self._append({"kind": "termination", "run_id": run_id, "shot_id": shot_id, "termination": termination, "data": dict(data or {})})
+
+    def __enter__(self) -> "CanonicalEventWriter":
+        return self
+
+    def __exit__(self, *_exc: object) -> None:
+        return None
