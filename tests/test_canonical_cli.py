@@ -298,7 +298,11 @@ def test_verify_run_rejects_rehashed_budget_and_iteration_claim_matrix(tmp_path)
         verify_run(output)
 
 
-def test_verify_run_rejects_rehashed_public_profile_contract_matrix(tmp_path):
+@pytest.mark.parametrize("family", [
+    "wall_time", "process_cpu_time", "peak_host_memory", "concurrency", "machine_environment",
+    "backend_device_time", "backend_device_memory", "adapter_overhead", "python_allocation_peak",
+])
+def test_verify_run_rejects_rehashed_public_profile_contract_matrix(tmp_path, family):
     """Every profiler metadata field is structural provenance, not decoration."""
     from bp_registry.cli import run_canonical, verify_run
 
@@ -310,7 +314,8 @@ def test_verify_run_rejects_rehashed_public_profile_contract_matrix(tmp_path):
             if event["kind"] in {"runtime", "termination"}:
                 profile = event["data"].get("profile")
                 if profile is not None:
-                    profile["runtime"]["process_cpu_time"]["method"] = "attacker-controlled-method"
+                    metric = profile[family] if family in {"adapter_overhead", "python_allocation_peak"} else profile["runtime"][family]
+                    metric["method"] = "attacker-controlled-method"
 
     _rewrite_rehashed_canonical_ledger(output, mutate)
     with pytest.raises(ValueError, match="profile"):

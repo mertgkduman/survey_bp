@@ -18,7 +18,7 @@ import threading
 import time
 import tracemalloc as _tracemalloc
 from types import MappingProxyType
-from typing import Callable, Literal, Mapping, TypeVar
+from typing import Any, Callable, Literal, Mapping, TypeVar
 
 from .budgets import Measurement, RuntimeResourceFacts
 
@@ -121,6 +121,78 @@ class ProfileMeasurement:
         if parsed.enabled and parsed.runtime.wall_time.method != "time.perf_counter_ns:v1":
             raise ValueError("profile wall-time method is not the admitted local profiler")
         return parsed
+
+
+def validate_public_clean_low_overhead_evidence(value: Mapping[str, object]) -> ProfileMeasurement:
+    """Validate the exact public contract emitted by :class:`LocalProfiler`.
+
+    Runtime values intentionally remain observations: this checks their producer,
+    availability state, scalar domain, and same-record context rather than asking a
+    fresh replay to reproduce a clock or RSS value.
+    """
+    parsed = ProfileMeasurement.from_evidence(value)
+    if parsed.level != "low_overhead":
+        raise ValueError("public profile level must be low_overhead")
+
+    def observed(fact: Measurement, *, method: str, scope: str, unit: str, precision: str, kind: type) -> None:
+        if (fact.method, fact.scope, fact.unit, fact.precision) != (method, scope, unit, precision):
+            raise ValueError("profile observed metric contract differs from local profiler")
+        if fact.unavailable_reason is not None or type(fact.value) is not kind or (kind is int and fact.value < 0):
+            raise ValueError("profile observed metric has an invalid value domain")
+
+    def unavailable(fact: Measurement, *, method: str, scope: str, unit: str, reason: str) -> None:
+        if (fact.value, fact.method, fact.scope, fact.unit, fact.precision, fact.unavailable_reason) != (None, method, scope, unit, "unknown", reason):
+            raise ValueError("profile unavailable metric contract differs from local profiler")
+
+    runtime = parsed.runtime
+    if not parsed.enabled:
+        if dict(parsed.environment) or dict(parsed.raw_context):
+            raise ValueError("disabled profile must not carry environment or raw context")
+        for fact, scope, unit in (
+            (runtime.wall_time, "process", "ns"), (runtime.process_cpu_time, "process", "ns"),
+            (runtime.peak_host_memory, "process", "bytes"), (runtime.concurrency, "process", "threads"),
+            (runtime.machine_environment, "host", "identity"), (parsed.adapter_overhead, "process", "ns"),
+            (parsed.python_allocation_peak, "process", "bytes"),
+        ):
+            unavailable(fact, method="not_collected", scope=scope, unit=unit, reason="profiling disabled")
+        unavailable(runtime.backend_device_time, method="not_applicable", scope="backend", unit="ns", reason="CPU execution")
+        unavailable(runtime.backend_device_memory, method="not_applicable", scope="backend", unit="bytes", reason="CPU execution")
+        return parsed
+
+    observed(runtime.wall_time, method="time.perf_counter_ns:v1", scope="process", unit="ns", precision="1 ns", kind=int)
+    observed(runtime.process_cpu_time, method="time.process_time_ns:v1", scope="process", unit="ns", precision="1 ns", kind=int)
+    observed(runtime.concurrency, method="threading.active_count:v1", scope="process", unit="threads", precision="instantaneous", kind=int)
+    if runtime.concurrency.value < 1:
+        raise ValueError("profile concurrency must be positive")
+    observed(runtime.machine_environment, method="profile_adapter:v1", scope="host", unit="identity", precision="declared", kind=str)
+    if runtime.machine_environment.value != "local-stdlib-cpu":
+        raise ValueError("profile machine identity differs from local profiler")
+    observed(parsed.adapter_overhead, method="profiling_adapter_empty_call:v1", scope="process", unit="ns", precision="1 ns", kind=int)
+    unavailable(runtime.backend_device_time, method="not_applicable", scope="backend", unit="ns", reason="CPU execution")
+    unavailable(runtime.backend_device_memory, method="not_applicable", scope="backend", unit="bytes", reason="CPU execution")
+    unavailable(parsed.python_allocation_peak, method="tracemalloc.get_traced_memory:v1", scope="process", unit="bytes", reason="representative allocation profiling disabled")
+    rss = runtime.peak_host_memory
+    if rss.value is None:
+        if (rss.method, rss.scope, rss.unit, rss.precision) not in {
+            ("resource.getrusage:RUSAGE_SELF:v1", "process", "bytes", "unknown"),
+            ("resource.getrusage:RUSAGE_SELF:ru_maxrss:v1", "process", "bytes", "unknown"),
+        } or not isinstance(rss.unavailable_reason, str) or not (
+            rss.unavailable_reason == "resource adapter unavailable"
+            or rss.unavailable_reason == "negative RSS observation"
+            or rss.unavailable_reason == "RSS normalization semantics unavailable"
+            or rss.unavailable_reason.startswith("resource adapter unavailable: ")
+        ):
+            raise ValueError("profile RSS unavailable contract differs from local profiler")
+        if rss.unavailable_reason != "RSS normalization semantics unavailable" and dict(parsed.raw_context):
+            raise ValueError("unavailable RSS must not carry raw RSS context")
+    else:
+        observed(rss, method="resource.getrusage:RUSAGE_SELF:ru_maxrss:v1", scope="process", unit="bytes", precision="platform-qualified peak", kind=int)
+        raw = dict(parsed.raw_context)
+        if set(raw) != {"rss_platform", "rss_raw_value", "rss_raw_unit", "rss_normalized_unit"} or raw["rss_normalized_unit"] != "bytes" or type(raw["rss_raw_value"]) is not int or raw["rss_raw_value"] < 0 or raw["rss_platform"] not in {"Linux", "Darwin"}:
+            raise ValueError("profile raw RSS context is inconsistent")
+        if raw["rss_raw_unit"] != ("kilobytes" if raw["rss_platform"] == "Linux" else "bytes"):
+            raise ValueError("profile raw RSS unit is inconsistent")
+    return parsed
 
 
 @dataclass(frozen=True, slots=True)
