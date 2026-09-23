@@ -15,6 +15,7 @@ actuals:
   tokens: 17818
   tasks: 3
   commits: 6
+commits: 6
 plan_head_before: c77478715efd93fd3c4f9100e893869055c61c82
 tech-stack:
   added: []
@@ -78,6 +79,8 @@ status: complete
 2. **Task 2: Route the public CLI through canonical execution and rich evidence** — `7edee78`, `f67cf05`
 3. **Task 3: Execute and check the deterministic canonical development result** — `5a31764`
 4. **Runtime evidence correction** — `d315072`
+
+**Plan metadata:** `1d0b11c`
 
 ## Decisions Made
 
