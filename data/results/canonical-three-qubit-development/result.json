@@ -8,7 +8,7 @@
   "final_row_count": 2,
   "fixture": "development_fixture",
   "ledger_path": "data/results/canonical-three-qubit-development/events.jsonl",
-  "ledger_sha256": "1197d13e753cd216ceaddb2ac247a8ef17669dca724a73c3f6525724e71848e2",
+  "ledger_sha256": "6adaad78aa9d7c7d6321af7d89754a8a210d913b19cd669b70c9f6e5be98fb7c",
   "manifest_path": "data/manifests/canonical-three-qubit-development.json",
   "manifest_sha256": "f62e836f89c84f98593eb82339615c76793c233467cdf8c8c40c655e3697137b",
   "policy_identity": "3fdcfd949a6376bfc5e1f06ab103eaf55a4056ea5554787d1f16720c9b2c98d0",
