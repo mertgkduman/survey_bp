@@ -1,0 +1,36 @@
+---
+schema_version: 1
+open_count: 0
+waived_count: 0
+fixed_count: 1
+total_count: 1
+last_updated: 2026-09-23T08:23:59.510Z
+---
+
+# Broken Windows Ledger
+
+> Cross-phase defect register. With `workflow.windows_enforce` enabled, `/gsd-ship` blocks while `open_count > 0`.
+> Waive with `gsd-tools windows waive <id> "<reason>"` (reason required).
+> Mark fixed with `gsd-tools windows fixed <id>`.
+
+| id | phase | kind | file | line | description | status | reason | recorded_at | resolved_at |
+|----|-------|------|------|------|-------------|--------|--------|-------------|-------------|
+| 1 | 02 | deviation | src/bp_registry/canonical/schedules.py | 140 | Single-neighbor check indexing was corrected to preserve a one-element incoming message buffer. | fixed |  | 2026-09-23T08:23:47.117Z | 2026-09-23T08:23:59.510Z |
+
+````json
+[
+  {
+    "id": 1,
+    "kind": "deviation",
+    "phase": "02",
+    "file": "src/bp_registry/canonical/schedules.py",
+    "line": 140,
+    "description": "Single-neighbor check indexing was corrected to preserve a one-element incoming message buffer.",
+    "status": "fixed",
+    "reason": "",
+    "recorded_at": "2026-09-23T08:23:47.117Z",
+    "resolved_at": "2026-09-23T08:23:59.510Z",
+    "milestone": "v1.0"
+  }
+]
+````
