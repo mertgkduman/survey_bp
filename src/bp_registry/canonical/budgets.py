@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, fields
+import math
 import numbers
 from threading import RLock
 from typing import Callable, Iterable, Mapping
@@ -64,6 +65,90 @@ class WorkVector:
 
     def as_evidence(self) -> dict[str, int]:
         return {item.name: getattr(self, item.name) for item in fields(self)}
+
+
+@dataclass(frozen=True, slots=True)
+class QualifiedIteration:
+    """A conventional count that never hides which schedule operation it means."""
+
+    count: int
+    schedule: str
+    atomic_unit: str
+
+    def __post_init__(self) -> None:
+        if isinstance(self.count, bool) or not isinstance(self.count, numbers.Integral) or not 0 <= self.count <= _MAX_COUNT:
+            raise ValueError("iteration count must be a bounded nonnegative integer")
+        if not isinstance(self.schedule, str) or not self.schedule or not isinstance(self.atomic_unit, str) or not self.atomic_unit:
+            raise ValueError("iteration schedule and atomic unit must be nonempty strings")
+        object.__setattr__(self, "count", int(self.count))
+
+    def as_evidence(self) -> dict[str, int | str]:
+        return {"count": self.count, "schedule": self.schedule, "atomic_unit": self.atomic_unit}
+
+
+@dataclass(frozen=True, slots=True)
+class Measurement:
+    """A scoped observed value or explicit unavailable fact, never an implied zero."""
+
+    value: int | float | str | None
+    method: str
+    scope: str
+    unit: str
+    precision: str
+    unavailable_reason: str | None = None
+
+    def __post_init__(self) -> None:
+        for name in ("method", "scope", "unit", "precision"):
+            if not isinstance(getattr(self, name), str) or not getattr(self, name):
+                raise ValueError("measurement method, scope, unit, and precision must be nonempty strings")
+        if self.value is None:
+            if not isinstance(self.unavailable_reason, str) or not self.unavailable_reason:
+                raise ValueError("unavailable measurements require a reason")
+        else:
+            if isinstance(self.value, bool) or not isinstance(self.value, (numbers.Real, str)):
+                raise ValueError("measurement values must be finite numbers or strings")
+            if isinstance(self.value, numbers.Real) and not math.isfinite(float(self.value)):
+                raise ValueError("measurement numeric values must be finite")
+            if self.unavailable_reason is not None:
+                raise ValueError("observed measurements cannot carry an unavailable reason")
+
+    @classmethod
+    def observed(cls, value: int | float | str, *, method: str, scope: str, unit: str, precision: str) -> "Measurement":
+        return cls(value, method=method, scope=scope, unit=unit, precision=precision)
+
+    @classmethod
+    def unavailable(cls, *, method: str, scope: str, unit: str, precision: str, reason: str) -> "Measurement":
+        return cls(None, method=method, scope=scope, unit=unit, precision=precision, unavailable_reason=reason)
+
+    def as_evidence(self) -> dict[str, int | float | str | None]:
+        return {
+            "value": self.value,
+            "method": self.method,
+            "scope": self.scope,
+            "unit": self.unit,
+            "precision": self.precision,
+            "unavailable_reason": self.unavailable_reason,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeResourceFacts:
+    """Same-machine runtime/resource context retained beside algorithmic work."""
+
+    wall_time: Measurement
+    process_cpu_time: Measurement
+    peak_host_memory: Measurement
+    concurrency: Measurement
+    machine_environment: Measurement
+    backend_device_time: Measurement
+    backend_device_memory: Measurement
+
+    def __post_init__(self) -> None:
+        if any(not isinstance(getattr(self, item.name), Measurement) for item in fields(self)):
+            raise ValueError("runtime resource facts must contain Measurement values")
+
+    def as_evidence(self) -> dict[str, dict[str, int | float | str | None]]:
+        return {item.name: getattr(self, item.name).as_evidence() for item in fields(self)}
 
 
 @dataclass(frozen=True, slots=True)
