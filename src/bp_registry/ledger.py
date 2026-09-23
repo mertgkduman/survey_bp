@@ -497,11 +497,13 @@ class CanonicalEventWriter:
         event["ledger_version"] = CANONICAL_LEDGER_VERSION
         event["event_id"] = _canonical_event_id(event)
         _validate_canonical_event(event)
+        key = _key(event["run_id"], event["shot_id"])
+        if event["kind"] != "shot_begin" and self._owners.get(key) is None:
+            raise ShotOwnershipError(f"canonical shot {key!r} is not owned by this writer")
         with _journal_lock(self.path):
             current = read_canonical_events(self.path)
             if any(row["event_id"] == event["event_id"] for row in current):
                 return
-            key = _key(event["run_id"], event["shot_id"])
             state = None
             for row in current:
                 if _key(row["run_id"], row["shot_id"]) == key:
@@ -533,6 +535,8 @@ class CanonicalEventWriter:
             raise
 
     def event(self, *, run_id: str, shot_id: int, kind: str, data: Mapping[str, Any] | None = None, sidecar: Mapping[str, Any] | None = None) -> None:
+        if kind in {"shot_begin", "termination"}:
+            raise ValueError("canonical reserved lifecycle kinds must use begin() and terminal()")
         event: dict[str, Any] = {"kind": kind, "run_id": run_id, "shot_id": shot_id, "data": dict(data or {})}
         if sidecar is not None:
             event["sidecar"] = dict(sidecar)

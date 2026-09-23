@@ -19,6 +19,21 @@ def _hold_shot(path: str, ready: multiprocessing.synchronize.Event,
         release.wait(timeout=10)
 
 
+def _attempt_canonical_intermediate_event(path: str, result: multiprocessing.queues.Queue) -> None:
+    """Try to inject canonical evidence without the owning writer's handle."""
+
+    from bp_registry.ledger import CanonicalEventWriter, ShotOwnershipError
+
+    try:
+        CanonicalEventWriter(path).event(
+            run_id="canonical", shot_id=1, kind="attempt",
+        )
+    except ShotOwnershipError:
+        result.put("ShotOwnershipError")
+    else:
+        result.put("appended")
+
+
 def test_empty_journal_has_no_final_rows_or_denominators(tmp_path):
     from bp_registry.ledger import reconcile, summarize
 
@@ -216,6 +231,17 @@ def test_canonical_intermediate_events_require_active_writer_ownership(tmp_path)
     path = tmp_path / "canonical-events.jsonl"
     with CanonicalEventWriter(path) as owner, CanonicalEventWriter(path) as intruder:
         owner.begin(run_id="canonical", shot_id=1, sample_seed_identity="seed-1")
+
+        context = multiprocessing.get_context("spawn")
+        result = context.Queue()
+        process = context.Process(
+            target=_attempt_canonical_intermediate_event,
+            args=(str(path), result),
+        )
+        process.start()
+        process.join(timeout=10)
+        assert process.exitcode == 0
+        assert result.get(timeout=1) == "ShotOwnershipError"
 
         for kind in (
             "attempt",
