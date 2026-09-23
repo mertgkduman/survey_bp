@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_profiling.py::test_semantic_trace_digest_contract_exists",
+  "exitCode": 1,
+  "targetTest": "test_semantic_trace_digest_contract_exists",
+  "targetFile": "tests/canonical/test_profiling.py",
+  "output": "TAP version 13\nnot ok 1 - test_semantic_trace_digest_contract_exists\n# tests 1\n# pass 0\n# fail 1\n",
+  "expected": "A bounded trace can provide a semantic digest that omits nondeterministic measurement values for replay comparison.",
+  "actual": "The target assertion failed because tracing.semantic_digest did not exist."
+}
