@@ -530,6 +530,10 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
         _verify_canonical_environment(manifest.environment)
         if manifest.trace_plan.level != "off":
             raise ValueError("canonical trace plan must be off until a public trace hook is implemented")
+        if manifest.profile_plan.level != "low_overhead" or manifest.profile_plan.cohort != "clean":
+            raise ValueError(
+                "canonical public profile plan requires a clean low_overhead cohort until a bounded quota exists"
+            )
         # Closed registry resolution is deliberately before any sample, ledger, or kernel work.
         validate_executable_canonical_baseline(manifest.policies)
         artifact = load_artifact(
