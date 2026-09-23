@@ -13,9 +13,15 @@ from typing import Any
 from .ledger import Writer, read_canonical_events
 from .canonical.metrics import unavailable_metric
 from .canonical.execution import run_canonical_structural_shot
-from .canonical.contracts import validate_composition
 from .canonical.numerics import REFERENCE_CPU_F64
-from .manifests import CanonicalExperimentV2, ManifestV1, manifest_digest, preflight
+from .manifests import (
+    CanonicalExperimentV2,
+    ManifestV1,
+    executable_canonical_policy_effects,
+    manifest_digest,
+    preflight,
+    validate_executable_canonical_baseline,
+)
 from . import evaluator, reference, sampling
 
 
@@ -100,7 +106,7 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
     manifest = resolved.manifest
     if not isinstance(manifest, CanonicalExperimentV2):
         raise ValueError("canonical execution requires a strict CanonicalExperimentV2 manifest")
-    composition = validate_composition(manifest.policies)
+    composition = validate_executable_canonical_baseline(manifest.policies)
     return {
         "run_id": manifest.run_id,
         "code_id": manifest.artifact.code_id,
@@ -109,8 +115,13 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
         "resolved_numerical_profile": REFERENCE_CPU_F64.as_evidence(),
         "policies": manifest.policies.model_dump(mode="json"),
         "policy_identity": composition.semantic_identity,
+        "policy_effects": executable_canonical_policy_effects(manifest.policies),
         "shot_budget": manifest.budgets.max_shots,
         "max_iterations": manifest.budgets.attempt.max_iterations,
+        "work_limits": {
+            scope: getattr(manifest.budgets, scope).work_limits.as_evidence()
+            for scope in ("shot", "search", "attempt")
+        },
         "relation": manifest.evidence.relation,
         "fixture": manifest.evidence.fixture,
         "assessment_status": manifest.evidence.assessment_status,
@@ -142,7 +153,7 @@ def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: s
         resolved.code, manifest_identity=digest, seed=manifest.randomness.sample_seed,
         shot_id=shot_id, x_error_rate=manifest.error_rate,
     )
-    composition = validate_composition(manifest.policies)
+    composition = validate_executable_canonical_baseline(manifest.policies)
     return run_canonical_structural_shot(
         _canonical_kernel_manifest(manifest), code=resolved.code, observation=sample.observation,
         hidden_truth=sample.hidden, shot_id=shot_id, ledger_path=ledger_path,

@@ -251,7 +251,8 @@ def test_public_budget_schema_uses_exact_work_resources():
     schema = CanonicalExperimentV2.model_json_schema()
     scope_schema = schema["$defs"]["CanonicalBudgetScopeV2"]["properties"]
     assert "max_work_units" not in scope_schema
-    assert set(scope_schema["work_limits"]["properties"]) == expected_resources
+    work_limit_ref = scope_schema["work_limits"]["$ref"].removeprefix("#/$defs/")
+    assert set(schema["$defs"][work_limit_ref]["properties"]) == expected_resources
 
     for scope in ("shot", "search", "attempt"):
         assert set(manifest["budgets"][scope]["work_limits"]) == expected_resources

@@ -14,9 +14,9 @@
   },
   "budgets": {
     "max_shots": 2,
-    "shot": {"max_iterations": 8, "max_work_units": 1000},
-    "search": {"max_iterations": 8, "max_work_units": 1000},
-    "attempt": {"max_iterations": 8, "max_work_units": 1000},
+    "shot": {"max_iterations": 8, "work_limits": {"check_to_variable_updates": 1000, "variable_to_check_updates": 1000, "belief_assemblies": 1000, "residual_priority_evaluations": 0, "bp_calls": 1, "candidate_checks": 1000, "intervention_actions": 0, "branch_expansions": 0, "branch_prunes": 0, "relay_transfers": 0, "fallback_calls": 0}},
+    "search": {"max_iterations": 8, "work_limits": {"check_to_variable_updates": 1000, "variable_to_check_updates": 1000, "belief_assemblies": 1000, "residual_priority_evaluations": 0, "bp_calls": 1, "candidate_checks": 1000, "intervention_actions": 0, "branch_expansions": 0, "branch_prunes": 0, "relay_transfers": 0, "fallback_calls": 0}},
+    "attempt": {"max_iterations": 8, "work_limits": {"check_to_variable_updates": 1000, "variable_to_check_updates": 1000, "belief_assemblies": 1000, "residual_priority_evaluations": 0, "bp_calls": 1, "candidate_checks": 1000, "intervention_actions": 0, "branch_expansions": 0, "branch_prunes": 0, "relay_transfers": 0, "fallback_calls": 0}},
     "denominator_rule": "all_terminal_shots"
   },
   "trace_plan": {"level": "off", "relative_dir": "trace-sidecars", "max_records": 0, "max_bytes": 0, "label": "development_default"},

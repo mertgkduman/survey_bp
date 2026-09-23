@@ -16,6 +16,7 @@ import numpy as np
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from .artifacts import LoadedArtifact, load_artifact
+from .canonical.budgets import WorkVector
 from .canonical.contracts import CanonicalCompositionSpec, CanonicalManifestV2, parse_canonical_manifest
 from .css import CssCode, fixture_code
 
@@ -248,9 +249,34 @@ class CanonicalEnvironmentV2(StrictModel):
     omp_num_threads: Literal[1]
 
 
+class CanonicalWorkLimitsV2(StrictModel):
+    """One complete, resource-specific hard cap vector for one lifecycle scope."""
+
+    check_to_variable_updates: int = Field(ge=0, le=MAX_ITERATIONS * 1_000)
+    variable_to_check_updates: int = Field(ge=0, le=MAX_ITERATIONS * 1_000)
+    belief_assemblies: int = Field(ge=0, le=MAX_ITERATIONS * 1_000)
+    residual_priority_evaluations: int = Field(ge=0, le=MAX_ITERATIONS * 1_000)
+    bp_calls: int = Field(ge=0, le=MAX_ITERATIONS * 1_000)
+    candidate_checks: int = Field(ge=0, le=MAX_ITERATIONS * 1_000)
+    intervention_actions: int = Field(ge=0, le=MAX_ITERATIONS * 1_000)
+    branch_expansions: int = Field(ge=0, le=MAX_ITERATIONS * 1_000)
+    branch_prunes: int = Field(ge=0, le=MAX_ITERATIONS * 1_000)
+    relay_transfers: int = Field(ge=0, le=MAX_ITERATIONS * 1_000)
+    fallback_calls: int = Field(ge=0, le=MAX_ITERATIONS * 1_000)
+
+    @model_validator(mode="after")
+    def names_match_the_canonical_work_vector(self) -> "CanonicalWorkLimitsV2":
+        if set(type(self).model_fields) != set(WorkVector.zero().as_evidence()):
+            raise ValueError("canonical work limit fields must exactly match WorkVector resources")
+        return self
+
+    def as_evidence(self) -> dict[str, int]:
+        return self.model_dump(mode="json")
+
+
 class CanonicalBudgetScopeV2(StrictModel):
     max_iterations: int = Field(ge=1, le=MAX_ITERATIONS)
-    max_work_units: int = Field(ge=1, le=MAX_ITERATIONS * 1_000)
+    work_limits: CanonicalWorkLimitsV2
 
 
 class CanonicalBudgetsV2(StrictModel):
@@ -264,6 +290,11 @@ class CanonicalBudgetsV2(StrictModel):
     def nested_scopes_do_not_expand_the_shot_limit(self) -> "CanonicalBudgetsV2":
         if self.search.max_iterations > self.shot.max_iterations or self.attempt.max_iterations > self.search.max_iterations:
             raise ValueError("canonical nested iteration budgets may not exceed their parent scope")
+        for resource in WorkVector.zero().as_evidence():
+            if getattr(self.search.work_limits, resource) > getattr(self.shot.work_limits, resource):
+                raise ValueError(f"canonical search {resource} limit may not exceed its shot parent")
+            if getattr(self.attempt.work_limits, resource) > getattr(self.search.work_limits, resource):
+                raise ValueError(f"canonical attempt {resource} limit may not exceed its search parent")
         return self
 
 
@@ -327,6 +358,44 @@ class CanonicalExperimentV2(StrictModel):
 
 
 ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2
+
+
+_EXECUTABLE_BASELINE_KINDS = {
+    "update": "binary_spa",
+    "schedule": "flooding",
+    "state_memory": "stateless",
+    "intervention": "identity",
+    "stopping": "syndrome_or_budget",
+    "selection": "stable_first",
+    "postprocessing": "identity",
+}
+_IDENTITY_ONLY_ROLES = frozenset({"state_memory", "intervention", "postprocessing"})
+
+
+def validate_executable_canonical_baseline(composition: CanonicalCompositionSpec):
+    """Admit only the Phase 2 policy composition with implemented public behavior."""
+    from .canonical.contracts import validate_composition
+
+    resolved = validate_composition(composition)
+    actual = {binding.role.value: binding.kind for binding in resolved.bindings}
+    if actual != _EXECUTABLE_BASELINE_KINDS:
+        raise ValueError(
+                "executable canonical baseline requires binary_spa/flooding/stateless/"
+            "identity/syndrome_or_budget/stable_first/identity policy kinds"
+        )
+    return resolved
+
+
+def executable_canonical_policy_effects(composition: CanonicalCompositionSpec) -> dict[str, dict[str, str]]:
+    """Return public binding IDs with their implemented or identity-only effect."""
+    resolved = validate_executable_canonical_baseline(composition)
+    return {
+        binding.role.value: {
+            "binding_id": binding.binding_id,
+            "effect": "identity_only" if binding.role.value in _IDENTITY_ONLY_ROLES else "active",
+        }
+        for binding in resolved.bindings
+    }
 
 
 @dataclass(frozen=True)
@@ -450,8 +519,7 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
     if isinstance(manifest, CanonicalExperimentV2):
         _verify_canonical_environment(manifest.environment)
         # Closed registry resolution is deliberately before any sample, ledger, or kernel work.
-        from .canonical.contracts import validate_composition
-        validate_composition(manifest.policies)
+        validate_executable_canonical_baseline(manifest.policies)
         artifact = load_artifact(
             manifest.artifact.root, manifest.artifact.path,
             expected_raw_sha256=manifest.artifact.raw_sha256,
