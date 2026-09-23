@@ -25,10 +25,12 @@ from .contracts import (
     parse_canonical_manifest,
     validate_composition,
 )
+from .budgets import BudgetTermination, BudgetTree, WallClockLimit, WorkVector
 from .kernel import BinarySpaKernel
 from .lineage import LineageEdge, LineageId, stable_lineage_id
 from .numerics import NumericalFailure
 from .problems import OriginalProblem, OriginalSpaceCandidate, WorkingProblem, select_stable_candidate
+from .schedules import FloodingSchedule, FloodingSweep
 
 
 class CanonicalConflictError(ValueError):
@@ -110,6 +112,73 @@ class CanonicalExecutionResult:
     termination: str
     evaluation: evaluator.Evaluation | None
     candidate: np.ndarray | None
+
+
+@dataclass(frozen=True)
+class AtomicFloodingResult:
+    """An attempt result whose completed sweeps each committed one leaf vector."""
+
+    v2c: np.ndarray
+    iterations: int
+    termination: BudgetTermination | None
+    last_sweep: FloodingSweep | None
+
+
+class AtomicFloodingExecutor:
+    """Reserve a whole flooding sweep before calculation or message-buffer swap."""
+
+    def __init__(
+        self,
+        schedule: FloodingSchedule,
+        budgets: BudgetTree,
+        *,
+        scope: str,
+        wall_clock: WallClockLimit | None = None,
+    ) -> None:
+        self.schedule = schedule
+        self.budgets = budgets
+        self.scope = scope
+        self.wall_clock = wall_clock
+
+    def _wall_boundary(self, kind: str) -> BudgetTermination | None:
+        return None if self.wall_clock is None else self.wall_clock.check(kind, scope=self.scope)
+
+    def run_attempt(
+        self, old_v2c: np.ndarray, syndrome: np.ndarray, *, error_rate: float, max_iterations: int
+    ) -> AtomicFloodingResult:
+        """Finish in-flight work, then stop only at a named operational boundary."""
+        state = np.array(old_v2c, dtype=np.float64, copy=True)
+        terminal = self._wall_boundary("attempt_start")
+        if terminal is not None:
+            return AtomicFloodingResult(state, 0, terminal, None)
+        last_sweep: FloodingSweep | None = None
+        for iteration in range(1, max_iterations + 1):
+            terminal = self._wall_boundary("iteration_boundary")
+            if terminal is not None:
+                return AtomicFloodingResult(state, iteration - 1, terminal, last_sweep)
+            proposed = WorkVector.from_flooding_counts(
+                edge_count=self.schedule.edge_table.edge_count,
+                variable_count=self.schedule.edge_table.variable_count,
+            )
+            reservation = self.budgets.reserve(self.scope, proposed, leaf_id=f"{self.scope}:flooding:{iteration}")
+            if reservation is None:
+                return AtomicFloodingResult(state, iteration - 1, self.budgets.last_termination, last_sweep)
+            try:
+                sweep = self.schedule.sweep(state, syndrome, error_rate=error_rate)
+                # Only a complete finite sweep becomes visible before its work commits.
+                state = np.array(sweep.new_v2c, dtype=np.float64, copy=True)
+                state.setflags(write=False)
+                reservation.commit_once()
+            except BaseException:
+                if reservation.active:
+                    reservation.rollback()
+                raise
+            last_sweep = sweep
+            terminal = self._wall_boundary("candidate_selection_boundary")
+            if terminal is not None:
+                return AtomicFloodingResult(state, iteration, terminal, last_sweep)
+        terminal = self._wall_boundary("attempt_end")
+        return AtomicFloodingResult(state, max_iterations, terminal, last_sweep)
 
 
 def _identity(manifest: CanonicalManifestV2, observation: DecoderObservation) -> str:
