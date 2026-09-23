@@ -85,6 +85,40 @@ def test_representative_python_allocation_is_opt_in_and_has_typed_missingness():
     assert profiled.python_allocation_peak.scope == "process"
 
 
+def test_failing_profiled_action_restores_profiler_owned_tracemalloc():
+    from bp_registry.canonical.profiling import LocalProfiler, ProfilingPlan
+
+    import tracemalloc
+
+    assert tracemalloc.is_tracing() is False
+    profiler = LocalProfiler(ProfilingPlan(track_python_allocations=True))
+
+    try:
+        with pytest.raises(RuntimeError, match="planned action failure"):
+            profiler.measure(lambda: (_ for _ in ()).throw(RuntimeError("planned action failure")))
+
+        assert tracemalloc.is_tracing() is False
+    finally:
+        if tracemalloc.is_tracing():
+            tracemalloc.stop()
+
+
+def test_profiler_preserves_caller_owned_tracemalloc_on_failure():
+    from bp_registry.canonical.profiling import LocalProfiler, ProfilingPlan
+
+    import tracemalloc
+
+    assert tracemalloc.is_tracing() is False
+    tracemalloc.start()
+    try:
+        profiler = LocalProfiler(ProfilingPlan(track_python_allocations=True))
+        with pytest.raises(RuntimeError, match="caller-owned tracer failure"):
+            profiler.measure(lambda: (_ for _ in ()).throw(RuntimeError("caller-owned tracer failure")))
+        assert tracemalloc.is_tracing() is True
+    finally:
+        tracemalloc.stop()
+
+
 def test_prespecified_representative_and_diagnostic_cohorts_keep_distinct_claims():
     from bp_registry.canonical.profiling import CohortSelection
 
@@ -126,7 +160,7 @@ def test_replay_links_agree_on_semantics_but_not_timing_and_retain_divergence():
 
     divergent = ReplayLink.create(
         clean_run_id="clean-8", profile_run_id="profile-8", manifest_identity="manifest-a",
-        sample_identity="sample-8", decoder_randomness_identity="rng-a", ordering_identity="order-a",
+        sample_identity="sample-7", decoder_randomness_identity="rng-a", ordering_identity="order-a",
         cohort=selection, profiling_level="representative", overhead_ns=7,
         clean_semantics=clean, profiled_semantics={**profiled, "candidate": "candidate-b"},
     )
@@ -134,3 +168,23 @@ def test_replay_links_agree_on_semantics_but_not_timing_and_retain_divergence():
     assert divergent.semantic_agreement.mismatches == ("candidate",)
     assert divergent.status == "diagnostic_divergence"
     assert divergent.population_estimate_eligible is False
+
+
+def test_replay_rejects_mismatched_cohort_sample_identity():
+    from bp_registry.canonical.profiling import CohortSelection, ReplayLink
+
+    selection = CohortSelection.representative(
+        run_identity="sample-7", stratum="syndrome-weight-2", inclusion_probability=0.25
+    )
+    semantics = {
+        "candidate": "candidate-a", "termination": "completed", "work": {"bp_calls": 1},
+        "lineage": "lineage-a", "semantic_trace_digest": "a" * 64,
+    }
+
+    with pytest.raises(ValueError, match="cohort run identity must equal replay sample identity"):
+        ReplayLink.create(
+            clean_run_id="clean-8", profile_run_id="profile-8", manifest_identity="manifest-a",
+            sample_identity="sample-8", decoder_randomness_identity="rng-a", ordering_identity="order-a",
+            cohort=selection, profiling_level="representative", overhead_ns=7,
+            clean_semantics=semantics, profiled_semantics=semantics,
+        )
