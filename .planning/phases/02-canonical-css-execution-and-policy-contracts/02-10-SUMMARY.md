@@ -84,7 +84,7 @@ commits: 4
 
 1. Added executable-baseline admission and explicit active versus identity-only binding effects before public sampling or ledger ownership.
 2. Replaced scalar public work caps with complete, nested WorkVector maps and regenerated the checked canonical schema/manifest.
-3. Routed public binary-SPA flooding through scoped BudgetTree reservations, preserving call-only work on denied or failed sweeps and matching work/terminal evidence.
+3. Routed public binary-SPA flooding through scoped BudgetTree reservations, preserving call-only work on denied or numerical-error sweeps and matching work/terminal evidence.
 
 ## Verification
 
@@ -109,7 +109,7 @@ The stale checked-result and full canonical CLI suite were intentionally deferre
 - `src/bp_registry/runner.py` — forwards preflighted limits and binding effects to structural execution.
 - `src/bp_registry/canonical/execution.py` — reserves BP calls/sweeps and emits terminal facts from committed budget leaves.
 - `data/manifests/canonical-three-qubit-development.json` and `data/manifests/schema-canonical-v2.json` — carry the complete resource-cap contract.
-- `tests/test_canonical_cli.py` and `tests/canonical/test_budgets.py` — cover public admission, denial, edge-free, numerical-failure, and BP-call behavior.
+- `tests/test_canonical_cli.py` and `tests/canonical/test_budgets.py` — cover public admission, denial, edge-free, numerical-error, and BP-call behavior.
 
 ## Decisions Made
 
