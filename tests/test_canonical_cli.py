@@ -19,14 +19,14 @@ def test_checked_canonical_manifest_has_a_strict_public_preflight_contract():
     schema_path = Path("data/manifests/schema-canonical-v2.json")
     assert schema_path.exists()
     assert manifest_path.exists()
-    assert schema_path.read_text(encoding="utf-8") == CanonicalExperimentV2.model_json_schema_json(indent=2) + "\n"
+    assert json.loads(schema_path.read_text(encoding="utf-8")) == CanonicalExperimentV2.model_json_schema()
 
     resolved = preflight(manifest_path)
     assert isinstance(resolved.manifest, CanonicalExperimentV2)
     assert resolved.manifest.evidence.relation == "canonical_implemented"
     assert resolved.manifest.evidence.fixture == "development_fixture"
     assert resolved.manifest.evidence.assessment_status == "not_assessed"
-    assert set(resolved.manifest.policies.model_fields) == {
+    assert set(type(resolved.manifest.policies).model_fields) == {
         "update", "schedule", "state_memory", "intervention", "stopping", "selection", "postprocessing",
     }
 

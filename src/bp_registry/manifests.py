@@ -16,7 +16,7 @@ import numpy as np
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from .artifacts import LoadedArtifact, load_artifact
-from .canonical.contracts import CanonicalManifestV2, parse_canonical_manifest
+from .canonical.contracts import CanonicalCompositionSpec, CanonicalManifestV2, parse_canonical_manifest
 from .css import CssCode, fixture_code
 
 
@@ -238,7 +238,95 @@ class LegacyManifestV1(StrictModel):
         return value
 
 
-ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1
+class CanonicalEnvironmentV2(StrictModel):
+    """Runtime identity for the project-owned CPU implementation only."""
+
+    python: str = Field(min_length=1)
+    numpy: str = Field(min_length=1)
+    scipy: str = Field(min_length=1)
+    backend: Literal["cpu"]
+    omp_num_threads: Literal[1]
+
+
+class CanonicalBudgetScopeV2(StrictModel):
+    max_iterations: int = Field(ge=1, le=MAX_ITERATIONS)
+    max_work_units: int = Field(ge=1, le=MAX_ITERATIONS * 1_000)
+
+
+class CanonicalBudgetsV2(StrictModel):
+    max_shots: int = Field(ge=1, le=MAX_SHOTS)
+    shot: CanonicalBudgetScopeV2
+    search: CanonicalBudgetScopeV2
+    attempt: CanonicalBudgetScopeV2
+    denominator_rule: Literal["all_terminal_shots"]
+
+    @model_validator(mode="after")
+    def nested_scopes_do_not_expand_the_shot_limit(self) -> "CanonicalBudgetsV2":
+        if self.search.max_iterations > self.shot.max_iterations or self.attempt.max_iterations > self.search.max_iterations:
+            raise ValueError("canonical nested iteration budgets may not exceed their parent scope")
+        return self
+
+
+class CanonicalTracePlanV2(StrictModel):
+    level: Literal["off", "full", "filtered"]
+    relative_dir: str = Field(min_length=1)
+    max_records: int = Field(ge=0, le=1_000_000)
+    max_bytes: int = Field(ge=0, le=64 * 1024 * 1024)
+    label: Literal["development_default", "prespecified_campaign"]
+
+
+class CanonicalProfilePlanV2(StrictModel):
+    enabled: bool
+    level: Literal["low_overhead", "representative"]
+    cohort: Literal["clean", "representative", "diagnostic"]
+    selected_before_outcome: bool
+
+
+class CanonicalRandomnessV2(StrictModel):
+    sample_seed: int = Field(ge=0)
+    decoder_seed_identity: str = Field(min_length=1)
+    sample_derivation: Literal["sha256-manifest-shot-v1"]
+
+
+class CanonicalEvidenceV2(StrictModel):
+    relation: Literal["canonical_implemented"]
+    fixture: Literal["development_fixture"]
+    assessment_status: Literal["not_assessed"]
+    procedure: str = Field(min_length=1)
+    sources: tuple[str, ...] = Field(min_length=1)
+    discrepancies: tuple[str, ...] = Field(min_length=1)
+
+    @field_validator("sources", "discrepancies", mode="before")
+    @classmethod
+    def evidence_lists_are_tuples(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+
+class CanonicalExperimentV2(StrictModel):
+    """Strict persisted public contract for canonical CSS development evidence."""
+
+    schema_version: Literal[2]
+    run_id: str = Field(min_length=1)
+    numerical_profile: Literal["cpu-float64-spa-v1"]
+    error_rate: float = Field(gt=0.0, lt=1.0)
+    policies: CanonicalCompositionSpec
+    budgets: CanonicalBudgetsV2
+    trace_plan: CanonicalTracePlanV2
+    profile_plan: CanonicalProfilePlanV2
+    environment: CanonicalEnvironmentV2
+    artifact: ArtifactV1
+    randomness: CanonicalRandomnessV2
+    evidence: CanonicalEvidenceV2
+
+    @field_validator("error_rate")
+    @classmethod
+    def canonical_rate_is_finite(cls, value: float) -> float:
+        if not math.isfinite(value):
+            raise ValueError("canonical error rate must be finite")
+        return value
+
+
+ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2
 
 
 @dataclass(frozen=True)
@@ -263,22 +351,24 @@ def _read_value(value: dict[str, Any] | str | Path) -> dict[str, Any]:
     return decoded
 
 
-def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | dict[str, Any] | str | Path) -> ManifestV1 | CanonicalManifestV2:
+def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | CanonicalExperimentV2 | dict[str, Any] | str | Path) -> ManifestV1 | CanonicalManifestV2 | CanonicalExperimentV2:
     """Dispatch complete native and canonical schemas without changing v1 meanings."""
-    if isinstance(value, (ManifestV1, CanonicalManifestV2)):
+    if isinstance(value, (ManifestV1, CanonicalManifestV2, CanonicalExperimentV2)):
         return value
     decoded = _read_value(value)
     if decoded.get("schema_version") == 2:
-        return parse_canonical_manifest(decoded)
+        return CanonicalExperimentV2.model_validate(decoded) if "budgets" in decoded else parse_canonical_manifest(decoded)
     if decoded.get("schema_version") != 1:
         raise ValueError(f"unsupported manifest schema version {decoded.get('schema_version')!r}")
     return ManifestV1.model_validate(decoded)
 
 
 def _parse_for_preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ManifestRecord:
-    if isinstance(value, (ManifestV1, LegacyManifestV1)):
+    if isinstance(value, (ManifestV1, LegacyManifestV1, CanonicalExperimentV2)):
         return value
     decoded = _read_value(value)
+    if decoded.get("schema_version") == 2:
+        return CanonicalExperimentV2.model_validate(decoded)
     if decoded.get("schema_version") != 1:
         raise ValueError(f"unsupported manifest schema version {decoded.get('schema_version')!r}")
     complete_fields = {
@@ -340,6 +430,16 @@ def _verify_environment(environment: EnvironmentV1, decoder: DecoderV1) -> None:
         raise ValueError("native decoder version does not match the execution environment")
 
 
+def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+    actual = _actual_environment()
+    expected = environment.model_dump(exclude={"omp_num_threads"})
+    actual = {key: actual[key] for key in expected}
+    if actual != expected:
+        raise ValueError("canonical manifest environment does not match this execution environment")
+    if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+        raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+
+
 def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedExperiment:
     """Resolve immutable CSS input and runtime identity before any simulation work."""
     manifest = _parse_for_preflight(value)
@@ -347,6 +447,23 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
         # Original minimal v1 tracer records are immutable historical evidence.
         # They are retained for replay only; new records must use ManifestV1.
         return ResolvedExperiment(manifest=manifest, code=fixture_code(), artifact=None)
+    if isinstance(manifest, CanonicalExperimentV2):
+        _verify_canonical_environment(manifest.environment)
+        # Closed registry resolution is deliberately before any sample, ledger, or kernel work.
+        from .canonical.contracts import validate_composition
+        validate_composition(manifest.policies)
+        artifact = load_artifact(
+            manifest.artifact.root, manifest.artifact.path,
+            expected_raw_sha256=manifest.artifact.raw_sha256,
+            expected_semantic_sha256=manifest.artifact.semantic_sha256,
+        )
+        if artifact.format_version != manifest.artifact.format_version:
+            raise ValueError("canonical artifact format version does not match manifest")
+        code = artifact.code.validate()
+        for name, expected in manifest.artifact.matrix_hashes.model_dump().items():
+            if matrix_hashes(code)[name] != expected:
+                raise ValueError("canonical matrix identity does not match the artifact")
+        return ResolvedExperiment(manifest=manifest, code=code, artifact=artifact)
     if manifest.implementation.source_artifact_status != "verified":
         raise ValueError("source artifact is not verified")
     _verify_environment(manifest.environment, manifest.decoder)

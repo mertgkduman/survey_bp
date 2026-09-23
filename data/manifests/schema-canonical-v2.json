@@ -1,0 +1,559 @@
+{
+  "$defs": {
+    "ArtifactV1": {
+      "additionalProperties": false,
+      "properties": {
+        "code_id": {
+          "minLength": 1,
+          "title": "Code Id",
+          "type": "string"
+        },
+        "format_version": {
+          "const": 1,
+          "title": "Format Version",
+          "type": "integer"
+        },
+        "matrix_hashes": {
+          "$ref": "#/$defs/MatrixHashesV1"
+        },
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "raw_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Raw Sha256",
+          "type": "string"
+        },
+        "root": {
+          "minLength": 1,
+          "title": "Root",
+          "type": "string"
+        },
+        "semantic_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Semantic Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "root",
+        "path",
+        "raw_sha256",
+        "semantic_sha256",
+        "matrix_hashes",
+        "format_version",
+        "code_id"
+      ],
+      "title": "ArtifactV1",
+      "type": "object"
+    },
+    "CanonicalBudgetScopeV2": {
+      "additionalProperties": false,
+      "properties": {
+        "max_iterations": {
+          "maximum": 100000,
+          "minimum": 1,
+          "title": "Max Iterations",
+          "type": "integer"
+        },
+        "max_work_units": {
+          "maximum": 100000000,
+          "minimum": 1,
+          "title": "Max Work Units",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "max_iterations",
+        "max_work_units"
+      ],
+      "title": "CanonicalBudgetScopeV2",
+      "type": "object"
+    },
+    "CanonicalBudgetsV2": {
+      "additionalProperties": false,
+      "properties": {
+        "attempt": {
+          "$ref": "#/$defs/CanonicalBudgetScopeV2"
+        },
+        "denominator_rule": {
+          "const": "all_terminal_shots",
+          "title": "Denominator Rule",
+          "type": "string"
+        },
+        "max_shots": {
+          "maximum": 1000000,
+          "minimum": 1,
+          "title": "Max Shots",
+          "type": "integer"
+        },
+        "search": {
+          "$ref": "#/$defs/CanonicalBudgetScopeV2"
+        },
+        "shot": {
+          "$ref": "#/$defs/CanonicalBudgetScopeV2"
+        }
+      },
+      "required": [
+        "max_shots",
+        "shot",
+        "search",
+        "attempt",
+        "denominator_rule"
+      ],
+      "title": "CanonicalBudgetsV2",
+      "type": "object"
+    },
+    "CanonicalCompositionSpec": {
+      "additionalProperties": false,
+      "description": "Seven explicit roles; omission is never an inactive-policy shorthand.",
+      "properties": {
+        "intervention": {
+          "$ref": "#/$defs/PolicySpec"
+        },
+        "postprocessing": {
+          "$ref": "#/$defs/PolicySpec"
+        },
+        "schedule": {
+          "$ref": "#/$defs/PolicySpec"
+        },
+        "selection": {
+          "$ref": "#/$defs/PolicySpec"
+        },
+        "state_memory": {
+          "$ref": "#/$defs/PolicySpec"
+        },
+        "stopping": {
+          "$ref": "#/$defs/PolicySpec"
+        },
+        "update": {
+          "$ref": "#/$defs/PolicySpec"
+        }
+      },
+      "required": [
+        "update",
+        "schedule",
+        "state_memory",
+        "intervention",
+        "stopping",
+        "selection",
+        "postprocessing"
+      ],
+      "title": "CanonicalCompositionSpec",
+      "type": "object"
+    },
+    "CanonicalEnvironmentV2": {
+      "additionalProperties": false,
+      "description": "Runtime identity for the project-owned CPU implementation only.",
+      "properties": {
+        "backend": {
+          "const": "cpu",
+          "title": "Backend",
+          "type": "string"
+        },
+        "numpy": {
+          "minLength": 1,
+          "title": "Numpy",
+          "type": "string"
+        },
+        "omp_num_threads": {
+          "const": 1,
+          "title": "Omp Num Threads",
+          "type": "integer"
+        },
+        "python": {
+          "minLength": 1,
+          "title": "Python",
+          "type": "string"
+        },
+        "scipy": {
+          "minLength": 1,
+          "title": "Scipy",
+          "type": "string"
+        }
+      },
+      "required": [
+        "python",
+        "numpy",
+        "scipy",
+        "backend",
+        "omp_num_threads"
+      ],
+      "title": "CanonicalEnvironmentV2",
+      "type": "object"
+    },
+    "CanonicalEvidenceV2": {
+      "additionalProperties": false,
+      "properties": {
+        "assessment_status": {
+          "const": "not_assessed",
+          "title": "Assessment Status",
+          "type": "string"
+        },
+        "discrepancies": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Discrepancies",
+          "type": "array"
+        },
+        "fixture": {
+          "const": "development_fixture",
+          "title": "Fixture",
+          "type": "string"
+        },
+        "procedure": {
+          "minLength": 1,
+          "title": "Procedure",
+          "type": "string"
+        },
+        "relation": {
+          "const": "canonical_implemented",
+          "title": "Relation",
+          "type": "string"
+        },
+        "sources": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Sources",
+          "type": "array"
+        }
+      },
+      "required": [
+        "relation",
+        "fixture",
+        "assessment_status",
+        "procedure",
+        "sources",
+        "discrepancies"
+      ],
+      "title": "CanonicalEvidenceV2",
+      "type": "object"
+    },
+    "CanonicalProfilePlanV2": {
+      "additionalProperties": false,
+      "properties": {
+        "cohort": {
+          "enum": [
+            "clean",
+            "representative",
+            "diagnostic"
+          ],
+          "title": "Cohort",
+          "type": "string"
+        },
+        "enabled": {
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "level": {
+          "enum": [
+            "low_overhead",
+            "representative"
+          ],
+          "title": "Level",
+          "type": "string"
+        },
+        "selected_before_outcome": {
+          "title": "Selected Before Outcome",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "enabled",
+        "level",
+        "cohort",
+        "selected_before_outcome"
+      ],
+      "title": "CanonicalProfilePlanV2",
+      "type": "object"
+    },
+    "CanonicalRandomnessV2": {
+      "additionalProperties": false,
+      "properties": {
+        "decoder_seed_identity": {
+          "minLength": 1,
+          "title": "Decoder Seed Identity",
+          "type": "string"
+        },
+        "sample_derivation": {
+          "const": "sha256-manifest-shot-v1",
+          "title": "Sample Derivation",
+          "type": "string"
+        },
+        "sample_seed": {
+          "minimum": 0,
+          "title": "Sample Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "sample_seed",
+        "decoder_seed_identity",
+        "sample_derivation"
+      ],
+      "title": "CanonicalRandomnessV2",
+      "type": "object"
+    },
+    "CanonicalTracePlanV2": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "enum": [
+            "development_default",
+            "prespecified_campaign"
+          ],
+          "title": "Label",
+          "type": "string"
+        },
+        "level": {
+          "enum": [
+            "off",
+            "full",
+            "filtered"
+          ],
+          "title": "Level",
+          "type": "string"
+        },
+        "max_bytes": {
+          "maximum": 67108864,
+          "minimum": 0,
+          "title": "Max Bytes",
+          "type": "integer"
+        },
+        "max_records": {
+          "maximum": 1000000,
+          "minimum": 0,
+          "title": "Max Records",
+          "type": "integer"
+        },
+        "relative_dir": {
+          "minLength": 1,
+          "title": "Relative Dir",
+          "type": "string"
+        }
+      },
+      "required": [
+        "level",
+        "relative_dir",
+        "max_records",
+        "max_bytes",
+        "label"
+      ],
+      "title": "CanonicalTracePlanV2",
+      "type": "object"
+    },
+    "MatrixHashesV1": {
+      "additionalProperties": false,
+      "description": "Separate role- and order-sensitive identities for each CSS object.",
+      "properties": {
+        "hx_raw_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Hx Raw Sha256",
+          "type": "string"
+        },
+        "hx_semantic_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Hx Semantic Sha256",
+          "type": "string"
+        },
+        "hz_raw_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Hz Raw Sha256",
+          "type": "string"
+        },
+        "hz_semantic_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Hz Semantic Sha256",
+          "type": "string"
+        },
+        "lx_raw_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Lx Raw Sha256",
+          "type": "string"
+        },
+        "lx_semantic_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Lx Semantic Sha256",
+          "type": "string"
+        },
+        "lz_raw_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Lz Raw Sha256",
+          "type": "string"
+        },
+        "lz_semantic_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Lz Semantic Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "hx_raw_sha256",
+        "hz_raw_sha256",
+        "lx_raw_sha256",
+        "lz_raw_sha256",
+        "hx_semantic_sha256",
+        "hz_semantic_sha256",
+        "lx_semantic_sha256",
+        "lz_semantic_sha256"
+      ],
+      "title": "MatrixHashesV1",
+      "type": "object"
+    },
+    "PolicySpec": {
+      "additionalProperties": false,
+      "description": "Persisted data only: no module paths, callables, or implicit defaults.",
+      "properties": {
+        "binding_id": {
+          "pattern": "^[a-z][a-z0-9_-]{0,63}$",
+          "title": "Binding Id",
+          "type": "string"
+        },
+        "hook": {
+          "anyOf": [
+            {
+              "enum": [
+                "shot",
+                "search",
+                "member",
+                "leg",
+                "branch",
+                "attempt",
+                "iteration",
+                "message"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Hook"
+        },
+        "kind": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Kind",
+          "type": "string"
+        },
+        "owned_state": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Owned State",
+          "type": "array"
+        },
+        "provides": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Provides",
+          "type": "array"
+        },
+        "requires": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Requires",
+          "type": "array"
+        },
+        "state_lifetime": {
+          "enum": [
+            "shot",
+            "search",
+            "member",
+            "leg",
+            "branch",
+            "attempt",
+            "iteration",
+            "message"
+          ],
+          "title": "State Lifetime",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "binding_id",
+        "state_lifetime"
+      ],
+      "title": "PolicySpec",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Strict persisted public contract for canonical CSS development evidence.",
+  "properties": {
+    "artifact": {
+      "$ref": "#/$defs/ArtifactV1"
+    },
+    "budgets": {
+      "$ref": "#/$defs/CanonicalBudgetsV2"
+    },
+    "environment": {
+      "$ref": "#/$defs/CanonicalEnvironmentV2"
+    },
+    "error_rate": {
+      "exclusiveMaximum": 1.0,
+      "exclusiveMinimum": 0.0,
+      "title": "Error Rate",
+      "type": "number"
+    },
+    "evidence": {
+      "$ref": "#/$defs/CanonicalEvidenceV2"
+    },
+    "numerical_profile": {
+      "const": "cpu-float64-spa-v1",
+      "title": "Numerical Profile",
+      "type": "string"
+    },
+    "policies": {
+      "$ref": "#/$defs/CanonicalCompositionSpec"
+    },
+    "profile_plan": {
+      "$ref": "#/$defs/CanonicalProfilePlanV2"
+    },
+    "randomness": {
+      "$ref": "#/$defs/CanonicalRandomnessV2"
+    },
+    "run_id": {
+      "minLength": 1,
+      "title": "Run Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 2,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "trace_plan": {
+      "$ref": "#/$defs/CanonicalTracePlanV2"
+    }
+  },
+  "required": [
+    "schema_version",
+    "run_id",
+    "numerical_profile",
+    "error_rate",
+    "policies",
+    "budgets",
+    "trace_plan",
+    "profile_plan",
+    "environment",
+    "artifact",
+    "randomness",
+    "evidence"
+  ],
+  "title": "CanonicalExperimentV2",
+  "type": "object"
+}
