@@ -97,7 +97,7 @@ Plans:
 5. A researcher can install the package, run the tutorial, and inspect mathematical conventions, lifecycle contracts, and compatibility examples.
 
 **Research focus:** Numerical stability, trace vocabulary, policy ownership, scoped budgets, and kernel-level work definitions.
-**Plans:** 1/9 plans executed
+**Plans:** 2/9 plans executed
 
 Plans:
 
@@ -107,7 +107,7 @@ Plans:
 
 **Wave 2** *(after Wave 1)*
 
-- [ ] 02-02-PLAN.md — Seven-role composition, lifecycle, compatibility, and policy evidence
+- [x] 02-02-PLAN.md — Seven-role composition, lifecycle, compatibility, and policy evidence
 - [ ] 02-03-PLAN.md — Stable sum-product numerics and double-buffered flooding semantics
 
 **Wave 3** *(after Wave 2)*
@@ -334,7 +334,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Evidence Registry and Native CSS Baseline | 9/9 | Complete    | 2026-09-22 |
-| 2. Canonical CSS Execution and Policy Contracts | 1/9 | In Progress|  |
+| 2. Canonical CSS Execution and Policy Contracts | 2/9 | In Progress|  |
 | 3. Update Rules and Scheduling | 0/TBD | Not started | - |
 | 4. Memory Policies and Relay-BP | 0/TBD | Not started | - |
 | 5. Guided and Perturbative BP Interventions | 0/TBD | Not started | - |
