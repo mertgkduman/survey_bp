@@ -13,7 +13,7 @@ def test_canonical_tutorial_has_required_contract_anchors():
     required_anchors = (
         "binary-spa-flooding-f64-v1",
         "log(p(0) / p(1))",
-        "s = hx (mod 2)",
+        "s_z = h_z e_x (mod 2)",
         "k = 25",
         "check-major, variable-minor",
         "old v2c snapshot",
