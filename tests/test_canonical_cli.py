@@ -152,6 +152,84 @@ def test_public_execution_identity_binds_manifest_code_sample_and_shot():
         assert public_execution_identity(**altered) != identity
 
 
+def _rewrite_rehashed_canonical_ledger(output: Path, mutate):
+    """Apply an attacker-style semantic edit while retaining generic event hashes."""
+    from hashlib import sha256
+
+    from bp_registry.ledger import _canonical_event_id
+
+    ledger_path = output / "events.jsonl"
+    events = [json.loads(line) for line in ledger_path.read_text(encoding="utf-8").splitlines()]
+    mutate(events)
+    for event in events:
+        event["event_id"] = _canonical_event_id(event)
+    ledger_path.write_text("".join(json.dumps(event, sort_keys=True, separators=(",", ":")) + "\n" for event in events), encoding="utf-8")
+    result_path = output / "result.json"
+    result = json.loads(result_path.read_text(encoding="utf-8"))
+    result["ledger_sha256"] = sha256(ledger_path.read_bytes()).hexdigest()
+    result_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+@pytest.mark.parametrize(
+    ("label", "mutate", "message"),
+    [
+        (
+            "work",
+            lambda events: next(event for event in events if event["kind"] == "termination")["data"]["work_vector"].__setitem__("bp_calls", 0),
+            "work_vector",
+        ),
+        (
+            "policy",
+            lambda events: next(event for event in events if event["kind"] == "termination")["data"]["policy_effects"]["update"].__setitem__("effect", "identity_only"),
+            "policy_effects",
+        ),
+    ],
+)
+def test_verify_run_rejects_rehashed_work_and_policy_tampering(tmp_path, label, mutate, message):
+    from bp_registry.cli import run_canonical, verify_run
+
+    output = tmp_path / label
+    run_canonical(CANONICAL_MANIFEST, output)
+    _rewrite_rehashed_canonical_ledger(output, mutate)
+    with pytest.raises(ValueError, match=message):
+        verify_run(output)
+
+
+@pytest.mark.parametrize(
+    ("label", "mutate", "message"),
+    [
+        (
+            "sample",
+            lambda events: next(event for event in events if event["kind"] == "shot_begin").__setitem__("sample_seed_identity", "tampered-sample"),
+            "sample identity",
+        ),
+        (
+            "lineage",
+            lambda events: next(event for event in events if event["kind"] == "selection")["data"].__setitem__("candidate_lineage_id", "candidate-tampered"),
+            "candidate_lineage_id",
+        ),
+        (
+            "profile",
+            lambda events: next(event for event in events if event["kind"] == "runtime")["data"]["profile"]["runtime"]["wall_time"].__setitem__("method", "untrusted"),
+            "profile",
+        ),
+        (
+            "trace",
+            lambda events: next(event for event in events if event["kind"] == "runtime").__setitem__("sidecar", {"path": "trace.json", "sha256": "0" * 64}),
+            "trace",
+        ),
+    ],
+)
+def test_verify_run_rejects_rehashed_structural_provenance_tampering(tmp_path, label, mutate, message):
+    from bp_registry.cli import run_canonical, verify_run
+
+    output = tmp_path / label
+    run_canonical(CANONICAL_MANIFEST, output)
+    _rewrite_rehashed_canonical_ledger(output, mutate)
+    with pytest.raises(ValueError, match=message):
+        verify_run(output)
+
+
 def test_public_profile_plan_emits_typed_attempt_evidence(tmp_path):
     from bp_registry.ledger import read_canonical_events
     from bp_registry.runner import run_canonical_one
