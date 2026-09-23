@@ -97,7 +97,7 @@ Plans:
 5. A researcher can install the package, run the tutorial, and inspect mathematical conventions, lifecycle contracts, and compatibility examples.
 
 **Research focus:** Numerical stability, trace vocabulary, policy ownership, scoped budgets, and kernel-level work definitions.
-**Plans:** 10/12 plans executed
+**Plans:** 11/12 plans executed
 
 Plans:
 
@@ -137,7 +137,7 @@ Plans:
 
 **Wave 9** *(after Wave 8)*
 
-- [ ] 02-11-PLAN.md — Structural ledger ownership and current-attempt candidate lineage
+- [x] 02-11-PLAN.md — Structural ledger ownership and current-attempt candidate lineage
 
 **Wave 10** *(after Waves 8–9)*
 
@@ -346,7 +346,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Evidence Registry and Native CSS Baseline | 9/9 | Complete    | 2026-09-22 |
-| 2. Canonical CSS Execution and Policy Contracts | 10/12 | In Progress|  |
+| 2. Canonical CSS Execution and Policy Contracts | 11/12 | In Progress|  |
 | 3. Update Rules and Scheduling | 0/TBD | Not started | - |
 | 4. Memory Policies and Relay-BP | 0/TBD | Not started | - |
 | 5. Guided and Perturbative BP Interventions | 0/TBD | Not started | - |
