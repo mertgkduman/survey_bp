@@ -140,6 +140,17 @@ def _canonical_kernel_manifest(manifest: CanonicalExperimentV2) -> dict[str, obj
     }
 
 
+def _canonical_execution_controls(manifest: CanonicalExperimentV2) -> dict[str, object]:
+    """Keep preflighted public limits and handler classifications beside the compact kernel input."""
+    return {
+        "work_limits": {
+            scope: getattr(manifest.budgets, scope).work_limits.as_evidence()
+            for scope in ("shot", "search", "attempt")
+        },
+        "policy_effects": executable_canonical_policy_effects(manifest.policies),
+    }
+
+
 def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path):
     """Sample outside the engine, then evaluate only a frozen original-space candidate."""
     resolved = preflight(manifest_path)
@@ -158,6 +169,7 @@ def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: s
         _canonical_kernel_manifest(manifest), code=resolved.code, observation=sample.observation,
         hidden_truth=sample.hidden, shot_id=shot_id, ledger_path=ledger_path,
         sample_seed_identity=sample.sample_identity,
+        execution_controls=_canonical_execution_controls(manifest),
         context={
             "manifest_sha256": digest,
             "artifact_raw_sha256": manifest.artifact.raw_sha256,

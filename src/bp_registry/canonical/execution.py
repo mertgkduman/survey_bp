@@ -25,12 +25,12 @@ from .contracts import (
     parse_canonical_manifest,
     validate_composition,
 )
-from .budgets import BudgetTermination, BudgetTree, WallClockLimit, WorkVector
+from .budgets import BudgetLimit, BudgetTermination, BudgetTree, WallClockLimit, WorkVector
 from .kernel import BinarySpaKernel
 from .lineage import LineageEdge, LineageId, stable_lineage_id
 from .numerics import NumericalFailure
 from .problems import OriginalProblem, OriginalSpaceCandidate, WorkingProblem, select_stable_candidate
-from .schedules import FloodingSchedule, FloodingSweep
+from .schedules import EdgeTable, FloodingSchedule, FloodingSweep
 
 
 class CanonicalConflictError(ValueError):
@@ -122,6 +122,7 @@ class AtomicFloodingResult:
     iterations: int
     termination: BudgetTermination | None
     last_sweep: FloodingSweep | None
+    converged: bool = False
 
 
 class AtomicFloodingExecutor:
@@ -144,7 +145,8 @@ class AtomicFloodingExecutor:
         return None if self.wall_clock is None else self.wall_clock.check(kind, scope=self.scope)
 
     def run_attempt(
-        self, old_v2c: np.ndarray, syndrome: np.ndarray, *, error_rate: float, max_iterations: int
+        self, old_v2c: np.ndarray, syndrome: np.ndarray, *, error_rate: float, max_iterations: int,
+        is_converged: Callable[[FloodingSweep], bool] | None = None,
     ) -> AtomicFloodingResult:
         """Finish in-flight work, then stop only at a named operational boundary."""
         state = np.array(old_v2c, dtype=np.float64, copy=True)
@@ -174,11 +176,41 @@ class AtomicFloodingExecutor:
                     reservation.rollback()
                 raise
             last_sweep = sweep
+            if is_converged is not None and is_converged(sweep):
+                return AtomicFloodingResult(state, iteration, None, last_sweep, True)
             terminal = self._wall_boundary("candidate_selection_boundary")
             if terminal is not None:
                 return AtomicFloodingResult(state, iteration, terminal, last_sweep)
         terminal = self._wall_boundary("attempt_end")
         return AtomicFloodingResult(state, max_iterations, terminal, last_sweep)
+
+
+def _budget_tree(execution_controls: Mapping[str, Any] | None) -> BudgetTree:
+    """Materialize public scoped WorkVector caps without a scalar conversion."""
+    if execution_controls is None:
+        return BudgetTree(limits=(), parents={"search": "shot", "attempt": "search"})
+    configured = execution_controls.get("work_limits")
+    if not isinstance(configured, Mapping):
+        raise ValueError("canonical execution controls require scoped work_limits")
+    resources = set(WorkVector.zero().as_evidence())
+    limits: list[BudgetLimit] = []
+    for scope in ("shot", "search", "attempt"):
+        values = configured.get(scope)
+        if not isinstance(values, Mapping) or set(values) != resources:
+            raise ValueError("canonical scoped work limits must exactly match WorkVector resources")
+        for resource, limit in values.items():
+            limits.append(BudgetLimit(scope, resource, limit))
+    return BudgetTree(limits=limits, parents={"search": "shot", "attempt": "search"})
+
+
+def _termination_evidence(termination: BudgetTermination) -> dict[str, Any]:
+    return {
+        "binding_scope": termination.binding_scope,
+        "resource": termination.resource,
+        "configured_limit": termination.configured_limit,
+        "consumed_amount": termination.consumed_amount,
+        "reason": termination.reason,
+    }
 
 
 def _identity(manifest: CanonicalManifestV2, observation: DecoderObservation) -> str:
@@ -285,6 +317,7 @@ def run_canonical_structural_shot(
     manifest: CanonicalManifestV2 | dict[str, object] | str, *, code: CssCode,
     observation: DecoderObservation, hidden_truth: HiddenTruth, shot_id: int,
     ledger_path: str | Path, sample_seed_identity: str, context: Mapping[str, Any],
+    execution_controls: Mapping[str, Any] | None = None,
     evaluate: Callable[..., evaluator.Evaluation] = evaluator.evaluate_candidate,
 ) -> CanonicalExecutionResult:
     """Run the kernel with v2 structural evidence and an outer truth boundary."""
@@ -294,6 +327,7 @@ def run_canonical_structural_shot(
     validated = code.validate()
     resolved = validate_composition(parsed.policies)
     PolicyRuntime(resolved).traverse_lifecycle()
+    budgets = _budget_tree(execution_controls)
     identity = _identity(parsed, observation)
     path = Path(ledger_path)
     existing = _existing_structural(path, parsed.run_id, shot_id, identity)
@@ -306,42 +340,113 @@ def run_canonical_structural_shot(
     for _attempt in range(30):
         try:
             with CanonicalEventWriter(path) as ledger:
-                common = {**dict(context), "canonical_identity": identity, "composition_identity": resolved.semantic_identity}
+                policy_effects = None if execution_controls is None else execution_controls.get("policy_effects")
+                common = {
+                    **dict(context), "canonical_identity": identity,
+                    "composition_identity": resolved.semantic_identity,
+                    "policy_effects": policy_effects,
+                }
                 ledger.begin(run_id=parsed.run_id, shot_id=shot_id, sample_seed_identity=sample_seed_identity, **common)
                 ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="attempt", data={**common, "scope": "attempt", "max_iterations": parsed.max_iterations})
                 started_ns = time.perf_counter_ns()
+
+                def terminal_with_work(termination: str, **data: Any) -> None:
+                    work = budgets.summary("attempt")
+                    work_data = {
+                        **common,
+                        "qualified_iterations": {
+                            "count": data.get("iterations", 0), "schedule": "flooding",
+                            "atomic_unit": "complete_double_buffered_sweep",
+                        },
+                        "work_vector": work.as_evidence(),
+                    }
+                    ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="work", data=work_data)
+                    ledger.terminal(
+                        run_id=parsed.run_id, shot_id=shot_id, termination=termination,
+                        data={**common, **data, "work_vector": work.as_evidence()},
+                    )
+
+                attempt_reservation = budgets.reserve(
+                    "attempt", WorkVector(bp_calls=1), leaf_id=f"attempt:{shot_id}:bp-call"
+                )
+                if attempt_reservation is None:
+                    termination = budgets.last_termination
+                    assert termination is not None
+                    terminal_with_work(
+                        termination.reason, budget_termination=_termination_evidence(termination),
+                        selection_status="unavailable_due_to_budget", outcome=None,
+                    )
+                    return CanonicalExecutionResult(parsed.run_id, shot_id, termination.reason, None, None)
+                attempt_reservation.commit_once()
                 try:
-                    kernel_result = BinarySpaKernel().run(validated.hz, observation.syndrome,
-                                                          error_rate=parsed.error_rate, max_iterations=parsed.max_iterations)
+                    kernel = BinarySpaKernel()
+                    edge_table = EdgeTable.from_check_matrix(validated.hz)
+                    schedule = FloodingSchedule(edge_table, kernel=kernel)
+                    if edge_table.edge_count == 0:
+                        candidate = kernel.candidate_from_beliefs(
+                            np.full(validated.n, kernel.prior(parsed.error_rate), dtype=np.float64)
+                        )
+                        iterations = 0
+                        converged = bool(np.array_equal(
+                            (validated.hz.astype(np.int64) @ candidate.astype(np.int64)) % 2,
+                            observation.syndrome,
+                        ))
+                        budget_termination = None
+                    else:
+                        executor = AtomicFloodingExecutor(schedule, budgets, scope="attempt")
+                        attempt = executor.run_attempt(
+                            schedule.initialize(parsed.error_rate), observation.syndrome,
+                            error_rate=parsed.error_rate, max_iterations=parsed.max_iterations,
+                            is_converged=lambda sweep: bool(np.array_equal(
+                                (validated.hz.astype(np.int64) @ sweep.candidate.astype(np.int64)) % 2,
+                                observation.syndrome,
+                            )),
+                        )
+                        candidate = None if attempt.last_sweep is None else attempt.last_sweep.candidate
+                        iterations = attempt.iterations
+                        converged = attempt.converged
+                        budget_termination = attempt.termination
                 except NumericalFailure as error:
                     ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="missingness", data={**common, "field": "candidate", "reason": "numerical_failure"})
-                    ledger.terminal(run_id=parsed.run_id, shot_id=shot_id, termination="numerical_failure",
-                                    data={**common, "numerical_failure": str(error), "selection_status": "unavailable_due_to_numerical_failure", "outcome": None})
+                    terminal_with_work(
+                        "numerical_failure", numerical_failure=str(error),
+                        selection_status="unavailable_due_to_numerical_failure", outcome=None,
+                    )
                     return CanonicalExecutionResult(parsed.run_id, shot_id, "numerical_failure", None, None)
-                candidate = np.array(kernel_result.candidate, dtype=np.uint8, copy=True)
+                if budget_termination is not None:
+                    terminal_with_work(
+                        budget_termination.reason, iterations=iterations,
+                        budget_termination=_termination_evidence(budget_termination),
+                        selection_status="unavailable_due_to_budget", outcome=None,
+                    )
+                    return CanonicalExecutionResult(parsed.run_id, shot_id, budget_termination.reason, None, None)
+                if candidate is None or not converged:
+                    terminal_with_work(
+                        "max_iterations", iterations=iterations, converged=False,
+                        selection_status="unavailable_due_to_stopping", outcome=None,
+                    )
+                    return CanonicalExecutionResult(parsed.run_id, shot_id, "max_iterations", None, None)
+                candidate = np.array(candidate, dtype=np.uint8, copy=True)
                 candidate.setflags(write=False)
                 candidate_id = stable_lineage_id("candidate", {"working": working_id.value, "candidate": candidate.tolist()})
                 selected = select_stable_candidate((OriginalSpaceCandidate(candidate_id.value, working, candidate, 0),))
                 if selected is None:  # defensive; the identity composition always supplies one candidate.
-                    ledger.terminal(run_id=parsed.run_id, shot_id=shot_id, termination="no_eligible_candidate",
-                                    data={**common, "selection_status": "no_eligible_candidate", "outcome": None})
+                    terminal_with_work("no_eligible_candidate", iterations=iterations,
+                                       selection_status="no_eligible_candidate", outcome=None)
                     return CanonicalExecutionResult(parsed.run_id, shot_id, "no_eligible_candidate", None, None)
                 frozen = selected.candidate
-                work = WorkVector.from_flooding_counts(edge_count=int(np.count_nonzero(validated.hz)), variable_count=validated.n)
-                work = WorkVector.sum(work for _ in range(kernel_result.iterations))
                 ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="candidate", data={**common, "candidate": frozen.tolist(), "candidate_lineage_id": selected.lineage_id})
                 ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="selection", data={**common, "selection_status": "frozen_decoder_visible_candidate", "original_lineage_id": original_id.value, "working_lineage_id": working_id.value, "candidate_lineage_id": selected.lineage_id})
-                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="work", data={**common, "qualified_iterations": {"count": kernel_result.iterations, "schedule": "flooding", "atomic_unit": "complete_double_buffered_sweep"}, "work_vector": work.as_evidence()})
                 evaluation_result = evaluate(validated, true_x=hidden_truth.x, true_z=hidden_truth.z, candidate_x=frozen)
                 ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="runtime", data={**common, "wall_time_ns": time.perf_counter_ns() - started_ns, "method": "time.perf_counter_ns", "scope": "canonical_attempt", "unit": "ns"})
                 ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="missingness", data={**common, "field": "backend_device_time", "reason": "CPU canonical profile has no device timer", "scope": "canonical_attempt"})
-                ledger.terminal(run_id=parsed.run_id, shot_id=shot_id, termination="completed", data={
-                    **common, "candidate": frozen.tolist(), "iterations": kernel_result.iterations,
-                    "converged": kernel_result.converged, "selection_status": "frozen_decoder_visible_candidate",
-                    "outcome": evaluation_result.outcome, "logical_action_agrees": evaluation_result.logical_action_agrees,
-                    "original_lineage_id": original_id.value, "working_lineage_id": working_id.value,
-                    "candidate_lineage_id": selected.lineage_id, "work_vector": work.as_evidence(),
-                })
+                terminal_with_work(
+                    "completed", candidate=frozen.tolist(), iterations=iterations, converged=converged,
+                    selection_status="frozen_decoder_visible_candidate", outcome=evaluation_result.outcome,
+                    logical_action_agrees=evaluation_result.logical_action_agrees,
+                    original_lineage_id=original_id.value, working_lineage_id=working_id.value,
+                    candidate_lineage_id=selected.lineage_id,
+                )
                 return CanonicalExecutionResult(parsed.run_id, shot_id, "completed", evaluation_result, frozen)
         except ShotOwnershipError:
             time.sleep(0.01)

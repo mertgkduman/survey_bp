@@ -204,7 +204,10 @@ def test_edge_free_attempt_counts_call_without_sweep(tmp_path):
         compact, code=code, observation=DecoderObservation("Z", np.array([], dtype=np.uint8)),
         hidden_truth=HiddenTruth(np.array([0], dtype=np.uint8), np.array([0], dtype=np.uint8)),
         shot_id=0, ledger_path=tmp_path / "events.jsonl", sample_seed_identity="edge-free",
-        context={}, execution_controls={"work_limits": manifest["budgets"]},
+        context={}, execution_controls={"work_limits": {
+            scope: manifest["budgets"][scope]["work_limits"]
+            for scope in ("shot", "search", "attempt")
+        }},
     )
     assert result.termination == "completed"
     events = read_canonical_events(tmp_path / "events.jsonl")
