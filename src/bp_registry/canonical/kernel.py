@@ -6,7 +6,7 @@ from dataclasses import dataclass
 import math
 import numpy as np
 
-from .numerics import NumericalFailure, boxplus, finite_saturate
+from .numerics import check_to_variable, finite_saturate, hard_decision, prior_llr
 
 
 def _binary(value: np.ndarray, name: str, *, ndim: int) -> np.ndarray:
@@ -26,30 +26,48 @@ class KernelResult:
 class BinarySpaKernel:
     """No native adapter: deterministic float64 LLR SPA with flooding updates."""
 
+    def prior(self, error_rate: float) -> float:
+        """Pure numerical prior helper used by schedules and standalone callers."""
+        return prior_llr(error_rate)
+
+    def check_message(self, incoming: np.ndarray, syndrome: int) -> float:
+        """Pure check-to-variable update for a single canonical edge."""
+        return check_to_variable(incoming, syndrome=syndrome)
+
+    def assemble_beliefs(
+        self, variable_count: int, edge_variables: tuple[int, ...], messages: np.ndarray, prior: float
+    ) -> np.ndarray:
+        """Pure belief assembly from a complete check-message buffer."""
+        beliefs = np.full(variable_count, prior, dtype=np.float64)
+        for variable, message in zip(edge_variables, messages, strict=True):
+            beliefs[variable] += message
+        return finite_saturate(beliefs, boundary="belief_assembly")
+
+    def variable_message(self, belief: float, check_message: float) -> float:
+        """Pure variable-to-check exclusion update after beliefs are complete."""
+        return float(finite_saturate(belief - check_message, boundary="variable_update"))
+
+    def candidate_from_beliefs(self, beliefs: np.ndarray) -> np.ndarray:
+        """Pure deterministic hard decision with the profile's exact-zero rule."""
+        return hard_decision(beliefs)
+
     def run(self, check_matrix: np.ndarray, syndrome: np.ndarray, *, error_rate: float, max_iterations: int) -> KernelResult:
+        from .schedules import EdgeTable, FloodingSchedule
+
         h = _binary(check_matrix, "check_matrix", ndim=2)
         s = _binary(syndrome, "syndrome", ndim=1)
-        if s.shape != (h.shape[0],) or h.shape[1] == 0 or not math.isfinite(error_rate) or not 0 < error_rate < 1:
+        if s.shape != (h.shape[0],) or not isinstance(max_iterations, int) or max_iterations < 0 or not math.isfinite(error_rate) or not 0 < error_rate < 1:
             raise ValueError("invalid SPA dimensions or error_rate")
-        prior = float(math.log((1.0 - error_rate) / error_rate))
-        edges = [(check, variable) for check in range(h.shape[0]) for variable in np.flatnonzero(h[check])]
-        v2c = {edge: prior for edge in edges}
-        checks = [np.flatnonzero(h[row]).tolist() for row in range(h.shape[0])]
+        table = EdgeTable.from_check_matrix(h)
+        schedule = FloodingSchedule(table, kernel=self)
+        v2c = schedule.initialize(error_rate)
+        candidate = self.candidate_from_beliefs(np.full(table.variable_count, self.prior(error_rate), dtype=np.float64))
+        if table.edge_count == 0:
+            return KernelResult(candidate, bool(np.array_equal((h.astype(np.int64) @ candidate) % 2, s)), 0)
         for iteration in range(1, max_iterations + 1):
-            c2v: dict[tuple[int, int], float] = {}
-            for check, variables in enumerate(checks):
-                for variable in variables:
-                    message = boxplus(np.asarray([v2c[(check, other)] for other in variables if other != variable]))
-                    c2v[(check, variable)] = -message if s[check] else message
-            beliefs = np.full(h.shape[1], prior, dtype=np.float64)
-            for (check, variable), message in c2v.items():
-                beliefs[variable] += message
-            beliefs = finite_saturate(beliefs, boundary="belief_assembly")
-            candidate = np.asarray(beliefs < 0, dtype=np.uint8)
+            sweep = schedule.sweep(v2c, s, error_rate=error_rate)
+            candidate = sweep.candidate
             if np.array_equal((h.astype(np.int64) @ candidate) % 2, s):
                 return KernelResult(candidate, True, iteration)
-            v2c = {
-                (check, variable): float(finite_saturate(beliefs[variable] - c2v[(check, variable)], boundary="variable_update"))
-                for check, variable in edges
-            }
+            v2c = sweep.new_v2c
         return KernelResult(candidate, False, max_iterations)

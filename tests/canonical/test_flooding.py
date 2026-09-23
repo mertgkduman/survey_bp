@@ -29,8 +29,8 @@ def test_flooding_reads_complete_old_snapshot_then_commits_complete_new_buffer()
 
     np.testing.assert_allclose(sweep.old_v2c, old_v2c)
     np.testing.assert_allclose(sweep.check_to_variable, [-0.7, 1.5, -2.0, -0.2])
-    np.testing.assert_allclose(sweep.beliefs, [-2.4, 1.6])
-    np.testing.assert_allclose(sweep.new_v2c, [-1.7, 0.1, -0.4, 1.8])
+    np.testing.assert_allclose(sweep.beliefs, [np.log(4.0) - 2.7, np.log(4.0) + 1.3])
+    np.testing.assert_allclose(sweep.new_v2c, [np.log(4.0) - 2.0, np.log(4.0) - 0.2, np.log(4.0) - 0.7, np.log(4.0) + 1.5])
     np.testing.assert_array_equal(sweep.candidate, np.array([1, 0], dtype=np.uint8))
     assert sweep.proposed_work.as_evidence() == {
         "check_to_variable": 4,
