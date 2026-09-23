@@ -16,6 +16,7 @@ import numpy as np
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from .artifacts import LoadedArtifact, load_artifact
+from .canonical.contracts import CanonicalManifestV2, parse_canonical_manifest
 from .css import CssCode, fixture_code
 
 
@@ -262,11 +263,13 @@ def _read_value(value: dict[str, Any] | str | Path) -> dict[str, Any]:
     return decoded
 
 
-def parse_manifest(value: ManifestV1 | dict[str, Any] | str | Path) -> ManifestV1:
-    """Dispatch only complete persisted schemas; unknown versions never fall through."""
-    if isinstance(value, ManifestV1):
+def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | dict[str, Any] | str | Path) -> ManifestV1 | CanonicalManifestV2:
+    """Dispatch complete native and canonical schemas without changing v1 meanings."""
+    if isinstance(value, (ManifestV1, CanonicalManifestV2)):
         return value
     decoded = _read_value(value)
+    if decoded.get("schema_version") == 2:
+        return parse_canonical_manifest(decoded)
     if decoded.get("schema_version") != 1:
         raise ValueError(f"unsupported manifest schema version {decoded.get('schema_version')!r}")
     return ManifestV1.model_validate(decoded)
