@@ -97,7 +97,36 @@ Plans:
 5. A researcher can install the package, run the tutorial, and inspect mathematical conventions, lifecycle contracts, and compatibility examples.
 
 **Research focus:** Numerical stability, trace vocabulary, policy ownership, scoped budgets, and kernel-level work definitions.
-**Plans:** TBD
+**Plans:** 9 plans
+
+Plans:
+
+**Wave 1**
+
+- [ ] 02-01-PLAN.md — End-to-end canonical CSS manifest, BP, evaluator, and ledger tracer
+
+**Wave 2** *(after Wave 1)*
+
+- [ ] 02-02-PLAN.md — Seven-role composition, lifecycle, compatibility, and policy evidence
+- [ ] 02-03-PLAN.md — Stable sum-product numerics and double-buffered flooding semantics
+
+**Wave 3** *(after Wave 2)*
+
+- [ ] 02-04-PLAN.md — Hierarchical budgets, atomic work, and qualified resource accounting
+- [ ] 02-05-PLAN.md — Candidate lineage, sparse control-flow events, and bounded traces
+
+**Wave 4** *(after Wave 3)*
+
+- [ ] 02-06-PLAN.md — Honest native instrumentation missingness and summaries
+- [ ] 02-07-PLAN.md — Local profiling, representative cohorts, and replay agreement
+
+**Wave 5** *(after Waves 2–4)*
+
+- [ ] 02-08-PLAN.md — Official canonical manifest, CLI integration, and verified result artifact
+
+**Wave 6** *(after Wave 5)*
+
+- [ ] 02-09-PLAN.md — Executable tutorial, profiling strategy, and novelty/depth register
 
 ### Phase 3: Update Rules and Scheduling
 
