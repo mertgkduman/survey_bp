@@ -84,7 +84,7 @@ Plans:
 
 ### Phase 2: Canonical CSS Execution and Policy Contracts
 
-**Goal:** A researcher can inspect and run a canonical binary BP policy composition with trustworthy outcomes and computational attribution.
+**Goal:** As a researcher, I want to inspect and run a canonical binary BP policy composition, so that I can trust its outcomes and computational attribution.
 **Mode:** mvp
 **Depends on:** Phase 1
 **Requirements:** ENG-01, ENG-02, ENG-03, ENG-04, ENG-05, ENG-06, SCH-01, LED-02, LED-03, LED-04, DOC-01
