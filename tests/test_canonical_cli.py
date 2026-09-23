@@ -278,3 +278,32 @@ def test_public_budget_schema_uses_exact_work_resources():
     )
     with pytest.raises(ValidationError):
         CanonicalExperimentV2.model_validate(expanding_child)
+
+
+def test_public_canonical_work_counts_one_bp_call_per_attempt(tmp_path):
+    from bp_registry.ledger import read_canonical_events
+    from bp_registry.runner import run_canonical_one
+
+    ledger_path = tmp_path / "events.jsonl"
+    result = run_canonical_one(CANONICAL_MANIFEST, shot_id=0, ledger_path=ledger_path)
+    assert result.termination == "completed"
+    events = read_canonical_events(ledger_path)
+    work = next(event["data"]["work_vector"] for event in events if event["kind"] == "work")
+    terminal = next(event["data"] for event in events if event["kind"] == "termination")
+    assert work == terminal["work_vector"]
+    assert work["bp_calls"] == 1
+
+
+def test_public_cap_below_one_sweep_emits_scoped_denial(tmp_path):
+    from bp_registry.ledger import read_canonical_events
+    from bp_registry.runner import run_canonical_one
+
+    manifest = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text(encoding="utf-8"))
+    manifest["budgets"]["attempt"]["work_limits"]["check_to_variable_updates"] = 0
+    manifest_path = tmp_path / "manifest.json"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    result = run_canonical_one(manifest_path, shot_id=0, ledger_path=tmp_path / "events.jsonl")
+    assert result.termination == "count_budget_exhausted"
+    terminal = next(event["data"] for event in read_canonical_events(tmp_path / "events.jsonl") if event["kind"] == "termination")
+    assert terminal["budget_termination"]["binding_scope"] == "attempt"
+    assert terminal["budget_termination"]["resource"] == "check_to_variable_updates"

@@ -5,9 +5,24 @@ from __future__ import annotations
 import importlib
 import importlib.util
 from concurrent.futures import ThreadPoolExecutor
+import json
+from pathlib import Path
 
 import numpy as np
 import pytest
+
+
+REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+CANONICAL_MANIFEST = REPOSITORY_ROOT / "data/manifests/canonical-three-qubit-development.json"
+
+
+def _public_manifest(tmp_path, **changes):
+    payload = json.loads(CANONICAL_MANIFEST.read_text(encoding="utf-8"))
+    for key, value in changes.items():
+        payload[key] = value
+    path = tmp_path / "manifest.json"
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    return path
 
 
 def _api():
@@ -140,3 +155,80 @@ def test_sweep_exception_rolls_back_reservation_without_changing_message_state()
         runner.run_attempt(old_v2c, np.array([2]), error_rate=0.2, max_iterations=1)
     np.testing.assert_allclose(old_v2c, [0.4])
     assert tree.summary("shot") == budgets.WorkVector.zero()
+
+
+def test_public_cap_denial_precedes_sweep_mutation_and_names_scope(tmp_path):
+    """A public cap smaller than one sweep preserves the committed call-only work."""
+    from bp_registry.ledger import read_canonical_events
+    from bp_registry.runner import run_canonical_one
+
+    payload = json.loads(CANONICAL_MANIFEST.read_text(encoding="utf-8"))
+    payload["budgets"]["attempt"]["work_limits"]["check_to_variable_updates"] = 0
+    manifest = _public_manifest(tmp_path, budgets=payload["budgets"])
+    ledger_path = tmp_path / "events.jsonl"
+
+    result = run_canonical_one(manifest, shot_id=0, ledger_path=ledger_path)
+    assert result.termination == "count_budget_exhausted"
+    events = read_canonical_events(ledger_path)
+    work = next(event["data"]["work_vector"] for event in events if event["kind"] == "work")
+    terminal = next(event["data"] for event in events if event["kind"] == "termination")
+    assert work == terminal["work_vector"]
+    assert work["bp_calls"] == 1
+    assert work["check_to_variable_updates"] == 0
+    assert terminal["budget_termination"] == {
+        "binding_scope": "attempt",
+        "resource": "check_to_variable_updates",
+        "configured_limit": 0,
+        "consumed_amount": 0,
+        "reason": "count_budget_exhausted",
+    }
+
+
+def test_edge_free_attempt_counts_call_without_sweep(tmp_path):
+    """An edge-free graph is a real BP attempt but has no reservable sweep."""
+    from bp_registry.canonical.execution import run_canonical_structural_shot
+    from bp_registry.css import CssCode
+    from bp_registry.ledger import read_canonical_events
+    from bp_registry.sampling import DecoderObservation, HiddenTruth
+
+    code = CssCode(
+        hx=np.zeros((0, 1), dtype=np.uint8), hz=np.zeros((0, 1), dtype=np.uint8),
+        lx=np.ones((1, 1), dtype=np.uint8), lz=np.ones((1, 1), dtype=np.uint8),
+    ).validate()
+    manifest = json.loads(CANONICAL_MANIFEST.read_text(encoding="utf-8"))
+    compact = {
+        "schema_version": 2, "run_id": "edge-free", "numerical_profile": manifest["numerical_profile"],
+        "max_iterations": 2, "error_rate": manifest["error_rate"], "policies": manifest["policies"],
+    }
+    result = run_canonical_structural_shot(
+        compact, code=code, observation=DecoderObservation("Z", np.array([], dtype=np.uint8)),
+        hidden_truth=HiddenTruth(np.array([0], dtype=np.uint8), np.array([0], dtype=np.uint8)),
+        shot_id=0, ledger_path=tmp_path / "events.jsonl", sample_seed_identity="edge-free",
+        context={}, execution_controls={"work_limits": manifest["budgets"]},
+    )
+    assert result.termination == "completed"
+    events = read_canonical_events(tmp_path / "events.jsonl")
+    terminal = next(event["data"] for event in events if event["kind"] == "termination")
+    assert terminal["iterations"] == 0
+    assert terminal["converged"] is True
+    assert terminal["work_vector"]["bp_calls"] == 1
+    assert terminal["work_vector"]["check_to_variable_updates"] == 0
+
+
+def test_numerical_failure_rolls_back_sweep_but_counts_attempt(tmp_path, monkeypatch):
+    """A failed numerical update cannot erase that the attempt itself was invoked."""
+    from bp_registry.canonical.numerics import NumericalFailure
+    from bp_registry.ledger import read_canonical_events
+    from bp_registry.runner import run_canonical_one
+
+    def fail(*_args, **_kwargs):
+        raise NumericalFailure("forced numerical failure")
+
+    monkeypatch.setattr("bp_registry.canonical.schedules.FloodingSchedule.sweep", fail)
+    ledger_path = tmp_path / "events.jsonl"
+    result = run_canonical_one(CANONICAL_MANIFEST, shot_id=0, ledger_path=ledger_path)
+    assert result.termination == "numerical_failure"
+    terminal = next(event["data"] for event in read_canonical_events(ledger_path) if event["kind"] == "termination")
+    assert terminal["work_vector"]["bp_calls"] == 1
+    assert terminal["work_vector"]["check_to_variable_updates"] == 0
+    assert terminal["outcome"] is None
