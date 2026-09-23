@@ -59,6 +59,86 @@ def test_terminal_row_is_durable_and_summary_counts_only_final_rows(tmp_path):
     assert summary["outcomes"] == {"logical_failure": 1}
 
 
+def test_native_metric_facts_round_trip_with_qualified_missingness(tmp_path):
+    from bp_registry import ledger
+    from bp_registry.canonical.metrics import MetricFact, unavailable_metric
+
+    assert hasattr(ledger, "query_native_metric_facts"), (
+        "ledger queries must expose typed native metric facts"
+    )
+    path = tmp_path / "events.jsonl"
+    metrics = [
+        MetricFact.observed(
+            "native_iterations", 0, method="ldpc.BpDecoder.iter",
+            scope="native_decoder_call", unit="native_iterations",
+            qualification="public_sdk_counter",
+        ),
+        unavailable_metric(
+            "native_edge_updates", method="ldpc.BpDecoder",
+            scope="native_decoder_call", unit="edge_messages",
+            qualification="opaque_native_internal",
+            reason="ldpc.BpDecoder does not expose edge-update counts",
+        ),
+    ]
+    with ledger.LedgerWriter(path) as writer:
+        writer.begin(run_id="native", shot_id=1, sample_seed_identity="seed-native")
+        writer.terminal(
+            run_id="native", shot_id=1, termination="completed",
+            native_metric_facts=[metric.as_evidence() for metric in metrics],
+        )
+
+    row = ledger.reconcile(path)[0]
+    assert row["native_metric_facts"] == [metric.as_evidence() for metric in metrics]
+    assert ledger.query_native_metric_facts(path) == [
+        {"run_id": "native", "shot_id": 1, **metric.as_evidence()} for metric in metrics
+    ]
+
+
+def test_native_metric_summary_separates_availability_from_numeric_zero(tmp_path):
+    from bp_registry import ledger
+    from bp_registry.canonical.metrics import MetricFact, unavailable_metric
+
+    path = tmp_path / "events.jsonl"
+    metrics = [
+        MetricFact.observed(
+            "native_iterations", 0, method="ldpc.BpDecoder.iter",
+            scope="native_decoder_call", unit="native_iterations",
+            qualification="public_sdk_counter",
+        ),
+        unavailable_metric(
+            "native_edge_updates", method="ldpc.BpDecoder",
+            scope="native_decoder_call", unit="edge_messages",
+            qualification="opaque_native_internal", reason="not exposed",
+        ),
+    ]
+    with ledger.LedgerWriter(path) as writer:
+        writer.begin(run_id="native", shot_id=2, sample_seed_identity="seed-native-2")
+        writer.terminal(
+            run_id="native", shot_id=2, termination="completed",
+            native_metric_facts=[metric.as_evidence() for metric in metrics],
+        )
+
+    availability = ledger.summarize(path)["native_metric_availability"]
+    assert availability["native_iterations"] == {"observed": 1, "unavailable": 0}
+    assert availability["native_edge_updates"] == {"observed": 0, "unavailable": 1}
+
+
+def test_reconciled_interruption_preserves_explicit_unavailable_native_metrics(tmp_path):
+    from bp_registry import ledger
+
+    path = tmp_path / "events.jsonl"
+    with ledger.LedgerWriter(path) as writer:
+        writer.begin(run_id="interrupted", shot_id=3, sample_seed_identity="seed-interrupted")
+
+    repaired = ledger.reconcile(path)[0]
+    facts = repaired["native_metric_facts"]
+    assert {fact["metric"] for fact in facts} == {
+        "native_iterations", "native_edge_updates", "native_control_flow_events",
+    }
+    assert all(fact["value"] is None for fact in facts)
+    assert all(fact["unavailable_reason"] for fact in facts)
+
+
 def test_duplicate_or_out_of_order_events_are_rejected_without_double_counting(tmp_path):
     from bp_registry.ledger import LedgerWriter, reconcile
 
