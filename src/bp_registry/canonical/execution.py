@@ -7,7 +7,8 @@ from hashlib import sha256
 import json
 from pathlib import Path
 import time
-from typing import Callable, Sequence
+from types import MappingProxyType
+from typing import Any, Callable, Mapping, Sequence
 
 import numpy as np
 
@@ -15,7 +16,15 @@ from .. import evaluator
 from ..css import CssCode
 from ..ledger import LedgerWriter, ShotOwnershipError, reconcile
 from ..sampling import DecoderObservation, HiddenTruth
-from .contracts import CanonicalManifestV2, parse_canonical_manifest
+from .contracts import (
+    CanonicalManifestV2,
+    Hook,
+    PolicyBinding,
+    PolicyDecision,
+    ResolvedComposition,
+    parse_canonical_manifest,
+    validate_composition,
+)
 from .kernel import BinarySpaKernel
 from .lineage import LineageEdge, LineageId, stable_lineage_id
 from .numerics import NumericalFailure
@@ -24,6 +33,74 @@ from .problems import OriginalProblem, OriginalSpaceCandidate, WorkingProblem, s
 
 class CanonicalConflictError(ValueError):
     """A stable run/shot key was reused with different canonical content."""
+
+
+@dataclass(frozen=True)
+class LifecycleEvent:
+    """An engine-owned lifecycle boundary available to later policy families."""
+
+    hook: Hook
+
+
+@dataclass(frozen=True)
+class CapabilityView:
+    """Copied, immutable decoder-visible values; no hidden truth or engine state."""
+
+    values: Mapping[str, Any]
+
+
+def _freeze_value(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return MappingProxyType({str(key): _freeze_value(item) for key, item in value.items()})
+    if isinstance(value, list):
+        return tuple(_freeze_value(item) for item in value)
+    if isinstance(value, np.ndarray):
+        copied = np.array(value, copy=True)
+        copied.setflags(write=False)
+        return copied
+    return value
+
+
+class PolicyRuntime:
+    """Engine-owned state allocator and decision validator for a resolved composition."""
+
+    _LIFECYCLE = (
+        Hook.SHOT, Hook.SEARCH, Hook.MEMBER, Hook.LEG, Hook.BRANCH,
+        Hook.ATTEMPT, Hook.ITERATION, Hook.MESSAGE,
+    )
+
+    def __init__(self, composition: ResolvedComposition):
+        self._bindings = {binding.binding_id: binding for binding in composition.bindings}
+        self._private_state: dict[tuple[str, str], dict[str, int | None]] = {}
+
+    def traverse_lifecycle(self) -> tuple[LifecycleEvent, ...]:
+        return tuple(LifecycleEvent(hook) for hook in self._LIFECYCLE)
+
+    def capability_view(self, values: Mapping[str, Any]) -> CapabilityView:
+        return CapabilityView(MappingProxyType({str(key): _freeze_value(value) for key, value in values.items()}))
+
+    def private_state(self, binding_id: str, *, sibling_id: str) -> dict[str, int | None]:
+        binding = self._binding(binding_id)
+        key = (binding.binding_id, f"{binding.state_lifetime.value}:{sibling_id}")
+        return self._private_state.setdefault(key, {name: None for name in binding.owned_state})
+
+    def apply_decision(self, decision: PolicyDecision, *, sibling_id: str = "default") -> PolicyDecision:
+        binding = self._binding(decision.binding_id)
+        if decision.hook != binding.hook.value:
+            raise ValueError(f"decision hook {decision.hook!r} does not match binding hook {binding.hook.value!r}")
+        if decision.action == "state_update":
+            unknown = set(decision.state_updates).difference(binding.owned_state)
+            if unknown:
+                raise ValueError(f"binding {binding.binding_id!r} does not own state {sorted(unknown)!r}")
+            state = self.private_state(binding.binding_id, sibling_id=sibling_id)
+            state.update(decision.state_updates)
+        return decision
+
+    def _binding(self, binding_id: str) -> PolicyBinding:
+        try:
+            return self._bindings[binding_id]
+        except KeyError as error:
+            raise ValueError(f"unknown policy binding {binding_id!r}") from error
 
 
 @dataclass(frozen=True)
@@ -65,6 +142,9 @@ def run_canonical_shot(manifest: CanonicalManifestV2 | dict[str, object] | str, 
     if type(shot_id) is not int or shot_id < 0 or observation.check_type != "Z":
         raise ValueError("canonical tracer accepts a nonnegative Z-check shot")
     validated = code.validate()
+    resolved = validate_composition(parsed.policies)
+    runtime = PolicyRuntime(resolved)
+    runtime.traverse_lifecycle()
     identity = _identity(parsed, observation)
     original_id = stable_lineage_id("original", {"identity": identity})
     original = OriginalProblem(original_id.value, validated.hx, validated.hz, observation.syndrome)

@@ -10,6 +10,16 @@ import pytest
 
 
 def _manifest(run_id: str = "canonical-tracer") -> dict[str, object]:
+    def policy(role: str, kind: str) -> dict[str, object]:
+        return {
+            "kind": kind,
+            "binding_id": f"{role}-v1",
+            "state_lifetime": "attempt",
+            "owned_state": [],
+            "requires": [],
+            "provides": [],
+        }
+
     return {
         "schema_version": 2,
         "run_id": run_id,
@@ -17,13 +27,13 @@ def _manifest(run_id: str = "canonical-tracer") -> dict[str, object]:
         "max_iterations": 8,
         "error_rate": 0.1,
         "policies": {
-            "update": {"kind": "binary_spa"},
-            "schedule": {"kind": "flooding"},
-            "state_memory": {"kind": "stateless"},
-            "intervention": {"kind": "identity"},
-            "stopping": {"kind": "syndrome_or_budget"},
-            "selection": {"kind": "stable_first"},
-            "postprocessing": {"kind": "identity"},
+            "update": policy("update", "binary_spa"),
+            "schedule": policy("schedule", "flooding"),
+            "state_memory": policy("state-memory", "stateless"),
+            "intervention": policy("intervention", "identity"),
+            "stopping": policy("stopping", "syndrome_or_budget"),
+            "selection": policy("selection", "stable_first"),
+            "postprocessing": policy("postprocessing", "identity"),
         },
     }
 

@@ -30,6 +30,8 @@ class Hook(str, Enum):
     SHOT = "shot"
     SEARCH = "search"
     MEMBER = "member"
+    LEG = "leg"
+    BRANCH = "branch"
     ATTEMPT = "attempt"
     ITERATION = "iteration"
     MESSAGE = "message"
@@ -39,6 +41,8 @@ class StateLifetime(str, Enum):
     SHOT = "shot"
     SEARCH = "search"
     MEMBER = "member"
+    LEG = "leg"
+    BRANCH = "branch"
     ATTEMPT = "attempt"
     ITERATION = "iteration"
     MESSAGE = "message"
@@ -54,7 +58,13 @@ _ROLE_HOOKS: dict[PolicyRole, Hook] = {
     PolicyRole.POSTPROCESSING: Hook.ATTEMPT,
 }
 _POLICY_KINDS: dict[PolicyRole, frozenset[str]] = {
-    role: frozenset({"identity"}) for role in PolicyRole
+    PolicyRole.UPDATE: frozenset({"identity", "binary_spa"}),
+    PolicyRole.SCHEDULE: frozenset({"identity", "flooding"}),
+    PolicyRole.STATE_MEMORY: frozenset({"identity", "stateless"}),
+    PolicyRole.INTERVENTION: frozenset({"identity"}),
+    PolicyRole.STOPPING: frozenset({"identity", "syndrome_or_budget"}),
+    PolicyRole.SELECTION: frozenset({"identity", "stable_first"}),
+    PolicyRole.POSTPROCESSING: frozenset({"identity"}),
 }
 
 
@@ -63,11 +73,11 @@ class PolicySpec(_Strict):
 
     kind: str = Field(min_length=1, max_length=64)
     binding_id: str = Field(pattern=r"^[a-z][a-z0-9_-]{0,63}$")
-    state_lifetime: Literal["shot", "search", "member", "attempt", "iteration", "message"]
+    state_lifetime: Literal["shot", "search", "member", "leg", "branch", "attempt", "iteration", "message"]
     owned_state: tuple[str, ...] = ()
     requires: tuple[str, ...] = ()
     provides: tuple[str, ...] = ()
-    hook: Literal["shot", "search", "member", "attempt", "iteration", "message"] | None = None
+    hook: Literal["shot", "search", "member", "leg", "branch", "attempt", "iteration", "message"] | None = None
 
     @field_validator("owned_state", "requires", "provides", mode="before")
     @classmethod
@@ -117,6 +127,7 @@ class PolicyBinding:
     requires: tuple[str, ...]
     provides: tuple[str, ...]
     compatibility_reason: str
+    evidence: "PolicyEvidence"
 
 
 @dataclass(frozen=True)
@@ -143,6 +154,71 @@ class PolicyEvidence(_Strict):
             raise ValueError("policy evidence requires a source anchor or precise procedure")
         if not self.invariants or any(not item.strip() for item in self.invariants):
             raise ValueError("policy evidence requires nonempty ordered invariants")
+        return self
+
+
+class SearchRelationship(str, Enum):
+    INDEPENDENT = "independent"
+    RESTARTED = "restarted"
+    BRANCHED = "branched"
+    RELAYED = "relayed"
+
+
+class ExecutionTopology(str, Enum):
+    SEQUENTIAL = "sequential"
+    CONCURRENT = "concurrent"
+    BATCHED = "batched"
+
+
+class RelayPayload(_Strict):
+    """The only transferable relay state is a registered, typed payload."""
+
+    kind: Literal["canonical-relay-v1"]
+    values: tuple[int, ...] = Field(min_length=1)
+
+    @field_validator("values", mode="before")
+    @classmethod
+    def relay_values_to_tuple(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @field_validator("values")
+    @classmethod
+    def relay_values_are_bits(cls, value: tuple[int, ...]) -> tuple[int, ...]:
+        if any(type(item) is not int or item not in (0, 1) for item in value):
+            raise ValueError("relay payload values must be binary integers")
+        return value
+
+
+class SearchPlan(_Strict):
+    """Relationship and execution topology are deliberately separate dimensions."""
+
+    model_config = ConfigDict(extra="forbid", strict=False, frozen=True, allow_inf_nan=False)
+    relationship: SearchRelationship
+    topology: ExecutionTopology
+    budget_scope: Literal["shot", "search", "member", "leg", "branch", "attempt"]
+    relay_payload: RelayPayload | None = None
+
+    @model_validator(mode="after")
+    def relay_is_explicit_and_exclusive(self) -> "SearchPlan":
+        if self.relationship is SearchRelationship.RELAYED and self.relay_payload is None:
+            raise ValueError("relayed relationships require a registered relay payload")
+        if self.relationship is not SearchRelationship.RELAYED and self.relay_payload is not None:
+            raise ValueError("relay payload is only valid for a relayed relationship")
+        return self
+
+
+class PolicyDecision(_Strict):
+    """Policy output is data the engine validates before applying any mutation."""
+
+    binding_id: str = Field(pattern=r"^[a-z][a-z0-9_-]{0,63}$")
+    hook: Literal["shot", "search", "member", "leg", "branch", "attempt", "iteration", "message"]
+    action: Literal["continue", "terminate", "state_update"]
+    state_updates: dict[str, int] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def state_updates_match_action(self) -> "PolicyDecision":
+        if self.action != "state_update" and self.state_updates:
+            raise ValueError("only state_update decisions may carry state updates")
         return self
 
 
@@ -177,7 +253,14 @@ def validate_composition(composition: CanonicalCompositionSpec) -> ResolvedCompo
                 owned_state=spec.owned_state,
                 requires=spec.requires,
                 provides=spec.provides,
-                compatibility_reason="closed identity-policy registry v1",
+                compatibility_reason="closed canonical CSS policy registry v1",
+                evidence=PolicyEvidence(
+                    procedure=f"Registered {spec.kind} policy follows the canonical CSS v1 procedure.",
+                    invariants=(
+                        "The policy receives only its declared decoder-visible capability view.",
+                        "The policy may mutate only declared private state through a typed decision.",
+                    ),
+                ),
             )
         )
     required = {capability for binding in bindings for capability in binding.requires}
