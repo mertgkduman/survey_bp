@@ -317,6 +317,66 @@ def test_verify_run_rejects_rehashed_public_profile_contract_matrix(tmp_path):
         verify_run(output)
 
 
+@pytest.mark.parametrize("label, mutate", [
+    ("extra-terminal-key", lambda events: next(event for event in events if event["kind"] == "termination")["data"].__setitem__("forged", True)),
+    ("reordered", lambda events: events.__setitem__(2, events.pop(5))),
+    ("duplicate-work", lambda events: events.insert(-1, {**next(event for event in events if event["kind"] == "work"), "data": {**next(event for event in events if event["kind"] == "work")["data"], "qualified_iterations": {"count": 0, "schedule": "flooding", "atomic_unit": "complete_double_buffered_sweep"}}})),
+])
+def test_verify_run_enforces_exact_terminal_event_grammar(tmp_path, label, mutate):
+    from bp_registry.cli import run_canonical, verify_run
+
+    output = tmp_path / label
+    run_canonical(CANONICAL_MANIFEST, output)
+    _rewrite_rehashed_canonical_ledger(output, mutate)
+    with pytest.raises(ValueError, match="(grammar|field set|envelope|work_vector|prior open)"):
+        verify_run(output)
+
+
+def test_verify_run_accepts_exact_completed_denied_maximum_and_numerical_grammars(tmp_path, monkeypatch):
+    from bp_registry.canonical.numerics import NumericalFailure
+    from bp_registry.canonical.schedules import FloodingSchedule
+    from bp_registry.cli import run_canonical, verify_run
+    from bp_registry.runner import run_canonical_one
+
+    complete = tmp_path / "complete"
+    assert run_canonical(CANONICAL_MANIFEST, complete)["final_row_count"] == 2
+    assert verify_run(complete)["final_row_count"] == 2
+    for label, change in (("pre", ("bp_calls", 0)), ("post", ("check_to_variable_updates", 0))):
+        manifest = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text(encoding="utf-8"))
+        manifest["budgets"]["attempt"]["work_limits"][change[0]] = change[1]
+        path = tmp_path / f"{label}.json"
+        path.write_text(json.dumps(manifest), encoding="utf-8")
+        output = tmp_path / label
+        assert run_canonical(path, output)["final_row_count"] == 2
+        assert verify_run(output)["final_row_count"] == 2
+
+    output = tmp_path / "numerical"
+    original = FloodingSchedule.sweep
+    monkeypatch.setattr(FloodingSchedule, "sweep", lambda *_a, **_kw: (_ for _ in ()).throw(NumericalFailure("transient")))
+    run_canonical_one(CANONICAL_MANIFEST, shot_id=0, ledger_path=output / "events.jsonl")
+    monkeypatch.setattr(FloodingSchedule, "sweep", original)
+    assert run_canonical(CANONICAL_MANIFEST, output)["final_row_count"] == 2
+    assert verify_run(output)["final_row_count"] == 2
+
+
+def test_verify_run_accepts_nondeterministic_profile_values_without_replay_equality(tmp_path):
+    from bp_registry.cli import run_canonical, verify_run
+
+    output = tmp_path / "profile-variation"
+    run_canonical(CANONICAL_MANIFEST, output)
+
+    def mutate(events):
+        for event in events:
+            if event["kind"] in {"runtime", "termination"} and "profile" in event["data"]:
+                profile = event["data"]["profile"]
+                for name in ("wall_time", "process_cpu_time", "peak_host_memory", "concurrency"):
+                    profile["runtime"][name]["value"] += 1
+                profile["adapter_overhead"]["value"] += 1
+
+    _rewrite_rehashed_canonical_ledger(output, mutate)
+    assert verify_run(output)["final_row_count"] == 2
+
+
 def test_public_profile_plan_emits_typed_attempt_evidence(tmp_path):
     from bp_registry.ledger import read_canonical_events
     from bp_registry.runner import run_canonical_one
