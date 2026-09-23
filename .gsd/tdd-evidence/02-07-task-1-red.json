@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_profiling.py::test_profile_contract_module_exists",
+  "exitCode": 1,
+  "targetTest": "test_profile_contract_module_exists",
+  "targetFile": "tests/canonical/test_profiling.py",
+  "output": "TAP version 13\nnot ok 1 - test_profile_contract_module_exists\n# tests 1\n# pass 0\n# fail 1\n",
+  "expected": "A project-owned profiling module provides typed local resource facts, explicit missingness, and overhead evidence.",
+  "actual": "The target assertion failed because bp_registry.canonical.profiling did not exist."
+}
