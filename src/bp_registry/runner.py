@@ -13,6 +13,7 @@ from typing import Any
 from .ledger import Writer, read_canonical_events
 from .canonical.metrics import unavailable_metric
 from .canonical.execution import run_canonical_structural_shot
+from .canonical.verification import PublicShotContext
 from .canonical.numerics import REFERENCE_CPU_F64
 from .manifests import (
     CanonicalExperimentV2,
@@ -182,10 +183,23 @@ def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: s
         shot_id=shot_id, x_error_rate=manifest.error_rate,
     )
     composition = validate_executable_canonical_baseline(manifest.policies)
+    compact_manifest = _canonical_kernel_manifest(manifest)
+    verification_context = PublicShotContext(
+        manifest_sha256=digest,
+        artifact_raw_sha256=manifest.artifact.raw_sha256,
+        artifact_semantic_sha256=manifest.artifact.semantic_sha256,
+        compact_manifest=compact_manifest,
+        sample_seed_identity=sample.sample_identity,
+        run_id=manifest.run_id,
+        shot_id=shot_id,
+        check_type=sample.observation.check_type,
+        syndrome=tuple(int(value) for value in sample.observation.syndrome.tolist()),
+    )
     return run_canonical_structural_shot(
-        _canonical_kernel_manifest(manifest), code=resolved.code, observation=sample.observation,
+        compact_manifest, code=resolved.code, observation=sample.observation,
         hidden_truth=sample.hidden, shot_id=shot_id, ledger_path=ledger_path,
         sample_seed_identity=sample.sample_identity,
+        verification_context=verification_context,
         execution_controls=_canonical_execution_controls(manifest),
         context={
             "manifest_sha256": digest,
@@ -197,6 +211,7 @@ def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: s
             "assessment_status": manifest.evidence.assessment_status,
             "decoder_seed_identity": manifest.randomness.decoder_seed_identity,
             "composition_identity": composition.semantic_identity,
+            "execution_identity": verification_context.execution_identity,
         },
     )
 

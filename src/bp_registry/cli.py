@@ -250,11 +250,8 @@ def run_canonical(manifest_path: str | Path, output: str | Path) -> dict[str, An
     report = preflight_canonical(manifest_path)
     output.mkdir(parents=True, exist_ok=True)
     ledger_path = output / "events.jsonl"
-    rows = canonical_terminal_rows(ledger_path, report["run_id"])
-    present = {row["shot_id"] for row in rows}
     for shot_id in range(report["shot_budget"]):
-        if shot_id not in present:
-            run_canonical_one(manifest_path, shot_id=shot_id, ledger_path=ledger_path)
+        run_canonical_one(manifest_path, shot_id=shot_id, ledger_path=ledger_path)
     rows = canonical_terminal_rows(ledger_path, report["run_id"])
     expected = list(range(report["shot_budget"]))
     if [row["shot_id"] for row in rows] != expected:

@@ -32,6 +32,7 @@ from .lineage import LineageEdge, LineageId, stable_lineage_id
 from .numerics import NumericalFailure
 from .problems import OriginalProblem, OriginalSpaceCandidate, WorkingProblem, select_stable_candidate
 from .schedules import EdgeTable, FloodingSchedule, FloodingSweep
+from .verification import PublicShotContext, validate_canonical_shot
 
 
 class CanonicalConflictError(ValueError):
@@ -339,18 +340,37 @@ def run_canonical_shot(manifest: CanonicalManifestV2 | dict[str, object] | str, 
     raise ShotOwnershipError("canonical shot remained owned beyond bounded retry window")
 
 
-def _existing_structural(path: Path, run_id: str, shot_id: int, identity: str) -> CanonicalExecutionResult | None:
-    for event in read_canonical_events(path):
-        if event["run_id"] == run_id and event["shot_id"] == shot_id and event["kind"] == "termination":
-            data = event["data"]
-            if data.get("canonical_identity") != identity:
-                raise CanonicalConflictError("conflicting canonical content for run/shot identity")
-            outcome = data.get("outcome")
-            evaluation = evaluator.Evaluation(outcome, data.get("logical_action_agrees")) if outcome else None
-            candidate = data.get("candidate")
-            return CanonicalExecutionResult(run_id, shot_id, event["termination"], evaluation,
-                                            None if candidate is None else np.asarray(candidate, dtype=np.uint8))
-    return None
+def _existing_structural(
+    path: Path, run_id: str, shot_id: int, identity: str,
+    verification_context: PublicShotContext | None = None,
+) -> CanonicalExecutionResult | None:
+    events = read_canonical_events(path)
+    matching = [
+        event for event in events
+        if event["run_id"] == run_id and event["shot_id"] == shot_id
+    ]
+    if not matching:
+        return None
+    if verification_context is not None:
+        try:
+            event = validate_canonical_shot(events, verification_context)
+        except ValueError as error:
+            raise CanonicalConflictError(
+                f"conflicting canonical content for run/shot identity: {error}"
+            ) from error
+    else:
+        terminals = [event for event in matching if event["kind"] == "termination"]
+        if len(terminals) != 1:
+            raise CanonicalConflictError("canonical shot has ambiguous terminal evidence")
+        event = terminals[0]
+        if event["data"].get("canonical_identity") != identity:
+            raise CanonicalConflictError("conflicting canonical content for run/shot identity")
+    data = event["data"]
+    outcome = data.get("outcome")
+    evaluation = evaluator.Evaluation(outcome, data.get("logical_action_agrees")) if outcome else None
+    candidate = data.get("candidate")
+    return CanonicalExecutionResult(run_id, shot_id, event["termination"], evaluation,
+                                    None if candidate is None else np.asarray(candidate, dtype=np.uint8))
 
 
 def run_canonical_structural_shot(
@@ -358,6 +378,7 @@ def run_canonical_structural_shot(
     observation: DecoderObservation, hidden_truth: HiddenTruth, shot_id: int,
     ledger_path: str | Path, sample_seed_identity: str, context: Mapping[str, Any],
     execution_controls: Mapping[str, Any] | None = None,
+    verification_context: PublicShotContext | None = None,
     evaluate: Callable[..., evaluator.Evaluation] = evaluator.evaluate_candidate,
 ) -> CanonicalExecutionResult:
     """Run the kernel with v2 structural evidence and an outer truth boundary."""
@@ -368,9 +389,11 @@ def run_canonical_structural_shot(
     resolved = validate_composition(parsed.policies)
     PolicyRuntime(resolved).traverse_lifecycle()
     budgets = _budget_tree(execution_controls)
-    identity = _identity(parsed, observation)
+    identity = verification_context.execution_identity if verification_context is not None else _identity(parsed, observation)
     path = Path(ledger_path)
-    existing = _existing_structural(path, parsed.run_id, shot_id, identity)
+    existing = _existing_structural(
+        path, parsed.run_id, shot_id, identity, verification_context,
+    )
     if existing is not None:
         return existing
     original_id = stable_lineage_id("original", {"identity": identity})
@@ -507,7 +530,9 @@ def run_canonical_structural_shot(
                 return CanonicalExecutionResult(parsed.run_id, shot_id, "completed", evaluation_result, frozen)
         except ShotOwnershipError:
             time.sleep(0.01)
-            existing = _existing_structural(path, parsed.run_id, shot_id, identity)
+            existing = _existing_structural(
+                path, parsed.run_id, shot_id, identity, verification_context,
+            )
             if existing is not None:
                 return existing
     raise ShotOwnershipError("canonical shot remained owned beyond bounded retry window")
