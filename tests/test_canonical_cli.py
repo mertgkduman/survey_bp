@@ -31,6 +31,21 @@ def test_checked_canonical_manifest_has_a_strict_public_preflight_contract():
     }
 
 
+def test_public_canonical_command_reconstructs_verified_structural_evidence(tmp_path):
+    from pathlib import Path
+
+    from bp_registry.cli import run_canonical, verify_run
+    from bp_registry.ledger import read_canonical_events
+
+    output = tmp_path / "canonical-result"
+    report = run_canonical(Path("data/manifests/canonical-three-qubit-development.json"), output)
+    assert report["final_row_count"] == 2
+    assert verify_run(output)["final_row_count"] == 2
+    events = read_canonical_events(output / "events.jsonl")
+    assert [event["kind"] for event in events].count("termination") == 2
+    assert all(event["data"].get("evidence_relation") == "canonical_implemented" for event in events)
+
+
 def _manifest(run_id: str = "canonical-tracer") -> dict[str, object]:
     def policy(role: str, kind: str) -> dict[str, object]:
         return {
