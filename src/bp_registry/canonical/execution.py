@@ -309,6 +309,7 @@ def run_canonical_structural_shot(
                 common = {**dict(context), "canonical_identity": identity, "composition_identity": resolved.semantic_identity}
                 ledger.begin(run_id=parsed.run_id, shot_id=shot_id, sample_seed_identity=sample_seed_identity, **common)
                 ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="attempt", data={**common, "scope": "attempt", "max_iterations": parsed.max_iterations})
+                started_ns = time.perf_counter_ns()
                 try:
                     kernel_result = BinarySpaKernel().run(validated.hz, observation.syndrome,
                                                           error_rate=parsed.error_rate, max_iterations=parsed.max_iterations)
@@ -332,6 +333,8 @@ def run_canonical_structural_shot(
                 ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="selection", data={**common, "selection_status": "frozen_decoder_visible_candidate", "original_lineage_id": original_id.value, "working_lineage_id": working_id.value, "candidate_lineage_id": selected.lineage_id})
                 ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="work", data={**common, "qualified_iterations": {"count": kernel_result.iterations, "schedule": "flooding", "atomic_unit": "complete_double_buffered_sweep"}, "work_vector": work.as_evidence()})
                 evaluation_result = evaluate(validated, true_x=hidden_truth.x, true_z=hidden_truth.z, candidate_x=frozen)
+                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="runtime", data={**common, "wall_time_ns": time.perf_counter_ns() - started_ns, "method": "time.perf_counter_ns", "scope": "canonical_attempt", "unit": "ns"})
+                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="missingness", data={**common, "field": "backend_device_time", "reason": "CPU canonical profile has no device timer", "scope": "canonical_attempt"})
                 ledger.terminal(run_id=parsed.run_id, shot_id=shot_id, termination="completed", data={
                     **common, "candidate": frozen.tolist(), "iterations": kernel_result.iterations,
                     "converged": kernel_result.converged, "selection_status": "frozen_decoder_visible_candidate",

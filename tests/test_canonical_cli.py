@@ -43,6 +43,8 @@ def test_public_canonical_command_reconstructs_verified_structural_evidence(tmp_
     assert verify_run(output)["final_row_count"] == 2
     events = read_canonical_events(output / "events.jsonl")
     assert [event["kind"] for event in events].count("termination") == 2
+    assert [event["kind"] for event in events].count("runtime") == 2
+    assert [event["kind"] for event in events].count("missingness") == 2
     assert all(event["data"].get("evidence_relation") == "canonical_implemented" for event in events)
 
 
