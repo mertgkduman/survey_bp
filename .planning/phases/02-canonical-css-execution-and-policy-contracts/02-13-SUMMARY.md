@@ -78,11 +78,11 @@ actuals:
 - **Files modified:** `src/bp_registry/canonical/execution.py`, `src/bp_registry/canonical/verification.py`.
 - **Verification:** Budget and semantic replay regression suite passes.
 
-**2. [Rule 2 - Missing critical functionality] Added transient numerical-failure qualification.**
+**2. [Rule 2 - Missing critical functionality] Added transient numerical-error qualification.**
 
 - **Found during:** Task 2 acceptance verification.
-- **Issue:** A historical numerical failure would be rejected if a fresh deterministic replay succeeded, overstating reproducibility.
-- **Fix:** Validate its rollback/missingness grammar and report `not_independently_reproduced_numerical_failure`.
+- **Issue:** A historical numerical error would be rejected if a fresh deterministic replay succeeded, overstating reproducibility.
+- **Fix:** Validate its rollback/missingness grammar and report explicit nonreproduction status.
 - **Files modified:** `src/bp_registry/canonical/execution.py`, `src/bp_registry/canonical/verification.py`, `tests/test_canonical_cli.py`.
 - **Verification:** `test_verify_run_rederives_budget_and_numerical_terminal_semantics` passes.
 
