@@ -2,9 +2,9 @@
 schema_version: 1
 open_count: 0
 waived_count: 0
-fixed_count: 1
-total_count: 1
-last_updated: 2026-09-23T08:23:59.510Z
+fixed_count: 2
+total_count: 2
+last_updated: 2026-09-23T09:15:31.774Z
 ---
 
 # Broken Windows Ledger
@@ -16,6 +16,7 @@ last_updated: 2026-09-23T08:23:59.510Z
 | id | phase | kind | file | line | description | status | reason | recorded_at | resolved_at |
 |----|-------|------|------|------|-------------|--------|--------|-------------|-------------|
 | 1 | 02 | deviation | src/bp_registry/canonical/schedules.py | 140 | Single-neighbor check indexing was corrected to preserve a one-element incoming message buffer. | fixed |  | 2026-09-23T08:23:47.117Z | 2026-09-23T08:23:59.510Z |
+| 2 | 02 | deviation | src/bp_registry/canonical/profiling.py |  | Restrict retained thread environment values to validated positive counts. | fixed |  | 2026-09-23T09:15:05.961Z | 2026-09-23T09:15:31.774Z |
 
 ````json
 [
@@ -30,6 +31,19 @@ last_updated: 2026-09-23T08:23:59.510Z
     "reason": "",
     "recorded_at": "2026-09-23T08:23:47.117Z",
     "resolved_at": "2026-09-23T08:23:59.510Z",
+    "milestone": "v1.0"
+  },
+  {
+    "id": 2,
+    "kind": "deviation",
+    "phase": "02",
+    "file": "src/bp_registry/canonical/profiling.py",
+    "line": null,
+    "description": "Restrict retained thread environment values to validated positive counts.",
+    "status": "fixed",
+    "reason": "",
+    "recorded_at": "2026-09-23T09:15:05.961Z",
+    "resolved_at": "2026-09-23T09:15:31.774Z",
     "milestone": "v1.0"
   }
 ]

@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 02
 current_phase_name: Canonical CSS Execution and Policy Contracts
-current_plan: 7
+current_plan: 8
 status: executing
-stopped_at: Completed 02-06-PLAN.md
-last_updated: "2026-09-23T09:03:40.743Z"
+stopped_at: Completed 02-07-PLAN.md
+last_updated: "2026-09-23T09:15:11.559Z"
 last_activity: 2026-09-23
 last_activity_desc: Phase 02 execution started
-state_head: ad0c881182d6b6667d8dff86277b9f0e89d53af9
+state_head: b9890e7472bcda952e78e5d3b8dfb18dd27bb4f7
 progress:
   total_phases: 14
   completed_phases: 1
   total_plans: 18
-  completed_plans: 15
+  completed_plans: 16
 ---
 
 # Project State
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 ## Current Position
 
 Phase: 02 (Canonical CSS Execution and Policy Contracts) — EXECUTING
-Plan: 7 of 9
+Plan: 8 of 9
 Total Phases: 14
-Current Plan: 7
+Current Plan: 8
 Total Plans in Phase: 9
 Status: Ready to execute
 Last activity: 2026-09-23 — Phase 02 execution started
@@ -55,6 +55,7 @@ Progress: 7% [█░░░░░░░░░]
 | Phase 02 P05 | 13m | 2 tasks | 5 files |
 | Phase 02 P04 | 7 min | 2 tasks | 4 files |
 | Phase 02 P06 | 8 min | 2 tasks | 7 files |
+| Phase 02 P07 | 10 min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,9 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - [Phase 02]: Phase 02: iteration, runtime, and resource measurements retain schedule, unit, precision, method, scope, and explicit missingness.
 - [Phase 02]: Native SDK iterations remain qualified observations and are never equated with canonical flooding work.
 - [Phase 02]: Opaque native internals serialize as unavailable metric facts with reasons and availability-only summaries.
+- [Phase 02]: Local standard-library profiling is default-on but retains explicit missingness and separately measured adapter overhead.
+- [Phase 02]: Only pre-outcome representative paired cohorts with inclusion probability and semantic agreement can support profiling population estimates.
+- [Phase 02]: Replay semantics compare candidate, termination, work, lineage, and trace digest while excluding measurement timing.
 
 ### Pending Todos
 
@@ -109,7 +113,7 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Last session: 2026-09-23T09:03:40.514Z
-Stopped at: Completed 02-06-PLAN.md
+Last session: 2026-09-23T09:15:11.364Z
+Stopped at: Completed 02-07-PLAN.md
 Resume file: None
 Next command: $gsd-discuss-phase 2
