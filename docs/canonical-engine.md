@@ -51,8 +51,9 @@ OMP_NUM_THREADS=1 .venv/bin/python -m bp_registry.cli verify-run "$OUT"
 
 The `canonical` report and `verify-run` report both return
 `final_row_count: 2`.  The reconciliation query reports two final rows.  The
-terminal results for this deterministic fixture are `completed` and `exact`
-for shots 0 and 1.  `verify-run` recomputes the result from the hash-linked
+terminal results for this deterministic fixture are `completed`; their
+independently evaluated outcomes are `logical_failure` for shot 0 and `exact`
+for shot 1. `verify-run` recomputes the result from the hash-linked
 structural ledger, checks the manifest identity and independent evaluation,
 and rejects mismatched or relabelled evidence.
 
@@ -72,9 +73,9 @@ Expected result fields map to contracts as follows:
 | `relation`, `fixture`, `assessment_status`, `statistical_claim` | evidence maturity: canonical implementation, development fixture, not assessed |
 | terminal `outcome`, `logical_action_agrees`, `termination` | evaluation after selection and the terminal reason |
 | `qualified_iterations`, `work_vector` | schedule-qualified flooding work, not a universal cost scalar |
-| `runtime` / `missingness` events | per-attempt CPU timing and explicitly unavailable backend device time |
+| terminal `profile` and `runtime` profile evidence | typed per-attempt CPU runtime/resource facts, adapter overhead, and explicit unavailable backend-device facts |
 | `original_lineage_id`, `working_lineage_id`, `candidate_lineage_id` | immutable ancestry from problem through frozen candidate |
-| trace semantic digest, when a trace sidecar is enabled | timing-independent observational semantic identity, not a performance measurement |
+| `trace_plan` | public tracing is admitted only as `off` until a canonical trace hook can emit bounded sidecars honestly |
 
 The checked fixture has trace level `off`; consequently it records no trace
 sidecar digest.  That absence is declared by the manifest rather than inferred
@@ -93,8 +94,11 @@ materializes its resolved engine profile as `binary-spa-flooding-f64-v1` in
 L = \log(P(0) / P(1)).
 \]
 
-For the binary CSS component being decoded, the observed syndrome convention is
-`s = Hx (mod 2)`, with bit vectors ordered by the immutable CSS artifact.  A
+For X-error recovery in the binary CSS component, the observed Z-check syndrome
+convention is `s_Z = H_Z e_X (mod 2)`, with bit vectors ordered by the immutable
+CSS artifact. The canonical sampler therefore forms the decoder-visible
+syndrome from `H_Z` and the hidden X-error vector `e_X`; it does not substitute
+`H_X` for this recovery component. A
 hard-decision tie is resolved deterministically by the profile's canonical
 index/order rule; no physical-error truth or unrecorded random draw chooses a
 tie.
@@ -169,10 +173,12 @@ derived through lineage instead of double-counted.
 
 `iterations` is intentionally retained as a familiar headline but is a
 **schedule-qualified iteration**: here, a flooding complete-double-buffered
-sweep.  Per-attempt runtime has method, scope, unit, and precision.  The CPU
-fixture emits `time.perf_counter_ns` timing and a `missingness` fact for
-`backend_device_time`, because zero would falsely imply an observed device
-measurement.
+sweep. Per-attempt runtime/resource evidence is emitted as a typed local
+profile: wall and process CPU time, peak host memory, adapter overhead, and
+explicitly unavailable backend-device timing/memory for this CPU fixture.
+Disabled profiling emits typed `not_collected` missingness rather than zeroes;
+the profile values are observational and never affect decoding, stopping, or
+candidate selection.
 
 Lineage IDs are derived from typed logical parents and canonical content, not
 event arrival, wall time, or process identity.  Candidate retention is a

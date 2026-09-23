@@ -50,7 +50,7 @@ def test_documented_tutorial(tmp_path):
 
     events = read_canonical_events(output / "events.jsonl")
     terminals = [event for event in events if event["kind"] == "termination"]
-    assert [event["data"]["outcome"] for event in terminals] == ["exact", "exact"]
+    assert [event["data"]["outcome"] for event in terminals] == ["logical_failure", "exact"]
     assert all(event["data"]["selection_status"] == "frozen_decoder_visible_candidate" for event in terminals)
     assert all(event["data"]["assessment_status"] == "not_assessed" for event in terminals)
     assert len([event for event in events if event["kind"] == "runtime"]) == 2
