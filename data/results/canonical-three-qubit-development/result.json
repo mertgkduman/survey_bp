@@ -1,0 +1,26 @@
+{
+  "assessment_status": "not_assessed",
+  "denominators": {
+    "all_terminal_shots": 2,
+    "exact": 2
+  },
+  "final_row_count": 2,
+  "fixture": "development_fixture",
+  "ledger_path": "data/results/canonical-three-qubit-development/events.jsonl",
+  "ledger_sha256": "8f5333756cd398a1e40dc9e04bf1d55d4e985a4fbc1240399e0b8475b22c479f",
+  "manifest_path": "data/manifests/canonical-three-qubit-development.json",
+  "manifest_sha256": "3334d9b85d68bc73c0b0a5f8c7b1ca18d19280ddc1a86d388b1131ce1205e53c",
+  "policy_identity": "3fdcfd949a6376bfc5e1f06ab103eaf55a4056ea5554787d1f16720c9b2c98d0",
+  "relation": "canonical_implemented",
+  "run_id": "canonical-three-qubit-development",
+  "schema_version": 2,
+  "shot_ids": [
+    0,
+    1
+  ],
+  "statistical_claim": "not_assessed; canonical development fixture, not a source-faithful or statistical reproduction",
+  "terminations": {
+    "completed": 2
+  },
+  "title": "canonical-three-qubit-development \u2014 canonical_implemented development_fixture not_assessed"
+}

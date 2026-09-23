@@ -46,6 +46,23 @@ def test_public_canonical_command_reconstructs_verified_structural_evidence(tmp_
     assert all(event["data"].get("evidence_relation") == "canonical_implemented" for event in events)
 
 
+def test_checked_canonical_result_is_idempotent_and_honestly_labeled():
+    from pathlib import Path
+
+    from bp_registry.cli import run_canonical, verify_run
+    from bp_registry.ledger import read_canonical_events
+
+    manifest = Path("data/manifests/canonical-three-qubit-development.json")
+    output = Path("data/results/canonical-three-qubit-development")
+    first = run_canonical(manifest, output)
+    second = run_canonical(manifest, output)
+    assert first["final_row_count"] == second["final_row_count"] == 2
+    assert verify_run(output)["final_row_count"] == 2
+    terminals = [event for event in read_canonical_events(output / "events.jsonl") if event["kind"] == "termination"]
+    assert [event["shot_id"] for event in terminals] == [0, 1]
+    assert all(event["data"]["assessment_status"] == "not_assessed" for event in terminals)
+
+
 def _manifest(run_id: str = "canonical-tracer") -> dict[str, object]:
     def policy(role: str, kind: str) -> dict[str, object]:
         return {
