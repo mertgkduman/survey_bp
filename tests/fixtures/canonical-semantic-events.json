@@ -1,0 +1,15 @@
+{
+  "ledger_version": 2,
+  "events": [
+    {"kind": "shot_begin", "run_id": "fixture", "shot_id": 0, "sample_seed_identity": "fixture-seed"},
+    {"kind": "attempt", "run_id": "fixture", "shot_id": 0, "data": {"lineage_id": "attempt-fixture"}},
+    {"kind": "candidate", "run_id": "fixture", "shot_id": 0, "data": {"lineage_id": "candidate-fixture"}},
+    {"kind": "selection", "run_id": "fixture", "shot_id": 0, "data": {"candidate_id": "candidate-fixture"}},
+    {"kind": "termination", "run_id": "fixture", "shot_id": 0, "termination": "completed", "data": {"semantic_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}
+  ],
+  "trace": {
+    "trace_version": 1,
+    "truncated": false,
+    "records": [{"kind": "edge", "iteration": 2, "edge": "e-1", "payload": {"message": {"typed_array": {"dtype": "uint8", "shape": [2], "values": [1, 0]}}}}]
+  }
+}
