@@ -278,6 +278,30 @@ def test_enabled_public_trace_plan_is_rejected_before_ledger(tmp_path):
     assert ledger_path.exists() is False
 
 
+@pytest.mark.parametrize(
+    "change",
+    [
+        {"level": "representative"},
+        {"cohort": "representative"},
+        {"cohort": "diagnostic"},
+    ],
+)
+def test_public_preflight_rejects_unbounded_profile_cohorts_before_ledger(tmp_path, change):
+    """Public Phase 2 profiling remains bounded until it has a cohort quota."""
+    from bp_registry.runner import preflight_canonical, run_canonical_one
+
+    manifest = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text(encoding="utf-8"))
+    manifest["profile_plan"].update(change)
+    manifest_path = tmp_path / "unbounded-profile.json"
+    ledger_path = tmp_path / "events.jsonl"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(ValueError, match="profile plan.*clean.*low_overhead"):
+        preflight_canonical(manifest_path)
+    with pytest.raises(ValueError, match="profile plan.*clean.*low_overhead"):
+        run_canonical_one(manifest_path, shot_id=0, ledger_path=ledger_path)
+    assert ledger_path.exists() is False
+
+
 def test_canonical_preflight_and_run_do_not_import_ldpc(tmp_path):
     script = """
 import builtins
