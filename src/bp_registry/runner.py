@@ -169,8 +169,8 @@ def _canonical_execution_controls(manifest: CanonicalExperimentV2) -> dict[str, 
     }
 
 
-def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path):
-    """Sample outside the engine, then evaluate only a frozen original-space candidate."""
+def canonical_public_shot_context(manifest_path: str | Path, *, shot_id: int) -> PublicShotContext:
+    """Resolve a deterministic public shot without opening a durable ledger."""
     resolved = preflight(manifest_path)
     manifest = resolved.manifest
     if not isinstance(manifest, CanonicalExperimentV2):
@@ -184,7 +184,7 @@ def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: s
     )
     composition = validate_executable_canonical_baseline(manifest.policies)
     compact_manifest = _canonical_kernel_manifest(manifest)
-    verification_context = PublicShotContext(
+    return PublicShotContext(
         manifest_sha256=digest,
         artifact_raw_sha256=manifest.artifact.raw_sha256,
         artifact_semantic_sha256=manifest.artifact.semantic_sha256,
@@ -194,7 +194,33 @@ def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: s
         shot_id=shot_id,
         check_type=sample.observation.check_type,
         syndrome=tuple(int(value) for value in sample.observation.syndrome.tolist()),
+        code=resolved.code,
+        hidden_truth=sample.hidden,
+        error_rate=manifest.error_rate,
+        max_iterations=manifest.budgets.attempt.max_iterations,
+        work_limits={
+            scope: getattr(manifest.budgets, scope).work_limits.as_evidence()
+            for scope in ("shot", "search", "attempt")
+        },
+        composition_identity=composition.semantic_identity,
+        policy_effects=executable_canonical_policy_effects(manifest.policies),
+        profile_plan=manifest.profile_plan.model_dump(mode="json"),
     )
+
+
+def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path):
+    """Sample outside the engine, then evaluate only a frozen original-space candidate."""
+    verification_context = canonical_public_shot_context(manifest_path, shot_id=shot_id)
+    resolved = preflight(manifest_path)
+    manifest = resolved.manifest
+    assert isinstance(manifest, CanonicalExperimentV2)
+    digest = verification_context.manifest_sha256
+    sample = sampling.sample_shot(
+        resolved.code, manifest_identity=digest, seed=manifest.randomness.sample_seed,
+        shot_id=shot_id, x_error_rate=manifest.error_rate,
+    )
+    composition = validate_executable_canonical_baseline(manifest.policies)
+    compact_manifest = _canonical_kernel_manifest(manifest)
     return run_canonical_structural_shot(
         compact_manifest, code=resolved.code, observation=sample.observation,
         hidden_truth=sample.hidden, shot_id=shot_id, ledger_path=ledger_path,

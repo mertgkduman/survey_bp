@@ -17,7 +17,11 @@ import numpy as np
 from . import evaluator, evidence, sampling
 from .ledger import read_canonical_events, reconcile, summarize
 from .manifests import CanonicalExperimentV2, ManifestV1, manifest_digest, preflight
-from .runner import canonical_terminal_rows, preflight_canonical, preflight_pilot, run_canonical_one, run_one
+from .canonical.verification import validate_canonical_shot
+from .runner import (
+    canonical_public_shot_context, canonical_terminal_rows, preflight_canonical,
+    preflight_pilot, run_canonical_one, run_one,
+)
 
 
 def _dump(value: dict[str, Any]) -> None:
@@ -224,6 +228,9 @@ def _canonical_result_from_terminal_events(manifest_path: Path, output: Path, ro
     outcomes = Counter((row["data"].get("outcome") or "outcome_unavailable") for row in rows)
     terminations = Counter(row["termination"] for row in rows)
     ledger_path = output / "events.jsonl"
+    events = read_canonical_events(ledger_path)
+    for row in rows:
+        validate_canonical_shot(events, canonical_public_shot_context(manifest_path, shot_id=row["shot_id"]))
     return {
         "schema_version": 2,
         "title": "canonical-three-qubit-development — canonical_implemented development_fixture not_assessed",
@@ -277,20 +284,9 @@ def _verify_canonical_run(output: Path, result: dict[str, Any]) -> dict[str, Any
     rows = canonical_terminal_rows(ledger_path, report["run_id"])
     if [row["shot_id"] for row in rows] != list(range(report["shot_budget"])):
         raise ValueError("canonical terminal rows differ from the manifest shot budget")
-    resolved = preflight(manifest_path)
-    assert isinstance(resolved.manifest, CanonicalExperimentV2)
+    events = read_canonical_events(ledger_path)
     for row in rows:
-        data = row["data"]
-        if data.get("manifest_sha256") != manifest_digest(resolved.manifest):
-            raise ValueError("canonical terminal manifest identity differs from preflight")
-        if row["termination"] == "completed":
-            sample = sampling.sample_shot(resolved.code, manifest_identity=manifest_digest(resolved.manifest),
-                                          seed=resolved.manifest.randomness.sample_seed, shot_id=row["shot_id"],
-                                          x_error_rate=resolved.manifest.error_rate)
-            candidate = np.asarray(data.get("candidate"), dtype=np.uint8)
-            evaluation = evaluator.evaluate_candidate(resolved.code, true_x=sample.hidden.x, true_z=sample.hidden.z, candidate_x=candidate)
-            if data.get("outcome") != evaluation.outcome or data.get("logical_action_agrees") != evaluation.logical_action_agrees:
-                raise ValueError("canonical terminal outcome does not equal independent evaluation")
+        validate_canonical_shot(events, canonical_public_shot_context(manifest_path, shot_id=row["shot_id"]))
     expected = _canonical_result_from_terminal_events(manifest_path, output, rows)
     if result != expected:
         raise ValueError("canonical result JSON does not equal terminal structural evidence")

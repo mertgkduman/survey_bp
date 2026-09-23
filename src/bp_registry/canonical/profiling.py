@@ -102,6 +102,26 @@ class ProfileMeasurement:
             "level": self.level,
         }
 
+    @classmethod
+    def from_evidence(cls, value: Mapping[str, object]) -> "ProfileMeasurement":
+        """Parse a persisted profile exactly; verification never trusts loose dicts."""
+        if not isinstance(value, Mapping) or set(value) != {"runtime", "adapter_overhead", "python_allocation_peak", "environment", "raw_context", "enabled", "level"}:
+            raise ValueError("profile evidence has an invalid field set")
+        def measurement(item: object) -> Measurement:
+            if not isinstance(item, Mapping) or set(item) != {"value", "method", "scope", "unit", "precision", "unavailable_reason"}:
+                raise ValueError("profile measurement evidence has an invalid field set")
+            return Measurement(**dict(item))
+        runtime_data = value["runtime"]
+        if not isinstance(runtime_data, Mapping) or set(runtime_data) != {
+            "wall_time", "process_cpu_time", "peak_host_memory", "concurrency", "machine_environment", "backend_device_time", "backend_device_memory",
+        }:
+            raise ValueError("profile runtime evidence has an invalid field set")
+        runtime = RuntimeResourceFacts(**{name: measurement(item) for name, item in runtime_data.items()})
+        parsed = cls(runtime, measurement(value["adapter_overhead"]), measurement(value["python_allocation_peak"]), value["environment"], value["raw_context"], value["enabled"], value["level"])
+        if parsed.enabled and parsed.runtime.wall_time.method != "time.perf_counter_ns:v1":
+            raise ValueError("profile wall-time method is not the admitted local profiler")
+        return parsed
+
 
 @dataclass(frozen=True, slots=True)
 class CohortSelection:

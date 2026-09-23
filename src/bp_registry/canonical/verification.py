@@ -13,6 +13,16 @@ from hashlib import sha256
 import json
 from typing import Any, Mapping, Sequence
 
+import numpy as np
+
+from .. import evaluator
+from .budgets import WorkVector
+from .kernel import BinarySpaKernel
+from .lineage import LineageEdge, stable_lineage_id
+from .problems import OriginalProblem, WorkingProblem
+from .profiling import ProfileMeasurement
+from .schedules import EdgeTable, FloodingSchedule
+
 
 class CanonicalStructuralVerificationError(ValueError):
     """Persisted canonical evidence is well-formed but not reusable."""
@@ -58,6 +68,14 @@ class PublicShotContext:
     shot_id: int
     check_type: str
     syndrome: tuple[int, ...]
+    code: Any | None = None
+    hidden_truth: Any | None = None
+    error_rate: float | None = None
+    max_iterations: int | None = None
+    work_limits: Mapping[str, Mapping[str, int]] | None = None
+    composition_identity: str | None = None
+    policy_effects: Mapping[str, Any] | None = None
+    profile_plan: Mapping[str, Any] | None = None
 
     @property
     def execution_identity(self) -> str:
@@ -72,6 +90,70 @@ class PublicShotContext:
             check_type=self.check_type,
             syndrome=self.syndrome,
         )
+
+
+def _expected_attempt(context: PublicShotContext) -> dict[str, Any]:
+    """Re-run the deterministic Phase 2 flooding baseline without ledger input."""
+    if context.code is None or context.error_rate is None or context.max_iterations is None:
+        return {}
+    code = context.code.validate()
+    limits = context.work_limits or {}
+    zero = WorkVector.zero()
+    bp_call = WorkVector(bp_calls=1)
+    # Every ancestor must admit the first BP-call reservation before work begins.
+    for scope in ("attempt", "search", "shot"):
+        for resource, amount in bp_call.as_evidence().items():
+            if amount > int(limits.get(scope, {}).get(resource, 10**9)):
+                return {"termination": "count_budget_exhausted", "work_vector": zero.as_evidence(), "iterations": 0}
+    work = bp_call
+    kernel = BinarySpaKernel()
+    table = EdgeTable.from_check_matrix(code.hz)
+    schedule = FloodingSchedule(table, kernel=kernel)
+    if table.edge_count == 0:
+        candidate = kernel.candidate_from_beliefs(np.full(code.n, kernel.prior(context.error_rate), dtype=np.float64))
+        converged = bool(np.array_equal((code.hz.astype(np.int64) @ candidate.astype(np.int64)) % 2, context.syndrome))
+        return {"termination": "completed" if converged else "max_iterations", "work_vector": work.as_evidence(), "iterations": 0, "candidate": candidate}
+    state = schedule.initialize(context.error_rate)
+    for iteration in range(1, context.max_iterations + 1):
+        delta = WorkVector.from_flooding_counts(edge_count=table.edge_count, variable_count=table.variable_count)
+        proposed = work + delta
+        for scope in ("attempt", "search", "shot"):
+            for resource, amount in proposed.as_evidence().items():
+                if amount > int(limits.get(scope, {}).get(resource, 10**9)):
+                    return {"termination": "count_budget_exhausted", "work_vector": work.as_evidence(), "iterations": iteration - 1}
+        sweep = schedule.sweep(state, np.asarray(context.syndrome, dtype=np.uint8), error_rate=context.error_rate)
+        state, work = sweep.new_v2c, proposed
+        if np.array_equal((code.hz.astype(np.int64) @ sweep.candidate.astype(np.int64)) % 2, context.syndrome):
+            return {"termination": "completed", "work_vector": work.as_evidence(), "iterations": iteration, "candidate": sweep.candidate}
+    return {"termination": "max_iterations", "work_vector": work.as_evidence(), "iterations": context.max_iterations}
+
+
+def _expect_equal(field: str, actual: Any, expected: Any) -> None:
+    if actual != expected:
+        raise CanonicalStructuralVerificationError(f"canonical {field} differs from independently reconstructed evidence")
+
+
+def _validate_profile(stream: Sequence[Mapping[str, Any]], terminal: Mapping[str, Any], context: PublicShotContext) -> None:
+    runtime = [event for event in stream if event.get("kind") == "runtime"]
+    profile = terminal.get("data", {}).get("profile")
+    measured = terminal.get("termination") != "count_budget_exhausted"
+    if not measured:
+        if runtime or profile is not None:
+            raise CanonicalStructuralVerificationError("profile evidence is fabricated for a pre-attempt denial")
+        return
+    if terminal.get("termination") == "numerical_failure":
+        if runtime or profile is not None:
+            raise CanonicalStructuralVerificationError("numerical failure must retain explicit missingness rather than runtime evidence")
+        return
+    if len(runtime) != 1 or not isinstance(profile, Mapping):
+        raise CanonicalStructuralVerificationError("measured canonical attempt requires exactly one runtime profile")
+    runtime_profile = runtime[0].get("data", {}).get("profile")
+    if runtime_profile != profile:
+        raise CanonicalStructuralVerificationError("profile runtime and terminal evidence differ")
+    parsed = ProfileMeasurement.from_evidence(profile)
+    plan = context.profile_plan or {}
+    if parsed.enabled != bool(plan.get("enabled", False)) or parsed.level != plan.get("level", "low_overhead"):
+        raise CanonicalStructuralVerificationError("profile plan does not match the admitted public plan")
 
 
 def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: PublicShotContext) -> Mapping[str, Any]:
@@ -109,4 +191,57 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
                 raise CanonicalStructuralVerificationError(
                     f"canonical {field} differs from current public execution identity"
                 )
+        if event.get("sidecar") is not None or event.get("kind") in {"trace_link", "trace_truncated"}:
+            raise CanonicalStructuralVerificationError("trace evidence is forbidden by the public trace-off plan")
+    expected = _expected_attempt(context)
+    if not expected:
+        return terminals[0]
+    terminal = terminals[0]
+    data = terminal["data"]
+    _expect_equal("termination", terminal.get("termination"), expected["termination"])
+    _expect_equal("work_vector", data.get("work_vector"), expected["work_vector"])
+    work = [event for event in stream if event.get("kind") == "work"]
+    if len(work) != 1 or work[0].get("data", {}).get("work_vector") != expected["work_vector"]:
+        raise CanonicalStructuralVerificationError("canonical work_vector does not match terminal evidence")
+    _expect_equal("policy_effects", data.get("policy_effects"), context.policy_effects)
+    if context.composition_identity is not None:
+        _expect_equal("composition_identity", data.get("composition_identity"), context.composition_identity)
+    _validate_profile(stream, terminal, context)
+    if expected["termination"] == "completed":
+        candidate = np.asarray(expected["candidate"], dtype=np.uint8)
+        _expect_equal("candidate", data.get("candidate"), candidate.tolist())
+        _expect_equal("iterations", data.get("iterations"), expected["iterations"])
+        original_id = stable_lineage_id("original", {"identity": context.execution_identity})
+        original = OriginalProblem(original_id.value, context.code.hx, context.code.hz, np.asarray(context.syndrome, dtype=np.uint8))
+        working_id = stable_lineage_id("working", {"original": original_id.value, "lift": "identity"})
+        working = WorkingProblem(working_id.value, original, LineageEdge("identity", original_id, working_id))
+        attempt_id = stable_lineage_id("attempt", {"working": working.lineage_id, "ordinal": 0})
+        candidate_id = stable_lineage_id("candidate", {"working": working.lineage_id, "attempt": attempt_id.value, "candidate": candidate.tolist()})
+        for field, value in {
+            "original_lineage_id": original_id.value, "working_lineage_id": working_id.value,
+            "attempt_lineage_id": attempt_id.value, "candidate_lineage_id": candidate_id.value,
+        }.items():
+            _expect_equal(field, data.get(field), value)
+        attempt = next(event for event in stream if event.get("kind") == "attempt")
+        _expect_equal("attempt_lineage_id", attempt.get("data", {}).get("attempt_lineage_id"), attempt_id.value)
+        candidate_event = next(event for event in stream if event.get("kind") == "candidate")
+        _expect_equal("candidate", candidate_event.get("data", {}).get("candidate"), candidate.tolist())
+        _expect_equal("candidate_lineage_id", candidate_event.get("data", {}).get("candidate_lineage_id"), candidate_id.value)
+        selection = next(event for event in stream if event.get("kind") == "selection")
+        for field, value in {
+            "original_lineage_id": original_id.value, "working_lineage_id": working_id.value,
+            "attempt_lineage_id": attempt_id.value, "candidate_lineage_id": candidate_id.value,
+        }.items():
+            _expect_equal(field, selection.get("data", {}).get(field), value)
+        if context.hidden_truth is not None:
+            evaluation = evaluator.evaluate_candidate(context.code, true_x=context.hidden_truth.x, true_z=context.hidden_truth.z, candidate_x=candidate)
+            _expect_equal("outcome", data.get("outcome"), evaluation.outcome)
+            _expect_equal("logical_action_agrees", data.get("logical_action_agrees"), evaluation.logical_action_agrees)
+        required = ["shot_begin", "attempt", "runtime", "candidate", "selection", "work", "termination"]
+    else:
+        if data.get("candidate") is not None or data.get("outcome") is not None:
+            raise CanonicalStructuralVerificationError("non-completed terminal carries forbidden candidate or outcome")
+        required = ["shot_begin", "attempt", "runtime", "work", "termination"] if expected["termination"] != "count_budget_exhausted" else ["shot_begin", "attempt", "work", "termination"]
+    if [event.get("kind") for event in stream] != required:
+        raise CanonicalStructuralVerificationError("canonical termination event grammar is invalid")
     return terminals[0]

@@ -483,6 +483,7 @@ def run_canonical_structural_shot(
                     )
                     (candidate, iterations, converged, budget_termination), profile = LocalProfiler(profile_plan).measure(admitted_attempt)
                     profile_evidence = profile.as_evidence()
+                    ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="runtime", data={**common, "profile": profile_evidence})
                 except NumericalFailure as error:
                     ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="missingness", data={**common, "field": "candidate", "reason": "numerical_failure"})
                     terminal_with_work(
@@ -518,7 +519,6 @@ def run_canonical_structural_shot(
                 ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="candidate", data={**common, "attempt_lineage_id": attempt_id.value, "candidate": frozen.tolist(), "candidate_lineage_id": selected.lineage_id})
                 ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="selection", data={**common, "selection_status": "frozen_decoder_visible_candidate", "original_lineage_id": original_id.value, "working_lineage_id": working_id.value, "attempt_lineage_id": attempt_id.value, "candidate_lineage_id": selected.lineage_id})
                 evaluation_result = evaluate(validated, true_x=hidden_truth.x, true_z=hidden_truth.z, candidate_x=frozen)
-                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="runtime", data={**common, "profile": profile_evidence})
                 terminal_with_work(
                     "completed", candidate=frozen.tolist(), iterations=iterations, converged=converged,
                     selection_status="frozen_decoder_visible_candidate", outcome=evaluation_result.outcome,
