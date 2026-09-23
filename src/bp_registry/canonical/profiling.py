@@ -105,7 +105,7 @@ class ProfileMeasurement:
 
 @dataclass(frozen=True, slots=True)
 class CohortSelection:
-    """Declared meaning of an already selected clean/profile or diagnostic run."""
+    """Declared meaning of an already selected clean/profile sample."""
 
     cohort: Literal["clean", "representative", "diagnostic"]
     run_identity: str
@@ -214,6 +214,8 @@ class ReplayLink:
             raise ValueError("clean and profiled runs must have distinct run IDs")
         if not isinstance(self.cohort, CohortSelection) or not isinstance(self.semantic_agreement, SemanticAgreement):
             raise ValueError("replay link requires typed cohort and semantic agreement")
+        if self.cohort.run_identity != self.sample_identity:
+            raise ValueError("cohort run identity must equal replay sample identity")
         if type(self.overhead_ns) is not int or self.overhead_ns < 0:
             raise ValueError("profile replay overhead must be a nonnegative integer nanosecond count")
         if self.retention not in {"paired_summary", "bounded_trace", "retained_divergence"}:
@@ -415,12 +417,22 @@ class LocalProfiler:
         overhead = self._overhead()
         allocation_started_here, allocation_prior = self._allocation_start()
         wall_start, cpu_start = self._clock(), self._cpu_clock()
+        action_error: BaseException | None = None
         try:
-            result = action()
+            try:
+                result = action()
+            except BaseException as error:
+                action_error = error
+                raise
+            finally:
+                wall_end, cpu_end = self._clock(), self._cpu_clock()
         finally:
-            wall_end, cpu_end = self._clock(), self._cpu_clock()
+            try:
+                allocation = self._allocation_end(allocation_started_here, allocation_prior)
+            except BaseException:
+                if action_error is None:
+                    raise
         peak, raw_context = self._peak_rss()
-        allocation = self._allocation_end(allocation_started_here, allocation_prior)
         profile = ProfileMeasurement(
             RuntimeResourceFacts(
                 wall_time=Measurement.observed(max(0, wall_end - wall_start), method="time.perf_counter_ns:v1", scope="process", unit="ns", precision="1 ns"),
