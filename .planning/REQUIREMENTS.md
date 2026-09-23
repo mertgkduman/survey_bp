@@ -33,7 +33,7 @@
 
 - [x] **ENG-01**: A researcher can run a canonical binary sum-product BP decoder end to end from a CSS manifest through evaluated outcomes and provenance without delegating its update loop to a third-party decoder.
 - [x] **ENG-02**: A researcher can compose explicit update, schedule, state/memory, intervention, stopping, selection, and postprocessing policies under typed lifecycle and compatibility contracts that reject undefined combinations.
-- [ ] **ENG-03**: A researcher can configure stopping and budgets at attempt, branch/leg, search, and shot scope and inspect the actual scope and reason that ended execution.
+- [x] **ENG-03**: A researcher can configure stopping and budgets at attempt, branch/leg, search, and shot scope and inspect the actual scope and reason that ended execution.
 - [x] **ENG-04**: A researcher can inspect and reproduce numerical conventions including probability/LLR encoding, precision, clipping, initialization, normalization, tie-breaking, and message read/write order.
 - [x] **ENG-05**: Policy execution cannot access sampled hidden truth, and every candidate transformed from a working problem is lifted and evaluated against the immutable original observation and constraints.
 - [x] **ENG-06**: Each implemented policy has source-linked equations or a precise declared procedure plus deterministic small-case/invariant checks independent of aggregate curve matching.
@@ -93,8 +93,8 @@
 
 - [x] **LED-01**: Every simulated shot produces an identified final record linking the manifest, input/sample, decoder configuration, versions, selected output, termination, outcome, and post-selection status, including unsuccessful and interrupted shots.
 - [x] **LED-02**: Canonical runs record linked control-flow events for attempts, interventions, branches/pruning, relay transfers, candidates, fallback, and selection; per-edge message tracing can be selectively enabled without removing required shot/control-flow evidence.
-- [ ] **LED-03**: A researcher can jointly analyze iterations, BP calls/message work, branch/relay work, candidate checks, fallback work, runtime, and parallel-resource context, without equating them to one universal iteration count.
-- [ ] **LED-04**: Native-reference results explicitly mark unavailable internal events or counters and their reasons; missing instrumentation is never reported as zero or reconstructed as observed fact.
+- [x] **LED-03**: A researcher can jointly analyze iterations, BP calls/message work, branch/relay work, candidate checks, fallback work, runtime, and parallel-resource context, without equating them to one universal iteration count.
+- [x] **LED-04**: Native-reference results explicitly mark unavailable internal events or counters and their reasons; missing instrumentation is never reported as zero or reconstructed as observed fact.
 - [ ] **LED-05**: A researcher can validate and merge durable ledger shards, detect incomplete or duplicate contributions, and reconstruct reported results from the preserved evidence.
 
 ### Simulation execution
@@ -191,7 +191,7 @@ Every v1 requirement has exactly one owning phase; later phases may use or stren
 | CSS-04 | Phase 1 | Complete |
 | ENG-01 | Phase 2 | Complete |
 | ENG-02 | Phase 2 | Complete |
-| ENG-03 | Phase 2 | Pending |
+| ENG-03 | Phase 2 | Complete |
 | ENG-04 | Phase 2 | Complete |
 | ENG-05 | Phase 2 | Complete |
 | ENG-06 | Phase 2 | Complete |
@@ -227,8 +227,8 @@ Every v1 requirement has exactly one owning phase; later phases may use or stren
 | POST-05 | Phase 7 | Pending |
 | LED-01 | Phase 1 | Complete |
 | LED-02 | Phase 2 | Complete |
-| LED-03 | Phase 2 | Pending |
-| LED-04 | Phase 2 | Pending |
+| LED-03 | Phase 2 | Complete |
+| LED-04 | Phase 2 | Complete |
 | LED-05 | Phase 8 | Pending |
 | SIM-01 | Phase 8 | Pending |
 | SIM-02 | Phase 8 | Pending |

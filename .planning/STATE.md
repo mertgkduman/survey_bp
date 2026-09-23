@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 02
 current_phase_name: Canonical CSS Execution and Policy Contracts
-current_plan: 8
+current_plan: 9
 status: executing
-stopped_at: Completed 02-07-PLAN.md
-last_updated: "2026-09-23T09:15:11.559Z"
+stopped_at: Completed 02-08-PLAN.md
+last_updated: "2026-09-23T09:28:54.217Z"
 last_activity: 2026-09-23
 last_activity_desc: Phase 02 execution started
-state_head: b9890e7472bcda952e78e5d3b8dfb18dd27bb4f7
+state_head: d315072224bad33e4a3194af5776e857ec158123
 progress:
   total_phases: 14
   completed_phases: 1
   total_plans: 18
-  completed_plans: 16
+  completed_plans: 17
 ---
 
 # Project State
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 ## Current Position
 
 Phase: 02 (Canonical CSS Execution and Policy Contracts) — EXECUTING
-Plan: 8 of 9
+Plan: 9 of 9
 Total Phases: 14
-Current Plan: 8
+Current Plan: 9
 Total Plans in Phase: 9
 Status: Ready to execute
 Last activity: 2026-09-23 — Phase 02 execution started
@@ -56,6 +56,7 @@ Progress: 7% [█░░░░░░░░░]
 | Phase 02 P04 | 7 min | 2 tasks | 4 files |
 | Phase 02 P06 | 8 min | 2 tasks | 7 files |
 | Phase 02 P07 | 10 min | 2 tasks | 3 files |
+| Phase 02 P08 | 8 min | 3 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,9 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - [Phase 02]: Local standard-library profiling is default-on but retains explicit missingness and separately measured adapter overhead.
 - [Phase 02]: Only pre-outcome representative paired cohorts with inclusion probability and semantic agreement can support profiling population estimates.
 - [Phase 02]: Replay semantics compare candidate, termination, work, lineage, and trace digest while excluding measurement timing.
+- [Phase 02]: Phase 02: public canonical experiments use a strict persisted CanonicalExperimentV2 while compact kernel contracts remain direct-test APIs.
+- [Phase 02]: Phase 02: canonical results reconstruct from hash-linked v2 terminal evidence and retain canonical_implemented/development_fixture/not_assessed labels.
+- [Phase 02]: Phase 02: canonical CPU runtime is measured per attempt and unavailable device timing is explicit missingness.
 
 ### Pending Todos
 
@@ -113,7 +117,7 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Last session: 2026-09-23T09:15:11.364Z
-Stopped at: Completed 02-07-PLAN.md
+Last session: 2026-09-23T09:28:54.003Z
+Stopped at: Completed 02-08-PLAN.md
 Resume file: None
 Next command: $gsd-discuss-phase 2
