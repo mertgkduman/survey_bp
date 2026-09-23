@@ -34,7 +34,7 @@
 - [x] **ENG-01**: A researcher can run a canonical binary sum-product BP decoder end to end from a CSS manifest through evaluated outcomes and provenance without delegating its update loop to a third-party decoder.
 - [x] **ENG-02**: A researcher can compose explicit update, schedule, state/memory, intervention, stopping, selection, and postprocessing policies under typed lifecycle and compatibility contracts that reject undefined combinations.
 - [ ] **ENG-03**: A researcher can configure stopping and budgets at attempt, branch/leg, search, and shot scope and inspect the actual scope and reason that ended execution.
-- [ ] **ENG-04**: A researcher can inspect and reproduce numerical conventions including probability/LLR encoding, precision, clipping, initialization, normalization, tie-breaking, and message read/write order.
+- [x] **ENG-04**: A researcher can inspect and reproduce numerical conventions including probability/LLR encoding, precision, clipping, initialization, normalization, tie-breaking, and message read/write order.
 - [x] **ENG-05**: Policy execution cannot access sampled hidden truth, and every candidate transformed from a working problem is lifted and evaluated against the immutable original observation and constraints.
 - [x] **ENG-06**: Each implemented policy has source-linked equations or a precise declared procedure plus deterministic small-case/invariant checks independent of aggregate curve matching.
 
@@ -46,7 +46,7 @@
 
 ### Scheduling
 
-- [ ] **SCH-01**: A researcher can select flooding with explicit old/new-message semantics and defined sweep/edge-work counts.
+- [x] **SCH-01**: A researcher can select flooding with explicit old/new-message semantics and defined sweep/edge-work counts.
 - [ ] **SCH-02**: A researcher can select layered scheduling with explicit layer membership, order, and fresh-message semantics.
 - [ ] **SCH-03**: A researcher can select serial scheduling with a declared update unit, traversal order, and tie behavior.
 - [ ] **SCH-04**: A researcher can select residual scheduling with a defined residual, priority invalidation, selection cost, and stopping/work accounting.
@@ -192,13 +192,13 @@ Every v1 requirement has exactly one owning phase; later phases may use or stren
 | ENG-01 | Phase 2 | Complete |
 | ENG-02 | Phase 2 | Complete |
 | ENG-03 | Phase 2 | Pending |
-| ENG-04 | Phase 2 | Pending |
+| ENG-04 | Phase 2 | Complete |
 | ENG-05 | Phase 2 | Complete |
 | ENG-06 | Phase 2 | Complete |
 | UPD-01 | Phase 3 | Pending |
 | UPD-02 | Phase 3 | Pending |
 | UPD-03 | Phase 3 | Pending |
-| SCH-01 | Phase 2 | Pending |
+| SCH-01 | Phase 2 | Complete |
 | SCH-02 | Phase 3 | Pending |
 | SCH-03 | Phase 3 | Pending |
 | SCH-04 | Phase 3 | Pending |
