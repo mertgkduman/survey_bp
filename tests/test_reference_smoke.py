@@ -46,7 +46,7 @@ def test_native_metric_facts_qualify_public_sdk_observability():
 def test_native_opaque_edge_work_cannot_be_claimed_as_observed_zero():
     import numpy as np
 
-    from bp_registry.canonical.metrics import MetricFact
+    from bp_registry.canonical.metrics import MetricFact, unavailable_metric
     from bp_registry.reference import NativeResult
 
     iteration = MetricFact.observed(
@@ -59,10 +59,15 @@ def test_native_opaque_edge_work_cannot_be_claimed_as_observed_zero():
         scope="native_decoder_call", unit="edge_messages",
         qualification="fabricated",
     )
+    opaque_control_flow = unavailable_metric(
+        "native_control_flow_events", method="ldpc.BpDecoder",
+        scope="native_decoder_call", unit="events",
+        qualification="opaque_native_internal", reason="SDK does not expose events",
+    )
     with pytest.raises(ValueError, match="unavailable"):
         NativeResult(
             candidate=np.zeros(2, dtype=np.uint8), converged=True, iterations=1,
-            metric_facts=(iteration, fabricated_edge_work),
+            metric_facts=(iteration, fabricated_edge_work, opaque_control_flow),
         )
 
 
