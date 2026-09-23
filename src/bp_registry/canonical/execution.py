@@ -27,6 +27,7 @@ from .contracts import (
 )
 from .budgets import BudgetLimit, BudgetTermination, BudgetTree, WallClockLimit, WorkVector
 from .kernel import BinarySpaKernel
+from .profiling import LocalProfiler, ProfilingPlan
 from .lineage import LineageEdge, LineageId, stable_lineage_id
 from .numerics import NumericalFailure
 from .problems import OriginalProblem, OriginalSpaceCandidate, WorkingProblem, select_stable_candidate
@@ -388,7 +389,7 @@ def run_canonical_structural_shot(
                 ledger.begin(run_id=parsed.run_id, shot_id=shot_id, sample_seed_identity=sample_seed_identity, **common)
                 attempt_id = _attempt_lineage_id(working, attempt_ordinal)
                 ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="attempt", data={**common, "scope": "attempt", "attempt_lineage_id": attempt_id.value, "max_iterations": parsed.max_iterations})
-                started_ns = time.perf_counter_ns()
+                profile_evidence: dict[str, object] | None = None
 
                 def terminal_with_work(termination: str, **data: Any) -> None:
                     work = budgets.summary("attempt")
@@ -403,7 +404,10 @@ def run_canonical_structural_shot(
                     ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="work", data=work_data)
                     ledger.terminal(
                         run_id=parsed.run_id, shot_id=shot_id, termination=termination,
-                        data={**common, **data, "work_vector": work.as_evidence()},
+                        data={
+                            **common, **data, "work_vector": work.as_evidence(),
+                            **({"profile": profile_evidence} if profile_evidence is not None else {}),
+                        },
                     )
 
                 attempt_reservation = budgets.reserve(
@@ -419,20 +423,19 @@ def run_canonical_structural_shot(
                     return CanonicalExecutionResult(parsed.run_id, shot_id, termination.reason, None, None)
                 attempt_reservation.commit_once()
                 try:
-                    kernel = BinarySpaKernel()
-                    edge_table = EdgeTable.from_check_matrix(validated.hz)
-                    schedule = FloodingSchedule(edge_table, kernel=kernel)
-                    if edge_table.edge_count == 0:
-                        candidate = kernel.candidate_from_beliefs(
-                            np.full(validated.n, kernel.prior(parsed.error_rate), dtype=np.float64)
-                        )
-                        iterations = 0
-                        converged = bool(np.array_equal(
-                            (validated.hz.astype(np.int64) @ candidate.astype(np.int64)) % 2,
-                            observation.syndrome,
-                        ))
-                        budget_termination = None
-                    else:
+                    def admitted_attempt() -> tuple[np.ndarray | None, int, bool, BudgetTermination | None]:
+                        kernel = BinarySpaKernel()
+                        edge_table = EdgeTable.from_check_matrix(validated.hz)
+                        schedule = FloodingSchedule(edge_table, kernel=kernel)
+                        if edge_table.edge_count == 0:
+                            candidate = kernel.candidate_from_beliefs(
+                                np.full(validated.n, kernel.prior(parsed.error_rate), dtype=np.float64)
+                            )
+                            converged = bool(np.array_equal(
+                                (validated.hz.astype(np.int64) @ candidate.astype(np.int64)) % 2,
+                                observation.syndrome,
+                            ))
+                            return candidate, 0, converged, None
                         executor = AtomicFloodingExecutor(schedule, budgets, scope="attempt")
                         attempt = executor.run_attempt(
                             schedule.initialize(parsed.error_rate), observation.syndrome,
@@ -442,10 +445,21 @@ def run_canonical_structural_shot(
                                 observation.syndrome,
                             )),
                         )
-                        candidate = None if attempt.last_sweep is None else attempt.last_sweep.candidate
-                        iterations = attempt.iterations
-                        converged = attempt.converged
-                        budget_termination = attempt.termination
+                        return (
+                            None if attempt.last_sweep is None else attempt.last_sweep.candidate,
+                            attempt.iterations,
+                            attempt.converged,
+                            attempt.termination,
+                        )
+
+                    plan_data = {} if execution_controls is None else dict(execution_controls.get("profile_plan", {}))
+                    profile_plan = ProfilingPlan(
+                        enabled=bool(plan_data.get("enabled", False)),
+                        level=plan_data.get("level", "low_overhead"),
+                        track_python_allocations=plan_data.get("level") == "representative",
+                    )
+                    (candidate, iterations, converged, budget_termination), profile = LocalProfiler(profile_plan).measure(admitted_attempt)
+                    profile_evidence = profile.as_evidence()
                 except NumericalFailure as error:
                     ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="missingness", data={**common, "field": "candidate", "reason": "numerical_failure"})
                     terminal_with_work(
@@ -481,8 +495,7 @@ def run_canonical_structural_shot(
                 ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="candidate", data={**common, "attempt_lineage_id": attempt_id.value, "candidate": frozen.tolist(), "candidate_lineage_id": selected.lineage_id})
                 ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="selection", data={**common, "selection_status": "frozen_decoder_visible_candidate", "original_lineage_id": original_id.value, "working_lineage_id": working_id.value, "attempt_lineage_id": attempt_id.value, "candidate_lineage_id": selected.lineage_id})
                 evaluation_result = evaluate(validated, true_x=hidden_truth.x, true_z=hidden_truth.z, candidate_x=frozen)
-                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="runtime", data={**common, "wall_time_ns": time.perf_counter_ns() - started_ns, "method": "time.perf_counter_ns", "scope": "canonical_attempt", "unit": "ns"})
-                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="missingness", data={**common, "field": "backend_device_time", "reason": "CPU canonical profile has no device timer", "scope": "canonical_attempt"})
+                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="runtime", data={**common, "profile": profile_evidence})
                 terminal_with_work(
                     "completed", candidate=frozen.tolist(), iterations=iterations, converged=converged,
                     selection_status="frozen_decoder_visible_candidate", outcome=evaluation_result.outcome,

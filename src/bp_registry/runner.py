@@ -22,7 +22,21 @@ from .manifests import (
     preflight,
     validate_executable_canonical_baseline,
 )
-from . import evaluator, reference, sampling
+from . import evaluator, sampling
+
+
+def _native_reference():
+    """Load the optional native adapter only for explicit native execution."""
+    from . import reference
+
+    return reference
+
+
+def __getattr__(name: str):
+    """Retain lazy compatibility for callers using runner.reference."""
+    if name == "reference":
+        return _native_reference()
+    raise AttributeError(name)
 
 
 @dataclass(frozen=True)
@@ -125,6 +139,8 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
         "relation": manifest.evidence.relation,
         "fixture": manifest.evidence.fixture,
         "assessment_status": manifest.evidence.assessment_status,
+        "profile_plan": manifest.profile_plan.model_dump(mode="json"),
+        "trace_plan": manifest.trace_plan.model_dump(mode="json"),
     }
 
 
@@ -148,6 +164,7 @@ def _canonical_execution_controls(manifest: CanonicalExperimentV2) -> dict[str, 
             for scope in ("shot", "search", "attempt")
         },
         "policy_effects": executable_canonical_policy_effects(manifest.policies),
+        "profile_plan": manifest.profile_plan.model_dump(mode="json"),
     }
 
 
@@ -257,7 +274,7 @@ def run_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path)
                 x_error_rate=x_error_rate,
             )
             stage = "decoding"
-            native = reference.decode(
+            native = _native_reference().decode(
                 code.hz, sample.observation.syndrome, error_rate=x_error_rate,
                 max_iter=max_iter, bp_method=bp_method,
                 schedule=schedule, input_vector_type=input_vector_type,

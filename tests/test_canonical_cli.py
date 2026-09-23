@@ -54,7 +54,10 @@ def test_documented_tutorial(tmp_path):
     assert all(event["data"]["selection_status"] == "frozen_decoder_visible_candidate" for event in terminals)
     assert all(event["data"]["assessment_status"] == "not_assessed" for event in terminals)
     assert len([event for event in events if event["kind"] == "runtime"]) == 2
-    assert len([event for event in events if event["kind"] == "missingness"]) == 2
+    assert all(
+        event["data"]["profile"]["runtime"]["backend_device_time"]["value"] is None
+        for event in events if event["kind"] == "runtime"
+    )
 
 
 def test_checked_canonical_manifest_has_a_strict_public_preflight_contract():
@@ -92,7 +95,7 @@ def test_public_canonical_command_reconstructs_verified_structural_evidence(tmp_
     events = read_canonical_events(output / "events.jsonl")
     assert [event["kind"] for event in events].count("termination") == 2
     assert [event["kind"] for event in events].count("runtime") == 2
-    assert [event["kind"] for event in events].count("missingness") == 2
+    assert all(event["data"]["profile"]["enabled"] is True for event in events if event["kind"] == "runtime")
     assert all(event["data"].get("evidence_relation") == "canonical_implemented" for event in events)
 
 
@@ -156,19 +159,20 @@ builtins.__import__ = blocked
 from bp_registry.runner import preflight_canonical, run_canonical_one, run_one
 from pathlib import Path
 root = Path(__import__('os').environ['BP_REGISTRY_ROOT'])
+output = Path(__import__('os').environ['BP_REGISTRY_OUTPUT'])
 manifest = root / 'data/manifests/canonical-three-qubit-development.json'
 assert preflight_canonical(manifest)['run_id'] == 'canonical-three-qubit-development'
-assert run_canonical_one(manifest, shot_id=0, ledger_path='canonical-events.jsonl').termination == 'completed'
+assert run_canonical_one(manifest, shot_id=0, ledger_path=output / 'canonical-events.jsonl').termination == 'completed'
 try:
-    run_one(root / 'data/manifests/project-three-qubit-fixture.json', shot_id=0, ledger_path='native-events.jsonl')
+    run_one(root / 'data/manifests/project-three-qubit-fixture.json', shot_id=0, ledger_path=output / 'native-events.jsonl')
 except ImportError as error:
     assert 'ldpc deliberately unavailable' in str(error)
 else:
     raise AssertionError('native reference path did not import ldpc')
 """
     completed = subprocess.run(
-        [sys.executable, "-c", script], cwd=tmp_path, text=True, capture_output=True,
-        env={**os.environ, "PYTHONPATH": str(REPOSITORY_ROOT / "src"), "OMP_NUM_THREADS": "1", "BP_REGISTRY_ROOT": str(REPOSITORY_ROOT)},
+        [sys.executable, "-c", script], cwd=REPOSITORY_ROOT, text=True, capture_output=True,
+        env={**os.environ, "PYTHONPATH": str(REPOSITORY_ROOT / "src"), "OMP_NUM_THREADS": "1", "BP_REGISTRY_ROOT": str(REPOSITORY_ROOT), "BP_REGISTRY_OUTPUT": str(tmp_path)},
     )
     assert completed.returncode == 0, completed.stderr
 

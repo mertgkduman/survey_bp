@@ -459,6 +459,16 @@ def _actual_environment() -> dict[str, str]:
     }
 
 
+def _actual_canonical_environment() -> dict[str, str]:
+    """Discover only dependencies required by project-owned canonical execution."""
+    return {
+        "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+        "numpy": version("numpy"),
+        "scipy": version("scipy"),
+        "backend": "cpu",
+    }
+
+
 def _matrix_raw_bytes(matrix: np.ndarray) -> bytes:
     """Stable JSON-value bytes preserve each artifact matrix's stored row order."""
     return json.dumps(matrix.tolist(), separators=(",", ":")).encode("utf-8")
@@ -500,7 +510,7 @@ def _verify_environment(environment: EnvironmentV1, decoder: DecoderV1) -> None:
 
 
 def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
-    actual = _actual_environment()
+    actual = _actual_canonical_environment()
     expected = environment.model_dump(exclude={"omp_num_threads"})
     actual = {key: actual[key] for key in expected}
     if actual != expected:
@@ -518,6 +528,8 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
         return ResolvedExperiment(manifest=manifest, code=fixture_code(), artifact=None)
     if isinstance(manifest, CanonicalExperimentV2):
         _verify_canonical_environment(manifest.environment)
+        if manifest.trace_plan.level != "off":
+            raise ValueError("canonical trace plan must be off until a public trace hook is implemented")
         # Closed registry resolution is deliberately before any sample, ledger, or kernel work.
         validate_executable_canonical_baseline(manifest.policies)
         artifact = load_artifact(
