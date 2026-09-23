@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from .ledger import Writer
+from .canonical.metrics import unavailable_metric
 from .manifests import ManifestV1, manifest_digest, preflight
 from . import evaluator, reference, sampling
 
@@ -22,6 +23,22 @@ class ShotResult:
     outcome: str
     converged: bool
     iterations: int
+
+
+def _unavailable_native_metric_facts(stage: str) -> list[dict[str, int | float | str | None]]:
+    """Retain missing native instrumentation after an unsuccessful terminal."""
+    reason = f"native instrumentation unavailable because {stage} raised before a native result was retained"
+    return [
+        unavailable_metric(
+            metric, method="runner.run_one", scope="native_decoder_call", unit=unit,
+            qualification="terminal_not_observed", reason=reason,
+        ).as_evidence()
+        for metric, unit in (
+            ("native_iterations", "native_iterations"),
+            ("native_edge_updates", "edge_messages"),
+            ("native_control_flow_events", "events"),
+        )
+    ]
 
 
 _REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
@@ -155,6 +172,7 @@ def run_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path)
                 hidden_x=sample.hidden.x.tolist(), hidden_z=sample.hidden.z.tolist(),
                 candidate=native.candidate.tolist(), native_converged=native.converged,
                 native_iterations=native.iterations, native_edge_updates=None,
+                native_metric_facts=[fact.as_evidence() for fact in native.metric_facts],
                 native_edge_updates_missing_reason=native.edge_updates_missing_reason,
                 native_internals_unavailable_reason=native.edge_updates_missing_reason,
                 outcome=evaluation.outcome, logical_action_agrees=evaluation.logical_action_agrees,
@@ -170,6 +188,7 @@ def run_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path)
                 termination="exception", exception_stage=stage,
                 exception_type=type(exc).__name__, exception_message=str(exc),
                 native_converged=None, native_iterations=None, native_edge_updates=None,
+                native_metric_facts=_unavailable_native_metric_facts(stage),
                 native_internals_unavailable_reason=(
                     f"native internals unavailable because {stage} raised before terminal evaluation"
                 ),

@@ -15,7 +15,7 @@ from typing import Any
 import numpy as np
 
 from . import evaluator, evidence, sampling
-from .ledger import reconcile
+from .ledger import reconcile, summarize
 from .manifests import ManifestV1, manifest_digest, preflight
 from .runner import preflight_pilot, run_one
 
@@ -160,7 +160,8 @@ def _result_from_final_rows(
         raise ValueError("pilot result requires a complete manifest")
     outcomes = Counter(row.get("outcome") or "outcome_unavailable" for row in rows)
     terminations = Counter(row["termination"] for row in rows)
-    return {
+    metric_summary = summarize(output / "events.jsonl")
+    result = {
         "schema_version": 1,
         "title": "gross-bb-144 pilot_adaptation — not_assessed",
         "run_id": manifest.run_id,
@@ -198,6 +199,9 @@ def _result_from_final_rows(
         },
         "statistical_claim": "not_assessed; this fixed 32-shot local smoke budget is not a curve comparison",
     }
+    if metric_summary["native_metric_availability"]:
+        result["native_metric_availability"] = metric_summary["native_metric_availability"]
+    return result
 
 
 def run_pilot(manifest_path: str | Path, output: str | Path) -> dict[str, Any]:

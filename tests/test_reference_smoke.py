@@ -146,6 +146,10 @@ def test_checked_in_three_qubit_fixture_is_a_current_executable_manifest(tmp_pat
     assert [event["kind"] for event in events] == ["begin", "terminal"]
     assert events[1]["manifest_sha256"]
     assert events[1]["code_id"] == "project-three-qubit-css-fixture"
+    facts = {fact["metric"]: fact for fact in events[1]["native_metric_facts"]}
+    assert facts["native_iterations"]["value"] == result.iterations
+    assert facts["native_edge_updates"]["value"] is None
+    assert facts["native_edge_updates"]["unavailable_reason"]
 
 
 def test_runner_uses_sampling_and_independent_evaluator(tmp_path, monkeypatch):
@@ -185,6 +189,16 @@ def test_runner_uses_sampling_and_independent_evaluator(tmp_path, monkeypatch):
     assert result.outcome == "logical_failure"
     assert terminal["sample_identity"] == "sentinel-sample"
     assert terminal["outcome"] == "logical_failure"
+    from bp_registry.cli import _result_from_final_rows
+    from bp_registry.ledger import reconcile
+
+    result_payload = _result_from_final_rows(manifest_path, tmp_path, reconcile(ledger_path), 0.0)
+    assert result_payload["native_metric_availability"]["native_iterations"] == {
+        "observed": 1, "unavailable": 0,
+    }
+    assert result_payload["native_metric_availability"]["native_edge_updates"] == {
+        "observed": 0, "unavailable": 1,
+    }
 
 
 def test_selected_pilot_preflight_is_bound_and_transparent(tmp_path):

@@ -89,6 +89,37 @@ def _validate_event(event: Mapping[str, Any]) -> None:
             raise ValueError("begin event requires a nonempty sample_seed_identity")
     elif not isinstance(event.get("termination"), str) or not event["termination"]:
         raise ValueError("terminal event requires a termination status")
+    elif "native_metric_facts" in event:
+        _native_metric_facts_from_evidence(event["native_metric_facts"])
+
+
+def _native_metric_facts_from_evidence(value: Any) -> tuple[Any, ...]:
+    """Validate a native metric envelope without inferring opaque internals."""
+    from .canonical.metrics import MetricFact
+
+    if not isinstance(value, list):
+        raise ValueError("native_metric_facts must be a list of typed metric facts")
+    facts = tuple(MetricFact.from_evidence(item) for item in value)
+    if len({fact.metric for fact in facts}) != len(facts):
+        raise ValueError("native_metric_facts cannot contain duplicate metric names")
+    return facts
+
+
+def _unavailable_native_metric_evidence(reason: str) -> list[dict[str, int | float | str | None]]:
+    """Record unobserved native internals as facts instead of synthesized counts."""
+    from .canonical.metrics import unavailable_metric
+
+    return [
+        unavailable_metric(
+            metric, method="ledger.reconcile", scope="native_decoder_call", unit=unit,
+            qualification="terminal_not_observed", reason=reason,
+        ).as_evidence()
+        for metric, unit in (
+            ("native_iterations", "native_iterations"),
+            ("native_edge_updates", "edge_messages"),
+            ("native_control_flow_events", "events"),
+        )
+    ]
 
 
 def _read_events(path: Path) -> list[dict[str, Any]]:
@@ -150,6 +181,10 @@ def _terminal_defaults(fields: Mapping[str, Any]) -> dict[str, Any]:
     terminal.setdefault("native_converged", None)
     terminal.setdefault("native_iterations", None)
     terminal.setdefault("native_edge_updates", None)
+    if "native_metric_facts" in terminal:
+        terminal["native_metric_facts"] = [
+            fact.as_evidence() for fact in _native_metric_facts_from_evidence(terminal["native_metric_facts"])
+        ]
     terminal.setdefault("native_internals_unavailable_reason", "not observed in this terminal record")
     terminal.setdefault("outcome", None)
     if terminal["outcome"] is None:
@@ -170,6 +205,7 @@ def _interrupted_terminal(begin: Mapping[str, Any]) -> dict[str, Any]:
             "artifact_semantic_sha256", "artifact_path",
         ) if field in begin
     }
+    unavailable_reason = "owner released without a terminal record; native internals were not observed"
     return {
         "kind": "terminal", "ledger_version": LEDGER_VERSION,
         "run_id": begin["run_id"], "shot_id": begin["shot_id"], **identity,
@@ -177,9 +213,8 @@ def _interrupted_terminal(begin: Mapping[str, Any]) -> dict[str, Any]:
             "termination": "interrupted",
             "termination_inference": "reconciled_after_owner_release",
             "observed_termination": False,
-            "native_internals_unavailable_reason": (
-                "owner released without a terminal record; native internals were not observed"
-            ),
+            "native_internals_unavailable_reason": unavailable_reason,
+            "native_metric_facts": _unavailable_native_metric_evidence(unavailable_reason),
             "outcome_unavailable_reason": "interrupted before independent evaluation completed",
         }),
     }
@@ -311,6 +346,9 @@ def summarize(path: str | Path) -> dict[str, Any]:
     outcomes = Counter(
         row["outcome"] if row.get("outcome") is not None else "unavailable" for row in final_rows
     )
+    availability: dict[str, Counter[str]] = {}
+    for fact in query_native_metric_facts(path):
+        availability.setdefault(fact["metric"], Counter())[fact["missingness"]] += 1
     return {
         "total_final": len(final_rows),
         "terminations": dict(Counter(row["termination"] for row in final_rows)),
@@ -318,7 +356,30 @@ def summarize(path: str | Path) -> dict[str, Any]:
         "nonconverged": sum(row.get("native_converged") is False for row in final_rows),
         "interrupted": sum(row.get("termination") == "interrupted" for row in final_rows),
         "postselected": sum(row.get("postselection") not in {None, "none", "unavailable"} for row in final_rows),
+        "native_metric_availability": {
+            metric: {
+                "observed": counts["observed"],
+                "unavailable": counts["unavailable"],
+            }
+            for metric, counts in sorted(availability.items())
+        },
     }
+
+
+def query_native_metric_facts(
+    path: str | Path, *, metric: str | None = None,
+) -> list[dict[str, int | float | str | None]]:
+    """Return typed terminal facts; unavailable values are never reduced to zero."""
+    if metric is not None and (not isinstance(metric, str) or not metric):
+        raise ValueError("native metric filter must be a nonempty string")
+    result: list[dict[str, int | float | str | None]] = []
+    for row in reconcile(path):
+        for fact in _native_metric_facts_from_evidence(row.get("native_metric_facts", [])):
+            if metric is None or fact.metric == metric:
+                result.append({
+                    "run_id": row["run_id"], "shot_id": row["shot_id"], **fact.as_evidence(),
+                })
+    return result
 
 
 # Canonical CSS structural evidence is a deliberately separate v2 grammar.  It
