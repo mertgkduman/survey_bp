@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -93,6 +94,83 @@ def test_public_canonical_command_reconstructs_verified_structural_evidence(tmp_
     assert [event["kind"] for event in events].count("runtime") == 2
     assert [event["kind"] for event in events].count("missingness") == 2
     assert all(event["data"].get("evidence_relation") == "canonical_implemented" for event in events)
+
+
+def test_public_profile_plan_emits_typed_attempt_evidence(tmp_path):
+    from bp_registry.ledger import read_canonical_events
+    from bp_registry.runner import run_canonical_one
+
+    ledger_path = tmp_path / "events.jsonl"
+    run_canonical_one(CANONICAL_MANIFEST, shot_id=0, ledger_path=ledger_path)
+    events = read_canonical_events(ledger_path)
+    runtime = next(event["data"] for event in events if event["kind"] == "runtime")
+    terminal = next(event["data"] for event in events if event["kind"] == "termination")
+
+    profile = runtime["profile"]
+    assert profile["enabled"] is True
+    assert profile["level"] == "low_overhead"
+    assert profile["runtime"]["wall_time"]["value"] is not None
+    assert profile["runtime"]["backend_device_time"]["value"] is None
+    assert profile["adapter_overhead"]["value"] is not None
+    assert terminal["profile"] == profile
+
+    disabled_manifest = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text())
+    disabled_manifest["profile_plan"]["enabled"] = False
+    disabled_path = tmp_path / "disabled.json"
+    disabled_path.write_text(json.dumps(disabled_manifest), encoding="utf-8")
+    run_canonical_one(disabled_path, shot_id=0, ledger_path=tmp_path / "disabled-events.jsonl")
+    disabled_events = read_canonical_events(tmp_path / "disabled-events.jsonl")
+    disabled_profile = next(event["data"]["profile"] for event in disabled_events if event["kind"] == "runtime")
+    assert disabled_profile["enabled"] is False
+    assert disabled_profile["runtime"]["wall_time"]["value"] is None
+    assert disabled_profile["runtime"]["wall_time"]["method"] == "not_collected"
+
+
+def test_enabled_public_trace_plan_is_rejected_before_ledger(tmp_path):
+    from bp_registry.runner import preflight_canonical, run_canonical_one
+
+    manifest = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text())
+    manifest["trace_plan"]["level"] = "full"
+    manifest["trace_plan"]["max_records"] = 1
+    manifest["trace_plan"]["max_bytes"] = 1024
+    manifest_path = tmp_path / "trace-enabled.json"
+    ledger_path = tmp_path / "events.jsonl"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="canonical trace plan.*off"):
+        preflight_canonical(manifest_path)
+    with pytest.raises(ValueError, match="canonical trace plan.*off"):
+        run_canonical_one(manifest_path, shot_id=0, ledger_path=ledger_path)
+    assert ledger_path.exists() is False
+
+
+def test_canonical_preflight_and_run_do_not_import_ldpc(tmp_path):
+    script = """
+import builtins
+_real_import = builtins.__import__
+def blocked(name, *args, **kwargs):
+    if name == 'ldpc' or name.startswith('ldpc.'):
+        raise ImportError('ldpc deliberately unavailable')
+    return _real_import(name, *args, **kwargs)
+builtins.__import__ = blocked
+from bp_registry.runner import preflight_canonical, run_canonical_one, run_one
+from pathlib import Path
+root = Path(__import__('os').environ['BP_REGISTRY_ROOT'])
+manifest = root / 'data/manifests/canonical-three-qubit-development.json'
+assert preflight_canonical(manifest)['run_id'] == 'canonical-three-qubit-development'
+assert run_canonical_one(manifest, shot_id=0, ledger_path='canonical-events.jsonl').termination == 'completed'
+try:
+    run_one(root / 'data/manifests/project-three-qubit-fixture.json', shot_id=0, ledger_path='native-events.jsonl')
+except ImportError as error:
+    assert 'ldpc deliberately unavailable' in str(error)
+else:
+    raise AssertionError('native reference path did not import ldpc')
+"""
+    completed = subprocess.run(
+        [sys.executable, "-c", script], cwd=tmp_path, text=True, capture_output=True,
+        env={**os.environ, "PYTHONPATH": str(REPOSITORY_ROOT / "src"), "OMP_NUM_THREADS": "1", "BP_REGISTRY_ROOT": str(REPOSITORY_ROOT)},
+    )
+    assert completed.returncode == 0, completed.stderr
 
 
 def test_checked_canonical_result_is_idempotent_and_honestly_labeled():
