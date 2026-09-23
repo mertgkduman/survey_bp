@@ -255,6 +255,68 @@ def test_verify_run_rederives_budget_and_numerical_terminal_semantics(tmp_path, 
     assert numerical["verification_status"] == "not_independently_reproduced_numerical_failure"
 
 
+def test_verify_run_rejects_rehashed_numerical_failure_claim_matrix(tmp_path, monkeypatch):
+    """A valid event hash cannot bless altered transient-failure science."""
+    from bp_registry.canonical.numerics import NumericalFailure
+    from bp_registry.canonical.schedules import FloodingSchedule
+    from bp_registry.cli import run_canonical, verify_run
+    from bp_registry.runner import run_canonical_one
+
+    output = tmp_path / "numerical-matrix"
+    original = FloodingSchedule.sweep
+    monkeypatch.setattr(FloodingSchedule, "sweep", lambda *_args, **_kwargs: (_ for _ in ()).throw(NumericalFailure("transient")))
+    run_canonical_one(CANONICAL_MANIFEST, shot_id=0, ledger_path=output / "events.jsonl")
+    monkeypatch.setattr(FloodingSchedule, "sweep", original)
+    run_canonical(CANONICAL_MANIFEST, output)
+
+    def mutate(events):
+        attempt = next(event for event in events if event["shot_id"] == 0 and event["kind"] == "attempt")
+        attempt["data"]["policy_effects"]["update"]["effect"] = "identity_only"
+
+    _rewrite_rehashed_canonical_ledger(output, mutate)
+    with pytest.raises(ValueError, match="policy_effects"):
+        verify_run(output)
+
+
+def test_verify_run_rejects_rehashed_budget_and_iteration_claim_matrix(tmp_path):
+    """Budget denials must derive their complete object from public inputs."""
+    from bp_registry.cli import run_canonical, verify_run
+
+    manifest = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text(encoding="utf-8"))
+    manifest["budgets"]["attempt"]["work_limits"]["bp_calls"] = 0
+    manifest_path = tmp_path / "denial.json"
+    output = tmp_path / "denial-output"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    run_canonical(manifest_path, output)
+
+    def mutate(events):
+        terminal = next(event for event in events if event["kind"] == "termination")
+        terminal["data"]["budget_termination"]["configured_limit"] = 7
+
+    _rewrite_rehashed_canonical_ledger(output, mutate)
+    with pytest.raises(ValueError, match="budget_termination"):
+        verify_run(output)
+
+
+def test_verify_run_rejects_rehashed_public_profile_contract_matrix(tmp_path):
+    """Every profiler metadata field is structural provenance, not decoration."""
+    from bp_registry.cli import run_canonical, verify_run
+
+    output = tmp_path / "profile-matrix"
+    run_canonical(CANONICAL_MANIFEST, output)
+
+    def mutate(events):
+        for event in events:
+            if event["kind"] in {"runtime", "termination"}:
+                profile = event["data"].get("profile")
+                if profile is not None:
+                    profile["runtime"]["process_cpu_time"]["method"] = "attacker-controlled-method"
+
+    _rewrite_rehashed_canonical_ledger(output, mutate)
+    with pytest.raises(ValueError, match="profile"):
+        verify_run(output)
+
+
 def test_public_profile_plan_emits_typed_attempt_evidence(tmp_path):
     from bp_registry.ledger import read_canonical_events
     from bp_registry.runner import run_canonical_one
