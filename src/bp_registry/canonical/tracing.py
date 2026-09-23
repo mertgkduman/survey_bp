@@ -97,6 +97,9 @@ class TracePlan:
             raise ValueError("trace record cap must be a bounded nonnegative integer")
         if type(self.max_bytes) is not int or not 0 <= self.max_bytes <= _MAX_BYTES:
             raise ValueError("trace byte cap must be a bounded nonnegative integer")
+        truncation_bytes = len(_json_bytes({"trace_version": TRACE_VERSION, "records": [], "truncated": True, "dropped_records": 1}))
+        if self.level != "off" and self.max_bytes < truncation_bytes:
+            raise ValueError("trace byte cap cannot hold the required truncation fact")
         if self.iterations is not None and any(type(item) is not int or item < 0 for item in self.iterations):
             raise ValueError("trace iteration filters must be nonnegative integers")
         if self.edges is not None and any(not isinstance(item, str) or not item for item in self.edges):
@@ -162,13 +165,18 @@ class TraceSink:
         if len(prospective) > self.plan.max_records or len(_json_bytes(document)) > self.plan.max_bytes:
             self._truncated = True
             self._dropped += 1
+            # A cap includes the explicit overflow evidence itself. If required,
+            # discard previously retained optional records to preserve that fact.
+            while self._records and len(_json_bytes({"trace_version": TRACE_VERSION, "records": self._records, "truncated": True, "dropped_records": self._dropped})) > self.plan.max_bytes:
+                self._records.pop()
+                self._dropped += 1
             return
         self._records.append(record)
 
     def finish(self) -> TraceResult:
         if self._finished is not None:
             return self._finished
-        if self.plan.level == "off" or not self._records:
+        if self.plan.level == "off" or (not self._records and not self._truncated):
             self._finished = TraceResult(None, None, 0, 0, self._truncated, self._dropped)
             return self._finished
         payload = {"trace_version": TRACE_VERSION, "records": self._records, "truncated": self._truncated, "dropped_records": self._dropped}

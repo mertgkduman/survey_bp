@@ -114,6 +114,18 @@ def test_semantic_trace_filters_and_explicitly_truncates_without_control_flow(tm
     assert TraceSink.load(tmp_path, result.sidecar_path, expected_sha256=result.sha256)["records"][0]["edge"] == "e-1"
 
 
+def test_byte_cap_persists_a_truncation_fact_even_when_no_optional_record_fits(tmp_path):
+    from bp_registry.canonical.tracing import TracePlan, TraceSink
+
+    sink = TraceSink(TracePlan(root=tmp_path, max_records=10, max_bytes=256))
+    sink.observe(kind="iteration", iteration=0, payload={"large": "x" * 512})
+    result = sink.finish()
+
+    assert result.records == 0 and result.truncated is True and result.sidecar_path is not None
+    loaded = TraceSink.load(tmp_path, result.sidecar_path, expected_sha256=result.sha256)
+    assert loaded["truncated"] is True and loaded["dropped_records"] == 1
+
+
 def test_sidecars_reject_escaping_paths_bad_payloads_and_hash_mismatches(tmp_path):
     from bp_registry.canonical.tracing import TracePlan, TraceSink
 
