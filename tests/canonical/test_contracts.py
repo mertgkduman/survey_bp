@@ -99,3 +99,55 @@ def test_resolved_composition_is_closed_and_exposes_typed_contracts():
     resolved = contracts.validate_composition(parsed.policies)
     assert tuple(binding.role.value for binding in resolved.bindings) == ROLES
     assert resolved.semantic_identity == contracts.validate_composition(parsed.policies).semantic_identity
+
+
+def test_lifecycle_owns_policy_state_and_rejects_unauthorized_decisions():
+    from bp_registry.canonical import execution
+
+    parsed = contracts.parse_canonical_manifest(manifest_payload())
+    resolved = contracts.validate_composition(parsed.policies)
+
+    assert hasattr(execution, "PolicyRuntime")
+    assert hasattr(contracts, "PolicyDecision")
+    runtime = execution.PolicyRuntime(resolved)
+    visited = runtime.traverse_lifecycle()
+    assert tuple(event.hook.value for event in visited) == (
+        "shot", "search", "member", "leg", "branch", "attempt", "iteration", "message",
+    )
+
+    first = runtime.private_state("update-identity", sibling_id="member-a")
+    second = runtime.private_state("update-identity", sibling_id="member-b")
+    assert first is not second
+    with pytest.raises(ValueError, match="does not own"):
+        runtime.apply_decision(
+            contracts.PolicyDecision(
+                binding_id="schedule-identity", hook="iteration", action="state_update",
+                state_updates={"foreign": 1},
+            )
+        )
+
+
+def test_search_relationship_topology_and_relay_transfer_are_typed_separately():
+    assert hasattr(contracts, "SearchRelationship")
+    assert hasattr(contracts, "ExecutionTopology")
+    assert hasattr(contracts, "RelayPayload")
+
+    plan = contracts.SearchPlan(
+        relationship="relayed", topology="sequential", budget_scope="search",
+        relay_payload={"kind": "canonical-relay-v1", "values": [1, 0]},
+    )
+    assert plan.relationship.value == "relayed"
+    assert plan.topology.value == "sequential"
+    with pytest.raises(ValueError, match="relay payload"):
+        contracts.SearchPlan(
+            relationship="independent", topology="concurrent", budget_scope="search",
+            relay_payload={"kind": "canonical-relay-v1", "values": [1]},
+        )
+
+
+def test_resolved_bindings_carry_complete_adjacent_evidence():
+    resolved = contracts.validate_composition(
+        contracts.parse_canonical_manifest(manifest_payload()).policies
+    )
+    assert all(binding.evidence.invariants for binding in resolved.bindings)
+    assert all(binding.evidence.procedure or binding.evidence.source_anchors for binding in resolved.bindings)
