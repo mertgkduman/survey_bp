@@ -136,7 +136,7 @@ def _expect_equal(field: str, actual: Any, expected: Any) -> None:
 def _validate_profile(stream: Sequence[Mapping[str, Any]], terminal: Mapping[str, Any], context: PublicShotContext) -> None:
     runtime = [event for event in stream if event.get("kind") == "runtime"]
     profile = terminal.get("data", {}).get("profile")
-    measured = terminal.get("termination") != "count_budget_exhausted"
+    measured = terminal.get("data", {}).get("work_vector", {}).get("bp_calls", 0) > 0
     if not measured:
         if runtime or profile is not None:
             raise CanonicalStructuralVerificationError("profile evidence is fabricated for a pre-attempt denial")
@@ -198,6 +198,19 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
         return terminals[0]
     terminal = terminals[0]
     data = terminal["data"]
+    if terminal.get("termination") == "numerical_failure":
+        if data.get("verification_status") != "not_independently_reproduced_numerical_failure":
+            raise CanonicalStructuralVerificationError("numerical failure lacks not-independently-reproduced status")
+        if data.get("candidate") is not None or data.get("outcome") is not None:
+            raise CanonicalStructuralVerificationError("numerical failure carries forbidden candidate or outcome")
+        work = data.get("work_vector")
+        if not isinstance(work, Mapping) or work.get("bp_calls") != 1 or any(
+            amount != 0 for resource, amount in work.items() if resource != "bp_calls"
+        ):
+            raise CanonicalStructuralVerificationError("numerical failure lacks atomic-sweep rollback work evidence")
+        if [event.get("kind") for event in stream] != ["shot_begin", "attempt", "missingness", "work", "termination"]:
+            raise CanonicalStructuralVerificationError("numerical failure event grammar is invalid")
+        return terminal
     _expect_equal("termination", terminal.get("termination"), expected["termination"])
     _expect_equal("work_vector", data.get("work_vector"), expected["work_vector"])
     work = [event for event in stream if event.get("kind") == "work"]
@@ -241,7 +254,11 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
     else:
         if data.get("candidate") is not None or data.get("outcome") is not None:
             raise CanonicalStructuralVerificationError("non-completed terminal carries forbidden candidate or outcome")
-        required = ["shot_begin", "attempt", "runtime", "work", "termination"] if expected["termination"] != "count_budget_exhausted" else ["shot_begin", "attempt", "work", "termination"]
+        required = (
+            ["shot_begin", "attempt", "runtime", "work", "termination"]
+            if data.get("work_vector", {}).get("bp_calls", 0) > 0
+            else ["shot_begin", "attempt", "work", "termination"]
+        )
     if [event.get("kind") for event in stream] != required:
         raise CanonicalStructuralVerificationError("canonical termination event grammar is invalid")
     return terminals[0]

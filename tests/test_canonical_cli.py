@@ -230,6 +230,31 @@ def test_verify_run_rejects_rehashed_structural_provenance_tampering(tmp_path, l
         verify_run(output)
 
 
+def test_verify_run_rederives_budget_and_numerical_terminal_semantics(tmp_path, monkeypatch):
+    from bp_registry.canonical.numerics import NumericalFailure
+    from bp_registry.cli import run_canonical, verify_run
+    from bp_registry.runner import run_canonical_one
+    from bp_registry.canonical.schedules import FloodingSchedule
+
+    budget_manifest = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text(encoding="utf-8"))
+    budget_manifest["budgets"]["attempt"]["work_limits"]["check_to_variable_updates"] = 0
+    budget_path = tmp_path / "cap.json"
+    budget_path.write_text(json.dumps(budget_manifest), encoding="utf-8")
+    budget_output = tmp_path / "cap-output"
+    assert run_canonical(budget_path, budget_output)["final_row_count"] == 2
+    assert verify_run(budget_output)["final_row_count"] == 2
+
+    numerical_output = tmp_path / "numerical-output"
+    original_sweep = FloodingSchedule.sweep
+    monkeypatch.setattr(FloodingSchedule, "sweep", lambda *_args, **_kwargs: (_ for _ in ()).throw(NumericalFailure("transient nonfinite")))
+    assert run_canonical_one(CANONICAL_MANIFEST, shot_id=0, ledger_path=numerical_output / "events.jsonl").termination == "numerical_failure"
+    monkeypatch.setattr(FloodingSchedule, "sweep", original_sweep)
+    report = run_canonical(CANONICAL_MANIFEST, numerical_output)
+    assert verify_run(numerical_output)["final_row_count"] == report["final_row_count"] == 2
+    numerical = next(event["data"] for event in __import__("bp_registry.ledger", fromlist=["read_canonical_events"]).read_canonical_events(numerical_output / "events.jsonl") if event["kind"] == "termination" and event["termination"] == "numerical_failure")
+    assert numerical["verification_status"] == "not_independently_reproduced_numerical_failure"
+
+
 def test_public_profile_plan_emits_typed_attempt_evidence(tmp_path):
     from bp_registry.ledger import read_canonical_events
     from bp_registry.runner import run_canonical_one

@@ -489,6 +489,7 @@ def run_canonical_structural_shot(
                     terminal_with_work(
                         "numerical_failure", numerical_failure=str(error),
                         selection_status="unavailable_due_to_numerical_failure", outcome=None,
+                        verification_status="not_independently_reproduced_numerical_failure",
                     )
                     return CanonicalExecutionResult(parsed.run_id, shot_id, "numerical_failure", None, None)
                 if budget_termination is not None:
