@@ -3,7 +3,8 @@
 
 The Markdown files named in ``SOURCE_FILES`` remain the source of truth.  This
 small renderer deliberately lays their text out as text; it is not a Markdown,
-HTML, or TeX conversion pipeline.
+HTML, or TeX conversion pipeline. The canonical-engine input is frozen at the
+Phase 2 boundary so later phase documentation does not change this snapshot.
 """
 
 from __future__ import annotations
@@ -32,7 +33,7 @@ SOURCE_FILES: tuple[str, ...] = (
     "docs/environment-pins.md",
     "docs/phase1-pilot.md",
     ".planning/phases/01-evidence-registry-and-native-css-baseline/01-VERIFICATION.md",
-    "docs/canonical-engine.md",
+    "docs/snapshots/canonical-engine-through-phase-2.md",
     "docs/profiling-and-tracing-strategy.md",
     "docs/research-novelty-and-depth-register.md",
     ".planning/phases/02-canonical-css-execution-and-policy-contracts/02-VERIFICATION.md",
