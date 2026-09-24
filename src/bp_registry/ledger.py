@@ -414,6 +414,22 @@ def _validate_canonical_event(event: Mapping[str, Any]) -> None:
     data = event.get("data", {})
     if not isinstance(data, dict):
         raise ValueError("canonical event data must be an object")
+    if event.get("ledger_version") == CANONICAL_SCHEDULE_LEDGER_VERSION and event["kind"] == "termination":
+        if set(data) != {"schedule_terminal", "deterministic_facts"}:
+            raise ValueError("V3 schedule terminal requires exact deterministic evidence fields")
+        facts = data["deterministic_facts"]
+        if not isinstance(facts, dict) or set(facts) != {"candidate", "policy_effects", "rng_identities"}:
+            raise ValueError("V3 schedule terminal requires candidate, policy, and RNG facts")
+        if (
+            not isinstance(facts["candidate"], list)
+            or not isinstance(facts["policy_effects"], dict)
+            or not isinstance(facts["rng_identities"], dict)
+            or not all(isinstance(value, str) and value for value in facts["rng_identities"].values())
+        ):
+            raise ValueError("V3 schedule terminal deterministic facts are invalid")
+        from .canonical.verification import reconstruct_schedule_terminal
+
+        reconstruct_schedule_terminal(data["schedule_terminal"])
     sidecar = event.get("sidecar")
     if sidecar is not None:
         if not isinstance(sidecar, dict):

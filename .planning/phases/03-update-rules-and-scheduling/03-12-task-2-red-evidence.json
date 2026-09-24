@@ -1,0 +1,9 @@
+{
+  "command": "PYTHONPATH=$PWD/src OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_tracing.py::test_selected_local_schedule_traces_are_bounded_truth_separated_and_explicit",
+  "exitCode": 1,
+  "output": "not ok 1 - test_selected_local_schedule_traces_are_bounded_truth_separated_and_explicit\n  ---\n  framework: pytest\n  assertion: traces must expose bounded decoder-visible local convergence records\n  ...\n# tests 1\n# pass 0\n# fail 1\n",
+  "targetTest": "test_selected_local_schedule_traces_are_bounded_truth_separated_and_explicit",
+  "targetFile": "tests/canonical/test_tracing.py",
+  "expected": "Selected local convergence and schedule-state observations retain explicit selection, truncation, missingness, bounded state, and truth separation.",
+  "actual": "The selected target failed its explicit assertion because TraceSink has no bounded local-convergence API."
+}

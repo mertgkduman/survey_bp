@@ -17,9 +17,13 @@ from typing import Any, Literal, Mapping
 import numpy as np
 
 
-TRACE_VERSION = 1
+TRACE_VERSION = 2
 _MAX_RECORDS = 1_000_000
 _MAX_BYTES = 64 * 1024 * 1024
+_MAX_SCHEDULE_STATE_ITEMS = 1_024
+_HIDDEN_TRUTH_FIELDS = frozenset({
+    "hidden_truth", "hidden_x", "hidden_z", "physical_error", "true_x", "true_z",
+})
 _MEASUREMENT_ONLY_FIELDS = frozenset({
     "adapter_overhead", "elapsed_ns", "measurement_time", "peak_host_memory",
     "process_cpu_time", "profile_overhead", "runtime", "timestamp", "wall_time",
@@ -67,6 +71,18 @@ def _semantic_value(value: object) -> object:
     if isinstance(value, (tuple, list)):
         return [_semantic_value(item) for item in value]
     return value
+
+
+def _reject_hidden_truth(value: object) -> None:
+    """Keep physical-error truth outside optional decoder-visible sidecars."""
+    if isinstance(value, Mapping):
+        for key, item in value.items():
+            if str(key).lower() in _HIDDEN_TRUTH_FIELDS:
+                raise ValueError("trace payload must not retain hidden physical truth")
+            _reject_hidden_truth(item)
+    elif isinstance(value, (tuple, list)):
+        for item in value:
+            _reject_hidden_truth(item)
 
 
 def semantic_digest(records: Mapping[str, object] | tuple[Mapping[str, object], ...] | list[Mapping[str, object]]) -> str:
@@ -126,7 +142,10 @@ class TracePlan:
             raise ValueError("trace record cap must be a bounded nonnegative integer")
         if type(self.max_bytes) is not int or not 0 <= self.max_bytes <= _MAX_BYTES:
             raise ValueError("trace byte cap must be a bounded nonnegative integer")
-        truncation_bytes = len(_json_bytes({"trace_version": TRACE_VERSION, "records": [], "truncated": True, "dropped_records": 1}))
+        truncation_bytes = len(_json_bytes({
+            "trace_version": TRACE_VERSION, "selection_basis": self.selection_basis(),
+            "records": [], "truncated": True, "dropped_records": 1,
+        }))
         if self.level != "off" and self.max_bytes < truncation_bytes:
             raise ValueError("trace byte cap cannot hold the required truncation fact")
         if self.iterations is not None and any(type(item) is not int or item < 0 for item in self.iterations):
@@ -138,6 +157,14 @@ class TracePlan:
     def disabled(cls, root: str | Path) -> "TracePlan":
         return cls(root=Path(root), level="off", max_records=0, max_bytes=0)
 
+    def selection_basis(self) -> dict[str, object]:
+        """Persist the predeclared observation selection separately from records."""
+        return {
+            "level": self.level,
+            "iterations": None if self.iterations is None else sorted(self.iterations),
+            "edges": None if self.edges is None else sorted(self.edges),
+        }
+
 
 @dataclass(frozen=True)
 class TraceResult:
@@ -147,11 +174,16 @@ class TraceResult:
     bytes_written: int
     truncated: bool
     dropped_records: int
+    selection_basis: Mapping[str, object]
 
     def ledger_link(self) -> dict[str, object] | None:
         if self.sidecar_path is None:
             return None
-        return {"path": self.sidecar_path, "sha256": self.sha256, "records": self.records, "bytes": self.bytes_written, "truncated": self.truncated, "dropped_records": self.dropped_records}
+        return {
+            "path": self.sidecar_path, "sha256": self.sha256, "records": self.records,
+            "bytes": self.bytes_written, "truncated": self.truncated,
+            "dropped_records": self.dropped_records, "selection_basis": dict(self.selection_basis),
+        }
 
 
 class TraceSink:
@@ -171,6 +203,15 @@ class TraceSink:
             return True
         return ((self.plan.iterations is None or iteration in self.plan.iterations) and (self.plan.edges is None or edge in self.plan.edges))
 
+    def _document(self, records: list[dict[str, object]]) -> dict[str, object]:
+        return {
+            "trace_version": TRACE_VERSION,
+            "selection_basis": self.plan.selection_basis(),
+            "records": records,
+            "truncated": self._truncated,
+            "dropped_records": self._dropped,
+        }
+
     def observe(self, *, kind: str, payload: Mapping[str, object], iteration: int | None = None, edge: str | None = None) -> None:
         if self._finished is not None:
             raise ValueError("trace sink is already finalized")
@@ -180,6 +221,7 @@ class TraceSink:
             raise ValueError("trace iteration must be a nonnegative integer")
         if edge is not None and (not isinstance(edge, str) or not edge):
             raise ValueError("trace edge must be a nonempty string")
+        _reject_hidden_truth(payload)
         record: dict[str, object] = {"kind": kind, "payload": _canonical_value(dict(payload))}
         if iteration is not None:
             record["iteration"] = iteration
@@ -190,25 +232,83 @@ class TraceSink:
         if not self._selected(iteration, edge):
             return
         prospective = self._records + [record]
-        document = {"trace_version": TRACE_VERSION, "records": prospective, "truncated": self._truncated, "dropped_records": self._dropped}
+        document = self._document(prospective)
         if len(prospective) > self.plan.max_records or len(_json_bytes(document)) > self.plan.max_bytes:
             self._truncated = True
             self._dropped += 1
             # A cap includes the explicit overflow evidence itself. If required,
             # discard previously retained optional records to preserve that fact.
-            while self._records and len(_json_bytes({"trace_version": TRACE_VERSION, "records": self._records, "truncated": True, "dropped_records": self._dropped})) > self.plan.max_bytes:
+            while self._records and len(_json_bytes(self._document(self._records))) > self.plan.max_bytes:
                 self._records.pop()
                 self._dropped += 1
             return
         self._records.append(record)
 
+    @staticmethod
+    def _local_progress_payload(
+        *, schedule: str, atomic_unit: str, source_iteration: int,
+        completed_traversals: int, local_cursor: tuple[int, ...], missing_reason: str | None,
+    ) -> dict[str, object]:
+        if not isinstance(schedule, str) or not schedule or not isinstance(atomic_unit, str) or not atomic_unit:
+            raise ValueError("schedule trace requires nonempty schedule and atomic-unit labels")
+        if type(source_iteration) is not int or source_iteration < 0 or type(completed_traversals) is not int or completed_traversals < 0:
+            raise ValueError("schedule trace progress must use nonnegative integers")
+        if completed_traversals > source_iteration:
+            raise ValueError("schedule trace traversals cannot exceed the source iteration")
+        if not isinstance(local_cursor, tuple) or len(local_cursor) > _MAX_SCHEDULE_STATE_ITEMS or any(type(value) is not int or value < 0 for value in local_cursor):
+            raise ValueError("schedule trace cursor must be a bounded nonnegative integer tuple")
+        if missing_reason is not None and (not isinstance(missing_reason, str) or not missing_reason):
+            raise ValueError("schedule trace missingness must be explicit nonempty text")
+        return {
+            "schedule": schedule,
+            "atomic_unit": atomic_unit,
+            "source_iteration": source_iteration,
+            "completed_traversals": completed_traversals,
+            "local_cursor": list(local_cursor),
+            "missing_reason": missing_reason,
+        }
+
+    def observe_local_convergence(
+        self, *, schedule: str, atomic_unit: str, source_iteration: int,
+        completed_traversals: int, local_cursor: tuple[int, ...], converged: bool | None,
+        missing_reason: str | None,
+    ) -> None:
+        """Retain a selected local convergence fact without candidate/truth payloads."""
+        if converged is not None and type(converged) is not bool:
+            raise ValueError("local convergence must be boolean or explicitly unavailable")
+        if converged is None and missing_reason is None:
+            raise ValueError("unavailable local convergence requires explicit missingness")
+        payload = self._local_progress_payload(
+            schedule=schedule, atomic_unit=atomic_unit, source_iteration=source_iteration,
+            completed_traversals=completed_traversals, local_cursor=local_cursor,
+            missing_reason=missing_reason,
+        )
+        payload["converged"] = converged
+        self.observe(kind="local_convergence", payload=payload, iteration=source_iteration)
+
+    def observe_schedule_state(
+        self, *, schedule: str, atomic_unit: str, source_iteration: int,
+        completed_traversals: int, local_cursor: tuple[int, ...], realized_order: tuple[int, ...],
+        missing_reason: str | None,
+    ) -> None:
+        """Retain only bounded decoder-visible traversal state, never edge payloads."""
+        if not isinstance(realized_order, tuple) or len(realized_order) > _MAX_SCHEDULE_STATE_ITEMS or any(type(value) is not int or value < 0 for value in realized_order):
+            raise ValueError("schedule trace realized order must be a bounded nonnegative integer tuple")
+        payload = self._local_progress_payload(
+            schedule=schedule, atomic_unit=atomic_unit, source_iteration=source_iteration,
+            completed_traversals=completed_traversals, local_cursor=local_cursor,
+            missing_reason=missing_reason,
+        )
+        payload["realized_order"] = list(realized_order)
+        self.observe(kind="schedule_state", payload=payload, iteration=source_iteration)
+
     def finish(self) -> TraceResult:
         if self._finished is not None:
             return self._finished
         if self.plan.level == "off" or (not self._records and not self._truncated):
-            self._finished = TraceResult(None, None, 0, 0, self._truncated, self._dropped)
+            self._finished = TraceResult(None, None, 0, 0, self._truncated, self._dropped, self.plan.selection_basis())
             return self._finished
-        payload = {"trace_version": TRACE_VERSION, "records": self._records, "truncated": self._truncated, "dropped_records": self._dropped}
+        payload = self._document(self._records)
         raw = _json_bytes(payload)
         if len(raw) > self.plan.max_bytes:
             raise ValueError("trace sidecar exceeded its declared byte cap")
@@ -228,7 +328,7 @@ class TraceSink:
                 if leaf.is_symlink() or leaf.read_bytes() != raw:
                     raise ValueError("content-addressed trace sidecar conflicts with existing file")
         relative = leaf.relative_to(Path(self.plan.root).resolve(strict=True)).as_posix()
-        self._finished = TraceResult(relative, digest, len(self._records), len(raw), self._truncated, self._dropped)
+        self._finished = TraceResult(relative, digest, len(self._records), len(raw), self._truncated, self._dropped, self.plan.selection_basis())
         return self._finished
 
     @staticmethod
@@ -251,6 +351,8 @@ class TraceSink:
             decoded = json.loads(raw.decode("utf-8"))
         except (UnicodeDecodeError, json.JSONDecodeError) as error:
             raise ValueError("trace sidecar is not valid UTF-8 JSON") from error
-        if not isinstance(decoded, dict) or decoded.get("trace_version") != TRACE_VERSION or not isinstance(decoded.get("records"), list):
+        if not isinstance(decoded, dict) or decoded.get("trace_version") not in {1, TRACE_VERSION} or not isinstance(decoded.get("records"), list):
             raise ValueError("trace sidecar has invalid schema")
+        if decoded["trace_version"] == TRACE_VERSION and not isinstance(decoded.get("selection_basis"), dict):
+            raise ValueError("trace sidecar lacks explicit selection basis")
         return decoded

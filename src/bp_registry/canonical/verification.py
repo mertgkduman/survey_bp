@@ -91,6 +91,70 @@ def reconstruct_schedule_terminal(evidence: Mapping[str, Any]) -> dict[str, obje
     return terminal
 
 
+def _deterministic_schedule_terminal(evidence: Mapping[str, Any]) -> dict[str, object]:
+    """Project the replay-equality facts from a typed V3 schedule terminal.
+
+    Setup/decode timing is deliberately parsed by ``reconstruct_schedule_terminal``
+    but omitted here: it is an observational same-ledger fact, not an equality
+    claim for deterministic schedule replay.
+    """
+    terminal = reconstruct_schedule_terminal(evidence)
+    views = []
+    for view in terminal["budget_views"]:
+        assert isinstance(view, Mapping)
+        views.append({
+            "kind": view["kind"],
+            "configured_limit": view["configured_limit"],
+            "qualified_iteration": view["qualified_iteration"],
+            "work_vector": view["work_vector"],
+        })
+    return {
+        "structural_event_version": terminal["structural_event_version"],
+        "schedule": terminal["schedule"],
+        "source_iteration": terminal["source_iteration"],
+        "completed_traversals": terminal["completed_traversals"],
+        "local_cursor": terminal["local_cursor"],
+        "stopping_adaptation": terminal["stopping_adaptation"],
+        "work_vector": terminal["work_vector"],
+        "budget_views": views,
+    }
+
+
+def validate_schedule_terminal_shot(
+    events: Sequence[Mapping[str, Any]], *, run_id: str, shot_id: int,
+    expected_terminal: Mapping[str, Any], expected_deterministic_facts: Mapping[str, Any],
+) -> Mapping[str, Any]:
+    """Verify a V3 local-schedule terminal against independently derived facts.
+
+    Event IDs only authenticate the JSON bytes that were written.  This entry
+    point compares the re-executed/preflight-derived progress, work, candidate,
+    policy, and purpose-separated RNG facts, so recomputing an event hash cannot
+    turn a semantic alteration into reusable scientific evidence.
+    """
+    if type(shot_id) is not int or shot_id < 0:
+        raise CanonicalStructuralVerificationError("schedule verification requires a nonnegative shot ID")
+    stream = [
+        event for event in events
+        if event.get("run_id") == run_id and event.get("shot_id") == shot_id
+    ]
+    if len(stream) != 2 or [event.get("kind") for event in stream] != ["shot_begin", "termination"]:
+        raise CanonicalStructuralVerificationError("schedule verification requires one V3 begin/terminal pair")
+    terminal = stream[-1]
+    if terminal.get("ledger_version") != 3:
+        raise CanonicalStructuralVerificationError("schedule verification only applies to V3 schedule evidence")
+    data = terminal.get("data")
+    if not isinstance(data, Mapping) or set(data) != {"schedule_terminal", "deterministic_facts"}:
+        raise CanonicalStructuralVerificationError("schedule terminal has an invalid deterministic field grammar")
+    try:
+        actual_terminal = _deterministic_schedule_terminal(data["schedule_terminal"])
+        reconstructed_terminal = _deterministic_schedule_terminal(expected_terminal)
+    except (TypeError, ValueError, CanonicalStructuralVerificationError) as error:
+        raise CanonicalStructuralVerificationError("schedule terminal cannot be independently reconstructed") from error
+    if actual_terminal != reconstructed_terminal or data["deterministic_facts"] != dict(expected_deterministic_facts):
+        raise CanonicalStructuralVerificationError("deterministic schedule terminal differs from independent reconstruction")
+    return terminal
+
+
 def _canonical_json(value: Mapping[str, Any]) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False).encode("utf-8")
 
