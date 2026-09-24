@@ -266,7 +266,7 @@ class CanonicalWorkLimitsV2(StrictModel):
 
     @model_validator(mode="after")
     def names_match_the_canonical_work_vector(self) -> "CanonicalWorkLimitsV2":
-        if set(type(self).model_fields) != set(WorkVector.zero().as_evidence()):
+        if set(type(self).model_fields) != set(WorkVector.zero().as_evidence(structural_event_version=2)):
             raise ValueError("canonical work limit fields must exactly match WorkVector resources")
         return self
 
@@ -290,7 +290,7 @@ class CanonicalBudgetsV2(StrictModel):
     def nested_scopes_do_not_expand_the_shot_limit(self) -> "CanonicalBudgetsV2":
         if self.search.max_iterations > self.shot.max_iterations or self.attempt.max_iterations > self.search.max_iterations:
             raise ValueError("canonical nested iteration budgets may not exceed their parent scope")
-        for resource in WorkVector.zero().as_evidence():
+        for resource in WorkVector.zero().as_evidence(structural_event_version=2):
             if getattr(self.search.work_limits, resource) > getattr(self.shot.work_limits, resource):
                 raise ValueError(f"canonical search {resource} limit may not exceed its shot parent")
             if getattr(self.attempt.work_limits, resource) > getattr(self.search.work_limits, resource):

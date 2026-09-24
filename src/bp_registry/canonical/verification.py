@@ -16,7 +16,7 @@ from typing import Any, Mapping, Sequence
 import numpy as np
 
 from .. import evaluator
-from .budgets import WorkVector
+from .budgets import BudgetView, Measurement, QualifiedIteration, ScheduleTerminalEvidence, WorkVector
 from .kernel import BinarySpaKernel
 from .numerics import MIN_SUM_CPU_F64
 from .lineage import stable_lineage_id
@@ -27,6 +27,68 @@ from .updates import MinSumUpdate, NormalizedMinSumUpdate, OffsetMinSumUpdate, P
 
 class CanonicalStructuralVerificationError(ValueError):
     """Persisted canonical evidence is well-formed but not reusable."""
+
+
+def reconstruct_schedule_terminal(evidence: Mapping[str, Any]) -> dict[str, object]:
+    """Independently validate version-three schedule progress and dual budget views.
+
+    This is intentionally a grammar and arithmetic reconstruction, not a claim
+    that a C2V cap, a source iteration, or measured runtime are interchangeable.
+    """
+    required = {
+        "structural_event_version", "schedule", "source_iteration", "completed_traversals",
+        "local_cursor", "stopping_adaptation", "work_vector", "setup_runtime", "decode_runtime",
+        "budget_views",
+    }
+    if not isinstance(evidence, Mapping) or set(evidence) != required:
+        raise CanonicalStructuralVerificationError("schedule terminal has an invalid exact field set")
+    if evidence["structural_event_version"] != 3:
+        raise CanonicalStructuralVerificationError("schedule terminal must use structural event version 3")
+    try:
+        work = WorkVector.from_evidence(evidence["work_vector"], structural_event_version=3)
+        source_iteration = QualifiedIteration.from_evidence(evidence["source_iteration"])
+        setup_runtime = Measurement(**evidence["setup_runtime"])
+        decode_runtime = Measurement(**evidence["decode_runtime"])
+    except (TypeError, ValueError) as error:
+        raise CanonicalStructuralVerificationError("schedule terminal contains invalid typed facts") from error
+    views = evidence["budget_views"]
+    if not isinstance(views, list) or len(views) != 2:
+        raise CanonicalStructuralVerificationError("schedule terminal requires two budget views")
+    parsed_views: list[BudgetView] = []
+    view_fields = {"kind", "configured_limit", "qualified_iteration", "work_vector", "setup_runtime", "decode_runtime"}
+    for view in views:
+        if not isinstance(view, Mapping) or set(view) != view_fields:
+            raise CanonicalStructuralVerificationError("budget view has an invalid exact field set")
+        if view["work_vector"] != work.as_evidence() or view["setup_runtime"] != setup_runtime.as_evidence() or view["decode_runtime"] != decode_runtime.as_evidence():
+            raise CanonicalStructuralVerificationError("budget views must retain the complete shared work and runtime facts")
+        try:
+            if view["kind"] == "common_check_to_variable_cap":
+                parsed = BudgetView.common_c2v_cap(view["configured_limit"])
+                if view["qualified_iteration"] is not None or work.check_to_variable_updates > parsed.configured_limit:
+                    raise ValueError("invalid common C2V cap evidence")
+            elif view["kind"] == "schedule_qualified_iteration_limit":
+                qualified = QualifiedIteration.from_evidence(view["qualified_iteration"])
+                parsed = BudgetView.schedule_iteration_limit(qualified)
+                if qualified.schedule != evidence["schedule"] or parsed.configured_limit != view["configured_limit"]:
+                    raise ValueError("invalid schedule-qualified iteration evidence")
+            else:
+                raise ValueError("unknown budget view")
+        except (TypeError, ValueError) as error:
+            raise CanonicalStructuralVerificationError("budget view is not independently reconstructable") from error
+        parsed_views.append(parsed)
+    try:
+        terminal = ScheduleTerminalEvidence(
+            schedule=evidence["schedule"], source_iteration=source_iteration,
+            completed_traversals=evidence["completed_traversals"],
+            local_cursor=tuple(evidence["local_cursor"]), stopping_adaptation=evidence["stopping_adaptation"],
+            work=work, setup_runtime=setup_runtime, decode_runtime=decode_runtime,
+            budget_views=tuple(parsed_views),
+        ).as_evidence()
+    except (TypeError, ValueError) as error:
+        raise CanonicalStructuralVerificationError("schedule terminal progress facts are invalid") from error
+    if terminal != dict(evidence):
+        raise CanonicalStructuralVerificationError("schedule terminal differs from independently reconstructed evidence")
+    return terminal
 
 
 def _canonical_json(value: Mapping[str, Any]) -> bytes:
@@ -124,7 +186,7 @@ def _expected_attempt(context: PublicShotContext) -> dict[str, Any]:
     bp_call = WorkVector(bp_calls=1)
     denial = _budget_denial(limits, zero, bp_call)
     if denial is not None:
-        return {"termination": "count_budget_exhausted", "work_vector": zero.as_evidence(), "iterations": 0, "budget_termination": denial, "admitted": False}
+        return {"termination": "count_budget_exhausted", "work_vector": zero.as_evidence(structural_event_version=2), "iterations": 0, "budget_termination": denial, "admitted": False}
     work = bp_call
     table = EdgeTable.from_check_matrix(code.hz)
     if context.update_kind == "min_sum":
@@ -165,19 +227,19 @@ def _expected_attempt(context: PublicShotContext) -> dict[str, Any]:
     if table.edge_count == 0:
         candidate = kernel.candidate_from_beliefs(np.full(code.n, kernel.prior(context.error_rate), dtype=np.float64))
         converged = bool(np.array_equal((code.hz.astype(np.int64) @ candidate.astype(np.int64)) % 2, context.syndrome))
-        return {"termination": "completed" if converged else "max_iterations", "work_vector": work.as_evidence(), "iterations": 0, "candidate": candidate, "admitted": True}
+        return {"termination": "completed" if converged else "max_iterations", "work_vector": work.as_evidence(structural_event_version=2), "iterations": 0, "candidate": candidate, "admitted": True}
     state = schedule.initialize(context.error_rate)
     for iteration in range(1, context.max_iterations + 1):
         delta = WorkVector.from_flooding_counts(edge_count=table.edge_count, variable_count=table.variable_count)
         denial = _budget_denial(limits, work, delta)
         if denial is not None:
-            return {"termination": "count_budget_exhausted", "work_vector": work.as_evidence(), "iterations": iteration - 1, "budget_termination": denial, "admitted": True}
+            return {"termination": "count_budget_exhausted", "work_vector": work.as_evidence(structural_event_version=2), "iterations": iteration - 1, "budget_termination": denial, "admitted": True}
         proposed = work + delta
         sweep = schedule.sweep(state, np.asarray(context.syndrome, dtype=np.uint8), error_rate=context.error_rate)
         state, work = sweep.new_v2c, proposed
         if np.array_equal((code.hz.astype(np.int64) @ sweep.candidate.astype(np.int64)) % 2, context.syndrome):
-            return {"termination": "completed", "work_vector": work.as_evidence(), "iterations": iteration, "candidate": sweep.candidate, "admitted": True}
-    return {"termination": "max_iterations", "work_vector": work.as_evidence(), "iterations": context.max_iterations, "admitted": True}
+            return {"termination": "completed", "work_vector": work.as_evidence(structural_event_version=2), "iterations": iteration, "candidate": sweep.candidate, "admitted": True}
+    return {"termination": "max_iterations", "work_vector": work.as_evidence(structural_event_version=2), "iterations": context.max_iterations, "admitted": True}
 
 
 def _expect_equal(field: str, actual: Any, expected: Any) -> None:
@@ -332,7 +394,7 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
             raise CanonicalStructuralVerificationError("numerical failure requires a typed diagnostic")
         if data["selection_status"] != "unavailable_due_to_numerical_failure" or data["verification_status"] != "not_independently_reproduced_numerical_failure" or data["outcome"] is not None:
             raise CanonicalStructuralVerificationError("numerical failure terminal qualification is invalid")
-        expected_work = WorkVector(bp_calls=1).as_evidence()
+        expected_work = WorkVector(bp_calls=1).as_evidence(structural_event_version=2)
         _expect_equal("work_vector", work_data["work_vector"], expected_work)
         _expect_equal("work_vector", data["work_vector"], expected_work)
         _expect_equal("qualified_iterations", work_data["qualified_iterations"], {"count": 0, "schedule": "flooding", "atomic_unit": "complete_double_buffered_sweep"})

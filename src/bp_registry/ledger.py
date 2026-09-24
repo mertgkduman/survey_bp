@@ -20,6 +20,7 @@ except ImportError as error:  # pragma: no cover - Phase 1 targets POSIX HPC hos
 
 LEDGER_VERSION = 1
 CANONICAL_LEDGER_VERSION = 2
+CANONICAL_SCHEDULE_LEDGER_VERSION = 3
 ShotKey = tuple[str, int]
 
 
@@ -399,7 +400,7 @@ def _canonical_event_bytes(event: Mapping[str, Any]) -> bytes:
 
 
 def _validate_canonical_event(event: Mapping[str, Any]) -> None:
-    if event.get("ledger_version") != CANONICAL_LEDGER_VERSION:
+    if event.get("ledger_version") not in {CANONICAL_LEDGER_VERSION, CANONICAL_SCHEDULE_LEDGER_VERSION}:
         raise ValueError("unsupported canonical ledger version")
     if event.get("kind") not in _CANONICAL_EVENT_KINDS:
         raise ValueError("unknown canonical structural event kind")
@@ -432,7 +433,7 @@ def _canonical_event_id(event: Mapping[str, Any]) -> str:
 
 
 def read_canonical_events(path: str | Path) -> list[dict[str, Any]]:
-    """Read validated v2 structural evidence without weakening v1 validation."""
+    """Read validated v2/V3 structural evidence without weakening v1 validation."""
     journal = Path(path)
     if not journal.exists():
         return []
@@ -487,14 +488,17 @@ def query_canonical_events(
 
 
 class CanonicalEventWriter:
-    """Durably append sparse v2 control-flow facts for canonical CSS shots."""
+    """Durably append sparse versioned control-flow facts for canonical CSS shots."""
 
-    def __init__(self, path: str | Path):
+    def __init__(self, path: str | Path, *, structural_event_version: int = CANONICAL_LEDGER_VERSION):
+        if structural_event_version not in {CANONICAL_LEDGER_VERSION, CANONICAL_SCHEDULE_LEDGER_VERSION}:
+            raise ValueError("unsupported canonical structural event version")
         self.path = Path(path)
+        self.structural_event_version = structural_event_version
         self._owners: dict[ShotKey, Any] = {}
 
     def _append(self, event: dict[str, Any]) -> None:
-        event["ledger_version"] = CANONICAL_LEDGER_VERSION
+        event["ledger_version"] = self.structural_event_version
         event["event_id"] = _canonical_event_id(event)
         _validate_canonical_event(event)
         key = _key(event["run_id"], event["shot_id"])

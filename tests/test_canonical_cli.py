@@ -974,7 +974,7 @@ def test_public_budget_schema_uses_exact_work_resources():
     from bp_registry.manifests import CanonicalExperimentV2
 
     manifest = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text(encoding="utf-8"))
-    expected_resources = set(WorkVector.zero().as_evidence())
+    expected_resources = set(WorkVector.zero().as_evidence(structural_event_version=2))
     schema = CanonicalExperimentV2.model_json_schema()
     scope_schema = schema["$defs"]["CanonicalBudgetScopeV2"]["properties"]
     assert "max_work_units" not in scope_schema

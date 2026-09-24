@@ -6,7 +6,7 @@ from dataclasses import dataclass, fields
 import math
 import numbers
 from threading import RLock
-from typing import Callable, Iterable, Mapping
+from typing import Callable, ClassVar, Iterable, Mapping
 
 
 _MAX_COUNT = (1 << 63) - 1
@@ -37,6 +37,13 @@ class WorkVector:
     branch_prunes: int = 0
     relay_transfers: int = 0
     fallback_calls: int = 0
+
+    _V2_FIELDS: ClassVar[tuple[str, ...]] = (
+        "check_to_variable_updates", "variable_to_check_updates", "belief_assemblies",
+        "residual_priority_evaluations", "bp_calls", "candidate_checks",
+        "intervention_actions", "branch_expansions", "branch_prunes", "relay_transfers",
+        "fallback_calls",
+    )
 
     def __post_init__(self) -> None:
         for item in fields(self):
@@ -72,8 +79,27 @@ class WorkVector:
             return NotImplemented
         return WorkVector(**{item.name: getattr(self, item.name) + getattr(other, item.name) for item in fields(self)})
 
-    def as_evidence(self) -> dict[str, int]:
-        return {item.name: getattr(self, item.name) for item in fields(self)}
+    def as_evidence(self, *, structural_event_version: int = 3) -> dict[str, int]:
+        """Serialize the full V3 vector or the byte-stable V2 field grammar."""
+        if structural_event_version == 2:
+            names = self._V2_FIELDS
+        elif structural_event_version == 3:
+            names = tuple(item.name for item in fields(self))
+        else:
+            raise ValueError("unsupported structural event version")
+        return {name: getattr(self, name) for name in names}
+
+    @classmethod
+    def from_evidence(cls, evidence: Mapping[str, object], *, structural_event_version: int) -> "WorkVector":
+        if not isinstance(evidence, Mapping):
+            raise ValueError("work evidence must be a mapping")
+        names = cls._V2_FIELDS if structural_event_version == 2 else tuple(item.name for item in fields(cls)) if structural_event_version == 3 else ()
+        if not names or set(evidence) != set(names):
+            raise ValueError("work evidence has an invalid versioned field set")
+        values = {name: evidence[name] for name in names}
+        if structural_event_version == 2:
+            values = {**cls.zero().as_evidence(), **values}
+        return cls(**values)
 
 
 @dataclass(frozen=True, slots=True)
@@ -93,6 +119,105 @@ class QualifiedIteration:
 
     def as_evidence(self) -> dict[str, int | str]:
         return {"count": self.count, "schedule": self.schedule, "atomic_unit": self.atomic_unit}
+
+    @classmethod
+    def from_evidence(cls, evidence: Mapping[str, object]) -> "QualifiedIteration":
+        if not isinstance(evidence, Mapping) or set(evidence) != {"count", "schedule", "atomic_unit"}:
+            raise ValueError("qualified iteration evidence has an invalid field set")
+        return cls(evidence["count"], schedule=evidence["schedule"], atomic_unit=evidence["atomic_unit"])
+
+
+@dataclass(frozen=True, slots=True)
+class BudgetView:
+    """One declared cap view; neither view converts itself into universal cost."""
+
+    kind: str
+    configured_limit: int
+    qualified_iteration: QualifiedIteration | None = None
+
+    def __post_init__(self) -> None:
+        if self.kind not in {"common_check_to_variable_cap", "schedule_qualified_iteration_limit"}:
+            raise ValueError("budget view kind is not supported")
+        if isinstance(self.configured_limit, bool) or not isinstance(self.configured_limit, numbers.Integral) or self.configured_limit < 0:
+            raise ValueError("budget view configured_limit must be nonnegative")
+        if (self.kind == "common_check_to_variable_cap") != (self.qualified_iteration is None):
+            raise ValueError("only schedule-qualified iteration views carry a qualified iteration")
+        object.__setattr__(self, "configured_limit", int(self.configured_limit))
+
+    @classmethod
+    def common_c2v_cap(cls, configured_limit: int) -> "BudgetView":
+        return cls("common_check_to_variable_cap", configured_limit)
+
+    @classmethod
+    def schedule_iteration_limit(cls, qualified_iteration: QualifiedIteration) -> "BudgetView":
+        if not isinstance(qualified_iteration, QualifiedIteration):
+            raise ValueError("schedule iteration limit requires QualifiedIteration")
+        return cls("schedule_qualified_iteration_limit", qualified_iteration.count, qualified_iteration)
+
+    def as_evidence(self, *, work: WorkVector, setup_runtime: "Measurement", decode_runtime: "Measurement") -> dict[str, object]:
+        return {
+            "kind": self.kind,
+            "configured_limit": self.configured_limit,
+            "qualified_iteration": None if self.qualified_iteration is None else self.qualified_iteration.as_evidence(),
+            "work_vector": work.as_evidence(),
+            "setup_runtime": setup_runtime.as_evidence(),
+            "decode_runtime": decode_runtime.as_evidence(),
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class ScheduleTerminalEvidence:
+    """Version-three terminal facts for schedule-local execution and partial work."""
+
+    schedule: str
+    source_iteration: QualifiedIteration
+    completed_traversals: int
+    local_cursor: tuple[int, ...]
+    stopping_adaptation: str
+    work: WorkVector
+    setup_runtime: "Measurement"
+    decode_runtime: "Measurement"
+    budget_views: tuple[BudgetView, ...]
+    structural_event_version: int = 3
+
+    def __post_init__(self) -> None:
+        if self.structural_event_version != 3:
+            raise ValueError("schedule terminal evidence requires structural event version 3")
+        if not isinstance(self.schedule, str) or not self.schedule:
+            raise ValueError("schedule terminal requires a schedule")
+        if not isinstance(self.source_iteration, QualifiedIteration) or self.source_iteration.schedule != self.schedule:
+            raise ValueError("source iteration must qualify the terminal schedule")
+        if isinstance(self.completed_traversals, bool) or not isinstance(self.completed_traversals, numbers.Integral) or self.completed_traversals < 0:
+            raise ValueError("completed traversals must be nonnegative")
+        if self.completed_traversals > self.source_iteration.count:
+            raise ValueError("completed traversals cannot exceed the qualified source iteration")
+        if not isinstance(self.local_cursor, tuple) or any(isinstance(item, bool) or not isinstance(item, numbers.Integral) or item < 0 for item in self.local_cursor):
+            raise ValueError("local cursor must contain nonnegative integers")
+        if not isinstance(self.stopping_adaptation, str) or not self.stopping_adaptation:
+            raise ValueError("schedule terminal requires stopping adaptation evidence")
+        if not isinstance(self.work, WorkVector) or not isinstance(self.setup_runtime, Measurement) or not isinstance(self.decode_runtime, Measurement):
+            raise ValueError("schedule terminal has invalid work or runtime facts")
+        if {view.kind for view in self.budget_views} != {"common_check_to_variable_cap", "schedule_qualified_iteration_limit"}:
+            raise ValueError("schedule terminal requires exactly the two declared budget views")
+        object.__setattr__(self, "completed_traversals", int(self.completed_traversals))
+        object.__setattr__(self, "local_cursor", tuple(int(item) for item in self.local_cursor))
+
+    def as_evidence(self) -> dict[str, object]:
+        return {
+            "structural_event_version": self.structural_event_version,
+            "schedule": self.schedule,
+            "source_iteration": self.source_iteration.as_evidence(),
+            "completed_traversals": self.completed_traversals,
+            "local_cursor": list(self.local_cursor),
+            "stopping_adaptation": self.stopping_adaptation,
+            "work_vector": self.work.as_evidence(),
+            "setup_runtime": self.setup_runtime.as_evidence(),
+            "decode_runtime": self.decode_runtime.as_evidence(),
+            "budget_views": [
+                view.as_evidence(work=self.work, setup_runtime=self.setup_runtime, decode_runtime=self.decode_runtime)
+                for view in self.budget_views
+            ],
+        }
 
 
 @dataclass(frozen=True, slots=True)
