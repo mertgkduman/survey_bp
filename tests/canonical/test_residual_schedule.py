@@ -245,12 +245,22 @@ def test_e_selections_form_one_source_iteration_without_rounding_partial_progres
     cache = schedule.initialize(v2c, c2v, syndrome, error_rate=0.1)
     executor = CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt")
     progress = ScheduleProgress(0, 0)
+    reference_v2c = v2c.copy()
+    reference_c2v = c2v.copy()
+    reference_cache = cache.values.copy()
     for expected_steps in range(1, table.edge_count + 1):
+        expected_selected, reference_v2c, reference_c2v, reference_cache = _reference_lifecycle_step(
+            table, kernel, reference_v2c, reference_c2v, reference_cache, syndrome, error_rate=0.1,
+        )
         proposal = schedule.propose_local_step(v2c, c2v, cache, syndrome, error_rate=0.1)
         result = schedule.execute_local_step(
             executor, proposal, v2c=v2c, c2v=c2v, cache=cache, progress=progress, is_converged=lambda _candidate: False,
         )
         cache, c2v, progress = result.cache, result.c2v, result.progress
+        assert result.selection.index == expected_selected
+        np.testing.assert_allclose(v2c, reference_v2c)
+        np.testing.assert_allclose(c2v, reference_c2v)
+        np.testing.assert_allclose(cache.values, reference_cache)
         assert progress.local_steps == expected_steps
         assert progress.iteration == expected_steps // table.edge_count
         assert progress.cursor == (expected_steps % table.edge_count,)
