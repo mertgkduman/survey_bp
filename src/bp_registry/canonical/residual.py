@@ -272,7 +272,6 @@ class SyndromeResidualSchedule:
         is_converged: Callable[[np.ndarray], bool],
     ) -> ResidualStepResult:
         """Commit exactly one selected edge, its dependent V2C updates, and one check."""
-        del cache  # The immutable cache replacement is carried by the proposal computation.
         result = executor.execute(
             proposal.local_step,
             messages=v2c,

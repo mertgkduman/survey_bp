@@ -135,7 +135,79 @@ def test_source_lifecycle_matches_independent_full_cache_oracle_and_preserves_se
     np.testing.assert_allclose(result.c2v, expected_c2v)
     np.testing.assert_allclose(result.cache.values, expected_cache)
     assert result.cache.values[selected] == 0.0
-    assert result.decode_work if hasattr(result, "decode_work") else proposal.decode_work.priority_comparisons == table.edge_count - 1
+    assert proposal.decode_work.priority_comparisons == table.edge_count - 1
+    assert proposal.decode_work.residual_precomputations == len(proposal.invalidated_indices)
+    assert proposal.decode_work.residual_differences == len(proposal.invalidated_indices)
+
+
+def test_selected_residual_remains_zero_until_a_later_dependency_update_invalidates_it():
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.execution import CanonicalLocalStepExecutor, ScheduleProgress
+
+    residual = _residual_module()
+    table, kernel, v2c, c2v, syndrome = _irregular_fixture()
+    # Keep c0/v0 first, then make c2/v1 the next source-cache selection.
+    v2c[6] = 8.0
+    c2v[0] = -0.3
+    c2v[4] = 4.7
+    c2v[5] = 5.2
+    schedule = residual.SyndromeResidualSchedule(table, kernel=kernel)
+    cache = schedule.initialize(v2c, c2v, syndrome, error_rate=0.1)
+    executor = CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt")
+
+    first = schedule.execute_local_step(
+        executor, schedule.propose_local_step(v2c, c2v, cache, syndrome, error_rate=0.1),
+        v2c=v2c, c2v=c2v, cache=cache, progress=ScheduleProgress(0, 0), is_converged=lambda _candidate: False,
+    )
+    assert first.selection.index == 0
+    assert first.cache.values[0] == 0.0
+    stateless = abs(schedule._prediction(v2c, syndrome, 0) - first.c2v[0])
+    assert stateless > 0.0
+
+    second_proposal = schedule.propose_local_step(v2c, first.c2v, first.cache, syndrome, error_rate=0.1)
+    assert second_proposal.selection.index == 5
+    assert 0 in second_proposal.invalidated_indices
+    second = schedule.execute_local_step(
+        executor, second_proposal,
+        v2c=v2c, c2v=first.c2v, cache=first.cache, progress=first.progress, is_converged=lambda _candidate: False,
+    )
+    assert second.cache.values[0] > 0.0
+
+
+@pytest.mark.parametrize(
+    "edges",
+    [
+        [(0, 0), (0, 1), (1, 0), (1, 2), (2, 1), (2, 2)],
+        [(0, 0), (0, 2), (1, 1), (1, 2), (2, 0), (2, 1), (2, 3)],
+    ],
+)
+def test_small_irregular_graphs_match_the_independent_source_lifecycle_oracle(edges):
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.execution import CanonicalLocalStepExecutor, ScheduleProgress
+    from bp_registry.canonical.kernel import BinarySpaKernel
+    from bp_registry.canonical.schedules import EdgeTable
+
+    residual = _residual_module()
+    table = EdgeTable.from_edges(3, 4, edges)
+    rng = np.random.default_rng(20260924 + table.edge_count)
+    v2c = rng.uniform(0.2, 4.0, size=table.edge_count)
+    c2v = rng.uniform(-1.0, 1.0, size=table.edge_count)
+    syndrome = np.asarray([0, 1, 0], dtype=np.uint8)
+    kernel = BinarySpaKernel()
+    schedule = residual.SyndromeResidualSchedule(table, kernel=kernel)
+    cache = schedule.initialize(v2c, c2v, syndrome, error_rate=0.1)
+    selected, expected_v2c, expected_c2v, expected_cache = _reference_lifecycle_step(
+        table, kernel, v2c, c2v, cache.values, syndrome, error_rate=0.1,
+    )
+    proposal = schedule.propose_local_step(v2c, c2v, cache, syndrome, error_rate=0.1)
+    result = schedule.execute_local_step(
+        CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt"), proposal,
+        v2c=v2c, c2v=c2v, cache=cache, progress=ScheduleProgress(0, 0), is_converged=lambda _candidate: False,
+    )
+    assert result.selection.index == selected
+    np.testing.assert_allclose(v2c, expected_v2c)
+    np.testing.assert_allclose(result.c2v, expected_c2v)
+    np.testing.assert_allclose(result.cache.values, expected_cache)
 
 
 def test_denied_local_bundle_preserves_messages_cache_progress_and_budget_leaves():
