@@ -1,10 +1,9 @@
 {
-  "command": "PYTHONPATH=\"$PWD/src\" OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_manifest.py tests/test_canonical_cli.py -k 'public_schedule_matrix or noncluster_spa_schedules_round_trip'",
-  "exit_code": 1,
-  "failing_tests": [
-    "test_v3_public_schedule_matrix_admits_only_the_implemented_spa_local_schedules",
-    "test_public_noncluster_spa_schedules_round_trip_and_reconstruct"
-  ],
+  "command": "PYTHONPATH=$PWD/src OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q 'tests/test_manifest.py::test_v3_public_schedule_matrix_admits_only_the_implemented_spa_local_schedules[check_node_serial]'",
+  "exitCode": 1,
+  "output": "not ok 1 - test_v3_public_schedule_matrix_admits_only_the_implemented_spa_local_schedules[check_node_serial]\n  ---\n  framework: pytest\n  assertion: every directly implemented noncluster local policy has a strict V3 route\n  actual: unknown policy kind 'check_node_serial'\n  ...\n# tests 1\n# pass 0\n# fail 1\n",
+  "targetTest": "test_v3_public_schedule_matrix_admits_only_the_implemented_spa_local_schedules[check_node_serial]",
+  "targetFile": "tests/test_manifest.py",
   "expected": "V3 public contracts admit and round-trip every directly implemented noncluster SPA schedule while rejecting incompatible min-sum/local pairs.",
   "actual": "The closed V3 registry rejected check_node_serial, variable_node_serial, residual, and randomized schedule kinds before public preflight."
 }
