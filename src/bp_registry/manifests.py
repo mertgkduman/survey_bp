@@ -17,6 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 from .artifacts import LoadedArtifact, load_artifact
 from .canonical.budgets import WorkVector
+from .canonical.cluster_schedule import ClusterArtifactQualification, ClusterArtifactSpec, load_cluster_artifact
 from .canonical.contracts import CanonicalCompositionSpec, CanonicalCompositionSpecV3, CanonicalManifestV2, parse_canonical_manifest
 from .css import CssCode, fixture_code
 
@@ -613,3 +614,19 @@ def manifest_digest(manifest: ManifestRecord) -> str:
         manifest.model_dump(mode="json"), sort_keys=True, separators=(",", ":")
     )
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def qualify_cluster_artifact(
+    value: dict[str, Any] | str | Path, *, approved_root: str | Path
+) -> ClusterArtifactQualification:
+    """Public preflight for a non-executable, externally supplied cluster artifact.
+
+    The root is supplied independently of the serialized specification so a report
+    binds source bytes and compatibility facts without treating a local path as
+    source evidence.  The result is deliberately not a canonical experiment and
+    cannot enter sampling or schedule execution.
+    """
+    decoded = _read_value(value)
+    if "approved_root" in decoded:
+        raise ValueError("cluster artifact specification must not serialize its approved root")
+    return load_cluster_artifact(ClusterArtifactSpec.from_mapping({**decoded, "approved_root": str(approved_root)}))
