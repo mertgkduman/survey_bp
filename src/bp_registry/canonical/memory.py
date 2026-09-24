@@ -28,7 +28,8 @@ def _finite_matrix(value: np.ndarray, *, name: str) -> np.ndarray:
 
 def _coefficient(value: float, *, name: str, upper_inclusive: bool) -> float:
     if not isinstance(value, float) or not math.isfinite(value) or value < 0.0 or value > 1.0:
-        raise ValueError(f"{name} must be a finite value in [0, 1{' ]' if upper_inclusive else ')'}")
+        bracket = "]" if upper_inclusive else ")"
+        raise ValueError(f"{name} must be a finite value in [0, 1{bracket}")
     if not upper_inclusive and value == 1.0:
         raise ValueError(f"{name} must be a finite value in [0, 1)")
     return value
@@ -221,6 +222,94 @@ class PDPrimeDeltaMix:
 
 
 @dataclass(frozen=True, slots=True)
+class PosteriorMomentumState:
+    """Chen's retained posterior ``Q`` and velocity ``g`` at one binding."""
+
+    binding_id: str
+    posterior: np.ndarray
+    velocity: np.ndarray
+
+
+@dataclass(frozen=True, slots=True)
+class PosteriorMomentumProposal:
+    """A pure Chen momentum update and its next owned history."""
+
+    binding_id: str
+    posterior: np.ndarray
+    velocity: np.ndarray
+
+
+@dataclass(frozen=True, slots=True)
+class PosteriorMomentum:
+    """Chen posterior momentum with an explicit original-C2V extrinsic step."""
+
+    binding_id: str
+    alpha: float
+    gamma: float
+    target: str = "belief"
+    advance_boundary: str = "source_iteration"
+    registered_name: str = "chen-posterior-momentum-v1"
+    fidelity: str = "gf4_source_scalar_llr_css_adaptation"
+
+    def __post_init__(self) -> None:
+        if not self.binding_id:
+            raise ValueError("memory binding_id must be nonempty")
+        if not isinstance(self.alpha, float) or not math.isfinite(self.alpha) or not 0.0 < self.alpha <= 1.0:
+            raise ValueError("momentum alpha must be a finite value in (0, 1]")
+        _coefficient(self.gamma, name="momentum gamma", upper_inclusive=False)
+        if self.target != "belief":
+            raise ValueError("posterior momentum may target only belief")
+        if self.advance_boundary not in {"local_update", "source_iteration"}:
+            raise ValueError("momentum requires a declared local_update or source_iteration boundary")
+
+    def initial_state(self, prior: np.ndarray | tuple[float, ...]) -> PosteriorMomentumState:
+        posterior = _finite_vector(prior, name="prior")
+        return PosteriorMomentumState(self.binding_id, posterior, _finite_vector(np.zeros_like(posterior), name="initial_velocity"))
+
+    def propose(
+        self, state: PosteriorMomentumState, fresh_posterior: np.ndarray | tuple[float, ...], *, boundary: str,
+    ) -> PosteriorMomentumProposal:
+        _boundary(boundary, expected=self.advance_boundary)
+        if state.binding_id != self.binding_id:
+            raise ValueError("momentum may use only its own state")
+        previous = _finite_vector(state.posterior, name="previous_posterior")
+        velocity = _finite_vector(state.velocity, name="previous_velocity")
+        fresh = _finite_vector(fresh_posterior, name="fresh_posterior")
+        if previous.shape != velocity.shape or previous.shape != fresh.shape:
+            raise ValueError("momentum posterior, velocity, and fresh_posterior must have the same shape")
+        next_velocity = self.gamma * velocity + (1.0 - self.gamma) * (previous - fresh)
+        next_posterior = previous - self.alpha * next_velocity
+        return PosteriorMomentumProposal(
+            self.binding_id,
+            _finite_vector(next_posterior, name="momentum_posterior"),
+            _finite_vector(next_velocity, name="momentum_velocity"),
+        )
+
+    def v2c_extrinsic(
+        self, posterior: np.ndarray | tuple[float, ...], original_current_c2v: np.ndarray | tuple[float, ...],
+    ) -> np.ndarray:
+        """Subtract the unsmoothed current C2V contribution required by Algorithm 1."""
+        belief = _finite_vector(posterior, name="posterior")
+        c2v = _finite_vector(original_current_c2v, name="original_current_c2v")
+        if belief.shape != c2v.shape:
+            raise ValueError("posterior and original_current_c2v must have the same shape")
+        return _finite_vector(belief - c2v, name="momentum_v2c")
+
+    def commit(
+        self, proposal: PosteriorMomentumProposal, state: PosteriorMomentumState | None = None,
+    ) -> PosteriorMomentumState:
+        if proposal.binding_id != self.binding_id:
+            raise ValueError("momentum may commit only its own proposal")
+        if state is not None and state.binding_id != self.binding_id:
+            raise ValueError("momentum may not overwrite another binding's state")
+        return PosteriorMomentumState(self.binding_id, proposal.posterior, proposal.velocity)
+
+    def reset(self, prior: np.ndarray | tuple[float, ...]) -> PosteriorMomentumState:
+        """Reset a new attempt or Relay leg to ``Q0=prior`` and ``g0=0``."""
+        return self.initial_state(prior)
+
+
+@dataclass(frozen=True, slots=True)
 class MemoryState:
     """Committed decoder-visible posterior history owned by one memory binding."""
 
@@ -243,12 +332,17 @@ class AffinePriorMemory:
 
     binding_id: str
     alpha: float
+    target: str = "prior"
+    advance_boundary: str = "source_iteration"
+    registered_name: str = "affine-prior-memory-primitive-v1"
 
     def __post_init__(self) -> None:
         if not self.binding_id:
             raise ValueError("memory binding_id must be nonempty")
         if not isinstance(self.alpha, float) or not math.isfinite(self.alpha) or not 0.0 <= self.alpha <= 1.0:
             raise ValueError("affine prior alpha must be a finite value in [0, 1]")
+        if self.target != "prior" or self.advance_boundary != "source_iteration":
+            raise ValueError("the affine prior primitive targets prior at the source_iteration boundary")
 
     def propose(self, base_prior: np.ndarray | tuple[float, ...], previous_posterior: np.ndarray | tuple[float, ...]) -> MemoryProposal:
         base = _finite_vector(base_prior, name="base_prior")
@@ -264,3 +358,77 @@ class AffinePriorMemory:
         if state is not None and state.binding_id != self.binding_id:
             raise ValueError("a memory binding may not overwrite another binding's state")
         return MemoryState(self.binding_id, proposal.posterior)
+
+
+@dataclass(frozen=True, slots=True)
+class EWAInitPriorMemory:
+    """Chen EWAInit source alias over the common affine prior primitive."""
+
+    binding_id: str
+    alpha: float
+    target: str = "prior"
+    advance_boundary: str = "source_iteration"
+    state_lifetime: str = "attempt"
+    registered_name: str = "ewa-prior-memory-v1"
+    fidelity: str = "source_equation_css_adaptation"
+
+    def __post_init__(self) -> None:
+        _coefficient(self.alpha, name="EWAInit alpha", upper_inclusive=True)
+        if not self.binding_id or self.target != "prior" or self.advance_boundary != "source_iteration":
+            raise ValueError("EWAInit requires a binding and the source prior/source_iteration target")
+
+    @property
+    def primitive(self) -> AffinePriorMemory:
+        return AffinePriorMemory(self.binding_id, 1.0 - self.alpha)
+
+    def initial_state(self, prior0: np.ndarray | tuple[float, ...]) -> MemoryState:
+        return MemoryState(self.binding_id, _finite_vector(prior0, name="prior0"))
+
+    def propose(
+        self, prior0: np.ndarray | tuple[float, ...], previous_posterior: np.ndarray | tuple[float, ...], *, boundary: str,
+    ) -> MemoryProposal:
+        _boundary(boundary, expected=self.advance_boundary)
+        return self.primitive.propose(prior0, previous_posterior)
+
+    def commit(self, proposal: MemoryProposal, state: MemoryState | None = None) -> MemoryState:
+        return self.primitive.commit(proposal, state)
+
+    def reset(self, prior0: np.ndarray | tuple[float, ...]) -> MemoryState:
+        return self.initial_state(prior0)
+
+
+@dataclass(frozen=True, slots=True)
+class RelayAffinePriorMemory:
+    """Relay Mem-BP source alias over the same affine prior primitive."""
+
+    binding_id: str
+    gamma: float
+    target: str = "prior"
+    advance_boundary: str = "source_iteration"
+    state_lifetime: str = "leg"
+    registered_name: str = "relay-affine-prior-memory-v1"
+    fidelity: str = "source_equation_css_adaptation"
+
+    def __post_init__(self) -> None:
+        _coefficient(self.gamma, name="Relay gamma", upper_inclusive=True)
+        if not self.binding_id or self.target != "prior" or self.advance_boundary != "source_iteration":
+            raise ValueError("Relay affine memory requires a binding and the source prior/source_iteration target")
+
+    @property
+    def primitive(self) -> AffinePriorMemory:
+        return AffinePriorMemory(self.binding_id, self.gamma)
+
+    def initial_state(self, initial_posterior: np.ndarray | tuple[float, ...]) -> MemoryState:
+        return MemoryState(self.binding_id, _finite_vector(initial_posterior, name="initial_posterior"))
+
+    def propose(
+        self, prior0: np.ndarray | tuple[float, ...], previous_posterior: np.ndarray | tuple[float, ...], *, boundary: str,
+    ) -> MemoryProposal:
+        _boundary(boundary, expected=self.advance_boundary)
+        return self.primitive.propose(prior0, previous_posterior)
+
+    def commit(self, proposal: MemoryProposal, state: MemoryState | None = None) -> MemoryState:
+        return self.primitive.commit(proposal, state)
+
+    def reset(self, initial_posterior: np.ndarray | tuple[float, ...]) -> MemoryState:
+        return self.initial_state(initial_posterior)
