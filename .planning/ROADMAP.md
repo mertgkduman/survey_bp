@@ -174,7 +174,64 @@ Plans:
 5. Researchers can run matched pilot comparisons of supported update/schedule combinations with raw work counters and explicit rejection of undefined combinations.
 
 **Research focus:** Source definitions for offset min-sum and cluster sequencing, residual/cache semantics, and intervention-sensitive schedule state.
-**Plans:** TBD
+**Plans:** 17 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 03-01-PLAN.md — Complete public min-sum tracer and schedule-neutral atomic local-step engine
+- [ ] 03-07-PLAN.md — Exact B1, generated (3,4) Gallager HGP, and BB-144 reuse
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 03-02-PLAN.md — Public normalized min-sum plus generated schema and documentation
+- [ ] 03-03-PLAN.md — Layered, CN/VN serial, and randomized schedule semantics
+- [ ] 03-04-PLAN.md — Huang–Ueng conventional sRBP cache, selection, and work
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 03-11-PLAN.md — Offset min-sum, generated assignments, refresh, and RNG replay
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 03-05-PLAN.md — Atomic local convergence, dual budgets, and versioned work/progress evidence
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
+- [ ] 03-06-PLAN.md — First non-flooding public tracer through layered SPA
+- [ ] 03-12-PLAN.md — Full terminal reconstruction and bounded local-convergence traces
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
+- [ ] 03-13-PLAN.md — Complete noncluster public policy admission and compatibility matrix
+
+**Wave 7** *(blocked on Wave 6 completion)*
+
+- [ ] 03-14-PLAN.md — Strict Moradi artifact loader, qualifier, and unavailable state
+
+**Wave 8** *(blocked on Wave 7 completion)*
+
+- [ ] 03-08-PLAN.md — Focused matched pilots with durable verified evidence
+
+**Wave 9** *(blocked on Wave 8 completion)*
+
+- [ ] 03-15-PLAN.md — Runnable notebook, tables, and diagnostic plots from retained pilots
+
+**Wave 10** *(blocked on Wave 9 completion)*
+
+- [ ] 03-09-PLAN.md — Blocking acquisition and qualification of authoritative cluster artifacts
+
+**Wave 11** *(blocked on Wave 10 completion)*
+
+- [ ] 03-10-PLAN.md — One qualified Moradi greedy cluster selection through the public engine
+
+**Wave 12** *(blocked on Wave 11 completion)*
+
+- [ ] 03-16-PLAN.md — Complete qualified cluster traversal, work, and reconstruction
+
+**Wave 13** *(blocked on Wave 12 completion)*
+
+- [ ] 03-17-PLAN.md — Retained qualified cluster pilot and final SCH-06 gate
 
 ### Phase 4: Memory Policies and Relay-BP
 
@@ -363,7 +420,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Evidence Registry and Native CSS Baseline | 9/9 | Complete    | 2026-09-22 |
 | 2. Canonical CSS Execution and Policy Contracts | 16/16 | Complete    | 2026-09-23 |
-| 3. Update Rules and Scheduling | 0/TBD | Not started | - |
+| 3. Update Rules and Scheduling | 0/17 | Planned | - |
 | 4. Memory Policies and Relay-BP | 0/TBD | Not started | - |
 | 5. Guided and Perturbative BP Interventions | 0/TBD | Not started | - |
 | 6. Beam Search, Ensembles, and Candidate Selection | 0/TBD | Not started | - |

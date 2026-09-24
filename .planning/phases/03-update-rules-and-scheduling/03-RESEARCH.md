@@ -105,7 +105,24 @@ No new runtime package is needed. The project pins `numpy==2.2.6`, `scipy==1.17.
 | Pydantic | 2.13.5 | Strict manifest/artifact models | Existing pin and environment match. [VERIFIED: `pyproject.toml:10-17`; environment probe] |
 | pytest | 9.0.3 | Unit, property, integration, and evidence tests | Existing suite and installed environment. [VERIFIED: `pyproject.toml:19-21`; environment probe] |
 
-**Package legitimacy audit:** Not applicable; this phase should install no external runtime package. [ASSUMED]
+No additional decoder-runtime dependency is proposed. The notebook and plotting deliverable needs the optional analysis dependencies audited below.
+
+## Package Legitimacy Audit
+
+Planning-time audit on 2026-09-23: official project documentation identifies each package; exact-version PyPI JSON confirms the named release and declared Python constraint. Installation and notebook execution remain execution-time checks, not completed validation.
+
+| Optional analysis dependency | Official identity | Exact release metadata | Declared Python |
+|---|---|---|---|
+| `matplotlib==3.10.9` | [Matplotlib installation](https://matplotlib.org/stable/install/index.html) | [PyPI release JSON](https://pypi.org/pypi/matplotlib/3.10.9/json) | `>=3.10` |
+| `nbformat==5.10.4` | [Jupyter nbformat documentation](https://nbformat.readthedocs.io/en/latest/) | [PyPI release JSON](https://pypi.org/pypi/nbformat/5.10.4/json) | `>=3.8` |
+| `nbclient==0.10.2` | [Jupyter notebook execution API](https://nbclient.readthedocs.io/en/latest/client.html) | [PyPI release JSON](https://pypi.org/pypi/nbclient/0.10.2/json) | `>=3.9.0` |
+| `ipykernel==6.29.5` | [IPython kernel installation](https://ipython.readthedocs.io/en/stable/install/kernel_install.html) | [PyPI release JSON](https://pypi.org/pypi/ipykernel/6.29.5/json) | `>=3.8` |
+
+[CITED: official project documentation and exact-version PyPI endpoints above, read during this planning run]
+
+The GSD `package-legitimacy check --ecosystem pypi matplotlib nbformat nbclient ipykernel` diagnostic returned `SUS` for all four because its PyPI adapter has no download-count observation; it additionally flagged the latest Matplotlib release age, not the selected `3.10.9` pin. These diagnostic results are retained rather than relabeled `OK`. Missing telemetry is not an observed identity failure: the direct authoritative package identities and exact releases above support planning these routine dependencies. No package installation was performed during planning, and no extra permission checkpoint is inferred from missing download telemetry.
+
+`nbclient` supplies execution orchestration, not the Python kernel. Include `ipykernel` explicitly, bind the runner to the project's interpreter through a controlled kernelspec/kernel manager, set finite cell timeouts and `allow_errors=False`, and smoke-test notebook execution after dependency installation. Use Matplotlib's noninteractive Agg backend on HPC. Keep these packages in an optional `analysis` extra and preserve existing decoder pins. [CITED: https://nbclient.readthedocs.io/en/latest/client.html] [CITED: https://ipython.readthedocs.io/en/stable/install/kernel_install.html] [CITED: https://matplotlib.org/stable/install/index.html]
 
 ## Selected Source Baselines
 
@@ -329,7 +346,7 @@ Residual invalidation oracle, based on Huang–Ueng S.2: after selecting `(c_max
 | NumPy | kernels/RNG | yes | 2.2.6 | — [VERIFIED: environment probe] |
 | SciPy | sparse artifacts | yes | 1.17.1 | — [VERIFIED: environment probe] |
 | pytest | validation | yes | 9.0.3 | — [VERIFIED: environment probe] |
-| Jupyter package | runnable notebook command | no distribution named `jupyter` observed | — | Use the project's existing notebook execution approach or add a separately approved dev dependency; do not add runtime packages implicitly. [VERIFIED: environment probe] |
+| Notebook analysis environment | runnable notebook command | not yet installed/validated for Phase 3 | audited pins above | Plan the optional analysis extra and project-interpreter notebook runner; validate installation and execution in the owning implementation task. The `jupyter` umbrella package is not required. [CITED: notebook execution API above] |
 | Cluster Q-table/partition | SCH-06 | no artifact found in bounded source archive | — | None; acquisition checkpoint blocks claim. [VERIFIED: bounded archive probe] |
 
 ## Validation Architecture
