@@ -56,3 +56,24 @@ def test_separate_xz_observations_are_named_by_check_type(small_css_checks):
     )
     assert sample.observations["Z"].syndrome.tolist() == ((hz @ np.ones(3, dtype=np.uint8)) % 2).tolist()
     assert sample.observations["X"].syndrome.tolist() == ((hx @ np.ones(3, dtype=np.uint8)) % 2).tolist()
+
+
+def test_parameter_assignment_identity_does_not_consume_or_relabel_physical_samples(small_css_checks):
+    from bp_registry.css import CssCode
+    from bp_registry.canonical.updates import ParameterGeneratorSpec, ParameterRefreshPlan
+
+    hx, hz = small_css_checks
+    code = CssCode(hx=hx, hz=hz)
+    baseline = _sample_shot()(code, manifest_identity="a" * 64, shot_id=5, seed=7, x_error_rate=0.4)
+    spec = ParameterGeneratorSpec.model_validate({
+        "shape": "scalar", "graph_sha256": "b" * 64, "distribution": "uniform",
+        "low": 0.0, "high": 1.0, "root_seed_identity": "c" * 64,
+    })
+    assert ParameterRefreshPlan(scope="attempt", generator=spec).initial_state(
+        configuration_identity="policy-a", attempt_identity="attempt:5"
+    ).derived_identity != ParameterRefreshPlan(scope="attempt", generator=spec).initial_state(
+        configuration_identity="policy-b", attempt_identity="attempt:5"
+    ).derived_identity
+    matched = _sample_shot()(code, manifest_identity="a" * 64, shot_id=5, seed=999, x_error_rate=0.4)
+    assert baseline.sample_identity == matched.sample_identity
+    assert (baseline.hidden_x == matched.hidden_x).all()

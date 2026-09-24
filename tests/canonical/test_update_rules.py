@@ -175,3 +175,54 @@ def test_offset_min_sum_source_iteration_uses_schedule_iteration_not_local_step_
     assert update.check_to_variable(np.asarray([2.0]), syndrome=0, source_iteration=1) == 0.5
     with pytest.raises(ValueError, match="source_iteration"):
         update.check_to_variable(np.asarray([2.0]), syndrome=0, source_iteration=2)
+
+
+def test_parameter_generation_replays_and_commits_only_after_admission():
+    updates = _updates_module()
+
+    class _Reservation:
+        active = True
+
+        def commit_once(self):
+            self.active = False
+
+        def rollback(self):
+            self.active = False
+
+    class _Budget:
+        last_termination = {"reason": "denied"}
+
+        def __init__(self, admit=True):
+            self.admit = admit
+
+        def reserve(self, *_args, **_kwargs):
+            return _Reservation() if self.admit else None
+
+    spec = updates.ParameterGeneratorSpec.model_validate({
+        "shape": "edge", "graph_sha256": "a" * 64, "distribution": "uniform",
+        "low": 0.0, "high": 1.0, "root_seed_identity": "b" * 64,
+    })
+    plan = updates.ParameterRefreshPlan(scope="source_iteration", generator=spec)
+    initial = plan.initial_state(configuration_identity="cfg", attempt_identity="attempt:1")
+    denied = plan.refresh(
+        initial, boundary="source_iteration", source_iteration=0, graph_sha256="a" * 64,
+        check_count=2, edge_count=3, budgets=_Budget(False), budget_scope="attempt",
+    )
+    assert not denied.admitted and denied.state == initial and denied.assignment is None
+    first = plan.refresh(
+        initial, boundary="source_iteration", source_iteration=0, graph_sha256="a" * 64,
+        check_count=2, edge_count=3, budgets=_Budget(), budget_scope="attempt",
+    )
+    replay = plan.refresh(
+        initial, boundary="source_iteration", source_iteration=0, graph_sha256="a" * 64,
+        check_count=2, edge_count=3, budgets=_Budget(), budget_scope="attempt",
+    )
+    assert first.admitted and first.assignment == replay.assignment
+    assert first.state == replay.state
+    assert first.evidence["purpose"] == "parameter_assignment"
+    assert first.evidence["resolved_assignment"] == first.assignment.model_dump(mode="json")
+    with pytest.raises(ValueError, match="source_iteration"):
+        plan.refresh(
+            initial, boundary="local_unit", source_iteration=0, graph_sha256="a" * 64,
+            check_count=2, edge_count=3, budgets=_Budget(), budget_scope="attempt",
+        )

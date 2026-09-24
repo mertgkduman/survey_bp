@@ -151,3 +151,23 @@ def test_resolved_bindings_carry_complete_adjacent_evidence():
     )
     assert all(binding.evidence.invariants for binding in resolved.bindings)
     assert all(binding.evidence.procedure or binding.evidence.source_anchors for binding in resolved.bindings)
+
+
+def test_v3_generated_assignment_requires_closed_generator_and_refresh_models():
+    generated = contracts.PolicySpecV3.model_validate({
+        "kind": "offset_min_sum", "binding_id": "update-oms-generator", "state_lifetime": "attempt",
+        "owned_state": [], "requires": [], "provides": [],
+        "parameter_generator": {
+            "shape": "check", "graph_sha256": "a" * 64, "distribution": "uniform",
+            "low": 0.0, "high": 1.0, "root_seed_identity": "b" * 64,
+        },
+        "parameter_refresh": {"scope": "attempt"},
+    })
+    assert generated.parameter_generator is not None
+    assert generated.parameter_refresh is not None
+    with pytest.raises(ValueError, match="parameter_generator"):
+        contracts.PolicySpecV3.model_validate({
+            "kind": "offset_min_sum", "binding_id": "update-oms-invalid", "state_lifetime": "attempt",
+            "owned_state": [], "requires": [], "provides": [],
+            "parameter_refresh": {"scope": "attempt"},
+        })
