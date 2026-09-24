@@ -49,7 +49,7 @@ def test_documented_tutorial(tmp_path):
     from bp_registry.ledger import read_canonical_events
 
     events = read_canonical_events(output / "events.jsonl")
-    terminals = [event for event in events if event["kind"] == "termination"]
+    terminals = sorted((event for event in events if event["kind"] == "termination"), key=lambda event: event["shot_id"])
     assert [event["data"]["outcome"] for event in terminals] == ["logical_failure", "exact"]
     assert all(event["data"]["selection_status"] == "frozen_decoder_visible_candidate" for event in terminals)
     assert all(event["data"]["assessment_status"] == "not_assessed" for event in terminals)

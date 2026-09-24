@@ -270,7 +270,15 @@ class AtomicFloodingExecutor:
             completed: list[FloodingSweep] = []
 
             def compute() -> np.ndarray:
-                sweep = self.schedule.sweep(state, syndrome, error_rate=error_rate, source_iteration=iteration - 1)
+                rule = getattr(self.schedule.kernel, "update_rule", None)
+                assignment = getattr(rule, "alpha", None)
+                if getattr(assignment, "shape", None) == "source_iteration":
+                    sweep = self.schedule.sweep(
+                        state, syndrome, error_rate=error_rate, source_iteration=iteration - 1,
+                    )
+                else:
+                    # Preserve the V2 public flooding call surface and existing instrumentation hooks.
+                    sweep = self.schedule.sweep(state, syndrome, error_rate=error_rate)
                 completed.append(sweep)
                 return sweep.new_v2c
 

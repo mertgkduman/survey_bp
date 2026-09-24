@@ -17,7 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 from .artifacts import LoadedArtifact, load_artifact
 from .canonical.budgets import WorkVector
-from .canonical.contracts import CanonicalCompositionSpec, CanonicalManifestV2, parse_canonical_manifest
+from .canonical.contracts import CanonicalCompositionSpec, CanonicalCompositionSpecV3, CanonicalManifestV2, parse_canonical_manifest
 from .css import CssCode, fixture_code
 
 
@@ -362,6 +362,7 @@ class CanonicalExperimentV3(CanonicalExperimentV2):
 
     schema_version: Literal[3]
     numerical_profile: Literal["cpu-float64-min-sum-v1"]
+    policies: CanonicalCompositionSpecV3
 
 
 ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2 | CanonicalExperimentV3

@@ -162,7 +162,7 @@ def _canonical_kernel_manifest(manifest: CanonicalExperimentV2 | CanonicalExperi
 def _canonical_policy_effects(manifest: CanonicalExperimentV2 | CanonicalExperimentV3, code) -> dict[str, dict[str, Any]]:
     """Bind declared NMS assignments to the code's canonical edge identities once."""
     effects: dict[str, dict[str, Any]] = executable_canonical_policy_effects(manifest.policies)
-    assignment = manifest.policies.update.parameter_assignment
+    assignment = getattr(manifest.policies.update, "parameter_assignment", None)
     if assignment is not None:
         table = EdgeTable.from_check_matrix(code.hz)
         resolved = assignment.resolve(
