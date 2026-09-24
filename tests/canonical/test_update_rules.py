@@ -63,7 +63,7 @@ def test_local_step_denial_preserves_every_owned_state_byte_for_byte():
     )
     proposal = LocalStepProposal(
         label="test-step",
-        proposed_work=WorkVector(check_to_variable_updates=1, candidate_checks=1),
+        proposed_work=WorkVector(check_to_variable_updates=1, candidate_checks=1, convergence_checks=1),
         compute=lambda: np.asarray([9.0, 9.0]),
     )
     result = CanonicalLocalStepExecutor(tree, scope="attempt").execute(
