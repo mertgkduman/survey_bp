@@ -255,6 +255,30 @@ def test_verify_run_rederives_budget_and_numerical_terminal_semantics(tmp_path, 
     assert numerical["verification_status"] == "not_independently_reproduced_numerical_failure"
 
 
+def test_verify_run_accepts_persistent_numerical_failure_without_replay(tmp_path, monkeypatch):
+    """A persisted numerical terminal is checked structurally, never re-executed."""
+    from bp_registry.canonical.numerics import NumericalFailure
+    from bp_registry.canonical.schedules import FloodingSchedule
+    from bp_registry.cli import run_canonical, verify_run
+    from bp_registry.runner import run_canonical_one
+
+    output = tmp_path / "persistent-numerical"
+    calls: list[object] = []
+
+    def persistent(*_args, **_kwargs):
+        calls.append(object())
+        raise NumericalFailure("persistent")
+
+    monkeypatch.setattr(FloodingSchedule, "sweep", persistent)
+    assert run_canonical_one(CANONICAL_MANIFEST, shot_id=0, ledger_path=output / "events.jsonl").termination == "numerical_failure"
+    assert run_canonical_one(CANONICAL_MANIFEST, shot_id=1, ledger_path=output / "events.jsonl").termination == "numerical_failure"
+    before_reuse = len(calls)
+
+    assert run_canonical(CANONICAL_MANIFEST, output)["final_row_count"] == 2
+    assert verify_run(output)["final_row_count"] == 2
+    assert len(calls) == before_reuse
+
+
 def test_verify_run_rejects_rehashed_numerical_failure_claim_matrix(tmp_path, monkeypatch):
     """A valid event hash cannot bless altered transient-failure science."""
     from bp_registry.canonical.numerics import NumericalFailure
