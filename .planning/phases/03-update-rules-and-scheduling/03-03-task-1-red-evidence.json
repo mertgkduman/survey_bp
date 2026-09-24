@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_schedule_semantics.py -k test_layered_schedule_commits_one_conflict_free_layer_before_later_layer_reads_it",
+  "exitCode": 1,
+  "output": "not ok 1 - test_layered_schedule_commits_one_conflict_free_layer_before_later_layer_reads_it\n  ---\n  framework: pytest\n  assertion: LayeredSchedule must provide the source-qualified local-layer production API\n  ...\n# tests 1\n# pass 0\n# fail 1\n",
+  "targetTest": "test_layered_schedule_commits_one_conflict_free_layer_before_later_layer_reads_it",
+  "targetFile": "tests/canonical/test_schedule_semantics.py",
+  "expected": "LayeredSchedule validates source-qualified conflict-free partitions and executes a local layer through CanonicalLocalStepExecutor with fresh later-layer visibility.",
+  "actual": "The selected target test failed because LayeredSchedule is absent from the production schedules module."
+}

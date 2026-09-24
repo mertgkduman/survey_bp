@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_schedule_semantics.py -k test_randomized_traversal_replays_exact_order_at_declared_refresh_boundaries",
+  "exitCode": 1,
+  "output": "not ok 1 - test_randomized_traversal_replays_exact_order_at_declared_refresh_boundaries\n  ---\n  framework: pytest\n  assertion: RandomizedTraversalPlan must provide replayable schedule-order identity\n  ...\n# tests 1\n# pass 0\n# fail 1\n",
+  "targetTest": "test_randomized_traversal_replays_exact_order_at_declared_refresh_boundaries",
+  "targetFile": "tests/canonical/test_schedule_semantics.py",
+  "expected": "Randomized traversal persists an independently derived schedule-order identity and exactly replayable realized permutation at configuration, attempt, and sweep boundaries.",
+  "actual": "The selected target test failed because RandomizedTraversalPlan is absent from the production schedules module."
+}

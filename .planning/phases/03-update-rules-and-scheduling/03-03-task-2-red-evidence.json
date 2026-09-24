@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_schedule_semantics.py -k test_check_node_serial_updates_a_check_then_refreshes_affected_variables",
+  "exitCode": 1,
+  "output": "not ok 1 - test_check_node_serial_updates_a_check_then_refreshes_affected_variables\n  ---\n  framework: pytest\n  assertion: CheckNodeSerialSchedule must expose the SCNS local-unit production API\n  ...\n# tests 1\n# pass 0\n# fail 1\n",
+  "targetTest": "test_check_node_serial_updates_a_check_then_refreshes_affected_variables",
+  "targetFile": "tests/canonical/test_schedule_semantics.py",
+  "expected": "Check-node serial executes all outgoing check messages before refreshing affected variable state, distinct from variable-node serial units.",
+  "actual": "The selected target test failed because CheckNodeSerialSchedule is absent from the production schedules module."
+}
