@@ -301,9 +301,17 @@ def test_version_three_schedule_terminal_preserves_dual_budget_views_and_rejects
         ),
     ).as_evidence()
     path = tmp_path / "schedule-events.jsonl"
+    deterministic = {
+        "candidate": [0, 1],
+        "policy_effects": {"update": "min_sum", "schedule": "layered"},
+        "rng_identities": {"schedule_order": "sha256:" + "a" * 64},
+    }
     with CanonicalEventWriter(path, structural_event_version=CANONICAL_SCHEDULE_LEDGER_VERSION) as writer:
         writer.begin(run_id="schedule", shot_id=1, sample_seed_identity="seed")
-        writer.terminal(run_id="schedule", shot_id=1, termination="count_budget_exhausted", data={"schedule_terminal": evidence})
+        writer.terminal(
+            run_id="schedule", shot_id=1, termination="count_budget_exhausted",
+            data={"schedule_terminal": evidence, "deterministic_facts": deterministic},
+        )
 
     terminal = read_canonical_events(path)[-1]
     assert terminal["ledger_version"] == 3
@@ -320,7 +328,7 @@ def test_version_three_schedule_verifier_reconstructs_deterministic_claims_after
 
     from bp_registry.canonical.budgets import BudgetView, Measurement, QualifiedIteration, ScheduleTerminalEvidence, WorkVector
     from bp_registry.canonical.verification import CanonicalStructuralVerificationError
-    from bp_registry.ledger import CANONICAL_SCHEDULE_LEDGER_VERSION, CanonicalEventWriter, read_canonical_events
+    from bp_registry.ledger import CANONICAL_SCHEDULE_LEDGER_VERSION, CanonicalEventWriter, _canonical_event_id, read_canonical_events
 
     assert hasattr(verification, "validate_schedule_terminal_shot"), (
         "V3 schedule terminals require independent reconstruction rather than rehashed self-claims"
@@ -362,7 +370,7 @@ def test_version_three_schedule_verifier_reconstructs_deterministic_claims_after
 
     tampered_terminal = {**terminal, "completed_traversals": 0}
     tampered_event = {**events[-1], "data": {"schedule_terminal": tampered_terminal, "deterministic_facts": deterministic}}
-    tampered_event["event_id"] = ""
+    tampered_event["event_id"] = _canonical_event_id(tampered_event)
     with pytest.raises(CanonicalStructuralVerificationError, match="deterministic schedule terminal"):
         verification.validate_schedule_terminal_shot(
             [*events[:-1], tampered_event],
@@ -372,14 +380,37 @@ def test_version_three_schedule_verifier_reconstructs_deterministic_claims_after
             expected_deterministic_facts=deterministic,
         )
 
-    tampered_facts = {**deterministic, "rng_identities": {"schedule_order": "sha256:" + "b" * 64}}
-    tampered_event = {**events[-1], "data": {"schedule_terminal": terminal, "deterministic_facts": tampered_facts}}
-    tampered_event["event_id"] = ""
-    with pytest.raises(CanonicalStructuralVerificationError, match="deterministic schedule terminal"):
-        verification.validate_schedule_terminal_shot(
-            [*events[:-1], tampered_event],
-            run_id="schedule",
-            shot_id=1,
-            expected_terminal=terminal,
-            expected_deterministic_facts=deterministic,
-        )
+    for tampered_facts in (
+        {**deterministic, "candidate": [1, 0]},
+        {**deterministic, "policy_effects": {"update": "offset_min_sum", "schedule": "layered"}},
+        {**deterministic, "rng_identities": {"schedule_order": "sha256:" + "b" * 64}},
+    ):
+        tampered_event = {**events[-1], "data": {"schedule_terminal": terminal, "deterministic_facts": tampered_facts}}
+        tampered_event["event_id"] = _canonical_event_id(tampered_event)
+        with pytest.raises(CanonicalStructuralVerificationError, match="deterministic schedule terminal"):
+            verification.validate_schedule_terminal_shot(
+                [*events[:-1], tampered_event],
+                run_id="schedule",
+                shot_id=1,
+                expected_terminal=terminal,
+                expected_deterministic_facts=deterministic,
+            )
+
+    changed_decode = {**terminal["decode_runtime"], "value": 99}
+    changed_measurement = {
+        **terminal,
+        "decode_runtime": changed_decode,
+        "budget_views": [
+            {**view, "decode_runtime": changed_decode}
+            for view in terminal["budget_views"]
+        ],
+    }
+    measured_event = {**events[-1], "data": {"schedule_terminal": changed_measurement, "deterministic_facts": deterministic}}
+    measured_event["event_id"] = _canonical_event_id(measured_event)
+    assert verification.validate_schedule_terminal_shot(
+        [*events[:-1], measured_event],
+        run_id="schedule",
+        shot_id=1,
+        expected_terminal=terminal,
+        expected_deterministic_facts=deterministic,
+    ) == measured_event
