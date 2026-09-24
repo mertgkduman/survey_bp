@@ -180,3 +180,50 @@ def test_sidecars_reject_escaping_paths_bad_payloads_and_hash_mismatches(tmp_pat
     sidecar.write_bytes(b"\xffnot-utf8")
     with pytest.raises(ValueError, match="UTF-8 JSON"):
         TraceSink.load(tmp_path, result.sidecar_path)
+
+
+def test_selected_local_schedule_traces_are_bounded_truth_separated_and_explicit(tmp_path):
+    from bp_registry.canonical.tracing import TracePlan, TraceSink
+
+    sink = TraceSink(TracePlan(root=tmp_path, level="full", max_records=2, max_bytes=4_096))
+    assert hasattr(sink, "observe_local_convergence"), (
+        "traces must expose bounded decoder-visible local convergence records"
+    )
+    assert hasattr(sink, "observe_schedule_state"), (
+        "traces must expose bounded decoder-visible schedule-state records"
+    )
+
+    sink.observe_local_convergence(
+        schedule="layered", atomic_unit="one_layer", source_iteration=1,
+        completed_traversals=1, local_cursor=(1,), converged=None,
+        missing_reason="candidate_not_materialized_at_local_stop",
+    )
+    sink.observe_schedule_state(
+        schedule="layered", atomic_unit="one_layer", source_iteration=1,
+        completed_traversals=1, local_cursor=(1,), realized_order=(0, 1),
+        missing_reason=None,
+    )
+    sink.observe_schedule_state(
+        schedule="layered", atomic_unit="one_layer", source_iteration=2,
+        completed_traversals=2, local_cursor=(0,), realized_order=(1, 0),
+        missing_reason=None,
+    )
+    result = sink.finish()
+
+    assert result.truncated is True and result.dropped_records == 1
+    assert result.selection_basis["level"] == "full"
+    loaded = TraceSink.load(tmp_path, result.sidecar_path, expected_sha256=result.sha256)
+    assert loaded["selection_basis"] == result.selection_basis
+    assert loaded["records"][0]["kind"] == "local_convergence"
+    assert loaded["records"][0]["payload"]["converged"] is None
+    assert loaded["records"][0]["payload"]["missing_reason"]
+
+    rejected = TraceSink(TracePlan(root=tmp_path, max_records=2, max_bytes=4_096))
+    with pytest.raises(ValueError, match="hidden physical truth"):
+        rejected.observe(kind="edge", edge="e-1", payload={"hidden_truth": [1, 0]})
+    with pytest.raises(ValueError, match="bounded"):
+        rejected.observe_schedule_state(
+            schedule="layered", atomic_unit="one_layer", source_iteration=1,
+            completed_traversals=1, local_cursor=(1,), realized_order=tuple(range(1_025)),
+            missing_reason=None,
+        )
