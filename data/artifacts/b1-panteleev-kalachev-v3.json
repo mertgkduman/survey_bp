@@ -1,0 +1,50 @@
+{
+  "format_version": 1,
+  "code_id": "b1-ghp-882",
+  "artifact": {
+    "path": "data/artifacts/b1-panteleev-kalachev-v3.npz",
+    "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+    "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548",
+    "arrays": ["hx", "hz", "lx", "lz"],
+    "pickle": false
+  },
+  "source": {
+    "paper": "Panteleev and Kalachev, arXiv:1904.02703v3",
+    "url": "https://arxiv.org/abs/1904.02703",
+    "revision": "v3",
+    "archive_url": "https://export.arxiv.org/e-print/1904.02703v3",
+    "archive_sha256": "5aa90578b1a93e18dedf505784d3b2836b2fd5a9bbe91bff2617e5fc6603975e",
+    "archive_member": "matrices/ghpc_3_3_N882_K24.tex",
+    "archive_member_sha256": "91be6649c066b88d46e1b232ac16c3e7cb94f8a928fd9f82834663b16e9d8e83",
+    "equations": {
+      "hx": "[A, B]",
+      "hz": "[B^T, A^T]",
+      "a_rows": [[27, null, null, null, null, 0, 54], [54, 27, null, null, null, null, 0], [0, 54, 27, null, null, null, null], [null, 0, 54, 27, null, null, null], [null, null, 0, 54, 27, null, null], [null, null, null, 0, 54, 27, null], [null, null, null, null, 0, 54, 27]],
+      "b_diagonal_exponents": [0, 1, 6]
+    }
+  },
+  "construction": {
+    "ring": "GF(2)[x]/(x^63-1)",
+    "circulant_convention": "row-major: polynomial x^e has one at column e in row 0",
+    "block_order": "source-displayed 7-by-7 row-major order; Hx left A then B, Hz left B^T then A^T",
+    "dimensions": {"ell": 63, "block_rows": 7, "hx": [441, 882], "hz": [441, 882]}
+  },
+  "logical_provenance": {
+    "status": "project-derived",
+    "algorithm": "deterministic GF(2) free-column quotient bases with Lz pairing normalization",
+    "ordering": "increasing free-column and quotient-representative order",
+    "author_supplied": false
+  },
+  "independent_validation": {
+    "hx_rank_gf2": 429,
+    "hz_rank_gf2": 429,
+    "k_gf2": 24,
+    "commutator_nonzero_entries": 0,
+    "row_weight": 6,
+    "column_weight": 3,
+    "logical_pairing": "identity"
+  },
+  "assessment_label": "pilot_adaptation",
+  "assessment_status": "not_assessed",
+  "distance": {"status": "source_bounded", "lower": 18, "upper": 24}
+}
