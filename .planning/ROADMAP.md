@@ -174,7 +174,7 @@ Plans:
 5. Researchers can run matched pilot comparisons of supported update/schedule combinations with raw work counters and explicit rejection of undefined combinations.
 
 **Research focus:** Source definitions for offset min-sum and cluster sequencing, residual/cache semantics, and intervention-sensitive schedule state.
-**Plans:** 2/17 plans executed
+**Plans:** 5/17 plans executed
 
 Plans:
 **Wave 1**
@@ -184,9 +184,9 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 03-02-PLAN.md — Public normalized min-sum plus generated schema and documentation
-- [ ] 03-03-PLAN.md — Layered, CN/VN serial, and randomized schedule semantics
-- [ ] 03-04-PLAN.md — Huang–Ueng conventional sRBP cache, selection, and work
+- [x] 03-02-PLAN.md — Public normalized min-sum plus generated schema and documentation
+- [x] 03-03-PLAN.md — Layered, CN/VN serial, and randomized schedule semantics
+- [x] 03-04-PLAN.md — Huang–Ueng conventional sRBP cache, selection, and work
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -420,7 +420,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Evidence Registry and Native CSS Baseline | 9/9 | Complete    | 2026-09-22 |
 | 2. Canonical CSS Execution and Policy Contracts | 16/16 | Complete    | 2026-09-23 |
-| 3. Update Rules and Scheduling | 2/17 | In Progress|  |
+| 3. Update Rules and Scheduling | 5/17 | In Progress|  |
 | 4. Memory Policies and Relay-BP | 0/TBD | Not started | - |
 | 5. Guided and Perturbative BP Interventions | 0/TBD | Not started | - |
 | 6. Beam Search, Ensembles, and Candidate Selection | 0/TBD | Not started | - |
