@@ -1,0 +1,9 @@
+{
+  "command": "PYTHONPATH=$PWD/src OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase3_pilots.py -k 'b1 or hgp or focused or undefined'",
+  "exitCode": 1,
+  "output": "not ok 1 - test_focused_b1_and_hgp_matrix_retains_schedules_parameters_and_rejection\n  ---\n  framework: pytest\n  assertion: focused B1/HGP manifests are available to the public pilot runner\n  actual: FileNotFoundError for data/manifests/phase3-pilot-b1.json\n  ...\n# tests 2\n# pass 1\n# fail 1\n",
+  "targetTest": "test_focused_b1_and_hgp_matrix_retains_schedules_parameters_and_rejection",
+  "targetFile": "tests/test_phase3_pilots.py",
+  "expected": "B1 and HGP focused public pilot manifests exist and run through bounded schedule and parameter variants.",
+  "actual": "No B1 public pilot manifest existed, so the target test failed before sampling."
+}
