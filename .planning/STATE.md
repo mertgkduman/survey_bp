@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 04
 current_phase_name: Memory Policies and Relay-BP
-current_plan: Not started
+current_plan: 2
 status: executing
-stopped_at: Phase 4 context gathered
-last_updated: "2026-09-24T22:40:48.900Z"
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-09-24T23:04:38.150Z"
 last_activity: 2026-09-24
-last_activity_desc: Phase 04 planning complete — 15 plans ready
-state_head: 230ffb4a884ce3e795a427edf308bfba10c1ee17
+last_activity_desc: Phase 04 execution started
+state_head: 385c89a3dca9c7e520a99d7434b7d9ca187a363b
 progress:
   total_phases: 14
   completed_phases: 3
   total_plans: 57
-  completed_plans: 42
+  completed_plans: 43
 ---
 
 # Project State
@@ -28,14 +28,14 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 
 ## Current Position
 
-Phase: 04 (Memory Policies and Relay-BP) — READY TO EXECUTE
-Plan: Not started
+Phase: 04 (Memory Policies and Relay-BP) — EXECUTING
+Plan: 2 of 15
 Total Phases: 14
-Current Plan: Not started
+Current Plan: 2
 Total Plans in Phase: 15
 Status: Ready to execute
-Last activity: 2026-09-24 — Phase 03 complete, transitioned to Phase 4
-Last Activity Description: Phase 04 planning complete — 15 plans ready
+Last activity: 2026-09-24 — Phase 04 execution started
+Last Activity Description: Phase 04 execution started
 
 Progress: [██░░░░░░░░] 21% [██░░░░░░░░]
 
@@ -59,6 +59,7 @@ Progress: [██░░░░░░░░] 21% [██░░░░░░░░]
 | Phase 02 P07 | 10 min | 2 tasks | 3 files |
 | Phase 02 P08 | 8 min | 3 tasks | 10 files |
 | Phase 02 P09 | 16 min | 2 tasks | 7 files |
+| Phase 04 P01 | 31m | 2 tasks | 10 files |
 
 Phase 02 P10–P16 gap-closure metrics are recorded in their individual summaries.
 
@@ -100,6 +101,8 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - [Phase 02]: Public execution rejects non-baseline policies and unbounded profiling plans before sampling; full manifest, artifact, sample, and shot identity bind replay.
 - [Phase 02]: Public verification reconstructs deterministic terminal, budget, work, candidate, lineage, and outcome claims; transient numerical errors retain explicit nonreproduction status.
 - [Phase 02]: Public low-overhead profile evidence has producer-backed metric and unavailable-RSS grammars; nondeterministic measurements are same-ledger observations, not replay-equality facts.
+- [Phase 04]: Phase 04: V4 manifests alone persist contiguous ordered affine-prior bindings, preserving V2/V3 semantics.
+- [Phase 04]: Phase 04: Relay legs transfer only a finite digest-bound posterior LLR and reset all leg-local execution state.
 
 ### Pending Todos
 
@@ -131,7 +134,7 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Last session: 2026-09-24T21:32:39.597Z
-Stopped at: Phase 4 context gathered
-Resume file: .planning/phases/04-memory-policies-and-relay-bp/04-CONTEXT.md
+Last session: 2026-09-24T23:04:35.394Z
+Stopped at: Completed 04-01-PLAN.md
+Resume file: None
 Next command: $gsd-discuss-phase 4

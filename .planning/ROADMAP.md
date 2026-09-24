@@ -247,12 +247,12 @@ Plans:
 4. A researcher can isolate memory/relay effects in pilot ablations and recover all leg work from the ledger; an adaptation is clearly labeled when it differs from source experiment settings.
 
 **Research focus:** Exact mixing/memory definitions, source equations and code defaults, warm-state inheritance, and candidate stopping/selection.
-**Plans:** 15 plans ready to execute
+**Plans:** 1/15 plans executed ready to execute
 
 Plans:
 **Wave 0**
 
-- [ ] 04-01-PLAN.md — End-to-end two-leg Relay tracer and Wave 0 test targets
+- [x] 04-01-PLAN.md — End-to-end two-leg Relay tracer and Wave 0 test targets
 
 **Wave 1** *(blocked on Wave 0 completion)*
 
@@ -476,7 +476,7 @@ Plans:
 | 1. Evidence Registry and Native CSS Baseline | 9/9 | Complete    | 2026-09-22 |
 | 2. Canonical CSS Execution and Policy Contracts | 16/16 | Complete    | 2026-09-23 |
 | 3. Update Rules and Scheduling | 17/17 | Complete    | 2026-09-24 |
-| 4. Memory Policies and Relay-BP | 0/TBD | Not started | - |
+| 4. Memory Policies and Relay-BP | 1/15 | In Progress|  |
 | 5. Guided and Perturbative BP Interventions | 0/TBD | Not started | - |
 | 6. Beam Search, Ensembles, and Candidate Selection | 0/TBD | Not started | - |
 | 7. Optional Postprocessing | 0/TBD | Not started | - |

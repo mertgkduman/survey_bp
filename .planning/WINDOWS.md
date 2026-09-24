@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 0
+open_count: 6
 waived_count: 0
 fixed_count: 3
-total_count: 3
-last_updated: 2026-09-24T09:43:53.726Z
+total_count: 9
+last_updated: 2026-09-24T23:03:30.055Z
 ---
 
 # Broken Windows Ledger
@@ -18,6 +18,12 @@ last_updated: 2026-09-24T09:43:53.726Z
 | 1 | 02 | deviation | src/bp_registry/canonical/schedules.py | 140 | Single-neighbor check indexing was corrected to preserve a one-element incoming message buffer. | fixed |  | 2026-09-23T08:23:47.117Z | 2026-09-23T08:23:59.510Z |
 | 2 | 02 | deviation | src/bp_registry/canonical/profiling.py |  | Restrict retained thread environment values to validated positive counts. | fixed |  | 2026-09-23T09:15:05.961Z | 2026-09-23T09:15:31.774Z |
 | 3 | 03 | deviation | tests/canonical/test_schedule_semantics.py |  | Fixed new layered replay test helper before Task 1 completion | fixed |  | 2026-09-24T09:43:35.988Z | 2026-09-24T09:43:53.726Z |
+| 4 | 04 | skipped-test | tests/canonical/test_memory_policies.py | 31 | Source-qualified damping, PDBP, PD′BP, and momentum equation test is deferred to Wave 1. | open |  | 2026-09-24T23:03:27.075Z |  |
+| 5 | 04 | skipped-test | tests/canonical/test_memory_composition.py | 30 | Seeded assignments, schedule compatibility, and budget-denial rollback fixture is deferred to Wave 1. | open |  | 2026-09-24T23:03:27.643Z |  |
+| 6 | 04 | skipped-test | tests/canonical/test_relay_differential.py | 8 | Pinned author v0.2.2 Relay differential needs the reviewed external environment and observer patch. | open |  | 2026-09-24T23:03:28.243Z |  |
+| 7 | 04 | skipped-test | tests/canonical/test_relay_differential.py | 13 | Observer patch equivalence needs the reviewed external author reference build. | open |  | 2026-09-24T23:03:28.838Z |  |
+| 8 | 04 | skipped-test | tests/canonical/test_phase4_evidence.py | 19 | B1 digest reconciliation and bounded notebook reuse evidence are deferred to Wave 1. | open |  | 2026-09-24T23:03:29.449Z |  |
+| 9 | 04 | unrun-verify | tests/test_canonical_cli.py | 21 | Inherited canonical CLI verification is blocked because .venv subprocesses cannot import bp_registry. | open |  | 2026-09-24T23:03:30.055Z |  |
 
 ````json
 [
@@ -58,6 +64,84 @@ last_updated: 2026-09-24T09:43:53.726Z
     "reason": "",
     "recorded_at": "2026-09-24T09:43:35.988Z",
     "resolved_at": "2026-09-24T09:43:53.726Z",
+    "milestone": "v1.0"
+  },
+  {
+    "id": 4,
+    "kind": "skipped-test",
+    "phase": "04",
+    "file": "tests/canonical/test_memory_policies.py",
+    "line": 31,
+    "description": "Source-qualified damping, PDBP, PD′BP, and momentum equation test is deferred to Wave 1.",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-09-24T23:03:27.075Z",
+    "resolved_at": null,
+    "milestone": "v1.0"
+  },
+  {
+    "id": 5,
+    "kind": "skipped-test",
+    "phase": "04",
+    "file": "tests/canonical/test_memory_composition.py",
+    "line": 30,
+    "description": "Seeded assignments, schedule compatibility, and budget-denial rollback fixture is deferred to Wave 1.",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-09-24T23:03:27.643Z",
+    "resolved_at": null,
+    "milestone": "v1.0"
+  },
+  {
+    "id": 6,
+    "kind": "skipped-test",
+    "phase": "04",
+    "file": "tests/canonical/test_relay_differential.py",
+    "line": 8,
+    "description": "Pinned author v0.2.2 Relay differential needs the reviewed external environment and observer patch.",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-09-24T23:03:28.243Z",
+    "resolved_at": null,
+    "milestone": "v1.0"
+  },
+  {
+    "id": 7,
+    "kind": "skipped-test",
+    "phase": "04",
+    "file": "tests/canonical/test_relay_differential.py",
+    "line": 13,
+    "description": "Observer patch equivalence needs the reviewed external author reference build.",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-09-24T23:03:28.838Z",
+    "resolved_at": null,
+    "milestone": "v1.0"
+  },
+  {
+    "id": 8,
+    "kind": "skipped-test",
+    "phase": "04",
+    "file": "tests/canonical/test_phase4_evidence.py",
+    "line": 19,
+    "description": "B1 digest reconciliation and bounded notebook reuse evidence are deferred to Wave 1.",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-09-24T23:03:29.449Z",
+    "resolved_at": null,
+    "milestone": "v1.0"
+  },
+  {
+    "id": 9,
+    "kind": "unrun-verify",
+    "phase": "04",
+    "file": "tests/test_canonical_cli.py",
+    "line": 21,
+    "description": "Inherited canonical CLI verification is blocked because .venv subprocesses cannot import bp_registry.",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-09-24T23:03:30.055Z",
+    "resolved_at": null,
     "milestone": "v1.0"
   }
 ]

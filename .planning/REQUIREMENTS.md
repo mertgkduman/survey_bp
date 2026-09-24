@@ -58,12 +58,12 @@
 - [ ] **MEM-01**: A researcher can enable damping with an explicit equation, parameter, application point, and reset behavior.
 - [ ] **MEM-02**: A researcher can enable a precisely specified mixing policy with explicit operands, weights, and application order.
 - [ ] **MEM-03**: A researcher can enable a source-defined momentum policy with explicit history state and initialization/reset semantics.
-- [ ] **MEM-04**: A researcher can enable a source-defined iteration-memory policy with explicit retained state, lifetime, and update equation.
-- [ ] **MEM-05**: A researcher can enable disordered memory with a declared sampling distribution, seed stream, update equation, and inheritance/reset behavior.
+- [x] **MEM-04**: A researcher can enable a source-defined iteration-memory policy with explicit retained state, lifetime, and update equation.
+- [x] **MEM-05**: A researcher can enable disordered memory with a declared sampling distribution, seed stream, update equation, and inheritance/reset behavior.
 
 ### Named BP modifications
 
-- [ ] **MOD-01**: A researcher can execute a source-linked canonical Relay-BP composition with explicit memory, ensemble/relay legs, transferred state, stopping, and candidate selection, and run the pinned original implementation as a reference in eligible regimes.
+- [x] **MOD-01**: A researcher can execute a source-linked canonical Relay-BP composition with explicit memory, ensemble/relay legs, transferred state, stopping, and candidate selection, and run the pinned original implementation as a reference in eligible regimes.
 - [ ] **MOD-02**: A researcher can execute source-defined BPGD as a canonical guided-decimation composition with reliable-variable selection, fixation, BP rounds, and recorded state transitions.
 - [ ] **MOD-03**: A researcher can execute source-defined impulse decoding with its failure trigger, shortening attempts, branch budgets, candidate lifting, and selection represented explicitly in the canonical execution model.
 - [ ] **MOD-04**: A researcher can execute a source-linked canonical BeamSearch composition with explicit branching, masked BP, beam ranking/pruning, width/budgets, and candidate selection, alongside the pinned original reference where available.
@@ -207,9 +207,9 @@ Every v1 requirement has exactly one owning phase; later phases may use or stren
 | MEM-01 | Phase 4 | Pending |
 | MEM-02 | Phase 4 | Pending |
 | MEM-03 | Phase 4 | Pending |
-| MEM-04 | Phase 4 | Pending |
-| MEM-05 | Phase 4 | Pending |
-| MOD-01 | Phase 4 | Pending |
+| MEM-04 | Phase 4 | Complete |
+| MEM-05 | Phase 4 | Complete |
+| MOD-01 | Phase 4 | Complete |
 | MOD-02 | Phase 5 | Pending |
 | MOD-03 | Phase 5 | Pending |
 | MOD-04 | Phase 6 | Pending |
