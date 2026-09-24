@@ -1,0 +1,25 @@
+{
+  "assessment_status": "not_assessed",
+  "denominators": {
+    "all_terminal_shots": 1,
+    "outcome_unavailable": 1
+  },
+  "final_row_count": 1,
+  "fixture": "pilot_adaptation",
+  "ledger_path": "data/results/phase3-pilots/runs/phase3-hgp-gallager-nms-seeded/events.jsonl",
+  "ledger_sha256": "2c682ddcc1443cbe795b76f3e2c5d801b40eeb9435686467c8bfbd1023dc1675",
+  "manifest_path": "data/results/phase3-pilots/manifests/phase3-hgp-gallager-nms-seeded.json",
+  "manifest_sha256": "11d02005daddc15081b42851f441bad91e51d9283c0aaa80c305e178b90b1cf3",
+  "policy_identity": "6c2534e1f84e3985302a312aace42c6edc7eeab0457989a27612c58ddd0bcd71",
+  "relation": "pilot_adaptation",
+  "run_id": "phase3-hgp-gallager-nms-seeded",
+  "schema_version": 2,
+  "shot_ids": [
+    0
+  ],
+  "statistical_claim": "not_assessed; bounded pilot adaptation, not a statistical reproduction, performance ranking, or superiority claim",
+  "terminations": {
+    "max_iterations": 1
+  },
+  "title": "phase3-hgp-gallager-nms-seeded \u2014 pilot_adaptation pilot_adaptation not_assessed"
+}

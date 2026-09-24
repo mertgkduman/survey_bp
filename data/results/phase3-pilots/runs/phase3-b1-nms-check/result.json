@@ -1,0 +1,25 @@
+{
+  "assessment_status": "not_assessed",
+  "denominators": {
+    "all_terminal_shots": 1,
+    "outcome_unavailable": 1
+  },
+  "final_row_count": 1,
+  "fixture": "pilot_adaptation",
+  "ledger_path": "data/results/phase3-pilots/runs/phase3-b1-nms-check/events.jsonl",
+  "ledger_sha256": "13981b138badbbf651a2421e9abb19dae5b1199aa67820faa23f72dc82d90e9c",
+  "manifest_path": "data/results/phase3-pilots/manifests/phase3-b1-nms-check.json",
+  "manifest_sha256": "143b9df408f9948b8aaee93d6c4dee28594f0881137076363c93dd7d997bc5b4",
+  "policy_identity": "6c2534e1f84e3985302a312aace42c6edc7eeab0457989a27612c58ddd0bcd71",
+  "relation": "pilot_adaptation",
+  "run_id": "phase3-b1-nms-check",
+  "schema_version": 2,
+  "shot_ids": [
+    0
+  ],
+  "statistical_claim": "not_assessed; bounded pilot adaptation, not a statistical reproduction, performance ranking, or superiority claim",
+  "terminations": {
+    "max_iterations": 1
+  },
+  "title": "phase3-b1-nms-check \u2014 pilot_adaptation pilot_adaptation not_assessed"
+}

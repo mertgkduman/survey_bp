@@ -25,7 +25,7 @@ from .schedules import (
     CheckNodeSerialSchedule, EdgeTable, FloodingSchedule, LayeredSchedule,
     RandomizedTraversalPlan, VariableNodeSerialSchedule,
 )
-from .updates import MinSumUpdate, NormalizedMinSumUpdate, OffsetMinSumUpdate, ParameterAssignment
+from .updates import MinSumUpdate, NormalizedMinSumUpdate, OffsetMinSumUpdate, ParameterAssignment, resolve_generated_configuration_assignment
 
 
 class CanonicalStructuralVerificationError(ValueError):
@@ -363,8 +363,12 @@ def _expected_attempt(context: PublicShotContext) -> dict[str, Any]:
     if context.update_kind == "min_sum":
         kernel = BinarySpaKernel(profile=MIN_SUM_CPU_F64, update_rule=MinSumUpdate())
     elif context.update_kind == "normalized_min_sum":
-        declared = context.compact_manifest.get("policies", {}).get("update", {}).get("parameter_assignment")
-        assignment = ParameterAssignment.model_validate(declared)
+        update = context.compact_manifest.get("policies", {}).get("update", {})
+        declared = update.get("parameter_assignment")
+        assignment = ParameterAssignment.model_validate(declared) if declared is not None else resolve_generated_configuration_assignment(
+            dict(update), dict(context.compact_manifest), graph_sha256=table.graph_sha256,
+            check_count=table.check_count, edge_count=table.edge_count,
+        )[0]
         resolved = assignment.resolve(
             graph_sha256=table.graph_sha256, check_count=table.check_count, edge_count=table.edge_count,
             source_iteration=0, edge_checks=tuple(check for check, _variable in table.edges),
@@ -377,8 +381,12 @@ def _expected_attempt(context: PublicShotContext) -> dict[str, Any]:
             ),
         )
     elif context.update_kind == "offset_min_sum":
-        declared = context.compact_manifest.get("policies", {}).get("update", {}).get("parameter_assignment")
-        assignment = ParameterAssignment.model_validate(declared)
+        update = context.compact_manifest.get("policies", {}).get("update", {})
+        declared = update.get("parameter_assignment")
+        assignment = ParameterAssignment.model_validate(declared) if declared is not None else resolve_generated_configuration_assignment(
+            dict(update), dict(context.compact_manifest), graph_sha256=table.graph_sha256,
+            check_count=table.check_count, edge_count=table.edge_count,
+        )[0]
         resolved = assignment.resolve(
             graph_sha256=table.graph_sha256, check_count=table.check_count, edge_count=table.edge_count,
             source_iteration=0, edge_checks=tuple(check for check, _variable in table.edges),
@@ -544,6 +552,29 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
     if len(terminals) != 1 or stream[-1] is not terminals[0]:
         raise CanonicalStructuralVerificationError("canonical shot must have exactly one final termination")
     terminal = terminals[0]
+    terminal_data = terminal.get("data", {})
+    has_setup = "setup_runtime" in terminal_data
+    has_decode = "decode_runtime" in terminal_data
+    if has_setup != has_decode:
+        raise CanonicalStructuralVerificationError("canonical runtime split must contain both setup and decode")
+    runtime_fields = frozenset({"setup_runtime", "decode_runtime"}) if has_setup else frozenset()
+    if has_setup:
+        for field in runtime_fields:
+            evidence = terminal_data[field]
+            try:
+                if not isinstance(evidence, Mapping) or set(evidence) != {
+                    "value", "method", "scope", "unit", "precision", "unavailable_reason"
+                }:
+                    raise ValueError("invalid runtime measurement fields")
+                measured = Measurement(**evidence)
+                if measured.unit != "ns" or (measured.value is not None and measured.value < 0):
+                    raise ValueError("runtime measurement must be nonnegative nanoseconds")
+                expected_scope = "canonical_setup" if field == "setup_runtime" else "canonical_decode_attempt"
+                expected_method = "time.perf_counter_ns:v1" if field == "setup_runtime" else "time.perf_counter_ns:profile-minus-setup:v1"
+                if measured.scope != expected_scope or measured.method != (expected_method if measured.value is not None else "not_measured"):
+                    raise ValueError("runtime measurement scope or method is invalid")
+            except (TypeError, ValueError) as error:
+                raise CanonicalStructuralVerificationError(f"canonical {field} is invalid") from error
     common = _COMMON_FIELDS
     term = terminal.get("termination")
     lineage = _expected_attempt_lineage(context)
@@ -559,7 +590,7 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
         if dict((field, missingness[field]) for field in ("field", "reason")) != {"field": "candidate", "reason": "numerical_failure"}:
             raise CanonicalStructuralVerificationError("numerical failure missingness evidence is invalid")
         work_data = _exact_data(records["work"], common | {"qualified_iterations", "work_vector"})
-        _exact_data(terminal, common | {"numerical_failure", "selection_status", "outcome", "verification_status", "work_vector"})
+        _exact_data(terminal, common | {"numerical_failure", "selection_status", "outcome", "verification_status", "work_vector"} | runtime_fields)
         data = terminal["data"]
         if not isinstance(data["numerical_failure"], str) or not data["numerical_failure"]:
             raise CanonicalStructuralVerificationError("numerical failure requires a typed diagnostic")
@@ -614,12 +645,15 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
     if is_local:
         _expect_equal("terminal schedule evidence", data.get("schedule_terminal"), work_data["schedule_terminal"])
         _expect_equal("terminal schedule realization", data.get("schedule_evidence"), work_data["schedule_evidence"])
+        if runtime_fields:
+            _expect_equal("schedule setup runtime", data["setup_runtime"], data["schedule_terminal"]["setup_runtime"])
+            _expect_equal("schedule decode runtime", data["decode_runtime"], data["schedule_terminal"]["decode_runtime"])
     if expected["admitted"]:
         _expect_equal("iterations", data.get("iterations"), expected["iterations"])
         _exact_data(records["runtime"], common | {"profile"})
         _validate_profile(stream, terminal, context)
     if expected["termination"] == "completed":
-        _exact_data(terminal, common | {"attempt_lineage_id", "candidate", "candidate_lineage_id", "converged", "iterations", "logical_action_agrees", "original_lineage_id", "outcome", "profile", "selection_status", "work_vector", "working_lineage_id"} | schedule_fields)
+        _exact_data(terminal, common | {"attempt_lineage_id", "candidate", "candidate_lineage_id", "converged", "iterations", "logical_action_agrees", "original_lineage_id", "outcome", "profile", "selection_status", "work_vector", "working_lineage_id"} | schedule_fields | runtime_fields)
         _exact_data(records["candidate"], common | {"attempt_lineage_id", "candidate", "candidate_lineage_id"})
         _exact_data(records["selection"], common | {"selection_status", "original_lineage_id", "working_lineage_id", "attempt_lineage_id", "candidate_lineage_id"})
         candidate = np.asarray(expected["candidate"], dtype=np.uint8)
@@ -651,7 +685,7 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
             _expect_equal("logical_action_agrees", data.get("logical_action_agrees"), evaluation.logical_action_agrees)
     else:
         if expected["termination"] == "count_budget_exhausted":
-            fields = common | {"budget_termination", "outcome", "selection_status", "work_vector"} | schedule_fields
+            fields = common | {"budget_termination", "outcome", "selection_status", "work_vector"} | schedule_fields | runtime_fields
             if expected["admitted"]:
                 fields |= {"iterations", "profile"}
             _exact_data(terminal, fields)
@@ -659,7 +693,7 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
             if data["selection_status"] != "unavailable_due_to_budget" or data["outcome"] is not None:
                 raise CanonicalStructuralVerificationError("count budget terminal qualification is invalid")
         else:
-            _exact_data(terminal, common | {"converged", "iterations", "outcome", "profile", "selection_status", "work_vector"} | schedule_fields)
+            _exact_data(terminal, common | {"converged", "iterations", "outcome", "profile", "selection_status", "work_vector"} | schedule_fields | runtime_fields)
             if data["converged"] is not False or data["selection_status"] != "unavailable_due_to_stopping" or data["outcome"] is not None:
                 raise CanonicalStructuralVerificationError("maximum iteration terminal qualification is invalid")
     return terminals[0]

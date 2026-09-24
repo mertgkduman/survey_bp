@@ -107,6 +107,25 @@ def load_artifact(
     if type(max_bytes) is not int or not 0 < max_bytes <= MAX_ARTIFACT_BYTES:
         raise ValueError("max_bytes must be a positive bounded integer")
     artifact = _confined_file(root, relative_path)
+    if artifact.suffix == ".npz":
+        # Phase 3 frozen B1/HGP artifacts use the bounded, pickle-free archive
+        # contract established by the code-construction boundary.  Reuse that
+        # validator rather than treating a metadata JSON sidecar as decoder input.
+        from .code_constructions import load_frozen_css_npz
+
+        code = load_frozen_css_npz(
+            root, relative_path,
+            expected_raw_sha256=expected_raw_sha256,
+            expected_semantic_sha256=expected_semantic_sha256,
+        )
+        return LoadedArtifact(
+            code=code,
+            format_version=1,
+            raw_sha256=hashlib.sha256(artifact.read_bytes()).hexdigest(),
+            semantic_sha256=semantic_sha256(code),
+        )
+    if artifact.suffix != ".json":
+        raise ValueError("unsupported CSS artifact format")
     if artifact.stat().st_size > max_bytes:
         raise ValueError("artifact exceeds size limit")
     raw_bytes = artifact.read_bytes()

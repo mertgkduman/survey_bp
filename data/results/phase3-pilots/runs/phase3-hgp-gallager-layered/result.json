@@ -1,0 +1,25 @@
+{
+  "assessment_status": "not_assessed",
+  "denominators": {
+    "all_terminal_shots": 1,
+    "outcome_unavailable": 1
+  },
+  "final_row_count": 1,
+  "fixture": "pilot_adaptation",
+  "ledger_path": "data/results/phase3-pilots/runs/phase3-hgp-gallager-layered/events.jsonl",
+  "ledger_sha256": "146546622b3e3d2999b151fffa8ec2efe9da307e89494a920bd1c7a02d014e7d",
+  "manifest_path": "data/results/phase3-pilots/manifests/phase3-hgp-gallager-layered.json",
+  "manifest_sha256": "08753392b1d9322e6b7fced0af5b42ae19d200b47440cb60ad8d96302676f7c5",
+  "policy_identity": "1e0bab8cf3c035a1e7e890466de14c9b79ba299c825c9a318883045411e34848",
+  "relation": "pilot_adaptation",
+  "run_id": "phase3-hgp-gallager-layered",
+  "schema_version": 2,
+  "shot_ids": [
+    0
+  ],
+  "statistical_claim": "not_assessed; bounded pilot adaptation, not a statistical reproduction, performance ranking, or superiority claim",
+  "terminations": {
+    "max_iterations": 1
+  },
+  "title": "phase3-hgp-gallager-layered \u2014 pilot_adaptation pilot_adaptation not_assessed"
+}

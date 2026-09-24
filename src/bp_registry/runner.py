@@ -163,13 +163,26 @@ def _canonical_policy_effects(manifest: CanonicalExperimentV2 | CanonicalExperim
     """Bind declared NMS assignments to the code's canonical edge identities once."""
     effects: dict[str, dict[str, Any]] = executable_canonical_policy_effects(manifest.policies)
     assignment = getattr(manifest.policies.update, "parameter_assignment", None)
+    generation = None
+    if assignment is None and isinstance(manifest, CanonicalExperimentV3) and manifest.policies.update.parameter_generator is not None:
+        from .canonical.updates import resolve_generated_configuration_assignment
+
+        table = EdgeTable.from_check_matrix(code.hz)
+        assignment, generation = resolve_generated_configuration_assignment(
+            manifest.policies.update.model_dump(mode="json"), _canonical_kernel_manifest(manifest),
+            graph_sha256=table.graph_sha256, check_count=table.check_count,
+            edge_count=table.edge_count,
+        )
     if assignment is not None:
         table = EdgeTable.from_check_matrix(code.hz)
         resolved = assignment.resolve(
             graph_sha256=table.graph_sha256, check_count=table.check_count, edge_count=table.edge_count,
             source_iteration=0, edge_checks=tuple(check for check, _variable in table.edges),
         )
-        effects["update"] = {**effects["update"], "parameter_assignment": assignment.as_evidence(resolved)}
+        effects["update"] = {
+            **effects["update"], "parameter_assignment": assignment.as_evidence(resolved),
+            **({"parameter_generation": generation} if generation is not None else {}),
+        }
     return effects
 
 
@@ -195,7 +208,8 @@ def canonical_public_shot_context(manifest_path: str | Path, *, shot_id: int) ->
         raise ValueError("shot_id is outside the canonical manifest budget")
     digest = manifest_digest(manifest)
     sample = sampling.sample_shot(
-        resolved.code, manifest_identity=digest, seed=manifest.randomness.sample_seed,
+        resolved.code, manifest_identity=manifest.randomness.physical_sample_identity or digest,
+        seed=manifest.randomness.sample_seed,
         shot_id=shot_id, x_error_rate=manifest.error_rate,
     )
     composition = validate_executable_canonical_baseline(manifest.policies)
@@ -239,7 +253,8 @@ def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: s
     assert isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3))
     digest = verification_context.manifest_sha256
     sample = sampling.sample_shot(
-        resolved.code, manifest_identity=digest, seed=manifest.randomness.sample_seed,
+        resolved.code, manifest_identity=manifest.randomness.physical_sample_identity or digest,
+        seed=manifest.randomness.sample_seed,
         shot_id=shot_id, x_error_rate=manifest.error_rate,
     )
     composition = validate_executable_canonical_baseline(manifest.policies)

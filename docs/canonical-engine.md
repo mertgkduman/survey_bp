@@ -191,6 +191,15 @@ schedule evidence exposes fresh/stale visibility, selected order, residual cache
 semantics, or randomized replay facts as appropriate. These quantities are not
 converted to flooding sweeps or a universal cost.
 
+Phase 3 pilot terminals also retain `setup_runtime` and `decode_runtime` as
+separate nanosecond measurements. Setup covers canonical graph, kernel, and
+schedule initialization; decode is the profiled attempt wall time after
+subtracting initialization inside that profile. Local schedule construction
+before the attempt is included in setup. Public preflight, artifact loading,
+and ledger I/O are outside these two scopes, so their sum is not an end-to-end
+CLI runtime. If an attempt ends before a scope is measured, its value is
+explicitly unavailable rather than zero.
+
 For an outgoing check-to-variable edge, min-sum uses
 
 \[
@@ -236,6 +245,13 @@ boundary, and every resolved assignment. Refresh scopes are exactly
 schedule's recorded iteration boundary, never a layer/node/residual local-unit
 counter. The draw is admitted atomically before RNG advancement; an admission
 denial leaves both assignment state and RNG state unchanged.
+
+Public V3 execution currently admits generated NMS/OMS assignments only with
+`configuration` refresh under flooding. Preflight rejects generated `attempt`
+or `source_iteration` refresh and generated assignments under local schedules;
+those scope contracts remain available for isolated semantics tests. The
+configuration draw is replayed from the compact manifest and immutable graph
+by both the kernel and `verify-run`.
 
 `source_defined` generation requires a source anchor. Arbitrary generated
 ranges are `exploratory`; no generated exploratory declaration can be relabeled

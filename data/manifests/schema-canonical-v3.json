@@ -198,7 +198,10 @@
           "type": "array"
         },
         "fixture": {
-          "const": "development_fixture",
+          "enum": [
+            "development_fixture",
+            "pilot_adaptation"
+          ],
           "title": "Fixture",
           "type": "string"
         },
@@ -208,7 +211,10 @@
           "type": "string"
         },
         "relation": {
-          "const": "canonical_implemented",
+          "enum": [
+            "canonical_implemented",
+            "pilot_adaptation"
+          ],
           "title": "Relation",
           "type": "string"
         },
@@ -277,6 +283,19 @@
           "minLength": 1,
           "title": "Decoder Seed Identity",
           "type": "string"
+        },
+        "physical_sample_identity": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Physical Sample Identity"
         },
         "sample_derivation": {
           "const": "sha256-manifest-shot-v1",
