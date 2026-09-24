@@ -1,5 +1,7 @@
 # Phase 3: Update Rules and Scheduling - Research
 
+> **Source revision, 2026-09-24:** The user replaced the blocked Moradi clustered RL-S implementation target with Hsu et al.'s non-disjoint group-shuffled BP. The original Moradi analysis below remains historical evidence and must not direct Plans 03-09, 03-10, 03-16, or 03-17. See [03-SOURCE-REVISION.md](./03-SOURCE-REVISION.md) for the active source, adaptation boundary, and the separate assessment of arXiv:2504.01728.
+
 **Researched:** 2026-09-23
 **Domain:** Binary CSS BP update rules, asynchronous scheduling, source artifacts, and scientific work accounting
 **Confidence:** HIGH for in-repo seams and published procedures; MEDIUM for the runnable cluster baseline pending an author artifact
@@ -62,7 +64,7 @@
 | SCH-03 | Serial schedules define update unit, ordering, and tie rules. | SCNS/SVNS Algorithm 1/2 semantics and local stopping adaptation below. |
 | SCH-04 | Residual schedule records definition, invalidation, selection cost, stopping, and work. | One pinned conventional sRBP baseline from Huang–Ueng below. |
 | SCH-05 | Random traversal is replayable and independent of physical sampling. | Order-plan lifecycle and purpose-separated RNG evidence below. |
-| SCH-06 | Cluster schedule uses a source-defined construction/order and learned artifacts where required. | One pinned Moradi et al. baseline, strict artifact acquisition gate, and no-substitute rule below. |
+| SCH-06 | Cluster schedule uses a source-defined construction/order and learned artifacts where required. | Hsu et al.'s non-disjoint group-shuffled BP is the active Phase 3 source per D-20; see 03-SOURCE-REVISION.md. The Moradi analysis below is historical and remains unavailable. |
 </phase_requirements>
 
 ## Summary

@@ -219,19 +219,19 @@ Plans:
 
 **Wave 10** *(blocked on Wave 9 completion)*
 
-- [ ] 03-09-PLAN.md — Blocking acquisition and qualification of authoritative cluster artifacts (user-confirmed unavailable; SCH-06 remains open)
+- [ ] 03-09-PLAN.md — Pin and qualify Hsu non-disjoint group source construction for binary CSS adaptation
 
 **Wave 11** *(blocked on Wave 10 completion)*
 
-- [ ] 03-10-PLAN.md — One qualified Moradi greedy cluster selection through the public engine
+- [ ] 03-10-PLAN.md — One Hsu overlapping check-group update through the public engine
 
 **Wave 12** *(blocked on Wave 11 completion)*
 
-- [ ] 03-16-PLAN.md — Complete qualified cluster traversal, work, and reconstruction
+- [ ] 03-16-PLAN.md — Complete Hsu group traversal, work, and reconstruction
 
 **Wave 13** *(blocked on Wave 12 completion)*
 
-- [ ] 03-17-PLAN.md — Retained qualified cluster pilot and final SCH-06 gate
+- [ ] 03-17-PLAN.md — Retained Hsu CSS-adaptation pilot and final SCH-06 gate
 
 ### Phase 4: Memory Policies and Relay-BP
 

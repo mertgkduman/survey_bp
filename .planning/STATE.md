@@ -5,11 +5,11 @@ current_phase: 03
 current_phase_name: Update Rules and Scheduling
 current_plan: 9
 status: executing
-stopped_at: "Plan 03-09 blocked: authoritative Moradi Q-table and ordered partition unavailable (user-confirmed)"
-last_updated: "2026-09-24T14:42:25.770Z"
+stopped_at: Plan 03-09 ready with Hsu non-disjoint group source; Moradi artifact remains unavailable
+last_updated: "2026-09-24T15:11:26.964Z"
 last_activity: 2026-09-24
-last_activity_desc: User confirmed authoritative Moradi cluster artifact unavailable; Phase 03 remains 13/17, SCH-06 blocked
-state_head: 5aa0ca44de7c6db8ae4b344e8202468757601572
+last_activity_desc: User selected Hsu non-disjoint group BP; four remaining Phase 03 plans revised and ready
+state_head: 8059864db91250036f89fb4745589a47e6e8b36c
 progress:
   total_phases: 14
   completed_phases: 2
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 9
 Total Plans in Phase: 17
 Status: Executing Phase 03
-Last activity: 2026-09-24 — User confirmed the authoritative Moradi cluster artifact is unavailable
-Last Activity Description: User confirmed authoritative Moradi cluster artifact unavailable; Phase 03 remains 13/17, SCH-06 blocked
+Last activity: 2026-09-24 — Phase 03 source revised to Hsu non-disjoint group BP
+Last Activity Description: User selected Hsu non-disjoint group BP; four remaining Phase 03 plans revised and ready
 
 Progress: 14% [█░░░░░░░░░]
 
@@ -107,7 +107,7 @@ None outside the roadmap.
 
 ### Blockers/Concerns
 
-- Phase 3 has completed 13/17 plans. The user confirmed that the authoritative Moradi Q-table and exact ordered partition are unavailable. Plan 03-09 remains at its blocking-human checkpoint; dependent Plans 03-10, 03-16, and 03-17 cannot proceed. SCH-06 remains open.
+- Phase 3 has completed 13/17 plans. The user confirmed that the authoritative Moradi Q-table and exact ordered partition are unavailable, then selected Hsu et al.'s non-disjoint group-shuffled BP as the replacement cluster source. Plans 03-09, 03-10, 03-16, and 03-17 are revised for that source and are ready to execute. SCH-06 remains open until verified execution.
 
 Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 security threats closed). Remaining research concerns for later phases:
 
@@ -131,6 +131,6 @@ No requested decoding regime or named policy family is deferred beyond the first
 ## Session Continuity
 
 Last session: 2026-09-24T04:44:45.038Z
-Stopped at: Plan 03-09 blocked: authoritative Moradi Q-table and ordered partition unavailable (user-confirmed)
+Stopped at: Plan 03-09 ready with Hsu non-disjoint group source; Moradi artifact remains unavailable
 Resume file: .planning/phases/03-update-rules-and-scheduling/03-09-PLAN.md
 Next command: $gsd-execute-phase 3
