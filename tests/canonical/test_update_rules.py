@@ -93,7 +93,7 @@ def test_normalized_min_sum_and_explicit_assignments_have_a_closed_graph_bound_c
 
     np.testing.assert_array_equal(
         scalar.resolve(graph_sha256="a" * 64, check_count=2, edge_count=3, source_iteration=0),
-        checks.resolve(graph_sha256="a" * 64, check_count=2, edge_count=3, source_iteration=0),
+        checks.resolve(graph_sha256="a" * 64, check_count=2, edge_count=3, source_iteration=0, edge_checks=(0, 1, 0)),
     )
     np.testing.assert_array_equal(
         scalar.resolve(graph_sha256="a" * 64, check_count=2, edge_count=3, source_iteration=0),
@@ -110,8 +110,6 @@ def test_normalized_min_sum_and_explicit_assignments_have_a_closed_graph_bound_c
     [
         {"shape": "scalar", "value": -0.1},
         {"shape": "scalar", "value": float("inf")},
-        {"shape": "check", "graph_sha256": "a" * 64, "values": [0.8]},
-        {"shape": "edge", "graph_sha256": "b" * 64, "values": [0.8, 0.8, 0.8]},
         {"shape": "scalar", "value": 0.8, "values": [0.8]},
     ],
 )
@@ -119,3 +117,21 @@ def test_explicit_normalization_assignments_reject_ambiguous_or_invalid_shapes(v
     updates = _updates_module()
     with pytest.raises(ValueError):
         updates.ParameterAssignment.model_validate(value)
+
+
+def test_graph_bound_assignment_rejects_a_different_immutable_graph():
+    updates = _updates_module()
+    assignment = updates.ParameterAssignment.model_validate(
+        {"shape": "edge", "graph_sha256": "b" * 64, "values": [0.8, 0.8, 0.8]}
+    )
+    with pytest.raises(ValueError, match="graph_sha256"):
+        assignment.resolve(graph_sha256="a" * 64, check_count=2, edge_count=3, source_iteration=0)
+
+
+def test_graph_bound_assignment_rejects_a_wrong_declared_length_before_broadcasting():
+    updates = _updates_module()
+    assignment = updates.ParameterAssignment.model_validate(
+        {"shape": "check", "graph_sha256": "a" * 64, "values": [0.8]}
+    )
+    with pytest.raises(ValueError, match="check_count"):
+        assignment.resolve(graph_sha256="a" * 64, check_count=2, edge_count=3, source_iteration=0, edge_checks=(0, 1, 0))

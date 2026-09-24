@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from hashlib import sha256
+import json
 import numbers
 from typing import Protocol
 
@@ -59,6 +61,12 @@ class EdgeTable:
     def edge_count(self) -> int:
         return len(self.edges)
 
+    @property
+    def graph_sha256(self) -> str:
+        """Stable graph identity for assignments indexed by canonical EdgeTable positions."""
+        payload = {"check_count": self.check_count, "variable_count": self.variable_count, "edges": self.edges}
+        return sha256(json.dumps(payload, separators=(",", ":")).encode("utf-8")).hexdigest()
+
 
 @dataclass(frozen=True, slots=True)
 class FloodingWork:
@@ -94,7 +102,7 @@ class FloodingSweep:
 class _FloodingKernel(Protocol):
     def prior(self, error_rate: float) -> float: ...
 
-    def check_message(self, incoming: np.ndarray, syndrome: int) -> float: ...
+    def check_message(self, incoming: np.ndarray, syndrome: int, *, check_index: int = 0, edge_index: int = 0, source_iteration: int = 0) -> float: ...
 
     def assemble_beliefs(self, variable_count: int, edge_variables: tuple[int, ...], messages: np.ndarray, prior: float) -> np.ndarray: ...
 
@@ -120,7 +128,7 @@ class FloodingSchedule:
         """Create the initial variable-to-check snapshot from the declared prior."""
         return np.full(self.edge_table.edge_count, self.kernel.prior(error_rate), dtype=np.float64)
 
-    def sweep(self, old_v2c: np.ndarray, syndrome: np.ndarray, *, error_rate: float) -> FloodingSweep:
+    def sweep(self, old_v2c: np.ndarray, syndrome: np.ndarray, *, error_rate: float, source_iteration: int = 0) -> FloodingSweep:
         """Build a finite full sweep without mutating the supplied old snapshot."""
         old = finite_saturate(old_v2c, boundary="flooding_old_v2c", profile=self.profile)
         if old.ndim != 1 or old.shape != (self.edge_table.edge_count,):
@@ -138,7 +146,10 @@ class FloodingSchedule:
         for check, edge_indices in enumerate(self._check_edges):
             for edge_index in edge_indices:
                 incoming = old_snapshot[[other for other in edge_indices if other != edge_index]]
-                c2v[edge_index] = self.kernel.check_message(incoming, int(syndrome_bits[check]))
+                c2v[edge_index] = self.kernel.check_message(
+                    incoming, int(syndrome_bits[check]), check_index=check,
+                    edge_index=edge_index, source_iteration=source_iteration,
+                )
         c2v = finite_saturate(c2v, boundary="flooding_complete_c2v", profile=self.profile)
         beliefs = self.kernel.assemble_beliefs(self.edge_table.variable_count, self._edge_variables, c2v, prior)
         beliefs = finite_saturate(beliefs, boundary="flooding_belief_assembly", profile=self.profile)

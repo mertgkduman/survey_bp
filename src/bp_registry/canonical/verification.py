@@ -22,7 +22,7 @@ from .numerics import MIN_SUM_CPU_F64
 from .lineage import stable_lineage_id
 from .profiling import ProfileMeasurement, validate_public_clean_low_overhead_evidence
 from .schedules import EdgeTable, FloodingSchedule
-from .updates import MinSumUpdate
+from .updates import MinSumUpdate, NormalizedMinSumUpdate, ParameterAssignment
 
 
 class CanonicalStructuralVerificationError(ValueError):
@@ -126,13 +126,24 @@ def _expected_attempt(context: PublicShotContext) -> dict[str, Any]:
     if denial is not None:
         return {"termination": "count_budget_exhausted", "work_vector": zero.as_evidence(), "iterations": 0, "budget_termination": denial, "admitted": False}
     work = bp_call
+    table = EdgeTable.from_check_matrix(code.hz)
     if context.update_kind == "min_sum":
         kernel = BinarySpaKernel(profile=MIN_SUM_CPU_F64, update_rule=MinSumUpdate())
+    elif context.update_kind == "normalized_min_sum":
+        declared = context.compact_manifest.get("policies", {}).get("update", {}).get("parameter_assignment")
+        assignment = ParameterAssignment.model_validate(declared)
+        resolved = assignment.resolve(
+            graph_sha256=table.graph_sha256, check_count=table.check_count, edge_count=table.edge_count,
+            source_iteration=0, edge_checks=tuple(check for check, _variable in table.edges),
+        )
+        kernel = BinarySpaKernel(
+            profile=MIN_SUM_CPU_F64,
+            update_rule=NormalizedMinSumUpdate(assignment, resolved_alpha=tuple(float(value) for value in resolved)),
+        )
     elif context.update_kind == "binary_spa":
         kernel = BinarySpaKernel()
     else:
         raise CanonicalStructuralVerificationError(f"unsupported public update rule {context.update_kind!r}")
-    table = EdgeTable.from_check_matrix(code.hz)
     schedule = FloodingSchedule(table, kernel=kernel, profile=kernel.profile)
     if table.edge_count == 0:
         candidate = kernel.candidate_from_beliefs(np.full(code.n, kernel.prior(context.error_rate), dtype=np.float64))

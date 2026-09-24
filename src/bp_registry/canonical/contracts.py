@@ -11,6 +11,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from .updates import ParameterAssignment
+
 
 class _Strict(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True, frozen=True, allow_inf_nan=False)
@@ -58,7 +60,7 @@ _ROLE_HOOKS: dict[PolicyRole, Hook] = {
     PolicyRole.POSTPROCESSING: Hook.ATTEMPT,
 }
 _POLICY_KINDS: dict[PolicyRole, frozenset[str]] = {
-    PolicyRole.UPDATE: frozenset({"identity", "binary_spa", "min_sum"}),
+    PolicyRole.UPDATE: frozenset({"identity", "binary_spa", "min_sum", "normalized_min_sum"}),
     PolicyRole.SCHEDULE: frozenset({"identity", "flooding"}),
     PolicyRole.STATE_MEMORY: frozenset({"identity", "stateless"}),
     PolicyRole.INTERVENTION: frozenset({"identity"}),
@@ -78,6 +80,7 @@ class PolicySpec(_Strict):
     requires: tuple[str, ...] = ()
     provides: tuple[str, ...] = ()
     hook: Literal["shot", "search", "member", "leg", "branch", "attempt", "iteration", "message"] | None = None
+    parameter_assignment: ParameterAssignment | None = None
 
     @field_validator("owned_state", "requires", "provides", mode="before")
     @classmethod
@@ -92,6 +95,14 @@ class PolicySpec(_Strict):
         if len(value) != len(set(value)):
             raise ValueError("state and capability declarations must not contain duplicates")
         return value
+
+    @model_validator(mode="after")
+    def normalization_is_explicit_and_scoped_to_the_update_role(self) -> "PolicySpec":
+        if self.kind == "normalized_min_sum" and self.parameter_assignment is None:
+            raise ValueError("normalized_min_sum requires one explicit parameter_assignment")
+        if self.kind != "normalized_min_sum" and self.parameter_assignment is not None:
+            raise ValueError("parameter_assignment is valid only for normalized_min_sum")
+        return self
 
 
 class CanonicalCompositionSpec(_Strict):
