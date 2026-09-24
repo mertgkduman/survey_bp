@@ -18,8 +18,7 @@ import numpy as np
 from .. import evaluator
 from .budgets import WorkVector
 from .kernel import BinarySpaKernel
-from .lineage import LineageEdge, stable_lineage_id
-from .problems import OriginalProblem, WorkingProblem
+from .lineage import stable_lineage_id
 from .profiling import ProfileMeasurement, validate_public_clean_low_overhead_evidence
 from .schedules import EdgeTable, FloodingSchedule
 
@@ -68,6 +67,11 @@ class PublicShotContext:
     shot_id: int
     check_type: str
     syndrome: tuple[int, ...]
+    code_id: str
+    evidence_relation: str
+    fixture: str
+    assessment_status: str
+    decoder_seed_identity: str
     code: Any | None = None
     hidden_truth: Any | None = None
     error_rate: float | None = None
@@ -191,6 +195,11 @@ def _validate_common(event: Mapping[str, Any], context: PublicShotContext, basel
         "manifest_sha256": context.manifest_sha256,
         "artifact_raw_sha256": context.artifact_raw_sha256,
         "artifact_semantic_sha256": context.artifact_semantic_sha256,
+        "code_id": context.code_id,
+        "evidence_relation": context.evidence_relation,
+        "fixture": context.fixture,
+        "assessment_status": context.assessment_status,
+        "decoder_seed_identity": context.decoder_seed_identity,
         "canonical_identity": context.execution_identity,
         "execution_identity": context.execution_identity,
     }
@@ -235,6 +244,20 @@ def _validate_event_envelopes(stream: Sequence[Mapping[str, Any]], context: Publ
     return baseline, by_kind
 
 
+def _expected_attempt_lineage(context: PublicShotContext) -> dict[str, str] | None:
+    """Reconstruct the public attempt ancestry independently of ledger records."""
+    if context.code is None:
+        return None
+    original = stable_lineage_id("original", {"identity": context.execution_identity})
+    working = stable_lineage_id("working", {"original": original.value, "lift": "identity"})
+    attempt = stable_lineage_id("attempt", {"working": working.value, "ordinal": 0})
+    return {
+        "original_lineage_id": original.value,
+        "working_lineage_id": working.value,
+        "attempt_lineage_id": attempt.value,
+    }
+
+
 def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: PublicShotContext) -> Mapping[str, Any]:
     """Reject a stale, duplicate, or identity-mismatched persisted shot.
 
@@ -254,12 +277,15 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
     terminal = terminals[0]
     common = _COMMON_FIELDS
     term = terminal.get("termination")
+    lineage = _expected_attempt_lineage(context)
     if term == "numerical_failure":
         _, records = _validate_event_envelopes(stream, context, ["shot_begin", "attempt", "missingness", "work", "termination"])
         _exact_data(records["shot_begin"], common)
         attempt = _exact_data(records["attempt"], common | {"scope", "attempt_lineage_id", "max_iterations"})
         if attempt["scope"] != "attempt" or attempt["max_iterations"] != context.max_iterations or not isinstance(attempt["attempt_lineage_id"], str):
             raise CanonicalStructuralVerificationError("numerical failure attempt evidence is invalid")
+        if lineage is not None:
+            _expect_equal("attempt_lineage_id", attempt["attempt_lineage_id"], lineage["attempt_lineage_id"])
         missingness = _exact_data(records["missingness"], common | {"field", "reason"})
         if dict((field, missingness[field]) for field in ("field", "reason")) != {"field": "candidate", "reason": "numerical_failure"}:
             raise CanonicalStructuralVerificationError("numerical failure missingness evidence is invalid")
@@ -290,6 +316,8 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
     attempt = _exact_data(records["attempt"], common | {"scope", "attempt_lineage_id", "max_iterations"})
     if attempt["scope"] != "attempt" or attempt["max_iterations"] != context.max_iterations or not isinstance(attempt["attempt_lineage_id"], str):
         raise CanonicalStructuralVerificationError("canonical attempt evidence is invalid")
+    if lineage is not None:
+        _expect_equal("attempt_lineage_id", attempt["attempt_lineage_id"], lineage["attempt_lineage_id"])
     work_data = _exact_data(records["work"], common | {"qualified_iterations", "work_vector"})
     _expect_equal("work_vector", work_data["work_vector"], expected["work_vector"])
     _expect_equal("qualified_iterations", work_data["qualified_iterations"], {"count": expected["iterations"], "schedule": "flooding", "atomic_unit": "complete_double_buffered_sweep"})
@@ -297,37 +325,35 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
     _expect_equal("work_vector", data.get("work_vector"), expected["work_vector"])
     if expected["admitted"]:
         _expect_equal("iterations", data.get("iterations"), expected["iterations"])
+        _exact_data(records["runtime"], common | {"profile"})
         _validate_profile(stream, terminal, context)
     if expected["termination"] == "completed":
         _exact_data(terminal, common | {"attempt_lineage_id", "candidate", "candidate_lineage_id", "converged", "iterations", "logical_action_agrees", "original_lineage_id", "outcome", "profile", "selection_status", "work_vector", "working_lineage_id"})
-        _exact_data(records["runtime"], common | {"profile"})
         _exact_data(records["candidate"], common | {"attempt_lineage_id", "candidate", "candidate_lineage_id"})
         _exact_data(records["selection"], common | {"selection_status", "original_lineage_id", "working_lineage_id", "attempt_lineage_id", "candidate_lineage_id"})
         candidate = np.asarray(expected["candidate"], dtype=np.uint8)
         _expect_equal("candidate", data.get("candidate"), candidate.tolist())
         _expect_equal("iterations", data.get("iterations"), expected["iterations"])
-        original_id = stable_lineage_id("original", {"identity": context.execution_identity})
-        original = OriginalProblem(original_id.value, context.code.hx, context.code.hz, np.asarray(context.syndrome, dtype=np.uint8))
-        working_id = stable_lineage_id("working", {"original": original_id.value, "lift": "identity"})
-        working = WorkingProblem(working_id.value, original, LineageEdge("identity", original_id, working_id))
-        attempt_id = stable_lineage_id("attempt", {"working": working.lineage_id, "ordinal": 0})
-        candidate_id = stable_lineage_id("candidate", {"working": working.lineage_id, "attempt": attempt_id.value, "candidate": candidate.tolist()})
+        if lineage is None:
+            raise CanonicalStructuralVerificationError("completed terminal requires a reconstructable public lineage")
+        candidate_id = stable_lineage_id("candidate", {"working": lineage["working_lineage_id"], "attempt": lineage["attempt_lineage_id"], "candidate": candidate.tolist()})
         for field, value in {
-            "original_lineage_id": original_id.value, "working_lineage_id": working_id.value,
-            "attempt_lineage_id": attempt_id.value, "candidate_lineage_id": candidate_id.value,
+            **lineage, "candidate_lineage_id": candidate_id.value,
         }.items():
             _expect_equal(field, data.get(field), value)
-        attempt = next(event for event in stream if event.get("kind") == "attempt")
-        _expect_equal("attempt_lineage_id", attempt.get("data", {}).get("attempt_lineage_id"), attempt_id.value)
         candidate_event = next(event for event in stream if event.get("kind") == "candidate")
         _expect_equal("candidate", candidate_event.get("data", {}).get("candidate"), candidate.tolist())
+        _expect_equal("attempt_lineage_id", candidate_event.get("data", {}).get("attempt_lineage_id"), lineage["attempt_lineage_id"])
         _expect_equal("candidate_lineage_id", candidate_event.get("data", {}).get("candidate_lineage_id"), candidate_id.value)
         selection = next(event for event in stream if event.get("kind") == "selection")
         for field, value in {
-            "original_lineage_id": original_id.value, "working_lineage_id": working_id.value,
-            "attempt_lineage_id": attempt_id.value, "candidate_lineage_id": candidate_id.value,
+            **lineage, "candidate_lineage_id": candidate_id.value,
         }.items():
             _expect_equal(field, selection.get("data", {}).get(field), value)
+        if data["converged"] is not True or data["selection_status"] != "frozen_decoder_visible_candidate":
+            raise CanonicalStructuralVerificationError("completed terminal selection qualification is invalid")
+        if selection.get("data", {}).get("selection_status") != "frozen_decoder_visible_candidate":
+            raise CanonicalStructuralVerificationError("selection evidence is not frozen decoder-visible")
         if context.hidden_truth is not None:
             evaluation = evaluator.evaluate_candidate(context.code, true_x=context.hidden_truth.x, true_z=context.hidden_truth.z, candidate_x=candidate)
             _expect_equal("outcome", data.get("outcome"), evaluation.outcome)

@@ -281,6 +281,8 @@ def test_verify_run_accepts_persistent_numerical_failure_without_replay(tmp_path
 
 def test_verify_run_rejects_every_unbound_terminal_and_provenance_field(tmp_path, monkeypatch):
     """Rehashed records still derive every terminal fact from trusted inputs."""
+    from dataclasses import replace
+
     from bp_registry.canonical.numerics import NumericalFailure
     from bp_registry.canonical.schedules import FloodingSchedule
     from bp_registry.cli import run_canonical, verify_run
@@ -355,6 +357,24 @@ def test_verify_run_rejects_every_unbound_terminal_and_provenance_field(tmp_path
     with pytest.raises(ValueError):
         verify_run(output)
     monkeypatch.setattr(FloodingSchedule, "sweep", original)
+
+    def finite_nonconverging(schedule, old_v2c, syndrome, *, error_rate):
+        sweep = original(schedule, old_v2c, syndrome, error_rate=error_rate)
+        return replace(sweep, candidate=np.zeros_like(sweep.candidate))
+
+    monkeypatch.setattr(FloodingSchedule, "sweep", finite_nonconverging)
+    maximum_manifest = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text(encoding="utf-8"))
+    maximum_manifest["budgets"]["attempt"]["max_iterations"] = 1
+    maximum_path = tmp_path / "maximum.json"
+    maximum_path.write_text(json.dumps(maximum_manifest), encoding="utf-8")
+    output = tmp_path / "maximum-attempt"
+    run_canonical(maximum_path, output)
+    _rewrite_rehashed_canonical_ledger(
+        output,
+        lambda events: next(event for event in events if event["kind"] == "attempt")["data"].__setitem__("attempt_lineage_id", "forged"),
+    )
+    with pytest.raises(ValueError):
+        verify_run(output)
 
 
 def test_verify_run_accepts_legitimate_terminal_classes_after_semantic_binding(tmp_path, monkeypatch):
