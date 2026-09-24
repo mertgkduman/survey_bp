@@ -61,7 +61,7 @@ _ROLE_HOOKS: dict[PolicyRole, Hook] = {
 }
 _POLICY_KINDS: dict[PolicyRole, frozenset[str]] = {
     PolicyRole.UPDATE: frozenset({"identity", "binary_spa", "min_sum", "normalized_min_sum", "offset_min_sum"}),
-    PolicyRole.SCHEDULE: frozenset({"identity", "flooding"}),
+    PolicyRole.SCHEDULE: frozenset({"identity", "flooding", "layered"}),
     PolicyRole.STATE_MEMORY: frozenset({"identity", "stateless"}),
     PolicyRole.INTERVENTION: frozenset({"identity"}),
     PolicyRole.STOPPING: frozenset({"identity", "syndrome_or_budget"}),
@@ -140,10 +140,39 @@ class PolicySpecV3(PolicySpec):
         return self
 
 
+class SchedulePolicySpecV3(PolicySpec):
+    """Persisted layered membership is explicit, graph-bound configuration data."""
+
+    partitions: tuple[tuple[int, ...], ...] | None = None
+    provenance: Literal["explicit", "source_explicit", "graph_coloring"] | None = None
+    construction_rule: str | None = None
+
+    @field_validator("partitions", mode="before")
+    @classmethod
+    def json_partitions_to_tuples(cls, value: Any) -> Any:
+        if isinstance(value, list):
+            return tuple(tuple(layer) if isinstance(layer, list) else layer for layer in value)
+        return value
+
+    @model_validator(mode="after")
+    def layered_controls_match_the_declared_kind(self) -> "SchedulePolicySpecV3":
+        if self.kind == "layered":
+            if self.partitions is None or self.provenance is None:
+                raise ValueError("layered schedules require explicit partitions and provenance")
+            if self.provenance == "graph_coloring" and not self.construction_rule:
+                raise ValueError("graph_coloring layered schedules require a construction_rule")
+            if self.provenance != "graph_coloring" and self.construction_rule is not None:
+                raise ValueError("only graph_coloring layered schedules may carry construction_rule")
+        elif self.partitions is not None or self.provenance is not None or self.construction_rule is not None:
+            raise ValueError("schedule controls are valid only for layered schedules")
+        return self
+
+
 class CanonicalCompositionSpecV3(CanonicalCompositionSpec):
     """V3 carries NMS assignments only on the update binding."""
 
     update: PolicySpecV3
+    schedule: SchedulePolicySpecV3
 
 
 @dataclass(frozen=True)
@@ -333,11 +362,11 @@ class CanonicalManifestV2(_Strict):
 
 
 class CanonicalManifestV3(_Strict):
-    """Compact kernel contract for the independently versioned min-sum tracer."""
+    """Compact kernel contract for promoted V3 local-step tracers."""
 
     schema_version: Literal[3]
     run_id: str = Field(min_length=1)
-    numerical_profile: Literal["cpu-float64-min-sum-v1"]
+    numerical_profile: Literal["cpu-float64-min-sum-v1", "cpu-float64-spa-v1"]
     max_iterations: int = Field(ge=1, le=100_000)
     error_rate: float = Field(ge=0.0, le=1.0)
     policies: CanonicalCompositionSpecV3

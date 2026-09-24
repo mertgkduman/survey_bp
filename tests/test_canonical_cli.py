@@ -66,6 +66,8 @@ def test_documented_nms_contract_names_equations_assignments_and_public_verifica
     assert "alpha" in tutorial
     assert "parameter_assignment" in tutorial
     assert "schema-canonical-v3.json" in tutorial
+    assert "layered" in tutorial
+    assert "partitions" in tutorial
 
 
 def test_checked_canonical_manifest_has_a_strict_public_preflight_contract():
@@ -820,6 +822,72 @@ else:
         env={**os.environ, "PYTHONPATH": str(REPOSITORY_ROOT / "src"), "OMP_NUM_THREADS": "1", "BP_REGISTRY_ROOT": str(REPOSITORY_ROOT), "BP_REGISTRY_OUTPUT": str(tmp_path)},
     )
     assert completed.returncode == 0, completed.stderr
+
+
+def test_layered_spa_public_manifest_preflights_runs_and_verifies_through_local_executor(tmp_path, monkeypatch):
+    """The first public non-flooding tracer uses the schedule-neutral executor."""
+    from bp_registry.canonical.execution import CanonicalLocalStepExecutor
+    from bp_registry.cli import run_canonical, verify_run
+    from bp_registry.manifests import preflight
+
+    manifest = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text(encoding="utf-8"))
+    manifest.update({
+        "schema_version": 3,
+        "run_id": "canonical-layered-spa-development",
+        "numerical_profile": "cpu-float64-spa-v1",
+    })
+    manifest["policies"]["schedule"] = {
+        "kind": "layered",
+        "binding_id": "schedule-layered-explicit-v1",
+        "state_lifetime": "iteration",
+        "owned_state": [],
+        "requires": [],
+        "provides": [],
+        "partitions": [[0]],
+        "provenance": "explicit",
+    }
+    manifest_path = tmp_path / "layered-spa.json"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    try:
+        resolved = preflight(manifest_path)
+    except ValueError:
+        resolved = None
+    assert resolved is not None, "a strict V3 SPA/layered manifest must pass public preflight"
+
+    calls: list[str] = []
+    original_execute = CanonicalLocalStepExecutor.execute
+
+    def counted_execute(self, *args, **kwargs):
+        calls.append("local-step")
+        return original_execute(self, *args, **kwargs)
+
+    monkeypatch.setattr(CanonicalLocalStepExecutor, "execute", counted_execute)
+    output = tmp_path / "layered-output"
+    assert run_canonical(manifest_path, output)["final_row_count"] == 2
+    assert verify_run(output)["final_row_count"] == 2
+    assert calls, "layered public execution must not bypass CanonicalLocalStepExecutor"
+
+    events = __import__("bp_registry.ledger", fromlist=["read_canonical_events"]).read_canonical_events(output / "events.jsonl")
+    terminal = next(event["data"] for event in events if event["kind"] == "termination")
+    assert terminal["schedule_evidence"]["realized_order"] == [0]
+    assert terminal["schedule_terminal"]["source_iteration"] == {
+        "count": 1, "schedule": "layered", "atomic_unit": "one_layer",
+    }
+
+    reports = [
+        json.loads(subprocess.run(
+            command, cwd=REPOSITORY_ROOT, text=True, capture_output=True, check=True,
+            env={**os.environ, "PYTHONPATH": str(REPOSITORY_ROOT / "src")},
+        ).stdout)
+        for command in (
+            [sys.executable, "-m", "bp_registry.cli", "preflight", str(manifest_path)],
+            [sys.executable, "-m", "bp_registry.cli", "canonical", str(manifest_path), "--output", str(output)],
+            [sys.executable, "-m", "bp_registry.cli", "verify-run", str(output)],
+        )
+    ]
+    assert reports[0]["policies"]["schedule"]["kind"] == "layered"
+    assert reports[-1]["final_row_count"] == 2
 
 
 def test_checked_canonical_result_is_idempotent_and_honestly_labeled():

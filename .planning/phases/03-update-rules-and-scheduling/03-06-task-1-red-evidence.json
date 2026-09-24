@@ -1,0 +1,9 @@
+{
+  "command": "PYTHONPATH=$PWD/src OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_canonical_cli.py -k layered_spa_public_manifest",
+  "exitCode": 1,
+  "output": "not ok 1 - test_layered_spa_public_manifest_preflights_runs_and_verifies_through_local_executor\n  ---\n  framework: pytest\n  assertion: a strict V3 SPA/layered manifest must pass public preflight\n  actual: resolved is None because the closed public schema only admits flooding schedules\n  ...\n# tests 1\n# pass 0\n# fail 1\n",
+  "targetTest": "test_layered_spa_public_manifest_preflights_runs_and_verifies_through_local_executor",
+  "targetFile": "tests/test_canonical_cli.py",
+  "expected": "A strict V3 binary-SPA/layered manifest preflights, executes through CanonicalLocalStepExecutor, writes public terminal evidence, and passes verify-run.",
+  "actual": "The named pytest target failed its explicit preflight assertion because the public V3 schema and executable registry admit only flooding schedules."
+}

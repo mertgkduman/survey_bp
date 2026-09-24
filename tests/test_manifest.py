@@ -142,6 +142,35 @@ def test_offset_min_sum_is_a_closed_v3_update_kind_with_an_explicit_assignment(t
     assert resolved.manifest.policies.update.kind == "offset_min_sum"
 
 
+def test_v3_layered_spa_admission_requires_explicit_partitions_and_rejects_unimplemented_pairs(tmp_path):
+    from bp_registry.manifests import preflight
+
+    value = json.loads(Path("data/manifests/canonical-three-qubit-development.json").read_text(encoding="utf-8"))
+    value.update({"schema_version": 3, "run_id": "canonical-layered-contract", "numerical_profile": "cpu-float64-spa-v1"})
+    value["policies"]["schedule"] = {
+        "kind": "layered", "binding_id": "schedule-layered-explicit-v1",
+        "state_lifetime": "iteration", "owned_state": [], "requires": [], "provides": [],
+        "partitions": [[0]], "provenance": "explicit",
+    }
+    path = tmp_path / "layered.json"
+    path.write_text(json.dumps(value), encoding="utf-8")
+    assert preflight(path).manifest.policies.schedule.partitions == ((0,),)
+
+    missing_partitions = json.loads(json.dumps(value))
+    missing_partitions["policies"]["schedule"].pop("partitions")
+    with pytest.raises(ValueError, match="partitions"):
+        preflight(missing_partitions)
+
+    unsupported = json.loads(json.dumps(value))
+    unsupported["numerical_profile"] = "cpu-float64-min-sum-v1"
+    unsupported["policies"]["update"] = {
+        "kind": "min_sum", "binding_id": "update-min-sum-v1",
+        "state_lifetime": "message", "owned_state": [], "requires": [], "provides": [],
+    }
+    with pytest.raises(ValueError, match="flooding/layered"):
+        preflight(unsupported)
+
+
 @pytest.mark.parametrize("value", [float("nan"), float("inf"), -0.01, 1.01, "0.1"])
 def test_manifest_rejects_nonfinite_out_of_range_or_coerced_rates(tmp_path, value):
     from bp_registry.manifests import parse_manifest

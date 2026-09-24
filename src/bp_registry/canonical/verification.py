@@ -16,12 +16,12 @@ from typing import Any, Mapping, Sequence
 import numpy as np
 
 from .. import evaluator
-from .budgets import BudgetView, Measurement, QualifiedIteration, ScheduleTerminalEvidence, WorkVector
+from .budgets import BudgetLimit, BudgetTree, BudgetView, Measurement, QualifiedIteration, ScheduleTerminalEvidence, WorkVector
 from .kernel import BinarySpaKernel
 from .numerics import MIN_SUM_CPU_F64
 from .lineage import stable_lineage_id
 from .profiling import ProfileMeasurement, validate_public_clean_low_overhead_evidence
-from .schedules import EdgeTable, FloodingSchedule
+from .schedules import EdgeTable, FloodingSchedule, LayeredSchedule
 from .updates import MinSumUpdate, NormalizedMinSumUpdate, OffsetMinSumUpdate, ParameterAssignment
 
 
@@ -145,6 +145,7 @@ class PublicShotContext:
     policy_effects: Mapping[str, Any] | None = None
     profile_plan: Mapping[str, Any] | None = None
     update_kind: str = "binary_spa"
+    schedule_kind: str = "flooding"
 
     @property
     def execution_identity(self) -> str:
@@ -176,10 +177,65 @@ def _budget_denial(limits: Mapping[str, Mapping[str, int]], work: WorkVector, de
     return None
 
 
+def _expected_layered_attempt(context: PublicShotContext) -> dict[str, Any]:
+    """Independently replay the closed SPA/layered public tracer without ledger facts."""
+    if context.code is None or context.error_rate is None or context.max_iterations is None:
+        return {}
+    schedule_data = context.compact_manifest.get("policies", {}).get("schedule", {})
+    if not isinstance(schedule_data, Mapping):
+        raise CanonicalStructuralVerificationError("layered public context lacks a schedule policy")
+    partitions = schedule_data.get("partitions")
+    provenance = schedule_data.get("provenance")
+    if not isinstance(partitions, list) or not isinstance(provenance, str):
+        raise CanonicalStructuralVerificationError("layered public context lacks explicit partition evidence")
+    code = context.code.validate()
+    table = EdgeTable.from_check_matrix(code.hz)
+    kernel = BinarySpaKernel()
+    schedule = LayeredSchedule(
+        table, kernel=kernel, partitions=partitions, provenance=provenance,
+        construction_rule=schedule_data.get("construction_rule"),
+    )
+    limits = context.work_limits or {}
+    budget_limits = [
+        BudgetLimit(scope, resource, int(limit))
+        for scope in ("shot", "search", "attempt")
+        for resource, limit in limits.get(scope, {}).items()
+    ]
+    budgets = BudgetTree(limits=budget_limits, parents={"search": "shot", "attempt": "search"})
+    bp_call = budgets.reserve("attempt", WorkVector(bp_calls=1), leaf_id="expected:bp-call")
+    if bp_call is None:
+        return {"termination": "count_budget_exhausted", "work_vector": WorkVector.zero().as_evidence(structural_event_version=2), "schedule_work_vector": WorkVector.zero().as_evidence(), "iterations": 0, "admitted": False}
+    bp_call.commit_once()
+    messages = np.full(table.edge_count, kernel.prior(context.error_rate), dtype=np.float64)
+    executor = __import__("bp_registry.canonical.execution", fromlist=["CanonicalLocalStepExecutor"]).CanonicalLocalStepExecutor(budgets, scope="attempt")
+    progress = __import__("bp_registry.canonical.execution", fromlist=["ScheduleProgress"]).ScheduleProgress(0, 0, (0,))
+    candidate: np.ndarray | None = None
+    for _ in range(context.max_iterations):
+        step = schedule.execute_local_step(
+            executor, messages, np.asarray(context.syndrome, dtype=np.uint8), error_rate=context.error_rate,
+            progress=progress,
+            is_converged=lambda proposed: bool(np.array_equal((code.hz.astype(np.int64) @ proposed.astype(np.int64)) % 2, context.syndrome)),
+        )
+        progress = step.progress
+        if not step.admitted:
+            work = budgets.summary("attempt")
+            return {"termination": "count_budget_exhausted", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(schedule.evidence())), "iterations": progress.local_steps, "admitted": True, "progress": progress}
+        candidate = step.candidate
+        if candidate is not None and np.array_equal((code.hz.astype(np.int64) @ candidate.astype(np.int64)) % 2, context.syndrome):
+            work = budgets.summary("attempt")
+            return {"termination": "completed", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(schedule.evidence())), "iterations": progress.local_steps, "candidate": candidate, "admitted": True, "progress": progress}
+        if progress.cursor == (schedule.unit_count,):
+            progress = type(progress)(progress.iteration + 1, progress.local_steps, (0,), progress.rng_state)
+    work = budgets.summary("attempt")
+    return {"termination": "max_iterations", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(schedule.evidence())), "iterations": progress.local_steps, "candidate": candidate, "admitted": True, "progress": progress}
+
+
 def _expected_attempt(context: PublicShotContext) -> dict[str, Any]:
     """Re-run the deterministic Phase 2 flooding baseline without ledger input."""
     if context.code is None or context.error_rate is None or context.max_iterations is None:
         return {}
+    if context.schedule_kind == "layered":
+        return _expected_layered_attempt(context)
     code = context.code.validate()
     limits = context.work_limits or {}
     zero = WorkVector.zero()
@@ -416,17 +472,31 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
         raise CanonicalStructuralVerificationError("canonical attempt evidence is invalid")
     if lineage is not None:
         _expect_equal("attempt_lineage_id", attempt["attempt_lineage_id"], lineage["attempt_lineage_id"])
-    work_data = _exact_data(records["work"], common | {"qualified_iterations", "work_vector"})
+    schedule_fields = frozenset({"schedule_terminal", "schedule_evidence"}) if context.schedule_kind == "layered" else frozenset()
+    work_data = _exact_data(records["work"], common | {"qualified_iterations", "work_vector"} | schedule_fields)
     _expect_equal("work_vector", work_data["work_vector"], expected["work_vector"])
-    _expect_equal("qualified_iterations", work_data["qualified_iterations"], {"count": expected["iterations"], "schedule": "flooding", "atomic_unit": "complete_double_buffered_sweep"})
+    expected_iteration = {
+        "count": expected["iterations"],
+        "schedule": "layered" if context.schedule_kind == "layered" else "flooding",
+        "atomic_unit": "one_layer" if context.schedule_kind == "layered" else "complete_double_buffered_sweep",
+    }
+    _expect_equal("qualified_iterations", work_data["qualified_iterations"], expected_iteration)
+    if context.schedule_kind == "layered":
+        schedule_terminal = reconstruct_schedule_terminal(work_data["schedule_terminal"])
+        _expect_equal("schedule work_vector", schedule_terminal["work_vector"], expected["schedule_work_vector"])
+        _expect_equal("schedule source_iteration", schedule_terminal["source_iteration"], expected_iteration)
+        _expect_equal("schedule evidence", work_data["schedule_evidence"], expected["schedule_evidence"])
     data = terminal["data"]
     _expect_equal("work_vector", data.get("work_vector"), expected["work_vector"])
+    if context.schedule_kind == "layered":
+        _expect_equal("terminal schedule evidence", data.get("schedule_terminal"), work_data["schedule_terminal"])
+        _expect_equal("terminal schedule realization", data.get("schedule_evidence"), work_data["schedule_evidence"])
     if expected["admitted"]:
         _expect_equal("iterations", data.get("iterations"), expected["iterations"])
         _exact_data(records["runtime"], common | {"profile"})
         _validate_profile(stream, terminal, context)
     if expected["termination"] == "completed":
-        _exact_data(terminal, common | {"attempt_lineage_id", "candidate", "candidate_lineage_id", "converged", "iterations", "logical_action_agrees", "original_lineage_id", "outcome", "profile", "selection_status", "work_vector", "working_lineage_id"})
+        _exact_data(terminal, common | {"attempt_lineage_id", "candidate", "candidate_lineage_id", "converged", "iterations", "logical_action_agrees", "original_lineage_id", "outcome", "profile", "selection_status", "work_vector", "working_lineage_id"} | schedule_fields)
         _exact_data(records["candidate"], common | {"attempt_lineage_id", "candidate", "candidate_lineage_id"})
         _exact_data(records["selection"], common | {"selection_status", "original_lineage_id", "working_lineage_id", "attempt_lineage_id", "candidate_lineage_id"})
         candidate = np.asarray(expected["candidate"], dtype=np.uint8)
@@ -458,7 +528,7 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
             _expect_equal("logical_action_agrees", data.get("logical_action_agrees"), evaluation.logical_action_agrees)
     else:
         if expected["termination"] == "count_budget_exhausted":
-            fields = common | {"budget_termination", "outcome", "selection_status", "work_vector"}
+            fields = common | {"budget_termination", "outcome", "selection_status", "work_vector"} | schedule_fields
             if expected["admitted"]:
                 fields |= {"iterations", "profile"}
             _exact_data(terminal, fields)
@@ -466,7 +536,7 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
             if data["selection_status"] != "unavailable_due_to_budget" or data["outcome"] is not None:
                 raise CanonicalStructuralVerificationError("count budget terminal qualification is invalid")
         else:
-            _exact_data(terminal, common | {"converged", "iterations", "outcome", "profile", "selection_status", "work_vector"})
+            _exact_data(terminal, common | {"converged", "iterations", "outcome", "profile", "selection_status", "work_vector"} | schedule_fields)
             if data["converged"] is not False or data["selection_status"] != "unavailable_due_to_stopping" or data["outcome"] is not None:
                 raise CanonicalStructuralVerificationError("maximum iteration terminal qualification is invalid")
     return terminals[0]

@@ -129,7 +129,7 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
         "code_id": manifest.artifact.code_id,
         "manifest_sha256": manifest_digest(manifest),
         "numerical_profile": manifest.numerical_profile,
-        "resolved_numerical_profile": (MIN_SUM_CPU_F64 if isinstance(manifest, CanonicalExperimentV3) else REFERENCE_CPU_F64).as_evidence(),
+        "resolved_numerical_profile": (MIN_SUM_CPU_F64 if manifest.numerical_profile == "cpu-float64-min-sum-v1" else REFERENCE_CPU_F64).as_evidence(),
         "policies": manifest.policies.model_dump(mode="json"),
         "policy_identity": composition.semantic_identity,
         "policy_effects": _canonical_policy_effects(manifest, resolved.code),
@@ -227,6 +227,7 @@ def canonical_public_shot_context(manifest_path: str | Path, *, shot_id: int) ->
         policy_effects=_canonical_policy_effects(manifest, resolved.code),
         profile_plan=manifest.profile_plan.model_dump(mode="json"),
         update_kind=manifest.policies.update.kind,
+        schedule_kind=manifest.policies.schedule.kind,
     )
 
 

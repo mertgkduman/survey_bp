@@ -26,7 +26,7 @@ from .contracts import (
     parse_canonical_manifest,
     validate_composition,
 )
-from .budgets import BudgetLimit, BudgetTermination, BudgetTree, WallClockLimit, WorkVector
+from .budgets import BudgetLimit, BudgetTermination, BudgetTree, BudgetView, Measurement, QualifiedIteration, ScheduleTerminalEvidence, WallClockLimit, WorkVector
 from .kernel import BinarySpaKernel
 from .profiling import LocalProfiler, ProfilingPlan
 from .lineage import LineageEdge, LineageId, stable_lineage_id
@@ -34,7 +34,7 @@ from .numerics import NumericalFailure
 from .numerics import MIN_SUM_CPU_F64
 from .updates import MinSumUpdate, NormalizedMinSumUpdate, OffsetMinSumUpdate
 from .problems import OriginalProblem, OriginalSpaceCandidate, WorkingProblem, select_stable_candidate
-from .schedules import EdgeTable, FloodingSchedule, FloodingSweep
+from .schedules import EdgeTable, FloodingSchedule, FloodingSweep, LayeredSchedule
 from .verification import PublicShotContext, validate_canonical_shot
 
 
@@ -411,6 +411,22 @@ def _existing(path: Path, run_id: str, shot_id: int, identity: str) -> Canonical
     return None
 
 
+def _layered_schedule_for_manifest(
+    manifest: CanonicalManifestV3, edge_table: EdgeTable, kernel: BinarySpaKernel,
+) -> LayeredSchedule:
+    """Instantiate the closed layered factory only after manifest preflight."""
+    policy = manifest.policies.schedule
+    if policy.kind != "layered" or policy.partitions is None or policy.provenance is None:
+        raise ValueError("layered factory requires a validated layered schedule policy")
+    return LayeredSchedule(
+        edge_table,
+        kernel=kernel,
+        partitions=policy.partitions,
+        provenance=policy.provenance,
+        construction_rule=policy.construction_rule,
+    )
+
+
 def run_canonical_shot(manifest: CanonicalManifestV2 | CanonicalManifestV3 | dict[str, object] | str, *, code: CssCode,
                        observation: DecoderObservation, hidden_truth: HiddenTruth, shot_id: int,
                        ledger_path: str | Path, evaluate: Callable[..., evaluator.Evaluation] = evaluator.evaluate_candidate,
@@ -540,6 +556,16 @@ def run_canonical_structural_shot(
     original = OriginalProblem(original_id.value, validated.hx, validated.hz, observation.syndrome)
     working_id = stable_lineage_id("working", {"original": original_id.value, "lift": "identity"})
     working = WorkingProblem(working_id.value, original, LineageEdge("identity", original_id, working_id))
+    layered_progress: ScheduleProgress | None = None
+    layered_schedule: LayeredSchedule | None = None
+    if parsed.policies.schedule.kind == "layered":
+        if not isinstance(parsed, CanonicalManifestV3):
+            raise ValueError("layered public execution requires the version-three kernel contract")
+        layered_table = EdgeTable.from_check_matrix(validated.hz)
+        layered_schedule = _layered_schedule_for_manifest(
+            parsed, layered_table, _kernel_for_manifest(parsed, layered_table),
+        )
+        layered_progress = ScheduleProgress(iteration=0, local_steps=0, cursor=(0,))
     for attempt_ordinal in range(30):
         try:
             with CanonicalEventWriter(path) as ledger:
@@ -556,19 +582,57 @@ def run_canonical_structural_shot(
 
                 def terminal_with_work(termination: str, **data: Any) -> None:
                     work = budgets.summary("attempt")
-                    work_data = {
-                        **common,
-                        "qualified_iterations": {
-                            "count": data.get("iterations", 0), "schedule": "flooding",
-                            "atomic_unit": "complete_double_buffered_sweep",
-                        },
-                        "work_vector": work.as_evidence(structural_event_version=2),
-                    }
+                    is_layered = parsed.policies.schedule.kind == "layered"
+                    if is_layered:
+                        assert layered_progress is not None and layered_schedule is not None
+                        qualified = QualifiedIteration(
+                            layered_progress.local_steps, schedule="layered", atomic_unit="one_layer",
+                        )
+                        setup_runtime = Measurement.unavailable(
+                            method="not_measured", scope="schedule_setup", unit="ns", precision="unknown",
+                            reason="public tracer does not separately time deterministic schedule construction",
+                        )
+                        decode_runtime = Measurement.unavailable(
+                            method="not_measured", scope="decode", unit="ns", precision="unknown",
+                            reason="runtime profiling is retained separately as same-ledger observational evidence",
+                        )
+                        c2v_cap = int(dict(execution_controls or {}).get("work_limits", {}).get("attempt", {}).get("check_to_variable_updates", 0))
+                        schedule_terminal = ScheduleTerminalEvidence(
+                            schedule="layered",
+                            source_iteration=qualified,
+                            completed_traversals=qualified.count // layered_schedule.unit_count,
+                            local_cursor=layered_progress.cursor,
+                            stopping_adaptation="D-09 after completed layer local unit",
+                            work=work,
+                            setup_runtime=setup_runtime,
+                            decode_runtime=decode_runtime,
+                            budget_views=(
+                                BudgetView.common_c2v_cap(c2v_cap),
+                                BudgetView.schedule_iteration_limit(qualified),
+                            ),
+                        ).as_evidence()
+                        work_data = {
+                            **common,
+                            "qualified_iterations": qualified.as_evidence(),
+                            "work_vector": work.as_evidence(structural_event_version=2),
+                            "schedule_terminal": schedule_terminal,
+                            "schedule_evidence": layered_schedule.evidence(),
+                        }
+                    else:
+                        work_data = {
+                            **common,
+                            "qualified_iterations": {
+                                "count": data.get("iterations", 0), "schedule": "flooding",
+                                "atomic_unit": "complete_double_buffered_sweep",
+                            },
+                            "work_vector": work.as_evidence(structural_event_version=2),
+                        }
                     ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="work", data=work_data)
                     ledger.terminal(
                         run_id=parsed.run_id, shot_id=shot_id, termination=termination,
                         data={
                             **common, **data, "work_vector": work.as_evidence(structural_event_version=2),
+                            **({"schedule_terminal": schedule_terminal, "schedule_evidence": layered_schedule.evidence()} if is_layered else {}),
                             **({"profile": profile_evidence} if profile_evidence is not None else {}),
                         },
                     )
@@ -587,8 +651,42 @@ def run_canonical_structural_shot(
                 attempt_reservation.commit_once()
                 try:
                     def admitted_attempt() -> tuple[np.ndarray | None, int, bool, BudgetTermination | None]:
+                        nonlocal layered_progress, layered_schedule
                         edge_table = EdgeTable.from_check_matrix(validated.hz)
                         kernel = _kernel_for_manifest(parsed, edge_table)
+                        if parsed.policies.schedule.kind == "layered":
+                            assert layered_schedule is not None and layered_progress is not None
+                            messages = np.full(
+                                edge_table.edge_count, kernel.prior(parsed.error_rate), dtype=np.float64,
+                            )
+                            candidate: np.ndarray | None = None
+                            executor = CanonicalLocalStepExecutor(budgets, scope="attempt")
+                            for _ in range(parsed.max_iterations):
+                                step = layered_schedule.execute_local_step(
+                                    executor, messages, observation.syndrome,
+                                    error_rate=parsed.error_rate, progress=layered_progress,
+                                    is_converged=lambda proposed: bool(np.array_equal(
+                                        (validated.hz.astype(np.int64) @ proposed.astype(np.int64)) % 2,
+                                        observation.syndrome,
+                                    )),
+                                )
+                                layered_progress = step.progress
+                                if not step.admitted:
+                                    return candidate, layered_progress.local_steps, False, step.termination
+                                candidate = step.candidate
+                                if step.candidate is not None and np.array_equal(
+                                    (validated.hz.astype(np.int64) @ step.candidate.astype(np.int64)) % 2,
+                                    observation.syndrome,
+                                ):
+                                    return candidate, layered_progress.local_steps, True, None
+                                if layered_progress.cursor == (layered_schedule.unit_count,):
+                                    layered_progress = ScheduleProgress(
+                                        iteration=layered_progress.iteration + 1,
+                                        local_steps=layered_progress.local_steps,
+                                        cursor=(0,),
+                                        rng_state=layered_progress.rng_state,
+                                    )
+                            return candidate, layered_progress.local_steps, False, None
                         schedule = FloodingSchedule(edge_table, kernel=kernel, profile=kernel.profile)
                         if edge_table.edge_count == 0:
                             candidate = kernel.candidate_from_beliefs(

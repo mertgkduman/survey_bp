@@ -114,12 +114,18 @@ ties have deterministic tested handling in the numerical profile; an
 alternative precision, clipping limit, or randomized tie rule must be a new
 named profile or declared policy, never an implicit substitution.
 
-## Version 3 min-sum and normalized min-sum
+## Version 3 update rules and layered SPA
 
 `CanonicalExperimentV2` remains the historical binary-SPA/flooding contract:
 its schema, selector, numerical profile, and persisted meanings do not change.
 `CanonicalExperimentV3` uses the named `cpu-float64-min-sum-v1` profile for
-`min_sum` and `normalized_min_sum`. Its generated public schema is
+`min_sum`, `normalized_min_sum`, and `offset_min_sum`.  Its first non-flooding
+public composition is `binary_spa` with the `layered` schedule and the historical
+`cpu-float64-spa-v1` profile. Layered manifests declare conflict-free check
+`partitions` plus `provenance`; graph-colored partitions additionally declare their
+deterministic construction rule. Public terminal evidence retains the realized
+membership/order, local progress, full work vector, two non-convertible budget views,
+and explicitly qualified schedule runtime facts. Its generated public schema is
 `data/manifests/schema-canonical-v3.json`; regenerate it only from
 `CanonicalExperimentV3.model_json_schema()` when the strict model changes.
 
