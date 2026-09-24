@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import numbers
+from threading import RLock
 from typing import Any, Callable, Protocol
 
 import numpy as np
@@ -403,3 +404,235 @@ class LayeredSchedule:
             rng_state=progress.rng_state,
         )
         return ScheduledLocalStepResult(True, next_progress, candidate_box[-1], proposal.proposed_work)
+
+
+class ScheduleAttemptRegistry:
+    """Caller-owned, thread-safe claim registry for one execution cohort.
+
+    The registry deliberately lives outside policy configuration: separate shots
+    get independent progress objects, while a coordinator can reject a duplicate
+    attempt identity instead of accidentally sharing a cursor across workers.
+    """
+
+    def __init__(self) -> None:
+        self._claimed: set[str] = set()
+        self._lock = RLock()
+
+    def claim(self, attempt_identity: str) -> str:
+        if not isinstance(attempt_identity, str) or not attempt_identity:
+            raise ValueError("schedule attempt identity must be a nonempty string")
+        with self._lock:
+            if attempt_identity in self._claimed:
+                raise ValueError("duplicate same-shot schedule attempt identity")
+            self._claimed.add(attempt_identity)
+        return attempt_identity
+
+
+class _NodeSerialSchedule:
+    """Shared proposal/executor seam; subclasses define their scientific unit."""
+
+    schedule_name: str
+    atomic_unit: str
+
+    def __init__(self, edge_table: EdgeTable, *, kernel: _FloodingKernel) -> None:
+        if not isinstance(edge_table, EdgeTable):
+            raise ValueError("serial schedules require an EdgeTable")
+        self.edge_table = edge_table
+        self.kernel = kernel
+        self._check_edges = tuple(
+            tuple(index for index, (check, _variable) in enumerate(edge_table.edges) if check == current)
+            for current in range(edge_table.check_count)
+        )
+        self._variable_edges = tuple(
+            tuple(index for index, (_check, variable) in enumerate(edge_table.edges) if variable == current)
+            for current in range(edge_table.variable_count)
+        )
+        self._edge_variables = tuple(variable for _check, variable in edge_table.edges)
+
+    @property
+    def unit_count(self) -> int:
+        raise NotImplementedError
+
+    def _unit_index(self, progress: Any) -> int:
+        cursor = getattr(progress, "cursor", ())
+        if len(cursor) != 1 or isinstance(cursor[0], bool) or not isinstance(cursor[0], numbers.Integral):
+            raise ValueError("serial progress cursor must contain exactly one integer unit index")
+        index = int(cursor[0])
+        if not 0 <= index < self.unit_count:
+            raise ValueError("serial progress cursor does not name an available local unit")
+        return index
+
+    def _all_c2v(self, messages: np.ndarray, syndrome: np.ndarray) -> np.ndarray:
+        c2v = np.empty(self.edge_table.edge_count, dtype=np.float64)
+        for check, indices in enumerate(self._check_edges):
+            for edge_index in indices:
+                incoming = messages[[other for other in indices if other != edge_index]]
+                c2v[edge_index] = self.kernel.check_message(incoming, int(syndrome[check]))
+        return c2v
+
+    def _compute_unit(
+        self, messages: np.ndarray, syndrome: np.ndarray, *, error_rate: float, unit_index: int
+    ) -> tuple[np.ndarray, np.ndarray, Any]:
+        raise NotImplementedError
+
+    def _proposed_work(self, unit_index: int) -> Any:
+        raise NotImplementedError
+
+    def evidence(self) -> dict[str, object]:
+        return {
+            "schedule": self.schedule_name,
+            "atomic_unit": self.atomic_unit,
+            "canonical_order": tuple(range(self.unit_count)),
+            "stopping_adaptation": "D-09 after serial node local unit",
+            "mutable_state_lifetime": "attempt",
+        }
+
+    def propose_local_step(self, messages: np.ndarray, syndrome: np.ndarray, *, error_rate: float, progress: Any) -> Any:
+        from .execution import LocalStepProposal
+
+        unit_index = self._unit_index(progress)
+        syndrome_bits = _binary_syndrome(self.edge_table, syndrome)
+        work = self._proposed_work(unit_index)
+        return LocalStepProposal(
+            label=f"{self.schedule_name}:{unit_index}",
+            proposed_work=work,
+            compute=lambda: self._compute_unit(messages, syndrome_bits, error_rate=error_rate, unit_index=unit_index)[0],
+        )
+
+    def execute_local_step(
+        self,
+        executor: Any,
+        messages: np.ndarray,
+        syndrome: np.ndarray,
+        *,
+        error_rate: float,
+        progress: Any,
+        is_converged: Callable[[np.ndarray], bool],
+    ) -> ScheduledLocalStepResult:
+        from .execution import ScheduleProgress
+
+        unit_index = self._unit_index(progress)
+        candidate_box: list[np.ndarray] = []
+        proposal = self.propose_local_step(messages, syndrome, error_rate=error_rate, progress=progress)
+
+        def compute() -> np.ndarray:
+            updated, candidate, _visibility = self._compute_unit(
+                messages,
+                _binary_syndrome(self.edge_table, syndrome),
+                error_rate=error_rate,
+                unit_index=unit_index,
+            )
+            candidate.setflags(write=False)
+            candidate_box.append(candidate)
+            return updated
+
+        result = executor.execute(
+            type(proposal)(proposal.label, proposal.proposed_work, compute),
+            messages=messages,
+            progress=progress,
+            policy_state={},
+            cache={},
+            is_converged=lambda _messages: bool(candidate_box and is_converged(candidate_box[-1])),
+        )
+        if not result.admitted:
+            return ScheduledLocalStepResult(False, progress, None, proposal.proposed_work, result.termination)
+        next_progress = ScheduleProgress(
+            iteration=progress.iteration,
+            local_steps=result.progress.local_steps,
+            cursor=(unit_index + 1,),
+            rng_state=progress.rng_state,
+        )
+        return ScheduledLocalStepResult(True, next_progress, candidate_box[-1], proposal.proposed_work)
+
+
+class CheckNodeSerialSchedule(_NodeSerialSchedule):
+    """SCNS: update a check's complete C2V fanout, then affected V2C state."""
+
+    schedule_name = "check_node_serial"
+    atomic_unit = "one_check_all_c2v_then_affected_v2c"
+
+    @property
+    def unit_count(self) -> int:
+        return self.edge_table.check_count
+
+    def evidence(self) -> dict[str, object]:
+        return {
+            **super().evidence(),
+            "stale_read_set": ("v2c_at_check_unit_entry",),
+            "fresh_read_set": ("affected_variable_beliefs", "affected_variable_v2c_for_later_checks"),
+            "source_procedure": "Moradi SCNS check-unit order with D-09 stopping adaptation",
+        }
+
+    def _proposed_work(self, unit_index: int) -> Any:
+        from .budgets import WorkVector
+
+        affected = {self.edge_table.edges[index][1] for index in self._check_edges[unit_index]}
+        return WorkVector(
+            check_to_variable_updates=len(self._check_edges[unit_index]),
+            variable_to_check_updates=sum(variable in affected for variable in self._edge_variables),
+            belief_assemblies=len(affected),
+            candidate_checks=1,
+        )
+
+    def _compute_unit(self, messages: np.ndarray, syndrome: np.ndarray, *, error_rate: float, unit_index: int) -> tuple[np.ndarray, np.ndarray, Any]:
+        entry = finite_saturate(messages, boundary="check_serial_entry_v2c")
+        if entry.ndim != 1 or entry.shape != (self.edge_table.edge_count,):
+            raise ValueError("serial messages must have exactly one value per canonical edge")
+        snapshot = np.array(entry, dtype=np.float64, copy=True)
+        c2v = self._all_c2v(snapshot, syndrome)
+        indices = self._check_edges[unit_index]
+        for edge_index in indices:
+            incoming = snapshot[[other for other in indices if other != edge_index]]
+            c2v[edge_index] = self.kernel.check_message(incoming, int(syndrome[unit_index]))
+        c2v = finite_saturate(c2v, boundary="check_serial_complete_c2v")
+        prior = self.kernel.prior(error_rate)
+        beliefs = self.kernel.assemble_beliefs(self.edge_table.variable_count, self._edge_variables, c2v, prior)
+        candidate = self.kernel.candidate_from_beliefs(beliefs)
+        affected = {self.edge_table.edges[index][1] for index in indices}
+        updated = np.array(snapshot, dtype=np.float64, copy=True)
+        for edge_index, variable in enumerate(self._edge_variables):
+            if variable in affected:
+                updated[edge_index] = self.kernel.variable_message(float(beliefs[variable]), float(c2v[edge_index]))
+        return finite_saturate(updated, boundary="check_serial_complete_v2c"), np.array(candidate, dtype=np.uint8, copy=True), self.evidence()
+
+
+class VariableNodeSerialSchedule(_NodeSerialSchedule):
+    """SVNS: gather a variable's current C2V state, then update its V2C fanout."""
+
+    schedule_name = "variable_node_serial"
+    atomic_unit = "one_variable_belief_then_incident_v2c"
+
+    @property
+    def unit_count(self) -> int:
+        return self.edge_table.variable_count
+
+    def evidence(self) -> dict[str, object]:
+        return {
+            **super().evidence(),
+            "stale_read_set": ("incident_c2v_at_variable_unit_entry",),
+            "fresh_read_set": ("variable_belief", "incident_v2c_for_later_variables"),
+            "source_procedure": "Moradi SVNS variable-unit order with D-09 stopping adaptation",
+        }
+
+    def _proposed_work(self, unit_index: int) -> Any:
+        from .budgets import WorkVector
+
+        return WorkVector(
+            variable_to_check_updates=len(self._variable_edges[unit_index]),
+            belief_assemblies=1,
+            candidate_checks=1,
+        )
+
+    def _compute_unit(self, messages: np.ndarray, syndrome: np.ndarray, *, error_rate: float, unit_index: int) -> tuple[np.ndarray, np.ndarray, Any]:
+        entry = finite_saturate(messages, boundary="variable_serial_entry_v2c")
+        if entry.ndim != 1 or entry.shape != (self.edge_table.edge_count,):
+            raise ValueError("serial messages must have exactly one value per canonical edge")
+        snapshot = np.array(entry, dtype=np.float64, copy=True)
+        c2v = finite_saturate(self._all_c2v(snapshot, syndrome), boundary="variable_serial_incident_c2v")
+        prior = self.kernel.prior(error_rate)
+        beliefs = self.kernel.assemble_beliefs(self.edge_table.variable_count, self._edge_variables, c2v, prior)
+        candidate = self.kernel.candidate_from_beliefs(beliefs)
+        updated = np.array(snapshot, dtype=np.float64, copy=True)
+        for edge_index in self._variable_edges[unit_index]:
+            updated[edge_index] = self.kernel.variable_message(float(beliefs[unit_index]), float(c2v[edge_index]))
+        return finite_saturate(updated, boundary="variable_serial_complete_v2c"), np.array(candidate, dtype=np.uint8, copy=True), self.evidence()
