@@ -279,6 +279,122 @@ def test_verify_run_accepts_persistent_numerical_failure_without_replay(tmp_path
     assert len(calls) == before_reuse
 
 
+def test_verify_run_rejects_every_unbound_terminal_and_provenance_field(tmp_path, monkeypatch):
+    """Rehashed records still derive every terminal fact from trusted inputs."""
+    from bp_registry.canonical.numerics import NumericalFailure
+    from bp_registry.canonical.schedules import FloodingSchedule
+    from bp_registry.cli import run_canonical, verify_run
+    from bp_registry.runner import run_canonical_one
+
+    def completed_output(label):
+        output = tmp_path / label
+        run_canonical(CANONICAL_MANIFEST, output)
+        return output
+
+    completed_cases = {
+        "completed-converged": lambda events: next(event for event in events if event["kind"] == "termination")["data"].__setitem__("converged", False),
+        "completed-terminal-selection": lambda events: next(event for event in events if event["kind"] == "termination")["data"].__setitem__("selection_status", "forged"),
+        "completed-selection": lambda events: next(event for event in events if event["kind"] == "selection")["data"].__setitem__("selection_status", "forged"),
+        "completed-candidate-attempt": lambda events: next(event for event in events if event["kind"] == "candidate")["data"].__setitem__("attempt_lineage_id", "forged"),
+        "completed-attempt": lambda events: next(event for event in events if event["kind"] == "attempt")["data"].__setitem__("attempt_lineage_id", "forged"),
+    }
+    for label, mutate in completed_cases.items():
+        output = completed_output(label)
+        _rewrite_rehashed_canonical_ledger(output, mutate)
+        with pytest.raises(ValueError):
+            verify_run(output)
+
+    for label, field in (
+        ("code-id", "code_id"),
+        ("evidence-relation", "evidence_relation"),
+        ("fixture", "fixture"),
+        ("assessment-status", "assessment_status"),
+        ("decoder-seed", "decoder_seed_identity"),
+    ):
+        output = completed_output(label)
+        _rewrite_rehashed_canonical_ledger(
+            output,
+            lambda events, field=field: [event["data"].__setitem__(field, "forged") for event in events],
+        )
+        with pytest.raises(ValueError):
+            verify_run(output)
+
+    for label, resource in (("pre-denial", "bp_calls"), ("post-denial", "check_to_variable_updates")):
+        manifest = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text(encoding="utf-8"))
+        manifest["budgets"]["attempt"]["work_limits"][resource] = 0
+        path = tmp_path / f"{label}.json"
+        path.write_text(json.dumps(manifest), encoding="utf-8")
+        output = tmp_path / label
+        run_canonical(path, output)
+        _rewrite_rehashed_canonical_ledger(
+            output,
+            lambda events: next(event for event in events if event["kind"] == "attempt")["data"].__setitem__("attempt_lineage_id", "forged"),
+        )
+        with pytest.raises(ValueError):
+            verify_run(output)
+        if label == "post-denial":
+            output = tmp_path / "post-denial-runtime"
+            run_canonical(path, output)
+            _rewrite_rehashed_canonical_ledger(
+                output,
+                lambda events: next(event for event in events if event["kind"] == "runtime")["data"].__setitem__("forged", True),
+            )
+            with pytest.raises(ValueError):
+                verify_run(output)
+
+    original = FloodingSchedule.sweep
+    monkeypatch.setattr(FloodingSchedule, "sweep", lambda *_a, **_kw: (_ for _ in ()).throw(NumericalFailure("persistent")))
+    output = tmp_path / "numerical-attempt"
+    run_canonical_one(CANONICAL_MANIFEST, shot_id=0, ledger_path=output / "events.jsonl")
+    run_canonical_one(CANONICAL_MANIFEST, shot_id=1, ledger_path=output / "events.jsonl")
+    run_canonical(CANONICAL_MANIFEST, output)
+    _rewrite_rehashed_canonical_ledger(
+        output,
+        lambda events: next(event for event in events if event["kind"] == "attempt")["data"].__setitem__("attempt_lineage_id", "forged"),
+    )
+    with pytest.raises(ValueError):
+        verify_run(output)
+    monkeypatch.setattr(FloodingSchedule, "sweep", original)
+
+
+def test_verify_run_accepts_legitimate_terminal_classes_after_semantic_binding(tmp_path, monkeypatch):
+    """Independent terminal checks retain every admitted public terminal class."""
+    from dataclasses import replace
+
+    from bp_registry.canonical.numerics import NumericalFailure
+    from bp_registry.canonical.schedules import FloodingSchedule
+    from bp_registry.cli import run_canonical, verify_run
+    from bp_registry.runner import run_canonical_one
+
+    assert verify_run((lambda output: (run_canonical(CANONICAL_MANIFEST, output), output)[1])(tmp_path / "completed"))["final_row_count"] == 2
+    for label, resource in (("pre", "bp_calls"), ("post", "check_to_variable_updates")):
+        manifest = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text(encoding="utf-8"))
+        manifest["budgets"]["attempt"]["work_limits"][resource] = 0
+        path = tmp_path / f"{label}.json"
+        path.write_text(json.dumps(manifest), encoding="utf-8")
+        output = tmp_path / label
+        assert verify_run((run_canonical(path, output), output)[1])["final_row_count"] == 2
+
+    original = FloodingSchedule.sweep
+    monkeypatch.setattr(FloodingSchedule, "sweep", lambda *_a, **_kw: (_ for _ in ()).throw(NumericalFailure("persistent")))
+    numerical = tmp_path / "numerical"
+    run_canonical_one(CANONICAL_MANIFEST, shot_id=0, ledger_path=numerical / "events.jsonl")
+    run_canonical_one(CANONICAL_MANIFEST, shot_id=1, ledger_path=numerical / "events.jsonl")
+    assert verify_run((run_canonical(CANONICAL_MANIFEST, numerical), numerical)[1])["final_row_count"] == 2
+
+    def finite_nonconverging(schedule, old_v2c, syndrome, *, error_rate):
+        sweep = original(schedule, old_v2c, syndrome, error_rate=error_rate)
+        return replace(sweep, candidate=np.zeros_like(sweep.candidate))
+
+    monkeypatch.setattr(FloodingSchedule, "sweep", finite_nonconverging)
+    maximum_manifest = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text(encoding="utf-8"))
+    maximum_manifest["budgets"]["attempt"]["max_iterations"] = 1
+    maximum_path = tmp_path / "maximum.json"
+    maximum_path.write_text(json.dumps(maximum_manifest), encoding="utf-8")
+    maximum = tmp_path / "maximum"
+    assert verify_run((run_canonical(maximum_path, maximum), maximum)[1])["final_row_count"] == 2
+
+
 def test_verify_run_rejects_rehashed_numerical_failure_claim_matrix(tmp_path, monkeypatch):
     """A valid event hash cannot bless altered transient-failure science."""
     from bp_registry.canonical.numerics import NumericalFailure
