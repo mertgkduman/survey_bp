@@ -251,9 +251,6 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
     terminals = [event for event in stream if event.get("kind") == "termination"]
     if len(terminals) != 1 or stream[-1] is not terminals[0]:
         raise CanonicalStructuralVerificationError("canonical shot must have exactly one final termination")
-    expected = _expected_attempt(context)
-    if not expected:
-        return terminals[0]
     terminal = terminals[0]
     common = _COMMON_FIELDS
     term = terminal.get("termination")
@@ -278,6 +275,9 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
         _expect_equal("work_vector", data["work_vector"], expected_work)
         _expect_equal("qualified_iterations", work_data["qualified_iterations"], {"count": 0, "schedule": "flooding", "atomic_unit": "complete_double_buffered_sweep"})
         return terminal
+    expected = _expected_attempt(context)
+    if not expected:
+        return terminals[0]
     _expect_equal("termination", terminal.get("termination"), expected["termination"])
     if term == "completed":
         kinds = ["shot_begin", "attempt", "runtime", "candidate", "selection", "work", "termination"]
