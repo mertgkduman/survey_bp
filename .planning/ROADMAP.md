@@ -219,7 +219,7 @@ Plans:
 
 **Wave 10** *(blocked on Wave 9 completion)*
 
-- [ ] 03-09-PLAN.md — Blocking acquisition and qualification of authoritative cluster artifacts
+- [ ] 03-09-PLAN.md — Blocking acquisition and qualification of authoritative cluster artifacts (user-confirmed unavailable; SCH-06 remains open)
 
 **Wave 11** *(blocked on Wave 10 completion)*
 
