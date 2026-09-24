@@ -15,7 +15,7 @@ affects: [documentation]
 actuals:
   tokens: 132700
   tasks: 2
-  commits: 3
+  commits: 4
 plan_head_before: 0cefef76d2d5657de8b3fb3c9e3ec39b6f1c14c0
 tech-stack:
   added: []
@@ -56,7 +56,7 @@ status: complete
 
 ## Verification
 
-- `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_docs_pdf.py` — 4 passed after the final permissions fix.
+- `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_docs_pdf.py` — 4 passed after the final layout adjustment.
 - `.venv/bin/python tools/build_docs_pdf.py --output docs/policy-bp-documentation-through-phase-2.pdf --check` — passed exact byte comparison.
 - Protected Markdown, Phase 1/2 verification reports, `.planning/STATE.md`, and `.planning/ROADMAP.md` — no diff.
 - Full `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q` — 184 passed in 62.97s after the final permissions fix.
@@ -67,6 +67,7 @@ status: complete
 1. **Task 1: Render the complete Phase 1--2 documentation path into a deterministic PDF** — `53fdcd3` (`feat`)
 2. **Task 2: Lock reproducibility, source preservation, and output-path safety** — `7c15906` (`test`)
 3. **Final publication fix: Make the PDF shared-readable on this HPC filesystem** — `26dab2a` (`fix`)
+4. **Final layout fix: Use short PDF section headings** — `30df961` (`fix`)
 
 ## Deviations from Plan
 
@@ -96,6 +97,14 @@ status: complete
 - **Verification:** Focused tests, 184-test full suite, and PDF regeneration check pass; resulting artifact mode is 0644.
 - **Committed in:** `26dab2a`
 
+**4. [Rule 1 - Layout] Keep long source paths out of large page titles.**
+- **Found during:** Final page-geometry inspection.
+- **Issue:** Repository-relative verification paths were too long for the large page-title font.
+- **Fix:** Use short fixed section titles; retain full paths and digests in the source manifest and smaller running label.
+- **Files modified:** `tools/build_docs_pdf.py`, `docs/policy-bp-documentation-through-phase-2.pdf`
+- **Verification:** Focused tests and exact PDF regeneration check pass after the final render.
+- **Committed in:** `30df961`
+
 ## Known Stubs
 
 None.
@@ -107,4 +116,4 @@ Phase 3 remains not started. This task changed no Markdown source, phase state, 
 ## Self-Check: PASSED
 
 - `tools/build_docs_pdf.py`, `tests/test_docs_pdf.py`, and `docs/policy-bp-documentation-through-phase-2.pdf` exist.
-- Commits `53fdcd3`, `7c15906`, and `26dab2a` exist in the repository history.
+- Commits `53fdcd3`, `7c15906`, `26dab2a`, and `30df961` exist in the repository history.

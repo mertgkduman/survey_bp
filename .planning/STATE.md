@@ -120,7 +120,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 |---|-------------|------|--------|-----------|
 | 260922-21z | Document Phase 1 ldpc SDK coverage and unblock UAT | 2026-09-22 | 4581389 | [260922-21z-document-phase-1-ldpc-sdk-coverage-and-u](./quick/260922-21z-document-phase-1-ldpc-sdk-coverage-and-u/) |
 | 260923-nbn | Repair Phase 2 GSD verification metadata | 2026-09-23 | 15a9e8a | [260923-nbn-repair-phase-2-gsd-verification-metadata](./quick/260923-nbn-repair-phase-2-gsd-verification-metadata/) |
-| 260923-ui8 | Create a reproducible PDF documentation snapshot through completed Phase 2 from existing Markdown; preserve existing Markdown and do not advance Phase 3 | 2026-09-23 | 26dab2a | [260923-ui8-create-a-reproducible-pdf-documentation-](./quick/260923-ui8-create-a-reproducible-pdf-documentation-/) |
+| 260923-ui8 | Create a reproducible PDF documentation snapshot through completed Phase 2 from existing Markdown; preserve existing Markdown and do not advance Phase 3 | 2026-09-23 | 30df961 | [260923-ui8-create-a-reproducible-pdf-documentation-](./quick/260923-ui8-create-a-reproducible-pdf-documentation-/) |
 
 ## Deferred Items
 
