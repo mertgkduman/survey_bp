@@ -173,18 +173,40 @@ def validate_public_clean_low_overhead_evidence(value: Mapping[str, object]) -> 
     unavailable(parsed.python_allocation_peak, method="tracemalloc.get_traced_memory:v1", scope="process", unit="bytes", reason="representative allocation profiling disabled")
     rss = runtime.peak_host_memory
     if rss.value is None:
-        if (rss.method, rss.scope, rss.unit, rss.precision) not in {
-            ("resource.getrusage:RUSAGE_SELF:v1", "process", "bytes", "unknown"),
-            ("resource.getrusage:RUSAGE_SELF:ru_maxrss:v1", "process", "bytes", "unknown"),
-        } or not isinstance(rss.unavailable_reason, str) or not (
-            rss.unavailable_reason == "resource adapter unavailable"
-            or rss.unavailable_reason == "negative RSS observation"
-            or rss.unavailable_reason == "RSS normalization semantics unavailable"
-            or rss.unavailable_reason.startswith("resource adapter unavailable: ")
-        ):
-            raise ValueError("profile RSS unavailable contract differs from local profiler")
-        if rss.unavailable_reason != "RSS normalization semantics unavailable" and dict(parsed.raw_context):
-            raise ValueError("unavailable RSS must not carry raw RSS context")
+        unavailable_reasons = {
+            "resource adapter unavailable": "resource.getrusage:RUSAGE_SELF:v1",
+            "resource adapter unavailable: AttributeError": "resource.getrusage:RUSAGE_SELF:v1",
+            "resource adapter unavailable: OSError": "resource.getrusage:RUSAGE_SELF:v1",
+            "resource adapter unavailable: ValueError": "resource.getrusage:RUSAGE_SELF:v1",
+            "resource adapter unavailable: TypeError": "resource.getrusage:RUSAGE_SELF:v1",
+            "negative RSS observation": "resource.getrusage:RUSAGE_SELF:ru_maxrss:v1",
+        }
+        if rss.unavailable_reason == "RSS normalization semantics unavailable":
+            unavailable(
+                rss,
+                method="resource.getrusage:RUSAGE_SELF:ru_maxrss:v1",
+                scope="process",
+                unit="bytes",
+                reason="RSS normalization semantics unavailable",
+            )
+            raw = dict(parsed.raw_context)
+            if (
+                set(raw) != {"rss_platform", "rss_raw_value", "rss_raw_unit"}
+                or type(raw["rss_platform"]) is not str
+                or not raw["rss_platform"]
+                or raw["rss_platform"] in {"Linux", "Darwin"}
+                or type(raw["rss_raw_value"]) is not int
+                or raw["rss_raw_value"] < 0
+                or raw["rss_raw_unit"] != "unknown"
+            ):
+                raise ValueError("profile unavailable RSS context is inconsistent")
+        else:
+            method = unavailable_reasons.get(rss.unavailable_reason)
+            if method is None:
+                raise ValueError("profile RSS unavailable contract differs from local profiler")
+            unavailable(rss, method=method, scope="process", unit="bytes", reason=rss.unavailable_reason)
+            if dict(parsed.raw_context):
+                raise ValueError("unavailable RSS must not carry raw RSS context")
     else:
         observed(rss, method="resource.getrusage:RUSAGE_SELF:ru_maxrss:v1", scope="process", unit="bytes", precision="platform-qualified peak", kind=int)
         raw = dict(parsed.raw_context)
@@ -420,9 +442,15 @@ class LocalProfiler:
             raw = int(usage.ru_maxrss)
             system = self._platform_system()
         except (AttributeError, OSError, ValueError, TypeError) as error:
-            return _unavailable(method="resource.getrusage:RUSAGE_SELF:v1", scope="process", unit="bytes", reason=f"resource adapter unavailable: {type(error).__name__}"), {}
+            category = next(
+                base for base in (AttributeError, OSError, ValueError, TypeError)
+                if isinstance(error, base)
+            )
+            return _unavailable(method="resource.getrusage:RUSAGE_SELF:v1", scope="process", unit="bytes", reason=f"resource adapter unavailable: {category.__name__}"), {}
         if raw < 0:
             return _unavailable(method="resource.getrusage:RUSAGE_SELF:ru_maxrss:v1", scope="process", unit="bytes", reason="negative RSS observation"), {}
+        if type(system) is not str or not system:
+            return _unavailable(method="resource.getrusage:RUSAGE_SELF:v1", scope="process", unit="bytes", reason="resource adapter unavailable: ValueError"), {}
         if system == "Linux":
             normalized, raw_unit = raw * 1024, "kilobytes"
         elif system == "Darwin":
