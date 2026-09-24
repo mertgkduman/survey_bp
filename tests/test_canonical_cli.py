@@ -82,6 +82,15 @@ def test_documented_noncluster_policy_matrix_names_local_units_and_replay_bounda
         assert term in tutorial
 
 
+def test_documented_cluster_artifact_checkpoint_preserves_the_external_blocker():
+    tutorial = (REPOSITORY_ROOT / "docs/canonical-engine.md").read_text(encoding="utf-8").lower()
+    for term in (
+        "qualify-cluster-artifact", "--approved-root", "not_established_by_qualification",
+        "external blocking dependency", "exits 2", "does not execute a schedule", "sch-06",
+    ):
+        assert term in tutorial
+
+
 def test_public_cluster_artifact_qualification_command_exists():
     """The external checkpoint must be a public command, not a private helper."""
     from bp_registry.cli import build_parser
