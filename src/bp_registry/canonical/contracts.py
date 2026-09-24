@@ -164,6 +164,8 @@ class SchedulePolicySpecV3(PolicySpec):
     def layered_controls_match_the_declared_kind(self) -> "SchedulePolicySpecV3":
         layered = self.kind == "layered"
         randomized = self.kind == "randomized"
+        if randomized and self.base_schedule is not None and self.base_schedule != "layered":
+            raise ValueError("public randomized schedules require a layered base_schedule")
         needs_layers = layered or (randomized and self.base_schedule == "layered")
         if needs_layers:
             if self.partitions is None or self.provenance is None:

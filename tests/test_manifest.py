@@ -211,6 +211,12 @@ def test_v3_public_schedule_matrix_admits_only_the_implemented_spa_local_schedul
     with pytest.raises(ValueError, match="compatibility"):
         preflight(incompatible)
 
+    if schedule_kind == "randomized":
+        unsupported_base = json.loads(json.dumps(value))
+        unsupported_base["policies"]["schedule"]["base_schedule"] = "check_node_serial"
+        with pytest.raises(ValueError, match="layered base_schedule"):
+            preflight(unsupported_base)
+
 
 @pytest.mark.parametrize("value", [float("nan"), float("inf"), -0.01, 1.01, "0.1"])
 def test_manifest_rejects_nonfinite_out_of_range_or_coerced_rates(tmp_path, value):
