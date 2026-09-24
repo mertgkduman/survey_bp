@@ -89,3 +89,46 @@ def test_iteration_and_runtime_measurements_keep_unit_precision_and_missingness(
     assert context.as_evidence()["peak_host_memory"]["unavailable_reason"] == "device counter unavailable"
     with pytest.raises(ValueError, match="reason"):
         api.Measurement(None, method="missing", scope="attempt", unit="ns", precision="unknown")
+
+
+def test_schedule_terminal_evidence_preserves_dual_views_partial_progress_and_legacy_work():
+    """Phase-3 terminals must never collapse local progress or work into one scalar."""
+    api = _api()
+    assert hasattr(api, "ScheduleTerminalEvidence"), (
+        "schedule terminals require a versioned evidence model with dual budget views"
+    )
+    from bp_registry.canonical.verification import reconstruct_schedule_terminal
+
+    legacy = {
+        "check_to_variable_updates": 2,
+        "variable_to_check_updates": 2,
+        "belief_assemblies": 1,
+        "residual_priority_evaluations": 0,
+        "bp_calls": 1,
+        "candidate_checks": 1,
+        "intervention_actions": 0,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "relay_transfers": 0,
+        "fallback_calls": 0,
+    }
+    assert api.WorkVector.from_evidence(legacy, structural_event_version=2).as_evidence(structural_event_version=2) == legacy
+
+    evidence = api.ScheduleTerminalEvidence(
+        schedule="layered",
+        source_iteration=api.QualifiedIteration(0, schedule="layered", atomic_unit="one_layer"),
+        completed_traversals=0,
+        local_cursor=(1,),
+        stopping_adaptation="D-09 after layer",
+        work=api.WorkVector(check_to_variable_updates=2, convergence_checks=1),
+        setup_runtime=api.Measurement.unavailable(method="not_measured", scope="schedule_setup", unit="ns", precision="unknown", reason="fixture"),
+        decode_runtime=api.Measurement.observed(9, method="fixture", scope="decode", unit="ns", precision="exact"),
+        budget_views=(
+            api.BudgetView.common_c2v_cap(2),
+            api.BudgetView.schedule_iteration_limit(api.QualifiedIteration(1, schedule="layered", atomic_unit="one_layer")),
+        ),
+    ).as_evidence()
+    reconstructed = reconstruct_schedule_terminal(evidence)
+    assert reconstructed == evidence
+    assert reconstructed["budget_views"][0]["work_vector"] == reconstructed["budget_views"][1]["work_vector"]
+    assert reconstructed["completed_traversals"] == 0

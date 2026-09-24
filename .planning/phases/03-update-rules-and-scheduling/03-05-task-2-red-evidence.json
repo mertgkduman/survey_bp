@@ -1,0 +1,9 @@
+{
+  "command": "PYTHONPATH=$PWD/src OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_work_accounting.py -k schedule_terminal_evidence",
+  "exitCode": 1,
+  "output": "not ok 1 - test_schedule_terminal_evidence_preserves_dual_views_partial_progress_and_legacy_work\n  ---\n  framework: pytest\n  assertion: schedule terminals require a versioned evidence model with dual budget views\n  ...\n# tests 1\n# pass 0\n# fail 1\n",
+  "targetTest": "test_schedule_terminal_evidence_preserves_dual_views_partial_progress_and_legacy_work",
+  "targetFile": "tests/canonical/test_work_accounting.py",
+  "expected": "A versioned schedule terminal retains both budget views, exact partial progress, full work, and separate runtime facts while V2 work dictionaries retain their original grammar.",
+  "actual": "The selected pytest target failed its explicit assertion because ScheduleTerminalEvidence is not yet exported."
+}
