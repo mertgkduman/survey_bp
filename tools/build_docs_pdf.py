@@ -37,6 +37,16 @@ SOURCE_FILES: tuple[str, ...] = (
     "docs/research-novelty-and-depth-register.md",
     ".planning/phases/02-canonical-css-execution-and-policy-contracts/02-VERIFICATION.md",
 )
+SECTION_TITLES: tuple[str, ...] = (
+    "Phase 1 source decisions",
+    "Development environment",
+    "Phase 1 native CSS pilot",
+    "Phase 1 verification",
+    "Canonical CSS engine",
+    "Profiling and tracing",
+    "Research novelty and depth",
+    "Phase 2 verification",
+)
 
 FRONT_MATTER: tuple[str, ...] = (
     "Status and evidence limits",
@@ -277,12 +287,12 @@ def render_pdf(
     state = RenderState()
     with PdfPages(output_path, metadata=PDF_METADATA) as pdf:
         _render_front_matter(pdf, state, sources)
-        for source in sources:
+        for source, title in zip(sources, SECTION_TITLES, strict=True):
             _render_text_section(
                 pdf,
                 state,
                 source.relative_path,
-                source.relative_path,
+                title,
                 source.text.splitlines(),
             )
     return output_path
