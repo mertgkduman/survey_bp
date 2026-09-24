@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_update_rules.py -k test_min_sum_public_update_contract_exists",
+  "exitCode": 1,
+  "output": "not ok 1 - test_min_sum_public_update_contract_exists\n  ---\n  framework: pytest\n  assertion: Phase 3 must provide bp_registry.canonical.updates\n  ...\n# tests 1\n# pass 0\n# fail 1\n",
+  "targetTest": "test_min_sum_public_update_contract_exists",
+  "targetFile": "tests/canonical/test_update_rules.py",
+  "expected": "The public min-sum update module and its three named API exports exist.",
+  "actual": "The direct pytest run executed one selected target test and failed its assertion because the module did not exist. The TAP-shaped transcript preserves that result for the GSD RED validator, which otherwise parses only Node TAP summaries."
+}
