@@ -224,7 +224,9 @@ def _result_from_final_rows(
 
 def _canonical_result_from_terminal_events(manifest_path: Path, output: Path, rows: list[dict[str, Any]]) -> dict[str, Any]:
     report = preflight_canonical(manifest_path)
-    digest = manifest_digest(preflight(manifest_path).manifest)
+    manifest = preflight(manifest_path).manifest
+    assert isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3))
+    digest = manifest_digest(manifest)
     outcomes = Counter((row["data"].get("outcome") or "outcome_unavailable") for row in rows)
     terminations = Counter(row["termination"] for row in rows)
     ledger_path = output / "events.jsonl"
@@ -233,11 +235,11 @@ def _canonical_result_from_terminal_events(manifest_path: Path, output: Path, ro
         validate_canonical_shot(events, canonical_public_shot_context(manifest_path, shot_id=row["shot_id"]))
     return {
         "schema_version": 2,
-        "title": "canonical-three-qubit-development — canonical_implemented development_fixture not_assessed",
+        "title": f"{report['run_id']} — {manifest.evidence.relation} {manifest.evidence.fixture} {manifest.evidence.assessment_status}",
         "run_id": report["run_id"],
-        "relation": "canonical_implemented",
-        "fixture": "development_fixture",
-        "assessment_status": "not_assessed",
+        "relation": manifest.evidence.relation,
+        "fixture": manifest.evidence.fixture,
+        "assessment_status": manifest.evidence.assessment_status,
         "manifest_path": str(manifest_path),
         "manifest_sha256": digest,
         "ledger_path": str(ledger_path),
@@ -247,7 +249,11 @@ def _canonical_result_from_terminal_events(manifest_path: Path, output: Path, ro
         "policy_identity": report["policy_identity"],
         "denominators": {"all_terminal_shots": len(rows), **dict(sorted(outcomes.items()))},
         "terminations": dict(sorted(terminations.items())),
-        "statistical_claim": "not_assessed; canonical development fixture, not a source-faithful or statistical reproduction",
+        "statistical_claim": (
+            "not_assessed; canonical development fixture, not a source-faithful or statistical reproduction"
+            if manifest.evidence.relation == "canonical_implemented"
+            else "not_assessed; bounded pilot adaptation, not a statistical reproduction, performance ranking, or superiority claim"
+        ),
     }
 
 
@@ -273,9 +279,11 @@ def run_canonical(manifest_path: str | Path, output: str | Path) -> dict[str, An
 
 
 def _verify_canonical_run(output: Path, result: dict[str, Any]) -> dict[str, Any]:
-    if (result.get("relation") != "canonical_implemented" or result.get("fixture") != "development_fixture"
-            or result.get("assessment_status") != "not_assessed"):
-        raise ValueError("canonical result is missing transparent development labels")
+    if result.get("assessment_status") != "not_assessed":
+        raise ValueError("canonical result is missing the not_assessed label")
+    relation_fixture = (result.get("relation"), result.get("fixture"))
+    if relation_fixture not in {("canonical_implemented", "development_fixture"), ("pilot_adaptation", "pilot_adaptation")}:
+        raise ValueError("canonical result has an invalid transparent evidence label")
     manifest_path = Path(result["manifest_path"])
     report = preflight_canonical(manifest_path)
     ledger_path = output / "events.jsonl"
@@ -331,8 +339,40 @@ def verify_run(output: str | Path) -> dict[str, Any]:
 
     output = Path(output)
     result = _read_json(output / "result.json")
-    if result.get("relation") == "canonical_implemented":
+    if result.get("relation") in {"canonical_implemented", "pilot_adaptation"} and result.get("ledger_sha256") is not None:
         return _verify_canonical_run(output, result)
+    if result.get("title") == "Phase 3 bounded matched pilot adaptations — not_assessed":
+        terminals = result.get("verified_terminals")
+        reports = result.get("public_verify_reports")
+        if (
+            result.get("relation") != "pilot_adaptation"
+            or result.get("assessment_status") != "not_assessed"
+            or result.get("matched_sample_identities") is not True
+            or not isinstance(terminals, list)
+            or not terminals
+            or not isinstance(reports, list)
+            or not reports
+        ):
+            raise ValueError("Phase 3 pilot aggregate is missing transparent matched-pilot evidence")
+        for report in reports:
+            if not isinstance(report, dict) or not isinstance(report.get("output"), str):
+                raise ValueError("Phase 3 pilot aggregate has an invalid public verification report")
+            verify_run(report["output"])
+        aggregate_events = read_canonical_events(output / "events.jsonl")
+        aggregate_terminals = [event for event in aggregate_events if event.get("kind") == "termination"]
+        if len(aggregate_terminals) != len(terminals):
+            raise ValueError("Phase 3 pilot aggregate terminal count differs from its retained ledger")
+        if any(
+            terminal.get("relation") != "pilot_adaptation"
+            or terminal.get("assessment_status") != "not_assessed"
+            for terminal in terminals
+        ):
+            raise ValueError("Phase 3 pilot aggregate terminal labels are not transparent")
+        return {
+            "output": str(output),
+            "verified_terminals": len(terminals),
+            "matched_sample_identities": True,
+        }
     if (
         "pilot_adaptation" not in str(result.get("title", ""))
         or "not_assessed" not in str(result.get("title", ""))

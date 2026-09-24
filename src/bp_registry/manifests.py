@@ -318,11 +318,12 @@ class CanonicalRandomnessV2(StrictModel):
     sample_seed: int = Field(ge=0)
     decoder_seed_identity: str = Field(min_length=1)
     sample_derivation: Literal["sha256-manifest-shot-v1"]
+    physical_sample_identity: str | None = Field(default=None, min_length=1)
 
 
 class CanonicalEvidenceV2(StrictModel):
-    relation: Literal["canonical_implemented"]
-    fixture: Literal["development_fixture"]
+    relation: Literal["canonical_implemented", "pilot_adaptation"]
+    fixture: Literal["development_fixture", "pilot_adaptation"]
     assessment_status: Literal["not_assessed"]
     procedure: str = Field(min_length=1)
     sources: tuple[str, ...] = Field(min_length=1)
@@ -332,6 +333,14 @@ class CanonicalEvidenceV2(StrictModel):
     @classmethod
     def evidence_lists_are_tuples(cls, value: Any) -> Any:
         return tuple(value) if isinstance(value, list) else value
+
+    @model_validator(mode="after")
+    def relation_and_fixture_are_honest(self) -> "CanonicalEvidenceV2":
+        if self.relation == "canonical_implemented" and self.fixture != "development_fixture":
+            raise ValueError("canonical implementation evidence requires a development_fixture label")
+        if self.relation == "pilot_adaptation" and self.fixture != "pilot_adaptation":
+            raise ValueError("pilot adaptation evidence requires a pilot_adaptation label")
+        return self
 
 
 class CanonicalExperimentV2(StrictModel):
@@ -572,7 +581,7 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
                 raise ValueError("CanonicalExperimentV3 local SPA schedules require the cpu-float64-spa-v1 profile")
             if actual in (_EXECUTABLE_MIN_SUM_KINDS, _EXECUTABLE_NORMALIZED_MIN_SUM_KINDS, _EXECUTABLE_OFFSET_MIN_SUM_KINDS) and manifest.numerical_profile != "cpu-float64-min-sum-v1":
                 raise ValueError("CanonicalExperimentV3 min-sum updates require the cpu-float64-min-sum-v1 profile")
-            if actual not in (*_EXECUTABLE_LOCAL_SPA_KINDS, _EXECUTABLE_MIN_SUM_KINDS, _EXECUTABLE_NORMALIZED_MIN_SUM_KINDS, _EXECUTABLE_OFFSET_MIN_SUM_KINDS):
+            if actual not in (_EXECUTABLE_BASELINE_KINDS, *_EXECUTABLE_LOCAL_SPA_KINDS, _EXECUTABLE_MIN_SUM_KINDS, _EXECUTABLE_NORMALIZED_MIN_SUM_KINDS, _EXECUTABLE_OFFSET_MIN_SUM_KINDS):
                 raise ValueError("CanonicalExperimentV3 requires a closed promoted local-step composition")
         artifact = load_artifact(
             manifest.artifact.root, manifest.artifact.path,
@@ -610,8 +619,14 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
 
 
 def manifest_digest(manifest: ManifestRecord) -> str:
+    document = manifest.model_dump(mode="json")
+    # Preserve the legacy digest when this optional extension is absent: that
+    # digest is also the default deterministic physical-sample identity.
+    randomness = document.get("randomness")
+    if isinstance(randomness, dict) and randomness.get("physical_sample_identity") is None:
+        randomness.pop("physical_sample_identity", None)
     payload = json.dumps(
-        manifest.model_dump(mode="json"), sort_keys=True, separators=(",", ":")
+        document, sort_keys=True, separators=(",", ":")
     )
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 

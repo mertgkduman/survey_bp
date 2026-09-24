@@ -1,0 +1,172 @@
+{
+  "artifact": {
+    "code_id": "gross-bb-144",
+    "format_version": 1,
+    "matrix_hashes": {
+      "hx_raw_sha256": "c1700ef674d1682cba2620523eaca7fa475826644f28295de46b9fc742d3729b",
+      "hx_semantic_sha256": "8ce200c0f0216d8701dd40e399198d7d97663d5e59f9fd216b5cde756bcad221",
+      "hz_raw_sha256": "ab9cc0bafc2eee02d026aea9f3500b809caad7e7d0708a9ac997719e99c4ae71",
+      "hz_semantic_sha256": "85b850d21d354fa0c4ced2d18ec0ac429b3961f53545bb5f152e8b46e77ab38c",
+      "lx_raw_sha256": "6ed70f72141fd5a499f3a6da6c44a578229fa97d28e5e927d353dba62bef1c16",
+      "lx_semantic_sha256": "058a41f65842e9071c2ace12520b796d162eb431e8cf031192be4ffc0177f7bc",
+      "lz_raw_sha256": "40dbe2f12c82a87bcfb58f9058432849afc64e9e1d06669803c753eba1888543",
+      "lz_semantic_sha256": "40b1742c12ef8051719e7a890219642ed3d93c118405ad1fea7c94265a1b8d28"
+    },
+    "path": "selected-css.json",
+    "raw_sha256": "2c02a3b99bf7267acf35efe28e0a2ef0d3827e5a22b948d53da14ae8df68ceb0",
+    "root": "data/artifacts",
+    "semantic_sha256": "e175e67c0f9ae6f4e0968461ad2f87ba38ad5344166b793c53dd038976d4f427"
+  },
+  "budgets": {
+    "attempt": {
+      "max_iterations": 1,
+      "work_limits": {
+        "belief_assemblies": 1000,
+        "bp_calls": 1,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 1000,
+        "check_to_variable_updates": 1000,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 10000,
+        "variable_to_check_updates": 1000
+      }
+    },
+    "denominator_rule": "all_terminal_shots",
+    "max_shots": 1,
+    "search": {
+      "max_iterations": 1,
+      "work_limits": {
+        "belief_assemblies": 1000,
+        "bp_calls": 1,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 1000,
+        "check_to_variable_updates": 1000,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 10000,
+        "variable_to_check_updates": 1000
+      }
+    },
+    "shot": {
+      "max_iterations": 1,
+      "work_limits": {
+        "belief_assemblies": 1000,
+        "bp_calls": 1,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 1000,
+        "check_to_variable_updates": 1000,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 10000,
+        "variable_to_check_updates": 1000
+      }
+    }
+  },
+  "environment": {
+    "backend": "cpu",
+    "numpy": "2.2.6",
+    "omp_num_threads": 1,
+    "python": "3.12.2",
+    "scipy": "1.17.1"
+  },
+  "error_rate": 0.05,
+  "evidence": {
+    "assessment_status": "not_assessed",
+    "discrepancies": [
+      "This bounded pilot adaptation is not a source-faithful curve reproduction or a decoder ranking."
+    ],
+    "fixture": "pilot_adaptation",
+    "procedure": "Bounded matched Phase 3 update-rule pilot through the public canonical V3 interfaces.",
+    "relation": "pilot_adaptation",
+    "sources": [
+      "Phase 3 D-15 through D-19"
+    ]
+  },
+  "numerical_profile": "cpu-float64-min-sum-v1",
+  "policies": {
+    "intervention": {
+      "binding_id": "intervention-identity-v1",
+      "kind": "identity",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "search"
+    },
+    "postprocessing": {
+      "binding_id": "postprocessing-identity-v1",
+      "kind": "identity",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "attempt"
+    },
+    "schedule": {
+      "binding_id": "schedule-flooding-v1",
+      "kind": "flooding",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "iteration"
+    },
+    "selection": {
+      "binding_id": "selection-stable-first-v1",
+      "kind": "stable_first",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "attempt"
+    },
+    "state_memory": {
+      "binding_id": "state-memory-stateless-v1",
+      "kind": "stateless",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "attempt"
+    },
+    "stopping": {
+      "binding_id": "stopping-syndrome-budget-v1",
+      "kind": "syndrome_or_budget",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "iteration"
+    },
+    "update": {
+      "binding_id": "update-min-sum-v1",
+      "kind": "min_sum",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "message"
+    }
+  },
+  "profile_plan": {
+    "cohort": "clean",
+    "enabled": true,
+    "level": "low_overhead",
+    "selected_before_outcome": true
+  },
+  "randomness": {
+    "decoder_seed_identity": "phase3-bb144-policy-stream-v1",
+    "physical_sample_identity": "phase3-bb144-matched-physical-samples-v1",
+    "sample_derivation": "sha256-manifest-shot-v1",
+    "sample_seed": 317
+  },
+  "run_id": "phase3-bb144-ms",
+  "schema_version": 3,
+  "trace_plan": {
+    "label": "development_default",
+    "level": "off",
+    "max_bytes": 0,
+    "max_records": 0,
+    "relative_dir": "trace-sidecars"
+  }
+}

@@ -195,7 +195,8 @@ def canonical_public_shot_context(manifest_path: str | Path, *, shot_id: int) ->
         raise ValueError("shot_id is outside the canonical manifest budget")
     digest = manifest_digest(manifest)
     sample = sampling.sample_shot(
-        resolved.code, manifest_identity=digest, seed=manifest.randomness.sample_seed,
+        resolved.code, manifest_identity=manifest.randomness.physical_sample_identity or digest,
+        seed=manifest.randomness.sample_seed,
         shot_id=shot_id, x_error_rate=manifest.error_rate,
     )
     composition = validate_executable_canonical_baseline(manifest.policies)
@@ -239,7 +240,8 @@ def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: s
     assert isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3))
     digest = verification_context.manifest_sha256
     sample = sampling.sample_shot(
-        resolved.code, manifest_identity=digest, seed=manifest.randomness.sample_seed,
+        resolved.code, manifest_identity=manifest.randomness.physical_sample_identity or digest,
+        seed=manifest.randomness.sample_seed,
         shot_id=shot_id, x_error_rate=manifest.error_rate,
     )
     composition = validate_executable_canonical_baseline(manifest.policies)

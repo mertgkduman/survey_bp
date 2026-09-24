@@ -3,10 +3,18 @@
     "ArtifactV1": {
       "additionalProperties": false,
       "properties": {
-        "root": {
+        "code_id": {
           "minLength": 1,
-          "title": "Root",
+          "title": "Code Id",
           "type": "string"
+        },
+        "format_version": {
+          "const": 1,
+          "title": "Format Version",
+          "type": "integer"
+        },
+        "matrix_hashes": {
+          "$ref": "#/$defs/MatrixHashesV1"
         },
         "path": {
           "minLength": 1,
@@ -18,22 +26,14 @@
           "title": "Raw Sha256",
           "type": "string"
         },
+        "root": {
+          "minLength": 1,
+          "title": "Root",
+          "type": "string"
+        },
         "semantic_sha256": {
           "pattern": "^[0-9a-f]{64}$",
           "title": "Semantic Sha256",
-          "type": "string"
-        },
-        "matrix_hashes": {
-          "$ref": "#/$defs/MatrixHashesV1"
-        },
-        "format_version": {
-          "const": 1,
-          "title": "Format Version",
-          "type": "integer"
-        },
-        "code_id": {
-          "minLength": 1,
-          "title": "Code Id",
           "type": "string"
         }
       },
@@ -72,18 +72,6 @@
     "CanonicalBudgetsV2": {
       "additionalProperties": false,
       "properties": {
-        "max_shots": {
-          "maximum": 1000000,
-          "minimum": 1,
-          "title": "Max Shots",
-          "type": "integer"
-        },
-        "shot": {
-          "$ref": "#/$defs/CanonicalBudgetScopeV2"
-        },
-        "search": {
-          "$ref": "#/$defs/CanonicalBudgetScopeV2"
-        },
         "attempt": {
           "$ref": "#/$defs/CanonicalBudgetScopeV2"
         },
@@ -91,6 +79,18 @@
           "const": "all_terminal_shots",
           "title": "Denominator Rule",
           "type": "string"
+        },
+        "max_shots": {
+          "maximum": 1000000,
+          "minimum": 1,
+          "title": "Max Shots",
+          "type": "integer"
+        },
+        "search": {
+          "$ref": "#/$defs/CanonicalBudgetScopeV2"
+        },
+        "shot": {
+          "$ref": "#/$defs/CanonicalBudgetScopeV2"
         }
       },
       "required": [
@@ -107,25 +107,25 @@
       "additionalProperties": false,
       "description": "Seven explicit roles; omission is never an inactive-policy shorthand.",
       "properties": {
-        "update": {
+        "intervention": {
+          "$ref": "#/$defs/PolicySpec"
+        },
+        "postprocessing": {
           "$ref": "#/$defs/PolicySpec"
         },
         "schedule": {
           "$ref": "#/$defs/PolicySpec"
         },
-        "state_memory": {
+        "selection": {
           "$ref": "#/$defs/PolicySpec"
         },
-        "intervention": {
+        "state_memory": {
           "$ref": "#/$defs/PolicySpec"
         },
         "stopping": {
           "$ref": "#/$defs/PolicySpec"
         },
-        "selection": {
-          "$ref": "#/$defs/PolicySpec"
-        },
-        "postprocessing": {
+        "update": {
           "$ref": "#/$defs/PolicySpec"
         }
       },
@@ -145,9 +145,9 @@
       "additionalProperties": false,
       "description": "Runtime identity for the project-owned CPU implementation only.",
       "properties": {
-        "python": {
-          "minLength": 1,
-          "title": "Python",
+        "backend": {
+          "const": "cpu",
+          "title": "Backend",
           "type": "string"
         },
         "numpy": {
@@ -155,20 +155,20 @@
           "title": "Numpy",
           "type": "string"
         },
-        "scipy": {
-          "minLength": 1,
-          "title": "Scipy",
-          "type": "string"
-        },
-        "backend": {
-          "const": "cpu",
-          "title": "Backend",
-          "type": "string"
-        },
         "omp_num_threads": {
           "const": 1,
           "title": "Omp Num Threads",
           "type": "integer"
+        },
+        "python": {
+          "minLength": 1,
+          "title": "Python",
+          "type": "string"
+        },
+        "scipy": {
+          "minLength": 1,
+          "title": "Scipy",
+          "type": "string"
         }
       },
       "required": [
@@ -184,24 +184,38 @@
     "CanonicalEvidenceV2": {
       "additionalProperties": false,
       "properties": {
-        "relation": {
-          "const": "canonical_implemented",
-          "title": "Relation",
-          "type": "string"
-        },
-        "fixture": {
-          "const": "development_fixture",
-          "title": "Fixture",
-          "type": "string"
-        },
         "assessment_status": {
           "const": "not_assessed",
           "title": "Assessment Status",
           "type": "string"
         },
+        "discrepancies": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Discrepancies",
+          "type": "array"
+        },
+        "fixture": {
+          "enum": [
+            "development_fixture",
+            "pilot_adaptation"
+          ],
+          "title": "Fixture",
+          "type": "string"
+        },
         "procedure": {
           "minLength": 1,
           "title": "Procedure",
+          "type": "string"
+        },
+        "relation": {
+          "enum": [
+            "canonical_implemented",
+            "pilot_adaptation"
+          ],
+          "title": "Relation",
           "type": "string"
         },
         "sources": {
@@ -210,14 +224,6 @@
           },
           "minItems": 1,
           "title": "Sources",
-          "type": "array"
-        },
-        "discrepancies": {
-          "items": {
-            "type": "string"
-          },
-          "minItems": 1,
-          "title": "Discrepancies",
           "type": "array"
         }
       },
@@ -235,6 +241,15 @@
     "CanonicalProfilePlanV2": {
       "additionalProperties": false,
       "properties": {
+        "cohort": {
+          "enum": [
+            "clean",
+            "representative",
+            "diagnostic"
+          ],
+          "title": "Cohort",
+          "type": "string"
+        },
         "enabled": {
           "title": "Enabled",
           "type": "boolean"
@@ -245,15 +260,6 @@
             "representative"
           ],
           "title": "Level",
-          "type": "string"
-        },
-        "cohort": {
-          "enum": [
-            "clean",
-            "representative",
-            "diagnostic"
-          ],
-          "title": "Cohort",
           "type": "string"
         },
         "selected_before_outcome": {
@@ -273,20 +279,33 @@
     "CanonicalRandomnessV2": {
       "additionalProperties": false,
       "properties": {
-        "sample_seed": {
-          "minimum": 0,
-          "title": "Sample Seed",
-          "type": "integer"
-        },
         "decoder_seed_identity": {
           "minLength": 1,
           "title": "Decoder Seed Identity",
           "type": "string"
         },
+        "physical_sample_identity": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Physical Sample Identity"
+        },
         "sample_derivation": {
           "const": "sha256-manifest-shot-v1",
           "title": "Sample Derivation",
           "type": "string"
+        },
+        "sample_seed": {
+          "minimum": 0,
+          "title": "Sample Seed",
+          "type": "integer"
         }
       },
       "required": [
@@ -300,6 +319,14 @@
     "CanonicalTracePlanV2": {
       "additionalProperties": false,
       "properties": {
+        "label": {
+          "enum": [
+            "development_default",
+            "prespecified_campaign"
+          ],
+          "title": "Label",
+          "type": "string"
+        },
         "level": {
           "enum": [
             "off",
@@ -309,10 +336,11 @@
           "title": "Level",
           "type": "string"
         },
-        "relative_dir": {
-          "minLength": 1,
-          "title": "Relative Dir",
-          "type": "string"
+        "max_bytes": {
+          "maximum": 67108864,
+          "minimum": 0,
+          "title": "Max Bytes",
+          "type": "integer"
         },
         "max_records": {
           "maximum": 1000000,
@@ -320,18 +348,9 @@
           "title": "Max Records",
           "type": "integer"
         },
-        "max_bytes": {
-          "maximum": 67108864,
-          "minimum": 0,
-          "title": "Max Bytes",
-          "type": "integer"
-        },
-        "label": {
-          "enum": [
-            "development_default",
-            "prespecified_campaign"
-          ],
-          "title": "Label",
+        "relative_dir": {
+          "minLength": 1,
+          "title": "Relative Dir",
           "type": "string"
         }
       },
@@ -349,46 +368,16 @@
       "additionalProperties": false,
       "description": "One complete, resource-specific hard cap vector for one lifecycle scope.",
       "properties": {
-        "check_to_variable_updates": {
-          "maximum": 100000000,
-          "minimum": 0,
-          "title": "Check To Variable Updates",
-          "type": "integer"
-        },
-        "variable_to_check_updates": {
-          "maximum": 100000000,
-          "minimum": 0,
-          "title": "Variable To Check Updates",
-          "type": "integer"
-        },
         "belief_assemblies": {
           "maximum": 100000000,
           "minimum": 0,
           "title": "Belief Assemblies",
           "type": "integer"
         },
-        "residual_priority_evaluations": {
-          "maximum": 100000000,
-          "minimum": 0,
-          "title": "Residual Priority Evaluations",
-          "type": "integer"
-        },
         "bp_calls": {
           "maximum": 100000000,
           "minimum": 0,
           "title": "Bp Calls",
-          "type": "integer"
-        },
-        "candidate_checks": {
-          "maximum": 100000000,
-          "minimum": 0,
-          "title": "Candidate Checks",
-          "type": "integer"
-        },
-        "intervention_actions": {
-          "maximum": 100000000,
-          "minimum": 0,
-          "title": "Intervention Actions",
           "type": "integer"
         },
         "branch_expansions": {
@@ -403,16 +392,46 @@
           "title": "Branch Prunes",
           "type": "integer"
         },
-        "relay_transfers": {
+        "candidate_checks": {
           "maximum": 100000000,
           "minimum": 0,
-          "title": "Relay Transfers",
+          "title": "Candidate Checks",
+          "type": "integer"
+        },
+        "check_to_variable_updates": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Check To Variable Updates",
           "type": "integer"
         },
         "fallback_calls": {
           "maximum": 100000000,
           "minimum": 0,
           "title": "Fallback Calls",
+          "type": "integer"
+        },
+        "intervention_actions": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Intervention Actions",
+          "type": "integer"
+        },
+        "relay_transfers": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Relay Transfers",
+          "type": "integer"
+        },
+        "residual_priority_evaluations": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Residual Priority Evaluations",
+          "type": "integer"
+        },
+        "variable_to_check_updates": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Variable To Check Updates",
           "type": "integer"
         }
       },
@@ -441,24 +460,14 @@
           "title": "Hx Raw Sha256",
           "type": "string"
         },
-        "hz_raw_sha256": {
-          "pattern": "^[0-9a-f]{64}$",
-          "title": "Hz Raw Sha256",
-          "type": "string"
-        },
-        "lx_raw_sha256": {
-          "pattern": "^[0-9a-f]{64}$",
-          "title": "Lx Raw Sha256",
-          "type": "string"
-        },
-        "lz_raw_sha256": {
-          "pattern": "^[0-9a-f]{64}$",
-          "title": "Lz Raw Sha256",
-          "type": "string"
-        },
         "hx_semantic_sha256": {
           "pattern": "^[0-9a-f]{64}$",
           "title": "Hx Semantic Sha256",
+          "type": "string"
+        },
+        "hz_raw_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Hz Raw Sha256",
           "type": "string"
         },
         "hz_semantic_sha256": {
@@ -466,9 +475,19 @@
           "title": "Hz Semantic Sha256",
           "type": "string"
         },
+        "lx_raw_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Lx Raw Sha256",
+          "type": "string"
+        },
         "lx_semantic_sha256": {
           "pattern": "^[0-9a-f]{64}$",
           "title": "Lx Semantic Sha256",
+          "type": "string"
+        },
+        "lz_raw_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Lz Raw Sha256",
           "type": "string"
         },
         "lz_semantic_sha256": {
@@ -494,54 +513,10 @@
       "additionalProperties": false,
       "description": "Persisted data only: no module paths, callables, or implicit defaults.",
       "properties": {
-        "kind": {
-          "maxLength": 64,
-          "minLength": 1,
-          "title": "Kind",
-          "type": "string"
-        },
         "binding_id": {
           "pattern": "^[a-z][a-z0-9_-]{0,63}$",
           "title": "Binding Id",
           "type": "string"
-        },
-        "state_lifetime": {
-          "enum": [
-            "shot",
-            "search",
-            "member",
-            "leg",
-            "branch",
-            "attempt",
-            "iteration",
-            "message"
-          ],
-          "title": "State Lifetime",
-          "type": "string"
-        },
-        "owned_state": {
-          "default": [],
-          "items": {
-            "type": "string"
-          },
-          "title": "Owned State",
-          "type": "array"
-        },
-        "requires": {
-          "default": [],
-          "items": {
-            "type": "string"
-          },
-          "title": "Requires",
-          "type": "array"
-        },
-        "provides": {
-          "default": [],
-          "items": {
-            "type": "string"
-          },
-          "title": "Provides",
-          "type": "array"
         },
         "hook": {
           "anyOf": [
@@ -564,6 +539,50 @@
           ],
           "default": null,
           "title": "Hook"
+        },
+        "kind": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Kind",
+          "type": "string"
+        },
+        "owned_state": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Owned State",
+          "type": "array"
+        },
+        "provides": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Provides",
+          "type": "array"
+        },
+        "requires": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Requires",
+          "type": "array"
+        },
+        "state_lifetime": {
+          "enum": [
+            "shot",
+            "search",
+            "member",
+            "leg",
+            "branch",
+            "attempt",
+            "iteration",
+            "message"
+          ],
+          "title": "State Lifetime",
+          "type": "string"
         }
       },
       "required": [
@@ -578,20 +597,14 @@
   "additionalProperties": false,
   "description": "Strict persisted public contract for canonical CSS development evidence.",
   "properties": {
-    "schema_version": {
-      "const": 2,
-      "title": "Schema Version",
-      "type": "integer"
+    "artifact": {
+      "$ref": "#/$defs/ArtifactV1"
     },
-    "run_id": {
-      "minLength": 1,
-      "title": "Run Id",
-      "type": "string"
+    "budgets": {
+      "$ref": "#/$defs/CanonicalBudgetsV2"
     },
-    "numerical_profile": {
-      "const": "cpu-float64-spa-v1",
-      "title": "Numerical Profile",
-      "type": "string"
+    "environment": {
+      "$ref": "#/$defs/CanonicalEnvironmentV2"
     },
     "error_rate": {
       "exclusiveMaximum": 1.0,
@@ -599,29 +612,35 @@
       "title": "Error Rate",
       "type": "number"
     },
+    "evidence": {
+      "$ref": "#/$defs/CanonicalEvidenceV2"
+    },
+    "numerical_profile": {
+      "const": "cpu-float64-spa-v1",
+      "title": "Numerical Profile",
+      "type": "string"
+    },
     "policies": {
       "$ref": "#/$defs/CanonicalCompositionSpec"
-    },
-    "budgets": {
-      "$ref": "#/$defs/CanonicalBudgetsV2"
-    },
-    "trace_plan": {
-      "$ref": "#/$defs/CanonicalTracePlanV2"
     },
     "profile_plan": {
       "$ref": "#/$defs/CanonicalProfilePlanV2"
     },
-    "environment": {
-      "$ref": "#/$defs/CanonicalEnvironmentV2"
-    },
-    "artifact": {
-      "$ref": "#/$defs/ArtifactV1"
-    },
     "randomness": {
       "$ref": "#/$defs/CanonicalRandomnessV2"
     },
-    "evidence": {
-      "$ref": "#/$defs/CanonicalEvidenceV2"
+    "run_id": {
+      "minLength": 1,
+      "title": "Run Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 2,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "trace_plan": {
+      "$ref": "#/$defs/CanonicalTracePlanV2"
     }
   },
   "required": [
