@@ -146,3 +146,18 @@ def test_inventory_registers_three_distinct_phase3_pilot_artifacts():
     assert (b1.n, b1.k) == (882, 24)
     assert (hgp.n, hgp.k) == (225, 29)
     assert gf2_rank(hgp.hx) + gf2_rank(hgp.hz) + hgp.k == hgp.n
+
+
+def test_frozen_pilot_archives_regenerate_exact_bytes(tmp_path):
+    constructions = _construction_module()
+
+    b1_path = tmp_path / "b1.npz"
+    constructions.write_css_npz(constructions.build_b1_ghp(), b1_path)
+    assert b1_path.read_bytes() == (ARTIFACTS / "b1-panteleev-kalachev-v3.npz").read_bytes()
+
+    constituent = constructions.build_gallager_constituent(seed=20260923)
+    hgp_path = tmp_path / "hgp.npz"
+    constructions.write_hgp_npz(constituent, constructions.build_hgp(constituent.matrix), hgp_path)
+    assert hgp_path.read_bytes() == (
+        ARTIFACTS / "hgp-gallager-3-4-seed-20260923.npz"
+    ).read_bytes()

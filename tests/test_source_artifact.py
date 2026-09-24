@@ -16,8 +16,15 @@ DECISIONS = Path("docs/phase1-source-decisions.md")
 def test_inventory_distinguishes_b1_c2_and_gross_and_records_d04_gate():
     inventory = json.loads(INVENTORY.read_text())
     by_id = {candidate["code_id"]: candidate for candidate in inventory["candidates"]}
-    assert set(by_id) == {"gross-bb-144", "b1-lifted-product-882", "bpgd-c2-hgp-1922"}
-    assert by_id["b1-lifted-product-882"]["family"] == "lifted_product"
+    assert set(by_id) == {
+        "gross-bb-144",
+        "b1-ghp-882",
+        "hgp-gallager-3-4-seed-20260923",
+        "bpgd-c2-hgp-1922",
+    }
+    assert by_id["b1-ghp-882"]["family"] == "generalized_hypergraph_product"
+    assert by_id["b1-ghp-882"]["matrix_identity"]["status"] == "source-derived"
+    assert by_id["hgp-gallager-3-4-seed-20260923"]["author_instance"] is False
     assert by_id["bpgd-c2-hgp-1922"]["family"] == "hypergraph_product"
     assert by_id["gross-bb-144"]["implementation"]["revision"]
     assert inventory["selection"]["decision"] == "selected_verified_gross_bb_144"

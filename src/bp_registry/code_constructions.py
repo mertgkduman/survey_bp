@@ -32,6 +32,8 @@ _B1_A_EXPONENTS: tuple[tuple[int | None, ...], ...] = (
 _B1_B_EXPONENTS = (0, 1, 6)
 _MAX_MATRIX_DIMENSION = 10_000
 _MAX_MATRIX_CELLS = 2_000_000
+_MAX_NPZ_BYTES = 1_000_000
+_MAX_NPZ_UNCOMPRESSED_BYTES = 2_000_000
 
 
 @dataclass(frozen=True)
@@ -236,6 +238,58 @@ def write_hgp_npz(constituent: GallagerConstituent, code: CssCode, artifact_path
         },
         artifact_path,
     )
+
+
+def _confined_artifact(root: str | Path, relative_path: str | Path) -> Path:
+    approved_root = Path(root).resolve(strict=True)
+    if not approved_root.is_dir():
+        raise ValueError("approved artifact root must be a directory")
+    requested = Path(relative_path)
+    if requested.is_absolute() or ".." in requested.parts:
+        raise ValueError("artifact path escapes approved root")
+    candidate = approved_root / requested
+    cursor = approved_root
+    for part in requested.parts:
+        cursor = cursor / part
+        if cursor.is_symlink():
+            raise ValueError("artifact path may not traverse a symlink")
+    resolved = candidate.resolve(strict=True)
+    if not resolved.is_relative_to(approved_root) or not resolved.is_file():
+        raise ValueError("artifact path must identify a regular file under the approved root")
+    return resolved
+
+
+def load_frozen_css_npz(
+    root: str | Path,
+    relative_path: str | Path,
+    *,
+    expected_raw_sha256: str | None = None,
+    expected_semantic_sha256: str | None = None,
+) -> CssCode:
+    """Load a bounded, confined primitive-array CSS archive without pickle."""
+    artifact = _confined_artifact(root, relative_path)
+    if artifact.stat().st_size > _MAX_NPZ_BYTES:
+        raise ValueError("NPZ artifact exceeds compressed size limit")
+    raw = artifact.read_bytes()
+    if expected_raw_sha256 is not None and hashlib.sha256(raw).hexdigest() != expected_raw_sha256:
+        raise ValueError("raw SHA-256 does not match NPZ artifact bytes")
+    allowed = {"hx.npy", "hz.npy", "lx.npy", "lz.npy", "constituent.npy", "permutations.npy"}
+    with zipfile.ZipFile(io.BytesIO(raw)) as archive:
+        members = archive.infolist()
+        if not members or any(member.filename not in allowed for member in members):
+            raise ValueError("NPZ artifact has unexpected members")
+        if sum(member.file_size for member in members) > _MAX_NPZ_UNCOMPRESSED_BYTES:
+            raise ValueError("NPZ artifact exceeds uncompressed size limit")
+    with np.load(io.BytesIO(raw), allow_pickle=False) as archive:
+        if not {"hx", "hz", "lx", "lz"}.issubset(archive.files):
+            raise ValueError("NPZ artifact lacks required CSS arrays")
+        arrays = {name: archive[name] for name in archive.files}
+    if any(array.dtype != np.uint8 for array in arrays.values()):
+        raise ValueError("NPZ artifact arrays must be primitive uint8")
+    code = CssCode(hx=arrays["hx"], hz=arrays["hz"], lx=arrays["lx"], lz=arrays["lz"]).validate()
+    if expected_semantic_sha256 is not None and semantic_sha256(code) != expected_semantic_sha256:
+        raise ValueError("semantic SHA-256 does not match CSS content")
+    return code
 
 
 def artifact_metadata(code: CssCode, artifact_path: Path) -> dict[str, str]:

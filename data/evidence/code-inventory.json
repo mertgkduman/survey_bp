@@ -1,10 +1,10 @@
 {
-  "format_version": 1,
+  "format_version": 2,
   "selection": {
     "decision": "selected_verified_gross_bb_144",
     "d04_rule": "A candidate may be selected only after exact source rows, ordered logical identity, pinned implementation identity, and independent CSS validation agree.",
     "conditional_first_choice_before_probe": "gross-bb-144",
-    "final_reason": "Gross regenerated from the pinned source commit and passed independent GF(2) rank, commutation, quotient-independence, ordered-pairing, raw-hash, and semantic-hash checks. B1 and C2 remain unresolved."
+    "final_reason": "Gross remains the selected verified artifact. B1 is now a source-derived, project-logical pilot; the seeded Gallager HGP is a generated-family pilot; C2 remains non-substitutable."
   },
   "candidates": [
     {
@@ -22,42 +22,51 @@
         "source_file_sha256": "e919e1830b88468c5d257c0119656576a7999f92743dfeccd389a967524b3d2c"
       },
       "matrix_identity": {"status": "established", "construction": "Hx=[A|B], Hz=[B^T|A^T]; columns are left block then right block", "artifact_raw_sha256": "2c02a3b99bf7267acf35efe28e0a2ef0d3827e5a22b948d53da14ae8df68ceb0", "artifact_semantic_sha256": "e175e67c0f9ae6f4e0968461ad2f87ba38ad5344166b793c53dd038976d4f427"},
-      "ordered_logical_identity": {"status": "established", "provider": "bposd.css.css_code", "package_version": "2.1", "module_sha256": "d1e0c238d81c9b023bffa7bd355cfe305f8da3a6233a0af2edc1187f4807d6b1", "source_lx_row_sha256": "eab85005550ccf58f443982c12e588780a7fba507dd0e0669b148fbf52bccc4f", "source_lz_row_sha256": "737c6a3ab8ca418a19617afb9c9c977329c2993b6b03dc79e4c9a747450c5a37", "paired_lz_row_sha256": "05cd78922140e9cd8f70d3419f489262247e0d0ee0c141526e375f1fc99fa3c4", "reason": "Lx source order retained; Lz normalized to the explicit ordered paired basis"},
-      "independent_validation": {"status": "passed", "hx_shape": [72, 144], "hz_shape": [72, 144], "hx_rank_gf2": 66, "hz_rank_gf2": 66, "k_gf2": 12, "commutator_nonzero_entries": 0, "reason": "project-owned CSS validation checks commutation, quotient independence, and identity pairing"},
+      "ordered_logical_identity": {"status": "established", "provider": "bposd.css.css_code", "package_version": "2.1", "module_sha256": "d1e0c238d81c9b023bffa7bd355cfe305f8da3a6233a0af2edc1187f4807d6b1", "source_lx_row_sha256": "eab85005550ccf58f443982c12e588780a7fba507dd0e0669b148fbf52bccc4f", "source_lz_row_sha256": "737c6a3ab8ca418a19617afb9c9c977329c2993b6b03dc79e4c9a747450c5a37", "paired_lz_row_sha256": "05cd78922140e9cd8f70d3419f489262247e0d0ee0c141526e375f1fc99fa3c4"},
+      "independent_validation": {"status": "passed", "hx_shape": [72, 144], "hz_shape": [72, 144], "hx_rank_gf2": 66, "hz_rank_gf2": 66, "k_gf2": 12, "commutator_nonzero_entries": 0},
       "noise_settings": {"status": "incomplete", "reason": "repository README describes circuit-level BP-OSD, while impulse Figure 6 is code-capacity"},
       "verification_status": "verified",
       "rejection_reason": "Not applicable; selected as a disclosed pilot adaptation, not source-faithful reproduction."
     },
     {
-      "code_id": "b1-lifted-product-882",
-      "family": "lifted_product",
+      "code_id": "b1-ghp-882",
+      "family": "generalized_hypergraph_product",
       "parameters": "[[882,24,18<=d<=24]]",
-      "paper_relations": [
-        {"work_id": "yao-bpgd", "revision": "v2", "anchor": "Figures 2-4", "relation": "BPGD CSS experiment"},
-        {"work_id": "bhatnagar-impulse", "revision": "v1", "anchor": "Figure 5", "relation": "explicitly identified as lifted-product B1"}
-      ],
-      "implementation": {"status": "unresolved", "reason": "no exact original implementation commit was established"},
-      "matrix_identity": {"status": "unresolved", "reason": "exact rows and column ordering unavailable"},
-      "ordered_logical_identity": {"status": "unresolved", "reason": "ordered logical-basis rows unavailable"},
-      "independent_validation": {"status": "not_run", "reason": "requires exact source rows"},
-      "noise_settings": {"status": "paper_reported_but_not_executable", "reason": "artifact identity gate is incomplete"},
-      "verification_status": "unresolved",
-      "rejection_reason": "Cannot promote a parameter label without exact source matrices and ordered logicals."
+      "paper_relations": [{"work_id": "panteleev-kalachev", "revision": "v3", "anchor": "Appendix B", "relation": "exact ghpc_3_3_N882_K24 source construction"}],
+      "implementation": {"status": "source-derived", "archive_member": "matrices/ghpc_3_3_N882_K24.tex", "archive_member_sha256": "91be6649c066b88d46e1b232ac16c3e7cb94f8a928fd9f82834663b16e9d8e83"},
+      "matrix_identity": {"status": "source-derived", "artifact_path": "data/artifacts/b1-panteleev-kalachev-v3.npz", "artifact_raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6", "artifact_semantic_sha256": "ea120ce6e5277e9eb090c419d14c1d4a587b8d52db9f34bb99c4262617be3048"},
+      "ordered_logical_identity": {"status": "project-derived", "reason": "A deterministic project-owned quotient basis is used; this is not an author-supplied ordered logical basis."},
+      "independent_validation": {"status": "passed", "hx_shape": [441, 882], "hz_shape": [441, 882], "hx_rank_gf2": 429, "hz_rank_gf2": 429, "k_gf2": 24, "commutator_nonzero_entries": 0},
+      "noise_settings": {"status": "not_assessed"},
+      "verification_status": "source-derived",
+      "rejection_reason": "Not a substitute for an author implementation or an author-ordered logical basis."
+    },
+    {
+      "code_id": "hgp-gallager-3-4-seed-20260923",
+      "family": "hypergraph_product",
+      "parameters": "[[225,29,unknown]]",
+      "paper_relations": [{"work_id": "pilot-adaptation", "revision": "project", "anchor": "Phase 03 plan 07", "relation": "fixed generated-family HGP comparison pilot"}],
+      "implementation": {"status": "generated-family", "generator": "PCG64", "seed": 20260923, "author_instance": false},
+      "matrix_identity": {"status": "generated-family", "artifact_path": "data/artifacts/hgp-gallager-3-4-seed-20260923.npz", "artifact_raw_sha256": "b31c99a754fb377acfb5e2cb2edc2cb7e55c4d1e78feb4aa84c171c051a78c44", "artifact_semantic_sha256": "272c9498396167424bc4279d96b5ad2d6e11cebc7f01de597716a1cd2c01d668"},
+      "ordered_logical_identity": {"status": "project-derived", "reason": "Deterministic quotient-basis logicals are generated by the project."},
+      "independent_validation": {"status": "passed", "hx_shape": [108, 225], "hz_shape": [108, 225], "k_gf2": 29, "commutator_nonzero_entries": 0},
+      "noise_settings": {"status": "not_assessed"},
+      "verification_status": "generated-family",
+      "author_instance": false,
+      "rejection_reason": "This fixed seed is a disclosed project pilot, not a reproduction of an author instance."
     },
     {
       "code_id": "bpgd-c2-hgp-1922",
       "family": "hypergraph_product",
       "parameters": "[[1922,50,16]]",
-      "paper_relations": [
-        {"work_id": "yao-bpgd", "revision": "v2", "anchor": "Figure 5", "relation": "explicitly identified as C2 hypergraph-product code"}
-      ],
+      "paper_relations": [{"work_id": "yao-bpgd", "revision": "v2", "anchor": "Figure 5", "relation": "explicitly identified as C2 hypergraph-product code"}],
       "implementation": {"status": "unresolved", "reason": "no pinned original code artifact or commit was established"},
       "matrix_identity": {"status": "unresolved", "reason": "seed classical matrices and tensor/product ordering unavailable"},
       "ordered_logical_identity": {"status": "unresolved", "reason": "ordered logical-basis rows unavailable"},
       "independent_validation": {"status": "not_run", "reason": "requires exact source rows"},
       "noise_settings": {"status": "paper_reported_but_not_executable", "reason": "artifact identity gate is incomplete"},
       "verification_status": "unresolved",
-      "rejection_reason": "The HGP family relation does not identify a particular matrix or logical basis."
+      "rejection_reason": "C2 does not substitute for B1: the HGP family relation does not identify a particular matrix or logical basis."
     }
   ]
 }
