@@ -60,6 +60,14 @@ def test_documented_tutorial(tmp_path):
     )
 
 
+def test_documented_nms_contract_names_equations_assignments_and_public_verification():
+    tutorial = (REPOSITORY_ROOT / "docs/canonical-engine.md").read_text(encoding="utf-8")
+    assert "normalized min-sum" in tutorial.lower()
+    assert "alpha" in tutorial
+    assert "parameter_assignment" in tutorial
+    assert "schema-canonical-v3.json" in tutorial
+
+
 def test_checked_canonical_manifest_has_a_strict_public_preflight_contract():
     """The development fixture is a public immutable experiment, not a kernel shortcut."""
     from pathlib import Path
