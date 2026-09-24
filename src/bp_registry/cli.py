@@ -348,20 +348,77 @@ def verify_run(output: str | Path) -> dict[str, Any]:
             result.get("relation") != "pilot_adaptation"
             or result.get("assessment_status") != "not_assessed"
             or result.get("matched_sample_identities") is not True
+            or result.get("rejected_undefined") is not True
+            or result.get("statistical_claim") != "not_assessed; bounded pilots are not statistical curve reproductions, performance rankings, or superiority claims"
             or not isinstance(terminals, list)
             or not terminals
             or not isinstance(reports, list)
             or not reports
         ):
             raise ValueError("Phase 3 pilot aggregate is missing transparent matched-pilot evidence")
+        expected_events: list[dict[str, Any]] = []
+        expected_terminals: list[dict[str, Any]] = []
+        matched: dict[tuple[str, int], set[str]] = {}
         for report in reports:
             if not isinstance(report, dict) or not isinstance(report.get("output"), str):
                 raise ValueError("Phase 3 pilot aggregate has an invalid public verification report")
-            verify_run(report["output"])
+            run_output = Path(report["output"])
+            if not run_output.resolve().is_relative_to((output / "runs").resolve()):
+                raise ValueError("Phase 3 pilot run path escapes the aggregate")
+            actual_report = verify_run(run_output)
+            if {key: value for key, value in actual_report.items() if key != "verified_at"} != {
+                key: value for key, value in report.items() if key != "verified_at"
+            }:
+                raise ValueError("Phase 3 pilot verification report differs from public replay")
+            run_result = _read_json(run_output / "result.json")
+            manifest_path = Path(run_result["manifest_path"])
+            if not manifest_path.resolve().is_relative_to((output / "manifests").resolve()):
+                raise ValueError("Phase 3 pilot manifest path escapes the aggregate")
+            manifest = _read_json(manifest_path)
+            events = read_canonical_events(run_output / "events.jsonl")
+            expected_events.extend(events)
+            samples = {
+                (event["run_id"], event["shot_id"]): event["sample_seed_identity"]
+                for event in events if event.get("kind") == "shot_begin"
+            }
+            for event in events:
+                if event.get("kind") != "termination":
+                    continue
+                data = event["data"]
+                sample = samples[(event["run_id"], event["shot_id"])]
+                matched.setdefault((data["code_id"], event["shot_id"]), set()).add(sample)
+                expected_terminals.append({
+                    "run_id": event["run_id"], "shot_id": event["shot_id"],
+                    "termination": event["termination"], "sample_identity": sample,
+                    "code_id": data["code_id"],
+                    "artifact_raw_sha256": data["artifact_raw_sha256"],
+                    "artifact_semantic_sha256": data["artifact_semantic_sha256"],
+                    "canonical_identity": data["canonical_identity"],
+                    "composition_identity": data["composition_identity"],
+                    "relation": data["evidence_relation"],
+                    "assessment_status": data["assessment_status"],
+                    "outcome": data.get("outcome"), "converged": data.get("converged"),
+                    "qualified_iterations": data.get("schedule_terminal", {}).get(
+                        "source_iteration", {"count": data.get("iterations", 0), "schedule": "flooding"}
+                    ),
+                    "work_vector": data["work_vector"],
+                    "schedule_terminal": data.get("schedule_terminal"),
+                    "profile": data.get("profile"),
+                    "policy_effects": data["policy_effects"],
+                    "matrix_hashes": manifest["artifact"]["matrix_hashes"],
+                    "budget_views": {
+                        "common_c2v_cap": manifest["budgets"]["shot"]["work_limits"]["check_to_variable_updates"],
+                        "qualified_iteration_limit": manifest["budgets"]["shot"]["max_iterations"],
+                        "budget_scope": "shot", "equal_total_cost_claim": False,
+                    },
+                })
         aggregate_events = read_canonical_events(output / "events.jsonl")
-        aggregate_terminals = [event for event in aggregate_events if event.get("kind") == "termination"]
-        if len(aggregate_terminals) != len(terminals):
-            raise ValueError("Phase 3 pilot aggregate terminal count differs from its retained ledger")
+        if aggregate_events != expected_events or terminals != expected_terminals:
+            raise ValueError("Phase 3 pilot aggregate differs from its publicly verified run evidence")
+        if result.get("code_ids") != sorted({item["code_id"] for item in expected_terminals}):
+            raise ValueError("Phase 3 pilot code identities differ from verified terminals")
+        if not matched or any(len(values) != 1 for values in matched.values()):
+            raise ValueError("Phase 3 pilot physical samples are not matched by code and shot")
         if any(
             terminal.get("relation") != "pilot_adaptation"
             or terminal.get("assessment_status") != "not_assessed"

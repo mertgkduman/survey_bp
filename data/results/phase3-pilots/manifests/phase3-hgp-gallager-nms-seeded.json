@@ -1,0 +1,193 @@
+{
+  "artifact": {
+    "code_id": "hgp-gallager-3-4-seed-20260923",
+    "format_version": 1,
+    "matrix_hashes": {
+      "hx_raw_sha256": "2497f0f59cdb7cf0787e601295e5d118d6cad2e62cc2226a88a47ccf2b034dfb",
+      "hx_semantic_sha256": "0edcbfaab182df09cdfe0a0adf6cf394e167896c540483d52b95217963c8664d",
+      "hz_raw_sha256": "002e894daec7f5e56d17f8bca28ad11dacfd2df236d1a18e031564d6d18727f4",
+      "hz_semantic_sha256": "45b088f719effe4389e9c96a67bcc49100beeb447b38d4ef4dbf51087c96bdfe",
+      "lx_raw_sha256": "c53605ad73244da3b9352a269333484e307055036bc5f1c428727ec9a9ce0b8b",
+      "lx_semantic_sha256": "3db83ea36085e780c1c7c8b409909cb8873b451bdc7ed1747bee066a0e93c0f7",
+      "lz_raw_sha256": "09cd80917934c1665921c09e027ebb51cc02014da6f51f3ca34f7a4001eb60f6",
+      "lz_semantic_sha256": "2dc6a64b64568bb5b88f09537ced7369baf535e377f33209f33aa38299734d87"
+    },
+    "path": "hgp-gallager-3-4-seed-20260923.npz",
+    "raw_sha256": "b31c99a754fb377acfb5e2cb2edc2cb7e55c4d1e78feb4aa84c171c051a78c44",
+    "root": "data/artifacts",
+    "semantic_sha256": "272c9498396167424bc4279d96b5ad2d6e11cebc7f01de597716a1cd2c01d668"
+  },
+  "budgets": {
+    "attempt": {
+      "max_iterations": 1,
+      "work_limits": {
+        "belief_assemblies": 1000,
+        "bp_calls": 1,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 1000,
+        "check_to_variable_updates": 1000,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 10000,
+        "variable_to_check_updates": 1000
+      }
+    },
+    "denominator_rule": "all_terminal_shots",
+    "max_shots": 1,
+    "search": {
+      "max_iterations": 1,
+      "work_limits": {
+        "belief_assemblies": 1000,
+        "bp_calls": 1,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 1000,
+        "check_to_variable_updates": 1000,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 10000,
+        "variable_to_check_updates": 1000
+      }
+    },
+    "shot": {
+      "max_iterations": 1,
+      "work_limits": {
+        "belief_assemblies": 1000,
+        "bp_calls": 1,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 1000,
+        "check_to_variable_updates": 1000,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 10000,
+        "variable_to_check_updates": 1000
+      }
+    }
+  },
+  "environment": {
+    "backend": "cpu",
+    "numpy": "2.2.6",
+    "omp_num_threads": 1,
+    "python": "3.12.2",
+    "scipy": "1.17.1"
+  },
+  "error_rate": 0.03,
+  "evidence": {
+    "assessment_status": "not_assessed",
+    "discrepancies": [
+      "This bounded pilot adaptation is not a source-faithful curve reproduction or a decoder ranking."
+    ],
+    "fixture": "pilot_adaptation",
+    "procedure": "Bounded matched Phase 3 schedule pilot on the generated Gallager (3,4) HGP adaptation.",
+    "relation": "pilot_adaptation",
+    "sources": [
+      "Phase 3 D-15 through D-19"
+    ]
+  },
+  "numerical_profile": "cpu-float64-min-sum-v1",
+  "policies": {
+    "intervention": {
+      "binding_id": "intervention-identity-v1",
+      "kind": "identity",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "search"
+    },
+    "postprocessing": {
+      "binding_id": "postprocessing-identity-v1",
+      "kind": "identity",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "attempt"
+    },
+    "schedule": {
+      "binding_id": "schedule-flooding-v1",
+      "kind": "flooding",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "iteration"
+    },
+    "selection": {
+      "binding_id": "selection-stable-first-v1",
+      "kind": "stable_first",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "attempt"
+    },
+    "state_memory": {
+      "binding_id": "state-memory-stateless-v1",
+      "kind": "stateless",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "attempt"
+    },
+    "stopping": {
+      "binding_id": "stopping-syndrome-budget-v1",
+      "kind": "syndrome_or_budget",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "iteration"
+    },
+    "update": {
+      "binding_id": "update-normalized-min-sum-v1",
+      "kind": "normalized_min_sum",
+      "owned_state": [],
+      "parameter_generator": {
+        "distribution": "uniform",
+        "graph_sha256": "1b3fe1fa3a814444c7ac52a72e599127a215d1704ae7f33ef92a9de5a7bb1a78",
+        "high": 0.9,
+        "low": 0.7,
+        "provenance": "exploratory",
+        "root_seed_identity": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "shape": "check"
+      },
+      "parameter_refresh": {
+        "generator": {
+          "distribution": "uniform",
+          "graph_sha256": "1b3fe1fa3a814444c7ac52a72e599127a215d1704ae7f33ef92a9de5a7bb1a78",
+          "high": 0.9,
+          "low": 0.7,
+          "provenance": "exploratory",
+          "root_seed_identity": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "shape": "check"
+        },
+        "scope": "configuration"
+      },
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "message"
+    }
+  },
+  "profile_plan": {
+    "cohort": "clean",
+    "enabled": true,
+    "level": "low_overhead",
+    "selected_before_outcome": true
+  },
+  "randomness": {
+    "decoder_seed_identity": "phase3-hgp-policy-stream-v1",
+    "physical_sample_identity": "phase3-hgp-matched-physical-samples-v1",
+    "sample_derivation": "sha256-manifest-shot-v1",
+    "sample_seed": 319
+  },
+  "run_id": "phase3-hgp-gallager-nms-seeded",
+  "schema_version": 3,
+  "trace_plan": {
+    "label": "development_default",
+    "level": "off",
+    "max_bytes": 0,
+    "max_records": 0,
+    "relative_dir": "trace-sidecars"
+  }
+}

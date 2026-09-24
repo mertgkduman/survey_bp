@@ -32,7 +32,7 @@ from .profiling import LocalProfiler, ProfilingPlan
 from .lineage import LineageEdge, LineageId, stable_lineage_id
 from .numerics import NumericalFailure
 from .numerics import MIN_SUM_CPU_F64
-from .updates import MinSumUpdate, NormalizedMinSumUpdate, OffsetMinSumUpdate
+from .updates import MinSumUpdate, NormalizedMinSumUpdate, OffsetMinSumUpdate, resolve_generated_configuration_assignment
 from .problems import OriginalProblem, OriginalSpaceCandidate, WorkingProblem, select_stable_candidate
 from .schedules import (
     CheckNodeSerialSchedule, EdgeTable, FloodingSchedule, FloodingSweep,
@@ -214,9 +214,17 @@ def _kernel_for_manifest(manifest: CanonicalManifestV2 | CanonicalManifestV3, ed
     if update == "min_sum":
         return BinarySpaKernel(profile=MIN_SUM_CPU_F64, update_rule=MinSumUpdate())
     if update == "normalized_min_sum":
-        if edge_table is None or manifest.policies.update.parameter_assignment is None:
+        if edge_table is None:
             raise ValueError("normalized_min_sum requires a resolved immutable EdgeTable assignment")
         assignment = manifest.policies.update.parameter_assignment
+        if assignment is None and isinstance(manifest, CanonicalManifestV3):
+            assignment, _ = resolve_generated_configuration_assignment(
+                manifest.policies.update.model_dump(mode="json"), manifest.model_dump(mode="json"),
+                graph_sha256=edge_table.graph_sha256, check_count=edge_table.check_count,
+                edge_count=edge_table.edge_count,
+            )
+        if assignment is None:
+            raise ValueError("normalized_min_sum requires a resolved immutable EdgeTable assignment")
         resolved = assignment.resolve(
             graph_sha256=edge_table.graph_sha256, check_count=edge_table.check_count,
             edge_count=edge_table.edge_count, source_iteration=0,
@@ -230,9 +238,17 @@ def _kernel_for_manifest(manifest: CanonicalManifestV2 | CanonicalManifestV3, ed
             ),
         )
     if update == "offset_min_sum":
-        if edge_table is None or manifest.policies.update.parameter_assignment is None:
+        if edge_table is None:
             raise ValueError("offset_min_sum requires a resolved immutable EdgeTable assignment")
         assignment = manifest.policies.update.parameter_assignment
+        if assignment is None and isinstance(manifest, CanonicalManifestV3):
+            assignment, _ = resolve_generated_configuration_assignment(
+                manifest.policies.update.model_dump(mode="json"), manifest.model_dump(mode="json"),
+                graph_sha256=edge_table.graph_sha256, check_count=edge_table.check_count,
+                edge_count=edge_table.edge_count,
+            )
+        if assignment is None:
+            raise ValueError("offset_min_sum requires a resolved immutable EdgeTable assignment")
         resolved = assignment.resolve(
             graph_sha256=edge_table.graph_sha256, check_count=edge_table.check_count,
             edge_count=edge_table.edge_count, source_iteration=0,

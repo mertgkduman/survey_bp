@@ -25,7 +25,7 @@ from .schedules import (
     CheckNodeSerialSchedule, EdgeTable, FloodingSchedule, LayeredSchedule,
     RandomizedTraversalPlan, VariableNodeSerialSchedule,
 )
-from .updates import MinSumUpdate, NormalizedMinSumUpdate, OffsetMinSumUpdate, ParameterAssignment
+from .updates import MinSumUpdate, NormalizedMinSumUpdate, OffsetMinSumUpdate, ParameterAssignment, resolve_generated_configuration_assignment
 
 
 class CanonicalStructuralVerificationError(ValueError):
@@ -363,8 +363,12 @@ def _expected_attempt(context: PublicShotContext) -> dict[str, Any]:
     if context.update_kind == "min_sum":
         kernel = BinarySpaKernel(profile=MIN_SUM_CPU_F64, update_rule=MinSumUpdate())
     elif context.update_kind == "normalized_min_sum":
-        declared = context.compact_manifest.get("policies", {}).get("update", {}).get("parameter_assignment")
-        assignment = ParameterAssignment.model_validate(declared)
+        update = context.compact_manifest.get("policies", {}).get("update", {})
+        declared = update.get("parameter_assignment")
+        assignment = ParameterAssignment.model_validate(declared) if declared is not None else resolve_generated_configuration_assignment(
+            dict(update), dict(context.compact_manifest), graph_sha256=table.graph_sha256,
+            check_count=table.check_count, edge_count=table.edge_count,
+        )[0]
         resolved = assignment.resolve(
             graph_sha256=table.graph_sha256, check_count=table.check_count, edge_count=table.edge_count,
             source_iteration=0, edge_checks=tuple(check for check, _variable in table.edges),
@@ -377,8 +381,12 @@ def _expected_attempt(context: PublicShotContext) -> dict[str, Any]:
             ),
         )
     elif context.update_kind == "offset_min_sum":
-        declared = context.compact_manifest.get("policies", {}).get("update", {}).get("parameter_assignment")
-        assignment = ParameterAssignment.model_validate(declared)
+        update = context.compact_manifest.get("policies", {}).get("update", {})
+        declared = update.get("parameter_assignment")
+        assignment = ParameterAssignment.model_validate(declared) if declared is not None else resolve_generated_configuration_assignment(
+            dict(update), dict(context.compact_manifest), graph_sha256=table.graph_sha256,
+            check_count=table.check_count, edge_count=table.edge_count,
+        )[0]
         resolved = assignment.resolve(
             graph_sha256=table.graph_sha256, check_count=table.check_count, edge_count=table.edge_count,
             source_iteration=0, edge_checks=tuple(check for check, _variable in table.edges),

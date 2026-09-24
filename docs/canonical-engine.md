@@ -237,6 +237,13 @@ schedule's recorded iteration boundary, never a layer/node/residual local-unit
 counter. The draw is admitted atomically before RNG advancement; an admission
 denial leaves both assignment state and RNG state unchanged.
 
+Public V3 execution currently admits generated NMS/OMS assignments only with
+`configuration` refresh under flooding. Preflight rejects generated `attempt`
+or `source_iteration` refresh and generated assignments under local schedules;
+those scope contracts remain available for isolated semantics tests. The
+configuration draw is replayed from the compact manifest and immutable graph
+by both the kernel and `verify-run`.
+
 `source_defined` generation requires a source anchor. Arbitrary generated
 ranges are `exploratory`; no generated exploratory declaration can be relabeled
 as a source-faithful setting.

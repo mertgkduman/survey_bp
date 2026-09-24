@@ -1,0 +1,25 @@
+{
+  "assessment_status": "not_assessed",
+  "denominators": {
+    "all_terminal_shots": 1,
+    "outcome_unavailable": 1
+  },
+  "final_row_count": 1,
+  "fixture": "pilot_adaptation",
+  "ledger_path": "data/results/phase3-pilots/runs/phase3-hgp-gallager-residual/events.jsonl",
+  "ledger_sha256": "44d2232a98918c64ae2ac871f021b057c61f9f56d5363467d4dd24d96e335bce",
+  "manifest_path": "data/results/phase3-pilots/manifests/phase3-hgp-gallager-residual.json",
+  "manifest_sha256": "2206f683504f41c5cf18ac65523edef6eef481a8dc92e51932dcbb8b49638713",
+  "policy_identity": "fad99d4c3c1f5582ca1c9121e5244e2bcd1563dfb9caaab09424e8bbdd37e9f4",
+  "relation": "pilot_adaptation",
+  "run_id": "phase3-hgp-gallager-residual",
+  "schema_version": 2,
+  "shot_ids": [
+    0
+  ],
+  "statistical_claim": "not_assessed; bounded pilot adaptation, not a statistical reproduction, performance ranking, or superiority claim",
+  "terminations": {
+    "max_iterations": 1
+  },
+  "title": "phase3-hgp-gallager-residual \u2014 pilot_adaptation pilot_adaptation not_assessed"
+}

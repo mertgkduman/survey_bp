@@ -313,6 +313,34 @@ class ParameterRefreshPlan(BaseModel):
         }
 
 
+def resolve_generated_configuration_assignment(
+    update: dict[str, Any], manifest_payload: dict[str, Any], *,
+    graph_sha256: str, check_count: int, edge_count: int,
+) -> tuple[ParameterAssignment, dict[str, Any]]:
+    """Replay a configuration-scoped draw from the public compact manifest."""
+    generator = ParameterGeneratorSpec.model_validate(update.get("parameter_generator"))
+    plan = ParameterRefreshPlan.model_validate(update.get("parameter_refresh"))
+    if plan.scope != "configuration" or plan.generator != generator:
+        raise ValueError("executable generated assignments require a matching configuration refresh")
+    configuration_identity = sha256(
+        json.dumps(manifest_payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    state = plan.initial_state(
+        configuration_identity=configuration_identity,
+        attempt_identity=f"{configuration_identity}:attempt:0",
+    )
+    from .budgets import BudgetTree
+
+    result = plan.refresh(
+        state, boundary="configuration", source_iteration=0,
+        graph_sha256=graph_sha256, check_count=check_count, edge_count=edge_count,
+        budgets=BudgetTree(limits=()), budget_scope="attempt",
+    )
+    if not result.admitted or result.assignment is None or result.evidence is None:
+        raise ValueError("configuration assignment generation was not admitted")
+    return result.assignment, result.evidence
+
+
 @dataclass(frozen=True, slots=True)
 class NormalizedMinSumUpdate:
     """Float64 min-sum whose magnitude is scaled before final saturation."""

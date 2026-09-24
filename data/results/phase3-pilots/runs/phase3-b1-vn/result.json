@@ -1,0 +1,25 @@
+{
+  "assessment_status": "not_assessed",
+  "denominators": {
+    "all_terminal_shots": 1,
+    "outcome_unavailable": 1
+  },
+  "final_row_count": 1,
+  "fixture": "pilot_adaptation",
+  "ledger_path": "data/results/phase3-pilots/runs/phase3-b1-vn/events.jsonl",
+  "ledger_sha256": "267d8e023c9fbef42c482879b027744fe8765b8da1c1bb2be3b58e0585184354",
+  "manifest_path": "data/results/phase3-pilots/manifests/phase3-b1-vn.json",
+  "manifest_sha256": "72648552ce2b25120d6c5ad85c925e81bdc8cdf30e02bd1ce19689e3c5276c4b",
+  "policy_identity": "3b9fa5f190dbd87d54a4a515ab0077e87173191947e303c76ba7b1e0c47ae860",
+  "relation": "pilot_adaptation",
+  "run_id": "phase3-b1-vn",
+  "schema_version": 2,
+  "shot_ids": [
+    0
+  ],
+  "statistical_claim": "not_assessed; bounded pilot adaptation, not a statistical reproduction, performance ranking, or superiority claim",
+  "terminations": {
+    "max_iterations": 1
+  },
+  "title": "phase3-b1-vn \u2014 pilot_adaptation pilot_adaptation not_assessed"
+}

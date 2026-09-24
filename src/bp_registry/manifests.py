@@ -577,6 +577,9 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
             raise ValueError("CanonicalExperimentV2 preserves only historical binary_spa semantics")
         if isinstance(manifest, CanonicalExperimentV3):
             actual = {binding.role.value: binding.kind for binding in composition.bindings}
+            refresh = manifest.policies.update.parameter_refresh
+            if refresh is not None and (refresh.scope != "configuration" or manifest.policies.schedule.kind != "flooding"):
+                raise ValueError("executable generated assignments require configuration refresh under flooding")
             if actual in _EXECUTABLE_LOCAL_SPA_KINDS and manifest.numerical_profile != "cpu-float64-spa-v1":
                 raise ValueError("CanonicalExperimentV3 local SPA schedules require the cpu-float64-spa-v1 profile")
             if actual in (_EXECUTABLE_MIN_SUM_KINDS, _EXECUTABLE_NORMALIZED_MIN_SUM_KINDS, _EXECUTABLE_OFFSET_MIN_SUM_KINDS) and manifest.numerical_profile != "cpu-float64-min-sum-v1":
