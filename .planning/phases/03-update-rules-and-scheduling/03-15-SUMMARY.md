@@ -14,14 +14,14 @@ affects: [phase-03-verification, css-pilot-analysis, future-reproduction-campaig
 actuals:
   tokens: 75566
   tasks: 2
-  commits: 6
+  commits: 7
 plan_head_before: 3799384643e5508ca9e71c0eda4bd55cf0d096cb
 tech-stack:
   added: [matplotlib==3.10.9, nbformat==5.10.4, nbclient==0.10.2, ipykernel==6.29.5]
   patterns:
     - Confined transient kernelspec bound to the project .venv interpreter
     - Read-only ledger/result analysis with durable input digest and trace links
-    - Separate full-work, setup-runtime, and decode-runtime reporting without equal-cost claims
+    - Separate work counters by operation type and report scoped setup/decode runtime without equal-cost claims
 key-files:
   created:
     - scripts/execute_phase3_notebook.py
@@ -38,6 +38,7 @@ key-decisions:
   - "Analysis reads only the retained events.jsonl and result.json inputs; no pilot or decoder execution is invoked."
   - "All output rows and figures retain pilot_adaptation/not_assessed labels, separate setup/decode scopes, missing outcomes, and equal_total_cost_claim=false."
   - "Executed-notebook timing metadata is removed because it is nondeterministic observation noise rather than retained evidence."
+  - "Heterogeneous work counters are never summed into a scalar; each outcome row records one-shot denominator and cohort size separately."
 requirements-completed: [UPD-01, UPD-02, UPD-03, SCH-02, SCH-03, SCH-04, SCH-05]
 coverage:
   - id: D1
@@ -92,6 +93,7 @@ status: complete
 
 - `OMP_NUM_THREADS=1 MPLBACKEND=Agg .venv/bin/python -m pytest -q tests/test_phase3_pilots.py -k 'notebook or dependency or kernel or report or table or plot or labels'` — 2 passed.
 - `OMP_NUM_THREADS=1 MPLBACKEND=Agg .venv/bin/python scripts/execute_phase3_notebook.py --input notebooks/phase3-pilot-analysis.ipynb --output data/results/phase3-pilots/phase3-pilot-analysis.executed.ipynb` — passed.
+- `PYTHONPATH="$PWD/src" OMP_NUM_THREADS=1 MPLBACKEND=Agg .venv/bin/python -m pytest -q` — 279 passed before the final notebook-only review correction; the corrected notebook executed and its focused 2-test suite passed.
 - Two consecutive notebook executions produced identical SHA-256 values for the executed notebook, both CSVs, and both PNGs.
 - `git diff --check 3799384643e5508ca9e71c0eda4bd55cf0d096cb..HEAD` — passed.
 
@@ -105,6 +107,7 @@ Each task was committed atomically through RED/GREEN checks:
 4. **Task 2 GREEN: retained-pilot tables and diagnostics** — `e0fd8f0` (`feat`)
 5. **Task 2 correction: portable CSV output** — `c5a8cbd` (`fix`)
 6. **Task 2 correction: deterministic executed notebook** — `736579f` (`fix`)
+7. **Review correction: separate heterogeneous work counters** — `987c898` (`fix`)
 
 ## Files Created/Modified
 
@@ -120,6 +123,7 @@ Each task was committed atomically through RED/GREEN checks:
 - The notebook accepts only expected roots, verifies exact analysis versions, runs the project kernel, and reads retained evidence; it does not call the pilot runner or decoder.
 - CSV rows retain `pilot_adaptation`, `not_assessed`, a shared evidence digest, and an event-ledger trace link. Missing outcomes remain missing rather than being inferred.
 - Work and timing are diagnostic observations only: complete work vectors and setup/decode scopes remain separate, and equal total cost is explicitly false.
+- The work chart shows C2V updates, V2C updates, convergence checks, and residual-priority evaluations on separate axes. The outcome table records one shot per policy run and the 19-terminal cohort separately; the notebook cross-checks each row against its retained ledger event.
 
 ## Deviations from Plan
 
@@ -141,9 +145,16 @@ Each task was committed atomically through RED/GREEN checks:
 - **Verification:** Whitespace check passes; repeated executions have identical hashes for all five generated artifacts.
 - **Committed in:** `c5a8cbd`, `736579f`
 
+**3. [Rule 1 - Scientific presentation] Kept unlike work counters separate**
+- **Found during:** Orchestrator review after task 2.
+- **Issue:** A scalar sum of C2V, V2C, convergence, and residual counters treated unlike operations as interchangeable and obscured the one-shot denominator.
+- **Fix:** Removed the scalar, plotted each counter separately, recorded one-shot and cohort denominators explicitly, and checked report rows against retained ledger events.
+- **Verification:** The notebook and focused tests pass; all five generated artifacts are byte-stable across repeated execution.
+- **Committed in:** `987c898`
+
 ---
 
-**Total deviations:** 2 auto-fixed Rule 1 correctness issues.
+**Total deviations:** 3 auto-fixed correctness and scientific-presentation issues.
 **Impact on plan:** Both changes enforce the plan's exact interpreter and deterministic-output contracts without changing decoder behavior or pilot evidence.
 
 ## Issues Encountered
@@ -161,7 +172,7 @@ Phase 3 has reproducible, claim-safe presentation artifacts for the retained bou
 ## Self-Check: PASSED
 
 - Confirmed all nine implementation, report, notebook, and test artifacts plus this summary exist.
-- Confirmed task commits `3e63da4`, `50d65be`, `33b49b0`, `e0fd8f0`, `c5a8cbd`, and `736579f` are reachable.
+- Confirmed task commits `3e63da4`, `50d65be`, `33b49b0`, `e0fd8f0`, `c5a8cbd`, `736579f`, and `987c898` are reachable.
 - Re-ran the focused notebook/report suite: 2 passed. No stubs, skipped tests, unrun verification, or new network/auth trust surface was introduced.
 
 ---
