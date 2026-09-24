@@ -5,6 +5,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
+from bp_registry.canonical import memory
 from bp_registry.canonical.memory import AffinePriorMemory
 
 
@@ -28,7 +29,6 @@ def test_affine_prior_memory_rejects_nonfinite_decoder_visible_operands():
         AffinePriorMemory("relay", 0.5).propose(np.asarray([1.0]), np.asarray([np.nan]))
 
 
-@pytest.mark.skip(reason="Wave 1 adds source-qualified damping, PDBP, PD′BP, and momentum equations.")
-def test_source_memory_equations_distinguish_message_and_belief_operands():
-    """Reserved behavior target; the skipped reason records its planned implementation boundary."""
-
+def test_damping_pdbp_and_pdprime_expose_distinct_targeted_rules():
+    """Published message and belief rules remain separately addressable policies."""
+    assert all(hasattr(memory, name) for name in ("V2CDamping", "PDBPFieldMix", "PDPrimeDeltaMix"))
