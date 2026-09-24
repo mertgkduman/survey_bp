@@ -55,9 +55,9 @@
 
 ### State and memory
 
-- [ ] **MEM-01**: A researcher can enable damping with an explicit equation, parameter, application point, and reset behavior.
-- [ ] **MEM-02**: A researcher can enable a precisely specified mixing policy with explicit operands, weights, and application order.
-- [ ] **MEM-03**: A researcher can enable a source-defined momentum policy with explicit history state and initialization/reset semantics.
+- [x] **MEM-01**: A researcher can enable damping with an explicit equation, parameter, application point, and reset behavior.
+- [x] **MEM-02**: A researcher can enable a precisely specified mixing policy with explicit operands, weights, and application order.
+- [x] **MEM-03**: A researcher can enable a source-defined momentum policy with explicit history state and initialization/reset semantics.
 - [x] **MEM-04**: A researcher can enable a source-defined iteration-memory policy with explicit retained state, lifetime, and update equation.
 - [x] **MEM-05**: A researcher can enable disordered memory with a declared sampling distribution, seed stream, update equation, and inheritance/reset behavior.
 
@@ -204,9 +204,9 @@ Every v1 requirement has exactly one owning phase; later phases may use or stren
 | SCH-04 | Phase 3 | Complete |
 | SCH-05 | Phase 3 | Complete |
 | SCH-06 | Phase 3 | Complete |
-| MEM-01 | Phase 4 | Pending |
-| MEM-02 | Phase 4 | Pending |
-| MEM-03 | Phase 4 | Pending |
+| MEM-01 | Phase 4 | Complete |
+| MEM-02 | Phase 4 | Complete |
+| MEM-03 | Phase 4 | Complete |
 | MEM-04 | Phase 4 | Complete |
 | MEM-05 | Phase 4 | Complete |
 | MOD-01 | Phase 4 | Complete |
