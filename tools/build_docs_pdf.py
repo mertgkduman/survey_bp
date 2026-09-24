@@ -35,7 +35,7 @@ SOURCE_FILES: tuple[str, ...] = (
     ".planning/phases/01-evidence-registry-and-native-css-baseline/01-VERIFICATION.md",
     "docs/snapshots/canonical-engine-through-phase-2.md",
     "docs/profiling-and-tracing-strategy.md",
-    "docs/research-novelty-and-depth-register.md",
+    "docs/snapshots/research-novelty-and-depth-register-through-phase-2.md",
     ".planning/phases/02-canonical-css-execution-and-policy-contracts/02-VERIFICATION.md",
 )
 SECTION_TITLES: tuple[str, ...] = (
