@@ -97,7 +97,7 @@ Plans:
 5. A researcher can install the package, run the tutorial, and inspect mathematical conventions, lifecycle contracts, and compatibility examples.
 
 **Research focus:** Numerical stability, trace vocabulary, policy ownership, scoped budgets, and kernel-level work definitions.
-**Plans:** 14/15 plans executed
+**Plans:** 15/15 plans executed
 
 Plans:
 
@@ -153,7 +153,7 @@ Plans:
 
 **Wave 13** *(after Wave 12)*
 
-- [ ] 02-15-PLAN.md — Complete provenance binding, persistent numerical verification, and RSS consistency
+- [x] 02-15-PLAN.md — Complete provenance binding, persistent numerical verification, and RSS consistency
 
 ### Phase 3: Update Rules and Scheduling
 
@@ -358,7 +358,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Evidence Registry and Native CSS Baseline | 9/9 | Complete    | 2026-09-22 |
-| 2. Canonical CSS Execution and Policy Contracts | 14/14 | In Progress|  |
+| 2. Canonical CSS Execution and Policy Contracts | 15/15 | In Progress|  |
 | 3. Update Rules and Scheduling | 0/TBD | Not started | - |
 | 4. Memory Policies and Relay-BP | 0/TBD | Not started | - |
 | 5. Guided and Perturbative BP Interventions | 0/TBD | Not started | - |
