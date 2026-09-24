@@ -106,3 +106,105 @@ def test_layered_schedule_records_repeated_t_cover_membership_and_structural_gra
     assert evidence["graph_identity"] == (2, 3, ((0, 0), (1, 1), (1, 2)))
     with pytest.raises(ValueError, match="text"):
         LayeredSchedule(table, kernel=BinarySpaKernel(), partitions=(("0",), (1,)), provenance="explicit")
+
+
+def _serial_api():
+    from bp_registry.canonical.budgets import BudgetLimit, BudgetTree
+    from bp_registry.canonical.execution import CanonicalLocalStepExecutor, ScheduleProgress
+    from bp_registry.canonical.kernel import BinarySpaKernel
+    from bp_registry.canonical.schedules import (
+        CheckNodeSerialSchedule,
+        EdgeTable,
+        ScheduleAttemptRegistry,
+        VariableNodeSerialSchedule,
+    )
+
+    return (
+        BudgetLimit,
+        BudgetTree,
+        CanonicalLocalStepExecutor,
+        ScheduleProgress,
+        BinarySpaKernel,
+        EdgeTable,
+        CheckNodeSerialSchedule,
+        VariableNodeSerialSchedule,
+        ScheduleAttemptRegistry,
+    )
+
+
+def test_check_node_serial_updates_a_check_then_refreshes_affected_variables():
+    import bp_registry.canonical.schedules as schedules
+
+    assert hasattr(schedules, "CheckNodeSerialSchedule"), (
+        "CheckNodeSerialSchedule must expose the SCNS local-unit production API"
+    )
+    (
+        _BudgetLimit,
+        BudgetTree,
+        CanonicalLocalStepExecutor,
+        ScheduleProgress,
+        BinarySpaKernel,
+        EdgeTable,
+        CheckNodeSerialSchedule,
+        VariableNodeSerialSchedule,
+        _Registry,
+    ) = _serial_api()
+    table = EdgeTable.from_edges(2, 2, [(0, 0), (0, 1), (1, 0), (1, 1)])
+    initial = np.asarray([1.5, -0.7, 0.2, 2.0], dtype=np.float64)
+    syndrome = np.asarray([0, 1], dtype=np.uint8)
+    executor = CanonicalLocalStepExecutor(BudgetTree(limits=(), parents={}), scope="attempt")
+    check_messages = initial.copy()
+    check = CheckNodeSerialSchedule(table, kernel=BinarySpaKernel()).execute_local_step(
+        executor, check_messages, syndrome, error_rate=0.2,
+        progress=ScheduleProgress(iteration=0, local_steps=0, cursor=(0,)),
+        is_converged=lambda _candidate: False,
+    )
+    assert check.admitted and check.progress.cursor == (1,)
+    assert check.proposed_work.check_to_variable_updates == 2
+    assert check.proposed_work.variable_to_check_updates == 4
+    assert CheckNodeSerialSchedule(table, kernel=BinarySpaKernel()).evidence()["atomic_unit"] == "one_check_all_c2v_then_affected_v2c"
+
+    variable_messages = initial.copy()
+    variable = VariableNodeSerialSchedule(table, kernel=BinarySpaKernel()).execute_local_step(
+        CanonicalLocalStepExecutor(BudgetTree(limits=(), parents={}), scope="variable"),
+        variable_messages, syndrome, error_rate=0.2,
+        progress=ScheduleProgress(iteration=0, local_steps=0, cursor=(0,)),
+        is_converged=lambda _candidate: False,
+    )
+    assert variable.admitted and variable.progress.cursor == (1,)
+    assert variable.proposed_work.check_to_variable_updates == 0
+    assert variable.proposed_work.variable_to_check_updates == 2
+    assert not np.allclose(check_messages, variable_messages)
+
+
+def test_serial_schedule_denial_retry_and_duplicate_shot_identity_do_not_share_or_double_commit():
+    (
+        BudgetLimit,
+        BudgetTree,
+        CanonicalLocalStepExecutor,
+        ScheduleProgress,
+        BinarySpaKernel,
+        EdgeTable,
+        CheckNodeSerialSchedule,
+        _VariableNodeSerialSchedule,
+        Registry,
+    ) = _serial_api()
+    table = EdgeTable.from_edges(2, 2, [(0, 0), (0, 1), (1, 0), (1, 1)])
+    schedule = CheckNodeSerialSchedule(table, kernel=BinarySpaKernel())
+    messages = np.asarray([1.5, -0.7, 0.2, 2.0], dtype=np.float64)
+    before = messages.copy()
+    progress = ScheduleProgress(iteration=0, local_steps=0, cursor=(0,))
+    denied = schedule.execute_local_step(
+        CanonicalLocalStepExecutor(BudgetTree(limits=(BudgetLimit("attempt", "candidate_checks", 0),), parents={}), scope="attempt"),
+        messages, np.asarray([0, 1], dtype=np.uint8), error_rate=0.2, progress=progress,
+        is_converged=lambda _candidate: False,
+    )
+    assert not denied.admitted
+    np.testing.assert_array_equal(messages, before)
+    assert denied.progress == progress
+
+    registry = Registry()
+    registry.claim("shot:17")
+    with pytest.raises(ValueError, match="duplicate"):
+        registry.claim("shot:17")
+    assert registry.claim("shot:18") == "shot:18"
