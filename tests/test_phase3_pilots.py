@@ -31,6 +31,7 @@ def test_analysis_extra_and_notebook_executor_are_pinned_and_confined():
     executor_source = NOTEBOOK_EXECUTOR.read_text(encoding="utf-8")
     assert 'repository_root / ".venv" / "bin" / "python"' in executor_source
     assert '"argv": [str(interpreter)' in executor_source
+    assert 'cell.metadata.pop("execution", None)' in executor_source
     assert "run_phase3_pilots" not in executor_source
 
 

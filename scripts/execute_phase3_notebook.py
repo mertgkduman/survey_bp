@@ -97,6 +97,10 @@ def execute_notebook(*, repository_root: Path, input_path: str, output_path: str
         finally:
             os.environ.clear()
             os.environ.update(previous)
+    # Kernel timing metadata varies between equivalent executions and is not
+    # retained pilot evidence; outputs and source are the reproducible record.
+    for cell in notebook.cells:
+        cell.metadata.pop("execution", None)
     nbformat.write(notebook, destination)
     return destination
 
