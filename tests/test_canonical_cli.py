@@ -66,6 +66,8 @@ def test_documented_nms_contract_names_equations_assignments_and_public_verifica
     assert "alpha" in tutorial
     assert "parameter_assignment" in tutorial
     assert "schema-canonical-v3.json" in tutorial
+    assert "layered" in tutorial
+    assert "partitions" in tutorial
 
 
 def test_checked_canonical_manifest_has_a_strict_public_preflight_contract():
