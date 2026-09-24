@@ -34,6 +34,7 @@ def test_bb144_tracer_runs_through_public_preflight_run_and_verify(tmp_path):
     assert report["labels"] == {"relation": "pilot_adaptation", "assessment_status": "not_assessed"}
     assert report["matched_sample_identities"] is True
     assert report["verified_terminals"]
+    assert all(item["setup_runtime"]["value"] is not None and item["decode_runtime"]["value"] is not None for item in report["verified_terminals"])
     assert (tmp_path / "phase3-pilots" / "events.jsonl").is_file()
     assert (tmp_path / "phase3-pilots" / "result.json").is_file()
 
@@ -57,6 +58,7 @@ def test_focused_b1_and_hgp_matrix_retains_schedules_parameters_and_rejection():
     )
     assert all(item["budget_views"]["common_c2v_cap"] > 0 and item["budget_views"]["qualified_iteration_limit"] == 1 for item in terminals)
     assert all(item["budget_views"]["equal_total_cost_claim"] is False for item in terminals)
+    assert all(item["setup_runtime"]["value"] is not None and item["decode_runtime"]["value"] is not None for item in terminals)
     assert all(item["artifact_raw_sha256"] and item["artifact_semantic_sha256"] and item["composition_identity"] for item in terminals)
     assert all({"hx_raw_sha256", "hz_raw_sha256", "lx_raw_sha256", "lz_raw_sha256"} <= item["matrix_hashes"].keys() for item in terminals)
     assert report["matched_sample_identities"] is True

@@ -7,7 +7,7 @@
   "final_row_count": 1,
   "fixture": "pilot_adaptation",
   "ledger_path": "data/results/phase3-pilots/runs/phase3-hgp-gallager-spa/events.jsonl",
-  "ledger_sha256": "56e7ea1396f4ab7466b0ff9d4d5b162c2ceea4e2ee55fc683dc1ef6ccca760ea",
+  "ledger_sha256": "98e8f695693720e522220493281ba971ac720824334a574853d21bb328e99cb6",
   "manifest_path": "data/results/phase3-pilots/manifests/phase3-hgp-gallager-spa.json",
   "manifest_sha256": "048d8057fd17324fe4ad1e5e6fc2dcff8315d26039357749bb31c542f69fe589",
   "policy_identity": "3fdcfd949a6376bfc5e1f06ab103eaf55a4056ea5554787d1f16720c9b2c98d0",

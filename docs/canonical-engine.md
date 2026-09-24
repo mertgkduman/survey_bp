@@ -191,6 +191,15 @@ schedule evidence exposes fresh/stale visibility, selected order, residual cache
 semantics, or randomized replay facts as appropriate. These quantities are not
 converted to flooding sweeps or a universal cost.
 
+Phase 3 pilot terminals also retain `setup_runtime` and `decode_runtime` as
+separate nanosecond measurements. Setup covers canonical graph, kernel, and
+schedule initialization; decode is the profiled attempt wall time after
+subtracting initialization inside that profile. Local schedule construction
+before the attempt is included in setup. Public preflight, artifact loading,
+and ledger I/O are outside these two scopes, so their sum is not an end-to-end
+CLI runtime. If an attempt ends before a scope is measured, its value is
+explicitly unavailable rather than zero.
+
 For an outgoing check-to-variable edge, min-sum uses
 
 \[

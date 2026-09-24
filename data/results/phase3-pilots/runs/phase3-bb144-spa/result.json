@@ -7,7 +7,7 @@
   "final_row_count": 1,
   "fixture": "pilot_adaptation",
   "ledger_path": "data/results/phase3-pilots/runs/phase3-bb144-spa/events.jsonl",
-  "ledger_sha256": "cc76628514f3d57fce3b95f1f6462140ef194c0b34c072f4e397611cb910b64e",
+  "ledger_sha256": "54575604341808ec54c7ffb7a0adc276325ec32f83a14a134ea8b987b2318d33",
   "manifest_path": "data/results/phase3-pilots/manifests/phase3-bb144-spa.json",
   "manifest_sha256": "a6fc1221607afc21cf447e62fdb976b6d51dae808bb7866d06e5a0280194b5dd",
   "policy_identity": "3fdcfd949a6376bfc5e1f06ab103eaf55a4056ea5554787d1f16720c9b2c98d0",

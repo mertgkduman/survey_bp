@@ -633,9 +633,12 @@ def run_canonical_structural_shot(
     local_schedule: Any | None = None
     randomized_plan: RandomizedTraversalPlan | None = None
     local_random_state: Any | None = None
+    setup_before_profile_ns = 0
+    setup_inside_profile_ns = 0
     if parsed.policies.schedule.kind != "flooding":
         if not isinstance(parsed, CanonicalManifestV3):
             raise ValueError("local public execution requires the version-three kernel contract")
+        setup_started_ns = time.perf_counter_ns()
         local_table = EdgeTable.from_check_matrix(validated.hz)
         local_schedule, randomized_plan = _local_schedule_for_manifest(
             parsed, local_table, _kernel_for_manifest(parsed, local_table),
@@ -645,6 +648,7 @@ def run_canonical_structural_shot(
             local_random_state = randomized_plan.initial_state(
                 configuration_identity=identity, attempt_identity=f"{identity}:attempt:0",
             )
+        setup_before_profile_ns = time.perf_counter_ns() - setup_started_ns
     for attempt_ordinal in range(30):
         try:
             with CanonicalEventWriter(path) as ledger:
@@ -662,6 +666,27 @@ def run_canonical_structural_shot(
                 def terminal_with_work(termination: str, **data: Any) -> None:
                     work = budgets.summary("attempt")
                     is_local = parsed.policies.schedule.kind != "flooding"
+                    setup_elapsed_ns = setup_before_profile_ns + setup_inside_profile_ns
+                    setup_runtime = (
+                        Measurement.observed(
+                            setup_elapsed_ns, method="time.perf_counter_ns:v1",
+                            scope="canonical_setup", unit="ns", precision="1 ns",
+                        ) if setup_elapsed_ns else Measurement.unavailable(
+                            method="not_measured", scope="canonical_setup", unit="ns", precision="unknown",
+                            reason="attempt ended before canonical setup began",
+                        )
+                    )
+                    profiled_wall = None if profile_evidence is None else profile_evidence["runtime"]["wall_time"]["value"]
+                    decode_runtime = (
+                        Measurement.observed(
+                            max(0, int(profiled_wall) - setup_inside_profile_ns),
+                            method="time.perf_counter_ns:profile-minus-setup:v1",
+                            scope="canonical_decode_attempt", unit="ns", precision="1 ns",
+                        ) if profiled_wall is not None else Measurement.unavailable(
+                            method="not_measured", scope="canonical_decode_attempt", unit="ns", precision="unknown",
+                            reason="attempt ended before the runtime profiler returned",
+                        )
+                    )
                     if is_local:
                         assert local_progress is not None and local_schedule is not None
                         schedule_name, atomic_unit, unit_count, stopping_adaptation, schedule_evidence = _local_schedule_metadata(
@@ -669,14 +694,6 @@ def run_canonical_structural_shot(
                         )
                         qualified = QualifiedIteration(
                             local_progress.local_steps, schedule=schedule_name, atomic_unit=atomic_unit,
-                        )
-                        setup_runtime = Measurement.unavailable(
-                            method="not_measured", scope="schedule_setup", unit="ns", precision="unknown",
-                            reason="public tracer does not separately time deterministic schedule construction",
-                        )
-                        decode_runtime = Measurement.unavailable(
-                            method="not_measured", scope="decode", unit="ns", precision="unknown",
-                            reason="runtime profiling is retained separately as same-ledger observational evidence",
                         )
                         c2v_cap = int(dict(execution_controls or {}).get("work_limits", {}).get("attempt", {}).get("check_to_variable_updates", 0))
                         schedule_terminal = ScheduleTerminalEvidence(
@@ -714,6 +731,8 @@ def run_canonical_structural_shot(
                         run_id=parsed.run_id, shot_id=shot_id, termination=termination,
                         data={
                             **common, **data, "work_vector": work.as_evidence(structural_event_version=2),
+                            "setup_runtime": setup_runtime.as_evidence(),
+                            "decode_runtime": decode_runtime.as_evidence(),
                             **({"schedule_terminal": schedule_terminal, "schedule_evidence": schedule_evidence} if is_local else {}),
                             **({"profile": profile_evidence} if profile_evidence is not None else {}),
                         },
@@ -733,7 +752,8 @@ def run_canonical_structural_shot(
                 attempt_reservation.commit_once()
                 try:
                     def admitted_attempt() -> tuple[np.ndarray | None, int, bool, BudgetTermination | None]:
-                        nonlocal local_progress, local_schedule, local_random_state
+                        nonlocal local_progress, local_schedule, local_random_state, setup_inside_profile_ns
+                        setup_started_ns = time.perf_counter_ns()
                         edge_table = EdgeTable.from_check_matrix(validated.hz)
                         kernel = _kernel_for_manifest(parsed, edge_table)
                         if parsed.policies.schedule.kind != "flooding":
@@ -741,6 +761,7 @@ def run_canonical_structural_shot(
                             messages = np.full(
                                 edge_table.edge_count, kernel.prior(parsed.error_rate), dtype=np.float64,
                             )
+                            setup_inside_profile_ns = time.perf_counter_ns() - setup_started_ns
                             candidate: np.ndarray | None = None
                             executor = CanonicalLocalStepExecutor(budgets, scope="attempt")
                             if parsed.policies.schedule.kind == "residual":
@@ -800,6 +821,8 @@ def run_canonical_structural_shot(
                                     )
                             return candidate, local_progress.local_steps, False, None
                         schedule = FloodingSchedule(edge_table, kernel=kernel, profile=kernel.profile)
+                        initialized = schedule.initialize(parsed.error_rate) if edge_table.edge_count else None
+                        setup_inside_profile_ns = time.perf_counter_ns() - setup_started_ns
                         if edge_table.edge_count == 0:
                             candidate = kernel.candidate_from_beliefs(
                                 np.full(validated.n, kernel.prior(parsed.error_rate), dtype=np.float64)
@@ -811,7 +834,7 @@ def run_canonical_structural_shot(
                             return candidate, 0, converged, None
                         executor = AtomicFloodingExecutor(schedule, budgets, scope="attempt")
                         attempt = executor.run_attempt(
-                            schedule.initialize(parsed.error_rate), observation.syndrome,
+                            initialized, observation.syndrome,
                             error_rate=parsed.error_rate, max_iterations=parsed.max_iterations,
                             is_converged=lambda sweep: bool(np.array_equal(
                                 (validated.hz.astype(np.int64) @ sweep.candidate.astype(np.int64)) % 2,

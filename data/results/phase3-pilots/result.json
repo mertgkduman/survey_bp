@@ -150,7 +150,7 @@
         "max_records": 0,
         "relative_dir": "trace-sidecars"
       },
-      "verified_at": "2026-09-24T12:46:18.506646+00:00",
+      "verified_at": "2026-09-24T13:05:02.961381+00:00",
       "work_limits": {
         "attempt": {
           "belief_assemblies": 1000,
@@ -336,7 +336,7 @@
         "max_records": 0,
         "relative_dir": "trace-sidecars"
       },
-      "verified_at": "2026-09-24T12:46:20.416611+00:00",
+      "verified_at": "2026-09-24T13:05:08.414681+00:00",
       "work_limits": {
         "attempt": {
           "belief_assemblies": 1000,
@@ -970,7 +970,7 @@
         "max_records": 0,
         "relative_dir": "trace-sidecars"
       },
-      "verified_at": "2026-09-24T12:46:22.330840+00:00",
+      "verified_at": "2026-09-24T13:05:14.006781+00:00",
       "work_limits": {
         "attempt": {
           "belief_assemblies": 1000,
@@ -1604,7 +1604,7 @@
         "max_records": 0,
         "relative_dir": "trace-sidecars"
       },
-      "verified_at": "2026-09-24T12:46:24.264740+00:00",
+      "verified_at": "2026-09-24T13:05:19.321367+00:00",
       "work_limits": {
         "attempt": {
           "belief_assemblies": 1000,
@@ -1790,7 +1790,7 @@
         "max_records": 0,
         "relative_dir": "trace-sidecars"
       },
-      "verified_at": "2026-09-24T12:46:59.991318+00:00",
+      "verified_at": "2026-09-24T13:06:53.463305+00:00",
       "work_limits": {
         "attempt": {
           "belief_assemblies": 4000,
@@ -3300,7 +3300,7 @@
         "max_records": 0,
         "relative_dir": "trace-sidecars"
       },
-      "verified_at": "2026-09-24T12:47:36.213967+00:00",
+      "verified_at": "2026-09-24T13:08:26.221606+00:00",
       "work_limits": {
         "attempt": {
           "belief_assemblies": 4000,
@@ -3486,7 +3486,7 @@
         "max_records": 0,
         "relative_dir": "trace-sidecars"
       },
-      "verified_at": "2026-09-24T12:48:12.976398+00:00",
+      "verified_at": "2026-09-24T13:09:59.516463+00:00",
       "work_limits": {
         "attempt": {
           "belief_assemblies": 4000,
@@ -3672,7 +3672,7 @@
         "max_records": 0,
         "relative_dir": "trace-sidecars"
       },
-      "verified_at": "2026-09-24T12:48:49.217508+00:00",
+      "verified_at": "2026-09-24T13:11:34.820933+00:00",
       "work_limits": {
         "attempt": {
           "belief_assemblies": 4000,
@@ -5182,7 +5182,7 @@
         "max_records": 0,
         "relative_dir": "trace-sidecars"
       },
-      "verified_at": "2026-09-24T12:49:25.612279+00:00",
+      "verified_at": "2026-09-24T13:13:08.654238+00:00",
       "work_limits": {
         "attempt": {
           "belief_assemblies": 4000,
@@ -5368,7 +5368,7 @@
         "max_records": 0,
         "relative_dir": "trace-sidecars"
       },
-      "verified_at": "2026-09-24T12:50:00.952003+00:00",
+      "verified_at": "2026-09-24T13:14:41.521812+00:00",
       "work_limits": {
         "attempt": {
           "belief_assemblies": 4000,
@@ -9100,7 +9100,7 @@
         "max_records": 0,
         "relative_dir": "trace-sidecars"
       },
-      "verified_at": "2026-09-24T12:50:37.496285+00:00",
+      "verified_at": "2026-09-24T13:16:13.590814+00:00",
       "work_limits": {
         "attempt": {
           "belief_assemblies": 4000,
@@ -9286,7 +9286,7 @@
         "max_records": 0,
         "relative_dir": "trace-sidecars"
       },
-      "verified_at": "2026-09-24T12:50:40.754119+00:00",
+      "verified_at": "2026-09-24T13:16:21.896881+00:00",
       "work_limits": {
         "attempt": {
           "belief_assemblies": 1000,
@@ -9797,7 +9797,7 @@
         "max_records": 0,
         "relative_dir": "trace-sidecars"
       },
-      "verified_at": "2026-09-24T12:50:43.723967+00:00",
+      "verified_at": "2026-09-24T13:16:29.728175+00:00",
       "work_limits": {
         "attempt": {
           "belief_assemblies": 1000,
@@ -9983,7 +9983,7 @@
         "max_records": 0,
         "relative_dir": "trace-sidecars"
       },
-      "verified_at": "2026-09-24T12:50:46.688709+00:00",
+      "verified_at": "2026-09-24T13:16:37.628294+00:00",
       "work_limits": {
         "attempt": {
           "belief_assemblies": 1000,
@@ -10169,7 +10169,7 @@
         "max_records": 0,
         "relative_dir": "trace-sidecars"
       },
-      "verified_at": "2026-09-24T12:50:49.680611+00:00",
+      "verified_at": "2026-09-24T13:16:45.578383+00:00",
       "work_limits": {
         "attempt": {
           "belief_assemblies": 1000,
@@ -10680,7 +10680,7 @@
         "max_records": 0,
         "relative_dir": "trace-sidecars"
       },
-      "verified_at": "2026-09-24T12:50:52.725837+00:00",
+      "verified_at": "2026-09-24T13:16:53.534325+00:00",
       "work_limits": {
         "attempt": {
           "belief_assemblies": 1000,
@@ -10866,7 +10866,7 @@
         "max_records": 0,
         "relative_dir": "trace-sidecars"
       },
-      "verified_at": "2026-09-24T12:50:55.507586+00:00",
+      "verified_at": "2026-09-24T13:17:00.986931+00:00",
       "work_limits": {
         "attempt": {
           "belief_assemblies": 1000,
@@ -12042,7 +12042,7 @@
         "max_records": 0,
         "relative_dir": "trace-sidecars"
       },
-      "verified_at": "2026-09-24T12:50:58.245293+00:00",
+      "verified_at": "2026-09-24T13:17:08.517186+00:00",
       "work_limits": {
         "attempt": {
           "belief_assemblies": 1000,
@@ -13262,7 +13262,7 @@
         "max_records": 0,
         "relative_dir": "trace-sidecars"
       },
-      "verified_at": "2026-09-24T12:51:01.045887+00:00",
+      "verified_at": "2026-09-24T13:17:16.205091+00:00",
       "work_limits": {
         "attempt": {
           "belief_assemblies": 1000,
@@ -13326,6 +13326,14 @@
       "code_id": "gross-bb-144",
       "composition_identity": "3fdcfd949a6376bfc5e1f06ab103eaf55a4056ea5554787d1f16720c9b2c98d0",
       "converged": false,
+      "decode_runtime": {
+        "method": "time.perf_counter_ns:profile-minus-setup:v1",
+        "precision": "1 ns",
+        "scope": "canonical_decode_attempt",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 66957604
+      },
       "matrix_hashes": {
         "hx_raw_sha256": "c1700ef674d1682cba2620523eaca7fa475826644f28295de46b9fc742d3729b",
         "hx_semantic_sha256": "8ce200c0f0216d8701dd40e399198d7d97663d5e59f9fd216b5cde756bcad221",
@@ -13374,7 +13382,7 @@
           "scope": "process",
           "unavailable_reason": null,
           "unit": "ns",
-          "value": 44909
+          "value": 45310
         },
         "enabled": true,
         "environment": {
@@ -13393,7 +13401,7 @@
           "rss_normalized_unit": "bytes",
           "rss_platform": "Linux",
           "rss_raw_unit": "kilobytes",
-          "rss_raw_value": 50688
+          "rss_raw_value": 49920
         },
         "runtime": {
           "backend_device_memory": {
@@ -13434,7 +13442,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "bytes",
-            "value": 51904512
+            "value": 51118080
           },
           "process_cpu_time": {
             "method": "time.process_time_ns:v1",
@@ -13442,7 +13450,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 69692988
+            "value": 69187154
           },
           "wall_time": {
             "method": "time.perf_counter_ns:v1",
@@ -13450,7 +13458,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 70079651
+            "value": 69549792
           }
         }
       },
@@ -13462,6 +13470,14 @@
       "run_id": "phase3-bb144-spa",
       "sample_identity": "4acd69b0ab507fbbb183e18097f4eee052089c8a245c5f6e3ecffd7c0a1f9403",
       "schedule_terminal": null,
+      "setup_runtime": {
+        "method": "time.perf_counter_ns:v1",
+        "precision": "1 ns",
+        "scope": "canonical_setup",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 2592188
+      },
       "shot_id": 0,
       "termination": "max_iterations",
       "work_vector": {
@@ -13492,6 +13508,14 @@
       "code_id": "gross-bb-144",
       "composition_identity": "c2391d89ef20e64c4cc86e2b8aa2c43dc42159cfa3903047987a2e3b6c1e54a7",
       "converged": false,
+      "decode_runtime": {
+        "method": "time.perf_counter_ns:profile-minus-setup:v1",
+        "precision": "1 ns",
+        "scope": "canonical_decode_attempt",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 17721684
+      },
       "matrix_hashes": {
         "hx_raw_sha256": "c1700ef674d1682cba2620523eaca7fa475826644f28295de46b9fc742d3729b",
         "hx_semantic_sha256": "8ce200c0f0216d8701dd40e399198d7d97663d5e59f9fd216b5cde756bcad221",
@@ -13540,7 +13564,7 @@
           "scope": "process",
           "unavailable_reason": null,
           "unit": "ns",
-          "value": 44810
+          "value": 43950
         },
         "enabled": true,
         "environment": {
@@ -13559,7 +13583,7 @@
           "rss_normalized_unit": "bytes",
           "rss_platform": "Linux",
           "rss_raw_unit": "kilobytes",
-          "rss_raw_value": 49152
+          "rss_raw_value": 49920
         },
         "runtime": {
           "backend_device_memory": {
@@ -13600,7 +13624,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "bytes",
-            "value": 50331648
+            "value": 51118080
           },
           "process_cpu_time": {
             "method": "time.process_time_ns:v1",
@@ -13608,7 +13632,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 16561423
+            "value": 20409162
           },
           "wall_time": {
             "method": "time.perf_counter_ns:v1",
@@ -13616,7 +13640,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 16650427
+            "value": 20599862
           }
         }
       },
@@ -13628,6 +13652,14 @@
       "run_id": "phase3-bb144-ms",
       "sample_identity": "4acd69b0ab507fbbb183e18097f4eee052089c8a245c5f6e3ecffd7c0a1f9403",
       "schedule_terminal": null,
+      "setup_runtime": {
+        "method": "time.perf_counter_ns:v1",
+        "precision": "1 ns",
+        "scope": "canonical_setup",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 2878178
+      },
       "shot_id": 0,
       "termination": "max_iterations",
       "work_vector": {
@@ -13658,6 +13690,14 @@
       "code_id": "gross-bb-144",
       "composition_identity": "6c2534e1f84e3985302a312aace42c6edc7eeab0457989a27612c58ddd0bcd71",
       "converged": false,
+      "decode_runtime": {
+        "method": "time.perf_counter_ns:profile-minus-setup:v1",
+        "precision": "1 ns",
+        "scope": "canonical_decode_attempt",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 14262651
+      },
       "matrix_hashes": {
         "hx_raw_sha256": "c1700ef674d1682cba2620523eaca7fa475826644f28295de46b9fc742d3729b",
         "hx_semantic_sha256": "8ce200c0f0216d8701dd40e399198d7d97663d5e59f9fd216b5cde756bcad221",
@@ -14149,7 +14189,7 @@
           "scope": "process",
           "unavailable_reason": null,
           "unit": "ns",
-          "value": 45138
+          "value": 45962
         },
         "enabled": true,
         "environment": {
@@ -14168,7 +14208,7 @@
           "rss_normalized_unit": "bytes",
           "rss_platform": "Linux",
           "rss_raw_unit": "kilobytes",
-          "rss_raw_value": 49152
+          "rss_raw_value": 50688
         },
         "runtime": {
           "backend_device_memory": {
@@ -14209,7 +14249,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "bytes",
-            "value": 50331648
+            "value": 51904512
           },
           "process_cpu_time": {
             "method": "time.process_time_ns:v1",
@@ -14217,7 +14257,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 16582603
+            "value": 16966330
           },
           "wall_time": {
             "method": "time.perf_counter_ns:v1",
@@ -14225,7 +14265,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 16668196
+            "value": 17056639
           }
         }
       },
@@ -14237,6 +14277,14 @@
       "run_id": "phase3-bb144-nms",
       "sample_identity": "4acd69b0ab507fbbb183e18097f4eee052089c8a245c5f6e3ecffd7c0a1f9403",
       "schedule_terminal": null,
+      "setup_runtime": {
+        "method": "time.perf_counter_ns:v1",
+        "precision": "1 ns",
+        "scope": "canonical_setup",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 2793988
+      },
       "shot_id": 0,
       "termination": "max_iterations",
       "work_vector": {
@@ -14267,6 +14315,14 @@
       "code_id": "gross-bb-144",
       "composition_identity": "9c540f5e7c02e041f1edbada6bc94a508d286b7ed04b567b9a154c617bd0d216",
       "converged": false,
+      "decode_runtime": {
+        "method": "time.perf_counter_ns:profile-minus-setup:v1",
+        "precision": "1 ns",
+        "scope": "canonical_decode_attempt",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 13917830
+      },
       "matrix_hashes": {
         "hx_raw_sha256": "c1700ef674d1682cba2620523eaca7fa475826644f28295de46b9fc742d3729b",
         "hx_semantic_sha256": "8ce200c0f0216d8701dd40e399198d7d97663d5e59f9fd216b5cde756bcad221",
@@ -14758,7 +14814,7 @@
           "scope": "process",
           "unavailable_reason": null,
           "unit": "ns",
-          "value": 42847
+          "value": 56385
         },
         "enabled": true,
         "environment": {
@@ -14777,7 +14833,7 @@
           "rss_normalized_unit": "bytes",
           "rss_platform": "Linux",
           "rss_raw_unit": "kilobytes",
-          "rss_raw_value": 50688
+          "rss_raw_value": 49920
         },
         "runtime": {
           "backend_device_memory": {
@@ -14818,7 +14874,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "bytes",
-            "value": 51904512
+            "value": 51118080
           },
           "process_cpu_time": {
             "method": "time.process_time_ns:v1",
@@ -14826,7 +14882,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 15746027
+            "value": 16579358
           },
           "wall_time": {
             "method": "time.perf_counter_ns:v1",
@@ -14834,7 +14890,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 15825966
+            "value": 16663178
           }
         }
       },
@@ -14846,6 +14902,14 @@
       "run_id": "phase3-bb144-oms",
       "sample_identity": "4acd69b0ab507fbbb183e18097f4eee052089c8a245c5f6e3ecffd7c0a1f9403",
       "schedule_terminal": null,
+      "setup_runtime": {
+        "method": "time.perf_counter_ns:v1",
+        "precision": "1 ns",
+        "scope": "canonical_setup",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 2745348
+      },
       "shot_id": 0,
       "termination": "max_iterations",
       "work_vector": {
@@ -14876,6 +14940,14 @@
       "code_id": "b1-ghp-882",
       "composition_identity": "3fdcfd949a6376bfc5e1f06ab103eaf55a4056ea5554787d1f16720c9b2c98d0",
       "converged": false,
+      "decode_runtime": {
+        "method": "time.perf_counter_ns:profile-minus-setup:v1",
+        "precision": "1 ns",
+        "scope": "canonical_decode_attempt",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 400295727
+      },
       "matrix_hashes": {
         "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
         "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
@@ -14924,7 +14996,7 @@
           "scope": "process",
           "unavailable_reason": null,
           "unit": "ns",
-          "value": 46633
+          "value": 50929
         },
         "enabled": true,
         "environment": {
@@ -14943,7 +15015,7 @@
           "rss_normalized_unit": "bytes",
           "rss_platform": "Linux",
           "rss_raw_unit": "kilobytes",
-          "rss_raw_value": 60796
+          "rss_raw_value": 61188
         },
         "runtime": {
           "backend_device_memory": {
@@ -14984,7 +15056,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "bytes",
-            "value": 62255104
+            "value": 62656512
           },
           "process_cpu_time": {
             "method": "time.process_time_ns:v1",
@@ -14992,7 +15064,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 477782878
+            "value": 456930312
           },
           "wall_time": {
             "method": "time.perf_counter_ns:v1",
@@ -15000,7 +15072,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 480213902
+            "value": 459129492
           }
         }
       },
@@ -15012,6 +15084,14 @@
       "run_id": "phase3-b1-spa",
       "sample_identity": "88fad6049730c629b054947e6ef953b579aaf40de33fbcb11cc6ac82c172159e",
       "schedule_terminal": null,
+      "setup_runtime": {
+        "method": "time.perf_counter_ns:v1",
+        "precision": "1 ns",
+        "scope": "canonical_setup",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 58833765
+      },
       "shot_id": 0,
       "termination": "max_iterations",
       "work_vector": {
@@ -15042,6 +15122,14 @@
       "code_id": "b1-ghp-882",
       "composition_identity": "1e0bab8cf3c035a1e7e890466de14c9b79ba299c825c9a318883045411e34848",
       "converged": false,
+      "decode_runtime": {
+        "method": "time.perf_counter_ns:profile-minus-setup:v1",
+        "precision": "1 ns",
+        "scope": "canonical_decode_attempt",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 386771667
+      },
       "matrix_hashes": {
         "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
         "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
@@ -15090,7 +15178,7 @@
           "scope": "process",
           "unavailable_reason": null,
           "unit": "ns",
-          "value": 45656
+          "value": 44984
         },
         "enabled": true,
         "environment": {
@@ -15109,7 +15197,7 @@
           "rss_normalized_unit": "bytes",
           "rss_platform": "Linux",
           "rss_raw_unit": "kilobytes",
-          "rss_raw_value": 61264
+          "rss_raw_value": 61704
         },
         "runtime": {
           "backend_device_memory": {
@@ -15150,7 +15238,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "bytes",
-            "value": 62734336
+            "value": 63184896
           },
           "process_cpu_time": {
             "method": "time.process_time_ns:v1",
@@ -15158,7 +15246,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 397075153
+            "value": 393323695
           },
           "wall_time": {
             "method": "time.perf_counter_ns:v1",
@@ -15166,7 +15254,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 398952543
+            "value": 395310531
           }
         }
       },
@@ -15183,22 +15271,22 @@
           {
             "configured_limit": 4000,
             "decode_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "decode",
-              "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
+              "method": "time.perf_counter_ns:profile-minus-setup:v1",
+              "precision": "1 ns",
+              "scope": "canonical_decode_attempt",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 386771667
             },
             "kind": "common_check_to_variable_cap",
             "qualified_iteration": null,
             "setup_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "schedule_setup",
-              "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
+              "method": "time.perf_counter_ns:v1",
+              "precision": "1 ns",
+              "scope": "canonical_setup",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 67377332
             },
             "work_vector": {
               "belief_assemblies": 882,
@@ -15224,12 +15312,12 @@
           {
             "configured_limit": 1,
             "decode_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "decode",
-              "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
+              "method": "time.perf_counter_ns:profile-minus-setup:v1",
+              "precision": "1 ns",
+              "scope": "canonical_decode_attempt",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 386771667
             },
             "kind": "schedule_qualified_iteration_limit",
             "qualified_iteration": {
@@ -15238,12 +15326,12 @@
               "schedule": "layered"
             },
             "setup_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "schedule_setup",
-              "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
+              "method": "time.perf_counter_ns:v1",
+              "precision": "1 ns",
+              "scope": "canonical_setup",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 67377332
             },
             "work_vector": {
               "belief_assemblies": 882,
@@ -15269,24 +15357,24 @@
         ],
         "completed_traversals": 0,
         "decode_runtime": {
-          "method": "not_measured",
-          "precision": "unknown",
-          "scope": "decode",
-          "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
+          "method": "time.perf_counter_ns:profile-minus-setup:v1",
+          "precision": "1 ns",
+          "scope": "canonical_decode_attempt",
+          "unavailable_reason": null,
           "unit": "ns",
-          "value": null
+          "value": 386771667
         },
         "local_cursor": [
           1
         ],
         "schedule": "layered",
         "setup_runtime": {
-          "method": "not_measured",
-          "precision": "unknown",
-          "scope": "schedule_setup",
-          "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
+          "method": "time.perf_counter_ns:v1",
+          "precision": "1 ns",
+          "scope": "canonical_setup",
+          "unavailable_reason": null,
           "unit": "ns",
-          "value": null
+          "value": 67377332
         },
         "source_iteration": {
           "atomic_unit": "one_layer",
@@ -15315,6 +15403,14 @@
           "residual_priority_evaluations": 0,
           "variable_to_check_updates": 18
         }
+      },
+      "setup_runtime": {
+        "method": "time.perf_counter_ns:v1",
+        "precision": "1 ns",
+        "scope": "canonical_setup",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 67377332
       },
       "shot_id": 0,
       "termination": "max_iterations",
@@ -15346,6 +15442,14 @@
       "code_id": "b1-ghp-882",
       "composition_identity": "413f4001c462e60f53ce25ab4cd074cf699d3cb2ced422981b604dcf0ae56fac",
       "converged": false,
+      "decode_runtime": {
+        "method": "time.perf_counter_ns:profile-minus-setup:v1",
+        "precision": "1 ns",
+        "scope": "canonical_decode_attempt",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 393283903
+      },
       "matrix_hashes": {
         "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
         "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
@@ -15394,7 +15498,7 @@
           "scope": "process",
           "unavailable_reason": null,
           "unit": "ns",
-          "value": 44157
+          "value": 45820
         },
         "enabled": true,
         "environment": {
@@ -15413,7 +15517,7 @@
           "rss_normalized_unit": "bytes",
           "rss_platform": "Linux",
           "rss_raw_unit": "kilobytes",
-          "rss_raw_value": 60584
+          "rss_raw_value": 60496
         },
         "runtime": {
           "backend_device_memory": {
@@ -15454,7 +15558,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "bytes",
-            "value": 62038016
+            "value": 61947904
           },
           "process_cpu_time": {
             "method": "time.process_time_ns:v1",
@@ -15462,7 +15566,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 401700874
+            "value": 399505954
           },
           "wall_time": {
             "method": "time.perf_counter_ns:v1",
@@ -15470,7 +15574,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 403609464
+            "value": 401465715
           }
         }
       },
@@ -15487,22 +15591,22 @@
           {
             "configured_limit": 4000,
             "decode_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "decode",
-              "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
+              "method": "time.perf_counter_ns:profile-minus-setup:v1",
+              "precision": "1 ns",
+              "scope": "canonical_decode_attempt",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 393283903
             },
             "kind": "common_check_to_variable_cap",
             "qualified_iteration": null,
             "setup_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "schedule_setup",
-              "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
+              "method": "time.perf_counter_ns:v1",
+              "precision": "1 ns",
+              "scope": "canonical_setup",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 166582588
             },
             "work_vector": {
               "belief_assemblies": 6,
@@ -15528,12 +15632,12 @@
           {
             "configured_limit": 1,
             "decode_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "decode",
-              "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
+              "method": "time.perf_counter_ns:profile-minus-setup:v1",
+              "precision": "1 ns",
+              "scope": "canonical_decode_attempt",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 393283903
             },
             "kind": "schedule_qualified_iteration_limit",
             "qualified_iteration": {
@@ -15542,12 +15646,12 @@
               "schedule": "check_node_serial"
             },
             "setup_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "schedule_setup",
-              "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
+              "method": "time.perf_counter_ns:v1",
+              "precision": "1 ns",
+              "scope": "canonical_setup",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 166582588
             },
             "work_vector": {
               "belief_assemblies": 6,
@@ -15573,24 +15677,24 @@
         ],
         "completed_traversals": 0,
         "decode_runtime": {
-          "method": "not_measured",
-          "precision": "unknown",
-          "scope": "decode",
-          "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
+          "method": "time.perf_counter_ns:profile-minus-setup:v1",
+          "precision": "1 ns",
+          "scope": "canonical_decode_attempt",
+          "unavailable_reason": null,
           "unit": "ns",
-          "value": null
+          "value": 393283903
         },
         "local_cursor": [
           1
         ],
         "schedule": "check_node_serial",
         "setup_runtime": {
-          "method": "not_measured",
-          "precision": "unknown",
-          "scope": "schedule_setup",
-          "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
+          "method": "time.perf_counter_ns:v1",
+          "precision": "1 ns",
+          "scope": "canonical_setup",
+          "unavailable_reason": null,
           "unit": "ns",
-          "value": null
+          "value": 166582588
         },
         "source_iteration": {
           "atomic_unit": "one_check_all_c2v_then_affected_v2c",
@@ -15619,6 +15723,14 @@
           "residual_priority_evaluations": 0,
           "variable_to_check_updates": 18
         }
+      },
+      "setup_runtime": {
+        "method": "time.perf_counter_ns:v1",
+        "precision": "1 ns",
+        "scope": "canonical_setup",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 166582588
       },
       "shot_id": 0,
       "termination": "max_iterations",
@@ -15650,6 +15762,14 @@
       "code_id": "b1-ghp-882",
       "composition_identity": "3b9fa5f190dbd87d54a4a515ab0077e87173191947e303c76ba7b1e0c47ae860",
       "converged": false,
+      "decode_runtime": {
+        "method": "time.perf_counter_ns:profile-minus-setup:v1",
+        "precision": "1 ns",
+        "scope": "canonical_decode_attempt",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 397492060
+      },
       "matrix_hashes": {
         "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
         "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
@@ -15698,7 +15818,7 @@
           "scope": "process",
           "unavailable_reason": null,
           "unit": "ns",
-          "value": 53014
+          "value": 43111
         },
         "enabled": true,
         "environment": {
@@ -15717,7 +15837,7 @@
           "rss_normalized_unit": "bytes",
           "rss_platform": "Linux",
           "rss_raw_unit": "kilobytes",
-          "rss_raw_value": 61548
+          "rss_raw_value": 60620
         },
         "runtime": {
           "backend_device_memory": {
@@ -15758,7 +15878,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "bytes",
-            "value": 63025152
+            "value": 62074880
           },
           "process_cpu_time": {
             "method": "time.process_time_ns:v1",
@@ -15766,7 +15886,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 413941416
+            "value": 403834155
           },
           "wall_time": {
             "method": "time.perf_counter_ns:v1",
@@ -15774,7 +15894,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 416079097
+            "value": 405713232
           }
         }
       },
@@ -15791,22 +15911,22 @@
           {
             "configured_limit": 4000,
             "decode_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "decode",
-              "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
+              "method": "time.perf_counter_ns:profile-minus-setup:v1",
+              "precision": "1 ns",
+              "scope": "canonical_decode_attempt",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 397492060
             },
             "kind": "common_check_to_variable_cap",
             "qualified_iteration": null,
             "setup_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "schedule_setup",
-              "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
+              "method": "time.perf_counter_ns:v1",
+              "precision": "1 ns",
+              "scope": "canonical_setup",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 168534442
             },
             "work_vector": {
               "belief_assemblies": 1,
@@ -15832,12 +15952,12 @@
           {
             "configured_limit": 1,
             "decode_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "decode",
-              "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
+              "method": "time.perf_counter_ns:profile-minus-setup:v1",
+              "precision": "1 ns",
+              "scope": "canonical_decode_attempt",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 397492060
             },
             "kind": "schedule_qualified_iteration_limit",
             "qualified_iteration": {
@@ -15846,12 +15966,12 @@
               "schedule": "variable_node_serial"
             },
             "setup_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "schedule_setup",
-              "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
+              "method": "time.perf_counter_ns:v1",
+              "precision": "1 ns",
+              "scope": "canonical_setup",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 168534442
             },
             "work_vector": {
               "belief_assemblies": 1,
@@ -15877,24 +15997,24 @@
         ],
         "completed_traversals": 0,
         "decode_runtime": {
-          "method": "not_measured",
-          "precision": "unknown",
-          "scope": "decode",
-          "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
+          "method": "time.perf_counter_ns:profile-minus-setup:v1",
+          "precision": "1 ns",
+          "scope": "canonical_decode_attempt",
+          "unavailable_reason": null,
           "unit": "ns",
-          "value": null
+          "value": 397492060
         },
         "local_cursor": [
           1
         ],
         "schedule": "variable_node_serial",
         "setup_runtime": {
-          "method": "not_measured",
-          "precision": "unknown",
-          "scope": "schedule_setup",
-          "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
+          "method": "time.perf_counter_ns:v1",
+          "precision": "1 ns",
+          "scope": "canonical_setup",
+          "unavailable_reason": null,
           "unit": "ns",
-          "value": null
+          "value": 168534442
         },
         "source_iteration": {
           "atomic_unit": "one_variable_belief_then_incident_v2c",
@@ -15923,6 +16043,14 @@
           "residual_priority_evaluations": 0,
           "variable_to_check_updates": 3
         }
+      },
+      "setup_runtime": {
+        "method": "time.perf_counter_ns:v1",
+        "precision": "1 ns",
+        "scope": "canonical_setup",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 168534442
       },
       "shot_id": 0,
       "termination": "max_iterations",
@@ -15954,6 +16082,14 @@
       "code_id": "b1-ghp-882",
       "composition_identity": "614ee1bd9e864602397fc0ee2ce287b8d500046dccbd57469991720cf02a477b",
       "converged": false,
+      "decode_runtime": {
+        "method": "time.perf_counter_ns:profile-minus-setup:v1",
+        "precision": "1 ns",
+        "scope": "canonical_decode_attempt",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 391052202
+      },
       "matrix_hashes": {
         "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
         "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
@@ -16002,7 +16138,7 @@
           "scope": "process",
           "unavailable_reason": null,
           "unit": "ns",
-          "value": 44117
+          "value": 48632
         },
         "enabled": true,
         "environment": {
@@ -16021,7 +16157,7 @@
           "rss_normalized_unit": "bytes",
           "rss_platform": "Linux",
           "rss_raw_unit": "kilobytes",
-          "rss_raw_value": 61456
+          "rss_raw_value": 61036
         },
         "runtime": {
           "backend_device_memory": {
@@ -16062,7 +16198,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "bytes",
-            "value": 62930944
+            "value": 62500864
           },
           "process_cpu_time": {
             "method": "time.process_time_ns:v1",
@@ -16070,7 +16206,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 391970825
+            "value": 397875265
           },
           "wall_time": {
             "method": "time.perf_counter_ns:v1",
@@ -16078,7 +16214,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 393828065
+            "value": 399654499
           }
         }
       },
@@ -16095,22 +16231,22 @@
           {
             "configured_limit": 4000,
             "decode_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "decode",
-              "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
+              "method": "time.perf_counter_ns:profile-minus-setup:v1",
+              "precision": "1 ns",
+              "scope": "canonical_decode_attempt",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 391052202
             },
             "kind": "common_check_to_variable_cap",
             "qualified_iteration": null,
             "setup_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "schedule_setup",
-              "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
+              "method": "time.perf_counter_ns:v1",
+              "precision": "1 ns",
+              "scope": "canonical_setup",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 67492130
             },
             "work_vector": {
               "belief_assemblies": 882,
@@ -16136,12 +16272,12 @@
           {
             "configured_limit": 1,
             "decode_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "decode",
-              "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
+              "method": "time.perf_counter_ns:profile-minus-setup:v1",
+              "precision": "1 ns",
+              "scope": "canonical_decode_attempt",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 391052202
             },
             "kind": "schedule_qualified_iteration_limit",
             "qualified_iteration": {
@@ -16150,12 +16286,12 @@
               "schedule": "randomized"
             },
             "setup_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "schedule_setup",
-              "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
+              "method": "time.perf_counter_ns:v1",
+              "precision": "1 ns",
+              "scope": "canonical_setup",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 67492130
             },
             "work_vector": {
               "belief_assemblies": 882,
@@ -16181,24 +16317,24 @@
         ],
         "completed_traversals": 0,
         "decode_runtime": {
-          "method": "not_measured",
-          "precision": "unknown",
-          "scope": "decode",
-          "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
+          "method": "time.perf_counter_ns:profile-minus-setup:v1",
+          "precision": "1 ns",
+          "scope": "canonical_decode_attempt",
+          "unavailable_reason": null,
           "unit": "ns",
-          "value": null
+          "value": 391052202
         },
         "local_cursor": [
           1
         ],
         "schedule": "randomized",
         "setup_runtime": {
-          "method": "not_measured",
-          "precision": "unknown",
-          "scope": "schedule_setup",
-          "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
+          "method": "time.perf_counter_ns:v1",
+          "precision": "1 ns",
+          "scope": "canonical_setup",
+          "unavailable_reason": null,
           "unit": "ns",
-          "value": null
+          "value": 67492130
         },
         "source_iteration": {
           "atomic_unit": "one_layer",
@@ -16227,6 +16363,14 @@
           "residual_priority_evaluations": 0,
           "variable_to_check_updates": 18
         }
+      },
+      "setup_runtime": {
+        "method": "time.perf_counter_ns:v1",
+        "precision": "1 ns",
+        "scope": "canonical_setup",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 67492130
       },
       "shot_id": 0,
       "termination": "max_iterations",
@@ -16258,6 +16402,14 @@
       "code_id": "b1-ghp-882",
       "composition_identity": "fad99d4c3c1f5582ca1c9121e5244e2bcd1563dfb9caaab09424e8bbdd37e9f4",
       "converged": false,
+      "decode_runtime": {
+        "method": "time.perf_counter_ns:profile-minus-setup:v1",
+        "precision": "1 ns",
+        "scope": "canonical_decode_attempt",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 68154447
+      },
       "matrix_hashes": {
         "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
         "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
@@ -16306,7 +16458,7 @@
           "scope": "process",
           "unavailable_reason": null,
           "unit": "ns",
-          "value": 48254
+          "value": 46492
         },
         "enabled": true,
         "environment": {
@@ -16374,7 +16526,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 74967626
+            "value": 75852596
           },
           "wall_time": {
             "method": "time.perf_counter_ns:v1",
@@ -16382,7 +16534,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 75346826
+            "value": 76333003
           }
         }
       },
@@ -16399,22 +16551,22 @@
           {
             "configured_limit": 4000,
             "decode_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "decode",
-              "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
+              "method": "time.perf_counter_ns:profile-minus-setup:v1",
+              "precision": "1 ns",
+              "scope": "canonical_decode_attempt",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 68154447
             },
             "kind": "common_check_to_variable_cap",
             "qualified_iteration": null,
             "setup_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "schedule_setup",
-              "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
+              "method": "time.perf_counter_ns:v1",
+              "precision": "1 ns",
+              "scope": "canonical_setup",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 174121077
             },
             "work_vector": {
               "belief_assemblies": 882,
@@ -16440,12 +16592,12 @@
           {
             "configured_limit": 1,
             "decode_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "decode",
-              "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
+              "method": "time.perf_counter_ns:profile-minus-setup:v1",
+              "precision": "1 ns",
+              "scope": "canonical_decode_attempt",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 68154447
             },
             "kind": "schedule_qualified_iteration_limit",
             "qualified_iteration": {
@@ -16454,12 +16606,12 @@
               "schedule": "residual"
             },
             "setup_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "schedule_setup",
-              "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
+              "method": "time.perf_counter_ns:v1",
+              "precision": "1 ns",
+              "scope": "canonical_setup",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 174121077
             },
             "work_vector": {
               "belief_assemblies": 882,
@@ -16485,24 +16637,24 @@
         ],
         "completed_traversals": 0,
         "decode_runtime": {
-          "method": "not_measured",
-          "precision": "unknown",
-          "scope": "decode",
-          "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
+          "method": "time.perf_counter_ns:profile-minus-setup:v1",
+          "precision": "1 ns",
+          "scope": "canonical_decode_attempt",
+          "unavailable_reason": null,
           "unit": "ns",
-          "value": null
+          "value": 68154447
         },
         "local_cursor": [
           1
         ],
         "schedule": "residual",
         "setup_runtime": {
-          "method": "not_measured",
-          "precision": "unknown",
-          "scope": "schedule_setup",
-          "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
+          "method": "time.perf_counter_ns:v1",
+          "precision": "1 ns",
+          "scope": "canonical_setup",
+          "unavailable_reason": null,
           "unit": "ns",
-          "value": null
+          "value": 174121077
         },
         "source_iteration": {
           "atomic_unit": "one_residual_selected_c2v_commit",
@@ -16531,6 +16683,14 @@
           "residual_priority_evaluations": 7957,
           "variable_to_check_updates": 2
         }
+      },
+      "setup_runtime": {
+        "method": "time.perf_counter_ns:v1",
+        "precision": "1 ns",
+        "scope": "canonical_setup",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 174121077
       },
       "shot_id": 0,
       "termination": "max_iterations",
@@ -16562,6 +16722,14 @@
       "code_id": "b1-ghp-882",
       "composition_identity": "6c2534e1f84e3985302a312aace42c6edc7eeab0457989a27612c58ddd0bcd71",
       "converged": false,
+      "decode_runtime": {
+        "method": "time.perf_counter_ns:profile-minus-setup:v1",
+        "precision": "1 ns",
+        "scope": "canonical_decode_attempt",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 83149189
+      },
       "matrix_hashes": {
         "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
         "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
@@ -19709,7 +19877,7 @@
           "scope": "process",
           "unavailable_reason": null,
           "unit": "ns",
-          "value": 53265
+          "value": 52897
         },
         "enabled": true,
         "environment": {
@@ -19728,7 +19896,7 @@
           "rss_normalized_unit": "bytes",
           "rss_platform": "Linux",
           "rss_raw_unit": "kilobytes",
-          "rss_raw_value": 60944
+          "rss_raw_value": 61856
         },
         "runtime": {
           "backend_device_memory": {
@@ -19769,7 +19937,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "bytes",
-            "value": 62406656
+            "value": 63340544
           },
           "process_cpu_time": {
             "method": "time.process_time_ns:v1",
@@ -19777,7 +19945,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 160801262
+            "value": 141624313
           },
           "wall_time": {
             "method": "time.perf_counter_ns:v1",
@@ -19785,7 +19953,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 162390775
+            "value": 142306056
           }
         }
       },
@@ -19797,6 +19965,14 @@
       "run_id": "phase3-b1-nms-check",
       "sample_identity": "88fad6049730c629b054947e6ef953b579aaf40de33fbcb11cc6ac82c172159e",
       "schedule_terminal": null,
+      "setup_runtime": {
+        "method": "time.perf_counter_ns:v1",
+        "precision": "1 ns",
+        "scope": "canonical_setup",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 59156867
+      },
       "shot_id": 0,
       "termination": "max_iterations",
       "work_vector": {
@@ -19827,6 +20003,14 @@
       "code_id": "hgp-gallager-3-4-seed-20260923",
       "composition_identity": "3fdcfd949a6376bfc5e1f06ab103eaf55a4056ea5554787d1f16720c9b2c98d0",
       "converged": false,
+      "decode_runtime": {
+        "method": "time.perf_counter_ns:profile-minus-setup:v1",
+        "precision": "1 ns",
+        "scope": "canonical_decode_attempt",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 143168847
+      },
       "matrix_hashes": {
         "hx_raw_sha256": "2497f0f59cdb7cf0787e601295e5d118d6cad2e62cc2226a88a47ccf2b034dfb",
         "hx_semantic_sha256": "0edcbfaab182df09cdfe0a0adf6cf394e167896c540483d52b95217963c8664d",
@@ -19875,477 +20059,7 @@
           "scope": "process",
           "unavailable_reason": null,
           "unit": "ns",
-          "value": 45138
-        },
-        "enabled": true,
-        "environment": {
-          "OMP_NUM_THREADS": "1"
-        },
-        "level": "low_overhead",
-        "python_allocation_peak": {
-          "method": "tracemalloc.get_traced_memory:v1",
-          "precision": "unknown",
-          "scope": "process",
-          "unavailable_reason": "representative allocation profiling disabled",
-          "unit": "bytes",
-          "value": null
-        },
-        "raw_context": {
-          "rss_normalized_unit": "bytes",
-          "rss_platform": "Linux",
-          "rss_raw_unit": "kilobytes",
-          "rss_raw_value": 50688
-        },
-        "runtime": {
-          "backend_device_memory": {
-            "method": "not_applicable",
-            "precision": "unknown",
-            "scope": "backend",
-            "unavailable_reason": "CPU execution",
-            "unit": "bytes",
-            "value": null
-          },
-          "backend_device_time": {
-            "method": "not_applicable",
-            "precision": "unknown",
-            "scope": "backend",
-            "unavailable_reason": "CPU execution",
-            "unit": "ns",
-            "value": null
-          },
-          "concurrency": {
-            "method": "threading.active_count:v1",
-            "precision": "instantaneous",
-            "scope": "process",
-            "unavailable_reason": null,
-            "unit": "threads",
-            "value": 1
-          },
-          "machine_environment": {
-            "method": "profile_adapter:v1",
-            "precision": "declared",
-            "scope": "host",
-            "unavailable_reason": null,
-            "unit": "identity",
-            "value": "local-stdlib-cpu"
-          },
-          "peak_host_memory": {
-            "method": "resource.getrusage:RUSAGE_SELF:ru_maxrss:v1",
-            "precision": "platform-qualified peak",
-            "scope": "process",
-            "unavailable_reason": null,
-            "unit": "bytes",
-            "value": 51904512
-          },
-          "process_cpu_time": {
-            "method": "time.process_time_ns:v1",
-            "precision": "1 ns",
-            "scope": "process",
-            "unavailable_reason": null,
-            "unit": "ns",
-            "value": 143650189
-          },
-          "wall_time": {
-            "method": "time.perf_counter_ns:v1",
-            "precision": "1 ns",
-            "scope": "process",
-            "unavailable_reason": null,
-            "unit": "ns",
-            "value": 144392405
-          }
-        }
-      },
-      "qualified_iterations": {
-        "count": 1,
-        "schedule": "flooding"
-      },
-      "relation": "pilot_adaptation",
-      "run_id": "phase3-hgp-gallager-spa",
-      "sample_identity": "5f8c0bf8db5dc59a42606c4c67f45d33a936d12ee9eb7e1c354aa84aaf0416d0",
-      "schedule_terminal": null,
-      "shot_id": 0,
-      "termination": "max_iterations",
-      "work_vector": {
-        "belief_assemblies": 225,
-        "bp_calls": 1,
-        "branch_expansions": 0,
-        "branch_prunes": 0,
-        "candidate_checks": 225,
-        "check_to_variable_updates": 756,
-        "fallback_calls": 0,
-        "intervention_actions": 0,
-        "relay_transfers": 0,
-        "residual_priority_evaluations": 0,
-        "variable_to_check_updates": 756
-      }
-    },
-    {
-      "artifact_raw_sha256": "b31c99a754fb377acfb5e2cb2edc2cb7e55c4d1e78feb4aa84c171c051a78c44",
-      "artifact_semantic_sha256": "272c9498396167424bc4279d96b5ad2d6e11cebc7f01de597716a1cd2c01d668",
-      "assessment_status": "not_assessed",
-      "budget_views": {
-        "budget_scope": "shot",
-        "common_c2v_cap": 1000,
-        "equal_total_cost_claim": false,
-        "qualified_iteration_limit": 1
-      },
-      "canonical_identity": "sha256:bffa2a64011e6c7364e3b41bdb26254182dddf59ee80680fa168d383bda385d7",
-      "code_id": "hgp-gallager-3-4-seed-20260923",
-      "composition_identity": "1e0bab8cf3c035a1e7e890466de14c9b79ba299c825c9a318883045411e34848",
-      "converged": false,
-      "matrix_hashes": {
-        "hx_raw_sha256": "2497f0f59cdb7cf0787e601295e5d118d6cad2e62cc2226a88a47ccf2b034dfb",
-        "hx_semantic_sha256": "0edcbfaab182df09cdfe0a0adf6cf394e167896c540483d52b95217963c8664d",
-        "hz_raw_sha256": "002e894daec7f5e56d17f8bca28ad11dacfd2df236d1a18e031564d6d18727f4",
-        "hz_semantic_sha256": "45b088f719effe4389e9c96a67bcc49100beeb447b38d4ef4dbf51087c96bdfe",
-        "lx_raw_sha256": "c53605ad73244da3b9352a269333484e307055036bc5f1c428727ec9a9ce0b8b",
-        "lx_semantic_sha256": "3db83ea36085e780c1c7c8b409909cb8873b451bdc7ed1747bee066a0e93c0f7",
-        "lz_raw_sha256": "09cd80917934c1665921c09e027ebb51cc02014da6f51f3ca34f7a4001eb60f6",
-        "lz_semantic_sha256": "2dc6a64b64568bb5b88f09537ced7369baf535e377f33209f33aa38299734d87"
-      },
-      "outcome": null,
-      "policy_effects": {
-        "intervention": {
-          "binding_id": "intervention-identity-v1",
-          "effect": "identity_only"
-        },
-        "postprocessing": {
-          "binding_id": "postprocessing-identity-v1",
-          "effect": "identity_only"
-        },
-        "schedule": {
-          "binding_id": "schedule-layered-v1",
-          "effect": "active"
-        },
-        "selection": {
-          "binding_id": "selection-stable-first-v1",
-          "effect": "active"
-        },
-        "state_memory": {
-          "binding_id": "state-memory-stateless-v1",
-          "effect": "identity_only"
-        },
-        "stopping": {
-          "binding_id": "stopping-syndrome-budget-v1",
-          "effect": "active"
-        },
-        "update": {
-          "binding_id": "update-binary-spa-v1",
-          "effect": "active"
-        }
-      },
-      "profile": {
-        "adapter_overhead": {
-          "method": "profiling_adapter_empty_call:v1",
-          "precision": "1 ns",
-          "scope": "process",
-          "unavailable_reason": null,
-          "unit": "ns",
-          "value": 49424
-        },
-        "enabled": true,
-        "environment": {
-          "OMP_NUM_THREADS": "1"
-        },
-        "level": "low_overhead",
-        "python_allocation_peak": {
-          "method": "tracemalloc.get_traced_memory:v1",
-          "precision": "unknown",
-          "scope": "process",
-          "unavailable_reason": "representative allocation profiling disabled",
-          "unit": "bytes",
-          "value": null
-        },
-        "raw_context": {
-          "rss_normalized_unit": "bytes",
-          "rss_platform": "Linux",
-          "rss_raw_unit": "kilobytes",
-          "rss_raw_value": 50688
-        },
-        "runtime": {
-          "backend_device_memory": {
-            "method": "not_applicable",
-            "precision": "unknown",
-            "scope": "backend",
-            "unavailable_reason": "CPU execution",
-            "unit": "bytes",
-            "value": null
-          },
-          "backend_device_time": {
-            "method": "not_applicable",
-            "precision": "unknown",
-            "scope": "backend",
-            "unavailable_reason": "CPU execution",
-            "unit": "ns",
-            "value": null
-          },
-          "concurrency": {
-            "method": "threading.active_count:v1",
-            "precision": "instantaneous",
-            "scope": "process",
-            "unavailable_reason": null,
-            "unit": "threads",
-            "value": 1
-          },
-          "machine_environment": {
-            "method": "profile_adapter:v1",
-            "precision": "declared",
-            "scope": "host",
-            "unavailable_reason": null,
-            "unit": "identity",
-            "value": "local-stdlib-cpu"
-          },
-          "peak_host_memory": {
-            "method": "resource.getrusage:RUSAGE_SELF:ru_maxrss:v1",
-            "precision": "platform-qualified peak",
-            "scope": "process",
-            "unavailable_reason": null,
-            "unit": "bytes",
-            "value": 51904512
-          },
-          "process_cpu_time": {
-            "method": "time.process_time_ns:v1",
-            "precision": "1 ns",
-            "scope": "process",
-            "unavailable_reason": null,
-            "unit": "ns",
-            "value": 144254306
-          },
-          "wall_time": {
-            "method": "time.perf_counter_ns:v1",
-            "precision": "1 ns",
-            "scope": "process",
-            "unavailable_reason": null,
-            "unit": "ns",
-            "value": 144890862
-          }
-        }
-      },
-      "qualified_iterations": {
-        "atomic_unit": "one_layer",
-        "count": 1,
-        "schedule": "layered"
-      },
-      "relation": "pilot_adaptation",
-      "run_id": "phase3-hgp-gallager-layered",
-      "sample_identity": "5f8c0bf8db5dc59a42606c4c67f45d33a936d12ee9eb7e1c354aa84aaf0416d0",
-      "schedule_terminal": {
-        "budget_views": [
-          {
-            "configured_limit": 1000,
-            "decode_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "decode",
-              "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
-              "unit": "ns",
-              "value": null
-            },
-            "kind": "common_check_to_variable_cap",
-            "qualified_iteration": null,
-            "setup_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "schedule_setup",
-              "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
-              "unit": "ns",
-              "value": null
-            },
-            "work_vector": {
-              "belief_assemblies": 225,
-              "bp_calls": 1,
-              "branch_expansions": 0,
-              "branch_prunes": 0,
-              "candidate_checks": 1,
-              "candidate_constructions": 1,
-              "check_to_variable_updates": 7,
-              "convergence_checks": 1,
-              "fallback_calls": 0,
-              "intervention_actions": 0,
-              "order_generation": 0,
-              "order_selection": 0,
-              "priority_maintenance": 0,
-              "relay_transfers": 0,
-              "residual_differences": 0,
-              "residual_precomputations": 0,
-              "residual_priority_evaluations": 0,
-              "variable_to_check_updates": 24
-            }
-          },
-          {
-            "configured_limit": 1,
-            "decode_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "decode",
-              "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
-              "unit": "ns",
-              "value": null
-            },
-            "kind": "schedule_qualified_iteration_limit",
-            "qualified_iteration": {
-              "atomic_unit": "one_layer",
-              "count": 1,
-              "schedule": "layered"
-            },
-            "setup_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "schedule_setup",
-              "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
-              "unit": "ns",
-              "value": null
-            },
-            "work_vector": {
-              "belief_assemblies": 225,
-              "bp_calls": 1,
-              "branch_expansions": 0,
-              "branch_prunes": 0,
-              "candidate_checks": 1,
-              "candidate_constructions": 1,
-              "check_to_variable_updates": 7,
-              "convergence_checks": 1,
-              "fallback_calls": 0,
-              "intervention_actions": 0,
-              "order_generation": 0,
-              "order_selection": 0,
-              "priority_maintenance": 0,
-              "relay_transfers": 0,
-              "residual_differences": 0,
-              "residual_precomputations": 0,
-              "residual_priority_evaluations": 0,
-              "variable_to_check_updates": 24
-            }
-          }
-        ],
-        "completed_traversals": 0,
-        "decode_runtime": {
-          "method": "not_measured",
-          "precision": "unknown",
-          "scope": "decode",
-          "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
-          "unit": "ns",
-          "value": null
-        },
-        "local_cursor": [
-          1
-        ],
-        "schedule": "layered",
-        "setup_runtime": {
-          "method": "not_measured",
-          "precision": "unknown",
-          "scope": "schedule_setup",
-          "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
-          "unit": "ns",
-          "value": null
-        },
-        "source_iteration": {
-          "atomic_unit": "one_layer",
-          "count": 1,
-          "schedule": "layered"
-        },
-        "stopping_adaptation": "D-09 after completed layer local unit",
-        "structural_event_version": 3,
-        "work_vector": {
-          "belief_assemblies": 225,
-          "bp_calls": 1,
-          "branch_expansions": 0,
-          "branch_prunes": 0,
-          "candidate_checks": 1,
-          "candidate_constructions": 1,
-          "check_to_variable_updates": 7,
-          "convergence_checks": 1,
-          "fallback_calls": 0,
-          "intervention_actions": 0,
-          "order_generation": 0,
-          "order_selection": 0,
-          "priority_maintenance": 0,
-          "relay_transfers": 0,
-          "residual_differences": 0,
-          "residual_precomputations": 0,
-          "residual_priority_evaluations": 0,
-          "variable_to_check_updates": 24
-        }
-      },
-      "shot_id": 0,
-      "termination": "max_iterations",
-      "work_vector": {
-        "belief_assemblies": 225,
-        "bp_calls": 1,
-        "branch_expansions": 0,
-        "branch_prunes": 0,
-        "candidate_checks": 1,
-        "check_to_variable_updates": 7,
-        "fallback_calls": 0,
-        "intervention_actions": 0,
-        "relay_transfers": 0,
-        "residual_priority_evaluations": 0,
-        "variable_to_check_updates": 24
-      }
-    },
-    {
-      "artifact_raw_sha256": "b31c99a754fb377acfb5e2cb2edc2cb7e55c4d1e78feb4aa84c171c051a78c44",
-      "artifact_semantic_sha256": "272c9498396167424bc4279d96b5ad2d6e11cebc7f01de597716a1cd2c01d668",
-      "assessment_status": "not_assessed",
-      "budget_views": {
-        "budget_scope": "shot",
-        "common_c2v_cap": 1000,
-        "equal_total_cost_claim": false,
-        "qualified_iteration_limit": 1
-      },
-      "canonical_identity": "sha256:8d16ba1ece4ec2bfbfb88ce6cbc14359cdc15ab4f6a7d228319dfbcf4ffa1609",
-      "code_id": "hgp-gallager-3-4-seed-20260923",
-      "composition_identity": "413f4001c462e60f53ce25ab4cd074cf699d3cb2ced422981b604dcf0ae56fac",
-      "converged": false,
-      "matrix_hashes": {
-        "hx_raw_sha256": "2497f0f59cdb7cf0787e601295e5d118d6cad2e62cc2226a88a47ccf2b034dfb",
-        "hx_semantic_sha256": "0edcbfaab182df09cdfe0a0adf6cf394e167896c540483d52b95217963c8664d",
-        "hz_raw_sha256": "002e894daec7f5e56d17f8bca28ad11dacfd2df236d1a18e031564d6d18727f4",
-        "hz_semantic_sha256": "45b088f719effe4389e9c96a67bcc49100beeb447b38d4ef4dbf51087c96bdfe",
-        "lx_raw_sha256": "c53605ad73244da3b9352a269333484e307055036bc5f1c428727ec9a9ce0b8b",
-        "lx_semantic_sha256": "3db83ea36085e780c1c7c8b409909cb8873b451bdc7ed1747bee066a0e93c0f7",
-        "lz_raw_sha256": "09cd80917934c1665921c09e027ebb51cc02014da6f51f3ca34f7a4001eb60f6",
-        "lz_semantic_sha256": "2dc6a64b64568bb5b88f09537ced7369baf535e377f33209f33aa38299734d87"
-      },
-      "outcome": null,
-      "policy_effects": {
-        "intervention": {
-          "binding_id": "intervention-identity-v1",
-          "effect": "identity_only"
-        },
-        "postprocessing": {
-          "binding_id": "postprocessing-identity-v1",
-          "effect": "identity_only"
-        },
-        "schedule": {
-          "binding_id": "schedule-check-node-serial-v1",
-          "effect": "active"
-        },
-        "selection": {
-          "binding_id": "selection-stable-first-v1",
-          "effect": "active"
-        },
-        "state_memory": {
-          "binding_id": "state-memory-stateless-v1",
-          "effect": "identity_only"
-        },
-        "stopping": {
-          "binding_id": "stopping-syndrome-budget-v1",
-          "effect": "active"
-        },
-        "update": {
-          "binding_id": "update-binary-spa-v1",
-          "effect": "active"
-        }
-      },
-      "profile": {
-        "adapter_overhead": {
-          "method": "profiling_adapter_empty_call:v1",
-          "precision": "1 ns",
-          "scope": "process",
-          "unavailable_reason": null,
-          "unit": "ns",
-          "value": 44501
+          "value": 44441
         },
         "enabled": true,
         "environment": {
@@ -20413,7 +20127,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 135148135
+            "value": 149067097
           },
           "wall_time": {
             "method": "time.perf_counter_ns:v1",
@@ -20421,170 +20135,40 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 135801738
+            "value": 149850418
           }
         }
       },
       "qualified_iterations": {
-        "atomic_unit": "one_check_all_c2v_then_affected_v2c",
         "count": 1,
-        "schedule": "check_node_serial"
+        "schedule": "flooding"
       },
       "relation": "pilot_adaptation",
-      "run_id": "phase3-hgp-gallager-cn",
+      "run_id": "phase3-hgp-gallager-spa",
       "sample_identity": "5f8c0bf8db5dc59a42606c4c67f45d33a936d12ee9eb7e1c354aa84aaf0416d0",
-      "schedule_terminal": {
-        "budget_views": [
-          {
-            "configured_limit": 1000,
-            "decode_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "decode",
-              "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
-              "unit": "ns",
-              "value": null
-            },
-            "kind": "common_check_to_variable_cap",
-            "qualified_iteration": null,
-            "setup_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "schedule_setup",
-              "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
-              "unit": "ns",
-              "value": null
-            },
-            "work_vector": {
-              "belief_assemblies": 7,
-              "bp_calls": 1,
-              "branch_expansions": 0,
-              "branch_prunes": 0,
-              "candidate_checks": 1,
-              "candidate_constructions": 1,
-              "check_to_variable_updates": 7,
-              "convergence_checks": 1,
-              "fallback_calls": 0,
-              "intervention_actions": 0,
-              "order_generation": 0,
-              "order_selection": 0,
-              "priority_maintenance": 0,
-              "relay_transfers": 0,
-              "residual_differences": 0,
-              "residual_precomputations": 0,
-              "residual_priority_evaluations": 0,
-              "variable_to_check_updates": 24
-            }
-          },
-          {
-            "configured_limit": 1,
-            "decode_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "decode",
-              "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
-              "unit": "ns",
-              "value": null
-            },
-            "kind": "schedule_qualified_iteration_limit",
-            "qualified_iteration": {
-              "atomic_unit": "one_check_all_c2v_then_affected_v2c",
-              "count": 1,
-              "schedule": "check_node_serial"
-            },
-            "setup_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "schedule_setup",
-              "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
-              "unit": "ns",
-              "value": null
-            },
-            "work_vector": {
-              "belief_assemblies": 7,
-              "bp_calls": 1,
-              "branch_expansions": 0,
-              "branch_prunes": 0,
-              "candidate_checks": 1,
-              "candidate_constructions": 1,
-              "check_to_variable_updates": 7,
-              "convergence_checks": 1,
-              "fallback_calls": 0,
-              "intervention_actions": 0,
-              "order_generation": 0,
-              "order_selection": 0,
-              "priority_maintenance": 0,
-              "relay_transfers": 0,
-              "residual_differences": 0,
-              "residual_precomputations": 0,
-              "residual_priority_evaluations": 0,
-              "variable_to_check_updates": 24
-            }
-          }
-        ],
-        "completed_traversals": 0,
-        "decode_runtime": {
-          "method": "not_measured",
-          "precision": "unknown",
-          "scope": "decode",
-          "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
-          "unit": "ns",
-          "value": null
-        },
-        "local_cursor": [
-          1
-        ],
-        "schedule": "check_node_serial",
-        "setup_runtime": {
-          "method": "not_measured",
-          "precision": "unknown",
-          "scope": "schedule_setup",
-          "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
-          "unit": "ns",
-          "value": null
-        },
-        "source_iteration": {
-          "atomic_unit": "one_check_all_c2v_then_affected_v2c",
-          "count": 1,
-          "schedule": "check_node_serial"
-        },
-        "stopping_adaptation": "D-09 after serial node local unit",
-        "structural_event_version": 3,
-        "work_vector": {
-          "belief_assemblies": 7,
-          "bp_calls": 1,
-          "branch_expansions": 0,
-          "branch_prunes": 0,
-          "candidate_checks": 1,
-          "candidate_constructions": 1,
-          "check_to_variable_updates": 7,
-          "convergence_checks": 1,
-          "fallback_calls": 0,
-          "intervention_actions": 0,
-          "order_generation": 0,
-          "order_selection": 0,
-          "priority_maintenance": 0,
-          "relay_transfers": 0,
-          "residual_differences": 0,
-          "residual_precomputations": 0,
-          "residual_priority_evaluations": 0,
-          "variable_to_check_updates": 24
-        }
+      "schedule_terminal": null,
+      "setup_runtime": {
+        "method": "time.perf_counter_ns:v1",
+        "precision": "1 ns",
+        "scope": "canonical_setup",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 6681571
       },
       "shot_id": 0,
       "termination": "max_iterations",
       "work_vector": {
-        "belief_assemblies": 7,
+        "belief_assemblies": 225,
         "bp_calls": 1,
         "branch_expansions": 0,
         "branch_prunes": 0,
-        "candidate_checks": 1,
-        "check_to_variable_updates": 7,
+        "candidate_checks": 225,
+        "check_to_variable_updates": 756,
         "fallback_calls": 0,
         "intervention_actions": 0,
         "relay_transfers": 0,
         "residual_priority_evaluations": 0,
-        "variable_to_check_updates": 24
+        "variable_to_check_updates": 756
       }
     },
     {
@@ -20597,10 +20181,18 @@
         "equal_total_cost_claim": false,
         "qualified_iteration_limit": 1
       },
-      "canonical_identity": "sha256:3f78d0f94d53218c29366132d20ddf214d55da03a06afe84c3db34a0ee6eba11",
+      "canonical_identity": "sha256:bffa2a64011e6c7364e3b41bdb26254182dddf59ee80680fa168d383bda385d7",
       "code_id": "hgp-gallager-3-4-seed-20260923",
-      "composition_identity": "3b9fa5f190dbd87d54a4a515ab0077e87173191947e303c76ba7b1e0c47ae860",
+      "composition_identity": "1e0bab8cf3c035a1e7e890466de14c9b79ba299c825c9a318883045411e34848",
       "converged": false,
+      "decode_runtime": {
+        "method": "time.perf_counter_ns:profile-minus-setup:v1",
+        "precision": "1 ns",
+        "scope": "canonical_decode_attempt",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 133389766
+      },
       "matrix_hashes": {
         "hx_raw_sha256": "2497f0f59cdb7cf0787e601295e5d118d6cad2e62cc2226a88a47ccf2b034dfb",
         "hx_semantic_sha256": "0edcbfaab182df09cdfe0a0adf6cf394e167896c540483d52b95217963c8664d",
@@ -20622,7 +20214,7 @@
           "effect": "identity_only"
         },
         "schedule": {
-          "binding_id": "schedule-variable-node-serial-v1",
+          "binding_id": "schedule-layered-v1",
           "effect": "active"
         },
         "selection": {
@@ -20649,311 +20241,7 @@
           "scope": "process",
           "unavailable_reason": null,
           "unit": "ns",
-          "value": 45136
-        },
-        "enabled": true,
-        "environment": {
-          "OMP_NUM_THREADS": "1"
-        },
-        "level": "low_overhead",
-        "python_allocation_peak": {
-          "method": "tracemalloc.get_traced_memory:v1",
-          "precision": "unknown",
-          "scope": "process",
-          "unavailable_reason": "representative allocation profiling disabled",
-          "unit": "bytes",
-          "value": null
-        },
-        "raw_context": {
-          "rss_normalized_unit": "bytes",
-          "rss_platform": "Linux",
-          "rss_raw_unit": "kilobytes",
-          "rss_raw_value": 50688
-        },
-        "runtime": {
-          "backend_device_memory": {
-            "method": "not_applicable",
-            "precision": "unknown",
-            "scope": "backend",
-            "unavailable_reason": "CPU execution",
-            "unit": "bytes",
-            "value": null
-          },
-          "backend_device_time": {
-            "method": "not_applicable",
-            "precision": "unknown",
-            "scope": "backend",
-            "unavailable_reason": "CPU execution",
-            "unit": "ns",
-            "value": null
-          },
-          "concurrency": {
-            "method": "threading.active_count:v1",
-            "precision": "instantaneous",
-            "scope": "process",
-            "unavailable_reason": null,
-            "unit": "threads",
-            "value": 1
-          },
-          "machine_environment": {
-            "method": "profile_adapter:v1",
-            "precision": "declared",
-            "scope": "host",
-            "unavailable_reason": null,
-            "unit": "identity",
-            "value": "local-stdlib-cpu"
-          },
-          "peak_host_memory": {
-            "method": "resource.getrusage:RUSAGE_SELF:ru_maxrss:v1",
-            "precision": "platform-qualified peak",
-            "scope": "process",
-            "unavailable_reason": null,
-            "unit": "bytes",
-            "value": 51904512
-          },
-          "process_cpu_time": {
-            "method": "time.process_time_ns:v1",
-            "precision": "1 ns",
-            "scope": "process",
-            "unavailable_reason": null,
-            "unit": "ns",
-            "value": 143927955
-          },
-          "wall_time": {
-            "method": "time.perf_counter_ns:v1",
-            "precision": "1 ns",
-            "scope": "process",
-            "unavailable_reason": null,
-            "unit": "ns",
-            "value": 144784107
-          }
-        }
-      },
-      "qualified_iterations": {
-        "atomic_unit": "one_variable_belief_then_incident_v2c",
-        "count": 1,
-        "schedule": "variable_node_serial"
-      },
-      "relation": "pilot_adaptation",
-      "run_id": "phase3-hgp-gallager-vn",
-      "sample_identity": "5f8c0bf8db5dc59a42606c4c67f45d33a936d12ee9eb7e1c354aa84aaf0416d0",
-      "schedule_terminal": {
-        "budget_views": [
-          {
-            "configured_limit": 1000,
-            "decode_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "decode",
-              "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
-              "unit": "ns",
-              "value": null
-            },
-            "kind": "common_check_to_variable_cap",
-            "qualified_iteration": null,
-            "setup_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "schedule_setup",
-              "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
-              "unit": "ns",
-              "value": null
-            },
-            "work_vector": {
-              "belief_assemblies": 1,
-              "bp_calls": 1,
-              "branch_expansions": 0,
-              "branch_prunes": 0,
-              "candidate_checks": 1,
-              "candidate_constructions": 1,
-              "check_to_variable_updates": 0,
-              "convergence_checks": 1,
-              "fallback_calls": 0,
-              "intervention_actions": 0,
-              "order_generation": 0,
-              "order_selection": 0,
-              "priority_maintenance": 0,
-              "relay_transfers": 0,
-              "residual_differences": 0,
-              "residual_precomputations": 0,
-              "residual_priority_evaluations": 0,
-              "variable_to_check_updates": 3
-            }
-          },
-          {
-            "configured_limit": 1,
-            "decode_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "decode",
-              "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
-              "unit": "ns",
-              "value": null
-            },
-            "kind": "schedule_qualified_iteration_limit",
-            "qualified_iteration": {
-              "atomic_unit": "one_variable_belief_then_incident_v2c",
-              "count": 1,
-              "schedule": "variable_node_serial"
-            },
-            "setup_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "schedule_setup",
-              "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
-              "unit": "ns",
-              "value": null
-            },
-            "work_vector": {
-              "belief_assemblies": 1,
-              "bp_calls": 1,
-              "branch_expansions": 0,
-              "branch_prunes": 0,
-              "candidate_checks": 1,
-              "candidate_constructions": 1,
-              "check_to_variable_updates": 0,
-              "convergence_checks": 1,
-              "fallback_calls": 0,
-              "intervention_actions": 0,
-              "order_generation": 0,
-              "order_selection": 0,
-              "priority_maintenance": 0,
-              "relay_transfers": 0,
-              "residual_differences": 0,
-              "residual_precomputations": 0,
-              "residual_priority_evaluations": 0,
-              "variable_to_check_updates": 3
-            }
-          }
-        ],
-        "completed_traversals": 0,
-        "decode_runtime": {
-          "method": "not_measured",
-          "precision": "unknown",
-          "scope": "decode",
-          "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
-          "unit": "ns",
-          "value": null
-        },
-        "local_cursor": [
-          1
-        ],
-        "schedule": "variable_node_serial",
-        "setup_runtime": {
-          "method": "not_measured",
-          "precision": "unknown",
-          "scope": "schedule_setup",
-          "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
-          "unit": "ns",
-          "value": null
-        },
-        "source_iteration": {
-          "atomic_unit": "one_variable_belief_then_incident_v2c",
-          "count": 1,
-          "schedule": "variable_node_serial"
-        },
-        "stopping_adaptation": "D-09 after serial node local unit",
-        "structural_event_version": 3,
-        "work_vector": {
-          "belief_assemblies": 1,
-          "bp_calls": 1,
-          "branch_expansions": 0,
-          "branch_prunes": 0,
-          "candidate_checks": 1,
-          "candidate_constructions": 1,
-          "check_to_variable_updates": 0,
-          "convergence_checks": 1,
-          "fallback_calls": 0,
-          "intervention_actions": 0,
-          "order_generation": 0,
-          "order_selection": 0,
-          "priority_maintenance": 0,
-          "relay_transfers": 0,
-          "residual_differences": 0,
-          "residual_precomputations": 0,
-          "residual_priority_evaluations": 0,
-          "variable_to_check_updates": 3
-        }
-      },
-      "shot_id": 0,
-      "termination": "max_iterations",
-      "work_vector": {
-        "belief_assemblies": 1,
-        "bp_calls": 1,
-        "branch_expansions": 0,
-        "branch_prunes": 0,
-        "candidate_checks": 1,
-        "check_to_variable_updates": 0,
-        "fallback_calls": 0,
-        "intervention_actions": 0,
-        "relay_transfers": 0,
-        "residual_priority_evaluations": 0,
-        "variable_to_check_updates": 3
-      }
-    },
-    {
-      "artifact_raw_sha256": "b31c99a754fb377acfb5e2cb2edc2cb7e55c4d1e78feb4aa84c171c051a78c44",
-      "artifact_semantic_sha256": "272c9498396167424bc4279d96b5ad2d6e11cebc7f01de597716a1cd2c01d668",
-      "assessment_status": "not_assessed",
-      "budget_views": {
-        "budget_scope": "shot",
-        "common_c2v_cap": 1000,
-        "equal_total_cost_claim": false,
-        "qualified_iteration_limit": 1
-      },
-      "canonical_identity": "sha256:ca9e60fc7445b04a4ccd77911753bcf55163001339d7fa910f82d6c1dc42fc2f",
-      "code_id": "hgp-gallager-3-4-seed-20260923",
-      "composition_identity": "614ee1bd9e864602397fc0ee2ce287b8d500046dccbd57469991720cf02a477b",
-      "converged": false,
-      "matrix_hashes": {
-        "hx_raw_sha256": "2497f0f59cdb7cf0787e601295e5d118d6cad2e62cc2226a88a47ccf2b034dfb",
-        "hx_semantic_sha256": "0edcbfaab182df09cdfe0a0adf6cf394e167896c540483d52b95217963c8664d",
-        "hz_raw_sha256": "002e894daec7f5e56d17f8bca28ad11dacfd2df236d1a18e031564d6d18727f4",
-        "hz_semantic_sha256": "45b088f719effe4389e9c96a67bcc49100beeb447b38d4ef4dbf51087c96bdfe",
-        "lx_raw_sha256": "c53605ad73244da3b9352a269333484e307055036bc5f1c428727ec9a9ce0b8b",
-        "lx_semantic_sha256": "3db83ea36085e780c1c7c8b409909cb8873b451bdc7ed1747bee066a0e93c0f7",
-        "lz_raw_sha256": "09cd80917934c1665921c09e027ebb51cc02014da6f51f3ca34f7a4001eb60f6",
-        "lz_semantic_sha256": "2dc6a64b64568bb5b88f09537ced7369baf535e377f33209f33aa38299734d87"
-      },
-      "outcome": null,
-      "policy_effects": {
-        "intervention": {
-          "binding_id": "intervention-identity-v1",
-          "effect": "identity_only"
-        },
-        "postprocessing": {
-          "binding_id": "postprocessing-identity-v1",
-          "effect": "identity_only"
-        },
-        "schedule": {
-          "binding_id": "schedule-randomized-v1",
-          "effect": "active"
-        },
-        "selection": {
-          "binding_id": "selection-stable-first-v1",
-          "effect": "active"
-        },
-        "state_memory": {
-          "binding_id": "state-memory-stateless-v1",
-          "effect": "identity_only"
-        },
-        "stopping": {
-          "binding_id": "stopping-syndrome-budget-v1",
-          "effect": "active"
-        },
-        "update": {
-          "binding_id": "update-binary-spa-v1",
-          "effect": "active"
-        }
-      },
-      "profile": {
-        "adapter_overhead": {
-          "method": "profiling_adapter_empty_call:v1",
-          "precision": "1 ns",
-          "scope": "process",
-          "unavailable_reason": null,
-          "unit": "ns",
-          "value": 41851
+          "value": 43880
         },
         "enabled": true,
         "environment": {
@@ -21021,7 +20309,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 137923482
+            "value": 134919761
           },
           "wall_time": {
             "method": "time.perf_counter_ns:v1",
@@ -21029,7 +20317,967 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 138527582
+            "value": 135598757
+          }
+        }
+      },
+      "qualified_iterations": {
+        "atomic_unit": "one_layer",
+        "count": 1,
+        "schedule": "layered"
+      },
+      "relation": "pilot_adaptation",
+      "run_id": "phase3-hgp-gallager-layered",
+      "sample_identity": "5f8c0bf8db5dc59a42606c4c67f45d33a936d12ee9eb7e1c354aa84aaf0416d0",
+      "schedule_terminal": {
+        "budget_views": [
+          {
+            "configured_limit": 1000,
+            "decode_runtime": {
+              "method": "time.perf_counter_ns:profile-minus-setup:v1",
+              "precision": "1 ns",
+              "scope": "canonical_decode_attempt",
+              "unavailable_reason": null,
+              "unit": "ns",
+              "value": 133389766
+            },
+            "kind": "common_check_to_variable_cap",
+            "qualified_iteration": null,
+            "setup_runtime": {
+              "method": "time.perf_counter_ns:v1",
+              "precision": "1 ns",
+              "scope": "canonical_setup",
+              "unavailable_reason": null,
+              "unit": "ns",
+              "value": 8725903
+            },
+            "work_vector": {
+              "belief_assemblies": 225,
+              "bp_calls": 1,
+              "branch_expansions": 0,
+              "branch_prunes": 0,
+              "candidate_checks": 1,
+              "candidate_constructions": 1,
+              "check_to_variable_updates": 7,
+              "convergence_checks": 1,
+              "fallback_calls": 0,
+              "intervention_actions": 0,
+              "order_generation": 0,
+              "order_selection": 0,
+              "priority_maintenance": 0,
+              "relay_transfers": 0,
+              "residual_differences": 0,
+              "residual_precomputations": 0,
+              "residual_priority_evaluations": 0,
+              "variable_to_check_updates": 24
+            }
+          },
+          {
+            "configured_limit": 1,
+            "decode_runtime": {
+              "method": "time.perf_counter_ns:profile-minus-setup:v1",
+              "precision": "1 ns",
+              "scope": "canonical_decode_attempt",
+              "unavailable_reason": null,
+              "unit": "ns",
+              "value": 133389766
+            },
+            "kind": "schedule_qualified_iteration_limit",
+            "qualified_iteration": {
+              "atomic_unit": "one_layer",
+              "count": 1,
+              "schedule": "layered"
+            },
+            "setup_runtime": {
+              "method": "time.perf_counter_ns:v1",
+              "precision": "1 ns",
+              "scope": "canonical_setup",
+              "unavailable_reason": null,
+              "unit": "ns",
+              "value": 8725903
+            },
+            "work_vector": {
+              "belief_assemblies": 225,
+              "bp_calls": 1,
+              "branch_expansions": 0,
+              "branch_prunes": 0,
+              "candidate_checks": 1,
+              "candidate_constructions": 1,
+              "check_to_variable_updates": 7,
+              "convergence_checks": 1,
+              "fallback_calls": 0,
+              "intervention_actions": 0,
+              "order_generation": 0,
+              "order_selection": 0,
+              "priority_maintenance": 0,
+              "relay_transfers": 0,
+              "residual_differences": 0,
+              "residual_precomputations": 0,
+              "residual_priority_evaluations": 0,
+              "variable_to_check_updates": 24
+            }
+          }
+        ],
+        "completed_traversals": 0,
+        "decode_runtime": {
+          "method": "time.perf_counter_ns:profile-minus-setup:v1",
+          "precision": "1 ns",
+          "scope": "canonical_decode_attempt",
+          "unavailable_reason": null,
+          "unit": "ns",
+          "value": 133389766
+        },
+        "local_cursor": [
+          1
+        ],
+        "schedule": "layered",
+        "setup_runtime": {
+          "method": "time.perf_counter_ns:v1",
+          "precision": "1 ns",
+          "scope": "canonical_setup",
+          "unavailable_reason": null,
+          "unit": "ns",
+          "value": 8725903
+        },
+        "source_iteration": {
+          "atomic_unit": "one_layer",
+          "count": 1,
+          "schedule": "layered"
+        },
+        "stopping_adaptation": "D-09 after completed layer local unit",
+        "structural_event_version": 3,
+        "work_vector": {
+          "belief_assemblies": 225,
+          "bp_calls": 1,
+          "branch_expansions": 0,
+          "branch_prunes": 0,
+          "candidate_checks": 1,
+          "candidate_constructions": 1,
+          "check_to_variable_updates": 7,
+          "convergence_checks": 1,
+          "fallback_calls": 0,
+          "intervention_actions": 0,
+          "order_generation": 0,
+          "order_selection": 0,
+          "priority_maintenance": 0,
+          "relay_transfers": 0,
+          "residual_differences": 0,
+          "residual_precomputations": 0,
+          "residual_priority_evaluations": 0,
+          "variable_to_check_updates": 24
+        }
+      },
+      "setup_runtime": {
+        "method": "time.perf_counter_ns:v1",
+        "precision": "1 ns",
+        "scope": "canonical_setup",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 8725903
+      },
+      "shot_id": 0,
+      "termination": "max_iterations",
+      "work_vector": {
+        "belief_assemblies": 225,
+        "bp_calls": 1,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 1,
+        "check_to_variable_updates": 7,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 0,
+        "variable_to_check_updates": 24
+      }
+    },
+    {
+      "artifact_raw_sha256": "b31c99a754fb377acfb5e2cb2edc2cb7e55c4d1e78feb4aa84c171c051a78c44",
+      "artifact_semantic_sha256": "272c9498396167424bc4279d96b5ad2d6e11cebc7f01de597716a1cd2c01d668",
+      "assessment_status": "not_assessed",
+      "budget_views": {
+        "budget_scope": "shot",
+        "common_c2v_cap": 1000,
+        "equal_total_cost_claim": false,
+        "qualified_iteration_limit": 1
+      },
+      "canonical_identity": "sha256:8d16ba1ece4ec2bfbfb88ce6cbc14359cdc15ab4f6a7d228319dfbcf4ffa1609",
+      "code_id": "hgp-gallager-3-4-seed-20260923",
+      "composition_identity": "413f4001c462e60f53ce25ab4cd074cf699d3cb2ced422981b604dcf0ae56fac",
+      "converged": false,
+      "decode_runtime": {
+        "method": "time.perf_counter_ns:profile-minus-setup:v1",
+        "precision": "1 ns",
+        "scope": "canonical_decode_attempt",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 133302189
+      },
+      "matrix_hashes": {
+        "hx_raw_sha256": "2497f0f59cdb7cf0787e601295e5d118d6cad2e62cc2226a88a47ccf2b034dfb",
+        "hx_semantic_sha256": "0edcbfaab182df09cdfe0a0adf6cf394e167896c540483d52b95217963c8664d",
+        "hz_raw_sha256": "002e894daec7f5e56d17f8bca28ad11dacfd2df236d1a18e031564d6d18727f4",
+        "hz_semantic_sha256": "45b088f719effe4389e9c96a67bcc49100beeb447b38d4ef4dbf51087c96bdfe",
+        "lx_raw_sha256": "c53605ad73244da3b9352a269333484e307055036bc5f1c428727ec9a9ce0b8b",
+        "lx_semantic_sha256": "3db83ea36085e780c1c7c8b409909cb8873b451bdc7ed1747bee066a0e93c0f7",
+        "lz_raw_sha256": "09cd80917934c1665921c09e027ebb51cc02014da6f51f3ca34f7a4001eb60f6",
+        "lz_semantic_sha256": "2dc6a64b64568bb5b88f09537ced7369baf535e377f33209f33aa38299734d87"
+      },
+      "outcome": null,
+      "policy_effects": {
+        "intervention": {
+          "binding_id": "intervention-identity-v1",
+          "effect": "identity_only"
+        },
+        "postprocessing": {
+          "binding_id": "postprocessing-identity-v1",
+          "effect": "identity_only"
+        },
+        "schedule": {
+          "binding_id": "schedule-check-node-serial-v1",
+          "effect": "active"
+        },
+        "selection": {
+          "binding_id": "selection-stable-first-v1",
+          "effect": "active"
+        },
+        "state_memory": {
+          "binding_id": "state-memory-stateless-v1",
+          "effect": "identity_only"
+        },
+        "stopping": {
+          "binding_id": "stopping-syndrome-budget-v1",
+          "effect": "active"
+        },
+        "update": {
+          "binding_id": "update-binary-spa-v1",
+          "effect": "active"
+        }
+      },
+      "profile": {
+        "adapter_overhead": {
+          "method": "profiling_adapter_empty_call:v1",
+          "precision": "1 ns",
+          "scope": "process",
+          "unavailable_reason": null,
+          "unit": "ns",
+          "value": 45772
+        },
+        "enabled": true,
+        "environment": {
+          "OMP_NUM_THREADS": "1"
+        },
+        "level": "low_overhead",
+        "python_allocation_peak": {
+          "method": "tracemalloc.get_traced_memory:v1",
+          "precision": "unknown",
+          "scope": "process",
+          "unavailable_reason": "representative allocation profiling disabled",
+          "unit": "bytes",
+          "value": null
+        },
+        "raw_context": {
+          "rss_normalized_unit": "bytes",
+          "rss_platform": "Linux",
+          "rss_raw_unit": "kilobytes",
+          "rss_raw_value": 50688
+        },
+        "runtime": {
+          "backend_device_memory": {
+            "method": "not_applicable",
+            "precision": "unknown",
+            "scope": "backend",
+            "unavailable_reason": "CPU execution",
+            "unit": "bytes",
+            "value": null
+          },
+          "backend_device_time": {
+            "method": "not_applicable",
+            "precision": "unknown",
+            "scope": "backend",
+            "unavailable_reason": "CPU execution",
+            "unit": "ns",
+            "value": null
+          },
+          "concurrency": {
+            "method": "threading.active_count:v1",
+            "precision": "instantaneous",
+            "scope": "process",
+            "unavailable_reason": null,
+            "unit": "threads",
+            "value": 1
+          },
+          "machine_environment": {
+            "method": "profile_adapter:v1",
+            "precision": "declared",
+            "scope": "host",
+            "unavailable_reason": null,
+            "unit": "identity",
+            "value": "local-stdlib-cpu"
+          },
+          "peak_host_memory": {
+            "method": "resource.getrusage:RUSAGE_SELF:ru_maxrss:v1",
+            "precision": "platform-qualified peak",
+            "scope": "process",
+            "unavailable_reason": null,
+            "unit": "bytes",
+            "value": 51904512
+          },
+          "process_cpu_time": {
+            "method": "time.process_time_ns:v1",
+            "precision": "1 ns",
+            "scope": "process",
+            "unavailable_reason": null,
+            "unit": "ns",
+            "value": 134711782
+          },
+          "wall_time": {
+            "method": "time.perf_counter_ns:v1",
+            "precision": "1 ns",
+            "scope": "process",
+            "unavailable_reason": null,
+            "unit": "ns",
+            "value": 135442944
+          }
+        }
+      },
+      "qualified_iterations": {
+        "atomic_unit": "one_check_all_c2v_then_affected_v2c",
+        "count": 1,
+        "schedule": "check_node_serial"
+      },
+      "relation": "pilot_adaptation",
+      "run_id": "phase3-hgp-gallager-cn",
+      "sample_identity": "5f8c0bf8db5dc59a42606c4c67f45d33a936d12ee9eb7e1c354aa84aaf0416d0",
+      "schedule_terminal": {
+        "budget_views": [
+          {
+            "configured_limit": 1000,
+            "decode_runtime": {
+              "method": "time.perf_counter_ns:profile-minus-setup:v1",
+              "precision": "1 ns",
+              "scope": "canonical_decode_attempt",
+              "unavailable_reason": null,
+              "unit": "ns",
+              "value": 133302189
+            },
+            "kind": "common_check_to_variable_cap",
+            "qualified_iteration": null,
+            "setup_runtime": {
+              "method": "time.perf_counter_ns:v1",
+              "precision": "1 ns",
+              "scope": "canonical_setup",
+              "unavailable_reason": null,
+              "unit": "ns",
+              "value": 15179436
+            },
+            "work_vector": {
+              "belief_assemblies": 7,
+              "bp_calls": 1,
+              "branch_expansions": 0,
+              "branch_prunes": 0,
+              "candidate_checks": 1,
+              "candidate_constructions": 1,
+              "check_to_variable_updates": 7,
+              "convergence_checks": 1,
+              "fallback_calls": 0,
+              "intervention_actions": 0,
+              "order_generation": 0,
+              "order_selection": 0,
+              "priority_maintenance": 0,
+              "relay_transfers": 0,
+              "residual_differences": 0,
+              "residual_precomputations": 0,
+              "residual_priority_evaluations": 0,
+              "variable_to_check_updates": 24
+            }
+          },
+          {
+            "configured_limit": 1,
+            "decode_runtime": {
+              "method": "time.perf_counter_ns:profile-minus-setup:v1",
+              "precision": "1 ns",
+              "scope": "canonical_decode_attempt",
+              "unavailable_reason": null,
+              "unit": "ns",
+              "value": 133302189
+            },
+            "kind": "schedule_qualified_iteration_limit",
+            "qualified_iteration": {
+              "atomic_unit": "one_check_all_c2v_then_affected_v2c",
+              "count": 1,
+              "schedule": "check_node_serial"
+            },
+            "setup_runtime": {
+              "method": "time.perf_counter_ns:v1",
+              "precision": "1 ns",
+              "scope": "canonical_setup",
+              "unavailable_reason": null,
+              "unit": "ns",
+              "value": 15179436
+            },
+            "work_vector": {
+              "belief_assemblies": 7,
+              "bp_calls": 1,
+              "branch_expansions": 0,
+              "branch_prunes": 0,
+              "candidate_checks": 1,
+              "candidate_constructions": 1,
+              "check_to_variable_updates": 7,
+              "convergence_checks": 1,
+              "fallback_calls": 0,
+              "intervention_actions": 0,
+              "order_generation": 0,
+              "order_selection": 0,
+              "priority_maintenance": 0,
+              "relay_transfers": 0,
+              "residual_differences": 0,
+              "residual_precomputations": 0,
+              "residual_priority_evaluations": 0,
+              "variable_to_check_updates": 24
+            }
+          }
+        ],
+        "completed_traversals": 0,
+        "decode_runtime": {
+          "method": "time.perf_counter_ns:profile-minus-setup:v1",
+          "precision": "1 ns",
+          "scope": "canonical_decode_attempt",
+          "unavailable_reason": null,
+          "unit": "ns",
+          "value": 133302189
+        },
+        "local_cursor": [
+          1
+        ],
+        "schedule": "check_node_serial",
+        "setup_runtime": {
+          "method": "time.perf_counter_ns:v1",
+          "precision": "1 ns",
+          "scope": "canonical_setup",
+          "unavailable_reason": null,
+          "unit": "ns",
+          "value": 15179436
+        },
+        "source_iteration": {
+          "atomic_unit": "one_check_all_c2v_then_affected_v2c",
+          "count": 1,
+          "schedule": "check_node_serial"
+        },
+        "stopping_adaptation": "D-09 after serial node local unit",
+        "structural_event_version": 3,
+        "work_vector": {
+          "belief_assemblies": 7,
+          "bp_calls": 1,
+          "branch_expansions": 0,
+          "branch_prunes": 0,
+          "candidate_checks": 1,
+          "candidate_constructions": 1,
+          "check_to_variable_updates": 7,
+          "convergence_checks": 1,
+          "fallback_calls": 0,
+          "intervention_actions": 0,
+          "order_generation": 0,
+          "order_selection": 0,
+          "priority_maintenance": 0,
+          "relay_transfers": 0,
+          "residual_differences": 0,
+          "residual_precomputations": 0,
+          "residual_priority_evaluations": 0,
+          "variable_to_check_updates": 24
+        }
+      },
+      "setup_runtime": {
+        "method": "time.perf_counter_ns:v1",
+        "precision": "1 ns",
+        "scope": "canonical_setup",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 15179436
+      },
+      "shot_id": 0,
+      "termination": "max_iterations",
+      "work_vector": {
+        "belief_assemblies": 7,
+        "bp_calls": 1,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 1,
+        "check_to_variable_updates": 7,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 0,
+        "variable_to_check_updates": 24
+      }
+    },
+    {
+      "artifact_raw_sha256": "b31c99a754fb377acfb5e2cb2edc2cb7e55c4d1e78feb4aa84c171c051a78c44",
+      "artifact_semantic_sha256": "272c9498396167424bc4279d96b5ad2d6e11cebc7f01de597716a1cd2c01d668",
+      "assessment_status": "not_assessed",
+      "budget_views": {
+        "budget_scope": "shot",
+        "common_c2v_cap": 1000,
+        "equal_total_cost_claim": false,
+        "qualified_iteration_limit": 1
+      },
+      "canonical_identity": "sha256:3f78d0f94d53218c29366132d20ddf214d55da03a06afe84c3db34a0ee6eba11",
+      "code_id": "hgp-gallager-3-4-seed-20260923",
+      "composition_identity": "3b9fa5f190dbd87d54a4a515ab0077e87173191947e303c76ba7b1e0c47ae860",
+      "converged": false,
+      "decode_runtime": {
+        "method": "time.perf_counter_ns:profile-minus-setup:v1",
+        "precision": "1 ns",
+        "scope": "canonical_decode_attempt",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 133144439
+      },
+      "matrix_hashes": {
+        "hx_raw_sha256": "2497f0f59cdb7cf0787e601295e5d118d6cad2e62cc2226a88a47ccf2b034dfb",
+        "hx_semantic_sha256": "0edcbfaab182df09cdfe0a0adf6cf394e167896c540483d52b95217963c8664d",
+        "hz_raw_sha256": "002e894daec7f5e56d17f8bca28ad11dacfd2df236d1a18e031564d6d18727f4",
+        "hz_semantic_sha256": "45b088f719effe4389e9c96a67bcc49100beeb447b38d4ef4dbf51087c96bdfe",
+        "lx_raw_sha256": "c53605ad73244da3b9352a269333484e307055036bc5f1c428727ec9a9ce0b8b",
+        "lx_semantic_sha256": "3db83ea36085e780c1c7c8b409909cb8873b451bdc7ed1747bee066a0e93c0f7",
+        "lz_raw_sha256": "09cd80917934c1665921c09e027ebb51cc02014da6f51f3ca34f7a4001eb60f6",
+        "lz_semantic_sha256": "2dc6a64b64568bb5b88f09537ced7369baf535e377f33209f33aa38299734d87"
+      },
+      "outcome": null,
+      "policy_effects": {
+        "intervention": {
+          "binding_id": "intervention-identity-v1",
+          "effect": "identity_only"
+        },
+        "postprocessing": {
+          "binding_id": "postprocessing-identity-v1",
+          "effect": "identity_only"
+        },
+        "schedule": {
+          "binding_id": "schedule-variable-node-serial-v1",
+          "effect": "active"
+        },
+        "selection": {
+          "binding_id": "selection-stable-first-v1",
+          "effect": "active"
+        },
+        "state_memory": {
+          "binding_id": "state-memory-stateless-v1",
+          "effect": "identity_only"
+        },
+        "stopping": {
+          "binding_id": "stopping-syndrome-budget-v1",
+          "effect": "active"
+        },
+        "update": {
+          "binding_id": "update-binary-spa-v1",
+          "effect": "active"
+        }
+      },
+      "profile": {
+        "adapter_overhead": {
+          "method": "profiling_adapter_empty_call:v1",
+          "precision": "1 ns",
+          "scope": "process",
+          "unavailable_reason": null,
+          "unit": "ns",
+          "value": 41670
+        },
+        "enabled": true,
+        "environment": {
+          "OMP_NUM_THREADS": "1"
+        },
+        "level": "low_overhead",
+        "python_allocation_peak": {
+          "method": "tracemalloc.get_traced_memory:v1",
+          "precision": "unknown",
+          "scope": "process",
+          "unavailable_reason": "representative allocation profiling disabled",
+          "unit": "bytes",
+          "value": null
+        },
+        "raw_context": {
+          "rss_normalized_unit": "bytes",
+          "rss_platform": "Linux",
+          "rss_raw_unit": "kilobytes",
+          "rss_raw_value": 50688
+        },
+        "runtime": {
+          "backend_device_memory": {
+            "method": "not_applicable",
+            "precision": "unknown",
+            "scope": "backend",
+            "unavailable_reason": "CPU execution",
+            "unit": "bytes",
+            "value": null
+          },
+          "backend_device_time": {
+            "method": "not_applicable",
+            "precision": "unknown",
+            "scope": "backend",
+            "unavailable_reason": "CPU execution",
+            "unit": "ns",
+            "value": null
+          },
+          "concurrency": {
+            "method": "threading.active_count:v1",
+            "precision": "instantaneous",
+            "scope": "process",
+            "unavailable_reason": null,
+            "unit": "threads",
+            "value": 1
+          },
+          "machine_environment": {
+            "method": "profile_adapter:v1",
+            "precision": "declared",
+            "scope": "host",
+            "unavailable_reason": null,
+            "unit": "identity",
+            "value": "local-stdlib-cpu"
+          },
+          "peak_host_memory": {
+            "method": "resource.getrusage:RUSAGE_SELF:ru_maxrss:v1",
+            "precision": "platform-qualified peak",
+            "scope": "process",
+            "unavailable_reason": null,
+            "unit": "bytes",
+            "value": 51904512
+          },
+          "process_cpu_time": {
+            "method": "time.process_time_ns:v1",
+            "precision": "1 ns",
+            "scope": "process",
+            "unavailable_reason": null,
+            "unit": "ns",
+            "value": 134812110
+          },
+          "wall_time": {
+            "method": "time.perf_counter_ns:v1",
+            "precision": "1 ns",
+            "scope": "process",
+            "unavailable_reason": null,
+            "unit": "ns",
+            "value": 135468107
+          }
+        }
+      },
+      "qualified_iterations": {
+        "atomic_unit": "one_variable_belief_then_incident_v2c",
+        "count": 1,
+        "schedule": "variable_node_serial"
+      },
+      "relation": "pilot_adaptation",
+      "run_id": "phase3-hgp-gallager-vn",
+      "sample_identity": "5f8c0bf8db5dc59a42606c4c67f45d33a936d12ee9eb7e1c354aa84aaf0416d0",
+      "schedule_terminal": {
+        "budget_views": [
+          {
+            "configured_limit": 1000,
+            "decode_runtime": {
+              "method": "time.perf_counter_ns:profile-minus-setup:v1",
+              "precision": "1 ns",
+              "scope": "canonical_decode_attempt",
+              "unavailable_reason": null,
+              "unit": "ns",
+              "value": 133144439
+            },
+            "kind": "common_check_to_variable_cap",
+            "qualified_iteration": null,
+            "setup_runtime": {
+              "method": "time.perf_counter_ns:v1",
+              "precision": "1 ns",
+              "scope": "canonical_setup",
+              "unavailable_reason": null,
+              "unit": "ns",
+              "value": 15559265
+            },
+            "work_vector": {
+              "belief_assemblies": 1,
+              "bp_calls": 1,
+              "branch_expansions": 0,
+              "branch_prunes": 0,
+              "candidate_checks": 1,
+              "candidate_constructions": 1,
+              "check_to_variable_updates": 0,
+              "convergence_checks": 1,
+              "fallback_calls": 0,
+              "intervention_actions": 0,
+              "order_generation": 0,
+              "order_selection": 0,
+              "priority_maintenance": 0,
+              "relay_transfers": 0,
+              "residual_differences": 0,
+              "residual_precomputations": 0,
+              "residual_priority_evaluations": 0,
+              "variable_to_check_updates": 3
+            }
+          },
+          {
+            "configured_limit": 1,
+            "decode_runtime": {
+              "method": "time.perf_counter_ns:profile-minus-setup:v1",
+              "precision": "1 ns",
+              "scope": "canonical_decode_attempt",
+              "unavailable_reason": null,
+              "unit": "ns",
+              "value": 133144439
+            },
+            "kind": "schedule_qualified_iteration_limit",
+            "qualified_iteration": {
+              "atomic_unit": "one_variable_belief_then_incident_v2c",
+              "count": 1,
+              "schedule": "variable_node_serial"
+            },
+            "setup_runtime": {
+              "method": "time.perf_counter_ns:v1",
+              "precision": "1 ns",
+              "scope": "canonical_setup",
+              "unavailable_reason": null,
+              "unit": "ns",
+              "value": 15559265
+            },
+            "work_vector": {
+              "belief_assemblies": 1,
+              "bp_calls": 1,
+              "branch_expansions": 0,
+              "branch_prunes": 0,
+              "candidate_checks": 1,
+              "candidate_constructions": 1,
+              "check_to_variable_updates": 0,
+              "convergence_checks": 1,
+              "fallback_calls": 0,
+              "intervention_actions": 0,
+              "order_generation": 0,
+              "order_selection": 0,
+              "priority_maintenance": 0,
+              "relay_transfers": 0,
+              "residual_differences": 0,
+              "residual_precomputations": 0,
+              "residual_priority_evaluations": 0,
+              "variable_to_check_updates": 3
+            }
+          }
+        ],
+        "completed_traversals": 0,
+        "decode_runtime": {
+          "method": "time.perf_counter_ns:profile-minus-setup:v1",
+          "precision": "1 ns",
+          "scope": "canonical_decode_attempt",
+          "unavailable_reason": null,
+          "unit": "ns",
+          "value": 133144439
+        },
+        "local_cursor": [
+          1
+        ],
+        "schedule": "variable_node_serial",
+        "setup_runtime": {
+          "method": "time.perf_counter_ns:v1",
+          "precision": "1 ns",
+          "scope": "canonical_setup",
+          "unavailable_reason": null,
+          "unit": "ns",
+          "value": 15559265
+        },
+        "source_iteration": {
+          "atomic_unit": "one_variable_belief_then_incident_v2c",
+          "count": 1,
+          "schedule": "variable_node_serial"
+        },
+        "stopping_adaptation": "D-09 after serial node local unit",
+        "structural_event_version": 3,
+        "work_vector": {
+          "belief_assemblies": 1,
+          "bp_calls": 1,
+          "branch_expansions": 0,
+          "branch_prunes": 0,
+          "candidate_checks": 1,
+          "candidate_constructions": 1,
+          "check_to_variable_updates": 0,
+          "convergence_checks": 1,
+          "fallback_calls": 0,
+          "intervention_actions": 0,
+          "order_generation": 0,
+          "order_selection": 0,
+          "priority_maintenance": 0,
+          "relay_transfers": 0,
+          "residual_differences": 0,
+          "residual_precomputations": 0,
+          "residual_priority_evaluations": 0,
+          "variable_to_check_updates": 3
+        }
+      },
+      "setup_runtime": {
+        "method": "time.perf_counter_ns:v1",
+        "precision": "1 ns",
+        "scope": "canonical_setup",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 15559265
+      },
+      "shot_id": 0,
+      "termination": "max_iterations",
+      "work_vector": {
+        "belief_assemblies": 1,
+        "bp_calls": 1,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 1,
+        "check_to_variable_updates": 0,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 0,
+        "variable_to_check_updates": 3
+      }
+    },
+    {
+      "artifact_raw_sha256": "b31c99a754fb377acfb5e2cb2edc2cb7e55c4d1e78feb4aa84c171c051a78c44",
+      "artifact_semantic_sha256": "272c9498396167424bc4279d96b5ad2d6e11cebc7f01de597716a1cd2c01d668",
+      "assessment_status": "not_assessed",
+      "budget_views": {
+        "budget_scope": "shot",
+        "common_c2v_cap": 1000,
+        "equal_total_cost_claim": false,
+        "qualified_iteration_limit": 1
+      },
+      "canonical_identity": "sha256:ca9e60fc7445b04a4ccd77911753bcf55163001339d7fa910f82d6c1dc42fc2f",
+      "code_id": "hgp-gallager-3-4-seed-20260923",
+      "composition_identity": "614ee1bd9e864602397fc0ee2ce287b8d500046dccbd57469991720cf02a477b",
+      "converged": false,
+      "decode_runtime": {
+        "method": "time.perf_counter_ns:profile-minus-setup:v1",
+        "precision": "1 ns",
+        "scope": "canonical_decode_attempt",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 138426011
+      },
+      "matrix_hashes": {
+        "hx_raw_sha256": "2497f0f59cdb7cf0787e601295e5d118d6cad2e62cc2226a88a47ccf2b034dfb",
+        "hx_semantic_sha256": "0edcbfaab182df09cdfe0a0adf6cf394e167896c540483d52b95217963c8664d",
+        "hz_raw_sha256": "002e894daec7f5e56d17f8bca28ad11dacfd2df236d1a18e031564d6d18727f4",
+        "hz_semantic_sha256": "45b088f719effe4389e9c96a67bcc49100beeb447b38d4ef4dbf51087c96bdfe",
+        "lx_raw_sha256": "c53605ad73244da3b9352a269333484e307055036bc5f1c428727ec9a9ce0b8b",
+        "lx_semantic_sha256": "3db83ea36085e780c1c7c8b409909cb8873b451bdc7ed1747bee066a0e93c0f7",
+        "lz_raw_sha256": "09cd80917934c1665921c09e027ebb51cc02014da6f51f3ca34f7a4001eb60f6",
+        "lz_semantic_sha256": "2dc6a64b64568bb5b88f09537ced7369baf535e377f33209f33aa38299734d87"
+      },
+      "outcome": null,
+      "policy_effects": {
+        "intervention": {
+          "binding_id": "intervention-identity-v1",
+          "effect": "identity_only"
+        },
+        "postprocessing": {
+          "binding_id": "postprocessing-identity-v1",
+          "effect": "identity_only"
+        },
+        "schedule": {
+          "binding_id": "schedule-randomized-v1",
+          "effect": "active"
+        },
+        "selection": {
+          "binding_id": "selection-stable-first-v1",
+          "effect": "active"
+        },
+        "state_memory": {
+          "binding_id": "state-memory-stateless-v1",
+          "effect": "identity_only"
+        },
+        "stopping": {
+          "binding_id": "stopping-syndrome-budget-v1",
+          "effect": "active"
+        },
+        "update": {
+          "binding_id": "update-binary-spa-v1",
+          "effect": "active"
+        }
+      },
+      "profile": {
+        "adapter_overhead": {
+          "method": "profiling_adapter_empty_call:v1",
+          "precision": "1 ns",
+          "scope": "process",
+          "unavailable_reason": null,
+          "unit": "ns",
+          "value": 45132
+        },
+        "enabled": true,
+        "environment": {
+          "OMP_NUM_THREADS": "1"
+        },
+        "level": "low_overhead",
+        "python_allocation_peak": {
+          "method": "tracemalloc.get_traced_memory:v1",
+          "precision": "unknown",
+          "scope": "process",
+          "unavailable_reason": "representative allocation profiling disabled",
+          "unit": "bytes",
+          "value": null
+        },
+        "raw_context": {
+          "rss_normalized_unit": "bytes",
+          "rss_platform": "Linux",
+          "rss_raw_unit": "kilobytes",
+          "rss_raw_value": 51456
+        },
+        "runtime": {
+          "backend_device_memory": {
+            "method": "not_applicable",
+            "precision": "unknown",
+            "scope": "backend",
+            "unavailable_reason": "CPU execution",
+            "unit": "bytes",
+            "value": null
+          },
+          "backend_device_time": {
+            "method": "not_applicable",
+            "precision": "unknown",
+            "scope": "backend",
+            "unavailable_reason": "CPU execution",
+            "unit": "ns",
+            "value": null
+          },
+          "concurrency": {
+            "method": "threading.active_count:v1",
+            "precision": "instantaneous",
+            "scope": "process",
+            "unavailable_reason": null,
+            "unit": "threads",
+            "value": 1
+          },
+          "machine_environment": {
+            "method": "profile_adapter:v1",
+            "precision": "declared",
+            "scope": "host",
+            "unavailable_reason": null,
+            "unit": "identity",
+            "value": "local-stdlib-cpu"
+          },
+          "peak_host_memory": {
+            "method": "resource.getrusage:RUSAGE_SELF:ru_maxrss:v1",
+            "precision": "platform-qualified peak",
+            "scope": "process",
+            "unavailable_reason": null,
+            "unit": "bytes",
+            "value": 52690944
+          },
+          "process_cpu_time": {
+            "method": "time.process_time_ns:v1",
+            "precision": "1 ns",
+            "scope": "process",
+            "unavailable_reason": null,
+            "unit": "ns",
+            "value": 140182636
+          },
+          "wall_time": {
+            "method": "time.perf_counter_ns:v1",
+            "precision": "1 ns",
+            "scope": "process",
+            "unavailable_reason": null,
+            "unit": "ns",
+            "value": 140881903
           }
         }
       },
@@ -21046,22 +21294,22 @@
           {
             "configured_limit": 1000,
             "decode_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "decode",
-              "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
+              "method": "time.perf_counter_ns:profile-minus-setup:v1",
+              "precision": "1 ns",
+              "scope": "canonical_decode_attempt",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 138426011
             },
             "kind": "common_check_to_variable_cap",
             "qualified_iteration": null,
             "setup_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "schedule_setup",
-              "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
+              "method": "time.perf_counter_ns:v1",
+              "precision": "1 ns",
+              "scope": "canonical_setup",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 9162203
             },
             "work_vector": {
               "belief_assemblies": 225,
@@ -21087,12 +21335,12 @@
           {
             "configured_limit": 1,
             "decode_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "decode",
-              "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
+              "method": "time.perf_counter_ns:profile-minus-setup:v1",
+              "precision": "1 ns",
+              "scope": "canonical_decode_attempt",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 138426011
             },
             "kind": "schedule_qualified_iteration_limit",
             "qualified_iteration": {
@@ -21101,12 +21349,12 @@
               "schedule": "randomized"
             },
             "setup_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "schedule_setup",
-              "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
+              "method": "time.perf_counter_ns:v1",
+              "precision": "1 ns",
+              "scope": "canonical_setup",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 9162203
             },
             "work_vector": {
               "belief_assemblies": 225,
@@ -21132,24 +21380,24 @@
         ],
         "completed_traversals": 0,
         "decode_runtime": {
-          "method": "not_measured",
-          "precision": "unknown",
-          "scope": "decode",
-          "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
+          "method": "time.perf_counter_ns:profile-minus-setup:v1",
+          "precision": "1 ns",
+          "scope": "canonical_decode_attempt",
+          "unavailable_reason": null,
           "unit": "ns",
-          "value": null
+          "value": 138426011
         },
         "local_cursor": [
           1
         ],
         "schedule": "randomized",
         "setup_runtime": {
-          "method": "not_measured",
-          "precision": "unknown",
-          "scope": "schedule_setup",
-          "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
+          "method": "time.perf_counter_ns:v1",
+          "precision": "1 ns",
+          "scope": "canonical_setup",
+          "unavailable_reason": null,
           "unit": "ns",
-          "value": null
+          "value": 9162203
         },
         "source_iteration": {
           "atomic_unit": "one_layer",
@@ -21178,6 +21426,14 @@
           "residual_priority_evaluations": 0,
           "variable_to_check_updates": 24
         }
+      },
+      "setup_runtime": {
+        "method": "time.perf_counter_ns:v1",
+        "precision": "1 ns",
+        "scope": "canonical_setup",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 9162203
       },
       "shot_id": 0,
       "termination": "max_iterations",
@@ -21209,6 +21465,14 @@
       "code_id": "hgp-gallager-3-4-seed-20260923",
       "composition_identity": "fad99d4c3c1f5582ca1c9121e5244e2bcd1563dfb9caaab09424e8bbdd37e9f4",
       "converged": false,
+      "decode_runtime": {
+        "method": "time.perf_counter_ns:profile-minus-setup:v1",
+        "precision": "1 ns",
+        "scope": "canonical_decode_attempt",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 20350131
+      },
       "matrix_hashes": {
         "hx_raw_sha256": "2497f0f59cdb7cf0787e601295e5d118d6cad2e62cc2226a88a47ccf2b034dfb",
         "hx_semantic_sha256": "0edcbfaab182df09cdfe0a0adf6cf394e167896c540483d52b95217963c8664d",
@@ -21257,7 +21521,7 @@
           "scope": "process",
           "unavailable_reason": null,
           "unit": "ns",
-          "value": 44055
+          "value": 44260
         },
         "enabled": true,
         "environment": {
@@ -21276,7 +21540,7 @@
           "rss_normalized_unit": "bytes",
           "rss_platform": "Linux",
           "rss_raw_unit": "kilobytes",
-          "rss_raw_value": 49920
+          "rss_raw_value": 50688
         },
         "runtime": {
           "backend_device_memory": {
@@ -21317,7 +21581,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "bytes",
-            "value": 51118080
+            "value": 51904512
           },
           "process_cpu_time": {
             "method": "time.process_time_ns:v1",
@@ -21325,7 +21589,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 22865295
+            "value": 22473496
           },
           "wall_time": {
             "method": "time.perf_counter_ns:v1",
@@ -21333,7 +21597,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 22970575
+            "value": 22594323
           }
         }
       },
@@ -21350,22 +21614,22 @@
           {
             "configured_limit": 1000,
             "decode_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "decode",
-              "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
+              "method": "time.perf_counter_ns:profile-minus-setup:v1",
+              "precision": "1 ns",
+              "scope": "canonical_decode_attempt",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 20350131
             },
             "kind": "common_check_to_variable_cap",
             "qualified_iteration": null,
             "setup_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "schedule_setup",
-              "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
+              "method": "time.perf_counter_ns:v1",
+              "precision": "1 ns",
+              "scope": "canonical_setup",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 21751374
             },
             "work_vector": {
               "belief_assemblies": 225,
@@ -21391,12 +21655,12 @@
           {
             "configured_limit": 1,
             "decode_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "decode",
-              "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
+              "method": "time.perf_counter_ns:profile-minus-setup:v1",
+              "precision": "1 ns",
+              "scope": "canonical_decode_attempt",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 20350131
             },
             "kind": "schedule_qualified_iteration_limit",
             "qualified_iteration": {
@@ -21405,12 +21669,12 @@
               "schedule": "residual"
             },
             "setup_runtime": {
-              "method": "not_measured",
-              "precision": "unknown",
-              "scope": "schedule_setup",
-              "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
+              "method": "time.perf_counter_ns:v1",
+              "precision": "1 ns",
+              "scope": "canonical_setup",
+              "unavailable_reason": null,
               "unit": "ns",
-              "value": null
+              "value": 21751374
             },
             "work_vector": {
               "belief_assemblies": 225,
@@ -21436,24 +21700,24 @@
         ],
         "completed_traversals": 0,
         "decode_runtime": {
-          "method": "not_measured",
-          "precision": "unknown",
-          "scope": "decode",
-          "unavailable_reason": "runtime profiling is retained separately as same-ledger observational evidence",
+          "method": "time.perf_counter_ns:profile-minus-setup:v1",
+          "precision": "1 ns",
+          "scope": "canonical_decode_attempt",
+          "unavailable_reason": null,
           "unit": "ns",
-          "value": null
+          "value": 20350131
         },
         "local_cursor": [
           1
         ],
         "schedule": "residual",
         "setup_runtime": {
-          "method": "not_measured",
-          "precision": "unknown",
-          "scope": "schedule_setup",
-          "unavailable_reason": "public tracer does not separately time deterministic schedule construction",
+          "method": "time.perf_counter_ns:v1",
+          "precision": "1 ns",
+          "scope": "canonical_setup",
+          "unavailable_reason": null,
           "unit": "ns",
-          "value": null
+          "value": 21751374
         },
         "source_iteration": {
           "atomic_unit": "one_residual_selected_c2v_commit",
@@ -21482,6 +21746,14 @@
           "residual_priority_evaluations": 2291,
           "variable_to_check_updates": 2
         }
+      },
+      "setup_runtime": {
+        "method": "time.perf_counter_ns:v1",
+        "precision": "1 ns",
+        "scope": "canonical_setup",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 21751374
       },
       "shot_id": 0,
       "termination": "max_iterations",
@@ -21513,6 +21785,14 @@
       "code_id": "hgp-gallager-3-4-seed-20260923",
       "composition_identity": "6c2534e1f84e3985302a312aace42c6edc7eeab0457989a27612c58ddd0bcd71",
       "converged": false,
+      "decode_runtime": {
+        "method": "time.perf_counter_ns:profile-minus-setup:v1",
+        "precision": "1 ns",
+        "scope": "canonical_decode_attempt",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 24571964
+      },
       "matrix_hashes": {
         "hx_raw_sha256": "2497f0f59cdb7cf0787e601295e5d118d6cad2e62cc2226a88a47ccf2b034dfb",
         "hx_semantic_sha256": "0edcbfaab182df09cdfe0a0adf6cf394e167896c540483d52b95217963c8664d",
@@ -22437,7 +22717,7 @@
           "scope": "process",
           "unavailable_reason": null,
           "unit": "ns",
-          "value": 40371
+          "value": 46027
         },
         "enabled": true,
         "environment": {
@@ -22456,7 +22736,7 @@
           "rss_normalized_unit": "bytes",
           "rss_platform": "Linux",
           "rss_raw_unit": "kilobytes",
-          "rss_raw_value": 51456
+          "rss_raw_value": 50688
         },
         "runtime": {
           "backend_device_memory": {
@@ -22497,7 +22777,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "bytes",
-            "value": 52690944
+            "value": 51904512
           },
           "process_cpu_time": {
             "method": "time.process_time_ns:v1",
@@ -22505,7 +22785,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 30459604
+            "value": 30259510
           },
           "wall_time": {
             "method": "time.perf_counter_ns:v1",
@@ -22513,7 +22793,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 30615063
+            "value": 30499274
           }
         }
       },
@@ -22525,6 +22805,14 @@
       "run_id": "phase3-hgp-gallager-nms-check",
       "sample_identity": "5f8c0bf8db5dc59a42606c4c67f45d33a936d12ee9eb7e1c354aa84aaf0416d0",
       "schedule_terminal": null,
+      "setup_runtime": {
+        "method": "time.perf_counter_ns:v1",
+        "precision": "1 ns",
+        "scope": "canonical_setup",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 5927310
+      },
       "shot_id": 0,
       "termination": "max_iterations",
       "work_vector": {
@@ -22555,6 +22843,14 @@
       "code_id": "hgp-gallager-3-4-seed-20260923",
       "composition_identity": "6c2534e1f84e3985302a312aace42c6edc7eeab0457989a27612c58ddd0bcd71",
       "converged": false,
+      "decode_runtime": {
+        "method": "time.perf_counter_ns:profile-minus-setup:v1",
+        "precision": "1 ns",
+        "scope": "canonical_decode_attempt",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 24118602
+      },
       "matrix_hashes": {
         "hx_raw_sha256": "2497f0f59cdb7cf0787e601295e5d118d6cad2e62cc2226a88a47ccf2b034dfb",
         "hx_semantic_sha256": "0edcbfaab182df09cdfe0a0adf6cf394e167896c540483d52b95217963c8664d",
@@ -23610,7 +23906,7 @@
           "scope": "process",
           "unavailable_reason": null,
           "unit": "ns",
-          "value": 47054
+          "value": 44012
         },
         "enabled": true,
         "environment": {
@@ -23629,7 +23925,7 @@
           "rss_normalized_unit": "bytes",
           "rss_platform": "Linux",
           "rss_raw_unit": "kilobytes",
-          "rss_raw_value": 50688
+          "rss_raw_value": 51456
         },
         "runtime": {
           "backend_device_memory": {
@@ -23670,7 +23966,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "bytes",
-            "value": 51904512
+            "value": 52690944
           },
           "process_cpu_time": {
             "method": "time.process_time_ns:v1",
@@ -23678,7 +23974,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 31110211
+            "value": 30454460
           },
           "wall_time": {
             "method": "time.perf_counter_ns:v1",
@@ -23686,7 +23982,7 @@
             "scope": "process",
             "unavailable_reason": null,
             "unit": "ns",
-            "value": 31283805
+            "value": 30680937
           }
         }
       },
@@ -23698,6 +23994,14 @@
       "run_id": "phase3-hgp-gallager-nms-seeded",
       "sample_identity": "5f8c0bf8db5dc59a42606c4c67f45d33a936d12ee9eb7e1c354aa84aaf0416d0",
       "schedule_terminal": null,
+      "setup_runtime": {
+        "method": "time.perf_counter_ns:v1",
+        "precision": "1 ns",
+        "scope": "canonical_setup",
+        "unavailable_reason": null,
+        "unit": "ns",
+        "value": 6562335
+      },
       "shot_id": 0,
       "termination": "max_iterations",
       "work_vector": {

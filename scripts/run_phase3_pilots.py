@@ -117,7 +117,9 @@ def _terminal_summary(events: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
             "outcome": data.get("outcome"), "converged": data.get("converged"),
             "qualified_iterations": data.get("schedule_terminal", {}).get("source_iteration", {"count": data.get("iterations", 0), "schedule": "flooding"}),
             "work_vector": data["work_vector"], "schedule_terminal": data.get("schedule_terminal"),
-            "profile": data.get("profile"), "policy_effects": data["policy_effects"],
+            "profile": data.get("profile"),
+            "setup_runtime": data["setup_runtime"], "decode_runtime": data["decode_runtime"],
+            "policy_effects": data["policy_effects"],
         })
     return terminals
 

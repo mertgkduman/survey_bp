@@ -404,6 +404,8 @@ def verify_run(output: str | Path) -> dict[str, Any]:
                     "work_vector": data["work_vector"],
                     "schedule_terminal": data.get("schedule_terminal"),
                     "profile": data.get("profile"),
+                    "setup_runtime": data["setup_runtime"],
+                    "decode_runtime": data["decode_runtime"],
                     "policy_effects": data["policy_effects"],
                     "matrix_hashes": manifest["artifact"]["matrix_hashes"],
                     "budget_views": {

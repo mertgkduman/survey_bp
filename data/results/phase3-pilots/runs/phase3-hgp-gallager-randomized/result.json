@@ -7,7 +7,7 @@
   "final_row_count": 1,
   "fixture": "pilot_adaptation",
   "ledger_path": "data/results/phase3-pilots/runs/phase3-hgp-gallager-randomized/events.jsonl",
-  "ledger_sha256": "a2f19c12f6f8d73796ba103d06c58eb0e8a844e57333d538844a8c252871061e",
+  "ledger_sha256": "76b573930362d9e3e12d5bb1dc392689c6883c26d5c53e00608c2b7c368980bd",
   "manifest_path": "data/results/phase3-pilots/manifests/phase3-hgp-gallager-randomized.json",
   "manifest_sha256": "b37facfd92b523784a791e248bec2c88096a0e673cf7f4170730b09e11442363",
   "policy_identity": "614ee1bd9e864602397fc0ee2ce287b8d500046dccbd57469991720cf02a477b",
