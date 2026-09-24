@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_relay.py -k tracer",
+  "exitCode": 1,
+  "targetTest": "test_tracer_two_leg_relay_is_public_truth_blind_and_transfers_only_posterior",
+  "targetFile": "tests/canonical/test_relay.py",
+  "output": "ImportError: cannot import name 'CanonicalManifestV4' from bp_registry.canonical.contracts",
+  "expected": "The public structural path accepts a strict two-leg Relay manifest and emits a posterior transfer.",
+  "actual": "The target test failed because CanonicalManifestV4 has not been implemented."
+}
