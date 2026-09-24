@@ -2,7 +2,7 @@
 phase: "02"
 slug: "canonical-css-execution-and-policy-contracts"
 status: open_threats
-threats_open: 2
+threats_open: 1
 asvs_level: 1
 block_on: high
 audited: "2026-09-23"
@@ -13,14 +13,14 @@ audited: "2026-09-23"
 ## OPEN_THREATS
 
 **Phase:** 02 — Canonical CSS Execution and Policy Contracts
-**Closed:** 44/46 | **Open:** 2/46
+**Closed:** 45/46 | **Open:** 1/46
 **ASVS Level:** 1 | **Block threshold:** high
 
 This update rechecks the six findings left open by the prior audit after
 Plan 02-13. All twelve Phase 2 plan-time threat models remain represented in
-the register. Four final public replay/profiling findings are closed, but two
-structural-provenance findings remain open because rehashed non-wall-time
-profile metadata is accepted by `verify-run`.
+the register. Wave 12 closes the rehashed profile-metadata bypass, but one
+structural-provenance finding remains open because several completed-path
+scientific facts are schema-required without being independently checked.
 
 ## Threat Verification
 
@@ -56,7 +56,7 @@ profile metadata is accepted by `verify-run`.
 | T-02-28 | Denial of service | medium | mitigate | closed | Canonical preflight rejects every public profile plan except `clean`/`low_overhead` before sampling, ledger creation, or kernel work at `src/bp_registry/manifests.py:529`; representative and non-clean variants are proven ledger-free in `tests/test_canonical_cli.py:314`. |
 | T-02-29 | Tampering / Information disclosure | high | mitigate | closed | The public identity binds resolved raw and semantic artifact hashes at `src/bp_registry/canonical/verification.py:35`, and every persisted structural event must match the current preflighted identity at `:179`; preflight resolves and verifies the artifact before sampling at `src/bp_registry/manifests.py:529`. |
 | T-02-30 | Information disclosure | high | mitigate | closed | Runner samples outside the engine at `src/bp_registry/runner.py:171`; the engine evaluates only after frozen selection at `src/bp_registry/canonical/execution.py:469`; integration coverage at `tests/test_canonical_cli.py:235`. |
-| T-02-31 | Tampering / Repudiation | high | mitigate | **open — blocking** | `verify-run` does invoke semantic reconstruction (`src/bp_registry/cli.py:275`), but its profile control is incomplete. `ProfileMeasurement.from_evidence` requires only the wall-time method (`src/bp_registry/canonical/profiling.py:105`); the underlying `Measurement` accepts arbitrary nonempty method/scope/unit/precision values (`src/bp_registry/canonical/budgets.py:90`). An adversarial edit of both runtime and terminal `process_cpu_time.method`, with every event ID and `ledger_sha256` recomputed, is accepted by `verify-run`. |
+| T-02-31 | Tampering / Repudiation | high | mitigate | closed | `verify-run` now invokes the strict clean/low-overhead producer contract at `src/bp_registry/canonical/verification.py:169`. It constrains every enabled or disabled measurement family’s method, scope, unit, precision, availability, and value domain at `src/bp_registry/canonical/profiling.py:126`. The rehashed `process_cpu_time.method` bypass now rejects; all nine metric-family mutations are covered at `tests/test_canonical_cli.py:301`. |
 | T-02-32 | Denial of service | high | mitigate | closed | Matrix/record/byte/count limits are validated in `src/bp_registry/artifacts.py:16`, `src/bp_registry/manifests.py:252`, and atomic reservations in `src/bp_registry/canonical/execution.py:415`; public cap test at `tests/canonical/test_budgets.py:160`. |
 | T-02-33 | Spoofing / Repudiation | high | mitigate | closed | Evidence-maturity and no-promotion documentation contracts are checked at `tests/canonical/test_policy_evidence.py:33`; checked evidence labels are verified in `tests/test_canonical_cli.py:180`. |
 | T-02-34 | Tampering | medium | mitigate | closed | The documented preflight/canonical/reconcile/verify commands execute in `tests/test_canonical_cli.py:20`, including resolved semantic profile and policy identity assertions. |
@@ -70,15 +70,14 @@ profile metadata is accepted by `verify-run`.
 | T-02-11-03 | Elevation of privilege | high | mitigate | closed | Engine requires the current `WorkingProblem` object and recomputes candidate ID from current working/attempt ancestry before evaluation at `src/bp_registry/canonical/execution.py:243`; hostile selector test at `tests/canonical/test_truth_boundary.py:84`. Shared checked-shot candidate IDs are safe semantic content IDs: durable event identity and writer ownership remain scoped to `(run_id, shot_id)` at `src/bp_registry/ledger.py:489`. |
 | T-02-12-01 | Tampering | medium | mitigate | closed | Enabled profile controls materialize in `src/bp_registry/canonical/execution.py:455`; unsupported trace levels fail before a ledger at `src/bp_registry/manifests.py:529`; public tests at `tests/test_canonical_cli.py:102` and `:132`. |
 | T-02-12-02 | Denial of service | medium | mitigate | closed | Profiler-owned `tracemalloc` cleanup is in the outer `finally` at `src/bp_registry/canonical/profiling.py:411`; exceptional cleanup tests at `tests/canonical/test_profiling.py:88` and `:106`. |
-| T-02-12-03 | Repudiation | high | mitigate | **open — blocking** | The validator does enforce ordered stream grammar, numerical-failure qualification, and trace-off at `src/bp_registry/canonical/verification.py:159`, but it does not validate the full typed profile contract claimed by the mitigation. The same rehashed `process_cpu_time.method` tamper accepted by `verify-run` changes a persisted structural provenance fact without detection; therefore the checked-result structural sequence is not fully validated. |
+| T-02-12-03 | Repudiation | high | mitigate | **open — blocking** | Wave 12 adds exact event envelopes/field sets and validates numerical, budget, iteration, and profile evidence at `src/bp_registry/canonical/verification.py:209`. But the completed path never checks that terminal `converged` is true, terminal/selection `selection_status` has the required value, or candidate-event `attempt_lineage_id` equals the reconstructed current attempt (`:301`). It also accepts a uniformly rehashed forged `code_id`, because baseline-only common fields are not compared to trusted context (`:188`). Each falsification is accepted by `verify-run` after recomputing event IDs and `ledger_sha256`. |
 | T-02-12-04 | Information disclosure | medium | mitigate | closed | Typed profile environment evidence rejects non-allowlisted fields at `src/bp_registry/canonical/profiling.py:78` and only gathers allowlisted thread variables at `:304`. |
 
 ## Open (blocking — severity at or above high)
 
 | Threat ID | Severity | Missing mitigation | Files searched |
 |---|---|---|---|
-| T-02-31 | high | Public verification does not constrain all profile measurement method/scope/unit/precision fields to the admitted local profiler contract. Rehashed non-wall-time profile metadata verifies. | `src/bp_registry/canonical/profiling.py`, `src/bp_registry/canonical/budgets.py`, `src/bp_registry/canonical/verification.py`, `src/bp_registry/cli.py`, `tests/test_canonical_cli.py` |
-| T-02-12-03 | high | The required full structural provenance grammar remains incomplete because typed profile facts can be altered and rehashed without rejection. | `src/bp_registry/canonical/profiling.py`, `src/bp_registry/canonical/verification.py`, `src/bp_registry/cli.py`, `data/results/canonical-three-qubit-development` |
+| T-02-12-03 | high | Completed-path schema checks omit semantic assertions for `converged`, selection statuses, candidate-event attempt lineage, and trusted provenance fields such as `code_id`; fully rehashed falsifications verify. | `src/bp_registry/canonical/verification.py`, `src/bp_registry/runner.py`, `src/bp_registry/cli.py`, `tests/test_canonical_cli.py` |
 
 ## Accepted Risks Log
 
@@ -93,10 +92,10 @@ None. No Phase 2 summary contains a `## Threat Flags` entry.
 
 ## Verification Evidence
 
-- `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_canonical_cli.py::test_public_replay_rejects_same_run_changed_full_manifest_before_result tests/test_canonical_cli.py::test_public_execution_identity_binds_manifest_code_sample_and_shot tests/test_canonical_cli.py::test_verify_run_rejects_rehashed_work_and_policy_tampering tests/test_canonical_cli.py::test_verify_run_rejects_rehashed_structural_provenance_tampering tests/test_canonical_cli.py::test_verify_run_rederives_budget_and_numerical_terminal_semantics tests/test_canonical_cli.py::test_public_preflight_rejects_unbounded_profile_cohorts_before_ledger` — **12 passed**.
+- `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_canonical_cli.py::test_verify_run_rejects_rehashed_numerical_failure_claim_matrix tests/test_canonical_cli.py::test_verify_run_rejects_rehashed_budget_and_iteration_claim_matrix tests/test_canonical_cli.py::test_verify_run_rejects_rehashed_public_profile_contract_matrix tests/test_canonical_cli.py::test_verify_run_enforces_exact_terminal_event_grammar tests/test_canonical_cli.py::test_verify_run_accepts_exact_completed_denied_maximum_and_numerical_grammars tests/test_canonical_cli.py::test_verify_run_accepts_nondeterministic_profile_values_without_replay_equality` — **16 passed**.
 - `OMP_NUM_THREADS=1 .venv/bin/python -m bp_registry.cli verify-run data/results/canonical-three-qubit-development` — **2 checked terminal rows semantically verified** against the present preflighted manifest and artifact.
-- `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q` — **157 passed**.
-- Adversarial temporary output: changing both runtime and terminal `profile.runtime.process_cpu_time.method` to `attacker-controlled-method`, recomputing every canonical `event_id` and `result.json` `ledger_sha256`, then running `verify-run` — **incorrectly accepted**. This is the blocking evidence above; checked artifacts were not modified.
+- Wave 12 completion evidence records `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q` — **173 passed**.
+- Adversarial temporary outputs: a fully rehashed `process_cpu_time.method` now **rejects**, while fully rehashed completed-terminal `converged`, terminal/selection `selection_status`, candidate-event `attempt_lineage_id`, and uniform `code_id` falsifications are each **incorrectly accepted**. Checked artifacts were not modified.
 
 ## Security Audit Trail
 
@@ -105,5 +104,6 @@ None. No Phase 2 summary contains a `## Threat Flags` entry.
 | 2026-09-23 | 36 | 36 | 0 | 0 | Prior ASVS L1 audit (superseded; Plans 02-10–12 absent) |
 | 2026-09-23 | 46 | 40 | 5 | 1 | ASVS L1 re-audit after Plans 02-10–12 |
 | 2026-09-23 | 46 | 44 | 2 | 0 | ASVS L1 re-audit after Plan 02-13 / Wave 11 |
+| 2026-09-23 | 46 | 45 | 1 | 0 | ASVS L1 re-audit after Plan 02-14 / Wave 12 |
 
-**threats_open:** 2
+**threats_open:** 1
