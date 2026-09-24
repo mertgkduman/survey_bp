@@ -60,7 +60,7 @@ def test_layered_schedule_commits_one_conflict_free_layer_before_later_layer_rea
     # layer 2 is required to observe layer 1's committed V2C values.
     replay_messages = original.copy()
     standalone = schedule.execute_local_step(
-        CanonicalLocalStepExecutor(_layer_api()[0](limits=(), parents={}), scope="replay"),
+        type(executor)(_layer_api()[0](limits=(), parents={}), scope="replay"),
         replay_messages,
         syndrome,
         error_rate=0.2,
