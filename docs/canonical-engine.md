@@ -137,6 +137,16 @@ finite saturation:
 m^{\mathrm{NMS}}_{c\to v}=\alpha\,m_{c\to v}.
 \]
 
+Offset min-sum uses the same signed extrinsic minimum, but subtracts its
+explicit nonnegative beta in `float64`, floors the magnitude at zero, and only
+then applies the named finite saturation:
+
+\[
+m^{\mathrm{OMS}}_{c\to v}=\operatorname{sat}\left(
+(-1)^{s_c}\prod\operatorname{sign}(q_{u\to c})
+\max(0,\min|q_{u\to c}|-\beta)\right).
+\]
+
 The update policy's `parameter_assignment` accepts exactly one tagged shape:
 `{"shape":"scalar","value":alpha}`, a `source_iteration` `values` vector,
 or graph-bound `check` / canonical `edge` `values` with a matching
@@ -145,6 +155,23 @@ is a finite `float64` alpha with `alpha >= 0`; `0 < alpha <= 1` is labelled
 `conventional`, while larger finite alpha is explicitly `exploratory`, never a
 source-faithful preset. Resolved values and this provenance are retained in
 terminal `policy_effects` and independently reconstructed by `verify-run`.
+
+For either NMS or OMS, a V3 update may instead carry a closed
+`parameter_generator` plus `parameter_refresh` declaration. The only current
+generator is `numpy.PCG64` with a finite nonnegative uniform interval and a
+graph-bound scalar, check, or canonical-edge output. Its purpose is always
+`parameter_assignment`, separate from both `schedule_order` and physical
+sampling. Evidence retains the generator/version, distribution bounds,
+provenance, graph hash, derived seed identity, refresh scope, source-iteration
+boundary, and every resolved assignment. Refresh scopes are exactly
+`configuration`, `attempt`, and `source_iteration`: the latter is the
+schedule's recorded iteration boundary, never a layer/node/residual local-unit
+counter. The draw is admitted atomically before RNG advancement; an admission
+denial leaves both assignment state and RNG state unchanged.
+
+`source_defined` generation requires a source anchor. Arbitrary generated
+ranges are `exploratory`; no generated exploratory declaration can be relabeled
+as a source-faithful setting.
 
 To run the scalar NMS development variant in a disposable directory, derive a
 strict V3 manifest from the checked fixture, then use the same public commands:
