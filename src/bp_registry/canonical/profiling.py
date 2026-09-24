@@ -192,6 +192,9 @@ def validate_public_clean_low_overhead_evidence(value: Mapping[str, object]) -> 
             raise ValueError("profile raw RSS context is inconsistent")
         if raw["rss_raw_unit"] != ("kilobytes" if raw["rss_platform"] == "Linux" else "bytes"):
             raise ValueError("profile raw RSS unit is inconsistent")
+        normalized = raw["rss_raw_value"] * (1024 if raw["rss_platform"] == "Linux" else 1)
+        if rss.value != normalized:
+            raise ValueError("profile RSS normalization does not equal its raw source fact")
     return parsed
 
 
