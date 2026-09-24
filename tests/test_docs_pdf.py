@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 from pathlib import Path
+import stat
 import sys
 
 import pytest
@@ -37,6 +38,7 @@ def test_two_renders_are_identical_to_checked_snapshot_and_preserve_sources(rend
     renderer.build_pdf(first)
 
     assert first.read_bytes() == CHECKED_PDF.read_bytes()
+    assert stat.S_IMODE(first.stat().st_mode) == 0o644
     assert renderer.check_pdf(CHECKED_PDF)
     assert {path: hashlib.sha256(path.read_bytes()).hexdigest() for path in before} == before
 

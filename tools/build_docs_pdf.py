@@ -305,6 +305,9 @@ def build_pdf(
     temporary_path = _temporary_pdf_path(output_path)
     try:
         render_pdf(temporary_path, repository_root)
+        # mkstemp creates mode 0600; this checked-in documentation is meant to
+        # be readable by collaborators on the shared filesystem.
+        os.chmod(temporary_path, 0o644)
         os.replace(temporary_path, output_path)
     finally:
         temporary_path.unlink(missing_ok=True)
