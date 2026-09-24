@@ -540,23 +540,30 @@ All observations are from local probes on 2026-09-24 `[VERIFIED: local environme
 | A8 | Proposed module/test filenames are the cleanest integration shape. | Architecture/validation | Low: planner may map the same responsibilities differently. |
 | A9 | Local CLI has no authentication/session/access-control boundary. | Security | Low now; revisit if remote services are introduced. |
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+These questions have a resolved **planning disposition**, not a known empirical answer. The named execution plans must establish the answer before their dependent pilot work proceeds. If a gate cannot establish it, retain the failed or inconclusive evidence and block only the dependent work; do not invent a value or source claim.
 
 1. **What numerical profile is source-matched?**
    - What we know: author code exposes F32/F64/fixed variants; README demonstrates F32; paper does not declare precision/clipping. [CITED: https://github.com/trmue/relay/blob/14cb31a18f9b7d099791b793e35b8a2951f8f3/README.md#L65-L81]
    - Recommendation: compare native F32 and F64 on deterministic and bounded BB fixtures against existing `"cpu-float64-min-sum-v1"`; add a profile only if outcomes/posteriors materially diverge, and never call an unspecified precision paper-faithful. [ASSUMED]
+   - Planning disposition: Plan 04-08 Task 1 records the measured profile and effective overrides before matched native/canonical comparisons in Plan 04-10. The paper's undeclared precision remains explicitly unknown.
 2. **Which B1 semantic digest is authoritative?**
    - What we know: executable loader/manifest give `ea120002...`; inventory gives `ea120ce6...`. [VERIFIED: artifact audit above]
    - Recommendation: reconstruct from source, validate raw/matrices/logicals, update the appropriate evidence in a separate planned task, then freeze one versioned identity before pilots. [ASSUMED]
+   - Planning disposition: Plan 04-09 Task 1 owns source reconstruction and stale-record classification; Task 2 owns conditional versioned repair of whichever evidence is stale. B1 remains inadmissible until both tasks establish one justified identity. Plan 04-15 then owns three-code pilot design; Plans 04-10–04-14 depend on that design.
 3. **What compute is actually allocated?**
    - What we know: SLURM is available and the current shell is in a large node allocation, but time/CPU entitlement for execution is not declared. [VERIFIED: local probe, 2026-09-24]
    - Recommendation: Wave 0 records `scontrol show job`, concurrency limits, and timing benchmark, then instantiates the prespecified menus without adapting to outcomes. [ASSUMED]
+   - Planning disposition: Plan 04-11 Task 1 records actual entitlement and bounded benchmark observations; Task 2 freezes finite caps before calibration in Plan 04-12. No node-wide capacity is treated as allocation.
 4. **Can the native instrumentation patch remain behavior-neutral?**
    - What we know: current public result lacks required per-leg internals. [CITED: author source links above]
    - Recommendation: patch only observer emission and require equivalence; otherwise keep native per-leg fields unavailable and use unmodified aggregate reference results. [ASSUMED]
+   - Planning disposition: Plan 04-08 Task 2 runs field-by-field differential fixtures against unmodified v0.2.2. The patch is used only if equivalent; otherwise native leg details remain unavailable with a reason.
 5. **Does the full v0.2.2 native suite pass here?**
    - What we know: offline compile succeeded and one long native BB test completed; the bounded research probe stopped before the entire 13-test suite completed. [VERIFIED: local `cargo test -p relay-bp --lib --offline` probe, 2026-09-24]
    - Recommendation: make the full isolated native suite an execution gate rather than infer success from partial output. [ASSUMED]
+   - Planning disposition: Plan 04-08 Task 1 runs and records the full isolated suite after the source-legitimacy gate in Plan 04-07. A failing suite blocks native comparison rather than being represented as a pass.
 
 ## Sources
 

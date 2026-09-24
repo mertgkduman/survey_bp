@@ -247,7 +247,62 @@ Plans:
 4. A researcher can isolate memory/relay effects in pilot ablations and recover all leg work from the ledger; an adaptation is clearly labeled when it differs from source experiment settings.
 
 **Research focus:** Exact mixing/memory definitions, source equations and code defaults, warm-state inheritance, and candidate stopping/selection.
-**Plans:** TBD
+**Plans:** 15 plans ready to execute
+
+Plans:
+**Wave 0**
+
+- [ ] 04-01-PLAN.md — End-to-end two-leg Relay tracer and Wave 0 test targets
+
+**Wave 1** *(blocked on Wave 0 completion)*
+
+- [ ] 04-02-PLAN.md — Source-defined memory equations and independent history fixtures
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 04-03-PLAN.md — Ordered, repeated, seeded memory composition and compatibility
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 04-04-PLAN.md — Public memory manifest and CLI admission
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 04-05-PLAN.md — Complete Relay lifecycle, controls, presets, and selection
+- [ ] 04-07-PLAN.md — Pinned author-source legitimacy gate
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
+- [ ] 04-06-PLAN.md — Relay transfer, lineage, ledger, trace, and work reconstruction
+- [ ] 04-08-PLAN.md — Isolated author reference, translation, and observer equivalence
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
+- [ ] 04-09-PLAN.md — Source-backed B1 identity reconciliation and versioned repair
+
+**Wave 7** *(blocked on Wave 6 completion)*
+
+- [ ] 04-15-PLAN.md — Identity-gated three-code pilot design and manifests
+
+**Wave 8** *(blocked on Wave 7 completion)*
+
+- [ ] 04-10-PLAN.md — Identified public execution path for matched pilots and stages
+
+**Wave 9** *(blocked on Wave 8 completion)*
+
+- [ ] 04-11-PLAN.md — Compute entitlement, benchmark, and finite cap freeze
+
+**Wave 10** *(blocked on Wave 9 completion)*
+
+- [ ] 04-12-PLAN.md — Finite per-code Relay memory tuning on calibration samples
+
+**Wave 11** *(blocked on Wave 10 completion)*
+
+- [ ] 04-13-PLAN.md — Fresh evaluation, ablations, native diagnostics, and costs
+
+**Wave 12** *(blocked on Wave 11 completion)*
+
+- [ ] 04-14-PLAN.md — Executable notebook and evidence-backed research guide
 
 ### Phase 5: Guided and Perturbative BP Interventions
 
