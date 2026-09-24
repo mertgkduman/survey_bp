@@ -83,11 +83,13 @@ def test_tracer_initializes_full_pool_selects_first_tie_and_reserves_one_local_u
     schedule = residual.SyndromeResidualSchedule(table, kernel=BinarySpaKernel())
     v2c = np.asarray([1.0, 1.0, 1.0, 1.0])
     c2v = np.asarray([0.0, 0.0, 0.0, 0.0])
-    cache = schedule.initialize(v2c, c2v, np.asarray([0, 0]), error_rate=0.1)
+    setup_tree = BudgetTree(limits=())
+    cache = schedule.initialize(v2c, c2v, np.asarray([0, 0]), error_rate=0.1, budgets=setup_tree, scope="attempt")
 
     assert cache.values.shape == (4,)
     assert cache.setup_work.residual_precomputations == 4
     assert cache.setup_work.residual_differences == 4
+    assert setup_tree.summary("attempt").residual_priority_evaluations == 8
     proposal = schedule.propose_local_step(v2c, c2v, cache, np.asarray([0, 0]), error_rate=0.1)
     assert proposal.selection.index == 0
     assert proposal.selection.comparisons == 3
@@ -109,6 +111,25 @@ def test_tracer_initializes_full_pool_selects_first_tie_and_reserves_one_local_u
     assert result.progress.iteration == 0
     assert result.cache.values[result.selection.index] == 0.0
     assert result.candidate.shape == (2,)
+
+
+def test_setup_budget_denial_precedes_all_full_pool_residual_calculation():
+    from bp_registry.canonical.budgets import BudgetLimit, BudgetTree
+    from bp_registry.canonical.kernel import BinarySpaKernel
+    from bp_registry.canonical.schedules import EdgeTable
+
+    residual = _residual_module()
+    table = EdgeTable.from_edges(1, 2, [(0, 0), (0, 1)])
+    schedule = residual.SyndromeResidualSchedule(table, kernel=BinarySpaKernel())
+    v2c = np.asarray([1.0, 2.0])
+    c2v = np.asarray([0.0, 0.0])
+    tree = BudgetTree(limits=(BudgetLimit("attempt", "residual_priority_evaluations", 0),))
+
+    with pytest.raises(residual.ResidualSetupBudgetDenied):
+        schedule.initialize(v2c, c2v, np.asarray([0]), error_rate=0.1, budgets=tree, scope="attempt")
+    np.testing.assert_array_equal(v2c, np.asarray([1.0, 2.0]))
+    np.testing.assert_array_equal(c2v, np.asarray([0.0, 0.0]))
+    assert tree.leaf_events() == ()
 
 
 def test_source_lifecycle_matches_independent_full_cache_oracle_and_preserves_selected_zero():
