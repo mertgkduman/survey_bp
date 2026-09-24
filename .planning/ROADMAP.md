@@ -174,7 +174,7 @@ Plans:
 5. Researchers can run matched pilot comparisons of supported update/schedule combinations with raw work counters and explicit rejection of undefined combinations.
 
 **Research focus:** Source definitions for offset min-sum and cluster sequencing, residual/cache semantics, and intervention-sensitive schedule state.
-**Plans:** 7/17 plans executed
+**Plans:** 9/17 plans executed
 
 Plans:
 **Wave 1**
@@ -198,8 +198,8 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 03-06-PLAN.md — First non-flooding public tracer through layered SPA
-- [ ] 03-12-PLAN.md — Full terminal reconstruction and bounded local-convergence traces
+- [x] 03-06-PLAN.md — First non-flooding public tracer through layered SPA
+- [x] 03-12-PLAN.md — Full terminal reconstruction and bounded local-convergence traces
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
@@ -420,7 +420,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Evidence Registry and Native CSS Baseline | 9/9 | Complete    | 2026-09-22 |
 | 2. Canonical CSS Execution and Policy Contracts | 16/16 | Complete    | 2026-09-23 |
-| 3. Update Rules and Scheduling | 7/17 | In Progress|  |
+| 3. Update Rules and Scheduling | 9/17 | In Progress|  |
 | 4. Memory Policies and Relay-BP | 0/TBD | Not started | - |
 | 5. Guided and Perturbative BP Interventions | 0/TBD | Not started | - |
 | 6. Beam Search, Ensembles, and Candidate Selection | 0/TBD | Not started | - |
