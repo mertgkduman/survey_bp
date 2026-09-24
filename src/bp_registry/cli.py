@@ -16,7 +16,7 @@ import numpy as np
 
 from . import evaluator, evidence, sampling
 from .ledger import read_canonical_events, reconcile, summarize
-from .manifests import CanonicalExperimentV2, CanonicalExperimentV3, ManifestV1, manifest_digest, preflight
+from .manifests import CanonicalExperimentV2, CanonicalExperimentV3, ManifestV1, manifest_digest, preflight, qualify_cluster_artifact
 from .canonical.verification import validate_canonical_shot
 from .runner import (
     canonical_public_shot_context, canonical_terminal_rows, preflight_canonical,
@@ -385,6 +385,9 @@ def build_parser() -> argparse.ArgumentParser:
     reconcile_command.add_argument("ledger", type=Path)
     verify_command = commands.add_parser("verify-run")
     verify_command.add_argument("output", type=Path)
+    cluster_command = commands.add_parser("qualify-cluster-artifact")
+    cluster_command.add_argument("specification", type=Path)
+    cluster_command.add_argument("--approved-root", type=Path, required=True)
     return parser
 
 
@@ -403,6 +406,11 @@ def main(argv: list[str] | None = None) -> None:
         _dump(_reconcile_report(args.ledger))
     elif args.command == "verify-run":
         _dump(verify_run(args.output))
+    elif args.command == "qualify-cluster-artifact":
+        qualification = qualify_cluster_artifact(args.specification, approved_root=args.approved_root)
+        _dump(qualification.report())
+        if not qualification.qualified:
+            raise SystemExit(2)
 
 
 if __name__ == "__main__":

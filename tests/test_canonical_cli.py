@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -91,6 +92,78 @@ def test_public_cluster_artifact_qualification_command_exists():
         if action.dest == "command"
     }
     assert "qualify-cluster-artifact" in command_destinations["command"]
+
+
+def test_public_cluster_qualification_reports_unavailability_deterministically(tmp_path):
+    specification = {
+        "q_table_path": "missing.npy", "partition_path": "missing.json",
+        "q_table_sha256": "a" * 64, "partition_sha256": "b" * 64,
+        "source_id": "moradi-clustered-rl-s", "source_uri": "https://example.test/moradi",
+        "source_revision": "author-release-v1", "source_record_sha256": "c" * 64,
+        "graph_sha256": "d" * 64, "channel": "code_capacity_x", "kernel": "binary_spa",
+        "state_encoding": "moradi-state-v1", "action_encoding": "moradi-action-v1",
+        "tie_breaking": "author-declared-stable-v1", "q_shape": [2, 2], "check_count": 2,
+    }
+    specification_path = tmp_path / "cluster-spec.json"
+    specification_path.write_text(json.dumps(specification), encoding="utf-8")
+    command = [
+        sys.executable, "-m", "bp_registry.cli", "qualify-cluster-artifact",
+        str(specification_path), "--approved-root", str(tmp_path),
+    ]
+    reports = [subprocess.run(
+        command, cwd=REPOSITORY_ROOT, text=True, capture_output=True,
+        env={**os.environ, "PYTHONPATH": str(REPOSITORY_ROOT / "src")},
+    ) for _ in range(2)]
+    assert [result.returncode for result in reports] == [2, 2]
+    assert reports[0].stdout == reports[1].stdout
+    report = json.loads(reports[0].stdout)
+    assert report["status"] == "unavailable" and report["qualified"] is False
+    assert report["source_support"] == "not_established_by_qualification"
+    assert report["reproduction_status"] == "not_established_by_qualification"
+    assert report["external_training_cost"] == "unknown"
+
+
+def test_public_cluster_qualification_binds_exact_supplied_bytes(tmp_path):
+    root = tmp_path / "author-release"
+    root.mkdir()
+    q_table = root / "q.npy"
+    np.save(q_table, np.asarray([[0.0, 1.0], [2.0, 3.0]], dtype=np.float64))
+    q_sha256 = hashlib.sha256(q_table.read_bytes()).hexdigest()
+    compatibility = {
+        "graph_sha256": "d" * 64, "channel": "code_capacity_x", "kernel": "binary_spa",
+        "state_encoding": "moradi-state-v1", "action_encoding": "moradi-action-v1",
+        "tie_breaking": "author-declared-stable-v1", "q_table_sha256": q_sha256,
+        "q_shape": [2, 2], "check_count": 2,
+    }
+    partition = root / "partition.json"
+    partition.write_text(json.dumps({
+        "format_version": 1,
+        "source": {"id": "moradi-clustered-rl-s", "uri": "https://example.test/moradi",
+                   "revision": "author-release-v1", "record_sha256": "c" * 64},
+        "compatibility": compatibility, "partition": [[0], [1]],
+    }, sort_keys=True, separators=(",", ":")), encoding="utf-8")
+    specification = {
+        "q_table_path": q_table.name, "partition_path": partition.name,
+        "q_table_sha256": q_sha256,
+        "partition_sha256": hashlib.sha256(partition.read_bytes()).hexdigest(),
+        "source_id": "moradi-clustered-rl-s", "source_uri": "https://example.test/moradi",
+        "source_revision": "author-release-v1", "source_record_sha256": "c" * 64,
+        "graph_sha256": "d" * 64, "channel": "code_capacity_x", "kernel": "binary_spa",
+        "state_encoding": "moradi-state-v1", "action_encoding": "moradi-action-v1",
+        "tie_breaking": "author-declared-stable-v1", "q_shape": [2, 2], "check_count": 2,
+    }
+    specification_path = tmp_path / "cluster-spec.json"
+    specification_path.write_text(json.dumps(specification), encoding="utf-8")
+    completed = subprocess.run(
+        [sys.executable, "-m", "bp_registry.cli", "qualify-cluster-artifact", str(specification_path),
+         "--approved-root", str(root)],
+        cwd=REPOSITORY_ROOT, text=True, capture_output=True, check=True,
+        env={**os.environ, "PYTHONPATH": str(REPOSITORY_ROOT / "src")},
+    )
+    report = json.loads(completed.stdout)
+    assert report["qualified"] is True and report["status"] == "qualified"
+    assert report["identity"]["expected_hashes"]["q_table_sha256"] == q_sha256
+    assert report["sch_06_status"].startswith("blocked_")
 
 
 def test_checked_canonical_manifest_has_a_strict_public_preflight_contract():
