@@ -70,3 +70,45 @@ def test_b1_polynomial_order_and_regeneration_are_explicit():
         np.eye(63, dtype=np.uint8)[0], np.eye(63, dtype=np.uint8)[54],
     )))
     assert np.array_equal(constructions.build_b1_ghp().hx, code.hx)
+
+
+def test_gallager_hgp_adaptation_is_frozen_with_rank_and_identity_provenance():
+    constructions = _construction_module()
+    from bp_registry.css import gf2_rank, semantic_sha256
+
+    constituent = constructions.build_gallager_constituent(seed=20260923)
+    assert constituent.matrix.shape == (9, 12)
+    assert len(constituent.permutations) == 2
+    assert all(sorted(permutation) == list(range(12)) for permutation in constituent.permutations)
+    assert np.array_equal(constituent.matrix.sum(axis=0), np.full(12, 3))
+    assert np.array_equal(constituent.matrix.sum(axis=1), np.full(9, 4))
+    assert gf2_rank(constituent.matrix) == 7
+
+    code = constructions.build_hgp(constituent.matrix)
+    assert code.hx.shape == code.hz.shape == (108, 225)
+    assert code.n == 225 and code.k == 29
+    assert code.lx is not None and code.lz is not None
+    assert not np.any((code.hx.astype(np.int64) @ code.hz.astype(np.int64).T) % 2)
+
+    metadata_path = ARTIFACTS / "hgp-gallager-3-4-seed-20260923.json"
+    assert metadata_path.is_file(), "the fixed Gallager-family pilot must be frozen as an artifact"
+    metadata = json.loads(metadata_path.read_text())
+    assert metadata["assessment_label"] == "pilot_adaptation"
+    assert metadata["assessment_status"] == "not_assessed"
+    assert metadata["author_instance"] is False
+    assert metadata["distance"] == {"status": "unknown", "reason": "not independently established"}
+    assert metadata["generator"]["bit_generator"] == "PCG64"
+    assert metadata["generator"]["seed"] == 20260923
+    assert metadata["generation_attempts"] == 1
+    assert metadata["constituent"]["rank_gf2"] == 7
+    assert metadata["code"]["k_gf2"] == 29
+    assert metadata["generator"]["permutations"] == [list(item) for item in constituent.permutations]
+
+    artifact = ARTIFACTS / "hgp-gallager-3-4-seed-20260923.npz"
+    with np.load(artifact, allow_pickle=False) as frozen:
+        assert set(frozen.files) == {"constituent", "permutations", "hx", "hz", "lx", "lz"}
+        assert np.array_equal(frozen["constituent"], constituent.matrix)
+        assert np.array_equal(frozen["hx"], code.hx)
+        assert np.array_equal(frozen["hz"], code.hz)
+    assert metadata["artifact"]["raw_sha256"] == hashlib.sha256(artifact.read_bytes()).hexdigest()
+    assert metadata["artifact"]["semantic_sha256"] == semantic_sha256(code)
