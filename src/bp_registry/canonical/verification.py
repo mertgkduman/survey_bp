@@ -138,7 +138,10 @@ def _expected_attempt(context: PublicShotContext) -> dict[str, Any]:
         )
         kernel = BinarySpaKernel(
             profile=MIN_SUM_CPU_F64,
-            update_rule=NormalizedMinSumUpdate(assignment, resolved_alpha=tuple(float(value) for value in resolved)),
+            update_rule=NormalizedMinSumUpdate(
+                assignment,
+                resolved_alpha=None if assignment.shape == "source_iteration" else tuple(float(value) for value in resolved),
+            ),
         )
     elif context.update_kind == "offset_min_sum":
         declared = context.compact_manifest.get("policies", {}).get("update", {}).get("parameter_assignment")
@@ -149,7 +152,10 @@ def _expected_attempt(context: PublicShotContext) -> dict[str, Any]:
         )
         kernel = BinarySpaKernel(
             profile=MIN_SUM_CPU_F64,
-            update_rule=OffsetMinSumUpdate(assignment, resolved_beta=tuple(float(value) for value in resolved)),
+            update_rule=OffsetMinSumUpdate(
+                assignment,
+                resolved_beta=None if assignment.shape == "source_iteration" else tuple(float(value) for value in resolved),
+            ),
         )
     elif context.update_kind == "binary_spa":
         kernel = BinarySpaKernel()

@@ -221,7 +221,10 @@ def _kernel_for_manifest(manifest: CanonicalManifestV2 | CanonicalManifestV3, ed
         )
         return BinarySpaKernel(
             profile=MIN_SUM_CPU_F64,
-            update_rule=NormalizedMinSumUpdate(assignment, resolved_alpha=tuple(float(value) for value in resolved)),
+            update_rule=NormalizedMinSumUpdate(
+                assignment,
+                resolved_alpha=None if assignment.shape == "source_iteration" else tuple(float(value) for value in resolved),
+            ),
         )
     if update == "offset_min_sum":
         if edge_table is None or manifest.policies.update.parameter_assignment is None:
@@ -234,7 +237,10 @@ def _kernel_for_manifest(manifest: CanonicalManifestV2 | CanonicalManifestV3, ed
         )
         return BinarySpaKernel(
             profile=MIN_SUM_CPU_F64,
-            update_rule=OffsetMinSumUpdate(assignment, resolved_beta=tuple(float(value) for value in resolved)),
+            update_rule=OffsetMinSumUpdate(
+                assignment,
+                resolved_beta=None if assignment.shape == "source_iteration" else tuple(float(value) for value in resolved),
+            ),
         )
     if update == "binary_spa":
         return BinarySpaKernel()
