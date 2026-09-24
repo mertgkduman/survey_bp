@@ -55,7 +55,7 @@ actuals:
 - Task 2 rehashed inventory and terminal-class positive controls: `2 passed`.
 - Task 3 focused profiling/RSS/nondeterministic tests: `3 passed`.
 - Checked evidence: `python -m bp_registry.cli verify-run data/results/canonical-three-qubit-development` verified 2 terminal rows.
-- Checked artifact remained unchanged: `git diff --exit-code HEAD -- data/results/canonical-three-qubit-development/events.jsonl data/results/canonical-three-qubit-development/result.json` passed.
+- Checked artifact remained byte-identical to tracked HEAD across both ledger and result files.
 - Complete suite: `178 passed`.
 
 ## Deviations from Plan
@@ -69,7 +69,7 @@ None.
 ## TDD Gate Compliance
 
 - RED/green commits are present for each task: `96c59c3`/`ee9cce0`, `d4e7f65`/`244340b`, and `9b1bba6`/`5c103a0`.
-- Each RED target failed on its planned assertion before the matching implementation was added.
+- Each RED target produced its expected red assertion before the matching implementation was added.
 
 ## Self-Check: PASSED
 
