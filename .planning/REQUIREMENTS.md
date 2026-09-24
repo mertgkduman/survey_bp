@@ -40,18 +40,18 @@
 
 ### Additional message-update rules
 
-- [ ] **UPD-01**: A researcher can select min-sum updates with a documented kernel-specific equation and verified small-graph behavior.
-- [ ] **UPD-02**: A researcher can select normalized min-sum with explicit normalization parameters and verified small-graph behavior.
-- [ ] **UPD-03**: A researcher can select offset min-sum with explicit offset/sign conventions and verified small-graph behavior.
+- [x] **UPD-01**: A researcher can select min-sum updates with a documented kernel-specific equation and verified small-graph behavior.
+- [x] **UPD-02**: A researcher can select normalized min-sum with explicit normalization parameters and verified small-graph behavior.
+- [x] **UPD-03**: A researcher can select offset min-sum with explicit offset/sign conventions and verified small-graph behavior.
 
 ### Scheduling
 
 - [x] **SCH-01**: A researcher can select flooding with explicit old/new-message semantics and defined sweep/edge-work counts.
-- [ ] **SCH-02**: A researcher can select layered scheduling with explicit layer membership, order, and fresh-message semantics.
-- [ ] **SCH-03**: A researcher can select serial scheduling with a declared update unit, traversal order, and tie behavior.
-- [ ] **SCH-04**: A researcher can select residual scheduling with a defined residual, priority invalidation, selection cost, and stopping/work accounting.
-- [ ] **SCH-05**: A researcher can select randomized scheduling and replay its order from recorded decoder-local randomness without altering physical-error samples.
-- [ ] **SCH-06**: A researcher can select a source-defined cluster-sequential schedule with recorded cluster construction/order and any learned parameters; arbitrary clustering is not mislabeled as a published variant.
+- [x] **SCH-02**: A researcher can select layered scheduling with explicit layer membership, order, and fresh-message semantics.
+- [x] **SCH-03**: A researcher can select serial scheduling with a declared update unit, traversal order, and tie behavior.
+- [x] **SCH-04**: A researcher can select residual scheduling with a defined residual, priority invalidation, selection cost, and stopping/work accounting.
+- [x] **SCH-05**: A researcher can select randomized scheduling and replay its order from recorded decoder-local randomness without altering physical-error samples.
+- [x] **SCH-06**: A researcher can select a source-defined cluster-sequential schedule with recorded cluster construction/order and any learned parameters; arbitrary clustering is not mislabeled as a published variant.
 
 ### State and memory
 
@@ -195,15 +195,15 @@ Every v1 requirement has exactly one owning phase; later phases may use or stren
 | ENG-04 | Phase 2 | Complete |
 | ENG-05 | Phase 2 | Complete |
 | ENG-06 | Phase 2 | Complete |
-| UPD-01 | Phase 3 | Pending |
-| UPD-02 | Phase 3 | Pending |
-| UPD-03 | Phase 3 | Pending |
+| UPD-01 | Phase 3 | Complete |
+| UPD-02 | Phase 3 | Complete |
+| UPD-03 | Phase 3 | Complete |
 | SCH-01 | Phase 2 | Complete |
-| SCH-02 | Phase 3 | Pending |
-| SCH-03 | Phase 3 | Pending |
-| SCH-04 | Phase 3 | Pending |
-| SCH-05 | Phase 3 | Pending |
-| SCH-06 | Phase 3 | Pending |
+| SCH-02 | Phase 3 | Complete |
+| SCH-03 | Phase 3 | Complete |
+| SCH-04 | Phase 3 | Complete |
+| SCH-05 | Phase 3 | Complete |
+| SCH-06 | Phase 3 | Complete |
 | MEM-01 | Phase 4 | Pending |
 | MEM-02 | Phase 4 | Pending |
 | MEM-03 | Phase 4 | Pending |

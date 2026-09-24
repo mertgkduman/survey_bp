@@ -12,7 +12,7 @@ Build a provenance-preserving research platform from paper evidence through nati
 
 - [x] **Phase 1: Evidence Registry and Native CSS Baseline** — Trace a paper experiment to validated inputs, a pinned native decoder run, and an outcome ledger. (completed 2026-09-22)
 - [x] **Phase 2: Canonical CSS Execution and Policy Contracts** — Run inspectable binary BP through the complete policy and evidence lifecycle. (completed 2026-09-23)
-- [ ] **Phase 3: Update Rules and Scheduling** — Compare the requested message rules and schedules with explicit semantics and work counters.
+- [x] **Phase 3: Update Rules and Scheduling** — Compare the requested message rules and schedules with explicit semantics and work counters. (completed 2026-09-24)
 - [ ] **Phase 4: Memory Policies and Relay-BP** — Implement state/history policies and the source-defined relay composition.
 - [ ] **Phase 5: Guided and Perturbative BP Interventions** — Implement BPGD, impulse, freezing, syndrome/sign flips, and restarting.
 - [ ] **Phase 6: Beam Search, Ensembles, and Candidate Selection** — Expose branching, pruning, lists, and voting as auditable policies.
@@ -174,7 +174,7 @@ Plans:
 5. Researchers can run matched pilot comparisons of supported update/schedule combinations with raw work counters and explicit rejection of undefined combinations.
 
 **Research focus:** Source definitions for offset min-sum and cluster sequencing, residual/cache semantics, and intervention-sensitive schedule state.
-**Plans:** 17/17 plans executed
+**Plans:** 17/17 plans complete
 
 Plans:
 **Wave 1**
@@ -420,7 +420,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Evidence Registry and Native CSS Baseline | 9/9 | Complete    | 2026-09-22 |
 | 2. Canonical CSS Execution and Policy Contracts | 16/16 | Complete    | 2026-09-23 |
-| 3. Update Rules and Scheduling | 17/17 | Verification|  |
+| 3. Update Rules and Scheduling | 17/17 | Complete    | 2026-09-24 |
 | 4. Memory Policies and Relay-BP | 0/TBD | Not started | - |
 | 5. Guided and Perturbative BP Interventions | 0/TBD | Not started | - |
 | 6. Beam Search, Ensembles, and Candidate Selection | 0/TBD | Not started | - |
