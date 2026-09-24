@@ -250,6 +250,39 @@ def test_min_sum_public_manifest_preflights_runs_and_verifies(tmp_path):
     assert reports[-1]["final_row_count"] == 2
 
 
+def test_canonical_v4_memory_composition_preflights_runs_and_verifies_publicly(tmp_path):
+    """The V4 manifest reaches the same public preflight/run/verify commands as V2/V3."""
+    value = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text(encoding="utf-8"))
+    value.update({"schema_version": 4, "run_id": "canonical-v4-public-memory"})
+    value["memory"] = {
+        "bindings": [{
+            "binding_id": "ewa-prior", "kind": "affine_prior", "target": "prior",
+            "parameters": {"alpha": 0.5}, "order": 0, "history_owner": "memory:ewa-prior",
+            "state_lifetime": "attempt", "advance_boundary": "source_iteration",
+            "refresh_boundary": "attempt_start", "source_status": "source_defined",
+        }],
+    }
+    manifest_path = tmp_path / "canonical-v4-public.json"
+    manifest_path.write_text(json.dumps(value), encoding="utf-8")
+    output = tmp_path / "v4-output"
+
+    commands = [
+        [sys.executable, "-m", "bp_registry.cli", "preflight", str(manifest_path)],
+        [sys.executable, "-m", "bp_registry.cli", "canonical", str(manifest_path), "--output", str(output)],
+        [sys.executable, "-m", "bp_registry.cli", "verify-run", str(output)],
+    ]
+    reports = [
+        json.loads(subprocess.run(
+            command, cwd=REPOSITORY_ROOT, text=True, capture_output=True, check=True,
+            env={**os.environ, "PYTHONPATH": str(REPOSITORY_ROOT / "src")},
+        ).stdout)
+        for command in commands
+    ]
+
+    assert reports[0]["run_id"] == "canonical-v4-public-memory"
+    assert reports[1]["final_row_count"] == reports[2]["final_row_count"] == 2
+
+
 def test_normalized_min_sum_public_manifest_binds_and_replays_scalar_assignment(tmp_path):
     """The V3 public route persists declared and graph-resolved NMS evidence."""
     from bp_registry.cli import run_canonical, verify_run

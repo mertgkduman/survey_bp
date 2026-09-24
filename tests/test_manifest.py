@@ -126,6 +126,62 @@ def test_canonical_v3_schema_is_generated_from_the_public_nms_contract():
     assert json.loads(schema_path.read_text(encoding="utf-8")) == CanonicalExperimentV3.model_json_schema()
 
 
+def test_canonical_v4_preflight_admits_ordered_repeated_memory_compositions(tmp_path):
+    """V4 is the public, strict boundary for every compatibility-approved binding chain."""
+    from bp_registry import manifests
+
+    assert hasattr(manifests, "CanonicalExperimentV4")
+    CanonicalExperimentV4 = manifests.CanonicalExperimentV4
+
+    value = json.loads(Path("data/manifests/canonical-three-qubit-development.json").read_text(encoding="utf-8"))
+    value.update({"schema_version": 4, "run_id": "canonical-v4-memory-composition"})
+    value["memory"] = {
+        "bindings": [
+            {
+                "binding_id": "ewa-first", "kind": "affine_prior", "target": "prior",
+                "parameters": {"alpha": 0.5}, "order": 0, "history_owner": "memory:ewa-first",
+                "state_lifetime": "attempt", "advance_boundary": "source_iteration",
+                "refresh_boundary": "attempt_start", "source_status": "source_defined",
+            },
+            {
+                "binding_id": "relay-second", "kind": "affine_prior", "target": "prior",
+                "parameters": {"alpha": 0.25}, "order": 1, "history_owner": "memory:relay-second",
+                "state_lifetime": "leg", "advance_boundary": "source_iteration",
+                "refresh_boundary": "leg_start", "source_status": "canonical_adaptation",
+            },
+        ],
+    }
+    manifest_path = tmp_path / "canonical-v4.json"
+    manifest_path.write_text(json.dumps(value), encoding="utf-8")
+
+    resolved = manifests.preflight(manifest_path)
+
+    assert isinstance(resolved.manifest, CanonicalExperimentV4)
+    assert [binding.binding_id for binding in resolved.manifest.memory.bindings] == ["ewa-first", "relay-second"]
+
+
+def test_canonical_v4_rejects_incompatible_memory_before_artifact_loading(tmp_path, monkeypatch):
+    """A rejected memory operand must fail at public admission, before any simulation input is loaded."""
+    from bp_registry import manifests
+
+    value = json.loads(Path("data/manifests/canonical-three-qubit-development.json").read_text(encoding="utf-8"))
+    value.update({"schema_version": 4, "run_id": "canonical-v4-rejected-memory"})
+    value["memory"] = {
+        "bindings": [{
+            "binding_id": "unsupported-pdbp", "kind": "pdbp_field_mix", "target": "belief",
+            "parameters": {"gamma": 0.5}, "order": 0, "history_owner": "memory:unsupported-pdbp",
+            "state_lifetime": "attempt", "advance_boundary": "local_update",
+            "refresh_boundary": "local_update", "source_status": "exploratory",
+        }],
+    }
+    manifest_path = tmp_path / "canonical-v4-rejected.json"
+    manifest_path.write_text(json.dumps(value), encoding="utf-8")
+    monkeypatch.setattr(manifests, "load_artifact", lambda *args, **kwargs: pytest.fail("artifact loading must not occur"))
+
+    with pytest.raises(ValueError, match="memory.target_boundary_unsupported"):
+        manifests.preflight(manifest_path)
+
+
 @pytest.mark.parametrize("edit", [
     {"source_id": "moradi-clustered-rl-s"},
     {"source_id": None},
