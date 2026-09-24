@@ -22,6 +22,13 @@ class WorkVector:
     check_to_variable_updates: int = 0
     variable_to_check_updates: int = 0
     belief_assemblies: int = 0
+    candidate_constructions: int = 0
+    convergence_checks: int = 0
+    order_generation: int = 0
+    order_selection: int = 0
+    residual_precomputations: int = 0
+    residual_differences: int = 0
+    priority_maintenance: int = 0
     residual_priority_evaluations: int = 0
     bp_calls: int = 0
     candidate_checks: int = 0
@@ -48,6 +55,8 @@ class WorkVector:
             check_to_variable_updates=edge_count,
             variable_to_check_updates=edge_count,
             belief_assemblies=variable_count,
+            candidate_constructions=1,
+            convergence_checks=1,
             candidate_checks=variable_count,
         )
 

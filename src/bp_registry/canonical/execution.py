@@ -176,7 +176,7 @@ class CanonicalLocalStepExecutor:
         is_converged: Callable[[np.ndarray], bool],
     ) -> LocalStepResult:
         """Leave every supplied state untouched when the complete bundle is denied."""
-        if proposal.proposed_work.candidate_checks < 1:
+        if proposal.proposed_work.convergence_checks != 1:
             raise ValueError("a canonical local step must reserve one convergence check")
         leaf_id = f"{self.scope}:local-step:{self._ordinal}:{proposal.label}"
         reservation = self.budgets.reserve(self.scope, proposal.proposed_work, leaf_id=leaf_id)

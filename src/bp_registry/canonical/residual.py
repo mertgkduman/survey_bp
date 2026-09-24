@@ -33,11 +33,16 @@ class ResidualWork:
     candidate_checks: int = 0
 
     def as_work_vector(self) -> WorkVector:
-        """Map to the Phase-2 work vocabulary pending the Phase-3 extension."""
+        """Map source-visible setup and decode operations to the full Phase-3 vector."""
         return WorkVector(
             check_to_variable_updates=self.check_to_variable_commits,
             variable_to_check_updates=self.variable_to_check_updates,
             belief_assemblies=self.belief_assemblies,
+            candidate_constructions=1 if self.candidate_checks else 0,
+            convergence_checks=self.candidate_checks,
+            residual_precomputations=self.residual_precomputations,
+            residual_differences=self.residual_differences,
+            priority_maintenance=self.priority_comparisons,
             residual_priority_evaluations=(
                 self.residual_precomputations
                 + self.residual_differences
