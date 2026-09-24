@@ -72,6 +72,47 @@ def test_layered_schedule_commits_one_conflict_free_layer_before_later_layer_rea
     assert second.candidate.shape == (2,)
 
 
+def test_layered_local_unit_reserves_its_mandatory_convergence_check_before_mutation():
+    """D-09 checks are part of, rather than subsequent to, local admission."""
+    from bp_registry.canonical.budgets import BudgetLimit, BudgetTree, WorkVector
+    from bp_registry.canonical.execution import CanonicalLocalStepExecutor, ScheduleProgress
+    from bp_registry.canonical.kernel import BinarySpaKernel
+    from bp_registry.canonical.schedules import EdgeTable, LayeredSchedule
+
+    assert "convergence_checks" in WorkVector.zero().as_evidence(), (
+        "Phase 3 local schedules require a distinct, reservable convergence-check resource"
+    )
+    table = EdgeTable.from_edges(2, 2, [(0, 0), (0, 1), (1, 0), (1, 1)])
+    schedule = LayeredSchedule(table, kernel=BinarySpaKernel(), partitions=((0,), (1,)), provenance="explicit")
+    messages = np.asarray([0.4, -0.2, 0.7, 1.3], dtype=np.float64)
+    before = messages.copy()
+    progress = ScheduleProgress(iteration=0, local_steps=0, cursor=(0,))
+    proposal = schedule.propose_local_step(messages, np.asarray([0, 1], dtype=np.uint8), error_rate=0.1, progress=progress)
+    assert proposal.proposed_work.convergence_checks == 1
+
+    denied_tree = BudgetTree(limits=(BudgetLimit("attempt", "convergence_checks", 0),))
+    denied = schedule.execute_local_step(
+        CanonicalLocalStepExecutor(denied_tree, scope="attempt"), messages,
+        np.asarray([0, 1], dtype=np.uint8), error_rate=0.1, progress=progress,
+        is_converged=lambda _candidate: False,
+    )
+    assert not denied.admitted
+    assert denied.progress == progress
+    np.testing.assert_array_equal(messages, before)
+    assert denied_tree.leaf_events() == ()
+
+    admitted_tree = BudgetTree(limits=(BudgetLimit("attempt", "convergence_checks", 1),))
+    admitted = schedule.execute_local_step(
+        CanonicalLocalStepExecutor(admitted_tree, scope="attempt"), messages,
+        np.asarray([0, 1], dtype=np.uint8), error_rate=0.1, progress=progress,
+        is_converged=lambda _candidate: False,
+    )
+    assert admitted.admitted
+    assert admitted.progress.local_steps == 1
+    assert admitted.progress.cursor == (1,)
+    assert admitted_tree.summary("attempt").convergence_checks == 1
+
+
 @pytest.mark.parametrize(
     "partitions,match",
     [

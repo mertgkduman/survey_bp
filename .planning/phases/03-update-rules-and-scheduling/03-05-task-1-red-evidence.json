@@ -1,0 +1,8 @@
+{
+  "command": "PYTHONPATH=$PWD/src OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_schedule_semantics.py -k mandatory_convergence_check",
+  "exit_code": 1,
+  "failing_test": "test_layered_local_unit_reserves_its_mandatory_convergence_check_before_mutation",
+  "expected_result": "A layered local proposal exposes one separately reservable convergence_checks work unit.",
+  "actual_result": "WorkVector evidence has no convergence_checks resource.",
+  "intentional": true
+}
