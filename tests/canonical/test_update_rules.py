@@ -143,7 +143,7 @@ def test_graph_bound_assignment_rejects_a_wrong_declared_length_before_broadcast
         (np.asarray([2.0, -3.0]), 0, 0.0, -2.0),
         (np.asarray([2.0, -3.0]), 0, 2.0, -0.0),
         (np.asarray([np.nextafter(2.0, 0.0)]), 1, 2.0, 0.0),
-        (np.asarray([np.nextafter(2.0, np.inf)]), 1, 2.0, np.nextafter(2.0, np.inf) - 2.0),
+        (np.asarray([np.nextafter(2.0, np.inf)]), 1, 2.0, -(np.nextafter(2.0, np.inf) - 2.0)),
         (np.asarray([30.0]), 0, 1.0, 25.0),
     ],
 )

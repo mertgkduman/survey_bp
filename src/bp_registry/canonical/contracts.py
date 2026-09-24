@@ -60,7 +60,7 @@ _ROLE_HOOKS: dict[PolicyRole, Hook] = {
     PolicyRole.POSTPROCESSING: Hook.ATTEMPT,
 }
 _POLICY_KINDS: dict[PolicyRole, frozenset[str]] = {
-    PolicyRole.UPDATE: frozenset({"identity", "binary_spa", "min_sum", "normalized_min_sum"}),
+    PolicyRole.UPDATE: frozenset({"identity", "binary_spa", "min_sum", "normalized_min_sum", "offset_min_sum"}),
     PolicyRole.SCHEDULE: frozenset({"identity", "flooding"}),
     PolicyRole.STATE_MEMORY: frozenset({"identity", "stateless"}),
     PolicyRole.INTERVENTION: frozenset({"identity"}),
@@ -122,10 +122,10 @@ class PolicySpecV3(PolicySpec):
 
     @model_validator(mode="after")
     def normalization_is_explicit_and_scoped_to_the_update_role(self) -> "PolicySpecV3":
-        if self.kind == "normalized_min_sum" and self.parameter_assignment is None:
-            raise ValueError("normalized_min_sum requires one explicit parameter_assignment")
-        if self.kind != "normalized_min_sum" and self.parameter_assignment is not None:
-            raise ValueError("parameter_assignment is valid only for normalized_min_sum")
+        if self.kind in {"normalized_min_sum", "offset_min_sum"} and self.parameter_assignment is None:
+            raise ValueError(f"{self.kind} requires one explicit parameter_assignment")
+        if self.kind not in {"normalized_min_sum", "offset_min_sum"} and self.parameter_assignment is not None:
+            raise ValueError("parameter_assignment is valid only for normalized_min_sum or offset_min_sum")
         return self
 
 

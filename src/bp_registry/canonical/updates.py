@@ -189,3 +189,62 @@ class NormalizedMinSumUpdate:
             declared_assignment=self.alpha.model_dump(mode="json"),
             resolved_assignment=self.resolved_alpha,
         )
+
+
+@dataclass(frozen=True, slots=True)
+class OffsetMinSumUpdate:
+    """Float64 offset min-sum with an explicit, never-broadcast beta assignment.
+
+    The magnitude is formed from finite incoming values, then beta is subtracted
+    in float64 and floored before the named output saturation boundary.  This is
+    intentionally distinct from clipping each incoming value before the offset.
+    """
+
+    beta: ParameterAssignment
+    profile: NumericalProfile = MIN_SUM_CPU_F64
+    resolved_beta: tuple[float, ...] | None = None
+
+    def _beta_for(self, *, edge_index: int, source_iteration: int) -> float:
+        if type(edge_index) is not int or edge_index < 0:
+            raise ValueError("edge_index must be a nonnegative integer")
+        if type(source_iteration) is not int or source_iteration < 0:
+            raise ValueError("source_iteration must be a nonnegative integer")
+        if self.resolved_beta is not None:
+            if edge_index >= len(self.resolved_beta):
+                raise ValueError("edge_index is outside the resolved offset assignment")
+            return self.resolved_beta[edge_index]
+        if self.beta.shape == "scalar":
+            assert self.beta.value is not None
+            return self.beta.value
+        if self.beta.shape == "source_iteration":
+            assert self.beta.values is not None
+            if source_iteration >= len(self.beta.values):
+                raise ValueError("source_iteration assignment has no declared value for this iteration")
+            return self.beta.values[source_iteration]
+        raise ValueError("non-scalar offset assignment must be resolved against an immutable graph before use")
+
+    def check_to_variable(
+        self, incoming: np.ndarray, *, syndrome: int, check_index: int = 0,
+        edge_index: int = 0, source_iteration: int = 0,
+    ) -> float:
+        values = np.asarray(incoming, dtype=np.float64)
+        if values.ndim != 1:
+            raise ValueError("offset_min_sum_input must be a one-dimensional LLR array")
+        if not np.all(np.isfinite(values)):
+            raise ValueError("offset_min_sum_input contains nonfinite values")
+        if type(syndrome) not in (int, np.int64, np.int32) or int(syndrome) not in (0, 1):
+            raise ValueError("syndrome must be a binary integer")
+        magnitude = self.profile.saturation if values.size == 0 else float(np.min(np.abs(values)))
+        beta = self._beta_for(edge_index=edge_index, source_iteration=source_iteration)
+        reduced = max(0.0, float(np.float64(magnitude) - np.float64(beta)))
+        sign = -1.0 if (int(np.count_nonzero(values < 0.0)) + int(syndrome)) % 2 else 1.0
+        return float(finite_saturate(sign * reduced, boundary="offset_min_sum_output", profile=self.profile))
+
+    def evidence(self) -> UpdateRuleEvidence:
+        return UpdateRuleEvidence(
+            kind="offset_min_sum", numerical_profile=self.profile.profile_id,
+            procedure="signed extrinsic minimum minus explicit beta in float64, zero floor, then saturation",
+            provenance=self.beta.provenance,
+            declared_assignment=self.beta.model_dump(mode="json"),
+            resolved_assignment=self.resolved_beta,
+        )

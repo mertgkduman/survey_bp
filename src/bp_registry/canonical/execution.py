@@ -32,7 +32,7 @@ from .profiling import LocalProfiler, ProfilingPlan
 from .lineage import LineageEdge, LineageId, stable_lineage_id
 from .numerics import NumericalFailure
 from .numerics import MIN_SUM_CPU_F64
-from .updates import MinSumUpdate, NormalizedMinSumUpdate
+from .updates import MinSumUpdate, NormalizedMinSumUpdate, OffsetMinSumUpdate
 from .problems import OriginalProblem, OriginalSpaceCandidate, WorkingProblem, select_stable_candidate
 from .schedules import EdgeTable, FloodingSchedule, FloodingSweep
 from .verification import PublicShotContext, validate_canonical_shot
@@ -222,6 +222,19 @@ def _kernel_for_manifest(manifest: CanonicalManifestV2 | CanonicalManifestV3, ed
         return BinarySpaKernel(
             profile=MIN_SUM_CPU_F64,
             update_rule=NormalizedMinSumUpdate(assignment, resolved_alpha=tuple(float(value) for value in resolved)),
+        )
+    if update == "offset_min_sum":
+        if edge_table is None or manifest.policies.update.parameter_assignment is None:
+            raise ValueError("offset_min_sum requires a resolved immutable EdgeTable assignment")
+        assignment = manifest.policies.update.parameter_assignment
+        resolved = assignment.resolve(
+            graph_sha256=edge_table.graph_sha256, check_count=edge_table.check_count,
+            edge_count=edge_table.edge_count, source_iteration=0,
+            edge_checks=tuple(check for check, _variable in edge_table.edges),
+        )
+        return BinarySpaKernel(
+            profile=MIN_SUM_CPU_F64,
+            update_rule=OffsetMinSumUpdate(assignment, resolved_beta=tuple(float(value) for value in resolved)),
         )
     if update == "binary_spa":
         return BinarySpaKernel()

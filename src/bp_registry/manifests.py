@@ -379,6 +379,7 @@ _EXECUTABLE_BASELINE_KINDS = {
 }
 _EXECUTABLE_MIN_SUM_KINDS = {**_EXECUTABLE_BASELINE_KINDS, "update": "min_sum"}
 _EXECUTABLE_NORMALIZED_MIN_SUM_KINDS = {**_EXECUTABLE_BASELINE_KINDS, "update": "normalized_min_sum"}
+_EXECUTABLE_OFFSET_MIN_SUM_KINDS = {**_EXECUTABLE_BASELINE_KINDS, "update": "offset_min_sum"}
 _IDENTITY_ONLY_ROLES = frozenset({"state_memory", "intervention", "postprocessing"})
 
 
@@ -388,9 +389,9 @@ def validate_executable_canonical_baseline(composition: CanonicalCompositionSpec
 
     resolved = validate_composition(composition)
     actual = {binding.role.value: binding.kind for binding in resolved.bindings}
-    if actual not in (_EXECUTABLE_BASELINE_KINDS, _EXECUTABLE_MIN_SUM_KINDS, _EXECUTABLE_NORMALIZED_MIN_SUM_KINDS):
+    if actual not in (_EXECUTABLE_BASELINE_KINDS, _EXECUTABLE_MIN_SUM_KINDS, _EXECUTABLE_NORMALIZED_MIN_SUM_KINDS, _EXECUTABLE_OFFSET_MIN_SUM_KINDS):
         raise ValueError(
-            "executable canonical baseline requires binary_spa, min_sum, or normalized_min_sum with flooding/stateless/"
+            "executable canonical baseline requires binary_spa, min_sum, normalized_min_sum, or offset_min_sum with flooding/stateless/"
             "identity/syndrome_or_budget/stable_first/identity policy kinds"
         )
     return resolved
@@ -552,7 +553,7 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
         composition = validate_executable_canonical_baseline(manifest.policies)
         if type(manifest) is CanonicalExperimentV2 and manifest.policies.update.kind != "binary_spa":
             raise ValueError("CanonicalExperimentV2 preserves only historical binary_spa semantics")
-        if isinstance(manifest, CanonicalExperimentV3) and manifest.policies.update.kind not in {"min_sum", "normalized_min_sum"}:
+        if isinstance(manifest, CanonicalExperimentV3) and manifest.policies.update.kind not in {"min_sum", "normalized_min_sum", "offset_min_sum"}:
             raise ValueError("CanonicalExperimentV3 requires a closed min-sum update rule")
         artifact = load_artifact(
             manifest.artifact.root, manifest.artifact.path,
