@@ -873,6 +873,23 @@
       "additionalProperties": false,
       "description": "Persisted layered membership is explicit, graph-bound configuration data.",
       "properties": {
+        "base_schedule": {
+          "anyOf": [
+            {
+              "enum": [
+                "layered",
+                "check_node_serial",
+                "variable_node_serial"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Base Schedule"
+        },
         "binding_id": {
           "pattern": "^[a-z][a-z0-9_-]{0,63}$",
           "title": "Binding Id",
@@ -969,6 +986,23 @@
           "title": "Provides",
           "type": "array"
         },
+        "refresh_scope": {
+          "anyOf": [
+            {
+              "enum": [
+                "configuration",
+                "attempt",
+                "sweep"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Refresh Scope"
+        },
         "requires": {
           "default": [],
           "items": {
@@ -976,6 +1010,19 @@
           },
           "title": "Requires",
           "type": "array"
+        },
+        "root_identity": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Root Identity"
         },
         "state_lifetime": {
           "enum": [

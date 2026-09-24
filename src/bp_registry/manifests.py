@@ -403,7 +403,7 @@ def validate_executable_canonical_baseline(composition: CanonicalCompositionSpec
     actual = {binding.role.value: binding.kind for binding in resolved.bindings}
     if actual not in (_EXECUTABLE_BASELINE_KINDS, _EXECUTABLE_MIN_SUM_KINDS, _EXECUTABLE_NORMALIZED_MIN_SUM_KINDS, _EXECUTABLE_OFFSET_MIN_SUM_KINDS, *_EXECUTABLE_LOCAL_SPA_KINDS):
         raise ValueError(
-            "executable canonical compatibility requires a closed flooding min-sum family or a binary_spa local schedule composition with stateless/"
+            "executable canonical baseline compatibility requires a closed flooding/layered min-sum family or a binary_spa local schedule composition with stateless/"
             "identity/syndrome_or_budget/stable_first/identity policy kinds"
         )
     return resolved
