@@ -50,6 +50,33 @@ def test_default_local_profile_records_qualified_local_facts_and_separate_overhe
     assert all("/" not in str(value) for value in profile.environment.values())
 
 
+def test_public_profile_rss_normalization_requires_linux_and_darwin_equality():
+    """The raw platform fact is the exact source for normalized RSS bytes."""
+    from bp_registry.canonical.profiling import (
+        LocalProfiler,
+        ProfilingPlan,
+        validate_public_clean_low_overhead_evidence,
+    )
+
+    class Resource:
+        RUSAGE_SELF = object()
+
+        @staticmethod
+        def getrusage(_scope):
+            return type("Usage", (), {"ru_maxrss": 7})()
+
+    for system, expected in (("Linux", 7 * 1024), ("Darwin", 7)):
+        _value, profile = LocalProfiler(
+            ProfilingPlan(), resource_module=Resource(), platform_system=lambda system=system: system,
+        ).measure(lambda: None)
+        evidence = profile.as_evidence()
+        assert evidence["runtime"]["peak_host_memory"]["value"] == expected
+        assert validate_public_clean_low_overhead_evidence(evidence).runtime.peak_host_memory.value == expected
+        evidence["runtime"]["peak_host_memory"]["value"] += 1
+        with pytest.raises(ValueError, match="normalization"):
+            validate_public_clean_low_overhead_evidence(evidence)
+
+
 def test_disabled_and_unavailable_profiles_remain_explicit_or_fail_closed_when_required():
     from bp_registry.canonical.profiling import (
         LocalProfiler,

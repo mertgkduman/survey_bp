@@ -534,12 +534,40 @@ def test_verify_run_accepts_nondeterministic_profile_values_without_replay_equal
         for event in events:
             if event["kind"] in {"runtime", "termination"} and "profile" in event["data"]:
                 profile = event["data"]["profile"]
-                for name in ("wall_time", "process_cpu_time", "peak_host_memory", "concurrency"):
+                for name in ("wall_time", "process_cpu_time", "concurrency"):
                     profile["runtime"][name]["value"] += 1
+                raw = profile["raw_context"]
+                raw["rss_raw_value"] += 1
+                profile["runtime"]["peak_host_memory"]["value"] += 1024 if raw["rss_platform"] == "Linux" else 1
                 profile["adapter_overhead"]["value"] += 1
 
     _rewrite_rehashed_canonical_ledger(output, mutate)
     assert verify_run(output)["final_row_count"] == 2
+
+
+def test_verify_run_rejects_rehashed_raw_rss_normalization_matrix(tmp_path):
+    """Platform-qualified raw RSS cannot be rehashed into another byte value."""
+    from bp_registry.cli import run_canonical, verify_run
+
+    for system, unit in (("Linux", "kilobytes"), ("Darwin", "bytes")):
+        output = tmp_path / system.lower()
+        run_canonical(CANONICAL_MANIFEST, output)
+
+        def mutate(events, system=system, unit=unit):
+            for event in events:
+                if event["kind"] in {"runtime", "termination"} and "profile" in event["data"]:
+                    profile = event["data"]["profile"]
+                    profile["raw_context"].update({
+                        "rss_platform": system,
+                        "rss_raw_value": 7,
+                        "rss_raw_unit": unit,
+                        "rss_normalized_unit": "bytes",
+                    })
+                    profile["runtime"]["peak_host_memory"]["value"] = 8
+
+        _rewrite_rehashed_canonical_ledger(output, mutate)
+        with pytest.raises(ValueError, match="profile"):
+            verify_run(output)
 
 
 def test_public_profile_plan_emits_typed_attempt_evidence(tmp_path):
