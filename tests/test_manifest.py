@@ -171,6 +171,53 @@ def test_v3_layered_spa_admission_requires_explicit_partitions_and_rejects_unimp
         preflight(unsupported)
 
 
+@pytest.mark.parametrize("schedule_kind", [
+    "check_node_serial", "variable_node_serial", "residual", "randomized",
+])
+def test_v3_public_schedule_matrix_admits_only_the_implemented_spa_local_schedules(tmp_path, schedule_kind):
+    """Every directly implemented noncluster local policy has a strict V3 route."""
+    from bp_registry.manifests import preflight
+
+    value = json.loads(Path("data/manifests/canonical-three-qubit-development.json").read_text(encoding="utf-8"))
+    value.update({
+        "schema_version": 3,
+        "run_id": f"canonical-{schedule_kind}-contract",
+        "numerical_profile": "cpu-float64-spa-v1",
+    })
+    value["policies"]["schedule"] = {
+        "kind": schedule_kind,
+        "binding_id": f"schedule-{schedule_kind}-v1",
+        "state_lifetime": "iteration",
+        "owned_state": [],
+        "requires": [],
+        "provides": [],
+    }
+    if schedule_kind == "randomized":
+        value["policies"]["schedule"].update({
+            "base_schedule": "layered",
+            "refresh_scope": "attempt",
+            "root_identity": "a" * 64,
+            "partitions": [[0]],
+            "provenance": "explicit",
+        })
+    assert preflight(value).manifest.policies.schedule.kind == schedule_kind
+
+    incompatible = json.loads(json.dumps(value))
+    incompatible["numerical_profile"] = "cpu-float64-min-sum-v1"
+    incompatible["policies"]["update"] = {
+        "kind": "min_sum", "binding_id": "update-min-sum-v1",
+        "state_lifetime": "message", "owned_state": [], "requires": [], "provides": [],
+    }
+    with pytest.raises(ValueError, match="compatibility"):
+        preflight(incompatible)
+
+    if schedule_kind == "randomized":
+        unsupported_base = json.loads(json.dumps(value))
+        unsupported_base["policies"]["schedule"]["base_schedule"] = "check_node_serial"
+        with pytest.raises(ValueError, match="layered base_schedule"):
+            preflight(unsupported_base)
+
+
 @pytest.mark.parametrize("value", [float("nan"), float("inf"), -0.01, 1.01, "0.1"])
 def test_manifest_rejects_nonfinite_out_of_range_or_coerced_rates(tmp_path, value):
     from bp_registry.manifests import parse_manifest

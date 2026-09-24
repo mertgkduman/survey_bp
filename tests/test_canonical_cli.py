@@ -70,6 +70,17 @@ def test_documented_nms_contract_names_equations_assignments_and_public_verifica
     assert "partitions" in tutorial
 
 
+def test_documented_noncluster_policy_matrix_names_local_units_and_replay_boundaries():
+    """The public guide must distinguish focused policies from universal interchangeability."""
+    tutorial = (REPOSITORY_ROOT / "docs/canonical-engine.md").read_text(encoding="utf-8").lower()
+    for term in (
+        "check-node serial", "variable-node serial", "residual", "randomized",
+        "one_check_all_c2v_then_affected_v2c", "one_variable_belief_then_incident_v2c",
+        "schedule_order", "compatibility rejection",
+    ):
+        assert term in tutorial
+
+
 def test_checked_canonical_manifest_has_a_strict_public_preflight_contract():
     """The development fixture is a public immutable experiment, not a kernel shortcut."""
     from pathlib import Path
@@ -888,6 +899,42 @@ def test_layered_spa_public_manifest_preflights_runs_and_verifies_through_local_
     ]
     assert reports[0]["policies"]["schedule"]["kind"] == "layered"
     assert reports[-1]["final_row_count"] == 2
+
+
+@pytest.mark.parametrize("schedule_kind", [
+    "check_node_serial", "variable_node_serial", "residual", "randomized",
+])
+def test_public_noncluster_spa_schedules_round_trip_and_reconstruct(tmp_path, schedule_kind):
+    """Public schedule admission never bypasses the canonical run/verify boundary."""
+    from bp_registry.cli import run_canonical, verify_run
+
+    manifest = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text(encoding="utf-8"))
+    manifest.update({
+        "schema_version": 3,
+        "run_id": f"canonical-{schedule_kind}-development",
+        "numerical_profile": "cpu-float64-spa-v1",
+    })
+    manifest["policies"]["schedule"] = {
+        "kind": schedule_kind,
+        "binding_id": f"schedule-{schedule_kind}-v1",
+        "state_lifetime": "iteration",
+        "owned_state": [],
+        "requires": [],
+        "provides": [],
+    }
+    if schedule_kind == "randomized":
+        manifest["policies"]["schedule"].update({
+            "base_schedule": "layered", "refresh_scope": "attempt", "root_identity": "a" * 64,
+            "partitions": [[0]], "provenance": "explicit",
+        })
+    if schedule_kind == "residual":
+        for scope in ("shot", "search", "attempt"):
+            manifest["budgets"][scope]["work_limits"]["residual_priority_evaluations"] = 1000
+    manifest_path = tmp_path / f"{schedule_kind}.json"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    output = tmp_path / schedule_kind
+    assert run_canonical(manifest_path, output)["final_row_count"] == 2
+    assert verify_run(output)["final_row_count"] == 2
 
 
 def test_checked_canonical_result_is_idempotent_and_honestly_labeled():

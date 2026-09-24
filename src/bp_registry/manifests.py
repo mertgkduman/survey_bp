@@ -381,6 +381,17 @@ _EXECUTABLE_MIN_SUM_KINDS = {**_EXECUTABLE_BASELINE_KINDS, "update": "min_sum"}
 _EXECUTABLE_NORMALIZED_MIN_SUM_KINDS = {**_EXECUTABLE_BASELINE_KINDS, "update": "normalized_min_sum"}
 _EXECUTABLE_OFFSET_MIN_SUM_KINDS = {**_EXECUTABLE_BASELINE_KINDS, "update": "offset_min_sum"}
 _EXECUTABLE_LAYERED_SPA_KINDS = {**_EXECUTABLE_BASELINE_KINDS, "schedule": "layered"}
+_EXECUTABLE_CHECK_SERIAL_SPA_KINDS = {**_EXECUTABLE_BASELINE_KINDS, "schedule": "check_node_serial"}
+_EXECUTABLE_VARIABLE_SERIAL_SPA_KINDS = {**_EXECUTABLE_BASELINE_KINDS, "schedule": "variable_node_serial"}
+_EXECUTABLE_RESIDUAL_SPA_KINDS = {**_EXECUTABLE_BASELINE_KINDS, "schedule": "residual"}
+_EXECUTABLE_RANDOMIZED_SPA_KINDS = {**_EXECUTABLE_BASELINE_KINDS, "schedule": "randomized"}
+_EXECUTABLE_LOCAL_SPA_KINDS = (
+    _EXECUTABLE_LAYERED_SPA_KINDS,
+    _EXECUTABLE_CHECK_SERIAL_SPA_KINDS,
+    _EXECUTABLE_VARIABLE_SERIAL_SPA_KINDS,
+    _EXECUTABLE_RESIDUAL_SPA_KINDS,
+    _EXECUTABLE_RANDOMIZED_SPA_KINDS,
+)
 _IDENTITY_ONLY_ROLES = frozenset({"state_memory", "intervention", "postprocessing"})
 
 
@@ -390,9 +401,9 @@ def validate_executable_canonical_baseline(composition: CanonicalCompositionSpec
 
     resolved = validate_composition(composition)
     actual = {binding.role.value: binding.kind for binding in resolved.bindings}
-    if actual not in (_EXECUTABLE_BASELINE_KINDS, _EXECUTABLE_MIN_SUM_KINDS, _EXECUTABLE_NORMALIZED_MIN_SUM_KINDS, _EXECUTABLE_OFFSET_MIN_SUM_KINDS, _EXECUTABLE_LAYERED_SPA_KINDS):
+    if actual not in (_EXECUTABLE_BASELINE_KINDS, _EXECUTABLE_MIN_SUM_KINDS, _EXECUTABLE_NORMALIZED_MIN_SUM_KINDS, _EXECUTABLE_OFFSET_MIN_SUM_KINDS, *_EXECUTABLE_LOCAL_SPA_KINDS):
         raise ValueError(
-            "executable canonical baseline requires a closed binary_spa/min-sum update and flooding/layered schedule composition with stateless/"
+            "executable canonical baseline compatibility requires a closed flooding/layered min-sum family or a binary_spa local schedule composition with stateless/"
             "identity/syndrome_or_budget/stable_first/identity policy kinds"
         )
     return resolved
@@ -556,11 +567,11 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
             raise ValueError("CanonicalExperimentV2 preserves only historical binary_spa semantics")
         if isinstance(manifest, CanonicalExperimentV3):
             actual = {binding.role.value: binding.kind for binding in composition.bindings}
-            if actual == _EXECUTABLE_LAYERED_SPA_KINDS and manifest.numerical_profile != "cpu-float64-spa-v1":
-                raise ValueError("CanonicalExperimentV3 layered SPA requires the cpu-float64-spa-v1 profile")
+            if actual in _EXECUTABLE_LOCAL_SPA_KINDS and manifest.numerical_profile != "cpu-float64-spa-v1":
+                raise ValueError("CanonicalExperimentV3 local SPA schedules require the cpu-float64-spa-v1 profile")
             if actual in (_EXECUTABLE_MIN_SUM_KINDS, _EXECUTABLE_NORMALIZED_MIN_SUM_KINDS, _EXECUTABLE_OFFSET_MIN_SUM_KINDS) and manifest.numerical_profile != "cpu-float64-min-sum-v1":
                 raise ValueError("CanonicalExperimentV3 min-sum updates require the cpu-float64-min-sum-v1 profile")
-            if actual not in (_EXECUTABLE_LAYERED_SPA_KINDS, _EXECUTABLE_MIN_SUM_KINDS, _EXECUTABLE_NORMALIZED_MIN_SUM_KINDS, _EXECUTABLE_OFFSET_MIN_SUM_KINDS):
+            if actual not in (*_EXECUTABLE_LOCAL_SPA_KINDS, _EXECUTABLE_MIN_SUM_KINDS, _EXECUTABLE_NORMALIZED_MIN_SUM_KINDS, _EXECUTABLE_OFFSET_MIN_SUM_KINDS):
                 raise ValueError("CanonicalExperimentV3 requires a closed promoted local-step composition")
         artifact = load_artifact(
             manifest.artifact.root, manifest.artifact.path,

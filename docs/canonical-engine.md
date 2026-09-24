@@ -119,15 +119,46 @@ named profile or declared policy, never an implicit substitution.
 `CanonicalExperimentV2` remains the historical binary-SPA/flooding contract:
 its schema, selector, numerical profile, and persisted meanings do not change.
 `CanonicalExperimentV3` uses the named `cpu-float64-min-sum-v1` profile for
-`min_sum`, `normalized_min_sum`, and `offset_min_sum`.  Its first non-flooding
-public composition is `binary_spa` with the `layered` schedule and the historical
-`cpu-float64-spa-v1` profile. Layered manifests declare conflict-free check
-`partitions` plus `provenance`; graph-colored partitions additionally declare their
-deterministic construction rule. Public terminal evidence retains the realized
-membership/order, local progress, full work vector, two non-convertible budget views,
-and explicitly qualified schedule runtime facts. Its generated public schema is
+`min_sum`, `normalized_min_sum`, and `offset_min_sum`; those update rules are
+intentionally flooding-only. The non-flooding public compositions are all
+`binary_spa` under the historical `cpu-float64-spa-v1` profile. Layered manifests
+declare conflict-free check `partitions` plus `provenance`; graph-colored partitions
+add their deterministic construction rule. Public terminal evidence retains realized
+membership/order, local progress, the full work vector, two non-convertible budget
+views, and explicitly qualified schedule runtime facts. Its generated public schema is
 `data/manifests/schema-canonical-v3.json`; regenerate it only from
 `CanonicalExperimentV3.model_json_schema()` when the strict model changes.
+
+### Focused noncluster schedule matrix
+
+This is a focused compatibility matrix, not a claim that update and schedule
+policies are universally interchangeable. Every listed local schedule runs through
+`CanonicalLocalStepExecutor`, reserves its complete local mutation and one
+convergence check before committing, and is replayed by `verify-run` from the
+preflighted manifest rather than trusted merely because a ledger event was rehashed.
+
+| Schedule kind | Admitted update | Atomic local unit | Required manifest evidence |
+| --- | --- | --- | --- |
+| `layered` | `binary_spa` | `one_layer` | explicit/source partitions and provenance; graph coloring also gives its construction rule |
+| `check_node_serial` (check-node serial) | `binary_spa` | `one_check_all_c2v_then_affected_v2c` | canonical check order; later checks observe refreshed affected V2C state |
+| `variable_node_serial` (variable-node serial) | `binary_spa` | `one_variable_belief_then_incident_v2c` | canonical variable order; the current incident C2V state is gathered before fanout refresh |
+| `residual` | `binary_spa` | `one_residual_selected_c2v_commit` | the pinned conventional Huang--Ueng sRBP cache, canonical-edge tie rule, and explicit setup/decode work |
+| `randomized` | `binary_spa` | one local unit of its declared layered base | `base_schedule`, `refresh_scope`, and a SHA-256 `root_identity`, plus the base partition evidence |
+
+Randomized traversal uses only its purpose-separated `schedule_order` PCG64
+stream. Its configuration, attempt, or sweep refresh boundary and every realized
+order are terminal evidence; this stream never changes the matched physical sample.
+The current public randomized factory deliberately admits only a layered base. A
+randomized serial base, a non-SPA local schedule, min-sum plus a local schedule, a
+missing source artifact for learned clustering, or any undeclared partition/refresh
+combination is a **compatibility rejection before sampling**: it creates neither a
+physical sample nor partial shot evidence.
+
+For every local terminal, `source_iteration` gives the named local-unit count,
+`completed_traversals` and `local_cursor` retain partial traversal state, and the
+schedule evidence exposes fresh/stale visibility, selected order, residual cache
+semantics, or randomized replay facts as appropriate. These quantities are not
+converted to flooding sweeps or a universal cost.
 
 For an outgoing check-to-variable edge, min-sum uses
 

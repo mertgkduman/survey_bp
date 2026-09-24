@@ -61,7 +61,10 @@ _ROLE_HOOKS: dict[PolicyRole, Hook] = {
 }
 _POLICY_KINDS: dict[PolicyRole, frozenset[str]] = {
     PolicyRole.UPDATE: frozenset({"identity", "binary_spa", "min_sum", "normalized_min_sum", "offset_min_sum"}),
-    PolicyRole.SCHEDULE: frozenset({"identity", "flooding", "layered"}),
+    PolicyRole.SCHEDULE: frozenset({
+        "identity", "flooding", "layered", "check_node_serial",
+        "variable_node_serial", "residual", "randomized",
+    }),
     PolicyRole.STATE_MEMORY: frozenset({"identity", "stateless"}),
     PolicyRole.INTERVENTION: frozenset({"identity"}),
     PolicyRole.STOPPING: frozenset({"identity", "syndrome_or_budget"}),
@@ -146,6 +149,9 @@ class SchedulePolicySpecV3(PolicySpec):
     partitions: tuple[tuple[int, ...], ...] | None = None
     provenance: Literal["explicit", "source_explicit", "graph_coloring"] | None = None
     construction_rule: str | None = None
+    base_schedule: Literal["layered", "check_node_serial", "variable_node_serial"] | None = None
+    refresh_scope: Literal["configuration", "attempt", "sweep"] | None = None
+    root_identity: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
 
     @field_validator("partitions", mode="before")
     @classmethod
@@ -156,7 +162,12 @@ class SchedulePolicySpecV3(PolicySpec):
 
     @model_validator(mode="after")
     def layered_controls_match_the_declared_kind(self) -> "SchedulePolicySpecV3":
-        if self.kind == "layered":
+        layered = self.kind == "layered"
+        randomized = self.kind == "randomized"
+        if randomized and self.base_schedule is not None and self.base_schedule != "layered":
+            raise ValueError("public randomized schedules require a layered base_schedule")
+        needs_layers = layered or (randomized and self.base_schedule == "layered")
+        if needs_layers:
             if self.partitions is None or self.provenance is None:
                 raise ValueError("layered schedules require explicit partitions and provenance")
             if self.provenance == "graph_coloring" and not self.construction_rule:
@@ -165,6 +176,12 @@ class SchedulePolicySpecV3(PolicySpec):
                 raise ValueError("only graph_coloring layered schedules may carry construction_rule")
         elif self.partitions is not None or self.provenance is not None or self.construction_rule is not None:
             raise ValueError("schedule controls are valid only for layered schedules")
+        randomized_controls = (self.base_schedule, self.refresh_scope, self.root_identity)
+        if randomized:
+            if any(value is None for value in randomized_controls):
+                raise ValueError("randomized schedules require base_schedule, refresh_scope, and root_identity")
+        elif any(value is not None for value in randomized_controls):
+            raise ValueError("randomized controls are valid only for randomized schedules")
         return self
 
 
