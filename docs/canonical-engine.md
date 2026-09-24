@@ -360,6 +360,56 @@ evidence of source-faithful or statistical reproduction.
 - A relay leg may transfer only a typed, named payload and has sequential
   attribution.  It cannot inherit arbitrary predecessor private state.
 
+## CanonicalExperimentV4 memory compositions
+
+`CanonicalExperimentV4` is the public versioned contract for ordered memory
+compositions.  It retains every V3 artifact, budget, evidence, randomness, and
+seven-role policy field unchanged, then adds one required `memory` object.  Its
+generated schema is [`schema-canonical-v4.json`](../data/manifests/schema-canonical-v4.json).
+Only schema version 4 parses as V4; V2 and V3 keep their historical meanings.
+
+`memory.bindings` is a nonempty list stored in its explicit execution order.
+Every binding has a unique `binding_id`, a disjoint `history_owner`, contiguous
+`order` beginning at zero, a closed `kind`/`target` pair, finite coefficient
+parameters, `state_lifetime`, `advance_boundary`, `refresh_boundary`, and a
+`source_status`.  Repeated kinds are allowed when these identities are distinct.
+The engine applies bindings in the persisted order and each owner controls only
+its own history refresh and commit boundary.
+
+The currently public flooding boundary is `source_iteration`: it admits
+`affine_prior`, V2C damping, PDBP field mixing, PD-prime delta mixing, and
+posterior momentum where their declared operands are available.  A preflight
+rejection identifies the failed operand, for example
+`memory.target_boundary_unsupported:belief:local_update:flooding`; rejection
+happens before artifact loading or sampling.  The preflight report includes the
+resolved ordered bindings and `memory.compatibility` result.
+
+Source labels remain evidence, not hidden defaults.  `source_defined` names a
+source-qualified procedure, `canonical_adaptation` names a project CSS
+adaptation, and `exploratory` identifies a non-source target.  EWA prior memory
+and uniform Relay affine memory use the same primitive under `gamma = 1-alpha`;
+their source status, history lifetime, and Relay leg transfer semantics remain
+separate declared bindings.  Relay's later disordered assignments are refresh
+configuration for that affine rule, not a second memory equation.
+
+Create a disposable V4 input from the checked fixture, then use only the public
+commands for preflight, execution, and verification:
+
+```bash
+OUT="$(mktemp -d "${TMPDIR:-/tmp}/canonical-v4.XXXXXX")"
+OMP_NUM_THREADS=1 .venv/bin/python -c 'import json, pathlib; src=pathlib.Path("data/manifests/canonical-three-qubit-development.json"); m=json.loads(src.read_text()); m.update({"schema_version":4,"run_id":"canonical-v4-memory-development"}); m["memory"]={"bindings":[{"binding_id":"ewa-prior","kind":"affine_prior","target":"prior","parameters":{"alpha":0.5},"order":0,"history_owner":"memory:ewa-prior","state_lifetime":"attempt","advance_boundary":"source_iteration","refresh_boundary":"attempt_start","source_status":"source_defined"}]}; pathlib.Path("'"$OUT"'/v4.json").write_text(json.dumps(m))'
+OMP_NUM_THREADS=1 .venv/bin/python -m bp_registry.cli preflight "$OUT/v4.json"
+OMP_NUM_THREADS=1 .venv/bin/python -m bp_registry.cli canonical "$OUT/v4.json" --output "$OUT/result"
+OMP_NUM_THREADS=1 .venv/bin/python -m bp_registry.cli verify-run "$OUT/result"
+```
+
+The final command reports the two terminal development shots.  The manifest
+digest binds the full V4 memory chain, including order, targets, histories,
+refresh boundaries, coefficients, and fidelity labels, into the public replay
+identity.  Do not replace `source_iteration` with an unsupported local boundary
+or omit a binding owner; those are rejected manifests rather than executable
+fallbacks.
+
 ## Evidence boundary
 
 This two-shot result is a bounded development smoke fixture.  It supplies an

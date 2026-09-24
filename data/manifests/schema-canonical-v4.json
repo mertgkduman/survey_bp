@@ -1,0 +1,1293 @@
+{
+  "$defs": {
+    "ArtifactV1": {
+      "additionalProperties": false,
+      "properties": {
+        "code_id": {
+          "minLength": 1,
+          "title": "Code Id",
+          "type": "string"
+        },
+        "format_version": {
+          "const": 1,
+          "title": "Format Version",
+          "type": "integer"
+        },
+        "matrix_hashes": {
+          "$ref": "#/$defs/MatrixHashesV1"
+        },
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "raw_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Raw Sha256",
+          "type": "string"
+        },
+        "root": {
+          "minLength": 1,
+          "title": "Root",
+          "type": "string"
+        },
+        "semantic_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Semantic Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "root",
+        "path",
+        "raw_sha256",
+        "semantic_sha256",
+        "matrix_hashes",
+        "format_version",
+        "code_id"
+      ],
+      "title": "ArtifactV1",
+      "type": "object"
+    },
+    "CanonicalBudgetScopeV2": {
+      "additionalProperties": false,
+      "properties": {
+        "max_iterations": {
+          "maximum": 100000,
+          "minimum": 1,
+          "title": "Max Iterations",
+          "type": "integer"
+        },
+        "work_limits": {
+          "$ref": "#/$defs/CanonicalWorkLimitsV2"
+        }
+      },
+      "required": [
+        "max_iterations",
+        "work_limits"
+      ],
+      "title": "CanonicalBudgetScopeV2",
+      "type": "object"
+    },
+    "CanonicalBudgetsV2": {
+      "additionalProperties": false,
+      "properties": {
+        "attempt": {
+          "$ref": "#/$defs/CanonicalBudgetScopeV2"
+        },
+        "denominator_rule": {
+          "const": "all_terminal_shots",
+          "title": "Denominator Rule",
+          "type": "string"
+        },
+        "max_shots": {
+          "maximum": 1000000,
+          "minimum": 1,
+          "title": "Max Shots",
+          "type": "integer"
+        },
+        "search": {
+          "$ref": "#/$defs/CanonicalBudgetScopeV2"
+        },
+        "shot": {
+          "$ref": "#/$defs/CanonicalBudgetScopeV2"
+        }
+      },
+      "required": [
+        "max_shots",
+        "shot",
+        "search",
+        "attempt",
+        "denominator_rule"
+      ],
+      "title": "CanonicalBudgetsV2",
+      "type": "object"
+    },
+    "CanonicalCompositionSpecV3": {
+      "additionalProperties": false,
+      "description": "V3 carries NMS assignments only on the update binding.",
+      "properties": {
+        "intervention": {
+          "$ref": "#/$defs/PolicySpec"
+        },
+        "postprocessing": {
+          "$ref": "#/$defs/PolicySpec"
+        },
+        "schedule": {
+          "$ref": "#/$defs/SchedulePolicySpecV3"
+        },
+        "selection": {
+          "$ref": "#/$defs/PolicySpec"
+        },
+        "state_memory": {
+          "$ref": "#/$defs/PolicySpec"
+        },
+        "stopping": {
+          "$ref": "#/$defs/PolicySpec"
+        },
+        "update": {
+          "$ref": "#/$defs/PolicySpecV3"
+        }
+      },
+      "required": [
+        "update",
+        "schedule",
+        "state_memory",
+        "intervention",
+        "stopping",
+        "selection",
+        "postprocessing"
+      ],
+      "title": "CanonicalCompositionSpecV3",
+      "type": "object"
+    },
+    "CanonicalEnvironmentV2": {
+      "additionalProperties": false,
+      "description": "Runtime identity for the project-owned CPU implementation only.",
+      "properties": {
+        "backend": {
+          "const": "cpu",
+          "title": "Backend",
+          "type": "string"
+        },
+        "numpy": {
+          "minLength": 1,
+          "title": "Numpy",
+          "type": "string"
+        },
+        "omp_num_threads": {
+          "const": 1,
+          "title": "Omp Num Threads",
+          "type": "integer"
+        },
+        "python": {
+          "minLength": 1,
+          "title": "Python",
+          "type": "string"
+        },
+        "scipy": {
+          "minLength": 1,
+          "title": "Scipy",
+          "type": "string"
+        }
+      },
+      "required": [
+        "python",
+        "numpy",
+        "scipy",
+        "backend",
+        "omp_num_threads"
+      ],
+      "title": "CanonicalEnvironmentV2",
+      "type": "object"
+    },
+    "CanonicalEvidenceV2": {
+      "additionalProperties": false,
+      "properties": {
+        "assessment_status": {
+          "const": "not_assessed",
+          "title": "Assessment Status",
+          "type": "string"
+        },
+        "discrepancies": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Discrepancies",
+          "type": "array"
+        },
+        "fixture": {
+          "enum": [
+            "development_fixture",
+            "pilot_adaptation"
+          ],
+          "title": "Fixture",
+          "type": "string"
+        },
+        "procedure": {
+          "minLength": 1,
+          "title": "Procedure",
+          "type": "string"
+        },
+        "relation": {
+          "enum": [
+            "canonical_implemented",
+            "pilot_adaptation"
+          ],
+          "title": "Relation",
+          "type": "string"
+        },
+        "sources": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Sources",
+          "type": "array"
+        }
+      },
+      "required": [
+        "relation",
+        "fixture",
+        "assessment_status",
+        "procedure",
+        "sources",
+        "discrepancies"
+      ],
+      "title": "CanonicalEvidenceV2",
+      "type": "object"
+    },
+    "CanonicalProfilePlanV2": {
+      "additionalProperties": false,
+      "properties": {
+        "cohort": {
+          "enum": [
+            "clean",
+            "representative",
+            "diagnostic"
+          ],
+          "title": "Cohort",
+          "type": "string"
+        },
+        "enabled": {
+          "title": "Enabled",
+          "type": "boolean"
+        },
+        "level": {
+          "enum": [
+            "low_overhead",
+            "representative"
+          ],
+          "title": "Level",
+          "type": "string"
+        },
+        "selected_before_outcome": {
+          "title": "Selected Before Outcome",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "enabled",
+        "level",
+        "cohort",
+        "selected_before_outcome"
+      ],
+      "title": "CanonicalProfilePlanV2",
+      "type": "object"
+    },
+    "CanonicalRandomnessV2": {
+      "additionalProperties": false,
+      "properties": {
+        "decoder_seed_identity": {
+          "minLength": 1,
+          "title": "Decoder Seed Identity",
+          "type": "string"
+        },
+        "physical_sample_identity": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Physical Sample Identity"
+        },
+        "sample_derivation": {
+          "const": "sha256-manifest-shot-v1",
+          "title": "Sample Derivation",
+          "type": "string"
+        },
+        "sample_seed": {
+          "minimum": 0,
+          "title": "Sample Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "sample_seed",
+        "decoder_seed_identity",
+        "sample_derivation"
+      ],
+      "title": "CanonicalRandomnessV2",
+      "type": "object"
+    },
+    "CanonicalTracePlanV2": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "enum": [
+            "development_default",
+            "prespecified_campaign"
+          ],
+          "title": "Label",
+          "type": "string"
+        },
+        "level": {
+          "enum": [
+            "off",
+            "full",
+            "filtered"
+          ],
+          "title": "Level",
+          "type": "string"
+        },
+        "max_bytes": {
+          "maximum": 67108864,
+          "minimum": 0,
+          "title": "Max Bytes",
+          "type": "integer"
+        },
+        "max_records": {
+          "maximum": 1000000,
+          "minimum": 0,
+          "title": "Max Records",
+          "type": "integer"
+        },
+        "relative_dir": {
+          "minLength": 1,
+          "title": "Relative Dir",
+          "type": "string"
+        }
+      },
+      "required": [
+        "level",
+        "relative_dir",
+        "max_records",
+        "max_bytes",
+        "label"
+      ],
+      "title": "CanonicalTracePlanV2",
+      "type": "object"
+    },
+    "CanonicalWorkLimitsV2": {
+      "additionalProperties": false,
+      "description": "One complete, resource-specific hard cap vector for one lifecycle scope.",
+      "properties": {
+        "belief_assemblies": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Belief Assemblies",
+          "type": "integer"
+        },
+        "bp_calls": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Bp Calls",
+          "type": "integer"
+        },
+        "branch_expansions": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Branch Expansions",
+          "type": "integer"
+        },
+        "branch_prunes": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Branch Prunes",
+          "type": "integer"
+        },
+        "candidate_checks": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Candidate Checks",
+          "type": "integer"
+        },
+        "check_to_variable_updates": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Check To Variable Updates",
+          "type": "integer"
+        },
+        "fallback_calls": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Fallback Calls",
+          "type": "integer"
+        },
+        "intervention_actions": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Intervention Actions",
+          "type": "integer"
+        },
+        "relay_transfers": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Relay Transfers",
+          "type": "integer"
+        },
+        "residual_priority_evaluations": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Residual Priority Evaluations",
+          "type": "integer"
+        },
+        "variable_to_check_updates": {
+          "maximum": 100000000,
+          "minimum": 0,
+          "title": "Variable To Check Updates",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "check_to_variable_updates",
+        "variable_to_check_updates",
+        "belief_assemblies",
+        "residual_priority_evaluations",
+        "bp_calls",
+        "candidate_checks",
+        "intervention_actions",
+        "branch_expansions",
+        "branch_prunes",
+        "relay_transfers",
+        "fallback_calls"
+      ],
+      "title": "CanonicalWorkLimitsV2",
+      "type": "object"
+    },
+    "MatrixHashesV1": {
+      "additionalProperties": false,
+      "description": "Separate role- and order-sensitive identities for each CSS object.",
+      "properties": {
+        "hx_raw_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Hx Raw Sha256",
+          "type": "string"
+        },
+        "hx_semantic_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Hx Semantic Sha256",
+          "type": "string"
+        },
+        "hz_raw_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Hz Raw Sha256",
+          "type": "string"
+        },
+        "hz_semantic_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Hz Semantic Sha256",
+          "type": "string"
+        },
+        "lx_raw_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Lx Raw Sha256",
+          "type": "string"
+        },
+        "lx_semantic_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Lx Semantic Sha256",
+          "type": "string"
+        },
+        "lz_raw_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Lz Raw Sha256",
+          "type": "string"
+        },
+        "lz_semantic_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Lz Semantic Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "hx_raw_sha256",
+        "hz_raw_sha256",
+        "lx_raw_sha256",
+        "lz_raw_sha256",
+        "hx_semantic_sha256",
+        "hz_semantic_sha256",
+        "lx_semantic_sha256",
+        "lz_semantic_sha256"
+      ],
+      "title": "MatrixHashesV1",
+      "type": "object"
+    },
+    "MemoryAdvanceBoundary": {
+      "description": "The one declared point at which a binding may replace its history.",
+      "enum": [
+        "local_update",
+        "source_iteration"
+      ],
+      "title": "MemoryAdvanceBoundary",
+      "type": "string"
+    },
+    "MemoryBindingSpec": {
+      "additionalProperties": false,
+      "description": "One ordered, separately owned memory policy binding.\n\nThe binding is intentionally declarative.  It records every ownership and\nlifecycle choice before a schedule can sample, advance, or commit state.",
+      "properties": {
+        "advance_boundary": {
+          "$ref": "#/$defs/MemoryAdvanceBoundary"
+        },
+        "binding_id": {
+          "pattern": "^[a-z][a-z0-9_-]{0,63}$",
+          "title": "Binding Id",
+          "type": "string"
+        },
+        "history_owner": {
+          "pattern": "^[a-z][a-z0-9:_-]{0,127}$",
+          "title": "History Owner",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "affine_prior",
+            "v2c_damping",
+            "pdbp_field_mix",
+            "pdprime_delta_mix",
+            "posterior_momentum"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "order": {
+          "maximum": 1000,
+          "minimum": 0,
+          "title": "Order",
+          "type": "integer"
+        },
+        "parameters": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Parameters",
+          "type": "object"
+        },
+        "refresh_boundary": {
+          "$ref": "#/$defs/MemoryRefreshBoundary"
+        },
+        "retain_history": {
+          "default": false,
+          "title": "Retain History",
+          "type": "boolean"
+        },
+        "source_status": {
+          "enum": [
+            "source_defined",
+            "canonical_adaptation",
+            "exploratory"
+          ],
+          "title": "Source Status",
+          "type": "string"
+        },
+        "state_lifetime": {
+          "enum": [
+            "shot",
+            "search",
+            "member",
+            "leg",
+            "branch",
+            "attempt",
+            "iteration",
+            "message"
+          ],
+          "title": "State Lifetime",
+          "type": "string"
+        },
+        "target": {
+          "enum": [
+            "prior",
+            "v2c",
+            "belief",
+            "posterior"
+          ],
+          "title": "Target",
+          "type": "string"
+        }
+      },
+      "required": [
+        "binding_id",
+        "kind",
+        "target",
+        "parameters",
+        "order",
+        "history_owner",
+        "state_lifetime",
+        "advance_boundary",
+        "refresh_boundary",
+        "source_status"
+      ],
+      "title": "MemoryBindingSpec",
+      "type": "object"
+    },
+    "MemoryCompositionSpec": {
+      "additionalProperties": false,
+      "description": "A closed ordered chain of memory bindings with no implicit owner/order.",
+      "properties": {
+        "bindings": {
+          "items": {
+            "$ref": "#/$defs/MemoryBindingSpec"
+          },
+          "maxItems": 64,
+          "minItems": 1,
+          "title": "Bindings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "bindings"
+      ],
+      "title": "MemoryCompositionSpec",
+      "type": "object"
+    },
+    "MemoryRefreshBoundary": {
+      "description": "The controller-owned boundary that starts a retained or reset lifetime.",
+      "enum": [
+        "attempt_start",
+        "leg_start",
+        "local_update",
+        "source_iteration"
+      ],
+      "title": "MemoryRefreshBoundary",
+      "type": "string"
+    },
+    "ParameterAssignment": {
+      "additionalProperties": false,
+      "description": "One explicit normalization assignment, never an inferred broadcast.",
+      "properties": {
+        "graph_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Graph Sha256"
+        },
+        "shape": {
+          "enum": [
+            "scalar",
+            "source_iteration",
+            "check",
+            "edge"
+          ],
+          "title": "Shape",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "values": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Values"
+        }
+      },
+      "required": [
+        "shape"
+      ],
+      "title": "ParameterAssignment",
+      "type": "object"
+    },
+    "ParameterGeneratorSpec": {
+      "additionalProperties": false,
+      "description": "Closed, purpose-separated generator declaration for one assignment draw.",
+      "properties": {
+        "algorithm": {
+          "const": "numpy.PCG64",
+          "default": "numpy.PCG64",
+          "title": "Algorithm",
+          "type": "string"
+        },
+        "distribution": {
+          "const": "uniform",
+          "title": "Distribution",
+          "type": "string"
+        },
+        "generator_version": {
+          "minLength": 1,
+          "title": "Generator Version",
+          "type": "string"
+        },
+        "graph_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Graph Sha256",
+          "type": "string"
+        },
+        "high": {
+          "title": "High",
+          "type": "number"
+        },
+        "low": {
+          "title": "Low",
+          "type": "number"
+        },
+        "provenance": {
+          "default": "exploratory",
+          "enum": [
+            "source_defined",
+            "exploratory"
+          ],
+          "title": "Provenance",
+          "type": "string"
+        },
+        "purpose": {
+          "const": "parameter_assignment",
+          "default": "parameter_assignment",
+          "title": "Purpose",
+          "type": "string"
+        },
+        "root_seed_identity": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Root Seed Identity",
+          "type": "string"
+        },
+        "shape": {
+          "enum": [
+            "scalar",
+            "check",
+            "edge"
+          ],
+          "title": "Shape",
+          "type": "string"
+        },
+        "source_anchor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Anchor"
+        }
+      },
+      "required": [
+        "shape",
+        "graph_sha256",
+        "distribution",
+        "low",
+        "high",
+        "root_seed_identity"
+      ],
+      "title": "ParameterGeneratorSpec",
+      "type": "object"
+    },
+    "ParameterRefreshPlan": {
+      "additionalProperties": false,
+      "description": "Configuration, attempt, or source-iteration assignment refresh contract.",
+      "properties": {
+        "generator": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ParameterGeneratorSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "scope": {
+          "enum": [
+            "configuration",
+            "attempt",
+            "source_iteration"
+          ],
+          "title": "Scope",
+          "type": "string"
+        }
+      },
+      "required": [
+        "scope"
+      ],
+      "title": "ParameterRefreshPlan",
+      "type": "object"
+    },
+    "PolicySpec": {
+      "additionalProperties": false,
+      "description": "Persisted data only: no module paths, callables, or implicit defaults.",
+      "properties": {
+        "binding_id": {
+          "pattern": "^[a-z][a-z0-9_-]{0,63}$",
+          "title": "Binding Id",
+          "type": "string"
+        },
+        "hook": {
+          "anyOf": [
+            {
+              "enum": [
+                "shot",
+                "search",
+                "member",
+                "leg",
+                "branch",
+                "attempt",
+                "iteration",
+                "message"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Hook"
+        },
+        "kind": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Kind",
+          "type": "string"
+        },
+        "owned_state": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Owned State",
+          "type": "array"
+        },
+        "provides": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Provides",
+          "type": "array"
+        },
+        "requires": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Requires",
+          "type": "array"
+        },
+        "state_lifetime": {
+          "enum": [
+            "shot",
+            "search",
+            "member",
+            "leg",
+            "branch",
+            "attempt",
+            "iteration",
+            "message"
+          ],
+          "title": "State Lifetime",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "binding_id",
+        "state_lifetime"
+      ],
+      "title": "PolicySpec",
+      "type": "object"
+    },
+    "PolicySpecV3": {
+      "additionalProperties": false,
+      "description": "V3-only update extension; V2's persisted policy schema remains byte-stable.",
+      "properties": {
+        "binding_id": {
+          "pattern": "^[a-z][a-z0-9_-]{0,63}$",
+          "title": "Binding Id",
+          "type": "string"
+        },
+        "hook": {
+          "anyOf": [
+            {
+              "enum": [
+                "shot",
+                "search",
+                "member",
+                "leg",
+                "branch",
+                "attempt",
+                "iteration",
+                "message"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Hook"
+        },
+        "kind": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Kind",
+          "type": "string"
+        },
+        "owned_state": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Owned State",
+          "type": "array"
+        },
+        "parameter_assignment": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ParameterAssignment"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "parameter_generator": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ParameterGeneratorSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "parameter_refresh": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ParameterRefreshPlan"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "provides": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Provides",
+          "type": "array"
+        },
+        "requires": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Requires",
+          "type": "array"
+        },
+        "state_lifetime": {
+          "enum": [
+            "shot",
+            "search",
+            "member",
+            "leg",
+            "branch",
+            "attempt",
+            "iteration",
+            "message"
+          ],
+          "title": "State Lifetime",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "binding_id",
+        "state_lifetime"
+      ],
+      "title": "PolicySpecV3",
+      "type": "object"
+    },
+    "SchedulePolicySpecV3": {
+      "additionalProperties": false,
+      "description": "Persisted layered membership is explicit, graph-bound configuration data.",
+      "properties": {
+        "base_schedule": {
+          "anyOf": [
+            {
+              "enum": [
+                "layered",
+                "check_node_serial",
+                "variable_node_serial"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Base Schedule"
+        },
+        "binding_id": {
+          "pattern": "^[a-z][a-z0-9_-]{0,63}$",
+          "title": "Binding Id",
+          "type": "string"
+        },
+        "construction_rule": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Construction Rule"
+        },
+        "hook": {
+          "anyOf": [
+            {
+              "enum": [
+                "shot",
+                "search",
+                "member",
+                "leg",
+                "branch",
+                "attempt",
+                "iteration",
+                "message"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Hook"
+        },
+        "kind": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Kind",
+          "type": "string"
+        },
+        "owned_state": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Owned State",
+          "type": "array"
+        },
+        "partitions": {
+          "anyOf": [
+            {
+              "items": {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Partitions"
+        },
+        "provenance": {
+          "anyOf": [
+            {
+              "enum": [
+                "explicit",
+                "source_explicit",
+                "graph_coloring"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provenance"
+        },
+        "provides": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Provides",
+          "type": "array"
+        },
+        "refresh_scope": {
+          "anyOf": [
+            {
+              "enum": [
+                "configuration",
+                "attempt",
+                "sweep"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Refresh Scope"
+        },
+        "requires": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Requires",
+          "type": "array"
+        },
+        "root_identity": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Root Identity"
+        },
+        "source_id": {
+          "anyOf": [
+            {
+              "const": "hsu-ndgsbp-2012-v1",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Id"
+        },
+        "state_lifetime": {
+          "enum": [
+            "shot",
+            "search",
+            "member",
+            "leg",
+            "branch",
+            "attempt",
+            "iteration",
+            "message"
+          ],
+          "title": "State Lifetime",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "binding_id",
+        "state_lifetime"
+      ],
+      "title": "SchedulePolicySpecV3",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Strict public composition contract for ordered Phase 4 memory bindings.\n\nV4 extends the complete V3 evidence contract so public execution retains the\nestablished artifact, budget, provenance, and outcome semantics.  The memory\nchain is persisted separately from the seven required policy roles because it\nmay contain repeated policy kinds with private history owners.",
+  "properties": {
+    "artifact": {
+      "$ref": "#/$defs/ArtifactV1"
+    },
+    "budgets": {
+      "$ref": "#/$defs/CanonicalBudgetsV2"
+    },
+    "environment": {
+      "$ref": "#/$defs/CanonicalEnvironmentV2"
+    },
+    "error_rate": {
+      "exclusiveMaximum": 1.0,
+      "exclusiveMinimum": 0.0,
+      "title": "Error Rate",
+      "type": "number"
+    },
+    "evidence": {
+      "$ref": "#/$defs/CanonicalEvidenceV2"
+    },
+    "memory": {
+      "$ref": "#/$defs/MemoryCompositionSpec"
+    },
+    "numerical_profile": {
+      "enum": [
+        "cpu-float64-min-sum-v1",
+        "cpu-float64-spa-v1"
+      ],
+      "title": "Numerical Profile",
+      "type": "string"
+    },
+    "policies": {
+      "$ref": "#/$defs/CanonicalCompositionSpecV3"
+    },
+    "profile_plan": {
+      "$ref": "#/$defs/CanonicalProfilePlanV2"
+    },
+    "randomness": {
+      "$ref": "#/$defs/CanonicalRandomnessV2"
+    },
+    "run_id": {
+      "minLength": 1,
+      "title": "Run Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 4,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "trace_plan": {
+      "$ref": "#/$defs/CanonicalTracePlanV2"
+    }
+  },
+  "required": [
+    "schema_version",
+    "run_id",
+    "numerical_profile",
+    "error_rate",
+    "policies",
+    "budgets",
+    "trace_plan",
+    "profile_plan",
+    "environment",
+    "artifact",
+    "randomness",
+    "evidence",
+    "memory"
+  ],
+  "title": "CanonicalExperimentV4",
+  "type": "object"
+}

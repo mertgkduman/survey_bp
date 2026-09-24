@@ -101,7 +101,7 @@ def preflight_pilot(manifest_path: str | Path) -> dict[str, Any]:
         raise ValueError("selected artifact run must remain a pilot_adaptation")
     if manifest.expected_output.status != "not_assessed":
         raise ValueError("selected artifact run must remain not_assessed")
-    return {
+    report = {
         "run_id": manifest.run_id,
         "code_id": manifest.artifact.code_id,
         "relation": manifest.paper.relation,
@@ -116,6 +116,7 @@ def preflight_pilot(manifest_path: str | Path) -> dict[str, Any]:
         "shot_budget": manifest.budget.max_shots,
         "max_iter": manifest.budget.max_iter,
     }
+    return report
 
 
 def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
@@ -125,7 +126,7 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
     if not isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4)):
         raise ValueError("canonical execution requires a strict CanonicalExperimentV2, V3, or V4 manifest")
     composition = validate_executable_canonical_baseline(manifest.policies)
-    return {
+    report = {
         "run_id": manifest.run_id,
         "code_id": manifest.artifact.code_id,
         "manifest_sha256": manifest_digest(manifest),
@@ -146,6 +147,12 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
         "profile_plan": manifest.profile_plan.model_dump(mode="json"),
         "trace_plan": manifest.trace_plan.model_dump(mode="json"),
     }
+    if isinstance(manifest, CanonicalExperimentV4):
+        report["memory"] = {
+            "bindings": [binding.model_dump(mode="json") for binding in manifest.memory.bindings],
+            "compatibility": {"admitted": True, "reason": None},
+        }
+    return report
 
 
 def _canonical_kernel_manifest(manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4) -> dict[str, object]:

@@ -126,6 +126,24 @@ def test_canonical_v3_schema_is_generated_from_the_public_nms_contract():
     assert json.loads(schema_path.read_text(encoding="utf-8")) == CanonicalExperimentV3.model_json_schema()
 
 
+def test_canonical_v4_schema_is_generated_from_the_public_memory_contract():
+    from bp_registry.manifests import CanonicalExperimentV4
+
+    schema_path = Path("data/manifests/schema-canonical-v4.json")
+    assert schema_path.exists()
+    assert json.loads(schema_path.read_text(encoding="utf-8")) == CanonicalExperimentV4.model_json_schema()
+
+
+def test_documented_v4_memory_contract_names_public_boundaries_and_rejections():
+    tutorial = Path("docs/canonical-engine.md").read_text(encoding="utf-8").lower()
+    for term in (
+        "canonicalexperimentv4", "schema-canonical-v4.json", "memory.bindings",
+        "history_owner", "source_iteration", "relay", "ewa", "compatibility",
+        "canonical-v4", "verify-run", "memory.target_boundary_unsupported",
+    ):
+        assert term in tutorial
+
+
 def test_canonical_v4_preflight_admits_ordered_repeated_memory_compositions(tmp_path):
     """V4 is the public, strict boundary for every compatibility-approved binding chain."""
     from bp_registry import manifests

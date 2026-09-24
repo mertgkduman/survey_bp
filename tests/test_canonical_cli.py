@@ -280,6 +280,8 @@ def test_canonical_v4_memory_composition_preflights_runs_and_verifies_publicly(t
     ]
 
     assert reports[0]["run_id"] == "canonical-v4-public-memory"
+    assert reports[0]["memory"]["compatibility"] == {"admitted": True, "reason": None}
+    assert [binding["binding_id"] for binding in reports[0]["memory"]["bindings"]] == ["ewa-prior"]
     assert reports[1]["final_row_count"] == reports[2]["final_row_count"] == 2
 
 
