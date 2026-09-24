@@ -170,6 +170,30 @@ def test_binding_commit_rejects_foreign_owned_state_without_mutating_history():
         owner.commit(proposal, MemoryState("foreign", np.asarray([2.0])))
 
 
-@pytest.mark.skip(reason="Wave 1 adds seeded assignments, schedule compatibility, and budget-denial rollback fixtures.")
 def test_denied_memory_work_preserves_history_rng_and_schedule_cursor():
-    """Reserved behavior target for the policy composition expansion."""
+    """A denied reservation leaves every proposed memory lifecycle fact intact."""
+    from bp_registry.canonical.budgets import BudgetLimit, BudgetTree, WorkVector
+    from bp_registry.canonical.memory import MemoryAssignmentSpec, MemoryCompositionState
+
+    graph = "e" * 64
+    assignment = MemoryAssignmentSpec(
+        mode="uniform", graph_sha256=graph, root_seed_identity="f" * 64,
+        low=-0.24, high=0.66, refresh_boundary="leg_start", retain_history=True,
+    )
+    state = assignment.initial_state(configuration_identity="configuration-3", decoder_identity="decoder-3")
+    history = MemoryCompositionState((MemoryState("rollback", np.asarray([2.0])),))
+    tree = BudgetTree(
+        limits=(BudgetLimit("attempt", "intervention_actions", 0),), parents={}
+    )
+
+    result = assignment.refresh(
+        state, boundary="leg_start", replay_identity="shot-3:leg-1", variable_count=1,
+        budgets=tree, budget_scope="attempt", history_state=history, schedule_cursor=(1,),
+        work=WorkVector(intervention_actions=1),
+    )
+
+    assert not result.admitted
+    assert result.state == state
+    assert result.history_state == history
+    assert result.schedule_cursor == (1,)
+    assert tree.summary("attempt") == WorkVector.zero()
