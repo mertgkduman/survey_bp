@@ -5,12 +5,28 @@ from __future__ import annotations
 import importlib.util
 import json
 from pathlib import Path
+import tomllib
 
 import pytest
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 PILOT_SCRIPT = REPOSITORY_ROOT / "scripts" / "run_phase3_pilots.py"
+NOTEBOOK_EXECUTOR = REPOSITORY_ROOT / "scripts" / "execute_phase3_notebook.py"
+
+
+def test_analysis_extra_and_notebook_executor_are_pinned_and_confined():
+    """D-18 analysis uses exact, isolated dependencies and a project kernel."""
+    with (REPOSITORY_ROOT / "pyproject.toml").open("rb") as stream:
+        project = tomllib.load(stream)["project"]
+
+    assert project.get("optional-dependencies", {}).get("analysis") == [
+        "matplotlib==3.10.9",
+        "nbformat==5.10.4",
+        "nbclient==0.10.2",
+        "ipykernel==6.29.5",
+    ]
+    assert NOTEBOOK_EXECUTOR.is_file(), "D-18 needs a confined notebook executor"
 
 
 def _pilot_module():
