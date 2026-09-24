@@ -101,7 +101,7 @@ def _has_symlinked_component(root: Path, relative: PurePosixPath) -> bool:
     return False
 
 
-def resolve_sources(
+def _resolve_sources(
     repository_root: Path = REPOSITORY_ROOT,
     source_files: Sequence[str] = SOURCE_FILES,
 ) -> tuple[SourceDocument, ...]:
@@ -140,13 +140,16 @@ def resolve_sources(
     return tuple(documents)
 
 
-def source_manifest(
-    repository_root: Path = REPOSITORY_ROOT,
-    source_files: Sequence[str] = SOURCE_FILES,
-) -> tuple[tuple[str, str], ...]:
+def resolve_sources(repository_root: Path = REPOSITORY_ROOT) -> tuple[SourceDocument, ...]:
+    """Return the immutable, approved documentation inventory."""
+
+    return _resolve_sources(repository_root, SOURCE_FILES)
+
+
+def source_manifest(repository_root: Path = REPOSITORY_ROOT) -> tuple[tuple[str, str], ...]:
     """Return ordered, repository-relative source labels and SHA-256 values."""
 
-    return tuple((source.relative_path, source.sha256) for source in resolve_sources(repository_root, source_files))
+    return tuple((source.relative_path, source.sha256) for source in resolve_sources(repository_root))
 
 
 def validate_output(output: Path, sources: Iterable[SourceDocument]) -> Path:
@@ -265,11 +268,10 @@ def _configure_matplotlib() -> None:
 def render_pdf(
     output: Path,
     repository_root: Path = REPOSITORY_ROOT,
-    source_files: Sequence[str] = SOURCE_FILES,
 ) -> Path:
     """Render the fixed inventory to ``output`` without replacing it yet."""
 
-    sources = resolve_sources(repository_root, source_files)
+    sources = resolve_sources(repository_root)
     output_path = validate_output(output, sources)
     _configure_matplotlib()
     state = RenderState()
@@ -295,15 +297,14 @@ def _temporary_pdf_path(output_path: Path) -> Path:
 def build_pdf(
     output: Path,
     repository_root: Path = REPOSITORY_ROOT,
-    source_files: Sequence[str] = SOURCE_FILES,
 ) -> Path:
     """Atomically render and replace the approved output PDF."""
 
-    sources = resolve_sources(repository_root, source_files)
+    sources = resolve_sources(repository_root)
     output_path = validate_output(output, sources)
     temporary_path = _temporary_pdf_path(output_path)
     try:
-        render_pdf(temporary_path, repository_root, source_files)
+        render_pdf(temporary_path, repository_root)
         os.replace(temporary_path, output_path)
     finally:
         temporary_path.unlink(missing_ok=True)
@@ -313,17 +314,16 @@ def build_pdf(
 def check_pdf(
     output: Path,
     repository_root: Path = REPOSITORY_ROOT,
-    source_files: Sequence[str] = SOURCE_FILES,
 ) -> bool:
     """Render beside ``output`` and compare the result byte-for-byte."""
 
-    sources = resolve_sources(repository_root, source_files)
+    sources = resolve_sources(repository_root)
     output_path = validate_output(output, sources)
     if not output_path.is_file():
         return False
     temporary_path = _temporary_pdf_path(output_path)
     try:
-        render_pdf(temporary_path, repository_root, source_files)
+        render_pdf(temporary_path, repository_root)
         return temporary_path.read_bytes() == output_path.read_bytes()
     finally:
         temporary_path.unlink(missing_ok=True)
