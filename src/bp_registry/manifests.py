@@ -357,7 +357,14 @@ class CanonicalExperimentV2(StrictModel):
         return value
 
 
-ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2
+class CanonicalExperimentV3(CanonicalExperimentV2):
+    """Versioned public contract for the promoted min-sum local-step tracer."""
+
+    schema_version: Literal[3]
+    numerical_profile: Literal["cpu-float64-min-sum-v1"]
+
+
+ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2 | CanonicalExperimentV3
 
 
 _EXECUTABLE_BASELINE_KINDS = {
@@ -369,6 +376,7 @@ _EXECUTABLE_BASELINE_KINDS = {
     "selection": "stable_first",
     "postprocessing": "identity",
 }
+_EXECUTABLE_MIN_SUM_KINDS = {**_EXECUTABLE_BASELINE_KINDS, "update": "min_sum"}
 _IDENTITY_ONLY_ROLES = frozenset({"state_memory", "intervention", "postprocessing"})
 
 
@@ -378,9 +386,9 @@ def validate_executable_canonical_baseline(composition: CanonicalCompositionSpec
 
     resolved = validate_composition(composition)
     actual = {binding.role.value: binding.kind for binding in resolved.bindings}
-    if actual != _EXECUTABLE_BASELINE_KINDS:
+    if actual not in (_EXECUTABLE_BASELINE_KINDS, _EXECUTABLE_MIN_SUM_KINDS):
         raise ValueError(
-                "executable canonical baseline requires binary_spa/flooding/stateless/"
+            "executable canonical baseline requires binary_spa or min_sum with flooding/stateless/"
             "identity/syndrome_or_budget/stable_first/identity policy kinds"
         )
     return resolved
@@ -420,11 +428,13 @@ def _read_value(value: dict[str, Any] | str | Path) -> dict[str, Any]:
     return decoded
 
 
-def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | CanonicalExperimentV2 | dict[str, Any] | str | Path) -> ManifestV1 | CanonicalManifestV2 | CanonicalExperimentV2:
+def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | CanonicalExperimentV2 | CanonicalExperimentV3 | dict[str, Any] | str | Path) -> ManifestV1 | CanonicalManifestV2 | CanonicalExperimentV2 | CanonicalExperimentV3:
     """Dispatch complete native and canonical schemas without changing v1 meanings."""
-    if isinstance(value, (ManifestV1, CanonicalManifestV2, CanonicalExperimentV2)):
+    if isinstance(value, (ManifestV1, CanonicalManifestV2, CanonicalExperimentV2, CanonicalExperimentV3)):
         return value
     decoded = _read_value(value)
+    if decoded.get("schema_version") == 3:
+        return CanonicalExperimentV3.model_validate(decoded)
     if decoded.get("schema_version") == 2:
         return CanonicalExperimentV2.model_validate(decoded) if "budgets" in decoded else parse_canonical_manifest(decoded)
     if decoded.get("schema_version") != 1:
@@ -433,9 +443,11 @@ def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | CanonicalExperiment
 
 
 def _parse_for_preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ManifestRecord:
-    if isinstance(value, (ManifestV1, LegacyManifestV1, CanonicalExperimentV2)):
+    if isinstance(value, (ManifestV1, LegacyManifestV1, CanonicalExperimentV2, CanonicalExperimentV3)):
         return value
     decoded = _read_value(value)
+    if decoded.get("schema_version") == 3:
+        return CanonicalExperimentV3.model_validate(decoded)
     if decoded.get("schema_version") == 2:
         return CanonicalExperimentV2.model_validate(decoded)
     if decoded.get("schema_version") != 1:
@@ -526,7 +538,7 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
         # Original minimal v1 tracer records are immutable historical evidence.
         # They are retained for replay only; new records must use ManifestV1.
         return ResolvedExperiment(manifest=manifest, code=fixture_code(), artifact=None)
-    if isinstance(manifest, CanonicalExperimentV2):
+    if isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3)):
         _verify_canonical_environment(manifest.environment)
         if manifest.trace_plan.level != "off":
             raise ValueError("canonical trace plan must be off until a public trace hook is implemented")
@@ -535,7 +547,11 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
                 "canonical public profile plan requires a clean low_overhead cohort until a bounded quota exists"
             )
         # Closed registry resolution is deliberately before any sample, ledger, or kernel work.
-        validate_executable_canonical_baseline(manifest.policies)
+        composition = validate_executable_canonical_baseline(manifest.policies)
+        if type(manifest) is CanonicalExperimentV2 and manifest.policies.update.kind != "binary_spa":
+            raise ValueError("CanonicalExperimentV2 preserves only historical binary_spa semantics")
+        if isinstance(manifest, CanonicalExperimentV3) and manifest.policies.update.kind != "min_sum":
+            raise ValueError("CanonicalExperimentV3 requires the closed min_sum update rule")
         artifact = load_artifact(
             manifest.artifact.root, manifest.artifact.path,
             expected_raw_sha256=manifest.artifact.raw_sha256,

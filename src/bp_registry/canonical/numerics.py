@@ -34,6 +34,10 @@ class NumericalProfile:
 
 
 REFERENCE_CPU_F64 = NumericalProfile()
+MIN_SUM_CPU_F64 = NumericalProfile(
+    profile_id="binary-min-sum-flooding-f64-v1",
+    normalization="min_sum",
+)
 SATURATION = REFERENCE_CPU_F64.saturation
 
 

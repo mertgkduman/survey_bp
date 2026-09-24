@@ -18,6 +18,7 @@ from ..ledger import CanonicalEventWriter, LedgerWriter, ShotOwnershipError, rea
 from ..sampling import DecoderObservation, HiddenTruth
 from .contracts import (
     CanonicalManifestV2,
+    CanonicalManifestV3,
     Hook,
     PolicyBinding,
     PolicyDecision,
@@ -30,6 +31,8 @@ from .kernel import BinarySpaKernel
 from .profiling import LocalProfiler, ProfilingPlan
 from .lineage import LineageEdge, LineageId, stable_lineage_id
 from .numerics import NumericalFailure
+from .numerics import MIN_SUM_CPU_F64
+from .updates import MinSumUpdate
 from .problems import OriginalProblem, OriginalSpaceCandidate, WorkingProblem, select_stable_candidate
 from .schedules import EdgeTable, FloodingSchedule, FloodingSweep
 from .verification import PublicShotContext, validate_canonical_shot
@@ -127,6 +130,91 @@ class AtomicFloodingResult:
     converged: bool = False
 
 
+@dataclass(frozen=True, slots=True)
+class ScheduleProgress:
+    """Serializable schedule-owned progress with no mutable hidden cursor."""
+
+    iteration: int
+    local_steps: int
+    cursor: tuple[int, ...] = ()
+    rng_state: tuple[object, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class LocalStepProposal:
+    """The whole local mutation plus its mandatory convergence check work."""
+
+    label: str
+    proposed_work: WorkVector
+    compute: Callable[[], np.ndarray]
+
+
+@dataclass(frozen=True, slots=True)
+class LocalStepResult:
+    admitted: bool
+    progress: ScheduleProgress
+    converged: bool
+    termination: BudgetTermination | None = None
+
+
+class CanonicalLocalStepExecutor:
+    """Schedule-neutral reserve → compute → commit → check local-step boundary."""
+
+    def __init__(self, budgets: BudgetTree, *, scope: str) -> None:
+        self.budgets = budgets
+        self.scope = scope
+        self._ordinal = 0
+
+    def execute(
+        self,
+        proposal: LocalStepProposal,
+        *,
+        messages: np.ndarray,
+        progress: ScheduleProgress,
+        policy_state: Mapping[str, Any],
+        cache: Mapping[str, Any],
+        is_converged: Callable[[np.ndarray], bool],
+    ) -> LocalStepResult:
+        """Leave every supplied state untouched when the complete bundle is denied."""
+        if proposal.proposed_work.candidate_checks < 1:
+            raise ValueError("a canonical local step must reserve one convergence check")
+        leaf_id = f"{self.scope}:local-step:{self._ordinal}:{proposal.label}"
+        reservation = self.budgets.reserve(self.scope, proposal.proposed_work, leaf_id=leaf_id)
+        if reservation is None:
+            return LocalStepResult(False, progress, False, self.budgets.last_termination)
+        before = np.array(messages, dtype=np.float64, copy=True)
+        try:
+            temporary = np.asarray(proposal.compute(), dtype=np.float64)
+            if temporary.shape != messages.shape:
+                raise ValueError("local-step computation must preserve the message-buffer shape")
+            if not np.all(np.isfinite(temporary)):
+                raise NumericalFailure("nonfinite arithmetic at canonical_local_step")
+            messages[...] = temporary
+            converged = bool(is_converged(messages))
+            reservation.commit_once()
+            self._ordinal += 1
+            return LocalStepResult(
+                True,
+                ScheduleProgress(progress.iteration, progress.local_steps + 1, progress.cursor, progress.rng_state),
+                converged,
+            )
+        except BaseException:
+            messages[...] = before
+            if reservation.active:
+                reservation.rollback()
+            raise
+
+
+def _kernel_for_manifest(manifest: CanonicalManifestV2 | CanonicalManifestV3) -> BinarySpaKernel:
+    """Resolve only the closed update registry; policies never receive hidden truth."""
+    update = manifest.policies.update.kind
+    if update == "min_sum":
+        return BinarySpaKernel(profile=MIN_SUM_CPU_F64, update_rule=MinSumUpdate())
+    if update == "binary_spa":
+        return BinarySpaKernel()
+    raise ValueError(f"unsupported executable update rule {update!r}")
+
+
 class AtomicFloodingExecutor:
     """Reserve a whole flooding sweep before calculation or message-buffer swap."""
 
@@ -152,6 +240,8 @@ class AtomicFloodingExecutor:
     ) -> AtomicFloodingResult:
         """Finish in-flight work, then stop only at a named operational boundary."""
         state = np.array(old_v2c, dtype=np.float64, copy=True)
+        local_steps = CanonicalLocalStepExecutor(self.budgets, scope=self.scope)
+        progress = ScheduleProgress(iteration=0, local_steps=0)
         terminal = self._wall_boundary("attempt_start")
         if terminal is not None:
             return AtomicFloodingResult(state, 0, terminal, None)
@@ -164,21 +254,29 @@ class AtomicFloodingExecutor:
                 edge_count=self.schedule.edge_table.edge_count,
                 variable_count=self.schedule.edge_table.variable_count,
             )
-            reservation = self.budgets.reserve(self.scope, proposed, leaf_id=f"{self.scope}:flooding:{iteration}")
-            if reservation is None:
-                return AtomicFloodingResult(state, iteration - 1, self.budgets.last_termination, last_sweep)
-            try:
+            completed: list[FloodingSweep] = []
+
+            def compute() -> np.ndarray:
                 sweep = self.schedule.sweep(state, syndrome, error_rate=error_rate)
-                # Only a complete finite sweep becomes visible before its work commits.
-                state = np.array(sweep.new_v2c, dtype=np.float64, copy=True)
-                state.setflags(write=False)
-                reservation.commit_once()
+                completed.append(sweep)
+                return sweep.new_v2c
+
+            try:
+                result = local_steps.execute(
+                    LocalStepProposal(f"flooding:{iteration}", proposed, compute),
+                    messages=state,
+                    progress=progress,
+                    policy_state={},
+                    cache={},
+                    is_converged=(lambda _messages: is_converged(completed[-1])) if is_converged is not None else (lambda _messages: False),
+                )
             except BaseException:
-                if reservation.active:
-                    reservation.rollback()
                 raise
-            last_sweep = sweep
-            if is_converged is not None and is_converged(sweep):
+            if not result.admitted:
+                return AtomicFloodingResult(state, iteration - 1, result.termination, last_sweep)
+            progress = result.progress
+            last_sweep = completed[-1]
+            if result.converged:
                 return AtomicFloodingResult(state, iteration, None, last_sweep, True)
             terminal = self._wall_boundary("candidate_selection_boundary")
             if terminal is not None:
@@ -215,7 +313,7 @@ def _termination_evidence(termination: BudgetTermination) -> dict[str, Any]:
     }
 
 
-def _identity(manifest: CanonicalManifestV2, observation: DecoderObservation) -> str:
+def _identity(manifest: CanonicalManifestV2 | CanonicalManifestV3, observation: DecoderObservation) -> str:
     payload = {"manifest": manifest.model_dump(mode="json"), "check_type": observation.check_type,
                "syndrome": np.asarray(observation.syndrome, dtype=np.uint8).tolist()}
     return sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
@@ -271,7 +369,7 @@ def _existing(path: Path, run_id: str, shot_id: int, identity: str) -> Canonical
     return None
 
 
-def run_canonical_shot(manifest: CanonicalManifestV2 | dict[str, object] | str, *, code: CssCode,
+def run_canonical_shot(manifest: CanonicalManifestV2 | CanonicalManifestV3 | dict[str, object] | str, *, code: CssCode,
                        observation: DecoderObservation, hidden_truth: HiddenTruth, shot_id: int,
                        ledger_path: str | Path, evaluate: Callable[..., evaluator.Evaluation] = evaluator.evaluate_candidate,
                        policy: Callable[[OriginalProblem, WorkingProblem, tuple[OriginalSpaceCandidate, ...]], Sequence[OriginalSpaceCandidate]] | None = None) -> CanonicalExecutionResult:
@@ -298,7 +396,7 @@ def run_canonical_shot(manifest: CanonicalManifestV2 | dict[str, object] | str, 
                 ledger.begin(run_id=parsed.run_id, shot_id=shot_id, sample_seed_identity=identity,
                              canonical_identity=identity, decoder_config=parsed.model_dump(mode="json"))
                 try:
-                    kernel_result = BinarySpaKernel().run(validated.hz, observation.syndrome,
+                    kernel_result = _kernel_for_manifest(parsed).run(validated.hz, observation.syndrome,
                                                           error_rate=parsed.error_rate, max_iterations=parsed.max_iterations)
                 except NumericalFailure as error:
                     ledger.terminal(run_id=parsed.run_id, shot_id=shot_id, canonical_identity=identity,
@@ -374,7 +472,7 @@ def _existing_structural(
 
 
 def run_canonical_structural_shot(
-    manifest: CanonicalManifestV2 | dict[str, object] | str, *, code: CssCode,
+    manifest: CanonicalManifestV2 | CanonicalManifestV3 | dict[str, object] | str, *, code: CssCode,
     observation: DecoderObservation, hidden_truth: HiddenTruth, shot_id: int,
     ledger_path: str | Path, sample_seed_identity: str, context: Mapping[str, Any],
     execution_controls: Mapping[str, Any] | None = None,
@@ -447,9 +545,9 @@ def run_canonical_structural_shot(
                 attempt_reservation.commit_once()
                 try:
                     def admitted_attempt() -> tuple[np.ndarray | None, int, bool, BudgetTermination | None]:
-                        kernel = BinarySpaKernel()
+                        kernel = _kernel_for_manifest(parsed)
                         edge_table = EdgeTable.from_check_matrix(validated.hz)
-                        schedule = FloodingSchedule(edge_table, kernel=kernel)
+                        schedule = FloodingSchedule(edge_table, kernel=kernel, profile=kernel.profile)
                         if edge_table.edge_count == 0:
                             candidate = kernel.candidate_from_beliefs(
                                 np.full(validated.n, kernel.prior(parsed.error_rate), dtype=np.float64)

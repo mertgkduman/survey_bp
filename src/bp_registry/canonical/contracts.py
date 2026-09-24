@@ -58,7 +58,7 @@ _ROLE_HOOKS: dict[PolicyRole, Hook] = {
     PolicyRole.POSTPROCESSING: Hook.ATTEMPT,
 }
 _POLICY_KINDS: dict[PolicyRole, frozenset[str]] = {
-    PolicyRole.UPDATE: frozenset({"identity", "binary_spa"}),
+    PolicyRole.UPDATE: frozenset({"identity", "binary_spa", "min_sum"}),
     PolicyRole.SCHEDULE: frozenset({"identity", "flooding"}),
     PolicyRole.STATE_MEMORY: frozenset({"identity", "stateless"}),
     PolicyRole.INTERVENTION: frozenset({"identity"}),
@@ -300,10 +300,32 @@ class CanonicalManifestV2(_Strict):
         return value
 
 
-def parse_canonical_manifest(value: CanonicalManifestV2 | dict[str, Any] | str) -> CanonicalManifestV2:
+class CanonicalManifestV3(_Strict):
+    """Compact kernel contract for the independently versioned min-sum tracer."""
+
+    schema_version: Literal[3]
+    run_id: str = Field(min_length=1)
+    numerical_profile: Literal["cpu-float64-min-sum-v1"]
+    max_iterations: int = Field(ge=1, le=100_000)
+    error_rate: float = Field(ge=0.0, le=1.0)
+    policies: CanonicalCompositionSpec
+
+    @field_validator("error_rate")
+    @classmethod
+    def finite_rate(cls, value: float) -> float:
+        if not math.isfinite(value):
+            raise ValueError("error_rate must be finite")
+        return value
+
+
+def parse_canonical_manifest(value: CanonicalManifestV2 | CanonicalManifestV3 | dict[str, Any] | str) -> CanonicalManifestV2 | CanonicalManifestV3:
     """Parse only the versioned strict canonical representation."""
-    if isinstance(value, CanonicalManifestV2):
+    if isinstance(value, (CanonicalManifestV2, CanonicalManifestV3)):
         return value
     if isinstance(value, str):
-        return CanonicalManifestV2.model_validate_json(value)
-    return CanonicalManifestV2.model_validate(value)
+        decoded = json.loads(value)
+    else:
+        decoded = value
+    if not isinstance(decoded, dict):
+        raise ValueError("canonical manifest must be an object")
+    return CanonicalManifestV3.model_validate(decoded) if decoded.get("schema_version") == 3 else CanonicalManifestV2.model_validate(decoded)

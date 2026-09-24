@@ -58,12 +58,12 @@ def test_local_step_denial_preserves_every_owned_state_byte_for_byte():
     progress = ScheduleProgress(iteration=0, local_steps=0, cursor=(0,), rng_state=("seed", 1))
     cache = {"residual": (0.5,)}
     tree = BudgetTree(
-        limits=(BudgetLimit("attempt", "syndrome_checks", 0),),
+        limits=(BudgetLimit("attempt", "candidate_checks", 0),),
         parents={"attempt": "search", "search": "shot"},
     )
     proposal = LocalStepProposal(
         label="test-step",
-        proposed_work=WorkVector(check_to_variable_updates=1, syndrome_checks=1),
+        proposed_work=WorkVector(check_to_variable_updates=1, candidate_checks=1),
         compute=lambda: np.asarray([9.0, 9.0]),
     )
     result = CanonicalLocalStepExecutor(tree, scope="attempt").execute(

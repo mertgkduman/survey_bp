@@ -6,7 +6,8 @@ from dataclasses import dataclass
 import math
 import numpy as np
 
-from .numerics import check_to_variable, finite_saturate, hard_decision, prior_llr
+from .numerics import NumericalProfile, REFERENCE_CPU_F64, check_to_variable, finite_saturate, hard_decision, prior_llr
+from .updates import CheckUpdateRule
 
 
 def _binary(value: np.ndarray, name: str, *, ndim: int) -> np.ndarray:
@@ -26,13 +27,19 @@ class KernelResult:
 class BinarySpaKernel:
     """No native adapter: deterministic float64 LLR SPA with flooding updates."""
 
+    def __init__(self, *, profile: NumericalProfile = REFERENCE_CPU_F64, update_rule: CheckUpdateRule | None = None) -> None:
+        self.profile = profile
+        self.update_rule = update_rule
+
     def prior(self, error_rate: float) -> float:
         """Pure numerical prior helper used by schedules and standalone callers."""
-        return prior_llr(error_rate)
+        return prior_llr(error_rate, profile=self.profile)
 
     def check_message(self, incoming: np.ndarray, syndrome: int) -> float:
         """Pure check-to-variable update for a single canonical edge."""
-        return check_to_variable(incoming, syndrome=syndrome)
+        if self.update_rule is not None:
+            return self.update_rule.check_to_variable(incoming, syndrome=syndrome)
+        return check_to_variable(incoming, syndrome=syndrome, profile=self.profile)
 
     def assemble_beliefs(
         self, variable_count: int, edge_variables: tuple[int, ...], messages: np.ndarray, prior: float
@@ -41,15 +48,15 @@ class BinarySpaKernel:
         beliefs = np.full(variable_count, prior, dtype=np.float64)
         for variable, message in zip(edge_variables, messages, strict=True):
             beliefs[variable] += message
-        return finite_saturate(beliefs, boundary="belief_assembly")
+        return finite_saturate(beliefs, boundary="belief_assembly", profile=self.profile)
 
     def variable_message(self, belief: float, check_message: float) -> float:
         """Pure variable-to-check exclusion update after beliefs are complete."""
-        return float(finite_saturate(belief - check_message, boundary="variable_update"))
+        return float(finite_saturate(belief - check_message, boundary="variable_update", profile=self.profile))
 
     def candidate_from_beliefs(self, beliefs: np.ndarray) -> np.ndarray:
         """Pure deterministic hard decision with the profile's exact-zero rule."""
-        return hard_decision(beliefs)
+        return hard_decision(beliefs, profile=self.profile)
 
     def run(self, check_matrix: np.ndarray, syndrome: np.ndarray, *, error_rate: float, max_iterations: int) -> KernelResult:
         from .schedules import EdgeTable, FloodingSchedule
@@ -59,7 +66,7 @@ class BinarySpaKernel:
         if s.shape != (h.shape[0],) or not isinstance(max_iterations, int) or max_iterations < 0 or not math.isfinite(error_rate) or not 0 < error_rate < 1:
             raise ValueError("invalid SPA dimensions or error_rate")
         table = EdgeTable.from_check_matrix(h)
-        schedule = FloodingSchedule(table, kernel=self)
+        schedule = FloodingSchedule(table, kernel=self, profile=self.profile)
         v2c = schedule.initialize(error_rate)
         candidate = self.candidate_from_beliefs(np.full(table.variable_count, self.prior(error_rate), dtype=np.float64))
         if table.edge_count == 0:
