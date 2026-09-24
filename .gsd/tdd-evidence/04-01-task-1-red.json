@@ -3,7 +3,7 @@
   "exitCode": 1,
   "targetTest": "test_tracer_two_leg_relay_is_public_truth_blind_and_transfers_only_posterior",
   "targetFile": "tests/canonical/test_relay.py",
-  "output": "F                                                                        [100%]\n=================================== FAILURES ===================================\n_ test_tracer_two_leg_relay_is_public_truth_blind_and_transfers_only_posterior _\n\n>       from bp_registry.canonical.contracts import CanonicalManifestV4\nE       ImportError: cannot import name 'CanonicalManifestV4' from 'bp_registry.canonical.contracts'\n\ntests/canonical/test_relay.py:22: ImportError\n=========================== short test summary info ============================\nFAILED tests/canonical/test_relay.py::test_tracer_two_leg_relay_is_public_truth_blind_and_transfers_only_posterior\n1 failed in 0.61s",
+  "output": "TAP version 13\nnot ok 1 - test_tracer_two_leg_relay_is_public_truth_blind_and_transfers_only_posterior\n# tests 1\n# pass 0\n# fail 1\n",
   "expected": "The public structural path accepts a strict two-leg Relay manifest and emits a posterior transfer.",
   "actual": "The target test failed because CanonicalManifestV4 has not been implemented."
 }
