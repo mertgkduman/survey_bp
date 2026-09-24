@@ -126,6 +126,22 @@ def test_canonical_v3_schema_is_generated_from_the_public_nms_contract():
     assert json.loads(schema_path.read_text(encoding="utf-8")) == CanonicalExperimentV3.model_json_schema()
 
 
+def test_offset_min_sum_is_a_closed_v3_update_kind_with_an_explicit_assignment(tmp_path):
+    from bp_registry.manifests import CanonicalExperimentV3, preflight
+
+    value = json.loads(Path("data/manifests/canonical-three-qubit-development.json").read_text(encoding="utf-8"))
+    value.update({"schema_version": 3, "run_id": "canonical-oms-development", "numerical_profile": "cpu-float64-min-sum-v1"})
+    value["policies"]["update"].update({
+        "kind": "offset_min_sum", "binding_id": "update-offset-min-sum-v1",
+        "parameter_assignment": {"shape": "scalar", "value": 0.25},
+    })
+    path = tmp_path / "offset-min-sum.json"
+    path.write_text(json.dumps(value), encoding="utf-8")
+    resolved = preflight(path)
+    assert isinstance(resolved.manifest, CanonicalExperimentV3)
+    assert resolved.manifest.policies.update.kind == "offset_min_sum"
+
+
 @pytest.mark.parametrize("value", [float("nan"), float("inf"), -0.01, 1.01, "0.1"])
 def test_manifest_rejects_nonfinite_out_of_range_or_coerced_rates(tmp_path, value):
     from bp_registry.manifests import parse_manifest

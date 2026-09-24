@@ -11,7 +11,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from .updates import ParameterAssignment
+from .updates import ParameterAssignment, ParameterGeneratorSpec, ParameterRefreshPlan
 
 
 class _Strict(BaseModel):
@@ -60,7 +60,7 @@ _ROLE_HOOKS: dict[PolicyRole, Hook] = {
     PolicyRole.POSTPROCESSING: Hook.ATTEMPT,
 }
 _POLICY_KINDS: dict[PolicyRole, frozenset[str]] = {
-    PolicyRole.UPDATE: frozenset({"identity", "binary_spa", "min_sum", "normalized_min_sum"}),
+    PolicyRole.UPDATE: frozenset({"identity", "binary_spa", "min_sum", "normalized_min_sum", "offset_min_sum"}),
     PolicyRole.SCHEDULE: frozenset({"identity", "flooding"}),
     PolicyRole.STATE_MEMORY: frozenset({"identity", "stateless"}),
     PolicyRole.INTERVENTION: frozenset({"identity"}),
@@ -119,13 +119,24 @@ class PolicySpecV3(PolicySpec):
     """V3-only update extension; V2's persisted policy schema remains byte-stable."""
 
     parameter_assignment: ParameterAssignment | None = None
+    parameter_generator: ParameterGeneratorSpec | None = None
+    parameter_refresh: ParameterRefreshPlan | None = None
 
     @model_validator(mode="after")
     def normalization_is_explicit_and_scoped_to_the_update_role(self) -> "PolicySpecV3":
-        if self.kind == "normalized_min_sum" and self.parameter_assignment is None:
-            raise ValueError("normalized_min_sum requires one explicit parameter_assignment")
-        if self.kind != "normalized_min_sum" and self.parameter_assignment is not None:
-            raise ValueError("parameter_assignment is valid only for normalized_min_sum")
+        parameterized = {"normalized_min_sum", "offset_min_sum"}
+        generated = self.parameter_generator is not None or self.parameter_refresh is not None
+        if self.kind in parameterized and self.parameter_assignment is None and not generated:
+            raise ValueError(f"{self.kind} requires one explicit parameter_assignment or generated assignment plan")
+        if self.kind not in parameterized and (self.parameter_assignment is not None or generated):
+            raise ValueError("parameter assignment controls are valid only for normalized_min_sum or offset_min_sum")
+        if self.parameter_assignment is not None and generated:
+            raise ValueError("explicit parameter_assignment cannot be combined with generated assignment controls")
+        if generated and (self.parameter_generator is None or self.parameter_refresh is None):
+            raise ValueError("generated assignments require both parameter_generator and parameter_refresh")
+        if self.parameter_generator is not None and self.parameter_refresh is not None:
+            if self.parameter_refresh.generator is not None and self.parameter_refresh.generator != self.parameter_generator:
+                raise ValueError("parameter_refresh generator must match parameter_generator")
         return self
 
 

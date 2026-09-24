@@ -22,7 +22,7 @@ from .numerics import MIN_SUM_CPU_F64
 from .lineage import stable_lineage_id
 from .profiling import ProfileMeasurement, validate_public_clean_low_overhead_evidence
 from .schedules import EdgeTable, FloodingSchedule
-from .updates import MinSumUpdate, NormalizedMinSumUpdate, ParameterAssignment
+from .updates import MinSumUpdate, NormalizedMinSumUpdate, OffsetMinSumUpdate, ParameterAssignment
 
 
 class CanonicalStructuralVerificationError(ValueError):
@@ -138,7 +138,24 @@ def _expected_attempt(context: PublicShotContext) -> dict[str, Any]:
         )
         kernel = BinarySpaKernel(
             profile=MIN_SUM_CPU_F64,
-            update_rule=NormalizedMinSumUpdate(assignment, resolved_alpha=tuple(float(value) for value in resolved)),
+            update_rule=NormalizedMinSumUpdate(
+                assignment,
+                resolved_alpha=None if assignment.shape == "source_iteration" else tuple(float(value) for value in resolved),
+            ),
+        )
+    elif context.update_kind == "offset_min_sum":
+        declared = context.compact_manifest.get("policies", {}).get("update", {}).get("parameter_assignment")
+        assignment = ParameterAssignment.model_validate(declared)
+        resolved = assignment.resolve(
+            graph_sha256=table.graph_sha256, check_count=table.check_count, edge_count=table.edge_count,
+            source_iteration=0, edge_checks=tuple(check for check, _variable in table.edges),
+        )
+        kernel = BinarySpaKernel(
+            profile=MIN_SUM_CPU_F64,
+            update_rule=OffsetMinSumUpdate(
+                assignment,
+                resolved_beta=None if assignment.shape == "source_iteration" else tuple(float(value) for value in resolved),
+            ),
         )
     elif context.update_kind == "binary_spa":
         kernel = BinarySpaKernel()

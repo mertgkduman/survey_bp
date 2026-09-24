@@ -135,3 +135,94 @@ def test_graph_bound_assignment_rejects_a_wrong_declared_length_before_broadcast
     )
     with pytest.raises(ValueError, match="check_count"):
         assignment.resolve(graph_sha256="a" * 64, check_count=2, edge_count=3, source_iteration=0, edge_checks=(0, 1, 0))
+
+
+@pytest.mark.parametrize(
+    ("incoming", "syndrome", "beta", "expected"),
+    [
+        (np.asarray([2.0, -3.0]), 0, 0.0, -2.0),
+        (np.asarray([2.0, -3.0]), 0, 2.0, -0.0),
+        (np.asarray([np.nextafter(2.0, 0.0)]), 1, 2.0, 0.0),
+        (np.asarray([np.nextafter(2.0, np.inf)]), 1, 2.0, -(np.nextafter(2.0, np.inf) - 2.0)),
+        (np.asarray([30.0]), 0, 1.0, 25.0),
+    ],
+)
+def test_offset_min_sum_matches_independent_float64_boundary_oracle(incoming, syndrome, beta, expected):
+    updates = _updates_module()
+    assignment = updates.ParameterAssignment.model_validate({"shape": "scalar", "value": beta})
+    observed = updates.OffsetMinSumUpdate(beta=assignment).check_to_variable(incoming, syndrome=syndrome)
+    assert observed == expected
+
+
+@pytest.mark.parametrize("value", [
+    {"shape": "scalar", "value": -0.1},
+    {"shape": "scalar", "value": float("nan")},
+    {"shape": "scalar", "value": float("inf")},
+])
+def test_offset_min_sum_rejects_invalid_beta_before_execution(value):
+    updates = _updates_module()
+    with pytest.raises(ValueError):
+        updates.ParameterAssignment.model_validate(value)
+
+
+def test_offset_min_sum_source_iteration_uses_schedule_iteration_not_local_step_count():
+    updates = _updates_module()
+    beta = updates.ParameterAssignment.model_validate(
+        {"shape": "source_iteration", "values": [0.25, 1.5]}
+    )
+    update = updates.OffsetMinSumUpdate(beta=beta)
+    assert update.check_to_variable(np.asarray([2.0]), syndrome=0, source_iteration=0) == 1.75
+    assert update.check_to_variable(np.asarray([2.0]), syndrome=0, source_iteration=1) == 0.5
+    with pytest.raises(ValueError, match="source_iteration"):
+        update.check_to_variable(np.asarray([2.0]), syndrome=0, source_iteration=2)
+
+
+def test_parameter_generation_replays_and_commits_only_after_admission():
+    updates = _updates_module()
+
+    class _Reservation:
+        active = True
+
+        def commit_once(self):
+            self.active = False
+
+        def rollback(self):
+            self.active = False
+
+    class _Budget:
+        last_termination = {"reason": "denied"}
+
+        def __init__(self, admit=True):
+            self.admit = admit
+
+        def reserve(self, *_args, **_kwargs):
+            return _Reservation() if self.admit else None
+
+    spec = updates.ParameterGeneratorSpec.model_validate({
+        "shape": "edge", "graph_sha256": "a" * 64, "distribution": "uniform",
+        "low": 0.0, "high": 1.0, "root_seed_identity": "b" * 64,
+    })
+    plan = updates.ParameterRefreshPlan(scope="source_iteration", generator=spec)
+    initial = plan.initial_state(configuration_identity="cfg", attempt_identity="attempt:1")
+    denied = plan.refresh(
+        initial, boundary="source_iteration", source_iteration=0, graph_sha256="a" * 64,
+        check_count=2, edge_count=3, budgets=_Budget(False), budget_scope="attempt",
+    )
+    assert not denied.admitted and denied.state == initial and denied.assignment is None
+    first = plan.refresh(
+        initial, boundary="source_iteration", source_iteration=0, graph_sha256="a" * 64,
+        check_count=2, edge_count=3, budgets=_Budget(), budget_scope="attempt",
+    )
+    replay = plan.refresh(
+        initial, boundary="source_iteration", source_iteration=0, graph_sha256="a" * 64,
+        check_count=2, edge_count=3, budgets=_Budget(), budget_scope="attempt",
+    )
+    assert first.admitted and first.assignment == replay.assignment
+    assert first.state == replay.state
+    assert first.evidence["purpose"] == "parameter_assignment"
+    assert first.evidence["resolved_assignment"] == first.assignment.model_dump(mode="json")
+    with pytest.raises(ValueError, match="source_iteration"):
+        plan.refresh(
+            initial, boundary="local_unit", source_iteration=0, graph_sha256="a" * 64,
+            check_count=2, edge_count=3, budgets=_Budget(), budget_scope="attempt",
+        )

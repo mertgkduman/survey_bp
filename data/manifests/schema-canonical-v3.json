@@ -551,6 +551,123 @@
       "title": "ParameterAssignment",
       "type": "object"
     },
+    "ParameterGeneratorSpec": {
+      "additionalProperties": false,
+      "description": "Closed, purpose-separated generator declaration for one assignment draw.",
+      "properties": {
+        "shape": {
+          "enum": [
+            "scalar",
+            "check",
+            "edge"
+          ],
+          "title": "Shape",
+          "type": "string"
+        },
+        "graph_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Graph Sha256",
+          "type": "string"
+        },
+        "distribution": {
+          "const": "uniform",
+          "title": "Distribution",
+          "type": "string"
+        },
+        "low": {
+          "title": "Low",
+          "type": "number"
+        },
+        "high": {
+          "title": "High",
+          "type": "number"
+        },
+        "root_seed_identity": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Root Seed Identity",
+          "type": "string"
+        },
+        "purpose": {
+          "const": "parameter_assignment",
+          "default": "parameter_assignment",
+          "title": "Purpose",
+          "type": "string"
+        },
+        "algorithm": {
+          "const": "numpy.PCG64",
+          "default": "numpy.PCG64",
+          "title": "Algorithm",
+          "type": "string"
+        },
+        "generator_version": {
+          "minLength": 1,
+          "title": "Generator Version",
+          "type": "string"
+        },
+        "provenance": {
+          "default": "exploratory",
+          "enum": [
+            "source_defined",
+            "exploratory"
+          ],
+          "title": "Provenance",
+          "type": "string"
+        },
+        "source_anchor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Anchor"
+        }
+      },
+      "required": [
+        "shape",
+        "graph_sha256",
+        "distribution",
+        "low",
+        "high",
+        "root_seed_identity"
+      ],
+      "title": "ParameterGeneratorSpec",
+      "type": "object"
+    },
+    "ParameterRefreshPlan": {
+      "additionalProperties": false,
+      "description": "Configuration, attempt, or source-iteration assignment refresh contract.",
+      "properties": {
+        "scope": {
+          "enum": [
+            "configuration",
+            "attempt",
+            "source_iteration"
+          ],
+          "title": "Scope",
+          "type": "string"
+        },
+        "generator": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ParameterGeneratorSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "scope"
+      ],
+      "title": "ParameterRefreshPlan",
+      "type": "object"
+    },
     "PolicySpec": {
       "additionalProperties": false,
       "description": "Persisted data only: no module paths, callables, or implicit defaults.",
@@ -714,6 +831,28 @@
           "anyOf": [
             {
               "$ref": "#/$defs/ParameterAssignment"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "parameter_generator": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ParameterGeneratorSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "parameter_refresh": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ParameterRefreshPlan"
             },
             {
               "type": "null"
