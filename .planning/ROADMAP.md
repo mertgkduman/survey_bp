@@ -97,7 +97,7 @@ Plans:
 5. A researcher can install the package, run the tutorial, and inspect mathematical conventions, lifecycle contracts, and compatibility examples.
 
 **Research focus:** Numerical stability, trace vocabulary, policy ownership, scoped budgets, and kernel-level work definitions.
-**Plans:** 14/14 plans executed
+**Plans:** 14/15 plans executed
 
 Plans:
 
@@ -150,6 +150,10 @@ Plans:
 **Wave 12** *(after Wave 11)*
 
 - [x] 02-14-PLAN.md — Exhaustive terminal-evidence grammar, budget reconstruction, and profile provenance
+
+**Wave 13** *(after Wave 12)*
+
+- [ ] 02-15-PLAN.md — Complete provenance binding, persistent numerical verification, and RSS consistency
 
 ### Phase 3: Update Rules and Scheduling
 
