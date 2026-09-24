@@ -81,3 +81,11 @@ def test_pdprime_requires_edge_aligned_c2v_operands_and_commits_both_histories()
     np.testing.assert_allclose(state.c2v, fresh)
     with pytest.raises(ValueError, match="edge-aligned"):
         policy.propose([5.0, -1.0], old, fresh[:1], boundary="local_update")
+
+
+def test_momentum_and_affine_source_aliases_are_exposed():
+    """Chen momentum and EWA/Relay reparameterizations are inspectable policies."""
+    assert all(
+        hasattr(memory, name)
+        for name in ("PosteriorMomentum", "EWAInitPriorMemory", "RelayAffinePriorMemory")
+    )
