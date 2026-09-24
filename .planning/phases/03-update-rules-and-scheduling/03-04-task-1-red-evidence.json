@@ -1,8 +1,9 @@
 {
-  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_residual_schedule.py -k 'tracer or selection or tie'",
-  "exit_code": 1,
-  "failing_test": "test_tracer_residual_schedule_contract_is_closed_to_conventional_srbp",
-  "expected_result": "A source-qualified residual schedule exports the closed conventional-sRBP contract and executes one local unit.",
-  "actual_result": "bp_registry.canonical.residual does not yet exist; the explicit assertion failed.",
-  "intentional": true
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_residual_schedule.py -k test_tracer_residual_schedule_contract_is_closed_to_conventional_srbp",
+  "exitCode": 1,
+  "output": "not ok 1 - test_tracer_residual_schedule_contract_is_closed_to_conventional_srbp\n  ---\n  framework: pytest\n  assertion: Phase 3 must provide bp_registry.canonical.residual\n  ...\n# tests 1\n# pass 0\n# fail 1\n",
+  "targetTest": "test_tracer_residual_schedule_contract_is_closed_to_conventional_srbp",
+  "targetFile": "tests/canonical/test_residual_schedule.py",
+  "expected": "The closed conventional Huang--Ueng sRBP contract and one residual-selected local unit exist.",
+  "actual": "The direct pytest run executed the named tracer test and failed its explicit assertion because the residual module did not yet exist."
 }
