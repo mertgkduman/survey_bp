@@ -21,7 +21,10 @@ from .kernel import BinarySpaKernel
 from .numerics import MIN_SUM_CPU_F64
 from .lineage import stable_lineage_id
 from .profiling import ProfileMeasurement, validate_public_clean_low_overhead_evidence
-from .schedules import EdgeTable, FloodingSchedule, LayeredSchedule
+from .schedules import (
+    CheckNodeSerialSchedule, EdgeTable, FloodingSchedule, LayeredSchedule,
+    RandomizedTraversalPlan, VariableNodeSerialSchedule,
+)
 from .updates import MinSumUpdate, NormalizedMinSumUpdate, OffsetMinSumUpdate, ParameterAssignment
 
 
@@ -241,24 +244,32 @@ def _budget_denial(limits: Mapping[str, Mapping[str, int]], work: WorkVector, de
     return None
 
 
-def _expected_layered_attempt(context: PublicShotContext) -> dict[str, Any]:
-    """Independently replay the closed SPA/layered public tracer without ledger facts."""
+def _expected_local_attempt(context: PublicShotContext) -> dict[str, Any]:
+    """Independently replay a closed public local schedule without ledger facts."""
     if context.code is None or context.error_rate is None or context.max_iterations is None:
         return {}
     schedule_data = context.compact_manifest.get("policies", {}).get("schedule", {})
     if not isinstance(schedule_data, Mapping):
-        raise CanonicalStructuralVerificationError("layered public context lacks a schedule policy")
+        raise CanonicalStructuralVerificationError("local public context lacks a schedule policy")
+    schedule_kind = context.schedule_kind
     partitions = schedule_data.get("partitions")
     provenance = schedule_data.get("provenance")
-    if not isinstance(partitions, list) or not isinstance(provenance, str):
-        raise CanonicalStructuralVerificationError("layered public context lacks explicit partition evidence")
+    if schedule_kind in {"layered", "randomized"} and (not isinstance(partitions, list) or not isinstance(provenance, str)):
+        raise CanonicalStructuralVerificationError("layered local public context lacks explicit partition evidence")
     code = context.code.validate()
     table = EdgeTable.from_check_matrix(code.hz)
     kernel = BinarySpaKernel()
-    schedule = LayeredSchedule(
-        table, kernel=kernel, partitions=partitions, provenance=provenance,
-        construction_rule=schedule_data.get("construction_rule"),
-    )
+    if schedule_kind in {"layered", "randomized"}:
+        schedule = LayeredSchedule(table, kernel=kernel, partitions=partitions, provenance=provenance, construction_rule=schedule_data.get("construction_rule"))
+    elif schedule_kind == "check_node_serial":
+        schedule = CheckNodeSerialSchedule(table, kernel=kernel)
+    elif schedule_kind == "variable_node_serial":
+        schedule = VariableNodeSerialSchedule(table, kernel=kernel)
+    elif schedule_kind == "residual":
+        from .residual import SyndromeResidualSchedule
+        schedule = SyndromeResidualSchedule(table, kernel=kernel)
+    else:
+        raise CanonicalStructuralVerificationError(f"unsupported public local schedule {schedule_kind!r}")
     limits = context.work_limits or {}
     budget_limits = [
         BudgetLimit(scope, resource, int(limit))
@@ -273,33 +284,73 @@ def _expected_layered_attempt(context: PublicShotContext) -> dict[str, Any]:
     messages = np.full(table.edge_count, kernel.prior(context.error_rate), dtype=np.float64)
     executor = __import__("bp_registry.canonical.execution", fromlist=["CanonicalLocalStepExecutor"]).CanonicalLocalStepExecutor(budgets, scope="attempt")
     progress = __import__("bp_registry.canonical.execution", fromlist=["ScheduleProgress"]).ScheduleProgress(0, 0, (0,))
+    randomized: RandomizedTraversalPlan | None = None
+    randomized_state = None
+    if schedule_kind == "randomized":
+        root_identity = schedule_data.get("root_identity")
+        refresh_scope = schedule_data.get("refresh_scope")
+        if not isinstance(root_identity, str) or not isinstance(refresh_scope, str):
+            raise CanonicalStructuralVerificationError("randomized local context lacks replay identity")
+        randomized = RandomizedTraversalPlan(schedule, refresh_scope=refresh_scope, root_identity=root_identity)
+        randomized_state = randomized.initial_state(configuration_identity=context.execution_identity, attempt_identity=f"{context.execution_identity}:attempt:0")
+    if schedule_kind == "residual":
+        c2v = np.zeros(table.edge_count, dtype=np.float64)
+        try:
+            cache = schedule.initialize(messages, c2v, np.asarray(context.syndrome, dtype=np.uint8), error_rate=context.error_rate, budgets=budgets)
+        except Exception as error:
+            termination = getattr(error, "termination", None)
+            return {"termination": "count_budget_exhausted", "work_vector": budgets.summary("attempt").as_evidence(structural_event_version=2), "schedule_work_vector": budgets.summary("attempt").as_evidence(), "iterations": 0, "admitted": False, "progress": progress, "schedule_evidence": {"schedule": "residual"}}
+        for _ in range(context.max_iterations):
+            proposal = schedule.propose_local_step(messages, c2v, cache, np.asarray(context.syndrome, dtype=np.uint8), error_rate=context.error_rate)
+            step = schedule.execute_local_step(executor, proposal, v2c=messages, c2v=c2v, cache=cache, progress=progress, is_converged=lambda proposed: bool(np.array_equal((code.hz.astype(np.int64) @ proposed.astype(np.int64)) % 2, context.syndrome)))
+            progress, cache, c2v = step.progress, step.cache, step.c2v
+            if not step.admitted:
+                return {"termination": "count_budget_exhausted", "work_vector": budgets.summary("attempt").as_evidence(structural_event_version=2), "schedule_work_vector": budgets.summary("attempt").as_evidence(), "iterations": progress.local_steps, "admitted": True, "progress": progress, "schedule_evidence": {"schedule": "residual", "atomic_unit": "one_residual_selected_c2v_commit", "source_iteration": schedule.source_iteration, "tie_rule": schedule.tie_rule, "policy_name": schedule.policy_name, "mutable_state_lifetime": "attempt"}}
+            if step.converged:
+                return {"termination": "completed", "work_vector": budgets.summary("attempt").as_evidence(structural_event_version=2), "schedule_work_vector": budgets.summary("attempt").as_evidence(), "iterations": progress.local_steps, "candidate": step.candidate, "admitted": True, "progress": progress, "schedule_evidence": {"schedule": "residual", "atomic_unit": "one_residual_selected_c2v_commit", "source_iteration": schedule.source_iteration, "tie_rule": schedule.tie_rule, "policy_name": schedule.policy_name, "mutable_state_lifetime": "attempt"}}
+        return {"termination": "max_iterations", "work_vector": budgets.summary("attempt").as_evidence(structural_event_version=2), "schedule_work_vector": budgets.summary("attempt").as_evidence(), "iterations": progress.local_steps, "admitted": True, "progress": progress, "schedule_evidence": {"schedule": "residual", "atomic_unit": "one_residual_selected_c2v_commit", "source_iteration": schedule.source_iteration, "tie_rule": schedule.tie_rule, "policy_name": schedule.policy_name, "mutable_state_lifetime": "attempt"}}
     candidate: np.ndarray | None = None
     for _ in range(context.max_iterations):
+        progress_for_step = progress
+        if randomized is not None:
+            assert randomized_state is not None
+            refresh = randomized.refresh(randomized_state, boundary="attempt", budgets=budgets, budget_scope="attempt")
+            if not refresh.admitted:
+                return {"termination": "count_budget_exhausted", "work_vector": budgets.summary("attempt").as_evidence(structural_event_version=2), "schedule_work_vector": budgets.summary("attempt").as_evidence(), "iterations": progress.local_steps, "admitted": False, "progress": progress, "schedule_evidence": dict(schedule.evidence())}
+            randomized_state = refresh.state
+            assert refresh.order is not None
+            progress_for_step = type(progress)(progress.iteration, progress.local_steps, (refresh.order[progress.cursor[0]],), progress.rng_state)
         step = schedule.execute_local_step(
             executor, messages, np.asarray(context.syndrome, dtype=np.uint8), error_rate=context.error_rate,
-            progress=progress,
+            progress=progress_for_step,
             is_converged=lambda proposed: bool(np.array_equal((code.hz.astype(np.int64) @ proposed.astype(np.int64)) % 2, context.syndrome)),
         )
-        progress = step.progress
+        progress = (type(progress)(progress.iteration, step.progress.local_steps, (progress.cursor[0] + 1,), progress.rng_state) if randomized is not None else step.progress)
+        evidence = dict(schedule.evidence())
+        if randomized is not None:
+            evidence["randomized_traversal"] = randomized.evidence(randomized_state)
         if not step.admitted:
             work = budgets.summary("attempt")
-            return {"termination": "count_budget_exhausted", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(schedule.evidence())), "iterations": progress.local_steps, "admitted": True, "progress": progress}
+            return {"termination": "count_budget_exhausted", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(evidence)), "iterations": progress.local_steps, "admitted": True, "progress": progress}
         candidate = step.candidate
         if candidate is not None and np.array_equal((code.hz.astype(np.int64) @ candidate.astype(np.int64)) % 2, context.syndrome):
             work = budgets.summary("attempt")
-            return {"termination": "completed", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(schedule.evidence())), "iterations": progress.local_steps, "candidate": candidate, "admitted": True, "progress": progress}
+            return {"termination": "completed", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(evidence)), "iterations": progress.local_steps, "candidate": candidate, "admitted": True, "progress": progress}
         if progress.cursor == (schedule.unit_count,):
             progress = type(progress)(progress.iteration + 1, progress.local_steps, (0,), progress.rng_state)
     work = budgets.summary("attempt")
-    return {"termination": "max_iterations", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(schedule.evidence())), "iterations": progress.local_steps, "candidate": candidate, "admitted": True, "progress": progress}
+    evidence = dict(schedule.evidence())
+    if randomized is not None:
+        evidence["randomized_traversal"] = randomized.evidence(randomized_state)
+    return {"termination": "max_iterations", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(evidence)), "iterations": progress.local_steps, "candidate": candidate, "admitted": True, "progress": progress}
 
 
 def _expected_attempt(context: PublicShotContext) -> dict[str, Any]:
     """Re-run the deterministic Phase 2 flooding baseline without ledger input."""
     if context.code is None or context.error_rate is None or context.max_iterations is None:
         return {}
-    if context.schedule_kind == "layered":
-        return _expected_layered_attempt(context)
+    if context.schedule_kind != "flooding":
+        return _expected_local_attempt(context)
     code = context.code.validate()
     limits = context.work_limits or {}
     zero = WorkVector.zero()
@@ -536,23 +587,31 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
         raise CanonicalStructuralVerificationError("canonical attempt evidence is invalid")
     if lineage is not None:
         _expect_equal("attempt_lineage_id", attempt["attempt_lineage_id"], lineage["attempt_lineage_id"])
-    schedule_fields = frozenset({"schedule_terminal", "schedule_evidence"}) if context.schedule_kind == "layered" else frozenset()
+    is_local = context.schedule_kind != "flooding"
+    schedule_fields = frozenset({"schedule_terminal", "schedule_evidence"}) if is_local else frozenset()
     work_data = _exact_data(records["work"], common | {"qualified_iterations", "work_vector"} | schedule_fields)
     _expect_equal("work_vector", work_data["work_vector"], expected["work_vector"])
+    local_atomic_units = {
+        "layered": "one_layer",
+        "check_node_serial": "one_check_all_c2v_then_affected_v2c",
+        "variable_node_serial": "one_variable_belief_then_incident_v2c",
+        "residual": "one_residual_selected_c2v_commit",
+        "randomized": "one_layer",
+    }
     expected_iteration = {
         "count": expected["iterations"],
-        "schedule": "layered" if context.schedule_kind == "layered" else "flooding",
-        "atomic_unit": "one_layer" if context.schedule_kind == "layered" else "complete_double_buffered_sweep",
+        "schedule": context.schedule_kind if is_local else "flooding",
+        "atomic_unit": local_atomic_units[context.schedule_kind] if is_local else "complete_double_buffered_sweep",
     }
     _expect_equal("qualified_iterations", work_data["qualified_iterations"], expected_iteration)
-    if context.schedule_kind == "layered":
+    if is_local:
         schedule_terminal = reconstruct_schedule_terminal(work_data["schedule_terminal"])
         _expect_equal("schedule work_vector", schedule_terminal["work_vector"], expected["schedule_work_vector"])
         _expect_equal("schedule source_iteration", schedule_terminal["source_iteration"], expected_iteration)
         _expect_equal("schedule evidence", work_data["schedule_evidence"], expected["schedule_evidence"])
     data = terminal["data"]
     _expect_equal("work_vector", data.get("work_vector"), expected["work_vector"])
-    if context.schedule_kind == "layered":
+    if is_local:
         _expect_equal("terminal schedule evidence", data.get("schedule_terminal"), work_data["schedule_terminal"])
         _expect_equal("terminal schedule realization", data.get("schedule_evidence"), work_data["schedule_evidence"])
     if expected["admitted"]:

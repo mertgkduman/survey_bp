@@ -916,6 +916,9 @@ def test_public_noncluster_spa_schedules_round_trip_and_reconstruct(tmp_path, sc
             "base_schedule": "layered", "refresh_scope": "attempt", "root_identity": "a" * 64,
             "partitions": [[0]], "provenance": "explicit",
         })
+    if schedule_kind == "residual":
+        for scope in ("shot", "search", "attempt"):
+            manifest["budgets"][scope]["work_limits"]["residual_priority_evaluations"] = 1000
     manifest_path = tmp_path / f"{schedule_kind}.json"
     manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
     output = tmp_path / schedule_kind
