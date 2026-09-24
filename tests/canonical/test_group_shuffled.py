@@ -83,3 +83,40 @@ def test_hsu_group_budget_denial_rolls_back_messages_c2v_and_cursor():
     np.testing.assert_array_equal(messages, before)
     np.testing.assert_array_equal(schedule._c2v, np.zeros(schedule.edge_table.edge_count))
     assert budgets.summary("attempt") == WorkVector(order_generation=3)
+
+
+def test_hsu_full_traversal_then_new_replay_order_and_partial_progress():
+    schedule = _small_schedule()
+    budgets = BudgetTree(limits=[], parents={"search": "shot", "attempt": "search"})
+    executor = CanonicalLocalStepExecutor(budgets, scope="attempt")
+    messages = np.full(schedule.edge_table.edge_count, BinarySpaKernel().prior(0.1))
+    syndrome = np.array([1, 0, 1], dtype=np.uint8)
+    progress = ScheduleProgress(0, 0, (0,))
+    assert schedule.refresh_order(progress, budgets=budgets)[0]
+    first = schedule.evidence()["traversals"][0]
+    for cursor in range(schedule.unit_count):
+        step = schedule.execute_local_step(executor, messages, syndrome, error_rate=0.1, progress=progress, is_converged=lambda _: False)
+        assert step.admitted and step.progress.cursor == (cursor + 1,)
+        progress = step.progress
+    assert progress.local_steps == schedule.unit_count == 2
+    assert progress.cursor == (2,)
+    progress = ScheduleProgress(1, progress.local_steps, (0,))
+    assert schedule.refresh_order(progress, budgets=budgets)[0]
+    second = schedule.evidence()["traversals"][1]
+    assert first["derived_identity"] != second["derived_identity"]
+    assert second["iteration"] == 1
+    step = schedule.execute_local_step(executor, messages, syndrome, error_rate=0.1, progress=progress, is_converged=lambda _: False)
+    assert step.admitted and step.progress.local_steps == 3 and step.progress.cursor == (1,)
+    work = budgets.summary("attempt")
+    assert work.order_generation == 6 and work.order_selection == 3
+    assert work.check_to_variable_updates == 12 and work.variable_to_check_updates == 18
+    assert work.convergence_checks == work.candidate_constructions == 3
+
+
+def test_hsu_order_budget_denial_leaves_rng_and_traversal_unchanged():
+    schedule = _small_schedule()
+    budgets = BudgetTree(limits=[BudgetLimit("attempt", "order_generation", 2)], parents={"search": "shot", "attempt": "search"})
+    admitted, termination = schedule.refresh_order(ScheduleProgress(0, 0, (0,)), budgets=budgets)
+    assert not admitted and termination is not None
+    assert schedule.evidence()["traversals"] == ()
+    assert budgets.summary("attempt") == WorkVector.zero()

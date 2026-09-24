@@ -1032,6 +1032,9 @@ def test_public_noncluster_spa_schedules_round_trip_and_reconstruct(tmp_path, sc
 
 
 def test_hsu_group_shuffled_public_one_group_round_trip(tmp_path):
+    import shutil
+
+    from bp_registry.canonical.verification import CanonicalStructuralVerificationError
     from bp_registry.cli import run_canonical, verify_run
     from bp_registry.ledger import read_canonical_events
     from bp_registry.manifests import preflight
@@ -1056,6 +1059,55 @@ def test_hsu_group_shuffled_public_one_group_round_trip(tmp_path):
     assert evidence["traversals"][0]["groups"][0] == evidence["traversals"][0]["order"][:2]
     assert terminal["schedule_terminal"]["source_iteration"]["atomic_unit"] == "one_overlapping_check_group"
     assert terminal["schedule_terminal"]["work_vector"]["order_generation"] == 72
+    for label, mutate in (
+        ("order", lambda events: next(event for event in events if event["kind"] == "work")["data"]["schedule_evidence"]["traversals"][0]["order"].reverse()),
+        ("work", lambda events: next(event for event in events if event["kind"] == "work")["data"]["schedule_terminal"]["work_vector"].__setitem__("order_selection", 0)),
+        ("source", lambda events: next(event for event in events if event["kind"] == "termination")["data"]["schedule_evidence"].__setitem__("source_id", "forged")),
+        ("progress", lambda events: next(event for event in events if event["kind"] == "termination")["data"]["schedule_terminal"]["local_cursor"].__setitem__(0, 2)),
+    ):
+        tampered = tmp_path / label
+        shutil.copytree(output, tampered)
+        _rewrite_rehashed_canonical_ledger(tampered, mutate)
+        with pytest.raises((CanonicalStructuralVerificationError, ValueError)):
+            verify_run(tampered)
+
+
+@pytest.mark.parametrize("belief_cap", [10000, 100000])
+def test_hsu_group_shuffled_public_full_or_budget_interrupted_traversal(tmp_path, belief_cap):
+    from bp_registry.cli import run_canonical, verify_run
+    from bp_registry.ledger import read_canonical_events
+
+    manifest = json.loads((REPOSITORY_ROOT / "data/manifests/phase3-pilot-bb144.json").read_text(encoding="utf-8"))
+    manifest["run_id"] = f"hsu-group-traversal-{belief_cap}"
+    manifest["policies"]["schedule"] = {
+        "kind": "group_shuffled", "binding_id": "schedule-hsu-group-v1",
+        "state_lifetime": "iteration", "source_id": "hsu-ndgsbp-2012-v1", "root_identity": "a" * 64,
+    }
+    for scope in ("shot", "search", "attempt"):
+        manifest["budgets"][scope]["max_iterations"] = 72
+        limits = manifest["budgets"][scope]["work_limits"]
+        limits.update({"check_to_variable_updates": 100000, "variable_to_check_updates": 100000, "belief_assemblies": belief_cap, "candidate_checks": 100000})
+    path = tmp_path / "manifest.json"
+    path.write_text(json.dumps(manifest), encoding="utf-8")
+    output = tmp_path / "output"
+    assert run_canonical(path, output)["final_row_count"] == 1
+    assert verify_run(output)["final_row_count"] == 1
+    terminal = next(event for event in read_canonical_events(output / "events.jsonl") if event["kind"] == "termination")
+    data = terminal["data"]
+    if belief_cap == 100000:
+        assert terminal["termination"] == "max_iterations"
+        assert data["iterations"] == 72
+        assert data["schedule_terminal"]["completed_traversals"] == 1
+        assert data["schedule_terminal"]["local_cursor"] == [1]
+        assert len(data["schedule_evidence"]["traversals"]) == 2
+        assert all(len(traversal["groups"]) == 71 for traversal in data["schedule_evidence"]["traversals"])
+    else:
+        assert terminal["termination"] == "count_budget_exhausted"
+        assert data["budget_termination"]["resource"] == "belief_assemblies"
+        assert 0 < data["iterations"] < 71
+        assert data["schedule_terminal"]["completed_traversals"] == 0
+        assert data["schedule_terminal"]["local_cursor"] == [data["iterations"]]
+        assert data["schedule_terminal"]["work_vector"]["belief_assemblies"] == 144 * data["iterations"]
 
 
 def test_checked_canonical_result_is_idempotent_and_honestly_labeled():

@@ -126,6 +126,26 @@ def test_canonical_v3_schema_is_generated_from_the_public_nms_contract():
     assert json.loads(schema_path.read_text(encoding="utf-8")) == CanonicalExperimentV3.model_json_schema()
 
 
+@pytest.mark.parametrize("edit", [
+    {"source_id": "moradi-clustered-rl-s"},
+    {"source_id": None},
+    {"root_identity": None},
+    {"base_schedule": "layered"},
+    {"partitions": [[0, 1]], "provenance": "explicit"},
+])
+def test_group_shuffled_manifest_rejects_unpinned_or_incompatible_schedule_controls(edit):
+    from bp_registry.manifests import CanonicalExperimentV3
+
+    manifest = json.loads(Path("data/manifests/phase3-pilot-bb144.json").read_text(encoding="utf-8"))
+    manifest["policies"]["schedule"] = {
+        "kind": "group_shuffled", "binding_id": "schedule-hsu-group-v1",
+        "state_lifetime": "iteration", "source_id": "hsu-ndgsbp-2012-v1", "root_identity": "a" * 64,
+        **edit,
+    }
+    with pytest.raises(ValueError):
+        CanonicalExperimentV3.model_validate(manifest)
+
+
 def test_cluster_artifact_public_preflight_is_not_an_executable_canonical_manifest(tmp_path):
     from bp_registry.manifests import qualify_cluster_artifact
 

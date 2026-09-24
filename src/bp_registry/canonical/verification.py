@@ -283,9 +283,20 @@ def _expected_local_attempt(context: PublicShotContext) -> dict[str, Any]:
         for resource, limit in limits.get(scope, {}).items()
     ]
     budgets = BudgetTree(limits=budget_limits, parents={"search": "shot", "attempt": "search"})
+    def budget_termination() -> dict[str, object]:
+        termination = budgets.last_termination
+        if termination is None:
+            raise CanonicalStructuralVerificationError("budget denial lacks a typed reason")
+        return {
+            "binding_scope": termination.binding_scope,
+            "resource": termination.resource,
+            "configured_limit": termination.configured_limit,
+            "consumed_amount": termination.consumed_amount,
+            "reason": termination.reason,
+        }
     bp_call = budgets.reserve("attempt", WorkVector(bp_calls=1), leaf_id="expected:bp-call")
     if bp_call is None:
-        return {"termination": "count_budget_exhausted", "work_vector": WorkVector.zero().as_evidence(structural_event_version=2), "schedule_work_vector": WorkVector.zero().as_evidence(), "iterations": 0, "admitted": False}
+        return {"termination": "count_budget_exhausted", "work_vector": WorkVector.zero().as_evidence(structural_event_version=2), "schedule_work_vector": WorkVector.zero().as_evidence(), "iterations": 0, "budget_termination": budget_termination(), "admitted": False}
     bp_call.commit_once()
     messages = np.full(table.edge_count, kernel.prior(context.error_rate), dtype=np.float64)
     executor = __import__("bp_registry.canonical.execution", fromlist=["CanonicalLocalStepExecutor"]).CanonicalLocalStepExecutor(budgets, scope="attempt")
@@ -305,13 +316,13 @@ def _expected_local_attempt(context: PublicShotContext) -> dict[str, Any]:
             cache = schedule.initialize(messages, c2v, np.asarray(context.syndrome, dtype=np.uint8), error_rate=context.error_rate, budgets=budgets)
         except Exception as error:
             termination = getattr(error, "termination", None)
-            return {"termination": "count_budget_exhausted", "work_vector": budgets.summary("attempt").as_evidence(structural_event_version=2), "schedule_work_vector": budgets.summary("attempt").as_evidence(), "iterations": 0, "admitted": False, "progress": progress, "schedule_evidence": {"schedule": "residual"}}
+            return {"termination": "count_budget_exhausted", "work_vector": budgets.summary("attempt").as_evidence(structural_event_version=2), "schedule_work_vector": budgets.summary("attempt").as_evidence(), "iterations": 0, "budget_termination": budget_termination(), "admitted": True, "progress": progress, "schedule_evidence": {"schedule": "residual"}}
         for _ in range(context.max_iterations):
             proposal = schedule.propose_local_step(messages, c2v, cache, np.asarray(context.syndrome, dtype=np.uint8), error_rate=context.error_rate)
             step = schedule.execute_local_step(executor, proposal, v2c=messages, c2v=c2v, cache=cache, progress=progress, is_converged=lambda proposed: bool(np.array_equal((code.hz.astype(np.int64) @ proposed.astype(np.int64)) % 2, context.syndrome)))
             progress, cache, c2v = step.progress, step.cache, step.c2v
             if not step.admitted:
-                return {"termination": "count_budget_exhausted", "work_vector": budgets.summary("attempt").as_evidence(structural_event_version=2), "schedule_work_vector": budgets.summary("attempt").as_evidence(), "iterations": progress.local_steps, "admitted": True, "progress": progress, "schedule_evidence": {"schedule": "residual", "atomic_unit": "one_residual_selected_c2v_commit", "source_iteration": schedule.source_iteration, "tie_rule": schedule.tie_rule, "policy_name": schedule.policy_name, "mutable_state_lifetime": "attempt"}}
+                return {"termination": "count_budget_exhausted", "work_vector": budgets.summary("attempt").as_evidence(structural_event_version=2), "schedule_work_vector": budgets.summary("attempt").as_evidence(), "iterations": progress.local_steps, "budget_termination": budget_termination(), "admitted": True, "progress": progress, "schedule_evidence": {"schedule": "residual", "atomic_unit": "one_residual_selected_c2v_commit", "source_iteration": schedule.source_iteration, "tie_rule": schedule.tie_rule, "policy_name": schedule.policy_name, "mutable_state_lifetime": "attempt"}}
             if step.converged:
                 return {"termination": "completed", "work_vector": budgets.summary("attempt").as_evidence(structural_event_version=2), "schedule_work_vector": budgets.summary("attempt").as_evidence(), "iterations": progress.local_steps, "candidate": step.candidate, "admitted": True, "progress": progress, "schedule_evidence": {"schedule": "residual", "atomic_unit": "one_residual_selected_c2v_commit", "source_iteration": schedule.source_iteration, "tie_rule": schedule.tie_rule, "policy_name": schedule.policy_name, "mutable_state_lifetime": "attempt"}}
         return {"termination": "max_iterations", "work_vector": budgets.summary("attempt").as_evidence(structural_event_version=2), "schedule_work_vector": budgets.summary("attempt").as_evidence(), "iterations": progress.local_steps, "admitted": True, "progress": progress, "schedule_evidence": {"schedule": "residual", "atomic_unit": "one_residual_selected_c2v_commit", "source_iteration": schedule.source_iteration, "tie_rule": schedule.tie_rule, "policy_name": schedule.policy_name, "mutable_state_lifetime": "attempt"}}
@@ -322,12 +333,12 @@ def _expected_local_attempt(context: PublicShotContext) -> dict[str, Any]:
             refreshed, _ = schedule.refresh_order(progress, budgets=budgets)
             if not refreshed:
                 work = budgets.summary("attempt")
-                return {"termination": "count_budget_exhausted", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(schedule.evidence())), "iterations": progress.local_steps, "admitted": True, "progress": progress}
+                return {"termination": "count_budget_exhausted", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(schedule.evidence())), "iterations": progress.local_steps, "budget_termination": budget_termination(), "admitted": True, "progress": progress}
         if randomized is not None:
             assert randomized_state is not None
             refresh = randomized.refresh(randomized_state, boundary="attempt", budgets=budgets, budget_scope="attempt")
             if not refresh.admitted:
-                return {"termination": "count_budget_exhausted", "work_vector": budgets.summary("attempt").as_evidence(structural_event_version=2), "schedule_work_vector": budgets.summary("attempt").as_evidence(), "iterations": progress.local_steps, "admitted": False, "progress": progress, "schedule_evidence": dict(schedule.evidence())}
+                return {"termination": "count_budget_exhausted", "work_vector": budgets.summary("attempt").as_evidence(structural_event_version=2), "schedule_work_vector": budgets.summary("attempt").as_evidence(), "iterations": progress.local_steps, "budget_termination": budget_termination(), "admitted": True, "progress": progress, "schedule_evidence": dict(schedule.evidence())}
             randomized_state = refresh.state
             assert refresh.order is not None
             progress_for_step = type(progress)(progress.iteration, progress.local_steps, (refresh.order[progress.cursor[0]],), progress.rng_state)
@@ -342,7 +353,7 @@ def _expected_local_attempt(context: PublicShotContext) -> dict[str, Any]:
             evidence["randomized_traversal"] = randomized.evidence(randomized_state)
         if not step.admitted:
             work = budgets.summary("attempt")
-            return {"termination": "count_budget_exhausted", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(evidence)), "iterations": progress.local_steps, "admitted": True, "progress": progress}
+            return {"termination": "count_budget_exhausted", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(evidence)), "iterations": progress.local_steps, "budget_termination": budget_termination(), "admitted": True, "progress": progress}
         candidate = step.candidate
         if candidate is not None and np.array_equal((code.hz.astype(np.int64) @ candidate.astype(np.int64)) % 2, context.syndrome):
             work = budgets.summary("attempt")
