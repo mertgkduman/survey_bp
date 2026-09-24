@@ -1,0 +1,10 @@
+{
+  "command": "PYTHONPATH=\"$PWD/src\" OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_manifest.py tests/test_canonical_cli.py -k 'public_schedule_matrix or noncluster_spa_schedules_round_trip'",
+  "exit_code": 1,
+  "failing_tests": [
+    "test_v3_public_schedule_matrix_admits_only_the_implemented_spa_local_schedules",
+    "test_public_noncluster_spa_schedules_round_trip_and_reconstruct"
+  ],
+  "expected": "V3 public contracts admit and round-trip every directly implemented noncluster SPA schedule while rejecting incompatible min-sum/local pairs.",
+  "actual": "The closed V3 registry rejected check_node_serial, variable_node_serial, residual, and randomized schedule kinds before public preflight."
+}
