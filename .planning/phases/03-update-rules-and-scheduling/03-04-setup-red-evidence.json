@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_residual_schedule.py -k test_setup_budget_denial_precedes_all_full_pool_residual_calculation",
+  "exitCode": 1,
+  "output": "not ok 1 - test_setup_budget_denial_precedes_all_full_pool_residual_calculation\n  ---\n  framework: pytest\n  assertion: full-pool setup reserves work before residual calculation and exposes a budget-denial result\n  actual: ResidualSetupBudgetDenied is not yet provided\n  ...\n# tests 1\n# pass 0\n# fail 1\n",
+  "targetTest": "test_setup_budget_denial_precedes_all_full_pool_residual_calculation",
+  "targetFile": "tests/canonical/test_residual_schedule.py",
+  "expected": "Initial full-pool source work is reserved before any residual calculation and denial leaves state untouched.",
+  "actual": "The named test failed because the schedule did not yet expose setup-budget admission."
+}

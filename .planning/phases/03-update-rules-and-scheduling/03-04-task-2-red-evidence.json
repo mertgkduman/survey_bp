@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_residual_schedule.py -k test_denied_local_bundle_preserves_messages_cache_progress_and_budget_leaves",
+  "exitCode": 1,
+  "output": "not ok 1 - test_denied_local_bundle_preserves_messages_cache_progress_and_budget_leaves\n  ---\n  framework: pytest\n  assertion: denied local bundles return the original immutable cache without mutating schedule state\n  actual: UnboundLocalError on the denied-path cache return\n  ...\n# tests 1\n# pass 0\n# fail 1\n",
+  "targetTest": "test_denied_local_bundle_preserves_messages_cache_progress_and_budget_leaves",
+  "targetFile": "tests/canonical/test_residual_schedule.py",
+  "expected": "Budget denial preserves messages, cache, progress, and committed work leaves.",
+  "actual": "The named denial test reached the schedule's denied path and failed because its cache return was not preserved."
+}
