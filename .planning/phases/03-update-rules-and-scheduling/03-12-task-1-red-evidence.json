@@ -1,0 +1,9 @@
+{
+  "command": "PYTHONPATH=$PWD/src OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_ledger.py::test_version_three_schedule_verifier_reconstructs_deterministic_claims_after_rehashing",
+  "exitCode": 1,
+  "output": "not ok 1 - test_version_three_schedule_verifier_reconstructs_deterministic_claims_after_rehashing\n  ---\n  framework: pytest\n  assertion: V3 schedule terminals require independent reconstruction rather than rehashed self-claims\n  ...\n# tests 1\n# pass 0\n# fail 1\n",
+  "targetTest": "test_version_three_schedule_verifier_reconstructs_deterministic_claims_after_rehashing",
+  "targetFile": "tests/test_ledger.py",
+  "expected": "A V3 schedule terminal verifier independently compares preflight-derived deterministic progress, work, candidate, policy, and RNG facts instead of trusting a recomputed event hash.",
+  "actual": "The selected target failed its explicit assertion because validate_schedule_terminal_shot does not yet exist."
+}

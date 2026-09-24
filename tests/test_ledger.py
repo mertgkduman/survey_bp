@@ -312,3 +312,74 @@ def test_version_three_schedule_terminal_preserves_dual_budget_views_and_rejects
     tampered["completed_traversals"] = 1
     with pytest.raises(CanonicalStructuralVerificationError, match="progress facts are invalid"):
         reconstruct_schedule_terminal(tampered)
+
+
+def test_version_three_schedule_verifier_reconstructs_deterministic_claims_after_rehashing(tmp_path):
+    """A valid event hash cannot authenticate altered schedule semantics."""
+    import bp_registry.canonical.verification as verification
+
+    from bp_registry.canonical.budgets import BudgetView, Measurement, QualifiedIteration, ScheduleTerminalEvidence, WorkVector
+    from bp_registry.canonical.verification import CanonicalStructuralVerificationError
+    from bp_registry.ledger import CANONICAL_SCHEDULE_LEDGER_VERSION, CanonicalEventWriter, read_canonical_events
+
+    assert hasattr(verification, "validate_schedule_terminal_shot"), (
+        "V3 schedule terminals require independent reconstruction rather than rehashed self-claims"
+    )
+
+    source_unit = QualifiedIteration(1, schedule="layered", atomic_unit="one_layer")
+    terminal = ScheduleTerminalEvidence(
+        schedule="layered", source_iteration=source_unit, completed_traversals=1,
+        local_cursor=(1,), stopping_adaptation="D-09 after layer",
+        work=WorkVector(check_to_variable_updates=2, convergence_checks=1),
+        setup_runtime=Measurement.unavailable(method="not_measured", scope="schedule_setup", unit="ns", precision="unknown", reason="fixture"),
+        decode_runtime=Measurement.observed(7, method="fixture", scope="decode", unit="ns", precision="exact"),
+        budget_views=(
+            BudgetView.common_c2v_cap(2),
+            BudgetView.schedule_iteration_limit(QualifiedIteration(1, schedule="layered", atomic_unit="one_layer")),
+        ),
+    ).as_evidence()
+    deterministic = {
+        "candidate": [0, 1],
+        "policy_effects": {"update": "min_sum", "schedule": "layered"},
+        "rng_identities": {"schedule_order": "sha256:" + "a" * 64},
+    }
+    path = tmp_path / "schedule-events.jsonl"
+    with CanonicalEventWriter(path, structural_event_version=CANONICAL_SCHEDULE_LEDGER_VERSION) as writer:
+        writer.begin(run_id="schedule", shot_id=1, sample_seed_identity="seed")
+        writer.terminal(
+            run_id="schedule", shot_id=1, termination="count_budget_exhausted",
+            data={"schedule_terminal": terminal, "deterministic_facts": deterministic},
+        )
+
+    events = read_canonical_events(path)
+    assert verification.validate_schedule_terminal_shot(
+        events,
+        run_id="schedule",
+        shot_id=1,
+        expected_terminal=terminal,
+        expected_deterministic_facts=deterministic,
+    ) == events[-1]
+
+    tampered_terminal = {**terminal, "completed_traversals": 0}
+    tampered_event = {**events[-1], "data": {"schedule_terminal": tampered_terminal, "deterministic_facts": deterministic}}
+    tampered_event["event_id"] = ""
+    with pytest.raises(CanonicalStructuralVerificationError, match="deterministic schedule terminal"):
+        verification.validate_schedule_terminal_shot(
+            [*events[:-1], tampered_event],
+            run_id="schedule",
+            shot_id=1,
+            expected_terminal=terminal,
+            expected_deterministic_facts=deterministic,
+        )
+
+    tampered_facts = {**deterministic, "rng_identities": {"schedule_order": "sha256:" + "b" * 64}}
+    tampered_event = {**events[-1], "data": {"schedule_terminal": terminal, "deterministic_facts": tampered_facts}}
+    tampered_event["event_id"] = ""
+    with pytest.raises(CanonicalStructuralVerificationError, match="deterministic schedule terminal"):
+        verification.validate_schedule_terminal_shot(
+            [*events[:-1], tampered_event],
+            run_id="schedule",
+            shot_id=1,
+            expected_terminal=terminal,
+            expected_deterministic_facts=deterministic,
+        )
