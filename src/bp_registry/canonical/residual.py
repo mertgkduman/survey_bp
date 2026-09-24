@@ -13,7 +13,7 @@ from typing import Callable
 
 import numpy as np
 
-from .budgets import WorkVector
+from .budgets import BudgetTermination, BudgetTree, WorkVector
 from .execution import CanonicalLocalStepExecutor, LocalStepProposal, ScheduleProgress
 from .kernel import BinarySpaKernel
 from .schedules import EdgeTable
@@ -61,6 +61,14 @@ class ResidualCache:
         copied = np.array(values, dtype=np.float64, copy=True)
         copied.setflags(write=False)
         object.__setattr__(self, "values", copied)
+
+
+class ResidualSetupBudgetDenied(RuntimeError):
+    """Initial full-pool source work could not be admitted without mutation."""
+
+    def __init__(self, termination: BudgetTermination | None) -> None:
+        super().__init__("sRBP setup work was denied before residual calculation")
+        self.termination = termination
 
 
 @dataclass(frozen=True, slots=True)
@@ -139,6 +147,7 @@ class SyndromeResidualSchedule:
             for current in range(edge_table.variable_count)
         )
         self._edge_variables = tuple(variable for _check, variable in edge_table.edges)
+        self._setup_ordinal = 0
 
     def _validate_state(self, v2c: np.ndarray, c2v: np.ndarray, syndrome: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         expected_edges = (self.edge_table.edge_count,)
@@ -162,19 +171,41 @@ class SyndromeResidualSchedule:
         incoming = v2c[[other for other in self._check_edges[check] if other != edge_index]]
         return self._min_sum.check_to_variable(incoming, syndrome=int(syndrome[check]))
 
-    def initialize(self, v2c: np.ndarray, c2v: np.ndarray, syndrome: np.ndarray, *, error_rate: float) -> ResidualCache:
+    def initialize(
+        self,
+        v2c: np.ndarray,
+        c2v: np.ndarray,
+        syndrome: np.ndarray,
+        *,
+        error_rate: float,
+        budgets: BudgetTree | None = None,
+        scope: str = "attempt",
+    ) -> ResidualCache:
         """Fill the full source cache before decoding; no selection occurs here."""
         del error_rate  # The supplied V2C state already encodes the declared channel prior.
         next_v2c, current_c2v, bits = self._validate_state(v2c, c2v, syndrome)
-        values = np.asarray(
-            [abs(self._prediction(next_v2c, bits, index) - current_c2v[index]) for index in range(self.edge_table.edge_count)],
-            dtype=np.float64,
-        )
         edge_count = self.edge_table.edge_count
-        return ResidualCache(
-            values,
-            ResidualWork(residual_precomputations=edge_count, residual_differences=edge_count),
-        )
+        setup_work = ResidualWork(residual_precomputations=edge_count, residual_differences=edge_count)
+        reservation = None
+        if budgets is not None:
+            leaf_id = f"{scope}:srbp:setup:{self._setup_ordinal}"
+            reservation = budgets.reserve(scope, setup_work.as_work_vector(), leaf_id=leaf_id)
+            if reservation is None:
+                raise ResidualSetupBudgetDenied(budgets.last_termination)
+        try:
+            values = np.asarray(
+                [abs(self._prediction(next_v2c, bits, index) - current_c2v[index]) for index in range(edge_count)],
+                dtype=np.float64,
+            )
+            cache = ResidualCache(values, setup_work)
+        except BaseException:
+            if reservation is not None and reservation.active:
+                reservation.rollback()
+            raise
+        if reservation is not None:
+            reservation.commit_once()
+            self._setup_ordinal += 1
+        return cache
 
     def _select(self, cache: ResidualCache) -> ResidualSelection:
         if cache.values.shape != (self.edge_table.edge_count,):
