@@ -70,6 +70,17 @@ def test_documented_nms_contract_names_equations_assignments_and_public_verifica
     assert "partitions" in tutorial
 
 
+def test_documented_noncluster_policy_matrix_names_local_units_and_replay_boundaries():
+    """The public guide must distinguish focused policies from universal interchangeability."""
+    tutorial = (REPOSITORY_ROOT / "docs/canonical-engine.md").read_text(encoding="utf-8").lower()
+    for term in (
+        "check-node serial", "variable-node serial", "residual", "randomized",
+        "one_check_all_c2v_then_affected_v2c", "one_variable_belief_then_incident_v2c",
+        "schedule_order", "compatibility rejection",
+    ):
+        assert term in tutorial
+
+
 def test_checked_canonical_manifest_has_a_strict_public_preflight_contract():
     """The development fixture is a public immutable experiment, not a kernel shortcut."""
     from pathlib import Path
