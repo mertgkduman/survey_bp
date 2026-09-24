@@ -8,22 +8,26 @@ import pytest
 from bp_registry.canonical.memory import AffinePriorMemory, MemoryState
 
 
-def _binding(binding_id: str, *, order: int, alpha: float, target: str = "prior"):
+def _binding(
+    binding_id: str, *, order: int, alpha: float, target: str = "prior",
+    kind: str = "affine_prior", advance_boundary=None,
+):
     from bp_registry.canonical.contracts import (
         MemoryAdvanceBoundary,
         MemoryBindingSpec,
         MemoryRefreshBoundary,
     )
 
+    parameter_name = "gamma" if kind == "v2c_damping" else "alpha"
     return MemoryBindingSpec(
         binding_id=binding_id,
-        kind="affine_prior",
+        kind=kind,
         target=target,
-        parameters={"alpha": alpha},
+        parameters={parameter_name: alpha},
         order=order,
         history_owner=f"history:{binding_id}",
         state_lifetime="leg",
-        advance_boundary=MemoryAdvanceBoundary.SOURCE_ITERATION,
+        advance_boundary=advance_boundary or MemoryAdvanceBoundary.SOURCE_ITERATION,
         refresh_boundary=MemoryRefreshBoundary.LEG_START,
         source_status="source_defined",
     )
@@ -58,7 +62,10 @@ def test_undefined_local_target_boundary_is_rejected_before_sampling_with_stable
     from bp_registry.canonical.contracts import MemoryCompositionSpec
 
     composition = MemoryCompositionSpec(
-        bindings=(_binding("local", order=0, alpha=0.5, target="v2c"),)
+        bindings=(_binding(
+            "local", order=0, alpha=0.5, target="v2c", kind="v2c_damping",
+            advance_boundary=contracts.MemoryAdvanceBoundary.LOCAL_UPDATE,
+        ),)
     )
 
     decision = validate_memory_compatibility(
@@ -66,7 +73,7 @@ def test_undefined_local_target_boundary_is_rejected_before_sampling_with_stable
     )
 
     assert decision.admitted is False
-    assert decision.reason == "memory.target_boundary_unsupported:v2c:source_iteration:flooding"
+    assert decision.reason == "memory.target_boundary_unsupported:v2c:local_update:flooding"
 
 
 def test_ordered_affine_bindings_have_an_explicit_commutativity_proof_for_shared_target_fixture():

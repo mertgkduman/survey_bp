@@ -401,6 +401,116 @@ class CanonicalManifestV3(_Strict):
         return value
 
 
+class MemoryAdvanceBoundary(str, Enum):
+    """The one declared point at which a binding may replace its history."""
+
+    LOCAL_UPDATE = "local_update"
+    SOURCE_ITERATION = "source_iteration"
+
+
+class MemoryRefreshBoundary(str, Enum):
+    """The controller-owned boundary that starts a retained or reset lifetime."""
+
+    ATTEMPT_START = "attempt_start"
+    LEG_START = "leg_start"
+    LOCAL_UPDATE = "local_update"
+    SOURCE_ITERATION = "source_iteration"
+
+
+class MemoryBindingSpec(_Strict):
+    """One ordered, separately owned memory policy binding.
+
+    The binding is intentionally declarative.  It records every ownership and
+    lifecycle choice before a schedule can sample, advance, or commit state.
+    """
+
+    binding_id: str = Field(pattern=r"^[a-z][a-z0-9_-]{0,63}$")
+    kind: Literal["affine_prior", "v2c_damping", "pdbp_field_mix", "pdprime_delta_mix", "posterior_momentum"]
+    target: Literal["prior", "v2c", "belief", "posterior"]
+    parameters: dict[str, float]
+    order: int = Field(ge=0, le=1_000)
+    history_owner: str = Field(pattern=r"^[a-z][a-z0-9:_-]{0,127}$")
+    state_lifetime: Literal["shot", "search", "member", "leg", "branch", "attempt", "iteration", "message"]
+    advance_boundary: MemoryAdvanceBoundary
+    refresh_boundary: MemoryRefreshBoundary
+    source_status: Literal["source_defined", "canonical_adaptation", "exploratory"]
+    retain_history: bool = False
+
+    @field_validator("parameters")
+    @classmethod
+    def parameters_are_finite(cls, value: dict[str, float]) -> dict[str, float]:
+        if not value or any(not isinstance(name, str) or not name or not isinstance(item, float) or not math.isfinite(item)
+                            for name, item in value.items()):
+            raise ValueError("memory parameters must be a nonempty finite float mapping")
+        return value
+
+    @model_validator(mode="after")
+    def kind_target_and_parameters_are_explicit(self) -> "MemoryBindingSpec":
+        expected = {
+            "affine_prior": ("prior", {"alpha"}),
+            "v2c_damping": ("v2c", {"gamma"}),
+            "pdbp_field_mix": ("belief", {"gamma"}),
+            "pdprime_delta_mix": ("belief", {"gamma"}),
+            "posterior_momentum": ("posterior", {"beta"}),
+        }
+        target, parameter_names = expected[self.kind]
+        if self.target != target:
+            raise ValueError(f"{self.kind} may target only {target}")
+        if set(self.parameters) != parameter_names:
+            raise ValueError(f"{self.kind} requires exactly {sorted(parameter_names)!r} parameters")
+        coefficient = next(iter(self.parameters.values()))
+        if not 0.0 <= coefficient <= 1.0:
+            raise ValueError("memory coefficients must be in [0, 1]")
+        if self.retain_history and self.refresh_boundary not in {MemoryRefreshBoundary.ATTEMPT_START, MemoryRefreshBoundary.LEG_START}:
+            raise ValueError("retained memory history requires an attempt_start or leg_start refresh boundary")
+        return self
+
+
+class MemoryCompositionSpec(_Strict):
+    """A closed ordered chain of memory bindings with no implicit owner/order."""
+
+    bindings: tuple[MemoryBindingSpec, ...] = Field(min_length=1, max_length=64)
+
+    @field_validator("bindings", mode="before")
+    @classmethod
+    def bindings_to_tuple(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @model_validator(mode="after")
+    def ordering_and_ownership_are_disjoint(self) -> "MemoryCompositionSpec":
+        ids = tuple(binding.binding_id for binding in self.bindings)
+        orders = tuple(binding.order for binding in self.bindings)
+        owners = tuple(binding.history_owner for binding in self.bindings)
+        if len(ids) != len(set(ids)):
+            raise ValueError("memory bindings must have distinct binding_id values")
+        if len(owners) != len(set(owners)):
+            raise ValueError("memory bindings must have disjoint history_owner values")
+        if tuple(sorted(orders)) != tuple(range(len(self.bindings))):
+            raise ValueError("memory binding order must be a contiguous explicit sequence beginning at zero")
+        if orders != tuple(range(len(self.bindings))):
+            raise ValueError("memory bindings must be stored in their explicit execution order")
+        return self
+
+
+class CanonicalManifestV5(_Strict):
+    """Versioned manifest carrying the ordered Phase 4 memory composition."""
+
+    schema_version: Literal[5]
+    run_id: str = Field(min_length=1)
+    numerical_profile: Literal["cpu-float64-min-sum-v1", "cpu-float64-spa-v1"]
+    max_iterations: int = Field(ge=1, le=100_000)
+    error_rate: float = Field(ge=0.0, le=1.0)
+    policies: CanonicalCompositionSpecV3
+    memory: MemoryCompositionSpec
+
+    @field_validator("error_rate")
+    @classmethod
+    def finite_rate(cls, value: float) -> float:
+        if not math.isfinite(value):
+            raise ValueError("error_rate must be finite")
+        return value
+
+
 class MemoryBindingV4(_Strict):
     """One explicitly ordered affine-prior memory binding."""
 
@@ -478,9 +588,9 @@ class CanonicalManifestV4(_Strict):
         return self
 
 
-def parse_canonical_manifest(value: CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4 | dict[str, Any] | str) -> CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4:
+def parse_canonical_manifest(value: CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4 | CanonicalManifestV5 | dict[str, Any] | str) -> CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4 | CanonicalManifestV5:
     """Parse only the versioned strict canonical representation."""
-    if isinstance(value, (CanonicalManifestV2, CanonicalManifestV3, CanonicalManifestV4)):
+    if isinstance(value, (CanonicalManifestV2, CanonicalManifestV3, CanonicalManifestV4, CanonicalManifestV5)):
         return value
     if isinstance(value, str):
         decoded = json.loads(value)
@@ -489,6 +599,8 @@ def parse_canonical_manifest(value: CanonicalManifestV2 | CanonicalManifestV3 | 
     if not isinstance(decoded, dict):
         raise ValueError("canonical manifest must be an object")
     schema_version = decoded.get("schema_version")
+    if schema_version == 5:
+        return CanonicalManifestV5.model_validate(decoded)
     if schema_version == 4:
         return CanonicalManifestV4.model_validate(decoded)
     return CanonicalManifestV3.model_validate(decoded) if schema_version == 3 else CanonicalManifestV2.model_validate(decoded)

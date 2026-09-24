@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import math
+from typing import Mapping
 
 import numpy as np
 
@@ -324,6 +325,70 @@ class MemoryProposal:
     binding_id: str
     prior: np.ndarray
     posterior: np.ndarray
+
+
+@dataclass(frozen=True, slots=True)
+class MemoryCompositionState:
+    """Private state slots keyed by the binding that owns each history."""
+
+    histories: tuple[MemoryState, ...] = ()
+
+    def by_binding(self) -> dict[str, MemoryState]:
+        state = {item.binding_id: item for item in self.histories}
+        if len(state) != len(self.histories):
+            raise ValueError("memory composition state has duplicate binding ownership")
+        return state
+
+
+@dataclass(frozen=True, slots=True)
+class MemoryCompositionProposal:
+    """A complete ordered proposal that becomes visible only through commit."""
+
+    value: np.ndarray
+    proposals: tuple[MemoryProposal, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class OrderedAffineMemoryComposition:
+    """Execute declared affine-prior bindings in order with disjoint histories."""
+
+    bindings: tuple[AffinePriorMemory, ...]
+
+    def __post_init__(self) -> None:
+        ids = tuple(binding.binding_id for binding in self.bindings)
+        if not ids or len(ids) != len(set(ids)):
+            raise ValueError("ordered memory composition requires distinct nonempty binding IDs")
+
+    def propose(
+        self,
+        base_prior: np.ndarray | tuple[float, ...],
+        state: MemoryCompositionState = MemoryCompositionState(),
+    ) -> MemoryCompositionProposal:
+        """Build every next value from immutable owner-local history, in order."""
+        histories = state.by_binding()
+        base = _finite_vector(base_prior, name="base_prior")
+        value = base
+        proposals: list[MemoryProposal] = []
+        for binding in self.bindings:
+            previous = histories.get(binding.binding_id)
+            posterior = base if previous is None or previous.posterior is None else previous.posterior
+            proposal = binding.propose(value, posterior)
+            value = proposal.prior
+            proposals.append(proposal)
+        return MemoryCompositionProposal(value, tuple(proposals))
+
+    def commit(
+        self,
+        proposal: MemoryCompositionProposal,
+        state: MemoryCompositionState = MemoryCompositionState(),
+    ) -> MemoryCompositionState:
+        """Atomically replace only the slots that own this complete proposal."""
+        if tuple(item.binding_id for item in proposal.proposals) != tuple(binding.binding_id for binding in self.bindings):
+            raise ValueError("memory composition proposal does not match its declared binding order")
+        next_state = state.by_binding()
+        for binding, item in zip(self.bindings, proposal.proposals, strict=True):
+            next_state[binding.binding_id] = binding.commit(item, next_state.get(binding.binding_id))
+        return MemoryCompositionState(tuple(next_state[binding.binding_id] for binding in self.bindings))
 
 
 @dataclass(frozen=True, slots=True)
