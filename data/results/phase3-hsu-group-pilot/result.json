@@ -1,0 +1,28 @@
+{
+  "assessment_status": "not_assessed",
+  "denominators": {
+    "all_terminal_shots": 2,
+    "exact": 1,
+    "outcome_unavailable": 1
+  },
+  "final_row_count": 2,
+  "fixture": "pilot_adaptation",
+  "ledger_path": "data/results/phase3-hsu-group-pilot/events.jsonl",
+  "ledger_sha256": "5d131cf534eecce426afbbb4354e128609bbc64b413ac93f5c1888c03ead44ee",
+  "manifest_path": "data/manifests/phase3-hsu-group-pilot.json",
+  "manifest_sha256": "b58133f1707f9226fe1d6fd6eadf2a9c866448cbc4aea9825b190556a5230d1d",
+  "policy_identity": "ca21a950aaff88944ae584a561577864e04b981d7204bcb5a739039aa64de043",
+  "relation": "pilot_adaptation",
+  "run_id": "phase3-hsu-group-pilot",
+  "schema_version": 2,
+  "shot_ids": [
+    0,
+    1
+  ],
+  "statistical_claim": "not_assessed; bounded pilot adaptation, not a statistical reproduction, performance ranking, or superiority claim",
+  "terminations": {
+    "completed": 1,
+    "max_iterations": 1
+  },
+  "title": "phase3-hsu-group-pilot \u2014 pilot_adaptation pilot_adaptation not_assessed"
+}

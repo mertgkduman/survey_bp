@@ -1110,6 +1110,26 @@ def test_hsu_group_shuffled_public_full_or_budget_interrupted_traversal(tmp_path
         assert data["schedule_terminal"]["work_vector"]["belief_assemblies"] == 144 * data["iterations"]
 
 
+def test_retained_hsu_group_pilot_is_source_labeled_and_independently_verifiable():
+    from bp_registry.cli import verify_run
+    from bp_registry.ledger import read_canonical_events
+    from bp_registry.manifests import preflight
+
+    manifest_path = Path("data/manifests/phase3-hsu-group-pilot.json")
+    output = Path("data/results/phase3-hsu-group-pilot")
+    resolved = preflight(manifest_path)
+    assert resolved.manifest.policies.schedule.source_id == "hsu-ndgsbp-2012-v1"
+    assert verify_run(output)["final_row_count"] == 2
+    result = json.loads((output / "result.json").read_text(encoding="utf-8"))
+    assert result["relation"] == result["fixture"] == "pilot_adaptation"
+    assert result["assessment_status"] == "not_assessed"
+    assert sum(result["terminations"].values()) == result["denominators"]["all_terminal_shots"] == 2
+    terminals = [event for event in read_canonical_events(output / "events.jsonl") if event["kind"] == "termination"]
+    assert len(terminals) == 2
+    assert all(event["data"]["schedule_evidence"]["source_id"] == "hsu-ndgsbp-2012-v1" for event in terminals)
+    assert all(event["data"]["schedule_terminal"]["work_vector"]["order_generation"] >= 72 for event in terminals)
+
+
 def test_checked_canonical_result_is_idempotent_and_honestly_labeled():
     from pathlib import Path
 
