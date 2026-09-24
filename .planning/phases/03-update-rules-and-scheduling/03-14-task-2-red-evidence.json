@@ -1,0 +1,9 @@
+{
+  "command": "PYTHONPATH=$PWD/src OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_canonical_cli.py -k public_cluster_artifact_qualification_command_exists",
+  "exitCode": 1,
+  "output": "not ok 1 - test_public_cluster_artifact_qualification_command_exists\n  ---\n  framework: pytest\n  assertion: the public CLI exposes the deterministic cluster artifact qualification checkpoint\n  actual: parser command choices were canonical, pilot, preflight, reconcile, validate-evidence, and verify-run; qualify-cluster-artifact was absent\n  ...\n# tests 1\n# pass 0\n# fail 1\n",
+  "targetTest": "test_public_cluster_artifact_qualification_command_exists",
+  "targetFile": "tests/test_canonical_cli.py",
+  "expected": "The public CLI exposes qualify-cluster-artifact as the deterministic external artifact checkpoint.",
+  "actual": "The CLI had no qualify-cluster-artifact command."
+}

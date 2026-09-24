@@ -81,6 +81,18 @@ def test_documented_noncluster_policy_matrix_names_local_units_and_replay_bounda
         assert term in tutorial
 
 
+def test_public_cluster_artifact_qualification_command_exists():
+    """The external checkpoint must be a public command, not a private helper."""
+    from bp_registry.cli import build_parser
+
+    command_destinations = {
+        action.dest: set(action.choices or {})
+        for action in build_parser()._actions
+        if action.dest == "command"
+    }
+    assert "qualify-cluster-artifact" in command_destinations["command"]
+
+
 def test_checked_canonical_manifest_has_a_strict_public_preflight_contract():
     """The development fixture is a public immutable experiment, not a kernel shortcut."""
     from pathlib import Path
