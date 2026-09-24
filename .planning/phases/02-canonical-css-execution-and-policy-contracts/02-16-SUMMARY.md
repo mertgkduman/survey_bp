@@ -89,7 +89,7 @@ status: complete
 - `OMP_NUM_THREADS=1 .venv/bin/python -m bp_registry.cli verify-run data/results/canonical-three-qubit-development` — 2 checked terminal rows verified.
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical tests/test_canonical_cli.py` — 101 passed.
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_css_small.py tests/test_evidence.py tests/test_ledger.py tests/test_manifest.py tests/test_phase1_cli.py tests/test_reference_smoke.py tests/test_sampling.py tests/test_source_artifact.py` — 79 passed.
-- `git diff --exit-code HEAD -- data/results/canonical-three-qubit-development/events.jsonl data/results/canonical-three-qubit-development/result.json` — checked artifact bytes unchanged.
+- The checked ledger and result files remained byte-identical to tracked HEAD.
 
 ## Task Commits
 
