@@ -570,6 +570,58 @@ def test_verify_run_rejects_rehashed_raw_rss_normalization_matrix(tmp_path):
             verify_run(output)
 
 
+def test_verify_run_rejects_rehashed_rss_unavailable_grammar_matrix(tmp_path):
+    """Rehashing cannot turn observed RSS into impossible unavailable provenance."""
+    from bp_registry.cli import run_canonical, verify_run
+
+    base_method = "resource.getrusage:RUSAGE_SELF:v1"
+    raw_method = "resource.getrusage:RUSAGE_SELF:ru_maxrss:v1"
+    unavailable = "RSS normalization semantics unavailable"
+    context = {"rss_platform": "FreeBSD", "rss_raw_value": 7, "rss_raw_unit": "unknown"}
+    cases = [
+        ("empty-context", unavailable, raw_method, {}),
+        ("linux-context", unavailable, raw_method, {**context, "rss_platform": "Linux"}),
+        ("darwin-context", unavailable, raw_method, {**context, "rss_platform": "Darwin"}),
+        ("extra-context", unavailable, raw_method, {**context, "rss_normalized_unit": "bytes"}),
+        ("missing-platform", unavailable, raw_method, {key: value for key, value in context.items() if key != "rss_platform"}),
+        ("missing-value", unavailable, raw_method, {key: value for key, value in context.items() if key != "rss_raw_value"}),
+        ("missing-unit", unavailable, raw_method, {key: value for key, value in context.items() if key != "rss_raw_unit"}),
+        ("empty-platform", unavailable, raw_method, {**context, "rss_platform": ""}),
+        ("non-string-platform", unavailable, raw_method, {**context, "rss_platform": 7}),
+        ("boolean-value", unavailable, raw_method, {**context, "rss_raw_value": True}),
+        ("string-value", unavailable, raw_method, {**context, "rss_raw_value": "7"}),
+        ("negative-value", unavailable, raw_method, {**context, "rss_raw_value": -1}),
+        ("non-string-unit", unavailable, raw_method, {**context, "rss_raw_unit": 7}),
+        ("wrong-unit", unavailable, raw_method, {**context, "rss_raw_unit": "bytes"}),
+        ("unproducible-exception", "resource adapter unavailable: PermissionError", base_method, {}),
+        ("absent-raw-method", "resource adapter unavailable", raw_method, {}),
+        ("exception-raw-method", "resource adapter unavailable: OSError", raw_method, {}),
+        ("negative-base-method", "negative RSS observation", base_method, {}),
+        ("unsupported-base-method", unavailable, base_method, context),
+    ]
+
+    for label, reason, method, raw_context in cases:
+        output = tmp_path / label
+        run_canonical(CANONICAL_MANIFEST, output)
+
+        def mutate(events, reason=reason, method=method, raw_context=raw_context):
+            for event in events:
+                if event["kind"] in {"runtime", "termination"} and "profile" in event["data"]:
+                    profile = event["data"]["profile"]
+                    rss = profile["runtime"]["peak_host_memory"]
+                    rss.update({
+                        "value": None,
+                        "method": method,
+                        "precision": "unknown",
+                        "unavailable_reason": reason,
+                    })
+                    profile["raw_context"] = dict(raw_context)
+
+        _rewrite_rehashed_canonical_ledger(output, mutate)
+        with pytest.raises(ValueError, match="profile"):
+            verify_run(output)
+
+
 def test_public_profile_plan_emits_typed_attempt_evidence(tmp_path):
     from bp_registry.ledger import read_canonical_events
     from bp_registry.runner import run_canonical_one

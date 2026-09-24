@@ -77,6 +77,71 @@ def test_public_profile_rss_normalization_requires_linux_and_darwin_equality():
             validate_public_clean_low_overhead_evidence(evidence)
 
 
+def test_public_profile_rss_unavailable_contract_matches_each_producer_branch():
+    """Every unavailable RSS record has one producer-reachable grammar."""
+    from bp_registry.canonical.profiling import (
+        LocalProfiler,
+        ProfilingPlan,
+        validate_public_clean_low_overhead_evidence,
+    )
+
+    class Resource:
+        RUSAGE_SELF = object()
+
+        @staticmethod
+        def getrusage(_scope):
+            return type("Usage", (), {"ru_maxrss": 7})()
+
+    def raising(error):
+        class RaisingResource:
+            RUSAGE_SELF = object()
+
+            @staticmethod
+            def getrusage(_scope):
+                raise error
+
+        return RaisingResource()
+
+    base_method = "resource.getrusage:RUSAGE_SELF:v1"
+    raw_method = "resource.getrusage:RUSAGE_SELF:ru_maxrss:v1"
+    cases = [
+        ("absent", None, "Linux", base_method, "resource adapter unavailable", {}),
+        ("attribute", raising(AttributeError("missing")), "Linux", base_method, "resource adapter unavailable: AttributeError", {}),
+        ("os", raising(OSError("adapter")), "Linux", base_method, "resource adapter unavailable: OSError", {}),
+        ("value", raising(ValueError("bad")), "Linux", base_method, "resource adapter unavailable: ValueError", {}),
+        ("type", raising(TypeError("bad")), "Linux", base_method, "resource adapter unavailable: TypeError", {}),
+        ("permission", raising(PermissionError("denied")), "Linux", base_method, "resource adapter unavailable: OSError", {}),
+        ("empty-platform", Resource(), "", base_method, "resource adapter unavailable: ValueError", {}),
+        ("non-string-platform", Resource(), 7, base_method, "resource adapter unavailable: ValueError", {}),
+        (
+            "negative",
+            type("NegativeResource", (), {"RUSAGE_SELF": object(), "getrusage": staticmethod(lambda _scope: type("Usage", (), {"ru_maxrss": -1})())})(),
+            "Linux",
+            raw_method,
+            "negative RSS observation",
+            {},
+        ),
+        (
+            "unsupported-platform",
+            Resource(),
+            "FreeBSD",
+            raw_method,
+            "RSS normalization semantics unavailable",
+            {"rss_platform": "FreeBSD", "rss_raw_value": 7, "rss_raw_unit": "unknown"},
+        ),
+    ]
+
+    for _label, resource_module, system, method, reason, raw_context in cases:
+        _value, profile = LocalProfiler(
+            ProfilingPlan(), resource_module=resource_module, platform_system=lambda system=system: system,
+        ).measure(lambda: None)
+        rss = profile.runtime.peak_host_memory
+        assert (rss.value, rss.method, rss.unavailable_reason, dict(profile.raw_context)) == (
+            None, method, reason, raw_context,
+        )
+        assert validate_public_clean_low_overhead_evidence(profile.as_evidence()) == profile
+
+
 def test_disabled_and_unavailable_profiles_remain_explicit_or_fail_closed_when_required():
     from bp_registry.canonical.profiling import (
         LocalProfiler,
