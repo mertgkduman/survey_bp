@@ -375,6 +375,8 @@ class LayeredSchedule:
                 check_to_variable_updates=len(layer_edges),
                 variable_to_check_updates=v2c_refreshes,
                 belief_assemblies=self.edge_table.variable_count,
+                candidate_constructions=1,
+                convergence_checks=1,
                 candidate_checks=1,
             ),
             compute=lambda: self._compute_layer(messages, syndrome_bits, error_rate=error_rate, layer_index=layer_index)[0],
@@ -587,6 +589,8 @@ class CheckNodeSerialSchedule(_NodeSerialSchedule):
             check_to_variable_updates=len(self._check_edges[unit_index]),
             variable_to_check_updates=sum(variable in affected for variable in self._edge_variables),
             belief_assemblies=len(affected),
+            candidate_constructions=1,
+            convergence_checks=1,
             candidate_checks=1,
         )
 
@@ -636,6 +640,8 @@ class VariableNodeSerialSchedule(_NodeSerialSchedule):
         return WorkVector(
             variable_to_check_updates=len(self._variable_edges[unit_index]),
             belief_assemblies=1,
+            candidate_constructions=1,
+            convergence_checks=1,
             candidate_checks=1,
         )
 
@@ -743,13 +749,9 @@ class RandomizedTraversalPlan:
             raise ValueError("randomized traversal may refresh only at its declared boundary")
         if state.realized_orders and self.refresh_scope != "sweep":
             return RandomizedTraversalRefresh(True, state, state.realized_orders[-1], 0)
-        # The present WorkVector has no order-generation dimension.  A zero leaf
-        # establishes the atomic admission seam without relabeling this work as a
-        # convergence check or residual operation; Plan 03-05 owns that schema
-        # extension and will replace the zero vector with its named resource.
         reservation = budgets.reserve(
             budget_scope,
-            WorkVector.zero(),
+            WorkVector(order_generation=self._unit_count, order_selection=self._unit_count),
             leaf_id=f"{budget_scope}:schedule-order:{state.derived_identity}:{len(state.realized_orders)}",
         )
         if reservation is None:

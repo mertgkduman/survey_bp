@@ -1,0 +1,9 @@
+{
+  "command": "PYTHONPATH=$PWD/src OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_schedule_semantics.py -k mandatory_convergence_check",
+  "exitCode": 1,
+  "output": "not ok 1 - test_layered_local_unit_reserves_its_mandatory_convergence_check_before_mutation\n  ---\n  framework: pytest\n  assertion: Phase 3 local schedules require a distinct, reservable convergence-check resource\n  ...\n# tests 1\n# pass 0\n# fail 1\n",
+  "targetTest": "test_layered_local_unit_reserves_its_mandatory_convergence_check_before_mutation",
+  "targetFile": "tests/canonical/test_schedule_semantics.py",
+  "expected": "A layered local proposal exposes one separately reservable convergence_checks work unit.",
+  "actual": "The selected pytest target failed its explicit assertion because WorkVector has no convergence_checks resource."
+}

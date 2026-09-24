@@ -176,7 +176,7 @@ class CanonicalLocalStepExecutor:
         is_converged: Callable[[np.ndarray], bool],
     ) -> LocalStepResult:
         """Leave every supplied state untouched when the complete bundle is denied."""
-        if proposal.proposed_work.candidate_checks < 1:
+        if proposal.proposed_work.convergence_checks != 1:
             raise ValueError("a canonical local step must reserve one convergence check")
         leaf_id = f"{self.scope}:local-step:{self._ordinal}:{proposal.label}"
         reservation = self.budgets.reserve(self.scope, proposal.proposed_work, leaf_id=leaf_id)
@@ -332,7 +332,9 @@ def _budget_tree(execution_controls: Mapping[str, Any] | None) -> BudgetTree:
     configured = execution_controls.get("work_limits")
     if not isinstance(configured, Mapping):
         raise ValueError("canonical execution controls require scoped work_limits")
-    resources = set(WorkVector.zero().as_evidence())
+    # Public V2/V3 flooding manifests retain their historical cap grammar;
+    # V3 schedule terminals carry the expanded vector separately.
+    resources = set(WorkVector.zero().as_evidence(structural_event_version=2))
     limits: list[BudgetLimit] = []
     for scope in ("shot", "search", "attempt"):
         values = configured.get(scope)
@@ -560,13 +562,13 @@ def run_canonical_structural_shot(
                             "count": data.get("iterations", 0), "schedule": "flooding",
                             "atomic_unit": "complete_double_buffered_sweep",
                         },
-                        "work_vector": work.as_evidence(),
+                        "work_vector": work.as_evidence(structural_event_version=2),
                     }
                     ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="work", data=work_data)
                     ledger.terminal(
                         run_id=parsed.run_id, shot_id=shot_id, termination=termination,
                         data={
-                            **common, **data, "work_vector": work.as_evidence(),
+                            **common, **data, "work_vector": work.as_evidence(structural_event_version=2),
                             **({"profile": profile_evidence} if profile_evidence is not None else {}),
                         },
                     )

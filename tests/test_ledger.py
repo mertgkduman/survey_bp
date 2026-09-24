@@ -281,3 +281,34 @@ def test_canonical_event_rejects_reserved_lifecycle_kinds(tmp_path):
             writer.event(run_id="canonical", shot_id=1, kind="termination")
 
     assert [event["kind"] for event in read_canonical_events(path)] == ["shot_begin"]
+
+
+def test_version_three_schedule_terminal_preserves_dual_budget_views_and_rejects_tampering(tmp_path):
+    from bp_registry.canonical.budgets import BudgetView, Measurement, QualifiedIteration, ScheduleTerminalEvidence, WorkVector
+    from bp_registry.canonical.verification import CanonicalStructuralVerificationError, reconstruct_schedule_terminal
+    from bp_registry.ledger import CANONICAL_SCHEDULE_LEDGER_VERSION, CanonicalEventWriter, read_canonical_events
+
+    source_unit = QualifiedIteration(0, schedule="layered", atomic_unit="one_layer")
+    evidence = ScheduleTerminalEvidence(
+        schedule="layered", source_iteration=source_unit, completed_traversals=0,
+        local_cursor=(1,), stopping_adaptation="D-09 after layer",
+        work=WorkVector(check_to_variable_updates=2, convergence_checks=1),
+        setup_runtime=Measurement.unavailable(method="not_measured", scope="schedule_setup", unit="ns", precision="unknown", reason="fixture"),
+        decode_runtime=Measurement.observed(7, method="fixture", scope="decode", unit="ns", precision="exact"),
+        budget_views=(
+            BudgetView.common_c2v_cap(2),
+            BudgetView.schedule_iteration_limit(QualifiedIteration(1, schedule="layered", atomic_unit="one_layer")),
+        ),
+    ).as_evidence()
+    path = tmp_path / "schedule-events.jsonl"
+    with CanonicalEventWriter(path, structural_event_version=CANONICAL_SCHEDULE_LEDGER_VERSION) as writer:
+        writer.begin(run_id="schedule", shot_id=1, sample_seed_identity="seed")
+        writer.terminal(run_id="schedule", shot_id=1, termination="count_budget_exhausted", data={"schedule_terminal": evidence})
+
+    terminal = read_canonical_events(path)[-1]
+    assert terminal["ledger_version"] == 3
+    assert reconstruct_schedule_terminal(terminal["data"]["schedule_terminal"]) == evidence
+    tampered = dict(evidence)
+    tampered["completed_traversals"] = 1
+    with pytest.raises(CanonicalStructuralVerificationError, match="progress facts are invalid"):
+        reconstruct_schedule_terminal(tampered)
