@@ -1,0 +1,8 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_residual_schedule.py -k 'tracer or selection or tie'",
+  "exit_code": 1,
+  "failing_test": "test_tracer_residual_schedule_contract_is_closed_to_conventional_srbp",
+  "expected_result": "A source-qualified residual schedule exports the closed conventional-sRBP contract and executes one local unit.",
+  "actual_result": "bp_registry.canonical.residual does not yet exist; the explicit assertion failed.",
+  "intentional": true
+}
