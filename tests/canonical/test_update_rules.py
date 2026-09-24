@@ -135,3 +135,43 @@ def test_graph_bound_assignment_rejects_a_wrong_declared_length_before_broadcast
     )
     with pytest.raises(ValueError, match="check_count"):
         assignment.resolve(graph_sha256="a" * 64, check_count=2, edge_count=3, source_iteration=0, edge_checks=(0, 1, 0))
+
+
+@pytest.mark.parametrize(
+    ("incoming", "syndrome", "beta", "expected"),
+    [
+        (np.asarray([2.0, -3.0]), 0, 0.0, -2.0),
+        (np.asarray([2.0, -3.0]), 0, 2.0, -0.0),
+        (np.asarray([np.nextafter(2.0, 0.0)]), 1, 2.0, 0.0),
+        (np.asarray([np.nextafter(2.0, np.inf)]), 1, 2.0, np.nextafter(2.0, np.inf) - 2.0),
+        (np.asarray([30.0]), 0, 1.0, 25.0),
+    ],
+)
+def test_offset_min_sum_matches_independent_float64_boundary_oracle(incoming, syndrome, beta, expected):
+    updates = _updates_module()
+    assignment = updates.ParameterAssignment.model_validate({"shape": "scalar", "value": beta})
+    observed = updates.OffsetMinSumUpdate(beta=assignment).check_to_variable(incoming, syndrome=syndrome)
+    assert observed == expected
+
+
+@pytest.mark.parametrize("value", [
+    {"shape": "scalar", "value": -0.1},
+    {"shape": "scalar", "value": float("nan")},
+    {"shape": "scalar", "value": float("inf")},
+])
+def test_offset_min_sum_rejects_invalid_beta_before_execution(value):
+    updates = _updates_module()
+    with pytest.raises(ValueError):
+        updates.ParameterAssignment.model_validate(value)
+
+
+def test_offset_min_sum_source_iteration_uses_schedule_iteration_not_local_step_count():
+    updates = _updates_module()
+    beta = updates.ParameterAssignment.model_validate(
+        {"shape": "source_iteration", "values": [0.25, 1.5]}
+    )
+    update = updates.OffsetMinSumUpdate(beta=beta)
+    assert update.check_to_variable(np.asarray([2.0]), syndrome=0, source_iteration=0) == 1.75
+    assert update.check_to_variable(np.asarray([2.0]), syndrome=0, source_iteration=1) == 0.5
+    with pytest.raises(ValueError, match="source_iteration"):
+        update.check_to_variable(np.asarray([2.0]), syndrome=0, source_iteration=2)
