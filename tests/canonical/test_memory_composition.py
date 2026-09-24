@@ -114,7 +114,7 @@ def test_denied_and_duplicate_memory_refreshes_do_not_mutate_or_double_commit():
 
     assert hasattr(memory, "MemoryAssignmentLifecycle"), "duplicate memory transitions need a single owner"
     from bp_registry.canonical.budgets import BudgetLimit, BudgetTree, WorkVector
-    from bp_registry.canonical.memory import MemoryAssignmentLifecycle, MemoryAssignmentSpec
+    from bp_registry.canonical.memory import MemoryAssignmentLifecycle, MemoryAssignmentSpec, MemoryCompositionState
 
     graph = "c" * 64
     assignment = MemoryAssignmentSpec(

@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from hashlib import sha256
+import json
 import math
-from typing import Mapping
+from threading import RLock
+from typing import Any, Literal
 
 import numpy as np
 
@@ -389,6 +392,203 @@ class OrderedAffineMemoryComposition:
         for binding, item in zip(self.bindings, proposal.proposals, strict=True):
             next_state[binding.binding_id] = binding.commit(item, next_state.get(binding.binding_id))
         return MemoryCompositionState(tuple(next_state[binding.binding_id] for binding in self.bindings))
+
+
+_MEMORY_REFRESH_BOUNDARIES = frozenset({"attempt_start", "leg_start", "local_update", "source_iteration"})
+
+
+@dataclass(frozen=True, slots=True)
+class MemoryAssignmentState:
+    """Immutable decoder-local generator state and its complete replay history."""
+
+    derived_identity: str
+    rng_state: str
+    resolved: tuple[tuple[str, tuple[float, ...]], ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class MemoryAssignmentResult:
+    """One proposed-and-committed assignment transition or an exact rollback."""
+
+    admitted: bool
+    owner: bool
+    replayed: bool
+    state: MemoryAssignmentState
+    values: tuple[float, ...]
+    history_state: MemoryCompositionState
+    schedule_cursor: tuple[int, ...]
+    evidence: dict[str, Any] | None
+    termination: Any = None
+
+
+@dataclass(frozen=True, slots=True)
+class MemoryAssignmentSpec:
+    """Fixed, vector, or uniform per-variable memory assignment declaration.
+
+    Assignment randomness is derived solely from a decoder identity and a
+    purpose label.  It never accepts a physical sample RNG or sample payload.
+    """
+
+    mode: Literal["fixed", "vector", "uniform"]
+    graph_sha256: str
+    root_seed_identity: str
+    refresh_boundary: Literal["attempt_start", "leg_start", "local_update", "source_iteration"]
+    retain_history: bool
+    value: float | None = None
+    values: tuple[float, ...] | None = None
+    low: float | None = None
+    high: float | None = None
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.graph_sha256, str) or len(self.graph_sha256) != 64 or any(char not in "0123456789abcdef" for char in self.graph_sha256):
+            raise ValueError("memory assignment graph_sha256 must be a SHA-256 identity")
+        if not isinstance(self.root_seed_identity, str) or len(self.root_seed_identity) != 64 or any(char not in "0123456789abcdef" for char in self.root_seed_identity):
+            raise ValueError("memory assignment root_seed_identity must be a SHA-256 identity")
+        if self.refresh_boundary not in _MEMORY_REFRESH_BOUNDARIES:
+            raise ValueError("memory assignment refresh boundary is unsupported")
+        if self.mode == "fixed":
+            if self.value is None or self.values is not None or self.low is not None or self.high is not None or not math.isfinite(self.value):
+                raise ValueError("fixed memory assignment requires exactly one finite value")
+        elif self.mode == "vector":
+            if self.value is not None or not self.values or self.low is not None or self.high is not None or any(not math.isfinite(item) for item in self.values):
+                raise ValueError("vector memory assignment requires exactly one nonempty finite vector")
+        else:
+            if self.value is not None or self.values is not None or self.low is None or self.high is None or not math.isfinite(self.low) or not math.isfinite(self.high) or self.low > self.high:
+                raise ValueError("uniform memory assignment requires one ordered finite interval")
+
+    def initial_state(self, *, configuration_identity: str, decoder_identity: str) -> MemoryAssignmentState:
+        if not all(isinstance(value, str) and value for value in (configuration_identity, decoder_identity)):
+            raise ValueError("configuration and decoder identities must be nonempty strings")
+        material = {
+            "purpose": "memory_assignment",
+            "root_seed_identity": self.root_seed_identity,
+            "assignment": self._identity_payload(),
+            "configuration_identity": configuration_identity,
+            "decoder_identity": decoder_identity,
+        }
+        derived = sha256(json.dumps(material, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+        rng = np.random.Generator(np.random.PCG64(int(derived[:32], 16)))
+        return MemoryAssignmentState(derived, json.dumps(rng.bit_generator.state, sort_keys=True))
+
+    def refresh(
+        self,
+        state: MemoryAssignmentState,
+        *,
+        boundary: str,
+        replay_identity: str,
+        variable_count: int,
+        budgets: Any,
+        budget_scope: str,
+        history_state: MemoryCompositionState,
+        schedule_cursor: tuple[int, ...],
+        work: Any,
+    ) -> MemoryAssignmentResult:
+        """Reserve all declared work before generating or changing lifecycle state."""
+        if not isinstance(state, MemoryAssignmentState):
+            raise ValueError("memory refresh requires immutable MemoryAssignmentState")
+        if boundary != self.refresh_boundary:
+            raise ValueError("memory assignment may refresh only at its declared boundary")
+        if not isinstance(replay_identity, str) or not replay_identity:
+            raise ValueError("memory refresh requires a complete replay identity")
+        if type(variable_count) is not int or variable_count < 1:
+            raise ValueError("memory assignment variable_count must be a positive integer")
+        if not isinstance(history_state, MemoryCompositionState) or not isinstance(schedule_cursor, tuple) or any(type(item) is not int or item < 0 for item in schedule_cursor):
+            raise ValueError("memory refresh requires immutable history and a nonnegative schedule cursor")
+        prior = dict(state.resolved)
+        if replay_identity in prior:
+            return MemoryAssignmentResult(
+                True, False, True, state, prior[replay_identity], history_state, schedule_cursor,
+                self._evidence(state, replay_identity, prior[replay_identity]),
+            )
+        reservation = budgets.reserve(
+            budget_scope, work,
+            leaf_id=f"{budget_scope}:memory-assignment:{state.derived_identity}:{replay_identity}",
+        )
+        if reservation is None:
+            return MemoryAssignmentResult(
+                False, False, False, state, (), history_state, schedule_cursor, None,
+                getattr(budgets, "last_termination", None),
+            )
+        try:
+            values, next_rng_state = self._resolve(state, replay_identity, variable_count)
+            next_state = MemoryAssignmentState(
+                state.derived_identity, next_rng_state, state.resolved + ((replay_identity, values),),
+            )
+            next_history = history_state if self.retain_history else MemoryCompositionState()
+            evidence = self._evidence(next_state, replay_identity, values)
+            reservation.commit_once()
+            return MemoryAssignmentResult(True, True, False, next_state, values, next_history, schedule_cursor, evidence)
+        except BaseException:
+            if reservation.active:
+                reservation.rollback()
+            raise
+
+    def _resolve(self, state: MemoryAssignmentState, replay_identity: str, variable_count: int) -> tuple[tuple[float, ...], str]:
+        if self.mode == "fixed":
+            assert self.value is not None
+            return (float(self.value),) * variable_count, state.rng_state
+        if self.mode == "vector":
+            assert self.values is not None
+            if len(self.values) != variable_count:
+                raise ValueError("vector memory assignment length must equal graph variable_count")
+            return tuple(float(item) for item in self.values), state.rng_state
+        seed_material = f"{state.derived_identity}:memory_assignment:{replay_identity}".encode("utf-8")
+        seed = int(sha256(seed_material).hexdigest()[:32], 16)
+        rng = np.random.Generator(np.random.PCG64(seed))
+        assert self.low is not None and self.high is not None
+        values = tuple(float(item) for item in rng.uniform(self.low, self.high, size=variable_count))
+        return values, json.dumps(rng.bit_generator.state, sort_keys=True)
+
+    def _identity_payload(self) -> dict[str, Any]:
+        return {
+            "mode": self.mode, "graph_sha256": self.graph_sha256, "refresh_boundary": self.refresh_boundary,
+            "retain_history": self.retain_history, "value": self.value, "values": self.values,
+            "low": self.low, "high": self.high,
+        }
+
+    def _evidence(self, state: MemoryAssignmentState, replay_identity: str, values: tuple[float, ...]) -> dict[str, Any]:
+        return {
+            "purpose": "memory_assignment",
+            "algorithm": "numpy.PCG64",
+            "root_seed_identity": self.root_seed_identity,
+            "decoder_seed_identity": state.derived_identity,
+            "graph_sha256": self.graph_sha256,
+            "generator": self._identity_payload(),
+            "refresh_boundary": self.refresh_boundary,
+            "retain_history": self.retain_history,
+            "replay_identity": replay_identity,
+            "resolved_values": list(values),
+        }
+
+
+class MemoryAssignmentLifecycle:
+    """Single-owner transition coordinator for duplicate complete replay identities."""
+
+    def __init__(self, assignment: MemoryAssignmentSpec) -> None:
+        self.assignment = assignment
+        self._lock = RLock()
+        self._completed: dict[str, MemoryAssignmentResult] = {}
+
+    def refresh(self, state: MemoryAssignmentState, **kwargs: Any) -> MemoryAssignmentResult:
+        replay_identity = kwargs.get("replay_identity")
+        if not isinstance(replay_identity, str) or not replay_identity:
+            raise ValueError("memory lifecycle requires a complete replay identity")
+        key_material = {
+            "decoder_seed_identity": state.derived_identity,
+            "replay_identity": replay_identity,
+            "graph_sha256": self.assignment.graph_sha256,
+            "boundary": kwargs.get("boundary"),
+            "variable_count": kwargs.get("variable_count"),
+        }
+        key = sha256(json.dumps(key_material, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+        with self._lock:
+            prior = self._completed.get(key)
+            if prior is not None:
+                return replace(prior, owner=False, replayed=True)
+            result = self.assignment.refresh(state, **kwargs)
+            if result.admitted:
+                self._completed[key] = result
+            return result
 
 
 @dataclass(frozen=True, slots=True)
