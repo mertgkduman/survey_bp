@@ -126,6 +126,24 @@ def test_canonical_v3_schema_is_generated_from_the_public_nms_contract():
     assert json.loads(schema_path.read_text(encoding="utf-8")) == CanonicalExperimentV3.model_json_schema()
 
 
+def test_cluster_artifact_public_preflight_is_not_an_executable_canonical_manifest(tmp_path):
+    from bp_registry.manifests import qualify_cluster_artifact
+
+    specification = {
+        "q_table_path": "missing.npy", "partition_path": "missing.json",
+        "q_table_sha256": "a" * 64, "partition_sha256": "b" * 64,
+        "source_id": "moradi-clustered-rl-s", "source_uri": "https://example.test/moradi",
+        "source_revision": "author-release-v1", "source_record_sha256": "c" * 64,
+        "graph_sha256": "d" * 64, "channel": "code_capacity_x", "kernel": "binary_spa",
+        "state_encoding": "moradi-state-v1", "action_encoding": "moradi-action-v1",
+        "tie_breaking": "author-declared-stable-v1", "q_shape": [2, 2], "check_count": 2,
+    }
+    result = qualify_cluster_artifact(specification, approved_root=tmp_path)
+    assert result.status == "unavailable"
+    with pytest.raises(ValueError, match="approved root"):
+        qualify_cluster_artifact({**specification, "approved_root": str(tmp_path)}, approved_root=tmp_path)
+
+
 def test_offset_min_sum_is_a_closed_v3_update_kind_with_an_explicit_assignment(tmp_path):
     from bp_registry.manifests import CanonicalExperimentV3, preflight
 

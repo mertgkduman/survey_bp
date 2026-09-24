@@ -154,6 +154,37 @@ missing source artifact for learned clustering, or any undeclared partition/refr
 combination is a **compatibility rejection before sampling**: it creates neither a
 physical sample nor partial shot evidence.
 
+### Clustered RL-S external artifact checkpoint
+
+`clustered RL-S` is not an admitted canonical schedule.  In particular, a generic
+layer, random partition, synthetic Q-table, fixture, retrained policy, or successful
+qualification record is not Moradi support and cannot complete `SCH-06`.  The exact
+author Q-table and ordered partition remain an external blocking dependency; their
+training/production cost is recorded as `unknown`, never zero.
+
+When authoritative bytes are supplied, create a strict JSON specification containing
+exactly `q_table_path`, `partition_path`, the two SHA-256 fields, source `id`/`uri`/
+`revision`/`record_sha256`, `graph_sha256`, `channel`, `kernel`, `state_encoding`,
+`action_encoding`, `tie_breaking`, `q_shape`, and `check_count`.  The paths are
+relative to an independently supplied confined root.  Then run:
+
+```bash
+OMP_NUM_THREADS=1 .venv/bin/python -m bp_registry.cli qualify-cluster-artifact \
+  cluster-artifact-spec.json --approved-root author-release-directory
+```
+
+The command accepts only bounded `.npy` float64 Q-table bytes and bounded strict JSON
+partition bytes; it rejects pickle/object arrays, traversal/symlink escapes, oversized
+or malformed payloads, nonfinite values, raw-hash mismatches, wrong Q shape, incomplete
+or repeated partition membership, and source/graph/channel/kernel/state/action/tie
+metadata mismatches.  It emits a sorted schema-version-1 report with `qualified`,
+`status` (`qualified`, `unavailable`, or `incompatible`), the pinned source and raw
+hash facts, all check results, and the persistent labels
+`not_established_by_qualification` for source support and reproduction.  An unavailable
+or incompatible artifact writes its report but exits 2; a qualified artifact exits 0.
+Qualification does not execute a schedule, establish a source claim, reproduce a paper,
+or complete `SCH-06`.
+
 For every local terminal, `source_iteration` gives the named local-unit count,
 `completed_traversals` and `local_cursor` retain partial traversal state, and the
 schedule evidence exposes fresh/stale visibility, selected order, residual cache

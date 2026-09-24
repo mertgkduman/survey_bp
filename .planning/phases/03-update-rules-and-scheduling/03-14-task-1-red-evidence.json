@@ -1,0 +1,9 @@
+{
+  "command": "PYTHONPATH=$PWD/src OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_cluster_schedule.py -k public_cluster_artifact_boundary_exists",
+  "exitCode": 1,
+  "output": "not ok 1 - test_public_cluster_artifact_boundary_exists\n  ---\n  framework: pytest\n  assertion: public cluster policy support begins with an explicit non-executable artifact gate\n  actual: importlib.util.find_spec('bp_registry.canonical.cluster_schedule') returned None\n  ...\n# tests 1\n# pass 0\n# fail 1\n",
+  "targetTest": "test_public_cluster_artifact_boundary_exists",
+  "targetFile": "tests/canonical/test_cluster_schedule.py",
+  "expected": "A public non-executable cluster artifact boundary exists before any artifact can be evaluated or a clustered schedule claimed.",
+  "actual": "The cluster artifact module did not exist."
+}
