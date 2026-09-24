@@ -49,7 +49,7 @@ def test_documented_tutorial(tmp_path):
     from bp_registry.ledger import read_canonical_events
 
     events = read_canonical_events(output / "events.jsonl")
-    terminals = [event for event in events if event["kind"] == "termination"]
+    terminals = sorted((event for event in events if event["kind"] == "termination"), key=lambda event: event["shot_id"])
     assert [event["data"]["outcome"] for event in terminals] == ["logical_failure", "exact"]
     assert all(event["data"]["selection_status"] == "frozen_decoder_visible_candidate" for event in terminals)
     assert all(event["data"]["assessment_status"] == "not_assessed" for event in terminals)
@@ -58,6 +58,14 @@ def test_documented_tutorial(tmp_path):
         event["data"]["profile"]["runtime"]["backend_device_time"]["value"] is None
         for event in events if event["kind"] == "runtime"
     )
+
+
+def test_documented_nms_contract_names_equations_assignments_and_public_verification():
+    tutorial = (REPOSITORY_ROOT / "docs/canonical-engine.md").read_text(encoding="utf-8")
+    assert "normalized min-sum" in tutorial.lower()
+    assert "alpha" in tutorial
+    assert "parameter_assignment" in tutorial
+    assert "schema-canonical-v3.json" in tutorial
 
 
 def test_checked_canonical_manifest_has_a_strict_public_preflight_contract():
@@ -133,6 +141,60 @@ def test_min_sum_public_manifest_preflights_runs_and_verifies(tmp_path):
     ]
     assert reports[0]["numerical_profile"] == "cpu-float64-min-sum-v1"
     assert reports[-1]["final_row_count"] == 2
+
+
+def test_normalized_min_sum_public_manifest_binds_and_replays_scalar_assignment(tmp_path):
+    """The V3 public route persists declared and graph-resolved NMS evidence."""
+    from bp_registry.cli import run_canonical, verify_run
+    from bp_registry.ledger import read_canonical_events
+    from bp_registry.manifests import preflight
+
+    manifest = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text(encoding="utf-8"))
+    manifest.update({
+        "schema_version": 3,
+        "run_id": "canonical-three-qubit-normalized-min-sum-development",
+        "numerical_profile": "cpu-float64-min-sum-v1",
+    })
+    manifest["policies"]["update"].update({
+        "kind": "normalized_min_sum", "binding_id": "update-normalized-min-sum-v1",
+        "parameter_assignment": {"shape": "scalar", "value": 0.75},
+    })
+    manifest["evidence"]["procedure"] = "Project-owned normalized min-sum flooding with an explicit scalar alpha."
+    manifest_path = tmp_path / "normalized-min-sum.json"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    resolved = preflight(manifest_path)
+    assert resolved.manifest.policies.update.parameter_assignment.shape == "scalar"
+    output = tmp_path / "normalized-output"
+    assert run_canonical(manifest_path, output)["final_row_count"] == 2
+    assert verify_run(output)["final_row_count"] == 2
+    events = read_canonical_events(output / "events.jsonl")
+    effects = next(event for event in events if event["kind"] == "termination")["data"]["policy_effects"]
+    assert effects["update"]["parameter_assignment"]["provenance"] == "conventional"
+    assert effects["update"]["parameter_assignment"]["resolved"] == [0.75] * int(resolved.code.hz.sum())
+
+
+@pytest.mark.parametrize("shape", ["check", "edge"])
+def test_normalized_min_sum_public_graph_assignments_match_constant_scalar_execution(tmp_path, shape):
+    from bp_registry.canonical.schedules import EdgeTable
+    from bp_registry.cli import run_canonical, verify_run
+    from bp_registry.manifests import preflight
+
+    baseline = preflight(REPOSITORY_ROOT / CANONICAL_MANIFEST)
+    table = EdgeTable.from_check_matrix(baseline.code.hz)
+    values = [0.75] * (table.check_count if shape == "check" else table.edge_count)
+    manifest = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text(encoding="utf-8"))
+    manifest.update({"schema_version": 3, "run_id": f"canonical-nms-{shape}", "numerical_profile": "cpu-float64-min-sum-v1"})
+    manifest["policies"]["update"].update({
+        "kind": "normalized_min_sum", "binding_id": f"update-nms-{shape}-v1",
+        "parameter_assignment": {"shape": shape, "graph_sha256": table.graph_sha256, "values": values},
+    })
+    manifest["evidence"]["procedure"] = f"Project-owned NMS flooding with an explicit {shape} assignment."
+    manifest_path = tmp_path / f"nms-{shape}.json"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    output = tmp_path / shape
+    assert run_canonical(manifest_path, output)["final_row_count"] == 2
+    assert verify_run(output)["final_row_count"] == 2
 
 
 def test_public_replay_rejects_same_run_changed_full_manifest_before_result(tmp_path):

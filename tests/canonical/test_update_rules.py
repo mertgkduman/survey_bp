@@ -78,3 +78,60 @@ def test_local_step_denial_preserves_every_owned_state_byte_for_byte():
     np.testing.assert_array_equal(messages, np.asarray([1.0, -2.0]))
     assert progress == ScheduleProgress(iteration=0, local_steps=0, cursor=(0,), rng_state=("seed", 1))
     assert cache == {"residual": (0.5,)}
+
+
+def test_normalized_min_sum_and_explicit_assignments_have_a_closed_graph_bound_contract():
+    updates = _updates_module()
+
+    scalar = updates.ParameterAssignment.model_validate({"shape": "scalar", "value": 0.8})
+    checks = updates.ParameterAssignment.model_validate(
+        {"shape": "check", "graph_sha256": "a" * 64, "values": [0.8, 0.8]}
+    )
+    edges = updates.ParameterAssignment.model_validate(
+        {"shape": "edge", "graph_sha256": "a" * 64, "values": [0.8, 0.8, 0.8]}
+    )
+
+    np.testing.assert_array_equal(
+        scalar.resolve(graph_sha256="a" * 64, check_count=2, edge_count=3, source_iteration=0),
+        checks.resolve(graph_sha256="a" * 64, check_count=2, edge_count=3, source_iteration=0, edge_checks=(0, 1, 0)),
+    )
+    np.testing.assert_array_equal(
+        scalar.resolve(graph_sha256="a" * 64, check_count=2, edge_count=3, source_iteration=0),
+        edges.resolve(graph_sha256="a" * 64, check_count=2, edge_count=3, source_iteration=0),
+    )
+    update = updates.NormalizedMinSumUpdate(alpha=scalar)
+    assert update.check_to_variable(np.asarray([2.0, -3.0]), syndrome=0) == -1.6
+    assert update.evidence().kind == "normalized_min_sum"
+    assert update.evidence().provenance == "conventional"
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        {"shape": "scalar", "value": -0.1},
+        {"shape": "scalar", "value": float("inf")},
+        {"shape": "scalar", "value": 0.8, "values": [0.8]},
+    ],
+)
+def test_explicit_normalization_assignments_reject_ambiguous_or_invalid_shapes(value):
+    updates = _updates_module()
+    with pytest.raises(ValueError):
+        updates.ParameterAssignment.model_validate(value)
+
+
+def test_graph_bound_assignment_rejects_a_different_immutable_graph():
+    updates = _updates_module()
+    assignment = updates.ParameterAssignment.model_validate(
+        {"shape": "edge", "graph_sha256": "b" * 64, "values": [0.8, 0.8, 0.8]}
+    )
+    with pytest.raises(ValueError, match="graph_sha256"):
+        assignment.resolve(graph_sha256="a" * 64, check_count=2, edge_count=3, source_iteration=0)
+
+
+def test_graph_bound_assignment_rejects_a_wrong_declared_length_before_broadcasting():
+    updates = _updates_module()
+    assignment = updates.ParameterAssignment.model_validate(
+        {"shape": "check", "graph_sha256": "a" * 64, "values": [0.8]}
+    )
+    with pytest.raises(ValueError, match="check_count"):
+        assignment.resolve(graph_sha256="a" * 64, check_count=2, edge_count=3, source_iteration=0, edge_checks=(0, 1, 0))

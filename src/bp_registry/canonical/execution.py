@@ -32,7 +32,7 @@ from .profiling import LocalProfiler, ProfilingPlan
 from .lineage import LineageEdge, LineageId, stable_lineage_id
 from .numerics import NumericalFailure
 from .numerics import MIN_SUM_CPU_F64
-from .updates import MinSumUpdate
+from .updates import MinSumUpdate, NormalizedMinSumUpdate
 from .problems import OriginalProblem, OriginalSpaceCandidate, WorkingProblem, select_stable_candidate
 from .schedules import EdgeTable, FloodingSchedule, FloodingSweep
 from .verification import PublicShotContext, validate_canonical_shot
@@ -205,11 +205,24 @@ class CanonicalLocalStepExecutor:
             raise
 
 
-def _kernel_for_manifest(manifest: CanonicalManifestV2 | CanonicalManifestV3) -> BinarySpaKernel:
+def _kernel_for_manifest(manifest: CanonicalManifestV2 | CanonicalManifestV3, edge_table: EdgeTable | None = None) -> BinarySpaKernel:
     """Resolve only the closed update registry; policies never receive hidden truth."""
     update = manifest.policies.update.kind
     if update == "min_sum":
         return BinarySpaKernel(profile=MIN_SUM_CPU_F64, update_rule=MinSumUpdate())
+    if update == "normalized_min_sum":
+        if edge_table is None or manifest.policies.update.parameter_assignment is None:
+            raise ValueError("normalized_min_sum requires a resolved immutable EdgeTable assignment")
+        assignment = manifest.policies.update.parameter_assignment
+        resolved = assignment.resolve(
+            graph_sha256=edge_table.graph_sha256, check_count=edge_table.check_count,
+            edge_count=edge_table.edge_count, source_iteration=0,
+            edge_checks=tuple(check for check, _variable in edge_table.edges),
+        )
+        return BinarySpaKernel(
+            profile=MIN_SUM_CPU_F64,
+            update_rule=NormalizedMinSumUpdate(assignment, resolved_alpha=tuple(float(value) for value in resolved)),
+        )
     if update == "binary_spa":
         return BinarySpaKernel()
     raise ValueError(f"unsupported executable update rule {update!r}")
@@ -257,7 +270,15 @@ class AtomicFloodingExecutor:
             completed: list[FloodingSweep] = []
 
             def compute() -> np.ndarray:
-                sweep = self.schedule.sweep(state, syndrome, error_rate=error_rate)
+                rule = getattr(self.schedule.kernel, "update_rule", None)
+                assignment = getattr(rule, "alpha", None)
+                if getattr(assignment, "shape", None) == "source_iteration":
+                    sweep = self.schedule.sweep(
+                        state, syndrome, error_rate=error_rate, source_iteration=iteration - 1,
+                    )
+                else:
+                    # Preserve the V2 public flooding call surface and existing instrumentation hooks.
+                    sweep = self.schedule.sweep(state, syndrome, error_rate=error_rate)
                 completed.append(sweep)
                 return sweep.new_v2c
 
@@ -545,8 +566,8 @@ def run_canonical_structural_shot(
                 attempt_reservation.commit_once()
                 try:
                     def admitted_attempt() -> tuple[np.ndarray | None, int, bool, BudgetTermination | None]:
-                        kernel = _kernel_for_manifest(parsed)
                         edge_table = EdgeTable.from_check_matrix(validated.hz)
+                        kernel = _kernel_for_manifest(parsed, edge_table)
                         schedule = FloodingSchedule(edge_table, kernel=kernel, profile=kernel.profile)
                         if edge_table.edge_count == 0:
                             candidate = kernel.candidate_from_beliefs(

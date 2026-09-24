@@ -118,6 +118,14 @@ def test_manifest_requires_complete_strict_provenance_and_round_trips_schema(tmp
         parse_manifest({**value, "schema_version": 2})
 
 
+def test_canonical_v3_schema_is_generated_from_the_public_nms_contract():
+    from bp_registry.manifests import CanonicalExperimentV3
+
+    schema_path = Path("data/manifests/schema-canonical-v3.json")
+    assert schema_path.exists()
+    assert json.loads(schema_path.read_text(encoding="utf-8")) == CanonicalExperimentV3.model_json_schema()
+
+
 @pytest.mark.parametrize("value", [float("nan"), float("inf"), -0.01, 1.01, "0.1"])
 def test_manifest_rejects_nonfinite_out_of_range_or_coerced_rates(tmp_path, value):
     from bp_registry.manifests import parse_manifest

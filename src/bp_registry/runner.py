@@ -15,6 +15,7 @@ from .canonical.metrics import unavailable_metric
 from .canonical.execution import run_canonical_structural_shot
 from .canonical.verification import PublicShotContext
 from .canonical.numerics import MIN_SUM_CPU_F64, REFERENCE_CPU_F64
+from .canonical.schedules import EdgeTable
 from .manifests import (
     CanonicalExperimentV2,
     CanonicalExperimentV3,
@@ -131,7 +132,7 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
         "resolved_numerical_profile": (MIN_SUM_CPU_F64 if isinstance(manifest, CanonicalExperimentV3) else REFERENCE_CPU_F64).as_evidence(),
         "policies": manifest.policies.model_dump(mode="json"),
         "policy_identity": composition.semantic_identity,
-        "policy_effects": executable_canonical_policy_effects(manifest.policies),
+        "policy_effects": _canonical_policy_effects(manifest, resolved.code),
         "shot_budget": manifest.budgets.max_shots,
         "max_iterations": manifest.budgets.attempt.max_iterations,
         "work_limits": {
@@ -158,14 +159,28 @@ def _canonical_kernel_manifest(manifest: CanonicalExperimentV2 | CanonicalExperi
     }
 
 
-def _canonical_execution_controls(manifest: CanonicalExperimentV2 | CanonicalExperimentV3) -> dict[str, object]:
+def _canonical_policy_effects(manifest: CanonicalExperimentV2 | CanonicalExperimentV3, code) -> dict[str, dict[str, Any]]:
+    """Bind declared NMS assignments to the code's canonical edge identities once."""
+    effects: dict[str, dict[str, Any]] = executable_canonical_policy_effects(manifest.policies)
+    assignment = getattr(manifest.policies.update, "parameter_assignment", None)
+    if assignment is not None:
+        table = EdgeTable.from_check_matrix(code.hz)
+        resolved = assignment.resolve(
+            graph_sha256=table.graph_sha256, check_count=table.check_count, edge_count=table.edge_count,
+            source_iteration=0, edge_checks=tuple(check for check, _variable in table.edges),
+        )
+        effects["update"] = {**effects["update"], "parameter_assignment": assignment.as_evidence(resolved)}
+    return effects
+
+
+def _canonical_execution_controls(manifest: CanonicalExperimentV2 | CanonicalExperimentV3, code) -> dict[str, object]:
     """Keep preflighted public limits and handler classifications beside the compact kernel input."""
     return {
         "work_limits": {
             scope: getattr(manifest.budgets, scope).work_limits.as_evidence()
             for scope in ("shot", "search", "attempt")
         },
-        "policy_effects": executable_canonical_policy_effects(manifest.policies),
+        "policy_effects": _canonical_policy_effects(manifest, code),
         "profile_plan": manifest.profile_plan.model_dump(mode="json"),
     }
 
@@ -209,7 +224,7 @@ def canonical_public_shot_context(manifest_path: str | Path, *, shot_id: int) ->
             for scope in ("shot", "search", "attempt")
         },
         composition_identity=composition.semantic_identity,
-        policy_effects=executable_canonical_policy_effects(manifest.policies),
+        policy_effects=_canonical_policy_effects(manifest, resolved.code),
         profile_plan=manifest.profile_plan.model_dump(mode="json"),
         update_kind=manifest.policies.update.kind,
     )
@@ -233,7 +248,7 @@ def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: s
         hidden_truth=sample.hidden, shot_id=shot_id, ledger_path=ledger_path,
         sample_seed_identity=sample.sample_identity,
         verification_context=verification_context,
-        execution_controls=_canonical_execution_controls(manifest),
+        execution_controls=_canonical_execution_controls(manifest, resolved.code),
         context={
             "manifest_sha256": digest,
             "artifact_raw_sha256": manifest.artifact.raw_sha256,

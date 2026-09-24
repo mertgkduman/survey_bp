@@ -11,6 +11,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from .updates import ParameterAssignment
+
 
 class _Strict(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True, frozen=True, allow_inf_nan=False)
@@ -58,7 +60,7 @@ _ROLE_HOOKS: dict[PolicyRole, Hook] = {
     PolicyRole.POSTPROCESSING: Hook.ATTEMPT,
 }
 _POLICY_KINDS: dict[PolicyRole, frozenset[str]] = {
-    PolicyRole.UPDATE: frozenset({"identity", "binary_spa", "min_sum"}),
+    PolicyRole.UPDATE: frozenset({"identity", "binary_spa", "min_sum", "normalized_min_sum"}),
     PolicyRole.SCHEDULE: frozenset({"identity", "flooding"}),
     PolicyRole.STATE_MEMORY: frozenset({"identity", "stateless"}),
     PolicyRole.INTERVENTION: frozenset({"identity"}),
@@ -93,7 +95,6 @@ class PolicySpec(_Strict):
             raise ValueError("state and capability declarations must not contain duplicates")
         return value
 
-
 class CanonicalCompositionSpec(_Strict):
     """Seven explicit roles; omission is never an inactive-policy shorthand."""
 
@@ -112,6 +113,26 @@ class CanonicalCompositionSpec(_Strict):
 
     def in_role_order(self) -> tuple[tuple[PolicyRole, PolicySpec], ...]:
         return tuple((role, getattr(self, role.value)) for role in PolicyRole)
+
+
+class PolicySpecV3(PolicySpec):
+    """V3-only update extension; V2's persisted policy schema remains byte-stable."""
+
+    parameter_assignment: ParameterAssignment | None = None
+
+    @model_validator(mode="after")
+    def normalization_is_explicit_and_scoped_to_the_update_role(self) -> "PolicySpecV3":
+        if self.kind == "normalized_min_sum" and self.parameter_assignment is None:
+            raise ValueError("normalized_min_sum requires one explicit parameter_assignment")
+        if self.kind != "normalized_min_sum" and self.parameter_assignment is not None:
+            raise ValueError("parameter_assignment is valid only for normalized_min_sum")
+        return self
+
+
+class CanonicalCompositionSpecV3(CanonicalCompositionSpec):
+    """V3 carries NMS assignments only on the update binding."""
+
+    update: PolicySpecV3
 
 
 @dataclass(frozen=True)
@@ -308,7 +329,7 @@ class CanonicalManifestV3(_Strict):
     numerical_profile: Literal["cpu-float64-min-sum-v1"]
     max_iterations: int = Field(ge=1, le=100_000)
     error_rate: float = Field(ge=0.0, le=1.0)
-    policies: CanonicalCompositionSpec
+    policies: CanonicalCompositionSpecV3
 
     @field_validator("error_rate")
     @classmethod

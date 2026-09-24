@@ -35,10 +35,16 @@ class BinarySpaKernel:
         """Pure numerical prior helper used by schedules and standalone callers."""
         return prior_llr(error_rate, profile=self.profile)
 
-    def check_message(self, incoming: np.ndarray, syndrome: int) -> float:
+    def check_message(
+        self, incoming: np.ndarray, syndrome: int, *, check_index: int = 0,
+        edge_index: int = 0, source_iteration: int = 0,
+    ) -> float:
         """Pure check-to-variable update for a single canonical edge."""
         if self.update_rule is not None:
-            return self.update_rule.check_to_variable(incoming, syndrome=syndrome)
+            return self.update_rule.check_to_variable(
+                incoming, syndrome=syndrome, check_index=check_index,
+                edge_index=edge_index, source_iteration=source_iteration,
+            )
         return check_to_variable(incoming, syndrome=syndrome, profile=self.profile)
 
     def assemble_beliefs(

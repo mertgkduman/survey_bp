@@ -114,6 +114,54 @@ ties have deterministic tested handling in the numerical profile; an
 alternative precision, clipping limit, or randomized tie rule must be a new
 named profile or declared policy, never an implicit substitution.
 
+## Version 3 min-sum and normalized min-sum
+
+`CanonicalExperimentV2` remains the historical binary-SPA/flooding contract:
+its schema, selector, numerical profile, and persisted meanings do not change.
+`CanonicalExperimentV3` uses the named `cpu-float64-min-sum-v1` profile for
+`min_sum` and `normalized_min_sum`. Its generated public schema is
+`data/manifests/schema-canonical-v3.json`; regenerate it only from
+`CanonicalExperimentV3.model_json_schema()` when the strict model changes.
+
+For an outgoing check-to-variable edge, min-sum uses
+
+\[
+m_{c\to v}=(-1)^{s_c}\prod_{u\in N(c)\setminus v}\operatorname{sign}(q_{u\to c})
+\min_{u\in N(c)\setminus v}|q_{u\to c}|.
+\]
+
+Normalized min-sum applies its declared normalization before the inherited
+finite saturation:
+
+\[
+m^{\mathrm{NMS}}_{c\to v}=\alpha\,m_{c\to v}.
+\]
+
+The update policy's `parameter_assignment` accepts exactly one tagged shape:
+`{"shape":"scalar","value":alpha}`, a `source_iteration` `values` vector,
+or graph-bound `check` / canonical `edge` `values` with a matching
+`graph_sha256`. There is no implicit vector broadcasting. Each resolved value
+is a finite `float64` alpha with `alpha >= 0`; `0 < alpha <= 1` is labelled
+`conventional`, while larger finite alpha is explicitly `exploratory`, never a
+source-faithful preset. Resolved values and this provenance are retained in
+terminal `policy_effects` and independently reconstructed by `verify-run`.
+
+To run the scalar NMS development variant in a disposable directory, derive a
+strict V3 manifest from the checked fixture, then use the same public commands:
+
+```bash
+OUT="$(mktemp -d "${TMPDIR:-/tmp}/canonical-nms.XXXXXX")"
+OMP_NUM_THREADS=1 .venv/bin/python -c 'import json, pathlib; p=pathlib.Path("data/manifests/canonical-three-qubit-development.json"); m=json.loads(p.read_text()); m.update({"schema_version":3,"run_id":"canonical-nms-development","numerical_profile":"cpu-float64-min-sum-v1"}); m["policies"]["update"].update({"kind":"normalized_min_sum","binding_id":"update-nms-v1","parameter_assignment":{"shape":"scalar","value":0.75}}); pathlib.Path("'"$OUT"'/nms.json").write_text(json.dumps(m))'
+OMP_NUM_THREADS=1 .venv/bin/python -m bp_registry.cli preflight "$OUT/nms.json"
+OMP_NUM_THREADS=1 .venv/bin/python -m bp_registry.cli canonical "$OUT/nms.json" --output "$OUT/result"
+OMP_NUM_THREADS=1 .venv/bin/python -m bp_registry.cli verify-run "$OUT/result"
+```
+
+The final command must report `final_row_count: 2`. Changing a declared or
+resolved assignment, policy effect, candidate, progress, work, or profile
+cannot be made valid by rehashing ledger records: the independent verifier
+reconstructs the manifest-bound terminal claims.
+
 ## Graph order and flooding buffers
 
 Sparse input enumeration is normalized to a canonical **check-major,

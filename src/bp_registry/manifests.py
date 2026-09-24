@@ -17,7 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 from .artifacts import LoadedArtifact, load_artifact
 from .canonical.budgets import WorkVector
-from .canonical.contracts import CanonicalCompositionSpec, CanonicalManifestV2, parse_canonical_manifest
+from .canonical.contracts import CanonicalCompositionSpec, CanonicalCompositionSpecV3, CanonicalManifestV2, parse_canonical_manifest
 from .css import CssCode, fixture_code
 
 
@@ -362,6 +362,7 @@ class CanonicalExperimentV3(CanonicalExperimentV2):
 
     schema_version: Literal[3]
     numerical_profile: Literal["cpu-float64-min-sum-v1"]
+    policies: CanonicalCompositionSpecV3
 
 
 ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2 | CanonicalExperimentV3
@@ -377,6 +378,7 @@ _EXECUTABLE_BASELINE_KINDS = {
     "postprocessing": "identity",
 }
 _EXECUTABLE_MIN_SUM_KINDS = {**_EXECUTABLE_BASELINE_KINDS, "update": "min_sum"}
+_EXECUTABLE_NORMALIZED_MIN_SUM_KINDS = {**_EXECUTABLE_BASELINE_KINDS, "update": "normalized_min_sum"}
 _IDENTITY_ONLY_ROLES = frozenset({"state_memory", "intervention", "postprocessing"})
 
 
@@ -386,9 +388,9 @@ def validate_executable_canonical_baseline(composition: CanonicalCompositionSpec
 
     resolved = validate_composition(composition)
     actual = {binding.role.value: binding.kind for binding in resolved.bindings}
-    if actual not in (_EXECUTABLE_BASELINE_KINDS, _EXECUTABLE_MIN_SUM_KINDS):
+    if actual not in (_EXECUTABLE_BASELINE_KINDS, _EXECUTABLE_MIN_SUM_KINDS, _EXECUTABLE_NORMALIZED_MIN_SUM_KINDS):
         raise ValueError(
-            "executable canonical baseline requires binary_spa or min_sum with flooding/stateless/"
+            "executable canonical baseline requires binary_spa, min_sum, or normalized_min_sum with flooding/stateless/"
             "identity/syndrome_or_budget/stable_first/identity policy kinds"
         )
     return resolved
@@ -550,8 +552,8 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
         composition = validate_executable_canonical_baseline(manifest.policies)
         if type(manifest) is CanonicalExperimentV2 and manifest.policies.update.kind != "binary_spa":
             raise ValueError("CanonicalExperimentV2 preserves only historical binary_spa semantics")
-        if isinstance(manifest, CanonicalExperimentV3) and manifest.policies.update.kind != "min_sum":
-            raise ValueError("CanonicalExperimentV3 requires the closed min_sum update rule")
+        if isinstance(manifest, CanonicalExperimentV3) and manifest.policies.update.kind not in {"min_sum", "normalized_min_sum"}:
+            raise ValueError("CanonicalExperimentV3 requires a closed min-sum update rule")
         artifact = load_artifact(
             manifest.artifact.root, manifest.artifact.path,
             expected_raw_sha256=manifest.artifact.raw_sha256,
