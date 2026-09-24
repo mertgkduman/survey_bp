@@ -97,7 +97,7 @@ Plans:
 5. A researcher can install the package, run the tutorial, and inspect mathematical conventions, lifecycle contracts, and compatibility examples.
 
 **Research focus:** Numerical stability, trace vocabulary, policy ownership, scoped budgets, and kernel-level work definitions.
-**Plans:** 15/15 plans executed
+**Plans:** 15/16 plans executed
 
 Plans:
 
@@ -154,6 +154,10 @@ Plans:
 **Wave 13** *(after Wave 12)*
 
 - [x] 02-15-PLAN.md — Complete provenance binding, persistent numerical verification, and RSS consistency
+
+**Wave 14** *(after Wave 13)*
+
+- [ ] 02-16-PLAN.md — Closed RSS-unavailable producer and verifier grammar
 
 ### Phase 3: Update Rules and Scheduling
 
