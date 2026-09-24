@@ -395,12 +395,14 @@ _EXECUTABLE_CHECK_SERIAL_SPA_KINDS = {**_EXECUTABLE_BASELINE_KINDS, "schedule": 
 _EXECUTABLE_VARIABLE_SERIAL_SPA_KINDS = {**_EXECUTABLE_BASELINE_KINDS, "schedule": "variable_node_serial"}
 _EXECUTABLE_RESIDUAL_SPA_KINDS = {**_EXECUTABLE_BASELINE_KINDS, "schedule": "residual"}
 _EXECUTABLE_RANDOMIZED_SPA_KINDS = {**_EXECUTABLE_BASELINE_KINDS, "schedule": "randomized"}
+_EXECUTABLE_GROUP_SHUFFLED_SPA_KINDS = {**_EXECUTABLE_BASELINE_KINDS, "schedule": "group_shuffled"}
 _EXECUTABLE_LOCAL_SPA_KINDS = (
     _EXECUTABLE_LAYERED_SPA_KINDS,
     _EXECUTABLE_CHECK_SERIAL_SPA_KINDS,
     _EXECUTABLE_VARIABLE_SERIAL_SPA_KINDS,
     _EXECUTABLE_RESIDUAL_SPA_KINDS,
     _EXECUTABLE_RANDOMIZED_SPA_KINDS,
+    _EXECUTABLE_GROUP_SHUFFLED_SPA_KINDS,
 )
 _IDENTITY_ONLY_ROLES = frozenset({"state_memory", "intervention", "postprocessing"})
 
@@ -594,6 +596,8 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
         if artifact.format_version != manifest.artifact.format_version:
             raise ValueError("canonical artifact format version does not match manifest")
         code = artifact.code.validate()
+        if isinstance(manifest, CanonicalExperimentV3) and manifest.policies.schedule.kind == "group_shuffled" and code.hz.shape[0] < 2:
+            raise ValueError("group_shuffled requires at least two checks")
         for name, expected in manifest.artifact.matrix_hashes.model_dump().items():
             if matrix_hashes(code)[name] != expected:
                 raise ValueError("canonical matrix identity does not match the artifact")

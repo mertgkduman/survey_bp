@@ -18,6 +18,7 @@ import numpy as np
 from .. import evaluator
 from .budgets import BudgetLimit, BudgetTree, BudgetView, Measurement, QualifiedIteration, ScheduleTerminalEvidence, WorkVector
 from .kernel import BinarySpaKernel
+from .group_shuffled import HsuGroupSchedule
 from .numerics import MIN_SUM_CPU_F64
 from .lineage import stable_lineage_id
 from .profiling import ProfileMeasurement, validate_public_clean_low_overhead_evidence
@@ -268,6 +269,11 @@ def _expected_local_attempt(context: PublicShotContext) -> dict[str, Any]:
     elif schedule_kind == "residual":
         from .residual import SyndromeResidualSchedule
         schedule = SyndromeResidualSchedule(table, kernel=kernel)
+    elif schedule_kind == "group_shuffled":
+        root_identity = schedule_data.get("root_identity")
+        if schedule_data.get("source_id") != "hsu-ndgsbp-2012-v1" or not isinstance(root_identity, str):
+            raise CanonicalStructuralVerificationError("group_shuffled context lacks its source and root identity")
+        schedule = HsuGroupSchedule(table, kernel=kernel, root_identity=root_identity, attempt_identity=f"{context.execution_identity}:attempt:0")
     else:
         raise CanonicalStructuralVerificationError(f"unsupported public local schedule {schedule_kind!r}")
     limits = context.work_limits or {}
@@ -312,6 +318,11 @@ def _expected_local_attempt(context: PublicShotContext) -> dict[str, Any]:
     candidate: np.ndarray | None = None
     for _ in range(context.max_iterations):
         progress_for_step = progress
+        if schedule_kind == "group_shuffled" and progress.cursor == (0,):
+            refreshed, _ = schedule.refresh_order(progress, budgets=budgets)
+            if not refreshed:
+                work = budgets.summary("attempt")
+                return {"termination": "count_budget_exhausted", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(schedule.evidence())), "iterations": progress.local_steps, "admitted": True, "progress": progress}
         if randomized is not None:
             assert randomized_state is not None
             refresh = randomized.refresh(randomized_state, boundary="attempt", budgets=budgets, budget_scope="attempt")
@@ -628,6 +639,7 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
         "variable_node_serial": "one_variable_belief_then_incident_v2c",
         "residual": "one_residual_selected_c2v_commit",
         "randomized": "one_layer",
+        "group_shuffled": "one_overlapping_check_group",
     }
     expected_iteration = {
         "count": expected["iterations"],

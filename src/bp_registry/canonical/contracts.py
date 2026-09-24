@@ -63,7 +63,7 @@ _POLICY_KINDS: dict[PolicyRole, frozenset[str]] = {
     PolicyRole.UPDATE: frozenset({"identity", "binary_spa", "min_sum", "normalized_min_sum", "offset_min_sum"}),
     PolicyRole.SCHEDULE: frozenset({
         "identity", "flooding", "layered", "check_node_serial",
-        "variable_node_serial", "residual", "randomized",
+        "variable_node_serial", "residual", "randomized", "group_shuffled",
     }),
     PolicyRole.STATE_MEMORY: frozenset({"identity", "stateless"}),
     PolicyRole.INTERVENTION: frozenset({"identity"}),
@@ -152,6 +152,7 @@ class SchedulePolicySpecV3(PolicySpec):
     base_schedule: Literal["layered", "check_node_serial", "variable_node_serial"] | None = None
     refresh_scope: Literal["configuration", "attempt", "sweep"] | None = None
     root_identity: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    source_id: Literal["hsu-ndgsbp-2012-v1"] | None = None
 
     @field_validator("partitions", mode="before")
     @classmethod
@@ -164,6 +165,7 @@ class SchedulePolicySpecV3(PolicySpec):
     def layered_controls_match_the_declared_kind(self) -> "SchedulePolicySpecV3":
         layered = self.kind == "layered"
         randomized = self.kind == "randomized"
+        group_shuffled = self.kind == "group_shuffled"
         if randomized and self.base_schedule is not None and self.base_schedule != "layered":
             raise ValueError("public randomized schedules require a layered base_schedule")
         needs_layers = layered or (randomized and self.base_schedule == "layered")
@@ -176,11 +178,14 @@ class SchedulePolicySpecV3(PolicySpec):
                 raise ValueError("only graph_coloring layered schedules may carry construction_rule")
         elif self.partitions is not None or self.provenance is not None or self.construction_rule is not None:
             raise ValueError("schedule controls are valid only for layered schedules")
-        randomized_controls = (self.base_schedule, self.refresh_scope, self.root_identity)
+        randomized_controls = (self.base_schedule, self.refresh_scope)
         if randomized:
-            if any(value is None for value in randomized_controls):
+            if any(value is None for value in randomized_controls) or self.root_identity is None or self.source_id is not None:
                 raise ValueError("randomized schedules require base_schedule, refresh_scope, and root_identity")
-        elif any(value is not None for value in randomized_controls):
+        elif group_shuffled:
+            if any(value is not None for value in randomized_controls) or self.root_identity is None or self.source_id != "hsu-ndgsbp-2012-v1":
+                raise ValueError("group_shuffled requires the Hsu source_id and a root_identity only")
+        elif any(value is not None for value in randomized_controls) or self.root_identity is not None or self.source_id is not None:
             raise ValueError("randomized controls are valid only for randomized schedules")
         return self
 

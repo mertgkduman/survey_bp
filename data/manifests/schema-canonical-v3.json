@@ -1043,6 +1043,19 @@
           "default": null,
           "title": "Root Identity"
         },
+        "source_id": {
+          "anyOf": [
+            {
+              "const": "hsu-ndgsbp-2012-v1",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Id"
+        },
         "state_lifetime": {
           "enum": [
             "shot",

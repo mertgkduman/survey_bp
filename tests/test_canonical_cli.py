@@ -1031,6 +1031,33 @@ def test_public_noncluster_spa_schedules_round_trip_and_reconstruct(tmp_path, sc
     assert verify_run(output)["final_row_count"] == 2
 
 
+def test_hsu_group_shuffled_public_one_group_round_trip(tmp_path):
+    from bp_registry.cli import run_canonical, verify_run
+    from bp_registry.ledger import read_canonical_events
+    from bp_registry.manifests import preflight
+
+    manifest = json.loads((REPOSITORY_ROOT / "data/manifests/phase3-pilot-bb144.json").read_text(encoding="utf-8"))
+    manifest["run_id"] = "hsu-group-one-unit-test"
+    manifest["policies"]["schedule"] = {
+        "kind": "group_shuffled", "binding_id": "schedule-hsu-group-v1",
+        "state_lifetime": "iteration", "source_id": "hsu-ndgsbp-2012-v1",
+        "root_identity": "a" * 64,
+    }
+    path = tmp_path / "hsu.json"
+    path.write_text(json.dumps(manifest), encoding="utf-8")
+    assert preflight(path).manifest.policies.schedule.kind == "group_shuffled"
+    output = tmp_path / "out"
+    assert run_canonical(path, output)["final_row_count"] == 1
+    assert verify_run(output)["final_row_count"] == 1
+    terminal = next(event["data"] for event in read_canonical_events(output / "events.jsonl") if event["kind"] == "termination")
+    evidence = terminal["schedule_evidence"]
+    assert evidence["source_id"] == "hsu-ndgsbp-2012-v1"
+    assert len(evidence["traversals"]) == 1
+    assert evidence["traversals"][0]["groups"][0] == evidence["traversals"][0]["order"][:2]
+    assert terminal["schedule_terminal"]["source_iteration"]["atomic_unit"] == "one_overlapping_check_group"
+    assert terminal["schedule_terminal"]["work_vector"]["order_generation"] == 72
+
+
 def test_checked_canonical_result_is_idempotent_and_honestly_labeled():
     from pathlib import Path
 

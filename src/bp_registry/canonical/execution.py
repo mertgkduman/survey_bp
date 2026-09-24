@@ -28,6 +28,7 @@ from .contracts import (
 )
 from .budgets import BudgetLimit, BudgetTermination, BudgetTree, BudgetView, Measurement, QualifiedIteration, ScheduleTerminalEvidence, WallClockLimit, WorkVector
 from .kernel import BinarySpaKernel
+from .group_shuffled import HsuGroupSchedule
 from .profiling import LocalProfiler, ProfilingPlan
 from .lineage import LineageEdge, LineageId, stable_lineage_id
 from .numerics import NumericalFailure
@@ -448,8 +449,9 @@ def _layered_schedule_for_manifest(
 
 def _local_schedule_for_manifest(
     manifest: CanonicalManifestV3, edge_table: EdgeTable, kernel: BinarySpaKernel,
+    *, attempt_identity: str,
 ) -> tuple[Any, RandomizedTraversalPlan | None]:
-    """Build only the validated noncluster V3 schedule named in the manifest."""
+    """Build the validated V3 schedule named in the manifest."""
     policy = manifest.policies.schedule
     if policy.kind == "layered":
         return _layered_schedule_for_manifest(manifest, edge_table, kernel), None
@@ -460,6 +462,9 @@ def _local_schedule_for_manifest(
     if policy.kind == "residual":
         from .residual import SyndromeResidualSchedule
         return SyndromeResidualSchedule(edge_table, kernel=kernel), None
+    if policy.kind == "group_shuffled":
+        assert policy.root_identity is not None and policy.source_id == "hsu-ndgsbp-2012-v1"
+        return HsuGroupSchedule(edge_table, kernel=kernel, root_identity=policy.root_identity, attempt_identity=attempt_identity), None
     if policy.kind == "randomized":
         if policy.base_schedule != "layered":
             raise ValueError("public randomized V3 admission currently requires the declared layered base schedule")
@@ -642,6 +647,7 @@ def run_canonical_structural_shot(
         local_table = EdgeTable.from_check_matrix(validated.hz)
         local_schedule, randomized_plan = _local_schedule_for_manifest(
             parsed, local_table, _kernel_for_manifest(parsed, local_table),
+            attempt_identity=f"{identity}:attempt:0",
         )
         local_progress = ScheduleProgress(iteration=0, local_steps=0, cursor=(0,))
         if randomized_plan is not None:
@@ -783,6 +789,10 @@ def run_canonical_structural_shot(
                                 return candidate, local_progress.local_steps, False, None
                             for _ in range(parsed.max_iterations):
                                 progress_for_step = local_progress
+                                if parsed.policies.schedule.kind == "group_shuffled" and local_progress.cursor == (0,):
+                                    refreshed, order_termination = local_schedule.refresh_order(local_progress, budgets=budgets)
+                                    if not refreshed:
+                                        return candidate, local_progress.local_steps, False, order_termination
                                 if randomized_plan is not None:
                                     assert local_random_state is not None
                                     refresh = randomized_plan.refresh(local_random_state, boundary="attempt", budgets=budgets, budget_scope="attempt")
