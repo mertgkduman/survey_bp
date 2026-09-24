@@ -113,9 +113,11 @@ No new runtime package is needed. The project pins `numpy==2.2.6`, `scipy==1.17.
 
 Pin Huang–Ueng, *Informed Dynamic Scheduling for QLDPC Codes*, Algorithm 1 / Section 3.2, rather than PRE-sRBP, NW-sRBP, LMD-sRBP, or an exploratory score. It is binary syndrome-domain, matches this phase's kernel, defines the full all-edge pool, and separately reports C2V commits, V2C propagation, precomputed C2V evaluations, and residual comparisons. [CITED: https://arxiv.org/html/2410.01197v2#S3.SS2] [CITED: https://quantum-journal.org/papers/q-2026-01-16-1967/]
 
-The source residual is
+The source residual at initialization or a dependency-triggered refresh is
 `r[c,v] = abs(m_pre[c,v] - m_current[c,v])`.
 Initialize all residuals, select a maximum over every C2V edge, commit that one C2V message, set its residual to zero, refresh V2C messages from the destination variable to its other checks, and recompute only C2V residuals whose inputs changed. The source calls `E` selected C2V commits one iteration. [CITED: https://arxiv.org/html/2410.01197v2#S3.SS1]
+
+The residual cache is therefore **stateful**, not the stateless function `abs(MS_prediction-current_SPA_message)` evaluated globally after every step. Because the source predicts with MS, commits with SPA, and explicitly resets the selected cache entry to zero, that selected entry remains zero even when a fresh stateless MS-versus-SPA difference would be nonzero. It is recomputed only if a later committed update changes one of its incoming V2C dependencies under S.2. The independent oracle must execute this reset/invalidation lifecycle from a full state representation; it must not recalculate every edge magnitude after each commit. [CITED: https://arxiv.org/html/2410.01197v2#S3.SS1] [CITED: https://arxiv.org/html/2410.01197v2#S3.SS2]
 
 Huang–Ueng use the min-sum expression to reduce **precomputation** cost while their S.1 text commits the SPA C2V update. Implement that asymmetry literally in the named source preset; do not silently use SPA residual predictions or commit min-sum values. [CITED: https://arxiv.org/html/2410.01197v2#S3.SS1]
 
@@ -267,7 +269,7 @@ Every terminal must include schedule name, source iteration count, atomic local-
 **What goes wrong:** per-iteration parameters redraw after each local unit. **Avoid:** define one source iteration per schedule as above and persist the realized parameter array for it. [VERIFIED: D-03 quoted above]
 
 ### Residual cache incoherence
-**What goes wrong:** priorities no longer equal `abs(pre-current)` after a V2C dependency changes. **Avoid:** unit-test the incremental cache against a full recomputation after every step on tiny irregular graphs. [CITED: https://arxiv.org/html/2410.01197v2#S3.SS2]
+**What goes wrong:** an implementation either leaves dependency-invalidated entries stale or incorrectly replaces the source cache with a global stateless `abs(MS_prediction-current_SPA_message)` recomputation. **Avoid:** compare the optimized cache after every step with an independent full-state reference that applies the same source lifecycle: preserve unaffected entries, reset the selected entry to zero, and recompute exactly the entries whose V2C inputs changed. Add a regression where MS prediction and the committed SPA value differ: immediately after selection the source cache must still hold zero for that edge; only a later dependency invalidation may make it nonzero again. [CITED: https://arxiv.org/html/2410.01197v2#S3.SS1] [CITED: https://arxiv.org/html/2410.01197v2#S3.SS2]
 
 ### Cluster overclaim
 **What goes wrong:** a random partition or zero table is reported as clustered RL-S. **Avoid:** fail closed until exact partition and learned table pass graph/channel/state compatibility checks. Introduce a typed reason such as proposed `not_assessed_missing_source_artifact` only through the normal schema-version process; this string is a recommendation, not an existing project enum. [VERIFIED: D-13/D-19 quoted above] [ASSUMED]
@@ -350,11 +352,11 @@ Residual invalidation oracle, based on Huang–Ueng S.2: after selecting `(c_max
 | UPD-03 | OMS zero floor, sign, invalid offset rejection, refresh | unit/property | `.venv/bin/python -m pytest tests/canonical/test_update_rules.py -q -x` | ❌ Wave 0 |
 | SCH-02 | membership validation, fresh later layers, repeated `t`-cover work, local stop | unit | `.venv/bin/python -m pytest tests/canonical/test_schedule_semantics.py -q -x` | ❌ Wave 0 |
 | SCH-03 | SCNS/SVNS differ, atomic node updates, deterministic order, D-09 stop | unit | same command | ❌ Wave 0 |
-| SCH-04 | sRBP cache equals full oracle, deterministic max tie, exact work, rollback | unit/property | `.venv/bin/python -m pytest tests/canonical/test_residual_schedule.py -q -x` | ❌ Wave 0 |
+| SCH-04 | sRBP cache equals a full-state lifecycle oracle; selected MS-prediction/SPA-commit residual stays zero until dependency invalidation; deterministic max tie, exact work, rollback | unit/property | `.venv/bin/python -m pytest tests/canonical/test_residual_schedule.py -q -x` | ❌ Wave 0 |
 | SCH-05 | three refresh scopes replay and do not change sample identity | integration | `.venv/bin/python -m pytest tests/canonical/test_schedule_semantics.py tests/test_sampling.py -q -x` | partial; new file Wave 0 |
 | SCH-06 | strict artifact validation, exact greedy choice/local unit, missing artifact fail-closed | unit/integration | `.venv/bin/python -m pytest tests/canonical/test_cluster_schedule.py -q -x` | ❌ Wave 0 |
 
-Add metamorphic tests: flooding remains byte-for-byte/evidence-compatible; equal scalar parameter arrays equal scalar execution; schedule RNG changes order evidence but not sampled syndrome; budget rejection causes no state/RNG mutation; incremental residual priorities equal full recomputation; each local stop has exactly one committed work leaf and convergence-check leaf. [ASSUMED]
+Add metamorphic tests: flooding remains byte-for-byte/evidence-compatible; equal scalar parameter arrays equal scalar execution; schedule RNG changes order evidence but not sampled syndrome; budget rejection causes no state/RNG mutation; incremental residual priorities equal the independent full-state **source-lifecycle** oracle rather than stateless all-edge magnitude recomputation; each local stop has exactly one committed work leaf and convergence-check leaf. [ASSUMED]
 
 ### Sampling Rate
 
