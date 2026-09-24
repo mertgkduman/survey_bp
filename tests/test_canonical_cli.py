@@ -99,6 +99,42 @@ def test_public_canonical_command_reconstructs_verified_structural_evidence(tmp_
     assert all(event["data"].get("evidence_relation") == "canonical_implemented" for event in events)
 
 
+def test_min_sum_public_manifest_preflights_runs_and_verifies(tmp_path):
+    """The promoted V3 route is public evidence, not a demonstration bypass."""
+    from bp_registry.cli import run_canonical, verify_run
+    from bp_registry.manifests import CanonicalExperimentV3, preflight
+
+    manifest = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text(encoding="utf-8"))
+    manifest["schema_version"] = 3
+    manifest["run_id"] = "canonical-three-qubit-min-sum-development"
+    manifest["numerical_profile"] = "cpu-float64-min-sum-v1"
+    manifest["policies"]["update"].update({"kind": "min_sum", "binding_id": "update-min-sum-v1"})
+    manifest["evidence"]["procedure"] = "Project-owned deterministic binary min-sum flooding through the canonical local-step procedure."
+    manifest_path = tmp_path / "min-sum.json"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    assert isinstance(preflight(manifest_path).manifest, CanonicalExperimentV3)
+    output = tmp_path / "min-sum-output"
+    report = run_canonical(manifest_path, output)
+    assert report["numerical_profile"] == "cpu-float64-min-sum-v1"
+    assert report["resolved_numerical_profile"]["profile_id"] == "binary-min-sum-flooding-f64-v1"
+    assert verify_run(output)["final_row_count"] == 2
+    commands = [
+        [sys.executable, "-m", "bp_registry.cli", "preflight", str(manifest_path)],
+        [sys.executable, "-m", "bp_registry.cli", "canonical", str(manifest_path), "--output", str(output)],
+        [sys.executable, "-m", "bp_registry.cli", "verify-run", str(output)],
+    ]
+    reports = [
+        json.loads(subprocess.run(
+            command, cwd=REPOSITORY_ROOT, text=True, capture_output=True, check=True,
+            env={**os.environ, "PYTHONPATH": str(REPOSITORY_ROOT / "src")},
+        ).stdout)
+        for command in commands
+    ]
+    assert reports[0]["numerical_profile"] == "cpu-float64-min-sum-v1"
+    assert reports[-1]["final_row_count"] == 2
+
+
 def test_public_replay_rejects_same_run_changed_full_manifest_before_result(tmp_path):
     """A full-manifest change must not reuse a same-run structural terminal."""
     from bp_registry.canonical.execution import CanonicalConflictError

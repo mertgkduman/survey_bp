@@ -14,9 +14,10 @@ from .ledger import Writer, read_canonical_events
 from .canonical.metrics import unavailable_metric
 from .canonical.execution import run_canonical_structural_shot
 from .canonical.verification import PublicShotContext
-from .canonical.numerics import REFERENCE_CPU_F64
+from .canonical.numerics import MIN_SUM_CPU_F64, REFERENCE_CPU_F64
 from .manifests import (
     CanonicalExperimentV2,
+    CanonicalExperimentV3,
     ManifestV1,
     executable_canonical_policy_effects,
     manifest_digest,
@@ -119,15 +120,15 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
     """Resolve all canonical external facts before sampling or durable evidence."""
     resolved = preflight(manifest_path)
     manifest = resolved.manifest
-    if not isinstance(manifest, CanonicalExperimentV2):
-        raise ValueError("canonical execution requires a strict CanonicalExperimentV2 manifest")
+    if not isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3)):
+        raise ValueError("canonical execution requires a strict CanonicalExperimentV2 or V3 manifest")
     composition = validate_executable_canonical_baseline(manifest.policies)
     return {
         "run_id": manifest.run_id,
         "code_id": manifest.artifact.code_id,
         "manifest_sha256": manifest_digest(manifest),
         "numerical_profile": manifest.numerical_profile,
-        "resolved_numerical_profile": REFERENCE_CPU_F64.as_evidence(),
+        "resolved_numerical_profile": (MIN_SUM_CPU_F64 if isinstance(manifest, CanonicalExperimentV3) else REFERENCE_CPU_F64).as_evidence(),
         "policies": manifest.policies.model_dump(mode="json"),
         "policy_identity": composition.semantic_identity,
         "policy_effects": executable_canonical_policy_effects(manifest.policies),
@@ -145,10 +146,10 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
     }
 
 
-def _canonical_kernel_manifest(manifest: CanonicalExperimentV2) -> dict[str, object]:
+def _canonical_kernel_manifest(manifest: CanonicalExperimentV2 | CanonicalExperimentV3) -> dict[str, object]:
     """Project-owned kernel receives only its compact execution policy contract."""
     return {
-        "schema_version": 2,
+        "schema_version": manifest.schema_version,
         "run_id": manifest.run_id,
         "numerical_profile": manifest.numerical_profile,
         "max_iterations": manifest.budgets.attempt.max_iterations,
@@ -157,7 +158,7 @@ def _canonical_kernel_manifest(manifest: CanonicalExperimentV2) -> dict[str, obj
     }
 
 
-def _canonical_execution_controls(manifest: CanonicalExperimentV2) -> dict[str, object]:
+def _canonical_execution_controls(manifest: CanonicalExperimentV2 | CanonicalExperimentV3) -> dict[str, object]:
     """Keep preflighted public limits and handler classifications beside the compact kernel input."""
     return {
         "work_limits": {
@@ -173,8 +174,8 @@ def canonical_public_shot_context(manifest_path: str | Path, *, shot_id: int) ->
     """Resolve a deterministic public shot without opening a durable ledger."""
     resolved = preflight(manifest_path)
     manifest = resolved.manifest
-    if not isinstance(manifest, CanonicalExperimentV2):
-        raise ValueError("canonical execution requires a strict CanonicalExperimentV2 manifest")
+    if not isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3)):
+        raise ValueError("canonical execution requires a strict CanonicalExperimentV2 or V3 manifest")
     if type(shot_id) is not int or not 0 <= shot_id < manifest.budgets.max_shots:
         raise ValueError("shot_id is outside the canonical manifest budget")
     digest = manifest_digest(manifest)
@@ -210,6 +211,7 @@ def canonical_public_shot_context(manifest_path: str | Path, *, shot_id: int) ->
         composition_identity=composition.semantic_identity,
         policy_effects=executable_canonical_policy_effects(manifest.policies),
         profile_plan=manifest.profile_plan.model_dump(mode="json"),
+        update_kind=manifest.policies.update.kind,
     )
 
 
@@ -218,7 +220,7 @@ def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: s
     verification_context = canonical_public_shot_context(manifest_path, shot_id=shot_id)
     resolved = preflight(manifest_path)
     manifest = resolved.manifest
-    assert isinstance(manifest, CanonicalExperimentV2)
+    assert isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3))
     digest = verification_context.manifest_sha256
     sample = sampling.sample_shot(
         resolved.code, manifest_identity=digest, seed=manifest.randomness.sample_seed,

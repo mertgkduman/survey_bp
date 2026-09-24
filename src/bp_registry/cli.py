@@ -16,7 +16,7 @@ import numpy as np
 
 from . import evaluator, evidence, sampling
 from .ledger import read_canonical_events, reconcile, summarize
-from .manifests import CanonicalExperimentV2, ManifestV1, manifest_digest, preflight
+from .manifests import CanonicalExperimentV2, CanonicalExperimentV3, ManifestV1, manifest_digest, preflight
 from .canonical.verification import validate_canonical_shot
 from .runner import (
     canonical_public_shot_context, canonical_terminal_rows, preflight_canonical,
@@ -394,7 +394,7 @@ def main(argv: list[str] | None = None) -> None:
         records = evidence.load_seed_records(args.records)
         _dump({"records": str(args.records), "paper_experiments": sorted(records["paper_experiments"]), "status": "valid"})
     elif args.command == "preflight":
-        _dump(preflight_canonical(args.manifest) if isinstance(preflight(args.manifest).manifest, CanonicalExperimentV2) else preflight_pilot(args.manifest))
+        _dump(preflight_canonical(args.manifest) if isinstance(preflight(args.manifest).manifest, (CanonicalExperimentV2, CanonicalExperimentV3)) else preflight_pilot(args.manifest))
     elif args.command == "pilot":
         _dump(run_pilot(args.manifest, args.output))
     elif args.command == "canonical":
