@@ -19,6 +19,7 @@ from ..sampling import DecoderObservation, HiddenTruth
 from .contracts import (
     CanonicalManifestV2,
     CanonicalManifestV3,
+    CanonicalManifestV4,
     Hook,
     PolicyBinding,
     PolicyDecision,
@@ -40,6 +41,7 @@ from .schedules import (
     LayeredSchedule, RandomizedTraversalPlan, VariableNodeSerialSchedule,
 )
 from .verification import PublicShotContext, validate_canonical_shot
+from .relay import RelayController
 
 
 class CanonicalConflictError(ValueError):
@@ -209,7 +211,7 @@ class CanonicalLocalStepExecutor:
             raise
 
 
-def _kernel_for_manifest(manifest: CanonicalManifestV2 | CanonicalManifestV3, edge_table: EdgeTable | None = None) -> BinarySpaKernel:
+def _kernel_for_manifest(manifest: CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4, edge_table: EdgeTable | None = None) -> BinarySpaKernel:
     """Resolve only the closed update registry; policies never receive hidden truth."""
     update = manifest.policies.update.kind
     if update == "min_sum":
@@ -375,7 +377,7 @@ def _termination_evidence(termination: BudgetTermination) -> dict[str, Any]:
     }
 
 
-def _identity(manifest: CanonicalManifestV2 | CanonicalManifestV3, observation: DecoderObservation) -> str:
+def _identity(manifest: CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4, observation: DecoderObservation) -> str:
     payload = {"manifest": manifest.model_dump(mode="json"), "check_type": observation.check_type,
                "syndrome": np.asarray(observation.syndrome, dtype=np.uint8).tolist()}
     return sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
@@ -607,8 +609,106 @@ def _existing_structural(
                                     None if candidate is None else np.asarray(candidate, dtype=np.uint8))
 
 
+def _run_relay_structural_shot(
+    parsed: CanonicalManifestV4, *, code: CssCode, observation: DecoderObservation,
+    hidden_truth: HiddenTruth, shot_id: int, ledger_path: str | Path,
+    sample_seed_identity: str, context: Mapping[str, Any],
+    execution_controls: Mapping[str, Any] | None,
+    verification_context: PublicShotContext | None,
+    evaluate: Callable[..., evaluator.Evaluation],
+) -> CanonicalExecutionResult:
+    """Execute the V4 Relay topology while keeping hidden truth outside the controller."""
+    if type(shot_id) is not int or shot_id < 0 or observation.check_type != "Z":
+        raise ValueError("canonical Relay tracer accepts a nonnegative Z-check shot")
+    validated = code.validate()
+    resolved = validate_composition(parsed.policies)
+    PolicyRuntime(resolved).traverse_lifecycle()
+    identity = verification_context.execution_identity if verification_context is not None else _identity(parsed, observation)
+    path = Path(ledger_path)
+    existing = _existing_structural(path, parsed.run_id, shot_id, identity, verification_context)
+    if existing is not None:
+        return existing
+    budgets = _budget_tree(execution_controls)
+    original_id = stable_lineage_id("original", {"identity": identity})
+    original = OriginalProblem(original_id.value, validated.hx, validated.hz, observation.syndrome)
+    working_id = stable_lineage_id("working", {"original": original_id.value, "lift": "identity"})
+    working = WorkingProblem(working_id.value, original, LineageEdge("identity", original_id, working_id))
+    edge_table = EdgeTable.from_check_matrix(validated.hz)
+    controller = RelayController(memory_bindings=parsed.memory_bindings, numerical_profile=parsed.numerical_profile)
+
+    for attempt_ordinal in range(30):
+        try:
+            with CanonicalEventWriter(path) as ledger:
+                common = {
+                    **dict(context), "canonical_identity": identity,
+                    "composition_identity": resolved.semantic_identity,
+                    "schema_version": 4,
+                    "relay_topology": "sequential_posterior_only",
+                }
+                ledger.begin(run_id=parsed.run_id, shot_id=shot_id, sample_seed_identity=sample_seed_identity, **common)
+                attempt_id = _attempt_lineage_id(working, attempt_ordinal)
+                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="attempt", data={
+                    **common, "scope": "attempt", "attempt_lineage_id": attempt_id.value,
+                    "total_leg_limit": parsed.relay.total_leg_limit,
+                })
+                run = controller.run(
+                    edge_table=edge_table, check_matrix=validated.hz, syndrome=observation.syndrome,
+                    kernel=_kernel_for_manifest(parsed, edge_table), error_rate=parsed.error_rate,
+                    legs=parsed.relay.legs, budgets=budgets, scope="attempt", lineage_prefix=attempt_id.value,
+                )
+                for transfer in run.transfers:
+                    ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="relay_transfer", data={
+                        **common, **transfer.as_evidence(),
+                        "reset": ("c2v", "v2c", "leg_history", "iteration", "convergence", "rng_identity"),
+                    })
+                work = budgets.summary("attempt")
+                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="work", data={
+                    **common, "work_vector": work.as_evidence(structural_event_version=2),
+                    "relay_legs": tuple({"index": leg.leg_index, "lineage_id": leg.lineage_id,
+                                          "iterations": leg.iterations, "converged": leg.converged}
+                                        for leg in run.legs),
+                })
+                if run.termination != "completed" or run.candidate is None:
+                    ledger.terminal(run_id=parsed.run_id, shot_id=shot_id, termination=run.termination, data={
+                        **common, "selection_status": "unavailable_due_to_budget" if run.termination == "budget_exhausted" else "unavailable_due_to_stopping",
+                        "outcome": None,
+                    })
+                    return CanonicalExecutionResult(parsed.run_id, shot_id, run.termination, None, None)
+                candidate = np.array(run.candidate, dtype=np.uint8, copy=True)
+                candidate.setflags(write=False)
+                candidate_id = _candidate_lineage_id(working, attempt_id, candidate)
+                selected = select_stable_candidate((OriginalSpaceCandidate(candidate_id.value, working, candidate, 0),))
+                assert selected is not None
+                selected = _require_current_candidate(selected, working=working, attempt_id=attempt_id)
+                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="candidate", data={
+                    **common, "candidate": selected.candidate.tolist(), "candidate_lineage_id": selected.lineage_id,
+                    "selection_score": "stable_first_valid_syndrome_candidate",
+                })
+                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="selection", data={
+                    **common, "selection_status": "frozen_decoder_visible_candidate",
+                    "candidate_lineage_id": selected.lineage_id,
+                })
+                # This is the first use of hidden truth; the controller and selection never receive it.
+                evaluation_result = evaluate(
+                    validated, true_x=hidden_truth.x, true_z=hidden_truth.z, candidate_x=selected.candidate,
+                )
+                ledger.terminal(run_id=parsed.run_id, shot_id=shot_id, termination="completed", data={
+                    **common, "candidate": selected.candidate.tolist(), "outcome": evaluation_result.outcome,
+                    "logical_action_agrees": evaluation_result.logical_action_agrees,
+                    "selection_status": "frozen_decoder_visible_candidate",
+                    "candidate_lineage_id": selected.lineage_id,
+                })
+                return CanonicalExecutionResult(parsed.run_id, shot_id, "completed", evaluation_result, selected.candidate)
+        except ShotOwnershipError:
+            time.sleep(0.01)
+            existing = _existing_structural(path, parsed.run_id, shot_id, identity, verification_context)
+            if existing is not None:
+                return existing
+    raise ShotOwnershipError("canonical Relay shot remained owned beyond bounded retry window")
+
+
 def run_canonical_structural_shot(
-    manifest: CanonicalManifestV2 | CanonicalManifestV3 | dict[str, object] | str, *, code: CssCode,
+    manifest: CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4 | dict[str, object] | str, *, code: CssCode,
     observation: DecoderObservation, hidden_truth: HiddenTruth, shot_id: int,
     ledger_path: str | Path, sample_seed_identity: str, context: Mapping[str, Any],
     execution_controls: Mapping[str, Any] | None = None,
@@ -617,6 +717,12 @@ def run_canonical_structural_shot(
 ) -> CanonicalExecutionResult:
     """Run the kernel with v2 structural evidence and an outer truth boundary."""
     parsed = parse_canonical_manifest(manifest)
+    if isinstance(parsed, CanonicalManifestV4):
+        return _run_relay_structural_shot(
+            parsed, code=code, observation=observation, hidden_truth=hidden_truth, shot_id=shot_id,
+            ledger_path=ledger_path, sample_seed_identity=sample_seed_identity, context=context,
+            execution_controls=execution_controls, verification_context=verification_context, evaluate=evaluate,
+        )
     if type(shot_id) is not int or shot_id < 0 or observation.check_type != "Z":
         raise ValueError("canonical tracer accepts a nonnegative Z-check shot")
     validated = code.validate()

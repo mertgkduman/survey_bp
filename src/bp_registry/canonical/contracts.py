@@ -401,9 +401,86 @@ class CanonicalManifestV3(_Strict):
         return value
 
 
-def parse_canonical_manifest(value: CanonicalManifestV2 | CanonicalManifestV3 | dict[str, Any] | str) -> CanonicalManifestV2 | CanonicalManifestV3:
+class MemoryBindingV4(_Strict):
+    """One explicitly ordered affine-prior memory binding."""
+
+    binding_id: str = Field(pattern=r"^[a-z][a-z0-9_-]{0,63}$")
+    kind: Literal["affine_prior"]
+    target: Literal["prior"]
+    order: int = Field(ge=0, le=1_000)
+    alpha: float = Field(ge=0.0, le=1.0)
+    state_lifetime: Literal["leg"]
+
+    @field_validator("alpha")
+    @classmethod
+    def finite_alpha(cls, value: float) -> float:
+        if not math.isfinite(value):
+            raise ValueError("affine prior alpha must be finite")
+        return value
+
+
+class RelayLegSpec(_Strict):
+    """A fresh canonical BP leg; no predecessor messages or history are persisted."""
+
+    max_iterations: int = Field(ge=1, le=100_000)
+
+
+class RelaySpecV4(_Strict):
+    """Sequential Relay topology with an unambiguous total leg count."""
+
+    total_leg_limit: int = Field(ge=2, le=10_000)
+    legs: tuple[RelayLegSpec, ...] = Field(min_length=2)
+
+    @field_validator("legs", mode="before")
+    @classmethod
+    def relay_legs_to_tuple(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @model_validator(mode="after")
+    def leg_limit_matches_explicit_legs(self) -> "RelaySpecV4":
+        if self.total_leg_limit != len(self.legs):
+            raise ValueError("total_leg_limit must equal the number of explicit Relay legs")
+        return self
+
+
+class CanonicalManifestV4(_Strict):
+    """Phase 4 strict Relay-BP extension; V2/V3 contracts stay unchanged."""
+
+    schema_version: Literal[4]
+    run_id: str = Field(min_length=1)
+    numerical_profile: Literal["cpu-float64-spa-v1"]
+    max_iterations: int = Field(ge=1, le=100_000)
+    error_rate: float = Field(ge=0.0, le=1.0)
+    policies: CanonicalCompositionSpec
+    memory_bindings: tuple[MemoryBindingV4, ...] = Field(min_length=1)
+    relay: RelaySpecV4
+
+    @field_validator("memory_bindings", mode="before")
+    @classmethod
+    def memory_bindings_to_tuple(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @field_validator("error_rate")
+    @classmethod
+    def finite_rate(cls, value: float) -> float:
+        if not math.isfinite(value):
+            raise ValueError("error_rate must be finite")
+        return value
+
+    @model_validator(mode="after")
+    def memory_order_and_ownership_are_explicit(self) -> "CanonicalManifestV4":
+        ids = tuple(binding.binding_id for binding in self.memory_bindings)
+        orders = tuple(binding.order for binding in self.memory_bindings)
+        if len(ids) != len(set(ids)):
+            raise ValueError("memory bindings must have distinct binding_id values")
+        if len(orders) != len(set(orders)) or tuple(sorted(orders)) != tuple(range(len(orders))):
+            raise ValueError("memory binding order must be a contiguous explicit sequence beginning at zero")
+        return self
+
+
+def parse_canonical_manifest(value: CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4 | dict[str, Any] | str) -> CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4:
     """Parse only the versioned strict canonical representation."""
-    if isinstance(value, (CanonicalManifestV2, CanonicalManifestV3)):
+    if isinstance(value, (CanonicalManifestV2, CanonicalManifestV3, CanonicalManifestV4)):
         return value
     if isinstance(value, str):
         decoded = json.loads(value)
@@ -411,4 +488,7 @@ def parse_canonical_manifest(value: CanonicalManifestV2 | CanonicalManifestV3 | 
         decoded = value
     if not isinstance(decoded, dict):
         raise ValueError("canonical manifest must be an object")
-    return CanonicalManifestV3.model_validate(decoded) if decoded.get("schema_version") == 3 else CanonicalManifestV2.model_validate(decoded)
+    schema_version = decoded.get("schema_version")
+    if schema_version == 4:
+        return CanonicalManifestV4.model_validate(decoded)
+    return CanonicalManifestV3.model_validate(decoded) if schema_version == 3 else CanonicalManifestV2.model_validate(decoded)
