@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from hashlib import sha256
+import json
 import numbers
 from threading import RLock
 from typing import Any, Callable, Protocol
@@ -265,6 +267,11 @@ class LayeredSchedule:
         self._check_variables = check_variables
         self._edge_variables = tuple(variable for _check, variable in edge_table.edges)
         self._memberships = tuple(memberships)
+
+    @property
+    def unit_count(self) -> int:
+        """One local unit is one declared layer, not a flooding sweep."""
+        return len(self.partitions)
 
     @classmethod
     def deterministic_graph_coloring(cls, edge_table: EdgeTable, *, kernel: _FloodingKernel) -> "LayeredSchedule":
@@ -636,3 +643,120 @@ class VariableNodeSerialSchedule(_NodeSerialSchedule):
         for edge_index in self._variable_edges[unit_index]:
             updated[edge_index] = self.kernel.variable_message(float(beliefs[unit_index]), float(c2v[edge_index]))
         return finite_saturate(updated, boundary="variable_serial_complete_v2c"), np.array(candidate, dtype=np.uint8, copy=True), self.evidence()
+
+
+@dataclass(frozen=True, slots=True)
+class RandomizedTraversalState:
+    """Attempt-local RNG state and realized traversal evidence."""
+
+    derived_identity: str
+    rng_state: str
+    realized_orders: tuple[tuple[int, ...], ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class RandomizedTraversalRefresh:
+    """Admission outcome for a boundary-owned order refresh."""
+
+    admitted: bool
+    state: RandomizedTraversalState
+    order: tuple[int, ...] | None
+    order_generation_operations: int
+    termination: Any = None
+
+
+class RandomizedTraversalPlan:
+    """Purpose-separated, replayable permutations over a declared base schedule.
+
+    This class never sees sampling state.  Its root identity produces only a
+    schedule-order substream; callers retain physical-error identities elsewhere.
+    Plan 03-05 will widen the WorkVector with an explicit order-generation
+    resource, while this policy already makes the required pre-draw admission
+    and state-commit boundary observable.
+    """
+
+    _BOUNDARY_BY_SCOPE = {"configuration": "configuration", "attempt": "attempt", "sweep": "sweep"}
+
+    def __init__(self, base_schedule: Any, *, refresh_scope: str, root_identity: str) -> None:
+        if refresh_scope not in self._BOUNDARY_BY_SCOPE:
+            raise ValueError("randomized traversal refresh_scope must be configuration, attempt, or sweep")
+        if not isinstance(root_identity, str) or len(root_identity) != 64 or any(character not in "0123456789abcdef" for character in root_identity):
+            raise ValueError("randomized traversal root_identity must be a lowercase SHA-256 hex digest")
+        unit_count = getattr(base_schedule, "unit_count", None)
+        if isinstance(unit_count, bool) or not isinstance(unit_count, numbers.Integral) or unit_count < 1:
+            raise ValueError("randomized traversal requires a nonempty layered or node-serial base schedule")
+        self.base_schedule = base_schedule
+        self.refresh_scope = refresh_scope
+        self.root_identity = root_identity
+        self._unit_count = int(unit_count)
+
+    def initial_state(self, *, configuration_identity: str, attempt_identity: str) -> RandomizedTraversalState:
+        if not isinstance(configuration_identity, str) or not configuration_identity or not isinstance(attempt_identity, str) or not attempt_identity:
+            raise ValueError("randomized traversal identities must be nonempty strings")
+        material = {
+            "purpose": "schedule_order",
+            "root_identity": self.root_identity,
+            "configuration_identity": configuration_identity,
+            "refresh_scope": self.refresh_scope,
+        }
+        if self.refresh_scope in {"attempt", "sweep"}:
+            material["attempt_identity"] = attempt_identity
+        derived = sha256(json.dumps(material, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+        generator = np.random.Generator(np.random.PCG64(int(derived[:32], 16)))
+        return RandomizedTraversalState(derived, json.dumps(generator.bit_generator.state, sort_keys=True), ())
+
+    def evidence(self, state: RandomizedTraversalState) -> dict[str, object]:
+        return {
+            "purpose": "schedule_order",
+            "algorithm": "numpy.PCG64",
+            "version": np.__version__,
+            "root_identity": self.root_identity,
+            "derived_identity": state.derived_identity,
+            "refresh_scope": self.refresh_scope,
+            "realized_orders": state.realized_orders,
+            "base_schedule": getattr(self.base_schedule, "schedule_name", "layered"),
+        }
+
+    def refresh(
+        self,
+        state: RandomizedTraversalState,
+        *,
+        boundary: str,
+        budgets: Any,
+        budget_scope: str,
+    ) -> RandomizedTraversalRefresh:
+        """Reserve before cloning/drawing; denial leaves state and order untouched."""
+        from .budgets import WorkVector
+
+        if not isinstance(state, RandomizedTraversalState):
+            raise ValueError("randomized traversal refresh requires its own immutable state")
+        if boundary != self._BOUNDARY_BY_SCOPE[self.refresh_scope]:
+            raise ValueError("randomized traversal may refresh only at its declared boundary")
+        if state.realized_orders and self.refresh_scope != "sweep":
+            return RandomizedTraversalRefresh(True, state, state.realized_orders[-1], 0)
+        # The present WorkVector has no order-generation dimension.  A zero leaf
+        # establishes the atomic admission seam without relabeling this work as a
+        # convergence check or residual operation; Plan 03-05 owns that schema
+        # extension and will replace the zero vector with its named resource.
+        reservation = budgets.reserve(
+            budget_scope,
+            WorkVector.zero(),
+            leaf_id=f"{budget_scope}:schedule-order:{state.derived_identity}:{len(state.realized_orders)}",
+        )
+        if reservation is None:
+            return RandomizedTraversalRefresh(False, state, None, 1, budgets.last_termination)
+        try:
+            generator = np.random.Generator(np.random.PCG64())
+            generator.bit_generator.state = json.loads(state.rng_state)
+            order = tuple(int(item) for item in generator.permutation(self._unit_count))
+            next_state = RandomizedTraversalState(
+                state.derived_identity,
+                json.dumps(generator.bit_generator.state, sort_keys=True),
+                state.realized_orders + (order,),
+            )
+            reservation.commit_once()
+            return RandomizedTraversalRefresh(True, next_state, order, 1)
+        except BaseException:
+            if reservation.active:
+                reservation.rollback()
+            raise
