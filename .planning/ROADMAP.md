@@ -11,7 +11,7 @@ Build a provenance-preserving research platform from paper evidence through nati
 ## Phases
 
 - [x] **Phase 1: Evidence Registry and Native CSS Baseline** — Trace a paper experiment to validated inputs, a pinned native decoder run, and an outcome ledger. (completed 2026-09-22)
-- [ ] **Phase 2: Canonical CSS Execution and Policy Contracts** — Run inspectable binary BP through the complete policy and evidence lifecycle.
+- [x] **Phase 2: Canonical CSS Execution and Policy Contracts** — Run inspectable binary BP through the complete policy and evidence lifecycle. (completed 2026-09-23)
 - [ ] **Phase 3: Update Rules and Scheduling** — Compare the requested message rules and schedules with explicit semantics and work counters.
 - [ ] **Phase 4: Memory Policies and Relay-BP** — Implement state/history policies and the source-defined relay composition.
 - [ ] **Phase 5: Guided and Perturbative BP Interventions** — Implement BPGD, impulse, freezing, syndrome/sign flips, and restarting.
@@ -97,7 +97,7 @@ Plans:
 5. A researcher can install the package, run the tutorial, and inspect mathematical conventions, lifecycle contracts, and compatibility examples.
 
 **Research focus:** Numerical stability, trace vocabulary, policy ownership, scoped budgets, and kernel-level work definitions.
-**Plans:** 16/16 plans executed
+**Plans:** 16/16 plans complete
 
 Plans:
 
@@ -362,7 +362,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Evidence Registry and Native CSS Baseline | 9/9 | Complete    | 2026-09-22 |
-| 2. Canonical CSS Execution and Policy Contracts | 16/16 | In Progress|  |
+| 2. Canonical CSS Execution and Policy Contracts | 16/16 | Complete    | 2026-09-23 |
 | 3. Update Rules and Scheduling | 0/TBD | Not started | - |
 | 4. Memory Policies and Relay-BP | 0/TBD | Not started | - |
 | 5. Guided and Perturbative BP Interventions | 0/TBD | Not started | - |

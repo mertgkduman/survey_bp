@@ -1,20 +1,21 @@
 ---
 gsd_state_version: "1.0"
 milestone: v1.0
-current_phase: 02
-current_phase_name: canonical-css-execution-and-policy-contracts
-current_plan: 9
-status: verifying
-stopped_at: Completed 02-09-PLAN.md
-last_updated: "2026-09-24T00:49:53.959Z"
+current_phase: 3
+current_phase_name: Update Rules and Scheduling
+current_plan: Not started
+status: planning
+stopped_at: Phase 02 complete, ready to plan Phase 3
+last_updated: "2026-09-24T01:23:39.028Z"
 last_activity: 2026-09-23
-last_activity_desc: Phase 02 verification metadata reconciled; review blockers remain
-state_head: 6cb7e533e020d13ecf3d423068cc98c5c5f74415
+last_activity_desc: Phase 02 complete, transitioned to Phase 3
+state_head: 2d3fad8f365d8b6ff203f0a7c29ca27c805df407
 progress:
   total_phases: 14
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 25
-  completed_plans: 18
+  completed_plans: 25
+  percent: 14
 ---
 
 # Project State
@@ -24,26 +25,26 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-22)
 
 **Core value:** Make BP decoder differences explicit, reproducible, and fairly comparable through canonical policy execution and published evidence.
-**Current focus:** Phase 02 — Canonical CSS Execution and Policy Contracts
+**Current focus:** Phase 03 — Update Rules and Scheduling
 
 ## Current Position
 
-Phase: 02 (canonical-css-execution-and-policy-contracts) — READY TO EXECUTE
-Plan: 9 of 9
+Phase: 3 — Update Rules and Scheduling
+Plan: Not started
 Total Phases: 14
-Current Plan: 9
-Total Plans in Phase: 16
-Status: All 9 Phase 2 plans and 15 UAT checks executed; Phase 2 remains verifying while CR-01 through CR-04 are unresolved.
-Last activity: 2026-09-23 — Reconciled Phase 2 verification metadata; review blockers remain.
+Current Plan: Not started
+Total Plans in Phase: TBD
+Status: Ready to plan
+Last activity: 2026-09-23 — Phase 02 complete, transitioned to Phase 3
 
-Progress: 7% [█░░░░░░░░░]
+Progress: 14% [█░░░░░░░░░]
 
 ## Performance Metrics
 
-- Total plans completed: 18
+- Total plans completed: 25
 - Average duration: N/A
 - Total execution time: 0 hours
-- Recent trend: Phases 1 and 2 each executed all 9 planned executions; Phase 2 has 15 passing UAT checks but remains open for review remediation and phase verification.
+- Recent trend: Phase 1 completed 9 plans; Phase 2 completed 16 plans, including seven review-driven gap plans, and passed goal, code, security, and validation gates.
 
 **Per-Plan Metrics:**
 
@@ -58,6 +59,8 @@ Progress: 7% [█░░░░░░░░░]
 | Phase 02 P07 | 10 min | 2 tasks | 3 files |
 | Phase 02 P08 | 8 min | 3 tasks | 10 files |
 | Phase 02 P09 | 16 min | 2 tasks | 7 files |
+
+Phase 02 P10–P16 gap-closure metrics are recorded in their individual summaries.
 
 ## Accumulated Context
 
@@ -94,6 +97,9 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - [Phase 02]: Phase 02: canonical CPU runtime is measured per attempt and unavailable device timing is explicit missingness.
 - [Phase 02]: Phase 02: public preflight reports persisted and resolved numerical profiles separately; canonical reconcile queries v2 terminals without changing legacy v1 repair semantics.
 - [Phase 02]: Phase 02: profiling and selective tracing remain provisional diagnostic evidence pending campaign preregistration and corpus recheck.
+- [Phase 02]: Public execution rejects non-baseline policies and unbounded profiling plans before sampling; full manifest, artifact, sample, and shot identity bind replay.
+- [Phase 02]: Public verification reconstructs deterministic terminal, budget, work, candidate, lineage, and outcome claims; transient numerical errors retain explicit nonreproduction status.
+- [Phase 02]: Public low-overhead profile evidence has producer-backed metric and unavailable-RSS grammars; nondeterministic measurements are same-ledger observations, not replay-equality facts.
 
 ### Pending Todos
 
@@ -101,7 +107,7 @@ None outside the roadmap.
 
 ### Blockers/Concerns
 
-Phase 2 remains blocked from completion by the four critical findings in `02-REVIEW.md` (`CR-01` through `CR-04`); its seven warnings also remain open. Remaining research concerns:
+Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 security threats closed). Remaining research concerns for later phases:
 
 - Original BPGD/impulse code identities remain unverified; exact SI/OTF variants and generic mixing/memory/voting definitions need source specifications.
 - Statistical targets and compute budgets for publication campaigns remain to be prespecified.
@@ -122,6 +128,6 @@ No requested decoding regime or named policy family is deferred beyond the first
 ## Session Continuity
 
 Last session: 2026-09-23T09:46:42.518Z
-Stopped at: Phase 2 verification metadata reconciled; CR-01 through CR-04 remain unresolved
+Stopped at: Phase 02 complete, ready to plan Phase 3
 Resume file: None
-Next command: $gsd-execute-phase 2
+Next command: $gsd-next

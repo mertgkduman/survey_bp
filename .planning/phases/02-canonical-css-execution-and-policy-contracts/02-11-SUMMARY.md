@@ -118,7 +118,7 @@ The focused public temporary-output regressions ran here. Checked result artifac
 - **Issue:** The earlier assertion expected an open-shot ordering error when an ownerless writer submitted an event.
 - **Fix:** The assertion now expects `ShotOwnershipError`, the stronger public boundary introduced by Task 1.
 - **Files modified:** `tests/canonical/test_tracing.py`
-- **Verification:** `tests/canonical/test_tracing.py tests/canonical/test_truth_boundary.py` reports `14 passed`.
+- **Verification:** The targeted tracing and truth-boundary suites report `14 passed`.
 - **Committed in:** `9504bc4`
 
 **Total deviations:** 1 auto-fixed (1 regression).
