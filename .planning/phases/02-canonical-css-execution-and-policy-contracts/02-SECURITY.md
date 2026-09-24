@@ -1,8 +1,8 @@
 ---
 phase: "02"
 slug: "canonical-css-execution-and-policy-contracts"
-status: open_threats
-threats_open: 2
+status: secured
+threats_open: 0
 asvs_level: 1
 block_on: high
 audited: "2026-09-23"
@@ -10,18 +10,19 @@ audited: "2026-09-23"
 
 # Phase 02 — Security
 
-## OPEN_THREATS
+## SECURED
 
 **Phase:** 02 — Canonical CSS Execution and Policy Contracts
-**Closed:** 44/46 | **Open:** 2/46
+**Threats Closed:** 46/46
 **ASVS Level:** 1 | **Block threshold:** high
 
-This update rechecks the six findings left open by the prior audit after
-Plan 02-13. All twelve Phase 2 plan-time threat models remain represented in
-the register. Wave 13 closes the prior completed-status, lineage, manifest,
-persistent-numerical, and observed-RSS gaps, but two profile/structural
-provenance findings remain open: a rehashed observed Linux RSS fact can be
-turned into a false unavailable-normalization record.
+This final Wave 14 audit rechecks the two remaining high-severity
+profile/structural-provenance findings against Plan 02-16's exact
+producer-reachable unavailable-RSS grammar. All twelve Phase 2 plan-time
+threat models remain represented in the register. Fully rehashed false
+unavailability claims with empty and retained supported-platform context now
+fail at the public verification boundary, without introducing a comparison to
+a fresh timing or resource observation.
 
 ## Threat Verification
 
@@ -57,7 +58,7 @@ turned into a false unavailable-normalization record.
 | T-02-28 | Denial of service | medium | mitigate | closed | Canonical preflight rejects every public profile plan except `clean`/`low_overhead` before sampling, ledger creation, or kernel work at `src/bp_registry/manifests.py:529`; representative and non-clean variants are proven ledger-free in `tests/test_canonical_cli.py:314`. |
 | T-02-29 | Tampering / Information disclosure | high | mitigate | closed | The public identity binds resolved raw and semantic artifact hashes at `src/bp_registry/canonical/verification.py:35`, and every persisted structural event must match the current preflighted identity at `:179`; preflight resolves and verifies the artifact before sampling at `src/bp_registry/manifests.py:529`. |
 | T-02-30 | Information disclosure | high | mitigate | closed | Runner samples outside the engine at `src/bp_registry/runner.py:171`; the engine evaluates only after frozen selection at `src/bp_registry/canonical/execution.py:469`; integration coverage at `tests/test_canonical_cli.py:235`. |
-| T-02-31 | Tampering / Repudiation | high | mitigate | **open — blocking** | Wave 13 binds observed Linux/Darwin raw-to-byte RSS values at `src/bp_registry/canonical/profiling.py:188`, but its unavailable-RSS branch accepts `RSS normalization semantics unavailable` without constraining `raw_context` (`:175`). A rehashed observed Linux RSS record can therefore retain Linux/kilobyte raw facts while changing the measurement to unavailable; `verify-run` accepts it after all event IDs and `ledger_sha256` are recomputed. |
+| T-02-31 | Tampering / Repudiation | high | mitigate | closed | Exact unavailable-RSS reason/method/context validation at `src/bp_registry/canonical/profiling.py:175` permits unsupported normalization only with the three-key, nonempty non-Linux/Darwin raw context at `:184`; the producer emits only matching records at `:437`. Fully rehashed empty, retained-Linux, and supported-Darwin false-unavailability profiles reject through `verify_run` (`tests/test_canonical_cli.py:573`). |
 | T-02-32 | Denial of service | high | mitigate | closed | Matrix/record/byte/count limits are validated in `src/bp_registry/artifacts.py:16`, `src/bp_registry/manifests.py:252`, and atomic reservations in `src/bp_registry/canonical/execution.py:415`; public cap test at `tests/canonical/test_budgets.py:160`. |
 | T-02-33 | Spoofing / Repudiation | high | mitigate | closed | Evidence-maturity and no-promotion documentation contracts are checked at `tests/canonical/test_policy_evidence.py:33`; checked evidence labels are verified in `tests/test_canonical_cli.py:180`. |
 | T-02-34 | Tampering | medium | mitigate | closed | The documented preflight/canonical/reconcile/verify commands execute in `tests/test_canonical_cli.py:20`, including resolved semantic profile and policy identity assertions. |
@@ -71,15 +72,13 @@ turned into a false unavailable-normalization record.
 | T-02-11-03 | Elevation of privilege | high | mitigate | closed | Engine requires the current `WorkingProblem` object and recomputes candidate ID from current working/attempt ancestry before evaluation at `src/bp_registry/canonical/execution.py:243`; hostile selector test at `tests/canonical/test_truth_boundary.py:84`. Shared checked-shot candidate IDs are safe semantic content IDs: durable event identity and writer ownership remain scoped to `(run_id, shot_id)` at `src/bp_registry/ledger.py:489`. |
 | T-02-12-01 | Tampering | medium | mitigate | closed | Enabled profile controls materialize in `src/bp_registry/canonical/execution.py:455`; unsupported trace levels fail before a ledger at `src/bp_registry/manifests.py:529`; public tests at `tests/test_canonical_cli.py:102` and `:132`. |
 | T-02-12-02 | Denial of service | medium | mitigate | closed | Profiler-owned `tracemalloc` cleanup is in the outer `finally` at `src/bp_registry/canonical/profiling.py:411`; exceptional cleanup tests at `tests/canonical/test_profiling.py:88` and `:106`. |
-| T-02-12-03 | Repudiation | high | mitigate | **open — blocking** | Wave 13 now binds completed `converged`/selection/lineage fields and all manifest-owned labels directly to `PublicShotContext` at `src/bp_registry/canonical/verification.py:192`, and validates numerical terminals before replay at `:281`. The sequence still accepts the rehashed false RSS-unavailable profile state described in T-02-31; this changes a persisted structural provenance/availability claim without detection, so complete public structural verification is not yet present. |
+| T-02-12-03 | Repudiation | high | mitigate | closed | `verify_run` requires equal runtime and terminal profile copies and invokes the public profile validator before result reuse at `src/bp_registry/canonical/verification.py:152`; exact event grammar, trusted manifest fields, terminal semantics, lineage, and persistent numerical-failure qualification remain enforced at `:192` and `:281`. Rehashed runtime-and-terminal unavailable-RSS grammar violations reject at `tests/test_canonical_cli.py:573`; prior structural matrices remain green. |
 | T-02-12-04 | Information disclosure | medium | mitigate | closed | Typed profile environment evidence rejects non-allowlisted fields at `src/bp_registry/canonical/profiling.py:78` and only gathers allowlisted thread variables at `:304`. |
 
-## Open (blocking — severity at or above high)
+## Open Threats
 
-| Threat ID | Severity | Missing mitigation | Files searched |
-|---|---|---|---|
-| T-02-31 | high | The unavailable-RSS contract fails to constrain raw context to the unavailable platform state. A rehashed observed Linux RSS claim can be downgraded to unavailable while retaining Linux/kilobyte raw facts. | `src/bp_registry/canonical/profiling.py`, `src/bp_registry/canonical/verification.py`, `tests/test_canonical_cli.py` |
-| T-02-12-03 | high | The required complete structural provenance grammar remains incomplete because the same forged RSS availability/source state is accepted in the validated event stream. | `src/bp_registry/canonical/profiling.py`, `src/bp_registry/canonical/verification.py`, `src/bp_registry/cli.py`, `data/results/canonical-three-qubit-development` |
+None. All declared mitigations are present; there are no blocking or
+below-threshold open threats.
 
 ## Accepted Risks Log
 
@@ -94,10 +93,9 @@ None. No Phase 2 summary contains a `## Threat Flags` entry.
 
 ## Verification Evidence
 
-- `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_canonical_cli.py::test_verify_run_accepts_persistent_numerical_failure_without_replay tests/test_canonical_cli.py::test_verify_run_rejects_every_unbound_terminal_and_provenance_field tests/test_canonical_cli.py::test_verify_run_accepts_legitimate_terminal_classes_after_semantic_binding tests/test_canonical_cli.py::test_verify_run_rejects_rehashed_raw_rss_normalization_matrix tests/test_canonical_cli.py::test_verify_run_accepts_nondeterministic_profile_values_without_replay_equality tests/canonical/test_profiling.py::test_public_profile_rss_normalization_requires_linux_and_darwin_equality` — **6 passed**.
-- `OMP_NUM_THREADS=1 .venv/bin/python -m bp_registry.cli verify-run data/results/canonical-three-qubit-development` — **2 checked terminal rows semantically verified** against the present preflighted manifest and artifact.
-- Wave 13 completion evidence records `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q` — **178 passed**.
-- Adversarial temporary outputs: rehashed `process_cpu_time.method`, completed `converged`, terminal/selection `selection_status`, candidate-event `attempt_lineage_id`, and uniform `code_id` all **reject**. Rehashing both copies of observed Linux RSS into `RSS normalization semantics unavailable` while retaining the Linux/kilobyte raw context is **incorrectly accepted**. Checked artifacts were not modified.
+- `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_profiling.py::test_public_profile_rss_unavailable_contract_matches_each_producer_branch tests/test_canonical_cli.py::test_verify_run_rejects_rehashed_rss_unavailable_grammar_matrix tests/test_canonical_cli.py::test_verify_run_accepts_persistent_numerical_failure_without_replay tests/test_canonical_cli.py::test_verify_run_rejects_every_unbound_terminal_and_provenance_field tests/test_canonical_cli.py::test_verify_run_rejects_rehashed_numerical_failure_claim_matrix tests/test_canonical_cli.py::test_verify_run_rejects_rehashed_public_profile_contract_matrix tests/test_canonical_cli.py::test_verify_run_enforces_exact_terminal_event_grammar` — **17 passed**.
+- Independent adversarial temporary outputs rewrote both runtime and terminal profile copies, recomputed every `event_id` and `result.ledger_sha256`, then invoked `verify_run`. False unavailable RSS with empty context, retained Linux/kilobyte context, and supported Darwin context each **rejected**. Direct producer checks canonicalized `PermissionError` to `OSError`, empty/non-string platform to base-method `ValueError`, and retained the sole supported unavailable shape for FreeBSD.
+- Independent final verification: `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q` — **180 passed**; `OMP_NUM_THREADS=1 .venv/bin/python -m bp_registry.cli verify-run data/results/canonical-three-qubit-development` — **2 checked terminal rows verified**; `git diff --exit-code HEAD --` for the checked ledger and result files — **no differences**. Dynamic timing/resource values were not compared with a fresh replay.
 
 ## Security Audit Trail
 
@@ -108,5 +106,6 @@ None. No Phase 2 summary contains a `## Threat Flags` entry.
 | 2026-09-23 | 46 | 44 | 2 | 0 | ASVS L1 re-audit after Plan 02-13 / Wave 11 |
 | 2026-09-23 | 46 | 45 | 1 | 0 | ASVS L1 re-audit after Plan 02-14 / Wave 12 |
 | 2026-09-23 | 46 | 44 | 2 | 0 | ASVS L1 re-audit after Plan 02-15 / Wave 13 |
+| 2026-09-23 | 46 | 46 | 0 | 0 | ASVS L1 final re-audit after Plan 02-16 / Wave 14 |
 
-**threats_open:** 2
+**threats_open:** 0
