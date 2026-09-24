@@ -112,3 +112,37 @@ def test_gallager_hgp_adaptation_is_frozen_with_rank_and_identity_provenance():
         assert np.array_equal(frozen["hz"], code.hz)
     assert metadata["artifact"]["raw_sha256"] == hashlib.sha256(artifact.read_bytes()).hexdigest()
     assert metadata["artifact"]["semantic_sha256"] == semantic_sha256(code)
+
+
+def test_inventory_registers_three_distinct_phase3_pilot_artifacts():
+    from bp_registry.artifacts import load_artifact
+    from bp_registry.css import gf2_rank
+
+    inventory = json.loads(Path("data/evidence/code-inventory.json").read_text())
+    by_id = {candidate["code_id"]: candidate for candidate in inventory["candidates"]}
+    assert set(by_id) == {
+        "gross-bb-144", "b1-ghp-882", "hgp-gallager-3-4-seed-20260923", "bpgd-c2-hgp-1922"
+    }
+    assert by_id["b1-ghp-882"]["matrix_identity"]["status"] == "source-derived"
+    assert by_id["b1-ghp-882"]["ordered_logical_identity"]["status"] == "project-derived"
+    assert by_id["hgp-gallager-3-4-seed-20260923"]["matrix_identity"]["status"] == "generated-family"
+    assert by_id["hgp-gallager-3-4-seed-20260923"]["author_instance"] is False
+    assert "does not substitute" in by_id["bpgd-c2-hgp-1922"]["rejection_reason"]
+
+    bb = load_artifact(
+        ARTIFACTS, "selected-css.json",
+        expected_raw_sha256=by_id["gross-bb-144"]["matrix_identity"]["artifact_raw_sha256"],
+    ).code
+    constructions = _construction_module()
+    b1 = constructions.load_frozen_css_npz(
+        ARTIFACTS, "b1-panteleev-kalachev-v3.npz",
+        expected_raw_sha256=by_id["b1-ghp-882"]["matrix_identity"]["artifact_raw_sha256"],
+    )
+    hgp = constructions.load_frozen_css_npz(
+        ARTIFACTS, "hgp-gallager-3-4-seed-20260923.npz",
+        expected_raw_sha256=by_id["hgp-gallager-3-4-seed-20260923"]["matrix_identity"]["artifact_raw_sha256"],
+    )
+    assert (bb.n, bb.k) == (144, 12)
+    assert (b1.n, b1.k) == (882, 24)
+    assert (hgp.n, hgp.k) == (225, 29)
+    assert gf2_rank(hgp.hx) + gf2_rank(hgp.hz) + hgp.k == hgp.n
