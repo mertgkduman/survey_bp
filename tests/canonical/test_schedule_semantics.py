@@ -208,3 +208,54 @@ def test_serial_schedule_denial_retry_and_duplicate_shot_identity_do_not_share_o
     with pytest.raises(ValueError, match="duplicate"):
         registry.claim("shot:17")
     assert registry.claim("shot:18") == "shot:18"
+
+
+def test_randomized_traversal_replays_exact_order_at_declared_refresh_boundaries():
+    import bp_registry.canonical.schedules as schedules
+
+    assert hasattr(schedules, "RandomizedTraversalPlan"), (
+        "RandomizedTraversalPlan must provide replayable schedule-order identity"
+    )
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.kernel import BinarySpaKernel
+    from bp_registry.canonical.schedules import EdgeTable, LayeredSchedule, RandomizedTraversalPlan
+
+    table = EdgeTable.from_edges(2, 3, [(0, 0), (1, 1), (1, 2)])
+    base = LayeredSchedule(table, kernel=BinarySpaKernel(), partitions=((0,), (1,)), provenance="explicit")
+    for scope, boundary in (("configuration", "configuration"), ("attempt", "attempt"), ("sweep", "sweep")):
+        plan = RandomizedTraversalPlan(base, refresh_scope=scope, root_identity="a" * 64)
+        initial = plan.initial_state(configuration_identity="cfg", attempt_identity="shot:4")
+        first = plan.refresh(initial, boundary=boundary, budgets=BudgetTree(limits=(), parents={}), budget_scope="attempt")
+        replay = plan.refresh(initial, boundary=boundary, budgets=BudgetTree(limits=(), parents={}), budget_scope="attempt")
+        assert first.admitted and replay.admitted
+        assert first.order == replay.order
+        assert first.state.realized_orders == (first.order,)
+        assert first.state.derived_identity == replay.state.derived_identity
+
+
+def test_randomized_refresh_denial_preserves_rng_order_and_physical_sample_identity(small_css_checks, monkeypatch):
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.kernel import BinarySpaKernel
+    from bp_registry.canonical.schedules import EdgeTable, LayeredSchedule, RandomizedTraversalPlan
+    from bp_registry.css import CssCode
+    from bp_registry.sampling import sample_shot
+
+    table = EdgeTable.from_edges(2, 3, [(0, 0), (1, 1), (1, 2)])
+    base = LayeredSchedule(table, kernel=BinarySpaKernel(), partitions=((0,), (1,)), provenance="explicit")
+    plan = RandomizedTraversalPlan(base, refresh_scope="sweep", root_identity="a" * 64)
+    initial = plan.initial_state(configuration_identity="cfg", attempt_identity="shot:4")
+    denied_tree = BudgetTree(limits=(), parents={})
+    monkeypatch.setattr(denied_tree, "reserve", lambda *_args, **_kwargs: None)
+    denied = plan.refresh(initial, boundary="sweep", budgets=denied_tree, budget_scope="attempt")
+    assert not denied.admitted
+    assert denied.state == initial
+    assert denied.order is None
+
+    hx, hz = small_css_checks
+    code = CssCode(hx=hx, hz=hz)
+    baseline = sample_shot(code, manifest_identity="b" * 64, shot_id=4, seed=11, x_error_rate=0.4)
+    changed_order_policy = RandomizedTraversalPlan(base, refresh_scope="sweep", root_identity="c" * 64)
+    assert changed_order_policy.initial_state(configuration_identity="cfg", attempt_identity="shot:4").derived_identity != initial.derived_identity
+    matched = sample_shot(code, manifest_identity="b" * 64, shot_id=4, seed=999, x_error_rate=0.4)
+    assert baseline.sample_identity == matched.sample_identity
+    np.testing.assert_array_equal(baseline.hidden_x, matched.hidden_x)
