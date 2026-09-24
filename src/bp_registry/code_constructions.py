@@ -15,7 +15,7 @@ import zipfile
 
 import numpy as np
 
-from .css import CssCode, gf2_rank, semantic_sha256
+from .css import CssCode, semantic_sha256
 
 
 _B1_ELL = 63
@@ -198,12 +198,8 @@ def build_hgp(constituent: np.ndarray) -> CssCode:
     return CssCode(hx=hx, hz=hz, lx=lx, lz=lz).validate()
 
 
-def write_css_npz(code: CssCode, artifact_path: Path) -> None:
-    """Write primitive CSS arrays as a reproducible, pickle-free NPZ archive."""
-    validated = code.validate()
-    if validated.lx is None or validated.lz is None:
-        raise ValueError("frozen CSS artifacts require an ordered logical basis")
-    arrays = {"hx": validated.hx, "hz": validated.hz, "lx": validated.lx, "lz": validated.lz}
+def _write_npz_arrays(arrays: dict[str, np.ndarray], artifact_path: Path) -> None:
+    """Write named primitive arrays with fixed ZIP metadata for byte replay."""
     with zipfile.ZipFile(artifact_path, mode="w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
         for name, array in arrays.items():
             buffer = io.BytesIO()
@@ -212,6 +208,34 @@ def write_css_npz(code: CssCode, artifact_path: Path) -> None:
             member.compress_type = zipfile.ZIP_DEFLATED
             member.external_attr = 0o600 << 16
             archive.writestr(member, buffer.getvalue(), compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
+
+
+def write_css_npz(code: CssCode, artifact_path: Path) -> None:
+    """Write primitive CSS arrays as a reproducible, pickle-free NPZ archive."""
+    validated = code.validate()
+    if validated.lx is None or validated.lz is None:
+        raise ValueError("frozen CSS artifacts require an ordered logical basis")
+    _write_npz_arrays(
+        {"hx": validated.hx, "hz": validated.hz, "lx": validated.lx, "lz": validated.lz}, artifact_path
+    )
+
+
+def write_hgp_npz(constituent: GallagerConstituent, code: CssCode, artifact_path: Path) -> None:
+    """Freeze a generated Gallager constituent and its derived self-product."""
+    validated = code.validate()
+    if validated.lx is None or validated.lz is None:
+        raise ValueError("frozen CSS artifacts require an ordered logical basis")
+    _write_npz_arrays(
+        {
+            "constituent": _bits(constituent.matrix, "constituent"),
+            "permutations": np.asarray(constituent.permutations, dtype=np.uint8),
+            "hx": validated.hx,
+            "hz": validated.hz,
+            "lx": validated.lx,
+            "lz": validated.lz,
+        },
+        artifact_path,
+    )
 
 
 def artifact_metadata(code: CssCode, artifact_path: Path) -> dict[str, str]:

@@ -1,0 +1,47 @@
+{
+  "format_version": 1,
+  "code_id": "hgp-gallager-3-4-seed-20260923",
+  "artifact": {
+    "path": "data/artifacts/hgp-gallager-3-4-seed-20260923.npz",
+    "raw_sha256": "b31c99a754fb377acfb5e2cb2edc2cb7e55c4d1e78feb4aa84c171c051a78c44",
+    "semantic_sha256": "272c9498396167424bc4279d96b5ad2d6e11cebc7f01de597716a1cd2c01d668",
+    "arrays": ["constituent", "permutations", "hx", "hz", "lx", "lz"],
+    "pickle": false
+  },
+  "source_family": {
+    "paper": "Kovalev, Prabhakar, Dumer, and Pryadko, arXiv:1804.01950",
+    "url": "https://arxiv.org/html/1804.01950",
+    "construction": "three stacked row blocks; first block is four identity matrices and later blocks are independent column permutations"
+  },
+  "generator": {
+    "implementation": "numpy.random.Generator",
+    "numpy_bit_generator": "PCG64",
+    "bit_generator": "PCG64",
+    "seed": 20260923,
+    "permutations": [[3, 10, 5, 2, 9, 6, 0, 1, 8, 7, 11, 4], [9, 1, 2, 5, 0, 10, 3, 8, 11, 6, 4, 7]]
+  },
+  "generation_attempts": 1,
+  "constituent": {
+    "shape": [9, 12],
+    "column_weight": 3,
+    "row_weight": 4,
+    "rank_gf2": 7,
+    "matrix_role": "project-generated family member"
+  },
+  "construction": {
+    "hgp": "self-product: Hx=[I_n kron H, H^T kron I_m], Hz=[H kron I_n, I_m kron H^T]",
+    "qubit_order": "n-by-n block followed by m-by-m block, each NumPy kron row-major",
+    "logical_basis": "deterministic project-derived GF(2) quotient basis"
+  },
+  "code": {
+    "hx_shape": [108, 225],
+    "hz_shape": [108, 225],
+    "n": 225,
+    "k_gf2": 29,
+    "dimension_formula": "(12-7)^2 + (9-7)^2"
+  },
+  "author_instance": false,
+  "assessment_label": "pilot_adaptation",
+  "assessment_status": "not_assessed",
+  "distance": {"status": "unknown", "reason": "not independently established"}
+}
