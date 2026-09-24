@@ -59,8 +59,14 @@ def test_retained_pilot_reports_are_qualified_evidence_without_rankings():
         assert row["trace_evidence_link"].startswith("data/results/phase3-pilots/events.jsonl#")
     assert {row["outcome"] for row in outcome_rows} == {"missing"}
     assert {row["outcome_missing_reason"] for row in outcome_rows} == {"unavailable_due_to_stopping"}
+    assert {row["denominator_shots"] for row in outcome_rows} == {"1"}
+    assert {row["cohort_terminal_count"] for row in outcome_rows} == {"19"}
     assert all(row["setup_runtime_ns"] and row["decode_runtime_ns"] for row in outcome_rows)
     assert all(row["full_work_vector_json"] and row["qualified_iterations"] for row in work_rows)
+    assert all("full_work_units" not in row for row in work_rows)
+    notebook = json.loads((REPOSITORY_ROOT / "notebooks" / "phase3-pilot-analysis.ipynb").read_text(encoding="utf-8"))
+    source = "\n".join("".join(cell.get("source", [])) for cell in notebook["cells"])
+    assert "full_work_units" not in source
 
 
 def _pilot_module():
