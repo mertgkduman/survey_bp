@@ -16,7 +16,7 @@ class MemoryCompatibilityDecision:
     binding_id: str | None = None
 
 
-_UPDATE_RULES = frozenset({"sum_product", "min_sum", "normalized_min_sum", "offset_min_sum"})
+_UPDATE_RULES = frozenset({"binary_spa", "sum_product", "min_sum", "normalized_min_sum", "offset_min_sum"})
 _FLOODING_OPERANDS = frozenset({
     ("affine_prior", "prior", "source_iteration"),
     ("v2c_damping", "v2c", "source_iteration"),

@@ -436,6 +436,18 @@ class MemoryBindingSpec(_Strict):
     source_status: Literal["source_defined", "canonical_adaptation", "exploratory"]
     retain_history: bool = False
 
+    @field_validator("advance_boundary", mode="before")
+    @classmethod
+    def advance_boundary_from_json(cls, value: Any) -> Any:
+        """Convert only declared JSON labels; strict models otherwise reject enum strings."""
+        return MemoryAdvanceBoundary(value) if isinstance(value, str) else value
+
+    @field_validator("refresh_boundary", mode="before")
+    @classmethod
+    def refresh_boundary_from_json(cls, value: Any) -> Any:
+        """Convert only declared JSON labels; strict models otherwise reject enum strings."""
+        return MemoryRefreshBoundary(value) if isinstance(value, str) else value
+
     @field_validator("parameters")
     @classmethod
     def parameters_are_finite(cls, value: dict[str, float]) -> dict[str, float]:

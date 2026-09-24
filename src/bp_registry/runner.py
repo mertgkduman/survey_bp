@@ -19,6 +19,7 @@ from .canonical.schedules import EdgeTable
 from .manifests import (
     CanonicalExperimentV2,
     CanonicalExperimentV3,
+    CanonicalExperimentV4,
     ManifestV1,
     executable_canonical_policy_effects,
     manifest_digest,
@@ -121,8 +122,8 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
     """Resolve all canonical external facts before sampling or durable evidence."""
     resolved = preflight(manifest_path)
     manifest = resolved.manifest
-    if not isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3)):
-        raise ValueError("canonical execution requires a strict CanonicalExperimentV2 or V3 manifest")
+    if not isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4)):
+        raise ValueError("canonical execution requires a strict CanonicalExperimentV2, V3, or V4 manifest")
     composition = validate_executable_canonical_baseline(manifest.policies)
     return {
         "run_id": manifest.run_id,
@@ -147,10 +148,10 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
     }
 
 
-def _canonical_kernel_manifest(manifest: CanonicalExperimentV2 | CanonicalExperimentV3) -> dict[str, object]:
+def _canonical_kernel_manifest(manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4) -> dict[str, object]:
     """Project-owned kernel receives only its compact execution policy contract."""
     return {
-        "schema_version": manifest.schema_version,
+        "schema_version": 3 if isinstance(manifest, CanonicalExperimentV4) else manifest.schema_version,
         "run_id": manifest.run_id,
         "numerical_profile": manifest.numerical_profile,
         "max_iterations": manifest.budgets.attempt.max_iterations,
@@ -159,7 +160,7 @@ def _canonical_kernel_manifest(manifest: CanonicalExperimentV2 | CanonicalExperi
     }
 
 
-def _canonical_policy_effects(manifest: CanonicalExperimentV2 | CanonicalExperimentV3, code) -> dict[str, dict[str, Any]]:
+def _canonical_policy_effects(manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4, code) -> dict[str, dict[str, Any]]:
     """Bind declared NMS assignments to the code's canonical edge identities once."""
     effects: dict[str, dict[str, Any]] = executable_canonical_policy_effects(manifest.policies)
     assignment = getattr(manifest.policies.update, "parameter_assignment", None)
@@ -186,7 +187,7 @@ def _canonical_policy_effects(manifest: CanonicalExperimentV2 | CanonicalExperim
     return effects
 
 
-def _canonical_execution_controls(manifest: CanonicalExperimentV2 | CanonicalExperimentV3, code) -> dict[str, object]:
+def _canonical_execution_controls(manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4, code) -> dict[str, object]:
     """Keep preflighted public limits and handler classifications beside the compact kernel input."""
     return {
         "work_limits": {
@@ -202,8 +203,8 @@ def canonical_public_shot_context(manifest_path: str | Path, *, shot_id: int) ->
     """Resolve a deterministic public shot without opening a durable ledger."""
     resolved = preflight(manifest_path)
     manifest = resolved.manifest
-    if not isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3)):
-        raise ValueError("canonical execution requires a strict CanonicalExperimentV2 or V3 manifest")
+    if not isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4)):
+        raise ValueError("canonical execution requires a strict CanonicalExperimentV2, V3, or V4 manifest")
     if type(shot_id) is not int or not 0 <= shot_id < manifest.budgets.max_shots:
         raise ValueError("shot_id is outside the canonical manifest budget")
     digest = manifest_digest(manifest)
@@ -250,7 +251,7 @@ def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: s
     verification_context = canonical_public_shot_context(manifest_path, shot_id=shot_id)
     resolved = preflight(manifest_path)
     manifest = resolved.manifest
-    assert isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3))
+    assert isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4))
     digest = verification_context.manifest_sha256
     sample = sampling.sample_shot(
         resolved.code, manifest_identity=manifest.randomness.physical_sample_identity or digest,

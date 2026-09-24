@@ -18,7 +18,11 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 from .artifacts import LoadedArtifact, load_artifact
 from .canonical.budgets import WorkVector
 from .canonical.cluster_schedule import ClusterArtifactQualification, ClusterArtifactSpec, load_cluster_artifact
-from .canonical.contracts import CanonicalCompositionSpec, CanonicalCompositionSpecV3, CanonicalManifestV2, parse_canonical_manifest
+from .canonical.compatibility import validate_memory_compatibility
+from .canonical.contracts import (
+    CanonicalCompositionSpec, CanonicalCompositionSpecV3, CanonicalManifestV2,
+    MemoryCompositionSpec, parse_canonical_manifest,
+)
 from .css import CssCode, fixture_code
 
 
@@ -375,7 +379,20 @@ class CanonicalExperimentV3(CanonicalExperimentV2):
     policies: CanonicalCompositionSpecV3
 
 
-ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2 | CanonicalExperimentV3
+class CanonicalExperimentV4(CanonicalExperimentV3):
+    """Strict public composition contract for ordered Phase 4 memory bindings.
+
+    V4 extends the complete V3 evidence contract so public execution retains the
+    established artifact, budget, provenance, and outcome semantics.  The memory
+    chain is persisted separately from the seven required policy roles because it
+    may contain repeated policy kinds with private history owners.
+    """
+
+    schema_version: Literal[4]
+    memory: MemoryCompositionSpec
+
+
+ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4
 
 
 _EXECUTABLE_BASELINE_KINDS = {
@@ -455,11 +472,13 @@ def _read_value(value: dict[str, Any] | str | Path) -> dict[str, Any]:
     return decoded
 
 
-def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | CanonicalExperimentV2 | CanonicalExperimentV3 | dict[str, Any] | str | Path) -> ManifestV1 | CanonicalManifestV2 | CanonicalExperimentV2 | CanonicalExperimentV3:
+def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | dict[str, Any] | str | Path) -> ManifestV1 | CanonicalManifestV2 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4:
     """Dispatch complete native and canonical schemas without changing v1 meanings."""
-    if isinstance(value, (ManifestV1, CanonicalManifestV2, CanonicalExperimentV2, CanonicalExperimentV3)):
+    if isinstance(value, (ManifestV1, CanonicalManifestV2, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4)):
         return value
     decoded = _read_value(value)
+    if decoded.get("schema_version") == 4:
+        return CanonicalExperimentV4.model_validate(decoded)
     if decoded.get("schema_version") == 3:
         return CanonicalExperimentV3.model_validate(decoded)
     if decoded.get("schema_version") == 2:
@@ -470,9 +489,11 @@ def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | CanonicalExperiment
 
 
 def _parse_for_preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ManifestRecord:
-    if isinstance(value, (ManifestV1, LegacyManifestV1, CanonicalExperimentV2, CanonicalExperimentV3)):
+    if isinstance(value, (ManifestV1, LegacyManifestV1, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4)):
         return value
     decoded = _read_value(value)
+    if decoded.get("schema_version") == 4:
+        return CanonicalExperimentV4.model_validate(decoded)
     if decoded.get("schema_version") == 3:
         return CanonicalExperimentV3.model_validate(decoded)
     if decoded.get("schema_version") == 2:
@@ -575,6 +596,14 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
             )
         # Closed registry resolution is deliberately before any sample, ledger, or kernel work.
         composition = validate_executable_canonical_baseline(manifest.policies)
+        if isinstance(manifest, CanonicalExperimentV4):
+            memory_decision = validate_memory_compatibility(
+                manifest.memory,
+                update_rule=manifest.policies.update.kind,
+                schedule=manifest.policies.schedule.kind,
+            )
+            if not memory_decision.admitted:
+                raise ValueError(memory_decision.reason)
         if type(manifest) is CanonicalExperimentV2 and manifest.policies.update.kind != "binary_spa":
             raise ValueError("CanonicalExperimentV2 preserves only historical binary_spa semantics")
         if isinstance(manifest, CanonicalExperimentV3):
