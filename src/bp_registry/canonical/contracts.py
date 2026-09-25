@@ -547,6 +547,45 @@ class RelayLegSpec(_Strict):
     max_iterations: int = Field(ge=1, le=100_000)
 
 
+class RelayMemoryTuningV4(_Strict):
+    """Opt-in source-linked Relay memory assignment for controlled CSS arms.
+
+    ``first_leg_gamma`` is scalar across variables.  Every later leg derives a
+    fresh per-variable Uniform interval from the declared root identity and the
+    public shot identity.  The interval is deliberately not clipped to [0, 1]:
+    the approved Relay reference accepts the declared finite endpoints.
+    """
+
+    semantics: Literal["relay_v022_dynamic_affine_prior_css_adaptation"]
+    first_leg_gamma: float
+    later_leg_center: float
+    later_leg_width: float = Field(ge=0.0)
+    seed_identity: str = Field(min_length=1, max_length=256)
+    rng_algorithm: Literal["numpy.PCG64"] = "numpy.PCG64"
+    refresh: Literal["per_later_leg"] = "per_later_leg"
+
+    @field_validator("first_leg_gamma", "later_leg_center", "later_leg_width")
+    @classmethod
+    def finite_memory_tuning(cls, value: float) -> float:
+        if not math.isfinite(value):
+            raise ValueError("Relay memory tuning values must be finite")
+        return value
+
+    @property
+    def later_leg_low(self) -> float:
+        return self.later_leg_center - self.later_leg_width / 2.0
+
+    @property
+    def later_leg_high(self) -> float:
+        return self.later_leg_center + self.later_leg_width / 2.0
+
+    @model_validator(mode="after")
+    def finite_interval_endpoints(self) -> "RelayMemoryTuningV4":
+        if not math.isfinite(self.later_leg_low) or not math.isfinite(self.later_leg_high):
+            raise ValueError("Relay memory tuning interval endpoints must be finite")
+        return self
+
+
 class RelaySpecV4(_Strict):
     """Sequential Relay topology with an unambiguous total leg count."""
 
@@ -562,6 +601,7 @@ class RelaySpecV4(_Strict):
     numerical_profile: Literal["cpu-float64-spa-v1"] = "cpu-float64-spa-v1"
     procedure: Literal["source_internal_bp", "canonical_internal_bp"] = "canonical_internal_bp"
     fidelity_status: Literal["source_procedure_css_adaptation", "canonical_css_adaptation", "controlled_component_adaptation"] = "canonical_css_adaptation"
+    memory_tuning: RelayMemoryTuningV4 | None = None
 
     @field_validator("legs", mode="before")
     @classmethod
@@ -590,6 +630,10 @@ class RelaySpecV4(_Strict):
             raise ValueError("source Relay procedure requires a source or controlled CSS-adaptation fidelity label")
         if self.procedure == "canonical_internal_bp" and self.fidelity_status == "source_procedure_css_adaptation":
             raise ValueError("canonical Relay procedure cannot claim source-procedure fidelity")
+        if self.memory_tuning is not None and self.fidelity_status != "controlled_component_adaptation":
+            raise ValueError("active Relay memory tuning requires a controlled_component_adaptation label")
+        if self.memory_tuning is not None and self.later_leg_memory != "disordered":
+            raise ValueError("active Relay memory tuning requires disordered later_leg_memory")
         return self
 
 

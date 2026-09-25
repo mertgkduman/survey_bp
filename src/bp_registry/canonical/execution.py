@@ -634,7 +634,10 @@ def _run_relay_structural_shot(
     working_id = stable_lineage_id("working", {"original": original_id.value, "lift": "identity"})
     working = WorkingProblem(working_id.value, original, LineageEdge("identity", original_id, working_id))
     edge_table = EdgeTable.from_check_matrix(validated.hz)
-    controller = RelayController(memory_bindings=parsed.memory_bindings, numerical_profile=parsed.numerical_profile)
+    controller = RelayController(
+        memory_bindings=parsed.memory_bindings, numerical_profile=parsed.numerical_profile,
+        memory_tuning=parsed.relay.memory_tuning,
+    )
 
     for attempt_ordinal in range(30):
         try:
@@ -648,6 +651,8 @@ def _run_relay_structural_shot(
                     "relay_procedure": parsed.relay.procedure,
                     "relay_fidelity_status": parsed.relay.fidelity_status,
                     "relay_numerical_profile": parsed.relay.numerical_profile,
+                    "relay_memory_tuning": None if parsed.relay.memory_tuning is None else parsed.relay.memory_tuning.model_dump(mode="json"),
+                    "relay_memory_mode": "legacy_transfer_affine" if parsed.relay.memory_tuning is None else "dynamic_affine_prior_each_source_iteration",
                 }
                 ledger.begin(run_id=parsed.run_id, shot_id=shot_id, sample_seed_identity=sample_seed_identity, **common)
                 attempt_id = _attempt_lineage_id(working, attempt_ordinal)
@@ -660,6 +665,7 @@ def _run_relay_structural_shot(
                     kernel=_kernel_for_manifest(parsed, edge_table), error_rate=parsed.error_rate,
                     legs=parsed.relay.legs, budgets=budgets, scope="attempt", lineage_prefix=attempt_id.value,
                     solution_limit=parsed.relay.solution_limit, transfer=parsed.relay.transfer,
+                    sample_seed_identity=sample_seed_identity,
                 )
                 for transfer in run.transfers:
                     ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="relay_transfer", data={
@@ -678,7 +684,7 @@ def _run_relay_structural_shot(
                                           "score": None if leg.score is None else {
                                               "syndrome_weight": leg.score.syndrome_weight,
                                               "prior_weight": leg.score.prior_weight,
-                                          }}
+                                          }, "memory": None if leg.memory_application is None else leg.memory_application.as_evidence()}
                                         for leg in run.legs),
                     "relay_stopping_reason": run.stopping_reason,
                 })

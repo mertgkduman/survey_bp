@@ -286,3 +286,73 @@ def test_budget_exhaustion_retains_partial_final_leg_work_with_exact_leaf_total(
     assert [leaf["leg_index"] for leaf in work["relay_work_leaves"] if leaf["kind"] == "leg"] == [0, 1, 1, 2]
     assert [leaf["leg_index"] for leaf in work["relay_work_leaves"] if leaf["kind"] == "transfer"] == [1, 2]
     assert validate_phase4_shot(path, run_id="relay-partial-leg", shot_id=0, trace_root=tmp_path)["work"] == work["work_vector"]
+
+
+def test_active_memory_tuning_is_seeded_per_leg_and_retains_actual_application_facts(tmp_path):
+    """The controlled mode uses gamma0 first, then un-clipped seeded vectors."""
+    from bp_registry.canonical.contracts import CanonicalManifestV4
+    from bp_registry.canonical.execution import run_canonical_structural_shot
+    from bp_registry.ledger import read_canonical_events
+    from bp_registry.sampling import DecoderObservation, HiddenTruth
+
+    raw = _three_leg_manifest("relay-active-memory").model_dump(mode="json")
+    raw["relay"].update({
+        "legs": [{"max_iterations": 2}, {"max_iterations": 2}, {"max_iterations": 2}],
+        "first_leg_iteration_limit": 2,
+        "later_leg_iteration_limit": 2,
+        "later_leg_memory": "disordered",
+        "fidelity_status": "controlled_component_adaptation",
+        "memory_tuning": {
+            "semantics": "relay_v022_dynamic_affine_prior_css_adaptation",
+            "first_leg_gamma": 0.25,
+            "later_leg_center": 1.0,
+            "later_leg_width": 4.0,
+            "seed_identity": "phase4-controlled-relay-memory-v1",
+        },
+    })
+    manifest = CanonicalManifestV4.model_validate(raw)
+    path = tmp_path / "active-memory.jsonl"
+    result = run_canonical_structural_shot(
+        manifest, code=_impossible_syndrome_code(),
+        observation=DecoderObservation("Z", np.ones(1, dtype=np.uint8)),
+        hidden_truth=HiddenTruth(np.zeros(3, dtype=np.uint8), np.zeros(3, dtype=np.uint8)),
+        shot_id=0, ledger_path=path, sample_seed_identity="active-memory-sample", context={},
+        execution_controls=_relay_controls(belief_assemblies=100),
+    )
+
+    assert result.termination == "completed"
+    work = next(event["data"] for event in read_canonical_events(path) if event["kind"] == "work")
+    memories = [row["memory"] for row in work["relay_legs"]]
+    first, later_one, later_two = memories
+    assert first["mode"] == "first_leg_uniform_gamma"
+    assert first["declared_first_leg_gamma"] == 0.25
+    assert first["gamma_count"] == 3
+    assert first["gamma_min"] == first["gamma_max"] == 0.25
+    for index, memory in enumerate((later_one, later_two), start=1):
+        assert memory["mode"] == "later_leg_disordered_gamma"
+        assert memory["leg_index"] == index
+        assert memory["later_leg_center"] == 1.0
+        assert memory["later_leg_width"] == 4.0
+        assert memory["later_leg_low"] == -1.0
+        assert memory["later_leg_high"] == 3.0
+        assert memory["applied_each_source_iteration"] is True
+        assert memory["gamma_count"] == 3
+        assert isinstance(memory["derived_seed_identity"], str)
+        assert isinstance(memory["pcg64_seed_hex"], str)
+        assert -1.0 <= memory["gamma_min"] <= memory["gamma_max"] <= 3.0
+    assert later_one["derived_seed_identity"] != later_two["derived_seed_identity"]
+
+
+def test_active_memory_tuning_requires_a_controlled_adaptation_identity():
+    """A source or canonical preset cannot silently acquire tuned semantics."""
+    from bp_registry.canonical.contracts import RelaySpecV4
+
+    with pytest.raises(ValueError, match="controlled_component_adaptation"):
+        RelaySpecV4.model_validate({
+            "total_leg_limit": 1, "legs": [{"max_iterations": 1}],
+            "memory_tuning": {
+                "semantics": "relay_v022_dynamic_affine_prior_css_adaptation",
+                "first_leg_gamma": 0.0, "later_leg_center": 0.0,
+                "later_leg_width": 2.0, "seed_identity": "controlled-seed",
+            },
+        })

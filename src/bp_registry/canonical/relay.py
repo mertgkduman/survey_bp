@@ -4,14 +4,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from hashlib import sha256
+import json
 import math
 from typing import Iterable, Literal
 
 import numpy as np
 
 from .budgets import BudgetTree, RelayWorkAccounting, WorkVector
-from .contracts import MemoryBindingV4, RelayLegSpec, RelaySpecV4
-from .memory import AffinePriorMemory, MemoryState
+from .contracts import MemoryBindingV4, RelayLegSpec, RelayMemoryTuningV4, RelaySpecV4
+from .memory import AffinePriorMemory, MemoryAssignmentSpec, MemoryCompositionState, MemoryState
 from .numerics import finite_saturate
 from .schedules import EdgeTable, FloodingSchedule
 
@@ -75,6 +76,54 @@ class RelayLegResult:
     iterations: int
     converged: bool
     score: "RelayCandidateScore | None" = None
+    memory_application: "RelayMemoryApplication | None" = None
+
+
+@dataclass(frozen=True, slots=True)
+class RelayMemoryApplication:
+    """The complete decoder-visible gamma assignment for one Relay leg.
+
+    The vector itself remains bounded by a digest.  Its source interval and
+    exact PCG64 seed are retained, so an auditor can reconstruct every applied
+    variable coefficient without turning every routine ledger into a large
+    trace sidecar.
+    """
+
+    leg_index: int
+    mode: Literal["legacy_transfer_affine", "first_leg_uniform_gamma", "later_leg_disordered_gamma"]
+    gamma: np.ndarray | None
+    declared_first_leg_gamma: float | None
+    later_leg_center: float | None
+    later_leg_width: float | None
+    later_leg_low: float | None
+    later_leg_high: float | None
+    seed_identity: str | None
+    derived_seed_identity: str | None
+    pcg64_seed_hex: str | None
+    sample_seed_identity: str | None
+
+    def as_evidence(self) -> dict[str, object]:
+        gamma = self.gamma
+        return {
+            "source_semantics": "trmue/relay@v0.2.2: relay.rs:183-203; min_sum.rs:406-448",
+            "equation": "effective_prior=(1-gamma)*channel_prior+gamma*previous_posterior",
+            "applied_each_source_iteration": self.mode != "legacy_transfer_affine",
+            "leg_index": self.leg_index,
+            "mode": self.mode,
+            "declared_first_leg_gamma": self.declared_first_leg_gamma,
+            "later_leg_center": self.later_leg_center,
+            "later_leg_width": self.later_leg_width,
+            "later_leg_low": self.later_leg_low,
+            "later_leg_high": self.later_leg_high,
+            "seed_identity": self.seed_identity,
+            "derived_seed_identity": self.derived_seed_identity,
+            "pcg64_seed_hex": self.pcg64_seed_hex,
+            "sample_seed_identity": self.sample_seed_identity,
+            "gamma_sha256": None if gamma is None else sha256(np.asarray(gamma, dtype="<f8").tobytes()).hexdigest(),
+            "gamma_count": None if gamma is None else int(gamma.size),
+            "gamma_min": None if gamma is None else float(np.min(gamma)),
+            "gamma_max": None if gamma is None else float(np.max(gamma)),
+        }
 
 
 @dataclass(frozen=True, slots=True)
@@ -249,7 +298,7 @@ class RelayController:
 
     def __init__(
         self, *, memory_bindings: Iterable[MemoryBindingV4], numerical_profile: str,
-        preset: RelayPreset | None = None,
+        preset: RelayPreset | None = None, memory_tuning: RelayMemoryTuningV4 | None = None,
     ) -> None:
         bindings = tuple(sorted(memory_bindings, key=lambda binding: binding.order))
         if not bindings:
@@ -257,6 +306,57 @@ class RelayController:
         self._memory = tuple(AffinePriorMemory(binding.binding_id, float(binding.alpha)) for binding in bindings)
         self.numerical_profile = numerical_profile
         self.preset = preset
+        self.memory_tuning = memory_tuning
+
+    @staticmethod
+    def _dynamic_prior(
+        base_prior: np.ndarray, previous_posterior: np.ndarray, gamma: np.ndarray, *, kernel: object,
+    ) -> np.ndarray:
+        """Apply Relay's per-iteration affine prior without clipping gamma.
+
+        The source permits finite gamma values outside the convex range.  The
+        canonical numerical profile therefore clips the *resulting LLR* only at
+        the existing named prior boundary, never the declared assignment.
+        """
+        if base_prior.shape != previous_posterior.shape or base_prior.shape != gamma.shape:
+            raise ValueError("Relay dynamic memory operands must have equal variable shape")
+        with np.errstate(over="raise", invalid="raise"):
+            try:
+                value = (1.0 - gamma) * base_prior + gamma * previous_posterior
+            except FloatingPointError as error:
+                raise ValueError("Relay dynamic memory produced nonfinite prior arithmetic") from error
+        return finite_saturate(value, boundary="relay_dynamic_affine_prior", profile=kernel.profile)  # type: ignore[attr-defined]
+
+    def _later_leg_assignment(
+        self, *, tuning: RelayMemoryTuningV4, edge_table: EdgeTable,
+        sample_seed_identity: str, leg_index: int, budgets: BudgetTree, scope: str,
+        assignment: MemoryAssignmentSpec, assignment_state: object,
+    ) -> tuple[np.ndarray, object, RelayMemoryApplication]:
+        """Draw one deterministic, source-shaped per-variable gamma vector."""
+        replay_identity = f"relay-memory-v022:{sample_seed_identity}:leg:{leg_index}"
+        result = assignment.refresh(
+            assignment_state, boundary="leg_start", replay_identity=replay_identity,
+            variable_count=edge_table.variable_count, budgets=budgets, budget_scope=scope,
+            history_state=MemoryCompositionState(), schedule_cursor=(), work=WorkVector.zero(),
+        )
+        if not result.admitted or result.evidence is None:
+            raise RuntimeError("zero-work Relay memory assignment was unexpectedly denied")
+        gamma = np.asarray(result.values, dtype=np.float64)
+        # MemoryAssignmentSpec uses this exact digest as the PCG64 input.  Keep
+        # it alongside the root identity and public sample identity so the draw
+        # is independently reconstructible.
+        derived_seed_identity = sha256(
+            f"{result.state.derived_identity}:memory_assignment:{replay_identity}".encode("utf-8")
+        ).hexdigest()
+        application = RelayMemoryApplication(
+            leg_index=leg_index, mode="later_leg_disordered_gamma", gamma=gamma,
+            declared_first_leg_gamma=None, later_leg_center=tuning.later_leg_center,
+            later_leg_width=tuning.later_leg_width, later_leg_low=tuning.later_leg_low,
+            later_leg_high=tuning.later_leg_high, seed_identity=tuning.seed_identity,
+            derived_seed_identity=derived_seed_identity, pcg64_seed_hex=derived_seed_identity[:32],
+            sample_seed_identity=sample_seed_identity,
+        )
+        return gamma, result.state, application
 
     @staticmethod
     def select_candidate(scores: Iterable[RelayCandidateScore]) -> RelayCandidateScore | None:
@@ -268,6 +368,7 @@ class RelayController:
         self, *, edge_table: EdgeTable, check_matrix: np.ndarray, syndrome: np.ndarray, kernel: object,
         error_rate: float, legs: tuple[RelayLegSpec, ...] | None, budgets: BudgetTree, scope: str, lineage_prefix: str,
         solution_limit: int | None = None, transfer: Literal["posterior_only", "disabled"] | None = None,
+        sample_seed_identity: str | None = None,
     ) -> RelayRunResult:
         if not math.isfinite(error_rate) or not 0.0 < error_rate < 1.0:
             raise ValueError("Relay requires a finite error rate strictly between zero and one")
@@ -282,11 +383,27 @@ class RelayController:
         )
         if active_solution_limit < 1:
             raise ValueError("Relay solution_limit must be positive")
+        if self.memory_tuning is not None and (not isinstance(sample_seed_identity, str) or not sample_seed_identity):
+            raise ValueError("active Relay memory tuning requires a public sample seed identity")
         base_prior = np.full(edge_table.variable_count, kernel.prior(error_rate), dtype=np.float64)  # type: ignore[attr-defined]
         previous: PosteriorTransferV2 | None = None
         leg_results: list[RelayLegResult] = []
         transfers: list[PosteriorTransferV2] = []
         accounting = RelayWorkAccounting(shot_identity=lineage_prefix)
+        assignment: MemoryAssignmentSpec | None = None
+        assignment_state: object | None = None
+        if self.memory_tuning is not None:
+            tuning = self.memory_tuning
+            assignment = MemoryAssignmentSpec(
+                mode="uniform", graph_sha256=edge_table.graph_sha256,
+                root_seed_identity=sha256(tuning.seed_identity.encode("utf-8")).hexdigest(),
+                refresh_boundary="leg_start", retain_history=False,
+                low=tuning.later_leg_low, high=tuning.later_leg_high,
+            )
+            assignment_state = assignment.initial_state(
+                configuration_identity=sha256(json.dumps(tuning.model_dump(mode="json"), sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest(),
+                decoder_identity=tuning.seed_identity,
+            )
 
         def finish(
             termination: str, stopping_reason: Literal["solution_limit", "leg_limit", "budget_exhausted"],
@@ -303,6 +420,7 @@ class RelayController:
         for index, leg in enumerate(active_legs):
             lineage_id = f"{lineage_prefix}:leg:{index}"
             prior = base_prior
+            posterior_for_memory = np.array(base_prior, dtype=np.float64, copy=True)
             if previous is not None and active_transfer == "posterior_only":
                 transfer_leaf_id = "relay-transfer:" + sha256(
                     f"{previous.producer_leg_lineage_id}:{previous.digest}".encode("utf-8")
@@ -313,12 +431,14 @@ class RelayController:
                 if transfer_reservation is None:
                     return finish("budget_exhausted", "budget_exhausted")
                 prior = previous.as_array()
+                posterior_for_memory = np.array(prior, dtype=np.float64, copy=True)
                 # No history, gamma assignment, messages, iteration, or convergence crosses a leg boundary.
-                states: dict[str, MemoryState] = {}
-                for memory in self._memory:
-                    proposal = memory.propose(base_prior, prior)
-                    states[memory.binding_id] = memory.commit(proposal, states.get(memory.binding_id))
-                    prior = proposal.prior
+                if self.memory_tuning is None:
+                    states: dict[str, MemoryState] = {}
+                    for memory in self._memory:
+                        proposal = memory.propose(base_prior, prior)
+                        states[memory.binding_id] = memory.commit(proposal, states.get(memory.binding_id))
+                        prior = proposal.prior
                 transfer_reservation.commit_once()
                 accounting.commit(
                     kind="transfer", leg_index=index,
@@ -327,10 +447,32 @@ class RelayController:
                 )
                 transfers.append(previous)
 
-            # Each loop builds a new schedule and V2C snapshot, intentionally resetting all leg-local state.
-            schedule = FloodingSchedule(edge_table, kernel=_PriorVectorKernel(kernel, prior), profile=kernel.profile)  # type: ignore[attr-defined]
-            messages = np.asarray([prior[variable] for _check, variable in edge_table.edges], dtype=np.float64)
-            posterior = np.array(prior, dtype=np.float64, copy=True)
+            memory_application: RelayMemoryApplication | None = None
+            gamma: np.ndarray | None = None
+            if self.memory_tuning is not None:
+                tuning = self.memory_tuning
+                if index == 0:
+                    gamma = np.full(edge_table.variable_count, tuning.first_leg_gamma, dtype=np.float64)
+                    memory_application = RelayMemoryApplication(
+                        leg_index=index, mode="first_leg_uniform_gamma", gamma=gamma,
+                        declared_first_leg_gamma=tuning.first_leg_gamma, later_leg_center=None,
+                        later_leg_width=None, later_leg_low=None, later_leg_high=None,
+                        seed_identity=tuning.seed_identity, derived_seed_identity=None,
+                        pcg64_seed_hex=None, sample_seed_identity=sample_seed_identity,
+                    )
+                else:
+                    assert assignment is not None and assignment_state is not None and sample_seed_identity is not None
+                    gamma, assignment_state, memory_application = self._later_leg_assignment(
+                        tuning=tuning, edge_table=edge_table, sample_seed_identity=sample_seed_identity,
+                        leg_index=index, budgets=budgets, scope=scope, assignment=assignment,
+                        assignment_state=assignment_state,
+                    )
+
+            # Each leg resets C2V/V2C state to channel priors.  For active
+            # memory, only the posterior crosses a Relay boundary; the current
+            # gamma vector is then applied before *every* source iteration.
+            messages = np.asarray([base_prior[variable] for _check, variable in edge_table.edges], dtype=np.float64)
+            posterior = np.array(posterior_for_memory if self.memory_tuning is not None else prior, dtype=np.float64, copy=True)
             candidate = kernel.candidate_from_beliefs(posterior)  # type: ignore[attr-defined]
             converged = bool(np.array_equal((check_matrix.astype(np.int64) @ candidate.astype(np.int64)) % 2, syndrome))
             completed = 0
@@ -356,8 +498,15 @@ class RelayController:
                         )),
                         prior_weight=float(np.dot(candidate.astype(np.float64), base_prior)),
                     ) if converged else None
-                    leg_results.append(RelayLegResult(index, lineage_id, candidate, posterior, completed, converged, score))
+                    leg_results.append(RelayLegResult(index, lineage_id, candidate, posterior, completed, converged, score, memory_application))
                     return finish("budget_exhausted", "budget_exhausted")
+                effective_prior = (
+                    self._dynamic_prior(base_prior, posterior, gamma, kernel=kernel)
+                    if gamma is not None else prior
+                )
+                schedule = FloodingSchedule(
+                    edge_table, kernel=_PriorVectorKernel(kernel, effective_prior), profile=kernel.profile,
+                )  # type: ignore[attr-defined]
                 sweep = schedule.sweep(messages, syndrome, error_rate=error_rate, source_iteration=iteration - 1)
                 messages = sweep.new_v2c
                 posterior = sweep.beliefs
@@ -384,7 +533,7 @@ class RelayController:
                     leg_index=index, syndrome_weight=syndrome_weight,
                     prior_weight=float(np.dot(candidate.astype(np.float64), base_prior)),
                 )
-            result = RelayLegResult(index, lineage_id, candidate, posterior, completed, converged, score)
+            result = RelayLegResult(index, lineage_id, candidate, posterior, completed, converged, score, memory_application)
             leg_results.append(result)
             previous = PosteriorTransferV2.from_posterior(
                 posterior, producer_leg_lineage_id=lineage_id, numerical_profile=self.numerical_profile,

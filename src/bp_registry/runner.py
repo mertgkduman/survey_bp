@@ -152,6 +152,28 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
             "bindings": [binding.model_dump(mode="json") for binding in manifest.memory.bindings],
             "compatibility": {"admitted": True, "reason": None},
         }
+        if manifest.relay is not None:
+            tuning = manifest.relay.memory_tuning
+            report["relay"] = {
+                "specification": manifest.relay.model_dump(mode="json"),
+                "memory_execution": (
+                    {"mode": "legacy_transfer_affine", "active_each_source_iteration": False}
+                    if tuning is None else
+                    {
+                        "mode": "dynamic_affine_prior_each_source_iteration",
+                        "active_each_source_iteration": True,
+                        "source_semantics": "trmue/relay@v0.2.2: relay.rs:183-203; min_sum.rs:406-448",
+                        "first_leg_gamma": tuning.first_leg_gamma,
+                        "later_leg_center": tuning.later_leg_center,
+                        "later_leg_width": tuning.later_leg_width,
+                        "later_leg_low": tuning.later_leg_low,
+                        "later_leg_high": tuning.later_leg_high,
+                        "seed_identity": tuning.seed_identity,
+                        "rng_algorithm": tuning.rng_algorithm,
+                        "refresh": tuning.refresh,
+                    }
+                ),
+            }
     return report
 
 

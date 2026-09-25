@@ -1043,6 +1043,57 @@
       "title": "RelayLegSpec",
       "type": "object"
     },
+    "RelayMemoryTuningV4": {
+      "additionalProperties": false,
+      "description": "Opt-in source-linked Relay memory assignment for controlled CSS arms.\n\n``first_leg_gamma`` is scalar across variables.  Every later leg derives a\nfresh per-variable Uniform interval from the declared root identity and the\npublic shot identity.  The interval is deliberately not clipped to [0, 1]:\nthe approved Relay reference accepts the declared finite endpoints.",
+      "properties": {
+        "first_leg_gamma": {
+          "title": "First Leg Gamma",
+          "type": "number"
+        },
+        "later_leg_center": {
+          "title": "Later Leg Center",
+          "type": "number"
+        },
+        "later_leg_width": {
+          "minimum": 0.0,
+          "title": "Later Leg Width",
+          "type": "number"
+        },
+        "refresh": {
+          "const": "per_later_leg",
+          "default": "per_later_leg",
+          "title": "Refresh",
+          "type": "string"
+        },
+        "rng_algorithm": {
+          "const": "numpy.PCG64",
+          "default": "numpy.PCG64",
+          "title": "Rng Algorithm",
+          "type": "string"
+        },
+        "seed_identity": {
+          "maxLength": 256,
+          "minLength": 1,
+          "title": "Seed Identity",
+          "type": "string"
+        },
+        "semantics": {
+          "const": "relay_v022_dynamic_affine_prior_css_adaptation",
+          "title": "Semantics",
+          "type": "string"
+        }
+      },
+      "required": [
+        "semantics",
+        "first_leg_gamma",
+        "later_leg_center",
+        "later_leg_width",
+        "seed_identity"
+      ],
+      "title": "RelayMemoryTuningV4",
+      "type": "object"
+    },
     "RelaySpecV4": {
       "additionalProperties": false,
       "description": "Sequential Relay topology with an unambiguous total leg count.",
@@ -1107,6 +1158,17 @@
           "minItems": 1,
           "title": "Legs",
           "type": "array"
+        },
+        "memory_tuning": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RelayMemoryTuningV4"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "numerical_profile": {
           "const": "cpu-float64-spa-v1",
