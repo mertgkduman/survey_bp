@@ -101,3 +101,16 @@ def test_bb144_observer_record_keeps_unavailable_facts_explicit():
     facts = unavailable_native_facts()
     assert facts["gamma"] == "unavailable: observer would change decoder behavior"
     assert facts["edge_work"] == "unavailable: observer would change decoder behavior"
+
+
+def test_bb144_observer_record_compares_exact_author_terminal_fields():
+    import json
+    from pathlib import Path
+
+    record = json.loads(Path("data/evidence/relay-v0.2.2-source.json").read_text())
+    comparison = record["observer_patch"]["bb144_terminal_equivalence"]
+    assert comparison["passed"] is True
+    assert comparison["timeout_seconds"] == 60
+    assert comparison["fields"] == ["candidate", "success", "score", "aggregate_iterations", "final_posterior", "log_output"]
+    assert comparison["unmodified"]["candidate_sha256"] == comparison["patched"]["candidate_sha256"]
+    assert comparison["unmodified"]["posterior_sha256"] == comparison["patched"]["posterior_sha256"]
