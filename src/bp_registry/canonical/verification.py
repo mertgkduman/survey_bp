@@ -11,11 +11,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from hashlib import sha256
 import json
+from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 import numpy as np
 
 from .. import evaluator
+from ..ledger import CANONICAL_RELAY_LEDGER_VERSION, read_canonical_events
 from .budgets import BudgetLimit, BudgetTree, BudgetView, Measurement, QualifiedIteration, ScheduleTerminalEvidence, WorkVector
 from .kernel import BinarySpaKernel
 from .group_shuffled import HsuGroupSchedule
@@ -31,6 +33,136 @@ from .updates import MinSumUpdate, NormalizedMinSumUpdate, OffsetMinSumUpdate, P
 
 class CanonicalStructuralVerificationError(ValueError):
     """Persisted canonical evidence is well-formed but not reusable."""
+
+
+def reconstruct_relay_work(events: Sequence[Mapping[str, Any]]) -> dict[str, int]:
+    """Reduce Phase 4's unique Relay leaves and reject ambiguous accounting.
+
+    The durable work record is authoritative only when its total is exactly the
+    sum of typed leaf contributions.  A repeated byte-identical ledger event is
+    already collapsed by ``read_canonical_events``; repeated leaf IDs with a
+    differing payload remain an error here.
+    """
+    work_events = [event for event in events if event.get("kind") == "work"]
+    if len(work_events) != 1:
+        raise CanonicalStructuralVerificationError("Phase 4 shot requires exactly one work event")
+    data = work_events[0].get("data")
+    if not isinstance(data, Mapping) or not isinstance(data.get("relay_work_leaves"), list):
+        raise CanonicalStructuralVerificationError("Phase 4 work requires typed Relay leaves")
+    try:
+        declared = WorkVector.from_evidence(data["work_vector"], structural_event_version=2)
+    except (TypeError, ValueError) as error:
+        raise CanonicalStructuralVerificationError("Phase 4 work vector is invalid") from error
+    leaves = data["relay_work_leaves"]
+    seen: dict[str, Mapping[str, Any]] = {}
+    deltas: list[WorkVector] = []
+    for leaf in leaves:
+        if not isinstance(leaf, Mapping):
+            raise CanonicalStructuralVerificationError("Phase 4 work leaf is not an object")
+        leaf_id = leaf.get("leaf_id")
+        if not isinstance(leaf_id, str) or not leaf_id:
+            raise CanonicalStructuralVerificationError("Phase 4 work leaf lacks a stable ID")
+        previous = seen.get(leaf_id)
+        if previous is not None:
+            if previous != leaf:
+                raise CanonicalStructuralVerificationError("Phase 4 work leaf ID has conflicting evidence")
+            continue
+        if leaf.get("kind") not in {"leg", "transfer", "candidate", "selection"}:
+            raise CanonicalStructuralVerificationError("Phase 4 work leaf has an unknown type")
+        if type(leaf.get("leg_index")) is not int or leaf["leg_index"] < 0:
+            raise CanonicalStructuralVerificationError("Phase 4 work leaf has invalid leg ancestry")
+        try:
+            deltas.append(WorkVector.from_evidence(leaf["work_vector"], structural_event_version=2))
+        except (KeyError, TypeError, ValueError) as error:
+            raise CanonicalStructuralVerificationError("Phase 4 work leaf has invalid work evidence") from error
+        seen[leaf_id] = leaf
+    reduced = WorkVector.sum(deltas)
+    if reduced != declared:
+        raise CanonicalStructuralVerificationError("Phase 4 work total does not equal the unique leaf reduction")
+    transfer_ids = {
+        event["data"].get("relay_leaf_id") for event in events
+        if event.get("kind") == "relay_transfer" and isinstance(event.get("data"), Mapping)
+    }
+    leaf_transfers = {leaf_id for leaf_id, leaf in seen.items() if leaf.get("kind") == "transfer"}
+    if transfer_ids != leaf_transfers:
+        raise CanonicalStructuralVerificationError("Phase 4 transfer events and transfer work leaves disagree")
+    return declared.as_evidence(structural_event_version=2)
+
+
+def _validate_phase4_trace(event: Mapping[str, Any], *, trace_root: Path) -> dict[str, object]:
+    """Load a bounded sidecar through its confined content-addressed reference."""
+    sidecar = event.get("sidecar")
+    if not isinstance(sidecar, Mapping):
+        raise CanonicalStructuralVerificationError("Phase 4 trace event lacks a sidecar link")
+    path, digest = sidecar.get("path"), sidecar.get("sha256")
+    if not isinstance(path, str) or not isinstance(digest, str):
+        raise CanonicalStructuralVerificationError("Phase 4 trace link is incomplete")
+    from .tracing import TraceSink
+
+    try:
+        document = TraceSink.load(trace_root, path, expected_sha256=digest)
+    except ValueError as error:
+        raise CanonicalStructuralVerificationError("Phase 4 trace sidecar failed confinement or rehash validation") from error
+    records = document.get("records")
+    if not isinstance(records, list) or sidecar.get("records") != len(records):
+        raise CanonicalStructuralVerificationError("Phase 4 trace record count disagrees with its link")
+    candidate = trace_root / path
+    if sidecar.get("bytes") != candidate.stat().st_size:
+        raise CanonicalStructuralVerificationError("Phase 4 trace byte count disagrees with its link")
+    if not isinstance(sidecar.get("truncated"), bool) or not isinstance(sidecar.get("dropped_records"), int):
+        raise CanonicalStructuralVerificationError("Phase 4 trace truncation evidence is incomplete")
+    if bool(document.get("truncated")) != sidecar["truncated"] or document.get("dropped_records") != sidecar["dropped_records"]:
+        raise CanonicalStructuralVerificationError("Phase 4 trace truncation facts disagree with its sidecar")
+    return document
+
+
+def validate_phase4_shot(
+    ledger_path: str | Path, *, run_id: str, shot_id: int, trace_root: str | Path,
+) -> dict[str, object]:
+    """Independently reconstruct one V4 Relay shot from hash-linked evidence.
+
+    Native adapter measurements are accepted only as typed ``missingness``
+    facts.  The verifier never turns an unavailable observation into zero.
+    """
+    if not isinstance(run_id, str) or not run_id or type(shot_id) is not int or shot_id < 0:
+        raise CanonicalStructuralVerificationError("Phase 4 verification requires a run ID and nonnegative shot ID")
+    events = [
+        event for event in read_canonical_events(ledger_path)
+        if event["run_id"] == run_id and event["shot_id"] == shot_id
+    ]
+    if not events or any(event["ledger_version"] != CANONICAL_RELAY_LEDGER_VERSION for event in events):
+        raise CanonicalStructuralVerificationError("Phase 4 verification requires V4 Relay ledger evidence")
+    if events[0]["kind"] != "shot_begin" or events[-1]["kind"] != "termination":
+        raise CanonicalStructuralVerificationError("Phase 4 shot lacks a durable begin-to-terminal boundary")
+    candidates = [event for event in events if event["kind"] == "candidate"]
+    selections = [event for event in events if event["kind"] == "selection"]
+    if len(selections) > 1:
+        raise CanonicalStructuralVerificationError("Phase 4 shot has ambiguous selection evidence")
+    if selections:
+        chosen = selections[0]["data"].get("candidate_lineage_id")
+        known = {event["data"].get("candidate_lineage_id") for event in candidates}
+        if not isinstance(chosen, str) or chosen not in known:
+            raise CanonicalStructuralVerificationError("Phase 4 selection does not name a retained candidate")
+    for event in events:
+        if event["kind"] == "missingness":
+            data = event["data"]
+            if data.get("value") is not None or not isinstance(data.get("field"), str) or not data["field"] or not isinstance(data.get("reason"), str) or not data["reason"]:
+                raise CanonicalStructuralVerificationError("Phase 4 unavailable facts must remain typed and explicit")
+    root = Path(trace_root)
+    traces = [_validate_phase4_trace(event, trace_root=root) for event in events if event["kind"] == "trace_link"]
+    work = reconstruct_relay_work(events) if any(event["kind"] == "work" for event in events) else None
+    terminal = events[-1]
+    if work is not None and terminal["data"].get("work_vector") != work:
+        raise CanonicalStructuralVerificationError("Phase 4 terminal work disagrees with reconstructed leaves")
+    return {
+        "events": events,
+        "transfers": [event["data"] for event in events if event["kind"] == "relay_transfer"],
+        "candidates": [event["data"] for event in candidates],
+        "selection": None if not selections else selections[0]["data"],
+        "terminal": terminal,
+        "work": work,
+        "traces": traces,
+    }
 
 
 def reconstruct_schedule_terminal(evidence: Mapping[str, Any]) -> dict[str, object]:

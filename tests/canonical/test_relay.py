@@ -151,6 +151,12 @@ def test_tracer_two_leg_relay_is_public_truth_blind_and_transfers_only_posterior
     events = (tmp_path / "events.jsonl").read_text(encoding="utf-8")
     assert "relay_transfer" in events
     assert "llr_log_p0_over_p1" in events
+    from bp_registry.canonical.verification import validate_phase4_shot
+
+    evidence = validate_phase4_shot(
+        tmp_path / "events.jsonl", run_id="phase4-relay-tracer", shot_id=0, trace_root=tmp_path,
+    )
+    assert evidence["work"] is not None
 
 
 def test_relay_leaf_accounting_is_idempotent_and_retains_per_leg_ancestry():

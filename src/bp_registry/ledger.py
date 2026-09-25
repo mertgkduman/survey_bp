@@ -478,6 +478,49 @@ def _canonical_event_id(event: Mapping[str, Any]) -> str:
     return "canonical-" + sha256(_canonical_event_bytes(content)).hexdigest()[:20]
 
 
+def _relay_work_leaves(event: Mapping[str, Any], existing: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Materialize a V4 work reduction from the transfer facts already durable."""
+    from .canonical.budgets import WorkVector
+
+    data = event["data"]
+    if "relay_work_leaves" in data:
+        return data["relay_work_leaves"]
+    try:
+        total = WorkVector.from_evidence(data["work_vector"], structural_event_version=2)
+    except (KeyError, TypeError, ValueError) as error:
+        raise ValueError("V4 Relay work event requires a V2 work vector") from error
+    matching = [
+        row for row in existing if row["kind"] == "relay_transfer"
+        and row["run_id"] == event["run_id"] and row["shot_id"] == event["shot_id"]
+    ]
+    if total.relay_transfers != len(matching):
+        raise ValueError("V4 Relay transfer leaves must exactly match the recorded transfer count")
+    legs = data.get("relay_legs")
+    if not isinstance(legs, (list, tuple)) or not legs or not isinstance(legs[0], Mapping):
+        raise ValueError("V4 Relay work requires ordered leg ancestry")
+    first_lineage = legs[0].get("lineage_id")
+    if not isinstance(first_lineage, str) or not first_lineage:
+        raise ValueError("V4 Relay work requires the first leg lineage")
+    residual_values = total.as_evidence(structural_event_version=2)
+    residual_values["relay_transfers"] = 0
+    leaves: list[dict[str, Any]] = [{
+        "kind": "leg", "leg_index": 0, "lineage_id": first_lineage,
+        "leaf_id": "relay-work:" + sha256(
+            f"{event['run_id']}:{event['shot_id']}:{first_lineage}".encode("utf-8")
+        ).hexdigest()[:20],
+        "work_vector": residual_values,
+    }]
+    for index, row in enumerate(matching, start=1):
+        transfer = row["data"]
+        leaves.append({
+            "kind": "transfer", "leg_index": index,
+            "lineage_id": transfer["producer_leg_lineage_id"],
+            "leaf_id": transfer["relay_leaf_id"],
+            "work_vector": WorkVector(relay_transfers=1).as_evidence(structural_event_version=2),
+        })
+    return leaves
+
+
 def read_canonical_events(path: str | Path) -> list[dict[str, Any]]:
     """Read validated v2/V3 structural evidence without weakening v1 validation."""
     journal = Path(path)
@@ -551,6 +594,15 @@ class CanonicalEventWriter:
             data.setdefault("relay_leaf_id", "relay-transfer:" + sha256(
                 f"{data.get('producer_leg_lineage_id')}:{data.get('digest')}".encode("utf-8")
             ).hexdigest()[:20])
+        if self.structural_event_version == CANONICAL_RELAY_LEDGER_VERSION and event["kind"] == "work":
+            event["data"]["relay_work_leaves"] = _relay_work_leaves(event, read_canonical_events(self.path))
+        if self.structural_event_version == CANONICAL_RELAY_LEDGER_VERSION and event["kind"] == "termination":
+            prior_work = [
+                row["data"]["work_vector"] for row in read_canonical_events(self.path)
+                if row["kind"] == "work" and row["run_id"] == event["run_id"] and row["shot_id"] == event["shot_id"]
+            ]
+            if len(prior_work) == 1:
+                event["data"].setdefault("work_vector", prior_work[0])
         event["ledger_version"] = self.structural_event_version
         event["event_id"] = _canonical_event_id(event)
         _validate_canonical_event(event)
