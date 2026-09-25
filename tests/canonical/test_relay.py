@@ -77,6 +77,7 @@ def test_ablation_controls_are_adaptations_and_never_mutate_source_preset():
     assert ablated.total_leg_limit == 1
     assert ablated.transfer == "disabled"
     assert ablated.later_leg_memory == "uniform"
+    assert ablated.as_spec().fidelity_status == "controlled_component_adaptation"
 
 
 def test_no_transfer_one_leg_uniform_and_disordered_controls_are_independent():

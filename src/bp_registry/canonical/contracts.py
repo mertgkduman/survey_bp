@@ -584,8 +584,10 @@ class RelaySpecV4(_Strict):
             raise ValueError("later_leg_iteration_limit must match every declared later leg")
         if self.solution_limit is None:
             object.__setattr__(self, "solution_limit", self.total_leg_limit)
-        if self.procedure == "source_internal_bp" and self.fidelity_status != "source_procedure_css_adaptation":
-            raise ValueError("source Relay procedure requires its source-procedure CSS-adaptation fidelity label")
+        if self.procedure == "source_internal_bp" and self.fidelity_status not in {
+            "source_procedure_css_adaptation", "controlled_component_adaptation",
+        }:
+            raise ValueError("source Relay procedure requires a source or controlled CSS-adaptation fidelity label")
         if self.procedure == "canonical_internal_bp" and self.fidelity_status == "source_procedure_css_adaptation":
             raise ValueError("canonical Relay procedure cannot claim source-procedure fidelity")
         return self
