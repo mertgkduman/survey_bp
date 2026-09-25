@@ -1,0 +1,211 @@
+{
+  "artifact": {
+    "code_id": "hgp-gallager-3-4-seed-20260923",
+    "format_version": 1,
+    "matrix_hashes": {
+      "hx_raw_sha256": "2497f0f59cdb7cf0787e601295e5d118d6cad2e62cc2226a88a47ccf2b034dfb",
+      "hx_semantic_sha256": "0edcbfaab182df09cdfe0a0adf6cf394e167896c540483d52b95217963c8664d",
+      "hz_raw_sha256": "002e894daec7f5e56d17f8bca28ad11dacfd2df236d1a18e031564d6d18727f4",
+      "hz_semantic_sha256": "45b088f719effe4389e9c96a67bcc49100beeb447b38d4ef4dbf51087c96bdfe",
+      "lx_raw_sha256": "c53605ad73244da3b9352a269333484e307055036bc5f1c428727ec9a9ce0b8b",
+      "lx_semantic_sha256": "3db83ea36085e780c1c7c8b409909cb8873b451bdc7ed1747bee066a0e93c0f7",
+      "lz_raw_sha256": "09cd80917934c1665921c09e027ebb51cc02014da6f51f3ca34f7a4001eb60f6",
+      "lz_semantic_sha256": "2dc6a64b64568bb5b88f09537ced7369baf535e377f33209f33aa38299734d87"
+    },
+    "path": "hgp-gallager-3-4-seed-20260923.npz",
+    "raw_sha256": "b31c99a754fb377acfb5e2cb2edc2cb7e55c4d1e78feb4aa84c171c051a78c44",
+    "root": "data/artifacts",
+    "semantic_sha256": "272c9498396167424bc4279d96b5ad2d6e11cebc7f01de597716a1cd2c01d668"
+  },
+  "budgets": {
+    "attempt": {
+      "max_iterations": 80,
+      "work_limits": {
+        "belief_assemblies": 320000,
+        "bp_calls": 1,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 320000,
+        "check_to_variable_updates": 320000,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 800000,
+        "variable_to_check_updates": 320000
+      }
+    },
+    "denominator_rule": "all_terminal_shots",
+    "max_shots": 32,
+    "search": {
+      "max_iterations": 80,
+      "work_limits": {
+        "belief_assemblies": 320000,
+        "bp_calls": 1,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 320000,
+        "check_to_variable_updates": 320000,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 800000,
+        "variable_to_check_updates": 320000
+      }
+    },
+    "shot": {
+      "max_iterations": 80,
+      "work_limits": {
+        "belief_assemblies": 320000,
+        "bp_calls": 1,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 320000,
+        "check_to_variable_updates": 320000,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 800000,
+        "variable_to_check_updates": 320000
+      }
+    }
+  },
+  "environment": {
+    "backend": "cpu",
+    "numpy": "2.2.6",
+    "omp_num_threads": 1,
+    "python": "3.12.2",
+    "scipy": "1.17.1"
+  },
+  "error_rate": 0.03,
+  "evidence": {
+    "assessment_status": "not_assessed",
+    "discrepancies": [
+      "This generated HGP fixture is not a paper-exact instance.",
+      "This bounded pilot adaptation is not a source-faithful curve reproduction or decoder ranking."
+    ],
+    "fixture": "pilot_adaptation",
+    "procedure": "Phase 4 focused factorial source_procedure, canonical_procedure, and controlled_matched Relay CSS pilot adaptation on the generated HGP fixture. Bounded D-23 benchmark arm=baseline; shots=32; central_error_rate=0.03.",
+    "relation": "pilot_adaptation",
+    "sources": [
+      "Phase 4 D-18",
+      "phase4-pilot-design.json#sha256:c64d5e8a25863545687120511746d0d452c74cdf3836f771da480a1d1cd081b7"
+    ]
+  },
+  "memory": {
+    "bindings": [
+      {
+        "advance_boundary": "source_iteration",
+        "binding_id": "relay-affine-prior-hgp-v1",
+        "history_owner": "memory:relay-affine-prior-hgp-v1",
+        "kind": "affine_prior",
+        "order": 0,
+        "parameters": {
+          "alpha": 0.875
+        },
+        "refresh_boundary": "leg_start",
+        "retain_history": false,
+        "source_status": "canonical_adaptation",
+        "state_lifetime": "leg",
+        "target": "prior"
+      }
+    ]
+  },
+  "numerical_profile": "cpu-float64-spa-v1",
+  "policies": {
+    "intervention": {
+      "binding_id": "intervention-identity-v1",
+      "kind": "identity",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "search"
+    },
+    "postprocessing": {
+      "binding_id": "postprocessing-identity-v1",
+      "kind": "identity",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "attempt"
+    },
+    "schedule": {
+      "binding_id": "schedule-flooding-v1",
+      "kind": "flooding",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "iteration"
+    },
+    "selection": {
+      "binding_id": "selection-stable-first-v1",
+      "kind": "stable_first",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "attempt"
+    },
+    "state_memory": {
+      "binding_id": "state-memory-stateless-v1",
+      "kind": "stateless",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "attempt"
+    },
+    "stopping": {
+      "binding_id": "stopping-syndrome-budget-v1",
+      "kind": "syndrome_or_budget",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "iteration"
+    },
+    "update": {
+      "binding_id": "update-binary-spa-v1",
+      "kind": "binary_spa",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "message"
+    }
+  },
+  "profile_plan": {
+    "cohort": "clean",
+    "enabled": true,
+    "level": "low_overhead",
+    "selected_before_outcome": true
+  },
+  "randomness": {
+    "decoder_seed_identity": "phase4-hgp-relay-policy-stream-v1",
+    "physical_sample_identity": "phase4-memory-relay-hgp-matched-physical-samples-v1",
+    "sample_derivation": "sha256-manifest-shot-v1",
+    "sample_seed": 319
+  },
+  "relay": {
+    "fidelity_status": "canonical_css_adaptation",
+    "first_leg_iteration_limit": 80,
+    "first_leg_memory": "uniform",
+    "later_leg_iteration_limit": 60,
+    "later_leg_memory": "uniform",
+    "legs": [
+      {
+        "max_iterations": 80
+      }
+    ],
+    "numerical_profile": "cpu-float64-spa-v1",
+    "preset_name": "phase4-benchmark-baseline-v1",
+    "procedure": "canonical_internal_bp",
+    "solution_limit": 1,
+    "total_leg_limit": 1,
+    "transfer": "posterior_only"
+  },
+  "run_id": "phase4-memory-relay-hgp-benchmark-baseline",
+  "schema_version": 4,
+  "trace_plan": {
+    "label": "development_default",
+    "level": "off",
+    "max_bytes": 0,
+    "max_records": 0,
+    "relative_dir": "trace-sidecars"
+  }
+}

@@ -498,3 +498,80 @@ def test_representative_v3_manifest_and_native_settings_are_fixed():
     assert '"num_sets": 30' in native_source
     assert '"stopping_criterion": "nconv"' in native_source
     assert '"stop_nconv": 1' in native_source
+
+
+def test_rate_amendment_uses_a_distinct_matched_namespace():
+    """A harder-rate probe cannot alias retained p=.03 physical samples."""
+    runner = _phase4_runner_module()
+    base = json.loads(Path("data/manifests/phase4-memory-relay-bb144.json").read_text(encoding="utf-8"))
+    p03 = runner._benchmark_manifest(base, arm="canonical_relay_31", central_error_rate=0.03)
+    p05_canonical = runner._benchmark_manifest(base, arm="canonical_relay_31", central_error_rate=0.05)
+    p05_native = runner._benchmark_manifest(base, arm="canonical_relay_31", central_error_rate=0.05)
+
+    assert p03["error_rate"] == 0.03
+    assert p05_canonical["error_rate"] == 0.05
+    assert p03["randomness"]["physical_sample_identity"] != p05_canonical["randomness"]["physical_sample_identity"]
+    assert p05_canonical["randomness"]["physical_sample_identity"].endswith("benchmark-p0050")
+    assert p05_canonical["randomness"]["physical_sample_identity"] == p05_native["randomness"]["physical_sample_identity"]
+
+
+def test_b1_p07_bounded_probe_has_a_fixed_three_leg_work_envelope():
+    """The p=.07 adaptation caps public work before the 900-second outer boundary."""
+    runner = _phase4_runner_module()
+    base = json.loads(Path("data/manifests/phase4-memory-relay-b1.json").read_text(encoding="utf-8"))
+    bounded = runner._benchmark_manifest(
+        base, arm="canonical_relay_31", central_error_rate=0.07,
+        work_limit_override=runner._B1_P07_BOUNDED_THREE_LEG_WORK_LIMITS,
+        namespace_suffix="-bounded-three-leg-v1", sample_namespace_suffix="",
+    )
+    unbounded = runner._benchmark_manifest(base, arm="canonical_relay_31", central_error_rate=0.07)
+
+    assert bounded["relay"]["total_leg_limit"] == 31
+    assert bounded["relay"]["first_leg_iteration_limit"] == 80
+    assert bounded["relay"]["later_leg_iteration_limit"] == 60
+    assert bounded["relay"]["solution_limit"] == 1
+    assert bounded["run_id"] != unbounded["run_id"]
+    assert bounded["randomness"]["physical_sample_identity"] == unbounded["randomness"]["physical_sample_identity"]
+    assert bounded["randomness"]["physical_sample_identity"].endswith("benchmark-p0070")
+    for scope_name in ("shot", "search", "attempt"):
+        assert bounded["budgets"][scope_name]["work_limits"] == {
+            "belief_assemblies": 176400, "candidate_checks": 176400,
+            "check_to_variable_updates": 529200, "variable_to_check_updates": 529200,
+            "residual_priority_evaluations": 0, "bp_calls": 3, "relay_transfers": 2,
+            "branch_expansions": 0, "branch_prunes": 0, "fallback_calls": 0,
+            "intervention_actions": 0,
+        }
+
+
+def test_frozen_v3_caps_are_numeric_separate_and_executable():
+    """D-23 freezes measured one-worker caps before calibration can rank a setting."""
+    caps = json.loads(Path("data/manifests/phase4-pilot-caps.json").read_text(encoding="utf-8"))
+    amendment = json.loads(Path("data/evidence/phase4-pilot-design-amendment-v3.json").read_text(encoding="utf-8"))
+    allocation = caps["allocation"]
+    categories = allocation["categories"]
+
+    assert caps["status"] == "frozen_pre_calibration"
+    assert amendment["calibration_outcomes_inspected"] is False
+    assert caps["entitlement"]["worker_count"] == 1
+    assert caps["entitlement"]["concurrency_proof"]["status"] == "not_proven"
+    assert sum(item["wall_seconds_max"] for item in categories.values()) <= allocation["allocatable_wall_seconds_after_margin"]
+    assert sum(item["planned_total_wall_seconds"] for item in categories.values()) <= allocation["allocatable_wall_seconds_after_margin"]
+    assert categories["calibration"]["planned_total_wall_seconds"] <= categories["calibration"]["wall_seconds_max"]
+    assert categories["evaluation"]["planned_total_wall_seconds"] <= categories["evaluation"]["wall_seconds_max"]
+    assert caps["evaluation"]["fresh_matched_samples_per_arm"] == 448
+    assert caps["stop_rules"]["no_silent_extension"]
+    assert caps["stop_rules"]["no_rank_chasing"]
+
+    namespaces = set()
+    expected_counts = {"gross-bb-144": 54, "b1-ghp-882": 20, "hgp-gallager-3-4-seed-20260923": 14}
+    for code_id, code in caps["codes"].items():
+        assert code["coarse_candidate_count"] == expected_counts[code_id]
+        assert len(code["coarse_candidates"]) == expected_counts[code_id]
+        assert code["calibration_shots_per_configuration"] == 32
+        assert code["evaluation_shots_per_arm"] == 448
+        assert code["canonical_public_boundary_seconds"] == 900
+        assert code["refinement_candidate_count_per_preset"] == 1
+        assert len(code["per_shot_work_cap"]) == 11
+        namespaces.update((code["calibration_namespace"], code["evaluation_namespace"], code["native_namespace"], code["fixture_trace_namespace"]))
+    assert len(namespaces) == 12
+    assert caps["codes"]["b1-ghp-882"]["per_shot_work_cap"]["bp_calls"] == 3

@@ -1,0 +1,304 @@
+{
+  "artifact": {
+    "code_id": "b1-ghp-882",
+    "format_version": 1,
+    "matrix_hashes": {
+      "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
+      "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
+      "hz_raw_sha256": "e66f9af2f546591faab8c812db497ee23eba80cbdef064d30c32a71e98bce662",
+      "hz_semantic_sha256": "6d8738b4aff3cead4a44dab9d26d3d2473781c54bae7c78e20e978e3cd6288f2",
+      "lx_raw_sha256": "a710640a7c0afe275fb0394bf6388c6ba0a8a07bdad9bcabff3ac7a12fe8ca74",
+      "lx_semantic_sha256": "d5c335893b922e6205f9f7a7f08644a68d6c29c6570f82b0bdb2297fbd22de12",
+      "lz_raw_sha256": "0fa1f2fa849ac334621118b395098232d1e3b1327b0eb4750055dde0c357f6a2",
+      "lz_semantic_sha256": "f609b3f1c83119e567e7d4274d2fc43e2f406c2fd8a49407047bc91c3d833889"
+    },
+    "path": "b1-panteleev-kalachev-v3.npz",
+    "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+    "root": "data/artifacts",
+    "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+  },
+  "budgets": {
+    "attempt": {
+      "max_iterations": 80,
+      "work_limits": {
+        "belief_assemblies": 176400,
+        "bp_calls": 3,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 176400,
+        "check_to_variable_updates": 529200,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 2,
+        "residual_priority_evaluations": 0,
+        "variable_to_check_updates": 529200
+      }
+    },
+    "denominator_rule": "all_terminal_shots",
+    "max_shots": 32,
+    "search": {
+      "max_iterations": 80,
+      "work_limits": {
+        "belief_assemblies": 176400,
+        "bp_calls": 3,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 176400,
+        "check_to_variable_updates": 529200,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 2,
+        "residual_priority_evaluations": 0,
+        "variable_to_check_updates": 529200
+      }
+    },
+    "shot": {
+      "max_iterations": 80,
+      "work_limits": {
+        "belief_assemblies": 176400,
+        "bp_calls": 3,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 176400,
+        "check_to_variable_updates": 529200,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 2,
+        "residual_priority_evaluations": 0,
+        "variable_to_check_updates": 529200
+      }
+    }
+  },
+  "environment": {
+    "backend": "cpu",
+    "numpy": "2.2.6",
+    "omp_num_threads": 1,
+    "python": "3.12.2",
+    "scipy": "1.17.1"
+  },
+  "error_rate": 0.07,
+  "evidence": {
+    "assessment_status": "not_assessed",
+    "discrepancies": [
+      "The B1 ordered logical basis is project-derived.",
+      "This bounded manifest is not a source-faithful curve reproduction or decoder ranking."
+    ],
+    "fixture": "development_fixture",
+    "procedure": "Phase 4 focused factorial source_procedure, canonical_procedure, and controlled_matched Relay CSS adaptation on the source-reconstructed B1 artifact after measured inventory reconciliation. Bounded D-23 benchmark arm=canonical_relay_31; shots=32; central_error_rate=0.07.",
+    "relation": "canonical_implemented",
+    "sources": [
+      "Panteleev and Kalachev arXiv:1904.02703v3 Appendix B",
+      "Phase 4 B1 identity-resolution record",
+      "phase4-b1-identity-resolution.json#sha256:70d4f4ff508d9a852d33eeb05e1a072ff6762551fab0d8ddeba82b5c38cf840b",
+      "phase4-pilot-design.json#sha256:c64d5e8a25863545687120511746d0d452c74cdf3836f771da480a1d1cd081b7",
+      "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+    ]
+  },
+  "memory": {
+    "bindings": [
+      {
+        "advance_boundary": "source_iteration",
+        "binding_id": "relay-affine-prior-b1-v1",
+        "history_owner": "memory:relay-affine-prior-b1-v1",
+        "kind": "affine_prior",
+        "order": 0,
+        "parameters": {
+          "alpha": 0.875
+        },
+        "refresh_boundary": "leg_start",
+        "retain_history": false,
+        "source_status": "canonical_adaptation",
+        "state_lifetime": "leg",
+        "target": "prior"
+      }
+    ]
+  },
+  "numerical_profile": "cpu-float64-spa-v1",
+  "policies": {
+    "intervention": {
+      "binding_id": "intervention-identity-v1",
+      "kind": "identity",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "search"
+    },
+    "postprocessing": {
+      "binding_id": "postprocessing-identity-v1",
+      "kind": "identity",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "attempt"
+    },
+    "schedule": {
+      "binding_id": "schedule-flooding-v1",
+      "kind": "flooding",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "iteration"
+    },
+    "selection": {
+      "binding_id": "selection-stable-first-v1",
+      "kind": "stable_first",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "attempt"
+    },
+    "state_memory": {
+      "binding_id": "state-memory-stateless-v1",
+      "kind": "stateless",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "attempt"
+    },
+    "stopping": {
+      "binding_id": "stopping-syndrome-budget-v1",
+      "kind": "syndrome_or_budget",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "iteration"
+    },
+    "update": {
+      "binding_id": "update-binary-spa-v1",
+      "kind": "binary_spa",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "message"
+    }
+  },
+  "profile_plan": {
+    "cohort": "clean",
+    "enabled": true,
+    "level": "low_overhead",
+    "selected_before_outcome": true
+  },
+  "randomness": {
+    "decoder_seed_identity": "phase4-b1-relay-policy-stream-v1",
+    "physical_sample_identity": "phase4-memory-relay-b1-matched-physical-samples-v1-benchmark-p0070-bounded-three-leg-v1",
+    "sample_derivation": "sha256-manifest-shot-v1",
+    "sample_seed": 318
+  },
+  "relay": {
+    "fidelity_status": "canonical_css_adaptation",
+    "first_leg_iteration_limit": 80,
+    "first_leg_memory": "uniform",
+    "later_leg_iteration_limit": 60,
+    "later_leg_memory": "uniform",
+    "legs": [
+      {
+        "max_iterations": 80
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      },
+      {
+        "max_iterations": 60
+      }
+    ],
+    "numerical_profile": "cpu-float64-spa-v1",
+    "preset_name": "phase4-benchmark-canonical-relay-31-v1",
+    "procedure": "canonical_internal_bp",
+    "solution_limit": 1,
+    "total_leg_limit": 31,
+    "transfer": "posterior_only"
+  },
+  "run_id": "phase4-memory-relay-b1-benchmark-canonical_relay_31-bounded-three-leg-v1",
+  "schema_version": 4,
+  "trace_plan": {
+    "label": "development_default",
+    "level": "off",
+    "max_bytes": 0,
+    "max_records": 0,
+    "relative_dir": "trace-sidecars"
+  }
+}

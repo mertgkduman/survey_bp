@@ -1,0 +1,190 @@
+{
+  "assessment_status": "not_assessed",
+  "code_id": "b1-ghp-882",
+  "fixture": "development_fixture",
+  "manifest_sha256": "cfd08c9dcffb1c1fb7fe1633bc7f50ebc3403051aa17a7c3e10cf650e96ce174",
+  "max_iterations": 80,
+  "memory": {
+    "bindings": [
+      {
+        "advance_boundary": "source_iteration",
+        "binding_id": "relay-affine-prior-b1-v1",
+        "history_owner": "memory:relay-affine-prior-b1-v1",
+        "kind": "affine_prior",
+        "order": 0,
+        "parameters": {
+          "alpha": 0.875
+        },
+        "refresh_boundary": "leg_start",
+        "retain_history": false,
+        "source_status": "canonical_adaptation",
+        "state_lifetime": "leg",
+        "target": "prior"
+      }
+    ],
+    "compatibility": {
+      "admitted": true,
+      "reason": null
+    }
+  },
+  "numerical_profile": "cpu-float64-spa-v1",
+  "policies": {
+    "intervention": {
+      "binding_id": "intervention-identity-v1",
+      "kind": "identity",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "search"
+    },
+    "postprocessing": {
+      "binding_id": "postprocessing-identity-v1",
+      "kind": "identity",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "attempt"
+    },
+    "schedule": {
+      "binding_id": "schedule-flooding-v1",
+      "kind": "flooding",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "iteration"
+    },
+    "selection": {
+      "binding_id": "selection-stable-first-v1",
+      "kind": "stable_first",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "attempt"
+    },
+    "state_memory": {
+      "binding_id": "state-memory-stateless-v1",
+      "kind": "stateless",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "attempt"
+    },
+    "stopping": {
+      "binding_id": "stopping-syndrome-budget-v1",
+      "kind": "syndrome_or_budget",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "iteration"
+    },
+    "update": {
+      "binding_id": "update-binary-spa-v1",
+      "kind": "binary_spa",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "message"
+    }
+  },
+  "policy_effects": {
+    "intervention": {
+      "binding_id": "intervention-identity-v1",
+      "effect": "identity_only"
+    },
+    "postprocessing": {
+      "binding_id": "postprocessing-identity-v1",
+      "effect": "identity_only"
+    },
+    "schedule": {
+      "binding_id": "schedule-flooding-v1",
+      "effect": "active"
+    },
+    "selection": {
+      "binding_id": "selection-stable-first-v1",
+      "effect": "active"
+    },
+    "state_memory": {
+      "binding_id": "state-memory-stateless-v1",
+      "effect": "identity_only"
+    },
+    "stopping": {
+      "binding_id": "stopping-syndrome-budget-v1",
+      "effect": "active"
+    },
+    "update": {
+      "binding_id": "update-binary-spa-v1",
+      "effect": "active"
+    }
+  },
+  "policy_identity": "3fdcfd949a6376bfc5e1f06ab103eaf55a4056ea5554787d1f16720c9b2c98d0",
+  "profile_plan": {
+    "cohort": "clean",
+    "enabled": true,
+    "level": "low_overhead",
+    "selected_before_outcome": true
+  },
+  "relation": "canonical_implemented",
+  "resolved_numerical_profile": {
+    "backend": "cpu-numpy",
+    "degree_one_rule": "positive_saturation_before_syndrome_sign",
+    "dtype": "float64",
+    "exact_zero_decision": 0,
+    "llr_encoding": "natural_log_odds",
+    "normalization": "none",
+    "prior_initialization": "log((1-p)/p)",
+    "profile_id": "binary-spa-flooding-f64-v1",
+    "saturation": 25.0,
+    "syndrome_convention": "one_negates_check_to_variable",
+    "tie_break": "ascending_canonical_id"
+  },
+  "run_id": "phase4-memory-relay-b1-benchmark-canonical_relay_31-bounded-three-leg-v1",
+  "shot_budget": 32,
+  "trace_plan": {
+    "label": "development_default",
+    "level": "off",
+    "max_bytes": 0,
+    "max_records": 0,
+    "relative_dir": "trace-sidecars"
+  },
+  "work_limits": {
+    "attempt": {
+      "belief_assemblies": 176400,
+      "bp_calls": 3,
+      "branch_expansions": 0,
+      "branch_prunes": 0,
+      "candidate_checks": 176400,
+      "check_to_variable_updates": 529200,
+      "fallback_calls": 0,
+      "intervention_actions": 0,
+      "relay_transfers": 2,
+      "residual_priority_evaluations": 0,
+      "variable_to_check_updates": 529200
+    },
+    "search": {
+      "belief_assemblies": 176400,
+      "bp_calls": 3,
+      "branch_expansions": 0,
+      "branch_prunes": 0,
+      "candidate_checks": 176400,
+      "check_to_variable_updates": 529200,
+      "fallback_calls": 0,
+      "intervention_actions": 0,
+      "relay_transfers": 2,
+      "residual_priority_evaluations": 0,
+      "variable_to_check_updates": 529200
+    },
+    "shot": {
+      "belief_assemblies": 176400,
+      "bp_calls": 3,
+      "branch_expansions": 0,
+      "branch_prunes": 0,
+      "candidate_checks": 176400,
+      "check_to_variable_updates": 529200,
+      "fallback_calls": 0,
+      "intervention_actions": 0,
+      "relay_transfers": 2,
+      "residual_priority_evaluations": 0,
+      "variable_to_check_updates": 529200
+    }
+  }
+}
