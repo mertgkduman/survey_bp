@@ -132,7 +132,7 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
         "manifest_sha256": manifest_digest(manifest),
         "numerical_profile": manifest.numerical_profile,
         "resolved_numerical_profile": (MIN_SUM_CPU_F64 if manifest.numerical_profile == "cpu-float64-min-sum-v1" else REFERENCE_CPU_F64).as_evidence(),
-        "policies": manifest.policies.model_dump(mode="json"),
+        "policies": manifest.policies.model_dump(mode="json", exclude_none=True),
         "policy_identity": composition.semantic_identity,
         "policy_effects": _canonical_policy_effects(manifest, resolved.code),
         "shot_budget": manifest.budgets.max_shots,
@@ -155,16 +155,42 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
     return report
 
 
+def _without_none(value: object) -> object:
+    """Canonical V4 kernel contracts reject fields that the public V3 model leaves null."""
+    if isinstance(value, dict):
+        return {key: _without_none(item) for key, item in value.items() if item is not None}
+    if isinstance(value, list):
+        return [_without_none(item) for item in value]
+    return value
+
+
 def _canonical_kernel_manifest(manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4) -> dict[str, object]:
     """Project-owned kernel receives only its compact execution policy contract."""
-    return {
+    compact: dict[str, object] = {
         "schema_version": 3 if isinstance(manifest, CanonicalExperimentV4) else manifest.schema_version,
         "run_id": manifest.run_id,
         "numerical_profile": manifest.numerical_profile,
         "max_iterations": manifest.budgets.attempt.max_iterations,
         "error_rate": manifest.error_rate,
-        "policies": manifest.policies.model_dump(mode="json"),
+        "policies": _without_none(manifest.policies.model_dump(mode="json")),
     }
+    if isinstance(manifest, CanonicalExperimentV4):
+        compact.update({
+            "schema_version": 4,
+            "memory_bindings": [
+                {
+                    "binding_id": binding.binding_id,
+                    "kind": binding.kind,
+                    "target": binding.target,
+                    "order": binding.order,
+                    "alpha": binding.parameters["alpha"],
+                    "state_lifetime": binding.state_lifetime,
+                }
+                for binding in manifest.memory.bindings
+            ],
+            "relay": manifest.relay.model_dump(mode="json"),
+        })
+    return compact
 
 
 def _canonical_policy_effects(manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4, code) -> dict[str, dict[str, Any]]:

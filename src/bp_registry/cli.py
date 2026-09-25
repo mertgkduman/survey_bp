@@ -17,7 +17,7 @@ import numpy as np
 from . import evaluator, evidence, sampling
 from .ledger import read_canonical_events, reconcile, summarize
 from .manifests import CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, ManifestV1, manifest_digest, preflight, qualify_cluster_artifact
-from .canonical.verification import validate_canonical_shot
+from .canonical.verification import validate_canonical_shot, validate_phase4_shot
 from .runner import (
     canonical_public_shot_context, canonical_terminal_rows, preflight_canonical,
     preflight_pilot, run_canonical_one, run_one,
@@ -232,7 +232,10 @@ def _canonical_result_from_terminal_events(manifest_path: Path, output: Path, ro
     ledger_path = output / "events.jsonl"
     events = read_canonical_events(ledger_path)
     for row in rows:
-        validate_canonical_shot(events, canonical_public_shot_context(manifest_path, shot_id=row["shot_id"]))
+        if isinstance(manifest, CanonicalExperimentV4):
+            validate_phase4_shot(ledger_path, run_id=manifest.run_id, shot_id=row["shot_id"], trace_root=output)
+        else:
+            validate_canonical_shot(events, canonical_public_shot_context(manifest_path, shot_id=row["shot_id"]))
     return {
         "schema_version": 2,
         "title": f"{report['run_id']} — {manifest.evidence.relation} {manifest.evidence.fixture} {manifest.evidence.assessment_status}",
@@ -286,6 +289,8 @@ def _verify_canonical_run(output: Path, result: dict[str, Any]) -> dict[str, Any
         raise ValueError("canonical result has an invalid transparent evidence label")
     manifest_path = Path(result["manifest_path"])
     report = preflight_canonical(manifest_path)
+    manifest = preflight(manifest_path).manifest
+    assert isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4))
     ledger_path = output / "events.jsonl"
     if result.get("ledger_sha256") != sha256(ledger_path.read_bytes()).hexdigest():
         raise ValueError("canonical result ledger hash does not match durable evidence")
@@ -294,7 +299,10 @@ def _verify_canonical_run(output: Path, result: dict[str, Any]) -> dict[str, Any
         raise ValueError("canonical terminal rows differ from the manifest shot budget")
     events = read_canonical_events(ledger_path)
     for row in rows:
-        validate_canonical_shot(events, canonical_public_shot_context(manifest_path, shot_id=row["shot_id"]))
+        if isinstance(manifest, CanonicalExperimentV4):
+            validate_phase4_shot(ledger_path, run_id=manifest.run_id, shot_id=row["shot_id"], trace_root=output)
+        else:
+            validate_canonical_shot(events, canonical_public_shot_context(manifest_path, shot_id=row["shot_id"]))
     expected = _canonical_result_from_terminal_events(manifest_path, output, rows)
     if result != expected:
         raise ValueError("canonical result JSON does not equal terminal structural evidence")
@@ -480,6 +488,9 @@ def build_parser() -> argparse.ArgumentParser:
     canonical_command = commands.add_parser("canonical")
     canonical_command.add_argument("manifest", type=Path)
     canonical_command.add_argument("--output", type=Path, required=True)
+    observation_command = commands.add_parser("canonical-observation")
+    observation_command.add_argument("manifest", type=Path)
+    observation_command.add_argument("--shot", type=int, default=0)
     reconcile_command = commands.add_parser("reconcile")
     reconcile_command.add_argument("ledger", type=Path)
     verify_command = commands.add_parser("verify-run")
@@ -501,6 +512,19 @@ def main(argv: list[str] | None = None) -> None:
         _dump(run_pilot(args.manifest, args.output))
     elif args.command == "canonical":
         _dump(run_canonical(args.manifest, args.output))
+    elif args.command == "canonical-observation":
+        context = canonical_public_shot_context(args.manifest, shot_id=args.shot)
+        _dump({
+            "run_id": context.run_id,
+            "shot_id": context.shot_id,
+            "sample_identity": context.sample_seed_identity,
+            "sample_namespace": preflight(args.manifest).manifest.randomness.physical_sample_identity,
+            "check_matrix": context.code.hz.tolist(),
+            "syndrome": list(context.syndrome),
+            "error_priors": [context.error_rate] * int(context.code.hz.shape[1]),
+            "decoder_seed": args.shot,
+            "hidden_truth": "not_exposed",
+        })
     elif args.command == "reconcile":
         _dump(_reconcile_report(args.ledger))
     elif args.command == "verify-run":

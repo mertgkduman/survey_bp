@@ -21,7 +21,7 @@ from .canonical.cluster_schedule import ClusterArtifactQualification, ClusterArt
 from .canonical.compatibility import validate_memory_compatibility
 from .canonical.contracts import (
     CanonicalCompositionSpec, CanonicalCompositionSpecV3, CanonicalManifestV2,
-    MemoryCompositionSpec, parse_canonical_manifest,
+    MemoryCompositionSpec, RelaySpecV4, parse_canonical_manifest,
 )
 from .css import CssCode, fixture_code
 
@@ -390,6 +390,7 @@ class CanonicalExperimentV4(CanonicalExperimentV3):
 
     schema_version: Literal[4]
     memory: MemoryCompositionSpec
+    relay: RelaySpecV4
 
 
 ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4

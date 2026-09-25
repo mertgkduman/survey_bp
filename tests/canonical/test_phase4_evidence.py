@@ -270,6 +270,13 @@ def test_runner_tracer_uses_public_canonical_boundaries_and_retains_native_unava
             return {"output": str(output), "final_row_count": 1}
         if command == "verify-run":
             return {"output": arguments[1], "final_row_count": 1, "verified_at": "test"}
+        if command == "canonical-observation":
+            return {
+                "sample_identity": "actual-sample",
+                "sample_namespace": "phase4-memory-relay-bb144-matched-physical-samples-v1",
+                "check_matrix": [[1, 0], [0, 1]], "syndrome": [0, 1],
+                "error_priors": [0.03, 0.03], "decoder_seed": 0, "hidden_truth": "not_exposed",
+            }
         raise AssertionError(arguments)
 
     monkeypatch.setattr(runner, "_json_command", public_boundary)
@@ -284,9 +291,9 @@ def test_runner_tracer_uses_public_canonical_boundaries_and_retains_native_unava
     )
 
     assert [arm["arm"] for arm in report["arms"]] == ["source_procedure", "canonical_default", "native_v022"]
-    assert all(arm["identity"]["sample_identity"] == report["sample_identity"] for arm in report["arms"])
+    assert all(arm["identity"]["sample_identity"] == report["sample_namespace"] for arm in report["arms"])
     assert report["arms"][-1]["status"] == "native_unavailable"
-    assert {call[0] for call in calls} == {"preflight", "canonical", "verify-run"}
+    assert {call[0] for call in calls} == {"preflight", "canonical", "verify-run", "canonical-observation"}
     assert not hasattr(runner, "run_canonical")
 
 
@@ -295,19 +302,42 @@ def test_stage_reuse_requires_full_identity_and_preserves_mismatched_or_interrup
     runner = _phase4_runner_module()
     monkeypatch.setattr(runner, "_json_command", lambda _root, *arguments: (
         {"run_id": "stub", "policy_identity": "policy", "shot_budget": 1}
-        if arguments[0] == "preflight" else {"output": arguments[-1], "final_row_count": 1, "verified_at": "test"}
+        if arguments[0] == "preflight" else (
+            {"sample_identity": "actual-sample", "sample_namespace": "phase4-memory-relay-bb144-matched-physical-samples-v1", "check_matrix": [[1]], "syndrome": [0], "error_priors": [0.03], "decoder_seed": 0, "hidden_truth": "not_exposed"}
+            if arguments[0] == "canonical-observation" else {"output": arguments[-1], "final_row_count": 1, "verified_at": "test"}
+        )
     ))
-    monkeypatch.setattr(runner, "_run_native", lambda **_kwargs: {"status": "native_unavailable", "reason": "test"})
+    monkeypatch.setattr(runner, "_run_native", lambda **_kwargs: {"status": "completed", "candidate": [0], "success": True})
     manifest = Path("data/manifests/phase4-memory-relay-bb144.json")
 
     first = runner.run_stage(repository_root=Path("."), manifest_path=manifest, stage="benchmark", output_root=tmp_path)
     reused = runner.run_stage(repository_root=Path("."), manifest_path=manifest, stage="benchmark", output_root=tmp_path)
     stage_file = Path(first["stage_record"])
     stale = json.loads(stage_file.read_text(encoding="utf-8"))
-    stale["identity"]["environment_identity"]["python"] = "mismatch"
+    stale["identity"]["arms"][0]["environment_identity"]["runner_python"] = "mismatch"
     stage_file.write_text(json.dumps(stale), encoding="utf-8")
     refreshed = runner.run_stage(repository_root=Path("."), manifest_path=manifest, stage="benchmark", output_root=tmp_path)
 
     assert reused["reused"] is True
     assert refreshed["reused"] is False
     assert any(path.name.startswith("mismatch-") for path in stage_file.parent.iterdir())
+
+
+def test_public_verify_executes_phase4_relay_through_cli(tmp_path):
+    """The public V4 path retains relay controls through preflight, run, and verification."""
+    import os
+    import subprocess
+    import sys
+
+    manifest = Path("data/manifests/phase4-memory-relay-bb144.json")
+    output = tmp_path / "relay-public"
+    environment = {**os.environ, "OMP_NUM_THREADS": "1", "PYTHONPATH": str(Path("src").resolve())}
+    for arguments in (
+        ["preflight", str(manifest)],
+        ["canonical", str(manifest), "--output", str(output)],
+        ["verify-run", str(output)],
+    ):
+        completed = subprocess.run([sys.executable, "-m", "bp_registry.cli", *arguments], text=True, capture_output=True, env=environment)
+        assert completed.returncode == 0, completed.stderr or completed.stdout
+    events = (output / "events.jsonl").read_text(encoding="utf-8")
+    assert '"relay_transfer"' in events
