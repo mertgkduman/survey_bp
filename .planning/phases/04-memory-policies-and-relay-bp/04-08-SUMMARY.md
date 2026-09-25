@@ -25,11 +25,11 @@ metrics:
   completed: "2026-09-24"
 status: complete
 plan_head_before: 2ee1a05d15dd681472f42fec2e4abc5f69a471f5
-commits: 3
+commits: 5
 actuals:
-  tokens: 10000
+  tokens: 26160
   tasks: 2
-  commits: 3
+  commits: 5
 ---
 
 # Phase 04 Plan 08: Pinned Relay v0.2.2 Native Qualification Summary
@@ -40,14 +40,15 @@ Built an isolated, exact-author Relay v0.2.2 qualification envelope with a behav
 
 - Added `RelayV022Adapter`, which accepts only a binary check matrix, syndrome, error priors, approved Relay settings, seed, and an explicit `f32` or `f64` profile. It rejects hidden truth and cannot import the installed fork accidentally.
 - Added an exact-pin qualification script and source record. The record binds `trmue/relay` tag `v0.2.2` to commit `14cb31a18f9b9d7d099791b793e35b8a2951f8f3` and tree `5f6f112429e62112ba71fbff45f4e16247725fbc`, while preserving distinct moving-main and installed-fork identities.
-- Added a git-applicable observer patch based on the exact commit. It is comment-only, then tested by rebuilding all native test targets and executing the deterministic Relay repetition fixture before and after the patch.
-- Added eight differential contracts for source identity, decoder-visible translation, explicit precision, patch identity, terminal fields, and unavailable facts.
+- Added a git-applicable observer patch based on the exact commit. It is comment-only, then tested by rebuilding all native test targets and executing deterministic Relay repetition and bounded 72-by-144 BB-144 CSS fixtures before and after the patch.
+- Added nine differential contracts for source identity, decoder-visible translation, explicit precision, patch identity, terminal fields, bounded BB-144 evidence, and unavailable facts.
 
 ## Verification
 
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_relay_differential.py -k 'source_identity or translation or unmodified or numerical_profile'` — 5 passed.
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_relay_differential.py -k 'observer or equivalence or bb144 or unavailable'` — 3 passed.
 - `scripts/qualify_relay_v022.py` — all workspace test targets built; the bounded `min_sum_decode_repetition_code` Relay fixture passed unmodified and patched.
+- The exact-author Python bindings ran the selected CSS gross-BB-144 72-by-144 fixture with `pre_iter=1`, `num_sets=1`, `set_max_iter=1`, seed 19, and a 60-second timeout. Candidate and posterior digests, success, and aggregate iterations agree field by field; native score and log stream are explicitly unavailable.
 
 ## Deviations from Plan
 
@@ -67,7 +68,7 @@ Built an isolated, exact-author Relay v0.2.2 qualification envelope with a behav
 
 ## Known Limits
 
-- The full author `decode_144_12_12` test remains inconclusive after its 720-second bound; no BB-144 result is claimed.
+- The full author `decode_144_12_12` test remains inconclusive after its 720-second bound; this does not invalidate the separately bounded 72-by-144 terminal comparison.
 - The comment-only observer cannot expose per-leg gamma, edge work, or resource metrics without changing decoder behavior. The source record retains all three as unavailable.
 
 ## Self-Check: PASSED
