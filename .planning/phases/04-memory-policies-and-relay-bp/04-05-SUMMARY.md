@@ -58,7 +58,14 @@ Canonical Relay now exposes immutable source-procedure and canonical-default CSS
 
 ## Deviations from Plan
 
-None - plan executed exactly as written.
+### Auto-fixed Issues
+
+**1. [Rule 1 - Bug] Allowed controlled source-procedure configurations through the V4 manifest validator**
+- **Found during:** Final preset-to-manifest smoke check
+- **Issue:** `RelayPreset.source_procedure().ablation(...).as_spec()` carried the required controlled-adaptation label but `RelaySpecV4` accepted only the immutable source label.
+- **Fix:** Allow the controlled-adaptation fidelity status for source-procedure configurations and assert that an ablation serializes into the strict V4 spec.
+- **Files modified:** `src/bp_registry/canonical/contracts.py`, `tests/canonical/test_relay.py`
+- **Commit:** `4dd67a8`
 
 ## Known Stubs
 
@@ -66,4 +73,4 @@ None.
 
 ## Self-Check: PASSED
 
-All four declared implementation/test files and all four TDD/task commits are present. The empty runtime maps reported by the broad stub scan are established execution state, not Relay output placeholders.
+All four declared implementation/test files, four TDD/task commits, and the inline Rule 1 fix commit are present. The empty runtime maps reported by the broad stub scan are established execution state, not Relay output placeholders.
