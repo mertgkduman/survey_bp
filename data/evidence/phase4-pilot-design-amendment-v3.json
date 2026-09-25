@@ -1,0 +1,155 @@
+{
+  "b1_bounded_profile": {
+    "path": "data/results/phase4-memory-relay/benchmark-v3-b1-p07-bounded-three-leg.json",
+    "qualification": "three-leg-equivalent first80+two later60 sweep envelope; not an unbounded 31-leg B1 runtime claim.",
+    "same_physical_sample_identity_as_unbounded_p007": true,
+    "sha256": "3a97d0570f3f6d3131c277f9731a986ccf2ff7864cdfdd6bad1a030720707fbc",
+    "work_limits": {
+      "belief_assemblies": 176400,
+      "bp_calls": 3,
+      "branch_expansions": 0,
+      "branch_prunes": 0,
+      "candidate_checks": 176400,
+      "check_to_variable_updates": 529200,
+      "fallback_calls": 0,
+      "intervention_actions": 0,
+      "relay_transfers": 2,
+      "residual_priority_evaluations": 0,
+      "variable_to_check_updates": 529200
+    }
+  },
+  "calibration_outcomes_inspected": false,
+  "freeze_time_utc": "2026-09-25T16:04:00Z",
+  "preserved_baseline_scans": {
+    "b1_p07_bounded": {
+      "benchmark_digest": "3deb45e6190d3cb232be350166b72fb6ab787fdc40f3ca0a8ac92f6d632795ea",
+      "path": "data/results/phase4-memory-relay/benchmark-v3-b1-p07-bounded-three-leg.json",
+      "sha256": "3a97d0570f3f6d3131c277f9731a986ccf2ff7864cdfdd6bad1a030720707fbc"
+    },
+    "bb_b1_p05_scan": {
+      "benchmark_digest": "e15dcf7e91008102c3a79a1d33c4cd7042951f9074c6734f0e8c725ee4d310ad",
+      "path": "data/results/phase4-memory-relay/benchmark-v3-p05-bb-b1-amendment.json",
+      "sha256": "9ec200127e2832a46d59b4f7fcc0b41a66a245287de2015412d2465ccc16f1e5"
+    },
+    "bb_b1_p07_scan": {
+      "benchmark_digest": "00760b0f5691dbce73d64d2e0fe8ee93f67d72490157b7cf639d1bca0348a627",
+      "path": "data/results/phase4-memory-relay/benchmark-v3-p07-bb-b1-amendment.json",
+      "sha256": "37b53b2e8ce42a4133db721a9cc98c7f24381cca275c10740c4700cc0b9757ad"
+    },
+    "representative_p03": {
+      "benchmark_digest": "98fe797587a4876405906fa682a2e312a639477f15cf3ab3c8b9be8039b5e627",
+      "path": "data/results/phase4-memory-relay/benchmark-v3-representative.json",
+      "sha256": "17555feee6f4eff6806b0de26525f41901edcc3ffddffe03f8ce155f0366d91b"
+    }
+  },
+  "prior_design_path": "data/evidence/phase4-pilot-design.json",
+  "prior_design_sha256": "b2475581b97b745c8a444c5f1167613a5ca275d72bfd3ce7ef7bde302a52f08d",
+  "purpose": "Versioned pre-calibration amendment for representative Phase 4 Relay memory tuning.",
+  "schema_version": 3,
+  "scope_change": {
+    "amended_calibration_shots_per_configuration": 32,
+    "amended_evaluation_shots_per_arm": 448,
+    "error_rate_and_relay_control_change": {
+      "amended_calibration": {
+        "b1-ghp-882_error_rate": 0.07,
+        "controls": {
+          "first_leg_iteration_limit": 80,
+          "later_leg_iteration_limit": 60,
+          "solution_limit": 1,
+          "total_leg_limit": 31
+        },
+        "gross-bb-144_error_rate": 0.07,
+        "hgp-gallager-3-4-seed-20260923_error_rate": 0.03
+      },
+      "original_design": {
+        "canonical_procedure_controls": {
+          "first_leg_iteration_limit": 4,
+          "later_leg_iteration_limit": 4,
+          "total_leg_limit": 2
+        },
+        "noise_grid_rates": [
+          0.01,
+          0.03,
+          0.05
+        ],
+        "source_procedure_controls": {
+          "first_leg_iteration_limit": 80,
+          "later_leg_iteration_limit": 60,
+          "total_leg_limit": 301
+        }
+      },
+      "preset_qualification": "Both source-named and canonical presets are controlled CSS calibration adaptations under the same 31/80/60/one-solution controls. The source-named calibration preset is not source-faithful to the original 301-leg design; source-faithful controls remain separately identified outside this finite tuning campaign.",
+      "reason": "Retained baseline scans found no later-leg activation at p=.03 for BB/B1 and only sparse activation at p=.05. BB p=.07 has repeated later-leg activation; B1 p=.07 is admitted only through the separately benchmarked bounded three-leg-equivalent profile. HGP p=.03 already exercises later legs through leg 31."
+    },
+    "reason": "At one worker, the measured HGP p=.03 31-leg p95 is 403.165s and B1 p=.07 must use a measured bounded profile. The minimum proposed 128 calibration shots would fund too few configurations for broad three-code tuning; the original 1024-shot evaluation minimum exceeds the separate evaluation allocation. The fixed adapted counts preserve finite fresh three-code evidence but carry explicit Wilson precision limitations.",
+    "research_calibration_menu": [
+      128,
+      256,
+      512,
+      1024
+    ],
+    "research_evaluation_menu": [
+      1024,
+      2048,
+      4096,
+      8192
+    ]
+  },
+  "status": "frozen_before_calibration",
+  "trigger": {
+    "b1-ghp-882": {
+      "decision": "select p=.07 only with the separately measured three-leg-equivalent internal work cap; unbounded p=.07 remains rate-scan-only incomplete evidence.",
+      "p003_relay_distinct_legs": {
+        "1": 32
+      },
+      "p005_relay_distinct_legs": {
+        "1": 30,
+        "2": 1,
+        "3": 1
+      },
+      "p007_unbounded": {
+        "completed": 28,
+        "completed_distinct_legs": {
+          "1": 24,
+          "2": 3,
+          "3": 1
+        },
+        "external_timeout_ids": [
+          0,
+          7,
+          19,
+          20
+        ]
+      }
+    },
+    "gross-bb-144": {
+      "decision": "select p=.07 pilot point because it is the first retained scan with repeated later-leg activation.",
+      "p003_relay_distinct_legs": {
+        "1": 32
+      },
+      "p005_relay_distinct_legs": {
+        "1": 31,
+        "2": 1
+      },
+      "p007_relay_distinct_legs": {
+        "1": 24,
+        "2": 2,
+        "3": 3,
+        "4": 1,
+        "5": 2
+      }
+    },
+    "hgp-gallager-3-4-seed-20260923": {
+      "decision": "retain p=.03 because the 32-shot scan exercised later legs through all 31 declared legs.",
+      "p003_relay_distinct_legs": {
+        "1": 13,
+        "12": 1,
+        "13": 1,
+        "2": 2,
+        "21": 1,
+        "31": 13,
+        "4": 1
+      }
+    }
+  }
+}

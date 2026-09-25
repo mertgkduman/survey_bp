@@ -1,179 +1,1164 @@
 {
   "allocation": {
-    "allocatable_wall_seconds_after_margin": 2005952,
-    "authorized_cpus": 2,
-    "authorized_memory": "8G",
-    "basis": "remaining_30_day_job_window_after_benchmark_and_10_percent_safety_margin",
-    "calibration_percent_max": 35,
-    "calibration_projected_wall_seconds_total": 668812,
-    "calibration_refinement_projected_wall_seconds": 20638,
-    "calibration_total_with_refinement_seconds": 689450,
-    "calibration_unallocated_seconds": 33271,
-    "calibration_wall_seconds_max": 702083,
-    "concurrency_proof": "No two-worker memory measurement exists; use one OMP_NUM_THREADS=1 worker.",
-    "evaluation_percent_max": 45,
-    "evaluation_projected_wall_seconds": 16479,
-    "evaluation_unallocated_seconds": 886199,
-    "evaluation_wall_seconds_max": 902678,
-    "fixture_percent_max": 10,
-    "fixture_wall_seconds_max": 200595,
-    "freeze_time_utc": "2026-09-25T03:??:??-04:00",
-    "job_end_time_utc": "2026-10-20T03:50:10-04:00",
-    "live_observed_runtime": "4-04:52:44",
-    "native_percent_max": 10,
-    "native_wall_seconds_max": 200595,
-    "omp_threads_per_worker": 1,
-    "remaining_wall_seconds_at_freeze": 2228836,
-    "remaining_wall_seconds_budget": "derived_live_at_freeze; no extension",
-    "safety_margin_fraction": 0.1,
-    "safety_margin_seconds": 222884,
-    "sum_category_wall_seconds_max": 2005951,
-    "sum_percent_max": 100,
-    "worker_count_prespecified": 1
+    "allocatable_wall_seconds_after_margin": 1982133,
+    "allocation_basis": "remaining job wall at freeze after 10 percent safety margin; one worker only",
+    "categories": {
+      "calibration": {
+        "fraction_max": 0.35,
+        "planned_coarse_wall_seconds": 641810,
+        "planned_refinement_wall_seconds": 38284,
+        "planned_total_wall_seconds": 680093,
+        "unallocated_nonreassignable_seconds": 13653,
+        "wall_seconds_max": 693746
+      },
+      "evaluation": {
+        "fraction_max": 0.45,
+        "planned_total_wall_seconds": 803954,
+        "unallocated_nonreassignable_seconds": 88005,
+        "wall_seconds_max": 891959
+      },
+      "fixture_trace": {
+        "factorial_projected_wall_seconds": 175865,
+        "fraction_max": 0.1,
+        "planned_total_wall_seconds": 179465,
+        "trace_projected_wall_seconds": 3600,
+        "unallocated_nonreassignable_seconds": 18748,
+        "wall_seconds_max": 198213
+      },
+      "native": {
+        "fraction_max": 0.1,
+        "planned_setup_reserve_seconds": 3600,
+        "planned_shot_wall_seconds": 11430,
+        "planned_total_wall_seconds": 15030,
+        "unallocated_nonreassignable_seconds": 183183,
+        "wall_seconds_max": 198213
+      }
+    },
+    "fraction_sum": 1.0,
+    "rounding_unallocated_seconds": 2,
+    "sum_category_wall_seconds_max": 1982131
   },
-  "benchmark_digest": "4853133d368b7a5debc8d8b998e81683ecffe05979d6c7658c0676d2d810194b",
-  "benchmark_path": "data/results/phase4-memory-relay/benchmark-v2.json",
-  "codes": {
-    "b1-ghp-882": {
-      "benchmark_public_command_p95_seconds": 58.026026339968666,
-      "benchmark_work_leg_count": 31,
-      "calibration_namespace": "phase4-memory-relay-b1-matched-physical-samples-v1-calibration-v2",
-      "calibration_projected_wall_seconds": 356512,
-      "calibration_shot_menu": [
-        128,
-        256,
-        512,
-        1024
-      ],
-      "coarse_configurations_max": 24,
-      "coarse_selection": "first N canonical candidate IDs ranked by SHA256(code_id + candidate_id + \"coarse-v2\"), before calibration; candidate_id encodes gamma/center/width",
-      "evaluation_configurations_max": 2,
-      "evaluation_namespace": "phase4-memory-relay-b1-matched-physical-samples-v1-evaluation-v2",
-      "evaluation_shot_menu": [
-        1024,
-        2048,
-        4096,
-        8192
-      ],
-      "evaluation_status": "finite_adapted_precision_limited",
-      "fixed_relay_cost_model": {
-        "leg_iteration_cap": 1,
-        "legs": 31,
-        "solution_cap_per_leg": 1
-      },
-      "fixture_namespace": "phase4-memory-relay-b1-matched-physical-samples-v1-fixture-v2",
-      "max_total_work_units_per_shot": 273421,
-      "native_namespace": "phase4-memory-relay-b1-matched-physical-samples-v1-native-v2",
-      "per_shot_public_command_wall_cap_seconds": 72.533,
-      "refinement_configurations_max": 1,
-      "refinement_selection": "exactly one: lowest SHA256(code_id + calibration_namespace + \"refinement-v2\") ranked eligible candidate; no outcome-dependent replacement",
-      "selected_calibration_shots_per_configuration": 128,
-      "selected_evaluation_shots_per_configuration": 128,
-      "trace_event_cap": 10000
+  "benchmark_evidence": {
+    "b1_p07_bounded": {
+      "benchmark_digest": "3deb45e6190d3cb232be350166b72fb6ab787fdc40f3ca0a8ac92f6d632795ea",
+      "path": "data/results/phase4-memory-relay/benchmark-v3-b1-p07-bounded-three-leg.json",
+      "sha256": "3a97d0570f3f6d3131c277f9731a986ccf2ff7864cdfdd6bad1a030720707fbc"
     },
-    "gross-bb-144": {
-      "benchmark_public_command_p95_seconds": 9.847471404122189,
-      "benchmark_work_leg_count": 31,
-      "calibration_namespace": "phase4-memory-relay-bb144-matched-physical-samples-v1-calibration-v2",
-      "calibration_projected_wall_seconds": 136131,
-      "calibration_shot_menu": [
-        128,
-        256,
-        512,
-        1024
-      ],
-      "coarse_configurations_max": 54,
-      "coarse_selection": "first N canonical candidate IDs ranked by SHA256(code_id + candidate_id + \"coarse-v2\"), before calibration; candidate_id encodes gamma/center/width",
-      "evaluation_configurations_max": 2,
-      "evaluation_namespace": "phase4-memory-relay-bb144-matched-physical-samples-v1-evaluation-v2",
-      "evaluation_shot_menu": [
-        1024,
-        2048,
-        4096,
-        8192
-      ],
-      "evaluation_status": "finite_adapted_precision_limited",
-      "fixed_relay_cost_model": {
-        "leg_iteration_cap": 1,
-        "legs": 31,
-        "solution_cap_per_leg": 1
-      },
-      "fixture_namespace": "phase4-memory-relay-bb144-matched-physical-samples-v1-fixture-v2",
-      "max_total_work_units_per_shot": 44641,
-      "native_namespace": "phase4-memory-relay-bb144-matched-physical-samples-v1-native-v2",
-      "per_shot_public_command_wall_cap_seconds": 12.309,
-      "refinement_configurations_max": 1,
-      "refinement_selection": "exactly one: lowest SHA256(code_id + calibration_namespace + \"refinement-v2\") ranked eligible candidate; no outcome-dependent replacement",
-      "selected_calibration_shots_per_configuration": 128,
-      "selected_evaluation_shots_per_configuration": 128,
-      "trace_event_cap": 10000
+    "bb_b1_p05_scan": {
+      "benchmark_digest": "e15dcf7e91008102c3a79a1d33c4cd7042951f9074c6734f0e8c725ee4d310ad",
+      "path": "data/results/phase4-memory-relay/benchmark-v3-p05-bb-b1-amendment.json",
+      "sha256": "9ec200127e2832a46d59b4f7fcc0b41a66a245287de2015412d2465ccc16f1e5"
     },
-    "hgp-gallager-3-4-seed-20260923": {
-      "benchmark_public_command_p95_seconds": 12.743712756084278,
-      "benchmark_work_leg_count": 31,
-      "calibration_namespace": "phase4-memory-relay-hgp-matched-physical-samples-v1-calibration-v2",
-      "calibration_projected_wall_seconds": 176169,
-      "calibration_shot_menu": [
-        128,
-        256,
-        512,
-        1024
-      ],
-      "coarse_configurations_max": 54,
-      "coarse_selection": "first N canonical candidate IDs ranked by SHA256(code_id + candidate_id + \"coarse-v2\"), before calibration; candidate_id encodes gamma/center/width",
-      "evaluation_configurations_max": 2,
-      "evaluation_namespace": "phase4-memory-relay-hgp-matched-physical-samples-v1-evaluation-v2",
-      "evaluation_shot_menu": [
-        1024,
-        2048,
-        4096,
-        8192
-      ],
-      "evaluation_status": "finite_adapted_precision_limited",
-      "fixed_relay_cost_model": {
-        "leg_iteration_cap": 1,
-        "legs": 31,
-        "solution_cap_per_leg": 1
-      },
-      "fixture_namespace": "phase4-memory-relay-hgp-matched-physical-samples-v1-fixture-v2",
-      "max_total_work_units_per_shot": 76028,
-      "native_namespace": "phase4-memory-relay-hgp-matched-physical-samples-v1-native-v2",
-      "per_shot_public_command_wall_cap_seconds": 15.93,
-      "refinement_configurations_max": 1,
-      "refinement_selection": "exactly one: lowest SHA256(code_id + calibration_namespace + \"refinement-v2\") ranked eligible candidate; no outcome-dependent replacement",
-      "selected_calibration_shots_per_configuration": 128,
-      "selected_evaluation_shots_per_configuration": 128,
-      "trace_event_cap": 10000
+    "bb_b1_p07_scan": {
+      "benchmark_digest": "00760b0f5691dbce73d64d2e0fe8ee93f67d72490157b7cf639d1bca0348a627",
+      "path": "data/results/phase4-memory-relay/benchmark-v3-p07-bb-b1-amendment.json",
+      "sha256": "37b53b2e8ce42a4133db721a9cc98c7f24381cca275c10740c4700cc0b9757ad"
+    },
+    "representative_p03": {
+      "benchmark_digest": "98fe797587a4876405906fa682a2e312a639477f15cf3ab3c8b9be8039b5e627",
+      "path": "data/results/phase4-memory-relay/benchmark-v3-representative.json",
+      "sha256": "17555feee6f4eff6806b0de26525f41901edcc3ffddffe03f8ce155f0366d91b"
     }
   },
-  "entitlement_digest": "50bf1b5c23c5e5a376bd135eebb27fbad833cb75fc9fddb015d54e2200cd3a89",
-  "reason": "v2 used one iteration per leg and is not representative of D-22 80/60 memory tuning",
+  "caps_digest": "9f8ddc31572d6dfe1a367d98ed1b51ef3cf50e77028b58f5f90de33259a5bc76",
+  "codes": {
+    "b1-ghp-882": {
+      "calibration_namespace": "phase4-memory-relay-b1-matched-physical-samples-v1-calibration-v3",
+      "calibration_shots_per_configuration": 32,
+      "canonical_public_boundary_seconds": 900,
+      "central_error_rate": 0.07,
+      "coarse_candidate_count": 20,
+      "coarse_candidates": [
+        {
+          "gamma0": 0.05,
+          "id": "g0p05-c0p75-w0p5",
+          "later_center": 0.75,
+          "later_high": 1.0,
+          "later_low": 0.5,
+          "later_width": 0.5,
+          "selection_rank_sha256": "056de112e9bfd1eca88b5376d5e608ae5ab385108868552db3424830bbab973d"
+        },
+        {
+          "gamma0": 0.75,
+          "id": "g0p75-c0p25-w2",
+          "later_center": 0.25,
+          "later_high": 1.25,
+          "later_low": -0.75,
+          "later_width": 2.0,
+          "selection_rank_sha256": "0598489e4a4602f691512245ab8408e4daaf5308d70299968976a095e8e68996"
+        },
+        {
+          "gamma0": 0,
+          "id": "g0-cm0p25-w2",
+          "later_center": -0.25,
+          "later_high": 0.75,
+          "later_low": -1.25,
+          "later_width": 2.0,
+          "selection_rank_sha256": "0de0d994b11431cbb4017c4c5862134bdcc8f981963b79ea9cbd9b97ce33975f"
+        },
+        {
+          "gamma0": 0,
+          "id": "g0-c0p25-w1p25",
+          "later_center": 0.25,
+          "later_high": 0.875,
+          "later_low": -0.375,
+          "later_width": 1.25,
+          "selection_rank_sha256": "0f96fb90ae5dc90923d13f5ade855d353d5ee90859d1ee132dcb4bd3664370a8"
+        },
+        {
+          "gamma0": 0,
+          "id": "g0-c0p75-w1p25",
+          "later_center": 0.75,
+          "later_high": 1.375,
+          "later_low": 0.125,
+          "later_width": 1.25,
+          "selection_rank_sha256": "178c90c690241b74fbcbd214aadd3a97a90fc7907cb185e868593c26e7fa20e7"
+        },
+        {
+          "gamma0": 0.25,
+          "id": "g0p25-cm0p25-w2",
+          "later_center": -0.25,
+          "later_high": 0.75,
+          "later_low": -1.25,
+          "later_width": 2.0,
+          "selection_rank_sha256": "20d473755c1bd8fcc74b494eb2d75bbadb352b9e0689a9fd1d633586ad7da44d"
+        },
+        {
+          "gamma0": 0.75,
+          "id": "g0p75-cm0p25-w1p25",
+          "later_center": -0.25,
+          "later_high": 0.375,
+          "later_low": -0.875,
+          "later_width": 1.25,
+          "selection_rank_sha256": "2ca2a8cdc14c1c2cd5539e21fceae3b5bd36b30f18378bba9f2dced11a682f4c"
+        },
+        {
+          "gamma0": 0.5,
+          "id": "g0p5-c0p75-w2",
+          "later_center": 0.75,
+          "later_high": 1.75,
+          "later_low": -0.25,
+          "later_width": 2.0,
+          "selection_rank_sha256": "2e7a78ca43839dbe196a35491800a840a9a7110dc793f16c1497c901cb257d82"
+        },
+        {
+          "gamma0": 0.125,
+          "id": "g0p125-cm0p25-w1p25",
+          "later_center": -0.25,
+          "later_high": 0.375,
+          "later_low": -0.875,
+          "later_width": 1.25,
+          "selection_rank_sha256": "308b068f35b7798d1d88ae6e08b3a15b2ba2b851b3d62430599c51d0efe233ed"
+        },
+        {
+          "gamma0": 0.75,
+          "id": "g0p75-cm0p25-w0p5",
+          "later_center": -0.25,
+          "later_high": 0.0,
+          "later_low": -0.5,
+          "later_width": 0.5,
+          "selection_rank_sha256": "3142e4b31a14e3d44afcd9a443973ab5c30affcc0abc1869254f7782b2956e83"
+        },
+        {
+          "gamma0": 0.05,
+          "id": "g0p05-cm0p25-w2",
+          "later_center": -0.25,
+          "later_high": 0.75,
+          "later_low": -1.25,
+          "later_width": 2.0,
+          "selection_rank_sha256": "331595c5a8726af86c85b0dc100f83d8222d6c930411b3a841291042f146436d"
+        },
+        {
+          "gamma0": 0.25,
+          "id": "g0p25-c0p75-w0p5",
+          "later_center": 0.75,
+          "later_high": 1.0,
+          "later_low": 0.5,
+          "later_width": 0.5,
+          "selection_rank_sha256": "352a21ddbcd851941076cb6e9a625477ed717f1e9b71b161e41c5f00c6076aca"
+        },
+        {
+          "gamma0": 0,
+          "id": "g0-c0p75-w2",
+          "later_center": 0.75,
+          "later_high": 1.75,
+          "later_low": -0.25,
+          "later_width": 2.0,
+          "selection_rank_sha256": "3531b41a4fc86dd50a3fbbc41c8089410065219023e3915bdd5f613587d5921f"
+        },
+        {
+          "gamma0": 0.25,
+          "id": "g0p25-c0p75-w1p25",
+          "later_center": 0.75,
+          "later_high": 1.375,
+          "later_low": 0.125,
+          "later_width": 1.25,
+          "selection_rank_sha256": "37ed82471368bbe4db23cb578aea602a3cf80e34311e1a39dc3bcb98a94e8852"
+        },
+        {
+          "gamma0": 0.05,
+          "id": "g0p05-cm0p25-w1p25",
+          "later_center": -0.25,
+          "later_high": 0.375,
+          "later_low": -0.875,
+          "later_width": 1.25,
+          "selection_rank_sha256": "4517c27d17e27cf6c2b66938dfb53d4ceaf0725d6034ae134c55d4a28cbe11e0"
+        },
+        {
+          "gamma0": 0.75,
+          "id": "g0p75-cm0p25-w2",
+          "later_center": -0.25,
+          "later_high": 0.75,
+          "later_low": -1.25,
+          "later_width": 2.0,
+          "selection_rank_sha256": "4c22b4462f856f6a39cce0b015598002335329a4622f9da8bb2eb67801e544fc"
+        },
+        {
+          "gamma0": 0.75,
+          "id": "g0p75-c0p25-w0p5",
+          "later_center": 0.25,
+          "later_high": 0.5,
+          "later_low": 0.0,
+          "later_width": 0.5,
+          "selection_rank_sha256": "5261b0ddcdaa1e8cd80fdff75adc9c5ac2a3edc968072baac5e9e004fb372188"
+        },
+        {
+          "gamma0": 0,
+          "id": "g0-c0p25-w0p5",
+          "later_center": 0.25,
+          "later_high": 0.5,
+          "later_low": 0.0,
+          "later_width": 0.5,
+          "selection_rank_sha256": "58f1c1e16811ecc473f3e976f27b9987ab0c79402657de4fa84b313b017e793c"
+        },
+        {
+          "gamma0": 0.125,
+          "id": "g0p125-c0p25-w0p5",
+          "later_center": 0.25,
+          "later_high": 0.5,
+          "later_low": 0.0,
+          "later_width": 0.5,
+          "selection_rank_sha256": "5e4da2edc2f06c916aa928e22cd21aa253c575d9d0bbfc62f5ee95a0d4037e76"
+        },
+        {
+          "gamma0": 0,
+          "id": "g0-cm0p25-w1p25",
+          "later_center": -0.25,
+          "later_high": 0.375,
+          "later_low": -0.875,
+          "later_width": 1.25,
+          "selection_rank_sha256": "5fa4ec25e53781b5db3ec0e5617c258eab558adad5a07fc4e7c632e242f908cb"
+        }
+      ],
+      "evaluation_namespace": "phase4-memory-relay-b1-matched-physical-samples-v1-evaluation-v3",
+      "evaluation_shots_per_arm": 448,
+      "fixed_relay_controls": {
+        "first_leg_iteration_limit": 80,
+        "later_leg_iteration_limit": 60,
+        "solution_limit": 1,
+        "total_leg_limit": 31
+      },
+      "fixture_shots_per_code": 32,
+      "fixture_trace_namespace": "phase4-memory-relay-b1-matched-physical-samples-v1-fixture-trace-v3",
+      "native_namespace": "phase4-memory-relay-b1-matched-physical-samples-v1-native-v3",
+      "native_shots_per_code": 448,
+      "per_shot_work_cap": {
+        "belief_assemblies": 176400,
+        "bp_calls": 3,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 176400,
+        "check_to_variable_updates": 529200,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 2,
+        "residual_priority_evaluations": 0,
+        "variable_to_check_updates": 529200
+      },
+      "precision_status": "finite_precision_limited_wilson_95_percent; no endpoint extension permitted",
+      "presets": [
+        "relay-source-internal-bp-v0.2.2",
+        "relay-canonical-css-default-v1"
+      ],
+      "refinement_candidate_count_per_preset": 1,
+      "refinement_candidates": [
+        {
+          "gamma0": 0.375,
+          "id": "r-g0p375-c0p5-w0p875",
+          "later_center": 0.5,
+          "later_high": 0.9375,
+          "later_low": 0.0625,
+          "later_width": 0.875,
+          "selection": "fixed before calibration, one per preset; no outcome-dependent replacement"
+        }
+      ],
+      "timing_model": {
+        "max_seconds": 134.76417176704854,
+        "multiplicative_margin": 1.1,
+        "one_worker_planning_seconds": 133.35835194000975,
+        "p95_seconds": 121.23486540000886,
+        "source": "measured per-shot public command elapsed including mandatory verification"
+      },
+      "trace_caps": {
+        "max_bytes": 52428800,
+        "max_records": 10000,
+        "max_shots": 32
+      }
+    },
+    "gross-bb-144": {
+      "calibration_namespace": "phase4-memory-relay-bb144-matched-physical-samples-v1-calibration-v3",
+      "calibration_shots_per_configuration": 32,
+      "canonical_public_boundary_seconds": 900,
+      "central_error_rate": 0.07,
+      "coarse_candidate_count": 54,
+      "coarse_candidates": [
+        {
+          "gamma0": 0.05,
+          "id": "g0p05-c0p25-w2",
+          "later_center": 0.25,
+          "later_high": 1.25,
+          "later_low": -0.75,
+          "later_width": 2.0,
+          "selection_rank_sha256": "01f95a50b0ff26377640a0c0df748d851e50de7b186e73762495a24901107b49"
+        },
+        {
+          "gamma0": 0.5,
+          "id": "g0p5-cm0p25-w2",
+          "later_center": -0.25,
+          "later_high": 0.75,
+          "later_low": -1.25,
+          "later_width": 2.0,
+          "selection_rank_sha256": "06afb0796be414fae1f7cad041c22b42a981650a8c73a8d27e1cd830ee28aa97"
+        },
+        {
+          "gamma0": 0.5,
+          "id": "g0p5-c0p75-w2",
+          "later_center": 0.75,
+          "later_high": 1.75,
+          "later_low": -0.25,
+          "later_width": 2.0,
+          "selection_rank_sha256": "0e529d7dc643c08794389d3aac454c09c9c304dbdb8f60328a72b01157c874eb"
+        },
+        {
+          "gamma0": 0.75,
+          "id": "g0p75-c0p75-w2",
+          "later_center": 0.75,
+          "later_high": 1.75,
+          "later_low": -0.25,
+          "later_width": 2.0,
+          "selection_rank_sha256": "16b39adfecec2440153e506e328455b7df2d406e3900cd669b0d66427dd7dc3f"
+        },
+        {
+          "gamma0": 0,
+          "id": "g0-cm0p25-w2",
+          "later_center": -0.25,
+          "later_high": 0.75,
+          "later_low": -1.25,
+          "later_width": 2.0,
+          "selection_rank_sha256": "1eeccc38fb30b39320ae4ab2f228627135363d6f920a941734c69bbe424400e2"
+        },
+        {
+          "gamma0": 0.125,
+          "id": "g0p125-c0p75-w1p25",
+          "later_center": 0.75,
+          "later_high": 1.375,
+          "later_low": 0.125,
+          "later_width": 1.25,
+          "selection_rank_sha256": "2c305b76cb76faf03c729d786f21c8eee74eae9012f38cbd111bb727a06cec77"
+        },
+        {
+          "gamma0": 0.05,
+          "id": "g0p05-c0p75-w2",
+          "later_center": 0.75,
+          "later_high": 1.75,
+          "later_low": -0.25,
+          "later_width": 2.0,
+          "selection_rank_sha256": "3da98762a5bebd601f3f0aba55b8ca85429100f8755a4dff27bc2ce3f7dcca31"
+        },
+        {
+          "gamma0": 0.5,
+          "id": "g0p5-cm0p25-w1p25",
+          "later_center": -0.25,
+          "later_high": 0.375,
+          "later_low": -0.875,
+          "later_width": 1.25,
+          "selection_rank_sha256": "3eb72143808fd67b91fe704bc8ce947385c01c3fea87f9a257823f8223ded364"
+        },
+        {
+          "gamma0": 0.125,
+          "id": "g0p125-c0p75-w2",
+          "later_center": 0.75,
+          "later_high": 1.75,
+          "later_low": -0.25,
+          "later_width": 2.0,
+          "selection_rank_sha256": "4643961628ed010c2bfe89adf84138eb3cfe2d149671abbbecae0f0b77d64d9d"
+        },
+        {
+          "gamma0": 0.75,
+          "id": "g0p75-c0p25-w1p25",
+          "later_center": 0.25,
+          "later_high": 0.875,
+          "later_low": -0.375,
+          "later_width": 1.25,
+          "selection_rank_sha256": "4a7b1aec30067924e8cf8413f5dfdb222a91191e6d8816c377e03ef60bedbecc"
+        },
+        {
+          "gamma0": 0,
+          "id": "g0-cm0p25-w1p25",
+          "later_center": -0.25,
+          "later_high": 0.375,
+          "later_low": -0.875,
+          "later_width": 1.25,
+          "selection_rank_sha256": "53c5c999463d656e9def85e9eb75c799d7a2288c52b57fbb1f70b55c87e9d2c8"
+        },
+        {
+          "gamma0": 0,
+          "id": "g0-c0p25-w1p25",
+          "later_center": 0.25,
+          "later_high": 0.875,
+          "later_low": -0.375,
+          "later_width": 1.25,
+          "selection_rank_sha256": "550ed3653f8f5815666439a8cbbe8657a8af2feda2fbf0debe6dc8ea7dba2879"
+        },
+        {
+          "gamma0": 0.125,
+          "id": "g0p125-c0p25-w2",
+          "later_center": 0.25,
+          "later_high": 1.25,
+          "later_low": -0.75,
+          "later_width": 2.0,
+          "selection_rank_sha256": "57d7f3058eaa81e9b2b4df8950bfae1f15d3d57b3887e324df12c3688c8b7f3d"
+        },
+        {
+          "gamma0": 0.5,
+          "id": "g0p5-c0p25-w2",
+          "later_center": 0.25,
+          "later_high": 1.25,
+          "later_low": -0.75,
+          "later_width": 2.0,
+          "selection_rank_sha256": "5914c2b436ee3d57566b8fb8f84e7a6dfff2b0c6774a89a10219fe3003e2f96a"
+        },
+        {
+          "gamma0": 0,
+          "id": "g0-c0p75-w2",
+          "later_center": 0.75,
+          "later_high": 1.75,
+          "later_low": -0.25,
+          "later_width": 2.0,
+          "selection_rank_sha256": "5d5143fc582439627229817ff087d91db1ee5feeba539355c201133bb431c156"
+        },
+        {
+          "gamma0": 0.05,
+          "id": "g0p05-cm0p25-w1p25",
+          "later_center": -0.25,
+          "later_high": 0.375,
+          "later_low": -0.875,
+          "later_width": 1.25,
+          "selection_rank_sha256": "6469eded5d43115883ef5b833786bc0999026ee7652b13bf648a476b52fefdd6"
+        },
+        {
+          "gamma0": 0.75,
+          "id": "g0p75-cm0p25-w2",
+          "later_center": -0.25,
+          "later_high": 0.75,
+          "later_low": -1.25,
+          "later_width": 2.0,
+          "selection_rank_sha256": "655966efc70098f84ee9e82df219b039a26c73f6483c263bd5a00196f56f4318"
+        },
+        {
+          "gamma0": 0.05,
+          "id": "g0p05-cm0p25-w2",
+          "later_center": -0.25,
+          "later_high": 0.75,
+          "later_low": -1.25,
+          "later_width": 2.0,
+          "selection_rank_sha256": "6615715a181555ffdd74aaa426cb7295124948d5e7a4d2f59b615754df0450d2"
+        },
+        {
+          "gamma0": 0,
+          "id": "g0-c0p25-w2",
+          "later_center": 0.25,
+          "later_high": 1.25,
+          "later_low": -0.75,
+          "later_width": 2.0,
+          "selection_rank_sha256": "684a4552d2d6bc33d27151c62342c0af21f4e09a3eac39ffb7992e716cab209a"
+        },
+        {
+          "gamma0": 0,
+          "id": "g0-c0p75-w1p25",
+          "later_center": 0.75,
+          "later_high": 1.375,
+          "later_low": 0.125,
+          "later_width": 1.25,
+          "selection_rank_sha256": "714b82e75e5eef71e52358b045663b567a5cf17581e34600a6028a6997c2dc43"
+        },
+        {
+          "gamma0": 0.125,
+          "id": "g0p125-cm0p25-w0p5",
+          "later_center": -0.25,
+          "later_high": 0.0,
+          "later_low": -0.5,
+          "later_width": 0.5,
+          "selection_rank_sha256": "837ce13ee60e67eb0cbaf42b06044251194d68ca9af0130ef64c8109045562ce"
+        },
+        {
+          "gamma0": 0.05,
+          "id": "g0p05-cm0p25-w0p5",
+          "later_center": -0.25,
+          "later_high": 0.0,
+          "later_low": -0.5,
+          "later_width": 0.5,
+          "selection_rank_sha256": "87131713b27ac7a901240166d4b61b08049ff0c8a6bee74591fa873db8469100"
+        },
+        {
+          "gamma0": 0.05,
+          "id": "g0p05-c0p25-w0p5",
+          "later_center": 0.25,
+          "later_high": 0.5,
+          "later_low": 0.0,
+          "later_width": 0.5,
+          "selection_rank_sha256": "8789a42dc916b9e2f54ac1fa8feb7800969ce9ed220da317a1ad51a46b23ab53"
+        },
+        {
+          "gamma0": 0.25,
+          "id": "g0p25-cm0p25-w0p5",
+          "later_center": -0.25,
+          "later_high": 0.0,
+          "later_low": -0.5,
+          "later_width": 0.5,
+          "selection_rank_sha256": "885a17147e2047c1b4fdc2bcd9711aa4b8f121726f88d38a9e290e0f525237c2"
+        },
+        {
+          "gamma0": 0.125,
+          "id": "g0p125-c0p25-w0p5",
+          "later_center": 0.25,
+          "later_high": 0.5,
+          "later_low": 0.0,
+          "later_width": 0.5,
+          "selection_rank_sha256": "8ef60ac19451387bbfc5b2d8abc784beaef174cd366c6aa5113e2d1a0757bd7c"
+        },
+        {
+          "gamma0": 0.25,
+          "id": "g0p25-c0p25-w0p5",
+          "later_center": 0.25,
+          "later_high": 0.5,
+          "later_low": 0.0,
+          "later_width": 0.5,
+          "selection_rank_sha256": "8ff8cde7644ce4662e56bb03f7d1a93637a92144e2c2e229459f9eaf046f5688"
+        },
+        {
+          "gamma0": 0.75,
+          "id": "g0p75-c0p25-w0p5",
+          "later_center": 0.25,
+          "later_high": 0.5,
+          "later_low": 0.0,
+          "later_width": 0.5,
+          "selection_rank_sha256": "9238bbe6d4cb11dd466ca7bd4ffdfaf9f2d42c59a397bdc2b566f18018b9029a"
+        },
+        {
+          "gamma0": 0.75,
+          "id": "g0p75-cm0p25-w1p25",
+          "later_center": -0.25,
+          "later_high": 0.375,
+          "later_low": -0.875,
+          "later_width": 1.25,
+          "selection_rank_sha256": "986f9514feab263ec13eb515114f8afabd10349417eec56bf83329cdfd7f854d"
+        },
+        {
+          "gamma0": 0.25,
+          "id": "g0p25-cm0p25-w2",
+          "later_center": -0.25,
+          "later_high": 0.75,
+          "later_low": -1.25,
+          "later_width": 2.0,
+          "selection_rank_sha256": "a179953ba4b357ce388ee0b2ae578bd11dfb50e8a29e372c3a651a9e5027c240"
+        },
+        {
+          "gamma0": 0.75,
+          "id": "g0p75-cm0p25-w0p5",
+          "later_center": -0.25,
+          "later_high": 0.0,
+          "later_low": -0.5,
+          "later_width": 0.5,
+          "selection_rank_sha256": "a521890d820afe0246500d5ab4cec030975a5ca0e4e556bc23039afb79ec9a42"
+        },
+        {
+          "gamma0": 0.125,
+          "id": "g0p125-cm0p25-w1p25",
+          "later_center": -0.25,
+          "later_high": 0.375,
+          "later_low": -0.875,
+          "later_width": 1.25,
+          "selection_rank_sha256": "a8601d8a6c4d0337779bd0577cd47ae50f67f234afa6e2d7ff1f94286e883ec4"
+        },
+        {
+          "gamma0": 0.5,
+          "id": "g0p5-cm0p25-w0p5",
+          "later_center": -0.25,
+          "later_high": 0.0,
+          "later_low": -0.5,
+          "later_width": 0.5,
+          "selection_rank_sha256": "b23d79eafd7b68bd57fcf01aeb5389d843597ecbd93fb16fecdaa05718f960ab"
+        },
+        {
+          "gamma0": 0.125,
+          "id": "g0p125-cm0p25-w2",
+          "later_center": -0.25,
+          "later_high": 0.75,
+          "later_low": -1.25,
+          "later_width": 2.0,
+          "selection_rank_sha256": "b31a63d27a578a63a5a48d55a5702b80e515a995f96a14e8494138d63746ef8e"
+        },
+        {
+          "gamma0": 0.5,
+          "id": "g0p5-c0p75-w0p5",
+          "later_center": 0.75,
+          "later_high": 1.0,
+          "later_low": 0.5,
+          "later_width": 0.5,
+          "selection_rank_sha256": "b55ed2b6492ced247a8b823a9e46ec51d1c4ef47a94ceefcd809f7798e527fe3"
+        },
+        {
+          "gamma0": 0.125,
+          "id": "g0p125-c0p25-w1p25",
+          "later_center": 0.25,
+          "later_high": 0.875,
+          "later_low": -0.375,
+          "later_width": 1.25,
+          "selection_rank_sha256": "b58e8cd41faf0382267daf04d1b86c3770f5c627cd79a7a62b1ff27e5e9a0645"
+        },
+        {
+          "gamma0": 0,
+          "id": "g0-cm0p25-w0p5",
+          "later_center": -0.25,
+          "later_high": 0.0,
+          "later_low": -0.5,
+          "later_width": 0.5,
+          "selection_rank_sha256": "bb1fd25b3f7a342da321a433dc1794e9c9c957d8dff482999c6e4ad6b2792c21"
+        },
+        {
+          "gamma0": 0.25,
+          "id": "g0p25-c0p75-w1p25",
+          "later_center": 0.75,
+          "later_high": 1.375,
+          "later_low": 0.125,
+          "later_width": 1.25,
+          "selection_rank_sha256": "be7c2fb654bc86a6b7c2b90df68142c78c86c7af53bfcec092908bc44f410419"
+        },
+        {
+          "gamma0": 0.5,
+          "id": "g0p5-c0p75-w1p25",
+          "later_center": 0.75,
+          "later_high": 1.375,
+          "later_low": 0.125,
+          "later_width": 1.25,
+          "selection_rank_sha256": "c71e447d1354669e30b5e365cee9d7309a9fd67f3023675e025c1294d88cb950"
+        },
+        {
+          "gamma0": 0.25,
+          "id": "g0p25-cm0p25-w1p25",
+          "later_center": -0.25,
+          "later_high": 0.375,
+          "later_low": -0.875,
+          "later_width": 1.25,
+          "selection_rank_sha256": "ccf710e594602c7f8fcae388514b729ae169845dd3c1a804f030e65c3d1aa3be"
+        },
+        {
+          "gamma0": 0.75,
+          "id": "g0p75-c0p75-w1p25",
+          "later_center": 0.75,
+          "later_high": 1.375,
+          "later_low": 0.125,
+          "later_width": 1.25,
+          "selection_rank_sha256": "cdbda1a7e5f279d8d2cfa7fce53b0a1753503c5654a1bbe6a58f4f3ac0d8ec98"
+        },
+        {
+          "gamma0": 0,
+          "id": "g0-c0p25-w0p5",
+          "later_center": 0.25,
+          "later_high": 0.5,
+          "later_low": 0.0,
+          "later_width": 0.5,
+          "selection_rank_sha256": "d4beff4614c35addc8b5e65e2d1ac2f4abb923c90367cfa7e87de1410f2ed3e2"
+        },
+        {
+          "gamma0": 0.5,
+          "id": "g0p5-c0p25-w1p25",
+          "later_center": 0.25,
+          "later_high": 0.875,
+          "later_low": -0.375,
+          "later_width": 1.25,
+          "selection_rank_sha256": "d62fef56c4e7bc71eae45bd95ee839907bf30626d894a5d4fc3ee56635ef4d84"
+        },
+        {
+          "gamma0": 0.05,
+          "id": "g0p05-c0p25-w1p25",
+          "later_center": 0.25,
+          "later_high": 0.875,
+          "later_low": -0.375,
+          "later_width": 1.25,
+          "selection_rank_sha256": "d69042a144800e90b2c9c7e4a4c250f32b6cdf14501aa9955ed1f2daa99b4889"
+        },
+        {
+          "gamma0": 0.75,
+          "id": "g0p75-c0p25-w2",
+          "later_center": 0.25,
+          "later_high": 1.25,
+          "later_low": -0.75,
+          "later_width": 2.0,
+          "selection_rank_sha256": "d836c38b4d758cf54aaa598a227805330d46a95b6f3b32f8265f06e07aabb1fb"
+        },
+        {
+          "gamma0": 0.25,
+          "id": "g0p25-c0p25-w1p25",
+          "later_center": 0.25,
+          "later_high": 0.875,
+          "later_low": -0.375,
+          "later_width": 1.25,
+          "selection_rank_sha256": "d8e0d3f4366bef4a10349eee8400503eeb5aed9a7f5d28e22da5a212ce338fcb"
+        },
+        {
+          "gamma0": 0.05,
+          "id": "g0p05-c0p75-w1p25",
+          "later_center": 0.75,
+          "later_high": 1.375,
+          "later_low": 0.125,
+          "later_width": 1.25,
+          "selection_rank_sha256": "d9285488db679564b4f8d87798097bd3fbcba54430179e0def9f8703a34a6802"
+        },
+        {
+          "gamma0": 0.75,
+          "id": "g0p75-c0p75-w0p5",
+          "later_center": 0.75,
+          "later_high": 1.0,
+          "later_low": 0.5,
+          "later_width": 0.5,
+          "selection_rank_sha256": "db94aa74237eac33b9c0216f0b71a121b6a911d99a7aa678c6454b0d7260ddc2"
+        },
+        {
+          "gamma0": 0.25,
+          "id": "g0p25-c0p25-w2",
+          "later_center": 0.25,
+          "later_high": 1.25,
+          "later_low": -0.75,
+          "later_width": 2.0,
+          "selection_rank_sha256": "e3d3a83918b147b6eb7251d6b32bb0416ee895da4bd18005fa5a46e4b95e0ca0"
+        },
+        {
+          "gamma0": 0.05,
+          "id": "g0p05-c0p75-w0p5",
+          "later_center": 0.75,
+          "later_high": 1.0,
+          "later_low": 0.5,
+          "later_width": 0.5,
+          "selection_rank_sha256": "e7d4541253363029dab216fdaa50c514b050c5b87fd1679054265ed364c2389e"
+        },
+        {
+          "gamma0": 0.5,
+          "id": "g0p5-c0p25-w0p5",
+          "later_center": 0.25,
+          "later_high": 0.5,
+          "later_low": 0.0,
+          "later_width": 0.5,
+          "selection_rank_sha256": "e90dd7d17fcbb1c4ffe0dbb2aa8ae2f773661aac8e130e615c31191201efa06e"
+        },
+        {
+          "gamma0": 0.25,
+          "id": "g0p25-c0p75-w0p5",
+          "later_center": 0.75,
+          "later_high": 1.0,
+          "later_low": 0.5,
+          "later_width": 0.5,
+          "selection_rank_sha256": "eba4c2b3341a69b4e5333c6353b465a3b7dc7a292d8fdb8d01c180e6b6686323"
+        },
+        {
+          "gamma0": 0.25,
+          "id": "g0p25-c0p75-w2",
+          "later_center": 0.75,
+          "later_high": 1.75,
+          "later_low": -0.25,
+          "later_width": 2.0,
+          "selection_rank_sha256": "f4a2480101859e29833b7ca9759a329f0bfea874d8cabb2d9e992de2ff7ab247"
+        },
+        {
+          "gamma0": 0,
+          "id": "g0-c0p75-w0p5",
+          "later_center": 0.75,
+          "later_high": 1.0,
+          "later_low": 0.5,
+          "later_width": 0.5,
+          "selection_rank_sha256": "f7e2617c420c50403f9cd37bcb54026c428fd56e5381110a4a3453e8c846bbce"
+        },
+        {
+          "gamma0": 0.125,
+          "id": "g0p125-c0p75-w0p5",
+          "later_center": 0.75,
+          "later_high": 1.0,
+          "later_low": 0.5,
+          "later_width": 0.5,
+          "selection_rank_sha256": "fcc58de59bdf50f2bdeebd6819ed99948d75e2fc3df335998c338c6324154f20"
+        }
+      ],
+      "evaluation_namespace": "phase4-memory-relay-bb144-matched-physical-samples-v1-evaluation-v3",
+      "evaluation_shots_per_arm": 448,
+      "fixed_relay_controls": {
+        "first_leg_iteration_limit": 80,
+        "later_leg_iteration_limit": 60,
+        "solution_limit": 1,
+        "total_leg_limit": 31
+      },
+      "fixture_shots_per_code": 32,
+      "fixture_trace_namespace": "phase4-memory-relay-bb144-matched-physical-samples-v1-fixture-trace-v3",
+      "native_namespace": "phase4-memory-relay-bb144-matched-physical-samples-v1-native-v3",
+      "native_shots_per_code": 448,
+      "per_shot_work_cap": {
+        "belief_assemblies": 270720,
+        "bp_calls": 31,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 270720,
+        "check_to_variable_updates": 812160,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 30,
+        "residual_priority_evaluations": 0,
+        "variable_to_check_updates": 812160
+      },
+      "precision_status": "finite_precision_limited_wilson_95_percent; no endpoint extension permitted",
+      "presets": [
+        "relay-source-internal-bp-v0.2.2",
+        "relay-canonical-css-default-v1"
+      ],
+      "refinement_candidate_count_per_preset": 1,
+      "refinement_candidates": [
+        {
+          "gamma0": 0.375,
+          "id": "r-g0p375-c0p5-w0p875",
+          "later_center": 0.5,
+          "later_high": 0.9375,
+          "later_low": 0.0625,
+          "later_width": 0.875,
+          "selection": "fixed before calibration, one per preset; no outcome-dependent replacement"
+        }
+      ],
+      "timing_model": {
+        "max_seconds": 24.832333561964333,
+        "multiplicative_margin": 1.1,
+        "one_worker_planning_seconds": 21.340090863406658,
+        "p95_seconds": 19.400082603096962,
+        "source": "measured per-shot public command elapsed including mandatory verification"
+      },
+      "trace_caps": {
+        "max_bytes": 52428800,
+        "max_records": 10000,
+        "max_shots": 32
+      }
+    },
+    "hgp-gallager-3-4-seed-20260923": {
+      "calibration_namespace": "phase4-memory-relay-hgp-matched-physical-samples-v1-calibration-v3",
+      "calibration_shots_per_configuration": 32,
+      "canonical_public_boundary_seconds": 900,
+      "central_error_rate": 0.03,
+      "coarse_candidate_count": 14,
+      "coarse_candidates": [
+        {
+          "gamma0": 0.75,
+          "id": "g0p75-c0p75-w0p5",
+          "later_center": 0.75,
+          "later_high": 1.0,
+          "later_low": 0.5,
+          "later_width": 0.5,
+          "selection_rank_sha256": "15d271dd585dccddc00cdac423394561e04afc77650868913af8f0a6ce9310dd"
+        },
+        {
+          "gamma0": 0,
+          "id": "g0-cm0p25-w0p5",
+          "later_center": -0.25,
+          "later_high": 0.0,
+          "later_low": -0.5,
+          "later_width": 0.5,
+          "selection_rank_sha256": "1d7e32e8b51ce15923e96641a6f2d0b41ae9be7dc8b101b533f1015eab785128"
+        },
+        {
+          "gamma0": 0.75,
+          "id": "g0p75-cm0p25-w0p5",
+          "later_center": -0.25,
+          "later_high": 0.0,
+          "later_low": -0.5,
+          "later_width": 0.5,
+          "selection_rank_sha256": "1dbd93d0830c2a22b18e5d9201bbd6b8b15f03f04d271428b57b1396d9ef299c"
+        },
+        {
+          "gamma0": 0.25,
+          "id": "g0p25-c0p75-w2",
+          "later_center": 0.75,
+          "later_high": 1.75,
+          "later_low": -0.25,
+          "later_width": 2.0,
+          "selection_rank_sha256": "1fb9aa3880668897256b493132e8acb5be1d160d52b6cae9f157bd2486748627"
+        },
+        {
+          "gamma0": 0.25,
+          "id": "g0p25-cm0p25-w1p25",
+          "later_center": -0.25,
+          "later_high": 0.375,
+          "later_low": -0.875,
+          "later_width": 1.25,
+          "selection_rank_sha256": "28e208cc9b6e67d29bb51a94faa29967fd2ed7d29cc2122e71d7cde20299a787"
+        },
+        {
+          "gamma0": 0.125,
+          "id": "g0p125-cm0p25-w0p5",
+          "later_center": -0.25,
+          "later_high": 0.0,
+          "later_low": -0.5,
+          "later_width": 0.5,
+          "selection_rank_sha256": "2ee3f0cff9619db3dd8b3c8e6bccfa15e40157393cc7fe602b3e5a308cab3906"
+        },
+        {
+          "gamma0": 0.5,
+          "id": "g0p5-c0p75-w2",
+          "later_center": 0.75,
+          "later_high": 1.75,
+          "later_low": -0.25,
+          "later_width": 2.0,
+          "selection_rank_sha256": "2fc5e2f7ff2a3a363f46709c0a3d754d8eb06896e33be96047f00a121e61e670"
+        },
+        {
+          "gamma0": 0,
+          "id": "g0-c0p25-w1p25",
+          "later_center": 0.25,
+          "later_high": 0.875,
+          "later_low": -0.375,
+          "later_width": 1.25,
+          "selection_rank_sha256": "34a2ce4422f1dd49798a8cb1c4cb47fccc2ee7d95107dc58483234a1abd06f9b"
+        },
+        {
+          "gamma0": 0.25,
+          "id": "g0p25-c0p75-w0p5",
+          "later_center": 0.75,
+          "later_high": 1.0,
+          "later_low": 0.5,
+          "later_width": 0.5,
+          "selection_rank_sha256": "35cb582b298ca1e6341fc7ce5258cffffa33c10f6890440eb43739f049a99a3b"
+        },
+        {
+          "gamma0": 0,
+          "id": "g0-c0p75-w1p25",
+          "later_center": 0.75,
+          "later_high": 1.375,
+          "later_low": 0.125,
+          "later_width": 1.25,
+          "selection_rank_sha256": "3d4e9f452d56b8456705ea4baed8c721f1dea385d87c4a297f85d427a824fa2b"
+        },
+        {
+          "gamma0": 0,
+          "id": "g0-cm0p25-w1p25",
+          "later_center": -0.25,
+          "later_high": 0.375,
+          "later_low": -0.875,
+          "later_width": 1.25,
+          "selection_rank_sha256": "400ae579f0f262b3a0b3bbbee98d2460cd5fd2953562ce71f89dd906b3f90096"
+        },
+        {
+          "gamma0": 0.05,
+          "id": "g0p05-cm0p25-w1p25",
+          "later_center": -0.25,
+          "later_high": 0.375,
+          "later_low": -0.875,
+          "later_width": 1.25,
+          "selection_rank_sha256": "416614028ec120f2fb0df2a3b1bc07e2511dc67210659ec00e703a87b44e7f6e"
+        },
+        {
+          "gamma0": 0.75,
+          "id": "g0p75-c0p25-w2",
+          "later_center": 0.25,
+          "later_high": 1.25,
+          "later_low": -0.75,
+          "later_width": 2.0,
+          "selection_rank_sha256": "43730486c0deb4b90f74fde693ae9d020ed7661185b5b4c3c9fe85df5828d687"
+        },
+        {
+          "gamma0": 0.05,
+          "id": "g0p05-c0p25-w2",
+          "later_center": 0.25,
+          "later_high": 1.25,
+          "later_low": -0.75,
+          "later_width": 2.0,
+          "selection_rank_sha256": "44f7c7ffc94fb6f46d2a3ac3d0dfddee70995564a217b976b729bed2efc21b0a"
+        }
+      ],
+      "evaluation_namespace": "phase4-memory-relay-hgp-matched-physical-samples-v1-evaluation-v3",
+      "evaluation_shots_per_arm": 448,
+      "fixed_relay_controls": {
+        "first_leg_iteration_limit": 80,
+        "later_leg_iteration_limit": 60,
+        "solution_limit": 1,
+        "total_leg_limit": 31
+      },
+      "fixture_shots_per_code": 32,
+      "fixture_trace_namespace": "phase4-memory-relay-hgp-matched-physical-samples-v1-fixture-trace-v3",
+      "native_namespace": "phase4-memory-relay-hgp-matched-physical-samples-v1-native-v3",
+      "native_shots_per_code": 448,
+      "per_shot_work_cap": {
+        "belief_assemblies": 423000,
+        "bp_calls": 31,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 423000,
+        "check_to_variable_updates": 1421280,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 30,
+        "residual_priority_evaluations": 0,
+        "variable_to_check_updates": 1421280
+      },
+      "precision_status": "finite_precision_limited_wilson_95_percent; no endpoint extension permitted",
+      "presets": [
+        "relay-source-internal-bp-v0.2.2",
+        "relay-canonical-css-default-v1"
+      ],
+      "refinement_candidate_count_per_preset": 1,
+      "refinement_candidates": [
+        {
+          "gamma0": 0.375,
+          "id": "r-g0p375-c0p5-w0p875",
+          "later_center": 0.5,
+          "later_high": 0.9375,
+          "later_low": 0.0625,
+          "later_width": 0.875,
+          "selection": "fixed before calibration, one per preset; no outcome-dependent replacement"
+        }
+      ],
+      "timing_model": {
+        "max_seconds": 407.5974283029791,
+        "multiplicative_margin": 1.1,
+        "one_worker_planning_seconds": 443.4810633120826,
+        "p95_seconds": 403.16460301098414,
+        "source": "measured per-shot public command elapsed including mandatory verification"
+      },
+      "trace_caps": {
+        "max_bytes": 52428800,
+        "max_records": 10000,
+        "max_shots": 32
+      }
+    }
+  },
+  "design_amendment": {
+    "path": "data/evidence/phase4-pilot-design-amendment-v3.json",
+    "sha256": "0cf0d785b409ee1798d74265ee23e7bb1cd4b894bc49a1b6a3ed392a99cd8385"
+  },
+  "entitlement": {
+    "account": "pfisterlab",
+    "allocation_digest": "d348dd75fc9a7b16fadd897b9105417c42bbc1ada11613dd96a5bd9ac46f51c6",
+    "authorized_cpus": 2,
+    "authorized_memory": "8G",
+    "authorized_memory_bytes": 8589934592,
+    "concurrency_proof": {
+      "observed_job_cgroup_memory_current_bytes": 7622107136,
+      "observed_job_cgroup_memory_peak_bytes": 8592445440,
+      "reason": "job cgroup was already near or above 8G; no safe two-worker RSS proof",
+      "status": "not_proven"
+    },
+    "cpus_per_task": 2,
+    "job_end_time_utc": "2026-10-20T23:50:10Z",
+    "job_id": "55938300",
+    "omp_num_threads_per_worker": 1,
+    "partition": "common",
+    "remaining_wall_seconds_at_freeze": 2202370,
+    "remaining_wall_seconds_budget": 1982133,
+    "safety_margin_fraction": 0.1,
+    "safety_margin_seconds": 220237,
+    "scheduler": "slurm",
+    "tasks": 1,
+    "time_limit_seconds": 2592000,
+    "worker_count": 1
+  },
+  "evaluation": {
+    "arms_per_code": [
+      "baseline",
+      "selected_source_procedure",
+      "selected_canonical_procedure"
+    ],
+    "fresh_matched_samples_per_arm": 448,
+    "interval": "Wilson 95 percent",
+    "paired_reporting": "discordant counts plus exact paired binomial test",
+    "selection_source": "calibration only",
+    "status": "finite_adapted_precision_limited"
+  },
+  "factorial": {
+    "arms": [
+      "baseline",
+      "v2c-damping",
+      "pdbp",
+      "pdprime",
+      "posterior-momentum",
+      "affine-prior",
+      "disordered-affine-prior",
+      "v2c-damping-plus-ewa",
+      "pdbp-plus-v2c-damping",
+      "momentum-plus-ewa",
+      "relay-one-leg",
+      "relay-no-transfer",
+      "relay-uniform-later-memory",
+      "relay-disordered-later-memory"
+    ],
+    "cells_per_code": 294,
+    "controls": {
+      "first_leg_iteration_limit": 80,
+      "later_leg_iteration_limit": 60,
+      "solution_limit": 1,
+      "total_leg_limit": 31
+    },
+    "noise_regions": [
+      {
+        "error_rate": 0.01,
+        "id": "easy"
+      },
+      {
+        "error_rate": 0.03,
+        "id": "visible_bp_failures"
+      },
+      {
+        "error_rate": 0.05,
+        "id": "harder"
+      }
+    ],
+    "precision_status": "finite_precision_limited_and_inconclusive_for_publication_curve_claims; retain Wilson intervals and capped/incomplete cells",
+    "runtime_boundary_seconds": 900,
+    "shots_per_arm_rate_code": 7,
+    "stop_rule": "No arm, region, shot count, or rank may be extended; every terminal, budget termination, and incomplete is retained.",
+    "work_cap_source": "the frozen per-code calibration work vector; B1 applies its bounded three-leg-equivalent vector at every factorial cell"
+  },
+  "freeze_id": "phase4-pilot-caps-v3-representative-20260925",
+  "freeze_time_utc": "2026-09-25T16:04:00Z",
   "reporting": {
-    "interval": "Wilson",
-    "native_setup": "Cargo/setup is retained separately and is not a per-shot runtime.",
-    "paired": "matched physical samples",
-    "runtime_measurement": "full public canonical command plus mandatory verification wall time; decode and verify distributions retained separately"
+    "resource": "canonical per-shot RSS unavailable; native RUSAGE_CHILDREN is cumulative high-water only",
+    "runtime": "public canonical command elapsed includes decode and mandatory verification; terminal ledger runtime is separately unavailable where absent",
+    "work": "per-leg canonical work retained; exact native per-leg work unavailable"
   },
-  "schema_version": 2,
-  "scoped_amendment": {
-    "calibration": "B1 is capped at 24 coarse configurations; BB and HGP retain 54. Each calibration configuration has exactly 128 shots and two presets. Projected one-worker total is 668,000 seconds, within 702,083 seconds.",
-    "evaluation": "Each code evaluates exactly baseline plus one calibration-selected policy at 128 fresh matched shots. This is a precision-limited adapted slice; Wilson insufficiency is reported, never extended.",
-    "native_fixture": "reserved fractions remain finite and separate.",
-    "reason": "The broad B1 54 coarse configurations \u00d7128 shots \u00d72 presets \u00d758.026s p95 public wall requires 802,151s, exceeding the 702,083s calibration allocation before other codes."
-  },
-  "selection_rule": "Fixed paired Wilson ranking over calibration only; lexical tie break; select at most 32 refinement configurations.",
-  "status": "superseded_pending_representative_v3",
+  "schema_version": 4,
+  "status": "frozen_pre_calibration",
   "stop_rules": {
-    "calibration": "Stop at selected shot-menu endpoint, runtime/work/trace cap, or insufficient_precision.",
-    "evaluation": "Never consumes calibration samples; stop at prespecified menu endpoint or cap.",
-    "inconclusive": [
+    "calibration": "Stop each preset/configuration at 32 identified shots, its exact per-shot work vector, 900-second public boundary, or trace cap; retain all terminals and incomplete states.",
+    "category_status_on_limit": "cap_reached",
+    "category_wall_enforcement": "Each stage runner must accumulate retained public command elapsed seconds in its named allocation category. Before launching a shot, it must refuse a launch that would exceed the numeric category wall_seconds_max; if the cap is reached during a shot, retain its terminal or incomplete record and mark the remaining planned cells cap_reached/inconclusive. Planning p95 estimates never override these ceilings.",
+    "evaluation": "Use only disjoint evaluation namespaces and stop each listed arm at 448 shots or its finite caps.",
+    "inconclusive_statuses": [
       "insufficient_precision",
       "cap_reached",
+      "budget_exhausted",
+      "incomplete_public_boundary",
       "native_unavailable",
       "inconclusive"
     ],
-    "no_silent_extension": "Any increase requires a new versioned campaign identity and retained amendment.",
-    "rank_chasing": "Unused allocation cannot add ranks, configurations, or shots."
+    "native": "Stop at 448 identified native shots per code and 900-second native timeout.",
+    "no_rank_chasing": "Unused category seconds are nonreassignable and cannot fund added candidates, refinement, shots, or ranks.",
+    "no_silent_extension": "Any count, candidate, work, runtime, trace, or concurrency increase requires a new versioned cap manifest and campaign identity.",
+    "refinement": "Run only the listed single fixed refinement candidate per code/preset; no added neighbors or replacements."
   },
-  "superseded_by": "data/results/phase4-memory-relay/benchmark-v3-representative.json"
+  "supersedes": {
+    "reason": "v2 was a one-iteration provisional contract",
+    "v2_status": "superseded_pending_representative_v3"
+  }
 }

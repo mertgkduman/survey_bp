@@ -561,6 +561,9 @@ def test_frozen_v3_caps_are_numeric_separate_and_executable():
     assert caps["evaluation"]["fresh_matched_samples_per_arm"] == 448
     assert caps["stop_rules"]["no_silent_extension"]
     assert caps["stop_rules"]["no_rank_chasing"]
+    assert caps["factorial"]["shots_per_arm_rate_code"] == 7
+    assert len(caps["factorial"]["arms"]) == 14
+    assert categories["fixture_trace"]["planned_total_wall_seconds"] <= categories["fixture_trace"]["wall_seconds_max"]
 
     namespaces = set()
     expected_counts = {"gross-bb-144": 54, "b1-ghp-882": 20, "hgp-gallager-3-4-seed-20260923": 14}
