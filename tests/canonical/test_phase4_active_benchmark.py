@@ -29,7 +29,7 @@ def test_active_manifest_is_a_controlled_31_leg_memory_contract():
     assert all(leg["max_iterations"] == 60 for leg in relay["legs"][1:])
     assert relay["memory_tuning"] == {
         "semantics": "relay_v022_dynamic_affine_prior_css_adaptation", "first_leg_gamma": .125,
-        "later_center": .25, "later_width": 1.25, "seed_identity": "active-v4-seed",
+        "later_leg_center": .25, "later_leg_width": 1.25, "seed_identity": "active-v4-seed",
         "rng_algorithm": "numpy.PCG64", "refresh": "per_later_leg",
     }
     assert manifest["randomness"]["physical_sample_identity"].endswith("active-v4-p0070")
@@ -45,6 +45,11 @@ def test_active_scan_trigger_is_fixed_before_scan_outcomes():
     assert plan["codes"]["gross-bb-144"]["rates"] == [.03, .05, .07]
     assert plan["codes"]["hgp-gallager-3-4-seed-20260923"]["rates"] == [.03]
     assert "32" in plan["trigger"]["advance_when"]
+    fallback = plan["b1_p007_bounded_fallback"]
+    assert fallback["profile"] == "b1_three_leg"
+    assert fallback["attempts"] == 32
+    assert fallback["work_vector"]["bp_calls"] == 3
+    assert "at least 2" in fallback["select_when"]
     assert plan["no_outcome_dependent_retries"] is True
 
 

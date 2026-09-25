@@ -84,6 +84,14 @@ def active_scan_plan() -> dict[str, object]:
             "select_when": "at least 2 of 32 retained Relay attempts have a later-leg activation",
             "terminal_when": "rate 0.07 is exhausted; retain the scan as precision-limited/inconclusive if activation remains sparse",
         },
+        "b1_p007_bounded_fallback": {
+            "when": "the complete unbounded p=0.07 B1 Relay scan has one or more external public-boundary incompletes",
+            "profile": "b1_three_leg",
+            "work_vector": dict(B1_THREE_LEG_WORK),
+            "attempts": SHOTS,
+            "select_when": "all 32 bounded attempts complete with active memory verified and at least 2 attempts have a later-leg activation",
+            "unbounded_role": "retain as incomplete rate-scan evidence; do not require it as a selected controlled arm",
+        },
         "no_outcome_dependent_retries": True,
     }
 
@@ -109,7 +117,7 @@ def build_active_manifest(base: Mapping[str, Any], *, arm: str, preset: str,
         "later_leg_memory": "disordered",
         "memory_tuning": {
             "semantics": ACTIVE_SEMANTICS, "first_leg_gamma": first_leg_gamma,
-            "later_center": later_center, "later_width": later_width,
+            "later_leg_center": later_center, "later_leg_width": later_width,
             "seed_identity": seed_identity, "rng_algorithm": "numpy.PCG64",
             "refresh": "per_later_leg",
         },

@@ -14,7 +14,7 @@ from typing import Any, Mapping
 
 
 AUTHOR_PIN = "relay-v0.2.2@14cb31a18f9b9d7d099791b793e35b8a2951f8f3"
-REQUIRED_CORE_COMMITS = ("6e6ad03", "660049a")
+REQUIRED_CORE_COMMITS = ("6e6ad03", "660049a", "1f8f1c2")
 
 
 def _helper():
@@ -63,6 +63,38 @@ def _later_activations(arm: Mapping[str, Any]) -> int:
     return sum(len(attempt.get("distinct_leg_indices", [])) > 1 for attempt in arm.get("attempts", []))
 
 
+def _complete_active(arm: Mapping[str, Any]) -> bool:
+    return arm.get("status") == "completed" and arm.get("active_memory_verified") is True and len(arm.get("attempts", [])) == 32
+
+
+def _bounded_selected(arm: Mapping[str, Any]) -> bool:
+    """The declared B1 bounded fallback must exercise later-leg adaptation."""
+    return _complete_active(arm) and _later_activations(arm) >= 2
+
+
+def _selected_arms_complete(code_id: str, selected_rate: float, code: Mapping[str, Any]) -> bool:
+    """Check every selected arm while leaving B1's retained unbounded scan informative."""
+    selected_key = f"p{selected_rate:.3f}".replace(".", "")
+    presets = code["rates"][selected_key]["presets"]
+    for preset_name, preset in presets.items():
+        bounded_replaces_scan = (
+            code_id == "b1-ghp-882" and selected_rate == .07
+            and preset_name == "canonical_default"
+            and "controlled_relay_31_bounded" in preset
+        )
+        required = {"baseline", "controlled_relay_31_bounded"} if bounded_replaces_scan else {"baseline", "controlled_relay_31"}
+        if not required.issubset(preset):
+            return False
+        for arm_name, arm in preset.items():
+            if arm.get("arm") not in {"baseline", "controlled_relay_31", "controlled_relay_31_bounded"}:
+                continue
+            if bounded_replaces_scan and arm_name == "controlled_relay_31":
+                continue
+            if not _complete_active(arm):
+                return False
+    return True
+
+
 def _arm_record(helper: Any, *, root: Path, base: Mapping[str, Any], output: Path,
                 rate: float, preset: str, arm: str, work_profile: str = "full31") -> dict[str, object]:
     manifest = helper.build_active_manifest(base, arm="baseline" if arm == "baseline" else "canonical_relay_31",
@@ -105,10 +137,21 @@ def run_campaign(*, root: Path, output_path: Path, job_id: str, campaign_id: str
             rate_key = f"p{rate:.3f}".replace(".", "")
             scan = _arm_record(helper, root=root, base=base, output=artifact_root / code_id / rate_key / "canonical_default" / "controlled-relay-31",
                                rate=rate, preset="canonical_default", arm="controlled_relay_31")
-            decision = "incomplete_scan" if scan["status"] != "completed" or not scan.get("active_memory_verified") else (
+            decision = "incomplete_scan" if not _complete_active(scan) else (
                 "selected" if scan["observed_later_leg_activations"] >= 2 else "advance")
             code["rates"][rate_key] = {"error_rate": rate, "presets": {"canonical_default": {"controlled_relay_31": scan}}, "trigger_decision": decision}
+            if code_id == "b1-ghp-882" and rate == .07 and decision == "incomplete_scan":
+                bounded = _arm_record(helper, root=root, base=base,
+                    output=artifact_root / code_id / rate_key / "canonical_default" / "controlled-relay-31-bounded",
+                    rate=rate, preset="canonical_default", arm="controlled_relay_31", work_profile="b1_three_leg")
+                bounded["arm"] = "controlled_relay_31_bounded"
+                code["rates"][rate_key]["presets"]["canonical_default"]["controlled_relay_31_bounded"] = bounded
+                decision = "selected_bounded" if _bounded_selected(bounded) else "incomplete_bounded_scan"
+                code["rates"][rate_key]["trigger_decision"] = decision
             if decision == "selected":
+                selected = rate
+                break
+            if decision == "selected_bounded":
                 selected = rate
                 break
             if decision == "incomplete_scan":
@@ -126,7 +169,13 @@ def run_campaign(*, root: Path, output_path: Path, job_id: str, campaign_id: str
                         rate=selected, preset=preset, arm=arm, work_profile=profile)
             code.update({"selected_rate": selected, "selection_status": "selected"})
         report["codes"][code_id] = code
-    report["status"] = "completed" if all(code["selection_status"] == "selected" for code in report["codes"].values()) else "incomplete_or_inconclusive"
+    all_required = all(
+        code["selection_status"] == "selected"
+        and _selected_arms_complete(code_id, code["selected_rate"], code)
+        for code_id, code in report["codes"].items()
+    )
+    report["status"] = "completed" if all_required else "final_inconclusive"
+    report["finality"] = "This report is immutable. If a process interruption occurred before it was written, resume the exact artifact journals with the same campaign ID; a written final_inconclusive report requires a new campaign ID."
     report["report_digest"] = _digest(report)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
