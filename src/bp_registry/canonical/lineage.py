@@ -224,6 +224,34 @@ class CandidateRecord:
 
 
 @dataclass(frozen=True)
+class RelayLegAncestry:
+    """Stable leg-to-leg ancestry that records only decoder-visible handoff facts."""
+
+    leg_index: int
+    lineage_id: str
+    parent_leg_lineage_id: str | None
+    transfer_digest: str | None
+
+    def __post_init__(self) -> None:
+        if type(self.leg_index) is not int or self.leg_index < 0 or not self.lineage_id:
+            raise ValueError("Relay leg ancestry requires a nonnegative index and stable lineage ID")
+        if self.leg_index == 0 and (self.parent_leg_lineage_id is not None or self.transfer_digest is not None):
+            raise ValueError("the first Relay leg has no transfer parent")
+        if self.leg_index > 0 and (
+            not isinstance(self.parent_leg_lineage_id, str) or not self.parent_leg_lineage_id
+            or not isinstance(self.transfer_digest, str) or len(self.transfer_digest) != 64
+        ):
+            raise ValueError("later Relay legs require a parent lineage and SHA-256 transfer digest")
+
+    def as_evidence(self) -> dict[str, object]:
+        return {
+            "leg_index": self.leg_index, "lineage_id": self.lineage_id,
+            "parent_leg_lineage_id": self.parent_leg_lineage_id,
+            "transfer_digest": self.transfer_digest,
+        }
+
+
+@dataclass(frozen=True)
 class SelectionRecord:
     """Frozen decoder-visible choice and complete ordered candidate evidence."""
 

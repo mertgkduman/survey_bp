@@ -6,7 +6,7 @@ from dataclasses import dataclass, fields
 import math
 import numbers
 from threading import RLock
-from typing import Callable, ClassVar, Iterable, Mapping
+from typing import Callable, ClassVar, Iterable, Literal, Mapping
 
 
 _MAX_COUNT = (1 << 63) - 1
@@ -100,6 +100,76 @@ class WorkVector:
         if structural_event_version == 2:
             values = {**cls.zero().as_evidence(), **values}
         return cls(**values)
+
+
+RelayWorkKind = Literal["leg", "transfer", "candidate", "selection"]
+
+
+@dataclass(frozen=True, slots=True)
+class _RelayWorkLeaf:
+    """One immutable Relay work leaf, attributed to a visible leg lineage."""
+
+    kind: RelayWorkKind
+    leg_index: int
+    lineage_id: str
+    leaf_id: str
+    delta: WorkVector
+
+
+class RelayWorkAccounting:
+    """Idempotent leaf accounting for a single Relay shot.
+
+    A retry may deliver the same committed fact again.  It is a no-op only when
+    every semantic field agrees; a reused ID with different work is evidence
+    corruption and fails closed.
+    """
+
+    def __init__(self, *, shot_identity: str) -> None:
+        if not isinstance(shot_identity, str) or not shot_identity:
+            raise ValueError("Relay work accounting requires a shot identity")
+        self.shot_identity = shot_identity
+        self._leaves: dict[str, _RelayWorkLeaf] = {}
+        self._lock = RLock()
+
+    def commit(
+        self, *, kind: RelayWorkKind, leg_index: int, lineage_id: str,
+        leaf_id: str, delta: WorkVector,
+    ) -> bool:
+        if kind not in {"leg", "transfer", "candidate", "selection"}:
+            raise ValueError("Relay work leaf kind is unsupported")
+        if type(leg_index) is not int or leg_index < 0:
+            raise ValueError("Relay work leaves require a nonnegative leg index")
+        if not isinstance(lineage_id, str) or not lineage_id or not isinstance(leaf_id, str) or not leaf_id:
+            raise ValueError("Relay work leaves require stable lineage and leaf IDs")
+        if not isinstance(delta, WorkVector):
+            raise ValueError("Relay work leaves require a WorkVector")
+        leaf = _RelayWorkLeaf(kind, leg_index, lineage_id, leaf_id, delta)
+        with self._lock:
+            previous = self._leaves.get(leaf_id)
+            if previous is not None:
+                if previous != leaf:
+                    raise ValueError("Relay work leaf ID conflicts with committed evidence")
+                return False
+            self._leaves[leaf_id] = leaf
+            return True
+
+    def leaves(self) -> tuple[dict[str, object], ...]:
+        with self._lock:
+            return tuple({
+                "kind": leaf.kind, "leg_index": leaf.leg_index,
+                "lineage_id": leaf.lineage_id, "leaf_id": leaf.leaf_id,
+                "work_vector": leaf.delta.as_evidence(),
+            } for leaf in self._leaves.values())
+
+    def summary(self) -> WorkVector:
+        with self._lock:
+            return WorkVector.sum(leaf.delta for leaf in self._leaves.values())
+
+    def by_leg(self, leg_index: int) -> WorkVector:
+        if type(leg_index) is not int or leg_index < 0:
+            raise ValueError("Relay leg index must be nonnegative")
+        with self._lock:
+            return WorkVector.sum(leaf.delta for leaf in self._leaves.values() if leaf.leg_index == leg_index)
 
 
 @dataclass(frozen=True, slots=True)

@@ -21,6 +21,7 @@ except ImportError as error:  # pragma: no cover - Phase 1 targets POSIX HPC hos
 LEDGER_VERSION = 1
 CANONICAL_LEDGER_VERSION = 2
 CANONICAL_SCHEDULE_LEDGER_VERSION = 3
+CANONICAL_RELAY_LEDGER_VERSION = 4
 ShotKey = tuple[str, int]
 
 
@@ -400,7 +401,9 @@ def _canonical_event_bytes(event: Mapping[str, Any]) -> bytes:
 
 
 def _validate_canonical_event(event: Mapping[str, Any]) -> None:
-    if event.get("ledger_version") not in {CANONICAL_LEDGER_VERSION, CANONICAL_SCHEDULE_LEDGER_VERSION}:
+    if event.get("ledger_version") not in {
+        CANONICAL_LEDGER_VERSION, CANONICAL_SCHEDULE_LEDGER_VERSION, CANONICAL_RELAY_LEDGER_VERSION,
+    }:
         raise ValueError("unsupported canonical ledger version")
     if event.get("kind") not in _CANONICAL_EVENT_KINDS:
         raise ValueError("unknown canonical structural event kind")
@@ -414,6 +417,33 @@ def _validate_canonical_event(event: Mapping[str, Any]) -> None:
     data = event.get("data", {})
     if not isinstance(data, dict):
         raise ValueError("canonical event data must be an object")
+    if event.get("ledger_version") == CANONICAL_RELAY_LEDGER_VERSION:
+        if event["kind"] == "shot_begin" and data.get("schema_version") != 4:
+            raise ValueError("V4 Relay ledger evidence requires a V4 manifest declaration")
+        if event["kind"] == "relay_transfer":
+            required = {
+                "representation", "vector_length", "producer_leg_lineage_id", "numerical_profile",
+                "clipping_evidence", "digest", "relay_leaf_id",
+            }
+            if not required.issubset(data) or data["representation"] != "llr_log_p0_over_p1":
+                raise ValueError("V4 Relay transfers require exact posterior and leaf evidence")
+            if type(data["vector_length"]) is not int or data["vector_length"] < 1:
+                raise ValueError("V4 Relay transfers require a positive vector length")
+            if not all(isinstance(data[field], str) and data[field] for field in required - {"vector_length"}):
+                raise ValueError("V4 Relay transfers require stable string evidence")
+        if event["kind"] == "work" and "relay_work_leaves" in data:
+            leaves = data["relay_work_leaves"]
+            if not isinstance(leaves, list) or not leaves:
+                raise ValueError("V4 Relay work requires a nonempty leaf list when present")
+            seen_leaves: set[str] = set()
+            for leaf in leaves:
+                if not isinstance(leaf, dict) or set(leaf) != {"kind", "leg_index", "lineage_id", "leaf_id", "work_vector"}:
+                    raise ValueError("V4 Relay work leaf has an invalid exact field set")
+                if leaf["kind"] not in {"leg", "transfer", "candidate", "selection"} or type(leaf["leg_index"]) is not int or leaf["leg_index"] < 0:
+                    raise ValueError("V4 Relay work leaf has invalid ancestry")
+                if not isinstance(leaf["lineage_id"], str) or not leaf["lineage_id"] or not isinstance(leaf["leaf_id"], str) or not leaf["leaf_id"] or leaf["leaf_id"] in seen_leaves:
+                    raise ValueError("V4 Relay work leaves must have unique stable IDs")
+                seen_leaves.add(leaf["leaf_id"])
     if event.get("ledger_version") == CANONICAL_SCHEDULE_LEDGER_VERSION and event["kind"] == "termination":
         if set(data) != {"schedule_terminal", "deterministic_facts"}:
             raise ValueError("V3 schedule terminal requires exact deterministic evidence fields")
@@ -507,13 +537,20 @@ class CanonicalEventWriter:
     """Durably append sparse versioned control-flow facts for canonical CSS shots."""
 
     def __init__(self, path: str | Path, *, structural_event_version: int = CANONICAL_LEDGER_VERSION):
-        if structural_event_version not in {CANONICAL_LEDGER_VERSION, CANONICAL_SCHEDULE_LEDGER_VERSION}:
+        if structural_event_version not in {CANONICAL_LEDGER_VERSION, CANONICAL_SCHEDULE_LEDGER_VERSION, CANONICAL_RELAY_LEDGER_VERSION}:
             raise ValueError("unsupported canonical structural event version")
         self.path = Path(path)
         self.structural_event_version = structural_event_version
         self._owners: dict[ShotKey, Any] = {}
 
     def _append(self, event: dict[str, Any]) -> None:
+        if event["kind"] == "shot_begin" and event["data"].get("schema_version") == 4 and self.structural_event_version == CANONICAL_LEDGER_VERSION:
+            self.structural_event_version = CANONICAL_RELAY_LEDGER_VERSION
+        if self.structural_event_version == CANONICAL_RELAY_LEDGER_VERSION and event["kind"] == "relay_transfer":
+            data = event["data"]
+            data.setdefault("relay_leaf_id", "relay-transfer:" + sha256(
+                f"{data.get('producer_leg_lineage_id')}:{data.get('digest')}".encode("utf-8")
+            ).hexdigest()[:20])
         event["ledger_version"] = self.structural_event_version
         event["event_id"] = _canonical_event_id(event)
         _validate_canonical_event(event)
