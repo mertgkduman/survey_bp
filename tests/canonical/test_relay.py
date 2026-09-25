@@ -62,6 +62,48 @@ def test_score_selection_keeps_the_first_leg_when_scores_tie():
     assert RelayController.select_candidate((later, first)) is first
 
 
+def test_ablation_controls_are_adaptations_and_never_mutate_source_preset():
+    """Each changed Relay component has a controlled identity and leaves the source frozen."""
+    from bp_registry.canonical.relay import RelayPreset
+
+    source = RelayPreset.source_procedure()
+    ablated = source.ablation(one_leg=True, posterior_transfer=False, later_leg_memory="uniform")
+
+    assert source.total_leg_limit == 301
+    assert source.transfer == "posterior_only"
+    assert source.later_leg_memory == "disordered"
+    assert ablated.name == "relay-controlled-source_internal_bp-v1"
+    assert ablated.fidelity_status == "controlled_component_adaptation"
+    assert ablated.total_leg_limit == 1
+    assert ablated.transfer == "disabled"
+    assert ablated.later_leg_memory == "uniform"
+
+
+def test_no_transfer_one_leg_uniform_and_disordered_controls_are_independent():
+    """Relay component arms isolate exactly the requested control."""
+    from bp_registry.canonical.relay import RelayPreset
+
+    source = RelayPreset.source_procedure()
+
+    assert source.ablation(posterior_transfer=False).transfer == "disabled"
+    assert source.ablation(one_leg=True).total_leg_limit == 1
+    assert source.ablation(later_leg_memory="uniform").later_leg_memory == "uniform"
+    assert RelayPreset.canonical_default().ablation(later_leg_memory="disordered").later_leg_memory == "disordered"
+
+
+def test_numerical_profile_and_source_parameter_sweep_controls_remain_explicit():
+    """A source sweep or numerical control cannot collapse into the source configuration."""
+    from bp_registry.canonical.relay import RelayPreset
+
+    source = RelayPreset.source_procedure()
+    sweep = source.ablation(source_parameter_sweep=(-0.10, 0.10))
+    numerical = source.ablation(numerical_profile="cpu-float64-spa-v1")
+
+    assert sweep.source_parameter_sweep == (-0.10, 0.10)
+    assert numerical.numerical_profile == "cpu-float64-spa-v1"
+    assert sweep.fidelity_status == numerical.fidelity_status == "controlled_component_adaptation"
+
+
 def _policies() -> dict[str, object]:
     return {
         "update": {"kind": "binary_spa", "binding_id": "update", "state_lifetime": "message"},
