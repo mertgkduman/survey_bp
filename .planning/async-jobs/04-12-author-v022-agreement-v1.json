@@ -5,7 +5,7 @@
   "job_id": "56390956",
   "backend": "slurm",
   "submit_command": "sbatch --parsable --exclude=dcc-core-ferc-u-ac39-4-1,dcc-dhvimdcore-gpu-ferc-s-p15-15,dcc-core-ferc-u-ab25-3-5 /hpc/group/pfisterlab/mg551/storage/survey_bp_low_noise_20260925/scripts/submit_phase4_author_v022_agreement.sbatch",
-  "status": "running",
+  "status": "completed",
   "expected_artifacts": [
     "data/results/phase4-memory-relay/author-v022-agreement-v1/result.json",
     "data/results/phase4-memory-relay/author-v022-agreement-v1/identity.json",
@@ -15,5 +15,12 @@
   "verification_command": ".venv/bin/python -c \"import json; from pathlib import Path; p=Path('data/results/phase4-memory-relay/author-v022-agreement-v1/result.json'); r=json.loads(p.read_text()); assert r['status'] in {'completed','inconclusive_wall_cap'} and set(r['codes'])=={'gross-bb-144','b1-ghp-882','hgp-gallager-3-4-seed-20260923'}; print(r['status'],r['look_shots'],r['result_digest'])\"",
   "resume_command": "if test -f data/results/phase4-memory-relay/author-v022-agreement-v1/result.json; then exit 0; fi; if squeue -h -j 56390956 | grep -q .; then exit 0; fi; sbatch --parsable --exclude=dcc-core-ferc-u-ac39-4-1,dcc-dhvimdcore-gpu-ferc-s-p15-15,dcc-core-ferc-u-ab25-3-5 /hpc/group/pfisterlab/mg551/storage/survey_bp_low_noise_20260925/scripts/submit_phase4_author_v022_agreement.sbatch",
   "submitted_at": "2026-09-25T19:55:35Z",
-  "terminal_details": null
+  "terminal_details": {
+    "slurm_state": "COMPLETED",
+    "report_status": "completed",
+    "result_digest": "37394b952124cae8e36b0d7b5c1045b4c8782759d598f7e5da83eb7d02d18dbe",
+    "digest_verified": true,
+    "complete_pairs_per_code": 128,
+    "native_import_isolated": true
+  }
 }

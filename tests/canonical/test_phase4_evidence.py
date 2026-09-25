@@ -544,8 +544,8 @@ def test_b1_p07_bounded_probe_has_a_fixed_three_leg_work_envelope():
 
 
 def test_frozen_v3_caps_are_numeric_separate_and_executable():
-    """D-23 freezes measured one-worker caps before calibration can rank a setting."""
-    caps = json.loads(Path("data/manifests/phase4-pilot-caps.json").read_text(encoding="utf-8"))
+    """The historical V3 freeze remains byte-preserved after the active V4 freeze."""
+    caps = json.loads(Path("data/manifests/phase4-pilot-caps-v3-pre-active-memory.json").read_text(encoding="utf-8"))
     amendment = json.loads(Path("data/evidence/phase4-pilot-design-amendment-v3.json").read_text(encoding="utf-8"))
     allocation = caps["allocation"]
     categories = allocation["categories"]
@@ -703,7 +703,7 @@ def test_live_freeze_entitlement_uses_running_slurm_remaining_wall_and_rejects_s
 def test_active_v4_cap_builder_requires_terminal_verified_benchmark_and_derives_new_identity(tmp_path):
     """The active-memory timing amendment cannot reuse the pre-active V3 cap."""
     runner = _phase4_runner_module()
-    prior = json.loads(Path("data/manifests/phase4-pilot-caps.json").read_text(encoding="utf-8"))
+    prior = json.loads(Path("data/manifests/phase4-pilot-caps-v3-pre-active-memory.json").read_text(encoding="utf-8"))
 
     def arm(*, elapsed: float, work: int) -> dict[str, object]:
         vector = {key: 0 for key in runner._ACTIVE_V4_WORK_VECTOR_KEYS}
