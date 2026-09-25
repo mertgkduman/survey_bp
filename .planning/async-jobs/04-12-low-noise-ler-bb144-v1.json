@@ -1,0 +1,19 @@
+{
+  "version": "1.0",
+  "plan_id": "04-12",
+  "phase": "04",
+  "job_id": "56386510",
+  "backend": "slurm",
+  "submit_command": "sbatch --parsable --exclude=dcc-core-ferc-u-ac39-4-1 /hpc/group/pfisterlab/mg551/storage/survey_bp_low_noise_20260925/scripts/submit_phase4_low_noise_ler.sbatch",
+  "status": "running",
+  "expected_artifacts": [
+    "data/results/phase4-memory-relay/low-noise-ler-v1/result.json",
+    "data/results/phase4-memory-relay/low-noise-ler-v1/identity.json",
+    "data/results/phase4-memory-relay/low-noise-ler-v1/slurm-56386510.out",
+    "data/results/phase4-memory-relay/low-noise-ler-v1/slurm-56386510.err"
+  ],
+  "verification_command": "test -f data/results/phase4-memory-relay/low-noise-ler-v1/result.json && .venv/bin/python -c \"import json; from pathlib import Path; p=Path('data/results/phase4-memory-relay/low-noise-ler-v1/result.json'); r=json.loads(p.read_text()); assert r['status'] in {'completed_precision','completed_with_inconclusive'}; print(r['status'],r['result_digest'])\"",
+  "resume_command": "if test -f data/results/phase4-memory-relay/low-noise-ler-v1/result.json; then exit 0; fi; if squeue -h -j 56386510 | grep -q .; then exit 0; fi; sbatch --parsable --exclude=dcc-core-ferc-u-ac39-4-1 /hpc/group/pfisterlab/mg551/storage/survey_bp_low_noise_20260925/scripts/submit_phase4_low_noise_ler.sbatch",
+  "submitted_at": "2026-09-25T18:18:47Z",
+  "terminal_details": null
+}
