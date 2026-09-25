@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from hashlib import sha256
-import json
 import math
 from typing import Iterable, Literal
 
@@ -270,7 +269,14 @@ class _PriorVectorKernel:
 
     def __init__(self, kernel: object, prior: np.ndarray) -> None:
         self._kernel = kernel
-        self._prior = np.asarray(prior, dtype=np.float64)
+        self.set_prior(prior)
+
+    def set_prior(self, prior: np.ndarray) -> None:
+        """Replace only the current sweep's finite effective-prior vector."""
+        values = np.asarray(prior, dtype=np.float64)
+        if values.ndim != 1 or values.size == 0 or not np.all(np.isfinite(values)):
+            raise ValueError("Relay prior kernel requires a nonempty finite prior vector")
+        self._prior = np.array(values, dtype=np.float64, copy=True)
 
     def prior(self, _error_rate: float) -> float:
         return 0.0
@@ -342,6 +348,13 @@ class RelayController:
         if not result.admitted or result.evidence is None:
             raise RuntimeError("zero-work Relay memory assignment was unexpectedly denied")
         gamma = np.asarray(result.values, dtype=np.float64)
+        # The assignment stream is deliberately Uniform(0, 1), independent of
+        # the candidate interval.  This lets calibration candidates map the
+        # same declared common random variates into different center/width
+        # intervals without perturbing their per-leg draw identity.
+        gamma = tuning.later_leg_low + tuning.later_leg_width * gamma
+        if not np.all(np.isfinite(gamma)):
+            raise ValueError("Relay disordered memory assignment is nonfinite")
         # MemoryAssignmentSpec uses this exact digest as the PCG64 input.  Keep
         # it alongside the root identity and public sample identity so the draw
         # is independently reconstructible.
@@ -398,10 +411,15 @@ class RelayController:
                 mode="uniform", graph_sha256=edge_table.graph_sha256,
                 root_seed_identity=sha256(tuning.seed_identity.encode("utf-8")).hexdigest(),
                 refresh_boundary="leg_start", retain_history=False,
-                low=tuning.later_leg_low, high=tuning.later_leg_high,
+                # Draw a normalized stream and map it to the declared interval
+                # after refresh.  The fixed [0, 1] generator contract preserves
+                # common random variates across candidate center/width values.
+                low=0.0, high=1.0,
             )
             assignment_state = assignment.initial_state(
-                configuration_identity=sha256(json.dumps(tuning.model_dump(mode="json"), sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest(),
+                configuration_identity=sha256(
+                    b"relay-v022-dynamic-memory-common-draw-stream-v1"
+                ).hexdigest(),
                 decoder_identity=tuning.seed_identity,
             )
 
@@ -468,14 +486,20 @@ class RelayController:
                         assignment_state=assignment_state,
                     )
 
-            # Each leg resets C2V/V2C state to channel priors.  For active
-            # memory, only the posterior crosses a Relay boundary; the current
-            # gamma vector is then applied before *every* source iteration.
+            # Each leg resets C2V/V2C state to channel priors.  The flooding
+            # topology is constructed once per leg; only its vector-prior
+            # operand changes before an active-memory sweep.
             messages = np.asarray([base_prior[variable] for _check, variable in edge_table.edges], dtype=np.float64)
             posterior = np.array(posterior_for_memory if self.memory_tuning is not None else prior, dtype=np.float64, copy=True)
             candidate = kernel.candidate_from_beliefs(posterior)  # type: ignore[attr-defined]
             converged = bool(np.array_equal((check_matrix.astype(np.int64) @ candidate.astype(np.int64)) % 2, syndrome))
             completed = 0
+            initial_effective_prior = (
+                self._dynamic_prior(base_prior, posterior, gamma, kernel=kernel)
+                if gamma is not None else prior
+            )
+            prior_kernel = _PriorVectorKernel(kernel, initial_effective_prior)
+            schedule = FloodingSchedule(edge_table, kernel=prior_kernel, profile=kernel.profile)  # type: ignore[attr-defined]
             for iteration in range(1, leg.max_iterations + 1):
                 proposed = WorkVector.from_flooding_counts(
                     edge_count=edge_table.edge_count, variable_count=edge_table.variable_count,
@@ -504,9 +528,7 @@ class RelayController:
                     self._dynamic_prior(base_prior, posterior, gamma, kernel=kernel)
                     if gamma is not None else prior
                 )
-                schedule = FloodingSchedule(
-                    edge_table, kernel=_PriorVectorKernel(kernel, effective_prior), profile=kernel.profile,
-                )  # type: ignore[attr-defined]
+                prior_kernel.set_prior(effective_prior)
                 sweep = schedule.sweep(messages, syndrome, error_rate=error_rate, source_iteration=iteration - 1)
                 messages = sweep.new_v2c
                 posterior = sweep.beliefs

@@ -356,3 +356,70 @@ def test_active_memory_tuning_requires_a_controlled_adaptation_identity():
                 "later_leg_width": 2.0, "seed_identity": "controlled-seed",
             },
         })
+
+
+def test_active_memory_changes_each_sweep_without_rebuilding_the_leg_schedule(monkeypatch):
+    """Dynamic Relay memory updates the prior operand, not schedule topology."""
+    import bp_registry.canonical.relay as relay_module
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.contracts import MemoryBindingV4, RelayLegSpec, RelayMemoryTuningV4
+    from bp_registry.canonical.numerics import REFERENCE_CPU_F64
+    from bp_registry.canonical.schedules import EdgeTable
+
+    class Kernel:
+        profile = REFERENCE_CPU_F64
+
+        def prior(self, _error_rate):
+            return 2.0
+
+        def check_message(self, *_args, **_kwargs):
+            return 1.0
+
+        def variable_message(self, belief, check_message):
+            return belief - check_message
+
+        def candidate_from_beliefs(self, beliefs):
+            return np.zeros(beliefs.size, dtype=np.uint8)
+
+    original = relay_module.FloodingSchedule
+    constructed: list[object] = []
+    observed_priors: list[np.ndarray] = []
+
+    class ObservingSchedule(original):
+        def __init__(self, *args, **kwargs):
+            constructed.append(self)
+            super().__init__(*args, **kwargs)
+
+        def sweep(self, *args, **kwargs):
+            observed_priors.append(np.array(self.kernel._prior, copy=True))
+            return super().sweep(*args, **kwargs)
+
+    monkeypatch.setattr(relay_module, "FloodingSchedule", ObservingSchedule)
+    controller = relay_module.RelayController(
+        memory_bindings=(MemoryBindingV4(
+            binding_id="relay-prior", kind="affine_prior", target="prior", order=0,
+            alpha=0.875, state_lifetime="leg",
+        ),),
+        numerical_profile="cpu-float64-spa-v1",
+        memory_tuning=RelayMemoryTuningV4(
+            semantics="relay_v022_dynamic_affine_prior_css_adaptation",
+            first_leg_gamma=0.5, later_leg_center=0.0, later_leg_width=0.0,
+            seed_identity="schedule-reuse-fixture",
+        ),
+    )
+    table = EdgeTable.from_edges(1, 3, [(0, 0), (0, 1), (0, 2)])
+    run = controller.run(
+        edge_table=table, check_matrix=np.ones((1, 3), dtype=np.uint8),
+        syndrome=np.ones(1, dtype=np.uint8), kernel=Kernel(), error_rate=0.1,
+        legs=(RelayLegSpec(max_iterations=2), RelayLegSpec(max_iterations=2)),
+        budgets=BudgetTree(limits=()), scope="attempt", lineage_prefix="active-schedule",
+        solution_limit=2, sample_seed_identity="active-schedule-sample",
+    )
+
+    assert run.stopping_reason == "leg_limit"
+    assert len(constructed) == 2
+    assert len(observed_priors) == 4
+    assert np.allclose(observed_priors[0], 2.0)
+    assert np.allclose(observed_priors[1], 2.5)
+    assert np.allclose(observed_priors[2], 2.0)
+    assert np.allclose(observed_priors[3], 2.0)
