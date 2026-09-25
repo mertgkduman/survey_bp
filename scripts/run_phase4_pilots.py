@@ -14,6 +14,7 @@ from copy import deepcopy
 from datetime import datetime, timezone
 from hashlib import sha256
 import json
+import math
 import os
 from pathlib import Path
 import resource
@@ -282,6 +283,212 @@ def select_calibration_settings(calibration: Mapping[str, Any]) -> dict[str, obj
         "shared_selection_rule": "among candidate ids eligible for both named presets, lowest mean estimated logical failure then mean C2V, mean total work, lexicographic candidate id",
         "codes": selections,
     }
+
+
+_ACTIVE_V4_AUTHOR_PIN = "relay-v0.2.2@14cb31a18f9b9d7d099791b793e35b8a2951f8f3"
+_ACTIVE_V4_REQUIRED_CORE_COMMITS = frozenset({"6e6ad03", "660049a", "1f8f1c2"})
+
+
+def _active_rate_key(rate: float) -> str:
+    return f"p{rate:.3f}".replace(".", "")
+
+
+def _p95(values: list[float]) -> float:
+    if not values:
+        raise ValueError("active benchmark arm has no retained public elapsed values")
+    return sorted(values)[math.ceil(.95 * len(values)) - 1]
+
+
+def _active_v4_required_arms(code_id: str, code: Mapping[str, Any]) -> list[Mapping[str, Any]]:
+    """Return exactly the terminal arms that support a selected active rate."""
+    if code.get("selection_status") != "selected" or not isinstance(code.get("selected_rate"), (int, float)):
+        raise ValueError(f"{code_id} has no terminal selected active benchmark rate")
+    rates = code.get("rates")
+    if not isinstance(rates, Mapping):
+        raise ValueError(f"{code_id} omits its retained active rate records")
+    selected = rates.get(_active_rate_key(float(code["selected_rate"])))
+    presets = selected.get("presets") if isinstance(selected, Mapping) else None
+    if not isinstance(presets, Mapping):
+        raise ValueError(f"{code_id} selected active rate omits preset records")
+    required: list[Mapping[str, Any]] = []
+    for preset_name in ("source_procedure", "canonical_default"):
+        preset = presets.get(preset_name)
+        if not isinstance(preset, Mapping):
+            raise ValueError(f"{code_id} omits required {preset_name} benchmark evidence")
+        controlled_name = (
+            "controlled_relay_31_bounded"
+            if code_id == "b1-ghp-882" and "controlled_relay_31_bounded" in preset
+            else "controlled_relay_31"
+        )
+        for arm_name in ("baseline", controlled_name):
+            arm = preset.get(arm_name)
+            if not isinstance(arm, Mapping):
+                raise ValueError(f"{code_id}/{preset_name} omits required {arm_name} evidence")
+            attempts = arm.get("attempts")
+            if (arm.get("status") != "completed" or arm.get("active_memory_verified") is not True
+                    or not isinstance(attempts, list) or len(attempts) != 32
+                    or any(not isinstance(item, Mapping) or item.get("status") != "completed" for item in attempts)):
+                raise ValueError(f"{code_id}/{preset_name}/{arm_name} is not a complete verified active arm")
+            required.append(arm)
+    return required
+
+
+def _renew_namespace(value: object, kind: str) -> str:
+    if not isinstance(value, str) or f"-{kind}-" not in value:
+        raise ValueError(f"prior cap omits a valid {kind} namespace")
+    return value.split(f"-{kind}-", 1)[0] + f"-v4-active-{kind}"
+
+
+def build_active_v4_caps(benchmark_report: Mapping[str, Any], live_entitlement: Mapping[str, Any],
+                         prior_caps: Mapping[str, Any]) -> dict[str, object]:
+    """Build, without writing, a new cap identity from terminal active-memory evidence.
+
+    It deliberately rejects any nonterminal report so a later calibration cannot
+    inherit a timing ceiling from the historical pre-active-memory V3 campaign.
+    The caller writes the returned immutable amendment before publishing caps.
+    """
+    if benchmark_report.get("status") != "completed":
+        raise ValueError("active V4 cap requires a terminal completed benchmark report")
+    if benchmark_report.get("author_source_pin") != _ACTIVE_V4_AUTHOR_PIN:
+        raise ValueError("active V4 cap requires the exact approved author v0.2.2 pin")
+    if not _ACTIVE_V4_REQUIRED_CORE_COMMITS.issubset(set(benchmark_report.get("core_commits", []))):
+        raise ValueError("active V4 cap lacks a required active-memory core repair")
+    report_digest = benchmark_report.get("report_digest")
+    if not isinstance(report_digest, str) or len(report_digest) != 64:
+        raise ValueError("active V4 cap requires a digest-bound benchmark report")
+    one_worker = live_entitlement.get("one_worker")
+    remaining = live_entitlement.get("remaining_wall_seconds")
+    if (not isinstance(one_worker, Mapping) or one_worker.get("omp_num_threads") != 1
+            or one_worker.get("workers") != 1 or not isinstance(remaining, (int, float)) or remaining <= 0):
+        raise ValueError("active V4 cap requires fresh positive one-worker remaining wall entitlement")
+    if prior_caps.get("status") != "frozen_pre_calibration" or not isinstance(prior_caps.get("caps_digest"), str):
+        raise ValueError("active V4 cap requires the preserved frozen V3 cap record")
+    report_codes = benchmark_report.get("codes")
+    prior_codes = prior_caps.get("codes")
+    if not isinstance(report_codes, Mapping) or not isinstance(prior_codes, Mapping) or set(report_codes) != set(prior_codes):
+        raise ValueError("active V4 report and prior cap must cover the same code identities")
+
+    margin_seconds = math.floor(float(remaining) * .10)
+    allocatable = math.floor(float(remaining)) - margin_seconds
+    fractions = {"calibration": .35, "evaluation": .45, "native": .10, "fixture_trace": .10}
+    category_max = {name: math.floor(allocatable * fraction) for name, fraction in fractions.items()}
+    code_caps: dict[str, dict[str, Any]] = {}
+    for code_id in sorted(report_codes):
+        report_code = report_codes[code_id]
+        prior_code = prior_codes[code_id]
+        if not isinstance(report_code, Mapping) or not isinstance(prior_code, Mapping):
+            raise ValueError(f"invalid active V4 report or prior cap for {code_id}")
+        elapsed: list[float] = []
+        work_max: dict[str, int] = {}
+        for arm in _active_v4_required_arms(code_id, report_code):
+            for attempt in arm["attempts"]:
+                boundary = attempt.get("public_boundary")
+                seconds = boundary.get("elapsed_seconds") if isinstance(boundary, Mapping) else None
+                work = attempt.get("work_vector")
+                if not isinstance(seconds, (int, float)) or seconds <= 0 or not isinstance(work, Mapping):
+                    raise ValueError(f"{code_id} active arm omits retained elapsed/work evidence")
+                elapsed.append(float(seconds))
+                for key, value in work.items():
+                    if not isinstance(value, int) or value < 0:
+                        raise ValueError(f"{code_id} active arm has invalid work evidence")
+                    work_max[key] = max(work_max.get(key, 0), value)
+        p95 = _p95(elapsed)
+        public_boundary = max(1, math.ceil(p95 * 1.25))
+        updated = deepcopy(dict(prior_code))
+        updated["central_error_rate"] = float(report_code["selected_rate"])
+        updated["canonical_public_boundary_seconds"] = public_boundary
+        updated["per_shot_work_cap"] = work_max
+        updated["calibration_namespace"] = _renew_namespace(prior_code.get("calibration_namespace"), "calibration")
+        updated["evaluation_namespace"] = _renew_namespace(prior_code.get("evaluation_namespace"), "evaluation")
+        updated["native_namespace"] = _renew_namespace(prior_code.get("native_namespace"), "native")
+        updated["fixture_trace_namespace"] = _renew_namespace(prior_code.get("fixture_trace_namespace"), "fixture-trace")
+        updated["active_v4_benchmark"] = {
+            "report_digest": report_digest, "selected_rate": float(report_code["selected_rate"]),
+            "retained_elapsed_count": len(elapsed), "public_elapsed_p95_seconds": p95,
+            "derived_public_boundary_seconds": public_boundary, "observed_work_max": work_max,
+        }
+        code_caps[code_id] = updated
+    # Preserve the frozen pre-outcome rank order, but trim only a suffix when
+    # fresh timings require it.  A round-robin extension keeps every code in a
+    # scientifically meaningful finite grid before one code receives extras.
+    def candidate_cost(code: Mapping[str, Any]) -> int:
+        return 2 * int(code["calibration_shots_per_configuration"]) * int(code["canonical_public_boundary_seconds"])
+
+    chosen_counts = {code_id: int(code["coarse_candidate_count"]) for code_id, code in code_caps.items()}
+    full_projection = sum(
+        (count + int(code_caps[code_id]["refinement_candidate_count_per_preset"])) * candidate_cost(code_caps[code_id])
+        for code_id, count in chosen_counts.items()
+    )
+    if full_projection > category_max["calibration"]:
+        chosen_counts = {code_id: 1 for code_id in code_caps}
+        minimum_projection = sum(
+            (count + int(code_caps[code_id]["refinement_candidate_count_per_preset"])) * candidate_cost(code_caps[code_id])
+            for code_id, count in chosen_counts.items()
+        )
+        if minimum_projection > category_max["calibration"]:
+            raise ValueError("active V4 calibration ceiling cannot support a meaningful three-code grid")
+        remaining_ceiling = category_max["calibration"] - minimum_projection
+        progressed = True
+        while progressed:
+            progressed = False
+            for code_id in sorted(code_caps):
+                code = code_caps[code_id]
+                if chosen_counts[code_id] >= int(code["coarse_candidate_count"]):
+                    continue
+                cost = candidate_cost(code)
+                if cost <= remaining_ceiling:
+                    chosen_counts[code_id] += 1
+                    remaining_ceiling -= cost
+                    progressed = True
+    planned_calibration = 0
+    for code_id, code in code_caps.items():
+        count = chosen_counts[code_id]
+        if count != int(code["coarse_candidate_count"]):
+            code["coarse_candidates"] = list(code["coarse_candidates"])[:count]
+            code["coarse_candidate_count"] = count
+        code["candidate_prefix_policy"] = "frozen V3 rank-order prefix; active-V4 timing round-robin allocation"
+        planned_calibration += (count + int(code["refinement_candidate_count_per_preset"])) * candidate_cost(code)
+
+    native_status = benchmark_report.get("native", {"status": "native_rerun_required"})
+    if not isinstance(native_status, Mapping) or not isinstance(native_status.get("status"), str):
+        raise ValueError("active V4 benchmark must retain an explicit native status")
+    amendment: dict[str, object] = {
+        "schema_version": 4, "status": "frozen_before_calibration", "calibration_outcomes_inspected": False,
+        "reason": "active per-iteration Relay gamma changed the timed canonical kernel; V3 is historical only",
+        "benchmark_report_digest": report_digest, "author_source_pin": _ACTIVE_V4_AUTHOR_PIN,
+        "core_commits": sorted(_ACTIVE_V4_REQUIRED_CORE_COMMITS),
+        "conditional_scan_history": {code_id: {"selected_rate": report_codes[code_id].get("selected_rate"),
+                                                 "rates_retained": sorted((report_codes[code_id].get("rates") or {}).keys())}
+                                     for code_id in sorted(report_codes)},
+        "native_status": deepcopy(dict(native_status)),
+        "supersedes": {"path": "data/manifests/phase4-pilot-caps.json", "caps_digest": prior_caps["caps_digest"],
+                       "prior_status": "superseded_pre_active_memory", "preserve_reports_byte_exact": True},
+        "allocation_basis": {"job_id": live_entitlement.get("job_id"), "remaining_wall_seconds": math.floor(float(remaining)),
+                              "safety_margin_seconds": margin_seconds, "one_worker": dict(one_worker)},
+    }
+    amendment_sha256 = _digest(amendment)
+    categories = {
+        name: {"fraction_max": fractions[name], "wall_seconds_max": category_max[name],
+               "planned_total_wall_seconds": planned_calibration if name == "calibration" else 0}
+        for name in fractions
+    }
+    caps: dict[str, object] = {
+        "schema_version": 4, "cap_version": "v4-active-memory", "status": "frozen_pre_calibration",
+        "author_source_pin": _ACTIVE_V4_AUTHOR_PIN,
+        "supersedes": amendment["supersedes"],
+        "design_amendment": {"path": "data/evidence/phase4-pilot-design-amendment-v4-active-memory.json", "sha256": amendment_sha256},
+        "benchmark_evidence": {"active_v4": {"report_digest": report_digest}},
+        "entitlement": dict(live_entitlement),
+        "allocation": {"remaining_wall_seconds_at_freeze": math.floor(float(remaining)), "safety_margin_seconds": margin_seconds,
+                       "allocatable_wall_seconds_after_margin": allocatable, "fraction_sum": sum(fractions.values()),
+                       "categories": categories},
+        "codes": code_caps,
+        "stop_rules": {"no_silent_extension": True, "category_wall_from_retained_elapsed": True,
+                       "incomplete_or_budget_terminal_is_inconclusive": True},
+    }
+    caps["caps_digest"] = _digest(caps)
+    return {"caps": caps, "amendment": amendment,
+            "supersession": {"prior_caps_status": "superseded_pre_active_memory", "prior_caps_digest": prior_caps["caps_digest"]}}
 
 
 def _calibration_manifest(base: Mapping[str, Any], cell: Mapping[str, Any], *, amendment_sha256: str) -> dict[str, Any]:

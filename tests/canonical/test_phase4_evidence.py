@@ -661,6 +661,57 @@ def test_selection_tie_break_uses_work_only_for_overlapping_wilson_intervals():
     assert selected["codes"]["code-a"]["presets"]["source"]["configuration_id"] == "overlap"
 
 
+def test_active_v4_cap_builder_requires_terminal_verified_benchmark_and_derives_new_identity():
+    """The active-memory timing amendment cannot reuse the pre-active V3 cap."""
+    runner = _phase4_runner_module()
+    prior = json.loads(Path("data/manifests/phase4-pilot-caps.json").read_text(encoding="utf-8"))
+
+    def arm(*, elapsed: float, work: int) -> dict[str, object]:
+        return {"status": "completed", "active_memory_verified": True, "attempts": [
+            {"status": "completed", "shot_id": shot, "public_boundary": {"elapsed_seconds": elapsed + shot / 100.0},
+             "work_vector": {"check_to_variable_updates": work + shot, "variable_to_check_updates": work + shot}}
+            for shot in range(32)
+        ]}
+
+    codes = {}
+    for code_id, rate in (("gross-bb-144", .03), ("b1-ghp-882", .07), ("hgp-gallager-3-4-seed-20260923", .03)):
+        key = f"p{rate:.3f}".replace(".", "")
+        canonical = {"baseline": arm(elapsed=4.0, work=20), "controlled_relay_31": arm(elapsed=5.0, work=30)}
+        if code_id == "b1-ghp-882":
+            canonical["controlled_relay_31"] = {"status": "incomplete_canonical_arm", "active_memory_verified": False, "attempts": []}
+            canonical["controlled_relay_31_bounded"] = arm(elapsed=8.0, work=40)
+        codes[code_id] = {"selected_rate": rate, "selection_status": "selected", "rates": {key: {"presets": {
+            "source_procedure": {"baseline": arm(elapsed=3.0, work=10), "controlled_relay_31": arm(elapsed=6.0, work=35)},
+            "canonical_default": canonical,
+        }}}}
+    report = {"status": "completed", "report_digest": "a" * 64,
+                  "author_source_pin": "relay-v0.2.2@14cb31a18f9b9d7d099791b793e35b8a2951f8f3",
+              "core_commits": ["6e6ad03", "660049a", "1f8f1c2"], "codes": codes}
+    entitlement = {"job_id": "55938300", "remaining_wall_seconds": 3_000_000,
+                   "one_worker": {"omp_num_threads": 1, "workers": 1}}
+
+    built = runner.build_active_v4_caps(report, entitlement, prior)
+
+    caps, amendment = built["caps"], built["amendment"]
+    assert caps["status"] == "frozen_pre_calibration"
+    assert caps["supersedes"]["prior_status"] == "superseded_pre_active_memory"
+    assert amendment["calibration_outcomes_inspected"] is False
+    assert caps["allocation"]["fraction_sum"] == 1.0
+    assert sum(item["wall_seconds_max"] for item in caps["allocation"]["categories"].values()) <= caps["allocation"]["allocatable_wall_seconds_after_margin"]
+    assert caps["codes"]["b1-ghp-882"]["central_error_rate"] == .07
+    assert caps["codes"]["b1-ghp-882"]["canonical_public_boundary_seconds"] >= 8
+    assert caps["codes"]["gross-bb-144"]["calibration_namespace"].endswith("-v4-active-calibration")
+    assert caps["caps_digest"] == runner._digest({key: value for key, value in caps.items() if key != "caps_digest"})
+
+    report["status"] = "final_inconclusive"
+    with pytest.raises(ValueError, match="terminal completed"):
+        runner.build_active_v4_caps(report, entitlement, prior)
+    report["status"] = "completed"
+    report["codes"]["gross-bb-144"]["rates"]["p0030"]["presets"]["source_procedure"]["baseline"]["attempts"] = []
+    with pytest.raises(ValueError, match="complete verified active arm"):
+        runner.build_active_v4_caps(report, entitlement, prior)
+
+
 def test_calibration_runner_retains_verified_attempts_and_is_idempotent(tmp_path, monkeypatch):
     """A resumed finite cell cannot duplicate public events or re-run a terminal shot."""
     runner = _phase4_runner_module()
