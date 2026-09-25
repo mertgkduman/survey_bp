@@ -609,6 +609,14 @@ def test_calibration_plan_is_complete_disjoint_and_keeps_controlled_adaptation_l
     manifest_a = runner._calibration_manifest(json.loads(Path("data/manifests/phase4-memory-relay-bb144.json").read_text()), first, amendment_sha256="b" * 64)
     manifest_b = runner._calibration_manifest(json.loads(Path("data/manifests/phase4-memory-relay-bb144.json").read_text()), same_code, amendment_sha256="b" * 64)
     assert manifest_a["relay"]["memory_tuning"]["seed_identity"] == manifest_b["relay"]["memory_tuning"]["seed_identity"]
+    source = next(cell for cell in plan["cells"] if cell["code_id"] == "gross-bb-144" and cell["preset_key"] == "source_procedure")
+    canonical = next(cell for cell in plan["cells"] if cell["code_id"] == "gross-bb-144" and cell["preset_key"] == "canonical_default")
+    source_manifest = runner._calibration_manifest(json.loads(Path("data/manifests/phase4-memory-relay-bb144.json").read_text()), source, amendment_sha256="b" * 64)
+    canonical_manifest = runner._calibration_manifest(json.loads(Path("data/manifests/phase4-memory-relay-bb144.json").read_text()), canonical, amendment_sha256="b" * 64)
+    assert source_manifest["policies"]["update"]["kind"] == "min_sum"
+    assert source_manifest["numerical_profile"] == source_manifest["relay"]["numerical_profile"] == "cpu-float64-min-sum-v1"
+    assert canonical_manifest["policies"]["update"]["kind"] == "binary_spa"
+    assert canonical_manifest["numerical_profile"] == canonical_manifest["relay"]["numerical_profile"] == "cpu-float64-spa-v1"
 
 
 def test_selection_rule_is_deterministic_and_never_reads_evaluation_data(tmp_path):

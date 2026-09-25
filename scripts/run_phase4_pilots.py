@@ -157,6 +157,7 @@ def calibration_plan(repository_root: Path, caps: Mapping[str, Any]) -> dict[str
                     # Both named procedures tune the same active disordered
                     # later-leg assignment under controlled CSS controls.
                     "later_leg_memory": "disordered",
+                    "numerical_profile": "cpu-float64-min-sum-v1" if procedure == "source_internal_bp" else "cpu-float64-spa-v1",
                 }
                 cells.append({
                     "configuration_id": f"{code_id}:{preset_key}:{tier}:{candidate_id}",
@@ -309,6 +310,18 @@ def _calibration_manifest(base: Mapping[str, Any], cell: Mapping[str, Any], *, a
         "rng_algorithm": "numpy.PCG64",
         "refresh": "per_later_leg",
     }
+    if relay["procedure"] == "source_internal_bp":
+        # The source-linked controlled procedure uses min-sum internally;
+        # changing only a label would make the two named arms duplicates.
+        value["policies"] = {
+            **dict(value["policies"]),
+            "update": {
+                "kind": "min_sum", "binding_id": "update-min-sum-v1",
+                "state_lifetime": "message", "owned_state": [], "requires": [], "provides": [],
+            },
+        }
+        value["numerical_profile"] = "cpu-float64-min-sum-v1"
+        relay["numerical_profile"] = "cpu-float64-min-sum-v1"
     value["relay"] = relay
     value["run_id"] = "phase4-calibration-" + _digest({"configuration_id": configuration_id, "amendment": amendment_sha256})[:24]
     value["error_rate"] = float(cell["central_error_rate"])
