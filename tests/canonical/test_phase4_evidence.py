@@ -677,6 +677,29 @@ def test_shared_selection_retains_zero_work_as_lower_than_positive_work():
     assert selected["codes"]["code-a"]["shared_memory_settings"]["candidate_id"] == "zero"
 
 
+def test_live_freeze_entitlement_uses_running_slurm_remaining_wall_and_rejects_stale_ceiling(monkeypatch):
+    runner = _phase4_runner_module()
+    record = (
+        "JobId=42 JobState=RUNNING TimeLimit=1-00:00:00 RunTime=01:00:00 "
+        "EndTime=2026-09-26T00:00:00 NumTasks=1"
+    )
+    monkeypatch.setattr(runner.subprocess, "run", lambda *_args, **_kwargs: type("Result", (), {
+        "returncode": 0, "stdout": record, "stderr": "",
+    })())
+    live = runner._live_freeze_entitlement("42", ceiling_seconds=3_600)
+    assert live["verified_remaining_wall_seconds"] == 82_800
+    assert live["remaining_wall_seconds"] == 3_600
+    assert live["one_worker"] == {"omp_num_threads": 1, "workers": 1}
+    with pytest.raises(ValueError, match="exceeds verified"):
+        runner._live_freeze_entitlement("42", ceiling_seconds=82_801)
+    stopped = record.replace("JobState=RUNNING", "JobState=COMPLETED")
+    monkeypatch.setattr(runner.subprocess, "run", lambda *_args, **_kwargs: type("Result", (), {
+        "returncode": 0, "stdout": stopped, "stderr": "",
+    })())
+    with pytest.raises(RuntimeError, match="requires RUNNING"):
+        runner._live_freeze_entitlement("42")
+
+
 def test_active_v4_cap_builder_requires_terminal_verified_benchmark_and_derives_new_identity(tmp_path):
     """The active-memory timing amendment cannot reuse the pre-active V3 cap."""
     runner = _phase4_runner_module()

@@ -1319,6 +1319,59 @@ def _slurm_entitlement(job_id: str) -> dict[str, object]:
     }
 
 
+def _slurm_duration_seconds(value: str) -> int:
+    """Parse Slurm's D-HH:MM:SS / HH:MM:SS durations without guessing units."""
+    if not value or value in {"Unknown", "UNLIMITED", "Partition_Limit"}:
+        raise ValueError("SLURM duration is not a finite concrete value")
+    days = 0
+    clock = value
+    if "-" in value:
+        day_text, clock = value.split("-", 1)
+        days = int(day_text)
+    parts = clock.split(":")
+    if len(parts) == 3:
+        hours, minutes, seconds = (int(part) for part in parts)
+    elif len(parts) == 2:
+        hours, minutes, seconds = 0, *(int(part) for part in parts)
+    else:
+        raise ValueError("SLURM duration must include clock fields")
+    if min(days, hours, minutes, seconds) < 0 or minutes >= 60 or seconds >= 60:
+        raise ValueError("SLURM duration has invalid clock fields")
+    return days * 86_400 + hours * 3_600 + minutes * 60 + seconds
+
+
+def _live_freeze_entitlement(job_id: str, *, ceiling_seconds: int | None = None) -> dict[str, object]:
+    """Derive a fresh finite one-worker freeze budget from the live Slurm job."""
+    shown = subprocess.run(["scontrol", "show", "job", "-o", job_id], text=True, capture_output=True, timeout=30, check=False)
+    if shown.returncode:
+        raise RuntimeError(f"cannot read live SLURM job {job_id}: {shown.stderr[-1000:]}")
+    fields = dict(token.split("=", 1) for token in shown.stdout.strip().split() if "=" in token)
+    required = ("JobState", "TimeLimit", "RunTime", "EndTime", "NumTasks")
+    missing = [field for field in required if not fields.get(field)]
+    if missing:
+        raise RuntimeError(f"live SLURM job record omits {', '.join(missing)}")
+    if fields["JobState"].split("+", 1)[0] != "RUNNING":
+        raise RuntimeError(f"active V4 freeze requires RUNNING SLURM job, got {fields['JobState']}")
+    if fields["EndTime"] in {"Unknown", "N/A"}:
+        raise RuntimeError("active V4 freeze requires a concrete SLURM EndTime")
+    if int(fields["NumTasks"]) != 1:
+        raise RuntimeError("active V4 freeze requires exactly one allocated Slurm task")
+    verified = _slurm_duration_seconds(fields["TimeLimit"]) - _slurm_duration_seconds(fields["RunTime"])
+    if verified <= 0:
+        raise RuntimeError("active V4 freeze has no remaining live Slurm wall time")
+    if ceiling_seconds is not None:
+        if ceiling_seconds <= 0:
+            raise ValueError("remaining wall ceiling must be positive")
+        if ceiling_seconds > verified:
+            raise ValueError("supplied remaining wall ceiling exceeds verified live Slurm remaining time")
+    effective = min(verified, ceiling_seconds) if ceiling_seconds is not None else verified
+    return {"job_id": job_id, "remaining_wall_seconds": effective, "verified_remaining_wall_seconds": verified,
+            "manual_ceiling_seconds": ceiling_seconds, "one_worker": {"omp_num_threads": 1, "workers": 1},
+            "scheduler": "slurm", "job_state": fields["JobState"], "time_limit": fields["TimeLimit"],
+            "run_time": fields["RunTime"], "end_time": fields["EndTime"],
+            "scontrol_show_job_o": shown.stdout.strip()}
+
+
 def _benchmark_manifest(
     base: Mapping[str, object], *, arm: str, central_error_rate: float = _BENCHMARK_CENTRAL_ERROR_RATE,
     work_limit_override: Mapping[str, int] | None = None, namespace_suffix: str = "",
@@ -1828,7 +1881,7 @@ def main() -> None:
     parser.add_argument("--prior-caps", type=Path, default=Path("data/manifests/phase4-pilot-caps.json"), help="current pre-active V3 cap to snapshot before replacement")
     parser.add_argument("--active-v4-caps-output", type=Path, default=Path("data/manifests/phase4-pilot-caps.json"), help="published V4 cap path; may replace --prior-caps only after snapshot")
     parser.add_argument("--active-v4-amendment-output", type=Path, default=Path("data/evidence/phase4-pilot-design-amendment-v4-active-memory.json"), help="new immutable active-V4 amendment path")
-    parser.add_argument("--remaining-wall-seconds", type=int, help="fresh one-worker remaining allocation wall time at freeze")
+    parser.add_argument("--remaining-wall-seconds", type=int, help="optional conservative ceiling; cannot exceed fresh Slurm-derived remaining wall time")
     parser.add_argument("--run-calibration", action="store_true", help="run/resume calibration from a published frozen V4 cap")
     parser.add_argument("--calibration-caps", type=Path, default=Path("data/manifests/phase4-pilot-caps.json"), help="published frozen cap for calibration")
     parser.add_argument("--calibration-output", type=Path, default=Path("data/results/phase4-memory-relay/calibration"), help="durable calibration output root")
@@ -1839,13 +1892,12 @@ def main() -> None:
     if selected_modes > 1:
         raise SystemExit("choose one benchmark, freeze, or calibration mode per invocation")
     if args.freeze_active_v4:
-        if not args.active_v4_report or not args.slurm_job_id or args.remaining_wall_seconds is None:
-            raise SystemExit("--freeze-active-v4 requires --active-v4-report, --slurm-job-id, and --remaining-wall-seconds")
+        if not args.active_v4_report or not args.slurm_job_id:
+            raise SystemExit("--freeze-active-v4 requires --active-v4-report and --slurm-job-id")
         print(json.dumps(publish_active_v4_caps(
             repository_root=repository_root, report_path=args.active_v4_report, prior_caps_path=args.prior_caps,
             caps_output_path=args.active_v4_caps_output, amendment_output_path=args.active_v4_amendment_output,
-            live_entitlement={"job_id": args.slurm_job_id, "remaining_wall_seconds": args.remaining_wall_seconds,
-                              "one_worker": {"omp_num_threads": 1, "workers": 1}},
+            live_entitlement=_live_freeze_entitlement(args.slurm_job_id, ceiling_seconds=args.remaining_wall_seconds),
         ), indent=2, sort_keys=True))
         return
     if args.run_calibration:
