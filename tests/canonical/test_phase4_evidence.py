@@ -684,13 +684,17 @@ def test_active_v4_cap_builder_requires_terminal_verified_benchmark_and_derives_
             "source_procedure": {"baseline": arm(elapsed=3.0, work=10), "controlled_relay_31": arm(elapsed=6.0, work=35)},
             "canonical_default": canonical,
         }}}}
-    report = {"status": "completed", "report_digest": "a" * 64,
-                  "author_source_pin": "relay-v0.2.2@14cb31a18f9b9d7d099791b793e35b8a2951f8f3",
+    report = {"status": "completed",
+              "author_source_pin": "relay-v0.2.2@14cb31a18f9b9d7d099791b793e35b8a2951f8f3",
               "core_commits": ["6e6ad03", "660049a", "1f8f1c2"], "codes": codes}
+    report["report_digest"] = runner._digest(report)
     entitlement = {"job_id": "55938300", "remaining_wall_seconds": 3_000_000,
                    "one_worker": {"omp_num_threads": 1, "workers": 1}}
 
-    built = runner.build_active_v4_caps(report, entitlement, prior)
+    built = runner.build_active_v4_caps(
+        report, entitlement, prior, report_path="data/results/active-v4.json", report_sha256="a" * 64,
+        prior_caps_path="data/manifests/phase4-pilot-caps.json", prior_caps_sha256="b" * 64,
+    )
 
     caps, amendment = built["caps"], built["amendment"]
     assert caps["status"] == "frozen_pre_calibration"
@@ -699,17 +703,36 @@ def test_active_v4_cap_builder_requires_terminal_verified_benchmark_and_derives_
     assert caps["allocation"]["fraction_sum"] == 1.0
     assert sum(item["wall_seconds_max"] for item in caps["allocation"]["categories"].values()) <= caps["allocation"]["allocatable_wall_seconds_after_margin"]
     assert caps["codes"]["b1-ghp-882"]["central_error_rate"] == .07
-    assert caps["codes"]["b1-ghp-882"]["canonical_public_boundary_seconds"] >= 8
+    assert caps["codes"]["b1-ghp-882"]["canonical_public_boundary_seconds"] == 900
+    assert caps["codes"]["gross-bb-144"]["per_shot_work_cap"]["check_to_variable_updates"] == 812160
+    assert caps["codes"]["b1-ghp-882"]["per_shot_work_cap"]["check_to_variable_updates"] == 529200
+    assert caps["codes"]["b1-ghp-882"]["active_v4_benchmark"]["observed_work_max"]["check_to_variable_updates"] < 529200
     assert caps["codes"]["gross-bb-144"]["calibration_namespace"].endswith("-v4-active-calibration")
+    assert all(item["planned_total_wall_seconds"] > 0 for item in caps["allocation"]["categories"].values())
+    assert caps["benchmark_evidence"]["active_v4"]["byte_sha256"] == "a" * 64
     assert caps["caps_digest"] == runner._digest({key: value for key, value in caps.items() if key != "caps_digest"})
+
+    tampered_report = deepcopy(report)
+    tampered_report["unbound_change"] = True
+    with pytest.raises(ValueError, match="digest-bound benchmark"):
+        runner.build_active_v4_caps(tampered_report, entitlement, prior, report_path="data/results/active-v4.json", report_sha256="a" * 64,
+                                    prior_caps_path="data/manifests/phase4-pilot-caps.json", prior_caps_sha256="b" * 64)
+    tampered_prior = deepcopy(prior)
+    tampered_prior["unbound_change"] = True
+    with pytest.raises(ValueError, match="preserved frozen V3"):
+        runner.build_active_v4_caps(report, entitlement, tampered_prior, report_path="data/results/active-v4.json", report_sha256="a" * 64,
+                                    prior_caps_path="data/manifests/phase4-pilot-caps.json", prior_caps_sha256="b" * 64)
 
     report["status"] = "final_inconclusive"
     with pytest.raises(ValueError, match="terminal completed"):
-        runner.build_active_v4_caps(report, entitlement, prior)
+        runner.build_active_v4_caps(report, entitlement, prior, report_path="data/results/active-v4.json", report_sha256="a" * 64,
+                                    prior_caps_path="data/manifests/phase4-pilot-caps.json", prior_caps_sha256="b" * 64)
     report["status"] = "completed"
     report["codes"]["gross-bb-144"]["rates"]["p0030"]["presets"]["source_procedure"]["baseline"]["attempts"] = []
+    report["report_digest"] = runner._digest({key: value for key, value in report.items() if key != "report_digest"})
     with pytest.raises(ValueError, match="complete verified active arm"):
-        runner.build_active_v4_caps(report, entitlement, prior)
+        runner.build_active_v4_caps(report, entitlement, prior, report_path="data/results/active-v4.json", report_sha256="a" * 64,
+                                    prior_caps_path="data/manifests/phase4-pilot-caps.json", prior_caps_sha256="b" * 64)
 
 
 def test_calibration_runner_retains_verified_attempts_and_is_idempotent(tmp_path, monkeypatch):
