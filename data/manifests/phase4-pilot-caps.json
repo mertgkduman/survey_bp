@@ -1,14 +1,20 @@
 {
   "allocation": {
+    "allocatable_wall_seconds_after_margin": 2005952,
     "authorized_cpus": 2,
     "authorized_memory": "8G",
     "basis": "remaining_30_day_job_window_after_benchmark_and_10_percent_safety_margin",
     "calibration_percent_max": 35,
+    "calibration_wall_seconds_max": 702083,
     "evaluation_percent_max": 45,
+    "evaluation_wall_seconds_max": 902678,
     "fixture_percent_max": 10,
+    "live_observed_runtime": "4-04:52:44",
     "native_percent_max": 10,
     "omp_threads_per_worker": 1,
+    "remaining_wall_seconds_at_freeze": 2228836,
     "remaining_wall_seconds_budget": "derived_live_at_freeze; no extension",
+    "safety_margin_fraction": 0.1,
     "sum_percent_max": 100,
     "worker_count_prespecified": 1
   },
@@ -25,7 +31,7 @@
         512,
         1024
       ],
-      "coarse_configurations_max": 54,
+      "coarse_configurations_max": 32,
       "evaluation_namespace": "phase4-memory-relay-b1-matched-physical-samples-v1-evaluation-v2",
       "evaluation_shot_menu": [
         1024,
@@ -33,6 +39,7 @@
         4096,
         8192
       ],
+      "evaluation_status": "inconclusive_insufficient_budget",
       "fixture_namespace": "phase4-memory-relay-b1-matched-physical-samples-v1-fixture-v2",
       "native_namespace": "phase4-memory-relay-b1-matched-physical-samples-v1-native-v2",
       "per_shot_public_command_wall_cap_seconds": 72.533,
@@ -58,6 +65,7 @@
         4096,
         8192
       ],
+      "evaluation_status": "inconclusive_insufficient_budget",
       "fixture_namespace": "phase4-memory-relay-bb144-matched-physical-samples-v1-fixture-v2",
       "native_namespace": "phase4-memory-relay-bb144-matched-physical-samples-v1-native-v2",
       "per_shot_public_command_wall_cap_seconds": 12.309,
@@ -83,6 +91,7 @@
         4096,
         8192
       ],
+      "evaluation_status": "inconclusive_insufficient_budget",
       "fixture_namespace": "phase4-memory-relay-hgp-matched-physical-samples-v1-fixture-v2",
       "native_namespace": "phase4-memory-relay-hgp-matched-physical-samples-v1-native-v2",
       "per_shot_public_command_wall_cap_seconds": 15.93,
@@ -99,6 +108,12 @@
     "runtime_measurement": "full public canonical command plus mandatory verification wall time; decode and verify distributions retained separately"
   },
   "schema_version": 2,
+  "scoped_amendment": {
+    "calibration": "B1 is capped at 32 coarse configurations; BB and HGP retain 54. This bounded calibration estimate is 655,000s using p95 public command walls.",
+    "evaluation": "The proposed 1024-shot minimum broad evaluation cannot fit the 902,678s evaluation allocation; it is frozen as insufficient-budget/inconclusive until a new versioned amendment, not silently reduced.",
+    "native_fixture": "reserved fractions remain finite and separate.",
+    "reason": "The broad B1 54 coarse configurations \u00d7128 shots \u00d72 presets \u00d758.026s p95 public wall requires 802,151s, exceeding the 702,083s calibration allocation before other codes."
+  },
   "selection_rule": "Fixed paired Wilson ranking over calibration only; lexical tie break; select at most 32 refinement configurations.",
   "status": "frozen_before_calibration",
   "stop_rules": {
