@@ -9,7 +9,7 @@ from typing import Iterable, Literal
 
 import numpy as np
 
-from .budgets import BudgetTree, WorkVector
+from .budgets import BudgetTree, RelayWorkAccounting, WorkVector
 from .contracts import MemoryBindingV4, RelayLegSpec, RelaySpecV4
 from .memory import AffinePriorMemory, MemoryState
 from .numerics import finite_saturate
@@ -202,6 +202,7 @@ class RelayPreset:
 class RelayRunResult:
     legs: tuple[RelayLegResult, ...]
     transfers: tuple[PosteriorTransferV2, ...]
+    work_leaves: tuple[dict[str, object], ...]
     termination: str
     stopping_reason: Literal["solution_limit", "leg_limit", "budget_exhausted"]
 
@@ -285,15 +286,32 @@ class RelayController:
         previous: PosteriorTransferV2 | None = None
         leg_results: list[RelayLegResult] = []
         transfers: list[PosteriorTransferV2] = []
+        accounting = RelayWorkAccounting(shot_identity=lineage_prefix)
+
+        def finish(
+            termination: str, stopping_reason: Literal["solution_limit", "leg_limit", "budget_exhausted"],
+        ) -> RelayRunResult:
+            # The budget tree is the reserve-before-mutation authority.  Relay
+            # work leaves mirror only facts that it committed, so the public
+            # ledger can retain per-leg ancestry without changing the cap.
+            if accounting.summary() != budgets.summary(scope):
+                raise RuntimeError("Relay committed leaves disagree with budgeted work")
+            return RelayRunResult(
+                tuple(leg_results), tuple(transfers), accounting.leaves(), termination, stopping_reason,
+            )
 
         for index, leg in enumerate(active_legs):
+            lineage_id = f"{lineage_prefix}:leg:{index}"
             prior = base_prior
             if previous is not None and active_transfer == "posterior_only":
+                transfer_leaf_id = "relay-transfer:" + sha256(
+                    f"{previous.producer_leg_lineage_id}:{previous.digest}".encode("utf-8")
+                ).hexdigest()[:20]
                 transfer_reservation = budgets.reserve(
-                    scope, WorkVector(relay_transfers=1), leaf_id=f"relay:{lineage_prefix}:transfer:{index}",
+                    scope, WorkVector(relay_transfers=1), leaf_id=transfer_leaf_id,
                 )
                 if transfer_reservation is None:
-                    return RelayRunResult(tuple(leg_results), tuple(transfers), "budget_exhausted", "budget_exhausted")
+                    return finish("budget_exhausted", "budget_exhausted")
                 prior = previous.as_array()
                 # No history, gamma assignment, messages, iteration, or convergence crosses a leg boundary.
                 states: dict[str, MemoryState] = {}
@@ -302,6 +320,11 @@ class RelayController:
                     states[memory.binding_id] = memory.commit(proposal, states.get(memory.binding_id))
                     prior = proposal.prior
                 transfer_reservation.commit_once()
+                accounting.commit(
+                    kind="transfer", leg_index=index,
+                    lineage_id=previous.producer_leg_lineage_id, leaf_id=transfer_leaf_id,
+                    delta=WorkVector(relay_transfers=1),
+                )
                 transfers.append(previous)
 
             # Each loop builds a new schedule and V2C snapshot, intentionally resetting all leg-local state.
@@ -319,13 +342,32 @@ class RelayController:
                     scope, proposed, leaf_id=f"relay:{lineage_prefix}:leg:{index}:sweep:{iteration}",
                 )
                 if reservation is None:
-                    return RelayRunResult(tuple(leg_results), tuple(transfers), "budget_exhausted", "budget_exhausted")
+                    # Retain a started leg even when only a prefix of its
+                    # sweeps committed.  Its explicit leaves are the durable
+                    # record of that partial work.
+                    candidate = np.array(candidate, dtype=np.uint8, copy=True)
+                    candidate.setflags(write=False)
+                    posterior = np.array(posterior, dtype=np.float64, copy=True)
+                    posterior.setflags(write=False)
+                    score = RelayCandidateScore(
+                        leg_index=index,
+                        syndrome_weight=int(np.count_nonzero(
+                            (check_matrix.astype(np.int64) @ candidate.astype(np.int64)) % 2 != syndrome
+                        )),
+                        prior_weight=float(np.dot(candidate.astype(np.float64), base_prior)),
+                    ) if converged else None
+                    leg_results.append(RelayLegResult(index, lineage_id, candidate, posterior, completed, converged, score))
+                    return finish("budget_exhausted", "budget_exhausted")
                 sweep = schedule.sweep(messages, syndrome, error_rate=error_rate, source_iteration=iteration - 1)
                 messages = sweep.new_v2c
                 posterior = sweep.beliefs
                 candidate = sweep.candidate
                 completed = iteration
                 reservation.commit_once()
+                accounting.commit(
+                    kind="leg", leg_index=index, lineage_id=lineage_id,
+                    leaf_id=f"relay:{lineage_prefix}:leg:{index}:sweep:{iteration}", delta=proposed,
+                )
                 if np.array_equal((check_matrix.astype(np.int64) @ candidate.astype(np.int64)) % 2, syndrome):
                     converged = True
                     break
@@ -333,7 +375,6 @@ class RelayController:
             candidate.setflags(write=False)
             posterior = np.array(posterior, dtype=np.float64, copy=True)
             posterior.setflags(write=False)
-            lineage_id = f"{lineage_prefix}:leg:{index}"
             syndrome_weight = int(np.count_nonzero(
                 (check_matrix.astype(np.int64) @ candidate.astype(np.int64)) % 2 != syndrome
             ))
@@ -350,5 +391,5 @@ class RelayController:
                 clipping_evidence="canonical_finite_saturate:relay_belief_assembly",
             )
             if len(tuple(leg_result for leg_result in leg_results if leg_result.converged)) >= active_solution_limit:
-                return RelayRunResult(tuple(leg_results), tuple(transfers), "completed", "solution_limit")
-        return RelayRunResult(tuple(leg_results), tuple(transfers), "completed", "leg_limit")
+                return finish("completed", "solution_limit")
+        return finish("completed", "leg_limit")

@@ -158,7 +158,10 @@ class RelayWorkAccounting:
             return tuple({
                 "kind": leaf.kind, "leg_index": leaf.leg_index,
                 "lineage_id": leaf.lineage_id, "leaf_id": leaf.leaf_id,
-                "work_vector": leaf.delta.as_evidence(),
+                # V4 Relay evidence retains the V2 work-vector grammar.  The
+                # expanded in-memory vector is still reduced before this
+                # boundary, so no work category is silently dropped.
+                "work_vector": leaf.delta.as_evidence(structural_event_version=2),
             } for leaf in self._leaves.values())
 
     def summary(self) -> WorkVector:

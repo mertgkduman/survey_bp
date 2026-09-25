@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 import importlib.util
 import hashlib
 import json
@@ -198,6 +199,25 @@ def test_phase4_ledger_reconstructs_transfer_candidates_selection_and_leaf_work(
     assert result["selection"]["candidate_lineage_id"] == "candidate:3:1"
     assert result["transfers"][0]["producer_leg_lineage_id"] == "attempt:3:leg:0"
     assert reconstruct_relay_work(result["events"])["relay_transfers"] == 1
+
+
+def test_phase4_reconstruction_rejects_leaf_lineage_mismatches_even_when_totals_match(tmp_path):
+    """A valid aggregate cannot conceal work assigned to the wrong Relay leg."""
+    from bp_registry.canonical.verification import CanonicalStructuralVerificationError, reconstruct_relay_work
+    from bp_registry.ledger import read_canonical_events
+
+    path = tmp_path / "lineage-mismatch.jsonl"
+    _phase4_events(path)
+    events = deepcopy(read_canonical_events(path))
+    work = next(event["data"] for event in events if event["kind"] == "work")
+    work["relay_legs"] = [
+        {"index": 0, "lineage_id": "attempt:3:leg:0"},
+        {"index": 1, "lineage_id": "attempt:3:leg:1"},
+    ]
+    next(leaf for leaf in work["relay_work_leaves"] if leaf["kind"] == "leg")["lineage_id"] = "attempt:3:leg:1"
+
+    with pytest.raises(CanonicalStructuralVerificationError, match="leg work leaf"):
+        reconstruct_relay_work(events)
 
 
 def test_phase4_validation_rejects_tampered_sidecars_and_keeps_unavailable_facts_typed(tmp_path):

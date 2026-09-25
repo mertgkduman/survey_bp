@@ -479,7 +479,12 @@ def _canonical_event_id(event: Mapping[str, Any]) -> str:
 
 
 def _relay_work_leaves(event: Mapping[str, Any], existing: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Materialize a V4 work reduction from the transfer facts already durable."""
+    """Return explicit V4 leaves; synthesize legacy aggregate records only.
+
+    Current Relay execution provides committed per-leg leaves.  The fallback
+    below remains solely so historical V4 journals written before that contract
+    can still be read and structurally reconstructed.
+    """
     from .canonical.budgets import WorkVector
 
     data = event["data"]

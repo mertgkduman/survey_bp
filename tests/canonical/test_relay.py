@@ -190,3 +190,99 @@ def test_relay_leaf_accounting_is_idempotent_and_retains_per_leg_ancestry():
     assert [leaf["kind"] for leaf in leaves] == ["leg", "transfer", "candidate", "selection"]
     assert accounting.summary().as_evidence()["relay_transfers"] == 1
     assert accounting.by_leg(1).as_evidence()["candidate_checks"] == 1
+
+
+def _three_leg_manifest(run_id: str):
+    from bp_registry.canonical.contracts import CanonicalManifestV4
+
+    return CanonicalManifestV4.model_validate({
+        "schema_version": 4,
+        "run_id": run_id,
+        "numerical_profile": "cpu-float64-spa-v1",
+        "max_iterations": 3,
+        "error_rate": 0.1,
+        "policies": _policies(),
+        "memory_bindings": [{
+            "binding_id": "relay-prior", "kind": "affine_prior", "target": "prior",
+            "order": 0, "alpha": 0.5, "state_lifetime": "leg",
+        }],
+        "relay": {
+            "total_leg_limit": 3, "solution_limit": 3,
+            "legs": [{"max_iterations": 1}, {"max_iterations": 2}, {"max_iterations": 3}],
+        },
+    })
+
+
+def _impossible_syndrome_code():
+    from bp_registry.css import CssCode
+
+    # A nonzero observed syndrome on this all-zero check is deliberately
+    # unreachable, so every declared Relay leg executes deterministically.
+    return CssCode(np.zeros((1, 3), dtype=np.uint8), np.zeros((1, 3), dtype=np.uint8)).validate()
+
+
+def _relay_controls(*, belief_assemblies: int):
+    from bp_registry.canonical.budgets import WorkVector
+
+    resources = WorkVector.zero().as_evidence(structural_event_version=2)
+    return {"work_limits": {
+        scope: {resource: belief_assemblies if resource == "belief_assemblies" else 100 for resource in resources}
+        for scope in ("shot", "search", "attempt")
+    }}
+
+
+def test_three_leg_relay_emits_committed_per_leg_leaves_and_replays_idempotently(tmp_path):
+    """Six committed sweeps stay on their own legs through the durable ledger."""
+    from bp_registry.canonical.budgets import WorkVector
+    from bp_registry.canonical.execution import run_canonical_structural_shot
+    from bp_registry.canonical.verification import validate_phase4_shot
+    from bp_registry.ledger import read_canonical_events
+    from bp_registry.sampling import DecoderObservation, HiddenTruth
+
+    path = tmp_path / "three-leg.jsonl"
+    code = _impossible_syndrome_code()
+    kwargs = {
+        "code": code, "observation": DecoderObservation("Z", np.ones(1, dtype=np.uint8)),
+        "hidden_truth": HiddenTruth(np.zeros(3, dtype=np.uint8), np.zeros(3, dtype=np.uint8)),
+        "shot_id": 0, "ledger_path": path, "sample_seed_identity": "three-leg-sample", "context": {},
+        "execution_controls": _relay_controls(belief_assemblies=100),
+    }
+    first = run_canonical_structural_shot(_three_leg_manifest("relay-three-leg"), **kwargs)
+    before_replay = read_canonical_events(path)
+    second = run_canonical_structural_shot(_three_leg_manifest("relay-three-leg"), **kwargs)
+
+    assert first.termination == second.termination == "completed"
+    assert read_canonical_events(path) == before_replay
+    work = next(event["data"] for event in before_replay if event["kind"] == "work")
+    leaves = work["relay_work_leaves"]
+    assert [leaf["leg_index"] for leaf in leaves if leaf["kind"] == "leg"] == [0, 1, 1, 2, 2, 2]
+    assert [leaf["leg_index"] for leaf in leaves if leaf["kind"] == "transfer"] == [1, 2]
+    assert sum(leaf["work_vector"]["belief_assemblies"] for leaf in leaves if leaf["kind"] == "leg" and leaf["leg_index"] == 0) == 3
+    assert sum(leaf["work_vector"]["belief_assemblies"] for leaf in leaves if leaf["kind"] == "leg" and leaf["leg_index"] == 1) == 6
+    assert sum(leaf["work_vector"]["belief_assemblies"] for leaf in leaves if leaf["kind"] == "leg" and leaf["leg_index"] == 2) == 9
+    assert WorkVector.sum(WorkVector.from_evidence(leaf["work_vector"], structural_event_version=2) for leaf in leaves) == WorkVector.from_evidence(work["work_vector"], structural_event_version=2)
+    assert validate_phase4_shot(path, run_id="relay-three-leg", shot_id=0, trace_root=tmp_path)["work"] == work["work_vector"]
+
+
+def test_budget_exhaustion_retains_partial_final_leg_work_with_exact_leaf_total(tmp_path):
+    """A rejected second sweep leaves the first committed sweep on the final leg."""
+    from bp_registry.canonical.execution import run_canonical_structural_shot
+    from bp_registry.canonical.verification import validate_phase4_shot
+    from bp_registry.ledger import read_canonical_events
+    from bp_registry.sampling import DecoderObservation, HiddenTruth
+
+    path = tmp_path / "partial-leg.jsonl"
+    result = run_canonical_structural_shot(
+        _three_leg_manifest("relay-partial-leg"), code=_impossible_syndrome_code(),
+        observation=DecoderObservation("Z", np.ones(1, dtype=np.uint8)),
+        hidden_truth=HiddenTruth(np.zeros(3, dtype=np.uint8), np.zeros(3, dtype=np.uint8)),
+        shot_id=0, ledger_path=path, sample_seed_identity="partial-leg-sample", context={},
+        execution_controls=_relay_controls(belief_assemblies=12),
+    )
+
+    assert result.termination == "budget_exhausted"
+    work = next(event["data"] for event in read_canonical_events(path) if event["kind"] == "work")
+    assert [row["iterations"] for row in work["relay_legs"]] == [1, 2, 1]
+    assert [leaf["leg_index"] for leaf in work["relay_work_leaves"] if leaf["kind"] == "leg"] == [0, 1, 1, 2]
+    assert [leaf["leg_index"] for leaf in work["relay_work_leaves"] if leaf["kind"] == "transfer"] == [1, 2]
+    assert validate_phase4_shot(path, run_id="relay-partial-leg", shot_id=0, trace_root=tmp_path)["work"] == work["work_vector"]

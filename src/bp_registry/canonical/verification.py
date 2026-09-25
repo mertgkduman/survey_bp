@@ -79,13 +79,38 @@ def reconstruct_relay_work(events: Sequence[Mapping[str, Any]]) -> dict[str, int
     reduced = WorkVector.sum(deltas)
     if reduced != declared:
         raise CanonicalStructuralVerificationError("Phase 4 work total does not equal the unique leaf reduction")
-    transfer_ids = {
-        event["data"].get("relay_leaf_id") for event in events
+    transfer_events = [
+        event for event in events
         if event.get("kind") == "relay_transfer" and isinstance(event.get("data"), Mapping)
-    }
+    ]
+    transfer_ids = {event["data"].get("relay_leaf_id") for event in transfer_events}
     leaf_transfers = {leaf_id for leaf_id, leaf in seen.items() if leaf.get("kind") == "transfer"}
     if transfer_ids != leaf_transfers:
         raise CanonicalStructuralVerificationError("Phase 4 transfer events and transfer work leaves disagree")
+    # New execution records the leg table alongside explicit committed leaves.
+    # Use it to reject an aggregate which is numerically correct but attributed
+    # to the wrong Relay leg.  Older journals lack relay_legs and continue
+    # through the compatibility path above.
+    relay_legs = data.get("relay_legs")
+    if relay_legs is not None:
+        if not isinstance(relay_legs, (list, tuple)):
+            raise CanonicalStructuralVerificationError("Phase 4 Relay leg table is invalid")
+        leg_lineages: dict[int, str] = {}
+        for row in relay_legs:
+            if not isinstance(row, Mapping) or type(row.get("index")) is not int or row["index"] < 0:
+                raise CanonicalStructuralVerificationError("Phase 4 Relay leg table has invalid indices")
+            lineage_id = row.get("lineage_id")
+            if not isinstance(lineage_id, str) or not lineage_id or row["index"] in leg_lineages:
+                raise CanonicalStructuralVerificationError("Phase 4 Relay leg table has ambiguous lineage")
+            leg_lineages[row["index"]] = lineage_id
+        for leaf in seen.values():
+            if leaf.get("kind") == "leg":
+                if leg_lineages.get(leaf["leg_index"]) != leaf.get("lineage_id"):
+                    raise CanonicalStructuralVerificationError("Phase 4 leg work leaf disagrees with Relay leg lineage")
+        for index, event in enumerate(transfer_events, start=1):
+            leaf = seen.get(event["data"].get("relay_leaf_id"))
+            if leaf is None or leaf.get("leg_index") != index or leaf.get("lineage_id") != event["data"].get("producer_leg_lineage_id"):
+                raise CanonicalStructuralVerificationError("Phase 4 transfer work leaf disagrees with Relay leg lineage")
     return declared.as_evidence(structural_event_version=2)
 
 

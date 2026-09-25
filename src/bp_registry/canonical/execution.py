@@ -669,6 +669,10 @@ def _run_relay_structural_shot(
                 work = budgets.summary("attempt")
                 ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="work", data={
                     **common, "work_vector": work.as_evidence(structural_event_version=2),
+                    # RelayController retains each reserve/commit fact with
+                    # its leg ancestry.  Do not ask the ledger to infer it
+                    # from an aggregate after the fact.
+                    "relay_work_leaves": list(run.work_leaves),
                     "relay_legs": tuple({"index": leg.leg_index, "lineage_id": leg.lineage_id,
                                           "iterations": leg.iterations, "converged": leg.converged,
                                           "score": None if leg.score is None else {
