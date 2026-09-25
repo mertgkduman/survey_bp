@@ -1,0 +1,66 @@
+{
+  "author_commit": "14cb31a18f9b9d7d099791b793e35b8a2951f8f3",
+  "author_repository": "https://github.com/trmue/relay.git",
+  "author_tag": "v0.2.2",
+  "author_tree": "5f6f112429e62112ba71fbff45f4e16247725fbc",
+  "build": {
+    "cargo": "cargo 1.93.0 (083ac5135 2025-12-15)",
+    "method": "isolated temporary clone plus complete test-target build and bounded Relay unit fixture",
+    "platform": "Linux-5.14.0-687.29.1.el9_8.x86_64-x86_64-with-glibc2.34",
+    "python": "3.12.2",
+    "rustc": "rustc 1.93.0 (254b59607 2026-01-19)"
+  },
+  "identities": {
+    "author_moving_main": {
+      "commit": "d185194ba0cb4101ced4340d82b2ee6d42f225f0",
+      "ref": "HEAD",
+      "repository": "https://github.com/trmue/relay.git",
+      "status": "not_author_reference"
+    },
+    "author_release": {
+      "commit": "14cb31a18f9b9d7d099791b793e35b8a2951f8f3",
+      "repository": "https://github.com/trmue/relay.git",
+      "tag": "v0.2.2",
+      "tree": "5f6f112429e62112ba71fbff45f4e16247725fbc"
+    },
+    "installed_fork": {
+      "commit": "8216aca3153642044e2cdccbaa41547d15551bb0",
+      "path": "/hpc/group/pfisterlab/mg551/storage/relay/relay",
+      "status": "untrusted_non_author_reference"
+    }
+  },
+  "numerical_profiles": {
+    "f32": "RelayDecoderF32 available",
+    "f64": "RelayDecoderF64 available",
+    "reason": "no material F32/F64 difference was demonstrated by this bounded qualification",
+    "source_matched_profile": null
+  },
+  "observer_patch": {
+    "base_commit": "14cb31a18f9b9d7d099791b793e35b8a2951f8f3",
+    "patch_sha256": "9a508c375225cd210a81411134f4406ea4c9ce41297af2e1d588b65aec0b0077",
+    "terminal_equivalence": {
+      "method": "same locked native suite before and after a comment-only observer boundary",
+      "passed": true
+    }
+  },
+  "qualification": {
+    "full_suite": {
+      "case": "decode_144_12_12",
+      "elapsed_lower_bound_seconds": 720,
+      "reason": "bounded qualification terminated the CPU-bound test; no result is claimed",
+      "status": "inconclusive_timeout"
+    },
+    "native_suite": {
+      "all_test_targets_built": true,
+      "patched_returncode": 0,
+      "unmodified_returncode": 0
+    },
+    "offline_scope": "bounded native tests; initial dependency resolution was required because v0.2.2 lock was stale and crates were uncached",
+    "passed": true
+  },
+  "unavailable_native_facts": {
+    "edge_work": "unavailable: would require behavior-changing instrumentation",
+    "gamma": "unavailable: comment-only observer cannot observe per-leg gamma",
+    "resource": "unavailable: would require behavior-changing instrumentation"
+  }
+}

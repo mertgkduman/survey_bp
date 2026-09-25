@@ -23,7 +23,10 @@ def test_source_identity_rejects_fork_and_requires_exact_author_pin():
     adapter = RelayV022Adapter()
     assert AUTHOR_COMMIT == "14cb31a18f9b9d7d099791b793e35b8a2951f8f3"
     with pytest.raises(ValueError, match="author commit"):
-        adapter.verify_source_identity({"author_commit": "fork-head"})
+        adapter.verify_source_identity({
+            "author_repository": "https://github.com/trmue/relay.git",
+            "author_tag": "v0.2.2", "author_commit": "fork-head",
+        })
 
 
 def test_translation_accepts_only_decoder_visible_inputs_and_source_options():
