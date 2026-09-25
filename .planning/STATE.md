@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 04
 current_phase_name: Memory Policies and Relay-BP
-current_plan: 5
+current_plan: 6
 status: executing
-stopped_at: Completed 04-04-PLAN.md
-last_updated: "2026-09-25T00:00:09.735Z"
+stopped_at: Completed 04-05-PLAN.md
+last_updated: "2026-09-25T00:14:01.241Z"
 last_activity: 2026-09-24
 last_activity_desc: Phase 04 execution started
-state_head: 96b0382f611eaa0d4f2c9e105e964cf9a19ab620
+state_head: 026bdaddf2dab0ec459f24672c787987d25ae6b5
 progress:
   total_phases: 14
   completed_phases: 3
   total_plans: 57
-  completed_plans: 46
+  completed_plans: 47
 ---
 
 # Project State
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 ## Current Position
 
 Phase: 04 (Memory Policies and Relay-BP) — EXECUTING
-Plan: 5 of 15
+Plan: 6 of 15
 Total Phases: 14
-Current Plan: 5
+Current Plan: 6
 Total Plans in Phase: 15
 Status: Ready to execute
 Last activity: 2026-09-24 — Phase 04 execution started
@@ -63,6 +63,7 @@ Progress: [██░░░░░░░░] 21% [██░░░░░░░░]
 | Phase 04 P02 | 6m | 2 tasks | 3 files |
 | Phase 04 P03 | 18m | 2 tasks | 4 files |
 | Phase 04 P04 | 11m | 2 tasks | 9 files |
+| Phase 04 P05 | 14m | 2 tasks | 4 files |
 
 Phase 02 P10–P16 gap-closure metrics are recorded in their individual summaries.
 
@@ -112,6 +113,8 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - [Phase 04]: Memory refreshes use decoder-local replay identities and one-owner commits.
 - [Phase 04]: CanonicalExperimentV4 extends the full V3 public evidence contract with ordered memory bindings while preserving historical V2/V3 meanings.
 - [Phase 04]: Public V4 preflight rejects incompatible memory operands before artifact loading and records resolved binding order and compatibility evidence.
+- [Phase 04]: Phase 04: Relay source and canonical presets are immutable named CSS adaptations; modified controls receive a controlled-adaptation identity.
+- [Phase 04]: Phase 04: Relay candidate selection uses decoder-visible syndrome/prior weights and stable earlier-leg ties.
 
 ### Pending Todos
 
@@ -143,7 +146,7 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Last session: 2026-09-25T00:00:07.267Z
-Stopped at: Completed 04-04-PLAN.md
+Last session: 2026-09-25T00:13:58.314Z
+Stopped at: Completed 04-05-PLAN.md
 Resume file: None
 Next command: $gsd-discuss-phase 4
