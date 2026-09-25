@@ -438,7 +438,6 @@ def _run_canonical_benchmark_arm(*, repository_root: Path, base: Mapping[str, ob
     if not isinstance(attempts, list):
         raise ValueError("canonical benchmark attempt journal is not a list")
     retained = {entry["shot_id"] for entry in attempts}
-    per_leg_totals: dict[str, dict[str, int]] = {}
     for shot_id in range(_BENCHMARK_SHOTS):
         if shot_id in retained:
             continue
@@ -461,10 +460,6 @@ def _run_canonical_benchmark_arm(*, repository_root: Path, base: Mapping[str, ob
             error = str(caught)
         all_attempts, shot_work = _canonical_attempts(run_path, expected_shots=_BENCHMARK_SHOTS)
         terminal = all_attempts[shot_id]
-        for leg, totals in shot_work["per_leg_totals"].items():
-            aggregate = per_leg_totals.setdefault(leg, {})
-            for name, amount in totals.items():
-                aggregate[name] = aggregate.get(name, 0) + amount
         attempts.append({
             "shot_id": shot_id,
             "status": "completed" if error is None and terminal["status"] == "completed" else "incomplete_canonical_shot",
@@ -473,7 +468,10 @@ def _run_canonical_benchmark_arm(*, repository_root: Path, base: Mapping[str, ob
             "public_boundary": {"run": run, "verify": verified, "decode_wall_seconds": decode_wall_seconds, "verify_wall_seconds": verify_wall_seconds, "elapsed_seconds": perf_counter() - started},
         })
         journal_path.write_text(json.dumps(attempts, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    raw_work = {"availability": "observed", "per_leg_totals": per_leg_totals}
+    # The ledger contains all retained shots.  Aggregate it once after any
+    # resume, so skipped journal entries still contribute exactly once.
+    _, retained_work = _canonical_attempts(run_path, expected_shots=_BENCHMARK_SHOTS)
+    raw_work = {"availability": "observed", "per_leg_totals": retained_work["per_leg_totals"]}
     completed = all(attempt["status"] == "completed" for attempt in attempts)
     return {
         "shot_ids": list(range(_BENCHMARK_SHOTS)), "attempts": attempts,
