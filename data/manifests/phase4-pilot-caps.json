@@ -6,10 +6,14 @@
     "basis": "remaining_30_day_job_window_after_benchmark_and_10_percent_safety_margin",
     "calibration_percent_max": 35,
     "calibration_projected_wall_seconds_total": 668812,
+    "calibration_refinement_projected_wall_seconds": 20638,
+    "calibration_total_with_refinement_seconds": 689450,
     "calibration_unallocated_seconds": 33271,
     "calibration_wall_seconds_max": 702083,
     "concurrency_proof": "No two-worker memory measurement exists; use one OMP_NUM_THREADS=1 worker.",
     "evaluation_percent_max": 45,
+    "evaluation_projected_wall_seconds": 16479,
+    "evaluation_unallocated_seconds": 886199,
     "evaluation_wall_seconds_max": 902678,
     "fixture_percent_max": 10,
     "fixture_wall_seconds_max": 200595,
@@ -42,6 +46,8 @@
         1024
       ],
       "coarse_configurations_max": 24,
+      "coarse_selection": "first N canonical candidate IDs ranked by SHA256(code_id + candidate_id + \"coarse-v2\"), before calibration; candidate_id encodes gamma/center/width",
+      "evaluation_configurations_max": 2,
       "evaluation_namespace": "phase4-memory-relay-b1-matched-physical-samples-v1-evaluation-v2",
       "evaluation_shot_menu": [
         1024,
@@ -49,14 +55,20 @@
         4096,
         8192
       ],
-      "evaluation_status": "inconclusive_insufficient_budget",
+      "evaluation_status": "finite_adapted_precision_limited",
+      "fixed_relay_cost_model": {
+        "leg_iteration_cap": 1,
+        "legs": 31,
+        "solution_cap_per_leg": 1
+      },
       "fixture_namespace": "phase4-memory-relay-b1-matched-physical-samples-v1-fixture-v2",
       "max_total_work_units_per_shot": 273421,
       "native_namespace": "phase4-memory-relay-b1-matched-physical-samples-v1-native-v2",
       "per_shot_public_command_wall_cap_seconds": 72.533,
-      "refinement_configurations_max": 32,
+      "refinement_configurations_max": 1,
+      "refinement_selection": "exactly one: lowest SHA256(code_id + calibration_namespace + \"refinement-v2\") ranked eligible candidate; no outcome-dependent replacement",
       "selected_calibration_shots_per_configuration": 128,
-      "selected_evaluation_shots_per_configuration": 0,
+      "selected_evaluation_shots_per_configuration": 128,
       "trace_event_cap": 10000
     },
     "gross-bb-144": {
@@ -71,6 +83,8 @@
         1024
       ],
       "coarse_configurations_max": 54,
+      "coarse_selection": "first N canonical candidate IDs ranked by SHA256(code_id + candidate_id + \"coarse-v2\"), before calibration; candidate_id encodes gamma/center/width",
+      "evaluation_configurations_max": 2,
       "evaluation_namespace": "phase4-memory-relay-bb144-matched-physical-samples-v1-evaluation-v2",
       "evaluation_shot_menu": [
         1024,
@@ -78,14 +92,20 @@
         4096,
         8192
       ],
-      "evaluation_status": "inconclusive_insufficient_budget",
+      "evaluation_status": "finite_adapted_precision_limited",
+      "fixed_relay_cost_model": {
+        "leg_iteration_cap": 1,
+        "legs": 31,
+        "solution_cap_per_leg": 1
+      },
       "fixture_namespace": "phase4-memory-relay-bb144-matched-physical-samples-v1-fixture-v2",
       "max_total_work_units_per_shot": 44641,
       "native_namespace": "phase4-memory-relay-bb144-matched-physical-samples-v1-native-v2",
       "per_shot_public_command_wall_cap_seconds": 12.309,
-      "refinement_configurations_max": 32,
+      "refinement_configurations_max": 1,
+      "refinement_selection": "exactly one: lowest SHA256(code_id + calibration_namespace + \"refinement-v2\") ranked eligible candidate; no outcome-dependent replacement",
       "selected_calibration_shots_per_configuration": 128,
-      "selected_evaluation_shots_per_configuration": 0,
+      "selected_evaluation_shots_per_configuration": 128,
       "trace_event_cap": 10000
     },
     "hgp-gallager-3-4-seed-20260923": {
@@ -100,6 +120,8 @@
         1024
       ],
       "coarse_configurations_max": 54,
+      "coarse_selection": "first N canonical candidate IDs ranked by SHA256(code_id + candidate_id + \"coarse-v2\"), before calibration; candidate_id encodes gamma/center/width",
+      "evaluation_configurations_max": 2,
       "evaluation_namespace": "phase4-memory-relay-hgp-matched-physical-samples-v1-evaluation-v2",
       "evaluation_shot_menu": [
         1024,
@@ -107,14 +129,20 @@
         4096,
         8192
       ],
-      "evaluation_status": "inconclusive_insufficient_budget",
+      "evaluation_status": "finite_adapted_precision_limited",
+      "fixed_relay_cost_model": {
+        "leg_iteration_cap": 1,
+        "legs": 31,
+        "solution_cap_per_leg": 1
+      },
       "fixture_namespace": "phase4-memory-relay-hgp-matched-physical-samples-v1-fixture-v2",
       "max_total_work_units_per_shot": 76028,
       "native_namespace": "phase4-memory-relay-hgp-matched-physical-samples-v1-native-v2",
       "per_shot_public_command_wall_cap_seconds": 15.93,
-      "refinement_configurations_max": 32,
+      "refinement_configurations_max": 1,
+      "refinement_selection": "exactly one: lowest SHA256(code_id + calibration_namespace + \"refinement-v2\") ranked eligible candidate; no outcome-dependent replacement",
       "selected_calibration_shots_per_configuration": 128,
-      "selected_evaluation_shots_per_configuration": 0,
+      "selected_evaluation_shots_per_configuration": 128,
       "trace_event_cap": 10000
     }
   },
@@ -128,7 +156,7 @@
   "schema_version": 2,
   "scoped_amendment": {
     "calibration": "B1 is capped at 24 coarse configurations; BB and HGP retain 54. Each calibration configuration has exactly 128 shots and two presets. Projected one-worker total is 668,000 seconds, within 702,083 seconds.",
-    "evaluation": "Selected evaluation shots per configuration is zero: the 1024-shot minimum cannot fit the finite evaluation allocation. It is explicitly inconclusive/insufficient-budget until a new versioned amendment.",
+    "evaluation": "Each code evaluates exactly baseline plus one calibration-selected policy at 128 fresh matched shots. This is a precision-limited adapted slice; Wilson insufficiency is reported, never extended.",
     "native_fixture": "reserved fractions remain finite and separate.",
     "reason": "The broad B1 54 coarse configurations \u00d7128 shots \u00d72 presets \u00d758.026s p95 public wall requires 802,151s, exceeding the 702,083s calibration allocation before other codes."
   },

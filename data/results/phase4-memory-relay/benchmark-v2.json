@@ -1,6 +1,6 @@
 {
   "artifact_root": "data/results/phase4-memory-relay/benchmark-artifacts/b2relaywork20260925",
-  "benchmark_digest": "4853133d368b7a5debc8d8b998e81683ecffe05979d6c7658c0676d2d810194b",
+  "benchmark_digest": "f74f98d3db4da92ef67016b8299d31ac53a4ea568f3dd3f420ec2b27ca59306a",
   "benchmark_run_id": "b2relaywork20260925",
   "codes": {
     "b1-ghp-882": {
@@ -166391,7 +166391,8 @@
     }
   ],
   "purpose": "D-23 measured finite Phase 4 pilot benchmark",
+  "runtime_measurement_note": "runtime_seconds is unavailable from canonical ledger; public_command_wall_seconds is the authoritative measured public decode-plus-verification wall distribution.",
   "sample_count_per_arm": 32,
   "schema_version": 1,
-  "status": "completed_with_retained_incompletes"
+  "status": "completed"
 }
