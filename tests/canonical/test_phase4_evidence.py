@@ -386,3 +386,35 @@ def test_three_codes_share_relay_stage_identity_protocol():
         for stage in ("benchmark", "calibration", "evaluation", "factorial", "native", "trace"):
             identity = runner.stage_identity(repository_root=Path("."), manifest_path=manifest, stage=stage, arm="native_v022")
             assert identity["source_identity"]["author_commit"] == "14cb31a18f9b9d7d099791b793e35b8a2951f8f3"
+
+
+def test_phase4_benchmark_retains_entitlement_and_thirty_two_identified_shots():
+    """D-23 records only the scheduler allocation and every bounded benchmark attempt."""
+    benchmark_path = Path("data/results/phase4-memory-relay/benchmark.json")
+    assert benchmark_path.is_file(), "D-23 requires retained measured benchmark evidence"
+    benchmark = json.loads(benchmark_path.read_text(encoding="utf-8"))
+
+    entitlement = benchmark["entitlement"]
+    assert entitlement["scheduler"] == "slurm"
+    assert entitlement["allocation"] == {
+        "account": "pfisterlab", "partition": "common", "cpus": 2,
+        "tasks": 1, "cpus_per_task": 2, "memory": "8G", "nodes": 1,
+        "time_limit": "30-00:00:00",
+    }
+    assert "node_capacity" not in entitlement
+    assert benchmark["sample_count_per_arm"] == 32
+    assert set(benchmark["codes"]) == {
+        "gross-bb-144", "b1-ghp-882", "hgp-gallager-3-4-seed-20260923",
+    }
+    for code_id, code in benchmark["codes"].items():
+        assert code["central_error_rate"] == 0.03, code_id
+        assert set(code["arms"]) == {"baseline", "canonical_relay_31", "native_v022"}
+        for arm_name, arm in code["arms"].items():
+            assert arm["shot_ids"] == list(range(32)), (code_id, arm_name)
+            assert len(arm["attempts"]) == 32
+            assert arm["runtime_seconds"]["count"] == 32
+            assert arm["resource_measurements"]["scope"] == "attempt"
+        assert code["arms"]["canonical_relay_31"]["relay"]["total_leg_limit"] == 31
+        assert code["arms"]["canonical_relay_31"]["raw_work"]["per_leg_totals"]
+        assert code["arms"]["native_v022"]["raw_work"]["availability"] == "unavailable"
+        assert code["arms"]["native_v022"]["source_identity"]["author_commit"] == "14cb31a18f9b9d7d099791b793e35b8a2951f8f3"
