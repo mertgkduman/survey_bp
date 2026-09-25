@@ -466,7 +466,7 @@ def test_benchmark_timeout_without_a_ledger_is_retained_as_each_incomplete_shot(
     runner = _phase4_runner_module()
     base = json.loads(Path("data/manifests/phase4-memory-relay-bb144.json").read_text(encoding="utf-8"))
 
-    def timeout(_root, *arguments):
+    def timeout(_root, *arguments, **_kwargs):
         if arguments[0] == "preflight":
             return {"run_id": "bounded", "shot_budget": 32}
         raise subprocess.TimeoutExpired(arguments, 300)
@@ -478,3 +478,23 @@ def test_benchmark_timeout_without_a_ledger_is_retained_as_each_incomplete_shot(
     assert arm["status"] == "incomplete_canonical_arm"
     assert [attempt["shot_id"] for attempt in arm["attempts"]] == list(range(32))
     assert {attempt["status"] for attempt in arm["attempts"]} == {"incomplete_canonical_shot"}
+
+
+def test_representative_v3_manifest_and_native_settings_are_fixed():
+    """D-22 representative work uses the declared 80/60/one-solution controls."""
+    runner = _phase4_runner_module()
+    base = json.loads(Path("data/manifests/phase4-memory-relay-bb144.json").read_text(encoding="utf-8"))
+    baseline = runner._benchmark_manifest(base, arm="baseline")["relay"]
+    relay = runner._benchmark_manifest(base, arm="canonical_relay_31")["relay"]
+    assert baseline["total_leg_limit"] == 1
+    assert baseline["legs"] == [{"max_iterations": 80}]
+    assert relay["total_leg_limit"] == 31
+    assert relay["solution_limit"] == 1
+    assert relay["legs"][0]["max_iterations"] == 80
+    assert all(leg["max_iterations"] == 60 for leg in relay["legs"][1:])
+    assert runner._NATIVE_TIMEOUT_SECONDS == 900
+    import inspect
+    native_source = inspect.getsource(runner._run_native)
+    assert '"num_sets": 30' in native_source
+    assert '"stopping_criterion": "nconv"' in native_source
+    assert '"stop_nconv": 1' in native_source

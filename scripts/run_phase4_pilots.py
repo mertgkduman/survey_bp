@@ -292,7 +292,7 @@ def _run_native(*, repository_root: Path, stage_root: Path, observation: Mapping
     result = adapter.run(
         check_matrix=observation["check_matrix"], syndrome=observation["syndrome"],
         error_priors=observation["error_priors"], relay_settings={
-            "pre_iter": 80, "num_sets": 30, "set_max_iter": 60, "stopping_criterion": "pre_iter", "logging": False,
+            "pre_iter": 80, "num_sets": 30, "set_max_iter": 60, "stopping_criterion": "nconv", "stop_nconv": 1, "logging": False,
         }, seed=int(observation["decoder_seed"]), numerical_profile="f64",
     )
     return {
