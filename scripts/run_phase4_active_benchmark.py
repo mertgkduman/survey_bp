@@ -106,6 +106,7 @@ def build_active_manifest(base: Mapping[str, Any], *, arm: str, preset: str,
         "total_leg_limit": legs, "first_leg_iteration_limit": 80,
         "later_leg_iteration_limit": 60, "solution_limit": 1,
         "legs": [{"max_iterations": 80}] + [{"max_iterations": 60} for _ in range(legs - 1)],
+        "later_leg_memory": "disordered",
         "memory_tuning": {
             "semantics": ACTIVE_SEMANTICS, "first_leg_gamma": first_leg_gamma,
             "later_center": later_center, "later_width": later_width,
@@ -114,6 +115,17 @@ def build_active_manifest(base: Mapping[str, Any], *, arm: str, preset: str,
         },
     })
     value["relay"] = relay
+    memory = dict(value["memory"])
+    bindings = []
+    for binding in memory.get("bindings", []):
+        copied = dict(binding)
+        if copied.get("kind") == "affine_prior":
+            parameters = dict(copied.get("parameters", {}))
+            parameters["alpha"] = first_leg_gamma
+            copied["parameters"] = parameters
+        bindings.append(copied)
+    memory["bindings"] = bindings
+    value["memory"] = memory
     code_id = value["artifact"]["code_id"]
     if work_profile == "b1_three_leg" and code_id == "b1-ghp-882":
         work = B1_THREE_LEG_WORK
@@ -148,9 +160,22 @@ def _active_facts(events: list[Mapping[str, Any]], shot_id: int) -> list[dict[st
         if event.get("shot_id") != shot_id:
             continue
         data = event.get("data")
-        if isinstance(data, Mapping) and (data.get("relay_memory_tuning") is not None or data.get("relay_memory_mode") == "dynamic_affine_prior_each_source_iteration" or data.get("relay_legs") is not None):
+        if isinstance(data, Mapping) and (data.get("relay_memory_mode") == "dynamic_affine_prior_each_source_iteration" or data.get("relay_legs") is not None):
             facts.append(dict(data))
     return facts
+
+
+def _active_memory_proven(attempt: Mapping[str, Any]) -> bool:
+    """Require core's explicit dynamic mode and applied memory for every executed leg."""
+    facts = attempt.get("active_memory_facts", [])
+    if not isinstance(facts, list) or not any(fact.get("relay_memory_mode") == "dynamic_affine_prior_each_source_iteration" for fact in facts if isinstance(fact, Mapping)):
+        return False
+    memory_legs = [leg for fact in facts if isinstance(fact, Mapping) for leg in fact.get("relay_legs", []) if isinstance(leg, Mapping)]
+    executed = attempt.get("distinct_leg_indices", [])
+    return bool(executed) and len(memory_legs) >= len(executed) and all(
+        isinstance(leg.get("memory"), Mapping) and leg["memory"].get("applied_each_source_iteration") is True
+        for leg in memory_legs
+    )
 
 
 def _attempt_from_events(events: list[Mapping[str, Any]], shot_id: int) -> dict[str, object]:
@@ -187,7 +212,11 @@ def run_canonical_arm(*, root: Path, manifest: Mapping[str, Any], output: Path) 
     """Run 32 durable public canonical attempts and verify every terminal."""
     output.mkdir(parents=True, exist_ok=True)
     manifest_path = output / "manifest.json"
-    _atomic(manifest_path, manifest)
+    expected_manifest = json.dumps(manifest, indent=2, sort_keys=True) + "\n"
+    if manifest_path.exists() and manifest_path.read_text(encoding="utf-8") != expected_manifest:
+        raise FileExistsError("refusing to overwrite a retained active benchmark manifest with different bytes")
+    if not manifest_path.exists():
+        _atomic(manifest_path, manifest)
     _atomic(output / "preflight.json", _command(root, "preflight", str(manifest_path)))
     journal_path, run_path = output / "attempts.json", output / "run"
     attempts: list[dict[str, Any]] = json.loads(journal_path.read_text()) if journal_path.exists() else []
@@ -217,7 +246,7 @@ def run_canonical_arm(*, root: Path, manifest: Mapping[str, Any], output: Path) 
             work_totals[name] = work_totals.get(name, 0) + amount
     return {"attempts": attempts, "status": "completed" if complete else "incomplete_canonical_arm",
             "manifest_sha256": _digest(manifest), "sample_namespace": manifest["randomness"]["physical_sample_identity"],
-            "active_memory_verified": complete and all(bool(x["active_memory_facts"]) for x in attempts),
+            "active_memory_verified": complete and all(_active_memory_proven(x) for x in attempts),
             "public_command_wall_seconds": _distribution([x.get("public_boundary", {}).get("elapsed_seconds") for x in attempts]),
             "distinct_leg_count_distribution": _distribution([float(count) for count in leg_counts]),
             "raw_work": {"availability": "observed", "total": work_totals,

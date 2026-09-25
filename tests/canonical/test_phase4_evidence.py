@@ -604,9 +604,14 @@ def test_calibration_plan_is_complete_disjoint_and_keeps_controlled_adaptation_l
     assert {cell["relay"]["solution_limit"] for cell in plan["cells"]} == {1}
     assert any(cell["candidate"]["later_low"] < 0 for cell in plan["cells"])
     assert any(cell["candidate"]["later_high"] > 1 for cell in plan["cells"])
+    first = plan["cells"][0]
+    same_code = next(cell for cell in plan["cells"] if cell["code_id"] == first["code_id"] and cell["candidate"]["id"] != first["candidate"]["id"])
+    manifest_a = runner._calibration_manifest(json.loads(Path("data/manifests/phase4-memory-relay-bb144.json").read_text()), first, amendment_sha256="b" * 64)
+    manifest_b = runner._calibration_manifest(json.loads(Path("data/manifests/phase4-memory-relay-bb144.json").read_text()), same_code, amendment_sha256="b" * 64)
+    assert manifest_a["relay"]["memory_tuning"]["seed_identity"] == manifest_b["relay"]["memory_tuning"]["seed_identity"]
 
 
-def test_selection_is_deterministic_and_never_reads_evaluation_data(tmp_path):
+def test_selection_rule_is_deterministic_and_never_reads_evaluation_data(tmp_path):
     """Selection uses only eligible calibration rows and reports finite precision."""
     runner = _phase4_runner_module()
     calibration = {
@@ -615,11 +620,11 @@ def test_selection_is_deterministic_and_never_reads_evaluation_data(tmp_path):
             "code-a": {
                 "presets": {
                     "source": {"configurations": [
-                        {"configuration_id": "b", "logical_failure": {"estimate": 0.25, "wilson_95": [0.1, 0.5], "eligible": True}, "work": {"mean_c2v": 9, "mean_total": 12}},
-                        {"configuration_id": "a", "logical_failure": {"estimate": 0.25, "wilson_95": [0.1, 0.5], "eligible": True}, "work": {"mean_c2v": 8, "mean_total": 99}},
+                        {"configuration_id": "b", "candidate": {"id": "shared"}, "logical_failure": {"estimate": 0.25, "wilson_95": [0.1, 0.5], "eligible": True}, "work": {"mean_c2v": 9, "mean_total": 12}},
+                        {"configuration_id": "a", "candidate": {"id": "local"}, "logical_failure": {"estimate": 0.25, "wilson_95": [0.1, 0.5], "eligible": True}, "work": {"mean_c2v": 8, "mean_total": 99}},
                     ]},
                     "canonical": {"configurations": [
-                        {"configuration_id": "c", "logical_failure": {"estimate": None, "wilson_95": None, "eligible": False}, "work": {"mean_c2v": None, "mean_total": None}},
+                        {"configuration_id": "c", "candidate": {"id": "shared"}, "logical_failure": {"estimate": None, "wilson_95": None, "eligible": False}, "work": {"mean_c2v": None, "mean_total": None}},
                     ]},
                 }
             }
@@ -631,4 +636,67 @@ def test_selection_is_deterministic_and_never_reads_evaluation_data(tmp_path):
     assert selected["calibration_digest"] == "a" * 64
     assert selected["codes"]["code-a"]["presets"]["source"]["configuration_id"] == "a"
     assert selected["codes"]["code-a"]["presets"]["canonical"]["status"] == "inconclusive"
+    assert selected["codes"]["code-a"]["shared_memory_settings"]["status"] == "inconclusive"
     assert selected["selection_input_fields"] == ["calibration.codes"]
+
+
+def test_selection_tie_break_uses_work_only_for_overlapping_wilson_intervals():
+    runner = _phase4_runner_module()
+    calibration = {
+        "calibration_digest": "c" * 64,
+        "codes": {"code-a": {"presets": {"source": {"configurations": [
+            {"configuration_id": "lowest", "candidate": {"id": "x"}, "logical_failure": {"estimate": 0.10, "wilson_95": [0.01, 0.40], "eligible": True}, "work": {"mean_c2v": 9, "mean_total": 9}},
+            {"configuration_id": "overlap", "candidate": {"id": "y"}, "logical_failure": {"estimate": 0.20, "wilson_95": [0.05, 0.45], "eligible": True}, "work": {"mean_c2v": 1, "mean_total": 1}},
+            {"configuration_id": "separate", "candidate": {"id": "z"}, "logical_failure": {"estimate": 0.30, "wilson_95": [0.50, 0.60], "eligible": True}, "work": {"mean_c2v": 0, "mean_total": 0}},
+        ]}}}}}
+    selected = runner.select_calibration_settings(calibration)
+    assert selected["codes"]["code-a"]["presets"]["source"]["configuration_id"] == "overlap"
+
+
+def test_calibration_runner_retains_verified_attempts_and_is_idempotent(tmp_path, monkeypatch):
+    """A resumed finite cell cannot duplicate public events or re-run a terminal shot."""
+    runner = _phase4_runner_module()
+    real_caps = json.loads(Path("data/manifests/phase4-pilot-caps.json").read_text())
+    code = deepcopy(real_caps["codes"]["gross-bb-144"])
+    code["coarse_candidates"] = [code["coarse_candidates"][0]]
+    code["coarse_candidate_count"] = 1
+    code["refinement_candidates"] = []
+    code["refinement_candidate_count_per_preset"] = 0
+    code["calibration_shots_per_configuration"] = 1
+    caps = deepcopy(real_caps)
+    caps["codes"] = {"gross-bb-144": code}
+    caps["allocation"]["categories"]["calibration"]["wall_seconds_max"] = 2_000.0
+    caps_path = tmp_path / "caps.json"
+    caps_path.write_text(json.dumps(caps), encoding="utf-8")
+    calls = {"canonical": 0}
+
+    def public(_root, *args, **_kwargs):
+        if args[0] == "preflight":
+            return {"status": "ok"}
+        if args[0] == "canonical":
+            calls["canonical"] += 1
+            manifest = json.loads(Path(args[1]).read_text())
+            output = Path(args[args.index("--output") + 1])
+            shot = int(args[args.index("--shot") + 1])
+            output.mkdir(parents=True, exist_ok=True)
+            events = [
+                {"event_id": f"begin-{manifest['run_id']}-{shot}", "kind": "shot_begin", "shot_id": shot, "sample_seed_identity": f"sample-{shot}"},
+                {"event_id": f"terminal-{manifest['run_id']}-{shot}", "kind": "termination", "shot_id": shot, "termination": "completed", "data": {"outcome": "exact", "work_vector": {"check_to_variable_updates": 2, "variable_to_check_updates": 2}}},
+            ]
+            with (output / "events.jsonl").open("a", encoding="utf-8") as handle:
+                for event in events:
+                    handle.write(json.dumps(event) + "\n")
+            return {"status": "ran"}
+        if args[0] == "verify-canonical-shot":
+            return {"status": "verified"}
+        raise AssertionError(args)
+
+    monkeypatch.setattr(runner, "_json_command", public)
+    first = runner.run_calibration(repository_root=Path("."), caps_path=caps_path, output_root=tmp_path / "calibration")
+    second = runner.run_calibration(repository_root=Path("."), caps_path=caps_path, output_root=tmp_path / "calibration")
+    assert first["status"] == second["status"] == "completed"
+    assert calls["canonical"] == 2  # one shot for each named controlled preset
+    lines = (tmp_path / "calibration" / "events.jsonl").read_text().splitlines()
+    assert len(lines) == len({json.loads(line)["event_id"] for line in lines})
+    for preset in second["codes"]["gross-bb-144"]["presets"].values():
+        assert preset["configurations"][0]["logical_failure"]["eligible"] is True

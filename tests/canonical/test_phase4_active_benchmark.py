@@ -23,6 +23,7 @@ def test_active_manifest_is_a_controlled_31_leg_memory_contract():
     )
     relay = manifest["relay"]
     assert relay["fidelity_status"] == "controlled_component_adaptation"
+    assert relay["later_leg_memory"] == "disordered"
     assert relay["total_leg_limit"] == 31
     assert relay["legs"][0]["max_iterations"] == 80
     assert all(leg["max_iterations"] == 60 for leg in relay["legs"][1:])
@@ -32,6 +33,7 @@ def test_active_manifest_is_a_controlled_31_leg_memory_contract():
         "rng_algorithm": "numpy.PCG64", "refresh": "per_later_leg",
     }
     assert manifest["randomness"]["physical_sample_identity"].endswith("active-v4-p0070")
+    assert manifest["memory"]["bindings"][0]["parameters"]["alpha"] == .125
     assert manifest["budgets"]["max_shots"] == 32
     for scope in ("shot", "search", "attempt"):
         assert manifest["budgets"][scope]["max_iterations"] == 80
@@ -61,8 +63,10 @@ def test_active_fact_extractor_requires_gamma_or_memory_evidence():
     runner = _module()
     events = [
         {"kind": "work", "shot_id": 0, "data": {"relay_work_leaves": []}},
-        {"kind": "work", "shot_id": 0, "data": {"relay_memory_tuning": {"semantics": "relay_v022_dynamic_affine_prior_css_adaptation"}, "relay_legs": [{"memory": {"applied_each_source_iteration": True}}]}},
+        {"kind": "work", "shot_id": 0, "data": {"relay_memory_mode": "dynamic_affine_prior_each_source_iteration", "relay_legs": [{"memory": {"applied_each_source_iteration": True}}]}},
     ]
     fact = runner._attempt_from_events(events, 0)
     assert fact["active_memory_facts"]
     assert fact["distinct_leg_indices"] == []
+    assert runner._active_memory_proven({**fact, "distinct_leg_indices": [0]}) is True
+    assert runner._active_memory_proven({**fact, "distinct_leg_indices": [0, 1]}) is False
