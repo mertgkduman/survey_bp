@@ -64,11 +64,11 @@ def _write_json_atomic(path: Path, value: object) -> None:
     temporary.replace(path)
 
 
-def _json_command(repository_root: Path, *arguments: str) -> dict[str, Any]:
+def _json_command(repository_root: Path, *arguments: str, timeout_seconds: float = 900) -> dict[str, Any]:
     """Invoke the public CLI only; no canonical execution internals are imported here."""
     completed = subprocess.run(
         [sys.executable, "-m", "bp_registry.cli", *arguments], cwd=repository_root,
-        text=True, capture_output=True, timeout=900,
+        text=True, capture_output=True, timeout=timeout_seconds,
         env={**os.environ, "PYTHONPATH": str(repository_root / "src"), "OMP_NUM_THREADS": "1"},
     )
     if completed.returncode:
@@ -464,13 +464,14 @@ def _run_canonical_benchmark_arm(*, repository_root: Path, base: Mapping[str, ob
         verified: dict[str, object] | None = None
         error: str | None = None
         decode_started = perf_counter()
+        deadline = decode_started + 900
         decode_wall_seconds: float | None = None
         verify_wall_seconds: float | None = None
         try:
-            run = _json_command(repository_root, "canonical", str(manifest_path), "--output", str(run_path), "--shot", str(shot_id))
+            run = _json_command(repository_root, "canonical", str(manifest_path), "--output", str(run_path), "--shot", str(shot_id), timeout_seconds=max(0.001, deadline - perf_counter()))
             decode_wall_seconds = perf_counter() - decode_started
             verify_started = perf_counter()
-            verified = _json_command(repository_root, "verify-canonical-shot", str(manifest_path), str(run_path), "--shot", str(shot_id))
+            verified = _json_command(repository_root, "verify-canonical-shot", str(manifest_path), str(run_path), "--shot", str(shot_id), timeout_seconds=max(0.001, deadline - perf_counter()))
             verify_wall_seconds = perf_counter() - verify_started
         except (OSError, RuntimeError, subprocess.TimeoutExpired, ValueError) as caught:
             if decode_wall_seconds is None:
