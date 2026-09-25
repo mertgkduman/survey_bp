@@ -220,3 +220,94 @@ def test_phase4_validation_rejects_tampered_sidecars_and_keeps_unavailable_facts
     sidecar.write_text("{}", encoding="utf-8")
     with pytest.raises(ValueError, match="SHA-256|sidecar"):
         validate_phase4_shot(path, run_id="phase4-trace", shot_id=0, trace_root=tmp_path)
+
+
+def _phase4_runner_module():
+    path = Path("scripts/run_phase4_pilots.py")
+    assert path.is_file(), "Phase 4 needs one staged public-boundary runner"
+    spec = importlib.util.spec_from_file_location("run_phase4_pilots", path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_stage_identity_separates_native_and_canonical_matching_arms(tmp_path):
+    """Matched samples never collapse source procedure, canonical, and native identities."""
+    runner = _phase4_runner_module()
+    manifest = Path("data/manifests/phase4-memory-relay-bb144.json")
+
+    source = runner.stage_identity(
+        repository_root=Path("."), manifest_path=manifest, stage="trace", arm="source_procedure",
+    )
+    canonical = runner.stage_identity(
+        repository_root=Path("."), manifest_path=manifest, stage="trace", arm="canonical_default",
+    )
+    native = runner.stage_identity(
+        repository_root=Path("."), manifest_path=manifest, stage="trace", arm="native_v022",
+    )
+
+    assert source["sample_identity"] == canonical["sample_identity"] == native["sample_identity"]
+    assert source["stage_identity"] != canonical["stage_identity"] != native["stage_identity"]
+    assert native["source_identity"]["author_commit"] == "14cb31a18f9b9d7d099791b793e35b8a2951f8f3"
+    assert native["translation_identity"] != canonical["translation_identity"]
+
+
+def test_runner_tracer_uses_public_canonical_boundaries_and_retains_native_unavailability(tmp_path, monkeypatch):
+    """The BB-144 tracer public-preflights, runs, and verifies both canonical Relay arms."""
+    runner = _phase4_runner_module()
+    calls: list[tuple[str, ...]] = []
+
+    def public_boundary(_root, *arguments):
+        calls.append(tuple(arguments))
+        command = arguments[0]
+        if command == "preflight":
+            return {"run_id": "stub", "policy_identity": "policy", "shot_budget": 1}
+        if command == "canonical":
+            output = Path(arguments[arguments.index("--output") + 1])
+            output.mkdir(parents=True, exist_ok=True)
+            (output / "result.json").write_text("{}", encoding="utf-8")
+            return {"output": str(output), "final_row_count": 1}
+        if command == "verify-run":
+            return {"output": arguments[1], "final_row_count": 1, "verified_at": "test"}
+        raise AssertionError(arguments)
+
+    monkeypatch.setattr(runner, "_json_command", public_boundary)
+    monkeypatch.setattr(runner, "_run_native", lambda **_kwargs: {
+        "status": "native_unavailable", "reason": "isolated exact-author source intentionally unavailable in unit test",
+    })
+
+    report = runner.run_stage(
+        repository_root=Path("."),
+        manifest_path=Path("data/manifests/phase4-memory-relay-bb144.json"),
+        stage="trace", output_root=tmp_path,
+    )
+
+    assert [arm["arm"] for arm in report["arms"]] == ["source_procedure", "canonical_default", "native_v022"]
+    assert all(arm["identity"]["sample_identity"] == report["sample_identity"] for arm in report["arms"])
+    assert report["arms"][-1]["status"] == "native_unavailable"
+    assert {call[0] for call in calls} == {"preflight", "canonical", "verify-run"}
+    assert not hasattr(runner, "run_canonical")
+
+
+def test_stage_reuse_requires_full_identity_and_preserves_mismatched_or_interrupted_evidence(tmp_path, monkeypatch):
+    """Reuse is exact; stale and incomplete stage outputs remain visible beside a new result."""
+    runner = _phase4_runner_module()
+    monkeypatch.setattr(runner, "_json_command", lambda _root, *arguments: (
+        {"run_id": "stub", "policy_identity": "policy", "shot_budget": 1}
+        if arguments[0] == "preflight" else {"output": arguments[-1], "final_row_count": 1, "verified_at": "test"}
+    ))
+    monkeypatch.setattr(runner, "_run_native", lambda **_kwargs: {"status": "native_unavailable", "reason": "test"})
+    manifest = Path("data/manifests/phase4-memory-relay-bb144.json")
+
+    first = runner.run_stage(repository_root=Path("."), manifest_path=manifest, stage="benchmark", output_root=tmp_path)
+    reused = runner.run_stage(repository_root=Path("."), manifest_path=manifest, stage="benchmark", output_root=tmp_path)
+    stage_file = Path(first["stage_record"])
+    stale = json.loads(stage_file.read_text(encoding="utf-8"))
+    stale["identity"]["environment_identity"]["python"] = "mismatch"
+    stage_file.write_text(json.dumps(stale), encoding="utf-8")
+    refreshed = runner.run_stage(repository_root=Path("."), manifest_path=manifest, stage="benchmark", output_root=tmp_path)
+
+    assert reused["reused"] is True
+    assert refreshed["reused"] is False
+    assert any(path.name.startswith("mismatch-") for path in stage_file.parent.iterdir())
