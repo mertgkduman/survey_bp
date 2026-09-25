@@ -74,3 +74,30 @@ def test_numerical_profile_is_explicit_and_unspecified_precision_is_not_faithful
             error_priors=np.full(2, 0.1), relay_settings={}, seed=0, numerical_profile="paper-faithful",
         )
 
+
+def test_observer_patch_is_based_on_exact_author_source():
+    from bp_registry.native.relay_v022 import observer_patch_identity
+
+    identity = observer_patch_identity()
+    assert identity["base_commit"] == "14cb31a18f9b9d7d099791b793e35b8a2951f8f3"
+    assert len(identity["patch_sha256"]) == 64
+
+
+def test_observer_equivalence_requires_all_terminal_fields():
+    from bp_registry.native.relay_v022 import assert_terminal_equivalence
+
+    terminal = {
+        "candidate": [1, 0], "success": True, "score": 0.1,
+        "aggregate_iterations": 2, "final_posterior": [0.2, -0.2], "log_output": "",
+    }
+    assert_terminal_equivalence(terminal, dict(terminal)) is True
+    with pytest.raises(ValueError, match="aggregate_iterations"):
+        assert_terminal_equivalence(terminal, dict(terminal, aggregate_iterations=3))
+
+
+def test_bb144_observer_record_keeps_unavailable_facts_explicit():
+    from bp_registry.native.relay_v022 import unavailable_native_facts
+
+    facts = unavailable_native_facts()
+    assert facts["gamma"] == "unavailable: observer would change decoder behavior"
+    assert facts["edge_work"] == "unavailable: observer would change decoder behavior"
