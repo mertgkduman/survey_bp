@@ -2,9 +2,48 @@
 
 from __future__ import annotations
 
+import importlib.util
+import json
 from pathlib import Path
 
 import pytest
+
+
+def _artifact_qualification_module():
+    path = Path("scripts/qualify_phase4_artifacts.py")
+    assert path.is_file(), "Phase 4 needs an exact artifact qualification command"
+    spec = importlib.util.spec_from_file_location("qualify_phase4_artifacts", path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_b1_identity_reconciliation_measures_source_and_classifies_inventory_staleness(tmp_path):
+    """B1 is admitted only after source reconstruction identifies the stale record."""
+    module = _artifact_qualification_module()
+
+    report = module.qualify_phase4_artifacts(Path("."), output_path=tmp_path / "resolution.json")
+
+    b1 = report["b1"]
+    assert b1["disposition"] == "inventory_stale"
+    assert b1["source"]["revision"] == "v3"
+    assert b1["reconstructed"]["raw_sha256"] == b1["records"]["artifact_v3"]["raw_sha256"]
+    assert b1["reconstructed"]["semantic_sha256"] == b1["records"]["phase3_manifest"]["semantic_sha256"]
+    assert b1["reconstructed"]["semantic_sha256"] != b1["records"]["inventory"]["semantic_sha256"]
+    assert b1["matrix_logical_identity_match"] is True
+    assert json.loads((tmp_path / "resolution.json").read_text(encoding="utf-8")) == report
+
+
+def test_b1_identity_gate_read_only_qualifies_bb144_and_hgp(tmp_path):
+    """The supporting artifacts are measured but cannot be promoted by family labels."""
+    report = _artifact_qualification_module().qualify_phase4_artifacts(
+        Path("."), output_path=tmp_path / "resolution.json"
+    )
+
+    assert report["supporting_qualifications"]["gross-bb-144"]["all_identities_match"] is True
+    assert report["supporting_qualifications"]["hgp-gallager-3-4-seed-20260923"]["all_identities_match"] is True
+    assert report["supporting_qualifications"]["hgp-gallager-3-4-seed-20260923"]["author_instance"] is False
 
 
 def test_phase4_validation_declares_all_five_wave_zero_test_targets():
