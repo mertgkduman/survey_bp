@@ -82,6 +82,375 @@ def _write_json_atomic(path: Path, value: object) -> None:
     temporary.replace(path)
 
 
+_CALIBRATION_PRESETS: tuple[tuple[str, str, str], ...] = (
+    ("source_procedure", "relay-source-internal-bp-v0.2.2", "source_internal_bp"),
+    ("canonical_default", "relay-canonical-css-default-v1", "canonical_internal_bp"),
+)
+
+
+def calibration_plan(repository_root: Path, caps: Mapping[str, Any]) -> dict[str, object]:
+    """Expand the frozen D-22 surface without reading any calibration outcome.
+
+    The result is a pure projection of the cap record.  Keeping this separate
+    from execution makes an accidental outcome-dependent new cell observable
+    as a digest change before a public command can start.
+    """
+    if caps.get("status") != "frozen_pre_calibration":
+        raise ValueError("calibration requires the frozen pre-calibration cap record")
+    amendment = caps.get("design_amendment")
+    if not isinstance(amendment, Mapping) or not isinstance(amendment.get("path"), str):
+        raise ValueError("calibration caps omit the versioned design amendment")
+    amendment_path = repository_root / str(amendment["path"])
+    if not amendment_path.is_file() or sha256(amendment_path.read_bytes()).hexdigest() != amendment.get("sha256"):
+        raise ValueError("calibration design amendment is missing or has drifted")
+    amendment_value = _read_json(amendment_path)
+    if amendment_value.get("calibration_outcomes_inspected") is not False:
+        raise ValueError("calibration amendment must predate every calibration outcome")
+
+    cells: list[dict[str, object]] = []
+    calibration_namespaces: list[str] = []
+    evaluation_namespaces: list[str] = []
+    for code_id in sorted(caps.get("codes", {})):
+        code = caps["codes"][code_id]
+        if not isinstance(code, Mapping):
+            raise ValueError(f"calibration caps for {code_id} are invalid")
+        controls = code.get("fixed_relay_controls")
+        if not isinstance(controls, Mapping) or controls != {
+            "total_leg_limit": 31, "first_leg_iteration_limit": 80,
+            "later_leg_iteration_limit": 60, "solution_limit": 1,
+        }:
+            raise ValueError(f"calibration controls drifted for {code_id}")
+        calibration_namespace = code.get("calibration_namespace")
+        evaluation_namespace = code.get("evaluation_namespace")
+        if not isinstance(calibration_namespace, str) or not isinstance(evaluation_namespace, str):
+            raise ValueError(f"calibration/evaluation namespaces missing for {code_id}")
+        calibration_namespaces.append(calibration_namespace)
+        evaluation_namespaces.append(evaluation_namespace)
+        candidates = [("coarse", item) for item in code.get("coarse_candidates", [])]
+        candidates.extend(("refinement", item) for item in code.get("refinement_candidates", []))
+        if len(candidates) != int(code.get("coarse_candidate_count", -1)) + int(code.get("refinement_candidate_count_per_preset", -1)):
+            raise ValueError(f"frozen candidate count drifted for {code_id}")
+        for preset_key, preset_name, procedure in _CALIBRATION_PRESETS:
+            for tier, candidate in candidates:
+                if not isinstance(candidate, Mapping):
+                    raise ValueError(f"invalid frozen {tier} candidate for {code_id}")
+                candidate_copy = dict(candidate)
+                candidate_id = candidate_copy.get("id")
+                if not isinstance(candidate_id, str):
+                    raise ValueError(f"candidate id missing for {code_id}")
+                relay = {
+                    "preset_name": preset_name,
+                    "procedure": procedure,
+                    # The amendment fixes 31/80/60 controls for both names;
+                    # neither arm is source-faithful in this calibration.
+                    "fidelity_status": "controlled_component_adaptation",
+                    **dict(controls),
+                    "first_leg_memory": "uniform",
+                    "later_leg_memory": "disordered" if preset_key == "source_procedure" else "uniform",
+                }
+                cells.append({
+                    "configuration_id": f"{code_id}:{preset_key}:{tier}:{candidate_id}",
+                    "code_id": code_id, "preset_key": preset_key,
+                    "tier": tier, "candidate": candidate_copy, "relay": relay,
+                    "calibration_namespace": calibration_namespace,
+                    "calibration_shots": int(code["calibration_shots_per_configuration"]),
+                    "central_error_rate": float(code["central_error_rate"]),
+                    "per_shot_work_cap": dict(code["per_shot_work_cap"]),
+                    "public_boundary_seconds": int(code["canonical_public_boundary_seconds"]),
+                })
+    if len(set(calibration_namespaces)) != len(calibration_namespaces) or set(calibration_namespaces) & set(evaluation_namespaces):
+        raise ValueError("calibration and evaluation namespaces must be globally disjoint")
+    calibration_input: dict[str, object] = {
+        "caps_digest": caps.get("caps_digest"), "amendment_sha256": amendment.get("sha256"),
+        "cells": cells, "calibration_namespaces": sorted(calibration_namespaces),
+        "evaluation_namespaces": sorted(evaluation_namespaces),
+        "selection_rule": "lowest_failure_then_overlapping_interval_c2v_total_lexicographic",
+    }
+    return {
+        "calibration_input": calibration_input,
+        "calibration_digest": _digest(calibration_input), "cells": cells,
+        "calibration_namespaces": sorted(calibration_namespaces),
+        "evaluation_namespaces": sorted(evaluation_namespaces),
+    }
+
+
+def select_calibration_settings(calibration: Mapping[str, Any]) -> dict[str, object]:
+    """Freeze only deterministic selections supported by retained calibration rows."""
+    digest = calibration.get("calibration_digest")
+    if not isinstance(digest, str) or len(digest) != 64:
+        raise ValueError("selection requires a bound calibration digest")
+    codes = calibration.get("codes")
+    if not isinstance(codes, Mapping):
+        raise ValueError("selection requires per-code calibration evidence")
+    selections: dict[str, object] = {}
+    for code_id in sorted(codes):
+        code = codes[code_id]
+        presets = code.get("presets") if isinstance(code, Mapping) else None
+        if not isinstance(presets, Mapping):
+            raise ValueError(f"calibration presets missing for {code_id}")
+        selected_presets: dict[str, object] = {}
+        for preset_key in sorted(presets):
+            values = presets[preset_key]
+            configurations = values.get("configurations") if isinstance(values, Mapping) else None
+            if not isinstance(configurations, list):
+                raise ValueError(f"calibration configurations missing for {code_id}/{preset_key}")
+            eligible: list[Mapping[str, Any]] = []
+            for configuration in configurations:
+                logical = configuration.get("logical_failure", {}) if isinstance(configuration, Mapping) else {}
+                if isinstance(logical, Mapping) and logical.get("eligible") is True and isinstance(logical.get("estimate"), (int, float)):
+                    eligible.append(configuration)
+            if not eligible:
+                selected_presets[preset_key] = {
+                    "status": "inconclusive", "reason": "no eligible complete calibration configuration",
+                    "configuration_id": None,
+                }
+                continue
+            def key(item: Mapping[str, Any]) -> tuple[float, float, float, str]:
+                logical = item["logical_failure"]
+                work = item.get("work", {})
+                # 95% overlap does not support a precision claim; it only
+                # activates the fixed resource and lexicographic tie sequence.
+                return (
+                    float(logical["estimate"]),
+                    float(work.get("mean_c2v") if work.get("mean_c2v") is not None else float("inf")),
+                    float(work.get("mean_total") if work.get("mean_total") is not None else float("inf")),
+                    str(item.get("configuration_id", "")),
+                )
+            winner = min(eligible, key=key)
+            selected_presets[preset_key] = {
+                "status": "selected_finite_precision_limited", "configuration_id": winner["configuration_id"],
+                "candidate": winner.get("candidate"), "logical_failure": winner["logical_failure"],
+                "work": winner.get("work"),
+            }
+        selections[code_id] = {"presets": selected_presets}
+    return {
+        "schema_version": 1, "status": "frozen_from_calibration_only",
+        "calibration_digest": digest, "selection_input_fields": ["calibration.codes"],
+        "selection_rule": "eligible lowest estimated logical-failure; overlapping 95% intervals then lower mean C2V, lower total work, lexicographic configuration id; no eligible configuration is inconclusive",
+        "codes": selections,
+    }
+
+
+def _calibration_manifest(base: Mapping[str, Any], cell: Mapping[str, Any], *, amendment_sha256: str) -> dict[str, Any]:
+    """Materialize one frozen calibration cell for the public canonical CLI."""
+    value = deepcopy(dict(base))
+    candidate = cell["candidate"]
+    relay = dict(cell["relay"])
+    configuration_id = str(cell["configuration_id"])
+    seed_identity = _digest({
+        "purpose": "phase4-relay-calibration-memory", "configuration_id": configuration_id,
+        "calibration_namespace": cell["calibration_namespace"],
+    })
+    relay["legs"] = [{"max_iterations": relay["first_leg_iteration_limit"]}] + [
+        {"max_iterations": relay["later_leg_iteration_limit"]}
+        for _ in range(int(relay["total_leg_limit"]) - 1)
+    ]
+    relay["memory_tuning"] = {
+        "semantics": "relay_v022_dynamic_affine_prior_css_adaptation",
+        "first_leg_gamma": float(candidate["gamma0"]),
+        "later_leg_center": float(candidate["later_center"]),
+        "later_leg_width": float(candidate["later_width"]),
+        "seed_identity": seed_identity,
+        "rng_algorithm": "numpy.PCG64",
+        "refresh": "per_later_leg",
+    }
+    value["relay"] = relay
+    value["run_id"] = "phase4-calibration-" + _digest({"configuration_id": configuration_id, "amendment": amendment_sha256})[:24]
+    value["error_rate"] = float(cell["central_error_rate"])
+    randomness = dict(value["randomness"])
+    randomness["physical_sample_identity"] = str(cell["calibration_namespace"])
+    randomness["decoder_seed_identity"] = seed_identity
+    value["randomness"] = randomness
+    budgets = dict(value["budgets"])
+    for scope_name in ("shot", "search", "attempt"):
+        scope = dict(budgets[scope_name])
+        scope["max_iterations"] = int(relay["first_leg_iteration_limit"])
+        scope["work_limits"] = dict(cell["per_shot_work_cap"])
+        budgets[scope_name] = scope
+    budgets["max_shots"] = int(cell["calibration_shots"])
+    value["budgets"] = budgets
+    bindings = deepcopy(value["memory"]["bindings"])
+    # The active V4 Relay path consumes the explicit memory_tuning declaration.
+    # Keep the base binding's alpha aligned with gamma0 as a manifest-level
+    # cross-check rather than relying on an unrecorded runner-side value.
+    bindings[0]["parameters"]["alpha"] = float(candidate["gamma0"])
+    value["memory"] = {"bindings": bindings}
+    evidence = dict(value["evidence"])
+    evidence["procedure"] = (
+        f"{evidence['procedure']} D-22 calibration cell={configuration_id}; "
+        "both named presets use controlled 31/80/60/one-solution CSS adaptation."
+    )
+    evidence["sources"] = list(evidence.get("sources", [])) + [
+        f"phase4-pilot-design-amendment-v3.json#sha256:{amendment_sha256}",
+    ]
+    evidence["discrepancies"] = list(evidence.get("discrepancies", [])) + [
+        "This finite controlled calibration is neither the source 301-leg procedure nor a source-faithful curve reproduction.",
+    ]
+    value["evidence"] = evidence
+    return value
+
+
+def _wilson_95(failures: int, denominator: int) -> list[float] | None:
+    if denominator <= 0:
+        return None
+    z = 1.959963984540054
+    p = failures / denominator
+    denominator_z = 1.0 + z * z / denominator
+    center = (p + z * z / (2.0 * denominator)) / denominator_z
+    half = z * ((p * (1.0 - p) / denominator + z * z / (4.0 * denominator * denominator)) ** 0.5) / denominator_z
+    return [max(0.0, center - half), min(1.0, center + half)]
+
+
+def _append_event_subset(source: Path, destination: Path, *, shot_id: int) -> None:
+    """Append one public shot's ledger events exactly once to the calibration ledger."""
+    if not source.is_file():
+        return
+    selected = [line for line in source.read_text(encoding="utf-8").splitlines() if line and json.loads(line).get("shot_id") == shot_id]
+    if not selected:
+        return
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with destination.open("a", encoding="utf-8") as handle:
+        handle.write("\n".join(selected) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+
+
+def _attempt_terminal(run_output: Path, shot_id: int) -> tuple[dict[str, Any] | None, str | None]:
+    events_path = run_output / "events.jsonl"
+    if not events_path.is_file():
+        return None, None
+    events = [json.loads(line) for line in events_path.read_text(encoding="utf-8").splitlines() if line]
+    terminal = next((event for event in reversed(events) if event.get("kind") == "termination" and event.get("shot_id") == shot_id), None)
+    sample = next((event.get("sample_seed_identity") for event in events if event.get("kind") == "shot_begin" and event.get("shot_id") == shot_id), None)
+    return terminal, sample if isinstance(sample, str) else None
+
+
+def _configuration_evidence(cell: Mapping[str, Any], attempts: list[Mapping[str, Any]]) -> dict[str, object]:
+    completed = [attempt for attempt in attempts if attempt.get("status") == "completed"]
+    logical = [attempt for attempt in completed if attempt.get("outcome") in {"exact", "stabilizer_equivalent", "logical_failure"}]
+    failures = sum(attempt.get("outcome") == "logical_failure" for attempt in logical)
+    work_rows = [attempt.get("work_vector") for attempt in completed if isinstance(attempt.get("work_vector"), Mapping)]
+    mean_c2v = (sum(int(row.get("check_to_variable_updates", 0)) for row in work_rows) / len(work_rows)) if work_rows else None
+    mean_total = (sum(sum(int(value) for value in row.values() if isinstance(value, int)) for row in work_rows) / len(work_rows)) if work_rows else None
+    complete = len(completed) == int(cell["calibration_shots"])
+    eligible = complete and len(logical) == len(completed)
+    return {
+        "configuration_id": cell["configuration_id"], "candidate": cell["candidate"], "relay": cell["relay"],
+        "attempts": list(attempts), "status": "completed" if eligible else "inconclusive",
+        "logical_failure": {
+            "failures": failures, "denominator": len(logical),
+            "estimate": failures / len(logical) if logical else None,
+            "wilson_95": _wilson_95(failures, len(logical)), "eligible": eligible,
+            "precision_status": "finite_precision_limited_wilson_95_percent" if eligible else "insufficient_precision_or_nonterminal",
+        },
+        "work": {"mean_c2v": mean_c2v, "mean_total": mean_total},
+        "termination_counts": {name: sum(attempt.get("termination") == name for attempt in attempts) for name in sorted({str(attempt.get("termination")) for attempt in attempts if attempt.get("termination") is not None})},
+    }
+
+
+def run_calibration(*, repository_root: Path, caps_path: Path, output_root: Path) -> dict[str, object]:
+    """Run or resume the finite D-22 calibration surface through public boundaries."""
+    repository_root, caps_path, output_root = repository_root.resolve(), caps_path.resolve(), output_root.resolve()
+    caps = _read_json(caps_path)
+    plan = calibration_plan(repository_root, caps)
+    amendment_sha256 = str(caps["design_amendment"]["sha256"])
+    category = caps["allocation"]["categories"]["calibration"]
+    category_cap = float(category["wall_seconds_max"])
+    result_path = output_root / "result.json"
+    events_path = output_root / "events.jsonl"
+    output_root.mkdir(parents=True, exist_ok=True)
+    result: dict[str, Any] = {
+        "schema_version": 1, "status": "running", "calibration_digest": plan["calibration_digest"],
+        "calibration_input": plan["calibration_input"], "caps_path": str(caps_path.relative_to(repository_root)),
+        "caps_sha256": sha256(caps_path.read_bytes()).hexdigest(), "amendment_sha256": amendment_sha256,
+        "allocation": {"category": "calibration", "wall_seconds_max": category_cap, "public_boundary_accounting": "decode plus mandatory verify elapsed per identified shot"},
+        "codes": {}, "selection_rule": plan["calibration_input"]["selection_rule"],
+        "evaluation_namespace_accessed": False,
+    }
+    if result_path.exists():
+        existing = _read_json(result_path)
+        if existing.get("calibration_digest") != plan["calibration_digest"]:
+            raise ValueError("refusing to mix a different calibration plan into retained evidence")
+        result.update(existing)
+    cells_by_code: dict[str, dict[str, list[Mapping[str, Any]]]] = {}
+    for cell in plan["cells"]:
+        cells_by_code.setdefault(str(cell["code_id"]), {}).setdefault(str(cell["preset_key"]), []).append(cell)
+    used_wall = sum(
+        float(attempt.get("public_boundary", {}).get("elapsed_seconds") or 0.0)
+        for code in result["codes"].values() for preset in code.get("presets", {}).values()
+        for configuration in preset.get("configurations", []) for attempt in configuration.get("attempts", [])
+    )
+    cap_reached = False
+    for code_id, preset_cells in cells_by_code.items():
+        code_record = result["codes"].setdefault(code_id, {"presets": {}})
+        base = _read_json(repository_root / _BENCHMARK_MANIFESTS[code_id])
+        for preset_key, cells in preset_cells.items():
+            preset_record = code_record["presets"].setdefault(preset_key, {"configurations": []})
+            existing_by_id = {entry.get("configuration_id"): entry for entry in preset_record["configurations"]}
+            for cell in cells:
+                configuration_id = str(cell["configuration_id"])
+                configuration = existing_by_id.get(configuration_id)
+                if configuration is None:
+                    configuration = _configuration_evidence(cell, [])
+                    preset_record["configurations"].append(configuration)
+                attempts = configuration["attempts"]
+                manifest = _calibration_manifest(base, cell, amendment_sha256=amendment_sha256)
+                cell_root = output_root / "runs" / code_id / preset_key / _digest(configuration_id)[:16]
+                manifest_path = cell_root / "manifest.json"
+                cell_root.mkdir(parents=True, exist_ok=True)
+                if not manifest_path.exists():
+                    _write_json_atomic(manifest_path, manifest)
+                    _write_json_atomic(cell_root / "preflight.json", _json_command(repository_root, "preflight", str(manifest_path)))
+                elif manifest_path.read_bytes() != (json.dumps(manifest, indent=2, sort_keys=True) + "\n").encode("utf-8"):
+                    raise ValueError(f"retained calibration manifest drifted: {configuration_id}")
+                retained = {int(attempt["shot_id"]) for attempt in attempts}
+                for shot_id in range(int(cell["calibration_shots"])):
+                    if shot_id in retained:
+                        continue
+                    if used_wall + float(cell["public_boundary_seconds"]) > category_cap:
+                        cap_reached = True
+                        attempts.append({"shot_id": shot_id, "status": "cap_reached", "termination": None, "failure": "calibration category wall ceiling would be exceeded before launch", "public_boundary": {"elapsed_seconds": 0.0}})
+                        retained.add(shot_id)
+                        continue
+                    started = perf_counter()
+                    attempts.append({"shot_id": shot_id, "status": "incomplete_public_boundary", "termination": None, "failure": "public canonical command interrupted before retained terminal", "public_boundary": {"elapsed_seconds": None}})
+                    _write_json_atomic(result_path, result)
+                    run_output = cell_root / "run"
+                    run = verified = None
+                    error = None
+                    try:
+                        run = _json_command(repository_root, "canonical", str(manifest_path), "--output", str(run_output), "--shot", str(shot_id), timeout_seconds=float(cell["public_boundary_seconds"]))
+                        verified = _json_command(repository_root, "verify-canonical-shot", str(manifest_path), str(run_output), "--shot", str(shot_id), timeout_seconds=max(0.001, float(cell["public_boundary_seconds"]) - (perf_counter() - started)))
+                    except (OSError, RuntimeError, subprocess.TimeoutExpired, ValueError) as caught:
+                        error = str(caught)
+                    elapsed = perf_counter() - started
+                    terminal, sample_identity = _attempt_terminal(run_output, shot_id)
+                    if terminal is not None:
+                        _append_event_subset(run_output / "events.jsonl", events_path, shot_id=shot_id)
+                    terminal_data = terminal.get("data", {}) if isinstance(terminal, Mapping) else {}
+                    status = "completed" if error is None and terminal is not None and terminal.get("termination") == "completed" else ("budget_exhausted" if terminal is not None and terminal.get("termination") == "budget_exhausted" else "incomplete_public_boundary")
+                    attempts[-1] = {
+                        "shot_id": shot_id, "status": status,
+                        "termination": terminal.get("termination") if terminal else None,
+                        "outcome": terminal_data.get("outcome") if isinstance(terminal_data, Mapping) else None,
+                        "work_vector": terminal_data.get("work_vector") if isinstance(terminal_data, Mapping) else None,
+                        "sample_identity": sample_identity, "failure": error,
+                        "public_boundary": {"elapsed_seconds": elapsed, "run": run, "verify": verified},
+                    }
+                    used_wall += elapsed
+                    configuration.update(_configuration_evidence(cell, attempts))
+                    result["allocation"]["retained_public_boundary_seconds"] = used_wall
+                    _write_json_atomic(result_path, result)
+                configuration.update(_configuration_evidence(cell, attempts))
+                _write_json_atomic(result_path, result)
+    result["allocation"]["retained_public_boundary_seconds"] = used_wall
+    result["status"] = "cap_reached" if cap_reached else "completed"
+    result["calibration_digest"] = plan["calibration_digest"]
+    result["result_digest"] = _digest({key: value for key, value in result.items() if key != "result_digest"})
+    _write_json_atomic(result_path, result)
+    return result
+
+
 def _json_command(repository_root: Path, *arguments: str, timeout_seconds: float = 900) -> dict[str, Any]:
     """Invoke the public CLI only; no canonical execution internals are imported here."""
     completed = subprocess.run(

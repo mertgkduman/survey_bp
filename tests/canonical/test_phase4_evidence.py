@@ -578,3 +578,57 @@ def test_frozen_v3_caps_are_numeric_separate_and_executable():
         namespaces.update((code["calibration_namespace"], code["evaluation_namespace"], code["native_namespace"], code["fixture_trace_namespace"]))
     assert len(namespaces) == 12
     assert caps["codes"]["b1-ghp-882"]["per_shot_work_cap"]["bp_calls"] == 3
+
+
+def test_calibration_plan_is_complete_disjoint_and_keeps_controlled_adaptation_labels():
+    """D-22 derives every finite cell before any calibration outcome is read."""
+    runner = _phase4_runner_module()
+    caps = json.loads(Path("data/manifests/phase4-pilot-caps.json").read_text(encoding="utf-8"))
+
+    plan = runner.calibration_plan(Path("."), caps)
+
+    assert plan["calibration_digest"] == runner._digest(plan["calibration_input"])
+    assert plan["evaluation_namespaces"] == sorted(
+        code["evaluation_namespace"] for code in caps["codes"].values()
+    )
+    assert set(plan["calibration_namespaces"]).isdisjoint(plan["evaluation_namespaces"])
+    expected = sum(
+        2 * (code["coarse_candidate_count"] + code["refinement_candidate_count_per_preset"])
+        for code in caps["codes"].values()
+    )
+    assert len(plan["cells"]) == expected
+    assert {cell["relay"]["fidelity_status"] for cell in plan["cells"]} == {"controlled_component_adaptation"}
+    assert {cell["relay"]["total_leg_limit"] for cell in plan["cells"]} == {31}
+    assert {cell["relay"]["first_leg_iteration_limit"] for cell in plan["cells"]} == {80}
+    assert {cell["relay"]["later_leg_iteration_limit"] for cell in plan["cells"]} == {60}
+    assert {cell["relay"]["solution_limit"] for cell in plan["cells"]} == {1}
+    assert any(cell["candidate"]["later_low"] < 0 for cell in plan["cells"])
+    assert any(cell["candidate"]["later_high"] > 1 for cell in plan["cells"])
+
+
+def test_selection_is_deterministic_and_never_reads_evaluation_data(tmp_path):
+    """Selection uses only eligible calibration rows and reports finite precision."""
+    runner = _phase4_runner_module()
+    calibration = {
+        "calibration_digest": "a" * 64,
+        "codes": {
+            "code-a": {
+                "presets": {
+                    "source": {"configurations": [
+                        {"configuration_id": "b", "logical_failure": {"estimate": 0.25, "wilson_95": [0.1, 0.5], "eligible": True}, "work": {"mean_c2v": 9, "mean_total": 12}},
+                        {"configuration_id": "a", "logical_failure": {"estimate": 0.25, "wilson_95": [0.1, 0.5], "eligible": True}, "work": {"mean_c2v": 8, "mean_total": 99}},
+                    ]},
+                    "canonical": {"configurations": [
+                        {"configuration_id": "c", "logical_failure": {"estimate": None, "wilson_95": None, "eligible": False}, "work": {"mean_c2v": None, "mean_total": None}},
+                    ]},
+                }
+            }
+        },
+        "evaluation": {"forbidden": "must not be consulted"},
+    }
+    selected = runner.select_calibration_settings(calibration)
+
+    assert selected["calibration_digest"] == "a" * 64
+    assert selected["codes"]["code-a"]["presets"]["source"]["configuration_id"] == "a"
+    assert selected["codes"]["code-a"]["presets"]["canonical"]["status"] == "inconclusive"
+    assert selected["selection_input_fields"] == ["calibration.codes"]
