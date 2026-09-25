@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 04
 current_phase_name: Memory Policies and Relay-BP
-current_plan: 10
+current_plan: 11
 status: executing
-stopped_at: Completed 04-09-PLAN.md
-last_updated: "2026-09-25T03:25:22.456Z"
+stopped_at: Completed 04-15-PLAN.md
+last_updated: "2026-09-25T03:38:17.355Z"
 last_activity: 2026-09-24
 last_activity_desc: Phase 04 execution started
-state_head: 31306fb431f26afa164354f8eb6205716a80f361
+state_head: 6a04452abb6c7e743bf5e8a619eed721cb8f882c
 progress:
   total_phases: 14
   completed_phases: 3
   total_plans: 57
-  completed_plans: 51
+  completed_plans: 52
 ---
 
 # Project State
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 ## Current Position
 
 Phase: 04 (Memory Policies and Relay-BP) — EXECUTING
-Plan: 10 of 15
+Plan: 11 of 15
 Total Phases: 14
-Current Plan: 10
+Current Plan: 11
 Total Plans in Phase: 15
 Status: Ready to execute
 Last activity: 2026-09-24 — Phase 04 execution started
@@ -68,6 +68,7 @@ Progress: [██░░░░░░░░] 21% [██░░░░░░░░]
 | Phase 04-memory-policies-and-relay-bp P06 | 417 seconds | 2 tasks | 6 files |
 | Phase 04 P08 | 25m | 2 tasks | 5 files |
 | Phase 04 P09 | 14m | 2 tasks | 5 files |
+| Phase 04 P15 | 22m | 1 tasks | 5 files |
 
 Phase 02 P10–P16 gap-closure metrics are recorded in their individual summaries.
 
@@ -126,6 +127,8 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - [Phase 04]: Phase 04 Plan 08: comment-only Relay observer preserves a behavior-neutral boundary; gamma, edge work, and resource facts remain unavailable.
 - [Phase 04]: Phase 04 Plan 09: B1 resolves to the frozen v3 artifact; only the inventory semantic digest was stale.
 - [Phase 04]: Phase 04 Plan 09: Phase 4 B1 manifests bind v3 and preserve all Phase 3 B1 evidence byte-for-byte.
+- [Phase 04]: Phase 04 Plan 15: freeze focused factorial arms, three-region noise grids, and matched sample namespaces before sampling.
+- [Phase 04]: Phase 04 Plan 15: bind B1 to the Plan 04-09 resolution digest and keep generated HGP explicitly non-paper-exact.
 
 ### Pending Todos
 
@@ -157,7 +160,7 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Last session: 2026-09-25T03:25:19.670Z
-Stopped at: Completed 04-09-PLAN.md
+Last session: 2026-09-25T03:38:14.593Z
+Stopped at: Completed 04-15-PLAN.md
 Resume file: None
 Next command: $gsd-discuss-phase 4
