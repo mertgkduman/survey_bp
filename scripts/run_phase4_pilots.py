@@ -433,17 +433,31 @@ def _run_canonical_benchmark_arm(*, repository_root: Path, base: Mapping[str, ob
     manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     _json_command(repository_root, "preflight", str(manifest_path))
     run_path = output / "run"
-    attempts: list[dict[str, object]] = []
+    journal_path = output / "canonical-attempts.json"
+    attempts: list[dict[str, object]] = json.loads(journal_path.read_text(encoding="utf-8")) if journal_path.exists() else []
+    if not isinstance(attempts, list):
+        raise ValueError("canonical benchmark attempt journal is not a list")
+    retained = {entry["shot_id"] for entry in attempts}
     per_leg_totals: dict[str, dict[str, int]] = {}
     for shot_id in range(_BENCHMARK_SHOTS):
+        if shot_id in retained:
+            continue
         started = perf_counter()
         run: dict[str, object] | None = None
         verified: dict[str, object] | None = None
         error: str | None = None
+        decode_started = perf_counter()
+        decode_wall_seconds: float | None = None
+        verify_wall_seconds: float | None = None
         try:
             run = _json_command(repository_root, "canonical", str(manifest_path), "--output", str(run_path), "--shot", str(shot_id))
+            decode_wall_seconds = perf_counter() - decode_started
+            verify_started = perf_counter()
             verified = _json_command(repository_root, "verify-canonical-shot", str(manifest_path), str(run_path), "--shot", str(shot_id))
-        except (RuntimeError, subprocess.TimeoutExpired) as caught:
+            verify_wall_seconds = perf_counter() - verify_started
+        except (OSError, RuntimeError, subprocess.TimeoutExpired, ValueError) as caught:
+            if decode_wall_seconds is None:
+                decode_wall_seconds = perf_counter() - decode_started
             error = str(caught)
         all_attempts, shot_work = _canonical_attempts(run_path, expected_shots=_BENCHMARK_SHOTS)
         terminal = all_attempts[shot_id]
@@ -455,14 +469,17 @@ def _run_canonical_benchmark_arm(*, repository_root: Path, base: Mapping[str, ob
             "shot_id": shot_id,
             "status": "completed" if error is None and terminal["status"] == "completed" else "incomplete_canonical_shot",
             "termination": terminal["termination"], "runtime_seconds": terminal["runtime_seconds"], "sample_identity": terminal["sample_identity"], "terminal": terminal["terminal"],
-            "failure": error, "public_boundary": {"run": run, "verify": verified, "elapsed_seconds": perf_counter() - started},
+            "manifest_sha256": _digest(manifest), "failure": error,
+            "public_boundary": {"run": run, "verify": verified, "decode_wall_seconds": decode_wall_seconds, "verify_wall_seconds": verify_wall_seconds, "elapsed_seconds": perf_counter() - started},
         })
+        journal_path.write_text(json.dumps(attempts, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     raw_work = {"availability": "observed", "per_leg_totals": per_leg_totals}
     completed = all(attempt["status"] == "completed" for attempt in attempts)
     return {
         "shot_ids": list(range(_BENCHMARK_SHOTS)), "attempts": attempts,
         "sample_identities": [attempt["sample_identity"] for attempt in attempts],
         "runtime_seconds": _distribution([attempt["runtime_seconds"] for attempt in attempts]),
+        "public_decode_wall_seconds": _distribution([attempt.get("public_boundary", {}).get("decode_wall_seconds") for attempt in attempts]),
         "resource_measurements": {"scope": "attempt", "method": "canonical_public_ledger", "status": "runtime facts retained per terminal"},
         "raw_work": raw_work, "relay": manifest["relay"], "manifest_sha256": _digest(manifest),
         "status": "completed" if completed else "incomplete_canonical_arm",
