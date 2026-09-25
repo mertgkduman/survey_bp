@@ -115,6 +115,14 @@ def build_active_manifest(base: Mapping[str, Any], *, arm: str, preset: str,
         },
     })
     value["relay"] = relay
+    if preset == "source_procedure":
+        update = {"kind": "min_sum", "binding_id": "update-min-sum-v1", "state_lifetime": "message",
+                  "owned_state": [], "requires": [], "provides": []}
+        policies = dict(value["policies"])
+        policies["update"] = update
+        value["policies"] = policies
+        value["numerical_profile"] = "cpu-float64-min-sum-v1"
+        relay["numerical_profile"] = "cpu-float64-min-sum-v1"
     memory = dict(value["memory"])
     bindings = []
     for binding in memory.get("bindings", []):

@@ -57,6 +57,9 @@ def test_b1_bounded_profile_is_explicit_and_not_a_short_base_budget():
     assert manifest["budgets"]["max_shots"] == 32
     assert manifest["budgets"]["shot"]["work_limits"]["bp_calls"] == 3
     assert manifest["budgets"]["shot"]["work_limits"]["check_to_variable_updates"] == 529200
+    assert manifest["policies"]["update"]["kind"] == "min_sum"
+    assert manifest["policies"]["update"]["binding_id"] == "update-min-sum-v1"
+    assert manifest["numerical_profile"] == manifest["relay"]["numerical_profile"] == "cpu-float64-min-sum-v1"
 
 
 def test_active_fact_extractor_requires_gamma_or_memory_evidence():
