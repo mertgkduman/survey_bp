@@ -151,3 +151,36 @@ def test_tracer_two_leg_relay_is_public_truth_blind_and_transfers_only_posterior
     events = (tmp_path / "events.jsonl").read_text(encoding="utf-8")
     assert "relay_transfer" in events
     assert "llr_log_p0_over_p1" in events
+
+
+def test_relay_leaf_accounting_is_idempotent_and_retains_per_leg_ancestry():
+    """Committed Relay work has one stable leaf even if delivery is retried."""
+    from bp_registry.canonical.budgets import RelayWorkAccounting, WorkVector
+
+    accounting = RelayWorkAccounting(shot_identity="run:0")
+    assert accounting.commit(
+        kind="leg", leg_index=0, lineage_id="attempt-a:leg:0",
+        leaf_id="relay:attempt-a:leg:0:sweep:1",
+        delta=WorkVector(bp_calls=1, check_to_variable_updates=2),
+    ) is True
+    assert accounting.commit(
+        kind="transfer", leg_index=1, lineage_id="attempt-a:leg:0",
+        leaf_id="relay:attempt-a:transfer:1", delta=WorkVector(relay_transfers=1),
+    ) is True
+    assert accounting.commit(
+        kind="candidate", leg_index=1, lineage_id="attempt-a:leg:1",
+        leaf_id="relay:attempt-a:candidate:1", delta=WorkVector(candidate_checks=1),
+    ) is True
+    assert accounting.commit(
+        kind="selection", leg_index=1, lineage_id="attempt-a:leg:1",
+        leaf_id="relay:attempt-a:selection", delta=WorkVector(order_selection=1),
+    ) is True
+    assert accounting.commit(
+        kind="transfer", leg_index=1, lineage_id="attempt-a:leg:0",
+        leaf_id="relay:attempt-a:transfer:1", delta=WorkVector(relay_transfers=1),
+    ) is False
+
+    leaves = accounting.leaves()
+    assert [leaf["kind"] for leaf in leaves] == ["leg", "transfer", "candidate", "selection"]
+    assert accounting.summary().as_evidence()["relay_transfers"] == 1
+    assert accounting.by_leg(1).as_evidence()["candidate_checks"] == 1
