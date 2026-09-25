@@ -46,6 +46,31 @@ def test_b1_identity_gate_read_only_qualifies_bb144_and_hgp(tmp_path):
     assert report["supporting_qualifications"]["hgp-gallager-3-4-seed-20260923"]["author_instance"] is False
 
 
+def test_b1_inventory_only_repair_preserves_v3_and_preflights_resolved_phase4_manifest():
+    """An inventory typo must bind Phase 4 to the frozen, source-matched v3 artifact."""
+    from bp_registry.manifests import preflight
+
+    resolution = json.loads(Path("data/evidence/phase4-b1-identity-resolution.json").read_text(encoding="utf-8"))
+    inventory = json.loads(Path("data/evidence/code-inventory.json").read_text(encoding="utf-8"))
+    phase4_path = Path("data/manifests/phase4-memory-relay-b1.json")
+    v3_artifact = Path("data/artifacts/b1-panteleev-kalachev-v3.npz")
+    v3_metadata = Path("data/artifacts/b1-panteleev-kalachev-v3.json")
+    phase3_manifest = Path("data/manifests/phase3-pilot-b1.json")
+
+    assert phase4_path.is_file(), "Phase 4 needs a resolved B1 manifest before dependent pilots run"
+    phase4 = json.loads(phase4_path.read_text(encoding="utf-8"))
+    b1_inventory = next(item for item in inventory["candidates"] if item["code_id"] == "b1-ghp-882")
+    measured = resolution["b1"]["reconstructed"]
+    assert resolution["b1"]["disposition"] == "inventory_stale"
+    assert v3_artifact.is_file() and v3_metadata.is_file() and phase3_manifest.is_file()
+    assert not Path("data/artifacts/b1-panteleev-kalachev-v4.npz").exists()
+    assert b1_inventory["matrix_identity"]["artifact_semantic_sha256"] == measured["semantic_sha256"]
+    assert phase4["artifact"]["path"] == "b1-panteleev-kalachev-v3.npz"
+    assert phase4["artifact"]["raw_sha256"] == measured["raw_sha256"]
+    assert phase4["artifact"]["matrix_hashes"] == measured["matrix_hashes"]
+    assert preflight(phase4_path).artifact is not None
+
+
 def test_phase4_validation_declares_all_five_wave_zero_test_targets():
     validation = Path(".planning/phases/04-memory-policies-and-relay-bp/04-VALIDATION.md").read_text(encoding="utf-8")
     for target in (
