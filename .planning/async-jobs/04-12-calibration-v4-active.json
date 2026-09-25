@@ -1,0 +1,18 @@
+{
+  "version": "1.0",
+  "plan_id": "04-12",
+  "phase": "04",
+  "job_id": "55938300:2702938",
+  "backend": "slurm-allocation-child",
+  "submit_command": "setsid bash .planning/async-jobs/04-12-calibration-v4-active.launch.sh >> data/results/phase4-memory-relay/calibration.launch.log 2>&1 < /dev/null &",
+  "status": "running",
+  "expected_artifacts": [
+    "data/results/phase4-memory-relay/calibration/result.json",
+    "data/results/phase4-memory-relay/calibration/events.jsonl",
+    "data/results/phase4-memory-relay/calibration.launch.log"
+  ],
+  "verification_command": ".venv/bin/python -c \"import json; from pathlib import Path; p=Path('data/results/phase4-memory-relay/calibration/result.json'); r=json.loads(p.read_text()); assert r['status'] in {'completed','completed_with_inconclusive','cap_reached'}; print(r['status'],r['calibration_digest'],r['result_digest'])\"",
+  "resume_command": "if test -f data/results/phase4-memory-relay/calibration/result.json && .venv/bin/python -c \"import json; assert json.load(open('data/results/phase4-memory-relay/calibration/result.json'))['status'] in {'completed','completed_with_inconclusive','cap_reached'}\" 2>/dev/null; then exit 0; fi; if test -r /proc/2702938/cmdline && tr '\\0' ' ' < /proc/2702938/cmdline | grep -Fq -- '--run-calibration'; then exit 0; fi; setsid bash .planning/async-jobs/04-12-calibration-v4-active.launch.sh >> data/results/phase4-memory-relay/calibration.launch.log 2>&1 < /dev/null &",
+  "submitted_at": "2026-09-25T20:58:54Z",
+  "terminal_details": null
+}
