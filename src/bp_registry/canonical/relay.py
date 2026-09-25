@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from hashlib import sha256
 import math
-from typing import Iterable
+from typing import Iterable, Literal
 
 import numpy as np
 
 from .budgets import BudgetTree, WorkVector
-from .contracts import MemoryBindingV4, RelayLegSpec
+from .contracts import MemoryBindingV4, RelayLegSpec, RelaySpecV4
 from .memory import AffinePriorMemory, MemoryState
 from .numerics import finite_saturate
 from .schedules import EdgeTable, FloodingSchedule
@@ -74,6 +74,110 @@ class RelayLegResult:
     posterior: np.ndarray
     iterations: int
     converged: bool
+    score: "RelayCandidateScore | None" = None
+
+
+@dataclass(frozen=True, slots=True)
+class RelayCandidateScore:
+    """A decoder-visible Relay candidate score; lower values win stably."""
+
+    leg_index: int
+    syndrome_weight: int
+    prior_weight: float
+
+    def __post_init__(self) -> None:
+        if self.leg_index < 0 or self.syndrome_weight < 0 or not math.isfinite(self.prior_weight):
+            raise ValueError("Relay candidate scores require finite decoder-visible values")
+
+    @property
+    def selection_key(self) -> tuple[int, float, int]:
+        return (self.syndrome_weight, self.prior_weight, self.leg_index)
+
+
+@dataclass(frozen=True, slots=True)
+class RelayPreset:
+    """Named immutable Relay controls, including their CSS adaptation status."""
+
+    name: str
+    procedure: Literal["source_internal_bp", "canonical_internal_bp"]
+    fidelity_status: Literal["source_procedure_css_adaptation", "canonical_css_adaptation", "controlled_component_adaptation"]
+    total_leg_limit: int
+    first_leg_iteration_limit: int
+    later_leg_iteration_limit: int
+    solution_limit: int
+    transfer: Literal["posterior_only", "disabled"]
+    first_leg_memory: Literal["uniform"]
+    later_leg_memory: Literal["uniform", "disordered"]
+    numerical_profile: str
+    source_parameter_sweep: tuple[float, float] | None = None
+
+    def __post_init__(self) -> None:
+        if not self.name or self.total_leg_limit < 1 or self.solution_limit < 1:
+            raise ValueError("Relay presets require a name and positive leg and solution limits")
+        if self.first_leg_iteration_limit < 1 or self.later_leg_iteration_limit < 1:
+            raise ValueError("Relay presets require positive iteration limits")
+        if self.procedure == "source_internal_bp" and self.fidelity_status != "source_procedure_css_adaptation":
+            raise ValueError("source Relay presets must retain their source-procedure CSS-adaptation status")
+        if self.procedure == "canonical_internal_bp" and self.fidelity_status == "source_procedure_css_adaptation":
+            raise ValueError("canonical Relay presets cannot claim source-procedure fidelity")
+        if self.source_parameter_sweep is not None:
+            low, high = self.source_parameter_sweep
+            if not math.isfinite(low) or not math.isfinite(high) or low >= high:
+                raise ValueError("Relay source parameter sweeps must be finite increasing intervals")
+
+    @classmethod
+    def source_procedure(cls) -> "RelayPreset":
+        return cls(
+            name="relay-source-internal-bp-v0.2.2", procedure="source_internal_bp",
+            fidelity_status="source_procedure_css_adaptation", total_leg_limit=301,
+            first_leg_iteration_limit=80, later_leg_iteration_limit=60, solution_limit=301,
+            transfer="posterior_only", first_leg_memory="uniform", later_leg_memory="disordered",
+            numerical_profile="cpu-float64-spa-v1", source_parameter_sweep=(-0.24, 0.66),
+        )
+
+    @classmethod
+    def canonical_default(cls) -> "RelayPreset":
+        return cls(
+            name="relay-canonical-css-default-v1", procedure="canonical_internal_bp",
+            fidelity_status="canonical_css_adaptation", total_leg_limit=2,
+            first_leg_iteration_limit=4, later_leg_iteration_limit=4, solution_limit=2,
+            transfer="posterior_only", first_leg_memory="uniform", later_leg_memory="uniform",
+            numerical_profile="cpu-float64-spa-v1",
+        )
+
+    @property
+    def legs(self) -> tuple[RelayLegSpec, ...]:
+        return (RelayLegSpec(max_iterations=self.first_leg_iteration_limit),) + tuple(
+            RelayLegSpec(max_iterations=self.later_leg_iteration_limit) for _ in range(self.total_leg_limit - 1)
+        )
+
+    def with_controls(
+        self, *, total_leg_limit: int | None = None, solution_limit: int | None = None,
+        transfer: Literal["posterior_only", "disabled"] | None = None,
+        later_leg_memory: Literal["uniform", "disordered"] | None = None,
+        numerical_profile: str | None = None, source_parameter_sweep: tuple[float, float] | None = None,
+    ) -> "RelayPreset":
+        """Return a separately named controlled adaptation without mutating this preset."""
+        if all(value is None for value in (total_leg_limit, solution_limit, transfer, later_leg_memory, numerical_profile, source_parameter_sweep)):
+            return self
+        return replace(
+            self, name=f"relay-controlled-{self.procedure}-v1", fidelity_status="controlled_component_adaptation",
+            total_leg_limit=self.total_leg_limit if total_leg_limit is None else total_leg_limit,
+            solution_limit=self.solution_limit if solution_limit is None else solution_limit,
+            transfer=self.transfer if transfer is None else transfer,
+            later_leg_memory=self.later_leg_memory if later_leg_memory is None else later_leg_memory,
+            numerical_profile=self.numerical_profile if numerical_profile is None else numerical_profile,
+            source_parameter_sweep=self.source_parameter_sweep if source_parameter_sweep is None else source_parameter_sweep,
+        )
+
+    def as_spec(self) -> RelaySpecV4:
+        return RelaySpecV4(
+            total_leg_limit=self.total_leg_limit, legs=self.legs, preset_name=self.name,
+            first_leg_iteration_limit=self.first_leg_iteration_limit,
+            later_leg_iteration_limit=self.later_leg_iteration_limit, solution_limit=self.solution_limit,
+            transfer=self.transfer, first_leg_memory=self.first_leg_memory, later_leg_memory=self.later_leg_memory,
+            numerical_profile=self.numerical_profile, procedure=self.procedure, fidelity_status=self.fidelity_status,
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -81,11 +185,16 @@ class RelayRunResult:
     legs: tuple[RelayLegResult, ...]
     transfers: tuple[PosteriorTransferV2, ...]
     termination: str
+    stopping_reason: Literal["solution_limit", "leg_limit", "budget_exhausted"]
 
     @property
     def candidate(self) -> np.ndarray | None:
-        converged = tuple(leg for leg in self.legs if leg.converged)
-        return None if not converged else converged[0].candidate
+        selected = RelayController.select_candidate(tuple(
+            leg.score for leg in self.legs if leg.converged and leg.score is not None
+        ))
+        if selected is None:
+            return None
+        return next(leg.candidate for leg in self.legs if leg.leg_index == selected.leg_index)
 
 
 class _PriorVectorKernel:
@@ -119,34 +228,57 @@ class _PriorVectorKernel:
 class RelayController:
     """Runs fresh legs sequentially; only a validated posterior crosses leg boundaries."""
 
-    def __init__(self, *, memory_bindings: Iterable[MemoryBindingV4], numerical_profile: str) -> None:
+    def __init__(
+        self, *, memory_bindings: Iterable[MemoryBindingV4], numerical_profile: str,
+        preset: RelayPreset | None = None,
+    ) -> None:
         bindings = tuple(sorted(memory_bindings, key=lambda binding: binding.order))
         if not bindings:
             raise ValueError("Relay requires at least one ordered memory binding")
         self._memory = tuple(AffinePriorMemory(binding.binding_id, float(binding.alpha)) for binding in bindings)
         self.numerical_profile = numerical_profile
+        self.preset = preset
+
+    @staticmethod
+    def select_candidate(scores: Iterable[RelayCandidateScore]) -> RelayCandidateScore | None:
+        """Select only decoder-visible scores and preserve earlier-leg ties."""
+        candidates = tuple(scores)
+        return None if not candidates else min(candidates, key=lambda score: score.selection_key)
 
     def run(
         self, *, edge_table: EdgeTable, check_matrix: np.ndarray, syndrome: np.ndarray, kernel: object,
-        error_rate: float, legs: tuple[RelayLegSpec, ...], budgets: BudgetTree, scope: str, lineage_prefix: str,
+        error_rate: float, legs: tuple[RelayLegSpec, ...] | None, budgets: BudgetTree, scope: str, lineage_prefix: str,
+        solution_limit: int | None = None, transfer: Literal["posterior_only", "disabled"] | None = None,
     ) -> RelayRunResult:
         if not math.isfinite(error_rate) or not 0.0 < error_rate < 1.0:
             raise ValueError("Relay requires a finite error rate strictly between zero and one")
+        active_legs = legs if legs is not None else (self.preset.legs if self.preset is not None else None)
+        if active_legs is None or not active_legs:
+            raise ValueError("Relay requires one explicit pre-leg and zero or more later legs")
+        active_solution_limit = solution_limit if solution_limit is not None else (
+            self.preset.solution_limit if self.preset is not None else 1
+        )
+        active_transfer = transfer if transfer is not None else (
+            self.preset.transfer if self.preset is not None else "posterior_only"
+        )
+        if active_solution_limit < 1:
+            raise ValueError("Relay solution_limit must be positive")
         base_prior = np.full(edge_table.variable_count, kernel.prior(error_rate), dtype=np.float64)  # type: ignore[attr-defined]
-        states: dict[str, MemoryState] = {}
         previous: PosteriorTransferV2 | None = None
         leg_results: list[RelayLegResult] = []
         transfers: list[PosteriorTransferV2] = []
 
-        for index, leg in enumerate(legs):
+        for index, leg in enumerate(active_legs):
             prior = base_prior
-            if previous is not None:
+            if previous is not None and active_transfer == "posterior_only":
                 transfer_reservation = budgets.reserve(
                     scope, WorkVector(relay_transfers=1), leaf_id=f"relay:{lineage_prefix}:transfer:{index}",
                 )
                 if transfer_reservation is None:
-                    return RelayRunResult(tuple(leg_results), tuple(transfers), "budget_exhausted")
+                    return RelayRunResult(tuple(leg_results), tuple(transfers), "budget_exhausted", "budget_exhausted")
                 prior = previous.as_array()
+                # No history, gamma assignment, messages, iteration, or convergence crosses a leg boundary.
+                states: dict[str, MemoryState] = {}
                 for memory in self._memory:
                     proposal = memory.propose(base_prior, prior)
                     states[memory.binding_id] = memory.commit(proposal, states.get(memory.binding_id))
@@ -169,7 +301,7 @@ class RelayController:
                     scope, proposed, leaf_id=f"relay:{lineage_prefix}:leg:{index}:sweep:{iteration}",
                 )
                 if reservation is None:
-                    return RelayRunResult(tuple(leg_results), tuple(transfers), "budget_exhausted")
+                    return RelayRunResult(tuple(leg_results), tuple(transfers), "budget_exhausted", "budget_exhausted")
                 sweep = schedule.sweep(messages, syndrome, error_rate=error_rate, source_iteration=iteration - 1)
                 messages = sweep.new_v2c
                 posterior = sweep.beliefs
@@ -184,10 +316,21 @@ class RelayController:
             posterior = np.array(posterior, dtype=np.float64, copy=True)
             posterior.setflags(write=False)
             lineage_id = f"{lineage_prefix}:leg:{index}"
-            result = RelayLegResult(index, lineage_id, candidate, posterior, completed, converged)
+            syndrome_weight = int(np.count_nonzero(
+                (check_matrix.astype(np.int64) @ candidate.astype(np.int64)) % 2 != syndrome
+            ))
+            score = None
+            if converged:
+                score = RelayCandidateScore(
+                    leg_index=index, syndrome_weight=syndrome_weight,
+                    prior_weight=float(np.dot(candidate.astype(np.float64), base_prior)),
+                )
+            result = RelayLegResult(index, lineage_id, candidate, posterior, completed, converged, score)
             leg_results.append(result)
             previous = PosteriorTransferV2.from_posterior(
                 posterior, producer_leg_lineage_id=lineage_id, numerical_profile=self.numerical_profile,
                 clipping_evidence="canonical_finite_saturate:relay_belief_assembly",
             )
-        return RelayRunResult(tuple(leg_results), tuple(transfers), "completed")
+            if len(tuple(leg_result for leg_result in leg_results if leg_result.converged)) >= active_solution_limit:
+                return RelayRunResult(tuple(leg_results), tuple(transfers), "completed", "solution_limit")
+        return RelayRunResult(tuple(leg_results), tuple(transfers), "completed", "leg_limit")

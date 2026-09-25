@@ -644,6 +644,10 @@ def _run_relay_structural_shot(
                     "composition_identity": resolved.semantic_identity,
                     "schema_version": 4,
                     "relay_topology": "sequential_posterior_only",
+                    "relay_preset_name": parsed.relay.preset_name,
+                    "relay_procedure": parsed.relay.procedure,
+                    "relay_fidelity_status": parsed.relay.fidelity_status,
+                    "relay_numerical_profile": parsed.relay.numerical_profile,
                 }
                 ledger.begin(run_id=parsed.run_id, shot_id=shot_id, sample_seed_identity=sample_seed_identity, **common)
                 attempt_id = _attempt_lineage_id(working, attempt_ordinal)
@@ -655,6 +659,7 @@ def _run_relay_structural_shot(
                     edge_table=edge_table, check_matrix=validated.hz, syndrome=observation.syndrome,
                     kernel=_kernel_for_manifest(parsed, edge_table), error_rate=parsed.error_rate,
                     legs=parsed.relay.legs, budgets=budgets, scope="attempt", lineage_prefix=attempt_id.value,
+                    solution_limit=parsed.relay.solution_limit, transfer=parsed.relay.transfer,
                 )
                 for transfer in run.transfers:
                     ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="relay_transfer", data={
@@ -665,8 +670,13 @@ def _run_relay_structural_shot(
                 ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="work", data={
                     **common, "work_vector": work.as_evidence(structural_event_version=2),
                     "relay_legs": tuple({"index": leg.leg_index, "lineage_id": leg.lineage_id,
-                                          "iterations": leg.iterations, "converged": leg.converged}
+                                          "iterations": leg.iterations, "converged": leg.converged,
+                                          "score": None if leg.score is None else {
+                                              "syndrome_weight": leg.score.syndrome_weight,
+                                              "prior_weight": leg.score.prior_weight,
+                                          }}
                                         for leg in run.legs),
+                    "relay_stopping_reason": run.stopping_reason,
                 })
                 if run.termination != "completed" or run.candidate is None:
                     ledger.terminal(run_id=parsed.run_id, shot_id=shot_id, termination=run.termination, data={
@@ -682,7 +692,8 @@ def _run_relay_structural_shot(
                 selected = _require_current_candidate(selected, working=working, attempt_id=attempt_id)
                 ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="candidate", data={
                     **common, "candidate": selected.candidate.tolist(), "candidate_lineage_id": selected.lineage_id,
-                    "selection_score": "stable_first_valid_syndrome_candidate",
+                    "selection_score": "stable_minimum_prior_weighted_valid_candidate",
+                    "relay_stopping_reason": run.stopping_reason,
                 })
                 ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="selection", data={
                     **common, "selection_status": "frozen_decoder_visible_candidate",

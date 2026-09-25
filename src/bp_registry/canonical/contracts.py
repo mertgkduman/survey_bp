@@ -550,8 +550,18 @@ class RelayLegSpec(_Strict):
 class RelaySpecV4(_Strict):
     """Sequential Relay topology with an unambiguous total leg count."""
 
-    total_leg_limit: int = Field(ge=2, le=10_000)
-    legs: tuple[RelayLegSpec, ...] = Field(min_length=2)
+    total_leg_limit: int = Field(ge=1, le=10_000)
+    legs: tuple[RelayLegSpec, ...] = Field(min_length=1)
+    preset_name: str = Field(default="relay-canonical-css-default-v1", min_length=1, max_length=96)
+    first_leg_iteration_limit: int | None = Field(default=None, ge=1, le=100_000)
+    later_leg_iteration_limit: int | None = Field(default=None, ge=1, le=100_000)
+    solution_limit: int | None = Field(default=None, ge=1, le=10_000)
+    transfer: Literal["posterior_only", "disabled"] = "posterior_only"
+    first_leg_memory: Literal["uniform"] = "uniform"
+    later_leg_memory: Literal["uniform", "disordered"] = "uniform"
+    numerical_profile: Literal["cpu-float64-spa-v1"] = "cpu-float64-spa-v1"
+    procedure: Literal["source_internal_bp", "canonical_internal_bp"] = "canonical_internal_bp"
+    fidelity_status: Literal["source_procedure_css_adaptation", "canonical_css_adaptation", "controlled_component_adaptation"] = "canonical_css_adaptation"
 
     @field_validator("legs", mode="before")
     @classmethod
@@ -562,6 +572,22 @@ class RelaySpecV4(_Strict):
     def leg_limit_matches_explicit_legs(self) -> "RelaySpecV4":
         if self.total_leg_limit != len(self.legs):
             raise ValueError("total_leg_limit must equal the number of explicit Relay legs")
+        first_limit = self.legs[0].max_iterations
+        later_limit = self.legs[1].max_iterations if len(self.legs) > 1 else first_limit
+        if self.first_leg_iteration_limit is None:
+            object.__setattr__(self, "first_leg_iteration_limit", first_limit)
+        elif self.first_leg_iteration_limit != first_limit:
+            raise ValueError("first_leg_iteration_limit must match the explicit pre-leg")
+        if self.later_leg_iteration_limit is None:
+            object.__setattr__(self, "later_leg_iteration_limit", later_limit)
+        elif any(leg.max_iterations != self.later_leg_iteration_limit for leg in self.legs[1:]):
+            raise ValueError("later_leg_iteration_limit must match every declared later leg")
+        if self.solution_limit is None:
+            object.__setattr__(self, "solution_limit", self.total_leg_limit)
+        if self.procedure == "source_internal_bp" and self.fidelity_status != "source_procedure_css_adaptation":
+            raise ValueError("source Relay procedure requires its source-procedure CSS-adaptation fidelity label")
+        if self.procedure == "canonical_internal_bp" and self.fidelity_status == "source_procedure_css_adaptation":
+            raise ValueError("canonical Relay procedure cannot claim source-procedure fidelity")
         return self
 
 
@@ -597,6 +623,12 @@ class CanonicalManifestV4(_Strict):
             raise ValueError("memory bindings must have distinct binding_id values")
         if len(orders) != len(set(orders)) or tuple(sorted(orders)) != tuple(range(len(orders))):
             raise ValueError("memory binding order must be a contiguous explicit sequence beginning at zero")
+        return self
+
+    @model_validator(mode="after")
+    def relay_numerical_profile_matches_manifest(self) -> "CanonicalManifestV4":
+        if self.relay.numerical_profile != self.numerical_profile:
+            raise ValueError("Relay numerical_profile must match the canonical manifest numerical_profile")
         return self
 
 
