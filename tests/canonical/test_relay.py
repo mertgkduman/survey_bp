@@ -3,6 +3,63 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
+
+
+def test_source_preset_exposes_its_own_fidelity_and_complete_leg_contract():
+    """The source procedure remains a named, immutable CSS adaptation."""
+    from bp_registry.canonical.relay import RelayPreset
+
+    source = RelayPreset.source_procedure()
+
+    assert source.name == "relay-source-internal-bp-v0.2.2"
+    assert source.procedure == "source_internal_bp"
+    assert source.fidelity_status == "source_procedure_css_adaptation"
+    assert source.total_leg_limit == 301
+    assert source.first_leg_iteration_limit == 80
+    assert source.later_leg_iteration_limit == 60
+    assert source.transfer == "posterior_only"
+    assert source.first_leg_memory == "uniform"
+    assert source.later_leg_memory == "disordered"
+    with pytest.raises((AttributeError, TypeError)):
+        source.total_leg_limit = 1  # type: ignore[misc]
+
+
+def test_canonical_preset_has_distinct_controlled_identity_and_bounded_stopping():
+    """The controlled default cannot silently inherit source-procedure identity."""
+    from bp_registry.canonical.relay import RelayPreset
+
+    source = RelayPreset.source_procedure()
+    canonical = RelayPreset.canonical_default()
+
+    assert canonical.name == "relay-canonical-css-default-v1"
+    assert canonical.procedure == "canonical_internal_bp"
+    assert canonical.fidelity_status == "canonical_css_adaptation"
+    assert canonical != source
+    assert canonical.total_leg_limit == len(canonical.legs)
+    assert canonical.total_leg_limit >= 1
+    assert canonical.solution_limit >= 1
+
+
+def test_leg_limit_counts_one_pre_leg_plus_declared_later_legs():
+    """A total leg limit is never interpreted as only the later-leg count."""
+    from bp_registry.canonical.relay import RelayPreset
+
+    preset = RelayPreset.canonical_default().with_controls(total_leg_limit=3)
+
+    assert len(preset.legs) == 3
+    assert preset.legs[0].max_iterations == preset.first_leg_iteration_limit
+    assert all(leg.max_iterations == preset.later_leg_iteration_limit for leg in preset.legs[1:])
+
+
+def test_score_selection_keeps_the_first_leg_when_scores_tie():
+    """Stable relay selection preserves source ordering without hidden truth."""
+    from bp_registry.canonical.relay import RelayCandidateScore, RelayController
+
+    first = RelayCandidateScore(leg_index=0, syndrome_weight=1, prior_weight=2.0)
+    later = RelayCandidateScore(leg_index=1, syndrome_weight=1, prior_weight=2.0)
+
+    assert RelayController.select_candidate((later, first)) is first
 
 
 def _policies() -> dict[str, object]:
