@@ -4,7 +4,7 @@
   "phase": "04",
   "job_id": "55938300:2607837",
   "backend": "slurm-allocation-child",
-  "submit_command": "setsid bash .planning/async-jobs/04-12-active-v4-20260925-core-1f8f1c2.launch.sh >> data/results/phase4-memory-relay/04-12-active-v4-20260925-core-1f8f1c2.stdout.log 2>&1 < /dev/null &; the launcher refuses a live lock owner",
+  "submit_command": "setsid bash .planning/async-jobs/04-12-active-v4-20260925-core-1f8f1c2.launch.sh >> data/results/phase4-memory-relay/04-12-active-v4-20260925-core-1f8f1c2.stdout.log 2>&1 < /dev/null &",
   "status": "running",
   "expected_artifacts": [
     "data/results/phase4-memory-relay/benchmark-v4-active-04-12-active-v4-20260925-core-1f8f1c2.json",
@@ -12,7 +12,7 @@
     "data/results/phase4-memory-relay/04-12-active-v4-20260925-core-1f8f1c2.stdout.log"
   ],
   "verification_command": "test -f data/results/phase4-memory-relay/benchmark-v4-active-04-12-active-v4-20260925-core-1f8f1c2.json && .venv/bin/python -c \"import json; r=json.load(open('data/results/phase4-memory-relay/benchmark-v4-active-04-12-active-v4-20260925-core-1f8f1c2.json')); assert r['status'] in {'completed','final_inconclusive'}; print(r['status'], r['report_digest'])\"",
-  "resume_command": "test ! -f data/results/phase4-memory-relay/benchmark-v4-active-04-12-active-v4-20260925-core-1f8f1c2.json && (! test -r /proc/2607837/cmdline || ! tr '\\0' ' ' < /proc/2607837/cmdline | grep -Fq -- '--campaign-id 04-12-active-v4-20260925-core-1f8f1c2') && setsid bash .planning/async-jobs/04-12-active-v4-20260925-core-1f8f1c2.launch.sh >> data/results/phase4-memory-relay/04-12-active-v4-20260925-core-1f8f1c2.stdout.log 2>&1 < /dev/null &; the launcher also rejects a live durable lock owner",
+  "resume_command": "test ! -f data/results/phase4-memory-relay/benchmark-v4-active-04-12-active-v4-20260925-core-1f8f1c2.json && (! test -r /proc/2607837/cmdline || ! tr '\\0' ' ' < /proc/2607837/cmdline | grep -Fq -- '--campaign-id 04-12-active-v4-20260925-core-1f8f1c2') && setsid bash .planning/async-jobs/04-12-active-v4-20260925-core-1f8f1c2.launch.sh >> data/results/phase4-memory-relay/04-12-active-v4-20260925-core-1f8f1c2.stdout.log 2>&1 < /dev/null &",
   "submitted_at": "2026-09-25T16:46:02Z",
   "terminal_details": null
 }
