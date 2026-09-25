@@ -1,0 +1,116 @@
+{
+  "allocation": {
+    "authorized_cpus": 2,
+    "authorized_memory": "8G",
+    "basis": "remaining_30_day_job_window_after_benchmark_and_10_percent_safety_margin",
+    "calibration_percent_max": 35,
+    "evaluation_percent_max": 45,
+    "fixture_percent_max": 10,
+    "native_percent_max": 10,
+    "omp_threads_per_worker": 1,
+    "remaining_wall_seconds_budget": "derived_live_at_freeze; no extension",
+    "sum_percent_max": 100,
+    "worker_count_prespecified": 1
+  },
+  "benchmark_digest": "4853133d368b7a5debc8d8b998e81683ecffe05979d6c7658c0676d2d810194b",
+  "benchmark_path": "data/results/phase4-memory-relay/benchmark-v2.json",
+  "codes": {
+    "b1-ghp-882": {
+      "benchmark_public_command_p95_seconds": 58.026026339968666,
+      "benchmark_work_leg_count": 31,
+      "calibration_namespace": "phase4-memory-relay-b1-matched-physical-samples-v1-calibration-v2",
+      "calibration_shot_menu": [
+        128,
+        256,
+        512,
+        1024
+      ],
+      "coarse_configurations_max": 54,
+      "evaluation_namespace": "phase4-memory-relay-b1-matched-physical-samples-v1-evaluation-v2",
+      "evaluation_shot_menu": [
+        1024,
+        2048,
+        4096,
+        8192
+      ],
+      "fixture_namespace": "phase4-memory-relay-b1-matched-physical-samples-v1-fixture-v2",
+      "native_namespace": "phase4-memory-relay-b1-matched-physical-samples-v1-native-v2",
+      "per_shot_public_command_wall_cap_seconds": 72.533,
+      "per_shot_work_cap": "benchmark-p95-plus-25-percent; exact work vector checked per leg",
+      "refinement_configurations_max": 32,
+      "trace_event_cap": 10000
+    },
+    "gross-bb-144": {
+      "benchmark_public_command_p95_seconds": 9.847471404122189,
+      "benchmark_work_leg_count": 31,
+      "calibration_namespace": "phase4-memory-relay-bb144-matched-physical-samples-v1-calibration-v2",
+      "calibration_shot_menu": [
+        128,
+        256,
+        512,
+        1024
+      ],
+      "coarse_configurations_max": 54,
+      "evaluation_namespace": "phase4-memory-relay-bb144-matched-physical-samples-v1-evaluation-v2",
+      "evaluation_shot_menu": [
+        1024,
+        2048,
+        4096,
+        8192
+      ],
+      "fixture_namespace": "phase4-memory-relay-bb144-matched-physical-samples-v1-fixture-v2",
+      "native_namespace": "phase4-memory-relay-bb144-matched-physical-samples-v1-native-v2",
+      "per_shot_public_command_wall_cap_seconds": 12.309,
+      "per_shot_work_cap": "benchmark-p95-plus-25-percent; exact work vector checked per leg",
+      "refinement_configurations_max": 32,
+      "trace_event_cap": 10000
+    },
+    "hgp-gallager-3-4-seed-20260923": {
+      "benchmark_public_command_p95_seconds": 12.743712756084278,
+      "benchmark_work_leg_count": 31,
+      "calibration_namespace": "phase4-memory-relay-hgp-matched-physical-samples-v1-calibration-v2",
+      "calibration_shot_menu": [
+        128,
+        256,
+        512,
+        1024
+      ],
+      "coarse_configurations_max": 54,
+      "evaluation_namespace": "phase4-memory-relay-hgp-matched-physical-samples-v1-evaluation-v2",
+      "evaluation_shot_menu": [
+        1024,
+        2048,
+        4096,
+        8192
+      ],
+      "fixture_namespace": "phase4-memory-relay-hgp-matched-physical-samples-v1-fixture-v2",
+      "native_namespace": "phase4-memory-relay-hgp-matched-physical-samples-v1-native-v2",
+      "per_shot_public_command_wall_cap_seconds": 15.93,
+      "per_shot_work_cap": "benchmark-p95-plus-25-percent; exact work vector checked per leg",
+      "refinement_configurations_max": 32,
+      "trace_event_cap": 10000
+    }
+  },
+  "entitlement_digest": "50bf1b5c23c5e5a376bd135eebb27fbad833cb75fc9fddb015d54e2200cd3a89",
+  "reporting": {
+    "interval": "Wilson",
+    "native_setup": "Cargo/setup is retained separately and is not a per-shot runtime.",
+    "paired": "matched physical samples",
+    "runtime_measurement": "full public canonical command plus mandatory verification wall time; decode and verify distributions retained separately"
+  },
+  "schema_version": 2,
+  "selection_rule": "Fixed paired Wilson ranking over calibration only; lexical tie break; select at most 32 refinement configurations.",
+  "status": "frozen_before_calibration",
+  "stop_rules": {
+    "calibration": "Stop at selected shot-menu endpoint, runtime/work/trace cap, or insufficient_precision.",
+    "evaluation": "Never consumes calibration samples; stop at prespecified menu endpoint or cap.",
+    "inconclusive": [
+      "insufficient_precision",
+      "cap_reached",
+      "native_unavailable",
+      "inconclusive"
+    ],
+    "no_silent_extension": "Any increase requires a new versioned campaign identity and retained amendment.",
+    "rank_chasing": "Unused allocation cannot add ranks, configurations, or shots."
+  }
+}

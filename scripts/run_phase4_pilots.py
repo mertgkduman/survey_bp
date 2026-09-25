@@ -496,6 +496,7 @@ def _run_canonical_benchmark_arm(*, repository_root: Path, base: Mapping[str, ob
         "sample_identities": [attempt["sample_identity"] for attempt in attempts],
         "runtime_seconds": _distribution([attempt["runtime_seconds"] for attempt in attempts]),
         "public_decode_wall_seconds": _distribution([attempt.get("public_boundary", {}).get("decode_wall_seconds") for attempt in attempts]),
+        "public_command_wall_seconds": _distribution([attempt.get("public_boundary", {}).get("elapsed_seconds") for attempt in attempts]),
         "resource_measurements": {"scope": "attempt", "method": "canonical_public_ledger", "status": "runtime facts retained per terminal"},
         "raw_work": raw_work, "relay": manifest["relay"], "manifest_sha256": _digest(manifest),
         "status": "completed" if completed else "incomplete_canonical_arm",
