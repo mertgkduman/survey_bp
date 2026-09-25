@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import hashlib
 import json
 from pathlib import Path
 
@@ -75,6 +76,73 @@ def test_b1_inventory_only_repair_preserves_v3_and_preflights_resolved_phase4_ma
 def test_b1_versioned_repair_historical_preserved_resolved_gate_regeneration():
     """The required repair gate remains selected by the plan-level verification command."""
     test_b1_inventory_only_repair_preserves_v3_and_preflights_resolved_phase4_manifest()
+
+
+def _canonical_json_sha256(value: object) -> str:
+    """Return the content digest used to bind the frozen pilot-design record."""
+    encoded = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+
+
+def test_phase4_pilot_design_prespecifies_focused_factorial_and_noise_grid():
+    """D-24/D-25 pilot choices exist before sampling or calibration evidence."""
+    design_path = Path("data/evidence/phase4-pilot-design.json")
+    assert design_path.is_file(), "Phase 4 needs a retained presampling pilot design"
+    design = json.loads(design_path.read_text(encoding="utf-8"))
+
+    assert design["schema_version"] == 1
+    assert design["status"] == "frozen_before_sampling"
+    assert design["calibration_outcomes_inspected"] is False
+    assert design["amendment_policy"] == {
+        "permitted_only_after": "retained_baseline_scan_before_calibration",
+        "preserve_prior_design": True,
+        "require_versioned_reason": True,
+    }
+    assert set(design["codes"]) == {"gross-bb-144", "b1-ghp-882", "hgp-gallager-3-4-seed-20260923"}
+    assert {arm["kind"] for arm in design["factorial_arms"]} >= {
+        "common_baseline", "memory_family", "two_policy_interaction", "relay_component_ablation",
+    }
+    assert len(design["selected_two_policy_interactions"]) == 3
+    assert {grid["region"] for grid in design["noise_grid"]} == {"easy", "visible_bp_failures", "harder"}
+    assert {configuration["name"] for configuration in design["configurations"]} == {
+        "source_procedure", "canonical_procedure", "controlled_matched",
+    }
+
+
+def test_phase4_pilot_manifests_gate_identity_presets_and_matched_samples():
+    """Each code binds the same frozen design while preserving source qualifications."""
+    design_path = Path("data/evidence/phase4-pilot-design.json")
+    assert design_path.is_file(), "pilot-design evidence must exist before manifests are admitted"
+    design = json.loads(design_path.read_text(encoding="utf-8"))
+    design_digest = _canonical_json_sha256(design)
+    manifest_paths = {
+        "gross-bb-144": Path("data/manifests/phase4-memory-relay-bb144.json"),
+        "b1-ghp-882": Path("data/manifests/phase4-memory-relay-b1.json"),
+        "hgp-gallager-3-4-seed-20260923": Path("data/manifests/phase4-memory-relay-hgp.json"),
+    }
+    manifests = {}
+    for code_id, path in manifest_paths.items():
+        assert path.is_file(), f"{code_id} needs an identity-gated Phase 4 pilot manifest"
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        manifests[code_id] = manifest
+        assert manifest["schema_version"] == 4
+        assert manifest["artifact"]["code_id"] == code_id
+        assert manifest["artifact"]["matrix_hashes"]
+        assert f"phase4-pilot-design.json#sha256:{design_digest}" in manifest["evidence"]["sources"]
+        assert manifest["randomness"]["physical_sample_identity"] == design["codes"][code_id]["sample_namespace"]
+        assert "source_procedure" in manifest["evidence"]["procedure"]
+        assert "controlled_matched" in manifest["evidence"]["procedure"]
+
+    b1 = manifests["b1-ghp-882"]
+    resolution = json.loads(Path("data/evidence/phase4-b1-identity-resolution.json").read_text(encoding="utf-8"))
+    assert resolution["b1"]["disposition"] == "inventory_stale"
+    assert b1["artifact"]["semantic_sha256"] == resolution["b1"]["reconstructed"]["semantic_sha256"]
+    assert resolution["b1"]["reconstructed"]["semantic_sha256"] in b1["evidence"]["sources"]
+
+    hgp = manifests["hgp-gallager-3-4-seed-20260923"]
+    assert hgp["evidence"]["relation"] == "pilot_adaptation"
+    assert "generated" in " ".join(hgp["evidence"]["discrepancies"]).lower()
+    assert "paper-exact" in " ".join(hgp["evidence"]["discrepancies"]).lower()
 
 
 def test_phase4_validation_declares_all_five_wave_zero_test_targets():
