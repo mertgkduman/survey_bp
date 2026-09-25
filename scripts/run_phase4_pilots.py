@@ -702,6 +702,7 @@ def main() -> None:
     parser.add_argument("--stage", choices=sorted(STAGES), default="trace")
     parser.add_argument("--output", type=Path, default=Path("data/results/phase4-pilots"))
     parser.add_argument("--benchmark", action="store_true", help="run the retained D-23 32-shot benchmark for all qualified Phase 4 codes")
+    parser.add_argument("--benchmark-output", type=Path, default=Path("data/results/phase4-memory-relay/benchmark-v2.json"), help="new versioned benchmark report; refuses to overwrite historical evidence")
     parser.add_argument("--slurm-job-id", default=os.environ.get("SLURM_JOB_ID"), help="concrete SLURM allocation used for a D-23 benchmark")
     parser.add_argument("--benchmark-artifact-run-id", help="resume only the named retained benchmark artifact identity")
     args = parser.parse_args()
@@ -711,7 +712,7 @@ def main() -> None:
             raise SystemExit("--benchmark requires --slurm-job-id or SLURM_JOB_ID")
         print(json.dumps(run_benchmark(
             repository_root=repository_root,
-            output_path=Path("data/results/phase4-memory-relay/benchmark.json"),
+            output_path=args.benchmark_output,
             job_id=args.slurm_job_id,
             artifact_run_id=args.benchmark_artifact_run_id,
         ), indent=2, sort_keys=True))
