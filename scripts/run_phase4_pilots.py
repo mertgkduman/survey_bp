@@ -64,8 +64,13 @@ def _canonical_json(value: object) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
 
 
+def _canonical_json_bytes(value: object) -> bytes:
+    """The byte contract used by immutable cap/amendment SHA256 references."""
+    return _canonical_json(value).encode("utf-8")
+
+
 def _digest(value: object) -> str:
-    return sha256(_canonical_json(value).encode("utf-8")).hexdigest()
+    return sha256(_canonical_json_bytes(value)).hexdigest()
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -88,6 +93,14 @@ def _write_json_atomic(path: Path, value: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(f".{path.name}.tmp-{os.getpid()}")
     temporary.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    temporary.replace(path)
+
+
+def _write_canonical_json_atomic(path: Path, value: object) -> None:
+    """Write exactly the bytes whose SHA256 is cited by a frozen artifact."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.tmp-{os.getpid()}")
+    temporary.write_bytes(_canonical_json_bytes(value))
     temporary.replace(path)
 
 
@@ -262,10 +275,13 @@ def select_calibration_settings(calibration: Mapping[str, Any]) -> dict[str, obj
             def shared_key(item: tuple[str, Mapping[str, Mapping[str, Any]]]) -> tuple[float, float, float, str]:
                 candidate_id, pair = item
                 rows = (pair["source"], pair["canonical"])
+                def mean_work(field: str) -> float:
+                    values = [row.get("work", {}).get(field) for row in rows]
+                    return sum(float(value) if value is not None else float("inf") for value in values) / len(values)
                 return (
                     sum(float(row["logical_failure"]["estimate"]) for row in rows) / 2.0,
-                    sum(float(row["work"].get("mean_c2v") or float("inf")) for row in rows) / 2.0,
-                    sum(float(row["work"].get("mean_total") or float("inf")) for row in rows) / 2.0,
+                    mean_work("mean_c2v"),
+                    mean_work("mean_total"),
                     candidate_id,
                 )
             candidate_id, pair = min(jointly_eligible, key=shared_key)
@@ -294,6 +310,11 @@ _ACTIVE_V4_GRAPH_FACTS = {
     "hgp-gallager-3-4-seed-20260923": {"checks": 225, "edges": 756},
 }
 _ACTIVE_V4_PUBLIC_HARD_BOUNDARY_SECONDS = 900
+_ACTIVE_V4_WORK_VECTOR_KEYS = frozenset(_theoretical_key for _theoretical_key in (
+    "belief_assemblies", "candidate_checks", "check_to_variable_updates", "variable_to_check_updates",
+    "residual_priority_evaluations", "bp_calls", "intervention_actions", "branch_expansions",
+    "branch_prunes", "relay_transfers", "fallback_calls",
+))
 
 
 def _active_rate_key(rate: float) -> str:
@@ -369,7 +390,21 @@ def _uses_b1_bounded_fallback(code_id: str, code: Mapping[str, Any]) -> bool:
     selected = rates.get(_active_rate_key(float(code["selected_rate"]))) if isinstance(rates, Mapping) else None
     presets = selected.get("presets") if isinstance(selected, Mapping) else None
     canonical = presets.get("canonical_default") if isinstance(presets, Mapping) else None
-    return isinstance(canonical, Mapping) and "controlled_relay_31_bounded" in canonical
+    source = presets.get("source_procedure") if isinstance(presets, Mapping) else None
+    if not isinstance(canonical, Mapping) or "controlled_relay_31_bounded" not in canonical:
+        return False
+    if not isinstance(source, Mapping) or not isinstance(source.get("controlled_relay_31"), Mapping):
+        raise ValueError("selected B1 bounded fallback omits the matched source controlled arm")
+    for label, arm in (("canonical bounded", canonical["controlled_relay_31_bounded"]),
+                       ("source controlled", source["controlled_relay_31"])):
+        attempts = arm.get("attempts") if isinstance(arm, Mapping) else None
+        if not isinstance(attempts, list) or len(attempts) != 32:
+            raise ValueError(f"selected B1 bounded fallback omits 32-shot {label} evidence")
+        for attempt in attempts:
+            work = attempt.get("work_vector") if isinstance(attempt, Mapping) else None
+            if not isinstance(work, Mapping) or work.get("bp_calls") is None or int(work["bp_calls"]) > 3:
+                raise ValueError(f"selected B1 bounded fallback is not consistently three-leg for {label}")
+    return True
 
 
 def _renew_namespace(value: object, kind: str) -> str:
@@ -425,6 +460,8 @@ def build_active_v4_caps(benchmark_report: Mapping[str, Any], live_entitlement: 
         prior_code = prior_codes[code_id]
         if not isinstance(report_code, Mapping) or not isinstance(prior_code, Mapping):
             raise ValueError(f"invalid active V4 report or prior cap for {code_id}")
+        b1_bounded = _uses_b1_bounded_fallback(code_id, report_code)
+        theoretical_work = _theoretical_active_v4_work(code_id, b1_bounded=b1_bounded)
         elapsed: list[float] = []
         observed_work_max: dict[str, int] = {}
         for arm in _active_v4_required_arms(code_id, report_code):
@@ -434,22 +471,34 @@ def build_active_v4_caps(benchmark_report: Mapping[str, Any], live_entitlement: 
                 work = attempt.get("work_vector")
                 if not isinstance(seconds, (int, float)) or seconds <= 0 or not isinstance(work, Mapping):
                     raise ValueError(f"{code_id} active arm omits retained elapsed/work evidence")
+                if set(work) != _ACTIVE_V4_WORK_VECTOR_KEYS:
+                    raise ValueError(f"{code_id} active arm work vector keys drift from the declared envelope")
                 elapsed.append(float(seconds))
                 for key, value in work.items():
                     if not isinstance(value, int) or value < 0:
                         raise ValueError(f"{code_id} active arm has invalid work evidence")
+                    if value > theoretical_work[key]:
+                        raise ValueError(f"{code_id} active arm exceeds the declared theoretical work envelope")
                     observed_work_max[key] = max(observed_work_max.get(key, 0), value)
         p95 = _p95(elapsed)
         timing_margin = math.ceil(p95 * 1.25)
         if timing_margin > _ACTIVE_V4_PUBLIC_HARD_BOUNDARY_SECONDS:
             raise ValueError(f"{code_id} retained p95 timing margin exceeds the 900-second public boundary")
-        b1_bounded = _uses_b1_bounded_fallback(code_id, report_code)
         updated = deepcopy(dict(prior_code))
+        historical_timing = updated.pop("timing_model", None)
         updated["central_error_rate"] = float(report_code["selected_rate"])
         # The public command limit stays immutable.  The measured p95 margin
         # informs category planning only; it must never silently lengthen a shot.
         updated["canonical_public_boundary_seconds"] = _ACTIVE_V4_PUBLIC_HARD_BOUNDARY_SECONDS
-        updated["per_shot_work_cap"] = _theoretical_active_v4_work(code_id, b1_bounded=b1_bounded)
+        updated["per_shot_work_cap"] = theoretical_work
+        if isinstance(historical_timing, Mapping):
+            updated["historical_pre_active_memory_timing_model"] = dict(historical_timing)
+        updated["timing_model"] = {
+            "source": "active-V4 retained public command elapsed including mandatory verification",
+            "p95_seconds": p95, "multiplicative_margin": 1.25,
+            "one_worker_planning_seconds": timing_margin,
+            "max_seconds": max(elapsed), "public_hard_boundary_seconds": _ACTIVE_V4_PUBLIC_HARD_BOUNDARY_SECONDS,
+        }
         updated["calibration_namespace"] = _renew_namespace(prior_code.get("calibration_namespace"), "calibration")
         updated["evaluation_namespace"] = _renew_namespace(prior_code.get("evaluation_namespace"), "evaluation")
         updated["native_namespace"] = _renew_namespace(prior_code.get("native_namespace"), "native")
@@ -598,6 +647,21 @@ def build_active_v4_caps(benchmark_report: Mapping[str, Any], live_entitlement: 
                "planned_total_wall_seconds": planned_categories[name]}
         for name in fractions
     }
+    evaluation_contract = deepcopy(dict(prior_caps["evaluation"]))
+    evaluation_contract.pop("fresh_matched_samples_per_arm", None)
+    evaluation_contract["fresh_matched_samples_per_arm_by_code"] = dict(evaluation_counts)
+    evaluation_contract["count_scope"] = "per-code; no scalar count is valid after active-V4 allocation"
+    factorial_contract = deepcopy(dict(factorial))
+    factorial_contract.pop("shots_per_arm_rate_code", None)
+    factorial_contract["shots_per_arm_rate_code_by_code"] = dict(fixture_factorial_counts)
+    factorial_contract["count_scope"] = "per-code; no scalar count is valid after active-V4 allocation"
+    native_contract = {"shots_per_code": dict(native_counts),
+                       "planning_cost_per_shot_seconds": _ACTIVE_V4_PUBLIC_HARD_BOUNDARY_SECONDS,
+                       "status": deepcopy(dict(native_status))}
+    fixture_trace_contract = {"fixture_shots_per_code": dict(fixture_factorial_counts),
+                              "factorial_shots_per_arm_rate_code_by_code": dict(fixture_factorial_counts),
+                              "factorial_arms": len(factorial["arms"]), "noise_regions": len(factorial["noise_regions"]),
+                              "count_scope": "per-code; jointly allocated with factorial work"}
     caps: dict[str, object] = {
         "schema_version": 4, "cap_version": "v4-active-memory", "status": "frozen_pre_calibration",
         "author_source_pin": _ACTIVE_V4_AUTHOR_PIN,
@@ -609,6 +673,10 @@ def build_active_v4_caps(benchmark_report: Mapping[str, Any], live_entitlement: 
                        "allocatable_wall_seconds_after_margin": allocatable, "fraction_sum": sum(fractions.values()),
                        "categories": categories},
         "codes": code_caps,
+        "evaluation": evaluation_contract,
+        "factorial": factorial_contract,
+        "native": native_contract,
+        "fixture_trace": fixture_trace_contract,
         "allocation_plan": {
             "evaluation": {"arms_per_code": list(evaluation_arms), "shots_per_code": evaluation_counts,
                            "planning_cost_basis": "worst selected source/canonical active p95 with 25 percent margin"},
@@ -631,7 +699,50 @@ def build_active_v4_caps(benchmark_report: Mapping[str, Any], live_entitlement: 
                                     "snapshot_path": amendment["supersedes"]["snapshot_path"]}}
 
 
-def _calibration_manifest(base: Mapping[str, Any], cell: Mapping[str, Any], *, amendment_sha256: str) -> dict[str, Any]:
+def publish_active_v4_caps(*, repository_root: Path, report_path: Path, prior_caps_path: Path,
+                           caps_output_path: Path, amendment_output_path: Path,
+                           live_entitlement: Mapping[str, Any]) -> dict[str, object]:
+    """Publish one immutable active-V4 freeze, snapshotting V3 before replacement."""
+    repository_root = repository_root.resolve()
+    report_path, prior_caps_path = report_path.resolve(), prior_caps_path.resolve()
+    caps_output_path, amendment_output_path = caps_output_path.resolve(), amendment_output_path.resolve()
+    report_bytes, prior_bytes = report_path.read_bytes(), prior_caps_path.read_bytes()
+    report, prior = _read_json(report_path), _read_json(prior_caps_path)
+    built = build_active_v4_caps(
+        report, live_entitlement, prior,
+        report_path=_display_path(report_path, repository_root), report_sha256=sha256(report_bytes).hexdigest(),
+        prior_caps_path=_display_path(prior_caps_path, repository_root), prior_caps_sha256=sha256(prior_bytes).hexdigest(),
+    )
+    caps, amendment = built["caps"], built["amendment"]
+    declared_amendment = repository_root / str(caps["design_amendment"]["path"])
+    snapshot_path = repository_root / str(built["publishing_contract"]["snapshot_path"])
+    if amendment_output_path != declared_amendment:
+        raise ValueError("active V4 amendment output must match the cap-declared portable path")
+    if snapshot_path.exists() or amendment_output_path.exists():
+        raise FileExistsError("refusing to overwrite retained V3 snapshot or active V4 amendment")
+    if caps_output_path.exists() and caps_output_path != prior_caps_path:
+        raise FileExistsError("refusing to overwrite an unrelated cap output")
+    if caps_output_path == prior_caps_path and caps_output_path.read_bytes() != prior_bytes:
+        raise ValueError("prior cap bytes drifted before its required V3 snapshot")
+    snapshot_path.parent.mkdir(parents=True, exist_ok=True)
+    snapshot_path.write_bytes(prior_bytes)
+    _write_canonical_json_atomic(amendment_output_path, amendment)
+    if sha256(amendment_output_path.read_bytes()).hexdigest() != caps["design_amendment"]["sha256"]:
+        raise ValueError("active V4 amendment byte SHA256 does not match its declared cap reference")
+    _write_canonical_json_atomic(caps_output_path, caps)
+    # The same check used before calibration proves the on-disk byte contract.
+    calibration_plan(repository_root, _read_json(caps_output_path))
+    return {"status": "published", "caps_path": _display_path(caps_output_path, repository_root),
+            "caps_byte_sha256": sha256(caps_output_path.read_bytes()).hexdigest(),
+            "amendment_path": _display_path(amendment_output_path, repository_root),
+            "amendment_byte_sha256": sha256(amendment_output_path.read_bytes()).hexdigest(),
+            "v3_snapshot_path": _display_path(snapshot_path, repository_root),
+            "v3_snapshot_byte_sha256": sha256(snapshot_path.read_bytes()).hexdigest(),
+            "caps_digest": caps["caps_digest"]}
+
+
+def _calibration_manifest(base: Mapping[str, Any], cell: Mapping[str, Any], *, amendment_path: str,
+                          amendment_sha256: str) -> dict[str, Any]:
     """Materialize one frozen calibration cell for the public canonical CLI."""
     value = deepcopy(dict(base))
     candidate = cell["candidate"]
@@ -696,7 +807,7 @@ def _calibration_manifest(base: Mapping[str, Any], cell: Mapping[str, Any], *, a
         "both named presets use controlled 31/80/60/one-solution CSS adaptation."
     )
     evidence["sources"] = list(evidence.get("sources", [])) + [
-        f"phase4-pilot-design-amendment-v3.json#sha256:{amendment_sha256}",
+        f"{amendment_path}#sha256:{amendment_sha256}",
     ]
     evidence["discrepancies"] = list(evidence.get("discrepancies", [])) + [
         "This finite controlled calibration is neither the source 301-leg procedure nor a source-faithful curve reproduction.",
@@ -808,6 +919,7 @@ def run_calibration(*, repository_root: Path, caps_path: Path, output_root: Path
     caps = _read_json(caps_path)
     plan = calibration_plan(repository_root, caps)
     amendment_sha256 = str(caps["design_amendment"]["sha256"])
+    amendment_path = str(caps["design_amendment"]["path"])
     category = caps["allocation"]["categories"]["calibration"]
     category_cap = float(category["wall_seconds_max"])
     result_path = output_root / "result.json"
@@ -848,7 +960,8 @@ def run_calibration(*, repository_root: Path, caps_path: Path, output_root: Path
                     configuration = _configuration_evidence(cell, [])
                     preset_record["configurations"].append(configuration)
                 attempts = configuration["attempts"]
-                manifest = _calibration_manifest(base, cell, amendment_sha256=amendment_sha256)
+                manifest = _calibration_manifest(base, cell, amendment_path=amendment_path,
+                                                 amendment_sha256=amendment_sha256)
                 cell_root = output_root / "runs" / code_id / preset_key / _digest(configuration_id)[:16]
                 manifest_path = cell_root / "manifest.json"
                 cell_root.mkdir(parents=True, exist_ok=True)
@@ -1710,10 +1823,35 @@ def main() -> None:
     parser.add_argument("--bounded-b1-p07-relay-probe", action="store_true", help="run the fresh 32-shot B1 p=.07 three-leg-equivalent Relay adaptation probe")
     parser.add_argument("--bounded-probe-output", type=Path, default=Path("data/results/phase4-memory-relay/benchmark-v3-b1-p07-bounded-three-leg.json"), help="new immutable report for the bounded B1 p=.07 probe")
     parser.add_argument("--bounded-probe-artifact-run-id", help="fresh artifact identity for the bounded B1 p=.07 probe")
+    parser.add_argument("--freeze-active-v4", action="store_true", help="publish the digest-bound active-memory V4 cap/amendment freeze")
+    parser.add_argument("--active-v4-report", type=Path, help="terminal immutable active-V4 benchmark report")
+    parser.add_argument("--prior-caps", type=Path, default=Path("data/manifests/phase4-pilot-caps.json"), help="current pre-active V3 cap to snapshot before replacement")
+    parser.add_argument("--active-v4-caps-output", type=Path, default=Path("data/manifests/phase4-pilot-caps.json"), help="published V4 cap path; may replace --prior-caps only after snapshot")
+    parser.add_argument("--active-v4-amendment-output", type=Path, default=Path("data/evidence/phase4-pilot-design-amendment-v4-active-memory.json"), help="new immutable active-V4 amendment path")
+    parser.add_argument("--remaining-wall-seconds", type=int, help="fresh one-worker remaining allocation wall time at freeze")
+    parser.add_argument("--run-calibration", action="store_true", help="run/resume calibration from a published frozen V4 cap")
+    parser.add_argument("--calibration-caps", type=Path, default=Path("data/manifests/phase4-pilot-caps.json"), help="published frozen cap for calibration")
+    parser.add_argument("--calibration-output", type=Path, default=Path("data/results/phase4-memory-relay/calibration"), help="durable calibration output root")
     args = parser.parse_args()
     repository_root = Path(__file__).resolve().parents[1]
-    if args.benchmark and args.bounded_b1_p07_relay_probe:
-        raise SystemExit("choose one benchmark mode per invocation")
+    selected_modes = sum(bool(value) for value in (args.benchmark, args.bounded_b1_p07_relay_probe,
+                                                    args.freeze_active_v4, args.run_calibration))
+    if selected_modes > 1:
+        raise SystemExit("choose one benchmark, freeze, or calibration mode per invocation")
+    if args.freeze_active_v4:
+        if not args.active_v4_report or not args.slurm_job_id or args.remaining_wall_seconds is None:
+            raise SystemExit("--freeze-active-v4 requires --active-v4-report, --slurm-job-id, and --remaining-wall-seconds")
+        print(json.dumps(publish_active_v4_caps(
+            repository_root=repository_root, report_path=args.active_v4_report, prior_caps_path=args.prior_caps,
+            caps_output_path=args.active_v4_caps_output, amendment_output_path=args.active_v4_amendment_output,
+            live_entitlement={"job_id": args.slurm_job_id, "remaining_wall_seconds": args.remaining_wall_seconds,
+                              "one_worker": {"omp_num_threads": 1, "workers": 1}},
+        ), indent=2, sort_keys=True))
+        return
+    if args.run_calibration:
+        print(json.dumps(run_calibration(repository_root=repository_root, caps_path=args.calibration_caps,
+                                         output_root=args.calibration_output), indent=2, sort_keys=True))
+        return
     if args.bounded_b1_p07_relay_probe:
         if not args.slurm_job_id or not args.bounded_probe_artifact_run_id:
             raise SystemExit("bounded B1 p=.07 probe requires --slurm-job-id and --bounded-probe-artifact-run-id")

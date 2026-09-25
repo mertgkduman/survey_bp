@@ -606,17 +606,19 @@ def test_calibration_plan_is_complete_disjoint_and_keeps_controlled_adaptation_l
     assert any(cell["candidate"]["later_high"] > 1 for cell in plan["cells"])
     first = plan["cells"][0]
     same_code = next(cell for cell in plan["cells"] if cell["code_id"] == first["code_id"] and cell["candidate"]["id"] != first["candidate"]["id"])
-    manifest_a = runner._calibration_manifest(json.loads(Path("data/manifests/phase4-memory-relay-bb144.json").read_text()), first, amendment_sha256="b" * 64)
-    manifest_b = runner._calibration_manifest(json.loads(Path("data/manifests/phase4-memory-relay-bb144.json").read_text()), same_code, amendment_sha256="b" * 64)
+    amendment_path = "data/evidence/phase4-pilot-design-amendment-v4-active-memory.json"
+    manifest_a = runner._calibration_manifest(json.loads(Path("data/manifests/phase4-memory-relay-bb144.json").read_text()), first, amendment_path=amendment_path, amendment_sha256="b" * 64)
+    manifest_b = runner._calibration_manifest(json.loads(Path("data/manifests/phase4-memory-relay-bb144.json").read_text()), same_code, amendment_path=amendment_path, amendment_sha256="b" * 64)
     assert manifest_a["relay"]["memory_tuning"]["seed_identity"] == manifest_b["relay"]["memory_tuning"]["seed_identity"]
     source = next(cell for cell in plan["cells"] if cell["code_id"] == "gross-bb-144" and cell["preset_key"] == "source_procedure")
     canonical = next(cell for cell in plan["cells"] if cell["code_id"] == "gross-bb-144" and cell["preset_key"] == "canonical_default")
-    source_manifest = runner._calibration_manifest(json.loads(Path("data/manifests/phase4-memory-relay-bb144.json").read_text()), source, amendment_sha256="b" * 64)
-    canonical_manifest = runner._calibration_manifest(json.loads(Path("data/manifests/phase4-memory-relay-bb144.json").read_text()), canonical, amendment_sha256="b" * 64)
+    source_manifest = runner._calibration_manifest(json.loads(Path("data/manifests/phase4-memory-relay-bb144.json").read_text()), source, amendment_path=amendment_path, amendment_sha256="b" * 64)
+    canonical_manifest = runner._calibration_manifest(json.loads(Path("data/manifests/phase4-memory-relay-bb144.json").read_text()), canonical, amendment_path=amendment_path, amendment_sha256="b" * 64)
     assert source_manifest["policies"]["update"]["kind"] == "min_sum"
     assert source_manifest["numerical_profile"] == source_manifest["relay"]["numerical_profile"] == "cpu-float64-min-sum-v1"
     assert canonical_manifest["policies"]["update"]["kind"] == "binary_spa"
     assert canonical_manifest["numerical_profile"] == canonical_manifest["relay"]["numerical_profile"] == "cpu-float64-spa-v1"
+    assert any(source.startswith(f"{amendment_path}#sha256:") for source in source_manifest["evidence"]["sources"])
 
 
 def test_selection_rule_is_deterministic_and_never_reads_evaluation_data(tmp_path):
@@ -661,15 +663,32 @@ def test_selection_tie_break_uses_work_only_for_overlapping_wilson_intervals():
     assert selected["codes"]["code-a"]["presets"]["source"]["configuration_id"] == "overlap"
 
 
-def test_active_v4_cap_builder_requires_terminal_verified_benchmark_and_derives_new_identity():
+def test_shared_selection_retains_zero_work_as_lower_than_positive_work():
+    runner = _phase4_runner_module()
+    def row(candidate_id: str, c2v: int) -> dict[str, object]:
+        return {"configuration_id": candidate_id, "candidate": {"id": candidate_id},
+                "logical_failure": {"estimate": .2, "wilson_95": [.1, .3], "eligible": True},
+                "work": {"mean_c2v": c2v, "mean_total": c2v}}
+    calibration = {"calibration_digest": "d" * 64, "codes": {"code-a": {"presets": {
+        "source": {"configurations": [row("zero", 0), row("positive", 1)]},
+        "canonical": {"configurations": [row("zero", 0), row("positive", 1)]},
+    }}}}
+    selected = runner.select_calibration_settings(calibration)
+    assert selected["codes"]["code-a"]["shared_memory_settings"]["candidate_id"] == "zero"
+
+
+def test_active_v4_cap_builder_requires_terminal_verified_benchmark_and_derives_new_identity(tmp_path):
     """The active-memory timing amendment cannot reuse the pre-active V3 cap."""
     runner = _phase4_runner_module()
     prior = json.loads(Path("data/manifests/phase4-pilot-caps.json").read_text(encoding="utf-8"))
 
     def arm(*, elapsed: float, work: int) -> dict[str, object]:
+        vector = {key: 0 for key in runner._ACTIVE_V4_WORK_VECTOR_KEYS}
+        vector.update({"check_to_variable_updates": work, "variable_to_check_updates": work,
+                       "bp_calls": 3, "relay_transfers": 2})
         return {"status": "completed", "active_memory_verified": True, "attempts": [
             {"status": "completed", "shot_id": shot, "public_boundary": {"elapsed_seconds": elapsed + shot / 100.0},
-             "work_vector": {"check_to_variable_updates": work + shot, "variable_to_check_updates": work + shot}}
+             "work_vector": {**vector, "check_to_variable_updates": work + shot, "variable_to_check_updates": work + shot}}
             for shot in range(32)
         ]}
 
@@ -707,15 +726,44 @@ def test_active_v4_cap_builder_requires_terminal_verified_benchmark_and_derives_
     assert caps["codes"]["gross-bb-144"]["per_shot_work_cap"]["check_to_variable_updates"] == 812160
     assert caps["codes"]["b1-ghp-882"]["per_shot_work_cap"]["check_to_variable_updates"] == 529200
     assert caps["codes"]["b1-ghp-882"]["active_v4_benchmark"]["observed_work_max"]["check_to_variable_updates"] < 529200
+    assert set(caps["codes"]["gross-bb-144"]["per_shot_work_cap"]) == runner._ACTIVE_V4_WORK_VECTOR_KEYS
+    assert caps["codes"]["gross-bb-144"]["timing_model"]["source"].startswith("active-V4")
+    assert "historical_pre_active_memory_timing_model" in caps["codes"]["gross-bb-144"]
     assert caps["codes"]["gross-bb-144"]["calibration_namespace"].endswith("-v4-active-calibration")
     assert all(item["planned_total_wall_seconds"] > 0 for item in caps["allocation"]["categories"].values())
     assert caps["benchmark_evidence"]["active_v4"]["byte_sha256"] == "a" * 64
+    assert "fresh_matched_samples_per_arm" not in caps["evaluation"]
+    assert caps["evaluation"]["fresh_matched_samples_per_arm_by_code"] == caps["allocation_plan"]["evaluation"]["shots_per_code"]
+    assert "shots_per_arm_rate_code" not in caps["factorial"]
+    assert caps["factorial"]["shots_per_arm_rate_code_by_code"] == caps["allocation_plan"]["fixture_trace"]["factorial_shots_per_arm_rate_code"]
     assert caps["caps_digest"] == runner._digest({key: value for key, value in caps.items() if key != "caps_digest"})
+
+    report_path = tmp_path / "data/results/active-v4.json"
+    prior_path = tmp_path / "data/manifests/phase4-pilot-caps.json"
+    amendment_path = tmp_path / "data/evidence/phase4-pilot-design-amendment-v4-active-memory.json"
+    report_path.parent.mkdir(parents=True)
+    prior_path.parent.mkdir(parents=True)
+    report_path.write_bytes(runner._canonical_json_bytes(report))
+    prior_path.write_bytes(runner._canonical_json_bytes(prior))
+    published = runner.publish_active_v4_caps(
+        repository_root=tmp_path, report_path=report_path, prior_caps_path=prior_path,
+        caps_output_path=prior_path, amendment_output_path=amendment_path, live_entitlement=entitlement,
+    )
+    snapshot = tmp_path / "data/manifests/phase4-pilot-caps-v3-pre-active-memory.json"
+    assert snapshot.read_bytes() == runner._canonical_json_bytes(prior)
+    assert published["amendment_byte_sha256"] == hashlib.sha256(amendment_path.read_bytes()).hexdigest()
+    assert runner.calibration_plan(tmp_path, json.loads(prior_path.read_text()))["calibration_digest"]
 
     tampered_report = deepcopy(report)
     tampered_report["unbound_change"] = True
     with pytest.raises(ValueError, match="digest-bound benchmark"):
         runner.build_active_v4_caps(tampered_report, entitlement, prior, report_path="data/results/active-v4.json", report_sha256="a" * 64,
+                                    prior_caps_path="data/manifests/phase4-pilot-caps.json", prior_caps_sha256="b" * 64)
+    inconsistent_b1 = deepcopy(report)
+    inconsistent_b1["codes"]["b1-ghp-882"]["rates"]["p0070"]["presets"]["source_procedure"]["controlled_relay_31"]["attempts"][0]["work_vector"]["bp_calls"] = 4
+    inconsistent_b1["report_digest"] = runner._digest({key: value for key, value in inconsistent_b1.items() if key != "report_digest"})
+    with pytest.raises(ValueError, match="consistently three-leg"):
+        runner.build_active_v4_caps(inconsistent_b1, entitlement, prior, report_path="data/results/active-v4.json", report_sha256="a" * 64,
                                     prior_caps_path="data/manifests/phase4-pilot-caps.json", prior_caps_sha256="b" * 64)
     tampered_prior = deepcopy(prior)
     tampered_prior["unbound_change"] = True
