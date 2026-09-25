@@ -395,6 +395,26 @@ class CanonicalExperimentV4(CanonicalExperimentV3):
     # opts the canonical kernel into the distinct Phase 4 Relay execution path.
     relay: RelaySpecV4 | None = None
 
+    @model_validator(mode="after")
+    def active_relay_procedure_has_its_declared_kernel(self) -> "CanonicalExperimentV4":
+        """Require a real source/canonical procedure distinction when tuning."""
+        if self.relay is None or self.relay.memory_tuning is None:
+            return self
+        expected = (
+            ("min_sum", "cpu-float64-min-sum-v1")
+            if self.relay.procedure == "source_internal_bp"
+            else ("binary_spa", "cpu-float64-spa-v1")
+        )
+        if self.policies.update.kind != expected[0]:
+            raise ValueError(
+                f"active {self.relay.procedure} Relay requires update policy {expected[0]}"
+            )
+        if self.numerical_profile != expected[1]:
+            raise ValueError(
+                f"active {self.relay.procedure} Relay requires numerical_profile {expected[1]}"
+            )
+        return self
+
 
 ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4
 

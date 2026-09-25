@@ -598,7 +598,7 @@ class RelaySpecV4(_Strict):
     transfer: Literal["posterior_only", "disabled"] = "posterior_only"
     first_leg_memory: Literal["uniform"] = "uniform"
     later_leg_memory: Literal["uniform", "disordered"] = "uniform"
-    numerical_profile: Literal["cpu-float64-spa-v1"] = "cpu-float64-spa-v1"
+    numerical_profile: Literal["cpu-float64-spa-v1", "cpu-float64-min-sum-v1"] = "cpu-float64-spa-v1"
     procedure: Literal["source_internal_bp", "canonical_internal_bp"] = "canonical_internal_bp"
     fidelity_status: Literal["source_procedure_css_adaptation", "canonical_css_adaptation", "controlled_component_adaptation"] = "canonical_css_adaptation"
     memory_tuning: RelayMemoryTuningV4 | None = None
@@ -642,7 +642,7 @@ class CanonicalManifestV4(_Strict):
 
     schema_version: Literal[4]
     run_id: str = Field(min_length=1)
-    numerical_profile: Literal["cpu-float64-spa-v1"]
+    numerical_profile: Literal["cpu-float64-spa-v1", "cpu-float64-min-sum-v1"]
     max_iterations: int = Field(ge=1, le=100_000)
     error_rate: float = Field(ge=0.0, le=1.0)
     policies: CanonicalCompositionSpec
@@ -675,6 +675,26 @@ class CanonicalManifestV4(_Strict):
     def relay_numerical_profile_matches_manifest(self) -> "CanonicalManifestV4":
         if self.relay.numerical_profile != self.numerical_profile:
             raise ValueError("Relay numerical_profile must match the canonical manifest numerical_profile")
+        return self
+
+    @model_validator(mode="after")
+    def active_relay_procedure_has_its_declared_kernel(self) -> "CanonicalManifestV4":
+        """Prevent label-only source/canonical active-memory procedure arms."""
+        if self.relay.memory_tuning is None:
+            return self
+        expected = (
+            ("min_sum", "cpu-float64-min-sum-v1")
+            if self.relay.procedure == "source_internal_bp"
+            else ("binary_spa", "cpu-float64-spa-v1")
+        )
+        if self.policies.update.kind != expected[0]:
+            raise ValueError(
+                f"active {self.relay.procedure} Relay requires update policy {expected[0]}"
+            )
+        if self.numerical_profile != expected[1]:
+            raise ValueError(
+                f"active {self.relay.procedure} Relay requires numerical_profile {expected[1]}"
+            )
         return self
 
 

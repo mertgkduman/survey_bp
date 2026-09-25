@@ -358,6 +358,46 @@ def test_active_memory_tuning_requires_a_controlled_adaptation_identity():
         })
 
 
+def test_active_memory_tuning_requires_distinct_source_and_canonical_kernels():
+    """An active Relay procedure label must select its declared update kernel."""
+    from bp_registry.canonical.contracts import CanonicalManifestV4
+
+    raw = _three_leg_manifest("relay-active-procedure").model_dump(mode="json")
+    raw["relay"].update({
+        "legs": [{"max_iterations": 2}, {"max_iterations": 2}, {"max_iterations": 2}],
+        "first_leg_iteration_limit": 2, "later_leg_iteration_limit": 2,
+        "later_leg_memory": "disordered", "fidelity_status": "controlled_component_adaptation",
+        "memory_tuning": {
+            "semantics": "relay_v022_dynamic_affine_prior_css_adaptation",
+            "first_leg_gamma": 0.25, "later_leg_center": 0.0,
+            "later_leg_width": 2.0, "seed_identity": "active-procedure-fixture",
+        },
+    })
+    # Canonical active memory uses the scalar SPA kernel already in this fixture.
+    canonical = CanonicalManifestV4.model_validate(raw)
+    assert canonical.policies.update.kind == "binary_spa"
+    assert canonical.numerical_profile == "cpu-float64-spa-v1"
+
+    source = {**raw, "relay": {**raw["relay"], "procedure": "source_internal_bp"}}
+    with pytest.raises(ValueError, match="update policy min_sum"):
+        CanonicalManifestV4.model_validate(source)
+
+    source = {
+        **source, "numerical_profile": "cpu-float64-min-sum-v1",
+        "relay": {**source["relay"], "numerical_profile": "cpu-float64-min-sum-v1"},
+        "policies": {**source["policies"], "update": {**source["policies"]["update"], "kind": "min_sum"}},
+    }
+    parsed_source = CanonicalManifestV4.model_validate(source)
+    assert parsed_source.policies.update.kind == "min_sum"
+
+    wrong_canonical = {
+        **source, "numerical_profile": "cpu-float64-spa-v1",
+        "relay": {**source["relay"], "procedure": "canonical_internal_bp", "numerical_profile": "cpu-float64-spa-v1"},
+    }
+    with pytest.raises(ValueError, match="update policy binary_spa"):
+        CanonicalManifestV4.model_validate(wrong_canonical)
+
+
 def test_active_memory_changes_each_sweep_without_rebuilding_the_leg_schedule(monkeypatch):
     """Dynamic Relay memory updates the prior operand, not schedule topology."""
     import bp_registry.canonical.relay as relay_module

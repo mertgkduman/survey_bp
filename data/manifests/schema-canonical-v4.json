@@ -1171,8 +1171,11 @@
           "default": null
         },
         "numerical_profile": {
-          "const": "cpu-float64-spa-v1",
           "default": "cpu-float64-spa-v1",
+          "enum": [
+            "cpu-float64-spa-v1",
+            "cpu-float64-min-sum-v1"
+          ],
           "title": "Numerical Profile",
           "type": "string"
         },
