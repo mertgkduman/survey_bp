@@ -5,16 +5,16 @@ current_phase: 04
 current_phase_name: Memory Policies and Relay-BP
 current_plan: 11
 status: executing
-stopped_at: Completed 04-15-PLAN.md
-last_updated: "2026-09-25T03:38:17.355Z"
+stopped_at: Completed 04-10-PLAN.md
+last_updated: "2026-09-25T04:06:47.750Z"
 last_activity: 2026-09-24
 last_activity_desc: Phase 04 execution started
-state_head: 6a04452abb6c7e743bf5e8a619eed721cb8f882c
+state_head: f696ae6f3b708be3f390937fa79d15ac2975023f
 progress:
   total_phases: 14
   completed_phases: 3
   total_plans: 57
-  completed_plans: 52
+  completed_plans: 53
 ---
 
 # Project State
@@ -69,6 +69,7 @@ Progress: [██░░░░░░░░] 21% [██░░░░░░░░]
 | Phase 04 P08 | 25m | 2 tasks | 5 files |
 | Phase 04 P09 | 14m | 2 tasks | 5 files |
 | Phase 04 P15 | 22m | 1 tasks | 5 files |
+| Phase 04 P10 | 58m | 2 tasks | 8 files |
 
 Phase 02 P10–P16 gap-closure metrics are recorded in their individual summaries.
 
@@ -129,6 +130,7 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - [Phase 04]: Phase 04 Plan 09: Phase 4 B1 manifests bind v3 and preserve all Phase 3 B1 evidence byte-for-byte.
 - [Phase 04]: Phase 04 Plan 15: freeze focused factorial arms, three-region noise grids, and matched sample namespaces before sampling.
 - [Phase 04]: Phase 04 Plan 15: bind B1 to the Plan 04-09 resolution digest and keep generated HGP explicitly non-paper-exact.
+- [Phase 04]: Phase 04 Plan 10: exact-author native Relay runs only from a stage-local verified v0.2.2 checkout; canonical and native arms share public observations but retain separate identities.
 
 ### Pending Todos
 
@@ -160,7 +162,7 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Last session: 2026-09-25T03:38:14.593Z
-Stopped at: Completed 04-15-PLAN.md
+Last session: 2026-09-25T04:06:44.308Z
+Stopped at: Completed 04-10-PLAN.md
 Resume file: None
 Next command: $gsd-discuss-phase 4
