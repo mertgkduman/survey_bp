@@ -355,7 +355,7 @@ def _benchmark_manifest(base: Mapping[str, object], *, arm: str) -> dict[str, ob
     value["error_rate"] = _BENCHMARK_CENTRAL_ERROR_RATE
     budgets = dict(value["budgets"])
     budgets["max_shots"] = _BENCHMARK_SHOTS
-    multiplier = 31
+    multiplier = 1 if arm == "baseline" else 31
     for scope_name in ("shot", "search", "attempt"):
         scope = dict(budgets[scope_name])
         scope["max_iterations"] = 80
