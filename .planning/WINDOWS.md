@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 6
+open_count: 7
 waived_count: 0
 fixed_count: 3
-total_count: 9
-last_updated: 2026-09-24T23:03:30.055Z
+total_count: 10
+last_updated: 2026-09-25T02:50:48.185Z
 ---
 
 # Broken Windows Ledger
@@ -24,6 +24,7 @@ last_updated: 2026-09-24T23:03:30.055Z
 | 7 | 04 | skipped-test | tests/canonical/test_relay_differential.py | 13 | Observer patch equivalence needs the reviewed external author reference build. | open |  | 2026-09-24T23:03:28.838Z |  |
 | 8 | 04 | skipped-test | tests/canonical/test_phase4_evidence.py | 19 | B1 digest reconciliation and bounded notebook reuse evidence are deferred to Wave 1. | open |  | 2026-09-24T23:03:29.449Z |  |
 | 9 | 04 | unrun-verify | tests/test_canonical_cli.py | 21 | Inherited canonical CLI verification is blocked because .venv subprocesses cannot import bp_registry. | open |  | 2026-09-24T23:03:30.055Z |  |
+| 10 | 04 | unrun-verify | scripts/qualify_relay_v022.py |  | Author decode_144_12_12 full native test exceeded the 720-second qualification bound and remains inconclusive. | open |  | 2026-09-25T02:50:48.185Z |  |
 
 ````json
 [
@@ -141,6 +142,19 @@ last_updated: 2026-09-24T23:03:30.055Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-09-24T23:03:30.055Z",
+    "resolved_at": null,
+    "milestone": "v1.0"
+  },
+  {
+    "id": 10,
+    "kind": "unrun-verify",
+    "phase": "04",
+    "file": "scripts/qualify_relay_v022.py",
+    "line": null,
+    "description": "Author decode_144_12_12 full native test exceeded the 720-second qualification bound and remains inconclusive.",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-09-25T02:50:48.185Z",
     "resolved_at": null,
     "milestone": "v1.0"
   }

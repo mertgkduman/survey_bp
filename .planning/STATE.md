@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 04
 current_phase_name: Memory Policies and Relay-BP
-current_plan: 8
+current_plan: 9
 status: executing
-stopped_at: Completed 04-06-PLAN.md
-last_updated: "2026-09-25T02:23:46.015Z"
+stopped_at: Completed 04-08-PLAN.md
+last_updated: "2026-09-25T02:50:36.325Z"
 last_activity: 2026-09-24
 last_activity_desc: Phase 04 execution started
-state_head: 5bcf237fd03b1fae622ff909ba0717122e1d7b57
+state_head: a272b2d614021e6605545b587d58050743baf2ee
 progress:
   total_phases: 14
   completed_phases: 3
   total_plans: 57
-  completed_plans: 49
+  completed_plans: 50
 ---
 
 # Project State
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 ## Current Position
 
 Phase: 04 (Memory Policies and Relay-BP) — EXECUTING
-Plan: 8 of 15
+Plan: 9 of 15
 Total Phases: 14
-Current Plan: 8
+Current Plan: 9
 Total Plans in Phase: 15
 Status: Ready to execute
 Last activity: 2026-09-24 — Phase 04 execution started
@@ -66,6 +66,7 @@ Progress: [██░░░░░░░░] 21% [██░░░░░░░░]
 | Phase 04 P05 | 14m | 2 tasks | 4 files |
 | Phase 04 P07 | 67s | 1 tasks | 1 files |
 | Phase 04-memory-policies-and-relay-bp P06 | 417 seconds | 2 tasks | 6 files |
+| Phase 04 P08 | 25m | 2 tasks | 5 files |
 
 Phase 02 P10–P16 gap-closure metrics are recorded in their individual summaries.
 
@@ -120,6 +121,8 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - [Phase 04]: Use only trmue/relay tag v0.2.2 at immutable commit 14cb31a18f9b9d7d099791b793e35b8a2951f8f3 as the original Relay reference.
 - [Phase 04]: Keep the PyPI relay-bp package and editable mg551-duke/relay fork outside the approved original-reference identity.
 - [Phase 04]: Phase 04 Plan 06: V4 Relay evidence reconstructs only from unique typed leaves and preserves V2/V3 semantics.
+- [Phase 04]: Phase 04 Plan 08: exact Relay v0.2.2 adapter uses only decoder-visible inputs and never imports the installed fork.
+- [Phase 04]: Phase 04 Plan 08: comment-only Relay observer preserves a behavior-neutral boundary; gamma, edge work, and resource facts remain unavailable.
 
 ### Pending Todos
 
@@ -151,7 +154,7 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Last session: 2026-09-25T02:23:43.334Z
-Stopped at: Completed 04-06-PLAN.md
+Last session: 2026-09-25T02:50:33.861Z
+Stopped at: Completed 04-08-PLAN.md
 Resume file: None
 Next command: $gsd-discuss-phase 4
