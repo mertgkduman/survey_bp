@@ -1026,6 +1026,147 @@
       "title": "PolicySpecV3",
       "type": "object"
     },
+    "RelayLegSpec": {
+      "additionalProperties": false,
+      "description": "A fresh canonical BP leg; no predecessor messages or history are persisted.",
+      "properties": {
+        "max_iterations": {
+          "maximum": 100000,
+          "minimum": 1,
+          "title": "Max Iterations",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "max_iterations"
+      ],
+      "title": "RelayLegSpec",
+      "type": "object"
+    },
+    "RelaySpecV4": {
+      "additionalProperties": false,
+      "description": "Sequential Relay topology with an unambiguous total leg count.",
+      "properties": {
+        "fidelity_status": {
+          "default": "canonical_css_adaptation",
+          "enum": [
+            "source_procedure_css_adaptation",
+            "canonical_css_adaptation",
+            "controlled_component_adaptation"
+          ],
+          "title": "Fidelity Status",
+          "type": "string"
+        },
+        "first_leg_iteration_limit": {
+          "anyOf": [
+            {
+              "maximum": 100000,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "First Leg Iteration Limit"
+        },
+        "first_leg_memory": {
+          "const": "uniform",
+          "default": "uniform",
+          "title": "First Leg Memory",
+          "type": "string"
+        },
+        "later_leg_iteration_limit": {
+          "anyOf": [
+            {
+              "maximum": 100000,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Later Leg Iteration Limit"
+        },
+        "later_leg_memory": {
+          "default": "uniform",
+          "enum": [
+            "uniform",
+            "disordered"
+          ],
+          "title": "Later Leg Memory",
+          "type": "string"
+        },
+        "legs": {
+          "items": {
+            "$ref": "#/$defs/RelayLegSpec"
+          },
+          "minItems": 1,
+          "title": "Legs",
+          "type": "array"
+        },
+        "numerical_profile": {
+          "const": "cpu-float64-spa-v1",
+          "default": "cpu-float64-spa-v1",
+          "title": "Numerical Profile",
+          "type": "string"
+        },
+        "preset_name": {
+          "default": "relay-canonical-css-default-v1",
+          "maxLength": 96,
+          "minLength": 1,
+          "title": "Preset Name",
+          "type": "string"
+        },
+        "procedure": {
+          "default": "canonical_internal_bp",
+          "enum": [
+            "source_internal_bp",
+            "canonical_internal_bp"
+          ],
+          "title": "Procedure",
+          "type": "string"
+        },
+        "solution_limit": {
+          "anyOf": [
+            {
+              "maximum": 10000,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Solution Limit"
+        },
+        "total_leg_limit": {
+          "maximum": 10000,
+          "minimum": 1,
+          "title": "Total Leg Limit",
+          "type": "integer"
+        },
+        "transfer": {
+          "default": "posterior_only",
+          "enum": [
+            "posterior_only",
+            "disabled"
+          ],
+          "title": "Transfer",
+          "type": "string"
+        }
+      },
+      "required": [
+        "total_leg_limit",
+        "legs"
+      ],
+      "title": "RelaySpecV4",
+      "type": "object"
+    },
     "SchedulePolicySpecV3": {
       "additionalProperties": false,
       "description": "Persisted layered membership is explicit, graph-bound configuration data.",
@@ -1258,6 +1399,17 @@
     },
     "randomness": {
       "$ref": "#/$defs/CanonicalRandomnessV2"
+    },
+    "relay": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RelaySpecV4"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "run_id": {
       "minLength": 1,

@@ -251,7 +251,7 @@ def test_min_sum_public_manifest_preflights_runs_and_verifies(tmp_path):
 
 
 def test_canonical_v4_memory_composition_preflights_runs_and_verifies_publicly(tmp_path):
-    """The V4 manifest reaches the same public preflight/run/verify commands as V2/V3."""
+    """The original memory-only V4 contract remains a public V3-kernel execution."""
     value = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text(encoding="utf-8"))
     value.update({"schema_version": 4, "run_id": "canonical-v4-public-memory"})
     value["memory"] = {
@@ -283,6 +283,8 @@ def test_canonical_v4_memory_composition_preflights_runs_and_verifies_publicly(t
     assert reports[0]["memory"]["compatibility"] == {"admitted": True, "reason": None}
     assert [binding["binding_id"] for binding in reports[0]["memory"]["bindings"]] == ["ewa-prior"]
     assert reports[1]["final_row_count"] == reports[2]["final_row_count"] == 2
+    events = (output / "events.jsonl").read_text(encoding="utf-8")
+    assert '"relay_transfer"' not in events
 
 
 def test_normalized_min_sum_public_manifest_binds_and_replays_scalar_assignment(tmp_path):

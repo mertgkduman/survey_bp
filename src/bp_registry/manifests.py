@@ -390,7 +390,10 @@ class CanonicalExperimentV4(CanonicalExperimentV3):
 
     schema_version: Literal[4]
     memory: MemoryCompositionSpec
-    relay: RelaySpecV4
+    # Relay was added after V4 first exposed its memory-only public contract.
+    # Retain those manifests as executable V4 evidence; a populated Relay spec
+    # opts the canonical kernel into the distinct Phase 4 Relay execution path.
+    relay: RelaySpecV4 | None = None
 
 
 ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4

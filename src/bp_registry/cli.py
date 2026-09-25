@@ -232,7 +232,7 @@ def _canonical_result_from_terminal_events(manifest_path: Path, output: Path, ro
     ledger_path = output / "events.jsonl"
     events = read_canonical_events(ledger_path)
     for row in rows:
-        if isinstance(manifest, CanonicalExperimentV4):
+        if isinstance(manifest, CanonicalExperimentV4) and manifest.relay is not None:
             validate_phase4_shot(ledger_path, run_id=manifest.run_id, shot_id=row["shot_id"], trace_root=output)
         else:
             validate_canonical_shot(events, canonical_public_shot_context(manifest_path, shot_id=row["shot_id"]))
@@ -299,7 +299,7 @@ def _verify_canonical_run(output: Path, result: dict[str, Any]) -> dict[str, Any
         raise ValueError("canonical terminal rows differ from the manifest shot budget")
     events = read_canonical_events(ledger_path)
     for row in rows:
-        if isinstance(manifest, CanonicalExperimentV4):
+        if isinstance(manifest, CanonicalExperimentV4) and manifest.relay is not None:
             validate_phase4_shot(ledger_path, run_id=manifest.run_id, shot_id=row["shot_id"], trace_root=output)
         else:
             validate_canonical_shot(events, canonical_public_shot_context(manifest_path, shot_id=row["shot_id"]))

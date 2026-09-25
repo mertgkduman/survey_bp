@@ -172,11 +172,14 @@ def _canonical_kernel_manifest(manifest: CanonicalExperimentV2 | CanonicalExperi
         "numerical_profile": manifest.numerical_profile,
         "max_iterations": manifest.budgets.attempt.max_iterations,
         "error_rate": manifest.error_rate,
-        "policies": _without_none(manifest.policies.model_dump(mode="json")),
+        # V2/V3 identity is part of retained public evidence. Preserve its
+        # historical null-bearing compact representation exactly.
+        "policies": manifest.policies.model_dump(mode="json"),
     }
-    if isinstance(manifest, CanonicalExperimentV4):
+    if isinstance(manifest, CanonicalExperimentV4) and manifest.relay is not None:
         compact.update({
             "schema_version": 4,
+            "policies": _without_none(manifest.policies.model_dump(mode="json")),
             "memory_bindings": [
                 {
                     "binding_id": binding.binding_id,
