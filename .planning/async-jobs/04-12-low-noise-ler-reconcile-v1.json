@@ -1,0 +1,19 @@
+{
+  "version": "1.0",
+  "plan_id": "04-12",
+  "phase": "04",
+  "job_id": "56389887",
+  "backend": "slurm",
+  "submit_command": "sbatch --parsable --export=ALL,SERIAL_JOB_ID=56386510,PARALLEL_JOB_ID=56389885 --exclude=dcc-core-ferc-u-ac39-4-1,dcc-dhvimdcore-gpu-ferc-s-p15-15 /hpc/group/pfisterlab/mg551/storage/survey_bp_low_noise_20260925/scripts/submit_phase4_low_noise_ler_reconcile.sbatch",
+  "status": "running",
+  "expected_artifacts": [
+    "data/results/phase4-memory-relay/low-noise-ler-v1-accelerated/result.json",
+    "data/results/phase4-memory-relay/low-noise-ler-v1-accelerated/handoff.json",
+    "data/results/phase4-memory-relay/low-noise-ler-v1-accelerated/slurm-56389887.out",
+    "data/results/phase4-memory-relay/low-noise-ler-v1-accelerated/slurm-56389887.err"
+  ],
+  "verification_command": ".venv/bin/python -c \"import json; from pathlib import Path; p=Path('data/results/phase4-memory-relay/low-noise-ler-v1-accelerated/result.json'); r=json.loads(p.read_text()); assert r['status'] in {'completed_precision','completed_with_inconclusive'} and set(r['rates'])=={'p0060','p0050'}; print(r['status'],r['result_digest'])\"",
+  "resume_command": "if test -f data/results/phase4-memory-relay/low-noise-ler-v1-accelerated/result.json; then exit 0; fi; if squeue -h -j 56389887 | grep -q .; then exit 0; fi; sbatch --parsable --export=ALL,SERIAL_JOB_ID=56386510,PARALLEL_JOB_ID=56389885 --exclude=dcc-core-ferc-u-ac39-4-1,dcc-dhvimdcore-gpu-ferc-s-p15-15 /hpc/group/pfisterlab/mg551/storage/survey_bp_low_noise_20260925/scripts/submit_phase4_low_noise_ler_reconcile.sbatch",
+  "submitted_at": "2026-09-25T19:35:05Z",
+  "terminal_details": null
+}
