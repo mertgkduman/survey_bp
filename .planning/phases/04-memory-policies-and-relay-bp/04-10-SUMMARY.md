@@ -20,20 +20,23 @@ key-files:
     - src/bp_registry/manifests.py
     - src/bp_registry/runner.py
     - tests/canonical/test_phase4_evidence.py
+    - tests/test_canonical_cli.py
+    - data/manifests/schema-canonical-v4.json
 decisions:
   - "Native Relay stages clone and build only trmue/relay v0.2.2 at 14cb31a18f9b9d7d099791b793e35b8a2951f8f3 in a durable stage-local checkout; the installed fork is rejected."
   - "Canonical and native arms share a public decoder-visible CSS observation and physical sample identity while retaining separate source, translation, configuration, and environment identities."
   - "Incomplete native stages are immutable evidence and require a new stage identity before retry."
+  - "V4 memory-only manifests retain the historical compact V3 execution and verification representation; only a populated relay field selects the Phase 4 Relay kernel and verifier."
 metrics:
-  duration: "~58m"
+  duration: "~1h 15m"
   completed: "2026-09-25"
   status: complete
 plan_head_before: 0aa09229e4df12e8915eab25faa5288000b95d20
-commits: 4
+commits: 6
 actuals:
-  tokens: 12534
+  tokens: 14142
   tasks: 2
-  commits: 4
+  commits: 6
 ---
 
 # Phase 04 Plan 10: Staged Memory and Relay Pilot Execution Summary
@@ -57,6 +60,8 @@ Built a finite, identity-safe Phase 4 runner that publicly preflights, runs, and
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_phase4_evidence.py -k 'runner_tracer or matched_native or public_boundary or stage_identity'` — 3 passed.
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_phase4_evidence.py -k 'stage_reuse or mismatch or interrupted or three_codes or public_verify'` — 4 passed, 1 skipped.
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_phase4_evidence.py tests/canonical/test_relay.py tests/canonical/test_relay_differential.py` — 33 passed, 1 skipped.
+- `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_manifest.py::test_canonical_v4_schema_is_generated_from_the_public_memory_contract tests/test_manifest.py::test_canonical_v4_preflight_admits_ordered_repeated_memory_compositions tests/test_manifest.py::test_canonical_v4_rejects_incompatible_memory_before_artifact_loading tests/test_canonical_cli.py::test_canonical_v4_memory_composition_preflights_runs_and_verifies_publicly tests/test_canonical_cli.py::test_retained_hsu_group_pilot_is_source_labeled_and_independently_verifiable tests/test_canonical_cli.py::test_checked_canonical_result_is_idempotent_and_honestly_labeled tests/canonical/test_phase4_evidence.py::test_public_verify_executes_phase4_relay_through_cli` — 7 passed.
+- `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q` — 361 passed, 1 skipped.
 - Bounded temporary-directory BB-144 tracer — completed all three arms; both canonical outputs passed public `preflight`, `canonical`, and `verify-run`, with V4 Relay transfer evidence in each canonical ledger.
 
 ## TDD Gate Compliance
@@ -78,6 +83,14 @@ Built a finite, identity-safe Phase 4 runner that publicly preflights, runs, and
    - **Verification:** Public CLI preflight/run/verify now emits and verifies `relay_transfer` evidence for the finite BB-144 manifest.
    - **Commit:** `2513aa0`.
 
+2. **[Rule 1 - Backward-compatible V4 identity] Restored retained memory-only V4 and legacy canonical verification.**
+   - **Found during:** Wave 8 full-suite regression gate.
+   - **Issue:** Requiring `relay` in every V4 manifest rejected the earlier V4 memory-only public contract. Applying null stripping to every compact manifest also changed retained V2/V3 canonical identities, causing independent verification of historical evidence to fail.
+   - **Fix:** Made `relay` optional in the V4 public schema and regenerated its checked schema. Memory-only V4 manifests keep the exact historical V3 compact kernel representation and canonical verifier; only V4 manifests with `relay` use the Phase 4 Relay kernel and structural verifier.
+   - **Files modified:** `data/manifests/schema-canonical-v4.json`, `src/bp_registry/manifests.py`, `src/bp_registry/runner.py`, `src/bp_registry/cli.py`, `tests/test_canonical_cli.py`.
+   - **Verification:** The three original manifest failures, three original CLI failures, and explicit Relay public preflight/run/verify regression all passed; full suite passed 361 tests with one expected skip.
+   - **Commit:** `0f2dbf8`.
+
 ## Known Stubs
 
 None.
@@ -85,5 +98,5 @@ None.
 ## Self-Check: PASSED
 
 - Confirmed `scripts/run_phase4_pilots.py` and all three Phase 4 manifests exist.
-- Confirmed task commits `2a152ff`, `2513aa0`, and `f696ae6` exist.
+- Confirmed task commits `2a152ff`, `2513aa0`, `f696ae6`, and regression commit `0f2dbf8` exist.
 - Confirmed the final bounded BB-144 stage record has three completed, separately identified arms.
