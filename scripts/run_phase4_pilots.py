@@ -56,6 +56,14 @@ def _read_json(path: Path) -> dict[str, Any]:
     return value
 
 
+def _write_json_atomic(path: Path, value: object) -> None:
+    """Durably replace an evidence journal without a partial JSON window."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.tmp-{os.getpid()}")
+    temporary.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    temporary.replace(path)
+
+
 def _json_command(repository_root: Path, *arguments: str) -> dict[str, Any]:
     """Invoke the public CLI only; no canonical execution internals are imported here."""
     completed = subprocess.run(
@@ -442,6 +450,16 @@ def _run_canonical_benchmark_arm(*, repository_root: Path, base: Mapping[str, ob
         if shot_id in retained:
             continue
         started = perf_counter()
+        # Persist the identified attempt before launching the child.  A job
+        # interruption can then be reported as incomplete rather than being
+        # silently absent from the 32-shot public ledger.
+        attempts.append({
+            "shot_id": shot_id, "status": "incomplete_canonical_interrupted",
+            "manifest_sha256": _digest(manifest), "sample_identity": None,
+            "failure": "public canonical command did not reach a retained terminal record",
+            "public_boundary": {"decode_wall_seconds": None, "verify_wall_seconds": None},
+        })
+        _write_json_atomic(journal_path, attempts)
         run: dict[str, object] | None = None
         verified: dict[str, object] | None = None
         error: str | None = None
@@ -460,14 +478,14 @@ def _run_canonical_benchmark_arm(*, repository_root: Path, base: Mapping[str, ob
             error = str(caught)
         all_attempts, shot_work = _canonical_attempts(run_path, expected_shots=_BENCHMARK_SHOTS)
         terminal = all_attempts[shot_id]
-        attempts.append({
+        attempts[-1] = {
             "shot_id": shot_id,
             "status": "completed" if error is None and terminal["status"] == "completed" else "incomplete_canonical_shot",
             "termination": terminal["termination"], "runtime_seconds": terminal["runtime_seconds"], "sample_identity": terminal["sample_identity"], "terminal": terminal["terminal"],
             "manifest_sha256": _digest(manifest), "failure": error,
             "public_boundary": {"run": run, "verify": verified, "decode_wall_seconds": decode_wall_seconds, "verify_wall_seconds": verify_wall_seconds, "elapsed_seconds": perf_counter() - started},
-        })
-        journal_path.write_text(json.dumps(attempts, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        }
+        _write_json_atomic(journal_path, attempts)
     # The ledger contains all retained shots.  Aggregate it once after any
     # resume, so skipped journal entries still contribute exactly once.
     _, retained_work = _canonical_attempts(run_path, expected_shots=_BENCHMARK_SHOTS)
@@ -539,16 +557,20 @@ def _run_native_benchmark_arm(*, repository_root: Path, base: Mapping[str, objec
         if shot_id in retained:
             continue
         started = perf_counter()
+        attempts.append({"shot_id": shot_id, "status": "incomplete_native_interrupted", "runtime_seconds": None,
+                         "sample_identity": None, "children_maxrss_kib": resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,
+                         "result": {"reason": "native command did not reach a retained terminal record"}})
+        _write_json_atomic(attempts_path, attempts)
         try:
             observation = _json_command(repository_root, "canonical-observation", str(relay_manifest_path), "--shot", str(shot_id))
         except (OSError, RuntimeError, subprocess.TimeoutExpired, ValueError) as error:
-            attempts.append({
+            attempts[-1] = {
                 "shot_id": shot_id, "status": "incomplete_native_observation_unavailable",
                 "runtime_seconds": perf_counter() - started, "sample_identity": None,
                 "children_maxrss_kib": resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,
                 "result": {"reason": str(error)},
-            })
-            attempts_path.write_text(json.dumps(attempts, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            }
+            _write_json_atomic(attempts_path, attempts)
             continue
         if setup_error is not None:
             result, status = {"reason": setup_error}, "incomplete_native_unavailable"
@@ -558,13 +580,13 @@ def _run_native_benchmark_arm(*, repository_root: Path, base: Mapping[str, objec
                 status = result["status"]
             except (OSError, RuntimeError, subprocess.TimeoutExpired, ValueError) as error:
                 result, status = {"reason": str(error)}, "incomplete_native_unavailable"
-        attempts.append({
+        attempts[-1] = {
             "shot_id": shot_id, "status": status, "runtime_seconds": perf_counter() - started,
             "sample_identity": observation["sample_identity"],
             "children_maxrss_kib": resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,
             "result": result,
-        })
-        attempts_path.write_text(json.dumps(attempts, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        }
+        _write_json_atomic(attempts_path, attempts)
     return {
         "shot_ids": list(range(_BENCHMARK_SHOTS)), "attempts": attempts,
         "sample_identities": [attempt["sample_identity"] for attempt in attempts],
