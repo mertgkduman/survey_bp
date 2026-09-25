@@ -116,8 +116,10 @@ class RelayPreset:
             raise ValueError("Relay presets require a name and positive leg and solution limits")
         if self.first_leg_iteration_limit < 1 or self.later_leg_iteration_limit < 1:
             raise ValueError("Relay presets require positive iteration limits")
-        if self.procedure == "source_internal_bp" and self.fidelity_status != "source_procedure_css_adaptation":
-            raise ValueError("source Relay presets must retain their source-procedure CSS-adaptation status")
+        if self.procedure == "source_internal_bp" and self.fidelity_status not in {
+            "source_procedure_css_adaptation", "controlled_component_adaptation",
+        }:
+            raise ValueError("source Relay presets require a source or controlled CSS-adaptation status")
         if self.procedure == "canonical_internal_bp" and self.fidelity_status == "source_procedure_css_adaptation":
             raise ValueError("canonical Relay presets cannot claim source-procedure fidelity")
         if self.source_parameter_sweep is not None:
@@ -168,6 +170,22 @@ class RelayPreset:
             later_leg_memory=self.later_leg_memory if later_leg_memory is None else later_leg_memory,
             numerical_profile=self.numerical_profile if numerical_profile is None else numerical_profile,
             source_parameter_sweep=self.source_parameter_sweep if source_parameter_sweep is None else source_parameter_sweep,
+        )
+
+    def ablation(
+        self, *, one_leg: bool = False, posterior_transfer: bool | None = None,
+        later_leg_memory: Literal["uniform", "disordered"] | None = None,
+        source_parameter_sweep: tuple[float, float] | None = None,
+        numerical_profile: str | None = None,
+    ) -> "RelayPreset":
+        """Create a one-component Relay arm with an explicit controlled-adaptation label."""
+        if posterior_transfer is not None and type(posterior_transfer) is not bool:
+            raise ValueError("posterior_transfer must be a boolean control")
+        return self.with_controls(
+            total_leg_limit=1 if one_leg else None,
+            transfer=None if posterior_transfer is None else ("posterior_only" if posterior_transfer else "disabled"),
+            later_leg_memory=later_leg_memory, source_parameter_sweep=source_parameter_sweep,
+            numerical_profile=numerical_profile,
         )
 
     def as_spec(self) -> RelaySpecV4:
