@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "status": "frozen_before_sampling",
+  "purpose": "Benchmark the exact author Relay v0.2.2 implementation and compare it with canonical source-procedure Relay on matched CSS observations and per-leg gamma assignments.",
+  "author_source_pin": "relay-v0.2.2@14cb31a18f9b9d7d099791b793e35b8a2951f8f3",
+  "code_rates": [
+    {"code_id": "gross-bb-144", "error_rate": 0.07, "work_profile": "full31", "total_legs": 31},
+    {"code_id": "b1-ghp-882", "error_rate": 0.07, "work_profile": "b1_three_leg", "total_legs": 3},
+    {"code_id": "hgp-gallager-3-4-seed-20260923", "error_rate": 0.03, "work_profile": "full31", "total_legs": 31}
+  ],
+  "rate_basis": "Prespecified Phase 4 V3 selected rates; B1 p=.07 uses the declared three-leg bounded adaptation. These rates are fixed independently of current V4 outcomes.",
+  "controls": {
+    "canonical_preset": "source_procedure",
+    "native_decoder_class": "RelayDecoderF64",
+    "first_leg_gamma": 0.125,
+    "later_leg_gamma_interval": [-0.375, 0.875],
+    "first_leg_iterations": 80,
+    "later_leg_iterations": 60,
+    "solution_limit": 1,
+    "stopping_criterion": "nconv",
+    "native_explicit_gammas": "Reconstruct canonical PCG64 later-leg gamma arrays from the manifest and public sample identity; verify hashes against each executed canonical leg before comparison."
+  },
+  "sampling": {
+    "shot_ids": "0..127 per code/rate",
+    "physical_sample_namespace": "Same code/rate namespace as the active V4 benchmark; both agreement arms see the same public CSS observation.",
+    "looks": [32, 64, 128],
+    "stopping": "No outcome-dependent stopping; finish 128 matched shots per code/rate or retain explicit incomplete evidence at the finite wall cap."
+  },
+  "reporting": {
+    "proposal_cells": ["valid_correct", "valid_wrong_logical", "invalid_correct", "invalid_wrong_logical", "no_proposal"],
+    "paired_metrics": ["all_shot_success", "diagnostic_cell", "exact_candidate", "syndrome_validity"],
+    "uncertainty": "Two-sided exact Clopper-Pearson intervals; Bonferroni across three codes and four paired disagreement metrics at each declared look.",
+    "incomplete": "Retain each native timeout, setup failure, and public canonical boundary failure in the denominator accounting; never equate missingness with agreement."
+  },
+  "resources": {
+    "workers": 8,
+    "omp_num_threads_per_worker": 1,
+    "memory_gb": 32,
+    "public_canonical_boundary_seconds": 900,
+    "native_boundary_seconds": 900,
+    "campaign_wall_seconds": 432000
+  },
+  "claim_limit": "Controlled CSS implementation agreement diagnostic, not bitwise equivalence, source circuit-curve reproduction, or a publication decoder ranking."
+}
