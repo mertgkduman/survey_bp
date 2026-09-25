@@ -260,12 +260,17 @@ def _canonical_result_from_terminal_events(manifest_path: Path, output: Path, ro
     }
 
 
-def run_canonical(manifest_path: str | Path, output: str | Path) -> dict[str, Any]:
+def run_canonical(manifest_path: str | Path, output: str | Path, *, shot_id: int | None = None) -> dict[str, Any]:
     """Run only missing canonical shots and reconstruct result solely from v2 terminals."""
     manifest_path, output = Path(manifest_path), Path(output)
     report = preflight_canonical(manifest_path)
     output.mkdir(parents=True, exist_ok=True)
     ledger_path = output / "events.jsonl"
+    if shot_id is not None:
+        if not 0 <= shot_id < report["shot_budget"]:
+            raise ValueError("canonical shot ID is outside the manifest budget")
+        run_canonical_one(manifest_path, shot_id=shot_id, ledger_path=ledger_path)
+        return {**report, "output": str(output), "final_row_count": 1, "shot_id": shot_id}
     for shot_id in range(report["shot_budget"]):
         run_canonical_one(manifest_path, shot_id=shot_id, ledger_path=ledger_path)
     rows = canonical_terminal_rows(ledger_path, report["run_id"])
@@ -279,6 +284,23 @@ def run_canonical(manifest_path: str | Path, output: str | Path) -> dict[str, An
     if not result_path.exists():
         result_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return {**report, "output": str(output), "final_row_count": len(rows)}
+
+
+def verify_canonical_shot(manifest_path: str | Path, output: str | Path, *, shot_id: int) -> dict[str, Any]:
+    """Verify one bounded public canonical shot without requiring a full cohort."""
+    manifest_path, output = Path(manifest_path), Path(output)
+    context = canonical_public_shot_context(manifest_path, shot_id=shot_id)
+    ledger_path = output / "events.jsonl"
+    events = read_canonical_events(ledger_path)
+    terminal = [event for event in events if event["kind"] == "termination" and event["run_id"] == context.run_id and event["shot_id"] == shot_id]
+    if len(terminal) != 1:
+        raise ValueError("canonical selected shot has no unique terminal evidence")
+    manifest = preflight(manifest_path).manifest
+    if isinstance(manifest, CanonicalExperimentV4) and manifest.relay is not None:
+        validate_phase4_shot(ledger_path, run_id=context.run_id, shot_id=shot_id, trace_root=output)
+    else:
+        validate_canonical_shot(events, context)
+    return {"output": str(output), "shot_id": shot_id, "termination": terminal[0]["termination"], "verified_at": datetime.now(timezone.utc).isoformat()}
 
 
 def _verify_canonical_run(output: Path, result: dict[str, Any]) -> dict[str, Any]:
@@ -488,6 +510,11 @@ def build_parser() -> argparse.ArgumentParser:
     canonical_command = commands.add_parser("canonical")
     canonical_command.add_argument("manifest", type=Path)
     canonical_command.add_argument("--output", type=Path, required=True)
+    canonical_command.add_argument("--shot", type=int)
+    canonical_verify_command = commands.add_parser("verify-canonical-shot")
+    canonical_verify_command.add_argument("manifest", type=Path)
+    canonical_verify_command.add_argument("output", type=Path)
+    canonical_verify_command.add_argument("--shot", type=int, required=True)
     observation_command = commands.add_parser("canonical-observation")
     observation_command.add_argument("manifest", type=Path)
     observation_command.add_argument("--shot", type=int, default=0)
@@ -511,7 +538,9 @@ def main(argv: list[str] | None = None) -> None:
     elif args.command == "pilot":
         _dump(run_pilot(args.manifest, args.output))
     elif args.command == "canonical":
-        _dump(run_canonical(args.manifest, args.output))
+        _dump(run_canonical(args.manifest, args.output, shot_id=args.shot))
+    elif args.command == "verify-canonical-shot":
+        _dump(verify_canonical_shot(args.manifest, args.output, shot_id=args.shot))
     elif args.command == "canonical-observation":
         context = canonical_public_shot_context(args.manifest, shot_id=args.shot)
         _dump({

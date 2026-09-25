@@ -16,8 +16,12 @@ from hashlib import sha256
 import json
 import os
 from pathlib import Path
+import resource
+import socket
 import subprocess
 import sys
+import tempfile
+from time import perf_counter
 from typing import Any, Mapping
 
 
@@ -27,6 +31,14 @@ AUTHOR_TREE = "5f6f112429e62112ba71fbff45f4e16247725fbc"
 STAGES = frozenset({"benchmark", "calibration", "evaluation", "factorial", "native", "trace"})
 ARMS = ("source_procedure", "canonical_default", "native_v022")
 _NATIVE_TIMEOUT_SECONDS = 90
+_BENCHMARK_SHOTS = 32
+_BENCHMARK_CENTRAL_ERROR_RATE = 0.03
+_BENCHMARK_ARMS = ("baseline", "canonical_relay_31", "native_v022")
+_BENCHMARK_MANIFESTS = {
+    "gross-bb-144": Path("data/manifests/phase4-memory-relay-bb144.json"),
+    "b1-ghp-882": Path("data/manifests/phase4-memory-relay-b1.json"),
+    "hgp-gallager-3-4-seed-20260923": Path("data/manifests/phase4-memory-relay-hgp.json"),
+}
 
 
 def _canonical_json(value: object) -> str:
@@ -178,6 +190,17 @@ def _git_exact_source(stage_root: Path) -> tuple[Path, Path]:
                 check = _run(args, cwd=source, timeout=30)
             if check.returncode or check.stdout.strip() != expected:
                 raise RuntimeError("stage-local native source does not match the approved author identity")
+    # A prior interrupted build can leave only Cargo.lock changed. It is a
+    # generated resolver byproduct, never source evidence; restore it before
+    # admitting the exact checkout, while rejecting any other tracked change.
+    changed = _run(["git", "diff", "--name-only"], cwd=source, timeout=30)
+    changed_paths = [line for line in changed.stdout.splitlines() if line]
+    if changed_paths == ["Cargo.lock"]:
+        restored = _run(["git", "checkout", "--", "Cargo.lock"], cwd=source, timeout=30)
+        if restored.returncode:
+            raise RuntimeError("could not restore generated Cargo.lock in stage-local native source")
+    elif changed_paths:
+        raise RuntimeError("stage-local native source has non-lock tracked modifications")
     clean = _run(["git", "status", "--porcelain"], cwd=source, timeout=30)
     if clean.returncode or clean.stdout.strip():
         raise RuntimeError("stage-local native source must remain unmodified")
@@ -188,6 +211,16 @@ def _git_exact_source(stage_root: Path) -> tuple[Path, Path]:
         installed = _run([str(environment / "bin/python"), "-m", "pip", "install", "--no-deps", str(source)], cwd=native_root, timeout=300)
         if installed.returncode:
             raise RuntimeError(f"exact author binding install failed: {installed.stderr[-1000:]}")
+        # The source's build backend may refresh Cargo.lock.  That build byproduct
+        # must never become a source modification used by an exact-author run.
+        dirty_after_install = _run(["git", "diff", "--name-only"], cwd=source, timeout=30)
+        if [line for line in dirty_after_install.stdout.splitlines() if line] == ["Cargo.lock"]:
+            restored = _run(["git", "checkout", "--", "Cargo.lock"], cwd=source, timeout=30)
+            if restored.returncode:
+                raise RuntimeError("could not restore generated Cargo.lock in stage-local native source")
+        clean_after_install = _run(["git", "status", "--porcelain"], cwd=source, timeout=30)
+        if clean_after_install.returncode or clean_after_install.stdout.strip():
+            raise RuntimeError("native build left the exact author source modified")
     return source, environment
 
 
@@ -203,7 +236,7 @@ source = Path(os.environ["RELAY_V022_SOURCE"]).resolve()
 module = Path(relay_bp.__file__).resolve()
 if "mg551/storage/relay" in str(module):
     raise RuntimeError("refusing installed fork module")
-payload = json.loads(os.environ["RELAY_V022_PAYLOAD"])
+payload = json.loads(Path(os.environ["RELAY_V022_PAYLOAD_PATH"]).read_text(encoding="utf-8"))
 classes = {"RelayDecoderF32": RelayDecoderF32, "RelayDecoderF64": RelayDecoderF64}
 decoder = classes[payload["decoder_class"]](
     np.asarray(payload["check_matrix"], dtype=np.uint8),
@@ -224,10 +257,16 @@ print(json.dumps({
         "syndrome": getattr(payload["syndrome"], "tolist", lambda: payload["syndrome"])(),
         "error_priors": getattr(payload["error_priors"], "tolist", lambda: payload["error_priors"])(),
     }
-    completed = subprocess.run(
-        [str(environment / "bin/python"), "-c", program], cwd=source, text=True, capture_output=True,
-        timeout=_NATIVE_TIMEOUT_SECONDS, env={**os.environ, "PYTHONNOUSERSITE": "1", "RELAY_V022_SOURCE": str(source), "RELAY_V022_PAYLOAD": _canonical_json(serializable)},
-    )
+    with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", suffix=".json", delete=False) as payload_file:
+        payload_file.write(_canonical_json(serializable))
+        payload_path = Path(payload_file.name)
+    try:
+        completed = subprocess.run(
+            [str(environment / "bin/python"), "-c", program], cwd=source, text=True, capture_output=True,
+            timeout=_NATIVE_TIMEOUT_SECONDS, env={**os.environ, "PYTHONNOUSERSITE": "1", "RELAY_V022_SOURCE": str(source), "RELAY_V022_PAYLOAD_PATH": str(payload_path)},
+        )
+    finally:
+        payload_path.unlink(missing_ok=True)
     if completed.returncode:
         raise RuntimeError(f"exact author native execution failed: {completed.stderr[-1000:]}")
     result = json.loads(completed.stdout)
@@ -260,6 +299,332 @@ def _run_native(*, repository_root: Path, stage_root: Path, observation: Mapping
 def _archive_mismatch(stage_dir: Path, existing: Mapping[str, object]) -> None:
     archive = stage_dir / f"mismatch-{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}-{_digest(existing)[:12]}.json"
     archive.write_text(json.dumps(existing, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def _slurm_entitlement(job_id: str) -> dict[str, object]:
+    """Read the scheduler allocation without consulting node-wide capacity."""
+    shown = subprocess.run(
+        ["scontrol", "show", "job", "-o", job_id], text=True, capture_output=True, timeout=30, check=False,
+    )
+    if shown.returncode:
+        raise RuntimeError(f"cannot read SLURM entitlement for {job_id}: {shown.stderr[-1000:]}")
+    fields = dict(
+        token.split("=", 1) for token in shown.stdout.strip().split() if "=" in token
+    )
+    required = ("Account", "Partition", "NumCPUs", "NumTasks", "CPUs/Task", "AllocTRES", "NumNodes", "TimeLimit")
+    missing = [name for name in required if not fields.get(name)]
+    if missing:
+        raise RuntimeError(f"SLURM allocation record omits {', '.join(missing)}")
+    alloc_tres = dict(
+        item.split("=", 1) for item in fields["AllocTRES"].split(",") if "=" in item
+    )
+    memory = alloc_tres.get("mem")
+    if memory is None:
+        raise RuntimeError("SLURM AllocTRES does not declare allocated memory")
+    return {
+        "scheduler": "slurm",
+        "job_id": job_id,
+        "observed_at": datetime.now(timezone.utc).isoformat(),
+        "scontrol_show_job_o": shown.stdout.strip(),
+        "allocation": {
+            "account": fields["Account"], "partition": fields["Partition"],
+            "cpus": int(fields["NumCPUs"]), "tasks": int(fields["NumTasks"]),
+            "cpus_per_task": int(fields["CPUs/Task"]), "memory": memory,
+            "nodes": int(fields["NumNodes"]), "time_limit": fields["TimeLimit"],
+        },
+        "concurrency_limit": 1,
+        "environment": {
+            "host": socket.gethostname(), "python": sys.version.split()[0],
+            "omp_num_threads": os.environ.get("OMP_NUM_THREADS", "unset"),
+        },
+    }
+
+
+def _benchmark_manifest(base: Mapping[str, object], *, arm: str) -> dict[str, object]:
+    """Build one bounded, identified benchmark arm from a qualified V4 manifest."""
+    value = deepcopy(dict(base))
+    value["run_id"] = f"{base['run_id']}-benchmark-{arm}"
+    value["error_rate"] = _BENCHMARK_CENTRAL_ERROR_RATE
+    budgets = dict(value["budgets"])
+    budgets["max_shots"] = _BENCHMARK_SHOTS
+    multiplier = 1 if arm == "baseline" else 31
+    for scope_name in ("shot", "search", "attempt"):
+        scope = dict(budgets[scope_name])
+        scope["max_iterations"] = 1
+        limits = {name: amount * multiplier for name, amount in dict(scope["work_limits"]).items()}
+        limits["bp_calls"] = multiplier
+        limits["relay_transfers"] = max(0, multiplier - 1)
+        scope["work_limits"] = limits
+        budgets[scope_name] = scope
+    value["budgets"] = budgets
+    relay = dict(value["relay"])
+    relay["total_leg_limit"] = multiplier
+    relay["legs"] = [{"max_iterations": 1} for _ in range(multiplier)]
+    relay["first_leg_iteration_limit"] = 1
+    relay["later_leg_iteration_limit"] = 1
+    relay["solution_limit"] = multiplier
+    relay["preset_name"] = "phase4-benchmark-baseline-v1" if arm == "baseline" else "phase4-benchmark-canonical-relay-31-v1"
+    relay["procedure"] = "canonical_internal_bp"
+    relay["fidelity_status"] = "canonical_css_adaptation"
+    value["relay"] = relay
+    evidence = dict(value["evidence"])
+    evidence["procedure"] = (
+        f"{evidence['procedure']} Bounded D-23 benchmark arm={arm}; "
+        f"shots={_BENCHMARK_SHOTS}; central_error_rate={_BENCHMARK_CENTRAL_ERROR_RATE}."
+    )
+    value["evidence"] = evidence
+    return value
+
+
+def _distribution(values: list[float | None]) -> dict[str, object]:
+    observed = sorted(value for value in values if value is not None)
+    result: dict[str, object] = {"count": len(values), "observed_count": len(observed), "values": values}
+    if observed:
+        result.update({
+            "min": observed[0], "max": observed[-1], "mean": sum(observed) / len(observed),
+            "p95": observed[min(len(observed) - 1, int((len(observed) - 1) * 0.95))],
+        })
+    return result
+
+
+def _canonical_attempts(output: Path, *, expected_shots: int) -> tuple[list[dict[str, object]], dict[str, object]]:
+    """Extract terminal facts and relay leaves from the public structural ledger."""
+    events_path = output / "events.jsonl"
+    events = [json.loads(line) for line in events_path.read_text(encoding="utf-8").splitlines() if line] if events_path.exists() else []
+    terminals = {event["shot_id"]: event for event in events if event.get("kind") == "termination"}
+    begins = {event["shot_id"]: event for event in events if event.get("kind") == "shot_begin"}
+    runtimes: dict[int, float] = {}
+    per_leg_totals: dict[str, dict[str, int]] = {}
+    for event in events:
+        data = event.get("data", {})
+        if event.get("kind") == "runtime":
+            profile = data.get("profile", {})
+            value = profile.get("wall_seconds") or profile.get("elapsed_seconds")
+            if isinstance(value, (int, float)):
+                runtimes[event["shot_id"]] = runtimes.get(event["shot_id"], 0.0) + float(value)
+        if event.get("kind") == "work":
+            for leaf in data.get("relay_work_leaves", []):
+                if leaf.get("kind") != "leg":
+                    continue
+                key = str(leaf["leg_index"])
+                total = per_leg_totals.setdefault(key, {})
+                for name, amount in leaf.get("work_vector", {}).items():
+                    if isinstance(amount, int):
+                        total[name] = total.get(name, 0) + amount
+    attempts = []
+    for shot_id in range(expected_shots):
+        terminal = terminals.get(shot_id)
+        attempts.append({
+            "shot_id": shot_id,
+            "status": "completed" if terminal is not None else "incomplete_no_terminal",
+            "termination": None if terminal is None else terminal["termination"],
+            "runtime_seconds": runtimes.get(shot_id),
+            "sample_identity": begins.get(shot_id, {}).get("sample_seed_identity"),
+            "terminal": {} if terminal is None else terminal.get("data", {}),
+        })
+    return attempts, {"availability": "observed", "per_leg_totals": per_leg_totals}
+
+
+def _run_canonical_benchmark_arm(*, repository_root: Path, base: Mapping[str, object], arm: str, output: Path) -> dict[str, object]:
+    """Use one bounded public CLI invocation per identified shot."""
+    manifest = _benchmark_manifest(base, arm=arm)
+    output.mkdir(parents=True, exist_ok=True)
+    manifest_path = output / "manifest.json"
+    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    _json_command(repository_root, "preflight", str(manifest_path))
+    run_path = output / "run"
+    attempts: list[dict[str, object]] = []
+    per_leg_totals: dict[str, dict[str, int]] = {}
+    for shot_id in range(_BENCHMARK_SHOTS):
+        started = perf_counter()
+        run: dict[str, object] | None = None
+        verified: dict[str, object] | None = None
+        error: str | None = None
+        try:
+            run = _json_command(repository_root, "canonical", str(manifest_path), "--output", str(run_path), "--shot", str(shot_id))
+            verified = _json_command(repository_root, "verify-canonical-shot", str(manifest_path), str(run_path), "--shot", str(shot_id))
+        except (RuntimeError, subprocess.TimeoutExpired) as caught:
+            error = str(caught)
+        all_attempts, shot_work = _canonical_attempts(run_path, expected_shots=_BENCHMARK_SHOTS)
+        terminal = all_attempts[shot_id]
+        for leg, totals in shot_work["per_leg_totals"].items():
+            aggregate = per_leg_totals.setdefault(leg, {})
+            for name, amount in totals.items():
+                aggregate[name] = aggregate.get(name, 0) + amount
+        attempts.append({
+            "shot_id": shot_id,
+            "status": "completed" if error is None and terminal["status"] == "completed" else "incomplete_canonical_shot",
+            "termination": terminal["termination"], "runtime_seconds": terminal["runtime_seconds"], "sample_identity": terminal["sample_identity"], "terminal": terminal["terminal"],
+            "failure": error, "public_boundary": {"run": run, "verify": verified, "elapsed_seconds": perf_counter() - started},
+        })
+    raw_work = {"availability": "observed", "per_leg_totals": per_leg_totals}
+    completed = all(attempt["status"] == "completed" for attempt in attempts)
+    return {
+        "shot_ids": list(range(_BENCHMARK_SHOTS)), "attempts": attempts,
+        "sample_identities": [attempt["sample_identity"] for attempt in attempts],
+        "runtime_seconds": _distribution([attempt["runtime_seconds"] for attempt in attempts]),
+        "resource_measurements": {"scope": "attempt", "method": "canonical_public_ledger", "status": "runtime facts retained per terminal"},
+        "raw_work": raw_work, "relay": manifest["relay"], "manifest_sha256": _digest(manifest),
+        "status": "completed" if completed else "incomplete_canonical_arm",
+        "failure": None if completed else "one or more identified canonical shots did not complete within the public CLI boundary",
+        "public_boundary": {"mode": "one public preflight/canonical/verify-canonical-shot invocation per identified shot"},
+    }
+
+
+def _reuse_exact_canonical_benchmark_arm(*, repository_root: Path, base: Mapping[str, object], arm: str, output: Path) -> dict[str, object] | None:
+    """Reuse only a complete old arm whose generated manifest bytes are identical."""
+    manifest_path = output / "manifest.json"
+    run_path = output / "run"
+    if not manifest_path.is_file() or not (run_path / "events.jsonl").is_file():
+        return None
+    expected = _benchmark_manifest(base, arm=arm)
+    if manifest_path.read_bytes() != (json.dumps(expected, indent=2, sort_keys=True) + "\n").encode("utf-8"):
+        return None
+    try:
+        verified = [
+            _json_command(repository_root, "verify-canonical-shot", str(manifest_path), str(run_path), "--shot", str(shot_id))
+            for shot_id in range(_BENCHMARK_SHOTS)
+        ]
+    except (OSError, RuntimeError, subprocess.TimeoutExpired, ValueError):
+        return None
+    attempts, raw_work = _canonical_attempts(run_path, expected_shots=_BENCHMARK_SHOTS)
+    if not all(attempt["status"] == "completed" for attempt in attempts):
+        return None
+    return {
+        "shot_ids": list(range(_BENCHMARK_SHOTS)), "attempts": attempts,
+        "sample_identities": [attempt["sample_identity"] for attempt in attempts],
+        "runtime_seconds": _distribution([attempt["runtime_seconds"] for attempt in attempts]),
+        "resource_measurements": {"scope": "attempt", "method": "canonical_public_ledger", "status": "runtime facts retained per terminal"},
+        "raw_work": raw_work, "relay": expected["relay"], "manifest_sha256": sha256(manifest_path.read_bytes()).hexdigest(),
+        "status": "completed", "failure": None, "reused_exact_identity": True,
+        "public_boundary": {"run": {"output": str(run_path)}, "verify": verified, "elapsed_seconds_whole_arm": None},
+    }
+
+
+def _run_native_benchmark_arm(*, repository_root: Path, base: Mapping[str, object], output: Path) -> dict[str, object]:
+    """Run each author-native shot separately so failures remain terminal benchmark facts."""
+    output.mkdir(parents=True, exist_ok=True)
+    source_record = _source_record(repository_root)
+    relay_manifest = _benchmark_manifest(base, arm="canonical_relay_31")
+    relay_manifest_path = output / "observation-manifest.json"
+    relay_manifest_path.write_text(json.dumps(relay_manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    attempts_path = output / "attempts.json"
+    attempts: list[dict[str, object]] = json.loads(attempts_path.read_text(encoding="utf-8")) if attempts_path.exists() else []
+    if not isinstance(attempts, list):
+        raise ValueError("native benchmark attempts record is not a list")
+    retained = {attempt["shot_id"] for attempt in attempts}
+    try:
+        # Validate exact source once per arm. Repeating an expensive status scan
+        # is not a per-shot measurement and must not consume the shot budget.
+        _git_exact_source(output / "native-stage")
+        setup_error: str | None = None
+    except (OSError, RuntimeError, subprocess.TimeoutExpired) as error:
+        setup_error = str(error)
+    for shot_id in range(_BENCHMARK_SHOTS):
+        if shot_id in retained:
+            continue
+        started = perf_counter()
+        try:
+            observation = _json_command(repository_root, "canonical-observation", str(relay_manifest_path), "--shot", str(shot_id))
+        except (OSError, RuntimeError, subprocess.TimeoutExpired, ValueError) as error:
+            attempts.append({
+                "shot_id": shot_id, "status": "incomplete_native_observation_unavailable",
+                "runtime_seconds": perf_counter() - started, "sample_identity": None,
+                "children_maxrss_kib": resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,
+                "result": {"reason": str(error)},
+            })
+            attempts_path.write_text(json.dumps(attempts, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            continue
+        if setup_error is not None:
+            result, status = {"reason": setup_error}, "incomplete_native_unavailable"
+        else:
+            try:
+                result = _run_native(repository_root=repository_root, stage_root=output / "native-stage", observation=observation)
+                status = result["status"]
+            except (OSError, RuntimeError, subprocess.TimeoutExpired, ValueError) as error:
+                result, status = {"reason": str(error)}, "incomplete_native_unavailable"
+        attempts.append({
+            "shot_id": shot_id, "status": status, "runtime_seconds": perf_counter() - started,
+            "sample_identity": observation["sample_identity"],
+            "children_maxrss_kib": resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,
+            "result": result,
+        })
+        attempts_path.write_text(json.dumps(attempts, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return {
+        "shot_ids": list(range(_BENCHMARK_SHOTS)), "attempts": attempts,
+        "sample_identities": [attempt["sample_identity"] for attempt in attempts],
+        "runtime_seconds": _distribution([float(attempt["runtime_seconds"]) for attempt in attempts]),
+        "resource_measurements": {
+            "scope": "all_children_to_date", "method": "resource.getrusage(RUSAGE_CHILDREN).ru_maxrss",
+            "interpretation": "cumulative child-process high-water mark, not independent per-shot RSS",
+            "cumulative_maxrss_kib": [attempt["children_maxrss_kib"] for attempt in attempts],
+        },
+        "raw_work": {
+            "availability": "unavailable", "reason": "unmodified exact-author Relay v0.2.2 does not expose edge or per-leg work facts",
+            "per_leg_totals": None,
+        },
+        "source_identity": {
+            "author_repository": AUTHOR_REPOSITORY, "author_commit": AUTHOR_COMMIT, "author_tree": AUTHOR_TREE,
+            "source_record_sha256": sha256((repository_root / "data/evidence/relay-v0.2.2-source.json").read_bytes()).hexdigest(),
+            "qualification": source_record["qualification"],
+        },
+    }
+
+
+def run_benchmark(*, repository_root: Path, output_path: Path, job_id: str, artifact_run_id: str | None = None) -> dict[str, object]:
+    """Retain the bounded D-23 benchmark once; an existing record is never silently replaced."""
+    repository_root, output_path = repository_root.resolve(), output_path.resolve()
+    if output_path.exists():
+        raise FileExistsError(f"refusing to replace retained benchmark evidence: {output_path}")
+    entitlement = _slurm_entitlement(job_id)
+    prior_root = output_path.parent / "benchmark-artifacts"
+    prior_incomplete_evidence = []
+    if prior_root.is_dir():
+        for ledger in sorted(prior_root.rglob("run/events.jsonl")):
+            terminal_count = sum(1 for line in ledger.read_text(encoding="utf-8").splitlines() if line and json.loads(line).get("kind") == "termination")
+            prior_incomplete_evidence.append({
+                "ledger_path": str(ledger.relative_to(repository_root)), "ledger_sha256": sha256(ledger.read_bytes()).hexdigest(),
+                "terminal_count": terminal_count, "status": "retained_interrupted_prior_attempt",
+            })
+    benchmark_run_id = artifact_run_id or _digest({
+        "entitlement": entitlement, "manifests": {
+            code_id: sha256((repository_root / path).read_bytes()).hexdigest()
+            for code_id, path in _BENCHMARK_MANIFESTS.items()
+        },
+    })[:16]
+    root = output_path.parent / "benchmark-artifacts" / benchmark_run_id
+    codes: dict[str, object] = {}
+    for code_id, relative_manifest in _BENCHMARK_MANIFESTS.items():
+        base = _read_json(repository_root / relative_manifest)
+        if base["artifact"]["code_id"] != code_id:
+            raise ValueError(f"benchmark manifest code identity drifted for {code_id}")
+        code_root = root / code_id
+        codes[code_id] = {
+            "central_error_rate": _BENCHMARK_CENTRAL_ERROR_RATE,
+            "manifest_sha256": sha256((repository_root / relative_manifest).read_bytes()).hexdigest(),
+            "sample_namespace": base["randomness"]["physical_sample_identity"],
+            "arms": {
+                "baseline": _reuse_exact_canonical_benchmark_arm(repository_root=repository_root, base=base, arm="baseline", output=code_root / "baseline") or _run_canonical_benchmark_arm(repository_root=repository_root, base=base, arm="baseline", output=code_root / "baseline"),
+                "canonical_relay_31": _reuse_exact_canonical_benchmark_arm(repository_root=repository_root, base=base, arm="canonical_relay_31", output=code_root / "canonical-relay-31") or _run_canonical_benchmark_arm(repository_root=repository_root, base=base, arm="canonical_relay_31", output=code_root / "canonical-relay-31"),
+                "native_v022": _run_native_benchmark_arm(repository_root=repository_root, base=base, output=code_root / "native-v022"),
+            },
+        }
+    result: dict[str, object] = {
+        "schema_version": 1, "status": "completed_with_retained_incompletes", "purpose": "D-23 measured finite Phase 4 pilot benchmark",
+        "benchmark_run_id": benchmark_run_id, "artifact_root": str(root.relative_to(repository_root)),
+        "prior_incomplete_evidence": prior_incomplete_evidence,
+        "sample_count_per_arm": _BENCHMARK_SHOTS, "entitlement": entitlement, "entitlement_digest": _digest(entitlement),
+        "codes": codes,
+        "command_boundaries": {
+            "canonical": [sys.executable, "-m", "bp_registry.cli", "preflight|canonical|verify-run"],
+            "native": ["approved exact author Relay v0.2.2", "per-shot timeout", _NATIVE_TIMEOUT_SECONDS],
+        },
+        "no_retry_policy": "Every failed or incomplete identified native attempt is retained; this benchmark does not retry it.",
+    }
+    result["benchmark_digest"] = _digest(result)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return result
 
 
 def run_stage(*, repository_root: Path, manifest_path: Path, stage: str, output_root: Path) -> dict[str, object]:
@@ -321,8 +686,22 @@ def main() -> None:
     parser.add_argument("--manifest", type=Path, default=Path("data/manifests/phase4-memory-relay-bb144.json"))
     parser.add_argument("--stage", choices=sorted(STAGES), default="trace")
     parser.add_argument("--output", type=Path, default=Path("data/results/phase4-pilots"))
+    parser.add_argument("--benchmark", action="store_true", help="run the retained D-23 32-shot benchmark for all qualified Phase 4 codes")
+    parser.add_argument("--slurm-job-id", default=os.environ.get("SLURM_JOB_ID"), help="concrete SLURM allocation used for a D-23 benchmark")
+    parser.add_argument("--benchmark-artifact-run-id", help="resume only the named retained benchmark artifact identity")
     args = parser.parse_args()
-    print(json.dumps(run_stage(repository_root=Path(__file__).resolve().parents[1], manifest_path=args.manifest, stage=args.stage, output_root=args.output), indent=2, sort_keys=True))
+    repository_root = Path(__file__).resolve().parents[1]
+    if args.benchmark:
+        if not args.slurm_job_id:
+            raise SystemExit("--benchmark requires --slurm-job-id or SLURM_JOB_ID")
+        print(json.dumps(run_benchmark(
+            repository_root=repository_root,
+            output_path=Path("data/results/phase4-memory-relay/benchmark.json"),
+            job_id=args.slurm_job_id,
+            artifact_run_id=args.benchmark_artifact_run_id,
+        ), indent=2, sort_keys=True))
+        return
+    print(json.dumps(run_stage(repository_root=repository_root, manifest_path=args.manifest, stage=args.stage, output_root=args.output), indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":

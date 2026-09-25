@@ -413,8 +413,48 @@ def test_phase4_benchmark_retains_entitlement_and_thirty_two_identified_shots():
             assert arm["shot_ids"] == list(range(32)), (code_id, arm_name)
             assert len(arm["attempts"]) == 32
             assert arm["runtime_seconds"]["count"] == 32
-            assert arm["resource_measurements"]["scope"] == "attempt"
+            expected_scope = "all_children_to_date" if arm_name == "native_v022" else "attempt"
+            assert arm["resource_measurements"]["scope"] == expected_scope
+        assert code["arms"]["baseline"]["sample_identities"] == code["arms"]["canonical_relay_31"]["sample_identities"] == code["arms"]["native_v022"]["sample_identities"]
         assert code["arms"]["canonical_relay_31"]["relay"]["total_leg_limit"] == 31
         assert code["arms"]["canonical_relay_31"]["raw_work"]["per_leg_totals"]
         assert code["arms"]["native_v022"]["raw_work"]["availability"] == "unavailable"
         assert code["arms"]["native_v022"]["source_identity"]["author_commit"] == "14cb31a18f9b9d7d099791b793e35b8a2951f8f3"
+
+
+def test_benchmark_per_shot_public_identity_matches_native_observation(tmp_path):
+    """Selected-shot canonical evidence and native input share one physical observation."""
+    runner = _phase4_runner_module()
+    base = json.loads(Path("data/manifests/phase4-memory-relay-bb144.json").read_text(encoding="utf-8"))
+    manifest = runner._benchmark_manifest(base, arm="canonical_relay_31")
+    manifest_path = tmp_path / "manifest.json"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    shot_id = 7
+
+    native_observation = runner._json_command(Path("."), "canonical-observation", str(manifest_path), "--shot", str(shot_id))
+    runner._json_command(Path("."), "canonical", str(manifest_path), "--output", str(tmp_path / "run"), "--shot", str(shot_id))
+    runner._json_command(Path("."), "verify-canonical-shot", str(manifest_path), str(tmp_path / "run"), "--shot", str(shot_id))
+    attempts, _ = runner._canonical_attempts(tmp_path / "run", expected_shots=32)
+
+    assert attempts[shot_id]["sample_identity"] == native_observation["sample_identity"]
+    assert attempts[shot_id]["terminal"]
+    assert all(attempt["sample_identity"] is None for attempt in attempts[:shot_id])
+
+
+def test_benchmark_timeout_without_a_ledger_is_retained_as_each_incomplete_shot(tmp_path, monkeypatch):
+    """A public CLI timeout cannot erase an unstarted shot from the 32-shot denominator."""
+    runner = _phase4_runner_module()
+    base = json.loads(Path("data/manifests/phase4-memory-relay-bb144.json").read_text(encoding="utf-8"))
+
+    def timeout(_root, *arguments):
+        if arguments[0] == "preflight":
+            return {"run_id": "bounded", "shot_budget": 32}
+        raise subprocess.TimeoutExpired(arguments, 300)
+
+    import subprocess
+    monkeypatch.setattr(runner, "_json_command", timeout)
+    arm = runner._run_canonical_benchmark_arm(repository_root=Path("."), base=base, arm="baseline", output=tmp_path / "baseline")
+
+    assert arm["status"] == "incomplete_canonical_arm"
+    assert [attempt["shot_id"] for attempt in arm["attempts"]] == list(range(32))
+    assert {attempt["status"] for attempt in arm["attempts"]} == {"incomplete_canonical_shot"}
