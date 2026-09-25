@@ -147,6 +147,7 @@
     }
   },
   "entitlement_digest": "50bf1b5c23c5e5a376bd135eebb27fbad833cb75fc9fddb015d54e2200cd3a89",
+  "reason": "v2 used one iteration per leg and is not representative of D-22 80/60 memory tuning",
   "reporting": {
     "interval": "Wilson",
     "native_setup": "Cargo/setup is retained separately and is not a per-shot runtime.",
@@ -161,7 +162,7 @@
     "reason": "The broad B1 54 coarse configurations \u00d7128 shots \u00d72 presets \u00d758.026s p95 public wall requires 802,151s, exceeding the 702,083s calibration allocation before other codes."
   },
   "selection_rule": "Fixed paired Wilson ranking over calibration only; lexical tie break; select at most 32 refinement configurations.",
-  "status": "frozen_before_calibration",
+  "status": "superseded_pending_representative_v3",
   "stop_rules": {
     "calibration": "Stop at selected shot-menu endpoint, runtime/work/trace cap, or insufficient_precision.",
     "evaluation": "Never consumes calibration samples; stop at prespecified menu endpoint or cap.",
@@ -173,5 +174,6 @@
     ],
     "no_silent_extension": "Any increase requires a new versioned campaign identity and retained amendment.",
     "rank_chasing": "Unused allocation cannot add ranks, configurations, or shots."
-  }
+  },
+  "superseded_by": "data/results/phase4-memory-relay/benchmark-v3-representative.json"
 }

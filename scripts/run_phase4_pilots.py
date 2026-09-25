@@ -30,7 +30,7 @@ AUTHOR_COMMIT = "14cb31a18f9b9d7d099791b793e35b8a2951f8f3"
 AUTHOR_TREE = "5f6f112429e62112ba71fbff45f4e16247725fbc"
 STAGES = frozenset({"benchmark", "calibration", "evaluation", "factorial", "native", "trace"})
 ARMS = ("source_procedure", "canonical_default", "native_v022")
-_NATIVE_TIMEOUT_SECONDS = 90
+_NATIVE_TIMEOUT_SECONDS = 900
 _BENCHMARK_SHOTS = 32
 _BENCHMARK_CENTRAL_ERROR_RATE = 0.03
 _BENCHMARK_ARMS = ("baseline", "canonical_relay_31", "native_v022")
@@ -68,7 +68,7 @@ def _json_command(repository_root: Path, *arguments: str) -> dict[str, Any]:
     """Invoke the public CLI only; no canonical execution internals are imported here."""
     completed = subprocess.run(
         [sys.executable, "-m", "bp_registry.cli", *arguments], cwd=repository_root,
-        text=True, capture_output=True, timeout=300,
+        text=True, capture_output=True, timeout=900,
         env={**os.environ, "PYTHONPATH": str(repository_root / "src"), "OMP_NUM_THREADS": "1"},
     )
     if completed.returncode:
@@ -292,7 +292,7 @@ def _run_native(*, repository_root: Path, stage_root: Path, observation: Mapping
     result = adapter.run(
         check_matrix=observation["check_matrix"], syndrome=observation["syndrome"],
         error_priors=observation["error_priors"], relay_settings={
-            "pre_iter": 1, "num_sets": 1, "set_max_iter": 1, "stopping_criterion": "pre_iter", "logging": False,
+            "pre_iter": 80, "num_sets": 30, "set_max_iter": 60, "stopping_criterion": "pre_iter", "logging": False,
         }, seed=int(observation["decoder_seed"]), numerical_profile="f64",
     )
     return {
@@ -355,11 +355,11 @@ def _benchmark_manifest(base: Mapping[str, object], *, arm: str) -> dict[str, ob
     value["error_rate"] = _BENCHMARK_CENTRAL_ERROR_RATE
     budgets = dict(value["budgets"])
     budgets["max_shots"] = _BENCHMARK_SHOTS
-    multiplier = 1 if arm == "baseline" else 31
+    multiplier = 31
     for scope_name in ("shot", "search", "attempt"):
         scope = dict(budgets[scope_name])
-        scope["max_iterations"] = 1
-        limits = {name: amount * multiplier for name, amount in dict(scope["work_limits"]).items()}
+        scope["max_iterations"] = 80
+        limits = {name: amount * multiplier * 80 for name, amount in dict(scope["work_limits"]).items()}
         limits["bp_calls"] = multiplier
         limits["relay_transfers"] = max(0, multiplier - 1)
         scope["work_limits"] = limits
@@ -367,10 +367,10 @@ def _benchmark_manifest(base: Mapping[str, object], *, arm: str) -> dict[str, ob
     value["budgets"] = budgets
     relay = dict(value["relay"])
     relay["total_leg_limit"] = multiplier
-    relay["legs"] = [{"max_iterations": 1} for _ in range(multiplier)]
-    relay["first_leg_iteration_limit"] = 1
-    relay["later_leg_iteration_limit"] = 1
-    relay["solution_limit"] = multiplier
+    relay["legs"] = [{"max_iterations": 80}] + [{"max_iterations": 60} for _ in range(multiplier - 1)]
+    relay["first_leg_iteration_limit"] = 80
+    relay["later_leg_iteration_limit"] = 60
+    relay["solution_limit"] = 1
     relay["preset_name"] = "phase4-benchmark-baseline-v1" if arm == "baseline" else "phase4-benchmark-canonical-relay-31-v1"
     relay["procedure"] = "canonical_internal_bp"
     relay["fidelity_status"] = "canonical_css_adaptation"
