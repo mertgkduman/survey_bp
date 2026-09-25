@@ -341,3 +341,48 @@ def test_public_verify_executes_phase4_relay_through_cli(tmp_path):
         assert completed.returncode == 0, completed.stderr or completed.stdout
     events = (output / "events.jsonl").read_text(encoding="utf-8")
     assert '"relay_transfer"' in events
+
+
+def test_interrupted_stage_is_retained_without_a_silent_same_identity_retry(tmp_path, monkeypatch):
+    """Finite native failures remain visible and require a new identified stage to retry."""
+    runner = _phase4_runner_module()
+    calls = {"native": 0}
+
+    def public_boundary(_root, *arguments):
+        if arguments[0] == "preflight":
+            return {"run_id": "stub", "shot_budget": 1}
+        if arguments[0] == "canonical-observation":
+            return {"sample_identity": "actual-sample", "sample_namespace": "phase4-memory-relay-bb144-matched-physical-samples-v1", "check_matrix": [[1]], "syndrome": [0], "error_priors": [0.03], "decoder_seed": 0, "hidden_truth": "not_exposed"}
+        return {"output": arguments[-1], "final_row_count": 1, "verified_at": "test"}
+
+    def unavailable(**_kwargs):
+        calls["native"] += 1
+        return {"status": "native_unavailable", "reason": "bounded test interruption"}
+
+    monkeypatch.setattr(runner, "_json_command", public_boundary)
+    monkeypatch.setattr(runner, "_run_native", unavailable)
+    kwargs = {"repository_root": Path("."), "manifest_path": Path("data/manifests/phase4-memory-relay-bb144.json"), "stage": "native", "output_root": tmp_path}
+    first = runner.run_stage(**kwargs)
+    retained = runner.run_stage(**kwargs)
+
+    assert first["status"] == retained["status"] == "incomplete_native_unavailable"
+    assert retained["reused"] is False
+    assert retained["retry_requires_new_stage_identity"] is True
+    assert calls["native"] == 1
+
+
+def test_three_codes_share_relay_stage_identity_protocol():
+    """BB-144, B1, and HGP expose the same bounded Relay stage contract."""
+    runner = _phase4_runner_module()
+    manifests = [
+        Path("data/manifests/phase4-memory-relay-bb144.json"),
+        Path("data/manifests/phase4-memory-relay-b1.json"),
+        Path("data/manifests/phase4-memory-relay-hgp.json"),
+    ]
+    for manifest in manifests:
+        value = json.loads(manifest.read_text(encoding="utf-8"))
+        assert value["relay"]["total_leg_limit"] == 2
+        assert value["budgets"]["attempt"]["work_limits"]["relay_transfers"] == 1
+        for stage in ("benchmark", "calibration", "evaluation", "factorial", "native", "trace"):
+            identity = runner.stage_identity(repository_root=Path("."), manifest_path=manifest, stage=stage, arm="native_v022")
+            assert identity["source_identity"]["author_commit"] == "14cb31a18f9b9d7d099791b793e35b8a2951f8f3"

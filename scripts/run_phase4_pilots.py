@@ -273,8 +273,15 @@ def run_stage(*, repository_root: Path, manifest_path: Path, stage: str, output_
     stage_record = stage_dir / "stage.json"
     if stage_record.exists():
         existing = _read_json(stage_record)
-        if existing.get("identity") == {"stage_identity": overall_identity, "arms": identities} and existing.get("status") == "completed":
-            return {**existing, "reused": True, "stage_record": str(stage_record)}
+        if existing.get("identity") == {"stage_identity": overall_identity, "arms": identities}:
+            if existing.get("status") == "completed":
+                return {**existing, "reused": True, "stage_record": str(stage_record)}
+            # A finite interruption is evidence, not permission to repeat the same
+            # workload. A caller must create a new stage identity explicitly.
+            return {
+                **existing, "reused": False, "stage_record": str(stage_record),
+                "retry_requires_new_stage_identity": True,
+            }
         _archive_mismatch(stage_dir, existing)
     manifests = stage_dir / "manifests"
     manifests.mkdir(exist_ok=True)
