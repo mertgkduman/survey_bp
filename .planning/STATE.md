@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 04
 current_phase_name: Memory Policies and Relay-BP
-current_plan: 6
+current_plan: 7
 status: executing
-stopped_at: Completed 04-05-PLAN.md
-last_updated: "2026-09-25T00:15:44.164Z"
+stopped_at: Completed 04-07-PLAN.md
+last_updated: "2026-09-25T02:12:23.699Z"
 last_activity: 2026-09-24
 last_activity_desc: Phase 04 execution started
-state_head: e30844eab1570e2e0c01861becf536539f982876
+state_head: 00afdfbaf4cc01654c1a4b32e466455e7b7945eb
 progress:
   total_phases: 14
   completed_phases: 3
   total_plans: 57
-  completed_plans: 47
+  completed_plans: 48
 ---
 
 # Project State
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 ## Current Position
 
 Phase: 04 (Memory Policies and Relay-BP) — EXECUTING
-Plan: 6 of 15
+Plan: 7 of 15
 Total Phases: 14
-Current Plan: 6
+Current Plan: 7
 Total Plans in Phase: 15
 Status: Ready to execute
 Last activity: 2026-09-24 — Phase 04 execution started
@@ -64,6 +64,7 @@ Progress: [██░░░░░░░░] 21% [██░░░░░░░░]
 | Phase 04 P03 | 18m | 2 tasks | 4 files |
 | Phase 04 P04 | 11m | 2 tasks | 9 files |
 | Phase 04 P05 | 14m | 2 tasks | 4 files |
+| Phase 04 P07 | 67s | 1 tasks | 1 files |
 
 Phase 02 P10–P16 gap-closure metrics are recorded in their individual summaries.
 
@@ -115,6 +116,8 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - [Phase 04]: Public V4 preflight rejects incompatible memory operands before artifact loading and records resolved binding order and compatibility evidence.
 - [Phase 04]: Phase 04: Relay source and canonical presets are immutable named CSS adaptations; modified controls receive a controlled-adaptation identity.
 - [Phase 04]: Phase 04: Relay candidate selection uses decoder-visible syndrome/prior weights and stable earlier-leg ties.
+- [Phase 04]: Use only trmue/relay tag v0.2.2 at immutable commit 14cb31a18f9b9d7d099791b793e35b8a2951f8f3 as the original Relay reference.
+- [Phase 04]: Keep the PyPI relay-bp package and editable mg551-duke/relay fork outside the approved original-reference identity.
 
 ### Pending Todos
 
@@ -146,7 +149,7 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Last session: 2026-09-25T00:15:41.593Z
-Stopped at: Completed 04-05-PLAN.md
+Last session: 2026-09-25T02:12:21.358Z
+Stopped at: Completed 04-07-PLAN.md
 Resume file: None
 Next command: $gsd-discuss-phase 4
