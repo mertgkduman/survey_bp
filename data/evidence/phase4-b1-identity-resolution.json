@@ -1,0 +1,210 @@
+{
+  "b1": {
+    "checks": {
+      "artifact_arrays_match_reconstruction": true,
+      "artifact_identity_matches_reconstruction": true,
+      "inventory_matches_reconstruction": false,
+      "metadata_matches_reconstruction": true,
+      "phase3_manifest_matches_reconstruction": true,
+      "regenerated_npz_matches_frozen_v3_bytes": true,
+      "source_construction_matches_pin": true
+    },
+    "construction": {
+      "logical_basis": "deterministic GF(2) free-column quotient basis with paired Lz normalization",
+      "serialization": "css-npz-v1 fixed ZIP metadata and DEFLATE level 9"
+    },
+    "disposition": "inventory_stale",
+    "matrix_logical_identity_match": true,
+    "reconstructed": {
+      "matrix_hashes": {
+        "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
+        "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
+        "hz_raw_sha256": "e66f9af2f546591faab8c812db497ee23eba80cbdef064d30c32a71e98bce662",
+        "hz_semantic_sha256": "6d8738b4aff3cead4a44dab9d26d3d2473781c54bae7c78e20e978e3cd6288f2",
+        "lx_raw_sha256": "a710640a7c0afe275fb0394bf6388c6ba0a8a07bdad9bcabff3ac7a12fe8ca74",
+        "lx_semantic_sha256": "d5c335893b922e6205f9f7a7f08644a68d6c29c6570f82b0bdb2297fbd22de12",
+        "lz_raw_sha256": "0fa1f2fa849ac334621118b395098232d1e3b1327b0eb4750055dde0c357f6a2",
+        "lz_semantic_sha256": "f609b3f1c83119e567e7d4274d2fc43e2f406c2fd8a49407047bc91c3d833889"
+      },
+      "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+      "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+    },
+    "records": {
+      "artifact_v3": {
+        "matrix_hashes": {
+          "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
+          "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
+          "hz_raw_sha256": "e66f9af2f546591faab8c812db497ee23eba80cbdef064d30c32a71e98bce662",
+          "hz_semantic_sha256": "6d8738b4aff3cead4a44dab9d26d3d2473781c54bae7c78e20e978e3cd6288f2",
+          "lx_raw_sha256": "a710640a7c0afe275fb0394bf6388c6ba0a8a07bdad9bcabff3ac7a12fe8ca74",
+          "lx_semantic_sha256": "d5c335893b922e6205f9f7a7f08644a68d6c29c6570f82b0bdb2297fbd22de12",
+          "lz_raw_sha256": "0fa1f2fa849ac334621118b395098232d1e3b1327b0eb4750055dde0c357f6a2",
+          "lz_semantic_sha256": "f609b3f1c83119e567e7d4274d2fc43e2f406c2fd8a49407047bc91c3d833889"
+        },
+        "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+        "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+      },
+      "inventory": {
+        "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+        "semantic_sha256": "ea120ce6e5277e9eb090c419d14c1d4a587b8d52db9f34bb99c4262617be3048"
+      },
+      "metadata_v3": {
+        "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+        "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+      },
+      "phase3_manifest": {
+        "code_id": "b1-ghp-882",
+        "format_version": 1,
+        "matrix_hashes": {
+          "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
+          "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
+          "hz_raw_sha256": "e66f9af2f546591faab8c812db497ee23eba80cbdef064d30c32a71e98bce662",
+          "hz_semantic_sha256": "6d8738b4aff3cead4a44dab9d26d3d2473781c54bae7c78e20e978e3cd6288f2",
+          "lx_raw_sha256": "a710640a7c0afe275fb0394bf6388c6ba0a8a07bdad9bcabff3ac7a12fe8ca74",
+          "lx_semantic_sha256": "d5c335893b922e6205f9f7a7f08644a68d6c29c6570f82b0bdb2297fbd22de12",
+          "lz_raw_sha256": "0fa1f2fa849ac334621118b395098232d1e3b1327b0eb4750055dde0c357f6a2",
+          "lz_semantic_sha256": "f609b3f1c83119e567e7d4274d2fc43e2f406c2fd8a49407047bc91c3d833889"
+        },
+        "path": "b1-panteleev-kalachev-v3.npz",
+        "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+        "root": "data/artifacts",
+        "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+      }
+    },
+    "source": {
+      "a_rows": [
+        [
+          27,
+          null,
+          null,
+          null,
+          null,
+          0,
+          54
+        ],
+        [
+          54,
+          27,
+          null,
+          null,
+          null,
+          null,
+          0
+        ],
+        [
+          0,
+          54,
+          27,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          0,
+          54,
+          27,
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          0,
+          54,
+          27,
+          null,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          0,
+          54,
+          27,
+          null
+        ],
+        [
+          null,
+          null,
+          null,
+          null,
+          0,
+          54,
+          27
+        ]
+      ],
+      "archive_member": "matrices/ghpc_3_3_N882_K24.tex",
+      "archive_member_sha256": "91be6649c066b88d46e1b232ac16c3e7cb94f8a928fd9f82834663b16e9d8e83",
+      "archive_sha256": "5aa90578b1a93e18dedf505784d3b2836b2fd5a9bbe91bff2617e5fc6603975e",
+      "b_diagonal_exponents": [
+        0,
+        1,
+        6
+      ],
+      "circulant_convention": "row-major: polynomial x^e has one at column e in row 0",
+      "hx": "[A, B]",
+      "hz": "[B^T, A^T]",
+      "paper": "Panteleev and Kalachev, arXiv:1904.02703v3",
+      "revision": "v3",
+      "ring": "GF(2)[x]/(x^63-1)"
+    }
+  },
+  "purpose": "Phase 4 exact CSS artifact qualification before dependent pilot design",
+  "schema_version": 1,
+  "supporting_qualifications": {
+    "gross-bb-144": {
+      "all_identities_match": true,
+      "artifact": {
+        "matrix_hashes": {
+          "hx_raw_sha256": "c1700ef674d1682cba2620523eaca7fa475826644f28295de46b9fc742d3729b",
+          "hx_semantic_sha256": "8ce200c0f0216d8701dd40e399198d7d97663d5e59f9fd216b5cde756bcad221",
+          "hz_raw_sha256": "ab9cc0bafc2eee02d026aea9f3500b809caad7e7d0708a9ac997719e99c4ae71",
+          "hz_semantic_sha256": "85b850d21d354fa0c4ced2d18ec0ac429b3961f53545bb5f152e8b46e77ab38c",
+          "lx_raw_sha256": "6ed70f72141fd5a499f3a6da6c44a578229fa97d28e5e927d353dba62bef1c16",
+          "lx_semantic_sha256": "058a41f65842e9071c2ace12520b796d162eb431e8cf031192be4ffc0177f7bc",
+          "lz_raw_sha256": "40dbe2f12c82a87bcfb58f9058432849afc64e9e1d06669803c753eba1888543",
+          "lz_semantic_sha256": "40b1742c12ef8051719e7a890219642ed3d93c118405ad1fea7c94265a1b8d28"
+        },
+        "raw_sha256": "2c02a3b99bf7267acf35efe28e0a2ef0d3827e5a22b948d53da14ae8df68ceb0",
+        "semantic_sha256": "e175e67c0f9ae6f4e0968461ad2f87ba38ad5344166b793c53dd038976d4f427"
+      },
+      "author_instance": true,
+      "checks": {
+        "inventory_matches": true,
+        "manifest_matches": true,
+        "metadata_matches": true
+      },
+      "manifest_path": "data/manifests/phase3-pilot-bb144.json",
+      "metadata_path": "data/artifacts/selected-css.provenance.json"
+    },
+    "hgp-gallager-3-4-seed-20260923": {
+      "all_identities_match": true,
+      "artifact": {
+        "matrix_hashes": {
+          "hx_raw_sha256": "2497f0f59cdb7cf0787e601295e5d118d6cad2e62cc2226a88a47ccf2b034dfb",
+          "hx_semantic_sha256": "0edcbfaab182df09cdfe0a0adf6cf394e167896c540483d52b95217963c8664d",
+          "hz_raw_sha256": "002e894daec7f5e56d17f8bca28ad11dacfd2df236d1a18e031564d6d18727f4",
+          "hz_semantic_sha256": "45b088f719effe4389e9c96a67bcc49100beeb447b38d4ef4dbf51087c96bdfe",
+          "lx_raw_sha256": "c53605ad73244da3b9352a269333484e307055036bc5f1c428727ec9a9ce0b8b",
+          "lx_semantic_sha256": "3db83ea36085e780c1c7c8b409909cb8873b451bdc7ed1747bee066a0e93c0f7",
+          "lz_raw_sha256": "09cd80917934c1665921c09e027ebb51cc02014da6f51f3ca34f7a4001eb60f6",
+          "lz_semantic_sha256": "2dc6a64b64568bb5b88f09537ced7369baf535e377f33209f33aa38299734d87"
+        },
+        "raw_sha256": "b31c99a754fb377acfb5e2cb2edc2cb7e55c4d1e78feb4aa84c171c051a78c44",
+        "semantic_sha256": "272c9498396167424bc4279d96b5ad2d6e11cebc7f01de597716a1cd2c01d668"
+      },
+      "author_instance": false,
+      "checks": {
+        "inventory_matches": true,
+        "manifest_matches": true,
+        "metadata_matches": true
+      },
+      "manifest_path": "data/manifests/phase3-pilot-hgp-gallager.json",
+      "metadata_path": "data/artifacts/hgp-gallager-3-4-seed-20260923.json"
+    }
+  }
+}
