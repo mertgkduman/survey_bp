@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "status": "frozen_before_sampling",
+  "purpose": "Focused comparable Phase 4 memory and Relay CSS pilot design under D-18, D-24, and D-25.",
+  "decision_basis": [
+    "Phase 4 D-18, D-24, and D-25",
+    "Phase 4 research focused-factorial selection",
+    "Phase 4 Plan 05 immutable RelayPreset definitions",
+    "Phase 4 Plan 09 B1 identity resolution"
+  ],
+  "calibration_outcomes_inspected": false,
+  "amendment_policy": {
+    "permitted_only_after": "retained_baseline_scan_before_calibration",
+    "preserve_prior_design": true,
+    "require_versioned_reason": true
+  },
+  "codes": {
+    "gross-bb-144": {
+      "identity_qualification": "project-pinned exact CSS artifact with author-instance qualification",
+      "author_instance": true,
+      "sample_namespace": "phase4-memory-relay-bb144-matched-physical-samples-v1"
+    },
+    "b1-ghp-882": {
+      "identity_qualification": "source-reconstructed frozen v3 CSS artifact after Plan 04-09 inventory-only reconciliation",
+      "author_instance": true,
+      "sample_namespace": "phase4-memory-relay-b1-matched-physical-samples-v1",
+      "required_resolution": "data/evidence/phase4-b1-identity-resolution.json"
+    },
+    "hgp-gallager-3-4-seed-20260923": {
+      "identity_qualification": "project-generated Gallager (3,4) HGP fixture; not paper-exact",
+      "author_instance": false,
+      "sample_namespace": "phase4-memory-relay-hgp-matched-physical-samples-v1"
+    }
+  },
+  "noise_grid": [
+    {
+      "region": "easy",
+      "error_rates": {"gross-bb-144": 0.01, "b1-ghp-882": 0.01, "hgp-gallager-3-4-seed-20260923": 0.01}
+    },
+    {
+      "region": "visible_bp_failures",
+      "error_rates": {"gross-bb-144": 0.03, "b1-ghp-882": 0.03, "hgp-gallager-3-4-seed-20260923": 0.03}
+    },
+    {
+      "region": "harder",
+      "error_rates": {"gross-bb-144": 0.05, "b1-ghp-882": 0.05, "hgp-gallager-3-4-seed-20260923": 0.05}
+    }
+  ],
+  "sample_matching": {
+    "scope": "all factorial arms and configurations at one code and noise-grid point",
+    "physical_sample_derivation": "sha256-manifest-shot-v1",
+    "require_same_physical_sample_identity": true,
+    "decoder_randomness_is_independent": true
+  },
+  "factorial_arms": [
+    {"id": "baseline", "kind": "common_baseline", "memory_bindings": []},
+    {"id": "v2c-damping", "kind": "memory_family", "memory_bindings": ["v2c_damping"]},
+    {"id": "pdbp", "kind": "memory_family", "memory_bindings": ["pdbp_field_mix"]},
+    {"id": "pdprime", "kind": "memory_family", "memory_bindings": ["pdprime_delta_mix"]},
+    {"id": "posterior-momentum", "kind": "memory_family", "memory_bindings": ["posterior_momentum"]},
+    {"id": "affine-prior", "kind": "memory_family", "memory_bindings": ["affine_prior"]},
+    {"id": "disordered-affine-prior", "kind": "memory_family", "memory_bindings": ["affine_prior_disordered"]},
+    {"id": "v2c-damping-plus-ewa", "kind": "two_policy_interaction", "memory_bindings": ["v2c_damping", "affine_prior"]},
+    {"id": "pdbp-plus-v2c-damping", "kind": "two_policy_interaction", "memory_bindings": ["pdbp_field_mix", "v2c_damping"]},
+    {"id": "momentum-plus-ewa", "kind": "two_policy_interaction", "memory_bindings": ["posterior_momentum", "affine_prior"]},
+    {"id": "relay-one-leg", "kind": "relay_component_ablation", "control": "one_leg"},
+    {"id": "relay-no-transfer", "kind": "relay_component_ablation", "control": "posterior_transfer_disabled"},
+    {"id": "relay-uniform-later-memory", "kind": "relay_component_ablation", "control": "uniform_later_leg_memory"},
+    {"id": "relay-disordered-later-memory", "kind": "relay_component_ablation", "control": "disordered_later_leg_memory"}
+  ],
+  "selected_two_policy_interactions": [
+    "v2c-damping-plus-ewa",
+    "pdbp-plus-v2c-damping",
+    "momentum-plus-ewa"
+  ],
+  "configurations": [
+    {
+      "name": "source_procedure",
+      "relay_preset": "relay-source-internal-bp-v0.2.2",
+      "procedure": "source_internal_bp",
+      "fidelity_status": "source_procedure_css_adaptation",
+      "total_leg_limit": 301,
+      "first_leg_iteration_limit": 80,
+      "later_leg_iteration_limit": 60,
+      "transfer": "posterior_only",
+      "first_leg_memory": "uniform",
+      "later_leg_memory": "disordered"
+    },
+    {
+      "name": "canonical_procedure",
+      "relay_preset": "relay-canonical-css-default-v1",
+      "procedure": "canonical_internal_bp",
+      "fidelity_status": "canonical_css_adaptation",
+      "total_leg_limit": 2,
+      "first_leg_iteration_limit": 4,
+      "later_leg_iteration_limit": 4,
+      "transfer": "posterior_only",
+      "first_leg_memory": "uniform",
+      "later_leg_memory": "uniform"
+    },
+    {
+      "name": "controlled_matched",
+      "relay_preset": "relay-controlled-source_internal_bp-v1",
+      "procedure": "source_internal_bp",
+      "fidelity_status": "controlled_component_adaptation",
+      "matched_controls": ["leg_limit", "iteration_limits", "solution_limit", "transfer", "memory_assignment", "numerical_profile"]
+    }
+  ]
+}

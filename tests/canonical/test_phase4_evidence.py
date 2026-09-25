@@ -135,8 +135,10 @@ def test_phase4_pilot_manifests_gate_identity_presets_and_matched_samples():
 
     b1 = manifests["b1-ghp-882"]
     resolution = json.loads(Path("data/evidence/phase4-b1-identity-resolution.json").read_text(encoding="utf-8"))
+    resolution_digest = _canonical_json_sha256(resolution)
     assert resolution["b1"]["disposition"] == "inventory_stale"
     assert b1["artifact"]["semantic_sha256"] == resolution["b1"]["reconstructed"]["semantic_sha256"]
+    assert f"phase4-b1-identity-resolution.json#sha256:{resolution_digest}" in b1["evidence"]["sources"]
     assert resolution["b1"]["reconstructed"]["semantic_sha256"] in b1["evidence"]["sources"]
 
     hgp = manifests["hgp-gallager-3-4-seed-20260923"]
