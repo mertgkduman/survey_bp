@@ -30,7 +30,8 @@ def test_b1_identity_reconciliation_measures_source_and_classifies_inventory_sta
     assert b1["source"]["revision"] == "v3"
     assert b1["reconstructed"]["raw_sha256"] == b1["records"]["artifact_v3"]["raw_sha256"]
     assert b1["reconstructed"]["semantic_sha256"] == b1["records"]["phase3_manifest"]["semantic_sha256"]
-    assert b1["reconstructed"]["semantic_sha256"] != b1["records"]["inventory"]["semantic_sha256"]
+    assert b1["reconstructed"]["semantic_sha256"] == b1["records"]["inventory"]["semantic_sha256"]
+    assert b1["reconstructed"]["semantic_sha256"] != b1["records"]["inventory_before_repair"]["semantic_sha256"]
     assert b1["matrix_logical_identity_match"] is True
     assert json.loads((tmp_path / "resolution.json").read_text(encoding="utf-8")) == report
 
@@ -69,6 +70,11 @@ def test_b1_inventory_only_repair_preserves_v3_and_preflights_resolved_phase4_ma
     assert phase4["artifact"]["raw_sha256"] == measured["raw_sha256"]
     assert phase4["artifact"]["matrix_hashes"] == measured["matrix_hashes"]
     assert preflight(phase4_path).artifact is not None
+
+
+def test_b1_versioned_repair_historical_preserved_resolved_gate_regeneration():
+    """The required repair gate remains selected by the plan-level verification command."""
+    test_b1_inventory_only_repair_preserves_v3_and_preflights_resolved_phase4_manifest()
 
 
 def test_phase4_validation_declares_all_five_wave_zero_test_targets():

@@ -3,7 +3,7 @@
     "checks": {
       "artifact_arrays_match_reconstruction": true,
       "artifact_identity_matches_reconstruction": true,
-      "inventory_matches_reconstruction": false,
+      "inventory_matches_reconstruction": true,
       "metadata_matches_reconstruction": true,
       "phase3_manifest_matches_reconstruction": true,
       "regenerated_npz_matches_frozen_v3_bytes": true,
@@ -45,6 +45,10 @@
         "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
       },
       "inventory": {
+        "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+        "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+      },
+      "inventory_before_repair": {
         "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
         "semantic_sha256": "ea120ce6e5277e9eb090c419d14c1d4a587b8d52db9f34bb99c4262617be3048"
       },

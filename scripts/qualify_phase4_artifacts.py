@@ -124,7 +124,27 @@ def _b1_report(root: Path, inventory: dict[str, Any]) -> dict[str, Any]:
         stale.append("phase3_manifest_stale")
     if not inventory_matches:
         stale.append("inventory_stale")
-    disposition = "unresolved" if not stale else stale[0] if len(stale) == 1 else "multiple_records_stale"
+    previous_inventory: dict[str, Any] | None = None
+    if stale:
+        disposition = stale[0] if len(stale) == 1 else "multiple_records_stale"
+    else:
+        resolution_link = inventory_entry.get("identity_resolution", {})
+        resolution_path = root / str(resolution_link.get("resolution_record", ""))
+        if resolution_link.get("disposition") == "inventory_stale" and resolution_path.is_file():
+            previous = _json(resolution_path).get("b1", {})
+            prior_records = previous.get("records", {})
+            previous_inventory = prior_records.get("inventory_before_repair") or prior_records.get("inventory")
+            if (
+                previous.get("disposition") == "inventory_stale"
+                and previous.get("reconstructed") == measured
+                and isinstance(previous_inventory, dict)
+                and previous_inventory.get("semantic_sha256") != measured["semantic_sha256"]
+            ):
+                disposition = "inventory_stale"
+            else:
+                disposition = "unresolved"
+        else:
+            disposition = "unresolved"
     if disposition == "unresolved":
         raise ValueError("B1 qualification could not classify a stale record from measured evidence")
 
@@ -141,6 +161,7 @@ def _b1_report(root: Path, inventory: dict[str, Any]) -> dict[str, Any]:
             "metadata_v3": {"raw_sha256": metadata_identity["raw_sha256"], "semantic_sha256": metadata_identity["semantic_sha256"]},
             "phase3_manifest": manifest_identity,
             "inventory": {"raw_sha256": inventory_identity["artifact_raw_sha256"], "semantic_sha256": inventory_identity["artifact_semantic_sha256"]},
+            "inventory_before_repair": previous_inventory,
         },
         "checks": {
             "source_construction_matches_pin": source_matches,
