@@ -19,3 +19,64 @@ def test_phase4_validation_declares_all_five_wave_zero_test_targets():
 @pytest.mark.skip(reason="B1 semantic digest reconciliation and bounded notebook artifacts are Wave 1 evidence work.")
 def test_notebook_stage_reuse_requires_matching_manifest_source_policy_and_sample_identities():
     """Reserved evidence target; missing external artifacts must remain explicit rather than fabricated."""
+
+
+def _phase4_events(path: Path) -> None:
+    from bp_registry.canonical.budgets import WorkVector
+    from bp_registry.ledger import CanonicalEventWriter
+
+    work = WorkVector(bp_calls=1, candidate_checks=1, relay_transfers=1).as_evidence(structural_event_version=2)
+    with CanonicalEventWriter(path, structural_event_version=4) as ledger:
+        ledger.begin(run_id="phase4-evidence", shot_id=3, sample_seed_identity="sample-3", schema_version=4)
+        ledger.event(run_id="phase4-evidence", shot_id=3, kind="attempt", data={"attempt_lineage_id": "attempt:3"})
+        ledger.event(run_id="phase4-evidence", shot_id=3, kind="relay_transfer", data={
+            "representation": "llr_log_p0_over_p1", "vector_length": 3,
+            "producer_leg_lineage_id": "attempt:3:leg:0", "numerical_profile": "cpu-float64-spa-v1",
+            "clipping_evidence": "finite", "digest": "a" * 64, "relay_leaf_id": "transfer:3:1",
+        })
+        ledger.event(run_id="phase4-evidence", shot_id=3, kind="work", data={
+            "work_vector": work,
+            "relay_work_leaves": [
+                {"kind": "leg", "leg_index": 0, "lineage_id": "attempt:3:leg:0", "leaf_id": "leg:3:0", "work_vector": WorkVector(bp_calls=1).as_evidence(structural_event_version=2)},
+                {"kind": "transfer", "leg_index": 1, "lineage_id": "attempt:3:leg:0", "leaf_id": "transfer:3:1", "work_vector": WorkVector(relay_transfers=1).as_evidence(structural_event_version=2)},
+                {"kind": "candidate", "leg_index": 1, "lineage_id": "attempt:3:leg:1", "leaf_id": "candidate:3:1", "work_vector": WorkVector(candidate_checks=1).as_evidence(structural_event_version=2)},
+            ],
+        })
+        ledger.event(run_id="phase4-evidence", shot_id=3, kind="candidate", data={"candidate_lineage_id": "candidate:3:1", "candidate": [0, 1, 0]})
+        ledger.event(run_id="phase4-evidence", shot_id=3, kind="selection", data={"candidate_lineage_id": "candidate:3:1", "selection_status": "frozen"})
+        ledger.terminal(run_id="phase4-evidence", shot_id=3, termination="completed", data={"candidate_lineage_id": "candidate:3:1", "work_vector": work})
+
+
+def test_phase4_ledger_reconstructs_transfer_candidates_selection_and_leaf_work(tmp_path):
+    """V4 terminal facts reduce from unique leaves and retain visible Relay ancestry."""
+    from bp_registry.canonical.verification import reconstruct_relay_work, validate_phase4_shot
+
+    path = tmp_path / "phase4.jsonl"
+    _phase4_events(path)
+
+    result = validate_phase4_shot(path, run_id="phase4-evidence", shot_id=3, trace_root=tmp_path)
+    assert result["selection"]["candidate_lineage_id"] == "candidate:3:1"
+    assert result["transfers"][0]["producer_leg_lineage_id"] == "attempt:3:leg:0"
+    assert reconstruct_relay_work(result["events"])["relay_transfers"] == 1
+
+
+def test_phase4_validation_rejects_tampered_sidecars_and_keeps_unavailable_facts_typed(tmp_path):
+    """Trace hashes and unavailable values remain evidence, never inferred measurements."""
+    from bp_registry.canonical.tracing import TracePlan, TraceSink
+    from bp_registry.canonical.verification import validate_phase4_shot
+    from bp_registry.ledger import CanonicalEventWriter
+
+    sink = TraceSink(TracePlan(root=tmp_path, max_records=2, max_bytes=500))
+    sink.observe(kind="relay_history", payload={"leg": 1, "history": "reset"})
+    link = sink.finish().ledger_link()
+    assert link is not None
+    path = tmp_path / "tampered.jsonl"
+    with CanonicalEventWriter(path, structural_event_version=4) as ledger:
+        ledger.begin(run_id="phase4-trace", shot_id=0, sample_seed_identity="sample", schema_version=4)
+        ledger.event(run_id="phase4-trace", shot_id=0, kind="missingness", data={"field": "native_iterations", "value": None, "reason": "native adapter does not expose it"})
+        ledger.event(run_id="phase4-trace", shot_id=0, kind="trace_link", data={"trace_kind": "relay_history"}, sidecar=link)
+        ledger.terminal(run_id="phase4-trace", shot_id=0, termination="completed", data={"work_vector": {"check_to_variable_updates": 0, "variable_to_check_updates": 0, "belief_assemblies": 0, "residual_priority_evaluations": 0, "bp_calls": 0, "candidate_checks": 0, "intervention_actions": 0, "branch_expansions": 0, "branch_prunes": 0, "relay_transfers": 0, "fallback_calls": 0}})
+    sidecar = tmp_path / link["path"]
+    sidecar.write_text("{}", encoding="utf-8")
+    with pytest.raises(ValueError, match="SHA-256|sidecar"):
+        validate_phase4_shot(path, run_id="phase4-trace", shot_id=0, trace_root=tmp_path)
