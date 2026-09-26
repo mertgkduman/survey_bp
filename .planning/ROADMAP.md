@@ -304,6 +304,11 @@ Plans:
 
 - [ ] 04-14-PLAN.md — Executable notebook and evidence-backed research guide
 
+**Review update (2026-09-26):** [Current gate and implementation review](../docs/phase4-plan-review-and-next-design.md)
+records the isolated ordinary-memory correction, factorial order supplement,
+trace gaps and pending evidence. Earlier plan summaries do not close these
+follow-up gates. Phase 4 remains executing.
+
 ### Phase 5: Guided and Perturbative BP Interventions
 
 **Goal:** A researcher can run and inspect guided fixation, impulse attempts, and perturbative BP interventions against the original decoding problem.
@@ -320,6 +325,12 @@ Plans:
 
 **Research focus:** Original BPGD/impulse code discovery; perturbation semantics; lifting; random-stream and cache invalidation rules.
 **Plans:** TBD
+
+**Preparatory design (2026-09-26):** [Intervention contracts](phases/05-guided-and-perturbative-bp-interventions/05-DESIGN.md)
+and [bounded next tasks](phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md)
+are available, with independently checked finite shortening/lifting fixtures.
+This is design work ahead of the Phase 4 dependency; Phase 5 execution and
+its requirements remain pending.
 
 ### Phase 6: Beam Search, Ensembles, and Candidate Selection
 

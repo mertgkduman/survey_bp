@@ -61,6 +61,14 @@
 - [x] **MEM-04**: A researcher can enable a source-defined iteration-memory policy with explicit retained state, lifetime, and update equation.
 - [x] **MEM-05**: A researcher can enable disordered memory with a declared sampling distribution, seed stream, update equation, and inheritance/reset behavior.
 
+**Coverage correction, 2026-09-26:** The checkmarks above reflect earlier
+plan-level completion and are not a current Phase 4 release verdict. The
+ordinary-memory public dispatch dropped bindings; its correction is verified
+in isolated commit fc214ef and awaits integration. Local schedules, additional
+lifetimes/history retention and ordinary disordered assignment retain explicit
+execution gaps. Reassess MEM-01–MEM-05 at the final Phase 4 gate. See the
+[current plan review](../docs/phase4-plan-review-and-next-design.md).
+
 ### Named BP modifications
 
 - [x] **MOD-01**: A researcher can execute a source-linked canonical Relay-BP composition with explicit memory, ensemble/relay legs, transferred state, stopping, and candidate selection, and run the pinned original implementation as a reference in eligible regimes.

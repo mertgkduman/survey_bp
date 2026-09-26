@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-09-26",
+  "status": "preparatory_source_review_not_execution_qualification",
+  "sources": {
+    "bpgd": {
+      "paper_revision": "arXiv:2312.10950v2",
+      "url": "https://arxiv.org/html/2312.10950v2",
+      "anchors": ["Section 4.3", "Algorithm 1", "Equation 36"],
+      "proposed_variant": "algorithm1_finite_bias_explicit_zero_and_round_rules",
+      "zero_discrepancy": "Algorithm 1 uses nonnegative -> positive prior; Equation 36 uses strictly positive -> positive prior.",
+      "round_discrepancy": "Algorithm 1 returns after the final decimation without another explicit BP call; reconcile with prose and native reference before source qualification.",
+      "state_continuation": "Inferred from single initialization and continuing rounds; native confirmation unresolved.",
+      "native_identity_status": "unverified",
+      "native_absence_claimed": false
+    },
+    "impulse": {
+      "paper_revision": "arXiv:2606.18240v1",
+      "url": "https://arxiv.org/html/2606.18240v1",
+      "anchors": ["Section IV", "Algorithm 1", "first-convergence alternative"],
+      "proposed_realization": "certified_structural_shortening_and_original_validation",
+      "realization_limit": "Independent GF(2) derivation; source numerical trajectory equivalence not established.",
+      "native_identity_status": "unverified",
+      "native_absence_claimed": false
+    },
+    "syndrome_flip": {"paper_revision": null, "status": "source_variant_unresolved", "named_source_claim_admitted": false},
+    "sign_flip": {"paper_revision": null, "status": "source_variant_unresolved", "named_source_claim_admitted": false}
+  },
+  "claim_limit": "Versioned source-status snapshot; this record does not establish native availability, source-faithful execution or reproduction."
+}

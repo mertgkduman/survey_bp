@@ -1,0 +1,91 @@
+{
+  "claim_limit": "Finite algebra design fixtures only; no BP implementation, source trajectory equivalence or simulation performance claim.",
+  "constructed_cases": {
+    "all_fixed_contradiction": {
+      "H": [
+        [
+          1
+        ]
+      ],
+      "fixed_value": 0,
+      "residual_empty_check": 1,
+      "s": [
+        1
+      ],
+      "satisfiable": false
+    },
+    "all_fixed_valid": {
+      "H": [
+        [
+          1
+        ]
+      ],
+      "fixed_value": 1,
+      "residual_empty_check": 0,
+      "s": [
+        1
+      ],
+      "satisfiable": true
+    },
+    "finite_prior_counterexample": {
+      "claim_scope": "Local-field counterexample; does not simulate a complete decoder.",
+      "finite_prior_sign_can_change": true,
+      "incoming_messages": [
+        -25,
+        -25
+      ],
+      "posterior": -25,
+      "prior": 25
+    },
+    "syndrome_flip": {
+      "H": [
+        [
+          1,
+          1
+        ]
+      ],
+      "certificate_t": [
+        1,
+        0
+      ],
+      "certified_lift": [
+        1,
+        0
+      ],
+      "certified_original_valid": true,
+      "delta": [
+        1
+      ],
+      "original_s": [
+        1
+      ],
+      "original_valid_without_certificate": false,
+      "working_candidate": [
+        0,
+        0
+      ],
+      "working_valid": true
+    }
+  },
+  "schema_version": 1,
+  "shortening": {
+    "all_fixed_candidate_cases": 2048,
+    "binary_matrices": 64,
+    "candidate_cases": 16384,
+    "checks": [
+      "working_original_equivalence",
+      "lift_injective",
+      "lift_covers_fixed_compatible_vectors"
+    ],
+    "fixed_subsets_per_syndrome": 8,
+    "matrix_shape": [
+      2,
+      3
+    ],
+    "ordered_case_digest_sha256": "360f564cb419cc8d49d7a4996e9438b2e1e6143eeeda6869332fe96fa7739659",
+    "original_valid_cases": 4096,
+    "syndromes_per_matrix": 4
+  },
+  "status": "passed",
+  "validator_byte_sha256": "8d0a7b5a444c13c2bf9f95f316f61c6bdfc7ee244b9670ef32971f77200cf25a"
+}
