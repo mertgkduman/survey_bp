@@ -152,6 +152,13 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
             "bindings": [binding.model_dump(mode="json") for binding in manifest.memory.bindings],
             "compatibility": {"admitted": True, "reason": None},
         }
+        if manifest.relay is None:
+            report["memory"]["execution"] = {
+                "compact_contract_version": 5,
+                "mode": "ordered_single_attempt_flooding",
+                "commit_boundary": "complete_double_buffered_sweep",
+                "operand_order": ["prior", "belief_or_posterior", "v2c"],
+            }
         if manifest.relay is not None:
             tuning = manifest.relay.memory_tuning
             report["relay"] = {
@@ -198,6 +205,11 @@ def _canonical_kernel_manifest(manifest: CanonicalExperimentV2 | CanonicalExperi
         # historical null-bearing compact representation exactly.
         "policies": manifest.policies.model_dump(mode="json"),
     }
+    if isinstance(manifest, CanonicalExperimentV4) and manifest.relay is None:
+        compact.update({
+            "schema_version": 5,
+            "memory": manifest.memory.model_dump(mode="json"),
+        })
     if isinstance(manifest, CanonicalExperimentV4) and manifest.relay is not None:
         compact.update({
             "schema_version": 4,

@@ -8,7 +8,7 @@ CLI one reuse boundary.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from hashlib import sha256
 import json
 from pathlib import Path
@@ -20,6 +20,8 @@ from .. import evaluator
 from ..ledger import CANONICAL_RELAY_LEDGER_VERSION, read_canonical_events
 from .budgets import BudgetLimit, BudgetTree, BudgetView, Measurement, QualifiedIteration, ScheduleTerminalEvidence, WorkVector
 from .kernel import BinarySpaKernel
+from .contracts import MemoryCompositionSpec
+from .memory_execution import MemoryFloodingSchedule
 from .group_shuffled import HsuGroupSchedule
 from .numerics import MIN_SUM_CPU_F64
 from .lineage import stable_lineage_id
@@ -581,23 +583,37 @@ def _expected_attempt(context: PublicShotContext) -> dict[str, Any]:
         kernel = BinarySpaKernel()
     else:
         raise CanonicalStructuralVerificationError(f"unsupported public update rule {context.update_kind!r}")
-    schedule = FloodingSchedule(table, kernel=kernel, profile=kernel.profile)
+    is_memory = context.compact_manifest.get("schema_version") == 5
+    if is_memory:
+        schedule = MemoryFloodingSchedule(table, kernel=kernel, memory=MemoryCompositionSpec.model_validate(context.compact_manifest["memory"]))
+        state = schedule.initialize(context.error_rate)
+    else:
+        schedule = FloodingSchedule(table, kernel=kernel, profile=kernel.profile)
+
+    def memory_evidence() -> dict[str, Any]:
+        return {"memory_execution": schedule.evidence()} if is_memory else {}
+
     if table.edge_count == 0:
         candidate = kernel.candidate_from_beliefs(np.full(code.n, kernel.prior(context.error_rate), dtype=np.float64))
         converged = bool(np.array_equal((code.hz.astype(np.int64) @ candidate.astype(np.int64)) % 2, context.syndrome))
-        return {"termination": "completed" if converged else "max_iterations", "work_vector": work.as_evidence(structural_event_version=2), "iterations": 0, "candidate": candidate, "admitted": True}
-    state = schedule.initialize(context.error_rate)
+        return {"termination": "completed" if converged else "max_iterations", "work_vector": work.as_evidence(structural_event_version=2), "iterations": 0, "candidate": candidate, "admitted": True, **memory_evidence()}
+    if not is_memory:
+        state = schedule.initialize(context.error_rate)
+    last_candidate = None
     for iteration in range(1, context.max_iterations + 1):
         delta = WorkVector.from_flooding_counts(edge_count=table.edge_count, variable_count=table.variable_count)
         denial = _budget_denial(limits, work, delta)
         if denial is not None:
-            return {"termination": "count_budget_exhausted", "work_vector": work.as_evidence(structural_event_version=2), "iterations": iteration - 1, "budget_termination": denial, "admitted": True}
+            return {"termination": "count_budget_exhausted", "work_vector": work.as_evidence(structural_event_version=2), "iterations": iteration - 1, "budget_termination": denial, "admitted": True, "diagnostic_candidate": last_candidate, **memory_evidence()}
         proposed = work + delta
-        sweep = schedule.sweep(state, np.asarray(context.syndrome, dtype=np.uint8), error_rate=context.error_rate)
+        sweep = schedule.sweep(state, np.asarray(context.syndrome, dtype=np.uint8), error_rate=context.error_rate, **({"source_iteration": iteration - 1} if is_memory else {}))
+        if is_memory:
+            schedule.commit(sweep)
+        last_candidate = sweep.candidate.tolist()
         state, work = sweep.new_v2c, proposed
         if np.array_equal((code.hz.astype(np.int64) @ sweep.candidate.astype(np.int64)) % 2, context.syndrome):
-            return {"termination": "completed", "work_vector": work.as_evidence(structural_event_version=2), "iterations": iteration, "candidate": sweep.candidate, "admitted": True}
-    return {"termination": "max_iterations", "work_vector": work.as_evidence(structural_event_version=2), "iterations": context.max_iterations, "admitted": True}
+            return {"termination": "completed", "work_vector": work.as_evidence(structural_event_version=2), "iterations": iteration, "candidate": sweep.candidate, "admitted": True, **memory_evidence()}
+    return {"termination": "max_iterations", "work_vector": work.as_evidence(structural_event_version=2), "iterations": context.max_iterations, "admitted": True, "diagnostic_candidate": last_candidate, **memory_evidence()}
 
 
 def _expect_equal(field: str, actual: Any, expected: Any) -> None:
@@ -758,6 +774,16 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
     term = terminal.get("termination")
     lineage = _expected_attempt_lineage(context)
     if term == "numerical_failure":
+        failed_memory = context.compact_manifest.get("schema_version") == 5
+        if failed_memory:
+            runtime_fields |= {"iterations", "memory_execution"}
+            count = terminal_data.get("iterations")
+            if type(count) is not int or not 0 <= count < context.max_iterations:
+                raise CanonicalStructuralVerificationError("numerical failure has an invalid memory commit count")
+            prefix = _expected_attempt(replace(context, max_iterations=count))
+            if prefix["termination"] != "max_iterations":
+                raise CanonicalStructuralVerificationError("numerical failure follows a reconstructed terminal prefix")
+            _expect_equal("memory execution", terminal_data.get("memory_execution"), prefix["memory_execution"])
         _, records = _validate_event_envelopes(stream, context, ["shot_begin", "attempt", "missingness", "work", "termination"])
         _exact_data(records["shot_begin"], common)
         attempt = _exact_data(records["attempt"], common | {"scope", "attempt_lineage_id", "max_iterations"})
@@ -775,15 +801,23 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
             raise CanonicalStructuralVerificationError("numerical failure requires a typed diagnostic")
         if data["selection_status"] != "unavailable_due_to_numerical_failure" or data["verification_status"] != "not_independently_reproduced_numerical_failure" or data["outcome"] is not None:
             raise CanonicalStructuralVerificationError("numerical failure terminal qualification is invalid")
-        expected_work = WorkVector(bp_calls=1).as_evidence(structural_event_version=2)
+        expected_work = prefix["work_vector"] if failed_memory else WorkVector(bp_calls=1).as_evidence(structural_event_version=2)
         _expect_equal("work_vector", work_data["work_vector"], expected_work)
         _expect_equal("work_vector", data["work_vector"], expected_work)
-        _expect_equal("qualified_iterations", work_data["qualified_iterations"], {"count": 0, "schedule": "flooding", "atomic_unit": "complete_double_buffered_sweep"})
+        _expect_equal("qualified_iterations", work_data["qualified_iterations"], {"count": count if failed_memory else 0, "schedule": "flooding", "atomic_unit": "complete_double_buffered_sweep"})
         return terminal
     expected = _expected_attempt(context)
     if not expected:
         return terminals[0]
     _expect_equal("termination", terminal.get("termination"), expected["termination"])
+    memory_fields = frozenset({"memory_execution"}) if "memory_execution" in expected else frozenset()
+    if memory_fields:
+        _expect_equal("memory execution", terminal_data.get("memory_execution"), expected["memory_execution"])
+    runtime_fields |= memory_fields
+    if context.compact_manifest.get("schema_version") == 5 and expected["termination"] in {"count_budget_exhausted", "max_iterations"}:
+        runtime_fields |= {"diagnostic_candidate", "diagnostic_candidate_origin"}
+        _expect_equal("diagnostic candidate", terminal_data.get("diagnostic_candidate"), expected.get("diagnostic_candidate"))
+        _expect_equal("diagnostic candidate origin", terminal_data.get("diagnostic_candidate_origin"), "last_committed_sweep" if expected.get("diagnostic_candidate") is not None else None)
     if term == "completed":
         kinds = ["shot_begin", "attempt", "runtime", "candidate", "selection", "work", "termination"]
     elif expected["termination"] == "count_budget_exhausted":

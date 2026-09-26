@@ -628,6 +628,13 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
             )
             if not memory_decision.admitted:
                 raise ValueError(memory_decision.reason)
+            if manifest.relay is None:
+                from .canonical.memory_execution import validate_single_attempt_memory
+
+                validate_single_attempt_memory(
+                    manifest.memory, schedule=manifest.policies.schedule.kind,
+                    update=manifest.policies.update, max_iterations=manifest.budgets.attempt.max_iterations,
+                )
         if type(manifest) is CanonicalExperimentV2 and manifest.policies.update.kind != "binary_spa":
             raise ValueError("CanonicalExperimentV2 preserves only historical binary_spa semantics")
         if isinstance(manifest, CanonicalExperimentV3):

@@ -20,6 +20,7 @@ from .contracts import (
     CanonicalManifestV2,
     CanonicalManifestV3,
     CanonicalManifestV4,
+    CanonicalManifestV5,
     Hook,
     PolicyBinding,
     PolicyDecision,
@@ -42,6 +43,7 @@ from .schedules import (
 )
 from .verification import PublicShotContext, validate_canonical_shot
 from .relay import RelayController
+from .memory_execution import MemoryFloodingSchedule, validate_single_attempt_memory
 
 
 class CanonicalConflictError(ValueError):
@@ -211,7 +213,7 @@ class CanonicalLocalStepExecutor:
             raise
 
 
-def _kernel_for_manifest(manifest: CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4, edge_table: EdgeTable | None = None) -> BinarySpaKernel:
+def _kernel_for_manifest(manifest: CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4 | CanonicalManifestV5, edge_table: EdgeTable | None = None) -> BinarySpaKernel:
     """Resolve only the closed update registry; policies never receive hidden truth."""
     update = manifest.policies.update.kind
     if update == "min_sum":
@@ -220,7 +222,7 @@ def _kernel_for_manifest(manifest: CanonicalManifestV2 | CanonicalManifestV3 | C
         if edge_table is None:
             raise ValueError("normalized_min_sum requires a resolved immutable EdgeTable assignment")
         assignment = manifest.policies.update.parameter_assignment
-        if assignment is None and isinstance(manifest, CanonicalManifestV3):
+        if assignment is None and isinstance(manifest, (CanonicalManifestV3, CanonicalManifestV5)):
             assignment, _ = resolve_generated_configuration_assignment(
                 manifest.policies.update.model_dump(mode="json"), manifest.model_dump(mode="json"),
                 graph_sha256=edge_table.graph_sha256, check_count=edge_table.check_count,
@@ -244,7 +246,7 @@ def _kernel_for_manifest(manifest: CanonicalManifestV2 | CanonicalManifestV3 | C
         if edge_table is None:
             raise ValueError("offset_min_sum requires a resolved immutable EdgeTable assignment")
         assignment = manifest.policies.update.parameter_assignment
-        if assignment is None and isinstance(manifest, CanonicalManifestV3):
+        if assignment is None and isinstance(manifest, (CanonicalManifestV3, CanonicalManifestV5)):
             assignment, _ = resolve_generated_configuration_assignment(
                 manifest.policies.update.model_dump(mode="json"), manifest.model_dump(mode="json"),
                 graph_sha256=edge_table.graph_sha256, check_count=edge_table.check_count,
@@ -313,7 +315,7 @@ class AtomicFloodingExecutor:
             def compute() -> np.ndarray:
                 rule = getattr(self.schedule.kernel, "update_rule", None)
                 assignment = getattr(rule, "alpha", None)
-                if getattr(assignment, "shape", None) == "source_iteration":
+                if isinstance(self.schedule, MemoryFloodingSchedule) or getattr(assignment, "shape", None) == "source_iteration":
                     sweep = self.schedule.sweep(
                         state, syndrome, error_rate=error_rate, source_iteration=iteration - 1,
                     )
@@ -336,6 +338,8 @@ class AtomicFloodingExecutor:
                 raise
             if not result.admitted:
                 return AtomicFloodingResult(state, iteration - 1, result.termination, last_sweep)
+            if isinstance(self.schedule, MemoryFloodingSchedule):
+                self.schedule.commit(completed[-1])
             progress = result.progress
             last_sweep = completed[-1]
             if result.converged:
@@ -377,7 +381,7 @@ def _termination_evidence(termination: BudgetTermination) -> dict[str, Any]:
     }
 
 
-def _identity(manifest: CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4, observation: DecoderObservation) -> str:
+def _identity(manifest: CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4 | CanonicalManifestV5, observation: DecoderObservation) -> str:
     payload = {"manifest": manifest.model_dump(mode="json"), "check_type": observation.check_type,
                "syndrome": np.asarray(observation.syndrome, dtype=np.uint8).tolist()}
     return sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
@@ -517,6 +521,8 @@ def run_canonical_shot(manifest: CanonicalManifestV2 | CanonicalManifestV3 | dic
         raise ValueError("canonical tracer accepts a nonnegative Z-check shot")
     validated = code.validate()
     resolved = validate_composition(parsed.policies)
+    if isinstance(parsed, (CanonicalManifestV4, CanonicalManifestV5)):
+        raise ValueError("memory and Relay require run_canonical_structural_shot")
     runtime = PolicyRuntime(resolved)
     runtime.traverse_lifecycle()
     identity = _identity(parsed, observation)
@@ -729,7 +735,7 @@ def _run_relay_structural_shot(
 
 
 def run_canonical_structural_shot(
-    manifest: CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4 | dict[str, object] | str, *, code: CssCode,
+    manifest: CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4 | CanonicalManifestV5 | dict[str, object] | str, *, code: CssCode,
     observation: DecoderObservation, hidden_truth: HiddenTruth, shot_id: int,
     ledger_path: str | Path, sample_seed_identity: str, context: Mapping[str, Any],
     execution_controls: Mapping[str, Any] | None = None,
@@ -748,6 +754,11 @@ def run_canonical_structural_shot(
         raise ValueError("canonical tracer accepts a nonnegative Z-check shot")
     validated = code.validate()
     resolved = validate_composition(parsed.policies)
+    if isinstance(parsed, CanonicalManifestV5):
+        validate_single_attempt_memory(
+            parsed.memory, schedule=parsed.policies.schedule.kind,
+            update=parsed.policies.update, max_iterations=parsed.max_iterations,
+        )
     PolicyRuntime(resolved).traverse_lifecycle()
     budgets = _budget_tree(execution_controls)
     identity = verification_context.execution_identity if verification_context is not None else _identity(parsed, observation)
@@ -763,6 +774,7 @@ def run_canonical_structural_shot(
     working = WorkingProblem(working_id.value, original, LineageEdge("identity", original_id, working_id))
     local_progress: ScheduleProgress | None = None
     local_schedule: Any | None = None
+    memory_schedule: MemoryFloodingSchedule | None = None
     randomized_plan: RandomizedTraversalPlan | None = None
     local_random_state: Any | None = None
     setup_before_profile_ns = 0
@@ -797,6 +809,11 @@ def run_canonical_structural_shot(
                 profile_evidence: dict[str, object] | None = None
 
                 def terminal_with_work(termination: str, **data: Any) -> None:
+                    if isinstance(parsed, CanonicalManifestV5) and termination in {"count_budget_exhausted", "max_iterations"}:
+                        # A diagnostic is decoder-visible output from the last
+                        # committed sweep. It is not selected as a recovery.
+                        data.setdefault("diagnostic_candidate", None)
+                        data["diagnostic_candidate_origin"] = "last_committed_sweep" if data["diagnostic_candidate"] is not None else None
                     work = budgets.summary("attempt")
                     is_local = parsed.policies.schedule.kind != "flooding"
                     setup_elapsed_ns = setup_before_profile_ns + setup_inside_profile_ns
@@ -868,6 +885,7 @@ def run_canonical_structural_shot(
                             "decode_runtime": decode_runtime.as_evidence(),
                             **({"schedule_terminal": schedule_terminal, "schedule_evidence": schedule_evidence} if is_local else {}),
                             **({"profile": profile_evidence} if profile_evidence is not None else {}),
+                            **({"memory_execution": memory_schedule.evidence()} if memory_schedule is not None else {}),
                         },
                     )
 
@@ -885,7 +903,7 @@ def run_canonical_structural_shot(
                 attempt_reservation.commit_once()
                 try:
                     def admitted_attempt() -> tuple[np.ndarray | None, int, bool, BudgetTermination | None]:
-                        nonlocal local_progress, local_schedule, local_random_state, setup_inside_profile_ns
+                        nonlocal local_progress, local_schedule, local_random_state, setup_inside_profile_ns, memory_schedule
                         setup_started_ns = time.perf_counter_ns()
                         edge_table = EdgeTable.from_check_matrix(validated.hz)
                         kernel = _kernel_for_manifest(parsed, edge_table)
@@ -957,8 +975,13 @@ def run_canonical_structural_shot(
                                         rng_state=local_progress.rng_state,
                                     )
                             return candidate, local_progress.local_steps, False, None
-                        schedule = FloodingSchedule(edge_table, kernel=kernel, profile=kernel.profile)
-                        initialized = schedule.initialize(parsed.error_rate) if edge_table.edge_count else None
+                        if isinstance(parsed, CanonicalManifestV5):
+                            memory_schedule = MemoryFloodingSchedule(edge_table, kernel=kernel, memory=parsed.memory)
+                            schedule = memory_schedule
+                            initialized = schedule.initialize(parsed.error_rate)
+                        else:
+                            schedule = FloodingSchedule(edge_table, kernel=kernel, profile=kernel.profile)
+                            initialized = schedule.initialize(parsed.error_rate) if edge_table.edge_count else None
                         setup_inside_profile_ns = time.perf_counter_ns() - setup_started_ns
                         if edge_table.edge_count == 0:
                             candidate = kernel.candidate_from_beliefs(
@@ -1000,6 +1023,7 @@ def run_canonical_structural_shot(
                         "numerical_failure", numerical_failure=str(error),
                         selection_status="unavailable_due_to_numerical_failure", outcome=None,
                         verification_status="not_independently_reproduced_numerical_failure",
+                        **({"iterations": 0 if memory_schedule is None else memory_schedule.evidence()["committed_iterations"]} if isinstance(parsed, CanonicalManifestV5) else {}),
                     )
                     return CanonicalExecutionResult(parsed.run_id, shot_id, "numerical_failure", None, None)
                 if budget_termination is not None:
@@ -1007,12 +1031,14 @@ def run_canonical_structural_shot(
                         budget_termination.reason, iterations=iterations,
                         budget_termination=_termination_evidence(budget_termination),
                         selection_status="unavailable_due_to_budget", outcome=None,
+                        **({"diagnostic_candidate": None if candidate is None else candidate.tolist()} if isinstance(parsed, CanonicalManifestV5) else {}),
                     )
                     return CanonicalExecutionResult(parsed.run_id, shot_id, budget_termination.reason, None, None)
                 if candidate is None or not converged:
                     terminal_with_work(
                         "max_iterations", iterations=iterations, converged=False,
                         selection_status="unavailable_due_to_stopping", outcome=None,
+                        **({"diagnostic_candidate": None if candidate is None else candidate.tolist()} if isinstance(parsed, CanonicalManifestV5) else {}),
                     )
                     return CanonicalExecutionResult(parsed.run_id, shot_id, "max_iterations", None, None)
                 candidate = np.array(candidate, dtype=np.uint8, copy=True)

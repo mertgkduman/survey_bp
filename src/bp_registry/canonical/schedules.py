@@ -129,7 +129,12 @@ class FloodingSchedule:
         """Create the initial variable-to-check snapshot from the declared prior."""
         return np.full(self.edge_table.edge_count, self.kernel.prior(error_rate), dtype=np.float64)
 
-    def sweep(self, old_v2c: np.ndarray, syndrome: np.ndarray, *, error_rate: float, source_iteration: int = 0) -> FloodingSweep:
+    def sweep(
+        self, old_v2c: np.ndarray, syndrome: np.ndarray, *, error_rate: float,
+        source_iteration: int = 0, prior_llrs: np.ndarray | None = None,
+        transform_beliefs: Callable[[np.ndarray, np.ndarray], np.ndarray] | None = None,
+        transform_v2c: Callable[[np.ndarray], np.ndarray] | None = None,
+    ) -> FloodingSweep:
         """Build a finite full sweep without mutating the supplied old snapshot."""
         old = finite_saturate(old_v2c, boundary="flooding_old_v2c", profile=self.profile)
         if old.ndim != 1 or old.shape != (self.edge_table.edge_count,):
@@ -142,7 +147,9 @@ class FloodingSchedule:
         ):
             raise ValueError("syndrome must be a binary integer vector matching the check count")
         old_snapshot = np.array(old, dtype=np.float64, copy=True)
-        prior = self.kernel.prior(error_rate)
+        prior = self.kernel.prior(error_rate) if prior_llrs is None else prior_llrs
+        if prior_llrs is not None and prior_llrs.shape != (self.edge_table.variable_count,):
+            raise ValueError("prior_llrs must have one value per variable")
         c2v = np.empty(self.edge_table.edge_count, dtype=np.float64)
         for check, edge_indices in enumerate(self._check_edges):
             for edge_index in edge_indices:
@@ -154,11 +161,15 @@ class FloodingSchedule:
         c2v = finite_saturate(c2v, boundary="flooding_complete_c2v", profile=self.profile)
         beliefs = self.kernel.assemble_beliefs(self.edge_table.variable_count, self._edge_variables, c2v, prior)
         beliefs = finite_saturate(beliefs, boundary="flooding_belief_assembly", profile=self.profile)
+        if transform_beliefs is not None:
+            beliefs = finite_saturate(transform_beliefs(beliefs, c2v), boundary="flooding_memory_beliefs", profile=self.profile)
         candidate = self.kernel.candidate_from_beliefs(beliefs)
         new_v2c = np.empty(self.edge_table.edge_count, dtype=np.float64)
         for edge_index, variable in enumerate(self._edge_variables):
             new_v2c[edge_index] = self.kernel.variable_message(float(beliefs[variable]), float(c2v[edge_index]))
         new_v2c = finite_saturate(new_v2c, boundary="flooding_complete_new_v2c", profile=self.profile)
+        if transform_v2c is not None:
+            new_v2c = finite_saturate(transform_v2c(new_v2c), boundary="flooding_memory_v2c", profile=self.profile)
         for array in (old_snapshot, c2v, beliefs, candidate, new_v2c):
             array.setflags(write=False)
         return FloodingSweep(

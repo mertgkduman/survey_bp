@@ -463,16 +463,19 @@ class MemoryBindingSpec(_Strict):
             "v2c_damping": ("v2c", {"gamma"}),
             "pdbp_field_mix": ("belief", {"gamma"}),
             "pdprime_delta_mix": ("belief", {"gamma"}),
-            "posterior_momentum": ("posterior", {"beta"}),
+            "posterior_momentum": ("posterior", {"alpha", "gamma"}),
         }
         target, parameter_names = expected[self.kind]
         if self.target != target:
             raise ValueError(f"{self.kind} may target only {target}")
         if set(self.parameters) != parameter_names:
             raise ValueError(f"{self.kind} requires exactly {sorted(parameter_names)!r} parameters")
-        coefficient = next(iter(self.parameters.values()))
-        if not 0.0 <= coefficient <= 1.0:
+        if any(not 0.0 <= coefficient <= 1.0 for coefficient in self.parameters.values()):
             raise ValueError("memory coefficients must be in [0, 1]")
+        if self.kind in {"pdbp_field_mix", "pdprime_delta_mix", "posterior_momentum"} and self.parameters["gamma"] == 1.0:
+            raise ValueError(f"{self.kind} gamma must be in [0, 1)")
+        if self.kind == "posterior_momentum" and self.parameters["alpha"] == 0.0:
+            raise ValueError("posterior_momentum alpha must be in (0, 1]")
         if self.retain_history and self.refresh_boundary not in {MemoryRefreshBoundary.ATTEMPT_START, MemoryRefreshBoundary.LEG_START}:
             raise ValueError("retained memory history requires an attempt_start or leg_start refresh boundary")
         return self
