@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "status": "frozen_before_sampling",
+  "purpose": "Estimate finite lower-noise BB-144 all-shot decoder failure rates for four matched controlled CSS arms and report syndrome validity crossed with logical projection for every final decoder proposal.",
+  "code_id": "gross-bb-144",
+  "author_source_pin": "relay-v0.2.2@14cb31a18f9b9d7d099791b793e35b8a2951f8f3",
+  "active_core_commits": ["6e6ad03", "660049a", "1f8f1c2"],
+  "error_rates": [0.06, 0.05],
+  "arms": ["canonical_baseline", "canonical_relay", "source_baseline", "source_relay"],
+  "controls": {
+    "first_leg_gamma": 0.125,
+    "later_leg_center": 0.25,
+    "later_leg_width": 1.25,
+    "relay_total_leg_limit": 31,
+    "baseline_total_leg_limit": 1,
+    "first_leg_iteration_limit": 80,
+    "later_leg_iteration_limit": 60,
+    "solution_limit": 1,
+    "work_profile": "full31",
+    "source_numerical_profile": "cpu-float64-min-sum-v1",
+    "canonical_numerical_profile": "cpu-float64-spa-v1"
+  },
+  "sampling": {
+    "channel": "independent_x_only_code_capacity",
+    "physical_sample_namespace_pattern": "phase4-low-noise-ler-v1-bb144-matched-p{rate}",
+    "matched_across_arms": true,
+    "disjoint_from_benchmark_calibration_evaluation": true,
+    "shot_ids": "prefix 0..N-1 at each rate, identical across all four arms"
+  },
+  "reporting_axes": {
+    "syndrome": ["valid", "invalid"],
+    "logical_projection": ["correct", "wrong"],
+    "cells": ["valid_correct", "valid_wrong_logical", "invalid_correct", "invalid_wrong_logical"],
+    "missing_proposal": "no_proposal counted as primary failure but reported separately",
+    "invalid_logical_note": "logical projection against pinned LZ is computed for diagnostics even when residual syndrome is nonzero; it is not a code-space logical coset"
+  },
+  "precision": {
+    "confidence": 0.95,
+    "interval_method": "two-sided Clopper-Pearson, Bonferroni alpha spending across six prespecified looks and two precision metrics for each arm/rate; separate simultaneous cell intervals across five categories",
+    "looks": [256, 512, 1024, 2048, 4096, 8192],
+    "minimum_failures": 50,
+    "maximum_relative_half_width": 0.35,
+    "no_recovery_policy": "count_as_failure",
+    "primary_failure": "any shot without a selected syndrome-valid and logically correct recovery; four diagnostic proposal cells and no-selection count remain separate",
+    "stop_when": "all four arms at one rate meet the failure-count and relative-width criteria for both all-shot decoder failure and selected valid-syndrome logical error at the same look",
+    "cap_rule": "if precision is not met by 8192 matched shots or the wall cap, retain inconclusive estimates and intervals; never extend silently",
+    "cross_arm_claim": "no statistical difference or ranking test is prespecified"
+  },
+  "public_shot_boundary_seconds": 900,
+  "max_campaign_wall_seconds": 432000,
+  "concurrency": {"workers": 1, "omp_num_threads": 1, "separate_slurm_job_from_active_v4_benchmark": true},
+  "evidence_relation": "uncalibrated_controlled_css_pilot",
+  "claim_limit": "No source-faithful curve reproduction, publication-level assessment, quaternary/circuit claim, or universal decoder ranking."
+}
