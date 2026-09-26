@@ -5,10 +5,10 @@ current_phase: 04
 current_phase_name: Memory Policies and Relay-BP
 current_plan: 12
 status: executing
-stopped_at: Completed 04-11-PLAN.md
-last_updated: "2026-09-25T16:12:40.296Z"
-last_activity: 2026-09-24
-last_activity_desc: Phase 04 execution started
+stopped_at: Calibration active; ordinary-memory correction verified in isolated commit fc214ef
+last_updated: "2026-09-26T20:12:08Z"
+last_activity: 2026-09-26
+last_activity_desc: Resumed Phase 04 coding; verified ordinary-memory execution correction in isolated worktree
 state_head: 71207fdad1f5f93b280f661e56d147b99a813a63
 progress:
   total_phases: 14
@@ -33,9 +33,9 @@ Plan: 12 of 15
 Total Phases: 14
 Current Plan: 12
 Total Plans in Phase: 15
-Status: Ready to execute
-Last activity: 2026-09-24 — Phase 04 execution started
-Last Activity Description: Phase 04 execution started
+Status: Executing calibration; continuing independent coding in an isolated worktree
+Last activity: 2026-09-26 — Ordinary-memory execution correction verified and committed as fc214ef
+Last Activity Description: Resumed coding while preserving the active calibration source
 
 Progress: [██░░░░░░░░] 21% [██░░░░░░░░]
 
@@ -140,6 +140,7 @@ None outside the roadmap.
 
 ### Blockers/Concerns
 
+- Phase 4 ordinary-memory V4 projection discarded memory before execution. Isolated commit `fc214ef` repairs flooding execution and replay; keep it separate from the live calibration source. Local memory/lifecycle/assignment and factorial trace work remain. See [coding handoff](phases/04-memory-policies-and-relay-bp/04-CODING-RESUME-HANDOFF.md).
 - Phase 3 passed goal verification with 17/17 plans and all eight requirements complete. The Hsu source-defined group schedule has a retained, independently verified two-shot CSS pilot. The Moradi artifact remains unavailable and is not conflated with the Hsu policy.
 
 Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 security threats closed). Remaining research concerns for later phases:
@@ -164,7 +165,7 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Last session: 2026-09-25T16:12:37.127Z
-Stopped at: Completed 04-11-PLAN.md
-Resume file: None
-Next command: $gsd-discuss-phase 4
+Last session: 2026-09-26T20:12:08Z
+Stopped at: Calibration active; ordinary-memory correction verified in isolated commit fc214ef
+Resume file: .planning/phases/04-memory-policies-and-relay-bp/04-CODING-RESUME-HANDOFF.md
+Next command: $gsd-execute-phase 4
