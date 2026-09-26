@@ -1,0 +1,124 @@
+{
+  "agreement_report_byte_sha256": "28bd1429206501dc4fe6d259d5870f49228ff36f3d53941e7a3df1bd4910057c",
+  "agreement_result_digest": "37394b952124cae8e36b0d7b5c1045b4c8782759d598f7e5da83eb7d02d18dbe",
+  "author_source_pin": "relay-v0.2.2@14cb31a18f9b9d7d099791b793e35b8a2951f8f3",
+  "claim_limit": "Recorded paired pipeline timing only; unequal boundaries and fixed canonical-first order do not isolate decoder-kernel or programming-language speed.",
+  "codes": {
+    "b1-ghp-882": {
+      "canonical_public_seconds": {
+        "count": 128,
+        "max": 86.92947682319209,
+        "mean": 64.73255200923631,
+        "median": 65.80034865392372,
+        "p95_linear": 79.49287974979961,
+        "total": 8285.766657182248
+      },
+      "canonical_slower_pairs": 127,
+      "exact_candidate_disagreements": 37,
+      "executed_gamma_digests_checked": 32,
+      "native_pipeline_seconds": {
+        "count": 128,
+        "max": 50.65326381102204,
+        "mean": 36.89355550813343,
+        "median": 36.86758615961298,
+        "p95_linear": 48.89599321479909,
+        "total": 4722.375105041079
+      },
+      "paired_canonical_over_native_ratio": {
+        "count": 128,
+        "max": 3.4036106379887503,
+        "mean": 1.8505935650671073,
+        "median": 1.8043569667673196,
+        "p95_linear": 2.8983268211989452,
+        "total": 236.87597632858973
+      },
+      "paired_shots": 128,
+      "paired_success_table": {
+        "canonical_0_native_0": 12,
+        "canonical_0_native_1": 2,
+        "canonical_1_native_0": 8,
+        "canonical_1_native_1": 106
+      }
+    },
+    "gross-bb-144": {
+      "canonical_public_seconds": {
+        "count": 128,
+        "max": 76.8055244020652,
+        "mean": 6.2428071396570886,
+        "median": 3.247260537929833,
+        "p95_linear": 16.669261777936473,
+        "total": 799.0793138761073
+      },
+      "canonical_slower_pairs": 127,
+      "exact_candidate_disagreements": 16,
+      "executed_gamma_digests_checked": 86,
+      "native_pipeline_seconds": {
+        "count": 128,
+        "max": 52.812475729035214,
+        "mean": 2.464382421096161,
+        "median": 1.9571308930171654,
+        "p95_linear": 2.7407167337485587,
+        "total": 315.4409499003086
+      },
+      "paired_canonical_over_native_ratio": {
+        "count": 128,
+        "max": 42.53610404887617,
+        "mean": 2.9317621339753077,
+        "median": 1.66103645976704,
+        "p95_linear": 7.134099373245978,
+        "total": 375.2655531488394
+      },
+      "paired_shots": 128,
+      "paired_success_table": {
+        "canonical_0_native_0": 27,
+        "canonical_0_native_1": 2,
+        "canonical_1_native_0": 1,
+        "canonical_1_native_1": 98
+      }
+    },
+    "hgp-gallager-3-4-seed-20260923": {
+      "canonical_public_seconds": {
+        "count": 128,
+        "max": 16.88048719498329,
+        "mean": 5.593694812587273,
+        "median": 5.261837576515973,
+        "p95_linear": 8.265816958190406,
+        "total": 715.992936011171
+      },
+      "canonical_slower_pairs": 127,
+      "exact_candidate_disagreements": 65,
+      "executed_gamma_digests_checked": 81,
+      "native_pipeline_seconds": {
+        "count": 128,
+        "max": 22.431521890917793,
+        "mean": 2.7511477956832096,
+        "median": 2.5743793623987585,
+        "p95_linear": 3.0874919136986136,
+        "total": 352.1469178474508
+      },
+      "paired_canonical_over_native_ratio": {
+        "count": 128,
+        "max": 7.930109941821255,
+        "mean": 2.1673594305438315,
+        "median": 2.0645763256859855,
+        "p95_linear": 3.1355911548848194,
+        "total": 277.42200710961043
+      },
+      "paired_shots": 128,
+      "paired_success_table": {
+        "canonical_0_native_0": 89,
+        "canonical_0_native_1": 4,
+        "canonical_1_native_0": 5,
+        "canonical_1_native_1": 30
+      }
+    }
+  },
+  "schema_version": 1,
+  "status": "completed_derived_diagnostic",
+  "summary_digest": "ef816080514e46c3e3e1539b4ea8471ac20cec0ba2f801d5de23924d2fcb0668",
+  "timing_scopes": {
+    "canonical_public_seconds": "public canonical CLI run plus mandatory verify-canonical-shot; excludes later diagnostic classification",
+    "native_pipeline_seconds": "canonical-observation, gamma reconstruction, isolated author process and decode, plus diagnostic classification",
+    "paired_canonical_over_native_ratio": "ratio of the two recorded unequal pipeline boundaries for each matched shot"
+  }
+}
