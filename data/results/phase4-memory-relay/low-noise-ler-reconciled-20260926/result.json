@@ -1,0 +1,750 @@
+{
+  "claim_limit": "uncalibrated controlled CSS adaptation; no source-faithful or universal ranking claim",
+  "compute_amendment": "p=.06 serial and p=.05 four-arm parallel execution; unchanged frozen scientific design",
+  "design_byte_sha256": "4599e809e12da24aee9127c2d22e6e89462c8d76fc3b74fc099aae155ee03f0a",
+  "finished_at": "2026-09-26T19:07:32.539161+00:00",
+  "rate_sources": {
+    "p0050": {
+      "byte_sha256": "6b94f298976c0a1b4eab856eaa54adeb646bf1c94d0e10fe8d1fe33b3637f9ae",
+      "job_id": "56389885",
+      "path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase4-memory-relay/low-noise-ler-p0050-parallel-v1/result.json"
+    },
+    "p0060": {
+      "byte_sha256": "7c8408098caf9a74aa182cd58dc330568ea20616b25849e73b11c4c3adcf1ba1",
+      "job_id": "56386510",
+      "path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase4-memory-relay/low-noise-ler-v1/progress.json"
+    }
+  },
+  "rates": {
+    "p0050": {
+      "arms": {
+        "canonical_baseline": {
+          "complete_shots": 8192,
+          "diagnostic_cell_estimates": {
+            "invalid_correct": {
+              "count": 0,
+              "denominator": 8192,
+              "estimate": 0.0,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.0,
+                0.0008651134683723663
+              ]
+            },
+            "invalid_wrong_logical": {
+              "count": 182,
+              "denominator": 8192,
+              "estimate": 0.022216796875,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.017439321711431425,
+                0.02781468261433659
+              ]
+            },
+            "no_proposal": {
+              "count": 0,
+              "denominator": 8192,
+              "estimate": 0.0,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.0,
+                0.0008651134683723663
+              ]
+            },
+            "valid_correct": {
+              "count": 7855,
+              "denominator": 8192,
+              "estimate": 0.9588623046875,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.951506341834372,
+                0.9654334935786921
+              ]
+            },
+            "valid_wrong_logical": {
+              "count": 155,
+              "denominator": 8192,
+              "estimate": 0.0189208984375,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.014532841073560716,
+                0.024136054567905837
+              ]
+            }
+          },
+          "diagnostic_cells": {
+            "invalid_correct": 0,
+            "invalid_wrong_logical": 182,
+            "no_proposal": 0,
+            "valid_correct": 7855,
+            "valid_wrong_logical": 155
+          },
+          "incomplete_shots": 0,
+          "planned_shots": 8192,
+          "precision_met": true,
+          "primary": {
+            "denominator": 8192,
+            "estimate": 0.0411376953125,
+            "failures": 337,
+            "metric": "all_shot_decoder_failure",
+            "precision_met": true,
+            "relative_half_width": 0.15438916843801997,
+            "simultaneous_over_looks_exact_interval": [
+              0.03511597434173448,
+              0.0478184034832415
+            ]
+          },
+          "selection": {
+            "no_selected_recovery": 182,
+            "selected_recoveries": 8010,
+            "valid_correct_selected": 7855
+          },
+          "strict_logical_error": {
+            "estimate": 0.019350811485642945,
+            "failures": 155,
+            "no_proposal_reported_separately": 0,
+            "precision_met": true,
+            "relative_half_width": 0.23145636738849967,
+            "simultaneous_over_looks_exact_interval": [
+              0.015226975825247926,
+              0.02418471289022107
+            ],
+            "valid_syndrome_selected_denominator": 8010
+          }
+        },
+        "canonical_relay": {
+          "complete_shots": 8192,
+          "diagnostic_cell_estimates": {
+            "invalid_correct": {
+              "count": 0,
+              "denominator": 8192,
+              "estimate": 0.0,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.0,
+                0.0008651134683723663
+              ]
+            },
+            "invalid_wrong_logical": {
+              "count": 0,
+              "denominator": 8192,
+              "estimate": 0.0,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.0,
+                0.0008651134683723663
+              ]
+            },
+            "no_proposal": {
+              "count": 0,
+              "denominator": 8192,
+              "estimate": 0.0,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.0,
+                0.0008651134683723663
+              ]
+            },
+            "valid_correct": {
+              "count": 7903,
+              "denominator": 8192,
+              "estimate": 0.9647216796875,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.9578502639378516,
+                0.970797591216026
+              ]
+            },
+            "valid_wrong_logical": {
+              "count": 289,
+              "denominator": 8192,
+              "estimate": 0.0352783203125,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.029202408783973954,
+                0.04214973606214848
+              ]
+            }
+          },
+          "diagnostic_cells": {
+            "invalid_correct": 0,
+            "invalid_wrong_logical": 0,
+            "no_proposal": 0,
+            "valid_correct": 7903,
+            "valid_wrong_logical": 289
+          },
+          "incomplete_shots": 0,
+          "planned_shots": 8192,
+          "precision_met": true,
+          "primary": {
+            "denominator": 8192,
+            "estimate": 0.0352783203125,
+            "failures": 289,
+            "metric": "all_shot_decoder_failure",
+            "precision_met": true,
+            "relative_half_width": 0.16737281090155165,
+            "simultaneous_over_looks_exact_interval": [
+              0.02970771799502324,
+              0.0415169812642001
+            ]
+          },
+          "selection": {
+            "no_selected_recovery": 0,
+            "selected_recoveries": 8192,
+            "valid_correct_selected": 7903
+          },
+          "strict_logical_error": {
+            "estimate": 0.0352783203125,
+            "failures": 289,
+            "no_proposal_reported_separately": 0,
+            "precision_met": true,
+            "relative_half_width": 0.16737281090155165,
+            "simultaneous_over_looks_exact_interval": [
+              0.02970771799502324,
+              0.0415169812642001
+            ],
+            "valid_syndrome_selected_denominator": 8192
+          }
+        },
+        "source_baseline": {
+          "complete_shots": 8192,
+          "diagnostic_cell_estimates": {
+            "invalid_correct": {
+              "count": 2,
+              "denominator": 8192,
+              "estimate": 0.000244140625,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                5.0529087080567895e-06,
+                0.0013964351794388309
+              ]
+            },
+            "invalid_wrong_logical": {
+              "count": 233,
+              "denominator": 8192,
+              "estimate": 0.0284423828125,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.02300564679809852,
+                0.03468742771776956
+              ]
+            },
+            "no_proposal": {
+              "count": 0,
+              "denominator": 8192,
+              "estimate": 0.0,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.0,
+                0.0008651134683723663
+              ]
+            },
+            "valid_correct": {
+              "count": 7839,
+              "denominator": 8192,
+              "estimate": 0.9569091796875,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.9494005386347047,
+                0.9636365875205037
+              ]
+            },
+            "valid_wrong_logical": {
+              "count": 118,
+              "denominator": 8192,
+              "estimate": 0.014404296875,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.01061315967643529,
+                0.019032244927912605
+              ]
+            }
+          },
+          "diagnostic_cells": {
+            "invalid_correct": 2,
+            "invalid_wrong_logical": 233,
+            "no_proposal": 0,
+            "valid_correct": 7839,
+            "valid_wrong_logical": 118
+          },
+          "incomplete_shots": 0,
+          "planned_shots": 8192,
+          "precision_met": true,
+          "primary": {
+            "denominator": 8192,
+            "estimate": 0.0430908203125,
+            "failures": 353,
+            "metric": "all_shot_decoder_failure",
+            "precision_met": true,
+            "relative_half_width": 0.15065856707136185,
+            "simultaneous_over_looks_exact_interval": [
+              0.03692681750939247,
+              0.04991081999381404
+            ]
+          },
+          "selection": {
+            "no_selected_recovery": 235,
+            "selected_recoveries": 7957,
+            "valid_correct_selected": 7839
+          },
+          "strict_logical_error": {
+            "estimate": 0.014829709689581501,
+            "failures": 118,
+            "no_proposal_reported_separately": 0,
+            "precision_met": true,
+            "relative_half_width": 0.26656499131900074,
+            "simultaneous_over_looks_exact_interval": [
+              0.011238322547286935,
+              0.019144485416620123
+            ],
+            "valid_syndrome_selected_denominator": 7957
+          }
+        },
+        "source_relay": {
+          "complete_shots": 8192,
+          "diagnostic_cell_estimates": {
+            "invalid_correct": {
+              "count": 0,
+              "denominator": 8192,
+              "estimate": 0.0,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.0,
+                0.0008651134683723663
+              ]
+            },
+            "invalid_wrong_logical": {
+              "count": 0,
+              "denominator": 8192,
+              "estimate": 0.0,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.0,
+                0.0008651134683723663
+              ]
+            },
+            "no_proposal": {
+              "count": 0,
+              "denominator": 8192,
+              "estimate": 0.0,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.0,
+                0.0008651134683723663
+              ]
+            },
+            "valid_correct": {
+              "count": 7902,
+              "denominator": 8192,
+              "estimate": 0.964599609375,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.9577176530148108,
+                0.9706862870003657
+              ]
+            },
+            "valid_wrong_logical": {
+              "count": 290,
+              "denominator": 8192,
+              "estimate": 0.035400390625,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.029313712999634235,
+                0.042282346985189116
+              ]
+            }
+          },
+          "diagnostic_cells": {
+            "invalid_correct": 0,
+            "invalid_wrong_logical": 0,
+            "no_proposal": 0,
+            "valid_correct": 7902,
+            "valid_wrong_logical": 290
+          },
+          "incomplete_shots": 0,
+          "planned_shots": 8192,
+          "precision_met": true,
+          "primary": {
+            "denominator": 8192,
+            "estimate": 0.035400390625,
+            "failures": 290,
+            "metric": "all_shot_decoder_failure",
+            "precision_met": true,
+            "relative_half_width": 0.16706998942011922,
+            "simultaneous_over_looks_exact_interval": [
+              0.029819981658394293,
+              0.04164866743276797
+            ]
+          },
+          "selection": {
+            "no_selected_recovery": 0,
+            "selected_recoveries": 8192,
+            "valid_correct_selected": 7902
+          },
+          "strict_logical_error": {
+            "estimate": 0.035400390625,
+            "failures": 290,
+            "no_proposal_reported_separately": 0,
+            "precision_met": true,
+            "relative_half_width": 0.16706998942011922,
+            "simultaneous_over_looks_exact_interval": [
+              0.029819981658394293,
+              0.04164866743276797
+            ],
+            "valid_syndrome_selected_denominator": 8192
+          }
+        }
+      },
+      "error_rate": 0.05,
+      "look_shots": 8192,
+      "precision_met": true
+    },
+    "p0060": {
+      "arms": {
+        "canonical_baseline": {
+          "complete_shots": 2048,
+          "diagnostic_cell_estimates": {
+            "invalid_correct": {
+              "count": 0,
+              "denominator": 2048,
+              "estimate": 0.0,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.0,
+                0.003455965934927807
+              ]
+            },
+            "invalid_wrong_logical": {
+              "count": 114,
+              "denominator": 2048,
+              "estimate": 0.0556640625,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.04100603941560132,
+                0.07338376053370105
+              ]
+            },
+            "no_proposal": {
+              "count": 0,
+              "denominator": 2048,
+              "estimate": 0.0,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.0,
+                0.003455965934927807
+              ]
+            },
+            "valid_correct": {
+              "count": 1850,
+              "denominator": 2048,
+              "estimate": 0.9033203125,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.8811654160699967,
+                0.9227081644093182
+              ]
+            },
+            "valid_wrong_logical": {
+              "count": 84,
+              "denominator": 2048,
+              "estimate": 0.041015625,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.02855072284330293,
+                0.05665240850846809
+              ]
+            }
+          },
+          "diagnostic_cells": {
+            "invalid_correct": 0,
+            "invalid_wrong_logical": 114,
+            "no_proposal": 0,
+            "valid_correct": 1850,
+            "valid_wrong_logical": 84
+          },
+          "incomplete_shots": 0,
+          "planned_shots": 2048,
+          "precision_met": true,
+          "primary": {
+            "denominator": 2048,
+            "estimate": 0.0966796875,
+            "failures": 198,
+            "metric": "all_shot_decoder_failure",
+            "precision_met": true,
+            "relative_half_width": 0.19603195264368056,
+            "simultaneous_over_looks_exact_interval": [
+              0.07888981151267697,
+              0.11679442735588864
+            ]
+          },
+          "selection": {
+            "no_selected_recovery": 114,
+            "selected_recoveries": 1934,
+            "valid_correct_selected": 1850
+          },
+          "strict_logical_error": {
+            "estimate": 0.04343329886246122,
+            "failures": 84,
+            "no_proposal_reported_separately": 0,
+            "precision_met": true,
+            "relative_half_width": 0.31223035469686555,
+            "simultaneous_over_looks_exact_interval": [
+              0.03127682076598321,
+              0.05839920938494568
+            ],
+            "valid_syndrome_selected_denominator": 1934
+          }
+        },
+        "canonical_relay": {
+          "complete_shots": 2048,
+          "diagnostic_cell_estimates": {
+            "invalid_correct": {
+              "count": 0,
+              "denominator": 2048,
+              "estimate": 0.0,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.0,
+                0.003455965934927807
+              ]
+            },
+            "invalid_wrong_logical": {
+              "count": 0,
+              "denominator": 2048,
+              "estimate": 0.0,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.0,
+                0.003455965934927807
+              ]
+            },
+            "no_proposal": {
+              "count": 0,
+              "denominator": 2048,
+              "estimate": 0.0,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.0,
+                0.003455965934927807
+              ]
+            },
+            "valid_correct": {
+              "count": 1870,
+              "denominator": 2048,
+              "estimate": 0.9130859375,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.8918522978297206,
+                0.9314834202184824
+              ]
+            },
+            "valid_wrong_logical": {
+              "count": 178,
+              "denominator": 2048,
+              "estimate": 0.0869140625,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.06851657978151757,
+                0.10814770217027933
+              ]
+            }
+          },
+          "diagnostic_cells": {
+            "invalid_correct": 0,
+            "invalid_wrong_logical": 0,
+            "no_proposal": 0,
+            "valid_correct": 1870,
+            "valid_wrong_logical": 178
+          },
+          "incomplete_shots": 0,
+          "planned_shots": 2048,
+          "precision_met": true,
+          "primary": {
+            "denominator": 2048,
+            "estimate": 0.0869140625,
+            "failures": 178,
+            "metric": "all_shot_decoder_failure",
+            "precision_met": true,
+            "relative_half_width": 0.20803000841022137,
+            "simultaneous_over_looks_exact_interval": [
+              0.07002489171475028,
+              0.10618635802043329
+            ]
+          },
+          "selection": {
+            "no_selected_recovery": 0,
+            "selected_recoveries": 2048,
+            "valid_correct_selected": 1870
+          },
+          "strict_logical_error": {
+            "estimate": 0.0869140625,
+            "failures": 178,
+            "no_proposal_reported_separately": 0,
+            "precision_met": true,
+            "relative_half_width": 0.20803000841022137,
+            "simultaneous_over_looks_exact_interval": [
+              0.07002489171475028,
+              0.10618635802043329
+            ],
+            "valid_syndrome_selected_denominator": 2048
+          }
+        },
+        "source_baseline": {
+          "complete_shots": 2048,
+          "diagnostic_cell_estimates": {
+            "invalid_correct": {
+              "count": 3,
+              "denominator": 2048,
+              "estimate": 0.00146484375,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                8.733254901149302e-05,
+                0.006474360132762049
+              ]
+            },
+            "invalid_wrong_logical": {
+              "count": 141,
+              "denominator": 2048,
+              "estimate": 0.06884765625,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.05248741324397041,
+                0.08817336707010888
+              ]
+            },
+            "no_proposal": {
+              "count": 0,
+              "denominator": 2048,
+              "estimate": 0.0,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.0,
+                0.003455965934927807
+              ]
+            },
+            "valid_correct": {
+              "count": 1829,
+              "denominator": 2048,
+              "estimate": 0.89306640625,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.8700126715765093,
+                0.913425246494923
+              ]
+            },
+            "valid_wrong_logical": {
+              "count": 75,
+              "denominator": 2048,
+              "estimate": 0.03662109375,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.024897926887199343,
+                0.051550326429657636
+              ]
+            }
+          },
+          "diagnostic_cells": {
+            "invalid_correct": 3,
+            "invalid_wrong_logical": 141,
+            "no_proposal": 0,
+            "valid_correct": 1829,
+            "valid_wrong_logical": 75
+          },
+          "incomplete_shots": 0,
+          "planned_shots": 2048,
+          "precision_met": true,
+          "primary": {
+            "denominator": 2048,
+            "estimate": 0.10693359375,
+            "failures": 219,
+            "metric": "all_shot_decoder_failure",
+            "precision_met": true,
+            "relative_half_width": 0.18520657039638125,
+            "simultaneous_over_looks_exact_interval": [
+              0.08826083012557853,
+              0.12787043844277335
+            ]
+          },
+          "selection": {
+            "no_selected_recovery": 144,
+            "selected_recoveries": 1904,
+            "valid_correct_selected": 1829
+          },
+          "strict_logical_error": {
+            "estimate": 0.03939075630252101,
+            "failures": 75,
+            "no_proposal_reported_separately": 0,
+            "precision_met": true,
+            "relative_half_width": 0.3316062676649082,
+            "simultaneous_over_looks_exact_interval": [
+              0.02776991973940234,
+              0.05389436309535624
+            ],
+            "valid_syndrome_selected_denominator": 1904
+          }
+        },
+        "source_relay": {
+          "complete_shots": 2048,
+          "diagnostic_cell_estimates": {
+            "invalid_correct": {
+              "count": 0,
+              "denominator": 2048,
+              "estimate": 0.0,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.0,
+                0.003455965934927807
+              ]
+            },
+            "invalid_wrong_logical": {
+              "count": 0,
+              "denominator": 2048,
+              "estimate": 0.0,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.0,
+                0.003455965934927807
+              ]
+            },
+            "no_proposal": {
+              "count": 0,
+              "denominator": 2048,
+              "estimate": 0.0,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.0,
+                0.003455965934927807
+              ]
+            },
+            "valid_correct": {
+              "count": 1862,
+              "denominator": 2048,
+              "estimate": 0.9091796875,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.887569322449116,
+                0.9279815937392214
+              ]
+            },
+            "valid_wrong_logical": {
+              "count": 186,
+              "denominator": 2048,
+              "estimate": 0.0908203125,
+              "exact_interval_simultaneous_over_cells_and_looks": [
+                0.07201840626077859,
+                0.11243067755088394
+              ]
+            }
+          },
+          "diagnostic_cells": {
+            "invalid_correct": 0,
+            "invalid_wrong_logical": 0,
+            "no_proposal": 0,
+            "valid_correct": 1862,
+            "valid_wrong_logical": 186
+          },
+          "incomplete_shots": 0,
+          "planned_shots": 2048,
+          "precision_met": true,
+          "primary": {
+            "denominator": 2048,
+            "estimate": 0.0908203125,
+            "failures": 186,
+            "metric": "all_shot_decoder_failure",
+            "precision_met": true,
+            "relative_half_width": 0.20300401506007487,
+            "simultaneous_over_looks_exact_interval": [
+              0.0735633097103839,
+              0.11043708588340531
+            ]
+          },
+          "selection": {
+            "no_selected_recovery": 0,
+            "selected_recoveries": 2048,
+            "valid_correct_selected": 1862
+          },
+          "strict_logical_error": {
+            "estimate": 0.0908203125,
+            "failures": 186,
+            "no_proposal_reported_separately": 0,
+            "precision_met": true,
+            "relative_half_width": 0.20300401506007487,
+            "simultaneous_over_looks_exact_interval": [
+              0.0735633097103839,
+              0.11043708588340531
+            ],
+            "valid_syndrome_selected_denominator": 2048
+          }
+        }
+      },
+      "error_rate": 0.06,
+      "look_shots": 2048,
+      "precision_met": true
+    }
+  },
+  "result_digest": "6688c8b92e03936b8c2d05e14fec36d64bd44e861abccd6d45d74dcbea833b27",
+  "sample_matching": "same physical sample identity at each code/rate/shot across four arms",
+  "schema_version": 1,
+  "status": "completed_precision"
+}

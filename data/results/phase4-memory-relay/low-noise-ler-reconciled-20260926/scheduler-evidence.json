@@ -1,0 +1,14 @@
+{
+  "reconciliation_note": "sacct confirms both jobs terminal; squeue no longer retains the serial job id; no decoder shots or cancellation commands were executed",
+  "records": {
+    "56386510": {
+      "exit_code": "0:0",
+      "state": "CANCELLED by 1498154"
+    },
+    "56389885": {
+      "exit_code": "0:0",
+      "state": "COMPLETED"
+    }
+  },
+  "sacct_output": "56386510|CANCELLED by 1498154|0:0\n56386510.batch|CANCELLED|0:15\n56386510.extern|COMPLETED|0:0\n56389885|COMPLETED|0:0\n56389885.batch|COMPLETED|0:0\n56389885.extern|COMPLETED|0:0\n"
+}

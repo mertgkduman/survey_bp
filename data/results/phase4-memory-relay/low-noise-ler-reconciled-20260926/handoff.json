@@ -1,0 +1,9 @@
+{
+  "p0060_look_shots": 2048,
+  "p0060_source": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase4-memory-relay/low-noise-ler-v1/progress.json",
+  "p0060_source_sha256": "7c8408098caf9a74aa182cd58dc330568ea20616b25849e73b11c4c3adcf1ba1",
+  "parallel_job_id": "56389885",
+  "recorded_at": "2026-09-26T19:07:32.525845+00:00",
+  "serial_job_cancelled_after_p0060_snapshot": false,
+  "serial_job_id": "56386510"
+}
