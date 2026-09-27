@@ -80,6 +80,17 @@ def test_failure_rows_retain_denominators_wilson_and_runtime_scope_without_filli
     assert row["runtime_scope"] == "public cell boundary"
 
 
+def test_evaluation_rows_use_the_producer_all_shot_failure_summary():
+    campaign = _module()
+    payload = {"codes": {"fixture-code": {"baseline": {"error_rate": .03, "summary": {
+        "all_shot_failure": {"failures": 1, "denominator": 7, "estimate": 1 / 7,
+                             "wilson_95": wilson_interval(1, 7)}}}}}}
+    row = campaign._failure_rows("evaluation", payload)[0]
+    assert row["failures"] == 1
+    assert row["denominator"] == 7
+    assert row["wilson_95"] == wilson_interval(1, 7)
+
+
 def test_campaign_root_requires_a_repository_shaped_root(tmp_path):
     campaign = _module()
     with pytest.raises(ValueError, match="campaign root"):
@@ -100,7 +111,8 @@ def test_active_benchmark_uses_report_digest_and_selected_rate_schema(tmp_path, 
 
     monkeypatch.setattr(campaign, "_runners", lambda: (None, None, Pilots, None))
     snapshot = campaign._benchmark(tmp_path)
-    assert snapshot["execution_qualified"] is True
+    assert snapshot["execution_qualified"] is False
+    assert "provenance" in snapshot["reason"]
     assert snapshot["tables"][0]["rows"][0]["error_rate"] == .03
     altered = dict(report); altered["benchmark_digest"] = report["report_digest"]
     _write(report_path, altered)

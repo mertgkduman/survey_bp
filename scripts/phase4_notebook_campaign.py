@@ -91,7 +91,9 @@ def _failure_rows(stage: str, value: Mapping[str, Any]) -> list[dict[str, object
                 if not isinstance(item, Mapping):
                     continue
                 summary = item.get("summary", item)
-                primary = summary.get("primary") if isinstance(summary, Mapping) else None
+                primary = summary.get("all_shot_failure") if isinstance(summary, Mapping) else None
+                if not isinstance(primary, Mapping) and isinstance(summary, Mapping):
+                    primary = summary.get("primary")
                 if isinstance(primary, Mapping):
                     rows.append({"stage": stage, "code_id": code_id, "arm": arm, "error_rate": item.get("error_rate"),
                                  "failures": primary.get("failures"), "denominator": primary.get("denominator"),
@@ -116,6 +118,54 @@ def _benchmark_rows(report: Mapping[str, Any]) -> list[dict[str, object]]:
                      "runtime_tails": item.get("public_command_wall_seconds"), "runtime_scope": "active-V4 public command boundary",
                      "resource_tails": {"selection_status": item.get("selection_status"), "rates": item.get("rates")}})
     return rows
+
+
+def _verify_active_benchmark(root: Path, report: Mapping[str, Any]) -> None:
+    """Reconstruct every retained active-V4 public arm from its own journal."""
+    artifact_root = root / str(report.get("artifact_root", ""))
+    _relative(root, artifact_root)
+    if not artifact_root.is_dir():
+        raise ValueError("active benchmark artifact root is absent")
+    if not isinstance(report.get("core_commits"), list) or not all(isinstance(item, str) for item in report["core_commits"]):
+        raise ValueError("active benchmark omits typed core provenance")
+    if not isinstance(report.get("author_source_pin"), str):
+        raise ValueError("active benchmark omits typed source provenance")
+    for code_id, code in report["codes"].items():
+        if not isinstance(code, Mapping):
+            raise ValueError("active benchmark code record is malformed")
+        for rate_key, rate in code.get("rates", {}).items():
+            if not isinstance(rate, Mapping) or not isinstance(rate.get("error_rate"), (int, float)):
+                raise ValueError("active benchmark rate record is malformed")
+            for preset, arms in rate.get("presets", {}).items():
+                if not isinstance(arms, Mapping):
+                    raise ValueError("active benchmark preset record is malformed")
+                for arm_name, arm in arms.items():
+                    if not isinstance(arm, Mapping) or arm.get("status") != "completed":
+                        raise ValueError("active benchmark arm is nonterminal")
+                    if arm.get("active_memory_verified") is not True or not isinstance(arm.get("attempts"), list):
+                        raise ValueError("active benchmark arm omits public active-memory observations")
+                    cell_root = artifact_root / str(code_id) / str(rate_key) / str(preset) / str(arm_name).replace("_", "-")
+                    manifest, journal, run = cell_root / "manifest.json", cell_root / "attempts.json", cell_root / "run"
+                    if not manifest.is_file() or not journal.is_file() or not (run / "events.jsonl").is_file():
+                        raise ValueError("active benchmark terminal provenance files are absent")
+                    if arm.get("manifest_sha256") != _json_digest(_read(manifest)):
+                        raise ValueError("active benchmark manifest digest differs from retained manifest")
+                    attempts = json.loads(journal.read_text(encoding="utf-8"))
+                    if attempts != arm["attempts"] or not attempts:
+                        raise ValueError("active benchmark report attempts differ from retained journal")
+                    for attempt in attempts:
+                        if not isinstance(attempt, Mapping) or attempt.get("status") != "completed":
+                            raise ValueError("active benchmark completed arm retains incomplete shot")
+                        verified = _verify_relay_shot(manifest, run, shot_id=int(attempt["shot_id"]), expected_row=attempt)
+                        facts = attempt.get("active_memory_facts")
+                        if not isinstance(facts, list) or not facts:
+                            raise ValueError("active benchmark shot omits typed active-memory facts")
+                        if any(not isinstance(fact, Mapping) or fact.get("evidence_relation") != "canonical_implemented"
+                               or fact.get("assessment_status") != "not_assessed" or fact.get("code_id") != code_id
+                               for fact in facts):
+                            raise ValueError("active benchmark active-memory facts drift from canonical contract")
+                        if verified["work"] != attempt.get("work_vector"):
+                            raise ValueError("active benchmark reported work differs from terminal ledger")
 
 
 def _calibration_rows(value: Mapping[str, Any]) -> list[dict[str, object]]:
@@ -185,9 +235,13 @@ def _benchmark(root: Path) -> dict[str, object]:
             raise ValueError("active benchmark is nonterminal or omits code records")
         if any(not isinstance(item, Mapping) or not isinstance(item.get("selected_rate"), (int, float)) or not isinstance(item.get("selection_status"), str) for item in codes.values()):
             raise ValueError("active benchmark code record omits selected-rate status")
+        _verify_active_benchmark(root, report)
         return _snapshot("benchmark", report_path, report, qualified=True, reason=None,
                          tables=[_table("benchmark", _benchmark_rows(report))])
     except (KeyError, OSError, ValueError) as error:
+        if "report" in locals() and "report_path" in locals() and report_path.is_file():
+            return _snapshot("benchmark", report_path, report, qualified=False, reason=str(error),
+                             tables=[_table("benchmark", _benchmark_rows(report))])
         fallback = root / "data/results/phase4-memory-relay/benchmark.json"
         if not fallback.is_file(): return _missing("benchmark", fallback, str(error))
         payload = _read(fallback)
@@ -234,6 +288,11 @@ def _evaluation(root: Path) -> dict[str, object]:
         arms = tuple(caps["evaluation"]["arms_per_code"])
         if payload.get("plan_digest") != runner._digest(plan) or payload.get("caps_digest") != caps["caps_digest"] or payload.get("selected_settings_digest") != runner._digest(selection):
             raise ValueError("evaluation result does not bind the verified three-arm plan")
+        retained_plan = _read(path.parent / "plan.json")
+        if retained_plan != plan:
+            raise ValueError("retained evaluation plan differs from verified producer plan")
+        if payload.get("shared_settings_view") != plan.get("shared_settings_view"):
+            raise ValueError("evaluation result shared settings differ from verified plan")
         if any(set(payload.get("codes", {}).get(code, {})) != set(arms) for code in caps["codes"]):
             raise ValueError("evaluation result omits or adds frozen arms")
         if payload.get("status") != "completed": raise ValueError("evaluation producer is nonterminal")
@@ -247,11 +306,24 @@ def _evaluation(root: Path) -> dict[str, object]:
                 raise ValueError("evaluation terminal provenance files are absent")
             rows = json.loads(attempts.read_text(encoding="utf-8"))
             if not isinstance(rows, list): raise ValueError("evaluation attempts are not a list")
+            expected_manifest = runner.build_manifest(
+                base=_read(root / runner.active.CODE_MANIFESTS[cell["code_id"]]), cell=cell, plan=plan)
+            if _read(manifest) != expected_manifest:
+                raise ValueError("evaluation manifest differs from verified producer plan")
+            if {int(row["shot_id"]) for row in rows if isinstance(row, Mapping)} != set(range(int(cell["shots"]))):
+                raise ValueError("evaluation attempts do not cover every planned shot")
             for row in rows:
-                if isinstance(row, Mapping) and row.get("status") == "completed":
-                    _verify_relay_shot(manifest, run, shot_id=int(row["shot_id"]), expected_row=row)
+                if not isinstance(row, Mapping) or row.get("status") != "completed":
+                    raise ValueError("completed evaluation result retains incomplete shot")
+                _verify_relay_shot(manifest, run, shot_id=int(row["shot_id"]), expected_row=row)
             if runner.summarize_rows(rows, planned=int(cell["shots"])) != arm.get("summary"):
                 raise ValueError("evaluation summary differs from verified attempts")
+        if payload.get("evaluation_category_wall_seconds_used") != runner.retained_category_wall(path.parent):
+            raise ValueError("evaluation category wall differs from retained terminal records")
+        expected_pairs = {code_id: {arm: runner.matched_summary(output=path.parent, code_id=code_id, first="baseline", second=arm)
+                         for arm in arms if arm != "baseline"} for code_id in caps["codes"]}
+        if payload.get("paired") != expected_pairs:
+            raise ValueError("evaluation matched cohorts differ from retained attempts")
         return _snapshot("evaluation", path, payload, qualified=True, reason=None,
                          tables=[_table("evaluation", _failure_rows("evaluation", payload))])
     except (FileNotFoundError, OSError, ValueError) as error:
@@ -269,26 +341,42 @@ def _factorial(root: Path) -> dict[str, object]:
                                               supplement=_read(root / "data/evidence/phase4-factorial-execution-supplement-v1.json"))
         factorial.assert_factorial_predecessor(evaluation_path=root / "data/results/phase4-memory-relay/evaluation/result.json", plan=plan, repository_root=root)
         if payload.get("factorial_digest") != plan["factorial_digest"]: raise ValueError("factorial result plan digest differs")
-        if payload.get("status") != "completed_not_assessed": raise ValueError("factorial producer is nonterminal or inconclusive")
-        factorial.validate_trace_inventory(payload.get("terminals", []), plan)
+        rows = payload.get("terminals")
+        if not isinstance(rows, list) or len(rows) != len(plan["cells"]):
+            raise ValueError("factorial result does not retain every planned terminal")
+        if {row.get("cell_id") for row in rows if isinstance(row, Mapping)} != {cell["cell_id"] for cell in plan["cells"]}:
+            raise ValueError("factorial result terminal identities differ from frozen plan")
+        if any(not isinstance(row, Mapping) or row.get("execution_status") != "completed" for row in rows):
+            raise ValueError("factorial producer is incomplete or inconclusive")
+        if payload.get("status") != factorial._result_status(payload.get("predecessor", {}), rows):
+            raise ValueError("factorial result status differs from retained terminals")
+        factorial.validate_trace_inventory(rows, plan)
         cells = {cell["cell_id"]: cell for cell in plan["cells"]}
-        for row in payload.get("terminals", []):
-            if not isinstance(row, Mapping) or row.get("execution_status") != "completed": continue
+        for row in rows:
             cell = cells.get(row.get("cell_id")); artifact = row.get("artifact")
             if cell is None or not isinstance(artifact, Mapping): raise ValueError("factorial terminal lacks cell artifact provenance")
             manifest = Path(str(artifact.get("manifest_path", ""))).resolve(); run = Path(str(artifact.get("run_dir", ""))).resolve()
             _relative(root, manifest); _relative(root, run)
             if not manifest.is_file() or _byte_sha(manifest) != artifact.get("manifest_sha256") or not (run / "events.jsonl").is_file():
                 raise ValueError("factorial manifest or ledger provenance differs")
+            if _read(manifest) != factorial.build_public_manifest(repository_root=root, cell=cell, plan=plan):
+                raise ValueError("factorial manifest differs from frozen cell plan")
             verified = _verify_relay_shot(manifest, run, shot_id=int(cell["shot_id"]), expected_row={"work_vector": row.get("raw_work")})
             if verified["sample_identity"] != row.get("sample_identity"):
                 raise ValueError("factorial terminal sample identity differs from verified ledger")
-        rows = _failure_rows("factorial", payload)
+        if payload.get("aggregate") != factorial.aggregate_terminals(rows, plan):
+            raise ValueError("factorial aggregates differ from retained terminals")
+        expected_trace_inventory = [{"cell_id": row["cell_id"], "code_id": row["code_id"], "noise_region": row["noise_region"],
+                                     "arm_id": row["arm_id"], "shot_id": row["shot_id"], "execution_status": row["execution_status"],
+                                     "trace": row.get("trace", {"status": "missing"})} for row in rows]
+        if payload.get("trace_inventory") != expected_trace_inventory:
+            raise ValueError("factorial trace inventory differs from retained terminals")
+        display_rows = _failure_rows("factorial", payload)
         rates = {(cell["code_id"], cell["noise_region"]): cell["error_rate"] for cell in plan["cells"]}
-        for row in rows:
+        for row in display_rows:
             row["error_rate"] = rates.get((row["code_id"], row["error_rate"]))
         return _snapshot("factorial", path, payload, qualified=True, reason=None,
-                         tables=[_table("factorial", rows)])
+                         tables=[_table("factorial", display_rows)])
     except (FileNotFoundError, OSError, ValueError) as error:
         return _snapshot("factorial", path, payload, qualified=False, reason=str(error), tables=[_table("factorial", _failure_rows("factorial", payload))])
 
@@ -301,20 +389,20 @@ def _historical_native(root: Path) -> dict[str, object]:
         _evaluation, _factorial, _pilots, summarize = _runners()
         summary = summarize(path.parent)
         if summary != payload: raise ValueError("historical runtime summary differs from verified agreement pairs")
-        rows = [{"stage": "historical_author_agreement", "code_id": code, "arm": "canonical_vs_author_native",
+        rows = [{"stage": "native", "code_id": code, "arm": "canonical_vs_author_native",
                  "error_rate": None, "failures": item.get("exact_candidate_disagreements"), "denominator": item.get("paired_shots"),
                  "estimate": None, "wilson_95": None, "runtime_tails": {"canonical_public": item.get("canonical_public_seconds"), "native_pipeline": item.get("native_pipeline_seconds")},
                  "runtime_scope": "unequal recorded public-vs-native pipeline boundaries; diagnostic only", "resource_tails": None}
                 for code, item in sorted(summary.get("codes", {}).items()) if isinstance(item, Mapping)]
         return _snapshot("historical_author_agreement", path, payload, qualified=False,
                          reason="historical author agreement is not fresh selected evaluation or factorial evidence",
-                         tables=[{**_table("historical_author_agreement", rows), "display_limit": 30}])
+                         tables=[{**_table("native", rows), "name": "historical_author_agreement", "title": "historical author agreement diagnostics", "display_limit": 30}])
     except (OSError, ValueError) as error:
         return _snapshot("historical_author_agreement", path, payload, qualified=False, reason=str(error), tables=[])
 
 
 def _native(root: Path) -> dict[str, object]:
-    path = root / "data/results/phase4-memory-relay/native/result.json"
+    path = root / "data/results/phase4-memory-relay/evaluation/native-pairs/result.json"
     if not path.is_file(): return _missing("native", path)
     payload = _read(path)
     try:
@@ -326,26 +414,22 @@ def _native(root: Path) -> dict[str, object]:
             saved = _read(journal).get("attempts")
             if not isinstance(saved, list) or evaluation.summarize_rows(saved, planned=int(item["planned_pairs"])) != item.get("native_summary"):
                 raise ValueError("native retained attempts do not reconstruct native summary")
+        if payload.get("native_category_wall_seconds_used") != evaluation.native_category_wall(path.parent):
+            raise ValueError("native category wall differs from retained terminal records")
         return _snapshot("native", path, payload, qualified=True, reason=None, tables=[_table("native", _failure_rows("native", payload))])
     except (FileNotFoundError, OSError, ValueError, KeyError) as error:
         return _snapshot("native", path, payload, qualified=False, reason=str(error), tables=[_table("native", _failure_rows("native", payload))])
 
 
-def _traces(root: Path) -> dict[str, object]:
-    path = root / "data/results/phase4-memory-relay/traces/index.json"
-    if not path.is_file(): return _missing("traces", path)
+def _traces(root: Path, factorial_snapshot: Mapping[str, object]) -> dict[str, object]:
+    """Trace links are factorial terminals, not an independent producer index."""
+    path = root / "data/results/phase4-memory-relay/factorial/result.json"
+    if not path.is_file(): return _missing("traces", path, "factorial terminal trace inventory is absent")
     payload = _read(path)
-    try:
-        from bp_registry.canonical.tracing import TraceSink
-        entries = payload.get("traces", payload.get("entries"))
-        if payload.get("status") != "completed" or not isinstance(entries, list): raise ValueError("trace index is nonterminal or malformed")
-        for entry in entries:
-            if not isinstance(entry, Mapping) or not isinstance(entry.get("sidecar"), Mapping): raise ValueError("trace index omits sidecar binding")
-            sidecar = entry["sidecar"]
-            TraceSink.load(path.parent, str(sidecar["path"]), expected_sha256=str(sidecar["sha256"]))
-        return _snapshot("traces", path, payload, qualified=True, reason=None, tables=[])
-    except (FileNotFoundError, OSError, ValueError, KeyError) as error:
-        return _snapshot("traces", path, payload, qualified=False, reason=str(error), tables=[])
+    if factorial_snapshot.get("execution_qualified") is not True:
+        return _snapshot("traces", path, payload, qualified=False,
+                         reason="factorial terminal/sidecar reconstruction is unavailable", tables=[])
+    return _snapshot("traces", path, payload, qualified=True, reason=None, tables=[])
 
 
 def _synthetic_fixture() -> dict[str, object]:
@@ -372,10 +456,11 @@ def build_campaign_snapshots(root: Path = ROOT, *, campaign_root: Path | None = 
     benchmark = _benchmark(root)
     baseline = {**benchmark, "stage": "baseline", "execution_qualified": False,
                 "reason": "baseline view is retained active-benchmark diagnostic evidence, not a fresh selected stage"}
+    factorial = _factorial(root)
     artifacts = {"baseline": baseline, "benchmark": benchmark,
                  "calibration": _calibration_or_selection(root, "calibration"), "selected_settings": _calibration_or_selection(root, "selected_settings"),
-                 "evaluation": _evaluation(root), "factorial": _factorial(root), "native": _native(root),
-                 "traces": _traces(root), "historical_author_agreement": _historical_native(root)}
+                 "evaluation": _evaluation(root), "factorial": factorial, "native": _native(root),
+                 "traces": _traces(root, factorial), "historical_author_agreement": _historical_native(root)}
     return {"schema_version": 1, "mode": "read_only_campaign_inventory", "campaign_root": str(campaign_root), "assessment": "not_assessed", "artifacts": artifacts,
             "tables": [table for item in artifacts.values() for table in item.get("tables", [])],
             "summary": {"qualified_stages": sorted(stage for stage, item in artifacts.items() if item.get("execution_qualified") is True),
