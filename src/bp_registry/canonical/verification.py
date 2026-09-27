@@ -145,18 +145,21 @@ def _validate_phase4_trace(event: Mapping[str, Any], *, trace_root: Path) -> dic
     return document
 
 
-def validate_phase4_shot(
-    ledger_path: str | Path, *, run_id: str, shot_id: int, trace_root: str | Path,
+def reconstruct_phase4_shot(
+    events: Sequence[Mapping[str, Any]], *, run_id: str, shot_id: int, trace_root: str | Path,
 ) -> dict[str, object]:
-    """Independently reconstruct one V4 Relay shot from hash-linked evidence.
+    """Reconstruct one V4 Relay shot from an already validated ledger stream.
 
-    Native adapter measurements are accepted only as typed ``missingness``
-    facts.  The verifier never turns an unavailable observation into zero.
+    Callers that reuse an inventory must obtain ``events`` from
+    :func:`read_canonical_events` after binding the source bytes to their
+    inventory.  This function intentionally retains all shot grammar, work
+    reconstruction, and sidecar checks while avoiding another whole-ledger
+    parse for each selected shot.
     """
     if not isinstance(run_id, str) or not run_id or type(shot_id) is not int or shot_id < 0:
         raise CanonicalStructuralVerificationError("Phase 4 verification requires a run ID and nonnegative shot ID")
     events = [
-        event for event in read_canonical_events(ledger_path)
+        event for event in events
         if event["run_id"] == run_id and event["shot_id"] == shot_id
     ]
     if not events or any(event["ledger_version"] != CANONICAL_RELAY_LEDGER_VERSION for event in events):
@@ -192,6 +195,20 @@ def validate_phase4_shot(
         "work": work,
         "traces": traces,
     }
+
+
+def validate_phase4_shot(
+    ledger_path: str | Path, *, run_id: str, shot_id: int, trace_root: str | Path,
+) -> dict[str, object]:
+    """Read, validate, and reconstruct one V4 Relay shot from durable evidence.
+
+    The path API remains the public validation boundary.  Inventory callers
+    may reuse its already validated stream through ``reconstruct_phase4_shot``.
+    """
+    return reconstruct_phase4_shot(
+        read_canonical_events(ledger_path), run_id=run_id, shot_id=shot_id,
+        trace_root=trace_root,
+    )
 
 
 def reconstruct_schedule_terminal(evidence: Mapping[str, Any]) -> dict[str, object]:

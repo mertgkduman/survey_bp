@@ -223,8 +223,8 @@ def test_phase4_reconstruction_rejects_leaf_lineage_mismatches_even_when_totals_
 def test_phase4_validation_rejects_tampered_sidecars_and_keeps_unavailable_facts_typed(tmp_path):
     """Trace hashes and unavailable values remain evidence, never inferred measurements."""
     from bp_registry.canonical.tracing import TracePlan, TraceSink
-    from bp_registry.canonical.verification import validate_phase4_shot
-    from bp_registry.ledger import CanonicalEventWriter
+    from bp_registry.canonical.verification import reconstruct_phase4_shot, validate_phase4_shot
+    from bp_registry.ledger import CanonicalEventWriter, read_canonical_events
 
     sink = TraceSink(TracePlan(root=tmp_path, max_records=2, max_bytes=500))
     sink.observe(kind="relay_history", payload={"leg": 1, "history": "reset"})
@@ -240,6 +240,10 @@ def test_phase4_validation_rejects_tampered_sidecars_and_keeps_unavailable_facts
     sidecar.write_text("{}", encoding="utf-8")
     with pytest.raises(ValueError, match="SHA-256|sidecar"):
         validate_phase4_shot(path, run_id="phase4-trace", shot_id=0, trace_root=tmp_path)
+    with pytest.raises(ValueError, match="SHA-256|sidecar"):
+        reconstruct_phase4_shot(
+            read_canonical_events(path), run_id="phase4-trace", shot_id=0, trace_root=tmp_path,
+        )
 
 
 def _phase4_runner_module():
