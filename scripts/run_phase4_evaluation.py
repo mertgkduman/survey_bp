@@ -210,6 +210,13 @@ def classify_candidate(manifest_path: Path, *, shot_id: int, candidate: object) 
             "candidate_sha256": sha256(proposed.tobytes()).hexdigest()}
 
 
+def terminal_candidate_for_diagnosis(terminal: Mapping[str, Any], *, termination: str | None) -> tuple[object, object]:
+    """Choose the producer-visible candidate appropriate to the terminal kind."""
+    if termination == "completed":
+        return terminal.get("candidate"), terminal.get("candidate_lineage_id")
+    return terminal.get("diagnostic_candidate"), terminal.get("diagnostic_candidate_origin")
+
+
 def summarize_rows(rows: list[Mapping[str, Any]], *, planned: int) -> dict[str, Any]:
     if len(rows) > planned or len({row.get("shot_id") for row in rows}) != len(rows):
         raise ValueError("duplicate or excess evaluation attempts")
@@ -473,6 +480,7 @@ def run_native_pairs(*, root: Path, caps: Mapping[str, Any], selection: Mapping[
                 native_rows[-1] = {"shot_id": shot_id, "status": "completed",
                     "sample_identity": observation["sample_identity"], "success_flag": result.success,
                     "selected": bool(result.success and diagnosis["syndrome_valid"]),
+                    "candidate": None if result.candidate is None else np.asarray(result.candidate, dtype=np.uint8).tolist(),
                     "aggregate_iterations": result.aggregate_iterations,
                     "gamma_digests": digests, "executed_gamma_digests_checked": checked,
                     "unavailable_native_facts": unavailable_native_facts(),
@@ -590,15 +598,16 @@ def run_cell(*, root: Path, cell: Mapping[str, Any], manifest: Mapping[str, Any]
         terminal = facts["terminal"]
         classification: dict[str, Any] = {}
         if facts["termination"] is not None:
-            classification = classify_candidate(manifest_path, shot_id=shot_id,
-                                                candidate=terminal.get("diagnostic_candidate"))
+            candidate, candidate_origin = terminal_candidate_for_diagnosis(
+                terminal, termination=facts["termination"])
+            classification = classify_candidate(manifest_path, shot_id=shot_id, candidate=candidate)
         selected = terminal.get("selection_status") == "frozen_decoder_visible_candidate"
         if selected and classification.get("diagnostic_cell") not in {"valid_correct", "valid_wrong_logical"}:
             raise ValueError("selected recovery fails independent syndrome evaluation")
         rows[-1] = {**row, **facts, **classification,
                     "status": "completed" if error is None and verify is not None and facts["termination"] is not None else "incomplete_public_boundary",
                     "outcome": terminal.get("outcome"), "selection_status": terminal.get("selection_status"),
-                    "candidate_origin": terminal.get("diagnostic_candidate_origin"), "selected": selected,
+                    "candidate_origin": candidate_origin, "selected": selected,
                     "failure": error,
                     "public_boundary": {"elapsed_seconds": perf_counter() - started,
                                         "decode_command_seconds": decode_command_seconds,

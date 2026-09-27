@@ -122,6 +122,7 @@ def _benchmark_rows(report: Mapping[str, Any]) -> list[dict[str, object]]:
 
 def _verify_active_benchmark(root: Path, report: Mapping[str, Any]) -> None:
     """Reconstruct every retained active-V4 public arm from its own journal."""
+    active = import_module("run_phase4_active_benchmark")
     artifact_root = root / str(report.get("artifact_root", ""))
     _relative(root, artifact_root)
     if not artifact_root.is_dir():
@@ -153,6 +154,9 @@ def _verify_active_benchmark(root: Path, report: Mapping[str, Any]) -> None:
                     attempts = json.loads(journal.read_text(encoding="utf-8"))
                     if attempts != arm["attempts"] or not attempts:
                         raise ValueError("active benchmark report attempts differ from retained journal")
+                    shot_ids = [attempt.get("shot_id") for attempt in attempts if isinstance(attempt, Mapping)]
+                    if len(attempts) != int(active.SHOTS) or len(shot_ids) != len(set(shot_ids)) or set(shot_ids) != set(range(int(active.SHOTS))):
+                        raise ValueError("active benchmark attempts do not cover each planned shot exactly once")
                     for attempt in attempts:
                         if not isinstance(attempt, Mapping) or attempt.get("status") != "completed":
                             raise ValueError("active benchmark completed arm retains incomplete shot")
@@ -164,8 +168,29 @@ def _verify_active_benchmark(root: Path, report: Mapping[str, Any]) -> None:
                                or fact.get("assessment_status") != "not_assessed" or fact.get("code_id") != code_id
                                for fact in facts):
                             raise ValueError("active benchmark active-memory facts drift from canonical contract")
+                        ledger_facts = active._attempt_from_events(active._events(run), int(attempt["shot_id"]))
+                        if facts != ledger_facts["active_memory_facts"] or not active._active_memory_proven(ledger_facts):
+                            raise ValueError("active benchmark facts differ from retained terminal ledger")
                         if verified["work"] != attempt.get("work_vector"):
                             raise ValueError("active benchmark reported work differs from terminal ledger")
+                    work_total: dict[str, int] = {}
+                    for attempt in attempts:
+                        for name, amount in attempt["work_vector"].items():
+                            work_total[name] = work_total.get(name, 0) + amount
+                    reconstructed = {
+                        "status": "completed",
+                        "active_memory_verified": all(active._active_memory_proven(attempt) for attempt in attempts),
+                        "public_command_wall_seconds": active._distribution(
+                            [attempt.get("public_boundary", {}).get("elapsed_seconds") for attempt in attempts]),
+                        "distinct_leg_count_distribution": active._distribution(
+                            [float(len(attempt["distinct_leg_indices"])) for attempt in attempts]),
+                        "raw_work": {"availability": "observed", "total": work_total,
+                                     "per_shot": [attempt["work_vector"] for attempt in attempts]},
+                        "termination_counts": {key: sum(attempt.get("termination") == key for attempt in attempts)
+                                               for key in sorted({attempt.get("termination") for attempt in attempts if attempt.get("termination")})},
+                    }
+                    if any(arm.get(key) != value for key, value in reconstructed.items()):
+                        raise ValueError("active benchmark arm aggregates differ from retained journal")
 
 
 def _calibration_rows(value: Mapping[str, Any]) -> list[dict[str, object]]:
@@ -215,8 +240,19 @@ def _verify_relay_shot(manifest_path: Path, run_dir: Path, *, shot_id: int, expe
             raise ValueError(f"ledger terminal {key} differs from manifest context")
     if expected_row is not None and expected_row.get("work_vector") is not None and expected_row.get("work_vector") != verified["work"]:
         raise ValueError("reported row work differs from reconstructed ledger work")
+    evaluation, _factorial, _pilots, _runtime = _runners()
+    candidate, candidate_origin = evaluation.terminal_candidate_for_diagnosis(
+        data, termination=terminal.get("termination"))
+    diagnosis = evaluation.classify_candidate(manifest_path, shot_id=shot_id, candidate=candidate)
+    semantic = {**diagnosis, "selected": data.get("selection_status") == "frozen_decoder_visible_candidate",
+                "selection_status": data.get("selection_status"), "candidate_origin": candidate_origin,
+                "outcome": data.get("outcome")}
+    if expected_row is not None:
+        for key, value in semantic.items():
+            if key in expected_row and expected_row.get(key) != value:
+                raise ValueError(f"reported row {key} differs from terminal candidate evidence")
     return {"terminal": terminal, "work": verified["work"], "sample_identity": begin.get("sample_seed_identity"),
-            "trace_count": len(verified["traces"])}
+            "trace_count": len(verified["traces"]), "semantic": semantic}
 
 
 def _benchmark(root: Path) -> dict[str, object]:
@@ -335,7 +371,10 @@ def _factorial(root: Path) -> dict[str, object]:
     if not path.is_file(): return _missing("factorial", path)
     payload = _read(path)
     try:
-        _evaluation, factorial, pilots, _runtime = _runners()
+        predecessor = _evaluation(root)
+        if predecessor.get("execution_qualified") is not True:
+            raise ValueError("factorial predecessor lacks full evaluation terminal proof")
+        _evaluation_runner, factorial, pilots, _runtime = _runners()
         _caps_path, caps = _caps(root, pilots)
         plan = factorial.build_factorial_plan(design=_read(root / "data/evidence/phase4-pilot-design.json"), caps=caps,
                                               supplement=_read(root / "data/evidence/phase4-factorial-execution-supplement-v1.json"))
@@ -406,14 +445,51 @@ def _native(root: Path) -> dict[str, object]:
     if not path.is_file(): return _missing("native", path)
     payload = _read(path)
     try:
-        evaluation, (_caps, _calibration, _selection) = _verified_inputs(root)
+        evaluation, (caps, _calibration, selection) = _verified_inputs(root)
+        plan = evaluation.evaluation_plan(caps, selection)
         if payload.get("status") != "completed": raise ValueError("native producer is nonterminal")
-        for code_id, item in payload.get("codes", {}).items():
+        if payload.get("selected_settings_digest") != evaluation._digest(selection) or payload.get("author_pin") != evaluation.pilot._ACTIVE_V4_AUTHOR_PIN:
+            raise ValueError("native result does not bind selected settings and approved author pin")
+        if set(payload.get("codes", {})) != set(caps["codes"]):
+            raise ValueError("native result omits or adds a frozen code")
+        native_cells = {code_id: evaluation.native_cell(caps, selection, code_id, plan) for code_id in caps["codes"]}
+        for code_id, item in payload["codes"].items():
             if not isinstance(item, Mapping): raise ValueError("native code report is malformed")
+            cell = native_cells[code_id]
+            if cell.get("status") != "ready" or item.get("planned_pairs") != cell.get("shots") or item.get("namespace") != cell.get("native_pair_namespace"):
+                raise ValueError("native report differs from the frozen selected cell")
             journal = path.parent / code_id / "native-attempts.json"
             saved = _read(journal).get("attempts")
             if not isinstance(saved, list) or evaluation.summarize_rows(saved, planned=int(item["planned_pairs"])) != item.get("native_summary"):
                 raise ValueError("native retained attempts do not reconstruct native summary")
+            canonical_root = path.parent / code_id / "canonical"
+            manifest = canonical_root / "manifest.json"
+            expected_manifest = evaluation.build_manifest(base=_read(root / evaluation.active.CODE_MANIFESTS[code_id]), cell=cell, plan=plan)
+            expected_manifest["run_id"] = "phase4-native-matched-" + evaluation._digest({"cell": cell, "selection": plan["selected_settings_digest"]})[:24]
+            if _read(manifest) != expected_manifest:
+                raise ValueError("native canonical manifest differs from frozen cell")
+            canonical_rows = json.loads((canonical_root / "attempts.json").read_text(encoding="utf-8"))
+            if {row.get("shot_id") for row in canonical_rows} != set(range(int(cell["shots"]))):
+                raise ValueError("native canonical journal does not cover every planned shot")
+            for canonical in canonical_rows:
+                if canonical.get("status") != "completed":
+                    raise ValueError("completed native result retains incomplete canonical pair")
+                _verify_relay_shot(manifest, canonical_root / "run", shot_id=int(canonical["shot_id"]), expected_row=canonical)
+            if {row.get("shot_id") for row in saved} != set(range(int(cell["shots"]))):
+                raise ValueError("native journal does not cover every planned shot")
+            pairs = []
+            canonical_by_id = {row["shot_id"]: row for row in canonical_rows}
+            for native in saved:
+                canonical = canonical_by_id.get(native.get("shot_id"))
+                if native.get("status") != "completed" or canonical is None or native.get("sample_identity") != canonical.get("sample_identity"):
+                    raise ValueError("native paired identity or terminal status differs")
+                diagnosis = evaluation.classify_candidate(manifest, shot_id=int(native["shot_id"]), candidate=native.get("candidate"))
+                if any(native.get(key) != value for key, value in diagnosis.items()) or native.get("selected") != bool(native.get("success_flag") and diagnosis["syndrome_valid"]):
+                    raise ValueError("native diagnostic evidence differs from retained candidate")
+                pairs.append({"shot_id": native["shot_id"], "sample_identity": native["sample_identity"],
+                              "arms": {"canonical_source": canonical, "author_native": native}})
+            if item.get("complete_pairs") != len(pairs) or item.get("paired") != evaluation.summarize_matched_cohort(pairs, arm_names=("canonical_source", "author_native")):
+                raise ValueError("native paired aggregate differs from retained journals")
         if payload.get("native_category_wall_seconds_used") != evaluation.native_category_wall(path.parent):
             raise ValueError("native category wall differs from retained terminal records")
         return _snapshot("native", path, payload, qualified=True, reason=None, tables=[_table("native", _failure_rows("native", payload))])

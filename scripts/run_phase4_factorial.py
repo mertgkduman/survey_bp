@@ -247,9 +247,11 @@ def canonical_public_executor(*, repository_root: Path, output_root: Path, plan:
         elapsed=perf_counter()-began; spent += elapsed
         if fact["termination"] is None: return {"cell_id":cell["cell_id"],"sample_namespace":observation["sample_namespace"],"sample_identity":observation["sample_identity"],"execution_status":"incomplete_public_boundary","terminal":False,"raw_work":fact["work_vector"],"runtime_seconds":elapsed,"resource":{"maxrss_kib":None},"trace":trace,"artifact":artifact,"public_boundary":{"preflight":preflight,"run":run,"verify":verify,"cell_deadline_seconds":cell_deadline_seconds,"category_remaining_at_start_seconds":category_remaining}}
         import run_phase4_evaluation as evaluation
-        classification=evaluation.classify_candidate(path,shot_id=cell["shot_id"],candidate=terminal.get("diagnostic_candidate"))
+        candidate, candidate_origin=evaluation.terminal_candidate_for_diagnosis(
+            terminal, termination=fact.get("termination"))
+        classification=evaluation.classify_candidate(path,shot_id=cell["shot_id"],candidate=candidate)
         selected=terminal.get("selection_status")=="frozen_decoder_visible_candidate"
-        return {"cell_id":cell["cell_id"],"sample_namespace":observation["sample_namespace"],"sample_identity":observation["sample_identity"],"execution_status":"completed","terminal":True,**classification,"selected":selected,"candidate_origin":terminal.get("diagnostic_candidate_origin"),"raw_work":fact["work_vector"],"runtime_seconds":elapsed,"resource":{"maxrss_kib":None},"trace":trace,"artifact":artifact,"public_boundary":{"preflight":preflight,"run":run,"verify":verify,"cell_deadline_seconds":cell_deadline_seconds,"category_remaining_at_start_seconds":category_remaining}}
+        return {"cell_id":cell["cell_id"],"sample_namespace":observation["sample_namespace"],"sample_identity":observation["sample_identity"],"execution_status":"completed","terminal":True,**classification,"selected":selected,"selection_status":terminal.get("selection_status"),"candidate_origin":candidate_origin,"outcome":terminal.get("outcome"),"raw_work":fact["work_vector"],"runtime_seconds":elapsed,"resource":{"maxrss_kib":None},"trace":trace,"artifact":artifact,"public_boundary":{"preflight":preflight,"run":run,"verify":verify,"cell_deadline_seconds":cell_deadline_seconds,"category_remaining_at_start_seconds":category_remaining}}
       except (OSError,RuntimeError,ValueError,subprocess.TimeoutExpired,TimeoutError) as error:
         elapsed=0.0 if began is None else perf_counter()-began; spent += elapsed
         trace=_retained_trace_evidence(active,root/"run",cell=cell,plan=plan)

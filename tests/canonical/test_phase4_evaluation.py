@@ -224,3 +224,10 @@ def test_fresh_native_started_attempt_charges_declared_boundary(tmp_path):
     _write(pair / "native-attempts.json", {"attempts": [{"shot_id": 0,
         "status": "incomplete_interrupted"}]})
     assert evaluation.native_category_wall(tmp_path) == 912.5
+
+
+def test_terminal_candidate_uses_completed_candidate_and_budget_diagnostic_candidate():
+    terminal = {"candidate": [1, 0], "candidate_lineage_id": "candidate-lineage",
+                "diagnostic_candidate": [0, 1], "diagnostic_candidate_origin": "last-sweep"}
+    assert evaluation.terminal_candidate_for_diagnosis(terminal, termination="completed") == ([1, 0], "candidate-lineage")
+    assert evaluation.terminal_candidate_for_diagnosis(terminal, termination="max_iterations") == ([0, 1], "last-sweep")

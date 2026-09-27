@@ -117,3 +117,25 @@ def test_active_benchmark_uses_report_digest_and_selected_rate_schema(tmp_path, 
     altered = dict(report); altered["benchmark_digest"] = report["report_digest"]
     _write(report_path, altered)
     assert campaign._benchmark(tmp_path)["execution_qualified"] is False
+
+
+def test_active_benchmark_rejects_duplicate_shots_before_accepting_arm_aggregates(tmp_path):
+    campaign = _module()
+    arm_root = tmp_path / "artifacts/fixture-code/p0030/canonical_default/controlled-relay-31"
+    manifest = arm_root / "manifest.json"
+    _write(manifest, {"fixture": "manifest"})
+    (arm_root / "run").mkdir(parents=True)
+    (arm_root / "run/events.jsonl").write_text("", encoding="utf-8")
+    attempts = [{"shot_id": 0, "status": "completed"} for _ in range(32)]
+    _write(arm_root / "attempts.json", attempts)
+    report = {
+        "artifact_root": "artifacts", "core_commits": ["core"], "author_source_pin": "pin",
+        "codes": {"fixture-code": {"rates": {"p0030": {"error_rate": .03, "presets": {
+            "canonical_default": {"controlled_relay_31": {
+                "status": "completed", "active_memory_verified": True, "attempts": attempts,
+                "manifest_sha256": campaign._json_digest({"fixture": "manifest"}),
+            }},
+        }}}}},
+    }
+    with pytest.raises(ValueError, match="exactly once"):
+        campaign._verify_active_benchmark(tmp_path, report)
