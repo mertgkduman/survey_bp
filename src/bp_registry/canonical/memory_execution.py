@@ -14,7 +14,7 @@ import numpy as np
 from .contracts import MemoryCompositionSpec
 from .memory import (
     AffinePriorMemory, MemoryAssignmentSpec, MemoryAssignmentState,
-    MemoryCompositionState, MemoryState, PDBPFieldMix, PDPrimeDeltaMix,
+    MemoryCompositionState, MemoryProposal, MemoryState, PDBPFieldMix, PDPrimeDeltaMix,
     PosteriorMomentum, V2CDamping,
 )
 from .numerics import NumericalProfile, REFERENCE_CPU_F64, finite_saturate
@@ -48,8 +48,7 @@ def validate_single_attempt_memory(
                 )
             if (binding.state_lifetime != "attempt"
                     or binding.refresh_boundary.value != "attempt_start"
-                    or binding.retain_history
-                    or (binding.kind == "affine_prior" and binding.assignment is not None)):
+                    or binding.retain_history):
                 raise ValueError(f"memory.local_lifecycle_unimplemented:{binding.binding_id}")
         field_index = 0
         for binding in memory.bindings:
@@ -409,6 +408,7 @@ class LocalMemoryExecution:
     def __init__(
         self, edge_table: EdgeTable, *, memory: MemoryCompositionSpec,
         profile: NumericalProfile = REFERENCE_CPU_F64,
+        execution_context: Mapping[str, str] | None = None,
         trace_sink: TraceSink | None = None, trace_context: Mapping[str, str] | None = None,
     ):
         validate_single_attempt_memory(memory, schedule="layered")
@@ -417,12 +417,24 @@ class LocalMemoryExecution:
         self._profile = profile
         self._owner = object()
         self._revision = 0
+        supplied_execution = {} if execution_context is None else dict(execution_context)
+        if any(not isinstance(key, str) or not key or not isinstance(value, str) or not value for key, value in supplied_execution.items()):
+            raise ValueError("local memory execution context must contain only nonempty string identifiers")
         supplied_trace = {} if trace_context is None else dict(trace_context)
         if any(not isinstance(key, str) or not key or not isinstance(value, str) or not value for key, value in supplied_trace.items()):
             raise ValueError("local memory trace context must contain only nonempty string identifiers")
         self._trace_sink = trace_sink
         self._trace_context = supplied_trace
+        # Like flooding memory, assignment draws are decoder state.  Optional
+        # tracing must never influence this key or the PCG64 stream.
+        self._configuration_identity = supplied_execution.get(
+            "configuration_identity", f"memory:{edge_table.graph_sha256}",
+        )
+        self._decoder_identity = supplied_execution.get(
+            "decoder_identity", f"memory-decoder:{edge_table.graph_sha256}",
+        )
         policies = []
+        assignments: list[MemoryAssignmentSpec | None] = []
         for binding in memory.bindings:
             policy_type = {
                 "affine_prior": AffinePriorMemory,
@@ -435,13 +447,25 @@ class LocalMemoryExecution:
                 binding.binding_id, **binding.parameters,
                 advance_boundary="source_iteration" if binding.kind == "affine_prior" else "local_update",
             ))
+            assignment = binding.assignment
+            assignments.append(None if assignment is None else MemoryAssignmentSpec(
+                mode=assignment.mode, graph_sha256=edge_table.graph_sha256,
+                root_seed_identity=assignment.root_seed_identity,
+                refresh_boundary=assignment.refresh_boundary, retain_history=False,
+                low=assignment.low, high=assignment.high,
+            ))
         self._policies = tuple(policies)
+        self._assignments = tuple(assignments)
         self._histories: tuple[Any, ...] | None = None
+        self._assignment_states: tuple[MemoryAssignmentState | None, ...] | None = None
+        self._assignment_evidence: tuple[dict[str, Any] | None, ...] | None = None
         self._pending: list[Any] | None = None
         self._pending_beliefs: np.ndarray | None = None
         self._base_prior: np.ndarray | None = None
         self._active_prior: np.ndarray | None = None
         self._pending_prior_proposals: tuple[tuple[int, Any], ...] | None = None
+        self._pending_assignment_states: tuple[MemoryAssignmentState | None, ...] | None = None
+        self._pending_assignment_evidence: tuple[dict[str, Any] | None, ...] | None = None
         self._source_iterations = 0
         self._seen_beliefs = False
         self._seen_v2c = False
@@ -469,6 +493,14 @@ class LocalMemoryExecution:
         self._owner = object()
         self._revision = 0
         self._histories = tuple(histories)
+        self._assignment_states = tuple(
+            None if assignment is None else assignment.initial_state(
+                configuration_identity=self._configuration_identity,
+                decoder_identity=self._decoder_identity,
+            )
+            for assignment in self._assignments
+        )
+        self._assignment_evidence = tuple(None for _ in self.memory.bindings)
         self._base_prior = np.array(beliefs, copy=True)
         self._base_prior.setflags(write=False)
         self._active_prior = None
@@ -485,27 +517,59 @@ class LocalMemoryExecution:
         """Stage the fixed prior for one complete deterministic traversal."""
         if not self.has_source_iteration_prior:
             return None
-        if self._histories is None or self._base_prior is None:
+        if (self._histories is None or self._base_prior is None
+                or self._assignment_states is None or self._assignment_evidence is None):
             raise ValueError("local prior memory requires initialization")
         if self._active_prior is not None or self._pending_prior_proposals is not None:
             raise ValueError("local prior memory already has an active source iteration")
         prior = self._base_prior
         proposals: list[tuple[int, Any]] = []
-        for index, (binding, policy, state) in enumerate(zip(self.memory.bindings, self._policies, self._histories, strict=True)):
+        pending_states = list(self._assignment_states)
+        pending_evidence = list(self._assignment_evidence)
+        for index, (binding, policy, state, assignment, assignment_state) in enumerate(zip(
+            self.memory.bindings, self._policies, self._histories, self._assignments,
+            self._assignment_states, strict=True,
+        )):
             if binding.kind == "affine_prior":
                 assert isinstance(state, MemoryState)
-                proposal = policy.propose(prior, state.posterior)
+                if assignment is None:
+                    proposal = policy.propose(prior, state.posterior)
+                else:
+                    assert assignment_state is not None
+                    transition = assignment.refresh(
+                        assignment_state, boundary="source_iteration",
+                        replay_identity=f"{self._decoder_identity}:source_iteration:{self._source_iterations}",
+                        variable_count=self.edge_table.variable_count,
+                        budgets=BudgetTree(limits=(), parents={}), budget_scope="attempt",
+                        history_state=MemoryCompositionState(), schedule_cursor=(self._source_iterations,),
+                        work=WorkVector.zero(),
+                    )
+                    if not transition.admitted:
+                        raise RuntimeError("admitted local-memory traversal unexpectedly denied assignment refresh")
+                    alpha = np.asarray(transition.values, dtype=np.float64)
+                    if alpha.shape != prior.shape or not np.all(np.isfinite(alpha)):
+                        raise ValueError("disordered local affine-prior assignment does not preserve variable shape")
+                    assigned_prior = self._bounded(
+                        (1.0 - alpha) * prior + alpha * state.posterior,
+                        "local_memory_disordered_affine_prior", self.edge_table.variable_count,
+                    )
+                    proposal = MemoryProposal(binding.binding_id, assigned_prior, state.posterior)
+                    pending_states[index] = transition.state
+                    pending_evidence[index] = transition.evidence
                 prior = self._bounded(proposal.prior, "local_memory_affine_prior", self.edge_table.variable_count)
                 proposals.append((index, proposal))
         self._active_prior = prior
         self._pending_prior_proposals = tuple(proposals)
+        self._pending_assignment_states = tuple(pending_states)
+        self._pending_assignment_evidence = tuple(pending_evidence)
         return prior
 
     def complete_source_iteration(self) -> None:
         """Commit staged affine histories only after every traversal unit committed."""
         if not self.has_source_iteration_prior:
             return
-        if self._histories is None or self._pending_prior_proposals is None or self._active_prior is None:
+        if (self._histories is None or self._pending_prior_proposals is None or self._active_prior is None
+                or self._pending_assignment_states is None or self._pending_assignment_evidence is None):
             raise ValueError("local prior memory has no complete source iteration to commit")
         if self._committed_beliefs is None:
             raise ValueError("local prior memory lacks the final decoder-visible posterior")
@@ -517,6 +581,8 @@ class LocalMemoryExecution:
             policy = self._policies[index]
             histories[index] = policy.commit(replace(proposal, posterior=posterior), histories[index])
         self._histories = tuple(histories)
+        self._assignment_states = self._pending_assignment_states
+        self._assignment_evidence = self._pending_assignment_evidence
         self._source_iterations += 1
         if self._trace_sink is not None:
             self._trace_sink.observe(
@@ -527,6 +593,11 @@ class LocalMemoryExecution:
                     "beliefs": posterior,
                     "history_sha256": MemoryFloodingSchedule._history_digests(self._histories),
                     "history_values": MemoryFloodingSchedule._history_values(self._histories),
+                    **({"assignment_evidence": {
+                        binding.binding_id: evidence
+                        for binding, evidence in zip(self.memory.bindings, self._assignment_evidence, strict=True)
+                        if evidence is not None
+                    }} if any(evidence is not None for evidence in self._assignment_evidence) else {}),
                 },
             )
         self.abort_source_iteration()
@@ -535,6 +606,8 @@ class LocalMemoryExecution:
         """Discard an incomplete traversal's staged affine prior/history proposal."""
         self._active_prior = None
         self._pending_prior_proposals = None
+        self._pending_assignment_states = None
+        self._pending_assignment_evidence = None
 
     def begin_step(self) -> None:
         if self._histories is None:
@@ -650,6 +723,13 @@ class LocalMemoryExecution:
             "committed_local_updates": self._revision,
             "committed_source_iterations": self._source_iterations,
             "history_sha256": MemoryFloodingSchedule._history_digests(histories),
+            **({"assignment_evidence": {
+                binding.binding_id: evidence
+                for binding, evidence in zip(self.memory.bindings, self._assignment_evidence, strict=True)
+                if evidence is not None
+            }} if self._assignment_evidence is not None and any(
+                evidence is not None for evidence in self._assignment_evidence
+            ) else {}),
             "memory_element_updates": {
                 binding.binding_id: (
                     self._source_iterations if binding.kind == "affine_prior" else self._revision

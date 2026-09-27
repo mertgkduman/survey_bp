@@ -1012,6 +1012,7 @@ def run_canonical_structural_shot(
                                 local_memory = LocalMemoryExecution(
                                     edge_table, memory=parsed.memory,
                                     profile=kernel.profile,
+                                    execution_context=memory_context,
                                     trace_sink=trace_sink, trace_context=trace_context,
                                 )
                                 local_memory.initialize(

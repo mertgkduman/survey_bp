@@ -12,7 +12,7 @@ from bp_registry.canonical.contracts import MemoryCompositionSpec
 from bp_registry.canonical.schedules import EdgeTable
 
 
-def _composition(*kinds: str) -> MemoryCompositionSpec:
+def _composition(*kinds: str, assignment: dict[str, object] | None = None) -> MemoryCompositionSpec:
     target = {
         "affine_prior": "prior",
         "pdbp_field_mix": "belief", "pdprime_delta_mix": "belief",
@@ -31,6 +31,7 @@ def _composition(*kinds: str) -> MemoryCompositionSpec:
             "advance_boundary": "source_iteration" if kind == "affine_prior" else "local_update",
             "refresh_boundary": "attempt_start",
             "source_status": "canonical_adaptation",
+            **({"assignment": assignment} if kind == "affine_prior" and assignment is not None else {}),
         }
         for index, kind in enumerate(kinds)
     ]})
@@ -114,23 +115,43 @@ def test_local_saturates_pdprime_history_before_the_next_unit_and_trace(tmp_path
     assert all(record["payload"]["history_values"]["pdprime"]["field"]["typed_array"]["values"] == [25.0] for record in records)
 
 
-def test_local_affine_prior_stages_and_commits_only_a_complete_traversal():
+def test_local_disordered_affine_prior_stages_rng_and_history_only_for_complete_traversals():
     from bp_registry.canonical.memory_execution import LocalMemoryExecution
 
+    assignment = {
+        "mode": "uniform", "low": 0.2, "high": 0.8,
+        "root_seed_identity": "d" * 64, "refresh_boundary": "source_iteration",
+        "rng_algorithm": "numpy.PCG64",
+    }
     controller = LocalMemoryExecution(
-        EdgeTable.from_edges(1, 1, [(0, 0)]), memory=_composition("affine_prior", "affine_prior"),
+        EdgeTable.from_edges(1, 1, [(0, 0)]),
+        memory=_composition("affine_prior", "affine_prior", assignment=assignment),
+        execution_context={"configuration_identity": "configuration", "decoder_identity": "decoder-shot-0"},
     )
     controller.initialize(error_rate=0.1, initial_v2c=np.asarray([0.0]), initial_beliefs=np.asarray([2.0]))
+    before = controller.evidence()
+    np.testing.assert_allclose(controller.begin_source_iteration(), [2.0])
+    # An incomplete traversal neither advances PCG64 state nor leaks an
+    # assignment record into terminal evidence.
+    controller.abort_source_iteration()
+    assert controller.evidence() == before
     np.testing.assert_allclose(controller.begin_source_iteration(), [2.0])
     controller.begin_step()
     controller.transform_beliefs(np.asarray([6.0]), np.asarray([0.0]))
     controller.commit(controller.proposal())
     controller.complete_source_iteration()
-    assert controller.evidence()["committed_source_iterations"] == 1
+    evidence = controller.evidence()
+    assert evidence["committed_source_iterations"] == 1
     assert controller.evidence()["memory_element_updates"] == {"affine_prior-0": 1, "affine_prior-1": 1}
-    np.testing.assert_allclose(controller.begin_source_iteration(), [5.0])
+    assignments = evidence["assignment_evidence"]
+    assert set(assignments) == {"affine_prior-0", "affine_prior-1"}
+    assert {item["algorithm"] for item in assignments.values()} == {"numpy.PCG64"}
+    assert {item["replay_identity"] for item in assignments.values()} == {"decoder-shot-0:source_iteration:0"}
+    staged = controller.begin_source_iteration()
     controller.abort_source_iteration()
-    assert controller.evidence()["committed_source_iterations"] == 1
+    np.testing.assert_allclose(controller.begin_source_iteration(), staged)
+    controller.abort_source_iteration()
+    assert controller.evidence() == evidence
 
 
 def test_local_memory_rejects_order_and_preserves_history_on_abandoned_step():
@@ -272,6 +293,67 @@ def test_public_local_ordered_affine_prior_replays_for_each_deterministic_schedu
     assert all("assignment_evidence" not in data["memory_execution"] for data in terminals)
 
 
+@pytest.mark.parametrize("schedule_kind", ["layered", "check_node_serial", "variable_node_serial"])
+def test_public_local_disordered_affine_prior_has_trace_neutral_pcg64_replay(tmp_path, schedule_kind):
+    """Public local memory binds draws to the decoder, never a trace or truth."""
+    from bp_registry.cli import run_canonical, verify_run
+    from bp_registry.canonical.tracing import TraceSink
+    from bp_registry.ledger import read_canonical_events
+
+    root = Path(__file__).resolve().parents[2]
+    base = json.loads((root / "data/manifests/canonical-three-qubit-development.json").read_text())
+    base.update({"schema_version": 4, "run_id": f"canonical-{schedule_kind}-local-disordered"})
+    schedule = {
+        "kind": schedule_kind, "binding_id": f"schedule-{schedule_kind}-local-disordered-v1",
+        "state_lifetime": "iteration", "owned_state": [], "requires": [], "provides": [],
+    }
+    if schedule_kind == "layered":
+        schedule.update({"partitions": [[0]], "provenance": "explicit"})
+    base["policies"]["schedule"] = schedule
+    base["memory"] = _composition(
+        "affine_prior", "pdbp_field_mix", "v2c_damping",
+        assignment={
+            "mode": "uniform", "low": 0.2, "high": 0.8,
+            "root_seed_identity": "e" * 64, "refresh_boundary": "source_iteration",
+            "rng_algorithm": "numpy.PCG64",
+        },
+    ).model_dump(mode="json")
+    base["randomness"]["physical_sample_identity"] = f"local-disordered-{schedule_kind}-sample"
+    off, on = tmp_path / f"{schedule_kind}-off.json", tmp_path / f"{schedule_kind}-on.json"
+    for path, level in ((off, "off"), (on, "full")):
+        manifest = json.loads(json.dumps(base))
+        manifest["trace_plan"] = {
+            "level": level, "relative_dir": "trace-sidecars",
+            "max_records": 16 if level == "full" else 0,
+            "max_bytes": 16_384 if level == "full" else 0,
+            "label": "prespecified_campaign" if level == "full" else "development_default",
+        }
+        path.write_text(json.dumps(manifest), encoding="utf-8")
+    off_output, on_output = tmp_path / f"{schedule_kind}-off", tmp_path / f"{schedule_kind}-on"
+    assert run_canonical(off, off_output)["final_row_count"] == 2
+    assert run_canonical(on, on_output)["final_row_count"] == 2
+    assert verify_run(on_output)["final_row_count"] == 2
+    off_terminal = [event["data"] for event in read_canonical_events(off_output / "events.jsonl") if event["kind"] == "termination"]
+    on_terminal = [event["data"] for event in read_canonical_events(on_output / "events.jsonl") if event["kind"] == "termination"]
+    assert [item["memory_execution"] for item in off_terminal] == [item["memory_execution"] for item in on_terminal]
+    for item in on_terminal:
+        memory = item["memory_execution"]
+        if memory["committed_source_iterations"]:
+            assert memory["assignment_evidence"]["affine_prior-0"]["algorithm"] == "numpy.PCG64"
+        else:
+            assert "assignment_evidence" not in memory
+    links = [event for event in read_canonical_events(on_output / "events.jsonl") if event["kind"] == "trace_link"]
+    documents = [
+        TraceSink.load(on_output, event["sidecar"]["path"], expected_sha256=event["sidecar"]["sha256"])
+        for event in links
+    ]
+    # The trace exposes only decoder identities; no physical truth enters a
+    # local assignment or its PCG64 replay key.
+    decoder_ids = {document["records"][0]["payload"]["decoder_identity"] for document in documents}
+    assert len(decoder_ids) == 2
+    assert "hidden_truth" not in str(documents)
+
+
 def _public_local_trace_manifest(tmp_path, *, trace: bool, max_records: int = 16):
     root = Path(__file__).resolve().parents[2]
     manifest = json.loads((root / "data/manifests/canonical-three-qubit-development.json").read_text())
@@ -357,11 +439,23 @@ def test_local_pdprime_numerical_failure_discards_uncommitted_histories(tmp_path
 
     monkeypatch.setattr(PDPrimeDeltaMix, "propose", fail)
     path = _public_local_trace_manifest(tmp_path, trace=False)
+    manifest = json.loads(path.read_text())
+    manifest["memory"] = _composition(
+        "affine_prior", "pdprime_delta_mix",
+        assignment={
+            "mode": "uniform", "low": 0.2, "high": 0.8,
+            "root_seed_identity": "f" * 64, "refresh_boundary": "source_iteration",
+            "rng_algorithm": "numpy.PCG64",
+        },
+    ).model_dump(mode="json")
+    path.write_text(json.dumps(manifest), encoding="utf-8")
     output = tmp_path / "numerical"
     assert run_canonical(path, output)["final_row_count"] == 2
     assert verify_run(output)["final_row_count"] == 2
     terminals = [event["data"] for event in read_canonical_events(output / "events.jsonl") if event["kind"] == "termination"]
     assert all(data["memory_execution"]["committed_local_updates"] == 0 for data in terminals)
+    assert all(data["memory_execution"]["committed_source_iterations"] == 0 for data in terminals)
+    assert all("assignment_evidence" not in data["memory_execution"] for data in terminals)
     monkeypatch.setattr(PDPrimeDeltaMix, "propose", original)
 
 

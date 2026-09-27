@@ -559,6 +559,7 @@ def _expected_local_attempt(
         local_memory = LocalMemoryExecution(
             table, memory=MemoryCompositionSpec.model_validate(context.compact_manifest["memory"]),
             profile=kernel.profile,
+            execution_context=context.memory_execution_context,
             trace_sink=trace_sink, trace_context=trace_context,
         )
         local_memory.initialize(
