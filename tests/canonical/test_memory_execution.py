@@ -449,7 +449,7 @@ def test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading(tmp_
     binding = value["memory"]["bindings"][0]
     if case == "local":
         value["policies"]["schedule"]["kind"] = "check_node_serial"
-        value["memory"] = composition("posterior_momentum", {"alpha": 0.5, "gamma": 0.5}).model_dump(mode="json")
+        value["memory"] = composition("affine_prior", {"alpha": 0.5}).model_dump(mode="json")
         value["memory"]["bindings"][0]["advance_boundary"] = "local_update"
     elif case == "retained":
         binding["retain_history"] = True

@@ -348,7 +348,7 @@ class LayeredSchedule:
 
     def _compute_layer(
         self, messages: np.ndarray, syndrome: np.ndarray, *, error_rate: float, layer_index: int,
-        transform_beliefs: Callable[[np.ndarray], np.ndarray] | None = None,
+        transform_beliefs: Callable[[np.ndarray, np.ndarray], np.ndarray] | None = None,
         transform_v2c: Callable[[np.ndarray], np.ndarray] | None = None,
     ) -> tuple[np.ndarray, np.ndarray]:
         entry = finite_saturate(messages, boundary="layer_entry_v2c")
@@ -366,7 +366,7 @@ class LayeredSchedule:
         prior = self.kernel.prior(error_rate)
         beliefs = self.kernel.assemble_beliefs(self.edge_table.variable_count, self._edge_variables, c2v, prior)
         if transform_beliefs is not None:
-            beliefs = finite_saturate(transform_beliefs(beliefs), boundary="layer_memory_beliefs")
+            beliefs = finite_saturate(transform_beliefs(beliefs, c2v), boundary="layer_memory_beliefs")
         candidate = self.kernel.candidate_from_beliefs(beliefs)
         affected_variables = set().union(*(self._check_variables[check] for check in layer))
         updated = np.array(entry_snapshot, dtype=np.float64, copy=True)
@@ -410,7 +410,7 @@ class LayeredSchedule:
         error_rate: float,
         progress: Any,
         is_converged: Callable[[np.ndarray], bool],
-        transform_beliefs: Callable[[np.ndarray], np.ndarray] | None = None,
+        transform_beliefs: Callable[[np.ndarray, np.ndarray], np.ndarray] | None = None,
         transform_v2c: Callable[[np.ndarray], np.ndarray] | None = None,
     ) -> ScheduledLocalStepResult:
         """Drive the production atomic executor and advance only an admitted cursor."""
@@ -514,7 +514,7 @@ class _NodeSerialSchedule:
 
     def _compute_unit(
         self, messages: np.ndarray, syndrome: np.ndarray, *, error_rate: float, unit_index: int,
-        transform_beliefs: Callable[[np.ndarray], np.ndarray] | None = None,
+        transform_beliefs: Callable[[np.ndarray, np.ndarray], np.ndarray] | None = None,
         transform_v2c: Callable[[np.ndarray], np.ndarray] | None = None,
     ) -> tuple[np.ndarray, np.ndarray, Any]:
         raise NotImplementedError
@@ -552,7 +552,7 @@ class _NodeSerialSchedule:
         error_rate: float,
         progress: Any,
         is_converged: Callable[[np.ndarray], bool],
-        transform_beliefs: Callable[[np.ndarray], np.ndarray] | None = None,
+        transform_beliefs: Callable[[np.ndarray, np.ndarray], np.ndarray] | None = None,
         transform_v2c: Callable[[np.ndarray], np.ndarray] | None = None,
     ) -> ScheduledLocalStepResult:
         from .execution import ScheduleProgress
@@ -626,7 +626,7 @@ class CheckNodeSerialSchedule(_NodeSerialSchedule):
 
     def _compute_unit(
         self, messages: np.ndarray, syndrome: np.ndarray, *, error_rate: float, unit_index: int,
-        transform_beliefs: Callable[[np.ndarray], np.ndarray] | None = None,
+        transform_beliefs: Callable[[np.ndarray, np.ndarray], np.ndarray] | None = None,
         transform_v2c: Callable[[np.ndarray], np.ndarray] | None = None,
     ) -> tuple[np.ndarray, np.ndarray, Any]:
         entry = finite_saturate(messages, boundary="check_serial_entry_v2c")
@@ -642,7 +642,7 @@ class CheckNodeSerialSchedule(_NodeSerialSchedule):
         prior = self.kernel.prior(error_rate)
         beliefs = self.kernel.assemble_beliefs(self.edge_table.variable_count, self._edge_variables, c2v, prior)
         if transform_beliefs is not None:
-            beliefs = finite_saturate(transform_beliefs(beliefs), boundary="check_serial_memory_beliefs")
+            beliefs = finite_saturate(transform_beliefs(beliefs, c2v), boundary="check_serial_memory_beliefs")
         candidate = self.kernel.candidate_from_beliefs(beliefs)
         affected = {self.edge_table.edges[index][1] for index in indices}
         updated = np.array(snapshot, dtype=np.float64, copy=True)
@@ -685,7 +685,7 @@ class VariableNodeSerialSchedule(_NodeSerialSchedule):
 
     def _compute_unit(
         self, messages: np.ndarray, syndrome: np.ndarray, *, error_rate: float, unit_index: int,
-        transform_beliefs: Callable[[np.ndarray], np.ndarray] | None = None,
+        transform_beliefs: Callable[[np.ndarray, np.ndarray], np.ndarray] | None = None,
         transform_v2c: Callable[[np.ndarray], np.ndarray] | None = None,
     ) -> tuple[np.ndarray, np.ndarray, Any]:
         entry = finite_saturate(messages, boundary="variable_serial_entry_v2c")
@@ -696,7 +696,7 @@ class VariableNodeSerialSchedule(_NodeSerialSchedule):
         prior = self.kernel.prior(error_rate)
         beliefs = self.kernel.assemble_beliefs(self.edge_table.variable_count, self._edge_variables, c2v, prior)
         if transform_beliefs is not None:
-            beliefs = finite_saturate(transform_beliefs(beliefs), boundary="variable_serial_memory_beliefs")
+            beliefs = finite_saturate(transform_beliefs(beliefs, c2v), boundary="variable_serial_memory_beliefs")
         candidate = self.kernel.candidate_from_beliefs(beliefs)
         updated = np.array(snapshot, dtype=np.float64, copy=True)
         for edge_index in self._variable_edges[unit_index]:

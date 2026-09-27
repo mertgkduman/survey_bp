@@ -29,13 +29,14 @@ def validate_single_attempt_memory(
 ) -> None:
     """Fail before sampling for lifecycle or operand orders not yet executed."""
     if schedule in {"layered", "check_node_serial", "variable_node_serial"}:
-        ranks = {"belief": 0, "v2c": 1}
+        ranks = {"belief": 0, "posterior": 0, "v2c": 1}
         orders = [ranks.get(binding.target, -1) for binding in memory.bindings]
         if -1 in orders or orders != sorted(orders):
             raise ValueError("memory.local_execution_order_requires_belief_then_v2c")
         for binding in memory.bindings:
             if (binding.kind, binding.target) not in {
-                ("pdbp_field_mix", "belief"), ("v2c_damping", "v2c"),
+                ("pdbp_field_mix", "belief"), ("pdprime_delta_mix", "belief"),
+                ("posterior_momentum", "posterior"), ("v2c_damping", "v2c"),
             } or binding.advance_boundary.value != "local_update":
                 raise ValueError(
                     f"memory.local_operand_unimplemented:{binding.kind}:{binding.target}:{binding.advance_boundary.value}"
@@ -44,6 +45,9 @@ def validate_single_attempt_memory(
                     or binding.refresh_boundary.value != "attempt_start"
                     or binding.retain_history):
                 raise ValueError(f"memory.local_lifecycle_unimplemented:{binding.binding_id}")
+        for index, binding in enumerate(memory.bindings):
+            if binding.kind == "pdprime_delta_mix" and index != 0:
+                raise ValueError("memory.pdprime_requires_fixed_prior_and_first_field_position")
         return
     if schedule != "flooding":
         raise ValueError(f"memory.execution_schedule_unimplemented:{schedule}")
@@ -378,12 +382,13 @@ class LocalMemoryProposal:
     """One local-unit history proposal, detached from the durable owner."""
 
     histories: tuple[Any, ...]
+    beliefs: np.ndarray
     owner: object
     revision: int
 
 
 class LocalMemoryExecution:
-    """Commit PDBP fields and V2C damping with an admitted local unit.
+    """Commit exact local memory operands with an admitted Phase 3 unit.
 
     Phase 3 local schedules assemble an entire decoder-visible belief vector,
     then build the affected V2C messages.  This coordinator inserts only the
@@ -392,21 +397,36 @@ class LocalMemoryExecution:
     local unit whose convergence check succeeded.
     """
 
-    def __init__(self, edge_table: EdgeTable, *, memory: MemoryCompositionSpec):
+    def __init__(
+        self, edge_table: EdgeTable, *, memory: MemoryCompositionSpec,
+        trace_sink: TraceSink | None = None, trace_context: Mapping[str, str] | None = None,
+    ):
         validate_single_attempt_memory(memory, schedule="layered")
         self.edge_table = edge_table
         self.memory = memory
         self._owner = object()
         self._revision = 0
+        supplied_trace = {} if trace_context is None else dict(trace_context)
+        if any(not isinstance(key, str) or not key or not isinstance(value, str) or not value for key, value in supplied_trace.items()):
+            raise ValueError("local memory trace context must contain only nonempty string identifiers")
+        self._trace_sink = trace_sink
+        self._trace_context = supplied_trace
         policies = []
         for binding in memory.bindings:
-            policy_type = {"pdbp_field_mix": PDBPFieldMix, "v2c_damping": V2CDamping}[binding.kind]
+            policy_type = {
+                "pdbp_field_mix": PDBPFieldMix,
+                "pdprime_delta_mix": PDPrimeDeltaMix,
+                "posterior_momentum": PosteriorMomentum,
+                "v2c_damping": V2CDamping,
+            }[binding.kind]
             policies.append(policy_type(binding.binding_id, **binding.parameters, advance_boundary="local_update"))
         self._policies = tuple(policies)
         self._histories: tuple[Any, ...] | None = None
         self._pending: list[Any] | None = None
+        self._pending_beliefs: np.ndarray | None = None
         self._seen_beliefs = False
         self._seen_v2c = False
+        self._committed_beliefs: np.ndarray | None = None
 
     def initialize(self, *, error_rate: float, initial_v2c: np.ndarray, initial_beliefs: np.ndarray) -> None:
         del error_rate  # The caller computes initial decoder-visible operands.
@@ -417,29 +437,48 @@ class LocalMemoryExecution:
         if not np.all(np.isfinite(v2c)) or not np.all(np.isfinite(beliefs)):
             raise ValueError("local memory initialization requires finite decoder-visible operands")
         histories = []
+        initial_c2v = self._per_variable_c2v(np.zeros(self.edge_table.edge_count, dtype=np.float64))
         for binding, policy in zip(self.memory.bindings, self._policies, strict=True):
-            histories.append(policy.initial_state(beliefs) if binding.kind == "pdbp_field_mix" else policy.initial_state(v2c))
+            if binding.kind == "pdprime_delta_mix":
+                histories.append(policy.initial_state(beliefs, initial_c2v))
+            elif binding.kind in {"pdbp_field_mix", "posterior_momentum"}:
+                histories.append(policy.initial_state(beliefs))
+            else:
+                histories.append(policy.initial_state(v2c))
         self._owner = object()
         self._revision = 0
         self._histories = tuple(histories)
+        self._committed_beliefs = np.array(beliefs, copy=True)
         self.discard()
 
     def begin_step(self) -> None:
         if self._histories is None:
             raise ValueError("local memory requires initialization before a local step")
         self._pending = list(self._histories)
-        self._seen_beliefs = not any(binding.kind == "pdbp_field_mix" for binding in self.memory.bindings)
+        self._seen_beliefs = not any(binding.kind in {"pdbp_field_mix", "pdprime_delta_mix", "posterior_momentum"} for binding in self.memory.bindings)
         self._seen_v2c = not any(binding.kind == "v2c_damping" for binding in self.memory.bindings)
 
-    def transform_beliefs(self, fresh_beliefs: np.ndarray) -> np.ndarray:
+    def transform_beliefs(self, fresh_beliefs: np.ndarray, fresh_c2v: np.ndarray) -> np.ndarray:
         if self._histories is None or self._pending is None:
             raise ValueError("local memory belief transform requires an active local step")
         value = self._bounded(fresh_beliefs, "local_memory_fresh_beliefs", self.edge_table.variable_count)
+        c2v_sum = self._per_variable_c2v(fresh_c2v)
         for index, (binding, policy, state) in enumerate(zip(self.memory.bindings, self._policies, self._histories, strict=True)):
             if binding.kind == "pdbp_field_mix":
                 proposal = policy.propose(state.field, value, boundary="local_update")
                 value = self._bounded(proposal.value, "local_memory_pdbp_field", self.edge_table.variable_count)
                 self._pending[index] = policy.commit(replace(proposal, value=value, history=(value,)), state)
+            elif binding.kind == "pdprime_delta_mix":
+                proposal = policy.propose(state.field, state.c2v, c2v_sum, boundary="local_update")
+                value = self._bounded(proposal.value, "local_memory_pdprime_field", self.edge_table.variable_count)
+                self._pending[index] = policy.commit(
+                    replace(proposal, value=value, history=(value, proposal.history[1])), state,
+                )
+            elif binding.kind == "posterior_momentum":
+                proposal = policy.propose(state, value, boundary="local_update")
+                value = self._bounded(proposal.posterior, "local_memory_momentum_posterior", self.edge_table.variable_count)
+                self._pending[index] = policy.commit(replace(proposal, posterior=value), state)
+        self._pending_beliefs = value
         self._seen_beliefs = True
         return value
 
@@ -456,20 +495,35 @@ class LocalMemoryExecution:
         return value
 
     def proposal(self) -> LocalMemoryProposal:
-        if self._pending is None or not self._seen_beliefs or not self._seen_v2c:
+        if self._pending is None or self._pending_beliefs is None or not self._seen_beliefs or not self._seen_v2c:
             raise ValueError("local memory proposal lacks a complete declared operand set")
-        return LocalMemoryProposal(tuple(self._pending), self._owner, self._revision)
+        return LocalMemoryProposal(tuple(self._pending), self._pending_beliefs, self._owner, self._revision)
 
     def commit(self, proposal: LocalMemoryProposal) -> None:
         if proposal.owner is not self._owner or proposal.revision != self._revision:
             raise ValueError("local memory commit received a foreign or stale proposal")
         self._histories = proposal.histories
         self._revision += 1
+        self._committed_beliefs = self._bounded(
+            proposal.beliefs, "local_memory_committed_beliefs", self.edge_table.variable_count,
+        )
+        if self._trace_sink is not None:
+            self._trace_sink.observe(
+                kind="memory_local_update", iteration=self._revision - 1,
+                payload={
+                    **self._trace_context,
+                    "local_update": self._revision - 1,
+                    "beliefs": self._committed_beliefs,
+                    "history_sha256": MemoryFloodingSchedule._history_digests(self._histories),
+                    "history_values": MemoryFloodingSchedule._history_values(self._histories),
+                },
+            )
         self.discard()
 
     def discard(self) -> None:
         """Drop an unadmitted proposal after a denial or compute/check failure."""
         self._pending = None
+        self._pending_beliefs = None
         self._seen_beliefs = False
         self._seen_v2c = False
 
@@ -481,6 +535,25 @@ class LocalMemoryExecution:
         copied = np.array(array, copy=True)
         copied.setflags(write=False)
         return copied
+
+    def _per_variable_c2v(self, c2v: np.ndarray) -> np.ndarray:
+        values = self._bounded(c2v, "local_memory_fresh_c2v", self.edge_table.edge_count)
+        reduced = np.zeros((1, self.edge_table.variable_count), dtype=np.float64)
+        np.add.at(reduced[0], np.asarray([variable for _check, variable in self.edge_table.edges], dtype=np.intp), values)
+        reduced.setflags(write=False)
+        return reduced
+
+    def observe_candidate(self, *, origin: Mapping[str, object], candidate: np.ndarray | None) -> None:
+        if self._trace_sink is None:
+            return
+        if candidate is not None and (candidate.ndim != 1 or not np.issubdtype(candidate.dtype, np.integer)):
+            raise ValueError("local memory trace candidate must be a one-dimensional integer vector")
+        self._trace_sink.observe(
+            kind="memory_candidate", payload={**self._trace_context, "origin": dict(origin), "candidate": candidate},
+        )
+
+    def trace_result(self) -> TraceResult | None:
+        return None if self._trace_sink is None else self._trace_sink.finish()
 
     def evidence(self) -> dict[str, Any]:
         histories = () if self._histories is None else self._histories
@@ -494,7 +567,13 @@ class LocalMemoryExecution:
             "history_sha256": MemoryFloodingSchedule._history_digests(histories),
             "memory_element_updates": {
                 binding.binding_id: self._revision * (
-                    self.edge_table.variable_count if binding.target == "belief" else self.edge_table.edge_count
+                    self.edge_table.edge_count if binding.kind == "v2c_damping"
+                    else 2 * self.edge_table.variable_count
+                    if binding.kind in {"pdprime_delta_mix", "posterior_momentum"}
+                    else self.edge_table.variable_count
                 ) for binding in self.memory.bindings
             },
+            "memory_c2v_reduction_additions": self._revision * self.edge_table.edge_count if any(
+                binding.kind == "pdprime_delta_mix" for binding in self.memory.bindings
+            ) else 0,
         }

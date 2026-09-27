@@ -30,6 +30,11 @@ _LOCAL_OPERANDS = frozenset({
     # vector before candidate construction and V2C mutation.  PDBP consumes
     # precisely that decoder-visible field and its separately owned old field.
     ("pdbp_field_mix", "belief", "local_update"),
+    # Local schedules retain the complete current C2V vector while assembling
+    # the fresh belief field, so PD-prime receives its matched sufficient
+    # statistic directly rather than a reconstruction from a clipped belief.
+    ("pdprime_delta_mix", "belief", "local_update"),
+    ("posterior_momentum", "posterior", "local_update"),
 })
 
 

@@ -932,6 +932,8 @@ def validate_canonical_shot(
     lineage = _expected_attempt_lineage(context)
     if term == "numerical_failure":
         failed_memory = context.compact_manifest.get("schema_version") == 5
+        is_local = context.schedule_kind != "flooding"
+        schedule_fields = frozenset({"schedule_terminal", "schedule_evidence"}) if is_local else frozenset()
         if failed_memory:
             runtime_fields |= {"iterations", "memory_execution"}
             count = terminal_data.get("iterations")
@@ -951,8 +953,8 @@ def validate_canonical_shot(
         missingness = _exact_data(records["missingness"], common | {"field", "reason"})
         if dict((field, missingness[field]) for field in ("field", "reason")) != {"field": "candidate", "reason": "numerical_failure"}:
             raise CanonicalStructuralVerificationError("numerical failure missingness evidence is invalid")
-        work_data = _exact_data(records["work"], common | {"qualified_iterations", "work_vector"})
-        _exact_data(terminal, common | {"numerical_failure", "selection_status", "outcome", "verification_status", "work_vector"} | runtime_fields)
+        work_data = _exact_data(records["work"], common | {"qualified_iterations", "work_vector"} | schedule_fields)
+        _exact_data(terminal, common | {"numerical_failure", "selection_status", "outcome", "verification_status", "work_vector"} | runtime_fields | schedule_fields)
         data = terminal["data"]
         if not isinstance(data["numerical_failure"], str) or not data["numerical_failure"]:
             raise CanonicalStructuralVerificationError("numerical failure requires a typed diagnostic")
@@ -961,7 +963,29 @@ def validate_canonical_shot(
         expected_work = prefix["work_vector"] if failed_memory else WorkVector(bp_calls=1).as_evidence(structural_event_version=2)
         _expect_equal("work_vector", work_data["work_vector"], expected_work)
         _expect_equal("work_vector", data["work_vector"], expected_work)
-        _expect_equal("qualified_iterations", work_data["qualified_iterations"], {"count": count if failed_memory else 0, "schedule": "flooding", "atomic_unit": "complete_double_buffered_sweep"})
+        if is_local:
+            local_atomic_units = {
+                "layered": "one_layer",
+                "check_node_serial": "one_check_all_c2v_then_affected_v2c",
+                "variable_node_serial": "one_variable_belief_then_incident_v2c",
+                "residual": "one_residual_selected_c2v_commit",
+                "randomized": "one_layer",
+                "group_shuffled": "one_overlapping_check_group",
+            }
+            expected_iteration = {
+                "count": count if failed_memory else 0,
+                "schedule": context.schedule_kind,
+                "atomic_unit": local_atomic_units[context.schedule_kind],
+            }
+            _expect_equal("qualified_iterations", work_data["qualified_iterations"], expected_iteration)
+            schedule_terminal = reconstruct_schedule_terminal(work_data["schedule_terminal"])
+            _expect_equal("schedule work_vector", schedule_terminal["work_vector"], prefix["schedule_work_vector"])
+            _expect_equal("schedule source_iteration", schedule_terminal["source_iteration"], expected_iteration)
+            _expect_equal("schedule evidence", work_data["schedule_evidence"], prefix["schedule_evidence"])
+            _expect_equal("terminal schedule evidence", data["schedule_terminal"], work_data["schedule_terminal"])
+            _expect_equal("terminal schedule realization", data["schedule_evidence"], work_data["schedule_evidence"])
+        else:
+            _expect_equal("qualified_iterations", work_data["qualified_iterations"], {"count": count if failed_memory else 0, "schedule": "flooding", "atomic_unit": "complete_double_buffered_sweep"})
         return terminal
     expected = _expected_attempt(context)
     if not expected:

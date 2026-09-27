@@ -633,8 +633,6 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
                 raise ValueError(f"canonical trace plan is not a bounded semantic-sidecar contract: {error}") from error
             if manifest.trace_plan.label != "prespecified_campaign":
                 raise ValueError("enabled canonical traces require a prespecified_campaign trace label")
-            if manifest.policies.schedule.kind != "flooding":
-                raise ValueError("enabled canonical memory traces currently require the flooding commit boundary")
         if manifest.profile_plan.level != "low_overhead" or manifest.profile_plan.cohort != "clean":
             raise ValueError(
                 "canonical public profile plan requires a clean low_overhead cohort until a bounded quota exists"

@@ -865,7 +865,7 @@ def run_canonical_structural_shot(
                     nonlocal trace_link_emitted
                     if trace_sink is None or trace_link_emitted:
                         return
-                    schedule = memory_schedule
+                    schedule = memory_schedule if memory_schedule is not None else local_memory
                     reason = "attempt_not_admitted" if schedule is None else "no_committed_decoder_state"
                     if schedule is not None:
                         candidate = data.get("candidate", data.get("diagnostic_candidate"))
@@ -1003,7 +1003,10 @@ def run_canonical_structural_shot(
                                 edge_table.edge_count, kernel.prior(parsed.error_rate), dtype=np.float64,
                             )
                             if isinstance(parsed, CanonicalManifestV5):
-                                local_memory = LocalMemoryExecution(edge_table, memory=parsed.memory)
+                                local_memory = LocalMemoryExecution(
+                                    edge_table, memory=parsed.memory,
+                                    trace_sink=trace_sink, trace_context=trace_context,
+                                )
                                 local_memory.initialize(
                                     error_rate=parsed.error_rate, initial_v2c=messages,
                                     initial_beliefs=np.full(edge_table.variable_count, kernel.prior(parsed.error_rate), dtype=np.float64),
@@ -1134,11 +1137,16 @@ def run_canonical_structural_shot(
                     ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="runtime", data={**common, "profile": profile_evidence})
                 except NumericalFailure as error:
                     ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="missingness", data={**common, "field": "candidate", "reason": "numerical_failure"})
+                    committed_iterations = (
+                        local_progress.local_steps if local_memory is not None and local_progress is not None
+                        else 0 if memory_schedule is None
+                        else memory_schedule.evidence()["committed_iterations"]
+                    )
                     terminal_with_work(
                         "numerical_failure", numerical_failure=str(error),
                         selection_status="unavailable_due_to_numerical_failure", outcome=None,
                         verification_status="not_independently_reproduced_numerical_failure",
-                        **({"iterations": 0 if memory_schedule is None else memory_schedule.evidence()["committed_iterations"]} if isinstance(parsed, CanonicalManifestV5) else {}),
+                        **({"iterations": committed_iterations} if isinstance(parsed, CanonicalManifestV5) else {}),
                     )
                     return CanonicalExecutionResult(parsed.run_id, shot_id, "numerical_failure", None, None)
                 if budget_termination is not None:

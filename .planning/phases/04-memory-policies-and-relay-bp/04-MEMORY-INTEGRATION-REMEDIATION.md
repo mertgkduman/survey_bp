@@ -73,18 +73,22 @@ do not merge kernel changes into that live source tree mid-campaign.
   The trace observer never supplies the PCG64 context: public configuration
   and decoder identities are supplied unconditionally for each shot and replay.
 - A bounded local-memory execution slice now runs through the existing Phase 3
-  local executors. At an admitted local unit, PDBP consumes the complete fresh
-  decoder-visible belief vector before candidate construction and V2C damping
-  consumes the subsequently formed affected fresh V2C buffer. Both retain
-  separate binding-owned histories and commit only after the unit's reserve,
-  compute, and convergence check; denied or abandoned units discard proposals.
+  local executors. At an admitted local unit, PDBP, PD-prime, and momentum
+  consume the complete fresh decoder-visible belief vector before candidate
+  construction; V2C damping consumes the subsequently formed affected fresh
+  V2C buffer. PD-prime receives that unit's complete C2V vector directly and
+  reduces it in canonical edge order to its matched per-variable old/fresh
+  sufficient statistic. It never reconstructs C2V from a clipped belief.
+  All bindings retain separate histories and commit only after the unit's
+  reserve, compute, and convergence check; denied or abandoned units discard
+  proposals.
 
 ## Executable memory matrix
 
 | Schedule family | Admitted local operands | Commit boundary | Explicit rejection |
 | --- | --- | --- | --- |
 | Flooding | affine prior, PDBP, PD-prime, posterior momentum, V2C damping at `source_iteration` | complete double-buffered sweep | local-update bindings and unsupported lifecycle declarations |
-| Layered, check-node serial, variable-node serial | PDBP belief-field mixing and V2C damping at `local_update`, in declared belief-then-V2C order; repeated bindings retain distinct histories | admitted local unit after its convergence check | affine, PD-prime, momentum, wrong target/boundary, V2C-before-belief order |
+| Layered, check-node serial, variable-node serial | PDBP, PD-prime (first field binding only), posterior momentum, and V2C damping at `local_update`, in declared field/posterior-then-V2C order; repeated supported bindings retain distinct histories | admitted local unit after its convergence check | affine prior, PD-prime after another field binding, wrong target/boundary, V2C-before-field order |
 | Residual, randomized, group-shuffled | none in this slice | n/a | no full common belief-plus-affected-V2C operand/commit proof is wired for the memory binding controller |
 
 All local bindings currently require `state_lifetime: attempt`,
@@ -122,6 +126,13 @@ approved `.venv/bin/python`, from the isolated checkout.
    history/draw/candidate facts, explicit sidecar truncation, V3 NMS/OMS
    source-iteration replay, pre-artifact short-vector rejection, and
    independent two-history operation-count validation.
+7. Expanded local exact-operand/trace gate:
+   `python -m pytest -q tests/canonical/test_local_memory_execution.py tests/canonical/test_memory_execution.py tests/canonical/test_memory_trace.py -k 'local or memory or trace'`:
+   **53 passed** (15.39 s). It covers PD-prime's exact local C2V statistic,
+   repeated momentum histories, all three admitted local schedule families,
+   denied/numerical-failure rollback, public preflight/run/replay, local trace
+   ON/OFF semantic equality, linked candidate/history sidecars, and cap
+   truncation.
 
 These are implementation fixtures, not statistical performance evidence.
 No calibration, evaluation, factorial or publication sample budget was used.
@@ -140,10 +151,12 @@ This does not replace the remaining complete-phase scientific and quality gates.
   ordinary-memory lifecycle: it is only accepted by the flooding executor
   while history reset is required. Mathematical compatibility declarations
   alone do not prove execution.
-- Public trace support is deliberately limited to ordinary flooding-memory V4.
-  Local-memory trace records, Relay unavailable-link handling, and any
-  multi-leg/lifetime controller remain separate work. These are not silently
-  represented as complete traces in public preflight.
+- Public trace support covers the admitted ordinary flooding and local V4
+  boundaries only. Local sidecars observe only committed local histories and
+  terminal decoder-visible candidates; they do not change controller state or
+  randomness. Relay unavailable-link handling and any multi-leg/lifetime
+  controller remain separate work and are not silently represented as complete
+  traces in public preflight.
 - The outcome-independent factorial execution supplement preserves the frozen
   damping-before-affine and momentum-before-affine arrays while recording the
   executable prior -> fields -> V2C order. It binds arm coefficients and the
