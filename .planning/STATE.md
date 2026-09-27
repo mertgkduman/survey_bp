@@ -162,6 +162,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 | 260923-ui8 | Create a reproducible PDF documentation snapshot through completed Phase 2 from existing Markdown; preserve existing Markdown and do not advance Phase 3 | 2026-09-23 | 30df961 | — | [260923-ui8-create-a-reproducible-pdf-documentation-](./quick/260923-ui8-create-a-reproducible-pdf-documentation-/) |
 | 260924-max | Record prospective quaternary memory-policy novelty in Markdown and reproducible PDF | 2026-09-24 | 2a83502 | — | [260924-max-record-prospective-quaternary-memory-pol](./quick/260924-max-record-prospective-quaternary-memory-pol/) |
 | 260926-ps2 | Review Phase 4 gates, design Phase 5 interventions and document development since the last PDFs | 2026-09-26 | b684cab | Verified | [260926-ps2-review-pending-phase-4-gates-design-phas](./quick/260926-ps2-review-pending-phase-4-gates-design-phas/) |
+| 260927-p0f | Add project README and push main plus isolated Phase 4 branch to GitHub | 2026-09-27 | 5a6377a | Verified | [260927-p0f-add-a-project-readme-and-push-to-git-git](./quick/260927-p0f-add-a-project-readme-and-push-to-git-git/) |
 
 ## Deferred Items
 
