@@ -144,8 +144,8 @@ def test_documented_v4_memory_contract_names_public_boundaries_and_rejections():
         assert term in tutorial
 
 
-def test_canonical_v4_preflight_admits_ordered_repeated_memory_compositions(tmp_path):
-    """V4 is the public, strict boundary for every compatibility-approved binding chain."""
+def test_canonical_v4_preflight_admits_repeated_attempt_memory_and_rejects_leg_lifetime(tmp_path):
+    """V4 retains executable one-attempt chains without claiming a leg controller."""
     from bp_registry import manifests
 
     assert hasattr(manifests, "CanonicalExperimentV4")
@@ -164,8 +164,8 @@ def test_canonical_v4_preflight_admits_ordered_repeated_memory_compositions(tmp_
             {
                 "binding_id": "relay-second", "kind": "affine_prior", "target": "prior",
                 "parameters": {"alpha": 0.25}, "order": 1, "history_owner": "memory:relay-second",
-                "state_lifetime": "leg", "advance_boundary": "source_iteration",
-                "refresh_boundary": "leg_start", "source_status": "canonical_adaptation",
+                "state_lifetime": "attempt", "advance_boundary": "source_iteration",
+                "refresh_boundary": "attempt_start", "source_status": "canonical_adaptation",
             },
         ],
     }
@@ -176,6 +176,13 @@ def test_canonical_v4_preflight_admits_ordered_repeated_memory_compositions(tmp_
 
     assert isinstance(resolved.manifest, CanonicalExperimentV4)
     assert [binding.binding_id for binding in resolved.manifest.memory.bindings] == ["ewa-first", "relay-second"]
+
+    unsupported_leg = json.loads(json.dumps(value))
+    unsupported_leg["memory"]["bindings"][1].update({
+        "state_lifetime": "leg", "refresh_boundary": "leg_start",
+    })
+    with pytest.raises(ValueError, match="memory.execution_lifecycle_unimplemented:relay-second"):
+        manifests.preflight(unsupported_leg)
 
 
 def test_canonical_v4_rejects_incompatible_memory_before_artifact_loading(tmp_path, monkeypatch):
@@ -254,7 +261,7 @@ def test_offset_min_sum_is_a_closed_v3_update_kind_with_an_explicit_assignment(t
     assert resolved.manifest.policies.update.kind == "offset_min_sum"
 
 
-def test_v3_layered_spa_admission_requires_explicit_partitions_and_rejects_unimplemented_pairs(tmp_path):
+def test_v3_layered_admission_requires_explicit_partitions_and_admits_min_sum(tmp_path):
     from bp_registry.manifests import preflight
 
     value = json.loads(Path("data/manifests/canonical-three-qubit-development.json").read_text(encoding="utf-8"))
@@ -279,14 +286,13 @@ def test_v3_layered_spa_admission_requires_explicit_partitions_and_rejects_unimp
         "kind": "min_sum", "binding_id": "update-min-sum-v1",
         "state_lifetime": "message", "owned_state": [], "requires": [], "provides": [],
     }
-    with pytest.raises(ValueError, match="flooding/layered"):
-        preflight(unsupported)
+    assert preflight(unsupported).manifest.policies.update.kind == "min_sum"
 
 
 @pytest.mark.parametrize("schedule_kind", [
     "check_node_serial", "variable_node_serial", "residual", "randomized",
 ])
-def test_v3_public_schedule_matrix_admits_only_the_implemented_spa_local_schedules(tmp_path, schedule_kind):
+def test_v3_public_schedule_matrix_admits_only_implemented_local_update_pairs(tmp_path, schedule_kind):
     """Every directly implemented noncluster local policy has a strict V3 route."""
     from bp_registry.manifests import preflight
 
@@ -320,14 +326,44 @@ def test_v3_public_schedule_matrix_admits_only_the_implemented_spa_local_schedul
         "kind": "min_sum", "binding_id": "update-min-sum-v1",
         "state_lifetime": "message", "owned_state": [], "requires": [], "provides": [],
     }
-    with pytest.raises(ValueError, match="compatibility"):
-        preflight(incompatible)
+    if schedule_kind in {"check_node_serial", "variable_node_serial"}:
+        assert preflight(incompatible).manifest.policies.update.kind == "min_sum"
+    else:
+        with pytest.raises(ValueError, match="flooding/layered"):
+            preflight(incompatible)
 
     if schedule_kind == "randomized":
         unsupported_base = json.loads(json.dumps(value))
         unsupported_base["policies"]["schedule"]["base_schedule"] = "check_node_serial"
         with pytest.raises(ValueError, match="layered base_schedule"):
             preflight(unsupported_base)
+
+
+@pytest.mark.parametrize("schedule_kind", ["layered", "check_node_serial", "variable_node_serial"])
+def test_v3_local_min_sum_public_run_and_replay(tmp_path, schedule_kind):
+    """Promoted local min-sum routes must survive the public replay boundary."""
+    from bp_registry.cli import run_canonical, verify_run
+
+    value = json.loads(Path("data/manifests/canonical-three-qubit-development.json").read_text(encoding="utf-8"))
+    value.update({
+        "schema_version": 3, "run_id": f"canonical-{schedule_kind}-min-sum-roundtrip",
+        "numerical_profile": "cpu-float64-min-sum-v1",
+    })
+    value["policies"]["update"] = {
+        "kind": "min_sum", "binding_id": "update-min-sum-v1",
+        "state_lifetime": "message", "owned_state": [], "requires": [], "provides": [],
+    }
+    value["policies"]["schedule"] = {
+        "kind": schedule_kind, "binding_id": f"schedule-{schedule_kind}-min-sum-v1",
+        "state_lifetime": "iteration", "owned_state": [], "requires": [], "provides": [],
+    }
+    if schedule_kind == "layered":
+        value["policies"]["schedule"].update({"partitions": [[0]], "provenance": "explicit"})
+    path = tmp_path / f"{schedule_kind}.json"
+    path.write_text(json.dumps(value), encoding="utf-8")
+    output = tmp_path / schedule_kind
+    assert run_canonical(path, output)["final_row_count"] == 2
+    assert verify_run(output)["final_row_count"] == 2
 
 
 @pytest.mark.parametrize("value", [float("nan"), float("inf"), -0.01, 1.01, "0.1"])

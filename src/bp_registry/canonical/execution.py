@@ -1062,12 +1062,12 @@ def run_canonical_structural_shot(
                                     step = local_schedule.execute_local_step(
                                         executor, messages, observation.syndrome,
                                         error_rate=parsed.error_rate, progress=progress_for_step,
-                                        prior_llrs=local_prior_llrs,
                                         is_converged=lambda proposed: bool(np.array_equal(
                                             (validated.hz.astype(np.int64) @ proposed.astype(np.int64)) % 2,
                                             observation.syndrome,
                                         )),
                                         **({
+                                            "prior_llrs": local_prior_llrs,
                                             "transform_beliefs": local_memory.transform_beliefs,
                                             "transform_v2c": local_memory.transform_v2c,
                                         } if local_memory is not None else {}),
