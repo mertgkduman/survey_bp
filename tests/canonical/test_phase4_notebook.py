@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 import phase4_notebook_support as support
 import execute_phase4_notebook as executor
+from preview_phase4_notebook import preview_notebook
 
 
 def _identity(root, stage="evaluation", **changes):
@@ -106,6 +107,19 @@ def test_notebook_confinement_rejects_traversal_and_symlink_roots(tmp_path):
         support.confined(tmp_path, "notebooks/input.ipynb", "notebooks")
 
 
+def test_campaign_input_can_use_primary_repo_but_rejects_unrelated_and_nested_roots(tmp_path):
+    assert executor.campaign_input_root(ROOT) == ROOT.resolve()
+    import subprocess
+    common = subprocess.run(["git", "rev-parse", "--git-common-dir"], cwd=ROOT,
+                            check=True, capture_output=True, text=True).stdout.strip()
+    primary = (ROOT / common).resolve().parent
+    assert executor.campaign_input_root(ROOT, primary) == primary
+    with pytest.raises(ValueError, match="same Git repository"):
+        executor.campaign_input_root(ROOT, tmp_path)
+    with pytest.raises(ValueError, match="repository root"):
+        executor.campaign_input_root(ROOT, ROOT / "scripts")
+
+
 def test_missing_evidence_is_not_synthesized_as_performance(tmp_path):
     inventory = support.notebook_inventory(tmp_path)
     assert set(inventory) == set(support.SECTIONS)
@@ -132,14 +146,26 @@ def test_source_notebook_complete_sections_and_actual_fixture_execution():
     notebook = nbformat.read(source, as_version=4)
     tagged = {cell.metadata.get("phase4_section") for cell in notebook.cells}
     assert set(support.SECTIONS) <= tagged
-    with tempfile.TemporaryDirectory(dir=ROOT / "data/results/phase4-notebook", prefix=".test-kernel-") as temporary:
+    # NFS can briefly retain directory metadata after the kernel closes files.
+    with tempfile.TemporaryDirectory(dir=ROOT / "data/results/phase4-notebook", prefix=".test-kernel-",
+                                     ignore_cleanup_errors=True) as temporary:
         destination = executor.execute_notebook(repository_root=ROOT, input_path=str(source),
                                                 output_path=str(Path(temporary) / "executed.ipynb"),
                                                 fixture=True)
         executed = nbformat.read(destination, as_version=4)
+        assert list((Path(temporary) / "figures").glob("*.png"))
+        preview = preview_notebook(ROOT, str(destination), str(Path(temporary) / "preview.html"))
+        html = preview.read_text()
+        assert "data:image/png;base64," in html
+        assert "<table" in html
+        assert "development_fixture" in html and "not_assessed" in html
     assert all(cell.execution_count is not None for cell in executed.cells if cell.cell_type == "code")
     assert all("execution" not in cell.metadata for cell in executed.cells)
     assert executed.metadata["phase4_validation"]["mode"] == "development_fixture"
     text = "".join(str(output) for cell in executed.cells if cell.cell_type == "code" for output in cell.outputs)
     assert "development_fixture" in text
     assert "not_assessed" in text
+    outputs = [output for cell in executed.cells if cell.cell_type == "code" for output in cell.outputs]
+    assert any("image/png" in output.get("data", {}) for output in outputs)
+    assert any("<table" in output.get("data", {}).get("text/html", "") for output in outputs)
+    assert "95% Wilson" in text

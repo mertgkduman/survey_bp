@@ -1,7 +1,7 @@
 # Phase 4 memory policies and Relay-BP
 
 Phase 4 is in progress. Its canonical memory correction, factorial preparation
-and notebook scaffold live in the isolated memory-integration checkout while
+and notebook analysis live in the isolated memory-integration checkout while
 the main checkout runs its frozen Relay calibration. Do not interpret fixture
 outputs or notebook infrastructure as measured decoder performance.
 
@@ -23,10 +23,12 @@ an implemented numerical execution path. Consult the memory-integration
 remediation record for current execution coverage and outstanding gaps.
 
 The isolated executor runs all five memory kinds at flooding boundaries.
-Layered, check-node serial and variable-node serial execution currently admit
-PDBP field mixing followed by V2C damping at atomic local boundaries. Other
-local operands/schedules and retained histories across additional lifetimes
-remain explicit gaps.
+Layered, check-node serial and variable-node serial execution also admit PDBP,
+PD-prime, posterior momentum and V2C damping at atomic local boundaries, with
+separate histories for repeated compatible bindings. PD-prime uses the actual
+complete C2V operand; clipping cannot be undone by subtracting beliefs. Local
+affine-prior memory, other local schedules and retained histories across
+additional lifetimes remain explicit gaps.
 
 The original executable reference is **trmue/relay v0.2.2**, immutable commit
 `14cb31a18f9b9d7d099791b793e35b8a2951f8f3`. Its source record, qualification and
@@ -91,16 +93,17 @@ has no automatic justification. Representative traces preserve beliefs,
 histories, assignment draws, leg transitions, candidates and public ledger links,
 with record/byte limits, truncation and native unavailability.
 
-Public trace links currently cover ordinary flooding-memory V4 execution.
-Local-memory and Relay traces remain unavailable in this preparation. Decoder
+Public trace links cover ordinary flooding-memory and the supported local-memory
+V4 execution. Relay traces remain unavailable in this preparation. Decoder
 assignment identities are supplied independently of the trace observer, so
 enabling tracing preserves the sampled coefficients and decoder semantics.
 
 ## Notebook execution and reuse
 
 `notebooks/phase4-memory-relay-analysis.ipynb` has all 13 research sections.
-The current outputs are availability/status records; quantitative analysis and
-figures await verified production evidence. The executor pins the observed
+Tables and failure figures retain exact denominators and 95% Wilson intervals.
+Development fixtures exercise these views with explicit synthetic labels;
+production figures require verified originating execution. The executor pins the observed
 NumPy/Matplotlib/nbformat/nbclient/ipykernel versions, requires the project venv,
 clears notebook outputs, confines source/output paths and removes volatile cell
 timings. In an existing GSD worktree it uses the primary checkout's venv.
@@ -114,7 +117,21 @@ OMP_NUM_THREADS=1 .venv/bin/python scripts/execute_phase4_notebook.py --fixture
 From the isolated memory-integration checkout, use the primary checkout's
 absolute `.venv/bin/python` path. Fixture execution consumes no campaign shots
 and labels every stage `development_fixture` / `not_assessed`. Omit `--fixture`
-to inspect qualified snapshot availability. This mode never starts simulation.
+to inspect campaign evidence and qualified snapshot availability. This mode
+never starts simulation. `--campaign-root` can read another checkout of the same
+Git repository; outputs stay in the integration checkout. Each executed notebook
+saves its figures alongside its output, avoiding writes to the campaign inputs.
+
+For a portable local HTML preview of a saved executed notebook:
+
+```bash
+.venv/bin/python scripts/preview_phase4_notebook.py \
+  --input data/results/phase4-notebook/executed.ipynb \
+  --output data/results/phase4-notebook/preview.html
+```
+
+The preview embeds its saved tables and PNG figures and preserves status and
+assessment labels. It does not rerun notebook cells or campaigns.
 
 `scripts/phase4_notebook_support.py` matches manifest, executable source/policy,
 ordered code, environment, sample, stage, caps and selection facts. It checks

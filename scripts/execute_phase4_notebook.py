@@ -29,11 +29,33 @@ def project_interpreter(root: Path) -> Path:
     return expected
 
 
+def campaign_input_root(root: Path, requested: Path | None = None) -> Path:
+    """Allow read-only evidence from the same repository's primary/worktree roots."""
+    candidate = root.resolve() if requested is None else requested.resolve()
+    if candidate == root.resolve():
+        return candidate
+    def repository_identity(directory: Path) -> Path:
+        result = subprocess.run(["git", "rev-parse", "--git-common-dir"], cwd=directory,
+                                check=True, capture_output=True, text=True)
+        top = subprocess.run(["git", "rev-parse", "--show-toplevel"], cwd=directory,
+                             check=True, capture_output=True, text=True)
+        if Path(top.stdout.strip()).resolve() != directory:
+            raise ValueError("campaign input must be a repository root")
+        return (directory / result.stdout.strip()).resolve()
+    try:
+        if repository_identity(root.resolve()) != repository_identity(candidate):
+            raise ValueError("campaign input must belong to the same Git repository")
+    except (OSError, subprocess.CalledProcessError) as error:
+        raise ValueError("campaign input must belong to the same Git repository") from error
+    return candidate
+
+
 def execute_notebook(*, repository_root: Path, input_path: str, output_path: str,
-                     fixture: bool = False) -> Path:
+                     fixture: bool = False, campaign_root: Path | None = None) -> Path:
     root = repository_root.resolve()
     expected = project_interpreter(root)
     validate_environment()
+    evidence_root = campaign_input_root(root, campaign_root)
     source = confined(root, input_path, "notebooks")
     destination = confined(root, output_path, "data/results/phase4-notebook")
     if source == destination:
@@ -58,6 +80,8 @@ def execute_notebook(*, repository_root: Path, input_path: str, output_path: str
             client.execute(cwd=str(root), env={**os.environ, "JUPYTER_PATH": temporary,
                            "MPLBACKEND": "Agg", "OMP_NUM_THREADS": "1",
                            "PHASE4_REPOSITORY_ROOT": str(root),
+                           "PHASE4_CAMPAIGN_ROOT": str(evidence_root),
+                           "PHASE4_NOTEBOOK_FIGURE_ROOT": str(destination.parent / "figures"),
                            "PHASE4_NOTEBOOK_FIXTURE": "1" if fixture else "0"})
         finally:
             # An explicitly supplied manager is caller-owned in nbclient.
@@ -71,6 +95,7 @@ def execute_notebook(*, repository_root: Path, input_path: str, output_path: str
     notebook.metadata["phase4_validation"] = {
         "mode": "development_fixture" if fixture else "qualified_snapshot_inventory",
         "assessment_status": "not_assessed", "production_sampling": False,
+        "campaign_input_root": str(evidence_root),
     }
     destination.parent.mkdir(parents=True, exist_ok=True)
     nbformat.write(notebook, destination)
@@ -82,9 +107,12 @@ def main() -> None:
     parser.add_argument("--input", default="notebooks/phase4-memory-relay-analysis.ipynb")
     parser.add_argument("--output", default="data/results/phase4-notebook/executed.ipynb")
     parser.add_argument("--fixture", action="store_true")
+    parser.add_argument("--campaign-root", type=Path,
+                        help="Read evidence from this repository's primary or worktree root")
     args = parser.parse_args()
     print(execute_notebook(repository_root=Path(__file__).resolve().parents[1],
-                           input_path=args.input, output_path=args.output, fixture=args.fixture))
+                           input_path=args.input, output_path=args.output, fixture=args.fixture,
+                           campaign_root=args.campaign_root))
 
 
 if __name__ == "__main__":
