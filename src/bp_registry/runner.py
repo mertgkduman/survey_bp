@@ -24,6 +24,7 @@ from .manifests import (
     executable_canonical_policy_effects,
     manifest_digest,
     preflight,
+    preflight_manifest_bytes,
     validate_executable_canonical_baseline,
 )
 from . import evaluator, sampling
@@ -283,53 +284,89 @@ def _canonical_execution_controls(manifest: CanonicalExperimentV2 | CanonicalExp
     return controls
 
 
-def canonical_public_shot_context(manifest_path: str | Path, *, shot_id: int) -> PublicShotContext:
-    """Resolve a deterministic public shot without opening a durable ledger."""
-    resolved = preflight(manifest_path)
+@dataclass(frozen=True, slots=True)
+class CanonicalPublicManifestContext:
+    """Immutable preflight facts from which each public shot is freshly sampled."""
+
+    manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4
+    code: Any
+    manifest_sha256: str
+    compact_manifest: dict[str, object]
+    composition_identity: str
+    policy_effects: dict[str, dict[str, Any]]
+    work_limits: dict[str, dict[str, int]]
+    profile_plan: dict[str, object]
+    trace_plan: dict[str, object] | None
+
+    def shot_context(self, shot_id: int) -> PublicShotContext:
+        """Derive one independent public context with the exact pinned sample rule."""
+        manifest = self.manifest
+        if type(shot_id) is not int or not 0 <= shot_id < manifest.budgets.max_shots:
+            raise ValueError("shot_id is outside the canonical manifest budget")
+        sample = sampling.sample_shot(
+            self.code, manifest_identity=manifest.randomness.physical_sample_identity or self.manifest_sha256,
+            seed=manifest.randomness.sample_seed,
+            shot_id=shot_id, x_error_rate=manifest.error_rate,
+        )
+        return PublicShotContext(
+            manifest_sha256=self.manifest_sha256,
+            artifact_raw_sha256=manifest.artifact.raw_sha256,
+            artifact_semantic_sha256=manifest.artifact.semantic_sha256,
+            compact_manifest=self.compact_manifest,
+            sample_seed_identity=sample.sample_identity,
+            run_id=manifest.run_id,
+            shot_id=shot_id,
+            check_type=sample.observation.check_type,
+            syndrome=tuple(int(value) for value in sample.observation.syndrome.tolist()),
+            code_id=manifest.artifact.code_id,
+            evidence_relation=manifest.evidence.relation,
+            fixture=manifest.evidence.fixture,
+            assessment_status=manifest.evidence.assessment_status,
+            decoder_seed_identity=manifest.randomness.decoder_seed_identity,
+            code=self.code,
+            hidden_truth=sample.hidden,
+            error_rate=manifest.error_rate,
+            max_iterations=manifest.budgets.attempt.max_iterations,
+            work_limits=self.work_limits,
+            composition_identity=self.composition_identity,
+            policy_effects=self.policy_effects,
+            profile_plan=self.profile_plan,
+            trace_plan=self.trace_plan,
+            update_kind=manifest.policies.update.kind,
+            schedule_kind=manifest.policies.schedule.kind,
+        )
+
+
+def canonical_public_manifest_context(
+    manifest_path: str | Path, *, manifest_bytes: bytes | None = None,
+) -> CanonicalPublicManifestContext:
+    """Preflight immutable public manifest facts once; this function never samples."""
+    resolved = (preflight(manifest_path) if manifest_bytes is None
+                else preflight_manifest_bytes(manifest_path, manifest_bytes))
     manifest = resolved.manifest
     if not isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4)):
         raise ValueError("canonical execution requires a strict CanonicalExperimentV2, V3, or V4 manifest")
-    if type(shot_id) is not int or not 0 <= shot_id < manifest.budgets.max_shots:
-        raise ValueError("shot_id is outside the canonical manifest budget")
-    digest = manifest_digest(manifest)
-    sample = sampling.sample_shot(
-        resolved.code, manifest_identity=manifest.randomness.physical_sample_identity or digest,
-        seed=manifest.randomness.sample_seed,
-        shot_id=shot_id, x_error_rate=manifest.error_rate,
-    )
     composition = validate_executable_canonical_baseline(manifest.policies)
-    compact_manifest = _canonical_kernel_manifest(manifest)
-    return PublicShotContext(
-        manifest_sha256=digest,
-        artifact_raw_sha256=manifest.artifact.raw_sha256,
-        artifact_semantic_sha256=manifest.artifact.semantic_sha256,
-        compact_manifest=compact_manifest,
-        sample_seed_identity=sample.sample_identity,
-        run_id=manifest.run_id,
-        shot_id=shot_id,
-        check_type=sample.observation.check_type,
-        syndrome=tuple(int(value) for value in sample.observation.syndrome.tolist()),
-        code_id=manifest.artifact.code_id,
-        evidence_relation=manifest.evidence.relation,
-        fixture=manifest.evidence.fixture,
-        assessment_status=manifest.evidence.assessment_status,
-        decoder_seed_identity=manifest.randomness.decoder_seed_identity,
+    return CanonicalPublicManifestContext(
+        manifest=manifest,
         code=resolved.code,
-        hidden_truth=sample.hidden,
-        error_rate=manifest.error_rate,
-        max_iterations=manifest.budgets.attempt.max_iterations,
+        manifest_sha256=manifest_digest(manifest),
+        compact_manifest=_canonical_kernel_manifest(manifest),
+        composition_identity=composition.semantic_identity,
+        policy_effects=_canonical_policy_effects(manifest, resolved.code),
         work_limits={
             scope: getattr(manifest.budgets, scope).work_limits.as_evidence()
             for scope in ("shot", "search", "attempt")
         },
-        composition_identity=composition.semantic_identity,
-        policy_effects=_canonical_policy_effects(manifest, resolved.code),
         profile_plan=manifest.profile_plan.model_dump(mode="json"),
         trace_plan=(manifest.trace_plan.model_dump(mode="json")
                     if manifest.trace_plan.level != "off" else None),
-        update_kind=manifest.policies.update.kind,
-        schedule_kind=manifest.policies.schedule.kind,
     )
+
+
+def canonical_public_shot_context(manifest_path: str | Path, *, shot_id: int) -> PublicShotContext:
+    """Resolve a deterministic public shot without opening a durable ledger."""
+    return canonical_public_manifest_context(manifest_path).shot_context(shot_id)
 
 
 def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path):

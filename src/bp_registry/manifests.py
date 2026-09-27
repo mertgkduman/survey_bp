@@ -542,6 +542,26 @@ def _parse_for_preflight(value: ManifestRecord | dict[str, Any] | str | Path) ->
     return LegacyManifestV1.model_validate(decoded)
 
 
+def preflight_manifest_bytes(manifest_path: str | Path, manifest_bytes: bytes) -> ResolvedExperiment:
+    """Preflight one caller-owned manifest snapshot without rereading its path.
+
+    ``manifest_path`` remains an explicit provenance/artifact-resolution
+    boundary for callers that bind a snapshot to a retained source path.  The
+    parsed bytes are the only manifest document used by this helper.
+    """
+    if not isinstance(manifest_path, (str, Path)):
+        raise TypeError("manifest snapshot requires its original path")
+    if not isinstance(manifest_bytes, bytes):
+        raise TypeError("manifest snapshot must be bytes")
+    try:
+        decoded = json.loads(manifest_bytes.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise ValueError("manifest snapshot is not UTF-8 JSON") from error
+    if not isinstance(decoded, dict):
+        raise ValueError("manifest snapshot must be a JSON object")
+    return preflight(decoded)
+
+
 def _actual_environment() -> dict[str, str]:
     return {
         "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
