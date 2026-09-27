@@ -25,6 +25,9 @@ _FLOODING_OPERANDS = frozenset({
     ("posterior_momentum", "posterior", "source_iteration"),
 })
 _LOCAL_OPERANDS = frozenset({
+    # Affine prior memory is held fixed through a complete deterministic local
+    # traversal and advances only at its source-iteration boundary.
+    ("affine_prior", "prior", "source_iteration"),
     ("v2c_damping", "v2c", "local_update"),
     # Every Phase 3 local executor already assembles a full fresh belief
     # vector before candidate construction and V2C mutation.  PDBP consumes

@@ -9,7 +9,7 @@ import json
 import math
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_serializer, model_validator
 
 from .updates import ParameterAssignment, ParameterGeneratorSpec, ParameterRefreshPlan
 
@@ -458,6 +458,20 @@ class MemoryBindingSpec(_Strict):
     source_status: Literal["source_defined", "canonical_adaptation", "exploratory"]
     retain_history: bool = False
     assignment: DisorderedAffinePriorAssignmentSpec | None = None
+
+    @model_serializer(mode="wrap")
+    def serialize_optional_assignment(self, handler):
+        """Keep the pre-assignment persisted binding representation stable.
+
+        ``assignment`` was added after the first public Relay manifests.  A
+        null extension is semantically absent, so serializing it would change
+        their manifest/sample identities despite no declared policy change.
+        A real disordered assignment remains part of the serialized contract.
+        """
+        document = handler(self)
+        if self.assignment is None:
+            document.pop("assignment", None)
+        return document
 
     @field_validator("advance_boundary", mode="before")
     @classmethod

@@ -268,15 +268,19 @@ def _canonical_policy_effects(manifest: CanonicalExperimentV2 | CanonicalExperim
 
 def _canonical_execution_controls(manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4, code) -> dict[str, object]:
     """Keep preflighted public limits and handler classifications beside the compact kernel input."""
-    return {
+    controls: dict[str, object] = {
         "work_limits": {
             scope: getattr(manifest.budgets, scope).work_limits.as_evidence()
             for scope in ("shot", "search", "attempt")
         },
         "policy_effects": _canonical_policy_effects(manifest, code),
         "profile_plan": manifest.profile_plan.model_dump(mode="json"),
-        "trace_plan": manifest.trace_plan.model_dump(mode="json"),
     }
+    # Trace-off V2/V3/Relay ledgers predate this control.  Omit an inert plan
+    # so their execution identity and replayed evidence remain historical.
+    if manifest.trace_plan.level != "off":
+        controls["trace_plan"] = manifest.trace_plan.model_dump(mode="json")
+    return controls
 
 
 def canonical_public_shot_context(manifest_path: str | Path, *, shot_id: int) -> PublicShotContext:
@@ -321,7 +325,8 @@ def canonical_public_shot_context(manifest_path: str | Path, *, shot_id: int) ->
         composition_identity=composition.semantic_identity,
         policy_effects=_canonical_policy_effects(manifest, resolved.code),
         profile_plan=manifest.profile_plan.model_dump(mode="json"),
-        trace_plan=manifest.trace_plan.model_dump(mode="json"),
+        trace_plan=(manifest.trace_plan.model_dump(mode="json")
+                    if manifest.trace_plan.level != "off" else None),
         update_kind=manifest.policies.update.kind,
         schedule_kind=manifest.policies.schedule.kind,
     )

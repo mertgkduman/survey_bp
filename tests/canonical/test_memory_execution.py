@@ -11,8 +11,8 @@ from bp_registry.canonical.contracts import MemoryCompositionSpec
 from bp_registry.canonical.execution import AtomicFloodingExecutor
 from bp_registry.canonical.kernel import BinarySpaKernel
 from bp_registry.canonical.schedules import EdgeTable
-from bp_registry.manifests import parse_manifest
-from bp_registry.runner import _canonical_kernel_manifest
+from bp_registry.manifests import manifest_digest, parse_manifest
+from bp_registry.runner import _canonical_execution_controls, _canonical_kernel_manifest, canonical_public_shot_context
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -38,6 +38,52 @@ def test_public_projection_preserves_memory_in_executable_contract():
     compact = _canonical_kernel_manifest(manifest)
     assert compact["schema_version"] == 5
     assert compact["memory"] == value["memory"]
+
+
+@pytest.mark.parametrize(("path", "manifest_sha256", "execution_identity"), [
+    (
+        "data/manifests/canonical-three-qubit-development.json",
+        "f62e836f89c84f98593eb82339615c76793c233467cdf8c8c40c655e3697137b",
+        "sha256:2a81bf50b948b06a0a6e14c008d58b0399031d0a5732b49ffea2c5172414564b",
+    ),
+    (
+        "data/manifests/phase3-hsu-group-pilot.json",
+        "b58133f1707f9226fe1d6fd6eadf2a9c866448cbc4aea9825b190556a5230d1d",
+        "sha256:02a376bd9f16a40cc66e1c9e3125e7e600e2361c615f93cdca632c38f601b5e1",
+    ),
+    # This frozen Relay fixture predates ordinary-memory assignments and
+    # enabled trace sidecars; its terminal identity is public evidence.
+    (
+        "data/manifests/phase4-memory-relay-b1.json",
+        "dd127331caec00e2ff72ec9e681c8b29e153fc2f08387a5d53e9f99123e77a12",
+        "sha256:8447ab3c2c47d86fec8fd4f91a2d8b9d4cbd89cbb88782f3bb4677c8955fbe6f",
+    ),
+])
+def test_trace_off_and_absent_assignment_preserve_frozen_public_identities(path, manifest_sha256, execution_identity):
+    """New optional controls must not reidentify recorded V2/V3/Relay work."""
+    manifest = parse_manifest(ROOT / path)
+    context = canonical_public_shot_context(ROOT / path, shot_id=0)
+    assert manifest_digest(manifest) == manifest_sha256
+    assert context.execution_identity == execution_identity
+    assert context.trace_plan is None
+    assert "trace_plan" not in _canonical_execution_controls(manifest, context.code)
+    if hasattr(manifest, "memory"):
+        assert all("assignment" not in binding.model_dump(mode="json") for binding in manifest.memory.bindings)
+
+
+def test_disordered_assignment_remains_manifest_identity_bearing():
+    value = json.loads((ROOT / "data/manifests/canonical-three-qubit-development.json").read_text())
+    assignment = {
+        "mode": "uniform", "low": 0.25, "high": 0.75,
+        "root_seed_identity": "a" * 64,
+        "refresh_boundary": "source_iteration", "rng_algorithm": "numpy.PCG64",
+    }
+    base = composition("affine_prior", {"alpha": 0.5}).model_dump(mode="json")
+    disordered = composition("affine_prior", {"alpha": 0.5}, assignment=assignment).model_dump(mode="json")
+    value.update(schema_version=4, memory=disordered)
+    asserted = parse_manifest(value)
+    assert disordered["bindings"][0]["assignment"] == assignment
+    assert manifest_digest(asserted) != manifest_digest(parse_manifest({**value, "memory": base}))
 
 
 def make_schedule(kind, parameters):
@@ -437,6 +483,7 @@ def test_memory_evidence_counts_every_owned_history_vector(kind, parameters):
 @pytest.mark.parametrize("case,message", [
     ("local", "target_boundary_unsupported"),
     ("retained", "execution_lifecycle_unimplemented"),
+    ("ordinary_leg", "execution_lifecycle_unimplemented"),
     ("order", "execution_order_requires"),
     ("pdprime_after_prior", "pdprime_requires_fixed_prior"),
     ("short_offset", "execution_update_assignment_shorter"),
@@ -453,6 +500,9 @@ def test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading(tmp_
         value["memory"]["bindings"][0]["advance_boundary"] = "local_update"
     elif case == "retained":
         binding["retain_history"] = True
+    elif case == "ordinary_leg":
+        binding["state_lifetime"] = "leg"
+        binding["refresh_boundary"] = "leg_start"
     elif case in {"order", "pdprime_after_prior"}:
         first = composition("v2c_damping" if case == "order" else "affine_prior", {"gamma": 0.5} if case == "order" else {"alpha": 0.5}, binding_id="first").model_dump(mode="json")["bindings"][0]
         second = composition("affine_prior" if case == "order" else "pdprime_delta_mix", {"alpha": 0.5} if case == "order" else {"gamma": 0.5}, binding_id="second").model_dump(mode="json")["bindings"][0]

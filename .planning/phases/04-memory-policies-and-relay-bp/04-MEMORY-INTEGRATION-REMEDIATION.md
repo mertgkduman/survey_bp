@@ -82,13 +82,22 @@ do not merge kernel changes into that live source tree mid-campaign.
   All bindings retain separate histories and commit only after the unit's
   reserve, compute, and convergence check; denied or abandoned units discard
   proposals.
+- Uniform affine prior memory now has a separate local source-iteration
+  boundary: it stages the declared ordered affine prior before a deterministic
+  local traversal, holds that exact prior across the traversal's units, and
+  commits each owner history from the final decoder-visible posterior only
+  after the traversal completes. An early convergence, denial, or numerical
+  failure discards the uncommitted affine proposal while retaining already
+  committed local-unit work honestly. Disordered local affine refresh remains
+  rejected: its assignment lifecycle needs a distinct source-iteration
+  reservation/evidence controller.
 
 ## Executable memory matrix
 
 | Schedule family | Admitted local operands | Commit boundary | Explicit rejection |
 | --- | --- | --- | --- |
 | Flooding | affine prior, PDBP, PD-prime, posterior momentum, V2C damping at `source_iteration` | complete double-buffered sweep | local-update bindings and unsupported lifecycle declarations |
-| Layered, check-node serial, variable-node serial | PDBP, PD-prime (first field binding only), posterior momentum, and V2C damping at `local_update`, in declared field/posterior-then-V2C order; repeated supported bindings retain distinct histories | admitted local unit after its convergence check | affine prior, PD-prime after another field binding, wrong target/boundary, V2C-before-field order |
+| Layered, check-node serial, variable-node serial | uniform affine prior at a complete `source_iteration` traversal, then PDBP, PD-prime (first field binding only), posterior momentum, and V2C damping at `local_update`; repeated supported bindings retain distinct histories | admitted local unit plus complete source traversal for affine history | disordered local affine, PD-prime after another field binding, wrong target/boundary, V2C-before-field order |
 | Residual, randomized, group-shuffled | none in this slice | n/a | no full common belief-plus-affected-V2C operand/commit proof is wired for the memory binding controller |
 
 All local bindings currently require `state_lifetime: attempt`,
@@ -133,6 +142,13 @@ approved `.venv/bin/python`, from the isolated checkout.
    denied/numerical-failure rollback, public preflight/run/replay, local trace
    ON/OFF semantic equality, linked candidate/history sidecars, and cap
    truncation.
+8. The local controller applies the active numerical profile before returning
+   or storing a policy proposal. Saturated PD-prime histories and traces now
+   equal the exact clipped belief consumed by the next unit. Public trace
+   verification independently replays bounded ordinary-memory observations;
+   hash-valid empty, altered-belief/history, or altered-candidate sidecars are
+   rejected, while V3 local numerical terminals reconstruct their empty local
+   schedule prefix.
 
 These are implementation fixtures, not statistical performance evidence.
 No calibration, evaluation, factorial or publication sample budget was used.
@@ -147,10 +163,9 @@ This does not replace the remaining complete-phase scientific and quality gates.
 
 - Local execution remains intentionally limited to the matrix above. Retained
   histories and lifetimes beyond one ordinary attempt remain unimplemented and
-  reject explicitly where applicable. A `leg` declaration is not a multi-leg
-  ordinary-memory lifecycle: it is only accepted by the flooding executor
-  while history reset is required. Mathematical compatibility declarations
-  alone do not prove execution.
+  reject explicitly. A non-Relay `leg` declaration now rejects before artifact
+  loading rather than implying generic multi-leg execution. Mathematical
+  compatibility declarations alone do not prove execution.
 - Public trace support covers the admitted ordinary flooding and local V4
   boundaries only. Local sidecars observe only committed local histories and
   terminal decoder-visible candidates; they do not change controller state or

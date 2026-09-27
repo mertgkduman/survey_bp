@@ -48,10 +48,16 @@ class BinarySpaKernel:
         return check_to_variable(incoming, syndrome=syndrome, profile=self.profile)
 
     def assemble_beliefs(
-        self, variable_count: int, edge_variables: tuple[int, ...], messages: np.ndarray, prior: float
+        self, variable_count: int, edge_variables: tuple[int, ...], messages: np.ndarray, prior: float | np.ndarray,
     ) -> np.ndarray:
         """Pure belief assembly from a complete check-message buffer."""
-        beliefs = np.full(variable_count, prior, dtype=np.float64)
+        prior_values = np.asarray(prior, dtype=np.float64)
+        if prior_values.ndim == 0:
+            beliefs = np.full(variable_count, float(prior_values), dtype=np.float64)
+        elif prior_values.shape == (variable_count,):
+            beliefs = np.array(prior_values, dtype=np.float64, copy=True)
+        else:
+            raise ValueError("prior must be scalar or have one value per variable")
         for variable, message in zip(edge_variables, messages, strict=True):
             beliefs[variable] += message
         return finite_saturate(beliefs, boundary="belief_assembly", profile=self.profile)

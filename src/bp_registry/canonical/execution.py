@@ -1005,6 +1005,7 @@ def run_canonical_structural_shot(
                             if isinstance(parsed, CanonicalManifestV5):
                                 local_memory = LocalMemoryExecution(
                                     edge_table, memory=parsed.memory,
+                                    profile=kernel.profile,
                                     trace_sink=trace_sink, trace_context=trace_context,
                                 )
                                 local_memory.initialize(
@@ -1013,6 +1014,7 @@ def run_canonical_structural_shot(
                                 )
                             setup_inside_profile_ns = time.perf_counter_ns() - setup_started_ns
                             candidate: np.ndarray | None = None
+                            local_prior_llrs: np.ndarray | None = None
                             executor = CanonicalLocalStepExecutor(budgets, scope="attempt")
                             if parsed.policies.schedule.kind == "residual":
                                 from .residual import ResidualSetupBudgetDenied
@@ -1033,6 +1035,8 @@ def run_canonical_structural_shot(
                                 return candidate, local_progress.local_steps, False, None
                             for _ in range(parsed.max_iterations):
                                 progress_for_step = local_progress
+                                if local_memory is not None and local_progress.cursor == (0,):
+                                    local_prior_llrs = local_memory.begin_source_iteration()
                                 if parsed.policies.schedule.kind == "group_shuffled" and local_progress.cursor == (0,):
                                     refreshed, order_termination = local_schedule.refresh_order(local_progress, budgets=budgets)
                                     if not refreshed:
@@ -1052,6 +1056,7 @@ def run_canonical_structural_shot(
                                     step = local_schedule.execute_local_step(
                                         executor, messages, observation.syndrome,
                                         error_rate=parsed.error_rate, progress=progress_for_step,
+                                        prior_llrs=local_prior_llrs,
                                         is_converged=lambda proposed: bool(np.array_equal(
                                             (validated.hz.astype(np.int64) @ proposed.astype(np.int64)) % 2,
                                             observation.syndrome,
@@ -1064,6 +1069,7 @@ def run_canonical_structural_shot(
                                 except BaseException:
                                     if local_memory is not None:
                                         local_memory.discard()
+                                        local_memory.abort_source_iteration()
                                     raise
                                 if randomized_plan is not None:
                                     local_progress = ScheduleProgress(local_progress.iteration, step.progress.local_steps, (local_progress.cursor[0] + 1,), local_progress.rng_state)
@@ -1072,22 +1078,31 @@ def run_canonical_structural_shot(
                                 if not step.admitted:
                                     if local_memory is not None:
                                         local_memory.discard()
+                                        local_memory.abort_source_iteration()
                                     return candidate, local_progress.local_steps, False, step.termination
                                 if local_memory is not None:
                                     local_memory.commit(local_memory.proposal())
+                                complete_source_iteration = local_progress.cursor == (local_schedule.unit_count,)
+                                if local_memory is not None and complete_source_iteration:
+                                    local_memory.complete_source_iteration()
                                 candidate = step.candidate
                                 if step.candidate is not None and np.array_equal(
                                     (validated.hz.astype(np.int64) @ step.candidate.astype(np.int64)) % 2,
                                     observation.syndrome,
                                 ):
+                                    if local_memory is not None and not complete_source_iteration:
+                                        local_memory.abort_source_iteration()
                                     return candidate, local_progress.local_steps, True, None
-                                if local_progress.cursor == (local_schedule.unit_count,):
+                                if complete_source_iteration:
                                     local_progress = ScheduleProgress(
                                         iteration=local_progress.iteration + 1,
                                         local_steps=local_progress.local_steps,
                                         cursor=(0,),
                                         rng_state=local_progress.rng_state,
                                     )
+                                    local_prior_llrs = None
+                            if local_memory is not None:
+                                local_memory.abort_source_iteration()
                             return candidate, local_progress.local_steps, False, None
                         if isinstance(parsed, CanonicalManifestV5):
                             memory_schedule = MemoryFloodingSchedule(

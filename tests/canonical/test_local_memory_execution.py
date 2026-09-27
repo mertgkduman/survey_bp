@@ -14,10 +14,12 @@ from bp_registry.canonical.schedules import EdgeTable
 
 def _composition(*kinds: str) -> MemoryCompositionSpec:
     target = {
+        "affine_prior": "prior",
         "pdbp_field_mix": "belief", "pdprime_delta_mix": "belief",
         "posterior_momentum": "posterior", "v2c_damping": "v2c",
     }
     parameters = {
+        "affine_prior": {"alpha": 0.5},
         "pdbp_field_mix": {"gamma": 0.25}, "pdprime_delta_mix": {"gamma": 0.5},
         "posterior_momentum": {"alpha": 0.5, "gamma": 0.5}, "v2c_damping": {"gamma": 0.5},
     }
@@ -26,7 +28,8 @@ def _composition(*kinds: str) -> MemoryCompositionSpec:
             "binding_id": f"{kind}-{index}", "kind": kind, "target": target[kind],
             "parameters": parameters[kind], "order": index,
             "history_owner": f"history:{kind}-{index}", "state_lifetime": "attempt",
-            "advance_boundary": "local_update", "refresh_boundary": "attempt_start",
+            "advance_boundary": "source_iteration" if kind == "affine_prior" else "local_update",
+            "refresh_boundary": "attempt_start",
             "source_status": "canonical_adaptation",
         }
         for index, kind in enumerate(kinds)
@@ -78,6 +81,56 @@ def test_local_pdprime_uses_matched_c2v_statistic_and_momentum_keeps_distinct_hi
     }
     assert evidence["memory_c2v_reduction_additions"] == 2
     assert len(set(evidence["history_sha256"].values())) == 3
+
+
+def test_local_saturates_pdprime_history_before_the_next_unit_and_trace(tmp_path):
+    from bp_registry.canonical.memory_execution import LocalMemoryExecution
+    from bp_registry.canonical.tracing import TracePlan, TraceSink
+
+    memory = MemoryCompositionSpec.model_validate({"bindings": [{
+        "binding_id": "pdprime", "kind": "pdprime_delta_mix", "target": "belief",
+        "parameters": {"gamma": 0.0}, "order": 0, "history_owner": "history:pdprime",
+        "state_lifetime": "attempt", "advance_boundary": "local_update",
+        "refresh_boundary": "attempt_start", "source_status": "canonical_adaptation",
+    }]})
+    sink = TraceSink(TracePlan(tmp_path, max_records=4, max_bytes=16_384))
+    controller = LocalMemoryExecution(
+        EdgeTable.from_edges(1, 1, [(0, 0)]), memory=memory, trace_sink=sink,
+        trace_context={"configuration_identity": "local-saturation", "decoder_identity": "shot-0"},
+    )
+    controller.initialize(error_rate=0.1, initial_v2c=np.asarray([0.0]), initial_beliefs=np.asarray([25.0]))
+    for _ in range(2):
+        controller.begin_step()
+        np.testing.assert_allclose(
+            controller.transform_beliefs(np.asarray([0.0]), np.asarray([25.0])), [25.0],
+        )
+        controller.commit(controller.proposal())
+    result = controller.trace_result()
+    assert result is not None and result.records == 2
+    document = TraceSink.load(tmp_path, result.sidecar_path, expected_sha256=result.sha256)
+    records = document["records"]
+    assert [record["kind"] for record in records] == ["memory_local_update", "memory_local_update"]
+    assert all(record["payload"]["beliefs"]["typed_array"]["values"] == [25.0] for record in records)
+    assert all(record["payload"]["history_values"]["pdprime"]["field"]["typed_array"]["values"] == [25.0] for record in records)
+
+
+def test_local_affine_prior_stages_and_commits_only_a_complete_traversal():
+    from bp_registry.canonical.memory_execution import LocalMemoryExecution
+
+    controller = LocalMemoryExecution(
+        EdgeTable.from_edges(1, 1, [(0, 0)]), memory=_composition("affine_prior", "affine_prior"),
+    )
+    controller.initialize(error_rate=0.1, initial_v2c=np.asarray([0.0]), initial_beliefs=np.asarray([2.0]))
+    np.testing.assert_allclose(controller.begin_source_iteration(), [2.0])
+    controller.begin_step()
+    controller.transform_beliefs(np.asarray([6.0]), np.asarray([0.0]))
+    controller.commit(controller.proposal())
+    controller.complete_source_iteration()
+    assert controller.evidence()["committed_source_iterations"] == 1
+    assert controller.evidence()["memory_element_updates"] == {"affine_prior-0": 1, "affine_prior-1": 1}
+    np.testing.assert_allclose(controller.begin_source_iteration(), [5.0])
+    controller.abort_source_iteration()
+    assert controller.evidence()["committed_source_iterations"] == 1
 
 
 def test_local_memory_rejects_order_and_preserves_history_on_abandoned_step():
@@ -166,6 +219,35 @@ def test_public_local_pdprime_and_momentum_replay_for_each_exact_schedule(tmp_pa
     assert verify_run(output)["final_row_count"] == 2
 
 
+@pytest.mark.parametrize("schedule_kind", ["layered", "check_node_serial", "variable_node_serial"])
+def test_public_local_ordered_affine_prior_replays_for_each_deterministic_schedule(tmp_path, schedule_kind):
+    from bp_registry.cli import run_canonical, verify_run
+    from bp_registry.ledger import read_canonical_events
+
+    root = Path(__file__).resolve().parents[2]
+    manifest = json.loads((root / "data/manifests/canonical-three-qubit-development.json").read_text())
+    manifest.update({"schema_version": 4, "run_id": f"canonical-{schedule_kind}-local-affine"})
+    schedule = {
+        "kind": schedule_kind, "binding_id": f"schedule-{schedule_kind}-local-affine-v1",
+        "state_lifetime": "iteration", "owned_state": [], "requires": [], "provides": [],
+    }
+    if schedule_kind == "layered":
+        schedule.update({"partitions": [[0]], "provenance": "explicit"})
+    manifest["policies"]["schedule"] = schedule
+    manifest["memory"] = _composition("affine_prior", "affine_prior", "pdbp_field_mix", "v2c_damping").model_dump(mode="json")
+    path = tmp_path / f"{schedule_kind}-affine.json"
+    path.write_text(json.dumps(manifest), encoding="utf-8")
+    output = tmp_path / schedule_kind
+    assert run_canonical(path, output)["final_row_count"] == 2
+    assert verify_run(output)["final_row_count"] == 2
+    terminals = [event["data"] for event in read_canonical_events(output / "events.jsonl") if event["kind"] == "termination"]
+    assert all(
+        data["memory_execution"]["committed_source_iterations"] <= data["memory_execution"]["committed_local_updates"]
+        for data in terminals
+    )
+    assert all("assignment_evidence" not in data["memory_execution"] for data in terminals)
+
+
 def _public_local_trace_manifest(tmp_path, *, trace: bool, max_records: int = 16):
     root = Path(__file__).resolve().parents[2]
     manifest = json.loads((root / "data/manifests/canonical-three-qubit-development.json").read_text())
@@ -216,6 +298,28 @@ def test_public_local_trace_is_observational_linked_and_capped(tmp_path):
     assert all(event["sidecar"]["truncated"] and event["sidecar"]["dropped_records"] > 0 for event in capped_links)
 
 
+def test_public_local_affine_trace_observes_only_completed_source_histories(tmp_path):
+    from bp_registry.canonical.tracing import TraceSink
+    from bp_registry.cli import run_canonical, verify_run
+    from bp_registry.ledger import read_canonical_events
+
+    off, on = _public_local_trace_manifest(tmp_path, trace=False), _public_local_trace_manifest(tmp_path, trace=True)
+    for path in (off, on):
+        value = json.loads(path.read_text())
+        value["memory"] = _composition("affine_prior", "pdbp_field_mix", "v2c_damping").model_dump(mode="json")
+        path.write_text(json.dumps(value), encoding="utf-8")
+    off_output, on_output = tmp_path / "affine-off", tmp_path / "affine-on"
+    assert run_canonical(off, off_output)["final_row_count"] == 2
+    assert run_canonical(on, on_output)["final_row_count"] == 2
+    assert verify_run(on_output)["final_row_count"] == 2
+    plain = [event["data"]["memory_execution"] for event in read_canonical_events(off_output / "events.jsonl") if event["kind"] == "termination"]
+    linked = read_canonical_events(on_output / "events.jsonl")
+    assert plain == [event["data"]["memory_execution"] for event in linked if event["kind"] == "termination"]
+    links = [event for event in linked if event["kind"] == "trace_link"]
+    documents = [TraceSink.load(on_output, event["sidecar"]["path"], expected_sha256=event["sidecar"]["sha256"]) for event in links]
+    assert all(any(record["kind"] == "memory_source_iteration" for record in document["records"]) for document in documents)
+
+
 def test_local_pdprime_numerical_failure_discards_uncommitted_histories(tmp_path, monkeypatch):
     from bp_registry.canonical.memory import PDPrimeDeltaMix
     from bp_registry.canonical.numerics import NumericalFailure
@@ -235,3 +339,29 @@ def test_local_pdprime_numerical_failure_discards_uncommitted_histories(tmp_path
     terminals = [event["data"] for event in read_canonical_events(output / "events.jsonl") if event["kind"] == "termination"]
     assert all(data["memory_execution"]["committed_local_updates"] == 0 for data in terminals)
     monkeypatch.setattr(PDPrimeDeltaMix, "propose", original)
+
+
+def test_public_v3_local_numerical_failure_replays_its_empty_schedule_prefix(tmp_path, monkeypatch):
+    from bp_registry.canonical.kernel import BinarySpaKernel
+    from bp_registry.canonical.numerics import NumericalFailure
+    from bp_registry.cli import run_canonical, verify_run
+
+    root = Path(__file__).resolve().parents[2]
+    manifest = json.loads((root / "data/manifests/canonical-three-qubit-development.json").read_text())
+    manifest.update({"schema_version": 3, "run_id": "canonical-v3-local-numerical"})
+    manifest.pop("memory", None)
+    manifest["policies"]["schedule"] = {
+        "kind": "layered", "binding_id": "schedule-layered-v3-numerical-v1",
+        "state_lifetime": "iteration", "owned_state": [], "requires": [], "provides": [],
+        "partitions": [[0]], "provenance": "explicit",
+    }
+    path = tmp_path / "v3-local-numerical.json"
+    path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    def fail(*_args, **_kwargs):
+        raise NumericalFailure("v3-local-injected")
+
+    monkeypatch.setattr(BinarySpaKernel, "check_message", fail)
+    output = tmp_path / "output"
+    assert run_canonical(path, output)["final_row_count"] == 2
+    assert verify_run(output)["final_row_count"] == 2

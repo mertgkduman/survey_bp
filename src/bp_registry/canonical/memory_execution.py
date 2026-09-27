@@ -17,7 +17,7 @@ from .memory import (
     MemoryCompositionState, MemoryState, PDBPFieldMix, PDPrimeDeltaMix,
     PosteriorMomentum, V2CDamping,
 )
-from .numerics import finite_saturate
+from .numerics import NumericalProfile, REFERENCE_CPU_F64, finite_saturate
 from .schedules import EdgeTable, FloodingSchedule, FloodingSweep
 from .tracing import TraceResult, TraceSink
 from .budgets import BudgetTree, WorkVector
@@ -29,25 +29,34 @@ def validate_single_attempt_memory(
 ) -> None:
     """Fail before sampling for lifecycle or operand orders not yet executed."""
     if schedule in {"layered", "check_node_serial", "variable_node_serial"}:
-        ranks = {"belief": 0, "posterior": 0, "v2c": 1}
+        ranks = {"prior": 0, "belief": 1, "posterior": 1, "v2c": 2}
         orders = [ranks.get(binding.target, -1) for binding in memory.bindings]
         if -1 in orders or orders != sorted(orders):
-            raise ValueError("memory.local_execution_order_requires_belief_then_v2c")
+            raise ValueError("memory.local_execution_order_requires_prior_then_belief_then_v2c")
         for binding in memory.bindings:
-            if (binding.kind, binding.target) not in {
+            supported_local = (binding.kind, binding.target) in {
                 ("pdbp_field_mix", "belief"), ("pdprime_delta_mix", "belief"),
                 ("posterior_momentum", "posterior"), ("v2c_damping", "v2c"),
-            } or binding.advance_boundary.value != "local_update":
+            } and binding.advance_boundary.value == "local_update"
+            supported_prior = (
+                (binding.kind, binding.target, binding.advance_boundary.value) ==
+                ("affine_prior", "prior", "source_iteration")
+            )
+            if not supported_local and not supported_prior:
                 raise ValueError(
                     f"memory.local_operand_unimplemented:{binding.kind}:{binding.target}:{binding.advance_boundary.value}"
                 )
             if (binding.state_lifetime != "attempt"
                     or binding.refresh_boundary.value != "attempt_start"
-                    or binding.retain_history):
+                    or binding.retain_history
+                    or (binding.kind == "affine_prior" and binding.assignment is not None)):
                 raise ValueError(f"memory.local_lifecycle_unimplemented:{binding.binding_id}")
-        for index, binding in enumerate(memory.bindings):
-            if binding.kind == "pdprime_delta_mix" and index != 0:
+        field_index = 0
+        for binding in memory.bindings:
+            if binding.kind == "pdprime_delta_mix" and field_index != 0:
                 raise ValueError("memory.pdprime_requires_fixed_prior_and_first_field_position")
+            if binding.target in {"belief", "posterior"}:
+                field_index += 1
         return
     if schedule != "flooding":
         raise ValueError(f"memory.execution_schedule_unimplemented:{schedule}")
@@ -67,8 +76,8 @@ def validate_single_attempt_memory(
     for binding in memory.bindings:
         if binding.advance_boundary.value != "source_iteration":
             raise ValueError(f"memory.execution_boundary_unimplemented:{binding.binding_id}")
-        if (binding.state_lifetime not in {"attempt", "leg"}
-                or binding.refresh_boundary.value != f"{binding.state_lifetime}_start"
+        if (binding.state_lifetime != "attempt"
+                or binding.refresh_boundary.value != "attempt_start"
                 or binding.retain_history):
             raise ValueError(f"memory.execution_lifecycle_unimplemented:{binding.binding_id}")
 
@@ -399,11 +408,13 @@ class LocalMemoryExecution:
 
     def __init__(
         self, edge_table: EdgeTable, *, memory: MemoryCompositionSpec,
+        profile: NumericalProfile = REFERENCE_CPU_F64,
         trace_sink: TraceSink | None = None, trace_context: Mapping[str, str] | None = None,
     ):
         validate_single_attempt_memory(memory, schedule="layered")
         self.edge_table = edge_table
         self.memory = memory
+        self._profile = profile
         self._owner = object()
         self._revision = 0
         supplied_trace = {} if trace_context is None else dict(trace_context)
@@ -414,16 +425,24 @@ class LocalMemoryExecution:
         policies = []
         for binding in memory.bindings:
             policy_type = {
+                "affine_prior": AffinePriorMemory,
                 "pdbp_field_mix": PDBPFieldMix,
                 "pdprime_delta_mix": PDPrimeDeltaMix,
                 "posterior_momentum": PosteriorMomentum,
                 "v2c_damping": V2CDamping,
             }[binding.kind]
-            policies.append(policy_type(binding.binding_id, **binding.parameters, advance_boundary="local_update"))
+            policies.append(policy_type(
+                binding.binding_id, **binding.parameters,
+                advance_boundary="source_iteration" if binding.kind == "affine_prior" else "local_update",
+            ))
         self._policies = tuple(policies)
         self._histories: tuple[Any, ...] | None = None
         self._pending: list[Any] | None = None
         self._pending_beliefs: np.ndarray | None = None
+        self._base_prior: np.ndarray | None = None
+        self._active_prior: np.ndarray | None = None
+        self._pending_prior_proposals: tuple[tuple[int, Any], ...] | None = None
+        self._source_iterations = 0
         self._seen_beliefs = False
         self._seen_v2c = False
         self._committed_beliefs: np.ndarray | None = None
@@ -439,7 +458,9 @@ class LocalMemoryExecution:
         histories = []
         initial_c2v = self._per_variable_c2v(np.zeros(self.edge_table.edge_count, dtype=np.float64))
         for binding, policy in zip(self.memory.bindings, self._policies, strict=True):
-            if binding.kind == "pdprime_delta_mix":
+            if binding.kind == "affine_prior":
+                histories.append(MemoryState(binding.binding_id, beliefs))
+            elif binding.kind == "pdprime_delta_mix":
                 histories.append(policy.initial_state(beliefs, initial_c2v))
             elif binding.kind in {"pdbp_field_mix", "posterior_momentum"}:
                 histories.append(policy.initial_state(beliefs))
@@ -448,8 +469,72 @@ class LocalMemoryExecution:
         self._owner = object()
         self._revision = 0
         self._histories = tuple(histories)
+        self._base_prior = np.array(beliefs, copy=True)
+        self._base_prior.setflags(write=False)
+        self._active_prior = None
+        self._pending_prior_proposals = None
+        self._source_iterations = 0
         self._committed_beliefs = np.array(beliefs, copy=True)
         self.discard()
+
+    @property
+    def has_source_iteration_prior(self) -> bool:
+        return any(binding.kind == "affine_prior" for binding in self.memory.bindings)
+
+    def begin_source_iteration(self) -> np.ndarray | None:
+        """Stage the fixed prior for one complete deterministic traversal."""
+        if not self.has_source_iteration_prior:
+            return None
+        if self._histories is None or self._base_prior is None:
+            raise ValueError("local prior memory requires initialization")
+        if self._active_prior is not None or self._pending_prior_proposals is not None:
+            raise ValueError("local prior memory already has an active source iteration")
+        prior = self._base_prior
+        proposals: list[tuple[int, Any]] = []
+        for index, (binding, policy, state) in enumerate(zip(self.memory.bindings, self._policies, self._histories, strict=True)):
+            if binding.kind == "affine_prior":
+                assert isinstance(state, MemoryState)
+                proposal = policy.propose(prior, state.posterior)
+                prior = self._bounded(proposal.prior, "local_memory_affine_prior", self.edge_table.variable_count)
+                proposals.append((index, proposal))
+        self._active_prior = prior
+        self._pending_prior_proposals = tuple(proposals)
+        return prior
+
+    def complete_source_iteration(self) -> None:
+        """Commit staged affine histories only after every traversal unit committed."""
+        if not self.has_source_iteration_prior:
+            return
+        if self._histories is None or self._pending_prior_proposals is None or self._active_prior is None:
+            raise ValueError("local prior memory has no complete source iteration to commit")
+        if self._committed_beliefs is None:
+            raise ValueError("local prior memory lacks the final decoder-visible posterior")
+        histories = list(self._histories)
+        posterior = self._bounded(
+            self._committed_beliefs, "local_memory_source_iteration_posterior", self.edge_table.variable_count,
+        )
+        for index, proposal in self._pending_prior_proposals:
+            policy = self._policies[index]
+            histories[index] = policy.commit(replace(proposal, posterior=posterior), histories[index])
+        self._histories = tuple(histories)
+        self._source_iterations += 1
+        if self._trace_sink is not None:
+            self._trace_sink.observe(
+                kind="memory_source_iteration", iteration=self._source_iterations - 1,
+                payload={
+                    **self._trace_context,
+                    "source_iteration": self._source_iterations - 1,
+                    "beliefs": posterior,
+                    "history_sha256": MemoryFloodingSchedule._history_digests(self._histories),
+                    "history_values": MemoryFloodingSchedule._history_values(self._histories),
+                },
+            )
+        self.abort_source_iteration()
+
+    def abort_source_iteration(self) -> None:
+        """Discard an incomplete traversal's staged affine prior/history proposal."""
+        self._active_prior = None
+        self._pending_prior_proposals = None
 
     def begin_step(self) -> None:
         if self._histories is None:
@@ -527,9 +612,8 @@ class LocalMemoryExecution:
         self._seen_beliefs = False
         self._seen_v2c = False
 
-    @staticmethod
-    def _bounded(value: np.ndarray, boundary: str, length: int) -> np.ndarray:
-        array = np.asarray(value, dtype=np.float64)
+    def _bounded(self, value: np.ndarray, boundary: str, length: int) -> np.ndarray:
+        array = np.asarray(finite_saturate(value, boundary=boundary, profile=self._profile), dtype=np.float64)
         if array.shape != (length,) or not np.all(np.isfinite(array)):
             raise ValueError(f"{boundary} must be a finite canonical vector")
         copied = np.array(array, copy=True)
@@ -559,14 +643,17 @@ class LocalMemoryExecution:
         histories = () if self._histories is None else self._histories
         return {
             "schema_version": 1,
-            "mode": "ordered_attempt_local_update",
+            "mode": "ordered_attempt_local_update_with_source_prior" if self.has_source_iteration_prior else "ordered_attempt_local_update",
             "bindings": self.memory.model_dump(mode="json")["bindings"],
-            "commit_boundary": "admitted_local_unit_after_convergence_check",
-            "operand_order": "complete_fresh_belief_then_affected_fresh_v2c",
+            "commit_boundary": "admitted_local_units_and_complete_source_traversal",
+            "operand_order": "source_iteration_prior_then_complete_fresh_belief_then_affected_fresh_v2c",
             "committed_local_updates": self._revision,
+            "committed_source_iterations": self._source_iterations,
             "history_sha256": MemoryFloodingSchedule._history_digests(histories),
             "memory_element_updates": {
-                binding.binding_id: self._revision * (
+                binding.binding_id: (
+                    self._source_iterations if binding.kind == "affine_prior" else self._revision
+                ) * (
                     self.edge_table.edge_count if binding.kind == "v2c_damping"
                     else 2 * self.edge_table.variable_count
                     if binding.kind in {"pdprime_delta_mix", "posterior_momentum"}

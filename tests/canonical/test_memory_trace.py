@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
 
 from bp_registry.canonical.contracts import MemoryCompositionSpec
 from bp_registry.canonical.kernel import BinarySpaKernel
@@ -141,3 +142,46 @@ def test_public_v4_trace_links_committed_memory_and_keeps_assignment_rng_observa
     assert run_canonical(capped_manifest, capped_output)["final_row_count"] == 2
     capped_links = [event for event in read_canonical_events(capped_output / "events.jsonl") if event["kind"] == "trace_link"]
     assert all(event["sidecar"]["truncated"] is True and event["sidecar"]["dropped_records"] > 0 for event in capped_links)
+
+
+@pytest.mark.parametrize("mutation", ["empty", "belief", "history", "candidate"])
+def test_public_trace_rejects_rehashed_nonsemantic_memory_sidecars(tmp_path, mutation):
+    """A hash-valid sidecar still has to equal an independent memory replay."""
+    import copy
+    import hashlib
+    import json
+
+    from bp_registry.canonical.verification import CanonicalStructuralVerificationError, validate_canonical_shot
+    from bp_registry.cli import run_canonical
+    from bp_registry.ledger import read_canonical_events
+    from bp_registry.runner import canonical_public_shot_context
+
+    manifest = _public_disordered_manifest(tmp_path, trace=True)
+    output = tmp_path / "output"
+    assert run_canonical(manifest, output)["final_row_count"] == 2
+    events = read_canonical_events(output / "events.jsonl")
+    trace = next(event for event in events if event["kind"] == "trace_link" and event["shot_id"] == 0)
+    document = TraceSink.load(output, trace["sidecar"]["path"], expected_sha256=trace["sidecar"]["sha256"])
+    changed = copy.deepcopy(document)
+    if mutation == "empty":
+        changed["records"] = []
+    elif mutation == "belief":
+        changed["records"][0]["payload"]["beliefs"]["typed_array"]["values"][0] += 1.0
+    elif mutation == "history":
+        changed["records"][0]["payload"]["history_sha256"]["affine"] = "0" * 64
+    else:
+        candidate = next(record for record in reversed(changed["records"]) if record["kind"] == "memory_candidate")
+        candidate["payload"]["candidate"]["typed_array"]["values"][0] ^= 1
+    encoded = json.dumps(changed, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    relative = f"trace-sidecars/rehashed-{mutation}.json"
+    (output / relative).write_bytes(encoded)
+    altered = copy.deepcopy(events)
+    altered_trace = next(event for event in altered if event["kind"] == "trace_link" and event["shot_id"] == 0)
+    altered_trace["sidecar"] = {
+        **altered_trace["sidecar"], "path": relative, "sha256": hashlib.sha256(encoded).hexdigest(),
+        "records": len(changed["records"]), "bytes": len(encoded),
+    }
+    with pytest.raises(CanonicalStructuralVerificationError, match="trace differs"):
+        validate_canonical_shot(
+            altered, canonical_public_shot_context(manifest, shot_id=0), trace_root=output,
+        )
