@@ -27,8 +27,12 @@ Layered, check-node serial and variable-node serial execution also admit PDBP,
 PD-prime, posterior momentum and V2C damping at atomic local boundaries, with
 separate histories for repeated compatible bindings. PD-prime uses the actual
 complete C2V operand; clipping cannot be undone by subtracting beliefs. Local
-affine-prior memory, other local schedules and retained histories across
-additional lifetimes remain explicit gaps.
+uniform affine-prior bindings stage once per source traversal, hold that prior
+through local units, and advance posterior history only after a complete
+traversal. An incomplete traversal keeps its committed local work and discards
+uncommitted affine history. Disordered local affine assignment, other local
+schedules and retained histories across additional lifetimes remain explicit
+gaps. PD-prime must precede other field bindings.
 
 The original executable reference is **trmue/relay v0.2.2**, immutable commit
 `14cb31a18f9b9d7d099791b793e35b8a2951f8f3`. Its source record, qualification and
@@ -67,10 +71,12 @@ configuration/shot/work/runtime limits and disjoint stage sample namespaces.
 4. Run the focused factorial only after its required predecessor evidence and
    versioned execution supplement are verified. Preserve all 14 arms, three
    regions and three codes; use the frozen per-code shot/work limits.
-5. Build producer-qualified notebook snapshots from verified originating
-   executions and retain linked per-shot/trace evidence. Production campaign
-   adapters and full notebook tables/figures remain unfinished; the present
-   scaffold reports unavailable snapshots explicitly.
+5. Read producer-qualified notebook views from verified originating executions
+   and retain linked per-shot/trace evidence. The campaign readers reconstruct
+   planned populations, outcome classifications, work and matched cohorts;
+   missing, running or incompatible evidence keeps its original status. The
+   production calibration, fresh evaluation and factorial views fill when their
+   terminal evidence becomes available.
 
 The auxiliary lower-noise and exact-author agreement campaigns have separate
 designs, sample identities and outputs. Their terminal results do not substitute
@@ -97,6 +103,9 @@ Public trace links cover ordinary flooding-memory and the supported local-memory
 V4 execution. Relay traces remain unavailable in this preparation. Decoder
 assignment identities are supplied independently of the trace observer, so
 enabling tracing preserves the sampled coefficients and decoder semantics.
+Memory sidecars are checked against independent numerical replay, including
+committed beliefs, private histories and candidate records. Capped sidecars keep
+their verified prefix and explicit truncation instead of claiming a full trace.
 
 ## Notebook execution and reuse
 
@@ -132,6 +141,13 @@ For a portable local HTML preview of a saved executed notebook:
 
 The preview embeds its saved tables and PNG figures and preserves status and
 assessment labels. It does not rerun notebook cells or campaigns.
+
+The equations section checks all five primitives with deterministic vectors.
+Work/runtime and cross-code sections keep each originating population and
+measurement boundary separate. The native section displays historical author
+agreement as an auxiliary diagnostic, alongside the status of fresh native
+pairs. Tables show bounded previews with retained row counts; large values are
+explicitly shortened and remain available in their linked source artifacts.
 
 `scripts/phase4_notebook_support.py` matches manifest, executable source/policy,
 ordered code, environment, sample, stage, caps and selection facts. It checks

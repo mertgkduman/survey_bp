@@ -11,7 +11,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
-from phase4_notebook_presentation import failure_points, failure_figure, table_html, display_campaign_stage
+from phase4_notebook_presentation import failure_points, failure_figure, table_html, display_campaign_stage, presentation_views, equation_check_table
 from bp_registry.phase4_analysis import wilson_interval
 
 
@@ -35,6 +35,8 @@ def test_failure_points_preserve_counts_and_empty_denominators():
         failure_points([{**_rows()[0], "failures": 17}])
     with pytest.raises(ValueError, match="estimate"):
         failure_points([{**_rows()[0], "estimate": .2}])
+    with pytest.raises(ValueError, match="estimate"):
+        failure_points([{**_rows()[0], "estimate": float("nan")}])
     with pytest.raises(ValueError, match="uncertainty"):
         failure_points([{**_rows()[0], "wilson_95": [.1, .2]}])
     with pytest.raises(ValueError, match="duplicate"):
@@ -52,6 +54,9 @@ def test_preview_is_bounded_escaped_and_missing_values_explicit():
     assert "&lt;b&gt;" in html
     assert "unavailable" in html
     assert "second" not in html.split("<tbody>")[1]
+    bounded = table_html({"rows": [{"large_diagnostic": "x" * 10000}]}, max_cell_chars=64)
+    assert len(bounded) < 1000
+    assert "full value in retained artifact" in bounded
 
 
 def test_fixture_figure_labels_uncertainty_and_qualification(tmp_path):
@@ -76,3 +81,27 @@ def test_unqualified_campaign_rows_never_become_figures(tmp_path):
     result = display_campaign_stage("evaluation", {}, campaign, figure_dir=tmp_path)
     assert result["figures"] == []
     assert list(tmp_path.iterdir()) == []
+
+
+def test_derived_views_require_qualified_sources_and_keep_measurement_scopes():
+    campaign = {"mode": "read_only_campaign_inventory", "artifacts": {
+        "evaluation": {"execution_qualified": True, "producer": {"path": "retained-evaluation"}},
+        "calibration": {"execution_qualified": False}},
+        "tables": [{"stage": "evaluation", "name": "fresh_evaluation", "rows": [
+            {**_rows()[0], "work_vectors": [{"check_to_variable_updates": 12}], "runtime_scope": "public CLI boundary"}]},
+                   {"stage": "calibration", "name": "unfinished", "rows": _rows()}]}
+    views = presentation_views(campaign)
+    cross = [table for table in views["tables"] if table["stage"] == "cross_code"]
+    costs = [table for table in views["tables"] if table["stage"] == "work_runtime_resources"]
+    assert len(cross) == len(costs) == 1
+    assert views["artifacts"]["cross_code"]["execution_qualified"] is True
+    assert costs[0]["rows"][0]["work_vectors"] == [{"check_to_variable_updates": 12}]
+    assert costs[0]["rows"][0]["runtime_scope"] == "public CLI boundary"
+    assert "failures" not in costs[0]["rows"][0]
+    assert "cross_code" not in campaign["artifacts"]
+
+
+def test_notebook_equation_examples_execute_all_five_primitives():
+    table = equation_check_table()
+    assert len(table["rows"]) == 5
+    assert {row["check"] for row in table["rows"]} == {"passed"}

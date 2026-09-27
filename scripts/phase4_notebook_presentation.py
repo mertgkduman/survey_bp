@@ -26,15 +26,20 @@ def _format(value: Any) -> str:
     return str(value)
 
 
-def table_html(table: Mapping[str, Any], *, max_rows: int = 30) -> str:
+def table_html(table: Mapping[str, Any], *, max_rows: int = 30, max_cell_chars: int = 512) -> str:
     """Bound the preview while retaining its explicit full-row denominator."""
-    if max_rows < 1:
+    if max_rows < 1 or max_cell_chars < 32:
         raise ValueError("table preview must retain at least one row")
     rows = list(table.get("rows", []))
     columns = list(table.get("columns", [])) or list(dict.fromkeys(key for row in rows for key in row))
     title = escape(str(table.get("title", table.get("name", "Evidence"))))
     header = "".join(f"<th>{escape(str(column))}</th>" for column in columns)
-    body = "".join("<tr>" + "".join(f"<td>{escape(_format(row.get(column)))}</td>" for column in columns) + "</tr>"
+    def cell(value: Any) -> str:
+        text = _format(value)
+        if len(text) > max_cell_chars:
+            text = text[:max_cell_chars] + " … [value preview; full value in retained artifact]"
+        return escape(text)
+    body = "".join("<tr>" + "".join(f"<td>{cell(row.get(column))}</td>" for column in columns) + "</tr>"
                    for row in rows[:max_rows])
     return (f"<h4>{title}</h4><p>Showing {min(len(rows), max_rows)} of {len(rows)} retained rows; "
             "unavailable values remain explicit.</p>"
@@ -61,7 +66,7 @@ def failure_points(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
             continue
         estimate = failures / denominator
         declared = metric.get("estimate")
-        if declared is not None and (not isinstance(declared, (float, int)) or abs(declared - estimate) > 1e-12):
+        if declared is not None and (type(declared) not in (float, int) or not isfinite(declared) or abs(declared - estimate) > 1e-12):
             raise ValueError("failure estimate disagrees with its retained denominator")
         interval = metric.get("wilson_95")
         if interval is None:
@@ -70,7 +75,7 @@ def failure_points(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
             raise ValueError("failure figure requires declared 95% Wilson bounds")
         low, high = interval
         expected = wilson_interval(failures, denominator)
-        if any(not isinstance(v, (float, int)) or not isfinite(v) for v in interval) or any(abs(a - b) > 1e-10 for a, b in zip(interval, expected)):
+        if any(type(v) not in (float, int) or not isfinite(v) for v in interval) or any(abs(a - b) > 1e-10 for a, b in zip(interval, expected)):
             raise ValueError("failure uncertainty does not match 95% Wilson outcome counts")
         arm = str(row.get("arm", row.get("arm_id")))
         if row.get("configuration_id") is not None:
@@ -130,6 +135,70 @@ def stage_tables(campaign: Mapping[str, Any], stage: str) -> list[Mapping[str, A
     return [table for table in campaign.get("tables", []) if table.get("stage") == stage]
 
 
+def presentation_views(campaign: Mapping[str, Any]) -> dict[str, Any]:
+    """Derive separate display sections from already qualified originating stages."""
+    result = {**campaign, "artifacts": dict(campaign.get("artifacts", {})),
+              "tables": list(campaign.get("tables", []))}
+    fixture = campaign.get("mode") == "development_fixture"
+    for stage, sources in (("cross_code", ("evaluation", "factorial")),
+                           ("work_runtime_resources", ("benchmark", "calibration", "evaluation", "factorial", "native"))):
+        accepted = [source for source in sources
+                    if fixture or campaign.get("artifacts", {}).get(source, {}).get("execution_qualified") is True]
+        tables = []
+        for source in accepted:
+            for original in stage_tables(campaign, source):
+                table = {**original, "stage": stage, "name": f"{stage}_{original.get('name', source)}",
+                         "title": f"{source}: {original.get('title', 'Retained evidence')}"}
+                if stage == "work_runtime_resources":
+                    columns = ["source_stage", "code_id", "arm", "configuration_id", "error_rate", "runtime_scope",
+                               "runtime_tails", "public_elapsed_seconds", "work_vectors", "raw_work", "resource_tails"]
+                    table["columns"] = columns
+                    table["rows"] = [{"source_stage": source, **{key: row.get(key) for key in columns[1:]}}
+                                     for row in original.get("rows", [])]
+                tables.append(table)
+        result["artifacts"][stage] = {
+            "stage": stage, "status": "development_fixture_not_assessed" if fixture else
+            "derived_from_verified_campaigns" if accepted else "missing_verified_origins",
+            "execution_qualified": bool(accepted) and not fixture,
+            "reason": "Each source keeps its own sample population and measurement boundary; no pooled ranking.",
+            "producer": {source: campaign.get("artifacts", {}).get(source, {}).get("producer", {}) for source in accepted},
+        }
+        result["tables"].extend(tables)
+    return result
+
+
+def equation_check_table() -> dict[str, Any]:
+    """Run deterministic primitive examples without drawing physical samples."""
+    import numpy as np
+    from bp_registry.canonical.memory import AffinePriorMemory, PDBPFieldMix, PDPrimeDeltaMix, PosteriorMomentum, V2CDamping
+
+    base, old, fresh = np.array([2., -1.]), np.array([4., 1.]), np.array([-2., 3.])
+    momentum = PosteriorMomentum("example-momentum", alpha=.5, gamma=.25)
+    cases = [
+        ("affine prior", "(1-alpha) base + alpha previous", {"alpha": .25},
+         AffinePriorMemory("example-affine", alpha=.25).propose(base, old).prior, [2.5, -.5]),
+        ("V2C damping", "(1-gamma) old + gamma fresh", {"gamma": .25},
+         V2CDamping("example-damping", gamma=.25).propose(old, fresh, boundary="source_iteration").value, [2.5, 1.5]),
+        ("PDBP", "(1-gamma) fresh + gamma old", {"gamma": .25},
+         PDBPFieldMix("example-pdbp", gamma=.25).propose(old, fresh, boundary="source_iteration").value, [-.5, 2.5]),
+        ("PD-prime", "old + (1-gamma) sum(fresh C2V - old C2V)", {"gamma": .25},
+         PDPrimeDeltaMix("example-pdprime", gamma=.25).propose(
+             old, np.array([[.5, -.5]]), np.array([[1.5, .5]]), boundary="source_iteration").value, [4.75, 1.75]),
+        ("posterior momentum", "g = gamma g_old + (1-gamma)(Q_old - fresh); Q = Q_old - alpha g",
+         {"alpha": .5, "gamma": .25, "old_velocity": [0., 0.]},
+         momentum.propose(momentum.initial_state(old), fresh, boundary="source_iteration").posterior, [1.75, 1.75]),
+    ]
+    rows = []
+    for name, equation, parameters, observed, expected in cases:
+        np.testing.assert_allclose(observed, expected, rtol=0, atol=1e-12)
+        rows.append({"primitive": name, "equation": equation, "parameters": parameters,
+                     "base": base.tolist(), "old": old.tolist(), "fresh": fresh.tolist(),
+                     "observed": observed.tolist(), "expected": expected, "check": "passed"})
+    return {"stage": "equations", "name": "deterministic_primitive_examples",
+            "title": "Deterministic equation examples — no campaign sampling",
+            "columns": ["primitive", "equation", "parameters", "observed", "expected", "check"], "rows": rows}
+
+
 def display_campaign_stage(stage: str, cached: Mapping[str, Any], campaign: Mapping[str, Any], *,
                            figure_dir: Path | None = None) -> dict[str, Any]:
     """Render a stage without treating a historical or missing artifact as a run."""
@@ -137,7 +206,9 @@ def display_campaign_stage(stage: str, cached: Mapping[str, Any], campaign: Mapp
 
     snapshot = campaign.get("artifacts", {}).get(stage, cached)
     fixture = campaign.get("mode") == "development_fixture"
-    qualification = ("development_fixture / not_assessed" if fixture else
+    equation_fixture = snapshot.get("kind") == "deterministic_equation_fixture"
+    qualification = ("Deterministic equation fixtures / not_assessed" if equation_fixture else
+                     "development_fixture / not_assessed" if fixture else
                      "CSS pilot adaptation / not_assessed" if snapshot.get("execution_qualified") is True else
                      "Unqualified artifact metadata / not_assessed")
     display(HTML(f"<p><strong>{escape(stage)}:</strong> {escape(str(snapshot.get('status', 'missing')))}"
@@ -173,7 +244,11 @@ def display_campaign_stage(stage: str, cached: Mapping[str, Any], campaign: Mapp
                     figures.append(str(path))
                 display(Image(data=png))
                 plt.close(figure)
-    elif tables:
+    elif tables and not equation_fixture:
         display(HTML("<p>Quantitative figures await verified originating execution; retained rows keep their source status.</p>"))
-    return {"stage": stage, "status": snapshot.get("status", "missing"), "tables": len(tables), "figures": figures,
-            "development_fixture": fixture, "execution_qualified": snapshot.get("execution_qualified") is True}
+    result = {"stage": stage, "status": snapshot.get("status", "missing"), "tables": len(tables), "figures": figures,
+              "development_fixture": fixture, "execution_qualified": snapshot.get("execution_qualified") is True}
+    if stage == "native" and "historical_author_agreement" in campaign.get("artifacts", {}):
+        result["auxiliary_views"] = [display_campaign_stage("historical_author_agreement", {}, campaign,
+                                                          figure_dir=figure_dir)]
+    return result
