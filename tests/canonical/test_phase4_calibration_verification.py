@@ -19,13 +19,15 @@ def surface():
     for preset in ("source_procedure", "canonical_default"):
         cells.append({"configuration_id": f"code:{preset}:coarse:a", "code_id": "code",
                       "preset_key": preset, "candidate": {"id": "a"}, "relay": {"procedure": preset},
+                      "calibration_namespace": "fixture-calibration",
                       "calibration_shots": 2, "per_shot_work_cap": {"bp_calls": 1,
                       "check_to_variable_updates": 10}, "public_boundary_seconds": 30})
     plan = {"cells": cells}
     codes = {"code": {"presets": {}}}
     for cell in cells:
         attempts = [{"shot_id": i, "status": "completed", "termination": "completed",
-                     "outcome": "logical_failure" if i else "exact", "sample_identity": f"sample-{i}",
+                     "outcome": "logical_failure" if i else "exact", "sample_identity": sha256(
+                         f"bp-registry-sample-v1\0fixture-calibration\0{i}".encode()).hexdigest(),
                      "aggregate_event_digest": "a" * 64, "failure": None,
                      "work_vector": {"bp_calls": 1, "check_to_variable_updates": 4},
                      "public_boundary": {"elapsed_seconds": 1.0, "category_charge_seconds": 1.0,
@@ -98,6 +100,29 @@ def test_matched_sample_transplant_rejects():
         audit.audit_surface(plan, result)
 
 
+@pytest.mark.parametrize("namespace", ["fixture-evaluation", "fixture-calibration"])
+def test_reused_or_evaluation_namespace_sample_cannot_enter_calibration(namespace):
+    plan, result = surface()
+    for preset in result["codes"]["code"]["presets"].values():
+        for a in preset["configurations"][0]["attempts"]:
+            a["sample_identity"] = sha256(f"bp-registry-sample-v1\0{namespace}\0{0}".encode()).hexdigest()
+    with pytest.raises(ValueError, match="frozen namespace and shot"):
+        audit.audit_surface(plan, result)
+
+
+def test_surface_sample_identity_agrees_with_public_sampler(small_css_checks):
+    from bp_registry.css import CssCode
+    from bp_registry.sampling import sample_shot
+    hx, hz = small_css_checks
+    plan, result = surface()
+    for preset in result["codes"]["code"]["presets"].values():
+        for a in preset["configurations"][0]["attempts"]:
+            sample = sample_shot(CssCode(hx=hx, hz=hz), shot_id=a["shot_id"], seed=1,
+                                 x_error_rate=0.1, manifest_identity="fixture-calibration")
+            assert sample.sample_identity == a["sample_identity"]
+    assert audit.audit_surface(plan, result)["status"] == "passed"
+
+
 def test_exact_byte_provenance_and_terminal_gate(tmp_path, monkeypatch):
     plan, result = surface()
     plan.update(calibration_input={"cells": plan["cells"]}, calibration_digest="c" * 64)
@@ -121,3 +146,37 @@ def test_exact_byte_provenance_and_terminal_gate(tmp_path, monkeypatch):
     path.write_text(json.dumps(result))
     with pytest.raises(ValueError, match="terminal"):
         audit.audit_terminal(root=tmp_path, caps_path=caps_path, calibration_path=path)
+
+
+def test_recovery_replaces_old_charge_instead_of_double_counting(tmp_path, monkeypatch):
+    plan, result = surface()
+    cell = plan["cells"][0]
+    plan = {"cells": [cell], "calibration_digest": "c" * 64, "calibration_input": {"selection_rule": "fixture"}}
+    result["codes"]["code"]["presets"].pop("canonical_default")
+    row(result)["attempts"][0].update(status="incomplete_public_boundary", termination=None,
+                                        public_boundary={"elapsed_seconds": 3.0})
+    result.update(status="running", calibration_digest=plan["calibration_digest"])
+    caps = {"design_amendment": {"sha256": "d" * 64, "path": "fixture.json"},
+            "allocation": {"categories": {"calibration": {"wall_seconds_max": 120}}}}
+    caps_path = tmp_path / "caps.json"
+    caps_path.write_text(json.dumps(caps))
+    output = tmp_path / "calibration"
+    output.mkdir()
+    (output / "result.json").write_text(json.dumps(result))
+    (tmp_path / "base.json").write_text("{}")
+    monkeypatch.setattr(pilot, "calibration_plan", lambda root, cap: plan)
+    monkeypatch.setattr(pilot, "_BENCHMARK_MANIFESTS", {"code": "base.json"})
+    monkeypatch.setattr(pilot, "_calibration_manifest", lambda *a, **kw: {"fixture": True})
+    monkeypatch.setattr(pilot, "_json_command", lambda *a, **kw: {"fixture": True})
+
+    def reconcile(**kw):
+        attempt = kw["attempt"]
+        if attempt["status"] != "incomplete_public_boundary":
+            return False
+        attempt.update(status="completed", termination="completed",
+                       public_boundary={"elapsed_seconds": None, "category_charge_seconds": 30.0})
+        return True
+
+    monkeypatch.setattr(pilot, "_reconcile_retained_attempt", reconcile)
+    actual = pilot.run_calibration(repository_root=tmp_path, caps_path=caps_path, output_root=output)
+    assert actual["allocation"]["retained_public_boundary_seconds"] == 31.0
