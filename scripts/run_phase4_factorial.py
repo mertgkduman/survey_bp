@@ -228,6 +228,7 @@ def canonical_public_executor(*, repository_root: Path, output_root: Path, plan:
       path=root/"manifest.json"; expected=json.dumps(manifest,indent=2,sort_keys=True)+"\n"
       if path.exists() and path.read_text()!=expected: raise ValueError("retained factorial manifest drifted")
       if not path.exists(): path.write_text(expected)
+      artifact={"manifest_path":str(path),"manifest_sha256":_sha(path),"run_dir":str(root/"run"),"ledger_path":str(root/"run"/"events.jsonl")}
       began=None
       try:
         began=perf_counter()
@@ -244,15 +245,15 @@ def canonical_public_executor(*, repository_root: Path, output_root: Path, plan:
         events=active._events(root/"run"); fact=active._attempt_from_events(events,cell["shot_id"]); trace=trace_evidence(events,cell=cell,plan=plan); terminal=fact["terminal"]
         if fact["sample_identity"] not in {None,observation["sample_identity"]}: raise ValueError("public ledger sample identity disagrees with public observation")
         elapsed=perf_counter()-began; spent += elapsed
-        if fact["termination"] is None: return {"cell_id":cell["cell_id"],"sample_namespace":observation["sample_namespace"],"sample_identity":observation["sample_identity"],"execution_status":"incomplete_public_boundary","terminal":False,"raw_work":fact["work_vector"],"runtime_seconds":elapsed,"resource":{"maxrss_kib":None},"trace":trace,"public_boundary":{"preflight":preflight,"run":run,"verify":verify,"cell_deadline_seconds":cell_deadline_seconds,"category_remaining_at_start_seconds":category_remaining}}
+        if fact["termination"] is None: return {"cell_id":cell["cell_id"],"sample_namespace":observation["sample_namespace"],"sample_identity":observation["sample_identity"],"execution_status":"incomplete_public_boundary","terminal":False,"raw_work":fact["work_vector"],"runtime_seconds":elapsed,"resource":{"maxrss_kib":None},"trace":trace,"artifact":artifact,"public_boundary":{"preflight":preflight,"run":run,"verify":verify,"cell_deadline_seconds":cell_deadline_seconds,"category_remaining_at_start_seconds":category_remaining}}
         import run_phase4_evaluation as evaluation
         classification=evaluation.classify_candidate(path,shot_id=cell["shot_id"],candidate=terminal.get("diagnostic_candidate"))
         selected=terminal.get("selection_status")=="frozen_decoder_visible_candidate"
-        return {"cell_id":cell["cell_id"],"sample_namespace":observation["sample_namespace"],"sample_identity":observation["sample_identity"],"execution_status":"completed","terminal":True,**classification,"selected":selected,"candidate_origin":terminal.get("diagnostic_candidate_origin"),"raw_work":fact["work_vector"],"runtime_seconds":elapsed,"resource":{"maxrss_kib":None},"trace":trace,"public_boundary":{"preflight":preflight,"run":run,"verify":verify,"cell_deadline_seconds":cell_deadline_seconds,"category_remaining_at_start_seconds":category_remaining}}
+        return {"cell_id":cell["cell_id"],"sample_namespace":observation["sample_namespace"],"sample_identity":observation["sample_identity"],"execution_status":"completed","terminal":True,**classification,"selected":selected,"candidate_origin":terminal.get("diagnostic_candidate_origin"),"raw_work":fact["work_vector"],"runtime_seconds":elapsed,"resource":{"maxrss_kib":None},"trace":trace,"artifact":artifact,"public_boundary":{"preflight":preflight,"run":run,"verify":verify,"cell_deadline_seconds":cell_deadline_seconds,"category_remaining_at_start_seconds":category_remaining}}
       except (OSError,RuntimeError,ValueError,subprocess.TimeoutExpired,TimeoutError) as error:
         elapsed=0.0 if began is None else perf_counter()-began; spent += elapsed
         trace=_retained_trace_evidence(active,root/"run",cell=cell,plan=plan)
-        return {"cell_id":cell["cell_id"],"sample_namespace":cell["factorial_namespace"],"sample_identity":None,"execution_status":"incomplete_public_boundary","terminal":False,"failure":str(error),"raw_work":None,"runtime_seconds":elapsed,"resource":{"maxrss_kib":None},"trace":trace,"public_boundary":{"cell_deadline_seconds":cell_deadline_seconds,"category_remaining_at_start_seconds":category_remaining}}
+        return {"cell_id":cell["cell_id"],"sample_namespace":cell["factorial_namespace"],"sample_identity":None,"execution_status":"incomplete_public_boundary","terminal":False,"failure":str(error),"raw_work":None,"runtime_seconds":elapsed,"resource":{"maxrss_kib":None},"trace":trace,"artifact":artifact,"public_boundary":{"cell_deadline_seconds":cell_deadline_seconds,"category_remaining_at_start_seconds":category_remaining}}
     return execute
 
 def _result_status(gate, rows):
