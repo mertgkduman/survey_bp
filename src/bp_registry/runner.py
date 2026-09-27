@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from copy import deepcopy
 from dataclasses import dataclass
 from hashlib import sha256
 from importlib.metadata import version
@@ -288,23 +289,53 @@ def _canonical_execution_controls(manifest: CanonicalExperimentV2 | CanonicalExp
 class CanonicalPublicManifestContext:
     """Immutable preflight facts from which each public shot is freshly sampled."""
 
-    manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4
-    code: Any
+    _manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4
+    _code: Any
     manifest_sha256: str
-    compact_manifest: dict[str, object]
+    _compact_manifest: dict[str, object]
     composition_identity: str
-    policy_effects: dict[str, dict[str, Any]]
-    work_limits: dict[str, dict[str, int]]
-    profile_plan: dict[str, object]
-    trace_plan: dict[str, object] | None
+    _policy_effects: dict[str, dict[str, Any]]
+    _work_limits: dict[str, dict[str, int]]
+    _profile_plan: dict[str, object]
+    _trace_plan: dict[str, object] | None
+
+    @property
+    def manifest(self) -> CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4:
+        """Return a detached manifest view of the preflight snapshot."""
+        return self._manifest.model_copy(deep=True)
+
+    @property
+    def code(self) -> Any:
+        """Return a detached code view; matrix mutation cannot poison later shots."""
+        return deepcopy(self._code)
+
+    @property
+    def compact_manifest(self) -> dict[str, object]:
+        return deepcopy(self._compact_manifest)
+
+    @property
+    def policy_effects(self) -> dict[str, dict[str, Any]]:
+        return deepcopy(self._policy_effects)
+
+    @property
+    def work_limits(self) -> dict[str, dict[str, int]]:
+        return deepcopy(self._work_limits)
+
+    @property
+    def profile_plan(self) -> dict[str, object]:
+        return deepcopy(self._profile_plan)
+
+    @property
+    def trace_plan(self) -> dict[str, object] | None:
+        return deepcopy(self._trace_plan)
 
     def shot_context(self, shot_id: int) -> PublicShotContext:
         """Derive one independent public context with the exact pinned sample rule."""
-        manifest = self.manifest
+        manifest = self._manifest
         if type(shot_id) is not int or not 0 <= shot_id < manifest.budgets.max_shots:
             raise ValueError("shot_id is outside the canonical manifest budget")
         sample = sampling.sample_shot(
-            self.code, manifest_identity=manifest.randomness.physical_sample_identity or self.manifest_sha256,
+            self._code, manifest_identity=manifest.randomness.physical_sample_identity or self.manifest_sha256,
             seed=manifest.randomness.sample_seed,
             shot_id=shot_id, x_error_rate=manifest.error_rate,
         )
@@ -312,7 +343,7 @@ class CanonicalPublicManifestContext:
             manifest_sha256=self.manifest_sha256,
             artifact_raw_sha256=manifest.artifact.raw_sha256,
             artifact_semantic_sha256=manifest.artifact.semantic_sha256,
-            compact_manifest=self.compact_manifest,
+            compact_manifest=deepcopy(self._compact_manifest),
             sample_seed_identity=sample.sample_identity,
             run_id=manifest.run_id,
             shot_id=shot_id,
@@ -323,15 +354,15 @@ class CanonicalPublicManifestContext:
             fixture=manifest.evidence.fixture,
             assessment_status=manifest.evidence.assessment_status,
             decoder_seed_identity=manifest.randomness.decoder_seed_identity,
-            code=self.code,
+            code=deepcopy(self._code),
             hidden_truth=sample.hidden,
             error_rate=manifest.error_rate,
             max_iterations=manifest.budgets.attempt.max_iterations,
-            work_limits=self.work_limits,
+            work_limits=deepcopy(self._work_limits),
             composition_identity=self.composition_identity,
-            policy_effects=self.policy_effects,
-            profile_plan=self.profile_plan,
-            trace_plan=self.trace_plan,
+            policy_effects=deepcopy(self._policy_effects),
+            profile_plan=deepcopy(self._profile_plan),
+            trace_plan=deepcopy(self._trace_plan),
             update_kind=manifest.policies.update.kind,
             schedule_kind=manifest.policies.schedule.kind,
         )
@@ -348,18 +379,18 @@ def canonical_public_manifest_context(
         raise ValueError("canonical execution requires a strict CanonicalExperimentV2, V3, or V4 manifest")
     composition = validate_executable_canonical_baseline(manifest.policies)
     return CanonicalPublicManifestContext(
-        manifest=manifest,
-        code=resolved.code,
+        _manifest=manifest,
+        _code=resolved.code,
         manifest_sha256=manifest_digest(manifest),
-        compact_manifest=_canonical_kernel_manifest(manifest),
+        _compact_manifest=_canonical_kernel_manifest(manifest),
         composition_identity=composition.semantic_identity,
-        policy_effects=_canonical_policy_effects(manifest, resolved.code),
-        work_limits={
+        _policy_effects=_canonical_policy_effects(manifest, resolved.code),
+        _work_limits={
             scope: getattr(manifest.budgets, scope).work_limits.as_evidence()
             for scope in ("shot", "search", "attempt")
         },
-        profile_plan=manifest.profile_plan.model_dump(mode="json"),
-        trace_plan=(manifest.trace_plan.model_dump(mode="json")
+        _profile_plan=manifest.profile_plan.model_dump(mode="json"),
+        _trace_plan=(manifest.trace_plan.model_dump(mode="json")
                     if manifest.trace_plan.level != "off" else None),
     )
 

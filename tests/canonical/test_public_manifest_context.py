@@ -109,6 +109,36 @@ def test_manifest_base_is_frozen_and_samples_each_shot_independently(tmp_path):
     assert first.memory_execution_context["decoder_identity"] != second.memory_execution_context["decoder_identity"]
 
 
+def test_manifest_base_and_derived_contexts_do_not_share_mutable_statics(tmp_path):
+    path = _ordinary_memory_manifest(tmp_path)
+    base = canonical_public_manifest_context(path)
+    expected_next = base.shot_context(1)
+    first = base.shot_context(0)
+
+    # Mutate every returned mutable boundary: none may poison the cached base
+    # or a separately derived public context.
+    first.work_limits["shot"]["injected"] = 1
+    first.compact_manifest["injected"] = {"control": True}
+    first.policy_effects["injected"] = {"control": True}
+    first.profile_plan["injected"] = True
+    first.code.hx[0, 0] ^= 1
+    base.work_limits["shot"]["injected"] = 1
+    base.compact_manifest["injected"] = {"control": True}
+    base.policy_effects["injected"] = {"control": True}
+    base.profile_plan["injected"] = True
+    base.code.hx[0, 0] ^= 1
+    base.manifest.memory.bindings[0].parameters["alpha"] = 0.2
+
+    next_context = base.shot_context(1)
+    wrapped = canonical_public_shot_context(path, shot_id=1)
+    assert _context_bytes(next_context) == _context_bytes(expected_next)
+    assert _context_bytes(next_context) == _context_bytes(wrapped)
+    assert "injected" not in next_context.work_limits["shot"]
+    assert "injected" not in next_context.compact_manifest
+    assert "injected" not in next_context.policy_effects
+    assert "injected" not in next_context.profile_plan
+
+
 def test_ledger_snapshot_parser_has_the_same_validation_as_the_path_api(tmp_path):
     path = tmp_path / "canonical-events.jsonl"
     with CanonicalEventWriter(path) as writer:
