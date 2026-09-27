@@ -43,7 +43,7 @@ from .schedules import (
 )
 from .verification import PublicShotContext, validate_canonical_shot
 from .relay import RelayController
-from .memory_execution import MemoryFloodingSchedule, validate_single_attempt_memory
+from .memory_execution import LocalMemoryExecution, MemoryFloodingSchedule, validate_single_attempt_memory
 
 
 class CanonicalConflictError(ValueError):
@@ -783,12 +783,13 @@ def run_canonical_structural_shot(
     local_progress: ScheduleProgress | None = None
     local_schedule: Any | None = None
     memory_schedule: MemoryFloodingSchedule | None = None
+    local_memory: LocalMemoryExecution | None = None
     randomized_plan: RandomizedTraversalPlan | None = None
     local_random_state: Any | None = None
     setup_before_profile_ns = 0
     setup_inside_profile_ns = 0
     if parsed.policies.schedule.kind != "flooding":
-        if not isinstance(parsed, CanonicalManifestV3):
+        if not isinstance(parsed, (CanonicalManifestV3, CanonicalManifestV5)):
             raise ValueError("local public execution requires the version-three kernel contract")
         setup_started_ns = time.perf_counter_ns()
         local_table = EdgeTable.from_check_matrix(validated.hz)
@@ -817,13 +818,15 @@ def run_canonical_structural_shot(
                 profile_evidence: dict[str, object] | None = None
 
                 def terminal_with_work(termination: str, **data: Any) -> None:
+                    is_local = parsed.policies.schedule.kind != "flooding"
                     if isinstance(parsed, CanonicalManifestV5) and termination in {"count_budget_exhausted", "max_iterations"}:
                         # A diagnostic is decoder-visible output from the last
                         # committed sweep. It is not selected as a recovery.
                         data.setdefault("diagnostic_candidate", None)
-                        data["diagnostic_candidate_origin"] = "last_committed_sweep" if data["diagnostic_candidate"] is not None else None
+                        data["diagnostic_candidate_origin"] = (
+                            "last_committed_local_unit" if is_local else "last_committed_sweep"
+                        ) if data["diagnostic_candidate"] is not None else None
                     work = budgets.summary("attempt")
-                    is_local = parsed.policies.schedule.kind != "flooding"
                     setup_elapsed_ns = setup_before_profile_ns + setup_inside_profile_ns
                     setup_runtime = (
                         Measurement.observed(
@@ -893,7 +896,8 @@ def run_canonical_structural_shot(
                             "decode_runtime": decode_runtime.as_evidence(),
                             **({"schedule_terminal": schedule_terminal, "schedule_evidence": schedule_evidence} if is_local else {}),
                             **({"profile": profile_evidence} if profile_evidence is not None else {}),
-                            **({"memory_execution": memory_schedule.evidence()} if memory_schedule is not None else {}),
+                            **({"memory_execution": (memory_schedule if memory_schedule is not None else local_memory).evidence()}
+                               if memory_schedule is not None or local_memory is not None else {}),
                         },
                     )
 
@@ -911,7 +915,7 @@ def run_canonical_structural_shot(
                 attempt_reservation.commit_once()
                 try:
                     def admitted_attempt() -> tuple[np.ndarray | None, int, bool, BudgetTermination | None]:
-                        nonlocal local_progress, local_schedule, local_random_state, setup_inside_profile_ns, memory_schedule
+                        nonlocal local_progress, local_schedule, local_random_state, setup_inside_profile_ns, memory_schedule, local_memory
                         setup_started_ns = time.perf_counter_ns()
                         edge_table = EdgeTable.from_check_matrix(validated.hz)
                         kernel = _kernel_for_manifest(parsed, edge_table)
@@ -920,6 +924,12 @@ def run_canonical_structural_shot(
                             messages = np.full(
                                 edge_table.edge_count, kernel.prior(parsed.error_rate), dtype=np.float64,
                             )
+                            if isinstance(parsed, CanonicalManifestV5):
+                                local_memory = LocalMemoryExecution(edge_table, memory=parsed.memory)
+                                local_memory.initialize(
+                                    error_rate=parsed.error_rate, initial_v2c=messages,
+                                    initial_beliefs=np.full(edge_table.variable_count, kernel.prior(parsed.error_rate), dtype=np.float64),
+                                )
                             setup_inside_profile_ns = time.perf_counter_ns() - setup_started_ns
                             candidate: np.ndarray | None = None
                             executor = CanonicalLocalStepExecutor(budgets, scope="attempt")
@@ -955,20 +965,35 @@ def run_canonical_structural_shot(
                                     assert refresh.order is not None
                                     logical_index = local_progress.cursor[0]
                                     progress_for_step = ScheduleProgress(local_progress.iteration, local_progress.local_steps, (refresh.order[logical_index],), local_progress.rng_state)
-                                step = local_schedule.execute_local_step(
-                                    executor, messages, observation.syndrome,
-                                    error_rate=parsed.error_rate, progress=progress_for_step,
-                                    is_converged=lambda proposed: bool(np.array_equal(
-                                        (validated.hz.astype(np.int64) @ proposed.astype(np.int64)) % 2,
-                                        observation.syndrome,
-                                    )),
-                                )
+                                if local_memory is not None:
+                                    local_memory.begin_step()
+                                try:
+                                    step = local_schedule.execute_local_step(
+                                        executor, messages, observation.syndrome,
+                                        error_rate=parsed.error_rate, progress=progress_for_step,
+                                        is_converged=lambda proposed: bool(np.array_equal(
+                                            (validated.hz.astype(np.int64) @ proposed.astype(np.int64)) % 2,
+                                            observation.syndrome,
+                                        )),
+                                        **({
+                                            "transform_beliefs": local_memory.transform_beliefs,
+                                            "transform_v2c": local_memory.transform_v2c,
+                                        } if local_memory is not None else {}),
+                                    )
+                                except BaseException:
+                                    if local_memory is not None:
+                                        local_memory.discard()
+                                    raise
                                 if randomized_plan is not None:
                                     local_progress = ScheduleProgress(local_progress.iteration, step.progress.local_steps, (local_progress.cursor[0] + 1,), local_progress.rng_state)
                                 else:
                                     local_progress = step.progress
                                 if not step.admitted:
+                                    if local_memory is not None:
+                                        local_memory.discard()
                                     return candidate, local_progress.local_steps, False, step.termination
+                                if local_memory is not None:
+                                    local_memory.commit(local_memory.proposal())
                                 candidate = step.candidate
                                 if step.candidate is not None and np.array_equal(
                                     (validated.hz.astype(np.int64) @ step.candidate.astype(np.int64)) % 2,

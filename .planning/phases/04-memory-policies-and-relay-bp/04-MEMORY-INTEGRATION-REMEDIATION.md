@@ -65,6 +65,25 @@ do not merge kernel changes into that live source tree mid-campaign.
   committed history arrays plus digests, PCG64 draw identity/evidence, and a
   caller-supplied candidate origin. The caller obtains the content-addressed
   result via `MemoryFloodingSchedule.trace_result()` and writes its ledger link.
+- A bounded local-memory execution slice now runs through the existing Phase 3
+  local executors. At an admitted local unit, PDBP consumes the complete fresh
+  decoder-visible belief vector before candidate construction and V2C damping
+  consumes the subsequently formed affected fresh V2C buffer. Both retain
+  separate binding-owned histories and commit only after the unit's reserve,
+  compute, and convergence check; denied or abandoned units discard proposals.
+
+## Executable memory matrix
+
+| Schedule family | Admitted local operands | Commit boundary | Explicit rejection |
+| --- | --- | --- | --- |
+| Flooding | affine prior, PDBP, PD-prime, posterior momentum, V2C damping at `source_iteration` | complete double-buffered sweep | local-update bindings and unsupported lifecycle declarations |
+| Layered, check-node serial, variable-node serial | PDBP belief-field mixing and V2C damping at `local_update`, in declared belief-then-V2C order; repeated bindings retain distinct histories | admitted local unit after its convergence check | affine, PD-prime, momentum, wrong target/boundary, V2C-before-belief order |
+| Residual, randomized, group-shuffled | none in this slice | n/a | no full common belief-plus-affected-V2C operand/commit proof is wired for the memory binding controller |
+
+All local bindings currently require `state_lifetime: attempt`,
+`refresh_boundary: attempt_start`, and `retain_history: false`. These
+constraints preserve the existing one-attempt scheduler lifecycle without
+claiming a leg/search/member history controller that is not yet implemented.
 
 ## Verification
 
@@ -85,16 +104,20 @@ approved `.venv/bin/python`, from the isolated checkout.
    **35 passed** (5.17 s). This includes public V5 preflight/run/semantic
    replay of a disordered affine-prior arm, transactional PCG64 replay, capped
    trace sidecars, and per-iteration NMS execution.
+5. Local-memory preflight/run/replay and rollback gate:
+   `python -m pytest -q tests/canonical/test_memory_execution.py tests/canonical/test_local_memory_execution.py tests/test_manifest.py -k 'memory or canonical_v4'`:
+   **41 passed, 33 deselected** (5.47 s). This includes the public layered
+   PDBP-plus-damping V4 path, semantic replay, and a denied local-unit rollback.
 
 These are implementation fixtures, not statistical performance evidence.
 No calibration, evaluation, factorial or publication sample budget was used.
 
 ## Remaining Phase 4 work
 
-- Local-schedule memory execution, retained histories, and lifetimes beyond
-  one flooding attempt remain unimplemented and reject explicitly where
-  applicable. A `leg` declaration is not a multi-leg ordinary-memory
-  lifecycle: it is only accepted by this single-attempt flooding executor
+- Local execution remains intentionally limited to the matrix above. Retained
+  histories and lifetimes beyond one ordinary attempt remain unimplemented and
+  reject explicitly where applicable. A `leg` declaration is not a multi-leg
+  ordinary-memory lifecycle: it is only accepted by the flooding executor
   while history reset is required. Mathematical compatibility declarations
   alone do not prove execution.
 - The frozen factorial design lists damping-before-affine and

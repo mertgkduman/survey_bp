@@ -365,7 +365,7 @@ def test_public_disordered_affine_prior_records_assignment_evidence(tmp_path):
 
 
 @pytest.mark.parametrize("case,message", [
-    ("local", "execution_schedule_unimplemented"),
+    ("local", "target_boundary_unsupported"),
     ("retained", "execution_lifecycle_unimplemented"),
     ("order", "execution_order_requires"),
     ("pdprime_after_prior", "pdprime_requires_fixed_prior"),
@@ -379,7 +379,7 @@ def test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading(tmp_
     binding = value["memory"]["bindings"][0]
     if case == "local":
         value["policies"]["schedule"]["kind"] = "check_node_serial"
-        value["memory"] = composition("v2c_damping", {"gamma": 0.5}).model_dump(mode="json")
+        value["memory"] = composition("posterior_momentum", {"alpha": 0.5, "gamma": 0.5}).model_dump(mode="json")
         value["memory"]["bindings"][0]["advance_boundary"] = "local_update"
     elif case == "retained":
         binding["retain_history"] = True

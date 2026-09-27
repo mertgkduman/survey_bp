@@ -21,7 +21,7 @@ from ..ledger import CANONICAL_RELAY_LEDGER_VERSION, read_canonical_events
 from .budgets import BudgetLimit, BudgetTree, BudgetView, Measurement, QualifiedIteration, ScheduleTerminalEvidence, WorkVector
 from .kernel import BinarySpaKernel
 from .contracts import MemoryCompositionSpec
-from .memory_execution import MemoryFloodingSchedule
+from .memory_execution import LocalMemoryExecution, MemoryFloodingSchedule
 from .group_shuffled import HsuGroupSchedule
 from .numerics import MIN_SUM_CPU_F64
 from .lineage import stable_lineage_id
@@ -419,6 +419,7 @@ def _expected_local_attempt(context: PublicShotContext) -> dict[str, Any]:
     code = context.code.validate()
     table = EdgeTable.from_check_matrix(code.hz)
     kernel = BinarySpaKernel()
+    is_memory = context.compact_manifest.get("schema_version") == 5
     if schedule_kind in {"layered", "randomized"}:
         schedule = LayeredSchedule(table, kernel=kernel, partitions=partitions, provenance=provenance, construction_rule=schedule_data.get("construction_rule"))
     elif schedule_kind == "check_node_serial":
@@ -458,6 +459,16 @@ def _expected_local_attempt(context: PublicShotContext) -> dict[str, Any]:
         return {"termination": "count_budget_exhausted", "work_vector": WorkVector.zero().as_evidence(structural_event_version=2), "schedule_work_vector": WorkVector.zero().as_evidence(), "iterations": 0, "budget_termination": budget_termination(), "admitted": False}
     bp_call.commit_once()
     messages = np.full(table.edge_count, kernel.prior(context.error_rate), dtype=np.float64)
+    local_memory = None
+    if is_memory:
+        local_memory = LocalMemoryExecution(table, memory=MemoryCompositionSpec.model_validate(context.compact_manifest["memory"]))
+        local_memory.initialize(
+            error_rate=context.error_rate, initial_v2c=messages,
+            initial_beliefs=np.full(table.variable_count, kernel.prior(context.error_rate), dtype=np.float64),
+        )
+
+    def memory_evidence() -> dict[str, Any]:
+        return {} if local_memory is None else {"memory_execution": local_memory.evidence()}
     executor = __import__("bp_registry.canonical.execution", fromlist=["CanonicalLocalStepExecutor"]).CanonicalLocalStepExecutor(budgets, scope="attempt")
     progress = __import__("bp_registry.canonical.execution", fromlist=["ScheduleProgress"]).ScheduleProgress(0, 0, (0,))
     randomized: RandomizedTraversalPlan | None = None
@@ -501,29 +512,42 @@ def _expected_local_attempt(context: PublicShotContext) -> dict[str, Any]:
             randomized_state = refresh.state
             assert refresh.order is not None
             progress_for_step = type(progress)(progress.iteration, progress.local_steps, (refresh.order[progress.cursor[0]],), progress.rng_state)
-        step = schedule.execute_local_step(
-            executor, messages, np.asarray(context.syndrome, dtype=np.uint8), error_rate=context.error_rate,
-            progress=progress_for_step,
-            is_converged=lambda proposed: bool(np.array_equal((code.hz.astype(np.int64) @ proposed.astype(np.int64)) % 2, context.syndrome)),
-        )
+        if local_memory is not None:
+            local_memory.begin_step()
+        try:
+            step = schedule.execute_local_step(
+                executor, messages, np.asarray(context.syndrome, dtype=np.uint8), error_rate=context.error_rate,
+                progress=progress_for_step,
+                is_converged=lambda proposed: bool(np.array_equal((code.hz.astype(np.int64) @ proposed.astype(np.int64)) % 2, context.syndrome)),
+                **({"transform_beliefs": local_memory.transform_beliefs, "transform_v2c": local_memory.transform_v2c}
+                   if local_memory is not None else {}),
+            )
+        except BaseException:
+            if local_memory is not None:
+                local_memory.discard()
+            raise
         progress = (type(progress)(progress.iteration, step.progress.local_steps, (progress.cursor[0] + 1,), progress.rng_state) if randomized is not None else step.progress)
         evidence = dict(schedule.evidence())
         if randomized is not None:
             evidence["randomized_traversal"] = randomized.evidence(randomized_state)
         if not step.admitted:
+            if local_memory is not None:
+                local_memory.discard()
             work = budgets.summary("attempt")
-            return {"termination": "count_budget_exhausted", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(evidence)), "iterations": progress.local_steps, "budget_termination": budget_termination(), "admitted": True, "progress": progress}
+            return {"termination": "count_budget_exhausted", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(evidence)), "iterations": progress.local_steps, "budget_termination": budget_termination(), "admitted": True, "progress": progress, **memory_evidence()}
+        if local_memory is not None:
+            local_memory.commit(local_memory.proposal())
         candidate = step.candidate
         if candidate is not None and np.array_equal((code.hz.astype(np.int64) @ candidate.astype(np.int64)) % 2, context.syndrome):
             work = budgets.summary("attempt")
-            return {"termination": "completed", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(evidence)), "iterations": progress.local_steps, "candidate": candidate, "admitted": True, "progress": progress}
+            return {"termination": "completed", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(evidence)), "iterations": progress.local_steps, "candidate": candidate, "admitted": True, "progress": progress, **memory_evidence()}
         if progress.cursor == (schedule.unit_count,):
             progress = type(progress)(progress.iteration + 1, progress.local_steps, (0,), progress.rng_state)
     work = budgets.summary("attempt")
     evidence = dict(schedule.evidence())
     if randomized is not None:
         evidence["randomized_traversal"] = randomized.evidence(randomized_state)
-    return {"termination": "max_iterations", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(evidence)), "iterations": progress.local_steps, "candidate": candidate, "admitted": True, "progress": progress}
+    return {"termination": "max_iterations", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(evidence)), "iterations": progress.local_steps, "candidate": candidate, "admitted": True, "progress": progress, **memory_evidence()}
 
 
 def _expected_attempt(context: PublicShotContext) -> dict[str, Any]:
@@ -817,7 +841,8 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
     if context.compact_manifest.get("schema_version") == 5 and expected["termination"] in {"count_budget_exhausted", "max_iterations"}:
         runtime_fields |= {"diagnostic_candidate", "diagnostic_candidate_origin"}
         _expect_equal("diagnostic candidate", terminal_data.get("diagnostic_candidate"), expected.get("diagnostic_candidate"))
-        _expect_equal("diagnostic candidate origin", terminal_data.get("diagnostic_candidate_origin"), "last_committed_sweep" if expected.get("diagnostic_candidate") is not None else None)
+        origin = "last_committed_local_unit" if context.schedule_kind != "flooding" else "last_committed_sweep"
+        _expect_equal("diagnostic candidate origin", terminal_data.get("diagnostic_candidate_origin"), origin if expected.get("diagnostic_candidate") is not None else None)
     if term == "completed":
         kinds = ["shot_begin", "attempt", "runtime", "candidate", "selection", "work", "termination"]
     elif expected["termination"] == "count_budget_exhausted":

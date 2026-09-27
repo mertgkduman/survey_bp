@@ -24,7 +24,13 @@ _FLOODING_OPERANDS = frozenset({
     ("pdprime_delta_mix", "belief", "source_iteration"),
     ("posterior_momentum", "posterior", "source_iteration"),
 })
-_LOCAL_OPERANDS = frozenset({("v2c_damping", "v2c", "local_update")})
+_LOCAL_OPERANDS = frozenset({
+    ("v2c_damping", "v2c", "local_update"),
+    # Every Phase 3 local executor already assembles a full fresh belief
+    # vector before candidate construction and V2C mutation.  PDBP consumes
+    # precisely that decoder-visible field and its separately owned old field.
+    ("pdbp_field_mix", "belief", "local_update"),
+})
 
 
 def validate_memory_compatibility(

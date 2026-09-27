@@ -153,12 +153,21 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
             "compatibility": {"admitted": True, "reason": None},
         }
         if manifest.relay is None:
-            report["memory"]["execution"] = {
-                "compact_contract_version": 5,
-                "mode": "ordered_single_attempt_flooding",
-                "commit_boundary": "complete_double_buffered_sweep",
-                "operand_order": ["prior", "belief_or_posterior", "v2c"],
-            }
+            report["memory"]["execution"] = (
+                {
+                    "compact_contract_version": 5,
+                    "mode": "ordered_single_attempt_flooding",
+                    "commit_boundary": "complete_double_buffered_sweep",
+                    "operand_order": ["prior", "belief_or_posterior", "v2c"],
+                }
+                if manifest.policies.schedule.kind == "flooding" else
+                {
+                    "compact_contract_version": 5,
+                    "mode": "ordered_attempt_local_update",
+                    "commit_boundary": "admitted_local_unit_after_convergence_check",
+                    "operand_order": ["complete_fresh_belief", "affected_fresh_v2c"],
+                }
+            )
         if manifest.relay is not None:
             tuning = manifest.relay.memory_tuning
             report["relay"] = {
