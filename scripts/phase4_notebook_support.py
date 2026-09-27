@@ -160,10 +160,15 @@ def notebook_inventory(root: Path, *, fixture: bool = False) -> dict[str, dict[s
     if not path.is_file():
         return {stage: {"status": "missing_qualified_snapshot", "stage": stage} for stage in SECTIONS}
     index = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(index, dict):
+        raise ValueError("notebook index must be an object")
     if index.get("index_digest") != digest({k: v for k, v in index.items() if k != "index_digest"}):
         raise ValueError("notebook index digest does not verify")
     if set(index.get("stages", {})) != set(SECTIONS):
         raise ValueError("notebook index omits required sections")
+    for stage, expected in index["stages"].items():
+        if not isinstance(expected, dict) or not isinstance(expected.get("facts"), dict) or expected["facts"].get("stage") != stage:
+            raise ValueError("notebook index assigns an identity to the wrong stage section")
     return {stage: load_stage(root, index["stages"][stage]) for stage in SECTIONS}
 
 

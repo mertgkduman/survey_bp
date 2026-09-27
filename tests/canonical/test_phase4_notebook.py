@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import sys
+import tempfile
 
 import nbformat
 import pytest
@@ -113,15 +114,29 @@ def test_missing_evidence_is_not_synthesized_as_performance(tmp_path):
     assert all(record["assessment_status"] == "not_assessed" for record in support.fixture_stages().values())
 
 
+def test_self_consistent_index_cannot_substitute_baseline_for_evaluation(tmp_path):
+    baseline = _identity(tmp_path, stage="baseline")
+    support.ensure_stage(tmp_path, baseline, producer=lambda: _record(baseline), predecessor_verified=True)
+    stages = {stage: _identity(tmp_path, stage=stage) for stage in support.SECTIONS}
+    stages["evaluation"] = baseline
+    index = {"stages": stages}
+    index["index_digest"] = support.digest(index)
+    path = tmp_path / "data/results/phase4-notebook/index.json"
+    path.write_text(json.dumps(index))
+    with pytest.raises(ValueError, match="wrong stage section"):
+        support.notebook_inventory(tmp_path)
+
+
 def test_source_notebook_complete_sections_and_actual_fixture_execution():
     source = ROOT / "notebooks/phase4-memory-relay-analysis.ipynb"
     notebook = nbformat.read(source, as_version=4)
     tagged = {cell.metadata.get("phase4_section") for cell in notebook.cells}
     assert set(support.SECTIONS) <= tagged
-    destination = executor.execute_notebook(repository_root=ROOT, input_path=str(source),
-                                            output_path="data/results/phase4-notebook/executed-fixture.ipynb",
-                                            fixture=True)
-    executed = nbformat.read(destination, as_version=4)
+    with tempfile.TemporaryDirectory(dir=ROOT / "data/results/phase4-notebook", prefix=".test-kernel-") as temporary:
+        destination = executor.execute_notebook(repository_root=ROOT, input_path=str(source),
+                                                output_path=str(Path(temporary) / "executed.ipynb"),
+                                                fixture=True)
+        executed = nbformat.read(destination, as_version=4)
     assert all(cell.execution_count is not None for cell in executed.cells if cell.cell_type == "code")
     assert all("execution" not in cell.metadata for cell in executed.cells)
     assert executed.metadata["phase4_validation"]["mode"] == "development_fixture"
