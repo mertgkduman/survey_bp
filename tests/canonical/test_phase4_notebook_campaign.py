@@ -35,6 +35,9 @@ def test_real_inventory_is_read_only_and_preserves_current_nonterminal_states():
     assert inventory["artifacts"]["evaluation"]["status"] == "missing"
     assert inventory["artifacts"]["benchmark"]["execution_qualified"] is False
     assert inventory["artifacts"]["historical_author_agreement"]["execution_qualified"] is False
+    tables = inventory["artifacts"]["historical_author_agreement"]["tables"]
+    if tables:
+        assert tables[0]["stage"] == "historical_author_agreement"
 
 
 def test_fabricated_completed_calibration_does_not_qualify_from_a_terminal_label(tmp_path, monkeypatch):
@@ -152,11 +155,11 @@ def test_inventory_proof_cache_reuses_current_ledger_once_and_rejects_changed_by
     calls = []
     import bp_registry.ledger as ledger_module
 
-    def read_once(path):
-        calls.append(Path(path).read_bytes())
+    def read_once(snapshot):
+        calls.append(snapshot)
         return [{"run_id": "run", "shot_id": 0}, {"run_id": "run", "shot_id": 1}]
 
-    monkeypatch.setattr(ledger_module, "read_canonical_events", read_once)
+    monkeypatch.setattr(ledger_module, "read_canonical_events_bytes", read_once)
     cache = campaign._InventoryProofCache()
     first_key, first = cache.events(ledger)
     second_key, second = cache.events(ledger)
@@ -166,16 +169,41 @@ def test_inventory_proof_cache_reuses_current_ledger_once_and_rejects_changed_by
     assert changed_key != first_key and changed == first and calls == [b"first", b"changed"]
 
 
-def test_inventory_proof_cache_rejects_a_ledger_replaced_during_parse(tmp_path, monkeypatch):
+def test_inventory_proof_cache_uses_an_immutable_ledger_snapshot_during_replace(tmp_path, monkeypatch):
     campaign = _module()
     ledger = tmp_path / "events.jsonl"
     ledger.write_text("before", encoding="utf-8")
     import bp_registry.ledger as ledger_module
 
-    def replace_during_parse(path):
-        Path(path).write_text("after", encoding="utf-8")
-        return []
+    def replace_during_parse(snapshot):
+        ledger.write_text("after", encoding="utf-8")
+        return [{"snapshot_bytes": snapshot.decode("utf-8")}]
 
-    monkeypatch.setattr(ledger_module, "read_canonical_events", replace_during_parse)
-    with pytest.raises(ValueError, match="changed"):
-        campaign._InventoryProofCache().events(ledger)
+    monkeypatch.setattr(ledger_module, "read_canonical_events_bytes", replace_during_parse)
+    key, events = campaign._InventoryProofCache().events(ledger)
+    assert key[1] != campaign._byte_sha(tmp_path / "events.jsonl")
+    assert events == [{"snapshot_bytes": "before"}]
+
+
+def test_inventory_context_base_uses_one_exact_manifest_buffer_per_current_bytes(tmp_path, monkeypatch):
+    campaign = _module()
+    manifest = tmp_path / "manifest.json"
+    manifest.write_text("first", encoding="utf-8")
+    import bp_registry.runner as runner
+    calls = []
+
+    class Base:
+        def __init__(self, marker): self.marker = marker
+        def shot_context(self, shot_id): return {"marker": self.marker, "shot_id": shot_id}
+
+    def build(path, *, manifest_bytes=None):
+        calls.append((Path(path), manifest_bytes))
+        return Base(manifest_bytes)
+
+    monkeypatch.setattr(runner, "canonical_public_manifest_context", build)
+    cache = campaign._InventoryProofCache()
+    assert cache.context(manifest, 0)["marker"] == b"first"
+    assert cache.context(manifest, 1)["marker"] == b"first"
+    manifest.write_text("second", encoding="utf-8")
+    assert cache.context(manifest, 0)["marker"] == b"second"
+    assert [item[1] for item in calls] == [b"first", b"second"]

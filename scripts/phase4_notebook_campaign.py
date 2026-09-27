@@ -24,28 +24,33 @@ class _InventoryProofCache:
     """One inventory call's immutable evidence cache; never shared globally."""
     def __init__(self) -> None:
         self.ledgers: dict[tuple[Path, str], list[Mapping[str, Any]]] = {}
+        self.bases: dict[tuple[Path, str], Any] = {}
         self.contexts: dict[tuple[Path, str, int], Any] = {}
 
+    @staticmethod
+    def _snapshot(path: Path) -> tuple[bytes, str]:
+        raw = path.read_bytes()
+        return raw, sha256(raw).hexdigest()
+
     def events(self, path: Path) -> tuple[tuple[Path, str], list[Mapping[str, Any]]]:
-        from bp_registry.ledger import read_canonical_events
-        resolved, digest = path.resolve(), _byte_sha(path)
+        from bp_registry.ledger import read_canonical_events_bytes
+        resolved = path.resolve()
+        snapshot, digest = self._snapshot(resolved)
         key = (resolved, digest)
         if key not in self.ledgers:
-            events = read_canonical_events(resolved)
-            if _byte_sha(resolved) != digest:
-                raise ValueError("ledger bytes changed while inventory proof was constructed")
-            self.ledgers[key] = events
+            self.ledgers[key] = read_canonical_events_bytes(snapshot)
         return key, self.ledgers[key]
 
     def context(self, manifest_path: Path, shot_id: int):
-        from bp_registry.runner import canonical_public_shot_context
-        resolved, digest = manifest_path.resolve(), _byte_sha(manifest_path)
-        key = (resolved, digest, shot_id)
+        from bp_registry.runner import canonical_public_manifest_context
+        resolved = manifest_path.resolve()
+        snapshot, digest = self._snapshot(resolved)
+        base_key = (resolved, digest)
+        if base_key not in self.bases:
+            self.bases[base_key] = canonical_public_manifest_context(resolved, manifest_bytes=snapshot)
+        key = (*base_key, shot_id)
         if key not in self.contexts:
-            context = canonical_public_shot_context(resolved, shot_id=shot_id)
-            if _byte_sha(resolved) != digest:
-                raise ValueError("manifest bytes changed while inventory context was constructed")
-            self.contexts[key] = context
+            self.contexts[key] = self.bases[base_key].shot_context(shot_id)
         return self.contexts[key]
 
 
@@ -505,7 +510,7 @@ def _historical_native(root: Path) -> dict[str, object]:
                 for code, item in sorted(summary.get("codes", {}).items()) if isinstance(item, Mapping)]
         return _snapshot("historical_author_agreement", path, payload, qualified=False,
                          reason="historical author agreement is not fresh selected evaluation or factorial evidence",
-                         tables=[{**_table("native", rows), "name": "historical_author_agreement", "title": "historical author agreement diagnostics", "display_limit": 30}])
+                         tables=[{**_table("historical_author_agreement", rows), "name": "historical_author_agreement", "title": "historical author agreement diagnostics", "display_limit": 30}])
     except (OSError, ValueError) as error:
         return _snapshot("historical_author_agreement", path, payload, qualified=False, reason=str(error), tables=[])
 
