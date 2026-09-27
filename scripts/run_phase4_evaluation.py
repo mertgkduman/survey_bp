@@ -52,14 +52,10 @@ def _byte_sha(path: Path) -> str:
     return sha256(path.read_bytes()).hexdigest()
 
 
-def verified_inputs(*, root: Path = ROOT, caps_path: Path = CAPS_PATH,
-                    calibration_path: Path = CALIBRATION_PATH,
-                    selection_path: Path = SELECTION_PATH,
-                    freeze_selection: bool = False) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
-    """Reject any selection or cap drift before writing/reading evaluation samples."""
-    root, caps_path, calibration_path, selection_path = (
-        path.resolve() for path in (root, caps_path, calibration_path, selection_path)
-    )
+def verified_calibration_inputs(*, root: Path = ROOT, caps_path: Path = CAPS_PATH,
+                                calibration_path: Path = CALIBRATION_PATH) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Verify terminal calibration provenance without requiring a frozen selection."""
+    root, caps_path, calibration_path = (path.resolve() for path in (root, caps_path, calibration_path))
     caps = _read(caps_path)
     if caps.get("schema_version") != 4 or caps.get("caps_digest") != _digest({k: v for k, v in caps.items() if k != "caps_digest"}):
         raise ValueError("frozen V4 cap digest does not verify")
@@ -73,6 +69,18 @@ def verified_inputs(*, root: Path = ROOT, caps_path: Path = CAPS_PATH,
         raise ValueError("calibration input drifted or fresh evaluation samples were already accessed")
     if calibration.get("result_digest") != _digest({k: v for k, v in calibration.items() if k != "result_digest"}):
         raise ValueError("terminal calibration result digest does not verify")
+    return caps, calibration
+
+
+def verified_inputs(*, root: Path = ROOT, caps_path: Path = CAPS_PATH,
+                    calibration_path: Path = CALIBRATION_PATH,
+                    selection_path: Path = SELECTION_PATH,
+                    freeze_selection: bool = False) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+    """Reject any selection or cap drift before writing/reading evaluation samples."""
+    root, caps_path, calibration_path, selection_path = (
+        path.resolve() for path in (root, caps_path, calibration_path, selection_path)
+    )
+    caps, calibration = verified_calibration_inputs(root=root, caps_path=caps_path, calibration_path=calibration_path)
     expected = pilot.select_calibration_settings(calibration)
     if set(expected["codes"]) != set(caps["codes"]):
         raise ValueError("terminal calibration does not cover every qualified code")

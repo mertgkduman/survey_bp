@@ -10,13 +10,17 @@ subprocess, or scheduler. Each artifact remains separately indexed with its
 producer path and byte digest, producer status, sample facts, normalized table
 rows, and an `execution_qualified` decision.
 
-Qualification is deliberately stricter than an artifact's terminal label. A
-terminal producer must have a verifying canonical result digest plus bound
-source-policy, code/manifest, frozen-cap, sample, and, for post-selection
-stages, selected-settings bytes. Missing, running, interrupted, malformed, or
-identity-mismatched records remain explicit unavailable or inconclusive
-snapshots. The adapter never changes a sample namespace or copies a terminal
-flag into its own proof.
+Qualification is deliberately stricter than an artifact's terminal label. The
+adapter calls the producer's stage-specific readers: calibration uses its
+frozen caps byte SHA, calibration-plan/input, terminal result digest, and
+evaluation-namespace guard; selection and post-selection stages additionally
+use the producer's deterministic selected-settings and three-arm evaluation
+plan checks. Evaluation and factorial records remain unavailable until their
+durable terminal ledgers are independently replayed; this read-only adapter
+does not invoke a simulation or a subprocess verifier. Missing, running,
+interrupted, malformed, or identity-mismatched records remain explicit
+unavailable or inconclusive snapshots. The adapter never changes a sample
+namespace or copies a terminal flag into its own proof.
 
 The current historical author-agreement diagnostic is included only as
 `historical_provenance_only`; it is never a substitute for fresh selected
@@ -25,8 +29,9 @@ evaluation or factorial evidence. Development fixtures are always returned as
 
 The frozen calibration and fresh evaluation results are still outstanding, so
 the real campaign inventory presently contains no execution-qualified stages.
-This is expected and does not prevent notebook construction or bounded fixture
-rendering.
+Benchmark and author-agreement metadata can still be displayed with their
+historical diagnostic scope. This does not prevent notebook construction or
+bounded fixture rendering.
 
 For the notebook-support layer, retain existing exact-cache confinement and add
 only an adapter-facing identity mapping for campaign snapshots. The mapping must
