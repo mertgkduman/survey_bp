@@ -92,6 +92,7 @@ class MemoryFloodingSchedule(FloodingSchedule):
 
     def __init__(
         self, edge_table: EdgeTable, *, kernel, memory: MemoryCompositionSpec,
+        execution_context: Mapping[str, str] | None = None,
         trace_sink: TraceSink | None = None, trace_context: Mapping[str, str] | None = None,
     ):
         validate_single_attempt_memory(memory, schedule="flooding")
@@ -105,12 +106,19 @@ class MemoryFloodingSchedule(FloodingSchedule):
         self._base_prior: np.ndarray | None = None
         self._error_rate: float | None = None
         self._trace_sink = trace_sink
-        supplied_context = {} if trace_context is None else dict(trace_context)
-        if any(not isinstance(key, str) or not key or not isinstance(value, str) or not value for key, value in supplied_context.items()):
+        supplied_execution = {} if execution_context is None else dict(execution_context)
+        if any(not isinstance(key, str) or not key or not isinstance(value, str) or not value for key, value in supplied_execution.items()):
+            raise ValueError("memory execution context must contain only nonempty string identifiers")
+        supplied_trace = {} if trace_context is None else dict(trace_context)
+        if any(not isinstance(key, str) or not key or not isinstance(value, str) or not value for key, value in supplied_trace.items()):
             raise ValueError("memory trace context must contain only nonempty string identifiers")
-        self._trace_context = supplied_context
-        self._configuration_identity = supplied_context.get("configuration_identity", f"memory:{edge_table.graph_sha256}")
-        self._decoder_identity = supplied_context.get("decoder_identity", f"memory-decoder:{edge_table.graph_sha256}")
+        # Assignment draws are decoder state, not observation state.  In
+        # particular, enabling a trace must never alter the PCG64 replay key.
+        # Direct fixtures retain graph-derived defaults when no public context
+        # is available, while public execution always supplies both values.
+        self._configuration_identity = supplied_execution.get("configuration_identity", f"memory:{edge_table.graph_sha256}")
+        self._decoder_identity = supplied_execution.get("decoder_identity", f"memory-decoder:{edge_table.graph_sha256}")
+        self._trace_context = supplied_trace
         policies = []
         assignments: list[MemoryAssignmentSpec | None] = []
         for binding in memory.bindings:
@@ -325,6 +333,18 @@ class MemoryFloodingSchedule(FloodingSchedule):
             values[state.binding_id] = arrays
         return values
 
+    def _memory_element_updates(self, *, committed_updates: int) -> dict[str, int]:
+        """Count every owned history element updated at one committed boundary."""
+        return {
+            binding.binding_id: committed_updates * (
+                self.edge_table.edge_count if binding.kind == "v2c_damping"
+                else 2 * self.edge_table.variable_count
+                if binding.kind in {"pdprime_delta_mix", "posterior_momentum"}
+                else self.edge_table.variable_count
+            )
+            for binding in self.memory.bindings
+        }
+
     def evidence(self) -> dict[str, Any]:
         digests = {} if self._histories is None else self._history_digests(self._histories)
         return {
@@ -348,10 +368,7 @@ class MemoryFloodingSchedule(FloodingSchedule):
             },
             # Separate from directional BP work; these are vector element
             # updates, not a claimed common instruction or runtime cost.
-            "memory_element_updates": {
-                binding.binding_id: self._revision * (self.edge_table.edge_count if binding.target == "v2c" else self.edge_table.variable_count)
-                for binding in self.memory.bindings
-            },
+            "memory_element_updates": self._memory_element_updates(committed_updates=self._revision),
             "memory_c2v_reduction_additions": self._revision * self.edge_table.edge_count if any(binding.kind == "pdprime_delta_mix" for binding in self.memory.bindings) else 0,
         }
 

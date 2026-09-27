@@ -42,7 +42,9 @@ do not merge kernel changes into that live source tree mid-campaign.
   primitives. No old beta value is assigned an invented mapping.
 - Terminal evidence records resolved primitives/fidelity, private-history
   digests, committed iterations, memory element updates and PD-prime C2V
-  reduction additions separately from directional BP work.
+  reduction additions separately from directional BP work. PD-prime's field
+  plus per-variable C2V history, and momentum's posterior plus velocity, each
+  count as two owned variable vectors per committed update.
 - Failed count-budget/iteration runs preserve the last committed diagnostic
   candidate and origin, with null for no committed proposal. It remains
   unselected; truth-aware classification belongs in the outer evaluator.
@@ -51,20 +53,25 @@ do not merge kernel changes into that live source tree mid-campaign.
   alterations are rejected.
 - PD-prime uses an O(n) per-variable C2V sum, reduced in canonical edge order,
   as the sufficient statistic for its delta equation.
-- Min-sum, scalar NMS, and per-iteration OMS dispatch/replay are covered. OMS
-  and NMS source-iteration assignments must cover the declared attempt limit;
-  both resolve at the canonical source-iteration index without an inferred
-  broadcast.
+- Min-sum, scalar NMS, and V3 per-iteration NMS/OMS dispatch/replay are
+  covered. OMS now receives its beta assignment at every declared source
+  iteration (rather than silently retaining beta index zero), and both NMS/OMS
+  source-iteration vectors must cover the entire declared attempt before an
+  artifact is loaded or a sample is drawn.
 - Public ordinary disordered affine-prior bindings now declare a bounded
   per-variable Uniform interval and 64-hex root seed identity. Each admitted
   flooding source iteration derives its own decoder-local NumPy PCG64 draw;
   assignment state, evidence, and coefficient vector commit with the sweep and
   replay independently of hidden physical truth.
-- Opt-in ordinary-memory tracing is observer-only and sink-bounded. Every
+- Opt-in public V4 flooding-memory tracing now materializes the existing
+  semantic-sidecar contract within the public output directory. Every
   committed retained sweep can expose decoder-visible beliefs, complete
   committed history arrays plus digests, PCG64 draw identity/evidence, and a
-  caller-supplied candidate origin. The caller obtains the content-addressed
-  result via `MemoryFloodingSchedule.trace_result()` and writes its ledger link.
+  terminal candidate origin. A single terminal `trace_link` precedes work
+  evidence and carries the existing content-addressed sidecar link, caps, and
+  truncation facts; no committed state produces an explicit unavailable reason.
+  The trace observer never supplies the PCG64 context: public configuration
+  and decoder identities are supplied unconditionally for each shot and replay.
 - A bounded local-memory execution slice now runs through the existing Phase 3
   local executors. At an admitted local unit, PDBP consumes the complete fresh
   decoder-visible belief vector before candidate construction and V2C damping
@@ -108,6 +115,13 @@ approved `.venv/bin/python`, from the isolated checkout.
    `python -m pytest -q tests/canonical/test_memory_execution.py tests/canonical/test_local_memory_execution.py tests/test_manifest.py -k 'memory or canonical_v4'`:
    **41 passed, 33 deselected** (5.47 s). This includes the public layered
    PDBP-plus-damping V4 path, semantic replay, and a denied local-unit rollback.
+6. Public trace and source-iteration repair gate:
+   `python -m pytest -q tests/canonical/test_memory_execution.py tests/canonical/test_memory_trace.py -k 'semantic_replay or v3_source or memory_evidence_counts or public_v4_trace'`:
+   **9 passed, 34 deselected** (3.48 s). It covers traced-versus-untraced
+   disordered assignment equality, distinct public shot identities, linked
+   history/draw/candidate facts, explicit sidecar truncation, V3 NMS/OMS
+   source-iteration replay, pre-artifact short-vector rejection, and
+   independent two-history operation-count validation.
 
 These are implementation fixtures, not statistical performance evidence.
 No calibration, evaluation, factorial or publication sample budget was used.
@@ -120,6 +134,10 @@ No calibration, evaluation, factorial or publication sample budget was used.
   ordinary-memory lifecycle: it is only accepted by the flooding executor
   while history reset is required. Mathematical compatibility declarations
   alone do not prove execution.
+- Public trace support is deliberately limited to ordinary flooding-memory V4.
+  Local-memory trace records, Relay unavailable-link handling, and any
+  multi-leg/lifetime controller remain separate work. These are not silently
+  represented as complete traces in public preflight.
 - The frozen factorial design lists damping-before-affine and
   momentum-before-affine interaction binding arrays. Those orders violate the
   implemented operand dependencies. Resolve their execution semantics in a
@@ -137,3 +155,6 @@ No calibration, evaluation, factorial or publication sample budget was used.
 The main checkout's live Relay simulations are unaffected by this isolated
 correction. Earlier memory-only V4 ledgers remain historical plain-BP evidence;
 the new compact identity prevents their reuse as executed-memory evidence.
+Earlier V3 source-iteration OMS/NMS evidence and memory-operation totals that
+used the prior affected paths require requalification; this correction does not
+rewrite durable historical ledgers.

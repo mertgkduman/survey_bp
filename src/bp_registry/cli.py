@@ -235,7 +235,7 @@ def _canonical_result_from_terminal_events(manifest_path: Path, output: Path, ro
         if isinstance(manifest, CanonicalExperimentV4) and manifest.relay is not None:
             validate_phase4_shot(ledger_path, run_id=manifest.run_id, shot_id=row["shot_id"], trace_root=output)
         else:
-            validate_canonical_shot(events, canonical_public_shot_context(manifest_path, shot_id=row["shot_id"]))
+            validate_canonical_shot(events, canonical_public_shot_context(manifest_path, shot_id=row["shot_id"]), trace_root=output)
     return {
         "schema_version": 2,
         "title": f"{report['run_id']} — {manifest.evidence.relation} {manifest.evidence.fixture} {manifest.evidence.assessment_status}",
@@ -299,7 +299,7 @@ def verify_canonical_shot(manifest_path: str | Path, output: str | Path, *, shot
     if isinstance(manifest, CanonicalExperimentV4) and manifest.relay is not None:
         validate_phase4_shot(ledger_path, run_id=context.run_id, shot_id=shot_id, trace_root=output)
     else:
-        validate_canonical_shot(events, context)
+        validate_canonical_shot(events, context, trace_root=output)
     return {"output": str(output), "shot_id": shot_id, "termination": terminal[0]["termination"], "verified_at": datetime.now(timezone.utc).isoformat()}
 
 
@@ -324,7 +324,7 @@ def _verify_canonical_run(output: Path, result: dict[str, Any]) -> dict[str, Any
         if isinstance(manifest, CanonicalExperimentV4) and manifest.relay is not None:
             validate_phase4_shot(ledger_path, run_id=manifest.run_id, shot_id=row["shot_id"], trace_root=output)
         else:
-            validate_canonical_shot(events, canonical_public_shot_context(manifest_path, shot_id=row["shot_id"]))
+            validate_canonical_shot(events, canonical_public_shot_context(manifest_path, shot_id=row["shot_id"]), trace_root=output)
     expected = _canonical_result_from_terminal_events(manifest_path, output, rows)
     if result != expected:
         raise ValueError("canonical result JSON does not equal terminal structural evidence")

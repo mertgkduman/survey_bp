@@ -31,6 +31,7 @@ from .schedules import (
     RandomizedTraversalPlan, VariableNodeSerialSchedule,
 )
 from .updates import MinSumUpdate, NormalizedMinSumUpdate, OffsetMinSumUpdate, ParameterAssignment, resolve_generated_configuration_assignment
+from .tracing import TracePlan
 
 
 class CanonicalStructuralVerificationError(ValueError):
@@ -345,6 +346,37 @@ def public_execution_identity(
     return "sha256:" + sha256(_canonical_json(payload)).hexdigest()
 
 
+def public_memory_execution_context(
+    *, compact_manifest: Mapping[str, Any], composition_identity: str | None,
+    decoder_seed_identity: str, sample_seed_identity: str, shot_id: int,
+) -> dict[str, str]:
+    """Derive ordinary-memory RNG keys independently of optional observation.
+
+    Trace-plan fields and ledger paths are intentionally absent.  The compact
+    manifest carries decoder policy and memory bindings, while the public
+    sample identity and shot distinguish independently admitted executions.
+    """
+    if type(shot_id) is not int or shot_id < 0:
+        raise ValueError("memory execution context requires a nonnegative shot ID")
+    configuration = {
+        "domain": "bp-registry-memory-configuration-v1",
+        "compact_manifest": dict(compact_manifest),
+        "composition_identity": composition_identity,
+        "decoder_seed_identity": decoder_seed_identity,
+    }
+    configuration_identity = "sha256:" + sha256(_canonical_json(configuration)).hexdigest()
+    decoder = {
+        "domain": "bp-registry-memory-decoder-v1",
+        "configuration_identity": configuration_identity,
+        "sample_seed_identity": sample_seed_identity,
+        "shot_id": shot_id,
+    }
+    return {
+        "configuration_identity": configuration_identity,
+        "decoder_identity": "sha256:" + sha256(_canonical_json(decoder)).hexdigest(),
+    }
+
+
 @dataclass(frozen=True, slots=True)
 class PublicShotContext:
     """Immutable preflighted context used to validate one public run/shot."""
@@ -371,6 +403,7 @@ class PublicShotContext:
     composition_identity: str | None = None
     policy_effects: Mapping[str, Any] | None = None
     profile_plan: Mapping[str, Any] | None = None
+    trace_plan: Mapping[str, Any] | None = None
     update_kind: str = "binary_spa"
     schedule_kind: str = "flooding"
 
@@ -386,6 +419,16 @@ class PublicShotContext:
             shot_id=self.shot_id,
             check_type=self.check_type,
             syndrome=self.syndrome,
+        )
+
+    @property
+    def memory_execution_context(self) -> dict[str, str]:
+        return public_memory_execution_context(
+            compact_manifest=self.compact_manifest,
+            composition_identity=self.composition_identity,
+            decoder_seed_identity=self.decoder_seed_identity,
+            sample_seed_identity=self.sample_seed_identity,
+            shot_id=self.shot_id,
         )
 
 
@@ -609,7 +652,10 @@ def _expected_attempt(context: PublicShotContext) -> dict[str, Any]:
         raise CanonicalStructuralVerificationError(f"unsupported public update rule {context.update_kind!r}")
     is_memory = context.compact_manifest.get("schema_version") == 5
     if is_memory:
-        schedule = MemoryFloodingSchedule(table, kernel=kernel, memory=MemoryCompositionSpec.model_validate(context.compact_manifest["memory"]))
+        schedule = MemoryFloodingSchedule(
+            table, kernel=kernel, memory=MemoryCompositionSpec.model_validate(context.compact_manifest["memory"]),
+            execution_context=context.memory_execution_context,
+        )
         state = schedule.initialize(context.error_rate)
     else:
         schedule = FloodingSchedule(table, kernel=kernel, profile=kernel.profile)
@@ -630,7 +676,12 @@ def _expected_attempt(context: PublicShotContext) -> dict[str, Any]:
         if denial is not None:
             return {"termination": "count_budget_exhausted", "work_vector": work.as_evidence(structural_event_version=2), "iterations": iteration - 1, "budget_termination": denial, "admitted": True, "diagnostic_candidate": last_candidate, **memory_evidence()}
         proposed = work + delta
-        sweep = schedule.sweep(state, np.asarray(context.syndrome, dtype=np.uint8), error_rate=context.error_rate, **({"source_iteration": iteration - 1} if is_memory else {}))
+        assignment = getattr(kernel.update_rule, "alpha", getattr(kernel.update_rule, "beta", None))
+        sweep = schedule.sweep(
+            state, np.asarray(context.syndrome, dtype=np.uint8), error_rate=context.error_rate,
+            **({"source_iteration": iteration - 1}
+               if is_memory or getattr(assignment, "shape", None) == "source_iteration" else {}),
+        )
         if is_memory:
             schedule.commit(sweep)
         last_candidate = sweep.candidate.tolist()
@@ -643,6 +694,31 @@ def _expected_attempt(context: PublicShotContext) -> dict[str, Any]:
 def _expect_equal(field: str, actual: Any, expected: Any) -> None:
     if actual != expected:
         raise CanonicalStructuralVerificationError(f"canonical {field} differs from independently reconstructed evidence")
+
+
+def _validate_memory_element_updates(evidence: Mapping[str, Any], context: PublicShotContext) -> None:
+    """Independently check per-binding history-state accounting evidence."""
+    if context.code is None:
+        return
+    bindings = evidence.get("bindings")
+    updates = evidence.get("memory_element_updates")
+    count = evidence.get("committed_iterations", evidence.get("committed_local_updates"))
+    if not isinstance(bindings, list) or not isinstance(updates, Mapping) or type(count) is not int or count < 0:
+        raise CanonicalStructuralVerificationError("memory operation evidence is malformed")
+    table = EdgeTable.from_check_matrix(context.code.validate().hz)
+    expected: dict[str, int] = {}
+    for binding in bindings:
+        if not isinstance(binding, Mapping) or not isinstance(binding.get("binding_id"), str) or not isinstance(binding.get("kind"), str):
+            raise CanonicalStructuralVerificationError("memory operation binding evidence is malformed")
+        kind = binding["kind"]
+        width = (
+            table.edge_count if kind == "v2c_damping" else
+            2 * table.variable_count if kind in {"pdprime_delta_mix", "posterior_momentum"}
+            else table.variable_count
+        )
+        expected[binding["binding_id"]] = count * width
+    if dict(updates) != expected:
+        raise CanonicalStructuralVerificationError("memory element updates do not match owned history state")
 
 
 def _validate_profile(stream: Sequence[Mapping[str, Any]], terminal: Mapping[str, Any], context: PublicShotContext) -> None:
@@ -754,7 +830,51 @@ def _expected_attempt_lineage(context: PublicShotContext) -> dict[str, str] | No
     }
 
 
-def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: PublicShotContext) -> Mapping[str, Any]:
+def _validate_public_memory_trace(
+    event: Mapping[str, Any], *, context: PublicShotContext, trace_root: Path | None,
+) -> None:
+    """Validate the one optional ordinary-memory sidecar for a public shot."""
+    plan = {} if context.trace_plan is None else dict(context.trace_plan)
+    enabled = plan.get("level", "off") != "off"
+    data = event.get("data")
+    if not isinstance(data, Mapping):
+        raise CanonicalStructuralVerificationError("canonical trace link lacks data")
+    common = _COMMON_FIELDS | frozenset({"trace_kind", "status"})
+    if data.get("trace_kind") != "ordinary_memory":
+        raise CanonicalStructuralVerificationError("canonical trace link has an unknown trace kind")
+    if data.get("status") == "unavailable":
+        if set(data) != common | {"reason"} or "sidecar" in event:
+            raise CanonicalStructuralVerificationError("canonical unavailable trace lacks explicit missingness")
+        return
+    if not enabled or data.get("status") != "linked" or set(data) != common:
+        raise CanonicalStructuralVerificationError("canonical trace link disagrees with the public trace plan")
+    if trace_root is None:
+        raise CanonicalStructuralVerificationError("canonical trace validation requires its public output root")
+    top = {"ledger_version", "event_id", "kind", "run_id", "shot_id", "data", "sidecar"}
+    if set(event) != top:
+        raise CanonicalStructuralVerificationError("canonical trace link has an invalid envelope")
+    document = _validate_phase4_trace(event, trace_root=trace_root)
+    try:
+        expected_selection = TracePlan(
+            root=trace_root, level=plan["level"], relative_dir=plan["relative_dir"],
+            max_records=plan["max_records"], max_bytes=plan["max_bytes"], label=plan["label"],
+        ).selection_basis()
+    except (KeyError, TypeError, ValueError) as error:
+        raise CanonicalStructuralVerificationError("canonical public trace plan is invalid") from error
+    if document.get("selection_basis") != expected_selection:
+        raise CanonicalStructuralVerificationError("canonical trace selection basis differs from the public trace plan")
+    execution_context = context.memory_execution_context
+    for record in document["records"]:
+        payload = record.get("payload") if isinstance(record, Mapping) else None
+        if not isinstance(payload, Mapping):
+            raise CanonicalStructuralVerificationError("canonical trace has an invalid record payload")
+        if payload.get("configuration_identity") != execution_context["configuration_identity"] or payload.get("decoder_identity") != execution_context["decoder_identity"]:
+            raise CanonicalStructuralVerificationError("canonical trace record has the wrong decoder execution identity")
+
+
+def validate_canonical_shot(
+    events: Sequence[Mapping[str, Any]], context: PublicShotContext, *, trace_root: str | Path | None = None,
+) -> Mapping[str, Any]:
     """Reject a stale, duplicate, or identity-mismatched persisted shot.
 
     Task 2 extends this entry point into complete semantic reconstruction.  The
@@ -770,6 +890,19 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
     terminals = [event for event in stream if event.get("kind") == "termination"]
     if len(terminals) != 1 or stream[-1] is not terminals[0]:
         raise CanonicalStructuralVerificationError("canonical shot must have exactly one final termination")
+    traces = [event for event in stream if event.get("kind") == "trace_link"]
+    trace_enabled = bool((context.trace_plan or {}).get("level", "off") != "off")
+    if trace_enabled:
+        if len(traces) != 1:
+            raise CanonicalStructuralVerificationError("enabled public trace plan requires exactly one terminal trace link")
+        trace_index = stream.index(traces[0])
+        if trace_index + 1 >= len(stream) or stream[trace_index + 1].get("kind") != "work":
+            raise CanonicalStructuralVerificationError("canonical trace must follow committed decoder state and precede work evidence")
+        _validate_common(traces[0], context, None)
+        _validate_public_memory_trace(traces[0], context=context, trace_root=None if trace_root is None else Path(trace_root))
+    elif traces:
+        raise CanonicalStructuralVerificationError("trace evidence is forbidden by the public trace-off plan")
+    stream = [event for event in stream if event.get("kind") != "trace_link"]
     terminal = terminals[0]
     terminal_data = terminal.get("data", {})
     has_setup = "setup_runtime" in terminal_data

@@ -920,9 +920,9 @@ def test_enabled_public_trace_plan_is_rejected_before_ledger(tmp_path):
     ledger_path = tmp_path / "events.jsonl"
     manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
 
-    with pytest.raises(ValueError, match="canonical trace plan.*off"):
+    with pytest.raises(ValueError, match="enabled canonical traces"):
         preflight_canonical(manifest_path)
-    with pytest.raises(ValueError, match="canonical trace plan.*off"):
+    with pytest.raises(ValueError, match="enabled canonical traces"):
         run_canonical_one(manifest_path, shot_id=0, ledger_path=ledger_path)
     assert ledger_path.exists() is False
 

@@ -275,6 +275,7 @@ def _canonical_execution_controls(manifest: CanonicalExperimentV2 | CanonicalExp
         },
         "policy_effects": _canonical_policy_effects(manifest, code),
         "profile_plan": manifest.profile_plan.model_dump(mode="json"),
+        "trace_plan": manifest.trace_plan.model_dump(mode="json"),
     }
 
 
@@ -320,6 +321,7 @@ def canonical_public_shot_context(manifest_path: str | Path, *, shot_id: int) ->
         composition_identity=composition.semantic_identity,
         policy_effects=_canonical_policy_effects(manifest, resolved.code),
         profile_plan=manifest.profile_plan.model_dump(mode="json"),
+        trace_plan=manifest.trace_plan.model_dump(mode="json"),
         update_kind=manifest.policies.update.kind,
         schedule_kind=manifest.policies.schedule.kind,
     )
@@ -345,6 +347,7 @@ def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: s
         sample_seed_identity=sample.sample_identity,
         verification_context=verification_context,
         execution_controls=_canonical_execution_controls(manifest, resolved.code),
+        memory_execution_context=verification_context.memory_execution_context,
         context={
             "manifest_sha256": digest,
             "artifact_raw_sha256": manifest.artifact.raw_sha256,

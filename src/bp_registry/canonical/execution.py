@@ -44,6 +44,7 @@ from .schedules import (
 from .verification import PublicShotContext, validate_canonical_shot
 from .relay import RelayController
 from .memory_execution import LocalMemoryExecution, MemoryFloodingSchedule, validate_single_attempt_memory
+from .tracing import TracePlan, TraceSink
 
 
 class CanonicalConflictError(ValueError):
@@ -314,7 +315,7 @@ class AtomicFloodingExecutor:
 
             def compute() -> np.ndarray:
                 rule = getattr(self.schedule.kernel, "update_rule", None)
-                assignment = getattr(rule, "alpha", None)
+                assignment = getattr(rule, "alpha", getattr(rule, "beta", None))
                 if isinstance(self.schedule, MemoryFloodingSchedule) or getattr(assignment, "shape", None) == "source_iteration":
                     sweep = self.schedule.sweep(
                         state, syndrome, error_rate=error_rate, source_iteration=iteration - 1,
@@ -377,6 +378,39 @@ def _budget_tree(execution_controls: Mapping[str, Any] | None) -> BudgetTree:
         for resource, limit in values.items():
             limits.append(BudgetLimit(scope, resource, limit))
     return BudgetTree(limits=limits, parents={"search": "shot", "attempt": "search"})
+
+
+def _public_trace_sink(execution_controls: Mapping[str, Any] | None, ledger_path: Path) -> TraceSink | None:
+    """Materialize the manifest-declared observer inside its output root."""
+    declared = None if execution_controls is None else execution_controls.get("trace_plan")
+    if not isinstance(declared, Mapping) or declared.get("level") == "off":
+        return None
+    try:
+        plan = TracePlan(
+            root=ledger_path.parent, level=declared["level"], relative_dir=declared["relative_dir"],
+            max_records=declared["max_records"], max_bytes=declared["max_bytes"], label=declared["label"],
+        )
+    except (KeyError, TypeError, ValueError) as error:
+        raise ValueError("canonical execution controls contain an invalid trace plan") from error
+    return TraceSink(plan)
+
+
+def _memory_execution_context(execution_context: Mapping[str, str] | None, *, identity: str, shot_id: int) -> dict[str, str]:
+    supplied = execution_context
+    if isinstance(supplied, Mapping):
+        values = dict(supplied)
+        if set(values) == {"configuration_identity", "decoder_identity"} and all(
+            isinstance(value, str) and value for value in values.values()
+        ):
+            return values
+        raise ValueError("public memory execution context is incomplete")
+    # Direct kernel fixtures have no manifest-level public context.  Keep a
+    # deterministic fallback while public runner calls always use the branch
+    # above, independently of optional tracing.
+    return {
+        "configuration_identity": f"memory:{identity}",
+        "decoder_identity": f"memory-decoder:{identity}:shot:{shot_id}",
+    }
 
 
 def _termination_evidence(termination: BudgetTermination) -> dict[str, Any]:
@@ -603,7 +637,7 @@ def _existing_structural(
         return None
     if verification_context is not None:
         try:
-            event = validate_canonical_shot(events, verification_context)
+            event = validate_canonical_shot(events, verification_context, trace_root=path.parent)
         except ValueError as error:
             raise CanonicalConflictError(
                 f"conflicting canonical content for run/shot identity: {error}"
@@ -748,6 +782,7 @@ def run_canonical_structural_shot(
     ledger_path: str | Path, sample_seed_identity: str, context: Mapping[str, Any],
     execution_controls: Mapping[str, Any] | None = None,
     verification_context: PublicShotContext | None = None,
+    memory_execution_context: Mapping[str, str] | None = None,
     evaluate: Callable[..., evaluator.Evaluation] = evaluator.evaluate_candidate,
 ) -> CanonicalExecutionResult:
     """Run the kernel with v2 structural evidence and an outer truth boundary."""
@@ -776,6 +811,13 @@ def run_canonical_structural_shot(
     )
     if existing is not None:
         return existing
+    trace_sink = _public_trace_sink(execution_controls, path)
+    memory_context = _memory_execution_context(memory_execution_context, identity=identity, shot_id=shot_id)
+    trace_context = {
+        **memory_context,
+        "run_id": parsed.run_id,
+        "shot_id": str(shot_id),
+    }
     original_id = stable_lineage_id("original", {"identity": identity})
     original = OriginalProblem(original_id.value, validated.hx, validated.hz, observation.syndrome)
     working_id = stable_lineage_id("working", {"original": original_id.value, "lift": "identity"})
@@ -816,6 +858,41 @@ def run_canonical_structural_shot(
                 attempt_id = _attempt_lineage_id(working, attempt_ordinal)
                 ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="attempt", data={**common, "scope": "attempt", "attempt_lineage_id": attempt_id.value, "max_iterations": parsed.max_iterations})
                 profile_evidence: dict[str, object] | None = None
+                trace_link_emitted = False
+
+                def emit_trace_link(termination: str, data: Mapping[str, Any]) -> None:
+                    """Link only terminal, committed-state observations to the ledger."""
+                    nonlocal trace_link_emitted
+                    if trace_sink is None or trace_link_emitted:
+                        return
+                    schedule = memory_schedule
+                    reason = "attempt_not_admitted" if schedule is None else "no_committed_decoder_state"
+                    if schedule is not None:
+                        candidate = data.get("candidate", data.get("diagnostic_candidate"))
+                        if candidate is not None:
+                            schedule.observe_candidate(
+                                origin={
+                                    "termination": termination,
+                                    "selection_status": data.get("selection_status"),
+                                    "candidate_lineage_id": data.get("candidate_lineage_id"),
+                                },
+                                candidate=np.asarray(candidate, dtype=np.uint8),
+                            )
+                        result = schedule.trace_result()
+                        assert result is not None
+                        link = result.ledger_link()
+                        if link is not None:
+                            ledger.event(
+                                run_id=parsed.run_id, shot_id=shot_id, kind="trace_link",
+                                data={**common, "trace_kind": "ordinary_memory", "status": "linked"}, sidecar=link,
+                            )
+                            trace_link_emitted = True
+                            return
+                    ledger.event(
+                        run_id=parsed.run_id, shot_id=shot_id, kind="trace_link",
+                        data={**common, "trace_kind": "ordinary_memory", "status": "unavailable", "reason": reason},
+                    )
+                    trace_link_emitted = True
 
                 def terminal_with_work(termination: str, **data: Any) -> None:
                     is_local = parsed.policies.schedule.kind != "flooding"
@@ -887,6 +964,7 @@ def run_canonical_structural_shot(
                             },
                             "work_vector": work.as_evidence(structural_event_version=2),
                         }
+                    emit_trace_link(termination, data)
                     ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="work", data=work_data)
                     ledger.terminal(
                         run_id=parsed.run_id, shot_id=shot_id, termination=termination,
@@ -1009,7 +1087,11 @@ def run_canonical_structural_shot(
                                     )
                             return candidate, local_progress.local_steps, False, None
                         if isinstance(parsed, CanonicalManifestV5):
-                            memory_schedule = MemoryFloodingSchedule(edge_table, kernel=kernel, memory=parsed.memory)
+                            memory_schedule = MemoryFloodingSchedule(
+                                edge_table, kernel=kernel, memory=parsed.memory,
+                                execution_context=memory_context, trace_sink=trace_sink,
+                                trace_context=trace_context,
+                            )
                             schedule = memory_schedule
                             initialized = schedule.initialize(parsed.error_rate)
                         else:

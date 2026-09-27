@@ -143,6 +143,19 @@ def public_manifest(tmp_path, *, memory=True, iterations=1, cap=None):
     return path
 
 
+def public_v3_source_iteration_manifest(tmp_path, *, kind, values):
+    value = json.loads((ROOT / "data/manifests/canonical-three-qubit-development.json").read_text())
+    value.update(schema_version=3, run_id=f"v3-{kind}-source-iteration", numerical_profile="cpu-float64-min-sum-v1")
+    value["randomness"]["physical_sample_identity"] = "memory-test-common-samples-4"
+    value["budgets"]["max_shots"] = 1
+    for scope in ("shot", "search", "attempt"):
+        value["budgets"][scope]["max_iterations"] = 2
+    value["policies"]["update"].update(kind=kind, parameter_assignment={"shape": "source_iteration", "values": values})
+    path = tmp_path / f"{kind}.json"
+    path.write_text(json.dumps(value), encoding="utf-8")
+    return path
+
+
 def test_public_memory_changes_behavior_and_preserves_invalid_candidate(tmp_path):
     from bp_registry.cli import run_canonical, verify_run
     from bp_registry.ledger import read_canonical_events
@@ -182,7 +195,7 @@ def test_public_budget_replay_distinguishes_no_proposal_from_invalid_proposal(tm
         assert data["memory_execution"]["committed_iterations"] == count
 
 
-@pytest.mark.parametrize("field", ["history_sha256", "committed_iterations", "diagnostic_candidate"])
+@pytest.mark.parametrize("field", ["history_sha256", "committed_iterations", "memory_element_updates", "diagnostic_candidate"])
 def test_semantic_replay_rejects_rehashed_memory_claims(tmp_path, field):
     from bp_registry.cli import run_canonical
     from bp_registry.ledger import read_canonical_events, _canonical_event_id
@@ -195,12 +208,14 @@ def test_semantic_replay_rejects_rehashed_memory_claims(tmp_path, field):
     terminal = next(event for event in events if event["kind"] == "termination")
     if field == "diagnostic_candidate":
         terminal["data"][field] = [0, 0, 1]
+    elif field == "memory_element_updates":
+        terminal["data"]["memory_execution"][field]["memory"] = 0
     elif field == "committed_iterations":
         terminal["data"]["memory_execution"][field] = 2
     else:
         terminal["data"]["memory_execution"][field]["memory"] = "0" * 64
     terminal["event_id"] = _canonical_event_id(terminal)
-    with pytest.raises(ValueError, match="memory execution|diagnostic candidate"):
+    with pytest.raises(ValueError, match="memory execution|memory element updates|diagnostic candidate"):
         validate_canonical_shot(events, canonical_public_shot_context(path, shot_id=0))
 
 
@@ -319,11 +334,11 @@ def test_disordered_affine_prior_assignment_is_decoder_local_replayed_and_atomic
     table = EdgeTable.from_edges(1, 2, [(0, 0), (0, 1)])
     first = MemoryFloodingSchedule(
         table, kernel=BinarySpaKernel(), memory=memory,
-        trace_context={"configuration_identity": "arm-a", "decoder_identity": "shot-a"},
+        execution_context={"configuration_identity": "arm-a", "decoder_identity": "shot-a"},
     )
     second = MemoryFloodingSchedule(
         table, kernel=BinarySpaKernel(), memory=memory,
-        trace_context={"configuration_identity": "arm-a", "decoder_identity": "shot-a"},
+        execution_context={"configuration_identity": "arm-a", "decoder_identity": "shot-a"},
     )
     syndrome = np.ones(1, dtype=np.uint8)
     for schedule in (first, second):
@@ -362,6 +377,61 @@ def test_public_disordered_affine_prior_records_assignment_evidence(tmp_path):
     assert assignment["algorithm"] == "numpy.PCG64"
     assert assignment["replay_identity"].endswith("source_iteration:0")
     assert len(assignment["resolved_values"]) == 3
+
+
+@pytest.mark.parametrize(
+    ("kind", "rule_name", "values"),
+    [
+        ("normalized_min_sum", "NormalizedMinSumUpdate", [0.0, 1.0]),
+        ("offset_min_sum", "OffsetMinSumUpdate", [100.0, 0.0]),
+    ],
+)
+def test_public_v3_source_iteration_updates_advance_and_replay(tmp_path, monkeypatch, kind, rule_name, values):
+    """Both V3 min-sum variants receive their declared sweep index."""
+    from bp_registry.cli import run_canonical, verify_run
+    from bp_registry.canonical import updates
+
+    update_type = getattr(updates, rule_name)
+    original = update_type.check_to_variable
+    observed: list[int] = []
+
+    def observed_update(self, incoming, *, syndrome, check_index=0, edge_index=0, source_iteration=0):
+        observed.append(source_iteration)
+        return original(
+            self, incoming, syndrome=syndrome, check_index=check_index,
+            edge_index=edge_index, source_iteration=source_iteration,
+        )
+
+    monkeypatch.setattr(update_type, "check_to_variable", observed_update)
+    path = public_v3_source_iteration_manifest(tmp_path, kind=kind, values=values)
+    output = tmp_path / kind
+    assert run_canonical(path, output)["final_row_count"] == 1
+    assert verify_run(output)["final_row_count"] == 1
+    assert {0, 1}.issubset(observed)
+
+
+@pytest.mark.parametrize("kind", ["normalized_min_sum", "offset_min_sum"])
+def test_public_v3_short_source_iteration_assignment_rejects_before_artifact_loading(tmp_path, kind):
+    from bp_registry.runner import preflight_canonical
+
+    path = public_v3_source_iteration_manifest(tmp_path, kind=kind, values=[0.5])
+    value = json.loads(path.read_text())
+    value["artifact"]["root"] = str(tmp_path / "intentionally-missing-artifact-root")
+    path.write_text(json.dumps(value), encoding="utf-8")
+    with pytest.raises(ValueError, match="declare every attempted"):
+        preflight_canonical(path)
+
+
+@pytest.mark.parametrize(
+    ("kind", "parameters"),
+    [("pdprime_delta_mix", {"gamma": 0.5}), ("posterior_momentum", {"alpha": 0.5, "gamma": 0.5})],
+)
+def test_memory_evidence_counts_every_owned_history_vector(kind, parameters):
+    schedule = make_schedule(kind, parameters)
+    messages = schedule.initialize(0.1)
+    proposal = schedule.sweep(messages, np.ones(1, dtype=np.uint8), error_rate=0.1)
+    schedule.commit(proposal)
+    assert schedule.evidence()["memory_element_updates"]["memory"] == 2 * schedule.edge_table.variable_count
 
 
 @pytest.mark.parametrize("case,message", [

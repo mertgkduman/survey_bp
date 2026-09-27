@@ -613,7 +613,28 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
     if isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3)):
         _verify_canonical_environment(manifest.environment)
         if manifest.trace_plan.level != "off":
-            raise ValueError("canonical trace plan must be off until a public trace hook is implemented")
+            if not isinstance(manifest, CanonicalExperimentV4) or manifest.relay is not None:
+                raise ValueError("enabled canonical traces require a non-Relay CanonicalExperimentV4 memory manifest")
+            # Validate the existing semantic-sidecar grammar before artifact
+            # resolution, sample generation, or ledger ownership.  The root is
+            # deliberately inert here; the runner confines the real sidecar to
+            # its public output directory.
+            from .canonical.tracing import TracePlan
+
+            try:
+                TracePlan(
+                    root=Path.cwd(), level=manifest.trace_plan.level,
+                    relative_dir=manifest.trace_plan.relative_dir,
+                    max_records=manifest.trace_plan.max_records,
+                    max_bytes=manifest.trace_plan.max_bytes,
+                    label=manifest.trace_plan.label,
+                )
+            except ValueError as error:
+                raise ValueError(f"canonical trace plan is not a bounded semantic-sidecar contract: {error}") from error
+            if manifest.trace_plan.label != "prespecified_campaign":
+                raise ValueError("enabled canonical traces require a prespecified_campaign trace label")
+            if manifest.policies.schedule.kind != "flooding":
+                raise ValueError("enabled canonical memory traces currently require the flooding commit boundary")
         if manifest.profile_plan.level != "low_overhead" or manifest.profile_plan.cohort != "clean":
             raise ValueError(
                 "canonical public profile plan requires a clean low_overhead cohort until a bounded quota exists"
@@ -640,6 +661,13 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
         if isinstance(manifest, CanonicalExperimentV3):
             actual = {binding.role.value: binding.kind for binding in composition.bindings}
             refresh = manifest.policies.update.parameter_refresh
+            assignment = manifest.policies.update.parameter_assignment
+            if assignment is not None and assignment.shape == "source_iteration":
+                assert assignment.values is not None
+                if len(assignment.values) < manifest.budgets.attempt.max_iterations:
+                    raise ValueError(
+                        "source_iteration parameter assignment must declare every attempted canonical iteration"
+                    )
             if refresh is not None and (refresh.scope != "configuration" or manifest.policies.schedule.kind != "flooding"):
                 raise ValueError("executable generated assignments require configuration refresh under flooding")
             if actual in _EXECUTABLE_LOCAL_SPA_KINDS and manifest.numerical_profile != "cpu-float64-spa-v1":
