@@ -1,14 +1,14 @@
 {
   "version": "1.0",
-  "timestamp": "2026-09-27T17:20:42.542Z",
+  "timestamp": "2026-09-27T18:59:32Z",
   "phase": "04",
   "phase_name": "Memory Policies and Relay-BP",
   "phase_dir": ".planning/phases/04-memory-policies-and-relay-bp",
   "plan": 12,
   "task": 1,
   "total_tasks": 2,
-  "status": "paused",
-  "pause_scope": "interactive session only; calibration remains running",
+  "status": "executing",
+  "pause_scope": "none; external calibration running",
   "completed_tasks": [
     {
       "id": "04-01..04-11,04-15",
@@ -28,19 +28,27 @@
       "name": "Complete prespecified calibration search",
       "status": "in_progress",
       "progress": {
-        "checked_at": "2026-09-27T17:20:42.542Z",
+        "checked_at": "2026-09-27T18:59:32Z",
         "status": "running",
-        "retained_attempts": 3716,
+        "retained_attempts": 3846,
         "planned_attempts": 5824,
-        "retained_percent": 63.8,
+        "retained_percent": 66.0,
         "termination_counts": {
-          "budget_exhausted": 453,
-          "completed": 3263
+          "completed": 3393,
+          "budget_exhausted": 453
         },
-        "public_boundary_seconds": 147916.49714055914,
+        "public_boundary_seconds": 152995.44702351512,
         "public_boundary_cap_seconds": 688243.0,
         "evaluation_namespace_accessed": false
       }
+    },
+    {
+      "id": "resumed-independent-continuation",
+      "name": "Local disordered affine execution, terminal calibration audit/recovery, shared evaluation preparation",
+      "status": "done",
+      "source_commit": "eb16e22",
+      "validation": "Full regression on eb16e22: 560 passed, 1 pre-existing skip, 454.56s; bounded calibration review findings resolved",
+      "artifact_commit": "ce1c22d"
     }
   ],
   "remaining_tasks": [
@@ -104,16 +112,16 @@
       "terminal_details": null,
       "manifest": ".planning/async-jobs/04-12-calibration-v4-active.json",
       "progress_snapshot": {
-        "checked_at": "2026-09-27T17:20:42.542Z",
+        "checked_at": "2026-09-27T18:59:32Z",
         "status": "running",
-        "retained_attempts": 3716,
+        "retained_attempts": 3846,
         "planned_attempts": 5824,
-        "retained_percent": 63.8,
+        "retained_percent": 66.0,
         "termination_counts": {
-          "budget_exhausted": 453,
-          "completed": 3263
+          "completed": 3393,
+          "budget_exhausted": 453
         },
-        "public_boundary_seconds": 147916.49714055914,
+        "public_boundary_seconds": 152995.44702351512,
         "public_boundary_cap_seconds": 688243.0,
         "evaluation_namespace_accessed": false
       },
@@ -230,5 +238,16 @@
   },
   "model_config_note": "GSD reports static Codex agent frontmatter older than project model overrides. Check saved models before future delegation; do not automatically select Astra or reinstall/update during this handoff.",
   "next_action": "Run $gsd-resume-work; inspect async manifest, PID/allocation and result terminal status first. Then $gsd-execute-phase 4. Do not relaunch a live job or rerun completed plans.",
-  "context_notes": "User requested a new-chat handoff. No source edits, job cancellation/relaunch, parameter selection, new campaign or tests were performed for this progress check. Full implementation report and coding handoff remain required reading."
+  "context_notes": "Phase4 resumed through gsd-execute-phase. Main source/caps/design frozen at101a01b; PID2702938 and allocation55938300 still running. Independent sourceeb16e22 fully verified:560 passed,1 pre-existing skip,454.56s; scoped artifacts committedce1c22d. No source merge, parameter selection, new production campaign or phase completion. See latest resumed execution report for terminal/integration/scientific gates.",
+  "implementation_source_commit": "eb16e22",
+  "execution_report": ".planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md",
+  "regression": {
+    "status": "passed",
+    "source_commit": "eb16e22",
+    "passed": 560,
+    "skipped": 1,
+    "seconds": 454.56,
+    "log": "/hpc/group/pfisterlab/mg551/storage/survey_bp_memory_integration_20260926/.planning/phases/04-memory-policies-and-relay-bp/04-CONTINUATION-REGRESSION-20260927.log"
+  },
+  "implementation_artifact_commit": "ce1c22d"
 }
