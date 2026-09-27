@@ -22,6 +22,8 @@ import numpy as np
 
 import run_phase4_active_benchmark as active
 import run_phase4_pilots as pilot
+import phase4_shared_evaluation as shared_evaluation
+import verify_phase4_calibration as calibration_audit
 from bp_registry.phase4_analysis import CELLS, summarize_matched_cohort, wilson_interval
 from bp_registry.canonical.memory import MemoryAssignmentSpec
 from bp_registry.canonical.schedules import EdgeTable
@@ -69,6 +71,7 @@ def verified_calibration_inputs(*, root: Path = ROOT, caps_path: Path = CAPS_PAT
         raise ValueError("calibration input drifted or fresh evaluation samples were already accessed")
     if calibration.get("result_digest") != _digest({k: v for k, v in calibration.items() if k != "result_digest"}):
         raise ValueError("terminal calibration result digest does not verify")
+    calibration_audit.audit_terminal(root=root, caps_path=caps_path, calibration_path=calibration_path)
     return caps, calibration
 
 
@@ -182,6 +185,53 @@ def build_manifest(*, base: Mapping[str, Any], cell: Mapping[str, Any], plan: Ma
         "Finite controlled CSS adaptation; no circuit reproduction, publication curve, or universal ranking claim."
     )
     return value
+
+
+def build_shared_evaluation_supplement(*, root: Path = ROOT, caps_path: Path = CAPS_PATH,
+                                       calibration_path: Path = CALIBRATION_PATH,
+                                       selection_path: Path = SELECTION_PATH,
+                                       shared_shots_by_code: Mapping[str, int],
+                                       wall_seconds_max: int) -> dict[str, Any]:
+    """Prepare, but never publish or run, a shared source/canonical view.
+
+    The legacy ``evaluation_plan`` and its cap stay untouched.  This wrapper
+    exists so callers use the same verified calibration/selection vocabulary
+    while the supplement remains a separately funded future decision.
+    """
+    return shared_evaluation.build_presampling_supplement(
+        root=root, caps_path=caps_path, calibration_path=calibration_path,
+        selection_path=selection_path, shared_shots_by_code=shared_shots_by_code,
+        wall_seconds_max=wall_seconds_max,
+    )
+
+
+def build_shared_manifest(*, base: Mapping[str, Any], cell: Mapping[str, Any],
+                          supplement: Mapping[str, Any], caps_path: Path = CAPS_PATH,
+                          selection_path: Path = SELECTION_PATH) -> dict[str, Any]:
+    """Materialize one manifest for public preflight only; never execute it."""
+    shared_evaluation.verify_bound_sources(
+        contract=supplement, caps_path=caps_path, selection_path=selection_path
+    )
+    declared = {(item["code_id"], item["arm"]): item for item in shared_evaluation.shared_cells(supplement)}
+    key = (cell.get("code_id"), cell.get("arm"))
+    frozen = declared.get(key)
+    if frozen is None or dict(cell) != frozen:
+        raise ValueError("shared evaluation cell is undeclared or has drifted")
+    arm = str(cell["arm"])
+    legacy_arm = "selected_source_procedure" if arm == "shared_source_procedure" else "selected_canonical_procedure"
+    plan = {"selected_settings_digest": supplement["selection"]["selection_digest"],
+            "caps_digest": supplement["source_cap"]["caps_digest"]}
+    manifest = build_manifest(
+        base=base, cell={**cell, "arm": legacy_arm}, plan=plan
+    )
+    manifest["run_id"] = "phase4-shared-evaluation-" + _digest(
+        {"cell": cell, "supplement": supplement["contract_digest"]}
+    )[:24]
+    manifest["evidence"]["procedure"] += (
+        f" Shared-memory supplemental evaluation arm={arm}; supplement digest="
+        f"{supplement['contract_digest']}; prepared only and not authorized for sampling."
+    )
+    return manifest
 
 
 def classify_candidate(manifest_path: Path, *, shot_id: int, candidate: object, context: object | None = None) -> dict[str, Any]:
