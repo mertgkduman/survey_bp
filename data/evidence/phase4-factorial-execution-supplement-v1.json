@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "status": "frozen_pre_sampling",
+  "calibration_outcomes_inspected": false,
+  "purpose": "Outcome-independent executable resolution for the frozen Phase 4 focused factorial ordinary-memory arms.",
+  "input_digests": {
+    "design_canonical_sha256": "c64d5e8a25863545687120511746d0d452c74cdf3836f771da480a1d1cd081b7",
+    "caps_canonical_sha256": "0c8fe8812ee84eb4b05034a101c712aadb19a77c5a02a71f8138734635bc9e7a"
+  },
+  "execution_order_resolution": {
+    "required_operand_order": ["prior", "fields_including_posterior_momentum", "v2c"],
+    "reason": "The memory executor applies affine prior before fresh fields, includes posterior momentum in the field transformation stage, then applies V2C damping. Frozen arrays remain retained as design evidence even where their declaration order is not executable.",
+    "discrepancy": "The frozen v2c-damping-plus-ewa and momentum-plus-ewa arrays respectively declare damping-before-affine and momentum-before-affine. This supplement does not edit that design; it records its stable effective execution order."
+  },
+  "ordinary_memory_arms": {
+    "v2c-damping": {"execution_ready": true, "frozen_binding_array": ["v2c_damping"], "effective_execution_order": ["v2c_damping"], "coefficients": [{"kind": "v2c_damping", "parameters": {"gamma": 0.5}}]},
+    "pdbp": {"execution_ready": true, "frozen_binding_array": ["pdbp_field_mix"], "effective_execution_order": ["pdbp_field_mix"], "coefficients": [{"kind": "pdbp_field_mix", "parameters": {"alpha": 0.5}}]},
+    "pdprime": {"execution_ready": true, "frozen_binding_array": ["pdprime_delta_mix"], "effective_execution_order": ["pdprime_delta_mix"], "coefficients": [{"kind": "pdprime_delta_mix", "parameters": {"alpha": 0.5}}]},
+    "posterior-momentum": {"execution_ready": true, "frozen_binding_array": ["posterior_momentum"], "effective_execution_order": ["posterior_momentum"], "coefficients": [{"kind": "posterior_momentum", "parameters": {"alpha": 0.5, "gamma": 0.5}}]},
+    "affine-prior": {"execution_ready": true, "frozen_binding_array": ["affine_prior"], "effective_execution_order": ["affine_prior"], "coefficients": [{"kind": "affine_prior", "parameters": {"alpha": 0.5}}]},
+    "disordered-affine-prior": {"execution_ready": false, "frozen_binding_array": ["affine_prior_disordered"], "effective_execution_order": ["affine_prior_disordered"], "coefficients": [{"kind": "affine_prior_disordered", "parameters": {"alpha": 0.5, "assignment": "per_source_iteration_digest_bound"}}]},
+    "v2c-damping-plus-ewa": {"execution_ready": true, "frozen_binding_array": ["v2c_damping", "affine_prior"], "effective_execution_order": ["affine_prior", "v2c_damping"], "coefficients": [{"kind": "affine_prior", "parameters": {"alpha": 0.5}}, {"kind": "v2c_damping", "parameters": {"gamma": 0.5}}]},
+    "pdbp-plus-v2c-damping": {"execution_ready": true, "frozen_binding_array": ["pdbp_field_mix", "v2c_damping"], "effective_execution_order": ["pdbp_field_mix", "v2c_damping"], "coefficients": [{"kind": "pdbp_field_mix", "parameters": {"alpha": 0.5}}, {"kind": "v2c_damping", "parameters": {"gamma": 0.5}}]},
+    "momentum-plus-ewa": {"execution_ready": true, "frozen_binding_array": ["posterior_momentum", "affine_prior"], "effective_execution_order": ["affine_prior", "posterior_momentum"], "coefficients": [{"kind": "affine_prior", "parameters": {"alpha": 0.5}}, {"kind": "posterior_momentum", "parameters": {"alpha": 0.5, "gamma": 0.5}}]}
+  },
+  "trace_contract": {
+    "api": "MemoryFloodingSchedule(edge_table, kernel, trace_sink=TraceSink, trace_context=Mapping); after committed activity caller invokes observe_candidate(origin, candidate), then trace_result() finalizes the observer and yields the trace_link sidecar.",
+    "record_kind": "memory_sweep",
+    "required_decoder_visible_facts": ["beliefs", "per_binding_history_digest_shape", "disordered_assignment_draw_identity", "candidate_origin", "leg_transition", "raw_work"],
+    "caps_source": "data/manifests/phase4-pilot-caps.json codes.*.trace_caps",
+    "selection": "prespecified clean/profile traces plus deterministic disagreement and upper-tail replays only",
+    "truth_policy": "No hidden physical truth enters a trace sidecar."
+  },
+  "predecessor_gate": {
+    "requirement": "A complete digest-bound fresh evaluation must admit every factorial arm for every code before production sampling.",
+    "current_gap": "The active V4 evaluation cap admits only baseline, selected_source_procedure, and selected_canonical_procedure. It does not yet admit the 11 additional ordinary-memory/Relay factorial arms.",
+    "fixture_policy": "Development fixtures may exercise this runner only when development_fixture=true and assessment=not_assessed; they cannot authorize production sampling."
+  },
+  "supplement_digest": "6c6bbe981426759c6a118032bb68cdc4eff0a0b4a3daaa07eb9fb3a7e7507fd0"
+}
