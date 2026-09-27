@@ -1,6 +1,8 @@
 """Coverage and aggregate integrity at the terminal calibration boundary."""
 from copy import deepcopy
+from hashlib import sha256
 import importlib
+import json
 from pathlib import Path
 import sys
 
@@ -94,3 +96,28 @@ def test_matched_sample_transplant_rejects():
     row(result)["attempts"][0]["sample_identity"] = "other-sample"
     with pytest.raises(ValueError, match="matched sample"):
         audit.audit_surface(plan, result)
+
+
+def test_exact_byte_provenance_and_terminal_gate(tmp_path, monkeypatch):
+    plan, result = surface()
+    plan.update(calibration_input={"cells": plan["cells"]}, calibration_digest="c" * 64)
+    caps = {"schema_version": 4, "design_amendment": {"sha256": "d" * 64},
+            "allocation": {"categories": {"calibration": {"wall_seconds_max": 120}}}}
+    caps["caps_digest"] = pilot._digest(caps)
+    caps_path = tmp_path / "caps.json"
+    caps_path.write_text(json.dumps(caps))
+    result.update(caps_sha256=sha256(caps_path.read_bytes()).hexdigest(),
+                  calibration_input=plan["calibration_input"], calibration_digest=plan["calibration_digest"],
+                  amendment_sha256="d" * 64)
+    result["result_digest"] = pilot._digest(result)
+    path = tmp_path / "result.json"
+    path.write_text(json.dumps(result))
+    monkeypatch.setattr(pilot, "calibration_plan", lambda root, cap: plan)
+    assert audit.audit_terminal(root=tmp_path, caps_path=caps_path, calibration_path=path)["status"] == "passed"
+    caps_path.write_text(json.dumps(caps, indent=2))
+    with pytest.raises(ValueError, match="provenance"):
+        audit.audit_terminal(root=tmp_path, caps_path=caps_path, calibration_path=path)
+    result["status"] = "running"
+    path.write_text(json.dumps(result))
+    with pytest.raises(ValueError, match="terminal"):
+        audit.audit_terminal(root=tmp_path, caps_path=caps_path, calibration_path=path)
