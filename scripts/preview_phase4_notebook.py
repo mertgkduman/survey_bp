@@ -64,7 +64,7 @@ body{font:16px/1.5 system-ui,sans-serif;color:#202832;background:#f4f6f8;margin:
 main{max-width:1050px;margin:24px auto;padding:28px;background:white;border-radius:8px}
 h1,h2,h3,h4{line-height:1.25} h2{margin-top:2em;border-top:1px solid #d8dde3;padding-top:1em}
 pre{white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.5 monospace;background:#f4f6f8;padding:12px}
-img{display:block;width:100%;height:auto;margin:20px auto}td,th{text-align:left;padding:8px;border-bottom:1px solid #d8dde3}
+img{display:block;width:100%;height:auto;margin:20px auto}td,th{text-align:left;vertical-align:top;padding:8px;border-bottom:1px solid #d8dde3}
 th{background:#eef2f6}details{margin:12px 0}summary{cursor:pointer;color:#345c82}
 @media(max-width:700px){main{margin:0;padding:16px;border-radius:0}body{font-size:15px}}
 </style><main><h1>Phase 4 executed notebook</h1>"""
