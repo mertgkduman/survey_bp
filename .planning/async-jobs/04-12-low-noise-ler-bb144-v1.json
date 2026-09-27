@@ -5,15 +5,27 @@
   "job_id": "56386510",
   "backend": "slurm",
   "submit_command": "sbatch --parsable --exclude=dcc-core-ferc-u-ac39-4-1 /hpc/group/pfisterlab/mg551/storage/survey_bp_low_noise_20260925/scripts/submit_phase4_low_noise_ler.sbatch",
-  "status": "running",
+  "status": "reconciled_terminal",
   "expected_artifacts": [
     "data/results/phase4-memory-relay/low-noise-ler-v1/progress.json",
     "data/results/phase4-memory-relay/low-noise-ler-v1/identity.json",
     "data/results/phase4-memory-relay/low-noise-ler-v1/slurm-56386510.out",
     "data/results/phase4-memory-relay/low-noise-ler-v1/slurm-56386510.err"
   ],
-  "verification_command": ".venv/bin/python -c \"import json; from pathlib import Path; p=Path('data/results/phase4-memory-relay/low-noise-ler-v1/progress.json'); r=json.loads(p.read_text()); x=r['rates']['p0060']; assert x['precision_met'] or x['look_shots']==8192; print(x['look_shots'],x['precision_met'])\"",
-  "resume_command": "if test -f data/results/phase4-memory-relay/low-noise-ler-v1-accelerated/result.json; then exit 0; fi; if squeue -h -j 56386510 | grep -q .; then exit 0; fi; sbatch --parsable --exclude=dcc-core-ferc-u-ac39-4-1 /hpc/group/pfisterlab/mg551/storage/survey_bp_low_noise_20260925/scripts/submit_phase4_low_noise_ler.sbatch",
+  "verification_command": ".venv/bin/python -c \"import json; from pathlib import Path; p=Path('data/results/phase4-memory-relay/low-noise-ler-reconciled-20260926/result.json'); r=json.loads(p.read_text()); assert r['status']=='completed_precision' and r['rates']['p0060']['precision_met']; print(r['status'],r['rates']['p0060']['look_shots'],r['result_digest'])\"",
+  "resume_command": "exit 0 # terminal: job 56386510 was cancelled after retained p=.06 evidence; see terminal_details",
   "submitted_at": "2026-09-25T18:18:47Z",
-  "terminal_details": null
+  "terminal_details": {
+    "slurm_state": "CANCELLED by 1498154",
+    "slurm_elapsed": "11:41:34",
+    "exit_code": "0:0",
+    "source_progress_status": "running-stale-after-cancellation",
+    "reconciled_report": "data/results/phase4-memory-relay/low-noise-ler-reconciled-20260926/result.json",
+    "reconciled_report_status": "completed_precision",
+    "reconciled_result_digest": "6688c8b92e03936b8c2d05e14fec36d64bd44e861abccd6d45d74dcbea833b27",
+    "reconciled_report_byte_sha256": "1171b8db487f81bcf104b378069bc579b680d8cc694d99a938356a003f00b998",
+    "p0060_look_shots": 2048,
+    "p0060_precision_met": true,
+    "digest_verified": true
+  }
 }

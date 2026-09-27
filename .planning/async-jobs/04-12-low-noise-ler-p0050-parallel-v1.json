@@ -5,7 +5,7 @@
   "job_id": "56389885",
   "backend": "slurm",
   "submit_command": "sbatch --parsable --exclude=dcc-core-ferc-u-ac39-4-1,dcc-dhvimdcore-gpu-ferc-s-p15-15 /hpc/group/pfisterlab/mg551/storage/survey_bp_low_noise_20260925/scripts/submit_phase4_low_noise_ler_p05_parallel.sbatch",
-  "status": "running",
+  "status": "completed",
   "expected_artifacts": [
     "data/results/phase4-memory-relay/low-noise-ler-p0050-parallel-v1/result.json",
     "data/results/phase4-memory-relay/low-noise-ler-p0050-parallel-v1/identity.json",
@@ -15,5 +15,14 @@
   "verification_command": ".venv/bin/python -c \"import json; from pathlib import Path; p=Path('data/results/phase4-memory-relay/low-noise-ler-p0050-parallel-v1/result.json'); r=json.loads(p.read_text()); assert r['status'] in {'completed_precision','completed_with_inconclusive'} and r['rate']==0.05; print(r['status'],r['result_digest'])\"",
   "resume_command": "if test -f data/results/phase4-memory-relay/low-noise-ler-p0050-parallel-v1/result.json; then exit 0; fi; if squeue -h -j 56389885 | grep -q .; then exit 0; fi; sbatch --parsable --exclude=dcc-core-ferc-u-ac39-4-1,dcc-dhvimdcore-gpu-ferc-s-p15-15 /hpc/group/pfisterlab/mg551/storage/survey_bp_low_noise_20260925/scripts/submit_phase4_low_noise_ler_p05_parallel.sbatch",
   "submitted_at": "2026-09-25T19:34:55Z",
-  "terminal_details": null
+  "terminal_details": {
+    "slurm_state": "COMPLETED",
+    "report_status": "completed_precision",
+    "rate": 0.05,
+    "look_shots": 8192,
+    "precision_met": true,
+    "result_digest": "708e240e673d0c52ef6a7792b04e4cc180afa67021776e23fb88dbaf87937439",
+    "result_byte_sha256": "6b94f298976c0a1b4eab856eaa54adeb646bf1c94d0e10fe8d1fe33b3637f9ae",
+    "digest_verified": true
+  }
 }

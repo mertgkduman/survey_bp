@@ -5,15 +5,26 @@
   "job_id": "56389887",
   "backend": "slurm",
   "submit_command": "sbatch --parsable --export=ALL,SERIAL_JOB_ID=56386510,PARALLEL_JOB_ID=56389885 --exclude=dcc-core-ferc-u-ac39-4-1,dcc-dhvimdcore-gpu-ferc-s-p15-15 /hpc/group/pfisterlab/mg551/storage/survey_bp_low_noise_20260925/scripts/submit_phase4_low_noise_ler_reconcile.sbatch",
-  "status": "running",
+  "status": "failed_reconciled_elsewhere",
   "expected_artifacts": [
     "data/results/phase4-memory-relay/low-noise-ler-v1-accelerated/result.json",
     "data/results/phase4-memory-relay/low-noise-ler-v1-accelerated/handoff.json",
     "data/results/phase4-memory-relay/low-noise-ler-v1-accelerated/slurm-56389887.out",
     "data/results/phase4-memory-relay/low-noise-ler-v1-accelerated/slurm-56389887.err"
   ],
-  "verification_command": ".venv/bin/python -c \"import json; from pathlib import Path; p=Path('data/results/phase4-memory-relay/low-noise-ler-v1-accelerated/result.json'); r=json.loads(p.read_text()); assert r['status'] in {'completed_precision','completed_with_inconclusive'} and set(r['rates'])=={'p0060','p0050'}; print(r['status'],r['result_digest'])\"",
-  "resume_command": "if test -f data/results/phase4-memory-relay/low-noise-ler-v1-accelerated/result.json; then exit 0; fi; if squeue -h -j 56389887 | grep -q .; then exit 0; fi; sbatch --parsable --export=ALL,SERIAL_JOB_ID=56386510,PARALLEL_JOB_ID=56389885 --exclude=dcc-core-ferc-u-ac39-4-1,dcc-dhvimdcore-gpu-ferc-s-p15-15 /hpc/group/pfisterlab/mg551/storage/survey_bp_low_noise_20260925/scripts/submit_phase4_low_noise_ler_reconcile.sbatch",
+  "verification_command": ".venv/bin/python -c \"import json; from pathlib import Path; p=Path('data/results/phase4-memory-relay/low-noise-ler-reconciled-20260926/result.json'); r=json.loads(p.read_text()); assert r['status']=='completed_precision' and set(r['rates'])=={'p0060','p0050'}; print(r['status'],r['result_digest'])\"",
+  "resume_command": "exit 0 # terminal: reconciliation job failed; retained replacement report is recorded in terminal_details",
   "submitted_at": "2026-09-25T19:35:05Z",
-  "terminal_details": null
+  "terminal_details": {
+    "slurm_state": "FAILED",
+    "slurm_elapsed": "21:13:36",
+    "exit_code": "1:0",
+    "expected_accelerated_report_present": false,
+    "replacement_report": "data/results/phase4-memory-relay/low-noise-ler-reconciled-20260926/result.json",
+    "replacement_report_status": "completed_precision",
+    "replacement_result_digest": "6688c8b92e03936b8c2d05e14fec36d64bd44e861abccd6d45d74dcbea833b27",
+    "replacement_report_byte_sha256": "1171b8db487f81bcf104b378069bc579b680d8cc694d99a938356a003f00b998",
+    "digest_verified": true,
+    "note": "The alternate terminal report is retained evidence, but it does not retroactively make SLURM job 56389887 successful."
+  }
 }
