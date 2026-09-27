@@ -4,10 +4,12 @@ Status: **prepared; production sampling blocked**
 
 `scripts/run_phase4_factorial.py` expands the frozen focused design into 882
 identified cells: 14 arms × three fixed noise regions × three CSS codes × seven
-matched shots. It does not invoke the canonical CLI, native adapter, scheduler,
-or any decoder kernel. Each cohort at one code/rate/shot has one derived
-physical-sample identity shared by all 14 arms; decoder randomness remains
-arm-specific.
+matched shots. Its default preparation command does not invoke the canonical
+CLI, native adapter, scheduler, or any decoder kernel. The explicit production
+executor remains gated and uses the public canonical commands only after the
+fresh evaluation predecessor verifies. Each cohort at one code/rate/shot has
+one derived physical-sample identity shared by all 14 arms; decoder randomness
+remains arm-specific.
 
 The companion [execution supplement](../../../data/evidence/phase4-factorial-execution-supplement-v1.json)
 is a versioned, digest-checked, outcome-independent binding of the frozen design
@@ -22,6 +24,11 @@ The runner refuses production sampling until a retained fresh evaluation:
 - has `status: completed` for BB-144, B1, and generated HGP;
 - binds the exact design/cap/supplement digests; and
 - completes its separately frozen three-arm baseline/source/canonical cohort.
+
+For a genuine predecessor, its nonempty canonical evaluation-plan and
+selected-settings digests must also match the retained three-arm evaluation
+plan whenever `selected-settings.json` is present. This verifies calibration
+provenance without asking evaluation to admit the distinct 14-arm factorial.
 
 This gate is deliberately not met because calibration/evaluation evidence is
 outstanding. The frozen active-V4 evaluation cap legitimately admits only
@@ -40,6 +47,16 @@ trace evidence as missingness. The coordinated public V4 ON/OFF, disordered
 assignment, and cap-truncation checks have passed. This confirms only the
 execution contract; calibration/evaluation evidence still blocks scientific
 sampling.
+
+The fourteen selected arm traces per code are within the frozen per-code
+`trace_caps.max_shots` limit of 32. Record and byte caps are aggregate per
+code, so the runner assigns each selected manifest an equal floor share and
+checks the retained inventory total. The separate frozen `fixture_shots_per_code`
+allocation remains seven and is not consumed by these existing factorial shot-0
+executions. Each production cell has one 900-second-or-less deadline shared by
+preflight, observation, canonical execution, and verification; each command
+receives only the remaining time. Actual wall duration is retained while RSS
+remains explicit missingness when unavailable.
 
 Development fixtures can exercise the runner only if they state both
 `development_fixture: true` and `assessment: not_assessed`. Fixture results stay

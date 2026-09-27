@@ -201,13 +201,14 @@
   "predecessor_gate": {
     "current_gap": "The active V4 evaluation cap legitimately admits only baseline, selected_source_procedure, and selected_canonical_procedure. The separately frozen factorial category admits all 14 ablation arms after this predecessor gate.",
     "fixture_policy": "Development fixtures may exercise this runner only when development_fixture=true and assessment=not_assessed; they cannot authorize production sampling.",
-    "requirement": "A complete digest-bound fresh evaluation must cover its frozen baseline, selected_source_procedure, and selected_canonical_procedure cohort for every code before production factorial sampling."
+    "requirement": "A complete digest-bound fresh evaluation must cover its frozen baseline, selected_source_procedure, and selected_canonical_procedure cohort for every code before production factorial sampling. Its nonempty canonical plan and selected-settings digests must match the retained three-arm evaluation plan when selected-settings.json is available."
   },
   "purpose": "Outcome-independent executable resolution for the frozen Phase 4 focused factorial ordinary-memory arms.",
   "schema_version": 1,
   "status": "frozen_pre_sampling",
-  "supplement_digest": "71803c4f0acabc8dbb2e4620de5aaddff1218963e539a4f6ca36a039a62d5244",
+  "supplement_digest": "8679c14c6028b608633b7b31efc8eb23c5138624b6ada1366a00b770257462b0",
   "trace_contract": {
+    "aggregate_cap_enforcement": "trace_caps.max_shots/max_records/max_bytes are enforced per code across the retained factorial inventory. Fourteen prespecified visible_bp_failures/shot-0 arm traces are within max_shots=32; each manifest receives an equal floor share of the aggregate record and byte caps. fixture_shots_per_code=7 is a separate frozen fixture allocation and no extra fixture shot is created for factorial tracing.",
     "api": "Public V4 manifests declare trace_plan(level, relative_dir, max_records, max_bytes, label). For enabled flooding-memory shots, canonical execution constructs MemoryFloodingSchedule(edge_table, kernel, trace_sink=TraceSink, trace_context=Mapping), invokes observe_candidate(origin, candidate) after committed activity, then trace_result() finalizes the observer and emits one trace_link sidecar. The factorial runner retains linked sidecars and explicit unavailable trace facts.",
     "caps_source": "data/manifests/phase4-pilot-caps.json codes.*.trace_caps",
     "public_v4_readiness": "Focused public V4 ON/OFF, disordered-assignment, and max_records truncation checks passed before factorial sampling. This records execution-contract readiness only; calibration/evaluation evidence remains the mandatory predecessor gate.",

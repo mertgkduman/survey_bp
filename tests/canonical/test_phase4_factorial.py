@@ -60,6 +60,17 @@ def test_factorial_requires_complete_fresh_evaluation_and_admitted_arms(tmp_path
     with pytest.raises(ValueError, match="fresh evaluation"):
         runner.assert_factorial_predecessor(evaluation_path=evaluation, plan=plan)
 
+    empty_provenance = runner.development_fixture_evaluation(plan)
+    empty_provenance.update({"development_fixture": False, "plan_digest": "", "selected_settings_digest": ""})
+    evaluation.write_text(json.dumps(empty_provenance), encoding="utf-8")
+    with pytest.raises(ValueError, match="digest contract"):
+        runner.assert_factorial_predecessor(evaluation_path=evaluation, plan=plan)
+
+    missing_selection = {**empty_provenance, "plan_digest": "a" * 64, "selected_settings_digest": "b" * 64}
+    evaluation.write_text(json.dumps(missing_selection), encoding="utf-8")
+    with pytest.raises(ValueError, match="selected settings are absent"):
+        runner.assert_factorial_predecessor(evaluation_path=evaluation, plan=plan, repository_root=tmp_path)
+
     fixture = runner.development_fixture_evaluation(plan)
     evaluation.write_text(json.dumps(fixture), encoding="utf-8")
     with pytest.raises(ValueError, match="development fixture"):
@@ -117,8 +128,15 @@ def test_factorial_manifest_preflights_all_frozen_arms_and_keeps_factorial_names
     traced = [manifest for key, manifest in manifests.items() if key.startswith("visible_bp_failures/")]
     assert len(traced) == 14
     assert all(manifest["trace_plan"]["level"] == "full" for manifest in traced)
-    assert all(manifest["trace_plan"]["max_records"] == caps["codes"]["gross-bb-144"]["trace_caps"]["max_records"] for manifest in traced)
-    assert all(manifest["trace_plan"]["max_bytes"] == caps["codes"]["gross-bb-144"]["trace_caps"]["max_bytes"] for manifest in traced)
+    trace_budget = plan["trace_contract"]["budgets_by_code"]["gross-bb-144"]
+    assert trace_budget["selected_trace_cells"] == 14
+    assert trace_budget["factorial_shots_per_arm_rate_code"] == 7
+    assert trace_budget["separate_fixture_shots_per_code"] == 7
+    assert trace_budget["selected_trace_cells"] <= trace_budget["aggregate"]["max_shots"]
+    assert trace_budget["selected_trace_cells"] * trace_budget["per_trace"]["max_records"] <= trace_budget["aggregate"]["max_records"]
+    assert trace_budget["selected_trace_cells"] * trace_budget["per_trace"]["max_bytes"] <= trace_budget["aggregate"]["max_bytes"]
+    assert all(manifest["trace_plan"]["max_records"] == trace_budget["per_trace"]["max_records"] for manifest in traced)
+    assert all(manifest["trace_plan"]["max_bytes"] == trace_budget["per_trace"]["max_bytes"] for manifest in traced)
     assert all(manifest["trace_plan"]["level"] == "off" for key, manifest in manifests.items() if not key.startswith("visible_bp_failures/"))
 
 
@@ -141,6 +159,24 @@ def test_incomplete_execution_is_retained_outside_proposal_cells():
     assert completed["all_shot_failure"]["failures"] == 1
     assert incomplete["completed"] == 0
     assert incomplete["execution_statuses"]["incomplete_public_boundary"] == 1
+
+
+def test_nonfixture_incomplete_rows_are_not_reported_completed(tmp_path):
+    runner = _module()
+    design, caps, supplement = _inputs()
+    plan = runner.build_factorial_plan(design=design, caps=caps, supplement=supplement)
+    evaluation = tmp_path / "evaluation.json"
+    evaluation.write_text(json.dumps(runner.development_fixture_evaluation(plan)), encoding="utf-8")
+
+    report = runner.run_factorial(
+        evaluation_path=evaluation, plan=plan, allow_development_fixture=True,
+        executor=lambda cell: {"cell_id": cell["cell_id"], "sample_namespace": cell["factorial_namespace"],
+                               "sample_identity": None, "execution_status": "incomplete_category_cap", "terminal": False,
+                               "raw_work": None, "runtime_seconds": None, "resource": {"maxrss_kib": None}},
+    )
+    assert report["status"] == "development_fixture_not_assessed"
+
+    assert runner._result_status({"development_fixture": False}, [{"execution_status": "incomplete_category_cap"}]) == "incomplete_or_inconclusive_not_assessed"
 
 
 def test_selected_trace_links_retain_caps_truncation_and_unavailable_status():
@@ -170,3 +206,43 @@ def test_selected_trace_links_retain_caps_truncation_and_unavailable_status():
             "data": {"status": "linked"},
             "sidecar": {**sidecar, "records": caps["codes"][selected["code_id"]]["trace_caps"]["max_records"] + 1},
         }], cell=selected, plan=plan)
+
+
+def test_trace_inventory_rejects_aggregate_cap_excess():
+    runner = _module()
+    design, caps, supplement = _inputs()
+    plan = runner.build_factorial_plan(design=design, caps=caps, supplement=supplement)
+    cell = next(item for item in plan["cells"] if item["code_id"] == "gross-bb-144" and item["noise_region"] == "visible_bp_failures" and item["shot_id"] == 0)
+    per_trace = plan["trace_contract"]["budgets_by_code"][cell["code_id"]]["per_trace"]
+    rows = [{"code_id": cell["code_id"], "trace": {"status": "linked", "selection_basis": "visible_bp_failures/shot-0", "sidecar": {"records": per_trace["max_records"], "bytes": per_trace["max_bytes"]}}} for _ in range(15)]
+    with pytest.raises(ValueError, match="aggregate cap"):
+        runner.validate_trace_inventory(rows, plan)
+
+
+def test_public_executor_uses_one_decreasing_cell_deadline_and_category_residual(tmp_path, monkeypatch):
+    runner = _module()
+    design, caps, supplement = _inputs()
+    plan = runner.build_factorial_plan(design=design, caps=caps, supplement=supplement)
+    cell = {**plan["cells"][0], "runtime_boundary_seconds": 1}
+    calls = []
+
+    class Active:
+        def _command(self, _root, *command, timeout):
+            calls.append((command[0], timeout))
+            return {}
+
+        def _events(self, _root):
+            return []
+
+    times = iter((0.0, 0.0, 1.0, 1.0))
+    monkeypatch.setattr(runner, "perf_counter", lambda: next(times))
+    monkeypatch.setattr(runner, "_active", lambda: Active())
+    monkeypatch.setattr(runner, "build_public_manifest", lambda **_kwargs: {"trace_plan": {"level": "off"}})
+    execute = runner.canonical_public_executor(repository_root=ROOT, output_root=tmp_path, plan={**plan, "factorial_category_wall_seconds_max": 1})
+    result = execute(cell)
+
+    assert calls == [("preflight", 1.0)]
+    assert result["execution_status"] == "incomplete_public_boundary"
+    assert result["runtime_seconds"] == 1.0
+    assert result["public_boundary"]["cell_deadline_seconds"] == 1
+    assert result["public_boundary"]["category_remaining_at_start_seconds"] == 1
