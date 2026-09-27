@@ -21,20 +21,19 @@ The runner refuses production sampling until a retained fresh evaluation:
 
 - has `status: completed` for BB-144, B1, and generated HGP;
 - binds the exact design/cap/supplement digests; and
-- explicitly admits every one of the 14 factorial arms.
+- completes its separately frozen three-arm baseline/source/canonical cohort.
 
-This gate is deliberately not met. The frozen active-V4 evaluation cap admits
-only `baseline`, `selected_source_procedure`, and
-`selected_canonical_procedure`; it does not admit the remaining 11 focused
-ordinary-memory/Relay arms. Calibration/evaluation evidence also remains
-outstanding. No cap or frozen design was changed to conceal this gap.
+This gate is deliberately not met because calibration/evaluation evidence is
+outstanding. The frozen active-V4 evaluation cap legitimately admits only
+`baseline`, `selected_source_procedure`, and `selected_canonical_procedure`.
+The distinct frozen factorial category admits all 14 focused arms after that
+predecessor completes; no cap or frozen design was changed.
 
-One additional execution gap remains explicit: the planned ordinary
-`disordered-affine-prior` arm has a fixed coefficient/assignment declaration,
-but public ordinary disordered-prior execution is still rejected by the current
-engine. The preparatory plan retains its seven shots per code/rate, marks it
-`execution_ready: false`, and refuses production execution until that declared
-assignment is implemented and verified.
+The public ordinary disordered-prior form is now the declared fresh uniform
+per-source-iteration PCG64 assignment on `[0, 1]`, bound to an arm-specific
+decoder seed. Its frozen design label is retained as an alias for executable
+`affine_prior`. Public canonical trace collection for factorial runs remains a
+separate runner-integration admission gate; direct schedule tracing is ready.
 
 Development fixtures can exercise the runner only if they state both
 `development_fixture: true` and `assessment: not_assessed`. Fixture results stay
@@ -49,10 +48,11 @@ sidecar is bounded by the frozen per-code byte, record, and shot caps and record
 only decoder-visible beliefs, history digests/shapes, assignment evidence,
 candidate origin, transitions, and raw work. No hidden physical truth is traced.
 
-The planned result contract retains all five mutually exclusive proposal outcome
-cells (`proposed_selected`, `proposed_unselected`, `no_proposal`,
-`terminal_failure`, `terminal_incomplete`), candidate origins, terminal-derived
+The planned result contract retains the five mutually exclusive proposal outcome
+cells (`valid_correct`, `valid_wrong_logical`, `invalid_correct`,
+`invalid_wrong_logical`, `no_proposal`), candidate origins, terminal-derived
 raw per-leg/total work, runtime/resource tails, and explicit resource missingness.
-It does not form a heterogeneous scalar cost. Any eventual evidence remains a
+Command failure and incomplete execution remain separate `execution_status`
+facts and do not masquerade as `no_proposal`. It does not form a heterogeneous scalar cost. Any eventual evidence remains a
 CSS pilot adaptation and `not_assessed`, with no circuit-reproduction or
 universal-ranking claim.
