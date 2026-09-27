@@ -82,7 +82,7 @@ approved `.venv/bin/python`, from the isolated checkout.
    **67 passed** (7.37 s), including 30 ordinary-memory execution tests.
 4. Focused post-correction trace/disordered/NMS gate:
    `python -m pytest -q tests/canonical/test_memory_execution.py tests/canonical/test_memory_trace.py`:
-   **34 passed** (4.67 s). This includes public V5 preflight/run/semantic
+   **35 passed** (5.17 s). This includes public V5 preflight/run/semantic
    replay of a disordered affine-prior arm, transactional PCG64 replay, capped
    trace sidecars, and per-iteration NMS execution.
 
