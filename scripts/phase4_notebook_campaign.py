@@ -289,7 +289,7 @@ def _verify_relay_shot(manifest_path: Path, run_dir: Path, *, shot_id: int, expe
     evaluation, _factorial, _pilots, _runtime = _runners()
     candidate, candidate_origin = evaluation.terminal_candidate_for_diagnosis(
         data, termination=terminal.get("termination"))
-    diagnosis = evaluation.classify_candidate(manifest_path, shot_id=shot_id, candidate=candidate)
+    diagnosis = evaluation.classify_candidate(manifest_path, shot_id=shot_id, candidate=candidate, context=context)
     semantic = {**diagnosis, "selected": data.get("selection_status") == "frozen_decoder_visible_candidate",
                 "selection_status": data.get("selection_status"), "candidate_origin": candidate_origin,
                 "outcome": data.get("outcome")}

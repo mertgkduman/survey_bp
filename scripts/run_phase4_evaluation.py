@@ -184,13 +184,15 @@ def build_manifest(*, base: Mapping[str, Any], cell: Mapping[str, Any], plan: Ma
     return value
 
 
-def classify_candidate(manifest_path: Path, *, shot_id: int, candidate: object) -> dict[str, Any]:
+def classify_candidate(manifest_path: Path, *, shot_id: int, candidate: object, context: object | None = None) -> dict[str, Any]:
     """Evaluate syndrome and logical projection from original hidden truth after decoding."""
     if candidate is None:
         return {"diagnostic_cell": "no_proposal", "syndrome_valid": None,
                 "logical_projection_correct": None, "candidate_sha256": None}
     from bp_registry.runner import canonical_public_shot_context
-    context = canonical_public_shot_context(manifest_path, shot_id=shot_id)
+    context = canonical_public_shot_context(manifest_path, shot_id=shot_id) if context is None else context
+    if getattr(context, "shot_id", None) != shot_id:
+        raise ValueError("candidate classification context has a different shot")
     if context.code is None or context.hidden_truth is None:
         raise ValueError("independent CSS truth is absent")
     code = context.code.validate()
