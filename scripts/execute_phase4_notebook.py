@@ -74,7 +74,9 @@ def execute_notebook(*, repository_root: Path, input_path: str, output_path: str
         }), encoding="utf-8")
         manager = KernelManager(kernel_name="phase4-project", kernel_spec_manager=
                                 KernelSpecManager(kernel_dirs=[str(Path(temporary) / "kernels")]))
-        client = NotebookClient(notebook, km=manager, kernel_name="phase4-project", timeout=120,
+        # Retained campaign validation includes CSS algebra and complete ledgers;
+        # the measured inventory takes several minutes, without running simulations.
+        client = NotebookClient(notebook, km=manager, kernel_name="phase4-project", timeout=120 if fixture else 600,
                                 allow_errors=False, resources={"metadata": {"path": str(root)}})
         try:
             client.execute(cwd=str(root), env={**os.environ, "JUPYTER_PATH": temporary,

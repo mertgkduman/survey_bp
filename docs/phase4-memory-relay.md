@@ -33,6 +33,9 @@ traversal. An incomplete traversal keeps its committed local work and discards
 uncommitted affine history. Disordered local affine assignment, other local
 schedules and retained histories across additional lifetimes remain explicit
 gaps. PD-prime must precede other field bindings.
+These three deterministic local schedules support sum-product and the declared
+min-sum, normalized min-sum and offset min-sum profiles. Replay uses the same
+profile and source-iteration parameter assignment as execution.
 
 The original executable reference is **trmue/relay v0.2.2**, immutable commit
 `14cb31a18f9b9d7d099791b793e35b8a2951f8f3`. Its source record, qualification and
@@ -106,11 +109,16 @@ enabling tracing preserves the sampled coefficients and decoder semantics.
 Memory sidecars are checked against independent numerical replay, including
 committed beliefs, private histories and candidate records. Capped sidecars keep
 their verified prefix and explicit truncation instead of claiming a full trace.
+Numerical-failure sidecars must match the independently reconstructed committed
+prefix. A sidecar finalization or storage failure records an unavailable trace
+reason while preserving decoder work and terminal evidence.
 
 ## Notebook execution and reuse
 
 `notebooks/phase4-memory-relay-analysis.ipynb` has all 13 research sections.
 Tables and failure figures retain exact denominators and 95% Wilson intervals.
+Retained-campaign validation can take several minutes. The confined executor
+allows ten minutes per cell for that analysis and two minutes in fixture mode.
 Development fixtures exercise these views with explicit synthetic labels;
 production figures require verified originating execution. The executor pins the observed
 NumPy/Matplotlib/nbformat/nbclient/ipykernel versions, requires the project venv,
