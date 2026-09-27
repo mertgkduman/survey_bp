@@ -12,6 +12,14 @@ branch: gsd/phase4-memory-integration-20260926
 
 # Ordinary memory execution correction
 
+The execution matrix below records the validated `62fe977` checkpoint.
+Commit `3a3bb8c` subsequently implements disordered affine-prior assignments
+at complete source-iteration traversals on the same three deterministic local
+schedules. See [local disordered continuation](04-LOCAL-DISORDERED-AFFINE-CONTINUATION.md)
+for its focused verification and remaining lifetime/schedule limits. Statements
+below that reject disordered local affine execution describe the earlier
+checkpoint; the live main campaign remains on its frozen source.
+
 ## Finding and authorized work
 
 During the user's requested coding continuation, Plan 04-13's factorial runner
