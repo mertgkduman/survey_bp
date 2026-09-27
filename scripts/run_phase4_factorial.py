@@ -6,6 +6,7 @@ from collections import Counter, defaultdict
 from copy import deepcopy
 from hashlib import sha256
 from pathlib import Path
+from time import perf_counter
 from typing import Any, Callable, Mapping
 from bp_registry.phase4_analysis import CELLS, wilson_interval
 
@@ -51,7 +52,7 @@ def build_factorial_plan(*,design,caps,supplement):
         for arm in arms:
          frozen,order,co,ready=_ordinary(arm,supplement); aid=arm["id"]
          cells.append({"cell_id":_d({"code":code,"region":region["region"],"shot":shot,"arm":aid,"supplement":supplement["supplement_digest"]})[:24],"code_id":code,"noise_region":region["region"],"error_rate":rate,"shot_id":shot,"arm_id":aid,"arm_kind":arm["kind"],"relay_control":arm.get("control"),"factorial_namespace":ns,"physical_sample_identity":physical,"original_binding_array":frozen,"execution_order":order,"coefficients":co,"execution_ready":ready,"work_cap":dict(caps["codes"][code]["per_shot_work_cap"]),"runtime_boundary_seconds":int(fact["runtime_boundary_seconds"]),"fidelity":{"status":"controlled_css_pilot_adaptation","assessment":"not_assessed"}})
-    out={"schema_version":1,"status":"prepared_no_sampling","assessment":{"status":"not_assessed","scope":"CSS_pilot_adaptation"},"input_digests":{"design_canonical_sha256":_d(design),"caps_canonical_sha256":_d(caps),"caps_digest":caps["caps_digest"],"supplement_digest":supplement["supplement_digest"]},"cells":cells,"cell_count":len(cells),"outcome_cells":list(CELLS),"blocked_execution_arms":sorted({c["arm_id"] for c in cells if not c["execution_ready"]}),"execution_order_note":supplement["execution_order_resolution"],"trace_contract":supplement["trace_contract"]}
+    out={"schema_version":1,"status":"prepared_no_sampling","assessment":{"status":"not_assessed","scope":"CSS_pilot_adaptation"},"input_digests":{"design_canonical_sha256":_d(design),"caps_canonical_sha256":_d(caps),"caps_digest":caps["caps_digest"],"supplement_digest":supplement["supplement_digest"]},"cells":cells,"cell_count":len(cells),"outcome_cells":list(CELLS),"factorial_category_wall_seconds_max":float(caps["allocation"]["categories"]["fixture_trace"]["wall_seconds_max"]),"blocked_execution_arms":sorted({c["arm_id"] for c in cells if not c["execution_ready"]}),"execution_order_note":supplement["execution_order_resolution"],"trace_contract":supplement["trace_contract"]}
     out["factorial_digest"]=_d(out); return out
 
 def _binding(cell,index,item,seed):
@@ -114,13 +115,19 @@ def aggregate_terminals(rows,plan):
 def canonical_public_executor(*, repository_root: Path, output_root: Path, plan: Mapping[str, Any]) -> Callable[[Mapping[str, Any]], Mapping[str, Any]]:
     """Return the production executor: public preflight, one shot, then verify."""
     active=_active()
+    spent=0.0
     def execute(cell):
+      nonlocal spent
+      boundary=float(cell["runtime_boundary_seconds"])
+      if spent+boundary>float(plan["factorial_category_wall_seconds_max"]):
+        return {"cell_id":cell["cell_id"],"sample_namespace":cell["factorial_namespace"],"sample_identity":None,"execution_status":"incomplete_category_cap","terminal":False,"raw_work":None,"runtime_seconds":None,"resource":{"maxrss_kib":None}}
       manifest=build_public_manifest(repository_root=repository_root,cell=cell,plan=plan)
       root=output_root/cell["code_id"]/cell["noise_region"]/cell["arm_id"]; root.mkdir(parents=True,exist_ok=True)
       path=root/"manifest.json"; expected=json.dumps(manifest,indent=2,sort_keys=True)+"\n"
       if path.exists() and path.read_text()!=expected: raise ValueError("retained factorial manifest drifted")
       if not path.exists(): path.write_text(expected)
       try:
+        began=perf_counter()
         preflight=active._command(repository_root,"preflight",str(path),timeout=cell["runtime_boundary_seconds"])
         observation=active._command(repository_root,"canonical-observation",str(path),"--shot",str(cell["shot_id"]),timeout=cell["runtime_boundary_seconds"])
         if observation.get("sample_namespace")!=cell["factorial_namespace"] or not isinstance(observation.get("sample_identity"),str): raise ValueError("public observation does not expose the declared factorial sample identity")
@@ -128,12 +135,14 @@ def canonical_public_executor(*, repository_root: Path, output_root: Path, plan:
         verify=active._command(repository_root,"verify-canonical-shot",str(path),str(root/"run"),"--shot",str(cell["shot_id"]),timeout=cell["runtime_boundary_seconds"])
         fact=active._attempt_from_events(active._events(root/"run"),cell["shot_id"]); terminal=fact["terminal"]
         if fact["sample_identity"] not in {None,observation["sample_identity"]}: raise ValueError("public ledger sample identity disagrees with public observation")
+        spent += perf_counter()-began
         if fact["termination"] is None: return {"cell_id":cell["cell_id"],"sample_namespace":observation["sample_namespace"],"sample_identity":observation["sample_identity"],"execution_status":"incomplete_public_boundary","terminal":False,"raw_work":fact["work_vector"],"runtime_seconds":None,"resource":{"maxrss_kib":None},"public_boundary":{"preflight":preflight,"run":run,"verify":verify}}
         import run_phase4_evaluation as evaluation
         classification=evaluation.classify_candidate(path,shot_id=cell["shot_id"],candidate=terminal.get("diagnostic_candidate"))
         selected=terminal.get("selection_status")=="frozen_decoder_visible_candidate"
         return {"cell_id":cell["cell_id"],"sample_namespace":observation["sample_namespace"],"sample_identity":observation["sample_identity"],"execution_status":"completed","terminal":True,**classification,"selected":selected,"candidate_origin":terminal.get("diagnostic_candidate_origin"),"raw_work":fact["work_vector"],"runtime_seconds":None,"resource":{"maxrss_kib":None},"public_boundary":{"preflight":preflight,"run":run,"verify":verify}}
       except (OSError,RuntimeError,ValueError) as error:
+        spent += perf_counter()-began
         return {"cell_id":cell["cell_id"],"sample_namespace":cell["factorial_namespace"],"sample_identity":None,"execution_status":"incomplete_public_boundary","terminal":False,"failure":str(error),"raw_work":None,"runtime_seconds":None,"resource":{"maxrss_kib":None}}
     return execute
 
