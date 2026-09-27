@@ -29,6 +29,16 @@ def _byte_sha(path: Path) -> str:
     return sha256(path.read_bytes()).hexdigest()
 
 
+def _json_value(value: object) -> object:
+    if hasattr(value, "tolist"):
+        return _json_value(value.tolist())
+    if isinstance(value, Mapping):
+        return {str(key): _json_value(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_value(item) for item in value]
+    return value
+
+
 def _read(path: Path) -> dict[str, Any]:
     value = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(value, dict):
@@ -506,7 +516,21 @@ def _native(root: Path) -> dict[str, object]:
                 if transcript.get("candidate") != native.get("candidate") or transcript.get("module_origin") != native.get("native_module_origin") or transcript.get("success") != native.get("success_flag"):
                     raise ValueError("native result transcript differs from retained journal")
                 later_legs = 2 if code_id == "b1-ghp-882" else 30
-                _gammas, expected_digests = evaluation.explicit_native_gammas(manifest, native_payload, later_legs=later_legs)
+                from bp_registry.native.relay_v022 import RelayV022Adapter
+                from bp_registry.runner import canonical_public_shot_context
+                context = canonical_public_shot_context(manifest, shot_id=int(native["shot_id"]))
+                observation = {"check_matrix": context.code.hz.tolist(), "syndrome": list(context.syndrome),
+                               "error_priors": [context.error_rate] * int(context.code.hz.shape[1]),
+                               "sample_identity": context.sample_seed_identity, "decoder_seed": int(native["shot_id"])}
+                _gammas, expected_digests = evaluation.explicit_native_gammas(manifest, observation, later_legs=later_legs)
+                tuning = manifest["relay"]["memory_tuning"]
+                settings = {"gamma0": float(cell["candidate"]["gamma0"]), "pre_iter": 80, "num_sets": later_legs,
+                            "set_max_iter": 60, "gamma_dist_interval": (float(tuning["later_leg_center"]) - float(tuning["later_leg_width"]) / 2, float(tuning["later_leg_center"]) + float(tuning["later_leg_width"]) / 2),
+                            "explicit_gammas": _gammas, "stop_nconv": 1, "stopping_criterion": "nconv", "logging": False}
+                expected_payload = RelayV022Adapter().translate(check_matrix=observation["check_matrix"], syndrome=observation["syndrome"],
+                    error_priors=observation["error_priors"], relay_settings=settings, seed=observation["decoder_seed"], numerical_profile="f64")
+                if _json_value(native_payload) != _json_value(expected_payload):
+                    raise ValueError("native author payload differs from canonical public observation")
                 if native.get("gamma_digests") != expected_digests or native.get("executed_gamma_digests_checked") != later_legs:
                     raise ValueError("native gamma evidence differs from frozen canonical replay")
                 diagnosis = evaluation.classify_candidate(manifest, shot_id=int(native["shot_id"]), candidate=native.get("candidate"))
