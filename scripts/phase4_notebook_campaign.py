@@ -31,7 +31,10 @@ class _InventoryProofCache:
         resolved, digest = path.resolve(), _byte_sha(path)
         key = (resolved, digest)
         if key not in self.ledgers:
-            self.ledgers[key] = read_canonical_events(resolved)
+            events = read_canonical_events(resolved)
+            if _byte_sha(resolved) != digest:
+                raise ValueError("ledger bytes changed while inventory proof was constructed")
+            self.ledgers[key] = events
         return key, self.ledgers[key]
 
     def context(self, manifest_path: Path, shot_id: int):
@@ -39,7 +42,10 @@ class _InventoryProofCache:
         resolved, digest = manifest_path.resolve(), _byte_sha(manifest_path)
         key = (resolved, digest, shot_id)
         if key not in self.contexts:
-            self.contexts[key] = canonical_public_shot_context(resolved, shot_id=shot_id)
+            context = canonical_public_shot_context(resolved, shot_id=shot_id)
+            if _byte_sha(resolved) != digest:
+                raise ValueError("manifest bytes changed while inventory context was constructed")
+            self.contexts[key] = context
         return self.contexts[key]
 
 
@@ -131,25 +137,35 @@ def _failure_rows(stage: str, value: Mapping[str, Any]) -> list[dict[str, object
                     rows.append({"stage": stage, "code_id": code_id, "arm": arm, "error_rate": item.get("error_rate"),
                                  "failures": primary.get("failures"), "denominator": primary.get("denominator"),
                                  "estimate": primary.get("estimate"), "wilson_95": primary.get("wilson_95", primary.get("interval")),
-                                 "runtime_tails": summary.get("runtime_seconds"), "runtime_scope": "producer-declared; do not mix boundaries", "resource_tails": summary.get("resource_measurements")})
+                                 "runtime_tails": summary.get("public_elapsed_seconds", summary.get("runtime_seconds")), "runtime_scope": "producer-declared public boundary",
+                                 "resource_tails": summary.get("resource_measurements", {"missing": "not retained by producer"}),
+                                 "diagnostic_cells": summary.get("diagnostic_cells"), "selected_valid_syndrome_logical_error": summary.get("selected_valid_syndrome_logical_error"),
+                                 "termination_counts": summary.get("termination_counts"), "work_vectors": summary.get("work_vectors")})
     return rows
 
 
 def _table(stage: str, rows: list[dict[str, object]]) -> dict[str, object]:
     return {"stage": stage, "name": f"{stage}_failure_accounting", "title": f"{stage} failure accounting",
-            "columns": ["stage", "code_id", "arm", "error_rate", "failures", "denominator", "estimate", "wilson_95", "runtime_tails", "runtime_scope", "resource_tails"], "rows": rows}
+            "columns": ["stage", "code_id", "arm", "error_rate", "failures", "denominator", "estimate", "wilson_95", "runtime_tails", "runtime_scope", "resource_tails", "diagnostic_cells", "selected_valid_syndrome_logical_error", "termination_counts", "work_vectors"], "rows": rows}
 
 
 def _benchmark_rows(report: Mapping[str, Any]) -> list[dict[str, object]]:
-    """Normalize active-V4 benchmark rates without pretending they are arms."""
+    """Flatten actual active-V4 code/rate/preset/arm records for presentation."""
     rows = []
-    for code_id, item in sorted(report.get("codes", {}).items()):
-        if not isinstance(item, Mapping): continue
-        rows.append({"stage": "benchmark", "code_id": code_id, "arm": "active_v4_benchmark",
-                     "error_rate": item.get("selected_rate"), "failures": None, "denominator": None,
-                     "estimate": None, "wilson_95": None,
-                     "runtime_tails": item.get("public_command_wall_seconds"), "runtime_scope": "active-V4 public command boundary",
-                     "resource_tails": {"selection_status": item.get("selection_status"), "rates": item.get("rates")}})
+    for code_id, code in sorted(report.get("codes", {}).items()):
+        if not isinstance(code, Mapping): continue
+        for rate_key, rate in sorted(code.get("rates", {}).items()):
+            if not isinstance(rate, Mapping): continue
+            for preset, arms in sorted(rate.get("presets", {}).items()):
+                if not isinstance(arms, Mapping): continue
+                for arm_name, arm in sorted(arms.items()):
+                    if not isinstance(arm, Mapping): continue
+                    rows.append({"stage": "benchmark", "code_id": code_id, "arm": arm_name, "preset": preset, "rate_id": rate_key,
+                                 "error_rate": rate.get("error_rate"), "failures": None, "denominator": None, "estimate": None, "wilson_95": None,
+                                 "runtime_tails": arm.get("public_command_wall_seconds"), "runtime_scope": "active-V4 public command boundary",
+                                 "resource_tails": {"missing": "benchmark producer retains no RSS measurement"}, "raw_work": arm.get("raw_work"),
+                                 "termination_counts": arm.get("termination_counts"), "selection_status": code.get("selection_status"),
+                                 "active_memory_verified": arm.get("active_memory_verified")})
     return rows
 
 
@@ -409,8 +425,12 @@ def _evaluation(root: Path, *, cache: _InventoryProofCache) -> dict[str, object]
                          for arm in arms if arm != "baseline"} for code_id in caps["codes"]}
         if payload.get("paired") != expected_pairs:
             raise ValueError("evaluation matched cohorts differ from retained attempts")
+        rows = _failure_rows("evaluation", payload)
+        rates = {(cell["code_id"], cell["arm"]): cell["error_rate"] for cell in plan["cells"]}
+        for row in rows:
+            row["error_rate"] = rates.get((row["code_id"], row["arm"]))
         return _snapshot("evaluation", path, payload, qualified=True, reason=None,
-                         tables=[_table("evaluation", _failure_rows("evaluation", payload))])
+                         tables=[_table("evaluation", rows)])
     except (FileNotFoundError, OSError, ValueError) as error:
         return _snapshot("evaluation", path, payload, qualified=False, reason=str(error), tables=[_table("evaluation", _failure_rows("evaluation", payload))])
 

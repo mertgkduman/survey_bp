@@ -99,7 +99,11 @@ def test_campaign_root_requires_a_repository_shaped_root(tmp_path):
 
 def test_active_benchmark_uses_report_digest_and_selected_rate_schema(tmp_path, monkeypatch):
     campaign = _module()
-    report = {"schema_version": 1, "status": "completed", "codes": {"fixture-code": {"selected_rate": .03, "selection_status": "selected"}}}
+    report = {"schema_version": 1, "status": "completed", "codes": {"fixture-code": {
+        "selected_rate": .03, "selection_status": "selected", "rates": {"p0030": {
+            "error_rate": .03, "presets": {"canonical_default": {"controlled_relay_31": {
+                "public_command_wall_seconds": {"p95": 1.0}, "raw_work": {"availability": "observed"},
+                "termination_counts": {"completed": 1}, "active_memory_verified": True}}}}}}}}
     report["report_digest"] = campaign._json_digest(report)
     report_path = tmp_path / "data/results/phase4-memory-relay/active.json"; _write(report_path, report)
     caps = {"schema_version": 4, "benchmark_evidence": {"active_v4": {"path": "data/results/phase4-memory-relay/active.json", "byte_sha256": campaign._byte_sha(report_path), "report_digest": report["report_digest"]}}}
@@ -160,3 +164,18 @@ def test_inventory_proof_cache_reuses_current_ledger_once_and_rejects_changed_by
     ledger.write_text("changed", encoding="utf-8")
     changed_key, changed = cache.events(ledger)
     assert changed_key != first_key and changed == first and calls == [b"first", b"changed"]
+
+
+def test_inventory_proof_cache_rejects_a_ledger_replaced_during_parse(tmp_path, monkeypatch):
+    campaign = _module()
+    ledger = tmp_path / "events.jsonl"
+    ledger.write_text("before", encoding="utf-8")
+    import bp_registry.ledger as ledger_module
+
+    def replace_during_parse(path):
+        Path(path).write_text("after", encoding="utf-8")
+        return []
+
+    monkeypatch.setattr(ledger_module, "read_canonical_events", replace_during_parse)
+    with pytest.raises(ValueError, match="changed"):
+        campaign._InventoryProofCache().events(ledger)
