@@ -52,7 +52,9 @@ benchmark rendering to roughly 35 KB before final evidence qualification.
 
 Rendered fixture figures, including the 14-arm layout, were visually inspected.
 The local HTML preview was inspected with headless Firefox at desktop width;
-labels, retained counts, tables and embedded figures are visible. This replaces
+the fixture baseline was also checked at 660 pixels and the actual historical
+diagnostic section at desktop width. Labels, retained counts, tables and
+embedded figures are visible. This replaces
 the earlier viewer/exporter limitation. Final saved outputs and regression counts
 will be recorded in the implementation-continuation record.
 
@@ -68,8 +70,26 @@ equation/derived-view and portable-output changes.
 Historical stable-source validation: the preceding project regression suite passed
 **478 tests, with one existing skip**, in 299.52 seconds. Both saved notebook
 artifacts were refreshed from cleared outputs; each executed all 14 code cells
-with 14 outputs and zero errors. This validates the scaffold and current source,
-not the outstanding production analysis.
+with 14 outputs and zero errors. That result validates the preceding scaffold,
+not this continuation's final source or the outstanding production analysis.
+
+Continuation review resolved the local replay/trace findings, exact-byte cache
+binding and shared-context mutation isolation. The source notebook now produces
+16 fixture tables and ten PNGs; the actual retained-campaign run produces five
+tables and no qualified failure figures. Its incomplete benchmark arm remains
+explicitly unqualified and historical author agreement is separately displayed.
+Campaign analysis has a measured multi-minute validation read and a finite
+600-second cell limit; fixture cells retain 120 seconds. The final source gate
+follows `62fe977`, which fixes legacy Hsu keyword dispatch and aligns public
+admission tests with the implemented and rejected memory/schedule matrix.
+
+Final continuation validation on `62fe977`: **532 passed, one existing skip**
+in **547.39 seconds** with the qualified main venv, `OMP_NUM_THREADS=1` and
+`PYTHONPATH=src`. Both saved notebooks were refreshed on this source: 14/14
+code cells, zero errors each; fixture 16 tables/ten PNGs, actual campaign five
+tables/zero qualified failure figures. Portable HTML exports are retained.
+This completes the independent implementation slice; Plan 04-14 remains open
+for production evidence and complete-phase verification.
 
 The frozen V4 cap does not admit fresh shared-settings evaluation; a versioned
 presampling cap amendment is still required for that planned view. Local-memory

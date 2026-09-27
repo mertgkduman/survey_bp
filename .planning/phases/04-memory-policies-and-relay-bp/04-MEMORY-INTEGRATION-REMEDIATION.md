@@ -1,7 +1,8 @@
 ---
 phase: 04-memory-policies-and-relay-bp
-status: flooding-correction-verified-isolated
-date: 2026-09-26
+status: independent-memory-slice-verified-isolated
+date: 2026-09-27
+source_validation_commit: 62fe977
 workflow: gsd-execute-phase
 corrects: [04-03, 04-04]
 affects: [04-13]
@@ -165,6 +166,15 @@ Final resumption regression, after `3743d35` and `2a00572`:
 passed **478 tests, with one existing skip**, in **299.52 seconds**. The bounded
 reviewer recheck in `cdd82b4` confirms all four correction-slice findings resolved.
 This does not replace the remaining complete-phase scientific and quality gates.
+
+Subsequent independent continuation validation on `62fe977` passed **532 tests,
+with one existing skip**, in **547.39 seconds**. The local prior keyword is now
+passed only to an actual memory controller's schedule, preserving the legacy
+Hsu public and retained-pilot round trips. Public admission tests explicitly
+cover supported local min-sum and rejection of a non-Relay leg lifecycle.
+See `04-IMPLEMENTATION-CONTINUATION-REVIEW.md` for the bounded trace/replay and
+cache corrections. Unsupported entries below remain gaps; this is not phase
+completion or performance evidence.
 
 ## Remaining Phase 4 work
 
