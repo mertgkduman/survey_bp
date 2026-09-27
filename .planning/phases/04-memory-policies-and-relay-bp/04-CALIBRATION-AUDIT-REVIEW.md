@@ -2,17 +2,23 @@
 phase: 04-memory-policies-and-relay-bp
 reviewed_commit: 6747e90bf02a1072e17a6c106bc2cc3ab937d1a8
 reviewed: 2026-09-27T18:45:25Z
+rechecked: 2026-09-27T18:50:19Z
+correction_commit: a44f270
 scope: surface_integrity_only
 files_reviewed:
   - scripts/verify_phase4_calibration.py
   - tests/canonical/test_phase4_calibration_verification.py
 producer_compared: scripts/run_phase4_pilots.py
-status: issues_found
+status: findings_resolved_after_bounded_recheck
 findings:
+  critical: 0
+  warning: 0
+  info: 0
+  total: 0
+resolved_findings:
   critical: 3
   warning: 0
   info: 0
-  total: 3
 ---
 
 # Phase 04 calibration surface audit review
@@ -106,3 +112,25 @@ that is successfully reconciled on the next invocation, then require
 - A read-only synthetic identity substitution demonstrated CR-01; an isolated
   temporary cap fixture demonstrated CR-02. No production calibration receipt,
   event ledger, partial outcome, selection, or evaluation artifact was read.
+
+## Bounded correction recheck
+
+All three reported findings are resolved by correction commit `a44f270`.
+This is a correction-only recheck, not a Phase 04 verdict.
+
+- **CR-01 resolved:** `audit_surface()` now reconstructs the sample identity
+  from the frozen calibration namespace and `shot_id`, matching the public
+  sampler's documented hash. The added regressions reject both reused
+  cross-shot identities and evaluation-namespace substitutions while retaining
+  the separate ledger-replay boundary.
+- **CR-02 resolved:** `run_calibration()` preserves a terminal result after
+  checking its exact plan, cap bytes, amendment, and self-digest. For a running
+  resume, retained cap placeholders also seed the terminal-status calculation.
+  The new twice-invoked capped fixture preserves `cap_reached` and passes the
+  surface audit both times.
+- **CR-03 resolved:** Reconciliation now adjusts retained wall accounting by
+  `new_charge - prior_charge`, so the allocation remains equal to the charges
+  reconstructed from retained attempts.
+
+The focused calibration audit suite passed: **21 passed**. No source was
+modified by this recheck, and no live calibration result or ledger was read.

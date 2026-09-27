@@ -27,12 +27,13 @@ Layered, check-node serial and variable-node serial execution also admit PDBP,
 PD-prime, posterior momentum and V2C damping at atomic local boundaries, with
 separate histories for repeated compatible bindings. PD-prime uses the actual
 complete C2V operand; clipping cannot be undone by subtracting beliefs. Local
-uniform affine-prior bindings stage once per source traversal, hold that prior
+uniform and disordered affine-prior bindings stage once per source traversal, hold that prior
 through local units, and advance posterior history only after a complete
 traversal. An incomplete traversal keeps its committed local work and discards
-uncommitted affine history. Disordered local affine assignment, other local
-schedules and retained histories across additional lifetimes remain explicit
-gaps. PD-prime must precede other field bindings.
+uncommitted affine history and assignment evidence. Disordered assignments use
+decoder-local PCG64 streams bound to the shot and source iteration; tracing
+does not change the draws. Other local schedules and retained histories across
+additional lifetimes remain explicit gaps. PD-prime must precede other field bindings.
 These three deterministic local schedules support sum-product and the declared
 min-sum, normalized min-sum and offset min-sum profiles. Replay uses the same
 profile and source-iteration parameter assignment as execution.
@@ -66,11 +67,23 @@ configuration/shot/work/runtime limits and disjoint stage sample namespaces.
 2. From verified terminal calibration, freeze deterministic per-preset and
    shared candidate settings. Apply the prespecified interval/work/lexicographic
    tie rules; an insufficient-precision candidate remains inconclusive.
+   In the isolated continuation, `scripts/verify_phase4_calibration.py` checks
+   the complete planned configuration/shot population, deterministic physical
+   sample identities, work caps and reconstructed aggregates/accounting before
+   either legacy selection freezing or shared-view preparation. Its
+   `surface_integrity_only` result supplements the separate public verification
+   of every retained canonical terminal; it does not replay ledgers itself.
 3. Use `scripts/run_phase4_evaluation.py --prepare`, then its `--run` and
    `--run-native` modes for fresh, matched observations under frozen caps. The
    current V4 evaluation cap admits baseline plus two selected-preset arms.
    Fresh shared-settings evaluation requires a versioned presampling cap
    amendment; a retained shared candidate is not an evaluated arm.
+   The isolated `build_shared_evaluation_supplement(...)` API prepares a
+   separately identified finite contract for source/canonical kernels using
+   the same shared memory setting and matched evaluation namespace.
+   `build_shared_manifest(...)` permits manifest validation only. Neither API
+   publishes an amendment, reserves scheduler entitlement, or starts samples;
+   its explicit supplemental wall ceiling is preparation, not funded compute.
 4. Run the focused factorial only after its required predecessor evidence and
    versioned execution supplement are verified. Preserve all 14 arms, three
    regions and three codes; use the frozen per-code shot/work limits.
