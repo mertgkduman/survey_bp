@@ -139,3 +139,24 @@ def test_active_benchmark_rejects_duplicate_shots_before_accepting_arm_aggregate
     }
     with pytest.raises(ValueError, match="exactly once"):
         campaign._verify_active_benchmark(tmp_path, report)
+
+
+def test_inventory_proof_cache_reuses_current_ledger_once_and_rejects_changed_bytes(tmp_path, monkeypatch):
+    campaign = _module()
+    ledger = tmp_path / "events.jsonl"
+    ledger.write_text("first", encoding="utf-8")
+    calls = []
+    import bp_registry.ledger as ledger_module
+
+    def read_once(path):
+        calls.append(Path(path).read_bytes())
+        return [{"run_id": "run", "shot_id": 0}, {"run_id": "run", "shot_id": 1}]
+
+    monkeypatch.setattr(ledger_module, "read_canonical_events", read_once)
+    cache = campaign._InventoryProofCache()
+    first_key, first = cache.events(ledger)
+    second_key, second = cache.events(ledger)
+    assert first_key == second_key and first is second and calls == [b"first"]
+    ledger.write_text("changed", encoding="utf-8")
+    changed_key, changed = cache.events(ledger)
+    assert changed_key != first_key and changed == first and calls == [b"first", b"changed"]

@@ -20,6 +20,29 @@ STAGES = ("baseline", "benchmark", "calibration", "selected_settings", "evaluati
 POST_SELECTION = frozenset({"evaluation", "factorial", "native", "traces"})
 
 
+class _InventoryProofCache:
+    """One inventory call's immutable evidence cache; never shared globally."""
+    def __init__(self) -> None:
+        self.ledgers: dict[tuple[Path, str], list[Mapping[str, Any]]] = {}
+        self.contexts: dict[tuple[Path, str, int], Any] = {}
+
+    def events(self, path: Path) -> tuple[tuple[Path, str], list[Mapping[str, Any]]]:
+        from bp_registry.ledger import read_canonical_events
+        resolved, digest = path.resolve(), _byte_sha(path)
+        key = (resolved, digest)
+        if key not in self.ledgers:
+            self.ledgers[key] = read_canonical_events(resolved)
+        return key, self.ledgers[key]
+
+    def context(self, manifest_path: Path, shot_id: int):
+        from bp_registry.runner import canonical_public_shot_context
+        resolved, digest = manifest_path.resolve(), _byte_sha(manifest_path)
+        key = (resolved, digest, shot_id)
+        if key not in self.contexts:
+            self.contexts[key] = canonical_public_shot_context(resolved, shot_id=shot_id)
+        return self.contexts[key]
+
+
 def _json_digest(value: object) -> str:
     return sha256(json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True,
                              allow_nan=False).encode()).hexdigest()
@@ -130,9 +153,10 @@ def _benchmark_rows(report: Mapping[str, Any]) -> list[dict[str, object]]:
     return rows
 
 
-def _verify_active_benchmark(root: Path, report: Mapping[str, Any]) -> None:
+def _verify_active_benchmark(root: Path, report: Mapping[str, Any], *, cache: _InventoryProofCache | None = None) -> None:
     """Reconstruct every retained active-V4 public arm from its own journal."""
     active = import_module("run_phase4_active_benchmark")
+    cache = _InventoryProofCache() if cache is None else cache
     artifact_root = root / str(report.get("artifact_root", ""))
     _relative(root, artifact_root)
     if not artifact_root.is_dir():
@@ -175,7 +199,7 @@ def _verify_active_benchmark(root: Path, report: Mapping[str, Any]) -> None:
                     for attempt in attempts:
                         if not isinstance(attempt, Mapping) or attempt.get("status") != "completed":
                             raise ValueError("active benchmark completed arm retains incomplete shot")
-                        verified = _verify_relay_shot(manifest, run, shot_id=int(attempt["shot_id"]), expected_row=attempt)
+                        verified = _verify_relay_shot(manifest, run, shot_id=int(attempt["shot_id"]), expected_row=attempt, cache=cache)
                         facts = attempt.get("active_memory_facts")
                         if not isinstance(facts, list) or not facts:
                             raise ValueError("active benchmark shot omits typed active-memory facts")
@@ -183,7 +207,8 @@ def _verify_active_benchmark(root: Path, report: Mapping[str, Any]) -> None:
                                or fact.get("assessment_status") != "not_assessed" or fact.get("code_id") != code_id
                                for fact in facts):
                             raise ValueError("active benchmark active-memory facts drift from canonical contract")
-                        ledger_facts = active._attempt_from_events(active._events(run), int(attempt["shot_id"]))
+                        _ledger_key, ledger_events = cache.events(run / "events.jsonl")
+                        ledger_facts = active._attempt_from_events(ledger_events, int(attempt["shot_id"]))
                         if facts != ledger_facts["active_memory_facts"] or not active._active_memory_proven(ledger_facts):
                             raise ValueError("active benchmark facts differ from retained terminal ledger")
                         if verified["work"] != attempt.get("work_vector"):
@@ -238,18 +263,18 @@ def _caps(root: Path, pilots) -> tuple[Path, dict[str, Any]]:
 
 
 def _verify_relay_shot(manifest_path: Path, run_dir: Path, *, shot_id: int, expected_row: Mapping[str, Any] | None = None,
-                       require_semantic: bool = False) -> dict[str, object]:
+                       require_semantic: bool = False, cache: _InventoryProofCache | None = None) -> dict[str, object]:
     """Purely reconstruct one retained public V4 Relay terminal and bind it to its manifest."""
-    from bp_registry.ledger import read_canonical_events
-    from bp_registry.runner import canonical_public_shot_context
-    from bp_registry.canonical.verification import validate_canonical_shot, validate_phase4_shot
-    context = canonical_public_shot_context(manifest_path, shot_id=shot_id)
-    stream = [event for event in read_canonical_events(run_dir / "events.jsonl") if event.get("run_id") == context.run_id and event.get("shot_id") == shot_id]
+    from bp_registry.canonical.verification import reconstruct_phase4_shot, validate_canonical_shot
+    cache = _InventoryProofCache() if cache is None else cache
+    context = cache.context(manifest_path, shot_id)
+    _ledger_key, events = cache.events(run_dir / "events.jsonl")
+    stream = [event for event in events if event.get("run_id") == context.run_id and event.get("shot_id") == shot_id]
     if context.compact_manifest.get("schema_version") == 5:
         terminal = validate_canonical_shot(stream, context, trace_root=run_dir)
         verified = {"terminal": terminal, "work": terminal.get("data", {}).get("work_vector"), "traces": []}
     else:
-        verified = validate_phase4_shot(run_dir / "events.jsonl", run_id=context.run_id, shot_id=shot_id, trace_root=run_dir)
+        verified = reconstruct_phase4_shot(events, run_id=context.run_id, shot_id=shot_id, trace_root=run_dir)
         terminal = verified["terminal"]
     begin = stream[0]
     data = terminal["data"]
@@ -278,8 +303,9 @@ def _verify_relay_shot(manifest_path: Path, run_dir: Path, *, shot_id: int, expe
             "trace_count": len(verified["traces"]), "semantic": semantic}
 
 
-def _benchmark(root: Path) -> dict[str, object]:
+def _benchmark(root: Path, *, cache: _InventoryProofCache | None = None) -> dict[str, object]:
     _evaluation, _factorial, pilots, _runtime = _runners()
+    cache = _InventoryProofCache() if cache is None else cache
     try:
         caps_path, caps = _caps(root, pilots)
         cited = caps["benchmark_evidence"]["active_v4"]
@@ -294,7 +320,7 @@ def _benchmark(root: Path) -> dict[str, object]:
             raise ValueError("active benchmark is nonterminal or omits code records")
         if any(not isinstance(item, Mapping) or not isinstance(item.get("selected_rate"), (int, float)) or not isinstance(item.get("selection_status"), str) for item in codes.values()):
             raise ValueError("active benchmark code record omits selected-rate status")
-        _verify_active_benchmark(root, report)
+        _verify_active_benchmark(root, report, cache=cache)
         return _snapshot("benchmark", report_path, report, qualified=True, reason=None,
                          tables=[_table("benchmark", _benchmark_rows(report))])
     except (KeyError, OSError, ValueError) as error:
@@ -337,7 +363,7 @@ def _calibration_or_selection(root: Path, stage: str) -> dict[str, object]:
         return _snapshot(stage, path, payload, qualified=False, reason=str(error), tables=[_table(stage, rows)])
 
 
-def _evaluation(root: Path) -> dict[str, object]:
+def _evaluation(root: Path, *, cache: _InventoryProofCache) -> dict[str, object]:
     path = root / "data/results/phase4-memory-relay/evaluation/result.json"
     if not path.is_file(): return _missing("evaluation", path)
     payload = _read(path)
@@ -374,7 +400,7 @@ def _evaluation(root: Path) -> dict[str, object]:
             for row in rows:
                 if not isinstance(row, Mapping) or row.get("status") != "completed":
                     raise ValueError("completed evaluation result retains incomplete shot")
-                _verify_relay_shot(manifest, run, shot_id=int(row["shot_id"]), expected_row=row, require_semantic=True)
+                _verify_relay_shot(manifest, run, shot_id=int(row["shot_id"]), expected_row=row, require_semantic=True, cache=cache)
             if runner.summarize_rows(rows, planned=int(cell["shots"])) != arm.get("summary"):
                 raise ValueError("evaluation summary differs from verified attempts")
         if payload.get("evaluation_category_wall_seconds_used") != runner.retained_category_wall(path.parent):
@@ -389,12 +415,12 @@ def _evaluation(root: Path) -> dict[str, object]:
         return _snapshot("evaluation", path, payload, qualified=False, reason=str(error), tables=[_table("evaluation", _failure_rows("evaluation", payload))])
 
 
-def _factorial(root: Path) -> dict[str, object]:
+def _factorial(root: Path, *, cache: _InventoryProofCache) -> dict[str, object]:
     path = root / "data/results/phase4-memory-relay/factorial/result.json"
     if not path.is_file(): return _missing("factorial", path)
     payload = _read(path)
     try:
-        predecessor = _evaluation(root)
+        predecessor = _evaluation(root, cache=cache)
         if predecessor.get("execution_qualified") is not True:
             raise ValueError("factorial predecessor lacks full evaluation terminal proof")
         _evaluation_runner, factorial, pilots, _runtime = _runners()
@@ -424,7 +450,7 @@ def _factorial(root: Path) -> dict[str, object]:
             if _read(manifest) != factorial.build_public_manifest(repository_root=root, cell=cell, plan=plan):
                 raise ValueError("factorial manifest differs from frozen cell plan")
             verified = _verify_relay_shot(manifest, run, shot_id=int(cell["shot_id"]),
-                                          expected_row={**row, "work_vector": row.get("raw_work")}, require_semantic=True)
+                                          expected_row={**row, "work_vector": row.get("raw_work")}, require_semantic=True, cache=cache)
             if verified["sample_identity"] != row.get("sample_identity"):
                 raise ValueError("factorial terminal sample identity differs from verified ledger")
         if payload.get("aggregate") != factorial.aggregate_terminals(rows, plan):
@@ -464,7 +490,7 @@ def _historical_native(root: Path) -> dict[str, object]:
         return _snapshot("historical_author_agreement", path, payload, qualified=False, reason=str(error), tables=[])
 
 
-def _native(root: Path) -> dict[str, object]:
+def _native(root: Path, *, cache: _InventoryProofCache) -> dict[str, object]:
     path = root / "data/results/phase4-memory-relay/evaluation/native-pairs/result.json"
     if not path.is_file(): return _missing("native", path)
     payload = _read(path)
@@ -498,7 +524,7 @@ def _native(root: Path) -> dict[str, object]:
             for canonical in canonical_rows:
                 if canonical.get("status") != "completed":
                     raise ValueError("completed native result retains incomplete canonical pair")
-                _verify_relay_shot(manifest, canonical_root / "run", shot_id=int(canonical["shot_id"]), expected_row=canonical, require_semantic=True)
+                _verify_relay_shot(manifest, canonical_root / "run", shot_id=int(canonical["shot_id"]), expected_row=canonical, require_semantic=True, cache=cache)
             if len(saved) != int(cell["shots"]) or len({row.get("shot_id") for row in saved}) != len(saved) or {row.get("shot_id") for row in saved} != set(range(int(cell["shots"]))):
                 raise ValueError("native journal does not cover every planned shot")
             pairs = []
@@ -579,13 +605,14 @@ def build_campaign_snapshots(root: Path = ROOT, *, campaign_root: Path | None = 
     if not (campaign_root / "data").is_dir() or not (campaign_root / "scripts").is_dir():
         raise ValueError("campaign root must contain retained repository data and scripts")
     root = campaign_root; relay = root / "data/results/phase4-memory-relay"
-    benchmark = _benchmark(root)
+    cache = _InventoryProofCache()
+    benchmark = _benchmark(root, cache=cache)
     baseline = {**benchmark, "stage": "baseline", "execution_qualified": False,
                 "reason": "baseline view is retained active-benchmark diagnostic evidence, not a fresh selected stage"}
-    factorial = _factorial(root)
+    factorial = _factorial(root, cache=cache)
     artifacts = {"baseline": baseline, "benchmark": benchmark,
                  "calibration": _calibration_or_selection(root, "calibration"), "selected_settings": _calibration_or_selection(root, "selected_settings"),
-                 "evaluation": _evaluation(root), "factorial": factorial, "native": _native(root),
+                 "evaluation": _evaluation(root, cache=cache), "factorial": factorial, "native": _native(root, cache=cache),
                  "traces": _traces(root, factorial), "historical_author_agreement": _historical_native(root)}
     return {"schema_version": 1, "mode": "read_only_campaign_inventory", "campaign_root": str(campaign_root), "assessment": "not_assessed", "artifacts": artifacts,
             "tables": [table for item in artifacts.values() for table in item.get("tables", [])],
