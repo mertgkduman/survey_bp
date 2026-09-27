@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 import pytest
 
@@ -185,3 +187,93 @@ def test_public_trace_rejects_rehashed_nonsemantic_memory_sidecars(tmp_path, mut
         validate_canonical_shot(
             altered, canonical_public_shot_context(manifest, shot_id=0), trace_root=output,
         )
+
+
+def test_numerical_failure_trace_replays_its_committed_prefix_and_rejects_rehash(tmp_path, monkeypatch):
+    """A failed second memory sweep has a semantic, bounded first-sweep trace."""
+    import copy
+    import hashlib
+    import json
+
+    from bp_registry.canonical.memory_execution import MemoryFloodingSchedule
+    from bp_registry.canonical.numerics import NumericalFailure
+    from bp_registry.canonical.verification import CanonicalStructuralVerificationError, validate_canonical_shot
+    from bp_registry.cli import run_canonical, verify_run
+    from bp_registry.ledger import read_canonical_events
+    from bp_registry.runner import canonical_public_shot_context
+
+    value = json.loads((Path(__file__).resolve().parents[2] / "data/manifests/canonical-three-qubit-development.json").read_text())
+    value.update({
+        "schema_version": 4, "run_id": "trace-numerical-prefix", "memory": {"bindings": [{
+            "binding_id": "memory", "kind": "posterior_momentum", "target": "posterior",
+            "parameters": {"alpha": 0.1, "gamma": 0.9}, "order": 0,
+            "history_owner": "trace:memory", "state_lifetime": "attempt",
+            "advance_boundary": "source_iteration", "refresh_boundary": "attempt_start",
+            "source_status": "canonical_adaptation", "retain_history": False,
+        }]},
+    })
+    value["randomness"]["physical_sample_identity"] = "trace-numerical-prefix-sample"
+    value["budgets"]["max_shots"] = 1
+    for scope in ("shot", "search", "attempt"):
+        value["budgets"][scope]["max_iterations"] = 3
+    value["trace_plan"] = {
+        "level": "full", "relative_dir": "trace-sidecars", "max_records": 16,
+        "max_bytes": 16_384, "label": "prespecified_campaign",
+    }
+    manifest = tmp_path / "trace-numerical-prefix.json"
+    manifest.write_text(json.dumps(value), encoding="utf-8")
+    original = MemoryFloodingSchedule.sweep
+
+    def fail_second(self, *args, **kwargs):
+        if kwargs.get("source_iteration") == 1:
+            raise NumericalFailure("trace-prefix-injected")
+        return original(self, *args, **kwargs)
+
+    monkeypatch.setattr(MemoryFloodingSchedule, "sweep", fail_second)
+    output = tmp_path / "output"
+    assert run_canonical(manifest, output)["final_row_count"] == 1
+    assert verify_run(output)["final_row_count"] == 1
+    events = read_canonical_events(output / "events.jsonl")
+    trace = next(event for event in events if event["kind"] == "trace_link")
+    document = TraceSink.load(output, trace["sidecar"]["path"], expected_sha256=trace["sidecar"]["sha256"])
+    altered_document = copy.deepcopy(document)
+    altered_document["records"][0]["payload"]["history_sha256"]["memory"] = "0" * 64
+    encoded = json.dumps(altered_document, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    relative = "trace-sidecars/rehashed-numerical-prefix.json"
+    (output / relative).write_bytes(encoded)
+    altered = copy.deepcopy(events)
+    altered_trace = next(event for event in altered if event["kind"] == "trace_link")
+    altered_trace["sidecar"] = {
+        **altered_trace["sidecar"], "path": relative, "sha256": hashlib.sha256(encoded).hexdigest(),
+        "records": len(altered_document["records"]), "bytes": len(encoded),
+    }
+    with pytest.raises(CanonicalStructuralVerificationError, match="trace differs"):
+        validate_canonical_shot(
+            altered, canonical_public_shot_context(manifest, shot_id=0), trace_root=output,
+        )
+
+
+def test_trace_sidecar_finalization_failure_is_observational(tmp_path, monkeypatch):
+    """A trace write failure retains the same completed decoder evidence."""
+    from bp_registry.canonical.memory_execution import MemoryFloodingSchedule
+    from bp_registry.cli import run_canonical, verify_run
+    from bp_registry.ledger import read_canonical_events
+
+    off = _public_disordered_manifest(tmp_path, trace=False)
+    on = _public_disordered_manifest(tmp_path, trace=True)
+    off_output, on_output = tmp_path / "off", tmp_path / "on"
+    assert run_canonical(off, off_output)["final_row_count"] == 2
+
+    def unavailable(_self):
+        raise OSError("injected sidecar filesystem failure")
+
+    monkeypatch.setattr(MemoryFloodingSchedule, "trace_result", unavailable)
+    assert run_canonical(on, on_output)["final_row_count"] == 2
+    assert verify_run(on_output)["final_row_count"] == 2
+    off_terminals = [event["data"] for event in read_canonical_events(off_output / "events.jsonl") if event["kind"] == "termination"]
+    on_events = read_canonical_events(on_output / "events.jsonl")
+    on_terminals = [event["data"] for event in on_events if event["kind"] == "termination"]
+    assert [item["memory_execution"] for item in on_terminals] == [item["memory_execution"] for item in off_terminals]
+    links = [event for event in on_events if event["kind"] == "trace_link"]
+    assert len(links) == 2
+    assert all(event["data"]["status"] == "unavailable" and event["data"]["reason"] == "sidecar_finalization_unavailable:OSError" for event in links)

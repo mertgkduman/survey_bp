@@ -868,26 +868,32 @@ def run_canonical_structural_shot(
                     schedule = memory_schedule if memory_schedule is not None else local_memory
                     reason = "attempt_not_admitted" if schedule is None else "no_committed_decoder_state"
                     if schedule is not None:
-                        candidate = data.get("candidate", data.get("diagnostic_candidate"))
-                        if candidate is not None:
-                            schedule.observe_candidate(
-                                origin={
-                                    "termination": termination,
-                                    "selection_status": data.get("selection_status"),
-                                    "candidate_lineage_id": data.get("candidate_lineage_id"),
-                                },
-                                candidate=np.asarray(candidate, dtype=np.uint8),
-                            )
-                        result = schedule.trace_result()
-                        assert result is not None
-                        link = result.ledger_link()
-                        if link is not None:
-                            ledger.event(
-                                run_id=parsed.run_id, shot_id=shot_id, kind="trace_link",
-                                data={**common, "trace_kind": "ordinary_memory", "status": "linked"}, sidecar=link,
-                            )
-                            trace_link_emitted = True
-                            return
+                        try:
+                            candidate = data.get("candidate", data.get("diagnostic_candidate"))
+                            if candidate is not None:
+                                schedule.observe_candidate(
+                                    origin={
+                                        "termination": termination,
+                                        "selection_status": data.get("selection_status"),
+                                        "candidate_lineage_id": data.get("candidate_lineage_id"),
+                                    },
+                                    candidate=np.asarray(candidate, dtype=np.uint8),
+                                )
+                            result = schedule.trace_result()
+                            assert result is not None
+                            link = result.ledger_link()
+                            if link is not None:
+                                ledger.event(
+                                    run_id=parsed.run_id, shot_id=shot_id, kind="trace_link",
+                                    data={**common, "trace_kind": "ordinary_memory", "status": "linked"}, sidecar=link,
+                                )
+                                trace_link_emitted = True
+                                return
+                        except (OSError, ValueError) as error:
+                            # Sidecar I/O is observational.  A bounded trace
+                            # failure must not erase already committed decoder
+                            # work or turn trace configuration into a control.
+                            reason = f"sidecar_finalization_unavailable:{type(error).__name__}"
                     ledger.event(
                         run_id=parsed.run_id, shot_id=shot_id, kind="trace_link",
                         data={**common, "trace_kind": "ordinary_memory", "status": "unavailable", "reason": reason},

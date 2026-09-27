@@ -149,6 +149,13 @@ approved `.venv/bin/python`, from the isolated checkout.
    hash-valid empty, altered-belief/history, or altered-candidate sidecars are
    rejected, while V3 local numerical terminals reconstruct their empty local
    schedule prefix.
+9. The ordinary local replay reconstructs the declared SPA/min-sum update
+   kernel and parameter assignment rather than assuming SPA. Numerical-failure
+   traces replay their committed V5 prefix before accepting a sidecar; V3 local
+   failures derive their retained local-unit count from the typed schedule
+   terminal. Trace sidecar finalization failures emit typed unavailable
+   evidence after decoder work, so observation never changes terminal decoder
+   state.
 
 These are implementation fixtures, not statistical performance evidence.
 No calibration, evaluation, factorial or publication sample budget was used.

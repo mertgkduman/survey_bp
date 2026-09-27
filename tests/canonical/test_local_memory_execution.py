@@ -197,6 +197,30 @@ def test_public_layered_memory_preflights_runs_and_replays(tmp_path):
     assert terminal["memory_execution"]["committed_local_updates"] == terminal["iterations"]
 
 
+def test_public_local_memory_replays_the_declared_min_sum_kernel(tmp_path):
+    """V5 local replay must not silently substitute the SPA default kernel."""
+    from bp_registry.cli import run_canonical, verify_run
+
+    root = Path(__file__).resolve().parents[2]
+    manifest = json.loads((root / "data/manifests/canonical-three-qubit-development.json").read_text())
+    manifest.update({
+        "schema_version": 4, "run_id": "canonical-layered-local-memory-min-sum",
+        "numerical_profile": "cpu-float64-min-sum-v1",
+    })
+    manifest["policies"]["update"]["kind"] = "min_sum"
+    manifest["policies"]["schedule"] = {
+        "kind": "layered", "binding_id": "schedule-layered-min-sum-v1",
+        "state_lifetime": "iteration", "owned_state": [], "requires": [], "provides": [],
+        "partitions": [[0]], "provenance": "explicit",
+    }
+    manifest["memory"] = _composition("pdbp_field_mix", "v2c_damping").model_dump(mode="json")
+    path = tmp_path / "local-memory-min-sum.json"
+    path.write_text(json.dumps(manifest), encoding="utf-8")
+    output = tmp_path / "output"
+    assert run_canonical(path, output)["final_row_count"] == 2
+    assert verify_run(output)["final_row_count"] == 2
+
+
 @pytest.mark.parametrize("schedule_kind", ["layered", "check_node_serial", "variable_node_serial"])
 def test_public_local_pdprime_and_momentum_replay_for_each_exact_schedule(tmp_path, schedule_kind):
     from bp_registry.cli import run_canonical, verify_run
@@ -365,3 +389,43 @@ def test_public_v3_local_numerical_failure_replays_its_empty_schedule_prefix(tmp
     output = tmp_path / "output"
     assert run_canonical(path, output)["final_row_count"] == 2
     assert verify_run(output)["final_row_count"] == 2
+
+
+def test_public_v3_local_numerical_failure_replays_an_admitted_prefix(tmp_path, monkeypatch):
+    """A failure in the second unit retains and verifies the first local commit."""
+    from dataclasses import replace
+    from bp_registry.canonical.numerics import NumericalFailure
+    from bp_registry.canonical.schedules import LayeredSchedule
+    from bp_registry.cli import run_canonical, verify_run
+    from bp_registry.ledger import read_canonical_events
+
+    root = Path(__file__).resolve().parents[2]
+    manifest = json.loads((root / "data/manifests/canonical-three-qubit-development.json").read_text())
+    manifest.update({"schema_version": 3, "run_id": "canonical-v3-local-numerical-prefix"})
+    manifest["policies"]["schedule"] = {
+        "kind": "layered", "binding_id": "schedule-layered-v3-numerical-prefix-v1",
+        "state_lifetime": "iteration", "owned_state": [], "requires": [], "provides": [],
+        "partitions": [[0]], "provenance": "explicit",
+    }
+    path = tmp_path / "v3-local-numerical-prefix.json"
+    path.write_text(json.dumps(manifest), encoding="utf-8")
+    original = LayeredSchedule.execute_local_step
+    calls = 0
+
+    def fail_after_first(self, *args, **kwargs):
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            raise NumericalFailure("v3-local-after-first-commit")
+        # Keep the actual first commit but make its candidate unavailable so
+        # the execution reaches the next local unit before the injected fault.
+        return replace(original(self, *args, **kwargs), candidate=None)
+
+    monkeypatch.setattr(LayeredSchedule, "execute_local_step", fail_after_first)
+    output = tmp_path / "output"
+    assert run_canonical(path, output)["final_row_count"] == 2
+    assert verify_run(output)["final_row_count"] == 2
+    events = read_canonical_events(output / "events.jsonl")
+    failed_shot = next(event["shot_id"] for event in events if event["kind"] == "termination" and event["termination"] == "numerical_failure")
+    work = next(event["data"] for event in events if event["kind"] == "work" and event["shot_id"] == failed_shot)
+    assert work["qualified_iterations"]["count"] == 1

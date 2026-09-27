@@ -465,6 +465,37 @@ def _budget_denial(limits: Mapping[str, Mapping[str, int]], work: WorkVector, de
     return None
 
 
+def _expected_kernel(context: PublicShotContext, table: EdgeTable) -> BinarySpaKernel:
+    """Reconstruct the declared update/profile kernel for any public schedule."""
+    if context.update_kind == "min_sum":
+        return BinarySpaKernel(profile=MIN_SUM_CPU_F64, update_rule=MinSumUpdate())
+    if context.update_kind in {"normalized_min_sum", "offset_min_sum"}:
+        update = context.compact_manifest.get("policies", {}).get("update", {})
+        declared = update.get("parameter_assignment")
+        assignment = ParameterAssignment.model_validate(declared) if declared is not None else resolve_generated_configuration_assignment(
+            dict(update), dict(context.compact_manifest), graph_sha256=table.graph_sha256,
+            check_count=table.check_count, edge_count=table.edge_count,
+        )[0]
+        resolved = assignment.resolve(
+            graph_sha256=table.graph_sha256, check_count=table.check_count, edge_count=table.edge_count,
+            source_iteration=0, edge_checks=tuple(check for check, _variable in table.edges),
+        )
+        if context.update_kind == "normalized_min_sum":
+            rule = NormalizedMinSumUpdate(
+                assignment,
+                resolved_alpha=None if assignment.shape == "source_iteration" else tuple(float(value) for value in resolved),
+            )
+        else:
+            rule = OffsetMinSumUpdate(
+                assignment,
+                resolved_beta=None if assignment.shape == "source_iteration" else tuple(float(value) for value in resolved),
+            )
+        return BinarySpaKernel(profile=MIN_SUM_CPU_F64, update_rule=rule)
+    if context.update_kind == "binary_spa":
+        return BinarySpaKernel()
+    raise CanonicalStructuralVerificationError(f"unsupported public update rule {context.update_kind!r}")
+
+
 def _expected_local_attempt(
     context: PublicShotContext, *, trace_sink: TraceSink | None = None,
     trace_context: Mapping[str, str] | None = None,
@@ -482,7 +513,7 @@ def _expected_local_attempt(
         raise CanonicalStructuralVerificationError("layered local public context lacks explicit partition evidence")
     code = context.code.validate()
     table = EdgeTable.from_check_matrix(code.hz)
-    kernel = BinarySpaKernel()
+    kernel = _expected_kernel(context, table)
     is_memory = context.compact_manifest.get("schema_version") == 5
     if schedule_kind in {"layered", "randomized"}:
         schedule = LayeredSchedule(table, kernel=kernel, partitions=partitions, provenance=provenance, construction_rule=schedule_data.get("construction_rule"))
@@ -650,48 +681,7 @@ def _expected_attempt(
         return {"termination": "count_budget_exhausted", "work_vector": zero.as_evidence(structural_event_version=2), "iterations": 0, "budget_termination": denial, "admitted": False}
     work = bp_call
     table = EdgeTable.from_check_matrix(code.hz)
-    if context.update_kind == "min_sum":
-        kernel = BinarySpaKernel(profile=MIN_SUM_CPU_F64, update_rule=MinSumUpdate())
-    elif context.update_kind == "normalized_min_sum":
-        update = context.compact_manifest.get("policies", {}).get("update", {})
-        declared = update.get("parameter_assignment")
-        assignment = ParameterAssignment.model_validate(declared) if declared is not None else resolve_generated_configuration_assignment(
-            dict(update), dict(context.compact_manifest), graph_sha256=table.graph_sha256,
-            check_count=table.check_count, edge_count=table.edge_count,
-        )[0]
-        resolved = assignment.resolve(
-            graph_sha256=table.graph_sha256, check_count=table.check_count, edge_count=table.edge_count,
-            source_iteration=0, edge_checks=tuple(check for check, _variable in table.edges),
-        )
-        kernel = BinarySpaKernel(
-            profile=MIN_SUM_CPU_F64,
-            update_rule=NormalizedMinSumUpdate(
-                assignment,
-                resolved_alpha=None if assignment.shape == "source_iteration" else tuple(float(value) for value in resolved),
-            ),
-        )
-    elif context.update_kind == "offset_min_sum":
-        update = context.compact_manifest.get("policies", {}).get("update", {})
-        declared = update.get("parameter_assignment")
-        assignment = ParameterAssignment.model_validate(declared) if declared is not None else resolve_generated_configuration_assignment(
-            dict(update), dict(context.compact_manifest), graph_sha256=table.graph_sha256,
-            check_count=table.check_count, edge_count=table.edge_count,
-        )[0]
-        resolved = assignment.resolve(
-            graph_sha256=table.graph_sha256, check_count=table.check_count, edge_count=table.edge_count,
-            source_iteration=0, edge_checks=tuple(check for check, _variable in table.edges),
-        )
-        kernel = BinarySpaKernel(
-            profile=MIN_SUM_CPU_F64,
-            update_rule=OffsetMinSumUpdate(
-                assignment,
-                resolved_beta=None if assignment.shape == "source_iteration" else tuple(float(value) for value in resolved),
-            ),
-        )
-    elif context.update_kind == "binary_spa":
-        kernel = BinarySpaKernel()
-    else:
-        raise CanonicalStructuralVerificationError(f"unsupported public update rule {context.update_kind!r}")
+    kernel = _expected_kernel(context, table)
     is_memory = context.compact_manifest.get("schema_version") == 5
     if is_memory:
         schedule = MemoryFloodingSchedule(
@@ -900,7 +890,14 @@ def _expected_public_memory_trace(
             "run_id": context.run_id,
             "shot_id": str(context.shot_id),
         }
-        expected = _expected_attempt(context, trace_sink=sink, trace_context=trace_context)
+        replay_context = context
+        if terminal.get("termination") == "numerical_failure":
+            terminal_data = terminal.get("data", {})
+            count = terminal_data.get("iterations") if isinstance(terminal_data, Mapping) else None
+            if type(count) is not int or not 0 <= count < context.max_iterations:
+                raise CanonicalStructuralVerificationError("numerical trace lacks a valid committed memory prefix")
+            replay_context = replace(context, max_iterations=count)
+        expected = _expected_attempt(replay_context, trace_sink=sink, trace_context=trace_context)
         terminal_data = terminal.get("data", {})
         candidate = terminal_data.get("candidate", terminal_data.get("diagnostic_candidate"))
         if candidate is not None:
@@ -920,7 +917,9 @@ def _expected_public_memory_trace(
         if result.sidecar_path is None:
             raise CanonicalStructuralVerificationError("canonical trace replay produced no observable records")
         document = TraceSink.load(root, result.sidecar_path, expected_sha256=result.sha256)
-        if expected.get("termination") != terminal.get("termination"):
+        if (expected.get("termination") != terminal.get("termination")
+                and not (terminal.get("termination") == "numerical_failure"
+                         and expected.get("termination") == "max_iterations")):
             raise CanonicalStructuralVerificationError("canonical trace replay has a different termination")
         return document
 
@@ -966,10 +965,9 @@ def _validate_public_memory_trace(
             raise CanonicalStructuralVerificationError("canonical trace has an invalid record payload")
         if payload.get("configuration_identity") != execution_context["configuration_identity"] or payload.get("decoder_identity") != execution_context["decoder_identity"]:
             raise CanonicalStructuralVerificationError("canonical trace record has the wrong decoder execution identity")
-    if terminal.get("termination") != "numerical_failure":
-        expected = _expected_public_memory_trace(context, plan, terminal)
-        if document != expected:
-            raise CanonicalStructuralVerificationError("canonical trace differs from independently replayed committed memory observations")
+    expected = _expected_public_memory_trace(context, plan, terminal)
+    if document != expected:
+        raise CanonicalStructuralVerificationError("canonical trace differs from independently replayed committed memory observations")
 
 
 def validate_canonical_shot(
@@ -1048,10 +1046,6 @@ def validate_canonical_shot(
             if prefix["termination"] != "max_iterations":
                 raise CanonicalStructuralVerificationError("numerical failure follows a reconstructed terminal prefix")
             _expect_equal("memory execution", terminal_data.get("memory_execution"), prefix["memory_execution"])
-        elif is_local:
-            prefix = _expected_attempt(replace(context, max_iterations=0))
-            if prefix.get("termination") != "max_iterations":
-                raise CanonicalStructuralVerificationError("numerical failure follows a reconstructed local terminal prefix")
         _, records = _validate_event_envelopes(stream, context, ["shot_begin", "attempt", "missingness", "work", "termination"])
         _exact_data(records["shot_begin"], common)
         attempt = _exact_data(records["attempt"], common | {"scope", "attempt_lineage_id", "max_iterations"})
@@ -1064,6 +1058,15 @@ def validate_canonical_shot(
             raise CanonicalStructuralVerificationError("numerical failure missingness evidence is invalid")
         work_data = _exact_data(records["work"], common | {"qualified_iterations", "work_vector"} | schedule_fields)
         _exact_data(terminal, common | {"numerical_failure", "selection_status", "outcome", "verification_status", "work_vector"} | runtime_fields | schedule_fields)
+        if is_local and not failed_memory:
+            qualified = work_data["qualified_iterations"]
+            if (not isinstance(qualified, Mapping) or type(qualified.get("count")) is not int
+                    or qualified["count"] < 0 or qualified["count"] >= context.max_iterations):
+                raise CanonicalStructuralVerificationError("local numerical failure has an invalid committed iteration count")
+            count = qualified["count"]
+            prefix = _expected_attempt(replace(context, max_iterations=count))
+            if prefix.get("termination") != "max_iterations":
+                raise CanonicalStructuralVerificationError("numerical failure follows a reconstructed local terminal prefix")
         data = terminal["data"]
         if not isinstance(data["numerical_failure"], str) or not data["numerical_failure"]:
             raise CanonicalStructuralVerificationError("numerical failure requires a typed diagnostic")
@@ -1083,7 +1086,7 @@ def validate_canonical_shot(
                 "group_shuffled": "one_overlapping_check_group",
             }
             expected_iteration = {
-                "count": count if failed_memory else 0,
+                "count": count,
                 "schedule": context.schedule_kind,
                 "atomic_unit": local_atomic_units[context.schedule_kind],
             }
