@@ -14,11 +14,12 @@ confined executor, identity/snapshot support and public guide are implemented.
 The source notebook and all executed cells label fixture execution as
 `development_fixture` / `not_assessed` and never start simulation.
 
-Eight focused tests cover source/sample/cap/selection identity binding,
+Nine focused tests cover source/sample/cap/selection identity binding,
 preservation of mismatched snapshots, predecessor gating before producer
 invocation, payload and source drift, missing executable source/selection,
 symlink/traversal confinement, unavailable evidence, complete sections and actual
-cleared-output fixture execution. Both fixture and availability notebooks execute
+cleared-output fixture execution, and rejection of a digest-valid index that
+files a baseline identity under evaluation. Both fixture and availability notebooks execute
 top-to-bottom with 14 code cells and 14 outputs. Availability mode retains all
 13 absent qualified stages explicitly. Analysis versions match the qualified
 primary checkout venv; the worktree executor derives this venv from git common
@@ -38,7 +39,19 @@ No notebook viewer/HTML exporter was available during this preparation, so only
 executed output structure and labels were inspected. Do not write the completion
 SUMMARY or mark Plan 04-14/Phase 4 complete from these infrastructure checks.
 
+The source notebook also validates its interpreter and pinned environment when
+executed manually, and every section exposes fixture and assessment labels.
+The focused command passed nine tests after these changes.
+
+Final stable-source validation: the complete project regression suite passed
+**478 tests, with one existing skip**, in 299.52 seconds. Both saved notebook
+artifacts were refreshed from cleared outputs; each executed all 14 code cells
+with 14 outputs and zero errors. This validates the scaffold and current source,
+not the outstanding production analysis or rendered visual inspection.
+
 The frozen V4 cap does not admit fresh shared-settings evaluation; a versioned
 presampling cap amendment is still required for that planned view. Local-memory
-schedule/lifetime coverage is a separate kernel execution gap. Both limitations
+schedule/lifetime coverage remains partial: layered/check-node/variable-node
+PDBP and damping execute; other local operands/schedules and retained lifetimes
+remain separate kernel gaps. These limitations
 remain visible in the notebook and public guide.

@@ -22,6 +22,12 @@ compatibility declarations do not establish that every schedule or lifetime has
 an implemented numerical execution path. Consult the memory-integration
 remediation record for current execution coverage and outstanding gaps.
 
+The isolated executor runs all five memory kinds at flooding boundaries.
+Layered, check-node serial and variable-node serial execution currently admit
+PDBP field mixing followed by V2C damping at atomic local boundaries. Other
+local operands/schedules and retained histories across additional lifetimes
+remain explicit gaps.
+
 The original executable reference is **trmue/relay v0.2.2**, immutable commit
 `14cb31a18f9b9d7d099791b793e35b8a2951f8f3`. Its source record, qualification and
 observer patch are in `data/evidence/relay-v0.2.2-source.json` and
@@ -84,6 +90,11 @@ missingness. A heterogeneous scalar cost or a native-iteration-to-C2V conversion
 has no automatic justification. Representative traces preserve beliefs,
 histories, assignment draws, leg transitions, candidates and public ledger links,
 with record/byte limits, truncation and native unavailability.
+
+Public trace links currently cover ordinary flooding-memory V4 execution.
+Local-memory and Relay traces remain unavailable in this preparation. Decoder
+assignment identities are supplied independently of the trace observer, so
+enabling tracing preserves the sampled coefficients and decoder semantics.
 
 ## Notebook execution and reuse
 

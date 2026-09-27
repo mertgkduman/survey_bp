@@ -126,6 +126,12 @@ approved `.venv/bin/python`, from the isolated checkout.
 These are implementation fixtures, not statistical performance evidence.
 No calibration, evaluation, factorial or publication sample budget was used.
 
+Final resumption regression, after `3743d35` and `2a00572`:
+`OMP_NUM_THREADS=1 PYTHONPATH=src /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python -m pytest -q`
+passed **478 tests, with one existing skip**, in **299.52 seconds**. The bounded
+reviewer recheck in `cdd82b4` confirms all four correction-slice findings resolved.
+This does not replace the remaining complete-phase scientific and quality gates.
+
 ## Remaining Phase 4 work
 
 - Local execution remains intentionally limited to the matrix above. Retained
@@ -138,15 +144,11 @@ No calibration, evaluation, factorial or publication sample budget was used.
   Local-memory trace records, Relay unavailable-link handling, and any
   multi-leg/lifetime controller remain separate work. These are not silently
   represented as complete traces in public preflight.
-- The frozen factorial design lists damping-before-affine and
-  momentum-before-affine interaction binding arrays. Those orders violate the
-  implemented operand dependencies. Resolve their execution semantics in a
-  versioned, outcome-independent supplement/amendment before factorial
-  sampling; preserve the frozen design/caps and document the discrepancy.
-- Factorial arm coefficients and its ledger-linking trace adapter must still
-  be selected from the frozen design/supplement before Task 2 can run. The
-  engine now provides the bounded ordinary-memory execution and observation
-  seam but does not authorize sampling.
+- The outcome-independent factorial execution supplement preserves the frozen
+  damping-before-affine and momentum-before-affine arrays while recording the
+  executable prior -> fields -> V2C order. It binds arm coefficients and the
+  existing public trace contract. Its implementation tests do not authorize
+  production sampling; terminal calibration and fresh evaluation are required.
 - Calibration must terminate and settings freeze before fresh evaluation.
   Existing evaluation-runner code is prepared; its scientific gates remain.
 - Do not mark Plan 04-13 or Phase 4 complete from this correction. Phase 5 and
