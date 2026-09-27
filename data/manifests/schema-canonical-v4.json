@@ -451,6 +451,54 @@
       "title": "CanonicalWorkLimitsV2",
       "type": "object"
     },
+    "DisorderedAffinePriorAssignmentSpec": {
+      "additionalProperties": false,
+      "description": "Public deterministic per-variable affine-prior coefficients.\n\nThe sole supported ordinary-memory disordered form is a fresh uniform\ncoefficient vector at each flooding source iteration.  Its seed identity\nis decoder-local and therefore cannot depend on physical-error truth.",
+      "properties": {
+        "high": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "High",
+          "type": "number"
+        },
+        "low": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Low",
+          "type": "number"
+        },
+        "mode": {
+          "const": "uniform",
+          "title": "Mode",
+          "type": "string"
+        },
+        "refresh_boundary": {
+          "const": "source_iteration",
+          "default": "source_iteration",
+          "title": "Refresh Boundary",
+          "type": "string"
+        },
+        "rng_algorithm": {
+          "const": "numpy.PCG64",
+          "default": "numpy.PCG64",
+          "title": "Rng Algorithm",
+          "type": "string"
+        },
+        "root_seed_identity": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Root Seed Identity",
+          "type": "string"
+        }
+      },
+      "required": [
+        "mode",
+        "low",
+        "high",
+        "root_seed_identity"
+      ],
+      "title": "DisorderedAffinePriorAssignmentSpec",
+      "type": "object"
+    },
     "MatrixHashesV1": {
       "additionalProperties": false,
       "description": "Separate role- and order-sensitive identities for each CSS object.",
@@ -524,6 +572,17 @@
       "properties": {
         "advance_boundary": {
           "$ref": "#/$defs/MemoryAdvanceBoundary"
+        },
+        "assignment": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DisorderedAffinePriorAssignmentSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "binding_id": {
           "pattern": "^[a-z][a-z0-9_-]{0,63}$",

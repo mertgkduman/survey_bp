@@ -18,7 +18,7 @@ from bp_registry.runner import _canonical_kernel_manifest
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def composition(kind, parameters, *, order=0, binding_id="memory"):
+def composition(kind, parameters, *, order=0, binding_id="memory", assignment=None):
     target = {"affine_prior": "prior", "v2c_damping": "v2c",
               "pdbp_field_mix": "belief", "pdprime_delta_mix": "belief",
               "posterior_momentum": "posterior"}[kind]
@@ -27,6 +27,7 @@ def composition(kind, parameters, *, order=0, binding_id="memory"):
         "parameters": parameters, "order": order, "history_owner": f"history:{binding_id}",
         "state_lifetime": "attempt", "advance_boundary": "source_iteration",
         "refresh_boundary": "attempt_start", "source_status": "canonical_adaptation",
+        **({"assignment": assignment} if assignment is not None else {}),
     }]})
 
 
@@ -245,6 +246,7 @@ def test_repeated_fields_use_disjoint_histories_and_explicit_order():
 @pytest.mark.parametrize("kind,assignment", [
     ("min_sum", None),
     ("normalized_min_sum", {"shape": "scalar", "value": 0.8}),
+    ("normalized_min_sum", {"shape": "source_iteration", "values": [0.2, 0.5, 0.8]}),
     ("offset_min_sum", {"shape": "source_iteration", "values": [0.0, 5.0, 10.0]}),
 ])
 def test_public_memory_preserves_min_sum_assignment_dispatch(tmp_path, kind, assignment):
@@ -279,12 +281,94 @@ def test_offset_assignment_advances_with_memory_source_iteration():
         messages = step.new_v2c
 
 
+def test_normalized_assignment_advances_with_memory_source_iteration():
+    from bp_registry.canonical.memory_execution import MemoryFloodingSchedule
+    from bp_registry.canonical.numerics import MIN_SUM_CPU_F64
+    from bp_registry.canonical.updates import NormalizedMinSumUpdate, ParameterAssignment
+
+    schedule = MemoryFloodingSchedule(
+        EdgeTable.from_edges(1, 1, [(0, 0)]),
+        kernel=BinarySpaKernel(
+            profile=MIN_SUM_CPU_F64,
+            update_rule=NormalizedMinSumUpdate(ParameterAssignment.model_validate({
+                "shape": "source_iteration", "values": [0.0, 0.5, 1.0],
+            })),
+        ),
+        memory=composition("posterior_momentum", {"alpha": 0.1, "gamma": 0.9}),
+    )
+    rule = schedule.kernel.update_rule
+    assert rule.check_to_variable(np.asarray([2.0]), syndrome=0, source_iteration=0) == 0.0
+    assert rule.check_to_variable(np.asarray([2.0]), syndrome=0, source_iteration=1) == 1.0
+    assert rule.check_to_variable(np.asarray([2.0]), syndrome=0, source_iteration=2) == 2.0
+    messages = schedule.initialize(0.1)
+    for index in range(3):
+        step = schedule.sweep(messages, np.ones(1, dtype=np.uint8), error_rate=0.1, source_iteration=index)
+        schedule.commit(step)
+        messages = step.new_v2c
+    assert schedule.evidence()["committed_iterations"] == 3
+
+
+def test_disordered_affine_prior_assignment_is_decoder_local_replayed_and_atomic():
+    from bp_registry.canonical.memory_execution import MemoryFloodingSchedule
+
+    assignment = {
+        "mode": "uniform", "low": 0.2, "high": 0.8,
+        "root_seed_identity": "a" * 64,
+    }
+    memory = composition("affine_prior", {"alpha": 0.5}, assignment=assignment)
+    table = EdgeTable.from_edges(1, 2, [(0, 0), (0, 1)])
+    first = MemoryFloodingSchedule(
+        table, kernel=BinarySpaKernel(), memory=memory,
+        trace_context={"configuration_identity": "arm-a", "decoder_identity": "shot-a"},
+    )
+    second = MemoryFloodingSchedule(
+        table, kernel=BinarySpaKernel(), memory=memory,
+        trace_context={"configuration_identity": "arm-a", "decoder_identity": "shot-a"},
+    )
+    syndrome = np.ones(1, dtype=np.uint8)
+    for schedule in (first, second):
+        start = schedule.initialize(0.1)
+        proposal = schedule.sweep(start, syndrome, error_rate=0.1, source_iteration=0)
+        assert schedule.evidence()["committed_iterations"] == 0
+        schedule.commit(proposal)
+
+    one = first.evidence()["assignment_evidence"]["memory"]
+    two = second.evidence()["assignment_evidence"]["memory"]
+    assert one == two
+    assert one["algorithm"] == "numpy.PCG64"
+    assert one["replay_identity"] == "shot-a:source_iteration:0"
+    assert len(one["resolved_values"]) == table.variable_count
+    assert all(0.2 <= value <= 0.8 for value in one["resolved_values"])
+
+
+def test_public_disordered_affine_prior_records_assignment_evidence(tmp_path):
+    from bp_registry.cli import run_canonical, verify_run
+    from bp_registry.ledger import read_canonical_events
+
+    path = public_manifest(tmp_path, iterations=2)
+    value = json.loads(path.read_text())
+    value["memory"] = composition(
+        "affine_prior", {"alpha": 0.5}, assignment={
+            "mode": "uniform", "low": 0.1, "high": 0.9,
+            "root_seed_identity": "b" * 64,
+        },
+    ).model_dump(mode="json")
+    path.write_text(json.dumps(value))
+    output = tmp_path / "disordered-public"
+    assert run_canonical(path, output)["final_row_count"] == 1
+    assert verify_run(output)["final_row_count"] == 1
+    terminal = next(event["data"] for event in read_canonical_events(output / "events.jsonl") if event["kind"] == "termination")
+    assignment = terminal["memory_execution"]["assignment_evidence"]["memory"]
+    assert assignment["algorithm"] == "numpy.PCG64"
+    assert assignment["replay_identity"].endswith("source_iteration:0")
+    assert len(assignment["resolved_values"]) == 3
+
+
 @pytest.mark.parametrize("case,message", [
     ("local", "execution_schedule_unimplemented"),
     ("retained", "execution_lifecycle_unimplemented"),
     ("order", "execution_order_requires"),
     ("pdprime_after_prior", "pdprime_requires_fixed_prior"),
-    ("nms_iterations", "execution_update_assignment_unimplemented"),
     ("short_offset", "execution_update_assignment_shorter"),
     ("beta", "requires exactly"),
 ])
@@ -304,10 +388,10 @@ def test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading(tmp_
         second = composition("affine_prior" if case == "order" else "pdprime_delta_mix", {"alpha": 0.5} if case == "order" else {"gamma": 0.5}, binding_id="second").model_dump(mode="json")["bindings"][0]
         second["order"] = 1
         value["memory"]["bindings"] = [first, second]
-    elif case in {"nms_iterations", "short_offset"}:
+    elif case == "short_offset":
         value["numerical_profile"] = "cpu-float64-min-sum-v1"
-        value["policies"]["update"]["kind"] = "normalized_min_sum" if case == "nms_iterations" else "offset_min_sum"
-        value["policies"]["update"]["parameter_assignment"] = {"shape": "source_iteration", "values": [0.5, 0.5, 0.5] if case == "nms_iterations" else [0.5]}
+        value["policies"]["update"]["kind"] = "offset_min_sum"
+        value["policies"]["update"]["parameter_assignment"] = {"shape": "source_iteration", "values": [0.5]}
     else:
         binding["parameters"] = {"beta": 0.5}
     path.write_text(json.dumps(value))

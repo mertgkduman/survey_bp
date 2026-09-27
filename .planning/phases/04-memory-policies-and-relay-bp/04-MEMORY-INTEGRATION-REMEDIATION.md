@@ -52,8 +52,19 @@ do not merge kernel changes into that live source tree mid-campaign.
 - PD-prime uses an O(n) per-variable C2V sum, reduced in canonical edge order,
   as the sufficient statistic for its delta equation.
 - Min-sum, scalar NMS, and per-iteration OMS dispatch/replay are covered. OMS
-  assignments must cover the declared attempt limit; unsupported per-iteration
-  NMS rejects before artifact loading rather than failing during execution.
+  and NMS source-iteration assignments must cover the declared attempt limit;
+  both resolve at the canonical source-iteration index without an inferred
+  broadcast.
+- Public ordinary disordered affine-prior bindings now declare a bounded
+  per-variable Uniform interval and 64-hex root seed identity. Each admitted
+  flooding source iteration derives its own decoder-local NumPy PCG64 draw;
+  assignment state, evidence, and coefficient vector commit with the sweep and
+  replay independently of hidden physical truth.
+- Opt-in ordinary-memory tracing is observer-only and sink-bounded. Every
+  committed retained sweep can expose decoder-visible beliefs, complete
+  committed history arrays plus digests, PCG64 draw identity/evidence, and a
+  caller-supplied candidate origin. The caller obtains the content-addressed
+  result via `MemoryFloodingSchedule.trace_result()` and writes its ledger link.
 
 ## Verification
 
@@ -69,26 +80,32 @@ approved `.venv/bin/python`, from the isolated checkout.
 3. Final targeted gate after assignment/admission/reset checks:
    `python -m pytest tests/canonical/test_memory_execution.py tests/test_manifest.py -q`:
    **67 passed** (7.37 s), including 30 ordinary-memory execution tests.
-4. Generated public V4 schema remains identical to the checked schema; model
-   validator corrections do not change its JSON shape. `git diff --check`
-   passes.
+4. Focused post-correction trace/disordered/NMS gate:
+   `python -m pytest -q tests/canonical/test_memory_execution.py tests/canonical/test_memory_trace.py`:
+   **34 passed** (4.67 s). This includes public V5 preflight/run/semantic
+   replay of a disordered affine-prior arm, transactional PCG64 replay, capped
+   trace sidecars, and per-iteration NMS execution.
 
 These are implementation fixtures, not statistical performance evidence.
 No calibration, evaluation, factorial or publication sample budget was used.
 
 ## Remaining Phase 4 work
 
-- Local-schedule memory execution, retained histories, lifetimes beyond this
-  single attempt/leg, per-iteration NMS, and public ordinary disordered prior
-  assignments remain unimplemented and now reject explicitly where applicable.
-  Mathematical compatibility declarations alone do not prove execution.
+- Local-schedule memory execution, retained histories, and lifetimes beyond
+  one flooding attempt remain unimplemented and reject explicitly where
+  applicable. A `leg` declaration is not a multi-leg ordinary-memory
+  lifecycle: it is only accepted by this single-attempt flooding executor
+  while history reset is required. Mathematical compatibility declarations
+  alone do not prove execution.
 - The frozen factorial design lists damping-before-affine and
   momentum-before-affine interaction binding arrays. Those orders violate the
   implemented operand dependencies. Resolve their execution semantics in a
   versioned, outcome-independent supplement/amendment before factorial
   sampling; preserve the frozen design/caps and document the discrepancy.
-- Ordinary arm coefficient settings and diagnostic trace hooks still need
-  implementation before Plan 04-13 Task 2 can run.
+- Factorial arm coefficients and its ledger-linking trace adapter must still
+  be selected from the frozen design/supplement before Task 2 can run. The
+  engine now provides the bounded ordinary-memory execution and observation
+  seam but does not authorize sampling.
 - Calibration must terminate and settings freeze before fresh evaluation.
   Existing evaluation-runner code is prepared; its scientific gates remain.
 - Do not mark Plan 04-13 or Phase 4 complete from this correction. Phase 5 and

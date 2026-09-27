@@ -340,6 +340,14 @@ class AtomicFloodingExecutor:
                 return AtomicFloodingResult(state, iteration - 1, result.termination, last_sweep)
             if isinstance(self.schedule, MemoryFloodingSchedule):
                 self.schedule.commit(completed[-1])
+                self.schedule.observe_candidate(
+                    origin={
+                        "candidate_origin": "last_committed_sweep",
+                        "source_iteration": iteration - 1,
+                        "status": "diagnostic",
+                    },
+                    candidate=completed[-1].candidate,
+                )
             progress = result.progress
             last_sweep = completed[-1]
             if result.converged:
