@@ -5,11 +5,11 @@ current_phase: 04
 current_phase_name: Memory Policies and Relay-BP
 current_plan: 12
 status: executing
-stopped_at: Calibration active; isolated Phase 4 corrections and prerequisites validated
-last_updated: "2026-09-27T03:14:07Z"
+stopped_at: Calibration active; independent Phase 4 implementation verified in isolation
+last_updated: "2026-09-27T07:36:17Z"
 last_activity: 2026-09-27
-last_activity_desc: Resumed Phase 4, reconciled asynchronous evidence and prepared isolated memory, factorial and notebook corrections
-state_head: 7459fc271d610f434a081c4f8544cca842d6e52e
+last_activity_desc: Continued local memory, terminal evidence readers and notebook views while calibration runs; 532 tests passed
+state_head: 9661829ae25472a9d829f4fb4fb60ae936e116be
 progress:
   total_phases: 14
   completed_phases: 3
@@ -33,9 +33,9 @@ Plan: 12 of 15
 Total Phases: 14
 Current Plan: 12
 Total Plans in Phase: 15
-Status: Executing calibration; independent Phase 4 prerequisites validated
-Last activity: 2026-09-27 — Resumed Phase 4 execution and reconciled terminal auxiliary evidence
-Last Activity Description: Preserved active calibration source; isolated corrections cover memory execution, local boundaries, public traces, factorial preparation and notebook identity
+Status: Executing calibration; independent memory, evidence readers and notebook implementation verified
+Last activity: 2026-09-27 — Continued independent Phase 4 implementation and passed final regression
+Last Activity Description: Preserved active calibration source; isolated source 62fe977 passes 532 tests with one existing skip and both notebooks execute without errors
 
 Progress: [██░░░░░░░░] 21% [██░░░░░░░░]
 
@@ -140,7 +140,7 @@ None outside the roadmap.
 
 ### Blockers/Concerns
 
-- Phase 4 calibration remains `running` (PID 2702938); Plans 04-12/13/14 remain incomplete. Isolated ordinary-memory execution, local PDBP/damping boundaries, public flooding traces, assignment/replay/work corrections, factorial preparation and notebook infrastructure are validated (478 tests passed, one existing skip). Retained histories/additional lifetimes, other local schedules, production evidence and notebook views remain. Keep source changes separate from the live campaign. See [execution resume](phases/04-memory-policies-and-relay-bp/04-EXECUTION-RESUME-20260927.md) and [coding handoff](phases/04-memory-policies-and-relay-bp/04-CODING-RESUME-HANDOFF.md).
+- Phase 4 calibration remains `running` (PID 2702938); Plans 04-12/13/14 remain incomplete. Independent local PD-prime/momentum/affine execution, semantic failure-prefix traces, exact-byte terminal readers, immutable shot contexts and notebook views are verified in isolated source `62fe977`: 532 tests passed, one existing skip. Both notebooks execute all 14 cells without errors. The completed benchmark summary retains a real incomplete B1 p=.07 arm, so its rows remain explicitly unqualified. Fresh production evidence, retained histories/additional lifetimes, other local schedules, disordered local affine and Relay traces remain. Keep source changes separate from the live campaign. See [implementation continuation](phases/04-memory-policies-and-relay-bp/04-IMPLEMENTATION-CONTINUATION-20260927.md) and [coding handoff](phases/04-memory-policies-and-relay-bp/04-CODING-RESUME-HANDOFF.md).
 - Phase 3 passed goal verification with 17/17 plans and all eight requirements complete. The Hsu source-defined group schedule has a retained, independently verified two-shot CSS pilot. The Moradi artifact remains unavailable and is not conflated with the Hsu policy.
 
 Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 security threats closed). Remaining research concerns for later phases:
@@ -166,12 +166,12 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Last session: 2026-09-27T03:14:07Z
-Stopped at: Calibration active; isolated Phase 4 corrections and prerequisites validated
+Last session: 2026-09-27T07:36:17Z
+Stopped at: Calibration active; independent Phase 4 implementation verified in isolation
 Resume file: .planning/phases/04-memory-policies-and-relay-bp/04-CODING-RESUME-HANDOFF.md
 Next command: $gsd-execute-phase 4
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
-Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-RESUME-20260927.md`.
+Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-IMPLEMENTATION-CONTINUATION-20260927.md`.
 The September 26 development PDF remains a historical snapshot. Phase 4
 completion and Phase 5 execution remain pending; no plan counts advanced.

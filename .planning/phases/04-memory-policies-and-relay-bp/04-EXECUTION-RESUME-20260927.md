@@ -7,6 +7,13 @@ date: 2026-09-27
 
 # Phase 4 execution resumption
 
+This records the earlier `639adef` checkpoint. The user's subsequent instruction
+to continue independent coding is tracked in
+`04-IMPLEMENTATION-CONTINUATION-20260927.md` and the updated coding handoff.
+That continuation implements the previously pending notebook views/readers and
+additional local operands; its final validation supersedes the historical
+478-pass result below. Scientific Plan 04-12/13/14 gates remain open.
+
 The manually invoked `$gsd-execute-phase 4` resumes Plan 04-12's external-job
 reconciliation and independent prerequisite implementation for Plans 04-13/14.
 No wave/evidence prerequisite was waived, no production sample was newly consumed,
