@@ -619,6 +619,33 @@ def _synthetic_fixture() -> dict[str, object]:
             "tables": [table for item in artifacts.values() for table in item["tables"]], "summary": {"qualified_stages": [], "unavailable_stages": list(STAGES)}}
 
 
+def _baseline_diagnostic_view(benchmark: Mapping[str, object]) -> dict[str, object]:
+    """Present retained benchmark diagnostics under the distinct baseline stage."""
+    tables: list[dict[str, object]] = []
+    for table in benchmark.get("tables", []):
+        if not isinstance(table, Mapping):
+            continue
+        rows = [
+            {**row, "stage": "baseline"}
+            for row in table.get("rows", [])
+            if isinstance(row, Mapping)
+        ]
+        tables.append({
+            **table,
+            "stage": "baseline",
+            "name": "retained_active_benchmark_baseline_diagnostic",
+            "title": "retained active-benchmark baseline diagnostics",
+            "rows": rows,
+        })
+    return {
+        **benchmark,
+        "stage": "baseline",
+        "execution_qualified": False,
+        "reason": "baseline view is retained active-benchmark diagnostic evidence, not a fresh selected stage",
+        "tables": tables,
+    }
+
+
 def build_campaign_snapshots(root: Path = ROOT, *, campaign_root: Path | None = None,
                              development_fixture: bool = False) -> dict[str, object]:
     """Return only retained evidence snapshots; never execute a campaign."""
@@ -632,8 +659,7 @@ def build_campaign_snapshots(root: Path = ROOT, *, campaign_root: Path | None = 
     root = campaign_root; relay = root / "data/results/phase4-memory-relay"
     cache = _InventoryProofCache()
     benchmark = _benchmark(root, cache=cache)
-    baseline = {**benchmark, "stage": "baseline", "execution_qualified": False,
-                "reason": "baseline view is retained active-benchmark diagnostic evidence, not a fresh selected stage"}
+    baseline = _baseline_diagnostic_view(benchmark)
     factorial = _factorial(root, cache=cache)
     artifacts = {"baseline": baseline, "benchmark": benchmark,
                  "calibration": _calibration_or_selection(root, "calibration"), "selected_settings": _calibration_or_selection(root, "selected_settings"),

@@ -40,6 +40,32 @@ def test_real_inventory_is_read_only_and_preserves_current_nonterminal_states():
         assert tables[0]["stage"] == "historical_author_agreement"
 
 
+def test_baseline_view_relabels_retained_benchmark_snapshot_without_mutation():
+    campaign = _module()
+    benchmark = {
+        "stage": "benchmark",
+        "status": "completed",
+        "execution_qualified": True,
+        "tables": [{
+            "stage": "benchmark",
+            "name": "active_benchmark",
+            "title": "active benchmark",
+            "columns": ["stage", "code_id", "arm", "error_rate"],
+            "rows": [{"stage": "benchmark", "code_id": "b1-ghp-882", "arm": "controlled_relay_31", "error_rate": 0.07}],
+        }],
+    }
+
+    baseline = campaign._baseline_diagnostic_view(benchmark)
+
+    assert benchmark["tables"][0]["stage"] == "benchmark"
+    assert benchmark["tables"][0]["rows"][0]["stage"] == "benchmark"
+    assert baseline["stage"] == "baseline"
+    assert baseline["execution_qualified"] is False
+    assert baseline["tables"][0]["stage"] == "baseline"
+    assert baseline["tables"][0]["name"] == "retained_active_benchmark_baseline_diagnostic"
+    assert baseline["tables"][0]["rows"][0]["stage"] == "baseline"
+
+
 def test_fabricated_completed_calibration_does_not_qualify_from_a_terminal_label(tmp_path, monkeypatch):
     campaign = _module()
     path = tmp_path / "data/results/phase4-memory-relay/calibration/result.json"
