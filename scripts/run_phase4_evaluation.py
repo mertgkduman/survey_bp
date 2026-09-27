@@ -345,14 +345,11 @@ print(json.dumps({"candidate": np.asarray(r.decoding, dtype=np.uint8).tolist(),
                   "native_decode_seconds": decode_seconds,
                   "module_origin": str(Path(relay_bp.__file__).resolve())}))
 '''
-    try:
-        process = subprocess.run(
-            [str(environment / "bin/python"), "-c", program], cwd=source,
-            text=True, capture_output=True, timeout=timeout,
-            env={**os.environ, "PYTHONNOUSERSITE": "1", "PYTHONPATH": "",
-                 "RELAY_V022_PAYLOAD_PATH": str(payload_path)})
-    finally:
-        payload_path.unlink(missing_ok=True)
+    process = subprocess.run(
+        [str(environment / "bin/python"), "-c", program], cwd=source,
+        text=True, capture_output=True, timeout=timeout,
+        env={**os.environ, "PYTHONNOUSERSITE": "1", "PYTHONPATH": "",
+             "RELAY_V022_PAYLOAD_PATH": str(payload_path)})
     if process.returncode:
         raise RuntimeError(f"pinned author native command failed: {(process.stderr or process.stdout)[-1200:]}")
     result = json.loads(process.stdout)
@@ -469,8 +466,12 @@ def run_native_pairs(*, root: Path, caps: Mapping[str, Any], selection: Mapping[
                 def call_author(payload: Mapping[str, Any]) -> dict[str, Any]:
                     raw = _author_runner(source, environment, payload, pair_root / f"shot-{shot_id:04d}-payload.json",
                                          timeout=max(.001, float(cell["native_boundary_seconds"]) - (perf_counter() - started)))
+                    result_path = pair_root / f"shot-{shot_id:04d}-native-result.json"
+                    pilot._write_json_atomic(result_path, raw)
                     metadata.update({"module_origin": raw["module_origin"], "payload_sha256": raw["payload_sha256"],
-                                     "native_decode_seconds": raw["native_decode_seconds"]})
+                                     "native_decode_seconds": raw["native_decode_seconds"],
+                                     "payload_path": str(pair_root / f"shot-{shot_id:04d}-payload.json"),
+                                     "result_path": str(result_path), "result_sha256": _byte_sha(result_path)})
                     return raw
                 result = RelayV022Adapter(native_runner=call_author).run(
                     check_matrix=observation["check_matrix"], syndrome=observation["syndrome"],
@@ -486,6 +487,8 @@ def run_native_pairs(*, root: Path, caps: Mapping[str, Any], selection: Mapping[
                     "unavailable_native_facts": unavailable_native_facts(),
                     "native_module_origin": metadata["module_origin"],
                     "native_payload_sha256": metadata["payload_sha256"],
+                    "native_payload_path": metadata["payload_path"],
+                    "native_result_path": metadata["result_path"], "native_result_sha256": metadata["result_sha256"],
                     "native_decode_seconds": metadata["native_decode_seconds"],
                     "manifest_sha256": _byte_sha(manifest_path), **diagnosis,
                     "public_boundary": {"elapsed_seconds": perf_counter() - started}}

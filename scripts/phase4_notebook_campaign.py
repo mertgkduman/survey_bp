@@ -151,6 +151,11 @@ def _verify_active_benchmark(root: Path, report: Mapping[str, Any]) -> None:
                         raise ValueError("active benchmark terminal provenance files are absent")
                     if arm.get("manifest_sha256") != _json_digest(_read(manifest)):
                         raise ValueError("active benchmark manifest digest differs from retained manifest")
+                    retained_manifest = _read(manifest)
+                    if retained_manifest.get("error_rate") != rate.get("error_rate"):
+                        raise ValueError("active benchmark manifest error rate differs from labeled rate")
+                    if arm.get("active_tuning") != retained_manifest.get("relay", {}).get("memory_tuning"):
+                        raise ValueError("active benchmark relay tuning differs from retained manifest")
                     attempts = json.loads(journal.read_text(encoding="utf-8"))
                     if attempts != arm["attempts"] or not attempts:
                         raise ValueError("active benchmark report attempts differ from retained journal")
@@ -222,15 +227,21 @@ def _caps(root: Path, pilots) -> tuple[Path, dict[str, Any]]:
     return path, value
 
 
-def _verify_relay_shot(manifest_path: Path, run_dir: Path, *, shot_id: int, expected_row: Mapping[str, Any] | None = None) -> dict[str, object]:
+def _verify_relay_shot(manifest_path: Path, run_dir: Path, *, shot_id: int, expected_row: Mapping[str, Any] | None = None,
+                       require_semantic: bool = False) -> dict[str, object]:
     """Purely reconstruct one retained public V4 Relay terminal and bind it to its manifest."""
     from bp_registry.ledger import read_canonical_events
     from bp_registry.runner import canonical_public_shot_context
-    from bp_registry.canonical.verification import validate_phase4_shot
+    from bp_registry.canonical.verification import validate_canonical_shot, validate_phase4_shot
     context = canonical_public_shot_context(manifest_path, shot_id=shot_id)
-    verified = validate_phase4_shot(run_dir / "events.jsonl", run_id=context.run_id, shot_id=shot_id, trace_root=run_dir)
     stream = [event for event in read_canonical_events(run_dir / "events.jsonl") if event.get("run_id") == context.run_id and event.get("shot_id") == shot_id]
-    begin, terminal = stream[0], verified["terminal"]
+    if context.compact_manifest.get("schema_version") == 5:
+        terminal = validate_canonical_shot(stream, context, trace_root=run_dir)
+        verified = {"terminal": terminal, "work": terminal.get("data", {}).get("work_vector"), "traces": []}
+    else:
+        verified = validate_phase4_shot(run_dir / "events.jsonl", run_id=context.run_id, shot_id=shot_id, trace_root=run_dir)
+        terminal = verified["terminal"]
+    begin = stream[0]
     data = terminal["data"]
     if begin.get("sample_seed_identity") != context.sample_seed_identity:
         raise ValueError("ledger sample identity differs from manifest context")
@@ -249,6 +260,8 @@ def _verify_relay_shot(manifest_path: Path, run_dir: Path, *, shot_id: int, expe
                 "outcome": data.get("outcome")}
     if expected_row is not None:
         for key, value in semantic.items():
+            if require_semantic and key not in expected_row:
+                raise ValueError(f"reported row omits terminal semantic field {key}")
             if key in expected_row and expected_row.get(key) != value:
                 raise ValueError(f"reported row {key} differs from terminal candidate evidence")
     return {"terminal": terminal, "work": verified["work"], "sample_identity": begin.get("sample_seed_identity"),
@@ -329,7 +342,7 @@ def _evaluation(root: Path) -> dict[str, object]:
             raise ValueError("retained evaluation plan differs from verified producer plan")
         if payload.get("shared_settings_view") != plan.get("shared_settings_view"):
             raise ValueError("evaluation result shared settings differ from verified plan")
-        if any(set(payload.get("codes", {}).get(code, {})) != set(arms) for code in caps["codes"]):
+        if set(payload.get("codes", {})) != set(caps["codes"]) or any(set(payload.get("codes", {}).get(code, {})) != set(arms) for code in caps["codes"]):
             raise ValueError("evaluation result omits or adds frozen arms")
         if payload.get("status") != "completed": raise ValueError("evaluation producer is nonterminal")
         relay = path.parent
@@ -351,7 +364,7 @@ def _evaluation(root: Path) -> dict[str, object]:
             for row in rows:
                 if not isinstance(row, Mapping) or row.get("status") != "completed":
                     raise ValueError("completed evaluation result retains incomplete shot")
-                _verify_relay_shot(manifest, run, shot_id=int(row["shot_id"]), expected_row=row)
+                _verify_relay_shot(manifest, run, shot_id=int(row["shot_id"]), expected_row=row, require_semantic=True)
             if runner.summarize_rows(rows, planned=int(cell["shots"])) != arm.get("summary"):
                 raise ValueError("evaluation summary differs from verified attempts")
         if payload.get("evaluation_category_wall_seconds_used") != runner.retained_category_wall(path.parent):
@@ -400,7 +413,8 @@ def _factorial(root: Path) -> dict[str, object]:
                 raise ValueError("factorial manifest or ledger provenance differs")
             if _read(manifest) != factorial.build_public_manifest(repository_root=root, cell=cell, plan=plan):
                 raise ValueError("factorial manifest differs from frozen cell plan")
-            verified = _verify_relay_shot(manifest, run, shot_id=int(cell["shot_id"]), expected_row={"work_vector": row.get("raw_work")})
+            verified = _verify_relay_shot(manifest, run, shot_id=int(cell["shot_id"]),
+                                          expected_row={**row, "work_vector": row.get("raw_work")}, require_semantic=True)
             if verified["sample_identity"] != row.get("sample_identity"):
                 raise ValueError("factorial terminal sample identity differs from verified ledger")
         if payload.get("aggregate") != factorial.aggregate_terminals(rows, plan):
@@ -469,13 +483,13 @@ def _native(root: Path) -> dict[str, object]:
             if _read(manifest) != expected_manifest:
                 raise ValueError("native canonical manifest differs from frozen cell")
             canonical_rows = json.loads((canonical_root / "attempts.json").read_text(encoding="utf-8"))
-            if {row.get("shot_id") for row in canonical_rows} != set(range(int(cell["shots"]))):
+            if len(canonical_rows) != int(cell["shots"]) or len({row.get("shot_id") for row in canonical_rows}) != len(canonical_rows) or {row.get("shot_id") for row in canonical_rows} != set(range(int(cell["shots"]))):
                 raise ValueError("native canonical journal does not cover every planned shot")
             for canonical in canonical_rows:
                 if canonical.get("status") != "completed":
                     raise ValueError("completed native result retains incomplete canonical pair")
-                _verify_relay_shot(manifest, canonical_root / "run", shot_id=int(canonical["shot_id"]), expected_row=canonical)
-            if {row.get("shot_id") for row in saved} != set(range(int(cell["shots"]))):
+                _verify_relay_shot(manifest, canonical_root / "run", shot_id=int(canonical["shot_id"]), expected_row=canonical, require_semantic=True)
+            if len(saved) != int(cell["shots"]) or len({row.get("shot_id") for row in saved}) != len(saved) or {row.get("shot_id") for row in saved} != set(range(int(cell["shots"]))):
                 raise ValueError("native journal does not cover every planned shot")
             pairs = []
             canonical_by_id = {row["shot_id"]: row for row in canonical_rows}
@@ -483,6 +497,18 @@ def _native(root: Path) -> dict[str, object]:
                 canonical = canonical_by_id.get(native.get("shot_id"))
                 if native.get("status") != "completed" or canonical is None or native.get("sample_identity") != canonical.get("sample_identity"):
                     raise ValueError("native paired identity or terminal status differs")
+                payload_path = Path(str(native.get("native_payload_path", ""))).resolve()
+                result_path = Path(str(native.get("native_result_path", ""))).resolve()
+                _relative(root, payload_path); _relative(root, result_path)
+                if not payload_path.is_file() or _byte_sha(payload_path) != native.get("native_payload_sha256") or not result_path.is_file() or _byte_sha(result_path) != native.get("native_result_sha256"):
+                    raise ValueError("native author payload/result transcript is absent or hash-mismatched")
+                transcript = _read(result_path); native_payload = _read(payload_path)
+                if transcript.get("candidate") != native.get("candidate") or transcript.get("module_origin") != native.get("native_module_origin") or transcript.get("success") != native.get("success_flag"):
+                    raise ValueError("native result transcript differs from retained journal")
+                later_legs = 2 if code_id == "b1-ghp-882" else 30
+                _gammas, expected_digests = evaluation.explicit_native_gammas(manifest, native_payload, later_legs=later_legs)
+                if native.get("gamma_digests") != expected_digests or native.get("executed_gamma_digests_checked") != later_legs:
+                    raise ValueError("native gamma evidence differs from frozen canonical replay")
                 diagnosis = evaluation.classify_candidate(manifest, shot_id=int(native["shot_id"]), candidate=native.get("candidate"))
                 if any(native.get(key) != value for key, value in diagnosis.items()) or native.get("selected") != bool(native.get("success_flag") and diagnosis["syndrome_valid"]):
                     raise ValueError("native diagnostic evidence differs from retained candidate")

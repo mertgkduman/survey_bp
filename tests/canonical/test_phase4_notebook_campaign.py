@@ -123,7 +123,7 @@ def test_active_benchmark_rejects_duplicate_shots_before_accepting_arm_aggregate
     campaign = _module()
     arm_root = tmp_path / "artifacts/fixture-code/p0030/canonical_default/controlled-relay-31"
     manifest = arm_root / "manifest.json"
-    _write(manifest, {"fixture": "manifest"})
+    _write(manifest, {"fixture": "manifest", "error_rate": .03})
     (arm_root / "run").mkdir(parents=True)
     (arm_root / "run/events.jsonl").write_text("", encoding="utf-8")
     attempts = [{"shot_id": 0, "status": "completed"} for _ in range(32)]
@@ -133,7 +133,7 @@ def test_active_benchmark_rejects_duplicate_shots_before_accepting_arm_aggregate
         "codes": {"fixture-code": {"rates": {"p0030": {"error_rate": .03, "presets": {
             "canonical_default": {"controlled_relay_31": {
                 "status": "completed", "active_memory_verified": True, "attempts": attempts,
-                "manifest_sha256": campaign._json_digest({"fixture": "manifest"}),
+                "manifest_sha256": campaign._json_digest({"fixture": "manifest", "error_rate": .03}),
             }},
         }}}}},
     }
