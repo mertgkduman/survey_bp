@@ -1,0 +1,234 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-09-27T17:20:42.542Z",
+  "phase": "04",
+  "phase_name": "Memory Policies and Relay-BP",
+  "phase_dir": ".planning/phases/04-memory-policies-and-relay-bp",
+  "plan": 12,
+  "task": 1,
+  "total_tasks": 2,
+  "status": "paused",
+  "pause_scope": "interactive session only; calibration remains running",
+  "completed_tasks": [
+    {
+      "id": "04-01..04-11,04-15",
+      "name": "Twelve Phase 4 plans have committed summaries",
+      "status": "done"
+    },
+    {
+      "id": "isolated-continuation",
+      "name": "Ordinary/local memory, semantic traces, evidence readers, factorial preparation and notebook views",
+      "status": "done",
+      "commit": "62fe977",
+      "artifact_commit": "b28ee43",
+      "validation": "532 passed, 1 existing skip; both notebooks 14/14 cells without errors"
+    },
+    {
+      "id": "04-12-task-1",
+      "name": "Complete prespecified calibration search",
+      "status": "in_progress",
+      "progress": {
+        "checked_at": "2026-09-27T17:20:42.542Z",
+        "status": "running",
+        "retained_attempts": 3716,
+        "planned_attempts": 5824,
+        "retained_percent": 63.8,
+        "termination_counts": {
+          "budget_exhausted": 453,
+          "completed": 3263
+        },
+        "public_boundary_seconds": 147916.49714055914,
+        "public_boundary_cap_seconds": 688243.0,
+        "evaluation_namespace_accessed": false
+      }
+    }
+  ],
+  "remaining_tasks": [
+    {
+      "id": "04-12",
+      "name": "Verify terminal calibration and deterministically freeze settings",
+      "status": "in_progress"
+    },
+    {
+      "id": "integration",
+      "name": "Integrate isolated corrections after releasing active campaign source freeze; preserve historical evidence identities",
+      "status": "not_started"
+    },
+    {
+      "id": "04-13",
+      "name": "Fresh three-arm/three-code evaluation, focused factorial, matched exact-author native diagnostics and linked traces",
+      "status": "not_started",
+      "implementation_prepared": true
+    },
+    {
+      "id": "04-14",
+      "name": "Populate notebook/documentation with verified production evidence and complete phase quality gates",
+      "status": "in_progress",
+      "implementation_prepared": true
+    },
+    {
+      "id": "prior-verification-refresh",
+      "name": "Refresh stale Phase 1 and 2 verification reports; do not rerun completed plans",
+      "status": "not_started"
+    }
+  ],
+  "blockers": [
+    {
+      "description": "Calibration is not terminal; scientific selections and dependent production campaigns await verified terminal evidence",
+      "type": "external",
+      "workaround": "Independent implementation can proceed in isolation; do not tune from partial results."
+    },
+    {
+      "description": "Completed benchmark retains a genuinely incomplete B1 p=.07 canonical-default arm; whole report remains execution-unqualified",
+      "type": "technical",
+      "workaround": "Preserve rows and explicit unqualified status; obtain qualifying fresh evidence."
+    }
+  ],
+  "async_jobs": [
+    {
+      "version": "1.0",
+      "plan_id": "04-12",
+      "phase": "04",
+      "job_id": "55938300:2702938",
+      "backend": "slurm-allocation-child",
+      "submit_command": "setsid bash .planning/async-jobs/04-12-calibration-v4-active.launch.sh >> data/results/phase4-memory-relay/calibration.launch.log 2>&1 < /dev/null &",
+      "status": "running",
+      "expected_artifacts": [
+        "data/results/phase4-memory-relay/calibration/result.json",
+        "data/results/phase4-memory-relay/calibration/events.jsonl",
+        "data/results/phase4-memory-relay/calibration.launch.log"
+      ],
+      "verification_command": ".venv/bin/python -c \"import json; from pathlib import Path; p=Path('data/results/phase4-memory-relay/calibration/result.json'); r=json.loads(p.read_text()); assert r['status'] in {'completed','completed_with_inconclusive','cap_reached'}; print(r['status'],r['calibration_digest'],r['result_digest'])\"",
+      "resume_command": "if test -f data/results/phase4-memory-relay/calibration/result.json && .venv/bin/python -c \"import json; assert json.load(open('data/results/phase4-memory-relay/calibration/result.json'))['status'] in {'completed','completed_with_inconclusive','cap_reached'}\" 2>/dev/null; then exit 0; fi; if test -r /proc/2702938/cmdline && tr '\\0' ' ' < /proc/2702938/cmdline | grep -Fq -- '--run-calibration'; then exit 0; fi; setsid bash .planning/async-jobs/04-12-calibration-v4-active.launch.sh >> data/results/phase4-memory-relay/calibration.launch.log 2>&1 < /dev/null &",
+      "submitted_at": "2026-09-25T20:58:54Z",
+      "terminal_details": null,
+      "manifest": ".planning/async-jobs/04-12-calibration-v4-active.json",
+      "progress_snapshot": {
+        "checked_at": "2026-09-27T17:20:42.542Z",
+        "status": "running",
+        "retained_attempts": 3716,
+        "planned_attempts": 5824,
+        "retained_percent": 63.8,
+        "termination_counts": {
+          "budget_exhausted": 453,
+          "completed": 3263
+        },
+        "public_boundary_seconds": 147916.49714055914,
+        "public_boundary_cap_seconds": 688243.0,
+        "evaluation_namespace_accessed": false
+      },
+      "watcher_state": "No watcher launched by this handoff; PID 2702938 and allocation 55938300 observed running."
+    }
+  ],
+  "human_actions_pending": [],
+  "decisions": [
+    {
+      "decision": "Results gate scientific selection and dependent campaigns, not independent coding",
+      "rationale": "User explicitly authorized continuing independent implementation while numerical results are pending",
+      "phase": "04"
+    },
+    {
+      "decision": "Preserve main kernel/runner/caps/design bytes at 101a01b until calibration terminal verification",
+      "rationale": "Keep the active campaign reproducible and its retained evidence attributable",
+      "phase": "04"
+    },
+    {
+      "decision": "Statistical reproduction agreement suffices; semantic/algebraic validation remains independent",
+      "rationale": "Project reproduction contract",
+      "phase": "04"
+    }
+  ],
+  "uncommitted_files": [
+    "?? .gsd/dispatch-isolation-sentinel.json",
+    "?? .gsd/tdd-evidence/01-06-task-1-red.json",
+    "?? .gsd/tdd-evidence/01-06-task-2-red.json",
+    "?? .gsd/tdd-evidence/02-03-task-1-red.json",
+    "?? .gsd/tdd-evidence/02-03-task-2-red.json",
+    "?? .gsd/tdd-evidence/02-04-task-1-red.json",
+    "?? .gsd/tdd-evidence/02-04-task-2-red.json",
+    "?? .gsd/tdd-evidence/02-06-task-1-red.json",
+    "?? .gsd/tdd-evidence/02-06-task-2-red.json",
+    "?? .gsd/tdd-evidence/02-09-task-1-red.json",
+    "?? .gsd/tdd-evidence/02-09-task-2-red.json",
+    "?? .gsd/tdd-evidence/02-10-task-1-red.json",
+    "?? .gsd/tdd-evidence/02-10-task-2-red.json",
+    "?? .gsd/tdd-evidence/04-02-task-1-red.json",
+    "?? .gsd/tdd-evidence/04-02-task-2-red.json",
+    "?? .gsd/tdd-evidence/04-03-task-1-red.json",
+    "?? .gsd/tdd-evidence/04-03-task-2-red.json",
+    "?? .gsd/tdd-evidence/04-04-task-1-red.json",
+    "?? .gsd/tdd-evidence/04-05-task-1-red.json",
+    "?? .gsd/tdd-evidence/04-05-task-2-red.json",
+    "?? .gsd/tdd-evidence/04-06-task-1-red.json",
+    "?? .gsd/tdd-evidence/04-06-task-2-red.json",
+    "?? .gsd/tdd-evidence/04-08-task-1-red.json",
+    "?? .gsd/tdd-evidence/04-09-task-1-red.json",
+    "?? .gsd/tdd-evidence/04-09-task-2-red.json",
+    "?? .gsd/tdd-evidence/04-10-task-1-red.json",
+    "?? .gsd/tdd-evidence/04-10-task-2-red.json",
+    "?? .gsd/tdd-evidence/04-15-task-1-red.json",
+    "?? .planning/milestone.lock",
+    "?? .planning/research/.cache/0f2b1f6b72934bdea651d05856dd2e2b59d2645ce154ab7c50523cb6e4afdd01.json",
+    "?? .planning/research/.cache/23089a100a9886ce2666f08db07992a73e7da93f4e4561febe50ba86dc7fed95.json",
+    "?? .planning/research/.cache/91894d423a6876c35dc20d34fe8881278f295fede13e007641bc5dc1e74d6056.json",
+    "?? .planning/research/.cache/9ba3ffb63477b97cbba3b629fb2e9914c4082ef5cb9e6b8b120a2e25dce849ef.json",
+    "?? .planning/research/.cache/ee134ae47572fec0a9fe2d11889b785a0d5d6852a8168ab24a2ae2d2206b8dd9.json",
+    "?? .planning/research/.cache/eef14d7b2d86bee15f71d71f6491f565b16374d3e729a670a034c6a3bc6ca862.json",
+    "?? .planning/state.json",
+    "?? data/results/phase4-memory-relay/04-12-active-v4-20260925-core-1f8f1c2.stdout.log",
+    "?? data/results/phase4-memory-relay/author-v022-agreement-v1/b1-ghp-882/",
+    "?? data/results/phase4-memory-relay/author-v022-agreement-v1/gross-bb-144/",
+    "?? data/results/phase4-memory-relay/author-v022-agreement-v1/hgp-gallager-3-4-seed-20260923/",
+    "?? data/results/phase4-memory-relay/author-v022-agreement-v1/identity.json",
+    "?? data/results/phase4-memory-relay/author-v022-agreement-v1/native-stage/",
+    "?? data/results/phase4-memory-relay/author-v022-agreement-v1/progress.json",
+    "?? data/results/phase4-memory-relay/author-v022-agreement-v1/result.json",
+    "?? data/results/phase4-memory-relay/author-v022-agreement-v1/slurm-56390956.err",
+    "?? data/results/phase4-memory-relay/author-v022-agreement-v1/slurm-56390956.out",
+    "?? data/results/phase4-memory-relay/benchmark-artifacts/04-12-active-v4-20260925-core-1f8f1c2/",
+    "?? data/results/phase4-memory-relay/benchmark-artifacts/269701a485bfb0ad/",
+    "?? data/results/phase4-memory-relay/benchmark-artifacts/3aa97aa62b3a3287/",
+    "?? data/results/phase4-memory-relay/benchmark-artifacts/57960887c700112d/"
+  ],
+  "uncommitted_files_elided_count": 24,
+  "uncommitted_files_measured_at": "2026-09-27T17:20:42.542Z",
+  "uncommitted_files_scope": "Measured immediately before writing this handoff; handoff files are subsequently committed.",
+  "worktrees": {
+    "main": {
+      "path": "/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "head_before_handoff": "f7b83e6a1894d8f6bdfc349dfa71e7e0c3989f37",
+      "tracked_clean": true
+    },
+    "implementation": {
+      "path": "/hpc/group/pfisterlab/mg551/storage/survey_bp_memory_integration_20260926",
+      "branch": "gsd/phase4-memory-integration-20260926",
+      "head": "b28ee43",
+      "validated_source": "62fe977",
+      "tracked_clean": true,
+      "uncommitted_files": [
+        "?? data/results/phase4-notebook/continuation-campaign/",
+        "?? data/results/phase4-notebook/continuation-fixture/",
+        "?? data/results/phase4-notebook/figures/baseline-0-3bb3034082c5757fc358.png",
+        "?? data/results/phase4-notebook/figures/benchmark-0-fb7e972f7cbad33184ba.png",
+        "?? data/results/phase4-notebook/figures/calibration-0-ada6fd0bc72b427db6f2.png",
+        "?? data/results/phase4-notebook/figures/cross_code-0-c2955857f3a98e470648.png",
+        "?? data/results/phase4-notebook/figures/cross_code-1-54e6448257f5d7c7df90.png",
+        "?? data/results/phase4-notebook/figures/evaluation-0-82c092c4cf38366f0ed2.png",
+        "?? data/results/phase4-notebook/figures/factorial-0-ff89a2bf64fd4a8a9f07.png",
+        "?? data/results/phase4-notebook/figures/native-0-6a60e2493b9e57d6abbb.png",
+        "?? data/results/phase4-notebook/figures/selected_settings-0-0ba7f114ee577fb3f805.png",
+        "?? data/results/phase4-notebook/figures/traces-0-7a899a078769f77f324d.png"
+      ]
+    }
+  },
+  "verification_status": {
+    "phase_01": "stale (previously passed)",
+    "phase_02": "stale (previously passed)",
+    "phase_03": "passed",
+    "phase_04": "missing; plans 12/13/14 incomplete",
+    "audit_uat": "0 parsed debt files/items; does not replace missing/stale verification"
+  },
+  "model_config_note": "GSD reports static Codex agent frontmatter older than project model overrides. Check saved models before future delegation; do not automatically select Astra or reinstall/update during this handoff.",
+  "next_action": "Run $gsd-resume-work; inspect async manifest, PID/allocation and result terminal status first. Then $gsd-execute-phase 4. Do not relaunch a live job or rerun completed plans.",
+  "context_notes": "User requested a new-chat handoff. No source edits, job cancellation/relaunch, parameter selection, new campaign or tests were performed for this progress check. Full implementation report and coding handoff remain required reading."
+}

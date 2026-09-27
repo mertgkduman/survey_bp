@@ -4,15 +4,15 @@ milestone: v1.0
 current_phase: 04
 current_phase_name: Memory Policies and Relay-BP
 current_plan: 12
-status: executing
-stopped_at: Calibration active; independent Phase 4 implementation verified in isolation
-last_updated: "2026-09-27T07:36:17Z"
+status: paused
+stopped_at: New-chat handoff saved; calibration continues at 63.8%; isolated implementation verified
+last_updated: "2026-09-27T17:20:42.542Z"
 last_activity: 2026-09-27
-last_activity_desc: Continued local memory, terminal evidence readers and notebook views while calibration runs; 532 tests passed
-state_head: 9661829ae25472a9d829f4fb4fb60ae936e116be
+last_activity_desc: Checked live calibration and saved structured new-chat handoff; Plans 04-12/13/14 remain incomplete
+state_head: f7b83e6a1894d8f6bdfc349dfa71e7e0c3989f37
 progress:
   total_phases: 14
-  completed_phases: 3
+  completed_phases: 1
   total_plans: 57
   completed_plans: 54
 ---
@@ -28,16 +28,16 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 
 ## Current Position
 
-Phase: 04 (Memory Policies and Relay-BP) — EXECUTING
+Phase: 04 (Memory Policies and Relay-BP) — SESSION PAUSED; CALIBRATION RUNNING
 Plan: 12 of 15
 Total Phases: 14
 Current Plan: 12
 Total Plans in Phase: 15
-Status: Executing calibration; independent memory, evidence readers and notebook implementation verified
-Last activity: 2026-09-27 — Continued independent Phase 4 implementation and passed final regression
-Last Activity Description: Preserved active calibration source; isolated source 62fe977 passes 532 tests with one existing skip and both notebooks execute without errors
+Status: Interactive session paused for a new chat; external calibration continues; independent implementation verified
+Last activity: 2026-09-27 — Checked calibration progress and saved GSD new-chat handoff
+Last Activity Description: Calibration running with 3,716/5,824 attempts (63.8%); preserved main source and saved .continue-here.md plus HANDOFF.json
 
-Progress: [██░░░░░░░░] 21% [██░░░░░░░░]
+Progress: 54/57 current plans have summaries; Phase 4 is 12/15. Fresh phase verification is 1/14: Phase 3 passed; Phase 1/2 previously passed reports are now flagged stale. Three phases were previously recorded complete; this freshness audit does not erase their completed plans.
 
 ## Performance Metrics
 
@@ -140,6 +140,7 @@ None outside the roadmap.
 
 ### Blockers/Concerns
 
+- New-chat progress audit: calibration running with 3,716/5,824 retained attempts (63.8%) at 2026-09-27T17:20:42.542Z. See `.planning/HANDOFF.json` for the measured snapshot and async resume context. Phase 1/2 verification reports are now flagged stale by GSD and need refreshing; Phase 3 remains passed. No completed plans were rerun or removed.
 - Phase 4 calibration remains `running` (PID 2702938); Plans 04-12/13/14 remain incomplete. Independent local PD-prime/momentum/affine execution, semantic failure-prefix traces, exact-byte terminal readers, immutable shot contexts and notebook views are verified in isolated source `62fe977`: 532 tests passed, one existing skip. Both notebooks execute all 14 cells without errors. The completed benchmark summary retains a real incomplete B1 p=.07 arm, so its rows remain explicitly unqualified. Fresh production evidence, retained histories/additional lifetimes, other local schedules, disordered local affine and Relay traces remain. Keep source changes separate from the live campaign. See [implementation continuation](phases/04-memory-policies-and-relay-bp/04-IMPLEMENTATION-CONTINUATION-20260927.md) and [coding handoff](phases/04-memory-policies-and-relay-bp/04-CODING-RESUME-HANDOFF.md).
 - Phase 3 passed goal verification with 17/17 plans and all eight requirements complete. The Hsu source-defined group schedule has a retained, independently verified two-shot CSS pilot. The Moradi artifact remains unavailable and is not conflated with the Hsu policy.
 
@@ -166,10 +167,11 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Last session: 2026-09-27T07:36:17Z
-Stopped at: Calibration active; independent Phase 4 implementation verified in isolation
-Resume file: .planning/phases/04-memory-policies-and-relay-bp/04-CODING-RESUME-HANDOFF.md
-Next command: $gsd-execute-phase 4
+Last session: 2026-09-27T17:20:42.542Z
+Stopped at: New-chat handoff saved; calibration continues; independent implementation verified
+Resume file: .planning/phases/04-memory-policies-and-relay-bp/.continue-here.md
+Structured handoff: .planning/HANDOFF.json
+Next command: $gsd-resume-work, then $gsd-execute-phase 4 after checking the async job
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
 Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-IMPLEMENTATION-CONTINUATION-20260927.md`.

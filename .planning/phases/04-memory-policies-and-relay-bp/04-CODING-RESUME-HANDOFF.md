@@ -29,6 +29,16 @@ completed-plan count was waived.
 Committed isolated head `b28ee43` contains the saved notebooks, portable HTML
 and ten standalone PNGs matching the embedded notebook bytes.
 
+## Latest new-chat checkpoint
+
+At 2026-09-27T17:20:42.542Z, calibration is still running with **3,716/5,824
+retained attempts (63.8%)**. The interactive session is
+paused for a new chat; the job continues. Read `.continue-here.md` and
+`.planning/HANDOFF.json` first, then use `$gsd-resume-work`. Plans 04-12/13/14
+remain incomplete. The isolated source/artifact heads remain `62fe977`/`b28ee43`.
+The progress query now flags Phase 1/2 verification stale; refresh those reports
+without rerunning completed plans. No campaign source/cap/design was changed.
+
 ## Current implementation
 
 Local PD-prime and posterior momentum now execute with exact fresh operands and
