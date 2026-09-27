@@ -114,6 +114,14 @@ def audit_surface(plan: Mapping[str, Any], result: Mapping[str, Any]) -> dict[st
                 sample = a.get("sample_identity")
                 if not isinstance(sample, str) or not sample:
                     raise ValueError("terminal sample identity missing")
+                namespace = cell.get("calibration_namespace")
+                if not isinstance(namespace, str) or not namespace:
+                    raise ValueError("frozen calibration sample namespace missing")
+                expected_sample = sha256(
+                    f"bp-registry-sample-v1\0{namespace}\0{a['shot_id']}".encode()
+                ).hexdigest()
+                if sample != expected_sample:
+                    raise ValueError("matched sample identity differs from frozen namespace and shot")
                 key = (cell["code_id"], a["shot_id"])
                 if key in samples and samples[key] != sample:
                     raise ValueError("matched sample identity differs across calibration configurations")

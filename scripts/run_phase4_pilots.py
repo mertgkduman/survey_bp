@@ -937,6 +937,13 @@ def run_calibration(*, repository_root: Path, caps_path: Path, output_root: Path
         existing = _read_json(result_path)
         if existing.get("calibration_digest") != plan["calibration_digest"]:
             raise ValueError("refusing to mix a different calibration plan into retained evidence")
+        if existing.get("status") in {"completed", "completed_with_inconclusive", "cap_reached"}:
+            if (existing.get("calibration_input") != plan["calibration_input"]
+                    or existing.get("caps_sha256") != sha256(caps_path.read_bytes()).hexdigest()
+                    or existing.get("amendment_sha256") != amendment_sha256
+                    or existing.get("result_digest") != _digest({k: v for k, v in existing.items() if k != "result_digest"})):
+                raise ValueError("retained terminal calibration provenance or digest does not verify")
+            return existing
         result.update(existing)
     cells_by_code: dict[str, dict[str, list[Mapping[str, Any]]]] = {}
     for cell in plan["cells"]:
@@ -946,7 +953,11 @@ def run_calibration(*, repository_root: Path, caps_path: Path, output_root: Path
         for code in result["codes"].values() for preset in code.get("presets", {}).values()
         for configuration in preset.get("configurations", []) for attempt in configuration.get("attempts", [])
     )
-    cap_reached = False
+    cap_reached = any(
+        attempt.get("status") == "cap_reached"
+        for code in result["codes"].values() for preset in code.get("presets", {}).values()
+        for configuration in preset.get("configurations", []) for attempt in configuration.get("attempts", [])
+    )
     for code_id, preset_cells in cells_by_code.items():
         code_record = result["codes"].setdefault(code_id, {"presets": {}})
         base = _read_json(repository_root / _BENCHMARK_MANIFESTS[code_id])
@@ -971,11 +982,15 @@ def run_calibration(*, repository_root: Path, caps_path: Path, output_root: Path
                 elif manifest_path.read_bytes() != (json.dumps(manifest, indent=2, sort_keys=True) + "\n").encode("utf-8"):
                     raise ValueError(f"retained calibration manifest drifted: {configuration_id}")
                 for attempt in attempts:
+                    prior_charge = float(attempt.get("public_boundary", {}).get("category_charge_seconds")
+                                         or attempt.get("public_boundary", {}).get("elapsed_seconds") or 0.0)
                     if _reconcile_retained_attempt(
                         repository_root=repository_root, manifest_path=manifest_path, run_output=cell_root / "run",
                         aggregate_events=events_path, attempt=attempt, boundary_seconds=float(cell["public_boundary_seconds"]),
                     ):
-                        used_wall += float(attempt.get("public_boundary", {}).get("category_charge_seconds") or 0.0)
+                        new_charge = float(attempt.get("public_boundary", {}).get("category_charge_seconds")
+                                           or attempt.get("public_boundary", {}).get("elapsed_seconds") or 0.0)
+                        used_wall += new_charge - prior_charge
                         configuration.update(_configuration_evidence(cell, attempts))
                         result["allocation"]["retained_public_boundary_seconds"] = used_wall
                         _write_json_atomic(result_path, result)

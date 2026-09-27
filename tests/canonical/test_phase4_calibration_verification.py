@@ -180,3 +180,38 @@ def test_recovery_replaces_old_charge_instead_of_double_counting(tmp_path, monke
     monkeypatch.setattr(pilot, "_reconcile_retained_attempt", reconcile)
     actual = pilot.run_calibration(repository_root=tmp_path, caps_path=caps_path, output_root=output)
     assert actual["allocation"]["retained_public_boundary_seconds"] == 31.0
+
+
+def test_reentering_capped_calibration_preserves_status_and_audit(tmp_path, monkeypatch):
+    plan, _ = surface()
+    cell = plan["cells"][0]
+    plan = {"cells": [cell], "calibration_digest": "c" * 64, "calibration_input": {"selection_rule": "fixture"}}
+    caps = {"design_amendment": {"sha256": "d" * 64, "path": "fixture.json"},
+            "allocation": {"categories": {"calibration": {"wall_seconds_max": 2}}}}
+    caps_path = tmp_path / "caps.json"
+    caps_path.write_text(json.dumps(caps))
+    (tmp_path / "base.json").write_text("{}")
+    monkeypatch.setattr(pilot, "calibration_plan", lambda root, cap: plan)
+    monkeypatch.setattr(pilot, "_BENCHMARK_MANIFESTS", {"code": "base.json"})
+    monkeypatch.setattr(pilot, "_calibration_manifest", lambda *a, **kw: {"fixture": True})
+
+    def preflight_only(root, verb, *args, **kw):
+        assert verb == "preflight", "no public sample can start after this cap"
+        return {"fixture": True}
+
+    monkeypatch.setattr(pilot, "_json_command", preflight_only)
+    output = tmp_path / "calibration"
+    first = pilot.run_calibration(repository_root=tmp_path, caps_path=caps_path, output_root=output)
+    assert first["status"] == "cap_reached"
+    assert audit.audit_surface(plan, first)["status"] == "passed"
+    second = pilot.run_calibration(repository_root=tmp_path, caps_path=caps_path, output_root=output)
+    assert second["status"] == "cap_reached"
+    assert audit.audit_surface(plan, second)["status"] == "passed"
+    assert first == second
+    invalid = {**second, "result_digest": "0" * 64}
+    result_path = output / "result.json"
+    result_path.write_text(json.dumps(invalid))
+    retained_bytes = result_path.read_bytes()
+    with pytest.raises(ValueError, match="provenance or digest"):
+        pilot.run_calibration(repository_root=tmp_path, caps_path=caps_path, output_root=output)
+    assert result_path.read_bytes() == retained_bytes
