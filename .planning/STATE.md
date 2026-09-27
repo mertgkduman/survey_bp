@@ -5,11 +5,11 @@ current_phase: 04
 current_phase_name: Memory Policies and Relay-BP
 current_plan: 12
 status: executing
-stopped_at: Calibration active; Phase 5 preparatory design and September 26 development PDF verified
-last_updated: "2026-09-26T22:56:19Z"
-last_activity: 2026-09-26
-last_activity_desc: Reviewed Phase 4 gates, prepared Phase 5 intervention design and published reproducible development PDF
-state_head: b684cab1c54014f9dc6e23449c29e59fcfa7b106
+stopped_at: Calibration active; isolated Phase 4 corrections and prerequisites validated
+last_updated: "2026-09-27T03:14:07Z"
+last_activity: 2026-09-27
+last_activity_desc: Resumed Phase 4, reconciled asynchronous evidence and prepared isolated memory, factorial and notebook corrections
+state_head: 7459fc271d610f434a081c4f8544cca842d6e52e
 progress:
   total_phases: 14
   completed_phases: 3
@@ -33,9 +33,9 @@ Plan: 12 of 15
 Total Phases: 14
 Current Plan: 12
 Total Plans in Phase: 15
-Status: Executing calibration; independent Phase 5 preparatory design completed
-Last activity: 2026-09-26 — Completed quick task 260926-ps2: plan review, intervention design and development PDF
-Last Activity Description: Preserved active calibration source; isolated memory correction remains fc214ef
+Status: Executing calibration; independent Phase 4 prerequisites validated
+Last activity: 2026-09-27 — Resumed Phase 4 execution and reconciled terminal auxiliary evidence
+Last Activity Description: Preserved active calibration source; isolated corrections cover memory execution, local boundaries, public traces, factorial preparation and notebook identity
 
 Progress: [██░░░░░░░░] 21% [██░░░░░░░░]
 
@@ -140,7 +140,7 @@ None outside the roadmap.
 
 ### Blockers/Concerns
 
-- Phase 4 ordinary-memory V4 projection discarded memory before execution. Isolated commit `fc214ef` repairs flooding execution and replay; keep it separate from the live calibration source. Local memory/lifecycle/assignment and factorial trace work remain. See [coding handoff](phases/04-memory-policies-and-relay-bp/04-CODING-RESUME-HANDOFF.md).
+- Phase 4 calibration remains `running` (PID 2702938); Plans 04-12/13/14 remain incomplete. Isolated ordinary-memory execution, local PDBP/damping boundaries, public flooding traces, assignment/replay/work corrections, factorial preparation and notebook infrastructure are validated (478 tests passed, one existing skip). Retained histories/additional lifetimes, other local schedules, production evidence and notebook views remain. Keep source changes separate from the live campaign. See [execution resume](phases/04-memory-policies-and-relay-bp/04-EXECUTION-RESUME-20260927.md) and [coding handoff](phases/04-memory-policies-and-relay-bp/04-CODING-RESUME-HANDOFF.md).
 - Phase 3 passed goal verification with 17/17 plans and all eight requirements complete. The Hsu source-defined group schedule has a retained, independently verified two-shot CSS pilot. The Moradi artifact remains unavailable and is not conflated with the Hsu policy.
 
 Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 security threats closed). Remaining research concerns for later phases:
@@ -166,12 +166,12 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Last session: 2026-09-26T22:56:19Z
-Stopped at: Calibration active; Phase 5 preparatory design and 15-page development PDF verified
+Last session: 2026-09-27T03:14:07Z
+Stopped at: Calibration active; isolated Phase 4 corrections and prerequisites validated
 Resume file: .planning/phases/04-memory-policies-and-relay-bp/04-CODING-RESUME-HANDOFF.md
 Next command: $gsd-execute-phase 4
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
-Latest report: `docs/development-update-20260926.pdf`; editable narrative and
-frozen evidence are linked by its source manifest. Phase 4 completion and
-Phase 5 execution remain pending.
+Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-RESUME-20260927.md`.
+The September 26 development PDF remains a historical snapshot. Phase 4
+completion and Phase 5 execution remain pending; no plan counts advanced.
