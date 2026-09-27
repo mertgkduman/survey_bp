@@ -12,8 +12,8 @@ arm-specific.
 The companion [execution supplement](../../../data/evidence/phase4-factorial-execution-supplement-v1.json)
 is a versioned, digest-checked, outcome-independent binding of the frozen design
 and active-V4 caps. It preserves the original design arrays and records the
-necessary executable order: affine prior, field transformations, V2C damping,
-then posterior momentum. In particular, it does not silently rewrite the frozen
+necessary executable order: affine prior, field transformations including
+posterior momentum, then V2C damping. In particular, it does not silently rewrite the frozen
 `v2c-damping-plus-ewa` or `momentum-plus-ewa` declaration arrays; both the frozen
 array and effective order are retained per cell.
 
@@ -32,15 +32,21 @@ predecessor completes; no cap or frozen design was changed.
 The public ordinary disordered-prior form is now the declared fresh uniform
 per-source-iteration PCG64 assignment on `[0, 1]`, bound to an arm-specific
 decoder seed. Its frozen design label is retained as an alias for executable
-`affine_prior`. Public canonical trace collection for factorial runs remains a
-separate runner-integration admission gate; direct schedule tracing is ready.
+`affine_prior`. The runner now declares its public V4 `trace_plan` using the
+existing confined sidecar contract. It selects only the deterministic
+`visible_bp_failures` shot 0 from every arm before outcomes, stores every
+observed ledger link and truncation fact, and retains unavailable Relay/native
+trace evidence as missingness. The coordinated public V4 ON/OFF, disordered
+assignment, and cap-truncation checks have passed. This confirms only the
+execution contract; calibration/evaluation evidence still blocks scientific
+sampling.
 
 Development fixtures can exercise the runner only if they state both
 `development_fixture: true` and `assessment: not_assessed`. Fixture results stay
 `development_fixture_not_assessed`; they cannot authorize sampling or support a
 performance claim.
 
-When the coordinated trace implementation lands, ordinary-memory callers use
+For an enabled flooding-memory shot, the public engine uses
 `MemoryFloodingSchedule(..., trace_sink=..., trace_context=...)`, call
 `observe_candidate(origin, candidate)` after committed work, then call
 `trace_result()` and retain its sidecar as a `trace_link` ledger event. The

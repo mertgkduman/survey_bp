@@ -98,6 +98,8 @@ def test_development_fixture_runner_retains_all_outcomes_and_terminal_measuremen
     assert all(summary["runtime_seconds"]["p95"] is not None for summary in summaries)
     assert sum(summary["resource_maxrss_kib"]["missing"] for summary in summaries) == len(plan["cells"])
     assert all(record["terminal"] for record in report["terminals"])
+    assert len(report["trace_inventory"]) == len(plan["cells"])
+    assert all(item["trace"]["status"] == "not_collected" for item in report["trace_inventory"])
 
 
 def test_factorial_manifest_preflights_all_frozen_arms_and_keeps_factorial_namespace_separate(tmp_path):
@@ -112,6 +114,12 @@ def test_factorial_manifest_preflights_all_frozen_arms_and_keeps_factorial_names
     assert all("factorial" in namespace for namespace in namespaces)
     assert len({manifest["randomness"]["decoder_seed_identity"] for manifest in manifests.values()}) == 14 * 3
     assert all(manifest["schema_version"] == 4 for manifest in manifests.values())
+    traced = [manifest for key, manifest in manifests.items() if key.startswith("visible_bp_failures/")]
+    assert len(traced) == 14
+    assert all(manifest["trace_plan"]["level"] == "full" for manifest in traced)
+    assert all(manifest["trace_plan"]["max_records"] == caps["codes"]["gross-bb-144"]["trace_caps"]["max_records"] for manifest in traced)
+    assert all(manifest["trace_plan"]["max_bytes"] == caps["codes"]["gross-bb-144"]["trace_caps"]["max_bytes"] for manifest in traced)
+    assert all(manifest["trace_plan"]["level"] == "off" for key, manifest in manifests.items() if not key.startswith("visible_bp_failures/"))
 
 
 def test_incomplete_execution_is_retained_outside_proposal_cells():
@@ -133,3 +141,32 @@ def test_incomplete_execution_is_retained_outside_proposal_cells():
     assert completed["all_shot_failure"]["failures"] == 1
     assert incomplete["completed"] == 0
     assert incomplete["execution_statuses"]["incomplete_public_boundary"] == 1
+
+
+def test_selected_trace_links_retain_caps_truncation_and_unavailable_status():
+    runner = _module()
+    design, caps, supplement = _inputs()
+    plan = runner.build_factorial_plan(design=design, caps=caps, supplement=supplement)
+    selected = next(cell for cell in plan["cells"] if cell["noise_region"] == "visible_bp_failures" and cell["shot_id"] == 0)
+    sidecar = {
+        "path": "factorial-traces/trace.json", "sha256": "a" * 64,
+        "records": 2, "bytes": 128, "truncated": True, "dropped_records": 4,
+    }
+    linked = runner.trace_evidence([{
+        "shot_id": selected["shot_id"], "kind": "trace_link",
+        "data": {"status": "linked", "trace_kind": "ordinary_memory"}, "sidecar": sidecar,
+    }], cell=selected, plan=plan)
+    assert linked["status"] == "linked"
+    assert linked["sidecar"]["truncated"] is True
+
+    unavailable = runner.trace_evidence([], cell=selected, plan=plan)
+    assert unavailable == {
+        "status": "unavailable", "reason": "no_public_trace_link",
+        "selection_basis": "visible_bp_failures/shot-0",
+    }
+    with pytest.raises(ValueError, match="frozen trace caps"):
+        runner.trace_evidence([{
+            "shot_id": selected["shot_id"], "kind": "trace_link",
+            "data": {"status": "linked"},
+            "sidecar": {**sidecar, "records": caps["codes"][selected["code_id"]]["trace_caps"]["max_records"] + 1},
+        }], cell=selected, plan=plan)

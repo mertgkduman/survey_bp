@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build and gate the finite Phase 4 factorial; this command never samples."""
 from __future__ import annotations
-import argparse, json, sys
+import argparse, json, subprocess, sys
 from collections import Counter, defaultdict
 from copy import deepcopy
 from hashlib import sha256
@@ -52,7 +52,8 @@ def build_factorial_plan(*,design,caps,supplement):
         for arm in arms:
          frozen,order,co,ready=_ordinary(arm,supplement); aid=arm["id"]
          cells.append({"cell_id":_d({"code":code,"region":region["region"],"shot":shot,"arm":aid,"supplement":supplement["supplement_digest"]})[:24],"code_id":code,"noise_region":region["region"],"error_rate":rate,"shot_id":shot,"arm_id":aid,"arm_kind":arm["kind"],"relay_control":arm.get("control"),"factorial_namespace":ns,"physical_sample_identity":physical,"original_binding_array":frozen,"execution_order":order,"coefficients":co,"execution_ready":ready,"work_cap":dict(caps["codes"][code]["per_shot_work_cap"]),"runtime_boundary_seconds":int(fact["runtime_boundary_seconds"]),"fidelity":{"status":"controlled_css_pilot_adaptation","assessment":"not_assessed"}})
-    out={"schema_version":1,"status":"prepared_no_sampling","assessment":{"status":"not_assessed","scope":"CSS_pilot_adaptation"},"input_digests":{"design_canonical_sha256":_d(design),"caps_canonical_sha256":_d(caps),"caps_digest":caps["caps_digest"],"supplement_digest":supplement["supplement_digest"]},"cells":cells,"cell_count":len(cells),"outcome_cells":list(CELLS),"factorial_category_wall_seconds_max":float(caps["allocation"]["categories"]["fixture_trace"]["wall_seconds_max"]),"blocked_execution_arms":sorted({c["arm_id"] for c in cells if not c["execution_ready"]}),"execution_order_note":supplement["execution_order_resolution"],"trace_contract":supplement["trace_contract"]}
+    trace_contract={**supplement["trace_contract"],"caps_by_code":{code:dict(item["trace_caps"]) for code,item in caps["codes"].items()},"preselected_clean_profile_rule":"visible_bp_failures/shot-0 for every factorial arm; deterministic before outcomes","preselected_shots_per_code":len(arms)}
+    out={"schema_version":1,"status":"prepared_no_sampling","assessment":{"status":"not_assessed","scope":"CSS_pilot_adaptation"},"input_digests":{"design_canonical_sha256":_d(design),"caps_canonical_sha256":_d(caps),"caps_digest":caps["caps_digest"],"supplement_digest":supplement["supplement_digest"]},"cells":cells,"cell_count":len(cells),"outcome_cells":list(CELLS),"factorial_category_wall_seconds_max":float(caps["allocation"]["categories"]["fixture_trace"]["wall_seconds_max"]),"blocked_execution_arms":sorted({c["arm_id"] for c in cells if not c["execution_ready"]}),"execution_order_note":supplement["execution_order_resolution"],"trace_contract":trace_contract}
     out["factorial_digest"]=_d(out); return out
 
 def _binding(cell,index,item,seed):
@@ -74,6 +75,15 @@ def build_public_manifest(*,repository_root,cell,plan):
     if cell["arm_id"]=="relay-no-transfer": relay["transfer"]="disabled"
     if cell["arm_id"]=="relay-uniform-later-memory": relay.pop("memory_tuning",None); relay["later_leg_memory"]="uniform"
     if cell["arm_id"]=="relay-disordered-later-memory": relay["later_leg_memory"]="disordered"
+    trace_caps=plan["trace_contract"]["caps_by_code"][cell["code_id"]]
+    selected_trace=(cell["noise_region"]=="visible_bp_failures" and cell["shot_id"]==0)
+    value["trace_plan"]={"level":"full" if selected_trace else "off",
+                         "relative_dir":f"factorial-traces/{cell['code_id']}/{cell['noise_region']}/{cell['arm_id']}",
+                         "max_records":int(trace_caps["max_records"]) if selected_trace else 0,
+                         "max_bytes":int(trace_caps["max_bytes"]) if selected_trace else 0,
+                         "label":"prespecified_campaign"}
+    value["evidence"]["discrepancies"].append(
+        "Trace selection is pre-outcome diagnostic evidence; disagreement/tail replays are not population performance estimates.")
     value["evidence"]["procedure"]+=f" Phase 4 factorial arm={cell['arm_id']}; digest={plan['factorial_digest']}."; value["evidence"]["discrepancies"].append("Finite CSS pilot adaptation; not a circuit reproduction or universal ranking.")
     return value
 
@@ -110,8 +120,35 @@ def aggregate_terminals(rows,plan):
       complete=[r for r in rs if r.get("execution_status")=="completed"]; cells=Counter(r.get("diagnostic_cell") for r in complete)
       if set(cells)-set(CELLS): raise ValueError("completed factorial terminal has invalid diagnostic cell")
       failures=sum(not(r.get("selected") is True and r.get("diagnostic_cell")=="valid_correct") for r in complete); valid=[r for r in complete if r.get("selected") is True and r.get("diagnostic_cell") in {"valid_correct","valid_wrong_logical"}]; wrong=sum(r.get("diagnostic_cell")=="valid_wrong_logical" for r in valid)
-      summary["/".join(key)]={"planned":7,"attempted":len(rs),"completed":len(complete),"incomplete_or_unstarted":7-len(complete),"diagnostic_cells":{c:cells[c] for c in CELLS},"all_shot_failure":{"failures":failures,"denominator":len(complete),"estimate":failures/len(complete) if complete else None,"wilson_95":wilson_interval(failures,len(complete))},"selected_valid_syndrome_logical_error":{"failures":wrong,"denominator":len(valid),"wilson_95":wilson_interval(wrong,len(valid))},"execution_statuses":dict(Counter(r.get("execution_status") for r in rs)),"raw_work":[r.get("raw_work") for r in rs],"runtime_seconds":_tails([float(r["runtime_seconds"]) for r in rs if isinstance(r.get("runtime_seconds"),(int,float))]),"resource_maxrss_kib":{"tails":_tails([float(r.get("resource",{}).get("maxrss_kib")) for r in rs if isinstance(r.get("resource",{}).get("maxrss_kib"),(int,float))]),"missing":sum(not isinstance(r.get("resource",{}).get("maxrss_kib"),(int,float)) for r in rs)}}
+      trace_statuses=Counter(str(r.get("trace",{}).get("status","missing")) for r in rs)
+      summary["/".join(key)]={"planned":7,"attempted":len(rs),"completed":len(complete),"incomplete_or_unstarted":7-len(complete),"diagnostic_cells":{c:cells[c] for c in CELLS},"all_shot_failure":{"failures":failures,"denominator":len(complete),"estimate":failures/len(complete) if complete else None,"wilson_95":wilson_interval(failures,len(complete))},"selected_valid_syndrome_logical_error":{"failures":wrong,"denominator":len(valid),"wilson_95":wilson_interval(wrong,len(valid))},"execution_statuses":dict(Counter(r.get("execution_status") for r in rs)),"raw_work":[r.get("raw_work") for r in rs],"runtime_seconds":_tails([float(r["runtime_seconds"]) for r in rs if isinstance(r.get("runtime_seconds"),(int,float))]),"resource_maxrss_kib":{"tails":_tails([float(r.get("resource",{}).get("maxrss_kib")) for r in rs if isinstance(r.get("resource",{}).get("maxrss_kib"),(int,float))]),"missing":sum(not isinstance(r.get("resource",{}).get("maxrss_kib"),(int,float)) for r in rs)},"trace":{"statuses":dict(trace_statuses),"missing":trace_statuses["missing"]+trace_statuses["unavailable"]}}
     return {"by_cell":summary,"outcome_cells":list(CELLS)}
+
+def trace_evidence(events, *, cell, plan):
+    """Index the public trace event without converting absence into a result."""
+    selected = cell["noise_region"] == "visible_bp_failures" and cell["shot_id"] == 0
+    if not selected:
+        return {"status":"not_selected_pre_outcome","selection_basis":"visible_bp_failures/shot-0"}
+    events = [event for event in events if event.get("shot_id") == cell["shot_id"] and event.get("kind") == "trace_link"]
+    if not events:
+        return {"status":"unavailable","reason":"no_public_trace_link","selection_basis":"visible_bp_failures/shot-0"}
+    event = events[-1]; data = event.get("data", {})
+    if not isinstance(data, Mapping) or data.get("status") != "linked":
+        return {"status":"unavailable","reason":data.get("reason","public_trace_unavailable") if isinstance(data, Mapping) else "invalid_trace_event","selection_basis":"visible_bp_failures/shot-0"}
+    sidecar = event.get("sidecar")
+    if not isinstance(sidecar, Mapping):
+        return {"status":"unavailable","reason":"linked_trace_missing_sidecar","selection_basis":"visible_bp_failures/shot-0"}
+    caps = plan["trace_contract"]["caps_by_code"][cell["code_id"]]
+    records, bytes_written = sidecar.get("records"), sidecar.get("bytes")
+    if type(records) is not int or type(bytes_written) is not int or records > caps["max_records"] or bytes_written > caps["max_bytes"]:
+        raise ValueError("public trace sidecar exceeds or omits frozen trace caps")
+    if not isinstance(sidecar.get("truncated"), bool) or type(sidecar.get("dropped_records")) is not int:
+        raise ValueError("public trace sidecar omits truncation evidence")
+    return {"status":"linked","trace_kind":data.get("trace_kind"),"sidecar":dict(sidecar),"selection_basis":"visible_bp_failures/shot-0"}
+
+def _retained_trace_evidence(active, run_root, *, cell, plan):
+    return trace_evidence(active._events(run_root), cell=cell, plan=plan) if (run_root / "events.jsonl").exists() else trace_evidence([], cell=cell, plan=plan)
+
 def canonical_public_executor(*, repository_root: Path, output_root: Path, plan: Mapping[str, Any]) -> Callable[[Mapping[str, Any]], Mapping[str, Any]]:
     """Return the production executor: public preflight, one shot, then verify."""
     active=_active()
@@ -122,10 +159,14 @@ def canonical_public_executor(*, repository_root: Path, output_root: Path, plan:
       if spent+boundary>float(plan["factorial_category_wall_seconds_max"]):
         return {"cell_id":cell["cell_id"],"sample_namespace":cell["factorial_namespace"],"sample_identity":None,"execution_status":"incomplete_category_cap","terminal":False,"raw_work":None,"runtime_seconds":None,"resource":{"maxrss_kib":None}}
       manifest=build_public_manifest(repository_root=repository_root,cell=cell,plan=plan)
-      root=output_root/cell["code_id"]/cell["noise_region"]/cell["arm_id"]; root.mkdir(parents=True,exist_ok=True)
+      # A manifest's trace plan applies to its whole run.  Isolating a cell keeps
+      # the prespecified shot-0 diagnostic trace from collecting the other six
+      # shots in an arm/rate cohort.
+      root=output_root/cell["code_id"]/cell["noise_region"]/cell["arm_id"]/f"shot-{cell['shot_id']}"; root.mkdir(parents=True,exist_ok=True)
       path=root/"manifest.json"; expected=json.dumps(manifest,indent=2,sort_keys=True)+"\n"
       if path.exists() and path.read_text()!=expected: raise ValueError("retained factorial manifest drifted")
       if not path.exists(): path.write_text(expected)
+      began=None
       try:
         began=perf_counter()
         preflight=active._command(repository_root,"preflight",str(path),timeout=cell["runtime_boundary_seconds"])
@@ -133,17 +174,18 @@ def canonical_public_executor(*, repository_root: Path, output_root: Path, plan:
         if observation.get("sample_namespace")!=cell["factorial_namespace"] or not isinstance(observation.get("sample_identity"),str): raise ValueError("public observation does not expose the declared factorial sample identity")
         run=active._command(repository_root,"canonical",str(path),"--output",str(root/"run"),"--shot",str(cell["shot_id"]),timeout=cell["runtime_boundary_seconds"])
         verify=active._command(repository_root,"verify-canonical-shot",str(path),str(root/"run"),"--shot",str(cell["shot_id"]),timeout=cell["runtime_boundary_seconds"])
-        fact=active._attempt_from_events(active._events(root/"run"),cell["shot_id"]); terminal=fact["terminal"]
+        events=active._events(root/"run"); fact=active._attempt_from_events(events,cell["shot_id"]); trace=trace_evidence(events,cell=cell,plan=plan); terminal=fact["terminal"]
         if fact["sample_identity"] not in {None,observation["sample_identity"]}: raise ValueError("public ledger sample identity disagrees with public observation")
         spent += perf_counter()-began
-        if fact["termination"] is None: return {"cell_id":cell["cell_id"],"sample_namespace":observation["sample_namespace"],"sample_identity":observation["sample_identity"],"execution_status":"incomplete_public_boundary","terminal":False,"raw_work":fact["work_vector"],"runtime_seconds":None,"resource":{"maxrss_kib":None},"public_boundary":{"preflight":preflight,"run":run,"verify":verify}}
+        if fact["termination"] is None: return {"cell_id":cell["cell_id"],"sample_namespace":observation["sample_namespace"],"sample_identity":observation["sample_identity"],"execution_status":"incomplete_public_boundary","terminal":False,"raw_work":fact["work_vector"],"runtime_seconds":None,"resource":{"maxrss_kib":None},"trace":trace,"public_boundary":{"preflight":preflight,"run":run,"verify":verify}}
         import run_phase4_evaluation as evaluation
         classification=evaluation.classify_candidate(path,shot_id=cell["shot_id"],candidate=terminal.get("diagnostic_candidate"))
         selected=terminal.get("selection_status")=="frozen_decoder_visible_candidate"
-        return {"cell_id":cell["cell_id"],"sample_namespace":observation["sample_namespace"],"sample_identity":observation["sample_identity"],"execution_status":"completed","terminal":True,**classification,"selected":selected,"candidate_origin":terminal.get("diagnostic_candidate_origin"),"raw_work":fact["work_vector"],"runtime_seconds":None,"resource":{"maxrss_kib":None},"public_boundary":{"preflight":preflight,"run":run,"verify":verify}}
-      except (OSError,RuntimeError,ValueError) as error:
-        spent += perf_counter()-began
-        return {"cell_id":cell["cell_id"],"sample_namespace":cell["factorial_namespace"],"sample_identity":None,"execution_status":"incomplete_public_boundary","terminal":False,"failure":str(error),"raw_work":None,"runtime_seconds":None,"resource":{"maxrss_kib":None}}
+        return {"cell_id":cell["cell_id"],"sample_namespace":observation["sample_namespace"],"sample_identity":observation["sample_identity"],"execution_status":"completed","terminal":True,**classification,"selected":selected,"candidate_origin":terminal.get("diagnostic_candidate_origin"),"raw_work":fact["work_vector"],"runtime_seconds":None,"resource":{"maxrss_kib":None},"trace":trace,"public_boundary":{"preflight":preflight,"run":run,"verify":verify}}
+      except (OSError,RuntimeError,ValueError,subprocess.TimeoutExpired,TimeoutError) as error:
+        spent += 0.0 if began is None else perf_counter()-began
+        trace=_retained_trace_evidence(active,root/"run",cell=cell,plan=plan)
+        return {"cell_id":cell["cell_id"],"sample_namespace":cell["factorial_namespace"],"sample_identity":None,"execution_status":"incomplete_public_boundary","terminal":False,"failure":str(error),"raw_work":None,"runtime_seconds":None,"resource":{"maxrss_kib":None},"trace":trace}
     return execute
 
 def run_factorial(*,evaluation_path,plan,executor:Callable[[Mapping[str,Any]],Mapping[str,Any]]|None=None,allow_development_fixture=False,repository_root:Path=ROOT,output_root:Path|None=None):
@@ -160,7 +202,7 @@ def run_factorial(*,evaluation_path,plan,executor:Callable[[Mapping[str,Any]],Ma
     for cohort in cohorts.values():
       observed={row.get("sample_identity") for row in cohort if row.get("sample_identity") is not None}
       if len(observed)>1: raise ValueError("executor produced unmatched physical samples across factorial arms")
-    return {"schema_version":1,"status":"development_fixture_not_assessed" if gate["development_fixture"] else "completed_not_assessed","assessment":"not_assessed","predecessor":gate,"factorial_digest":plan["factorial_digest"],"terminals":rows,"aggregate":aggregate_terminals(rows,plan)}
+    return {"schema_version":1,"status":"development_fixture_not_assessed" if gate["development_fixture"] else "completed_not_assessed","assessment":"not_assessed","predecessor":gate,"factorial_digest":plan["factorial_digest"],"terminals":rows,"trace_inventory":[{"cell_id":row["cell_id"],"code_id":row["code_id"],"noise_region":row["noise_region"],"arm_id":row["arm_id"],"shot_id":row["shot_id"],"execution_status":row["execution_status"],"trace":row.get("trace",{"status":"missing"})} for row in rows],"aggregate":aggregate_terminals(rows,plan)}
 def trace_link_event(*,ledger_id,schedule):
     result=schedule.trace_result(); link=None if result is None else result.ledger_link()
     if link is None: raise ValueError("ordinary-memory trace yielded no sidecar link")
