@@ -64,6 +64,19 @@ configuration/shot/work/runtime limits and disjoint stage sample namespaces.
 1. Reconcile the running calibration using its existing async manifest. Never
    relaunch a live PID or change its source/caps. Retain every coarse/refinement
    attempt, Wilson uncertainty, work, failure and capped/inconclusive terminal.
+   While it runs, the isolated verifier can inspect an immutable snapshot of
+   the retained prefix without starting work or selecting a setting:
+
+   ```bash
+   OMP_NUM_THREADS=1 PYTHONPATH=src .venv/bin/python scripts/verify_phase4_calibration.py --progress
+   ```
+
+   This checks the frozen cap/plan identity, observed configuration and shot
+   subsets, terminal receipts, sample identities, work, aggregates and charged
+   wall time. A current in-flight placeholder has no terminal verification;
+   its aggregate is not marked checked. The report's `selection_permitted` is
+   always false because public ledger replay remains a separate gate. Run the
+   same command without `--progress` only after the producer is terminal.
 2. From verified terminal calibration, freeze deterministic per-preset and
    shared candidate settings. Apply the prespecified interval/work/lexicographic
    tie rules; an insufficient-precision candidate remains inconclusive.

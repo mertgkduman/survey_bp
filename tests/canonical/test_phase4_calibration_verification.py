@@ -55,6 +55,39 @@ def test_complete_surface_reconstructs_counts_and_preserves_input():
     assert result == before
 
 
+def test_progress_audits_prefix_without_qualifying_selection():
+    plan, result = surface()
+    result["status"] = "running"
+    result["codes"]["code"]["presets"].pop("canonical_default")
+    row(result)["attempts"].pop()
+    row(result).update(pilot._configuration_evidence(plan["cells"][0], row(result)["attempts"]))
+    result["allocation"]["retained_public_boundary_seconds"] = 1.0
+    original = deepcopy(result)
+    report = audit.audit_surface(plan, result, allow_running=True)
+    assert report["scope"] == "partial_surface_integrity_only"
+    assert report["observed_configurations"] == 1
+    assert report["retained_attempts"] == 1
+    assert report["planned_attempts"] == 4
+    assert report["selection_permitted"] is False
+    assert result == original
+    with pytest.raises(ValueError, match="terminal"):
+        audit.audit_surface(plan, result)
+
+
+def test_progress_accepts_unpriced_inflight_placeholder_but_rejects_retained_tampering():
+    plan, result = surface()
+    result["status"] = "running"
+    attempts = row(result)["attempts"]
+    attempts[1] = {"shot_id": 1, "status": "incomplete_public_boundary", "termination": None,
+                   "failure": "public canonical command interrupted before retained terminal",
+                   "public_boundary": {"elapsed_seconds": None}}
+    result["allocation"]["retained_public_boundary_seconds"] = 3.0
+    assert audit.audit_surface(plan, result, allow_running=True)["retained_attempts"] == 4
+    attempts[0]["work_vector"]["check_to_variable_updates"] = 11
+    with pytest.raises(ValueError, match="work cap"):
+        audit.audit_surface(plan, result, allow_running=True)
+
+
 @pytest.mark.parametrize("change,match", [
     (lambda r: r["codes"]["code"]["presets"]["canonical_default"]["configurations"].clear(), "configuration coverage"),
     (lambda r: row(r)["attempts"].pop(), "shot coverage"),

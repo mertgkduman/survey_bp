@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Read-only terminal calibration coverage audit; ledger replay is a separate gate.
+"""Read-only calibration coverage audit; ledger replay is a separate gate.
 
 No settings are selected or written. A surface-integrity verdict proves plan
 coverage and internal aggregate consistency, not canonical ledger semantics.
+Progress mode checks only the retained prefix and never qualifies a selection.
 """
 from __future__ import annotations
 
@@ -50,9 +51,12 @@ def _summary(cell: Mapping[str, Any], attempts: list[Mapping[str, Any]]) -> dict
     }
 
 
-def audit_surface(plan: Mapping[str, Any], result: Mapping[str, Any]) -> dict[str, Any]:
-    """Reject missing planned rows, duplicated shots, and self-hashed claim drift."""
-    if result.get("status") not in TERMINAL:
+def audit_surface(
+    plan: Mapping[str, Any], result: Mapping[str, Any], *, allow_running: bool = False,
+) -> dict[str, Any]:
+    """Check exact terminal coverage or an explicitly incomplete retained prefix."""
+    partial = result.get("status") == "running" and allow_running
+    if not partial and result.get("status") not in TERMINAL:
         raise ValueError("surface audit requires terminal calibration")
     if result.get("evaluation_namespace_accessed") is not False:
         raise ValueError("calibration accessed evaluation samples")
@@ -73,13 +77,25 @@ def audit_surface(plan: Mapping[str, Any], result: Mapping[str, Any]) -> dict[st
                 if cell is None or (code_id, preset_key) != (cell["code_id"], cell["preset_key"]):
                     raise ValueError("configuration coverage outside frozen code/preset")
                 found[cid] = configuration
-    if set(found) != set(expected) or found_presets != expected_presets or set(result.get("codes", {})) != {c["code_id"] for c in expected.values()}:
+    if partial:
+        coverage_valid = (
+            set(found) <= set(expected) and found_presets <= expected_presets
+            and set(result.get("codes", {})) <= {c["code_id"] for c in expected.values()}
+        )
+    else:
+        coverage_valid = (
+            set(found) == set(expected) and found_presets == expected_presets
+            and set(result.get("codes", {})) == {c["code_id"] for c in expected.values()}
+        )
+    if not coverage_valid:
         raise ValueError("configuration coverage differs from frozen plan")
     statuses: Counter[str] = Counter()
     samples: dict[tuple[str, int], str] = {}
     total_charge = 0.0
     eligible_count = 0
     for cid, cell in expected.items():
+        if cid not in found:
+            continue
         config = found[cid]
         if config.get("candidate") != cell["candidate"] or config.get("relay") != cell["relay"]:
             raise ValueError("configuration controls differ from frozen plan")
@@ -91,7 +107,8 @@ def audit_surface(plan: Mapping[str, Any], result: Mapping[str, Any]) -> dict[st
             raise ValueError("invalid shot coverage identifiers")
         if len(ids) != len(set(ids)):
             raise ValueError("duplicate shot coverage")
-        if set(ids) != set(range(cell["calibration_shots"])):
+        valid_ids = set(range(cell["calibration_shots"]))
+        if (not set(ids) <= valid_ids) or (not partial and set(ids) != valid_ids):
             raise ValueError("shot coverage differs from frozen plan")
         for a in attempts:
             status = a.get("status")
@@ -102,6 +119,11 @@ def audit_surface(plan: Mapping[str, Any], result: Mapping[str, Any]) -> dict[st
             charge = boundary.get("category_charge_seconds")
             if charge is None:
                 charge = boundary.get("elapsed_seconds")
+            # A running producer first persists an in-flight placeholder. It
+            # has no charge until the public boundary returns; its missing
+            # elapsed time is not a zero-duration terminal observation.
+            if partial and status == "incomplete_public_boundary" and charge is None:
+                charge = 0.0
             charge = _number(charge, "wall charge")
             total_charge += charge
             if status in {"completed", "budget_exhausted"}:
@@ -141,32 +163,43 @@ def audit_surface(plan: Mapping[str, Any], result: Mapping[str, Any]) -> dict[st
                     raise ValueError("terminal work cap components missing")
             elif status == "cap_reached" and (charge != 0 or a.get("termination") is not None):
                 raise ValueError("unstarted cap placeholder claims terminal work")
-        summary = _summary(cell, attempts)
-        for field, value in summary.items():
-            if config.get(field) != value:
-                raise ValueError(f"configuration aggregate {field} does not reconstruct")
-        eligible_count += int(summary["logical_failure"]["eligible"])
+        # The in-flight placeholder is persisted before its aggregate is
+        # refreshed. Never misstate that transient record as fully checked.
+        if not (partial and any(a["status"] == "incomplete_public_boundary" for a in attempts)):
+            summary = _summary(cell, attempts)
+            for field, value in summary.items():
+                if config.get(field) != value:
+                    raise ValueError(f"configuration aggregate {field} does not reconstruct")
+            eligible_count += int(summary["logical_failure"]["eligible"])
     allocation = result.get("allocation", {})
     _close(allocation.get("retained_public_boundary_seconds"), total_charge, "wall charge")
     if total_charge > _number(allocation.get("wall_seconds_max"), "wall cap") + 1e-8:
         raise ValueError("calibration wall charge exceeds frozen category")
     expected_status = ("cap_reached" if statuses["cap_reached"] else "completed"
                        if eligible_count == len(expected) else "completed_with_inconclusive")
-    if result["status"] != expected_status:
+    if not partial and result["status"] != expected_status:
         raise ValueError("terminal aggregate status does not reconstruct")
-    return {"status": "passed", "scope": "surface_integrity_only",
+    return {"status": "passed", "scope": "partial_surface_integrity_only" if partial else "surface_integrity_only",
             "planned_configurations": len(expected), "eligible_configurations": eligible_count,
+            "observed_configurations": len(found),
             "planned_attempts": sum(c["calibration_shots"] for c in expected.values()),
             "retained_attempts": sum(statuses.values()), "attempt_status_counts": dict(statuses),
+            # This surface audit never replays the underlying public ledger.
+            # Even a terminal surface verdict cannot by itself release a
+            # selected setting for fresh evaluation.
+            "selection_permitted": False,
             "ledger_semantics": "requires_separate_public_verification",
             "assessment_status": "not_assessed"}
 
 
-def audit_terminal(*, root: Path, caps_path: Path, calibration_path: Path) -> dict[str, Any]:
-    """Load exact bytes and bind the complete surface to its frozen cap/plan."""
+def audit_terminal(
+    *, root: Path, caps_path: Path, calibration_path: Path, allow_running: bool = False,
+) -> dict[str, Any]:
+    """Load exact bytes and bind a retained snapshot to its frozen cap/plan."""
     caps_bytes, result_bytes = caps_path.read_bytes(), calibration_path.read_bytes()
     caps, result = json.loads(caps_bytes), json.loads(result_bytes)
-    if result.get("status") not in TERMINAL:
+    partial = result.get("status") == "running" and allow_running
+    if not partial and result.get("status") not in TERMINAL:
         raise ValueError("surface audit requires terminal calibration")
     if caps.get("schema_version") != 4 or caps.get("caps_digest") != pilot._digest({k: v for k, v in caps.items() if k != "caps_digest"}):
         raise ValueError("frozen cap digest does not verify")
@@ -175,12 +208,13 @@ def audit_terminal(*, root: Path, caps_path: Path, calibration_path: Path) -> di
         raise ValueError("calibration provenance differs from frozen plan")
     if result.get("amendment_sha256") != caps["design_amendment"]["sha256"]:
         raise ValueError("calibration amendment identity drifted")
-    if result.get("result_digest") != pilot._digest({k: v for k, v in result.items() if k != "result_digest"}):
+    if not partial and result.get("result_digest") != pilot._digest({k: v for k, v in result.items() if k != "result_digest"}):
         raise ValueError("terminal result digest does not verify")
     if result.get("allocation", {}).get("wall_seconds_max") != caps["allocation"]["categories"]["calibration"]["wall_seconds_max"]:
         raise ValueError("calibration category wall cap drifted")
-    report = audit_surface(plan, result)
-    return {**report, "calibration_digest": plan["calibration_digest"], "result_byte_sha256": sha256(result_bytes).hexdigest()}
+    report = audit_surface(plan, result, allow_running=allow_running)
+    return {**report, "producer_status": result["status"],
+            "calibration_digest": plan["calibration_digest"], "result_byte_sha256": sha256(result_bytes).hexdigest()}
 
 
 def main() -> None:
@@ -188,9 +222,13 @@ def main() -> None:
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--caps", type=Path, default=Path("data/manifests/phase4-pilot-caps.json"))
     parser.add_argument("--calibration", type=Path, default=Path("data/results/phase4-memory-relay/calibration/result.json"))
+    parser.add_argument("--progress", action="store_true", help="audit a running prefix without qualifying a selection")
     args = parser.parse_args()
     root = args.root.resolve()
-    print(json.dumps(audit_terminal(root=root, caps_path=root / args.caps, calibration_path=root / args.calibration), indent=2, sort_keys=True))
+    print(json.dumps(audit_terminal(
+        root=root, caps_path=root / args.caps, calibration_path=root / args.calibration,
+        allow_running=args.progress,
+    ), indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":
