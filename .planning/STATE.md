@@ -5,10 +5,10 @@ current_phase: 04
 current_phase_name: Memory Policies and Relay-BP
 current_plan: 12
 status: executing
-stopped_at: Plan 04-12 external calibration running; independent continuation verified with 560 tests
-last_updated: "2026-09-27T18:59:32Z"
+stopped_at: Plan 04-12 external calibration running; progress audit verified with 562 tests
+last_updated: "2026-09-28T02:09:36Z"
 last_activity: 2026-09-27
-last_activity_desc: Calibration 3846/5824 (66.0%); isolated eb16e22 verified with 560 passed and one pre-existing skip
+last_activity_desc: Calibration 4466/5824 (76.7%); isolated progress audit 532324f verified with 562 passed and one pre-existing skip
 state_head: 789034ad680c933b604e73c117ef976208744691
 progress:
   total_phases: 14
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 12
 Total Plans in Phase: 15
 Status: Executing Phase 04; external calibration running; isolated continuation fully verified
-Last activity: 2026-09-27 — Resumed Phase 4 and implemented independent corrections
-Last Activity Description: Calibration 3846/5824 (66.0%); independent local memory/audit/recovery/shared preparation verified, 560 passed and one pre-existing skip; no plan counts advanced
+Last activity: 2026-09-27 — Read-only live calibration progress audit and isolated verifier extension
+Last Activity Description: Calibration 4466/5824 (76.7%); partial surface integrity passed without selection; isolated audit source `532324f` verified, 562 passed and one pre-existing skip; no plan counts advanced
 
 Progress: 54/57 current plans have summaries; Phase 4 is 12/15. Fresh phase verification is 1/14: Phase 3 passed; Phase 1/2 previously passed reports are now flagged stale. Three phases were previously recorded complete; this freshness audit does not erase their completed plans.
 
@@ -140,7 +140,7 @@ None outside the roadmap.
 
 ### Blockers/Concerns
 
-- Current resumed execution: calibration 3846/5824 (66.0%) at 2026-09-27T18:59:32Z. Isolated source `eb16e22` is verified: 560 passed, one pre-existing skip, 454.56s; artifact head `ce1c22d`. No main source merge or new production stage. Earlier September 27 entries below are historical snapshots; see the resumed execution report for current scope and remaining gates.
+- Current resumed execution: calibration 4466/5824 (76.7%) at 2026-09-28T02:09:36Z, with 4013 completed and 453 budget-exhausted attempts. The isolated progress audit passed for the retained prefix but `selection_permitted` is false; source `532324f` passed 562 tests, one pre-existing skip, 440.89s; artifact head `efabeb2`. No main source merge or new production stage. Earlier entries below are historical snapshots; see the isolated progress audit record for current scope and remaining gates.
 
 - New-chat progress audit: calibration running with 3,716/5,824 retained attempts (63.8%) at 2026-09-27T17:20:42.542Z. See `.planning/HANDOFF.json` for the measured snapshot and async resume context. Phase 1/2 verification reports are now flagged stale by GSD and need refreshing; Phase 3 remains passed. No completed plans were rerun or removed.
 - Phase 4 calibration remains `running` (PID 2702938); Plans 04-12/13/14 remain incomplete. Independent local PD-prime/momentum/affine execution, semantic failure-prefix traces, exact-byte terminal readers, immutable shot contexts and notebook views are verified in isolated source `62fe977`: 532 tests passed, one existing skip. Both notebooks execute all 14 cells without errors. The completed benchmark summary retains a real incomplete B1 p=.07 arm, so its rows remain explicitly unqualified. Fresh production evidence, retained histories/additional lifetimes, other local schedules, disordered local affine and Relay traces remain. Keep source changes separate from the live campaign. See [implementation continuation](phases/04-memory-policies-and-relay-bp/04-IMPLEMENTATION-CONTINUATION-20260927.md) and [coding handoff](phases/04-memory-policies-and-relay-bp/04-CODING-RESUME-HANDOFF.md).
@@ -170,13 +170,14 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Last session: 2026-09-27T18:59:32Z
-Stopped at: Plan 04-12 external job running; isolated eb16e22 fully verified; artifact head ce1c22d
+Last session: 2026-09-28T02:09:36Z
+Stopped at: Plan 04-12 external job running; isolated 532324f fully verified; artifact head efabeb2
 Resume file: .planning/phases/04-memory-policies-and-relay-bp/.continue-here.md
 Structured handoff: .planning/HANDOFF.json
 Next command: $gsd-execute-phase 4 after reconciling the existing async job
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
 Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md`.
+Latest isolated progress audit: `gsd/phase4-memory-integration-20260926` at `efabeb2`, `.planning/phases/04-memory-policies-and-relay-bp/04-PROGRESS-AUDIT-CONTINUATION-20260928.md`.
 The September 26 development PDF remains a historical snapshot. Phase 4
 completion and Phase 5 execution remain pending; no plan counts advanced.

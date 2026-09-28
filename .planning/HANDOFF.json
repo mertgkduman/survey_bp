@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "timestamp": "2026-09-27T18:59:32Z",
+  "timestamp": "2026-09-28T02:09:36Z",
   "phase": "04",
   "phase_name": "Memory Policies and Relay-BP",
   "phase_dir": ".planning/phases/04-memory-policies-and-relay-bp",
@@ -49,6 +49,14 @@
       "source_commit": "eb16e22",
       "validation": "Full regression on eb16e22: 560 passed, 1 pre-existing skip, 454.56s; bounded calibration review findings resolved",
       "artifact_commit": "ce1c22d"
+    },
+    {
+      "id": "running-calibration-progress-audit",
+      "name": "Read-only frozen-plan audit of the running calibration prefix in isolated source",
+      "status": "done",
+      "source_commit": "532324f",
+      "validation": "Progress audit passed at 4466/5824; 50 focused tests and full regression 562 passed, 1 pre-existing skip, 440.89s",
+      "artifact_commit": "efabeb2"
     }
   ],
   "remaining_tasks": [
@@ -112,20 +120,24 @@
       "terminal_details": null,
       "manifest": ".planning/async-jobs/04-12-calibration-v4-active.json",
       "progress_snapshot": {
-        "checked_at": "2026-09-27T18:59:32Z",
+        "checked_at": "2026-09-28T02:09:36Z",
         "status": "running",
-        "retained_attempts": 3846,
+        "retained_attempts": 4466,
         "planned_attempts": 5824,
-        "retained_percent": 66.0,
+        "retained_percent": 76.7,
+        "observed_configurations": 140,
+        "planned_configurations": 182,
         "termination_counts": {
-          "completed": 3393,
+          "completed": 4013,
           "budget_exhausted": 453
         },
-        "public_boundary_seconds": 152995.44702351512,
+        "result_byte_sha256": "3d2a8df0cd08827bc3216292396fe67fccf04ecb8dc68c1c018c754449b688e0",
+        "surface_audit": "passed_partial_surface_integrity_only",
+        "selection_permitted": false,
         "public_boundary_cap_seconds": 688243.0,
         "evaluation_namespace_accessed": false
       },
-      "watcher_state": "No watcher launched by this handoff; PID 2702938 and allocation 55938300 observed running."
+      "watcher_state": "No watcher launched; PID 2702938 observed running before the audited progress snapshot."
     }
   ],
   "human_actions_pending": [],
@@ -210,8 +222,8 @@
     "implementation": {
       "path": "/hpc/group/pfisterlab/mg551/storage/survey_bp_memory_integration_20260926",
       "branch": "gsd/phase4-memory-integration-20260926",
-      "head": "b28ee43",
-      "validated_source": "62fe977",
+      "head": "efabeb2",
+      "validated_source": "532324f",
       "tracked_clean": true,
       "uncommitted_files": [
         "?? data/results/phase4-notebook/continuation-campaign/",
@@ -238,16 +250,17 @@
   },
   "model_config_note": "GSD reports static Codex agent frontmatter older than project model overrides. Check saved models before future delegation; do not automatically select Astra or reinstall/update during this handoff.",
   "next_action": "Run $gsd-resume-work; inspect async manifest, PID/allocation and result terminal status first. Then $gsd-execute-phase 4. Do not relaunch a live job or rerun completed plans.",
-  "context_notes": "Phase4 resumed through gsd-execute-phase. Main source/caps/design frozen at101a01b; PID2702938 and allocation55938300 still running. Independent sourceeb16e22 fully verified:560 passed,1 pre-existing skip,454.56s; scoped artifacts committedce1c22d. No source merge, parameter selection, new production campaign or phase completion. See latest resumed execution report for terminal/integration/scientific gates.",
-  "implementation_source_commit": "eb16e22",
+  "context_notes": "Phase 4 remains 12/15. Main campaign source/caps/design frozen at 101a01b; PID 2702938 remains active. Isolated source 532324f adds a read-only running-prefix audit and passed 562 tests, 1 pre-existing skip, 440.89s; artifact head efabeb2. Partial result at 2026-09-28T02:09:36Z was 4466/5824 and audit passed without selection. No source merge, selected setting, fresh evaluation, or phase completion.",
+  "implementation_source_commit": "532324f",
   "execution_report": ".planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md",
   "regression": {
     "status": "passed",
-    "source_commit": "eb16e22",
-    "passed": 560,
+    "source_commit": "532324f",
+    "passed": 562,
     "skipped": 1,
-    "seconds": 454.56,
-    "log": "/hpc/group/pfisterlab/mg551/storage/survey_bp_memory_integration_20260926/.planning/phases/04-memory-policies-and-relay-bp/04-CONTINUATION-REGRESSION-20260927.log"
+    "seconds": 440.89,
+    "log": "/hpc/group/pfisterlab/mg551/storage/survey_bp_memory_integration_20260926/.planning/phases/04-memory-policies-and-relay-bp/04-PROGRESS-AUDIT-REGRESSION-20260927.log"
   },
-  "implementation_artifact_commit": "ce1c22d"
+  "implementation_artifact_commit": "efabeb2",
+  "latest_progress_audit": "gsd/phase4-memory-integration-20260926:.planning/phases/04-memory-policies-and-relay-bp/04-PROGRESS-AUDIT-CONTINUATION-20260928.md"
 }
