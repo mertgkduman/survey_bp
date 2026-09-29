@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Read-only calibration coverage audit; ledger replay is a separate gate.
+"""Read-only calibration coverage audit with an optional terminal ledger gate.
 
 No settings are selected or written. A surface-integrity verdict proves plan
 coverage and internal aggregate consistency, not canonical ledger semantics.
 Progress mode checks only the retained prefix and never qualifies a selection.
+The ``--ledgers`` gate additionally checks exact manifest, aggregate-ledger,
+Relay work, and terminal-field bindings after the producer becomes terminal.
 """
 from __future__ import annotations
 
@@ -17,6 +19,8 @@ from typing import Any, Mapping
 
 import run_phase4_pilots as pilot
 from bp_registry.phase4_analysis import wilson_interval
+from bp_registry.canonical.verification import reconstruct_phase4_shot
+from bp_registry.ledger import read_canonical_events_bytes
 
 TERMINAL = {"completed", "completed_with_inconclusive", "cap_reached"}
 ATTEMPT_STATUSES = {"completed", "budget_exhausted", "incomplete_public_boundary", "cap_reached"}
@@ -217,17 +221,131 @@ def audit_terminal(
             "calibration_digest": plan["calibration_digest"], "result_byte_sha256": sha256(result_bytes).hexdigest()}
 
 
+def audit_retained_ledgers(
+    *, root: Path, caps_path: Path, calibration_path: Path,
+) -> dict[str, Any]:
+    """Independently bind every terminal shot to the frozen manifest and ledger.
+
+    This is deliberately terminal-only.  The producer can append its aggregate
+    ledger while running, so an in-flight snapshot cannot establish coverage.
+    The public per-shot verification receipts are checked by ``audit_terminal``;
+    here the ledger grammar, Relay work, exact appended bytes and retained
+    terminal fields are reconstructed without trusting those receipts.
+    """
+    surface = audit_terminal(root=root, caps_path=caps_path, calibration_path=calibration_path)
+    caps = json.loads(caps_path.read_bytes())
+    result = json.loads(calibration_path.read_bytes())
+    plan = pilot.calibration_plan(root, caps)
+    aggregate_path = calibration_path.parent / "events.jsonl"
+    import run_phase4_active_benchmark as active
+
+    expected: dict[tuple[str, int], tuple[Mapping[str, Any], Path]] = {}
+    for cell in plan["cells"]:
+        code_id, preset_key = cell["code_id"], cell["preset_key"]
+        configuration_id = cell["configuration_id"]
+        stored = next(
+            item for item in result["codes"][code_id]["presets"][preset_key]["configurations"]
+            if item["configuration_id"] == configuration_id
+        )
+        cell_root = (calibration_path.parent / "runs" / code_id / preset_key
+                     / pilot._digest(configuration_id)[:16])
+        manifest_path = cell_root / "manifest.json"
+        expected_manifest = pilot._calibration_manifest(
+            json.loads((root / active.CODE_MANIFESTS[code_id]).read_bytes()), cell,
+            amendment_path=caps["design_amendment"]["path"],
+            amendment_sha256=caps["design_amendment"]["sha256"],
+        )
+        if json.loads(manifest_path.read_bytes()) != expected_manifest:
+            raise ValueError(f"calibration manifest differs from frozen plan: {configuration_id}")
+        run_id = expected_manifest["run_id"]
+        for attempt in stored["attempts"]:
+            key = (run_id, attempt["shot_id"])
+            if attempt["status"] == "cap_reached":
+                if attempt.get("aggregate_event_digest") is not None:
+                    raise ValueError(f"unstarted calibration shot has ledger evidence: {key}")
+                continue
+            if key in expected:
+                raise ValueError(f"duplicate planned calibration shot: {key}")
+            expected[key] = (attempt, cell_root / "run")
+
+    # A calibration ledger can exceed hundreds of MB.  The producer appends
+    # one complete shot at a time, so validate a bounded group at a time.
+    seen_keys: set[tuple[str, int]] = set()
+    seen_event_ids: set[str] = set()
+    verified = 0
+    ledger_hash = sha256()
+
+    def verify_group(key: tuple[str, int], lines: list[bytes]) -> None:
+        nonlocal verified
+        if key in seen_keys or key not in expected:
+            raise ValueError(f"duplicate or undeclared calibration ledger shot: {key}")
+        seen_keys.add(key)
+        attempt, run_dir = expected[key]
+        digest = sha256(b"".join(lines)).hexdigest()
+        if digest != attempt.get("aggregate_event_digest"):
+            raise ValueError(f"calibration shot ledger digest differs: {key}")
+        events = read_canonical_events_bytes(b"".join(lines))
+        if any((event["run_id"], event["shot_id"]) != key for event in events):
+            raise ValueError(f"calibration ledger group crosses shot boundaries: {key}")
+        for event in events:
+            if event["event_id"] in seen_event_ids:
+                raise ValueError("calibration aggregate ledger repeats an event ID")
+            seen_event_ids.add(event["event_id"])
+        if attempt["status"] not in {"completed", "budget_exhausted"}:
+            return
+        reconstructed = reconstruct_phase4_shot(
+            events, run_id=key[0], shot_id=key[1], trace_root=run_dir,
+        )
+        terminal = reconstructed["terminal"]
+        if (events[0].get("sample_seed_identity") != attempt["sample_identity"]
+                or terminal.get("termination") != attempt["termination"]
+                or terminal["data"].get("outcome") != attempt["outcome"]
+                or reconstructed["work"] != attempt["work_vector"]):
+            raise ValueError(f"calibration shot facts differ from reconstructed ledger: {key}")
+        verified += 1
+
+    current_key: tuple[str, int] | None = None
+    current_lines: list[bytes] = []
+    with aggregate_path.open("rb") as handle:
+        for line in handle:
+            ledger_hash.update(line)
+            if not line.endswith(b"\n"):
+                raise ValueError("calibration aggregate ledger has a partial line")
+            event = json.loads(line)
+            key = (event["run_id"], event["shot_id"])
+            if current_key is not None and key != current_key:
+                verify_group(current_key, current_lines)
+                current_lines = []
+            current_key = key
+            current_lines.append(line)
+    if current_key is not None:
+        verify_group(current_key, current_lines)
+    missing = {key for key, (attempt, _) in expected.items()
+               if attempt["status"] in {"completed", "budget_exhausted"}} - seen_keys
+    if missing:
+        raise ValueError(f"terminal calibration shots are absent from aggregate ledger: {len(missing)}")
+    return {**surface, "scope": "terminal_surface_and_relay_ledger_integrity",
+            "ledger_semantics": "reconstructed_relay_ledger_and_manifest",
+            "verified_terminal_shots": verified,
+            "aggregate_ledger_byte_sha256": ledger_hash.hexdigest(),
+            "selection_permitted": not surface["attempt_status_counts"].get("incomplete_public_boundary", 0)}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--caps", type=Path, default=Path("data/manifests/phase4-pilot-caps.json"))
     parser.add_argument("--calibration", type=Path, default=Path("data/results/phase4-memory-relay/calibration/result.json"))
     parser.add_argument("--progress", action="store_true", help="audit a running prefix without qualifying a selection")
+    parser.add_argument("--ledgers", action="store_true", help="also reconstruct every terminal Relay ledger (terminal only)")
     args = parser.parse_args()
     root = args.root.resolve()
-    print(json.dumps(audit_terminal(
+    if args.progress and args.ledgers:
+        parser.error("--ledgers requires a terminal calibration result")
+    audit = audit_retained_ledgers if args.ledgers else audit_terminal
+    print(json.dumps(audit(
         root=root, caps_path=root / args.caps, calibration_path=root / args.calibration,
-        allow_running=args.progress,
+        **({"allow_running": True} if args.progress else {}),
     ), indent=2, sort_keys=True))
 
 
