@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 04
 current_phase_name: Memory Policies and Relay-BP
-current_plan: 12
+current_plan: 13
 status: executing
-stopped_at: Plan 04-12 calibration terminal audited and selections frozen; fresh evaluation pending
-last_updated: "2026-09-29T23:03:19Z"
+stopped_at: Completed 04-12-PLAN.md; B1 selection remains inconclusive for Plan 04-13
+last_updated: "2026-09-29T23:56:01.366Z"
 last_activity: 2026-09-29
 last_activity_desc: Terminal calibration 5824/5824 passed independent Relay ledger audit; B1 inconclusive; dated development update published
-state_head: 640b9c19977870d8f7225ce4335f75c8de1ec61b
+state_head: 91926c531b2708e8f01eed1f8ed3c872170ad185
 progress:
   total_phases: 14
   completed_phases: 3
   total_plans: 57
-  completed_plans: 54
+  completed_plans: 55
 ---
 
 # Project State
@@ -29,19 +29,19 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 ## Current Position
 
 Phase: 04 (Memory Policies and Relay-BP) — EXECUTING
-Plan: 12 of 15
+Plan: 13 of 15
 Total Phases: 14
-Current Plan: 12
+Current Plan: 13
 Total Plans in Phase: 15
-Status: Executing Phase 04; terminal calibration audited, selections frozen, fresh evaluation pending
-Last activity: 2026-09-29 — Dated evidence update and calibration reconciliation
+Status: Ready to execute
+Last activity: 2026-09-29 — Phase 04 execution resumed (wave continue)
 Last Activity Description: `completed_with_inconclusive` calibration retained 5,824/5,824 shots; isolated source `263501e` reconstructed all terminal Relay ledgers; B1 has no eligible setting under its frozen work cap. Deterministic BB-144/HGP selections are frozen; fresh evaluation, factorial and production traces are absent. No plan count advanced.
 
-Progress: 54/57 current plans have summaries; Phase 4 is 12/15. Fresh phase verification is 1/14: Phase 3 passed; Phase 1/2 previously passed reports are now flagged stale. Three phases were previously recorded complete; this freshness audit does not erase their completed plans.
+Progress: 55/57 current plans have summaries; Phase 4 is 13/15. Fresh phase verification is 1/14: Phase 3 passed; Phase 1/2 previously passed reports are now flagged stale. Three phases were previously recorded complete; this freshness audit does not erase their completed plans.
 
 ## Performance Metrics
 
-- Total plans completed: 54
+- Total plans completed: 55
 - Average duration: N/A
 - Total execution time: 0 hours
 - Recent trend: Phase 1 completed 9 plans; Phase 2 completed 16 plans, including seven review-driven gap plans, and passed goal, code, security, and validation gates.
@@ -71,6 +71,7 @@ Progress: 54/57 current plans have summaries; Phase 4 is 12/15. Fresh phase veri
 | Phase 04 P15 | 22m | 1 tasks | 5 files |
 | Phase 04 P10 | 58m | 2 tasks | 8 files |
 | Phase 04 P11 | 0 | 2 tasks | 73 files |
+| Phase 04 P12 | 4d | 2 tasks | 2 files |
 
 Phase 02 P10–P16 gap-closure metrics are recorded in their individual summaries.
 
@@ -133,6 +134,8 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - [Phase 04]: Phase 04 Plan 15: bind B1 to the Plan 04-09 resolution digest and keep generated HGP explicitly non-paper-exact.
 - [Phase 04]: Phase 04 Plan 10: exact-author native Relay runs only from a stage-local verified v0.2.2 checkout; canonical and native arms share public observations but retain separate identities.
 - [Phase 04]: Phase 4 caps use one worker and rate-specific representative Relay evidence; B1 p=.07 is bounded to a measured three-leg-equivalent work vector.
+- [Phase 04]: Phase 04 Plan 12: terminal Relay-ledger verification releases BB-144/HGP selections while B1 remains inconclusive under the frozen cap.
+- [Phase 04]: Phase 04 Plan 12: async calibration manifest reconciled from terminal evidence without campaign relaunch or result rewrites.
 
 ### Pending Todos
 
@@ -171,9 +174,9 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Last session: 2026-09-29T23:03:19Z
-Stopped at: Plan 04-12 terminal calibration audited and settings frozen; B1 inconclusive; evaluation pending
-Resume file: .planning/phases/04-memory-policies-and-relay-bp/.continue-here.md
+Last session: 2026-09-29T23:55:57.866Z
+Stopped at: Completed 04-12-PLAN.md; B1 selection remains inconclusive for Plan 04-13
+Resume file: .planning/phases/04-memory-policies-and-relay-bp/04-13-PLAN.md
 Structured handoff: .planning/HANDOFF.json
 Next command: $gsd-execute-phase 4 to integrate verified source and handle the B1 gap before fresh evaluation
 
