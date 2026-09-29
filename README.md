@@ -21,8 +21,9 @@ The current implementation focuses on **binary CSS code-capacity decoding**:
 - Scheduling policies, typed work budgets, event ledgers, and run verification.
 - A native `ldpc.BpDecoder` baseline and source-linked memory/Relay BP work.
 
-Memory and Relay BP qualification is in progress. The default branch preserves
-the source used by the ongoing calibration campaign; additional implementation
+Memory and Relay BP qualification is in progress. The calibration campaign has
+finished with B1 inconclusive; fresh evaluation is pending. The default branch preserves
+the source used by that campaign; additional implementation
 and diagnostic work is maintained on
 [`gsd/phase4-memory-integration-20260926`](https://github.com/mertgkduman/survey_bp/tree/gsd/phase4-memory-integration-20260926).
 See the [execution record](.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md)
@@ -125,6 +126,7 @@ retained.
 
 Further reading:
 
+- [29 September development update](docs/development-update-20260929.md) ([PDF](docs/development-update-20260929.pdf))
 - [Native CSS pilot guide](docs/phase1-pilot.md)
 - [Memory-policy source decisions](docs/memory-policy-sources.md)
 - [Profiling and tracing strategy](docs/profiling-and-tracing-strategy.md)

@@ -1,0 +1,347 @@
+{
+  "author_agreement": {
+    "codes": {
+      "b1-ghp-882": {
+        "all_shot_success_disagreements": 10,
+        "complete_pairs": 128,
+        "exact_candidate_disagreements": 37
+      },
+      "gross-bb-144": {
+        "all_shot_success_disagreements": 3,
+        "complete_pairs": 128,
+        "exact_candidate_disagreements": 16
+      },
+      "hgp-gallager-3-4-seed-20260923": {
+        "all_shot_success_disagreements": 9,
+        "complete_pairs": 128,
+        "exact_candidate_disagreements": 65
+      }
+    },
+    "qualification": "controlled CSS agreement diagnostic; not formal equivalence",
+    "status": "completed"
+  },
+  "calibration": {
+    "attempt_status_counts": {
+      "budget_exhausted": 453,
+      "completed": 5371
+    },
+    "calibration_digest": "17fb3faf912254f7faf5e8233a78f77fa1965824b936d3d53a764a7a70721b84",
+    "eligible_configurations": 59,
+    "independent_ledger_audit": {
+      "auditor_commit": "263501e",
+      "scope": "terminal_surface_and_relay_ledger_integrity",
+      "status": "passed",
+      "verified_terminal_shots": 5824
+    },
+    "per_code_preset": {
+      "b1-ghp-882": {
+        "canonical_default": {
+          "attempt_status_counts": {
+            "budget_exhausted": 155,
+            "completed": 517
+          },
+          "configurations": 21,
+          "eligible_configurations": 0
+        },
+        "source_procedure": {
+          "attempt_status_counts": {
+            "budget_exhausted": 298,
+            "completed": 374
+          },
+          "configurations": 21,
+          "eligible_configurations": 0
+        }
+      },
+      "gross-bb-144": {
+        "canonical_default": {
+          "attempt_status_counts": {
+            "completed": 1760
+          },
+          "configurations": 55,
+          "eligible_configurations": 20
+        },
+        "source_procedure": {
+          "attempt_status_counts": {
+            "completed": 1760
+          },
+          "configurations": 55,
+          "eligible_configurations": 26
+        }
+      },
+      "hgp-gallager-3-4-seed-20260923": {
+        "canonical_default": {
+          "attempt_status_counts": {
+            "completed": 480
+          },
+          "configurations": 15,
+          "eligible_configurations": 6
+        },
+        "source_procedure": {
+          "attempt_status_counts": {
+            "completed": 480
+          },
+          "configurations": 15,
+          "eligible_configurations": 7
+        }
+      }
+    },
+    "planned_attempts": 5824,
+    "planned_configurations": 182,
+    "retained_attempts": 5824,
+    "retained_configurations": 182,
+    "status": "completed_with_inconclusive"
+  },
+  "captured_at_utc": "2026-09-29T22:57:37+00:00",
+  "low_noise": {
+    "qualification": "uncalibrated X-only CSS code-capacity pilot; not circuit reproduction",
+    "rates": {
+      "p0050": {
+        "arms": {
+          "canonical_baseline": {
+            "denominator": 8192,
+            "estimate": 0.0411376953125,
+            "failures": 337,
+            "simultaneous_over_looks_exact_interval": [
+              0.03511597434173448,
+              0.0478184034832415
+            ]
+          },
+          "canonical_relay": {
+            "denominator": 8192,
+            "estimate": 0.0352783203125,
+            "failures": 289,
+            "simultaneous_over_looks_exact_interval": [
+              0.02970771799502324,
+              0.0415169812642001
+            ]
+          },
+          "source_baseline": {
+            "denominator": 8192,
+            "estimate": 0.0430908203125,
+            "failures": 353,
+            "simultaneous_over_looks_exact_interval": [
+              0.03692681750939247,
+              0.04991081999381404
+            ]
+          },
+          "source_relay": {
+            "denominator": 8192,
+            "estimate": 0.035400390625,
+            "failures": 290,
+            "simultaneous_over_looks_exact_interval": [
+              0.029819981658394293,
+              0.04164866743276797
+            ]
+          }
+        },
+        "error_rate": 0.05
+      },
+      "p0060": {
+        "arms": {
+          "canonical_baseline": {
+            "denominator": 2048,
+            "estimate": 0.0966796875,
+            "failures": 198,
+            "simultaneous_over_looks_exact_interval": [
+              0.07888981151267697,
+              0.11679442735588864
+            ]
+          },
+          "canonical_relay": {
+            "denominator": 2048,
+            "estimate": 0.0869140625,
+            "failures": 178,
+            "simultaneous_over_looks_exact_interval": [
+              0.07002489171475028,
+              0.10618635802043329
+            ]
+          },
+          "source_baseline": {
+            "denominator": 2048,
+            "estimate": 0.10693359375,
+            "failures": 219,
+            "simultaneous_over_looks_exact_interval": [
+              0.08826083012557853,
+              0.12787043844277335
+            ]
+          },
+          "source_relay": {
+            "denominator": 2048,
+            "estimate": 0.0908203125,
+            "failures": 186,
+            "simultaneous_over_looks_exact_interval": [
+              0.0735633097103839,
+              0.11043708588340531
+            ]
+          }
+        },
+        "error_rate": 0.06
+      }
+    },
+    "status": "completed_precision"
+  },
+  "phase_status": {
+    "completed_phases": 3,
+    "fresh_phase4_evaluation_result_exists": false,
+    "phase4_factorial_result_exists": false,
+    "phase4_recorded_completed_plans": 12,
+    "phase4_total_plans": 15,
+    "phase4_traces_index_exists": false,
+    "total_phases": 14
+  },
+  "schema_version": 1,
+  "scope": "Dated documentation snapshot; does not qualify publication curves or Phase 4 completion.",
+  "selection": {
+    "calibration_digest": "17fb3faf912254f7faf5e8233a78f77fa1965824b936d3d53a764a7a70721b84",
+    "codes": {
+      "b1-ghp-882": {
+        "presets": {
+          "canonical_default": {
+            "calibration_logical_failure": null,
+            "candidate": null,
+            "configuration_id": null,
+            "status": "inconclusive"
+          },
+          "source_procedure": {
+            "calibration_logical_failure": null,
+            "candidate": null,
+            "configuration_id": null,
+            "status": "inconclusive"
+          }
+        },
+        "shared": {
+          "candidate_id": null,
+          "status": "inconclusive"
+        }
+      },
+      "gross-bb-144": {
+        "presets": {
+          "canonical_default": {
+            "calibration_logical_failure": {
+              "denominator": 32,
+              "eligible": true,
+              "estimate": 0.34375,
+              "failures": 11,
+              "precision_status": "finite_precision_limited_wilson_95_percent",
+              "wilson_95": [
+                0.20410437924433172,
+                0.5168891202103778
+              ]
+            },
+            "candidate": {
+              "gamma0": 0.375,
+              "id": "r-g0p375-c0p5-w0p875",
+              "later_center": 0.5,
+              "later_width": 0.875
+            },
+            "configuration_id": "gross-bb-144:canonical_default:refinement:r-g0p375-c0p5-w0p875",
+            "status": "selected_finite_precision_limited"
+          },
+          "source_procedure": {
+            "calibration_logical_failure": {
+              "denominator": 32,
+              "eligible": true,
+              "estimate": 0.34375,
+              "failures": 11,
+              "precision_status": "finite_precision_limited_wilson_95_percent",
+              "wilson_95": [
+                0.20410437924433172,
+                0.5168891202103778
+              ]
+            },
+            "candidate": {
+              "gamma0": 0.375,
+              "id": "r-g0p375-c0p5-w0p875",
+              "later_center": 0.5,
+              "later_width": 0.875
+            },
+            "configuration_id": "gross-bb-144:source_procedure:refinement:r-g0p375-c0p5-w0p875",
+            "status": "selected_finite_precision_limited"
+          }
+        },
+        "shared": {
+          "candidate_id": "g0p125-c0p25-w1p25",
+          "status": "selected_finite_precision_limited"
+        }
+      },
+      "hgp-gallager-3-4-seed-20260923": {
+        "presets": {
+          "canonical_default": {
+            "calibration_logical_failure": {
+              "denominator": 32,
+              "eligible": true,
+              "estimate": 0.53125,
+              "failures": 17,
+              "precision_status": "finite_precision_limited_wilson_95_percent",
+              "wilson_95": [
+                0.3644951711897464,
+                0.6913061289193116
+              ]
+            },
+            "candidate": {
+              "gamma0": 0.5,
+              "id": "g0p5-c0p75-w2",
+              "later_center": 0.75,
+              "later_width": 2.0
+            },
+            "configuration_id": "hgp-gallager-3-4-seed-20260923:canonical_default:coarse:g0p5-c0p75-w2",
+            "status": "selected_finite_precision_limited"
+          },
+          "source_procedure": {
+            "calibration_logical_failure": {
+              "denominator": 32,
+              "eligible": true,
+              "estimate": 0.84375,
+              "failures": 27,
+              "precision_status": "finite_precision_limited_wilson_95_percent",
+              "wilson_95": [
+                0.682458504024696,
+                0.9313557971749429
+              ]
+            },
+            "candidate": {
+              "gamma0": 0.25,
+              "id": "g0p25-c0p75-w0p5",
+              "later_center": 0.75,
+              "later_width": 0.5
+            },
+            "configuration_id": "hgp-gallager-3-4-seed-20260923:source_procedure:coarse:g0p25-c0p75-w0p5",
+            "status": "selected_finite_precision_limited"
+          }
+        },
+        "shared": {
+          "candidate_id": "g0p5-c0p75-w2",
+          "status": "selected_finite_precision_limited"
+        }
+      }
+    },
+    "status": "frozen_from_calibration_only"
+  },
+  "source_artifacts": {
+    "author_agreement_result": {
+      "byte_sha256": "28bd1429206501dc4fe6d259d5870f49228ff36f3d53941e7a3df1bd4910057c",
+      "bytes": 7231,
+      "path": "data/results/phase4-memory-relay/author-v022-agreement-v1/result.json"
+    },
+    "calibration_events": {
+      "byte_sha256": "205f8fca7ff3fc00732dd68d1d697a4bac614235f4112a2b9f266158c1ad744d",
+      "bytes": 784636567,
+      "path": "data/results/phase4-memory-relay/calibration/events.jsonl"
+    },
+    "calibration_result": {
+      "byte_sha256": "59a5f27fc8271724f603741c4311becfaca52a7ef01bbb93d240a823f58f2fef",
+      "bytes": 97183929,
+      "path": "data/results/phase4-memory-relay/calibration/result.json"
+    },
+    "low_noise_result": {
+      "byte_sha256": "1171b8db487f81bcf104b378069bc579b680d8cc694d99a938356a003f00b998",
+      "bytes": 25247,
+      "path": "data/results/phase4-memory-relay/low-noise-ler-reconciled-20260926/result.json"
+    },
+    "selected_settings": {
+      "byte_sha256": "079024069b6866b8a458ffeb03fe7a581ec1074ade7ff3a74e70803bb323300c",
+      "bytes": 4602,
+      "path": "data/results/phase4-memory-relay/selected-settings.json"
+    }
+  }
+}

@@ -72,9 +72,12 @@ def plain(text):
 
 
 class Renderer:
-    def __init__(self, pdf, preview_dir=None):
+    def __init__(self, pdf, preview_dir=None, *, title=TITLE,
+                 footer="26 September 2026 • frozen evidence snapshot • Phase 4 active"):
         self.pdf = pdf
         self.preview_dir = preview_dir
+        self.title = title
+        self.footer = footer
         self.page = 0
         self.figure = None
         self.section = "Overview"
@@ -136,9 +139,9 @@ class Renderer:
         self.canvas = FigureCanvasAgg(self.figure)
         self.figure.patch.set_facecolor("white")
         self.drawn_text = []
-        self.text(LEFT, 762, TITLE, size=8.5, weight="bold", color=BLUE)
+        self.text(LEFT, 762, self.title, size=8.5, weight="bold", color=BLUE)
         self.text(LEFT, 745, self.section, size=7.8, color=MUTED)
-        self.text(LEFT, 37, "26 September 2026 • frozen evidence snapshot • Phase 4 active", size=7, color=MUTED)
+        self.text(LEFT, 37, self.footer, size=7, color=MUTED)
         self.text(RIGHT - 42, 37, f"Page {self.page}", size=7, color=MUTED)
         self.y = TOP
 
