@@ -1,0 +1,228 @@
+{
+  "calibration_outcomes_inspected": false,
+  "execution_order_resolution": {
+    "discrepancy": "The frozen v2c-damping-plus-ewa and momentum-plus-ewa arrays respectively declare damping-before-affine and momentum-before-affine. This supplement does not edit that design; it records its stable effective execution order.",
+    "reason": "The memory executor applies affine prior before fresh fields, includes posterior momentum in the field transformation stage, then applies V2C damping. Frozen arrays remain retained as design evidence even where their declaration order is not executable.",
+    "required_operand_order": [
+      "prior",
+      "fields_including_posterior_momentum",
+      "v2c"
+    ]
+  },
+  "input_digests": {
+    "caps_canonical_sha256": "0c8fe8812ee84eb4b05034a101c712aadb19a77c5a02a71f8138734635bc9e7a",
+    "design_canonical_sha256": "c64d5e8a25863545687120511746d0d452c74cdf3836f771da480a1d1cd081b7"
+  },
+  "ordinary_memory_arms": {
+    "affine-prior": {
+      "coefficients": [
+        {
+          "kind": "affine_prior",
+          "parameters": {
+            "alpha": 0.5
+          }
+        }
+      ],
+      "effective_execution_order": [
+        "affine_prior"
+      ],
+      "execution_ready": true,
+      "frozen_binding_array": [
+        "affine_prior"
+      ]
+    },
+    "disordered-affine-prior": {
+      "coefficients": [
+        {
+          "kind": "affine_prior",
+          "parameters": {
+            "alpha": 0.5,
+            "assignment": "per_source_iteration_digest_bound"
+          }
+        }
+      ],
+      "effective_execution_order": [
+        "affine_prior"
+      ],
+      "execution_ready": true,
+      "frozen_aliases": {
+        "affine_prior_disordered": "affine_prior"
+      },
+      "frozen_binding_array": [
+        "affine_prior_disordered"
+      ]
+    },
+    "momentum-plus-ewa": {
+      "coefficients": [
+        {
+          "kind": "affine_prior",
+          "parameters": {
+            "alpha": 0.5
+          }
+        },
+        {
+          "kind": "posterior_momentum",
+          "parameters": {
+            "alpha": 0.5,
+            "gamma": 0.5
+          }
+        }
+      ],
+      "effective_execution_order": [
+        "affine_prior",
+        "posterior_momentum"
+      ],
+      "execution_ready": true,
+      "frozen_binding_array": [
+        "posterior_momentum",
+        "affine_prior"
+      ]
+    },
+    "pdbp": {
+      "coefficients": [
+        {
+          "kind": "pdbp_field_mix",
+          "parameters": {
+            "gamma": 0.5
+          }
+        }
+      ],
+      "effective_execution_order": [
+        "pdbp_field_mix"
+      ],
+      "execution_ready": true,
+      "frozen_binding_array": [
+        "pdbp_field_mix"
+      ]
+    },
+    "pdbp-plus-v2c-damping": {
+      "coefficients": [
+        {
+          "kind": "pdbp_field_mix",
+          "parameters": {
+            "gamma": 0.5
+          }
+        },
+        {
+          "kind": "v2c_damping",
+          "parameters": {
+            "gamma": 0.5
+          }
+        }
+      ],
+      "effective_execution_order": [
+        "pdbp_field_mix",
+        "v2c_damping"
+      ],
+      "execution_ready": true,
+      "frozen_binding_array": [
+        "pdbp_field_mix",
+        "v2c_damping"
+      ]
+    },
+    "pdprime": {
+      "coefficients": [
+        {
+          "kind": "pdprime_delta_mix",
+          "parameters": {
+            "gamma": 0.5
+          }
+        }
+      ],
+      "effective_execution_order": [
+        "pdprime_delta_mix"
+      ],
+      "execution_ready": true,
+      "frozen_binding_array": [
+        "pdprime_delta_mix"
+      ]
+    },
+    "posterior-momentum": {
+      "coefficients": [
+        {
+          "kind": "posterior_momentum",
+          "parameters": {
+            "alpha": 0.5,
+            "gamma": 0.5
+          }
+        }
+      ],
+      "effective_execution_order": [
+        "posterior_momentum"
+      ],
+      "execution_ready": true,
+      "frozen_binding_array": [
+        "posterior_momentum"
+      ]
+    },
+    "v2c-damping": {
+      "coefficients": [
+        {
+          "kind": "v2c_damping",
+          "parameters": {
+            "gamma": 0.5
+          }
+        }
+      ],
+      "effective_execution_order": [
+        "v2c_damping"
+      ],
+      "execution_ready": true,
+      "frozen_binding_array": [
+        "v2c_damping"
+      ]
+    },
+    "v2c-damping-plus-ewa": {
+      "coefficients": [
+        {
+          "kind": "affine_prior",
+          "parameters": {
+            "alpha": 0.5
+          }
+        },
+        {
+          "kind": "v2c_damping",
+          "parameters": {
+            "gamma": 0.5
+          }
+        }
+      ],
+      "effective_execution_order": [
+        "affine_prior",
+        "v2c_damping"
+      ],
+      "execution_ready": true,
+      "frozen_binding_array": [
+        "v2c_damping",
+        "affine_prior"
+      ]
+    }
+  },
+  "predecessor_gate": {
+    "current_gap": "The active V4 evaluation cap legitimately admits only baseline, selected_source_procedure, and selected_canonical_procedure. The separately frozen factorial category admits all 14 ablation arms after this predecessor gate.",
+    "fixture_policy": "Development fixtures may exercise this runner only when development_fixture=true and assessment=not_assessed; they cannot authorize production sampling.",
+    "requirement": "A complete digest-bound fresh evaluation must cover its frozen baseline, selected_source_procedure, and selected_canonical_procedure cohort for every code before production factorial sampling. Its nonempty canonical plan and selected-settings digests must match the retained three-arm evaluation plan when selected-settings.json is available."
+  },
+  "purpose": "Outcome-independent executable resolution for the frozen Phase 4 focused factorial ordinary-memory arms.",
+  "schema_version": 1,
+  "status": "frozen_pre_sampling",
+  "supplement_digest": "8679c14c6028b608633b7b31efc8eb23c5138624b6ada1366a00b770257462b0",
+  "trace_contract": {
+    "aggregate_cap_enforcement": "trace_caps.max_shots/max_records/max_bytes are enforced per code across the retained factorial inventory. Fourteen prespecified visible_bp_failures/shot-0 arm traces are within max_shots=32; each manifest receives an equal floor share of the aggregate record and byte caps. fixture_shots_per_code=7 is a separate frozen fixture allocation and no extra fixture shot is created for factorial tracing.",
+    "api": "Public V4 manifests declare trace_plan(level, relative_dir, max_records, max_bytes, label). For enabled flooding-memory shots, canonical execution constructs MemoryFloodingSchedule(edge_table, kernel, trace_sink=TraceSink, trace_context=Mapping), invokes observe_candidate(origin, candidate) after committed activity, then trace_result() finalizes the observer and emits one trace_link sidecar. The factorial runner retains linked sidecars and explicit unavailable trace facts.",
+    "caps_source": "data/manifests/phase4-pilot-caps.json codes.*.trace_caps",
+    "public_v4_readiness": "Focused public V4 ON/OFF, disordered-assignment, and max_records truncation checks passed before factorial sampling. This records execution-contract readiness only; calibration/evaluation evidence remains the mandatory predecessor gate.",
+    "record_kind": "memory_sweep",
+    "required_decoder_visible_facts": [
+      "beliefs",
+      "history_values",
+      "per_binding_history_digest_shape",
+      "disordered_assignment_draw_identity",
+      "candidate_origin",
+      "leg_transition",
+      "raw_work"
+    ],
+    "selection": "Before outcomes, collect full traces only for visible_bp_failures shot 0 from every factorial arm; later disagreement and upper-tail replays are diagnostic follow-ups and are not population performance estimates.",
+    "truth_policy": "No hidden physical truth enters a trace sidecar."
+  }
+}

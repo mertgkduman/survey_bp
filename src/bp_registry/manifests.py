@@ -445,6 +445,15 @@ _EXECUTABLE_LOCAL_SPA_KINDS = (
     _EXECUTABLE_RANDOMIZED_SPA_KINDS,
     _EXECUTABLE_GROUP_SHUFFLED_SPA_KINDS,
 )
+_EXECUTABLE_LOCAL_MIN_SUM_KINDS = tuple(
+    {**local, "update": update}
+    for local in (
+        _EXECUTABLE_LAYERED_SPA_KINDS,
+        _EXECUTABLE_CHECK_SERIAL_SPA_KINDS,
+        _EXECUTABLE_VARIABLE_SERIAL_SPA_KINDS,
+    )
+    for update in ("min_sum", "normalized_min_sum", "offset_min_sum")
+)
 _IDENTITY_ONLY_ROLES = frozenset({"state_memory", "intervention", "postprocessing"})
 
 
@@ -454,7 +463,7 @@ def validate_executable_canonical_baseline(composition: CanonicalCompositionSpec
 
     resolved = validate_composition(composition)
     actual = {binding.role.value: binding.kind for binding in resolved.bindings}
-    if actual not in (_EXECUTABLE_BASELINE_KINDS, _EXECUTABLE_MIN_SUM_KINDS, _EXECUTABLE_NORMALIZED_MIN_SUM_KINDS, _EXECUTABLE_OFFSET_MIN_SUM_KINDS, *_EXECUTABLE_LOCAL_SPA_KINDS):
+    if actual not in (_EXECUTABLE_BASELINE_KINDS, _EXECUTABLE_MIN_SUM_KINDS, _EXECUTABLE_NORMALIZED_MIN_SUM_KINDS, _EXECUTABLE_OFFSET_MIN_SUM_KINDS, *_EXECUTABLE_LOCAL_SPA_KINDS, *_EXECUTABLE_LOCAL_MIN_SUM_KINDS):
         raise ValueError(
             "executable canonical baseline compatibility requires a closed flooding/layered min-sum family or a binary_spa local schedule composition with stateless/"
             "identity/syndrome_or_budget/stable_first/identity policy kinds"
@@ -531,6 +540,26 @@ def _parse_for_preflight(value: ManifestRecord | dict[str, Any] | str | Path) ->
     if complete_fields.issubset(decoded):
         return ManifestV1.model_validate(decoded)
     return LegacyManifestV1.model_validate(decoded)
+
+
+def preflight_manifest_bytes(manifest_path: str | Path, manifest_bytes: bytes) -> ResolvedExperiment:
+    """Preflight one caller-owned manifest snapshot without rereading its path.
+
+    ``manifest_path`` remains an explicit provenance/artifact-resolution
+    boundary for callers that bind a snapshot to a retained source path.  The
+    parsed bytes are the only manifest document used by this helper.
+    """
+    if not isinstance(manifest_path, (str, Path)):
+        raise TypeError("manifest snapshot requires its original path")
+    if not isinstance(manifest_bytes, bytes):
+        raise TypeError("manifest snapshot must be bytes")
+    try:
+        decoded = json.loads(manifest_bytes.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise ValueError("manifest snapshot is not UTF-8 JSON") from error
+    if not isinstance(decoded, dict):
+        raise ValueError("manifest snapshot must be a JSON object")
+    return preflight(decoded)
 
 
 def _actual_environment() -> dict[str, str]:
@@ -613,7 +642,26 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
     if isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3)):
         _verify_canonical_environment(manifest.environment)
         if manifest.trace_plan.level != "off":
-            raise ValueError("canonical trace plan must be off until a public trace hook is implemented")
+            if not isinstance(manifest, CanonicalExperimentV4) or manifest.relay is not None:
+                raise ValueError("enabled canonical traces require a non-Relay CanonicalExperimentV4 memory manifest")
+            # Validate the existing semantic-sidecar grammar before artifact
+            # resolution, sample generation, or ledger ownership.  The root is
+            # deliberately inert here; the runner confines the real sidecar to
+            # its public output directory.
+            from .canonical.tracing import TracePlan
+
+            try:
+                TracePlan(
+                    root=Path.cwd(), level=manifest.trace_plan.level,
+                    relative_dir=manifest.trace_plan.relative_dir,
+                    max_records=manifest.trace_plan.max_records,
+                    max_bytes=manifest.trace_plan.max_bytes,
+                    label=manifest.trace_plan.label,
+                )
+            except ValueError as error:
+                raise ValueError(f"canonical trace plan is not a bounded semantic-sidecar contract: {error}") from error
+            if manifest.trace_plan.label != "prespecified_campaign":
+                raise ValueError("enabled canonical traces require a prespecified_campaign trace label")
         if manifest.profile_plan.level != "low_overhead" or manifest.profile_plan.cohort != "clean":
             raise ValueError(
                 "canonical public profile plan requires a clean low_overhead cohort until a bounded quota exists"
@@ -628,18 +676,32 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
             )
             if not memory_decision.admitted:
                 raise ValueError(memory_decision.reason)
+            if manifest.relay is None:
+                from .canonical.memory_execution import validate_single_attempt_memory
+
+                validate_single_attempt_memory(
+                    manifest.memory, schedule=manifest.policies.schedule.kind,
+                    update=manifest.policies.update, max_iterations=manifest.budgets.attempt.max_iterations,
+                )
         if type(manifest) is CanonicalExperimentV2 and manifest.policies.update.kind != "binary_spa":
             raise ValueError("CanonicalExperimentV2 preserves only historical binary_spa semantics")
         if isinstance(manifest, CanonicalExperimentV3):
             actual = {binding.role.value: binding.kind for binding in composition.bindings}
             refresh = manifest.policies.update.parameter_refresh
+            assignment = manifest.policies.update.parameter_assignment
+            if assignment is not None and assignment.shape == "source_iteration":
+                assert assignment.values is not None
+                if len(assignment.values) < manifest.budgets.attempt.max_iterations:
+                    raise ValueError(
+                        "source_iteration parameter assignment must declare every attempted canonical iteration"
+                    )
             if refresh is not None and (refresh.scope != "configuration" or manifest.policies.schedule.kind != "flooding"):
                 raise ValueError("executable generated assignments require configuration refresh under flooding")
             if actual in _EXECUTABLE_LOCAL_SPA_KINDS and manifest.numerical_profile != "cpu-float64-spa-v1":
                 raise ValueError("CanonicalExperimentV3 local SPA schedules require the cpu-float64-spa-v1 profile")
-            if actual in (_EXECUTABLE_MIN_SUM_KINDS, _EXECUTABLE_NORMALIZED_MIN_SUM_KINDS, _EXECUTABLE_OFFSET_MIN_SUM_KINDS) and manifest.numerical_profile != "cpu-float64-min-sum-v1":
+            if actual in (_EXECUTABLE_MIN_SUM_KINDS, _EXECUTABLE_NORMALIZED_MIN_SUM_KINDS, _EXECUTABLE_OFFSET_MIN_SUM_KINDS, *_EXECUTABLE_LOCAL_MIN_SUM_KINDS) and manifest.numerical_profile != "cpu-float64-min-sum-v1":
                 raise ValueError("CanonicalExperimentV3 min-sum updates require the cpu-float64-min-sum-v1 profile")
-            if actual not in (_EXECUTABLE_BASELINE_KINDS, *_EXECUTABLE_LOCAL_SPA_KINDS, _EXECUTABLE_MIN_SUM_KINDS, _EXECUTABLE_NORMALIZED_MIN_SUM_KINDS, _EXECUTABLE_OFFSET_MIN_SUM_KINDS):
+            if actual not in (_EXECUTABLE_BASELINE_KINDS, *_EXECUTABLE_LOCAL_SPA_KINDS, *_EXECUTABLE_LOCAL_MIN_SUM_KINDS, _EXECUTABLE_MIN_SUM_KINDS, _EXECUTABLE_NORMALIZED_MIN_SUM_KINDS, _EXECUTABLE_OFFSET_MIN_SUM_KINDS):
                 raise ValueError("CanonicalExperimentV3 requires a closed promoted local-step composition")
         artifact = load_artifact(
             manifest.artifact.root, manifest.artifact.path,

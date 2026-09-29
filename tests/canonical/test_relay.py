@@ -159,6 +159,48 @@ def test_tracer_two_leg_relay_is_public_truth_blind_and_transfers_only_posterior
     assert evidence["work"] is not None
 
 
+def test_prevalidated_relay_reconstruction_matches_path_validation_and_rejects_tampering(tmp_path):
+    """Inventory reuse keeps the path verifier's per-shot proof intact."""
+    from copy import deepcopy
+
+    from bp_registry.canonical.contracts import CanonicalManifestV4
+    from bp_registry.canonical.execution import run_canonical_structural_shot
+    from bp_registry.canonical.verification import (
+        CanonicalStructuralVerificationError, reconstruct_phase4_shot, validate_phase4_shot,
+    )
+    from bp_registry.css import fixture_code
+    from bp_registry.ledger import read_canonical_events
+    from bp_registry.sampling import DecoderObservation, HiddenTruth
+
+    code = fixture_code()
+    hidden_x = np.asarray([1, 0, 0], dtype=np.uint8)
+    path = tmp_path / "inventory-relay.jsonl"
+    manifest = CanonicalManifestV4.model_validate({
+        "schema_version": 4, "run_id": "inventory-relay", "numerical_profile": "cpu-float64-spa-v1",
+        "max_iterations": 2, "error_rate": 0.1, "policies": _policies(),
+        "memory_bindings": [{"binding_id": "relay-prior", "kind": "affine_prior", "target": "prior",
+                              "order": 0, "alpha": 0.5, "state_lifetime": "leg"}],
+        "relay": {"total_leg_limit": 1, "legs": [{"max_iterations": 2}]},
+    })
+    run_canonical_structural_shot(
+        manifest, code=code, observation=DecoderObservation("Z", code.hz @ hidden_x % 2),
+        hidden_truth=HiddenTruth(hidden_x, np.zeros(3, dtype=np.uint8)), shot_id=0,
+        ledger_path=path, sample_seed_identity="inventory-sample", context={},
+    )
+    events = read_canonical_events(path)
+    path_result = validate_phase4_shot(path, run_id="inventory-relay", shot_id=0, trace_root=tmp_path)
+    assert reconstruct_phase4_shot(events, run_id="inventory-relay", shot_id=0, trace_root=tmp_path) == path_result
+
+    bad_work = deepcopy(events)
+    next(event for event in bad_work if event["kind"] == "work")["data"]["work_vector"]["belief_assemblies"] += 1
+    with pytest.raises(CanonicalStructuralVerificationError, match="work"):
+        reconstruct_phase4_shot(bad_work, run_id="inventory-relay", shot_id=0, trace_root=tmp_path)
+    bad_selection = deepcopy(events)
+    next(event for event in bad_selection if event["kind"] == "selection")["data"]["candidate_lineage_id"] = "candidate-unknown"
+    with pytest.raises(CanonicalStructuralVerificationError, match="selection"):
+        reconstruct_phase4_shot(bad_selection, run_id="inventory-relay", shot_id=0, trace_root=tmp_path)
+
+
 def test_relay_leaf_accounting_is_idempotent_and_retains_per_leg_ancestry():
     """Committed Relay work has one stable leaf even if delivery is retried."""
     from bp_registry.canonical.budgets import RelayWorkAccounting, WorkVector

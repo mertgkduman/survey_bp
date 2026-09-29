@@ -250,14 +250,21 @@ def test_min_sum_public_manifest_preflights_runs_and_verifies(tmp_path):
     assert reports[-1]["final_row_count"] == 2
 
 
-def test_canonical_v4_memory_composition_preflights_runs_and_verifies_publicly(tmp_path):
-    """The original memory-only V4 contract remains a public V3-kernel execution."""
+@pytest.mark.parametrize("kind,target,parameters", [
+    ("affine_prior", "prior", {"alpha": 0.5}),
+    ("v2c_damping", "v2c", {"gamma": 0.5}),
+    ("pdbp_field_mix", "belief", {"gamma": 0.5}),
+    ("pdprime_delta_mix", "belief", {"gamma": 0.5}),
+    ("posterior_momentum", "posterior", {"alpha": 0.5, "gamma": 0.5}),
+])
+def test_canonical_v4_memory_composition_preflights_runs_and_verifies_publicly(tmp_path, kind, target, parameters):
+    """Every admitted ordinary-memory kind executes and replays through the CLI."""
     value = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text(encoding="utf-8"))
     value.update({"schema_version": 4, "run_id": "canonical-v4-public-memory"})
     value["memory"] = {
         "bindings": [{
-            "binding_id": "ewa-prior", "kind": "affine_prior", "target": "prior",
-            "parameters": {"alpha": 0.5}, "order": 0, "history_owner": "memory:ewa-prior",
+            "binding_id": "memory", "kind": kind, "target": target,
+            "parameters": parameters, "order": 0, "history_owner": "memory:policy",
             "state_lifetime": "attempt", "advance_boundary": "source_iteration",
             "refresh_boundary": "attempt_start", "source_status": "source_defined",
         }],
@@ -281,10 +288,18 @@ def test_canonical_v4_memory_composition_preflights_runs_and_verifies_publicly(t
 
     assert reports[0]["run_id"] == "canonical-v4-public-memory"
     assert reports[0]["memory"]["compatibility"] == {"admitted": True, "reason": None}
-    assert [binding["binding_id"] for binding in reports[0]["memory"]["bindings"]] == ["ewa-prior"]
+    assert [binding["binding_id"] for binding in reports[0]["memory"]["bindings"]] == ["memory"]
     assert reports[1]["final_row_count"] == reports[2]["final_row_count"] == 2
     events = (output / "events.jsonl").read_text(encoding="utf-8")
     assert '"relay_transfer"' not in events
+    terminals = [json.loads(line) for line in events.splitlines() if json.loads(line)["kind"] == "termination"]
+    for terminal in terminals:
+        memory = terminal["data"]["memory_execution"]
+        assert memory["bindings"][0]["kind"] == kind
+        assert memory["bindings"][0]["parameters"] == parameters
+        assert memory["committed_iterations"] == terminal["data"]["iterations"]
+        assert memory["memory_element_updates"]["memory"] > 0
+        assert len(memory["history_sha256"]["memory"]) == 64
 
 
 def test_normalized_min_sum_public_manifest_binds_and_replays_scalar_assignment(tmp_path):
@@ -905,9 +920,9 @@ def test_enabled_public_trace_plan_is_rejected_before_ledger(tmp_path):
     ledger_path = tmp_path / "events.jsonl"
     manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
 
-    with pytest.raises(ValueError, match="canonical trace plan.*off"):
+    with pytest.raises(ValueError, match="enabled canonical traces"):
         preflight_canonical(manifest_path)
-    with pytest.raises(ValueError, match="canonical trace plan.*off"):
+    with pytest.raises(ValueError, match="enabled canonical traces"):
         run_canonical_one(manifest_path, shot_id=0, ledger_path=ledger_path)
     assert ledger_path.exists() is False
 

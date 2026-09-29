@@ -349,21 +349,30 @@ class NormalizedMinSumUpdate:
     profile: NumericalProfile = MIN_SUM_CPU_F64
     resolved_alpha: tuple[float, ...] | None = None
 
+    def _alpha_for(self, *, edge_index: int, source_iteration: int) -> float:
+        if type(edge_index) is not int or edge_index < 0:
+            raise ValueError("edge_index must be a nonnegative integer")
+        if type(source_iteration) is not int or source_iteration < 0:
+            raise ValueError("source_iteration must be a nonnegative integer")
+        if self.resolved_alpha is not None:
+            if edge_index >= len(self.resolved_alpha):
+                raise ValueError("edge_index is outside the resolved normalization assignment")
+            return self.resolved_alpha[edge_index]
+        if self.alpha.shape == "scalar":
+            assert self.alpha.value is not None
+            return self.alpha.value
+        if self.alpha.shape == "source_iteration":
+            assert self.alpha.values is not None
+            if source_iteration >= len(self.alpha.values):
+                raise ValueError("source_iteration assignment has no declared value for this iteration")
+            return self.alpha.values[source_iteration]
+        raise ValueError("non-scalar normalization must be resolved against an immutable graph before use")
+
     def check_to_variable(
         self, incoming: np.ndarray, *, syndrome: int, check_index: int = 0,
         edge_index: int = 0, source_iteration: int = 0,
     ) -> float:
-        if type(edge_index) is not int or edge_index < 0:
-            raise ValueError("edge_index must be a nonnegative integer")
-        if self.resolved_alpha is None:
-            if self.alpha.shape != "scalar":
-                raise ValueError("non-scalar normalization must be resolved against an immutable graph before use")
-            multiplier = self.alpha.value
-        else:
-            if edge_index >= len(self.resolved_alpha):
-                raise ValueError("edge_index is outside the resolved normalization assignment")
-            multiplier = self.resolved_alpha[edge_index]
-        assert multiplier is not None
+        multiplier = self._alpha_for(edge_index=edge_index, source_iteration=source_iteration)
         values = finite_saturate(incoming, boundary="normalized_min_sum_input", profile=self.profile)
         if values.ndim != 1:
             raise ValueError("normalized_min_sum_input must be a one-dimensional LLR array")

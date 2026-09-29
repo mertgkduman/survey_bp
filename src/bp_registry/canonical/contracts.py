@@ -9,7 +9,7 @@ import json
 import math
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_serializer, model_validator
 
 from .updates import ParameterAssignment, ParameterGeneratorSpec, ParameterRefreshPlan
 
@@ -417,6 +417,28 @@ class MemoryRefreshBoundary(str, Enum):
     SOURCE_ITERATION = "source_iteration"
 
 
+class DisorderedAffinePriorAssignmentSpec(_Strict):
+    """Public deterministic per-variable affine-prior coefficients.
+
+    The sole supported ordinary-memory disordered form is a fresh uniform
+    coefficient vector at each flooding source iteration.  Its seed identity
+    is decoder-local and therefore cannot depend on physical-error truth.
+    """
+
+    mode: Literal["uniform"]
+    low: float = Field(ge=0.0, le=1.0)
+    high: float = Field(ge=0.0, le=1.0)
+    root_seed_identity: str = Field(pattern=r"^[0-9a-f]{64}$")
+    refresh_boundary: Literal["source_iteration"] = "source_iteration"
+    rng_algorithm: Literal["numpy.PCG64"] = "numpy.PCG64"
+
+    @model_validator(mode="after")
+    def ordered_finite_interval(self) -> "DisorderedAffinePriorAssignmentSpec":
+        if not math.isfinite(self.low) or not math.isfinite(self.high) or self.low > self.high:
+            raise ValueError("disordered affine-prior assignment requires ordered finite endpoints")
+        return self
+
+
 class MemoryBindingSpec(_Strict):
     """One ordered, separately owned memory policy binding.
 
@@ -435,6 +457,21 @@ class MemoryBindingSpec(_Strict):
     refresh_boundary: MemoryRefreshBoundary
     source_status: Literal["source_defined", "canonical_adaptation", "exploratory"]
     retain_history: bool = False
+    assignment: DisorderedAffinePriorAssignmentSpec | None = None
+
+    @model_serializer(mode="wrap")
+    def serialize_optional_assignment(self, handler):
+        """Keep the pre-assignment persisted binding representation stable.
+
+        ``assignment`` was added after the first public Relay manifests.  A
+        null extension is semantically absent, so serializing it would change
+        their manifest/sample identities despite no declared policy change.
+        A real disordered assignment remains part of the serialized contract.
+        """
+        document = handler(self)
+        if self.assignment is None:
+            document.pop("assignment", None)
+        return document
 
     @field_validator("advance_boundary", mode="before")
     @classmethod
@@ -463,16 +500,26 @@ class MemoryBindingSpec(_Strict):
             "v2c_damping": ("v2c", {"gamma"}),
             "pdbp_field_mix": ("belief", {"gamma"}),
             "pdprime_delta_mix": ("belief", {"gamma"}),
-            "posterior_momentum": ("posterior", {"beta"}),
+            "posterior_momentum": ("posterior", {"alpha", "gamma"}),
         }
         target, parameter_names = expected[self.kind]
         if self.target != target:
             raise ValueError(f"{self.kind} may target only {target}")
         if set(self.parameters) != parameter_names:
             raise ValueError(f"{self.kind} requires exactly {sorted(parameter_names)!r} parameters")
-        coefficient = next(iter(self.parameters.values()))
-        if not 0.0 <= coefficient <= 1.0:
+        if any(not 0.0 <= coefficient <= 1.0 for coefficient in self.parameters.values()):
             raise ValueError("memory coefficients must be in [0, 1]")
+        if self.kind in {"pdbp_field_mix", "pdprime_delta_mix", "posterior_momentum"} and self.parameters["gamma"] == 1.0:
+            raise ValueError(f"{self.kind} gamma must be in [0, 1)")
+        if self.kind == "posterior_momentum" and self.parameters["alpha"] == 0.0:
+            raise ValueError("posterior_momentum alpha must be in (0, 1]")
+        if self.assignment is not None:
+            if self.kind != "affine_prior":
+                raise ValueError("only affine_prior supports a disordered assignment")
+            if self.advance_boundary is not MemoryAdvanceBoundary.SOURCE_ITERATION:
+                raise ValueError("disordered affine-prior assignment requires source_iteration advancement")
+            if self.refresh_boundary is not MemoryRefreshBoundary.ATTEMPT_START or self.retain_history:
+                raise ValueError("ordinary disordered affine-prior assignment requires reset attempt history")
         if self.retain_history and self.refresh_boundary not in {MemoryRefreshBoundary.ATTEMPT_START, MemoryRefreshBoundary.LEG_START}:
             raise ValueError("retained memory history requires an attempt_start or leg_start refresh boundary")
         return self

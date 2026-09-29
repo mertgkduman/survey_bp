@@ -22,6 +22,8 @@ import numpy as np
 
 import run_phase4_active_benchmark as active
 import run_phase4_pilots as pilot
+import phase4_shared_evaluation as shared_evaluation
+import verify_phase4_calibration as calibration_audit
 from bp_registry.phase4_analysis import CELLS, summarize_matched_cohort, wilson_interval
 from bp_registry.canonical.memory import MemoryAssignmentSpec
 from bp_registry.canonical.schedules import EdgeTable
@@ -52,14 +54,10 @@ def _byte_sha(path: Path) -> str:
     return sha256(path.read_bytes()).hexdigest()
 
 
-def verified_inputs(*, root: Path = ROOT, caps_path: Path = CAPS_PATH,
-                    calibration_path: Path = CALIBRATION_PATH,
-                    selection_path: Path = SELECTION_PATH,
-                    freeze_selection: bool = False) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
-    """Reject any selection or cap drift before writing/reading evaluation samples."""
-    root, caps_path, calibration_path, selection_path = (
-        path.resolve() for path in (root, caps_path, calibration_path, selection_path)
-    )
+def verified_calibration_inputs(*, root: Path = ROOT, caps_path: Path = CAPS_PATH,
+                                calibration_path: Path = CALIBRATION_PATH) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Verify terminal calibration provenance without requiring a frozen selection."""
+    root, caps_path, calibration_path = (path.resolve() for path in (root, caps_path, calibration_path))
     caps = _read(caps_path)
     if caps.get("schema_version") != 4 or caps.get("caps_digest") != _digest({k: v for k, v in caps.items() if k != "caps_digest"}):
         raise ValueError("frozen V4 cap digest does not verify")
@@ -73,6 +71,19 @@ def verified_inputs(*, root: Path = ROOT, caps_path: Path = CAPS_PATH,
         raise ValueError("calibration input drifted or fresh evaluation samples were already accessed")
     if calibration.get("result_digest") != _digest({k: v for k, v in calibration.items() if k != "result_digest"}):
         raise ValueError("terminal calibration result digest does not verify")
+    calibration_audit.audit_terminal(root=root, caps_path=caps_path, calibration_path=calibration_path)
+    return caps, calibration
+
+
+def verified_inputs(*, root: Path = ROOT, caps_path: Path = CAPS_PATH,
+                    calibration_path: Path = CALIBRATION_PATH,
+                    selection_path: Path = SELECTION_PATH,
+                    freeze_selection: bool = False) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+    """Reject any selection or cap drift before writing/reading evaluation samples."""
+    root, caps_path, calibration_path, selection_path = (
+        path.resolve() for path in (root, caps_path, calibration_path, selection_path)
+    )
+    caps, calibration = verified_calibration_inputs(root=root, caps_path=caps_path, calibration_path=calibration_path)
     expected = pilot.select_calibration_settings(calibration)
     if set(expected["codes"]) != set(caps["codes"]):
         raise ValueError("terminal calibration does not cover every qualified code")
@@ -176,13 +187,62 @@ def build_manifest(*, base: Mapping[str, Any], cell: Mapping[str, Any], plan: Ma
     return value
 
 
-def classify_candidate(manifest_path: Path, *, shot_id: int, candidate: object) -> dict[str, Any]:
+def build_shared_evaluation_supplement(*, root: Path = ROOT, caps_path: Path = CAPS_PATH,
+                                       calibration_path: Path = CALIBRATION_PATH,
+                                       selection_path: Path = SELECTION_PATH,
+                                       shared_shots_by_code: Mapping[str, int],
+                                       wall_seconds_max: int) -> dict[str, Any]:
+    """Prepare, but never publish or run, a shared source/canonical view.
+
+    The legacy ``evaluation_plan`` and its cap stay untouched.  This wrapper
+    exists so callers use the same verified calibration/selection vocabulary
+    while the supplement remains a separately funded future decision.
+    """
+    return shared_evaluation.build_presampling_supplement(
+        root=root, caps_path=caps_path, calibration_path=calibration_path,
+        selection_path=selection_path, shared_shots_by_code=shared_shots_by_code,
+        wall_seconds_max=wall_seconds_max,
+    )
+
+
+def build_shared_manifest(*, base: Mapping[str, Any], cell: Mapping[str, Any],
+                          supplement: Mapping[str, Any], caps_path: Path = CAPS_PATH,
+                          selection_path: Path = SELECTION_PATH) -> dict[str, Any]:
+    """Materialize one manifest for public preflight only; never execute it."""
+    shared_evaluation.verify_bound_sources(
+        contract=supplement, caps_path=caps_path, selection_path=selection_path
+    )
+    declared = {(item["code_id"], item["arm"]): item for item in shared_evaluation.shared_cells(supplement)}
+    key = (cell.get("code_id"), cell.get("arm"))
+    frozen = declared.get(key)
+    if frozen is None or dict(cell) != frozen:
+        raise ValueError("shared evaluation cell is undeclared or has drifted")
+    arm = str(cell["arm"])
+    legacy_arm = "selected_source_procedure" if arm == "shared_source_procedure" else "selected_canonical_procedure"
+    plan = {"selected_settings_digest": supplement["selection"]["selection_digest"],
+            "caps_digest": supplement["source_cap"]["caps_digest"]}
+    manifest = build_manifest(
+        base=base, cell={**cell, "arm": legacy_arm}, plan=plan
+    )
+    manifest["run_id"] = "phase4-shared-evaluation-" + _digest(
+        {"cell": cell, "supplement": supplement["contract_digest"]}
+    )[:24]
+    manifest["evidence"]["procedure"] += (
+        f" Shared-memory supplemental evaluation arm={arm}; supplement digest="
+        f"{supplement['contract_digest']}; prepared only and not authorized for sampling."
+    )
+    return manifest
+
+
+def classify_candidate(manifest_path: Path, *, shot_id: int, candidate: object, context: object | None = None) -> dict[str, Any]:
     """Evaluate syndrome and logical projection from original hidden truth after decoding."""
     if candidate is None:
         return {"diagnostic_cell": "no_proposal", "syndrome_valid": None,
                 "logical_projection_correct": None, "candidate_sha256": None}
     from bp_registry.runner import canonical_public_shot_context
-    context = canonical_public_shot_context(manifest_path, shot_id=shot_id)
+    context = canonical_public_shot_context(manifest_path, shot_id=shot_id) if context is None else context
+    if getattr(context, "shot_id", None) != shot_id:
+        raise ValueError("candidate classification context has a different shot")
     if context.code is None or context.hidden_truth is None:
         raise ValueError("independent CSS truth is absent")
     code = context.code.validate()
@@ -200,6 +260,13 @@ def classify_candidate(manifest_path: Path, *, shot_id: int, candidate: object) 
             ("correct" if logical_correct else "wrong_logical"),
             "syndrome_valid": syndrome_valid, "logical_projection_correct": logical_correct,
             "candidate_sha256": sha256(proposed.tobytes()).hexdigest()}
+
+
+def terminal_candidate_for_diagnosis(terminal: Mapping[str, Any], *, termination: str | None) -> tuple[object, object]:
+    """Choose the producer-visible candidate appropriate to the terminal kind."""
+    if termination == "completed":
+        return terminal.get("candidate"), terminal.get("candidate_lineage_id")
+    return terminal.get("diagnostic_candidate"), terminal.get("diagnostic_candidate_origin")
 
 
 def summarize_rows(rows: list[Mapping[str, Any]], *, planned: int) -> dict[str, Any]:
@@ -330,14 +397,11 @@ print(json.dumps({"candidate": np.asarray(r.decoding, dtype=np.uint8).tolist(),
                   "native_decode_seconds": decode_seconds,
                   "module_origin": str(Path(relay_bp.__file__).resolve())}))
 '''
-    try:
-        process = subprocess.run(
-            [str(environment / "bin/python"), "-c", program], cwd=source,
-            text=True, capture_output=True, timeout=timeout,
-            env={**os.environ, "PYTHONNOUSERSITE": "1", "PYTHONPATH": "",
-                 "RELAY_V022_PAYLOAD_PATH": str(payload_path)})
-    finally:
-        payload_path.unlink(missing_ok=True)
+    process = subprocess.run(
+        [str(environment / "bin/python"), "-c", program], cwd=source,
+        text=True, capture_output=True, timeout=timeout,
+        env={**os.environ, "PYTHONNOUSERSITE": "1", "PYTHONPATH": "",
+             "RELAY_V022_PAYLOAD_PATH": str(payload_path)})
     if process.returncode:
         raise RuntimeError(f"pinned author native command failed: {(process.stderr or process.stdout)[-1200:]}")
     result = json.loads(process.stdout)
@@ -454,8 +518,12 @@ def run_native_pairs(*, root: Path, caps: Mapping[str, Any], selection: Mapping[
                 def call_author(payload: Mapping[str, Any]) -> dict[str, Any]:
                     raw = _author_runner(source, environment, payload, pair_root / f"shot-{shot_id:04d}-payload.json",
                                          timeout=max(.001, float(cell["native_boundary_seconds"]) - (perf_counter() - started)))
+                    result_path = pair_root / f"shot-{shot_id:04d}-native-result.json"
+                    pilot._write_json_atomic(result_path, raw)
                     metadata.update({"module_origin": raw["module_origin"], "payload_sha256": raw["payload_sha256"],
-                                     "native_decode_seconds": raw["native_decode_seconds"]})
+                                     "native_decode_seconds": raw["native_decode_seconds"],
+                                     "payload_path": str(pair_root / f"shot-{shot_id:04d}-payload.json"),
+                                     "result_path": str(result_path), "result_sha256": _byte_sha(result_path)})
                     return raw
                 result = RelayV022Adapter(native_runner=call_author).run(
                     check_matrix=observation["check_matrix"], syndrome=observation["syndrome"],
@@ -465,11 +533,14 @@ def run_native_pairs(*, root: Path, caps: Mapping[str, Any], selection: Mapping[
                 native_rows[-1] = {"shot_id": shot_id, "status": "completed",
                     "sample_identity": observation["sample_identity"], "success_flag": result.success,
                     "selected": bool(result.success and diagnosis["syndrome_valid"]),
+                    "candidate": None if result.candidate is None else np.asarray(result.candidate, dtype=np.uint8).tolist(),
                     "aggregate_iterations": result.aggregate_iterations,
                     "gamma_digests": digests, "executed_gamma_digests_checked": checked,
                     "unavailable_native_facts": unavailable_native_facts(),
                     "native_module_origin": metadata["module_origin"],
                     "native_payload_sha256": metadata["payload_sha256"],
+                    "native_payload_path": metadata["payload_path"],
+                    "native_result_path": metadata["result_path"], "native_result_sha256": metadata["result_sha256"],
                     "native_decode_seconds": metadata["native_decode_seconds"],
                     "manifest_sha256": _byte_sha(manifest_path), **diagnosis,
                     "public_boundary": {"elapsed_seconds": perf_counter() - started}}
@@ -582,15 +653,16 @@ def run_cell(*, root: Path, cell: Mapping[str, Any], manifest: Mapping[str, Any]
         terminal = facts["terminal"]
         classification: dict[str, Any] = {}
         if facts["termination"] is not None:
-            classification = classify_candidate(manifest_path, shot_id=shot_id,
-                                                candidate=terminal.get("diagnostic_candidate"))
+            candidate, candidate_origin = terminal_candidate_for_diagnosis(
+                terminal, termination=facts["termination"])
+            classification = classify_candidate(manifest_path, shot_id=shot_id, candidate=candidate)
         selected = terminal.get("selection_status") == "frozen_decoder_visible_candidate"
         if selected and classification.get("diagnostic_cell") not in {"valid_correct", "valid_wrong_logical"}:
             raise ValueError("selected recovery fails independent syndrome evaluation")
         rows[-1] = {**row, **facts, **classification,
                     "status": "completed" if error is None and verify is not None and facts["termination"] is not None else "incomplete_public_boundary",
                     "outcome": terminal.get("outcome"), "selection_status": terminal.get("selection_status"),
-                    "candidate_origin": terminal.get("diagnostic_candidate_origin"), "selected": selected,
+                    "candidate_origin": candidate_origin, "selected": selected,
                     "failure": error,
                     "public_boundary": {"elapsed_seconds": perf_counter() - started,
                                         "decode_command_seconds": decode_command_seconds,

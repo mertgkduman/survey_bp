@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from copy import deepcopy
 from dataclasses import dataclass
 from hashlib import sha256
 from importlib.metadata import version
@@ -24,6 +25,7 @@ from .manifests import (
     executable_canonical_policy_effects,
     manifest_digest,
     preflight,
+    preflight_manifest_bytes,
     validate_executable_canonical_baseline,
 )
 from . import evaluator, sampling
@@ -152,6 +154,22 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
             "bindings": [binding.model_dump(mode="json") for binding in manifest.memory.bindings],
             "compatibility": {"admitted": True, "reason": None},
         }
+        if manifest.relay is None:
+            report["memory"]["execution"] = (
+                {
+                    "compact_contract_version": 5,
+                    "mode": "ordered_single_attempt_flooding",
+                    "commit_boundary": "complete_double_buffered_sweep",
+                    "operand_order": ["prior", "belief_or_posterior", "v2c"],
+                }
+                if manifest.policies.schedule.kind == "flooding" else
+                {
+                    "compact_contract_version": 5,
+                    "mode": "ordered_attempt_local_update",
+                    "commit_boundary": "admitted_local_unit_after_convergence_check",
+                    "operand_order": ["complete_fresh_belief", "affected_fresh_v2c"],
+                }
+            )
         if manifest.relay is not None:
             tuning = manifest.relay.memory_tuning
             report["relay"] = {
@@ -198,6 +216,11 @@ def _canonical_kernel_manifest(manifest: CanonicalExperimentV2 | CanonicalExperi
         # historical null-bearing compact representation exactly.
         "policies": manifest.policies.model_dump(mode="json"),
     }
+    if isinstance(manifest, CanonicalExperimentV4) and manifest.relay is None:
+        compact.update({
+            "schema_version": 5,
+            "memory": manifest.memory.model_dump(mode="json"),
+        })
     if isinstance(manifest, CanonicalExperimentV4) and manifest.relay is not None:
         compact.update({
             "schema_version": 4,
@@ -247,7 +270,7 @@ def _canonical_policy_effects(manifest: CanonicalExperimentV2 | CanonicalExperim
 
 def _canonical_execution_controls(manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4, code) -> dict[str, object]:
     """Keep preflighted public limits and handler classifications beside the compact kernel input."""
-    return {
+    controls: dict[str, object] = {
         "work_limits": {
             scope: getattr(manifest.budgets, scope).work_limits.as_evidence()
             for scope in ("shot", "search", "attempt")
@@ -255,53 +278,126 @@ def _canonical_execution_controls(manifest: CanonicalExperimentV2 | CanonicalExp
         "policy_effects": _canonical_policy_effects(manifest, code),
         "profile_plan": manifest.profile_plan.model_dump(mode="json"),
     }
+    # Trace-off V2/V3/Relay ledgers predate this control.  Omit an inert plan
+    # so their execution identity and replayed evidence remain historical.
+    if manifest.trace_plan.level != "off":
+        controls["trace_plan"] = manifest.trace_plan.model_dump(mode="json")
+    return controls
+
+
+@dataclass(frozen=True, slots=True)
+class CanonicalPublicManifestContext:
+    """Immutable preflight facts from which each public shot is freshly sampled."""
+
+    _manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4
+    _code: Any
+    manifest_sha256: str
+    _compact_manifest: dict[str, object]
+    composition_identity: str
+    _policy_effects: dict[str, dict[str, Any]]
+    _work_limits: dict[str, dict[str, int]]
+    _profile_plan: dict[str, object]
+    _trace_plan: dict[str, object] | None
+
+    @property
+    def manifest(self) -> CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4:
+        """Return a detached manifest view of the preflight snapshot."""
+        return self._manifest.model_copy(deep=True)
+
+    @property
+    def code(self) -> Any:
+        """Return a detached code view; matrix mutation cannot poison later shots."""
+        return deepcopy(self._code)
+
+    @property
+    def compact_manifest(self) -> dict[str, object]:
+        return deepcopy(self._compact_manifest)
+
+    @property
+    def policy_effects(self) -> dict[str, dict[str, Any]]:
+        return deepcopy(self._policy_effects)
+
+    @property
+    def work_limits(self) -> dict[str, dict[str, int]]:
+        return deepcopy(self._work_limits)
+
+    @property
+    def profile_plan(self) -> dict[str, object]:
+        return deepcopy(self._profile_plan)
+
+    @property
+    def trace_plan(self) -> dict[str, object] | None:
+        return deepcopy(self._trace_plan)
+
+    def shot_context(self, shot_id: int) -> PublicShotContext:
+        """Derive one independent public context with the exact pinned sample rule."""
+        manifest = self._manifest
+        if type(shot_id) is not int or not 0 <= shot_id < manifest.budgets.max_shots:
+            raise ValueError("shot_id is outside the canonical manifest budget")
+        sample = sampling.sample_shot(
+            self._code, manifest_identity=manifest.randomness.physical_sample_identity or self.manifest_sha256,
+            seed=manifest.randomness.sample_seed,
+            shot_id=shot_id, x_error_rate=manifest.error_rate,
+        )
+        return PublicShotContext(
+            manifest_sha256=self.manifest_sha256,
+            artifact_raw_sha256=manifest.artifact.raw_sha256,
+            artifact_semantic_sha256=manifest.artifact.semantic_sha256,
+            compact_manifest=deepcopy(self._compact_manifest),
+            sample_seed_identity=sample.sample_identity,
+            run_id=manifest.run_id,
+            shot_id=shot_id,
+            check_type=sample.observation.check_type,
+            syndrome=tuple(int(value) for value in sample.observation.syndrome.tolist()),
+            code_id=manifest.artifact.code_id,
+            evidence_relation=manifest.evidence.relation,
+            fixture=manifest.evidence.fixture,
+            assessment_status=manifest.evidence.assessment_status,
+            decoder_seed_identity=manifest.randomness.decoder_seed_identity,
+            code=deepcopy(self._code),
+            hidden_truth=sample.hidden,
+            error_rate=manifest.error_rate,
+            max_iterations=manifest.budgets.attempt.max_iterations,
+            work_limits=deepcopy(self._work_limits),
+            composition_identity=self.composition_identity,
+            policy_effects=deepcopy(self._policy_effects),
+            profile_plan=deepcopy(self._profile_plan),
+            trace_plan=deepcopy(self._trace_plan),
+            update_kind=manifest.policies.update.kind,
+            schedule_kind=manifest.policies.schedule.kind,
+        )
+
+
+def canonical_public_manifest_context(
+    manifest_path: str | Path, *, manifest_bytes: bytes | None = None,
+) -> CanonicalPublicManifestContext:
+    """Preflight immutable public manifest facts once; this function never samples."""
+    resolved = (preflight(manifest_path) if manifest_bytes is None
+                else preflight_manifest_bytes(manifest_path, manifest_bytes))
+    manifest = resolved.manifest
+    if not isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4)):
+        raise ValueError("canonical execution requires a strict CanonicalExperimentV2, V3, or V4 manifest")
+    composition = validate_executable_canonical_baseline(manifest.policies)
+    return CanonicalPublicManifestContext(
+        _manifest=manifest,
+        _code=resolved.code,
+        manifest_sha256=manifest_digest(manifest),
+        _compact_manifest=_canonical_kernel_manifest(manifest),
+        composition_identity=composition.semantic_identity,
+        _policy_effects=_canonical_policy_effects(manifest, resolved.code),
+        _work_limits={
+            scope: getattr(manifest.budgets, scope).work_limits.as_evidence()
+            for scope in ("shot", "search", "attempt")
+        },
+        _profile_plan=manifest.profile_plan.model_dump(mode="json"),
+        _trace_plan=(manifest.trace_plan.model_dump(mode="json")
+                    if manifest.trace_plan.level != "off" else None),
+    )
 
 
 def canonical_public_shot_context(manifest_path: str | Path, *, shot_id: int) -> PublicShotContext:
     """Resolve a deterministic public shot without opening a durable ledger."""
-    resolved = preflight(manifest_path)
-    manifest = resolved.manifest
-    if not isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4)):
-        raise ValueError("canonical execution requires a strict CanonicalExperimentV2, V3, or V4 manifest")
-    if type(shot_id) is not int or not 0 <= shot_id < manifest.budgets.max_shots:
-        raise ValueError("shot_id is outside the canonical manifest budget")
-    digest = manifest_digest(manifest)
-    sample = sampling.sample_shot(
-        resolved.code, manifest_identity=manifest.randomness.physical_sample_identity or digest,
-        seed=manifest.randomness.sample_seed,
-        shot_id=shot_id, x_error_rate=manifest.error_rate,
-    )
-    composition = validate_executable_canonical_baseline(manifest.policies)
-    compact_manifest = _canonical_kernel_manifest(manifest)
-    return PublicShotContext(
-        manifest_sha256=digest,
-        artifact_raw_sha256=manifest.artifact.raw_sha256,
-        artifact_semantic_sha256=manifest.artifact.semantic_sha256,
-        compact_manifest=compact_manifest,
-        sample_seed_identity=sample.sample_identity,
-        run_id=manifest.run_id,
-        shot_id=shot_id,
-        check_type=sample.observation.check_type,
-        syndrome=tuple(int(value) for value in sample.observation.syndrome.tolist()),
-        code_id=manifest.artifact.code_id,
-        evidence_relation=manifest.evidence.relation,
-        fixture=manifest.evidence.fixture,
-        assessment_status=manifest.evidence.assessment_status,
-        decoder_seed_identity=manifest.randomness.decoder_seed_identity,
-        code=resolved.code,
-        hidden_truth=sample.hidden,
-        error_rate=manifest.error_rate,
-        max_iterations=manifest.budgets.attempt.max_iterations,
-        work_limits={
-            scope: getattr(manifest.budgets, scope).work_limits.as_evidence()
-            for scope in ("shot", "search", "attempt")
-        },
-        composition_identity=composition.semantic_identity,
-        policy_effects=_canonical_policy_effects(manifest, resolved.code),
-        profile_plan=manifest.profile_plan.model_dump(mode="json"),
-        update_kind=manifest.policies.update.kind,
-        schedule_kind=manifest.policies.schedule.kind,
-    )
+    return canonical_public_manifest_context(manifest_path).shot_context(shot_id)
 
 
 def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path):
@@ -324,6 +420,7 @@ def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: s
         sample_seed_identity=sample.sample_identity,
         verification_context=verification_context,
         execution_controls=_canonical_execution_controls(manifest, resolved.code),
+        memory_execution_context=verification_context.memory_execution_context,
         context={
             "manifest_sha256": digest,
             "artifact_raw_sha256": manifest.artifact.raw_sha256,

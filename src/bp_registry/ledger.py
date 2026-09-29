@@ -526,15 +526,12 @@ def _relay_work_leaves(event: Mapping[str, Any], existing: list[dict[str, Any]])
     return leaves
 
 
-def read_canonical_events(path: str | Path) -> list[dict[str, Any]]:
-    """Read validated v2/V3 structural evidence without weakening v1 validation."""
-    journal = Path(path)
-    if not journal.exists():
-        return []
+def _read_canonical_event_text(text: str) -> list[dict[str, Any]]:
+    """Parse one already-read canonical JSONL snapshot with the path grammar."""
     result: list[dict[str, Any]] = []
     seen: dict[str, dict[str, Any]] = {}
     states: dict[ShotKey, str] = {}
-    for number, line in enumerate(journal.read_text(encoding="utf-8").splitlines(), start=1):
+    for number, line in enumerate(text.splitlines(), start=1):
         if not line.strip():
             continue
         try:
@@ -564,6 +561,25 @@ def read_canonical_events(path: str | Path) -> list[dict[str, Any]]:
         seen[event["event_id"]] = event
         result.append(event)
     return result
+
+
+def read_canonical_events_bytes(snapshot: bytes) -> list[dict[str, Any]]:
+    """Validate canonical evidence from one caller-owned immutable byte snapshot."""
+    if not isinstance(snapshot, bytes):
+        raise TypeError("canonical ledger snapshot must be bytes")
+    try:
+        text = snapshot.decode("utf-8")
+    except UnicodeDecodeError as error:
+        raise ValueError("canonical ledger snapshot is not UTF-8") from error
+    return _read_canonical_event_text(text)
+
+
+def read_canonical_events(path: str | Path) -> list[dict[str, Any]]:
+    """Read validated v2/V3 structural evidence without weakening v1 validation."""
+    journal = Path(path)
+    if not journal.exists():
+        return []
+    return _read_canonical_event_text(journal.read_text(encoding="utf-8"))
 
 
 def query_canonical_events(

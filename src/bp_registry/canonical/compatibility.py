@@ -24,7 +24,21 @@ _FLOODING_OPERANDS = frozenset({
     ("pdprime_delta_mix", "belief", "source_iteration"),
     ("posterior_momentum", "posterior", "source_iteration"),
 })
-_LOCAL_OPERANDS = frozenset({("v2c_damping", "v2c", "local_update")})
+_LOCAL_OPERANDS = frozenset({
+    # Affine prior memory is held fixed through a complete deterministic local
+    # traversal and advances only at its source-iteration boundary.
+    ("affine_prior", "prior", "source_iteration"),
+    ("v2c_damping", "v2c", "local_update"),
+    # Every Phase 3 local executor already assembles a full fresh belief
+    # vector before candidate construction and V2C mutation.  PDBP consumes
+    # precisely that decoder-visible field and its separately owned old field.
+    ("pdbp_field_mix", "belief", "local_update"),
+    # Local schedules retain the complete current C2V vector while assembling
+    # the fresh belief field, so PD-prime receives its matched sufficient
+    # statistic directly rather than a reconstruction from a clipped belief.
+    ("pdprime_delta_mix", "belief", "local_update"),
+    ("posterior_momentum", "posterior", "local_update"),
+})
 
 
 def validate_memory_compatibility(

@@ -8,10 +8,11 @@ CLI one reuse boundary.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from hashlib import sha256
 import json
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import Any, Mapping, Sequence
 
 import numpy as np
@@ -20,6 +21,8 @@ from .. import evaluator
 from ..ledger import CANONICAL_RELAY_LEDGER_VERSION, read_canonical_events
 from .budgets import BudgetLimit, BudgetTree, BudgetView, Measurement, QualifiedIteration, ScheduleTerminalEvidence, WorkVector
 from .kernel import BinarySpaKernel
+from .contracts import MemoryCompositionSpec
+from .memory_execution import LocalMemoryExecution, MemoryFloodingSchedule
 from .group_shuffled import HsuGroupSchedule
 from .numerics import MIN_SUM_CPU_F64
 from .lineage import stable_lineage_id
@@ -29,6 +32,7 @@ from .schedules import (
     RandomizedTraversalPlan, VariableNodeSerialSchedule,
 )
 from .updates import MinSumUpdate, NormalizedMinSumUpdate, OffsetMinSumUpdate, ParameterAssignment, resolve_generated_configuration_assignment
+from .tracing import TracePlan, TraceSink
 
 
 class CanonicalStructuralVerificationError(ValueError):
@@ -141,18 +145,21 @@ def _validate_phase4_trace(event: Mapping[str, Any], *, trace_root: Path) -> dic
     return document
 
 
-def validate_phase4_shot(
-    ledger_path: str | Path, *, run_id: str, shot_id: int, trace_root: str | Path,
+def reconstruct_phase4_shot(
+    events: Sequence[Mapping[str, Any]], *, run_id: str, shot_id: int, trace_root: str | Path,
 ) -> dict[str, object]:
-    """Independently reconstruct one V4 Relay shot from hash-linked evidence.
+    """Reconstruct one V4 Relay shot from an already validated ledger stream.
 
-    Native adapter measurements are accepted only as typed ``missingness``
-    facts.  The verifier never turns an unavailable observation into zero.
+    Callers that reuse an inventory must obtain ``events`` from
+    :func:`read_canonical_events` after binding the source bytes to their
+    inventory.  This function intentionally retains all shot grammar, work
+    reconstruction, and sidecar checks while avoiding another whole-ledger
+    parse for each selected shot.
     """
     if not isinstance(run_id, str) or not run_id or type(shot_id) is not int or shot_id < 0:
         raise CanonicalStructuralVerificationError("Phase 4 verification requires a run ID and nonnegative shot ID")
     events = [
-        event for event in read_canonical_events(ledger_path)
+        event for event in events
         if event["run_id"] == run_id and event["shot_id"] == shot_id
     ]
     if not events or any(event["ledger_version"] != CANONICAL_RELAY_LEDGER_VERSION for event in events):
@@ -188,6 +195,20 @@ def validate_phase4_shot(
         "work": work,
         "traces": traces,
     }
+
+
+def validate_phase4_shot(
+    ledger_path: str | Path, *, run_id: str, shot_id: int, trace_root: str | Path,
+) -> dict[str, object]:
+    """Read, validate, and reconstruct one V4 Relay shot from durable evidence.
+
+    The path API remains the public validation boundary.  Inventory callers
+    may reuse its already validated stream through ``reconstruct_phase4_shot``.
+    """
+    return reconstruct_phase4_shot(
+        read_canonical_events(ledger_path), run_id=run_id, shot_id=shot_id,
+        trace_root=trace_root,
+    )
 
 
 def reconstruct_schedule_terminal(evidence: Mapping[str, Any]) -> dict[str, object]:
@@ -343,6 +364,37 @@ def public_execution_identity(
     return "sha256:" + sha256(_canonical_json(payload)).hexdigest()
 
 
+def public_memory_execution_context(
+    *, compact_manifest: Mapping[str, Any], composition_identity: str | None,
+    decoder_seed_identity: str, sample_seed_identity: str, shot_id: int,
+) -> dict[str, str]:
+    """Derive ordinary-memory RNG keys independently of optional observation.
+
+    Trace-plan fields and ledger paths are intentionally absent.  The compact
+    manifest carries decoder policy and memory bindings, while the public
+    sample identity and shot distinguish independently admitted executions.
+    """
+    if type(shot_id) is not int or shot_id < 0:
+        raise ValueError("memory execution context requires a nonnegative shot ID")
+    configuration = {
+        "domain": "bp-registry-memory-configuration-v1",
+        "compact_manifest": dict(compact_manifest),
+        "composition_identity": composition_identity,
+        "decoder_seed_identity": decoder_seed_identity,
+    }
+    configuration_identity = "sha256:" + sha256(_canonical_json(configuration)).hexdigest()
+    decoder = {
+        "domain": "bp-registry-memory-decoder-v1",
+        "configuration_identity": configuration_identity,
+        "sample_seed_identity": sample_seed_identity,
+        "shot_id": shot_id,
+    }
+    return {
+        "configuration_identity": configuration_identity,
+        "decoder_identity": "sha256:" + sha256(_canonical_json(decoder)).hexdigest(),
+    }
+
+
 @dataclass(frozen=True, slots=True)
 class PublicShotContext:
     """Immutable preflighted context used to validate one public run/shot."""
@@ -369,6 +421,7 @@ class PublicShotContext:
     composition_identity: str | None = None
     policy_effects: Mapping[str, Any] | None = None
     profile_plan: Mapping[str, Any] | None = None
+    trace_plan: Mapping[str, Any] | None = None
     update_kind: str = "binary_spa"
     schedule_kind: str = "flooding"
 
@@ -384,6 +437,16 @@ class PublicShotContext:
             shot_id=self.shot_id,
             check_type=self.check_type,
             syndrome=self.syndrome,
+        )
+
+    @property
+    def memory_execution_context(self) -> dict[str, str]:
+        return public_memory_execution_context(
+            compact_manifest=self.compact_manifest,
+            composition_identity=self.composition_identity,
+            decoder_seed_identity=self.decoder_seed_identity,
+            sample_seed_identity=self.sample_seed_identity,
+            shot_id=self.shot_id,
         )
 
 
@@ -402,7 +465,41 @@ def _budget_denial(limits: Mapping[str, Mapping[str, int]], work: WorkVector, de
     return None
 
 
-def _expected_local_attempt(context: PublicShotContext) -> dict[str, Any]:
+def _expected_kernel(context: PublicShotContext, table: EdgeTable) -> BinarySpaKernel:
+    """Reconstruct the declared update/profile kernel for any public schedule."""
+    if context.update_kind == "min_sum":
+        return BinarySpaKernel(profile=MIN_SUM_CPU_F64, update_rule=MinSumUpdate())
+    if context.update_kind in {"normalized_min_sum", "offset_min_sum"}:
+        update = context.compact_manifest.get("policies", {}).get("update", {})
+        declared = update.get("parameter_assignment")
+        assignment = ParameterAssignment.model_validate(declared) if declared is not None else resolve_generated_configuration_assignment(
+            dict(update), dict(context.compact_manifest), graph_sha256=table.graph_sha256,
+            check_count=table.check_count, edge_count=table.edge_count,
+        )[0]
+        resolved = assignment.resolve(
+            graph_sha256=table.graph_sha256, check_count=table.check_count, edge_count=table.edge_count,
+            source_iteration=0, edge_checks=tuple(check for check, _variable in table.edges),
+        )
+        if context.update_kind == "normalized_min_sum":
+            rule = NormalizedMinSumUpdate(
+                assignment,
+                resolved_alpha=None if assignment.shape == "source_iteration" else tuple(float(value) for value in resolved),
+            )
+        else:
+            rule = OffsetMinSumUpdate(
+                assignment,
+                resolved_beta=None if assignment.shape == "source_iteration" else tuple(float(value) for value in resolved),
+            )
+        return BinarySpaKernel(profile=MIN_SUM_CPU_F64, update_rule=rule)
+    if context.update_kind == "binary_spa":
+        return BinarySpaKernel()
+    raise CanonicalStructuralVerificationError(f"unsupported public update rule {context.update_kind!r}")
+
+
+def _expected_local_attempt(
+    context: PublicShotContext, *, trace_sink: TraceSink | None = None,
+    trace_context: Mapping[str, str] | None = None,
+) -> dict[str, Any]:
     """Independently replay a closed public local schedule without ledger facts."""
     if context.code is None or context.error_rate is None or context.max_iterations is None:
         return {}
@@ -416,7 +513,8 @@ def _expected_local_attempt(context: PublicShotContext) -> dict[str, Any]:
         raise CanonicalStructuralVerificationError("layered local public context lacks explicit partition evidence")
     code = context.code.validate()
     table = EdgeTable.from_check_matrix(code.hz)
-    kernel = BinarySpaKernel()
+    kernel = _expected_kernel(context, table)
+    is_memory = context.compact_manifest.get("schema_version") == 5
     if schedule_kind in {"layered", "randomized"}:
         schedule = LayeredSchedule(table, kernel=kernel, partitions=partitions, provenance=provenance, construction_rule=schedule_data.get("construction_rule"))
     elif schedule_kind == "check_node_serial":
@@ -456,6 +554,21 @@ def _expected_local_attempt(context: PublicShotContext) -> dict[str, Any]:
         return {"termination": "count_budget_exhausted", "work_vector": WorkVector.zero().as_evidence(structural_event_version=2), "schedule_work_vector": WorkVector.zero().as_evidence(), "iterations": 0, "budget_termination": budget_termination(), "admitted": False}
     bp_call.commit_once()
     messages = np.full(table.edge_count, kernel.prior(context.error_rate), dtype=np.float64)
+    local_memory = None
+    if is_memory:
+        local_memory = LocalMemoryExecution(
+            table, memory=MemoryCompositionSpec.model_validate(context.compact_manifest["memory"]),
+            profile=kernel.profile,
+            execution_context=context.memory_execution_context,
+            trace_sink=trace_sink, trace_context=trace_context,
+        )
+        local_memory.initialize(
+            error_rate=context.error_rate, initial_v2c=messages,
+            initial_beliefs=np.full(table.variable_count, kernel.prior(context.error_rate), dtype=np.float64),
+        )
+
+    def memory_evidence() -> dict[str, Any]:
+        return {} if local_memory is None else {"memory_execution": local_memory.evidence()}
     executor = __import__("bp_registry.canonical.execution", fromlist=["CanonicalLocalStepExecutor"]).CanonicalLocalStepExecutor(budgets, scope="attempt")
     progress = __import__("bp_registry.canonical.execution", fromlist=["ScheduleProgress"]).ScheduleProgress(0, 0, (0,))
     randomized: RandomizedTraversalPlan | None = None
@@ -484,8 +597,11 @@ def _expected_local_attempt(context: PublicShotContext) -> dict[str, Any]:
                 return {"termination": "completed", "work_vector": budgets.summary("attempt").as_evidence(structural_event_version=2), "schedule_work_vector": budgets.summary("attempt").as_evidence(), "iterations": progress.local_steps, "candidate": step.candidate, "admitted": True, "progress": progress, "schedule_evidence": {"schedule": "residual", "atomic_unit": "one_residual_selected_c2v_commit", "source_iteration": schedule.source_iteration, "tie_rule": schedule.tie_rule, "policy_name": schedule.policy_name, "mutable_state_lifetime": "attempt"}}
         return {"termination": "max_iterations", "work_vector": budgets.summary("attempt").as_evidence(structural_event_version=2), "schedule_work_vector": budgets.summary("attempt").as_evidence(), "iterations": progress.local_steps, "admitted": True, "progress": progress, "schedule_evidence": {"schedule": "residual", "atomic_unit": "one_residual_selected_c2v_commit", "source_iteration": schedule.source_iteration, "tie_rule": schedule.tie_rule, "policy_name": schedule.policy_name, "mutable_state_lifetime": "attempt"}}
     candidate: np.ndarray | None = None
+    local_prior_llrs: np.ndarray | None = None
     for _ in range(context.max_iterations):
         progress_for_step = progress
+        if local_memory is not None and progress.cursor == (0,):
+            local_prior_llrs = local_memory.begin_source_iteration()
         if schedule_kind == "group_shuffled" and progress.cursor == (0,):
             refreshed, _ = schedule.refresh_order(progress, budgets=budgets)
             if not refreshed:
@@ -499,37 +615,63 @@ def _expected_local_attempt(context: PublicShotContext) -> dict[str, Any]:
             randomized_state = refresh.state
             assert refresh.order is not None
             progress_for_step = type(progress)(progress.iteration, progress.local_steps, (refresh.order[progress.cursor[0]],), progress.rng_state)
-        step = schedule.execute_local_step(
-            executor, messages, np.asarray(context.syndrome, dtype=np.uint8), error_rate=context.error_rate,
-            progress=progress_for_step,
-            is_converged=lambda proposed: bool(np.array_equal((code.hz.astype(np.int64) @ proposed.astype(np.int64)) % 2, context.syndrome)),
-        )
+        if local_memory is not None:
+            local_memory.begin_step()
+        try:
+            step = schedule.execute_local_step(
+                executor, messages, np.asarray(context.syndrome, dtype=np.uint8), error_rate=context.error_rate,
+                progress=progress_for_step,
+                is_converged=lambda proposed: bool(np.array_equal((code.hz.astype(np.int64) @ proposed.astype(np.int64)) % 2, context.syndrome)),
+                **({"prior_llrs": local_prior_llrs, "transform_beliefs": local_memory.transform_beliefs, "transform_v2c": local_memory.transform_v2c}
+                   if local_memory is not None else {}),
+            )
+        except BaseException:
+            if local_memory is not None:
+                local_memory.discard()
+                local_memory.abort_source_iteration()
+            raise
         progress = (type(progress)(progress.iteration, step.progress.local_steps, (progress.cursor[0] + 1,), progress.rng_state) if randomized is not None else step.progress)
         evidence = dict(schedule.evidence())
         if randomized is not None:
             evidence["randomized_traversal"] = randomized.evidence(randomized_state)
         if not step.admitted:
+            if local_memory is not None:
+                local_memory.discard()
+                local_memory.abort_source_iteration()
             work = budgets.summary("attempt")
-            return {"termination": "count_budget_exhausted", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(evidence)), "iterations": progress.local_steps, "budget_termination": budget_termination(), "admitted": True, "progress": progress}
+            return {"termination": "count_budget_exhausted", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(evidence)), "iterations": progress.local_steps, "budget_termination": budget_termination(), "admitted": True, "progress": progress, **memory_evidence()}
+        if local_memory is not None:
+            local_memory.commit(local_memory.proposal())
+        complete_source_iteration = progress.cursor == (schedule.unit_count,)
+        if local_memory is not None and complete_source_iteration:
+            local_memory.complete_source_iteration()
         candidate = step.candidate
         if candidate is not None and np.array_equal((code.hz.astype(np.int64) @ candidate.astype(np.int64)) % 2, context.syndrome):
+            if local_memory is not None and not complete_source_iteration:
+                local_memory.abort_source_iteration()
             work = budgets.summary("attempt")
-            return {"termination": "completed", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(evidence)), "iterations": progress.local_steps, "candidate": candidate, "admitted": True, "progress": progress}
-        if progress.cursor == (schedule.unit_count,):
+            return {"termination": "completed", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(evidence)), "iterations": progress.local_steps, "candidate": candidate, "admitted": True, "progress": progress, **memory_evidence()}
+        if complete_source_iteration:
             progress = type(progress)(progress.iteration + 1, progress.local_steps, (0,), progress.rng_state)
+            local_prior_llrs = None
     work = budgets.summary("attempt")
+    if local_memory is not None:
+        local_memory.abort_source_iteration()
     evidence = dict(schedule.evidence())
     if randomized is not None:
         evidence["randomized_traversal"] = randomized.evidence(randomized_state)
-    return {"termination": "max_iterations", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(evidence)), "iterations": progress.local_steps, "candidate": candidate, "admitted": True, "progress": progress}
+    return {"termination": "max_iterations", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(evidence)), "iterations": progress.local_steps, "candidate": candidate, "admitted": True, "progress": progress, **memory_evidence()}
 
 
-def _expected_attempt(context: PublicShotContext) -> dict[str, Any]:
+def _expected_attempt(
+    context: PublicShotContext, *, trace_sink: TraceSink | None = None,
+    trace_context: Mapping[str, str] | None = None,
+) -> dict[str, Any]:
     """Re-run the deterministic Phase 2 flooding baseline without ledger input."""
     if context.code is None or context.error_rate is None or context.max_iterations is None:
         return {}
     if context.schedule_kind != "flooding":
-        return _expected_local_attempt(context)
+        return _expected_local_attempt(context, trace_sink=trace_sink, trace_context=trace_context)
     code = context.code.validate()
     limits = context.work_limits or {}
     zero = WorkVector.zero()
@@ -539,70 +681,88 @@ def _expected_attempt(context: PublicShotContext) -> dict[str, Any]:
         return {"termination": "count_budget_exhausted", "work_vector": zero.as_evidence(structural_event_version=2), "iterations": 0, "budget_termination": denial, "admitted": False}
     work = bp_call
     table = EdgeTable.from_check_matrix(code.hz)
-    if context.update_kind == "min_sum":
-        kernel = BinarySpaKernel(profile=MIN_SUM_CPU_F64, update_rule=MinSumUpdate())
-    elif context.update_kind == "normalized_min_sum":
-        update = context.compact_manifest.get("policies", {}).get("update", {})
-        declared = update.get("parameter_assignment")
-        assignment = ParameterAssignment.model_validate(declared) if declared is not None else resolve_generated_configuration_assignment(
-            dict(update), dict(context.compact_manifest), graph_sha256=table.graph_sha256,
-            check_count=table.check_count, edge_count=table.edge_count,
-        )[0]
-        resolved = assignment.resolve(
-            graph_sha256=table.graph_sha256, check_count=table.check_count, edge_count=table.edge_count,
-            source_iteration=0, edge_checks=tuple(check for check, _variable in table.edges),
+    kernel = _expected_kernel(context, table)
+    is_memory = context.compact_manifest.get("schema_version") == 5
+    if is_memory:
+        schedule = MemoryFloodingSchedule(
+            table, kernel=kernel, memory=MemoryCompositionSpec.model_validate(context.compact_manifest["memory"]),
+            execution_context=context.memory_execution_context,
+            trace_sink=trace_sink, trace_context=trace_context,
         )
-        kernel = BinarySpaKernel(
-            profile=MIN_SUM_CPU_F64,
-            update_rule=NormalizedMinSumUpdate(
-                assignment,
-                resolved_alpha=None if assignment.shape == "source_iteration" else tuple(float(value) for value in resolved),
-            ),
-        )
-    elif context.update_kind == "offset_min_sum":
-        update = context.compact_manifest.get("policies", {}).get("update", {})
-        declared = update.get("parameter_assignment")
-        assignment = ParameterAssignment.model_validate(declared) if declared is not None else resolve_generated_configuration_assignment(
-            dict(update), dict(context.compact_manifest), graph_sha256=table.graph_sha256,
-            check_count=table.check_count, edge_count=table.edge_count,
-        )[0]
-        resolved = assignment.resolve(
-            graph_sha256=table.graph_sha256, check_count=table.check_count, edge_count=table.edge_count,
-            source_iteration=0, edge_checks=tuple(check for check, _variable in table.edges),
-        )
-        kernel = BinarySpaKernel(
-            profile=MIN_SUM_CPU_F64,
-            update_rule=OffsetMinSumUpdate(
-                assignment,
-                resolved_beta=None if assignment.shape == "source_iteration" else tuple(float(value) for value in resolved),
-            ),
-        )
-    elif context.update_kind == "binary_spa":
-        kernel = BinarySpaKernel()
+        state = schedule.initialize(context.error_rate)
     else:
-        raise CanonicalStructuralVerificationError(f"unsupported public update rule {context.update_kind!r}")
-    schedule = FloodingSchedule(table, kernel=kernel, profile=kernel.profile)
+        schedule = FloodingSchedule(table, kernel=kernel, profile=kernel.profile)
+
+    def memory_evidence() -> dict[str, Any]:
+        return {"memory_execution": schedule.evidence()} if is_memory else {}
+
     if table.edge_count == 0:
         candidate = kernel.candidate_from_beliefs(np.full(code.n, kernel.prior(context.error_rate), dtype=np.float64))
         converged = bool(np.array_equal((code.hz.astype(np.int64) @ candidate.astype(np.int64)) % 2, context.syndrome))
-        return {"termination": "completed" if converged else "max_iterations", "work_vector": work.as_evidence(structural_event_version=2), "iterations": 0, "candidate": candidate, "admitted": True}
-    state = schedule.initialize(context.error_rate)
+        return {"termination": "completed" if converged else "max_iterations", "work_vector": work.as_evidence(structural_event_version=2), "iterations": 0, "candidate": candidate, "admitted": True, **memory_evidence()}
+    if not is_memory:
+        state = schedule.initialize(context.error_rate)
+    last_candidate = None
     for iteration in range(1, context.max_iterations + 1):
         delta = WorkVector.from_flooding_counts(edge_count=table.edge_count, variable_count=table.variable_count)
         denial = _budget_denial(limits, work, delta)
         if denial is not None:
-            return {"termination": "count_budget_exhausted", "work_vector": work.as_evidence(structural_event_version=2), "iterations": iteration - 1, "budget_termination": denial, "admitted": True}
+            return {"termination": "count_budget_exhausted", "work_vector": work.as_evidence(structural_event_version=2), "iterations": iteration - 1, "budget_termination": denial, "admitted": True, "diagnostic_candidate": last_candidate, **memory_evidence()}
         proposed = work + delta
-        sweep = schedule.sweep(state, np.asarray(context.syndrome, dtype=np.uint8), error_rate=context.error_rate)
+        assignment = getattr(kernel.update_rule, "alpha", getattr(kernel.update_rule, "beta", None))
+        sweep = schedule.sweep(
+            state, np.asarray(context.syndrome, dtype=np.uint8), error_rate=context.error_rate,
+            **({"source_iteration": iteration - 1}
+               if is_memory or getattr(assignment, "shape", None) == "source_iteration" else {}),
+        )
+        if is_memory:
+            schedule.commit(sweep)
+            schedule.observe_candidate(
+                origin={
+                    "candidate_origin": "last_committed_sweep",
+                    "source_iteration": iteration - 1,
+                    "status": "diagnostic",
+                },
+                candidate=sweep.candidate,
+            )
+        last_candidate = sweep.candidate.tolist()
         state, work = sweep.new_v2c, proposed
         if np.array_equal((code.hz.astype(np.int64) @ sweep.candidate.astype(np.int64)) % 2, context.syndrome):
-            return {"termination": "completed", "work_vector": work.as_evidence(structural_event_version=2), "iterations": iteration, "candidate": sweep.candidate, "admitted": True}
-    return {"termination": "max_iterations", "work_vector": work.as_evidence(structural_event_version=2), "iterations": context.max_iterations, "admitted": True}
+            return {"termination": "completed", "work_vector": work.as_evidence(structural_event_version=2), "iterations": iteration, "candidate": sweep.candidate, "admitted": True, **memory_evidence()}
+    return {"termination": "max_iterations", "work_vector": work.as_evidence(structural_event_version=2), "iterations": context.max_iterations, "admitted": True, "diagnostic_candidate": last_candidate, **memory_evidence()}
 
 
 def _expect_equal(field: str, actual: Any, expected: Any) -> None:
     if actual != expected:
         raise CanonicalStructuralVerificationError(f"canonical {field} differs from independently reconstructed evidence")
+
+
+def _validate_memory_element_updates(evidence: Mapping[str, Any], context: PublicShotContext) -> None:
+    """Independently check per-binding history-state accounting evidence."""
+    if context.code is None:
+        return
+    bindings = evidence.get("bindings")
+    updates = evidence.get("memory_element_updates")
+    count = evidence.get("committed_iterations", evidence.get("committed_local_updates"))
+    source_count = evidence.get("committed_source_iterations", count)
+    if (not isinstance(bindings, list) or not isinstance(updates, Mapping)
+            or type(count) is not int or count < 0
+            or type(source_count) is not int or source_count < 0):
+        raise CanonicalStructuralVerificationError("memory operation evidence is malformed")
+    table = EdgeTable.from_check_matrix(context.code.validate().hz)
+    expected: dict[str, int] = {}
+    for binding in bindings:
+        if not isinstance(binding, Mapping) or not isinstance(binding.get("binding_id"), str) or not isinstance(binding.get("kind"), str):
+            raise CanonicalStructuralVerificationError("memory operation binding evidence is malformed")
+        kind = binding["kind"]
+        width = (
+            table.edge_count if kind == "v2c_damping" else
+            2 * table.variable_count if kind in {"pdprime_delta_mix", "posterior_momentum"}
+            else table.variable_count
+        )
+        expected[binding["binding_id"]] = (source_count if kind == "affine_prior" else count) * width
+    if dict(updates) != expected:
+        raise CanonicalStructuralVerificationError("memory element updates do not match owned history state")
 
 
 def _validate_profile(stream: Sequence[Mapping[str, Any]], terminal: Mapping[str, Any], context: PublicShotContext) -> None:
@@ -714,7 +874,105 @@ def _expected_attempt_lineage(context: PublicShotContext) -> dict[str, str] | No
     }
 
 
-def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: PublicShotContext) -> Mapping[str, Any]:
+def _expected_public_memory_trace(
+    context: PublicShotContext, plan: Mapping[str, Any], terminal: Mapping[str, Any],
+) -> Mapping[str, Any]:
+    """Replay the bounded observer independently of persisted sidecar bytes."""
+    with TemporaryDirectory(prefix="bp-registry-trace-replay-") as directory:
+        root = Path(directory)
+        trace_plan = TracePlan(
+            root=root, level=plan["level"], relative_dir=plan["relative_dir"],
+            max_records=plan["max_records"], max_bytes=plan["max_bytes"], label=plan["label"],
+        )
+        sink = TraceSink(trace_plan)
+        trace_context = {
+            **context.memory_execution_context,
+            "run_id": context.run_id,
+            "shot_id": str(context.shot_id),
+        }
+        replay_context = context
+        if terminal.get("termination") == "numerical_failure":
+            terminal_data = terminal.get("data", {})
+            count = terminal_data.get("iterations") if isinstance(terminal_data, Mapping) else None
+            if type(count) is not int or not 0 <= count < context.max_iterations:
+                raise CanonicalStructuralVerificationError("numerical trace lacks a valid committed memory prefix")
+            replay_context = replace(context, max_iterations=count)
+        expected = _expected_attempt(replay_context, trace_sink=sink, trace_context=trace_context)
+        terminal_data = terminal.get("data", {})
+        candidate = terminal_data.get("candidate", terminal_data.get("diagnostic_candidate"))
+        if candidate is not None:
+            sink.observe(
+                kind="memory_candidate",
+                payload={
+                    **trace_context,
+                    "origin": {
+                        "termination": terminal.get("termination"),
+                        "selection_status": terminal_data.get("selection_status"),
+                        "candidate_lineage_id": terminal_data.get("candidate_lineage_id"),
+                    },
+                    "candidate": np.asarray(candidate, dtype=np.uint8),
+                },
+            )
+        result = sink.finish()
+        if result.sidecar_path is None:
+            raise CanonicalStructuralVerificationError("canonical trace replay produced no observable records")
+        document = TraceSink.load(root, result.sidecar_path, expected_sha256=result.sha256)
+        if (expected.get("termination") != terminal.get("termination")
+                and not (terminal.get("termination") == "numerical_failure"
+                         and expected.get("termination") == "max_iterations")):
+            raise CanonicalStructuralVerificationError("canonical trace replay has a different termination")
+        return document
+
+
+def _validate_public_memory_trace(
+    event: Mapping[str, Any], *, context: PublicShotContext, trace_root: Path | None,
+    terminal: Mapping[str, Any],
+) -> None:
+    """Validate the one optional ordinary-memory sidecar for a public shot."""
+    plan = {} if context.trace_plan is None else dict(context.trace_plan)
+    enabled = plan.get("level", "off") != "off"
+    data = event.get("data")
+    if not isinstance(data, Mapping):
+        raise CanonicalStructuralVerificationError("canonical trace link lacks data")
+    common = _COMMON_FIELDS | frozenset({"trace_kind", "status"})
+    if data.get("trace_kind") != "ordinary_memory":
+        raise CanonicalStructuralVerificationError("canonical trace link has an unknown trace kind")
+    if data.get("status") == "unavailable":
+        if set(data) != common | {"reason"} or "sidecar" in event:
+            raise CanonicalStructuralVerificationError("canonical unavailable trace lacks explicit missingness")
+        return
+    if not enabled or data.get("status") != "linked" or set(data) != common:
+        raise CanonicalStructuralVerificationError("canonical trace link disagrees with the public trace plan")
+    if trace_root is None:
+        raise CanonicalStructuralVerificationError("canonical trace validation requires its public output root")
+    top = {"ledger_version", "event_id", "kind", "run_id", "shot_id", "data", "sidecar"}
+    if set(event) != top:
+        raise CanonicalStructuralVerificationError("canonical trace link has an invalid envelope")
+    document = _validate_phase4_trace(event, trace_root=trace_root)
+    try:
+        expected_selection = TracePlan(
+            root=trace_root, level=plan["level"], relative_dir=plan["relative_dir"],
+            max_records=plan["max_records"], max_bytes=plan["max_bytes"], label=plan["label"],
+        ).selection_basis()
+    except (KeyError, TypeError, ValueError) as error:
+        raise CanonicalStructuralVerificationError("canonical public trace plan is invalid") from error
+    if document.get("selection_basis") != expected_selection:
+        raise CanonicalStructuralVerificationError("canonical trace selection basis differs from the public trace plan")
+    execution_context = context.memory_execution_context
+    for record in document["records"]:
+        payload = record.get("payload") if isinstance(record, Mapping) else None
+        if not isinstance(payload, Mapping):
+            raise CanonicalStructuralVerificationError("canonical trace has an invalid record payload")
+        if payload.get("configuration_identity") != execution_context["configuration_identity"] or payload.get("decoder_identity") != execution_context["decoder_identity"]:
+            raise CanonicalStructuralVerificationError("canonical trace record has the wrong decoder execution identity")
+    expected = _expected_public_memory_trace(context, plan, terminal)
+    if document != expected:
+        raise CanonicalStructuralVerificationError("canonical trace differs from independently replayed committed memory observations")
+
+
+def validate_canonical_shot(
+    events: Sequence[Mapping[str, Any]], context: PublicShotContext, *, trace_root: str | Path | None = None,
+) -> Mapping[str, Any]:
     """Reject a stale, duplicate, or identity-mismatched persisted shot.
 
     Task 2 extends this entry point into complete semantic reconstruction.  The
@@ -730,6 +988,22 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
     terminals = [event for event in stream if event.get("kind") == "termination"]
     if len(terminals) != 1 or stream[-1] is not terminals[0]:
         raise CanonicalStructuralVerificationError("canonical shot must have exactly one final termination")
+    traces = [event for event in stream if event.get("kind") == "trace_link"]
+    trace_enabled = bool((context.trace_plan or {}).get("level", "off") != "off")
+    if trace_enabled:
+        if len(traces) != 1:
+            raise CanonicalStructuralVerificationError("enabled public trace plan requires exactly one terminal trace link")
+        trace_index = stream.index(traces[0])
+        if trace_index + 1 >= len(stream) or stream[trace_index + 1].get("kind") != "work":
+            raise CanonicalStructuralVerificationError("canonical trace must follow committed decoder state and precede work evidence")
+        _validate_common(traces[0], context, None)
+        _validate_public_memory_trace(
+            traces[0], context=context, trace_root=None if trace_root is None else Path(trace_root),
+            terminal=terminals[0],
+        )
+    elif traces:
+        raise CanonicalStructuralVerificationError("trace evidence is forbidden by the public trace-off plan")
+    stream = [event for event in stream if event.get("kind") != "trace_link"]
     terminal = terminals[0]
     terminal_data = terminal.get("data", {})
     has_setup = "setup_runtime" in terminal_data
@@ -758,6 +1032,20 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
     term = terminal.get("termination")
     lineage = _expected_attempt_lineage(context)
     if term == "numerical_failure":
+        failed_memory = context.compact_manifest.get("schema_version") == 5
+        is_local = context.schedule_kind != "flooding"
+        schedule_fields = frozenset({"schedule_terminal", "schedule_evidence"}) if is_local else frozenset()
+        prefix: dict[str, Any] | None = None
+        count = 0
+        if failed_memory:
+            runtime_fields |= {"iterations", "memory_execution"}
+            count = terminal_data.get("iterations")
+            if type(count) is not int or not 0 <= count < context.max_iterations:
+                raise CanonicalStructuralVerificationError("numerical failure has an invalid memory commit count")
+            prefix = _expected_attempt(replace(context, max_iterations=count))
+            if prefix["termination"] != "max_iterations":
+                raise CanonicalStructuralVerificationError("numerical failure follows a reconstructed terminal prefix")
+            _expect_equal("memory execution", terminal_data.get("memory_execution"), prefix["memory_execution"])
         _, records = _validate_event_envelopes(stream, context, ["shot_begin", "attempt", "missingness", "work", "termination"])
         _exact_data(records["shot_begin"], common)
         attempt = _exact_data(records["attempt"], common | {"scope", "attempt_lineage_id", "max_iterations"})
@@ -768,22 +1056,63 @@ def validate_canonical_shot(events: Sequence[Mapping[str, Any]], context: Public
         missingness = _exact_data(records["missingness"], common | {"field", "reason"})
         if dict((field, missingness[field]) for field in ("field", "reason")) != {"field": "candidate", "reason": "numerical_failure"}:
             raise CanonicalStructuralVerificationError("numerical failure missingness evidence is invalid")
-        work_data = _exact_data(records["work"], common | {"qualified_iterations", "work_vector"})
-        _exact_data(terminal, common | {"numerical_failure", "selection_status", "outcome", "verification_status", "work_vector"} | runtime_fields)
+        work_data = _exact_data(records["work"], common | {"qualified_iterations", "work_vector"} | schedule_fields)
+        _exact_data(terminal, common | {"numerical_failure", "selection_status", "outcome", "verification_status", "work_vector"} | runtime_fields | schedule_fields)
+        if is_local and not failed_memory:
+            qualified = work_data["qualified_iterations"]
+            if (not isinstance(qualified, Mapping) or type(qualified.get("count")) is not int
+                    or qualified["count"] < 0 or qualified["count"] >= context.max_iterations):
+                raise CanonicalStructuralVerificationError("local numerical failure has an invalid committed iteration count")
+            count = qualified["count"]
+            prefix = _expected_attempt(replace(context, max_iterations=count))
+            if prefix.get("termination") != "max_iterations":
+                raise CanonicalStructuralVerificationError("numerical failure follows a reconstructed local terminal prefix")
         data = terminal["data"]
         if not isinstance(data["numerical_failure"], str) or not data["numerical_failure"]:
             raise CanonicalStructuralVerificationError("numerical failure requires a typed diagnostic")
         if data["selection_status"] != "unavailable_due_to_numerical_failure" or data["verification_status"] != "not_independently_reproduced_numerical_failure" or data["outcome"] is not None:
             raise CanonicalStructuralVerificationError("numerical failure terminal qualification is invalid")
-        expected_work = WorkVector(bp_calls=1).as_evidence(structural_event_version=2)
+        expected_work = prefix["work_vector"] if failed_memory or is_local else WorkVector(bp_calls=1).as_evidence(structural_event_version=2)
         _expect_equal("work_vector", work_data["work_vector"], expected_work)
         _expect_equal("work_vector", data["work_vector"], expected_work)
-        _expect_equal("qualified_iterations", work_data["qualified_iterations"], {"count": 0, "schedule": "flooding", "atomic_unit": "complete_double_buffered_sweep"})
+        if is_local:
+            assert prefix is not None
+            local_atomic_units = {
+                "layered": "one_layer",
+                "check_node_serial": "one_check_all_c2v_then_affected_v2c",
+                "variable_node_serial": "one_variable_belief_then_incident_v2c",
+                "residual": "one_residual_selected_c2v_commit",
+                "randomized": "one_layer",
+                "group_shuffled": "one_overlapping_check_group",
+            }
+            expected_iteration = {
+                "count": count,
+                "schedule": context.schedule_kind,
+                "atomic_unit": local_atomic_units[context.schedule_kind],
+            }
+            _expect_equal("qualified_iterations", work_data["qualified_iterations"], expected_iteration)
+            schedule_terminal = reconstruct_schedule_terminal(work_data["schedule_terminal"])
+            _expect_equal("schedule work_vector", schedule_terminal["work_vector"], prefix["schedule_work_vector"])
+            _expect_equal("schedule source_iteration", schedule_terminal["source_iteration"], expected_iteration)
+            _expect_equal("schedule evidence", work_data["schedule_evidence"], prefix["schedule_evidence"])
+            _expect_equal("terminal schedule evidence", data["schedule_terminal"], work_data["schedule_terminal"])
+            _expect_equal("terminal schedule realization", data["schedule_evidence"], work_data["schedule_evidence"])
+        else:
+            _expect_equal("qualified_iterations", work_data["qualified_iterations"], {"count": count if failed_memory else 0, "schedule": "flooding", "atomic_unit": "complete_double_buffered_sweep"})
         return terminal
     expected = _expected_attempt(context)
     if not expected:
         return terminals[0]
     _expect_equal("termination", terminal.get("termination"), expected["termination"])
+    memory_fields = frozenset({"memory_execution"}) if "memory_execution" in expected else frozenset()
+    if memory_fields:
+        _expect_equal("memory execution", terminal_data.get("memory_execution"), expected["memory_execution"])
+    runtime_fields |= memory_fields
+    if context.compact_manifest.get("schema_version") == 5 and expected["termination"] in {"count_budget_exhausted", "max_iterations"}:
+        runtime_fields |= {"diagnostic_candidate", "diagnostic_candidate_origin"}
+        _expect_equal("diagnostic candidate", terminal_data.get("diagnostic_candidate"), expected.get("diagnostic_candidate"))
+        origin = "last_committed_local_unit" if context.schedule_kind != "flooding" else "last_committed_sweep"
+        _expect_equal("diagnostic candidate origin", terminal_data.get("diagnostic_candidate_origin"), origin if expected.get("diagnostic_candidate") is not None else None)
     if term == "completed":
         kinds = ["shot_begin", "attempt", "runtime", "candidate", "selection", "work", "termination"]
     elif expected["termination"] == "count_budget_exhausted":

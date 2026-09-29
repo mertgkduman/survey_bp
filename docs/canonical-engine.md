@@ -373,8 +373,11 @@ Every binding has a unique `binding_id`, a disjoint `history_owner`, contiguous
 `order` beginning at zero, a closed `kind`/`target` pair, finite coefficient
 parameters, `state_lifetime`, `advance_boundary`, `refresh_boundary`, and a
 `source_status`.  Repeated kinds are allowed when these identities are distinct.
-The engine applies bindings in the persisted order and each owner controls only
-its own history refresh and commit boundary.
+Ordinary flooding execution applies bindings in the persisted dependency order:
+prior transforms, complete belief/posterior transforms, then V2C transforms.
+Orders that violate these operand dependencies reject before sampling. Each
+binding has its own history; a complete sweep commits all histories with the
+message buffer, after budget admission and the convergence check succeed.
 
 The currently public flooding boundary is `source_iteration`: it admits
 `affine_prior`, V2C damping, PDBP field mixing, PD-prime delta mixing, and
@@ -383,6 +386,46 @@ rejection identifies the failed operand, for example
 `memory.target_boundary_unsupported:belief:local_update:flooding`; rejection
 happens before artifact loading or sampling.  The preflight report includes the
 resolved ordered bindings and `memory.compatibility` result.
+
+Memory-only public V4 manifests now project to the compact V5 execution
+contract, including the complete `memory` declaration. The original V4
+memory-only projection discarded that declaration and executed plain V3 BP;
+its older ledgers remain historical evidence and cannot be reused as executed
+memory evidence. V2/V3 and the separate V4 Relay projection retain their
+execution contracts. This correction does not establish new statistical
+evidence for memory policies.
+
+The executable ordinary-memory scope is one attempt/leg with histories reset
+at `attempt_start`/`leg_start`, respectively, and `retain_history=false`.
+Local schedules, shorter lifetimes, and retained histories reject with an
+explicit `memory.execution_*_unimplemented` reason. Their mathematical
+compatibility declarations are prerequisites for future execution support.
+Scalar and graph-resolved NMS assignments are executable; source-iteration NMS
+assignments reject until their kernel boundary is implemented. Per-iteration
+OMS assignments must cover the full declared attempt limit and advance with
+each committed sweep.
+PD-prime requires a fixed channel prior and the first field position; placing
+it after an upstream prior/field policy would discard that policy's operands
+and therefore rejects. It stores the per-variable C2V sum as its sufficient
+history statistic, reduced in canonical edge order, without a dense matrix.
+
+Parameters are explicit: affine prior uses `alpha` in [0,1], V2C damping uses
+fresh-input `gamma` in [0,1], PDBP and PD-prime use `gamma` in [0,1), and
+posterior momentum uses step size `alpha` in (0,1] and velocity weight `gamma`
+in [0,1). The unused earlier momentum `beta` declaration is rejected instead
+of assigning it an implicit meaning. Momentum subtracts the original current
+C2V contribution when constructing V2C messages. V2C damping retains the
+previous fresh input to each binding, as specified by its primitive.
+
+Every ordinary-memory terminal after initialization records `memory_execution`:
+resolved bindings and primitives, fidelity labels, committed iteration count,
+private-history digests, and memory element work separately from the BP
+directional work vector. Public verification reconstructs those facts from
+the manifest and observation. Failed count-budget or iteration-limit runs
+also retain `diagnostic_candidate` and `diagnostic_candidate_origin`; these
+describe the last committed sweep without selecting an invalid recovery.
+No committed sweep means the diagnostic is null. Evaluation of syndrome and
+logical-action diagnostics belongs outside the truth-sealed policy execution.
 
 Source labels remain evidence, not hidden defaults.  `source_defined` names a
 source-qualified procedure, `canonical_adaptation` names a project CSS
