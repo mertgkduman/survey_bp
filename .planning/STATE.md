@@ -5,11 +5,11 @@ current_phase: 04
 current_phase_name: Memory Policies and Relay-BP
 current_plan: 12
 status: executing
-stopped_at: Plan 04-12 external calibration running; progress audit verified with 562 tests
-last_updated: "2026-09-28T02:09:36Z"
-last_activity: 2026-09-27
-last_activity_desc: Calibration 4466/5824 (76.7%); isolated progress audit 532324f verified with 562 passed and one pre-existing skip
-state_head: 789034ad680c933b604e73c117ef976208744691
+stopped_at: Plan 04-12 calibration terminal audited and selections frozen; fresh evaluation pending
+last_updated: "2026-09-29T23:03:19Z"
+last_activity: 2026-09-29
+last_activity_desc: Terminal calibration 5824/5824 passed independent Relay ledger audit; B1 inconclusive; dated development update published
+state_head: 640b9c19977870d8f7225ce4335f75c8de1ec61b
 progress:
   total_phases: 14
   completed_phases: 3
@@ -33,9 +33,9 @@ Plan: 12 of 15
 Total Phases: 14
 Current Plan: 12
 Total Plans in Phase: 15
-Status: Executing Phase 04; external calibration running; isolated continuation fully verified
-Last activity: 2026-09-27 — Read-only live calibration progress audit and isolated verifier extension
-Last Activity Description: Calibration 4466/5824 (76.7%); partial surface integrity passed without selection; isolated audit source `532324f` verified, 562 passed and one pre-existing skip; no plan counts advanced
+Status: Executing Phase 04; terminal calibration audited, selections frozen, fresh evaluation pending
+Last activity: 2026-09-29 — Dated evidence update and calibration reconciliation
+Last Activity Description: `completed_with_inconclusive` calibration retained 5,824/5,824 shots; isolated source `263501e` reconstructed all terminal Relay ledgers; B1 has no eligible setting under its frozen work cap. Deterministic BB-144/HGP selections are frozen; fresh evaluation, factorial and production traces are absent. No plan count advanced.
 
 Progress: 54/57 current plans have summaries; Phase 4 is 12/15. Fresh phase verification is 1/14: Phase 3 passed; Phase 1/2 previously passed reports are now flagged stale. Three phases were previously recorded complete; this freshness audit does not erase their completed plans.
 
@@ -140,7 +140,7 @@ None outside the roadmap.
 
 ### Blockers/Concerns
 
-- Current resumed execution: calibration 4466/5824 (76.7%) at 2026-09-28T02:09:36Z, with 4013 completed and 453 budget-exhausted attempts. The isolated progress audit passed for the retained prefix but `selection_permitted` is false; source `532324f` passed 562 tests, one pre-existing skip, 440.89s; artifact head `efabeb2`. No main source merge or new production stage. Earlier entries below are historical snapshots; see the isolated progress audit record for current scope and remaining gates.
+- Current: calibration is terminal and independently audited (5,824/5,824 shots; 5,371 completed and 453 budget-exhausted). B1 has no eligible complete setting; BB-144 and generated HGP selections were frozen from calibration only. No fresh evaluation/factorial/traces result or main source merge exists. The [29 September development update](../docs/development-update-20260929.md) records evidence hashes and limitations. Entries below are historical checkpoints, not live progress.
 
 - New-chat progress audit: calibration running with 3,716/5,824 retained attempts (63.8%) at 2026-09-27T17:20:42.542Z. See `.planning/HANDOFF.json` for the measured snapshot and async resume context. Phase 1/2 verification reports are now flagged stale by GSD and need refreshing; Phase 3 remains passed. No completed plans were rerun or removed.
 - Phase 4 calibration remains `running` (PID 2702938); Plans 04-12/13/14 remain incomplete. Independent local PD-prime/momentum/affine execution, semantic failure-prefix traces, exact-byte terminal readers, immutable shot contexts and notebook views are verified in isolated source `62fe977`: 532 tests passed, one existing skip. Both notebooks execute all 14 cells without errors. The completed benchmark summary retains a real incomplete B1 p=.07 arm, so its rows remain explicitly unqualified. Fresh production evidence, retained histories/additional lifetimes, other local schedules, disordered local affine and Relay traces remain. Keep source changes separate from the live campaign. See [implementation continuation](phases/04-memory-policies-and-relay-bp/04-IMPLEMENTATION-CONTINUATION-20260927.md) and [coding handoff](phases/04-memory-policies-and-relay-bp/04-CODING-RESUME-HANDOFF.md).
@@ -163,6 +163,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 | 260924-max | Record prospective quaternary memory-policy novelty in Markdown and reproducible PDF | 2026-09-24 | 2a83502 | — | [260924-max-record-prospective-quaternary-memory-pol](./quick/260924-max-record-prospective-quaternary-memory-pol/) |
 | 260926-ps2 | Review Phase 4 gates, design Phase 5 interventions and document development since the last PDFs | 2026-09-26 | b684cab | Verified | [260926-ps2-review-pending-phase-4-gates-design-phas](./quick/260926-ps2-review-pending-phase-4-gates-design-phas/) |
 | 260927-p0f | Add project README and push main plus isolated Phase 4 branch to GitHub | 2026-09-27 | 5a6377a | Verified | [260927-p0f-add-a-project-readme-and-push-to-git-git](./quick/260927-p0f-add-a-project-readme-and-push-to-git-git/) |
+| 260929-qaa | Publish a verified 29 September development update in Markdown and PDF to GitHub | 2026-09-29 | 640b9c1 | Verified | [260929-qaa-publish-a-verified-29-september-developm](./quick/260929-qaa-publish-a-verified-29-september-developm/) |
 
 ## Deferred Items
 
@@ -170,14 +171,14 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Last session: 2026-09-28T02:09:36Z
-Stopped at: Plan 04-12 external job running; isolated 532324f fully verified; artifact head efabeb2
+Last session: 2026-09-29T23:03:19Z
+Stopped at: Plan 04-12 terminal calibration audited and settings frozen; B1 inconclusive; evaluation pending
 Resume file: .planning/phases/04-memory-policies-and-relay-bp/.continue-here.md
 Structured handoff: .planning/HANDOFF.json
-Next command: $gsd-execute-phase 4 after reconciling the existing async job
+Next command: $gsd-execute-phase 4 to integrate verified source and handle the B1 gap before fresh evaluation
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
 Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md`.
-Latest isolated progress audit: `gsd/phase4-memory-integration-20260926` at `efabeb2`, `.planning/phases/04-memory-policies-and-relay-bp/04-PROGRESS-AUDIT-CONTINUATION-20260928.md`.
-The September 26 development PDF remains a historical snapshot. Phase 4
+Latest isolated terminal ledger audit: `gsd/phase4-memory-integration-20260926` at `263501e`, `.planning/phases/04-memory-policies-and-relay-bp/04-CALIBRATION-LEDGER-AUDIT-PREPARATION.md` in that branch.
+The September 26 development PDF remains a historical snapshot. The September 29 update records the terminal calibration. Phase 4
 completion and Phase 5 execution remain pending; no plan counts advanced.
