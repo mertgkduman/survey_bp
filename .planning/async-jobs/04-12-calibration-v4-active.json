@@ -5,7 +5,7 @@
   "job_id": "55938300:2702938",
   "backend": "slurm-allocation-child",
   "submit_command": "setsid bash .planning/async-jobs/04-12-calibration-v4-active.launch.sh >> data/results/phase4-memory-relay/calibration.launch.log 2>&1 < /dev/null &",
-  "status": "running",
+  "status": "completed_with_inconclusive",
   "expected_artifacts": [
     "data/results/phase4-memory-relay/calibration/result.json",
     "data/results/phase4-memory-relay/calibration/events.jsonl",
@@ -14,5 +14,27 @@
   "verification_command": ".venv/bin/python -c \"import json; from pathlib import Path; p=Path('data/results/phase4-memory-relay/calibration/result.json'); r=json.loads(p.read_text()); assert r['status'] in {'completed','completed_with_inconclusive','cap_reached'}; print(r['status'],r['calibration_digest'],r['result_digest'])\"",
   "resume_command": "if test -f data/results/phase4-memory-relay/calibration/result.json && .venv/bin/python -c \"import json; assert json.load(open('data/results/phase4-memory-relay/calibration/result.json'))['status'] in {'completed','completed_with_inconclusive','cap_reached'}\" 2>/dev/null; then exit 0; fi; if test -r /proc/2702938/cmdline && tr '\\0' ' ' < /proc/2702938/cmdline | grep -Fq -- '--run-calibration'; then exit 0; fi; setsid bash .planning/async-jobs/04-12-calibration-v4-active.launch.sh >> data/results/phase4-memory-relay/calibration.launch.log 2>&1 < /dev/null &",
   "submitted_at": "2026-09-25T20:58:54Z",
-  "terminal_details": null
+  "terminal_details": {
+    "producer_status": "completed_with_inconclusive",
+    "calibration_digest": "17fb3faf912254f7faf5e8233a78f77fa1965824b936d3d53a764a7a70721b84",
+    "result_digest": "8b93a09244608692a0c2ab4523f83d5b67374b7b8b9b3f5f050f317eec6202d2",
+    "result_byte_sha256": "59a5f27fc8271724f603741c4311becfaca52a7ef01bbb93d240a823f58f2fef",
+    "aggregate_ledger_byte_sha256": "205f8fca7ff3fc00732dd68d1d697a4bac614235f4112a2b9f266158c1ad744d",
+    "planned_configurations": 182,
+    "observed_configurations": 182,
+    "planned_attempts": 5824,
+    "retained_attempts": 5824,
+    "attempt_status_counts": {
+      "completed": 5371,
+      "budget_exhausted": 453
+    },
+    "verified_terminal_shots": 5824,
+    "ledger_audit": "passed: terminal_surface_and_relay_ledger_integrity",
+    "selection_permitted": true,
+    "evaluation_namespace_accessed": false,
+    "selected_settings_status": "frozen_from_calibration_only",
+    "selected_settings_byte_sha256": "079024069b6866b8a458ffeb03fe7a581ec1074ade7ff3a74e70803bb323300c",
+    "b1_selection_status": "inconclusive: no eligible complete calibration configuration under frozen cap",
+    "reconciled_at": "2026-09-29T23:52:38Z"
+  }
 }
