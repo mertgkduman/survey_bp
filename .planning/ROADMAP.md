@@ -338,13 +338,54 @@ measured budget.
 5. Researchers can enable/disable these interventions on eligible CSS pilots and inspect pre-intervention, attempted, and selected outcomes without claiming new settings reproduce a source curve.
 
 **Research focus:** Original BPGD/impulse code discovery; perturbation semantics; lifting; random-stream and cache invalidation rules.
-**Plans:** TBD
+**Plans:** 14 plans in 8 waves; ready to execute
 
 **Preparatory design (2026-09-26):** [Intervention contracts](phases/05-guided-and-perturbative-bp-interventions/05-DESIGN.md)
 and [bounded next tasks](phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md)
 are available, with independently checked finite shortening/lifting fixtures.
-The Phase 4 dependency is complete; Phase 5 planning and execution remain
-pending.
+The Phase 4 dependency is complete. Phase 5 planning passed independent
+verification on 2026-09-30; execution remains pending. Source ambiguities
+retain explicit implementation dispositions and qualification labels.
+
+Plans:
+
+**Wave 0**
+
+- [ ] 05-01-PLAN.md — End-to-end BPGD tracer and first test targets
+
+**Wave 1** *(blocked on Wave 0 completion)*
+
+- [ ] 05-02-PLAN.md — Source qualification and transformed-problem algebra
+- [ ] 05-03-PLAN.md — BP sessions, reset, ownership, and atomic work
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 05-04-PLAN.md — Complete guided decimation
+- [ ] 05-05-PLAN.md — Bounded impulse attempts and selection
+- [ ] 05-06-PLAN.md — Freezing, syndrome flips, and sign flips
+- [ ] 05-07-PLAN.md — Bounded Restart Belief branches
+- [ ] 05-09-PLAN.md — Plotly package identity and legitimacy gate
+
+**Wave 3** *(blocked on Wave 2 controller completion)*
+
+- [ ] 05-08-PLAN.md — Versioned public manifest, CLI, ledger, and verifier
+- [ ] 05-12-PLAN.md — Deterministic BB-144 and HGP algebra and policy fixtures
+
+**Wave 4** *(blocked on public execution)*
+
+- [ ] 05-10-PLAN.md — B1 entitlement, calibration, and sealed cap freeze
+
+**Wave 5** *(blocked on cap freeze)*
+
+- [ ] 05-14-PLAN.md — Bounded matched B1 evaluation
+
+**Wave 6** *(blocked on verified pilot evidence and package gate)*
+
+- [ ] 05-11-PLAN.md — Shot-first notebook and synchronized plots
+
+**Wave 7** *(blocked on executed notebook)*
+
+- [ ] 05-13-PLAN.md — Standalone HTML export and documentation
 
 ### Phase 6: Beam Search, Ensembles, and Candidate Selection
 
@@ -504,7 +545,7 @@ pending.
 | 2. Canonical CSS Execution and Policy Contracts | 16/16 | Complete    | 2026-09-23 |
 | 3. Update Rules and Scheduling | 17/17 | Complete    | 2026-09-24 |
 | 4. Memory Policies and Relay-BP | 15/15 | Complete    | 2026-09-30 |
-| 5. Guided and Perturbative BP Interventions | 0/TBD | Not started | - |
+| 5. Guided and Perturbative BP Interventions | 0/14 | Planned | - |
 | 6. Beam Search, Ensembles, and Candidate Selection | 0/TBD | Not started | - |
 | 7. Optional Postprocessing | 0/TBD | Not started | - |
 | 8. Reproducible Campaigns and Statistical Assessment | 0/TBD | Not started | - |
