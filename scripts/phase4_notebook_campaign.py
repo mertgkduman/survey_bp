@@ -104,6 +104,68 @@ def _missing(stage: str, path: Path, reason: str = "producer artifact is absent"
             "producer": {"path": str(path)}, "assessment": "not_assessed", "tables": []}
 
 
+def _cancelled_production(root: Path) -> dict[str, object] | None:
+    """Verify the stopped job's receipts before displaying cancellation metadata."""
+    manifest_path = root / ".planning/async-jobs/04-13-production-v1.json"
+    if not manifest_path.is_file():
+        return None
+    manifest = _read(manifest_path)
+    if manifest.get("status") != "cancelled":
+        return None
+    details = manifest.get("terminal_details")
+    if manifest.get("plan_id") != "04-13" or not isinstance(details, Mapping) or details.get("automatic_resume_disabled") is not True:
+        raise ValueError("cancelled production manifest lacks terminal provenance")
+    inventory_path = root / "data/evidence/phase4-retained-evidence-inventory.json"
+    inventory = _read(inventory_path)
+    if inventory.get("decision") != "comprehensive_phase4_experiment_cancelled_by_user_as_premature":
+        raise ValueError("retained inventory does not bind the user cancellation")
+    entries = inventory.get("entries")
+    if not isinstance(entries, Mapping):
+        raise ValueError("retained cancellation inventory omits entries")
+    receipt = entries.get("interrupted_b1_baseline")
+    if not isinstance(receipt, Mapping) or receipt.get("path") != details.get("retained_attempts_path"):
+        raise ValueError("cancelled receipt path differs from terminal manifest")
+    receipt_path = root / str(receipt["path"])
+    if _byte_sha(receipt_path) != receipt.get("sha256") or receipt.get("sha256") != details.get("retained_attempts_sha256"):
+        raise ValueError("cancelled receipt bytes differ from retained identity")
+    attempts = json.loads(receipt_path.read_text(encoding="utf-8"))
+    if not isinstance(attempts, list) or not all(isinstance(row, Mapping) for row in attempts):
+        raise ValueError("cancelled receipt is not a typed attempt list")
+    counts = {status: sum(row.get("status") == status for row in attempts)
+              for status in sorted({str(row.get("status")) for row in attempts})}
+    if counts != receipt.get("attempts") or counts != details.get("retained_attempt_status_counts"):
+        raise ValueError("cancelled receipt counts differ from terminal manifest")
+    for key in ("fresh_evaluation", "fresh_native_pairs", "factorial"):
+        entry = entries.get(key)
+        if not isinstance(entry, Mapping) or entry.get("status") != "unavailable_cancelled_before_completion":
+            raise ValueError(f"cancelled {key} status is absent from inventory")
+        if (root / str(entry.get("path"))).exists():
+            raise ValueError(f"cancelled {key} unexpectedly has a result artifact")
+    return {"manifest_path": str(manifest_path), "inventory_path": str(inventory_path),
+            "receipt_path": str(receipt_path), "receipt_sha256": receipt["sha256"],
+            "counts": counts, "reason": str(details.get("reason", "user cancelled the production experiment"))}
+
+
+def _cancelled_stage(stage: str, cancellation: Mapping[str, object]) -> dict[str, object]:
+    counts = cancellation["counts"]
+    tables = []
+    if stage == "evaluation":
+        tables = [{"stage": stage, "name": "interrupted_attempt_receipts",
+                   "title": "Interrupted B1 baseline receipts (no performance denominator)",
+                   "columns": ["code_id", "arm", "completed_attempt_receipts", "interrupted_attempt_receipts",
+                               "performance_denominator", "assessment"],
+                   "rows": [{"code_id": "b1-ghp-882", "arm": "baseline",
+                             "completed_attempt_receipts": counts.get("completed", 0),
+                             "interrupted_attempt_receipts": counts.get("incomplete_interrupted", 0),
+                             "performance_denominator": None, "assessment": "not_assessed_incomplete_prefix"}]}]
+    return {"stage": stage, "status": "cancelled_before_completion", "execution_qualified": False,
+            "reason": cancellation["reason"], "assessment": "not_assessed",
+            "producer": {"manifest": cancellation["manifest_path"], "inventory": cancellation["inventory_path"],
+                         "receipt_path": cancellation["receipt_path"] if stage == "evaluation" else None,
+                         "receipt_sha256": cancellation["receipt_sha256"] if stage == "evaluation" else None},
+            "tables": tables}
+
+
 def _snapshot(stage: str, path: Path, payload: Mapping[str, Any], *, qualified: bool, reason: str | None,
               tables: list[dict[str, object]]) -> dict[str, object]:
     return {"stage": stage, "status": payload.get("status", "status_missing"), "execution_qualified": qualified,
@@ -657,6 +719,7 @@ def build_campaign_snapshots(root: Path = ROOT, *, campaign_root: Path | None = 
     if not (campaign_root / "data").is_dir() or not (campaign_root / "scripts").is_dir():
         raise ValueError("campaign root must contain retained repository data and scripts")
     root = campaign_root; relay = root / "data/results/phase4-memory-relay"
+    cancellation = _cancelled_production(root)
     cache = _InventoryProofCache()
     benchmark = _benchmark(root, cache=cache)
     baseline = _baseline_diagnostic_view(benchmark)
@@ -665,6 +728,9 @@ def build_campaign_snapshots(root: Path = ROOT, *, campaign_root: Path | None = 
                  "calibration": _calibration_or_selection(root, "calibration"), "selected_settings": _calibration_or_selection(root, "selected_settings"),
                  "evaluation": _evaluation(root, cache=cache), "factorial": factorial, "native": _native(root, cache=cache),
                  "traces": _traces(root, factorial), "historical_author_agreement": _historical_native(root)}
+    if cancellation is not None:
+        for stage in ("evaluation", "factorial", "native", "traces"):
+            artifacts[stage] = _cancelled_stage(stage, cancellation)
     return {"schema_version": 1, "mode": "read_only_campaign_inventory", "campaign_root": str(campaign_root), "assessment": "not_assessed", "artifacts": artifacts,
             "tables": [table for item in artifacts.values() for table in item.get("tables", [])],
             "summary": {"qualified_stages": sorted(stage for stage, item in artifacts.items() if item.get("execution_qualified") is True),

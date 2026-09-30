@@ -146,6 +146,12 @@ def test_source_notebook_complete_sections_and_actual_fixture_execution():
     notebook = nbformat.read(source, as_version=4)
     tagged = {cell.metadata.get("phase4_section") for cell in notebook.cells}
     assert set(support.SECTIONS) <= tagged
+    narrative = "\n".join(cell.source for cell in notebook.cells if cell.cell_type == "markdown")
+    assert "159 completed and one interrupted" in narrative
+    assert "not a completed performance cohort" in narrative
+    assert "Plan 04-12 awaits live calibration" not in narrative
+    code = "\n".join(cell.source for cell in notebook.cells if cell.cell_type == "code")
+    assert "run_phase4_evaluation" not in code and "run_phase4_factorial" not in code
     # NFS can briefly retain directory metadata after the kernel closes files.
     with tempfile.TemporaryDirectory(dir=ROOT / "data/results/phase4-notebook", prefix=".test-kernel-",
                                      ignore_cleanup_errors=True) as temporary:

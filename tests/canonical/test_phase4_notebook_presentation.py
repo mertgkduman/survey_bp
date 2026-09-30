@@ -83,6 +83,22 @@ def test_unqualified_campaign_rows_never_become_figures(tmp_path):
     assert list(tmp_path.iterdir()) == []
 
 
+def test_cancelled_receipt_counts_render_without_a_performance_figure(tmp_path):
+    campaign = {"mode": "read_only_campaign_inventory", "artifacts": {
+        "evaluation": {"status": "cancelled_before_completion", "execution_qualified": False,
+                       "reason": "user stopped premature experiment"}},
+        "tables": [{"stage": "evaluation", "name": "interrupted_attempt_receipts",
+                    "columns": ["completed_attempt_receipts", "interrupted_attempt_receipts",
+                                "performance_denominator"],
+                    "rows": [{"completed_attempt_receipts": 159,
+                              "interrupted_attempt_receipts": 1,
+                              "performance_denominator": None}]}]}
+    result = display_campaign_stage("evaluation", {}, campaign, figure_dir=tmp_path)
+    assert result["status"] == "cancelled_before_completion"
+    assert result["tables"] == 1 and result["figures"] == []
+    assert list(tmp_path.iterdir()) == []
+
+
 def test_derived_views_require_qualified_sources_and_keep_measurement_scopes():
     campaign = {"mode": "read_only_campaign_inventory", "artifacts": {
         "evaluation": {"execution_qualified": True, "producer": {"path": "retained-evaluation"}},

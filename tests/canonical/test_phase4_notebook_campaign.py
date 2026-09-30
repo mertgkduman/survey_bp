@@ -25,19 +25,45 @@ def _write(path: Path, value: object) -> None:
     path.write_text(json.dumps(value), encoding="utf-8")
 
 
-def test_real_inventory_is_read_only_and_preserves_current_nonterminal_states():
+def test_real_cancellation_inventory_preserves_interrupted_receipts_without_a_result():
     campaign = _module()
-    inventory = campaign.build_campaign_snapshots(ROOT)
-    assert inventory["mode"] == "read_only_campaign_inventory"
-    assert inventory["assessment"] == "not_assessed"
-    assert inventory["summary"]["qualified_stages"] == []
-    assert inventory["artifacts"]["calibration"]["status"] == "missing"
-    assert inventory["artifacts"]["evaluation"]["status"] == "missing"
-    assert inventory["artifacts"]["benchmark"]["execution_qualified"] is False
-    assert inventory["artifacts"]["historical_author_agreement"]["execution_qualified"] is False
-    tables = inventory["artifacts"]["historical_author_agreement"]["tables"]
-    if tables:
-        assert tables[0]["stage"] == "historical_author_agreement"
+    cancellation = campaign._cancelled_production(ROOT)
+    assert cancellation is not None
+    assert cancellation["counts"] == {"completed": 159, "incomplete_interrupted": 1}
+    snapshots = {stage: campaign._cancelled_stage(stage, cancellation)
+                 for stage in ("evaluation", "factorial", "native", "traces")}
+    assert all(item["status"] == "cancelled_before_completion" and not item["execution_qualified"]
+               for item in snapshots.values())
+    row = snapshots["evaluation"]["tables"][0]["rows"][0]
+    assert row["completed_attempt_receipts"] == 159
+    assert row["interrupted_attempt_receipts"] == 1
+    assert row["performance_denominator"] is None
+    assert all(not item["tables"] for stage, item in snapshots.items() if stage != "evaluation")
+
+
+def test_cancelled_receipt_tampering_rejected_before_display(tmp_path):
+    campaign = _module()
+    receipt = tmp_path / "data/results/phase4-memory-relay/evaluation/b1-ghp-882/baseline/attempts.json"
+    _write(receipt, [{"status": "completed"}, {"status": "incomplete_interrupted"}])
+    relative = str(receipt.relative_to(tmp_path))
+    inventory = {"decision": "comprehensive_phase4_experiment_cancelled_by_user_as_premature",
+                 "entries": {"interrupted_b1_baseline": {"path": relative, "sha256": campaign._byte_sha(receipt),
+                                                         "attempts": {"completed": 1, "incomplete_interrupted": 1}}}}
+    for key, path in {"fresh_evaluation": "evaluation/result.json",
+                      "fresh_native_pairs": "evaluation/native-pairs/result.json",
+                      "factorial": "factorial/result.json"}.items():
+        inventory["entries"][key] = {"path": "data/results/phase4-memory-relay/" + path,
+                                      "status": "unavailable_cancelled_before_completion"}
+    _write(tmp_path / "data/evidence/phase4-retained-evidence-inventory.json", inventory)
+    _write(tmp_path / ".planning/async-jobs/04-13-production-v1.json",
+           {"plan_id": "04-13", "status": "cancelled", "terminal_details": {
+               "automatic_resume_disabled": True, "retained_attempts_path": relative,
+               "retained_attempts_sha256": campaign._byte_sha(receipt),
+               "retained_attempt_status_counts": {"completed": 1, "incomplete_interrupted": 1}}})
+    assert campaign._cancelled_production(tmp_path)["counts"]["completed"] == 1
+    _write(receipt, [{"status": "completed"}, {"status": "completed"}])
+    with pytest.raises(ValueError, match="receipt bytes"):
+        campaign._cancelled_production(tmp_path)
 
 
 def test_baseline_view_relabels_retained_benchmark_snapshot_without_mutation():
