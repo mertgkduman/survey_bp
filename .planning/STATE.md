@@ -3,12 +3,12 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 05
 current_phase_name: Guided and Perturbative BP Interventions
-current_plan: 8
+current_plan: 9
 status: executing
-stopped_at: Completed 05-07-PLAN.md; Wave 2 controllers complete
+stopped_at: Completed 05-08-PLAN.md; public V5 execution and replay complete
 last_updated: "2026-09-30T22:39:45.432Z"
 last_activity: 2026-09-30
-last_activity_desc: Completed Phase 05 Plan 07 bounded Restart Belief
+last_activity_desc: Completed Phase 05 Plan 08 public intervention execution
 state_head: 844104cbcd316e75f2418888d6f8974c19811a9c
 progress:
   total_phases: 14
@@ -29,13 +29,13 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 ## Current Position
 
 Phase: 05 (Guided and Perturbative BP Interventions) — IN PROGRESS
-Plan: 08 of 14
+Plan: 09 of 14
 Total Phases: 14
-Current Plan: 8
+Current Plan: 9
 Total Plans in Phase: 14
 Status: Ready to execute
-Last activity: 2026-09-30 — Completed Phase 05 Plan 07
-Last Activity Description: Phase 05 has 7 of 14 plans complete; all six controller families are implemented
+Last activity: 2026-09-30 — Completed Phase 05 Plan 08
+Last Activity Description: Phase 05 has 8 of 14 plans complete; public V5 manifests, execution, and replay are available
 
 Progress: [███░░░░░░░] 29%
 
