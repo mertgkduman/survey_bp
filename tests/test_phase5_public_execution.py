@@ -326,8 +326,10 @@ def test_phase5_evaluation_rejected_without_entitlement_or_cap_freeze(tmp_path, 
 
     monkeypatch.setattr(pilot, "FREEZE", tmp_path / "missing-freeze.json")
     monkeypatch.setattr(pilot, "ENTITLEMENT", tmp_path / "missing-entitlement.json")
+    monkeypatch.setattr(pilot, "EVALUATION_OUTPUT", tmp_path / "evaluation")
     with pytest.raises(FileNotFoundError):
         pilot.evaluate()
+    assert not (tmp_path / "evaluation").exists()
 
 
 def test_phase5_cap_freeze_self_audit_rejects_digest_mismatch(tmp_path, monkeypatch):
@@ -341,3 +343,60 @@ def test_phase5_cap_freeze_self_audit_rejects_digest_mismatch(tmp_path, monkeypa
     monkeypatch.setattr(pilot, "EVALUATION", evaluation)
     with pytest.raises(ValueError, match="digests do not agree"):
         pilot.self_audit()
+
+
+@pytest.mark.parametrize("mutation", (
+    "entitlement_digest", "cap_freeze_digest", "evaluation_manifest_digest",
+    "frozen_cap", "qualification", "availability", "arm_membership", "sample_identity",
+))
+def test_phase5_evaluation_preflight_rejects_frozen_prerequisite_tamper_without_output(
+    tmp_path, monkeypatch, mutation,
+):
+    """A changed seal or scientific control must fail before opening output."""
+    import scripts.run_phase5_pilot as pilot
+
+    calibration = pilot._read(pilot.CALIBRATION)
+    entitlement = pilot._read(pilot.ENTITLEMENT)
+    freeze = pilot._read(pilot.FREEZE)
+    evaluation = pilot._read(pilot.EVALUATION)
+    entitlement_path = tmp_path / "entitlement.json"
+    freeze_path = tmp_path / "freeze.json"
+    evaluation_path = tmp_path / "evaluation.json"
+    output = tmp_path / "evaluation-output"
+    if mutation == "entitlement_digest":
+        entitlement["purpose"] = "tampered"
+    elif mutation == "cap_freeze_digest":
+        freeze["caps_source"] = "outcome-conditioned"
+    elif mutation == "evaluation_manifest_digest":
+        evaluation["shot_ids"] = list(range(15))
+    elif mutation == "frozen_cap":
+        evaluation["arm_manifests"]["impulse"]["intervention_limits"]["max_total_actions"] += 1
+    elif mutation == "qualification":
+        evaluation["arm_manifests"]["guided_decimation"]["intervention"]["qualification"] = "source_faithful"
+    elif mutation == "availability":
+        evaluation["arm_manifests"]["restart_belief"]["intervention"]["native_availability"] = "available"
+    elif mutation == "arm_membership":
+        evaluation["arm_order"].pop()
+    elif mutation == "sample_identity":
+        evaluation["physical_sample_identity"] = calibration["physical_sample_identity"]
+    entitlement_path.write_bytes(
+        json.dumps(entitlement).encode("utf-8") if mutation == "entitlement_digest" else pilot.ENTITLEMENT.read_bytes()
+    )
+    freeze_path.write_bytes(
+        json.dumps(freeze).encode("utf-8") if mutation == "cap_freeze_digest" else pilot.FREEZE.read_bytes()
+    )
+    evaluation_path.write_bytes(
+        json.dumps(evaluation).encode("utf-8") if mutation not in {"entitlement_digest", "cap_freeze_digest"}
+        else pilot.EVALUATION.read_bytes()
+    )
+    monkeypatch.setattr(pilot, "ENTITLEMENT", entitlement_path)
+    monkeypatch.setattr(pilot, "FREEZE", freeze_path)
+    monkeypatch.setattr(pilot, "EVALUATION", evaluation_path)
+    monkeypatch.setattr(pilot, "EVALUATION_OUTPUT", output)
+    # The calibration's already checked identity and objective summary are fixed.
+    # This isolates each seal mutation from the expensive B1 policy preflight.
+    monkeypatch.setattr(pilot, "_stage", lambda _path, *, stage: calibration if stage == "calibration" else evaluation)
+    monkeypatch.setattr(pilot, "_calibration_objective_summary", lambda _design: freeze["calibration_objective_summary"])
+    with pytest.raises(ValueError):
+        pilot.evaluate()
+    assert not output.exists()
