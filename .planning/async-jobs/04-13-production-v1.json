@@ -2,9 +2,9 @@
   "version": "1.0",
   "plan_id": "04-13",
   "phase": "04",
-  "job_id": "55938300:launch-pending",
+  "job_id": "55938300:3156090",
   "backend": "slurm-allocation-child",
-  "status": "launch_pending",
+  "status": "running",
   "submit_command": "setsid bash .planning/async-jobs/04-13-production-v1.launch.sh >> data/results/phase4-memory-relay/04-13-production-v1.stdout.log 2>&1 < /dev/null &",
   "expected_artifacts": [
     "data/results/phase4-memory-relay/evaluation/result.json",
@@ -13,8 +13,8 @@
     "data/results/phase4-memory-relay/04-13-production-v1.stdout.log"
   ],
   "verification_command": "OMP_NUM_THREADS=1 .venv/bin/python -c \"import json; from pathlib import Path; e=json.loads(Path('data/results/phase4-memory-relay/evaluation/result.json').read_text()); f=json.loads(Path('data/results/phase4-memory-relay/factorial/result.json').read_text()); assert e['status']=='completed_with_inconclusive_selection'; assert f['predecessor']['sha256']; print(e['status'], f['status'], f['factorial_digest'])\"",
-  "resume_command": "if test -f data/results/phase4-memory-relay/factorial/result.json; then exit 0; fi; if test -r /proc/REPLACE_WITH_CHILD_PID/cmdline && tr '\\0' ' ' < /proc/REPLACE_WITH_CHILD_PID/cmdline | grep -Fq -- '04-13-production-v1.launch.sh'; then exit 0; fi; setsid bash .planning/async-jobs/04-13-production-v1.launch.sh >> data/results/phase4-memory-relay/04-13-production-v1.stdout.log 2>&1 < /dev/null &",
-  "submitted_at": null,
+  "resume_command": "if test -f data/results/phase4-memory-relay/factorial/result.json; then exit 0; fi; if test -r /proc/3156090/cmdline && tr '\\0' ' ' < /proc/3156090/cmdline | grep -Fq -- '04-13-production-v1.launch.sh'; then exit 0; fi; setsid bash .planning/async-jobs/04-13-production-v1.launch.sh >> data/results/phase4-memory-relay/04-13-production-v1.stdout.log 2>&1 < /dev/null &",
+  "submitted_at": "2026-09-30T00:11:11Z",
   "source_commit": "2b9b0b3911ec7d6a65abb8d50a925f3dd2393b3e",
   "frozen_inputs": {
     "caps_digest": "527a732c6183bcfecdfc443073027cad16e6a314f9bf9785373491601c3120e8",
