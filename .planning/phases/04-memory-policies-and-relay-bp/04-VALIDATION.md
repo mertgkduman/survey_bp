@@ -1,15 +1,16 @@
 ---
 phase: "04"
 slug: "memory-policies-and-relay-bp"
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: validated
+nyquist_compliant: true
+wave_0_complete: true
 created: "2026-09-24"
+updated: "2026-09-30"
 ---
 
-# Phase 04 — Validation Strategy
+# Phase 04 — Validation
 
-> Execution feedback contract derived from `04-RESEARCH.md`. Plan and task IDs will be filled after planning; test targets below are Wave 0 dependencies until created.
+The automated contracts cover the six Phase 4 requirements and the stopped-campaign evidence boundary. The full repository suite passed on 2026-09-30: **568 passed, 1 skipped**. A later narrow path-confinement correction passed 20 affected notebook tests. These checks establish executable semantics and evidence integrity; they do not establish a Relay performance effect or published-curve reproduction.
 
 ## Test Infrastructure
 
@@ -17,64 +18,36 @@ created: "2026-09-24"
 |---|---|
 | Framework | pytest 9.0.3 |
 | Config file | `pyproject.toml` |
-| Quick run command | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q -x tests/canonical/test_memory_policies.py tests/canonical/test_relay.py` after Wave 0 |
-| Full suite command | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q` |
-| Estimated runtime | Measure and record during Wave 0; do not assume an HPC node is representative of later allocations. |
-
-## Sampling Rate
-
-- After each task commit, run the focused new test and its nearest existing contract, schedule, or manifest test.
-- After every plan wave, run the configured full suite.
-- Before `$gsd-verify-work`, require the full suite and bounded native differential fixtures to pass.
-- Measure feedback latency in Wave 0 and record it in the execution summary.
+| Full suite | `PYTHONPATH=src OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q` |
+| Retained audit | `OMP_NUM_THREADS=1 PYTHONPATH=src .venv/bin/python scripts/verify_phase4_calibration.py --root . --ledgers` (5,824/5,824 terminal shots verified in Plan 04-12) |
 
 ## Per-Requirement Verification Map
 
-| Requirement | Planned behavior | Test type | Automated target | File exists | Status |
-|---|---|---|---|---|---|
-| MEM-01 | Damping equation, endpoints, state reset, local and source boundaries | unit and property | `tests/canonical/test_memory_policies.py` | No — Wave 0 | Pending |
-| MEM-02 | Field and delta mixing operands, order, and distinguishing fixture | unit and golden | `tests/canonical/test_memory_policies.py` | No — Wave 0 | Pending |
-| MEM-03 | Momentum recurrence, zero initial velocity, original C2V subtraction, reset | unit and differential | `tests/canonical/test_memory_policies.py` | No — Wave 0 | Pending |
-| MEM-04 | Affine prior memory lifetime and EWAInit/Relay reparameterization | unit and metamorphic | `tests/canonical/test_memory_policies.py` | No — Wave 0 | Pending |
-| MEM-05 | Seeded per-variable draws, refresh, history, RNG separation, repeated binding order | unit and property | `tests/canonical/test_memory_composition.py` | No — Wave 0 | Pending |
-| MOD-01 | Leg transfer, reset, stopping, candidate selection, and leaf work | integration | `tests/canonical/test_relay.py` | No — Wave 0 | Pending |
-| MOD-01 | Author v0.2.2 translation and instrumentation equivalence | differential | `tests/canonical/test_relay_differential.py` | No — Wave 0 | Pending |
-| MOD-01 | Ledger reconstruction, identities, trace bounds, and notebook reuse | evidence | `tests/canonical/test_phase4_evidence.py` | No — Wave 0 | Pending |
+| Requirement | Executable check and retained evidence | Status |
+|---|---|---|
+| MEM-01 | `tests/canonical/test_memory_policies.py` checks damping equation, endpoints and boundary; `test_memory_execution.py` and `test_local_memory_execution.py` check public execution and reset/rollback. | Covered |
+| MEM-02 | `test_memory_policies.py` distinguishes PDBP field mixing from PD′BP edge-delta mixing; `test_local_memory_execution.py` checks operands, saturation and order. | Covered |
+| MEM-03 | `test_memory_policies.py` checks zero momentum initialization, original C2V subtraction and reset; local and public execution tests check history ownership and replay. | Covered |
+| MEM-04 | `test_memory_policies.py` checks affine prior memory and EWAInit/Relay reparameterization; `test_memory_composition.py`, `test_memory_execution.py` and local tests check lifetime and ordered bindings. | Covered |
+| MEM-05 | `test_memory_composition.py` checks decoder-local seeded draws, refresh and rollback; `test_memory_execution.py` and local tests check public replay, trace neutrality and assignment evidence. | Covered |
+| MOD-01 | `tests/canonical/test_relay.py` checks leg transfer, stopping, scoring and work; `test_relay_differential.py` checks exact-author identity, translation and observer equivalence; `test_phase4_evidence.py` checks artifact identities, stage reuse and ledger reconstruction. | Covered |
+| MOD-01 evidence boundary | `test_phase4_notebook.py`, `test_phase4_notebook_campaign.py` and `test_phase4_notebook_presentation.py` check cancelled-stage labeling, receipt integrity and unavailable outcome denominators. The executed read-only notebook is `data/results/phase4-notebook/retained-cancelled-phase4.ipynb`. | Covered |
 
-## Wave 0 Requirements
+## Wave 0 and Invariants
 
-- [ ] Create `tests/canonical/test_memory_policies.py` for exact source equations and endpoints.
-- [ ] Create `tests/canonical/test_memory_composition.py` for ordered and repeated bindings, seeded draws, schedule compatibility, and atomic rollback.
-- [ ] Create `tests/canonical/test_relay.py` for real posterior transfer, leg lifecycle, scoring, lineage, and budgets.
-- [ ] Create `tests/canonical/test_relay_differential.py` for the pinned original reference and behavior-neutral observer patch.
-- [ ] Create `tests/canonical/test_phase4_evidence.py` for B1 identity gating, ledger reconstruction, trace caps, and notebook stage reuse.
-- [ ] Establish the isolated author v0.2.2 reference, reconcile B1's semantic digest, and discover the actual compute allocation before locking pilot caps.
-- [ ] Benchmark a bounded 32-shot representative sample and freeze finite calibration/evaluation budgets before collecting assessment results.
+The five named Wave 0 targets exist: `tests/canonical/test_memory_policies.py`, `test_memory_composition.py`, `test_relay.py`, `test_relay_differential.py`, and `test_phase4_evidence.py`. Later tests added ordinary and local schedule execution, trace and notebook boundaries. The full suite covers typed version routing, independent history, budget rollback, decoder-visible selection, finite posterior transfer, leaf-work reconstruction, identity gates and hash-linked artifact reuse.
 
-## Mandatory Invariants
+The retained calibration passed an independent ledger audit of 182 configurations and 5,824 terminal shots. B1 selection is inconclusive under its frozen cap. The cancelled evaluation prefix has 159 completed and one interrupted **receipt**, with no qualified performance denominator. Fresh evaluation, native-pair and factorial results are absent. No statistical comparison is inferred from this prefix.
 
-1. Exact equation fixtures distinguish damping, PDBP, PD′BP, momentum, and affine prior memory; EWAInit and Relay memory agree under the documented reparameterization.
-2. Each binding owns its history; reversing ordered repeated bindings changes a distinguishing result or has an explicit commutativity proof for that fixture.
-3. Budget rejection leaves message state, history, RNG state, and schedule cursor unchanged.
-4. Relay legs inherit only the predecessor's finite real posterior LLR vector; message and leg-local state reset. Candidate selection is invariant to hidden truth.
-5. Every leg's leaf work reconstructs from the ledger. Native fields unavailable from the pinned author code remain explicitly unavailable.
-6. V2/V3 persisted manifests preserve their semantics; new executable policy admission uses a versioned contract.
-7. All BB-144, B1, and HGP pilots pass exact matrix/logical identity checks before use; B1's current digest conflict blocks its pilot until resolved.
-8. Notebook stages reuse artifacts only when all declared manifest, source, policy, code, environment, sample, and stage identities match; mismatches preserve old evidence.
+## Manual Evidence Review
 
-## Manual-Only Verifications
+The exact-author v0.2.2 tag/commit/tree and divergent installed fork were reviewed in Plan 04-07; the isolated build, comment-only observer and bounded equivalence fixture are recorded in Plan 04-08. Plan 04-11 recorded scheduler entitlement and finite caps before calibration. These are provenance and resource checks, not substitutes for automated policy tests.
 
-| Behavior | Requirement | Why manual | Instructions |
-|---|---|---|---|
-| Native package legitimacy and pin | MOD-01 | Local and repository provenance require a reviewed source identity | Check author tag and commit, compare the local fork separately, record the isolated build digest and any patch diff. |
-| Compute allocation and finite pilot caps | MOD-01 | Entitlement is deployment-specific | Record SLURM allocation and concurrency, inspect bounded benchmark, then freeze configuration, shot, work, and runtime caps before calibration. |
+## Sign-Off
 
-## Validation Sign-Off
+- [x] Every Phase 4 requirement has executable checks.
+- [x] All five Wave 0 test targets exist.
+- [x] Full suite and bounded native differential fixtures passed.
+- [x] Incomplete production evidence remains explicitly unqualified.
 
-- [ ] Every task has an automated verification command or a named Wave 0 dependency.
-- [ ] No three consecutive tasks lack automated verification.
-- [ ] Wave 0 creates all named test targets.
-- [ ] The full suite, native differential fixtures, and bounded notebook mode pass.
-- [ ] Set `nyquist_compliant: true` only after the implemented tests cover every requirement.
-
-**Approval:** pending
+**Approval:** validated 2026-09-30 under the revised Phase 4 scope.
