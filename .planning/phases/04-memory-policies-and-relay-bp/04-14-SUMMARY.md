@@ -14,7 +14,7 @@ affects: [phase-4-verification, phase-5, phase-8, phase-9]
 actuals:
   tokens: 4100
   tasks: 2
-  commits: 2
+  commits: 3
 tech-stack:
   added: []
   patterns: [verified cancellation metadata before display, separate receipt counts from outcome denominators]
@@ -67,6 +67,6 @@ The Phase 4 notebook now identifies the completed calibration, frozen BB-144/HGP
 
 The public guide gives separate bounded fixture and read-only retained-evidence commands. The executed retained notebook has 28 completed cells and no production sampling. No code path in the notebook invokes the cancelled producer.
 
-Verification: 60 focused tests passed with one skipped; full repository suite 568 passed with one skipped. The retained notebook output was inspected for all four cancelled-stage labels, receipt counts, and lack of a performance denominator. No comprehensive simulation was restarted.
+Verification: 60 focused tests passed with one skipped; full repository suite 568 passed with one skipped. After a path-confinement review fix, 20 relevant notebook tests passed. The retained notebook output was inspected for all four cancelled-stage labels, receipt counts, and lack of a performance denominator. No comprehensive simulation was restarted.
 
 Phase 4 plans are complete. Phase goal verification remains the next gate before Phase 5.

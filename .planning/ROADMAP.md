@@ -247,7 +247,7 @@ Plans:
 4. A researcher can inspect memory/relay effects in deterministic fixtures and bounded retained pilots, recover leg work from their ledgers, and see missing or interrupted comparisons explicitly labeled. A comprehensive factorial is not a Phase 4 gate.
 
 **Research focus:** Exact mixing/memory definitions, source equations and code defaults, warm-state inheritance, and candidate stopping/selection.
-**Plans:** 14/15 plans executed
+**Plans:** 15/15 plans executed
 
 Plans:
 **Wave 0**
@@ -302,7 +302,7 @@ Plans:
 
 **Wave 12** *(blocked on Wave 11 completion)*
 
-- [ ] 04-14-PLAN.md — Availability-aware notebook and evidence-backed research guide
+- [x] 04-14-PLAN.md — Availability-aware notebook and evidence-backed research guide
 
 **Review update (2026-09-26):** [Current gate and implementation review](../docs/phase4-plan-review-and-next-design.md)
 records the isolated ordinary-memory correction, factorial order supplement,
@@ -497,7 +497,7 @@ its requirements remain pending.
 | 1. Evidence Registry and Native CSS Baseline | 9/9 | Complete    | 2026-09-22 |
 | 2. Canonical CSS Execution and Policy Contracts | 16/16 | Complete    | 2026-09-23 |
 | 3. Update Rules and Scheduling | 17/17 | Complete    | 2026-09-24 |
-| 4. Memory Policies and Relay-BP | 14/15 | In Progress|  |
+| 4. Memory Policies and Relay-BP | 15/15 | In Progress|  |
 | 5. Guided and Perturbative BP Interventions | 0/TBD | Not started | - |
 | 6. Beam Search, Ensembles, and Candidate Selection | 0/TBD | Not started | - |
 | 7. Optional Postprocessing | 0/TBD | Not started | - |
