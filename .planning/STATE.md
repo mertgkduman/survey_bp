@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 05
 current_phase_name: Guided and Perturbative BP Interventions
-current_plan: 6
+current_plan: 7
 status: executing
-stopped_at: Completed 05-05-PLAN.md; continuing Wave 2
-last_updated: "2026-09-30T22:22:59.602Z"
+stopped_at: Completed 05-06-PLAN.md; Wave 2 full regression gate running
+last_updated: "2026-09-30T22:33:28.749Z"
 last_activity: 2026-09-30
-last_activity_desc: Completed Phase 05 Plan 05 bounded impulse search
-state_head: 9d476f03ef07e9bca0ea4bd9d1b607793c1c2f37
+last_activity_desc: Completed Phase 05 Plan 06 three perturbative controllers
+state_head: 555ddcc9488ea656deca265341dcc8430e4809fa
 progress:
   total_phases: 14
   completed_phases: 4
   total_plans: 71
-  completed_plans: 62
+  completed_plans: 63
 ---
 
 # Project State
@@ -29,13 +29,13 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 ## Current Position
 
 Phase: 05 (Guided and Perturbative BP Interventions) — IN PROGRESS
-Plan: 06 of 14
+Plan: 07 of 14
 Total Phases: 14
-Current Plan: 6
+Current Plan: 7
 Total Plans in Phase: 14
 Status: Ready to execute
-Last activity: 2026-09-30 — Completed Phase 05 Plan 05
-Last Activity Description: Phase 05 has 5 of 14 plans complete; Wave 2 continues
+Last activity: 2026-09-30 — Completed Phase 05 Plan 06
+Last Activity Description: Phase 05 has 6 of 14 plans complete; Wave 2 regression gate is running
 
 Progress: [███░░░░░░░] 29%
 
@@ -78,6 +78,7 @@ Progress: [███░░░░░░░] 29%
 | Phase 05 P03 | 8min | 2 tasks | 7 files |
 | Phase 05 P04 | 12min | 2 tasks | 2 files |
 | Phase 05 P05 | 10min | 2 tasks | 2 files |
+| Phase 05 P06 | 18min | 3 tasks | 3 files |
 
 Phase 02 P10–P16 gap-closure metrics are recorded in their individual summaries.
 
