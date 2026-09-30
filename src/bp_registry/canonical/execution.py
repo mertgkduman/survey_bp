@@ -799,7 +799,10 @@ def _run_guided_structural_shot(
     original = OriginalProblem(original_id.value, validated.hx, validated.hz, observation.syndrome)
     working_id = stable_lineage_id("working", {"original": original_id.value, "lift": "identity"})
     working = WorkingProblem(working_id.value, original, LineageEdge("identity", original_id, working_id))
-    session = BpSession(EdgeTable.from_check_matrix(original.hz), original.syndrome, error_rate=parsed.error_rate)
+    session = BpSession(
+        EdgeTable.from_check_matrix(original.hz), original.syndrome,
+        error_rate=parsed.error_rate, owner_identity=f"{identity}:shot:{shot_id}:attempt:0",
+    )
     controller = GuidedDecimationController(parsed.intervention)
     budgets = _budget_tree(execution_controls)
     common = {
