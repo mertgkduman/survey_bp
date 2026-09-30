@@ -75,6 +75,8 @@ def test_phase5_synchronized_legend_visibility_and_work_panels():
         assert group[0].showlegend is True
         assert group[1].showlegend is False and group[2].showlegend is False
     assert "not_assessed" in figure.layout.title.text
+    assert "manifest-digest" in figure.data[0].hovertemplate
+    assert "fixed-sample-identity" in figure.data[1].customdata
     assert dataset.rows == before
 
 
