@@ -6,6 +6,122 @@ import numpy as np
 import pytest
 
 
+def _session(matrix=None, syndrome=None):
+    from bp_registry.canonical.intervention_session import BpSession
+    from bp_registry.canonical.schedules import EdgeTable
+
+    h = np.asarray([[1, 1, 0], [0, 1, 1]], dtype=np.uint8) if matrix is None else matrix
+    s = np.asarray([1, 0], dtype=np.uint8) if syndrome is None else syndrome
+    return h, BpSession(EdgeTable.from_check_matrix(h), s, error_rate=0.1)
+
+
+def test_reliability_tie_zero_and_eligibility_exhaustion():
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.guided_decimation import GuidedDecimationController
+
+    _, session = _session()
+    controller = GuidedDecimationController(_manifest()["intervention"])
+    budget = BudgetTree(limits=(), parents={})
+    first = controller.fix_one(session, posterior=np.asarray([0.0, 2.0, -2.0]), budgets=budget)
+    assert first.proposal.target_index == 1
+    assert first.proposal.signed_prior == 25.0
+    assert first.tie_indices == (1, 2)
+    second = controller.fix_one(session, posterior=np.asarray([0.0, 2.0, -2.0]), budgets=budget)
+    assert second.proposal.target_index == 2
+    assert second.proposal.signed_prior == -25.0
+    third = controller.fix_one(session, posterior=np.zeros(3), budgets=budget)
+    assert third.proposal.target_index == 0
+    assert third.proposal.signed_prior == 25.0
+    exhausted = controller.fix_one(session, posterior=np.zeros(3), budgets=budget)
+    assert exhausted.termination == "no_eligible_target"
+    assert exhausted.proposal is None
+
+
+def test_missing_or_nonfinite_reliability_is_explicit():
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.guided_decimation import GuidedDecimationController
+
+    _, session = _session()
+    controller = GuidedDecimationController(_manifest()["intervention"])
+    budget = BudgetTree(limits=(), parents={})
+    assert controller.fix_one(session, posterior=None, budgets=budget).termination == "no_posterior"
+    assert controller.fix_one(session, posterior=np.asarray([0.0, np.inf, 0.0]), budgets=budget).termination == "numerical_failure"
+    assert controller.fix_one(session, posterior=np.asarray([0.0, np.nan, 0.0]), budgets=budget).termination == "numerical_failure"
+
+
+def test_final_round_cap_work_and_replay_reject_semantic_tampering():
+    from dataclasses import replace
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.guided_decimation import GuidedDecimationController, reconstruct_guided_result
+
+    h, session = _session()
+    spec = dict(_manifest()["intervention"])
+    spec["round_limit"] = 2
+    controller = GuidedDecimationController(spec)
+    budget = BudgetTree(limits=(), parents={})
+    result = controller.run(session, check_matrix=h, budgets=budget)
+    assert result.termination in {"valid_original_candidate", "round_cap_reached"}
+    assert result.work == budget.summary("attempt")
+    assert len(result.rounds) <= 2
+    assert all(len(row.sweeps) <= 1 for row in result.rounds)
+    assert len({leaf[0] for leaf in result.leaves}) == len(result.leaves)
+    reconstruct_guided_result(spec, h, np.asarray([1, 0], dtype=np.uint8), 0.1, result)
+    with pytest.raises(ValueError, match="replay"):
+        reconstruct_guided_result(spec, h, np.asarray([1, 0], dtype=np.uint8), 0.1, replace(result, termination="no_eligible_target"))
+
+
+def test_final_round_returns_after_last_fixation_without_extra_sweep():
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.guided_decimation import GuidedDecimationController
+
+    h = np.asarray([[1, 1], [1, 1]], dtype=np.uint8)
+    _, session = _session(h, np.asarray([0, 1], dtype=np.uint8))
+    spec = dict(_manifest()["intervention"])
+    spec.update(round_limit=2, sweeps_per_round=2)
+    budget = BudgetTree(limits=(), parents={})
+    result = GuidedDecimationController(spec).run(session, check_matrix=h, budgets=budget)
+    assert result.termination == "round_cap_reached"
+    assert len(result.rounds) == 2
+    assert tuple(len(row.sweeps) for row in result.rounds) == (2, 2)
+    assert tuple(row.selected_target for row in result.rounds) == (0, 1)
+    assert all(row.final_round_rule == "return_after_last_fixation" for row in result.rounds)
+    assert result.work.bp_calls == 2
+    assert result.work.original_checks == 4
+    assert result.work.fixation_actions == 2
+    assert result.candidate is None
+
+
+def test_replay_rejects_rehashed_target_and_work_tampering():
+    from dataclasses import replace
+    from bp_registry.canonical.budgets import BudgetTree, WorkVector
+    from bp_registry.canonical.guided_decimation import GuidedDecimationController, reconstruct_guided_result
+
+    h = np.asarray([[1, 1], [1, 1]], dtype=np.uint8)
+    syndrome = np.asarray([0, 1], dtype=np.uint8)
+    _, session = _session(h, syndrome)
+    spec = dict(_manifest()["intervention"])
+    spec.update(round_limit=2, sweeps_per_round=1)
+    result = GuidedDecimationController(spec).run(session, check_matrix=h, budgets=BudgetTree(limits=(), parents={}))
+    changed_round = replace(result.rounds[0], selected_target=1, state_after="rehashed-fake")
+    with pytest.raises(ValueError, match="replay"):
+        reconstruct_guided_result(spec, h, syndrome, 0.1, replace(result, rounds=(changed_round, *result.rounds[1:])))
+    with pytest.raises(ValueError, match="replay"):
+        reconstruct_guided_result(spec, h, syndrome, 0.1, replace(result, work=result.work + WorkVector(bp_calls=1)))
+
+
+def test_denial_replay_preserves_last_committed_state_and_work():
+    from bp_registry.canonical.budgets import BudgetLimit, BudgetTree
+    from bp_registry.canonical.guided_decimation import GuidedDecimationController
+
+    h, session = _session()
+    initial = session.state.digest
+    budget = BudgetTree(limits=[BudgetLimit("attempt", "check_to_variable_updates", 0)], parents={})
+    result = GuidedDecimationController(_manifest()["intervention"]).run(session, check_matrix=h, budgets=budget)
+    assert result.termination == "count_budget_exhausted"
+    assert result.final_state_digest == initial
+    assert result.work == budget.summary("attempt")
+
+
 def _policies() -> dict[str, object]:
     return {
         "update": {"kind": "binary_spa", "binding_id": "update", "state_lifetime": "message"},
