@@ -4,12 +4,12 @@ milestone: v1.0
 current_phase: 04
 current_phase_name: Memory Policies and Relay-BP
 current_plan: 14
-status: Plan 04-14 pending availability-aware notebook and guide; comprehensive child cancelled
-stopped_at: "Plan 04-13 reconciled; Plan 04-14 remains before Phase 4 verification"
-last_updated: "2026-09-30T04:38:47Z"
+status: Plan 04-14 executing availability-aware notebook and guide
+stopped_at: Plan 04-13 reconciled; Plan 04-14 remains before Phase 4 verification
+last_updated: "2026-09-30T04:51:36.364Z"
 last_activity: 2026-09-30
-last_activity_desc: Cancelled comprehensive experiment reconciled; retained evidence inventory and Plan 04-13 complete
-state_head: db99a51
+last_activity_desc: Phase 04 execution started
+state_head: 65dbcb445e316fd4d4e0111c4ee887066cd292cf
 progress:
   total_phases: 14
   completed_phases: 3
@@ -33,9 +33,9 @@ Plan: 14 of 15
 Total Phases: 14
 Current Plan: 14
 Total Plans in Phase: 15
-Status: Plan 04-14 pending availability-aware notebook and guide; comprehensive child cancelled
-Last activity: 2026-09-30 - Completed quick task 260930-0vq: Stop Phase 4 comprehensive experiment and right-size plans
-Last Activity Description: Cancelled comprehensive experiment reconciled; retained evidence inventory and Plan 04-13 complete
+Status: Plan 04-14 executing availability-aware notebook and guide
+Last activity: 2026-09-30 — Phase 04 execution started
+Last Activity Description: Phase 04 execution started
 
 Progress: 56/57 current plans have summaries; Phase 4 is 14/15. Fresh phase verification is 1/14: Phase 3 passed; Phase 1/2 previously passed reports are now flagged stale. Three phases were previously recorded complete; this freshness audit does not erase their completed plans.
 
@@ -177,10 +177,10 @@ No requested decoding regime or named policy family is deferred beyond the first
 ## Session Continuity
 
 Last session: 2026-09-30T04:38:47Z
-Stopped at: Plan 04-13 reconciled; Plan 04-14 remains before Phase 4 verification
+Stopped at: Resumed Plan 04-14; notebook and guide implementation complete, phase gates pending
 Resume file: .planning/phases/04-memory-policies-and-relay-bp/.continue-here.md
 Structured handoff: .planning/HANDOFF.json
-Next command: $gsd-execute-phase 4 to execute revised Plan 04-14 and verify Phase 4 without restarting the cancelled campaign
+Next command: Complete Plan 04-14 summary and Phase 4 verification; do not restart the cancelled campaign
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
 Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md`.
