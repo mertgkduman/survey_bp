@@ -328,3 +328,16 @@ def test_phase5_evaluation_rejected_without_entitlement_or_cap_freeze(tmp_path, 
     monkeypatch.setattr(pilot, "ENTITLEMENT", tmp_path / "missing-entitlement.json")
     with pytest.raises(FileNotFoundError):
         pilot.evaluate()
+
+
+def test_phase5_cap_freeze_self_audit_rejects_digest_mismatch(tmp_path, monkeypatch):
+    import scripts.run_phase5_pilot as pilot
+
+    frozen = tmp_path / "freeze.json"
+    evaluation = tmp_path / "evaluation.json"
+    frozen.write_text(json.dumps({"evaluation_design_digest": "0" * 64}), encoding="utf-8")
+    evaluation.write_text(json.dumps({"cap_freeze_digest": "1" * 64}), encoding="utf-8")
+    monkeypatch.setattr(pilot, "FREEZE", frozen)
+    monkeypatch.setattr(pilot, "EVALUATION", evaluation)
+    with pytest.raises(ValueError, match="digests do not agree"):
+        pilot.self_audit()
