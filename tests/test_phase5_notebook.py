@@ -45,6 +45,23 @@ def test_phase5_attempt_rows_retain_invalid_and_no_proposal():
     assert html.count("<details>") == 1
 
 
+def test_phase5_attempt_drilldown_keeps_every_terminal_class():
+    base = _dataset()
+    statuses = (
+        "failed", "contradictory_empty_check", "invalid_original_candidate",
+        "count_budget_exhausted", "unavailable", "no_proposal",
+    )
+    attempts = tuple(AttemptRow(
+        0, "impulse", index, status,
+        json.dumps({"order": index, "termination": status, "original_valid": False}),
+        "controlled_css_adaptation",
+    ) for index, status in enumerate(statuses))
+    dataset = Phase5Dataset(base.rows, attempts, base.ledger_sha256, base.design_digest, base.source_root, base.assessment_status)
+    html = attempt_details_html(dataset, shot_id=0)
+    assert html.count("<details>") == len(statuses)
+    assert all(status in html for status in statuses)
+
+
 def test_phase5_synchronized_legend_visibility_and_work_panels():
     dataset = _dataset()
     before = tuple(dataset.rows)
