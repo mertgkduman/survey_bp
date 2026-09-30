@@ -750,14 +750,22 @@ def main() -> None:
                 category_wall_seconds_used=retained_category_wall(output))
         if args.run:
             pilot._write_json_atomic(output / "progress.json", {"status": "running", "plan_digest": _digest(plan), "codes": cells})
+    arm_statuses = [arm.get("status") for code in cells.values() for arm in code.values()]
+    unavailable_selection_arms = sorted(
+        f"{code_id}/{arm}" for code_id, code in cells.items() for arm, record in code.items()
+        if record.get("status") == "unavailable_inconclusive_selection"
+    )
+    runnable_complete = all(status in {"completed", "unavailable_inconclusive_selection"} for status in arm_statuses)
     result: dict[str, Any] = {"schema_version": 1,
-        "status": "prepared" if args.prepare else "completed" if all(
-            arm.get("status") == "completed" for code in cells.values() for arm in code.values()) else "incomplete_or_inconclusive",
+        "status": "prepared" if args.prepare else
+                  "completed_with_inconclusive_selection" if runnable_complete and unavailable_selection_arms else
+                  "completed" if runnable_complete else "incomplete_or_inconclusive",
         "plan_digest": _digest(plan), "caps_digest": plan["caps_digest"],
         "selected_settings_digest": plan["selected_settings_digest"], "codes": cells,
         "evaluation_category_wall_seconds_max": caps["allocation"]["categories"]["evaluation"]["wall_seconds_max"],
         "evaluation_category_wall_seconds_used": retained_category_wall(output),
         "shared_settings_view": plan["shared_settings_view"],
+        "unavailable_selection_arms": unavailable_selection_arms,
         "claim_scope": "finite CSS pilot adaptation; not_assessed for circuit curves or universal ranking"}
     if args.run:
         result["paired"] = {code_id: {

@@ -345,3 +345,27 @@ def test_factorial_progress_receipt_prevents_duplicate_launch_after_interruption
     interrupted_row = next(row for row in report["terminals"] if row["cell_id"] == calls[1])
     assert interrupted_row["execution_status"] == "incomplete_interrupted_unreconciled"
     assert calls[1] not in resumed_calls
+
+
+def test_factorial_restart_charges_retained_and_unreconciled_category_wall(tmp_path):
+    """A restart cannot reset finite factorial category accounting to zero."""
+    runner = _module()
+    design, caps, supplement = _inputs()
+    plan = runner.build_factorial_plan(design=design, caps=caps, supplement=supplement)
+    first, second = plan["cells"][:2]
+    output = tmp_path / "factorial"
+    output.mkdir()
+    (output / "progress.json").write_text(json.dumps({
+        "schema_version": 1, "status": "running", "factorial_digest": plan["factorial_digest"],
+        "predecessor_sha256": "a" * 64,
+        "rows": {
+            first["cell_id"]: {"cell_id": first["cell_id"], "runtime_seconds": 12.5,
+                               "execution_status": "completed"},
+            second["cell_id"]: {"cell_id": second["cell_id"], "runtime_seconds": None,
+                                "execution_status": "incomplete_interrupted_unreconciled"},
+        },
+    }), encoding="utf-8")
+
+    charged = runner.retained_factorial_category_wall(output_root=output, plan=plan)
+
+    assert charged == 12.5 + second["runtime_boundary_seconds"]

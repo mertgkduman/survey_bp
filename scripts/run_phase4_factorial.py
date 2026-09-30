@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build and gate the finite Phase 4 factorial; this command never samples."""
 from __future__ import annotations
-import argparse, json, re, subprocess, sys
+import argparse, json, math, re, subprocess, sys
 from collections import Counter, defaultdict
 from copy import deepcopy
 from hashlib import sha256
@@ -137,12 +137,13 @@ def _expected_evaluation_provenance(repository_root):
         selection_path=selection_path, freeze_selection=False,
     )
     expected=evaluation.evaluation_plan(caps,selection)
-    return {"plan_digest":evaluation._digest(expected),"selected_settings_digest":evaluation._digest(selection),"arms":("baseline","selected_source_procedure","selected_canonical_procedure")}
+    return {"plan_digest":evaluation._digest(expected),"selected_settings_digest":evaluation._digest(selection),"arms":("baseline","selected_source_procedure","selected_canonical_procedure"),"cells":expected["cells"]}
 
 def assert_factorial_predecessor(*,evaluation_path,plan,allow_development_fixture=False,repository_root=ROOT):
     e=_read(evaluation_path); fixture=e.get("development_fixture") is True; arms=("baseline","selected_source_procedure","selected_canonical_procedure"); codes={x["code_id"] for x in plan["cells"]}
     if fixture and (not allow_development_fixture or e.get("assessment")!="not_assessed"): raise ValueError("development fixture cannot authorize production factorial sampling")
-    if e.get("status")!="completed": raise ValueError("fresh evaluation is absent, incomplete, or inconclusive")
+    allowed_statuses={"completed"} if fixture else {"completed","completed_with_inconclusive_selection"}
+    if e.get("status") not in allowed_statuses: raise ValueError("fresh evaluation is absent, incomplete, or inconclusive")
     if e.get("caps_digest")!=plan["input_digests"]["caps_digest"]:
         raise ValueError("fresh evaluation digest contract differs")
     if not fixture and (not _digest_text(e.get("plan_digest")) or not _digest_text(e.get("selected_settings_digest"))):
@@ -150,8 +151,23 @@ def assert_factorial_predecessor(*,evaluation_path,plan,allow_development_fixtur
     expected=None if fixture else _expected_evaluation_provenance(repository_root)
     if expected is not None and (e["plan_digest"]!=expected["plan_digest"] or e["selected_settings_digest"]!=expected["selected_settings_digest"]):
         raise ValueError("fresh evaluation provenance differs from the retained three-arm evaluation plan")
-    if not isinstance(e.get("codes"),Mapping) or set(e["codes"])!=codes or any(e["codes"][c].get(a,{}).get("status")!="completed" for c in codes for a in arms): raise ValueError("fresh evaluation is not complete for its frozen three-arm cohort")
-    return {"path":str(evaluation_path),"sha256":_sha(evaluation_path),"development_fixture":fixture,"assessment":"not_assessed","evaluation_plan_digest":e["plan_digest"],"selected_settings_digest":e["selected_settings_digest"]}
+    if not isinstance(e.get("codes"),Mapping) or set(e["codes"])!=codes: raise ValueError("fresh evaluation is not complete for its frozen three-arm cohort")
+    expected_statuses={(item["code_id"],item["arm"]):item["status"] for item in expected.get("cells",[]) } if expected is not None else {(code,arm):"ready" for code in codes for arm in arms}
+    if set(expected_statuses)!={(code,arm) for code in codes for arm in arms}: raise ValueError("fresh evaluation expected cohort is malformed")
+    unavailable=[]
+    for code, arm in sorted(expected_statuses):
+        actual=e["codes"][code].get(arm,{})
+        expected_status=expected_statuses[(code,arm)]
+        if expected_status=="ready":
+            if actual.get("status")!="completed": raise ValueError("fresh evaluation is not complete for its runnable frozen cohort")
+        elif expected_status=="unavailable_inconclusive_selection":
+            if actual.get("status")!="unavailable_inconclusive_selection": raise ValueError("fresh evaluation unavailable selection was represented as a completed arm")
+            unavailable.append(f"{code}/{arm}")
+        else: raise ValueError("fresh evaluation contains an unrecognized frozen arm status")
+    if fixture and unavailable: raise ValueError("development fixture cannot model unavailable production selections")
+    if unavailable and e.get("status")!="completed_with_inconclusive_selection": raise ValueError("fresh evaluation must expose unavailable selection status")
+    if not unavailable and e.get("status")!="completed": raise ValueError("fresh evaluation incorrectly claims an unavailable selection")
+    return {"path":str(evaluation_path),"sha256":_sha(evaluation_path),"development_fixture":fixture,"assessment":"not_assessed","evaluation_plan_digest":e["plan_digest"],"selected_settings_digest":e["selected_settings_digest"],"unavailable_selection_arms":unavailable}
 
 def _tails(values):
     if not values:return {"p50":None,"p95":None,"max":None}
@@ -209,10 +225,33 @@ def validate_trace_inventory(rows, plan):
             raise ValueError("retained trace sidecars exceed frozen per-code aggregate cap")
     return True
 
+
+def retained_factorial_category_wall(*, output_root: Path, plan: Mapping[str, Any]) -> float:
+    """Conservatively carry retained cell charges across a process restart."""
+    journal = Path(output_root) / "progress.json"
+    if not journal.exists():
+        return 0.0
+    progress = _read(journal)
+    if progress.get("factorial_digest") != plan["factorial_digest"] or not isinstance(progress.get("rows"), Mapping):
+        raise ValueError("retained factorial category journal identity differs")
+    cells = {cell["cell_id"]: cell for cell in plan["cells"]}
+    total = 0.0
+    for cell_id, row in progress["rows"].items():
+        if cell_id not in cells or not isinstance(row, Mapping):
+            raise ValueError("retained factorial category journal cell differs")
+        elapsed = row.get("runtime_seconds")
+        if isinstance(elapsed, (int, float)) and math.isfinite(float(elapsed)) and float(elapsed) >= 0:
+            total += float(elapsed)
+        elif row.get("execution_status") != "in_progress":
+            # A terminal record without observed elapsed is charged its frozen
+            # per-cell ceiling so resumption cannot bypass the category cap.
+            total += float(cells[cell_id]["runtime_boundary_seconds"])
+    return total
+
 def canonical_public_executor(*, repository_root: Path, output_root: Path, plan: Mapping[str, Any]) -> Callable[[Mapping[str, Any]], Mapping[str, Any]]:
     """Return the production executor: public preflight, one shot, then verify."""
     active=_active()
-    spent=0.0
+    spent=retained_factorial_category_wall(output_root=output_root, plan=plan)
     def execute(cell):
       nonlocal spent
       boundary=float(cell["runtime_boundary_seconds"])
@@ -262,15 +301,96 @@ def _result_status(gate, rows):
     if gate["development_fixture"]: return "development_fixture_not_assessed"
     return "completed_not_assessed" if all(row["execution_status"]=="completed" for row in rows) else "incomplete_or_inconclusive_not_assessed"
 
+
+def _write_json_atomic(path: Path, value: object) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.tmp")
+    temporary.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    temporary.replace(path)
+
+
+def _factorial_row(cell: Mapping[str, Any], actual: Mapping[str, Any]) -> dict[str, Any]:
+    if actual.get("cell_id") != cell["cell_id"] or actual.get("sample_namespace") != cell["factorial_namespace"]:
+        raise ValueError("executor observation identity differs from factorial cell")
+    return {**dict(actual), "code_id": cell["code_id"], "noise_region": cell["noise_region"],
+            "shot_id": cell["shot_id"], "arm_id": cell["arm_id"]}
+
+
+def _interrupted_row(cell: Mapping[str, Any]) -> dict[str, Any]:
+    """Retain a pre-launch receipt as an unreconciled terminal after interruption."""
+    return {"cell_id": cell["cell_id"], "sample_namespace": cell["factorial_namespace"],
+            "sample_identity": None, "execution_status": "incomplete_interrupted_unreconciled",
+            "terminal": False, "raw_work": None, "runtime_seconds": None,
+            "resource": {"maxrss_kib": None, "missing_reason": "interrupted after durable launch receipt"},
+            "trace": {"status": "unavailable", "reason": "interrupted_before_reconciliation"},
+            "code_id": cell["code_id"], "noise_region": cell["noise_region"],
+            "shot_id": cell["shot_id"], "arm_id": cell["arm_id"]}
+
+
+def _factorial_progress(*, output_root: Path, plan: Mapping[str, Any], gate: Mapping[str, Any]) -> tuple[Path, dict[str, Any]]:
+    """Load a byte-bound durable receipt journal without permitting replacement."""
+    output_root.mkdir(parents=True, exist_ok=True)
+    plan_path = output_root / "plan.json"
+    expected_plan = json.dumps(plan, indent=2, sort_keys=True) + "\n"
+    if plan_path.exists() and plan_path.read_text(encoding="utf-8") != expected_plan:
+        raise ValueError("retained factorial plan drifted")
+    if not plan_path.exists():
+        _write_json_atomic(plan_path, plan)
+    progress_path = output_root / "progress.json"
+    expected = {"schema_version": 1, "status": "running", "factorial_digest": plan["factorial_digest"],
+                "predecessor_sha256": gate["sha256"], "rows": {}}
+    progress = _read(progress_path) if progress_path.exists() else expected
+    if progress.get("schema_version") != 1 or progress.get("factorial_digest") != expected["factorial_digest"] or progress.get("predecessor_sha256") != expected["predecessor_sha256"]:
+        raise ValueError("retained factorial progress identity differs")
+    rows = progress.get("rows")
+    if not isinstance(rows, Mapping):
+        raise ValueError("retained factorial progress rows are malformed")
+    cells = {cell["cell_id"]: cell for cell in plan["cells"]}
+    if not set(rows).issubset(cells):
+        raise ValueError("retained factorial progress contains an unknown cell")
+    for cell_id, row in rows.items():
+        if not isinstance(row, Mapping) or row.get("cell_id") != cell_id:
+            raise ValueError("retained factorial progress row identity differs")
+        cell = cells[cell_id]
+        if any(row.get(key) != cell[source] for key, source in (("sample_namespace", "factorial_namespace"), ("code_id", "code_id"), ("noise_region", "noise_region"), ("shot_id", "shot_id"), ("arm_id", "arm_id"))):
+            raise ValueError("retained factorial progress cell context differs")
+    return progress_path, {**progress, "rows": dict(rows)}
+
+
 def run_factorial(*,evaluation_path,plan,executor:Callable[[Mapping[str,Any]],Mapping[str,Any]]|None=None,allow_development_fixture=False,repository_root:Path=ROOT,output_root:Path|None=None):
-    gate=assert_factorial_predecessor(evaluation_path=evaluation_path,plan=plan,allow_development_fixture=allow_development_fixture); rows=[]
+    gate=assert_factorial_predecessor(evaluation_path=evaluation_path,plan=plan,allow_development_fixture=allow_development_fixture,repository_root=repository_root); rows=[]
     if executor is None:
       if gate["development_fixture"] or output_root is None: raise ValueError("production public factorial execution requires a genuine predecessor and output root")
       executor=canonical_public_executor(repository_root=repository_root,output_root=output_root,plan=plan)
+    progress_path = progress = None
+    if output_root is not None:
+      output_root = Path(output_root)
+      result_path = output_root / "result.json"
+      if result_path.exists():
+        retained = _read(result_path)
+        if retained.get("factorial_digest") != plan["factorial_digest"] or retained.get("predecessor", {}).get("sha256") != gate["sha256"]:
+          raise ValueError("retained factorial result identity differs")
+        return retained
+      progress_path, progress = _factorial_progress(output_root=output_root, plan=plan, gate=gate)
     for cell in plan["cells"]:
-      actual=dict(executor(cell))
-      if actual.get("cell_id")!=cell["cell_id"] or actual.get("sample_namespace")!=cell["factorial_namespace"]: raise ValueError("executor observation identity differs from factorial cell")
-      rows.append({**actual,"code_id":cell["code_id"],"noise_region":cell["noise_region"],"shot_id":cell["shot_id"],"arm_id":cell["arm_id"]})
+      retained = None if progress is None else progress["rows"].get(cell["cell_id"])
+      if retained is not None:
+        if retained.get("execution_status") == "in_progress":
+          retained = _interrupted_row(cell)
+          progress["rows"][cell["cell_id"]] = retained
+          _write_json_atomic(progress_path, progress)
+        rows.append(dict(retained)); continue
+      if progress is not None:
+        progress["rows"][cell["cell_id"]] = {"cell_id": cell["cell_id"], "sample_namespace": cell["factorial_namespace"],
+          "sample_identity": None, "execution_status": "in_progress", "terminal": False, "raw_work": None,
+          "runtime_seconds": None, "resource": {"maxrss_kib": None}, "trace": {"status": "unavailable", "reason": "launch_receipt"},
+          "code_id": cell["code_id"], "noise_region": cell["noise_region"], "shot_id": cell["shot_id"], "arm_id": cell["arm_id"]}
+        _write_json_atomic(progress_path, progress)
+      actual = _factorial_row(cell, dict(executor(cell)))
+      if progress is not None:
+        progress["rows"][cell["cell_id"]] = actual
+        _write_json_atomic(progress_path, progress)
+      rows.append(actual)
     cohorts=defaultdict(list)
     for row in rows: cohorts[(row["code_id"],row["noise_region"],row["shot_id"])].append(row)
     for cohort in cohorts.values():
@@ -278,7 +398,12 @@ def run_factorial(*,evaluation_path,plan,executor:Callable[[Mapping[str,Any]],Ma
       if len(observed)>1: raise ValueError("executor produced unmatched physical samples across factorial arms")
     validate_trace_inventory(rows,plan)
     status=_result_status(gate,rows)
-    return {"schema_version":1,"status":status,"assessment":"not_assessed","predecessor":gate,"factorial_digest":plan["factorial_digest"],"terminals":rows,"trace_inventory":[{"cell_id":row["cell_id"],"code_id":row["code_id"],"noise_region":row["noise_region"],"arm_id":row["arm_id"],"shot_id":row["shot_id"],"execution_status":row["execution_status"],"trace":row.get("trace",{"status":"missing"})} for row in rows],"aggregate":aggregate_terminals(rows,plan)}
+    result={"schema_version":1,"status":status,"assessment":"not_assessed","predecessor":gate,"factorial_digest":plan["factorial_digest"],"terminals":rows,"trace_inventory":[{"cell_id":row["cell_id"],"code_id":row["code_id"],"noise_region":row["noise_region"],"arm_id":row["arm_id"],"shot_id":row["shot_id"],"execution_status":row["execution_status"],"trace":row.get("trace",{"status":"missing"})} for row in rows],"aggregate":aggregate_terminals(rows,plan)}
+    if progress is not None:
+      progress["status"] = "terminal"
+      _write_json_atomic(progress_path, progress)
+      _write_json_atomic(output_root / "result.json", result)
+    return result
 def trace_link_event(*,ledger_id,schedule):
     result=schedule.trace_result(); link=None if result is None else result.ledger_link()
     if link is None: raise ValueError("ordinary-memory trace yielded no sidecar link")
