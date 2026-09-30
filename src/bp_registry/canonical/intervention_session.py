@@ -5,7 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from hashlib import sha256
 import json
-from typing import Literal
+from types import MappingProxyType
+from typing import Literal, Mapping
 
 import numpy as np
 
@@ -35,6 +36,16 @@ class BpSessionState:
     source_iteration: int
     revision: int
     digest: str
+    c2v: np.ndarray
+    graph_identity: str
+    prior_identity: str
+    dtype: Literal["float64"]
+    owner_identity: str
+    coordinate_identity: str
+    schedule_cursor: tuple[int, ...]
+    residual_cache: None
+    private_histories: tuple[object, ...]
+    mutation_evidence: Mapping[str, tuple[str, ...]]
 
 
 @dataclass(frozen=True, slots=True)
@@ -47,6 +58,12 @@ class InterventionProposal:
     expected_revision: int
     state_before: str
     owner: object
+    source_variant: str = "algorithm1_v2_interpretation"
+    target_order: tuple[int, ...] = ()
+    reset_fields: tuple[str, ...] = ()
+    preserved_fields: tuple[str, ...] = ("graph", "syndrome", "v2c", "c2v")
+    stream_identity: str = "not_applicable"
+    child_lineage_id: str = ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -57,10 +74,22 @@ class SessionTransition:
     leaf_id: str | None
 
 
+def decoder_stream_identity(root: str, decoder: str, intervention: str, attempt: int, purpose: str) -> str:
+    """Stable decoder RNG namespace, disjoint from physical sampling."""
+    if (any(not isinstance(value, str) or not value for value in (root, decoder, intervention, purpose))
+            or type(attempt) is not int or attempt < 0 or purpose == "physical_sampling"):
+        raise ValueError("decoder stream needs nonempty identities, a bounded attempt, and a decoder-only purpose")
+    content = ["decoder-intervention-stream-v1", root, decoder, intervention, attempt, purpose]
+    return "decoder-stream-" + sha256(json.dumps(content, separators=(",", ":")).encode()).hexdigest()
+
+
 class BpSession:
     """One continuing flooding attempt with reserve-before-compute semantics."""
 
-    def __init__(self, edge_table: EdgeTable, syndrome: np.ndarray, *, error_rate: float) -> None:
+    def __init__(
+        self, edge_table: EdgeTable, syndrome: np.ndarray, *, error_rate: float,
+        owner_identity: str | None = None,
+    ) -> None:
         self.edge_table = edge_table
         bits = np.asarray(syndrome)
         if bits.shape != (edge_table.check_count,) or not np.issubdtype(bits.dtype, np.integer) or np.any((bits != 0) & (bits != 1)):
@@ -71,6 +100,12 @@ class BpSession:
         self.kernel = BinarySpaKernel()
         self.schedule = FloodingSchedule(edge_table, kernel=self.kernel)
         self._owner = object()
+        if owner_identity is not None and (not isinstance(owner_identity, str) or not owner_identity):
+            raise ValueError("owner identity must be a nonempty string")
+        self.owner_identity = owner_identity or "session-" + sha256(json.dumps(
+            [edge_table.graph_sha256, self.syndrome.tolist(), error_rate],
+            separators=(",", ":"), allow_nan=False,
+        ).encode()).hexdigest()[:20]
         prior = np.full(edge_table.variable_count, self.kernel.prior(error_rate), dtype=np.float64)
         v2c = self.schedule.initialize(error_rate)
         posterior = np.array(prior, copy=True)
@@ -84,23 +119,37 @@ class BpSession:
     def _make_state(
         self, prior: np.ndarray, v2c: np.ndarray, posterior: np.ndarray,
         candidate: np.ndarray, fixed_indices: tuple[int, ...], source_iteration: int, revision: int,
+        *, c2v: np.ndarray | None = None,
+        mutation_evidence: Mapping[str, tuple[str, ...]] | None = None,
     ) -> BpSessionState:
         n, e = self.edge_table.variable_count, self.edge_table.edge_count
         p = _frozen_f64(prior, n, "prior")
         v = _frozen_f64(v2c, e, "v2c")
         b = _frozen_f64(posterior, n, "posterior")
+        c2v_snapshot = _frozen_f64(np.zeros(e) if c2v is None else c2v, e, "c2v")
         c = np.asarray(candidate)
         if c.shape != (n,) or not np.issubdtype(c.dtype, np.integer) or np.any((c != 0) & (c != 1)):
             raise ValueError("candidate must be a binary original-coordinate vector")
         c = np.array(c, dtype=np.uint8, copy=True)
         c.setflags(write=False)
+        prior_identity = sha256(p.tobytes()).hexdigest()
+        coordinate_identity = sha256(json.dumps(list(range(n))).encode()).hexdigest()
+        evidence = MappingProxyType(dict(mutation_evidence or {}))
         payload = {
             "prior": p.tolist(), "v2c": v.tolist(), "posterior": b.tolist(),
+            "c2v": c2v_snapshot.tolist(), "graph_identity": self.edge_table.graph_sha256,
+            "prior_identity": prior_identity, "dtype": "float64", "owner_identity": self.owner_identity,
+            "coordinate_identity": coordinate_identity,
             "candidate": c.tolist(), "fixed_indices": fixed_indices,
             "source_iteration": source_iteration, "revision": revision,
+            "schedule_cursor": (source_iteration,), "mutation_evidence": dict(evidence),
         }
         digest = sha256(json.dumps(payload, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
-        return BpSessionState(p, v, b, c, fixed_indices, source_iteration, revision, digest)
+        return BpSessionState(
+            p, v, b, c, fixed_indices, source_iteration, revision, digest,
+            c2v_snapshot, self.edge_table.graph_sha256, prior_identity, "float64",
+            self.owner_identity, coordinate_identity, (source_iteration,), None, (), evidence,
+        )
 
     def propose_finite_prior(self, target_index: int, signed_prior: float) -> InterventionProposal:
         state = self._state
@@ -108,13 +157,21 @@ class BpSession:
             raise ValueError("finite-prior target is ineligible")
         if not np.isfinite(signed_prior) or abs(signed_prior) != 25.0:
             raise ValueError("the source-qualified finite prior must have magnitude 25")
-        return InterventionProposal("finite_prior_bias", target_index, float(signed_prior), state.revision, state.digest, self._owner)
+        child_identity = sha256(json.dumps(
+            [state.digest, target_index, signed_prior], separators=(",", ":")
+        ).encode()).hexdigest()
+        return InterventionProposal(
+            "finite_prior_bias", target_index, float(signed_prior), state.revision,
+            state.digest, self._owner, target_order=(target_index,),
+            child_lineage_id="working-" + child_identity[:20],
+        )
 
     def commit_intervention(self, proposal: InterventionProposal, *, budgets: BudgetTree, leaf_id: str) -> SessionTransition:
         state = self._state
-        if (proposal.owner is not self._owner or proposal.expected_revision != state.revision
-                or proposal.state_before != state.digest):
-            raise ValueError("intervention proposal does not own the current session revision")
+        if proposal.owner is not self._owner:
+            raise ValueError("foreign intervention proposal owner")
+        if proposal.expected_revision != state.revision or proposal.state_before != state.digest:
+            raise ValueError("stale intervention proposal revision or before-state")
         reservation = budgets.reserve("attempt", WorkVector(intervention_actions=1), leaf_id=leaf_id)
         if reservation is None:
             return SessionTransition(False, state, "count_budget_exhausted", None)
@@ -124,6 +181,11 @@ class BpSession:
             next_state = self._make_state(
                 prior, state.v2c, state.posterior, state.candidate,
                 (*state.fixed_indices, proposal.target_index), state.source_iteration, state.revision + 1,
+                c2v=state.c2v,
+                mutation_evidence={
+                    "preserved": ("graph", "syndrome", "v2c", "c2v", "posterior"),
+                    "recomputed": ("prior_identity",), "invalidated": (),
+                },
             )
         except BaseException:
             reservation.rollback()
@@ -153,6 +215,11 @@ class BpSession:
             next_state = self._make_state(
                 state.prior, sweep.new_v2c, sweep.beliefs, sweep.candidate,
                 state.fixed_indices, state.source_iteration + 1, state.revision + 1,
+                c2v=sweep.check_to_variable,
+                mutation_evidence={
+                    "preserved": ("graph", "syndrome", "prior"),
+                    "recomputed": ("c2v", "posterior", "candidate", "v2c"), "invalidated": (),
+                },
             )
         except BaseException:
             reservation.rollback()
@@ -163,3 +230,95 @@ class BpSession:
 
     def original_syndrome_valid(self, check_matrix: np.ndarray) -> bool:
         return bool(np.array_equal((np.asarray(check_matrix, dtype=np.int64) @ self._state.candidate) % 2, self.syndrome))
+
+    def continue_units(self, count: int, *, budgets: BudgetTree, leaf_prefix: str) -> tuple[SessionTransition, ...]:
+        if type(count) is not int or not 1 <= count <= 100_000 or not leaf_prefix:
+            raise ValueError("continuation requires a finite positive unit count and leaf prefix")
+        results: list[SessionTransition] = []
+        for index in range(count):
+            result = self.advance(
+                budgets=budgets, leaf_id=f"{leaf_prefix}:{index}", bp_call_start=index == 0,
+            )
+            results.append(result)
+            if not result.admitted:
+                break
+        return tuple(results)
+
+    def reset_fresh(
+        self, *, budgets: BudgetTree, leaf_id: str, edge_table: EdgeTable | None = None,
+        syndrome: np.ndarray | None = None, error_rate: float | None = None,
+        preserve: tuple[str, ...] = (), owner_identity: str | None = None,
+    ) -> "BpSession":
+        """Create an independent branch; only a complete compatible state may carry over."""
+        table = self.edge_table if edge_table is None else edge_table
+        next_syndrome = self.syndrome if syndrome is None else syndrome
+        next_rate = self.error_rate if error_rate is None else error_rate
+        preserve_set = frozenset(preserve)
+        complete = frozenset({"v2c", "c2v", "posterior", "candidate"})
+        if preserve_set and (
+            preserve_set != complete or table.graph_sha256 != self.edge_table.graph_sha256
+            or not np.array_equal(next_syndrome, self.syndrome)
+            or next_rate != self.error_rate
+            or (owner_identity is not None and owner_identity != self.state.owner_identity)
+        ):
+            raise ValueError("incompatible graph, coordinate, prior, dtype, or owner for preserved BP state")
+        reservation = budgets.reserve("attempt", WorkVector(intervention_actions=1), leaf_id=leaf_id)
+        if reservation is None:
+            raise ValueError("reset denied by count budget; parent state remains unchanged")
+        try:
+            branch_owner = "session-" + sha256(json.dumps(
+                [self.state.owner_identity, leaf_id, table.graph_sha256, next_rate],
+                separators=(",", ":"), allow_nan=False,
+            ).encode()).hexdigest()[:20]
+            child = type(self)(table, next_syndrome, error_rate=next_rate, owner_identity=branch_owner)
+            if preserve_set:
+                old = self.state
+                child._state = child._make_state(
+                    old.prior, old.v2c, old.posterior, old.candidate,
+                    old.fixed_indices, old.source_iteration, 0, c2v=old.c2v,
+                    mutation_evidence={
+                        "preserved": tuple(sorted(preserve_set)), "recomputed": (), "invalidated": (),
+                    },
+                )
+        except BaseException:
+            reservation.rollback()
+            raise
+        reservation.commit_once()
+        return child
+
+    def mutate_posterior_sign(self, target_index: int, *, budgets: BudgetTree, leaf_id: str) -> SessionTransition:
+        """Flip a committed posterior and refresh only its outgoing V2C edges."""
+        state = self.state
+        if (type(target_index) is not int or not 0 <= target_index < self.edge_table.variable_count
+                or state.source_iteration == 0):
+            raise ValueError("posterior sign mutation requires a completed sweep and valid target")
+        edge_indices = tuple(i for i, (_, variable) in enumerate(self.edge_table.edges) if variable == target_index)
+        work = WorkVector(intervention_actions=1, variable_to_check_updates=len(edge_indices), candidate_constructions=1)
+        reservation = budgets.reserve("attempt", work, leaf_id=leaf_id)
+        if reservation is None:
+            return SessionTransition(False, state, "count_budget_exhausted", None)
+        try:
+            posterior = np.array(state.posterior, copy=True)
+            posterior[target_index] = -posterior[target_index]
+            v2c = np.array(state.v2c, copy=True)
+            for edge_index in edge_indices:
+                v2c[edge_index] = self.kernel.variable_message(float(posterior[target_index]), float(state.c2v[edge_index]))
+            candidate = self.kernel.candidate_from_beliefs(posterior)
+            next_state = self._make_state(
+                state.prior, v2c, posterior, candidate, state.fixed_indices,
+                state.source_iteration, state.revision + 1, c2v=state.c2v,
+                mutation_evidence={
+                    "preserved": ("prior", "c2v", "graph", "syndrome"),
+                    "recomputed": ("target_v2c", "target_hard_decision"), "invalidated": (),
+                },
+            )
+        except BaseException:
+            reservation.rollback()
+            raise
+        reservation.commit_once()
+        self._state = next_state
+        return SessionTransition(True, next_state, None, leaf_id)
+
+
+class InterventionSession(BpSession):
+    """Named reusable Phase 5 session API; BpSession remains the tracer alias."""

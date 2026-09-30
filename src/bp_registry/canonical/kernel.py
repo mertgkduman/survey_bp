@@ -35,6 +35,14 @@ class BinarySpaKernel:
         """Pure numerical prior helper used by schedules and standalone callers."""
         return prior_llr(error_rate, profile=self.profile)
 
+    def new_session(self, edge_table, syndrome: np.ndarray, *, error_rate: float):
+        """Open an owned Phase 5 session without changing the legacy one-shot run."""
+        from .intervention_session import InterventionSession
+
+        if self.update_rule is not None or self.profile != REFERENCE_CPU_F64:
+            raise ValueError("intervention sessions currently require the reference SPA kernel")
+        return InterventionSession(edge_table, syndrome, error_rate=error_rate)
+
     def check_message(
         self, incoming: np.ndarray, syndrome: int, *, check_index: int = 0,
         edge_index: int = 0, source_iteration: int = 0,

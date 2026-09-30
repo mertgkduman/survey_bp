@@ -37,12 +37,24 @@ class WorkVector:
     branch_prunes: int = 0
     relay_transfers: int = 0
     fallback_calls: int = 0
+    fixation_actions: int = 0
+    transformations: int = 0
+    lifted_coordinates: int = 0
+    original_checks: int = 0
+    ranking_scans: int = 0
 
     _V2_FIELDS: ClassVar[tuple[str, ...]] = (
         "check_to_variable_updates", "variable_to_check_updates", "belief_assemblies",
         "residual_priority_evaluations", "bp_calls", "candidate_checks",
         "intervention_actions", "branch_expansions", "branch_prunes", "relay_transfers",
         "fallback_calls",
+    )
+    _V3_FIELDS: ClassVar[tuple[str, ...]] = (
+        "check_to_variable_updates", "variable_to_check_updates", "belief_assemblies",
+        "candidate_constructions", "convergence_checks", "order_generation", "order_selection",
+        "residual_precomputations", "residual_differences", "priority_maintenance",
+        "residual_priority_evaluations", "bp_calls", "candidate_checks", "intervention_actions",
+        "branch_expansions", "branch_prunes", "relay_transfers", "fallback_calls",
     )
 
     def __post_init__(self) -> None:
@@ -84,6 +96,8 @@ class WorkVector:
         if structural_event_version == 2:
             names = self._V2_FIELDS
         elif structural_event_version == 3:
+            names = self._V3_FIELDS
+        elif structural_event_version == 4:
             names = tuple(item.name for item in fields(self))
         else:
             raise ValueError("unsupported structural event version")
@@ -93,7 +107,11 @@ class WorkVector:
     def from_evidence(cls, evidence: Mapping[str, object], *, structural_event_version: int) -> "WorkVector":
         if not isinstance(evidence, Mapping):
             raise ValueError("work evidence must be a mapping")
-        names = cls._V2_FIELDS if structural_event_version == 2 else tuple(item.name for item in fields(cls)) if structural_event_version == 3 else ()
+        names = {
+            2: cls._V2_FIELDS,
+            3: cls._V3_FIELDS,
+            4: tuple(item.name for item in fields(cls)),
+        }.get(structural_event_version, ())
         if not names or set(evidence) != set(names):
             raise ValueError("work evidence has an invalid versioned field set")
         values = {name: evidence[name] for name in names}
@@ -369,7 +387,7 @@ class BudgetLimit:
     def __post_init__(self) -> None:
         if not isinstance(self.scope, str) or not self.scope:
             raise ValueError("budget scope must be a nonempty string")
-        if self.resource not in WorkVector.zero().as_evidence():
+        if self.resource not in {item.name for item in fields(WorkVector)}:
             raise ValueError("budget resource must name a WorkVector field")
         if isinstance(self.limit, bool) or not isinstance(self.limit, numbers.Integral) or not 0 <= self.limit <= _MAX_COUNT:
             raise ValueError("budget limit must be a bounded nonnegative integer")
@@ -471,7 +489,7 @@ class BudgetTree:
             for ancestor in lineage:
                 used = self.summary(ancestor)
                 pending = WorkVector.sum(item.delta for item in self._pending.values() for item in item if ancestor in self._ancestors(item.scope))
-                for resource, amount in delta.as_evidence().items():
+                for resource, amount in delta.as_evidence(structural_event_version=4).items():
                     limit = self._limits.get((ancestor, resource))
                     if limit is not None and getattr(used, resource) + getattr(pending, resource) + amount > limit.limit:
                         self._last_termination = BudgetTermination(
