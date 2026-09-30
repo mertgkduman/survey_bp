@@ -98,6 +98,12 @@ def capture_entitlement() -> dict[str, Any]:
 
 def _stage(path: Path, *, stage: str) -> dict[str, Any]:
     design = _read(path)
+    identity = _read(ROOT / "data/evidence/phase4-b1-identity-resolution.json")["b1"]
+    reconstructed = identity["reconstructed"]
+    if (identity.get("matrix_logical_identity_match") is not True
+            or reconstructed.get("raw_sha256") != B1_RAW
+            or reconstructed.get("semantic_sha256") != B1_SEMANTIC):
+        raise ValueError("Phase 5 B1 pilot requires the resolved ordered matrix/logical identity")
     if design.get("schema_version") != 1 or design.get("stage") != stage:
         raise ValueError("Phase 5 pilot stage schema or stage is wrong")
     if tuple(design.get("arm_order", ())) != ARMS or set(design.get("arm_manifests", {})) != set(ARMS):
@@ -115,6 +121,7 @@ def _stage(path: Path, *, stage: str) -> dict[str, Any]:
                 or parsed.artifact.code_id != "b1-ghp-882"
                 or parsed.artifact.raw_sha256 != B1_RAW
                 or parsed.artifact.semantic_sha256 != B1_SEMANTIC
+                or parsed.artifact.matrix_hashes.model_dump(mode="json") != reconstructed["matrix_hashes"]
                 or parsed.evidence.relation != "pilot_adaptation"
                 or parsed.evidence.assessment_status != "not_assessed"
                 or parsed.randomness.physical_sample_identity != design["physical_sample_identity"]
