@@ -46,6 +46,8 @@ from .verification import PublicShotContext, validate_canonical_shot
 from .relay import RelayController
 from .memory_execution import LocalMemoryExecution, MemoryFloodingSchedule, validate_single_attempt_memory
 from .tracing import TracePlan, TraceSink
+from .contracts import Phase5InterventionContract
+from .phase5 import execute_phase5_controller, phase5_attempt_events, phase5_work_evidence
 
 
 class CanonicalConflictError(ValueError):
@@ -371,6 +373,12 @@ def _budget_tree(execution_controls: Mapping[str, Any] | None) -> BudgetTree:
     # Public V2/V3 flooding manifests retain their historical cap grammar;
     # V3 schedule terminals carry the expanded vector separately.
     resources = set(WorkVector.zero().as_evidence(structural_event_version=2))
+    phase5_caps = execution_controls.get("phase5_work_caps")
+    if phase5_caps is not None and (
+        not isinstance(phase5_caps, Mapping)
+        or set(phase5_caps) != set(WorkVector.zero().as_evidence(structural_event_version=4))
+    ):
+        raise ValueError("Phase 5 execution controls require a complete work cap vector")
     limits: list[BudgetLimit] = []
     for scope in ("shot", "search", "attempt"):
         values = configured.get(scope)
@@ -378,6 +386,10 @@ def _budget_tree(execution_controls: Mapping[str, Any] | None) -> BudgetTree:
             raise ValueError("canonical scoped work limits must exactly match WorkVector resources")
         for resource, limit in values.items():
             limits.append(BudgetLimit(scope, resource, limit))
+    if phase5_caps is not None:
+        for resource, limit in phase5_caps.items():
+            if resource not in resources:
+                limits.append(BudgetLimit("attempt", resource, limit))
     return BudgetTree(limits=limits, parents={"search": "shot", "attempt": "search"})
 
 
@@ -651,6 +663,10 @@ def _existing_structural(
         if event["data"].get("canonical_identity") != identity:
             raise CanonicalConflictError("conflicting canonical content for run/shot identity")
     data = event["data"]
+    if event["ledger_version"] == 5:
+        if data["identity"].get("execution_identity") != identity:
+            raise CanonicalConflictError("conflicting Phase 5 execution identity")
+        data = data["payload"]
     outcome = data.get("outcome")
     evaluation = evaluator.Evaluation(outcome, data.get("logical_action_agrees")) if outcome else None
     candidate = data.get("candidate")
@@ -888,6 +904,105 @@ def _run_guided_structural_shot(
     return CanonicalExecutionResult(parsed.run_id, shot_id, termination, assessment, None if selected is None else selected.candidate)
 
 
+def _run_phase5_structural_shot(
+    parsed: CanonicalManifestV6, *, code: CssCode, observation: DecoderObservation,
+    hidden_truth: HiddenTruth, shot_id: int, ledger_path: str | Path,
+    sample_seed_identity: str, context: Mapping[str, Any],
+    execution_controls: Mapping[str, Any] | None,
+    verification_context: PublicShotContext | None,
+    evaluate: Callable[..., evaluator.Evaluation],
+) -> CanonicalExecutionResult:
+    """Run one source-qualified controller behind the sealed public shot boundary."""
+    if type(shot_id) is not int or shot_id < 0 or observation.check_type != "Z":
+        raise ValueError("Phase 5 requires a nonnegative Z-check shot")
+    spec = parsed.intervention
+    if not isinstance(spec, Phase5InterventionContract):
+        raise ValueError("Phase 5 public execution requires the complete intervention contract")
+    validated = code.validate()
+    identity = verification_context.execution_identity if verification_context is not None else _identity(parsed, observation)
+    path = Path(ledger_path)
+    existing = _existing_structural(path, parsed.run_id, shot_id, identity, verification_context)
+    if existing is not None:
+        return existing
+    original_id = stable_lineage_id("original", {"identity": identity})
+    original = OriginalProblem(original_id.value, validated.hx, validated.hz, observation.syndrome)
+    budgets = _budget_tree(execution_controls)
+    started = time.monotonic()
+    outcome = execute_phase5_controller(
+        spec, original, error_rate=parsed.error_rate, budgets=budgets,
+        max_iterations=parsed.max_iterations, owner_identity=identity,
+    )
+    cap = None if execution_controls is None else execution_controls.get("phase5_max_runtime_seconds")
+    if cap is not None and time.monotonic() - started > cap:
+        raise ValueError("Phase 5 runtime cap was exceeded")
+    candidate = None if outcome.candidate is None else np.asarray(outcome.candidate, dtype=np.uint8)
+    if candidate is not None and (candidate.shape != (validated.hz.shape[1],)
+                                  or not np.array_equal((validated.hz @ candidate) % 2, observation.syndrome)):
+        raise ValueError("Phase 5 controller selected an invalid original-space candidate")
+    assessment = None if candidate is None else evaluate(
+        validated, true_x=hidden_truth.x, true_z=hidden_truth.z, candidate_x=candidate,
+    )
+    identity_data = {
+        "execution_identity": identity,
+        "manifest_sha256": context.get("manifest_sha256"),
+        "artifact_raw_sha256": context.get("artifact_raw_sha256"),
+        "artifact_semantic_sha256": context.get("artifact_semantic_sha256"),
+        "sample_seed_identity": sample_seed_identity,
+        "source_variant": spec.variant,
+        "source_revision": spec.source_revision,
+        "qualification": spec.qualification,
+        "native_availability": spec.native_availability,
+        "intervention_kind": spec.kind,
+    }
+    terminal = {
+        "candidate": None if candidate is None else candidate.tolist(),
+        "selected_origin": outcome.selected_origin,
+        "qualification": outcome.qualification,
+        "selection_status": "no_valid_candidate" if candidate is None else "frozen_original_valid_candidate",
+        "outcome": None if assessment is None else assessment.outcome,
+        "logical_action_agrees": None if assessment is None else assessment.logical_action_agrees,
+        "work_vector": outcome.work.as_evidence(structural_event_version=4),
+        "termination": outcome.termination,
+    }
+    for _ in range(30):
+        try:
+            with CanonicalEventWriter(path, structural_event_version=5) as ledger:
+                ledger.begin(run_id=parsed.run_id, shot_id=shot_id, sample_seed_identity=sample_seed_identity,
+                             schema_version=5, compact_schema_version=6, identity=identity_data,
+                             payload={"original_lineage_id": original_id.value, "syndrome": [int(bit) for bit in original.syndrome]})
+                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="intervention",
+                             data={"identity": identity_data, "payload": outcome.header})
+                for branch in outcome.branches:
+                    ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="branch",
+                                 data={"identity": identity_data, "payload": branch})
+                for kind, payload in phase5_attempt_events(spec, outcome):
+                    ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind=kind,
+                                 data={"identity": identity_data, "payload": payload})
+                if candidate is not None:
+                    ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="candidate",
+                                 data={"identity": identity_data, "payload": {"bits": candidate.tolist(), "origin": outcome.selected_origin}})
+                    ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="original_check",
+                                 data={"identity": identity_data, "payload": {"candidate": candidate.tolist(), "valid": True}})
+                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="selection",
+                             data={"identity": identity_data, "payload": {"candidate": terminal["candidate"], "origin": outcome.selected_origin,
+                                                                        "status": terminal["selection_status"]}})
+                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="work",
+                             data={"identity": identity_data, "payload": phase5_work_evidence(outcome)})
+                if assessment is not None:
+                    ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="evaluation",
+                                 data={"identity": identity_data, "payload": {"outcome": assessment.outcome,
+                                                                            "logical_action_agrees": assessment.logical_action_agrees}})
+                ledger.terminal(run_id=parsed.run_id, shot_id=shot_id, termination=outcome.termination,
+                                data={"identity": identity_data, "payload": terminal})
+            return CanonicalExecutionResult(parsed.run_id, shot_id, outcome.termination, assessment, candidate)
+        except ShotOwnershipError:
+            time.sleep(0.01)
+            existing = _existing_structural(path, parsed.run_id, shot_id, identity, verification_context)
+            if existing is not None:
+                return existing
+    raise ShotOwnershipError("Phase 5 shot remained owned beyond bounded retry window")
+
+
 def run_canonical_structural_shot(
     manifest: CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4 | CanonicalManifestV5 | CanonicalManifestV6 | dict[str, object] | str, *, code: CssCode,
     observation: DecoderObservation, hidden_truth: HiddenTruth, shot_id: int,
@@ -900,6 +1015,13 @@ def run_canonical_structural_shot(
     """Run the kernel with v2 structural evidence and an outer truth boundary."""
     parsed = parse_canonical_manifest(manifest)
     if isinstance(parsed, CanonicalManifestV6):
+        if isinstance(parsed.intervention, Phase5InterventionContract):
+            return _run_phase5_structural_shot(
+                parsed, code=code, observation=observation, hidden_truth=hidden_truth,
+                shot_id=shot_id, ledger_path=ledger_path, sample_seed_identity=sample_seed_identity,
+                context=context, execution_controls=execution_controls,
+                verification_context=verification_context, evaluate=evaluate,
+            )
         return _run_guided_structural_shot(
             parsed, code=code, observation=observation, hidden_truth=hidden_truth,
             shot_id=shot_id, ledger_path=ledger_path, sample_seed_identity=sample_seed_identity,

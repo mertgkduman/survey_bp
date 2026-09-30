@@ -476,9 +476,26 @@ class CanonicalExperimentV5(CanonicalExperimentV4):
                 raise ValueError(f"{name} exceeds public per-attempt iteration cap")
         if self.trace_plan.max_records > self.intervention_limits.max_trace_records or self.trace_plan.max_bytes > self.intervention_limits.max_trace_bytes:
             raise ValueError("trace plan exceeds Phase 5 trace caps")
+        if self.trace_plan.level != "off":
+            raise ValueError("Phase 5 public intervention traces are not yet an executable evidence mode")
         inherited = self.budgets.attempt.work_limits.as_evidence()
         if any(self.intervention_limits.work_caps[name] != amount for name, amount in inherited.items()):
             raise ValueError("Phase 5 caps for historical work fields must equal public attempt limits")
+        potential_attempts = {
+            "identity": 1,
+            "guided_decimation": self.intervention.round_limit,
+            "impulse": self.intervention.attempt_cap,
+            "freezing": self.intervention.retry_cap,
+            "syndrome_flip": self.intervention.test_cap,
+            "sign_flip": 1,
+            "restart_belief": (self.intervention.eta or 0) * (self.intervention.t_cap or 0),
+        }[self.intervention.kind]
+        if potential_attempts > self.intervention_limits.max_total_attempts:
+            raise ValueError("intervention attempt potential exceeds the public hard cap")
+        # A reset, release, or insertion can require more than one action per
+        # attempt.  Reserve a conservative finite envelope up front.
+        if 2 * potential_attempts > self.intervention_limits.max_total_actions:
+            raise ValueError("intervention action potential exceeds the public hard cap")
         return self
 
 

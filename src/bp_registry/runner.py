@@ -296,7 +296,7 @@ def _canonical_policy_effects(manifest: CanonicalExperimentV2 | CanonicalExperim
     return effects
 
 
-def _canonical_execution_controls(manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4, code) -> dict[str, object]:
+def _canonical_execution_controls(manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5, code) -> dict[str, object]:
     """Keep preflighted public limits and handler classifications beside the compact kernel input."""
     controls: dict[str, object] = {
         "work_limits": {
@@ -306,6 +306,9 @@ def _canonical_execution_controls(manifest: CanonicalExperimentV2 | CanonicalExp
         "policy_effects": _canonical_policy_effects(manifest, code),
         "profile_plan": manifest.profile_plan.model_dump(mode="json"),
     }
+    if isinstance(manifest, CanonicalExperimentV5):
+        controls["phase5_work_caps"] = dict(manifest.intervention_limits.work_caps)
+        controls["phase5_max_runtime_seconds"] = manifest.intervention_limits.max_runtime_seconds
     # Trace-off V2/V3/Relay ledgers predate this control.  Omit an inert plan
     # so their execution identity and replayed evidence remain historical.
     if manifest.trace_plan.level != "off":
@@ -317,7 +320,7 @@ def _canonical_execution_controls(manifest: CanonicalExperimentV2 | CanonicalExp
 class CanonicalPublicManifestContext:
     """Immutable preflight facts from which each public shot is freshly sampled."""
 
-    _manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4
+    _manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5
     _code: Any
     manifest_sha256: str
     _compact_manifest: dict[str, object]
@@ -326,9 +329,10 @@ class CanonicalPublicManifestContext:
     _work_limits: dict[str, dict[str, int]]
     _profile_plan: dict[str, object]
     _trace_plan: dict[str, object] | None
+    _phase5_limits: dict[str, object] | None = None
 
     @property
-    def manifest(self) -> CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4:
+    def manifest(self) -> CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5:
         """Return a detached manifest view of the preflight snapshot."""
         return self._manifest.model_copy(deep=True)
 
@@ -391,6 +395,7 @@ class CanonicalPublicManifestContext:
             policy_effects=deepcopy(self._policy_effects),
             profile_plan=deepcopy(self._profile_plan),
             trace_plan=deepcopy(self._trace_plan),
+            phase5_limits=deepcopy(self._phase5_limits),
             update_kind=manifest.policies.update.kind,
             schedule_kind=manifest.policies.schedule.kind,
         )
@@ -403,9 +408,9 @@ def canonical_public_manifest_context(
     resolved = (preflight(manifest_path) if manifest_bytes is None
                 else preflight_manifest_bytes(manifest_path, manifest_bytes))
     manifest = resolved.manifest
-    if not isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4)):
-        raise ValueError("canonical execution requires a strict CanonicalExperimentV2, V3, or V4 manifest")
-    composition = validate_executable_canonical_baseline(manifest.policies)
+    if not isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5)):
+        raise ValueError("canonical execution requires a strict public canonical manifest")
+    composition = validate_composition(manifest.policies) if isinstance(manifest, CanonicalExperimentV5) else validate_executable_canonical_baseline(manifest.policies)
     return CanonicalPublicManifestContext(
         _manifest=manifest,
         _code=resolved.code,
@@ -420,6 +425,8 @@ def canonical_public_manifest_context(
         _profile_plan=manifest.profile_plan.model_dump(mode="json"),
         _trace_plan=(manifest.trace_plan.model_dump(mode="json")
                     if manifest.trace_plan.level != "off" else None),
+        _phase5_limits=(manifest.intervention_limits.model_dump(mode="json")
+                        if isinstance(manifest, CanonicalExperimentV5) else None),
     )
 
 
@@ -433,14 +440,14 @@ def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: s
     verification_context = canonical_public_shot_context(manifest_path, shot_id=shot_id)
     resolved = preflight(manifest_path)
     manifest = resolved.manifest
-    assert isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4))
+    assert isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5))
     digest = verification_context.manifest_sha256
     sample = sampling.sample_shot(
         resolved.code, manifest_identity=manifest.randomness.physical_sample_identity or digest,
         seed=manifest.randomness.sample_seed,
         shot_id=shot_id, x_error_rate=manifest.error_rate,
     )
-    composition = validate_executable_canonical_baseline(manifest.policies)
+    composition = validate_composition(manifest.policies) if isinstance(manifest, CanonicalExperimentV5) else validate_executable_canonical_baseline(manifest.policies)
     compact_manifest = _canonical_kernel_manifest(manifest)
     return run_canonical_structural_shot(
         compact_manifest, code=resolved.code, observation=sample.observation,

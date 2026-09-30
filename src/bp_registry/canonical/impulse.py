@@ -93,6 +93,13 @@ class ImpulseResult:
     work: WorkVector
     leaves: tuple[tuple[str, str, WorkVector], ...]
 
+    @property
+    def qualification(self) -> str:
+        return (
+            "source_operator_semantic_adaptation" if self.realization == "semantic_forced_one"
+            else "controlled_css_adaptation"
+        )
+
     def as_evidence(self) -> dict[str, object]:
         """JSON-safe evidence; negative infinity is a symbolic operator only."""
         record = asdict(self)

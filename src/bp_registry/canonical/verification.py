@@ -21,7 +21,9 @@ from .. import evaluator
 from ..ledger import CANONICAL_RELAY_LEDGER_VERSION, read_canonical_events
 from .budgets import BudgetLimit, BudgetTree, BudgetView, Measurement, QualifiedIteration, ScheduleTerminalEvidence, WorkVector
 from .kernel import BinarySpaKernel
-from .contracts import MemoryCompositionSpec
+from .contracts import MemoryCompositionSpec, Phase5InterventionContract, parse_canonical_manifest
+from .phase5 import execute_phase5_controller, phase5_attempt_events, phase5_work_evidence
+from .problems import OriginalProblem
 from .memory_execution import LocalMemoryExecution, MemoryFloodingSchedule
 from .group_shuffled import HsuGroupSchedule
 from .numerics import MIN_SUM_CPU_F64
@@ -422,6 +424,7 @@ class PublicShotContext:
     policy_effects: Mapping[str, Any] | None = None
     profile_plan: Mapping[str, Any] | None = None
     trace_plan: Mapping[str, Any] | None = None
+    phase5_limits: Mapping[str, Any] | None = None
     update_kind: str = "binary_spa"
     schedule_kind: str = "flooding"
 
@@ -970,6 +973,100 @@ def _validate_public_memory_trace(
         raise CanonicalStructuralVerificationError("canonical trace differs from independently replayed committed memory observations")
 
 
+def validate_phase5_shot(
+    events: Sequence[Mapping[str, Any]], context: PublicShotContext,
+) -> Mapping[str, Any]:
+    """Reexecute the declared controller and compare every durable scientific fact."""
+    from .execution import _budget_tree
+
+    stream = [event for event in events if event.get("run_id") == context.run_id and event.get("shot_id") == context.shot_id]
+    if not stream or any(event.get("ledger_version") != 5 for event in stream):
+        raise CanonicalStructuralVerificationError("Phase 5 shot requires version-five structural evidence")
+    parsed = parse_canonical_manifest(context.compact_manifest)
+    spec = parsed.intervention
+    if not isinstance(spec, Phase5InterventionContract):
+        raise CanonicalStructuralVerificationError("Phase 5 shot requires the complete intervention contract")
+    if context.code is None or context.hidden_truth is None or context.work_limits is None or context.phase5_limits is None:
+        raise CanonicalStructuralVerificationError("Phase 5 replay requires the full preflighted public context")
+    identity = context.execution_identity
+    identity_data = {
+        "execution_identity": identity,
+        "manifest_sha256": context.manifest_sha256,
+        "artifact_raw_sha256": context.artifact_raw_sha256,
+        "artifact_semantic_sha256": context.artifact_semantic_sha256,
+        "sample_seed_identity": context.sample_seed_identity,
+        "source_variant": spec.variant,
+        "source_revision": spec.source_revision,
+        "qualification": spec.qualification,
+        "native_availability": spec.native_availability,
+        "intervention_kind": spec.kind,
+    }
+    code = context.code.validate()
+    original_id = stable_lineage_id("original", {"identity": identity})
+    original = OriginalProblem(original_id.value, code.hx, code.hz, np.asarray(context.syndrome, dtype=np.uint8))
+    budgets = _budget_tree({"work_limits": context.work_limits, "phase5_work_caps": context.phase5_limits["work_caps"]})
+    outcome = execute_phase5_controller(
+        spec, original, error_rate=context.error_rate, budgets=budgets,
+        max_iterations=context.max_iterations, owner_identity=identity,
+    )
+    candidate = None if outcome.candidate is None else np.asarray(outcome.candidate, dtype=np.uint8)
+    if candidate is not None and (candidate.shape != (code.hz.shape[1],)
+                                  or not np.array_equal((code.hz @ candidate) % 2, original.syndrome)):
+        raise CanonicalStructuralVerificationError("replayed candidate fails original syndrome validation")
+    assessment = None if candidate is None else evaluator.evaluate_candidate(
+        code, true_x=context.hidden_truth.x, true_z=context.hidden_truth.z, candidate_x=candidate,
+    )
+    terminal = {
+        "candidate": None if candidate is None else candidate.tolist(),
+        "selected_origin": outcome.selected_origin,
+        "qualification": outcome.qualification,
+        "selection_status": "no_valid_candidate" if candidate is None else "frozen_original_valid_candidate",
+        "outcome": None if assessment is None else assessment.outcome,
+        "logical_action_agrees": None if assessment is None else assessment.logical_action_agrees,
+        "work_vector": outcome.work.as_evidence(structural_event_version=4),
+        "termination": outcome.termination,
+    }
+    expected: list[tuple[str, Mapping[str, Any]]] = [
+        ("shot_begin", {"original_lineage_id": original_id.value, "syndrome": [int(bit) for bit in original.syndrome]}),
+        ("intervention", outcome.header),
+    ]
+    expected.extend(("branch", row) for row in outcome.branches)
+    expected.extend(phase5_attempt_events(spec, outcome))
+    if candidate is not None:
+        expected.append(("candidate", {"bits": candidate.tolist(), "origin": outcome.selected_origin}))
+        expected.append(("original_check", {"candidate": candidate.tolist(), "valid": True}))
+    expected.extend([
+        ("selection", {"candidate": terminal["candidate"], "origin": outcome.selected_origin,
+                       "status": terminal["selection_status"]}),
+        ("work", phase5_work_evidence(outcome)),
+    ])
+    if assessment is not None:
+        expected.append(("evaluation", {"outcome": assessment.outcome,
+                                         "logical_action_agrees": assessment.logical_action_agrees}))
+    expected.append(("termination", terminal))
+    if len(stream) != len(expected):
+        raise CanonicalStructuralVerificationError("Phase 5 event count differs from deterministic replay")
+    for index, (event, (kind, payload)) in enumerate(zip(stream, expected)):
+        data = event.get("data", {})
+        if event.get("kind") != kind or data.get("identity") != identity_data or data.get("payload") != payload:
+            raise CanonicalStructuralVerificationError(f"Phase 5 event {index} differs from deterministic replay")
+        if kind == "shot_begin":
+            if data.get("schema_version") != 5 or data.get("compact_schema_version") != 6 or event.get("sample_seed_identity") != context.sample_seed_identity:
+                raise CanonicalStructuralVerificationError("Phase 5 begin identity or schema differs")
+        if kind == "termination" and event.get("termination") != outcome.termination:
+            raise CanonicalStructuralVerificationError("Phase 5 terminal status differs from deterministic replay")
+    work_payload = next(event["data"]["payload"] for event in stream if event["kind"] == "work")
+    leaves = work_payload["leaves"]
+    if len({leaf["leaf_id"] for leaf in leaves}) != len(leaves):
+        raise CanonicalStructuralVerificationError("Phase 5 duplicate work leaf")
+    reduced = WorkVector.sum(
+        WorkVector.from_evidence(leaf["work_vector"], structural_event_version=4) for leaf in leaves
+    )
+    if reduced != WorkVector.from_evidence(work_payload["work_vector"], structural_event_version=4):
+        raise CanonicalStructuralVerificationError("Phase 5 work total differs from leaf reduction")
+    return stream[-1]
+
+
 def validate_canonical_shot(
     events: Sequence[Mapping[str, Any]], context: PublicShotContext, *, trace_root: str | Path | None = None,
 ) -> Mapping[str, Any]:
@@ -979,6 +1076,10 @@ def validate_canonical_shot(
     early check here is deliberately strict enough to make terminal reuse safe
     before the executor ever returns a previous result.
     """
+    if context.compact_manifest.get("schema_version") == 6:
+        parsed = parse_canonical_manifest(context.compact_manifest)
+        if isinstance(parsed.intervention, Phase5InterventionContract):
+            return validate_phase5_shot(events, context)
     stream = [
         event for event in events
         if event.get("run_id") == context.run_id and event.get("shot_id") == context.shot_id

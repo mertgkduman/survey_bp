@@ -102,6 +102,7 @@ def _public_v5_b1_restart() -> dict[str, object]:
     manifest = _public_v5()
     source = json.loads((ROOT / "data/manifests/phase3-pilot-b1.json").read_text())
     manifest["run_id"] = "phase5-public-b1-restart"
+    manifest["intervention_limits"]["max_total_actions"] = 32
     manifest["artifact"] = source["artifact"]
     manifest["evidence"] = source["evidence"]
     manifest["policies"]["intervention"]["kind"] = "restart_belief"
@@ -223,3 +224,60 @@ def test_source_decisions_qualification_native_availability_restart_distance():
     assert restart["b1_distance"] == {"status": "source_bounded", "lower": 18, "upper": 24}
     assert restart["b1_t_cap"] == 8
     assert restart["qualification"] == "mechanism_only_adaptation"
+
+
+@pytest.mark.parametrize("kind", ["identity", "guided_decimation", "impulse", "freezing", "syndrome_flip", "sign_flip"])
+def test_phase5_public_execution_and_replay_each_small_arm(tmp_path, kind):
+    from bp_registry.cli import run_canonical, verify_canonical_shot
+    from bp_registry.ledger import read_canonical_events
+
+    manifest_path = tmp_path / "manifest.json"
+    manifest_path.write_text(json.dumps(_public_v5(kind)), encoding="utf-8")
+    output = tmp_path / "output"
+    report = run_canonical(manifest_path, output, shot_id=0)
+    assert report["shot_id"] == 0
+    events = read_canonical_events(output / "events.jsonl")
+    assert all(row["ledger_version"] == 5 for row in events)
+    assert events[1]["data"]["identity"]["intervention_kind"] == kind
+    assert verify_canonical_shot(manifest_path, output, shot_id=0)["termination"] == events[-1]["termination"]
+
+
+def test_phase5_public_execution_b1_restart_replay(tmp_path):
+    from bp_registry.cli import run_canonical, verify_canonical_shot
+    from bp_registry.ledger import read_canonical_events
+
+    manifest_path = tmp_path / "manifest.json"
+    manifest_path.write_text(json.dumps(_public_v5_b1_restart()), encoding="utf-8")
+    output = tmp_path / "output"
+    run_canonical(manifest_path, output, shot_id=0)
+    events = read_canonical_events(output / "events.jsonl")
+    assert events[1]["data"]["identity"]["intervention_kind"] == "restart_belief"
+    assert verify_canonical_shot(manifest_path, output, shot_id=0)["termination"] == events[-1]["termination"]
+
+
+@pytest.mark.parametrize("mutation", ["qualification", "missing_attempt", "duplicate_leaf", "candidate"])
+def test_phase5_replay_rejects_rehashed_semantic_tamper(tmp_path, mutation):
+    from bp_registry.cli import run_canonical, verify_canonical_shot
+    from bp_registry.ledger import _canonical_event_id
+
+    manifest_path = tmp_path / "manifest.json"
+    manifest_path.write_text(json.dumps(_public_v5("identity")), encoding="utf-8")
+    output = tmp_path / "output"
+    run_canonical(manifest_path, output, shot_id=0)
+    ledger = output / "events.jsonl"
+    events = [json.loads(line) for line in ledger.read_text().splitlines()]
+    if mutation == "qualification":
+        events[1]["data"]["identity"]["qualification"] = "source_faithful"
+    elif mutation == "missing_attempt":
+        events = [event for event in events if event["kind"] != "attempt"]
+    elif mutation == "duplicate_leaf":
+        work = next(event for event in events if event["kind"] == "work")
+        work["data"]["payload"]["leaves"].append(dict(work["data"]["payload"]["leaves"][0]))
+    else:
+        terminal = events[-1]
+        terminal["data"]["payload"]["candidate"] = [1, 1, 1]
+    for event in events:
+        event["event_id"] = _canonical_event_id(event)
+    ledger.write_text("".join(json.dumps(event, sort_keys=True, separators=(",", ":")) + "\n" for event in events))
+    with pytest.raises(ValueError):
+        verify_canonical_shot(manifest_path, output, shot_id=0)

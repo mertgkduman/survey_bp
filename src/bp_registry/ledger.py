@@ -22,6 +22,7 @@ LEDGER_VERSION = 1
 CANONICAL_LEDGER_VERSION = 2
 CANONICAL_SCHEDULE_LEDGER_VERSION = 3
 CANONICAL_RELAY_LEDGER_VERSION = 4
+CANONICAL_INTERVENTION_LEDGER_VERSION = 5
 ShotKey = tuple[str, int]
 
 
@@ -390,6 +391,7 @@ _CANONICAL_EVENT_KINDS = frozenset({
     "shot_begin", "attempt", "intervention", "branch", "branch_pruned",
     "relay_transfer", "candidate", "fallback", "selection", "termination",
     "work", "runtime", "missingness", "trace_link", "trace_truncated",
+    "transform", "lift", "original_check", "evaluation",
 })
 
 
@@ -403,6 +405,7 @@ def _canonical_event_bytes(event: Mapping[str, Any]) -> bytes:
 def _validate_canonical_event(event: Mapping[str, Any]) -> None:
     if event.get("ledger_version") not in {
         CANONICAL_LEDGER_VERSION, CANONICAL_SCHEDULE_LEDGER_VERSION, CANONICAL_RELAY_LEDGER_VERSION,
+        CANONICAL_INTERVENTION_LEDGER_VERSION,
     }:
         raise ValueError("unsupported canonical ledger version")
     if event.get("kind") not in _CANONICAL_EVENT_KINDS:
@@ -417,6 +420,31 @@ def _validate_canonical_event(event: Mapping[str, Any]) -> None:
     data = event.get("data", {})
     if not isinstance(data, dict):
         raise ValueError("canonical event data must be an object")
+    if event.get("ledger_version") == CANONICAL_INTERVENTION_LEDGER_VERSION:
+        from .canonical.budgets import WorkVector
+
+        if event["kind"] == "shot_begin":
+            if set(data) != {"schema_version", "compact_schema_version", "identity", "payload"} or data["schema_version"] != 5 or data["compact_schema_version"] != 6:
+                raise ValueError("V5 intervention shot_begin requires exact public/compact versions")
+        elif set(data) != {"identity", "payload"}:
+            raise ValueError("V5 intervention event requires exact identity and payload fields")
+        if not isinstance(data.get("identity"), dict) or not isinstance(data.get("payload"), dict):
+            raise ValueError("V5 intervention identity and payload must be objects")
+        if event["kind"] == "work":
+            payload = data["payload"]
+            if set(payload) != {"work_vector", "leaves"} or not isinstance(payload["leaves"], list):
+                raise ValueError("V5 work requires vector and exact leaf list")
+            WorkVector.from_evidence(payload["work_vector"], structural_event_version=4)
+            seen: set[str] = set()
+            for leaf in payload["leaves"]:
+                if not isinstance(leaf, dict) or set(leaf) != {"leaf_id", "scope", "work_vector"}:
+                    raise ValueError("V5 work leaf has an invalid exact field set")
+                if not isinstance(leaf["leaf_id"], str) or not leaf["leaf_id"] or leaf["leaf_id"] in seen:
+                    raise ValueError("V5 work leaves require unique stable IDs")
+                if leaf["scope"] != "attempt":
+                    raise ValueError("V5 work leaf requires attempt scope")
+                WorkVector.from_evidence(leaf["work_vector"], structural_event_version=4)
+                seen.add(leaf["leaf_id"])
     if event.get("ledger_version") == CANONICAL_RELAY_LEDGER_VERSION:
         if event["kind"] == "shot_begin" and data.get("schema_version") != 4:
             raise ValueError("V4 Relay ledger evidence requires a V4 manifest declaration")
@@ -601,7 +629,7 @@ class CanonicalEventWriter:
     """Durably append sparse versioned control-flow facts for canonical CSS shots."""
 
     def __init__(self, path: str | Path, *, structural_event_version: int = CANONICAL_LEDGER_VERSION):
-        if structural_event_version not in {CANONICAL_LEDGER_VERSION, CANONICAL_SCHEDULE_LEDGER_VERSION, CANONICAL_RELAY_LEDGER_VERSION}:
+        if structural_event_version not in {CANONICAL_LEDGER_VERSION, CANONICAL_SCHEDULE_LEDGER_VERSION, CANONICAL_RELAY_LEDGER_VERSION, CANONICAL_INTERVENTION_LEDGER_VERSION}:
             raise ValueError("unsupported canonical structural event version")
         self.path = Path(path)
         self.structural_event_version = structural_event_version
