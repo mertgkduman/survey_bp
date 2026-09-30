@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
+from concurrent.futures import ProcessPoolExecutor
 from copy import deepcopy
 from hashlib import sha256
 import json
@@ -142,6 +143,40 @@ def _evaluation_projection(calibration: dict[str, Any]) -> dict[str, Any]:
     return design
 
 
+def _run_arm(arm: str, manifest: dict[str, Any], shot_ids: list[int], output: Path) -> tuple[dict[str, Any], list[str], dict[int, str]]:
+    """One independent public arm; the parent joins only verified arm results."""
+    if os.environ.get("OMP_NUM_THREADS") != "1":
+        raise ValueError("Phase 5 pilot requires one OpenMP thread per arm")
+    arm_root = output / arm
+    arm_root.mkdir(parents=True, exist_ok=True)
+    manifest_path = arm_root / "manifest.json"
+    _write_once(manifest_path, manifest)
+    parsed = preflight(manifest_path).manifest
+    digest = manifest_digest(parsed)
+    result_path = arm_root / "result.json"
+    if result_path.exists():
+        # run_canonical wrote this only after replaying every shot.  On resume
+        # the manifest and ledger bytes must still match that verified result.
+        completed = _read(result_path)
+        if (completed.get("manifest_sha256") != digest
+                or completed.get("ledger_sha256") != sha256((arm_root / "events.jsonl").read_bytes()).hexdigest()):
+            raise ValueError(f"completed {arm} arm has drifted on resume")
+    else:
+        run_canonical(manifest_path, arm_root)
+    events = read_canonical_events(arm_root / "events.jsonl")
+    begins = {row["shot_id"]: row for row in events if row["kind"] == "shot_begin"}
+    if sorted(begins) != shot_ids:
+        raise ValueError(f"{arm} has an incomplete shot_begin set")
+    row = {
+        "manifest_sha256": digest,
+        "shot_ids": sorted(begins),
+        "terminal_count": sum(event["kind"] == "termination" for event in events),
+        "work_event_count": sum(event["kind"] == "work" for event in events),
+    }
+    samples = {shot_id: event["sample_seed_identity"] for shot_id, event in begins.items()}
+    return row, (arm_root / "events.jsonl").read_text(encoding="utf-8").splitlines(), samples
+
+
 def _run_stage(design: dict[str, Any], output: Path) -> dict[str, Any]:
     if os.environ.get("OMP_NUM_THREADS") != "1":
         raise ValueError("Phase 5 pilot requires one OpenMP thread")
@@ -149,40 +184,21 @@ def _run_stage(design: dict[str, Any], output: Path) -> dict[str, Any]:
     arm_rows: dict[str, Any] = {}
     all_events: list[str] = []
     sample_ids: dict[int, str] = {}
-    for arm in ARMS:
-        arm_root = output / arm
-        arm_root.mkdir(exist_ok=True)
-        manifest_path = arm_root / "manifest.json"
-        _write_once(manifest_path, design["arm_manifests"][arm])
-        result_path = arm_root / "result.json"
-        if result_path.exists():
-            # This result was written only after run_canonical replayed every
-            # shot.  On resume, its ledger and manifest digests must still
-            # match before bypassing the costly identical controller replay.
-            completed = _read(result_path)
-            if (completed.get("manifest_sha256") != manifest_digest(preflight(manifest_path).manifest)
-                    or completed.get("ledger_sha256") != sha256((arm_root / "events.jsonl").read_bytes()).hexdigest()):
-                raise ValueError(f"completed {arm} arm has drifted on resume")
-        else:
-            run_canonical(manifest_path, arm_root)
-        # run_canonical reconstructs its result through validate_canonical_shot
-        # for every terminal.  A second verify_run would replay the same work.
-        events = read_canonical_events(arm_root / "events.jsonl")
-        begins = {row["shot_id"]: row for row in events if row["kind"] == "shot_begin"}
-        if sorted(begins) != design["shot_ids"]:
-            raise ValueError(f"{arm} has an incomplete shot_begin set")
-        for shot_id, event in begins.items():
-            sample_id = event["sample_seed_identity"]
-            previous = sample_ids.setdefault(shot_id, sample_id)
-            if previous != sample_id:
-                raise ValueError("matched arms do not share the same physical sample identity")
-        arm_rows[arm] = {
-            "manifest_sha256": manifest_digest(preflight(design["arm_manifests"][arm]).manifest),
-            "shot_ids": sorted(begins),
-            "terminal_count": sum(row["kind"] == "termination" for row in events),
-            "work_event_count": sum(row["kind"] == "work" for row in events),
+    available_cpus = _read(ENTITLEMENT)["allocated_cpus"]["value"]
+    workers = min(2, int(available_cpus)) if available_cpus and str(available_cpus).isdigit() else 1
+    with ProcessPoolExecutor(max_workers=workers) as pool:
+        submitted = {
+            arm: pool.submit(_run_arm, arm, design["arm_manifests"][arm], design["shot_ids"], output)
+            for arm in ARMS
         }
-        all_events.extend((arm_root / "events.jsonl").read_text(encoding="utf-8").splitlines())
+        for arm in ARMS:
+            row, lines, samples = submitted[arm].result()
+            for shot_id, sample_id in samples.items():
+                previous = sample_ids.setdefault(shot_id, sample_id)
+                if previous != sample_id:
+                    raise ValueError("matched arms do not share the same physical sample identity")
+            arm_rows[arm] = row
+            all_events.extend(lines)
     aggregate_ledger = output / "events.jsonl"
     ledger_text = "\n".join(all_events) + "\n"
     if aggregate_ledger.exists() and aggregate_ledger.read_text(encoding="utf-8") != ledger_text:
