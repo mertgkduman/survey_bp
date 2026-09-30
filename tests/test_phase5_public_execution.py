@@ -281,3 +281,50 @@ def test_phase5_replay_rejects_rehashed_semantic_tamper(tmp_path, mutation):
     ledger.write_text("".join(json.dumps(event, sort_keys=True, separators=(",", ":")) + "\n" for event in events))
     with pytest.raises(ValueError):
         verify_canonical_shot(manifest_path, output, shot_id=0)
+
+
+def test_phase5_calibration_manifest_b1_identity_seven_arms_finite_caps_and_disjoint_samples():
+    from scripts.run_phase5_pilot import ARMS, CALIBRATION, _evaluation_projection, _stage
+
+    design = _stage(CALIBRATION, stage="calibration")
+    assert tuple(design["arm_order"]) == ARMS
+    assert design["shot_ids"] == list(range(4))
+    assert design["error_rate"] == 0.07
+    assert {design["arm_manifests"][arm]["randomness"]["physical_sample_identity"] for arm in ARMS} == {
+        design["physical_sample_identity"]
+    }
+    for arm in ARMS:
+        manifest = design["arm_manifests"][arm]
+        assert manifest["artifact"]["code_id"] == "b1-ghp-882"
+        assert manifest["artifact"]["raw_sha256"] == "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6"
+        assert manifest["evidence"]["relation"] == "pilot_adaptation"
+        assert manifest["evidence"]["assessment_status"] == "not_assessed"
+        assert manifest["environment"]["omp_num_threads"] == 1
+        limits = manifest["intervention_limits"]
+        assert limits["max_runtime_seconds"] == 300.0
+        assert limits["max_trace_records"] == 512
+        assert limits["max_total_attempts"] == 64
+        assert limits["max_total_actions"] == 128
+        assert all(0 <= count <= 300000 for count in limits["work_caps"].values())
+    assert design["arm_manifests"]["guided_decimation"]["intervention"]["round_limit"] == 16
+    assert design["arm_manifests"]["guided_decimation"]["intervention"]["sweeps_per_round"] == 10
+    assert design["arm_manifests"]["impulse"]["intervention"]["attempt_cap"] == 8
+    assert design["arm_manifests"]["freezing"]["intervention"]["retry_cap"] == 8
+    assert design["arm_manifests"]["syndrome_flip"]["intervention"]["top_k"] == 8
+    assert design["arm_manifests"]["syndrome_flip"]["intervention"]["max_weight"] == 1
+    assert design["arm_manifests"]["restart_belief"]["intervention"]["eta"] == 8
+    assert design["arm_manifests"]["restart_belief"]["intervention"]["t_cap"] == 8
+    assert design["arm_manifests"]["restart_belief"]["intervention"]["residual_sweeps"] == 10
+    evaluation = _evaluation_projection(design)
+    assert evaluation["shot_ids"] == list(range(16))
+    assert evaluation["physical_sample_identity"] != design["physical_sample_identity"]
+    assert all(design["arm_manifests"][arm]["intervention_limits"] == evaluation["arm_manifests"][arm]["intervention_limits"] for arm in ARMS)
+
+
+def test_phase5_evaluation_rejected_without_entitlement_or_cap_freeze(tmp_path, monkeypatch):
+    import scripts.run_phase5_pilot as pilot
+
+    monkeypatch.setattr(pilot, "FREEZE", tmp_path / "missing-freeze.json")
+    monkeypatch.setattr(pilot, "ENTITLEMENT", tmp_path / "missing-entitlement.json")
+    with pytest.raises(FileNotFoundError):
+        pilot.evaluate()

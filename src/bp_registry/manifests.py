@@ -468,8 +468,24 @@ class CanonicalExperimentV5(CanonicalExperimentV4):
                 raise ValueError("B1 restart adaptation requires the pinned artifact identity")
         if self.intervention.kind == "restart_belief" and self.evidence.relation != "pilot_adaptation":
             raise ValueError("B1 restart mechanism requires pilot_adaptation evidence")
+        if self.artifact.code_id == "b1-ghp-882" and (
+            self.artifact.raw_sha256 != "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6"
+            or self.evidence.relation != "pilot_adaptation"
+            or self.evidence.fixture != "pilot_adaptation"
+            or self.evidence.assessment_status != "not_assessed"
+        ):
+            raise ValueError("B1 intervention shots require pinned pilot_adaptation and not_assessed evidence")
         if self.intervention.kind != "restart_belief" and self.evidence.relation != "canonical_implemented":
-            raise ValueError("Phase 5 controlled development arms require canonical_implemented evidence")
+            # A matched B1 mechanism pilot uses the same separately qualified
+            # single-arm controllers, never a source-faithful ranking label.
+            if not (
+                self.artifact.code_id == "b1-ghp-882"
+                and self.artifact.raw_sha256 == "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6"
+                and self.evidence.relation == "pilot_adaptation"
+                and self.evidence.fixture == "pilot_adaptation"
+                and self.evidence.assessment_status == "not_assessed"
+            ):
+                raise ValueError("Phase 5 controlled arms require development evidence or the pinned B1 pilot")
         for name in ("sweeps_per_round", "baseline_sweeps", "attempt_sweeps", "period_sweeps", "lifetime_sweeps", "trunk_sweeps", "continuation_sweeps", "root_sweeps", "residual_sweeps"):
             value = getattr(self.intervention, name)
             if value is not None and value > self.budgets.attempt.max_iterations:
