@@ -68,6 +68,11 @@ BB-144 and generated HGP selections were frozen; B1 selection was inconclusive
 under its cap and has no selected tuned arm. The interrupted Plan 04-13
 production child is recorded in `.planning/async-jobs/04-13-production-v1.json`.
 Its partial B1 baseline prefix is not a completed fresh evaluation cohort.
+The hash-linked retained/absent stage list is
+`data/evidence/phase4-retained-evidence-inventory.json`: 159 completed B1
+baseline attempt receipts, one `incomplete_interrupted` receipt, and no
+complete fresh evaluation, native-pair or factorial result. The prefix has no
+performance denominator or cross-arm estimate.
 
 Phase 4 completion now uses deterministic equation, state-lifetime, Relay
 transfer and ledger checks; existing bounded pilot/native diagnostics; and an
@@ -130,13 +135,24 @@ From the primary checkout:
 OMP_NUM_THREADS=1 .venv/bin/python scripts/execute_phase4_notebook.py --fixture
 ```
 
-From the isolated memory-integration checkout, use the primary checkout's
-absolute `.venv/bin/python` path. Fixture execution consumes no campaign shots
-and labels every stage `development_fixture` / `not_assessed`. Omit `--fixture`
-to inspect campaign evidence and qualified snapshot availability. This mode
-never starts simulation. `--campaign-root` can read another checkout of the same
-Git repository; outputs stay in the integration checkout. Each executed notebook
-saves its figures alongside its output, avoiding writes to the campaign inputs.
+Fixture execution consumes no campaign shots and labels synthetic results
+`development_fixture` / `not_assessed`. To inspect retained evidence without
+starting simulation or replacing the fixture output, run:
+
+```bash
+OMP_NUM_THREADS=1 .venv/bin/python scripts/execute_phase4_notebook.py \
+  --output data/results/phase4-notebook/retained-cancelled-phase4.ipynb
+```
+
+This read-only campaign mode checks available originating evidence and displays
+`cancelled_before_completion` for fresh evaluation, native pairs, factorial
+and planned factorial-linked traces. Its B1 receipt table gives
+completed/interrupted counts with `performance_denominator` unavailable. It
+does not calculate a failure rate from the prefix. `--campaign-root` can read
+another checkout of the same Git repository; outputs stay in the executing
+checkout. In an existing GSD worktree, use the primary checkout's absolute
+`.venv/bin/python` path. Each executed notebook saves figures alongside its
+output, avoiding writes to campaign inputs.
 
 For a portable local HTML preview of a saved executed notebook:
 
@@ -161,8 +177,10 @@ ordered code, environment, sample, stage, caps and selection facts. It checks
 current referenced bytes and sample namespaces. Snapshot/index digests bind
 records; originating execution qualification is a separate producer obligation.
 Mismatched/nonterminal evidence is preserved; new identity paths use exclusive
-creation. Explicit producer callbacks require verified predecessor evidence
-before invocation. Arbitrary notebook Python is trusted project code, not a
+creation. The current notebook has no producer invocation for the cancelled
+stages. The lower-level stage helper permits an explicit producer callback
+only with verified predecessor evidence; using that API would require a new
+campaign plan. Arbitrary notebook Python is trusted project code, not a
 filesystem sandbox.
 
 ## Scientific limits and completion gates
