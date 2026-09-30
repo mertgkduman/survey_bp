@@ -5,17 +5,16 @@ current_phase: 05
 current_phase_name: Guided and Perturbative BP Interventions
 current_plan: Not started
 status: planning
-stopped_at: Phase 04 complete, ready to plan Phase 05
-last_updated: "2026-09-30T05:26:41.738Z"
+stopped_at: Phase 05 context gathered
+last_updated: "2026-09-30T19:22:47.944Z"
 last_activity: 2026-09-30
 last_activity_desc: Phase 04 complete, transitioned to Phase 05
-state_head: bdc3188286b54ee728ecb67a902cd21710cd0297
+state_head: 3aa29f062c5eebe2cabaa13f8baab34f52931165
 progress:
   total_phases: 14
   completed_phases: 4
   total_plans: 57
   completed_plans: 57
-  percent: 29
 ---
 
 # Project State
@@ -177,8 +176,10 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Last session: 2026-09-30
-Stopped at: Phase 04 complete, ready to plan Phase 05
+**Resume file:** .planning/phases/05-guided-and-perturbative-bp-interventions/05-CONTEXT.md
+
+Last session: 2026-09-30T19:22:43.152Z
+Stopped at: Phase 05 context gathered
 Next command: $gsd-plan-phase 5; use the bounded intervention design and do not restart the cancelled Phase 4 campaign
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
