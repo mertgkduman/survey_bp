@@ -38,7 +38,9 @@ class GuidedDecimationController:
         # max uses original index as the secondary key independently of array or worker order.
         target = min(eligible, key=lambda index: (-abs(float(values[index])), index))
         signed = self.spec.finite_bias_magnitude if values[target] >= 0 else -self.spec.finite_bias_magnitude
-        proposal = session.propose_finite_prior(target, signed)
+        proposal = session.propose_finite_prior(
+            target, signed, source_variant=self.spec.variant, target_order=eligible,
+        )
         transition = session.commit_intervention(
             proposal, budgets=budgets, leaf_id=f"guided-fix:{state.revision}:{target}",
         )

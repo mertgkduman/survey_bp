@@ -7,7 +7,7 @@ from enum import Enum
 import hashlib
 import json
 import math
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_serializer, model_validator
 
@@ -323,6 +323,52 @@ class PolicyDecision(_Strict):
         if self.action != "state_update" and self.state_updates:
             raise ValueError("only state_update decisions may carry state updates")
         return self
+
+
+class FinitePriorBiasAction(_Strict):
+    kind: Literal["finite_prior_bias"]
+    target_index: int = Field(ge=0)
+    signed_llr: float
+
+    @model_validator(mode="after")
+    def nonzero_finite_field(self) -> "FinitePriorBiasAction":
+        if self.signed_llr == 0.0:
+            raise ValueError("finite-prior action requires a nonzero signed field")
+        return self
+
+
+class ExactCoordinateFixAction(_Strict):
+    kind: Literal["exact_coordinate_fix"]
+    target_index: int = Field(ge=0)
+    bit_value: Literal[0, 1]
+
+
+class SyndromeXorAction(_Strict):
+    kind: Literal["syndrome_xor"]
+    test_vector: tuple[int, ...] = Field(min_length=1)
+
+    @field_validator("test_vector", mode="before")
+    @classmethod
+    def json_vector_to_tuple(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @field_validator("test_vector")
+    @classmethod
+    def binary_test_vector(cls, value: tuple[int, ...]) -> tuple[int, ...]:
+        if any(type(bit) is not int or bit not in (0, 1) for bit in value):
+            raise ValueError("syndrome XOR test vector must be binary")
+        return value
+
+
+class PosteriorSignFlipAction(_Strict):
+    kind: Literal["posterior_sign_flip"]
+    target_index: int = Field(ge=0)
+
+
+InterventionAction = Annotated[
+    FinitePriorBiasAction | ExactCoordinateFixAction | SyndromeXorAction | PosteriorSignFlipAction,
+    Field(discriminator="kind"),
+]
 
 
 def validate_composition(composition: CanonicalCompositionSpec | CanonicalCompositionSpecV6) -> ResolvedComposition:

@@ -11,6 +11,7 @@ from typing import Literal, Mapping
 import numpy as np
 
 from .budgets import BudgetTree, WorkVector
+from .contracts import FinitePriorBiasAction
 from .kernel import BinarySpaKernel
 from .schedules import EdgeTable, FloodingSchedule
 
@@ -58,6 +59,8 @@ class InterventionProposal:
     expected_revision: int
     state_before: str
     owner: object
+    action_payload: FinitePriorBiasAction
+    anticipated_work: WorkVector
     source_variant: str = "algorithm1_v2_interpretation"
     target_order: tuple[int, ...] = ()
     reset_fields: tuple[str, ...] = ()
@@ -151,18 +154,30 @@ class BpSession:
             self.owner_identity, coordinate_identity, (source_iteration,), None, (), evidence,
         )
 
-    def propose_finite_prior(self, target_index: int, signed_prior: float) -> InterventionProposal:
+    def propose_finite_prior(
+        self, target_index: int, signed_prior: float, *,
+        source_variant: str = "algorithm1_v2_interpretation",
+        target_order: tuple[int, ...] | None = None,
+    ) -> InterventionProposal:
         state = self._state
         if type(target_index) is not int or not 0 <= target_index < self.edge_table.variable_count or target_index in state.fixed_indices:
             raise ValueError("finite-prior target is ineligible")
         if not np.isfinite(signed_prior) or abs(signed_prior) != 25.0:
             raise ValueError("the source-qualified finite prior must have magnitude 25")
+        order = (target_index,) if target_order is None else tuple(target_order)
+        if (not order or target_index not in order or len(order) != len(set(order))
+                or any(type(index) is not int or not 0 <= index < self.edge_table.variable_count for index in order)
+                or not source_variant):
+            raise ValueError("proposal target order and source variant must be explicit and valid")
         child_identity = sha256(json.dumps(
             [state.digest, target_index, signed_prior], separators=(",", ":")
         ).encode()).hexdigest()
         return InterventionProposal(
             "finite_prior_bias", target_index, float(signed_prior), state.revision,
-            state.digest, self._owner, target_order=(target_index,),
+            state.digest, self._owner,
+            FinitePriorBiasAction(kind="finite_prior_bias", target_index=target_index, signed_llr=float(signed_prior)),
+            WorkVector(intervention_actions=1, fixation_actions=1, ranking_scans=len(order)),
+            source_variant=source_variant, target_order=order,
             child_lineage_id="working-" + child_identity[:20],
         )
 
@@ -172,7 +187,17 @@ class BpSession:
             raise ValueError("foreign intervention proposal owner")
         if proposal.expected_revision != state.revision or proposal.state_before != state.digest:
             raise ValueError("stale intervention proposal revision or before-state")
-        reservation = budgets.reserve("attempt", WorkVector(intervention_actions=1), leaf_id=leaf_id)
+        expected_work = WorkVector(
+            intervention_actions=1, fixation_actions=1, ranking_scans=len(proposal.target_order),
+        )
+        if (proposal.action != "finite_prior_bias" or proposal.action_payload.kind != proposal.action
+                or proposal.action_payload.target_index != proposal.target_index
+                or proposal.action_payload.signed_llr != proposal.signed_prior
+                or proposal.anticipated_work != expected_work
+                or not proposal.child_lineage_id.startswith("working-")
+                or proposal.target_index not in proposal.target_order):
+            raise ValueError("untrusted intervention proposal action or work declaration")
+        reservation = budgets.reserve("attempt", proposal.anticipated_work, leaf_id=leaf_id)
         if reservation is None:
             return SessionTransition(False, state, "count_budget_exhausted", None)
         try:

@@ -71,6 +71,37 @@ def test_denial_rollback_keeps_parent_session_exactly_intact():
     assert denied.summary("attempt").intervention_actions == 0
 
 
+def test_proposal_carries_source_mutation_work_and_rejects_untrusted_action():
+    from pydantic import TypeAdapter
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.contracts import FinitePriorBiasAction, InterventionAction
+    from bp_registry.canonical.intervention_session import BpSession
+    from bp_registry.canonical.schedules import EdgeTable
+
+    adapter = TypeAdapter(InterventionAction)
+    action = adapter.validate_python({"kind": "finite_prior_bias", "target_index": 0, "signed_llr": 25.0})
+    assert isinstance(action, FinitePriorBiasAction)
+    with pytest.raises(ValueError):
+        adapter.validate_python({"kind": "execute_python", "target_index": 0})
+    with pytest.raises(ValueError):
+        adapter.validate_python({"kind": "finite_prior_bias", "target_index": 0, "signed_llr": float("inf")})
+    h = np.asarray([[1, 1]], dtype=np.uint8)
+    session = BpSession(EdgeTable.from_check_matrix(h), np.asarray([1], dtype=np.uint8), error_rate=0.1)
+    proposal = session.propose_finite_prior(
+        0, 25.0, source_variant="algorithm1_v2_interpretation", target_order=(0, 1),
+    )
+    assert proposal.action_payload == action
+    assert proposal.anticipated_work.fixation_actions == 1
+    assert proposal.anticipated_work.ranking_scans == 2
+    assert proposal.stream_identity == "not_applicable"
+    assert proposal.child_lineage_id.startswith("working-")
+    assert proposal.preserved_fields == ("graph", "syndrome", "v2c", "c2v")
+    budget = BudgetTree(limits=(), parents={})
+    transition = session.commit_intervention(proposal, budgets=budget, leaf_id="fix-test")
+    assert transition.admitted
+    assert budget.summary("attempt") == proposal.anticipated_work
+
+
 def test_tracer_original_validation_and_hidden_truth_sealing(tmp_path):
     from bp_registry.canonical.execution import run_canonical_structural_shot
     from bp_registry.css import CssCode
