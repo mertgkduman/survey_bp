@@ -6,14 +6,14 @@ Build a provenance-preserving research platform from paper evidence through nati
 
 **Milestone:** v1.0 — platform and first journal-paper evidence.
 **Structure:** End-to-end capability slices (`mvp` mode), fine granularity. Fourteen phases are used because the three required regimes each need distinct implementation and experimental qualification; phase counts are not a reason to merge those gates or defer publication scope.
-**Planning status:** No implementation plans or experiments have been executed. Plan counts remain TBD until phase planning.
+**Planning status:** Phases 1–4 are complete. Phase 5 is next; later plan counts remain TBD until their phase planning.
 
 ## Phases
 
 - [x] **Phase 1: Evidence Registry and Native CSS Baseline** — Trace a paper experiment to validated inputs, a pinned native decoder run, and an outcome ledger. (completed 2026-09-22)
 - [x] **Phase 2: Canonical CSS Execution and Policy Contracts** — Run inspectable binary BP through the complete policy and evidence lifecycle. (completed 2026-09-23)
 - [x] **Phase 3: Update Rules and Scheduling** — Compare the requested message rules and schedules with explicit semantics and work counters. (completed 2026-09-24)
-- [ ] **Phase 4: Memory Policies and Relay-BP** — Implement state/history policies and the source-defined relay composition.
+- [x] **Phase 4: Memory Policies and Relay-BP** — Implement state/history policies and the source-defined relay composition. (completed 2026-09-30)
 - [ ] **Phase 5: Guided and Perturbative BP Interventions** — Implement BPGD, impulse, freezing, syndrome/sign flips, and restarting.
 - [ ] **Phase 6: Beam Search, Ensembles, and Candidate Selection** — Expose branching, pruning, lists, and voting as auditable policies.
 - [ ] **Phase 7: Optional Postprocessing** — Add independent OSD/LSD/SI/OTF processing with BP-only attribution preserved.
@@ -235,7 +235,7 @@ Plans:
 
 ### Phase 4: Memory Policies and Relay-BP
 
-**Goal:** A researcher can inspect state/history effects and execute a source-linked Relay-BP policy composition with faithful state transfer and accounting.
+**Goal:** As a QLDPC decoding researcher, I want to inspect state and history effects and execute a source-linked Relay-BP policy composition with faithful state transfer and accounting, so that I can distinguish policy behavior using bounded evidence with clear provenance.
 **Mode:** mvp
 **Depends on:** Phase 3
 **Requirements:** MEM-01, MEM-02, MEM-03, MEM-04, MEM-05, MOD-01
@@ -247,7 +247,7 @@ Plans:
 4. A researcher can inspect memory/relay effects in deterministic fixtures and bounded retained pilots, recover leg work from their ledgers, and see missing or interrupted comparisons explicitly labeled. A comprehensive factorial is not a Phase 4 gate.
 
 **Research focus:** Exact mixing/memory definitions, source equations and code defaults, warm-state inheritance, and candidate stopping/selection.
-**Plans:** 15/15 plans executed
+**Plans:** 15/15 plans complete
 
 Plans:
 **Wave 0**
@@ -317,6 +317,12 @@ deterministic checks and explicit missingness. Phase 5 can begin once these
 bounded Phase 4 verification and documentation gates pass. See the
 [cancellation record](phases/04-memory-policies-and-relay-bp/04-13-CANCELLATION-20260930.md).
 
+**Completion (2026-09-30):** The revised four criteria and six requirements
+passed [goal verification](phases/04-memory-policies-and-relay-bp/04-VERIFICATION.md),
+validation and security checks. The cancelled grid did not resume. Later CSS
+campaigns must be sized from a new question, precision target, stop rule and
+measured budget.
+
 ### Phase 5: Guided and Perturbative BP Interventions
 
 **Goal:** A researcher can run and inspect guided fixation, impulse attempts, and perturbative BP interventions against the original decoding problem.
@@ -337,8 +343,8 @@ bounded Phase 4 verification and documentation gates pass. See the
 **Preparatory design (2026-09-26):** [Intervention contracts](phases/05-guided-and-perturbative-bp-interventions/05-DESIGN.md)
 and [bounded next tasks](phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md)
 are available, with independently checked finite shortening/lifting fixtures.
-This is design work ahead of the Phase 4 dependency; Phase 5 execution and
-its requirements remain pending.
+The Phase 4 dependency is complete; Phase 5 planning and execution remain
+pending.
 
 ### Phase 6: Beam Search, Ensembles, and Candidate Selection
 
@@ -497,7 +503,7 @@ its requirements remain pending.
 | 1. Evidence Registry and Native CSS Baseline | 9/9 | Complete    | 2026-09-22 |
 | 2. Canonical CSS Execution and Policy Contracts | 16/16 | Complete    | 2026-09-23 |
 | 3. Update Rules and Scheduling | 17/17 | Complete    | 2026-09-24 |
-| 4. Memory Policies and Relay-BP | 15/15 | In Progress|  |
+| 4. Memory Policies and Relay-BP | 15/15 | Complete    | 2026-09-30 |
 | 5. Guided and Perturbative BP Interventions | 0/TBD | Not started | - |
 | 6. Beam Search, Ensembles, and Candidate Selection | 0/TBD | Not started | - |
 | 7. Optional Postprocessing | 0/TBD | Not started | - |

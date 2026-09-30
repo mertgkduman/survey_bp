@@ -69,6 +69,12 @@ lifetimes/history retention and ordinary disordered assignment retain explicit
 execution gaps. Reassess MEM-01–MEM-05 at the final Phase 4 gate. See the
 [current plan review](../docs/phase4-plan-review-and-next-design.md).
 
+**Final Phase 4 check, 2026-09-30:** The ordinary-memory dispatch correction is
+integrated. Public flooding and local-schedule memory, ordered and disordered
+assignments, state rollback, trace semantics and semantic replay have passing
+automated checks; see `04-VALIDATION.md` and `04-VERIFICATION.md`. The earlier
+paragraph records the September 26 review state, not an open implementation gap.
+
 ### Named BP modifications
 
 - [x] **MOD-01**: A researcher can execute a source-linked canonical Relay-BP composition with explicit memory, ensemble/relay legs, transferred state, stopping, and candidate selection, and run the pinned original implementation as a reference in eligible regimes.

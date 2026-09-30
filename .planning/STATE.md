@@ -1,20 +1,21 @@
 ---
 gsd_state_version: "1.0"
 milestone: v1.0
-current_phase: 04
-current_phase_name: Memory Policies and Relay-BP
-current_plan: 14
-status: Plan 04-14 executing availability-aware notebook and guide
-stopped_at: Plan 04-13 reconciled; Plan 04-14 remains before Phase 4 verification
-last_updated: "2026-09-30T04:51:36.364Z"
+current_phase: 05
+current_phase_name: Guided and Perturbative BP Interventions
+current_plan: Not started
+status: planning
+stopped_at: Phase 04 complete, ready to plan Phase 05
+last_updated: "2026-09-30T05:26:41.738Z"
 last_activity: 2026-09-30
-last_activity_desc: Phase 04 execution started
-state_head: 65dbcb445e316fd4d4e0111c4ee887066cd292cf
+last_activity_desc: Phase 04 complete, transitioned to Phase 05
+state_head: bdc3188286b54ee728ecb67a902cd21710cd0297
 progress:
   total_phases: 14
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 57
-  completed_plans: 56
+  completed_plans: 57
+  percent: 29
 ---
 
 # Project State
@@ -24,24 +25,24 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-22)
 
 **Core value:** Make BP decoder differences explicit, reproducible, and fairly comparable through canonical policy execution and published evidence.
-**Current focus:** Phase 04 — Memory Policies and Relay-BP
+**Current focus:** Phase 05 — Guided and Perturbative BP Interventions
 
 ## Current Position
 
-Phase: 04 (Memory Policies and Relay-BP) — EXECUTING
-Plan: 14 of 15
+Phase: 05 — Guided and Perturbative BP Interventions
+Plan: Not started
 Total Phases: 14
-Current Plan: 14
-Total Plans in Phase: 15
-Status: Plan 04-14 executing availability-aware notebook and guide
-Last activity: 2026-09-30 — Phase 04 execution started
-Last Activity Description: Phase 04 execution started
+Current Plan: Not started
+Total Plans in Phase: TBD
+Status: Ready to plan
+Last activity: 2026-09-30 — Phase 04 complete, transitioned to Phase 05
+Last Activity Description: Phase 04 complete, transitioned to Phase 05
 
-Progress: 56/57 current plans have summaries; Phase 4 is 14/15. Fresh phase verification is 1/14: Phase 3 passed; Phase 1/2 previously passed reports are now flagged stale. Three phases were previously recorded complete; this freshness audit does not erase their completed plans.
+Progress: [███░░░░░░░] 29%
 
 ## Performance Metrics
 
-- Total plans completed: 56
+- Total plans completed: 57
 - Average duration: N/A
 - Total execution time: 0 hours
 - Recent trend: Phase 1 completed 9 plans; Phase 2 completed 16 plans, including seven review-driven gap plans, and passed goal, code, security, and validation gates.
@@ -144,7 +145,7 @@ None outside the roadmap.
 
 ### Blockers/Concerns
 
-- Current: Plan 04-12 is complete after an independent audit of all 5,824 calibration shots. B1 has no eligible tuned setting under the frozen cap; BB-144 and generated HGP selections are frozen. On 2026-09-30 the user stopped the comprehensive Plan 04-13 child because the experiment size was premature. The child is terminal and its manifest disables automatic resume. The B1 baseline prefix has 159 completed and one interrupted receipt; complete fresh evaluation, native-pair and factorial results do not exist. Plan 04-13 is complete with a hashed retained-evidence inventory; Plan 04-14 requires an availability-aware notebook and guide, then Phase 4 verification. See the [cancellation record](phases/04-memory-policies-and-relay-bp/04-13-CANCELLATION-20260930.md). Entries below are historical checkpoints, not live progress.
+- Current: Phase 4 passed goal verification (4/4 revised criteria; 6/6 requirements), validation and ASVS L1 security. The user stopped the oversized comprehensive experiment; its terminal manifest disables resume. B1 selection remains inconclusive, and the 159 completed plus one interrupted B1 records are receipts without a qualified performance denominator. Fresh evaluation, native-pair and factorial results remain absent. Phase 5 planning is next. See the [cancellation record](phases/04-memory-policies-and-relay-bp/04-13-CANCELLATION-20260930.md) and `04-VERIFICATION.md`. Entries below are historical checkpoints, not live progress.
 
 - New-chat progress audit: calibration running with 3,716/5,824 retained attempts (63.8%) at 2026-09-27T17:20:42.542Z. See `.planning/HANDOFF.json` for the measured snapshot and async resume context. Phase 1/2 verification reports are now flagged stale by GSD and need refreshing; Phase 3 remains passed. No completed plans were rerun or removed.
 - Phase 4 calibration remains `running` (PID 2702938); Plans 04-12/13/14 remain incomplete. Independent local PD-prime/momentum/affine execution, semantic failure-prefix traces, exact-byte terminal readers, immutable shot contexts and notebook views are verified in isolated source `62fe977`: 532 tests passed, one existing skip. Both notebooks execute all 14 cells without errors. The completed benchmark summary retains a real incomplete B1 p=.07 arm, so its rows remain explicitly unqualified. Fresh production evidence, retained histories/additional lifetimes, other local schedules, disordered local affine and Relay traces remain. Keep source changes separate from the live campaign. See [implementation continuation](phases/04-memory-policies-and-relay-bp/04-IMPLEMENTATION-CONTINUATION-20260927.md) and [coding handoff](phases/04-memory-policies-and-relay-bp/04-CODING-RESUME-HANDOFF.md).
@@ -176,14 +177,11 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Last session: 2026-09-30T04:38:47Z
-Stopped at: Resumed Plan 04-14; notebook and guide implementation complete, phase gates pending
-Resume file: .planning/phases/04-memory-policies-and-relay-bp/.continue-here.md
-Structured handoff: .planning/HANDOFF.json
-Next command: Complete Plan 04-14 summary and Phase 4 verification; do not restart the cancelled campaign
+Last session: 2026-09-30
+Stopped at: Phase 04 complete, ready to plan Phase 05
+Next command: $gsd-plan-phase 5; use the bounded intervention design and do not restart the cancelled Phase 4 campaign
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
 Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md`.
 Latest isolated terminal ledger audit: `gsd/phase4-memory-integration-20260926` at `263501e`, `.planning/phases/04-memory-policies-and-relay-bp/04-CALIBRATION-LEDGER-AUDIT-PREPARATION.md` in that branch.
-The September 26 development PDF remains a historical snapshot. The September 29 update records the terminal calibration. Phase 4
-completion and Phase 5 execution remain pending; Plan 04-13 is complete under the revised scope; the comprehensive production campaign was cancelled by the user and is no longer a Phase 4 gate.
+The September 26 development PDF remains a historical snapshot. The September 29 update records the terminal calibration. Phase 4 is complete under the revised scope; Phase 5 planning and execution remain pending. The comprehensive production campaign was cancelled by the user and is no longer a Phase 4 gate.
