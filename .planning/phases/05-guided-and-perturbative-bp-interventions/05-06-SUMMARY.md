@@ -92,7 +92,7 @@ Freezing, syndrome flip, and posterior sign flip now have separate bounded contr
 - Controller, session, guided, and impulse targeted modules: 35 passed.
 - Task selections: freezing 1 passed; syndrome flip 4 passed; sign flip 3 passed.
 - Independent algebra oracle: 16,384 shortening cases and four constructed cases passed.
-- Full regression suite: running at summary authoring time; final result is recorded in the next execution state.
+- Full regression suite: 604 passed, 1 skipped in 290.59 seconds.
 
 ## Deviations from Plan
 

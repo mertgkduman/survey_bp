@@ -5,7 +5,7 @@ current_phase: 05
 current_phase_name: Guided and Perturbative BP Interventions
 current_plan: 7
 status: executing
-stopped_at: Completed 05-06-PLAN.md; Wave 2 full regression gate running
+stopped_at: Completed 05-06-PLAN.md; full regression passed; executing 05-07
 last_updated: "2026-09-30T22:33:28.749Z"
 last_activity: 2026-09-30
 last_activity_desc: Completed Phase 05 Plan 06 three perturbative controllers
@@ -35,7 +35,7 @@ Current Plan: 7
 Total Plans in Phase: 14
 Status: Ready to execute
 Last activity: 2026-09-30 — Completed Phase 05 Plan 06
-Last Activity Description: Phase 05 has 6 of 14 plans complete; Wave 2 regression gate is running
+Last Activity Description: Phase 05 has 6 of 14 plans complete; 604 tests passed, one skipped; Wave 2 continues
 
 Progress: [███░░░░░░░] 29%
 
