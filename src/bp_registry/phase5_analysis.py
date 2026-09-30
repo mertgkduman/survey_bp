@@ -18,6 +18,11 @@ ARMS = ("identity", "guided_decimation", "impulse", "freezing", "syndrome_flip",
 OUTCOMES = ("exact", "stabilizer_equivalent", "logical_failure", "invalid_syndrome", "outcome_unavailable")
 WORK_FIELDS = ("check_to_variable_updates", "variable_to_check_updates", "intervention_actions", "transformations", "original_checks")
 _RESULT_ROOT = Path(__file__).resolve().parents[2] / "data/results/phase5-interventions"
+_MANIFEST_ROOT = Path(__file__).resolve().parents[2] / "data/manifests"
+
+
+def _digest(value: object) -> str:
+    return sha256(json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False).encode("utf-8")).hexdigest()
 
 
 @dataclass(frozen=True, slots=True)
@@ -93,6 +98,26 @@ def load_verified_evidence(source: str | Path) -> Phase5Dataset:
     if root != permitted / "b1-mechanism-pilot" and root != permitted / "b1-calibration":
         raise ValueError("Phase 5 analysis only reads the two confined B1 evidence roots")
     result = _read_json(root / "result.json")
+    design_name = "phase5-b1-calibration.json" if root.name == "b1-calibration" else "phase5-b1-mechanism-pilot.json"
+    design = _read_json(_MANIFEST_ROOT / design_name)
+    if result.get("design_digest") != _digest(design):
+        raise ValueError("Phase 5 matched result differs from the sealed stage design")
+    if root.name == "b1-mechanism-pilot":
+        freeze = _read_json(Path(__file__).resolve().parents[2] / "docs/evidence/phase5-b1-cap-freeze.json")
+        if design.get("cap_freeze_digest") != _digest(freeze):
+            raise ValueError("Phase 5 evaluation design is not bound to the objective freeze")
+        projection = dict(design)
+        projection.pop("cap_freeze_digest", None)
+        if freeze.get("evaluation_design_digest") != _digest(projection):
+            raise ValueError("Phase 5 freeze does not bind the evaluation design")
+        references = (
+            ("entitlement_sha256", Path(__file__).resolve().parents[2] / "docs/evidence/phase5-compute-entitlement.json"),
+            ("calibration_result_sha256", _RESULT_ROOT / "b1-calibration/result.json"),
+            ("calibration_ledger_sha256", _RESULT_ROOT / "b1-calibration/events.jsonl"),
+        )
+        for field, path in references:
+            if sha256(path.read_bytes()).hexdigest() != freeze.get(field):
+                raise ValueError(f"Phase 5 freeze reference {field} has drifted")
     if result.get("code_id") != "b1-ghp-882" or result.get("relation") != "pilot_adaptation" or result.get("assessment_status") != "not_assessed":
         raise ValueError("Phase 5 analysis requires qualified B1 pilot evidence")
     if tuple(result.get("arm_order", ())) != ARMS or result.get("shot_ids") != list(range(4 if result.get("stage") == "calibration" else 16)):
@@ -102,15 +127,22 @@ def load_verified_evidence(source: str | Path) -> Phase5Dataset:
     if actual_hash != result.get("ledger_sha256"):
         raise ValueError("Phase 5 aggregate ledger digest differs from result evidence")
     events = read_canonical_events(ledger)
+    expected_run_ids = {design["arm_manifests"][arm]["run_id"] for arm in ARMS}
+    if {event["run_id"] for event in events} != expected_run_ids:
+        raise ValueError("Phase 5 aggregate ledger contains an unknown or missing arm")
     rows: list[ShotArmRow] = []
     attempts: list[AttemptRow] = []
     for arm in ARMS:
         arm_root = root / arm
         manifest = _read_json(arm_root / "manifest.json")
+        if manifest != design["arm_manifests"][arm]:
+            raise ValueError(f"{arm} manifest differs from the sealed stage design")
         arm_result = _read_json(arm_root / "result.json")
         arm_ledger = arm_root / "events.jsonl"
         if sha256(arm_ledger.read_bytes()).hexdigest() != arm_result.get("ledger_sha256"):
             raise ValueError(f"{arm} ledger digest differs from its public result")
+        if [event for event in events if event["run_id"] == manifest["run_id"]] != read_canonical_events(arm_ledger):
+            raise ValueError(f"{arm} aggregate and public ledgers disagree")
         arm_evidence = result.get("arm_evidence", {}).get(arm, {})
         if (manifest.get("run_id") != f"phase5-b1-{result['stage']}-{arm}"
                 or arm_result.get("manifest_sha256") != arm_evidence.get("manifest_sha256")
