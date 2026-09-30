@@ -123,9 +123,11 @@ def _cancelled_production(root: Path) -> dict[str, object] | None:
     if not isinstance(entries, Mapping):
         raise ValueError("retained cancellation inventory omits entries")
     receipt = entries.get("interrupted_b1_baseline")
-    if not isinstance(receipt, Mapping) or receipt.get("path") != details.get("retained_attempts_path"):
+    expected_receipt = "data/results/phase4-memory-relay/evaluation/b1-ghp-882/baseline/attempts.json"
+    if not isinstance(receipt, Mapping) or receipt.get("path") != expected_receipt or receipt.get("path") != details.get("retained_attempts_path"):
         raise ValueError("cancelled receipt path differs from terminal manifest")
     receipt_path = root / str(receipt["path"])
+    _relative(root, receipt_path)
     if _byte_sha(receipt_path) != receipt.get("sha256") or receipt.get("sha256") != details.get("retained_attempts_sha256"):
         raise ValueError("cancelled receipt bytes differ from retained identity")
     attempts = json.loads(receipt_path.read_text(encoding="utf-8"))
@@ -135,9 +137,12 @@ def _cancelled_production(root: Path) -> dict[str, object] | None:
               for status in sorted({str(row.get("status")) for row in attempts})}
     if counts != receipt.get("attempts") or counts != details.get("retained_attempt_status_counts"):
         raise ValueError("cancelled receipt counts differ from terminal manifest")
-    for key in ("fresh_evaluation", "fresh_native_pairs", "factorial"):
+    expected_results = {"fresh_evaluation": "data/results/phase4-memory-relay/evaluation/result.json",
+                        "fresh_native_pairs": "data/results/phase4-memory-relay/evaluation/native-pairs/result.json",
+                        "factorial": "data/results/phase4-memory-relay/factorial/result.json"}
+    for key, expected_path in expected_results.items():
         entry = entries.get(key)
-        if not isinstance(entry, Mapping) or entry.get("status") != "unavailable_cancelled_before_completion":
+        if not isinstance(entry, Mapping) or entry.get("path") != expected_path or entry.get("status") != "unavailable_cancelled_before_completion":
             raise ValueError(f"cancelled {key} status is absent from inventory")
         if (root / str(entry.get("path"))).exists():
             raise ValueError(f"cancelled {key} unexpectedly has a result artifact")

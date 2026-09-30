@@ -64,6 +64,10 @@ def test_cancelled_receipt_tampering_rejected_before_display(tmp_path):
     _write(receipt, [{"status": "completed"}, {"status": "completed"}])
     with pytest.raises(ValueError, match="receipt bytes"):
         campaign._cancelled_production(tmp_path)
+    inventory["entries"]["interrupted_b1_baseline"]["path"] = "../outside/attempts.json"
+    _write(tmp_path / "data/evidence/phase4-retained-evidence-inventory.json", inventory)
+    with pytest.raises(ValueError, match="receipt path"):
+        campaign._cancelled_production(tmp_path)
 
 
 def test_baseline_view_relabels_retained_benchmark_snapshot_without_mutation():
