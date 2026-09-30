@@ -223,7 +223,13 @@ def synchronized_figure(dataset: Phase5Dataset, *, selected_arm: str = "guided_d
         source = selected[0]
         visible: bool | str = True if arm in {"identity", selected_arm} else "legendonly"
         counts = Counter(row.outcome for row in selected)
-        hover = f"{escape(arm)}<br>{escape(source.variant)}<br>{escape(source.qualification)}<br>{escape(source.assessment_status)}"
+        hover = (
+            f"{escape(arm)}<br>code {escape(source.code_id)}"
+            f"<br>manifest {escape(source.manifest_sha256)}"
+            f"<br>source {escape(source.source_revision)}"
+            f"<br>variant {escape(source.variant)}"
+            f"<br>{escape(source.qualification)} / {escape(source.assessment_status)}"
+        )
         figure.add_trace(go.Bar(
             x=list(OUTCOMES), y=[counts[status] for status in OUTCOMES], name=arm,
             legendgroup=arm, showlegend=True, visible=visible, marker_color=palette[index],
@@ -231,16 +237,18 @@ def synchronized_figure(dataset: Phase5Dataset, *, selected_arm: str = "guided_d
         ), row=1, col=1)
         figure.add_trace(go.Scatter(
             x=[row.shot_id for row in selected], y=[row.attempt_count for row in selected],
+            customdata=[escape(row.sample_identity) for row in selected],
             mode="lines+markers", name=arm, legendgroup=arm, showlegend=False,
             visible=visible, line_color=palette[index],
-            hovertemplate=hover + "<br>shot %{x}: %{y} attempts<extra></extra>",
+            hovertemplate=hover + "<br>sample %{customdata}<br>shot %{x}: %{y} attempts<extra></extra>",
         ), row=1, col=2)
         figure.add_trace(go.Box(
             x=[field for field in WORK_FIELDS for _row in selected],
             y=[row.work[field] for field in WORK_FIELDS for row in selected],
+            customdata=[escape(row.sample_identity) for _field in WORK_FIELDS for row in selected],
             name=arm, legendgroup=arm, showlegend=False, visible=visible,
             marker_color=palette[index], boxpoints="all", jitter=0.2,
-            hovertemplate=hover + "<br>%{x}: %{y} work units<extra></extra>",
+            hovertemplate=hover + "<br>sample %{customdata}<br>%{x}: %{y} work units<extra></extra>",
         ), row=1, col=3)
     figure.update_layout(
         title="B1 matched Phase 5 mechanism evidence — pilot_adaptation, not_assessed",
