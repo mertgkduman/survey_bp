@@ -338,7 +338,7 @@ measured budget.
 5. Researchers can enable/disable these interventions on eligible CSS pilots and inspect pre-intervention, attempted, and selected outcomes without claiming new settings reproduce a source curve.
 
 **Research focus:** Original BPGD/impulse code discovery; perturbation semantics; lifting; random-stream and cache invalidation rules.
-**Plans:** 1/14 plans executed in 8 waves; ready to execute
+**Plans:** 2/14 plans executed in 8 waves; ready to execute
 
 **Preparatory design (2026-09-26):** [Intervention contracts](phases/05-guided-and-perturbative-bp-interventions/05-DESIGN.md)
 and [bounded next tasks](phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md)
@@ -355,7 +355,7 @@ Plans:
 
 **Wave 1** *(blocked on Wave 0 completion)*
 
-- [ ] 05-02-PLAN.md — Source qualification and transformed-problem algebra
+- [x] 05-02-PLAN.md — Source qualification and transformed-problem algebra
 - [ ] 05-03-PLAN.md — BP sessions, reset, ownership, and atomic work
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -545,7 +545,7 @@ Plans:
 | 2. Canonical CSS Execution and Policy Contracts | 16/16 | Complete    | 2026-09-23 |
 | 3. Update Rules and Scheduling | 17/17 | Complete    | 2026-09-24 |
 | 4. Memory Policies and Relay-BP | 15/15 | Complete    | 2026-09-30 |
-| 5. Guided and Perturbative BP Interventions | 1/14 | In Progress|  |
+| 5. Guided and Perturbative BP Interventions | 2/14 | In Progress|  |
 | 6. Beam Search, Ensembles, and Candidate Selection | 0/TBD | Not started | - |
 | 7. Optional Postprocessing | 0/TBD | Not started | - |
 | 8. Reproducible Campaigns and Statistical Assessment | 0/TBD | Not started | - |
