@@ -6,10 +6,10 @@ current_phase_name: Guided and Perturbative BP Interventions
 current_plan: Not started
 status: executing
 stopped_at: Phase 05 plans verified
-last_updated: "2026-09-30T20:47:22.512Z"
+last_updated: "2026-09-30T21:20:02Z"
 last_activity: 2026-09-30
-last_activity_desc: Phase 05 planning complete — 14 plans ready
-state_head: 2e599c8ec939c7346836b5ec748b1c664f754475
+last_activity_desc: Published color-coded study-design glossary; Phase 05 remains ready to execute
+state_head: 6ddf01392ff5cae4c932ea34a561b662fbb6aa20
 progress:
   total_phases: 14
   completed_phases: 4
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: Not started
 Total Plans in Phase: 14
 Status: Ready to execute
-Last activity: 2026-09-30 — Phase 05 planning verified; 14 plans ready
-Last Activity Description: Phase 05 planning complete — 14 plans ready
+Last activity: 2026-09-30 — Published study-design glossary in Markdown and PDF
+Last Activity Description: Phase 05 remains ready to execute; 14 plans verified
 
 Progress: [███░░░░░░░] 29%
 
@@ -169,6 +169,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 | 260927-p0f | Add project README and push main plus isolated Phase 4 branch to GitHub | 2026-09-27 | 5a6377a | Verified | [260927-p0f-add-a-project-readme-and-push-to-git-git](./quick/260927-p0f-add-a-project-readme-and-push-to-git-git/) |
 | 260929-qaa | Publish a verified 29 September development update in Markdown and PDF to GitHub | 2026-09-29 | 640b9c1 | Verified | [260929-qaa-publish-a-verified-29-september-developm](./quick/260929-qaa-publish-a-verified-29-september-developm/) |
 | 260930-0vq | Stop Phase 4 comprehensive experiment and right-size plans | 2026-09-30 | db99a51 | Verified | [260930-0vq-stop-phase-4-comprehensive-experiment-an](./quick/260930-0vq-stop-phase-4-comprehensive-experiment-an/) |
+| 260930-nuv | Create a source-backed study-design glossary in Markdown and color-coded PDF, then commit and push to GitHub | 2026-09-30 | 6ddf013 | Verified | [260930-nuv-create-a-source-backed-study-design-glos](./quick/260930-nuv-create-a-source-backed-study-design-glos/) |
 
 ## Deferred Items
 

@@ -126,6 +126,7 @@ retained.
 
 Further reading:
 
+- [Study-design glossary and status key](docs/study-design-glossary.md) ([PDF](docs/study-design-glossary.pdf))
 - [29 September development update](docs/development-update-20260929.md) ([PDF](docs/development-update-20260929.pdf))
 - [Native CSS pilot guide](docs/phase1-pilot.md)
 - [Memory-policy source decisions](docs/memory-policy-sources.md)
