@@ -20,7 +20,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from bp_registry.cli import run_canonical  # noqa: E402
+from bp_registry.cli import run_canonical, verify_run  # noqa: E402
 from bp_registry.canonical.budgets import WorkVector  # noqa: E402
 from bp_registry.ledger import read_canonical_events  # noqa: E402
 from bp_registry.manifests import manifest_digest, preflight  # noqa: E402
@@ -359,6 +359,49 @@ def evaluate() -> dict[str, Any]:
     return _run_stage(_stage(EVALUATION, stage="evaluation"), EVALUATION_OUTPUT)
 
 
+def verify_evaluation() -> dict[str, Any]:
+    """Replay each public arm and reconcile the sealed matched aggregate."""
+    self_audit()
+    design = _stage(EVALUATION, stage="evaluation")
+    result = _read(EVALUATION_OUTPUT / "result.json")
+    if result.get("design_digest") != _digest(design) or result.get("shot_ids") != list(range(16)):
+        raise ValueError("evaluation result differs from the sealed design")
+    if result.get("assessment_status") != "not_assessed" or result.get("relation") != "pilot_adaptation":
+        raise ValueError("evaluation result has an unsupported assessment or relation")
+    reports = {}
+    with ProcessPoolExecutor(max_workers=2) as pool:
+        submitted = {arm: pool.submit(verify_run, EVALUATION_OUTPUT / arm) for arm in ARMS}
+        for arm in ARMS:
+            reports[arm] = submitted[arm].result()
+    aggregate_lines = []
+    physical_ids: dict[int, str] = {}
+    for arm in ARMS:
+        arm_root = EVALUATION_OUTPUT / arm
+        arm_result = _read(arm_root / "result.json")
+        evidence = result["arm_evidence"][arm]
+        if (arm_result.get("manifest_sha256") != evidence["manifest_sha256"]
+                or arm_result.get("ledger_sha256") != sha256((arm_root / "events.jsonl").read_bytes()).hexdigest()):
+            raise ValueError(f"evaluation {arm} evidence digest differs from aggregate")
+        events = read_canonical_events(arm_root / "events.jsonl")
+        begins = {event["shot_id"]: event["sample_seed_identity"] for event in events if event["kind"] == "shot_begin"}
+        if sorted(begins) != list(range(16)):
+            raise ValueError(f"evaluation {arm} lacks sixteen admitted shots")
+        for shot_id, sample_id in begins.items():
+            old = physical_ids.setdefault(shot_id, sample_id)
+            if old != sample_id:
+                raise ValueError("evaluation physical sample identities differ across arms")
+        aggregate_lines.extend((arm_root / "events.jsonl").read_text(encoding="utf-8").splitlines())
+    aggregate = "\n".join(aggregate_lines) + "\n"
+    if (EVALUATION_OUTPUT / "events.jsonl").read_text(encoding="utf-8") != aggregate:
+        raise ValueError("evaluation aggregate ledger differs from public arms")
+    if sha256(aggregate.encode("utf-8")).hexdigest() != result.get("ledger_sha256"):
+        raise ValueError("evaluation aggregate ledger digest differs from result")
+    if {str(k): physical_ids[k] for k in sorted(physical_ids)} != result.get("physical_sample_identities"):
+        raise ValueError("evaluation sample identities differ from aggregate result")
+    return {"status": "passed", "arm_reports": reports, "matched_shots": 16,
+            "assessment_status": "not_assessed"}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--preflight-entitlement", action="store_true")
@@ -366,6 +409,9 @@ def main() -> None:
     parser.add_argument("--freeze-caps", action="store_true")
     parser.add_argument("--self-audit", action="store_true")
     parser.add_argument("--evaluate", action="store_true")
+    parser.add_argument("--verify", action="store_true")
+    parser.add_argument("--require-cap-freeze", type=Path)
+    parser.add_argument("--require-entitlement", type=Path)
     args = parser.parse_args()
     if not any(vars(args).values()):
         parser.error("choose at least one stage")
@@ -379,7 +425,13 @@ def main() -> None:
     if args.self_audit:
         result["self_audit"] = self_audit()
     if args.evaluate:
+        if (args.require_cap_freeze is not None and args.require_cap_freeze.resolve() != FREEZE.resolve()) or (
+            args.require_entitlement is not None and args.require_entitlement.resolve() != ENTITLEMENT.resolve()
+        ):
+            raise ValueError("required seal paths must be the exact Phase 5 entitlement and cap-freeze evidence")
         result["evaluation"] = evaluate()
+    if args.verify:
+        result["verification"] = verify_evaluation()
     print(json.dumps(result, indent=2, sort_keys=True))
 
 

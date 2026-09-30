@@ -1,0 +1,31 @@
+{
+  "assessment_status": "not_assessed",
+  "denominators": {
+    "all_terminal_shots": 4,
+    "outcome_unavailable": 2,
+    "stabilizer_equivalent": 2
+  },
+  "final_row_count": 4,
+  "fixture": "pilot_adaptation",
+  "ledger_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-calibration/freezing/events.jsonl",
+  "ledger_sha256": "4fff21078e76a7326131274605d42739223f7f8e138bbc9e010251c52b61a279",
+  "manifest_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-calibration/freezing/manifest.json",
+  "manifest_sha256": "3c56be4de780f1dbf8dc0f4cb6445a97a6ef980762b0bac3af932197dd50e5fd",
+  "policy_identity": "00bbe2d6d195e08dd81a10a562177877a92cd10e3ca01d41946333a963f4a35c",
+  "relation": "pilot_adaptation",
+  "run_id": "phase5-b1-calibration-freezing",
+  "schema_version": 2,
+  "shot_ids": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "statistical_claim": "not_assessed; bounded pilot adaptation, not a statistical reproduction, performance ranking, or superiority claim",
+  "terminations": {
+    "baseline_valid": 1,
+    "freeze_valid": 1,
+    "retry_cap_reached": 2
+  },
+  "title": "phase5-b1-calibration-freezing \u2014 pilot_adaptation pilot_adaptation not_assessed"
+}

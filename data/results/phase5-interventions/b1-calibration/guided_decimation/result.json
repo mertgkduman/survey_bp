@@ -1,0 +1,30 @@
+{
+  "assessment_status": "not_assessed",
+  "denominators": {
+    "all_terminal_shots": 4,
+    "outcome_unavailable": 2,
+    "stabilizer_equivalent": 2
+  },
+  "final_row_count": 4,
+  "fixture": "pilot_adaptation",
+  "ledger_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-calibration/guided_decimation/events.jsonl",
+  "ledger_sha256": "64d736ec7118f461561438831fb5d42211c09fca3eef044b9f4c3807c851c415",
+  "manifest_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-calibration/guided_decimation/manifest.json",
+  "manifest_sha256": "3c15a6d788c2a236dd323d558bfd587d0d9c8a9d54fbe2e71456e972dd9344b0",
+  "policy_identity": "dc0d663a0c9519605ba41a42283ff99dfff00b06fe2234e1347d12f301ea2096",
+  "relation": "pilot_adaptation",
+  "run_id": "phase5-b1-calibration-guided_decimation",
+  "schema_version": 2,
+  "shot_ids": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "statistical_claim": "not_assessed; bounded pilot adaptation, not a statistical reproduction, performance ranking, or superiority claim",
+  "terminations": {
+    "count_budget_exhausted": 2,
+    "valid_original_candidate": 2
+  },
+  "title": "phase5-b1-calibration-guided_decimation \u2014 pilot_adaptation pilot_adaptation not_assessed"
+}

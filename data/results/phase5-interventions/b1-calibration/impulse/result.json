@@ -1,0 +1,30 @@
+{
+  "assessment_status": "not_assessed",
+  "denominators": {
+    "all_terminal_shots": 4,
+    "outcome_unavailable": 1,
+    "stabilizer_equivalent": 3
+  },
+  "final_row_count": 4,
+  "fixture": "pilot_adaptation",
+  "ledger_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-calibration/impulse/events.jsonl",
+  "ledger_sha256": "978873069b925766e940fc32dac5e3055eaaae45fb8725fb28637f6fac89cde2",
+  "manifest_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-calibration/impulse/manifest.json",
+  "manifest_sha256": "4de866fce766f84478d753d45e39d45401ea70e342eed4ce8b411166e93894c7",
+  "policy_identity": "0a34a433747634fa3fb30f9d882bf5faf3bf9cb3ad09048f704e0925af401475",
+  "relation": "pilot_adaptation",
+  "run_id": "phase5-b1-calibration-impulse",
+  "schema_version": 2,
+  "shot_ids": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "statistical_claim": "not_assessed; bounded pilot adaptation, not a statistical reproduction, performance ranking, or superiority claim",
+  "terminations": {
+    "baseline_valid": 3,
+    "count_budget_exhausted": 1
+  },
+  "title": "phase5-b1-calibration-impulse \u2014 pilot_adaptation pilot_adaptation not_assessed"
+}

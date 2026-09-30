@@ -1,0 +1,111 @@
+{
+  "arm_evidence": {
+    "freezing": {
+      "manifest_sha256": "3c56be4de780f1dbf8dc0f4cb6445a97a6ef980762b0bac3af932197dd50e5fd",
+      "shot_ids": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "terminal_count": 4,
+      "work_event_count": 4
+    },
+    "guided_decimation": {
+      "manifest_sha256": "3c15a6d788c2a236dd323d558bfd587d0d9c8a9d54fbe2e71456e972dd9344b0",
+      "shot_ids": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "terminal_count": 4,
+      "work_event_count": 4
+    },
+    "identity": {
+      "manifest_sha256": "4316e576daec0ede099408e352669cf97167eb91f7888091da7fefad86f5fbc1",
+      "shot_ids": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "terminal_count": 4,
+      "work_event_count": 4
+    },
+    "impulse": {
+      "manifest_sha256": "4de866fce766f84478d753d45e39d45401ea70e342eed4ce8b411166e93894c7",
+      "shot_ids": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "terminal_count": 4,
+      "work_event_count": 4
+    },
+    "restart_belief": {
+      "manifest_sha256": "5d5328969ea1a75ec14e4397b5ddbd1a8d8fbdf7404eae720bf116b147e5717a",
+      "shot_ids": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "terminal_count": 4,
+      "work_event_count": 4
+    },
+    "sign_flip": {
+      "manifest_sha256": "b63f13c149f566b374eee293a21e0b824baff9307d253b4a00a82eb2038b12d8",
+      "shot_ids": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "terminal_count": 4,
+      "work_event_count": 4
+    },
+    "syndrome_flip": {
+      "manifest_sha256": "a9999d6e3b7251516b88b90d220fb2ed81924c8786ac9312e86fb830392a7989",
+      "shot_ids": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "terminal_count": 4,
+      "work_event_count": 4
+    }
+  },
+  "arm_order": [
+    "identity",
+    "guided_decimation",
+    "impulse",
+    "freezing",
+    "syndrome_flip",
+    "sign_flip",
+    "restart_belief"
+  ],
+  "assessment_status": "not_assessed",
+  "code_id": "b1-ghp-882",
+  "design_digest": "b944f54bfe3fc79003b46e16925866bf70ca420f66237d936ff1e2ce5510a441",
+  "error_rate": 0.07,
+  "ledger_sha256": "533c47a2cea02b11345ebc804e3a541786f39e191aa2e602c7d243e75809437b",
+  "physical_sample_identities": {
+    "0": "3f78bf7e6c1a6097b4b265edf70153c0b45ae4bae5413fff087dfd9be704cdb1",
+    "1": "44dd660e35d95b9af1d71e948d4eeb204cbb95ef9af35ef21b48599aaef75cbe",
+    "2": "dc49e45477a3d71c8880f574b1137e1c81dce2a02c323f8361986a48084d03aa",
+    "3": "f55800bfbaeb16ad32440ad9637951ab7e1a4312c9fba299181750a295ef673f"
+  },
+  "relation": "pilot_adaptation",
+  "schema_version": 1,
+  "shot_ids": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "stage": "calibration",
+  "statistical_claim": "not_assessed; bounded mechanism pilot only"
+}

@@ -1,0 +1,41 @@
+{
+  "account": {
+    "status": "available",
+    "value": "pfisterlab"
+  },
+  "allocated_cpus": {
+    "status": "available",
+    "value": "2"
+  },
+  "allocated_memory": {
+    "status": "available",
+    "value": "cpu=2,mem=8G,node=1,billing=2"
+  },
+  "job_id": {
+    "status": "available",
+    "value": "55938300"
+  },
+  "node_list": {
+    "status": "available",
+    "value": "dcc-core-ferc-u-ac39-4-1"
+  },
+  "omp_num_threads": 1,
+  "partition": {
+    "status": "available",
+    "value": "common"
+  },
+  "purpose": "bounded_phase5_b1_mechanism_pilot",
+  "qos": {
+    "status": "available",
+    "value": "normal"
+  },
+  "scheduler": {
+    "status": "available",
+    "value": "slurm"
+  },
+  "schema_version": 1,
+  "walltime": {
+    "status": "available",
+    "value": "30-00:00:00"
+  }
+}
