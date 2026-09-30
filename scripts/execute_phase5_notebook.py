@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 from hashlib import sha256
 import json
+import os
 from pathlib import Path
 import sys
 
@@ -39,8 +40,21 @@ def execute_notebook(evidence: Path, output: Path) -> Path:
         "source_root": str(Path(evidence).resolve(strict=True)),
         "source_notebook_sha256": sha256(source.read_bytes()).hexdigest(),
     }
-    client = NotebookClient(notebook, timeout=600, kernel_name="python3", resources={"metadata": {"path": str(ROOT)}})
-    executed = client.execute()
+    # The generic python3 kernelspec resolves `python` from PATH.  Bind it to
+    # this project's pinned environment, then restore the caller environment.
+    old_path = os.environ.get("PATH", "")
+    old_pythonpath = os.environ.get("PYTHONPATH")
+    os.environ["PATH"] = str(ROOT / ".venv/bin") + os.pathsep + old_path
+    os.environ["PYTHONPATH"] = os.pathsep.join((str(ROOT / "src"), str(ROOT), old_pythonpath or ""))
+    try:
+        client = NotebookClient(notebook, timeout=600, kernel_name="python3", resources={"metadata": {"path": str(ROOT)}})
+        executed = client.execute()
+    finally:
+        os.environ["PATH"] = old_path
+        if old_pythonpath is None:
+            os.environ.pop("PYTHONPATH", None)
+        else:
+            os.environ["PYTHONPATH"] = old_pythonpath
     for cell in executed.cells:
         cell.metadata.pop("execution", None)
         if cell.cell_type == "code":

@@ -68,6 +68,9 @@ def test_phase5_notebook_text_is_escaped_and_loader_is_confined(tmp_path):
     assert "<script>" not in html
     assert "source&lt;test&gt;" in html and "variant&lt;test&gt;" in html
     assert "source<test>" not in html
+    figure_html = synchronized_figure(_dataset()).to_html(full_html=False, include_plotlyjs=False)
+    assert "variant<test>" not in figure_html
+    assert "variant&lt;test&gt;" in figure_html or "variant\\u0026lt;test\\u0026gt;" in figure_html
     detail = attempt_details_html(_dataset(), shot_id=0)
     assert "<details>" in detail
     with pytest.raises((ValueError, FileNotFoundError)):
@@ -102,3 +105,54 @@ def test_phase5_guide_public_commands_source_limits_and_claim_limits():
     ):
         assert text in guide
     assert "one baseline and six" in guide.lower() or "one identity baseline and six" in guide.lower()
+
+
+def test_phase5_standalone_html_escaped_offline_grouped_and_no_mutation(tmp_path, monkeypatch):
+    from hashlib import sha256
+    from pathlib import Path
+    import nbformat
+    import scripts.preview_phase5_notebook as preview
+
+    dataset = _dataset()
+    before = tuple(dataset.rows)
+    monkeypatch.setattr(preview, "load_verified_evidence", lambda _path: dataset)
+    notebook = nbformat.v4.new_notebook(cells=[
+        nbformat.v4.new_code_cell("print('done')", outputs=[nbformat.v4.new_output("stream", name="stdout", text="done")]),
+    ])
+    source = Path(__file__).resolve().parents[1] / "notebooks/phase5-interventions-analysis.ipynb"
+    notebook.metadata["phase5_evidence"] = {
+        "source_notebook_sha256": sha256(source.read_bytes()).hexdigest(),
+        "assessment_status": "not_assessed", "source_root": str(tmp_path),
+        "ledger_sha256": dataset.ledger_sha256, "design_digest": dataset.design_digest,
+    }
+    executed = tmp_path / "executed.ipynb"
+    nbformat.write(notebook, executed)
+    destination = tmp_path / "phase5.html"
+    preview.export_html(executed, destination, check=True)
+    html = destination.read_text(encoding="utf-8")
+    assert "plotly.js" in html.lower() or "Plotly.newPlot" in html
+    import re
+    assert not re.search(r"<(?:script|link)\b[^>]+(?:src|href)\s*=\s*['\"]?https?://", html, re.I)
+    assert "togglegroup" in html and "legendonly" in html
+    assert "variant&lt;test&gt;" in html and "variant<test>" not in html
+    assert "manifest-digest" in html and "not_assessed" in html
+    assert "events.jsonl" in html and "phase5-interventions.ipynb" in html
+    assert dataset.rows == before
+    preview.export_html(executed, destination, check=True)
+
+
+def test_phase5_html_rejects_untrusted_executed_notebook_identity(tmp_path):
+    import nbformat
+    import scripts.preview_phase5_notebook as preview
+
+    notebook = nbformat.v4.new_notebook(cells=[
+        nbformat.v4.new_code_cell("print('untrusted')", outputs=[nbformat.v4.new_output("stream", name="stdout", text="untrusted")]),
+    ])
+    notebook.metadata["phase5_evidence"] = {
+        "source_notebook_sha256": "0" * 64, "assessment_status": "not_assessed",
+        "source_root": str(tmp_path), "ledger_sha256": "x", "design_digest": "y",
+    }
+    executed = tmp_path / "tampered.ipynb"
+    nbformat.write(notebook, executed)
+    with pytest.raises(ValueError, match="tracked source notebook"):
+        preview.export_html(executed, tmp_path / "report.html", check=True)
