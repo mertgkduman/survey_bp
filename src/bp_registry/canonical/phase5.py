@@ -48,7 +48,20 @@ def _project(result: object, *, rows_field: str | None, candidate_field: str, or
     leaves = result.leaves
     if not isinstance(work, WorkVector):
         raise ValueError("Phase 5 controller did not return typed work")
-    rows = tuple(data.pop(rows_field)) if rows_field is not None else ()
+    rows = tuple(data.pop(rows_field)) if rows_field is not None else (
+        {
+            "order": 0,
+            "target_index": data.get("target_index"),
+            "trigger": data.get("trigger"),
+            "action_state_digest": data.get("action_state_digest"),
+            "continuation_state_digest": data.get("continuation_state_digest"),
+            "prior_before": data.get("prior_before"),
+            "prior_after": data.get("prior_after"),
+            "v2c_preserved": data.get("v2c_before") == data.get("v2c_after_action"),
+            "c2v_preserved": data.get("c2v_before") == data.get("c2v_after_action"),
+            "termination": data.get("termination"),
+        },
+    )
     branches: tuple[dict[str, Any], ...] = ()
     if rows_field == "branches":
         branch_rows: list[dict[str, Any]] = []
@@ -66,7 +79,7 @@ def _project(result: object, *, rows_field: str | None, candidate_field: str, or
         None if getattr(result, candidate_field) is None else tuple(int(bit) for bit in getattr(result, candidate_field)),
         result.termination,
         result.qualification,
-        None if origin_field is None else getattr(result, origin_field),
+        None if origin_field is None else _json(getattr(result, origin_field)),
         data, branches, rows, work, leaves,
     )
 

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 from copy import deepcopy
 from hashlib import sha256
 import json
@@ -19,6 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from bp_registry.cli import run_canonical  # noqa: E402
+from bp_registry.canonical.budgets import WorkVector  # noqa: E402
 from bp_registry.ledger import read_canonical_events  # noqa: E402
 from bp_registry.manifests import manifest_digest, preflight  # noqa: E402
 
@@ -152,10 +154,19 @@ def _run_stage(design: dict[str, Any], output: Path) -> dict[str, Any]:
         arm_root.mkdir(exist_ok=True)
         manifest_path = arm_root / "manifest.json"
         _write_once(manifest_path, design["arm_manifests"][arm])
-        run_canonical(manifest_path, arm_root)
+        result_path = arm_root / "result.json"
+        if result_path.exists():
+            # This result was written only after run_canonical replayed every
+            # shot.  On resume, its ledger and manifest digests must still
+            # match before bypassing the costly identical controller replay.
+            completed = _read(result_path)
+            if (completed.get("manifest_sha256") != manifest_digest(preflight(manifest_path).manifest)
+                    or completed.get("ledger_sha256") != sha256((arm_root / "events.jsonl").read_bytes()).hexdigest()):
+                raise ValueError(f"completed {arm} arm has drifted on resume")
+        else:
+            run_canonical(manifest_path, arm_root)
         # run_canonical reconstructs its result through validate_canonical_shot
-        # for every terminal.  A second verify_run here would replay the same
-        # bounded B1 controller work without adding a distinct gate.
+        # for every terminal.  A second verify_run would replay the same work.
         events = read_canonical_events(arm_root / "events.jsonl")
         begins = {row["shot_id"]: row for row in events if row["kind"] == "shot_begin"}
         if sorted(begins) != design["shot_ids"]:
@@ -198,6 +209,47 @@ def calibrate() -> dict[str, Any]:
     return _run_stage(design, CALIBRATION_OUTPUT)
 
 
+def _calibration_objective_summary(design: dict[str, Any]) -> dict[str, Any]:
+    """Reduce control-flow and work only; logical outcomes never enter caps."""
+    events = read_canonical_events(CALIBRATION_OUTPUT / "events.jsonl")
+    summary: dict[str, Any] = {}
+    for arm in ARMS:
+        run_id = design["arm_manifests"][arm]["run_id"]
+        stream = [event for event in events if event["run_id"] == run_id]
+        begins = [event for event in stream if event["kind"] == "shot_begin"]
+        terminals = [event for event in stream if event["kind"] == "termination"]
+        work_events = [event for event in stream if event["kind"] == "work"]
+        if len(begins) != 4 or len(terminals) != 4 or len(work_events) != 4:
+            raise ValueError(f"calibration {arm} lacks four admitted terminal/work records")
+        attempts = [event["data"]["payload"] for event in stream if event["kind"] == "attempt"]
+        status = Counter(str(row.get("termination", row.get("terminal_reason", "continued"))) for row in attempts)
+        no_proposal = sum(not any(event["kind"] == "attempt" and event["shot_id"] == shot for event in stream)
+                          for shot in range(4))
+        totals: list[WorkVector] = []
+        leaf_count = 0
+        for event in work_events:
+            payload = event["data"]["payload"]
+            leaves = payload["leaves"]
+            if len({leaf["leaf_id"] for leaf in leaves}) != len(leaves):
+                raise ValueError("calibration has duplicate leaf work")
+            reduced = WorkVector.sum(WorkVector.from_evidence(leaf["work_vector"], structural_event_version=4) for leaf in leaves)
+            declared = WorkVector.from_evidence(payload["work_vector"], structural_event_version=4)
+            if reduced != declared:
+                raise ValueError("calibration typed work differs from unique leaves")
+            totals.append(reduced)
+            leaf_count += len(leaves)
+        summary[arm] = {
+            "attempt_status_counts": dict(sorted(status.items())),
+            "terminal_status_counts": dict(sorted(Counter(event["termination"] for event in terminals).items())),
+            "no_proposal_slots": no_proposal,
+            "cap_hit_attempts": sum("budget_exhausted" in key or "cap_reached" in key for key in status.elements()),
+            "committed_work_leaves": leaf_count,
+            "typed_work_total": WorkVector.sum(totals).as_evidence(structural_event_version=4),
+            "qualification": design["arm_manifests"][arm]["intervention"]["qualification"],
+        }
+    return summary
+
+
 def freeze_caps() -> dict[str, Any]:
     if not ENTITLEMENT.exists() or not (CALIBRATION_OUTPUT / "result.json").exists():
         raise ValueError("cap freeze requires entitlement and four-shot calibration")
@@ -228,6 +280,14 @@ def freeze_caps() -> dict[str, Any]:
         "arm_order": list(ARMS), "calibration_shot_ids": list(range(4)),
         "evaluation_shot_ids": list(range(16)),
         "caps_source": "prespecified_calibration_manifest; no outcome-conditioned tuning",
+        "calibration_objective_summary": _calibration_objective_summary(design),
+        "arm_control_digests": {
+            arm: _digest({
+                "budgets": design["arm_manifests"][arm]["budgets"],
+                "intervention": design["arm_manifests"][arm]["intervention"],
+                "intervention_limits": design["arm_manifests"][arm]["intervention_limits"],
+            }) for arm in ARMS
+        },
         "assessment_status": "not_assessed",
     }
     _write_once(FREEZE, freeze)
@@ -252,6 +312,20 @@ def self_audit() -> dict[str, Any]:
         raise ValueError("calibration event ledger changed after freeze")
     if calibration["physical_sample_identity"] == evaluation["physical_sample_identity"]:
         raise ValueError("calibration and evaluation sample identities overlap")
+    if _calibration_objective_summary(calibration) != freeze.get("calibration_objective_summary"):
+        raise ValueError("calibration control-flow or typed work differs from the freeze")
+    if {
+        arm: _digest({
+            "budgets": evaluation["arm_manifests"][arm]["budgets"] | {"max_shots": 4},
+            "intervention": (
+                evaluation["arm_manifests"][arm]["intervention"]
+                | ({"root_seed": "phase5-b1-calibration-decoder-v1"}
+                   if evaluation["arm_manifests"][arm]["intervention"].get("root_seed") is not None else {})
+            ),
+            "intervention_limits": evaluation["arm_manifests"][arm]["intervention_limits"],
+        }) for arm in ARMS
+    } != freeze.get("arm_control_digests"):
+        raise ValueError("evaluation controls or source variants differ from the objective freeze")
     _stage(EVALUATION, stage="evaluation")
     return {"status": "passed", "cap_freeze_digest": _digest(freeze),
             "calibration_shots": 4, "evaluation_shots": 16, "arms": list(ARMS)}
