@@ -409,5 +409,8 @@ def trace_link_event(*,ledger_id,schedule):
     if link is None: raise ValueError("ordinary-memory trace yielded no sidecar link")
     return {"kind":"trace_link","ledger_id":ledger_id,"data":{"trace_kind":"ordinary_memory","sidecar":link}}
 def main():
-    p=argparse.ArgumentParser(description=__doc__); p.add_argument("--design",type=Path,default=ROOT/"data/evidence/phase4-pilot-design.json"); p.add_argument("--caps",type=Path,default=ROOT/"data/manifests/phase4-pilot-caps.json"); p.add_argument("--supplement",type=Path,default=ROOT/"data/evidence/phase4-factorial-execution-supplement-v1.json"); a=p.parse_args(); plan=build_factorial_plan(design=_read(a.design),caps=_read(a.caps),supplement=_read(a.supplement)); print(json.dumps({k:v for k,v in plan.items() if k!="cells"},indent=2,sort_keys=True))
+    p=argparse.ArgumentParser(description=__doc__); p.add_argument("--design",type=Path,default=ROOT/"data/evidence/phase4-pilot-design.json"); p.add_argument("--caps",type=Path,default=ROOT/"data/manifests/phase4-pilot-caps.json"); p.add_argument("--supplement",type=Path,default=ROOT/"data/evidence/phase4-factorial-execution-supplement-v1.json"); p.add_argument("--run",action="store_true",help="run the gated factorial with durable per-cell receipts"); p.add_argument("--evaluation",type=Path,default=ROOT/"data/results/phase4-memory-relay/evaluation/result.json"); p.add_argument("--output",type=Path,default=ROOT/"data/results/phase4-memory-relay/factorial"); a=p.parse_args(); plan=build_factorial_plan(design=_read(a.design),caps=_read(a.caps),supplement=_read(a.supplement))
+    if a.run:
+        print(json.dumps(run_factorial(evaluation_path=a.evaluation,plan=plan,repository_root=ROOT,output_root=a.output),indent=2,sort_keys=True)); return
+    print(json.dumps({k:v for k,v in plan.items() if k!="cells"},indent=2,sort_keys=True))
 if __name__=="__main__": main()
