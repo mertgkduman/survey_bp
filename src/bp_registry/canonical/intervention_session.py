@@ -47,6 +47,7 @@ class BpSessionState:
     residual_cache: None
     private_histories: tuple[object, ...]
     mutation_evidence: Mapping[str, tuple[str, ...]]
+    pending_sign_target: int | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -91,7 +92,7 @@ class BpSession:
 
     def __init__(
         self, edge_table: EdgeTable, syndrome: np.ndarray, *, error_rate: float,
-        owner_identity: str | None = None,
+        owner_identity: str | None = None, kernel: BinarySpaKernel | None = None,
     ) -> None:
         self.edge_table = edge_table
         bits = np.asarray(syndrome)
@@ -100,7 +101,9 @@ class BpSession:
         self.syndrome = np.array(bits, dtype=np.uint8, copy=True)
         self.syndrome.setflags(write=False)
         self.error_rate = error_rate
-        self.kernel = BinarySpaKernel()
+        if kernel is not None and not isinstance(kernel, BinarySpaKernel):
+            raise ValueError("intervention session kernel must be a canonical binary kernel")
+        self.kernel = kernel or BinarySpaKernel()
         self.schedule = FloodingSchedule(edge_table, kernel=self.kernel)
         self._owner = object()
         if owner_identity is not None and (not isinstance(owner_identity, str) or not owner_identity):
@@ -124,6 +127,7 @@ class BpSession:
         candidate: np.ndarray, fixed_indices: tuple[int, ...], source_iteration: int, revision: int,
         *, c2v: np.ndarray | None = None,
         mutation_evidence: Mapping[str, tuple[str, ...]] | None = None,
+        pending_sign_target: int | None = None,
     ) -> BpSessionState:
         n, e = self.edge_table.variable_count, self.edge_table.edge_count
         p = _frozen_f64(prior, n, "prior")
@@ -135,6 +139,8 @@ class BpSession:
             raise ValueError("candidate must be a binary original-coordinate vector")
         c = np.array(c, dtype=np.uint8, copy=True)
         c.setflags(write=False)
+        if pending_sign_target is not None and (type(pending_sign_target) is not int or not 0 <= pending_sign_target < n):
+            raise ValueError("pending sign target must be a valid variable")
         prior_identity = sha256(p.tobytes()).hexdigest()
         coordinate_identity = sha256(json.dumps(list(range(n))).encode()).hexdigest()
         evidence = MappingProxyType(dict(mutation_evidence or {}))
@@ -146,12 +152,14 @@ class BpSession:
             "candidate": c.tolist(), "fixed_indices": fixed_indices,
             "source_iteration": source_iteration, "revision": revision,
             "schedule_cursor": (source_iteration,), "mutation_evidence": dict(evidence),
+            "pending_sign_target": pending_sign_target,
         }
         digest = sha256(json.dumps(payload, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
         return BpSessionState(
             p, v, b, c, fixed_indices, source_iteration, revision, digest,
             c2v_snapshot, self.edge_table.graph_sha256, prior_identity, "float64",
             self.owner_identity, coordinate_identity, (source_iteration,), None, (), evidence,
+            pending_sign_target,
         )
 
     def propose_finite_prior(
@@ -229,12 +237,23 @@ class BpSession:
         work = WorkVector.from_flooding_counts(
             edge_count=self.edge_table.edge_count, variable_count=self.edge_table.variable_count,
         ) + WorkVector(bp_calls=int(bp_call_start))
+        pending_edges = tuple(
+            index for index, (_check, variable) in enumerate(self.edge_table.edges)
+            if variable == state.pending_sign_target
+        ) if state.pending_sign_target is not None else ()
+        if pending_edges:
+            work = work + WorkVector(variable_to_check_updates=len(pending_edges))
         reservation = budgets.reserve("attempt", work, leaf_id=leaf_id)
         if reservation is None:
             return SessionTransition(False, state, "count_budget_exhausted", None)
         try:
+            input_v2c = np.array(state.v2c, copy=True)
+            for edge_index in pending_edges:
+                input_v2c[edge_index] = self.kernel.variable_message(
+                    float(state.posterior[state.pending_sign_target]), float(state.c2v[edge_index]),
+                )
             sweep = self.schedule.sweep(
-                state.v2c, self.syndrome, error_rate=self.error_rate,
+                input_v2c, self.syndrome, error_rate=self.error_rate,
                 source_iteration=state.source_iteration, prior_llrs=state.prior,
             )
             next_state = self._make_state(
@@ -243,7 +262,8 @@ class BpSession:
                 c2v=sweep.check_to_variable,
                 mutation_evidence={
                     "preserved": ("graph", "syndrome", "prior"),
-                    "recomputed": ("c2v", "posterior", "candidate", "v2c"), "invalidated": (),
+                    "recomputed": ("c2v", "posterior", "candidate", "v2c"),
+                    "invalidated": ("pending_sign_target",) if pending_edges else (),
                 },
             )
         except BaseException:
@@ -295,7 +315,7 @@ class BpSession:
                 [self.state.owner_identity, leaf_id, table.graph_sha256, next_rate],
                 separators=(",", ":"), allow_nan=False,
             ).encode()).hexdigest()[:20]
-            child = type(self)(table, next_syndrome, error_rate=next_rate, owner_identity=branch_owner)
+            child = type(self)(table, next_syndrome, error_rate=next_rate, owner_identity=branch_owner, kernel=self.kernel)
             if preserve_set:
                 old = self.state
                 child._state = child._make_state(
@@ -304,6 +324,7 @@ class BpSession:
                     mutation_evidence={
                         "preserved": tuple(sorted(preserve_set)), "recomputed": (), "invalidated": (),
                     },
+                    pending_sign_target=old.pending_sign_target,
                 )
         except BaseException:
             reservation.rollback()
@@ -336,6 +357,38 @@ class BpSession:
                     "preserved": ("prior", "c2v", "graph", "syndrome"),
                     "recomputed": ("target_v2c", "target_hard_decision"), "invalidated": (),
                 },
+            )
+        except BaseException:
+            reservation.rollback()
+            raise
+        reservation.commit_once()
+        self._state = next_state
+        return SessionTransition(True, next_state, None, leaf_id)
+
+    def stage_posterior_sign(self, target_index: int, *, budgets: BudgetTree, leaf_id: str) -> SessionTransition:
+        """Change only posterior and decision now; use it on outgoing edges next sweep."""
+        state = self.state
+        if (type(target_index) is not int or not 0 <= target_index < self.edge_table.variable_count
+                or state.source_iteration == 0 or state.pending_sign_target is not None):
+            raise ValueError("staged posterior sign requires a completed sweep and no pending mutation")
+        reservation = budgets.reserve(
+            "attempt", WorkVector(intervention_actions=1, candidate_constructions=1), leaf_id=leaf_id,
+        )
+        if reservation is None:
+            return SessionTransition(False, state, "count_budget_exhausted", None)
+        try:
+            posterior = np.array(state.posterior, copy=True)
+            posterior[target_index] = -posterior[target_index]
+            candidate = self.kernel.candidate_from_beliefs(posterior)
+            next_state = self._make_state(
+                state.prior, state.v2c, posterior, candidate, state.fixed_indices,
+                state.source_iteration, state.revision + 1, c2v=state.c2v,
+                mutation_evidence={
+                    "preserved": ("prior", "v2c", "c2v", "graph", "syndrome"),
+                    "recomputed": ("target_posterior", "target_hard_decision"),
+                    "invalidated": ("pending_outgoing_target",),
+                },
+                pending_sign_target=target_index,
             )
         except BaseException:
             reservation.rollback()
