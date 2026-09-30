@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 05
 current_phase_name: Guided and Perturbative BP Interventions
-current_plan: 3
+current_plan: 4
 status: executing
-stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-09-30T21:56:41.367Z"
+stopped_at: Completed 05-03-PLAN.md; Wave 1 regression gate running
+last_updated: "2026-09-30T22:05:28.154Z"
 last_activity: 2026-09-30
-last_activity_desc: Completed Phase 05 guided BP tracer; Wave 1 is next
-state_head: 473a601c4fa809afae800b6986d6ad64a2ee3658
+last_activity_desc: Completed Phase 05 Wave 1 source, transform, and session contracts
+state_head: af3f5352d20f23b23a4313b07e8b0d09864411ce
 progress:
   total_phases: 14
   completed_phases: 4
   total_plans: 71
-  completed_plans: 59
+  completed_plans: 60
 ---
 
 # Project State
@@ -29,13 +29,13 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 ## Current Position
 
 Phase: 05 (Guided and Perturbative BP Interventions) — IN PROGRESS
-Plan: 03 of 14
+Plan: 04 of 14
 Total Phases: 14
-Current Plan: 3
+Current Plan: 4
 Total Plans in Phase: 14
-Status: Ready to execute
-Last activity: 2026-09-30 — Completed Phase 05 Plan 01 guided BP tracer
-Last Activity Description: Phase 05 has 1 of 14 plans complete; Wave 1 is next
+Status: In progress
+Last activity: 2026-09-30 — Completed Phase 05 Wave 1 contracts
+Last Activity Description: Phase 05 has 3 of 14 plans complete; Wave 2 is next
 
 Progress: [███░░░░░░░] 29%
 
@@ -75,6 +75,7 @@ Progress: [███░░░░░░░] 29%
 | Phase 04 P13 | 2026-09-30 | 2 tasks | 4 files |
 | Phase 05 P01 | 15min | 1 tasks | 5 files |
 | Phase 05 P02 | 8min | 2 tasks | 6 files |
+| Phase 05 P03 | 8min | 2 tasks | 7 files |
 
 Phase 02 P10–P16 gap-closure metrics are recorded in their individual summaries.
 
