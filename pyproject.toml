@@ -15,6 +15,7 @@ analysis = [
   "nbformat==5.10.4",
   "nbclient==0.10.2",
   "ipykernel==6.29.5",
+  "plotly==7.1.0",
 ]
 
 [tool.setuptools.packages.find]
