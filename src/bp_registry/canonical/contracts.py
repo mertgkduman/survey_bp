@@ -197,6 +197,26 @@ class CanonicalCompositionSpecV3(CanonicalCompositionSpec):
     schedule: SchedulePolicySpecV3
 
 
+class CanonicalCompositionSpecV6(_Strict):
+    """Phase 5 composition; earlier versions keep their closed intervention registry."""
+
+    update: PolicySpecV3
+    schedule: SchedulePolicySpecV3
+    state_memory: PolicySpec
+    intervention: PolicySpec
+    stopping: PolicySpec
+    selection: PolicySpec
+    postprocessing: PolicySpec
+
+    def in_role_order(self) -> tuple[tuple[PolicyRole, PolicySpec], ...]:
+        return tuple((role, getattr(self, role.value)) for role in PolicyRole)
+
+    @model_validator(mode="after")
+    def has_a_valid_static_graph(self) -> "CanonicalCompositionSpecV6":
+        validate_composition(self)
+        return self
+
+
 @dataclass(frozen=True)
 class PolicyBinding:
     """Resolved closed-registry policy identity and declared ownership."""
@@ -305,7 +325,7 @@ class PolicyDecision(_Strict):
         return self
 
 
-def validate_composition(composition: CanonicalCompositionSpec) -> ResolvedComposition:
+def validate_composition(composition: CanonicalCompositionSpec | CanonicalCompositionSpecV6) -> ResolvedComposition:
     """Resolve only known in-code kinds and reject invalid static ownership graphs."""
 
     binding_ids: set[str] = set()
@@ -313,7 +333,11 @@ def validate_composition(composition: CanonicalCompositionSpec) -> ResolvedCompo
     provided: set[str] = set()
     bindings: list[PolicyBinding] = []
     for role, spec in composition.in_role_order():
-        if spec.kind not in _POLICY_KINDS[role]:
+        phase5_guided = (
+            isinstance(composition, CanonicalCompositionSpecV6)
+            and role is PolicyRole.INTERVENTION and spec.kind == "guided_decimation"
+        )
+        if spec.kind not in _POLICY_KINDS[role] and not phase5_guided:
             raise ValueError(f"unknown policy kind {spec.kind!r}; expected a known policy kind for {role.value}")
         if spec.binding_id in binding_ids:
             raise ValueError(f"duplicate binding_id {spec.binding_id!r}")
@@ -338,7 +362,11 @@ def validate_composition(composition: CanonicalCompositionSpec) -> ResolvedCompo
                 provides=spec.provides,
                 compatibility_reason="closed canonical CSS policy registry v1",
                 evidence=PolicyEvidence(
-                    procedure=f"Registered {spec.kind} policy follows the canonical CSS v1 procedure.",
+                    source_anchors=("arxiv:2312.10950v2:algorithm-1",) if phase5_guided else (),
+                    procedure=(
+                        "Algorithm 1 v2 interpretation: maximum absolute posterior, finite signed prior 25, continuing flooding state."
+                        if phase5_guided else f"Registered {spec.kind} policy follows the canonical CSS v1 procedure."
+                    ),
                     invariants=(
                         "The policy receives only its declared decoder-visible capability view.",
                         "The policy may mutate only declared private state through a typed decision.",
@@ -745,9 +773,50 @@ class CanonicalManifestV4(_Strict):
         return self
 
 
-def parse_canonical_manifest(value: CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4 | CanonicalManifestV5 | dict[str, Any] | str) -> CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4 | CanonicalManifestV5:
+class InterventionSpec(_Strict):
+    """Source-qualified, bounded BPGD interpretation for the Phase 5 tracer."""
+
+    kind: Literal["guided_decimation"]
+    variant: Literal["algorithm1_v2_interpretation"]
+    source_revision: Literal["arxiv:2312.10950v2"]
+    finite_bias_magnitude: float
+    zero_rule: Literal["positive_prior_for_zero_posterior"]
+    final_round_rule: Literal["return_after_last_fixation"]
+    round_limit: int = Field(ge=1, le=10_000)
+    sweeps_per_round: int = Field(ge=1, le=100_000)
+
+    @model_validator(mode="after")
+    def source_parameters_are_explicit(self) -> "InterventionSpec":
+        if self.finite_bias_magnitude != 25.0:
+            raise ValueError("the Algorithm 1 v2 tracer requires finite prior magnitude 25")
+        return self
+
+
+class CanonicalManifestV6(_Strict):
+    """Compact Phase 5 intervention contract; V2–V5 remain unchanged."""
+
+    schema_version: Literal[6]
+    run_id: str = Field(min_length=1)
+    numerical_profile: Literal["cpu-float64-spa-v1"]
+    max_iterations: int = Field(ge=1, le=100_000)
+    error_rate: float = Field(gt=0.0, lt=1.0)
+    policies: CanonicalCompositionSpecV6
+    intervention: InterventionSpec
+
+    @model_validator(mode="after")
+    def tracer_uses_compatible_kernel_and_state(self) -> "CanonicalManifestV6":
+        if (self.policies.update.kind != "binary_spa" or self.policies.schedule.kind != "flooding"
+                or self.policies.intervention.kind != self.intervention.kind
+                or self.policies.state_memory.kind != "identity"):
+            raise ValueError("the guided-decimation tracer requires SPA flooding and an explicit guided intervention")
+        if self.intervention.sweeps_per_round > self.max_iterations:
+            raise ValueError("guided sweeps_per_round exceeds the declared per-round max_iterations")
+        return self
+
+
+def parse_canonical_manifest(value: CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4 | CanonicalManifestV5 | CanonicalManifestV6 | dict[str, Any] | str) -> CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4 | CanonicalManifestV5 | CanonicalManifestV6:
     """Parse only the versioned strict canonical representation."""
-    if isinstance(value, (CanonicalManifestV2, CanonicalManifestV3, CanonicalManifestV4, CanonicalManifestV5)):
+    if isinstance(value, (CanonicalManifestV2, CanonicalManifestV3, CanonicalManifestV4, CanonicalManifestV5, CanonicalManifestV6)):
         return value
     if isinstance(value, str):
         decoded = json.loads(value)
@@ -756,6 +825,8 @@ def parse_canonical_manifest(value: CanonicalManifestV2 | CanonicalManifestV3 | 
     if not isinstance(decoded, dict):
         raise ValueError("canonical manifest must be an object")
     schema_version = decoded.get("schema_version")
+    if schema_version == 6:
+        return CanonicalManifestV6.model_validate(decoded)
     if schema_version == 5:
         return CanonicalManifestV5.model_validate(decoded)
     if schema_version == 4:

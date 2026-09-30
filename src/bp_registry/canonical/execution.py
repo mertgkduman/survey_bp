@@ -21,6 +21,7 @@ from .contracts import (
     CanonicalManifestV3,
     CanonicalManifestV4,
     CanonicalManifestV5,
+    CanonicalManifestV6,
     Hook,
     PolicyBinding,
     PolicyDecision,
@@ -423,7 +424,7 @@ def _termination_evidence(termination: BudgetTermination) -> dict[str, Any]:
     }
 
 
-def _identity(manifest: CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4 | CanonicalManifestV5, observation: DecoderObservation) -> str:
+def _identity(manifest: CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4 | CanonicalManifestV5 | CanonicalManifestV6, observation: DecoderObservation) -> str:
     payload = {"manifest": manifest.model_dump(mode="json"), "check_type": observation.check_type,
                "syndrome": np.asarray(observation.syndrome, dtype=np.uint8).tolist()}
     return sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
@@ -563,8 +564,8 @@ def run_canonical_shot(manifest: CanonicalManifestV2 | CanonicalManifestV3 | dic
         raise ValueError("canonical tracer accepts a nonnegative Z-check shot")
     validated = code.validate()
     resolved = validate_composition(parsed.policies)
-    if isinstance(parsed, (CanonicalManifestV4, CanonicalManifestV5)):
-        raise ValueError("memory and Relay require run_canonical_structural_shot")
+    if isinstance(parsed, (CanonicalManifestV4, CanonicalManifestV5, CanonicalManifestV6)):
+        raise ValueError("memory, Relay, and interventions require run_canonical_structural_shot")
     runtime = PolicyRuntime(resolved)
     runtime.traverse_lifecycle()
     identity = _identity(parsed, observation)
@@ -776,8 +777,116 @@ def _run_relay_structural_shot(
     raise ShotOwnershipError("canonical Relay shot remained owned beyond bounded retry window")
 
 
+def _run_guided_structural_shot(
+    parsed: CanonicalManifestV6, *, code: CssCode, observation: DecoderObservation,
+    hidden_truth: HiddenTruth, shot_id: int, ledger_path: str | Path,
+    sample_seed_identity: str, context: Mapping[str, Any],
+    execution_controls: Mapping[str, Any] | None,
+    verification_context: PublicShotContext | None,
+    evaluate: Callable[..., evaluator.Evaluation],
+) -> CanonicalExecutionResult:
+    """One production BPGD tracer through the original-problem truth boundary."""
+    from .guided_decimation import GuidedDecimationController
+    from .intervention_session import BpSession
+
+    if type(shot_id) is not int or shot_id < 0 or observation.check_type != "Z":
+        raise ValueError("guided tracer accepts a nonnegative Z-check shot")
+    validated = code.validate()
+    resolved = validate_composition(parsed.policies)
+    PolicyRuntime(resolved).traverse_lifecycle()
+    identity = verification_context.execution_identity if verification_context is not None else _identity(parsed, observation)
+    original_id = stable_lineage_id("original", {"identity": identity})
+    original = OriginalProblem(original_id.value, validated.hx, validated.hz, observation.syndrome)
+    working_id = stable_lineage_id("working", {"original": original_id.value, "lift": "identity"})
+    working = WorkingProblem(working_id.value, original, LineageEdge("identity", original_id, working_id))
+    session = BpSession(EdgeTable.from_check_matrix(original.hz), original.syndrome, error_rate=parsed.error_rate)
+    controller = GuidedDecimationController(parsed.intervention)
+    budgets = _budget_tree(execution_controls)
+    common = {
+        **dict(context), "schema_version": 6, "canonical_identity": identity,
+        "composition_identity": resolved.semantic_identity,
+        "source_revision": parsed.intervention.source_revision,
+        "source_variant": parsed.intervention.variant,
+    }
+    selected: OriginalSpaceCandidate | None = None
+    termination = "round_limit_without_valid_candidate"
+    with CanonicalEventWriter(ledger_path) as ledger:
+        ledger.begin(run_id=parsed.run_id, shot_id=shot_id, sample_seed_identity=sample_seed_identity, **common)
+        attempt_id = _attempt_lineage_id(working, 0)
+        ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="attempt", data={
+            **common, "attempt_lineage_id": attempt_id.value, "scope": "attempt",
+            "max_iterations": parsed.max_iterations,
+        })
+        for round_index in range(parsed.intervention.round_limit):
+            for sweep_index in range(parsed.intervention.sweeps_per_round):
+                transition = session.advance(
+                    budgets=budgets, leaf_id=f"guided-sweep:{shot_id}:{round_index}:{sweep_index}",
+                    bp_call_start=sweep_index == 0,
+                )
+                if not transition.admitted:
+                    termination = transition.termination or "count_budget_exhausted"
+                    break
+                if session.original_syndrome_valid(original.hz):
+                    candidate_id = _candidate_lineage_id(working, attempt_id, session.state.candidate)
+                    selected = OriginalSpaceCandidate(candidate_id.value, working, session.state.candidate, 0)
+                    termination = "completed"
+                    break
+            if selected is not None or termination == "count_budget_exhausted":
+                break
+            before = session.state
+            guided = controller.fix_one(session, posterior=before.posterior, budgets=budgets)
+            ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="intervention", data={
+                **common,
+                "action": "finite_prior_bias", "admitted": guided.admitted,
+                "termination": guided.termination,
+                "target_index": None if guided.proposal is None else guided.proposal.target_index,
+                "signed_prior": None if guided.proposal is None else guided.proposal.signed_prior,
+                "finite_bias_magnitude": parsed.intervention.finite_bias_magnitude,
+                "zero_rule": parsed.intervention.zero_rule,
+                "final_round_rule": parsed.intervention.final_round_rule,
+                "eligibility_set": list(guided.eligibility_set),
+                "state_before": before.digest,
+                "state_after": session.state.digest,
+                "reservation_leaf": guided.session_transition.leaf_id,
+                "original_syndrome_valid": session.original_syndrome_valid(original.hz),
+            })
+            if not guided.admitted:
+                termination = guided.termination or "no_eligible_target"
+                break
+            # Algorithm 1 returns after the final fixation; no invented BP call.
+        work = budgets.summary("attempt")
+        if selected is not None:
+            ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="candidate", data={
+                **common, "candidate_lineage_id": selected.lineage_id,
+                "candidate": selected.candidate.tolist(), "original_syndrome_valid": True,
+            })
+            ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="selection", data={
+                **common, "candidate_lineage_id": selected.lineage_id,
+                "selection_status": "frozen_decoder_visible_candidate",
+            })
+        ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="work", data={
+            **common, "work_vector": work.as_evidence(structural_event_version=2),
+            "leaf_ids": [leaf_id for leaf_id, _, _ in budgets.leaf_events()],
+        })
+        # Truth is first consulted after the candidate has passed original checks
+        # and its decoder-visible selection has been written.
+        assessment = None if selected is None else evaluate(
+            validated, true_x=hidden_truth.x, true_z=hidden_truth.z, candidate_x=selected.candidate,
+        )
+        ledger.terminal(run_id=parsed.run_id, shot_id=shot_id, termination=termination, data={
+            **common, "candidate": None if selected is None else selected.candidate.tolist(),
+            "diagnostic_candidate": session.state.candidate.tolist(),
+            "original_syndrome_valid": session.original_syndrome_valid(original.hz),
+            "outcome": None if assessment is None else assessment.outcome,
+            "logical_action_agrees": None if assessment is None else assessment.logical_action_agrees,
+            "selection_status": "no_valid_candidate" if selected is None else "frozen_decoder_visible_candidate",
+            "work_vector": work.as_evidence(structural_event_version=2),
+        })
+    return CanonicalExecutionResult(parsed.run_id, shot_id, termination, assessment, None if selected is None else selected.candidate)
+
+
 def run_canonical_structural_shot(
-    manifest: CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4 | CanonicalManifestV5 | dict[str, object] | str, *, code: CssCode,
+    manifest: CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4 | CanonicalManifestV5 | CanonicalManifestV6 | dict[str, object] | str, *, code: CssCode,
     observation: DecoderObservation, hidden_truth: HiddenTruth, shot_id: int,
     ledger_path: str | Path, sample_seed_identity: str, context: Mapping[str, Any],
     execution_controls: Mapping[str, Any] | None = None,
@@ -787,6 +896,13 @@ def run_canonical_structural_shot(
 ) -> CanonicalExecutionResult:
     """Run the kernel with v2 structural evidence and an outer truth boundary."""
     parsed = parse_canonical_manifest(manifest)
+    if isinstance(parsed, CanonicalManifestV6):
+        return _run_guided_structural_shot(
+            parsed, code=code, observation=observation, hidden_truth=hidden_truth,
+            shot_id=shot_id, ledger_path=ledger_path, sample_seed_identity=sample_seed_identity,
+            context=context, execution_controls=execution_controls,
+            verification_context=verification_context, evaluate=evaluate,
+        )
     if isinstance(parsed, CanonicalManifestV4):
         return _run_relay_structural_shot(
             parsed, code=code, observation=observation, hidden_truth=hidden_truth, shot_id=shot_id,
