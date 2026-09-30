@@ -32,7 +32,7 @@ def test_phase5_shot_first_candidate_origin_original_validation_and_work():
     assert "fixed-sample-identity" in html
     assert "pilot_adaptation" in html and "not_assessed" in html
     assert "impulse" in html and "identity" in html
-    assert "C2V work" in html and "Selected origin" in html
+    assert "C2V work" in html and "Selected origin" in html and "Selected candidate" in html
     assert html.count("<tr") == 8
 
 

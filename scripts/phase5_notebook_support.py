@@ -15,7 +15,7 @@ def shot_table_html(dataset: Phase5Dataset, *, shot_id: int, selected_arm: str) 
     if len(matched) != len(ARMS) or len({row.sample_identity for row in matched}) != 1:
         raise ValueError("shot-first view requires seven matched arm rows")
     highlighted = {"identity", selected_arm}
-    headings = ("Arm", "Status", "Outcome cell", "Selected origin", "Original valid", "Attempts", "C2V work", "Qualification", "Source revision", "Variant")
+    headings = ("Arm", "Status", "Outcome cell", "Selected candidate", "Selected origin", "Original valid", "Attempts", "C2V work", "Qualification", "Source revision", "Variant")
     body = []
     for row in matched:
         style = ' class="selected"' if row.arm in highlighted else ""
@@ -25,7 +25,15 @@ def shot_table_html(dataset: Phase5Dataset, *, shot_id: int, selected_arm: str) 
             str(row.attempt_count), str(row.work["check_to_variable_updates"]), row.qualification,
             row.source_revision, row.variant,
         )
-        body.append("<tr" + style + ">" + "".join(f"<td>{escape(value)}</td>" for value in values) + "</tr>")
+        candidate = row.selected_candidate
+        candidate_cell = (
+            "unavailable" if candidate is None else
+            f"<details><summary>{sum(candidate)} ones · {len(candidate)} bits</summary><code>"
+            + "".join(str(bit) for bit in candidate) + "</code></details>"
+        )
+        cells = [f"<td>{escape(value)}</td>" for value in values]
+        cells.insert(3, f"<td>{candidate_cell}</td>")
+        body.append("<tr" + style + ">" + "".join(cells) + "</tr>")
     return (
         '<div class="phase5-shot"><h3>Matched physical shot ' + str(shot_id) + "</h3>"
         + '<p>Sample identity: <code>' + escape(matched[0].sample_identity) + '</code>. '
