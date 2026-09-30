@@ -1,0 +1,67 @@
+{
+  "schema_version": "phase4-retained-evidence-inventory-v1",
+  "decision": "comprehensive_phase4_experiment_cancelled_by_user_as_premature",
+  "recorded_at": "2026-09-30T04:38:47Z",
+  "claim_limit": "bounded mechanism/source diagnostics only; no completed fresh three-code comparison, factorial effect, reproduction or ranking claim",
+  "entries": {
+    "calibration": {
+      "path": "data/results/phase4-memory-relay/calibration/result.json",
+      "sha256": "59a5f27fc8271724f603741c4311becfaca52a7ef01bbb93d240a823f58f2fef",
+      "bytes": 97183929,
+      "producer_status": "completed_with_inconclusive",
+      "verified_shots": 5824,
+      "verified_configurations": 182
+    },
+    "frozen_selections": {
+      "path": "data/results/phase4-memory-relay/selected-settings.json",
+      "sha256": "079024069b6866b8a458ffeb03fe7a581ec1074ade7ff3a74e70803bb323300c",
+      "bytes": 4602,
+      "producer_status": "frozen_from_calibration_only",
+      "b1": "inconclusive_under_frozen_cap"
+    },
+    "auxiliary_author_agreement": {
+      "path": "data/results/phase4-memory-relay/author-v022-agreement-v1/result.json",
+      "sha256": "28bd1429206501dc4fe6d259d5870f49228ff36f3d53941e7a3df1bd4910057c",
+      "bytes": 7231,
+      "producer_status": "completed",
+      "relationship": "independent_auxiliary; does_not_complete_cancelled_fresh_evaluation"
+    },
+    "auxiliary_low_noise_p0050": {
+      "path": "data/results/phase4-memory-relay/low-noise-ler-p0050-parallel-v1/result.json",
+      "sha256": "6b94f298976c0a1b4eab856eaa54adeb646bf1c94d0e10fe8d1fe33b3637f9ae",
+      "bytes": 11249,
+      "producer_status": "completed_precision",
+      "relationship": "independent_auxiliary; does_not_complete_cancelled_fresh_evaluation"
+    },
+    "auxiliary_low_noise_reconciled": {
+      "path": "data/results/phase4-memory-relay/low-noise-ler-reconciled-20260926/result.json",
+      "sha256": "1171b8db487f81bcf104b378069bc579b680d8cc694d99a938356a003f00b998",
+      "bytes": 25247,
+      "producer_status": "completed_precision",
+      "relationship": "independent_auxiliary; does_not_complete_cancelled_fresh_evaluation"
+    },
+    "interrupted_b1_baseline": {
+      "path": "data/results/phase4-memory-relay/evaluation/b1-ghp-882/baseline/attempts.json",
+      "sha256": "eae6f33f402dff75673148eb486b9278a289445f9c929b34dc788a2debe77ebe",
+      "bytes": 11804203,
+      "producer_status": "attempt_receipts",
+      "attempts": {
+        "completed": 159,
+        "incomplete_interrupted": 1
+      },
+      "assessment": "not_assessed_incomplete_prefix"
+    },
+    "fresh_evaluation": {
+      "path": "data/results/phase4-memory-relay/evaluation/result.json",
+      "status": "unavailable_cancelled_before_completion"
+    },
+    "fresh_native_pairs": {
+      "path": "data/results/phase4-memory-relay/evaluation/native-pairs/result.json",
+      "status": "unavailable_cancelled_before_completion"
+    },
+    "factorial": {
+      "path": "data/results/phase4-memory-relay/factorial/result.json",
+      "status": "unavailable_cancelled_before_completion"
+    }
+  }
+}

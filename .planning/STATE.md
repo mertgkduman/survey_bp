@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 04
 current_phase_name: Memory Policies and Relay-BP
-current_plan: 13
-status: Plan 04-13 external_job_waiting; bounded evaluation/native/factorial child active
-stopped_at: "Plan 04-13 external_job_waiting: production child 3156090 in Slurm 55938300; Plan 04-14 awaits terminal evidence"
-last_updated: "2026-09-30T00:13:57.520Z"
+current_plan: 14
+status: Plan 04-14 pending availability-aware notebook and guide; comprehensive child cancelled
+stopped_at: "Plan 04-13 reconciled; Plan 04-14 remains before Phase 4 verification"
+last_updated: "2026-09-30T04:38:47Z"
 last_activity: 2026-09-30
-last_activity_desc: Plan 04-12 complete; Plan 04-13 production child 3156090 active under frozen caps; B1 tuned arms unavailable
+last_activity_desc: Cancelled comprehensive experiment reconciled; retained evidence inventory and Plan 04-13 complete
 state_head: 0de1e044878e7b7faa17ee83bb010984ce6ee638
 progress:
   total_phases: 14
   completed_phases: 3
   total_plans: 57
-  completed_plans: 55
+  completed_plans: 56
 ---
 
 # Project State
@@ -29,19 +29,19 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 ## Current Position
 
 Phase: 04 (Memory Policies and Relay-BP) — EXECUTING
-Plan: 13 of 15
+Plan: 14 of 15
 Total Phases: 14
-Current Plan: 13
+Current Plan: 14
 Total Plans in Phase: 15
-Status: Plan 04-13 external_job_waiting; bounded evaluation/native/factorial child active
+Status: Plan 04-14 pending availability-aware notebook and guide; comprehensive child cancelled
 Last activity: 2026-09-30
-Last Activity Description: Plan 04-12 complete; Plan 04-13 production child 3156090 active under frozen caps; B1 tuned arms unavailable
+Last Activity Description: Cancelled comprehensive experiment reconciled; retained evidence inventory and Plan 04-13 complete
 
-Progress: 55/57 current plans have summaries; Phase 4 is 13/15. Fresh phase verification is 1/14: Phase 3 passed; Phase 1/2 previously passed reports are now flagged stale. Three phases were previously recorded complete; this freshness audit does not erase their completed plans.
+Progress: 56/57 current plans have summaries; Phase 4 is 14/15. Fresh phase verification is 1/14: Phase 3 passed; Phase 1/2 previously passed reports are now flagged stale. Three phases were previously recorded complete; this freshness audit does not erase their completed plans.
 
 ## Performance Metrics
 
-- Total plans completed: 55
+- Total plans completed: 56
 - Average duration: N/A
 - Total execution time: 0 hours
 - Recent trend: Phase 1 completed 9 plans; Phase 2 completed 16 plans, including seven review-driven gap plans, and passed goal, code, security, and validation gates.
@@ -72,6 +72,7 @@ Progress: 55/57 current plans have summaries; Phase 4 is 13/15. Fresh phase veri
 | Phase 04 P10 | 58m | 2 tasks | 8 files |
 | Phase 04 P11 | 0 | 2 tasks | 73 files |
 | Phase 04 P12 | 4d | 2 tasks | 2 files |
+| Phase 04 P13 | 2026-09-30 | 2 tasks | 4 files |
 
 Phase 02 P10–P16 gap-closure metrics are recorded in their individual summaries.
 
@@ -143,7 +144,7 @@ None outside the roadmap.
 
 ### Blockers/Concerns
 
-- Current: Plan 04-12 is complete after an independent audit of all 5,824 calibration shots. B1 has no eligible tuned setting under the frozen cap; BB-144 and generated HGP selections are frozen. The isolated implementation is merged. Plan 04-13 is `external_job_waiting`: child PID 3156090 in Slurm allocation 55938300 is running eligible fresh evaluation, then exact-author native pairs and the gated factorial. Its manifest is `.planning/async-jobs/04-13-production-v1.json`. Plan 04-14 and phase verification await terminal evidence. The [29 September development update](../docs/development-update-20260929.md) is a historical snapshot. Entries below are historical checkpoints, not live progress.
+- Current: Plan 04-12 is complete after an independent audit of all 5,824 calibration shots. B1 has no eligible tuned setting under the frozen cap; BB-144 and generated HGP selections are frozen. On 2026-09-30 the user stopped the comprehensive Plan 04-13 child because the experiment size was premature. The child is terminal and its manifest disables automatic resume. The B1 baseline prefix has 159 completed and one interrupted receipt; complete fresh evaluation, native-pair and factorial results do not exist. Plan 04-13 is complete with a hashed retained-evidence inventory; Plan 04-14 requires an availability-aware notebook and guide, then Phase 4 verification. See the [cancellation record](phases/04-memory-policies-and-relay-bp/04-13-CANCELLATION-20260930.md). Entries below are historical checkpoints, not live progress.
 
 - New-chat progress audit: calibration running with 3,716/5,824 retained attempts (63.8%) at 2026-09-27T17:20:42.542Z. See `.planning/HANDOFF.json` for the measured snapshot and async resume context. Phase 1/2 verification reports are now flagged stale by GSD and need refreshing; Phase 3 remains passed. No completed plans were rerun or removed.
 - Phase 4 calibration remains `running` (PID 2702938); Plans 04-12/13/14 remain incomplete. Independent local PD-prime/momentum/affine execution, semantic failure-prefix traces, exact-byte terminal readers, immutable shot contexts and notebook views are verified in isolated source `62fe977`: 532 tests passed, one existing skip. Both notebooks execute all 14 cells without errors. The completed benchmark summary retains a real incomplete B1 p=.07 arm, so its rows remain explicitly unqualified. Fresh production evidence, retained histories/additional lifetimes, other local schedules, disordered local affine and Relay traces remain. Keep source changes separate from the live campaign. See [implementation continuation](phases/04-memory-policies-and-relay-bp/04-IMPLEMENTATION-CONTINUATION-20260927.md) and [coding handoff](phases/04-memory-policies-and-relay-bp/04-CODING-RESUME-HANDOFF.md).
@@ -170,18 +171,18 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 ## Deferred Items
 
-No requested decoding regime or named policy family is deferred beyond the first journal milestone.
+No requested decoding regime or named policy family is deferred beyond the first journal milestone. The cancelled comprehensive Phase 4 CSS evaluation/factorial is deferred from Phase 4; Phases 8–9 will scope any later CSS campaign afresh. Relay circuit-curve assessment remains in Phase 13.
 
 ## Session Continuity
 
-Last session: 2026-09-30T00:14:00Z
-Stopped at: Plan 04-13 external_job_waiting: production child 3156090 in Slurm 55938300; Plan 04-14 awaits terminal evidence
+Last session: 2026-09-30T04:38:47Z
+Stopped at: Plan 04-13 reconciled; Plan 04-14 remains before Phase 4 verification
 Resume file: .planning/phases/04-memory-policies-and-relay-bp/.continue-here.md
 Structured handoff: .planning/HANDOFF.json
-Next command: $gsd-execute-phase 4 after the 04-13 async job is terminal; reconcile its manifest and verify retained outputs before Plan 04-14
+Next command: $gsd-execute-phase 4 to execute revised Plan 04-14 and verify Phase 4 without restarting the cancelled campaign
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
 Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md`.
 Latest isolated terminal ledger audit: `gsd/phase4-memory-integration-20260926` at `263501e`, `.planning/phases/04-memory-policies-and-relay-bp/04-CALIBRATION-LEDGER-AUDIT-PREPARATION.md` in that branch.
 The September 26 development PDF remains a historical snapshot. The September 29 update records the terminal calibration. Phase 4
-completion and Phase 5 execution remain pending; no plan counts advanced.
+completion and Phase 5 execution remain pending; Plan 04-13 is complete under the revised scope; the comprehensive production campaign was cancelled by the user and is no longer a Phase 4 gate.

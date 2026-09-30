@@ -1,9 +1,15 @@
 # Phase 4 memory policies and Relay-BP
 
-Phase 4 is in progress. Its canonical memory correction, factorial preparation
-and notebook analysis live in the isolated memory-integration checkout while
-the main checkout runs its frozen Relay calibration. Do not interpret fixture
-outputs or notebook infrastructure as measured decoder performance.
+Phase 4 implementation and bounded evidence review are in progress. On 2026-09-30,
+the user stopped the comprehensive Phase 4 evaluation/factorial because its size
+was premature. Its B1 baseline receipt has 159 completed attempts and one
+interrupted attempt; no complete fresh evaluation, native-pair or factorial
+result exists. The old production sequence must not be resumed. Existing
+calibration, fixtures and independent pilots are retained with their original
+identities and assessment labels. See the
+[Phase 4 cancellation record](../.planning/phases/04-memory-policies-and-relay-bp/04-13-CANCELLATION-20260930.md).
+Do not interpret fixture outputs or notebook infrastructure as measured decoder
+performance.
 
 ## Equations, state and source identity
 
@@ -54,62 +60,29 @@ receive hidden physical truth.
 
 ## Bounded experimental workflow
 
-The frozen design and cap manifest are `data/evidence/phase4-pilot-design.json`
-and `data/manifests/phase4-pilot-caps.json`. Preserve these bytes and all
-superseded evidence. BB-144, reconciled B1 and generated HGP retain ordered
-artifact hashes; generated HGP is explicitly non-paper-exact. B1 uses the
-documented bounded three-leg work envelope. All campaigns retain finite
-configuration/shot/work/runtime limits and disjoint stage sample namespaces.
+The frozen historical design and cap manifest are
+`data/evidence/phase4-pilot-design.json` and
+`data/manifests/phase4-pilot-caps.json`. Preserve them and all retained evidence.
+The completed calibration audit covered 182 configurations and 5,824 shots.
+BB-144 and generated HGP selections were frozen; B1 selection was inconclusive
+under its cap and has no selected tuned arm. The interrupted Plan 04-13
+production child is recorded in `.planning/async-jobs/04-13-production-v1.json`.
+Its partial B1 baseline prefix is not a completed fresh evaluation cohort.
 
-1. Reconcile the running calibration using its existing async manifest. Never
-   relaunch a live PID or change its source/caps. Retain every coarse/refinement
-   attempt, Wilson uncertainty, work, failure and capped/inconclusive terminal.
-   While it runs, the isolated verifier can inspect an immutable snapshot of
-   the retained prefix without starting work or selecting a setting:
+Phase 4 completion now uses deterministic equation, state-lifetime, Relay
+transfer and ledger checks; existing bounded pilot/native diagnostics; and an
+evidence inventory that records exact identities, denominators, missing stages
+and source/adaptation labels. The notebook can inspect retained campaign data
+without starting simulation. Use fixture mode to exercise analysis plumbing.
+Do not invoke the old evaluation `--run`, `--run-native`, or factorial launch
+sequence to close Phase 4. The prior 448-shot evaluation and 14-arm factorial
+are historical plans, not current completion requirements.
 
-   ```bash
-   OMP_NUM_THREADS=1 PYTHONPATH=src .venv/bin/python scripts/verify_phase4_calibration.py --progress
-   ```
-
-   This checks the frozen cap/plan identity, observed configuration and shot
-   subsets, terminal receipts, sample identities, work, aggregates and charged
-   wall time. A current in-flight placeholder has no terminal verification;
-   its aggregate is not marked checked. The report's `selection_permitted` is
-   always false because public ledger replay remains a separate gate. Run the
-   same command without `--progress` only after the producer is terminal.
-2. From verified terminal calibration, freeze deterministic per-preset and
-   shared candidate settings. Apply the prespecified interval/work/lexicographic
-   tie rules; an insufficient-precision candidate remains inconclusive.
-   In the isolated continuation, `scripts/verify_phase4_calibration.py` checks
-   the complete planned configuration/shot population, deterministic physical
-   sample identities, work caps and reconstructed aggregates/accounting before
-   either legacy selection freezing or shared-view preparation. Its
-   `surface_integrity_only` result supplements the separate public verification
-   of every retained canonical terminal; it does not replay ledgers itself.
-3. Use `scripts/run_phase4_evaluation.py --prepare`, then its `--run` and
-   `--run-native` modes for fresh, matched observations under frozen caps. The
-   current V4 evaluation cap admits baseline plus two selected-preset arms.
-   Fresh shared-settings evaluation requires a versioned presampling cap
-   amendment; a retained shared candidate is not an evaluated arm.
-   The isolated `build_shared_evaluation_supplement(...)` API prepares a
-   separately identified finite contract for source/canonical kernels using
-   the same shared memory setting and matched evaluation namespace.
-   `build_shared_manifest(...)` permits manifest validation only. Neither API
-   publishes an amendment, reserves scheduler entitlement, or starts samples;
-   its explicit supplemental wall ceiling is preparation, not funded compute.
-4. Run the focused factorial only after its required predecessor evidence and
-   versioned execution supplement are verified. Preserve all 14 arms, three
-   regions and three codes; use the frozen per-code shot/work limits.
-5. Read producer-qualified notebook views from verified originating executions
-   and retain linked per-shot/trace evidence. The campaign readers reconstruct
-   planned populations, outcome classifications, work and matched cohorts;
-   missing, running or incompatible evidence keeps its original status. The
-   production calibration, fresh evaluation and factorial views fill when their
-   terminal evidence becomes available.
-
+Future CSS comparisons belong to a newly scoped Phase 8/9 campaign with its
+own scientific question, precision target, stopping rules and compute budget.
 The auxiliary lower-noise and exact-author agreement campaigns have separate
-designs, sample identities and outputs. Their terminal results do not substitute
-for fresh evaluation of calibration-selected settings.
+designs and sample identities; they do not substitute for the cancelled fresh
+evaluation of calibration-selected settings.
 
 ## Outcomes, work and tracing
 
@@ -201,6 +174,8 @@ statistical performance checks supplement independent algebra and policy checks.
 Quaternary decoding, circuit implementation, generic search and publication
 campaign assessment stay with their owning later phases.
 
-Plans 04-12, 04-13 and 04-14 cannot close until their production evidence and
-verification gates pass. The executed fixture notebook verifies its plumbing;
-its existence does not satisfy the complete Phase 4 notebook evidence contract.
+Plan 04-12 closed with terminal calibration evidence. Revised Plans 04-13/14
+close through cancellation reconciliation, retained-evidence verification, an
+availability-aware notebook and the Phase 4 mechanism/ledger gates. The
+cancelled fresh evaluation and factorial are not completion gates. A fixture
+notebook verifies analysis plumbing, not a statistical performance claim.

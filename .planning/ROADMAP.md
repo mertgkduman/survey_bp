@@ -244,10 +244,10 @@ Plans:
 1. Damping, mixing, momentum, iteration memory, and disordered memory each have a precise equation/procedure, application order, state lifetime, reset semantics, and deterministic verification fixtures.
 2. Relay-BP explicitly records leg/member identity, disordered-memory draws, transferred posterior state, scoped stopping, and selected solutions.
 3. A pinned original Relay-BP reference and canonical realization can run eligible pilot inputs with documented configuration translations, numerical differences, and native instrumentation limits.
-4. A researcher can isolate memory/relay effects in pilot ablations and recover all leg work from the ledger; an adaptation is clearly labeled when it differs from source experiment settings.
+4. A researcher can inspect memory/relay effects in deterministic fixtures and bounded retained pilots, recover leg work from their ledgers, and see missing or interrupted comparisons explicitly labeled. A comprehensive factorial is not a Phase 4 gate.
 
 **Research focus:** Exact mixing/memory definitions, source equations and code defaults, warm-state inheritance, and candidate stopping/selection.
-**Plans:** 13/15 plans executed ready to execute
+**Plans:** 14/15 plans executed
 
 Plans:
 **Wave 0**
@@ -298,16 +298,24 @@ Plans:
 
 **Wave 11** *(blocked on Wave 10 completion)*
 
-- [ ] 04-13-PLAN.md — Fresh evaluation, ablations, native diagnostics, and costs
+- [x] 04-13-PLAN.md — Reconcile cancelled production and qualify retained bounded evidence
 
 **Wave 12** *(blocked on Wave 11 completion)*
 
-- [ ] 04-14-PLAN.md — Executable notebook and evidence-backed research guide
+- [ ] 04-14-PLAN.md — Availability-aware notebook and evidence-backed research guide
 
 **Review update (2026-09-26):** [Current gate and implementation review](../docs/phase4-plan-review-and-next-design.md)
 records the isolated ordinary-memory correction, factorial order supplement,
 trace gaps and pending evidence. Earlier plan summaries do not close these
 follow-up gates. Phase 4 remains executing.
+
+**Scope update (2026-09-30):** The user stopped the comprehensive Plan 04-13
+experiment because its size was premature. The interrupted evaluation prefix
+is preserved; the fresh evaluation/native/factorial sequence will not be
+restarted to close Phase 4. Plans 04-13/14 now finish with retained evidence,
+deterministic checks and explicit missingness. Phase 5 can begin once these
+bounded Phase 4 verification and documentation gates pass. See the
+[cancellation record](phases/04-memory-policies-and-relay-bp/04-13-CANCELLATION-20260930.md).
 
 ### Phase 5: Guided and Perturbative BP Interventions
 
@@ -379,6 +387,7 @@ its requirements remain pending.
 5. Reports explicitly account for timeout, nonconvergence, partial runs and post-selection, including acceptance probability, conditional denominators, actual work, and environment/timing context.
 
 **Research focus:** Paper-specific precision and budgets, sequential inference, digitization, multiplicity, sample replay, durable shard protocol, and site execution limits.
+**Scope carry-forward:** Design future CSS campaigns from a newly prespecified question, precision target, stopping rule and measured budget. The cancelled Phase 4 grid is historical evidence, not a required or automatically funded Phase 8 run.
 **Plans:** TBD
 
 ### Phase 9: CSS Reproduction and Controlled Comparisons
@@ -395,6 +404,7 @@ its requirements remain pending.
 4. Generated results report outcome classes and aggregate denominators, convergence, iterations, work, runtime and resource context separately, without asserting superiority beyond the observed evidence.
 
 **Research focus:** Final CSS paper/code/rate grid, faithful parameter extraction, meaningful ablation design, precision/power, and cost calibration.
+**Scope carry-forward:** Reconsider memory/Relay comparisons alongside other CSS policies only after Phase 8 campaign rules are ready. Size a focused comparison from its scientific question and available compute; do not inherit the cancelled Phase 4 448-shot/14-arm grid by default.
 **Plans:** TBD
 
 ### Phase 10: Correlated Quaternary Execution
@@ -487,7 +497,7 @@ its requirements remain pending.
 | 1. Evidence Registry and Native CSS Baseline | 9/9 | Complete    | 2026-09-22 |
 | 2. Canonical CSS Execution and Policy Contracts | 16/16 | Complete    | 2026-09-23 |
 | 3. Update Rules and Scheduling | 17/17 | Complete    | 2026-09-24 |
-| 4. Memory Policies and Relay-BP | 13/15 | In Progress|  |
+| 4. Memory Policies and Relay-BP | 14/15 | In Progress|  |
 | 5. Guided and Perturbative BP Interventions | 0/TBD | Not started | - |
 | 6. Beam Search, Ensembles, and Candidate Selection | 0/TBD | Not started | - |
 | 7. Optional Postprocessing | 0/TBD | Not started | - |

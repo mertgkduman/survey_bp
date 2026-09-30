@@ -1,14 +1,14 @@
 {
   "version": "1.0",
-  "timestamp": "2026-09-30T00:15:10Z",
+  "timestamp": "2026-09-30T04:38:47Z",
   "phase": "04",
   "phase_name": "Memory Policies and Relay-BP",
   "phase_dir": ".planning/phases/04-memory-policies-and-relay-bp",
-  "plan": 13,
+  "plan": 14,
   "task": 1,
   "total_tasks": 2,
-  "status": "external_job_waiting",
-  "pause_scope": "Plan 04-13 production campaign running; no user approval pending",
+  "status": "plan_04_14_ready",
+  "pause_scope": "Cancelled campaign reconciled; availability-aware Phase 4 notebook/guide pending.",
   "completed_tasks": [
     {
       "id": "04-01..04-12,04-15",
@@ -26,18 +26,19 @@
       "name": "B1 predecessor gate, durable factorial receipts, and one-worker launch",
       "status": "done",
       "commit": "0de1e04"
+    },
+    {
+      "id": "04-13",
+      "name": "Reconciled cancelled campaign and qualified retained evidence",
+      "status": "done",
+      "summary": ".planning/phases/04-memory-policies-and-relay-bp/04-13-SUMMARY.md"
     }
   ],
   "remaining_tasks": [
     {
-      "id": "04-13",
-      "name": "Verify terminal fresh evaluation, exact-author pairs, factorial, and trace evidence; complete SUMMARY",
-      "status": "external_job_waiting"
-    },
-    {
       "id": "04-14",
-      "name": "Populate production notebook/documentation and complete phase gates",
-      "status": "blocked_by_04-13"
+      "name": "Finish availability-aware notebook and public guide over retained evidence",
+      "status": "ready"
     },
     {
       "id": "prior-verification-refresh",
@@ -47,19 +48,14 @@
   ],
   "blockers": [
     {
-      "description": "Plan 04-13 production child remains live",
-      "type": "external",
-      "workaround": "Inspect manifest, PID, allocation and producer progress; never duplicate-launch an active job."
+      "description": "B1 had no eligible tuned selection under the frozen calibration cap",
+      "type": "scientific",
+      "workaround": "Retain inconclusive selection and unavailable selected arms."
     },
     {
-      "description": "B1 has no eligible tuned selection under the frozen calibration cap",
-      "type": "scientific",
-      "workaround": "Retain unavailable selected arms and all inconclusive evidence; do not manufacture a winner."
-    },
-    {
-      "description": "Shared-settings evaluation lacks a published presampling supplement/entitlement",
-      "type": "scientific",
-      "workaround": "Keep it prepared-only until a separately versioned finite contract is qualified."
+      "description": "Fresh evaluation/native/factorial results were not completed before user cancellation",
+      "type": "scope",
+      "workaround": "Report their status and partial receipts; Phase 4 completion no longer depends on the comprehensive campaign."
     }
   ],
   "async_jobs": [
@@ -69,7 +65,7 @@
       "phase": "04",
       "job_id": "55938300:3156090",
       "backend": "slurm-allocation-child",
-      "status": "running",
+      "status": "cancelled",
       "submit_command": "setsid bash .planning/async-jobs/04-13-production-v1.launch.sh >> data/results/phase4-memory-relay/04-13-production-v1.stdout.log 2>&1 < /dev/null &",
       "expected_artifacts": [
         "data/results/phase4-memory-relay/evaluation/result.json",
@@ -78,7 +74,7 @@
         "data/results/phase4-memory-relay/04-13-production-v1.stdout.log"
       ],
       "verification_command": "OMP_NUM_THREADS=1 .venv/bin/python -c \"import json; from pathlib import Path; e=json.loads(Path('data/results/phase4-memory-relay/evaluation/result.json').read_text()); f=json.loads(Path('data/results/phase4-memory-relay/factorial/result.json').read_text()); assert e['status']=='completed_with_inconclusive_selection'; assert f['predecessor']['sha256']; print(e['status'], f['status'], f['factorial_digest'])\"",
-      "resume_command": "if test -f data/results/phase4-memory-relay/factorial/result.json; then exit 0; fi; if test -r /proc/3156090/cmdline && tr '\\0' ' ' < /proc/3156090/cmdline | grep -Fq -- '04-13-production-v1.launch.sh'; then exit 0; fi; setsid bash .planning/async-jobs/04-13-production-v1.launch.sh >> data/results/phase4-memory-relay/04-13-production-v1.stdout.log 2>&1 < /dev/null &",
+      "resume_command": "printf \"Phase 4 comprehensive campaign cancelled by user; see 04-13 cancellation record.\\n\" >&2; exit 1",
       "submitted_at": "2026-09-30T00:11:11Z",
       "source_commit": "2b9b0b3911ec7d6a65abb8d50a925f3dd2393b3e",
       "frozen_inputs": {
@@ -96,7 +92,27 @@
         "b1_selected_arms": "unavailable_inconclusive_selection; never sample or report a selected B1 arm",
         "shared_settings": "not admitted without a versioned presampling supplemental contract and finite entitlement"
       },
-      "terminal_details": null,
+      "terminal_details": {
+        "at": "2026-09-30T04:38:47Z",
+        "reason": "User stopped comprehensive Phase 4 experiment; experiment size was premature.",
+        "signal": "SIGTERM to process group 3156090",
+        "child_process_group": 3156090,
+        "shared_slurm_allocation": "55938300 (left running; unrelated work may share allocation)",
+        "retained_attempts_path": "data/results/phase4-memory-relay/evaluation/b1-ghp-882/baseline/attempts.json",
+        "retained_attempt_status_counts": {
+          "completed": 159,
+          "incomplete_interrupted": 1
+        },
+        "retained_attempts_sha256": "eae6f33f402dff75673148eb486b9278a289445f9c929b34dc788a2debe77ebe",
+        "missing_expected_results": [
+          "data/results/phase4-memory-relay/evaluation/result.json",
+          "data/results/phase4-memory-relay/evaluation/native-pairs/result.json",
+          "data/results/phase4-memory-relay/factorial/result.json"
+        ],
+        "previous_resume_command": "if test -f data/results/phase4-memory-relay/factorial/result.json; then exit 0; fi; if test -r /proc/3156090/cmdline && tr '\\0' ' ' < /proc/3156090/cmdline | grep -Fq -- '04-13-production-v1.launch.sh'; then exit 0; fi; setsid bash .planning/async-jobs/04-13-production-v1.launch.sh >> data/results/phase4-memory-relay/04-13-production-v1.stdout.log 2>&1 < /dev/null &",
+        "automatic_resume_disabled": true,
+        "note": "Retained partial attempts are not a completed evaluation or statistical assessment."
+      },
       "manifest": ".planning/async-jobs/04-13-production-v1.json"
     }
   ],
@@ -104,9 +120,9 @@
     "phase_01": "stale (previously passed)",
     "phase_02": "stale (previously passed)",
     "phase_03": "passed",
-    "phase_04": "missing; Plan 04-13/14 incomplete"
+    "phase_04": "pending; Plan 04-14 incomplete"
   },
   "model_config_note": "Use saved Codex role models/efforts; do not automatically select Astra.",
-  "next_action": "After 04-13 terminal exit, run $gsd-execute-phase 4 to reconcile and verify retained outputs, complete 04-13, then execute 04-14 and phase gates.",
-  "context_notes": "Phase 4 is 13/15. Calibration terminal audit passed 182/182 configurations and 5824/5824 shots. B1 selection is inconclusive. Source integration merged at d563d8d. Child PID 3156090 in Slurm 55938300 runs eligible evaluation then exact-author v0.2.2 pairs and gated factorial. No Plan 04-13 SUMMARY or phase verification is yet valid."
+  "next_action": "Execute revised Plan 04-14 and Phase 4 verification without restarting the cancelled campaign; then proceed to Phase 5.",
+  "context_notes": "Phase 4 is 14/15. Calibration audit passed 5824/5824 shots; B1 selection is inconclusive. The comprehensive Plan 04-13 child was cancelled at 159 completed and 1 interrupted B1 baseline attempts. No complete evaluation, native pair, or factorial result exists. The large experiment is deferred to later campaign planning, not a Phase 4 gate. Plan 04-13 cancellation reconciliation and retained inventory complete."
 }
