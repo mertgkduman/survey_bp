@@ -21,7 +21,8 @@ from .canonical.cluster_schedule import ClusterArtifactQualification, ClusterArt
 from .canonical.compatibility import validate_memory_compatibility
 from .canonical.contracts import (
     CanonicalCompositionSpec, CanonicalCompositionSpecV3, CanonicalManifestV2,
-    MemoryCompositionSpec, RelaySpecV4, parse_canonical_manifest,
+    CanonicalCompositionSpecV6, MemoryCompositionSpec, Phase5InterventionContract,
+    RelaySpecV4, parse_canonical_manifest, validate_composition,
 )
 from .css import CssCode, fixture_code
 
@@ -416,7 +417,72 @@ class CanonicalExperimentV4(CanonicalExperimentV3):
         return self
 
 
-ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4
+class Phase5ExecutionLimits(StrictModel):
+    """Finite controls for every Phase 5 work category and observation scope."""
+
+    max_total_attempts: int = Field(ge=1, le=1_000_000)
+    max_total_actions: int = Field(ge=1, le=1_000_000)
+    max_runtime_seconds: float = Field(gt=0.0, le=86_400.0)
+    max_trace_records: int = Field(ge=0, le=1_000_000)
+    max_trace_bytes: int = Field(ge=0, le=64 * 1024 * 1024)
+    work_caps: dict[str, int]
+
+    @model_validator(mode="after")
+    def all_work_caps_are_explicit(self) -> "Phase5ExecutionLimits":
+        names = set(WorkVector.zero().as_evidence(structural_event_version=4))
+        if set(self.work_caps) != names or any(type(value) is not int or not 0 <= value <= 10**12 for value in self.work_caps.values()):
+            raise ValueError("Phase 5 work caps must name every bounded WorkVector resource")
+        if not math.isfinite(self.max_runtime_seconds):
+            raise ValueError("Phase 5 runtime cap must be finite")
+        return self
+
+
+class CanonicalExperimentV5(CanonicalExperimentV4):
+    """Complete public V4 evidence contract with one Phase 5 intervention."""
+
+    schema_version: Literal[5]
+    policies: CanonicalCompositionSpecV6
+    memory: None = None
+    relay: None = None
+    intervention: Phase5InterventionContract
+    intervention_limits: Phase5ExecutionLimits
+
+    @model_validator(mode="after")
+    def intervention_is_compatible_before_artifacts(self) -> "CanonicalExperimentV5":
+        if self.policies.intervention.kind != self.intervention.kind:
+            raise ValueError("public intervention policy and control kind disagree")
+        if self.policies.schedule.kind != "flooding" or self.policies.state_memory.kind != "identity":
+            raise ValueError("Phase 5 public intervention requires flooding and identity state memory")
+        expected_update = "normalized_min_sum" if self.intervention.kind == "sign_flip" else "binary_spa"
+        expected_profile = "cpu-float64-min-sum-v1" if expected_update == "normalized_min_sum" else "cpu-float64-spa-v1"
+        if self.policies.update.kind != expected_update or self.numerical_profile != expected_profile:
+            raise ValueError("public intervention update and numerical profile are incompatible")
+        if self.intervention.kind == "sign_flip":
+            assignment = self.policies.update.parameter_assignment
+            if assignment is None or assignment.shape != "scalar" or assignment.value != self.intervention.alpha:
+                raise ValueError("sign-flip normalized-min-sum assignment must equal the declared alpha")
+        if self.intervention.kind == "restart_belief" and self.intervention.code_id != self.artifact.code_id:
+            raise ValueError("restart code identity must match the artifact")
+        if self.intervention.kind == "restart_belief" and self.artifact.code_id == "b1-ghp-882":
+            if self.artifact.raw_sha256 != "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6":
+                raise ValueError("B1 restart adaptation requires the pinned artifact identity")
+        if self.intervention.kind == "restart_belief" and self.evidence.relation != "pilot_adaptation":
+            raise ValueError("B1 restart mechanism requires pilot_adaptation evidence")
+        if self.intervention.kind != "restart_belief" and self.evidence.relation != "canonical_implemented":
+            raise ValueError("Phase 5 controlled development arms require canonical_implemented evidence")
+        for name in ("sweeps_per_round", "baseline_sweeps", "attempt_sweeps", "period_sweeps", "lifetime_sweeps", "trunk_sweeps", "continuation_sweeps", "root_sweeps", "residual_sweeps"):
+            value = getattr(self.intervention, name)
+            if value is not None and value > self.budgets.attempt.max_iterations:
+                raise ValueError(f"{name} exceeds public per-attempt iteration cap")
+        if self.trace_plan.max_records > self.intervention_limits.max_trace_records or self.trace_plan.max_bytes > self.intervention_limits.max_trace_bytes:
+            raise ValueError("trace plan exceeds Phase 5 trace caps")
+        inherited = self.budgets.attempt.work_limits.as_evidence()
+        if any(self.intervention_limits.work_caps[name] != amount for name, amount in inherited.items()):
+            raise ValueError("Phase 5 caps for historical work fields must equal public attempt limits")
+        return self
+
+
+ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5
 
 
 _EXECUTABLE_BASELINE_KINDS = {
@@ -505,11 +571,13 @@ def _read_value(value: dict[str, Any] | str | Path) -> dict[str, Any]:
     return decoded
 
 
-def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | dict[str, Any] | str | Path) -> ManifestV1 | CanonicalManifestV2 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4:
+def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | dict[str, Any] | str | Path) -> ManifestV1 | CanonicalManifestV2 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5:
     """Dispatch complete native and canonical schemas without changing v1 meanings."""
-    if isinstance(value, (ManifestV1, CanonicalManifestV2, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4)):
+    if isinstance(value, (ManifestV1, CanonicalManifestV2, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5)):
         return value
     decoded = _read_value(value)
+    if decoded.get("schema_version") == 5:
+        return CanonicalExperimentV5.model_validate(decoded)
     if decoded.get("schema_version") == 4:
         return CanonicalExperimentV4.model_validate(decoded)
     if decoded.get("schema_version") == 3:
@@ -522,9 +590,11 @@ def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | CanonicalExperiment
 
 
 def _parse_for_preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ManifestRecord:
-    if isinstance(value, (ManifestV1, LegacyManifestV1, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4)):
+    if isinstance(value, (ManifestV1, LegacyManifestV1, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5)):
         return value
     decoded = _read_value(value)
+    if decoded.get("schema_version") == 5:
+        return CanonicalExperimentV5.model_validate(decoded)
     if decoded.get("schema_version") == 4:
         return CanonicalExperimentV4.model_validate(decoded)
     if decoded.get("schema_version") == 3:
@@ -639,6 +709,31 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
         # Original minimal v1 tracer records are immutable historical evidence.
         # They are retained for replay only; new records must use ManifestV1.
         return ResolvedExperiment(manifest=manifest, code=fixture_code(), artifact=None)
+    if isinstance(manifest, CanonicalExperimentV5):
+        # All source/operator/kernel/cap checks above run during strict model
+        # validation, before this branch can open an artifact or sample.
+        _verify_canonical_environment(manifest.environment)
+        validate_composition(manifest.policies)
+        if manifest.profile_plan.level != "low_overhead" or manifest.profile_plan.cohort != "clean":
+            raise ValueError("Phase 5 public profiling requires a clean low_overhead cohort")
+        if manifest.trace_plan.level != "off":
+            raise ValueError("Phase 5 semantic trace sidecars are not admitted by this public contract")
+        artifact = load_artifact(
+            manifest.artifact.root, manifest.artifact.path,
+            expected_raw_sha256=manifest.artifact.raw_sha256,
+            expected_semantic_sha256=manifest.artifact.semantic_sha256,
+        )
+        if artifact.format_version != manifest.artifact.format_version:
+            raise ValueError("Phase 5 artifact format version disagrees with the manifest")
+        code = artifact.code.validate()
+        hashes = matrix_hashes(code)
+        for name, expected in manifest.artifact.matrix_hashes.model_dump().items():
+            if hashes[name] != expected:
+                raise ValueError("Phase 5 matrix identity does not match the artifact")
+        if manifest.intervention.kind == "restart_belief" and manifest.artifact.code_id == "b1-ghp-882":
+            if code.hz.shape != (441, 882) or code.hx.shape != (441, 882):
+                raise ValueError("B1 restart artifact dimensions are not source compatible")
+        return ResolvedExperiment(manifest=manifest, code=code, artifact=artifact)
     if isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3)):
         _verify_canonical_environment(manifest.environment)
         if manifest.trace_plan.level != "off":

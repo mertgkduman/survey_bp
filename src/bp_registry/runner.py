@@ -17,10 +17,12 @@ from .canonical.execution import run_canonical_structural_shot
 from .canonical.verification import PublicShotContext
 from .canonical.numerics import MIN_SUM_CPU_F64, REFERENCE_CPU_F64
 from .canonical.schedules import EdgeTable
+from .canonical.contracts import validate_composition
 from .manifests import (
     CanonicalExperimentV2,
     CanonicalExperimentV3,
     CanonicalExperimentV4,
+    CanonicalExperimentV5,
     ManifestV1,
     executable_canonical_policy_effects,
     manifest_digest,
@@ -125,9 +127,9 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
     """Resolve all canonical external facts before sampling or durable evidence."""
     resolved = preflight(manifest_path)
     manifest = resolved.manifest
-    if not isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4)):
-        raise ValueError("canonical execution requires a strict CanonicalExperimentV2, V3, or V4 manifest")
-    composition = validate_executable_canonical_baseline(manifest.policies)
+    if not isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5)):
+        raise ValueError("canonical execution requires a strict public canonical manifest")
+    composition = validate_composition(manifest.policies) if isinstance(manifest, CanonicalExperimentV5) else validate_executable_canonical_baseline(manifest.policies)
     report = {
         "run_id": manifest.run_id,
         "code_id": manifest.artifact.code_id,
@@ -149,7 +151,14 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
         "profile_plan": manifest.profile_plan.model_dump(mode="json"),
         "trace_plan": manifest.trace_plan.model_dump(mode="json"),
     }
-    if isinstance(manifest, CanonicalExperimentV4):
+    if isinstance(manifest, CanonicalExperimentV5):
+        report["intervention"] = {
+            "specification": manifest.intervention.model_dump(mode="json", exclude_none=True),
+            "limits": manifest.intervention_limits.model_dump(mode="json"),
+            "compact_contract_version": 6,
+            "ledger_version": 5,
+        }
+    elif isinstance(manifest, CanonicalExperimentV4):
         report["memory"] = {
             "bindings": [binding.model_dump(mode="json") for binding in manifest.memory.bindings],
             "compatibility": {"admitted": True, "reason": None},
@@ -204,8 +213,18 @@ def _without_none(value: object) -> object:
     return value
 
 
-def _canonical_kernel_manifest(manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4) -> dict[str, object]:
+def _canonical_kernel_manifest(manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5) -> dict[str, object]:
     """Project-owned kernel receives only its compact execution policy contract."""
+    if isinstance(manifest, CanonicalExperimentV5):
+        return {
+            "schema_version": 6,
+            "run_id": manifest.run_id,
+            "numerical_profile": manifest.numerical_profile,
+            "max_iterations": manifest.budgets.attempt.max_iterations,
+            "error_rate": manifest.error_rate,
+            "policies": _without_none(manifest.policies.model_dump(mode="json")),
+            "intervention": manifest.intervention.model_dump(mode="json", exclude_none=True),
+        }
     compact: dict[str, object] = {
         "schema_version": 3 if isinstance(manifest, CanonicalExperimentV4) else manifest.schema_version,
         "run_id": manifest.run_id,
@@ -241,9 +260,18 @@ def _canonical_kernel_manifest(manifest: CanonicalExperimentV2 | CanonicalExperi
     return compact
 
 
-def _canonical_policy_effects(manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4, code) -> dict[str, dict[str, Any]]:
+def _canonical_policy_effects(manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5, code) -> dict[str, dict[str, Any]]:
     """Bind declared NMS assignments to the code's canonical edge identities once."""
-    effects: dict[str, dict[str, Any]] = executable_canonical_policy_effects(manifest.policies)
+    if isinstance(manifest, CanonicalExperimentV5):
+        effects: dict[str, dict[str, Any]] = {
+            binding.role.value: {
+                "binding_id": binding.binding_id,
+                "effect": "active" if binding.role.value in {"update", "schedule", "intervention", "stopping", "selection"} else "identity_only",
+            }
+            for binding in validate_composition(manifest.policies).bindings
+        }
+    else:
+        effects = executable_canonical_policy_effects(manifest.policies)
     assignment = getattr(manifest.policies.update, "parameter_assignment", None)
     generation = None
     if assignment is None and isinstance(manifest, CanonicalExperimentV3) and manifest.policies.update.parameter_generator is not None:
