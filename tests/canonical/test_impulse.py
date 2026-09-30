@@ -9,6 +9,133 @@ import numpy as np
 import pytest
 
 
+def _impulse_spec(**overrides):
+    return {
+        "realization": "exact_shortening", "selection": "minimum_original_weight",
+        "baseline_sweeps": 1, "attempt_sweeps": 1, "attempt_cap": 2,
+        **overrides,
+    }
+
+
+def test_baseline_success_has_no_impulse_attempts():
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.impulse import ImpulseController
+
+    original = _original([[1]], [0])
+    result = ImpulseController(_impulse_spec()).run(original, error_rate=0.1, budgets=BudgetTree(limits=(), parents={}))
+    assert result.termination == "baseline_valid"
+    assert result.selected_candidate == (0,)
+    assert result.attempts == ()
+    assert result.work.transformations == 0
+
+
+def test_trigger_fresh_shortening_contradiction_and_cap():
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.impulse import ImpulseController
+
+    original = _original([[1, 1], [1, 1]], [0, 1])
+    result = ImpulseController(_impulse_spec()).run(original, error_rate=0.1, budgets=BudgetTree(limits=(), parents={}))
+    assert result.baseline_diagnostic_candidate is not None
+    assert result.termination == "no_proposal"
+    assert tuple(row.target_index for row in result.attempts) == (0, 1)
+    assert len({row.session_owner for row in result.attempts}) == 2
+    assert all(row.initial_iteration == 0 for row in result.attempts)
+    assert all(row.realization == "exact_shortening" for row in result.attempts)
+    assert all(not row.original_valid for row in result.attempts)
+    assert result.work.transformations == 2
+
+
+def test_source_semantic_forced_one_keeps_graph_and_json_finite():
+    import json
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.impulse import ImpulseController
+
+    original = _original([[1, 1], [1, 1]], [0, 1])
+    spec = _impulse_spec(realization="semantic_forced_one", attempt_cap=1)
+    result = ImpulseController(spec).run(original, error_rate=0.1, budgets=BudgetTree(limits=(), parents={}))
+    assert result.attempts[0].graph_identity == result.baseline_graph_identity
+    assert result.attempts[0].forced_value == 1
+    assert result.attempts[0].source_operator == "negative_infinite_llr"
+    assert result.attempts[0].qualification == "source_operator_semantic_adaptation"
+    assert "Infinity" not in json.dumps(result.as_evidence(), allow_nan=False)
+
+
+def test_impulse_replay_rejects_changed_branch_and_work():
+    from dataclasses import replace
+    from bp_registry.canonical.budgets import BudgetTree, WorkVector
+    from bp_registry.canonical.impulse import ImpulseController, reconstruct_impulse_result
+
+    original = _original([[1, 1], [1, 1]], [0, 1])
+    spec = _impulse_spec()
+    result = ImpulseController(spec).run(original, error_rate=0.1, budgets=BudgetTree(limits=(), parents={}))
+    reconstruct_impulse_result(spec, original, 0.1, result)
+    altered = replace(result.attempts[0], target_index=1)
+    with pytest.raises(ValueError, match="replay"):
+        reconstruct_impulse_result(spec, original, 0.1, replace(result, attempts=(altered, *result.attempts[1:])))
+    with pytest.raises(ValueError, match="replay"):
+        reconstruct_impulse_result(spec, original, 0.1, replace(result, work=result.work + WorkVector(bp_calls=1)))
+
+
+def test_minimum_weight_and_first_convergence_are_stable_under_worker_order():
+    from dataclasses import replace
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.impulse import ImpulseController, select_impulse_candidate
+
+    original = _original([[1, 1, 0], [0, 1, 1]], [1, 0])
+    impossible = _original([[1, 1, 1], [1, 1, 1]], [0, 1])
+    result = ImpulseController(_impulse_spec()).run(impossible, error_rate=0.1, budgets=BudgetTree(limits=(), parents={}))
+    heavier = replace(result.attempts[0], order=0, target_index=0, lifted_candidate=(0, 1, 1), original_valid=True)
+    lighter = replace(result.attempts[1], order=1, target_index=1, lifted_candidate=(1, 0, 0), original_valid=True)
+    for rows in ((heavier, lighter), (lighter, heavier)):
+        assert select_impulse_candidate(rows, original, mode="minimum_original_weight") == lighter
+        assert select_impulse_candidate(rows, original, mode="first_convergence") == heavier
+    forged = replace(lighter, lifted_candidate=(0, 0, 0))
+    assert select_impulse_candidate((forged,), original, mode="minimum_original_weight") is None
+
+
+def test_attempt_cap_and_budget_denial_keep_unique_committed_work():
+    from bp_registry.canonical.budgets import BudgetLimit, BudgetTree
+    from bp_registry.canonical.impulse import ImpulseController
+
+    original = _original([[1, 1, 1], [1, 1, 1]], [0, 1])
+    capped = ImpulseController(_impulse_spec(attempt_cap=1)).run(
+        original, error_rate=0.1, budgets=BudgetTree(limits=(), parents={}),
+    )
+    assert capped.termination == "attempt_cap_reached"
+    assert len(capped.attempts) == 1
+    assert len({row[0] for row in capped.leaves}) == len(capped.leaves)
+    denied_budget = BudgetTree(limits=[BudgetLimit("attempt", "intervention_actions", 0)], parents={})
+    denied = ImpulseController(_impulse_spec()).run(original, error_rate=0.1, budgets=denied_budget)
+    assert denied.termination == "count_budget_exhausted"
+    assert len(denied.attempts) == 1
+    assert denied.attempts[0].action_leaf is None
+    assert denied.work.intervention_actions == 0
+    assert denied.work == denied_budget.summary("attempt")
+
+
+def test_first_convergence_stops_at_first_declared_valid_attempt():
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.impulse import ImpulseController
+
+    original = _original(
+        [[1, 1, 1, 1, 1], [0, 1, 0, 1, 1], [1, 0, 0, 1, 1]],
+        [0, 0, 1],
+    )
+    first = ImpulseController(_impulse_spec(
+        selection="first_convergence", attempt_sweeps=5, attempt_cap=5,
+    )).run(original, error_rate=0.1, budgets=BudgetTree(limits=(), parents={}))
+    minimum = ImpulseController(_impulse_spec(
+        selection="minimum_original_weight", attempt_sweeps=5, attempt_cap=5,
+    )).run(original, error_rate=0.1, budgets=BudgetTree(limits=(), parents={}))
+    assert first.termination == "impulse_valid"
+    assert first.selected_origin == 0
+    assert len(first.attempts) == 1
+    assert minimum.termination == "impulse_valid"
+    assert len(minimum.attempts) == 5
+    assert minimum.work.bp_calls > first.work.bp_calls
+    assert np.array_equal((original.hz @ first.selected_candidate) % 2, original.syndrome)
+
+
 def _original(h, s):
     from bp_registry.canonical.problems import OriginalProblem
 
