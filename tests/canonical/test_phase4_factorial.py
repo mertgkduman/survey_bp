@@ -246,3 +246,102 @@ def test_public_executor_uses_one_decreasing_cell_deadline_and_category_residual
     assert result["runtime_seconds"] == 1.0
     assert result["public_boundary"]["cell_deadline_seconds"] == 1
     assert result["public_boundary"]["category_remaining_at_start_seconds"] == 1
+
+
+def test_factorial_predecessor_allows_only_verified_unavailable_b1_selection(tmp_path, monkeypatch):
+    """Frozen factorial controls do not need a B1 winner that calibration lacks."""
+    runner = _module()
+    design, caps, supplement = _inputs()
+    plan = runner.build_factorial_plan(design=design, caps=caps, supplement=supplement)
+    selection_digest = "b" * 64
+    evaluation_digest = "a" * 64
+    expected_cells = []
+    report_codes = {}
+    for code_id in sorted({cell["code_id"] for cell in plan["cells"]}):
+        unavailable = code_id == "b1-ghp-882"
+        expected_cells.extend([
+            {"code_id": code_id, "arm": "baseline", "status": "ready"},
+            {"code_id": code_id, "arm": "selected_source_procedure",
+             "status": "unavailable_inconclusive_selection" if unavailable else "ready"},
+            {"code_id": code_id, "arm": "selected_canonical_procedure",
+             "status": "unavailable_inconclusive_selection" if unavailable else "ready"},
+        ])
+        report_codes[code_id] = {
+            "baseline": {"status": "completed"},
+            "selected_source_procedure": {"status": "unavailable_inconclusive_selection" if unavailable else "completed"},
+            "selected_canonical_procedure": {"status": "unavailable_inconclusive_selection" if unavailable else "completed"},
+        }
+    monkeypatch.setattr(runner, "_expected_evaluation_provenance", lambda _root: {
+        "plan_digest": evaluation_digest,
+        "selected_settings_digest": selection_digest,
+        "arms": ("baseline", "selected_source_procedure", "selected_canonical_procedure"),
+        "cells": expected_cells,
+    })
+    path = tmp_path / "evaluation.json"
+    path.write_text(json.dumps({
+        "status": "completed_with_inconclusive_selection",
+        "caps_digest": plan["input_digests"]["caps_digest"],
+        "plan_digest": evaluation_digest,
+        "selected_settings_digest": selection_digest,
+        "codes": report_codes,
+    }), encoding="utf-8")
+
+    gate = runner.assert_factorial_predecessor(evaluation_path=path, plan=plan)
+
+    assert gate["unavailable_selection_arms"] == [
+        "b1-ghp-882/selected_canonical_procedure",
+        "b1-ghp-882/selected_source_procedure",
+    ]
+    assert gate["assessment"] == "not_assessed"
+
+    report_codes["b1-ghp-882"]["selected_source_procedure"] = {"status": "completed"}
+    path.write_text(json.dumps({
+        "status": "completed_with_inconclusive_selection",
+        "caps_digest": plan["input_digests"]["caps_digest"],
+        "plan_digest": evaluation_digest,
+        "selected_settings_digest": selection_digest,
+        "codes": report_codes,
+    }), encoding="utf-8")
+    with pytest.raises(ValueError, match="unavailable selection"):
+        runner.assert_factorial_predecessor(evaluation_path=path, plan=plan)
+
+
+def test_factorial_progress_receipt_prevents_duplicate_launch_after_interruption(tmp_path):
+    """A persisted in-progress cell is retained as inconclusive, never relaunched."""
+    runner = _module()
+    design, caps, supplement = _inputs()
+    plan = runner.build_factorial_plan(design=design, caps=caps, supplement=supplement)
+    fixture = tmp_path / "evaluation.json"
+    fixture.write_text(json.dumps(runner.development_fixture_evaluation(plan)), encoding="utf-8")
+    output = tmp_path / "factorial"
+    calls: list[str] = []
+
+    def interrupted(cell):
+        calls.append(cell["cell_id"])
+        if len(calls) == 2:
+            raise KeyboardInterrupt
+        return {"cell_id": cell["cell_id"], "sample_namespace": cell["factorial_namespace"],
+                "sample_identity": cell["physical_sample_identity"], "execution_status": "completed",
+                "terminal": True, "diagnostic_cell": "valid_correct", "selected": True,
+                "raw_work": {}, "runtime_seconds": 0.0, "resource": {"maxrss_kib": None},
+                "trace": {"status": "not_collected"}}
+
+    with pytest.raises(KeyboardInterrupt):
+        runner.run_factorial(evaluation_path=fixture, plan=plan, executor=interrupted,
+                             allow_development_fixture=True, output_root=output)
+    progress = json.loads((output / "progress.json").read_text(encoding="utf-8"))
+    assert progress["rows"][calls[1]]["execution_status"] == "in_progress"
+
+    resumed_calls: list[str] = []
+    report = runner.run_factorial(
+        evaluation_path=fixture, plan=plan, allow_development_fixture=True, output_root=output,
+        executor=lambda cell: resumed_calls.append(cell["cell_id"]) or {
+            "cell_id": cell["cell_id"], "sample_namespace": cell["factorial_namespace"],
+            "sample_identity": cell["physical_sample_identity"], "execution_status": "completed",
+            "terminal": True, "diagnostic_cell": "valid_correct", "selected": True,
+            "raw_work": {}, "runtime_seconds": 0.0, "resource": {"maxrss_kib": None},
+            "trace": {"status": "not_collected"},
+        })
+    interrupted_row = next(row for row in report["terminals"] if row["cell_id"] == calls[1])
+    assert interrupted_row["execution_status"] == "incomplete_interrupted_unreconciled"
+    assert calls[1] not in resumed_calls
