@@ -2,18 +2,18 @@
   "assessment_status": "not_assessed",
   "denominators": {
     "all_terminal_shots": 4,
-    "outcome_unavailable": 1,
-    "stabilizer_equivalent": 3
+    "outcome_unavailable": 2,
+    "stabilizer_equivalent": 2
   },
   "final_row_count": 4,
   "fixture": "pilot_adaptation",
   "ledger_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-calibration/restart_belief/events.jsonl",
-  "ledger_sha256": "ea3b5f2f15a9459504ae83d1036aedd22750d65e2eed816967b8184a52f728b5",
+  "ledger_sha256": "ff66a6d5e368089f2ae5294101d81e09d130b405b627b015a99c18cd5b661538",
   "manifest_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-calibration/restart_belief/manifest.json",
-  "manifest_sha256": "5d5328969ea1a75ec14e4397b5ddbd1a8d8fbdf7404eae720bf116b147e5717a",
+  "manifest_sha256": "596e45dc8bb536c0070f380b5697d5381720acd6f10ee6f28233dc418be86607",
   "policy_identity": "a133bca0c1585186e21d702812e84e56e250b30e09515f16f3598e917391f5d6",
   "relation": "pilot_adaptation",
-  "run_id": "phase5-b1-calibration-restart_belief",
+  "run_id": "phase5-b1-calibration-restart_belief-v2",
   "schema_version": 2,
   "shot_ids": [
     0,
@@ -23,8 +23,8 @@
   ],
   "statistical_claim": "not_assessed; bounded pilot adaptation, not a statistical reproduction, performance ranking, or superiority claim",
   "terminations": {
-    "count_budget_exhausted": 1,
-    "root_valid": 3
+    "count_budget_exhausted": 2,
+    "root_valid": 2
   },
-  "title": "phase5-b1-calibration-restart_belief \u2014 pilot_adaptation pilot_adaptation not_assessed"
+  "title": "phase5-b1-calibration-restart_belief-v2 \u2014 pilot_adaptation pilot_adaptation not_assessed"
 }

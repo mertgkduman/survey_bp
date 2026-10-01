@@ -2,18 +2,18 @@
   "assessment_status": "not_assessed",
   "denominators": {
     "all_terminal_shots": 4,
-    "outcome_unavailable": 1,
-    "stabilizer_equivalent": 3
+    "outcome_unavailable": 2,
+    "stabilizer_equivalent": 2
   },
   "final_row_count": 4,
   "fixture": "pilot_adaptation",
   "ledger_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-calibration/identity/events.jsonl",
-  "ledger_sha256": "538d015c40af602a4bd4ce460c58bb6d615543b663f827c55af04a694fcf03d2",
+  "ledger_sha256": "65edbb9e1d04b2b558c89fcc9bf0779b0833fd1d02772a82c9d14b47e558daea",
   "manifest_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-calibration/identity/manifest.json",
-  "manifest_sha256": "4316e576daec0ede099408e352669cf97167eb91f7888091da7fefad86f5fbc1",
+  "manifest_sha256": "024ddf5aa2508562fb0daf34c14b334b36266fe920f7252a03e53e503e98c924",
   "policy_identity": "5bb3cc0211902a3e00e67b05d96c589c8dc4f0bb2a1faed56620bc5a2415c022",
   "relation": "pilot_adaptation",
-  "run_id": "phase5-b1-calibration-identity",
+  "run_id": "phase5-b1-calibration-identity-v2",
   "schema_version": 2,
   "shot_ids": [
     0,
@@ -23,8 +23,8 @@
   ],
   "statistical_claim": "not_assessed; bounded pilot adaptation, not a statistical reproduction, performance ranking, or superiority claim",
   "terminations": {
-    "baseline_valid": 3,
-    "iteration_cap_reached": 1
+    "baseline_valid": 2,
+    "iteration_cap_reached": 2
   },
-  "title": "phase5-b1-calibration-identity \u2014 pilot_adaptation pilot_adaptation not_assessed"
+  "title": "phase5-b1-calibration-identity-v2 \u2014 pilot_adaptation pilot_adaptation not_assessed"
 }

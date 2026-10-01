@@ -1,7 +1,7 @@
 {
   "arm_evidence": {
     "freezing": {
-      "manifest_sha256": "3c56be4de780f1dbf8dc0f4cb6445a97a6ef980762b0bac3af932197dd50e5fd",
+      "manifest_sha256": "b776e7f86c40948a1edcbde1e12ebe4671ad5bc0052e1ab0fa11f455b9abdd20",
       "shot_ids": [
         0,
         1,
@@ -12,7 +12,7 @@
       "work_event_count": 4
     },
     "guided_decimation": {
-      "manifest_sha256": "3c15a6d788c2a236dd323d558bfd587d0d9c8a9d54fbe2e71456e972dd9344b0",
+      "manifest_sha256": "57e8b4bd00e14f98e4a1c756f70f3b322fa8e50a671823134df9a239d0c0fa9c",
       "shot_ids": [
         0,
         1,
@@ -23,7 +23,7 @@
       "work_event_count": 4
     },
     "identity": {
-      "manifest_sha256": "4316e576daec0ede099408e352669cf97167eb91f7888091da7fefad86f5fbc1",
+      "manifest_sha256": "024ddf5aa2508562fb0daf34c14b334b36266fe920f7252a03e53e503e98c924",
       "shot_ids": [
         0,
         1,
@@ -34,7 +34,7 @@
       "work_event_count": 4
     },
     "impulse": {
-      "manifest_sha256": "4de866fce766f84478d753d45e39d45401ea70e342eed4ce8b411166e93894c7",
+      "manifest_sha256": "4881bc90b8fe9f18fc6882c006d57917ea61d3273daff79a2fbf442a763ab3f7",
       "shot_ids": [
         0,
         1,
@@ -45,7 +45,7 @@
       "work_event_count": 4
     },
     "restart_belief": {
-      "manifest_sha256": "5d5328969ea1a75ec14e4397b5ddbd1a8d8fbdf7404eae720bf116b147e5717a",
+      "manifest_sha256": "596e45dc8bb536c0070f380b5697d5381720acd6f10ee6f28233dc418be86607",
       "shot_ids": [
         0,
         1,
@@ -56,7 +56,7 @@
       "work_event_count": 4
     },
     "sign_flip": {
-      "manifest_sha256": "b63f13c149f566b374eee293a21e0b824baff9307d253b4a00a82eb2038b12d8",
+      "manifest_sha256": "1a4bccec307dff9f6b99ae3a3694a87fc0cf3215b5c001b9b078c2d61df3eaaa",
       "shot_ids": [
         0,
         1,
@@ -67,7 +67,7 @@
       "work_event_count": 4
     },
     "syndrome_flip": {
-      "manifest_sha256": "a9999d6e3b7251516b88b90d220fb2ed81924c8786ac9312e86fb830392a7989",
+      "manifest_sha256": "ca72826050972216fe40058c766d4b5e333434b594984f8a57954915f8f3f8a3",
       "shot_ids": [
         0,
         1,
@@ -89,14 +89,14 @@
   ],
   "assessment_status": "not_assessed",
   "code_id": "b1-ghp-882",
-  "design_digest": "b944f54bfe3fc79003b46e16925866bf70ca420f66237d936ff1e2ce5510a441",
+  "design_digest": "5901d1e3d0f13585e1fd25884224342c84ff3cdbdd1108e4d9f86d64546e0a0f",
   "error_rate": 0.07,
-  "ledger_sha256": "533c47a2cea02b11345ebc804e3a541786f39e191aa2e602c7d243e75809437b",
+  "ledger_sha256": "0079f4102d4f5e672b9041cc4a5c0372e02e8d4b807be3a8c8b3a7f070896fef",
   "physical_sample_identities": {
-    "0": "3f78bf7e6c1a6097b4b265edf70153c0b45ae4bae5413fff087dfd9be704cdb1",
-    "1": "44dd660e35d95b9af1d71e948d4eeb204cbb95ef9af35ef21b48599aaef75cbe",
-    "2": "dc49e45477a3d71c8880f574b1137e1c81dce2a02c323f8361986a48084d03aa",
-    "3": "f55800bfbaeb16ad32440ad9637951ab7e1a4312c9fba299181750a295ef673f"
+    "0": "a7077d3547a27d0eb08a7f3d03352b9a9acad60ff08bf58c3d491027731fa135",
+    "1": "ccbdb2a82841f76d1bccd3e882caf7b9ebad396725147d71464ef521c8fad535",
+    "2": "cf112bcd1966a9420da4c5bf176b7d4563e4b7d25711c2cddf0925c198d3efd7",
+    "3": "42576d09695bd2aedbb306347b37a15792e9a148d94c9479f1a3aea22fa6866d"
   },
   "relation": "pilot_adaptation",
   "schema_version": 1,

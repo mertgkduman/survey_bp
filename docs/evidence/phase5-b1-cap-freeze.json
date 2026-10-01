@@ -1,12 +1,12 @@
 {
   "arm_control_digests": {
-    "freezing": "cf9d3ecec4801d8a1934c4a959f8c09ee65fdc2362562e4dde3a38bca4b9f056",
+    "freezing": "1676ad9fe7e15fc8a2d2e1a8854e6fa9ebeb10a855d28eb7560507fd5baf5ba5",
     "guided_decimation": "df72d047179955f4f7b73ba7743ab8961e700213045c17de05501a07d868a457",
     "identity": "3b68c1b9735704ab125bee9fa75f1aec45c8b52b77d2e6f2bc4625f8259d1a6e",
     "impulse": "754d2c3de7579db2722b6466a787d958c2f75f3b26c473ec972ece8164af5198",
     "restart_belief": "a65806c39b96dcad36c928493afd6562837c2c4b55a77942303f0436eec38a18",
     "sign_flip": "02dd46ba4e30365cf2c442e32d14c01a0d053ea451823cea416c9fcc121069a6",
-    "syndrome_flip": "2404d10820a988cfe03f37462824362b74cb57dac553983b586beb290efe84ac"
+    "syndrome_flip": "27aaecd7438666a5e14257dcff7ec1c7fd271bde5ba8b9cf7623bc0445e03f33"
   },
   "arm_order": [
     "identity",
@@ -20,57 +20,55 @@
   "assessment_status": "not_assessed",
   "b1_raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
   "b1_semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548",
-  "calibration_design_digest": "b944f54bfe3fc79003b46e16925866bf70ca420f66237d936ff1e2ce5510a441",
-  "calibration_ledger_sha256": "533c47a2cea02b11345ebc804e3a541786f39e191aa2e602c7d243e75809437b",
+  "calibration_design_digest": "5901d1e3d0f13585e1fd25884224342c84ff3cdbdd1108e4d9f86d64546e0a0f",
+  "calibration_ledger_sha256": "0079f4102d4f5e672b9041cc4a5c0372e02e8d4b807be3a8c8b3a7f070896fef",
   "calibration_objective_summary": {
     "freezing": {
       "attempt_status_counts": {
-        "lifetime_expired": 19,
-        "valid_original_candidate": 1
+        "lifetime_expired": 24
       },
       "cap_hit_attempts": 0,
-      "committed_work_leaves": 519,
+      "committed_work_leaves": 631,
       "no_proposal_slots": 1,
       "qualification": "controlled_css_adaptation",
       "terminal_status_counts": {
         "baseline_valid": 1,
-        "freeze_valid": 1,
-        "retry_cap_reached": 2
+        "retry_cap_reached": 3
       },
       "typed_work_total": {
-        "belief_assemblies": 211480,
-        "bp_calls": 24,
+        "belief_assemblies": 244956,
+        "bp_calls": 28,
         "branch_expansions": 0,
         "branch_prunes": 0,
-        "candidate_checks": 211480,
-        "candidate_constructions": 240,
-        "check_to_variable_updates": 634440,
-        "convergence_checks": 240,
+        "candidate_checks": 244980,
+        "candidate_constructions": 278,
+        "check_to_variable_updates": 734868,
+        "convergence_checks": 278,
         "fallback_calls": 0,
-        "fixation_actions": 20,
-        "intervention_actions": 39,
-        "lifted_coordinates": 176400,
-        "order_generation": 0,
-        "order_selection": 0,
-        "original_checks": 240,
+        "fixation_actions": 24,
+        "intervention_actions": 48,
+        "lifted_coordinates": 211680,
+        "order_generation": 3,
+        "order_selection": 3,
+        "original_checks": 278,
         "priority_maintenance": 0,
-        "ranking_scans": 0,
+        "ranking_scans": 3969,
         "relay_transfers": 0,
         "residual_differences": 0,
         "residual_precomputations": 0,
         "residual_priority_evaluations": 0,
-        "transformations": 39,
-        "variable_to_check_updates": 634440
+        "transformations": 48,
+        "variable_to_check_updates": 734868
       }
     },
     "guided_decimation": {
       "attempt_status_counts": {
-        "None": 23,
+        "None": 25,
         "count_budget_exhausted": 2,
         "valid_original_candidate": 2
       },
       "cap_hit_attempts": 2,
-      "committed_work_leaves": 517,
+      "committed_work_leaves": 584,
       "no_proposal_slots": 0,
       "qualification": "algorithm_interpretation",
       "terminal_status_counts": {
@@ -78,59 +76,59 @@
         "valid_original_candidate": 2
       },
       "typed_work_total": {
-        "belief_assemblies": 217854,
-        "bp_calls": 27,
+        "belief_assemblies": 235494,
+        "bp_calls": 29,
         "branch_expansions": 0,
         "branch_prunes": 0,
-        "candidate_checks": 217854,
-        "candidate_constructions": 247,
-        "check_to_variable_updates": 653562,
-        "convergence_checks": 247,
+        "candidate_checks": 235494,
+        "candidate_constructions": 267,
+        "check_to_variable_updates": 706482,
+        "convergence_checks": 267,
         "fallback_calls": 0,
-        "fixation_actions": 23,
-        "intervention_actions": 23,
+        "fixation_actions": 25,
+        "intervention_actions": 25,
         "lifted_coordinates": 0,
-        "order_generation": 0,
-        "order_selection": 0,
-        "original_checks": 247,
+        "order_generation": 25,
+        "order_selection": 25,
+        "original_checks": 267,
         "priority_maintenance": 0,
-        "ranking_scans": 20176,
+        "ranking_scans": 22050,
         "relay_transfers": 0,
         "residual_differences": 0,
         "residual_precomputations": 0,
         "residual_priority_evaluations": 0,
         "transformations": 0,
-        "variable_to_check_updates": 653562
+        "variable_to_check_updates": 706482
       }
     },
     "identity": {
       "attempt_status_counts": {
-        "None": 170
+        "None": 201
       },
       "cap_hit_attempts": 0,
-      "committed_work_leaves": 340,
+      "committed_work_leaves": 402,
       "no_proposal_slots": 0,
       "qualification": "canonical_implemented",
       "terminal_status_counts": {
-        "baseline_valid": 3,
-        "iteration_cap_reached": 1
+        "baseline_valid": 2,
+        "iteration_cap_reached": 2
       },
       "typed_work_total": {
-        "belief_assemblies": 149940,
+        "belief_assemblies": 177282,
         "bp_calls": 4,
         "branch_expansions": 0,
         "branch_prunes": 0,
-        "candidate_checks": 149940,
-        "candidate_constructions": 170,
-        "check_to_variable_updates": 449820,
-        "convergence_checks": 170,
+        "candidate_checks": 177282,
+        "candidate_constructions": 201,
+        "check_to_variable_updates": 531846,
+        "convergence_checks": 201,
         "fallback_calls": 0,
         "fixation_actions": 0,
         "intervention_actions": 0,
         "lifted_coordinates": 0,
         "order_generation": 0,
         "order_selection": 0,
-        "original_checks": 170,
+        "original_checks": 201,
         "priority_maintenance": 0,
         "ranking_scans": 0,
         "relay_transfers": 0,
@@ -138,170 +136,168 @@
         "residual_precomputations": 0,
         "residual_priority_evaluations": 0,
         "transformations": 0,
-        "variable_to_check_updates": 449820
+        "variable_to_check_updates": 531846
       }
     },
     "impulse": {
       "attempt_status_counts": {
-        "count_budget_exhausted": 1,
-        "working_syndrome_invalid": 3
+        "count_budget_exhausted": 2,
+        "working_syndrome_invalid": 6
       },
-      "cap_hit_attempts": 1,
-      "committed_work_leaves": 410,
-      "no_proposal_slots": 3,
+      "cap_hit_attempts": 2,
+      "committed_work_leaves": 614,
+      "no_proposal_slots": 2,
       "qualification": "controlled_css_adaptation",
       "terminal_status_counts": {
-        "baseline_valid": 3,
-        "count_budget_exhausted": 1
+        "baseline_valid": 2,
+        "count_budget_exhausted": 2
       },
       "typed_work_total": {
-        "belief_assemblies": 179013,
-        "bp_calls": 8,
+        "belief_assemblies": 235428,
+        "bp_calls": 12,
         "branch_expansions": 0,
         "branch_prunes": 0,
-        "candidate_checks": 179013,
-        "candidate_constructions": 203,
-        "check_to_variable_updates": 537039,
-        "convergence_checks": 203,
+        "candidate_checks": 235428,
+        "candidate_constructions": 267,
+        "check_to_variable_updates": 706284,
+        "convergence_checks": 267,
         "fallback_calls": 0,
-        "fixation_actions": 4,
-        "intervention_actions": 4,
-        "lifted_coordinates": 29106,
-        "order_generation": 0,
-        "order_selection": 0,
-        "original_checks": 203,
-        "priority_maintenance": 0,
-        "ranking_scans": 0,
-        "relay_transfers": 0,
-        "residual_differences": 0,
-        "residual_precomputations": 0,
-        "residual_priority_evaluations": 0,
-        "transformations": 4,
-        "variable_to_check_updates": 537039
-      }
-    },
-    "restart_belief": {
-      "attempt_status_counts": {
-        "count_budget_exhausted": 1,
-        "working_syndrome_invalid": 3
-      },
-      "cap_hit_attempts": 1,
-      "committed_work_leaves": 424,
-      "no_proposal_slots": 3,
-      "qualification": "mechanism_only_adaptation",
-      "terminal_status_counts": {
-        "count_budget_exhausted": 1,
-        "root_valid": 3
-      },
-      "typed_work_total": {
-        "belief_assemblies": 178974,
-        "bp_calls": 8,
-        "branch_expansions": 1,
-        "branch_prunes": 0,
-        "candidate_checks": 178978,
-        "candidate_constructions": 203,
-        "check_to_variable_updates": 536922,
-        "convergence_checks": 203,
-        "fallback_calls": 0,
-        "fixation_actions": 4,
+        "fixation_actions": 8,
         "intervention_actions": 8,
         "lifted_coordinates": 58212,
-        "order_generation": 1,
-        "order_selection": 0,
-        "original_checks": 203,
+        "order_generation": 4,
+        "order_selection": 4,
+        "original_checks": 335,
         "priority_maintenance": 0,
-        "ranking_scans": 882,
+        "ranking_scans": 3528,
         "relay_transfers": 0,
         "residual_differences": 0,
         "residual_precomputations": 0,
         "residual_priority_evaluations": 0,
         "transformations": 8,
-        "variable_to_check_updates": 536922
+        "variable_to_check_updates": 706284
+      }
+    },
+    "restart_belief": {
+      "attempt_status_counts": {
+        "count_budget_exhausted": 2,
+        "working_syndrome_invalid": 6
+      },
+      "cap_hit_attempts": 2,
+      "committed_work_leaves": 576,
+      "no_proposal_slots": 2,
+      "qualification": "mechanism_only_adaptation",
+      "terminal_status_counts": {
+        "count_budget_exhausted": 2,
+        "root_valid": 2
+      },
+      "typed_work_total": {
+        "belief_assemblies": 235350,
+        "bp_calls": 12,
+        "branch_expansions": 2,
+        "branch_prunes": 0,
+        "candidate_checks": 235358,
+        "candidate_constructions": 267,
+        "check_to_variable_updates": 706050,
+        "convergence_checks": 267,
+        "fallback_calls": 0,
+        "fixation_actions": 8,
+        "intervention_actions": 16,
+        "lifted_coordinates": 116424,
+        "order_generation": 2,
+        "order_selection": 6,
+        "original_checks": 267,
+        "priority_maintenance": 0,
+        "ranking_scans": 7056,
+        "relay_transfers": 0,
+        "residual_differences": 0,
+        "residual_precomputations": 0,
+        "residual_priority_evaluations": 0,
+        "transformations": 16,
+        "variable_to_check_updates": 706050
       }
     },
     "sign_flip": {
       "attempt_status_counts": {
-        "baseline_valid": 1,
-        "continuation_cap_reached": 2,
-        "sign_flip_valid": 1
+        "baseline_valid": 2,
+        "continuation_cap_reached": 2
       },
       "cap_hit_attempts": 2,
-      "committed_work_leaves": 495,
+      "committed_work_leaves": 430,
       "no_proposal_slots": 0,
       "qualification": "bsfbp_sign_only_controlled_adaptation",
       "terminal_status_counts": {
-        "baseline_valid": 1,
-        "continuation_cap_reached": 2,
-        "sign_flip_valid": 1
+        "baseline_valid": 2,
+        "continuation_cap_reached": 2
       },
       "typed_work_total": {
-        "belief_assemblies": 216972,
-        "bp_calls": 7,
+        "belief_assemblies": 187866,
+        "bp_calls": 6,
         "branch_expansions": 0,
         "branch_prunes": 0,
-        "candidate_checks": 216972,
-        "candidate_constructions": 249,
-        "check_to_variable_updates": 650916,
-        "convergence_checks": 246,
+        "candidate_checks": 187866,
+        "candidate_constructions": 215,
+        "check_to_variable_updates": 563598,
+        "convergence_checks": 213,
         "fallback_calls": 0,
         "fixation_actions": 0,
-        "intervention_actions": 3,
+        "intervention_actions": 2,
         "lifted_coordinates": 0,
-        "order_generation": 0,
-        "order_selection": 0,
-        "original_checks": 246,
+        "order_generation": 2,
+        "order_selection": 2,
+        "original_checks": 213,
         "priority_maintenance": 0,
-        "ranking_scans": 0,
+        "ranking_scans": 2646,
         "relay_transfers": 0,
         "residual_differences": 0,
         "residual_precomputations": 0,
         "residual_priority_evaluations": 0,
         "transformations": 0,
-        "variable_to_check_updates": 650925
+        "variable_to_check_updates": 563604
       }
     },
     "syndrome_flip": {
       "attempt_status_counts": {
-        "count_budget_exhausted": 1,
-        "working_syndrome_invalid": 3
+        "count_budget_exhausted": 2,
+        "working_syndrome_invalid": 6
       },
-      "cap_hit_attempts": 1,
-      "committed_work_leaves": 411,
-      "no_proposal_slots": 3,
+      "cap_hit_attempts": 2,
+      "committed_work_leaves": 544,
+      "no_proposal_slots": 2,
       "qualification": "controlled_css_adaptation",
       "terminal_status_counts": {
-        "baseline_valid": 3,
-        "count_budget_exhausted": 1
+        "baseline_valid": 2,
+        "count_budget_exhausted": 2
       },
       "typed_work_total": {
-        "belief_assemblies": 179046,
-        "bp_calls": 8,
+        "belief_assemblies": 235494,
+        "bp_calls": 12,
         "branch_expansions": 0,
         "branch_prunes": 0,
-        "candidate_checks": 179046,
-        "candidate_constructions": 203,
-        "check_to_variable_updates": 537138,
-        "convergence_checks": 203,
+        "candidate_checks": 235494,
+        "candidate_constructions": 267,
+        "check_to_variable_updates": 706482,
+        "convergence_checks": 267,
         "fallback_calls": 0,
         "fixation_actions": 0,
-        "intervention_actions": 4,
-        "lifted_coordinates": 29106,
-        "order_generation": 1,
+        "intervention_actions": 8,
+        "lifted_coordinates": 58212,
+        "order_generation": 2,
         "order_selection": 0,
-        "original_checks": 203,
+        "original_checks": 267,
         "priority_maintenance": 0,
-        "ranking_scans": 882,
+        "ranking_scans": 1764,
         "relay_transfers": 0,
         "residual_differences": 0,
         "residual_precomputations": 0,
         "residual_priority_evaluations": 0,
-        "transformations": 4,
-        "variable_to_check_updates": 537138
+        "transformations": 8,
+        "variable_to_check_updates": 706482
       }
     }
   },
-  "calibration_physical_sample_identity": "phase5-b1-calibration-physical-v1",
-  "calibration_result_sha256": "f852060adc9f1990586ac13a674772c1dd6ed1824b3cef28628a9d0e57885790",
+  "calibration_physical_sample_identity": "phase5-b1-calibration-physical-v2",
+  "calibration_result_sha256": "e228e98a6f7921f31181d807d0fd917c09da3621c7bdaaf0ae9c7447ab2ed9a3",
   "calibration_shot_ids": [
     0,
     1,
@@ -310,8 +306,8 @@
   ],
   "caps_source": "prespecified_calibration_manifest; no outcome-conditioned tuning",
   "entitlement_sha256": "995d8891692468fe7719716c2e16d2371dcc019f9068ece25bb5228ec7ae8893",
-  "evaluation_design_digest": "02e21d0e83cd3ea13c0c8fb7759ba4a8435f00d7d0a29a3685702a79ce15607c",
-  "evaluation_physical_sample_identity": "phase5-b1-evaluation-physical-v1",
+  "evaluation_design_digest": "2d0ed7c2fe2344dd4148e90381bf919d054201e6888defdea42fd51ed8655b05",
+  "evaluation_physical_sample_identity": "phase5-b1-evaluation-physical-v2",
   "evaluation_shot_ids": [
     0,
     1,
