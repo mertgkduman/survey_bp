@@ -35,7 +35,8 @@ def export_html(executed: Path, html_path: Path, *, check: bool = False) -> Path
         raise ValueError("executed notebook lacks qualified evidence metadata")
     if not any(cell.cell_type == "code" and cell.get("outputs") for cell in notebook.cells):
         raise ValueError("Phase 5 notebook has no executed results")
-    dataset = load_verified_evidence(Path(evidence["source_root"]))
+    evidence_root = Path(evidence["source_root"])
+    dataset = load_verified_evidence(evidence_root if evidence_root.is_absolute() else ROOT / evidence_root)
     if dataset.ledger_sha256 != evidence.get("ledger_sha256") or dataset.design_digest != evidence.get("design_digest"):
         raise ValueError("executed notebook evidence digest has drifted")
     figure = synchronized_figure(dataset)

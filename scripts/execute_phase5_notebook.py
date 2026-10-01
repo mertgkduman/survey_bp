@@ -22,6 +22,7 @@ from bp_registry.phase5_analysis import load_verified_evidence  # noqa: E402
 
 def execute_notebook(evidence: Path, output: Path) -> Path:
     dataset = load_verified_evidence(evidence)
+    relative_evidence = Path(evidence).resolve(strict=True).relative_to(ROOT)
     source = ROOT / "notebooks/phase5-interventions-analysis.ipynb"
     notebook = nbformat.read(source, as_version=4)
     tagged = [cell for cell in notebook.cells if "phase5_parameters" in cell.metadata.get("tags", ())]
@@ -29,7 +30,7 @@ def execute_notebook(evidence: Path, output: Path) -> Path:
         raise ValueError("Phase 5 notebook requires one parameter cell")
     tagged[0].source = (
         "from pathlib import Path\n"
-        f"EVIDENCE_ROOT = Path({json.dumps(str(Path(evidence).resolve(strict=True)))})\n"
+        f"EVIDENCE_ROOT = Path({json.dumps(str(relative_evidence))})\n"
         "SHOT_ID = 0\n"
         "SELECTED_ARM = 'guided_decimation'\n"
     )
@@ -37,7 +38,7 @@ def execute_notebook(evidence: Path, output: Path) -> Path:
         "ledger_sha256": dataset.ledger_sha256,
         "design_digest": dataset.design_digest,
         "assessment_status": dataset.assessment_status,
-        "source_root": str(Path(evidence).resolve(strict=True)),
+        "source_root": str(relative_evidence),
         "source_notebook_sha256": sha256(source.read_bytes()).hexdigest(),
     }
     # The generic python3 kernelspec resolves `python` from PATH.  Bind it to

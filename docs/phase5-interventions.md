@@ -21,7 +21,8 @@ For the matched pilot, first capture the effective scheduler entitlement, calibr
 
 ```bash
 OMP_NUM_THREADS=1 .venv/bin/python scripts/run_phase5_pilot.py --preflight-entitlement --calibrate --freeze-caps --self-audit
-OMP_NUM_THREADS=1 .venv/bin/python scripts/run_phase5_pilot.py --evaluate
+OMP_NUM_THREADS=1 .venv/bin/python scripts/run_phase5_pilot.py --evaluate --require-cap-freeze docs/evidence/phase5-b1-cap-freeze.json --require-entitlement docs/evidence/phase5-compute-entitlement.json
+OMP_NUM_THREADS=1 .venv/bin/python scripts/run_phase5_pilot.py --verify
 ```
 
 The entitlement is in `docs/evidence/phase5-compute-entitlement.json`; the objective cap and manifest digest binding is in `docs/evidence/phase5-b1-cap-freeze.json`. Calibration and evaluation use different physical sample namespaces. Within a stage, each of the seven arms uses the same physical sample seed and identity for each shot. The baseline has no intervention; no arm combines two interventions. The fixed ceilings include 80 baseline sweeps, 16 BPGD rounds of at most 10 sweeps, 8 impulse attempts, 8 freezing retries, top-8 weight-one syndrome tests, a 16-action sign envelope within 80 sweeps, and Restart Belief `eta=8`, `t_cap=8`, and at most 10 sweeps per residual solve. Per-shot runtime and typed work caps are declared in each saved manifest.
