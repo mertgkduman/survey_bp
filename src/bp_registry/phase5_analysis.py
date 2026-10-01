@@ -198,7 +198,7 @@ def load_verified_evidence(source: str | Path) -> Phase5Dataset:
                 terminal["outcome"] or "outcome_unavailable", stream[-1]["termination"],
                 None if selected is None else tuple(int(bit) for bit in selected),
                 json.dumps(terminal["selected_origin"], sort_keys=True, separators=(",", ":")),
-                selected_original_valid, len(arm_attempts),
+                selected_original_valid, 0 if arm == "identity" else len(arm_attempts),
                 json.dumps(work_payload["work_vector"], sort_keys=True, separators=(",", ":")),
             ))
     if len(rows) != len(ARMS) * len(result["shot_ids"]):
@@ -215,7 +215,7 @@ def synchronized_figure(dataset: Phase5Dataset, *, selected_arm: str = "guided_d
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
 
-    figure = make_subplots(rows=1, cols=3, subplot_titles=("Outcome cells", "Attempts per matched shot", "Typed work per shot"),
+    figure = make_subplots(rows=1, cols=3, subplot_titles=("Outcome cells", "Intervention attempts per matched shot", "Typed work per shot"),
                            horizontal_spacing=0.08)
     palette = ("#20324d", "#007a72", "#99613a", "#7159a6", "#b04c68", "#4d83aa", "#937500")
     for index, arm in enumerate(ARMS):

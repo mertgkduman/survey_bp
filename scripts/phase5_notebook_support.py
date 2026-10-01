@@ -15,7 +15,7 @@ def shot_table_html(dataset: Phase5Dataset, *, shot_id: int, selected_arm: str) 
     if len(matched) != len(ARMS) or len({row.sample_identity for row in matched}) != 1:
         raise ValueError("shot-first view requires seven matched arm rows")
     highlighted = {"identity", selected_arm}
-    headings = ("Arm", "Status", "Outcome cell", "Selected candidate", "Selected origin", "Original valid", "Attempts", "C2V work", "Qualification", "Source revision", "Variant")
+    headings = ("Arm", "Status", "Outcome cell", "Selected candidate", "Selected origin", "Original valid", "Intervention attempts", "C2V work", "Qualification", "Source revision", "Variant")
     body = []
     for row in matched:
         style = ' class="selected"' if row.arm in highlighted else ""
@@ -47,11 +47,12 @@ def attempt_details_html(dataset: Phase5Dataset, *, shot_id: int) -> str:
     matched = dataset.shot(shot_id)
     if len(matched) != len(ARMS):
         raise ValueError("attempt drilldown requires a complete matched shot")
-    sections = ['<section class="phase5-attempts"><h3>Every recorded attempt</h3>']
+    sections = ['<section class="phase5-attempts"><h3>Every recorded intervention attempt and baseline sweep</h3>']
     for arm in ARMS:
         row = next(item for item in matched if item.arm == arm)
         attempts = dataset.attempts_for(shot_id, arm)
-        sections.append("<h4>" + escape(arm) + " — " + str(len(attempts)) + " attempts</h4>")
+        record_kind = "baseline sweep records" if arm == "identity" else "intervention attempts"
+        sections.append("<h4>" + escape(arm) + " — " + str(len(attempts)) + " " + record_kind + "</h4>")
         if not attempts:
             sections.append('<p class="attempt-empty">No intervention attempt was proposed; terminal: '
                             + escape(row.termination) + ".</p>")
@@ -59,7 +60,9 @@ def attempt_details_html(dataset: Phase5Dataset, *, shot_id: int) -> str:
         for attempt in attempts:
             payload = attempt.payload
             target = payload.get("target_index", payload.get("selected_target", payload.get("test_vector", "unavailable")))
-            summary = f"{arm} attempt {attempt.order}: {attempt.termination}; target {target}"
+            summary = (f"{arm} sweep {attempt.order}: {attempt.termination}"
+                       if arm == "identity" else
+                       f"{arm} attempt {attempt.order}: {attempt.termination}; target {target}")
             sections.append(
                 "<details><summary>" + escape(summary) + "</summary>"
                 + "<p>Qualification: " + escape(attempt.qualification) + "</p>"

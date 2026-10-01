@@ -45,6 +45,29 @@ def test_phase5_attempt_rows_retain_invalid_and_no_proposal():
     assert html.count("<details>") == 1
 
 
+def test_phase5_baseline_sweeps_are_visible_without_being_counted_as_interventions():
+    base = _dataset()
+    baseline_sweep = AttemptRow(0, "identity", 0, "continued", json.dumps({"index": 0}), "identity")
+    dataset = Phase5Dataset(base.rows, (baseline_sweep, *base.attempts), base.ledger_sha256,
+                            base.design_digest, base.source_root, base.assessment_status)
+    detail = attempt_details_html(dataset, shot_id=0)
+    table = shot_table_html(dataset, shot_id=0, selected_arm="impulse")
+    assert "identity — 1 baseline sweep records" in detail
+    assert "identity sweep 0" in detail
+    assert "Intervention attempts" in table
+    assert dataset.shot(0)[0].attempt_count == 0
+
+
+def test_phase5_retained_baseline_keeps_sweeps_but_has_zero_intervention_attempts():
+    from pathlib import Path
+    from bp_registry.phase5_analysis import load_verified_evidence
+
+    root = Path(__file__).resolve().parents[1]
+    dataset = load_verified_evidence(root / "data/results/phase5-interventions/b1-mechanism-pilot")
+    assert all(row.attempt_count == 0 for row in dataset.rows if row.arm == "identity")
+    assert dataset.attempts_for(0, "identity")
+
+
 def test_phase5_attempt_drilldown_keeps_every_terminal_class():
     base = _dataset()
     statuses = (
