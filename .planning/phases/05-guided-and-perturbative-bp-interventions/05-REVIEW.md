@@ -119,3 +119,9 @@ Acquire `CanonicalEventWriter` and emit `shot_begin` before calling the controll
 _Reviewed: 2026-10-01T02:30:31Z_
 _Reviewer: the agent (gsd-code-reviewer)_
 _Depth: deep_
+
+## Resolution
+
+The controller and replay fixes are in `29439d6`, `350ae2b`, `42be928`, and `a7e48bd`. They move target/order/residual computations inside reservations, charge contradiction checks, stop at declared wall-clock boundaries, preserve partial work, and replay typed deadline evidence. Shot ownership is acquired before controller dispatch. Source qualification and revision links were corrected in `9234ea4`.
+
+The reviewer independently rechecked every flagged reserve-order and contradiction site after `a7e48bd` and found CR-01, CR-02, and WR-01 through WR-04 resolved. Public fixture-arm replay, all seven immediate-deadline replay cases, and deterministic BB-144/HGP code fixtures pass. The original B1 pilot at `5bdc3d9` remains a superseded development record; corrected work accounting requires a new calibration seal and disjoint evaluation identities before Phase 5 completion.
