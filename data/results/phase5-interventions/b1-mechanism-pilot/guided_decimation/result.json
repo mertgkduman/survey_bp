@@ -9,12 +9,12 @@
   "final_row_count": 16,
   "fixture": "pilot_adaptation",
   "ledger_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-mechanism-pilot/guided_decimation/events.jsonl",
-  "ledger_sha256": "bfb15c6f0b91158e3f503feea5770236d80445dae6703e6debc950312eb511ff",
+  "ledger_sha256": "d5fbd3781c6a49cdd711615974208e33ddd182e138b6efa6cad4c5a941f57c6d",
   "manifest_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-mechanism-pilot/guided_decimation/manifest.json",
-  "manifest_sha256": "3bfea343d6cf33f9a4b9dac01698c515c1f47855d94a7dd1e9104fc731b10289",
+  "manifest_sha256": "0c25e7df25dcea0e9c0b6c33b661542282c99492e175e454adc635d7e3a71b5a",
   "policy_identity": "dc0d663a0c9519605ba41a42283ff99dfff00b06fe2234e1347d12f301ea2096",
   "relation": "pilot_adaptation",
-  "run_id": "phase5-b1-evaluation-guided_decimation",
+  "run_id": "phase5-b1-evaluation-guided_decimation-v2",
   "schema_version": 2,
   "shot_ids": [
     0,
@@ -39,5 +39,5 @@
     "count_budget_exhausted": 5,
     "valid_original_candidate": 11
   },
-  "title": "phase5-b1-evaluation-guided_decimation \u2014 pilot_adaptation pilot_adaptation not_assessed"
+  "title": "phase5-b1-evaluation-guided_decimation-v2 \u2014 pilot_adaptation pilot_adaptation not_assessed"
 }

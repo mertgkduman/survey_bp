@@ -2,19 +2,19 @@
   "assessment_status": "not_assessed",
   "denominators": {
     "all_terminal_shots": 16,
-    "exact": 4,
-    "outcome_unavailable": 3,
+    "exact": 1,
+    "outcome_unavailable": 6,
     "stabilizer_equivalent": 9
   },
   "final_row_count": 16,
   "fixture": "pilot_adaptation",
   "ledger_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-mechanism-pilot/impulse/events.jsonl",
-  "ledger_sha256": "a20ec78d381b89a5ea90ea7a29b2ae92a97a6dca2c509d2faf2042aec22781c2",
+  "ledger_sha256": "239356a18c9483866593bec34f34e826d50a12411a35a213822389e918c3bcf8",
   "manifest_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-mechanism-pilot/impulse/manifest.json",
-  "manifest_sha256": "44f4a30b691c0be2851a9c68e02f54550f9d98c627cb74791058ef38b522f06e",
+  "manifest_sha256": "ee9acb39c0730c36131bf45e93d979b4b7238c0698e9cae36426a508b686e4e3",
   "policy_identity": "0a34a433747634fa3fb30f9d882bf5faf3bf9cb3ad09048f704e0925af401475",
   "relation": "pilot_adaptation",
-  "run_id": "phase5-b1-evaluation-impulse",
+  "run_id": "phase5-b1-evaluation-impulse-v2",
   "schema_version": 2,
   "shot_ids": [
     0,
@@ -36,8 +36,8 @@
   ],
   "statistical_claim": "not_assessed; bounded pilot adaptation, not a statistical reproduction, performance ranking, or superiority claim",
   "terminations": {
-    "baseline_valid": 13,
-    "count_budget_exhausted": 3
+    "baseline_valid": 10,
+    "count_budget_exhausted": 6
   },
-  "title": "phase5-b1-evaluation-impulse \u2014 pilot_adaptation pilot_adaptation not_assessed"
+  "title": "phase5-b1-evaluation-impulse-v2 \u2014 pilot_adaptation pilot_adaptation not_assessed"
 }

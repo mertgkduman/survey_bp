@@ -80,7 +80,8 @@
   "evidence": {
     "assessment_status": "not_assessed",
     "discrepancies": [
-      "This bounded pilot adaptation is not a source-faithful curve reproduction or a decoder ranking."
+      "This bounded pilot adaptation is not a source-faithful curve reproduction or a decoder ranking.",
+      "Corrected work-receipt revision v2 supersedes the earlier Phase 5 mechanism pilot; no decoder ranking or source-curve assessment is made."
     ],
     "fixture": "pilot_adaptation",
     "procedure": "Prespecified Phase 5 B1 evaluation, freezing; mechanism only.",
@@ -103,7 +104,7 @@
     "qualification": "controlled_css_adaptation",
     "reset_rule": "fresh_structural_branch_then_release_to_original",
     "retry_cap": 8,
-    "root_seed": "phase5-b1-evaluation-decoder-v1",
+    "root_seed": "phase5-b1-evaluation-decoder-v2",
     "selection": "first_valid",
     "source_revision": "arxiv:0801.1241",
     "stream_status": "derived_decoder_stream",
@@ -212,13 +213,13 @@
     "selected_before_outcome": true
   },
   "randomness": {
-    "decoder_seed_identity": "phase5-b1-evaluation-decoder-v1",
-    "physical_sample_identity": "phase5-b1-evaluation-physical-v1",
+    "decoder_seed_identity": "phase5-b1-evaluation-decoder-v2",
+    "physical_sample_identity": "phase5-b1-evaluation-physical-v2",
     "sample_derivation": "sha256-manifest-shot-v1",
-    "sample_seed": 5072026
+    "sample_seed": 5072027
   },
   "relay": null,
-  "run_id": "phase5-b1-evaluation-freezing",
+  "run_id": "phase5-b1-evaluation-freezing-v2",
   "schema_version": 5,
   "trace_plan": {
     "label": "development_default",

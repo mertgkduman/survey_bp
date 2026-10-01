@@ -2,19 +2,19 @@
   "assessment_status": "not_assessed",
   "denominators": {
     "all_terminal_shots": 16,
-    "exact": 5,
-    "outcome_unavailable": 2,
-    "stabilizer_equivalent": 9
+    "exact": 1,
+    "outcome_unavailable": 4,
+    "stabilizer_equivalent": 11
   },
   "final_row_count": 16,
   "fixture": "pilot_adaptation",
   "ledger_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-mechanism-pilot/syndrome_flip/events.jsonl",
-  "ledger_sha256": "6064d72e13cfe039b9f78c018d1ad552dc0201c549b1ea03e64c8e8adaf08540",
+  "ledger_sha256": "46228c7b05e8bab303a51dcb33acd82e01cae52a9132078f71c3b1e8dc9954da",
   "manifest_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-mechanism-pilot/syndrome_flip/manifest.json",
-  "manifest_sha256": "f472b2e04b7767eb777a2d46a232cae478d291278b5d4ddfda58af3f1c700401",
+  "manifest_sha256": "7870152ed29a3c96bc9481c7c73d0c3a5606962d6fc2db64e5f4ffb39997d322",
   "policy_identity": "6f4e4a5032d343f1e661c4dc8cb4bffcd563f665e69e6aca4057ea6adb2ebf25",
   "relation": "pilot_adaptation",
-  "run_id": "phase5-b1-evaluation-syndrome_flip",
+  "run_id": "phase5-b1-evaluation-syndrome_flip-v2",
   "schema_version": 2,
   "shot_ids": [
     0,
@@ -36,9 +36,9 @@
   ],
   "statistical_claim": "not_assessed; bounded pilot adaptation, not a statistical reproduction, performance ranking, or superiority claim",
   "terminations": {
-    "baseline_valid": 13,
-    "count_budget_exhausted": 2,
-    "syndrome_flip_valid": 1
+    "baseline_valid": 10,
+    "count_budget_exhausted": 4,
+    "syndrome_flip_valid": 2
   },
-  "title": "phase5-b1-evaluation-syndrome_flip \u2014 pilot_adaptation pilot_adaptation not_assessed"
+  "title": "phase5-b1-evaluation-syndrome_flip-v2 \u2014 pilot_adaptation pilot_adaptation not_assessed"
 }

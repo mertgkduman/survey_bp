@@ -43,6 +43,7 @@ findings:
   info: 0
   total: 6
 status: issues_found
+resolution_status: resolved
 ---
 
 # Phase 05: Code Review Report
@@ -127,3 +128,5 @@ The controller and replay fixes are in `29439d6`, `350ae2b`, `42be928`, and `a7e
 The reviewer independently rechecked every flagged reserve-order and contradiction site after `a7e48bd` and found CR-01, CR-02, and WR-01 through WR-04 resolved. Public fixture-arm replay, all seven immediate-deadline replay cases, and deterministic BB-144/HGP code fixtures pass. The original B1 pilot at `5bdc3d9` remains a superseded development record; corrected work accounting requires a new calibration seal and disjoint evaluation identities before Phase 5 completion.
 
 The replacement calibration and cap seal are retained in `6db8d3e`. All 28 calibration shots have replay-checked arm results, the self-audit passed, the 43 public Phase 5 tests passed, and the intervention design check passed 16,388 cases. The v2 evaluation uses a new physical sample namespace and decoder seeds; its matched-shot execution and replay are the remaining release checks.
+
+The corrected evaluation subsequently completed all 112 matched arm shots. The public seven-arm `--verify` replay passed, including aggregate ledger, digest, and physical-sample reconciliation. The executed v2 notebook and standalone HTML passed their checks. Across the test suite, 678 tests passed and one was skipped; a timing-sensitive ledger test was run alone after a concurrent run timed out, and its full 13-test module passed. No release blocker from this review remains open.
