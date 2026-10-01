@@ -232,7 +232,7 @@ class RestartController:
             if root_valid:
                 root_term = "root_valid"
                 break
-        llr = tuple(float(value) for value in root.state.posterior)
+        llr: tuple[float, ...] = ()
         order: tuple[int, ...] = ()
         root_candidate = _bits(root.state.candidate)
         branches: list[RestartBranch] = []
@@ -244,15 +244,15 @@ class RestartController:
             if _deadline(wall_clock):
                 termination = "wall_clock_deadline"
             else:
-                admitted, computed_order = _reserve_compute(
+                admitted, root_order = _reserve_compute(
                     budgets, f"{root_owner}:root:llr-order", WorkVector(order_generation=1, ranking_scans=n),
-                    lambda: tuple(sorted(range(n), key=lambda index: (llr[index], index))),
+                    lambda: self._root_llr_order(root),
                 )
                 if not admitted:
                     termination = "count_budget_exhausted"
                 else:
-                    assert computed_order is not None
-                    order = computed_order
+                    assert root_order is not None
+                    llr, order = root_order
                     for branch_order, root_target in enumerate(order[:self.spec.eta]):
                         branch = self._branch(original, root, budgets, branch_order, root_target, wall_clock=wall_clock)
                         branches.append(branch)
@@ -490,6 +490,11 @@ class RestartController:
         return RestartBranch(branch_order, root_target, branch_id, open_leaf, tuple(rows), branch_term)
 
     @staticmethod
+    def _root_llr_order(root: BpSession) -> tuple[tuple[float, ...], tuple[int, ...]]:
+        llr = tuple(float(value) for value in root.state.posterior)
+        return llr, tuple(sorted(range(len(llr)), key=lambda index: (llr[index], index)))
+
+    @staticmethod
     def _transformed_views(original: OriginalProblem, inserted: list[int]):
         error = np.zeros(original.hz.shape[1], dtype=np.uint8)
         error[inserted] = 1
@@ -523,12 +528,11 @@ class RestartController:
         original: OriginalProblem, inserted: list[int], target: int, order: int,
         reason: str, insertion_leaf: str | None = None, transformation_leaf: str | None = None,
     ) -> RestartResidual:
+        # The terminal is emitted before an algebraic residual transformation
+        # was admitted, so do not manufacture error/syndrome evidence after it.
         committed = tuple(inserted)
-        error = np.zeros(original.hz.shape[1], dtype=np.uint8)
-        error[list(committed)] = 1
-        syndrome = original.syndrome ^ ((original.hz.astype(np.int64) @ error.astype(np.int64)) % 2).astype(np.uint8)
         return RestartResidual(
-            order, _bits(error), committed, _bits(syndrome), None, None, None,
+            order, (), committed, (), None, None, None,
             None, None, 0, None, None, None, (), None, None, reason,
             insertion_leaf, transformation_leaf, None, (), None, None,
         )
