@@ -68,6 +68,16 @@ def test_phase5_retained_baseline_keeps_sweeps_but_has_zero_intervention_attempt
     assert dataset.attempts_for(0, "identity")
 
 
+def test_phase5_loader_accepts_sealed_v2_calibration_identities():
+    from pathlib import Path
+    from bp_registry.phase5_analysis import load_verified_evidence
+
+    root = Path(__file__).resolve().parents[1]
+    dataset = load_verified_evidence(root / "data/results/phase5-interventions/b1-calibration")
+    assert len(dataset.rows) == 4 * len(ARMS)
+    assert len({row.sample_identity for row in dataset.rows}) == 4
+
+
 def test_phase5_attempt_drilldown_keeps_every_terminal_class():
     base = _dataset()
     statuses = (

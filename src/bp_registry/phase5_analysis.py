@@ -144,7 +144,7 @@ def load_verified_evidence(source: str | Path) -> Phase5Dataset:
         if [event for event in events if event["run_id"] == manifest["run_id"]] != read_canonical_events(arm_ledger):
             raise ValueError(f"{arm} aggregate and public ledgers disagree")
         arm_evidence = result.get("arm_evidence", {}).get(arm, {})
-        if (manifest.get("run_id") != f"phase5-b1-{result['stage']}-{arm}"
+        if (manifest.get("run_id") != design["arm_manifests"][arm]["run_id"]
                 or arm_result.get("manifest_sha256") != arm_evidence.get("manifest_sha256")
                 or manifest.get("intervention", {}).get("kind") != arm
                 or manifest.get("evidence", {}).get("assessment_status") != "not_assessed"):
