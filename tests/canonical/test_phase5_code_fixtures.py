@@ -100,6 +100,10 @@ def test_phase5_bb144_hgp_algebra_fixed_shortening_and_lift(label):
 def _spec(kind: str) -> Phase5InterventionContract:
     design = json.loads((ROOT / "data/manifests/phase5-b1-calibration.json").read_text(encoding="utf-8"))
     declaration = dict(design["arm_manifests"][kind]["intervention"])
+    # Fixed code fixtures keep their own decoder stream when the sampled B1
+    # pilot advances to a fresh calibration namespace.
+    if declaration.get("root_seed") is not None:
+        declaration["root_seed"] = "phase5-b1-calibration-decoder-v1"
     for field in (
         "sweeps_per_round", "baseline_sweeps", "attempt_sweeps", "period_sweeps",
         "lifetime_sweeps", "trunk_sweeps", "continuation_sweeps",

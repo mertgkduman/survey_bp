@@ -790,6 +790,12 @@ def _run_relay_structural_shot(
             existing = _existing_structural(path, parsed.run_id, shot_id, identity, verification_context)
             if existing is not None:
                 return existing
+        except ValueError as error:
+            if "shot_begin is duplicated" in str(error):
+                existing = _existing_structural(path, parsed.run_id, shot_id, identity, verification_context)
+                if existing is not None:
+                    return existing
+            raise
     raise ShotOwnershipError("canonical Relay shot remained owned beyond bounded retry window")
 
 

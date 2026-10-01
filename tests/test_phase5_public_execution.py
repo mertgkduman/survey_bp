@@ -218,7 +218,7 @@ def test_source_decisions_qualification_native_availability_restart_distance():
         }
         if arm["source_revision"].startswith("arxiv:") and "v" in arm["source_revision"]:
             assert arm["source_url"].endswith(arm["source_revision"].split(":", 1)[1])
-    pilot = json.loads((ROOT / "data/manifests/phase5-b1-mechanism-pilot.json").read_text(encoding="utf-8"))
+    pilot = json.loads((ROOT / "data/manifests/phase5-b1-calibration.json").read_text(encoding="utf-8"))
     for key, arm in record["arms"].items():
         sealed = pilot["arm_manifests"]["guided_decimation" if key == "bpgd" else key]["intervention"]
         assert arm["canonical_identity"] == sealed["variant"]
@@ -255,13 +255,14 @@ def test_phase5_public_execution_and_replay_each_small_arm(tmp_path, kind):
     assert verify_canonical_shot(manifest_path, output, shot_id=0)["termination"] == events[-1]["termination"]
 
 
-def test_phase5_deadline_stops_before_next_leaf_and_replays(tmp_path, monkeypatch):
+@pytest.mark.parametrize("kind", ["identity", "guided_decimation", "impulse", "freezing", "syndrome_flip", "sign_flip", "restart_belief"])
+def test_phase5_deadline_stops_before_next_leaf_and_replays(tmp_path, monkeypatch, kind):
     from bp_registry.cli import run_canonical, verify_canonical_shot
     from bp_registry.ledger import _canonical_event_id, read_canonical_events
     from bp_registry.canonical import execution
 
     manifest_path = tmp_path / "manifest.json"
-    manifest_path.write_text(json.dumps(_public_v5()), encoding="utf-8")
+    manifest_path.write_text(json.dumps(_public_v5_b1_restart() if kind == "restart_belief" else _public_v5(kind)), encoding="utf-8")
     ticks = iter((0, 10_000_000_001))
     monkeypatch.setattr(execution, "time", SimpleNamespace(monotonic_ns=lambda: next(ticks), sleep=time.sleep))
     output = tmp_path / "output"

@@ -104,7 +104,8 @@ def _stage(path: Path, *, stage: str) -> dict[str, Any]:
             or reconstructed.get("raw_sha256") != B1_RAW
             or reconstructed.get("semantic_sha256") != B1_SEMANTIC):
         raise ValueError("Phase 5 B1 pilot requires the resolved ordered matrix/logical identity")
-    if design.get("schema_version") != 1 or design.get("stage") != stage:
+    if (design.get("schema_version") != 1 or design.get("stage") != stage
+            or design.get("receipt_revision") != "corrected_work_accounting_v2"):
         raise ValueError("Phase 5 pilot stage schema or stage is wrong")
     if tuple(design.get("arm_order", ())) != ARMS or set(design.get("arm_manifests", {})) != set(ARMS):
         raise ValueError("Phase 5 pilot requires exactly the baseline and six single arms")
@@ -136,16 +137,16 @@ def _evaluation_projection(calibration: dict[str, Any]) -> dict[str, Any]:
     design = deepcopy(calibration)
     design["stage"] = "evaluation"
     design["shot_ids"] = list(range(16))
-    design["physical_sample_identity"] = "phase5-b1-evaluation-physical-v1"
+    design["physical_sample_identity"] = "phase5-b1-evaluation-physical-v2"
     design["design_status"] = "sealed_after_objective_calibration"
     for arm in ARMS:
         manifest = design["arm_manifests"][arm]
-        manifest["run_id"] = f"phase5-b1-evaluation-{arm}"
+        manifest["run_id"] = f"phase5-b1-evaluation-{arm}-v2"
         manifest["randomness"]["physical_sample_identity"] = design["physical_sample_identity"]
-        manifest["randomness"]["decoder_seed_identity"] = "phase5-b1-evaluation-decoder-v1"
+        manifest["randomness"]["decoder_seed_identity"] = "phase5-b1-evaluation-decoder-v2"
         manifest["budgets"]["max_shots"] = 16
         if manifest["intervention"].get("root_seed") is not None:
-            manifest["intervention"]["root_seed"] = "phase5-b1-evaluation-decoder-v1"
+            manifest["intervention"]["root_seed"] = "phase5-b1-evaluation-decoder-v2"
         manifest["evidence"]["procedure"] = f"Prespecified Phase 5 B1 evaluation, {arm}; mechanism only."
     return design
 
@@ -342,7 +343,7 @@ def self_audit() -> dict[str, Any]:
             "budgets": evaluation["arm_manifests"][arm]["budgets"] | {"max_shots": 4},
             "intervention": (
                 evaluation["arm_manifests"][arm]["intervention"]
-                | ({"root_seed": "phase5-b1-calibration-decoder-v1"}
+                | ({"root_seed": "phase5-b1-calibration-decoder-v2"}
                    if evaluation["arm_manifests"][arm]["intervention"].get("root_seed") is not None else {})
             ),
             "intervention_limits": evaluation["arm_manifests"][arm]["intervention_limits"],

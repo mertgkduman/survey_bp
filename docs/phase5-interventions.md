@@ -4,6 +4,8 @@ Phase 5 exposes one CSS code-capacity BP baseline and six separate, source-quali
 
 The B1 pilot is `pilot_adaptation` and `not_assessed`. Its finite 4-shot calibration and 16-shot evaluation are for mechanism inspection. No result here establishes published-curve agreement, source-faithful reproduction, decoder superiority, or an error-rate ranking.
 
+The current pilot uses the corrected work-receipt v2 execution. The earlier v1 pilot is retained in Git history at `5bdc3d9` as superseded development evidence: review found target/order and contradiction computations that preceded their work reservations. V2 keeps the original numerical caps and source variants while using new physical sample seeds, namespaces, and run identities; its four-shot calibration and cap freeze precede its evaluation. The older outcomes were not used to alter the ceilings.
+
 ## Public execution path
 
 The stage design in `data/manifests/phase5-b1-calibration.json` has seven embedded complete `CanonicalExperimentV5` manifests. The stage runner saves each arm's individual manifest under its result directory before calling the public canonical path. Each V5 manifest projects to compact `CanonicalManifestV6`; its structural ledger uses version 5. Earlier public and compact schemas retain their historical meanings.
@@ -32,6 +34,8 @@ The entitlement is in `docs/evidence/phase5-compute-entitlement.json`; the objec
 Controllers receive only the immutable original CSS problem, public syndrome, declared controls, and bounded work tree. Hidden physical X/Z truth is held by the runner until a selected original-space candidate is frozen. A candidate is eligible only after the original equation `H_Z x = s` holds; the independent evaluator then assigns one of five cells: `exact`, `stabilizer_equivalent`, `logical_failure`, `invalid_syndrome`, or `outcome_unavailable`. Undefined metrics remain unavailable rather than zero.
 
 Each version-five structural shot binds manifest, artifact, sample, source variant, qualification, state/attempt rows, transform and lift facts, original checks, selection, evaluation, and terminal status. Typed work is the sum of unique committed leaf vectors. Denied, contradictory, invalid, cap-hit, unsuccessful, and no-proposal paths remain visible. `verify-canonical-shot` independently replays the controller and checks event order, candidate origin, original validation, outcome, and leaf work; rehashing a changed ledger claim does not make it valid.
+
+The declared 300-second per-shot operational limit is checked at atomic-work boundaries. A deadline retains completed leaves, records the observed elapsed time and boundary in a `runtime` event, and emits a normal terminal row. One in-flight atomic operation may finish after the nominal threshold; its overshoot is recorded. Deadline shots do not enter truth-aware evaluation.
 
 ## Source qualifications and limits
 
