@@ -16,6 +16,7 @@ import plotly
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
 
 from bp_registry.phase5_analysis import ARMS, load_verified_evidence, synchronized_figure  # noqa: E402
