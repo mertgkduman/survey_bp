@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from hashlib import sha256
 import json
 from pathlib import Path
@@ -47,7 +47,7 @@ from .relay import RelayController
 from .memory_execution import LocalMemoryExecution, MemoryFloodingSchedule, validate_single_attempt_memory
 from .tracing import TracePlan, TraceSink
 from .contracts import Phase5InterventionContract
-from .phase5 import execute_phase5_controller, phase5_attempt_events, phase5_work_evidence
+from .phase5 import execute_phase5_controller, finalize_phase5_deadline, phase5_attempt_events, phase5_work_evidence
 
 
 class CanonicalConflictError(ValueError):
@@ -926,22 +926,6 @@ def _run_phase5_structural_shot(
         return existing
     original_id = stable_lineage_id("original", {"identity": identity})
     original = OriginalProblem(original_id.value, validated.hx, validated.hz, observation.syndrome)
-    budgets = _budget_tree(execution_controls)
-    started = time.monotonic()
-    outcome = execute_phase5_controller(
-        spec, original, error_rate=parsed.error_rate, budgets=budgets,
-        max_iterations=parsed.max_iterations, owner_identity=identity,
-    )
-    cap = None if execution_controls is None else execution_controls.get("phase5_max_runtime_seconds")
-    if cap is not None and time.monotonic() - started > cap:
-        raise ValueError("Phase 5 runtime cap was exceeded")
-    candidate = None if outcome.candidate is None else np.asarray(outcome.candidate, dtype=np.uint8)
-    if candidate is not None and (candidate.shape != (validated.hz.shape[1],)
-                                  or not np.array_equal((validated.hz @ candidate) % 2, observation.syndrome)):
-        raise ValueError("Phase 5 controller selected an invalid original-space candidate")
-    assessment = None if candidate is None else evaluate(
-        validated, true_x=hidden_truth.x, true_z=hidden_truth.z, candidate_x=candidate,
-    )
     identity_data = {
         "execution_identity": identity,
         "manifest_sha256": context.get("manifest_sha256"),
@@ -954,22 +938,40 @@ def _run_phase5_structural_shot(
         "native_availability": spec.native_availability,
         "intervention_kind": spec.kind,
     }
-    terminal = {
-        "candidate": None if candidate is None else candidate.tolist(),
-        "selected_origin": outcome.selected_origin,
-        "qualification": outcome.qualification,
-        "selection_status": "no_valid_candidate" if candidate is None else "frozen_original_valid_candidate",
-        "outcome": None if assessment is None else assessment.outcome,
-        "logical_action_agrees": None if assessment is None else assessment.logical_action_agrees,
-        "work_vector": outcome.work.as_evidence(structural_event_version=4),
-        "termination": outcome.termination,
-    }
     for _ in range(30):
         try:
             with CanonicalEventWriter(path, structural_event_version=5) as ledger:
                 ledger.begin(run_id=parsed.run_id, shot_id=shot_id, sample_seed_identity=sample_seed_identity,
                              schema_version=5, compact_schema_version=6, identity=identity_data,
                              payload={"original_lineage_id": original_id.value, "syndrome": [int(bit) for bit in original.syndrome]})
+                budgets = _budget_tree(execution_controls)
+                cap = None if execution_controls is None else execution_controls.get("phase5_max_runtime_seconds")
+                wall_clock = None if cap is None else WallClockLimit(int(cap * 1_000_000_000), clock=time.monotonic_ns)
+                if wall_clock is not None:
+                    wall_clock.check("attempt_start", scope="attempt")
+                outcome = execute_phase5_controller(
+                    spec, original, error_rate=parsed.error_rate, budgets=budgets,
+                    max_iterations=parsed.max_iterations, owner_identity=identity,
+                    wall_clock=wall_clock,
+                )
+                outcome = finalize_phase5_deadline(outcome, wall_clock)
+                candidate = None if outcome.candidate is None else np.asarray(outcome.candidate, dtype=np.uint8)
+                if candidate is not None and (candidate.shape != (validated.hz.shape[1],)
+                                              or not np.array_equal((validated.hz @ candidate) % 2, observation.syndrome)):
+                    raise ValueError("Phase 5 controller selected an invalid original-space candidate")
+                assessment = None if candidate is None or outcome.termination == "wall_clock_deadline" else evaluate(
+                    validated, true_x=hidden_truth.x, true_z=hidden_truth.z, candidate_x=candidate,
+                )
+                terminal = {
+                    "candidate": None if candidate is None else candidate.tolist(),
+                    "selected_origin": outcome.selected_origin,
+                    "qualification": outcome.qualification,
+                    "selection_status": "no_valid_candidate" if candidate is None else "frozen_original_valid_candidate",
+                    "outcome": None if assessment is None else assessment.outcome,
+                    "logical_action_agrees": None if assessment is None else assessment.logical_action_agrees,
+                    "work_vector": outcome.work.as_evidence(structural_event_version=4),
+                    "termination": outcome.termination,
+                }
                 ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="intervention",
                              data={"identity": identity_data, "payload": outcome.header})
                 for branch in outcome.branches:
@@ -992,6 +994,12 @@ def _run_phase5_structural_shot(
                     ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="evaluation",
                                  data={"identity": identity_data, "payload": {"outcome": assessment.outcome,
                                                                             "logical_action_agrees": assessment.logical_action_agrees}})
+                if wall_clock is not None and wall_clock.first_termination is not None:
+                    ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="runtime",
+                                 data={"identity": identity_data, "payload": {
+                                     "deadline": asdict(wall_clock.first_termination),
+                                     "check_count": wall_clock.first_termination_check,
+                                 }})
                 ledger.terminal(run_id=parsed.run_id, shot_id=shot_id, termination=outcome.termination,
                                 data={"identity": identity_data, "payload": terminal})
             return CanonicalExecutionResult(parsed.run_id, shot_id, outcome.termination, assessment, candidate)

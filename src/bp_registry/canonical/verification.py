@@ -8,7 +8,7 @@ CLI one reuse boundary.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import asdict, dataclass, replace
 from hashlib import sha256
 import json
 from pathlib import Path
@@ -19,10 +19,10 @@ import numpy as np
 
 from .. import evaluator
 from ..ledger import CANONICAL_RELAY_LEDGER_VERSION, read_canonical_events
-from .budgets import BudgetLimit, BudgetTree, BudgetView, Measurement, QualifiedIteration, ScheduleTerminalEvidence, WorkVector
+from .budgets import BudgetLimit, BudgetTree, BudgetView, Measurement, QualifiedIteration, ScheduleTerminalEvidence, WallClockLimit, WorkVector
 from .kernel import BinarySpaKernel
 from .contracts import MemoryCompositionSpec, Phase5InterventionContract, parse_canonical_manifest
-from .phase5 import execute_phase5_controller, phase5_attempt_events, phase5_work_evidence
+from .phase5 import execute_phase5_controller, finalize_phase5_deadline, phase5_attempt_events, phase5_work_evidence
 from .problems import OriginalProblem
 from .memory_execution import LocalMemoryExecution, MemoryFloodingSchedule
 from .group_shuffled import HsuGroupSchedule
@@ -1005,15 +1005,49 @@ def validate_phase5_shot(
     original_id = stable_lineage_id("original", {"identity": identity})
     original = OriginalProblem(original_id.value, code.hx, code.hz, np.asarray(context.syndrome, dtype=np.uint8))
     budgets = _budget_tree({"work_limits": context.work_limits, "phase5_work_caps": context.phase5_limits["work_caps"]})
+    runtime_rows = [row for row in stream if row.get("kind") == "runtime"]
+    if len(runtime_rows) > 1:
+        raise CanonicalStructuralVerificationError("Phase 5 shot has duplicate runtime evidence")
+    wall_clock = None
+    if runtime_rows:
+        runtime = runtime_rows[0].get("data", {}).get("payload")
+        cap_ns = int(context.phase5_limits["max_runtime_seconds"] * 1_000_000_000)
+        if not isinstance(runtime, Mapping) or set(runtime) != {"deadline", "check_count"}:
+            raise CanonicalStructuralVerificationError("Phase 5 runtime evidence is malformed")
+        deadline = runtime["deadline"]
+        check_count = runtime["check_count"]
+        if (not isinstance(deadline, Mapping) or type(check_count) is not int or check_count < 2
+                or deadline.get("reason") != "wall_clock_deadline"
+                or deadline.get("resource") != "wall_clock_ns"
+                or deadline.get("configured_limit") != cap_ns
+                or type(deadline.get("observed_elapsed_ns")) is not int
+                or deadline["observed_elapsed_ns"] < cap_ns
+                or deadline.get("overshoot_ns") != deadline["observed_elapsed_ns"] - cap_ns):
+            raise CanonicalStructuralVerificationError("Phase 5 runtime deadline differs from the sealed cap")
+        clock_checks = 0
+
+        def replay_clock() -> int:
+            nonlocal clock_checks
+            clock_checks += 1
+            return deadline["observed_elapsed_ns"] if clock_checks == check_count else 0
+
+        wall_clock = WallClockLimit(cap_ns, clock=replay_clock)
+        wall_clock.check("attempt_start", scope="attempt")
     outcome = execute_phase5_controller(
         spec, original, error_rate=context.error_rate, budgets=budgets,
         max_iterations=context.max_iterations, owner_identity=identity,
+        wall_clock=wall_clock,
     )
+    outcome = finalize_phase5_deadline(outcome, wall_clock)
+    if runtime_rows and (wall_clock is None or wall_clock.first_termination is None
+                         or wall_clock.first_termination_check != runtime["check_count"]
+                         or asdict(wall_clock.first_termination) != runtime["deadline"]):
+        raise CanonicalStructuralVerificationError("Phase 5 runtime boundary cannot be independently replayed")
     candidate = None if outcome.candidate is None else np.asarray(outcome.candidate, dtype=np.uint8)
     if candidate is not None and (candidate.shape != (code.hz.shape[1],)
                                   or not np.array_equal((code.hz @ candidate) % 2, original.syndrome)):
         raise CanonicalStructuralVerificationError("replayed candidate fails original syndrome validation")
-    assessment = None if candidate is None else evaluator.evaluate_candidate(
+    assessment = None if candidate is None or outcome.termination == "wall_clock_deadline" else evaluator.evaluate_candidate(
         code, true_x=context.hidden_truth.x, true_z=context.hidden_truth.z, candidate_x=candidate,
     )
     terminal = {
@@ -1043,6 +1077,8 @@ def validate_phase5_shot(
     if assessment is not None:
         expected.append(("evaluation", {"outcome": assessment.outcome,
                                          "logical_action_agrees": assessment.logical_action_agrees}))
+    if runtime_rows:
+        expected.append(("runtime", runtime))
     expected.append(("termination", terminal))
     if len(stream) != len(expected):
         raise CanonicalStructuralVerificationError("Phase 5 event count differs from deterministic replay")

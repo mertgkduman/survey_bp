@@ -545,10 +545,16 @@ class WallClockLimit:
         self.duration_ns = int(duration_ns)
         self._clock = clock
         self._started_ns: int | None = None
+        self.check_count = 0
+        self.first_termination: BudgetTermination | None = None
+        self.first_termination_check: int | None = None
 
     def check(self, boundary_kind: str, *, scope: str) -> BudgetTermination | None:
         if boundary_kind not in _WALL_BOUNDARIES:
             raise ValueError("wall-clock checks require a declared synchronization boundary")
+        self.check_count += 1
+        if self.first_termination is not None:
+            return self.first_termination
         observed = self._clock()
         if isinstance(observed, bool) or not isinstance(observed, numbers.Integral):
             raise ValueError("monotonic clock must return integer nanoseconds")
@@ -558,7 +564,7 @@ class WallClockLimit:
         elapsed = max(0, int(observed) - self._started_ns)
         if elapsed < self.duration_ns:
             return None
-        return BudgetTermination(
+        self.first_termination = BudgetTermination(
             binding_scope=scope,
             resource="wall_clock_ns",
             configured_limit=self.duration_ns,
@@ -568,3 +574,5 @@ class WallClockLimit:
             observed_elapsed_ns=elapsed,
             overshoot_ns=max(0, elapsed - self.duration_ns),
         )
+        self.first_termination_check = self.check_count
+        return self.first_termination

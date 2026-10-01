@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, is_dataclass
+from dataclasses import asdict, dataclass, is_dataclass, replace
 import json
 from typing import Any
 
 import numpy as np
 
-from .budgets import BudgetTree, WorkVector
+from .budgets import BudgetTree, WallClockLimit, WorkVector
 from .contracts import Phase5InterventionContract
 from .guided_decimation import GuidedDecimationController
 from .impulse import ImpulseController, ImpulseSpec
@@ -33,6 +33,19 @@ class Phase5Outcome:
     attempts: tuple[dict[str, Any], ...]
     work: WorkVector
     leaves: tuple[tuple[str, str, WorkVector], ...]
+
+
+def finalize_phase5_deadline(outcome: Phase5Outcome, wall_clock: WallClockLimit | None) -> Phase5Outcome:
+    """Stop at the final boundary while retaining every completed atomic leaf."""
+    if wall_clock is None:
+        return outcome
+    deadline = wall_clock.first_termination
+    if deadline is None:
+        deadline = wall_clock.check("attempt_end", scope="attempt")
+    if deadline is None:
+        return outcome
+    return replace(outcome, termination="wall_clock_deadline",
+                   header={**outcome.header, "termination": "wall_clock_deadline"})
 
 
 def _json(value: object) -> Any:
@@ -86,7 +99,7 @@ def _project(result: object, *, rows_field: str | None, candidate_field: str, or
 
 def _identity_baseline(
     original: OriginalProblem, error_rate: float, budgets: BudgetTree,
-    max_iterations: int, owner_identity: str,
+    max_iterations: int, owner_identity: str, wall_clock: WallClockLimit | None = None,
 ) -> Phase5Outcome:
     session = BpSession(
         EdgeTable.from_check_matrix(original.hz), original.syndrome,
@@ -101,6 +114,7 @@ def _identity_baseline(
         try:
             moved = session.advance(
                 budgets=budgets, leaf_id=f"{owner_identity}:baseline:sweep:{index}", bp_call_start=index == 0,
+                wall_clock=wall_clock,
             )
         except (ValueError, FloatingPointError):
             termination = "numerical_failure"
@@ -113,6 +127,11 @@ def _identity_baseline(
                          "sweep_leaf": None, "validation_leaf": None, "original_valid": None, "termination": termination})
             break
         check_leaf = f"{owner_identity}:baseline:original-check:{index}"
+        if wall_clock is not None and wall_clock.check("candidate_selection_boundary", scope="attempt") is not None:
+            termination = "wall_clock_deadline"
+            rows.append({"index": index, "state_before": before, "state_after": session.state.digest,
+                         "sweep_leaf": moved.leaf_id, "validation_leaf": None, "original_valid": None, "termination": termination})
+            break
         reservation = budgets.reserve("attempt", WorkVector(original_checks=1), leaf_id=check_leaf)
         if reservation is None:
             termination = "count_budget_exhausted"
@@ -147,11 +166,11 @@ def _identity_baseline(
 def execute_phase5_controller(
     spec: Phase5InterventionContract, original: OriginalProblem,
     *, error_rate: float, budgets: BudgetTree, max_iterations: int,
-    owner_identity: str,
+    owner_identity: str, wall_clock: WallClockLimit | None = None,
 ) -> Phase5Outcome:
     """Dispatch one declared family; no controller receives physical or logical truth."""
     if spec.kind == "identity":
-        return _identity_baseline(original, error_rate, budgets, max_iterations, owner_identity)
+        return _identity_baseline(original, error_rate, budgets, max_iterations, owner_identity, wall_clock)
     if spec.kind == "guided_decimation":
         session = BpSession(
             EdgeTable.from_check_matrix(original.hz), original.syndrome,
@@ -163,40 +182,40 @@ def execute_phase5_controller(
             "finite_bias_magnitude": spec.finite_bias_magnitude,
             "zero_rule": spec.zero_rule, "final_round_rule": spec.final_round_rule,
             "round_limit": spec.round_limit, "sweeps_per_round": spec.sweeps_per_round,
-        }).run(session, check_matrix=original.hz, budgets=budgets)
+        }).run(session, check_matrix=original.hz, budgets=budgets, wall_clock=wall_clock)
         return _project(result, rows_field="rounds", candidate_field="candidate")
     if spec.kind == "impulse":
         result = ImpulseController(ImpulseSpec(
             realization=spec.realization, selection=spec.selection,
             baseline_sweeps=spec.baseline_sweeps, attempt_sweeps=spec.attempt_sweeps,
             attempt_cap=spec.attempt_cap, coordinate_order=spec.coordinate_order,
-        )).run(original, error_rate=error_rate, budgets=budgets, owner_identity=owner_identity)
+        )).run(original, error_rate=error_rate, budgets=budgets, owner_identity=owner_identity, wall_clock=wall_clock)
         return _project(result, rows_field="attempts", candidate_field="selected_candidate", origin_field="selected_origin")
     if spec.kind == "freezing":
         result = FreezingController(FreezingSpec(
             period_sweeps=spec.period_sweeps, lifetime_sweeps=spec.lifetime_sweeps,
             retry_cap=spec.retry_cap, root_seed=spec.root_seed,
-        )).run(original, error_rate=error_rate, budgets=budgets)
+        )).run(original, error_rate=error_rate, budgets=budgets, wall_clock=wall_clock)
         return _project(result, rows_field="trials", candidate_field="selected_candidate")
     if spec.kind == "syndrome_flip":
         result = SyndromeFlipController(SyndromeFlipSpec(
             baseline_sweeps=spec.baseline_sweeps, attempt_sweeps=spec.attempt_sweeps,
             top_k=spec.top_k, max_weight=spec.max_weight, test_cap=spec.test_cap,
             root_seed=spec.root_seed,
-        )).run(original, error_rate=error_rate, budgets=budgets)
+        )).run(original, error_rate=error_rate, budgets=budgets, wall_clock=wall_clock)
         return _project(result, rows_field="tests", candidate_field="selected_candidate", origin_field="selected_test_order")
     if spec.kind == "sign_flip":
         result = SignFlipController(SignFlipSpec(
             alpha=spec.alpha, trunk_sweeps=spec.trunk_sweeps,
             continuation_sweeps=spec.continuation_sweeps,
-        )).run(original, error_rate=error_rate, budgets=budgets)
+        )).run(original, error_rate=error_rate, budgets=budgets, wall_clock=wall_clock)
         return _project(result, rows_field=None, candidate_field="selected_candidate", origin_field="target_index")
     if spec.kind == "restart_belief":
         result = RestartController(RestartSpec(
             preset=spec.preset, code_id=spec.code_id, eta=spec.eta, t_cap=spec.t_cap,
             root_sweeps=spec.root_sweeps, residual_sweeps=spec.residual_sweeps,
             exact_distance=spec.exact_distance,
-        )).run(original, error_rate=error_rate, budgets=budgets)
+        )).run(original, error_rate=error_rate, budgets=budgets, wall_clock=wall_clock)
         return _project(result, rows_field="branches", candidate_field="selected_candidate", origin_field="selected_origin")
     raise ValueError("unregistered Phase 5 intervention kind")
 

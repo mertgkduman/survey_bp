@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+import time
+from types import SimpleNamespace
 
 import pytest
 
@@ -251,6 +253,38 @@ def test_phase5_public_execution_and_replay_each_small_arm(tmp_path, kind):
     assert all(row["ledger_version"] == 5 for row in events)
     assert events[1]["data"]["identity"]["intervention_kind"] == kind
     assert verify_canonical_shot(manifest_path, output, shot_id=0)["termination"] == events[-1]["termination"]
+
+
+def test_phase5_deadline_stops_before_next_leaf_and_replays(tmp_path, monkeypatch):
+    from bp_registry.cli import run_canonical, verify_canonical_shot
+    from bp_registry.ledger import _canonical_event_id, read_canonical_events
+    from bp_registry.canonical import execution
+
+    manifest_path = tmp_path / "manifest.json"
+    manifest_path.write_text(json.dumps(_public_v5()), encoding="utf-8")
+    ticks = iter((0, 10_000_000_001))
+    monkeypatch.setattr(execution, "time", SimpleNamespace(monotonic_ns=lambda: next(ticks), sleep=time.sleep))
+    output = tmp_path / "output"
+    run_canonical(manifest_path, output, shot_id=0)
+    events = read_canonical_events(output / "events.jsonl")
+    runtime = next(row["data"]["payload"] for row in events if row["kind"] == "runtime")
+    assert runtime["check_count"] == 2
+    assert runtime["deadline"]["reason"] == "wall_clock_deadline"
+    assert events[-1]["termination"] == "wall_clock_deadline"
+    work = next(row["data"]["payload"] for row in events if row["kind"] == "work")
+    assert work["leaves"] == []
+    assert not any(row["kind"] == "evaluation" for row in events)
+    assert verify_canonical_shot(manifest_path, output, shot_id=0)["termination"] == "wall_clock_deadline"
+    for row in events:
+        if row["kind"] == "runtime":
+            row["data"]["payload"]["check_count"] += 1
+            row["event_id"] = _canonical_event_id(row)
+    (output / "events.jsonl").write_text(
+        "".join(json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n" for row in events),
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="runtime|replay|event"):
+        verify_canonical_shot(manifest_path, output, shot_id=0)
 
 
 def test_phase5_public_execution_b1_restart_replay(tmp_path):
