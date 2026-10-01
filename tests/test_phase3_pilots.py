@@ -26,6 +26,7 @@ def test_analysis_extra_and_notebook_executor_are_pinned_and_confined():
         "nbformat==5.10.4",
         "nbclient==0.10.2",
         "ipykernel==6.29.5",
+        "plotly==7.1.0",
     ]
     assert NOTEBOOK_EXECUTOR.is_file(), "D-18 needs a confined notebook executor"
     executor_source = NOTEBOOK_EXECUTOR.read_text(encoding="utf-8")
