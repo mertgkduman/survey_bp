@@ -6,6 +6,7 @@
   "arms": {
     "bpgd": {
       "paper_revision": "arXiv:2312.10950v2",
+      "source_revision": "arxiv:2312.10950v2",
       "source_url": "https://arxiv.org/html/2312.10950v2",
       "procedure_anchor": ["Section 4.3", "Algorithm 1", "Equation 36"],
       "kernel_family": "binary_css_spa",
@@ -25,6 +26,7 @@
     },
     "impulse": {
       "paper_revision": "arXiv:2606.18240v1",
+      "source_revision": "arxiv:2606.18240v1",
       "source_url": "https://arxiv.org/html/2606.18240v1",
       "procedure_anchor": ["Section IV", "Algorithm 1"],
       "kernel_family": "binary_css_bp",
@@ -45,6 +47,7 @@
     },
     "freezing": {
       "paper_revision": "arXiv:0801.1241",
+      "source_revision": "arxiv:0801.1241",
       "source_url": "https://arxiv.org/html/0801.1241",
       "procedure_anchor": ["frustrated-check perturbation and freezing procedure"],
       "kernel_family": "quaternary_depolarizing_bp_in_source; binary_css_adaptation_here",
@@ -63,6 +66,7 @@
     },
     "syndrome_flip": {
       "paper_revision": "arXiv:2507.00254v1",
+      "source_revision": "arxiv:2507.00254v1",
       "source_url": "https://arxiv.org/html/2507.00254v1",
       "procedure_anchor": ["BP-SF algorithm and source repository"],
       "kernel_family": "binary_bp_with_syndrome_transform",
@@ -81,6 +85,7 @@
     },
     "sign_flip": {
       "paper_revision": "IEEE TQE 2023 DOI:10.1109/TQE.2023.3279379",
+      "source_revision": "doi:10.1109/TQE.2023.3279379",
       "source_url": "https://doi.org/10.1109/TQE.2023.3279379",
       "procedure_anchor": ["BSFBP sign-flip after failed normalized-min-sum iteration"],
       "kernel_family": "normalized_min_sum_in_source; isolated_binary_css_sign_arm_here",
@@ -93,13 +98,14 @@
       "native_repository": null,
       "native_commit": null,
       "native_availability": "unverified",
-      "qualification": "controlled_css_adaptation",
+      "qualification": "bsfbp_sign_only_controlled_adaptation",
       "canonical_identity": "bsfbp_sign_only_controlled_adaptation",
       "unresolved": ["isolating sign flip omits source branch-assisted syndrome pruning", "author-code identity", "ties in Global target selection"]
     },
     "restart_belief": {
       "paper_revision": "arXiv:2511.13281v1",
-      "source_url": "https://arxiv.org/html/2511.13281",
+      "source_revision": "arxiv:2511.13281v1",
+      "source_url": "https://arxiv.org/html/2511.13281v1",
       "procedure_anchor": ["Section III-A", "Restart Belief algorithm", "bounded-distance t=floor((d-1)/2)"],
       "kernel_family": "binary_css_bp_with_residual_syndrome_branches",
       "trigger": "root BP fails and source bounded-distance exit does not apply",

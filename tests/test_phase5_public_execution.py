@@ -204,15 +204,25 @@ def test_source_decisions_qualification_native_availability_restart_distance():
     required = {
         "paper_revision", "source_url", "procedure_anchor", "kernel_family", "trigger",
         "target_and_order", "changed_state", "preserved_state", "reset_rule", "lift_rule",
-        "native_repository", "native_commit", "native_availability", "qualification",
+        "native_repository", "native_commit", "native_availability", "qualification", "source_revision",
         "unresolved", "canonical_identity",
     }
     for arm in record["arms"].values():
         assert required <= set(arm)
         assert arm["unresolved"] is not None
         assert arm["qualification"] in {
-            "algorithm_interpretation", "controlled_css_adaptation", "mechanism_only_adaptation"
+            "algorithm_interpretation", "controlled_css_adaptation", "mechanism_only_adaptation",
+            "bsfbp_sign_only_controlled_adaptation",
         }
+        if arm["source_revision"].startswith("arxiv:") and "v" in arm["source_revision"]:
+            assert arm["source_url"].endswith(arm["source_revision"].split(":", 1)[1])
+    pilot = json.loads((ROOT / "data/manifests/phase5-b1-mechanism-pilot.json").read_text(encoding="utf-8"))
+    for key, arm in record["arms"].items():
+        sealed = pilot["arm_manifests"]["guided_decimation" if key == "bpgd" else key]["intervention"]
+        assert arm["canonical_identity"] == sealed["variant"]
+        assert arm["source_revision"] == sealed["source_revision"]
+        assert arm["qualification"] == sealed["qualification"]
+        assert arm["native_availability"] == sealed["native_availability"]
     assert record["arms"]["bpgd"]["canonical_identity"] == "algorithm1_v2_interpretation"
     assert record["arms"]["impulse"]["native_availability"] == "unverified"
     assert record["arms"]["impulse"]["source_procedure"]["operator"] == "unchanged_graph_negative_infinite_llr"
