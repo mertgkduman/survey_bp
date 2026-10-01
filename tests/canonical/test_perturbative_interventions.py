@@ -51,6 +51,35 @@ def test_syndrome_flip_oscillation_certificate_and_original_invalid_rejection():
     assert all(not row.eligible for row in result.tests)
 
 
+def test_syndrome_flip_denied_order_generation_returns_replayable_terminal():
+    from bp_registry.canonical.budgets import BudgetLimit, BudgetTree
+    from bp_registry.canonical.interventions import (
+        SyndromeFlipController, SyndromeFlipSpec, reconstruct_syndrome_flip_result,
+    )
+
+    original = _problem([[1, 1], [1, 1]], [0, 1])
+    before_matrix = original.hz.copy()
+    before_syndrome = original.syndrome.copy()
+    spec = SyndromeFlipSpec(2, 1, 2, 1, 2, "denied-order-seed")
+    limits = (BudgetLimit("attempt", "order_generation", 0),)
+    result = SyndromeFlipController(spec).run(
+        original, error_rate=0.1, budgets=BudgetTree(limits=limits, parents={}),
+    )
+    assert result.termination == "count_budget_exhausted"
+    assert result.ranked_targets == ()
+    assert result.tests == ()
+    assert result.selected_candidate is None
+    assert result.work.order_generation == 0
+    assert result.work.ranking_scans == 0
+    assert result.work.intervention_actions == 0
+    assert all("test-order" not in leaf_id for leaf_id, _, _ in result.leaves)
+    assert np.array_equal(original.hz, before_matrix)
+    assert np.array_equal(original.syndrome, before_syndrome)
+    assert reconstruct_syndrome_flip_result(
+        spec, original, 0.1, result, budget_limits=limits,
+    ) == result
+
+
 def test_sign_flip_posterior_global_target_and_message_continuation():
     from bp_registry.canonical.budgets import BudgetTree
     from bp_registry.canonical.interventions import SignFlipController, SignFlipSpec

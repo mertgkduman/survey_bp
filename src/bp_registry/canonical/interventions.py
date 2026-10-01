@@ -495,7 +495,15 @@ class SyndromeFlipController:
                     leaf_id=root + ":test-order",
                 )
                 if generation is None:
-                    termination = "count_budget_exhausted"
+                    return SyndromeFlipResult(
+                        "controlled_css_adaptation", "arxiv:2507.00254v1",
+                        "0417d33fc2ffb3b442d0397bb09954fc1c6c3938",
+                        "seeded_declared_order_replaces_unseeded_parallel_arrival", root, stream,
+                        original.lineage_id, _bits(baseline.state.candidate),
+                        tuple(int(x) for x in counts), ranked, tuple(tests),
+                        None, None, "count_budget_exhausted",
+                        budgets.summary("attempt"), budgets.leaf_events(),
+                    )
                 else:
                     try:
                         ranked = tuple(sorted(range(n), key=lambda index: (-int(counts[index]), index))[:self.spec.top_k])

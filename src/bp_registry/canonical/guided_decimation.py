@@ -18,6 +18,11 @@ from .numerics import NumericalFailure
 from .schedules import EdgeTable
 
 
+# The guided controller shares the validated public spec with the Phase 5
+# manifest instead of maintaining a second model with the same fields.
+GuidedDecimationSpec = InterventionSpec
+
+
 @dataclass(frozen=True, slots=True)
 class GuidedTransition:
     admitted: bool

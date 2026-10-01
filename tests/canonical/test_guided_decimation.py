@@ -15,6 +15,14 @@ def _session(matrix=None, syndrome=None):
     return h, BpSession(EdgeTable.from_check_matrix(h), s, error_rate=0.1)
 
 
+def test_guided_spec_export_is_shared_manifest_contract():
+    from bp_registry.canonical.contracts import InterventionSpec
+    from bp_registry.canonical.guided_decimation import GuidedDecimationSpec
+
+    assert GuidedDecimationSpec is InterventionSpec
+    assert GuidedDecimationSpec.model_validate(_manifest()["intervention"]).kind == "guided_decimation"
+
+
 def test_reliability_tie_zero_and_eligibility_exhaustion():
     from bp_registry.canonical.budgets import BudgetTree
     from bp_registry.canonical.guided_decimation import GuidedDecimationController
