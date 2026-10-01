@@ -1,0 +1,43 @@
+{
+  "assessment_status": "not_assessed",
+  "denominators": {
+    "all_terminal_shots": 16,
+    "exact": 2,
+    "outcome_unavailable": 5,
+    "stabilizer_equivalent": 9
+  },
+  "final_row_count": 16,
+  "fixture": "pilot_adaptation",
+  "ledger_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-mechanism-pilot/guided_decimation/events.jsonl",
+  "ledger_sha256": "bfb15c6f0b91158e3f503feea5770236d80445dae6703e6debc950312eb511ff",
+  "manifest_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-mechanism-pilot/guided_decimation/manifest.json",
+  "manifest_sha256": "3bfea343d6cf33f9a4b9dac01698c515c1f47855d94a7dd1e9104fc731b10289",
+  "policy_identity": "dc0d663a0c9519605ba41a42283ff99dfff00b06fe2234e1347d12f301ea2096",
+  "relation": "pilot_adaptation",
+  "run_id": "phase5-b1-evaluation-guided_decimation",
+  "schema_version": 2,
+  "shot_ids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "statistical_claim": "not_assessed; bounded pilot adaptation, not a statistical reproduction, performance ranking, or superiority claim",
+  "terminations": {
+    "count_budget_exhausted": 5,
+    "valid_original_candidate": 11
+  },
+  "title": "phase5-b1-evaluation-guided_decimation \u2014 pilot_adaptation pilot_adaptation not_assessed"
+}

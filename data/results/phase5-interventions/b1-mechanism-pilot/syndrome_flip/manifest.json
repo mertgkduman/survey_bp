@@ -1,0 +1,233 @@
+{
+  "artifact": {
+    "code_id": "b1-ghp-882",
+    "format_version": 1,
+    "matrix_hashes": {
+      "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
+      "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
+      "hz_raw_sha256": "e66f9af2f546591faab8c812db497ee23eba80cbdef064d30c32a71e98bce662",
+      "hz_semantic_sha256": "6d8738b4aff3cead4a44dab9d26d3d2473781c54bae7c78e20e978e3cd6288f2",
+      "lx_raw_sha256": "a710640a7c0afe275fb0394bf6388c6ba0a8a07bdad9bcabff3ac7a12fe8ca74",
+      "lx_semantic_sha256": "d5c335893b922e6205f9f7a7f08644a68d6c29c6570f82b0bdb2297fbd22de12",
+      "lz_raw_sha256": "0fa1f2fa849ac334621118b395098232d1e3b1327b0eb4750055dde0c357f6a2",
+      "lz_semantic_sha256": "f609b3f1c83119e567e7d4274d2fc43e2f406c2fd8a49407047bc91c3d833889"
+    },
+    "path": "b1-panteleev-kalachev-v3.npz",
+    "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+    "root": "data/artifacts",
+    "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+  },
+  "budgets": {
+    "attempt": {
+      "max_iterations": 80,
+      "work_limits": {
+        "belief_assemblies": 300000,
+        "bp_calls": 128,
+        "branch_expansions": 64,
+        "branch_prunes": 64,
+        "candidate_checks": 300000,
+        "check_to_variable_updates": 300000,
+        "fallback_calls": 300000,
+        "intervention_actions": 128,
+        "relay_transfers": 300000,
+        "residual_priority_evaluations": 300000,
+        "variable_to_check_updates": 300000
+      }
+    },
+    "denominator_rule": "all_terminal_shots",
+    "max_shots": 16,
+    "search": {
+      "max_iterations": 80,
+      "work_limits": {
+        "belief_assemblies": 300000,
+        "bp_calls": 128,
+        "branch_expansions": 64,
+        "branch_prunes": 64,
+        "candidate_checks": 300000,
+        "check_to_variable_updates": 300000,
+        "fallback_calls": 300000,
+        "intervention_actions": 128,
+        "relay_transfers": 300000,
+        "residual_priority_evaluations": 300000,
+        "variable_to_check_updates": 300000
+      }
+    },
+    "shot": {
+      "max_iterations": 80,
+      "work_limits": {
+        "belief_assemblies": 300000,
+        "bp_calls": 128,
+        "branch_expansions": 64,
+        "branch_prunes": 64,
+        "candidate_checks": 300000,
+        "check_to_variable_updates": 300000,
+        "fallback_calls": 300000,
+        "intervention_actions": 128,
+        "relay_transfers": 300000,
+        "residual_priority_evaluations": 300000,
+        "variable_to_check_updates": 300000
+      }
+    }
+  },
+  "environment": {
+    "backend": "cpu",
+    "numpy": "2.2.6",
+    "omp_num_threads": 1,
+    "python": "3.12.2",
+    "scipy": "1.17.1"
+  },
+  "error_rate": 0.07,
+  "evidence": {
+    "assessment_status": "not_assessed",
+    "discrepancies": [
+      "This bounded pilot adaptation is not a source-faithful curve reproduction or a decoder ranking."
+    ],
+    "fixture": "pilot_adaptation",
+    "procedure": "Prespecified Phase 5 B1 evaluation, syndrome_flip; mechanism only.",
+    "relation": "pilot_adaptation",
+    "sources": [
+      "Phase 3 D-15 through D-19"
+    ]
+  },
+  "intervention": {
+    "attempt_sweeps": 10,
+    "baseline_sweeps": 80,
+    "kind": "syndrome_flip",
+    "lift_rule": "xor_test_vector",
+    "max_weight": 1,
+    "native_availability": "repository_revision_verified_in_phase_research",
+    "operator": "syndrome_xor_test_vector",
+    "preserved_fields": [
+      "original_graph",
+      "original_syndrome"
+    ],
+    "qualification": "controlled_css_adaptation",
+    "reset_rule": "fresh_per_test",
+    "root_seed": "phase5-b1-evaluation-decoder-v1",
+    "selection": "first_declared_valid",
+    "source_code_commit": "0417d33fc2ffb3b442d0397bb09954fc1c6c3938",
+    "source_revision": "arxiv:2507.00254v1",
+    "stream_status": "derived_decoder_stream",
+    "test_cap": 8,
+    "top_k": 8,
+    "trigger": "baseline_invalid_after_oscillation_count",
+    "unresolved": [
+      "unseeded_source_sampling"
+    ],
+    "variant": "bpsf_stable_order_css_v1"
+  },
+  "intervention_limits": {
+    "max_runtime_seconds": 300.0,
+    "max_total_actions": 128,
+    "max_total_attempts": 64,
+    "max_trace_bytes": 2097152,
+    "max_trace_records": 512,
+    "work_caps": {
+      "belief_assemblies": 300000,
+      "bp_calls": 128,
+      "branch_expansions": 64,
+      "branch_prunes": 64,
+      "candidate_checks": 300000,
+      "candidate_constructions": 300000,
+      "check_to_variable_updates": 300000,
+      "convergence_checks": 300000,
+      "fallback_calls": 300000,
+      "fixation_actions": 300000,
+      "intervention_actions": 128,
+      "lifted_coordinates": 300000,
+      "order_generation": 300000,
+      "order_selection": 300000,
+      "original_checks": 300000,
+      "priority_maintenance": 300000,
+      "ranking_scans": 300000,
+      "relay_transfers": 300000,
+      "residual_differences": 300000,
+      "residual_precomputations": 300000,
+      "residual_priority_evaluations": 300000,
+      "transformations": 300000,
+      "variable_to_check_updates": 300000
+    }
+  },
+  "memory": null,
+  "numerical_profile": "cpu-float64-spa-v1",
+  "policies": {
+    "intervention": {
+      "binding_id": "intervention-identity-v1",
+      "kind": "syndrome_flip",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "search"
+    },
+    "postprocessing": {
+      "binding_id": "postprocessing-identity-v1",
+      "kind": "identity",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "attempt"
+    },
+    "schedule": {
+      "binding_id": "schedule-flooding-v1",
+      "kind": "flooding",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "iteration"
+    },
+    "selection": {
+      "binding_id": "selection-stable-first-v1",
+      "kind": "stable_first",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "attempt"
+    },
+    "state_memory": {
+      "binding_id": "state-memory-stateless-v1",
+      "kind": "identity",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "attempt"
+    },
+    "stopping": {
+      "binding_id": "stopping-syndrome-budget-v1",
+      "kind": "syndrome_or_budget",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "iteration"
+    },
+    "update": {
+      "binding_id": "update-binary-spa-v1",
+      "kind": "binary_spa",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "message"
+    }
+  },
+  "profile_plan": {
+    "cohort": "clean",
+    "enabled": true,
+    "level": "low_overhead",
+    "selected_before_outcome": true
+  },
+  "randomness": {
+    "decoder_seed_identity": "phase5-b1-evaluation-decoder-v1",
+    "physical_sample_identity": "phase5-b1-evaluation-physical-v1",
+    "sample_derivation": "sha256-manifest-shot-v1",
+    "sample_seed": 5072026
+  },
+  "relay": null,
+  "run_id": "phase5-b1-evaluation-syndrome_flip",
+  "schema_version": 5,
+  "trace_plan": {
+    "label": "development_default",
+    "level": "off",
+    "max_bytes": 0,
+    "max_records": 0,
+    "relative_dir": "trace-sidecars"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "assessment_status": "not_assessed",
+  "denominators": {
+    "all_terminal_shots": 16,
+    "exact": 5,
+    "outcome_unavailable": 2,
+    "stabilizer_equivalent": 9
+  },
+  "final_row_count": 16,
+  "fixture": "pilot_adaptation",
+  "ledger_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-mechanism-pilot/syndrome_flip/events.jsonl",
+  "ledger_sha256": "6064d72e13cfe039b9f78c018d1ad552dc0201c549b1ea03e64c8e8adaf08540",
+  "manifest_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-mechanism-pilot/syndrome_flip/manifest.json",
+  "manifest_sha256": "f472b2e04b7767eb777a2d46a232cae478d291278b5d4ddfda58af3f1c700401",
+  "policy_identity": "6f4e4a5032d343f1e661c4dc8cb4bffcd563f665e69e6aca4057ea6adb2ebf25",
+  "relation": "pilot_adaptation",
+  "run_id": "phase5-b1-evaluation-syndrome_flip",
+  "schema_version": 2,
+  "shot_ids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "statistical_claim": "not_assessed; bounded pilot adaptation, not a statistical reproduction, performance ranking, or superiority claim",
+  "terminations": {
+    "baseline_valid": 13,
+    "count_budget_exhausted": 2,
+    "syndrome_flip_valid": 1
+  },
+  "title": "phase5-b1-evaluation-syndrome_flip \u2014 pilot_adaptation pilot_adaptation not_assessed"
+}

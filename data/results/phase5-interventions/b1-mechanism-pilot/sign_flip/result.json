@@ -1,0 +1,44 @@
+{
+  "assessment_status": "not_assessed",
+  "denominators": {
+    "all_terminal_shots": 16,
+    "exact": 4,
+    "outcome_unavailable": 4,
+    "stabilizer_equivalent": 8
+  },
+  "final_row_count": 16,
+  "fixture": "pilot_adaptation",
+  "ledger_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-mechanism-pilot/sign_flip/events.jsonl",
+  "ledger_sha256": "4f68fe5d2b31af481e00d950eb73f2a1839bfc041262cf4106871eff6f775aaf",
+  "manifest_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-mechanism-pilot/sign_flip/manifest.json",
+  "manifest_sha256": "4d0bb4bf701d21c28c4137e09d1f37c5315401da292df3635768b727280b03eb",
+  "policy_identity": "68b34114f476b9dfd32b69a70b67e6fe9d5245cdb3ec0887721eb2119318db47",
+  "relation": "pilot_adaptation",
+  "run_id": "phase5-b1-evaluation-sign_flip",
+  "schema_version": 2,
+  "shot_ids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "statistical_claim": "not_assessed; bounded pilot adaptation, not a statistical reproduction, performance ranking, or superiority claim",
+  "terminations": {
+    "baseline_valid": 9,
+    "continuation_cap_reached": 4,
+    "sign_flip_valid": 3
+  },
+  "title": "phase5-b1-evaluation-sign_flip \u2014 pilot_adaptation pilot_adaptation not_assessed"
+}

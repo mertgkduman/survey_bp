@@ -1,0 +1,43 @@
+{
+  "assessment_status": "not_assessed",
+  "denominators": {
+    "all_terminal_shots": 16,
+    "exact": 4,
+    "outcome_unavailable": 2,
+    "stabilizer_equivalent": 10
+  },
+  "final_row_count": 16,
+  "fixture": "pilot_adaptation",
+  "ledger_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-mechanism-pilot/restart_belief/events.jsonl",
+  "ledger_sha256": "4a3c2dbde610d14faad5654bc79824b69e354ed13d5ba42dc0a49dc4ab114bff",
+  "manifest_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase5-interventions/b1-mechanism-pilot/restart_belief/manifest.json",
+  "manifest_sha256": "62a486f10f57e445b3caa53feba3a65495ef1148ec5273621bef3be764749777",
+  "policy_identity": "a133bca0c1585186e21d702812e84e56e250b30e09515f16f3598e917391f5d6",
+  "relation": "pilot_adaptation",
+  "run_id": "phase5-b1-evaluation-restart_belief",
+  "schema_version": 2,
+  "shot_ids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "statistical_claim": "not_assessed; bounded pilot adaptation, not a statistical reproduction, performance ranking, or superiority claim",
+  "terminations": {
+    "count_budget_exhausted": 3,
+    "root_valid": 13
+  },
+  "title": "phase5-b1-evaluation-restart_belief \u2014 pilot_adaptation pilot_adaptation not_assessed"
+}
