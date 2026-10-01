@@ -111,19 +111,26 @@ class GuidedDecimationController:
         except BaseException:
             selection.rollback()
             raise
-        selection.commit_once()
         if not eligible:
+            selection.commit_once()
             return GuidedTransition(False, "no_eligible_target", None, SessionTransition(False, state, "no_eligible_target", None), ())
         if values is None:
+            selection.commit_once()
             return GuidedTransition(False, "no_posterior", None, SessionTransition(False, state, "no_posterior", None), eligible)
         # Infinity is rejected alongside NaN for this finite-prior procedure.
         if values.shape != (session.edge_table.variable_count,) or not np.all(np.isfinite(values)):
+            selection.commit_once()
             return GuidedTransition(False, "numerical_failure", None, SessionTransition(False, state, "numerical_failure", None), eligible)
-        reliability = max(abs(float(values[index])) for index in eligible)
-        ties = tuple(index for index in eligible if abs(float(values[index])) == reliability)
-        target = ties[0]  # eligible is ascending original-coordinate order.
-        zero = float(values[target]) == 0.0
-        signed = self.spec.finite_bias_magnitude if values[target] >= 0 else -self.spec.finite_bias_magnitude
+        try:
+            reliability = max(abs(float(values[index])) for index in eligible)
+            ties = tuple(index for index in eligible if abs(float(values[index])) == reliability)
+            target = ties[0]  # eligible is ascending original-coordinate order.
+            zero = float(values[target]) == 0.0
+            signed = self.spec.finite_bias_magnitude if values[target] >= 0 else -self.spec.finite_bias_magnitude
+        except BaseException:
+            selection.rollback()
+            raise
+        selection.commit_once()
         proposal = session.propose_finite_prior(
             target, signed, source_variant=self.spec.variant, target_order=eligible,
         )

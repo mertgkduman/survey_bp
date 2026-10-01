@@ -342,24 +342,21 @@ class RestartController:
                 break
             reservation.commit_once()
             inserted.append(target)
-            error = np.zeros(original.hz.shape[1], dtype=np.uint8)
-            error[inserted] = 1
-            residual_syndrome = original.syndrome ^ ((original.hz.astype(np.int64) @ error.astype(np.int64)) % 2).astype(np.uint8)
             transform_leaf = f"{branch_id}:residual:{residual_order}:transform"
             if _deadline(wall_clock):
                 rows.append(self._denied_row(original, inserted, target, residual_order, "wall_clock_deadline", insertion_leaf))
                 branch_term = "wall_clock_deadline"
                 break
-            admitted, views = _reserve_compute(
+            admitted, transformed = _reserve_compute(
                 budgets, transform_leaf, WorkVector(transformations=2),
-                lambda: self._views(original, error, residual_syndrome),
+                lambda: self._transformed_views(original, inserted),
             )
             if not admitted:
                 rows.append(self._denied_row(original, inserted, target, residual_order, "count_budget_exhausted", insertion_leaf))
                 branch_term = "count_budget_exhausted"
                 break
-            assert views is not None
-            residual_view, xor_cert, shortened, short_cert = views
+            assert transformed is not None
+            error, residual_syndrome, residual_view, xor_cert, shortened, short_cert = transformed
             reset_leaf = f"{branch_id}:residual:{residual_order}:fresh-reset"
             try:
                 session = root.reset_fresh(
@@ -383,7 +380,6 @@ class RestartController:
             validation_leaf: str | None = None
             next_target = None
             local_term = "residual_sweep_cap"
-            empty = np.count_nonzero(shortened.check_matrix, axis=1) == 0
             contradiction_leaf = f"{branch_id}:residual:{residual_order}:contradiction-check"
             if _deadline(wall_clock):
                 local_term = "wall_clock_deadline"
@@ -392,7 +388,10 @@ class RestartController:
             else:
                 checked, contradiction = _reserve_compute(
                     budgets, contradiction_leaf, WorkVector(candidate_checks=1),
-                    lambda: bool(np.any(empty & (shortened.syndrome == 1))),
+                    lambda: bool(np.any(
+                        (np.count_nonzero(shortened.check_matrix, axis=1) == 0)
+                        & (shortened.syndrome == 1)
+                    )),
                 )
             if local_term == "wall_clock_deadline":
                 pass
@@ -489,6 +488,15 @@ class RestartController:
         else:
             branch_term = "t_cap_reached"
         return RestartBranch(branch_order, root_target, branch_id, open_leaf, tuple(rows), branch_term)
+
+    @staticmethod
+    def _transformed_views(original: OriginalProblem, inserted: list[int]):
+        error = np.zeros(original.hz.shape[1], dtype=np.uint8)
+        error[inserted] = 1
+        residual_syndrome = original.syndrome ^ (
+            (original.hz.astype(np.int64) @ error.astype(np.int64)) % 2
+        ).astype(np.uint8)
+        return error, residual_syndrome, *RestartController._views(original, error, residual_syndrome)
 
     @staticmethod
     def _views(original: OriginalProblem, error: np.ndarray, residual_syndrome: np.ndarray):

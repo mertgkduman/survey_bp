@@ -269,7 +269,6 @@ class FreezingController:
                 lifted: tuple[int, ...] | None = None
                 valid: bool | None = None
                 local_term = "lifetime_expired"
-                empty = np.count_nonzero(working.check_matrix, axis=1) == 0
                 if _deadline(wall_clock):
                     local_term = "wall_clock_deadline"
                 else:
@@ -278,7 +277,10 @@ class FreezingController:
                         local_term = "count_budget_exhausted"
                     else:
                         try:
-                            contradictory = bool(np.any(empty & (working.syndrome == 1)))
+                            contradictory = bool(np.any(
+                                (np.count_nonzero(working.check_matrix, axis=1) == 0)
+                                & (working.syndrome == 1)
+                            ))
                         except BaseException:
                             contradiction.rollback()
                             raise
