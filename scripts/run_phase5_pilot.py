@@ -266,7 +266,10 @@ def _calibration_objective_summary(design: dict[str, Any]) -> dict[str, Any]:
             "attempt_status_counts": dict(sorted(status.items())),
             "terminal_status_counts": dict(sorted(Counter(event["termination"] for event in terminals).items())),
             "no_proposal_slots": no_proposal,
-            "cap_hit_attempts": sum("budget_exhausted" in key or "cap_reached" in key for key in status.elements()),
+            "cap_hit_attempts": sum(
+                "budget_exhausted" in key or "cap_reached" in key or key == "wall_clock_deadline"
+                for key in status.elements()
+            ),
             "committed_work_leaves": leaf_count,
             "typed_work_total": WorkVector.sum(totals).as_evidence(structural_event_version=4),
             "qualification": design["arm_manifests"][arm]["intervention"]["qualification"],
