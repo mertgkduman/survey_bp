@@ -23,6 +23,7 @@ from .manifests import (
     CanonicalExperimentV3,
     CanonicalExperimentV4,
     CanonicalExperimentV5,
+    CanonicalExperimentV6,
     ManifestV1,
     executable_canonical_policy_effects,
     manifest_digest,
@@ -155,9 +156,11 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
         report["intervention"] = {
             "specification": manifest.intervention.model_dump(mode="json", exclude_none=True),
             "limits": manifest.intervention_limits.model_dump(mode="json"),
-            "compact_contract_version": 6,
+            "compact_contract_version": 7 if isinstance(manifest, CanonicalExperimentV6) else 6,
             "ledger_version": 5,
         }
+        if isinstance(manifest, CanonicalExperimentV6):
+            report["memory"] = manifest.memory.model_dump(mode="json")
     elif isinstance(manifest, CanonicalExperimentV4):
         report["memory"] = {
             "bindings": [binding.model_dump(mode="json") for binding in manifest.memory.bindings],
@@ -216,8 +219,8 @@ def _without_none(value: object) -> object:
 def _canonical_kernel_manifest(manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5) -> dict[str, object]:
     """Project-owned kernel receives only its compact execution policy contract."""
     if isinstance(manifest, CanonicalExperimentV5):
-        return {
-            "schema_version": 6,
+        compact = {
+            "schema_version": 7 if isinstance(manifest, CanonicalExperimentV6) else 6,
             "run_id": manifest.run_id,
             "numerical_profile": manifest.numerical_profile,
             "max_iterations": manifest.budgets.attempt.max_iterations,
@@ -225,6 +228,9 @@ def _canonical_kernel_manifest(manifest: CanonicalExperimentV2 | CanonicalExperi
             "policies": _without_none(manifest.policies.model_dump(mode="json")),
             "intervention": manifest.intervention.model_dump(mode="json", exclude_none=True),
         }
+        if isinstance(manifest, CanonicalExperimentV6):
+            compact["memory"] = manifest.memory.model_dump(mode="json")
+        return compact
     compact: dict[str, object] = {
         "schema_version": 3 if isinstance(manifest, CanonicalExperimentV4) else manifest.schema_version,
         "run_id": manifest.run_id,

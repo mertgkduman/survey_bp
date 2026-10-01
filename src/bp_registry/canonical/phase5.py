@@ -100,10 +100,11 @@ def _project(result: object, *, rows_field: str | None, candidate_field: str, or
 def _identity_baseline(
     original: OriginalProblem, error_rate: float, budgets: BudgetTree,
     max_iterations: int, owner_identity: str, wall_clock: WallClockLimit | None = None,
+    damping_gamma: float | None = None,
 ) -> Phase5Outcome:
     session = BpSession(
         EdgeTable.from_check_matrix(original.hz), original.syndrome,
-        error_rate=error_rate, owner_identity=owner_identity,
+        error_rate=error_rate, owner_identity=owner_identity, damping_gamma=damping_gamma,
     )
     initial = session.state.digest
     rows: list[dict[str, Any]] = []
@@ -167,14 +168,15 @@ def execute_phase5_controller(
     spec: Phase5InterventionContract, original: OriginalProblem,
     *, error_rate: float, budgets: BudgetTree, max_iterations: int,
     owner_identity: str, wall_clock: WallClockLimit | None = None,
+    damping_gamma: float | None = None,
 ) -> Phase5Outcome:
     """Dispatch one declared family; no controller receives physical or logical truth."""
     if spec.kind == "identity":
-        return _identity_baseline(original, error_rate, budgets, max_iterations, owner_identity, wall_clock)
+        return _identity_baseline(original, error_rate, budgets, max_iterations, owner_identity, wall_clock, damping_gamma)
     if spec.kind == "guided_decimation":
         session = BpSession(
             EdgeTable.from_check_matrix(original.hz), original.syndrome,
-            error_rate=error_rate, owner_identity=owner_identity,
+            error_rate=error_rate, owner_identity=owner_identity, damping_gamma=damping_gamma,
         )
         result = GuidedDecimationController({
             "kind": "guided_decimation", "variant": spec.variant,
@@ -189,33 +191,33 @@ def execute_phase5_controller(
             realization=spec.realization, selection=spec.selection,
             baseline_sweeps=spec.baseline_sweeps, attempt_sweeps=spec.attempt_sweeps,
             attempt_cap=spec.attempt_cap, coordinate_order=spec.coordinate_order,
-        )).run(original, error_rate=error_rate, budgets=budgets, owner_identity=owner_identity, wall_clock=wall_clock)
+        )).run(original, error_rate=error_rate, budgets=budgets, owner_identity=owner_identity, wall_clock=wall_clock, damping_gamma=damping_gamma)
         return _project(result, rows_field="attempts", candidate_field="selected_candidate", origin_field="selected_origin")
     if spec.kind == "freezing":
         result = FreezingController(FreezingSpec(
             period_sweeps=spec.period_sweeps, lifetime_sweeps=spec.lifetime_sweeps,
             retry_cap=spec.retry_cap, root_seed=spec.root_seed,
-        )).run(original, error_rate=error_rate, budgets=budgets, wall_clock=wall_clock)
+        )).run(original, error_rate=error_rate, budgets=budgets, wall_clock=wall_clock, damping_gamma=damping_gamma)
         return _project(result, rows_field="trials", candidate_field="selected_candidate")
     if spec.kind == "syndrome_flip":
         result = SyndromeFlipController(SyndromeFlipSpec(
             baseline_sweeps=spec.baseline_sweeps, attempt_sweeps=spec.attempt_sweeps,
             top_k=spec.top_k, max_weight=spec.max_weight, test_cap=spec.test_cap,
             root_seed=spec.root_seed,
-        )).run(original, error_rate=error_rate, budgets=budgets, wall_clock=wall_clock)
+        )).run(original, error_rate=error_rate, budgets=budgets, wall_clock=wall_clock, damping_gamma=damping_gamma)
         return _project(result, rows_field="tests", candidate_field="selected_candidate", origin_field="selected_test_order")
     if spec.kind == "sign_flip":
         result = SignFlipController(SignFlipSpec(
             alpha=spec.alpha, trunk_sweeps=spec.trunk_sweeps,
             continuation_sweeps=spec.continuation_sweeps,
-        )).run(original, error_rate=error_rate, budgets=budgets, wall_clock=wall_clock)
+        )).run(original, error_rate=error_rate, budgets=budgets, wall_clock=wall_clock, damping_gamma=damping_gamma)
         return _project(result, rows_field=None, candidate_field="selected_candidate", origin_field="target_index")
     if spec.kind == "restart_belief":
         result = RestartController(RestartSpec(
             preset=spec.preset, code_id=spec.code_id, eta=spec.eta, t_cap=spec.t_cap,
             root_sweeps=spec.root_sweeps, residual_sweeps=spec.residual_sweeps,
             exact_distance=spec.exact_distance,
-        )).run(original, error_rate=error_rate, budgets=budgets, wall_clock=wall_clock)
+        )).run(original, error_rate=error_rate, budgets=budgets, wall_clock=wall_clock, damping_gamma=damping_gamma)
         return _project(result, rows_field="branches", candidate_field="selected_candidate", origin_field="selected_origin")
     raise ValueError("unregistered Phase 5 intervention kind")
 

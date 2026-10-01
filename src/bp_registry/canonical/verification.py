@@ -21,7 +21,7 @@ from .. import evaluator
 from ..ledger import CANONICAL_RELAY_LEDGER_VERSION, read_canonical_events
 from .budgets import BudgetLimit, BudgetTree, BudgetView, Measurement, QualifiedIteration, ScheduleTerminalEvidence, WallClockLimit, WorkVector
 from .kernel import BinarySpaKernel
-from .contracts import MemoryCompositionSpec, Phase5InterventionContract, parse_canonical_manifest
+from .contracts import CanonicalManifestV7, MemoryCompositionSpec, Phase5InterventionContract, parse_canonical_manifest
 from .phase5 import execute_phase5_controller, finalize_phase5_deadline, phase5_attempt_events, phase5_work_evidence
 from .problems import OriginalProblem
 from .memory_execution import LocalMemoryExecution, MemoryFloodingSchedule
@@ -1001,6 +1001,13 @@ def validate_phase5_shot(
         "native_availability": spec.native_availability,
         "intervention_kind": spec.kind,
     }
+    damping_gamma = None
+    if isinstance(parsed, CanonicalManifestV7):
+        binding = parsed.memory.bindings[0]
+        damping_gamma = binding.parameters["gamma"]
+        identity_data["memory_binding"] = binding.binding_id
+        identity_data["damping_gamma"] = damping_gamma
+        identity_data["memory_source_status"] = binding.source_status
     code = context.code.validate()
     original_id = stable_lineage_id("original", {"identity": identity})
     original = OriginalProblem(original_id.value, code.hx, code.hz, np.asarray(context.syndrome, dtype=np.uint8))
@@ -1037,6 +1044,7 @@ def validate_phase5_shot(
         spec, original, error_rate=context.error_rate, budgets=budgets,
         max_iterations=context.max_iterations, owner_identity=identity,
         wall_clock=wall_clock,
+        damping_gamma=damping_gamma,
     )
     outcome = finalize_phase5_deadline(outcome, wall_clock)
     if runtime_rows and (wall_clock is None or wall_clock.first_termination is None
@@ -1087,7 +1095,7 @@ def validate_phase5_shot(
         if event.get("kind") != kind or data.get("identity") != identity_data or data.get("payload") != payload:
             raise CanonicalStructuralVerificationError(f"Phase 5 event {index} differs from deterministic replay")
         if kind == "shot_begin":
-            if data.get("schema_version") != 5 or data.get("compact_schema_version") != 6 or event.get("sample_seed_identity") != context.sample_seed_identity:
+            if data.get("schema_version") != 5 or data.get("compact_schema_version") != parsed.schema_version or event.get("sample_seed_identity") != context.sample_seed_identity:
                 raise CanonicalStructuralVerificationError("Phase 5 begin identity or schema differs")
         if kind == "termination" and event.get("termination") != outcome.termination:
             raise CanonicalStructuralVerificationError("Phase 5 terminal status differs from deterministic replay")
@@ -1112,7 +1120,7 @@ def validate_canonical_shot(
     early check here is deliberately strict enough to make terminal reuse safe
     before the executor ever returns a previous result.
     """
-    if context.compact_manifest.get("schema_version") == 6:
+    if context.compact_manifest.get("schema_version") in {6, 7}:
         parsed = parse_canonical_manifest(context.compact_manifest)
         if isinstance(parsed.intervention, Phase5InterventionContract):
             return validate_phase5_shot(events, context)

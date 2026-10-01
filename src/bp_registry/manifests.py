@@ -515,7 +515,35 @@ class CanonicalExperimentV5(CanonicalExperimentV4):
         return self
 
 
-ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5
+class CanonicalExperimentV6(CanonicalExperimentV5):
+    """Phase 5 intervention with one explicit, attempt-reset V2C damping policy."""
+
+    schema_version: Literal[6]
+    memory: MemoryCompositionSpec
+
+    @model_validator(mode="after")
+    def admitted_intervention_memory(self) -> "CanonicalExperimentV6":
+        if len(self.memory.bindings) != 1:
+            raise ValueError("intervention damping requires exactly one memory binding")
+        binding = self.memory.bindings[0]
+        if (binding.kind != "v2c_damping" or binding.target != "v2c"
+                or binding.advance_boundary.value != "source_iteration"
+                or binding.refresh_boundary.value != "attempt_start"
+                or binding.state_lifetime != "attempt" or binding.retain_history
+                or binding.source_status != "canonical_adaptation"):
+            raise ValueError("intervention damping requires attempt-reset source-iteration V2C memory")
+        if self.intervention.kind == "impulse" and self.intervention.realization == "semantic_forced_one":
+            raise ValueError("damped semantic forced-one impulse is not qualified")
+        decision = validate_memory_compatibility(
+            self.memory, update_rule=self.policies.update.kind,
+            schedule=self.policies.schedule.kind,
+        )
+        if not decision.admitted:
+            raise ValueError(decision.reason)
+        return self
+
+
+ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | CanonicalExperimentV6
 
 
 _EXECUTABLE_BASELINE_KINDS = {
@@ -604,11 +632,13 @@ def _read_value(value: dict[str, Any] | str | Path) -> dict[str, Any]:
     return decoded
 
 
-def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | dict[str, Any] | str | Path) -> ManifestV1 | CanonicalManifestV2 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5:
+def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | CanonicalExperimentV6 | dict[str, Any] | str | Path) -> ManifestRecord:
     """Dispatch complete native and canonical schemas without changing v1 meanings."""
-    if isinstance(value, (ManifestV1, CanonicalManifestV2, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5)):
+    if isinstance(value, (ManifestV1, CanonicalManifestV2, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV6)):
         return value
     decoded = _read_value(value)
+    if decoded.get("schema_version") == 6:
+        return CanonicalExperimentV6.model_validate(decoded)
     if decoded.get("schema_version") == 5:
         return CanonicalExperimentV5.model_validate(decoded)
     if decoded.get("schema_version") == 4:
@@ -623,9 +653,11 @@ def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | CanonicalExperiment
 
 
 def _parse_for_preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ManifestRecord:
-    if isinstance(value, (ManifestV1, LegacyManifestV1, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5)):
+    if isinstance(value, (ManifestV1, LegacyManifestV1, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV6)):
         return value
     decoded = _read_value(value)
+    if decoded.get("schema_version") == 6:
+        return CanonicalExperimentV6.model_validate(decoded)
     if decoded.get("schema_version") == 5:
         return CanonicalExperimentV5.model_validate(decoded)
     if decoded.get("schema_version") == 4:
@@ -747,6 +779,14 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
         # validation, before this branch can open an artifact or sample.
         _verify_canonical_environment(manifest.environment)
         validate_composition(manifest.policies)
+        if isinstance(manifest, CanonicalExperimentV6):
+            from .canonical.memory_execution import validate_single_attempt_memory
+
+            validate_single_attempt_memory(
+                manifest.memory, schedule=manifest.policies.schedule.kind,
+                update=manifest.policies.update,
+                max_iterations=manifest.budgets.attempt.max_iterations,
+            )
         if manifest.profile_plan.level != "low_overhead" or manifest.profile_plan.cohort != "clean":
             raise ValueError("Phase 5 public profiling requires a clean low_overhead cohort")
         if manifest.trace_plan.level != "off":

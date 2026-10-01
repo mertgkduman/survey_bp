@@ -424,8 +424,9 @@ def _validate_canonical_event(event: Mapping[str, Any]) -> None:
         from .canonical.budgets import WorkVector
 
         if event["kind"] == "shot_begin":
-            if set(data) != {"schema_version", "compact_schema_version", "identity", "payload"} or data["schema_version"] != 5 or data["compact_schema_version"] != 6:
-                raise ValueError("V5 intervention shot_begin requires exact public/compact versions")
+            if (set(data) != {"schema_version", "compact_schema_version", "identity", "payload"}
+                    or data["schema_version"] != 5 or data["compact_schema_version"] not in {6, 7}):
+                raise ValueError("intervention shot_begin requires a registered compact contract version")
         elif set(data) != {"identity", "payload"}:
             raise ValueError("V5 intervention event requires exact identity and payload fields")
         if not isinstance(data.get("identity"), dict) or not isinstance(data.get("payload"), dict):

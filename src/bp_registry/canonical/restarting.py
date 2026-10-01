@@ -195,6 +195,7 @@ class RestartController:
     def run(
         self, original: OriginalProblem, *, error_rate: float, budgets: BudgetTree,
         wall_clock: WallClockLimit | None = None,
+        damping_gamma: float | None = None,
     ) -> RestartResult:
         if not isinstance(original, OriginalProblem):
             raise ValueError("restart requires an immutable original CSS problem")
@@ -205,7 +206,7 @@ class RestartController:
         root_owner = "restart-" + sha256(json.dumps(material, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest()[:20]
         root = BpSession(
             EdgeTable.from_check_matrix(original.hz), original.syndrome,
-            error_rate=error_rate, owner_identity=root_owner,
+            error_rate=error_rate, owner_identity=root_owner, damping_gamma=damping_gamma,
         )
         initial = root.state.digest
         root_valid = False

@@ -13,6 +13,7 @@ import numpy as np
 from .budgets import BudgetTree, WallClockLimit, WorkVector
 from .contracts import FinitePriorBiasAction
 from .kernel import BinarySpaKernel
+from .memory import V2CDamping, V2CDampingState, TargetMemoryProposal
 from .schedules import EdgeTable, FloodingSchedule
 
 
@@ -93,6 +94,7 @@ class BpSession:
     def __init__(
         self, edge_table: EdgeTable, syndrome: np.ndarray, *, error_rate: float,
         owner_identity: str | None = None, kernel: BinarySpaKernel | None = None,
+        damping_gamma: float | None = None,
     ) -> None:
         self.edge_table = edge_table
         bits = np.asarray(syndrome)
@@ -105,6 +107,8 @@ class BpSession:
             raise ValueError("intervention session kernel must be a canonical binary kernel")
         self.kernel = kernel or BinarySpaKernel()
         self.schedule = FloodingSchedule(edge_table, kernel=self.kernel)
+        self.damping_gamma = damping_gamma
+        self._damping_policy = None if damping_gamma is None else V2CDamping("phase5-v2c-damping", damping_gamma)
         self._owner = object()
         if owner_identity is not None and (not isinstance(owner_identity, str) or not owner_identity):
             raise ValueError("owner identity must be a nonempty string")
@@ -114,6 +118,9 @@ class BpSession:
         ).encode()).hexdigest()[:20]
         prior = np.full(edge_table.variable_count, self.kernel.prior(error_rate), dtype=np.float64)
         v2c = self.schedule.initialize(error_rate)
+        self._damping_state: V2CDampingState | None = (
+            None if self._damping_policy is None else self._damping_policy.initial_state(v2c)
+        )
         posterior = np.array(prior, copy=True)
         candidate = self.kernel.candidate_from_beliefs(posterior)
         self._state = self._make_state(prior, v2c, posterior, candidate, (), 0, 0)
@@ -128,6 +135,7 @@ class BpSession:
         *, c2v: np.ndarray | None = None,
         mutation_evidence: Mapping[str, tuple[str, ...]] | None = None,
         pending_sign_target: int | None = None,
+        memory_history: np.ndarray | None = None,
     ) -> BpSessionState:
         n, e = self.edge_table.variable_count, self.edge_table.edge_count
         p = _frozen_f64(prior, n, "prior")
@@ -154,11 +162,21 @@ class BpSession:
             "schedule_cursor": (source_iteration,), "mutation_evidence": dict(evidence),
             "pending_sign_target": pending_sign_target,
         }
+        if self._damping_state is not None:
+            history = _frozen_f64(
+                self._damping_state.v2c if memory_history is None else memory_history,
+                e, "damping_history",
+            )
+            payload["damping_gamma"] = self.damping_gamma
+            payload["damping_history_sha256"] = sha256(history.tobytes()).hexdigest()
+            private_histories: tuple[object, ...] = (history,)
+        else:
+            private_histories = ()
         digest = sha256(json.dumps(payload, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
         return BpSessionState(
             p, v, b, c, fixed_indices, source_iteration, revision, digest,
             c2v_snapshot, self.edge_table.graph_sha256, prior_identity, "float64",
-            self.owner_identity, coordinate_identity, (source_iteration,), None, (), evidence,
+            self.owner_identity, coordinate_identity, (source_iteration,), None, private_histories, evidence,
             pending_sign_target,
         )
 
@@ -260,9 +278,20 @@ class BpSession:
                 input_v2c[edge_index] = self.kernel.variable_message(
                     float(state.posterior[state.pending_sign_target]), float(state.c2v[edge_index]),
                 )
+            memory_proposal: TargetMemoryProposal | None = None
+
+            def damp_v2c(fresh: np.ndarray) -> np.ndarray:
+                nonlocal memory_proposal
+                assert self._damping_policy is not None and self._damping_state is not None
+                memory_proposal = self._damping_policy.propose(
+                    self._damping_state.v2c, fresh, boundary="source_iteration",
+                )
+                return memory_proposal.value
+
             sweep = self.schedule.sweep(
                 input_v2c, self.syndrome, error_rate=self.error_rate,
                 source_iteration=state.source_iteration, prior_llrs=state.prior,
+                transform_v2c=damp_v2c if self._damping_policy is not None else None,
             )
             next_state = self._make_state(
                 state.prior, sweep.new_v2c, sweep.beliefs, sweep.candidate,
@@ -273,11 +302,15 @@ class BpSession:
                     "recomputed": ("c2v", "posterior", "candidate", "v2c"),
                     "invalidated": ("pending_sign_target",) if pending_edges else (),
                 },
+                memory_history=None if memory_proposal is None else memory_proposal.history[0],
             )
         except BaseException:
             reservation.rollback()
             raise
         reservation.commit_once()
+        if memory_proposal is not None:
+            assert self._damping_policy is not None and self._damping_state is not None
+            self._damping_state = self._damping_policy.commit(memory_proposal, self._damping_state)
         self._state = next_state
         return SessionTransition(True, next_state, None, leaf_id)
 
@@ -330,8 +363,13 @@ class BpSession:
                 [self.state.owner_identity, leaf_id, table.graph_sha256, next_rate],
                 separators=(",", ":"), allow_nan=False,
             ).encode()).hexdigest()[:20]
-            child = type(self)(table, next_syndrome, error_rate=next_rate, owner_identity=branch_owner, kernel=self.kernel)
+            child = type(self)(
+                table, next_syndrome, error_rate=next_rate, owner_identity=branch_owner,
+                kernel=self.kernel, damping_gamma=self.damping_gamma,
+            )
             if preserve_set:
+                if self._damping_state is not None:
+                    child._damping_state = self._damping_state
                 old = self.state
                 child._state = child._make_state(
                     old.prior, old.v2c, old.posterior, old.candidate,

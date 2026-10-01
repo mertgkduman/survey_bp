@@ -236,9 +236,12 @@ class ImpulseController:
     def run(
         self, original: OriginalProblem, *, error_rate: float, budgets: BudgetTree,
         owner_identity: str | None = None, wall_clock: WallClockLimit | None = None,
+        damping_gamma: float | None = None,
     ) -> ImpulseResult:
         if not isinstance(original, OriginalProblem):
             raise ValueError("impulse requires an immutable original problem")
+        if damping_gamma is not None and self.spec.realization == "semantic_forced_one":
+            raise ValueError("damped semantic forced-one impulse is not qualified")
         n = original.hz.shape[1]
         root = owner_identity or "impulse-" + sha256(json.dumps(
             [original.lineage_id, original.hz.tolist(), original.syndrome.tolist(), error_rate, asdict(self.spec)],
@@ -248,7 +251,7 @@ class ImpulseController:
             raise ValueError("impulse owner identity must be a nonempty string")
         baseline = BpSession(
             EdgeTable.from_check_matrix(original.hz), original.syndrome,
-            error_rate=error_rate, owner_identity=f"{root}:baseline",
+            error_rate=error_rate, owner_identity=f"{root}:baseline", damping_gamma=damping_gamma,
         )
         initial_digest = baseline.state.digest
         if wall_clock is not None and wall_clock.check("candidate_selection_boundary", scope="attempt") is not None:
@@ -321,7 +324,8 @@ class ImpulseController:
         else:
             selected_candidate = None
             for attempt_order, target in enumerate(order[:self.spec.attempt_cap]):
-                row = self._attempt(original, error_rate, budgets, root, attempt_order, target, wall_clock=wall_clock)
+                row = self._attempt(original, error_rate, budgets, root, attempt_order, target,
+                                    wall_clock=wall_clock, damping_gamma=damping_gamma)
                 attempts.append(row)
                 if row.termination == "count_budget_exhausted":
                     termination = "count_budget_exhausted"
@@ -368,6 +372,7 @@ class ImpulseController:
     def _attempt(
         self, original: OriginalProblem, error_rate: float, budgets: BudgetTree,
         root: str, order: int, target: int, *, wall_clock: WallClockLimit | None = None,
+        damping_gamma: float | None = None,
     ) -> ImpulseAttempt:
         mode = self.spec.realization
         owner = f"{root}:attempt:{order}:target:{target}"
@@ -385,7 +390,7 @@ class ImpulseController:
             if mode == "exact_shortening":
                 working, certificate = transform_fixed_coordinates(original, (target,), (1,))
                 table = EdgeTable.from_check_matrix(working.check_matrix)
-                session: BpSession = BpSession(table, working.syndrome, error_rate=error_rate, owner_identity=owner)
+                session: BpSession = BpSession(table, working.syndrome, error_rate=error_rate, owner_identity=owner, damping_gamma=damping_gamma)
                 working_id = working.lineage_id
                 lift_digest = certificate.digest
             else:

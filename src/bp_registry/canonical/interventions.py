@@ -170,10 +170,11 @@ class FreezingController:
     def run(
         self, original: OriginalProblem, *, error_rate: float, budgets: BudgetTree,
         wall_clock: WallClockLimit | None = None,
+        damping_gamma: float | None = None,
     ) -> FreezingResult:
         root = _owner("freezing", original, self.spec.root_seed, error_rate)
         table = EdgeTable.from_check_matrix(original.hz)
-        baseline = BpSession(table, original.syndrome, error_rate=error_rate, owner_identity=root + ":baseline")
+        baseline = BpSession(table, original.syndrome, error_rate=error_rate, owner_identity=root + ":baseline", damping_gamma=damping_gamma)
         baseline_valid = False
         baseline_term = "failed_period"
         for index in range(self.spec.period_sweeps):
@@ -262,7 +263,7 @@ class FreezingController:
                 working, cert = transform_fixed_coordinates(original, (target,), (0,))
                 session = BpSession(
                     EdgeTable.from_check_matrix(working.check_matrix), working.syndrome,
-                    error_rate=error_rate, owner_identity=owner,
+                    error_rate=error_rate, owner_identity=owner, damping_gamma=damping_gamma,
                 )
                 initial = session.state.digest
                 sweep_leaves: list[str] = []
@@ -444,13 +445,14 @@ class SyndromeFlipController:
     def run(
         self, original: OriginalProblem, *, error_rate: float, budgets: BudgetTree,
         wall_clock: WallClockLimit | None = None,
+        damping_gamma: float | None = None,
     ) -> SyndromeFlipResult:
         root = _owner("syndrome-flip", original, self.spec.root_seed, error_rate)
         n = original.hz.shape[1]
         stream = decoder_stream_identity(root, "bpsf", "test_vector_order", 0, "test_selection")
         baseline = BpSession(
             EdgeTable.from_check_matrix(original.hz), original.syndrome,
-            error_rate=error_rate, owner_identity=root + ":baseline",
+            error_rate=error_rate, owner_identity=root + ":baseline", damping_gamma=damping_gamma,
         )
         counts = np.zeros(n, dtype=np.int64)
         previous: tuple[int, ...] | None = None
@@ -543,7 +545,7 @@ class SyndromeFlipController:
                     working, cert = transform_syndrome(original, np.asarray(t, dtype=np.uint8))
                     session = BpSession(
                         EdgeTable.from_check_matrix(working.check_matrix), working.syndrome,
-                        error_rate=error_rate, owner_identity=owner,
+                        error_rate=error_rate, owner_identity=owner, damping_gamma=damping_gamma,
                     )
                     initial = session.state.digest
                     sweep_leaves: list[str] = []
@@ -664,6 +666,7 @@ class SignFlipController:
     def run(
         self, original: OriginalProblem, *, error_rate: float, budgets: BudgetTree,
         wall_clock: WallClockLimit | None = None,
+        damping_gamma: float | None = None,
     ) -> SignFlipResult:
         root = _owner("sign-flip", original, f"alpha:{self.spec.alpha}", error_rate)
         assignment = ParameterAssignment(shape="scalar", value=float(self.spec.alpha))
@@ -672,7 +675,7 @@ class SignFlipController:
         )
         session = BpSession(
             EdgeTable.from_check_matrix(original.hz), original.syndrome,
-            error_rate=error_rate, owner_identity=root, kernel=kernel,
+            error_rate=error_rate, owner_identity=root, kernel=kernel, damping_gamma=damping_gamma,
         )
         trigger = "failed_normalized_min_sum_trunk"
         termination = "no_proposal"

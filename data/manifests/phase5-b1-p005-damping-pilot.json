@@ -1,0 +1,3561 @@
+{
+  "arm_manifests": {
+    "freezing": {
+      "artifact": {
+        "code_id": "b1-ghp-882",
+        "format_version": 1,
+        "matrix_hashes": {
+          "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
+          "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
+          "hz_raw_sha256": "e66f9af2f546591faab8c812db497ee23eba80cbdef064d30c32a71e98bce662",
+          "hz_semantic_sha256": "6d8738b4aff3cead4a44dab9d26d3d2473781c54bae7c78e20e978e3cd6288f2",
+          "lx_raw_sha256": "a710640a7c0afe275fb0394bf6388c6ba0a8a07bdad9bcabff3ac7a12fe8ca74",
+          "lx_semantic_sha256": "d5c335893b922e6205f9f7a7f08644a68d6c29c6570f82b0bdb2297fbd22de12",
+          "lz_raw_sha256": "0fa1f2fa849ac334621118b395098232d1e3b1327b0eb4750055dde0c357f6a2",
+          "lz_semantic_sha256": "f609b3f1c83119e567e7d4274d2fc43e2f406c2fd8a49407047bc91c3d833889"
+        },
+        "path": "b1-panteleev-kalachev-v3.npz",
+        "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+        "root": "data/artifacts",
+        "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+      },
+      "budgets": {
+        "attempt": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "denominator_rule": "all_terminal_shots",
+        "max_shots": 128,
+        "search": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "shot": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        }
+      },
+      "environment": {
+        "backend": "cpu",
+        "numpy": "2.2.6",
+        "omp_num_threads": 1,
+        "python": "3.12.2",
+        "scipy": "1.17.1"
+      },
+      "error_rate": 0.05,
+      "evidence": {
+        "assessment_status": "not_assessed",
+        "discrepancies": [
+          "This bounded pilot adaptation is not a source-faithful curve reproduction or a decoder ranking.",
+          "Corrected work-receipt revision v2 supersedes the earlier Phase 5 mechanism pilot; no decoder ranking or source-curve assessment is made.",
+          "The p=0.05 paired damping pilot is a controlled composition adaptation, not source-curve reproduction."
+        ],
+        "fixture": "pilot_adaptation",
+        "procedure": "Prespecified matched p=0.05 B1 mechanism pilot; freezing; memory disabled.",
+        "relation": "pilot_adaptation",
+        "sources": [
+          "Phase 3 D-15 through D-19"
+        ]
+      },
+      "intervention": {
+        "kind": "freezing",
+        "lifetime_sweeps": 10,
+        "lift_rule": "restore_fixed",
+        "native_availability": "unverified",
+        "operator": "temporary_zero_freeze",
+        "period_sweeps": 10,
+        "preserved_fields": [
+          "original_graph",
+          "original_syndrome"
+        ],
+        "qualification": "controlled_css_adaptation",
+        "reset_rule": "fresh_structural_branch_then_release_to_original",
+        "retry_cap": 8,
+        "root_seed": "phase5-b1-p005-damping-decoder-v1",
+        "selection": "first_valid",
+        "source_revision": "arxiv:0801.1241",
+        "stream_status": "derived_decoder_stream",
+        "trigger": "frustrated_check",
+        "unresolved": [
+          "quaternary_to_binary"
+        ],
+        "variant": "freezing_binary_css_controlled_v1"
+      },
+      "intervention_limits": {
+        "max_runtime_seconds": 300.0,
+        "max_total_actions": 128,
+        "max_total_attempts": 64,
+        "max_trace_bytes": 2097152,
+        "max_trace_records": 512,
+        "work_caps": {
+          "belief_assemblies": 300000,
+          "bp_calls": 128,
+          "branch_expansions": 64,
+          "branch_prunes": 64,
+          "candidate_checks": 300000,
+          "candidate_constructions": 300000,
+          "check_to_variable_updates": 300000,
+          "convergence_checks": 300000,
+          "fallback_calls": 300000,
+          "fixation_actions": 300000,
+          "intervention_actions": 128,
+          "lifted_coordinates": 300000,
+          "order_generation": 300000,
+          "order_selection": 300000,
+          "original_checks": 300000,
+          "priority_maintenance": 300000,
+          "ranking_scans": 300000,
+          "relay_transfers": 300000,
+          "residual_differences": 300000,
+          "residual_precomputations": 300000,
+          "residual_priority_evaluations": 300000,
+          "transformations": 300000,
+          "variable_to_check_updates": 300000
+        }
+      },
+      "memory": null,
+      "numerical_profile": "cpu-float64-spa-v1",
+      "policies": {
+        "intervention": {
+          "binding_id": "intervention-identity-v1",
+          "kind": "freezing",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "search"
+        },
+        "postprocessing": {
+          "binding_id": "postprocessing-identity-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "schedule": {
+          "binding_id": "schedule-flooding-v1",
+          "kind": "flooding",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "selection": {
+          "binding_id": "selection-stable-first-v1",
+          "kind": "stable_first",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "state_memory": {
+          "binding_id": "state-memory-stateless-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "stopping": {
+          "binding_id": "stopping-syndrome-budget-v1",
+          "kind": "syndrome_or_budget",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "update": {
+          "binding_id": "update-binary-spa-v1",
+          "kind": "binary_spa",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "message"
+        }
+      },
+      "profile_plan": {
+        "cohort": "clean",
+        "enabled": true,
+        "level": "low_overhead",
+        "selected_before_outcome": true
+      },
+      "randomness": {
+        "decoder_seed_identity": "phase5-b1-p005-damping-decoder-v1",
+        "physical_sample_identity": "phase5-b1-p005-damping-physical-v1",
+        "sample_derivation": "sha256-manifest-shot-v1",
+        "sample_seed": 5012128
+      },
+      "relay": null,
+      "run_id": "phase5-b1-p005-freezing-v1",
+      "schema_version": 5,
+      "trace_plan": {
+        "label": "development_default",
+        "level": "off",
+        "max_bytes": 0,
+        "max_records": 0,
+        "relative_dir": "trace-sidecars"
+      }
+    },
+    "freezing__damped": {
+      "artifact": {
+        "code_id": "b1-ghp-882",
+        "format_version": 1,
+        "matrix_hashes": {
+          "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
+          "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
+          "hz_raw_sha256": "e66f9af2f546591faab8c812db497ee23eba80cbdef064d30c32a71e98bce662",
+          "hz_semantic_sha256": "6d8738b4aff3cead4a44dab9d26d3d2473781c54bae7c78e20e978e3cd6288f2",
+          "lx_raw_sha256": "a710640a7c0afe275fb0394bf6388c6ba0a8a07bdad9bcabff3ac7a12fe8ca74",
+          "lx_semantic_sha256": "d5c335893b922e6205f9f7a7f08644a68d6c29c6570f82b0bdb2297fbd22de12",
+          "lz_raw_sha256": "0fa1f2fa849ac334621118b395098232d1e3b1327b0eb4750055dde0c357f6a2",
+          "lz_semantic_sha256": "f609b3f1c83119e567e7d4274d2fc43e2f406c2fd8a49407047bc91c3d833889"
+        },
+        "path": "b1-panteleev-kalachev-v3.npz",
+        "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+        "root": "data/artifacts",
+        "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+      },
+      "budgets": {
+        "attempt": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "denominator_rule": "all_terminal_shots",
+        "max_shots": 128,
+        "search": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "shot": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        }
+      },
+      "environment": {
+        "backend": "cpu",
+        "numpy": "2.2.6",
+        "omp_num_threads": 1,
+        "python": "3.12.2",
+        "scipy": "1.17.1"
+      },
+      "error_rate": 0.05,
+      "evidence": {
+        "assessment_status": "not_assessed",
+        "discrepancies": [
+          "This bounded pilot adaptation is not a source-faithful curve reproduction or a decoder ranking.",
+          "Corrected work-receipt revision v2 supersedes the earlier Phase 5 mechanism pilot; no decoder ranking or source-curve assessment is made.",
+          "The p=0.05 paired damping pilot is a controlled composition adaptation, not source-curve reproduction."
+        ],
+        "fixture": "pilot_adaptation",
+        "procedure": "Prespecified matched p=0.05 B1 mechanism pilot; freezing; V2C damping gamma=0.5 at each fresh BP attempt.",
+        "relation": "pilot_adaptation",
+        "sources": [
+          "Phase 3 D-15 through D-19"
+        ]
+      },
+      "intervention": {
+        "kind": "freezing",
+        "lifetime_sweeps": 10,
+        "lift_rule": "restore_fixed",
+        "native_availability": "unverified",
+        "operator": "temporary_zero_freeze",
+        "period_sweeps": 10,
+        "preserved_fields": [
+          "original_graph",
+          "original_syndrome"
+        ],
+        "qualification": "controlled_css_adaptation",
+        "reset_rule": "fresh_structural_branch_then_release_to_original",
+        "retry_cap": 8,
+        "root_seed": "phase5-b1-p005-damping-decoder-v1",
+        "selection": "first_valid",
+        "source_revision": "arxiv:0801.1241",
+        "stream_status": "derived_decoder_stream",
+        "trigger": "frustrated_check",
+        "unresolved": [
+          "quaternary_to_binary"
+        ],
+        "variant": "freezing_binary_css_controlled_v1"
+      },
+      "intervention_limits": {
+        "max_runtime_seconds": 300.0,
+        "max_total_actions": 128,
+        "max_total_attempts": 64,
+        "max_trace_bytes": 2097152,
+        "max_trace_records": 512,
+        "work_caps": {
+          "belief_assemblies": 300000,
+          "bp_calls": 128,
+          "branch_expansions": 64,
+          "branch_prunes": 64,
+          "candidate_checks": 300000,
+          "candidate_constructions": 300000,
+          "check_to_variable_updates": 300000,
+          "convergence_checks": 300000,
+          "fallback_calls": 300000,
+          "fixation_actions": 300000,
+          "intervention_actions": 128,
+          "lifted_coordinates": 300000,
+          "order_generation": 300000,
+          "order_selection": 300000,
+          "original_checks": 300000,
+          "priority_maintenance": 300000,
+          "ranking_scans": 300000,
+          "relay_transfers": 300000,
+          "residual_differences": 300000,
+          "residual_precomputations": 300000,
+          "residual_priority_evaluations": 300000,
+          "transformations": 300000,
+          "variable_to_check_updates": 300000
+        }
+      },
+      "memory": {
+        "bindings": [
+          {
+            "advance_boundary": "source_iteration",
+            "binding_id": "v2c-damping",
+            "history_owner": "attempt:v2c-damping",
+            "kind": "v2c_damping",
+            "order": 0,
+            "parameters": {
+              "gamma": 0.5
+            },
+            "refresh_boundary": "attempt_start",
+            "retain_history": false,
+            "source_status": "canonical_adaptation",
+            "state_lifetime": "attempt",
+            "target": "v2c"
+          }
+        ]
+      },
+      "numerical_profile": "cpu-float64-spa-v1",
+      "policies": {
+        "intervention": {
+          "binding_id": "intervention-identity-v1",
+          "kind": "freezing",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "search"
+        },
+        "postprocessing": {
+          "binding_id": "postprocessing-identity-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "schedule": {
+          "binding_id": "schedule-flooding-v1",
+          "kind": "flooding",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "selection": {
+          "binding_id": "selection-stable-first-v1",
+          "kind": "stable_first",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "state_memory": {
+          "binding_id": "state-memory-stateless-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "stopping": {
+          "binding_id": "stopping-syndrome-budget-v1",
+          "kind": "syndrome_or_budget",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "update": {
+          "binding_id": "update-binary-spa-v1",
+          "kind": "binary_spa",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "message"
+        }
+      },
+      "profile_plan": {
+        "cohort": "clean",
+        "enabled": true,
+        "level": "low_overhead",
+        "selected_before_outcome": true
+      },
+      "randomness": {
+        "decoder_seed_identity": "phase5-b1-p005-damping-decoder-v1",
+        "physical_sample_identity": "phase5-b1-p005-damping-physical-v1",
+        "sample_derivation": "sha256-manifest-shot-v1",
+        "sample_seed": 5012128
+      },
+      "relay": null,
+      "run_id": "phase5-b1-p005-freezing__damped-v1",
+      "schema_version": 6,
+      "trace_plan": {
+        "label": "development_default",
+        "level": "off",
+        "max_bytes": 0,
+        "max_records": 0,
+        "relative_dir": "trace-sidecars"
+      }
+    },
+    "guided_decimation": {
+      "artifact": {
+        "code_id": "b1-ghp-882",
+        "format_version": 1,
+        "matrix_hashes": {
+          "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
+          "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
+          "hz_raw_sha256": "e66f9af2f546591faab8c812db497ee23eba80cbdef064d30c32a71e98bce662",
+          "hz_semantic_sha256": "6d8738b4aff3cead4a44dab9d26d3d2473781c54bae7c78e20e978e3cd6288f2",
+          "lx_raw_sha256": "a710640a7c0afe275fb0394bf6388c6ba0a8a07bdad9bcabff3ac7a12fe8ca74",
+          "lx_semantic_sha256": "d5c335893b922e6205f9f7a7f08644a68d6c29c6570f82b0bdb2297fbd22de12",
+          "lz_raw_sha256": "0fa1f2fa849ac334621118b395098232d1e3b1327b0eb4750055dde0c357f6a2",
+          "lz_semantic_sha256": "f609b3f1c83119e567e7d4274d2fc43e2f406c2fd8a49407047bc91c3d833889"
+        },
+        "path": "b1-panteleev-kalachev-v3.npz",
+        "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+        "root": "data/artifacts",
+        "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+      },
+      "budgets": {
+        "attempt": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "denominator_rule": "all_terminal_shots",
+        "max_shots": 128,
+        "search": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "shot": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        }
+      },
+      "environment": {
+        "backend": "cpu",
+        "numpy": "2.2.6",
+        "omp_num_threads": 1,
+        "python": "3.12.2",
+        "scipy": "1.17.1"
+      },
+      "error_rate": 0.05,
+      "evidence": {
+        "assessment_status": "not_assessed",
+        "discrepancies": [
+          "This bounded pilot adaptation is not a source-faithful curve reproduction or a decoder ranking.",
+          "Corrected work-receipt revision v2 supersedes the earlier Phase 5 mechanism pilot; no decoder ranking or source-curve assessment is made.",
+          "The p=0.05 paired damping pilot is a controlled composition adaptation, not source-curve reproduction."
+        ],
+        "fixture": "pilot_adaptation",
+        "procedure": "Prespecified matched p=0.05 B1 mechanism pilot; guided_decimation; memory disabled.",
+        "relation": "pilot_adaptation",
+        "sources": [
+          "Phase 3 D-15 through D-19"
+        ]
+      },
+      "intervention": {
+        "final_round_rule": "return_after_last_fixation",
+        "finite_bias_magnitude": 25.0,
+        "kind": "guided_decimation",
+        "lift_rule": "identity",
+        "native_availability": "unverified",
+        "operator": "finite_prior_bias",
+        "preserved_fields": [
+          "graph",
+          "syndrome",
+          "messages"
+        ],
+        "qualification": "algorithm_interpretation",
+        "reset_rule": "continue_messages",
+        "round_limit": 16,
+        "selection": "max_abs_reliability",
+        "source_revision": "arxiv:2312.10950v2",
+        "stream_status": "not_applicable",
+        "sweeps_per_round": 10,
+        "trigger": "failed_bp_round",
+        "unresolved": [
+          "zero_sign",
+          "final_round"
+        ],
+        "variant": "algorithm1_v2_interpretation",
+        "zero_rule": "positive_prior_for_zero_posterior"
+      },
+      "intervention_limits": {
+        "max_runtime_seconds": 300.0,
+        "max_total_actions": 128,
+        "max_total_attempts": 64,
+        "max_trace_bytes": 2097152,
+        "max_trace_records": 512,
+        "work_caps": {
+          "belief_assemblies": 300000,
+          "bp_calls": 128,
+          "branch_expansions": 64,
+          "branch_prunes": 64,
+          "candidate_checks": 300000,
+          "candidate_constructions": 300000,
+          "check_to_variable_updates": 300000,
+          "convergence_checks": 300000,
+          "fallback_calls": 300000,
+          "fixation_actions": 300000,
+          "intervention_actions": 128,
+          "lifted_coordinates": 300000,
+          "order_generation": 300000,
+          "order_selection": 300000,
+          "original_checks": 300000,
+          "priority_maintenance": 300000,
+          "ranking_scans": 300000,
+          "relay_transfers": 300000,
+          "residual_differences": 300000,
+          "residual_precomputations": 300000,
+          "residual_priority_evaluations": 300000,
+          "transformations": 300000,
+          "variable_to_check_updates": 300000
+        }
+      },
+      "memory": null,
+      "numerical_profile": "cpu-float64-spa-v1",
+      "policies": {
+        "intervention": {
+          "binding_id": "intervention-identity-v1",
+          "kind": "guided_decimation",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "search"
+        },
+        "postprocessing": {
+          "binding_id": "postprocessing-identity-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "schedule": {
+          "binding_id": "schedule-flooding-v1",
+          "kind": "flooding",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "selection": {
+          "binding_id": "selection-stable-first-v1",
+          "kind": "stable_first",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "state_memory": {
+          "binding_id": "state-memory-stateless-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "stopping": {
+          "binding_id": "stopping-syndrome-budget-v1",
+          "kind": "syndrome_or_budget",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "update": {
+          "binding_id": "update-binary-spa-v1",
+          "kind": "binary_spa",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "message"
+        }
+      },
+      "profile_plan": {
+        "cohort": "clean",
+        "enabled": true,
+        "level": "low_overhead",
+        "selected_before_outcome": true
+      },
+      "randomness": {
+        "decoder_seed_identity": "phase5-b1-p005-damping-decoder-v1",
+        "physical_sample_identity": "phase5-b1-p005-damping-physical-v1",
+        "sample_derivation": "sha256-manifest-shot-v1",
+        "sample_seed": 5012128
+      },
+      "relay": null,
+      "run_id": "phase5-b1-p005-guided_decimation-v1",
+      "schema_version": 5,
+      "trace_plan": {
+        "label": "development_default",
+        "level": "off",
+        "max_bytes": 0,
+        "max_records": 0,
+        "relative_dir": "trace-sidecars"
+      }
+    },
+    "guided_decimation__damped": {
+      "artifact": {
+        "code_id": "b1-ghp-882",
+        "format_version": 1,
+        "matrix_hashes": {
+          "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
+          "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
+          "hz_raw_sha256": "e66f9af2f546591faab8c812db497ee23eba80cbdef064d30c32a71e98bce662",
+          "hz_semantic_sha256": "6d8738b4aff3cead4a44dab9d26d3d2473781c54bae7c78e20e978e3cd6288f2",
+          "lx_raw_sha256": "a710640a7c0afe275fb0394bf6388c6ba0a8a07bdad9bcabff3ac7a12fe8ca74",
+          "lx_semantic_sha256": "d5c335893b922e6205f9f7a7f08644a68d6c29c6570f82b0bdb2297fbd22de12",
+          "lz_raw_sha256": "0fa1f2fa849ac334621118b395098232d1e3b1327b0eb4750055dde0c357f6a2",
+          "lz_semantic_sha256": "f609b3f1c83119e567e7d4274d2fc43e2f406c2fd8a49407047bc91c3d833889"
+        },
+        "path": "b1-panteleev-kalachev-v3.npz",
+        "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+        "root": "data/artifacts",
+        "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+      },
+      "budgets": {
+        "attempt": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "denominator_rule": "all_terminal_shots",
+        "max_shots": 128,
+        "search": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "shot": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        }
+      },
+      "environment": {
+        "backend": "cpu",
+        "numpy": "2.2.6",
+        "omp_num_threads": 1,
+        "python": "3.12.2",
+        "scipy": "1.17.1"
+      },
+      "error_rate": 0.05,
+      "evidence": {
+        "assessment_status": "not_assessed",
+        "discrepancies": [
+          "This bounded pilot adaptation is not a source-faithful curve reproduction or a decoder ranking.",
+          "Corrected work-receipt revision v2 supersedes the earlier Phase 5 mechanism pilot; no decoder ranking or source-curve assessment is made.",
+          "The p=0.05 paired damping pilot is a controlled composition adaptation, not source-curve reproduction."
+        ],
+        "fixture": "pilot_adaptation",
+        "procedure": "Prespecified matched p=0.05 B1 mechanism pilot; guided_decimation; V2C damping gamma=0.5 at each fresh BP attempt.",
+        "relation": "pilot_adaptation",
+        "sources": [
+          "Phase 3 D-15 through D-19"
+        ]
+      },
+      "intervention": {
+        "final_round_rule": "return_after_last_fixation",
+        "finite_bias_magnitude": 25.0,
+        "kind": "guided_decimation",
+        "lift_rule": "identity",
+        "native_availability": "unverified",
+        "operator": "finite_prior_bias",
+        "preserved_fields": [
+          "graph",
+          "syndrome",
+          "messages"
+        ],
+        "qualification": "algorithm_interpretation",
+        "reset_rule": "continue_messages",
+        "round_limit": 16,
+        "selection": "max_abs_reliability",
+        "source_revision": "arxiv:2312.10950v2",
+        "stream_status": "not_applicable",
+        "sweeps_per_round": 10,
+        "trigger": "failed_bp_round",
+        "unresolved": [
+          "zero_sign",
+          "final_round"
+        ],
+        "variant": "algorithm1_v2_interpretation",
+        "zero_rule": "positive_prior_for_zero_posterior"
+      },
+      "intervention_limits": {
+        "max_runtime_seconds": 300.0,
+        "max_total_actions": 128,
+        "max_total_attempts": 64,
+        "max_trace_bytes": 2097152,
+        "max_trace_records": 512,
+        "work_caps": {
+          "belief_assemblies": 300000,
+          "bp_calls": 128,
+          "branch_expansions": 64,
+          "branch_prunes": 64,
+          "candidate_checks": 300000,
+          "candidate_constructions": 300000,
+          "check_to_variable_updates": 300000,
+          "convergence_checks": 300000,
+          "fallback_calls": 300000,
+          "fixation_actions": 300000,
+          "intervention_actions": 128,
+          "lifted_coordinates": 300000,
+          "order_generation": 300000,
+          "order_selection": 300000,
+          "original_checks": 300000,
+          "priority_maintenance": 300000,
+          "ranking_scans": 300000,
+          "relay_transfers": 300000,
+          "residual_differences": 300000,
+          "residual_precomputations": 300000,
+          "residual_priority_evaluations": 300000,
+          "transformations": 300000,
+          "variable_to_check_updates": 300000
+        }
+      },
+      "memory": {
+        "bindings": [
+          {
+            "advance_boundary": "source_iteration",
+            "binding_id": "v2c-damping",
+            "history_owner": "attempt:v2c-damping",
+            "kind": "v2c_damping",
+            "order": 0,
+            "parameters": {
+              "gamma": 0.5
+            },
+            "refresh_boundary": "attempt_start",
+            "retain_history": false,
+            "source_status": "canonical_adaptation",
+            "state_lifetime": "attempt",
+            "target": "v2c"
+          }
+        ]
+      },
+      "numerical_profile": "cpu-float64-spa-v1",
+      "policies": {
+        "intervention": {
+          "binding_id": "intervention-identity-v1",
+          "kind": "guided_decimation",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "search"
+        },
+        "postprocessing": {
+          "binding_id": "postprocessing-identity-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "schedule": {
+          "binding_id": "schedule-flooding-v1",
+          "kind": "flooding",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "selection": {
+          "binding_id": "selection-stable-first-v1",
+          "kind": "stable_first",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "state_memory": {
+          "binding_id": "state-memory-stateless-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "stopping": {
+          "binding_id": "stopping-syndrome-budget-v1",
+          "kind": "syndrome_or_budget",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "update": {
+          "binding_id": "update-binary-spa-v1",
+          "kind": "binary_spa",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "message"
+        }
+      },
+      "profile_plan": {
+        "cohort": "clean",
+        "enabled": true,
+        "level": "low_overhead",
+        "selected_before_outcome": true
+      },
+      "randomness": {
+        "decoder_seed_identity": "phase5-b1-p005-damping-decoder-v1",
+        "physical_sample_identity": "phase5-b1-p005-damping-physical-v1",
+        "sample_derivation": "sha256-manifest-shot-v1",
+        "sample_seed": 5012128
+      },
+      "relay": null,
+      "run_id": "phase5-b1-p005-guided_decimation__damped-v1",
+      "schema_version": 6,
+      "trace_plan": {
+        "label": "development_default",
+        "level": "off",
+        "max_bytes": 0,
+        "max_records": 0,
+        "relative_dir": "trace-sidecars"
+      }
+    },
+    "identity": {
+      "artifact": {
+        "code_id": "b1-ghp-882",
+        "format_version": 1,
+        "matrix_hashes": {
+          "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
+          "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
+          "hz_raw_sha256": "e66f9af2f546591faab8c812db497ee23eba80cbdef064d30c32a71e98bce662",
+          "hz_semantic_sha256": "6d8738b4aff3cead4a44dab9d26d3d2473781c54bae7c78e20e978e3cd6288f2",
+          "lx_raw_sha256": "a710640a7c0afe275fb0394bf6388c6ba0a8a07bdad9bcabff3ac7a12fe8ca74",
+          "lx_semantic_sha256": "d5c335893b922e6205f9f7a7f08644a68d6c29c6570f82b0bdb2297fbd22de12",
+          "lz_raw_sha256": "0fa1f2fa849ac334621118b395098232d1e3b1327b0eb4750055dde0c357f6a2",
+          "lz_semantic_sha256": "f609b3f1c83119e567e7d4274d2fc43e2f406c2fd8a49407047bc91c3d833889"
+        },
+        "path": "b1-panteleev-kalachev-v3.npz",
+        "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+        "root": "data/artifacts",
+        "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+      },
+      "budgets": {
+        "attempt": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "denominator_rule": "all_terminal_shots",
+        "max_shots": 128,
+        "search": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "shot": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        }
+      },
+      "environment": {
+        "backend": "cpu",
+        "numpy": "2.2.6",
+        "omp_num_threads": 1,
+        "python": "3.12.2",
+        "scipy": "1.17.1"
+      },
+      "error_rate": 0.05,
+      "evidence": {
+        "assessment_status": "not_assessed",
+        "discrepancies": [
+          "This bounded pilot adaptation is not a source-faithful curve reproduction or a decoder ranking.",
+          "Corrected work-receipt revision v2 supersedes the earlier Phase 5 mechanism pilot; no decoder ranking or source-curve assessment is made.",
+          "The p=0.05 paired damping pilot is a controlled composition adaptation, not source-curve reproduction."
+        ],
+        "fixture": "pilot_adaptation",
+        "procedure": "Prespecified matched p=0.05 B1 mechanism pilot; identity; memory disabled.",
+        "relation": "pilot_adaptation",
+        "sources": [
+          "Phase 3 D-15 through D-19"
+        ]
+      },
+      "intervention": {
+        "kind": "identity",
+        "lift_rule": "identity",
+        "native_availability": "not_applicable",
+        "operator": "identity",
+        "preserved_fields": [],
+        "qualification": "canonical_implemented",
+        "reset_rule": "not_applicable",
+        "selection": "stable_first",
+        "source_revision": "project:canonical-baseline",
+        "stream_status": "not_applicable",
+        "trigger": "attempt_start",
+        "unresolved": [],
+        "variant": "identity_baseline_v1"
+      },
+      "intervention_limits": {
+        "max_runtime_seconds": 300.0,
+        "max_total_actions": 128,
+        "max_total_attempts": 64,
+        "max_trace_bytes": 2097152,
+        "max_trace_records": 512,
+        "work_caps": {
+          "belief_assemblies": 300000,
+          "bp_calls": 128,
+          "branch_expansions": 64,
+          "branch_prunes": 64,
+          "candidate_checks": 300000,
+          "candidate_constructions": 300000,
+          "check_to_variable_updates": 300000,
+          "convergence_checks": 300000,
+          "fallback_calls": 300000,
+          "fixation_actions": 300000,
+          "intervention_actions": 128,
+          "lifted_coordinates": 300000,
+          "order_generation": 300000,
+          "order_selection": 300000,
+          "original_checks": 300000,
+          "priority_maintenance": 300000,
+          "ranking_scans": 300000,
+          "relay_transfers": 300000,
+          "residual_differences": 300000,
+          "residual_precomputations": 300000,
+          "residual_priority_evaluations": 300000,
+          "transformations": 300000,
+          "variable_to_check_updates": 300000
+        }
+      },
+      "memory": null,
+      "numerical_profile": "cpu-float64-spa-v1",
+      "policies": {
+        "intervention": {
+          "binding_id": "intervention-identity-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "search"
+        },
+        "postprocessing": {
+          "binding_id": "postprocessing-identity-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "schedule": {
+          "binding_id": "schedule-flooding-v1",
+          "kind": "flooding",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "selection": {
+          "binding_id": "selection-stable-first-v1",
+          "kind": "stable_first",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "state_memory": {
+          "binding_id": "state-memory-stateless-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "stopping": {
+          "binding_id": "stopping-syndrome-budget-v1",
+          "kind": "syndrome_or_budget",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "update": {
+          "binding_id": "update-binary-spa-v1",
+          "kind": "binary_spa",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "message"
+        }
+      },
+      "profile_plan": {
+        "cohort": "clean",
+        "enabled": true,
+        "level": "low_overhead",
+        "selected_before_outcome": true
+      },
+      "randomness": {
+        "decoder_seed_identity": "phase5-b1-p005-damping-decoder-v1",
+        "physical_sample_identity": "phase5-b1-p005-damping-physical-v1",
+        "sample_derivation": "sha256-manifest-shot-v1",
+        "sample_seed": 5012128
+      },
+      "relay": null,
+      "run_id": "phase5-b1-p005-identity-v1",
+      "schema_version": 5,
+      "trace_plan": {
+        "label": "development_default",
+        "level": "off",
+        "max_bytes": 0,
+        "max_records": 0,
+        "relative_dir": "trace-sidecars"
+      }
+    },
+    "identity__damped": {
+      "artifact": {
+        "code_id": "b1-ghp-882",
+        "format_version": 1,
+        "matrix_hashes": {
+          "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
+          "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
+          "hz_raw_sha256": "e66f9af2f546591faab8c812db497ee23eba80cbdef064d30c32a71e98bce662",
+          "hz_semantic_sha256": "6d8738b4aff3cead4a44dab9d26d3d2473781c54bae7c78e20e978e3cd6288f2",
+          "lx_raw_sha256": "a710640a7c0afe275fb0394bf6388c6ba0a8a07bdad9bcabff3ac7a12fe8ca74",
+          "lx_semantic_sha256": "d5c335893b922e6205f9f7a7f08644a68d6c29c6570f82b0bdb2297fbd22de12",
+          "lz_raw_sha256": "0fa1f2fa849ac334621118b395098232d1e3b1327b0eb4750055dde0c357f6a2",
+          "lz_semantic_sha256": "f609b3f1c83119e567e7d4274d2fc43e2f406c2fd8a49407047bc91c3d833889"
+        },
+        "path": "b1-panteleev-kalachev-v3.npz",
+        "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+        "root": "data/artifacts",
+        "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+      },
+      "budgets": {
+        "attempt": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "denominator_rule": "all_terminal_shots",
+        "max_shots": 128,
+        "search": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "shot": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        }
+      },
+      "environment": {
+        "backend": "cpu",
+        "numpy": "2.2.6",
+        "omp_num_threads": 1,
+        "python": "3.12.2",
+        "scipy": "1.17.1"
+      },
+      "error_rate": 0.05,
+      "evidence": {
+        "assessment_status": "not_assessed",
+        "discrepancies": [
+          "This bounded pilot adaptation is not a source-faithful curve reproduction or a decoder ranking.",
+          "Corrected work-receipt revision v2 supersedes the earlier Phase 5 mechanism pilot; no decoder ranking or source-curve assessment is made.",
+          "The p=0.05 paired damping pilot is a controlled composition adaptation, not source-curve reproduction."
+        ],
+        "fixture": "pilot_adaptation",
+        "procedure": "Prespecified matched p=0.05 B1 mechanism pilot; identity; V2C damping gamma=0.5 at each fresh BP attempt.",
+        "relation": "pilot_adaptation",
+        "sources": [
+          "Phase 3 D-15 through D-19"
+        ]
+      },
+      "intervention": {
+        "kind": "identity",
+        "lift_rule": "identity",
+        "native_availability": "not_applicable",
+        "operator": "identity",
+        "preserved_fields": [],
+        "qualification": "canonical_implemented",
+        "reset_rule": "not_applicable",
+        "selection": "stable_first",
+        "source_revision": "project:canonical-baseline",
+        "stream_status": "not_applicable",
+        "trigger": "attempt_start",
+        "unresolved": [],
+        "variant": "identity_baseline_v1"
+      },
+      "intervention_limits": {
+        "max_runtime_seconds": 300.0,
+        "max_total_actions": 128,
+        "max_total_attempts": 64,
+        "max_trace_bytes": 2097152,
+        "max_trace_records": 512,
+        "work_caps": {
+          "belief_assemblies": 300000,
+          "bp_calls": 128,
+          "branch_expansions": 64,
+          "branch_prunes": 64,
+          "candidate_checks": 300000,
+          "candidate_constructions": 300000,
+          "check_to_variable_updates": 300000,
+          "convergence_checks": 300000,
+          "fallback_calls": 300000,
+          "fixation_actions": 300000,
+          "intervention_actions": 128,
+          "lifted_coordinates": 300000,
+          "order_generation": 300000,
+          "order_selection": 300000,
+          "original_checks": 300000,
+          "priority_maintenance": 300000,
+          "ranking_scans": 300000,
+          "relay_transfers": 300000,
+          "residual_differences": 300000,
+          "residual_precomputations": 300000,
+          "residual_priority_evaluations": 300000,
+          "transformations": 300000,
+          "variable_to_check_updates": 300000
+        }
+      },
+      "memory": {
+        "bindings": [
+          {
+            "advance_boundary": "source_iteration",
+            "binding_id": "v2c-damping",
+            "history_owner": "attempt:v2c-damping",
+            "kind": "v2c_damping",
+            "order": 0,
+            "parameters": {
+              "gamma": 0.5
+            },
+            "refresh_boundary": "attempt_start",
+            "retain_history": false,
+            "source_status": "canonical_adaptation",
+            "state_lifetime": "attempt",
+            "target": "v2c"
+          }
+        ]
+      },
+      "numerical_profile": "cpu-float64-spa-v1",
+      "policies": {
+        "intervention": {
+          "binding_id": "intervention-identity-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "search"
+        },
+        "postprocessing": {
+          "binding_id": "postprocessing-identity-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "schedule": {
+          "binding_id": "schedule-flooding-v1",
+          "kind": "flooding",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "selection": {
+          "binding_id": "selection-stable-first-v1",
+          "kind": "stable_first",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "state_memory": {
+          "binding_id": "state-memory-stateless-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "stopping": {
+          "binding_id": "stopping-syndrome-budget-v1",
+          "kind": "syndrome_or_budget",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "update": {
+          "binding_id": "update-binary-spa-v1",
+          "kind": "binary_spa",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "message"
+        }
+      },
+      "profile_plan": {
+        "cohort": "clean",
+        "enabled": true,
+        "level": "low_overhead",
+        "selected_before_outcome": true
+      },
+      "randomness": {
+        "decoder_seed_identity": "phase5-b1-p005-damping-decoder-v1",
+        "physical_sample_identity": "phase5-b1-p005-damping-physical-v1",
+        "sample_derivation": "sha256-manifest-shot-v1",
+        "sample_seed": 5012128
+      },
+      "relay": null,
+      "run_id": "phase5-b1-p005-identity__damped-v1",
+      "schema_version": 6,
+      "trace_plan": {
+        "label": "development_default",
+        "level": "off",
+        "max_bytes": 0,
+        "max_records": 0,
+        "relative_dir": "trace-sidecars"
+      }
+    },
+    "impulse": {
+      "artifact": {
+        "code_id": "b1-ghp-882",
+        "format_version": 1,
+        "matrix_hashes": {
+          "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
+          "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
+          "hz_raw_sha256": "e66f9af2f546591faab8c812db497ee23eba80cbdef064d30c32a71e98bce662",
+          "hz_semantic_sha256": "6d8738b4aff3cead4a44dab9d26d3d2473781c54bae7c78e20e978e3cd6288f2",
+          "lx_raw_sha256": "a710640a7c0afe275fb0394bf6388c6ba0a8a07bdad9bcabff3ac7a12fe8ca74",
+          "lx_semantic_sha256": "d5c335893b922e6205f9f7a7f08644a68d6c29c6570f82b0bdb2297fbd22de12",
+          "lz_raw_sha256": "0fa1f2fa849ac334621118b395098232d1e3b1327b0eb4750055dde0c357f6a2",
+          "lz_semantic_sha256": "f609b3f1c83119e567e7d4274d2fc43e2f406c2fd8a49407047bc91c3d833889"
+        },
+        "path": "b1-panteleev-kalachev-v3.npz",
+        "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+        "root": "data/artifacts",
+        "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+      },
+      "budgets": {
+        "attempt": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "denominator_rule": "all_terminal_shots",
+        "max_shots": 128,
+        "search": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "shot": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        }
+      },
+      "environment": {
+        "backend": "cpu",
+        "numpy": "2.2.6",
+        "omp_num_threads": 1,
+        "python": "3.12.2",
+        "scipy": "1.17.1"
+      },
+      "error_rate": 0.05,
+      "evidence": {
+        "assessment_status": "not_assessed",
+        "discrepancies": [
+          "This bounded pilot adaptation is not a source-faithful curve reproduction or a decoder ranking.",
+          "Corrected work-receipt revision v2 supersedes the earlier Phase 5 mechanism pilot; no decoder ranking or source-curve assessment is made.",
+          "The p=0.05 paired damping pilot is a controlled composition adaptation, not source-curve reproduction."
+        ],
+        "fixture": "pilot_adaptation",
+        "procedure": "Prespecified matched p=0.05 B1 mechanism pilot; impulse; memory disabled.",
+        "relation": "pilot_adaptation",
+        "sources": [
+          "Phase 3 D-15 through D-19"
+        ]
+      },
+      "intervention": {
+        "attempt_cap": 8,
+        "attempt_sweeps": 10,
+        "baseline_sweeps": 80,
+        "kind": "impulse",
+        "lift_rule": "restore_fixed",
+        "native_availability": "unverified",
+        "operator": "exact_shortening",
+        "preserved_fields": [
+          "original_graph",
+          "original_syndrome"
+        ],
+        "qualification": "controlled_css_adaptation",
+        "realization": "exact_shortening",
+        "reset_rule": "fresh_per_coordinate",
+        "selection": "minimum_original_weight",
+        "source_revision": "arxiv:2606.18240v1",
+        "stream_status": "not_applicable",
+        "trigger": "baseline_invalid",
+        "unresolved": [
+          "source_infinite_llr_trajectory"
+        ],
+        "variant": "impulse_exact_shortening_css_v1"
+      },
+      "intervention_limits": {
+        "max_runtime_seconds": 300.0,
+        "max_total_actions": 128,
+        "max_total_attempts": 64,
+        "max_trace_bytes": 2097152,
+        "max_trace_records": 512,
+        "work_caps": {
+          "belief_assemblies": 300000,
+          "bp_calls": 128,
+          "branch_expansions": 64,
+          "branch_prunes": 64,
+          "candidate_checks": 300000,
+          "candidate_constructions": 300000,
+          "check_to_variable_updates": 300000,
+          "convergence_checks": 300000,
+          "fallback_calls": 300000,
+          "fixation_actions": 300000,
+          "intervention_actions": 128,
+          "lifted_coordinates": 300000,
+          "order_generation": 300000,
+          "order_selection": 300000,
+          "original_checks": 300000,
+          "priority_maintenance": 300000,
+          "ranking_scans": 300000,
+          "relay_transfers": 300000,
+          "residual_differences": 300000,
+          "residual_precomputations": 300000,
+          "residual_priority_evaluations": 300000,
+          "transformations": 300000,
+          "variable_to_check_updates": 300000
+        }
+      },
+      "memory": null,
+      "numerical_profile": "cpu-float64-spa-v1",
+      "policies": {
+        "intervention": {
+          "binding_id": "intervention-identity-v1",
+          "kind": "impulse",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "search"
+        },
+        "postprocessing": {
+          "binding_id": "postprocessing-identity-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "schedule": {
+          "binding_id": "schedule-flooding-v1",
+          "kind": "flooding",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "selection": {
+          "binding_id": "selection-stable-first-v1",
+          "kind": "stable_first",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "state_memory": {
+          "binding_id": "state-memory-stateless-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "stopping": {
+          "binding_id": "stopping-syndrome-budget-v1",
+          "kind": "syndrome_or_budget",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "update": {
+          "binding_id": "update-binary-spa-v1",
+          "kind": "binary_spa",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "message"
+        }
+      },
+      "profile_plan": {
+        "cohort": "clean",
+        "enabled": true,
+        "level": "low_overhead",
+        "selected_before_outcome": true
+      },
+      "randomness": {
+        "decoder_seed_identity": "phase5-b1-p005-damping-decoder-v1",
+        "physical_sample_identity": "phase5-b1-p005-damping-physical-v1",
+        "sample_derivation": "sha256-manifest-shot-v1",
+        "sample_seed": 5012128
+      },
+      "relay": null,
+      "run_id": "phase5-b1-p005-impulse-v1",
+      "schema_version": 5,
+      "trace_plan": {
+        "label": "development_default",
+        "level": "off",
+        "max_bytes": 0,
+        "max_records": 0,
+        "relative_dir": "trace-sidecars"
+      }
+    },
+    "impulse__damped": {
+      "artifact": {
+        "code_id": "b1-ghp-882",
+        "format_version": 1,
+        "matrix_hashes": {
+          "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
+          "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
+          "hz_raw_sha256": "e66f9af2f546591faab8c812db497ee23eba80cbdef064d30c32a71e98bce662",
+          "hz_semantic_sha256": "6d8738b4aff3cead4a44dab9d26d3d2473781c54bae7c78e20e978e3cd6288f2",
+          "lx_raw_sha256": "a710640a7c0afe275fb0394bf6388c6ba0a8a07bdad9bcabff3ac7a12fe8ca74",
+          "lx_semantic_sha256": "d5c335893b922e6205f9f7a7f08644a68d6c29c6570f82b0bdb2297fbd22de12",
+          "lz_raw_sha256": "0fa1f2fa849ac334621118b395098232d1e3b1327b0eb4750055dde0c357f6a2",
+          "lz_semantic_sha256": "f609b3f1c83119e567e7d4274d2fc43e2f406c2fd8a49407047bc91c3d833889"
+        },
+        "path": "b1-panteleev-kalachev-v3.npz",
+        "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+        "root": "data/artifacts",
+        "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+      },
+      "budgets": {
+        "attempt": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "denominator_rule": "all_terminal_shots",
+        "max_shots": 128,
+        "search": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "shot": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        }
+      },
+      "environment": {
+        "backend": "cpu",
+        "numpy": "2.2.6",
+        "omp_num_threads": 1,
+        "python": "3.12.2",
+        "scipy": "1.17.1"
+      },
+      "error_rate": 0.05,
+      "evidence": {
+        "assessment_status": "not_assessed",
+        "discrepancies": [
+          "This bounded pilot adaptation is not a source-faithful curve reproduction or a decoder ranking.",
+          "Corrected work-receipt revision v2 supersedes the earlier Phase 5 mechanism pilot; no decoder ranking or source-curve assessment is made.",
+          "The p=0.05 paired damping pilot is a controlled composition adaptation, not source-curve reproduction."
+        ],
+        "fixture": "pilot_adaptation",
+        "procedure": "Prespecified matched p=0.05 B1 mechanism pilot; impulse; V2C damping gamma=0.5 at each fresh BP attempt.",
+        "relation": "pilot_adaptation",
+        "sources": [
+          "Phase 3 D-15 through D-19"
+        ]
+      },
+      "intervention": {
+        "attempt_cap": 8,
+        "attempt_sweeps": 10,
+        "baseline_sweeps": 80,
+        "kind": "impulse",
+        "lift_rule": "restore_fixed",
+        "native_availability": "unverified",
+        "operator": "exact_shortening",
+        "preserved_fields": [
+          "original_graph",
+          "original_syndrome"
+        ],
+        "qualification": "controlled_css_adaptation",
+        "realization": "exact_shortening",
+        "reset_rule": "fresh_per_coordinate",
+        "selection": "minimum_original_weight",
+        "source_revision": "arxiv:2606.18240v1",
+        "stream_status": "not_applicable",
+        "trigger": "baseline_invalid",
+        "unresolved": [
+          "source_infinite_llr_trajectory"
+        ],
+        "variant": "impulse_exact_shortening_css_v1"
+      },
+      "intervention_limits": {
+        "max_runtime_seconds": 300.0,
+        "max_total_actions": 128,
+        "max_total_attempts": 64,
+        "max_trace_bytes": 2097152,
+        "max_trace_records": 512,
+        "work_caps": {
+          "belief_assemblies": 300000,
+          "bp_calls": 128,
+          "branch_expansions": 64,
+          "branch_prunes": 64,
+          "candidate_checks": 300000,
+          "candidate_constructions": 300000,
+          "check_to_variable_updates": 300000,
+          "convergence_checks": 300000,
+          "fallback_calls": 300000,
+          "fixation_actions": 300000,
+          "intervention_actions": 128,
+          "lifted_coordinates": 300000,
+          "order_generation": 300000,
+          "order_selection": 300000,
+          "original_checks": 300000,
+          "priority_maintenance": 300000,
+          "ranking_scans": 300000,
+          "relay_transfers": 300000,
+          "residual_differences": 300000,
+          "residual_precomputations": 300000,
+          "residual_priority_evaluations": 300000,
+          "transformations": 300000,
+          "variable_to_check_updates": 300000
+        }
+      },
+      "memory": {
+        "bindings": [
+          {
+            "advance_boundary": "source_iteration",
+            "binding_id": "v2c-damping",
+            "history_owner": "attempt:v2c-damping",
+            "kind": "v2c_damping",
+            "order": 0,
+            "parameters": {
+              "gamma": 0.5
+            },
+            "refresh_boundary": "attempt_start",
+            "retain_history": false,
+            "source_status": "canonical_adaptation",
+            "state_lifetime": "attempt",
+            "target": "v2c"
+          }
+        ]
+      },
+      "numerical_profile": "cpu-float64-spa-v1",
+      "policies": {
+        "intervention": {
+          "binding_id": "intervention-identity-v1",
+          "kind": "impulse",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "search"
+        },
+        "postprocessing": {
+          "binding_id": "postprocessing-identity-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "schedule": {
+          "binding_id": "schedule-flooding-v1",
+          "kind": "flooding",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "selection": {
+          "binding_id": "selection-stable-first-v1",
+          "kind": "stable_first",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "state_memory": {
+          "binding_id": "state-memory-stateless-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "stopping": {
+          "binding_id": "stopping-syndrome-budget-v1",
+          "kind": "syndrome_or_budget",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "update": {
+          "binding_id": "update-binary-spa-v1",
+          "kind": "binary_spa",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "message"
+        }
+      },
+      "profile_plan": {
+        "cohort": "clean",
+        "enabled": true,
+        "level": "low_overhead",
+        "selected_before_outcome": true
+      },
+      "randomness": {
+        "decoder_seed_identity": "phase5-b1-p005-damping-decoder-v1",
+        "physical_sample_identity": "phase5-b1-p005-damping-physical-v1",
+        "sample_derivation": "sha256-manifest-shot-v1",
+        "sample_seed": 5012128
+      },
+      "relay": null,
+      "run_id": "phase5-b1-p005-impulse__damped-v1",
+      "schema_version": 6,
+      "trace_plan": {
+        "label": "development_default",
+        "level": "off",
+        "max_bytes": 0,
+        "max_records": 0,
+        "relative_dir": "trace-sidecars"
+      }
+    },
+    "restart_belief": {
+      "artifact": {
+        "code_id": "b1-ghp-882",
+        "format_version": 1,
+        "matrix_hashes": {
+          "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
+          "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
+          "hz_raw_sha256": "e66f9af2f546591faab8c812db497ee23eba80cbdef064d30c32a71e98bce662",
+          "hz_semantic_sha256": "6d8738b4aff3cead4a44dab9d26d3d2473781c54bae7c78e20e978e3cd6288f2",
+          "lx_raw_sha256": "a710640a7c0afe275fb0394bf6388c6ba0a8a07bdad9bcabff3ac7a12fe8ca74",
+          "lx_semantic_sha256": "d5c335893b922e6205f9f7a7f08644a68d6c29c6570f82b0bdb2297fbd22de12",
+          "lz_raw_sha256": "0fa1f2fa849ac334621118b395098232d1e3b1327b0eb4750055dde0c357f6a2",
+          "lz_semantic_sha256": "f609b3f1c83119e567e7d4274d2fc43e2f406c2fd8a49407047bc91c3d833889"
+        },
+        "path": "b1-panteleev-kalachev-v3.npz",
+        "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+        "root": "data/artifacts",
+        "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+      },
+      "budgets": {
+        "attempt": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "denominator_rule": "all_terminal_shots",
+        "max_shots": 128,
+        "search": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "shot": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        }
+      },
+      "environment": {
+        "backend": "cpu",
+        "numpy": "2.2.6",
+        "omp_num_threads": 1,
+        "python": "3.12.2",
+        "scipy": "1.17.1"
+      },
+      "error_rate": 0.05,
+      "evidence": {
+        "assessment_status": "not_assessed",
+        "discrepancies": [
+          "This bounded pilot adaptation is not a source-faithful curve reproduction or a decoder ranking.",
+          "Corrected work-receipt revision v2 supersedes the earlier Phase 5 mechanism pilot; no decoder ranking or source-curve assessment is made.",
+          "The p=0.05 paired damping pilot is a controlled composition adaptation, not source-curve reproduction."
+        ],
+        "fixture": "pilot_adaptation",
+        "procedure": "Prespecified matched p=0.05 B1 mechanism pilot; restart_belief; memory disabled.",
+        "relation": "pilot_adaptation",
+        "sources": [
+          "Phase 3 D-15 through D-19"
+        ]
+      },
+      "intervention": {
+        "code_id": "b1-ghp-882",
+        "eta": 8,
+        "kind": "restart_belief",
+        "lift_rule": "xor_inserted_error",
+        "native_availability": "repository_revision_verified_in_phase_research",
+        "operator": "inserted_error_residual_restart",
+        "preserved_fields": [
+          "inserted_error"
+        ],
+        "preset": "b1_tcap8_mechanism",
+        "qualification": "mechanism_only_adaptation",
+        "reset_rule": "fresh_per_residual",
+        "residual_sweeps": 10,
+        "root_sweeps": 80,
+        "selection": "strict_lower_weight",
+        "source_code_commit": "275535ec981763166c8549d91959dc6e371ec4b1",
+        "source_revision": "arxiv:2511.13281v1",
+        "stream_status": "not_applicable",
+        "t_cap": 8,
+        "trigger": "root_bp_failure",
+        "unresolved": [
+          "exact_b1_distance"
+        ],
+        "variant": "restart_belief_b1_tcap8_mechanism_v1"
+      },
+      "intervention_limits": {
+        "max_runtime_seconds": 300.0,
+        "max_total_actions": 128,
+        "max_total_attempts": 64,
+        "max_trace_bytes": 2097152,
+        "max_trace_records": 512,
+        "work_caps": {
+          "belief_assemblies": 300000,
+          "bp_calls": 128,
+          "branch_expansions": 64,
+          "branch_prunes": 64,
+          "candidate_checks": 300000,
+          "candidate_constructions": 300000,
+          "check_to_variable_updates": 300000,
+          "convergence_checks": 300000,
+          "fallback_calls": 300000,
+          "fixation_actions": 300000,
+          "intervention_actions": 128,
+          "lifted_coordinates": 300000,
+          "order_generation": 300000,
+          "order_selection": 300000,
+          "original_checks": 300000,
+          "priority_maintenance": 300000,
+          "ranking_scans": 300000,
+          "relay_transfers": 300000,
+          "residual_differences": 300000,
+          "residual_precomputations": 300000,
+          "residual_priority_evaluations": 300000,
+          "transformations": 300000,
+          "variable_to_check_updates": 300000
+        }
+      },
+      "memory": null,
+      "numerical_profile": "cpu-float64-spa-v1",
+      "policies": {
+        "intervention": {
+          "binding_id": "intervention-identity-v1",
+          "kind": "restart_belief",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "search"
+        },
+        "postprocessing": {
+          "binding_id": "postprocessing-identity-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "schedule": {
+          "binding_id": "schedule-flooding-v1",
+          "kind": "flooding",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "selection": {
+          "binding_id": "selection-stable-first-v1",
+          "kind": "stable_first",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "state_memory": {
+          "binding_id": "state-memory-stateless-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "stopping": {
+          "binding_id": "stopping-syndrome-budget-v1",
+          "kind": "syndrome_or_budget",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "update": {
+          "binding_id": "update-binary-spa-v1",
+          "kind": "binary_spa",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "message"
+        }
+      },
+      "profile_plan": {
+        "cohort": "clean",
+        "enabled": true,
+        "level": "low_overhead",
+        "selected_before_outcome": true
+      },
+      "randomness": {
+        "decoder_seed_identity": "phase5-b1-p005-damping-decoder-v1",
+        "physical_sample_identity": "phase5-b1-p005-damping-physical-v1",
+        "sample_derivation": "sha256-manifest-shot-v1",
+        "sample_seed": 5012128
+      },
+      "relay": null,
+      "run_id": "phase5-b1-p005-restart_belief-v1",
+      "schema_version": 5,
+      "trace_plan": {
+        "label": "development_default",
+        "level": "off",
+        "max_bytes": 0,
+        "max_records": 0,
+        "relative_dir": "trace-sidecars"
+      }
+    },
+    "restart_belief__damped": {
+      "artifact": {
+        "code_id": "b1-ghp-882",
+        "format_version": 1,
+        "matrix_hashes": {
+          "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
+          "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
+          "hz_raw_sha256": "e66f9af2f546591faab8c812db497ee23eba80cbdef064d30c32a71e98bce662",
+          "hz_semantic_sha256": "6d8738b4aff3cead4a44dab9d26d3d2473781c54bae7c78e20e978e3cd6288f2",
+          "lx_raw_sha256": "a710640a7c0afe275fb0394bf6388c6ba0a8a07bdad9bcabff3ac7a12fe8ca74",
+          "lx_semantic_sha256": "d5c335893b922e6205f9f7a7f08644a68d6c29c6570f82b0bdb2297fbd22de12",
+          "lz_raw_sha256": "0fa1f2fa849ac334621118b395098232d1e3b1327b0eb4750055dde0c357f6a2",
+          "lz_semantic_sha256": "f609b3f1c83119e567e7d4274d2fc43e2f406c2fd8a49407047bc91c3d833889"
+        },
+        "path": "b1-panteleev-kalachev-v3.npz",
+        "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+        "root": "data/artifacts",
+        "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+      },
+      "budgets": {
+        "attempt": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "denominator_rule": "all_terminal_shots",
+        "max_shots": 128,
+        "search": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "shot": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        }
+      },
+      "environment": {
+        "backend": "cpu",
+        "numpy": "2.2.6",
+        "omp_num_threads": 1,
+        "python": "3.12.2",
+        "scipy": "1.17.1"
+      },
+      "error_rate": 0.05,
+      "evidence": {
+        "assessment_status": "not_assessed",
+        "discrepancies": [
+          "This bounded pilot adaptation is not a source-faithful curve reproduction or a decoder ranking.",
+          "Corrected work-receipt revision v2 supersedes the earlier Phase 5 mechanism pilot; no decoder ranking or source-curve assessment is made.",
+          "The p=0.05 paired damping pilot is a controlled composition adaptation, not source-curve reproduction."
+        ],
+        "fixture": "pilot_adaptation",
+        "procedure": "Prespecified matched p=0.05 B1 mechanism pilot; restart_belief; V2C damping gamma=0.5 at each fresh BP attempt.",
+        "relation": "pilot_adaptation",
+        "sources": [
+          "Phase 3 D-15 through D-19"
+        ]
+      },
+      "intervention": {
+        "code_id": "b1-ghp-882",
+        "eta": 8,
+        "kind": "restart_belief",
+        "lift_rule": "xor_inserted_error",
+        "native_availability": "repository_revision_verified_in_phase_research",
+        "operator": "inserted_error_residual_restart",
+        "preserved_fields": [
+          "inserted_error"
+        ],
+        "preset": "b1_tcap8_mechanism",
+        "qualification": "mechanism_only_adaptation",
+        "reset_rule": "fresh_per_residual",
+        "residual_sweeps": 10,
+        "root_sweeps": 80,
+        "selection": "strict_lower_weight",
+        "source_code_commit": "275535ec981763166c8549d91959dc6e371ec4b1",
+        "source_revision": "arxiv:2511.13281v1",
+        "stream_status": "not_applicable",
+        "t_cap": 8,
+        "trigger": "root_bp_failure",
+        "unresolved": [
+          "exact_b1_distance"
+        ],
+        "variant": "restart_belief_b1_tcap8_mechanism_v1"
+      },
+      "intervention_limits": {
+        "max_runtime_seconds": 300.0,
+        "max_total_actions": 128,
+        "max_total_attempts": 64,
+        "max_trace_bytes": 2097152,
+        "max_trace_records": 512,
+        "work_caps": {
+          "belief_assemblies": 300000,
+          "bp_calls": 128,
+          "branch_expansions": 64,
+          "branch_prunes": 64,
+          "candidate_checks": 300000,
+          "candidate_constructions": 300000,
+          "check_to_variable_updates": 300000,
+          "convergence_checks": 300000,
+          "fallback_calls": 300000,
+          "fixation_actions": 300000,
+          "intervention_actions": 128,
+          "lifted_coordinates": 300000,
+          "order_generation": 300000,
+          "order_selection": 300000,
+          "original_checks": 300000,
+          "priority_maintenance": 300000,
+          "ranking_scans": 300000,
+          "relay_transfers": 300000,
+          "residual_differences": 300000,
+          "residual_precomputations": 300000,
+          "residual_priority_evaluations": 300000,
+          "transformations": 300000,
+          "variable_to_check_updates": 300000
+        }
+      },
+      "memory": {
+        "bindings": [
+          {
+            "advance_boundary": "source_iteration",
+            "binding_id": "v2c-damping",
+            "history_owner": "attempt:v2c-damping",
+            "kind": "v2c_damping",
+            "order": 0,
+            "parameters": {
+              "gamma": 0.5
+            },
+            "refresh_boundary": "attempt_start",
+            "retain_history": false,
+            "source_status": "canonical_adaptation",
+            "state_lifetime": "attempt",
+            "target": "v2c"
+          }
+        ]
+      },
+      "numerical_profile": "cpu-float64-spa-v1",
+      "policies": {
+        "intervention": {
+          "binding_id": "intervention-identity-v1",
+          "kind": "restart_belief",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "search"
+        },
+        "postprocessing": {
+          "binding_id": "postprocessing-identity-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "schedule": {
+          "binding_id": "schedule-flooding-v1",
+          "kind": "flooding",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "selection": {
+          "binding_id": "selection-stable-first-v1",
+          "kind": "stable_first",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "state_memory": {
+          "binding_id": "state-memory-stateless-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "stopping": {
+          "binding_id": "stopping-syndrome-budget-v1",
+          "kind": "syndrome_or_budget",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "update": {
+          "binding_id": "update-binary-spa-v1",
+          "kind": "binary_spa",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "message"
+        }
+      },
+      "profile_plan": {
+        "cohort": "clean",
+        "enabled": true,
+        "level": "low_overhead",
+        "selected_before_outcome": true
+      },
+      "randomness": {
+        "decoder_seed_identity": "phase5-b1-p005-damping-decoder-v1",
+        "physical_sample_identity": "phase5-b1-p005-damping-physical-v1",
+        "sample_derivation": "sha256-manifest-shot-v1",
+        "sample_seed": 5012128
+      },
+      "relay": null,
+      "run_id": "phase5-b1-p005-restart_belief__damped-v1",
+      "schema_version": 6,
+      "trace_plan": {
+        "label": "development_default",
+        "level": "off",
+        "max_bytes": 0,
+        "max_records": 0,
+        "relative_dir": "trace-sidecars"
+      }
+    },
+    "sign_flip": {
+      "artifact": {
+        "code_id": "b1-ghp-882",
+        "format_version": 1,
+        "matrix_hashes": {
+          "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
+          "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
+          "hz_raw_sha256": "e66f9af2f546591faab8c812db497ee23eba80cbdef064d30c32a71e98bce662",
+          "hz_semantic_sha256": "6d8738b4aff3cead4a44dab9d26d3d2473781c54bae7c78e20e978e3cd6288f2",
+          "lx_raw_sha256": "a710640a7c0afe275fb0394bf6388c6ba0a8a07bdad9bcabff3ac7a12fe8ca74",
+          "lx_semantic_sha256": "d5c335893b922e6205f9f7a7f08644a68d6c29c6570f82b0bdb2297fbd22de12",
+          "lz_raw_sha256": "0fa1f2fa849ac334621118b395098232d1e3b1327b0eb4750055dde0c357f6a2",
+          "lz_semantic_sha256": "f609b3f1c83119e567e7d4274d2fc43e2f406c2fd8a49407047bc91c3d833889"
+        },
+        "path": "b1-panteleev-kalachev-v3.npz",
+        "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+        "root": "data/artifacts",
+        "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+      },
+      "budgets": {
+        "attempt": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "denominator_rule": "all_terminal_shots",
+        "max_shots": 128,
+        "search": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "shot": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        }
+      },
+      "environment": {
+        "backend": "cpu",
+        "numpy": "2.2.6",
+        "omp_num_threads": 1,
+        "python": "3.12.2",
+        "scipy": "1.17.1"
+      },
+      "error_rate": 0.05,
+      "evidence": {
+        "assessment_status": "not_assessed",
+        "discrepancies": [
+          "This bounded pilot adaptation is not a source-faithful curve reproduction or a decoder ranking.",
+          "Corrected work-receipt revision v2 supersedes the earlier Phase 5 mechanism pilot; no decoder ranking or source-curve assessment is made.",
+          "The p=0.05 paired damping pilot is a controlled composition adaptation, not source-curve reproduction."
+        ],
+        "fixture": "pilot_adaptation",
+        "procedure": "Prespecified matched p=0.05 B1 mechanism pilot; sign_flip; memory disabled.",
+        "relation": "pilot_adaptation",
+        "sources": [
+          "Phase 3 D-15 through D-19"
+        ]
+      },
+      "intervention": {
+        "alpha": 0.8,
+        "continuation_sweeps": 40,
+        "kind": "sign_flip",
+        "lift_rule": "identity",
+        "native_availability": "unverified",
+        "operator": "posterior_sign_flip",
+        "preserved_fields": [
+          "prior",
+          "v2c",
+          "c2v"
+        ],
+        "qualification": "bsfbp_sign_only_controlled_adaptation",
+        "reset_rule": "continue_messages_at_next_sweep",
+        "selection": "global_mismatched_check_target",
+        "source_revision": "doi:10.1109/TQE.2023.3279379",
+        "stream_status": "not_applicable",
+        "trigger": "failed_normalized_min_sum_trunk",
+        "trunk_sweeps": 40,
+        "unresolved": [
+          "compound_branch_omitted"
+        ],
+        "variant": "bsfbp_sign_only_controlled_adaptation"
+      },
+      "intervention_limits": {
+        "max_runtime_seconds": 300.0,
+        "max_total_actions": 128,
+        "max_total_attempts": 64,
+        "max_trace_bytes": 2097152,
+        "max_trace_records": 512,
+        "work_caps": {
+          "belief_assemblies": 300000,
+          "bp_calls": 128,
+          "branch_expansions": 64,
+          "branch_prunes": 64,
+          "candidate_checks": 300000,
+          "candidate_constructions": 300000,
+          "check_to_variable_updates": 300000,
+          "convergence_checks": 300000,
+          "fallback_calls": 300000,
+          "fixation_actions": 300000,
+          "intervention_actions": 128,
+          "lifted_coordinates": 300000,
+          "order_generation": 300000,
+          "order_selection": 300000,
+          "original_checks": 300000,
+          "priority_maintenance": 300000,
+          "ranking_scans": 300000,
+          "relay_transfers": 300000,
+          "residual_differences": 300000,
+          "residual_precomputations": 300000,
+          "residual_priority_evaluations": 300000,
+          "transformations": 300000,
+          "variable_to_check_updates": 300000
+        }
+      },
+      "memory": null,
+      "numerical_profile": "cpu-float64-min-sum-v1",
+      "policies": {
+        "intervention": {
+          "binding_id": "intervention-identity-v1",
+          "kind": "sign_flip",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "search"
+        },
+        "postprocessing": {
+          "binding_id": "postprocessing-identity-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "schedule": {
+          "binding_id": "schedule-flooding-v1",
+          "kind": "flooding",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "selection": {
+          "binding_id": "selection-stable-first-v1",
+          "kind": "stable_first",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "state_memory": {
+          "binding_id": "state-memory-stateless-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "stopping": {
+          "binding_id": "stopping-syndrome-budget-v1",
+          "kind": "syndrome_or_budget",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "update": {
+          "binding_id": "update-binary-spa-v1",
+          "kind": "normalized_min_sum",
+          "owned_state": [],
+          "parameter_assignment": {
+            "shape": "scalar",
+            "value": 0.8
+          },
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "message"
+        }
+      },
+      "profile_plan": {
+        "cohort": "clean",
+        "enabled": true,
+        "level": "low_overhead",
+        "selected_before_outcome": true
+      },
+      "randomness": {
+        "decoder_seed_identity": "phase5-b1-p005-damping-decoder-v1",
+        "physical_sample_identity": "phase5-b1-p005-damping-physical-v1",
+        "sample_derivation": "sha256-manifest-shot-v1",
+        "sample_seed": 5012128
+      },
+      "relay": null,
+      "run_id": "phase5-b1-p005-sign_flip-v1",
+      "schema_version": 5,
+      "trace_plan": {
+        "label": "development_default",
+        "level": "off",
+        "max_bytes": 0,
+        "max_records": 0,
+        "relative_dir": "trace-sidecars"
+      }
+    },
+    "sign_flip__damped": {
+      "artifact": {
+        "code_id": "b1-ghp-882",
+        "format_version": 1,
+        "matrix_hashes": {
+          "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
+          "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
+          "hz_raw_sha256": "e66f9af2f546591faab8c812db497ee23eba80cbdef064d30c32a71e98bce662",
+          "hz_semantic_sha256": "6d8738b4aff3cead4a44dab9d26d3d2473781c54bae7c78e20e978e3cd6288f2",
+          "lx_raw_sha256": "a710640a7c0afe275fb0394bf6388c6ba0a8a07bdad9bcabff3ac7a12fe8ca74",
+          "lx_semantic_sha256": "d5c335893b922e6205f9f7a7f08644a68d6c29c6570f82b0bdb2297fbd22de12",
+          "lz_raw_sha256": "0fa1f2fa849ac334621118b395098232d1e3b1327b0eb4750055dde0c357f6a2",
+          "lz_semantic_sha256": "f609b3f1c83119e567e7d4274d2fc43e2f406c2fd8a49407047bc91c3d833889"
+        },
+        "path": "b1-panteleev-kalachev-v3.npz",
+        "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+        "root": "data/artifacts",
+        "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+      },
+      "budgets": {
+        "attempt": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "denominator_rule": "all_terminal_shots",
+        "max_shots": 128,
+        "search": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "shot": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        }
+      },
+      "environment": {
+        "backend": "cpu",
+        "numpy": "2.2.6",
+        "omp_num_threads": 1,
+        "python": "3.12.2",
+        "scipy": "1.17.1"
+      },
+      "error_rate": 0.05,
+      "evidence": {
+        "assessment_status": "not_assessed",
+        "discrepancies": [
+          "This bounded pilot adaptation is not a source-faithful curve reproduction or a decoder ranking.",
+          "Corrected work-receipt revision v2 supersedes the earlier Phase 5 mechanism pilot; no decoder ranking or source-curve assessment is made.",
+          "The p=0.05 paired damping pilot is a controlled composition adaptation, not source-curve reproduction."
+        ],
+        "fixture": "pilot_adaptation",
+        "procedure": "Prespecified matched p=0.05 B1 mechanism pilot; sign_flip; V2C damping gamma=0.5 at each fresh BP attempt.",
+        "relation": "pilot_adaptation",
+        "sources": [
+          "Phase 3 D-15 through D-19"
+        ]
+      },
+      "intervention": {
+        "alpha": 0.8,
+        "continuation_sweeps": 40,
+        "kind": "sign_flip",
+        "lift_rule": "identity",
+        "native_availability": "unverified",
+        "operator": "posterior_sign_flip",
+        "preserved_fields": [
+          "prior",
+          "v2c",
+          "c2v"
+        ],
+        "qualification": "bsfbp_sign_only_controlled_adaptation",
+        "reset_rule": "continue_messages_at_next_sweep",
+        "selection": "global_mismatched_check_target",
+        "source_revision": "doi:10.1109/TQE.2023.3279379",
+        "stream_status": "not_applicable",
+        "trigger": "failed_normalized_min_sum_trunk",
+        "trunk_sweeps": 40,
+        "unresolved": [
+          "compound_branch_omitted"
+        ],
+        "variant": "bsfbp_sign_only_controlled_adaptation"
+      },
+      "intervention_limits": {
+        "max_runtime_seconds": 300.0,
+        "max_total_actions": 128,
+        "max_total_attempts": 64,
+        "max_trace_bytes": 2097152,
+        "max_trace_records": 512,
+        "work_caps": {
+          "belief_assemblies": 300000,
+          "bp_calls": 128,
+          "branch_expansions": 64,
+          "branch_prunes": 64,
+          "candidate_checks": 300000,
+          "candidate_constructions": 300000,
+          "check_to_variable_updates": 300000,
+          "convergence_checks": 300000,
+          "fallback_calls": 300000,
+          "fixation_actions": 300000,
+          "intervention_actions": 128,
+          "lifted_coordinates": 300000,
+          "order_generation": 300000,
+          "order_selection": 300000,
+          "original_checks": 300000,
+          "priority_maintenance": 300000,
+          "ranking_scans": 300000,
+          "relay_transfers": 300000,
+          "residual_differences": 300000,
+          "residual_precomputations": 300000,
+          "residual_priority_evaluations": 300000,
+          "transformations": 300000,
+          "variable_to_check_updates": 300000
+        }
+      },
+      "memory": {
+        "bindings": [
+          {
+            "advance_boundary": "source_iteration",
+            "binding_id": "v2c-damping",
+            "history_owner": "attempt:v2c-damping",
+            "kind": "v2c_damping",
+            "order": 0,
+            "parameters": {
+              "gamma": 0.5
+            },
+            "refresh_boundary": "attempt_start",
+            "retain_history": false,
+            "source_status": "canonical_adaptation",
+            "state_lifetime": "attempt",
+            "target": "v2c"
+          }
+        ]
+      },
+      "numerical_profile": "cpu-float64-min-sum-v1",
+      "policies": {
+        "intervention": {
+          "binding_id": "intervention-identity-v1",
+          "kind": "sign_flip",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "search"
+        },
+        "postprocessing": {
+          "binding_id": "postprocessing-identity-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "schedule": {
+          "binding_id": "schedule-flooding-v1",
+          "kind": "flooding",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "selection": {
+          "binding_id": "selection-stable-first-v1",
+          "kind": "stable_first",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "state_memory": {
+          "binding_id": "state-memory-stateless-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "stopping": {
+          "binding_id": "stopping-syndrome-budget-v1",
+          "kind": "syndrome_or_budget",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "update": {
+          "binding_id": "update-binary-spa-v1",
+          "kind": "normalized_min_sum",
+          "owned_state": [],
+          "parameter_assignment": {
+            "shape": "scalar",
+            "value": 0.8
+          },
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "message"
+        }
+      },
+      "profile_plan": {
+        "cohort": "clean",
+        "enabled": true,
+        "level": "low_overhead",
+        "selected_before_outcome": true
+      },
+      "randomness": {
+        "decoder_seed_identity": "phase5-b1-p005-damping-decoder-v1",
+        "physical_sample_identity": "phase5-b1-p005-damping-physical-v1",
+        "sample_derivation": "sha256-manifest-shot-v1",
+        "sample_seed": 5012128
+      },
+      "relay": null,
+      "run_id": "phase5-b1-p005-sign_flip__damped-v1",
+      "schema_version": 6,
+      "trace_plan": {
+        "label": "development_default",
+        "level": "off",
+        "max_bytes": 0,
+        "max_records": 0,
+        "relative_dir": "trace-sidecars"
+      }
+    },
+    "syndrome_flip": {
+      "artifact": {
+        "code_id": "b1-ghp-882",
+        "format_version": 1,
+        "matrix_hashes": {
+          "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
+          "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
+          "hz_raw_sha256": "e66f9af2f546591faab8c812db497ee23eba80cbdef064d30c32a71e98bce662",
+          "hz_semantic_sha256": "6d8738b4aff3cead4a44dab9d26d3d2473781c54bae7c78e20e978e3cd6288f2",
+          "lx_raw_sha256": "a710640a7c0afe275fb0394bf6388c6ba0a8a07bdad9bcabff3ac7a12fe8ca74",
+          "lx_semantic_sha256": "d5c335893b922e6205f9f7a7f08644a68d6c29c6570f82b0bdb2297fbd22de12",
+          "lz_raw_sha256": "0fa1f2fa849ac334621118b395098232d1e3b1327b0eb4750055dde0c357f6a2",
+          "lz_semantic_sha256": "f609b3f1c83119e567e7d4274d2fc43e2f406c2fd8a49407047bc91c3d833889"
+        },
+        "path": "b1-panteleev-kalachev-v3.npz",
+        "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+        "root": "data/artifacts",
+        "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+      },
+      "budgets": {
+        "attempt": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "denominator_rule": "all_terminal_shots",
+        "max_shots": 128,
+        "search": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "shot": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        }
+      },
+      "environment": {
+        "backend": "cpu",
+        "numpy": "2.2.6",
+        "omp_num_threads": 1,
+        "python": "3.12.2",
+        "scipy": "1.17.1"
+      },
+      "error_rate": 0.05,
+      "evidence": {
+        "assessment_status": "not_assessed",
+        "discrepancies": [
+          "This bounded pilot adaptation is not a source-faithful curve reproduction or a decoder ranking.",
+          "Corrected work-receipt revision v2 supersedes the earlier Phase 5 mechanism pilot; no decoder ranking or source-curve assessment is made.",
+          "The p=0.05 paired damping pilot is a controlled composition adaptation, not source-curve reproduction."
+        ],
+        "fixture": "pilot_adaptation",
+        "procedure": "Prespecified matched p=0.05 B1 mechanism pilot; syndrome_flip; memory disabled.",
+        "relation": "pilot_adaptation",
+        "sources": [
+          "Phase 3 D-15 through D-19"
+        ]
+      },
+      "intervention": {
+        "attempt_sweeps": 10,
+        "baseline_sweeps": 80,
+        "kind": "syndrome_flip",
+        "lift_rule": "xor_test_vector",
+        "max_weight": 1,
+        "native_availability": "repository_revision_verified_in_phase_research",
+        "operator": "syndrome_xor_test_vector",
+        "preserved_fields": [
+          "original_graph",
+          "original_syndrome"
+        ],
+        "qualification": "controlled_css_adaptation",
+        "reset_rule": "fresh_per_test",
+        "root_seed": "phase5-b1-p005-damping-decoder-v1",
+        "selection": "first_declared_valid",
+        "source_code_commit": "0417d33fc2ffb3b442d0397bb09954fc1c6c3938",
+        "source_revision": "arxiv:2507.00254v1",
+        "stream_status": "derived_decoder_stream",
+        "test_cap": 8,
+        "top_k": 8,
+        "trigger": "baseline_invalid_after_oscillation_count",
+        "unresolved": [
+          "unseeded_source_sampling"
+        ],
+        "variant": "bpsf_stable_order_css_v1"
+      },
+      "intervention_limits": {
+        "max_runtime_seconds": 300.0,
+        "max_total_actions": 128,
+        "max_total_attempts": 64,
+        "max_trace_bytes": 2097152,
+        "max_trace_records": 512,
+        "work_caps": {
+          "belief_assemblies": 300000,
+          "bp_calls": 128,
+          "branch_expansions": 64,
+          "branch_prunes": 64,
+          "candidate_checks": 300000,
+          "candidate_constructions": 300000,
+          "check_to_variable_updates": 300000,
+          "convergence_checks": 300000,
+          "fallback_calls": 300000,
+          "fixation_actions": 300000,
+          "intervention_actions": 128,
+          "lifted_coordinates": 300000,
+          "order_generation": 300000,
+          "order_selection": 300000,
+          "original_checks": 300000,
+          "priority_maintenance": 300000,
+          "ranking_scans": 300000,
+          "relay_transfers": 300000,
+          "residual_differences": 300000,
+          "residual_precomputations": 300000,
+          "residual_priority_evaluations": 300000,
+          "transformations": 300000,
+          "variable_to_check_updates": 300000
+        }
+      },
+      "memory": null,
+      "numerical_profile": "cpu-float64-spa-v1",
+      "policies": {
+        "intervention": {
+          "binding_id": "intervention-identity-v1",
+          "kind": "syndrome_flip",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "search"
+        },
+        "postprocessing": {
+          "binding_id": "postprocessing-identity-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "schedule": {
+          "binding_id": "schedule-flooding-v1",
+          "kind": "flooding",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "selection": {
+          "binding_id": "selection-stable-first-v1",
+          "kind": "stable_first",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "state_memory": {
+          "binding_id": "state-memory-stateless-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "stopping": {
+          "binding_id": "stopping-syndrome-budget-v1",
+          "kind": "syndrome_or_budget",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "update": {
+          "binding_id": "update-binary-spa-v1",
+          "kind": "binary_spa",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "message"
+        }
+      },
+      "profile_plan": {
+        "cohort": "clean",
+        "enabled": true,
+        "level": "low_overhead",
+        "selected_before_outcome": true
+      },
+      "randomness": {
+        "decoder_seed_identity": "phase5-b1-p005-damping-decoder-v1",
+        "physical_sample_identity": "phase5-b1-p005-damping-physical-v1",
+        "sample_derivation": "sha256-manifest-shot-v1",
+        "sample_seed": 5012128
+      },
+      "relay": null,
+      "run_id": "phase5-b1-p005-syndrome_flip-v1",
+      "schema_version": 5,
+      "trace_plan": {
+        "label": "development_default",
+        "level": "off",
+        "max_bytes": 0,
+        "max_records": 0,
+        "relative_dir": "trace-sidecars"
+      }
+    },
+    "syndrome_flip__damped": {
+      "artifact": {
+        "code_id": "b1-ghp-882",
+        "format_version": 1,
+        "matrix_hashes": {
+          "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
+          "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
+          "hz_raw_sha256": "e66f9af2f546591faab8c812db497ee23eba80cbdef064d30c32a71e98bce662",
+          "hz_semantic_sha256": "6d8738b4aff3cead4a44dab9d26d3d2473781c54bae7c78e20e978e3cd6288f2",
+          "lx_raw_sha256": "a710640a7c0afe275fb0394bf6388c6ba0a8a07bdad9bcabff3ac7a12fe8ca74",
+          "lx_semantic_sha256": "d5c335893b922e6205f9f7a7f08644a68d6c29c6570f82b0bdb2297fbd22de12",
+          "lz_raw_sha256": "0fa1f2fa849ac334621118b395098232d1e3b1327b0eb4750055dde0c357f6a2",
+          "lz_semantic_sha256": "f609b3f1c83119e567e7d4274d2fc43e2f406c2fd8a49407047bc91c3d833889"
+        },
+        "path": "b1-panteleev-kalachev-v3.npz",
+        "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+        "root": "data/artifacts",
+        "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+      },
+      "budgets": {
+        "attempt": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "denominator_rule": "all_terminal_shots",
+        "max_shots": 128,
+        "search": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        },
+        "shot": {
+          "max_iterations": 80,
+          "work_limits": {
+            "belief_assemblies": 300000,
+            "bp_calls": 128,
+            "branch_expansions": 64,
+            "branch_prunes": 64,
+            "candidate_checks": 300000,
+            "check_to_variable_updates": 300000,
+            "fallback_calls": 300000,
+            "intervention_actions": 128,
+            "relay_transfers": 300000,
+            "residual_priority_evaluations": 300000,
+            "variable_to_check_updates": 300000
+          }
+        }
+      },
+      "environment": {
+        "backend": "cpu",
+        "numpy": "2.2.6",
+        "omp_num_threads": 1,
+        "python": "3.12.2",
+        "scipy": "1.17.1"
+      },
+      "error_rate": 0.05,
+      "evidence": {
+        "assessment_status": "not_assessed",
+        "discrepancies": [
+          "This bounded pilot adaptation is not a source-faithful curve reproduction or a decoder ranking.",
+          "Corrected work-receipt revision v2 supersedes the earlier Phase 5 mechanism pilot; no decoder ranking or source-curve assessment is made.",
+          "The p=0.05 paired damping pilot is a controlled composition adaptation, not source-curve reproduction."
+        ],
+        "fixture": "pilot_adaptation",
+        "procedure": "Prespecified matched p=0.05 B1 mechanism pilot; syndrome_flip; V2C damping gamma=0.5 at each fresh BP attempt.",
+        "relation": "pilot_adaptation",
+        "sources": [
+          "Phase 3 D-15 through D-19"
+        ]
+      },
+      "intervention": {
+        "attempt_sweeps": 10,
+        "baseline_sweeps": 80,
+        "kind": "syndrome_flip",
+        "lift_rule": "xor_test_vector",
+        "max_weight": 1,
+        "native_availability": "repository_revision_verified_in_phase_research",
+        "operator": "syndrome_xor_test_vector",
+        "preserved_fields": [
+          "original_graph",
+          "original_syndrome"
+        ],
+        "qualification": "controlled_css_adaptation",
+        "reset_rule": "fresh_per_test",
+        "root_seed": "phase5-b1-p005-damping-decoder-v1",
+        "selection": "first_declared_valid",
+        "source_code_commit": "0417d33fc2ffb3b442d0397bb09954fc1c6c3938",
+        "source_revision": "arxiv:2507.00254v1",
+        "stream_status": "derived_decoder_stream",
+        "test_cap": 8,
+        "top_k": 8,
+        "trigger": "baseline_invalid_after_oscillation_count",
+        "unresolved": [
+          "unseeded_source_sampling"
+        ],
+        "variant": "bpsf_stable_order_css_v1"
+      },
+      "intervention_limits": {
+        "max_runtime_seconds": 300.0,
+        "max_total_actions": 128,
+        "max_total_attempts": 64,
+        "max_trace_bytes": 2097152,
+        "max_trace_records": 512,
+        "work_caps": {
+          "belief_assemblies": 300000,
+          "bp_calls": 128,
+          "branch_expansions": 64,
+          "branch_prunes": 64,
+          "candidate_checks": 300000,
+          "candidate_constructions": 300000,
+          "check_to_variable_updates": 300000,
+          "convergence_checks": 300000,
+          "fallback_calls": 300000,
+          "fixation_actions": 300000,
+          "intervention_actions": 128,
+          "lifted_coordinates": 300000,
+          "order_generation": 300000,
+          "order_selection": 300000,
+          "original_checks": 300000,
+          "priority_maintenance": 300000,
+          "ranking_scans": 300000,
+          "relay_transfers": 300000,
+          "residual_differences": 300000,
+          "residual_precomputations": 300000,
+          "residual_priority_evaluations": 300000,
+          "transformations": 300000,
+          "variable_to_check_updates": 300000
+        }
+      },
+      "memory": {
+        "bindings": [
+          {
+            "advance_boundary": "source_iteration",
+            "binding_id": "v2c-damping",
+            "history_owner": "attempt:v2c-damping",
+            "kind": "v2c_damping",
+            "order": 0,
+            "parameters": {
+              "gamma": 0.5
+            },
+            "refresh_boundary": "attempt_start",
+            "retain_history": false,
+            "source_status": "canonical_adaptation",
+            "state_lifetime": "attempt",
+            "target": "v2c"
+          }
+        ]
+      },
+      "numerical_profile": "cpu-float64-spa-v1",
+      "policies": {
+        "intervention": {
+          "binding_id": "intervention-identity-v1",
+          "kind": "syndrome_flip",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "search"
+        },
+        "postprocessing": {
+          "binding_id": "postprocessing-identity-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "schedule": {
+          "binding_id": "schedule-flooding-v1",
+          "kind": "flooding",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "selection": {
+          "binding_id": "selection-stable-first-v1",
+          "kind": "stable_first",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "state_memory": {
+          "binding_id": "state-memory-stateless-v1",
+          "kind": "identity",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "attempt"
+        },
+        "stopping": {
+          "binding_id": "stopping-syndrome-budget-v1",
+          "kind": "syndrome_or_budget",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "iteration"
+        },
+        "update": {
+          "binding_id": "update-binary-spa-v1",
+          "kind": "binary_spa",
+          "owned_state": [],
+          "provides": [],
+          "requires": [],
+          "state_lifetime": "message"
+        }
+      },
+      "profile_plan": {
+        "cohort": "clean",
+        "enabled": true,
+        "level": "low_overhead",
+        "selected_before_outcome": true
+      },
+      "randomness": {
+        "decoder_seed_identity": "phase5-b1-p005-damping-decoder-v1",
+        "physical_sample_identity": "phase5-b1-p005-damping-physical-v1",
+        "sample_derivation": "sha256-manifest-shot-v1",
+        "sample_seed": 5012128
+      },
+      "relay": null,
+      "run_id": "phase5-b1-p005-syndrome_flip__damped-v1",
+      "schema_version": 6,
+      "trace_plan": {
+        "label": "development_default",
+        "level": "off",
+        "max_bytes": 0,
+        "max_records": 0,
+        "relative_dir": "trace-sidecars"
+      }
+    }
+  },
+  "arm_order": [
+    "identity",
+    "identity__damped",
+    "guided_decimation",
+    "guided_decimation__damped",
+    "impulse",
+    "impulse__damped",
+    "freezing",
+    "freezing__damped",
+    "syndrome_flip",
+    "syndrome_flip__damped",
+    "sign_flip",
+    "sign_flip__damped",
+    "restart_belief",
+    "restart_belief__damped"
+  ],
+  "assessment_status": "not_assessed",
+  "claim_limit": "No decoder ranking, statistical reproduction, or source-curve agreement claim.",
+  "code_id": "b1-ghp-882",
+  "damping_equation": "v2c=(1-gamma)*previous_fresh+gamma*current_fresh; reset to channel prior per attempt",
+  "damping_gamma": 0.5,
+  "decoder_seed_identity": "phase5-b1-p005-damping-decoder-v1",
+  "error_rate": 0.05,
+  "implementation_sha256": {
+    "scripts/run_phase5_damping_pilot.py": "c72a36bd643dbbc53613ad00ecbed893ae5225ffc6be5c138004c15e801fee2f",
+    "src/bp_registry/canonical/contracts.py": "6798806e1e69f5d68f1e067a11152abd6221de1c9627306c8985df12ef9393ff",
+    "src/bp_registry/canonical/execution.py": "b2967821147daf5c716952447f88d655d0c62cf9f80f26e576b6b65f69a3278d",
+    "src/bp_registry/canonical/impulse.py": "8bc47741931be78d8184348339df02cd8d1230e9392d76852c9052357d741045",
+    "src/bp_registry/canonical/intervention_session.py": "1d1d0fee970eab7d90833deaa4d01a2c44c565bbe61db2aaeca82dc1e7fad180",
+    "src/bp_registry/canonical/interventions.py": "c8f48808cd5885f4dd46d13d231650466e1378e875a8fe0ef1078c847ca4a0df",
+    "src/bp_registry/canonical/memory.py": "fce510b94605c2e76d24940d00e2b6471d24f588baaa11e2195dc6f0fafb17af",
+    "src/bp_registry/canonical/phase5.py": "f48cd031f95adc9eb7df8be95e065b8cc95b216f2118a00b99facd9144bbfb9b",
+    "src/bp_registry/canonical/restarting.py": "9754c2cc6defe08a142b1c9270aa09129848113c04e0a802b970edb86dd80b11",
+    "src/bp_registry/canonical/verification.py": "d9c13bd4500a7628b1f16e5c9ee60b3c325851c2e48b353ade9c71f1dd2bb40f",
+    "src/bp_registry/ledger.py": "878fd4d0794d5ee804e441e49ddcc7fa95317cc132df61bcb14bdc7b357fec0c",
+    "src/bp_registry/manifests.py": "e9f8bfb91ab43078985dedaf7f613ba0ce41f497cf4ecee3522e66db4d45ae7e",
+    "src/bp_registry/runner.py": "96115fe54abc1da40ebe7085572c5d1395e966168c78750cf9549022bf4e786c"
+  },
+  "physical_sample_identity": "phase5-b1-p005-damping-physical-v1",
+  "question": "Which bounded Phase 5 mechanisms remain available at p=0.05, and how do their attempts and typed work change under V2C damping?",
+  "relation": "pilot_adaptation",
+  "sample_seed": 5012128,
+  "schema_version": 1,
+  "shot_ids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99,
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115,
+    116,
+    117,
+    118,
+    119,
+    120,
+    121,
+    122,
+    123,
+    124,
+    125,
+    126,
+    127
+  ],
+  "source_cap_freeze_sha256": "0d144d6223ccd97097b153367a55002b76c6d2542f3a1c164499ae4175598267",
+  "source_design_sha256": "bd7624711260bd990f7197df563565f3e193fd8c78eb7120981bc6072047ec6e",
+  "stage": "matched_mechanism_pilot",
+  "stop_rule": "fixed 128 matched physical samples; retain every terminal class"
+}

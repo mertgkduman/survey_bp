@@ -142,6 +142,53 @@ def test_canonical_v5_and_compact_v6_public_baseline_roundtrip(tmp_path):
     assert preflight_canonical(saved)["intervention"]["ledger_version"] == 5
 
 
+@pytest.mark.parametrize("kind", ["identity", "guided_decimation", "impulse", "freezing", "syndrome_flip", "sign_flip"])
+def test_v6_damping_composition_executes_and_replays_small_public_arm(tmp_path, kind):
+    from bp_registry.canonical.contracts import CanonicalManifestV7, parse_canonical_manifest
+    from bp_registry.canonical.verification import validate_canonical_shot
+    from bp_registry.ledger import read_canonical_events
+    from bp_registry.manifests import CanonicalExperimentV6, preflight
+    from bp_registry.runner import _canonical_kernel_manifest, canonical_public_shot_context, run_canonical_one
+
+    manifest = _public_v5(kind)
+    manifest["schema_version"] = 6
+    manifest["run_id"] = f"phase5-damped-{kind}"
+    manifest["memory"] = {"bindings": [{
+        "binding_id": "v2c-damping", "kind": "v2c_damping", "target": "v2c",
+        "parameters": {"gamma": 0.5}, "order": 0,
+        "history_owner": "attempt:v2c-damping", "state_lifetime": "attempt",
+        "advance_boundary": "source_iteration", "refresh_boundary": "attempt_start",
+        "source_status": "canonical_adaptation", "retain_history": False,
+    }]}
+    parsed = preflight(manifest).manifest
+    assert isinstance(parsed, CanonicalExperimentV6)
+    assert isinstance(parse_canonical_manifest(_canonical_kernel_manifest(parsed)), CanonicalManifestV7)
+    saved = tmp_path / "manifest.json"
+    ledger = tmp_path / "events.jsonl"
+    saved.write_text(json.dumps(manifest), encoding="utf-8")
+    result = run_canonical_one(saved, shot_id=0, ledger_path=ledger)
+    terminal = validate_canonical_shot(read_canonical_events(ledger), canonical_public_shot_context(saved, shot_id=0))
+    assert terminal["termination"] == result.termination
+    assert terminal["data"]["identity"]["damping_gamma"] == 0.5
+
+
+def test_v6_rejects_other_memory_before_artifact(monkeypatch):
+    from bp_registry.manifests import preflight
+
+    manifest = _public_v5("identity")
+    manifest["schema_version"] = 6
+    manifest["memory"] = {"bindings": [{
+        "binding_id": "wrong-memory", "kind": "affine_prior", "target": "prior",
+        "parameters": {"alpha": 0.5}, "order": 0,
+        "history_owner": "attempt:wrong-memory", "state_lifetime": "attempt",
+        "advance_boundary": "source_iteration", "refresh_boundary": "attempt_start",
+        "source_status": "canonical_adaptation", "retain_history": False,
+    }]}
+    monkeypatch.setattr("bp_registry.manifests.load_artifact", lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("artifact opened")))
+    with pytest.raises(ValueError, match="V2C memory"):
+        preflight(manifest)
+
+
 def test_intervention_preflight_rejects_unsupported_kernel_before_artifact(monkeypatch):
     from bp_registry.manifests import preflight
 

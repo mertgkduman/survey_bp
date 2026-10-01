@@ -1018,9 +1018,29 @@ class CanonicalManifestV6(_Strict):
         return self
 
 
-def parse_canonical_manifest(value: CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4 | CanonicalManifestV5 | CanonicalManifestV6 | dict[str, Any] | str) -> CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4 | CanonicalManifestV5 | CanonicalManifestV6:
+class CanonicalManifestV7(CanonicalManifestV6):
+    """Compact intervention contract with one declared damping composition."""
+
+    schema_version: Literal[7]
+    memory: MemoryCompositionSpec
+
+    @model_validator(mode="after")
+    def supported_damping_only(self) -> "CanonicalManifestV7":
+        if len(self.memory.bindings) != 1:
+            raise ValueError("intervention damping requires one memory binding")
+        binding = self.memory.bindings[0]
+        if (binding.kind != "v2c_damping" or binding.target != "v2c"
+                or binding.advance_boundary is not MemoryAdvanceBoundary.SOURCE_ITERATION
+                or binding.refresh_boundary is not MemoryRefreshBoundary.ATTEMPT_START
+                or binding.state_lifetime != "attempt" or binding.retain_history
+                or binding.source_status != "canonical_adaptation"):
+            raise ValueError("unsupported intervention memory composition")
+        return self
+
+
+def parse_canonical_manifest(value: CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4 | CanonicalManifestV5 | CanonicalManifestV6 | CanonicalManifestV7 | dict[str, Any] | str) -> CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4 | CanonicalManifestV5 | CanonicalManifestV6 | CanonicalManifestV7:
     """Parse only the versioned strict canonical representation."""
-    if isinstance(value, (CanonicalManifestV2, CanonicalManifestV3, CanonicalManifestV4, CanonicalManifestV5, CanonicalManifestV6)):
+    if isinstance(value, (CanonicalManifestV2, CanonicalManifestV3, CanonicalManifestV4, CanonicalManifestV5, CanonicalManifestV6, CanonicalManifestV7)):
         return value
     if isinstance(value, str):
         decoded = json.loads(value)
@@ -1029,6 +1049,8 @@ def parse_canonical_manifest(value: CanonicalManifestV2 | CanonicalManifestV3 | 
     if not isinstance(decoded, dict):
         raise ValueError("canonical manifest must be an object")
     schema_version = decoded.get("schema_version")
+    if schema_version == 7:
+        return CanonicalManifestV7.model_validate(decoded)
     if schema_version == 6:
         return CanonicalManifestV6.model_validate(decoded)
     if schema_version == 5:

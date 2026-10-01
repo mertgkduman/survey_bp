@@ -22,6 +22,7 @@ from .contracts import (
     CanonicalManifestV4,
     CanonicalManifestV5,
     CanonicalManifestV6,
+    CanonicalManifestV7,
     Hook,
     PolicyBinding,
     PolicyDecision,
@@ -911,7 +912,7 @@ def _run_guided_structural_shot(
 
 
 def _run_phase5_structural_shot(
-    parsed: CanonicalManifestV6, *, code: CssCode, observation: DecoderObservation,
+    parsed: CanonicalManifestV6 | CanonicalManifestV7, *, code: CssCode, observation: DecoderObservation,
     hidden_truth: HiddenTruth, shot_id: int, ledger_path: str | Path,
     sample_seed_identity: str, context: Mapping[str, Any],
     execution_controls: Mapping[str, Any] | None,
@@ -944,11 +945,18 @@ def _run_phase5_structural_shot(
         "native_availability": spec.native_availability,
         "intervention_kind": spec.kind,
     }
+    damping_gamma = None
+    if isinstance(parsed, CanonicalManifestV7):
+        binding = parsed.memory.bindings[0]
+        damping_gamma = binding.parameters["gamma"]
+        identity_data["memory_binding"] = binding.binding_id
+        identity_data["damping_gamma"] = damping_gamma
+        identity_data["memory_source_status"] = binding.source_status
     for _ in range(30):
         try:
             with CanonicalEventWriter(path, structural_event_version=5) as ledger:
                 ledger.begin(run_id=parsed.run_id, shot_id=shot_id, sample_seed_identity=sample_seed_identity,
-                             schema_version=5, compact_schema_version=6, identity=identity_data,
+                             schema_version=5, compact_schema_version=parsed.schema_version, identity=identity_data,
                              payload={"original_lineage_id": original_id.value, "syndrome": [int(bit) for bit in original.syndrome]})
                 budgets = _budget_tree(execution_controls)
                 cap = None if execution_controls is None else execution_controls.get("phase5_max_runtime_seconds")
@@ -959,6 +967,7 @@ def _run_phase5_structural_shot(
                     spec, original, error_rate=parsed.error_rate, budgets=budgets,
                     max_iterations=parsed.max_iterations, owner_identity=identity,
                     wall_clock=wall_clock,
+                    damping_gamma=damping_gamma,
                 )
                 outcome = finalize_phase5_deadline(outcome, wall_clock)
                 candidate = None if outcome.candidate is None else np.asarray(outcome.candidate, dtype=np.uint8)
