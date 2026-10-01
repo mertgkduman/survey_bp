@@ -369,7 +369,9 @@ def verify_evaluation() -> dict[str, Any]:
     if result.get("assessment_status") != "not_assessed" or result.get("relation") != "pilot_adaptation":
         raise ValueError("evaluation result has an unsupported assessment or relation")
     reports = {}
-    with ProcessPoolExecutor(max_workers=2) as pool:
+    available_cpus = _read(ENTITLEMENT)["allocated_cpus"]["value"]
+    workers = min(2, int(available_cpus)) if available_cpus and str(available_cpus).isdigit() else 1
+    with ProcessPoolExecutor(max_workers=workers) as pool:
         submitted = {arm: pool.submit(verify_run, EVALUATION_OUTPUT / arm) for arm in ARMS}
         for arm in ARMS:
             reports[arm] = submitted[arm].result()

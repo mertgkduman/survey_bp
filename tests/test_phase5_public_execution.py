@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import pytest
@@ -400,3 +401,18 @@ def test_phase5_evaluation_preflight_rejects_frozen_prerequisite_tamper_without_
     with pytest.raises(ValueError):
         pilot.evaluate()
     assert not output.exists()
+
+
+def test_phase5_public_verify_run_accepts_relative_reference_to_absolute_result_path(tmp_path):
+    """The public verifier must accept either spelling of the same saved output."""
+    from bp_registry.cli import run_canonical, verify_run
+
+    manifest = _public_v5("identity")
+    manifest["run_id"] = "phase5-relative-verify-regression"
+    path = tmp_path / "manifest.json"
+    path.write_text(json.dumps(manifest), encoding="utf-8")
+    output = tmp_path / "output"
+    run_canonical(path, output)
+    relative_output = Path(os.path.relpath(output, ROOT))
+    report = verify_run(relative_output)
+    assert report["final_row_count"] == manifest["budgets"]["max_shots"]

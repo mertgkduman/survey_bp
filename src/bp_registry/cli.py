@@ -325,7 +325,12 @@ def _verify_canonical_run(output: Path, result: dict[str, Any]) -> dict[str, Any
             validate_phase4_shot(ledger_path, run_id=manifest.run_id, shot_id=row["shot_id"], trace_root=output)
         else:
             validate_canonical_shot(events, canonical_public_shot_context(manifest_path, shot_id=row["shot_id"]), trace_root=output)
-    expected = _canonical_result_from_terminal_events(manifest_path, output, rows)
+    recorded_ledger = Path(result["ledger_path"])
+    if recorded_ledger.resolve() != ledger_path.resolve():
+        raise ValueError("canonical result ledger path does not resolve to the verified output")
+    # Preserve the path spelling used when the result was written. A caller may
+    # supply the same output directory as a relative or absolute CLI argument.
+    expected = _canonical_result_from_terminal_events(manifest_path, recorded_ledger.parent, rows)
     if result != expected:
         raise ValueError("canonical result JSON does not equal terminal structural evidence")
     return {**report, "output": str(output), "final_row_count": len(rows), "verified_at": datetime.now(timezone.utc).isoformat()}
