@@ -9,7 +9,7 @@ from typing import Callable, Literal, Mapping, Sequence, TypeVar
 
 import numpy as np
 
-from .budgets import BudgetLimit, BudgetTree, WorkVector
+from .budgets import BudgetLimit, BudgetTree, WallClockLimit, WorkVector
 from .intervention_session import BpSession, SessionTransition
 from .numerics import NumericalFailure
 from .problems import OriginalProblem
@@ -162,13 +162,18 @@ class _ForcedOneSession(BpSession):
         candidate[target] = 1
         self._state = self._make_state(prior, v2c, posterior, candidate, (target,), 0, 0)
 
-    def advance(self, *, budgets: BudgetTree, leaf_id: str, bp_call_start: bool | None = None) -> SessionTransition:
+    def advance(
+        self, *, budgets: BudgetTree, leaf_id: str, bp_call_start: bool | None = None,
+        wall_clock: WallClockLimit | None = None,
+    ) -> SessionTransition:
         state = self.state
         if bp_call_start is None:
             bp_call_start = state.source_iteration == 0
         work = WorkVector.from_flooding_counts(
             edge_count=self.edge_table.edge_count, variable_count=self.edge_table.variable_count,
         ) + WorkVector(bp_calls=int(bp_call_start))
+        if wall_clock is not None and wall_clock.check("iteration_boundary", scope="attempt") is not None:
+            return SessionTransition(False, state, "wall_clock_deadline", None)
         reservation = budgets.reserve("attempt", work, leaf_id=leaf_id)
         if reservation is None:
             return SessionTransition(False, state, "count_budget_exhausted", None)
@@ -230,14 +235,11 @@ class ImpulseController:
 
     def run(
         self, original: OriginalProblem, *, error_rate: float, budgets: BudgetTree,
-        owner_identity: str | None = None,
+        owner_identity: str | None = None, wall_clock: WallClockLimit | None = None,
     ) -> ImpulseResult:
         if not isinstance(original, OriginalProblem):
             raise ValueError("impulse requires an immutable original problem")
         n = original.hz.shape[1]
-        order = self.spec.coordinate_order or tuple(range(n))
-        if tuple(sorted(order)) != tuple(range(n)):
-            raise ValueError("impulse order must enumerate every original coordinate exactly once")
         root = owner_identity or "impulse-" + sha256(json.dumps(
             [original.lineage_id, original.hz.tolist(), original.syndrome.tolist(), error_rate, asdict(self.spec)],
             sort_keys=True, separators=(",", ":"), allow_nan=False,
@@ -249,12 +251,43 @@ class ImpulseController:
             error_rate=error_rate, owner_identity=f"{root}:baseline",
         )
         initial_digest = baseline.state.digest
+        if wall_clock is not None and wall_clock.check("candidate_selection_boundary", scope="attempt") is not None:
+            return ImpulseResult(
+                self.spec.realization,
+                "impulse_negative_infinite_semantic_v1" if self.spec.realization == "semantic_forced_one" else "impulse_exact_shortening_css_v1",
+                "author_code_unverified", self.spec.selection, root, original.lineage_id,
+                baseline.edge_table.graph_sha256, initial_digest, baseline.state.digest,
+                _candidate(baseline.state.candidate), None, "wall_clock_deadline", (), None,
+                None, "wall_clock_deadline", budgets.summary("attempt"), budgets.leaf_events(),
+            )
+        order_reservation = budgets.reserve(
+            "attempt", WorkVector(order_generation=1, order_selection=1, ranking_scans=n),
+            leaf_id=f"{root}:coordinate-order",
+        )
+        if order_reservation is None:
+            return ImpulseResult(
+                self.spec.realization,
+                "impulse_negative_infinite_semantic_v1" if self.spec.realization == "semantic_forced_one" else "impulse_exact_shortening_css_v1",
+                "author_code_unverified", self.spec.selection, root, original.lineage_id,
+                baseline.edge_table.graph_sha256, initial_digest, baseline.state.digest,
+                _candidate(baseline.state.candidate), None, "count_budget_exhausted", (), None,
+                None, "count_budget_exhausted", budgets.summary("attempt"), budgets.leaf_events(),
+            )
+        try:
+            order = self.spec.coordinate_order or tuple(range(n))
+            if tuple(sorted(order)) != tuple(range(n)):
+                raise ValueError("impulse order must enumerate every original coordinate exactly once")
+        except BaseException:
+            order_reservation.rollback()
+            raise
+        order_reservation.commit_once()
         baseline_valid: bool | None = None
         baseline_term = "baseline_sweep_cap"
         for index in range(self.spec.baseline_sweeps):
             try:
                 moved = baseline.advance(
                     budgets=budgets, leaf_id=f"{root}:baseline:sweep:{index}", bp_call_start=index == 0,
+                    wall_clock=wall_clock,
                 )
             except (NumericalFailure, ValueError, FloatingPointError):
                 baseline_term = "numerical_failure"
@@ -263,6 +296,9 @@ class ImpulseController:
                 baseline_term = moved.termination or "count_budget_exhausted"
                 break
             check_leaf = f"{root}:baseline:original-check:{index}"
+            if wall_clock is not None and wall_clock.check("candidate_selection_boundary", scope="attempt") is not None:
+                baseline_term = "wall_clock_deadline"
+                break
             admitted, baseline_valid = _reserve_check(
                 budgets, check_leaf, lambda: baseline.original_syndrome_valid(original.hz),
             )
@@ -279,38 +315,44 @@ class ImpulseController:
         if baseline_valid:
             selected_candidate = diagnostic
             termination = "baseline_valid"
-        elif baseline_term in ("count_budget_exhausted", "numerical_failure"):
+        elif baseline_term in ("count_budget_exhausted", "numerical_failure", "wall_clock_deadline"):
             selected_candidate = None
             termination = baseline_term
         else:
             selected_candidate = None
             for attempt_order, target in enumerate(order[:self.spec.attempt_cap]):
-                row = self._attempt(original, error_rate, budgets, root, attempt_order, target)
+                row = self._attempt(original, error_rate, budgets, root, attempt_order, target, wall_clock=wall_clock)
                 attempts.append(row)
                 if row.termination == "count_budget_exhausted":
                     termination = "count_budget_exhausted"
                     break
+                if row.termination == "wall_clock_deadline":
+                    termination = "wall_clock_deadline"
+                    break
                 if self.spec.selection == "first_convergence" and row.original_valid:
                     break
-            if termination != "count_budget_exhausted":
+            if termination not in ("count_budget_exhausted", "wall_clock_deadline"):
                 rank_leaf = f"{root}:selection"
-                reservation = budgets.reserve(
-                    "attempt", WorkVector(ranking_scans=len(attempts)), leaf_id=rank_leaf,
-                )
-                if reservation is None:
-                    termination = "count_budget_exhausted"
+                if wall_clock is not None and wall_clock.check("candidate_selection_boundary", scope="attempt") is not None:
+                    termination = "wall_clock_deadline"
                 else:
-                    try:
-                        selected = select_impulse_candidate(attempts, original, mode=self.spec.selection)
-                    except BaseException:
-                        reservation.rollback()
-                        raise
-                    reservation.commit_once()
-                    if selected is not None:
-                        selected_candidate = selected.lifted_candidate
-                        termination = "impulse_valid"
+                    reservation = budgets.reserve(
+                        "attempt", WorkVector(ranking_scans=len(attempts)), leaf_id=rank_leaf,
+                    )
+                    if reservation is None:
+                        termination = "count_budget_exhausted"
                     else:
-                        termination = "attempt_cap_reached" if self.spec.attempt_cap < len(order) else "no_proposal"
+                        try:
+                            selected = select_impulse_candidate(attempts, original, mode=self.spec.selection)
+                        except BaseException:
+                            reservation.rollback()
+                            raise
+                        reservation.commit_once()
+                        if selected is not None:
+                            selected_candidate = selected.lifted_candidate
+                            termination = "impulse_valid"
+                        else:
+                            termination = "attempt_cap_reached" if self.spec.attempt_cap < len(order) else "no_proposal"
         identity = (
             "impulse_negative_infinite_semantic_v1" if self.spec.realization == "semantic_forced_one"
             else "impulse_exact_shortening_css_v1"
@@ -325,7 +367,7 @@ class ImpulseController:
 
     def _attempt(
         self, original: OriginalProblem, error_rate: float, budgets: BudgetTree,
-        root: str, order: int, target: int,
+        root: str, order: int, target: int, *, wall_clock: WallClockLimit | None = None,
     ) -> ImpulseAttempt:
         mode = self.spec.realization
         owner = f"{root}:attempt:{order}:target:{target}"
@@ -334,6 +376,8 @@ class ImpulseController:
             intervention_actions=1, fixation_actions=1,
             transformations=int(mode == "exact_shortening"),
         )
+        if wall_clock is not None and wall_clock.check("candidate_selection_boundary", scope="attempt") is not None:
+            return self._row(order, target, mode, original.lineage_id, "", owner, None, None, None, None, None, "wall_clock_deadline", None, (), None)
         reservation = budgets.reserve("attempt", action_work, leaf_id=action_leaf)
         if reservation is None:
             return self._row(order, target, mode, original.lineage_id, "", owner, None, None, None, None, None, "count_budget_exhausted", None, (), None)
@@ -363,13 +407,23 @@ class ImpulseController:
         for sweep_index in range(self.spec.attempt_sweeps):
             # A contradictory empty check is an exact algebraic terminal.
             if mode == "exact_shortening":
-                empty = np.count_nonzero(working.check_matrix, axis=1) == 0
-                if np.any(empty & (working.syndrome == 1)):
+                contradiction_leaf = f"{owner}:contradiction-check:{sweep_index}"
+                if wall_clock is not None and wall_clock.check("candidate_selection_boundary", scope="attempt") is not None:
+                    term = "wall_clock_deadline"
+                    break
+                checked, contradiction = _reserve_check(
+                    budgets, contradiction_leaf,
+                    lambda: bool(np.any((np.count_nonzero(working.check_matrix, axis=1) == 0) & (working.syndrome == 1))),
+                )
+                if not checked:
+                    term = "count_budget_exhausted"
+                    break
+                if contradiction:
                     term = "contradictory_empty_check"
                     break
             leaf = f"{owner}:sweep:{sweep_index}"
             try:
-                moved = session.advance(budgets=budgets, leaf_id=leaf, bp_call_start=sweep_index == 0)
+                moved = session.advance(budgets=budgets, leaf_id=leaf, bp_call_start=sweep_index == 0, wall_clock=wall_clock)
             except (NumericalFailure, ValueError, FloatingPointError):
                 term = "numerical_failure"
                 break
@@ -379,6 +433,9 @@ class ImpulseController:
             sweep_leaves.append(leaf)
             diagnostic = _candidate(session.state.candidate)
             check_leaf = f"{owner}:lift-original-check:{sweep_index}"
+            if wall_clock is not None and wall_clock.check("candidate_selection_boundary", scope="attempt") is not None:
+                term = "wall_clock_deadline"
+                break
             if mode == "exact_shortening":
                 try:
                     admitted, lift = _reserve_check(

@@ -17,7 +17,7 @@ from typing import Mapping, Sequence
 
 import numpy as np
 
-from .budgets import BudgetLimit, BudgetTree, WorkVector
+from .budgets import BudgetLimit, BudgetTree, WallClockLimit, WorkVector
 from .intervention_session import BpSession, decoder_stream_identity
 from .kernel import BinarySpaKernel
 from .numerics import MIN_SUM_CPU_F64, NumericalFailure
@@ -63,6 +63,12 @@ def _checked(budgets: BudgetTree, leaf_id: str, compute, *, lifted: int = 0):
         raise
     reservation.commit_once()
     return True, result
+
+
+def _deadline(wall_clock: WallClockLimit | None) -> bool:
+    return wall_clock is not None and wall_clock.check(
+        "candidate_selection_boundary", scope="attempt",
+    ) is not None
 
 
 class IdempotentActionGate:
@@ -161,7 +167,10 @@ class FreezingController:
     def __init__(self, spec: FreezingSpec | Mapping[str, object]) -> None:
         self.spec = spec if isinstance(spec, FreezingSpec) else FreezingSpec(**spec)
 
-    def run(self, original: OriginalProblem, *, error_rate: float, budgets: BudgetTree) -> FreezingResult:
+    def run(
+        self, original: OriginalProblem, *, error_rate: float, budgets: BudgetTree,
+        wall_clock: WallClockLimit | None = None,
+    ) -> FreezingResult:
         root = _owner("freezing", original, self.spec.root_seed, error_rate)
         table = EdgeTable.from_check_matrix(original.hz)
         baseline = BpSession(table, original.syndrome, error_rate=error_rate, owner_identity=root + ":baseline")
@@ -169,12 +178,15 @@ class FreezingController:
         baseline_term = "failed_period"
         for index in range(self.spec.period_sweeps):
             try:
-                moved = baseline.advance(budgets=budgets, leaf_id=f"{root}:baseline:sweep:{index}", bp_call_start=index == 0)
+                moved = baseline.advance(budgets=budgets, leaf_id=f"{root}:baseline:sweep:{index}", bp_call_start=index == 0, wall_clock=wall_clock)
             except (NumericalFailure, ValueError, FloatingPointError):
                 baseline_term = "numerical_failure"
                 break
             if not moved.admitted:
                 baseline_term = moved.termination or "count_budget_exhausted"
+                break
+            if _deadline(wall_clock):
+                baseline_term = "wall_clock_deadline"
                 break
             admitted, baseline_valid = _checked(
                 budgets, f"{root}:baseline:check:{index}",
@@ -187,28 +199,53 @@ class FreezingController:
                 baseline_term = "baseline_valid"
                 break
         diagnostic = _bits(baseline.state.candidate)
-        mismatched = (original.hz.astype(np.int64) @ baseline.state.candidate.astype(np.int64)) % 2 != original.syndrome
-        frustrated = tuple(int(index) for index in np.flatnonzero(mismatched))
+        frustrated: tuple[int, ...] = ()
         trials: list[FreezingTrial] = []
         selected = diagnostic if baseline_valid else None
         termination = baseline_term if baseline_term != "failed_period" else "no_proposal"
         if not baseline_valid and baseline_term == "failed_period":
+            if _deadline(wall_clock):
+                return FreezingResult(
+                    "controlled_css_adaptation", "arxiv:0801.1241", "quaternary_depolarizing_bp", "author_code_unverified",
+                    root, diagnostic, frustrated, tuple(trials), selected, "wall_clock_deadline",
+                    budgets.summary("attempt"), budgets.leaf_events(),
+                )
             gate = IdempotentActionGate(root, budgets)
             choices: list[tuple[int, int, str]] = []
             seen: set[int] = set()
-            for check in frustrated:
-                stream = decoder_stream_identity(root, "freezing", f"check:{check}", 0, "neighbor_draw")
-                seed = int(stream.rsplit("-", 1)[-1][:16], 16)
-                neighbors = sorted(int(i) for i in np.flatnonzero(original.hz[check]))
-                drawn = np.random.default_rng(seed).permutation(neighbors)
-                for variable in drawn:
-                    target = int(variable)
-                    if target not in seen:
-                        choices.append((check, target, stream))
-                        seen.add(target)
+            target_order = budgets.reserve(
+                "attempt", WorkVector(order_generation=1, order_selection=1, ranking_scans=original.hz.shape[0] + original.hz.shape[1]),
+                leaf_id=root + ":target-order",
+            )
+            if target_order is None:
+                return FreezingResult(
+                    "controlled_css_adaptation", "arxiv:0801.1241", "quaternary_depolarizing_bp", "author_code_unverified",
+                    root, diagnostic, frustrated, tuple(trials), selected, "count_budget_exhausted",
+                    budgets.summary("attempt"), budgets.leaf_events(),
+                )
+            try:
+                mismatched = (original.hz.astype(np.int64) @ baseline.state.candidate.astype(np.int64)) % 2 != original.syndrome
+                frustrated = tuple(int(index) for index in np.flatnonzero(mismatched))
+                for check in frustrated:
+                    stream = decoder_stream_identity(root, "freezing", f"check:{check}", 0, "neighbor_draw")
+                    seed = int(stream.rsplit("-", 1)[-1][:16], 16)
+                    neighbors = sorted(int(i) for i in np.flatnonzero(original.hz[check]))
+                    drawn = np.random.default_rng(seed).permutation(neighbors)
+                    for variable in drawn:
+                        target = int(variable)
+                        if target not in seen:
+                            choices.append((check, target, stream))
+                            seen.add(target)
+            except BaseException:
+                target_order.rollback()
+                raise
+            target_order.commit_once()
             for order, (check, target, stream) in enumerate(choices[:self.spec.retry_cap]):
                 owner = f"{root}:trial:{order}:target:{target}"
                 action_leaf = owner + ":freeze"
+                if _deadline(wall_clock):
+                    termination = "wall_clock_deadline"
+                    break
                 admitted = gate.commit(
                     owner, expected_revision=gate.revision,
                     work=WorkVector(intervention_actions=1, fixation_actions=1, transformations=1),
@@ -233,13 +270,29 @@ class FreezingController:
                 valid: bool | None = None
                 local_term = "lifetime_expired"
                 empty = np.count_nonzero(working.check_matrix, axis=1) == 0
-                if np.any(empty & (working.syndrome == 1)):
-                    local_term = "contradictory_empty_check"
+                if _deadline(wall_clock):
+                    local_term = "wall_clock_deadline"
+                else:
+                    contradiction = budgets.reserve("attempt", WorkVector(candidate_checks=1), leaf_id=owner + ":contradiction-check")
+                    if contradiction is None:
+                        local_term = "count_budget_exhausted"
+                    else:
+                        try:
+                            contradictory = bool(np.any(empty & (working.syndrome == 1)))
+                        except BaseException:
+                            contradiction.rollback()
+                            raise
+                        contradiction.commit_once()
+                        local_term = "contradictory_empty_check" if contradictory else "lifetime_expired"
+                if local_term == "contradictory_empty_check":
+                    pass
+                elif local_term == "wall_clock_deadline" or local_term == "count_budget_exhausted":
+                    pass
                 else:
                     for sweep in range(self.spec.lifetime_sweeps):
                         leaf = f"{owner}:sweep:{sweep}"
                         try:
-                            moved = session.advance(budgets=budgets, leaf_id=leaf, bp_call_start=sweep == 0)
+                            moved = session.advance(budgets=budgets, leaf_id=leaf, bp_call_start=sweep == 0, wall_clock=wall_clock)
                         except (NumericalFailure, ValueError, FloatingPointError):
                             local_term = "numerical_failure"
                             break
@@ -247,6 +300,9 @@ class FreezingController:
                             local_term = moved.termination or "count_budget_exhausted"
                             break
                         sweep_leaves.append(leaf)
+                        if _deadline(wall_clock):
+                            local_term = "wall_clock_deadline"
+                            break
                         try:
                             checked, lift = _checked(
                                 budgets, f"{owner}:lift-check:{sweep}",
@@ -267,7 +323,7 @@ class FreezingController:
                             selected = lifted
                             break
                 release_leaf: str | None = None
-                if selected is None and local_term != "count_budget_exhausted":
+                if selected is None and local_term not in ("count_budget_exhausted", "wall_clock_deadline"):
                     release_leaf = owner + ":release"
                     released = gate.commit(
                         release_leaf, expected_revision=gate.revision,
@@ -292,7 +348,7 @@ class FreezingController:
                 if selected is not None:
                     termination = "freeze_valid"
                     break
-                if local_term == "count_budget_exhausted":
+                if local_term in ("count_budget_exhausted", "wall_clock_deadline"):
                     termination = local_term
                     break
             else:
@@ -383,7 +439,10 @@ class SyndromeFlipController:
     def __init__(self, spec: SyndromeFlipSpec | Mapping[str, object]) -> None:
         self.spec = spec if isinstance(spec, SyndromeFlipSpec) else SyndromeFlipSpec(**spec)
 
-    def run(self, original: OriginalProblem, *, error_rate: float, budgets: BudgetTree) -> SyndromeFlipResult:
+    def run(
+        self, original: OriginalProblem, *, error_rate: float, budgets: BudgetTree,
+        wall_clock: WallClockLimit | None = None,
+    ) -> SyndromeFlipResult:
         root = _owner("syndrome-flip", original, self.spec.root_seed, error_rate)
         n = original.hz.shape[1]
         stream = decoder_stream_identity(root, "bpsf", "test_vector_order", 0, "test_selection")
@@ -397,7 +456,7 @@ class SyndromeFlipController:
         baseline_term = "failed_baseline"
         for sweep in range(self.spec.baseline_sweeps):
             try:
-                moved = baseline.advance(budgets=budgets, leaf_id=f"{root}:baseline:sweep:{sweep}", bp_call_start=sweep == 0)
+                moved = baseline.advance(budgets=budgets, leaf_id=f"{root}:baseline:sweep:{sweep}", bp_call_start=sweep == 0, wall_clock=wall_clock)
             except (NumericalFailure, ValueError, FloatingPointError):
                 baseline_term = "numerical_failure"
                 break
@@ -408,6 +467,9 @@ class SyndromeFlipController:
             if previous is not None:
                 counts += np.asarray([int(a != b) for a, b in zip(previous, current, strict=True)], dtype=np.int64)
             previous = current
+            if _deadline(wall_clock):
+                baseline_term = "wall_clock_deadline"
+                break
             admitted, baseline_valid = _checked(
                 budgets, f"{root}:baseline:check:{sweep}",
                 lambda: baseline.original_syndrome_valid(original.hz),
@@ -418,33 +480,43 @@ class SyndromeFlipController:
             if baseline_valid:
                 baseline_term = "baseline_valid"
                 break
-        ranked = tuple(sorted(range(n), key=lambda index: (-int(counts[index]), index))[:self.spec.top_k])
+        ranked: tuple[int, ...] = ()
         tests: list[SyndromeFlipTest] = []
         selected: SyndromeFlipTest | None = None
         termination = baseline_term
         if not baseline_valid and baseline_term == "failed_baseline":
-            generation = budgets.reserve(
-                "attempt", WorkVector(order_generation=1, ranking_scans=n),
-                leaf_id=root + ":test-order",
-            )
-            if generation is None:
-                termination = "count_budget_exhausted"
+            if _deadline(wall_clock):
+                termination = "wall_clock_deadline"
             else:
-                vectors: list[tuple[int, ...]] = []
-                for weight in range(1, min(self.spec.max_weight, len(ranked)) + 1):
-                    for indices in combinations(ranked, weight):
-                        t = [0] * n
-                        for index in indices:
-                            t[index] = 1
-                        vectors.append(tuple(t))
-                rng = np.random.default_rng(int(stream.rsplit("-", 1)[-1][:16], 16))
-                declared = tuple(vectors[int(i)] for i in rng.permutation(len(vectors)))
-                generation.commit_once()
+                generation = budgets.reserve(
+                    "attempt", WorkVector(order_generation=1, ranking_scans=n),
+                    leaf_id=root + ":test-order",
+                )
+                if generation is None:
+                    termination = "count_budget_exhausted"
+                else:
+                    try:
+                        ranked = tuple(sorted(range(n), key=lambda index: (-int(counts[index]), index))[:self.spec.top_k])
+                        vectors: list[tuple[int, ...]] = []
+                        for weight in range(1, min(self.spec.max_weight, len(ranked)) + 1):
+                            for indices in combinations(ranked, weight):
+                                t = [0] * n
+                                for index in indices:
+                                    t[index] = 1
+                                vectors.append(tuple(t))
+                        rng = np.random.default_rng(int(stream.rsplit("-", 1)[-1][:16], 16))
+                        declared = tuple(vectors[int(i)] for i in rng.permutation(len(vectors)))
+                    except BaseException:
+                        generation.rollback()
+                        raise
+                    generation.commit_once()
                 gate = IdempotentActionGate(root, budgets)
                 for order, t in enumerate(declared[:self.spec.test_cap]):
-                    working, cert = transform_syndrome(original, np.asarray(t, dtype=np.uint8))
                     owner = f"{root}:test:{order}"
                     action_leaf = owner + ":transform"
+                    if _deadline(wall_clock):
+                        termination = "wall_clock_deadline"
+                        break
                     admitted = gate.commit(
                         owner, expected_revision=gate.revision,
                         work=WorkVector(intervention_actions=1, transformations=1),
@@ -452,12 +524,13 @@ class SyndromeFlipController:
                     )
                     if admitted is None:
                         tests.append(SyndromeFlipTest(
-                            order, t, _bits(working.syndrome), working.lineage_id, cert.digest,
+                            order, t, (), "", "",
                             owner, None, None, None, None, None, None, None, False,
                             "count_budget_exhausted", None, (),
                         ))
                         termination = "count_budget_exhausted"
                         break
+                    working, cert = transform_syndrome(original, np.asarray(t, dtype=np.uint8))
                     session = BpSession(
                         EdgeTable.from_check_matrix(working.check_matrix), working.syndrome,
                         error_rate=error_rate, owner_identity=owner,
@@ -471,7 +544,7 @@ class SyndromeFlipController:
                     for sweep in range(self.spec.attempt_sweeps):
                         leaf = f"{owner}:sweep:{sweep}"
                         try:
-                            moved = session.advance(budgets=budgets, leaf_id=leaf, bp_call_start=sweep == 0)
+                            moved = session.advance(budgets=budgets, leaf_id=leaf, bp_call_start=sweep == 0, wall_clock=wall_clock)
                         except (NumericalFailure, ValueError, FloatingPointError):
                             local_term = "numerical_failure"
                             break
@@ -479,6 +552,9 @@ class SyndromeFlipController:
                             local_term = moved.termination or "count_budget_exhausted"
                             break
                         sweep_leaves.append(leaf)
+                        if _deadline(wall_clock):
+                            local_term = "wall_clock_deadline"
+                            break
                         try:
                             checked, lift = _checked(
                                 budgets, f"{owner}:lift-check:{sweep}",
@@ -510,7 +586,7 @@ class SyndromeFlipController:
                     if row.eligible:
                         selected = row
                         break
-                    if local_term == "count_budget_exhausted":
+                    if local_term in ("count_budget_exhausted", "wall_clock_deadline"):
                         termination = local_term
                         break
                 else:
@@ -575,7 +651,10 @@ class SignFlipController:
     def __init__(self, spec: SignFlipSpec | Mapping[str, object]) -> None:
         self.spec = spec if isinstance(spec, SignFlipSpec) else SignFlipSpec(**spec)
 
-    def run(self, original: OriginalProblem, *, error_rate: float, budgets: BudgetTree) -> SignFlipResult:
+    def run(
+        self, original: OriginalProblem, *, error_rate: float, budgets: BudgetTree,
+        wall_clock: WallClockLimit | None = None,
+    ) -> SignFlipResult:
         root = _owner("sign-flip", original, f"alpha:{self.spec.alpha}", error_rate)
         assignment = ParameterAssignment(shape="scalar", value=float(self.spec.alpha))
         kernel = BinarySpaKernel(
@@ -590,7 +669,7 @@ class SignFlipController:
         baseline_valid = False
         for sweep in range(self.spec.trunk_sweeps):
             try:
-                moved = session.advance(budgets=budgets, leaf_id=f"{root}:trunk:{sweep}", bp_call_start=sweep == 0)
+                moved = session.advance(budgets=budgets, leaf_id=f"{root}:trunk:{sweep}", bp_call_start=sweep == 0, wall_clock=wall_clock)
             except (NumericalFailure, ValueError, FloatingPointError):
                 termination = "numerical_failure"
                 trigger = "trunk_numerical_failure"
@@ -598,6 +677,10 @@ class SignFlipController:
             if not moved.admitted:
                 termination = moved.termination or "count_budget_exhausted"
                 trigger = "trunk_denied"
+                break
+            if _deadline(wall_clock):
+                termination = "wall_clock_deadline"
+                trigger = "trunk_deadline"
                 break
             checked, baseline_valid = _checked(
                 budgets, f"{root}:trunk-check:{sweep}",
@@ -612,22 +695,43 @@ class SignFlipController:
                 termination = "baseline_valid"
                 break
         before = session.state
-        mismatched_mask = (original.hz.astype(np.int64) @ before.candidate.astype(np.int64)) % 2 != original.syndrome
-        checks = tuple(int(index) for index in np.flatnonzero(mismatched_mask))
-        scores = tuple(int(np.sum(original.hz[list(checks), index])) if checks else 0 for index in range(original.hz.shape[1]))
-        target = None if trigger != "failed_normalized_min_sum_trunk" or not checks or max(scores, default=0) == 0 else min(
-            index for index, score in enumerate(scores) if score == max(scores)
-        )
+        checks: tuple[int, ...] = ()
+        scores: tuple[int, ...] = ()
+        target: int | None = None
+        if trigger == "failed_normalized_min_sum_trunk":
+            if _deadline(wall_clock):
+                termination = "wall_clock_deadline"
+                trigger = "trunk_deadline"
+            else:
+                target_reservation = budgets.reserve(
+                    "attempt", WorkVector(order_generation=1, order_selection=1, ranking_scans=original.hz.shape[0] + original.hz.shape[1]),
+                    leaf_id=root + ":target-order",
+                )
+                if target_reservation is None:
+                    termination = "count_budget_exhausted"
+                    trigger = "trunk_denied"
+                else:
+                    try:
+                        mismatched_mask = (original.hz.astype(np.int64) @ before.candidate.astype(np.int64)) % 2 != original.syndrome
+                        checks = tuple(int(index) for index in np.flatnonzero(mismatched_mask))
+                        scores = tuple(int(np.sum(original.hz[list(checks), index])) if checks else 0 for index in range(original.hz.shape[1]))
+                        target = None if not checks or max(scores, default=0) == 0 else min(
+                            index for index, score in enumerate(scores) if score == max(scores)
+                        )
+                    except BaseException:
+                        target_reservation.rollback()
+                        raise
+                    target_reservation.commit_once()
         action_state: str | None = None
         continuation_state: str | None = None
         selected = _bits(before.candidate) if baseline_valid else None
         after = before
-        if trigger == "failed_normalized_min_sum_trunk" and termination not in ("count_budget_exhausted", "numerical_failure"):
+        if trigger == "failed_normalized_min_sum_trunk" and termination not in ("count_budget_exhausted", "numerical_failure", "wall_clock_deadline"):
             if target is None:
                 termination = "no_eligible_target"
             else:
                 try:
-                    moved = session.stage_posterior_sign(target, budgets=budgets, leaf_id=f"{root}:posterior-sign:{before.revision}")
+                    moved = session.stage_posterior_sign(target, budgets=budgets, leaf_id=f"{root}:posterior-sign:{before.revision}", wall_clock=wall_clock)
                 except ValueError:
                     termination = "stale_proposal"
                 else:
@@ -640,7 +744,7 @@ class SignFlipController:
                             try:
                                 moved = session.advance(
                                     budgets=budgets, leaf_id=f"{root}:continuation:{sweep}",
-                                    bp_call_start=sweep == 0,
+                                    bp_call_start=sweep == 0, wall_clock=wall_clock,
                                 )
                             except (NumericalFailure, ValueError, FloatingPointError):
                                 termination = "numerical_failure"
@@ -649,6 +753,9 @@ class SignFlipController:
                                 termination = moved.termination or "count_budget_exhausted"
                                 break
                             continuation_state = session.state.digest
+                            if _deadline(wall_clock):
+                                termination = "wall_clock_deadline"
+                                break
                             checked, valid = _checked(
                                 budgets, f"{root}:continuation-check:{sweep}",
                                 lambda: session.original_syndrome_valid(original.hz),

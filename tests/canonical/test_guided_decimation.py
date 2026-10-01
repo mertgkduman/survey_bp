@@ -208,7 +208,7 @@ def test_proposal_carries_source_mutation_work_and_rejects_untrusted_action():
     )
     assert proposal.action_payload == action
     assert proposal.anticipated_work.fixation_actions == 1
-    assert proposal.anticipated_work.ranking_scans == 2
+    assert proposal.anticipated_work.ranking_scans == 0
     assert proposal.stream_identity == "not_applicable"
     assert proposal.child_lineage_id.startswith("working-")
     assert proposal.preserved_fields == ("graph", "syndrome", "v2c", "c2v")

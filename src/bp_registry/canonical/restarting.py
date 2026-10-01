@@ -9,7 +9,7 @@ from typing import Literal, Mapping
 
 import numpy as np
 
-from .budgets import BudgetLimit, BudgetTree, WorkVector
+from .budgets import BudgetLimit, BudgetTree, WallClockLimit, WorkVector
 from .intervention_session import BpSession
 from .lineage import stable_lineage_id
 from .numerics import NumericalFailure
@@ -180,13 +180,22 @@ def _reserve_compute(budgets: BudgetTree, leaf_id: str, work: WorkVector, comput
     return True, result
 
 
+def _deadline(wall_clock: WallClockLimit | None) -> bool:
+    return wall_clock is not None and wall_clock.check(
+        "candidate_selection_boundary", scope="attempt",
+    ) is not None
+
+
 class RestartController:
     """Deterministic root, branch, residual, and strict-lower-weight machine."""
 
     def __init__(self, spec: RestartSpec | Mapping[str, object]) -> None:
         self.spec = spec if isinstance(spec, RestartSpec) else RestartSpec(**spec)
 
-    def run(self, original: OriginalProblem, *, error_rate: float, budgets: BudgetTree) -> RestartResult:
+    def run(
+        self, original: OriginalProblem, *, error_rate: float, budgets: BudgetTree,
+        wall_clock: WallClockLimit | None = None,
+    ) -> RestartResult:
         if not isinstance(original, OriginalProblem):
             raise ValueError("restart requires an immutable original CSS problem")
         n = original.hz.shape[1]
@@ -203,12 +212,15 @@ class RestartController:
         root_term = "root_sweep_cap"
         for sweep in range(self.spec.root_sweeps):
             try:
-                moved = root.advance(budgets=budgets, leaf_id=f"{root_owner}:root:sweep:{sweep}", bp_call_start=sweep == 0)
+                moved = root.advance(budgets=budgets, leaf_id=f"{root_owner}:root:sweep:{sweep}", bp_call_start=sweep == 0, wall_clock=wall_clock)
             except (NumericalFailure, ValueError, FloatingPointError):
                 root_term = "numerical_failure"
                 break
             if not moved.admitted:
                 root_term = moved.termination or "count_budget_exhausted"
+                break
+            if _deadline(wall_clock):
+                root_term = "wall_clock_deadline"
                 break
             checked, root_valid = _reserve_compute(
                 budgets, f"{root_owner}:root:check:{sweep}", WorkVector(original_checks=1),
@@ -221,7 +233,7 @@ class RestartController:
                 root_term = "root_valid"
                 break
         llr = tuple(float(value) for value in root.state.posterior)
-        order = tuple(sorted(range(n), key=lambda index: (llr[index], index)))
+        order: tuple[int, ...] = ()
         root_candidate = _bits(root.state.candidate)
         branches: list[RestartBranch] = []
         incumbent: RestartCandidate | None = None
@@ -229,35 +241,43 @@ class RestartController:
         if root_valid:
             termination = "root_valid"
         elif root_term == "root_sweep_cap":
-            admitted, _ = _reserve_compute(
-                budgets, f"{root_owner}:root:llr-order", WorkVector(order_generation=1, ranking_scans=n),
-                lambda: order,
-            )
-            if not admitted:
-                termination = "count_budget_exhausted"
+            if _deadline(wall_clock):
+                termination = "wall_clock_deadline"
             else:
-                for branch_order, root_target in enumerate(order[:self.spec.eta]):
-                    branch = self._branch(original, root, budgets, branch_order, root_target)
-                    branches.append(branch)
-                    if branch.termination == "count_budget_exhausted":
-                        termination = "count_budget_exhausted"
-                        break
-                    for row in branch.residuals:
-                        if row.original_valid and row.lifted_candidate is not None:
-                            candidate = RestartCandidate(
-                                branch_order, row.order, row.lifted_candidate, True,
-                                sum(row.lifted_candidate),
-                                stable_lineage_id("candidate", {
-                                    "branch": branch.lineage_id, "residual": row.order,
-                                    "bits": row.lifted_candidate,
-                                }).value,
-                            )
-                            incumbent = select_lower_restart_candidate(incumbent, candidate, original)
+                admitted, computed_order = _reserve_compute(
+                    budgets, f"{root_owner}:root:llr-order", WorkVector(order_generation=1, ranking_scans=n),
+                    lambda: tuple(sorted(range(n), key=lambda index: (llr[index], index))),
+                )
+                if not admitted:
+                    termination = "count_budget_exhausted"
                 else:
-                    termination = (
-                        "restart_valid" if incumbent is not None else
-                        "branch_cap_reached" if self.spec.eta < n else "no_proposal"
-                    )
+                    assert computed_order is not None
+                    order = computed_order
+                    for branch_order, root_target in enumerate(order[:self.spec.eta]):
+                        branch = self._branch(original, root, budgets, branch_order, root_target, wall_clock=wall_clock)
+                        branches.append(branch)
+                        if branch.termination == "count_budget_exhausted":
+                            termination = "count_budget_exhausted"
+                            break
+                        if branch.termination == "wall_clock_deadline":
+                            termination = "wall_clock_deadline"
+                            break
+                        for row in branch.residuals:
+                            if row.original_valid and row.lifted_candidate is not None:
+                                candidate = RestartCandidate(
+                                    branch_order, row.order, row.lifted_candidate, True,
+                                    sum(row.lifted_candidate),
+                                    stable_lineage_id("candidate", {
+                                        "branch": branch.lineage_id, "residual": row.order,
+                                        "bits": row.lifted_candidate,
+                                    }).value,
+                                )
+                                incumbent = select_lower_restart_candidate(incumbent, candidate, original)
+                    else:
+                        termination = (
+                            "restart_valid" if incumbent is not None else
+                            "branch_cap_reached" if self.spec.eta < n else "no_proposal"
+                        )
         b1_dimensions_match = original.hz.shape == (441, 882) and original.hx.shape == (441, 882)
         qualification = (
             "development_fixture" if self.spec.code_id == "b1-ghp-882" and not b1_dimensions_match
@@ -285,13 +305,15 @@ class RestartController:
 
     def _branch(
         self, original: OriginalProblem, root: BpSession, budgets: BudgetTree,
-        branch_order: int, root_target: int,
+        branch_order: int, root_target: int, *, wall_clock: WallClockLimit | None = None,
     ) -> RestartBranch:
         owner = root.owner_identity
         branch_id = stable_lineage_id("branch", {
             "root": owner, "order": branch_order, "target": root_target,
         }).value
         open_leaf = f"{owner}:branch:{branch_order}:open"
+        if _deadline(wall_clock):
+            return RestartBranch(branch_order, root_target, branch_id, None, (), "wall_clock_deadline")
         reservation = budgets.reserve("attempt", WorkVector(branch_expansions=1), leaf_id=open_leaf)
         if reservation is None:
             return RestartBranch(branch_order, root_target, branch_id, None, (), "count_budget_exhausted")
@@ -306,6 +328,10 @@ class RestartController:
                 break
             target = next_target
             insertion_leaf = f"{branch_id}:insert:{residual_order}:{target}"
+            if _deadline(wall_clock):
+                rows.append(self._denied_row(original, inserted, target, residual_order, "wall_clock_deadline"))
+                branch_term = "wall_clock_deadline"
+                break
             reservation = budgets.reserve(
                 "attempt", WorkVector(intervention_actions=1, fixation_actions=1),
                 leaf_id=insertion_leaf,
@@ -320,6 +346,10 @@ class RestartController:
             error[inserted] = 1
             residual_syndrome = original.syndrome ^ ((original.hz.astype(np.int64) @ error.astype(np.int64)) % 2).astype(np.uint8)
             transform_leaf = f"{branch_id}:residual:{residual_order}:transform"
+            if _deadline(wall_clock):
+                rows.append(self._denied_row(original, inserted, target, residual_order, "wall_clock_deadline", insertion_leaf))
+                branch_term = "wall_clock_deadline"
+                break
             admitted, views = _reserve_compute(
                 budgets, transform_leaf, WorkVector(transformations=2),
                 lambda: self._views(original, error, residual_syndrome),
@@ -335,13 +365,14 @@ class RestartController:
                 session = root.reset_fresh(
                     budgets=budgets, leaf_id=reset_leaf,
                     edge_table=EdgeTable.from_check_matrix(shortened.check_matrix),
-                    syndrome=shortened.syndrome,
+                    syndrome=shortened.syndrome, wall_clock=wall_clock,
                 )
             except ValueError as error_value:
-                if "denied by count budget" not in str(error_value):
+                if "denied by count budget" not in str(error_value) and "wall-clock deadline" not in str(error_value):
                     raise
-                rows.append(self._denied_row(original, inserted, target, residual_order, "count_budget_exhausted", insertion_leaf, transform_leaf))
-                branch_term = "count_budget_exhausted"
+                reason = "wall_clock_deadline" if "wall-clock deadline" in str(error_value) else "count_budget_exhausted"
+                rows.append(self._denied_row(original, inserted, target, residual_order, reason, insertion_leaf, transform_leaf))
+                branch_term = reason
                 break
             initial = session.state.digest
             sweep_leaves: list[str] = []
@@ -354,11 +385,18 @@ class RestartController:
             local_term = "residual_sweep_cap"
             empty = np.count_nonzero(shortened.check_matrix, axis=1) == 0
             contradiction_leaf = f"{branch_id}:residual:{residual_order}:contradiction-check"
-            checked, contradiction = _reserve_compute(
-                budgets, contradiction_leaf, WorkVector(candidate_checks=1),
-                lambda: bool(np.any(empty & (shortened.syndrome == 1))),
-            )
-            if not checked:
+            if _deadline(wall_clock):
+                local_term = "wall_clock_deadline"
+                checked = False
+                contradiction = None
+            else:
+                checked, contradiction = _reserve_compute(
+                    budgets, contradiction_leaf, WorkVector(candidate_checks=1),
+                    lambda: bool(np.any(empty & (shortened.syndrome == 1))),
+                )
+            if local_term == "wall_clock_deadline":
+                pass
+            elif not checked:
                 local_term = "count_budget_exhausted"
             elif contradiction:
                 local_term = "contradictory_empty_check"
@@ -366,7 +404,7 @@ class RestartController:
                 for sweep in range(self.spec.residual_sweeps):
                     leaf = f"{branch_id}:residual:{residual_order}:sweep:{sweep}"
                     try:
-                        moved = session.advance(budgets=budgets, leaf_id=leaf, bp_call_start=sweep == 0)
+                        moved = session.advance(budgets=budgets, leaf_id=leaf, bp_call_start=sweep == 0, wall_clock=wall_clock)
                     except (NumericalFailure, ValueError, FloatingPointError):
                         local_term = "numerical_failure"
                         break
@@ -375,6 +413,10 @@ class RestartController:
                         break
                     sweep_leaves.append(leaf)
                     validation_leaf = f"{branch_id}:residual:{residual_order}:lift-check:{sweep}"
+                    if _deadline(wall_clock):
+                        validation_leaf = None
+                        local_term = "wall_clock_deadline"
+                        break
                     try:
                         checked, lifts = _reserve_compute(
                             budgets, validation_leaf,
@@ -399,17 +441,33 @@ class RestartController:
                         local_term = "valid_original_candidate"
                         break
                     local_term = original_lift.reason or residual_lift.reason or "original_syndrome_invalid"
-            if not valid and local_term not in ("count_budget_exhausted", "numerical_failure", "invalid_lift", "contradictory_empty_check"):
-                eligible = [index for index in range(original.hz.shape[1]) if index not in inserted]
-                if eligible:
-                    # Shortened posterior positions are mapped back to original columns.
-                    local_scores = {
-                        original_index: float(session.state.posterior[shortened.column_map.index(original_index)])
-                        for original_index in eligible
-                    }
-                    next_target = min(eligible, key=lambda index: (local_scores[index], index))
+            if not valid and local_term not in ("count_budget_exhausted", "wall_clock_deadline", "numerical_failure", "invalid_lift", "contradictory_empty_check"):
+                target_leaf = f"{branch_id}:residual:{residual_order}:next-target"
+                if _deadline(wall_clock):
+                    local_term = "wall_clock_deadline"
                 else:
-                    local_term = "no_eligible_target"
+                    target_reservation = budgets.reserve(
+                        "attempt", WorkVector(order_selection=1, ranking_scans=original.hz.shape[1]),
+                        leaf_id=target_leaf,
+                    )
+                    if target_reservation is None:
+                        local_term = "count_budget_exhausted"
+                    else:
+                        try:
+                            eligible = [index for index in range(original.hz.shape[1]) if index not in inserted]
+                            if eligible:
+                                # Shortened posterior positions are mapped back to original columns.
+                                local_scores = {
+                                    original_index: float(session.state.posterior[shortened.column_map.index(original_index)])
+                                    for original_index in eligible
+                                }
+                                next_target = min(eligible, key=lambda index: (local_scores[index], index))
+                            else:
+                                local_term = "no_eligible_target"
+                        except BaseException:
+                            target_reservation.rollback()
+                            raise
+                        target_reservation.commit_once()
             row = RestartResidual(
                 residual_order, _bits(error), tuple(inserted), _bits(residual_syndrome),
                 shortened.lineage_id, residual_view.lineage_id, session.owner_identity,
@@ -419,7 +477,7 @@ class RestartController:
                 tuple(sweep_leaves), validation_leaf, next_target,
             )
             rows.append(row)
-            if local_term in ("count_budget_exhausted", "numerical_failure", "invalid_lift", "contradictory_empty_check", "no_eligible_target"):
+            if local_term in ("count_budget_exhausted", "wall_clock_deadline", "numerical_failure", "invalid_lift", "contradictory_empty_check", "no_eligible_target"):
                 branch_term = local_term
                 break
             if valid:

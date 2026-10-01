@@ -10,7 +10,7 @@ from typing import Literal, Mapping
 
 import numpy as np
 
-from .budgets import BudgetTree, WorkVector
+from .budgets import BudgetTree, WallClockLimit, WorkVector
 from .contracts import FinitePriorBiasAction
 from .kernel import BinarySpaKernel
 from .schedules import EdgeTable, FloodingSchedule
@@ -184,20 +184,21 @@ class BpSession:
             "finite_prior_bias", target_index, float(signed_prior), state.revision,
             state.digest, self._owner,
             FinitePriorBiasAction(kind="finite_prior_bias", target_index=target_index, signed_llr=float(signed_prior)),
-            WorkVector(intervention_actions=1, fixation_actions=1, ranking_scans=len(order)),
+            WorkVector(intervention_actions=1, fixation_actions=1),
             source_variant=source_variant, target_order=order,
             child_lineage_id="working-" + child_identity[:20],
         )
 
-    def commit_intervention(self, proposal: InterventionProposal, *, budgets: BudgetTree, leaf_id: str) -> SessionTransition:
+    def commit_intervention(
+        self, proposal: InterventionProposal, *, budgets: BudgetTree, leaf_id: str,
+        wall_clock: WallClockLimit | None = None,
+    ) -> SessionTransition:
         state = self._state
         if proposal.owner is not self._owner:
             raise ValueError("foreign intervention proposal owner")
         if proposal.expected_revision != state.revision or proposal.state_before != state.digest:
             raise ValueError("stale intervention proposal revision or before-state")
-        expected_work = WorkVector(
-            intervention_actions=1, fixation_actions=1, ranking_scans=len(proposal.target_order),
-        )
+        expected_work = WorkVector(intervention_actions=1, fixation_actions=1)
         if (proposal.action != "finite_prior_bias" or proposal.action_payload.kind != proposal.action
                 or proposal.action_payload.target_index != proposal.target_index
                 or proposal.action_payload.signed_llr != proposal.signed_prior
@@ -205,6 +206,8 @@ class BpSession:
                 or not proposal.child_lineage_id.startswith("working-")
                 or proposal.target_index not in proposal.target_order):
             raise ValueError("untrusted intervention proposal action or work declaration")
+        if wall_clock is not None and wall_clock.check("candidate_selection_boundary", scope="attempt") is not None:
+            return SessionTransition(False, state, "wall_clock_deadline", None)
         reservation = budgets.reserve("attempt", proposal.anticipated_work, leaf_id=leaf_id)
         if reservation is None:
             return SessionTransition(False, state, "count_budget_exhausted", None)
@@ -227,7 +230,10 @@ class BpSession:
         self._state = next_state
         return SessionTransition(True, next_state, None, leaf_id)
 
-    def advance(self, *, budgets: BudgetTree, leaf_id: str, bp_call_start: bool | None = None) -> SessionTransition:
+    def advance(
+        self, *, budgets: BudgetTree, leaf_id: str, bp_call_start: bool | None = None,
+        wall_clock: WallClockLimit | None = None,
+    ) -> SessionTransition:
         """Reserve a complete sweep, compute privately, then atomically swap state."""
         state = self._state
         if bp_call_start is None:
@@ -243,6 +249,8 @@ class BpSession:
         ) if state.pending_sign_target is not None else ()
         if pending_edges:
             work = work + WorkVector(variable_to_check_updates=len(pending_edges))
+        if wall_clock is not None and wall_clock.check("iteration_boundary", scope="attempt") is not None:
+            return SessionTransition(False, state, "wall_clock_deadline", None)
         reservation = budgets.reserve("attempt", work, leaf_id=leaf_id)
         if reservation is None:
             return SessionTransition(False, state, "count_budget_exhausted", None)
@@ -276,13 +284,17 @@ class BpSession:
     def original_syndrome_valid(self, check_matrix: np.ndarray) -> bool:
         return bool(np.array_equal((np.asarray(check_matrix, dtype=np.int64) @ self._state.candidate) % 2, self.syndrome))
 
-    def continue_units(self, count: int, *, budgets: BudgetTree, leaf_prefix: str) -> tuple[SessionTransition, ...]:
+    def continue_units(
+        self, count: int, *, budgets: BudgetTree, leaf_prefix: str,
+        wall_clock: WallClockLimit | None = None,
+    ) -> tuple[SessionTransition, ...]:
         if type(count) is not int or not 1 <= count <= 100_000 or not leaf_prefix:
             raise ValueError("continuation requires a finite positive unit count and leaf prefix")
         results: list[SessionTransition] = []
         for index in range(count):
             result = self.advance(
                 budgets=budgets, leaf_id=f"{leaf_prefix}:{index}", bp_call_start=index == 0,
+                wall_clock=wall_clock,
             )
             results.append(result)
             if not result.admitted:
@@ -293,6 +305,7 @@ class BpSession:
         self, *, budgets: BudgetTree, leaf_id: str, edge_table: EdgeTable | None = None,
         syndrome: np.ndarray | None = None, error_rate: float | None = None,
         preserve: tuple[str, ...] = (), owner_identity: str | None = None,
+        wall_clock: WallClockLimit | None = None,
     ) -> "BpSession":
         """Create an independent branch; only a complete compatible state may carry over."""
         table = self.edge_table if edge_table is None else edge_table
@@ -307,6 +320,8 @@ class BpSession:
             or (owner_identity is not None and owner_identity != self.state.owner_identity)
         ):
             raise ValueError("incompatible graph, coordinate, prior, dtype, or owner for preserved BP state")
+        if wall_clock is not None and wall_clock.check("candidate_selection_boundary", scope="attempt") is not None:
+            raise ValueError("reset denied by wall-clock deadline; parent state remains unchanged")
         reservation = budgets.reserve("attempt", WorkVector(intervention_actions=1), leaf_id=leaf_id)
         if reservation is None:
             raise ValueError("reset denied by count budget; parent state remains unchanged")
@@ -332,7 +347,10 @@ class BpSession:
         reservation.commit_once()
         return child
 
-    def mutate_posterior_sign(self, target_index: int, *, budgets: BudgetTree, leaf_id: str) -> SessionTransition:
+    def mutate_posterior_sign(
+        self, target_index: int, *, budgets: BudgetTree, leaf_id: str,
+        wall_clock: WallClockLimit | None = None,
+    ) -> SessionTransition:
         """Flip a committed posterior and refresh only its outgoing V2C edges."""
         state = self.state
         if (type(target_index) is not int or not 0 <= target_index < self.edge_table.variable_count
@@ -340,6 +358,8 @@ class BpSession:
             raise ValueError("posterior sign mutation requires a completed sweep and valid target")
         edge_indices = tuple(i for i, (_, variable) in enumerate(self.edge_table.edges) if variable == target_index)
         work = WorkVector(intervention_actions=1, variable_to_check_updates=len(edge_indices), candidate_constructions=1)
+        if wall_clock is not None and wall_clock.check("candidate_selection_boundary", scope="attempt") is not None:
+            return SessionTransition(False, state, "wall_clock_deadline", None)
         reservation = budgets.reserve("attempt", work, leaf_id=leaf_id)
         if reservation is None:
             return SessionTransition(False, state, "count_budget_exhausted", None)
@@ -365,12 +385,17 @@ class BpSession:
         self._state = next_state
         return SessionTransition(True, next_state, None, leaf_id)
 
-    def stage_posterior_sign(self, target_index: int, *, budgets: BudgetTree, leaf_id: str) -> SessionTransition:
+    def stage_posterior_sign(
+        self, target_index: int, *, budgets: BudgetTree, leaf_id: str,
+        wall_clock: WallClockLimit | None = None,
+    ) -> SessionTransition:
         """Change only posterior and decision now; use it on outgoing edges next sweep."""
         state = self.state
         if (type(target_index) is not int or not 0 <= target_index < self.edge_table.variable_count
                 or state.source_iteration == 0 or state.pending_sign_target is not None):
             raise ValueError("staged posterior sign requires a completed sweep and no pending mutation")
+        if wall_clock is not None and wall_clock.check("candidate_selection_boundary", scope="attempt") is not None:
+            return SessionTransition(False, state, "wall_clock_deadline", None)
         reservation = budgets.reserve(
             "attempt", WorkVector(intervention_actions=1, candidate_constructions=1), leaf_id=leaf_id,
         )

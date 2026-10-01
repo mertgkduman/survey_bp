@@ -11,7 +11,7 @@ from typing import Mapping
 
 import numpy as np
 
-from .budgets import BudgetLimit, BudgetTree, WorkVector
+from .budgets import BudgetLimit, BudgetTree, WallClockLimit, WorkVector
 from .contracts import InterventionSpec
 from .intervention_session import BpSession, InterventionProposal, SessionTransition
 from .numerics import NumericalFailure
@@ -83,17 +83,39 @@ class GuidedDecimationController:
     def __init__(self, spec: InterventionSpec | Mapping[str, object]) -> None:
         self.spec = spec if isinstance(spec, InterventionSpec) else InterventionSpec.model_validate(spec)
 
-    def fix_one(self, session: BpSession, *, posterior: np.ndarray | None, budgets: BudgetTree) -> GuidedTransition:
+    def fix_one(
+        self, session: BpSession, *, posterior: np.ndarray | None, budgets: BudgetTree,
+        wall_clock: WallClockLimit | None = None,
+    ) -> GuidedTransition:
         state = session.state
-        eligible = tuple(index for index in range(session.edge_table.variable_count) if index not in state.fixed_indices)
+        if wall_clock is not None and wall_clock.check("candidate_selection_boundary", scope="attempt") is not None:
+            return GuidedTransition(False, "wall_clock_deadline", None, SessionTransition(False, state, "wall_clock_deadline", None), ())
+        selection = budgets.reserve(
+            "attempt", WorkVector(
+                order_generation=1, order_selection=1,
+                ranking_scans=session.edge_table.variable_count,
+            ),
+            leaf_id=f"guided-target-order:{state.owner_identity}:{state.revision}:{len(budgets.leaf_events())}",
+        )
+        if selection is None:
+            return GuidedTransition(False, "count_budget_exhausted", None, SessionTransition(False, state, "count_budget_exhausted", None), ())
+        try:
+            eligible = tuple(index for index in range(session.edge_table.variable_count) if index not in state.fixed_indices)
+            if posterior is None:
+                values = None
+            else:
+                try:
+                    values = np.asarray(posterior, dtype=np.float64)
+                except (TypeError, ValueError, OverflowError):
+                    values = np.empty(0)
+        except BaseException:
+            selection.rollback()
+            raise
+        selection.commit_once()
         if not eligible:
             return GuidedTransition(False, "no_eligible_target", None, SessionTransition(False, state, "no_eligible_target", None), ())
-        if posterior is None:
+        if values is None:
             return GuidedTransition(False, "no_posterior", None, SessionTransition(False, state, "no_posterior", None), eligible)
-        try:
-            values = np.asarray(posterior, dtype=np.float64)
-        except (TypeError, ValueError, OverflowError):
-            values = np.empty(0)
         # Infinity is rejected alongside NaN for this finite-prior procedure.
         if values.shape != (session.edge_table.variable_count,) or not np.all(np.isfinite(values)):
             return GuidedTransition(False, "numerical_failure", None, SessionTransition(False, state, "numerical_failure", None), eligible)
@@ -107,13 +129,17 @@ class GuidedDecimationController:
         )
         transition = session.commit_intervention(
             proposal, budgets=budgets, leaf_id=f"guided-fix:{state.owner_identity}:{state.revision}:{target}",
+            wall_clock=wall_clock,
         )
         return GuidedTransition(
             transition.admitted, transition.termination, proposal, transition,
             eligible, ties, reliability, zero,
         )
 
-    def run(self, session: BpSession, *, check_matrix: np.ndarray, budgets: BudgetTree) -> GuidedDecimationResult:
+    def run(
+        self, session: BpSession, *, check_matrix: np.ndarray, budgets: BudgetTree,
+        wall_clock: WallClockLimit | None = None,
+    ) -> GuidedDecimationResult:
         """Run at most T complete BP units per round and return all committed evidence."""
         matrix = np.asarray(check_matrix)
         if (matrix.shape != (session.edge_table.check_count, session.edge_table.variable_count)
@@ -133,6 +159,7 @@ class GuidedDecimationController:
                 try:
                     transition = session.advance(
                         budgets=budgets, leaf_id=leaf_id, bp_call_start=sweep_index == 0,
+                        wall_clock=wall_clock,
                     )
                 except (NumericalFailure, ValueError, FloatingPointError):
                     round_reason = "numerical_failure"
@@ -143,6 +170,10 @@ class GuidedDecimationController:
                     sweeps.append(GuidedSweep(sweep_index, before, session.state.digest, False, None, None, None, round_reason, None))
                     break
                 check_leaf = f"guided-original-check:{session.owner_identity}:{round_index}:{sweep_index}"
+                if wall_clock is not None and wall_clock.check("candidate_selection_boundary", scope="attempt") is not None:
+                    round_reason = "wall_clock_deadline"
+                    sweeps.append(GuidedSweep(sweep_index, before, session.state.digest, True, transition.leaf_id, None, None, round_reason, None))
+                    break
                 reservation = budgets.reserve("attempt", WorkVector(original_checks=1), leaf_id=check_leaf)
                 if reservation is None:
                     round_reason = "count_budget_exhausted"
@@ -165,7 +196,7 @@ class GuidedDecimationController:
                     break
             guided: GuidedTransition | None = None
             if round_reason is None:
-                guided = self.fix_one(session, posterior=session.state.posterior, budgets=budgets)
+                guided = self.fix_one(session, posterior=session.state.posterior, budgets=budgets, wall_clock=wall_clock)
                 if not guided.admitted:
                     round_reason = guided.termination or "no_proposal"
                 elif round_index == self.spec.round_limit - 1:
