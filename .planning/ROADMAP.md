@@ -325,7 +325,7 @@ measured budget.
 
 ### Phase 5: Guided and Perturbative BP Interventions
 
-**Goal:** A researcher can run and inspect guided fixation, impulse attempts, and perturbative BP interventions against the original decoding problem.
+**Goal:** As a QLDPC decoding researcher, I want to run and inspect guided fixation, impulse attempts, and perturbative BP interventions against the original decoding problem, so that I can study their behavior and assess their recoveries on the original problem.
 **Mode:** mvp
 **Depends on:** Phase 4
 **Requirements:** MOD-02, MOD-03, INT-01, INT-02, INT-03, INT-04
