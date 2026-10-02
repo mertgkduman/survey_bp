@@ -753,6 +753,8 @@ class RelaySpecV4(_Strict):
             "source_procedure_css_adaptation", "controlled_component_adaptation",
         }:
             raise ValueError("source Relay procedure requires a source or controlled CSS-adaptation fidelity label")
+        if self.procedure == "source_internal_bp" and self.numerical_profile != "cpu-float64-min-sum-v1":
+            raise ValueError("source Relay procedure requires the min-sum numerical profile")
         if self.procedure == "canonical_internal_bp" and self.fidelity_status == "source_procedure_css_adaptation":
             raise ValueError("canonical Relay procedure cannot claim source-procedure fidelity")
         if self.memory_tuning is not None and self.fidelity_status != "controlled_component_adaptation":
@@ -803,22 +805,21 @@ class CanonicalManifestV4(_Strict):
         return self
 
     @model_validator(mode="after")
-    def active_relay_procedure_has_its_declared_kernel(self) -> "CanonicalManifestV4":
-        """Prevent label-only source/canonical active-memory procedure arms."""
-        if self.relay.memory_tuning is None:
+    def relay_procedure_has_its_declared_kernel(self) -> "CanonicalManifestV4":
+        """Bind every source claim, and active canonical memory, to its kernel."""
+        if self.relay.procedure == "source_internal_bp":
+            expected = ("min_sum", "cpu-float64-min-sum-v1")
+        elif self.relay.memory_tuning is not None:
+            expected = ("binary_spa", "cpu-float64-spa-v1")
+        else:
             return self
-        expected = (
-            ("min_sum", "cpu-float64-min-sum-v1")
-            if self.relay.procedure == "source_internal_bp"
-            else ("binary_spa", "cpu-float64-spa-v1")
-        )
         if self.policies.update.kind != expected[0]:
             raise ValueError(
-                f"active {self.relay.procedure} Relay requires update policy {expected[0]}"
+                f"{self.relay.procedure} Relay requires update policy {expected[0]}"
             )
         if self.numerical_profile != expected[1]:
             raise ValueError(
-                f"active {self.relay.procedure} Relay requires numerical_profile {expected[1]}"
+                f"{self.relay.procedure} Relay requires numerical_profile {expected[1]}"
             )
         return self
 

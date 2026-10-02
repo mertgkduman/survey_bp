@@ -21,6 +21,8 @@ def test_source_preset_exposes_its_own_fidelity_and_complete_leg_contract():
     assert source.transfer == "posterior_only"
     assert source.first_leg_memory == "uniform"
     assert source.later_leg_memory == "disordered"
+    assert source.numerical_profile == "cpu-float64-min-sum-v1"
+    assert source.as_spec().numerical_profile == "cpu-float64-min-sum-v1"
     with pytest.raises((AttributeError, TypeError)):
         source.total_leg_limit = 1  # type: ignore[misc]
 
@@ -98,11 +100,13 @@ def test_numerical_profile_and_source_parameter_sweep_controls_remain_explicit()
 
     source = RelayPreset.source_procedure()
     sweep = source.ablation(source_parameter_sweep=(-0.10, 0.10))
-    numerical = source.ablation(numerical_profile="cpu-float64-spa-v1")
+    numerical = source.ablation(numerical_profile="cpu-float64-min-sum-v1")
 
     assert sweep.source_parameter_sweep == (-0.10, 0.10)
-    assert numerical.numerical_profile == "cpu-float64-spa-v1"
+    assert numerical.numerical_profile == "cpu-float64-min-sum-v1"
     assert sweep.fidelity_status == numerical.fidelity_status == "controlled_component_adaptation"
+    with pytest.raises(ValueError, match="min-sum numerical profile"):
+        source.ablation(numerical_profile="cpu-float64-spa-v1")
 
 
 def _policies() -> dict[str, object]:
@@ -421,12 +425,18 @@ def test_active_memory_tuning_requires_distinct_source_and_canonical_kernels():
     assert canonical.numerical_profile == "cpu-float64-spa-v1"
 
     source = {**raw, "relay": {**raw["relay"], "procedure": "source_internal_bp"}}
-    with pytest.raises(ValueError, match="update policy min_sum"):
+    with pytest.raises(ValueError, match="min-sum numerical profile"):
         CanonicalManifestV4.model_validate(source)
 
     source = {
         **source, "numerical_profile": "cpu-float64-min-sum-v1",
         "relay": {**source["relay"], "numerical_profile": "cpu-float64-min-sum-v1"},
+    }
+    with pytest.raises(ValueError, match="update policy min_sum"):
+        CanonicalManifestV4.model_validate(source)
+
+    source = {
+        **source,
         "policies": {**source["policies"], "update": {**source["policies"]["update"], "kind": "min_sum"}},
     }
     parsed_source = CanonicalManifestV4.model_validate(source)
@@ -438,6 +448,42 @@ def test_active_memory_tuning_requires_distinct_source_and_canonical_kernels():
     }
     with pytest.raises(ValueError, match="update policy binary_spa"):
         CanonicalManifestV4.model_validate(wrong_canonical)
+
+
+def test_untuned_source_procedure_rejects_label_only_spa_and_preserves_min_sum():
+    """The author kernel is required even when active memory tuning is absent."""
+    from bp_registry.canonical.contracts import CanonicalManifestV4
+
+    raw = _three_leg_manifest("relay-untuned-source-procedure").model_dump(mode="json")
+    raw["relay"].update({
+        "procedure": "source_internal_bp",
+        "fidelity_status": "source_procedure_css_adaptation",
+        "later_leg_memory": "disordered",
+        "memory_tuning": None,
+        "legs": [{"max_iterations": 2}] * 3,
+        "first_leg_iteration_limit": 2,
+        "later_leg_iteration_limit": 2,
+    })
+
+    with pytest.raises(ValueError, match="min-sum numerical profile"):
+        CanonicalManifestV4.model_validate(raw)
+
+    source = {
+        **raw,
+        "numerical_profile": "cpu-float64-min-sum-v1",
+        "relay": {**raw["relay"], "numerical_profile": "cpu-float64-min-sum-v1"},
+    }
+    with pytest.raises(ValueError, match="update policy min_sum"):
+        CanonicalManifestV4.model_validate(source)
+
+    source["policies"] = {
+        **source["policies"],
+        "update": {**source["policies"]["update"], "kind": "min_sum"},
+    }
+    parsed = CanonicalManifestV4.model_validate(source)
+    assert parsed.relay.memory_tuning is None
+    assert parsed.relay.procedure == "source_internal_bp"
+    assert parsed.policies.update.kind == "min_sum"
 
 
 def test_active_memory_changes_each_sweep_without_rebuilding_the_leg_schedule(monkeypatch):

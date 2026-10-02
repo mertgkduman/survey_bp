@@ -5,6 +5,8 @@ import importlib.util
 import json
 from pathlib import Path
 
+import pytest
+
 
 def _module():
     spec = importlib.util.spec_from_file_location("phase4_active_benchmark", Path("scripts/run_phase4_active_benchmark.py"))
@@ -65,6 +67,32 @@ def test_b1_bounded_profile_is_explicit_and_not_a_short_base_budget():
     assert manifest["policies"]["update"]["kind"] == "min_sum"
     assert manifest["policies"]["update"]["binding_id"] == "update-min-sum-v1"
     assert manifest["numerical_profile"] == manifest["relay"]["numerical_profile"] == "cpu-float64-min-sum-v1"
+
+
+def test_public_untuned_source_relay_requires_author_min_sum_kernel():
+    """Public preflight contracts reject a source label attached to SPA."""
+    from bp_registry.manifests import CanonicalExperimentV4
+
+    source = json.loads(Path("data/manifests/phase4-memory-relay-b1.json").read_text(encoding="utf-8"))
+    source.update({"numerical_profile": "cpu-float64-min-sum-v1"})
+    source["relay"].update({
+        "procedure": "source_internal_bp",
+        "fidelity_status": "source_procedure_css_adaptation",
+        "numerical_profile": "cpu-float64-min-sum-v1",
+        "later_leg_memory": "disordered",
+    })
+
+    with pytest.raises(ValueError, match="update policy min_sum"):
+        CanonicalExperimentV4.model_validate(source)
+
+    source["policies"]["update"].update({
+        "kind": "min_sum",
+        "binding_id": "update-min-sum-v1",
+    })
+    parsed = CanonicalExperimentV4.model_validate(source)
+    assert parsed.relay is not None
+    assert parsed.relay.memory_tuning is None
+    assert parsed.policies.update.kind == "min_sum"
 
 
 def test_active_fact_extractor_requires_gamma_or_memory_evidence():

@@ -168,6 +168,8 @@ class RelayPreset:
             "source_procedure_css_adaptation", "controlled_component_adaptation",
         }:
             raise ValueError("source Relay presets require a source or controlled CSS-adaptation status")
+        if self.procedure == "source_internal_bp" and self.numerical_profile != "cpu-float64-min-sum-v1":
+            raise ValueError("source Relay presets require the min-sum numerical profile")
         if self.procedure == "canonical_internal_bp" and self.fidelity_status == "source_procedure_css_adaptation":
             raise ValueError("canonical Relay presets cannot claim source-procedure fidelity")
         if self.source_parameter_sweep is not None:
@@ -182,7 +184,7 @@ class RelayPreset:
             fidelity_status="source_procedure_css_adaptation", total_leg_limit=301,
             first_leg_iteration_limit=80, later_leg_iteration_limit=60, solution_limit=301,
             transfer="posterior_only", first_leg_memory="uniform", later_leg_memory="disordered",
-            numerical_profile="cpu-float64-spa-v1", source_parameter_sweep=(-0.24, 0.66),
+            numerical_profile="cpu-float64-min-sum-v1", source_parameter_sweep=(-0.24, 0.66),
         )
 
     @classmethod
