@@ -173,6 +173,201 @@ def _serial_api():
     )
 
 
+def _two_check_local_execution_inputs(schedule: dict[str, object], *, max_iterations: int = 1):
+    """A decoder-visible nonconverging fixture with two local checks."""
+    from bp_registry.css import CssCode
+    from bp_registry.sampling import DecoderObservation, HiddenTruth
+
+    def policy(role: str, kind: str) -> dict[str, object]:
+        return {
+            "kind": kind, "binding_id": f"{role}-v1", "state_lifetime": "attempt",
+            "owned_state": [], "requires": [], "provides": [],
+        }
+
+    manifest = {
+        "schema_version": 3, "run_id": "local-source-iteration-test",
+        "numerical_profile": "cpu-float64-spa-v1", "max_iterations": max_iterations,
+        # At p=1/2 all SPA messages remain zero, while the supplied nonzero
+        # syndrome keeps the candidate outside the stopping condition.
+        "error_rate": 0.5,
+        "policies": {
+            "update": policy("update", "binary_spa"),
+            "schedule": schedule,
+            "state_memory": policy("state-memory", "stateless"),
+            "intervention": policy("intervention", "identity"),
+            "stopping": policy("stopping", "syndrome_or_budget"),
+            "selection": policy("selection", "stable_first"),
+            "postprocessing": policy("postprocessing", "identity"),
+        },
+    }
+    code = CssCode(
+        hx=np.zeros((0, 4), dtype=np.uint8),
+        hz=np.asarray([[1, 1, 0, 0], [0, 0, 1, 1]], dtype=np.uint8),
+        lx=np.asarray([[1, 1, 0, 0], [0, 0, 1, 1]], dtype=np.uint8),
+        lz=np.asarray([[1, 0, 0, 0], [0, 0, 1, 0]], dtype=np.uint8),
+    ).validate()
+    return (
+        manifest, code, DecoderObservation("Z", np.asarray([1, 1], dtype=np.uint8)),
+        HiddenTruth(np.asarray([1, 0, 1, 0], dtype=np.uint8), np.zeros(4, dtype=np.uint8)),
+    )
+
+
+@pytest.mark.parametrize(
+    ("schedule", "expected_steps"),
+    [
+        ({"kind": "layered", "binding_id": "schedule-layered-v1", "state_lifetime": "iteration", "owned_state": [], "requires": [], "provides": [], "partitions": [[0], [1]], "provenance": "explicit"}, 2),
+        ({"kind": "check_node_serial", "binding_id": "schedule-check-node-serial-v1", "state_lifetime": "iteration", "owned_state": [], "requires": [], "provides": []}, 2),
+        ({"kind": "variable_node_serial", "binding_id": "schedule-variable-node-serial-v1", "state_lifetime": "iteration", "owned_state": [], "requires": [], "provides": []}, 4),
+        ({"kind": "residual", "binding_id": "schedule-residual-v1", "state_lifetime": "iteration", "owned_state": [], "requires": [], "provides": []}, 4),
+    ],
+)
+def test_local_max_iterations_means_one_complete_source_traversal(tmp_path, schedule, expected_steps):
+    """The public local executor must not stop after its first local unit."""
+    from bp_registry.canonical.execution import run_canonical_structural_shot
+    from bp_registry.ledger import read_canonical_events
+    from bp_registry.canonical.verification import PublicShotContext, _expected_local_attempt
+
+    manifest, code, observation, hidden = _two_check_local_execution_inputs(schedule)
+    ledger_path = tmp_path / "events.jsonl"
+    result = run_canonical_structural_shot(
+        manifest, code=code, observation=observation, hidden_truth=hidden,
+        shot_id=0, ledger_path=ledger_path, sample_seed_identity="local-source-iteration-test",
+        context={},
+    )
+    assert result.termination == "max_iterations"
+    terminal = next(event["data"] for event in read_canonical_events(ledger_path) if event["kind"] == "termination")
+    assert terminal["iterations"] == expected_steps
+    assert terminal["schedule_terminal"]["completed_traversals"] == 1
+    assert terminal["schedule_terminal"]["local_cursor"] == [0]
+
+    replay = _expected_local_attempt(PublicShotContext(
+        manifest_sha256="a" * 64, artifact_raw_sha256="b" * 64,
+        artifact_semantic_sha256="c" * 64, compact_manifest=manifest,
+        sample_seed_identity="local-source-iteration-test", run_id=manifest["run_id"],
+        shot_id=0, check_type="Z", syndrome=(1, 1), code_id="two-check-test",
+        evidence_relation="canonical_implemented", fixture="test",
+        assessment_status="not_assessed", decoder_seed_identity="test",
+        code=code, error_rate=0.5, max_iterations=1,
+        schedule_kind=schedule["kind"],
+    ))
+    assert replay["iterations"] == expected_steps
+    assert replay["progress"].iteration == 1
+    assert replay["progress"].cursor == (0,)
+
+
+@pytest.mark.parametrize("refresh_scope,expected_orders", [("configuration", 1), ("attempt", 1), ("sweep", 2)])
+def test_randomized_execution_refreshes_at_its_declared_boundary(tmp_path, refresh_scope, expected_orders):
+    """A sweep order is retained within a traversal and renewed only between sweeps."""
+    from bp_registry.canonical.execution import run_canonical_structural_shot
+    from bp_registry.ledger import read_canonical_events
+
+    schedule = {
+        "kind": "randomized", "binding_id": "schedule-randomized-v1",
+        "state_lifetime": "iteration", "owned_state": [], "requires": [], "provides": [],
+        "base_schedule": "layered", "refresh_scope": refresh_scope, "root_identity": "a" * 64,
+        "partitions": [[0], [1]], "provenance": "explicit",
+    }
+    manifest, code, observation, hidden = _two_check_local_execution_inputs(schedule, max_iterations=2)
+    ledger_path = tmp_path / "events.jsonl"
+    result = run_canonical_structural_shot(
+        manifest, code=code, observation=observation, hidden_truth=hidden,
+        shot_id=0, ledger_path=ledger_path, sample_seed_identity="randomized-boundary-test",
+        context={},
+    )
+    assert result.termination == "max_iterations"
+    terminal = next(event["data"] for event in read_canonical_events(ledger_path) if event["kind"] == "termination")
+    orders = terminal["schedule_evidence"]["randomized_traversal"]["realized_orders"]
+    assert len(orders) == expected_orders
+    assert terminal["iterations"] == 4
+
+
+class _RecordingSpaKernel:
+    """SPA delegate that exposes which C2V edges a local unit evaluated."""
+
+    def __init__(self):
+        from bp_registry.canonical.kernel import BinarySpaKernel
+
+        self._delegate = BinarySpaKernel()
+        self.profile = self._delegate.profile
+        self.c2v_calls: list[tuple[int, int]] = []
+
+    def prior(self, error_rate):
+        return self._delegate.prior(error_rate)
+
+    def check_message(self, incoming, syndrome, *, check_index=0, edge_index=0, source_iteration=0):
+        self.c2v_calls.append((check_index, edge_index))
+        return self._delegate.check_message(
+            incoming, syndrome, check_index=check_index,
+            edge_index=edge_index, source_iteration=source_iteration,
+        )
+
+    def assemble_beliefs(self, variable_count, edge_variables, messages, prior):
+        return self._delegate.assemble_beliefs(variable_count, edge_variables, messages, prior)
+
+    def variable_message(self, belief, check_message):
+        return self._delegate.variable_message(belief, check_message)
+
+    def candidate_from_beliefs(self, beliefs):
+        return self._delegate.candidate_from_beliefs(beliefs)
+
+
+@pytest.mark.parametrize(
+    ("schedule_type", "first_edges", "second_edges"),
+    [
+        ("layered", ((0, 0), (0, 1)), ((1, 2), (1, 3))),
+        ("check_node_serial", ((0, 0), (0, 1)), ((1, 2), (1, 3))),
+        ("variable_node_serial", ((0, 0), (1, 2)), ((0, 1), (1, 3))),
+    ],
+)
+def test_local_schedules_recompute_only_the_selected_c2v_edges_and_charge_them(schedule_type, first_edges, second_edges):
+    """A later local unit must retain prior C2V state instead of re-evaluating it."""
+    (
+        _BudgetLimit,
+        BudgetTree,
+        CanonicalLocalStepExecutor,
+        ScheduleProgress,
+        _BinarySpaKernel,
+        EdgeTable,
+        CheckNodeSerialSchedule,
+        VariableNodeSerialSchedule,
+        _Registry,
+    ) = _serial_api()
+    table = EdgeTable.from_edges(2, 2, [(0, 0), (0, 1), (1, 0), (1, 1)])
+    kernel = _RecordingSpaKernel()
+    if schedule_type == "layered":
+        from bp_registry.canonical.schedules import LayeredSchedule
+
+        schedule = LayeredSchedule(table, kernel=kernel, partitions=((0,), (1,)), provenance="explicit")
+    elif schedule_type == "check_node_serial":
+        schedule = CheckNodeSerialSchedule(table, kernel=kernel)
+    else:
+        schedule = VariableNodeSerialSchedule(table, kernel=kernel)
+    messages = np.asarray([1.5, -0.7, 0.2, 2.0], dtype=np.float64)
+    syndrome = np.asarray([0, 1], dtype=np.uint8)
+    executor = CanonicalLocalStepExecutor(BudgetTree(limits=(), parents={}), scope="attempt")
+
+    first = schedule.execute_local_step(
+        executor, messages, syndrome, error_rate=0.2,
+        progress=ScheduleProgress(iteration=0, local_steps=0, cursor=(0,)),
+        is_converged=lambda _candidate: False,
+    )
+    assert first.admitted
+    assert tuple(kernel.c2v_calls) == first_edges
+    assert first.proposed_work.check_to_variable_updates == len(first_edges)
+    c2v_after_first = schedule._c2v.copy()
+
+    second = schedule.execute_local_step(
+        executor, messages, syndrome, error_rate=0.2, progress=first.progress,
+        is_converged=lambda _candidate: False,
+    )
+    assert second.admitted
+    assert tuple(kernel.c2v_calls) == first_edges + second_edges
+    assert second.proposed_work.check_to_variable_updates == len(second_edges)
+    unchanged = set(range(table.edge_count)).difference(edge for _check, edge in second_edges)
+    for edge in unchanged:
+        assert schedule._c2v[edge] == c2v_after_first[edge]
+
+
 def test_check_node_serial_updates_a_check_then_refreshes_affected_variables():
     import bp_registry.canonical.schedules as schedules
 
@@ -213,7 +408,7 @@ def test_check_node_serial_updates_a_check_then_refreshes_affected_variables():
         is_converged=lambda _candidate: False,
     )
     assert variable.admitted and variable.progress.cursor == (1,)
-    assert variable.proposed_work.check_to_variable_updates == 0
+    assert variable.proposed_work.check_to_variable_updates == 2
     assert variable.proposed_work.variable_to_check_updates == 2
     assert not np.allclose(check_messages, variable_messages)
 
