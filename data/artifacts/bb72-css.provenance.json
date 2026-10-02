@@ -1,0 +1,76 @@
+{
+  "artifact": {
+    "matrix_hashes": {
+      "hx_raw_sha256": "e8c3d3aec1d494845428b674ab29b24ce8f1b0e418989cdfc2a66de4c3f636ab",
+      "hx_semantic_sha256": "7838e1a8acde1a614b807294784655928a4ed8602a97b73dfcb323a56dd10bd5",
+      "hz_raw_sha256": "d8a0bdd27e92c2523770b88d830cd9955a39029d59045e0029ceb75a1d1a1330",
+      "hz_semantic_sha256": "c2704a3b0bd2c1f33a2a269a696b1eab691b124d1e1dd6b13e200a1512855b00",
+      "lx_raw_sha256": "8b7d0e929f19621c939dc076d4b47078f652ae92f63327002b6c80ee7b397ef2",
+      "lx_semantic_sha256": "71d4a25f92fdbab039fcb29efb27a3607f7ac7bece3bf57a5a8811338505d219",
+      "lz_raw_sha256": "08d566a4284e0dadcdddbcf8d621a5cdef595f3773b4e6e5a1d345aed6186037",
+      "lz_semantic_sha256": "d2b025de64e9a5f6d5ed92d16fdbbb13ff7a950623e6f407f64a8e051720fcb1"
+    },
+    "path": "data/artifacts/bb72-css.json",
+    "raw_sha256": "8cb3af882fecf8d16ff3b84c2c69939cdafde122fd48ab0d87a7e113d4e91227",
+    "semantic_sha256": "ff81d1e31a0fd2bb5a7ecc980298fdbaf2a65fe70a806e8a20764d047ce94aad",
+    "shapes": {
+      "hx": [
+        36,
+        72
+      ],
+      "hz": [
+        36,
+        72
+      ],
+      "lx": [
+        12,
+        72
+      ],
+      "lz": [
+        12,
+        72
+      ]
+    }
+  },
+  "assessment_status": "not_assessed",
+  "code_id": "bravyi-bb-72",
+  "distance": {
+    "independently_verified": false,
+    "status": "source_reported",
+    "value": 6
+  },
+  "format_version": 1,
+  "independent_validation": {
+    "commutator_nonzero_entries": 0,
+    "hx_rank_gf2": 30,
+    "hz_rank_gf2": 30,
+    "k_gf2": 12
+  },
+  "logical_provider": {
+    "method": "deterministic free-column quotient basis and GF(2) pairing normalization",
+    "source_logical_equivalence": "not_assessed",
+    "status": "project_derived"
+  },
+  "recipe": {
+    "command": "PYTHONPATH=src:. python tools/freeze_bb72_source.py --source-dir <clean-pinned-checkout> --artifact-output data/artifacts/bb72-css.json --provenance-output data/artifacts/bb72-css.provenance.json",
+    "tool": "tools/freeze_bb72_source.py"
+  },
+  "source": {
+    "matrix_ordering": "Hx=[A|B], Hz=[B^T|A^T], columns=left block then right block",
+    "parameter_location": "commented [[72,12,6]] block",
+    "parameters": {
+      "a1": 3,
+      "a2": 1,
+      "a3": 2,
+      "b1": 3,
+      "b2": 1,
+      "b3": 2,
+      "ell": 6,
+      "m": 6
+    },
+    "repository": "https://github.com/sbravyi/BivariateBicycleCodes",
+    "revision": "fa77e3333d3ec44c79d8f914dd24c040d1da471b",
+    "source_file": "decoder_setup.py",
+    "source_file_sha256": "e919e1830b88468c5d257c0119656576a7999f92743dfeccd389a967524b3d2c"
+  }
+}

@@ -1,0 +1,173 @@
+{
+  "schema_version": 3,
+  "run_id": "phase3-bb72",
+  "numerical_profile": "cpu-float64-spa-v1",
+  "error_rate": 0.05,
+  "policies": {
+    "update": {
+      "kind": "binary_spa",
+      "binding_id": "update-binary-spa-v1",
+      "state_lifetime": "message",
+      "owned_state": [],
+      "requires": [],
+      "provides": []
+    },
+    "schedule": {
+      "kind": "flooding",
+      "binding_id": "schedule-flooding-v1",
+      "state_lifetime": "iteration",
+      "owned_state": [],
+      "requires": [],
+      "provides": []
+    },
+    "state_memory": {
+      "kind": "stateless",
+      "binding_id": "state-memory-stateless-v1",
+      "state_lifetime": "attempt",
+      "owned_state": [],
+      "requires": [],
+      "provides": []
+    },
+    "intervention": {
+      "kind": "identity",
+      "binding_id": "intervention-identity-v1",
+      "state_lifetime": "search",
+      "owned_state": [],
+      "requires": [],
+      "provides": []
+    },
+    "stopping": {
+      "kind": "syndrome_or_budget",
+      "binding_id": "stopping-syndrome-budget-v1",
+      "state_lifetime": "iteration",
+      "owned_state": [],
+      "requires": [],
+      "provides": []
+    },
+    "selection": {
+      "kind": "stable_first",
+      "binding_id": "selection-stable-first-v1",
+      "state_lifetime": "attempt",
+      "owned_state": [],
+      "requires": [],
+      "provides": []
+    },
+    "postprocessing": {
+      "kind": "identity",
+      "binding_id": "postprocessing-identity-v1",
+      "state_lifetime": "attempt",
+      "owned_state": [],
+      "requires": [],
+      "provides": []
+    }
+  },
+  "budgets": {
+    "max_shots": 1,
+    "shot": {
+      "max_iterations": 1,
+      "work_limits": {
+        "check_to_variable_updates": 1000,
+        "variable_to_check_updates": 1000,
+        "belief_assemblies": 1000,
+        "residual_priority_evaluations": 10000,
+        "bp_calls": 1,
+        "candidate_checks": 1000,
+        "intervention_actions": 0,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "relay_transfers": 0,
+        "fallback_calls": 0
+      }
+    },
+    "search": {
+      "max_iterations": 1,
+      "work_limits": {
+        "check_to_variable_updates": 1000,
+        "variable_to_check_updates": 1000,
+        "belief_assemblies": 1000,
+        "residual_priority_evaluations": 10000,
+        "bp_calls": 1,
+        "candidate_checks": 1000,
+        "intervention_actions": 0,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "relay_transfers": 0,
+        "fallback_calls": 0
+      }
+    },
+    "attempt": {
+      "max_iterations": 1,
+      "work_limits": {
+        "check_to_variable_updates": 1000,
+        "variable_to_check_updates": 1000,
+        "belief_assemblies": 1000,
+        "residual_priority_evaluations": 10000,
+        "bp_calls": 1,
+        "candidate_checks": 1000,
+        "intervention_actions": 0,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "relay_transfers": 0,
+        "fallback_calls": 0
+      }
+    },
+    "denominator_rule": "all_terminal_shots"
+  },
+  "trace_plan": {
+    "level": "off",
+    "relative_dir": "trace-sidecars",
+    "max_records": 0,
+    "max_bytes": 0,
+    "label": "development_default"
+  },
+  "profile_plan": {
+    "enabled": true,
+    "level": "low_overhead",
+    "cohort": "clean",
+    "selected_before_outcome": true
+  },
+  "environment": {
+    "python": "3.12.2",
+    "numpy": "2.2.6",
+    "scipy": "1.17.1",
+    "backend": "cpu",
+    "omp_num_threads": 1
+  },
+  "artifact": {
+    "root": "data/artifacts",
+    "path": "bb72-css.json",
+    "raw_sha256": "8cb3af882fecf8d16ff3b84c2c69939cdafde122fd48ab0d87a7e113d4e91227",
+    "semantic_sha256": "ff81d1e31a0fd2bb5a7ecc980298fdbaf2a65fe70a806e8a20764d047ce94aad",
+    "matrix_hashes": {
+      "hx_raw_sha256": "e8c3d3aec1d494845428b674ab29b24ce8f1b0e418989cdfc2a66de4c3f636ab",
+      "hx_semantic_sha256": "7838e1a8acde1a614b807294784655928a4ed8602a97b73dfcb323a56dd10bd5",
+      "hz_raw_sha256": "d8a0bdd27e92c2523770b88d830cd9955a39029d59045e0029ceb75a1d1a1330",
+      "hz_semantic_sha256": "c2704a3b0bd2c1f33a2a269a696b1eab691b124d1e1dd6b13e200a1512855b00",
+      "lx_raw_sha256": "8b7d0e929f19621c939dc076d4b47078f652ae92f63327002b6c80ee7b397ef2",
+      "lx_semantic_sha256": "71d4a25f92fdbab039fcb29efb27a3607f7ac7bece3bf57a5a8811338505d219",
+      "lz_raw_sha256": "08d566a4284e0dadcdddbcf8d621a5cdef595f3773b4e6e5a1d345aed6186037",
+      "lz_semantic_sha256": "d2b025de64e9a5f6d5ed92d16fdbbb13ff7a950623e6f407f64a8e051720fcb1"
+    },
+    "format_version": 1,
+    "code_id": "bravyi-bb-72"
+  },
+  "randomness": {
+    "sample_seed": 317,
+    "decoder_seed_identity": "phase3-bb72-policy-stream-v1",
+    "sample_derivation": "sha256-manifest-shot-v1",
+    "physical_sample_identity": "phase3-bb72-matched-physical-samples-v1"
+  },
+  "evidence": {
+    "relation": "pilot_adaptation",
+    "fixture": "pilot_adaptation",
+    "assessment_status": "not_assessed",
+    "procedure": "One-shot BB72 artifact and canonical SPA smoke pilot; source-pinned matrices with project-derived logical basis.",
+    "sources": [
+      "Bravyi et al. arXiv:2308.07915; pinned BivariateBicycleCodes fa77e333"
+    ],
+    "discrepancies": [
+      "This one-shot pilot is not a source-faithful curve reproduction or a decoder ranking.",
+      "Ordered logical basis is project-derived; author logical-row equivalence was not assessed."
+    ]
+  }
+}
