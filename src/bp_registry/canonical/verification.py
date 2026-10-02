@@ -576,6 +576,7 @@ def _expected_local_attempt(
     progress = __import__("bp_registry.canonical.execution", fromlist=["ScheduleProgress"]).ScheduleProgress(0, 0, (0,))
     randomized: RandomizedTraversalPlan | None = None
     randomized_state = None
+    randomized_order: tuple[int, ...] | None = None
     if schedule_kind == "randomized":
         root_identity = schedule_data.get("root_identity")
         refresh_scope = schedule_data.get("refresh_scope")
@@ -590,7 +591,9 @@ def _expected_local_attempt(
         except Exception as error:
             termination = getattr(error, "termination", None)
             return {"termination": "count_budget_exhausted", "work_vector": budgets.summary("attempt").as_evidence(structural_event_version=2), "schedule_work_vector": budgets.summary("attempt").as_evidence(), "iterations": 0, "budget_termination": budget_termination(), "admitted": True, "progress": progress, "schedule_evidence": {"schedule": "residual"}}
-        for _ in range(context.max_iterations):
+        # The residual schedule advances its iteration only after E selected
+        # C2V commits, so max_iterations bounds complete source traversals.
+        while progress.iteration < context.max_iterations:
             proposal = schedule.propose_local_step(messages, c2v, cache, np.asarray(context.syndrome, dtype=np.uint8), error_rate=context.error_rate)
             step = schedule.execute_local_step(executor, proposal, v2c=messages, c2v=c2v, cache=cache, progress=progress, is_converged=lambda proposed: bool(np.array_equal((code.hz.astype(np.int64) @ proposed.astype(np.int64)) % 2, context.syndrome)))
             progress, cache, c2v = step.progress, step.cache, step.c2v
@@ -601,7 +604,15 @@ def _expected_local_attempt(
         return {"termination": "max_iterations", "work_vector": budgets.summary("attempt").as_evidence(structural_event_version=2), "schedule_work_vector": budgets.summary("attempt").as_evidence(), "iterations": progress.local_steps, "admitted": True, "progress": progress, "schedule_evidence": {"schedule": "residual", "atomic_unit": "one_residual_selected_c2v_commit", "source_iteration": schedule.source_iteration, "tie_rule": schedule.tie_rule, "policy_name": schedule.policy_name, "mutable_state_lifetime": "attempt"}}
     candidate: np.ndarray | None = None
     local_prior_llrs: np.ndarray | None = None
-    for _ in range(context.max_iterations):
+    # Layered/node-serial and randomized schedules expose one local unit at a
+    # time, but their public iteration limit bounds complete traversals.  Hsu's
+    # retained group schedule pins its historical bound in declared local groups.
+    def local_iteration_remaining() -> bool:
+        if schedule_kind in {"layered", "check_node_serial", "variable_node_serial", "randomized"}:
+            return progress.iteration < context.max_iterations
+        return progress.local_steps < context.max_iterations
+
+    while local_iteration_remaining():
         progress_for_step = progress
         if local_memory is not None and progress.cursor == (0,):
             local_prior_llrs = local_memory.begin_source_iteration()
@@ -612,12 +623,27 @@ def _expected_local_attempt(
                 return {"termination": "count_budget_exhausted", "work_vector": work.as_evidence(structural_event_version=2), "schedule_work_vector": work.as_evidence(), "schedule_evidence": json.loads(json.dumps(schedule.evidence())), "iterations": progress.local_steps, "budget_termination": budget_termination(), "admitted": True, "progress": progress}
         if randomized is not None:
             assert randomized_state is not None
-            refresh = randomized.refresh(randomized_state, boundary="attempt", budgets=budgets, budget_scope="attempt")
-            if not refresh.admitted:
-                return {"termination": "count_budget_exhausted", "work_vector": budgets.summary("attempt").as_evidence(structural_event_version=2), "schedule_work_vector": budgets.summary("attempt").as_evidence(), "iterations": progress.local_steps, "budget_termination": budget_termination(), "admitted": True, "progress": progress, "schedule_evidence": dict(schedule.evidence())}
-            randomized_state = refresh.state
-            assert refresh.order is not None
-            progress_for_step = type(progress)(progress.iteration, progress.local_steps, (refresh.order[progress.cursor[0]],), progress.rng_state)
+            if progress.cursor == (0,):
+                boundary: str | None = None
+                if randomized.refresh_scope == "sweep":
+                    boundary = "sweep"
+                elif progress.iteration == 0:
+                    boundary = randomized.refresh_scope
+                if boundary is not None:
+                    refresh = randomized.refresh(
+                        randomized_state, boundary=boundary, budgets=budgets,
+                        budget_scope="attempt",
+                    )
+                    if not refresh.admitted:
+                        return {"termination": "count_budget_exhausted", "work_vector": budgets.summary("attempt").as_evidence(structural_event_version=2), "schedule_work_vector": budgets.summary("attempt").as_evidence(), "iterations": progress.local_steps, "budget_termination": budget_termination(), "admitted": True, "progress": progress, "schedule_evidence": dict(schedule.evidence())}
+                    randomized_state = refresh.state
+                    randomized_order = refresh.order
+            if randomized_order is None:
+                raise CanonicalStructuralVerificationError("randomized traversal has no admitted order")
+            progress_for_step = type(progress)(
+                progress.iteration, progress.local_steps,
+                (randomized_order[progress.cursor[0]],), progress.rng_state,
+            )
         if local_memory is not None:
             local_memory.begin_step()
         try:

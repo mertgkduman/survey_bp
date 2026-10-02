@@ -287,6 +287,10 @@ class LayeredSchedule:
         self._check_variables = check_variables
         self._edge_variables = tuple(variable for _check, variable in edge_table.edges)
         self._memberships = tuple(memberships)
+        # Each public execution creates a fresh schedule per attempt.  Retaining
+        # this buffer here makes C2V age explicit: a local unit changes only its
+        # declared edges and later units read the committed values elsewhere.
+        self._c2v = np.zeros(edge_table.edge_count, dtype=np.float64)
 
     @property
     def unit_count(self) -> int:
@@ -338,32 +342,33 @@ class LayeredSchedule:
             raise ValueError("layer progress cursor does not name an available layer")
         return index
 
-    def _all_c2v(self, messages: np.ndarray, syndrome: np.ndarray) -> np.ndarray:
-        c2v = np.empty(self.edge_table.edge_count, dtype=np.float64)
-        for check, indices in enumerate(self._check_edges):
-            for edge_index in indices:
-                incoming = messages[[other for other in indices if other != edge_index]]
-                c2v[edge_index] = self.kernel.check_message(incoming, int(syndrome[check]))
-        return c2v
+    def _refresh_c2v_edges(
+        self, c2v: np.ndarray, messages: np.ndarray, syndrome: np.ndarray, edge_indices: tuple[int, ...],
+    ) -> np.ndarray:
+        """Return a C2V state with exactly the selected canonical edges refreshed."""
+        refreshed = np.array(c2v, dtype=np.float64, copy=True)
+        for edge_index in edge_indices:
+            check, _variable = self.edge_table.edges[edge_index]
+            check_edges = self._check_edges[check]
+            incoming = messages[[other for other in check_edges if other != edge_index]]
+            refreshed[edge_index] = self.kernel.check_message(
+                incoming, int(syndrome[check]), check_index=check, edge_index=edge_index,
+            )
+        return finite_saturate(refreshed, boundary="layer_complete_c2v")
 
     def _compute_layer(
         self, messages: np.ndarray, syndrome: np.ndarray, *, error_rate: float, layer_index: int,
         prior_llrs: np.ndarray | None = None,
         transform_beliefs: Callable[[np.ndarray, np.ndarray], np.ndarray] | None = None,
         transform_v2c: Callable[[np.ndarray], np.ndarray] | None = None,
-    ) -> tuple[np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         entry = finite_saturate(messages, boundary="layer_entry_v2c")
         if entry.ndim != 1 or entry.shape != (self.edge_table.edge_count,):
             raise ValueError("layered messages must have exactly one value per canonical edge")
         entry_snapshot = np.array(entry, dtype=np.float64, copy=True)
         layer = self.partitions[layer_index]
-        c2v = self._all_c2v(entry_snapshot, syndrome)
-        for check in layer:
-            indices = self._check_edges[check]
-            for edge_index in indices:
-                incoming = entry_snapshot[[other for other in indices if other != edge_index]]
-                c2v[edge_index] = self.kernel.check_message(incoming, int(syndrome[check]))
-        c2v = finite_saturate(c2v, boundary="layer_complete_c2v")
+        layer_edges = tuple(edge_index for check in layer for edge_index in self._check_edges[check])
+        c2v = self._refresh_c2v_edges(self._c2v, entry_snapshot, syndrome, layer_edges)
         prior = self.kernel.prior(error_rate) if prior_llrs is None else finite_saturate(
             prior_llrs, boundary="layer_memory_prior", profile=self.kernel.profile,
         )
@@ -380,7 +385,11 @@ class LayeredSchedule:
                 updated[edge_index] = self.kernel.variable_message(float(beliefs[variable]), float(c2v[edge_index]))
         if transform_v2c is not None:
             updated = finite_saturate(transform_v2c(updated), boundary="layer_memory_v2c")
-        return finite_saturate(updated, boundary="layer_complete_v2c"), np.array(candidate, dtype=np.uint8, copy=True)
+        return (
+            finite_saturate(updated, boundary="layer_complete_v2c"),
+            np.array(candidate, dtype=np.uint8, copy=True),
+            c2v,
+        )
 
     def propose_local_step(self, messages: np.ndarray, syndrome: np.ndarray, *, error_rate: float, progress: Any) -> Any:
         """Return an immutable local mutation proposal; no schedule cursor is mutated."""
@@ -424,16 +433,18 @@ class LayeredSchedule:
 
         layer_index = self._step_index(progress)
         candidate_box: list[np.ndarray] = []
+        c2v_box: list[np.ndarray] = []
         proposal = self.propose_local_step(messages, syndrome, error_rate=error_rate, progress=progress)
 
         def compute() -> np.ndarray:
-            updated, candidate = self._compute_layer(
+            updated, candidate, next_c2v = self._compute_layer(
                 messages, _binary_syndrome(self.edge_table, syndrome), error_rate=error_rate,
                 layer_index=layer_index, prior_llrs=prior_llrs,
                 transform_beliefs=transform_beliefs, transform_v2c=transform_v2c,
             )
             candidate.setflags(write=False)
             candidate_box.append(candidate)
+            c2v_box.append(next_c2v)
             return updated
 
         result = executor.execute(
@@ -446,6 +457,7 @@ class LayeredSchedule:
         )
         if not result.admitted:
             return ScheduledLocalStepResult(False, progress, None, proposal.proposed_work, result.termination)
+        self._c2v = c2v_box[-1]
         next_progress = ScheduleProgress(
             iteration=progress.iteration,
             local_steps=result.progress.local_steps,
@@ -497,6 +509,7 @@ class _NodeSerialSchedule:
             for current in range(edge_table.variable_count)
         )
         self._edge_variables = tuple(variable for _check, variable in edge_table.edges)
+        self._c2v = np.zeros(edge_table.edge_count, dtype=np.float64)
 
     @property
     def unit_count(self) -> int:
@@ -511,20 +524,26 @@ class _NodeSerialSchedule:
             raise ValueError("serial progress cursor does not name an available local unit")
         return index
 
-    def _all_c2v(self, messages: np.ndarray, syndrome: np.ndarray) -> np.ndarray:
-        c2v = np.empty(self.edge_table.edge_count, dtype=np.float64)
-        for check, indices in enumerate(self._check_edges):
-            for edge_index in indices:
-                incoming = messages[[other for other in indices if other != edge_index]]
-                c2v[edge_index] = self.kernel.check_message(incoming, int(syndrome[check]))
-        return c2v
+    def _refresh_c2v_edges(
+        self, c2v: np.ndarray, messages: np.ndarray, syndrome: np.ndarray, edge_indices: tuple[int, ...],
+    ) -> np.ndarray:
+        """Return a C2V state with exactly one serial unit's edges refreshed."""
+        refreshed = np.array(c2v, dtype=np.float64, copy=True)
+        for edge_index in edge_indices:
+            check, _variable = self.edge_table.edges[edge_index]
+            check_edges = self._check_edges[check]
+            incoming = messages[[other for other in check_edges if other != edge_index]]
+            refreshed[edge_index] = self.kernel.check_message(
+                incoming, int(syndrome[check]), check_index=check, edge_index=edge_index,
+            )
+        return finite_saturate(refreshed, boundary="serial_selected_c2v")
 
     def _compute_unit(
         self, messages: np.ndarray, syndrome: np.ndarray, *, error_rate: float, unit_index: int,
         prior_llrs: np.ndarray | None = None,
         transform_beliefs: Callable[[np.ndarray, np.ndarray], np.ndarray] | None = None,
         transform_v2c: Callable[[np.ndarray], np.ndarray] | None = None,
-    ) -> tuple[np.ndarray, np.ndarray, Any]:
+    ) -> tuple[np.ndarray, np.ndarray, Any, np.ndarray]:
         raise NotImplementedError
 
     def _proposed_work(self, unit_index: int) -> Any:
@@ -568,10 +587,11 @@ class _NodeSerialSchedule:
 
         unit_index = self._unit_index(progress)
         candidate_box: list[np.ndarray] = []
+        c2v_box: list[np.ndarray] = []
         proposal = self.propose_local_step(messages, syndrome, error_rate=error_rate, progress=progress)
 
         def compute() -> np.ndarray:
-            updated, candidate, _visibility = self._compute_unit(
+            updated, candidate, _visibility, next_c2v = self._compute_unit(
                 messages,
                 _binary_syndrome(self.edge_table, syndrome),
                 error_rate=error_rate,
@@ -582,6 +602,7 @@ class _NodeSerialSchedule:
             )
             candidate.setflags(write=False)
             candidate_box.append(candidate)
+            c2v_box.append(next_c2v)
             return updated
 
         result = executor.execute(
@@ -594,6 +615,7 @@ class _NodeSerialSchedule:
         )
         if not result.admitted:
             return ScheduledLocalStepResult(False, progress, None, proposal.proposed_work, result.termination)
+        self._c2v = c2v_box[-1]
         next_progress = ScheduleProgress(
             iteration=progress.iteration,
             local_steps=result.progress.local_steps,
@@ -639,17 +661,13 @@ class CheckNodeSerialSchedule(_NodeSerialSchedule):
         prior_llrs: np.ndarray | None = None,
         transform_beliefs: Callable[[np.ndarray, np.ndarray], np.ndarray] | None = None,
         transform_v2c: Callable[[np.ndarray], np.ndarray] | None = None,
-    ) -> tuple[np.ndarray, np.ndarray, Any]:
+    ) -> tuple[np.ndarray, np.ndarray, Any, np.ndarray]:
         entry = finite_saturate(messages, boundary="check_serial_entry_v2c")
         if entry.ndim != 1 or entry.shape != (self.edge_table.edge_count,):
             raise ValueError("serial messages must have exactly one value per canonical edge")
         snapshot = np.array(entry, dtype=np.float64, copy=True)
-        c2v = self._all_c2v(snapshot, syndrome)
         indices = self._check_edges[unit_index]
-        for edge_index in indices:
-            incoming = snapshot[[other for other in indices if other != edge_index]]
-            c2v[edge_index] = self.kernel.check_message(incoming, int(syndrome[unit_index]))
-        c2v = finite_saturate(c2v, boundary="check_serial_complete_c2v")
+        c2v = self._refresh_c2v_edges(self._c2v, snapshot, syndrome, indices)
         prior = self.kernel.prior(error_rate) if prior_llrs is None else finite_saturate(
             prior_llrs, boundary="check_serial_memory_prior", profile=self.kernel.profile,
         )
@@ -666,7 +684,10 @@ class CheckNodeSerialSchedule(_NodeSerialSchedule):
                 updated[edge_index] = self.kernel.variable_message(float(beliefs[variable]), float(c2v[edge_index]))
         if transform_v2c is not None:
             updated = finite_saturate(transform_v2c(updated), boundary="check_serial_memory_v2c")
-        return finite_saturate(updated, boundary="check_serial_complete_v2c"), np.array(candidate, dtype=np.uint8, copy=True), self.evidence()
+        return (
+            finite_saturate(updated, boundary="check_serial_complete_v2c"),
+            np.array(candidate, dtype=np.uint8, copy=True), self.evidence(), c2v,
+        )
 
 
 class VariableNodeSerialSchedule(_NodeSerialSchedule):
@@ -691,6 +712,7 @@ class VariableNodeSerialSchedule(_NodeSerialSchedule):
         from .budgets import WorkVector
 
         return WorkVector(
+            check_to_variable_updates=len(self._variable_edges[unit_index]),
             variable_to_check_updates=len(self._variable_edges[unit_index]),
             belief_assemblies=1,
             candidate_constructions=1,
@@ -703,12 +725,12 @@ class VariableNodeSerialSchedule(_NodeSerialSchedule):
         prior_llrs: np.ndarray | None = None,
         transform_beliefs: Callable[[np.ndarray, np.ndarray], np.ndarray] | None = None,
         transform_v2c: Callable[[np.ndarray], np.ndarray] | None = None,
-    ) -> tuple[np.ndarray, np.ndarray, Any]:
+    ) -> tuple[np.ndarray, np.ndarray, Any, np.ndarray]:
         entry = finite_saturate(messages, boundary="variable_serial_entry_v2c")
         if entry.ndim != 1 or entry.shape != (self.edge_table.edge_count,):
             raise ValueError("serial messages must have exactly one value per canonical edge")
         snapshot = np.array(entry, dtype=np.float64, copy=True)
-        c2v = finite_saturate(self._all_c2v(snapshot, syndrome), boundary="variable_serial_incident_c2v")
+        c2v = self._refresh_c2v_edges(self._c2v, snapshot, syndrome, self._variable_edges[unit_index])
         prior = self.kernel.prior(error_rate) if prior_llrs is None else finite_saturate(
             prior_llrs, boundary="variable_serial_memory_prior", profile=self.kernel.profile,
         )
@@ -723,7 +745,10 @@ class VariableNodeSerialSchedule(_NodeSerialSchedule):
             updated[edge_index] = self.kernel.variable_message(float(beliefs[unit_index]), float(c2v[edge_index]))
         if transform_v2c is not None:
             updated = finite_saturate(transform_v2c(updated), boundary="variable_serial_memory_v2c")
-        return finite_saturate(updated, boundary="variable_serial_complete_v2c"), np.array(candidate, dtype=np.uint8, copy=True), self.evidence()
+        return (
+            finite_saturate(updated, boundary="variable_serial_complete_v2c"),
+            np.array(candidate, dtype=np.uint8, copy=True), self.evidence(), c2v,
+        )
 
 
 @dataclass(frozen=True, slots=True)

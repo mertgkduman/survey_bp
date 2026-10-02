@@ -1092,6 +1092,7 @@ def run_canonical_structural_shot(
     local_memory: LocalMemoryExecution | None = None
     randomized_plan: RandomizedTraversalPlan | None = None
     local_random_state: Any | None = None
+    local_random_order: tuple[int, ...] | None = None
     setup_before_profile_ns = 0
     setup_inside_profile_ns = 0
     if parsed.policies.schedule.kind != "flooding":
@@ -1294,7 +1295,9 @@ def run_canonical_structural_shot(
                                     cache = local_schedule.initialize(messages, c2v, observation.syndrome, error_rate=parsed.error_rate, budgets=budgets)
                                 except ResidualSetupBudgetDenied as error:
                                     return None, 0, False, error.termination
-                                for _ in range(parsed.max_iterations):
+                                # A residual source iteration is a complete traversal
+                                # of the E selected C2V commits, not one local commit.
+                                while local_progress.iteration < parsed.max_iterations:
                                     proposal = local_schedule.propose_local_step(messages, c2v, cache, observation.syndrome, error_rate=parsed.error_rate)
                                     step = local_schedule.execute_local_step(executor, proposal, v2c=messages, c2v=c2v, cache=cache, progress=local_progress, is_converged=lambda proposed: bool(np.array_equal((validated.hz.astype(np.int64) @ proposed.astype(np.int64)) % 2, observation.syndrome)))
                                     local_progress, cache, c2v = step.progress, step.cache, step.c2v
@@ -1304,7 +1307,18 @@ def run_canonical_structural_shot(
                                     if step.converged:
                                         return candidate, local_progress.local_steps, True, None
                                 return candidate, local_progress.local_steps, False, None
-                            for _ in range(parsed.max_iterations):
+                            # Layered/node-serial and randomized traversals use
+                            # max_iterations as complete source traversals.  The
+                            # Hsu group schedule predates this contract and pins
+                            # its bound in declared local groups.
+                            def local_iteration_remaining() -> bool:
+                                if parsed.policies.schedule.kind in {
+                                    "layered", "check_node_serial", "variable_node_serial", "randomized",
+                                }:
+                                    return local_progress.iteration < parsed.max_iterations
+                                return local_progress.local_steps < parsed.max_iterations
+
+                            while local_iteration_remaining():
                                 progress_for_step = local_progress
                                 if local_memory is not None and local_progress.cursor == (0,):
                                     local_prior_llrs = local_memory.begin_source_iteration()
@@ -1314,13 +1328,31 @@ def run_canonical_structural_shot(
                                         return candidate, local_progress.local_steps, False, order_termination
                                 if randomized_plan is not None:
                                     assert local_random_state is not None
-                                    refresh = randomized_plan.refresh(local_random_state, boundary="attempt", budgets=budgets, budget_scope="attempt")
-                                    if not refresh.admitted:
-                                        return candidate, local_progress.local_steps, False, refresh.termination
-                                    local_random_state = refresh.state
-                                    assert refresh.order is not None
+                                    # An order belongs to its declared boundary.  Reusing it
+                                    # within a traversal makes every local unit part of the
+                                    # same realized permutation.
+                                    if local_progress.cursor == (0,):
+                                        boundary: str | None = None
+                                        if randomized_plan.refresh_scope == "sweep":
+                                            boundary = "sweep"
+                                        elif local_progress.iteration == 0:
+                                            boundary = randomized_plan.refresh_scope
+                                        if boundary is not None:
+                                            refresh = randomized_plan.refresh(
+                                                local_random_state, boundary=boundary,
+                                                budgets=budgets, budget_scope="attempt",
+                                            )
+                                            if not refresh.admitted:
+                                                return candidate, local_progress.local_steps, False, refresh.termination
+                                            local_random_state = refresh.state
+                                            local_random_order = refresh.order
+                                    if local_random_order is None:
+                                        raise RuntimeError("randomized traversal has no admitted order")
                                     logical_index = local_progress.cursor[0]
-                                    progress_for_step = ScheduleProgress(local_progress.iteration, local_progress.local_steps, (refresh.order[logical_index],), local_progress.rng_state)
+                                    progress_for_step = ScheduleProgress(
+                                        local_progress.iteration, local_progress.local_steps,
+                                        (local_random_order[logical_index],), local_progress.rng_state,
+                                    )
                                 if local_memory is not None:
                                     local_memory.begin_step()
                                 try:
