@@ -16,7 +16,28 @@ if [[ "$local_head" != "$remote_head" ]]; then
     exit 1
 fi
 
-git add -- "$base/events.jsonl" "$base/result.json" "$base/summary.json" "$base/REPORT.md" \
+gzip -n -9 -c "$base/events.jsonl" > "$base/events.jsonl.gz.tmp"
+mv "$base/events.jsonl.gz.tmp" "$base/events.jsonl.gz"
+cat > "$base/README.md" <<'EOF'
+# Verified p=0.05 pilot evidence
+
+The aggregate `events.jsonl` is kept uncompressed on the HPC filesystem for
+verification. GitHub stores `events.jsonl.gz` because the raw aggregate is too
+large for an ordinary GitHub file. Restore it with:
+
+```bash
+gzip -dc events.jsonl.gz > events.jsonl
+```
+
+The restored file's SHA-256 must equal `ledger_sha256` in `result.json`.
+Individual arm ledgers are stored uncompressed and can be inspected directly.
+EOF
+if [[ $(stat -c %s "$base/events.jsonl.gz") -ge 100000000 ]]; then
+    echo 'Compressed aggregate exceeds the GitHub file size limit.' >&2
+    exit 1
+fi
+
+git add -- "$base/events.jsonl.gz" "$base/README.md" "$base/result.json" "$base/summary.json" "$base/REPORT.md" \
     "$base"/*/manifest.json "$base"/*/events.jsonl "$base"/*/result.json
 git diff --cached --check
 git commit -m 'Publish verified matched p=0.05 intervention and damping pilot'
