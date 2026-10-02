@@ -397,22 +397,23 @@ class CanonicalExperimentV4(CanonicalExperimentV3):
     relay: RelaySpecV4 | None = None
 
     @model_validator(mode="after")
-    def active_relay_procedure_has_its_declared_kernel(self) -> "CanonicalExperimentV4":
-        """Require a real source/canonical procedure distinction when tuning."""
-        if self.relay is None or self.relay.memory_tuning is None:
+    def relay_procedure_has_its_declared_kernel(self) -> "CanonicalExperimentV4":
+        """Reject source labels that do not select the author's min-sum kernel."""
+        if self.relay is None:
             return self
-        expected = (
-            ("min_sum", "cpu-float64-min-sum-v1")
-            if self.relay.procedure == "source_internal_bp"
-            else ("binary_spa", "cpu-float64-spa-v1")
-        )
+        if self.relay.procedure == "source_internal_bp":
+            expected = ("min_sum", "cpu-float64-min-sum-v1")
+        elif self.relay.memory_tuning is not None:
+            expected = ("binary_spa", "cpu-float64-spa-v1")
+        else:
+            return self
         if self.policies.update.kind != expected[0]:
             raise ValueError(
-                f"active {self.relay.procedure} Relay requires update policy {expected[0]}"
+                f"{self.relay.procedure} Relay requires update policy {expected[0]}"
             )
         if self.numerical_profile != expected[1]:
             raise ValueError(
-                f"active {self.relay.procedure} Relay requires numerical_profile {expected[1]}"
+                f"{self.relay.procedure} Relay requires numerical_profile {expected[1]}"
             )
         return self
 
