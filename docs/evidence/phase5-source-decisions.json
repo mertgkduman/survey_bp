@@ -70,7 +70,7 @@
       "source_url": "https://arxiv.org/html/2507.00254v1",
       "procedure_anchor": ["BP-SF algorithm and source repository"],
       "kernel_family": "binary_bp_with_syndrome_transform",
-      "trigger": "baseline BP failure after hard-decision oscillation counting",
+      "trigger": "baseline BP failure after hard-decision oscillation counting initialized from the source all-zero previous decision",
       "target_and_order": "rank oscillating variables; source uses np.argsort top-k, unseeded sampling, and parallel first arrival; canonical tests use stable declared order and replayable stream",
       "changed_state": "working syndrome is s XOR Ht for each declared test vector t",
       "preserved_state": "immutable original graph and syndrome, recorded test-vector certificate",
@@ -108,7 +108,7 @@
       "source_url": "https://arxiv.org/html/2511.13281v1",
       "procedure_anchor": ["Section III-A", "Restart Belief algorithm", "bounded-distance t=floor((d-1)/2)"],
       "kernel_family": "binary_css_bp_with_residual_syndrome_branches",
-      "trigger": "root BP fails and source bounded-distance exit does not apply",
+      "trigger": "root BP is invalid or its valid candidate does not satisfy the available weight acceptance certificate",
       "target_and_order": "root output LLRs sorted ascending; separate branches begin at successive roots",
       "changed_state": "branch inserted-error vector, residual syndrome, forced-zero priors",
       "preserved_state": "within-branch inserted-error history and declared root target order",
@@ -121,7 +121,12 @@
       "canonical_identity": "restart_belief_b1_tcap8_mechanism_v1",
       "b1_distance": {"status": "source_bounded", "lower": 18, "upper": 24},
       "b1_t_cap": 8,
-      "unresolved": ["exact B1 distance", "source-valid bounded-distance threshold for B1", "exact output LLR ties"]
+      "root_acceptance": {
+        "rule": "accept valid root only when weight <= 8; branch from heavier valid roots",
+        "basis": "distance lower bound 18 proves floor((d-1)/2) >= 8",
+        "defect_shortcut": "unavailable_without_declared_xi_and_exact_t"
+      },
+      "unresolved": ["exact B1 distance and exact bounded-distance threshold", "source defect shortcut parameters xi and applicable exact t", "exact output LLR ties"]
     }
   }
 }

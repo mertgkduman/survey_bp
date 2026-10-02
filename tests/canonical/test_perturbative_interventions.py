@@ -51,6 +51,21 @@ def test_syndrome_flip_oscillation_certificate_and_original_invalid_rejection():
     assert all(not row.eligible for row in result.tests)
 
 
+def test_syndrome_flip_counts_zero_to_first_hard_decision_from_source_algorithm():
+    """BP-SF Algorithm 1 initializes the previous hard decision to all zeroes."""
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.interventions import SyndromeFlipController, SyndromeFlipSpec
+
+    original = _problem([[0, 1], [1, 1]], [1, 0])
+    result = SyndromeFlipController(
+        SyndromeFlipSpec(2, 1, 2, 1, 2, "source-zero-baseline"),
+    ).run(original, error_rate=0.1, budgets=BudgetTree(limits=(), parents={}))
+
+    # The hard decisions are [0, 1] then [1, 1]. Counting from [0, 0]
+    # gives one flip at each coordinate.
+    assert result.baseline_oscillations == (1, 1)
+
+
 def test_syndrome_flip_denied_order_generation_returns_replayable_terminal():
     from bp_registry.canonical.budgets import BudgetLimit, BudgetTree
     from bp_registry.canonical.interventions import (

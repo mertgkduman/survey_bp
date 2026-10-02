@@ -52,7 +52,16 @@ class RestartSpec:
 
     @property
     def qualification(self) -> str:
-        return "pilot_adaptation" if self.preset == "b1_tcap8_mechanism" else "source_distance_parameterized"
+        return (
+            "pilot_adaptation" if self.preset == "b1_tcap8_mechanism"
+            else "source_distance_parameterized_conservative_gate"
+        )
+
+    @property
+    def root_acceptance_rule(self) -> str:
+        if self.preset == "b1_tcap8_mechanism":
+            return "proven_lower_bound_t8_weight_gate_without_defect_shortcut"
+        return "exact_t_weight_gate_without_defect_shortcut"
 
     @property
     def source_random_stream(self) -> str:
@@ -141,6 +150,11 @@ class RestartResult:
     root_initial_digest: str
     root_final_digest: str
     root_candidate: tuple[int, ...]
+    root_weight: int
+    root_acceptance_threshold: int
+    root_acceptance_rule: str
+    root_defect_gate_status: str
+    root_accepted: bool
     root_posterior: tuple[float, ...]
     root_llr_order: tuple[int, ...]
     root_termination: str
@@ -236,12 +250,15 @@ class RestartController:
         llr: tuple[float, ...] = ()
         order: tuple[int, ...] = ()
         root_candidate = _bits(root.state.candidate)
+        root_weight = sum(root_candidate)
+        root_acceptance_threshold = self.spec.t_cap
+        root_accepted = root_valid and root_weight <= root_acceptance_threshold
         branches: list[RestartBranch] = []
         incumbent: RestartCandidate | None = None
         termination = root_term if root_term != "root_sweep_cap" else "no_proposal"
-        if root_valid:
+        if root_accepted:
             termination = "root_valid"
-        elif root_term == "root_sweep_cap":
+        elif root_term in {"root_valid", "root_sweep_cap"}:
             if _deadline(wall_clock):
                 termination = "wall_clock_deadline"
             else:
@@ -298,8 +315,11 @@ class RestartController:
             "source_bounded" if self.spec.code_id == "b1-ghp-882" else "exact_declared",
             (18, 24) if self.spec.code_id == "b1-ghp-882" else None,
             root_owner, original.lineage_id, initial, root.state.digest,
-            root_candidate, llr, order, root_term, tuple(branches),
-            root_candidate if root_valid else None if incumbent is None else incumbent.candidate,
+            root_candidate, root_weight, root_acceptance_threshold,
+            self.spec.root_acceptance_rule,
+            "unavailable_without_declared_xi_and_applicable_t", root_accepted,
+            llr, order, root_term, tuple(branches),
+            root_candidate if root_accepted else None if incumbent is None else incumbent.candidate,
             None if incumbent is None else (incumbent.branch_order, incumbent.residual_order),
             termination, budgets.summary("attempt"), budgets.leaf_events(),
         )

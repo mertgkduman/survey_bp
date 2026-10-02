@@ -118,7 +118,9 @@ def test_two_steps_match_scalar_equations_and_proposals_do_not_mutate_history(ki
                        "posterior_momentum": 0.25*p}[kind]
     np.testing.assert_allclose(second.beliefs, expected_second, atol=1e-12)
     if kind == "v2c_damping":
-        np.testing.assert_allclose(second.new_v2c, 2.25*p, atol=1e-12)
+        # The old operand is the first committed damped value (1.5p), not the
+        # first raw fresh proposal (2p).
+        np.testing.assert_allclose(second.new_v2c, 2.0*p, atol=1e-12)
     assert schedule.evidence()["committed_iterations"] == 1
 
 

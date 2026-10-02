@@ -34,6 +34,63 @@ def test_restart_distance_preset_rejects_b1_and_adaptation_qualifies():
     assert spec.source_random_stream == "not_applicable"
 
 
+def test_restart_b1_gate_branches_from_valid_root_above_proven_t8():
+    """A syndrome-valid root is not sufficient for source early acceptance."""
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.restarting import RestartController
+
+    original = _restart_original(np.eye(9, dtype=np.uint8), np.ones(9, dtype=np.uint8))
+    result = RestartController(_restart_spec(eta=1, residual_sweeps=1)).run(
+        original, error_rate=0.1, budgets=BudgetTree(limits=(), parents={}),
+    )
+
+    assert result.root_termination == "root_valid"
+    assert sum(result.root_candidate) == 9
+    assert result.root_weight == 9
+    assert result.root_acceptance_threshold == 8
+    assert result.root_acceptance_rule == "proven_lower_bound_t8_weight_gate_without_defect_shortcut"
+    assert result.root_defect_gate_status == "unavailable_without_declared_xi_and_applicable_t"
+    assert not result.root_accepted
+    assert result.termination != "root_valid"
+    assert len(result.branches) == 1
+
+
+def test_restart_exact_distance_gate_branches_from_overweight_valid_root():
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.restarting import RestartController
+
+    original = _restart_original(np.eye(2, dtype=np.uint8), np.ones(2, dtype=np.uint8))
+    result = RestartController({
+        "preset": "source_exact_distance", "code_id": "two-bit-fixture",
+        "eta": 1, "t_cap": 1, "root_sweeps": 1, "residual_sweeps": 1,
+        "exact_distance": 3,
+    }).run(original, error_rate=0.1, budgets=BudgetTree(limits=(), parents={}))
+
+    assert result.root_termination == "root_valid"
+    assert sum(result.root_candidate) == 2
+    assert result.root_acceptance_threshold == 1
+    assert result.root_acceptance_rule == "exact_t_weight_gate_without_defect_shortcut"
+    assert not result.root_accepted
+    assert result.termination != "root_valid"
+    assert len(result.branches) == 1
+
+
+def test_restart_b1_gate_accepts_root_within_proven_t8():
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.restarting import RestartController
+
+    original = _restart_original(np.eye(8, dtype=np.uint8), np.ones(8, dtype=np.uint8))
+    result = RestartController(_restart_spec(eta=1, residual_sweeps=1)).run(
+        original, error_rate=0.1, budgets=BudgetTree(limits=(), parents={}),
+    )
+
+    assert result.root_weight == result.root_acceptance_threshold == 8
+    assert result.root_accepted
+    assert result.termination == "root_valid"
+    assert result.selected_candidate == result.root_candidate
+    assert result.branches == ()
+
+
 def test_restart_root_branch_residual_reset_inserted_and_t_cap():
     from bp_registry.canonical.budgets import BudgetTree
     from bp_registry.canonical.restarting import RestartController

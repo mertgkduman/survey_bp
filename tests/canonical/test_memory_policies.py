@@ -51,7 +51,7 @@ def test_damping_uses_gokduman_fresh_coefficient_orientation(gamma, expected):
     proposal = policy.propose(np.asarray([4.0, -2.0]), np.asarray([0.0, 6.0]), boundary="source_iteration")
     np.testing.assert_allclose(proposal.value, expected)
     assert proposal.target == "v2c"
-    np.testing.assert_allclose(policy.commit(proposal, policy.initial_state([4.0, -2.0])).v2c, [0.0, 6.0])
+    np.testing.assert_allclose(policy.commit(proposal, policy.initial_state([4.0, -2.0])).v2c, expected)
 
 
 def test_damping_rejects_missing_operands_and_wrong_advance_boundary():

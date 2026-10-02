@@ -415,7 +415,7 @@ posterior momentum uses step size `alpha` in (0,1] and velocity weight `gamma`
 in [0,1). The unused earlier momentum `beta` declaration is rejected instead
 of assigning it an implicit meaning. Momentum subtracts the original current
 C2V contribution when constructing V2C messages. V2C damping retains the
-previous fresh input to each binding, as specified by its primitive.
+previous committed damped output as the old operand for the next update.
 
 Every ordinary-memory terminal after initialization records `memory_execution`:
 resolved bindings and primitives, fidelity labels, committed iteration count,
