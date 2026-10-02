@@ -4,6 +4,20 @@ Phase 5 exposes one CSS code-capacity BP baseline and six separate, source-quali
 
 The B1 pilot is `pilot_adaptation` and `not_assessed`. Its finite 4-shot calibration and 16-shot evaluation are for mechanism inspection. No result here establishes published-curve agreement, source-faithful reproduction, decoder superiority, or an error-rate ranking.
 
+The sealed `phase5-b1-p005-damping-pilot.json` and its
+`b1-p005-damping-pilot` result directory predate the correction that makes V2C
+damping retain the previous committed damped output. They are retained only as
+invalidated historical evidence and must not be resumed or republished. The
+sealed v1 builder remains unchanged, and its implementation-digest comparison
+rejects the corrected source tree.
+
+A corrected campaign must use a new v2 design and output namespace, including
+`phase5-b1-p005-damping-pilot-v2.json`, `b1-p005-damping-pilot-v2`, v2 run IDs,
+and new physical-sample and decoder identities. Its sealed equation must read
+`v2c=(1-gamma)*previous_committed_damped+gamma*current_fresh`, with channel-prior
+reset at every fresh attempt. This prevents public execution from discovering
+or appending to any v1 ledger while preserving the old bytes for audit.
+
 The current pilot uses the corrected work-receipt v2 execution. The earlier v1 pilot is retained in Git history at `5bdc3d9` as superseded development evidence: review found target/order and contradiction computations that preceded their work reservations. V2 keeps the original numerical caps and source variants while using new physical sample seeds, namespaces, and run identities; its four-shot calibration and cap freeze precede its evaluation. The older outcomes were not used to alter the ceilings.
 
 ## Public execution path
@@ -46,9 +60,9 @@ The primary source-decision record is `docs/evidence/phase5-source-decisions.jso
 | Guided decimation (BPGD) | `algorithm_interpretation` | Algorithm 1 v2 uses a finite prior magnitude of 25, an explicit positive-prior exact-zero rule, and returns after the last fixation. The source's exact-zero sign and possible extra final BP round remain unresolved; native identity is unverified. |
 | Impulse | `controlled_css_adaptation` | The public arm uses exact fixed-one structural shortening and certified restoration. The paper's unchanged-graph negative-infinite-LLR trajectory is a separate semantic operator; its numerical equivalence to shortening and author-code identity are unverified. |
 | Freezing | `controlled_css_adaptation` | A binary temporary-zero freeze and bounded seeded neighbor choice adapt a source quaternary identity-probability procedure. Native availability and source sampling equivalence are unverified. |
-| Syndrome flip | `controlled_css_adaptation` | A source revision is identified, but canonical test order and seeded selection replace source unseeded/parallel arrival semantics. Only lifted candidates satisfying the original syndrome can be selected. |
+| Syndrome flip | `controlled_css_adaptation` | Oscillation counting follows the source all-zero initial hard decision. Canonical test order and seeded selection replace source unseeded/parallel arrival semantics. Only lifted candidates satisfying the original syndrome can be selected. |
 | Sign flip | `bsfbp_sign_only_controlled_adaptation` | The public controller isolates a posterior sign action in normalized min-sum BP. It does not claim the source's compound branch-assisted pruning or native-code agreement. |
-| Restart Belief | `mechanism_only_adaptation` | B1's exact distance is unknown; the source-bounded interval is 18–24. The B1 preset fixes `t_cap=8`, so this is not an exact-distance source run. Fresh residual resets preserve only inserted-error state. |
+| Restart Belief | `mechanism_only_adaptation` | B1's distance bound 18–24 proves only `t>=8`. The B1 preset accepts a root-valid candidate only at weight at most 8 and branches from heavier roots. The paper's defect shortcut is unavailable because exact `t` and `xi` are undeclared. Fresh residual resets preserve only inserted-error state, so this remains a conservative mechanism adaptation rather than an exact-distance source run. |
 
 Native comparisons marked `unverified` or `repository_revision_verified_in_phase_research` are not inferred to agree with canonical trajectories. Calibration may establish trigger availability and cost but cannot tune ceilings using logical outcomes. Evaluation cannot alter source qualification, tie rules, arm membership, or the frozen caps.
 

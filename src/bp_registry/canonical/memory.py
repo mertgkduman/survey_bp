@@ -110,8 +110,13 @@ class V2CDamping:
         fresh = _finite_vector(fresh_v2c, name="fresh_v2c")
         if old.shape != fresh.shape:
             raise ValueError("old_v2c and fresh_v2c must have the same shape")
-        value = (1.0 - self.gamma) * old + self.gamma * fresh
-        return TargetMemoryProposal(self.binding_id, self.target, _finite_vector(value, name="damped_v2c"), (fresh,))
+        value = _finite_vector(
+            (1.0 - self.gamma) * old + self.gamma * fresh,
+            name="damped_v2c",
+        )
+        # Equation (17) uses the previous decoder-visible damped message as
+        # m^(t), rather than the raw proposal that produced it.
+        return TargetMemoryProposal(self.binding_id, self.target, value, (value,))
 
     def commit(self, proposal: TargetMemoryProposal, state: V2CDampingState | None = None) -> V2CDampingState:
         if proposal.binding_id != self.binding_id or proposal.target != self.target or len(proposal.history) != 1:

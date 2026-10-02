@@ -1,11 +1,11 @@
-"""The Phase 5 memory composition follows the Phase 4 fresh-message equation."""
+"""The Phase 5 memory composition follows the cited damped-message recurrence."""
 
 from __future__ import annotations
 
 import numpy as np
 
 
-def test_v2c_damping_uses_previous_fresh_input_and_resets_on_new_attempt():
+def test_v2c_damping_uses_previous_damped_output_and_resets_on_new_attempt():
     from bp_registry.canonical.budgets import BudgetTree
     from bp_registry.canonical.intervention_session import BpSession
     from bp_registry.canonical.kernel import BinarySpaKernel
@@ -21,14 +21,16 @@ def test_v2c_damping_uses_previous_fresh_input_and_resets_on_new_attempt():
 
     first = session.advance(budgets=budget, leaf_id="damped:first")
     assert first.admitted
-    np.testing.assert_allclose(session.state.v2c, 0.5 * initial + 0.5 * first_fresh.new_v2c)
-    np.testing.assert_allclose(session.state.private_histories[0], first_fresh.new_v2c)
+    first_damped = 0.5 * initial + 0.5 * first_fresh.new_v2c
+    np.testing.assert_allclose(session.state.v2c, first_damped)
+    np.testing.assert_allclose(session.state.private_histories[0], first_damped)
 
     second_fresh = reference.sweep(session.state.v2c, syndrome, error_rate=0.1, source_iteration=1)
     second = session.advance(budgets=budget, leaf_id="damped:second")
     assert second.admitted
-    np.testing.assert_allclose(session.state.v2c, 0.5 * first_fresh.new_v2c + 0.5 * second_fresh.new_v2c)
-    np.testing.assert_allclose(session.state.private_histories[0], second_fresh.new_v2c)
+    second_damped = 0.5 * first_damped + 0.5 * second_fresh.new_v2c
+    np.testing.assert_allclose(session.state.v2c, second_damped)
+    np.testing.assert_allclose(session.state.private_histories[0], second_damped)
 
     child = session.reset_fresh(budgets=budget, leaf_id="damped:reset")
     np.testing.assert_allclose(child.state.v2c, initial)

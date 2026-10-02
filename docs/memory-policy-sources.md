@@ -9,7 +9,7 @@ as an adaptation unless the source itself defines that regime.
 
 | Registered name | Primitive and equation | Target and advance boundary | Initialization and reset | Fidelity label |
 | --- | --- | --- | --- | --- |
-| `gy-pfister-v2c-damping-v1` | `v2c_out = (1-gamma) v2c_old + gamma v2c_fresh`, `gamma in [0, 1]` | V2C after a fresh V2C calculation; declared `local_update` or `source_iteration` | channel-prior V2C is the initial old vector; reset at an attempt or Relay leg | source equation; binary CSS component adaptation |
+| `gy-pfister-v2c-damping-v1` | `v2c_out = (1-gamma) v2c_old + gamma v2c_fresh`, `gamma in [0, 1]` | V2C after a fresh V2C calculation; `v2c_old` is the previous committed damped output at the declared `local_update` or `source_iteration` boundary | channel-prior V2C is the initial old vector; commit stores `v2c_out`; reset at an attempt or Relay leg | source equation; binary CSS component adaptation |
 | `pretti-pdbp-field-mix-v1` | `h_out = (1-gamma) h_fresh + gamma h_old`, `gamma in [0, 1)` | belief/effective field after fresh C2V aggregation; declared `local_update` or `source_iteration` | channel field initializes the old field; commit stores the mixed field | classical source, binary CSS adaptation |
 | `pretti-pdprime-delta-mix-v1` | `Delta = sum(c2v_fresh-c2v_old)` over edge-aligned C2V rows; `h_out = h_old + (1-gamma) Delta`, `gamma in [0, 1)` | belief/effective field after a matched old/fresh C2V pair; declared `local_update` or `source_iteration` | channel field and C2V matrix initialize history; commit stores both field and fresh C2V | classical source, binary CSS adaptation |
 | `chen-posterior-momentum-v1` | `g_t = gamma*g_(t-1) + (1-gamma)*(Q_(t-1)-Q_fresh)`; `Q_t = Q_(t-1)-alpha*g_t` | posterior belief at the declared boundary; V2C uses `Q_t - original_current_c2v` | `g_0=0`, `Q_0=prior`; reset at an attempt or Relay leg | GF(4) source, scalar-LLR CSS adaptation |
@@ -38,7 +38,8 @@ outside this uniform primitive and is handled by the later composition work.
 
 1. Gökduman, Yao, and Pfister, *Damped BPGD*,
    [arXiv:2411.08177](https://arxiv.org/abs/2411.08177): selected for V2C
-   damping.  Its gamma weights the fresh V2C operand, which is verified by
+   damping.  Its gamma weights the fresh V2C operand and its recurrence uses
+   the previous committed damped output, both verified by multi-step and
    endpoint fixtures.
 2. Pretti, *PDBP and PD-prime BP*,
    [arXiv:1407.0521](https://arxiv.org/abs/1407.0521): selected as two distinct

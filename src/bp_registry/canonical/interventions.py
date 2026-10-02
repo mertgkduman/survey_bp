@@ -455,7 +455,9 @@ class SyndromeFlipController:
             error_rate=error_rate, owner_identity=root + ":baseline", damping_gamma=damping_gamma,
         )
         counts = np.zeros(n, dtype=np.int64)
-        previous: tuple[int, ...] | None = None
+        # BP-SF Algorithm 1 initializes the prior hard decision to the all-zero
+        # vector, so nonzero decisions in the first update count as flips.
+        previous = tuple(0 for _ in range(n))
         baseline_valid = False
         baseline_term = "failed_baseline"
         for sweep in range(self.spec.baseline_sweeps):
@@ -468,8 +470,10 @@ class SyndromeFlipController:
                 baseline_term = moved.termination or "count_budget_exhausted"
                 break
             current = _bits(baseline.state.candidate)
-            if previous is not None:
-                counts += np.asarray([int(a != b) for a, b in zip(previous, current, strict=True)], dtype=np.int64)
+            counts += np.asarray(
+                [int(a != b) for a, b in zip(previous, current, strict=True)],
+                dtype=np.int64,
+            )
             previous = current
             if _deadline(wall_clock):
                 baseline_term = "wall_clock_deadline"
