@@ -4,11 +4,61 @@
 from __future__ import annotations
 
 from collections import Counter
+from concurrent.futures import ProcessPoolExecutor
 from hashlib import sha256
 import json
+import os
 from pathlib import Path
 
-from run_phase5_damping_pilot_v2 import ARMS, BASE_ARMS, OUTPUT, SHOTS, verify
+from run_phase5_damping_pilot_v2 import (
+    ARMS, BASE_ARMS, OUTPUT, SHOTS, _digest_bytes, _read, sealed_design,
+)
+from bp_registry.cli import verify_run
+
+
+def _verify_arm(arm: str) -> str:
+    verify_run(OUTPUT / arm)
+    return arm
+
+
+def _verify_aggregate(design: dict, result: dict, root: Path, *, design_path: Path | None = None) -> dict:
+    """Apply the sealed verifier's aggregate and paired-sample checks once."""
+    pinned_design = design_path or root.parents[2] / "manifests/phase5-b1-p005-damping-pilot-v2.json"
+    if result["design_sha256"] != _digest_bytes(pinned_design):
+        raise ValueError("paired result design digest differs")
+    if result["ledger_sha256"] != _digest_bytes(root / "events.jsonl"):
+        raise ValueError("paired result aggregate ledger digest differs")
+    aggregate: list[str] = []
+    samples: dict[int, str] = {}
+    for arm in ARMS:
+        arm_root = root / arm
+        if _read(arm_root / "manifest.json") != design["arm_manifests"][arm]:
+            raise ValueError(f"{arm} saved manifest drifted")
+        arm_result = _read(arm_root / "result.json")
+        if arm_result["ledger_sha256"] != result["arm_results"][arm]["ledger_sha256"]:
+            raise ValueError(f"{arm} public result digest drifted")
+        lines = (arm_root / "events.jsonl").read_text(encoding="utf-8").splitlines()
+        aggregate.extend(lines)
+        for event in (json.loads(line) for line in lines if line):
+            if event["kind"] == "shot_begin":
+                shot_id, sample_id = event["shot_id"], event["sample_seed_identity"]
+                if samples.setdefault(shot_id, sample_id) != sample_id:
+                    raise ValueError("paired physical sample mismatch")
+    if ("\n".join(aggregate) + "\n").encode("utf-8") != (root / "events.jsonl").read_bytes():
+        raise ValueError("aggregate ledger differs from its arm evidence")
+    if sorted(samples) != design["shot_ids"] or {str(k): v for k, v in samples.items()} != result["physical_sample_identities"]:
+        raise ValueError("paired sample identity set is incomplete")
+    return {"status": "passed", "shots": len(samples), "arms": len(ARMS), "ledger_sha256": result["ledger_sha256"]}
+
+
+def verify_parallel() -> dict:
+    design = sealed_design()
+    available = int(os.environ.get("SLURM_CPUS_PER_TASK", os.cpu_count() or 1))
+    with ProcessPoolExecutor(max_workers=min(len(ARMS), available)) as pool:
+        verified = tuple(pool.map(_verify_arm, ARMS))
+    if verified != ARMS:
+        raise ValueError("not every arm completed public replay verification")
+    return _verify_aggregate(design, _read(OUTPUT / "result.json"), OUTPUT)
 
 
 def _save(path: Path, text: str) -> None:
@@ -20,7 +70,7 @@ def _save(path: Path, text: str) -> None:
 
 
 def summarize() -> tuple[dict, str]:
-    verification = verify()
+    verification = verify_parallel()
     rows: dict[str, dict] = {}
     terminals: dict[str, dict[int, str]] = {}
     for arm in ARMS:
