@@ -34,7 +34,7 @@ def summarize() -> tuple[dict, str]:
                 if event["kind"] == "termination":
                     if shot_id in outcomes:
                         raise ValueError(f"duplicate terminal: {arm} {shot_id}")
-                    outcomes[shot_id] = event["data"]["payload"]["outcome"]
+                    outcomes[shot_id] = event["data"]["payload"]["outcome"] or "outcome_unavailable"
                 elif event["kind"] == "work":
                     if shot_id in work:
                         raise ValueError(f"duplicate work event: {arm} {shot_id}")
