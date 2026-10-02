@@ -177,6 +177,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 | 260929-qaa | Publish a verified 29 September development update in Markdown and PDF to GitHub | 2026-09-29 | 640b9c1 | Verified | [260929-qaa-publish-a-verified-29-september-developm](./quick/260929-qaa-publish-a-verified-29-september-developm/) |
 | 260930-0vq | Stop Phase 4 comprehensive experiment and right-size plans | 2026-09-30 | db99a51 | Verified | [260930-0vq-stop-phase-4-comprehensive-experiment-an](./quick/260930-0vq-stop-phase-4-comprehensive-experiment-an/) |
 | 260930-nuv | Create a source-backed study-design glossary in Markdown and color-coded PDF, then commit and push to GitHub | 2026-09-30 | 6ddf013 | Verified | [260930-nuv-create-a-source-backed-study-design-glos](./quick/260930-nuv-create-a-source-backed-study-design-glos/) |
+| 261002-in6 | Add explicit Phase 6 candidate-list selection foundation | 2026-10-02 | 77bf533 | Verified | [261002-in6-implement-phase-6-candidate-list-selecti](./quick/261002-in6-implement-phase-6-candidate-list-selecti/) |
 
 ## Deferred Items
 
