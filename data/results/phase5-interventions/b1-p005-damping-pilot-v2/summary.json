@@ -1,0 +1,205 @@
+{
+  "arms": {
+    "freezing": {
+      "mean_bp_calls": 3.25,
+      "mean_bp_sweeps": 29.6484375,
+      "mean_intervention_actions": 4.2578125,
+      "outcomes": {
+        "exact": 72,
+        "outcome_unavailable": 26,
+        "stabilizer_equivalent": 30
+      },
+      "terminations": {
+        "baseline_valid": 71,
+        "freeze_valid": 31,
+        "retry_cap_reached": 26
+      }
+    },
+    "freezing__damped": {
+      "mean_bp_calls": 2.734375,
+      "mean_bp_sweeps": 25.4609375,
+      "mean_intervention_actions": 3.375,
+      "outcomes": {
+        "exact": 70,
+        "outcome_unavailable": 23,
+        "stabilizer_equivalent": 35
+      },
+      "terminations": {
+        "baseline_valid": 93,
+        "freeze_valid": 12,
+        "retry_cap_reached": 23
+      }
+    },
+    "guided_decimation": {
+      "mean_bp_calls": 3.2421875,
+      "mean_bp_sweeps": 27.6875,
+      "mean_intervention_actions": 2.2421875,
+      "outcomes": {
+        "exact": 74,
+        "outcome_unavailable": 8,
+        "stabilizer_equivalent": 46
+      },
+      "terminations": {
+        "count_budget_exhausted": 8,
+        "valid_original_candidate": 120
+      }
+    },
+    "guided_decimation__damped": {
+      "mean_bp_calls": 1.3125,
+      "mean_bp_sweeps": 9.59375,
+      "mean_intervention_actions": 0.3125,
+      "outcomes": {
+        "exact": 77,
+        "stabilizer_equivalent": 51
+      },
+      "terminations": {
+        "valid_original_candidate": 128
+      }
+    },
+    "identity": {
+      "mean_bp_calls": 1.0,
+      "mean_bp_sweeps": 24.671875,
+      "mean_intervention_actions": 0.0,
+      "outcomes": {
+        "exact": 74,
+        "outcome_unavailable": 13,
+        "stabilizer_equivalent": 41
+      },
+      "terminations": {
+        "baseline_valid": 115,
+        "iteration_cap_reached": 13
+      }
+    },
+    "identity__damped": {
+      "mean_bp_calls": 1.0,
+      "mean_bp_sweeps": 9.59375,
+      "mean_intervention_actions": 0.0,
+      "outcomes": {
+        "exact": 77,
+        "stabilizer_equivalent": 51
+      },
+      "terminations": {
+        "baseline_valid": 128
+      }
+    },
+    "impulse": {
+      "mean_bp_calls": 1.40625,
+      "mean_bp_sweeps": 28.0234375,
+      "mean_intervention_actions": 0.40625,
+      "outcomes": {
+        "exact": 74,
+        "outcome_unavailable": 13,
+        "stabilizer_equivalent": 41
+      },
+      "terminations": {
+        "baseline_valid": 115,
+        "count_budget_exhausted": 13
+      }
+    },
+    "impulse__damped": {
+      "mean_bp_calls": 1.0,
+      "mean_bp_sweeps": 9.59375,
+      "mean_intervention_actions": 0.0,
+      "outcomes": {
+        "exact": 77,
+        "stabilizer_equivalent": 51
+      },
+      "terminations": {
+        "baseline_valid": 128
+      }
+    },
+    "restart_belief": {
+      "mean_bp_calls": 8.8359375,
+      "mean_bp_sweeps": 82.421875,
+      "mean_intervention_actions": 15.734375,
+      "outcomes": {
+        "exact": 68,
+        "outcome_unavailable": 36,
+        "stabilizer_equivalent": 24
+      },
+      "terminations": {
+        "count_budget_exhausted": 63,
+        "restart_valid": 65
+      }
+    },
+    "restart_belief__damped": {
+      "mean_bp_calls": 9.6953125,
+      "mean_bp_sweeps": 81.53125,
+      "mean_intervention_actions": 17.546875,
+      "outcomes": {
+        "exact": 69,
+        "outcome_unavailable": 26,
+        "stabilizer_equivalent": 33
+      },
+      "terminations": {
+        "count_budget_exhausted": 38,
+        "restart_valid": 90
+      }
+    },
+    "sign_flip": {
+      "mean_bp_calls": 1.203125,
+      "mean_bp_sweeps": 22.46875,
+      "mean_intervention_actions": 0.203125,
+      "outcomes": {
+        "exact": 77,
+        "outcome_unavailable": 8,
+        "stabilizer_equivalent": 43
+      },
+      "terminations": {
+        "baseline_valid": 102,
+        "continuation_cap_reached": 8,
+        "sign_flip_valid": 18
+      }
+    },
+    "sign_flip__damped": {
+      "mean_bp_calls": 1.140625,
+      "mean_bp_sweeps": 14.921875,
+      "mean_intervention_actions": 0.140625,
+      "outcomes": {
+        "exact": 79,
+        "outcome_unavailable": 2,
+        "stabilizer_equivalent": 47
+      },
+      "terminations": {
+        "baseline_valid": 110,
+        "continuation_cap_reached": 2,
+        "sign_flip_valid": 16
+      }
+    },
+    "syndrome_flip": {
+      "mean_bp_calls": 1.3125,
+      "mean_bp_sweeps": 27.1484375,
+      "mean_intervention_actions": 0.3125,
+      "outcomes": {
+        "exact": 75,
+        "outcome_unavailable": 9,
+        "stabilizer_equivalent": 44
+      },
+      "terminations": {
+        "baseline_valid": 115,
+        "count_budget_exhausted": 9,
+        "syndrome_flip_valid": 4
+      }
+    },
+    "syndrome_flip__damped": {
+      "mean_bp_calls": 1.0,
+      "mean_bp_sweeps": 9.59375,
+      "mean_intervention_actions": 0.0,
+      "outcomes": {
+        "exact": 77,
+        "stabilizer_equivalent": 51
+      },
+      "terminations": {
+        "baseline_valid": 128
+      }
+    }
+  },
+  "design_sha256": "767082ba19983d15106b10095d48fc0cc096a3d8d25379c41e1f4f5dbcb4d564",
+  "schema_version": 1,
+  "verification": {
+    "arms": 14,
+    "ledger_sha256": "d4d1c97143326f9decb7b3ae4e02a9ada75f4fb51d051cac6d68c9ac458105bd",
+    "shots": 128,
+    "status": "passed"
+  }
+}
