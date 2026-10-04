@@ -291,7 +291,13 @@ def _terminals(root: Path) -> dict[int, dict[str, Any]]:
 
 
 def _verified_group(spec: dict[str, Any], cohort: str, rate: float, configs: list[dict[str, Any]]) -> dict[str, dict[int, dict[str, Any]]]:
-    group = {config["id"]: _terminals(_arm_path(cohort, rate, config)) for config in configs}
+    paths = [_arm_path(cohort, rate, config) for config in configs]
+    requested = int(os.environ.get("BB72_VERIFY_WORKERS", os.environ.get("SLURM_CPUS_PER_TASK", "8")))
+    if requested < 1:
+        raise ValueError("BB72_VERIFY_WORKERS must be positive")
+    with ProcessPoolExecutor(max_workers=min(len(configs), requested)) as pool:
+        terminal_sets = list(pool.map(_terminals, paths))
+    group = {config["id"]: rows for config, rows in zip(configs, terminal_sets, strict=True)}
     identities = [tuple(group[key][shot]["sample_identity"] for shot in sorted(group[key])) for key in group]
     if any(other != identities[0] for other in identities[1:]):
         raise ValueError(f"mismatched physical samples: {cohort} {_rate_id(rate)}")
