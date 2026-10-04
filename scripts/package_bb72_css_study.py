@@ -64,6 +64,8 @@ def package() -> dict:
         _write_once(root / "events.jsonl.gz", compressed)
         packaged[relative] = {
             "raw_sha256": expected, "compressed_sha256": _hash(compressed),
+            "manifest_sha256": _hash((root / "manifest.json").read_bytes()),
+            "arm_result_sha256": _hash((root / "result.json").read_bytes()),
             "raw_bytes": len(raw), "compressed_bytes": len(compressed),
         }
     manifest = {
