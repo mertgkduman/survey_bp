@@ -149,7 +149,7 @@ table{{border-collapse:collapse;width:100%}}td,th{{border:1px solid #cbd5e1;padd
 <h1>BB72 CSS BP comparison v1</h1><p class="note">Controlled X-only code-capacity study on the source-pinned [[72,12,6]] BB72 code. Selection and evaluation use disjoint matched samples. All terminal outcomes count. These results do not reproduce the Bravyi circuit-level BP-OSD experiment or rank decoders across codes.</p>
 <p><a href="REPORT.md">Verified report</a> · <a href="../../studies/bb72-css-bp-v1.json">Frozen design</a></p>
 {figures[0]}{figures[1]}{figures[2]}
-<h2>Source-settings view</h2><p>Published settings and source semantics are shown separately from the shared-work comparison. Their BB72 CSS status limits each claim.</p>
+<h2>Source-settings view</h2><p>Published settings and source semantics are shown separately from the shared-work comparison. Their BB72 CSS status limits each claim. The BP-SF arm here uses canonical SPA messages and deterministic test order; its source paper uses min-sum messages and parallel test selection.</p>
 <table><thead><tr><th>Source</th><th>BB72 CSS status</th><th>Reason</th></tr></thead><tbody>{source_rows}</tbody></table>
 <p class="note">The shared cap is 40 flooding sweeps or 8,640 messages per direction. Extra intervention work differs. Consult the report and per-arm ledgers for outcomes, work, and missing measurements.</p>
 </body></html>"""
