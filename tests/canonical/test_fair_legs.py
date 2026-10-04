@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 import numpy as np
 import pytest
 
@@ -67,6 +69,15 @@ def test_gamma_one_matches_canonical_min_sum_and_half_damps_v2c():
     half = _controller(v2c_gamma=0.5).initial_bp()
     assert np.allclose([row[2] for row in half.edge_messages], 0.5 * old + 0.5 * fresh)
     assert np.allclose([row[2] for row in plain.edge_messages], fresh)
+
+
+def test_beam_path_score_normalizes_current_round_llrs_by_iterations():
+    segment = _controller().initial_bp()
+    summed = np.asarray([2.0, -4.0, 6.0])
+    two_steps = replace(segment, sum_llr=summed, iterations=2)
+    four_steps = replace(segment, sum_llr=summed, iterations=4)
+    assert two_steps.reliability_score == 6.0
+    assert four_steps.reliability_score == 3.0
 
 
 def test_relay_uses_seeded_disordered_memory_and_resets_edge_history():

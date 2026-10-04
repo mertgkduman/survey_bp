@@ -82,7 +82,9 @@ class BPSegment:
 
     @property
     def reliability_score(self) -> float:
-        return float(np.sum(np.abs(self.sum_llr)))
+        # The source normalizes branch scores by the number of BP iterations
+        # so paths truncated by a work limit remain comparable during pruning.
+        return float(np.sum(np.abs(self.sum_llr))) / self.iterations if self.iterations else 0.0
 
     def as_evidence(self) -> dict[str, object]:
         return {

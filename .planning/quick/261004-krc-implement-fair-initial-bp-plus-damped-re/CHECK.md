@@ -5,13 +5,14 @@
 - The same `BPSegment` object from one min-sum initial run is passed to BeamSearch and RelayBP within each damping arm. Foreign initial states are rejected.
 - `g1000` (off) and `g0500` (on) run on the same BB72 physical sample IDs. Both methods use the same initial numerical profile, schedule, stop check and damping at each gamma.
 - Relay extra units use source-shaped per-variable disordered affine-prior memory, posterior-only transfer, and reset message/damping histories. The pinned native Relay source initializes subsequent-leg V2C messages from channel priors (`relay.rs` lines 333-342; `min_sum.rs` lines 270-279). The common plain initial BP stage is an explicit controlled adaptation of the paper's memory-BP first leg.
-- Beam extra units use source-shaped min-sum masked branches with adjusted syndrome, surviving-edge warm start, cumulative LLR reliability and stable pruning. The CSS use and damping addition are controlled adaptations, not a circuit reproduction or pinned-C++ edge-case reproduction.
+- Beam extra units use source-shaped min-sum masked branches with adjusted syndrome, surviving-edge warm start, current-round cumulative LLR reliability normalized by iteration count, and stable pruning. The CSS use and damping addition are controlled adaptations, not a circuit reproduction or pinned-C++ edge-case reproduction.
 - Initial and extra typed work, unit statuses, original-syndrome candidates, independent CSS outcomes, and observed serial runtime are separate evidence fields. A common extra C2V cap is enforced before each run; actual spent work is reported.
 
 ## Verification
 
-- 13 focused new tests pass; 46 combined new/Relay/memory tests pass after the damping-factorial runner revision.
+- 14 focused new tests pass; 47 combined new/Relay/memory tests pass after the source score-normalization correction.
 - Eight BB72 matched physical samples run in four arms (Beam and Relay, each at gamma 1.0 and 0.5); both replay verification and fixed-denominator checks pass. The result is `not_assessed` and makes no ranking claim.
+- A post-commit source recheck found that the Beam paper divides branch reliability scores by the number of iterations in that branch. The corrected controller rejected the original development ledger at shot 2 during replay, as expected. That first ledger remains in Git commit `4955bff`; the current development ledger was regenerated from the same frozen design after the correction.
 - Full worktree suite: 737 passed, 1 skipped, 1 failed solely because a historical untracked Phase 4 cancellation receipt is absent from the isolated checkout. The same receipt test passes in the original workspace (1 passed). No existing source file was modified by this quick task.
 
 ## Remaining integration
