@@ -16,6 +16,7 @@ Produce an independent, source-qualified test of the BB72 v1 BP-SF signal with c
 2. Add Phase 5 decode runtime measurements as observational evidence with backward-compatible replay validation. Permit BP-SF to run either canonical SPA or canonical min-sum through an explicit manifest policy. Add tests for kernel compatibility, runtime evidence, and old-ledger behavior.
 3. Prespecify an independent BB72 v2 factorial study: SPA/min-sum, BP-SF off/on, γ=1/0.5, short and full BP-only controls; matched new samples, separate selection/evaluation if tuning, sample size/power rationale, total-work and runtime views, fixed statistical contrasts, and source-status limits. Run bounded smoke/preflight, then the approved HPC campaign and publish verified results.
 4. Prepare the outstanding Phase 5 human verification evidence for review. After technical gates, move into Phase 6 planning without marking a human checkpoint passed autonomously.
+5. Protect the sealed v2 campaign against the original Slurm wall-time limit: schedule a conditional continuation that preserves a raw interrupted-ledger copy, trims only a proven incomplete trailing shot, resumes the original manifest/sample identities, verifies all arms, and publishes only the complete package.
 
 ## Must haves
 
