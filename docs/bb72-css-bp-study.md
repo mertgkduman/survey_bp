@@ -36,6 +36,7 @@ OMP_NUM_THREADS=1 .venv/bin/python scripts/run_bb72_css_study.py freeze-selectio
 OMP_NUM_THREADS=1 .venv/bin/python scripts/run_bb72_css_study.py preflight-evaluation
 OMP_NUM_THREADS=1 .venv/bin/python scripts/run_bb72_css_study.py run-evaluation --workers 18
 OMP_NUM_THREADS=1 .venv/bin/python scripts/run_bb72_css_study.py report
+.venv/bin/python scripts/render_bb72_css_study.py
 ```
 
-Run in a bounded Slurm allocation when local CPUs are insufficient. Outputs are under `data/results/bb72-css-bp-v1/`: per-arm `manifest.json`, `events.jsonl`, and `result.json`, plus `seal.json`, `selection-lock.json`, aggregate `result.json`, and `REPORT.md`. Raw event ledgers remain available for independent replay even when a compressed GitHub publication copy is used.
+Run in a bounded Slurm allocation when local CPUs are insufficient. Outputs are under `data/results/bb72-css-bp-v1/`: per-arm `manifest.json`, `events.jsonl`, and `result.json`, plus `seal.json`, `selection-lock.json`, aggregate `result.json`, `REPORT.md`, and read-only offline `study.html`. Raw event ledgers remain available for independent replay even when a compressed GitHub publication copy is used.
