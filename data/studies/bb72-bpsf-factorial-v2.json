@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "study_id": "bb72-bpsf-factorial-v2",
+  "status": "prespecified_before_study_sampling",
+  "question": "Does the BB72 v1 BP-SF gain at p=0.08 replicate, and how does it depend on canonical SPA versus min-sum updates, V2C damping, and BP-only sweep allowance?",
+  "claim_scope": "Independent controlled X-only BB72 CSS adaptation. The min-sum BP-SF arm remains different from the source's unseeded parallel first-arrival execution; no author-code reproduction or parallel-latency claim.",
+  "artifact": {
+    "code_id": "bravyi-bb-72",
+    "raw_sha256": "8cb3af882fecf8d16ff3b84c2c69939cdafde122fd48ab0d87a7e113d4e91227",
+    "source_status": "Bravyi source-pinned [[72,12,6]] matrices; project-derived ordered logical basis"
+  },
+  "channel": {"kind": "independent_x_bit_flip_code_capacity", "x_error_rates": [0.05, 0.08], "z_error_rate": 0.0},
+  "cohort": {
+    "kind": "independent_evaluation_only_no_parameter_selection",
+    "physical_sample_identity_prefix": "bb72-bpsf-factorial-v2-evaluation",
+    "sample_seed": 720401,
+    "shots_per_rate": {"p050": 512, "p080": 1280},
+    "v1_overlap_rule": "new physical sample namespace and seed; no v1 shot is reused or pooled"
+  },
+  "factorial": {
+    "update": ["binary_spa", "min_sum"],
+    "damping_gamma": [1.0, 0.5],
+    "mode": ["bp20", "bp40", "bpsf20plus4x5"],
+    "arm_count_per_rate": 12,
+    "parameters_are_fixed_before_v2_sampling": true,
+    "bpsf_controls": {"baseline_sweeps": 20, "attempt_sweeps": 5, "test_cap": 4, "top_k": 4, "max_weight": 1, "selection": "seeded_stable_first_valid"}
+  },
+  "shared_work": {
+    "schedule": "flooding",
+    "max_bp_sweeps_per_shot": 40,
+    "max_check_to_variable_updates_per_shot": 8640,
+    "max_variable_to_check_updates_per_shot": 8640,
+    "edge_count": 216,
+    "denominator_rule": "all_terminal_shots",
+    "cost_reporting": "Report BP messages and calls, all additional typed intervention work, and measured controller runtime separately. A common message cap is not equal total work or parallel latency.",
+    "runtime_method": "time.perf_counter_ns:phase5-controller:v1 for intervention arms; ordinary canonical decode runtime for BP-only arms",
+    "runtime_comparison_status": "same-node descriptive serial execution only; different measurement scopes and control overhead are disclosed"
+  },
+  "assessment": {
+    "primary_endpoint": "unconditional_failure; only exact or stabilizer-equivalent recovery is valid",
+    "primary_rate": "p080",
+    "primary_contrasts": [
+      {"id": "spa-bpsf-vs-spa-bp40", "update": "binary_spa", "gamma": 1.0, "new_mode": "bpsf20plus4x5", "reference_mode": "bp40"},
+      {"id": "ms-bpsf-vs-ms-bp40", "update": "min_sum", "gamma": 1.0, "new_mode": "bpsf20plus4x5", "reference_mode": "bp40"}
+    ],
+    "test": "two-sided exact paired McNemar on discordant matched shots",
+    "multiplicity": "Holm familywise correction across the two p080 primary contrasts at alpha=0.05",
+    "secondary": "All p050 contrasts, gamma=0.5 arms, BP20 controls, outcome transitions, typed work and runtime are descriptive with exact binomial intervals; no unadjusted directional claims.",
+    "rate_interval": "two-sided 95% Clopper-Pearson on every all-terminal denominator",
+    "no_outcome_dependent_stopping": true,
+    "no_cross_study_pooling": true,
+    "decision_rule": "A primary contrast is directional only with Holm-adjusted p <= 0.05 and matching observed sign. Otherwise inconclusive; no general decoder ranking follows from BB72 alone."
+  },
+  "sample_size_basis": {
+    "v1_p080_discordance": {"newly_valid": 20, "lost_valid": 4, "matched_shots": 512},
+    "planning_scenario": {"discordance_probability": 0.05, "absolute_failure_difference": 0.02},
+    "method": "exact binomial rejection region, binomial mixture over discordant count, conservative two-sided alpha=0.025 per primary contrast",
+    "p080_shots": 1280,
+    "scenario_power_approx": 0.818,
+    "qualification": "Sensitivity calculation, not a guaranteed effect or power for the unknown min-sum contrast. The v1 effect is not pooled with v2 inference."
+  },
+  "source_settings_view": [
+    {"id": "spa_bpsf", "status": "controlled_css_adaptation", "reason": "Canonical SPA messages and deterministic seeded test order differ from source min-sum parallel selection."},
+    {"id": "min_sum_bpsf", "status": "source_informed_kernel_adaptation", "reason": "Min-sum update is source-informed, but seeded serial first-valid selection and fixed BB72 CSS conditions remain different from the paper."},
+    {"id": "bravyi_bb72_bp_osd", "status": "not_reproduced", "reason": "The source BB72 experiment used circuit-level BP-OSD, not perfect-syndrome X-only CSS BP."}
+  ]
+}
