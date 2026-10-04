@@ -54,6 +54,8 @@
     "multiplicity": "Holm familywise adjustment over all non-reference family-by-rate contrasts",
     "alpha": 0.05,
     "rate_interval": "two-sided 95% Clopper-Pearson interval on all terminal samples",
+    "marginal_rate_halfwidth_target": 0.045,
+    "paired_effect_power_status": "No minimum detectable paired effect is guaranteed by 512 shots; nonsignificant contrasts remain inconclusive.",
     "decision_rule": "Report a directional difference only when adjusted p <= 0.05 and the observed difference has that direction; otherwise inconclusive. No decoder ranking follows from a single code or noise model."
   },
   "source_settings_view": [
