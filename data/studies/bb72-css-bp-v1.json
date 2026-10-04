@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "study_id": "bb72-css-bp-v1",
+  "status": "prespecified_before_study_sampling",
+  "question": "On the source-pinned [[72,12,6]] BB code under independent X-only code-capacity noise, how do compatible BP updates and two BP-internal interventions change unconditional valid-recovery probability and measured work under a shared edge-message cap?",
+  "claim_scope": "Controlled CSS adaptation on BB72; no Bravyi circuit-level, BPGD source-curve, or BP-SF source-curve reproduction claim.",
+  "artifact": {
+    "code_id": "bravyi-bb-72",
+    "path": "data/artifacts/bb72-css.json",
+    "raw_sha256": "8cb3af882fecf8d16ff3b84c2c69939cdafde122fd48ab0d87a7e113d4e91227",
+    "provenance_path": "data/artifacts/bb72-css.provenance.json",
+    "logical_basis_status": "project_derived; source-row equivalence not assessed",
+    "distance_status": "source_reported_6; not independently verified"
+  },
+  "channel": {
+    "kind": "independent_x_bit_flip_code_capacity",
+    "z_error_rate": 0.0,
+    "x_error_rates": [0.03, 0.05, 0.08]
+  },
+  "cohorts": {
+    "selection": {"shots_per_rate": 128, "sample_seed": 720301, "identity_prefix": "bb72-css-bp-v1-selection"},
+    "evaluation": {"shots_per_rate": 512, "sample_seed": 720302, "identity_prefix": "bb72-css-bp-v1-evaluation"}
+  },
+  "shared_work": {
+    "schedule": "flooding",
+    "max_bp_sweeps_per_shot": 40,
+    "max_check_to_variable_updates_per_shot": 8640,
+    "max_variable_to_check_updates_per_shot": 8640,
+    "edge_count": 216,
+    "denominator_rule": "all_terminal_shots",
+    "other_work": "Retain and report all typed non-message work, BP calls, wall time, and resource context separately; the edge cap is not equal total CPU cost."
+  },
+  "families": [
+    {"id": "spa", "kind": "binary_spa", "gamma": [1.0, 0.75, 0.5], "source_qualification": "canonical_baseline"},
+    {"id": "ms", "kind": "min_sum", "gamma": [1.0, 0.5], "source_qualification": "canonical_update_adaptation"},
+    {"id": "nms", "kind": "normalized_min_sum", "alpha": [0.7, 0.85], "gamma": [1.0, 0.5], "source_qualification": "canonical_update_adaptation"},
+    {"id": "oms", "kind": "offset_min_sum", "offset": [0.1, 0.2], "gamma": [1.0, 0.5], "source_qualification": "canonical_update_adaptation"},
+    {"id": "bpgd", "kind": "guided_decimation", "round_limit": 8, "sweeps_per_round": 5, "gamma": [1.0, 0.5], "source_qualification": "algorithm_interpretation_and_BB72_transplant"},
+    {"id": "bpsf", "kind": "syndrome_flip", "baseline_sweeps": 20, "attempt_sweeps": 5, "test_cap": 4, "top_k": 4, "max_weight": 1, "gamma": [1.0, 0.5], "source_qualification": "controlled_css_adaptation_and_BB72_transplant"}
+  ],
+  "selection_rule": {
+    "unit": "one decoder family across all three selection rates",
+    "primary_order": ["fewest_unconditional_failures_pooled_equal_weight_rates", "fewest_check_to_variable_updates_pooled", "lexicographic_configuration_id"],
+    "selected_for_evaluation": "one configuration per family plus fixed SPA gamma=1 reference",
+    "evaluation_blind_until_selection_lock": true
+  },
+  "assessment": {
+    "primary_endpoint": "unconditional_failure = any terminal outcome other than exact or stabilizer_equivalent",
+    "secondary_endpoints": ["logical_failure", "outcome_unavailable", "invalid_syndrome", "convergence", "BP sweeps", "typed work", "runtime"],
+    "fixed_shots_no_adaptive_stopping": true,
+    "reference": "spa_gamma_1",
+    "contrasts": "each selected family versus the fixed reference at each rate",
+    "paired_test": "two-sided exact McNemar via binomial test on discordant matched samples",
+    "multiplicity": "Holm familywise adjustment over all non-reference family-by-rate contrasts",
+    "alpha": 0.05,
+    "rate_interval": "two-sided 95% Clopper-Pearson interval on all terminal samples",
+    "decision_rule": "Report a directional difference only when adjusted p <= 0.05 and the observed difference has that direction; otherwise inconclusive. No decoder ranking follows from a single code or noise model."
+  },
+  "source_settings_view": [
+    {"id": "bravyi_bb72_bp_osd", "source": "Bravyi et al., arXiv:2308.07915 and sbravyi/BivariateBicycleCodes@fa77e333", "original_regime": "circuit_level", "bb72_css_status": "not_applicable_as_faithful_reproduction", "reason": "The pinned source uses circuit-level BP-OSD; this study has perfect-syndrome X-only CSS noise and BP-only arms."},
+    {"id": "yao_bpgd", "source": "Yao et al., arXiv:2312.10950v2, Algorithm 1 and B1 simulations", "original_regime": "B1_bit_flip_code_capacity", "bb72_css_status": "modified_settings_transplant", "reason": "The controlled BB72 arm uses T=5 and R=8 under the common cap; the B1 source reports T=10 or 100 and a larger decimation envelope."},
+    {"id": "gokduman_damping", "source": "Gokduman, Yao and Pfister, arXiv:2411.08177v2, Eq. 17", "original_regime": "erasure_code_capacity", "bb72_css_status": "equation_transplant_only", "reason": "The same V2C recurrence is used on an X-bit-flip channel with project-selected gamma values; published erasure-channel optimized gamma values are not imported."},
+    {"id": "bpsf", "source": "BP-SF, arXiv:2507.00254v1, Algorithm 1", "original_regime": "source_paper_codes_and_execution", "bb72_css_status": "controlled_css_adaptation", "reason": "Seeded stable test order and first-valid original-problem selection replace source unseeded parallel arrival semantics."}
+  ]
+}
