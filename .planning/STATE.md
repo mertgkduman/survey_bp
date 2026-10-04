@@ -168,6 +168,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261003-s2b | Prespecify, run, and publish the BB72 CSS BP comparison | 2026-10-04 | a23899c | Verified | [261003-s2b-prespecify-and-prepare-bb72-css-bp-decod](./quick/261003-s2b-prespecify-and-prepare-bb72-css-bp-decod/) |
 | 261002-mjc | Parallelize Phase 5 v2 arm verification before publication | 2026-10-02 | b26d0c2 | Verified | [261002-mjc-parallelize-phase-5-v2-arm-verification-](./quick/261002-mjc-parallelize-phase-5-v2-arm-verification-/) |
 | 261002-ldj | Pin and validate Bravyi BB72 CSS fixture | 2026-10-02 | 60679e4 | Verified | [261002-ldj-pin-and-validate-bravyi-bb72-css-fixture](./quick/261002-ldj-pin-and-validate-bravyi-bb72-css-fixture/) |
 | 260922-21z | Document Phase 1 ldpc SDK coverage and unblock UAT | 2026-09-22 | 4581389 | — | [260922-21z-document-phase-1-ldpc-sdk-coverage-and-u](./quick/260922-21z-document-phase-1-ldpc-sdk-coverage-and-u/) |
