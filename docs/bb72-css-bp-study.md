@@ -15,6 +15,18 @@ The frozen [study design](../data/studies/bb72-css-bp-v1.json) defines a small-c
 
 All arms use the same flooding schedule, numerical profile appropriate to the update rule, pinned BB72 artifact, bit-flip channel, all-terminal denominator, at most 40 BP sweeps per physical sample, and at most 8,640 messages per direction. BPGD and BP-SF may do extra branching, ranking, transforms, or checks. Their typed work and BP calls are therefore reported separately; the shared edge cap does **not** assert equal total CPU cost. Incompatible combinations fail public preflight.
 
+This first cohort deliberately isolates four executable message-update families before adding two distinct BP-internal interventions. The intervention contrasts are reported alongside, with their extra work exposed rather than hidden inside an iteration count. The following implemented or referenced algorithms have separate follow-up status:
+
+| Deferred family | Reason for a separate comparison |
+| --- | --- |
+| Relay-BP | Multi-leg state transfer and source min-sum controls need a distinct BB72 eligibility and total-work design. The completed Phase 4 mechanism pilots do not establish a BB72 source setting. |
+| Impulse | Current exact structural shortening is a controlled CSS adaptation; equivalence to the source's negative-infinite-LLR trajectory remains unverified. |
+| Freezing | The implemented binary control adapts a quaternary identity-probability procedure. |
+| Sign flip | The implemented sign-only arm requires NMS and omits source branch-assisted pruning; comparing it directly to SPA would confound the update rule and intervention. |
+| Restart Belief | BB72 distance six is source-reported but not independently certified for the exact-distance acceptance rule. |
+| BP-OSD / BP-LSD | These are optional postprocessing references with additional algebraic work. They require their own BP-only versus fallback comparison after the Phase 7 interface. |
+| Circuit decoders | Detector/observable evaluation and noisy extraction semantics belong to the circuit stages; perfect-syndrome CSS outcomes are not substitutes. |
+
 The damping recurrence is `m_next=(1−γ)m_previous_committed+γm_fresh`, reset at each new attempt. `γ=1` is the undamped control. The source [damping equation](https://arxiv.org/html/2411.08177v2#S4.SS2) was studied on erasures; these bit-flip applications are adaptations. [Yao *et al.*](https://arxiv.org/html/2312.10950v2) studied BPGD on B1 at different sweep and round settings. [BP-SF](https://arxiv.org/html/2507.00254v1) uses different parallel selection behavior. The [Bravyi source repository](https://github.com/sbravyi/BivariateBicycleCodes/tree/fa77e3333d3ec44c79d8f914dd24c040d1da471b) uses circuit-level BP-OSD for its original experiment. `source_settings_view` records these distinctions beside the controlled results; it is not a second set of faithful BB72 CSS curves.
 
 ## Sampling and assessment
