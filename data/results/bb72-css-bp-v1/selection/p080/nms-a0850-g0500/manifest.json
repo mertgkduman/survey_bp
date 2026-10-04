@@ -1,0 +1,197 @@
+{
+  "artifact": {
+    "code_id": "bravyi-bb-72",
+    "format_version": 1,
+    "matrix_hashes": {
+      "hx_raw_sha256": "e8c3d3aec1d494845428b674ab29b24ce8f1b0e418989cdfc2a66de4c3f636ab",
+      "hx_semantic_sha256": "7838e1a8acde1a614b807294784655928a4ed8602a97b73dfcb323a56dd10bd5",
+      "hz_raw_sha256": "d8a0bdd27e92c2523770b88d830cd9955a39029d59045e0029ceb75a1d1a1330",
+      "hz_semantic_sha256": "c2704a3b0bd2c1f33a2a269a696b1eab691b124d1e1dd6b13e200a1512855b00",
+      "lx_raw_sha256": "8b7d0e929f19621c939dc076d4b47078f652ae92f63327002b6c80ee7b397ef2",
+      "lx_semantic_sha256": "71d4a25f92fdbab039fcb29efb27a3607f7ac7bece3bf57a5a8811338505d219",
+      "lz_raw_sha256": "08d566a4284e0dadcdddbcf8d621a5cdef595f3773b4e6e5a1d345aed6186037",
+      "lz_semantic_sha256": "d2b025de64e9a5f6d5ed92d16fdbbb13ff7a950623e6f407f64a8e051720fcb1"
+    },
+    "path": "bb72-css.json",
+    "raw_sha256": "8cb3af882fecf8d16ff3b84c2c69939cdafde122fd48ab0d87a7e113d4e91227",
+    "root": "data/artifacts",
+    "semantic_sha256": "ff81d1e31a0fd2bb5a7ecc980298fdbaf2a65fe70a806e8a20764d047ce94aad"
+  },
+  "budgets": {
+    "attempt": {
+      "max_iterations": 40,
+      "work_limits": {
+        "belief_assemblies": 8640,
+        "bp_calls": 32,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 8640,
+        "check_to_variable_updates": 8640,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 10000,
+        "variable_to_check_updates": 8640
+      }
+    },
+    "denominator_rule": "all_terminal_shots",
+    "max_shots": 128,
+    "search": {
+      "max_iterations": 40,
+      "work_limits": {
+        "belief_assemblies": 8640,
+        "bp_calls": 32,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 8640,
+        "check_to_variable_updates": 8640,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 10000,
+        "variable_to_check_updates": 8640
+      }
+    },
+    "shot": {
+      "max_iterations": 40,
+      "work_limits": {
+        "belief_assemblies": 8640,
+        "bp_calls": 32,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 8640,
+        "check_to_variable_updates": 8640,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 10000,
+        "variable_to_check_updates": 8640
+      }
+    }
+  },
+  "environment": {
+    "backend": "cpu",
+    "numpy": "2.2.6",
+    "omp_num_threads": 1,
+    "python": "3.12.2",
+    "scipy": "1.17.1"
+  },
+  "error_rate": 0.08,
+  "evidence": {
+    "assessment_status": "not_assessed",
+    "discrepancies": [
+      "BB72 X-only code-capacity execution is not the Bravyi circuit-level BP-OSD experiment.",
+      "Source-defined interventions and damping are controlled BB72 adaptations, not source-curve reproductions."
+    ],
+    "fixture": "development_fixture",
+    "procedure": "BB72 controlled CSS comparison; selection; p080; nms-a0850-g0500; frozen design sha256:b3e89645bde5061fb309474db574e88218345a8cd0e4008b81d405e29127cbdd",
+    "relation": "canonical_implemented",
+    "sources": [
+      "Bravyi et al. arXiv:2308.07915; pinned BB72 construction",
+      "Gokduman et al. arXiv:2411.08177v2 Eq. 17"
+    ]
+  },
+  "memory": {
+    "bindings": [
+      {
+        "advance_boundary": "source_iteration",
+        "binding_id": "v2c-damping",
+        "history_owner": "attempt:v2c-damping",
+        "kind": "v2c_damping",
+        "order": 0,
+        "parameters": {
+          "gamma": 0.5
+        },
+        "refresh_boundary": "attempt_start",
+        "retain_history": false,
+        "source_status": "canonical_adaptation",
+        "state_lifetime": "attempt",
+        "target": "v2c"
+      }
+    ]
+  },
+  "numerical_profile": "cpu-float64-min-sum-v1",
+  "policies": {
+    "intervention": {
+      "binding_id": "intervention-identity-v1",
+      "kind": "identity",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "search"
+    },
+    "postprocessing": {
+      "binding_id": "postprocessing-identity-v1",
+      "kind": "identity",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "attempt"
+    },
+    "schedule": {
+      "binding_id": "schedule-flooding-v1",
+      "kind": "flooding",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "iteration"
+    },
+    "selection": {
+      "binding_id": "selection-stable-first-v1",
+      "kind": "stable_first",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "attempt"
+    },
+    "state_memory": {
+      "binding_id": "state-memory-stateless-v1",
+      "kind": "stateless",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "attempt"
+    },
+    "stopping": {
+      "binding_id": "stopping-syndrome-budget-v1",
+      "kind": "syndrome_or_budget",
+      "owned_state": [],
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "iteration"
+    },
+    "update": {
+      "binding_id": "update-normalized-min-sum-v1",
+      "kind": "normalized_min_sum",
+      "owned_state": [],
+      "parameter_assignment": {
+        "shape": "scalar",
+        "value": 0.85
+      },
+      "provides": [],
+      "requires": [],
+      "state_lifetime": "message"
+    }
+  },
+  "profile_plan": {
+    "cohort": "clean",
+    "enabled": true,
+    "level": "low_overhead",
+    "selected_before_outcome": true
+  },
+  "randomness": {
+    "decoder_seed_identity": "bb72-css-bp-v1-selection-p080-decoder",
+    "physical_sample_identity": "bb72-css-bp-v1-selection-p080",
+    "sample_derivation": "sha256-manifest-shot-v1",
+    "sample_seed": 720301
+  },
+  "run_id": "bb72-css-bp-v1-selection-p080-nms-a0850-g0500",
+  "schema_version": 4,
+  "trace_plan": {
+    "label": "development_default",
+    "level": "off",
+    "max_bytes": 0,
+    "max_records": 0,
+    "relative_dir": "trace-sidecars"
+  }
+}
