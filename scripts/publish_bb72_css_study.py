@@ -66,7 +66,12 @@ def publish() -> str:
     staged = set(_git("diff", "--cached", "--name-only").splitlines())
     if staged != set(relative_paths):
         raise ValueError("staged publication paths differ from the verified file set")
-    subprocess.run(["git", "diff", "--cached", "--check"], cwd=ROOT, check=True)
+    # Plotly embeds upstream JavaScript with trailing spaces in the offline HTML.
+    # Its package digest protects the generated file; check the remaining files.
+    subprocess.run([
+        "git", "diff", "--cached", "--check", "--", ".",
+        ":(exclude)data/results/bb72-css-bp-v1/study.html",
+    ], cwd=ROOT, check=True)
     subprocess.run(["git", "commit", "-m", "Publish verified BB72 CSS BP study v1"], cwd=ROOT, check=True)
     subprocess.run(["git", "push", REMOTE, f"HEAD:{BRANCH}"], cwd=ROOT, check=True)
     return _git("rev-parse", "HEAD")
