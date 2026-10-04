@@ -1071,6 +1071,7 @@ def validate_phase5_shot(
         max_iterations=context.max_iterations, owner_identity=identity,
         wall_clock=wall_clock,
         damping_gamma=damping_gamma,
+        update_kind=parsed.policies.update.kind,
     )
     outcome = finalize_phase5_deadline(outcome, wall_clock)
     if runtime_rows and (wall_clock is None or wall_clock.first_termination is None
@@ -1118,7 +1119,24 @@ def validate_phase5_shot(
         raise CanonicalStructuralVerificationError("Phase 5 event count differs from deterministic replay")
     for index, (event, (kind, payload)) in enumerate(zip(stream, expected)):
         data = event.get("data", {})
-        if event.get("kind") != kind or data.get("identity") != identity_data or data.get("payload") != payload:
+        actual_payload = data.get("payload")
+        if kind == "termination" and isinstance(actual_payload, Mapping) and "decode_runtime" in actual_payload:
+            evidence = actual_payload["decode_runtime"]
+            try:
+                if not isinstance(evidence, Mapping) or set(evidence) != {
+                    "value", "method", "scope", "unit", "precision", "unavailable_reason"
+                }:
+                    raise ValueError("invalid intervention runtime fields")
+                measured = Measurement(**evidence)
+                if (type(measured.value) is not int or measured.value < 0
+                        or measured.method != "time.perf_counter_ns:phase5-controller:v1"
+                        or measured.scope != "canonical_intervention_controller"
+                        or measured.unit != "ns" or measured.precision != "1 ns"):
+                    raise ValueError("invalid intervention runtime measurement")
+            except (TypeError, ValueError) as error:
+                raise CanonicalStructuralVerificationError("Phase 5 decode runtime is invalid") from error
+            actual_payload = {key: value for key, value in actual_payload.items() if key != "decode_runtime"}
+        if event.get("kind") != kind or data.get("identity") != identity_data or actual_payload != payload:
             raise CanonicalStructuralVerificationError(f"Phase 5 event {index} differs from deterministic replay")
         if kind == "shot_begin":
             if data.get("schema_version") != 5 or data.get("compact_schema_version") != parsed.schema_version or event.get("sample_seed_identity") != context.sample_seed_identity:

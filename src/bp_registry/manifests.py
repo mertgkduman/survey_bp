@@ -454,9 +454,12 @@ class CanonicalExperimentV5(CanonicalExperimentV4):
             raise ValueError("public intervention policy and control kind disagree")
         if self.policies.schedule.kind != "flooding" or self.policies.state_memory.kind != "identity":
             raise ValueError("Phase 5 public intervention requires flooding and identity state memory")
-        expected_update = "normalized_min_sum" if self.intervention.kind == "sign_flip" else "binary_spa"
-        expected_profile = "cpu-float64-min-sum-v1" if expected_update == "normalized_min_sum" else "cpu-float64-spa-v1"
-        if self.policies.update.kind != expected_update or self.numerical_profile != expected_profile:
+        allowed_updates = ({"binary_spa", "min_sum"} if self.intervention.kind == "syndrome_flip"
+                           else {"normalized_min_sum"} if self.intervention.kind == "sign_flip"
+                           else {"binary_spa"})
+        expected_profile = ("cpu-float64-spa-v1" if self.policies.update.kind == "binary_spa"
+                            else "cpu-float64-min-sum-v1")
+        if self.policies.update.kind not in allowed_updates or self.numerical_profile != expected_profile:
             raise ValueError("public intervention update and numerical profile are incompatible")
         if self.intervention.kind == "sign_flip":
             assignment = self.policies.update.parameter_assignment

@@ -299,7 +299,55 @@ def test_phase5_public_execution_and_replay_each_small_arm(tmp_path, kind):
     events = read_canonical_events(output / "events.jsonl")
     assert all(row["ledger_version"] == 5 for row in events)
     assert events[1]["data"]["identity"]["intervention_kind"] == kind
+    runtime = events[-1]["data"]["payload"]["decode_runtime"]
+    assert runtime["value"] >= 0
+    assert runtime["method"] == "time.perf_counter_ns:phase5-controller:v1"
     assert verify_canonical_shot(manifest_path, output, shot_id=0)["termination"] == events[-1]["termination"]
+
+
+def test_syndrome_flip_min_sum_public_kernel_and_runtime_replay(tmp_path):
+    from bp_registry.cli import run_canonical, verify_canonical_shot
+    from bp_registry.ledger import _canonical_event_id, read_canonical_events
+    from bp_registry.manifests import preflight
+
+    manifest = _public_v5("syndrome_flip")
+    manifest["numerical_profile"] = "cpu-float64-min-sum-v1"
+    manifest["policies"]["update"].update(kind="min_sum", binding_id="update-min-sum-v1")
+    assert preflight(manifest).manifest.policies.update.kind == "min_sum"
+    path = tmp_path / "manifest.json"
+    path.write_text(json.dumps(manifest), encoding="utf-8")
+    output = tmp_path / "output"
+    run_canonical(path, output, shot_id=0)
+    assert verify_canonical_shot(path, output, shot_id=0)["shot_id"] == 0
+    ledger = output / "events.jsonl"
+    events = read_canonical_events(ledger)
+    assert events[-1]["data"]["payload"]["decode_runtime"]["scope"] == "canonical_intervention_controller"
+
+    # Historical intervention ledgers have no timing measurement and remain replayable.
+    events[-1]["data"]["payload"].pop("decode_runtime")
+    events[-1]["event_id"] = _canonical_event_id(events[-1])
+    ledger.write_text("".join(json.dumps(event, sort_keys=True, separators=(",", ":")) + "\n" for event in events))
+    assert verify_canonical_shot(path, output, shot_id=0)["shot_id"] == 0
+
+    # A rehashed observational field cannot masquerade as a valid measurement.
+    events[-1]["data"]["payload"]["decode_runtime"] = {
+        "value": -1, "method": "time.perf_counter_ns:phase5-controller:v1",
+        "scope": "canonical_intervention_controller", "unit": "ns", "precision": "1 ns",
+        "unavailable_reason": None,
+    }
+    events[-1]["event_id"] = _canonical_event_id(events[-1])
+    ledger.write_text("".join(json.dumps(event, sort_keys=True, separators=(",", ":")) + "\n" for event in events))
+    with pytest.raises(ValueError, match="runtime"):
+        verify_canonical_shot(path, output, shot_id=0)
+
+
+def test_syndrome_flip_min_sum_requires_compatible_profile():
+    from bp_registry.manifests import parse_manifest
+
+    manifest = _public_v5("syndrome_flip")
+    manifest["policies"]["update"].update(kind="min_sum", binding_id="update-min-sum-v1")
+    with pytest.raises(ValueError, match="profile"):
+        parse_manifest(manifest)
 
 
 @pytest.mark.parametrize("kind", ["identity", "guided_decimation", "impulse", "freezing", "syndrome_flip", "sign_flip", "restart_belief"])

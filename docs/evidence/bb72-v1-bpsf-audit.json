@@ -1,0 +1,115 @@
+{
+  "design_sha256": "b3e89645bde5061fb309474db574e88218345a8cd0e4008b81d405e29127cbdd",
+  "rates": {
+    "p030": {
+      "gained_bp_calls": {
+        "2": 6,
+        "4": 1
+      },
+      "gained_intervention_actions": {
+        "1": 6,
+        "3": 1
+      },
+      "gained_termination_pairs": {
+        "completed=>syndrome_flip_valid": 2,
+        "max_iterations=>syndrome_flip_valid": 5
+      },
+      "lost_valid": 1,
+      "matched_shots": 512,
+      "newly_valid": 7,
+      "outcome_transitions": {
+        "exact=>exact": 485,
+        "exact=>logical_failure": 1,
+        "logical_failure=>exact": 2,
+        "logical_failure=>logical_failure": 13,
+        "unavailable=>exact": 2,
+        "unavailable=>logical_failure": 5,
+        "unavailable=>stabilizer_equivalent": 3,
+        "unavailable=>unavailable": 1
+      },
+      "reported_holm_adjusted_p": 0.7734375,
+      "runtime_available_shots": {
+        "bpsf": 0,
+        "spa": 512
+      }
+    },
+    "p050": {
+      "gained_bp_calls": {
+        "2": 10,
+        "3": 3,
+        "4": 1,
+        "5": 1
+      },
+      "gained_intervention_actions": {
+        "1": 10,
+        "2": 3,
+        "3": 1,
+        "4": 1
+      },
+      "gained_termination_pairs": {
+        "completed=>syndrome_flip_valid": 2,
+        "max_iterations=>syndrome_flip_valid": 13
+      },
+      "lost_valid": 3,
+      "matched_shots": 512,
+      "newly_valid": 15,
+      "outcome_transitions": {
+        "exact=>exact": 405,
+        "exact=>logical_failure": 3,
+        "exact=>stabilizer_equivalent": 1,
+        "logical_failure=>exact": 2,
+        "logical_failure=>logical_failure": 50,
+        "logical_failure=>unavailable": 1,
+        "stabilizer_equivalent=>exact": 1,
+        "stabilizer_equivalent=>stabilizer_equivalent": 5,
+        "unavailable=>exact": 10,
+        "unavailable=>logical_failure": 16,
+        "unavailable=>stabilizer_equivalent": 3,
+        "unavailable=>unavailable": 15
+      },
+      "reported_holm_adjusted_p": 0.128143310546875,
+      "runtime_available_shots": {
+        "bpsf": 0,
+        "spa": 512
+      }
+    },
+    "p080": {
+      "gained_bp_calls": {
+        "2": 14,
+        "3": 4,
+        "4": 2
+      },
+      "gained_intervention_actions": {
+        "1": 14,
+        "2": 4,
+        "3": 2
+      },
+      "gained_termination_pairs": {
+        "completed=>syndrome_flip_valid": 2,
+        "max_iterations=>syndrome_flip_valid": 18
+      },
+      "lost_valid": 4,
+      "matched_shots": 512,
+      "newly_valid": 20,
+      "outcome_transitions": {
+        "exact=>exact": 233,
+        "exact=>logical_failure": 4,
+        "logical_failure=>exact": 2,
+        "logical_failure=>logical_failure": 90,
+        "logical_failure=>unavailable": 1,
+        "stabilizer_equivalent=>stabilizer_equivalent": 7,
+        "unavailable=>exact": 12,
+        "unavailable=>logical_failure": 52,
+        "unavailable=>stabilizer_equivalent": 6,
+        "unavailable=>unavailable": 105
+      },
+      "reported_holm_adjusted_p": 0.027789831161499023,
+      "runtime_available_shots": {
+        "bpsf": 0,
+        "spa": 512
+      }
+    }
+  },
+  "schema_version": 1,
+  "study_id": "bb72-css-bp-v1"
+}

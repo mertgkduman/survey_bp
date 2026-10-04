@@ -7,6 +7,7 @@ from hashlib import sha256
 import json
 from pathlib import Path
 import time
+from time import perf_counter_ns as _performance_clock_ns
 from types import MappingProxyType
 from typing import Any, Callable, Mapping, Sequence
 
@@ -963,13 +964,20 @@ def _run_phase5_structural_shot(
                 wall_clock = None if cap is None else WallClockLimit(int(cap * 1_000_000_000), clock=time.monotonic_ns)
                 if wall_clock is not None:
                     wall_clock.check("attempt_start", scope="attempt")
+                decode_started_ns = _performance_clock_ns()
                 outcome = execute_phase5_controller(
                     spec, original, error_rate=parsed.error_rate, budgets=budgets,
                     max_iterations=parsed.max_iterations, owner_identity=identity,
                     wall_clock=wall_clock,
                     damping_gamma=damping_gamma,
+                    update_kind=parsed.policies.update.kind,
                 )
                 outcome = finalize_phase5_deadline(outcome, wall_clock)
+                decode_runtime = Measurement.observed(
+                    max(0, _performance_clock_ns() - decode_started_ns),
+                    method="time.perf_counter_ns:phase5-controller:v1",
+                    scope="canonical_intervention_controller", unit="ns", precision="1 ns",
+                )
                 candidate = None if outcome.candidate is None else np.asarray(outcome.candidate, dtype=np.uint8)
                 if candidate is not None and (candidate.shape != (validated.hz.shape[1],)
                                               or not np.array_equal((validated.hz @ candidate) % 2, observation.syndrome)):
@@ -986,6 +994,7 @@ def _run_phase5_structural_shot(
                     "logical_action_agrees": None if assessment is None else assessment.logical_action_agrees,
                     "work_vector": outcome.work.as_evidence(structural_event_version=4),
                     "termination": outcome.termination,
+                    "decode_runtime": decode_runtime.as_evidence(),
                 }
                 ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="intervention",
                              data={"identity": identity_data, "payload": outcome.header})

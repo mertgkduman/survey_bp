@@ -1010,9 +1010,12 @@ class CanonicalManifestV6(_Strict):
                 or self.policies.intervention.kind != self.intervention.kind
                 or self.policies.state_memory.kind != "identity"):
             raise ValueError("Phase 5 interventions require flooding, identity state memory, and a matching policy")
-        expected_update = "normalized_min_sum" if self.intervention.kind == "sign_flip" else "binary_spa"
-        expected_profile = "cpu-float64-min-sum-v1" if expected_update == "normalized_min_sum" else "cpu-float64-spa-v1"
-        if self.policies.update.kind != expected_update or self.numerical_profile != expected_profile:
+        allowed_updates = ({"binary_spa", "min_sum"} if self.intervention.kind == "syndrome_flip"
+                           else {"normalized_min_sum"} if self.intervention.kind == "sign_flip"
+                           else {"binary_spa"})
+        expected_profile = ("cpu-float64-spa-v1" if self.policies.update.kind == "binary_spa"
+                            else "cpu-float64-min-sum-v1")
+        if self.policies.update.kind not in allowed_updates or self.numerical_profile != expected_profile:
             raise ValueError("intervention kernel/profile combination is unsupported")
         if self.intervention.kind == "guided_decimation" and self.intervention.sweeps_per_round > self.max_iterations:
             raise ValueError("guided sweeps_per_round exceeds the declared per-round max_iterations")

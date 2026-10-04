@@ -446,6 +446,7 @@ class SyndromeFlipController:
         self, original: OriginalProblem, *, error_rate: float, budgets: BudgetTree,
         wall_clock: WallClockLimit | None = None,
         damping_gamma: float | None = None,
+        kernel: BinarySpaKernel | None = None,
     ) -> SyndromeFlipResult:
         root = _owner("syndrome-flip", original, self.spec.root_seed, error_rate)
         n = original.hz.shape[1]
@@ -453,6 +454,7 @@ class SyndromeFlipController:
         baseline = BpSession(
             EdgeTable.from_check_matrix(original.hz), original.syndrome,
             error_rate=error_rate, owner_identity=root + ":baseline", damping_gamma=damping_gamma,
+            kernel=kernel,
         )
         counts = np.zeros(n, dtype=np.int64)
         # BP-SF Algorithm 1 initializes the prior hard decision to the all-zero
@@ -550,6 +552,7 @@ class SyndromeFlipController:
                     session = BpSession(
                         EdgeTable.from_check_matrix(working.check_matrix), working.syndrome,
                         error_rate=error_rate, owner_identity=owner, damping_gamma=damping_gamma,
+                        kernel=kernel,
                     )
                     initial = session.state.digest
                     sweep_leaves: list[str] = []

@@ -13,13 +13,16 @@ from .contracts import Phase5InterventionContract
 from .guided_decimation import GuidedDecimationController
 from .impulse import ImpulseController, ImpulseSpec
 from .intervention_session import BpSession
+from .kernel import BinarySpaKernel
 from .interventions import (
     FreezingController, FreezingSpec, SignFlipController, SignFlipSpec,
     SyndromeFlipController, SyndromeFlipSpec,
 )
 from .problems import OriginalProblem
+from .numerics import MIN_SUM_CPU_F64
 from .restarting import RestartController, RestartSpec
 from .schedules import EdgeTable
+from .updates import MinSumUpdate
 
 
 @dataclass(frozen=True, slots=True)
@@ -169,8 +172,13 @@ def execute_phase5_controller(
     *, error_rate: float, budgets: BudgetTree, max_iterations: int,
     owner_identity: str, wall_clock: WallClockLimit | None = None,
     damping_gamma: float | None = None,
+    update_kind: str = "binary_spa",
 ) -> Phase5Outcome:
     """Dispatch one declared family; no controller receives physical or logical truth."""
+    if (update_kind != "binary_spa"
+            and not (spec.kind == "syndrome_flip" and update_kind == "min_sum")
+            and not (spec.kind == "sign_flip" and update_kind == "normalized_min_sum")):
+        raise ValueError("intervention update rule is unsupported")
     if spec.kind == "identity":
         return _identity_baseline(original, error_rate, budgets, max_iterations, owner_identity, wall_clock, damping_gamma)
     if spec.kind == "guided_decimation":
@@ -200,11 +208,14 @@ def execute_phase5_controller(
         )).run(original, error_rate=error_rate, budgets=budgets, wall_clock=wall_clock, damping_gamma=damping_gamma)
         return _project(result, rows_field="trials", candidate_field="selected_candidate")
     if spec.kind == "syndrome_flip":
+        kernel = (BinarySpaKernel(profile=MIN_SUM_CPU_F64, update_rule=MinSumUpdate())
+                  if update_kind == "min_sum" else None)
         result = SyndromeFlipController(SyndromeFlipSpec(
             baseline_sweeps=spec.baseline_sweeps, attempt_sweeps=spec.attempt_sweeps,
             top_k=spec.top_k, max_weight=spec.max_weight, test_cap=spec.test_cap,
             root_seed=spec.root_seed,
-        )).run(original, error_rate=error_rate, budgets=budgets, wall_clock=wall_clock, damping_gamma=damping_gamma)
+        )).run(original, error_rate=error_rate, budgets=budgets, wall_clock=wall_clock,
+               damping_gamma=damping_gamma, kernel=kernel)
         return _project(result, rows_field="tests", candidate_field="selected_candidate", origin_field="selected_test_order")
     if spec.kind == "sign_flip":
         result = SignFlipController(SignFlipSpec(
