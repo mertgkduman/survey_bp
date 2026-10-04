@@ -1,19 +1,19 @@
 ---
 gsd_state_version: "1.0"
 milestone: v1.0
-current_phase: 05
-current_phase_name: Guided and Perturbative BP Interventions
+current_phase: 6
+current_phase_name: Beam Search, Ensembles, and Candidate Selection
 current_plan: 14
 status: executing
 stopped_at: Completed 05-10-PLAN.md and 05-12-PLAN.md; B1 calibration sealed before evaluation
-last_updated: "2026-09-30T22:39:45.432Z"
+last_updated: "2026-10-04T07:41:32.047Z"
 last_activity: 2026-09-30
-last_activity_desc: Completed Phase 05 Plan 10 B1 calibration and objective cap freeze
-state_head: 844104cbcd316e75f2418888d6f8974c19811a9c
+last_activity_desc: Phase 6 planning complete — 10 plans ready
+state_head: 3e9771c5dd0b34ea0665a2c66347eca5c5006ac6
 progress:
   total_phases: 14
   completed_phases: 4
-  total_plans: 71
+  total_plans: 81
   completed_plans: 64
 ---
 
@@ -28,14 +28,14 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 
 ## Current Position
 
-Phase: 05 (Guided and Perturbative BP Interventions) — IN PROGRESS
+Phase: 6 (Beam Search, Ensembles, and Candidate Selection) — READY TO EXECUTE
 Plan: 14 of 14
 Total Phases: 14
 Current Plan: 14
-Total Plans in Phase: 14
+Total Plans in Phase: 10
 Status: Ready to execute
 Last activity: 2026-09-30 — Completed Phase 05 Plan 10
-Last Activity Description: Phase 05 has 11 of 14 plans complete; the B1 calibration and cap freeze passed self-audit
+Last Activity Description: Phase 6 planning complete — 10 plans ready
 
 Progress: [███░░░░░░░] 29%
 
