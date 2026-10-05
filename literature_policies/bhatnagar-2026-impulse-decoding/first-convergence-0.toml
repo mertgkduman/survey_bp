@@ -57,6 +57,7 @@ v2c_clip = 25.0
 baseline_sweeps = 100
 attempt_sweeps = 100
 attempt_cap = "code_block_length"
+coordinate_order = "index_ascending"
 
 [stopping]
 kind = "syndrome_or_budget"

@@ -35,4 +35,4 @@ For a compatible schema-v5 CSS study, the same public command computes or verifi
 bp-registry path/to/study.json --decoder literature_policies/bhatnagar-2026-impulse-decoding/first-convergence-0.toml --results-root path/to/results
 ```
 
-The study must pin the code artifact, physical sample identity, iteration and work budgets. The symbolic one-attempt-per-coordinate cap resolves to the validated artifact block length before execution and cache identity are formed. The policy records flooding and a finite magnitude-25 forced LLR as declared interpretations; the paper's message schedule and exact infinity realization are unresolved.
+The study must pin the code artifact, physical sample identity, iteration and work budgets. The symbolic one-attempt-per-coordinate cap and ascending coordinate order resolve from the validated artifact block length before execution and cache identity are formed. The policy records flooding and a finite magnitude-25 forced LLR as declared interpretations; the paper's message schedule and exact infinity realization are unresolved.

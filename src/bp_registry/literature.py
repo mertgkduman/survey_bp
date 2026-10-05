@@ -101,7 +101,8 @@ class LiteraturePolicy:
         intervention = self.executable.get("intervention")
         return bool(isinstance(intervention, Mapping)
                     and (intervention.get("round_limit") == _CODE_BLOCK_LENGTH
-                         or intervention.get("attempt_cap") == _CODE_BLOCK_LENGTH))
+                         or intervention.get("attempt_cap") == _CODE_BLOCK_LENGTH
+                         or intervention.get("coordinate_order") == "index_ascending"))
 
     def decoder_projection(self, *, code_block_length: int | None = None) -> dict[str, Any]:
         """Return a fresh canonical-decoder object for the study compiler."""
@@ -167,6 +168,13 @@ def _resolve_symbolic_controls(
         if type(code_block_length) is not int or code_block_length < 1:
             raise ValueError("literature code block length must be a validated positive integer")
         intervention[field] = code_block_length
+    coordinate_order = intervention.get("coordinate_order")
+    if isinstance(coordinate_order, str):
+        if coordinate_order != "index_ascending" or intervention.get("kind") != "impulse":
+            raise ValueError("unsupported symbolic literature coordinate order")
+        if type(code_block_length) is not int or code_block_length < 1:
+            raise ValueError("literature code block length must be a validated positive integer")
+        intervention["coordinate_order"] = list(range(code_block_length))
     return resolved
 
 
@@ -191,6 +199,9 @@ def _validate_symbolic_runnable_controls(executable: Mapping[str, Any]) -> None:
         value = intervention.get(field)
         if isinstance(value, str) and (value != _CODE_BLOCK_LENGTH or intervention.get("kind") != kind):
             raise ValueError("unsupported symbolic literature control")
+    order = intervention.get("coordinate_order")
+    if isinstance(order, str) and (order != "index_ascending" or intervention.get("kind") != "impulse"):
+        raise ValueError("unsupported symbolic literature coordinate order")
 
 
 def parse_literature_policy(path: str | Path) -> LiteraturePolicy:
@@ -389,6 +400,7 @@ def _bhatnagar_executable(*, forced_value: int, selection: str, attempt_cap: int
             "baseline_sweeps": 100,
             "attempt_sweeps": 100,
             "attempt_cap": attempt_cap,
+            "coordinate_order": "index_ascending" if isinstance(attempt_cap, str) else list(range(attempt_cap)),
         },
         "stopping": {"kind": "syndrome_or_budget", "max_iterations": 100},
         # The source selector is internal to the intervention controller.

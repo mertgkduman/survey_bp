@@ -259,6 +259,7 @@ def test_bhatnagar_source_variants_have_distinct_closed_controls() -> None:
         assert control["selection"] == selection
         assert control["baseline_sweeps"] == control["attempt_sweeps"] == 100
         assert control["attempt_cap"] == 3
+        assert control["coordinate_order"] == [0, 1, 2]
         assert control["v2c_clip"] == 25.0
         assert control["reset_rule"] == "fresh_per_coordinate"
         assert "source_schedule_unspecified" in row.unresolved
@@ -289,6 +290,7 @@ def test_bhatnagar_first_convergence_0_runnable_public_reuse(tmp_path: Path, mon
     policy = folder / "first-convergence-0.toml"
     parsed = parse_literature_policy(policy)
     assert parsed.decoder_projection(code_block_length=3)["intervention"]["forced_value"] == 0
+    assert parsed.decoder_projection(code_block_length=3)["intervention"]["coordinate_order"] == [0, 1, 2]
     study = _phase5_study(tmp_path)
     document = json.loads(study.read_text())
     document["run_id"] = "bhatnagar-impulse-three-qubit"
@@ -301,6 +303,7 @@ def test_bhatnagar_first_convergence_0_runnable_public_reuse(tmp_path: Path, mon
     manifest = json.loads((Path(first["output"]) / "manifest.json").read_text())
     assert manifest["intervention"]["forced_value"] == 0
     assert manifest["intervention"]["attempt_cap"] == 3
+    assert manifest["intervention"]["coordinate_order"] == [0, 1, 2]
     assert manifest["intervention"]["v2c_clip"] == 25.0
     assert manifest["intervention"]["reset_rule"] == "fresh_per_coordinate"
     assert first["result"]["assessment_status"] == "not_assessed"

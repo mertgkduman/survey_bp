@@ -29,7 +29,7 @@ status: complete
 
 All three requested [Bhatnagar et al.](https://arxiv.org/html/2606.18240v1) names now have exact typed translations: `Minimum_Weight/1`, `First_Convergence/0`, and `First_Convergence/1`. Their source records remain non-runnable and retain the source experiment identity gap. The first-convergence force-zero variant has a separate runnable TOML policy at the paper root.
 
-The runnable policy declares 100 sweeps for baseline and each fresh coordinate, V2C clip 25, original-syndrome validation, and a symbolic one-attempt-per-coordinate cap resolved after artifact validation. Its paper notes distinguish the unspecified message schedule and finite realization of an infinite forced prior. The common command computes and then verifies/reuses a bounded three-qubit fixture. That fixture frequently succeeds at baseline, so the direct impulse kernel tests supply the forced-attempt and replay evidence; the fixture is not a paper curve assessment.
+The runnable policy declares 100 sweeps for baseline and each fresh coordinate, V2C clip 25, original-syndrome validation, and symbolic ascending coordinate order and one-attempt-per-coordinate cap resolved after artifact validation. Its paper notes distinguish the unspecified message schedule and finite realization of an infinite forced prior. The common command computes and then verifies/reuses a bounded three-qubit fixture. That fixture frequently succeeds at baseline, so the direct impulse kernel tests supply the forced-attempt and replay evidence; the fixture is not a paper curve assessment.
 
 ## Verification
 
