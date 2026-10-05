@@ -10,6 +10,8 @@ This directory collects source-grounded descriptions of BP-family decoders befor
 
 The first CSS gate has three papers: [Yao BPGD](./yao-2024-guided-decimation/paper_reproduction/PAPER.md), [Bhatnagar impulse](./bhatnagar-2026-impulse-decoding/paper_reproduction/PAPER.md), and [Rabeti–Mahdavifar MBBP-LD](./rabeti-2026-multiple-bases-bp-list-decoding/paper_reproduction/PAPER.md). Their 14 `.spec.toml` source records remain non-runnable. Qualified canonical adaptations are separate paper-root `.toml` files. The common parser keeps equations, references, and explanations as provenance while compiling only registered policy controls. A runnable adaptation is still `not_assessed` against the published curve.
 
+The [14-record qualification inventory](./qualification-v1.json) names each source revision, blocker, compiler disposition, and runnable counterpart. The selected [Yao T=100 R=2](./yao-2024-guided-decimation/bpgd-t100-r002.toml), [Bhatnagar First_Convergence/0](./bhatnagar-2026-impulse-decoding/first-convergence-0.toml), and [Rabeti MBBP-LD pilot](./rabeti-2026-multiple-bases-bp-list-decoding/mbbp-ld.toml) use the same [bounded B1 study and command](../docs/css-literature-gate.md). Other source records remain specifications until their exact runnable mapping is qualified.
+
 ```text
 literature_policies/<paper-id>/
   <decoder-a>.toml

@@ -1,0 +1,28 @@
+{
+  "entries": {
+    "bhatnagar": {
+      "cache_key": "0f1c2fd3815f18bd03d0620ea7ed7f88cd6b0abcc22e8ee350548b6933e79ba3",
+      "ledger_sha256": "67082443bbe29c35c886da6ac5698829a6fd471666fa62f515a7931ddc33a0f8",
+      "result_sha256": "a8dd38f7be833cde0b46135b467ef7dc374a9ce2d30efe90765f6418c1c4c72e",
+      "shot_denominator": 2,
+      "status": "reused"
+    },
+    "rabeti": {
+      "cache_key": "a405fa792654336ed25a42e08145beeb1e64740e11983db08b866bb2cf2a62b0",
+      "ledger_sha256": "06f7b5cfc73b0d1d5a20566c72a8f224e32800cb8292cbb6114dc9f7d38d70d6",
+      "result_sha256": "6d962a38d104279ab44635c42f951dd3f5443ad5e6b06eb456d416a0237d6e1c",
+      "shot_denominator": 2,
+      "status": "reused"
+    },
+    "yao": {
+      "cache_key": "1f8d5ed310f9c03e1c91358af45f401a357970b8f53a121a832c7c7d2637acb8",
+      "ledger_sha256": "41fa8b21bd4793704320167d466394fe9caff13c4fe0621f98941aa68dcfcca0",
+      "result_sha256": "97539b104d41148acb57496dce12fae17d45d417e86a959015a14ba28e4cdd67",
+      "shot_denominator": 2,
+      "status": "reused"
+    }
+  },
+  "evidence_index_sha256": "39e7f09035787a65ff200675587a2076f19191fb049cf07224c0149e3e14b1d4",
+  "schema_version": 1,
+  "study_sha256": "4c024765e50ea27606b39d14127204459e02eb45047bb51a34852c6ef627e3af"
+}

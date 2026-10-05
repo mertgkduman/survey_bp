@@ -1,0 +1,57 @@
+{
+  "assessment_status": "not_assessed",
+  "entries": {
+    "bhatnagar": {
+      "cache_key": "0f1c2fd3815f18bd03d0620ea7ed7f88cd6b0abcc22e8ee350548b6933e79ba3",
+      "computation_receipt_sha256": "1688dbd75b64045edb089f92de944da25106ce2e1e1862618b27241de79302ab",
+      "ledger_sha256": "67082443bbe29c35c886da6ac5698829a6fd471666fa62f515a7931ddc33a0f8",
+      "manifest_sha256": "46dab7dfa0bca64c9164f912565f47a3941f36fb57577b3c209b89b620ac1318",
+      "output": "cache/0f1c2fd3815f18bd03d0620ea7ed7f88cd6b0abcc22e8ee350548b6933e79ba3",
+      "policy": "literature_policies/bhatnagar-2026-impulse-decoding/first-convergence-0.toml",
+      "policy_sha256": "e6d7abeccd599d8df05786b6ab0e054b7bd631c2618bc967183bef11341293e6",
+      "request_receipt": "efd598cbacd802fa69c35cda74cd94bf15c6d9bc68f50544d989faf1fc91305b",
+      "request_receipt_sha256": "f59cd60ec7ec7c9ce3ccff2d3fc9e9c63b494ecace271e26f14cde7e004d2ca1",
+      "result_sha256": "a8dd38f7be833cde0b46135b467ef7dc374a9ce2d30efe90765f6418c1c4c72e",
+      "shot_denominator": 2,
+      "terminations": {
+        "baseline_valid": 2
+      }
+    },
+    "rabeti": {
+      "cache_key": "a405fa792654336ed25a42e08145beeb1e64740e11983db08b866bb2cf2a62b0",
+      "computation_receipt_sha256": "016dbaf1e3e454bd2dc4570e59bdf39cbf2fc6bfbdd78afc6feae1832cb07f79",
+      "ledger_sha256": "06f7b5cfc73b0d1d5a20566c72a8f224e32800cb8292cbb6114dc9f7d38d70d6",
+      "manifest_sha256": "8b2a48f7850891a0655ed577691a559dda49c98852d2d50cdaf3224f5aa5c5a9",
+      "output": "cache/a405fa792654336ed25a42e08145beeb1e64740e11983db08b866bb2cf2a62b0",
+      "policy": "literature_policies/rabeti-2026-multiple-bases-bp-list-decoding/mbbp-ld.toml",
+      "policy_sha256": "51c770e05d11144188236c6f33b482c2463710ae4e2fedf8195abcb9546797d4",
+      "request_receipt": "3ded6df09e04b947789d70acf956094247a1d0adfb70f85566857f589e462b7f",
+      "request_receipt_sha256": "cc83737e1d97a1b717c1af1d961c83de1b7c27e78e5ffa94627fc6b28b28a6b8",
+      "result_sha256": "6d962a38d104279ab44635c42f951dd3f5443ad5e6b06eb456d416a0237d6e1c",
+      "shot_denominator": 2,
+      "terminations": {
+        "selected_original_valid_candidate": 2
+      }
+    },
+    "yao": {
+      "cache_key": "1f8d5ed310f9c03e1c91358af45f401a357970b8f53a121a832c7c7d2637acb8",
+      "computation_receipt_sha256": "25c4380514f9d0e6a88e9b44afc5fae95dc7c0cda98364a928d59271a15ef490",
+      "ledger_sha256": "41fa8b21bd4793704320167d466394fe9caff13c4fe0621f98941aa68dcfcca0",
+      "manifest_sha256": "62bc6112d75c32e7e7bdec00ce26b4e8cbb144ce4c7d5b3a5f899b73c7943f38",
+      "output": "cache/1f8d5ed310f9c03e1c91358af45f401a357970b8f53a121a832c7c7d2637acb8",
+      "policy": "literature_policies/yao-2024-guided-decimation/bpgd-t100-r002.toml",
+      "policy_sha256": "f94f4ff8acb2f5bd13346b93943083b250ec5e3648e153e9b35b9d610406665b",
+      "request_receipt": "916194f8de41a73c4792e5dd1f79ba93bd5e42beba2e5c0f1050bf150bd5274e",
+      "request_receipt_sha256": "0618f549d40cbebac0ecfa6e90ca487bb7f02d67b9f0b7c13ef7c1f8c9629717",
+      "result_sha256": "97539b104d41148acb57496dce12fae17d45d417e86a959015a14ba28e4cdd67",
+      "shot_denominator": 2,
+      "terminations": {
+        "valid_original_candidate": 2
+      }
+    }
+  },
+  "qualification_sha256": "834149a6ad54623f71da644175b032e299b24767832a709923057e414c3881d4",
+  "schema_version": 1,
+  "study": "data/studies/css-literature-b1-gate-v1.json",
+  "study_sha256": "4c024765e50ea27606b39d14127204459e02eb45047bb51a34852c6ef627e3af"
+}

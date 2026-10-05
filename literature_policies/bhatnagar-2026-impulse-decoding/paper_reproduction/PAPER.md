@@ -27,7 +27,7 @@ The source also plots `Minimum_Weight/0`, but it was not among the requested dec
 
 ## Reproduction path
 
-Qualify source versus canonical shortening and selection semantics, the BP update and schedule, an independent original-syndrome check, and full-attempt work accounting. A bounded B1 policy-file run can test the interface during Phase 6. Published-curve assessment remains a separately prespecified CSS campaign.
+Qualify source versus canonical shortening and selection semantics, the BP update and schedule, an independent original-syndrome check, and full-attempt work accounting. The [bounded B1 policy-file gate](../../../docs/css-literature-gate.md) tests the interface on matched near-zero-noise samples during Phase 6. Published-curve assessment remains a separately prespecified CSS campaign.
 
 For a compatible schema-v5 CSS study, the same public command computes or verifies and reuses the result:
 

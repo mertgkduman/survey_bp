@@ -4,7 +4,7 @@ schema_version = 1
 record_kind = "literature_policy"
 variant_id = "bp-t100"
 execution_status = "runnable"
-qualification = "canonical_adaptation"
+qualification = "canonical_adaptation_not_assessed"
 
 [source]
 paper = "Yao et al., Belief Propagation Decoding of Quantum LDPC Codes with Guided Decimation"

@@ -434,6 +434,9 @@ def test_mbbp_ld_runnable_public_compute_reuse_and_receipt(tmp_path: Path, monke
     assert manifest["ensemble"]["bases"][1]["redundant_transforms"][0] == [0, 1, *([0] * 34)]
     assert first["result"]["assessment_status"] == "not_assessed"
     assert first["result"]["terminations"] == {"selected_original_valid_candidate": 1}
+    receipt = json.loads((Path(first["output"]) / "request-receipts" /
+                          f'{first["request_receipt"]}.json').read_text())
+    assert receipt["source_path"] == "literature_policies/rabeti-2026-multiple-bases-bp-list-decoding/mbbp-ld.toml"
     events = [json.loads(line) for line in (Path(first["output"]) / "events.jsonl").read_text().splitlines()]
     assert any(event["kind"] == "original_check" for event in events)
     assert any(event["kind"] == "evaluation" for event in events)

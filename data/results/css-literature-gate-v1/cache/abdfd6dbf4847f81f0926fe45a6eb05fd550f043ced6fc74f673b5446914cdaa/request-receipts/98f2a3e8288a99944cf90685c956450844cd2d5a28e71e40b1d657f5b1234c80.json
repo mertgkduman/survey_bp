@@ -1,0 +1,242 @@
+{
+  "computation_key": "abdfd6dbf4847f81f0926fe45a6eb05fd550f043ced6fc74f673b5446914cdaa",
+  "executable_policy_sha256": "3e1afd7cbb1f55db69b2a3355c702c4d37e21cd539155d91a05662427072efcc",
+  "provenance_sha256": "72b5e0acc9fb1aa857e49b5871172024a53d6b9209d2ad43d3f4dccd59fe887a",
+  "raw_document_sha256": "f94f4ff8acb2f5bd13346b93943083b250ec5e3648e153e9b35b9d610406665b",
+  "schema_version": 1,
+  "source_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/literature_policies/yao-2024-guided-decimation/bpgd-t100-r002.toml",
+  "verification": {
+    "assessment_status": "not_assessed",
+    "code_id": "b1-ghp-882",
+    "final_row_count": 2,
+    "fixture": "pilot_adaptation",
+    "intervention": {
+      "compact_contract_version": 6,
+      "ledger_version": 5,
+      "limits": {
+        "max_runtime_seconds": 600.0,
+        "max_total_actions": 2000,
+        "max_total_attempts": 1000,
+        "max_trace_bytes": 0,
+        "max_trace_records": 0,
+        "work_caps": {
+          "belief_assemblies": 100000000,
+          "bp_calls": 1000000,
+          "branch_expansions": 0,
+          "branch_prunes": 0,
+          "candidate_checks": 100000000,
+          "candidate_constructions": 100000000,
+          "check_to_variable_updates": 100000000,
+          "convergence_checks": 100000000,
+          "fallback_calls": 0,
+          "fixation_actions": 1000,
+          "intervention_actions": 2000,
+          "lifted_coordinates": 0,
+          "order_generation": 100000000,
+          "order_selection": 100000000,
+          "original_checks": 100000000,
+          "priority_maintenance": 100000000,
+          "ranking_scans": 100000000,
+          "relay_transfers": 0,
+          "residual_differences": 100000000,
+          "residual_precomputations": 100000000,
+          "residual_priority_evaluations": 100000000,
+          "transformations": 0,
+          "variable_to_check_updates": 100000000
+        }
+      },
+      "specification": {
+        "final_round_rule": "return_after_last_fixation",
+        "finite_bias_magnitude": 25.0,
+        "kind": "guided_decimation",
+        "lift_rule": "identity",
+        "native_availability": "unverified",
+        "operator": "finite_prior_bias",
+        "preserved_fields": [
+          "graph",
+          "syndrome",
+          "messages"
+        ],
+        "qualification": "algorithm_interpretation",
+        "reset_rule": "continue_messages",
+        "round_limit": 2,
+        "selection": "max_abs_reliability",
+        "source_revision": "arxiv:2312.10950v2",
+        "stream_status": "not_applicable",
+        "sweeps_per_round": 100,
+        "trigger": "failed_bp_round",
+        "unresolved": [
+          "zero_bias_boundary",
+          "final_round_source_interpretation",
+          "author_implementation_identity",
+          "ordered_paper_experiment_artifact_identity"
+        ],
+        "variant": "algorithm1_v2_interpretation",
+        "zero_rule": "positive_prior_for_zero_posterior"
+      }
+    },
+    "manifest_sha256": "c43fd64b8bb908cfe26946a959d7427fb949ada9eac3d8617d92f32cf046c28d",
+    "max_iterations": 100,
+    "numerical_profile": "cpu-float64-spa-v1",
+    "output": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/css-literature-gate-v1/cache/abdfd6dbf4847f81f0926fe45a6eb05fd550f043ced6fc74f673b5446914cdaa",
+    "policies": {
+      "intervention": {
+        "binding_id": "research-intervention-guided-decimation",
+        "kind": "guided_decimation",
+        "owned_state": [],
+        "provides": [],
+        "requires": [],
+        "state_lifetime": "search"
+      },
+      "postprocessing": {
+        "binding_id": "research-postprocessing-identity",
+        "kind": "identity",
+        "owned_state": [],
+        "provides": [],
+        "requires": [],
+        "state_lifetime": "attempt"
+      },
+      "schedule": {
+        "binding_id": "research-schedule-flooding",
+        "kind": "flooding",
+        "owned_state": [],
+        "provides": [],
+        "requires": [],
+        "state_lifetime": "iteration"
+      },
+      "selection": {
+        "binding_id": "research-selection-stable-first",
+        "kind": "stable_first",
+        "owned_state": [],
+        "provides": [],
+        "requires": [],
+        "state_lifetime": "attempt"
+      },
+      "state_memory": {
+        "binding_id": "research-state-memory-stateless",
+        "kind": "stateless",
+        "owned_state": [],
+        "provides": [],
+        "requires": [],
+        "state_lifetime": "attempt"
+      },
+      "stopping": {
+        "binding_id": "research-stopping-syndrome-or-budget",
+        "kind": "syndrome_or_budget",
+        "owned_state": [],
+        "provides": [],
+        "requires": [],
+        "state_lifetime": "iteration"
+      },
+      "update": {
+        "binding_id": "research-update-binary-spa",
+        "kind": "binary_spa",
+        "owned_state": [],
+        "provides": [],
+        "requires": [],
+        "state_lifetime": "message"
+      }
+    },
+    "policy_effects": {
+      "intervention": {
+        "binding_id": "research-intervention-guided-decimation",
+        "effect": "active"
+      },
+      "postprocessing": {
+        "binding_id": "research-postprocessing-identity",
+        "effect": "identity_only"
+      },
+      "schedule": {
+        "binding_id": "research-schedule-flooding",
+        "effect": "active"
+      },
+      "selection": {
+        "binding_id": "research-selection-stable-first",
+        "effect": "active"
+      },
+      "state_memory": {
+        "binding_id": "research-state-memory-stateless",
+        "effect": "identity_only"
+      },
+      "stopping": {
+        "binding_id": "research-stopping-syndrome-or-budget",
+        "effect": "active"
+      },
+      "update": {
+        "binding_id": "research-update-binary-spa",
+        "effect": "active"
+      }
+    },
+    "policy_identity": "7c2fb18bfec9d6a5014ca43d4cd96624e976c76cd8f89513c10017b4b48275d4",
+    "profile_plan": {
+      "cohort": "clean",
+      "enabled": true,
+      "level": "low_overhead",
+      "selected_before_outcome": true
+    },
+    "relation": "pilot_adaptation",
+    "resolved_numerical_profile": {
+      "backend": "cpu-numpy",
+      "degree_one_rule": "positive_saturation_before_syndrome_sign",
+      "dtype": "float64",
+      "exact_zero_decision": 0,
+      "llr_encoding": "natural_log_odds",
+      "normalization": "none",
+      "prior_initialization": "log((1-p)/p)",
+      "profile_id": "binary-spa-flooding-f64-v1",
+      "saturation": 25.0,
+      "syndrome_convention": "one_negates_check_to_variable",
+      "tie_break": "ascending_canonical_id"
+    },
+    "run_id": "css-literature-b1-gate-v1-3e1afd7cbb1f",
+    "shot_budget": 2,
+    "trace_plan": {
+      "label": "development_default",
+      "level": "off",
+      "max_bytes": 0,
+      "max_records": 0,
+      "relative_dir": "trace-sidecars"
+    },
+    "work_limits": {
+      "attempt": {
+        "belief_assemblies": 100000000,
+        "bp_calls": 1000000,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 100000000,
+        "check_to_variable_updates": 100000000,
+        "fallback_calls": 0,
+        "intervention_actions": 2000,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 100000000,
+        "variable_to_check_updates": 100000000
+      },
+      "search": {
+        "belief_assemblies": 100000000,
+        "bp_calls": 1000000,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 100000000,
+        "check_to_variable_updates": 100000000,
+        "fallback_calls": 0,
+        "intervention_actions": 2000,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 100000000,
+        "variable_to_check_updates": 100000000
+      },
+      "shot": {
+        "belief_assemblies": 100000000,
+        "bp_calls": 1000000,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 100000000,
+        "check_to_variable_updates": 100000000,
+        "fallback_calls": 0,
+        "intervention_actions": 2000,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 100000000,
+        "variable_to_check_updates": 100000000
+      }
+    }
+  }
+}

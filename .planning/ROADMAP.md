@@ -6,7 +6,7 @@ Build a provenance-preserving research platform from paper evidence through nati
 
 **Milestone:** v1.0 — platform and first journal-paper evidence.
 **Structure:** End-to-end capability slices (`mvp` mode), fine granularity. Fourteen phases are used because the three required regimes each need distinct implementation and experimental qualification; phase counts are not a reason to merge those gates or defer publication scope.
-**Planning status:** Phases 1–4 are complete. Phase 5 implementation is technically verified with human review still open. Phase 6 is being replanned around the approved three-paper CSS policy gate and existing BeamSearch/RelayBP work; later plan counts remain TBD.
+**Planning status:** Phases 1–4 are complete. Phase 5 implementation is technically verified with human review still open. All nine Phase 6 plans are implemented; phase-goal verification follows the three-paper CSS policy gate. Later plan counts remain TBD.
 
 ## Phases
 
@@ -28,6 +28,7 @@ Build a provenance-preserving research platform from paper evidence through nati
 ## Cross-Phase Contracts
 
 - Every phase delivers a runnable or inspectable research capability with documentation and verification. Large reproduction claims wait until the statistical campaign gate in Phase 8; earlier runs are fixtures or pilots with their assessment status explicit.
+- Source transcription, policy qualification, code/circuit artifact collection, and bounded mechanism pilots may continue alongside implementation phases. These feed later reproduction manifests; they do not bypass the Phase 8 statistical gate or the CSS, quaternary, circuit sequence.
 - Native reference execution and canonical implementation are distinct. A paper's reported circuit experiment is reproduced in the circuit stage; earlier CSS demonstrations of its mechanisms are adaptations if their settings differ.
 - One canonical engine is used within each compatible mathematical family. Circuit problems may reuse binary updates when justified; quaternary or richer correlated factors are not coerced into that kernel.
 - All implemented policy compositions validate original-problem outputs and preserve provenance, work attribution, and source/interpretation status. Later phases inherit and extend these contracts.
@@ -402,7 +403,7 @@ Plans:
 5. The first CSS literature set (Yao BPGD, Bhatnagar impulse, and Rabeti–Mahdavifar MBBP-LD) has source-grounded paper-level policy files with explicit runnable/unsupported status. At least one qualified variant per paper runs through the common policy-file command on a bounded CSS study with verified provenance and original-problem checks; full curve assessment remains in Phases 8–9.
 
 **Research focus:** Controlled CSS BeamSearch/RelayBP semantics, ensemble/list selection, search work versus parallel latency, and a small B1 literature-policy execution gate; original circuit reference integration follows in Phases 12–13.
-**Plans:** 8/9 plans executed across 6 waves, independently checked in `06-PLAN-CHECK.md`. Public voting was narrowed to a fail-closed reserved field for this source-driven gate.
+**Plans:** 9/9 plans executed across 6 waves, independently checked in `06-PLAN-CHECK.md`. Public voting was narrowed to a fail-closed reserved field for this source-driven gate.
 
 - [x] 06-01-PLAN.md
 - [x] 06-02-PLAN.md
@@ -412,7 +413,7 @@ Plans:
 - [x] 06-06-PLAN.md
 - [x] 06-07-PLAN.md
 - [x] 06-08-PLAN.md
-- [ ] 06-09-PLAN.md
+- [x] 06-09-PLAN.md
 
 ### Phase 7: Optional Postprocessing
 
@@ -428,6 +429,7 @@ Plans:
 4. Pinned native BP-OSD/BP-LSD composites run as references with tested APIs and metadata; their internal BP does not replace the canonical engine under an adapter label.
 
 **Research focus:** Standalone fallback interfaces, reliability conventions, exact SI/OTF variants, and source numerical/API drift.
+**Parallel literature work:** Continue adding source-grounded paper folders and runnable policy files for compatible CSS decoders while Phase 7 is built. Preserve source specifications and blockers in `paper_reproduction/`; use bounded pilots to expose missing kernel or manifest support. Any larger paper-curve assessment waits for Phase 8 campaign controls.
 **Plans:** TBD
 
 ### Phase 8: Reproducible Campaigns and Statistical Assessment
@@ -445,6 +447,7 @@ Plans:
 5. Reports explicitly account for timeout, nonconvergence, partial runs and post-selection, including acceptance probability, conditional denominators, actual work, and environment/timing context.
 
 **Research focus:** Paper-specific precision and budgets, sequential inference, digitization, multiplicity, sample replay, durable shard protocol, and site execution limits.
+**Operational gate:** Profile decoder and replay throughput, ledger size, and HPC shard cost on representative nontrivial CSS samples before approving large campaigns; choose resource and storage budgets from measured evidence.
 **Scope carry-forward:** Design future CSS campaigns from a newly prespecified question, precision target, stopping rule and measured budget. The cancelled Phase 4 grid is historical evidence, not a required or automatically funded Phase 8 run.
 **Plans:** TBD
 

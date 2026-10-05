@@ -637,8 +637,11 @@ class CanonicalExperimentV7(CanonicalExperimentV3):
         assignment = self.policies.update.parameter_assignment
         if roles != required or assignment is None or assignment.shape != "scalar" or assignment.value != 0.875:
             raise ValueError("MBBP-LD requires normalized-min-sum alpha=0.875, serial checks, and independent identity members")
-        if self.evidence.relation != "canonical_implemented" or self.evidence.fixture != "development_fixture":
-            raise ValueError("public MBBP-LD is a canonical-adaptation development contract")
+        if (self.evidence.relation, self.evidence.fixture) not in {
+            ("canonical_implemented", "development_fixture"),
+            ("pilot_adaptation", "pilot_adaptation"),
+        } or self.evidence.assessment_status != "not_assessed":
+            raise ValueError("public MBBP-LD requires a not-assessed canonical or pilot-adaptation evidence label")
         if self.vote is not None:
             raise ValueError("coordinate-majority voting is declared but not yet executable in the public MBBP-LD contract")
         if self.ensemble.max_iterations != self.budgets.attempt.max_iterations:
@@ -877,6 +880,20 @@ def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
         raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
 
 
+def _resolved_artifact_root(root: str) -> str:
+    """Resolve a repository-relative pin without serializing a machine path."""
+    if not root.startswith("repo:"):
+        return root
+    relative = Path(root.removeprefix("repo:"))
+    if not relative.parts or relative.is_absolute() or ".." in relative.parts:
+        raise ValueError("repository artifact root must be a non-traversing relative path")
+    repository = Path(__file__).resolve().parents[2]
+    resolved = (repository / relative).resolve()
+    if not resolved.is_relative_to(repository.resolve()):
+        raise ValueError("repository artifact root escapes the repository")
+    return str(resolved)
+
+
 def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedExperiment:
     """Resolve immutable CSS input and runtime identity before any simulation work."""
     manifest = _parse_for_preflight(value)
@@ -891,7 +908,7 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
         if manifest.trace_plan.level != "off" or manifest.profile_plan.level != "low_overhead" or manifest.profile_plan.cohort != "clean":
             raise ValueError("Phase 6 public MBBP requires trace-off clean low-overhead profiling")
         artifact = load_artifact(
-            manifest.artifact.root, manifest.artifact.path,
+            _resolved_artifact_root(manifest.artifact.root), manifest.artifact.path,
             expected_raw_sha256=manifest.artifact.raw_sha256,
             expected_semantic_sha256=manifest.artifact.semantic_sha256,
         )
@@ -924,7 +941,7 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
         if manifest.trace_plan.level != "off":
             raise ValueError("Phase 5 semantic trace sidecars are not admitted by this public contract")
         artifact = load_artifact(
-            manifest.artifact.root, manifest.artifact.path,
+            _resolved_artifact_root(manifest.artifact.root), manifest.artifact.path,
             expected_raw_sha256=manifest.artifact.raw_sha256,
             expected_semantic_sha256=manifest.artifact.semantic_sha256,
         )
@@ -1004,7 +1021,7 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
             if actual not in (_EXECUTABLE_BASELINE_KINDS, *_EXECUTABLE_LOCAL_SPA_KINDS, *_EXECUTABLE_LOCAL_MIN_SUM_KINDS, _EXECUTABLE_MIN_SUM_KINDS, _EXECUTABLE_NORMALIZED_MIN_SUM_KINDS, _EXECUTABLE_OFFSET_MIN_SUM_KINDS):
                 raise ValueError("CanonicalExperimentV3 requires a closed promoted local-step composition")
         artifact = load_artifact(
-            manifest.artifact.root, manifest.artifact.path,
+            _resolved_artifact_root(manifest.artifact.root), manifest.artifact.path,
             expected_raw_sha256=manifest.artifact.raw_sha256,
             expected_semantic_sha256=manifest.artifact.semantic_sha256,
         )
@@ -1021,7 +1038,7 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
         raise ValueError("source artifact is not verified")
     _verify_environment(manifest.environment, manifest.decoder)
     artifact = load_artifact(
-        manifest.artifact.root,
+        _resolved_artifact_root(manifest.artifact.root),
         manifest.artifact.path,
         expected_raw_sha256=manifest.artifact.raw_sha256,
         expected_semantic_sha256=manifest.artifact.semantic_sha256,

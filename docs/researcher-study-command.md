@@ -27,6 +27,8 @@ For a commented V2C damping policy, use `examples/three-qubit-memory-study.json`
 
 Results are addressed by a hash of the effective manifest and package source. On another call, the command verifies the cached ledger and result before returning `status: reused`; otherwise it produces and verifies them and returns `status: computed`. Changing comments or whitespace in the policy file leaves the effective decoder unchanged. Changing a policy, budget, artifact, environment, or engine source changes the result identity. An explicit `physical_sample_identity` in the study keeps physical samples matched across decoder files.
 
+The CSS literature gate serializes its artifact root relative to the repository and its result paths relative to each cache directory. This lets an editable clone reuse a copied result package with the same source files, artifact bytes, and pinned runtime environment. The public verifier replays the moved ledger before reporting reuse.
+
 Use the same API from Python:
 
 ```python
@@ -42,4 +44,4 @@ print(result["status"], result["result"]["denominators"])
 
 TOML is the recommended hand-written policy format because it permits `#` comments. JSON policy files are accepted and have identical semantics. Policy files compose **registered** implementations; they cannot define a new update equation by naming a Python module or callable. A new algorithm requires a reviewed policy implementation and compatibility rule in the engine before it can be selected from a file.
 
-The public canonical runner supports schema v2/v3 CSS compositions and schema v4 ordered memory bindings. For v4, place `memory` and optional `relay` sections in the decoder file along with the seven roles; keep them out of the study JSON. The registered BB72 BeamSearch/RelayBP campaign uses its own source-sealed backend through this same command. Phase 5 intervention controls, new policy implementations, and faithful circuit-level studies need explicit interface support and qualification before this command can claim them.
+The public canonical runner supports schema v2/v3 CSS compositions, schema v4 ordered memory bindings, qualified Phase 5 guided-decimation and impulse interventions, and the Phase 6 MBBP-LD ensemble. For memory studies, place `memory` and optional `relay` sections in the decoder file along with the seven roles; keep them out of the study JSON. The registered BB72 BeamSearch/RelayBP campaign uses its own source-sealed backend through this same command. The [three-paper CSS gate](css-literature-gate.md) demonstrates one study file across the intervention and ensemble families. New policy implementations and faithful circuit-level studies still need explicit interface support and qualification.

@@ -1,0 +1,7 @@
+# Exploratory B1 p=0.005 run (not an acceptance gate)
+
+These outputs were generated while checking whether the first CSS literature gate could include nontrivial B1 errors within a short workflow run. The same local B1 candidate and two matched sample IDs were used, but this run was **not** the frozen near-zero-noise acceptance study. Its results are `pilot_adaptation` and `not_assessed`; they provide no paper-curve or decoder-ranking claim.
+
+The guided-decimation and impulse packages completed and passed their public replay at creation. Their compiled manifests, ledgers, results, computation receipts, and request receipts remain under the original [`css-literature-gate-v1/cache/`](../css-literature-gate-v1/cache/) path so their absolute manifest references stay valid. The MBBP-LD process was stopped during ledger writing because serial Python execution and dense augmented-matrix event payloads made this small exploratory run too slow for the acceptance gate. Its partial ledger has no terminal denominator and must not be treated as a result. [exploratory-index.json](exploratory-index.json) records each status and file hash.
+
+The [bounded acceptance gate](../../studies/css-literature-b1-gate-v1.json) uses p=0.000001 for command/provenance smoke validation. Nontrivial B1 MBBP performance requires a separately planned campaign with measured runtime and storage budget in Phases 8–9.

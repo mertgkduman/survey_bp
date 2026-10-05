@@ -152,17 +152,54 @@ def _validated_artifact_block_length(study: dict[str, Any]) -> int:
     return _validated_artifact_dimensions(study)[0]
 
 
+def _concretize_multi_decoder_study(study: dict[str, Any], decoder: dict[str, Any]) -> None:
+    """Bind a decoder-neutral study to one existing strict experiment schema.
+
+    Schema 8 belongs only to the study command.  The persisted experiment is
+    still V5 or V7 and receives the same pinned artifact, samples and budgets.
+    """
+    if study.get("schema_version") != 8:
+        return
+    profiles = study.pop("numerical_profiles", None)
+    if ("numerical_profile" in study or not isinstance(profiles, dict)
+            or profiles != {"binary_spa": "cpu-float64-spa-v1",
+                            "normalized_min_sum": "cpu-float64-min-sum-v1"}):
+        raise ValueError("multi-decoder study requires exact declared numerical profiles")
+    has_ensemble = "ensemble" in decoder or "list_selection" in decoder
+    has_intervention_limits = "intervention_limits" in decoder
+    if has_ensemble == has_intervention_limits:
+        raise ValueError("multi-decoder study requires exactly one registered intervention or ensemble family")
+    target = 7 if has_ensemble else 5
+    update = decoder.get("update")
+    kind = update.get("kind") if isinstance(update, dict) else None
+    expected = "normalized_min_sum" if target == 7 else "binary_spa"
+    if kind != expected:
+        raise ValueError("decoder update is incompatible with the multi-decoder study profile")
+    artifact = study.get("artifact")
+    if not isinstance(artifact, dict) or not isinstance(artifact.get("root"), str):
+        raise ValueError("multi-decoder study requires a declared repository artifact root")
+    repository = Path(__file__).resolve().parents[2].resolve()
+    artifact_root = Path(artifact["root"]).resolve()
+    if not artifact_root.is_relative_to(repository):
+        raise ValueError("multi-decoder study requires an artifact root inside the repository")
+    study["artifact"] = {**artifact, "root": f"repo:{artifact_root.relative_to(repository).as_posix()}"}
+    study["schema_version"] = target
+    study["numerical_profile"] = profiles[kind]
+
+
 def _request_receipt(policy: LiteraturePolicy | None, decoder_path: Path, *, computation_key: str,
                      execution_identity: str, verification: dict[str, Any]) -> tuple[str, dict[str, Any]]:
     """Bind an immutable source document to verified shared computation evidence."""
+    repository = Path(__file__).resolve().parents[2].resolve()
+    resolved_source = (policy.source_path if policy is not None else decoder_path).resolve()
+    source_path = (resolved_source.relative_to(repository).as_posix()
+                   if resolved_source.is_relative_to(repository) else str(resolved_source))
     if policy is None:
         raw_identity = sha256(decoder_path.read_bytes()).hexdigest()
-        provenance_identity = sha256(_json_bytes({"legacy_decoder": str(decoder_path)})).hexdigest()
-        source_path = str(decoder_path)
+        provenance_identity = sha256(_json_bytes({"legacy_decoder": source_path})).hexdigest()
     else:
         raw_identity = policy.raw_document_identity
         provenance_identity = policy.provenance_identity
-        source_path = str(policy.source_path)
     request = {
         "schema_version": 1,
         "computation_key": computation_key,
@@ -174,21 +211,24 @@ def _request_receipt(policy: LiteraturePolicy | None, decoder_path: Path, *, com
     request_id = sha256(_json_bytes(request)).hexdigest()
     # Verification timestamps are observations, not the identity of a stable
     # computation receipt.  Preserve the replay-relevant verification facts.
-    request["verification"] = {name: value for name, value in verification.items() if name != "verified_at"}
+    request["verification"] = {name: value for name, value in verification.items()
+                               if name not in {"verified_at", "output"}}
     return request_id, request
 
 
 def _ensure_canonical(study_path: Path, decoder: dict[str, Any], results_root: Path,
                       *, policy: LiteraturePolicy | None = None, decoder_path: Path | None = None) -> dict[str, Any]:
     study = _read_object(study_path)
-    if "policies" in study or study.get("schema_version") not in (2, 3, 4, 5, 6, 7):
-        raise ValueError("canonical study must be a schema v2-v7 experiment without policies")
+    if "policies" in study or study.get("schema_version") not in (2, 3, 4, 5, 6, 7, 8):
+        raise ValueError("canonical study must be a schema v2-v8 study without policies")
     if study["schema_version"] == 4 and ("memory" in study or "relay" in study):
         raise ValueError("schema v4 memory and Relay controls belong in the decoder file")
     if study["schema_version"] in (5, 6) and ({"intervention", "intervention_limits", "memory"} & set(study)):
         raise ValueError("schema v5/v6 intervention and memory controls belong in the decoder file")
     if study["schema_version"] == 7 and ({"ensemble", "list_selection", "vote"} & set(study)):
         raise ValueError("schema v7 ensemble, list selection, and vote controls belong in the decoder file")
+    if study["schema_version"] == 8 and ({"memory", "relay", "intervention", "intervention_limits", "ensemble", "list_selection", "vote"} & set(study)):
+        raise ValueError("schema v8 decoder controls belong in the decoder file")
     if not isinstance(study.get("randomness"), dict) or not study["randomness"].get("physical_sample_identity"):
         raise ValueError("study must explicitly pin physical_sample_identity for matched comparisons")
     artifact = study.get("artifact")
@@ -203,6 +243,7 @@ def _ensure_canonical(study_path: Path, decoder: dict[str, Any], results_root: P
         decoder = policy.decoder_projection(
             code_block_length=code_block_length, code_check_count=code_check_count,
         )
+    _concretize_multi_decoder_study(study, decoder)
     policies = _expanded_policies(decoder, schema_version=study["schema_version"])
     _apply_decoder_stopping_cap(study, decoder)
     policy_payload = {"decoder": decoder, "policies": policies}
@@ -245,7 +286,7 @@ def _ensure_canonical(study_path: Path, decoder: dict[str, Any], results_root: P
             verified = verify_run(output)
             status = "reused"
         else:
-            run_canonical(manifest_path, output)
+            run_canonical(manifest_path, output, portable_result_paths=True)
             verified = verify_run(output)
             _write_once(receipt_path, _json_bytes(receipt))
             status = "computed"

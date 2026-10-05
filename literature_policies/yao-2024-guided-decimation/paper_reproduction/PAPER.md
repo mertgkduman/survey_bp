@@ -5,7 +5,7 @@
 - Paper: Hanwen Yao, Waleed Abu Laban, Christian Häger, Alexandre Graell i Amat, and Henry D. Pfister, *Belief Propagation Decoding of Quantum LDPC Codes with Guided Decimation*, [arXiv:2312.10950v2](https://arxiv.org/pdf/2312.10950v2), 21 June 2024.
 - Anchors: binary BP in Section 3; BPGD in Section 4.3 and Algorithm 1; Figure 3 varies `T`; Section 4.6 and Figure 6 vary `R`.
 - Author implementation identity: unverified. Do not infer source-exact execution from the canonical implementation.
-- All listed files are `.spec.toml` source records and are **not runnable** with the current `bp-registry --decoder` parser. The Phase 5 guided-decimation controller is implemented separately; public policy-file V5/V6 exposure and exact source-experiment qualification remain.
+- All ten `.spec.toml` files are **non-runnable source records**. Separate paper-root `bp-t100.toml`, `bpgd-t001.toml`, and `bpgd-t100-r002.toml` files are runnable **canonical adaptations** through the public command. The other seven source variants have typed mappings but no paper-root runnable file yet. Exact source-experiment qualification remains open.
 
 ## Requested decoder variants
 
@@ -34,4 +34,4 @@
 
 ## Reproduction path
 
-First validate each file's kernel-readable policy composition and independent transition fixtures. Then bind a source-qualified B1 artifact, source-specific noise grid, stopping/denominator rule, expected points, tolerance, environment, and ledger to a reproduction manifest. A cross-paper B1 or BB code run is a controlled adaptation unless it exactly matches this paper's experiment.
+The [bounded B1 policy-file gate](../../../docs/css-literature-gate.md) exercises `bpgd-t100-r002.toml` on matched near-zero-noise samples for interface and provenance validation. Later bind this paper's ordered B1 artifact, noise grid, stopping/denominator rule, expected points, tolerance, environment, and ledger to a reproduction manifest. A cross-paper B1 or BB code run is a controlled adaptation unless it exactly matches this paper's experiment.

@@ -1,0 +1,41 @@
+{
+  "assessment_status": "not_assessed",
+  "entries": [
+    {
+      "cache_key": "26c7deb7d4bcab92643620d2d1926b7335aa6d264fa43c8f194b91828f58229d",
+      "files_sha256": {
+        "cache-receipt.json": "42caad094164c592cdd370db48d7f4e364fc65129411380f3103b3b585ede73c",
+        "events.jsonl": "c6a77f3ad66267695124a9b47c67a43f2214d63c301dd8f8bcd34d18d7d327bd",
+        "manifest.json": "3724f27285008808b649c8a4e7a4a7f515fa1c44d631931ff7663489200f724b",
+        "request-receipts/df29ffc4e920baf576ce4a5918db50929931e6e4eb4149fcb7e38708f8903a75.json": "232ff4d06a0ff6b5bb2663fa245b13604bea4b78bc85086dbd5137795e230c79",
+        "result.json": "1b8251c4250f551b68fdcd62e0797043d48a6cf84865ad5c35ef826ebeb8d042"
+      },
+      "intervention": "impulse",
+      "status": "complete_verified_at_creation"
+    },
+    {
+      "cache_key": "77c9f4c9ee6b878a98b2340a661c7cce7124582e840034f7014f3c36c60561a5",
+      "files_sha256": {
+        "events.jsonl": "4e1be5d01b9c8be1bf63c951ed469039b56dd1c2f7b94e8e78eda2e7d2abcd38",
+        "manifest.json": "e840aba1301120381f93f9ef8e5b1eeb148d55387dce33d281adb4b79dff5eac"
+      },
+      "intervention": "identity",
+      "status": "interrupted_partial_ledger"
+    },
+    {
+      "cache_key": "abdfd6dbf4847f81f0926fe45a6eb05fd550f043ced6fc74f673b5446914cdaa",
+      "files_sha256": {
+        "cache-receipt.json": "383134e49260fec05f00239c5925c9305b6d5d2aec7c16e44e80dd6d83d4a70c",
+        "events.jsonl": "d3a51f4e302affeea97c00c3f1e12ce71d1802b8d59abebb8d3612e9cc29cb6f",
+        "manifest.json": "ac90b4bb31b26334139c514d68372f7fc36028c0aea1f1c05c982812fe4e98e0",
+        "request-receipts/98f2a3e8288a99944cf90685c956450844cd2d5a28e71e40b1d657f5b1234c80.json": "16dd1f38d54397503a0dd3ba8fb715fc10efb5aac10aaa332bcf20a4c6d1e86d",
+        "result.json": "4be377a24a0f1497a462213e550ff5eb7a040449276393118a1dd12b4e88dab0"
+      },
+      "intervention": "guided_decimation",
+      "status": "complete_verified_at_creation"
+    }
+  ],
+  "error_rate": 0.005,
+  "max_shots": 2,
+  "schema_version": 1
+}

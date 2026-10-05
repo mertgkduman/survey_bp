@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import shutil
 import tomllib
 
 import pytest
@@ -37,6 +38,32 @@ def test_canonical_policy_file_computes_then_reuses_verified_result(tmp_path: Pa
     ledger.write_bytes(ledger.read_bytes() + b"tampered\n")
     with pytest.raises(ValueError):
         ensure_study(study_path, decoder, results_root=cache)
+
+
+def test_canonical_study_cache_reuses_after_directory_move(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Published study packages must not depend on the producer's output path."""
+    monkeypatch.setenv("OMP_NUM_THREADS", "1")
+    study = json.loads((ROOT / "examples/three-qubit-study.json").read_text())
+    study["artifact"]["root"] = str(ROOT / "data/artifacts")
+    study_path = tmp_path / "study.json"
+    study_path.write_text(json.dumps(study))
+    decoder = ROOT / "examples/three-qubit-decoder.toml"
+    original = tmp_path / "original-cache"
+    moved = tmp_path / "moved-cache"
+    first = ensure_study(study_path, decoder, results_root=original)
+    assert first["status"] == "computed"
+    receipt = json.loads((Path(first["output"]) / "request-receipts" /
+                          f'{first["request_receipt"]}.json').read_text())
+    assert receipt["source_path"] == "examples/three-qubit-decoder.toml"
+    result = first["result"]
+    assert result["manifest_path"] == "manifest.json"
+    assert result["ledger_path"] == "events.jsonl"
+    shutil.move(original, moved)
+    second = ensure_study(study_path, decoder, results_root=moved)
+    assert second["status"] == "reused"
+    assert second["cache_key"] == first["cache_key"]
+    assert second["request_receipt"] == first["request_receipt"]
+    assert second["result"] == first["result"]
 
 
 def test_schema5_and_schema6_policy_studies_accept_decoder_owned_controls(tmp_path: Path) -> None:

@@ -1,0 +1,26 @@
+{
+  "assessment_status": "not_assessed",
+  "denominators": {
+    "all_terminal_shots": 2,
+    "exact": 2
+  },
+  "final_row_count": 2,
+  "fixture": "pilot_adaptation",
+  "ledger_path": "events.jsonl",
+  "ledger_sha256": "67082443bbe29c35c886da6ac5698829a6fd471666fa62f515a7931ddc33a0f8",
+  "manifest_path": "manifest.json",
+  "manifest_sha256": "b6caa708847e0dbf428ced5fdea252ce365d17a723e7ab0cb4cb820aa82963bb",
+  "policy_identity": "72dcbfbe6262f233df66ca363491dc3d8d904083f1c070e66561578e960d17a2",
+  "relation": "pilot_adaptation",
+  "run_id": "css-literature-b1-gate-v1-d5208d00f2f2",
+  "schema_version": 2,
+  "shot_ids": [
+    0,
+    1
+  ],
+  "statistical_claim": "not_assessed; bounded pilot adaptation, not a statistical reproduction, performance ranking, or superiority claim",
+  "terminations": {
+    "baseline_valid": 2
+  },
+  "title": "css-literature-b1-gate-v1-d5208d00f2f2 \u2014 pilot_adaptation pilot_adaptation not_assessed"
+}

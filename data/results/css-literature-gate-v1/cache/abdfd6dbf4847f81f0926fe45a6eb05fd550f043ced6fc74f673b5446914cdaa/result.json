@@ -1,0 +1,26 @@
+{
+  "assessment_status": "not_assessed",
+  "denominators": {
+    "all_terminal_shots": 2,
+    "exact": 2
+  },
+  "final_row_count": 2,
+  "fixture": "pilot_adaptation",
+  "ledger_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/css-literature-gate-v1/cache/abdfd6dbf4847f81f0926fe45a6eb05fd550f043ced6fc74f673b5446914cdaa/events.jsonl",
+  "ledger_sha256": "d3a51f4e302affeea97c00c3f1e12ce71d1802b8d59abebb8d3612e9cc29cb6f",
+  "manifest_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/css-literature-gate-v1/cache/abdfd6dbf4847f81f0926fe45a6eb05fd550f043ced6fc74f673b5446914cdaa/manifest.json",
+  "manifest_sha256": "c43fd64b8bb908cfe26946a959d7427fb949ada9eac3d8617d92f32cf046c28d",
+  "policy_identity": "7c2fb18bfec9d6a5014ca43d4cd96624e976c76cd8f89513c10017b4b48275d4",
+  "relation": "pilot_adaptation",
+  "run_id": "css-literature-b1-gate-v1-3e1afd7cbb1f",
+  "schema_version": 2,
+  "shot_ids": [
+    0,
+    1
+  ],
+  "statistical_claim": "not_assessed; bounded pilot adaptation, not a statistical reproduction, performance ranking, or superiority claim",
+  "terminations": {
+    "valid_original_candidate": 2
+  },
+  "title": "css-literature-b1-gate-v1-3e1afd7cbb1f \u2014 pilot_adaptation pilot_adaptation not_assessed"
+}

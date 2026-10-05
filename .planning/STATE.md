@@ -5,16 +5,16 @@ current_phase: 6
 current_phase_name: Beam Search, Ensembles, and Candidate Selection
 current_plan: 9
 status: in_progress
-stopped_at: Completed Phase 6 Wave 5 plans 06-07 and 06-08; begin bounded B1 gate 06-09
+stopped_at: Completed all nine Phase 6 plans; run phase-goal verification before Phase 7
 last_updated: "2026-10-05T22:21:00Z"
 last_activity: 2026-10-05
-last_activity_desc: Phase 6 Wave 5 complete: public MBBP replay and runnable third-paper policy route
+last_activity_desc: Phase 6 Plan 09 complete: bounded three-paper B1 policy gate and portable evidence
 state_head: d79b764
 progress:
   total_phases: 14
   completed_phases: 4
   total_plans: 80
-  completed_plans: 79
+  completed_plans: 80
 ---
 
 # Project State
@@ -24,20 +24,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-22)
 
 **Core value:** Make BP decoder differences explicit, reproducible, and fairly comparable through canonical policy execution and published evidence.
-**Current focus:** Phase 06 — first three-paper CSS policy-file gate and auditable ensemble selection, preserving fair BeamSearch/RelayBP evidence
+**Current focus:** Phase 06 goal verification after the three-paper CSS policy-file gate; prepare Phase 7 with parallel CSS literature intake
 
 ## Current Position
 
-Phase: 6 (Beam Search, Ensembles, and Candidate Selection) — PLANNED
-Plan: 06-09 ready
+Phase: 6 (Beam Search, Ensembles, and Candidate Selection) — IMPLEMENTED, pending phase-goal verification
+Plan: 06-09 complete
 Total Phases: 14
 Current Plan: 9
 Total Plans in Phase: 9 (former 10 archived after user change)
-Status: Executing verified Phase 6 plans; Wave 5 complete
-Last activity: 2026-10-05 — Phase 6 Wave 5 completed
-Last Activity Description: MBBP-LD public execution/replay and paper-root TOML compute/reuse verified
+Status: All Phase 6 plans implemented; phase-goal verification pending
+Last activity: 2026-10-05 — Phase 6 Plan 09 completed
+Last Activity Description: Three-paper bounded B1 gate computed, packaged, and reused through the installed policy-file command
 
-Progress: [█████████░] 89% of Phase 6 plans
+Progress: [██████████] 100% of Phase 6 plans
 
 ## Performance Metrics
 

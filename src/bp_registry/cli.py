@@ -260,7 +260,8 @@ def _canonical_result_from_terminal_events(manifest_path: Path, output: Path, ro
     }
 
 
-def run_canonical(manifest_path: str | Path, output: str | Path, *, shot_id: int | None = None) -> dict[str, Any]:
+def run_canonical(manifest_path: str | Path, output: str | Path, *, shot_id: int | None = None,
+                  portable_result_paths: bool = False) -> dict[str, Any]:
     """Run only missing canonical shots and reconstruct result solely from v2 terminals."""
     manifest_path, output = Path(manifest_path), Path(output)
     report = preflight_canonical(manifest_path)
@@ -279,6 +280,11 @@ def run_canonical(manifest_path: str | Path, output: str | Path, *, shot_id: int
         raise ValueError("canonical ledger does not contain exactly the pinned terminal shot IDs")
     result_path = output / "result.json"
     result = _canonical_result_from_terminal_events(manifest_path, output, rows)
+    if portable_result_paths:
+        if manifest_path.resolve() != (output / "manifest.json").resolve():
+            raise ValueError("portable canonical result requires its manifest inside the output directory")
+        result["manifest_path"] = "manifest.json"
+        result["ledger_path"] = "events.jsonl"
     if result_path.exists() and _read_json(result_path) != result:
         raise ValueError("canonical result conflicts with terminal evidence")
     if not result_path.exists():
@@ -309,7 +315,9 @@ def _verify_canonical_run(output: Path, result: dict[str, Any]) -> dict[str, Any
     relation_fixture = (result.get("relation"), result.get("fixture"))
     if relation_fixture not in {("canonical_implemented", "development_fixture"), ("pilot_adaptation", "pilot_adaptation")}:
         raise ValueError("canonical result has an invalid transparent evidence label")
-    manifest_path = Path(result["manifest_path"])
+    portable_paths = result.get("manifest_path") == "manifest.json" and result.get("ledger_path") == "events.jsonl"
+    recorded_manifest = Path(result["manifest_path"])
+    manifest_path = output / recorded_manifest if portable_paths else recorded_manifest
     report = preflight_canonical(manifest_path)
     manifest = preflight(manifest_path).manifest
     assert isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV7))
@@ -325,12 +333,17 @@ def _verify_canonical_run(output: Path, result: dict[str, Any]) -> dict[str, Any
             validate_phase4_shot(ledger_path, run_id=manifest.run_id, shot_id=row["shot_id"], trace_root=output)
         else:
             validate_canonical_shot(events, canonical_public_shot_context(manifest_path, shot_id=row["shot_id"]), trace_root=output)
-    recorded_ledger = Path(result["ledger_path"])
+    raw_ledger = Path(result["ledger_path"])
+    recorded_ledger = output / raw_ledger if portable_paths else raw_ledger
     if recorded_ledger.resolve() != ledger_path.resolve():
         raise ValueError("canonical result ledger path does not resolve to the verified output")
     # Preserve the path spelling used when the result was written. A caller may
     # supply the same output directory as a relative or absolute CLI argument.
-    expected = _canonical_result_from_terminal_events(manifest_path, recorded_ledger.parent, rows)
+    expected_output = output if portable_paths else recorded_ledger.parent
+    expected = _canonical_result_from_terminal_events(manifest_path, expected_output, rows)
+    if portable_paths:
+        expected["manifest_path"] = "manifest.json"
+        expected["ledger_path"] = "events.jsonl"
     if result != expected:
         raise ValueError("canonical result JSON does not equal terminal structural evidence")
     return {**report, "output": str(output), "final_row_count": len(rows), "verified_at": datetime.now(timezone.utc).isoformat()}
