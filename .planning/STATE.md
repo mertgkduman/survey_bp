@@ -6,9 +6,9 @@ current_phase_name: Beam Search, Ensembles, and Candidate Selection
 current_plan: 0
 status: replanning
 stopped_at: Phase 6 former 10 plans superseded; fair BeamSearch/RelayBP replan pending
-last_updated: "2026-10-04T19:26:15Z"
-last_activity: 2026-10-04
-last_activity_desc: Fair damped BeamSearch/RelayBP controller and matched development fixture implemented; Phase 6 replanning remains
+last_updated: "2026-10-05T06:18:13Z"
+last_activity: 2026-10-05
+last_activity_desc: Verified BB72 BP-SF v2 package and fair damped BeamSearch/RelayBP branch published to main; Phase 6 replanning remains
 state_head: 3e9771c5dd0b34ea0665a2c66347eca5c5006ac6
 progress:
   total_phases: 14
@@ -33,9 +33,9 @@ Plan: replan pending
 Total Phases: 14
 Current Plan: 0
 Total Plans in Phase: 0 (former 10 archived after user change)
-Status: Replanning; controlled implementation and eight-shot development fixture complete in isolated worktree
-Last activity: 2026-10-04 — User revised Phase 6 comparison
-Last Activity Description: Fair damped BeamSearch/RelayBP controller and matched development fixture implemented; Phase 6 replanning remains
+Status: Replanning; controlled implementation and eight-shot development fixture published on main
+Last activity: 2026-10-05 — Verified BB72 v2 publication and BeamSearch/RelayBP merge
+Last Activity Description: Verified BB72 BP-SF v2 package and fair damped BeamSearch/RelayBP branch published to main; Phase 6 replanning remains
 
 Progress: [███░░░░░░░] 29%
 
@@ -168,6 +168,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261005-2b9 | Merge fair damped BeamSearch/RelayBP after BB72 BP-SF v2 publication | 2026-10-05 | b84071e | Verified and published | [261005-2b9-merge-verified-fair-damped-beamsearch-re](./quick/261005-2b9-merge-verified-fair-damped-beamsearch-re/) |
 | 261004-krc | Implement fair initial BP with damped BeamSearch branches and RelayBP memory legs | 2026-10-04 | 4955bff | Verified development implementation | [261004-krc-implement-fair-initial-bp-plus-damped-re](./quick/261004-krc-implement-fair-initial-bp-plus-damped-re/) |
 | 261003-s2b | Prespecify, run, and publish the BB72 CSS BP comparison | 2026-10-04 | a23899c | Verified | [261003-s2b-prespecify-and-prepare-bb72-css-bp-decod](./quick/261003-s2b-prespecify-and-prepare-bb72-css-bp-decod/) |
 | 261002-mjc | Parallelize Phase 5 v2 arm verification before publication | 2026-10-02 | b26d0c2 | Verified | [261002-mjc-parallelize-phase-5-v2-arm-verification-](./quick/261002-mjc-parallelize-phase-5-v2-arm-verification-/) |
