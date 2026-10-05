@@ -8,7 +8,7 @@ status: replanning
 stopped_at: Phase 6 former 10 plans superseded; fair BeamSearch/RelayBP replan pending
 last_updated: "2026-10-05T06:18:13Z"
 last_activity: 2026-10-05
-last_activity_desc: Importable policy-file study command and verified result reuse added; Phase 6 replanning remains
+last_activity_desc: Literature policy registry scaffold added; Phase 6 replanning remains
 state_head: 3e9771c5dd0b34ea0665a2c66347eca5c5006ac6
 progress:
   total_phases: 14
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 0
 Total Plans in Phase: 0 (former 10 archived after user change)
 Status: Replanning; BB72 campaign and researcher policy-file interface available on main
-Last activity: 2026-10-05 — Importable policy-file study command added
-Last Activity Description: One command reuses verified published BB72 evidence or produces missing results; canonical CSS policies accept TOML/JSON; Phase 6 replanning remains
+Last activity: 2026-10-05 — Literature policy registry scaffold added
+Last Activity Description: Per-paper source template separates mapped-only specifications from executable TOML; Phase 6 replanning remains
 
 Progress: [███░░░░░░░] 29%
 
@@ -168,6 +168,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261005-kcm | Scaffold literature policy registry and source status contract | 2026-10-05 | 660bdd8 | Verified | [261005-kcm-scaffold-literature-policy-registry-and-](./quick/261005-kcm-scaffold-literature-policy-registry-and-/) |
 | 261005-jlz | Add importable policy-file study command with verified cache reuse | 2026-10-05 | 1f8b1c3 | Verified | [261005-jlz-add-importable-policy-file-study-command](./quick/261005-jlz-add-importable-policy-file-study-command/) |
 | 261005-fze | Run matched BB72 BeamSearch/RelayBP parameter and evaluation campaign | 2026-10-05 | 3db441e | Verified and published | [261005-fze-run-matched-bb72-beamsearch-relaybp-para](./quick/261005-fze-run-matched-bb72-beamsearch-relaybp-para/) |
 | 261005-2b9 | Merge fair damped BeamSearch/RelayBP after BB72 BP-SF v2 publication | 2026-10-05 | b84071e | Verified and published | [261005-2b9-merge-verified-fair-damped-beamsearch-re](./quick/261005-2b9-merge-verified-fair-damped-beamsearch-re/) |
