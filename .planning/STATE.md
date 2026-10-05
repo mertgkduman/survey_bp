@@ -3,12 +3,12 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 6
 current_phase_name: Beam Search, Ensembles, and Candidate Selection
-current_plan: 0
-status: replanning
-stopped_at: Phase 6 former 10 plans superseded; fair BeamSearch/RelayBP replan pending
-last_updated: "2026-10-05T06:18:13Z"
+current_plan: 1
+status: planned
+stopped_at: Phase 6 nine-plan replan verified; begin 06-01
+last_updated: "2026-10-05T20:47:18Z"
 last_activity: 2026-10-05
-last_activity_desc: First three-paper CSS literature gate captured with 14 non-runnable source specifications; Phase 6 replanning remains
+last_activity_desc: Phase 6 nine-plan replan independently passed; first CSS policy-file execution slice ready
 state_head: a6526e8
 progress:
   total_phases: 14
@@ -24,18 +24,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-22)
 
 **Core value:** Make BP decoder differences explicit, reproducible, and fairly comparable through canonical policy execution and published evidence.
-**Current focus:** Phase 06 — fair initial BP with damped BeamSearch branches and RelayBP disordered-memory legs
+**Current focus:** Phase 06 — first three-paper CSS policy-file gate and auditable ensemble selection, preserving fair BeamSearch/RelayBP evidence
 
 ## Current Position
 
-Phase: 6 (Beam Search, Ensembles, and Candidate Selection) — REPLAN REQUIRED
-Plan: replan pending
+Phase: 6 (Beam Search, Ensembles, and Candidate Selection) — PLANNED
+Plan: 06-01 ready
 Total Phases: 14
-Current Plan: 0
-Total Plans in Phase: 0 (former 10 archived after user change)
-Status: Replanning; BB72 campaign and researcher policy-file interface available on main
-Last activity: 2026-10-05 — First CSS literature gate captured
-Last Activity Description: Yao BPGD, Bhatnagar impulse, and Rabeti–Mahdavifar MBBP-LD have 14 non-runnable source specifications and paper reproduction records; Phase 6 replanning remains
+Current Plan: 1
+Total Plans in Phase: 9 (former 10 archived after user change)
+Status: Planned and independently checked; BB72 campaign and researcher policy-file interface available on main
+Last activity: 2026-10-05 — Phase 6 nine-plan replan verified
+Last Activity Description: Three-paper CSS gate and controlled BeamSearch/RelayBP scope reconciled; begin 06-01
 
 Progress: [███░░░░░░░] 29%
 
@@ -194,11 +194,11 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-**Resume file:** .planning/phases/05-guided-and-perturbative-bp-interventions/05-01-PLAN.md
+**Resume file:** .planning/phases/06-beam-search-ensembles-and-candidate-selection/06-01-PLAN.md
 
-Last session: 2026-09-30
-Stopped at: Phase 05 plans verified
-Next command: $gsd-execute-phase 5; follow the bounded intervention plans and do not restart the cancelled Phase 4 campaign
+Last session: 2026-10-05
+Stopped at: Phase 06 nine-plan replan independently verified; Phase 05 human review remains open
+Next command: $gsd-execute-phase 06, beginning with the literature-policy command tracer; do not relaunch completed BB72 campaigns by default
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
 Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md`.

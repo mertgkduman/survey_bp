@@ -6,7 +6,7 @@ Build a provenance-preserving research platform from paper evidence through nati
 
 **Milestone:** v1.0 — platform and first journal-paper evidence.
 **Structure:** End-to-end capability slices (`mvp` mode), fine granularity. Fourteen phases are used because the three required regimes each need distinct implementation and experimental qualification; phase counts are not a reason to merge those gates or defer publication scope.
-**Planning status:** Phases 1–4 are complete. Phase 5 is next; later plan counts remain TBD until their phase planning.
+**Planning status:** Phases 1–4 are complete. Phase 5 implementation is technically verified with human review still open. Phase 6 is being replanned around the approved three-paper CSS policy gate and existing BeamSearch/RelayBP work; later plan counts remain TBD.
 
 ## Phases
 
@@ -15,7 +15,7 @@ Build a provenance-preserving research platform from paper evidence through nati
 - [x] **Phase 3: Update Rules and Scheduling** — Compare the requested message rules and schedules with explicit semantics and work counters. (completed 2026-09-24)
 - [x] **Phase 4: Memory Policies and Relay-BP** — Implement state/history policies and the source-defined relay composition. (completed 2026-09-30)
 - [ ] **Phase 5: Guided and Perturbative BP Interventions** — Implement BPGD, impulse, freezing, syndrome/sign flips, and restarting.
-- [ ] **Phase 6: Beam Search, Ensembles, and Candidate Selection** — Expose branching, pruning, lists, and voting as auditable policies.
+- [ ] **Phase 6: Beam Search, Ensembles, and Candidate Selection** — Expose branching, pruning, lists, and voting as auditable policies, and qualify the first three-paper CSS policy-file gate.
 - [ ] **Phase 7: Optional Postprocessing** — Add independent OSD/LSD/SI/OTF processing with BP-only attribution preserved.
 - [ ] **Phase 8: Reproducible Campaigns and Statistical Assessment** — Run paired, resumable campaigns with prespecified statistical criteria.
 - [ ] **Phase 9: CSS Reproduction and Controlled Comparisons** — Qualify selected source results and isolate policy contributions in CSS decoding.
@@ -395,14 +395,24 @@ Plans:
 **Requirements:** MOD-04, INT-05, CAN-01, CAN-02
 **Success Criteria:**
 
-1. Canonical BeamSearch exposes masked BP, branch decisions, beam width, ranking/pruning, budgets, and selection, with source-linked fixtures and a pinned executable reference where available.
+1. The controlled CSS BeamSearch/RelayBP comparison has a shared initial BP run, declared damped branch/leg semantics, masked BeamSearch branches, ranking/pruning, width/budgets, candidate selection, source-linked fixtures, and verified work evidence. The original BeamSearch circuit procedure and native reference remain Phase 12–13 targets.
 2. Generic branching/ensemble compositions declare member identity, inherited versus independent state, resource limits, and work aggregation without double-counting or hiding discarded paths.
 3. List selection preserves candidate origin and eligibility with declared scores/ties; voting defines its object and electorate and validates its final output against original constraints.
 4. Researchers can replay a small search tree and account for accepted, rejected, pruned and budget-exhausted paths through the ledger.
 5. The first CSS literature set (Yao BPGD, Bhatnagar impulse, and Rabeti–Mahdavifar MBBP-LD) has source-grounded paper-level policy files with explicit runnable/unsupported status. At least one qualified variant per paper runs through the common policy-file command on a bounded CSS study with verified provenance and original-problem checks; full curve assessment remains in Phases 8–9.
 
-**Research focus:** Source beam/masking/ranking rules, reference integration terms and interface, voting semantics, search work versus parallel latency, and a small B1 literature-policy execution gate.
-**Plans:** TBD
+**Research focus:** Controlled CSS BeamSearch/RelayBP semantics, voting, search work versus parallel latency, and a small B1 literature-policy execution gate; original circuit reference integration follows in Phases 12–13.
+**Plans:** 9 plans across 6 waves, independently checked in `06-PLAN-CHECK.md`.
+
+- [ ] 06-01 — First paper-root TOML through strict compilation, public command, verified compute/reuse and separate numerical/provenance identities.
+- [ ] 06-02 — Yao BP/BPGD T/R qualification and one bounded runnable BPGD policy.
+- [ ] 06-03 — True impulse force-to-zero and V2C-only clipping with historical compatibility.
+- [ ] 06-04 — Three Bhatnagar impulse dispositions and a runnable force-to-zero policy.
+- [ ] 06-05 — Generic candidate selection/voting and regression lock for completed fair BeamSearch/RelayBP evidence.
+- [ ] 06-06 — MBBP-LD augmented bases, independent members, frequency-weighted selection and typed no-convergence terminal.
+- [ ] 06-07 — Versioned ensemble public execution, ledger and independent replay.
+- [ ] 06-08 — Runnable MBBP-LD policy through the common command.
+- [ ] 06-09 — Bounded B1 gate, all 14 dispositions, installed-CLI reuse assertions and evidence package.
 
 ### Phase 7: Optional Postprocessing
 
@@ -497,7 +507,7 @@ Plans:
 1. Circuit manifests identify and hash the noisy circuit, rounds/boundaries, detector/fault representation, observables, extraction/conversion options, and any correlation approximations.
 2. Known injected-fault fixtures verify detector and logical-observable maps; a detector-fitting candidate with wrong logical prediction fails the appropriate observable check.
 3. Eligible canonical policies execute using mathematically compatible factors, with binary reuse justified and richer representations introduced only when required by the selected model.
-4. Pinned circuit references consume matched observations through documented transforms and expose any instrumentation limits.
+4. Pinned circuit references, including the original BeamSearch implementation for its selected circuit target, consume matched observations through documented transforms and expose any instrumentation limits.
 5. The ledger distinguishes detector fit and observable correctness and explicitly marks static exact/degenerate recovery fields not applicable when undefined; channel dependencies cannot be silently dropped.
 
 **Research focus:** Extraction circuits, detector/fault factorization, exclusive/correlated mechanisms, rounds/windows, observables, and source reference settings.
@@ -514,7 +524,7 @@ Plans:
 1. Selected circuit source experiments run under pinned source-faithful conditions and produce native-reference assessments with complete model provenance.
 2. Canonical circuit realizations are assessed against the source targets with declared tolerances, stopping/uncertainty procedures, and explicit pass/fail/inconclusive status.
 3. Controlled policy comparisons share circuit samples and budgets and report observable failure, convergence, work, runtime distributions, resources, and post-selection separately.
-4. Circuit-first paper claims deferred during CSS adaptation work are addressed in their original setting; remaining limitations are linked to experiment records and manuscript evidence.
+4. Circuit-first paper claims deferred during CSS adaptation work, including the original BeamSearch target and pinned reference, are addressed in their original setting; remaining limitations are linked to experiment records and manuscript evidence.
 
 **Research focus:** Circuit paper/figure selection, exact source settings, correlation sensitivity, native/canonical timing comparability, and rare-event precision.
 **Plans:** TBD

@@ -19,3 +19,9 @@
 - The old 06-01 through 06-10 plans, their validation/source audit, and their PASS report are archived under `superseded-20261004/`. Their PASS verdict applies only to the former AutDEC/BeamSearch ordering. The Phase 6 plan must be rebuilt around this user decision before `$gsd-execute-phase 06` is used.
 - The Phase 5 notebook visual UAT remains open. This explicit implementation request authorizes independent controlled development while that visual review is pending; it does not mark the review passed.
 - The sealed BB72 BP-SF v2 run remains in the original checkout. Development occurs in `feat/fair-damped-beam-relay`; merge into main only after the v2 run and publisher finish.
+
+## Current planning baseline (2026-10-05)
+
+The BB72 BP-SF v2 and matched BeamSearch/RelayBP work have since been published to `main`; the preceding branch/run condition is historical. Replan from the tracked implementation and verified evidence currently on `main`, without rerunning a completed campaign by default.
+
+The user approved the [three-paper CSS literature gate](06-LITERATURE-GATE.md) as an additional Phase 6 acceptance slice. Its 14 paper-root `.spec.toml` records are source specifications, not executable decoder files. Make the kernel-readable policy-file route and bounded B1 execution concrete first, while preserving the controlled BeamSearch/RelayBP decisions above and leaving full publication-curve assessment to Phases 8–9.

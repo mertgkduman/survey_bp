@@ -80,7 +80,7 @@ paragraph records the September 26 review state, not an open implementation gap.
 - [x] **MOD-01**: A researcher can execute a source-linked canonical Relay-BP composition with explicit memory, ensemble/relay legs, transferred state, stopping, and candidate selection, and run the pinned original implementation as a reference in eligible regimes.
 - [ ] **MOD-02**: A researcher can execute source-defined BPGD as a canonical guided-decimation composition with reliable-variable selection, fixation, BP rounds, and recorded state transitions.
 - [ ] **MOD-03**: A researcher can execute source-defined impulse decoding with its failure trigger, shortening attempts, branch budgets, candidate lifting, and selection represented explicitly in the canonical execution model.
-- [ ] **MOD-04**: A researcher can execute a source-linked canonical BeamSearch composition with explicit branching, masked BP, beam ranking/pruning, width/budgets, and candidate selection, alongside the pinned original reference where available.
+- [ ] **MOD-04**: A researcher can execute a source-linked canonical BeamSearch CSS adaptation with a declared common initial BP run, masked/decimated branches, beam ranking/pruning, width/budgets, optional damping, candidate selection, and complete work evidence. The original paper's circuit procedure and pinned executable reference are qualified under CIR-04 and CEV-01.
 
 ### Additional interventions
 
@@ -145,9 +145,9 @@ paragraph records the September 26 review state, not an open implementation gap.
 - [ ] **CIR-01**: A researcher can load and hash a noisy syndrome-extraction circuit, round/boundary conventions, detector/fault representation, observable map, and extraction settings as a typed circuit problem.
 - [ ] **CIR-02**: An independent evaluator scores predicted logical-observable flips against circuit truth and separately checks detector fit when defined, using injected-fault fixtures and explicit not-applicable static-recovery fields.
 - [ ] **CIR-03**: A researcher can execute eligible canonical policies on circuit problems through a kernel compatible with the declared factors, reusing binary parity updates only where mathematically justified.
-- [ ] **CIR-04**: A researcher can execute pinned source circuit-decoder references on matched observation records with documented input/output translations and observability limits.
+- [ ] **CIR-04**: A researcher can execute pinned source circuit-decoder references, including the original BeamSearch implementation for its selected circuit target, on matched observation records with documented input/output translations and observability limits.
 - [ ] **CIR-05**: Circuit manifests explicitly preserve or identify approximations to dependent/exclusive/correlated fault mechanisms; graph conversion cannot silently change the simulated noise claim.
-- [ ] **CEV-01**: A researcher can run selected published circuit experiments and inspect native-reference reproduction assessments under source-faithful settings.
+- [ ] **CEV-01**: A researcher can run selected published circuit experiments, including the original BeamSearch target when qualified, and inspect native-reference reproduction assessments under source-faithful settings.
 - [ ] **CEV-02**: A researcher can assess canonical circuit realizations against the selected published outputs within declared statistical tolerances, including discrepancies and inconclusive outcomes.
 - [ ] **CEV-03**: A researcher can compare and ablate eligible circuit policies on shared samples and declared work/resources while reporting observable failure, convergence, work, runtime distributions, and post-selection separately.
 

@@ -1,8 +1,8 @@
 # Phase 6: Beam Search, Ensembles, and Candidate Selection - Research
 
-**Researched:** 2026-10-04
-**Domain:** BP search trees, automorphism ensembles, candidate selection, voting, and auditable work accounting
-**Confidence:** HIGH for repository architecture; MEDIUM for source-paper interpretation because the BeamSearch paper and implementation differ at one material rule
+**Researched:** 2026-10-05 (additive literature-policy gate refresh; original BeamSearch research 2026-10-04)
+**Domain:** BP search trees, controlled BeamSearch/RelayBP extensions, literature-policy ingestion, ensembles, candidate selection, and auditable work accounting
+**Confidence:** HIGH for repository architecture; MEDIUM for paper-specific semantics and artifact matching
 
 ## Summary
 
@@ -12,16 +12,57 @@ BeamSearch must expose qualified source variants. The paper branches on the leas
 
 Use AutDEC as the source model for independent ensemble members and likelihood selection, not as evidence for voting. AutDEC transforms syndromes using automorphism-induced check permutations, runs constituent decoders, admits valid corrections, and selects minimum weight under its code-capacity model. Its official repository currently executes members serially even though the paper presents the online ensemble as parallel. [CITED: https://arxiv.org/html/2503.01738v1] [VERIFIED: https://github.com/hsayginel/autdec/blob/00746ced028ebc6edca1b4e56ee6db3d9039d553/autdec/code_capacity.py#L55-L120] Voting therefore needs an explicit `canonical_generic` status rather than a false paper attribution. [ASSUMED]
 
-**Primary recommendation:** implement a kernel-generic masked seam whose source-qualified BeamSearch profiles bind min-sum, preserve the pinned C++ sentinel/reuse edge behavior only in its observed profile, use the exact AutDEC `U_A H = H A` coordinate convention, require an isolated native build attempt, and complete candidate/vote ledgers plus deterministic replay before a performance campaign. [ASSUMED]
+**Primary recommendation (historical, superseded for the current replan by the binding 2026-10-05 section below):** implement a kernel-generic masked seam whose source-qualified BeamSearch profiles bind min-sum, preserve the pinned C++ sentinel/reuse edge behavior only in its observed profile, use the exact AutDEC `U_A H = H A` coordinate convention, require an isolated native build attempt, and complete candidate/vote ledgers plus deterministic replay before a performance campaign. [ASSUMED]
 
 Phase 5 provides a technically verified base: its report records `status: human_needed`, `score: 14/14 must-haves verified`, `behavior_unverified: 0`, and two remaining human review categories. [VERIFIED: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-VERIFICATION.md:1-5,128-151`] Phase 6 may build on its immutable-original, truth-free controller, independent original check, and typed budget-denial patterns, while final phase progression still respects those human review items. [VERIFIED: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-VERIFICATION.md:164-170`] [ASSUMED]
+
+## 2026-10-05 Planning Precedence and CSS Literature Gate
+
+This section is additive and binding for the replan. `06-CONTEXT.md` and `06-LITERATURE-GATE.md` supersede the former AutDEC-oriented Phase 6 plan. The AutDEC, generic-voting, and native BeamSearch sections below remain historical design research for future requirement work; they do not authorize reintroducing the superseded plan. Reuse the tracked fair BeamSearch/RelayBP implementation and verified BB72 evidence on `main`; do not rerun that completed campaign by default. [VERIFIED: `.planning/phases/06-beam-search-ensembles-and-candidate-selection/06-CONTEXT.md:40-46`; `.planning/phases/06-beam-search-ensembles-and-candidate-selection/06-LITERATURE-GATE.md:1-9`]
+
+The new acceptance slice is one bounded CSS gate for Yao BPGD, Bhatnagar impulse decoding, and Rabeti–Mahdavifar MBBP-LD. The 14 paper-root files are source specifications, not executable decoder files: each representative record says verbatim `record_kind = "literature_policy_spec"` and `execution_status = "not_runnable"`. [VERIFIED: `literature_policies/yao-2024-guided-decimation/bpgd-t100-r010.spec.toml:1-6`; `literature_policies/bhatnagar-2026-impulse-decoding/minimum-weight-1.spec.toml:1-6`; `literature_policies/rabeti-2026-multiple-bases-bp-list-decoding/mbbp-ld.spec.toml:1-6`] Their equations and metadata are evidence to validate; they must never be evaluated as Python or silently treated as registered policy kinds. [VERIFIED: `literature_policies/README.md:7-11`]
+
+### Existing seam and required extension
+
+The public command is already the correct user-facing seam: `bp-registry` resolves to `bp_registry.study_cli:main`, whose exact inputs are `study`, required `--decoder`, optional `--results-root`, and `--workers`. [VERIFIED: `pyproject.toml:5-13`; `src/bp_registry/study_cli.py:12-20`] Its current canonical route reads TOML with `tomllib`, requires the seven verbatim roles `"update", "schedule", "state_memory", "intervention", "stopping", "selection", "postprocessing"`, and accepts only study schemas `2, 3, 4`. [VERIFIED: `src/bp_registry/study.py:14-23,35-44,75-97,100-125`] Extend this route rather than adding a paper-specific command. [ASSUMED]
+
+Partition each runnable literature file into two strict projections: an executable projection containing only registered policy/control fields and a provenance projection containing source identity, equation anchors, explanations, qualification, and unresolved facts. Derive execution identity only from the first projection; retain a normalized metadata digest and raw policy-document digest so prose or comments remain traceable without changing numerical decoder identity. Unknown executable keys, a `.spec.toml` input, `execution_status = "not_runnable"`, unsupported kernels, and nonfinite controls must fail before artifact loading. [ASSUMED]
+
+The cache/result receipt must expose executable-policy, normalized-provenance, and raw-document identities. The executable identity remains the cache-equivalence key; the provenance identities identify which paper record requested or reused the computation. This extends the current verified compute/reuse behavior without making metadata executable. [VERIFIED: `src/bp_registry/study.py:120-148`; `tests/test_study_entrypoint.py:17-39`] [ASSUMED]
+
+### Paper-family implementation map
+
+| Family | Source-grounded semantics | Existing seam and required work |
+|---|---|---|
+| Yao binary BP/BPGD | Requested axes are BP at 100 iterations, BPGD `T=1,10,70,100`, and `T=100` with `R=2,5,10,50,882`; the record preserves the Algorithm 1 versus Eq. (36) zero-bias discrepancy. [CITED: https://arxiv.org/pdf/2312.10950v2] [VERIFIED: `literature_policies/yao-2024-guided-decimation/paper_reproduction/PAPER.md:10-33`] | The dispatcher has the exact branch `if spec.kind == "guided_decimation"` and passes `finite_bias_magnitude`, `zero_rule`, `round_limit`, and `sweeps_per_round` to the controller. [VERIFIED: `src/bp_registry/canonical/phase5.py:170-203`] Add V5/V6 study-file expansion, strict T/R translation, and zero-rule qualification; map the BP comparator to the identity intervention with the source iteration cap. [ASSUMED] |
+| Bhatnagar impulse | The record requires initial BP, fresh coordinate attempts after failure, shortening value 0 or 1, first-convergence or minimum-weight selection, 100 sweeps, and V2C clipping at 25. [CITED: https://arxiv.org/pdf/2606.18240v1] [VERIFIED: `literature_policies/bhatnagar-2026-impulse-decoding/paper_reproduction/PAPER.md:10-30`] | Current exact literals are `Realization = Literal["semantic_forced_one", "exact_shortening"]` and `Selection = Literal["minimum_original_weight", "first_convergence"]`; dispatch already handles `spec.kind == "impulse"`. [VERIFIED: `src/bp_registry/canonical/impulse.py:20-47`; `src/bp_registry/canonical/phase5.py:197-203`] Add a forced-value field and source-semantic forced-zero route. Attempts now hardcode `(target,), (1,)` and `_ForcedOneSession`, so `/0` cannot be implemented by renaming a policy. [VERIFIED: `src/bp_registry/canonical/impulse.py:372-400`] Map `minimum_weight` explicitly to `minimum_original_weight`, and test the source V2C-only clip separately from other numerical saturation. [ASSUMED] |
+| Rabeti–Mahdavifar MBBP-LD | The record specifies normalized min-sum `alpha=0.875`, serial checks, augmented bases `H(t)`, independent members, 100 iterations, and score `frequency(candidate)/(Hamming_weight(candidate)+1)`. [CITED: https://arxiv.org/pdf/2605.14170v1] [VERIFIED: `literature_policies/rabeti-2026-multiple-bases-bp-list-decoding/mbbp-ld.spec.toml:14-44`] | Reuse canonical lineage, unique budget leaves, independent BP sessions, candidate admission, and original checks. Add a versioned subtree/basis transformation, explicit augmented syndrome, one independent member per basis, deduplicated candidate frequency, and deterministic weighted selection. Exact partition/permutation, syndrome notation, and ties remain gaps, so the first bounded run is a declared adaptation unless resolved. [VERIFIED: `literature_policies/rabeti-2026-multiple-bases-bp-list-decoding/paper_reproduction/PAPER.md:15-25`] [ASSUMED] |
+
+### B1 qualification and bounded gate
+
+Use the repository B1 artifact only after its existing identity checks pass. Its source record says verbatim `"code_id": "b1-ghp-882"`, raw SHA-256 `"3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6"`, dimensions `"hx": [441, 882], "hz": [441, 882]`, and logical provenance `"status": "project-derived"`, `"author_supplied": false`. [VERIFIED: `data/artifacts/b1-panteleev-kalachev-v3.json:1-49`] Reconstruction validates the local matrix/logical identity, but every paper record leaves equality to its ordered experimental artifact unresolved. [VERIFIED: `data/evidence/phase4-b1-identity-resolution.json:2-30`; `literature_policies/yao-2024-guided-decimation/paper_reproduction/PAPER.md:27-33`; `literature_policies/bhatnagar-2026-impulse-decoding/paper_reproduction/PAPER.md:20-26`; `literature_policies/rabeti-2026-multiple-bases-bp-list-decoding/paper_reproduction/PAPER.md:15-21`]
+
+Run one qualified variant from each family through the same `bp-registry <study> --decoder <policy>` interface, then invoke it again to prove verified reuse. Use a small pinned shot set and `not_assessed` evidence; require terminal ledgers, typed work, candidate lineage, original-syndrome checks, deterministic replay, and explicit adaptation/artifact-gap labels. All 14 requested records must either preflight as runnable `.toml` files or return a typed unsupported/non-runnable result. Full Figure 3/5/6 assessment remains in Phases 8–9. [VERIFIED: `.planning/phases/06-beam-search-ensembles-and-candidate-selection/06-LITERATURE-GATE.md:5-9`; `.planning/notes/css-literature-policy-gate.md:30-35`] [ASSUMED]
+
+### Gate validation additions
+
+- Parser: comments and source prose cannot affect execution identity; executable controls must; metadata and raw-document identities remain visible; `.spec.toml`, unknown controls, and nonfinite values fail before artifact I/O. [ASSUMED]
+- BPGD/impulse: all requested T/R, selection, and forced-value variants translate to typed controls; zero-bias, final-round, selection, ordering, and forced-zero/one fixtures replay byte-identically. [ASSUMED]
+- MBBP-LD: hand-audited small graphs verify basis augmentation, augmented syndrome, member independence, duplicate frequency, score/ties, no-convergence behavior, original checks, and unique-member work. [ASSUMED]
+- B1 smoke: at least one variant per paper computes once and reuses once; altered ledgers, artifact digests, executable controls, or provenance receipts are rejected. [ASSUMED]
+
+### Remaining source gaps
+
+1. Author-code identities are unverified for all three selected sources. [VERIFIED: `literature_policies/yao-2024-guided-decimation/paper_reproduction/PAPER.md:3-8`; `literature_policies/bhatnagar-2026-impulse-decoding/paper_reproduction/PAPER.md:3-8`; `literature_policies/rabeti-2026-multiple-bases-bp-list-decoding/paper_reproduction/PAPER.md:3-7`]
+2. B1 ordered matrices/logicals are not matched to the three paper experiments; the local artifact is qualified only as the project candidate above. [VERIFIED: paper-reproduction and B1 records cited above]
+3. Yao's zero-bias rule, Bhatnagar's message schedule and finite realization of infinite priors, and MBBP-LD's partition/permutation, augmented-syndrome notation, and tie completion require explicit interpretation records. [VERIFIED: `literature_policies/yao-2024-guided-decimation/bpgd-t100-r010.spec.toml:14-18`; `literature_policies/bhatnagar-2026-impulse-decoding/minimum-weight-1.spec.toml:19-25`; `literature_policies/rabeti-2026-multiple-bases-bp-list-decoding/mbbp-ld.spec.toml:14-18`]
 
 <phase_requirements>
 ## Phase Requirements
 
 | ID | Description | Research support |
 |---|---|---|
-| MOD-04 | A researcher can execute a source-linked canonical BeamSearch composition with explicit branching, masked BP, beam ranking/pruning, width/budgets, and candidate selection, alongside the pinned original reference where available. | Exact paper flow, repository differences, pin, interface, license boundary, and fixtures are specified below. [CITED: https://arxiv.org/html/2512.07057v2] |
+| MOD-04 | A researcher can execute a source-linked canonical BeamSearch CSS adaptation with a common initial BP run, masked/decimated branches, ranking/pruning, width/budgets, optional damping, candidate selection, and complete work evidence. Original circuit reference work belongs to CIR-04/CEV-01 in Phases 12–13. | The binding gate section above and tracked fair BeamSearch/RelayBP evidence govern Phase 6; original paper/repository research below is retained for the circuit stages. [CITED: https://arxiv.org/html/2512.07057v2] |
 | INT-05 | A researcher can compose branching and ensembling with explicit parent/member identity, resource limits, shared versus independent state, and aggregated work. | Existing `SearchRelationship` values are quoted below; the recommended controller and budget hierarchy make every path and member explicit. [VERIFIED: `src/bp_registry/canonical/contracts.py:263-309`] |
 | CAN-01 | A researcher can select from a candidate list using declared eligibility, scoring, and deterministic tie rules, preserving rejected candidates and their origins. | Existing `CandidateRecord` and `SelectionRecord` retain origin, validation, reason, ordinal, digest, score, and the complete ordered frozen list. [VERIFIED: `src/bp_registry/canonical/lineage.py:182-277`] |
 | CAN-02 | A researcher can apply a precisely defined voting policy over a declared object and eligible set, with final original-problem validity checked rather than assumed. | Two canonical-generic vote objects and their validation rules are specified below. [ASSUMED] |
@@ -34,7 +75,7 @@ Phase 5 provides a technically verified base: its report records `status: human_
 - Keep original problems immutable; policies cannot inspect hidden simulation truth; independent evaluators judge outputs in original coordinates. [VERIFIED: `AGENTS.md:project-doc`]
 - Emit an event ledger for every simulation and a reproduction manifest for every supported paper; distinguish source-faithful reproduction, canonical adaptation, controlled comparison, and mapped-only evidence. [VERIFIED: `AGENTS.md:project-doc`]
 - Prespecify tolerances, budgets, stopping, and denominator rules and retain failed or inconclusive evidence. [VERIFIED: `AGENTS.md:project-doc`]
-- Do not alter the running BB72 v2 source-sealed study during this phase-planning work. [VERIFIED: parent task instruction]
+- Historical constraint: do not alter the then-running BB72 v2 source-sealed study. The campaign is now complete; the 2026-10-05 precedence section governs this replan. [VERIFIED: parent task instruction; `.planning/phases/06-beam-search-ensembles-and-candidate-selection/06-CONTEXT.md:40-46`]
 
 ## Architectural Responsibility Map
 
@@ -61,10 +102,10 @@ Phase 5 provides a technically verified base: its report records `status: human_
 
 | Reference | Immutable identity | Use | Boundary |
 |---|---|---|---|
-| BeamSearchDecoder | commit `084a475b05fb64308103317a1ce5a0c4b0be58aa` | Required source reference for MOD-04 | Mandatory stage-local build attempt; capture commit/tree/build/dependencies/logs and independently validate every returned vector. [VERIFIED: https://github.com/ionq-publications/BeamSearchDecoder/blob/084a475b05fb64308103317a1ce5a0c4b0be58aa/README.md#L6-L22] |
+| BeamSearchDecoder | commit `084a475b05fb64308103317a1ce5a0c4b0be58aa` | Original circuit reference for CIR-04/CEV-01 in Phases 12–13 | Later stage-local build attempt; capture commit/tree/build/dependencies/logs and independently validate every returned vector. [VERIFIED: https://github.com/ionq-publications/BeamSearchDecoder/blob/084a475b05fb64308103317a1ce5a0c4b0be58aa/README.md#L6-L22] |
 | AutDEC | commit `00746ced028ebc6edca1b4e56ee6db3d9039d553` | Ensemble semantic reference and optional fixture cross-check | Its repository is MIT, Python `>=3.11`, and pins `ldpc=2.1.2`, which differs from this project's `ldpc==2.4.1`; isolate it. [VERIFIED: https://github.com/hsayginel/autdec/blob/00746ced028ebc6edca1b4e56ee6db3d9039d553/pyproject.toml#L31-L41] |
 
-**Installation:** no native-reference package belongs in the canonical environment for Phase 6. [ASSUMED] For BeamSearch, create a digest-bound stage-local virtual environment at the pinned commit, run `pip install -r requirements.txt`, then run `python3 setup.py build_ext --inplace` from `decoder`, exactly as the official README documents. [VERIFIED: https://github.com/ionq-publications/BeamSearchDecoder/blob/084a475b05fb64308103317a1ce5a0c4b0be58aa/README.md#L6-L22] Capture the Python/compiler/platform identities, resolved dependency lock, commands, stdout/stderr, extension digest, and smoke result. [ASSUMED] A `native_unavailable` result is admissible only after this isolated attempt fails for a recorded platform or build reason. [ASSUMED]
+**Later circuit-stage installation note (not a Phase 6 gate):** no native-reference package belongs in the canonical environment. [ASSUMED] For BeamSearch in Phases 12–13, create a digest-bound stage-local virtual environment at the pinned commit, run `pip install -r requirements.txt`, then run `python3 setup.py build_ext --inplace` from `decoder`, exactly as the official README documents. [VERIFIED: https://github.com/ionq-publications/BeamSearchDecoder/blob/084a475b05fb64308103317a1ce5a0c4b0be58aa/README.md#L6-L22] Capture the Python/compiler/platform identities, resolved dependency lock, commands, stdout/stderr, extension digest, and smoke result. [ASSUMED] A `native_unavailable` result is admissible only after this isolated attempt fails for a recorded platform or build reason. [ASSUMED]
 
 ## Package Legitimacy Audit
 
@@ -286,7 +327,7 @@ key = (
 
 | Req | Behavior | Test type | Automated command | Exists? |
 |---|---|---|---|---|
-| MOD-04 | min-sum binding, qualified paper ties, observed C++ root sentinel/reuse behavior, masking, warm start, pruning, quota, and native build/smoke | unit/integration | quick run above plus isolated native smoke | No, Wave 0 [ASSUMED] |
+| MOD-04 | Controlled CSS common initial BP, declared damping, masked BeamSearch branches, pruning, quota, original validation, and reuse of existing fair BeamSearch/RelayBP evidence | unit/integration | active 06-05 and 06-09 plan commands | Partly implemented; active replan closes remaining selection/ledger gaps [ASSUMED] |
 | INT-05 | member/branch identities, transfer declarations, leaf work aggregation, topology-independent replay | unit/integration | quick run above | No, Wave 0 [ASSUMED] |
 | CAN-01 | eligibility, scoring, ties, complete rejected-origin retention | unit | quick run above | No, Wave 0 [ASSUMED] |
 | CAN-02 | exact plurality plus invalid coordinate-majority output and final original check | unit | quick run above | No, Wave 0 [ASSUMED] |
@@ -299,13 +340,13 @@ key = (
 - Equal reliability/path/candidate scores that exercise every tie rule and remain stable under reversed completion order. [ASSUMED]
 - A nontrivial AutDEC automorphism fixture validating `U_A H = H A`, `(H A)c = U_A s`, direct `Hc=s` without inverse mapping, independent state, and minimum-weight selection. [ASSUMED]
 - A coordinate-majority fixture whose synthesized vector fails the original syndrome and is rejected. [ASSUMED]
-- A mandatory pinned native build/smoke attempt in the isolated environment documented by the official README. Only a demonstrated build/platform failure may produce typed `native_unavailable` evidence, including commands, logs, platform, compiler, dependency resolution, and failure reason. [VERIFIED: https://github.com/ionq-publications/BeamSearchDecoder/blob/084a475b05fb64308103317a1ce5a0c4b0be58aa/README.md#L6-L22] [ASSUMED]
+- For CIR-04/CEV-01 in Phases 12–13, a pinned native build/smoke attempt in the isolated environment documented by the official README. Only a demonstrated build/platform failure may produce typed `native_unavailable` evidence, including commands, logs, platform, compiler, dependency resolution, and failure reason. [VERIFIED: https://github.com/ionq-publications/BeamSearchDecoder/blob/084a475b05fb64308103317a1ce5a0c4b0be58aa/README.md#L6-L22] [ASSUMED]
 
 ### Sampling Rate
 
 - **Per task commit:** targeted Phase 6 tests. [ASSUMED]
 - **Per wave merge:** full suite. [ASSUMED]
-- **Phase gate:** full suite green, byte-identical replay, native identity captured, and all four requirements traced before `$gsd-verify-work`. [ASSUMED]
+- **Phase gate:** full suite green, byte-identical replay, controlled BeamSearch/RelayBP evidence verified without rerun, and all four Phase 6 requirements traced before `$gsd-verify-work`. [ASSUMED]
 
 ## Environment Availability
 
@@ -315,10 +356,10 @@ key = (
 | Project virtualenv | tests | yes | Python 3.12.2, pytest 9.0.3 [VERIFIED: environment probe on 2026-10-04] | recreate from project pins |
 | Git | pinned native sources | yes | 2.52.0 [VERIFIED: environment probe on 2026-10-04] | archive with digest |
 | Slurm | optional native/performance runs | yes | 25.11.1 [VERIFIED: environment probe on 2026-10-04] | local deterministic fixtures |
-| BeamSearch native build | required source comparison | source available; extension not yet built | pinned source inspected, README build path present [VERIFIED: https://github.com/ionq-publications/BeamSearchDecoder/blob/084a475b05fb64308103317a1ce5a0c4b0be58aa/README.md#L6-L22] | Mandatory isolated build attempt; typed failure only after captured evidence [ASSUMED] |
+| BeamSearch native build | Phase 12–13 original circuit reference | source available; extension not yet built | pinned source inspected, README build path present [VERIFIED: https://github.com/ionq-publications/BeamSearchDecoder/blob/084a475b05fb64308103317a1ce5a0c4b0be58aa/README.md#L6-L22] | Later isolated build attempt; typed failure only after captured evidence [ASSUMED] |
 | AutDEC native package | optional semantic cross-check | not installed | pinned source inspected only [VERIFIED: environment probe on 2026-10-04] | canonical deterministic ensemble fixture |
 
-**Missing blocking dependencies:** none for canonical implementation and deterministic validation; native MOD-04 qualification still requires the isolated build attempt and cannot be discharged by a policy-level unavailable declaration. [ASSUMED]
+**Missing blocking dependencies:** none for the current Phase 6 canonical implementation and deterministic validation. The original BeamSearch native build remains a Phase 12–13 obligation under CIR-04/CEV-01. [ASSUMED]
 
 ## Security Domain
 
@@ -350,13 +391,17 @@ Treat manifests and native outputs as untrusted inputs: reject unknown fields/ve
 | A2 | Automorphisms are staged inputs rather than discovered during decode. | Ensemble | Runtime discovery would require extra dependencies and separate work accounting. |
 | A3 | Full manifest V7 and compact manifest V8 are the next versions. | Versioning | Concurrent work may consume a version; recheck before coding. |
 | A4 | The small synthetic fixtures can expose all pruning/tie/invalid-vote cases. | Validation | More than one fixture may be necessary. |
-| A5 | Native dependencies install only in a digest-bound isolated environment, with a mandatory documented build attempt. | Stack | An integrated adapter must preserve environment isolation and cannot silently mutate the canonical environment. |
-| A6 | One human checkpoint can review all 14 SUS dependency resolutions before the single isolated native install. | Package audit | If project policy requires package-by-package approvals, Plan 06-09 must split the checkpoint records without weakening the gate. |
+| A5 | In the later circuit stages, native dependencies install only in a digest-bound isolated environment, with a documented build attempt. | Stack | An integrated adapter must preserve environment isolation and cannot silently mutate the canonical environment. |
+| A6 | A later circuit-stage checkpoint can review the 14 SUS dependency resolutions before isolated native installation. | Package audit | Phase 12–13 planning must settle the package gate; the superseded Phase 6 Plan 06-09 does not govern it. |
+| A7 | Runnable literature TOML uses separate executable, normalized-metadata, and raw-document identities while retaining the existing one-command interface. | 2026-10-05 gate | Conflating them would either make prose executable or make comments change decoder identity. |
+| A8 | Phase 6 extends the existing impulse controller with explicit forced zero and one rather than leaving `/0` variants non-runnable. | 2026-10-05 gate | Without this extension, two requested Bhatnagar variants cannot honestly preflight. |
+| A9 | The first MBBP-LD B1 run is a canonical adaptation until partition, augmented-syndrome, tie, author-code, and artifact gaps are resolved. | 2026-10-05 gate | An unqualified run could be misreported as a paper reproduction. |
+| A10 | One bounded variant per paper plus typed disposition for all 14 records is sufficient for the Phase 6 interface gate. | 2026-10-05 gate | Expanding to full curves would duplicate Phase 8–9 campaign responsibilities and delay unrelated implementation. |
 
 ## Open Questions (RESOLVED)
 
 1. **RESOLVED — paper and pinned-C++ ties:** the paper does not prescribe complete node/path tie semantics, so the canonical paper profile is named `paper_v2_min_sum_plus_declared_ties` and records its stable lowest-index and parent/child/ordinal completions as project additions. [CITED: https://arxiv.org/html/2512.07057v2] The pinned C++ profile reproduces strict branch-index comparisons plus the root index-0 sentinel/reuse behavior and the lexicographic `(score, store_idx)` queue behavior; its profile is named `official_cpp_084a475_observed_min_sum`. [VERIFIED: https://github.com/ionq-publications/BeamSearchDecoder/blob/084a475b05fb64308103317a1ce5a0c4b0be58aa/decoder/src_cpp/beam_search.hpp#L229-L240] [VERIFIED: https://github.com/ionq-publications/BeamSearchDecoder/blob/084a475b05fb64308103317a1ce5a0c4b0be58aa/decoder/src_cpp/beam_search.hpp#L401-L455] A cleaned filter or SPA kernel always receives an adaptation label. [ASSUMED]
-2. **RESOLVED — native build and distribution boundary:** do not vendor or redistribute the native source in this repository; retain the CC BY-NC-SA identity in evidence. [VERIFIED: https://github.com/ionq-publications/BeamSearchDecoder/blob/084a475b05fb64308103317a1ce5a0c4b0be58aa/LICENSE] Create a pinned, digest-bound isolated checkout/environment and attempt the repository's documented dependency install and extension build. [VERIFIED: https://github.com/ionq-publications/BeamSearchDecoder/blob/084a475b05fb64308103317a1ce5a0c4b0be58aa/README.md#L6-L22] Typed missingness is allowed only after a captured build/platform failure; absence of preinstalled prerequisites is not sufficient. [ASSUMED]
+2. **RESOLVED for Phases 12–13 — native build and distribution boundary:** do not vendor or redistribute the native source in this repository; retain the CC BY-NC-SA identity in evidence. [VERIFIED: https://github.com/ionq-publications/BeamSearchDecoder/blob/084a475b05fb64308103317a1ce5a0c4b0be58aa/LICENSE] At circuit-stage planning, create a pinned, digest-bound isolated checkout/environment and attempt the repository's documented dependency install and extension build. [VERIFIED: https://github.com/ionq-publications/BeamSearchDecoder/blob/084a475b05fb64308103317a1ce5a0c4b0be58aa/README.md#L6-L22] Typed missingness is allowed only after a captured build/platform failure; absence of preinstalled prerequisites is not sufficient. [ASSUMED]
 3. **RESOLVED — Phase 5 dependency:** the Phase 5 verification records `14/14 must-haves verified`, `behavior_unverified: 0`, and `status: human_needed` for two review categories. [VERIFIED: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-VERIFICATION.md:1-5,128-151`] Phase 6 may use that technically verified API baseline while preserving the BB72 source seal; Phase 6 final release evidence must continue to report the outstanding Phase 5 human review rather than treating it as completed. [ASSUMED]
 
 ## Sources
@@ -367,7 +412,10 @@ Treat manifests and native outputs as untrusted inputs: reject unknown fields/ve
 - [Official BeamSearchDecoder at pinned commit](https://github.com/ionq-publications/BeamSearchDecoder/tree/084a475b05fb64308103317a1ce5a0c4b0be58aa) — executable rules, Cython interface, license, build. [VERIFIED]
 - [Automorphism Ensemble Decoding of Quantum LDPC Codes, arXiv v1](https://arxiv.org/html/2503.01738v1) — ensemble transforms, online procedure, selection, parallel presentation. [CITED]
 - [Official AutDEC at pinned commit](https://github.com/hsayginel/autdec/tree/00746ced028ebc6edca1b4e56ee6db3d9039d553) — serial execution, concrete admission/ties/fallback, dependencies, MIT license. [VERIFIED]
-- In-repository contracts, lineage, budgets, manifests, ledger, project constraints, roadmap, and requirements opened on 2026-10-04. [VERIFIED: paths cited inline]
+- [Yao et al., binary BPGD, arXiv v2](https://arxiv.org/pdf/2312.10950v2) — binary BP/BPGD controls and B1 targets. [CITED]
+- [Bhatnagar et al., impulse decoding, arXiv v1](https://arxiv.org/pdf/2606.18240v1) — shortening, selection, and B1 target. [CITED]
+- [Rabeti and Mahdavifar, MBBP-LD, arXiv v1](https://arxiv.org/pdf/2605.14170v1) — multiple bases, normalized min-sum, and frequency-weighted list selection. [CITED]
+- In-repository contracts, lineage, budgets, manifests, ledger, project constraints, roadmap, literature specifications, and requirements opened through 2026-10-05. [VERIFIED: paths cited inline]
 
 ### Confidence note
 
@@ -382,6 +430,8 @@ The configured documentation providers were unavailable, so the research seam se
 - BeamSearch semantics: MEDIUM — paper and code are primary sources but contain a material divergence.
 - Ensemble semantics: MEDIUM — paper and official repository agree on the core transform/admit/select flow, while topology differs.
 - Voting: LOW — deliberately proposed canonical-generic behavior, not attributed to a source.
+- Literature policy route: HIGH — public study/parser, Phase 5 dispatch, specifications, B1 identity records, and tests inspected directly.
+- Paper-specific gate semantics: MEDIUM — primary revisions are pinned, but author implementations and exact B1 experiment identities remain unresolved.
 
-**Research date:** 2026-10-04  
+**Research date:** 2026-10-05
 **Valid until:** 2026-11-03, or immediately stale if either pinned native identity or the canonical schema head changes.
