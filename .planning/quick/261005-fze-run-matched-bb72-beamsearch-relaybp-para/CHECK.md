@@ -10,3 +10,9 @@
 - The dependent publication job commits only the manifest-listed evidence, checks the expected main ref before merging, re-verifies the merged checkout, runs the focused end-to-end test, and pushes main only after those gates pass.
 
 The campaign remains a controlled BB72 CSS adaptation. It cannot validate either paper's circuit-level curves and does not complete Phase 6.
+
+## Terminal verification and publication
+
+- Selection array `57705654`, lock `57705655`, evaluation array `57705656`, replay/report `57705657`, and publisher `57706767` all completed with exit code zero.
+- The report replayed all evaluation shards; the publisher checked all 43 published files and passed the focused end-to-end test on the merged checkout.
+- GitHub `main` was updated to `3db441ec8048317b966db21c4d40b46f43cda5c1`. A fresh main-checkout `verify-package` passed.
