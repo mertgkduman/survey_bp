@@ -1,0 +1,550 @@
+{
+  "assessment_status": "controlled_evaluation_complete",
+  "claim_limit": "BB72 X-only CSS controlled comparison; no circuit-paper reproduction or cross-code ranking",
+  "design_sha256": "9b013e8ee67fafc3e8891407b94264575f4f3ae66711176b6d1958d3d888c904",
+  "evaluation_ledger_sha256": {
+    "p050": {
+      "i05": "4b9d2ca91428169b59d25ef1286b49bd9b601a0f403d0b442d9e29bb1e518085",
+      "i10": "c5304afe7425161db384642eb75332583c82e9e731021772f2173f23f9ca44d1",
+      "i20": "7da7a8ed2a742eec8b6e601be7d472a7d41faed95731dc47f20f60cb46024e5a"
+    },
+    "p080": {
+      "i05": "fb41b6d71930a9db11ff28da30d944c1518960ba1ab68c502422a74b4c71e5f2",
+      "i10": "1ee063d0ee111806780f7f4f515f156ec39cc67d261ca8d13b77e7e0500615ea",
+      "i20": "a61578df1ec245c56153cfc86116ce29871c98fd9f5b12535f707469043cecfc"
+    }
+  },
+  "initial_baselines": {
+    "p050": {
+      "g0500": {
+        "failure_interval_95": [
+          0.14738509617423887,
+          0.2157393201572248
+        ],
+        "failures": 92,
+        "mean_c2v": 842.90625,
+        "mean_runtime_ms": 28.085669166015624,
+        "shots": 512
+      },
+      "g1000": {
+        "failure_interval_95": [
+          0.41904654408096653,
+          0.5071654669099025
+        ],
+        "failures": 237,
+        "mean_c2v": 2160.0,
+        "mean_runtime_ms": 70.74082061523437,
+        "shots": 512
+      }
+    },
+    "p080": {
+      "g0500": {
+        "failure_interval_95": [
+          0.45978212074280456,
+          0.5152754055617608
+        ],
+        "failures": 624,
+        "mean_c2v": 1638.05625,
+        "mean_runtime_ms": 151.13366600156252,
+        "shots": 1280
+      },
+      "g1000": {
+        "failure_interval_95": [
+          0.7843265807577009,
+          0.828316067362399
+        ],
+        "failures": 1033,
+        "mean_c2v": 3528.05625,
+        "mean_runtime_ms": 323.1035956304687,
+        "shots": 1280
+      }
+    }
+  },
+  "parameter_grid": {
+    "p050": {
+      "g0500": {
+        "i05": {
+          "beam": {
+            "failure_interval_95": [
+              0.12945057269205582,
+              0.19484667872315029
+            ],
+            "failures": 82,
+            "mean_extra_c2v": 96.92578125,
+            "mean_initial_c2v": 842.90625,
+            "mean_runtime_ms": 31.40815830078125,
+            "mean_total_c2v": 939.83203125,
+            "shots": 512
+          },
+          "relay": {
+            "failure_interval_95": [
+              0.12410179422675846,
+              0.18854773761522484
+            ],
+            "failures": 79,
+            "mean_extra_c2v": 179.296875,
+            "mean_initial_c2v": 842.90625,
+            "mean_runtime_ms": 33.89072291796875,
+            "mean_total_c2v": 1022.203125,
+            "shots": 512
+          }
+        },
+        "i10": {
+          "beam": {
+            "failure_interval_95": [
+              0.12766593985452807,
+              0.19274871387482798
+            ],
+            "failures": 81,
+            "mean_extra_c2v": 121.224609375,
+            "mean_initial_c2v": 842.90625,
+            "mean_runtime_ms": 82.64605633007812,
+            "mean_total_c2v": 964.130859375,
+            "shots": 512
+          },
+          "relay": {
+            "failure_interval_95": [
+              0.12410179422675846,
+              0.18854773761522484
+            ],
+            "failures": 79,
+            "mean_extra_c2v": 144.703125,
+            "mean_initial_c2v": 842.90625,
+            "mean_runtime_ms": 83.96270007617187,
+            "mean_total_c2v": 987.609375,
+            "shots": 512
+          }
+        },
+        "i20": {
+          "beam": {
+            "failure_interval_95": [
+              0.12766593985452807,
+              0.19274871387482798
+            ],
+            "failures": 81,
+            "mean_extra_c2v": 131.044921875,
+            "mean_initial_c2v": 842.90625,
+            "mean_runtime_ms": 104.3074565390625,
+            "mean_total_c2v": 973.951171875,
+            "shots": 512
+          },
+          "relay": {
+            "failure_interval_95": [
+              0.12766593985452807,
+              0.19274871387482798
+            ],
+            "failures": 81,
+            "mean_extra_c2v": 118.96875,
+            "mean_initial_c2v": 842.90625,
+            "mean_runtime_ms": 103.20494128515625,
+            "mean_total_c2v": 961.875,
+            "shots": 512
+          }
+        }
+      },
+      "g1000": {
+        "i05": {
+          "beam": {
+            "failure_interval_95": [
+              0.41711761776168127,
+              0.5052108187005009
+            ],
+            "failures": 236,
+            "mean_extra_c2v": 3817.03125,
+            "mean_initial_c2v": 2160.0,
+            "mean_runtime_ms": 200.88367385546874,
+            "mean_total_c2v": 5977.03125,
+            "shots": 512
+          },
+          "relay": {
+            "failure_interval_95": [
+              0.19465930677978105,
+              0.269423116205772
+            ],
+            "failures": 118,
+            "mean_extra_c2v": 2013.1875,
+            "mean_initial_c2v": 2160.0,
+            "mean_runtime_ms": 138.04351586914063,
+            "mean_total_c2v": 4173.1875,
+            "shots": 512
+          }
+        },
+        "i10": {
+          "beam": {
+            "failure_interval_95": [
+              0.40940855879752974,
+              0.49738558580435405
+            ],
+            "failures": 232,
+            "mean_extra_c2v": 3828.69140625,
+            "mean_initial_c2v": 2160.0,
+            "mean_runtime_ms": 512.9777044882812,
+            "mean_total_c2v": 5988.69140625,
+            "shots": 512
+          },
+          "relay": {
+            "failure_interval_95": [
+              0.15460085771235707,
+              0.22405495022498748
+            ],
+            "failures": 96,
+            "mean_extra_c2v": 1281.234375,
+            "mean_initial_c2v": 2160.0,
+            "mean_runtime_ms": 294.398849859375,
+            "mean_total_c2v": 3441.234375,
+            "shots": 512
+          }
+        },
+        "i20": {
+          "beam": {
+            "failure_interval_95": [
+              0.41133482524645715,
+              0.4993428913206275
+            ],
+            "failures": 233,
+            "mean_extra_c2v": 3875.185546875,
+            "mean_initial_c2v": 2160.0,
+            "mean_runtime_ms": 641.7486079882813,
+            "mean_total_c2v": 6035.185546875,
+            "shots": 512
+          },
+          "relay": {
+            "failure_interval_95": [
+              0.1636516602663305,
+              0.23441874273547342
+            ],
+            "failures": 101,
+            "mean_extra_c2v": 1016.296875,
+            "mean_initial_c2v": 2160.0,
+            "mean_runtime_ms": 339.5829572773437,
+            "mean_total_c2v": 3176.296875,
+            "shots": 512
+          }
+        }
+      }
+    },
+    "p080": {
+      "g0500": {
+        "i05": {
+          "beam": {
+            "failure_interval_95": [
+              0.43335575824660094,
+              0.48869902049029024
+            ],
+            "failures": 590,
+            "mean_extra_c2v": 387.98203125,
+            "mean_initial_c2v": 1638.05625,
+            "mean_runtime_ms": 187.98972316484372,
+            "mean_total_c2v": 2026.03828125,
+            "shots": 1280
+          },
+          "relay": {
+            "failure_interval_95": [
+              0.43335575824660094,
+              0.48869902049029024
+            ],
+            "failures": 590,
+            "mean_extra_c2v": 676.51875,
+            "mean_initial_c2v": 1638.05625,
+            "mean_runtime_ms": 214.31378274140627,
+            "mean_total_c2v": 2314.575,
+            "shots": 1280
+          }
+        },
+        "i10": {
+          "beam": {
+            "failure_interval_95": [
+              0.43102774752694145,
+              0.4863503192591177
+            ],
+            "failures": 587,
+            "mean_extra_c2v": 426.24140625,
+            "mean_initial_c2v": 1638.05625,
+            "mean_runtime_ms": 194.78151917656248,
+            "mean_total_c2v": 2064.29765625,
+            "shots": 1280
+          },
+          "relay": {
+            "failure_interval_95": [
+              0.42947607757386363,
+              0.4847841813737265
+            ],
+            "failures": 585,
+            "mean_extra_c2v": 365.5125,
+            "mean_initial_c2v": 1638.05625,
+            "mean_runtime_ms": 188.71337797109373,
+            "mean_total_c2v": 2003.56875,
+            "shots": 1280
+          }
+        },
+        "i20": {
+          "beam": {
+            "failure_interval_95": [
+              0.4318036836878159,
+              0.48713328705660897
+            ],
+            "failures": 588,
+            "mean_extra_c2v": 495.72421875,
+            "mean_initial_c2v": 1638.05625,
+            "mean_runtime_ms": 196.24322025156252,
+            "mean_total_c2v": 2133.78046875,
+            "shots": 1280
+          },
+          "relay": {
+            "failure_interval_95": [
+              0.4287003438358578,
+              0.48400101123264233
+            ],
+            "failures": 584,
+            "mean_extra_c2v": 327.7125,
+            "mean_initial_c2v": 1638.05625,
+            "mean_runtime_ms": 181.01464010390623,
+            "mean_total_c2v": 1965.76875,
+            "shots": 1280
+          }
+        }
+      },
+      "g1000": {
+        "i05": {
+          "beam": {
+            "failure_interval_95": [
+              0.7818892613291929,
+              0.826076872873412
+            ],
+            "failures": 1030,
+            "mean_extra_c2v": 6662.184375,
+            "mean_initial_c2v": 3528.05625,
+            "mean_runtime_ms": 955.6445218898438,
+            "mean_total_c2v": 10190.240625,
+            "shots": 1280
+          },
+          "relay": {
+            "failure_interval_95": [
+              0.5528847125695514,
+              0.6076823746786091
+            ],
+            "failures": 743,
+            "mean_extra_c2v": 4824.05625,
+            "mean_initial_c2v": 3528.05625,
+            "mean_runtime_ms": 775.4692084632812,
+            "mean_total_c2v": 8352.1125,
+            "shots": 1280
+          }
+        },
+        "i10": {
+          "beam": {
+            "failure_interval_95": [
+              0.7802650501445263,
+              0.8245834051355402
+            ],
+            "failures": 1028,
+            "mean_extra_c2v": 6709.60078125,
+            "mean_initial_c2v": 3528.05625,
+            "mean_runtime_ms": 966.6224457226563,
+            "mean_total_c2v": 10237.65703125,
+            "shots": 1280
+          },
+          "relay": {
+            "failure_interval_95": [
+              0.4745834705008958,
+              0.5300932433763981
+            ],
+            "failures": 643,
+            "mean_extra_c2v": 3032.775,
+            "mean_initial_c2v": 3528.05625,
+            "mean_runtime_ms": 616.7812882015626,
+            "mean_total_c2v": 6560.83125,
+            "shots": 1280
+          }
+        },
+        "i20": {
+          "beam": {
+            "failure_interval_95": [
+              0.7810770892960326,
+              0.8253302057390699
+            ],
+            "failures": 1029,
+            "mean_extra_c2v": 6764.58046875,
+            "mean_initial_c2v": 3528.05625,
+            "mean_runtime_ms": 946.7487154265625,
+            "mean_total_c2v": 10292.63671875,
+            "shots": 1280
+          },
+          "relay": {
+            "failure_interval_95": [
+              0.4714653942775071,
+              0.5269757010960874
+            ],
+            "failures": 639,
+            "mean_extra_c2v": 2326.725,
+            "mean_initial_c2v": 3528.05625,
+            "mean_runtime_ms": 539.1538413492187,
+            "mean_total_c2v": 5854.78125,
+            "shots": 1280
+          }
+        }
+      }
+    }
+  },
+  "schema_version": 1,
+  "seal_sha256": "619f72984b7622b1d59e65fd14160a3b240c9674545bec512a121390e79f378a",
+  "selected_paired_contrasts": {
+    "p050/g0500": {
+      "assessment": "inconclusive",
+      "beam_minus_relay_failure": 0.001953125,
+      "beam_only_valid": 4,
+      "discordant": 9,
+      "holm_p": 1.0,
+      "raw_p": 1.0,
+      "relay_only_valid": 5
+    },
+    "p050/g1000": {
+      "assessment": "relay_lower_failure",
+      "beam_minus_relay_failure": 0.265625,
+      "beam_only_valid": 1,
+      "discordant": 138,
+      "holm_p": 2.393462618617646e-39,
+      "raw_p": 7.978208728725487e-40,
+      "relay_only_valid": 137
+    },
+    "p080/g0500": {
+      "assessment": "inconclusive",
+      "beam_minus_relay_failure": 0.0046875,
+      "beam_only_valid": 11,
+      "discordant": 28,
+      "holm_p": 0.6898569017648697,
+      "raw_p": 0.34492845088243484,
+      "relay_only_valid": 17
+    },
+    "p080/g1000": {
+      "assessment": "relay_lower_failure",
+      "beam_minus_relay_failure": 0.30234375,
+      "beam_only_valid": 2,
+      "discordant": 391,
+      "holm_p": 1.2156265536647463e-112,
+      "raw_p": 3.039066384161866e-113,
+      "relay_only_valid": 389
+    }
+  },
+  "selected_summaries": {
+    "p050": {
+      "g0500": {
+        "beam": {
+          "failure_interval_95": [
+            0.12945057269205582,
+            0.19484667872315029
+          ],
+          "failures": 82,
+          "mean_extra_c2v": 96.92578125,
+          "mean_initial_c2v": 842.90625,
+          "mean_runtime_ms": 31.40815830078125,
+          "mean_total_c2v": 939.83203125,
+          "selected_profile": "i05",
+          "shots": 512
+        },
+        "relay": {
+          "failure_interval_95": [
+            0.12766593985452807,
+            0.19274871387482798
+          ],
+          "failures": 81,
+          "mean_extra_c2v": 118.96875,
+          "mean_initial_c2v": 842.90625,
+          "mean_runtime_ms": 103.20494128515625,
+          "mean_total_c2v": 961.875,
+          "selected_profile": "i20",
+          "shots": 512
+        }
+      },
+      "g1000": {
+        "beam": {
+          "failure_interval_95": [
+            0.40940855879752974,
+            0.49738558580435405
+          ],
+          "failures": 232,
+          "mean_extra_c2v": 3828.69140625,
+          "mean_initial_c2v": 2160.0,
+          "mean_runtime_ms": 512.9777044882812,
+          "mean_total_c2v": 5988.69140625,
+          "selected_profile": "i10",
+          "shots": 512
+        },
+        "relay": {
+          "failure_interval_95": [
+            0.15460085771235707,
+            0.22405495022498748
+          ],
+          "failures": 96,
+          "mean_extra_c2v": 1281.234375,
+          "mean_initial_c2v": 2160.0,
+          "mean_runtime_ms": 294.398849859375,
+          "mean_total_c2v": 3441.234375,
+          "selected_profile": "i10",
+          "shots": 512
+        }
+      }
+    },
+    "p080": {
+      "g0500": {
+        "beam": {
+          "failure_interval_95": [
+            0.43335575824660094,
+            0.48869902049029024
+          ],
+          "failures": 590,
+          "mean_extra_c2v": 387.98203125,
+          "mean_initial_c2v": 1638.05625,
+          "mean_runtime_ms": 187.98972316484372,
+          "mean_total_c2v": 2026.03828125,
+          "selected_profile": "i05",
+          "shots": 1280
+        },
+        "relay": {
+          "failure_interval_95": [
+            0.4287003438358578,
+            0.48400101123264233
+          ],
+          "failures": 584,
+          "mean_extra_c2v": 327.7125,
+          "mean_initial_c2v": 1638.05625,
+          "mean_runtime_ms": 181.01464010390623,
+          "mean_total_c2v": 1965.76875,
+          "selected_profile": "i20",
+          "shots": 1280
+        }
+      },
+      "g1000": {
+        "beam": {
+          "failure_interval_95": [
+            0.7818892613291929,
+            0.826076872873412
+          ],
+          "failures": 1030,
+          "mean_extra_c2v": 6662.184375,
+          "mean_initial_c2v": 3528.05625,
+          "mean_runtime_ms": 955.6445218898438,
+          "mean_total_c2v": 10190.240625,
+          "selected_profile": "i05",
+          "shots": 1280
+        },
+        "relay": {
+          "failure_interval_95": [
+            0.4745834705008958,
+            0.5300932433763981
+          ],
+          "failures": 643,
+          "mean_extra_c2v": 3032.775,
+          "mean_initial_c2v": 3528.05625,
+          "mean_runtime_ms": 616.7812882015626,
+          "mean_total_c2v": 6560.83125,
+          "selected_profile": "i10",
+          "shots": 1280
+        }
+      }
+    }
+  },
+  "selection_lock_sha256": "cbcb544b1b9bd300735170a9b4974438e8468314aecb3072d18a2985ea074f3a",
+  "source_status": "controlled_css_adaptation",
+  "study_id": "fair-beam-relay-css-v2"
+}

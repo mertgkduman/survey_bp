@@ -1,0 +1,36 @@
+{
+  "assessment_status": "not_assessed",
+  "cohort": "evaluation",
+  "controls": {
+    "beam_rounds": 4,
+    "beam_width": 2,
+    "extra_iterations_per_unit": 5,
+    "initial_iterations": 20,
+    "max_extra_c2v_updates": 8640,
+    "max_extra_units": 8,
+    "relay_gamma_high": 0.66,
+    "relay_gamma_low": -0.24,
+    "relay_seed": "fair-beam-relay-css-v2-disordered",
+    "solution_limit": 1,
+    "v2c_gamma": 0.5
+  },
+  "design_sha256": "9b013e8ee67fafc3e8891407b94264575f4f3ae66711176b6d1958d3d888c904",
+  "profile": "i05",
+  "rate": "p080",
+  "schema_version": 1,
+  "seal_sha256": "619f72984b7622b1d59e65fd14160a3b240c9674545bec512a121390e79f378a",
+  "selection_lock_sha256": "cbcb544b1b9bd300735170a9b4974438e8468314aecb3072d18a2985ea074f3a",
+  "source_status": "controlled_css_adaptation",
+  "spec": {
+    "damping_gammas": [
+      1.0,
+      0.5
+    ],
+    "error_rate": 0.08,
+    "physical_sample_identity": "fair-beam-relay-css-v2-evaluation-p080",
+    "sample_seed": 740603,
+    "shots": 1280,
+    "study_id": "fair-beam-relay-css-v2-evaluation-p080-i05"
+  },
+  "study_id": "fair-beam-relay-css-v2"
+}
