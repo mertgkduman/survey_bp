@@ -109,3 +109,26 @@ def test_tracer_bp_t100_common_command_computes(tmp_path: Path, monkeypatch: pyt
     assert first["status"] == "computed"
     assert second["status"] == "reused"
     assert first["cache_key"] == second["cache_key"]
+
+
+def test_shared_compute_keeps_append_only_request_receipts(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("OMP_NUM_THREADS", "1")
+    study = _study(tmp_path)
+    first_policy = tmp_path / "first.toml"
+    second_policy = tmp_path / "second.toml"
+    first_policy.write_text(_runnable_policy(source_note="same source") + "# raw-a\n")
+    second_policy.write_text(_runnable_policy(source_note="same source") + "# raw-b\n")
+    first = ensure_study(study, first_policy, results_root=tmp_path / "results")
+    second = ensure_study(study, second_policy, results_root=tmp_path / "results")
+    assert first["status"] == "computed" and second["status"] == "reused"
+    assert first["cache_key"] == second["cache_key"]
+    assert first["request_receipt"] != second["request_receipt"]
+    receipts = Path(first["output"]) / "request-receipts"
+    first_receipt = json.loads((receipts / f'{first["request_receipt"]}.json').read_text())
+    second_receipt = json.loads((receipts / f'{second["request_receipt"]}.json').read_text())
+    assert first_receipt["computation_key"] == second_receipt["computation_key"]
+    assert first_receipt["raw_document_sha256"] != second_receipt["raw_document_sha256"]
+    receipt_path = receipts / f'{first["request_receipt"]}.json'
+    receipt_path.write_text('{"tampered": true}')
+    with pytest.raises(ValueError, match="frozen study file differs"):
+        ensure_study(study, first_policy, results_root=tmp_path / "results")

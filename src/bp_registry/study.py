@@ -128,6 +128,32 @@ def _apply_decoder_stopping_cap(study: dict[str, Any], decoder: dict[str, Any]) 
             raise ValueError("study budgets must equal the decoder stopping.max_iterations cap")
 
 
+def _request_receipt(policy: LiteraturePolicy | None, decoder_path: Path, *, computation_key: str,
+                     execution_identity: str, verification: dict[str, Any]) -> tuple[str, dict[str, Any]]:
+    """Bind an immutable source document to verified shared computation evidence."""
+    if policy is None:
+        raw_identity = sha256(decoder_path.read_bytes()).hexdigest()
+        provenance_identity = sha256(_json_bytes({"legacy_decoder": str(decoder_path)})).hexdigest()
+        source_path = str(decoder_path)
+    else:
+        raw_identity = policy.raw_document_identity
+        provenance_identity = policy.provenance_identity
+        source_path = str(policy.source_path)
+    request = {
+        "schema_version": 1,
+        "computation_key": computation_key,
+        "executable_policy_sha256": execution_identity,
+        "provenance_sha256": provenance_identity,
+        "raw_document_sha256": raw_identity,
+        "source_path": source_path,
+    }
+    request_id = sha256(_json_bytes(request)).hexdigest()
+    # Verification timestamps are observations, not the identity of a stable
+    # computation receipt.  Preserve the replay-relevant verification facts.
+    request["verification"] = {name: value for name, value in verification.items() if name != "verified_at"}
+    return request_id, request
+
+
 def _ensure_canonical(study_path: Path, decoder: dict[str, Any], results_root: Path,
                       *, policy: LiteraturePolicy | None = None, decoder_path: Path | None = None) -> dict[str, Any]:
     study = _read_object(study_path)
@@ -185,7 +211,13 @@ def _ensure_canonical(study_path: Path, decoder: dict[str, Any], results_root: P
             verified = verify_run(output)
             _write_once(receipt_path, _json_bytes(receipt))
             status = "computed"
+        request_id, request = _request_receipt(
+            policy, decoder_path or Path("<in-memory-decoder>"), computation_key=key,
+            execution_identity=policy_identity, verification=verified,
+        )
+        _write_once(output / "request-receipts" / f"{request_id}.json", _json_bytes(request))
         return {"status": status, "output": str(output), "cache_key": key,
+                "request_receipt": request_id,
                 "result": json.loads((output / "result.json").read_text()), "verification": verified}
 
 
