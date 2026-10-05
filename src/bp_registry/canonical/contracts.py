@@ -873,7 +873,9 @@ class Phase5InterventionContract(_Strict):
     final_round_rule: Literal["return_after_last_fixation"] | None = None
     round_limit: int | None = Field(default=None, ge=1, le=10_000)
     sweeps_per_round: int | None = Field(default=None, ge=1, le=100_000)
-    realization: Literal["semantic_forced_one", "exact_shortening"] | None = None
+    realization: Literal["semantic_forced_zero", "semantic_forced_one", "exact_shortening"] | None = None
+    forced_value: Literal[0, 1] | None = None
+    v2c_clip: float | None = None
     baseline_sweeps: int | None = Field(default=None, ge=1, le=100_000)
     attempt_sweeps: int | None = Field(default=None, ge=1, le=100_000)
     attempt_cap: int | None = Field(default=None, ge=1, le=100_000)
@@ -913,10 +915,11 @@ class Phase5InterventionContract(_Strict):
         }
         if self.kind == "impulse":
             expected = (
-                "impulse_negative_infinite_semantic_v1" if self.realization == "semantic_forced_one"
+                "impulse_positive_infinite_semantic_v1" if self.realization == "semantic_forced_zero"
+                else "impulse_negative_infinite_semantic_v1" if self.realization == "semantic_forced_one"
                 else "impulse_exact_shortening_css_v1",
                 "arxiv:2606.18240v1",
-                "source_operator_semantic_adaptation" if self.realization == "semantic_forced_one" else "controlled_css_adaptation",
+                "source_operator_semantic_adaptation" if self.realization in {"semantic_forced_zero", "semantic_forced_one"} else "controlled_css_adaptation",
                 "unverified", "not_applicable",
             )
         else:
@@ -933,9 +936,9 @@ class Phase5InterventionContract(_Strict):
         }
         if self.kind == "impulse":
             expected_semantics = (
-                "baseline_invalid", "semantic_forced_one" if self.realization == "semantic_forced_one" else "exact_shortening",
+                "baseline_invalid", self.realization,
                 "minimum_original_weight" if self.selection == "minimum_original_weight" else "first_convergence",
-                "identity" if self.realization == "semantic_forced_one" else "restore_fixed",
+                "identity" if self.realization in {"semantic_forced_zero", "semantic_forced_one"} else "restore_fixed",
                 "fresh_per_coordinate", ("original_graph", "original_syndrome"),
             )
         else:
@@ -948,7 +951,7 @@ class Phase5InterventionContract(_Strict):
             raise ValueError("intervention trigger, operator, selection, lift, reset, or preservation is unsupported")
         controls = {
             "finite_bias_magnitude", "zero_rule", "final_round_rule", "round_limit", "sweeps_per_round",
-            "realization", "baseline_sweeps", "attempt_sweeps", "attempt_cap", "coordinate_order",
+            "realization", "forced_value", "v2c_clip", "baseline_sweeps", "attempt_sweeps", "attempt_cap", "coordinate_order",
             "period_sweeps", "lifetime_sweeps", "retry_cap", "root_seed", "top_k", "max_weight",
             "test_cap", "alpha", "trunk_sweeps", "continuation_sweeps", "preset", "code_id",
             "eta", "t_cap", "root_sweeps", "residual_sweeps", "exact_distance",
@@ -962,7 +965,7 @@ class Phase5InterventionContract(_Strict):
             "sign_flip": {"alpha", "trunk_sweeps", "continuation_sweeps"},
             "restart_belief": {"preset", "code_id", "eta", "t_cap", "root_sweeps", "residual_sweeps"},
         }[self.kind]
-        optional = {"coordinate_order"} if self.kind == "impulse" else {"exact_distance"} if self.kind == "restart_belief" else set()
+        optional = {"coordinate_order", "forced_value", "v2c_clip"} if self.kind == "impulse" else {"exact_distance"} if self.kind == "restart_belief" else set()
         active = {name for name in controls if getattr(self, name) is not None}
         if not required <= active or active - required - optional:
             raise ValueError("intervention controls do not match the declared arm")
@@ -970,6 +973,16 @@ class Phase5InterventionContract(_Strict):
                 or self.kind == "impulse" and self.coordinate_order is not None
                 and (len(self.coordinate_order) != len(set(self.coordinate_order)) or any(type(i) is not int or i < 0 for i in self.coordinate_order))):
             raise ValueError("guided magnitude or impulse coordinate order is invalid")
+        if self.kind == "impulse":
+            expected_forced_value = 0 if self.realization == "semantic_forced_zero" else 1
+            if self.forced_value is not None and self.forced_value != expected_forced_value:
+                raise ValueError("impulse forced value contradicts the closed realization")
+            if self.v2c_clip is not None and (
+                not math.isfinite(self.v2c_clip) or self.v2c_clip <= 0.0 or self.v2c_clip != 25.0
+            ):
+                raise ValueError("impulse v2c clip must be the registered finite source control of magnitude 25")
+        elif self.forced_value is not None or self.v2c_clip is not None:
+            raise ValueError("impulse forced-value and v2c-clip controls are invalid for this intervention")
         if self.kind == "restart_belief":
             from .restarting import RestartSpec
 

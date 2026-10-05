@@ -199,6 +199,7 @@ def execute_phase5_controller(
             realization=spec.realization, selection=spec.selection,
             baseline_sweeps=spec.baseline_sweeps, attempt_sweeps=spec.attempt_sweeps,
             attempt_cap=spec.attempt_cap, coordinate_order=spec.coordinate_order,
+            forced_value=spec.forced_value, v2c_clip=spec.v2c_clip,
         )).run(original, error_rate=error_rate, budgets=budgets, owner_identity=owner_identity, wall_clock=wall_clock, damping_gamma=damping_gamma)
         return _project(result, rows_field="attempts", candidate_field="selected_candidate", origin_field="selected_origin")
     if spec.kind == "freezing":

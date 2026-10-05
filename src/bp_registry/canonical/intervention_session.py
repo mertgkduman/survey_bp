@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from hashlib import sha256
 import json
+import math
 from types import MappingProxyType
 from typing import Literal, Mapping
 
@@ -95,6 +96,7 @@ class BpSession:
         self, edge_table: EdgeTable, syndrome: np.ndarray, *, error_rate: float,
         owner_identity: str | None = None, kernel: BinarySpaKernel | None = None,
         damping_gamma: float | None = None,
+        v2c_clip: float | None = None,
     ) -> None:
         self.edge_table = edge_table
         bits = np.asarray(syndrome)
@@ -107,7 +109,14 @@ class BpSession:
             raise ValueError("intervention session kernel must be a canonical binary kernel")
         self.kernel = kernel or BinarySpaKernel()
         self.schedule = FloodingSchedule(edge_table, kernel=self.kernel)
+        if v2c_clip is not None and (
+            type(v2c_clip) not in (int, float) or not math.isfinite(v2c_clip) or v2c_clip <= 0.0 or v2c_clip != 25.0
+        ):
+            raise ValueError("v2c clip must be the registered finite source control of magnitude 25")
+        if damping_gamma is not None and v2c_clip is not None:
+            raise ValueError("v2c clip cannot be combined with damping")
         self.damping_gamma = damping_gamma
+        self.v2c_clip = None if v2c_clip is None else float(v2c_clip)
         self._damping_policy = None if damping_gamma is None else V2CDamping("phase5-v2c-damping", damping_gamma)
         self._owner = object()
         if owner_identity is not None and (not isinstance(owner_identity, str) or not owner_identity):
@@ -162,6 +171,8 @@ class BpSession:
             "schedule_cursor": (source_iteration,), "mutation_evidence": dict(evidence),
             "pending_sign_target": pending_sign_target,
         }
+        if self.v2c_clip is not None:
+            payload["v2c_clip"] = self.v2c_clip
         if self._damping_state is not None:
             history = _frozen_f64(
                 self._damping_state.v2c if memory_history is None else memory_history,
@@ -179,6 +190,12 @@ class BpSession:
             self.owner_identity, coordinate_identity, (source_iteration,), None, private_histories, evidence,
             pending_sign_target,
         )
+
+    def _v2c_transform(self, fresh: np.ndarray) -> np.ndarray:
+        """Apply the source V2C-only control after construction, before commit."""
+        if self.v2c_clip is None:
+            return fresh
+        return np.clip(np.asarray(fresh, dtype=np.float64), -self.v2c_clip, self.v2c_clip)
 
     def propose_finite_prior(
         self, target_index: int, signed_prior: float, *,
@@ -280,18 +297,21 @@ class BpSession:
                 )
             memory_proposal: TargetMemoryProposal | None = None
 
-            def damp_v2c(fresh: np.ndarray) -> np.ndarray:
+            def transform_v2c(fresh: np.ndarray) -> np.ndarray:
                 nonlocal memory_proposal
-                assert self._damping_policy is not None and self._damping_state is not None
-                memory_proposal = self._damping_policy.propose(
-                    self._damping_state.v2c, fresh, boundary="source_iteration",
-                )
-                return memory_proposal.value
+                transformed = self._v2c_transform(fresh)
+                if self._damping_policy is not None:
+                    assert self._damping_state is not None
+                    memory_proposal = self._damping_policy.propose(
+                        self._damping_state.v2c, transformed, boundary="source_iteration",
+                    )
+                    return memory_proposal.value
+                return transformed
 
             sweep = self.schedule.sweep(
                 input_v2c, self.syndrome, error_rate=self.error_rate,
                 source_iteration=state.source_iteration, prior_llrs=state.prior,
-                transform_v2c=damp_v2c if self._damping_policy is not None else None,
+                transform_v2c=transform_v2c if self._damping_policy is not None or self.v2c_clip is not None else None,
             )
             next_state = self._make_state(
                 state.prior, sweep.new_v2c, sweep.beliefs, sweep.candidate,
@@ -365,7 +385,7 @@ class BpSession:
             ).encode()).hexdigest()[:20]
             child = type(self)(
                 table, next_syndrome, error_rate=next_rate, owner_identity=branch_owner,
-                kernel=self.kernel, damping_gamma=self.damping_gamma,
+                kernel=self.kernel, damping_gamma=self.damping_gamma, v2c_clip=self.v2c_clip,
             )
             if preserve_set:
                 if self._damping_state is not None:

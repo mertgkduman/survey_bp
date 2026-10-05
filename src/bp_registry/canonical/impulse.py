@@ -17,7 +17,7 @@ from .schedules import EdgeTable
 from .transformations import lift_candidate, transform_fixed_coordinates
 
 
-Realization = Literal["semantic_forced_one", "exact_shortening"]
+Realization = Literal["semantic_forced_zero", "semantic_forced_one", "exact_shortening"]
 Selection = Literal["minimum_original_weight", "first_convergence"]
 T = TypeVar("T")
 
@@ -30,11 +30,13 @@ class ImpulseSpec:
     attempt_sweeps: int
     attempt_cap: int
     coordinate_order: tuple[int, ...] | None = None
+    forced_value: Literal[0, 1] | None = None
+    v2c_clip: float | None = None
 
     def __post_init__(self) -> None:
         if self.coordinate_order is not None:
             object.__setattr__(self, "coordinate_order", tuple(self.coordinate_order))
-        if self.realization not in ("semantic_forced_one", "exact_shortening"):
+        if self.realization not in ("semantic_forced_zero", "semantic_forced_one", "exact_shortening"):
             raise ValueError("impulse realization must name a supported source or structural route")
         if self.selection not in ("minimum_original_weight", "first_convergence"):
             raise ValueError("impulse selection mode is invalid")
@@ -45,6 +47,18 @@ class ImpulseSpec:
             or len(set(self.coordinate_order)) != len(self.coordinate_order)
         ):
             raise ValueError("impulse coordinate order must be unique nonnegative original indices")
+        expected_value = 0 if self.realization == "semantic_forced_zero" else 1
+        if self.forced_value is not None and (type(self.forced_value) is not int or self.forced_value != expected_value):
+            raise ValueError("forced value contradicts the closed impulse realization")
+        if self.v2c_clip is not None and (
+            type(self.v2c_clip) not in (int, float) or not np.isfinite(self.v2c_clip) or self.v2c_clip != 25.0
+        ):
+            raise ValueError("v2c clip must be the registered finite source control of magnitude 25")
+
+    @property
+    def effective_forced_value(self) -> Literal[0, 1]:
+        """Resolve legacy force-one evidence without allowing a contradictory pair."""
+        return 0 if self.realization == "semantic_forced_zero" else 1
 
 
 @dataclass(frozen=True, slots=True)
@@ -92,13 +106,12 @@ class ImpulseResult:
     termination: str
     work: WorkVector
     leaves: tuple[tuple[str, str, WorkVector], ...]
+    v2c_clip: float | None = None
+    v2c_clip_boundary: Literal["post_v2c_construction_pre_state_commit"] | None = None
 
     @property
     def qualification(self) -> str:
-        return (
-            "source_operator_semantic_adaptation" if self.realization == "semantic_forced_one"
-            else "controlled_css_adaptation"
-        )
+        return "source_operator_semantic_adaptation" if self.realization.startswith("semantic_forced_") else "controlled_css_adaptation"
 
     def as_evidence(self) -> dict[str, object]:
         """JSON-safe evidence; negative infinity is a symbolic operator only."""
@@ -139,27 +152,33 @@ def _reserve_check(
     return True, result
 
 
-class _ForcedOneSession(BpSession):
+class _ForcedBitSession(BpSession):
     """Unchanged-graph, hard-bit forcing with finite SPA saturation.
 
     The source's -infinity channel instruction is represented symbolically.
-    Every outgoing target edge and hard decision is clamped to one, while the
-    finite numerical messages use -25. This is not a native trajectory claim.
+    Every outgoing target edge and hard decision is clamped to the declared bit,
+    while the finite numerical messages use its signed magnitude-25 surrogate.
+    This is not a native trajectory claim.
     """
 
-    def __init__(self, table: EdgeTable, syndrome: np.ndarray, *, error_rate: float, owner_identity: str, target: int) -> None:
-        super().__init__(table, syndrome, error_rate=error_rate, owner_identity=owner_identity)
+    def __init__(
+        self, table: EdgeTable, syndrome: np.ndarray, *, error_rate: float,
+        owner_identity: str, target: int, forced_value: Literal[0, 1], v2c_clip: float | None,
+    ) -> None:
+        super().__init__(table, syndrome, error_rate=error_rate, owner_identity=owner_identity, v2c_clip=v2c_clip)
         self.target = target
+        self.forced_value = forced_value
+        self._forced_llr = 25.0 if forced_value == 0 else -25.0
         prior = np.array(self.state.prior, copy=True)
-        prior[target] = -25.0
+        prior[target] = self._forced_llr
         v2c = np.array(self.state.v2c, copy=True)
         for edge_index, (_check, variable) in enumerate(table.edges):
             if variable == target:
-                v2c[edge_index] = -25.0
+                v2c[edge_index] = self._forced_llr
         posterior = np.array(self.state.posterior, copy=True)
-        posterior[target] = -25.0
+        posterior[target] = self._forced_llr
         candidate = np.array(self.state.candidate, copy=True)
-        candidate[target] = 1
+        candidate[target] = forced_value
         self._state = self._make_state(prior, v2c, posterior, candidate, (target,), 0, 0)
 
     def advance(
@@ -181,15 +200,16 @@ class _ForcedOneSession(BpSession):
             sweep = self.schedule.sweep(
                 state.v2c, self.syndrome, error_rate=self.error_rate,
                 source_iteration=state.source_iteration, prior_llrs=state.prior,
+                transform_v2c=self._v2c_transform,
             )
             v2c = np.array(sweep.new_v2c, copy=True)
             for edge_index, (_check, variable) in enumerate(self.edge_table.edges):
                 if variable == self.target:
-                    v2c[edge_index] = -25.0
+                    v2c[edge_index] = self._forced_llr
             beliefs = np.array(sweep.beliefs, copy=True)
-            beliefs[self.target] = -25.0
+            beliefs[self.target] = self._forced_llr
             candidate = np.array(sweep.candidate, copy=True)
-            candidate[self.target] = 1
+            candidate[self.target] = self.forced_value
             next_state = self._make_state(
                 state.prior, v2c, beliefs, candidate, state.fixed_indices,
                 state.source_iteration + 1, state.revision + 1,
@@ -240,8 +260,10 @@ class ImpulseController:
     ) -> ImpulseResult:
         if not isinstance(original, OriginalProblem):
             raise ValueError("impulse requires an immutable original problem")
-        if damping_gamma is not None and self.spec.realization == "semantic_forced_one":
-            raise ValueError("damped semantic forced-one impulse is not qualified")
+        if damping_gamma is not None and self.spec.realization.startswith("semantic_forced_"):
+            raise ValueError("damped semantic forced impulse is not qualified")
+        if damping_gamma is not None and self.spec.v2c_clip is not None:
+            raise ValueError("v2c clip cannot be combined with damping")
         n = original.hz.shape[1]
         root = owner_identity or "impulse-" + sha256(json.dumps(
             [original.lineage_id, original.hz.tolist(), original.syndrome.tolist(), error_rate, asdict(self.spec)],
@@ -252,16 +274,18 @@ class ImpulseController:
         baseline = BpSession(
             EdgeTable.from_check_matrix(original.hz), original.syndrome,
             error_rate=error_rate, owner_identity=f"{root}:baseline", damping_gamma=damping_gamma,
+            v2c_clip=self.spec.v2c_clip,
         )
         initial_digest = baseline.state.digest
         if wall_clock is not None and wall_clock.check("candidate_selection_boundary", scope="attempt") is not None:
             return ImpulseResult(
                 self.spec.realization,
-                "impulse_negative_infinite_semantic_v1" if self.spec.realization == "semantic_forced_one" else "impulse_exact_shortening_css_v1",
+                _canonical_identity(self.spec.realization),
                 "author_code_unverified", self.spec.selection, root, original.lineage_id,
                 baseline.edge_table.graph_sha256, initial_digest, baseline.state.digest,
                 _candidate(baseline.state.candidate), None, "wall_clock_deadline", (), None,
                 None, "wall_clock_deadline", budgets.summary("attempt"), budgets.leaf_events(),
+                self.spec.v2c_clip, _clip_boundary(self.spec.v2c_clip),
             )
         order_reservation = budgets.reserve(
             "attempt", WorkVector(order_generation=1, order_selection=1, ranking_scans=n),
@@ -270,11 +294,12 @@ class ImpulseController:
         if order_reservation is None:
             return ImpulseResult(
                 self.spec.realization,
-                "impulse_negative_infinite_semantic_v1" if self.spec.realization == "semantic_forced_one" else "impulse_exact_shortening_css_v1",
+                _canonical_identity(self.spec.realization),
                 "author_code_unverified", self.spec.selection, root, original.lineage_id,
                 baseline.edge_table.graph_sha256, initial_digest, baseline.state.digest,
                 _candidate(baseline.state.candidate), None, "count_budget_exhausted", (), None,
                 None, "count_budget_exhausted", budgets.summary("attempt"), budgets.leaf_events(),
+                self.spec.v2c_clip, _clip_boundary(self.spec.v2c_clip),
             )
         try:
             order = self.spec.coordinate_order or tuple(range(n))
@@ -357,16 +382,14 @@ class ImpulseController:
                             termination = "impulse_valid"
                         else:
                             termination = "attempt_cap_reached" if self.spec.attempt_cap < len(order) else "no_proposal"
-        identity = (
-            "impulse_negative_infinite_semantic_v1" if self.spec.realization == "semantic_forced_one"
-            else "impulse_exact_shortening_css_v1"
-        )
+        identity = _canonical_identity(self.spec.realization)
         return ImpulseResult(
             self.spec.realization, identity, "author_code_unverified", self.spec.selection,
             root, original.lineage_id, baseline.edge_table.graph_sha256,
             initial_digest, baseline.state.digest, diagnostic, baseline_valid, baseline_term,
             tuple(attempts), selected_candidate, None if selected is None else selected.order,
             termination, budgets.summary("attempt"), budgets.leaf_events(),
+            self.spec.v2c_clip, _clip_boundary(self.spec.v2c_clip),
         )
 
     def _attempt(
@@ -390,13 +413,19 @@ class ImpulseController:
             if mode == "exact_shortening":
                 working, certificate = transform_fixed_coordinates(original, (target,), (1,))
                 table = EdgeTable.from_check_matrix(working.check_matrix)
-                session: BpSession = BpSession(table, working.syndrome, error_rate=error_rate, owner_identity=owner, damping_gamma=damping_gamma)
+                session: BpSession = BpSession(
+                    table, working.syndrome, error_rate=error_rate, owner_identity=owner,
+                    damping_gamma=damping_gamma, v2c_clip=self.spec.v2c_clip,
+                )
                 working_id = working.lineage_id
                 lift_digest = certificate.digest
             else:
                 table = EdgeTable.from_check_matrix(original.hz)
-                session = _ForcedOneSession(table, original.syndrome, error_rate=error_rate, owner_identity=owner, target=target)
-                working_id = "identity:" + original.lineage_id + f":forced:{target}"
+                session = _ForcedBitSession(
+                    table, original.syndrome, error_rate=error_rate, owner_identity=owner,
+                    target=target, forced_value=self.spec.effective_forced_value, v2c_clip=self.spec.v2c_clip,
+                )
+                working_id = "identity:" + original.lineage_id + f":forced:{target}:value:{self.spec.effective_forced_value}"
                 lift_digest = None
         except BaseException:
             reservation.rollback()
@@ -489,12 +518,30 @@ class ImpulseController:
     ) -> ImpulseAttempt:
         return ImpulseAttempt(
             order, target, mode,
-            "negative_infinite_llr" if mode == "semantic_forced_one" else "exact_fixed_one",
-            "source_operator_semantic_adaptation" if mode == "semantic_forced_one" else "controlled_css_adaptation",
-            1, working_id, graph_id, owner, initial, 0, final,
+            _source_operator(mode),
+            "source_operator_semantic_adaptation" if mode.startswith("semantic_forced_") else "controlled_css_adaptation",
+            0 if mode == "semantic_forced_zero" else 1, working_id, graph_id, owner, initial, 0, final,
             diagnostic, lifted, lift_digest, original_valid, term,
             action_leaf, sweeps, validation_leaf,
         )
+
+
+def _canonical_identity(mode: Realization) -> str:
+    if mode == "semantic_forced_zero":
+        return "impulse_positive_infinite_semantic_v1"
+    if mode == "semantic_forced_one":
+        return "impulse_negative_infinite_semantic_v1"
+    return "impulse_exact_shortening_css_v1"
+
+
+def _source_operator(mode: Realization) -> str:
+    if mode == "semantic_forced_zero":
+        return "positive_infinite_llr"
+    return "negative_infinite_llr" if mode == "semantic_forced_one" else "exact_fixed_one"
+
+
+def _clip_boundary(clip: float | None) -> Literal["post_v2c_construction_pre_state_commit"] | None:
+    return None if clip is None else "post_v2c_construction_pre_state_commit"
 
 
 def reconstruct_impulse_result(
