@@ -8,8 +8,8 @@ status: replanning
 stopped_at: Phase 6 former 10 plans superseded; fair BeamSearch/RelayBP replan pending
 last_updated: "2026-10-05T06:18:13Z"
 last_activity: 2026-10-05
-last_activity_desc: Decoder TOML moved to paper root; reproduction details grouped below it; Phase 6 replanning remains
-state_head: 3e9771c5dd0b34ea0665a2c66347eca5c5006ac6
+last_activity_desc: First three-paper CSS literature gate captured with 14 non-runnable source specifications; Phase 6 replanning remains
+state_head: a6526e8
 progress:
   total_phases: 14
   completed_phases: 4
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 0
 Total Plans in Phase: 0 (former 10 archived after user change)
 Status: Replanning; BB72 campaign and researcher policy-file interface available on main
-Last activity: 2026-10-05 — Literature policy folder layout revised
-Last Activity Description: Decoder TOML files sit in each paper folder; source and experiment details sit in paper_reproduction; Phase 6 replanning remains
+Last activity: 2026-10-05 — First CSS literature gate captured
+Last Activity Description: Yao BPGD, Bhatnagar impulse, and Rabeti–Mahdavifar MBBP-LD have 14 non-runnable source specifications and paper reproduction records; Phase 6 replanning remains
 
 Progress: [███░░░░░░░] 29%
 
@@ -168,6 +168,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261005-le8 | Capture first three-paper CSS literature gate and source specs | 2026-10-05 | a6526e8 | Verified and published | [261005-le8-capture-three-paper-css-literature-gate-](./quick/261005-le8-capture-three-paper-css-literature-gate-/) |
 | 261005-kkp | Place decoder TOML in paper folder and reproduction details below it | 2026-10-05 | 1ad21ba | Verified | [261005-kkp-place-decoder-toml-beside-paper-folder-a](./quick/261005-kkp-place-decoder-toml-beside-paper-folder-a/) |
 | 261005-kcm | Scaffold literature policy registry and source status contract | 2026-10-05 | 660bdd8 | Verified | [261005-kcm-scaffold-literature-policy-registry-and-](./quick/261005-kcm-scaffold-literature-policy-registry-and-/) |
 | 261005-jlz | Add importable policy-file study command with verified cache reuse | 2026-10-05 | 1f8b1c3 | Verified | [261005-jlz-add-importable-policy-file-study-command](./quick/261005-jlz-add-importable-policy-file-study-command/) |
