@@ -8,7 +8,7 @@ status: planned
 stopped_at: Completed 06-01-PLAN.md
 last_updated: "2026-10-05T21:01:54.320Z"
 last_activity: 2026-10-05
-last_activity_desc: Phase 6 nine-plan replan independently passed; first CSS policy-file execution slice ready
+last_activity_desc: Phase 6 Plan 01 completed and verified; runnable Yao BP policy computes and reuses through installed command
 state_head: 8bf3bdef0250b613de75de4adfc5853627ff6e3d
 progress:
   total_phases: 14
@@ -29,13 +29,13 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 ## Current Position
 
 Phase: 6 (Beam Search, Ensembles, and Candidate Selection) — PLANNED
-Plan: 06-01 ready
+Plan: 06-02 ready
 Total Phases: 14
 Current Plan: 2
 Total Plans in Phase: 9 (former 10 archived after user change)
-Status: Planned and independently checked; BB72 campaign and researcher policy-file interface available on main
-Last activity: 2026-10-05 — Phase 6 nine-plan replan verified
-Last Activity Description: Three-paper CSS gate and controlled BeamSearch/RelayBP scope reconciled; begin 06-01
+Status: Executing verified Phase 6 plans; first literature policy command slice complete
+Last activity: 2026-10-05 — Phase 6 Plan 01 completed
+Last Activity Description: Runnable Yao BP comparator computes and reuses with separate numerical and request provenance identities; begin Wave 2
 
 Progress: [███░░░░░░░] 29%
 
@@ -200,7 +200,7 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 Last session: 2026-10-05T21:01:52.495Z
 Stopped at: Completed 06-01-PLAN.md
-Next command: $gsd-execute-phase 06, beginning with the literature-policy command tracer; do not relaunch completed BB72 campaigns by default
+Next command: $gsd-execute-phase 06, beginning Wave 2; do not relaunch completed BB72 campaigns by default
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
 Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md`.

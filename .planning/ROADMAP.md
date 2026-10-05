@@ -414,16 +414,6 @@ Plans:
 - [ ] 06-08-PLAN.md
 - [ ] 06-09-PLAN.md
 
-- [x] 06-01 — First paper-root TOML through strict compilation, public command, verified compute/reuse and separate numerical/provenance identities.
-- [ ] 06-02 — Yao BP/BPGD T/R qualification and one bounded runnable BPGD policy.
-- [ ] 06-03 — True impulse force-to-zero and V2C-only clipping with historical compatibility.
-- [ ] 06-04 — Three Bhatnagar impulse dispositions and a runnable force-to-zero policy.
-- [ ] 06-05 — Generic candidate selection/voting and regression lock for completed fair BeamSearch/RelayBP evidence.
-- [ ] 06-06 — MBBP-LD augmented bases, independent members, frequency-weighted selection and typed no-convergence terminal.
-- [ ] 06-07 — Versioned ensemble public execution, ledger and independent replay.
-- [ ] 06-08 — Runnable MBBP-LD policy through the common command.
-- [ ] 06-09 — Bounded B1 gate, all 14 dispositions, installed-CLI reuse assertions and evidence package.
-
 ### Phase 7: Optional Postprocessing
 
 **Goal:** A researcher can attach independently configurable additional processing to canonical BP nonconvergence while retaining clear BP-only evidence.
