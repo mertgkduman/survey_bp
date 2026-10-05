@@ -80,7 +80,7 @@ paragraph records the September 26 review state, not an open implementation gap.
 - [x] **MOD-01**: A researcher can execute a source-linked canonical Relay-BP composition with explicit memory, ensemble/relay legs, transferred state, stopping, and candidate selection, and run the pinned original implementation as a reference in eligible regimes.
 - [ ] **MOD-02**: A researcher can execute source-defined BPGD as a canonical guided-decimation composition with reliable-variable selection, fixation, BP rounds, and recorded state transitions.
 - [ ] **MOD-03**: A researcher can execute source-defined impulse decoding with its failure trigger, shortening attempts, branch budgets, candidate lifting, and selection represented explicitly in the canonical execution model.
-- [ ] **MOD-04**: A researcher can execute a source-linked canonical BeamSearch CSS adaptation with a declared common initial BP run, masked/decimated branches, beam ranking/pruning, width/budgets, optional damping, candidate selection, and complete work evidence. The original paper's circuit procedure and pinned executable reference are qualified under CIR-04 and CEV-01.
+- [x] **MOD-04**: A researcher can execute a source-linked canonical BeamSearch CSS adaptation with a declared common initial BP run, masked/decimated branches, beam ranking/pruning, width/budgets, optional damping, candidate selection, and complete work evidence. The original paper's circuit procedure and pinned executable reference are qualified under CIR-04 and CEV-01.
 
 ### Additional interventions
 
@@ -93,7 +93,7 @@ paragraph records the September 26 review state, not an open implementation gap.
 ### Candidate selection
 
 - [x] **CAN-01**: A researcher can select from a candidate list using declared eligibility, scoring, and deterministic tie rules, preserving rejected candidates and their origins.
-- [ ] **CAN-02**: A researcher can apply a precisely defined voting policy over a declared object and eligible set, with final original-problem validity checked rather than assumed.
+- [ ] **CAN-02**: A researcher can apply a precisely defined voting policy over a declared object and eligible set, with final original-problem validity checked rather than assumed. Phase 6 delivered and tested the importable kernel primitive; Phase 9 owns public policy-file execution, ledger replay, and matched CSS assessment.
 
 ### Optional postprocessing
 
@@ -226,14 +226,14 @@ Every v1 requirement has exactly one owning phase; later phases may use or stren
 | MOD-01 | Phase 4 | Complete |
 | MOD-02 | Phase 5 | Pending |
 | MOD-03 | Phase 5 | Pending |
-| MOD-04 | Phase 6 | Pending |
+| MOD-04 | Phase 6 | Complete |
 | INT-01 | Phase 5 | Pending |
 | INT-02 | Phase 5 | Pending |
 | INT-03 | Phase 5 | Pending |
 | INT-04 | Phase 5 | Pending |
 | INT-05 | Phase 6 | Complete |
 | CAN-01 | Phase 6 | Complete |
-| CAN-02 | Phase 6 | Pending |
+| CAN-02 | Phase 9 | Pending |
 | POST-01 | Phase 7 | Pending |
 | POST-02 | Phase 7 | Pending |
 | POST-03 | Phase 7 | Pending |

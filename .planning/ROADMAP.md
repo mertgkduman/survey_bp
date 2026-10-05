@@ -6,7 +6,7 @@ Build a provenance-preserving research platform from paper evidence through nati
 
 **Milestone:** v1.0 — platform and first journal-paper evidence.
 **Structure:** End-to-end capability slices (`mvp` mode), fine granularity. Fourteen phases are used because the three required regimes each need distinct implementation and experimental qualification; phase counts are not a reason to merge those gates or defer publication scope.
-**Planning status:** Phases 1–4 are complete. Phase 5 implementation is technically verified with human review still open. All nine Phase 6 plans are implemented; phase-goal verification follows the three-paper CSS policy gate. Later plan counts remain TBD.
+**Planning status:** Phases 1–4 and 6 are complete. Phase 5 implementation is technically verified with human visual review still open. Phase 7 is next for planning; CSS literature intake and bounded pilots continue alongside it. Later plan counts remain TBD.
 
 ## Phases
 
@@ -15,7 +15,7 @@ Build a provenance-preserving research platform from paper evidence through nati
 - [x] **Phase 3: Update Rules and Scheduling** — Compare the requested message rules and schedules with explicit semantics and work counters. (completed 2026-09-24)
 - [x] **Phase 4: Memory Policies and Relay-BP** — Implement state/history policies and the source-defined relay composition. (completed 2026-09-30)
 - [ ] **Phase 5: Guided and Perturbative BP Interventions** — Implement BPGD, impulse, freezing, syndrome/sign flips, and restarting.
-- [ ] **Phase 6: Beam Search, Ensembles, and Candidate Selection** — Expose branching, pruning, lists, and voting as auditable policies, and qualify the first three-paper CSS policy-file gate.
+- [x] **Phase 6: Beam Search, Ensembles, and Candidate Selection** — Expose branching, pruning, lists, and voting as auditable policies, and qualify the first three-paper CSS policy-file gate. (completed 2026-10-05)
 - [ ] **Phase 7: Optional Postprocessing** — Add independent OSD/LSD/SI/OTF processing with BP-only attribution preserved.
 - [ ] **Phase 8: Reproducible Campaigns and Statistical Assessment** — Run paired, resumable campaigns with prespecified statistical criteria.
 - [ ] **Phase 9: CSS Reproduction and Controlled Comparisons** — Qualify selected source results and isolate policy contributions in CSS decoding.
@@ -339,13 +339,13 @@ measured budget.
 5. Researchers can enable/disable these interventions on eligible CSS pilots and inspect pre-intervention, attempted, and selected outcomes without claiming new settings reproduce a source curve.
 
 **Research focus:** Original BPGD/impulse code discovery; perturbation semantics; lifting; random-stream and cache invalidation rules.
-**Plans:** 7/14 plans executed in 8 waves; ready to execute
+**Plans:** 14/14 plans implemented and technically verified; Phase 5 human notebook/HTML review remains open.
 
 **Preparatory design (2026-09-26):** [Intervention contracts](phases/05-guided-and-perturbative-bp-interventions/05-DESIGN.md)
 and [bounded next tasks](phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md)
 are available, with independently checked finite shortening/lifting fixtures.
 The Phase 4 dependency is complete. Phase 5 planning passed independent
-verification on 2026-09-30; execution is in progress. Source ambiguities
+verification on 2026-09-30; implementation is complete. Source ambiguities
 retain explicit implementation dispositions and qualification labels.
 
 Plans:
@@ -365,45 +365,45 @@ Plans:
 - [x] 05-05-PLAN.md — Bounded impulse attempts and selection
 - [x] 05-06-PLAN.md — Freezing, syndrome flips, and sign flips
 - [x] 05-07-PLAN.md — Bounded Restart Belief branches
-- [ ] 05-09-PLAN.md — Plotly package identity and legitimacy gate
+- [x] 05-09-PLAN.md — Plotly package identity and legitimacy gate
 
 **Wave 3** *(blocked on Wave 2 controller completion)*
 
-- [ ] 05-08-PLAN.md — Versioned public manifest, CLI, ledger, and verifier
-- [ ] 05-12-PLAN.md — Deterministic BB-144 and HGP algebra and policy fixtures
+- [x] 05-08-PLAN.md — Versioned public manifest, CLI, ledger, and verifier
+- [x] 05-12-PLAN.md — Deterministic BB-144 and HGP algebra and policy fixtures
 
 **Wave 4** *(blocked on public execution)*
 
-- [ ] 05-10-PLAN.md — B1 entitlement, calibration, and sealed cap freeze
+- [x] 05-10-PLAN.md — B1 entitlement, calibration, and sealed cap freeze
 
 **Wave 5** *(blocked on cap freeze)*
 
-- [ ] 05-14-PLAN.md — Bounded matched B1 evaluation
+- [x] 05-14-PLAN.md — Bounded matched B1 evaluation
 
 **Wave 6** *(blocked on verified pilot evidence and package gate)*
 
-- [ ] 05-11-PLAN.md — Shot-first notebook and synchronized plots
+- [x] 05-11-PLAN.md — Shot-first notebook and synchronized plots
 
 **Wave 7** *(blocked on executed notebook)*
 
-- [ ] 05-13-PLAN.md — Standalone HTML export and documentation
+- [x] 05-13-PLAN.md — Standalone HTML export and documentation
 
 ### Phase 6: Beam Search, Ensembles, and Candidate Selection
 
 **Goal:** A researcher can execute branching/ensemble searches and inspect how candidate generation, pruning, selection, and voting affect outputs and cost.
 **Mode:** mvp
 **Depends on:** Phase 5
-**Requirements:** MOD-04, INT-05, CAN-01, CAN-02
+**Requirements:** MOD-04, INT-05, CAN-01. The voting kernel is available through Python; public policy-file voting is carried to Phase 9 as CAN-02.
 **Success Criteria:**
 
 1. The controlled CSS BeamSearch/RelayBP comparison has a shared initial BP run, declared damped branch/leg semantics, masked BeamSearch branches, ranking/pruning, width/budgets, candidate selection, source-linked fixtures, and verified work evidence. The original BeamSearch circuit procedure and native reference remain Phase 12–13 targets.
 2. Generic branching/ensemble compositions declare member identity, inherited versus independent state, resource limits, and work aggregation without double-counting or hiding discarded paths.
-3. List selection preserves candidate origin and eligibility with declared scores/ties. Coordinate-majority voting has an independently checked kernel primitive; its public manifest fails closed until end-to-end execution and replay are added.
+3. List selection preserves candidate origin and eligibility with declared scores/ties. Coordinate-majority voting has an independently checked importable kernel primitive; its public manifest fails closed until Phase 9 adds end-to-end execution and replay.
 4. Researchers can replay a small search tree and account for accepted, rejected, pruned and budget-exhausted paths through the ledger.
 5. The first CSS literature set (Yao BPGD, Bhatnagar impulse, and Rabeti–Mahdavifar MBBP-LD) has source-grounded paper-level policy files with explicit runnable/unsupported status. At least one qualified variant per paper runs through the common policy-file command on a bounded CSS study with verified provenance and original-problem checks; full curve assessment remains in Phases 8–9.
 
 **Research focus:** Controlled CSS BeamSearch/RelayBP semantics, ensemble/list selection, search work versus parallel latency, and a small B1 literature-policy execution gate; original circuit reference integration follows in Phases 12–13.
-**Plans:** 9/9 plans executed across 6 waves, independently checked in `06-PLAN-CHECK.md`. Public voting was narrowed to a fail-closed reserved field for this source-driven gate.
+**Plans:** 9/9 plans complete; public voting remains fail-closed pending CAN-02 in Phase 9.
 
 - [x] 06-01-PLAN.md
 - [x] 06-02-PLAN.md
@@ -456,13 +456,14 @@ Plans:
 **Goal:** A researcher can assess the selected published CSS results and compare BP mechanisms under shared conditions with trustworthy uncertainty and cost attribution.
 **Mode:** mvp
 **Depends on:** Phase 8
-**Requirements:** EVAL-01, EVAL-02, EVAL-03
+**Requirements:** EVAL-01, EVAL-02, EVAL-03, CAN-02
 **Success Criteria:**
 
 1. The selected CSS source experiments have pinned faithful configurations and native assessment reports, with original-code/settings gaps retained rather than silently defaulted.
 2. Canonical CSS realizations are assessed against declared published targets; source-faithful passes, discrepancies, inconclusive points, and adaptations are distinguishable in the registry.
 3. Controlled experiments and ablations share codes/noise/samples and explicit budgets, isolating update/schedule, memory/intervention, search/selection, and optional-fallback effects across eligible compositions.
 4. Generated results report outcome classes and aggregate denominators, convergence, iterations, work, runtime and resource context separately, without asserting superiority beyond the observed evidence.
+5. Eligible CSS ensembles can select a declared public voting policy from a decoder file, execute it with complete ballots and lineage, validate the aggregate against the original syndrome, and replay the ledger. Voting comparisons use the same matched samples and budgets as list-selection controls.
 
 **Research focus:** Final CSS paper/code/rate grid, faithful parameter extraction, meaningful ablation design, precision/power, and cost calibration.
 **Scope carry-forward:** Reconsider memory/Relay comparisons alongside other CSS policies only after Phase 8 campaign rules are ready. Size a focused comparison from its scientific question and available compute; do not inherit the cancelled Phase 4 448-shot/14-arm grid by default.
@@ -559,8 +560,8 @@ Plans:
 | 2. Canonical CSS Execution and Policy Contracts | 16/16 | Complete    | 2026-09-23 |
 | 3. Update Rules and Scheduling | 17/17 | Complete    | 2026-09-24 |
 | 4. Memory Policies and Relay-BP | 15/15 | Complete    | 2026-09-30 |
-| 5. Guided and Perturbative BP Interventions | 7/14 | In Progress|  |
-| 6. Beam Search, Ensembles, and Candidate Selection | 1/9 | In Progress|  |
+| 5. Guided and Perturbative BP Interventions | 14/14 | Human review pending |  |
+| 6. Beam Search, Ensembles, and Candidate Selection | 9/9 | Complete    | 2026-10-05 |
 | 7. Optional Postprocessing | 0/TBD | Not started | - |
 | 8. Reproducible Campaigns and Statistical Assessment | 0/TBD | Not started | - |
 | 9. CSS Reproduction and Controlled Comparisons | 0/TBD | Not started | - |

@@ -1,20 +1,21 @@
 ---
 gsd_state_version: "1.0"
 milestone: v1.0
-current_phase: 6
-current_phase_name: Beam Search, Ensembles, and Candidate Selection
-current_plan: 9
-status: in_progress
-stopped_at: Completed all nine Phase 6 plans; run phase-goal verification before Phase 7
-last_updated: "2026-10-05T22:21:00Z"
+current_phase: 7
+current_phase_name: Optional Postprocessing
+current_plan: Not started
+status: planning
+stopped_at: Phase 6 complete; plan Phase 7 while Phase 5 human visual review remains open
+last_updated: "2026-10-05T23:21:23.305Z"
 last_activity: 2026-10-05
-last_activity_desc: Phase 6 Plan 09 complete: bounded three-paper B1 policy gate and portable evidence
-state_head: d79b764
+last_activity_desc: Phase 6 goal verified; Phase 7 planning is next, with Phase 5 human review retained
+state_head: 54dc360f2dfd57dfcc0a157a8e8e894c91f2acca
 progress:
   total_phases: 14
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 80
   completed_plans: 80
+  percent: 36
 ---
 
 # Project State
@@ -24,20 +25,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-22)
 
 **Core value:** Make BP decoder differences explicit, reproducible, and fairly comparable through canonical policy execution and published evidence.
-**Current focus:** Phase 06 goal verification after the three-paper CSS policy-file gate; prepare Phase 7 with parallel CSS literature intake
+**Current focus:** Plan Phase 07 optional postprocessing while CSS literature policy intake and bounded pilots continue; retain Phase 5 human visual review as an open item
 
 ## Current Position
 
-Phase: 6 (Beam Search, Ensembles, and Candidate Selection) — IMPLEMENTED, pending phase-goal verification
-Plan: 06-09 complete
+Phase: 7 — Optional Postprocessing
+Plan: Not started
 Total Phases: 14
-Current Plan: 9
-Total Plans in Phase: 9 (former 10 archived after user change)
-Status: All Phase 6 plans implemented; phase-goal verification pending
-Last activity: 2026-10-05 — Phase 6 Plan 09 completed
-Last Activity Description: Three-paper bounded B1 gate computed, packaged, and reused through the installed policy-file command
+Current Plan: Not started
+Total Plans in Phase: TBD
+Status: Ready to plan
+Last activity: 2026-10-05 — Phase 6 verified complete; Phase 7 selected for planning
+Last Activity Description: Phase 5 notebook/HTML human review remains open and does not block Phase 7 design work
 
-Progress: [██████████] 100% of Phase 6 plans
+Progress: [████░░░░░░] 5 of 14 phases complete (36%)
 
 ## Performance Metrics
 
@@ -146,6 +147,9 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - [Phase 04]: Phase 04 Plan 12: terminal Relay-ledger verification releases BB-144/HGP selections while B1 remains inconclusive under the frozen cap.
 - [Phase 04]: Phase 04 Plan 12: async calibration manifest reconciled from terminal evidence without campaign relaunch or result rewrites.
 - [Phase 6]: Phase 06: executable policy identity excludes source prose while immutable request receipts retain provenance and raw TOML identity.
+- [Phase 6]: The three-paper B1 gate verified the common policy-file command and portable cache for one Yao, Bhatnagar, and Rabeti adaptation; two p=0.000001 shots per policy are not a performance or source-curve assessment.
+- [Phase 6]: Coordinate-majority voting is an importable, independently checked kernel primitive; CAN-02 public TOML execution and replay are assigned to Phase 9.
+- [Phase 6]: Phase 5 human visual review remains open while Phase 7 planning proceeds, as directed by the user. Continue CSS paper intake and bounded pilots alongside Phase 7; Phase 8 owns campaign statistics and throughput profiling.
 
 ### Pending Todos
 
@@ -196,13 +200,13 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-**Resume file:** .planning/phases/06-beam-search-ensembles-and-candidate-selection/06-07-PLAN.md
+**Resume file:** .planning/phases/06-beam-search-ensembles-and-candidate-selection/06-VERIFICATION.md
 
-Last session: 2026-10-05T21:01:52.495Z
-Stopped at: Completed Phase 6 Wave 3; begin Plan 06-07
-Next command: $gsd-execute-phase 06, beginning Wave 3; do not relaunch completed BB72 campaigns by default
+Last session: 2026-10-05T23:20:53Z
+Stopped at: Phase 6 goal verified and completed; Phase 7 planning is next while Phase 5 human visual review stays open
+Next command: $gsd-discuss-phase 7 or $gsd-plan-phase 7 after source and fallback scope review; do not relaunch completed BB72 campaigns by default
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
 Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md`.
 Latest isolated terminal ledger audit: `gsd/phase4-memory-integration-20260926` at `263501e`, `.planning/phases/04-memory-policies-and-relay-bp/04-CALIBRATION-LEDGER-AUDIT-PREPARATION.md` in that branch.
-The September 26 development PDF remains a historical snapshot. The September 29 update records the terminal calibration. Phase 4 is complete under the revised scope; Phase 5 planning passed independent verification and execution remains pending. The comprehensive production campaign was cancelled by the user and is no longer a Phase 4 gate.
+The September 26 development PDF remains a historical snapshot. The September 29 update records the terminal calibration. Phase 4 is complete under the revised scope; Phase 5 implementation passed technical verification and awaits the human notebook/HTML review. The comprehensive production campaign was cancelled by the user and is no longer a Phase 4 gate.
