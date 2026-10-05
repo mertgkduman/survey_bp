@@ -1,1 +1,0 @@
-Put source-grounded `<variant>.spec.toml` records here while a decoder is mapped or specified but not executable. These files are never passed to `bp-registry`; the variant row in `PAPER.md` must list the exact missing semantics or implementation.

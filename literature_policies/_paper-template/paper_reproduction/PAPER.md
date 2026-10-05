@@ -11,7 +11,7 @@
 
 | Variant ID | Source procedure | Status | TOML file | Missing facts or implementation |
 | --- | --- | --- | --- | --- |
-| `<variant>` | `<paper section / algorithm>` | mapped only | `source-specs/<variant>.spec.toml` | `<specific gaps>` |
+| `<variant>` | `<paper section / algorithm>` | mapped only | `../<variant>.spec.toml` | `<specific gaps>` |
 
 ## Policy semantics
 

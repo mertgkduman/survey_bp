@@ -1,14 +1,22 @@
 # Literature BP policy registry
 
-This directory collects source-grounded descriptions of BP-family decoders before their reproduction campaigns. Create one folder per **paper revision**, named `<first-author>-<year>-<short-title>`. Start from [`_paper-template/`](./_paper-template/), then add one record per decoder variant the paper defines. A variant in a paper is a source identity; it is not automatically an executable policy composition.
+This directory collects source-grounded descriptions of BP-family decoders before their reproduction campaigns. Create one folder per **paper revision**, named `<first-author>-<year>-<short-title>`. Start from [`_paper-template/`](./_paper-template/), then add one TOML file directly in the paper folder for each requested decoder variant. A variant in a paper is a source identity; it is not automatically an executable policy composition.
 
 ## Each paper folder
 
-- `PAPER.md`: citation, exact revision and primary-source links, author-code revision if available, equations/algorithm anchors, decoder variants, unresolved details, and the source's code/circuit/noise/result identities.
-- `decoders/<variant>.toml`: a **runnable** declarative file using the installed `bp-registry` policy schema. Only put a file here after its policy kinds and compatibility have passed preflight and focused equation/transition checks. Preserve the exact source basis and any adaptations in `PAPER.md`.
-- `source-specs/<variant>.spec.toml`: a **mapped-only** TOML record for a decoder that cannot yet be expressed by the executable registry. Record known equations, ordering, parameters, source anchors, and unknowns. This file is research evidence, not an input to `bp-registry`.
+- `<variant>.toml`: a **runnable** declarative decoder file using the installed `bp-registry` policy schema. Put it directly in the paper folder once its policy kinds and compatibility have passed preflight and focused equation/transition checks.
+- `<variant>.spec.toml`: a **mapped-only** decoder specification, also directly in the paper folder, when the source algorithm cannot yet be expressed by the executable registry. Record known equations, ordering, and parameters. This file is research evidence and is not an input to `bp-registry` until it is implemented and converted to a runnable file.
+- `paper_reproduction/`: the citation, exact revision and primary-source links, author-code revision, equation/algorithm anchors, decoder status and unresolved details, plus code, circuit, noise, and reported-result identities. Keep source-specific settings and adaptation decisions here so the decoder TOML can be reused in other study settings.
 
-Keep one source-specific variant per file when parameters or procedure differ materially. A controlled adaptation gets its own clearly named file and source-status entry. Do not silently fill missing parameters or equate a CSS adaptation with a circuit-paper reproduction.
+```text
+literature_policies/<paper-id>/
+  <decoder-a>.toml
+  <decoder-b>.spec.toml
+  paper_reproduction/
+    PAPER.md
+```
+
+Keep one source-specific variant per file when parameters or procedure differ materially. A controlled adaptation gets its own clearly named file and source-status entry in `paper_reproduction/PAPER.md`. Do not silently fill missing parameters or equate a CSS adaptation with a circuit-paper reproduction.
 
 ## Status path
 
