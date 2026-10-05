@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "study_id": "fair-beam-relay-css-v2",
+  "status": "prespecified_before_sampling",
+  "source_status": "controlled_css_adaptation",
+  "assessment_status": "not_assessed_until_terminal_verification",
+  "artifact_path": "data/artifacts/bb72-css.json",
+  "artifact_raw_sha256": "8cb3af882fecf8d16ff3b84c2c69939cdafde122fd48ab0d87a7e113d4e91227",
+  "artifact_semantic_sha256": "ff81d1e31a0fd2bb5a7ecc980298fdbaf2a65fe70a806e8a20764d047ce94aad",
+  "noise_model": "independent_x_only_css_code_capacity",
+  "rates": {
+    "p050": {"error_rate": 0.05, "selection_shots": 128, "evaluation_shots": 512},
+    "p080": {"error_rate": 0.08, "selection_shots": 128, "evaluation_shots": 1280}
+  },
+  "cohorts": {
+    "selection": {"sample_seed": 740602, "physical_identity_prefix": "fair-beam-relay-css-v2-selection"},
+    "evaluation": {"sample_seed": 740603, "physical_identity_prefix": "fair-beam-relay-css-v2-evaluation"}
+  },
+  "damping_gammas": [1.0, 0.5],
+  "profiles": {
+    "i05": {"extra_iterations_per_unit": 5},
+    "i10": {"extra_iterations_per_unit": 10},
+    "i20": {"extra_iterations_per_unit": 20}
+  },
+  "common_controls": {
+    "initial_iterations": 20,
+    "max_extra_units": 8,
+    "max_extra_c2v_updates": 8640,
+    "beam_width": 2,
+    "beam_rounds": 4,
+    "solution_limit": 1,
+    "relay_gamma_low": -0.24,
+    "relay_gamma_high": 0.66,
+    "relay_seed": "fair-beam-relay-css-v2-disordered"
+  },
+  "selection_rule": "For each rate, damping, and method independently: fewest unconditional failures on selection shots; then least total initial-plus-extra C2V work; then lexicographically first profile ID. Freeze before evaluation.",
+  "evaluation_rule": "All evaluation profiles run on matched, independent physical samples. Four selected Beam-versus-Relay rate/damping contrasts use two-sided exact paired McNemar tests and Holm familywise correction at alpha=0.05; all other contrasts are descriptive. Every terminal shot counts; exact and stabilizer-equivalent outcomes are successes.",
+  "source_links": {
+    "beam": "https://arxiv.org/html/2512.07057v2",
+    "relay": "https://arxiv.org/html/2506.01779v2"
+  },
+  "limitations": [
+    "BB72 X-only CSS code capacity is a controlled adaptation of the cited circuit-level experiments.",
+    "The common plain-BP initial run is separate from Relay's paper-defined first memory-BP leg.",
+    "A shared additional C2V update cap does not equalize total operations, runtime, or parallel latency.",
+    "Selection and evaluation physical sample namespaces are disjoint; no outcome-dependent stopping is allowed."
+  ]
+}
