@@ -1,0 +1,1 @@
+Put only preflighted, executable `<variant>.toml` decoder files here. These files use the policy schema documented in `docs/researcher-study-command.md`; paper metadata and adaptation decisions stay in the parent `PAPER.md`.

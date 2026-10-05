@@ -128,6 +128,7 @@ retained.
 | [`data/artifacts/`](data/artifacts/) | Code artifacts and their identities |
 | [`data/manifests/`](data/manifests/) | Experiment configurations and schema snapshots |
 | [`data/evidence/`](data/evidence/) | Source, protocol, and artifact provenance |
+| [`literature_policies/`](literature_policies/) | Per-paper source specifications and qualified decoder TOML files |
 | [`data/results/`](data/results/) | Retained development and pilot evidence |
 | [`docs/`](docs/) | Technical guides, source decisions, and development reports |
 | [`scripts/`](scripts/) | Campaign and analysis utilities |
