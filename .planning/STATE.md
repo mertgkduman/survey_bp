@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 6
 current_phase_name: Beam Search, Ensembles, and Candidate Selection
-current_plan: 1
+current_plan: 2
 status: planned
-stopped_at: Phase 6 nine-plan replan verified; begin 06-01
-last_updated: "2026-10-05T20:47:18Z"
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-10-05T21:01:54.320Z"
 last_activity: 2026-10-05
 last_activity_desc: Phase 6 nine-plan replan independently passed; first CSS policy-file execution slice ready
-state_head: a6526e8
+state_head: 8bf3bdef0250b613de75de4adfc5853627ff6e3d
 progress:
   total_phases: 14
   completed_phases: 4
-  total_plans: 81
-  completed_plans: 64
+  total_plans: 80
+  completed_plans: 72
 ---
 
 # Project State
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 Phase: 6 (Beam Search, Ensembles, and Candidate Selection) — PLANNED
 Plan: 06-01 ready
 Total Phases: 14
-Current Plan: 1
+Current Plan: 2
 Total Plans in Phase: 9 (former 10 archived after user change)
 Status: Planned and independently checked; BB72 campaign and researcher policy-file interface available on main
 Last activity: 2026-10-05 — Phase 6 nine-plan replan verified
@@ -80,6 +80,7 @@ Progress: [███░░░░░░░] 29%
 | Phase 05 P05 | 10min | 2 tasks | 2 files |
 | Phase 05 P06 | 18min | 3 tasks | 3 files |
 | Phase 05 P07 | 12min | 2 tasks | 2 files |
+| Phase 06 P01 | 14m | 2 tasks | 5 files |
 
 Phase 02 P10–P16 gap-closure metrics are recorded in their individual summaries.
 
@@ -144,6 +145,7 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - [Phase 04]: Phase 4 caps use one worker and rate-specific representative Relay evidence; B1 p=.07 is bounded to a measured three-leg-equivalent work vector.
 - [Phase 04]: Phase 04 Plan 12: terminal Relay-ledger verification releases BB-144/HGP selections while B1 remains inconclusive under the frozen cap.
 - [Phase 04]: Phase 04 Plan 12: async calibration manifest reconciled from terminal evidence without campaign relaunch or result rewrites.
+- [Phase 6]: Phase 06: executable policy identity excludes source prose while immutable request receipts retain provenance and raw TOML identity.
 
 ### Pending Todos
 
@@ -194,10 +196,10 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-**Resume file:** .planning/phases/06-beam-search-ensembles-and-candidate-selection/06-01-PLAN.md
+**Resume file:** 06-02-PLAN.md
 
-Last session: 2026-10-05
-Stopped at: Phase 06 nine-plan replan independently verified; Phase 05 human review remains open
+Last session: 2026-10-05T21:01:52.495Z
+Stopped at: Completed 06-01-PLAN.md
 Next command: $gsd-execute-phase 06, beginning with the literature-policy command tracer; do not relaunch completed BB72 campaigns by default
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.

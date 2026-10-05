@@ -402,9 +402,19 @@ Plans:
 5. The first CSS literature set (Yao BPGD, Bhatnagar impulse, and Rabeti–Mahdavifar MBBP-LD) has source-grounded paper-level policy files with explicit runnable/unsupported status. At least one qualified variant per paper runs through the common policy-file command on a bounded CSS study with verified provenance and original-problem checks; full curve assessment remains in Phases 8–9.
 
 **Research focus:** Controlled CSS BeamSearch/RelayBP semantics, voting, search work versus parallel latency, and a small B1 literature-policy execution gate; original circuit reference integration follows in Phases 12–13.
-**Plans:** 9 plans across 6 waves, independently checked in `06-PLAN-CHECK.md`.
+**Plans:** 1/9 plans executed across 6 waves, independently checked in `06-PLAN-CHECK.md`.
 
-- [ ] 06-01 — First paper-root TOML through strict compilation, public command, verified compute/reuse and separate numerical/provenance identities.
+- [x] 06-01-PLAN.md
+- [ ] 06-02-PLAN.md
+- [ ] 06-03-PLAN.md
+- [ ] 06-04-PLAN.md
+- [ ] 06-05-PLAN.md
+- [ ] 06-06-PLAN.md
+- [ ] 06-07-PLAN.md
+- [ ] 06-08-PLAN.md
+- [ ] 06-09-PLAN.md
+
+- [x] 06-01 — First paper-root TOML through strict compilation, public command, verified compute/reuse and separate numerical/provenance identities.
 - [ ] 06-02 — Yao BP/BPGD T/R qualification and one bounded runnable BPGD policy.
 - [ ] 06-03 — True impulse force-to-zero and V2C-only clipping with historical compatibility.
 - [ ] 06-04 — Three Bhatnagar impulse dispositions and a runnable force-to-zero policy.
@@ -557,7 +567,7 @@ Plans:
 | 3. Update Rules and Scheduling | 17/17 | Complete    | 2026-09-24 |
 | 4. Memory Policies and Relay-BP | 15/15 | Complete    | 2026-09-30 |
 | 5. Guided and Perturbative BP Interventions | 7/14 | In Progress|  |
-| 6. Beam Search, Ensembles, and Candidate Selection | 0/TBD | Not started | - |
+| 6. Beam Search, Ensembles, and Candidate Selection | 1/9 | In Progress|  |
 | 7. Optional Postprocessing | 0/TBD | Not started | - |
 | 8. Reproducible Campaigns and Statistical Assessment | 0/TBD | Not started | - |
 | 9. CSS Reproduction and Controlled Comparisons | 0/TBD | Not started | - |

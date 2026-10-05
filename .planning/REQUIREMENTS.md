@@ -88,11 +88,11 @@ paragraph records the September 26 review state, not an open implementation gap.
 - [ ] **INT-02**: A researcher can apply a source-defined syndrome-flipping intervention while retaining the original syndrome and validating lifted candidates against it.
 - [ ] **INT-03**: A researcher can apply a source-defined sign-flipping intervention with explicit target selection, magnitude/sign convention, trigger, and state consequences.
 - [ ] **INT-04**: A researcher can configure restarting with explicit reset/preserved state, stopping budget, and independent replayable random streams.
-- [ ] **INT-05**: A researcher can compose branching and ensembling with explicit parent/member identity, resource limits, shared versus independent state, and aggregated work.
+- [x] **INT-05**: A researcher can compose branching and ensembling with explicit parent/member identity, resource limits, shared versus independent state, and aggregated work.
 
 ### Candidate selection
 
-- [ ] **CAN-01**: A researcher can select from a candidate list using declared eligibility, scoring, and deterministic tie rules, preserving rejected candidates and their origins.
+- [x] **CAN-01**: A researcher can select from a candidate list using declared eligibility, scoring, and deterministic tie rules, preserving rejected candidates and their origins.
 - [ ] **CAN-02**: A researcher can apply a precisely defined voting policy over a declared object and eligible set, with final original-problem validity checked rather than assumed.
 
 ### Optional postprocessing
@@ -231,8 +231,8 @@ Every v1 requirement has exactly one owning phase; later phases may use or stren
 | INT-02 | Phase 5 | Pending |
 | INT-03 | Phase 5 | Pending |
 | INT-04 | Phase 5 | Pending |
-| INT-05 | Phase 6 | Pending |
-| CAN-01 | Phase 6 | Pending |
+| INT-05 | Phase 6 | Complete |
+| CAN-01 | Phase 6 | Complete |
 | CAN-02 | Phase 6 | Pending |
 | POST-01 | Phase 7 | Pending |
 | POST-02 | Phase 7 | Pending |
