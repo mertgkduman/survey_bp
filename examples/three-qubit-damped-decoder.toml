@@ -1,0 +1,39 @@
+# Schema v4: the memory binding is part of the decoder specification.
+schema_version = 1
+engine = "canonical_css"
+
+[update]
+kind = "binary_spa"
+
+[schedule]
+kind = "flooding"
+
+[state_memory]
+kind = "stateless"
+
+[intervention]
+kind = "identity"
+
+[stopping]
+kind = "syndrome_or_budget"
+
+[selection]
+kind = "stable_first"
+
+[postprocessing]
+kind = "identity"
+
+[[memory.bindings]]
+binding_id = "research-v2c-damping"
+kind = "v2c_damping"
+target = "v2c"
+order = 0
+history_owner = "attempt:research-v2c-damping"
+state_lifetime = "attempt"
+advance_boundary = "source_iteration"
+refresh_boundary = "attempt_start"
+source_status = "canonical_adaptation"
+retain_history = false
+
+[memory.bindings.parameters]
+gamma = 0.5 # fresh-message coefficient

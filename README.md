@@ -61,6 +61,15 @@ dependencies and follow the environment guide.
 
 ## Run a small checked experiment
 
+For the researcher-facing one-command workflow, supply a study and a TOML decoder file:
+
+```bash
+bp-registry data/studies/fair-beam-relay-css-v2.json \
+  --decoder examples/bb72-relay-decoder.toml --workers 8
+```
+
+The command verifies and reuses the published BB72 package when present, or produces and verifies it when absent. For a custom composition of registered canonical CSS policies, use `OMP_NUM_THREADS=1 bp-registry examples/three-qubit-study.json --decoder examples/three-qubit-decoder.toml`. Python users can import `ensure_study` from `bp_registry.study`. See the [researcher study command](docs/researcher-study-command.md) for the file formats, result identity, and scope.
+
 Run these commands from the repository root. The example uses a deterministic,
 two-shot, three-qubit CSS development fixture and writes to a fresh temporary
 directory:

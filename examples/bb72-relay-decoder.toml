@@ -1,0 +1,6 @@
+# Relay's per-variable memory interval is fixed in this study design.
+schema_version = 1
+engine = "fair_beam_relay_css_v2"
+method = "relay"
+damping = 0.5
+profile = "selected"

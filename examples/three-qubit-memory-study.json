@@ -1,0 +1,115 @@
+{
+  "artifact": {
+    "code_id": "project-three-qubit-css-fixture",
+    "format_version": 1,
+    "matrix_hashes": {
+      "hx_raw_sha256": "fa81a63939636a8d6184ff498c46e93fc2ab837d080c5852d691bb4f23b8920d",
+      "hx_semantic_sha256": "c0ff96e5b6433755fb67cb5280ed266d8c27fc211cc9f76cb9099489100d6edd",
+      "hz_raw_sha256": "7cbf797444cc052926f6dd17990f417a61ee2340377d7e3f89ff1e66c895abb3",
+      "hz_semantic_sha256": "a3ee6a716269bd21164dfcb5b52554c185a70db554c7040120ce224317667fe2",
+      "lx_raw_sha256": "9995179b267ee1c40c900fe8212f5f64cf8a8daf9c69732ddb20826a56ff25ca",
+      "lx_semantic_sha256": "72ec5303a315712d4046ebeaeb3bf479ff2bfa98b40d9c2aad29ed63134837bf",
+      "lz_raw_sha256": "fa81a63939636a8d6184ff498c46e93fc2ab837d080c5852d691bb4f23b8920d",
+      "lz_semantic_sha256": "bc4640878fdd40fe9d3d355070f5982703b8e2da039c169054ba386bb5552e08"
+    },
+    "path": "project-three-qubit-css-fixture.json",
+    "raw_sha256": "87328ebbe70907d74a5dd3ee67d6a4b8e87b2c82b66270aee1b71594b4a78d25",
+    "root": "../data/artifacts",
+    "semantic_sha256": "6ee26cb7bf253c42265a326821219b057ceca35cad64fb382f2c4117141e6f4e"
+  },
+  "budgets": {
+    "attempt": {
+      "max_iterations": 8,
+      "work_limits": {
+        "belief_assemblies": 1000,
+        "bp_calls": 1,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 1000,
+        "check_to_variable_updates": 1000,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 0,
+        "variable_to_check_updates": 1000
+      }
+    },
+    "denominator_rule": "all_terminal_shots",
+    "max_shots": 2,
+    "search": {
+      "max_iterations": 8,
+      "work_limits": {
+        "belief_assemblies": 1000,
+        "bp_calls": 1,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 1000,
+        "check_to_variable_updates": 1000,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 0,
+        "variable_to_check_updates": 1000
+      }
+    },
+    "shot": {
+      "max_iterations": 8,
+      "work_limits": {
+        "belief_assemblies": 1000,
+        "bp_calls": 1,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 1000,
+        "check_to_variable_updates": 1000,
+        "fallback_calls": 0,
+        "intervention_actions": 0,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 0,
+        "variable_to_check_updates": 1000
+      }
+    }
+  },
+  "environment": {
+    "backend": "cpu",
+    "numpy": "2.2.6",
+    "omp_num_threads": 1,
+    "python": "3.12.2",
+    "scipy": "1.17.1"
+  },
+  "error_rate": 0.1,
+  "evidence": {
+    "assessment_status": "not_assessed",
+    "discrepancies": [
+      "This development fixture is canonical implementation evidence, not a source-faithful paper reproduction.",
+      "Its fixed two-shot budget is not a statistical assessment or curve comparison."
+    ],
+    "fixture": "development_fixture",
+    "procedure": "Project-owned deterministic binary SPA flooding with one declared V2C damping binding, followed by independent original-space evaluation.",
+    "relation": "canonical_implemented",
+    "sources": [
+      "project-owned canonical procedure basis"
+    ]
+  },
+  "numerical_profile": "cpu-float64-spa-v1",
+  "profile_plan": {
+    "cohort": "clean",
+    "enabled": true,
+    "level": "low_overhead",
+    "selected_before_outcome": true
+  },
+  "randomness": {
+    "decoder_seed_identity": "canonical-deterministic-no-local-randomness-v1",
+    "physical_sample_identity": "researcher-three-qubit-matched-v1",
+    "sample_derivation": "sha256-manifest-shot-v1",
+    "sample_seed": 12
+  },
+  "run_id": "researcher-three-qubit-memory-example",
+  "schema_version": 4,
+  "trace_plan": {
+    "label": "development_default",
+    "level": "off",
+    "max_bytes": 0,
+    "max_records": 0,
+    "relative_dir": "trace-sidecars"
+  }
+}

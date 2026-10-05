@@ -1,0 +1,25 @@
+# Seven explicit policy roles. Comments are for people; the expanded JSON
+# manifest records the effective, validated policy composition.
+schema_version = 1
+engine = "canonical_css"
+
+[update]
+kind = "binary_spa"
+
+[schedule]
+kind = "flooding"
+
+[state_memory]
+kind = "stateless"
+
+[intervention]
+kind = "identity"
+
+[stopping]
+kind = "syndrome_or_budget"
+
+[selection]
+kind = "stable_first"
+
+[postprocessing]
+kind = "identity"
