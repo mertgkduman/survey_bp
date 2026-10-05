@@ -1,0 +1,61 @@
+{
+  "assessment_status": "not_assessed",
+  "claim": "development fixture only; no statistical decoder ranking or source-curve reproduction",
+  "design_sha256": "bfa4263c43103d99a5b751ca01738f23ca1884e92412e2bfe4a64318c8df2ea3",
+  "implementation_sha256": {
+    "scripts/run_fair_beam_relay_css.py": "858636d1c120e7dd76661627222590385c094ebd567f8edbe05246329166bcea",
+    "src/bp_registry/canonical/fair_legs.py": "6eaab6c4774df28358bec230bf4d806032c5edc2a20b7bfde0e71f1f11287995"
+  },
+  "ledger_sha256": "c9148eed3611ede18d684f8273db236e20a2975ca78872352e05e024846ea82f",
+  "outcomes": {
+    "g0500": {
+      "beam": {
+        "exact": 4,
+        "logical_failure": 4
+      },
+      "initial": {
+        "exact": 3,
+        "logical_failure": 4,
+        "no_valid_candidate": 1
+      },
+      "relay": {
+        "exact": 3,
+        "logical_failure": 4,
+        "stabilizer_equivalent": 1
+      }
+    },
+    "g1000": {
+      "beam": {
+        "exact": 3,
+        "no_valid_candidate": 5
+      },
+      "initial": {
+        "exact": 3,
+        "no_valid_candidate": 5
+      },
+      "relay": {
+        "exact": 3,
+        "logical_failure": 4,
+        "stabilizer_equivalent": 1
+      }
+    }
+  },
+  "schema_version": 1,
+  "shots": 8,
+  "source_status": "controlled_css_adaptation",
+  "study_id": "fair-beam-relay-css-v1",
+  "total_extra_c2v_updates": {
+    "g0500": {
+      "beam": 426,
+      "relay": 1080
+    },
+    "g1000": {
+      "beam": 42600,
+      "relay": 18360
+    }
+  },
+  "total_initial_c2v_updates": {
+    "g0500": 12744,
+    "g1000": 22248
+  }
+}

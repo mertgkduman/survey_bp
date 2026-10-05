@@ -3,12 +3,12 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 6
 current_phase_name: Beam Search, Ensembles, and Candidate Selection
-current_plan: 14
-status: executing
-stopped_at: Completed 05-10-PLAN.md and 05-12-PLAN.md; B1 calibration sealed before evaluation
-last_updated: "2026-10-04T07:41:32.047Z"
-last_activity: 2026-09-30
-last_activity_desc: Phase 6 planning complete — 10 plans ready
+current_plan: 0
+status: replanning
+stopped_at: Phase 6 former 10 plans superseded; fair BeamSearch/RelayBP replan pending
+last_updated: "2026-10-04T19:26:15Z"
+last_activity: 2026-10-04
+last_activity_desc: Fair damped BeamSearch/RelayBP controller and matched development fixture implemented; Phase 6 replanning remains
 state_head: 3e9771c5dd0b34ea0665a2c66347eca5c5006ac6
 progress:
   total_phases: 14
@@ -24,18 +24,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-22)
 
 **Core value:** Make BP decoder differences explicit, reproducible, and fairly comparable through canonical policy execution and published evidence.
-**Current focus:** Phase 05 — Guided and Perturbative BP Interventions
+**Current focus:** Phase 06 — fair initial BP with damped BeamSearch branches and RelayBP disordered-memory legs
 
 ## Current Position
 
-Phase: 6 (Beam Search, Ensembles, and Candidate Selection) — READY TO EXECUTE
-Plan: 14 of 14
+Phase: 6 (Beam Search, Ensembles, and Candidate Selection) — REPLAN REQUIRED
+Plan: replan pending
 Total Phases: 14
-Current Plan: 14
-Total Plans in Phase: 10
-Status: Ready to execute
-Last activity: 2026-09-30 — Completed Phase 05 Plan 10
-Last Activity Description: Phase 6 planning complete — 10 plans ready
+Current Plan: 0
+Total Plans in Phase: 0 (former 10 archived after user change)
+Status: Replanning; controlled implementation and eight-shot development fixture complete in isolated worktree
+Last activity: 2026-10-04 — User revised Phase 6 comparison
+Last Activity Description: Fair damped BeamSearch/RelayBP controller and matched development fixture implemented; Phase 6 replanning remains
 
 Progress: [███░░░░░░░] 29%
 
@@ -168,6 +168,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261004-krc | Implement fair initial BP with damped BeamSearch branches and RelayBP memory legs | 2026-10-04 | 4955bff | Verified development implementation | [261004-krc-implement-fair-initial-bp-plus-damped-re](./quick/261004-krc-implement-fair-initial-bp-plus-damped-re/) |
 | 261003-s2b | Prespecify, run, and publish the BB72 CSS BP comparison | 2026-10-04 | a23899c | Verified | [261003-s2b-prespecify-and-prepare-bb72-css-bp-decod](./quick/261003-s2b-prespecify-and-prepare-bb72-css-bp-decod/) |
 | 261002-mjc | Parallelize Phase 5 v2 arm verification before publication | 2026-10-02 | b26d0c2 | Verified | [261002-mjc-parallelize-phase-5-v2-arm-verification-](./quick/261002-mjc-parallelize-phase-5-v2-arm-verification-/) |
 | 261002-ldj | Pin and validate Bravyi BB72 CSS fixture | 2026-10-02 | 60679e4 | Verified | [261002-ldj-pin-and-validate-bravyi-bb72-css-fixture](./quick/261002-ldj-pin-and-validate-bravyi-bb72-css-fixture/) |
