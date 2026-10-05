@@ -15,7 +15,11 @@ import tomllib
 from typing import Any
 
 from .cli import run_canonical, verify_run
-from .manifests import CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, parse_manifest, preflight
+from .literature import LiteraturePolicy, parse_literature_policy
+from .manifests import (
+    CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4,
+    CanonicalExperimentV5, CanonicalExperimentV6, parse_manifest, preflight,
+)
 
 
 _ROLES = (
@@ -74,11 +78,20 @@ def _study_lock(path: Path):
 
 def _expanded_policies(decoder: dict[str, Any], *, schema_version: int) -> dict[str, Any]:
     required = {"schema_version", "engine", *_ROLES}
-    allowed = required | ({"memory", "relay"} if schema_version == 4 else set())
+    extension = (
+        {"memory", "relay"} if schema_version == 4 else
+        {"intervention", "intervention_limits"} if schema_version == 5 else
+        {"memory", "intervention", "intervention_limits"} if schema_version == 6 else set()
+    )
+    allowed = required | extension
     if not required <= set(decoder) or not set(decoder) <= allowed:
         raise ValueError("canonical decoder must declare engine, schema_version, and all seven policy roles")
     if schema_version == 4 and "memory" not in decoder:
         raise ValueError("schema v4 decoder must declare its ordered memory bindings")
+    if schema_version in (5, 6) and not {"intervention", "intervention_limits"} <= set(decoder):
+        raise ValueError("schema v5/v6 decoder must declare intervention controls and limits")
+    if schema_version == 6 and "memory" not in decoder:
+        raise ValueError("schema v6 decoder must declare its ordered memory bindings")
     if decoder["schema_version"] != 1 or decoder["engine"] != "canonical_css":
         raise ValueError("unsupported canonical decoder file version or engine")
     expanded = {}
@@ -89,20 +102,41 @@ def _expanded_policies(decoder: dict[str, Any], *, schema_version: int) -> dict[
         if not isinstance(value, dict) or not isinstance(value.get("kind"), str):
             raise ValueError(f"{role} requires a registered policy kind")
         kind = value["kind"]
+        binding_controls = {name: control for name, control in value.items()
+                            if name in {"kind", "parameter_assignment"}}
         expanded[role] = {
             "binding_id": f"research-{role.replace('_', '-')}-{kind.replace('_', '-')}",
             "state_lifetime": _LIFETIMES[role],
-            **value,
+            **binding_controls,
         }
     return expanded
 
 
-def _ensure_canonical(study_path: Path, decoder: dict[str, Any], results_root: Path) -> dict[str, Any]:
+def _apply_decoder_stopping_cap(study: dict[str, Any], decoder: dict[str, Any]) -> None:
+    """Make a decoder-owned sweep cap explicit in each public manifest budget."""
+    control = decoder["stopping"].get("max_iterations")
+    if control is None:
+        return
+    if type(control) is not int or control < 1:
+        raise ValueError("stopping.max_iterations must be a positive integer")
+    budgets = study.get("budgets")
+    if not isinstance(budgets, dict):
+        raise ValueError("canonical study must declare explicit budgets")
+    for scope in ("attempt", "search", "shot"):
+        budget = budgets.get(scope)
+        if not isinstance(budget, dict) or budget.get("max_iterations") != control:
+            raise ValueError("study budgets must equal the decoder stopping.max_iterations cap")
+
+
+def _ensure_canonical(study_path: Path, decoder: dict[str, Any], results_root: Path,
+                      *, policy: LiteraturePolicy | None = None, decoder_path: Path | None = None) -> dict[str, Any]:
     study = _read_object(study_path)
-    if "policies" in study or study.get("schema_version") not in (2, 3, 4):
-        raise ValueError("canonical study must be a schema v2/v3/v4 experiment without policies")
+    if "policies" in study or study.get("schema_version") not in (2, 3, 4, 5, 6):
+        raise ValueError("canonical study must be a schema v2-v6 experiment without policies")
     if study["schema_version"] == 4 and ("memory" in study or "relay" in study):
         raise ValueError("schema v4 memory and Relay controls belong in the decoder file")
+    if study["schema_version"] in (5, 6) and ({"intervention", "intervention_limits", "memory"} & set(study)):
+        raise ValueError("schema v5/v6 intervention and memory controls belong in the decoder file")
     if not isinstance(study.get("randomness"), dict) or not study["randomness"].get("physical_sample_identity"):
         raise ValueError("study must explicitly pin physical_sample_identity for matched comparisons")
     artifact = study.get("artifact")
@@ -111,18 +145,24 @@ def _ensure_canonical(study_path: Path, decoder: dict[str, Any], results_root: P
     study["artifact"] = {**artifact, "root": str((study_path.parent / artifact["root"]).resolve())
                          if not Path(artifact["root"]).is_absolute() else artifact["root"]}
     policies = _expanded_policies(decoder, schema_version=study["schema_version"])
-    policy_payload = {"policies": policies}
+    _apply_decoder_stopping_cap(study, decoder)
+    policy_payload = {"decoder": decoder, "policies": policies}
     if study["schema_version"] == 4:
         policy_payload["memory"] = decoder["memory"]
         policy_payload["relay"] = decoder.get("relay")
         study["memory"] = decoder["memory"]
         study["relay"] = decoder.get("relay")
+    if study["schema_version"] in (5, 6):
+        study["intervention"] = decoder["intervention"]
+        study["intervention_limits"] = decoder["intervention_limits"]
+    if study["schema_version"] == 6:
+        study["memory"] = decoder["memory"]
     policy_identity = sha256(_json_bytes(policy_payload)).hexdigest()
     study["run_id"] = f"{study['run_id']}-{policy_identity[:12]}"
     study["policies"] = policies
     parsed = parse_manifest(study)
-    if not isinstance(parsed, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4)):
-        raise ValueError("this public study runner supports canonical CSS schema v2/v3/v4")
+    if not isinstance(parsed, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV6)):
+        raise ValueError("this public study runner supports canonical CSS schema v2-v6")
     preflight(study)
     manifest_bytes = _json_bytes(study)
     source_identity = _source_identity()
@@ -139,12 +179,13 @@ def _ensure_canonical(study_path: Path, decoder: dict[str, Any], results_root: P
             if not receipt_path.is_file() or json.loads(receipt_path.read_text()) != receipt:
                 raise ValueError("cached result is missing or conflicts with its source receipt")
             verified = verify_run(output)
-            return {"status": "reused", "output": str(output), "cache_key": key,
-                    "result": json.loads((output / "result.json").read_text()), "verification": verified}
-        run_canonical(manifest_path, output)
-        verified = verify_run(output)
-        _write_once(receipt_path, _json_bytes(receipt))
-        return {"status": "computed", "output": str(output), "cache_key": key,
+            status = "reused"
+        else:
+            run_canonical(manifest_path, output)
+            verified = verify_run(output)
+            _write_once(receipt_path, _json_bytes(receipt))
+            status = "computed"
+        return {"status": status, "output": str(output), "cache_key": key,
                 "result": json.loads((output / "result.json").read_text()), "verification": verified}
 
 
@@ -259,10 +300,21 @@ def ensure_study(study_file: str | Path, decoder_file: str | Path, *,
     if type(workers) is not int or workers < 1:
         raise ValueError("workers must be a positive integer")
     study_path = Path(study_file).resolve()
-    decoder = _read_object(Path(decoder_file).resolve())
+    decoder_path = Path(decoder_file).resolve()
+    raw_decoder = _read_object(decoder_path)
+    policy: LiteraturePolicy | None = None
+    if raw_decoder.get("record_kind") in {"literature_policy", "literature_policy_spec"} or decoder_path.name.endswith(".spec.toml"):
+        policy = parse_literature_policy(decoder_path)
+        if policy.disposition != "runnable":
+            return {"status": "non_runnable", "disposition": policy.disposition,
+                    "source_path": str(policy.source_path), "blocking_features": list(policy.blocking_features)}
+        decoder = policy.decoder_projection()
+    else:
+        decoder = raw_decoder
     study = _read_object(study_path)
     if study.get("study_id") == "fair-beam-relay-css-v2":
         default_root = study_path.parents[2] / "data/results"
         return _ensure_campaign(study_path, decoder, Path(results_root or default_root), workers)
     default_root = Path.cwd() / "bp-registry-results"
-    return _ensure_canonical(study_path, decoder, Path(results_root or default_root))
+    return _ensure_canonical(study_path, decoder, Path(results_root or default_root),
+                             policy=policy, decoder_path=decoder_path)

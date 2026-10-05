@@ -8,7 +8,7 @@ import tomllib
 
 import pytest
 
-from bp_registry.study import ensure_study
+from bp_registry.study import _expanded_policies, ensure_study
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -37,6 +37,28 @@ def test_canonical_policy_file_computes_then_reuses_verified_result(tmp_path: Pa
     ledger.write_bytes(ledger.read_bytes() + b"tampered\n")
     with pytest.raises(ValueError):
         ensure_study(study_path, decoder, results_root=cache)
+
+
+def test_schema5_and_schema6_policy_studies_accept_decoder_owned_controls(tmp_path: Path) -> None:
+    """Schemas 5 and 6 are compiled without the study owning decoder controls."""
+    sources = [
+        ROOT / "data/manifests/phase5-b1-mechanism-pilot.json",
+        ROOT / "data/manifests/phase5-b1-p005-damping-pilot-v2.json",
+    ]
+    for source_path, schema in zip(sources, (5, 6), strict=True):
+        source = json.loads(source_path.read_text())
+        study = dict(next(manifest for manifest in source["arm_manifests"].values()
+                          if manifest["schema_version"] == schema))
+        assert study["schema_version"] == schema
+        decoder = {"schema_version": 1, "engine": "canonical_css", **study.pop("policies")}
+        decoder["intervention"] = study.pop("intervention")
+        decoder["intervention_limits"] = study.pop("intervention_limits")
+        if schema == 6:
+            decoder["memory"] = study.pop("memory")
+        assert "intervention" not in study and "intervention_limits" not in study
+        assert set(_expanded_policies(decoder, schema_version=schema)) == {
+            "update", "schedule", "state_memory", "intervention", "stopping", "selection", "postprocessing",
+        }
 
 
 def test_policy_file_rejects_unimplemented_composition(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

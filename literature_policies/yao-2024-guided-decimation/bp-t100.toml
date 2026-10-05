@@ -1,0 +1,40 @@
+# Runnable canonical adaptation of the BP comparator in Yao et al. (v2).
+# The source artifact and curve qualification remain in paper_reproduction/.
+schema_version = 1
+record_kind = "literature_policy"
+variant_id = "bp-t100"
+execution_status = "runnable"
+qualification = "canonical_adaptation"
+
+[source]
+paper = "Yao et al., Belief Propagation Decoding of Quantum LDPC Codes with Guided Decimation"
+revision = "arxiv:2312.10950v2"
+url = "https://arxiv.org/pdf/2312.10950v2"
+anchors = ["Sec. 3.2", "Figure 3", "Figure 6"]
+note = "Canonical binary-SPA comparison policy; not a source-faithful curve claim."
+
+[equations]
+update = "Binary sum-product BP, paper Eqs. (21)-(22)."
+initial_llr = "log((1-p_x)/p_x), paper Eq. (35)."
+
+[update]
+kind = "binary_spa"
+
+[schedule]
+kind = "flooding"
+
+[state_memory]
+kind = "stateless"
+
+[intervention]
+kind = "identity"
+
+[stopping]
+kind = "syndrome_or_budget"
+max_iterations = 100
+
+[selection]
+kind = "stable_first"
+
+[postprocessing]
+kind = "identity"
