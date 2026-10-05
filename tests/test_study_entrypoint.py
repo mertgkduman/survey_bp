@@ -116,3 +116,12 @@ def test_published_bb72_arm_reuses_verified_package() -> None:
     assert result["verification"]["package_files"] == 43
     assert result["result"]["p050"]["failures"] == 81
     assert result["result"]["p080"]["failures"] == 584
+
+
+def test_symbolic_literature_round_limit_uses_validated_b1_artifact_without_running_it() -> None:
+    """B1 supplies n=882 to identity resolution; this is not a simulation."""
+    from bp_registry.study import _validated_artifact_block_length
+
+    source = json.loads((ROOT / "data/manifests/phase3-pilot-b1.json").read_text())
+    source["artifact"]["root"] = str(ROOT / "data/artifacts")
+    assert _validated_artifact_block_length(source) == 882

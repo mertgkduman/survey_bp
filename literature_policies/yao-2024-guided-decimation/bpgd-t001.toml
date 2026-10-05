@@ -1,0 +1,76 @@
+# Bounded canonical adaptation of Yao et al. Algorithm 1.  The source record
+# remains bpgd-t001.spec.toml; this file contains only registered controls.
+schema_version = 1
+record_kind = "literature_policy"
+variant_id = "bpgd-t001"
+execution_status = "runnable"
+qualification = "canonical_adaptation_not_assessed"
+
+[source]
+paper = "Yao et al., Belief Propagation Decoding of Quantum LDPC Codes with Guided Decimation"
+revision = "arxiv:2312.10950v2"
+url = "https://arxiv.org/pdf/2312.10950v2"
+anchors = ["Sec. 4.3", "Algorithm 1", "Figure 3"]
+note = "T is one flooding BP sweep per BPGD round; Algorithm 1 R=n is resolved from the validated selected artifact."
+
+[equations]
+initial_llr = "log((1-p_x)/p_x); paper Eq. (35)"
+update = "binary sum-product BP; paper Eqs. (21)-(22)"
+fixation = "Algorithm 1 finite signed prior of magnitude 25 after a failed BP round"
+
+[explanations]
+scope = "A bounded canonical adaptation for the common researcher command; it is not a paper-curve reproduction."
+zero_bias = "Algorithm 1 and Eq. (36) differ at exactly zero posterior bias; this policy declares the positive-prior interpretation."
+final_round = "The controller returns after the last fixation without adding an undeclared final BP sweep."
+
+[unresolved]
+author_implementation_identity = "unverified"
+ordered_paper_experiment_artifact_identity = "unverified"
+paper_curve_settings = "not transcribed for source-faithful assessment"
+
+[update]
+kind = "binary_spa"
+
+[schedule]
+kind = "flooding"
+
+[state_memory]
+kind = "stateless"
+
+[intervention]
+kind = "guided_decimation"
+variant = "algorithm1_v2_interpretation"
+source_revision = "arxiv:2312.10950v2"
+qualification = "algorithm_interpretation"
+native_availability = "unverified"
+trigger = "failed_bp_round"
+operator = "finite_prior_bias"
+selection = "max_abs_reliability"
+lift_rule = "identity"
+reset_rule = "continue_messages"
+preserved_fields = ["graph", "syndrome", "messages"]
+unresolved = ["zero_bias_boundary", "final_round_source_interpretation", "author_implementation_identity", "ordered_paper_experiment_artifact_identity"]
+stream_status = "not_applicable"
+finite_bias_magnitude = 25.0
+zero_rule = "positive_prior_for_zero_posterior"
+final_round_rule = "return_after_last_fixation"
+round_limit = "code_block_length"
+sweeps_per_round = 1
+
+[stopping]
+kind = "syndrome_or_budget"
+max_iterations = 1
+
+[selection]
+kind = "stable_first"
+
+[postprocessing]
+kind = "identity"
+
+[intervention_limits]
+max_total_attempts = 1000
+max_total_actions = 2000
+max_runtime_seconds = 600.0
+max_trace_records = 0
+max_trace_bytes = 0
+work_caps = { check_to_variable_updates = 100000000, variable_to_check_updates = 100000000, belief_assemblies = 100000000, candidate_constructions = 100000000, convergence_checks = 100000000, order_generation = 100000000, order_selection = 100000000, residual_precomputations = 100000000, residual_differences = 100000000, priority_maintenance = 100000000, residual_priority_evaluations = 100000000, bp_calls = 1000000, candidate_checks = 100000000, intervention_actions = 2000, branch_expansions = 0, branch_prunes = 0, relay_transfers = 0, fallback_calls = 0, fixation_actions = 1000, transformations = 0, lifted_coordinates = 0, original_checks = 100000000, ranking_scans = 100000000 }

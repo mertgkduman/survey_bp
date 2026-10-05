@@ -3,7 +3,11 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
+import subprocess
+import sys
+import tomllib
 
 import pytest
 
@@ -175,3 +179,60 @@ def test_yao_source_table_preserves_t_r_and_source_identity_gaps() -> None:
     assert all(record.qualification != "source_faithful" for record in records)
     assert all("author_implementation_identity" in record.unresolved for record in records)
     assert all("ordered_paper_experiment_artifact_identity" in record.unresolved for record in records)
+
+
+def test_yao_symbolic_round_limit_requires_validated_code_length() -> None:
+    folder = ROOT / "literature_policies/yao-2024-guided-decimation"
+    unresolved = qualify_yao_source_records(folder)
+    dispositions = {record.variant_id: record.disposition for record in unresolved}
+    assert {dispositions[name] for name in ("bpgd-t001", "bpgd-t010", "bpgd-t070", "bpgd-t100")} == {
+        "requires_artifact_block_length",
+    }
+    assert {dispositions[name] for name in ("bpgd-t100-r002", "bpgd-t100-r005", "bpgd-t100-r010", "bpgd-t100-r050", "bpgd-t100-r882")} == {
+        "runnable",
+    }
+    policy = parse_literature_policy(folder / "bpgd-t001.toml")
+    with pytest.raises(ValueError, match="code block length"):
+        policy.decoder_projection()
+    resolved_three = policy.decoder_projection(code_block_length=3)
+    resolved_b1 = policy.decoder_projection(code_block_length=882)
+    assert resolved_three["intervention"]["round_limit"] == 3
+    assert resolved_b1["intervention"]["round_limit"] == 882
+    assert policy.execution_identity_for(code_block_length=3) != policy.execution_identity_for(code_block_length=882)
+
+
+def test_bpgd_t001_runnable_policy_resolves_after_artifact_and_reuses(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("OMP_NUM_THREADS", "1")
+    policy = ROOT / "literature_policies/yao-2024-guided-decimation/bpgd-t001.toml"
+    source_spec = tomllib.loads(policy.with_suffix(".spec.toml").read_text())
+    parsed_policy = parse_literature_policy(policy)
+    executable = parsed_policy.decoder_projection(code_block_length=3)
+    assert source_spec["execution_status"] == "not_runnable"
+    assert executable["update"] == source_spec["update"]
+    assert executable["schedule"] == source_spec["schedule"]
+    assert executable["state_memory"] == source_spec["state_memory"]
+    assert executable["intervention"]["sweeps_per_round"] == source_spec["intervention"]["sweeps_per_round"]
+    assert executable["intervention"]["finite_bias_magnitude"] == source_spec["intervention"]["finite_bias_magnitude"]
+    assert executable["intervention"]["round_limit"] == 3
+    first = ensure_study(_phase5_study(tmp_path), policy, results_root=tmp_path / "results")
+    assert first["status"] == "computed"
+    manifest = json.loads((Path(first["output"]) / "manifest.json").read_text())
+    assert manifest["intervention"]["round_limit"] == 3
+    assert manifest["intervention"]["sweeps_per_round"] == 1
+    assert manifest["intervention"]["finite_bias_magnitude"] == 25.0
+    assert manifest["intervention"]["zero_rule"] == "positive_prior_for_zero_posterior"
+    assert manifest["intervention"]["final_round_rule"] == "return_after_last_fixation"
+    assert first["result"]["assessment_status"] == "not_assessed"
+    assert ensure_study(_phase5_study(tmp_path), policy, results_root=tmp_path / "results")["status"] == "reused"
+
+
+def test_bpgd_t001_runnable_policy_uses_installed_common_command(tmp_path: Path) -> None:
+    policy = ROOT / "literature_policies/yao-2024-guided-decimation/bpgd-t001.toml"
+    command = Path(sys.executable).with_name("bp-registry")
+    result = subprocess.run(
+        [command, _phase5_study(tmp_path), "--decoder", policy,
+         "--results-root", tmp_path / "cli-results"],
+        check=True, capture_output=True, text=True,
+        env={**os.environ, "OMP_NUM_THREADS": "1"},
+    )
+    assert json.loads(result.stdout)["status"] == "computed"

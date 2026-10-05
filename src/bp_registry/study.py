@@ -15,6 +15,7 @@ import tomllib
 from typing import Any
 
 from .cli import run_canonical, verify_run
+from .artifacts import load_artifact
 from .literature import LiteraturePolicy, parse_literature_policy
 from .manifests import (
     CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4,
@@ -128,6 +129,21 @@ def _apply_decoder_stopping_cap(study: dict[str, Any], decoder: dict[str, Any]) 
             raise ValueError("study budgets must equal the decoder stopping.max_iterations cap")
 
 
+def _validated_artifact_block_length(study: dict[str, Any]) -> int:
+    """Return ``n`` only after validating the study's pinned artifact bytes."""
+    artifact = study.get("artifact")
+    if not isinstance(artifact, dict):
+        raise ValueError("canonical study must declare an artifact before symbolic policy resolution")
+    required = {"root", "path", "raw_sha256", "semantic_sha256"}
+    if not required <= set(artifact):
+        raise ValueError("canonical study artifact is incomplete for symbolic policy resolution")
+    loaded = load_artifact(
+        artifact["root"], artifact["path"], expected_raw_sha256=artifact["raw_sha256"],
+        expected_semantic_sha256=artifact["semantic_sha256"],
+    )
+    return int(loaded.code.hz.shape[1])
+
+
 def _request_receipt(policy: LiteraturePolicy | None, decoder_path: Path, *, computation_key: str,
                      execution_identity: str, verification: dict[str, Any]) -> tuple[str, dict[str, Any]]:
     """Bind an immutable source document to verified shared computation evidence."""
@@ -170,6 +186,12 @@ def _ensure_canonical(study_path: Path, decoder: dict[str, Any], results_root: P
         raise ValueError("study artifact must declare a root")
     study["artifact"] = {**artifact, "root": str((study_path.parent / artifact["root"]).resolve())
                          if not Path(artifact["root"]).is_absolute() else artifact["root"]}
+    if policy is not None and policy.requires_artifact_block_length():
+        # R=n is source data, not a default.  Resolve only after byte and
+        # semantic validation, before executable/cache identities are made.
+        decoder = policy.decoder_projection(
+            code_block_length=_validated_artifact_block_length(study),
+        )
     policies = _expanded_policies(decoder, schema_version=study["schema_version"])
     _apply_decoder_stopping_cap(study, decoder)
     policy_payload = {"decoder": decoder, "policies": policies}
@@ -340,7 +362,9 @@ def ensure_study(study_file: str | Path, decoder_file: str | Path, *,
         if policy.disposition != "runnable":
             return {"status": "non_runnable", "disposition": policy.disposition,
                     "source_path": str(policy.source_path), "blocking_features": list(policy.blocking_features)}
-        decoder = policy.decoder_projection()
+        # Symbolic source controls are resolved inside ``_ensure_canonical``
+        # after the selected artifact is byte/semantically validated.
+        decoder = {} if policy.requires_artifact_block_length() else policy.decoder_projection()
     else:
         decoder = raw_decoder
     study = _read_object(study_path)

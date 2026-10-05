@@ -97,6 +97,10 @@ class LiteraturePolicy:
         executable = _resolve_symbolic_controls(self.executable, code_block_length=code_block_length)
         return {"schema_version": 1, "engine": "canonical_css", **executable}
 
+    def execution_identity_for(self, *, code_block_length: int | None = None) -> str:
+        """Return the numerical identity after any source control is resolved."""
+        return _identity(_resolve_symbolic_controls(self.executable, code_block_length=code_block_length))
+
 
 @dataclass(frozen=True)
 class YaoSourceDisposition:
