@@ -1,0 +1,55 @@
+{
+  "assessment_status": "not_assessed",
+  "cohort": "evaluation",
+  "ledger_sha256": "fb41b6d71930a9db11ff28da30d944c1518960ba1ab68c502422a74b4c71e5f2",
+  "manifest_sha256": "fe8ef184eac6fc2363f237a6fd44ba3febab4530caf09cbd7ce5c81fe9eeeb5d",
+  "outcomes": {
+    "g0500": {
+      "beam": {
+        "exact": 644,
+        "logical_failure": 586,
+        "no_valid_candidate": 4,
+        "stabilizer_equivalent": 46
+      },
+      "initial": {
+        "exact": 626,
+        "logical_failure": 430,
+        "no_valid_candidate": 194,
+        "stabilizer_equivalent": 30
+      },
+      "relay": {
+        "exact": 650,
+        "logical_failure": 541,
+        "no_valid_candidate": 49,
+        "stabilizer_equivalent": 40
+      }
+    },
+    "g1000": {
+      "beam": {
+        "exact": 249,
+        "logical_failure": 17,
+        "no_valid_candidate": 1013,
+        "stabilizer_equivalent": 1
+      },
+      "initial": {
+        "exact": 246,
+        "logical_failure": 13,
+        "no_valid_candidate": 1020,
+        "stabilizer_equivalent": 1
+      },
+      "relay": {
+        "exact": 507,
+        "logical_failure": 199,
+        "no_valid_candidate": 544,
+        "stabilizer_equivalent": 30
+      }
+    }
+  },
+  "profile": "i05",
+  "rate": "p080",
+  "schema_version": 1,
+  "selection_lock_sha256": "cbcb544b1b9bd300735170a9b4974438e8468314aecb3072d18a2985ea074f3a",
+  "shots": 1280,
+  "source_status": "controlled_css_adaptation",
+  "study_id": "fair-beam-relay-css-v2"
+}
