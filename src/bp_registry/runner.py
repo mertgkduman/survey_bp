@@ -24,6 +24,7 @@ from .manifests import (
     CanonicalExperimentV4,
     CanonicalExperimentV5,
     CanonicalExperimentV6,
+    CanonicalExperimentV7,
     ManifestV1,
     executable_canonical_policy_effects,
     manifest_digest,
@@ -128,9 +129,9 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
     """Resolve all canonical external facts before sampling or durable evidence."""
     resolved = preflight(manifest_path)
     manifest = resolved.manifest
-    if not isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5)):
+    if not isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV7)):
         raise ValueError("canonical execution requires a strict public canonical manifest")
-    composition = validate_composition(manifest.policies) if isinstance(manifest, CanonicalExperimentV5) else validate_executable_canonical_baseline(manifest.policies)
+    composition = validate_composition(manifest.policies) if isinstance(manifest, (CanonicalExperimentV5, CanonicalExperimentV7)) else validate_executable_canonical_baseline(manifest.policies)
     report = {
         "run_id": manifest.run_id,
         "code_id": manifest.artifact.code_id,
@@ -161,6 +162,11 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
         }
         if isinstance(manifest, CanonicalExperimentV6):
             report["memory"] = manifest.memory.model_dump(mode="json")
+    elif isinstance(manifest, CanonicalExperimentV7):
+        report["ensemble"] = manifest.ensemble.model_dump(mode="json")
+        report["list_selection"] = manifest.list_selection.model_dump(mode="json")
+        report["vote"] = None if manifest.vote is None else manifest.vote.model_dump(mode="json")
+        report["ledger_version"] = 6
     elif isinstance(manifest, CanonicalExperimentV4):
         report["memory"] = {
             "bindings": [binding.model_dump(mode="json") for binding in manifest.memory.bindings],
@@ -216,8 +222,10 @@ def _without_none(value: object) -> object:
     return value
 
 
-def _canonical_kernel_manifest(manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5) -> dict[str, object]:
+def _canonical_kernel_manifest(manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | CanonicalExperimentV7) -> dict[str, object]:
     """Project-owned kernel receives only its compact execution policy contract."""
+    if isinstance(manifest, CanonicalExperimentV7):
+        return manifest.model_dump(mode="json")
     if isinstance(manifest, CanonicalExperimentV5):
         compact = {
             "schema_version": 7 if isinstance(manifest, CanonicalExperimentV6) else 6,
@@ -266,9 +274,9 @@ def _canonical_kernel_manifest(manifest: CanonicalExperimentV2 | CanonicalExperi
     return compact
 
 
-def _canonical_policy_effects(manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5, code) -> dict[str, dict[str, Any]]:
+def _canonical_policy_effects(manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | CanonicalExperimentV7, code) -> dict[str, dict[str, Any]]:
     """Bind declared NMS assignments to the code's canonical edge identities once."""
-    if isinstance(manifest, CanonicalExperimentV5):
+    if isinstance(manifest, (CanonicalExperimentV5, CanonicalExperimentV7)):
         effects: dict[str, dict[str, Any]] = {
             binding.role.value: {
                 "binding_id": binding.binding_id,
@@ -302,7 +310,7 @@ def _canonical_policy_effects(manifest: CanonicalExperimentV2 | CanonicalExperim
     return effects
 
 
-def _canonical_execution_controls(manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5, code) -> dict[str, object]:
+def _canonical_execution_controls(manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | CanonicalExperimentV7, code) -> dict[str, object]:
     """Keep preflighted public limits and handler classifications beside the compact kernel input."""
     controls: dict[str, object] = {
         "work_limits": {
@@ -326,7 +334,7 @@ def _canonical_execution_controls(manifest: CanonicalExperimentV2 | CanonicalExp
 class CanonicalPublicManifestContext:
     """Immutable preflight facts from which each public shot is freshly sampled."""
 
-    _manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5
+    _manifest: CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | CanonicalExperimentV7
     _code: Any
     manifest_sha256: str
     _compact_manifest: dict[str, object]
@@ -338,7 +346,7 @@ class CanonicalPublicManifestContext:
     _phase5_limits: dict[str, object] | None = None
 
     @property
-    def manifest(self) -> CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5:
+    def manifest(self) -> CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | CanonicalExperimentV7:
         """Return a detached manifest view of the preflight snapshot."""
         return self._manifest.model_copy(deep=True)
 
@@ -414,9 +422,9 @@ def canonical_public_manifest_context(
     resolved = (preflight(manifest_path) if manifest_bytes is None
                 else preflight_manifest_bytes(manifest_path, manifest_bytes))
     manifest = resolved.manifest
-    if not isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5)):
+    if not isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV7)):
         raise ValueError("canonical execution requires a strict public canonical manifest")
-    composition = validate_composition(manifest.policies) if isinstance(manifest, CanonicalExperimentV5) else validate_executable_canonical_baseline(manifest.policies)
+    composition = validate_composition(manifest.policies) if isinstance(manifest, (CanonicalExperimentV5, CanonicalExperimentV7)) else validate_executable_canonical_baseline(manifest.policies)
     return CanonicalPublicManifestContext(
         _manifest=manifest,
         _code=resolved.code,
@@ -446,14 +454,14 @@ def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: s
     verification_context = canonical_public_shot_context(manifest_path, shot_id=shot_id)
     resolved = preflight(manifest_path)
     manifest = resolved.manifest
-    assert isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5))
+    assert isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV7))
     digest = verification_context.manifest_sha256
     sample = sampling.sample_shot(
         resolved.code, manifest_identity=manifest.randomness.physical_sample_identity or digest,
         seed=manifest.randomness.sample_seed,
         shot_id=shot_id, x_error_rate=manifest.error_rate,
     )
-    composition = validate_composition(manifest.policies) if isinstance(manifest, CanonicalExperimentV5) else validate_executable_canonical_baseline(manifest.policies)
+    composition = validate_composition(manifest.policies) if isinstance(manifest, (CanonicalExperimentV5, CanonicalExperimentV7)) else validate_executable_canonical_baseline(manifest.policies)
     compact_manifest = _canonical_kernel_manifest(manifest)
     return run_canonical_structural_shot(
         compact_manifest, code=resolved.code, observation=sample.observation,

@@ -552,7 +552,104 @@ class CanonicalExperimentV6(CanonicalExperimentV5):
         return self
 
 
-ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | CanonicalExperimentV6
+class MbbpBasisDescriptorV7(StrictModel):
+    """A public, ordered duplicate-check basis for one independent member."""
+
+    member_id: str = Field(min_length=1)
+    local_ordinal: int = Field(ge=0)
+    partition_identity: str = Field(min_length=1)
+    permutation_identity: str = Field(min_length=1)
+    transform_kind: Literal["one_hot_original_check_rows"]
+    redundant_transforms: tuple[tuple[int, ...], ...] = Field(min_length=1)
+
+    @field_validator("redundant_transforms", mode="before")
+    @classmethod
+    def transform_arrays_are_tuples(cls, value: Any) -> Any:
+        if isinstance(value, list):
+            return tuple(tuple(row) if isinstance(row, list) else row for row in value)
+        return value
+
+    @field_validator("redundant_transforms")
+    @classmethod
+    def source_rows_are_one_hot(cls, value: tuple[tuple[int, ...], ...]) -> tuple[tuple[int, ...], ...]:
+        if any(not row or any(type(bit) is not int or bit not in (0, 1) for bit in row) or sum(row) != 1 for row in value):
+            raise ValueError("MBBP source-qualified transforms must be nonempty one-hot original-check rows")
+        return value
+
+
+class MbbpEnsembleV7(StrictModel):
+    """Complete, finite MBBP-LD controls admitted by the public V7 boundary."""
+
+    kind: Literal["mbbp_ld"]
+    source_status: Literal["canonical_adaptation"]
+    member_state: Literal["independent"]
+    max_iterations: int = Field(ge=1, le=100_000)
+    max_member_c2v_updates: int = Field(ge=0, le=10**12)
+    max_total_members: int = Field(ge=1, le=100_000)
+    no_member_terminal: Literal["no_member_converged_zero_return"]
+    bases: tuple[MbbpBasisDescriptorV7, ...] = Field(min_length=1)
+
+    @field_validator("bases", mode="before")
+    @classmethod
+    def basis_arrays_are_tuples(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @model_validator(mode="after")
+    def basis_order_and_caps_are_closed(self) -> "MbbpEnsembleV7":
+        if len(self.bases) > self.max_total_members:
+            raise ValueError("MBBP basis count exceeds max_total_members")
+        observed = tuple((basis.local_ordinal, basis.member_id) for basis in self.bases)
+        if observed != tuple(sorted(observed)) or len({basis.member_id for basis in self.bases}) != len(self.bases):
+            raise ValueError("MBBP bases require unique member IDs in stable ordinal order")
+        return self
+
+
+class MbbpListSelectionV7(StrictModel):
+    kind: Literal["frequency_over_weight_plus_one"]
+    tie_rule: Literal["local_ordinal_then_lineage"]
+
+
+class MbbpCoordinateVoteV7(StrictModel):
+    object: Literal["correction_bits"]
+    electorate_rule: Literal["admitted_members"]
+    aggregation: Literal["coordinate_majority"]
+    tie_bit: Literal[0, 1]
+
+
+class CanonicalExperimentV7(CanonicalExperimentV3):
+    """Strict public MBBP-LD experiment; earlier schemas retain their meaning."""
+
+    schema_version: Literal[7]
+    numerical_profile: Literal["cpu-float64-min-sum-v1"]
+    ensemble: MbbpEnsembleV7
+    list_selection: MbbpListSelectionV7
+    vote: MbbpCoordinateVoteV7 | None = None
+
+    @model_validator(mode="after")
+    def is_the_closed_mbbp_ld_profile(self) -> "CanonicalExperimentV7":
+        roles = {role.value: policy.kind for role, policy in self.policies.in_role_order()}
+        required = {
+            "update": "normalized_min_sum", "schedule": "check_node_serial",
+            "state_memory": "identity", "intervention": "identity",
+            "stopping": "syndrome_or_budget", "selection": "stable_first",
+            "postprocessing": "identity",
+        }
+        assignment = self.policies.update.parameter_assignment
+        if roles != required or assignment is None or assignment.shape != "scalar" or assignment.value != 0.875:
+            raise ValueError("MBBP-LD requires normalized-min-sum alpha=0.875, serial checks, and independent identity members")
+        if self.evidence.relation != "canonical_implemented" or self.evidence.fixture != "development_fixture":
+            raise ValueError("public MBBP-LD is a canonical-adaptation development contract")
+        if self.vote is not None:
+            raise ValueError("coordinate-majority voting is declared but not yet executable in the public MBBP-LD contract")
+        if self.ensemble.max_iterations != self.budgets.attempt.max_iterations:
+            raise ValueError("MBBP ensemble and public attempt iteration caps must agree")
+        total_c2v = len(self.ensemble.bases) * self.ensemble.max_member_c2v_updates
+        if total_c2v > self.budgets.attempt.work_limits.check_to_variable_updates:
+            raise ValueError("MBBP declared member C2V work exceeds the public attempt work cap")
+        return self
+
+
+ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | CanonicalExperimentV6 | CanonicalExperimentV7
 
 
 _EXECUTABLE_BASELINE_KINDS = {
@@ -641,11 +738,13 @@ def _read_value(value: dict[str, Any] | str | Path) -> dict[str, Any]:
     return decoded
 
 
-def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | CanonicalExperimentV6 | dict[str, Any] | str | Path) -> ManifestRecord:
+def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | CanonicalExperimentV6 | CanonicalExperimentV7 | dict[str, Any] | str | Path) -> ManifestRecord:
     """Dispatch complete native and canonical schemas without changing v1 meanings."""
-    if isinstance(value, (ManifestV1, CanonicalManifestV2, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV6)):
+    if isinstance(value, (ManifestV1, CanonicalManifestV2, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV6, CanonicalExperimentV7)):
         return value
     decoded = _read_value(value)
+    if decoded.get("schema_version") == 7 and "ensemble" in decoded:
+        return CanonicalExperimentV7.model_validate(decoded)
     if decoded.get("schema_version") == 6:
         return CanonicalExperimentV6.model_validate(decoded)
     if decoded.get("schema_version") == 5:
@@ -662,9 +761,11 @@ def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | CanonicalExperiment
 
 
 def _parse_for_preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ManifestRecord:
-    if isinstance(value, (ManifestV1, LegacyManifestV1, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV6)):
+    if isinstance(value, (ManifestV1, LegacyManifestV1, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV6, CanonicalExperimentV7)):
         return value
     decoded = _read_value(value)
+    if decoded.get("schema_version") == 7 and "ensemble" in decoded:
+        return CanonicalExperimentV7.model_validate(decoded)
     if decoded.get("schema_version") == 6:
         return CanonicalExperimentV6.model_validate(decoded)
     if decoded.get("schema_version") == 5:
@@ -783,6 +884,28 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
         # Original minimal v1 tracer records are immutable historical evidence.
         # They are retained for replay only; new records must use ManifestV1.
         return ResolvedExperiment(manifest=manifest, code=fixture_code(), artifact=None)
+    if isinstance(manifest, CanonicalExperimentV7):
+        # All controls except the artifact-row dimension are closed by model
+        # validation.  Resolve the immutable matrix only after that boundary.
+        _verify_canonical_environment(manifest.environment)
+        if manifest.trace_plan.level != "off" or manifest.profile_plan.level != "low_overhead" or manifest.profile_plan.cohort != "clean":
+            raise ValueError("Phase 6 public MBBP requires trace-off clean low-overhead profiling")
+        artifact = load_artifact(
+            manifest.artifact.root, manifest.artifact.path,
+            expected_raw_sha256=manifest.artifact.raw_sha256,
+            expected_semantic_sha256=manifest.artifact.semantic_sha256,
+        )
+        if artifact.format_version != manifest.artifact.format_version:
+            raise ValueError("Phase 6 artifact format version disagrees with the manifest")
+        code = artifact.code.validate()
+        for name, expected in manifest.artifact.matrix_hashes.model_dump().items():
+            if matrix_hashes(code)[name] != expected:
+                raise ValueError("Phase 6 matrix identity does not match the artifact")
+        check_count = code.hz.shape[0]
+        for basis in manifest.ensemble.bases:
+            if any(len(row) != check_count for row in basis.redundant_transforms):
+                raise ValueError("MBBP source-row transforms must match the artifact check count")
+        return ResolvedExperiment(manifest=manifest, code=code, artifact=artifact)
     if isinstance(manifest, CanonicalExperimentV5):
         # All source/operator/kernel/cap checks above run during strict model
         # validation, before this branch can open an artifact or sample.

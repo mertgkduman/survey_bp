@@ -23,6 +23,7 @@ CANONICAL_LEDGER_VERSION = 2
 CANONICAL_SCHEDULE_LEDGER_VERSION = 3
 CANONICAL_RELAY_LEDGER_VERSION = 4
 CANONICAL_INTERVENTION_LEDGER_VERSION = 5
+CANONICAL_ENSEMBLE_LEDGER_VERSION = 6
 ShotKey = tuple[str, int]
 
 
@@ -392,6 +393,7 @@ _CANONICAL_EVENT_KINDS = frozenset({
     "relay_transfer", "candidate", "fallback", "selection", "termination",
     "work", "runtime", "missingness", "trace_link", "trace_truncated",
     "transform", "lift", "original_check", "evaluation",
+    "basis", "member", "candidate_origin", "duplicate_group", "work_leaf",
 })
 
 
@@ -405,7 +407,7 @@ def _canonical_event_bytes(event: Mapping[str, Any]) -> bytes:
 def _validate_canonical_event(event: Mapping[str, Any]) -> None:
     if event.get("ledger_version") not in {
         CANONICAL_LEDGER_VERSION, CANONICAL_SCHEDULE_LEDGER_VERSION, CANONICAL_RELAY_LEDGER_VERSION,
-        CANONICAL_INTERVENTION_LEDGER_VERSION,
+        CANONICAL_INTERVENTION_LEDGER_VERSION, CANONICAL_ENSEMBLE_LEDGER_VERSION,
     }:
         raise ValueError("unsupported canonical ledger version")
     if event.get("kind") not in _CANONICAL_EVENT_KINDS:
@@ -446,6 +448,15 @@ def _validate_canonical_event(event: Mapping[str, Any]) -> None:
                     raise ValueError("V5 work leaf requires attempt scope")
                 WorkVector.from_evidence(leaf["work_vector"], structural_event_version=4)
                 seen.add(leaf["leaf_id"])
+    if event.get("ledger_version") == CANONICAL_ENSEMBLE_LEDGER_VERSION:
+        if event["kind"] == "shot_begin":
+            if (set(data) != {"schema_version", "identity", "payload"}
+                    or data["schema_version"] != 7):
+                raise ValueError("ensemble shot_begin requires the V7 public contract")
+        elif set(data) != {"identity", "payload"}:
+            raise ValueError("V6 ensemble event requires exact identity and payload fields")
+        if not isinstance(data.get("identity"), dict) or not isinstance(data.get("payload"), dict):
+            raise ValueError("V6 ensemble identity and payload must be objects")
     if event.get("ledger_version") == CANONICAL_RELAY_LEDGER_VERSION:
         if event["kind"] == "shot_begin" and data.get("schema_version") != 4:
             raise ValueError("V4 Relay ledger evidence requires a V4 manifest declaration")
@@ -630,7 +641,7 @@ class CanonicalEventWriter:
     """Durably append sparse versioned control-flow facts for canonical CSS shots."""
 
     def __init__(self, path: str | Path, *, structural_event_version: int = CANONICAL_LEDGER_VERSION):
-        if structural_event_version not in {CANONICAL_LEDGER_VERSION, CANONICAL_SCHEDULE_LEDGER_VERSION, CANONICAL_RELAY_LEDGER_VERSION, CANONICAL_INTERVENTION_LEDGER_VERSION}:
+        if structural_event_version not in {CANONICAL_LEDGER_VERSION, CANONICAL_SCHEDULE_LEDGER_VERSION, CANONICAL_RELAY_LEDGER_VERSION, CANONICAL_INTERVENTION_LEDGER_VERSION, CANONICAL_ENSEMBLE_LEDGER_VERSION}:
             raise ValueError("unsupported canonical structural event version")
         self.path = Path(path)
         self.structural_event_version = structural_event_version

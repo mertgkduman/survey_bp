@@ -1035,6 +1035,70 @@ def _run_phase5_structural_shot(
     raise ShotOwnershipError("Phase 5 shot remained owned beyond bounded retry window")
 
 
+def run_phase6_structural_shot(
+    manifest: CanonicalExperimentV7 | dict[str, object] | str, *, code: CssCode,
+    observation: DecoderObservation, hidden_truth: HiddenTruth, shot_id: int,
+    ledger_path: str | Path, sample_seed_identity: str, context: Mapping[str, Any],
+    verification_context: PublicShotContext | None = None,
+    evaluate: Callable[..., evaluator.Evaluation] = evaluator.evaluate_candidate,
+) -> CanonicalExecutionResult:
+    """Execute the V7 MBBP member list, crossing to truth only after selection."""
+    # Import lazily: manifests imports canonical contracts during package
+    # initialization, while this module is exported by canonical.__init__.
+    from ..manifests import CanonicalExperimentV7, parse_manifest
+    from .mbbp import MbbpBasis, MbbpController, MbbpSpec
+    from .phase6 import phase6_events
+
+    parsed = parse_manifest(manifest)
+    if not isinstance(parsed, CanonicalExperimentV7):
+        raise ValueError("Phase 6 execution requires CanonicalExperimentV7")
+    if type(shot_id) is not int or shot_id < 0 or observation.check_type != "Z":
+        raise ValueError("Phase 6 requires a nonnegative Z-check shot")
+    validated = code.validate()
+    identity = verification_context.execution_identity if verification_context is not None else _identity(parsed, observation)
+    original = OriginalProblem(stable_lineage_id("original", {"identity": identity}).value,
+                               validated.hx, validated.hz, observation.syndrome)
+    bases = tuple(MbbpBasis(
+        item.member_id, item.local_ordinal, item.partition_identity, item.permutation_identity,
+        item.redundant_transforms,
+    ) for item in parsed.ensemble.bases)
+    result = MbbpController(MbbpSpec(
+        bases, max_iterations=parsed.ensemble.max_iterations, max_member_c2v_updates=parsed.ensemble.max_member_c2v_updates,
+    )).run(original, error_rate=parsed.error_rate)
+    projection = phase6_events(original, bases=bases, result=result)
+    identity_data = {"execution_identity": identity, "source_status": parsed.ensemble.source_status,
+                     "ensemble_kind": parsed.ensemble.kind}
+    candidate = None if result.selected_candidate is None else np.asarray(result.selected_candidate, dtype=np.uint8)
+    if candidate is not None and not np.array_equal((validated.hz @ candidate) % 2, observation.syndrome):
+        raise ValueError("MBBP selected a candidate failing the original syndrome")
+    assessment = None if candidate is None else evaluate(validated, true_x=hidden_truth.x, true_z=hidden_truth.z, candidate_x=candidate)
+    with CanonicalEventWriter(ledger_path, structural_event_version=6) as ledger:
+        ledger.begin(run_id=parsed.run_id, shot_id=shot_id, sample_seed_identity=sample_seed_identity,
+                     schema_version=7, identity=identity_data,
+                     payload={"original_lineage_id": original.lineage_id, "syndrome": original.syndrome.tolist()})
+        terminal_payload: Mapping[str, Any] | None = None
+        for kind, payload in projection.events:
+            if kind == "header":
+                continue
+            if kind == "termination":
+                terminal_payload = payload
+            else:
+                ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind=kind,
+                             data={"identity": identity_data, "payload": payload})
+        if assessment is not None:
+            ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="evaluation",
+                         data={"identity": identity_data, "payload": {"outcome": assessment.outcome,
+                                                                    "logical_action_agrees": assessment.logical_action_agrees}})
+        if terminal_payload is None:
+            raise ValueError("Phase 6 projection lacks terminal evidence")
+        terminal = dict(terminal_payload)
+        terminal["outcome"] = None if assessment is None else assessment.outcome
+        terminal["logical_action_agrees"] = None if assessment is None else assessment.logical_action_agrees
+        ledger.terminal(run_id=parsed.run_id, shot_id=shot_id, termination=projection.terminal,
+                        data={"identity": identity_data, "payload": terminal})
+    return CanonicalExecutionResult(parsed.run_id, shot_id, projection.terminal, assessment, candidate)
+
+
 def run_canonical_structural_shot(
     manifest: CanonicalManifestV2 | CanonicalManifestV3 | CanonicalManifestV4 | CanonicalManifestV5 | CanonicalManifestV6 | dict[str, object] | str, *, code: CssCode,
     observation: DecoderObservation, hidden_truth: HiddenTruth, shot_id: int,
@@ -1045,6 +1109,12 @@ def run_canonical_structural_shot(
     evaluate: Callable[..., evaluator.Evaluation] = evaluator.evaluate_candidate,
 ) -> CanonicalExecutionResult:
     """Run the kernel with v2 structural evidence and an outer truth boundary."""
+    if isinstance(manifest, dict) and manifest.get("schema_version") == 7 and "ensemble" in manifest:
+        return run_phase6_structural_shot(
+            manifest, code=code, observation=observation, hidden_truth=hidden_truth, shot_id=shot_id,
+            ledger_path=ledger_path, sample_seed_identity=sample_seed_identity, context=context,
+            verification_context=verification_context, evaluate=evaluate,
+        )
     parsed = parse_canonical_manifest(manifest)
     if isinstance(parsed, CanonicalManifestV6):
         if isinstance(parsed.intervention, Phase5InterventionContract):

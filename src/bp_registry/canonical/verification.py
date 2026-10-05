@@ -1155,6 +1155,70 @@ def validate_phase5_shot(
     return stream[-1]
 
 
+def validate_phase6_shot(events: Sequence[Mapping[str, Any]], context: PublicShotContext) -> Mapping[str, Any]:
+    """Replay the complete V7 ensemble without trusting persisted summaries."""
+    from ..manifests import CanonicalExperimentV7, parse_manifest
+    from .mbbp import MbbpBasis, MbbpController, MbbpSpec
+    from .phase6 import phase6_events
+
+    parsed = parse_manifest(context.compact_manifest)
+    if not isinstance(parsed, CanonicalExperimentV7):
+        raise CanonicalStructuralVerificationError("Phase 6 replay requires the complete V7 ensemble contract")
+    if context.code is None or context.hidden_truth is None or context.error_rate is None:
+        raise CanonicalStructuralVerificationError("Phase 6 replay requires code, observation, and hidden truth at the evaluator boundary")
+    stream = [event for event in events if event.get("run_id") == context.run_id and event.get("shot_id") == context.shot_id]
+    if not stream or any(event.get("ledger_version") != 6 for event in stream):
+        raise CanonicalStructuralVerificationError("Phase 6 shot requires version-six structural evidence")
+    code = context.code.validate()
+    identity = context.execution_identity
+    original = OriginalProblem(stable_lineage_id("original", {"identity": identity}).value,
+                               code.hx, code.hz, np.asarray(context.syndrome, dtype=np.uint8))
+    bases = tuple(MbbpBasis(item.member_id, item.local_ordinal, item.partition_identity,
+                            item.permutation_identity, item.redundant_transforms)
+                  for item in parsed.ensemble.bases)
+    result = MbbpController(MbbpSpec(bases, max_iterations=parsed.ensemble.max_iterations,
+                                     max_member_c2v_updates=parsed.ensemble.max_member_c2v_updates)).run(
+                                         original, error_rate=context.error_rate)
+    projection = phase6_events(original, bases=bases, result=result)
+    candidate = None if result.selected_candidate is None else np.asarray(result.selected_candidate, dtype=np.uint8)
+    if candidate is not None and not np.array_equal((code.hz @ candidate) % 2, original.syndrome):
+        raise CanonicalStructuralVerificationError("replayed Phase 6 selection fails the original syndrome")
+    assessment = None if candidate is None else evaluator.evaluate_candidate(
+        code, true_x=context.hidden_truth.x, true_z=context.hidden_truth.z, candidate_x=candidate,
+    )
+    identity_data = {"execution_identity": identity, "source_status": parsed.ensemble.source_status,
+                     "ensemble_kind": parsed.ensemble.kind}
+    expected: list[tuple[str, Mapping[str, Any]]] = [
+        ("shot_begin", {"original_lineage_id": original.lineage_id, "syndrome": original.syndrome.tolist()}),
+    ]
+    expected.extend((kind, payload) for kind, payload in projection.events if kind not in {"header", "termination"})
+    if assessment is not None:
+        expected.append(("evaluation", {"outcome": assessment.outcome,
+                                           "logical_action_agrees": assessment.logical_action_agrees}))
+    terminal = dict(projection.events[-1][1])
+    terminal["outcome"] = None if assessment is None else assessment.outcome
+    terminal["logical_action_agrees"] = None if assessment is None else assessment.logical_action_agrees
+    expected.append(("termination", terminal))
+    if len(stream) != len(expected):
+        raise CanonicalStructuralVerificationError("Phase 6 event count differs from deterministic replay")
+    for index, (event, (kind, payload)) in enumerate(zip(stream, expected)):
+        data = event.get("data")
+        if event.get("kind") != kind or not isinstance(data, Mapping):
+            raise CanonicalStructuralVerificationError(f"Phase 6 event {index} has an invalid kind or payload")
+        if kind == "shot_begin":
+            if data.get("schema_version") != 7 or data.get("identity") != identity_data or data.get("payload") != payload:
+                raise CanonicalStructuralVerificationError("Phase 6 header differs from deterministic replay")
+        elif data.get("identity") != identity_data or data.get("payload") != payload:
+            raise CanonicalStructuralVerificationError(f"Phase 6 event {index} differs from deterministic replay")
+        if kind == "termination" and event.get("termination") != result.terminal_status:
+            raise CanonicalStructuralVerificationError("Phase 6 terminal status differs from deterministic replay")
+    if result.terminal_status == "no_member_converged_zero_return":
+        forbidden = {"selection", "original_check", "evaluation"}
+        if any(event.get("kind") in forbidden for event in stream):
+            raise CanonicalStructuralVerificationError("Phase 6 zero-return sentinel crossed selection/evaluation boundary")
+    return stream[-1]
+
+
 def validate_canonical_shot(
     events: Sequence[Mapping[str, Any]], context: PublicShotContext, *, trace_root: str | Path | None = None,
 ) -> Mapping[str, Any]:
@@ -1164,6 +1228,8 @@ def validate_canonical_shot(
     early check here is deliberately strict enough to make terminal reuse safe
     before the executor ever returns a previous result.
     """
+    if context.compact_manifest.get("schema_version") == 7 and "ensemble" in context.compact_manifest:
+        return validate_phase6_shot(events, context)
     if context.compact_manifest.get("schema_version") in {6, 7}:
         parsed = parse_canonical_manifest(context.compact_manifest)
         if isinstance(parsed.intervention, Phase5InterventionContract):
