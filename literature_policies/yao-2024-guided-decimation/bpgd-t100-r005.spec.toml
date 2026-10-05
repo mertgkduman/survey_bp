@@ -1,0 +1,44 @@
+# Source-grounded specification. Not an input to bp-registry yet.
+schema_version = 1
+record_kind = "literature_policy_spec"
+variant_id = "bpgd-t100-r005"
+execution_status = "not_runnable"
+blocking_features = ["policy_file_phase5_intervention_dispatch", "source_experiment_identity_check"]
+
+[source]
+paper = "Yao et al., Belief Propagation Decoding of Quantum LDPC Codes with Guided Decimation"
+revision = "arxiv:2312.10950v2"
+url = "https://arxiv.org/pdf/2312.10950v2"
+anchors = ["Sec. 4.3", "Algorithm 1", "Sec. 4.6", "Figure 6"]
+
+[equations]
+initial_llr = "log((1-p_x)/p_x); paper Eq. (35)"
+update = "binary sum-product BP; paper Eqs. (21)-(22)"
+fixation = "select the most reliable undecimated variable and assign finite signed prior; paper Eq. (36), Algorithm 1"
+interpretive_gap = "Algorithm 1 and Eq. (36) differ at exactly zero posterior bias; resolve explicitly before source-faithful claim"
+
+[update]
+kind = "binary_spa"
+
+[schedule]
+kind = "flooding"
+
+[state_memory]
+kind = "stateless"
+
+[intervention]
+kind = "guided_decimation"
+variant = "algorithm1_v2_interpretation"
+sweeps_per_round = 100
+round_limit = 5
+finite_bias_magnitude = 25.0
+selection_order = "largest_reliability_undecimated"
+
+[stopping]
+kind = "syndrome_or_budget"
+
+[selection]
+kind = "stable_first"
+
+[postprocessing]
+kind = "identity"

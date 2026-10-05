@@ -399,8 +399,9 @@ Plans:
 2. Generic branching/ensemble compositions declare member identity, inherited versus independent state, resource limits, and work aggregation without double-counting or hiding discarded paths.
 3. List selection preserves candidate origin and eligibility with declared scores/ties; voting defines its object and electorate and validates its final output against original constraints.
 4. Researchers can replay a small search tree and account for accepted, rejected, pruned and budget-exhausted paths through the ledger.
+5. The first CSS literature set (Yao BPGD, Bhatnagar impulse, and Rabeti–Mahdavifar MBBP-LD) has source-grounded paper-level policy files with explicit runnable/unsupported status. At least one qualified variant per paper runs through the common policy-file command on a bounded CSS study with verified provenance and original-problem checks; full curve assessment remains in Phases 8–9.
 
-**Research focus:** Source beam/masking/ranking rules, reference integration terms and interface, voting semantics, search work versus parallel latency.
+**Research focus:** Source beam/masking/ranking rules, reference integration terms and interface, voting semantics, search work versus parallel latency, and a small B1 literature-policy execution gate.
 **Plans:** TBD
 
 ### Phase 7: Optional Postprocessing

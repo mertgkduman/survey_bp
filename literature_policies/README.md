@@ -5,8 +5,10 @@ This directory collects source-grounded descriptions of BP-family decoders befor
 ## Each paper folder
 
 - `<variant>.toml`: a **runnable** declarative decoder file using the installed `bp-registry` policy schema. Put it directly in the paper folder once its policy kinds and compatibility have passed preflight and focused equation/transition checks.
-- `<variant>.spec.toml`: a **mapped-only** decoder specification, also directly in the paper folder, when the source algorithm cannot yet be expressed by the executable registry. Record known equations, ordering, and parameters. This file is research evidence and is not an input to `bp-registry` until it is implemented and converted to a runnable file.
+- `<variant>.spec.toml`: a **non-runnable source specification**, also directly in the paper folder, when its proposed policy composition has not yet passed executable-registry qualification. Record known equations, ordering, parameters, and explicit blockers. This file is research evidence and is not an input to `bp-registry` until it is validated and converted to a runnable file.
 - `paper_reproduction/`: the citation, exact revision and primary-source links, author-code revision, equation/algorithm anchors, decoder status and unresolved details, plus code, circuit, noise, and reported-result identities. Keep source-specific settings and adaptation decisions here so the decoder TOML can be reused in other study settings.
+
+The first CSS gate has three source records: [Yao BPGD](./yao-2024-guided-decimation/paper_reproduction/PAPER.md), [Bhatnagar impulse](./bhatnagar-2026-impulse-decoding/paper_reproduction/PAPER.md), and [Rabeti–Mahdavifar MBBP-LD](./rabeti-2026-multiple-bases-bp-list-decoding/paper_reproduction/PAPER.md). Their 14 `.spec.toml` files expose proposed kernel-readable roles and source metadata, but all remain explicitly non-runnable. The existing public parser rejects extra source metadata and does not expose these intervention/ensemble controls through a policy file. The Phase 6 gate will extend that contract and independently qualify each executable conversion.
 
 ```text
 literature_policies/<paper-id>/

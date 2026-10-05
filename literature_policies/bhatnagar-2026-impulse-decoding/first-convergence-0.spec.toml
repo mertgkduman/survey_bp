@@ -1,0 +1,46 @@
+# Source-grounded specification. Not an input to bp-registry yet.
+schema_version = 1
+record_kind = "literature_policy_spec"
+variant_id = "first-convergence-0"
+execution_status = "not_runnable"
+blocking_features = ["policy_file_phase5_intervention_dispatch", "source_experiment_identity_check"]
+
+[source]
+paper = "Bhatnagar et al., Impulse Decoding of Quantum LDPC Codes: Equivalence of Degeneracy and Code-Shortening"
+revision = "arxiv:2606.18240v1"
+url = "https://arxiv.org/pdf/2606.18240v1"
+anchors = ["Sec. IV", "Algorithm 1", "Sec. V", "Figure 5"]
+
+[equations]
+initial_llr = "log((1-p)/p); Algorithm 1"
+shortening = "one fresh BP attempt per coordinate, with forced initial LLR sign set by the shortening value; Sec. IV"
+selection = "choose the least-weight converged candidate or first converged coordinate, according to the variant; Sec. IV"
+
+[update]
+kind = "binary_spa"
+v2c_message_clip = 25.0
+
+[schedule]
+kind = "flooding"
+source_schedule_status = "paper_algorithm_does_not_fix_message_order"
+
+[state_memory]
+kind = "stateless"
+
+[intervention]
+kind = "impulse"
+trigger = "initial_bp_nonconvergence"
+shorten_value = 0
+attempt_cap = "code_block_length"
+coordinate_order = "index_ascending"
+baseline_sweeps = 100
+attempt_sweeps = 100
+
+[stopping]
+kind = "syndrome_or_budget"
+
+[selection]
+kind = "first_convergence"
+
+[postprocessing]
+kind = "identity"

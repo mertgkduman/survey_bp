@@ -1,0 +1,44 @@
+# Source-grounded specification. Not an input to bp-registry yet.
+schema_version = 1
+record_kind = "literature_policy_spec"
+variant_id = "mbbp-ld"
+execution_status = "not_runnable"
+blocking_features = ["subtree_redundant_check_ensemble", "independent_member_accounting", "frequency_weighted_list_selection", "source_experiment_identity_check"]
+
+[source]
+paper = "Rabeti and Mahdavifar, Multiple-Bases Belief Propagation List Decoding for Quantum LDPC Codes"
+revision = "arxiv:2605.14170v1"
+url = "https://arxiv.org/pdf/2605.14170v1"
+anchors = ["Sec. III", "Algorithm 1", "Algorithm 2", "Sec. IV", "Figure 5"]
+
+[equations]
+check_update = "normalized min-sum with alpha=0.875; paper Eq. (2) and Sec. IV"
+augmented_matrix = "H(t) is H stacked with the rows selected by maximal subtree t; paper Eq. (4), Algorithm 2"
+list_score = "frequency(candidate)/(Hamming_weight(candidate)+1); Sec. III-B"
+source_gap = "resolve augmented syndrome duplication, candidate tie order, partition permutation, and implementation identity before exact source-run status"
+
+[update]
+kind = "normalized_min_sum"
+alpha = 0.875
+
+[schedule]
+kind = "check_node_serial"
+
+[state_memory]
+kind = "stateless"
+
+[intervention]
+kind = "subtree_redundant_check_ensemble"
+member_state = "independent"
+subtree_rule = "maximal_cycle_free_check_partition"
+
+[stopping]
+kind = "syndrome_or_budget"
+max_iterations = 100
+
+[selection]
+kind = "frequency_weighted_score"
+score = "candidate_frequency/(hamming_weight+1)"
+
+[postprocessing]
+kind = "identity"
