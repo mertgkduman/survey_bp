@@ -11,7 +11,7 @@ import tomllib
 
 import pytest
 
-from bp_registry.literature import parse_literature_policy, qualify_yao_source_records
+from bp_registry.literature import parse_literature_policy, qualify_yao_source_records, qualify_bhatnagar_source_records
 from bp_registry.study import ensure_study
 
 
@@ -236,3 +236,95 @@ def test_bpgd_t001_runnable_policy_uses_installed_common_command(tmp_path: Path)
         env={**os.environ, "OMP_NUM_THREADS": "1"},
     )
     assert json.loads(result.stdout)["status"] == "computed"
+
+
+def test_bhatnagar_source_variants_have_distinct_closed_controls() -> None:
+    folder = ROOT / "literature_policies/bhatnagar-2026-impulse-decoding"
+    unresolved = qualify_bhatnagar_source_records(folder)
+    assert [row.variant_id for row in unresolved] == [
+        "minimum-weight-1", "first-convergence-0", "first-convergence-1",
+    ]
+    assert all(row.disposition == "requires_artifact_block_length" for row in unresolved)
+    rows = {row.variant_id: row for row in qualify_bhatnagar_source_records(folder, code_block_length=3)}
+    assert all(row.disposition == "runnable" for row in rows.values())
+    for name, forced, selection in (
+        ("minimum-weight-1", 1, "minimum_original_weight"),
+        ("first-convergence-0", 0, "first_convergence"),
+        ("first-convergence-1", 1, "first_convergence"),
+    ):
+        row = rows[name]
+        control = row.executable["intervention"]
+        assert control["forced_value"] == forced
+        assert control["realization"] == ("semantic_forced_zero" if forced == 0 else "semantic_forced_one")
+        assert control["selection"] == selection
+        assert control["baseline_sweeps"] == control["attempt_sweeps"] == 100
+        assert control["attempt_cap"] == 3
+        assert control["v2c_clip"] == 25.0
+        assert control["reset_rule"] == "fresh_per_coordinate"
+        assert "source_schedule_unspecified" in row.unresolved
+        assert row.qualification != "source_faithful"
+
+
+def test_bhatnagar_variant_suffix_and_source_controls_fail_closed(tmp_path: Path) -> None:
+    folder = ROOT / "literature_policies/bhatnagar-2026-impulse-decoding"
+    for source in folder.glob("*.spec.toml"):
+        (tmp_path / source.name).write_bytes(source.read_bytes())
+    zero = tmp_path / "first-convergence-0.spec.toml"
+    zero.write_text(zero.read_text().replace("shorten_value = 0", "shorten_value = 1"))
+    with pytest.raises(ValueError, match="named variant"):
+        qualify_bhatnagar_source_records(tmp_path, code_block_length=3)
+    zero.write_bytes((folder / zero.name).read_bytes())
+    runnable = tmp_path / "first-convergence-0.toml"
+    runnable.write_text((folder / runnable.name).read_text().replace("forced_value = 0", "forced_value = 1"))
+    with pytest.raises(ValueError, match="closed source variant"):
+        parse_literature_policy(runnable)
+
+
+def test_bhatnagar_first_convergence_0_runnable_public_reuse(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("OMP_NUM_THREADS", "1")
+    # Another execution wave may edit independent kernel files while this test
+    # runs; pin the source receipt so this checks the requested policy path.
+    monkeypatch.setattr("bp_registry.study._source_identity", lambda: "test-source-snapshot")
+    folder = ROOT / "literature_policies/bhatnagar-2026-impulse-decoding"
+    policy = folder / "first-convergence-0.toml"
+    parsed = parse_literature_policy(policy)
+    assert parsed.decoder_projection(code_block_length=3)["intervention"]["forced_value"] == 0
+    study = _phase5_study(tmp_path)
+    document = json.loads(study.read_text())
+    document["run_id"] = "bhatnagar-impulse-three-qubit"
+    document["budgets"]["max_shots"] = 1
+    for scope in ("shot", "search", "attempt"):
+        document["budgets"][scope]["max_iterations"] = 100
+    study.write_text(json.dumps(document))
+    first = ensure_study(study, policy, results_root=tmp_path / "results")
+    assert first["status"] == "computed"
+    manifest = json.loads((Path(first["output"]) / "manifest.json").read_text())
+    assert manifest["intervention"]["forced_value"] == 0
+    assert manifest["intervention"]["attempt_cap"] == 3
+    assert manifest["intervention"]["v2c_clip"] == 25.0
+    assert manifest["intervention"]["reset_rule"] == "fresh_per_coordinate"
+    assert first["result"]["assessment_status"] == "not_assessed"
+    second = ensure_study(study, policy, results_root=tmp_path / "results")
+    assert second["status"] == "reused"
+    assert first["cache_key"] == second["cache_key"]
+
+
+def test_bhatnagar_first_convergence_0_installed_common_command(tmp_path: Path) -> None:
+    policy = ROOT / "literature_policies/bhatnagar-2026-impulse-decoding/first-convergence-0.toml"
+    study = _phase5_study(tmp_path)
+    document = json.loads(study.read_text())
+    document["run_id"] = "bhatnagar-cli-three-qubit"
+    document["budgets"]["max_shots"] = 1
+    for scope in ("shot", "search", "attempt"):
+        document["budgets"][scope]["max_iterations"] = 100
+    study.write_text(json.dumps(document))
+    command = Path(sys.executable).with_name("bp-registry")
+    completed = subprocess.run(
+        [command, study, "--decoder", policy, "--results-root", tmp_path / "cli-results"],
+        check=True, capture_output=True, text=True,
+        env={**os.environ, "OMP_NUM_THREADS": "1"},
+    )
+    result = json.loads(completed.stdout)
+    assert result["status"] == "computed"
+    assert result["verification"]["final_row_count"] == 1
+    assert result["verification"]["intervention"]["specification"]["forced_value"] == 0

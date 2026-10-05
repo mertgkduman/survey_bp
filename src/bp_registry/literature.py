@@ -34,6 +34,7 @@ _CONTROL_KEYS = {
     "round_limit", "sweeps_per_round", "realization", "baseline_sweeps", "attempt_sweeps", "attempt_cap",
     "coordinate_order", "period_sweeps", "lifetime_sweeps", "retry_cap", "root_seed", "top_k", "max_weight",
     "test_cap", "alpha", "trunk_sweeps", "continuation_sweeps", "preset", "code_id", "eta", "t_cap",
+    "forced_value", "v2c_clip",
     "root_sweeps", "residual_sweeps", "exact_distance", "variant", "source_revision", "qualification",
     "native_availability", "trigger", "operator", "selection", "lift_rule", "reset_rule", "preserved_fields",
     "unresolved", "stream_status", "source_code_commit",
@@ -51,6 +52,15 @@ _YAO_VARIANT_ORDER = (
 _YAO_UNRESOLVED = (
     "author_implementation_identity",
     "ordered_paper_experiment_artifact_identity",
+)
+_BHATNAGAR_VARIANTS = (
+    ("minimum-weight-1", 1, "minimum_original_weight"),
+    ("first-convergence-0", 0, "first_convergence"),
+    ("first-convergence-1", 1, "first_convergence"),
+)
+_BHATNAGAR_UNRESOLVED = (
+    "source_schedule_unspecified", "infinite_prior_finite_runtime_surrogate",
+    "source_experiment_identity_unverified",
 )
 
 
@@ -90,7 +100,8 @@ class LiteraturePolicy:
         """Whether a bounded source control needs the admitted code length."""
         intervention = self.executable.get("intervention")
         return bool(isinstance(intervention, Mapping)
-                    and intervention.get("round_limit") == _CODE_BLOCK_LENGTH)
+                    and (intervention.get("round_limit") == _CODE_BLOCK_LENGTH
+                         or intervention.get("attempt_cap") == _CODE_BLOCK_LENGTH))
 
     def decoder_projection(self, *, code_block_length: int | None = None) -> dict[str, Any]:
         """Return a fresh canonical-decoder object for the study compiler."""
@@ -105,6 +116,18 @@ class LiteraturePolicy:
 @dataclass(frozen=True)
 class YaoSourceDisposition:
     """Typed source-to-kernel translation, independent of paper-curve claims."""
+
+    variant_id: str
+    source_path: Path
+    disposition: str
+    executable: Mapping[str, Any]
+    qualification: str
+    unresolved: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class BhatnagarSourceDisposition:
+    """One exact source name and its qualified canonical impulse controls."""
 
     variant_id: str
     source_path: Path
@@ -135,15 +158,15 @@ def _resolve_symbolic_controls(
     intervention = resolved.get("intervention")
     if not isinstance(intervention, dict):
         return resolved
-    round_limit = intervention.get("round_limit")
-    if not isinstance(round_limit, str):
-        return resolved
-    if (round_limit != _CODE_BLOCK_LENGTH
-            or intervention.get("kind") != "guided_decimation"):
-        raise ValueError("unsupported symbolic literature control")
-    if type(code_block_length) is not int or code_block_length < 1:
-        raise ValueError("Yao code block length must be a validated positive integer")
-    intervention["round_limit"] = code_block_length
+    for field, kind in (("round_limit", "guided_decimation"), ("attempt_cap", "impulse")):
+        value = intervention.get(field)
+        if not isinstance(value, str):
+            continue
+        if value != _CODE_BLOCK_LENGTH or intervention.get("kind") != kind:
+            raise ValueError("unsupported symbolic literature control")
+        if type(code_block_length) is not int or code_block_length < 1:
+            raise ValueError("literature code block length must be a validated positive integer")
+        intervention[field] = code_block_length
     return resolved
 
 
@@ -164,11 +187,10 @@ def _validate_symbolic_runnable_controls(executable: Mapping[str, Any]) -> None:
     intervention = executable.get("intervention")
     if not isinstance(intervention, Mapping):
         return
-    round_limit = intervention.get("round_limit")
-    if isinstance(round_limit, str) and (
-        round_limit != _CODE_BLOCK_LENGTH or intervention.get("kind") != "guided_decimation"
-    ):
-        raise ValueError("unsupported symbolic literature control")
+    for field, kind in (("round_limit", "guided_decimation"), ("attempt_cap", "impulse")):
+        value = intervention.get(field)
+        if isinstance(value, str) and (value != _CODE_BLOCK_LENGTH or intervention.get("kind") != kind):
+            raise ValueError("unsupported symbolic literature control")
 
 
 def parse_literature_policy(path: str | Path) -> LiteraturePolicy:
@@ -218,6 +240,16 @@ def parse_literature_policy(path: str | Path) -> LiteraturePolicy:
             _validate_finite(document[name], field=name)
             executable[name] = dict(document[name])
     _validate_symbolic_runnable_controls(executable)
+    if (source["revision"] == "arxiv:2606.18240v1"
+            or document["variant_id"] in {name for name, _, _ in _BHATNAGAR_VARIANTS}):
+        expected_rows = qualify_bhatnagar_source_records(source_path.parent)
+        expected = next((row for row in expected_rows if row.variant_id == document["variant_id"]), None)
+        if (expected is None or source["revision"] != "arxiv:2606.18240v1"
+                or {role: executable[role] for role in ROLES} != dict(expected.executable)
+                or document["qualification"] != expected.qualification
+                or not isinstance(document.get("unresolved"), dict)
+                or not set(expected.unresolved) <= set(document["unresolved"])):
+            raise ValueError("Bhatnagar runnable policy must match its closed source variant and qualification")
     provenance = {name: document[name] for name in ("record_kind", "variant_id", "qualification", "source", "equations", "explanations", "unresolved") if name in document}
     return LiteraturePolicy(
         source_path=source_path, disposition="runnable", blocking_features=(),
@@ -231,9 +263,9 @@ def _source_record(path: Path) -> dict[str, Any]:
     try:
         value = tomllib.loads(path.read_text(encoding="utf-8"))
     except tomllib.TOMLDecodeError as error:
-        raise ValueError(f"Yao source record is invalid TOML: {path.name}") from error
+        raise ValueError(f"literature source record is invalid TOML: {path.name}") from error
     if not isinstance(value, dict):
-        raise ValueError(f"Yao source record must be a table: {path.name}")
+        raise ValueError(f"literature source record must be a table: {path.name}")
     return value
 
 
@@ -327,3 +359,85 @@ def qualify_yao_source_records(
             unresolved=_YAO_UNRESOLVED,
         ))
     return tuple(records)
+
+
+def _bhatnagar_executable(*, forced_value: int, selection: str, attempt_cap: int | str) -> dict[str, Any]:
+    realization = "semantic_forced_zero" if forced_value == 0 else "semantic_forced_one"
+    return {
+        "update": {"kind": "binary_spa"},
+        "schedule": {"kind": "flooding"},
+        # The impulse controller owns fresh BP sessions.  It does not preserve
+        # messages between coordinates; the public memory role is identity.
+        "state_memory": {"kind": "identity"},
+        "intervention": {
+            "kind": "impulse",
+            "variant": "impulse_positive_infinite_semantic_v1" if forced_value == 0 else "impulse_negative_infinite_semantic_v1",
+            "source_revision": "arxiv:2606.18240v1",
+            "qualification": "source_operator_semantic_adaptation",
+            "native_availability": "unverified",
+            "trigger": "baseline_invalid",
+            "operator": realization,
+            "selection": selection,
+            "lift_rule": "identity",
+            "reset_rule": "fresh_per_coordinate",
+            "preserved_fields": ["original_graph", "original_syndrome"],
+            "unresolved": list(_BHATNAGAR_UNRESOLVED),
+            "stream_status": "not_applicable",
+            "realization": realization,
+            "forced_value": forced_value,
+            "v2c_clip": 25.0,
+            "baseline_sweeps": 100,
+            "attempt_sweeps": 100,
+            "attempt_cap": attempt_cap,
+        },
+        "stopping": {"kind": "syndrome_or_budget", "max_iterations": 100},
+        # The source selector is internal to the intervention controller.
+        "selection": {"kind": "stable_first"},
+        "postprocessing": {"kind": "identity"},
+    }
+
+
+def qualify_bhatnagar_source_records(
+    directory: str | Path, *, code_block_length: int | None = None,
+) -> tuple[BhatnagarSourceDisposition, ...]:
+    """Translate the three named impulse variants without source-name aliases.
+
+    Flooding schedule, finite forced prior and V2C clip are qualified
+    interpretations.  A runnable disposition says only that the canonical
+    controls are executable, never that a published curve was reproduced.
+    """
+    if code_block_length is not None and (type(code_block_length) is not int or code_block_length < 1):
+        raise ValueError("literature code block length must be a validated positive integer")
+    root = Path(directory)
+    rows: list[BhatnagarSourceDisposition] = []
+    for variant_id, forced_value, selection in _BHATNAGAR_VARIANTS:
+        path = root / f"{variant_id}.spec.toml"
+        source = _source_record(path)
+        intervention = source.get("intervention")
+        if (source.get("record_kind") != "literature_policy_spec"
+                or source.get("variant_id") != variant_id
+                or source.get("execution_status") != "not_runnable"
+                or not isinstance(intervention, dict)
+                or source.get("source", {}).get("revision") != "arxiv:2606.18240v1"
+                or source.get("update") != {"kind": "binary_spa", "v2c_message_clip": 25.0}
+                or source.get("schedule") != {"kind": "flooding", "source_schedule_status": "paper_algorithm_does_not_fix_message_order"}
+                or source.get("state_memory") != {"kind": "stateless"}
+                or source.get("stopping") != {"kind": "syndrome_or_budget"}
+                or source.get("selection") != {"kind": "minimum_weight" if selection == "minimum_original_weight" else "first_convergence"}
+                or source.get("postprocessing") != {"kind": "identity"}
+                or intervention != {
+                    "kind": "impulse", "trigger": "initial_bp_nonconvergence",
+                    "shorten_value": forced_value, "attempt_cap": _CODE_BLOCK_LENGTH,
+                    "coordinate_order": "index_ascending", "baseline_sweeps": 100,
+                    "attempt_sweeps": 100,
+                }):
+            raise ValueError(f"Bhatnagar source record does not match the named variant: {path.name}")
+        cap = _CODE_BLOCK_LENGTH if code_block_length is None else code_block_length
+        rows.append(BhatnagarSourceDisposition(
+            variant_id=variant_id, source_path=path.resolve(),
+            disposition="requires_artifact_block_length" if code_block_length is None else "runnable",
+            executable=MappingProxyType(_bhatnagar_executable(
+                forced_value=forced_value, selection=selection, attempt_cap=cap,
+            )), qualification="canonical_adaptation_not_assessed", unresolved=_BHATNAGAR_UNRESOLVED,
+        ))
+    return tuple(rows)

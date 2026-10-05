@@ -1,0 +1,77 @@
+# Canonical force-to-zero interpretation; source record remains .spec.toml.
+schema_version = 1
+record_kind = "literature_policy"
+variant_id = "first-convergence-0"
+execution_status = "runnable"
+qualification = "canonical_adaptation_not_assessed"
+
+[source]
+paper = "Bhatnagar et al., Impulse Decoding of Quantum LDPC Codes: Equivalence of Degeneracy and Code-Shortening"
+revision = "arxiv:2606.18240v1"
+url = "https://arxiv.org/pdf/2606.18240v1"
+anchors = ["Sec. IV", "Algorithm 1", "Sec. V", "Figure 5"]
+note = "The common command resolves the paper's one-attempt-per-coordinate cap from the validated code block length."
+
+[equations]
+initial_llr = "log((1-p)/p); Algorithm 1"
+shortening = "One fresh BP session per ascending coordinate, forcing initial LLR toward zero."
+selection = "Return the first converged coordinate whose candidate passes original syndrome validation."
+
+[explanations]
+schedule = "Flooding is a declared canonical interpretation; the paper algorithm does not fix message order."
+finite_prior = "The paper's infinite LLR is represented by the kernel's signed magnitude-25 finite surrogate."
+state_memory = "Identity is the public memory role; the impulse controller starts a fresh BP session for every coordinate."
+assessment = "This bounded canonical adaptation has not been assessed against a published curve."
+
+[unresolved]
+source_schedule_unspecified = "The source does not specify the message order."
+infinite_prior_finite_runtime_surrogate = "Finite magnitude 25 is an explicit canonical realization."
+source_experiment_identity_unverified = "The full paper experiment artifact and author-code identity remain unverified."
+
+[update]
+kind = "binary_spa"
+
+[schedule]
+kind = "flooding"
+
+[state_memory]
+kind = "identity"
+
+[intervention]
+kind = "impulse"
+variant = "impulse_positive_infinite_semantic_v1"
+source_revision = "arxiv:2606.18240v1"
+qualification = "source_operator_semantic_adaptation"
+native_availability = "unverified"
+trigger = "baseline_invalid"
+operator = "semantic_forced_zero"
+selection = "first_convergence"
+lift_rule = "identity"
+reset_rule = "fresh_per_coordinate"
+preserved_fields = ["original_graph", "original_syndrome"]
+unresolved = ["source_schedule_unspecified", "infinite_prior_finite_runtime_surrogate", "source_experiment_identity_unverified"]
+stream_status = "not_applicable"
+realization = "semantic_forced_zero"
+forced_value = 0
+v2c_clip = 25.0
+baseline_sweeps = 100
+attempt_sweeps = 100
+attempt_cap = "code_block_length"
+
+[stopping]
+kind = "syndrome_or_budget"
+max_iterations = 100
+
+[selection]
+kind = "stable_first"
+
+[postprocessing]
+kind = "identity"
+
+[intervention_limits]
+max_total_attempts = 1000
+max_total_actions = 2000
+max_runtime_seconds = 600.0
+max_trace_records = 0
+max_trace_bytes = 0
+work_caps = { check_to_variable_updates = 100000000, variable_to_check_updates = 100000000, belief_assemblies = 100000000, candidate_constructions = 100000000, convergence_checks = 100000000, order_generation = 100000000, order_selection = 100000000, residual_precomputations = 100000000, residual_differences = 100000000, priority_maintenance = 100000000, residual_priority_evaluations = 100000000, bp_calls = 1000000, candidate_checks = 100000000, intervention_actions = 2000, branch_expansions = 0, branch_prunes = 0, relay_transfers = 0, fallback_calls = 0, fixation_actions = 0, transformations = 1000, lifted_coordinates = 1000, original_checks = 100000000, ranking_scans = 100000000 }
