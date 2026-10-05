@@ -1006,10 +1006,12 @@ class CanonicalManifestV6(_Strict):
 
     @model_validator(mode="after")
     def tracer_uses_compatible_kernel_and_state(self) -> "CanonicalManifestV6":
+        allowed_memory = ({"identity", "stateless"} if self.intervention.kind == "guided_decimation"
+                          else {"identity"})
         if (self.policies.schedule.kind != "flooding"
                 or self.policies.intervention.kind != self.intervention.kind
-                or self.policies.state_memory.kind != "identity"):
-            raise ValueError("Phase 5 interventions require flooding, identity state memory, and a matching policy")
+                or self.policies.state_memory.kind not in allowed_memory):
+            raise ValueError("Phase 5 intervention requires flooding, its matching policy, and its declared state-memory role")
         allowed_updates = ({"binary_spa", "min_sum"} if self.intervention.kind == "syndrome_flip"
                            else {"normalized_min_sum"} if self.intervention.kind == "sign_flip"
                            else {"binary_spa"})

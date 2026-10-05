@@ -227,6 +227,20 @@ def test_intervention_preflight_accepts_each_qualified_small_fixture_arm(kind):
     assert isinstance(parse_canonical_manifest(_canonical_kernel_manifest(resolved.manifest)), CanonicalManifestV6)
 
 
+def test_guided_decimation_alone_admits_stateless_policy_memory() -> None:
+    """BPGD owns its continuing session; the role adds no separate memory policy."""
+    from bp_registry.manifests import CanonicalExperimentV5, preflight
+
+    guided = _public_v5("guided_decimation")
+    guided["policies"]["state_memory"]["kind"] = "stateless"
+    assert isinstance(preflight(guided).manifest, CanonicalExperimentV5)
+
+    impulse = _public_v5("impulse")
+    impulse["policies"]["state_memory"]["kind"] = "stateless"
+    with pytest.raises(ValueError, match="state-memory role"):
+        preflight(impulse)
+
+
 def test_intervention_preflight_b1_restart_requires_pinned_artifact_and_unknown_distance():
     from bp_registry.manifests import CanonicalExperimentV5, preflight
 

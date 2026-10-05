@@ -452,8 +452,13 @@ class CanonicalExperimentV5(CanonicalExperimentV4):
     def intervention_is_compatible_before_artifacts(self) -> "CanonicalExperimentV5":
         if self.policies.intervention.kind != self.intervention.kind:
             raise ValueError("public intervention policy and control kind disagree")
-        if self.policies.schedule.kind != "flooding" or self.policies.state_memory.kind != "identity":
-            raise ValueError("Phase 5 public intervention requires flooding and identity state memory")
+        # BPGD retains its decoder session inside its intervention controller.
+        # ``stateless`` means that the composition contributes no second memory
+        # policy; it does not reset that controller-owned message session.
+        allowed_memory = ({"identity", "stateless"} if self.intervention.kind == "guided_decimation"
+                          else {"identity"})
+        if self.policies.schedule.kind != "flooding" or self.policies.state_memory.kind not in allowed_memory:
+            raise ValueError("Phase 5 public intervention requires flooding and its declared state-memory role")
         allowed_updates = ({"binary_spa", "min_sum"} if self.intervention.kind == "syndrome_flip"
                            else {"normalized_min_sum"} if self.intervention.kind == "sign_flip"
                            else {"binary_spa"})

@@ -43,6 +43,15 @@ _TOP_LEVEL = {
     "explanations", "unresolved", "blocking_features", *ROLES, "memory", "relay", "intervention_limits",
 }
 _SOURCE_KEYS = {"paper", "revision", "url", "anchors", "note"}
+_CODE_BLOCK_LENGTH = "code_block_length"
+_YAO_VARIANT_ORDER = (
+    "bp-t100", "bpgd-t001", "bpgd-t010", "bpgd-t070", "bpgd-t100",
+    "bpgd-t100-r002", "bpgd-t100-r005", "bpgd-t100-r010", "bpgd-t100-r050", "bpgd-t100-r882",
+)
+_YAO_UNRESOLVED = (
+    "author_implementation_identity",
+    "ordered_paper_experiment_artifact_identity",
+)
 
 
 def _canonical_bytes(value: Any) -> bytes:
@@ -77,9 +86,61 @@ class LiteraturePolicy:
     provenance_identity: str
     raw_document_identity: str
 
-    def decoder_projection(self) -> dict[str, Any]:
+    def requires_artifact_block_length(self) -> bool:
+        """Whether a bounded source control needs the admitted code length."""
+        intervention = self.executable.get("intervention")
+        return bool(isinstance(intervention, Mapping)
+                    and intervention.get("round_limit") == _CODE_BLOCK_LENGTH)
+
+    def decoder_projection(self, *, code_block_length: int | None = None) -> dict[str, Any]:
         """Return a fresh canonical-decoder object for the study compiler."""
-        return {"schema_version": 1, "engine": "canonical_css", **self.executable}
+        executable = _resolve_symbolic_controls(self.executable, code_block_length=code_block_length)
+        return {"schema_version": 1, "engine": "canonical_css", **executable}
+
+
+@dataclass(frozen=True)
+class YaoSourceDisposition:
+    """Typed source-to-kernel translation, independent of paper-curve claims."""
+
+    variant_id: str
+    source_path: Path
+    disposition: str
+    executable: Mapping[str, Any]
+    qualification: str
+    unresolved: tuple[str, ...]
+
+
+def _copy_executable(value: Mapping[str, Any]) -> dict[str, Any]:
+    """Copy closed policy tables without preserving caller-owned mappings."""
+    copied: dict[str, Any] = {}
+    for name, control in value.items():
+        copied[name] = dict(control) if isinstance(control, Mapping) else control
+    return copied
+
+
+def _resolve_symbolic_controls(
+    executable: Mapping[str, Any], *, code_block_length: int | None,
+) -> dict[str, Any]:
+    """Resolve the only admitted artifact-dependent literature control.
+
+    ``R = n`` in Yao's Algorithm 1 is intentionally not a default.  The
+    persisted decoder projection receives the validated integer so cache and
+    manifest identities cannot contain a symbolic token.
+    """
+    resolved = _copy_executable(executable)
+    intervention = resolved.get("intervention")
+    if not isinstance(intervention, dict):
+        return resolved
+    round_limit = intervention.get("round_limit")
+    if not isinstance(round_limit, str):
+        return resolved
+    if (round_limit != _CODE_BLOCK_LENGTH
+            or intervention.get("kind") != "guided_decimation"):
+        raise ValueError("unsupported symbolic literature control")
+    if type(code_block_length) is not int or code_block_length < 1:
+        raise ValueError("Yao code block length must be a validated positive integer")
+    intervention["round_limit"] = code_block_length
+    return resolved
 
 
 def _source_specification(path: Path, document: Mapping[str, Any], raw_identity: str) -> LiteraturePolicy:
@@ -92,6 +153,18 @@ def _source_specification(path: Path, document: Mapping[str, Any], raw_identity:
         execution_identity=_identity({}), provenance_identity=_identity(dict(document)),
         raw_document_identity=raw_identity,
     )
+
+
+def _validate_symbolic_runnable_controls(executable: Mapping[str, Any]) -> None:
+    """Reject stringly controls before they can reach a public manifest."""
+    intervention = executable.get("intervention")
+    if not isinstance(intervention, Mapping):
+        return
+    round_limit = intervention.get("round_limit")
+    if isinstance(round_limit, str) and (
+        round_limit != _CODE_BLOCK_LENGTH or intervention.get("kind") != "guided_decimation"
+    ):
+        raise ValueError("unsupported symbolic literature control")
 
 
 def parse_literature_policy(path: str | Path) -> LiteraturePolicy:
@@ -140,6 +213,7 @@ def parse_literature_policy(path: str | Path) -> LiteraturePolicy:
                 raise ValueError(f"{name} must be a table")
             _validate_finite(document[name], field=name)
             executable[name] = dict(document[name])
+    _validate_symbolic_runnable_controls(executable)
     provenance = {name: document[name] for name in ("record_kind", "variant_id", "qualification", "source", "equations", "explanations", "unresolved") if name in document}
     return LiteraturePolicy(
         source_path=source_path, disposition="runnable", blocking_features=(),
@@ -147,3 +221,105 @@ def parse_literature_policy(path: str | Path) -> LiteraturePolicy:
         execution_identity=_identity(executable), provenance_identity=_identity(provenance),
         raw_document_identity=raw_identity,
     )
+
+
+def _source_record(path: Path) -> dict[str, Any]:
+    try:
+        value = tomllib.loads(path.read_text(encoding="utf-8"))
+    except tomllib.TOMLDecodeError as error:
+        raise ValueError(f"Yao source record is invalid TOML: {path.name}") from error
+    if not isinstance(value, dict):
+        raise ValueError(f"Yao source record must be a table: {path.name}")
+    return value
+
+
+def _yao_bpgd_executable(*, sweeps_per_round: int, round_limit: int | str) -> dict[str, Any]:
+    """The closed Algorithm 1 v2 interpretation used by the existing kernel."""
+    return {
+        "update": {"kind": "binary_spa"},
+        "schedule": {"kind": "flooding"},
+        "state_memory": {"kind": "stateless"},
+        "intervention": {
+            "kind": "guided_decimation", "variant": "algorithm1_v2_interpretation",
+            "source_revision": "arxiv:2312.10950v2", "qualification": "algorithm_interpretation",
+            "native_availability": "unverified", "trigger": "failed_bp_round",
+            "operator": "finite_prior_bias", "selection": "max_abs_reliability",
+            "lift_rule": "identity", "reset_rule": "continue_messages",
+            "preserved_fields": ["graph", "syndrome", "messages"],
+            "unresolved": ["zero_bias_boundary", "final_round_source_interpretation", *_YAO_UNRESOLVED],
+            "stream_status": "not_applicable", "finite_bias_magnitude": 25.0,
+            "zero_rule": "positive_prior_for_zero_posterior",
+            "final_round_rule": "return_after_last_fixation",
+            "round_limit": round_limit, "sweeps_per_round": sweeps_per_round,
+        },
+        "stopping": {"kind": "syndrome_or_budget", "max_iterations": sweeps_per_round},
+        "selection": {"kind": "stable_first"},
+        "postprocessing": {"kind": "identity"},
+    }
+
+
+def qualify_yao_source_records(
+    directory: str | Path, *, code_block_length: int | None = None,
+) -> tuple[YaoSourceDisposition, ...]:
+    """Translate all requested Yao Figure 3/6 records into closed controls.
+
+    The result describes only the algorithmic mapping.  Source author-code and
+    ordered-artifact identity remain unresolved, so no result is source-faithful.
+    """
+    root = Path(directory)
+    records: list[YaoSourceDisposition] = []
+    for variant_id in _YAO_VARIANT_ORDER:
+        path = root / f"{variant_id}.spec.toml"
+        document = _source_record(path)
+        if (document.get("record_kind") != "literature_policy_spec"
+                or document.get("variant_id") != variant_id
+                or document.get("execution_status") != "not_runnable"):
+            raise ValueError(f"Yao source record has an invalid header: {path.name}")
+        roles = {name: document.get(name) for name in ROLES}
+        if (not all(isinstance(control, dict) for control in roles.values())
+                or roles["update"].get("kind") != "binary_spa"
+                or roles["schedule"].get("kind") != "flooding"
+                or roles["state_memory"].get("kind") != "stateless"
+                or roles["stopping"].get("kind") != "syndrome_or_budget"
+                or roles["selection"].get("kind") != "stable_first"
+                or roles["postprocessing"].get("kind") != "identity"):
+            raise ValueError(f"Yao source record has an unsupported policy composition: {path.name}")
+        if variant_id == "bp-t100":
+            if (roles["intervention"].get("kind") != "identity"
+                    or roles["stopping"].get("max_iterations") != 100):
+                raise ValueError("Yao BP comparator controls are not Figure 3/6 T=100")
+            executable = {
+                "update": {"kind": "binary_spa"}, "schedule": {"kind": "flooding"},
+                "state_memory": {"kind": "stateless"}, "intervention": {"kind": "identity"},
+                "stopping": {"kind": "syndrome_or_budget", "max_iterations": 100},
+                "selection": {"kind": "stable_first"}, "postprocessing": {"kind": "identity"},
+            }
+            disposition = "runnable"
+        else:
+            intervention = roles["intervention"]
+            if intervention.get("kind") != "guided_decimation":
+                raise ValueError(f"Yao BPGD record is not guided decimation: {path.name}")
+            sweeps = intervention.get("sweeps_per_round")
+            raw_round_limit = intervention.get("round_limit")
+            if type(sweeps) is not int or sweeps < 1:
+                raise ValueError(f"Yao T must be a positive integer: {path.name}")
+            if raw_round_limit == _CODE_BLOCK_LENGTH:
+                if code_block_length is None:
+                    executable = _yao_bpgd_executable(sweeps_per_round=sweeps, round_limit=_CODE_BLOCK_LENGTH)
+                    disposition = "requires_artifact_block_length"
+                elif type(code_block_length) is int and code_block_length > 0:
+                    executable = _yao_bpgd_executable(sweeps_per_round=sweeps, round_limit=code_block_length)
+                    disposition = "runnable"
+                else:
+                    raise ValueError("Yao code block length must be a validated positive integer")
+            elif type(raw_round_limit) is int and raw_round_limit > 0:
+                executable = _yao_bpgd_executable(sweeps_per_round=sweeps, round_limit=raw_round_limit)
+                disposition = "runnable"
+            else:
+                raise ValueError(f"Yao R must be a positive integer or code_block_length: {path.name}")
+        records.append(YaoSourceDisposition(
+            variant_id=variant_id, source_path=path.resolve(), disposition=disposition,
+            executable=MappingProxyType(executable), qualification="canonical_adaptation_not_assessed",
+            unresolved=_YAO_UNRESOLVED,
+        ))
+    return tuple(records)

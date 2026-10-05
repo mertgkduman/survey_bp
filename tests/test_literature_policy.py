@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from bp_registry.literature import parse_literature_policy
+from bp_registry.literature import parse_literature_policy, qualify_yao_source_records
 from bp_registry.study import ensure_study
 
 
@@ -52,6 +52,29 @@ def _study(tmp_path: Path) -> Path:
     study = json.loads((ROOT / "examples/three-qubit-study.json").read_text())
     study["artifact"]["root"] = str(ROOT / "data/artifacts")
     path = tmp_path / "study.json"
+    path.write_text(json.dumps(study))
+    return path
+
+
+def _phase5_study(tmp_path: Path) -> Path:
+    """A tiny public study whose decoder owns the BPGD controls."""
+    study = json.loads((ROOT / "data/manifests/canonical-three-qubit-development.json").read_text())
+    study["schema_version"] = 5
+    study["run_id"] = "literature-bpgd-three-qubit"
+    study["randomness"]["physical_sample_identity"] = "literature-bpgd-three-qubit-v1"
+    study["artifact"]["root"] = str(ROOT / "data/artifacts")
+    study.pop("policies")
+    legacy_caps = {
+        "check_to_variable_updates": 100000000, "variable_to_check_updates": 100000000,
+        "belief_assemblies": 100000000, "residual_priority_evaluations": 100000000,
+        "bp_calls": 1000000, "candidate_checks": 100000000,
+        "intervention_actions": 2000, "branch_expansions": 0, "branch_prunes": 0,
+        "relay_transfers": 0, "fallback_calls": 0,
+    }
+    for scope in ("shot", "search", "attempt"):
+        study["budgets"][scope]["max_iterations"] = 1
+        study["budgets"][scope]["work_limits"] = legacy_caps
+    path = tmp_path / "phase5-study.json"
     path.write_text(json.dumps(study))
     return path
 
@@ -132,3 +155,23 @@ def test_shared_compute_keeps_append_only_request_receipts(tmp_path: Path, monke
     receipt_path.write_text('{"tampered": true}')
     with pytest.raises(ValueError, match="frozen study file differs"):
         ensure_study(study, first_policy, results_root=tmp_path / "results")
+
+
+def test_yao_source_table_preserves_t_r_and_source_identity_gaps() -> None:
+    records = qualify_yao_source_records(
+        ROOT / "literature_policies/yao-2024-guided-decimation", code_block_length=882,
+    )
+    assert [record.variant_id for record in records] == [
+        "bp-t100", "bpgd-t001", "bpgd-t010", "bpgd-t070", "bpgd-t100",
+        "bpgd-t100-r002", "bpgd-t100-r005", "bpgd-t100-r010", "bpgd-t100-r050", "bpgd-t100-r882",
+    ]
+    assert all(record.disposition == "runnable" for record in records)
+    bpgd = {record.variant_id: record for record in records if record.variant_id.startswith("bpgd")}
+    assert bpgd["bpgd-t001"].executable["intervention"]["sweeps_per_round"] == 1
+    assert bpgd["bpgd-t070"].executable["intervention"]["sweeps_per_round"] == 70
+    assert bpgd["bpgd-t100-r050"].executable["intervention"]["round_limit"] == 50
+    assert bpgd["bpgd-t100"].executable["intervention"]["round_limit"] == 882
+    assert bpgd["bpgd-t100"].executable == bpgd["bpgd-t100-r882"].executable
+    assert all(record.qualification != "source_faithful" for record in records)
+    assert all("author_implementation_identity" in record.unresolved for record in records)
+    assert all("ordered_paper_experiment_artifact_identity" in record.unresolved for record in records)
