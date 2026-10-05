@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 6
 current_phase_name: Beam Search, Ensembles, and Candidate Selection
-current_plan: 7
+current_plan: 9
 status: in_progress
-stopped_at: Completed Phase 6 Wave 3 plans 06-04 and 06-06; begin 06-07
-last_updated: "2026-10-05T22:02:25Z"
+stopped_at: Completed Phase 6 Wave 5 plans 06-07 and 06-08; begin bounded B1 gate 06-09
+last_updated: "2026-10-05T22:21:00Z"
 last_activity: 2026-10-05
-last_activity_desc: Phase 6 Wave 3 complete: impulse policy route and audited MBBP-LD core
-state_head: d1204b6
+last_activity_desc: Phase 6 Wave 5 complete: public MBBP replay and runnable third-paper policy route
+state_head: d79b764
 progress:
   total_phases: 14
   completed_phases: 4
   total_plans: 80
-  completed_plans: 77
+  completed_plans: 79
 ---
 
 # Project State
@@ -29,15 +29,15 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 ## Current Position
 
 Phase: 6 (Beam Search, Ensembles, and Candidate Selection) — PLANNED
-Plan: 06-07 ready
+Plan: 06-09 ready
 Total Phases: 14
-Current Plan: 4
+Current Plan: 9
 Total Plans in Phase: 9 (former 10 archived after user change)
-Status: Executing verified Phase 6 plans; Wave 3 complete
-Last activity: 2026-10-05 — Phase 6 Wave 3 completed
-Last Activity Description: Bhatnagar impulse TOML computes and reuses; MBBP-LD core passes 19 focused tests
+Status: Executing verified Phase 6 plans; Wave 5 complete
+Last activity: 2026-10-05 — Phase 6 Wave 5 completed
+Last Activity Description: MBBP-LD public execution/replay and paper-root TOML compute/reuse verified
 
-Progress: [███░░░░░░░] 29%
+Progress: [█████████░] 89% of Phase 6 plans
 
 ## Performance Metrics
 

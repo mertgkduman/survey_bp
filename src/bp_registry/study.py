@@ -19,7 +19,7 @@ from .artifacts import load_artifact
 from .literature import LiteraturePolicy, parse_literature_policy
 from .manifests import (
     CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4,
-    CanonicalExperimentV5, CanonicalExperimentV6, parse_manifest, preflight,
+    CanonicalExperimentV5, CanonicalExperimentV6, CanonicalExperimentV7, parse_manifest, preflight,
 )
 
 
@@ -82,7 +82,8 @@ def _expanded_policies(decoder: dict[str, Any], *, schema_version: int) -> dict[
     extension = (
         {"memory", "relay"} if schema_version == 4 else
         {"intervention", "intervention_limits"} if schema_version == 5 else
-        {"memory", "intervention", "intervention_limits"} if schema_version == 6 else set()
+        {"memory", "intervention", "intervention_limits"} if schema_version == 6 else
+        {"ensemble", "list_selection", "vote"} if schema_version == 7 else set()
     )
     allowed = required | extension
     if not required <= set(decoder) or not set(decoder) <= allowed:
@@ -93,6 +94,8 @@ def _expanded_policies(decoder: dict[str, Any], *, schema_version: int) -> dict[
         raise ValueError("schema v5/v6 decoder must declare intervention controls and limits")
     if schema_version == 6 and "memory" not in decoder:
         raise ValueError("schema v6 decoder must declare its ordered memory bindings")
+    if schema_version == 7 and not {"ensemble", "list_selection"} <= set(decoder):
+        raise ValueError("schema v7 decoder must declare its complete ensemble and list selection")
     if decoder["schema_version"] != 1 or decoder["engine"] != "canonical_css":
         raise ValueError("unsupported canonical decoder file version or engine")
     expanded = {}
@@ -129,8 +132,8 @@ def _apply_decoder_stopping_cap(study: dict[str, Any], decoder: dict[str, Any]) 
             raise ValueError("study budgets must equal the decoder stopping.max_iterations cap")
 
 
-def _validated_artifact_block_length(study: dict[str, Any]) -> int:
-    """Return ``n`` only after validating the study's pinned artifact bytes."""
+def _validated_artifact_dimensions(study: dict[str, Any]) -> tuple[int, int]:
+    """Return ``(n, m_z)`` only after validating pinned artifact bytes."""
     artifact = study.get("artifact")
     if not isinstance(artifact, dict):
         raise ValueError("canonical study must declare an artifact before symbolic policy resolution")
@@ -141,7 +144,12 @@ def _validated_artifact_block_length(study: dict[str, Any]) -> int:
         artifact["root"], artifact["path"], expected_raw_sha256=artifact["raw_sha256"],
         expected_semantic_sha256=artifact["semantic_sha256"],
     )
-    return int(loaded.code.hz.shape[1])
+    return int(loaded.code.hz.shape[1]), int(loaded.code.hz.shape[0])
+
+
+def _validated_artifact_block_length(study: dict[str, Any]) -> int:
+    """Preserve the public test seam for source R=n resolution."""
+    return _validated_artifact_dimensions(study)[0]
 
 
 def _request_receipt(policy: LiteraturePolicy | None, decoder_path: Path, *, computation_key: str,
@@ -173,12 +181,14 @@ def _request_receipt(policy: LiteraturePolicy | None, decoder_path: Path, *, com
 def _ensure_canonical(study_path: Path, decoder: dict[str, Any], results_root: Path,
                       *, policy: LiteraturePolicy | None = None, decoder_path: Path | None = None) -> dict[str, Any]:
     study = _read_object(study_path)
-    if "policies" in study or study.get("schema_version") not in (2, 3, 4, 5, 6):
-        raise ValueError("canonical study must be a schema v2-v6 experiment without policies")
+    if "policies" in study or study.get("schema_version") not in (2, 3, 4, 5, 6, 7):
+        raise ValueError("canonical study must be a schema v2-v7 experiment without policies")
     if study["schema_version"] == 4 and ("memory" in study or "relay" in study):
         raise ValueError("schema v4 memory and Relay controls belong in the decoder file")
     if study["schema_version"] in (5, 6) and ({"intervention", "intervention_limits", "memory"} & set(study)):
         raise ValueError("schema v5/v6 intervention and memory controls belong in the decoder file")
+    if study["schema_version"] == 7 and ({"ensemble", "list_selection", "vote"} & set(study)):
+        raise ValueError("schema v7 ensemble, list selection, and vote controls belong in the decoder file")
     if not isinstance(study.get("randomness"), dict) or not study["randomness"].get("physical_sample_identity"):
         raise ValueError("study must explicitly pin physical_sample_identity for matched comparisons")
     artifact = study.get("artifact")
@@ -189,8 +199,9 @@ def _ensure_canonical(study_path: Path, decoder: dict[str, Any], results_root: P
     if policy is not None and policy.requires_artifact_block_length():
         # R=n is source data, not a default.  Resolve only after byte and
         # semantic validation, before executable/cache identities are made.
+        code_block_length, code_check_count = _validated_artifact_dimensions(study)
         decoder = policy.decoder_projection(
-            code_block_length=_validated_artifact_block_length(study),
+            code_block_length=code_block_length, code_check_count=code_check_count,
         )
     policies = _expanded_policies(decoder, schema_version=study["schema_version"])
     _apply_decoder_stopping_cap(study, decoder)
@@ -205,12 +216,17 @@ def _ensure_canonical(study_path: Path, decoder: dict[str, Any], results_root: P
         study["intervention_limits"] = decoder["intervention_limits"]
     if study["schema_version"] == 6:
         study["memory"] = decoder["memory"]
+    if study["schema_version"] == 7:
+        study["ensemble"] = decoder["ensemble"]
+        study["list_selection"] = decoder["list_selection"]
+        if "vote" in decoder:
+            study["vote"] = decoder["vote"]
     policy_identity = sha256(_json_bytes(policy_payload)).hexdigest()
     study["run_id"] = f"{study['run_id']}-{policy_identity[:12]}"
     study["policies"] = policies
     parsed = parse_manifest(study)
-    if not isinstance(parsed, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV6)):
-        raise ValueError("this public study runner supports canonical CSS schema v2-v6")
+    if not isinstance(parsed, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV6, CanonicalExperimentV7)):
+        raise ValueError("this public study runner supports canonical CSS schema v2-v7")
     preflight(study)
     manifest_bytes = _json_bytes(study)
     source_identity = _source_identity()

@@ -42,6 +42,7 @@ _CONTROL_KEYS = {
 _TOP_LEVEL = {
     "schema_version", "record_kind", "variant_id", "execution_status", "qualification", "source", "equations",
     "explanations", "unresolved", "blocking_features", *ROLES, "memory", "relay", "intervention_limits",
+    "ensemble", "list_selection", "vote",
 }
 _SOURCE_KEYS = {"paper", "revision", "url", "anchors", "note"}
 _CODE_BLOCK_LENGTH = "code_block_length"
@@ -99,19 +100,34 @@ class LiteraturePolicy:
     def requires_artifact_block_length(self) -> bool:
         """Whether a bounded source control needs the admitted code length."""
         intervention = self.executable.get("intervention")
-        return bool(isinstance(intervention, Mapping)
-                    and (intervention.get("round_limit") == _CODE_BLOCK_LENGTH
-                         or intervention.get("attempt_cap") == _CODE_BLOCK_LENGTH
-                         or intervention.get("coordinate_order") == "index_ascending"))
+        ensemble = self.executable.get("ensemble")
+        return bool(
+            isinstance(intervention, Mapping)
+            and (intervention.get("round_limit") == _CODE_BLOCK_LENGTH
+                 or intervention.get("attempt_cap") == _CODE_BLOCK_LENGTH
+                 or intervention.get("coordinate_order") == "index_ascending")
+            or isinstance(ensemble, Mapping) and any(
+                isinstance(basis, Mapping) and "source_rows" in basis
+                for basis in ensemble.get("bases", ())
+            )
+        )
 
-    def decoder_projection(self, *, code_block_length: int | None = None) -> dict[str, Any]:
+    def decoder_projection(
+        self, *, code_block_length: int | None = None, code_check_count: int | None = None,
+    ) -> dict[str, Any]:
         """Return a fresh canonical-decoder object for the study compiler."""
-        executable = _resolve_symbolic_controls(self.executable, code_block_length=code_block_length)
+        executable = _resolve_symbolic_controls(
+            self.executable, code_block_length=code_block_length, code_check_count=code_check_count,
+        )
         return {"schema_version": 1, "engine": "canonical_css", **executable}
 
-    def execution_identity_for(self, *, code_block_length: int | None = None) -> str:
+    def execution_identity_for(
+        self, *, code_block_length: int | None = None, code_check_count: int | None = None,
+    ) -> str:
         """Return the numerical identity after any source control is resolved."""
-        return _identity(_resolve_symbolic_controls(self.executable, code_block_length=code_block_length))
+        return _identity(_resolve_symbolic_controls(
+            self.executable, code_block_length=code_block_length, code_check_count=code_check_count,
+        ))
 
 
 @dataclass(frozen=True)
@@ -138,6 +154,18 @@ class BhatnagarSourceDisposition:
     unresolved: tuple[str, ...]
 
 
+@dataclass(frozen=True)
+class RabetiSourceDisposition:
+    """Source controls awaiting an explicitly qualified local basis set."""
+
+    variant_id: str
+    source_path: Path
+    disposition: str
+    executable: Mapping[str, Any]
+    qualification: str
+    unresolved: tuple[str, ...]
+
+
 def _copy_executable(value: Mapping[str, Any]) -> dict[str, Any]:
     """Copy closed policy tables without preserving caller-owned mappings."""
     copied: dict[str, Any] = {}
@@ -147,34 +175,51 @@ def _copy_executable(value: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _resolve_symbolic_controls(
-    executable: Mapping[str, Any], *, code_block_length: int | None,
+    executable: Mapping[str, Any], *, code_block_length: int | None, code_check_count: int | None,
 ) -> dict[str, Any]:
-    """Resolve the only admitted artifact-dependent literature control.
+    """Resolve source controls from validated artifact dimensions.
 
-    ``R = n`` in Yao's Algorithm 1 is intentionally not a default.  The
-    persisted decoder projection receives the validated integer so cache and
-    manifest identities cannot contain a symbolic token.
+    Yao's R=n, Bhatnagar's coordinate range, and Rabeti's one-hot check rows
+    enter the persisted decoder projection before cache and manifest identity.
     """
     resolved = _copy_executable(executable)
     intervention = resolved.get("intervention")
-    if not isinstance(intervention, dict):
-        return resolved
-    for field, kind in (("round_limit", "guided_decimation"), ("attempt_cap", "impulse")):
-        value = intervention.get(field)
-        if not isinstance(value, str):
-            continue
-        if value != _CODE_BLOCK_LENGTH or intervention.get("kind") != kind:
-            raise ValueError("unsupported symbolic literature control")
-        if type(code_block_length) is not int or code_block_length < 1:
-            raise ValueError("literature code block length must be a validated positive integer")
-        intervention[field] = code_block_length
-    coordinate_order = intervention.get("coordinate_order")
-    if isinstance(coordinate_order, str):
-        if coordinate_order != "index_ascending" or intervention.get("kind") != "impulse":
-            raise ValueError("unsupported symbolic literature coordinate order")
-        if type(code_block_length) is not int or code_block_length < 1:
-            raise ValueError("literature code block length must be a validated positive integer")
-        intervention["coordinate_order"] = list(range(code_block_length))
+    if isinstance(intervention, dict):
+        for field, kind in (("round_limit", "guided_decimation"), ("attempt_cap", "impulse")):
+            value = intervention.get(field)
+            if not isinstance(value, str):
+                continue
+            if value != _CODE_BLOCK_LENGTH or intervention.get("kind") != kind:
+                raise ValueError("unsupported symbolic literature control")
+            if type(code_block_length) is not int or code_block_length < 1:
+                raise ValueError("literature code block length must be a validated positive integer")
+            intervention[field] = code_block_length
+        coordinate_order = intervention.get("coordinate_order")
+        if isinstance(coordinate_order, str):
+            if coordinate_order != "index_ascending" or intervention.get("kind") != "impulse":
+                raise ValueError("unsupported symbolic literature coordinate order")
+            if type(code_block_length) is not int or code_block_length < 1:
+                raise ValueError("literature code block length must be a validated positive integer")
+            intervention["coordinate_order"] = list(range(code_block_length))
+    ensemble = resolved.get("ensemble")
+    if isinstance(ensemble, dict) and ensemble.get("kind") == "mbbp_ld":
+        bases = ensemble.get("bases")
+        if not isinstance(bases, list):
+            raise ValueError("MBBP ensemble must declare basis descriptors")
+        resolved_bases = []
+        for basis in bases:
+            if not isinstance(basis, dict) or "source_rows" not in basis:
+                raise ValueError("MBBP basis requires explicit source rows")
+            if type(code_check_count) is not int or code_check_count < 1:
+                raise ValueError("MBBP check count must come from a validated artifact")
+            rows = basis["source_rows"]
+            if not isinstance(rows, list) or not rows or any(type(i) is not int or i < 0 or i >= code_check_count for i in rows):
+                raise ValueError("MBBP source row is outside the validated check count")
+            transforms = [[int(j == i) for j in range(code_check_count)] for i in rows]
+            resolved_bases.append({name: value for name, value in basis.items() if name != "source_rows"} | {
+                "redundant_transforms": transforms,
+            })
+        ensemble["bases"] = resolved_bases
     return resolved
 
 
@@ -244,7 +289,7 @@ def parse_literature_policy(path: str | Path) -> LiteraturePolicy:
             raise ValueError(f"{role} requires a registered policy kind")
         _validate_finite(control, field=role)
         executable[role] = dict(control)
-    for name in ("memory", "relay", "intervention_limits"):
+    for name in ("memory", "relay", "intervention_limits", "ensemble", "list_selection", "vote"):
         if name in document:
             if not isinstance(document[name], dict):
                 raise ValueError(f"{name} must be a table")
@@ -261,6 +306,49 @@ def parse_literature_policy(path: str | Path) -> LiteraturePolicy:
                 or not isinstance(document.get("unresolved"), dict)
                 or not set(expected.unresolved) <= set(document["unresolved"])):
             raise ValueError("Bhatnagar runnable policy must match its closed source variant and qualification")
+    if (source["revision"] == "arxiv:2605.14170v1" or document["variant_id"] == "mbbp-ld"):
+        expected = qualify_rabeti_source_record(source_path.parent)
+        ensemble = executable.get("ensemble")
+        score = executable.get("list_selection")
+        if (document["variant_id"] != expected.variant_id
+                or source["revision"] != "arxiv:2605.14170v1"
+                or document["qualification"] != expected.qualification
+                or {role: executable[role] for role in ROLES} != {role: expected.executable[role] for role in ROLES}
+                or not isinstance(ensemble, dict)
+                or not isinstance(score, dict)
+                or score != expected.executable["list_selection"]
+                or "vote" in executable
+                or not isinstance(document.get("unresolved"), dict)
+                or not set(expected.unresolved) <= set(document["unresolved"])):
+            raise ValueError("Rabeti runnable policy must match its closed source controls and qualification")
+        expected_ensemble = expected.executable["ensemble"]
+        bases = ensemble.get("bases")
+        if (set(ensemble) != set(expected_ensemble) | {"max_member_c2v_updates", "max_total_members", "bases"}
+                or any(ensemble[name] != value for name, value in expected_ensemble.items())
+                or type(ensemble["max_member_c2v_updates"]) is not int
+                or ensemble["max_member_c2v_updates"] < 1
+                or type(ensemble["max_total_members"]) is not int
+                or ensemble["max_total_members"] < 1
+                or not isinstance(bases, list) or not bases):
+            raise ValueError("Rabeti ensemble requires finite independent members and one-hot bases")
+        if len(bases) > ensemble["max_total_members"]:
+            raise ValueError("Rabeti basis count exceeds the declared member cap")
+        member_ids: set[str] = set()
+        for ordinal, basis in enumerate(bases):
+            if (not isinstance(basis, dict)
+                    or set(basis) != {"member_id", "local_ordinal", "partition_identity", "permutation_identity", "transform_kind", "source_rows"}
+                    or any(not isinstance(basis[name], str) or not basis[name]
+                           for name in ("member_id", "partition_identity", "permutation_identity"))
+                    or basis["member_id"] in member_ids
+                    or type(basis["local_ordinal"]) is not int or basis["local_ordinal"] != ordinal
+                    or basis["transform_kind"] != "one_hot_original_check_rows"
+                    or not isinstance(basis["source_rows"], list) or not basis["source_rows"]
+                    or any(type(row) is not int or row < 0 for row in basis["source_rows"])
+                    or len(set(basis["source_rows"])) != len(basis["source_rows"])):
+                raise ValueError("Rabeti basis must use ordered one-hot original check rows")
+            member_ids.add(basis["member_id"])
+    elif {"ensemble", "list_selection", "vote"} & set(executable):
+        raise ValueError("ensemble controls require a registered source-family compiler")
     provenance = {name: document[name] for name in ("record_kind", "variant_id", "qualification", "source", "equations", "explanations", "unresolved") if name in document}
     return LiteraturePolicy(
         source_path=source_path, disposition="runnable", blocking_features=(),
@@ -453,3 +541,67 @@ def qualify_bhatnagar_source_records(
             )), qualification="canonical_adaptation_not_assessed", unresolved=_BHATNAGAR_UNRESOLVED,
         ))
     return tuple(rows)
+
+
+_RABETI_UNRESOLVED = (
+    "source_partition_permutation", "augmented_syndrome_notation",
+    "candidate_score_ties", "author_implementation_identity",
+    "ordered_paper_experiment_artifact_identity",
+)
+
+
+def qualify_rabeti_source_record(directory: str | Path) -> RabetiSourceDisposition:
+    """Map the paper's fixed MBBP controls without inventing its basis set.
+
+    The source constructs H_t from selected original check rows.  A local
+    runnable policy must still bind exact one-hot row descriptors and disclose
+    its partition/permutation choice before claiming a canonical adaptation.
+    """
+    path = Path(directory) / "mbbp-ld.spec.toml"
+    source = _source_record(path)
+    expected = {
+        "update": {"kind": "normalized_min_sum", "alpha": 0.875},
+        "schedule": {"kind": "check_node_serial"},
+        "state_memory": {"kind": "stateless"},
+        "intervention": {
+            "kind": "subtree_redundant_check_ensemble", "member_state": "independent",
+            "subtree_rule": "maximal_cycle_free_check_partition",
+        },
+        "stopping": {"kind": "syndrome_or_budget", "max_iterations": 100},
+        "selection": {
+            "kind": "frequency_weighted_score",
+            "score": "candidate_frequency/(hamming_weight+1)",
+        },
+        "postprocessing": {"kind": "identity"},
+    }
+    if (source.get("record_kind") != "literature_policy_spec"
+            or source.get("variant_id") != "mbbp-ld"
+            or source.get("execution_status") != "not_runnable"
+            or not isinstance(source.get("source"), dict)
+            or source["source"].get("revision") != "arxiv:2605.14170v1"
+            or any(source.get(role) != controls for role, controls in expected.items())):
+        raise ValueError("Rabeti source record does not match the named MBBP-LD controls")
+    executable = {
+        "update": {"kind": "normalized_min_sum", "parameter_assignment": {"shape": "scalar", "value": 0.875}},
+        "schedule": {"kind": "check_node_serial"},
+        "state_memory": {"kind": "identity"},
+        "intervention": {"kind": "identity"},
+        "stopping": {"kind": "syndrome_or_budget", "max_iterations": 100},
+        "selection": {"kind": "stable_first"},
+        "postprocessing": {"kind": "identity"},
+        "ensemble": {
+            "kind": "mbbp_ld", "source_status": "canonical_adaptation",
+            "member_state": "independent", "max_iterations": 100,
+            "no_member_terminal": "no_member_converged_zero_return",
+        },
+        "list_selection": {
+            "kind": "frequency_over_weight_plus_one",
+            "tie_rule": "local_ordinal_then_lineage",
+        },
+    }
+    return RabetiSourceDisposition(
+        variant_id="mbbp-ld", source_path=path.resolve(),
+        disposition="requires_local_basis_descriptors",
+        executable=MappingProxyType(executable), qualification="canonical_adaptation_not_assessed",
+        unresolved=_RABETI_UNRESOLVED,
+    )

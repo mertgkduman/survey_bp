@@ -397,12 +397,12 @@ Plans:
 
 1. The controlled CSS BeamSearch/RelayBP comparison has a shared initial BP run, declared damped branch/leg semantics, masked BeamSearch branches, ranking/pruning, width/budgets, candidate selection, source-linked fixtures, and verified work evidence. The original BeamSearch circuit procedure and native reference remain Phase 12–13 targets.
 2. Generic branching/ensemble compositions declare member identity, inherited versus independent state, resource limits, and work aggregation without double-counting or hiding discarded paths.
-3. List selection preserves candidate origin and eligibility with declared scores/ties; voting defines its object and electorate and validates its final output against original constraints.
+3. List selection preserves candidate origin and eligibility with declared scores/ties. Coordinate-majority voting has an independently checked kernel primitive; its public manifest fails closed until end-to-end execution and replay are added.
 4. Researchers can replay a small search tree and account for accepted, rejected, pruned and budget-exhausted paths through the ledger.
 5. The first CSS literature set (Yao BPGD, Bhatnagar impulse, and Rabeti–Mahdavifar MBBP-LD) has source-grounded paper-level policy files with explicit runnable/unsupported status. At least one qualified variant per paper runs through the common policy-file command on a bounded CSS study with verified provenance and original-problem checks; full curve assessment remains in Phases 8–9.
 
-**Research focus:** Controlled CSS BeamSearch/RelayBP semantics, voting, search work versus parallel latency, and a small B1 literature-policy execution gate; original circuit reference integration follows in Phases 12–13.
-**Plans:** 6/9 plans executed across 6 waves, independently checked in `06-PLAN-CHECK.md`.
+**Research focus:** Controlled CSS BeamSearch/RelayBP semantics, ensemble/list selection, search work versus parallel latency, and a small B1 literature-policy execution gate; original circuit reference integration follows in Phases 12–13.
+**Plans:** 8/9 plans executed across 6 waves, independently checked in `06-PLAN-CHECK.md`. Public voting was narrowed to a fail-closed reserved field for this source-driven gate.
 
 - [x] 06-01-PLAN.md
 - [x] 06-02-PLAN.md
@@ -410,8 +410,8 @@ Plans:
 - [x] 06-04-PLAN.md
 - [x] 06-05-PLAN.md
 - [x] 06-06-PLAN.md
-- [ ] 06-07-PLAN.md
-- [ ] 06-08-PLAN.md
+- [x] 06-07-PLAN.md
+- [x] 06-08-PLAN.md
 - [ ] 06-09-PLAN.md
 
 ### Phase 7: Optional Postprocessing
