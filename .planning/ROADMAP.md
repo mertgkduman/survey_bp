@@ -402,12 +402,12 @@ Plans:
 5. The first CSS literature set (Yao BPGD, Bhatnagar impulse, and Rabeti–Mahdavifar MBBP-LD) has source-grounded paper-level policy files with explicit runnable/unsupported status. At least one qualified variant per paper runs through the common policy-file command on a bounded CSS study with verified provenance and original-problem checks; full curve assessment remains in Phases 8–9.
 
 **Research focus:** Controlled CSS BeamSearch/RelayBP semantics, voting, search work versus parallel latency, and a small B1 literature-policy execution gate; original circuit reference integration follows in Phases 12–13.
-**Plans:** 4/9 plans executed across 6 waves, independently checked in `06-PLAN-CHECK.md`.
+**Plans:** 5/9 plans executed across 6 waves, independently checked in `06-PLAN-CHECK.md`.
 
 - [x] 06-01-PLAN.md
 - [x] 06-02-PLAN.md
 - [x] 06-03-PLAN.md
-- [ ] 06-04-PLAN.md
+- [x] 06-04-PLAN.md
 - [x] 06-05-PLAN.md
 - [ ] 06-06-PLAN.md
 - [ ] 06-07-PLAN.md
