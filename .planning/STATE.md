@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 6
 current_phase_name: Beam Search, Ensembles, and Candidate Selection
-current_plan: 2
-status: planned
-stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-10-05T21:01:54.320Z"
+current_plan: 4
+status: in_progress
+stopped_at: Completed Phase 6 Wave 2 plans 06-02, 06-03, 06-05; begin 06-04 and 06-06
+last_updated: "2026-10-05T21:49:40Z"
 last_activity: 2026-10-05
-last_activity_desc: Phase 6 Plan 01 completed and verified; runnable Yao BP policy computes and reuses through installed command
-state_head: 8bf3bdef0250b613de75de4adfc5853627ff6e3d
+last_activity_desc: Phase 6 Wave 2 complete: Yao BPGD policy, impulse forced-zero/V2C clip, and auditable selection/voting
+state_head: 317cbb0
 progress:
   total_phases: 14
   completed_phases: 4
   total_plans: 80
-  completed_plans: 72
+  completed_plans: 75
 ---
 
 # Project State
@@ -29,13 +29,13 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 ## Current Position
 
 Phase: 6 (Beam Search, Ensembles, and Candidate Selection) — PLANNED
-Plan: 06-02 ready
+Plan: 06-04 ready
 Total Phases: 14
-Current Plan: 2
+Current Plan: 4
 Total Plans in Phase: 9 (former 10 archived after user change)
-Status: Executing verified Phase 6 plans; first literature policy command slice complete
-Last activity: 2026-10-05 — Phase 6 Plan 01 completed
-Last Activity Description: Runnable Yao BP comparator computes and reuses with separate numerical and request provenance identities; begin Wave 2
+Status: Executing verified Phase 6 plans; Waves 1–2 complete
+Last activity: 2026-10-05 — Phase 6 Wave 2 completed
+Last Activity Description: Yao BPGD, forced-zero impulse, and complete candidate/vote evidence passed focused checks; begin Wave 3
 
 Progress: [███░░░░░░░] 29%
 
@@ -196,11 +196,11 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-**Resume file:** 06-02-PLAN.md
+**Resume file:** .planning/phases/06-beam-search-ensembles-and-candidate-selection/06-04-PLAN.md
 
 Last session: 2026-10-05T21:01:52.495Z
-Stopped at: Completed 06-01-PLAN.md
-Next command: $gsd-execute-phase 06, beginning Wave 2; do not relaunch completed BB72 campaigns by default
+Stopped at: Completed Phase 6 Waves 1–2
+Next command: $gsd-execute-phase 06, beginning Wave 3; do not relaunch completed BB72 campaigns by default
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
 Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md`.
