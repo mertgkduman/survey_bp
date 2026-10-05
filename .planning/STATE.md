@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 6
 current_phase_name: Beam Search, Ensembles, and Candidate Selection
-current_plan: 6
+current_plan: 7
 status: in_progress
-stopped_at: Completed Phase 6 Plan 06-04; finish 06-06, then Wave 4
-last_updated: "2026-10-05T21:59:07Z"
+stopped_at: Completed Phase 6 Wave 3 plans 06-04 and 06-06; begin 06-07
+last_updated: "2026-10-05T22:02:25Z"
 last_activity: 2026-10-05
-last_activity_desc: Phase 6 Plan 06-04 complete: three impulse mappings and runnable force-zero policy
-state_head: 281819e
+last_activity_desc: Phase 6 Wave 3 complete: impulse policy route and audited MBBP-LD core
+state_head: d1204b6
 progress:
   total_phases: 14
   completed_phases: 4
   total_plans: 80
-  completed_plans: 76
+  completed_plans: 77
 ---
 
 # Project State
@@ -29,13 +29,13 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 ## Current Position
 
 Phase: 6 (Beam Search, Ensembles, and Candidate Selection) — PLANNED
-Plan: 06-06 in progress
+Plan: 06-07 ready
 Total Phases: 14
 Current Plan: 4
 Total Plans in Phase: 9 (former 10 archived after user change)
-Status: Executing verified Phase 6 plans; Plan 06-04 complete, Plan 06-06 in progress
-Last activity: 2026-10-05 — Phase 6 Plan 06-04 completed
-Last Activity Description: Three Bhatnagar impulse source variants have exact mappings; force-zero TOML runs and reuses through the common command
+Status: Executing verified Phase 6 plans; Wave 3 complete
+Last activity: 2026-10-05 — Phase 6 Wave 3 completed
+Last Activity Description: Bhatnagar impulse TOML computes and reuses; MBBP-LD core passes 19 focused tests
 
 Progress: [███░░░░░░░] 29%
 
@@ -196,10 +196,10 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-**Resume file:** .planning/phases/06-beam-search-ensembles-and-candidate-selection/06-06-PLAN.md
+**Resume file:** .planning/phases/06-beam-search-ensembles-and-candidate-selection/06-07-PLAN.md
 
 Last session: 2026-10-05T21:01:52.495Z
-Stopped at: Completed Phase 6 Plan 06-04; Plan 06-06 in progress
+Stopped at: Completed Phase 6 Wave 3; begin Plan 06-07
 Next command: $gsd-execute-phase 06, beginning Wave 3; do not relaunch completed BB72 campaigns by default
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
