@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_postprocessing_osd.py -k qualification -x",
+  "exitCode": 1,
+  "targetTest": "test_qualification_receipt_binds_exact_source_build_api_and_primary_environment",
+  "targetFile": "tests/canonical/test_postprocessing_osd.py",
+  "output": "TAP version 13\nnot ok 1 - test_qualification_receipt_binds_exact_source_build_api_and_primary_environment\n  ---\n  error: AssertionError: the approved OSD source must be qualified before admission\n  ...\n# tests 1\n# pass 0\n# fail 1\n",
+  "expected": "Only an exact source-pinned isolated build with source, wheel, primary-environment, API, and differential evidence may admit the standalone OSD worker.",
+  "actual": "The target test failed its receipt-existence assertion because no approved standalone OSD qualification receipt existed."
+}
