@@ -6,6 +6,7 @@ from contextlib import contextmanager
 import fcntl
 import gzip
 from hashlib import sha256
+from importlib.metadata import version
 import json
 import os
 from pathlib import Path
@@ -16,7 +17,9 @@ from typing import Any
 
 from .cli import run_canonical, verify_run
 from .artifacts import load_artifact
+from . import evaluator, sampling
 from .literature import LiteraturePolicy, parse_literature_policy
+from .reference import NativeBpLsdReference, NativeBpOsdReference
 from .manifests import (
     CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4,
     CanonicalExperimentV5, CanonicalExperimentV6, CanonicalExperimentV7, parse_manifest, preflight,
@@ -31,6 +34,11 @@ _LIFETIMES = {
     "intervention": "search", "stopping": "iteration", "selection": "attempt",
     "postprocessing": "attempt",
 }
+_NATIVE_COMPOSITE_ENGINES = {
+    "native_bp_osd": NativeBpOsdReference,
+    "native_bp_lsd": NativeBpLsdReference,
+}
+_NATIVE_COMPOSITE_PIN = "2.4.1"
 
 
 def _json_bytes(value: Any) -> bytes:
@@ -401,6 +409,142 @@ def _ensure_campaign(study_path: Path, decoder: dict[str, Any], results_root: Pa
                 "verification": {"package_files": 43, "assessment_status": result["assessment_status"]}}
 
 
+def resolve_native_composite_arm(decoder: dict[str, Any]) -> tuple[str, type[NativeBpOsdReference] | type[NativeBpLsdReference], dict[str, Any]]:
+    """Resolve one closed native-composite arm before sampling any observation."""
+    if not isinstance(decoder, dict):
+        raise ValueError("native composite decoder must be an object")
+    engine = decoder.get("engine")
+    adapter = _NATIVE_COMPOSITE_ENGINES.get(engine)
+    if adapter is None:
+        raise ValueError("unsupported native composite arm kind")
+    common = {
+        "schema_version", "engine", "provider", "package", "version", "max_iter",
+        "bp_method", "schedule", "input_vector_type",
+    }
+    method_controls = ({"osd_method", "osd_order"} if engine == "native_bp_osd" else {
+        "lsd_method", "lsd_order", "bits_per_step", "always_run_lsd",
+    })
+    if set(decoder) != common | method_controls:
+        raise ValueError("native composite arm requires complete explicit constructor controls")
+    if decoder["schema_version"] != 1:
+        raise ValueError("unsupported native composite decoder file version")
+    if decoder["provider"] != "quantumgizmos" or decoder["package"] != "ldpc":
+        raise ValueError("native composite arm requires the declared ldpc provider/package identity")
+    if decoder["version"] != _NATIVE_COMPOSITE_PIN or version("ldpc") != _NATIVE_COMPOSITE_PIN:
+        raise ValueError("native composite arm requires exact ldpc==2.4.1 environment identity")
+    controls = {name: decoder[name] for name in common - {"schema_version", "engine", "provider", "package", "version"}}
+    controls.update({name: decoder[name] for name in method_controls})
+    return engine, adapter, controls
+
+
+def _native_study_inputs(study_path: Path) -> tuple[dict[str, Any], Any, int, str, float]:
+    study = _read_object(study_path)
+    artifact = study.get("artifact")
+    if not isinstance(artifact, dict) or not {"root", "path", "raw_sha256", "semantic_sha256"} <= set(artifact):
+        raise ValueError("native composite study requires a complete pinned artifact")
+    root = Path(artifact["root"])
+    if not root.is_absolute():
+        root = (study_path.parent / root).resolve()
+    loaded = load_artifact(
+        root, artifact["path"], expected_raw_sha256=artifact["raw_sha256"],
+        expected_semantic_sha256=artifact["semantic_sha256"],
+    )
+    randomness = study.get("randomness")
+    if not isinstance(randomness, dict) or type(randomness.get("sample_seed")) is not int:
+        raise ValueError("native composite study requires an explicit sample seed")
+    sample_identity = randomness.get("physical_sample_identity")
+    if not isinstance(sample_identity, str) or not sample_identity:
+        raise ValueError("native composite study requires an explicit physical_sample_identity")
+    max_shots = study.get("budgets", {}).get("max_shots") if isinstance(study.get("budgets"), dict) else None
+    if type(max_shots) is not int or max_shots < 1:
+        raise ValueError("native composite study requires a positive max_shots budget")
+    error_rate = study.get("error_rate")
+    if not isinstance(error_rate, (int, float)) or isinstance(error_rate, bool):
+        raise ValueError("native composite study requires an explicit error rate")
+    return study, loaded.code, max_shots, sample_identity, float(error_rate)
+
+
+def _native_composite_result_row(shot: sampling.ShotSample, result: Any, evaluation: Any) -> dict[str, Any]:
+    """Serialize native evidence without projecting it into canonical fallback fields."""
+    return {
+        "shot_id": shot.shot_id,
+        "sample_identity": shot.sample_identity,
+        "observation_check_type": shot.observation.check_type,
+        "native_composite_identity": result.identity,
+        "constructor_controls": result.constructor_controls,
+        "terminal_status": result.terminal_status,
+        "native_converged": result.converged,
+        "native_iterations": result.iterations,
+        "native_bp_candidate": None if result.bp_candidate is None else result.bp_candidate.tolist(),
+        "native_final_candidate": None if result.candidate is None else result.candidate.tolist(),
+        "original_syndrome_valid": result.original_syndrome_valid,
+        "native_metric_facts": [fact.as_evidence() for fact in result.metric_facts],
+        "error_type": result.error_type,
+        "error_message": result.error_message,
+        "outcome": None if evaluation is None else evaluation.outcome,
+        "logical_action_agrees": None if evaluation is None else evaluation.logical_action_agrees,
+    }
+
+
+def _ensure_native_composite(study_path: Path, decoder_path: Path, decoder: dict[str, Any], results_root: Path) -> dict[str, Any]:
+    engine, adapter, controls = resolve_native_composite_arm(decoder)
+    study, code, max_shots, physical_identity, error_rate = _native_study_inputs(study_path)
+    study_bytes = _json_bytes(study)
+    arm_identity = {
+        "engine": engine, "identity_kind": "native_composite_reference",
+        "package": "ldpc", "version": _NATIVE_COMPOSITE_PIN, "controls": controls,
+    }
+    key = sha256(study_bytes + _json_bytes(arm_identity) + _source_identity().encode()).hexdigest()
+    output = (results_root / key).resolve()
+    receipt = {
+        "schema_version": 1, "engine": engine, "identity_kind": "native_composite_reference",
+        "cache_key": key, "study_sha256": sha256(study_bytes).hexdigest(),
+        "arm_sha256": sha256(_json_bytes(arm_identity)).hexdigest(), "source_sha256": _source_identity(),
+    }
+    with _study_lock(results_root / ".locks" / f"{key}.lock"):
+        receipt_path = output / "cache-receipt.json"
+        result_path = output / "result.json"
+        if result_path.exists():
+            if not receipt_path.is_file() or json.loads(receipt_path.read_text()) != receipt:
+                raise ValueError("cached native composite result is missing or conflicts with its source receipt")
+            result = json.loads(result_path.read_text())
+            status = "reused"
+        else:
+            rows = []
+            for shot_id in range(max_shots):
+                shot = sampling.sample_shot(
+                    code, shot_id=shot_id, seed=study["randomness"]["sample_seed"],
+                    x_error_rate=error_rate, manifest_identity=physical_identity,
+                )
+                result = adapter.decode(
+                    code.hz, shot.observation.syndrome, error_rate=error_rate,
+                    observation_identity=shot.sample_identity, **controls,
+                )
+                outcome = (evaluator.evaluate_candidate(
+                    code, true_x=shot.hidden.x, true_z=shot.hidden.z, candidate_x=result.candidate,
+                ) if result.candidate is not None else None)
+                rows.append(_native_composite_result_row(shot, result, outcome))
+            result = {
+                "schema_version": 1, "engine": engine,
+                "identity_kind": "native_composite_reference", "matched_physical_sample_identity": physical_identity,
+                "rows": rows,
+            }
+            _write_once(output / "study.json", study_bytes)
+            _write_once(result_path, _json_bytes(result))
+            _write_once(receipt_path, _json_bytes(receipt))
+            status = "computed"
+        request_id, request = _request_receipt(
+            None, decoder_path, computation_key=key, execution_identity=receipt["arm_sha256"],
+            verification={"row_count": len(result["rows"]), "engine": engine},
+        )
+        _write_once(output / "request-receipts" / f"{request_id}.json", _json_bytes(request))
+        return {
+            "status": status, "output": str(output), "cache_key": key,
+            "request_receipt": request_id, "result": result,
+            "verification": {"row_count": len(result["rows"]), "engine": engine},
+        }
+
+
 def ensure_study(study_file: str | Path, decoder_file: str | Path, *,
                  results_root: str | Path | None = None, workers: int = 1) -> dict[str, Any]:
     """Verify and reuse a result, or run the requested decoder and verify it.
@@ -425,6 +569,9 @@ def ensure_study(study_file: str | Path, decoder_file: str | Path, *,
     else:
         decoder = raw_decoder
     study = _read_object(study_path)
+    if raw_decoder.get("engine") in _NATIVE_COMPOSITE_ENGINES:
+        default_root = Path.cwd() / "bp-registry-results"
+        return _ensure_native_composite(study_path, decoder_path, raw_decoder, Path(results_root or default_root))
     if study.get("study_id") == "fair-beam-relay-css-v2":
         default_root = study_path.parents[2] / "data/results"
         return _ensure_campaign(study_path, decoder, Path(results_root or default_root), workers)

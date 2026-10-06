@@ -22,6 +22,73 @@ def test_native_bp_osd_study_arm_identity_resolver_is_explicit():
     assert hasattr(study, "resolve_native_composite_arm")
 
 
+@pytest.mark.parametrize(
+    ("engine", "method_controls"),
+    (
+        ("native_bp_osd", {"osd_method": "OSD_0", "osd_order": 0}),
+        ("native_bp_lsd", {
+            "lsd_method": "LSD_0", "lsd_order": 0, "bits_per_step": 1,
+            "always_run_lsd": False,
+        }),
+    ),
+)
+def test_native_composite_study_arms_share_matched_samples_and_keep_disjoint_cache_identity(
+    tmp_path: Path, engine: str, method_controls: dict[str, object],
+):
+    from bp_registry.sampling import sample_shot
+
+    study = json.loads((ROOT / "examples/three-qubit-study.json").read_text())
+    study["artifact"]["root"] = str(ROOT / "data/artifacts")
+    study_path = tmp_path / "study.json"
+    study_path.write_text(json.dumps(study))
+    decoder = {
+        "schema_version": 1, "engine": engine, "provider": "quantumgizmos", "package": "ldpc",
+        "version": "2.4.1", "max_iter": 1, "bp_method": "product_sum", "schedule": "parallel",
+        "input_vector_type": "syndrome", **method_controls,
+    }
+    decoder_path = tmp_path / f"{engine}.json"
+    decoder_path.write_text(json.dumps(decoder))
+    cache = tmp_path / "results"
+
+    first = ensure_study(study_path, decoder_path, results_root=cache)
+    second = ensure_study(study_path, decoder_path, results_root=cache)
+    assert first["status"] == "computed"
+    assert second["status"] == "reused"
+    assert first["cache_key"] == second["cache_key"]
+    assert first["result"]["identity_kind"] == "native_composite_reference"
+    assert first["result"]["engine"] == engine
+    assert {row["native_composite_identity"]["kind"] for row in first["result"]["rows"]} == {
+        "native_composite_reference"
+    }
+    expected = sample_shot(
+        __import__("bp_registry.artifacts", fromlist=["load_artifact"]).load_artifact(
+            study["artifact"]["root"], study["artifact"]["path"],
+            expected_raw_sha256=study["artifact"]["raw_sha256"],
+            expected_semantic_sha256=study["artifact"]["semantic_sha256"],
+        ).code,
+        shot_id=0, seed=study["randomness"]["sample_seed"], x_error_rate=study["error_rate"],
+        manifest_identity=study["randomness"]["physical_sample_identity"],
+    )
+    assert first["result"]["rows"][0]["sample_identity"] == expected.sample_identity
+    assert "bp_only" not in first["result"]["rows"][0]
+    assert "fallback" not in first["result"]["rows"][0]
+
+
+def test_native_bp_lsd_study_arm_rejects_runtime_override_and_pin_drift(tmp_path: Path):
+    from bp_registry.study import resolve_native_composite_arm
+
+    controls = {
+        "schema_version": 1, "engine": "native_bp_lsd", "provider": "quantumgizmos", "package": "ldpc",
+        "version": "2.4.1", "max_iter": 1, "bp_method": "product_sum", "schedule": "parallel",
+        "input_vector_type": "syndrome", "lsd_method": "LSD_0", "lsd_order": 0,
+        "bits_per_step": 1, "always_run_lsd": False,
+    }
+    with pytest.raises(ValueError, match="complete explicit"):
+        resolve_native_composite_arm({**controls, "runtime_override": "canonical"})
+    with pytest.raises(ValueError, match="ldpc==2.4.1"):
+        resolve_native_composite_arm({**controls, "version": "0.0.0"})
+
+
 def test_canonical_policy_file_computes_then_reuses_verified_result(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("OMP_NUM_THREADS", "1")
     study = json.loads((ROOT / "examples/three-qubit-study.json").read_text())
