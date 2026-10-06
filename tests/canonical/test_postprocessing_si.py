@@ -16,7 +16,7 @@ def _original():
     from bp_registry.canonical.problems import OriginalProblem
 
     return OriginalProblem(
-        lineage_id="si-original",
+        lineage_id="original-si",
         hx=np.asarray([[1, 1, 0, 0]], dtype=np.uint8),
         hz=np.asarray([[1, 1, 0, 0], [0, 0, 1, 1]], dtype=np.uint8),
         syndrome=np.asarray([0, 1], dtype=np.uint8),
@@ -63,7 +63,7 @@ def test_reduction_rejects_incompatible_css_before_any_rerun():
     from bp_registry.canonical.problems import OriginalProblem
 
     incompatible = OriginalProblem(
-        lineage_id="si-incompatible",
+        lineage_id="original-si-incompatible",
         hx=np.asarray([[1, 0, 0]], dtype=np.uint8),
         hz=np.asarray([[1, 1, 0]], dtype=np.uint8),
         syndrome=np.asarray([0], dtype=np.uint8),
