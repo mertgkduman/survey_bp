@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Literal
+from typing import Literal, Protocol
 
 import numpy as np
 
@@ -80,6 +80,12 @@ class PostprocessingResult:
     error: str | None = None
 
 
+class PostprocessingProcessor(Protocol):
+    """One closed fallback method, selected before postprocessing begins."""
+
+    def run(self, snapshot: FailedAttemptSnapshot) -> PostprocessingResult: ...
+
+
 def _load_lsd_decoder():
     from ldpc.lsd_decoder import LsdDecoder
     return LsdDecoder
@@ -118,7 +124,7 @@ class LsdPostprocessor:
 class PostprocessingController:
     """Invoke exactly one optional processor after the complete BP composition fails."""
 
-    def __init__(self, postprocessor: LsdPostprocessor | None) -> None:
+    def __init__(self, postprocessor: PostprocessingProcessor | None) -> None:
         self.postprocessor = postprocessor
 
     def execute(self, snapshots: tuple[FailedAttemptSnapshot, ...], *, bp_succeeded: bool) -> PostprocessingResult:

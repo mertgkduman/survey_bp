@@ -94,3 +94,63 @@ def test_rerun_solve_lift_and_original_validation_produce_a_qualified_candidate(
     assert result.selected_candidate == (0, 0, 1, 0)
     assert result.trials[0].original_valid is True
     assert {leaf.stage for leaf in result.work} == {"ranking", "reduction", "rerun", "solve", "lift", "original_check"}
+
+
+def test_unsolved_inactivated_system_is_retained_as_unsuccessful_evidence():
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.postprocessing.si import StabilizerInactivationSpec
+    from bp_registry.canonical.problems import OriginalProblem
+
+    original = OriginalProblem(
+        lineage_id="original-si-unsolved",
+        hx=np.asarray([[1, 1, 0, 0]], dtype=np.uint8),
+        hz=np.asarray([[1, 1, 0, 0], [1, 1, 0, 0], [0, 0, 1, 1]], dtype=np.uint8),
+        syndrome=np.asarray([0, 1, 1], dtype=np.uint8),
+    )
+    result = StabilizerInactivationSpec(max_inactivations=1).run(
+        original, np.asarray([1.0, 1.0, 2.0, 2.0]),
+        rerun=lambda working: np.asarray([1, 0], dtype=np.uint8),
+        budgets=BudgetTree(limits=(), parents={}), scope="si",
+    )
+
+    assert result.status == "unsuccessful"
+    assert result.selected_candidate is None
+    assert result.trials[0].status == "inactivated_system_unsolved"
+
+
+def test_capped_si_retains_typed_partial_work_without_reporting_success():
+    from bp_registry.canonical.budgets import BudgetLimit, BudgetTree
+    from bp_registry.canonical.postprocessing.si import StabilizerInactivationSpec
+
+    result = StabilizerInactivationSpec(max_inactivations=1).run(
+        _original(), np.asarray([1.0, 1.0, 2.0, 2.0]),
+        rerun=lambda working: np.asarray([1, 0], dtype=np.uint8),
+        budgets=BudgetTree(limits=(BudgetLimit("si", "bp_calls", 0),), parents={}), scope="si",
+    )
+
+    assert result.status == "capped"
+    assert result.selected_candidate is None
+    assert result.trials[0].status == "capped_rerun"
+    assert {leaf.stage for leaf in result.work} == {"ranking", "reduction"}
+
+
+def test_later_si_trial_can_replace_an_earlier_valid_candidate_by_declared_weight_score():
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.postprocessing.si import StabilizerInactivationSpec
+    from bp_registry.canonical.problems import OriginalProblem
+
+    original = OriginalProblem(
+        lineage_id="original-si-multiple",
+        hx=np.asarray([[1, 1, 0, 0, 0, 0], [0, 0, 1, 1, 0, 0]], dtype=np.uint8),
+        hz=np.asarray([[1, 1, 0, 0, 0, 0], [0, 0, 1, 1, 0, 0], [0, 0, 0, 0, 1, 1]], dtype=np.uint8),
+        syndrome=np.asarray([0, 0, 1], dtype=np.uint8),
+    )
+    result = StabilizerInactivationSpec(max_inactivations=2).run(
+        original, np.asarray([1.0, 1.0, 2.0, 2.0, 3.0, 3.0]),
+        rerun=lambda working: np.asarray([1, 1, 1, 0] if working.check_matrix.shape[1] == 4 else [1, 0], dtype=np.uint8),
+        budgets=BudgetTree(limits=(), parents={}), scope="si",
+    )
+
+    assert result.status == "success"
+    assert [trial.original_valid for trial in result.trials] == [True, True]
+    assert result.selected_candidate == (0, 0, 0, 0, 1, 0)

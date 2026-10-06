@@ -14,6 +14,7 @@ class SiTrialWork:
     trial_index: int
     stage: str
     vector: WorkVector
+    leaf_id: str | None = None
 
     def __post_init__(self) -> None:
         if type(self.trial_index) is not int or self.trial_index < 0:
@@ -22,6 +23,8 @@ class SiTrialWork:
             raise ValueError("SI work stage is not declared")
         if not isinstance(self.vector, WorkVector):
             raise ValueError("SI work requires a typed work vector")
+        if self.leaf_id is not None and (not isinstance(self.leaf_id, str) or not self.leaf_id):
+            raise ValueError("SI work leaf IDs must be nonempty when present")
 
     def as_evidence(self) -> dict[str, object]:
         return {
@@ -29,5 +32,6 @@ class SiTrialWork:
             "method": "stabilizer_inactivation",
             "trial_index": self.trial_index,
             "stage": self.stage,
+            "leaf_id": self.leaf_id,
             "work_vector": self.vector.as_evidence(structural_event_version=4),
         }
