@@ -430,7 +430,7 @@ Plans:
 
 **Research focus:** Standalone fallback interfaces, reliability conventions, exact SI/OTF variants, and source numerical/API drift.
 **Parallel literature work:** Continue adding source-grounded paper folders and runnable policy files for compatible CSS decoders while Phase 7 is built. Preserve source specifications and blockers in `paper_reproduction/`; use bounded pilots to expose missing kernel or manifest support. Any larger paper-curve assessment waits for Phase 8 campaign controls.
-**Plans:** 5/15 plans executed planned and independently verified
+**Plans:** 6/15 plans complete; 07-03 qualification halted pending an OSD evidence decision.
 
 Plans:
 
@@ -447,11 +447,11 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 07-03-PLAN.md — Qualify and integrate standalone OSD through an isolated worker.
+- [ ] 07-03-PLAN.md — Qualify and integrate standalone OSD through an isolated worker. Qualification halted: the approved source lacks the required candidate-evidence API.
 
-**Wave 4** *(blocked on Wave 3 completion)*
+**Wave 4** *(OTF mechanics completed independently while 07-03 is halted)*
 
-- [ ] 07-05-PLAN.md — Implement ordered Tanner forest mechanics as a labeled CSS adaptation.
+- [x] 07-05-PLAN.md — Implement ordered Tanner forest mechanics as a labeled CSS adaptation.
 
 **Wave 5** *(blocked on Wave 4 and snapshot completion)*
 
@@ -612,7 +612,7 @@ Plans:
 | 4. Memory Policies and Relay-BP | 15/15 | Complete    | 2026-09-30 |
 | 5. Guided and Perturbative BP Interventions | 14/14 | Human review pending |  |
 | 6. Beam Search, Ensembles, and Candidate Selection | 9/9 | Complete    | 2026-10-05 |
-| 7. Optional Postprocessing | 5/15 | In Progress|  |
+| 7. Optional Postprocessing | 6/15 | Blocked on POST-01 decision |  |
 | 8. Reproducible Campaigns and Statistical Assessment | 0/TBD | Not started | - |
 | 9. CSS Reproduction and Controlled Comparisons | 0/TBD | Not started | - |
 | 10. Correlated Quaternary Execution | 0/TBD | Not started | - |

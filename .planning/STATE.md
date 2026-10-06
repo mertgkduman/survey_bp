@@ -5,16 +5,16 @@ current_phase: 07
 current_phase_name: Optional Postprocessing
 current_plan: 3
 status: executing
-stopped_at: Phase 07 Plan 07-02 approved; executing Plan 07-03 isolated standalone OSD qualification
-last_updated: "2026-10-06T07:06:18.278Z"
+stopped_at: "Phase 07 Plan 07-03 qualification halted: approved OSD source lacks complete candidate-evidence API; Plan 07-05 OTF completed independently"
+last_updated: "2026-10-06T07:58:55.701Z"
 last_activity: 2026-10-06
 last_activity_desc: Phase 07 execution started
-state_head: e2bc122f7739779bd7d98e4fb212aa1d71b3da68
+state_head: 07178d47350929c72102d3dfb1ba7aba58988c03
 progress:
   total_phases: 14
   completed_phases: 5
   total_plans: 95
-  completed_plans: 85
+  completed_plans: 86
 ---
 
 # Project State
@@ -168,6 +168,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 - Statistical targets and compute budgets for publication campaigns remain to be prespecified.
 - The observed development environment is node-specific; recheck package and backend identity before interpreting runs elsewhere.
 - Circuit fault correlations and observable semantics require dedicated qualification; a CSS adaptation does not reproduce a circuit paper.
+- Phase 07 POST-01 / Plan 07-03: approved standalone OSD commit builds in isolation but does not expose complete higher-order candidate solutions and scores; qualification receipt is failed/non-runnable. User decision pending on a source instrumentation patch, reduced evidence contract, or leaving OSD blocked.
 
 ### Quick Tasks Completed
 
@@ -199,11 +200,11 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-**Resume file:** .planning/phases/07-optional-postprocessing/07-03-PLAN.md
+**Resume file:** .planning/phases/07-optional-postprocessing/07-03-SUMMARY.md
 
-Last session: 2026-10-06T07:06:16.027Z
-Stopped at: Phase 07 Plan 07-02 approved; executing Plan 07-03 isolated standalone OSD qualification
-Next command: Continue $gsd-execute-phase 7 with Plan 07-03 isolated standalone OSD qualification.
+Last session: 2026-10-06T07:58:53.195Z
+Stopped at: Phase 07 Plan 07-03 qualification halted: approved OSD source lacks complete candidate-evidence API; Plan 07-05 OTF completed independently
+Next command: Resolve the Plan 07-03 OSD evidence decision, then continue $gsd-execute-phase 7 from the recorded failed qualification receipt.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
 Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md`.
