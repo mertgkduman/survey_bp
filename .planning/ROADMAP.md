@@ -430,7 +430,19 @@ Plans:
 
 **Research focus:** Standalone fallback interfaces, reliability conventions, exact SI/OTF variants, and source numerical/API drift.
 **Parallel literature work:** Continue adding source-grounded paper folders and runnable policy files for compatible CSS decoders while Phase 7 is built. Preserve source specifications and blockers in `paper_reproduction/`; use bounded pilots to expose missing kernel or manifest support. Any larger paper-curve assessment waits for Phase 8 campaign controls.
-**Plans:** TBD
+**Plans:** 10 plans
+
+Plans:
+- [ ] 07-01-PLAN.md — Prove the complete-composition fallback boundary through released standalone LSD.
+- [ ] 07-02-PLAN.md — Verify the official standalone OSD source identity before any build.
+- [ ] 07-03-PLAN.md — Qualify and integrate standalone OSD through an isolated worker.
+- [ ] 07-04-PLAN.md — Implement source-anchored SI mechanics as a labeled CSS adaptation.
+- [ ] 07-05-PLAN.md — Implement ordered Tanner forest mechanics as a labeled CSS adaptation.
+- [ ] 07-06-PLAN.md — Add pinned native BP-OSD/BP-LSD composite references.
+- [ ] 07-07-PLAN.md — Expose strict public manifests, ledger replay, and CLI execution.
+- [ ] 07-08-PLAN.md — Extend complete literature policy files and controlled fallback arms.
+- [ ] 07-09-PLAN.md — Run and verify the bounded matched B1 mechanism view.
+- [ ] 07-10-PLAN.md — Publish the digest-bound shot-first notebook and HTML evidence view.
 
 ### Phase 8: Reproducible Campaigns and Statistical Assessment
 
