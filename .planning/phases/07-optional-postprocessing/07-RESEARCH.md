@@ -284,11 +284,15 @@ chosen = min(compatible_failed_snapshots, key=lambda item: item.ranking_key)
 | A4 | No executable author SI implementation identity was established in this pass. | SI | A later author artifact could replace the blocker and change provenance. |
 | A5 | Build the official standalone OSD branch in isolation rather than implementing a new kernel. | Standard Stack | Build incompatibility could leave POST-01 non-runnable until another audited seam is selected. |
 
-## Open Questions
+## Execution Qualification Dispositions
 
-1. **Standalone OSD build identity:** Can commit `baec4c8...` build against Python 3.12 in an isolated environment without pulling incompatible `ldpc` code? Wave 0 must answer with build receipt, import probe, and tiny-matrix differential tests.
-2. **SI exact determinism:** Resolve equal check-reliability ties, choice among nonunique reconstruction solutions, and author code identity before admitting a source-faithful file.
-3. **OTF Phase 7 scope:** Admit only the tested binary-CSS adaptation; leave circuit sparsification, transfer matrices, and faithful BPOTF execution for later circuit phases.
+No feasibility question remains for execution planning. The source facts below are closed admission gates; a failed gate produces the stated non-runnable or blocked disposition and never authorizes a substitute implementation.
+
+| Topic | Known source status | Phase 7 pass gate | Phase 7 fail disposition |
+|---|---|---|---|
+| Standalone OSD build identity | Official `quantumgizmos/ldpc` commit `baec4c8...` is pinned, but Python 3.12 build/API compatibility is not yet established. | Human verification of the exact official commit, followed by an isolated build receipt, exact import/constructor probe, primary-environment invariance check, and tiny-matrix differential fixtures. | POST-01 remains explicitly blocked and non-runnable; no project-written or moving-source OSD substitutes for the failed seam. |
+| SI source fidelity | arXiv v3 does not specify equal-reliability ties or the choice among nonunique GF(2) solutions, and this research did not establish an author-code identity. These source details remain unknown. | The faithful `.spec.toml` is non-runnable with all three blockers. A separately named canonical CSS adaptation may run only with ascending stabilizer-ID ties, a declared deterministic free-variable rule, and algebraic reduction/solve/lift fixtures per D-12. | Any source-faithful SI claim remains non-runnable; failure of an adaptation fixture also blocks the adaptation rather than inventing a source convention. |
+| OTF Phase 7 scope | The pinned paper/code is circuit-oriented and retains implementation TODOs; faithful circuit transfer is not established for the binary CSS path. | Admit only the separately named binary-CSS canonical adaptation after ordering, acyclicity, maximality, same-kernel rerun, lift, and original-validation fixtures. | Source-faithful/circuit OTF remains non-runnable in Phase 7 and is carried to Phases 12–13; no circuit fidelity claim is emitted. |
 
 ## Environment Availability
 
@@ -315,7 +319,7 @@ chosen = min(compatible_failed_snapshots, key=lambda item: item.ranking_key)
 |----------|-------|
 | Framework | pytest 9.0.3 [VERIFIED: runtime probe, 2026-10-05] |
 | Config file | `pyproject.toml` (`testpaths = ["tests"]`, `pythonpath = ["src"]`) [VERIFIED: pyproject.toml:28-30, exact quote] |
-| Quick run command | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_postprocessing_handoff.py tests/canonical/test_postprocessing_lsd.py` [ASSUMED] |
+| Quick run command | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase7_public_execution.py tests/canonical/test_postprocessing_handoff.py` [ASSUMED] |
 | Full suite command | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q` [VERIFIED: .planning/config.json:42, exact quote] |
 
 ### Phase Requirements → Test Map
@@ -323,7 +327,7 @@ chosen = min(compatible_failed_snapshots, key=lambda item: item.ranking_key)
 | Req ID | Behavior | Test Type | Automated Command | File Exists? |
 |--------|----------|-----------|-------------------|-------------|
 | POST-01 | OSD import/build gate, reliability/order/method, valid reconstruction, work | contract/differential | `pytest -q tests/canonical/test_postprocessing_osd.py` | ❌ Wave 0 |
-| POST-02 | Standalone LSD methods/order, tie fixture, valid reconstruction, work | contract/differential | `pytest -q tests/canonical/test_postprocessing_lsd.py` | ❌ Wave 0 |
+| POST-02 | Standalone LSD methods/order, tie fixture, valid reconstruction, work | contract/differential | `pytest -q tests/test_phase7_public_execution.py tests/canonical/test_postprocessing_handoff.py` | ❌ Wave 0 |
 | POST-03 | SI source fixture, reduced rerun/solve/lift, blocker/adaptation status | algebra/integration | `pytest -q tests/canonical/test_postprocessing_si.py` | ❌ Wave 0 |
 | POST-04 | OTF stable forest, acyclicity, rerun/lift, adaptation status | algebra/integration | `pytest -q tests/canonical/test_postprocessing_otf.py` | ❌ Wave 0 |
 | POST-05 | Whole-composition trigger, BP/final evidence, native identity/missingness, matched shots | integration/CLI | `pytest -q tests/test_phase7_public_execution.py` | ❌ Wave 0 |
@@ -350,7 +354,7 @@ chosen = min(compatible_failed_snapshots, key=lambda item: item.ranking_key)
 
 - [ ] `tests/canonical/test_postprocessing_handoff.py` — trigger/rank/reliability/compatibility contract.
 - [ ] `tests/canonical/test_postprocessing_osd.py` — isolated official branch build/import and algorithm fixtures.
-- [ ] `tests/canonical/test_postprocessing_lsd.py` — released standalone interface and work fixtures.
+- [ ] `tests/test_phase7_public_execution.py` — released standalone LSD contract fixtures plus the installed-CLI tracer.
 - [ ] `tests/canonical/test_postprocessing_si.py` and `test_postprocessing_otf.py` — source/adaptation algebra fixtures.
 - [ ] `tests/test_phase7_public_execution.py` and `tests/test_phase7_notebook.py` — public evidence path.
 - [ ] Versioned fallback ledger/work golden fixture and tamper case.
