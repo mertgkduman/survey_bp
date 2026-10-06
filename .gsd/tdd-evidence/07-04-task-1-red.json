@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -c '<pytest command captured and emitted as TAP for the GSD RED-evidence parser>'",
+  "exitCode": 1,
+  "targetTest": "test_source_status_module_exists_as_the_closed_canonical_adaptation_seam",
+  "targetFile": "tests/canonical/test_postprocessing_si.py",
+  "output": "TAP version 13\nnot ok 1 - test_source_status_module_exists_as_the_closed_canonical_adaptation_seam\n  ---\n  message: canonical SI seam is absent; underlying pytest exit=1\n  ...\n1..1\n# tests 1\n# pass 0\n# fail 1\n",
+  "expected": "The closed canonical SI adaptation seam exists before source-status and reduction contracts can be exercised.",
+  "actual": "Assertion failed because src/bp_registry/canonical/postprocessing/si.py did not exist."
+}
