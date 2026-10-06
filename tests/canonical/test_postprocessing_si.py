@@ -72,3 +72,25 @@ def test_reduction_rejects_incompatible_css_before_any_rerun():
         StabilizerInactivationSpec(max_inactivations=1).reduce(
             incompatible, np.asarray([1.0, 2.0, 3.0], dtype=np.float64),
         )
+
+
+def test_rerun_controller_is_a_method_owned_canonical_si_operation():
+    from bp_registry.canonical.postprocessing.si import StabilizerInactivationSpec
+
+    assert hasattr(StabilizerInactivationSpec, "run")
+
+
+def test_rerun_solve_lift_and_original_validation_produce_a_qualified_candidate():
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.postprocessing.si import StabilizerInactivationSpec
+
+    result = StabilizerInactivationSpec(max_inactivations=1).run(
+        _original(), np.asarray([-3.0, 1.0, -2.0, 2.0], dtype=np.float64),
+        rerun=lambda working: np.asarray([1, 0], dtype=np.uint8),
+        budgets=BudgetTree(limits=(), parents={}), scope="si",
+    )
+
+    assert result.status == "success"
+    assert result.selected_candidate == (0, 0, 1, 0)
+    assert result.trials[0].original_valid is True
+    assert {leaf.stage for leaf in result.work} == {"ranking", "reduction", "rerun", "solve", "lift", "original_check"}

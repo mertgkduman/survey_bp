@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -c '<pytest command captured and emitted as TAP for the GSD RED-evidence parser>'",
+  "exitCode": 1,
+  "targetTest": "test_rerun_controller_is_a_method_owned_canonical_si_operation",
+  "targetFile": "tests/canonical/test_postprocessing_si.py",
+  "output": "TAP version 13\nnot ok 1 - test_rerun_controller_is_a_method_owned_canonical_si_operation\n  ---\n  message: SI controller has no run method; underlying pytest exit=1\n  ...\n1..1\n# tests 1\n# pass 0\n# fail 1\n",
+  "expected": "SI owns deterministic reduced-problem reruns, solves, lifts, and original validation within one fallback call.",
+  "actual": "Assertion failed because StabilizerInactivationSpec had no run method."
+}
