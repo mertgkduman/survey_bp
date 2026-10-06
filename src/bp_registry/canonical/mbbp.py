@@ -185,6 +185,20 @@ class MbbpMember:
     candidate: tuple[int, ...] | None
     original_valid: bool | None
     work: WorkVector
+    terminal_posterior: tuple[float, ...] | None = None
+
+    def __post_init__(self) -> None:
+        if self.candidate is not None and (
+            not isinstance(self.candidate, tuple)
+            or any(type(value) is not int or value not in (0, 1) for value in self.candidate)
+        ):
+            raise ValueError("MBBP terminal candidate must be a binary tuple")
+        if self.terminal_posterior is not None and (
+            self.candidate is None
+            or len(self.terminal_posterior) != len(self.candidate)
+            or not all(math.isfinite(value) for value in self.terminal_posterior)
+        ):
+            raise ValueError("MBBP terminal posterior must be finite and candidate-aligned")
 
     @property
     def converged(self) -> bool:
@@ -205,6 +219,7 @@ class MbbpMember:
             "normalized_min_sum_alpha": self.normalized_min_sum_alpha,
             "status": self.status,
             "candidate": None if self.candidate is None else list(self.candidate),
+            "terminal_posterior": None if self.terminal_posterior is None else list(self.terminal_posterior),
             "original_valid": self.original_valid,
             "admitted": self.admitted,
             "work": self.work.as_evidence(structural_event_version=4),
@@ -281,6 +296,8 @@ class MbbpController:
             "alpha": self.spec.alpha, "schedule": "check_node_serial",
         })
         progress = ScheduleProgress(iteration=0, local_steps=0, cursor=(0,))
+        terminal_candidate: tuple[int, ...] | None = None
+        terminal_posterior: tuple[float, ...] | None = None
         for iteration in range(self.spec.max_iterations):
             for check_index in range(schedule.unit_count):
                 progress = ScheduleProgress(iteration=iteration, local_steps=progress.local_steps, cursor=(check_index,))
@@ -291,9 +308,14 @@ class MbbpController:
                 if not step.admitted:
                     return MbbpMember(
                         system.member_id, system.local_ordinal, lineage_id, system.content_identity, initial_identity,
-                        "check_node_serial", self.spec.alpha, "budget_denied", None, None, tree.summary(scope),
+                        "check_node_serial", self.spec.alpha, "budget_denied", terminal_candidate, None,
+                        tree.summary(scope), terminal_posterior,
                     )
                 progress = step.progress
+                if step.candidate is None or step.posterior is None:
+                    raise ValueError("admitted MBBP local step must expose terminal candidate and posterior")
+                terminal_candidate = tuple(int(value) for value in step.candidate.tolist())
+                terminal_posterior = tuple(float(value) for value in step.posterior.tolist())
                 if step.candidate is not None and self._valid(
                     system.check_matrix, system.syndrome, tuple(step.candidate.tolist()),
                 ):
@@ -305,7 +327,8 @@ class MbbpController:
                     if check is None:
                         return MbbpMember(
                             system.member_id, system.local_ordinal, lineage_id, system.content_identity, initial_identity,
-                            "check_node_serial", self.spec.alpha, "budget_denied", None, None, tree.summary(scope),
+                            "check_node_serial", self.spec.alpha, "budget_denied", terminal_candidate, None,
+                            tree.summary(scope), terminal_posterior,
                         )
                     original_valid = self._valid(original.hz, original.syndrome, candidate)
                     check.commit_once()
@@ -313,11 +336,12 @@ class MbbpController:
                         system.member_id, system.local_ordinal, lineage_id, system.content_identity, initial_identity,
                         "check_node_serial", self.spec.alpha,
                         "converged_original_valid" if original_valid else "converged_original_invalid",
-                        candidate, original_valid, tree.summary(scope),
+                        candidate, original_valid, tree.summary(scope), terminal_posterior,
                     )
         return MbbpMember(
             system.member_id, system.local_ordinal, lineage_id, system.content_identity, initial_identity,
-            "check_node_serial", self.spec.alpha, "iteration_cap", None, None, tree.summary(scope),
+            "check_node_serial", self.spec.alpha, "iteration_cap", terminal_candidate, None, tree.summary(scope),
+            terminal_posterior,
         )
 
     def run(

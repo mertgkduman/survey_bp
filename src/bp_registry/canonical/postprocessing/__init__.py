@@ -115,6 +115,8 @@ UNSUPPORTED_COMPOSITION_REASONS = MappingProxyType({
     "fair_relay": "unsupported_fair_relay_missing_complete_terminal_snapshot_contract",
     "guided_decimation": "unsupported_guided_decimation_missing_complete_terminal_snapshot_contract",
     "impulse": "unsupported_impulse_missing_complete_terminal_snapshot_contract",
+    "v5_intervention": "unsupported_v5_intervention_missing_complete_terminal_snapshot_contract",
+    "v6_intervention": "unsupported_v6_intervention_missing_complete_terminal_snapshot_contract",
     "restart": "unsupported_restart_missing_complete_terminal_snapshot_contract",
     "transformed": "unsupported_transformed_composition_missing_complete_terminal_snapshot_contract",
 })
@@ -164,6 +166,52 @@ def adapt_flooding_attempt(
         transform_identity=working.transform_identity,
     )
     return CompositionSnapshotResult("compatible", snapshots=(snapshot,))
+
+
+def adapt_mbbp_result(
+    result: object, *, working: WorkingProblem, error_rate: float,
+) -> CompositionSnapshotResult:
+    """Freeze every declared failed MBBP member after the ensemble is complete."""
+    members = tuple(getattr(result, "members", ()))
+    if not members:
+        return CompositionSnapshotResult("incompatible", reason="missing_declared_mbbp_members")
+    if any(getattr(member, "original_valid", None) is True for member in members):
+        return CompositionSnapshotResult("composition_success", reason="original_valid_mbbp_member")
+    snapshots: list[FailedAttemptSnapshot] = []
+    for member in members:
+        member_id = str(getattr(member, "member_id", "unknown"))
+        candidate = getattr(member, "candidate", None)
+        posterior = getattr(member, "terminal_posterior", None)
+        if candidate is None:
+            return CompositionSnapshotResult("incompatible", reason=f"mbbp_member_{member_id}_missing_terminal_candidate")
+        if posterior is None:
+            return CompositionSnapshotResult("incompatible", reason=f"mbbp_member_{member_id}_missing_terminal_posterior")
+        try:
+            frozen_candidate = _readonly_binary(candidate, length=working.original.hz.shape[1], name="candidate")
+        except ValueError:
+            return CompositionSnapshotResult("incompatible", reason=f"mbbp_member_{member_id}_terminal_candidate_shape_or_binary_mismatch")
+        if _original_valid(working, frozen_candidate):
+            return CompositionSnapshotResult("composition_success", reason="original_valid_mbbp_member")
+        observed = np.asarray(posterior, dtype=np.float64)
+        if observed.shape != (working.original.hz.shape[1],):
+            return CompositionSnapshotResult("incompatible", reason=f"mbbp_member_{member_id}_terminal_posterior_shape_mismatch")
+        if not np.all(np.isfinite(observed)):
+            return CompositionSnapshotResult("incompatible", reason=f"mbbp_member_{member_id}_nonfinite_terminal_posterior")
+        residual = (working.original.hz.astype(np.int64) @ frozen_candidate.astype(np.int64)) % 2
+        snapshots.append(FailedAttemptSnapshot(
+            attempt_lineage_id=str(getattr(getattr(member, "lineage_id", None), "value", "")),
+            working=working,
+            candidate=frozen_candidate,
+            posterior_llr=observed,
+            original_residual_weight=int(np.count_nonzero(residual != working.original.syndrome)),
+            original_channel_nll=_original_channel_nll(frozen_candidate, error_rate=error_rate),
+            declared_attempt_ordinal=int(getattr(member, "local_ordinal", -1)),
+            termination=str(getattr(member, "status", "unknown")),
+            transform_identity=f"mbbp_basis:{getattr(member, 'basis_identity', member_id)}",
+            work=getattr(member, "work", WorkVector.zero()),
+        ))
+    ordered = tuple(sorted(snapshots, key=lambda snapshot: (snapshot.declared_attempt_ordinal, snapshot.attempt_lineage_id)))
+    return CompositionSnapshotResult("compatible", snapshots=ordered)
 
 
 @dataclass(frozen=True)

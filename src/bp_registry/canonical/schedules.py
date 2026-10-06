@@ -209,6 +209,7 @@ class ScheduledLocalStepResult:
     candidate: np.ndarray | None
     proposed_work: Any
     termination: Any = None
+    posterior: np.ndarray | None = None
 
 
 class LayeredSchedule:
@@ -588,6 +589,7 @@ class _NodeSerialSchedule:
         unit_index = self._unit_index(progress)
         candidate_box: list[np.ndarray] = []
         c2v_box: list[np.ndarray] = []
+        posterior_box: list[np.ndarray] = []
         proposal = self.propose_local_step(messages, syndrome, error_rate=error_rate, progress=progress)
 
         def compute() -> np.ndarray:
@@ -603,6 +605,12 @@ class _NodeSerialSchedule:
             candidate.setflags(write=False)
             candidate_box.append(candidate)
             c2v_box.append(next_c2v)
+            posterior = self.kernel.assemble_beliefs(
+                self.edge_table.variable_count, self._edge_variables, next_c2v, self.kernel.prior(error_rate),
+            )
+            posterior = np.array(posterior, dtype=np.float64, copy=True)
+            posterior.setflags(write=False)
+            posterior_box.append(posterior)
             return updated
 
         result = executor.execute(
@@ -622,7 +630,8 @@ class _NodeSerialSchedule:
             cursor=(unit_index + 1,),
             rng_state=progress.rng_state,
         )
-        return ScheduledLocalStepResult(True, next_progress, candidate_box[-1], proposal.proposed_work)
+        return ScheduledLocalStepResult(True, next_progress, candidate_box[-1], proposal.proposed_work,
+                                        posterior=posterior_box[-1])
 
 
 class CheckNodeSerialSchedule(_NodeSerialSchedule):

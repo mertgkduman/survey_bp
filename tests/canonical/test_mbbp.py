@@ -19,7 +19,7 @@ def test_mbbp_module_exports_augmented_basis_seam() -> None:
 
 
 def _original() -> OriginalProblem:
-    return OriginalProblem("mbbp-fixture", np.zeros((1, 3), dtype=np.uint8), H, S)
+    return OriginalProblem("original-mbbp-fixture", np.zeros((1, 3), dtype=np.uint8), H, S)
 
 
 def _basis(member_id: str, ordinal: int, transforms: tuple[tuple[int, ...], ...] = ((1, 1),)):
@@ -124,7 +124,11 @@ def test_no_member_converged_returns_typed_zero_sentinel_without_candidate_admis
     assert result.selected_candidate is None
     assert result.selected_origin_id is None
     assert result.selection is not None and result.selection.selected_origin_id is None
-    assert all(member.status == "iteration_cap" and member.candidate is None for member in result.members)
+    assert all(
+        member.status == "iteration_cap" and member.candidate == (0, 0, 0)
+        and member.terminal_posterior is not None and np.all(np.isfinite(member.terminal_posterior))
+        for member in result.members
+    )
     assert np.any((impossible.hz @ np.asarray(result.source_zero_return, dtype=np.uint8)) % 2 != impossible.syndrome)
 
 
@@ -140,7 +144,7 @@ def test_member_budget_denial_keeps_terminal_and_unique_work_evidence() -> None:
     assert result.work_leaves == ()
 
 
-def test_member_postprocessing_handoff_preserves_all_failed_terminals_in_declared_order() -> None:
+def test_member_postprocessing_snapshot_posterior_preserves_all_failed_terminals_in_declared_order() -> None:
     from bp_registry.canonical import postprocessing
 
     assert hasattr(postprocessing, "adapt_mbbp_result"), "the MBBP handoff adapter must be public"
@@ -173,7 +177,7 @@ def test_member_postprocessing_handoff_preserves_all_failed_terminals_in_declare
     assert all(member.candidate is not None and member.terminal_posterior is not None for member in forward.members)
 
 
-def test_member_postprocessing_handoff_suppresses_fallback_after_any_original_valid_member() -> None:
+def test_member_postprocessing_later_success_suppresses_fallback_after_any_original_valid_member() -> None:
     from bp_registry.canonical import postprocessing
     from bp_registry.canonical.lineage import LineageEdge, LineageId
     from bp_registry.canonical.mbbp import MbbpController, MbbpSpec
@@ -195,7 +199,7 @@ def test_member_postprocessing_handoff_suppresses_fallback_after_any_original_va
     assert handoff.snapshots == ()
 
 
-def test_unsupported_postprocessing_compositions_fail_closed_with_stable_reason() -> None:
+def test_member_unsupported_postprocessing_compositions_fail_closed_with_stable_reason() -> None:
     from bp_registry.canonical.postprocessing import unsupported_composition
 
     result = unsupported_composition("relay")
