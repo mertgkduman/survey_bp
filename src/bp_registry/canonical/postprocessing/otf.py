@@ -8,7 +8,7 @@ an immutable original CSS ``H_Z`` problem and uses no hidden simulation truth.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Literal
+from typing import Callable, Literal
 
 import numpy as np
 
@@ -226,6 +226,63 @@ class OrderedTannerForestSpec:
                 rejected.append(column)
         return self._construction(original, probabilities, ordered, tuple(accepted), tuple(rejected), (), tuple(work))
 
+    def run(
+        self,
+        original: OriginalProblem,
+        posterior_llr: np.ndarray,
+        *,
+        rerun: Callable[[WorkingProblem], np.ndarray],
+        budgets: BudgetTree,
+        scope: str,
+    ) -> "OtfResult":
+        """Run the declared same BP kernel once on the certified forest.
+
+        The caller owns the kernel binding.  This method owns only OTF graph
+        work, forest-space validation, total zero-extension, and immutable
+        original-syndrome validation; it cannot invoke another fallback.
+        """
+        if not callable(rerun) or not isinstance(budgets, BudgetTree) or not isinstance(scope, str) or not scope:
+            raise ValueError("OTF run requires a declared same-kernel rerun, BudgetTree, and scope")
+        construction = self.build(original, posterior_llr, budgets=budgets, scope=scope)
+        work = list(construction.work)
+
+        def reserve(stage: str, vector: WorkVector) -> bool:
+            leaf_id = f"{scope}:otf:{original.lineage_id}:{stage}"
+            reservation = budgets.reserve(scope, vector, leaf_id=leaf_id)
+            if reservation is None:
+                return False
+            reservation.commit_once()
+            work.append(OtfWork(stage, vector, None, leaf_id))
+            return True
+
+        if not reserve("forest_bp", WorkVector(bp_calls=1, candidate_checks=1)):
+            return _otf_result("capped", construction, None, None, False, work)
+        try:
+            forest_candidate = _binary_vector(
+                rerun(construction.working), construction.working.check_matrix.shape[1], "OTF forest rerun candidate",
+            )
+        except Exception:
+            return _otf_result("invalid_rerun_candidate", construction, None, None, False, work)
+        observed_forest = (construction.working.check_matrix.astype(np.int64) @ forest_candidate.astype(np.int64)) % 2
+        if not np.array_equal(observed_forest.astype(np.uint8), construction.working.syndrome):
+            return _otf_result("forest_syndrome_invalid", construction, tuple(forest_candidate.tolist()), None, False, work)
+        if not reserve("lift", WorkVector(lifted_coordinates=original.hz.shape[1])):
+            return _otf_result("capped", construction, tuple(forest_candidate.tolist()), None, False, work)
+        lifted = np.zeros(original.hz.shape[1], dtype=np.uint8)
+        lifted[list(construction.working.column_map)] = forest_candidate
+        lifted.setflags(write=False)
+        if not reserve("original_check", WorkVector(original_checks=1, candidate_checks=1)):
+            return _otf_result("capped", construction, tuple(forest_candidate.tolist()), tuple(lifted.tolist()), False, work)
+        original_valid = bool(np.array_equal(
+            (original.hz.astype(np.int64) @ lifted.astype(np.int64) % 2).astype(np.uint8), original.syndrome,
+        ))
+        if not original_valid:
+            return _otf_result("original_syndrome_invalid", construction, tuple(forest_candidate.tolist()), tuple(lifted.tolist()), False, work)
+        return _otf_result(
+            "success_capped" if construction.status == "capped" else "success",
+            construction, tuple(forest_candidate.tolist()), tuple(lifted.tolist()), True, work,
+        )
+
     @staticmethod
     def _construction(
         original: OriginalProblem, probabilities: np.ndarray, ordered: tuple[int, ...], accepted: tuple[int, ...],
@@ -245,4 +302,63 @@ class OrderedTannerForestSpec:
         return ForestConstruction(
             original, "capped" if cap_denied else "complete", canonical_css_adaptation_status(),
             tuple(float(item) for item in probabilities), ordered, accepted, rejected, cap_denied, working, work,
+        )
+
+
+def _binary_vector(value: np.ndarray, length: int, name: str) -> np.ndarray:
+    candidate = np.asarray(value)
+    if candidate.shape != (length,) or not np.issubdtype(candidate.dtype, np.integer) or np.any((candidate != 0) & (candidate != 1)):
+        raise ValueError(f"{name} must be a binary vector with the forest column length")
+    result = np.array(candidate, dtype=np.uint8, copy=True)
+    result.setflags(write=False)
+    return result
+
+
+@dataclass(frozen=True, slots=True)
+class OtfResult:
+    """Complete one-method OTF evidence, including unsuccessful outcomes."""
+
+    status: str
+    construction: ForestConstruction
+    forest_candidate: tuple[int, ...] | None
+    lifted_candidate: tuple[int, ...] | None
+    original_valid: bool
+    selected_candidate: tuple[int, ...] | None
+    work: tuple[OtfWork, ...]
+    termination: str | None
+
+
+def _otf_result(
+    status: str, construction: ForestConstruction, forest_candidate: tuple[int, ...] | None,
+    lifted_candidate: tuple[int, ...] | None, original_valid: bool, work: list[OtfWork],
+) -> OtfResult:
+    selected = lifted_candidate if original_valid else None
+    capped = status in {"capped", "success_capped"}
+    return OtfResult(
+        status, construction, forest_candidate, lifted_candidate, original_valid, selected,
+        tuple(work), "count_budget_exhausted" if capped else None,
+    )
+
+
+class OtfPostprocessor:
+    """One closed OTF binding compatible with the generic one-shot controller."""
+
+    def __init__(self, spec: OrderedTannerForestSpec, *, rerun: Callable[[WorkingProblem], np.ndarray]) -> None:
+        if not isinstance(spec, OrderedTannerForestSpec) or not callable(rerun):
+            raise ValueError("OTF postprocessor needs a closed spec and declared same-kernel rerun")
+        self.spec, self._rerun = spec, rerun
+
+    def run(self, snapshot):
+        """Adapt a frozen failed snapshot without a detector or circuit representation."""
+        from . import PostprocessingResult
+
+        result = self.spec.run(
+            snapshot.working.original, snapshot.posterior_llr, rerun=self._rerun,
+            budgets=BudgetTree(limits=(), parents={}), scope=f"otf:{snapshot.attempt_lineage_id}",
+        )
+        success = result.selected_candidate is not None
+        return PostprocessingResult(
+            "success" if success else result.status,
+            tuple(snapshot.candidate.tolist()), result.selected_candidate, success if success else False,
+            snapshot.attempt_lineage_id, 1,
         )

@@ -11,11 +11,12 @@ def test_otf_exposes_a_named_css_adaptation_contract():
     assert (Path(__file__).resolve().parents[2] / "src/bp_registry/canonical/postprocessing/otf.py").is_file()
 
 
-def _original(matrix=((1, 1, 0), (1, 1, 1))):
+def _original(matrix=((1, 1, 0), (1, 1, 1)), syndrome=None):
     from bp_registry.canonical.problems import OriginalProblem
 
     return OriginalProblem("original-otf", np.zeros((0, len(matrix[0])), dtype=np.uint8),
-                           np.asarray(matrix, dtype=np.uint8), np.zeros(len(matrix), dtype=np.uint8))
+                           np.asarray(matrix, dtype=np.uint8),
+                           np.zeros(len(matrix), dtype=np.uint8) if syndrome is None else np.asarray(syndrome, dtype=np.uint8))
 
 
 def test_probability_conversion_orders_descending_error_probability_then_original_id():
@@ -67,3 +68,85 @@ def test_otf_rerun_is_a_method_owned_same_kernel_operation():
     from bp_registry.canonical.postprocessing.otf import OrderedTannerForestSpec
 
     assert hasattr(OrderedTannerForestSpec, "run")
+
+
+def test_forest_bp_rerun_lifts_omitted_columns_as_zero_and_validates_original_syndrome():
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.postprocessing.otf import OrderedTannerForestSpec
+
+    seen = []
+    result = OrderedTannerForestSpec().run(
+        _original(syndrome=(1, 1)), np.asarray([-4.0, -3.0, 3.0]),
+        rerun=lambda working: (seen.append((working.column_map, working.check_matrix.copy())) or np.asarray([1, 0], dtype=np.uint8)),
+        budgets=BudgetTree(limits=(), parents={}), scope="otf",
+    )
+
+    assert seen[0][0] == (0, 2)
+    np.testing.assert_array_equal(seen[0][1], [[1, 0], [1, 1]])
+    assert result.status == "success"
+    assert result.forest_candidate == (1, 0)
+    assert result.lifted_candidate == result.selected_candidate == (1, 0, 0)
+    assert result.original_valid is True
+    assert {entry.stage for entry in result.work} == {"sort", "union_find_probe", "accepted_column", "forest_bp", "lift", "original_check"}
+
+
+@pytest.mark.parametrize(
+    ("rerun", "status"),
+    [
+        (lambda working: np.asarray([2, 0], dtype=np.uint8), "invalid_rerun_candidate"),
+        (lambda working: np.asarray([0, 0], dtype=np.uint8), "forest_syndrome_invalid"),
+    ],
+)
+def test_invalid_or_nonconverged_forest_outputs_stay_unsuccessful(rerun, status):
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.postprocessing.otf import OrderedTannerForestSpec
+
+    result = OrderedTannerForestSpec().run(
+        _original(syndrome=(1, 1)), np.asarray([-4.0, -3.0, 3.0]), rerun=rerun,
+        budgets=BudgetTree(limits=(), parents={}), scope="otf",
+    )
+
+    assert result.status == status
+    assert result.selected_candidate is None
+    assert result.original_valid is False
+    assert any(entry.stage == "forest_bp" for entry in result.work)
+
+
+def test_valid_candidate_remains_eligible_when_the_declared_forest_cap_terminates_the_call():
+    from bp_registry.canonical.budgets import BudgetTree
+    from bp_registry.canonical.postprocessing.otf import OrderedTannerForestSpec
+
+    result = OrderedTannerForestSpec(max_accepted_columns=1).run(
+        _original(syndrome=(1, 1)), np.asarray([-4.0, -3.0, 3.0]),
+        rerun=lambda working: np.asarray([1], dtype=np.uint8), budgets=BudgetTree(limits=(), parents={}), scope="otf",
+    )
+
+    assert result.status == "success_capped"
+    assert result.termination == "count_budget_exhausted"
+    assert result.construction.status == "capped"
+    assert result.selected_candidate == (1, 0, 0)
+
+
+def test_budget_denial_retains_graph_work_without_claiming_an_otf_success():
+    from bp_registry.canonical.budgets import BudgetLimit, BudgetTree
+    from bp_registry.canonical.postprocessing.otf import OrderedTannerForestSpec
+
+    result = OrderedTannerForestSpec().run(
+        _original(syndrome=(1, 1)), np.asarray([-4.0, -3.0, 3.0]),
+        rerun=lambda working: np.asarray([1, 0], dtype=np.uint8),
+        budgets=BudgetTree(limits=(BudgetLimit("otf", "bp_calls", 0),), parents={}), scope="otf",
+    )
+
+    assert result.status == "capped"
+    assert result.selected_candidate is None
+    assert {entry.stage for entry in result.work} == {"sort", "union_find_probe", "accepted_column"}
+
+
+def test_circuit_source_status_stays_non_runnable_while_the_css_adaptation_has_no_detector_input():
+    from bp_registry.canonical.postprocessing.otf import OrderedTannerForestSpec, source_faithful_status
+
+    status = source_faithful_status()
+    assert status.disposition == "non_runnable"
+    assert status.qualification == "source_faithful"
+    assert "detector" in " ".join(status.blockers)
+    assert OrderedTannerForestSpec.build.__annotations__.get("original") is not None
