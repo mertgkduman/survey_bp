@@ -219,7 +219,6 @@ class MbbpMember:
             "normalized_min_sum_alpha": self.normalized_min_sum_alpha,
             "status": self.status,
             "candidate": None if self.candidate is None else list(self.candidate),
-            "terminal_posterior": None if self.terminal_posterior is None else list(self.terminal_posterior),
             "original_valid": self.original_valid,
             "admitted": self.admitted,
             "work": self.work.as_evidence(structural_event_version=4),

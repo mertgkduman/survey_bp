@@ -66,6 +66,29 @@ def test_phase6_projection_preserves_no_member_zero_return_without_selection():
     assert terminal["selection"] is None
 
 
+def test_phase6_member_projection_preserves_historical_payload_grammar():
+    """Phase 7-only reliability must not rewrite sealed V7 member events."""
+    from bp_registry.canonical.mbbp import MbbpBasis, MbbpController, MbbpSpec
+    from bp_registry.canonical.phase6 import phase6_events
+    from bp_registry.canonical.problems import OriginalProblem
+
+    original = OriginalProblem("original-phase6-payload", np.array([[1, 0]], dtype=np.uint8),
+                               np.array([[1, 0]], dtype=np.uint8), np.array([1], dtype=np.uint8))
+    basis = MbbpBasis("member-0", 0, "p0", "q0", ((1,),))
+    result = MbbpController(MbbpSpec((basis,), max_iterations=1, max_member_c2v_updates=0)).run(
+        original, error_rate=0.1,
+    )
+
+    member = next(payload for kind, payload in phase6_events(original, bases=(basis,), result=result).events
+                  if kind == "member")
+
+    assert set(member) == {
+        "member_id", "local_ordinal", "lineage_id", "basis_identity", "initial_state_identity",
+        "schedule", "normalized_min_sum_alpha", "status", "candidate", "original_valid", "admitted", "work",
+    }
+    assert result.members[0].terminal_posterior is None
+
+
 def test_phase6_historical_schema_six_retains_its_dispatch():
     from bp_registry.manifests import parse_manifest
 
