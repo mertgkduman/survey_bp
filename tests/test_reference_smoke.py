@@ -3,6 +3,17 @@
 import pytest
 
 
+@pytest.mark.parametrize(
+    "name",
+    ("NativeBpOsdReference", "NativeBpLsdReference"),
+)
+def test_native_composite_reference_adapters_are_explicit(name):
+    """Pinned native composites must retain identities distinct from canonical BP."""
+    from bp_registry import reference
+
+    assert hasattr(reference, name), f"{name} must be an explicit native reference adapter"
+
+
 def test_native_bp_fits_tiny_syndrome():
     import numpy as np
     from bp_registry.reference import decode
