@@ -61,3 +61,9 @@ def test_accepted_column_cap_retains_the_ordered_denial_evidence():
     assert forest.cap_denied_columns == (1, 2)
     assert forest.is_acyclic() is True
     assert forest.is_ordered_maximal() is False
+
+
+def test_otf_rerun_is_a_method_owned_same_kernel_operation():
+    from bp_registry.canonical.postprocessing.otf import OrderedTannerForestSpec
+
+    assert hasattr(OrderedTannerForestSpec, "run")
