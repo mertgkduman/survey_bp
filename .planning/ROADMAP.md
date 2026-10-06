@@ -430,18 +430,56 @@ Plans:
 
 **Research focus:** Standalone fallback interfaces, reliability conventions, exact SI/OTF variants, and source numerical/API drift.
 **Parallel literature work:** Continue adding source-grounded paper folders and runnable policy files for compatible CSS decoders while Phase 7 is built. Preserve source specifications and blockers in `paper_reproduction/`; use bounded pilots to expose missing kernel or manifest support. Any larger paper-curve assessment waits for Phase 8 campaign controls.
-**Plans:** 10 plans
+**Plans:** 15 plans planned and independently verified
 
 Plans:
-- [ ] 07-01-PLAN.md — Prove the complete-composition fallback boundary through released standalone LSD.
+
+**Wave 1**
+
+- [ ] 07-01-PLAN.md — Run the public canonical BP-to-LSD tracer with ledger replay.
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 07-02-PLAN.md — Verify the official standalone OSD source identity before any build.
-- [ ] 07-03-PLAN.md — Qualify and integrate standalone OSD through an isolated worker.
 - [ ] 07-04-PLAN.md — Implement source-anchored SI mechanics as a labeled CSS adaptation.
-- [ ] 07-05-PLAN.md — Implement ordered Tanner forest mechanics as a labeled CSS adaptation.
 - [ ] 07-06-PLAN.md — Add pinned native BP-OSD/BP-LSD composite references.
-- [ ] 07-07-PLAN.md — Expose strict public manifests, ledger replay, and CLI execution.
-- [ ] 07-08-PLAN.md — Extend complete literature policy files and controlled fallback arms.
+- [ ] 07-11-PLAN.md — Preserve real failed-attempt posterior snapshots for supported compositions.
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 07-03-PLAN.md — Qualify and integrate standalone OSD through an isolated worker.
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 07-05-PLAN.md — Implement ordered Tanner forest mechanics as a labeled CSS adaptation.
+
+**Wave 5** *(blocked on Wave 4 and snapshot completion)*
+
+- [ ] 07-07-PLAN.md — Admit qualified fallback methods and snapshot-capable compositions in strict public manifests.
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
+- [ ] 07-12-PLAN.md — Emit and independently replay Phase 7 fallback evidence.
+
+**Wave 7** *(blocked on Wave 6 completion)*
+
+- [ ] 07-13-PLAN.md — Expose Phase 7 preflight, run, results, and verify-run through the public CLI.
+
+**Wave 8** *(blocked on Wave 7 completion)*
+
+- [ ] 07-08-PLAN.md — Compile complete literature policy files and resolve controlled fallback arms.
+
+**Wave 9** *(blocked on Wave 8 completion)*
+
+- [ ] 07-14-PLAN.md — Publish complete runnable OSD and LSD policy variants.
+- [ ] 07-15-PLAN.md — Publish SI/OTF faithful specifications and named CSS adaptations.
+
+**Wave 10** *(blocked on Wave 9 completion)*
+
 - [ ] 07-09-PLAN.md — Run and verify the bounded matched B1 mechanism view.
+
+**Wave 11** *(blocked on Wave 10 completion)*
+
 - [ ] 07-10-PLAN.md — Publish the digest-bound shot-first notebook and HTML evidence view.
 
 ### Phase 8: Reproducible Campaigns and Statistical Assessment
@@ -574,7 +612,7 @@ Plans:
 | 4. Memory Policies and Relay-BP | 15/15 | Complete    | 2026-09-30 |
 | 5. Guided and Perturbative BP Interventions | 14/14 | Human review pending |  |
 | 6. Beam Search, Ensembles, and Candidate Selection | 9/9 | Complete    | 2026-10-05 |
-| 7. Optional Postprocessing | 0/TBD | Not started | - |
+| 7. Optional Postprocessing | 0/15 | Planned | - |
 | 8. Reproducible Campaigns and Statistical Assessment | 0/TBD | Not started | - |
 | 9. CSS Reproduction and Controlled Comparisons | 0/TBD | Not started | - |
 | 10. Correlated Quaternary Execution | 0/TBD | Not started | - |
