@@ -11,14 +11,14 @@ def _working():
     from bp_registry.canonical.problems import OriginalProblem, WorkingProblem
 
     original = OriginalProblem(
-        "handoff-original",
+        "original-handoff",
         np.zeros((1, 3), dtype=np.uint8),
         np.asarray([[1, 1, 0], [0, 1, 1]], dtype=np.uint8),
         np.asarray([1, 0], dtype=np.uint8),
     )
     return WorkingProblem(
-        "handoff-working", original,
-        LineageEdge("identity", LineageId("original", original.lineage_id), LineageId("working", "handoff-working")),
+        "working-handoff", original,
+        LineageEdge("identity", LineageId("original", original.lineage_id), LineageId("working", "working-handoff")),
     )
 
 
@@ -80,7 +80,7 @@ def test_single_attempt_original_validity_suppresses_fallback_and_hidden_truth_i
     from bp_registry.canonical.postprocessing import adapt_flooding_attempt
 
     result = adapt_flooding_attempt(
-        _failed_attempt(candidate=(0, 1, 0), converged=True), working=_working(), error_rate=0.1,
+        _failed_attempt(candidate=(1, 0, 0), converged=True), working=_working(), error_rate=0.1,
         attempt_lineage_id="attempt-0", declared_attempt_ordinal=0,
     )
 

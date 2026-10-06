@@ -18,7 +18,7 @@ from .lineage import LineageEdge, stable_lineage_id
 from .problems import OriginalProblem, WorkingProblem
 from .schedules import EdgeTable, FloodingSchedule
 
-from .postprocessing import FailedAttemptSnapshot, LsdPostprocessor, PostprocessingController, PostprocessingResult
+from .postprocessing import LsdPostprocessor, PostprocessingController, PostprocessingResult, adapt_flooding_attempt
 
 
 def phase7_events(result: PostprocessingResult) -> tuple[tuple[str, dict[str, Any]], ...]:
@@ -75,21 +75,15 @@ def run_phase7_structural_shot(
         initialized, observation.syndrome, error_rate=parsed.error_rate, max_iterations=parsed.max_iterations,
         is_converged=lambda sweep: bool(np.array_equal((validated.hz @ sweep.candidate) % 2, observation.syndrome)),
     )
-    sweep = attempt.last_sweep
-    bp_candidate = None if sweep is None else np.asarray(sweep.candidate, dtype=np.uint8)
-    bp_succeeded = bool(attempt.converged and bp_candidate is not None)
-    snapshots: tuple[FailedAttemptSnapshot, ...] = ()
-    if bp_candidate is not None and not bp_succeeded:
-        residual = (validated.hz @ bp_candidate) % 2
-        snapshots = (FailedAttemptSnapshot(
-            attempt_lineage_id=f"attempt-{shot_id}-0", working=working, candidate=bp_candidate,
-            posterior_llr=np.asarray(sweep.beliefs, dtype=np.float64),
-            original_residual_weight=int(np.count_nonzero(residual != observation.syndrome)),
-            original_channel_nll=float(np.sum(np.abs(sweep.beliefs))), declared_attempt_ordinal=0,
-        ),)
+    bp_candidate = attempt.terminal_candidate
+    composition = adapt_flooding_attempt(
+        attempt, working=working, error_rate=parsed.error_rate,
+        attempt_lineage_id=f"attempt-{shot_id}-0", declared_attempt_ordinal=0,
+    )
+    bp_succeeded = composition.disposition == "composition_success"
     enabled = bool(config.get("enabled"))
     processor = (LsdPostprocessor(method=str(config["method"]), order=int(config["order"])) if enabled else None)
-    result = PostprocessingController(processor).execute(snapshots, bp_succeeded=bp_succeeded)
+    result = PostprocessingController(processor).execute_composition(composition)
     final = (np.asarray(result.candidate, dtype=np.uint8) if result.status == "success" and result.candidate is not None
              else bp_candidate)
     evaluation = None if final is None else evaluator.evaluate_candidate(

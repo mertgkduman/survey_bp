@@ -143,6 +143,24 @@ class AtomicFloodingResult:
     last_sweep: FloodingSweep | None
     converged: bool = False
 
+    @property
+    def terminal_candidate(self) -> np.ndarray | None:
+        """Return the last committed decoder-visible candidate, never an alias."""
+        if self.last_sweep is None:
+            return None
+        candidate = np.array(self.last_sweep.candidate, dtype=np.uint8, copy=True)
+        candidate.setflags(write=False)
+        return candidate
+
+    @property
+    def terminal_posterior(self) -> np.ndarray | None:
+        """Return the last committed posterior reliability, never an alias."""
+        if self.last_sweep is None:
+            return None
+        posterior = np.array(self.last_sweep.beliefs, dtype=np.float64, copy=True)
+        posterior.setflags(write=False)
+        return posterior
+
 
 @dataclass(frozen=True, slots=True)
 class ScheduleProgress:
