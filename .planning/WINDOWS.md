@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 7
+open_count: 8
 waived_count: 0
 fixed_count: 3
-total_count: 10
-last_updated: 2026-09-25T02:50:48.185Z
+total_count: 11
+last_updated: 2026-10-06T04:59:35.849Z
 ---
 
 # Broken Windows Ledger
@@ -25,6 +25,7 @@ last_updated: 2026-09-25T02:50:48.185Z
 | 8 | 04 | skipped-test | tests/canonical/test_phase4_evidence.py | 19 | B1 digest reconciliation and bounded notebook reuse evidence are deferred to Wave 1. | open |  | 2026-09-24T23:03:29.449Z |  |
 | 9 | 04 | unrun-verify | tests/test_canonical_cli.py | 21 | Inherited canonical CLI verification is blocked because .venv subprocesses cannot import bp_registry. | open |  | 2026-09-24T23:03:30.055Z |  |
 | 10 | 04 | unrun-verify | scripts/qualify_relay_v022.py |  | Author decode_144_12_12 full native test exceeded the 720-second qualification bound and remains inconclusive. | open |  | 2026-09-25T02:50:48.185Z |  |
+| 11 | 07 | unrun-verify | tests/canonical/test_postprocessing_handoff.py |  | Planned SI handoff regression was unavailable because the test file is absent from this checkout. | open |  | 2026-10-06T04:59:35.849Z |  |
 
 ````json
 [
@@ -155,6 +156,19 @@ last_updated: 2026-09-25T02:50:48.185Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-09-25T02:50:48.185Z",
+    "resolved_at": null,
+    "milestone": "v1.0"
+  },
+  {
+    "id": 11,
+    "kind": "unrun-verify",
+    "phase": "07",
+    "file": "tests/canonical/test_postprocessing_handoff.py",
+    "line": null,
+    "description": "Planned SI handoff regression was unavailable because the test file is absent from this checkout.",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-10-06T04:59:35.849Z",
     "resolved_at": null,
     "milestone": "v1.0"
   }
