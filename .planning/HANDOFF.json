@@ -1,0 +1,131 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-10-06T15:01:04.648Z",
+  "phase": "07",
+  "phase_name": "Optional Postprocessing",
+  "phase_dir": ".planning/phases/07-optional-postprocessing",
+  "plan": 3,
+  "task": 2,
+  "total_tasks": 2,
+  "status": "paused",
+  "completed_tasks": [
+    {
+      "id": 1,
+      "name": "Qualify the exact standalone OSD source in isolation",
+      "status": "done_with_failed_qualification",
+      "commit": "44d5aec",
+      "evidence": "data/qualifications/phase7-standalone-osd-baec4c8.json"
+    },
+    {
+      "id": "other_phase7_plans",
+      "name": "Plans 07-01, 07-02, 07-04, 07-05, 07-06, and 07-11",
+      "status": "done",
+      "evidence": ".planning/ROADMAP.md"
+    }
+  ],
+  "remaining_tasks": [
+    {
+      "id": 2,
+      "name": "Execute qualified OSD from canonical handoff",
+      "status": "blocked_by_failed_qualification"
+    },
+    {
+      "id": "other_phase7_plans",
+      "name": "Plans 07-07 through 07-10 and 07-12 through 07-15",
+      "status": "paused"
+    }
+  ],
+  "blockers": [
+    {
+      "description": "Exact approved standalone_osd commit lacks an exposed complete higher-order candidate/score API; POST-01 receipt is failed and non-runnable.",
+      "type": "technical",
+      "workaround": "When Phase 7 resumes, revisit the evidence contract or explicitly approve and qualify a separate trace-only source patch; neither is authorized now."
+    },
+    {
+      "description": "User explicitly froze optional postprocessing to prioritize BP variants.",
+      "type": "human_action",
+      "workaround": "Do not resume Phase 7 unless the user reprioritizes it."
+    }
+  ],
+  "async_jobs": [],
+  "human_actions_pending": [
+    {
+      "action": "Choose the next BP-focused workstream",
+      "context": "The roadmap next lists campaign infrastructure, while the user wants BP variants. An asynchronous choice between quaternary BP, CSS variants, and BP comparison tools is pending.",
+      "blocking": true
+    }
+  ],
+  "decisions": [
+    {
+      "decision": "Approve exact quantumgizmos/ldpc.git standalone_osd commit baec4c8bfa2a679b0ba0e72df5582e277cd6918b for isolated build only.",
+      "rationale": "User approved the exact source and primary-environment isolation.",
+      "phase": "07"
+    },
+    {
+      "decision": "Leave standalone OSD non-runnable after its missing candidate-evidence API was observed.",
+      "rationale": "The Phase 7 provenance contract requires every higher-order candidate and score; no substitute or source patch was approved.",
+      "phase": "07"
+    },
+    {
+      "decision": "Pause optional postprocessing and prioritize BP variants.",
+      "rationale": "Explicit user direction on 2026-10-06.",
+      "phase": "07"
+    }
+  ],
+  "uncommitted_files": [
+    " M .planning/ROADMAP.md",
+    " M .planning/STATE.md",
+    "?? .claude/",
+    "?? .gsd/dispatch-isolation-sentinel.json",
+    "?? .gsd/tdd-evidence/01-06-task-1-red.json",
+    "?? .gsd/tdd-evidence/01-06-task-2-red.json",
+    "?? .gsd/tdd-evidence/02-03-task-1-red.json",
+    "?? .gsd/tdd-evidence/02-03-task-2-red.json",
+    "?? .gsd/tdd-evidence/02-04-task-1-red.json",
+    "?? .gsd/tdd-evidence/02-04-task-2-red.json",
+    "?? .gsd/tdd-evidence/02-06-task-1-red.json",
+    "?? .gsd/tdd-evidence/02-06-task-2-red.json",
+    "?? .gsd/tdd-evidence/02-09-task-1-red.json",
+    "?? .gsd/tdd-evidence/02-09-task-2-red.json",
+    "?? .gsd/tdd-evidence/02-10-task-1-red.json",
+    "?? .gsd/tdd-evidence/02-10-task-2-red.json",
+    "?? .gsd/tdd-evidence/04-02-task-1-red.json",
+    "?? .gsd/tdd-evidence/04-02-task-2-red.json",
+    "?? .gsd/tdd-evidence/04-03-task-1-red.json",
+    "?? .gsd/tdd-evidence/04-03-task-2-red.json",
+    "?? .gsd/tdd-evidence/04-04-task-1-red.json",
+    "?? .gsd/tdd-evidence/04-05-task-1-red.json",
+    "?? .gsd/tdd-evidence/04-05-task-2-red.json",
+    "?? .gsd/tdd-evidence/04-06-task-1-red.json",
+    "?? .gsd/tdd-evidence/04-06-task-2-red.json",
+    "?? .gsd/tdd-evidence/04-08-task-1-red.json",
+    "?? .gsd/tdd-evidence/04-09-task-1-red.json",
+    "?? .gsd/tdd-evidence/04-09-task-2-red.json",
+    "?? .gsd/tdd-evidence/04-10-task-1-red.json",
+    "?? .gsd/tdd-evidence/04-10-task-2-red.json",
+    "?? .gsd/tdd-evidence/04-15-task-1-red.json",
+    "?? .gsd/tdd-evidence/07-05-task-1-red.json",
+    "?? .gsd/tdd-evidence/07-05-task-2-red.json",
+    "?? .gsd/tdd-evidence/07-06-task-1-red.json",
+    "?? .gsd/tdd-evidence/07-06-task-2-red.json",
+    "?? .gsd/tdd-evidence/07-11-task-1-red.json",
+    "?? .gsd/tdd-evidence/07-11-task-2-red.json",
+    "?? .planning/milestone.lock",
+    "?? .planning/research/.cache/0f2b1f6b72934bdea651d05856dd2e2b59d2645ce154ab7c50523cb6e4afdd01.json",
+    "?? .planning/research/.cache/207a18db0111d9012c0b3f55e4ccf49e470f106af9cce27b8fce8fbbd9aaf6e7.json",
+    "?? .planning/research/.cache/23089a100a9886ce2666f08db07992a73e7da93f4e4561febe50ba86dc7fed95.json",
+    "?? .planning/research/.cache/25b52f76b187ebf5fec9ef2d7eaa6233f61edcabe45bfe5379732bfa580442c4.json",
+    "?? .planning/research/.cache/4f24c1b9d9cfbd75f1ba01126f5572b41ba5fb415dc8967eb0e19ae424b1e40f.json",
+    "?? .planning/research/.cache/91894d423a6876c35dc20d34fe8881278f295fede13e007641bc5dc1e74d6056.json",
+    "?? .planning/research/.cache/9ba3ffb63477b97cbba3b629fb2e9914c4082ef5cb9e6b8b120a2e25dce849ef.json",
+    "?? .planning/research/.cache/ee134ae47572fec0a9fe2d11889b785a0d5d6852a8168ab24a2ae2d2206b8dd9.json",
+    "?? .planning/research/.cache/eef14d7b2d86bee15f71d71f6491f565b16374d3e729a670a034c6a3bc6ca862.json",
+    "?? .planning/research/.cache/f1f1a5641d5cd97121dad698381d74fe143eeed446d35ced06af3eba4da84906.json",
+    "?? .planning/state.json",
+    "?? data/results/bb72-bpsf-factorial-v2/continuation-57637301.log"
+  ],
+  "uncommitted_file_count": 206,
+  "uncommitted_elided_count": 156,
+  "next_action": "Obtain/consume the user choice for BP-focused work, amend roadmap dependencies and state accordingly, then start that GSD phase. Do not resume Phase 7 without explicit reprioritization.",
+  "context_notes": "Phase 7 is 6/15 complete; Plan 07-03 has a halted summary that GSD summary-count helpers may incorrectly count as complete. Its receipt is non-runnable. Plan 07-05 OTF was completed independently and full pytest passed 861, 1 skipped. Primary .venv ldpc is 2.4.1. Main is clean for tracked files except planned pause edits; numerous preexisting untracked research outputs must not be staged or deleted. Two orphaned qualifier polling shells were stopped. GSD-managed worktree creation timed out on this HPC filesystem; protected-main commits require a dedicated branch and reviewed fast-forward."
+}

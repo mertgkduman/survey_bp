@@ -6,7 +6,7 @@ Build a provenance-preserving research platform from paper evidence through nati
 
 **Milestone:** v1.0 — platform and first journal-paper evidence.
 **Structure:** End-to-end capability slices (`mvp` mode), fine granularity. Fourteen phases are used because the three required regimes each need distinct implementation and experimental qualification; phase counts are not a reason to merge those gates or defer publication scope.
-**Planning status:** Phases 1–4 and 6 are complete. Phase 5 implementation is technically verified with human visual review still open. Phase 7 is next for planning; CSS literature intake and bounded pilots continue alongside it. Later plan counts remain TBD.
+**Planning status:** Phases 1–4 and 6 are complete. Phase 5 implementation is technically verified with human visual review still open. Phase 7 is paused at 6/15 completed plans by user direction to prioritize BP variants; its failed OSD qualification remains recorded. The next BP-focused phase will be selected before revising the execution order. Later plan counts remain TBD.
 
 ## Phases
 
@@ -16,7 +16,7 @@ Build a provenance-preserving research platform from paper evidence through nati
 - [x] **Phase 4: Memory Policies and Relay-BP** — Implement state/history policies and the source-defined relay composition. (completed 2026-09-30)
 - [ ] **Phase 5: Guided and Perturbative BP Interventions** — Implement BPGD, impulse, freezing, syndrome/sign flips, and restarting.
 - [x] **Phase 6: Beam Search, Ensembles, and Candidate Selection** — Expose branching, pruning, lists, and voting as auditable policies, and qualify the first three-paper CSS policy-file gate. (completed 2026-10-05)
-- [ ] **Phase 7: Optional Postprocessing** — Add independent OSD/LSD/SI/OTF processing with BP-only attribution preserved.
+- [ ] **Phase 7: Optional Postprocessing** — Paused by user after 6/15 plans to prioritize BP variants; retain the isolated OSD qualification failure and completed LSD/SI/OTF work for later resumption.
 - [ ] **Phase 8: Reproducible Campaigns and Statistical Assessment** — Run paired, resumable campaigns with prespecified statistical criteria.
 - [ ] **Phase 9: CSS Reproduction and Controlled Comparisons** — Qualify selected source results and isolate policy contributions in CSS decoding.
 - [ ] **Phase 10: Correlated Quaternary Execution** — Add joint Pauli inference and explicitly compatible policy compositions.
@@ -430,7 +430,8 @@ Plans:
 
 **Research focus:** Standalone fallback interfaces, reliability conventions, exact SI/OTF variants, and source numerical/API drift.
 **Parallel literature work:** Continue adding source-grounded paper folders and runnable policy files for compatible CSS decoders while Phase 7 is built. Preserve source specifications and blockers in `paper_reproduction/`; use bounded pilots to expose missing kernel or manifest support. Any larger paper-curve assessment waits for Phase 8 campaign controls.
-**Plans:** 6/15 plans complete; 07-03 qualification halted pending an OSD evidence decision.
+**Plans:** 6/15 plans complete; remaining work paused by user. Plan 07-03 qualification is failed and non-runnable.
+**Pause decision:** On 2026-10-06, the user froze optional postprocessing and prioritized BP variants. No OSD source patch or reduced evidence contract is authorized by this decision.
 
 Plans:
 
@@ -602,7 +603,7 @@ Plans:
 
 ## Progress
 
-**Execution order:** 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11 → 12 → 13 → 14. Independent plans within a phase may execute in parallel once their dependencies are verified.
+**Execution order:** Phases 1–6 are complete or technically verified as recorded above. Phase 7 is paused. Select and document the next BP-focused phase and its dependency change before executing later phases; independent plans within a phase may execute in parallel once their dependencies are verified.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -612,7 +613,7 @@ Plans:
 | 4. Memory Policies and Relay-BP | 15/15 | Complete    | 2026-09-30 |
 | 5. Guided and Perturbative BP Interventions | 14/14 | Human review pending |  |
 | 6. Beam Search, Ensembles, and Candidate Selection | 9/9 | Complete    | 2026-10-05 |
-| 7. Optional Postprocessing | 6/15 | Blocked on POST-01 decision |  |
+| 7. Optional Postprocessing | 6/15 | Paused by user; POST-01 qualification failed |  |
 | 8. Reproducible Campaigns and Statistical Assessment | 0/TBD | Not started | - |
 | 9. CSS Reproduction and Controlled Comparisons | 0/TBD | Not started | - |
 | 10. Correlated Quaternary Execution | 0/TBD | Not started | - |

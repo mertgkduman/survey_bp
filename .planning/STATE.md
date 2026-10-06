@@ -4,12 +4,12 @@ milestone: v1.0
 current_phase: 07
 current_phase_name: Optional Postprocessing
 current_plan: 3
-status: executing
-stopped_at: "Phase 07 Plan 07-03 qualification halted: approved OSD source lacks complete candidate-evidence API; Plan 07-05 OTF completed independently"
-last_updated: "2026-10-06T07:58:55.701Z"
+status: paused
+stopped_at: Phase 07 optional postprocessing paused by user after 6/15 completed plans; prioritize BP variants next
+last_updated: "2026-10-06T15:00:22.770Z"
 last_activity: 2026-10-06
-last_activity_desc: Phase 07 execution started
-state_head: 07178d47350929c72102d3dfb1ba7aba58988c03
+last_activity_desc: Phase 07 paused by user to prioritize BP variants
+state_head: b43f71772164d797c5a195100fac4afb95872252
 progress:
   total_phases: 14
   completed_phases: 5
@@ -24,18 +24,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-22)
 
 **Core value:** Make BP decoder differences explicit, reproducible, and fairly comparable through canonical policy execution and published evidence.
-**Current focus:** Phase 07 — Optional Postprocessing
+**Current focus:** Select the next BP-focused phase; Phase 07 optional postprocessing is paused.
 
 ## Current Position
 
-Phase: 07 (Optional Postprocessing) — EXECUTING
+Phase: 07 (Optional Postprocessing) — PAUSED
 Plan: 3 of 15
 Total Phases: 14
 Current Plan: 3
 Total Plans in Phase: 15
-Status: Ready to execute
-Last activity: 2026-10-06 — Phase 07 execution started
-Last Activity Description: Phase 07 execution started
+Status: Paused by user to prioritize BP variants
+Last activity: 2026-10-06 — Phase 07 paused by user
+Last Activity Description: Phase 07 paused by user to prioritize BP variants
 
 Progress: [████░░░░░░] 5 of 14 phases complete (36%)
 
@@ -168,7 +168,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 - Statistical targets and compute budgets for publication campaigns remain to be prespecified.
 - The observed development environment is node-specific; recheck package and backend identity before interpreting runs elsewhere.
 - Circuit fault correlations and observable semantics require dedicated qualification; a CSS adaptation does not reproduce a circuit paper.
-- Phase 07 POST-01 / Plan 07-03: approved standalone OSD commit builds in isolation but does not expose complete higher-order candidate solutions and scores; qualification receipt is failed/non-runnable. User decision pending on a source instrumentation patch, reduced evidence contract, or leaving OSD blocked.
+- Phase 07 POST-01 / Plan 07-03: approved standalone OSD commit builds in isolation but does not expose complete higher-order candidate solutions and scores; qualification receipt is failed/non-runnable. The user paused postprocessing, so no OSD source patch or reduced evidence contract is being pursued now.
 
 ### Quick Tasks Completed
 
@@ -202,9 +202,9 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 **Resume file:** .planning/phases/07-optional-postprocessing/07-03-SUMMARY.md
 
-Last session: 2026-10-06T07:58:53.195Z
-Stopped at: Phase 07 Plan 07-03 qualification halted: approved OSD source lacks complete candidate-evidence API; Plan 07-05 OTF completed independently
-Next command: Resolve the Plan 07-03 OSD evidence decision, then continue $gsd-execute-phase 7 from the recorded failed qualification receipt.
+Last session: 2026-10-06T15:00:19.355Z
+Stopped at: Phase 07 optional postprocessing paused by user after 6/15 completed plans; prioritize BP variants next
+Next command: Select the next BP-focused phase and update its dependency/order before starting; use $gsd-resume-work when optional postprocessing is reprioritized.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
 Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md`.
