@@ -24,6 +24,7 @@ key-files:
     - src/bp_registry/canonical/mbbp.py
     - src/bp_registry/canonical/schedules.py
     - tests/canonical/test_mbbp.py
+    - tests/test_phase6_public_execution.py
 key-decisions:
   - "Recompute original-syndrome validity from terminal candidates before postprocessing eligibility so a budget-limited member cannot trigger fallback after a valid BP result."
   - "Treat missing or unusable terminal evidence as an incompatible handoff and skip fallback rather than dropping a failed attempt."
@@ -49,7 +50,7 @@ coverage:
 actuals:
   tokens: 7613
   tasks: 2
-  commits: 5
+  commits: 6
 plan_head_before: f0cbe29945c806cdd2e2fdf3a06ad7b0f0aad4aa
 duration: 8min
 completed: 2026-10-06
@@ -71,6 +72,7 @@ Canonical flooding and MBBP now freeze decoder-visible terminal reliability befo
 
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_mbbp.py tests/canonical/test_postprocessing_handoff.py -k 'member and (posterior or snapshot or completion_order or later_success or all_failed or ranking or unsupported or budget)' -x` — 4 passed.
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/test_mbbp.py tests/canonical/test_postprocessing_handoff.py tests/test_phase7_public_execution.py -x` — 24 passed.
+- `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_css_literature_gate.py::test_gate_package_replays_all_three_and_rejects_result_tamper -x --tb=short` — 1 passed in 205.13s.
 
 ## TDD Gate Compliance
 
@@ -86,6 +88,7 @@ Canonical flooding and MBBP now freeze decoder-visible terminal reliability befo
 3. `ba713b1` — `feat(07-11): freeze canonical terminal handoff`
 4. `3d35202` — `test(07-11): add failing MBBP handoff contracts`
 5. `6fb5b66` — `feat(07-11): retain MBBP terminal handoffs`
+6. `b47a236` — `fix(07-11): preserve Phase 6 member event grammar`
 
 ## Deviations from Plan
 
@@ -107,6 +110,14 @@ Canonical flooding and MBBP now freeze decoder-visible terminal reliability befo
 - **Verification:** MBBP and handoff regression suite passed.
 - **Committed in:** `6fb5b66`
 
+**3. [Rule 1 - Bug] Preserved sealed Phase 6 member-event payloads.**
+- **Found during:** Wave 2 integration gate
+- **Issue:** Serial posterior evidence added for Phase 7 was serialized through the existing Phase 6 MBBP event projection, causing historical V7 receipts to differ from deterministic replay.
+- **Fix:** Kept `terminal_posterior` on the in-memory MBBP member for the Phase 7 adapter while excluding it from the established Phase 6 structural payload grammar.
+- **Files modified:** `src/bp_registry/canonical/mbbp.py`, `tests/test_phase6_public_execution.py`
+- **Verification:** Phase 6 payload regression and the previously failing three-package literature gate passed.
+- **Committed in:** `b47a236`
+
 ## Issues Encountered
 
 The first Task 1 RED probe initially failed during import collection. The test was corrected to make a direct assertion about the missing public adapter before implementation; the recorded RED evidence then passed the TDD gate.
@@ -117,7 +128,7 @@ None.
 
 ## Self-Check: PASSED
 
-All seven implementation/test files and the summary exist. The five recorded TDD task commits are present in Git.
+All implementation/test files and the summary exist. The six recorded task commits are present in Git.
 
 ## Next Phase Readiness
 
