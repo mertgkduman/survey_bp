@@ -430,7 +430,7 @@ Plans:
 
 **Research focus:** Standalone fallback interfaces, reliability conventions, exact SI/OTF variants, and source numerical/API drift.
 **Parallel literature work:** Continue adding source-grounded paper folders and runnable policy files for compatible CSS decoders while Phase 7 is built. Preserve source specifications and blockers in `paper_reproduction/`; use bounded pilots to expose missing kernel or manifest support. Any larger paper-curve assessment waits for Phase 8 campaign controls.
-**Plans:** 4/15 plans executed planned and independently verified
+**Plans:** 5/15 plans executed planned and independently verified
 
 Plans:
 
@@ -440,7 +440,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 07-02-PLAN.md — Verify the official standalone OSD source identity before any build.
+- [x] 07-02-PLAN.md — Verify the official standalone OSD source identity before any build.
 - [x] 07-04-PLAN.md — Implement source-anchored SI mechanics as a labeled CSS adaptation.
 - [x] 07-06-PLAN.md — Add pinned native BP-OSD/BP-LSD composite references.
 - [x] 07-11-PLAN.md — Preserve real failed-attempt posterior snapshots for supported compositions.
@@ -612,7 +612,7 @@ Plans:
 | 4. Memory Policies and Relay-BP | 15/15 | Complete    | 2026-09-30 |
 | 5. Guided and Perturbative BP Interventions | 14/14 | Human review pending |  |
 | 6. Beam Search, Ensembles, and Candidate Selection | 9/9 | Complete    | 2026-10-05 |
-| 7. Optional Postprocessing | 4/15 | In Progress|  |
+| 7. Optional Postprocessing | 5/15 | In Progress|  |
 | 8. Reproducible Campaigns and Statistical Assessment | 0/TBD | Not started | - |
 | 9. CSS Reproduction and Controlled Comparisons | 0/TBD | Not started | - |
 | 10. Correlated Quaternary Execution | 0/TBD | Not started | - |
