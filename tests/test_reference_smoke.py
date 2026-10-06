@@ -14,6 +14,105 @@ def test_native_composite_reference_adapters_are_explicit(name):
     assert hasattr(reference, name), f"{name} must be an explicit native reference adapter"
 
 
+@pytest.mark.parametrize(
+    ("adapter_name", "controls"),
+    (
+        ("NativeBpOsdReference", {"osd_method": "OSD_0", "osd_order": 0}),
+        ("NativeBpLsdReference", {
+            "lsd_method": "LSD_0", "lsd_order": 0, "bits_per_step": 1,
+            "always_run_lsd": False,
+        }),
+    ),
+)
+def test_native_composites_preserve_distinct_identity_original_validation_and_missingness(
+    adapter_name, controls,
+):
+    """A composite owns its BP lifecycle and exposes no invented internal work."""
+    import numpy as np
+    from bp_registry import reference
+
+    h = np.array([[1, 1, 0, 1], [1, 0, 0, 0]], dtype=np.uint8)
+    syndrome = np.array([1, 0], dtype=np.uint8)
+    adapter = getattr(reference, adapter_name)
+    result = adapter.decode(
+        h, syndrome, error_rate=0.1, max_iter=1, observation_identity="matched-shot-7", **controls,
+    )
+
+    assert result.identity["kind"] == "native_composite_reference"
+    assert result.identity["package"] == "ldpc"
+    assert result.identity["version"] == "2.4.1"
+    assert result.identity["includes_internal_bp"] == "true"
+    assert result.observation_identity == "matched-shot-7"
+    assert result.constructor_controls.items() >= controls.items()
+    assert result.terminal_status == "completed"
+    assert result.original_syndrome_valid is True
+    assert np.array_equal((h @ result.candidate) % 2, syndrome)
+    assert np.array_equal(result.bp_candidate, np.zeros(4, dtype=np.uint8))
+    assert result.converged is False
+    assert result.metric("native_iterations").missingness.value == "observed"
+    for name in (
+        "native_edge_updates", "native_control_flow_events", "native_internal_bp_work",
+        "native_fallback_work",
+    ):
+        assert result.metric(name).missingness.value == "unavailable"
+        assert result.metric(name).value is None
+        assert result.metric(name).unavailable_reason
+
+
+def test_native_bp_osd_and_bp_lsd_reject_implicit_or_unsupported_method_controls():
+    import numpy as np
+    from bp_registry.reference import decode_bp_lsd, decode_bp_osd
+
+    h = np.eye(2, dtype=np.uint8)
+    syndrome = np.array([1, 0], dtype=np.uint8)
+    with pytest.raises(ValueError, match="osd_method"):
+        decode_bp_osd(
+            h, syndrome, error_rate=0.1, max_iter=1, osd_method="OSD_UNDECLARED", osd_order=0,
+            observation_identity="method-boundary",
+        )
+    with pytest.raises(ValueError, match="bits_per_step"):
+        decode_bp_lsd(
+            h, syndrome, error_rate=0.1, max_iter=1, lsd_method="LSD_0", lsd_order=0,
+            bits_per_step=0, always_run_lsd=False, observation_identity="method-boundary",
+        )
+
+
+def test_native_bp_osd_retains_malformed_and_error_terminal_evidence(monkeypatch):
+    import numpy as np
+    from bp_registry import reference
+
+    class MalformedDecoder:
+        def __init__(self, *_args, **_kwargs):
+            self.iter = 1
+
+        def decode(self, _syndrome):
+            return np.array([2, 0], dtype=np.uint8)
+
+    monkeypatch.setattr(reference, "BpOsdDecoder", MalformedDecoder)
+    malformed = reference.decode_bp_osd(
+        np.eye(2, dtype=np.uint8), np.array([1, 0], dtype=np.uint8), error_rate=0.1, max_iter=1,
+        osd_method="OSD_0", osd_order=0, observation_identity="malformed-native-output",
+    )
+    assert malformed.terminal_status == "malformed_output"
+    assert malformed.candidate is None
+    assert malformed.original_syndrome_valid is None
+    assert malformed.error_type == "ValueError"
+    assert malformed.metric("native_iterations").missingness.value == "unavailable"
+
+    class BrokenDecoder:
+        def __init__(self, *_args, **_kwargs):
+            raise RuntimeError("native boom")
+
+    monkeypatch.setattr(reference, "BpOsdDecoder", BrokenDecoder)
+    error = reference.decode_bp_osd(
+        np.eye(2, dtype=np.uint8), np.array([1, 0], dtype=np.uint8), error_rate=0.1, max_iter=1,
+        osd_method="OSD_0", osd_order=0, observation_identity="native-error",
+    )
+    assert error.terminal_status == "native_error"
+    assert error.error_type == "RuntimeError"
+    assert error.metric("native_fallback_work").value is None
+
+
 def test_native_bp_fits_tiny_syndrome():
     import numpy as np
     from bp_registry.reference import decode
