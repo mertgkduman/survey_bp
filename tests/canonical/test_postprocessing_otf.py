@@ -150,3 +150,28 @@ def test_circuit_source_status_stays_non_runnable_while_the_css_adaptation_has_n
     assert status.qualification == "source_faithful"
     assert "detector" in " ".join(status.blockers)
     assert OrderedTannerForestSpec.build.__annotations__.get("original") is not None
+
+
+def test_otf_postprocessor_uses_the_generic_one_shot_controller_protocol():
+    from bp_registry.canonical.lineage import LineageEdge, LineageId
+    from bp_registry.canonical.postprocessing import FailedAttemptSnapshot, PostprocessingController
+    from bp_registry.canonical.postprocessing.otf import OtfPostprocessor, OrderedTannerForestSpec
+    from bp_registry.canonical.problems import WorkingProblem
+
+    original = _original(syndrome=(1, 1))
+    working = WorkingProblem(
+        "working-otf", original,
+        LineageEdge("identity", LineageId("original", original.lineage_id), LineageId("working", "working-otf")),
+    )
+    snapshot = FailedAttemptSnapshot(
+        "otf-failed-attempt", working, np.zeros(3, dtype=np.uint8), np.asarray([-4.0, -3.0, 3.0]),
+        original_residual_weight=2, original_channel_nll=1.0, declared_attempt_ordinal=0,
+    )
+
+    result = PostprocessingController(
+        OtfPostprocessor(OrderedTannerForestSpec(), rerun=lambda forest: np.asarray([1, 0], dtype=np.uint8)),
+    ).execute((snapshot,), bp_succeeded=False)
+
+    assert result.status == "success"
+    assert result.candidate == (1, 0, 0)
+    assert result.native_calls == 1
