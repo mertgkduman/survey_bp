@@ -39,7 +39,10 @@ def _failed_attempt(*, candidate=(0, 0, 0), beliefs=(1.0, -2.0, 3.0), converged=
 
 
 def test_single_attempt_freezes_immutable_terminal_snapshot_before_fallback():
-    from bp_registry.canonical.postprocessing import adapt_flooding_attempt
+    from bp_registry.canonical import postprocessing
+
+    assert hasattr(postprocessing, "adapt_flooding_attempt"), "the flooding handoff adapter must be public"
+    adapt_flooding_attempt = postprocessing.adapt_flooding_attempt
 
     result = adapt_flooding_attempt(
         _failed_attempt(), working=_working(), error_rate=0.1,
