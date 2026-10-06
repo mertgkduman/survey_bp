@@ -1,15 +1,15 @@
 ---
 gsd_state_version: "1.0"
 milestone: v1.0
-current_phase: 07
-current_phase_name: Optional Postprocessing
-current_plan: 3
-status: paused
-stopped_at: Phase 07 optional postprocessing paused by user after 6/15 completed plans; prioritize BP variants next
-last_updated: "2026-10-06T15:00:22.770Z"
+current_phase: 10
+current_phase_name: Correlated Quaternary Execution
+current_plan: 0
+status: planning
+stopped_at: Phase 10 quaternary BP selected as next; roadmap dependencies updated; ready for phase context and planning
+last_updated: "2026-10-06T17:15:23.844Z"
 last_activity: 2026-10-06
-last_activity_desc: Phase 07 paused by user to prioritize BP variants
-state_head: b43f71772164d797c5a195100fac4afb95872252
+last_activity_desc: Quaternary BP selected next; Phase 7 remains paused
+state_head: 280f4dc170e3f99a08a3d57d28501fc0aa0d63b7
 progress:
   total_phases: 14
   completed_phases: 5
@@ -24,18 +24,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-22)
 
 **Core value:** Make BP decoder differences explicit, reproducible, and fairly comparable through canonical policy execution and published evidence.
-**Current focus:** Select the next BP-focused phase; Phase 07 optional postprocessing is paused.
+**Current focus:** Phase 10 — Correlated Quaternary Execution. Phase 07 optional postprocessing remains paused.
 
 ## Current Position
 
-Phase: 07 (Optional Postprocessing) — PAUSED
-Plan: 3 of 15
+Phase: 10 (Correlated Quaternary Execution) — PLANNING
+Plan: 0 of TBD
 Total Phases: 14
-Current Plan: 3
-Total Plans in Phase: 15
-Status: Paused by user to prioritize BP variants
-Last activity: 2026-10-06 — Phase 07 paused by user
-Last Activity Description: Phase 07 paused by user to prioritize BP variants
+Current Plan: 0
+Total Plans in Phase: TBD
+Status: Planning Phase 10
+Last activity: 2026-10-06 — Phase 10 selected as next BP priority
+Last Activity Description: Quaternary BP selected next; Phase 7 remains paused
 
 Progress: [████░░░░░░] 5 of 14 phases complete (36%)
 
@@ -194,17 +194,21 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 | 260930-0vq | Stop Phase 4 comprehensive experiment and right-size plans | 2026-09-30 | db99a51 | Verified | [260930-0vq-stop-phase-4-comprehensive-experiment-an](./quick/260930-0vq-stop-phase-4-comprehensive-experiment-an/) |
 | 260930-nuv | Create a source-backed study-design glossary in Markdown and color-coded PDF, then commit and push to GitHub | 2026-09-30 | 6ddf013 | Verified | [260930-nuv-create-a-source-backed-study-design-glos](./quick/260930-nuv-create-a-source-backed-study-design-glos/) |
 
+### Roadmap Evolution
+
+- Phase 10 reordered: User selected quaternary BP next: Phase 10 now depends on verified Phase 6 CSS foundation; Phase 8 can proceed independently of paused Phase 7, Phase 11 requires both Phase 8 statistical controls and Phase 10 engine, and optional fallback comparisons remain conditional on qualification.
+
 ## Deferred Items
 
 No requested decoding regime or named policy family is deferred beyond the first journal milestone. The cancelled comprehensive Phase 4 CSS evaluation/factorial is deferred from Phase 4; Phases 8–9 will scope any later CSS campaign afresh. Relay circuit-curve assessment remains in Phase 13.
 
 ## Session Continuity
 
-**Resume file:** .planning/phases/07-optional-postprocessing/07-03-SUMMARY.md
+**Resume file:** .planning/ROADMAP.md
 
-Last session: 2026-10-06T15:00:19.355Z
-Stopped at: Phase 07 optional postprocessing paused by user after 6/15 completed plans; prioritize BP variants next
-Next command: Select the next BP-focused phase and update its dependency/order before starting; use $gsd-resume-work when optional postprocessing is reprioritized.
+Last session: 2026-10-06T17:15:20.478Z
+Stopped at: Phase 10 quaternary BP selected as next; roadmap dependencies updated; ready for phase context and planning
+Next command: $gsd-discuss-phase 10, then $gsd-plan-phase 10; use the Phase 07 handoff only when optional postprocessing is reprioritized.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
 Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md`.

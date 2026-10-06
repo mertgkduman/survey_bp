@@ -48,13 +48,7 @@
     }
   ],
   "async_jobs": [],
-  "human_actions_pending": [
-    {
-      "action": "Choose the next BP-focused workstream",
-      "context": "The roadmap next lists campaign infrastructure, while the user wants BP variants. An asynchronous choice between quaternary BP, CSS variants, and BP comparison tools is pending.",
-      "blocking": true
-    }
-  ],
+  "human_actions_pending": [],
   "decisions": [
     {
       "decision": "Approve exact quantumgizmos/ldpc.git standalone_osd commit baec4c8bfa2a679b0ba0e72df5582e277cd6918b for isolated build only.",
@@ -70,6 +64,11 @@
       "decision": "Pause optional postprocessing and prioritize BP variants.",
       "rationale": "Explicit user direction on 2026-10-06.",
       "phase": "07"
+    },
+    {
+      "decision": "Advance Phase 10 correlated quaternary BP execution next while Phase 7 remains paused.",
+      "rationale": "User selected the quaternary BP kernel and compatible variants over campaign infrastructure or more CSS variants.",
+      "phase": "10"
     }
   ],
   "uncommitted_files": [
@@ -126,6 +125,6 @@
   ],
   "uncommitted_file_count": 206,
   "uncommitted_elided_count": 156,
-  "next_action": "Obtain/consume the user choice for BP-focused work, amend roadmap dependencies and state accordingly, then start that GSD phase. Do not resume Phase 7 without explicit reprioritization.",
-  "context_notes": "Phase 7 is 6/15 complete; Plan 07-03 has a halted summary that GSD summary-count helpers may incorrectly count as complete. Its receipt is non-runnable. Plan 07-05 OTF was completed independently and full pytest passed 861, 1 skipped. Primary .venv ldpc is 2.4.1. Main is clean for tracked files except planned pause edits; numerous preexisting untracked research outputs must not be staged or deleted. Two orphaned qualifier polling shells were stopped. GSD-managed worktree creation timed out on this HPC filesystem; protected-main commits require a dedicated branch and reviewed fast-forward."
+  "next_action": "Begin Phase 10 context and plan under the updated roadmap: Phase 10 depends on Phase 6; Phase 8 is independently available later; Phase 11 depends on Phases 8 and 10. Resume Phase 7 only if the user reprioritizes it.",
+  "context_notes": "Phase 7 is 6/15 complete; Plan 07-03 has a halted summary that GSD summary-count helpers may incorrectly count as complete. Its receipt is non-runnable. Plan 07-05 OTF was completed independently and full pytest passed 861, 1 skipped. Primary .venv ldpc is 2.4.1. Main is clean for tracked files except planned pause edits; numerous preexisting untracked research outputs must not be staged or deleted. Two orphaned qualifier polling shells were stopped. GSD-managed worktree creation timed out on this HPC filesystem; protected-main commits require a dedicated branch and reviewed fast-forward. After this handoff, the user selected Phase 10 as next; roadmap and STATE were updated accordingly."
 }

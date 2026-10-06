@@ -6,7 +6,7 @@ Build a provenance-preserving research platform from paper evidence through nati
 
 **Milestone:** v1.0 — platform and first journal-paper evidence.
 **Structure:** End-to-end capability slices (`mvp` mode), fine granularity. Fourteen phases are used because the three required regimes each need distinct implementation and experimental qualification; phase counts are not a reason to merge those gates or defer publication scope.
-**Planning status:** Phases 1–4 and 6 are complete. Phase 5 implementation is technically verified with human visual review still open. Phase 7 is paused at 6/15 completed plans by user direction to prioritize BP variants; its failed OSD qualification remains recorded. The next BP-focused phase will be selected before revising the execution order. Later plan counts remain TBD.
+**Planning status:** Phases 1–4 and 6 are complete. Phase 5 implementation is technically verified with human visual review still open. Phase 7 is paused at 6/15 completed plans by user direction to prioritize BP variants; its failed OSD qualification remains recorded. Phase 10 quaternary BP execution is next. Campaign and reproduction work remains in the first journal milestone. Later plan counts remain TBD.
 
 ## Phases
 
@@ -487,7 +487,7 @@ Plans:
 
 **Goal:** A researcher can run, resume, and statistically assess paired experiments without losing samples, changing stopping semantics, or hiding uncertainty.
 **Mode:** mvp
-**Depends on:** Phase 7
+**Depends on:** Phase 6
 **Requirements:** LED-05, SIM-01, SIM-02, SIM-03, STAT-01, STAT-02, STAT-03, STAT-04, STAT-05
 **Success Criteria:**
 
@@ -512,7 +512,7 @@ Plans:
 
 1. The selected CSS source experiments have pinned faithful configurations and native assessment reports, with original-code/settings gaps retained rather than silently defaulted.
 2. Canonical CSS realizations are assessed against declared published targets; source-faithful passes, discrepancies, inconclusive points, and adaptations are distinguishable in the registry.
-3. Controlled experiments and ablations share codes/noise/samples and explicit budgets, isolating update/schedule, memory/intervention, search/selection, and optional-fallback effects across eligible compositions.
+3. Controlled experiments and ablations share codes/noise/samples and explicit budgets, isolating update/schedule, memory/intervention, and search/selection effects across eligible compositions; optional-fallback effects enter only after their methods are independently qualified.
 4. Generated results report outcome classes and aggregate denominators, convergence, iterations, work, runtime and resource context separately, without asserting superiority beyond the observed evidence.
 5. Eligible CSS ensembles can select a declared public voting policy from a decoder file, execute it with complete ballots and lineage, validate the aggregate against the original syndrome, and replay the ledger. Voting comparisons use the same matched samples and budgets as list-selection controls.
 
@@ -524,7 +524,7 @@ Plans:
 
 **Goal:** A researcher can decode joint Pauli errors through a canonical quaternary BP kernel with verified correlation semantics and explicitly compatible policies.
 **Mode:** mvp
-**Depends on:** Phase 9
+**Depends on:** Phase 6
 **Requirements:** QBP-01, QBP-02, QBP-03, QBP-04
 **Success Criteria:**
 
@@ -534,13 +534,14 @@ Plans:
 4. Compatible source-backed policy compositions, including quaternary BPGD, execute with traceable semantics; unsupported ports are rejected and new adaptations are labeled.
 
 **Research focus:** Quaternary factor equations, scalar/vector message representations, memory/numeric choices, and policy-specific compatibility derivations.
+**Priority decision:** Begin this phase next, ahead of campaign infrastructure and reproduction, while Phase 7 optional postprocessing remains paused. Reuse the verified CSS execution lifecycle where mathematically compatible; keep correlated quaternary factors in their own canonical kernel family.
 **Plans:** TBD
 
 ### Phase 11: Quaternary Reproduction and Comparisons
 
 **Goal:** A researcher can qualify selected correlated code-capacity results and compare joint versus separate inference on identical physical samples.
 **Mode:** mvp
-**Depends on:** Phase 10
+**Depends on:** Phase 8 and Phase 10
 **Requirements:** QEV-01, QEV-02
 **Success Criteria:**
 
@@ -603,7 +604,7 @@ Plans:
 
 ## Progress
 
-**Execution order:** Phases 1–6 are complete or technically verified as recorded above. Phase 7 is paused. Select and document the next BP-focused phase and its dependency change before executing later phases; independent plans within a phase may execute in parallel once their dependencies are verified.
+**Execution order:** Phases 1–6 are complete or technically verified as recorded above. Phase 7 is paused. Execute Phase 10 quaternary BP next, then Phase 8 campaign controls before statistical assessment in Phases 9 and 11. The later circuit and journal phases retain their dependencies. Independent plans within a phase may execute in parallel once their dependencies are verified.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -616,7 +617,7 @@ Plans:
 | 7. Optional Postprocessing | 6/15 | Paused by user; POST-01 qualification failed |  |
 | 8. Reproducible Campaigns and Statistical Assessment | 0/TBD | Not started | - |
 | 9. CSS Reproduction and Controlled Comparisons | 0/TBD | Not started | - |
-| 10. Correlated Quaternary Execution | 0/TBD | Not started | - |
+| 10. Correlated Quaternary Execution | 0/TBD | Next — BP priority | - |
 | 11. Quaternary Reproduction and Comparisons | 0/TBD | Not started | - |
 | 12. Circuit Models and Canonical Integration | 0/TBD | Not started | - |
 | 13. Circuit Reproduction and Comparisons | 0/TBD | Not started | - |
