@@ -1,0 +1,277 @@
+{
+  "api": {
+    "candidate_enumeration_exposed": false,
+    "class": "OsdDecoder",
+    "decode_surface": "decode(syndrome, bit_weights)",
+    "methods": [
+      "OSD_0",
+      "OSD_E",
+      "OSD_CS"
+    ],
+    "module": "ldpc.osd_decoder",
+    "properties": [
+      "osd_method",
+      "osd_order",
+      "osd0_decoding",
+      "osdw_decoding"
+    ]
+  },
+  "build": {
+    "build_requirements": [
+      "setuptools>=68.2.2",
+      "Cython>=3.0.2",
+      "numpy",
+      "scipy",
+      "tqdm",
+      "pytest",
+      "stim",
+      "sinter>=1.12.0",
+      "pymatching"
+    ],
+    "compiler": "c++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)",
+    "dependency_freeze": [
+      "contourpy==1.4.0",
+      "cycler==0.12.1",
+      "Cython==3.3.0",
+      "fonttools==4.66.1",
+      "iniconfig==2.3.0",
+      "kiwisolver==1.5.1",
+      "ldpc @ file:///tmp/phase7-qualified-osd-G1rX5q/wheel/ldpc-2.3.10-cp312-cp312-linux_x86_64.whl#sha256=a4249e919f70e6ae82d0c5e72d797b6571bb9e578131c15bd872abe6d8c118bf",
+      "matplotlib==3.11.2",
+      "networkx==3.7",
+      "numpy==2.5.3",
+      "packaging==26.3",
+      "pillow==12.3.0",
+      "pluggy==1.6.0",
+      "Pygments==2.21.0",
+      "PyMatching==2.4.0",
+      "pyparsing==3.3.3",
+      "pytest==9.1.1",
+      "python-dateutil==2.9.0.post0",
+      "scipy==1.18.1",
+      "setuptools==84.0.0",
+      "sinter==1.16.0",
+      "six==1.17.0",
+      "stim==1.16.0",
+      "tqdm==4.70.1"
+    ],
+    "dependency_freeze_sha256": "cf22dd386a5c6299b0dac5c293a092f59ec6c7a8abd171358455e945e8ce9d15",
+    "qualified_python": "/tmp/phase7-qualified-osd-G1rX5q/venv/bin/python",
+    "wheel_filename": "ldpc-2.3.10-cp312-cp312-linux_x86_64.whl",
+    "wheel_sha256": "a4249e919f70e6ae82d0c5e72d797b6571bb9e578131c15bd872abe6d8c118bf",
+    "work_root": "/tmp/phase7-qualified-osd-G1rX5q"
+  },
+  "disposition": "failed",
+  "failure_reasons": [
+    "required_higher_order_candidate_enumeration_not_exposed"
+  ],
+  "fixtures": {
+    "all_syndrome_valid": true,
+    "results": [
+      {
+        "candidate": [
+          1,
+          0,
+          0
+        ],
+        "final_candidate": [
+          1,
+          0,
+          0
+        ],
+        "fixture": "full_rank",
+        "method": "OSD_0",
+        "order": 0,
+        "osd0_candidate": [
+          1,
+          0,
+          0
+        ],
+        "syndrome_valid": true
+      },
+      {
+        "candidate": [
+          1,
+          0,
+          0
+        ],
+        "final_candidate": [
+          1,
+          0,
+          0
+        ],
+        "fixture": "full_rank",
+        "method": "OSD_E",
+        "order": 2,
+        "osd0_candidate": [
+          1,
+          0,
+          0
+        ],
+        "syndrome_valid": true
+      },
+      {
+        "candidate": [
+          1,
+          0,
+          0
+        ],
+        "final_candidate": [
+          1,
+          0,
+          0
+        ],
+        "fixture": "full_rank",
+        "method": "OSD_CS",
+        "order": 2,
+        "osd0_candidate": [
+          1,
+          0,
+          0
+        ],
+        "syndrome_valid": true
+      },
+      {
+        "candidate": [
+          1,
+          0,
+          0
+        ],
+        "final_candidate": [
+          1,
+          0,
+          0
+        ],
+        "fixture": "rank_deficient",
+        "method": "OSD_0",
+        "order": 0,
+        "osd0_candidate": [
+          1,
+          0,
+          0
+        ],
+        "syndrome_valid": true
+      },
+      {
+        "candidate": [
+          1,
+          0,
+          0
+        ],
+        "final_candidate": [
+          1,
+          0,
+          0
+        ],
+        "fixture": "rank_deficient",
+        "method": "OSD_E",
+        "order": 2,
+        "osd0_candidate": [
+          1,
+          0,
+          0
+        ],
+        "syndrome_valid": true
+      },
+      {
+        "candidate": [
+          1,
+          0,
+          0
+        ],
+        "final_candidate": [
+          1,
+          0,
+          0
+        ],
+        "fixture": "rank_deficient",
+        "method": "OSD_CS",
+        "order": 2,
+        "osd0_candidate": [
+          1,
+          0,
+          0
+        ],
+        "syndrome_valid": true
+      },
+      {
+        "candidate": [
+          1,
+          0,
+          0
+        ],
+        "final_candidate": [
+          1,
+          0,
+          0
+        ],
+        "fixture": "equal_weight",
+        "method": "OSD_0",
+        "order": 0,
+        "osd0_candidate": [
+          1,
+          0,
+          0
+        ],
+        "syndrome_valid": true
+      },
+      {
+        "candidate": [
+          1,
+          0,
+          0
+        ],
+        "final_candidate": [
+          1,
+          0,
+          0
+        ],
+        "fixture": "equal_weight",
+        "method": "OSD_E",
+        "order": 2,
+        "osd0_candidate": [
+          1,
+          0,
+          0
+        ],
+        "syndrome_valid": true
+      },
+      {
+        "candidate": [
+          1,
+          0,
+          0
+        ],
+        "final_candidate": [
+          1,
+          0,
+          0
+        ],
+        "fixture": "equal_weight",
+        "method": "OSD_CS",
+        "order": 2,
+        "osd0_candidate": [
+          1,
+          0,
+          0
+        ],
+        "syndrome_valid": true
+      }
+    ]
+  },
+  "primary_environment": {
+    "ldpc_version_after": "2.4.1",
+    "ldpc_version_before": "2.4.1",
+    "python": "/hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python"
+  },
+  "qualification": "phase7_standalone_osd",
+  "receipt_sha256": "4c7248af4089422fcee167e40c6a36630623851ecf55f43986cb42488c85453a",
+  "runnable": false,
+  "schema_version": 1,
+  "source": {
+    "checked_out_commit": "baec4c8bfa2a679b0ba0e72df5582e277cd6918b",
+    "commit": "baec4c8bfa2a679b0ba0e72df5582e277cd6918b",
+    "repository": "https://github.com/quantumgizmos/ldpc.git",
+    "tree_sha256": "38a60cfb087f64d4ddced64def246db3253103fa45954915950745516fc48d84"
+  }
+}

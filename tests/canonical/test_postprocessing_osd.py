@@ -12,11 +12,12 @@ RECEIPT = ROOT / "data/qualifications/phase7-standalone-osd-baec4c8.json"
 APPROVED_COMMIT = "baec4c8bfa2a679b0ba0e72df5582e277cd6918b"
 
 
-def test_qualification_receipt_binds_exact_source_build_api_and_primary_environment():
-    """Only a passing, immutable receipt may identify the optional worker."""
+def test_failed_qualification_receipt_binds_exact_source_and_rejects_admission():
+    """An API gap must produce durable evidence and no runnable worker identity."""
     assert RECEIPT.is_file(), "the approved OSD source must be qualified before admission"
     receipt = json.loads(RECEIPT.read_text(encoding="utf-8"))
-    assert receipt["disposition"] == "passed"
+    assert receipt["disposition"] == "failed"
+    assert receipt["runnable"] is False
     assert receipt["source"]["commit"] == APPROVED_COMMIT
     assert receipt["source"]["repository"] == "https://github.com/quantumgizmos/ldpc.git"
     assert len(receipt["source"]["tree_sha256"]) == 64
@@ -27,6 +28,8 @@ def test_qualification_receipt_binds_exact_source_build_api_and_primary_environm
     assert receipt["api"]["class"] == "OsdDecoder"
     assert {"OSD_0", "OSD_E", "OSD_CS"} <= set(receipt["api"]["methods"])
     assert receipt["fixtures"]["all_syndrome_valid"] is True
+    assert receipt["api"]["candidate_enumeration_exposed"] is False
+    assert "required_higher_order_candidate_enumeration_not_exposed" in receipt["failure_reasons"]
     assert receipt["receipt_sha256"] == _digest_without_receipt_sha(receipt)
 
 
