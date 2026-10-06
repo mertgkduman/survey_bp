@@ -138,3 +138,67 @@ def test_member_budget_denial_keeps_terminal_and_unique_work_evidence() -> None:
     assert result.members[0].status == "budget_denied"
     assert result.members[0].candidate is None
     assert result.work_leaves == ()
+
+
+def test_member_postprocessing_handoff_preserves_all_failed_terminals_in_declared_order() -> None:
+    from bp_registry.canonical import postprocessing
+
+    assert hasattr(postprocessing, "adapt_mbbp_result"), "the MBBP handoff adapter must be public"
+    from bp_registry.canonical.lineage import LineageEdge, LineageId
+    from bp_registry.canonical.mbbp import MbbpController, MbbpSpec
+    from bp_registry.canonical.problems import OriginalProblem, WorkingProblem
+
+    impossible = OriginalProblem(
+        "original-mbbp-postprocessing", np.zeros((1, 3), dtype=np.uint8),
+        np.zeros((1, 3), dtype=np.uint8), np.asarray([1], dtype=np.uint8),
+    )
+    working = WorkingProblem(
+        "working-mbbp-postprocessing", impossible,
+        LineageEdge("identity", LineageId("original", impossible.lineage_id),
+                    LineageId("working", "working-mbbp-postprocessing")),
+    )
+    controller = MbbpController(MbbpSpec(
+        bases=(_basis("basis-a", 0, ((1,),)), _basis("basis-b", 1, ((1,),))), max_iterations=2,
+    ))
+    forward = controller.run(impossible, error_rate=0.1, completion_order=("basis-a", "basis-b"))
+    reversed_order = controller.run(impossible, error_rate=0.1, completion_order=("basis-b", "basis-a"))
+
+    result = postprocessing.adapt_mbbp_result(forward, working=working, error_rate=0.1)
+    reordered = postprocessing.adapt_mbbp_result(reversed_order, working=working, error_rate=0.1)
+
+    assert result.disposition == "compatible"
+    assert [snapshot.declared_attempt_ordinal for snapshot in result.snapshots] == [0, 1]
+    assert all(snapshot.posterior_llr.flags.writeable is False for snapshot in result.snapshots)
+    assert tuple(snapshot.rank for snapshot in result.snapshots) == tuple(snapshot.rank for snapshot in reordered.snapshots)
+    assert all(member.candidate is not None and member.terminal_posterior is not None for member in forward.members)
+
+
+def test_member_postprocessing_handoff_suppresses_fallback_after_any_original_valid_member() -> None:
+    from bp_registry.canonical import postprocessing
+    from bp_registry.canonical.lineage import LineageEdge, LineageId
+    from bp_registry.canonical.mbbp import MbbpController, MbbpSpec
+    from bp_registry.canonical.problems import WorkingProblem
+
+    original = _original()
+    working = WorkingProblem(
+        "working-mbbp-success", original,
+        LineageEdge("identity", LineageId("original", original.lineage_id), LineageId("working", "working-mbbp-success")),
+    )
+    result = MbbpController(MbbpSpec(
+        bases=(_basis("basis-a", 0), _basis("basis-b", 1, ((1, 0),))), max_iterations=8,
+    )).run(original, error_rate=0.1)
+
+    handoff = postprocessing.adapt_mbbp_result(result, working=working, error_rate=0.1)
+
+    assert any(member.original_valid for member in result.members)
+    assert handoff.disposition == "composition_success"
+    assert handoff.snapshots == ()
+
+
+def test_unsupported_postprocessing_compositions_fail_closed_with_stable_reason() -> None:
+    from bp_registry.canonical.postprocessing import unsupported_composition
+
+    result = unsupported_composition("relay")
+
+    assert result.disposition == "unsupported_composition"
+    assert result.reason == "unsupported_relay_missing_complete_terminal_snapshot_contract"
