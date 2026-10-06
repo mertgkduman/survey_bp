@@ -15,6 +15,13 @@ from bp_registry.study import _expanded_policies, ensure_study
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def test_native_bp_osd_study_arm_identity_resolver_is_explicit():
+    """Native composite arms must use a separate public study path."""
+    from bp_registry import study
+
+    assert hasattr(study, "resolve_native_composite_arm")
+
+
 def test_canonical_policy_file_computes_then_reuses_verified_result(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("OMP_NUM_THREADS", "1")
     study = json.loads((ROOT / "examples/three-qubit-study.json").read_text())
