@@ -652,7 +652,38 @@ class CanonicalExperimentV7(CanonicalExperimentV3):
         return self
 
 
-ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | CanonicalExperimentV6 | CanonicalExperimentV7
+class PostprocessingConfigV8(StrictModel):
+    """One closed optional method binding for the public Phase 7 tracer."""
+
+    enabled: bool
+    method: Literal["LSD_0", "LSD_E", "LSD_CS"] | None = None
+    order: int | None = Field(default=None, ge=0, le=100)
+    source_status: Literal["controlled_adaptation"] | None = None
+    reliability_convention: Literal["natural_log_odds_log_p0_over_p1"] | None = None
+
+    @model_validator(mode="after")
+    def complete_disabled_or_lsd_binding(self) -> "PostprocessingConfigV8":
+        values = (self.method, self.order, self.source_status, self.reliability_convention)
+        if self.enabled and any(value is None for value in values):
+            raise ValueError("enabled Phase 7 postprocessing requires one qualified complete LSD binding")
+        if not self.enabled and any(value is not None for value in values):
+            raise ValueError("disabled Phase 7 postprocessing cannot carry latent method controls")
+        return self
+
+
+class CanonicalExperimentV8(CanonicalExperimentV3):
+    """Complete canonical experiment with a separately attributed Phase 7 fallback."""
+
+    schema_version: Literal[8]
+    postprocessing_config: PostprocessingConfigV8
+
+    @model_validator(mode="after")
+    def phase7_preserves_the_canonical_bp_contract(self) -> "CanonicalExperimentV8":
+        validate_executable_canonical_baseline(self.policies)
+        return self
+
+
+ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | CanonicalExperimentV6 | CanonicalExperimentV7 | CanonicalExperimentV8
 
 
 _EXECUTABLE_BASELINE_KINDS = {
@@ -746,6 +777,8 @@ def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | CanonicalExperiment
     if isinstance(value, (ManifestV1, CanonicalManifestV2, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV6, CanonicalExperimentV7)):
         return value
     decoded = _read_value(value)
+    if decoded.get("schema_version") == 8:
+        return CanonicalExperimentV8.model_validate(decoded)
     if decoded.get("schema_version") == 7 and "ensemble" in decoded:
         return CanonicalExperimentV7.model_validate(decoded)
     if decoded.get("schema_version") == 6:
@@ -767,6 +800,8 @@ def _parse_for_preflight(value: ManifestRecord | dict[str, Any] | str | Path) ->
     if isinstance(value, (ManifestV1, LegacyManifestV1, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV6, CanonicalExperimentV7)):
         return value
     decoded = _read_value(value)
+    if decoded.get("schema_version") == 8:
+        return CanonicalExperimentV8.model_validate(decoded)
     if decoded.get("schema_version") == 7 and "ensemble" in decoded:
         return CanonicalExperimentV7.model_validate(decoded)
     if decoded.get("schema_version") == 6:

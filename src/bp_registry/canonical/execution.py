@@ -1109,6 +1109,13 @@ def run_canonical_structural_shot(
     evaluate: Callable[..., evaluator.Evaluation] = evaluator.evaluate_candidate,
 ) -> CanonicalExecutionResult:
     """Run the kernel with v2 structural evidence and an outer truth boundary."""
+    if isinstance(manifest, dict) and "postprocessing_config" in manifest:
+        from .phase7 import run_phase7_structural_shot
+        return run_phase7_structural_shot(
+            manifest, code=code, observation=observation, hidden_truth=hidden_truth, shot_id=shot_id,
+            ledger_path=ledger_path, sample_seed_identity=sample_seed_identity, context=context,
+            execution_controls=execution_controls,
+        )
     if isinstance(manifest, dict) and manifest.get("schema_version") == 7 and "ensemble" in manifest:
         return run_phase6_structural_shot(
             manifest, code=code, observation=observation, hidden_truth=hidden_truth, shot_id=shot_id,

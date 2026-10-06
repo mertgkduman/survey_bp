@@ -16,8 +16,9 @@ import numpy as np
 
 from . import evaluator, evidence, sampling
 from .ledger import read_canonical_events, reconcile, summarize
-from .manifests import CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV7, ManifestV1, manifest_digest, preflight, qualify_cluster_artifact
+from .manifests import CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV7, CanonicalExperimentV8, ManifestV1, manifest_digest, preflight, qualify_cluster_artifact
 from .canonical.verification import validate_canonical_shot, validate_phase4_shot
+from .canonical.phase7 import validate_phase7_shot
 from .runner import (
     canonical_public_shot_context, canonical_terminal_rows, preflight_canonical,
     preflight_pilot, run_canonical_one, run_one,
@@ -225,14 +226,16 @@ def _result_from_final_rows(
 def _canonical_result_from_terminal_events(manifest_path: Path, output: Path, rows: list[dict[str, Any]]) -> dict[str, Any]:
     report = preflight_canonical(manifest_path)
     manifest = preflight(manifest_path).manifest
-    assert isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV7))
+    assert isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV7, CanonicalExperimentV8))
     digest = manifest_digest(manifest)
     outcomes = Counter(((row["data"].get("payload", row["data"])).get("outcome") or "outcome_unavailable") for row in rows)
     terminations = Counter(row["termination"] for row in rows)
     ledger_path = output / "events.jsonl"
     events = read_canonical_events(ledger_path)
     for row in rows:
-        if isinstance(manifest, CanonicalExperimentV4) and manifest.relay is not None:
+        if isinstance(manifest, CanonicalExperimentV8):
+            validate_phase7_shot(events, run_id=manifest.run_id, shot_id=row["shot_id"])
+        elif isinstance(manifest, CanonicalExperimentV4) and manifest.relay is not None:
             validate_phase4_shot(ledger_path, run_id=manifest.run_id, shot_id=row["shot_id"], trace_root=output)
         else:
             validate_canonical_shot(events, canonical_public_shot_context(manifest_path, shot_id=row["shot_id"]), trace_root=output)
@@ -302,7 +305,9 @@ def verify_canonical_shot(manifest_path: str | Path, output: str | Path, *, shot
     if len(terminal) != 1:
         raise ValueError("canonical selected shot has no unique terminal evidence")
     manifest = preflight(manifest_path).manifest
-    if isinstance(manifest, CanonicalExperimentV4) and manifest.relay is not None:
+    if isinstance(manifest, CanonicalExperimentV8):
+        validate_phase7_shot(events, run_id=context.run_id, shot_id=shot_id)
+    elif isinstance(manifest, CanonicalExperimentV4) and manifest.relay is not None:
         validate_phase4_shot(ledger_path, run_id=context.run_id, shot_id=shot_id, trace_root=output)
     else:
         validate_canonical_shot(events, context, trace_root=output)
@@ -320,7 +325,7 @@ def _verify_canonical_run(output: Path, result: dict[str, Any]) -> dict[str, Any
     manifest_path = output / recorded_manifest if portable_paths else recorded_manifest
     report = preflight_canonical(manifest_path)
     manifest = preflight(manifest_path).manifest
-    assert isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV7))
+    assert isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV7, CanonicalExperimentV8))
     ledger_path = output / "events.jsonl"
     if result.get("ledger_sha256") != sha256(ledger_path.read_bytes()).hexdigest():
         raise ValueError("canonical result ledger hash does not match durable evidence")
@@ -329,7 +334,9 @@ def _verify_canonical_run(output: Path, result: dict[str, Any]) -> dict[str, Any
         raise ValueError("canonical terminal rows differ from the manifest shot budget")
     events = read_canonical_events(ledger_path)
     for row in rows:
-        if isinstance(manifest, CanonicalExperimentV4) and manifest.relay is not None:
+        if isinstance(manifest, CanonicalExperimentV8):
+            validate_phase7_shot(events, run_id=manifest.run_id, shot_id=row["shot_id"])
+        elif isinstance(manifest, CanonicalExperimentV4) and manifest.relay is not None:
             validate_phase4_shot(ledger_path, run_id=manifest.run_id, shot_id=row["shot_id"], trace_root=output)
         else:
             validate_canonical_shot(events, canonical_public_shot_context(manifest_path, shot_id=row["shot_id"]), trace_root=output)
@@ -552,7 +559,7 @@ def main(argv: list[str] | None = None) -> None:
         records = evidence.load_seed_records(args.records)
         _dump({"records": str(args.records), "paper_experiments": sorted(records["paper_experiments"]), "status": "valid"})
     elif args.command == "preflight":
-        _dump(preflight_canonical(args.manifest) if isinstance(preflight(args.manifest).manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV7)) else preflight_pilot(args.manifest))
+        _dump(preflight_canonical(args.manifest) if isinstance(preflight(args.manifest).manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV7, CanonicalExperimentV8)) else preflight_pilot(args.manifest))
     elif args.command == "pilot":
         _dump(run_pilot(args.manifest, args.output))
     elif args.command == "canonical":

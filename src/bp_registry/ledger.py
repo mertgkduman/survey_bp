@@ -24,6 +24,7 @@ CANONICAL_SCHEDULE_LEDGER_VERSION = 3
 CANONICAL_RELAY_LEDGER_VERSION = 4
 CANONICAL_INTERVENTION_LEDGER_VERSION = 5
 CANONICAL_ENSEMBLE_LEDGER_VERSION = 6
+CANONICAL_POSTPROCESSING_LEDGER_VERSION = 7
 ShotKey = tuple[str, int]
 
 
@@ -394,6 +395,7 @@ _CANONICAL_EVENT_KINDS = frozenset({
     "work", "runtime", "missingness", "trace_link", "trace_truncated",
     "transform", "lift", "original_check", "evaluation",
     "basis", "member", "candidate_origin", "duplicate_group", "work_leaf",
+    "bp_only", "final",
 })
 
 
@@ -408,6 +410,7 @@ def _validate_canonical_event(event: Mapping[str, Any]) -> None:
     if event.get("ledger_version") not in {
         CANONICAL_LEDGER_VERSION, CANONICAL_SCHEDULE_LEDGER_VERSION, CANONICAL_RELAY_LEDGER_VERSION,
         CANONICAL_INTERVENTION_LEDGER_VERSION, CANONICAL_ENSEMBLE_LEDGER_VERSION,
+        CANONICAL_POSTPROCESSING_LEDGER_VERSION,
     }:
         raise ValueError("unsupported canonical ledger version")
     if event.get("kind") not in _CANONICAL_EVENT_KINDS:
@@ -641,7 +644,7 @@ class CanonicalEventWriter:
     """Durably append sparse versioned control-flow facts for canonical CSS shots."""
 
     def __init__(self, path: str | Path, *, structural_event_version: int = CANONICAL_LEDGER_VERSION):
-        if structural_event_version not in {CANONICAL_LEDGER_VERSION, CANONICAL_SCHEDULE_LEDGER_VERSION, CANONICAL_RELAY_LEDGER_VERSION, CANONICAL_INTERVENTION_LEDGER_VERSION, CANONICAL_ENSEMBLE_LEDGER_VERSION}:
+        if structural_event_version not in {CANONICAL_LEDGER_VERSION, CANONICAL_SCHEDULE_LEDGER_VERSION, CANONICAL_RELAY_LEDGER_VERSION, CANONICAL_INTERVENTION_LEDGER_VERSION, CANONICAL_ENSEMBLE_LEDGER_VERSION, CANONICAL_POSTPROCESSING_LEDGER_VERSION}:
             raise ValueError("unsupported canonical structural event version")
         self.path = Path(path)
         self.structural_event_version = structural_event_version
