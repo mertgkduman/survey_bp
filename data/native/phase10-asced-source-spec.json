@@ -58,7 +58,25 @@
     "projects": ["numpy", "galois", "matplotlib", "scikit-build-core", "pybind11"],
     "classification": "SUS"
   },
-  "build_proposal": null,
+  "build_proposal": {
+    "status": "pending_human",
+    "disposable_root": "/tmp/phase10-asced-native",
+    "primary_environment": "docs/environment-freeze.txt",
+    "primary_environment_access": "forbidden",
+    "python_packages": {
+      "numpy": {"classification": "SUS", "registry_url": "https://pypi.org/pypi/numpy/json", "version": "2.5.3", "artifact": "numpy-2.5.3-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", "artifact_url": "https://files.pythonhosted.org/packages/65/af/aa78d1a88805456e212b65461354cd943197fb9acecc4c90fd12295123a3/numpy-2.5.3-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", "sha256": "b7e18c623bb5c95acb3b3328861272816ba199fb531921c5d6d0b675f1fde9e3"},
+      "galois": {"classification": "SUS", "registry_url": "https://pypi.org/pypi/galois/json", "version": "0.4.11", "artifact": "galois-0.4.11-py3-none-any.whl", "artifact_url": "https://files.pythonhosted.org/packages/05/89/dc69acbd34bde07b9dee9f9f88d7ce61ff97fd99d6d576d72d2db1461349/galois-0.4.11-py3-none-any.whl", "sha256": "d2e12a2b7fd44b108cc15d7de27dabcb8a98a556ea2c69c94fe695139629d9aa"},
+      "matplotlib": {"classification": "SUS", "registry_url": "https://pypi.org/pypi/matplotlib/json", "version": "3.11.2", "artifact": "matplotlib-3.11.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", "artifact_url": "https://files.pythonhosted.org/packages/b8/90/2b3fd67ee273163faeda6d514be70b5596eaa0fd77b60ffc294ad0b34f5f/matplotlib-3.11.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", "sha256": "df4f7784aca81a94f254c0a2767d592ee25f407e488f5fa7203e51093fb6ca27"},
+      "scikit-build-core": {"classification": "SUS", "registry_url": "https://pypi.org/pypi/scikit-build-core/json", "version": "1.1.1", "artifact": "scikit_build_core-1.1.1-py3-none-any.whl", "artifact_url": "https://files.pythonhosted.org/packages/01/1b/83913d6d5c6a7f8ad5bf5d67b2d57ab09475f1bb9dd0c7a3f44067d59b90/scikit_build_core-1.1.1-py3-none-any.whl", "sha256": "6f6d6cf600e2e9639fd258ecd11cfc19bd189354b968916a519c6793e7e26237"},
+      "pybind11": {"classification": "SUS", "registry_url": "https://pypi.org/pypi/pybind11/json", "version": "3.1.0", "artifact": "pybind11-3.1.0-py3-none-any.whl", "artifact_url": "https://files.pythonhosted.org/packages/33/fd/8762f7ee3e4e4be6d1d846cffb4916dd9bb02b2f800d3603718a0efe494c/pybind11-3.1.0-py3-none-any.whl", "sha256": "b8488090f8acffbcb6b5d6a85571a6827a0a2981ffb75e5a0b27b87c4a6b7dd0"}
+    },
+    "pybind11_overlay": {"classification": "human_reviewed_build_input", "repository": "https://github.com/pybind/pybind11.git", "tag": "v3.1.0", "commit": "97bf890db679505a14dfe547a5e77bb2bd05dc90", "archive_url": "https://codeload.github.com/pybind/pybind11/tar.gz/refs/tags/v3.1.0", "archive_sha256": "ef712655692a2e9bf7bb7874c022564a45f91d847ddee987e720cd9e28849665", "mount": "/tmp/phase10-asced-native/source/quantum_asced/pybind11", "scope": "build-only overlay; no native algorithm source change"},
+    "cmake": {"classification": "human_reviewed_build_input", "provider": "Kitware", "release_page": "https://cmake.org/download/", "version": "4.2.0", "platform": "linux-x86_64", "artifact": "cmake-4.2.0-linux-x86_64.tar.gz", "artifact_url": "https://cmake.org/files/v4.2/cmake-4.2.0-linux-x86_64.tar.gz", "artifact_sha256": "bbcebd4c433eab3af03a8c80bb5d84e8dfc3ff8a4ab9d01547b21240c23f7c2c", "acquisition_command": "curl --fail --location --output /tmp/phase10-asced-native/downloads/cmake-4.2.0-linux-x86_64.tar.gz https://cmake.org/files/v4.2/cmake-4.2.0-linux-x86_64.tar.gz && tar -xzf /tmp/phase10-asced-native/downloads/cmake-4.2.0-linux-x86_64.tar.gz -C /tmp/phase10-asced-native/tools", "executable": "/tmp/phase10-asced-native/tools/cmake-4.2.0-linux-x86_64/bin/cmake", "executable_sha256": "1b8bffb9e82925587e70a6211d5e539e06133cae978610917e1ed90e111bd208", "ambient_path_fallback": "forbidden"},
+    "driver": {"path": "/tmp/phase10-asced-native/driver/demo_bp4.py", "source_checkout": "/tmp/phase10-asced-native/source/quantum_asced", "build_directory": "/tmp/phase10-asced-native/build", "install_prefix": "/tmp/phase10-asced-native/prefix", "scope": "out-of-tree demo/artifact path correction and aggregate entry point only", "forbidden_changes": ["algorithm source", "Pauli semantics", "candidate selection", "channel code"]},
+    "algorithm_guard": {"before_after": "all source.algorithm_files SHA-256 values must equal source.source_digests before and after build", "allow_algorithm_modification": false},
+    "native_bounds": {"workers": 1, "max_trials": 10000, "target_errors": 10, "channel": "equal-proportion depolarizing only"},
+    "receipts": {"stdout": "/tmp/phase10-asced-native/receipts/stdout.log", "stderr": "/tmp/phase10-asced-native/receipts/stderr.log", "receipt": "/tmp/phase10-asced-native/receipts/native-receipt.json"}
+  },
   "human_decision": {
     "required_plan": "10-14",
     "status": "pending_human",

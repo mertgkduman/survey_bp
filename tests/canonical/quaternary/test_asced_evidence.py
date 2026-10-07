@@ -73,3 +73,36 @@ def test_proposal_binds_all_unapproved_packages_overlay_and_cmake_identity() -> 
     spec = json.loads(SPEC.read_text(encoding="utf-8"))
     proposal = spec["build_proposal"]
     assert proposal is not None, "an inert human-review proposal is required"
+    assert proposal["status"] == "pending_human"
+    assert set(proposal["python_packages"]) == {
+        "numpy", "galois", "matplotlib", "scikit-build-core", "pybind11",
+    }
+    for lock in proposal["python_packages"].values():
+        assert lock["classification"] == "SUS"
+        assert lock["registry_url"].startswith("https://pypi.org/pypi/")
+        assert len(lock["sha256"]) == 64
+    assert proposal["pybind11_overlay"]["commit"] == "97bf890db679505a14dfe547a5e77bb2bd05dc90"
+    cmake = proposal["cmake"]
+    assert cmake["provider"] == "Kitware"
+    assert cmake["ambient_path_fallback"] == "forbidden"
+    assert cmake["executable"].startswith(proposal["disposable_root"] + "/")
+    assert len(cmake["artifact_sha256"]) == len(cmake["executable_sha256"]) == 64
+    assert proposal["algorithm_guard"]["allow_algorithm_modification"] is False
+
+
+def test_pending_human_proposal_refuses_build_run_and_ambient_cmake(tmp_path: Path) -> None:
+    spec = json.loads(SPEC.read_text(encoding="utf-8"))
+    result = subprocess.run(
+        [sys.executable, str(SCRIPT), "build-run"], capture_output=True, text=True, check=False,
+    )
+    assert result.returncode != 0
+    assert "pending_human" in result.stderr
+    spec["build_proposal"]["cmake"]["executable"] = "/usr/bin/cmake"
+    tampered = tmp_path / "source-spec.json"
+    tampered.write_text(json.dumps(spec), encoding="utf-8")
+    result = subprocess.run(
+        [sys.executable, str(SCRIPT), "--spec", str(tampered), "verify-proposal"],
+        capture_output=True, text=True, check=False,
+    )
+    assert result.returncode != 0
+    assert "only the recorded disposable-root CMake executable" in result.stderr
