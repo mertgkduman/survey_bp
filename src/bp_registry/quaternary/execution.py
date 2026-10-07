@@ -19,6 +19,7 @@ import numpy as np
 from ..canonical.numerics import boxplus
 from ..canonical.budgets import BudgetLimit, BudgetTree
 from .kernel import ScalarLlrBp4Kernel
+from .mbp4 import FixedAlphaMbp4Kernel, Mbp4Spec
 from .problems import PauliCode, QuaternaryOriginalProblem
 from .qbpgd import QbpgdController, QbpgdSpec
 
@@ -321,6 +322,64 @@ def run_quaternary_qbpgd(
         "termination": decoded.termination, "outcome": outcome, "run_fidelity": decoded.run_fidelity,
         "component_fidelity": dict(decoded.component_fidelity), "component_ids": dict(decoded.component_ids),
         "interpretation_ids": dict(decoded.interpretation_ids), "source_author_code_identity": decoded.source_author_code_identity,
+        "work": decoded.work.as_evidence(structural_event_version=4),
+    }
+
+
+def run_quaternary_mbp4(
+    manifest: Any, output: str | Path, *, resolved_composition: Mapping[str, Any], shot_id: int = 0,
+) -> dict[str, Any]:
+    """Run the closed fixed-alpha MBP4 recurrence with replay-complete evidence."""
+    problem, channel, run_id, iterations, max_work, smoothing, manifest_sha256 = _manifest_parts(manifest)
+    payload = manifest.model_dump(mode="json") if hasattr(manifest, "model_dump") else manifest
+    composition = payload["composition"]
+    kernel_config = composition["kernel"].get("config")
+    if not isinstance(kernel_config, Mapping):
+        raise ValueError("public fixed-alpha MBP4 requires an explicit kernel configuration")
+    spec = Mbp4Spec(alpha=kernel_config.get("alpha"), schedule=composition["schedule"]["kind"], max_iterations=iterations)
+    physical_identity = _digest({"checks": problem.checks.tolist(), "channel": channel.tolist(), "run_id": run_id})
+    hidden = _sample(channel, seed_identity=f"{physical_identity}:shot:{shot_id}")
+    if not np.array_equal(syndrome_for(problem, hidden), problem.syndrome):
+        raise ValueError("manifest observation does not match its deterministic categorical sample")
+    priors = np.maximum(channel, smoothing)
+    priors /= priors.sum(axis=1, keepdims=True)
+    original = QuaternaryOriginalProblem(
+        lineage_id=f"original-mbp4-{manifest_sha256[:16]}",
+        code=PauliCode(checks=problem.checks, source_artifact_identity=f"public-manifest:{manifest_sha256}"),
+        syndrome=problem.syndrome,
+    )
+    session = FixedAlphaMbp4Kernel(spec).new_session(
+        original, priors, budgets=BudgetTree(limits=(BudgetLimit("attempt", "bp_calls", max_work),), parents={}),
+    )
+    decoded = session.run()
+    candidate = np.asarray(decoded.candidate, dtype=np.uint8)
+    outcome, logical = _evaluate(problem, hidden, candidate)
+    events = [
+        _event("preflight", {
+            "run_id": run_id, "shot_id": shot_id, "manifest_sha256": manifest_sha256,
+            "pauli_encoding": "I=0,X=1,Y=2,Z=3", "observation": problem.syndrome.tolist(),
+            "public_schema": "quaternary_experiment_v2", "resolved_composition": dict(resolved_composition),
+        }),
+        _event("sample", {
+            "sample_identity": _digest({"manifest": manifest_sha256, "shot": shot_id}), "channel": channel.tolist(),
+            "decoder_priors": priors.tolist(), "decoder_smoothing": smoothing, "hidden_truth_sealed": True,
+            "sampling": "one_categorical_I_X_Y_Z_value_per_qubit",
+        }),
+        _event("mbp4_decode", {
+            "alpha": spec.alpha, "equation_identity": spec.equation_identity, "source_revision": spec.source_revision,
+            "schedule": spec.schedule, "schedule_freshness": decoded.schedule_freshness,
+            "initial_state_digest": decoded.initial_state_digest, "state_digest": decoded.state_digest,
+            "work": decoded.work.as_evidence(structural_event_version=4), "sweeps": decoded.as_evidence()["sweep_digests"],
+        }),
+        _event("candidate_freeze", {"candidate": candidate.tolist(), "marginals": session._marginals.tolist()}),
+        _event("evaluation", {"outcome": outcome, "logical_action_agrees": logical, "logical_action_unavailable_reason": "non-CSS tracer has no declared logical basis"}),
+        _event("termination", {"termination": decoded.termination, "candidate": candidate.tolist(), "outcome": outcome, "assessment_status": "not_assessed"}),
+    ]
+    _write_events(Path(output) / "events.jsonl", events)
+    return {
+        "termination": decoded.termination, "outcome": outcome, "run_fidelity": resolved_composition["run_fidelity"],
+        "component_fidelity": resolved_composition["component_fidelity"], "component_ids": {"kernel": spec.equation_identity},
+        "interpretation_ids": {"fixed_alpha": "declared_manifest_alpha"}, "source_author_code_identity": "unverified",
         "work": decoded.work.as_evidence(structural_event_version=4),
     }
 

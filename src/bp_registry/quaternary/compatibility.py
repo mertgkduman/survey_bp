@@ -57,7 +57,9 @@ def resolve_quaternary_composition(
     for _role, policy in composition.in_role_order():
         _reject_binary(policy.kind)
 
-    if kernel.kind != "qbp_scalar_llr":
+    if kernel.kind in {"ambp4", "qbp_ambp4"}:
+        raise ValueError("AMBP4 requires its complete adaptive alpha search contract and is unsupported")
+    if kernel.kind not in {"qbp_scalar_llr", "qbp_mbp4_fixed_alpha"}:
         raise ValueError(f"unknown quaternary kernel kind: {kernel.kind}")
     if schedule.kind not in {"qbp_flooding", "qbp_variable_serial"}:
         raise ValueError(f"unknown or unsupported quaternary schedule kind: {schedule.kind}")
@@ -87,18 +89,34 @@ def resolve_quaternary_composition(
     revisions = list(_SOURCE_REVISIONS)
     procedure_basis = "source_scalar_llr_bp4_v1"
 
+    if kernel.kind == "qbp_mbp4_fixed_alpha":
+        # Import here to keep composition data independent of the implementation
+        # until an MBP4 binding is actually requested.
+        from .mbp4 import Mbp4Spec
+        Mbp4Spec(alpha=kernel.config.get("alpha"), schedule=schedule.kind)
+        equations.update({
+            "mbp4_posterior": "Gamma_n^W = Lambda_n^W + (1/alpha) sum_anticommuting Delta_m_to_n",
+            "mbp4_edge_inhibition": "Gamma_n_to_m^W = Gamma_n^W - commutation(W,S_mn) Delta_m_to_n",
+        })
+        lifecycle["kernel_state_owner"] = "mbp4_session"
+        revisions.append("kuo-lai-2023-arxiv-2104.13659v2")
+        procedure_basis = "source_fixed_alpha_mbp4_v1"
     if composition.transforms:
         equations["c2v_transforms"] = "; ".join(
             "Delta/alpha_c" if transform.kind == "qbp_c2v_normalization" else "sign(Delta)max(0,abs(Delta)-beta)"
             for transform in composition.transforms
         )
         revisions.append("lai-kuo-2021-c2v-transform-v3")
+        if kernel.kind == "qbp_mbp4_fixed_alpha":
+            reasons.extend(f"mbp4_with_{transform.kind}" for transform in composition.transforms)
     if len(composition.transforms) > 1:
         reasons.append("transform_combination_not_source_defined")
 
     if intervention.kind == "identity":
         pass
     elif intervention.kind == "qbpgd":
+        if kernel.kind == "qbp_mbp4_fixed_alpha":
+            raise ValueError("fixed-alpha MBP4 does not admit an undeclared Q-BPGD composition")
         continued = intervention.config.get("continued_messages")
         prior_profile = _config_string(intervention.config, "prior_profile")
         if type(continued) is not bool or prior_profile not in {"depolarizing", "general_joint"}:
@@ -116,7 +134,7 @@ def resolve_quaternary_composition(
         if prior_profile == "general_joint":
             reasons.append("general_joint_prior")
     elif intervention.kind == "mbp4":
-        raise ValueError("MBP4 execution is reserved until its distinct recurrence is implemented")
+        raise ValueError("MBP4 is a kernel recurrence and must use qbp_mbp4_fixed_alpha as the closed kernel kind")
     elif intervention.kind == "ambp4":
         raise ValueError("AMBP4 requires its complete adaptive search contract and is unsupported")
     elif intervention.kind in {"asced", "asced_overcomplete"}:

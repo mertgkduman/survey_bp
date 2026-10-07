@@ -36,7 +36,7 @@ from .manifests import (
     validate_executable_canonical_baseline,
 )
 from . import evaluator, sampling
-from .quaternary.execution import run_quaternary_qbpgd, run_quaternary_tracer, verify_quaternary_tracer
+from .quaternary.execution import run_quaternary_mbp4, run_quaternary_qbpgd, run_quaternary_tracer, verify_quaternary_tracer
 from .quaternary.compatibility import resolve_quaternary_composition
 
 
@@ -258,11 +258,14 @@ def run_quaternary(manifest_path: str | Path, output: str | Path, *, shot_id: in
         persisted_manifest.write_text(json.dumps(manifest.model_dump(mode="json"), sort_keys=True) + "\n", encoding="utf-8")
         manifest_reference = str(persisted_manifest)
     qbpgd = isinstance(manifest, QuaternaryExperimentV2) and manifest.composition.intervention is not None and manifest.composition.intervention.kind == "qbpgd"
+    mbp4 = isinstance(manifest, QuaternaryExperimentV2) and manifest.composition.kernel is not None and manifest.composition.kernel.kind == "qbp_mbp4_fixed_alpha"
     if qbpgd:
         result: Any = run_quaternary_qbpgd(manifest, output_path, resolved_composition=report["composition"], shot_id=0)
+    elif mbp4:
+        result = run_quaternary_mbp4(manifest, output_path, resolved_composition=report["composition"], shot_id=0)
     else:
         result = run_quaternary_tracer(manifest, output_path, shot_id=0)
-    if isinstance(manifest, QuaternaryExperimentV2) and not qbpgd:
+    if isinstance(manifest, QuaternaryExperimentV2) and not qbpgd and not mbp4:
         ledger_path = output_path / "events.jsonl"
         events = [json.loads(line) for line in ledger_path.read_text(encoding="utf-8").splitlines()]
         events[0]["data"]["resolved_composition"] = report["composition"]
@@ -271,13 +274,13 @@ def run_quaternary(manifest_path: str | Path, output: str | Path, *, shot_id: in
     ledger_path = output_path / "events.jsonl"
     public = {
         **report, "output": str(output_path), "final_row_count": 1,
-        "termination": result["termination"] if qbpgd else result.termination,
-        "outcome": result["outcome"] if qbpgd else result.outcome,
+        "termination": result["termination"] if (qbpgd or mbp4) else result.termination,
+        "outcome": result["outcome"] if (qbpgd or mbp4) else result.outcome,
         "ledger_sha256": sha256(ledger_path.read_bytes()).hexdigest(),
         "manifest_path": manifest_reference, "ledger_path": str(ledger_path),
         "statistical_claim": "not_assessed; development fixture, not a source-curve reproduction or performance result",
     }
-    if qbpgd:
+    if qbpgd or mbp4:
         public.update({
             "run_fidelity": result["run_fidelity"], "component_fidelity": result["component_fidelity"],
             "component_ids": result["component_ids"], "interpretation_ids": result["interpretation_ids"],
