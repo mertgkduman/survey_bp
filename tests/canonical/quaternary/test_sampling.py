@@ -14,10 +14,14 @@ try:
     from bp_registry.quaternary.sampling import (
         DecoderPriorSmoothing,
         JointPauliChannel,
-        sample_joint_pauli,
     )
 except ModuleNotFoundError:
-    DecoderPriorSmoothing = JointPauliChannel = sample_joint_pauli = None
+    DecoderPriorSmoothing = JointPauliChannel = None
+
+try:
+    from bp_registry.quaternary.sampling import sample_joint_pauli
+except ImportError:
+    sample_joint_pauli = None
 
 
 def _problem(n: int = 1) -> QuaternaryOriginalProblem:
