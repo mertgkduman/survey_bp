@@ -535,7 +535,7 @@ Plans:
 
 **Research focus:** Quaternary factor equations, scalar/vector message representations, memory/numeric choices, and policy-specific compatibility derivations.
 **Priority decision:** Begin this phase next, ahead of campaign infrastructure and reproduction, while Phase 7 optional postprocessing remains paused. Reuse the verified CSS execution lifecycle where mathematically compatible; keep correlated quaternary factors in their own canonical kernel family.
-**Plans:** 4/16 plans executed.
+**Plans:** 5/16 plans executed.
 
 Plans:
 
@@ -551,7 +551,7 @@ Plans:
 **Wave 3** *(blocked on Wave 2 completion)*
 
 - [x] 10-03-PLAN.md — Classify Pauli candidates independently.
-- [ ] 10-04-PLAN.md — Validate and sample joint Pauli channels.
+- [x] 10-04-PLAN.md — Validate and sample joint Pauli channels.
 - [ ] 10-05-PLAN.md — Implement and independently check scalar LLR-BP4.
 - [ ] 10-10-PLAN.md — Construct, qualify, and identify CSS aSCED splitters.
 - [ ] 10-14-PLAN.md — Resolve the exact native source and build trust gate.
@@ -662,7 +662,7 @@ Plans:
 | 7. Optional Postprocessing | 6/15 | Paused by user; POST-01 qualification failed |  |
 | 8. Reproducible Campaigns and Statistical Assessment | 0/TBD | Not started | - |
 | 9. CSS Reproduction and Controlled Comparisons | 0/TBD | Not started | - |
-| 10. Correlated Quaternary Execution | 4/16 | In Progress|  |
+| 10. Correlated Quaternary Execution | 5/16 | In Progress|  |
 | 11. Quaternary Reproduction and Comparisons | 0/TBD | Not started | - |
 | 12. Circuit Models and Canonical Integration | 0/TBD | Not started | - |
 | 13. Circuit Reproduction and Comparisons | 0/TBD | Not started | - |

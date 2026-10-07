@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 10
 current_phase_name: Correlated Quaternary Execution
-current_plan: 5
+current_plan: 6
 status: executing
-stopped_at: Completed 10-03-PLAN.md
-last_updated: "2026-10-07T03:43:54.917Z"
+stopped_at: Completed 10-04-PLAN.md
+last_updated: "2026-10-07T03:55:25.515Z"
 last_activity: 2026-10-06
 last_activity_desc: Phase 10 execution started
-state_head: 394e6dcb9c6b320303490077a2952d68862fe7ef
+state_head: d627404ce02744da7c0555d8e391e08ebc7a8c8a
 progress:
   total_phases: 14
   completed_phases: 5
   total_plans: 111
-  completed_plans: 91
+  completed_plans: 92
 ---
 
 # Project State
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 ## Current Position
 
 Phase: 10 (Correlated Quaternary Execution) — EXECUTING
-Plan: 5 of 16
+Plan: 6 of 16
 Total Phases: 14
-Current Plan: 5
+Current Plan: 6
 Total Plans in Phase: 16
 Status: Ready to execute
 Last activity: 2026-10-06 — Phase 10 execution started
@@ -85,6 +85,7 @@ Progress: [████░░░░░░] 5 of 14 phases complete (36%)
 | Phase 10-correlated-quaternary-execution P02 | 10m | 2 tasks | 4 files |
 | Phase 10-correlated-quaternary-execution P13 | 7m | 2 tasks | 3 files |
 | Phase 10 P03 | 4m | 1 tasks | 2 files |
+| Phase 10-correlated-quaternary-execution P04 | 8m 14s | 2 tasks | 2 files |
 
 Phase 02 P10–P16 gap-closure metrics are recorded in their individual summaries.
 
@@ -161,6 +162,8 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - [Phase 10]: Native aSCED source is fixed to kit-cel/quantum_asced commit 816772071486615dfc7d71d1e15df597edc58a26; all build inputs remain pending human approval.
 - [Phase 10]: Phase 10 Plan 03: evaluator-local symplectic and GF(2) routines are the authority for four-outcome Pauli classification.
 - [Phase 10]: Phase 10 Plan 03: logical residual actions use immutable (x, z) coordinates, while absent bases yield explicit unavailable reasons.
+- [Phase 10]: Phase 10 Plan 04: physical I/X/Y/Z rows remain unchanged after strict validation, while decoder smoothing is separately identified.
+- [Phase 10]: Phase 10 Plan 04: inverse-CDF ties use decimal persisted-value thresholds with stable I<X<Y<Z ownership.
 
 ### Pending Todos
 
@@ -218,8 +221,8 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 **Resume file:** None
 
-Last session: 2026-10-07T03:43:51.455Z
-Stopped at: Completed 10-03-PLAN.md
+Last session: 2026-10-07T03:55:22.433Z
+Stopped at: Completed 10-04-PLAN.md
 Next command: $gsd-discuss-phase 10, then $gsd-plan-phase 10; use the Phase 07 handoff only when optional postprocessing is reprioritized.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
