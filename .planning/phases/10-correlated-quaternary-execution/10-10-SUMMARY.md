@@ -22,7 +22,10 @@ key-files:
     - data/fixtures/quaternary/asced-gb46-canonical-fixture.json
     - tests/canonical/quaternary/test_asced_splitters.py
     - tests/canonical/quaternary/fixtures/asced-splitters.json
-  modified: []
+  modified:
+    - src/bp_registry/quaternary/asced.py
+    - data/fixtures/quaternary/asced-gb46-canonical-fixture.json
+    - tests/canonical/quaternary/test_asced_splitters.py
 key-decisions:
   - "GB46 H is a pinned source input; deterministic T and H_ext are project-generated canonical_adaptation evidence."
   - "The extended aSCED factor graph retains immutable-original transform/lift lineage without claiming its noncommuting splitter rows are a stabilizer code."
@@ -80,6 +83,7 @@ Deterministic canonical CSS splitter batches are fully qualified and materialize
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/quaternary/test_asced_splitters.py -k 'construct or canonical_adaptation or source_component or constructed_receipt or gb46 or h_ext_digest or independent_constructor or immutable or exhausted or witness or rank or detectable or partition or css_type or weight or cycle or even_delta or hash or reject_author_bytes or non_css' -x` — 7 passed.
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/quaternary/test_asced_splitters.py -k 'materialize or constructed_receipt or canonical_gb46 or fidelity or source_component or reject_raw or reject_exhausted or immutable or batch or transform or lineage or stable_order or path_count or cap or tamper' -x` — 6 passed.
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/quaternary/test_algebra.py -x` — 35 passed.
+- `python -m pytest tests/canonical/quaternary/test_asced_splitters.py -q` — 8 passed after the receipt correction.
 
 ## TDD Gate Compliance
 
@@ -108,6 +112,12 @@ Deterministic canonical CSS splitter batches are fully qualified and materialize
    - **Fix:** Added immutable `AscedWorkingGraph` with the same original-parent and transform/lift evidence, without misrepresenting it as a stabilizer code.
    - **Files modified:** `src/bp_registry/quaternary/asced.py`
    - **Verification:** Materialization, tamper, path-cap, and GB46 tests passed.
+
+## Postcompletion Correction
+
+- Corrected `SplitterSearchReceipt.candidates_examined` to record the number of candidates actually inspected: accepted candidates record `candidate_ordinal + 1`, and exhausted searches record `min(attempt_cap, math.comb(n, row_weight))` without materializing the combination space.
+- Hardened materialization by checking the receipt hash, source artifact and component identities, profile hash, search totals, rejection tallies, accepted ordinals, and the deterministic reconstructed search before exposing a working graph.
+- Regenerated the project-owned GB46 fixture with its receipt witness: X accepts ordinal 35 after 36 candidates; Z accepts ordinal 1937 after 1938 candidates.
 
 ## Known Stubs
 

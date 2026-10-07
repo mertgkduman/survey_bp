@@ -2464,11 +2464,31 @@
   },
   "receipt": {
     "artifact_sha256": "c875598d3c3326a418e132f8a5424d1839d93343d6a087a1ede9f3d60ac8d613",
-    "constructed_receipt_sha256": "81040a3280291bf5594d4207522dcc232fd1c13c55aecf7c0cbe7fa915847d25",
+    "constructed_receipt_sha256": "d28362b1d8b97eb01768d8fd33c7f6d04c1050ad828b767c5ebb089da59c8fc9",
     "constructor_identity": "asced-css-lexicographic-v1",
     "h_ext_sha256": "2a50c370f69f9f751e711fd97dd48178844c14bc2117d85e31f12af0f70c6355",
     "profile_sha256": "7c72eb9772e13c664902ed04b4ddc17e3c0d10a7210b8d362f40bb707c2b9a1f",
     "run_fidelity": "canonical_adaptation",
+    "search_receipts": [
+      {
+        "accepted_ordinal": 35,
+        "attempt_cap": 10000,
+        "candidates_examined": 36,
+        "rejected_cycle": 35,
+        "rejected_detectability": 0,
+        "rejected_rank": 0,
+        "role": "x"
+      },
+      {
+        "accepted_ordinal": 1937,
+        "attempt_cap": 10000,
+        "candidates_examined": 1938,
+        "rejected_cycle": 1937,
+        "rejected_detectability": 0,
+        "rejected_rank": 0,
+        "role": "z"
+      }
+    ],
     "source_component_ids": [
       "kit-cel/quantum_asced@816772071486615dfc7d71d1e15df597edc58a26:src/Graph_Optimization/Graph_Optimization_GF4.cpp:add_splitters:rank_growth",
       "kit-cel/quantum_asced@816772071486615dfc7d71d1e15df597edc58a26:src/Graph_Optimization/Graph_Optimization.cpp:remove_infeasible_indices:co_neighbor_removal"

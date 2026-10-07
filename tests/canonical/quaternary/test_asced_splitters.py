@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+from dataclasses import replace
 import numpy as np
 import importlib.util
 import json
@@ -61,6 +62,12 @@ def test_pinned_gb46_input_yields_the_frozen_canonical_receipt() -> None:
     assert "source_fixture_verified" not in json.dumps(frozen)
     assert frozen["source_input"]["raw_sha256"] == "4bd60bc22ccda388780ad2ad2a29b63143b3f024e599e57ef5bcb983f51cb9b2"
     assert frozen["qualification"]["rank_growth"] == frozen["qualification"]["detectable_rank"] == 2
+    for receipt in frozen["receipt"]["search_receipts"]:
+        assert receipt["candidates_examined"] == receipt["accepted_ordinal"] + 1
+        assert (
+            receipt["rejected_cycle"] + receipt["rejected_rank"] + receipt["rejected_detectability"]
+            == receipt["candidates_examined"] - 1
+        )
 
 
 def test_gb46_h_ext_uses_the_declared_x_then_z_block_order_and_is_immutable() -> None:
@@ -94,6 +101,13 @@ def test_rejects_non_css_input_tampered_source_and_exhausted_search() -> None:
     assert isinstance(exhausted, SplitterSearchExhausted)
     assert exhausted.terminal_status == "exhausted"
     assert len(exhausted.receipts) == 1
+    receipt = exhausted.receipts[0]
+    assert receipt.candidates_examined == 1
+    assert receipt.accepted_ordinal is None
+    assert receipt.rejected_cycle + receipt.rejected_rank + receipt.rejected_detectability == 1
+    all_candidates = construct_splitter_batch(_small_css(), delta=2, row_weight=3, attempt_cap=16)
+    assert isinstance(all_candidates, SplitterSearchExhausted)
+    assert all_candidates.receipts[0].candidates_examined == 4  # math.comb(4, 3), not the cap.
 
 
 def test_source_components_are_distinct_from_project_run_fidelity() -> None:
@@ -149,6 +163,40 @@ def test_materialization_rejects_raw_exhausted_and_tampered_batches() -> None:
     object.__setattr__(qualified, "h_ext", np.zeros_like(qualified.h_ext))
     with pytest.raises(ValueError, match="mismatched splitter graph"):
         materialize_asced_batches(original, (qualified,), path_cap=4)
+
+    def _tampered_receipt() -> QualifiedAscedBatch:
+        rebuilt = construct_splitter_batch(_small_css(), delta=2, row_weight=2, attempt_cap=16)
+        assert isinstance(rebuilt, QualifiedAscedBatch)
+        return rebuilt
+
+    receipt_digest = _tampered_receipt()
+    object.__setattr__(receipt_digest, "receipt", replace(receipt_digest.receipt, receipt_sha256="0" * 64))
+    with pytest.raises(ValueError, match="constructed receipt digest"):
+        materialize_asced_batches(original, (receipt_digest,), path_cap=4)
+
+    artifact = _tampered_receipt()
+    object.__setattr__(artifact, "receipt", replace(artifact.receipt, artifact_sha256="0" * 64))
+    with pytest.raises(ValueError, match="source artifact"):
+        materialize_asced_batches(original, (artifact,), path_cap=4)
+
+    profile = _tampered_receipt()
+    object.__setattr__(profile, "receipt", replace(profile.receipt, profile_sha256="0" * 64))
+    with pytest.raises(ValueError, match="receipt/profile"):
+        materialize_asced_batches(original, (profile,), path_cap=4)
+
+    source = _tampered_receipt()
+    object.__setattr__(source, "receipt", replace(source.receipt, source_component_ids=("tampered", "source")))
+    with pytest.raises(ValueError, match="unrecognized construction receipt"):
+        materialize_asced_batches(original, (source,), path_cap=4)
+
+    search = _tampered_receipt()
+    changed_search = replace(
+        search.receipt.search_receipts[0],
+        accepted_ordinal=search.receipt.search_receipts[0].accepted_ordinal + 1,
+    )
+    object.__setattr__(search, "receipt", replace(search.receipt, search_receipts=(changed_search, *search.receipt.search_receipts[1:])))
+    with pytest.raises(ValueError, match="inconsistent construction search receipt"):
+        materialize_asced_batches(original, (search,), path_cap=4)
 
 
 def test_materializes_the_exact_gb46_canonical_fixture_before_shots() -> None:

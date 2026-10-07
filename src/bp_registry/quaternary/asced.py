@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from hashlib import sha256
 from itertools import combinations
 import json
+from math import comb
 from typing import Literal
 
 import numpy as np
@@ -135,6 +136,7 @@ def gb46_canonical_fixture_payload(raw: bytes) -> dict[str, object]:
             "splitter_sha256": result.receipt.splitter_sha256,
             "h_ext_sha256": result.receipt.h_ext_sha256,
             "terminal_status": result.receipt.terminal_status,
+            "search_receipts": [_search_receipt_payload(item) for item in result.receipt.search_receipts],
             "constructed_receipt_sha256": result.receipt.receipt_sha256,
         },
         "qualification": {
@@ -231,6 +233,52 @@ class ConstructedSplitterReceipt:
     terminal_status: Literal["completed"]
     search_receipts: tuple[SplitterSearchReceipt, ...]
     receipt_sha256: str
+
+
+def _construction_profile(*, delta: int, row_weight: int, attempt_cap: int) -> dict[str, object]:
+    """Return the complete deterministic construction profile bound by a receipt."""
+    return {
+        "delta": delta,
+        "row_weight": row_weight,
+        "attempt_cap": attempt_cap,
+        "order": "x_then_z",
+        "search": "lexicographic_first_support",
+    }
+
+
+def _search_receipt_payload(receipt: SplitterSearchReceipt) -> dict[str, object]:
+    """Serialize a search witness without relying on slots implementation details."""
+    return {
+        "role": receipt.role,
+        "attempt_cap": receipt.attempt_cap,
+        "candidates_examined": receipt.candidates_examined,
+        "accepted_ordinal": receipt.accepted_ordinal,
+        "rejected_cycle": receipt.rejected_cycle,
+        "rejected_rank": receipt.rejected_rank,
+        "rejected_detectability": receipt.rejected_detectability,
+    }
+
+
+def _constructed_receipt_payload(
+    *,
+    artifact_sha256: str,
+    profile: dict[str, object],
+    splitter_sha256: str,
+    h_ext_sha256: str,
+    qualification_sha256: str,
+    search_receipts: tuple[SplitterSearchReceipt, ...],
+) -> dict[str, object]:
+    """Return the bytes covered by a completed project-construction receipt."""
+    return {
+        "run_fidelity": "canonical_adaptation",
+        "source_component_ids": _SOURCE_COMPONENT_IDS,
+        "artifact_sha256": artifact_sha256,
+        "profile": profile,
+        "splitter_sha256": splitter_sha256,
+        "h_ext_sha256": h_ext_sha256,
+        "qualification_sha256": qualification_sha256,
+        "search": [_search_receipt_payload(receipt) for receipt in search_receipts],
+    }
 
 
 @dataclass(frozen=True, slots=True)
@@ -382,14 +430,17 @@ def construct_splitter_batch(code: CssCode | PauliCode, *, delta: int, row_weigh
     if type(attempt_cap) is not int or attempt_cap < 1:
         raise ValueError("splitter attempt cap must be positive")
     h, h_roles = _css_pauli_rows(validated)
+    searchable_candidates = min(attempt_cap, comb(validated.n, row_weight))
     rows: list[AscedSplitterRow] = []
     search_receipts: list[SplitterSearchReceipt] = []
     for role in ("x",) * (delta // 2) + ("z",) * (delta // 2):
         cycle_rejections = rank_rejections = detectability_rejections = 0
+        candidates_examined = 0
         accepted: AscedSplitterRow | None = None
         for ordinal, support in enumerate(combinations(range(validated.n), row_weight)):
-            if ordinal >= attempt_cap:
+            if ordinal >= searchable_candidates:
                 break
+            candidates_examined += 1
             candidate = _pauli_row(role, support, validated.n)
             existing = np.vstack((h, *[_pauli_row(item.role, item.support, validated.n) for item in rows])) if rows else h
             existing_roles = h_roles + tuple(item.role for item in rows)
@@ -409,7 +460,7 @@ def construct_splitter_batch(code: CssCode | PauliCode, *, delta: int, row_weigh
             rows.append(accepted)
             break
         search_receipts.append(SplitterSearchReceipt(
-            role, attempt_cap, min(attempt_cap, len(tuple(combinations(range(validated.n), row_weight)))),
+            role, attempt_cap, candidates_examined,
             None if accepted is None else accepted.candidate_ordinal,
             cycle_rejections, rank_rejections, detectability_rejections,
         ))
@@ -417,20 +468,18 @@ def construct_splitter_batch(code: CssCode | PauliCode, *, delta: int, row_weigh
             return SplitterSearchExhausted(role, attempt_cap, tuple(search_receipts))
     complete_rows = tuple(rows)
     splitter, h_ext, row_map, qualification = qualify_splitter_batch(validated, complete_rows, row_weight=row_weight)
-    profile = {"delta": delta, "row_weight": row_weight, "attempt_cap": attempt_cap, "order": "x_then_z", "search": "lexicographic_first_support"}
+    profile = _construction_profile(delta=delta, row_weight=row_weight, attempt_cap=attempt_cap)
     artifact_sha = _artifact_sha256(validated)
     splitter_sha = sha256(_canonical_bytes(splitter.tolist())).hexdigest()
     h_ext_sha = sha256(_canonical_bytes({"rows": h_ext.tolist(), "row_map": [list(item) for item in row_map]})).hexdigest()
-    receipt_payload = {
-        "run_fidelity": "canonical_adaptation", "source_component_ids": _SOURCE_COMPONENT_IDS,
-        "artifact_sha256": artifact_sha, "profile": profile, "splitter_sha256": splitter_sha,
-        "h_ext_sha256": h_ext_sha, "qualification_sha256": qualification.qualification_sha256,
-        "search": [receipt.__dict__ if hasattr(receipt, "__dict__") else {
-            "role": receipt.role, "attempt_cap": receipt.attempt_cap, "candidates_examined": receipt.candidates_examined,
-            "accepted_ordinal": receipt.accepted_ordinal, "rejected_cycle": receipt.rejected_cycle,
-            "rejected_rank": receipt.rejected_rank, "rejected_detectability": receipt.rejected_detectability,
-        } for receipt in search_receipts],
-    }
+    receipt_payload = _constructed_receipt_payload(
+        artifact_sha256=artifact_sha,
+        profile=profile,
+        splitter_sha256=splitter_sha,
+        h_ext_sha256=h_ext_sha,
+        qualification_sha256=qualification.qualification_sha256,
+        search_receipts=tuple(search_receipts),
+    )
     receipt = ConstructedSplitterReceipt(
         "canonical_adaptation", "asced-css-lexicographic-v1", _SOURCE_COMPONENT_IDS, artifact_sha,
         sha256(_canonical_bytes(profile)).hexdigest(), splitter_sha, h_ext_sha, "completed",
@@ -445,8 +494,36 @@ def _verify_qualified_batch(batch: QualifiedAscedBatch) -> None:
         raise ValueError("materialization accepts only a complete QualifiedAscedBatch")
     if batch.receipt.run_fidelity != "canonical_adaptation" or batch.receipt.terminal_status != "completed":
         raise ValueError("materialization requires a completed canonical-adaptation construction receipt")
+    receipt = batch.receipt
+    if receipt.constructor_identity != "asced-css-lexicographic-v1" or receipt.source_component_ids != _SOURCE_COMPONENT_IDS:
+        raise ValueError("materialization rejected an unrecognized construction receipt")
+    if receipt.artifact_sha256 != _artifact_sha256(batch.code):
+        raise ValueError("materialization rejected a receipt/source artifact mismatch")
+    if not batch.rows or len(receipt.search_receipts) != len(batch.rows):
+        raise ValueError("materialization rejected an incomplete construction search receipt")
+    if len(batch.qualification.row_weights) != len(batch.rows):
+        raise ValueError("materialization rejected a malformed qualification witness")
+    row_weight = batch.qualification.row_weights[0]
+    if any(weight != row_weight for weight in batch.qualification.row_weights):
+        raise ValueError("materialization rejected a nonuniform construction profile")
+    attempt_cap = receipt.search_receipts[0].attempt_cap
+    if attempt_cap < 1 or any(search.attempt_cap != attempt_cap for search in receipt.search_receipts):
+        raise ValueError("materialization rejected inconsistent search attempt caps")
+    profile = _construction_profile(delta=len(batch.rows), row_weight=row_weight, attempt_cap=attempt_cap)
+    if receipt.profile_sha256 != sha256(_canonical_bytes(profile)).hexdigest():
+        raise ValueError("materialization rejected a receipt/profile mismatch")
+    for row, search in zip(batch.rows, receipt.search_receipts):
+        rejected = search.rejected_cycle + search.rejected_rank + search.rejected_detectability
+        if (
+            search.role != row.role
+            or search.accepted_ordinal != row.candidate_ordinal
+            or search.candidates_examined != row.candidate_ordinal + 1
+            or search.candidates_examined > min(search.attempt_cap, comb(batch.code.n, row_weight))
+            or rejected != search.candidates_examined - 1
+        ):
+            raise ValueError("materialization rejected an inconsistent construction search receipt")
     expected_splitter, expected_h_ext, expected_map, expected_qualification = qualify_splitter_batch(
-        batch.code, batch.rows, row_weight=batch.qualification.row_weights[0],
+        batch.code, batch.rows, row_weight=row_weight,
     )
     if (
         not np.array_equal(expected_splitter, batch.splitter)
@@ -459,6 +536,25 @@ def _verify_qualified_batch(batch: QualifiedAscedBatch) -> None:
     h_ext_sha = sha256(_canonical_bytes({"rows": batch.h_ext.tolist(), "row_map": [list(item) for item in batch.h_ext_row_map]})).hexdigest()
     if batch.receipt.splitter_sha256 != splitter_sha or batch.receipt.h_ext_sha256 != h_ext_sha:
         raise ValueError("materialization rejected a receipt/content digest mismatch")
+    receipt_payload = _constructed_receipt_payload(
+        artifact_sha256=receipt.artifact_sha256,
+        profile=profile,
+        splitter_sha256=splitter_sha,
+        h_ext_sha256=h_ext_sha,
+        qualification_sha256=batch.qualification.qualification_sha256,
+        search_receipts=receipt.search_receipts,
+    )
+    if receipt.receipt_sha256 != sha256(_canonical_bytes(receipt_payload)).hexdigest():
+        raise ValueError("materialization rejected a constructed receipt digest mismatch")
+    reconstructed = construct_splitter_batch(
+        batch.code, delta=len(batch.rows), row_weight=row_weight, attempt_cap=attempt_cap,
+    )
+    if (
+        isinstance(reconstructed, SplitterSearchExhausted)
+        or reconstructed.rows != batch.rows
+        or reconstructed.receipt != receipt
+    ):
+        raise ValueError("materialization rejected a noncanonical construction search receipt")
 
 
 def materialize_asced_batches(
