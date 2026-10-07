@@ -9,7 +9,12 @@ import numpy as np
 from bp_registry.quaternary.algebra import Pauli
 from bp_registry.quaternary.kernel import ScalarLlrBp4Kernel
 from bp_registry.quaternary.problems import PauliCode, QuaternaryOriginalProblem
-from bp_registry.quaternary.schedules import QbpFloodingSchedule, QbpVariableSerialSchedule, QuaternaryEdgeTable
+from bp_registry.quaternary.schedules import (
+    QbpFloodingSchedule,
+    QbpVariableSerialSchedule,
+    QuaternaryCheckTransform,
+    QuaternaryEdgeTable,
+)
 
 
 def test_quaternary_source_schedule_module_is_available() -> None:
@@ -96,3 +101,45 @@ def test_source_five_qubit_iiiyi_fixture_retains_schedule_sensitive_trace() -> N
     assert serial_second.result.converged is False
     assert "".join("IXYZ"[int(value)] for value in serial_third.result.candidate) == "IIIYI"
     assert serial_third.result.converged is True
+
+
+def test_normalization_and_offset_have_source_equations_and_scalar_scope() -> None:
+    normalization = QuaternaryCheckTransform.normalization(2.0)
+    offset = QuaternaryCheckTransform.offset(0.75)
+    assert normalization.apply(-3.0) == -1.5
+    assert offset.apply(-3.0) == -2.25
+    assert offset.apply(0.5) == 0.0
+    assert normalization.application_point == "scalar_commutation_c2v_after_check_reduction_before_variable_assembly"
+    assert normalization.as_evidence()["equation_identity"] == "lai-kuo-2021-c2v-divide-alpha-c"
+
+
+def test_transforms_compose_at_c2v_boundary_without_mutating_priors_or_candidate_scoring() -> None:
+    problem = _problem(((Pauli.X, Pauli.X, Pauli.I), (Pauli.X, Pauli.I, Pauli.X)), (Pauli.Y, Pauli.I, Pauli.I))
+    priors = _priors(problem.code.n)
+    baseline = QbpFloodingSchedule(ScalarLlrBp4Kernel().new_session(problem, priors)).sweep()
+    transformed = QbpFloodingSchedule(
+        ScalarLlrBp4Kernel().new_session(problem, priors),
+        transforms=(QuaternaryCheckTransform.normalization(2.0), QuaternaryCheckTransform.offset(0.1)),
+    ).sweep()
+    assert transformed.transform_order == (
+        "lai-kuo-2021-c2v-divide-alpha-c",
+        "lai-kuo-2021-c2v-signed-offset-beta",
+    )
+    assert not np.allclose(transformed.result.c2v, baseline.result.c2v)
+    assert np.array_equal(priors, _priors(problem.code.n))
+    assert transformed.result.candidate.shape == baseline.result.candidate.shape == (problem.code.n,)
+
+
+def test_transform_parameters_and_binary_policy_names_are_rejected() -> None:
+    for invalid in (0.0, -1.0, np.inf, np.nan, True):
+        with np.testing.assert_raises(ValueError):
+            QuaternaryCheckTransform.normalization(invalid)
+    with np.testing.assert_raises(ValueError):
+        QuaternaryCheckTransform("normalized_min_sum", 0.8)
+    with np.testing.assert_raises(ValueError):
+        QuaternaryCheckTransform("qbp_c2v_offset", 0.2).apply(np.asarray((0.2, 0.3)))
+    with np.testing.assert_raises(ValueError):
+        QbpFloodingSchedule(
+            ScalarLlrBp4Kernel().new_session(_problem(((Pauli.X,),), (Pauli.I,)), _priors(1)),
+            transforms=("offset_min_sum",),  # type: ignore[arg-type]
+        )
