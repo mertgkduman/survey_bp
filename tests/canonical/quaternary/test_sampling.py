@@ -39,6 +39,11 @@ def test_public_joint_pauli_sampling_module_is_available():
     assert importlib.util.find_spec("bp_registry.quaternary.sampling") is not None
 
 
+def test_public_categorical_pauli_sampler_is_available():
+    """QBP-02 must expose one categorical draw per physical qubit."""
+    assert callable(sample_joint_pauli)
+
+
 @pytest.mark.parametrize("p,expected", [
     (0.0, [1.0, 0.0, 0.0, 0.0]),
     (1.0, [0.0, 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0]),
@@ -105,3 +110,63 @@ def test_decoder_smoothing_has_a_separate_identity_and_cannot_change_channel():
     assert smoothing.identity != channel.identity
     assert smoothing.apply(channel.resolved_probabilities).tolist() == [[1.0, 1e-9, 1e-9, 1e-9]]
     assert channel.resolved_probabilities.tolist() == [[1.0, 0.0, 0.0, 0.0]]
+
+
+@pytest.mark.parametrize("label", [Pauli.I, Pauli.X, Pauli.Y, Pauli.Z])
+def test_categorical_exact_pauli_channels_produce_one_deterministic_pauli(label):
+    probabilities = np.zeros(4, dtype=np.float64)
+    probabilities[int(label)] = 1.0
+    sample = sample_joint_pauli(
+        _problem(),
+        channel=JointPauliChannel.explicit(probabilities, n=1),
+        shot_id=7,
+        manifest_identity="sampling-deterministic-v1",
+    )
+
+    assert sample.hidden.paulis.tolist() == [label]
+    assert sample.hidden.x.tolist() == [int(label in (Pauli.X, Pauli.Y))]
+    assert sample.hidden.z.tolist() == [int(label in (Pauli.Y, Pauli.Z))]
+    assert sample.observation.syndrome.tolist() == [int(label in (Pauli.Y, Pauli.Z)), int(label in (Pauli.X, Pauli.Y))]
+
+
+def test_single_y_flips_both_css_component_observations():
+    sample = sample_joint_pauli(
+        _problem(), channel=JointPauliChannel.explicit([0.0, 0.0, 1.0, 0.0], n=1),
+        shot_id=0, manifest_identity="single-y-v1",
+    )
+
+    assert sample.observation.syndrome.tolist() == [1, 1]
+    assert sample.hidden.paulis.tolist() == [Pauli.Y]
+
+
+def test_correlated_joint_distribution_retains_y_mass_and_xz_covariance():
+    channel = JointPauliChannel.explicit([0.5, 0.0, 0.5, 0.0], n=1)
+
+    assert channel.resolved_probabilities[0, Pauli.Y] == 0.5
+    assert channel.x_rate(0) == 0.5
+    assert channel.z_rate(0) == 0.5
+    assert channel.xz_covariance(0) == pytest.approx(0.25)
+
+
+def test_exact_cumulative_boundaries_use_i_x_y_z_ownership(monkeypatch):
+    channel = JointPauliChannel.explicit([0.1, 0.2, 0.3, 0.4], n=4)
+    draws = iter([0.0, 0.1, 0.3, 0.6])
+    monkeypatch.setattr("bp_registry.quaternary.sampling._rng", lambda identity, shot: type("Rng", (), {"random": lambda self: next(draws)})())
+
+    sample = sample_joint_pauli(_problem(4), channel=channel, shot_id=0, manifest_identity="boundary-v1")
+
+    assert sample.hidden.paulis.tolist() == [Pauli.I, Pauli.X, Pauli.Y, Pauli.Z]
+
+
+def test_replay_identity_binds_channel_order_and_shot_and_rejects_tampering():
+    channel = JointPauliChannel.depolarizing(0.4, n=1)
+    first = sample_joint_pauli(_problem(), channel=channel, shot_id=3, manifest_identity="replay-v1")
+    second = sample_joint_pauli(_problem(), channel=channel, shot_id=3, manifest_identity="replay-v1")
+
+    assert first.sample_identity == second.sample_identity
+    assert first.hidden.paulis.tolist() == second.hidden.paulis.tolist()
+    assert first.ledger["channel_identity"] == channel.identity
+    assert first.ledger["pauli_order"] == "I,X,Y,Z"
+    tampered = JointPauliChannel.depolarizing(0.5, n=1)
+    assert tampered.identity != channel.identity
+    assert first.sample_identity != hashlib.sha256(f"joint-pauli-sample-v1\0replay-v1\0{tampered.identity}\03".encode()).hexdigest()
