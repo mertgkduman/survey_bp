@@ -535,7 +535,52 @@ Plans:
 
 **Research focus:** Quaternary factor equations, scalar/vector message representations, memory/numeric choices, and policy-specific compatibility derivations.
 **Priority decision:** Begin this phase next, ahead of campaign infrastructure and reproduction, while Phase 7 optional postprocessing remains paused. Reuse the verified CSS execution lifecycle where mathematically compatible; keep correlated quaternary factors in their own canonical kernel family.
-**Plans:** TBD
+**Plans:** 0/16 plans complete.
+
+Plans:
+
+**Wave 1**
+
+- [ ] 10-01-PLAN.md — Run and replay the public non-CSS joint-Pauli tracer.
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 10-02-PLAN.md — Define Pauli algebra and immutable general/CSS problems.
+- [ ] 10-13-PLAN.md — Audit pinned native aSCED and freeze its build proposal.
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 10-03-PLAN.md — Classify Pauli candidates independently.
+- [ ] 10-04-PLAN.md — Validate and sample joint Pauli channels.
+- [ ] 10-05-PLAN.md — Implement and independently check scalar LLR-BP4.
+- [ ] 10-10-PLAN.md — Construct, qualify, and identify CSS aSCED splitters.
+- [ ] 10-14-PLAN.md — Resolve the exact native source and build trust gate.
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 10-06-PLAN.md — Add quaternary schedules, normalization, and offset.
+- [ ] 10-11-PLAN.md — Bind and verify overcomplete aSCED maps.
+- [ ] 10-15-PLAN.md — Build and run the pinned native aSCED reference.
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
+- [ ] 10-07-PLAN.md — Admit compatible compositions through public execution.
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
+- [ ] 10-08-PLAN.md — Execute and replay quaternary BPGD.
+
+**Wave 7** *(blocked on Wave 6 completion)*
+
+- [ ] 10-09-PLAN.md — Execute and replay fixed-alpha MBP4.
+
+**Wave 8** *(blocked on Wave 7 completion)*
+
+- [ ] 10-12-PLAN.md — Run every aSCED path and select original-valid candidates.
+
+**Wave 9** *(blocked on Wave 8 completion)*
+
+- [ ] 10-16-PLAN.md — Run and verify bounded matched mechanism evidence.
 
 ### Phase 11: Quaternary Reproduction and Comparisons
 

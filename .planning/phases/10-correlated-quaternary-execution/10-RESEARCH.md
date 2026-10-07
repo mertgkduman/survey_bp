@@ -656,42 +656,47 @@ Returning both arrays preserves the literal source weights and the normalization
 | A1 | Keep existing work-vector fields and qualify their units rather than add arithmetic counters. | Current Repository Baseline | Work comparisons could miss a required schema distinction. |
 | A2 | Persist Pauli label in each quaternary edge-table hash. | Canonical Mathematical Contract | Artifact identity could be insufficient if omitted. |
 | A3 | Lock a combined CSS syndrome row order during Phase 10 planning. | Canonical Mathematical Contract | Cross-component syndrome evidence could drift. |
-| A4 | Select quaternary saturation through Wave 0 differential tests rather than inherit `25.0`. | Numerical Contract | Numerical behavior and source comparisons depend on the bound. |
+| A4 | Bind `quaternary-bp4-f64-v1` to symmetric saturation `±25.0`, subject to its mandatory pre-evidence oracle gate. | Numerical Contract | Numerical behavior and source comparisons depend on the bound. |
 | A5 | Strict user priors must already sum to one; only explicitly source-literal weights may be normalized with raw values retained. | Sampling / Q-BPGD | A different API policy changes rejection and provenance semantics. |
 | A6 | Use `rank(T Λ Hᵀ)=Δ` with rank growth, CSS type, weight, and cycle checks as the canonical executable splitter qualification. | aSCED Source Resolution | A different formalization could admit the wrong affine partition. |
 | A7 | Use stable `(batch index, virtual path index)` to resolve equal-weight aSCED candidates. | aSCED Source Resolution | The paper does not specify ties; trajectory identity with another implementation may differ. |
-| A8 | Use GB46 with `Δ=2` as the bounded paper-linked demonstration. | Bounded Mechanism Evidence | A different small profile may be easier to build or verify. |
+| A8 | Use the resolved GB46 `p=0.05`, seed `10`, 256-shot, `Δ=2`, `L=1` bounded profile and its declared native aggregate arm. | Bounded Mechanism Evidence | These project-level settings determine evidence identity and resource use. |
 | A9 | Apply a pinned build-only pybind11 overlay and out-of-tree path-corrected driver to the native checkout. | Native Reference Gate | Native upstream may publish a repair before execution. |
 | A10 | Native licensing remains unresolved until a human verifies authoritative license information. | Native Reference Gate | Copying or redistribution without resolution creates legal/provenance risk. |
 | A11 | Use the proposed `canonical/quaternary/` module layout. | Architecture Patterns | Repository maintainers may prefer the current flat module convention. |
 | A12 | The author implementation identity for Yao Q-BPGD remains unresolved; the current project record must not be read as proof of absence. | Open Questions | Reproduction planning could miss an available source implementation. |
 
-## Open Questions
+## Open Questions (RESOLVED FOR PLANNING)
 
-1. **What is the exact persisted combined syndrome order for compiled CSS artifacts?**
-   - What we know: current code separately identifies Z checks and X checks, and the source formulas use one ordered stabilizer matrix. [VERIFIED: src/bp_registry/sampling.py:105-114] [CITED: https://arxiv.org/html/2312.10950v2]
-   - What's unclear: no current quaternary artifact schema exists. [VERIFIED: repository file audit 2026-10-06]
-   - Recommendation: lock row order and roles in semantic bytes before kernel work. [ASSUMED]
+These source gaps remain visible, but none is left for the planner to decide. Items 1, 2, 3, and 5 are binding Phase 10 implementation choices. Item 4 is a mandatory execution precondition for the D-12 native run. [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:40-63]
 
-2. **What finite saturation and boundary behavior define the canonical quaternary numerical profile?**
-   - What we know: current binary saturation is `25.0`; source Q-BP specifies real LLRs and stable log operations but not this project's finite bound. [VERIFIED: src/bp_registry/canonical/numerics.py:15-41] [CITED: https://arxiv.org/html/2104.00304]
-   - What's unclear: the smallest bound that preserves oracle agreement over intended priors and degrees. [ASSUMED]
-   - Recommendation: parameterize it, sweep adversarial tiny-tree fixtures, and freeze the selected profile before public manifests. [ASSUMED]
+1. **Combined CSS syndrome order — binding decision**
+   - **Evidence boundary:** current code computes the observation labeled `"X"` as `hx @ hidden_z` and the observation labeled `"Z"` as `hz @ hidden_x`; the quaternary source requires one ordered stabilizer matrix. [VERIFIED: src/bp_registry/sampling.py:105-114] [CITED: https://arxiv.org/html/2312.10950v2]
+   - **Plan decision:** compile CSS rows as X-type stabilizers first, in stored `H_x` row order, then Z-type stabilizers in stored `H_z` row order. Persist the combined syndrome as `[s_X, s_Z] = [H_x z, H_z x]`, with every row's type and original index in semantic bytes. [ASSUMED]
+   - **aSCED extension:** for a batch, persist augmented syndrome order `[s_X, g_X, s_Z, g_Z]`; the overcomplete form is the declared matrix image of that exact vector. [CITED: https://arxiv.org/html/2605.06547v2]
+   - **Execution gate:** CSS compilation must round-trip both current observations and independent Y-error fixtures byte-for-byte before any public manifest is admitted. [ASSUMED]
 
-3. **Can authoritative Q-BPGD code refine the locked continuation interpretation?**
-   - What we know: Algorithm 3 says to run Q-BP for `T` iterations, then decimate using maximum marginal reliability. [CITED: https://arxiv.org/html/2312.10950v2]
-   - What's unclear: author-code identity remains unresolved; D-14 through D-16 already lock continuation, literal-weight normalization, and ties as explicit canonical interpretations. [VERIFIED: literature_policies/yao-2024-guided-decimation/paper_reproduction/PAPER.md:3-8,27-33] [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:52-58]
-   - Recommendation: implement the locked choices and change source-status labeling only if authoritative code is later qualified. [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:52-58]
+2. **Canonical quaternary saturation — binding decision with validation gate**
+   - **Evidence boundary:** the source Q-BP equations use real LLRs but do not prescribe this project's finite bound; the existing binary profile uses `float64`, natural log odds, and saturation `25.0`. [CITED: https://arxiv.org/html/2104.00304] [VERIFIED: src/bp_registry/canonical/numerics.py:15-41]
+   - **Plan decision:** define `quaternary-bp4-f64-v1` with `float64`, natural-log identity-referenced LLRs, stable ordered box-plus/log-sum-exp, symmetric clipping at `±25.0` after every public message/belief primitive, and terminal evidence for any nonfinite intermediate. This is a project numerical convention, not a paper-specified constant. [ASSUMED]
+   - **Execution gate:** before freezing a public manifest, the profile must agree with conventional vector BP4 and exact enumeration on the Wave 0 tree/adversarial fixtures at declared tolerances. Failure blocks evidence collection and requires a newly named profile; it cannot silently change `quaternary-bp4-f64-v1`. [ASSUMED]
 
-4. **What authoritative license and repaired build identity govern the native aSCED reference?**
-   - What we know: commit `816772071486615dfc7d71d1e15df597edc58a26` is audited, but its declared pybind11 submodule and demo matrix path do not resolve from that tree. [VERIFIED: pinned repository audit 2026-10-06]
-   - What's unclear: authoritative license terms and the exact upstream-compatible pybind11 revision. [ASSUMED]
-   - Recommendation: make license verification plus a hashed, build-only overlay a checkpoint before native execution; never block canonical implementation on native instrumentation. [ASSUMED]
+3. **Authoritative Q-BPGD code — no planning dependency**
+   - **Evidence boundary:** no authoritative author-code identity is qualified in the project record. [VERIFIED: literature_policies/yao-2024-guided-decimation/paper_reproduction/PAPER.md:3-8,27-33] Algorithm 3 still supplies the paper-level iteration and reliability contract. [CITED: https://arxiv.org/html/2312.10950v2]
+   - **Plan decision:** implement D-14 through D-16 exactly as the persisted canonical interpretation: continue committed edge messages, ratio-normalize the literal `(1-ε, ε, ε, ε)` vector, and use the locked qubit/Pauli tie orders. Label the result `canonical_adaptation` wherever the unresolved buffer semantics matter. [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:52-58]
+   - **Later source handling:** newly discovered authoritative code may add a separate source profile or revise a future schema, but it does not alter Phase 10 evidence already identified under this interpretation. [ASSUMED]
 
-5. **Which paper-linked bounded aSCED profile should be frozen?**
-   - What we know: the paper/repository provide GB46 and toric ordinary/overcomplete examples, but D-13 deliberately does not prescribe a curve or sample count. [CITED: https://arxiv.org/html/2605.06547v2] [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:60-63]
-   - What's unclear: the smallest run that exercises both ordinary and overcomplete paths within the available HPC budget. [ASSUMED]
-   - Recommendation: preflight GB46, `Δ=2`, one batch per option, a small fixed shot set, and source-profile decoder settings; persist any different choice before sampling. [ASSUMED]
+4. **Native aSCED license/build identity — mandatory blocking execution gate**
+   - **Evidence boundary:** commit `816772071486615dfc7d71d1e15df597edc58a26` is the audited native source, but its declared pybind11 submodule and demo matrix path do not resolve from that tree. [VERIFIED: pinned repository audit 2026-10-06] Authoritative license terms and the upstream-compatible pybind11 revision remain unknown. [ASSUMED]
+   - **Precondition A — license:** before cloning/building for the retained D-12 evidence, a human must record an authoritative license or explicit permission that covers the intended build/run and artifact retention. Unknown terms do not pass. [ASSUMED]
+   - **Precondition B — reproducible build identity:** pin the pybind11 source revision, environment/compilers, and minimal build-only overlay; store their hashes and a diff proving that the overlay changes packaging/paths only. Build and smoke-test the pinned native revision in its isolated environment. [ASSUMED]
+   - **Blocking disposition:** canonical implementation may proceed while these gates are addressed, but Phase 10 cannot complete and D-12 cannot be waived if either gate fails. Escalate the unresolved gate to the user rather than substituting canonical output or dropping the native arm. [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:47-50]
+
+5. **Bounded aSCED mechanism profile — binding decision**
+   - **Evidence boundary:** the paper/repository provide GB46 ordinary and overcomplete materials, while D-13 deliberately excludes curve reproduction and ranking. [CITED: https://arxiv.org/html/2605.06547v2] [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:47-63]
+   - **Plan decision:** freeze a GB46 depolarizing smoke profile at physical `p=0.05`, canonical seed `10`, and admitted shot IDs `0..255`. Run standalone canonical BP4 and canonical aSCED on those identical 256 samples. For each ordinary and overcomplete aSCED arm declare `Δ=2`, `L=1`, enumerate all four virtual paths, use the first qualified pinned batch, cap ordinary BP4 at 25 iterations and overcomplete BP4 at 12 iterations, and retain every path record. These bounded choices are project conventions and do not claim to reproduce a paper curve. [ASSUMED]
+   - **Native arm:** after item 4 passes, run the closest supported equal-proportion depolarizing native configurations with one worker, `max_trials=10000`, and `target_errors=10`; retain the actual denominator and aggregate counters. Mark native seed, shot IDs, injected errors, and per-shot/path counters `unavailable` because the audited binding does not expose them. [VERIFIED: pinned native binding audit 2026-10-06] [ASSUMED]
+   - **Evidence label:** all three arms remain `not_assessed`; no logical-error-rate reproduction or ranking claim is permitted. [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:47-50]
 
 ## Environment Availability
 
