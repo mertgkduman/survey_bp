@@ -181,6 +181,8 @@ For symplectic splitter matrix `T` and original stabilizer matrix `H`, verify bo
 
 The pinned generator enforces rank growth and removes co-neighbor positions to avoid extra 4-cycles, but contains an explicit TODO to check that a generated row is not logical. [VERIFIED: kit-cel/quantum_asced@816772071486615dfc7d71d1e15df597edc58a26:qec/Graph_Optimization.cpp; qec/Graph_Optimization_GF4.cpp] Therefore native-generated rows are inputs to canonical qualification, never proof that qualification passed. [ASSUMED]
 
+Execution decision (2026-10-07): the pinned generator uses unseeded `std::rand()` and does not persist its generated ordered `T` or `H_ext`. The exact proposed GB46 `source_fixture_verified` receipt is unavailable from the audited source. The user selected a deterministic, independently qualified GB46 fixture with run fidelity `canonical_adaptation`; its source-backed rank-growth and co-neighbor-removal components remain separately identified. No constructed row or graph may be described as the author's exact output. [VERIFIED: pinned generator audit; .planning/phases/10-correlated-quaternary-execution/10-EXECUTION-DECISIONS.md]
+
 ### Path execution and selection
 
 For every admitted shot, run all declared `(batch, virtual-syndrome)` paths unless a prespecified evidence cap rejects the manifest before sampling. [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:40-50] Each path ledger must contain graph identity, batch/index, `g`, augmented syndrome, numerical/profile identity, terminal reason, iteration/work vector, candidate, extended-syndrome validity, original-syndrome validity, and selection status. [ASSUMED]
@@ -190,6 +192,8 @@ The paper forms the candidate pool from every path output that satisfies the imm
 ### Overcomplete option
 
 The full Phase 10 method must support both ordinary augmented checks and the paper's overcomplete path. For every batch verify over GF(2) that `H_oc=M H_ext`, compute `z_oc=M z_ext`, and persist `M`, its rank/shape, row order, and all hashes. [CITED: https://arxiv.org/html/2605.06547v2] The pinned repository's audited precomputed GB46 and toric artifacts satisfied these matrix relations; use them as fixtures, not as a substitute for generic validation. [VERIFIED: kit-cel/quantum_asced@816772071486615dfc7d71d1e15df597edc58a26:Extended_PCMs]
+
+The selected canonical splitter batch has its own `H_ext`, so a precomputed author `M`/`H_oc` pair cannot be bound to it without exact matrix identity. Construct a nontrivial overcomplete `M` deterministically against the selected canonical `H_ext`, with declared row-combination order, a finite cap, independent matrix/syndrome checks, and a content-addressed receipt. Retain the pinned pair only as separate source comparison data. [ASSUMED: user adaptation decision 2026-10-07]
 
 ### Paper/repository discrepancies that must stay visible
 
@@ -210,7 +214,7 @@ No license file or package license field was located during the audit; absence i
 
 ### Bounded mechanism evidence
 
-Prespecify one small CSS code/profile, fixed admitted shot IDs, sample count, `L`, even `Δ`, path cap, iteration caps, smoothing, selection tie, and work units before execution. [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:47-50] A compact paper-linked choice is GB46 with `Δ=2`, ordinary BP4 aSCED plus the available overcomplete artifact, while retaining the exact selected parameters in the manifest. [ASSUMED] Run canonical standalone BP4 and canonical aSCED on identical Pauli samples, retain all path results, and label the evidence `not_assessed`; run native only on the closest equal-proportion aggregate input and record that shot matching and per-shot native counters are unavailable. [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:47-50]
+Prespecify one small CSS code/profile, fixed admitted shot IDs, sample count, `L`, even `Δ`, path cap, iteration caps, smoothing, selection tie, and work units before execution. [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:47-50] A compact paper-linked choice is GB46 with `Δ=2`, ordinary BP4 aSCED plus a deterministically constructed canonical overcomplete map, while retaining the exact selected parameters and receipt digests in the manifest. [ASSUMED: user adaptation decision 2026-10-07] Run canonical standalone BP4 and canonical aSCED on identical Pauli samples, retain all path results, and label the evidence `not_assessed`; run native only on the closest equal-proportion aggregate input and record that shot matching and per-shot native counters are unavailable. [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:47-50]
 
 ## Canonical Mathematical Contract
 
