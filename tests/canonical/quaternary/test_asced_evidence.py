@@ -106,3 +106,20 @@ def test_pending_human_proposal_refuses_build_run_and_ambient_cmake(tmp_path: Pa
     )
     assert result.returncode != 0
     assert "only the recorded disposable-root CMake executable" in result.stderr
+
+
+def test_approved_build_emits_a_digest_bound_success_receipt(tmp_path: Path) -> None:
+    """The approved proposal must build only through the guarded CLI path."""
+    receipt = tmp_path / "build-receipt.json"
+    summary = ROOT / ".planning" / "phases" / "10-correlated-quaternary-execution" / "10-14-SUMMARY.md"
+    result = subprocess.run(
+        [
+            sys.executable, str(SCRIPT), "build", "--spec", str(SPEC),
+            "--approval-summary", str(summary), "--receipt", str(receipt),
+        ],
+        capture_output=True, text=True, check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    payload = json.loads(receipt.read_text(encoding="utf-8"))
+    assert payload["terminal"] == "build_success"
+    assert payload["source_spec_sha256"] == "55359962431c055cf971171f81d75997282beb29e8928a8d82e023fbb6c1f24e"
