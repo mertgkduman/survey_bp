@@ -18,9 +18,12 @@ import numpy as np
 
 from ..canonical.numerics import boxplus
 from ..canonical.budgets import BudgetLimit, BudgetTree
+from ..css import CssCode
+from .asced import AscedController, AscedSpec, SplitterSearchExhausted, construct_splitter_batch, materialize_asced_batches
+from .asced_overcomplete import OvercompleteSearchExhausted, construct_overcomplete_map
 from .kernel import ScalarLlrBp4Kernel
 from .mbp4 import FixedAlphaMbp4Kernel, Mbp4Spec
-from .problems import PauliCode, QuaternaryOriginalProblem
+from .problems import PauliCode, QuaternaryOriginalProblem, compile_css_artifact
 from .qbpgd import QbpgdController, QbpgdSpec
 
 
@@ -382,6 +385,101 @@ def run_quaternary_mbp4(
         "interpretation_ids": {"fixed_alpha": "declared_manifest_alpha"}, "source_author_code_identity": "unverified",
         "work": decoded.work.as_evidence(structural_event_version=4),
     }
+
+
+def _css_from_public_problem(problem: TracerPauliProblem) -> CssCode:
+    """Recover the strict ordered CSS artifact required at the aSCED boundary."""
+    rows = np.asarray(problem.checks, dtype=np.uint8)
+    x_rows: list[np.ndarray] = []
+    z_rows: list[np.ndarray] = []
+    seen_z = False
+    for row in rows:
+        labels = set(int(item) for item in row.tolist())
+        if labels <= {0, int(PauliValue.X)} and int(np.count_nonzero(row)):
+            if seen_z:
+                raise ValueError("CSS aSCED requires all X checks before all Z checks")
+            x_rows.append((row == PauliValue.X).astype(np.uint8))
+        elif labels <= {0, int(PauliValue.Z)} and int(np.count_nonzero(row)):
+            seen_z = True
+            z_rows.append((row == PauliValue.Z).astype(np.uint8))
+        else:
+            raise ValueError("non-CSS aSCED is unsupported without a separate splitter derivation")
+    if not x_rows or not z_rows:
+        raise ValueError("CSS aSCED requires nonempty ordered X and Z check blocks")
+    return CssCode(np.vstack(x_rows), np.vstack(z_rows)).validate()
+
+
+def run_quaternary_asced(
+    manifest: Any, output: str | Path, *, resolved_composition: Mapping[str, Any], shot_id: int = 0,
+) -> dict[str, Any]:
+    """Execute the complete receipt-bound CSS aSCED ensemble through the public ledger."""
+    problem, channel, run_id, iterations, max_work, smoothing, manifest_sha256 = _manifest_parts(manifest)
+    payload = manifest.model_dump(mode="json") if hasattr(manifest, "model_dump") else manifest
+    intervention = payload["composition"]["intervention"]
+    config = intervention.get("config", {})
+    if not isinstance(config, Mapping) or config.get("css_only") is not True:
+        raise ValueError("public aSCED requires an explicit css_only=true configuration")
+    delta, row_weight, attempt_cap, path_cap = (config.get(name) for name in ("delta", "row_weight", "attempt_cap", "path_cap"))
+    if not all(type(value) is int for value in (delta, row_weight, attempt_cap, path_cap)):
+        raise ValueError("public aSCED requires integer delta, row_weight, attempt_cap, and path_cap")
+    css = _css_from_public_problem(problem)
+    constructed = construct_splitter_batch(css, delta=delta, row_weight=row_weight, attempt_cap=attempt_cap)
+    if isinstance(constructed, SplitterSearchExhausted):
+        raise ValueError("public aSCED splitter construction exhausted before sampling")
+    original = QuaternaryOriginalProblem(
+        lineage_id=f"original-asced-{manifest_sha256[:16]}",
+        code=compile_css_artifact(css, source_artifact_identity=f"public-manifest:{manifest_sha256}"),
+        syndrome=problem.syndrome,
+    )
+    batches = materialize_asced_batches(original, (constructed,), path_cap=path_cap)
+    if sum(batch.path_count for batch in batches) * iterations > max_work:
+        raise ValueError("public aSCED declared all-path BP work exceeds the manifest cap before sampling")
+    use_overcomplete = intervention["kind"] == "asced_overcomplete" or config.get("overcomplete") is True
+    maps = None
+    if use_overcomplete:
+        made = construct_overcomplete_map(constructed, pair_cap=config.get("pair_cap", 1000))
+        if isinstance(made, OvercompleteSearchExhausted):
+            raise ValueError("public aSCED overcomplete construction exhausted before sampling")
+        maps = {batches[0].batch_id: made}
+    physical_identity = _digest({"checks": problem.checks.tolist(), "channel": channel.tolist(), "run_id": run_id})
+    hidden = _sample(channel, seed_identity=f"{physical_identity}:shot:{shot_id}")
+    if not np.array_equal(syndrome_for(problem, hidden), problem.syndrome):
+        raise ValueError("manifest observation does not match its deterministic categorical sample")
+    priors = np.maximum(channel, smoothing)
+    priors /= priors.sum(axis=1, keepdims=True)
+    kernel_config = payload["composition"]["kernel"].get("config", {})
+    if payload["composition"]["kernel"]["kind"] == "qbp_mbp4_fixed_alpha":
+        kernel = FixedAlphaMbp4Kernel(Mbp4Spec(alpha=kernel_config.get("alpha"), schedule=payload["composition"]["schedule"]["kind"], max_iterations=iterations))
+    else:
+        kernel = ScalarLlrBp4Kernel()
+    result = AscedController(AscedSpec(max_iterations=iterations, path_cap=path_cap)).run(
+        original, batches, priors, kernel=kernel, budgets=BudgetTree(limits=(BudgetLimit("attempt", "bp_calls", max_work),), parents={}), overcomplete=maps,
+    )
+    candidate = None if result.selected_candidate is None else np.asarray(result.selected_candidate, dtype=np.uint8)
+    outcome, logical = ("invalid_syndrome", None) if candidate is None else _evaluate(problem, hidden, candidate)
+    events = [
+        _event("preflight", {
+            "run_id": run_id, "shot_id": shot_id, "manifest_sha256": manifest_sha256,
+            "public_schema": "quaternary_experiment_v2", "observation": problem.syndrome.tolist(),
+            "resolved_composition": dict(resolved_composition), "run_fidelity": "canonical_adaptation",
+            "splitter_receipt": constructed.receipt.receipt_sha256, "h_ext_sha256": constructed.receipt.h_ext_sha256,
+            "path_count": sum(batch.path_count for batch in batches), "overcomplete": use_overcomplete,
+        }),
+        _event("sample", {"sample_identity": _digest({"manifest": manifest_sha256, "shot": shot_id}), "channel": channel.tolist(), "decoder_priors": priors.tolist(), "decoder_smoothing": smoothing, "hidden_truth_sealed": True}),
+    ]
+    events.extend(_event("asced_path", {
+        "batch_index": path.batch_index, "path_index": path.path_index, "graph_identity": path.graph_identity,
+        "virtual_bits_lsb_first": list(path.virtual_bits), "extended_syndrome": list(path.extended_syndrome),
+        "candidate": list(path.candidate), "extended_valid": path.extended_valid, "original_valid": path.original_valid,
+        "pauli_weight": path.pauli_weight, "terminal": path.terminal, "work": path.work.as_evidence(structural_event_version=4),
+    }) for path in result.paths)
+    events.extend((
+        _event("selection", {"original_valid_pool": [list(item) for item in result.original_valid_pool], "selected_origin": None if result.selected_origin is None else list(result.selected_origin), "selected_candidate": None if candidate is None else candidate.tolist(), "tie_rule": "batch_index_then_path_index"}),
+        _event("evaluation", {"outcome": outcome, "logical_action_agrees": logical, "original_observation": problem.syndrome.tolist()}),
+        _event("termination", {"termination": result.termination, "candidate": None if candidate is None else candidate.tolist(), "outcome": outcome, "assessment_status": "not_assessed", "work": result.work.as_evidence(structural_event_version=4)}),
+    ))
+    _write_events(Path(output) / "events.jsonl", events)
+    return {"termination": result.termination, "outcome": outcome, "run_fidelity": result.run_fidelity, "component_fidelity": dict(resolved_composition["component_fidelity"]), "component_ids": dict(result.component_ids), "interpretation_ids": dict(result.interpretation_ids), "source_author_code_identity": "unverified", "work": result.work.as_evidence(structural_event_version=4)}
 
 
 def verify_quaternary_tracer(manifest: Any, output: str | Path, *, shot_id: int = 0) -> dict[str, Any]:

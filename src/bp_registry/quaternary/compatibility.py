@@ -141,7 +141,12 @@ def resolve_quaternary_composition(
         css_only = intervention.config.get("css_only")
         if problem_kind != "css" or css_only is not True:
             raise ValueError("non-CSS aSCED is unsupported without a separate splitter derivation")
-        raise ValueError("aSCED execution is reserved until qualified splitter output is available")
+        component_fidelity["intervention"] = "source_backed"
+        equations["asced_selection"] = "all_L_times_2^Delta_paths; original_syndrome_valid_minimum_pauli_weight"
+        lifecycle["asced_path_lifecycle"] = "materialize_all_qualified_paths_before_sampling_then_fresh_session_per_path"
+        revisions.append("wursthorn-et-al-2026-asced-css-path-selection")
+        procedure_basis = "canonical_asced_css_interpretation_v1"
+        reasons.extend(("project_constructed_splitter_and_map", "stable_batch_path_tie_interpretation"))
     else:
         raise ValueError(f"unknown quaternary intervention kind: {intervention.kind}")
 

@@ -169,6 +169,12 @@ def test_compatibility_rejects_empty_or_unowned_compositions():
             kernel=None,
             schedule=QuaternaryPolicySpec(kind="qbp_flooding", binding_id="schedule"),
         )
+    with pytest.raises(ValueError, match="owns state"):
+        resolve_quaternary_composition(
+            _composition(intervention="qbpgd", continued_messages=True, prior_profile="depolarizing").model_copy(
+                update={"intervention": QuaternaryPolicySpec(kind="qbpgd", binding_id="intervention")}
+            )
+        )
 
 
 def test_css_asced_composition_is_an_explicit_canonical_adaptation() -> None:
@@ -180,12 +186,40 @@ def test_css_asced_composition_is_an_explicit_canonical_adaptation() -> None:
     assert resolved.run_fidelity == "canonical_adaptation"
     assert resolved.component_fidelity["intervention"] == "source_backed"
     assert "project_constructed_splitter_and_map" in resolved.adaptation_reasons
-    with pytest.raises(ValueError, match="owns state"):
-        resolve_quaternary_composition(
-            _composition(intervention="qbpgd", continued_messages=True, prior_profile="depolarizing").model_copy(
-                update={"intervention": QuaternaryPolicySpec(kind="qbpgd", binding_id="intervention")}
-            )
-        )
+
+
+def test_public_css_asced_preflights_runs_all_paths_and_replays(tmp_path) -> None:
+    data = _public_v2_manifest()
+    data.update(
+        run_id="public-asced-css", max_iterations=1, max_work=10_000,
+        problem={"checks": [[1, 1, 0, 0], [0, 0, 3, 3]], "syndrome": [0, 0]},
+        channel={"probabilities": [[1.0, 0.0, 0.0, 0.0]] * 4, "decoder_smoothing": 1e-12},
+    )
+    data["composition"]["intervention"] = {
+        "kind": "asced", "binding_id": "asced",
+        "config": {"css_only": True, "delta": 2, "row_weight": 1, "attempt_cap": 4, "path_cap": 4},
+    }
+    report = preflight_quaternary(data)
+    assert report["composition"]["run_fidelity"] == "canonical_adaptation"
+    result = run_quaternary(data, tmp_path)
+    events = [json.loads(line) for line in (tmp_path / "events.jsonl").read_text(encoding="utf-8").splitlines()]
+    assert len([event for event in events if event["kind"] == "asced_path"]) == 4
+    assert result["run_fidelity"] == "canonical_adaptation"
+    assert verify_quaternary_run(tmp_path)["verified"] is True
+    path = tmp_path / "events.jsonl"
+    path.write_text(path.read_text(encoding="utf-8").replace('"path_index":0', '"path_index":9', 1), encoding="utf-8")
+    with pytest.raises(ValueError, match="differs"):
+        verify_quaternary_run(tmp_path)
+
+
+def test_public_asced_rejects_non_css_before_sampling() -> None:
+    data = _public_v2_manifest()
+    data["composition"]["intervention"] = {
+        "kind": "asced", "binding_id": "asced",
+        "config": {"css_only": True, "delta": 2, "row_weight": 1, "attempt_cap": 4, "path_cap": 4},
+    }
+    with pytest.raises(ValueError, match="non-CSS"):
+        preflight_quaternary(data)
 
 
 def _public_v2_manifest() -> dict:

@@ -36,7 +36,7 @@ from .manifests import (
     validate_executable_canonical_baseline,
 )
 from . import evaluator, sampling
-from .quaternary.execution import run_quaternary_mbp4, run_quaternary_qbpgd, run_quaternary_tracer, verify_quaternary_tracer
+from .quaternary.execution import TracerPauliProblem, _css_from_public_problem, run_quaternary_asced, run_quaternary_mbp4, run_quaternary_qbpgd, run_quaternary_tracer, verify_quaternary_tracer
 from .quaternary.compatibility import resolve_quaternary_composition
 
 
@@ -235,7 +235,11 @@ def preflight_quaternary(manifest_path: str | Path) -> dict[str, Any]:
         "assessment_status": manifest.evidence.assessment_status,
     }
     if isinstance(manifest, QuaternaryExperimentV2):
-        resolved = resolve_quaternary_composition(manifest.composition)
+        intervention = manifest.composition.intervention
+        is_asced = intervention is not None and intervention.kind in {"asced", "asced_overcomplete"}
+        if is_asced:
+            _css_from_public_problem(TracerPauliProblem(manifest.problem.checks, manifest.problem.syndrome))
+        resolved = resolve_quaternary_composition(manifest.composition, problem_kind="css" if is_asced else "general_pauli")
         report["shot_budget"] = manifest.shot_budget
         report["composition"] = resolved.model_dump(mode="json")
     return report
@@ -259,13 +263,16 @@ def run_quaternary(manifest_path: str | Path, output: str | Path, *, shot_id: in
         manifest_reference = str(persisted_manifest)
     qbpgd = isinstance(manifest, QuaternaryExperimentV2) and manifest.composition.intervention is not None and manifest.composition.intervention.kind == "qbpgd"
     mbp4 = isinstance(manifest, QuaternaryExperimentV2) and manifest.composition.kernel is not None and manifest.composition.kernel.kind == "qbp_mbp4_fixed_alpha"
-    if qbpgd:
+    asced = isinstance(manifest, QuaternaryExperimentV2) and manifest.composition.intervention is not None and manifest.composition.intervention.kind in {"asced", "asced_overcomplete"}
+    if asced:
+        result: Any = run_quaternary_asced(manifest, output_path, resolved_composition=report["composition"], shot_id=0)
+    elif qbpgd:
         result: Any = run_quaternary_qbpgd(manifest, output_path, resolved_composition=report["composition"], shot_id=0)
     elif mbp4:
         result = run_quaternary_mbp4(manifest, output_path, resolved_composition=report["composition"], shot_id=0)
     else:
         result = run_quaternary_tracer(manifest, output_path, shot_id=0)
-    if isinstance(manifest, QuaternaryExperimentV2) and not qbpgd and not mbp4:
+    if isinstance(manifest, QuaternaryExperimentV2) and not qbpgd and not mbp4 and not asced:
         ledger_path = output_path / "events.jsonl"
         events = [json.loads(line) for line in ledger_path.read_text(encoding="utf-8").splitlines()]
         events[0]["data"]["resolved_composition"] = report["composition"]
@@ -274,13 +281,13 @@ def run_quaternary(manifest_path: str | Path, output: str | Path, *, shot_id: in
     ledger_path = output_path / "events.jsonl"
     public = {
         **report, "output": str(output_path), "final_row_count": 1,
-        "termination": result["termination"] if (qbpgd or mbp4) else result.termination,
-        "outcome": result["outcome"] if (qbpgd or mbp4) else result.outcome,
+        "termination": result["termination"] if (qbpgd or mbp4 or asced) else result.termination,
+        "outcome": result["outcome"] if (qbpgd or mbp4 or asced) else result.outcome,
         "ledger_sha256": sha256(ledger_path.read_bytes()).hexdigest(),
         "manifest_path": manifest_reference, "ledger_path": str(ledger_path),
         "statistical_claim": "not_assessed; development fixture, not a source-curve reproduction or performance result",
     }
-    if qbpgd or mbp4:
+    if qbpgd or mbp4 or asced:
         public.update({
             "run_fidelity": result["run_fidelity"], "component_fidelity": result["component_fidelity"],
             "component_ids": result["component_ids"], "interpretation_ids": result["interpretation_ids"],

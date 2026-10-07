@@ -58,3 +58,26 @@ def test_asced_rejects_non_css_and_over_cap_before_paths() -> None:
         module.AscedController(module.AscedSpec(max_iterations=1, path_cap=3)).run(
             _original(), _batch(), np.full((4, 4), 0.25), kernel=ScalarLlrBp4Kernel(),
         )
+
+
+def test_overcomplete_paths_require_the_exact_constructed_map_pair() -> None:
+    from bp_registry.quaternary.asced_overcomplete import construct_overcomplete_map
+
+    module = importlib.import_module("bp_registry.quaternary.asced")
+    batches = _batch()
+    created = construct_overcomplete_map(batches[0].qualified)
+    assert not hasattr(created, "terminal_status")
+    result = module.AscedController(module.AscedSpec(max_iterations=1, path_cap=4)).run(
+        _original(), batches, np.full((4, 4), 0.25), kernel=ScalarLlrBp4Kernel(),
+        overcomplete={batches[0].batch_id: created},
+    )
+    assert len(result.paths) == 4
+    with pytest.raises(ValueError, match="different splitter batch"):
+        module.AscedController(module.AscedSpec(max_iterations=1, path_cap=4)).run(
+            _original(), batches, np.full((4, 4), 0.25), kernel=ScalarLlrBp4Kernel(),
+            overcomplete={batches[0].batch_id: (created[0], created[1].__class__(
+                created[1].run_fidelity, "0" * 64, created[1].h_ext_sha256, created[1].h_ext_row_map_sha256,
+                created[1].construction_profile_sha256, created[1].mapping_sha256, created[1].h_oc_sha256,
+                created[1].row_order_sha256, created[1].qualification_sha256, created[1].receipt_sha256,
+            ), created[2])},
+        )

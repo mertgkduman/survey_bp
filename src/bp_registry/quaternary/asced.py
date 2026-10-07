@@ -13,7 +13,7 @@ from hashlib import sha256
 from itertools import combinations
 import json
 from math import comb
-from typing import Literal
+from typing import Literal, Mapping
 
 import numpy as np
 
@@ -494,6 +494,7 @@ class AscedController:
         *,
         kernel: ScalarLlrBp4Kernel | FixedAlphaMbp4Kernel,
         budgets: BudgetTree | None = None,
+        overcomplete: Mapping[str, tuple[object, object, tuple[object, ...]]] | None = None,
     ) -> AscedResult:
         if not isinstance(original, QuaternaryOriginalProblem):
             raise ValueError("aSCED execution requires a CSS-derived immutable original problem")
@@ -511,15 +512,17 @@ class AscedController:
             _verify_qualified_batch(batch.qualified)
             if batch.working.original.semantic_sha256 != original.semantic_sha256:
                 raise ValueError("aSCED batch must retain the immutable original problem observation")
+        if overcomplete is not None and set(overcomplete) != {batch.batch_id for batch in declared}:
+            raise ValueError("aSCED overcomplete execution requires one exact constructed map per batch")
         path_results: list[AscedPathResult] = []
         for batch_index, batch in enumerate(declared):
             for path_index in range(batch.path_count):
                 bits = _virtual_bits(path_index, len(batch.qualified.rows))
                 z_ext = _path_syndrome(original, batch, bits)
-                problem = _AscedSessionProblem(
-                    _AscedSessionCode(batch.working.checks), z_ext,
-                    f"asced-path-{batch.batch_id}-{path_index}",
-                )
+                checks, observed = batch.working.checks, z_ext
+                if overcomplete is not None:
+                    checks, observed = _overcomplete_path_inputs(batch, z_ext, overcomplete[batch.batch_id])
+                problem = _AscedSessionProblem(_AscedSessionCode(checks), observed, f"asced-path-{batch.batch_id}-{path_index}")
                 # A session owns exactly one leaf.  Sharing one BudgetTree here
                 # would make later path evidence include earlier path work and
                 # would make replay depend on caller mutation history.
@@ -532,7 +535,7 @@ class AscedController:
                 else:
                     decoded = session.run()
                     candidate, terminal, work = decoded.candidate, decoded.termination, decoded.work
-                extended_valid = bool(np.array_equal(problem.code.syndrome(candidate), z_ext))
+                extended_valid = bool(np.array_equal(problem.code.syndrome(candidate), observed))
                 original_valid = bool(np.array_equal(original.code.syndrome(candidate), original.syndrome))
                 path_results.append(AscedPathResult(
                     batch_index, path_index, batch.batch_id, batch.graph_identity, bits,
@@ -554,14 +557,50 @@ class AscedController:
 def reconstruct_asced(
     spec: AscedSpec, original: QuaternaryOriginalProblem, batches: tuple[AscedBatch, ...] | list[AscedBatch], priors: object,
     expected: AscedResult, *, kernel: ScalarLlrBp4Kernel | FixedAlphaMbp4Kernel,
+    overcomplete: Mapping[str, tuple[object, object, tuple[object, ...]]] | None = None,
 ) -> AscedResult:
     """Independently re-run decoder-visible paths and reject altered evidence."""
     if not isinstance(expected, AscedResult):
         raise ValueError("aSCED replay requires an AscedResult")
-    rebuilt = AscedController(spec).run(original, batches, priors, kernel=kernel)
+    rebuilt = AscedController(spec).run(original, batches, priors, kernel=kernel, overcomplete=overcomplete)
     if rebuilt.as_evidence() != expected.as_evidence():
         raise ValueError("aSCED replay evidence differs from declared all-path execution")
     return rebuilt
+
+
+def _overcomplete_path_inputs(
+    batch: AscedBatch, z_ext: np.ndarray, value: tuple[object, object, tuple[object, ...]],
+) -> tuple[np.ndarray, np.ndarray]:
+    """Bind one path to the full verified splitter/map receipt pair."""
+    from .asced_overcomplete import AscedOvercompleteMap, ConstructedOvercompleteReceipt, map_overcomplete_syndrome
+
+    map_, receipt, searches = value
+    if not isinstance(map_, AscedOvercompleteMap) or not isinstance(receipt, ConstructedOvercompleteReceipt):
+        raise ValueError("aSCED execution requires typed constructed overcomplete receipts")
+    if map_.comparison_only or map_.fidelity != "canonical_adaptation":
+        raise ValueError("source comparison maps cannot enter canonical aSCED execution")
+    if receipt.constructed_splitter_receipt_sha256 != batch.qualified.receipt.receipt_sha256:
+        raise ValueError("aSCED overcomplete receipt is bound to a different splitter batch")
+    if receipt.h_ext_sha256 != batch.qualified.receipt.h_ext_sha256:
+        raise ValueError("aSCED overcomplete receipt has a mismatched H_ext digest")
+    if receipt.mapping_sha256 != map_.mapping_sha256 or receipt.h_oc_sha256 != map_.h_oc_sha256:
+        raise ValueError("aSCED overcomplete receipt/map digest mismatch")
+    if map_.row_origin_map != batch.qualified.h_ext_row_map or not np.array_equal(map_.h_ext, batch.qualified.h_ext != 0):
+        raise ValueError("aSCED overcomplete map must retain exact H_ext bytes and typed row order")
+    if len(searches) != 2 or tuple(getattr(search, "role", None) for search in searches) != ("x", "z"):
+        raise ValueError("aSCED overcomplete map requires one X then one Z constructed row")
+    raw = np.array(batch.qualified.h_ext, dtype=np.uint8, copy=True)
+    extras: list[np.ndarray] = []
+    for search in searches:
+        pair = getattr(search, "accepted_pair", None)
+        if not isinstance(pair, tuple) or len(pair) != 2:
+            raise ValueError("aSCED overcomplete search receipt is incomplete")
+        support = map_.h_oc[len(raw) + len(extras)]
+        extras.append(np.where(support, Pauli.X if search.role == "x" else Pauli.Z, Pauli.I).astype(np.uint8))
+    checks = np.vstack((raw, *extras))
+    if not np.array_equal((checks != 0).astype(np.uint8), map_.h_oc):
+        raise ValueError("aSCED overcomplete checks do not equal the certified H_oc")
+    return checks, map_overcomplete_syndrome(map_, z_ext)
 
 
 def augment_css(code: CssCode, rows: tuple[AscedSplitterRow, ...]) -> tuple[np.ndarray, tuple[tuple[str, str, int], ...]]:
