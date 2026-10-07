@@ -175,3 +175,45 @@ def test_compatibility_rejects_empty_or_unowned_compositions():
                 update={"intervention": QuaternaryPolicySpec(kind="qbpgd", binding_id="intervention")}
             )
         )
+
+
+def _public_v2_manifest() -> dict:
+    data = manifest_value()
+    data["schema_version"] = "quaternary_experiment_v2"
+    data["composition"] = {
+        "kernel": {"kind": "qbp_scalar_llr", "binding_id": "kernel"},
+        "schedule": {"kind": "qbp_flooding", "binding_id": "schedule"},
+        "transforms": [],
+        "intervention": {"kind": "identity", "binding_id": "intervention"},
+    }
+    data["shot_budget"] = 1
+    return data
+
+
+def test_full_public_manifest_resolves_before_sampling_and_replays(tmp_path):
+    import bp_registry.manifests as public_manifests
+
+    assert hasattr(public_manifests, "QuaternaryExperimentV2")
+    from bp_registry.manifests import QuaternaryExperimentV2
+
+    manifest = parse_manifest(_public_v2_manifest())
+    assert isinstance(manifest, QuaternaryExperimentV2)
+    report = preflight_quaternary(_public_v2_manifest())
+    assert report["composition"]["run_fidelity"] == "source_backed"
+
+    result = run_quaternary(_public_v2_manifest(), tmp_path)
+    events = [json.loads(line) for line in (tmp_path / "events.jsonl").read_text(encoding="utf-8").splitlines()]
+    assert result["assessment_status"] == "not_assessed"
+    assert events[0]["data"]["resolved_composition"]["run_fidelity"] == "source_backed"
+    assert events[-1]["data"]["assessment_status"] == "not_assessed"
+    assert verify_quaternary_run(tmp_path)["verified"] is True
+
+
+def test_full_public_replay_rejects_resolved_identity_and_event_order_tampering(tmp_path):
+    run_quaternary(_public_v2_manifest(), tmp_path)
+    path = tmp_path / "events.jsonl"
+    events = path.read_text(encoding="utf-8").splitlines()
+    events[0] = events[0].replace("source_backed", "canonical_adaptation", 1)
+    path.write_text("\n".join(events) + "\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="differs"):
+        verify_quaternary_run(tmp_path)
