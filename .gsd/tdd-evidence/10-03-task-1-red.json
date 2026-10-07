@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -c '<run target test_evaluator_module_is_an_independent_public_boundary as a TAP-emitting test>'",
+  "exitCode": 1,
+  "targetTest": "test_evaluator_module_is_an_independent_public_boundary",
+  "targetFile": "tests/canonical/quaternary/test_evaluator.py",
+  "output": "TAP version 13\nnot ok 1 - test_evaluator_module_is_an_independent_public_boundary\n  ---\n  message: AssertionError: QBP-03 needs an evaluator outside decoder and policy visibility\n  ...\n1..1\n# tests 1\n# pass 0\n# fail 1\n",
+  "expected": "An independent quaternary evaluator module exists outside decoder and policy visibility.",
+  "actual": "The target assertion failed because bp_registry.quaternary.evaluator did not exist."
+}
