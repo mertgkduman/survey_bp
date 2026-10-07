@@ -13,9 +13,9 @@ provides:
   - Public aSCED execution, evidence ledger, and deterministic replay
 affects: [phase-10-native-aSCED-evidence, phase-11]
 actuals:
-  tokens: 11711
+  tokens: 16939
   tasks: 2
-  commits: 6
+  commits: 8
 plan_head_before: 57340f5e3b09206fdc6fc6eee11febd0cffc08f7
 tech-stack:
   added: []
@@ -60,7 +60,7 @@ status: complete
 - **Completed:** 2026-10-07T20:25:19Z
 - **Tasks:** 2
 - **Files modified:** 7
-- **Verification:** `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/quaternary -x` — 151 passed
+- **Verification:** `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/quaternary -x` — 153 passed
 
 ## Accomplishments
 
@@ -72,8 +72,9 @@ status: complete
 
 1. **Task 1: Run all CSS aSCED paths and select by the paper rule** — `680eeee` (RED), `dda8f9a` (GREEN)
 2. **Task 2: Execute and independently replay aSCED publicly** — `c1f777f` (RED), `da8621d` (GREEN)
+3. **Postcompletion provenance correction** — `1d7a842` (fix)
 
-The measured ledger contains 6 commits because Plan 10-11's concurrent hardening commits (`9968ea3`, `d0432ce`) landed after this plan's recorded base; the four commits above are Plan 10-12's task commits.
+The measured ledger contains 8 commits because Plan 10-11's concurrent hardening commits (`9968ea3`, `d0432ce`) landed after this plan's recorded base; the five commits above are Plan 10-12's task commits.
 
 ## Files Created/Modified
 
@@ -105,6 +106,12 @@ The measured ledger contains 6 commits because Plan 10-11's concurrent hardening
 
 **Total deviations:** 1 auto-fixed (1 blocking)
 **Impact on plan:** Required to execute fresh canonical sessions on the plan's certified transformed graph; no new dependency or native execution was introduced.
+
+## Postcompletion Correction
+
+- `1d7a842` reconstructs the expected overcomplete map from the verified `QualifiedAscedBatch` before every path, comparing the full map, all receipt fields (including receipt digest), and both search witnesses.
+- Overcomplete path graph identities now bind the ordinary batch graph, the constructed map receipt, and the `H_oc` digest. Public preflight and per-path ledger entries persist both the receipt and graph identity.
+- `AscedSpec.max_total_bp_calls` is a required preflight cap. The controller rejects a declared all-path run that could exceed it before creating any session; the unused caller `BudgetTree` argument was removed.
 
 ## Known Stubs
 
