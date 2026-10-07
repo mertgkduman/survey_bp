@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import importlib.util
+
 import numpy as np
 import pytest
 from bp_registry.quaternary.algebra import Pauli, anticommutes, multiply_mod_phase, pauli_weight, syndrome, to_symplectic
@@ -10,6 +12,11 @@ from bp_registry.quaternary.algebra import Pauli, anticommutes, multiply_mod_pha
 def test_public_pauli_algebra_module_is_available():
     """The reusable algebra is a public Phase 10 contract."""
     assert Pauli.Y == 2
+
+
+def test_public_quaternary_problem_contract_module_is_available():
+    """Immutable general-stabilizer problems are a public Phase 10 contract."""
+    assert importlib.util.find_spec("bp_registry.quaternary.problems") is not None
 
 
 @pytest.mark.parametrize("label", range(4))
