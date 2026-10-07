@@ -63,6 +63,14 @@ def _candidate(code: PauliCode, truth: object, proposed: object) -> PauliCandida
     )
 
 
+def _evaluate(code: PauliCode, truth: object, proposed: object):
+    from bp_registry.quaternary.evaluator import evaluate_pauli_candidate
+
+    return evaluate_pauli_candidate(
+        _candidate(code, truth, proposed), hidden_truth=np.asarray(truth, dtype=np.uint8)
+    )
+
+
 def _general_code(*, logical_basis: bool = True) -> PauliCode:
     arguments: dict[str, object] = {}
     if logical_basis:
@@ -98,7 +106,7 @@ def test_evaluator_module_is_an_independent_public_boundary():
 def test_invalid_syndrome_precedes_every_other_outcome():
     from bp_registry.quaternary.evaluator import evaluate_pauli_candidate
 
-    result = evaluate_pauli_candidate(_candidate(_general_code(), [0, 0], [3, 0]))
+    result = _evaluate(_general_code(), [0, 0], [3, 0])
 
     assert result.outcome == "invalid_syndrome"
     assert result.logical_action is None
@@ -109,8 +117,8 @@ def test_exact_and_degenerate_stabilizer_residuals_have_distinct_outcomes():
     from bp_registry.quaternary.evaluator import evaluate_pauli_candidate
 
     code = _general_code()
-    exact = evaluate_pauli_candidate(_candidate(code, [2, 3], [2, 3]))
-    degenerate = evaluate_pauli_candidate(_candidate(code, [0, 0], [1, 1]))
+    exact = _evaluate(code, [2, 3], [2, 3])
+    degenerate = _evaluate(code, [0, 0], [1, 1])
 
     assert exact.outcome == "exact"
     assert exact.logical_action == ((0, 0),)
@@ -121,7 +129,7 @@ def test_exact_and_degenerate_stabilizer_residuals_have_distinct_outcomes():
 def test_logical_failure_reports_specific_declared_logical_action():
     from bp_registry.quaternary.evaluator import evaluate_pauli_candidate
 
-    result = evaluate_pauli_candidate(_candidate(_general_code(), [0, 0], [1, 0]))
+    result = _evaluate(_general_code(), [0, 0], [1, 0])
 
     assert result.outcome == "logical_failure"
     assert result.logical_action == ((1, 0),)
@@ -132,8 +140,8 @@ def test_missing_logical_basis_is_typed_unavailable_without_changing_span_outcom
     from bp_registry.quaternary.evaluator import evaluate_pauli_candidate
 
     code = _general_code(logical_basis=False)
-    degenerate = evaluate_pauli_candidate(_candidate(code, [0, 0], [1, 1]))
-    logical = evaluate_pauli_candidate(_candidate(code, [0, 0], [1, 0]))
+    degenerate = _evaluate(code, [0, 0], [1, 1])
+    logical = _evaluate(code, [0, 0], [1, 0])
 
     assert degenerate.outcome == "stabilizer_equivalent"
     assert logical.outcome == "logical_failure"
@@ -148,7 +156,7 @@ def test_exhaustive_general_fixture_matches_hand_syndrome_and_span_enumeration()
     code = _general_code()
     for truth in product(range(4), repeat=2):
         for proposed in product(range(4), repeat=2):
-            result = evaluate_pauli_candidate(_candidate(code, truth, proposed))
+            result = _evaluate(code, truth, proposed)
             if not np.array_equal(hand_syndrome(code.checks, proposed), hand_syndrome(code.checks, truth)):
                 expected = "invalid_syndrome"
             elif _residual(truth, proposed) == (0, 0):
@@ -177,7 +185,7 @@ def test_css_compilation_agrees_with_existing_css_evaluator_for_all_tiny_pauli_p
                 candidate_x=proposed_x,
                 candidate_z=proposed_z,
             )
-            actual = evaluate_pauli_candidate(_candidate(compiled, truth, proposed))
+            actual = _evaluate(compiled, truth, proposed)
             assert actual.outcome == expected.outcome
 
 
@@ -188,7 +196,7 @@ def test_evaluator_rejects_malformed_candidate_even_if_an_object_was_tampered_af
     object.__setattr__(candidate, "candidate", np.asarray([0, 4], dtype=np.uint8))
 
     with pytest.raises(ValueError, match="candidate Pauli labels"):
-        evaluate_pauli_candidate(candidate)
+        evaluate_pauli_candidate(candidate, hidden_truth=np.asarray([0, 0], dtype=np.uint8))
 
 
 def test_evaluator_source_does_not_import_kernel_commutation_or_stopping_logic():
