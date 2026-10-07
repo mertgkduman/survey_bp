@@ -3,13 +3,13 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 10
 current_phase_name: Correlated Quaternary Execution
-current_plan: 13
+current_plan: 14
 status: executing
-stopped_at: Completed 10-11-PLAN.md
-last_updated: "2026-10-07T20:17:11.058Z"
+stopped_at: Completed 10-12-PLAN.md
+last_updated: "2026-10-07T20:25:19.068Z"
 last_activity: 2026-10-06
 last_activity_desc: Phase 10 execution started
-state_head: 9968ea3ef1a7f6d4020def4e065dc7ed04564c6f
+state_head: da8621d1cf027f6a5ecf01a4d38ffe537c902747
 progress:
   total_phases: 14
   completed_phases: 5
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 ## Current Position
 
 Phase: 10 (Correlated Quaternary Execution) — EXECUTING
-Plan: 13 of 16
+Plan: 14 of 16
 Total Phases: 14
-Current Plan: 13
+Current Plan: 14
 Total Plans in Phase: 16
 Status: Ready to execute
 Last activity: 2026-10-06 — Phase 10 execution started
@@ -93,6 +93,7 @@ Progress: [████░░░░░░] 5 of 14 phases complete (36%)
 | Phase 10-correlated-quaternary-execution P09 | 7m | 2 tasks | 6 files |
 | Phase 10 P10 | 12m | 2 tasks | 4 files |
 | Phase 10 P11 | 11m | 1 tasks | 4 files |
+| Phase 10 P12 | 10m | 2 tasks | 7 files |
 
 Phase 02 P10–P16 gap-closure metrics are recorded in their individual summaries.
 
@@ -186,6 +187,8 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - [Phase 10]: Phase 10 Plan 11: canonical GB46 M retains identity rows and appends deterministic X/Z pair images under a 1000-pair cap.
 - [Phase 10]: Phase 10 Plan 11: typed [s_X,g_X,s_Z,g_Z] assembly and comparison-only source maps prevent block or source-map substitution.
 - [Phase 10]: Phase 10 Plan 11: canonical overcomplete construction accepts only a reverified QualifiedAscedBatch, closing standalone receipt spoofing.
+- [Phase 10]: aSCED executes every declared CSS virtual path in LSB order and selects only original-syndrome-valid minimum-weight candidates with stable batch/path ties.
+- [Phase 10]: Canonical aSCED runs bind verified constructed splitter and overcomplete receipts and remain canonical_adaptation even when paper components are source-backed.
 
 ### Pending Todos
 
@@ -243,8 +246,8 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 **Resume file:** None
 
-Last session: 2026-10-07T20:11:01.287Z
-Stopped at: Completed 10-11-PLAN.md
+Last session: 2026-10-07T20:25:15.935Z
+Stopped at: Completed 10-12-PLAN.md
 Next command: $gsd-discuss-phase 10, then $gsd-plan-phase 10; use the Phase 07 handoff only when optional postprocessing is reprioritized.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
