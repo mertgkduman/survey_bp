@@ -251,3 +251,54 @@ def test_qbpgd_general_prior_is_a_distinct_adaptation_reason(tmp_path):
     assert result["run_fidelity"] == "canonical_adaptation"
     assert "general_joint_prior" in result["adaptation_reasons"]
     assert "continued_message_buffers" in result["adaptation_reasons"]
+
+
+def _mbp4_public_manifest(*, transforms=(), alpha: object = 0.75, kernel: str = "qbp_mbp4_fixed_alpha") -> dict:
+    data = _public_v2_manifest()
+    data["composition"]["kernel"] = {"kind": kernel, "binding_id": "mbp4", "config": {"alpha": alpha}}
+    data["composition"]["transforms"] = [
+        {"kind": kind, "binding_id": f"transform-{index}"} for index, kind in enumerate(transforms)
+    ]
+    return data
+
+
+def test_mbp4_public_source_run_records_fixed_recurrence_and_replays(tmp_path):
+    from bp_registry.quaternary import execution
+
+    assert hasattr(execution, "run_quaternary_mbp4")
+    manifest = _mbp4_public_manifest()
+    report = preflight_quaternary(manifest)
+    assert report["composition"]["run_fidelity"] == "source_backed"
+    result = run_quaternary(manifest, tmp_path)
+    events = [json.loads(line) for line in (tmp_path / "events.jsonl").read_text(encoding="utf-8").splitlines()]
+    decode = next(event for event in events if event["kind"] == "mbp4_decode")
+    assert decode["data"]["alpha"] == pytest.approx(0.75)
+    assert decode["data"]["equation_identity"] == "kuo-lai-2023-mbp4-fixed-inhibition-eq15-18"
+    assert decode["data"]["schedule_freshness"] == "complete_old_v2c_snapshot_then_complete_commit"
+    assert result["run_fidelity"] == "source_backed"
+    assert verify_quaternary_run(tmp_path)["verified"] is True
+
+
+def test_mbp4_public_unsourced_composition_is_canonical_adaptation_and_tampering_fails_replay(tmp_path):
+    manifest = _mbp4_public_manifest(transforms=("qbp_c2v_normalization",))
+    report = preflight_quaternary(manifest)
+    assert report["composition"]["run_fidelity"] == "canonical_adaptation"
+    assert "mbp4_with_qbp_c2v_normalization" in report["composition"]["adaptation_reasons"]
+    run_quaternary(manifest, tmp_path)
+    path = tmp_path / "events.jsonl"
+    path.write_text(path.read_text(encoding="utf-8").replace('"alpha":0.75', '"alpha":0.5', 1), encoding="utf-8")
+    with pytest.raises(ValueError, match="differs"):
+        verify_quaternary_run(tmp_path)
+
+
+@pytest.mark.parametrize(
+    "kwargs,match",
+    [
+        ({"kernel": "ambp4"}, "AMBP4"),
+        ({"alpha": [1.0, 0.75]}, "alpha search|fixed alpha"),
+        ({"kernel": "binary_memory"}, "unsupported binary"),
+    ],
+)
+def test_mbp4_public_preflight_rejects_adaptive_and_binary_variants(kwargs, match):
+    with pytest.raises(ValueError, match=match):
+        preflight_quaternary(_mbp4_public_manifest(**kwargs))
