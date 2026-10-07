@@ -17,7 +17,7 @@ def _problem() -> QuaternaryOriginalProblem:
     return QuaternaryOriginalProblem(
         lineage_id="original-qbpgd-fixture",
         code=PauliCode(checks=np.asarray(((1, 3),), dtype=np.uint8)),
-        syndrome=np.asarray((1,), dtype=np.uint8),
+        syndrome=np.asarray((0,), dtype=np.uint8),
     )
 
 

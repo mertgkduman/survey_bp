@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from hashlib import sha256
+import json
 import numbers
 
 import numpy as np
@@ -182,6 +184,32 @@ class QbpSession:
     def last(self) -> QbpSweep:
         return self._last
 
+    @property
+    def state_digest(self) -> str:
+        """Stable decoder-visible identity for the owned priors and edge buffers."""
+        payload = {
+            "priors": self.priors.tolist(), "c2v": self._c2v.tolist(),
+            "v2c": self._v2c.tolist(), "beliefs": self._beliefs.tolist(),
+            "candidate": self._candidate.tolist(), "iteration": self._iteration,
+        }
+        return sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+    def replace_prior(self, variable: int, probabilities: object) -> None:
+        """Commit one decoder-visible prior without resetting the owned messages.
+
+        Q-BPGD owns the decimation lifecycle.  It may alter one selected prior
+        between complete QBP blocks, while the current C2V/V2C buffers remain
+        committed attempt state for the next block.
+        """
+        if isinstance(variable, bool) or not isinstance(variable, numbers.Integral) or not 0 <= int(variable) < self.problem.code.n:
+            raise ValueError("prior replacement requires a valid qubit index")
+        replacement = _priors(np.asarray(probabilities, dtype=np.float64)[None, :], n=1)[0]
+        updated = np.array(self.priors, dtype=np.float64, copy=True)
+        updated[int(variable)] = replacement
+        updated.setflags(write=False)
+        self.priors = updated
+        self._prior_llrs = np.asarray([self.kernel.prior_llrs(row) for row in self.priors], dtype=np.float64)
+
     def _is_converged(self) -> bool:
         return bool(np.array_equal(self.problem.code.syndrome(self._candidate), self.problem.syndrome))
 
@@ -201,8 +229,10 @@ class QbpSession:
             work=work,
         )
 
-    def sweep(self) -> QbpSweep:
+    def sweep(self, *, stop_on_convergence: bool = True) -> QbpSweep:
         """Reserve all four-state sweep work before calculating or mutating buffers."""
+        if not isinstance(stop_on_convergence, bool):
+            raise ValueError("stop_on_convergence must be boolean")
         if self._terminal != "running":
             return self._last
         next_iteration = self._iteration + 1
@@ -245,7 +275,7 @@ class QbpSession:
         self._marginals = next_marginals
         self._candidate = next_candidate
         converged = self._is_converged()
-        self._terminal = "converged" if converged else "running"
+        self._terminal = "converged" if converged and stop_on_convergence else "running"
         self._last = self._snapshot(converged=converged, terminal=self._terminal, work=self.budgets.summary(self.budget_scope))
         return self._last
 
