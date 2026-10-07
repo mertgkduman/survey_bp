@@ -4,6 +4,46 @@
 **Domain:** Four-state Pauli belief propagation, joint Pauli channels, and source-backed quaternary BP policies  
 **Confidence:** MEDIUM — repository facts were read from source files (HIGH); mathematical recommendations come from primary papers retrieved through the configured `websearch` seam, whose verified tier is MEDIUM.
 
+<user_constraints>
+## User Constraints (from CONTEXT.md)
+
+The following decisions, discretion, and deferred scope are copied verbatim from Phase 10 context. [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:12-131]
+
+### Locked Decisions
+
+- **D-01:** The public quaternary path supports general stabilizer codes in Phase 10, including non-CSS Pauli check rows. Existing validated CSS artifacts can be supplied directly and compiled losslessly into that model, preserving their identity and an explicitly declared combined check/syndrome order. — **Reversibility:** costly — public artifact identity, manifests, and ledgers depend on this model boundary and ordering.
+- **D-02:** A logical-operator basis is optional for running a general stabilizer code. The independent evaluator must use original-syndrome agreement and stabilizer-span membership to distinguish `invalid_syndrome`, `exact`, `stabilizer_equivalent`, and `logical_failure`. Without a supplied logical basis, the specific logical action is unavailable and must be marked as such; it is not inferred. — **Reversibility:** costly — changing this would invalidate stored outcome semantics and allowed code artifacts.
+- **D-03:** Demonstrate the general path with at least one small non-CSS code through the public manifest, decoder, evaluator, and ledger, in addition to independent algebraic fixtures. This is an implementation check, not a statistical result.
+- **D-04:** Accept both a named depolarizing channel with physical rate `p` and an explicit `I/X/Y/Z` probability table. The explicit form may be one shared row or one row per qubit. Persist the resolved four probabilities for every qubit, channel identity, and declared ordering in manifests and ledgers. — **Reversibility:** costly — saved manifest and sample identities depend on these conventions.
+- **D-05:** Physical sampling honors exact zeros. A log-domain decoder faced with any zero prior requires an explicitly configured and recorded smoothing rule; the smoothing changes decoder beliefs only, not the physical sampling distribution. Reject silent smoothing or silent normalization of malformed user channel tables.
+- **D-06:** For a per-qubit table, report each physical non-identity rate as `1-P(I)`. Use a scalar `p` only when a named uniform channel defines it; do not label an average of heterogeneous rows as the experiment's physical `p`.
+- **D-07:** Expose source-defined quaternary flooding and serial schedules, plus quaternary check-message normalization and offset as explicit policies with their own equations, order, and preflight compatibility checks. Existing binary policy names do not automatically qualify as quaternary policies.
+- **D-08:** Implement source-defined MBP4 as a distinct quaternary recurrence after the required Q-BPGD path. It is not a port of the binary memory adapter.
+- **D-09:** Individually source-backed quaternary policies may be combined when mathematical and lifecycle compatibility checks pass. If their combination is not source-defined, label the run a canonical adaptation and record its effective order and semantics. Unsupported combinations fail preflight; no source-fidelity claim follows merely from source-backed components.
+- **D-10:** Add the full paper aSCED method in Phase 10 for CSS codes: splitter-row construction/qualification, batches and all declared virtual-syndrome paths, original-syndrome-valid candidate selection by the paper's rule, and the overcomplete-check option. Keep the original code and measured syndrome immutable; attribute each path's graph, virtual syndrome, candidate, work, and termination. — **Reversibility:** costly — ensemble lineage, candidate selection, and work are persisted evidence contracts.
+- **D-11:** The aSCED source-backed profile is CSS-specific. The general stabilizer kernel remains available for ordinary quaternary BP, but non-CSS aSCED is rejected until a separate splitter derivation and compatibility qualification exists. Do not generalize the paper's concrete CSS construction by name alone.
+- **D-12:** Pin and run the authors' public `kit-cel/quantum_asced` repository as a bounded executable native reference and source guide. Keep its implementation, environment, numerical settings, instrumentation limits, and results distinct from canonical aSCED. It does not replace canonical policy execution.
+- **D-13:** Run a bounded, prespecified, shot-matched Pauli-sample comparison of canonical aSCED and standalone BP4, with the qualified native aSCED reference on matched inputs where its interface permits. Retain every admitted shot, path-level work, and unavailable native counters with reasons. Label this evidence `not_assessed`; it cannot establish paper-curve reproduction or a performance ranking.
+- **D-14:** Continue committed Q-BP edge messages across decimation rounds while updating the chosen qubit's prior. Record this as a canonical interpretation of source-ambiguous buffer handling, subject to authoritative author-code findings; do not call it proven source-literal behavior.
+- **D-15:** Preserve the paper's literal fixation weights `(1-ε, ε, ε, ε)` with the leading weight at the chosen Pauli. Record the raw vector, divide all four entries by their common sum for the probability interface, and record that ratio-preserving interpretation. Do not silently change the leading term to `1-3ε`.
+- **D-16:** Resolve equal Q-BPGD reliability by lowest qubit index, and equal Pauli posterior components by `I < X < Y < Z`. Persist this deterministic interpretation for replay.
+- **D-17:** Keep the depolarizing Q-BPGD setup as the source-backed profile. Q-BPGD with an arbitrary declared joint or per-qubit prior is permitted as a separately labeled canonical adaptation after compatibility checks.
+
+### the agent's Discretion
+
+- Select exact combined CSS syndrome row order, manifest/schema version, numerical profile and saturation, positive-prior smoothing options, finite fixture sizes, aSCED path caps, bounded run size, and paper-linked demonstration code before collecting evidence. Persist the chosen conventions; verify them independently. The user did not prescribe numerical values or a particular paper curve.
+- Inspect aSCED's paper and pinned author revision for splitter generation, overcomplete matrices, BP4 settings, candidate tie behavior, reference entry points, and license/packaging constraints. Resolve source ambiguities explicitly; preserve missing native instrumentation as missing.
+
+### Deferred Ideas (OUT OF SCOPE)
+
+- Non-CSS aSCED awaits a separate source/compatibility derivation; Phase 10 must reject it explicitly.
+- Statistical quaternary reproduction and controlled comparisons remain in Phase 11 after Phase 8. Circuit decoding remains in Phases 12–13.
+
+### Reviewed Todos (not folded)
+- `.planning/todos/pending/literature-policy-toml-provenance-and-cli.md` — previously assigned to paused Phase 7; Phase 10 reuses the established policy-file route without absorbing that paused task.
+- `.planning/todos/pending/phase6-css-literature-vertical-slice.md` — the bounded CSS literature gate was assigned to Phase 6; no new Phase 10 scope follows from its keyword match.
+</user_constraints>
+
 ## Summary
 
 Phase 10 should add a second canonical kernel family for four-state Pauli variables. The recommended baseline is Lai and Kuo's scalar log-domain BP: each qubit retains a three-component identity-referenced LLR belief for `X`, `Y`, and `Z`, while each Tanner edge passes the scalar likelihood that the qubit error commutes rather than anticommutes with that edge's Pauli label. This retains the joint `I/X/Y/Z` prior, including the shared `Y=(X,Z)` event, and has a source-stated equivalence to the refined linear-domain BP4 for qubits. [CITED: https://arxiv.org/html/2104.00304]
@@ -12,7 +52,7 @@ The scalar implementation must be verified against two deliberately independent 
 
 The public Phase 10 path should compile immutable Pauli checks, declared joint priors, and the full ordered syndrome into a quaternary problem; sample one categorical Pauli value per qubit; run only compositions admitted by a quaternary compatibility matrix; emit Pauli candidates plus four-state marginals; and hand candidates and hidden truth to an independent evaluator. This follows the repository's existing separation of decoder-visible observation and hidden truth and its four CSS outcome meanings. [VERIFIED: src/bp_registry/sampling.py:16-40; src/bp_registry/evaluator.py:13-19,33-83]
 
-**Primary recommendation:** Build a source-defined scalar LLR-BP4 kernel with a conventional vector BP4 test oracle, then add source-literal Q-BPGD as a quaternary intervention over four-state marginals; reject every binary policy lacking a quaternary derivation rather than porting it by name. [CITED: https://arxiv.org/html/2104.00304] [CITED: https://arxiv.org/html/2312.10950v2]
+**Primary recommendation:** Build a source-defined scalar LLR-BP4 kernel with independent vector/exact oracles, then add Q-BPGD, fixed-`α` MBP4, and full CSS aSCED including overcomplete checks. Pin native aSCED commit `816772071486615dfc7d71d1e15df597edc58a26` as an isolated bounded reference, and keep every paper/native discrepancy explicit. [CITED: https://arxiv.org/html/2104.00304] [CITED: https://arxiv.org/html/2104.13659] [CITED: https://arxiv.org/html/2605.06547v2]
 
 ## Architectural Responsibility Map
 
@@ -22,6 +62,9 @@ The public Phase 10 path should compile immutable Pauli checks, declared joint p
 | Joint four-state BP | Canonical kernel | Policy controller | The kernel owns commutation-factor message math; schedules and interventions select when state advances. [VERIFIED: .planning/research/ARCHITECTURE.md:54-57] |
 | Joint channel sampling | Experiment runner | Evidence ledger | Sampling owns physical randomness and hidden truth; the ledger records the resolved prior and sample identity. [VERIFIED: .planning/research/ARCHITECTURE.md:58-60] |
 | Q-BPGD | Policy controller | Canonical kernel | The controller chooses an undecimated variable and changes its prior; the kernel supplies four-state marginals without knowing hidden truth. [CITED: https://arxiv.org/html/2312.10950v2] |
+| MBP4 | Canonical quaternary kernel | Schedule policy | MBP4 changes the quaternary variable recurrence and edge inhibition; schedule determines message freshness. [CITED: https://arxiv.org/html/2104.13659] |
+| CSS aSCED | Ensemble controller | Canonical quaternary kernel | The controller owns qualified splitter graphs, virtual syndromes, all paths, and selection; each path invokes BP4/MBP4 without access to hidden truth. [CITED: https://arxiv.org/html/2605.06547v2] |
+| Native aSCED | Isolated reference environment | Evidence ledger | The pinned author program is assessed as an executable reference with its own environment and missingness, never used as the canonical engine. [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:47-50] |
 | Exact/degenerate/logical classification | Independent evaluator | Model compiler | Outcome classification requires original checks, logical basis, and hidden truth, all outside decoder visibility. [VERIFIED: src/bp_registry/evaluator.py:33-83] |
 | Manifests, trace, replay, and work | Evidence ledger | Experiment runner | Project architecture assigns provenance and final evaluation to the runner/evaluator boundary, while the kernel emits typed work and state events. [VERIFIED: .planning/research/ARCHITECTURE.md:59-73] |
 
@@ -108,7 +151,66 @@ The existing policy registry admits the verbatim update kinds `"identity", "bina
 
 ## Package Legitimacy Audit
 
-No external package is added, so the Package Legitimacy Gate is not triggered. [VERIFIED: Standard Stack recommendation above] The Kuo repository is an isolated source reference and is not installed or imported by the canonical runtime. [CITED: https://github.com/kywukuo/qLDPC_dec]
+No external package is added to the canonical runtime. [VERIFIED: pyproject.toml:5-22] The required native aSCED reference is a separate build environment whose author manifest names `numpy>=1.24`, `galois>=0.4`, `matplotlib>=3.7`, `scikit-build-core>=0.10`, and `pybind11>=2.12`; the legitimacy seam returned `SUS` for all five because registry download/repository metadata was incomplete, so the planner must add a human verification checkpoint before creating that environment. [VERIFIED: kit-cel/quantum_asced@816772071486615dfc7d71d1e15df597edc58a26:pyproject.toml:1-22] [VERIFIED: package-legitimacy probe 2026-10-06]
+
+| Package | Registry | Registry version observed | Verdict | Disposition |
+|---------|----------|---------------------------|---------|-------------|
+| `numpy` | PyPI | `2.5.3` | SUS | Native-only; verify and resolve through the pinned native lock/environment. [VERIFIED: PyPI probe 2026-10-06] |
+| `galois` | PyPI | `0.4.11` | SUS | Native-only; human verification checkpoint. [VERIFIED: PyPI probe 2026-10-06] |
+| `matplotlib` | PyPI | `3.11.2` | SUS | Native demo-only; human verification checkpoint. [VERIFIED: PyPI probe 2026-10-06] |
+| `scikit-build-core` | PyPI | `1.1.1` | SUS | Native build-only; human verification checkpoint. [VERIFIED: PyPI probe 2026-10-06] |
+| `pybind11` | PyPI | `3.1.0` | SUS | Native build-only; pin a source revision because the author checkout lacks the declared submodule. [VERIFIED: PyPI probe 2026-10-06] |
+
+**Packages removed due to SLOP verdict:** none. [VERIFIED: package-legitimacy probe 2026-10-06]
+
+**Packages flagged as suspicious [SUS]:** `numpy`, `galois`, `matplotlib`, `scikit-build-core`, `pybind11`; these findings apply to the isolated native environment, not the already pinned canonical environment. [VERIFIED: package-legitimacy probe 2026-10-06]
+
+## aSCED Source Resolution and Required Contract
+
+### Exact source identities
+
+Use Wursthorn et al., *Affine Subcode Ensemble Decoding for Degeneracy-Aware Quantum Error Correction*, arXiv `2605.06547v2` dated 2026-05-08, as the mathematical source. [CITED: https://arxiv.org/html/2605.06547v2] Pin the native reference to author repository commit `816772071486615dfc7d71d1e15df597edc58a26` (commit date 2026-08-10, subject `Updated README`), which is the revision audited during this research. [VERIFIED: https://github.com/kit-cel/quantum_asced/tree/816772071486615dfc7d71d1e15df597edc58a26]
+
+The paper's concrete aSCED construction is CSS-specific: each batch augments the component Tanner graphs with `Δ/2` X-type and `Δ/2` Z-type splitter rows, so the literal profile requires even `Δ`; `L` batches yield `K=L·2^Δ` decoder paths. [CITED: https://arxiv.org/html/2605.06547v2] Each batch must enumerate every virtual syndrome `g∈F₂^Δ`, preserving a declared bit order. [CITED: https://arxiv.org/html/2605.06547v2] The pinned code resolves the bit convention as least-significant-bit first via bit `j` of the integer path index. [VERIFIED: kit-cel/quantum_asced@816772071486615dfc7d71d1e15df597edc58a26:qec/Ensemble_Decoder.cpp]
+
+### Splitter construction and qualification
+
+The paper requires splitter rows independent of the stabilizer row span and outside the logical normalizer, with linearly independent detectable components so all `2^Δ` affine subsets are represented. [CITED: https://arxiv.org/html/2605.06547v2] Plan a deterministic preflight that records and hashes the original CSS matrices, ordered splitter rows, augmented matrix, batch ID, row roles, weight, cycle check, and qualification witnesses. [ASSUMED]
+
+For symplectic splitter matrix `T` and original stabilizer matrix `H`, verify both `rank([H;T])=rank(H)+Δ` and `rank(T Λ Hᵀ)=Δ`; the latter is a recommended executable qualification of independent detectable components and rejects any nonzero splitter combination in the normalizer. [ASSUMED] Also verify CSS row type, even `Δ`, requested row weight, and no new component-graph 4-cycle for the paper-linked profile. [CITED: https://arxiv.org/html/2605.06547v2]
+
+The pinned generator enforces rank growth and removes co-neighbor positions to avoid extra 4-cycles, but contains an explicit TODO to check that a generated row is not logical. [VERIFIED: kit-cel/quantum_asced@816772071486615dfc7d71d1e15df597edc58a26:qec/Graph_Optimization.cpp; qec/Graph_Optimization_GF4.cpp] Therefore native-generated rows are inputs to canonical qualification, never proof that qualification passed. [ASSUMED]
+
+### Path execution and selection
+
+For every admitted shot, run all declared `(batch, virtual-syndrome)` paths unless a prespecified evidence cap rejects the manifest before sampling. [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:40-50] Each path ledger must contain graph identity, batch/index, `g`, augmented syndrome, numerical/profile identity, terminal reason, iteration/work vector, candidate, extended-syndrome validity, original-syndrome validity, and selection status. [ASSUMED]
+
+The paper forms the candidate pool from every path output that satisfies the immutable **original** syndrome, then chooses minimum Pauli weight; no valid candidate is a type-I failure. [CITED: https://arxiv.org/html/2605.06547v2] The paper does not resolve equal-weight ties. [ASSUMED] Use stable `(batch index, virtual path index)` order for canonical replay and label it an implementation interpretation; the pinned native code also retains the first strict minimum in ascending path order. [VERIFIED: kit-cel/quantum_asced@816772071486615dfc7d71d1e15df597edc58a26:qec/Ensemble_Decoder.cpp]
+
+### Overcomplete option
+
+The full Phase 10 method must support both ordinary augmented checks and the paper's overcomplete path. For every batch verify over GF(2) that `H_oc=M H_ext`, compute `z_oc=M z_ext`, and persist `M`, its rank/shape, row order, and all hashes. [CITED: https://arxiv.org/html/2605.06547v2] The pinned repository's audited precomputed GB46 and toric artifacts satisfied these matrix relations; use them as fixtures, not as a substitute for generic validation. [VERIFIED: kit-cel/quantum_asced@816772071486615dfc7d71d1e15df597edc58a26:Extended_PCMs]
+
+### Paper/repository discrepancies that must stay visible
+
+| Ambiguity or discrepancy | Source result | Planning consequence |
+|--------------------------|---------------|----------------------|
+| Candidate admission | Paper admits any original-syndrome-valid candidate; native code uses its path decoder's extended-syndrome success flag and includes a TODO about ensemble validity. [CITED: https://arxiv.org/html/2605.06547v2] [VERIFIED: kit-cel/quantum_asced@816772071486615dfc7d71d1e15df597edc58a26:qec/Ensemble_Decoder.cpp] | Canonical aSCED follows the paper/original syndrome. Record both validity flags and classify the native difference. |
+| Pauli order | Canonical/source BP4 order is `I,X,Y,Z`; the native repository encodes `0,1,2,3` as `I,X,Z,Y` and stores LLRs in X,Z,Y order. [CITED: https://arxiv.org/html/2312.10950v2] [VERIFIED: kit-cel/quantum_asced@816772071486615dfc7d71d1e15df597edc58a26:qec/BP_Decoder_GF4.cpp] | Require an explicit tested translation at the native evidence boundary. |
+| Hard-decision ties | Native strict comparisons send equal nonpositive minima to Y; paper tie behavior is unspecified. [VERIFIED: kit-cel/quantum_asced@816772071486615dfc7d71d1e15df597edc58a26:qec/BP_Decoder_GF4.cpp] | Persist canonical tie policy and do not claim trajectory identity. |
+| GB126 splitter weight | Paper v2 describes weight-six splitters for its GB126 figure; the pinned repository's GB126 precomputed splitters audited as weight four. [CITED: https://arxiv.org/html/2605.06547v2] [VERIFIED: pinned repository artifact audit 2026-10-06] | Do not call that artifact a source-faithful recreation of the paper figure without resolution. |
+| Channel proportions | Native initialization assigns `pZ` and `pY` from `config.pX`; default equal proportions hide the defect. [VERIFIED: kit-cel/quantum_asced@816772071486615dfc7d71d1e15df597edc58a26:qec/Pauli_Channel.cpp] | Restrict unmodified native evidence to the equal-proportion depolarizing profile. |
+| Shared shots | Native Python bindings do not expose per-shot error/syndrome injection or seed control. [VERIFIED: kit-cel/quantum_asced@816772071486615dfc7d71d1e15df597edc58a26:qec/python_bindings.cpp] | Canonical aSCED and BP4 use exact shared samples; native matching is `unavailable` with this reason unless a non-algorithmic instrumentation patch is separately pinned. |
+
+### Native reference execution gate
+
+Keep the native checkout, build inputs, environment freeze, driver, stdout/stderr, results, and instrumentation-limit record outside canonical execution. [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:47-50] The audited checkout declares a pybind11 submodule but contains no `pybind11/` gitlink while CMake calls `add_subdirectory(pybind11)`; its demos reference `Check_Matrices/` while the checkout provides `Extended_PCMs/`. [VERIFIED: kit-cel/quantum_asced@816772071486615dfc7d71d1e15df597edc58a26:.gitmodules; CMakeLists.txt; Examples/demo_asced.py] The planner must pin and hash a build-only pybind11 overlay and an out-of-tree driver/path correction, with no algorithm edits. [ASSUMED]
+
+No license file or package license field was located during the audit; absence is not proof of license status. [ASSUMED] Treat licensing as an explicit human gate before copying or redistributing native source, and keep the initial use to isolated executable-reference assessment. [ASSUMED]
+
+### Bounded mechanism evidence
+
+Prespecify one small CSS code/profile, fixed admitted shot IDs, sample count, `L`, even `Δ`, path cap, iteration caps, smoothing, selection tie, and work units before execution. [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:47-50] A compact paper-linked choice is GB46 with `Δ=2`, ordinary BP4 aSCED plus the available overcomplete artifact, while retaining the exact selected parameters in the manifest. [ASSUMED] Run canonical standalone BP4 and canonical aSCED on identical Pauli samples, retain all path results, and label the evidence `not_assessed`; run native only on the closest equal-proportion aggregate input and record that shot matching and per-shot native counters are unavailable. [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:47-50]
 
 ## Canonical Mathematical Contract
 
@@ -213,7 +315,9 @@ The Phase 10 registry should be closed and fail during preflight, before samplin
 | Check-message normalization | **Admit: source-backed** | Divide `Δ_{m→n}` by declared `α_c>0` before subsequent computations. [CITED: https://arxiv.org/html/2104.00304] |
 | Check-message offset | **Admit: source-backed** | Apply `sign(Δ) max(0, |Δ|-β)` for declared `β>0`. [CITED: https://arxiv.org/html/2104.00304] |
 | Q-BPGD | **Admit: required, source-backed intervention** | Yao Algorithm 3 defines reliability, fixation, round count, and early success for quaternary BP. [CITED: https://arxiv.org/html/2312.10950v2] |
-| MBP4 | **Compatible source profile; plan after baseline/Q-BPGD or explicitly defer** | Kuo and Lai define a distinct quaternary LLR recurrence with `1/α` posterior scaling and fixed edge inhibition. It is not the binary Phase 4 memory transform. [CITED: https://arxiv.org/html/2104.13659] |
+| MBP4 | **Admit: required after Q-BPGD** | Kuo and Lai define a distinct quaternary LLR recurrence with `1/α` posterior scaling and fixed edge inhibition. D-08 requires this recurrence in Phase 10; it is not the binary Phase 4 memory transform. [CITED: https://arxiv.org/html/2104.13659] [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:35-38] |
+| CSS aSCED / overcomplete aSCED | **Admit: required ensemble controller, CSS only** | Wursthorn et al. define the augmented CSS graphs, virtual syndromes, original-syndrome candidate rule, and overcomplete mapping. [CITED: https://arxiv.org/html/2605.06547v2] |
+| Non-CSS aSCED | **Reject** | The selected source profile is CSS-specific and D-11 forbids generalization without a separate derivation. [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:40-46] |
 | AMBP4 | **Do not include without its complete adaptive search contract** | The MBP paper treats adaptive MBP as a separate algorithm; a scalar `α` field alone is incomplete. [CITED: https://arxiv.org/html/2104.13659] |
 | Binary SPA | **Reject in quaternary registry** | It factorizes X and Z and cannot represent one joint Y variable/prior. [VERIFIED: .planning/research/ARCHITECTURE.md:37-43] |
 | Binary min-sum / normalized min-sum / offset min-sum | **Reject unless a quaternary derivation is added and labeled adaptation** | Existing registered rules are binary, while the source-backed quaternary offset/normalization acts on scalar commutation C2V messages. [VERIFIED: src/bp_registry/canonical/contracts.py:62-67] [CITED: https://arxiv.org/html/2104.00304] |
@@ -239,7 +343,9 @@ The source writes `argmax` without a tie rule. Use a persisted deterministic ord
 
 MBP4 is mathematically compatible with the same Pauli checks and LLR quantizer, but it changes the variable recurrence: the posterior anticommute sum is scaled by `1/α`, while the outgoing-edge inhibition `-<W,S_mn>Δ_m→n` remains unscaled. [CITED: https://arxiv.org/html/2104.13659] This is a distinct update/state-memory policy and must not be implemented by applying the Phase 4 binary memory adapter after ordinary Q-BP. [VERIFIED: docs/memory-policy-sources.md:1-24] [CITED: https://arxiv.org/html/2104.13659]
 
-Phase 10 can satisfy QBP-04 with flooding, serial, normalization/offset, and Q-BPGD. Implement MBP4 only if the plan has capacity after the baseline, sampler, evaluator, and required Q-BPGD gates; otherwise preserve it as the next source-qualified quaternary policy. [ASSUMED]
+Implement fixed-`α` MBP4 after Q-BPGD as required by D-08. [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:35-38] Keep the source distinction exact: normalized BP4 scales both posterior accumulation and edge inhibition, whereas MBP4 scales the posterior accumulation by `1/α` but subtracts the unscaled destination-edge message when forming outgoing state. [CITED: https://arxiv.org/html/2104.13659] Parameter `α` is explicit and persisted; no universal source value applies across all codes. [CITED: https://arxiv.org/html/2104.13659]
+
+AMBP4 is a different source algorithm that searches a declared descending sequence of `α` values and returns the first valid result; do not silently include that search in a run labeled MBP4. [CITED: https://arxiv.org/html/2104.13659] Support parallel/flooding or source-defined serial scheduling only when the composition preflight owns exact freshness and ordering semantics. [CITED: https://arxiv.org/html/2104.13659]
 
 ## Architecture Patterns
 
@@ -257,13 +363,21 @@ flowchart TD
     G --> H{Policy controller}
     H -->|flooding/serial/normalization| G
     H -->|Q-BPGD fixation| G
+    H -->|MBP4 recurrence| G
+    E --> Q{CSS aSCED?}
+    Q -->|yes| R[Qualified splitter batches + every virtual syndrome]
+    R --> G
     G --> I[Pauli candidate + four-state marginals + work/events]
-    I --> J[Independent original-problem evaluator]
+    I --> S{Original-syndrome valid?}
+    S -->|yes| T[Minimum-weight stable selection]
+    T --> J
+    S -->|no| R
     F --> J
     J --> K[Outcome + logical action]
     I --> L[Versioned ledger / trace]
     K --> L
     M[Vector BP4 + exact enumeration test oracles] -. differential validation .-> G
+    N[Pinned native aSCED environment] -. qualified aggregate reference .-> L
 ```
 
 This flow follows the project's required compile/sample/decode/evaluate lifecycle and keeps truth outside the policy controller. [VERIFIED: .planning/research/ARCHITECTURE.md:63-73]
@@ -281,6 +395,10 @@ src/bp_registry/
     ├── kernel.py                    # scalar LLR-BP4 pure updates/session
     ├── schedules.py                 # admitted flooding and serial semantics
     ├── guided_decimation.py         # source-profile Q-BPGD controller
+    ├── mbp4.py                      # fixed-alpha modified quaternary recurrence
+    ├── asced.py                     # CSS splitter batches, paths, and selection
+    ├── asced_overcomplete.py        # H/M and mapped-syndrome qualification
+    ├── native_asced.py              # isolated reference identity/missingness adapter
     ├── compatibility.py             # closed policy registry/preflight
     ├── contracts.py                 # strict manifests and resolved evidence
     └── execution.py                 # sampling boundary, ledger, replay
@@ -291,6 +409,11 @@ tests/canonical/quaternary/
 ├── test_kernel.py
 ├── test_schedules.py
 ├── test_bpgd.py
+├── test_mbp4.py
+├── test_asced_splitters.py
+├── test_asced_ensemble.py
+├── test_asced_overcomplete.py
+├── test_asced_evidence.py
 ├── test_evaluator.py
 └── test_public_execution.py
 ```
@@ -315,6 +438,12 @@ The package boundary is a recommendation that makes the second mathematical kern
 
 **When to use:** Whenever a paper's policy is executed outside its exact noise, code, schedule, or reset semantics. [VERIFIED: .planning/PROJECT.md:82-89]
 
+### Pattern 4: Materialized ensemble before shots
+
+**What:** Construct, qualify, order, and hash every aSCED batch graph and overcomplete mapping during preflight. Shot execution supplies only the measured original syndrome and enumerated virtual bits; it never regenerates splitters. [ASSUMED]
+
+**When to use:** Every aSCED manifest so graph identity, path cardinality, work, and replay are fixed before physical sampling. [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:40-50]
+
 ### Anti-Patterns to Avoid
 
 - **Two independent binary decoders presented as Q-BP:** this loses the joint Y state and is only a comparison arm. [VERIFIED: .planning/research/ARCHITECTURE.md:37-43]
@@ -322,6 +451,8 @@ The package boundary is a recommendation that makes the second mathematical kern
 - **Policy names as compatibility proof:** a binary `normalized_min_sum` and a quaternary normalized commutation message are different equations. [VERIFIED: .planning/research/ARCHITECTURE.md:77-88]
 - **Shared algebra between kernel and evaluator:** one error could self-validate. [ASSUMED]
 - **Reproduction settings hidden as defaults:** source and controlled configurations answer different questions. [VERIFIED: AGENTS.md:16-18]
+- **Filtering aSCED by extended-syndrome convergence:** the paper selection pool is based on the immutable original syndrome; store extended validity separately. [CITED: https://arxiv.org/html/2605.06547v2]
+- **Calling the native run shot-matched:** its current Python interface cannot accept the canonical shot or deterministic seed. Record this as unavailable instead of aligning only aggregate `p`. [VERIFIED: pinned native binding audit 2026-10-06]
 
 ## Don't Hand-Roll
 
@@ -333,6 +464,9 @@ The package boundary is a recommendation that makes the second mathematical kern
 | Replay identity | Ad hoc random seeds inside policies | Existing manifest identity + shot ID pattern and decoder-local substreams | Current sampling hashes manifest identity and shot ID; project architecture separates physical and decoder randomness. [VERIFIED: src/bp_registry/sampling.py:60-73,84-90] |
 | Q-BPGD reliability | Binary absolute LLR | Maximum normalized I/X/Y/Z posterior | This is the source definition for Q-BPGD. [CITED: https://arxiv.org/html/2312.10950v2] |
 | Tiny-problem truth oracle | Another rearrangement of the production scalar equations | Exhaustive enumeration and conventional vector BP4 | These fail differently and can expose commutation or normalization errors. [CITED: https://arxiv.org/html/2002.06502] [ASSUMED] |
+| aSCED path pruning | Early exit after one converged virtual path | Enumerate the manifest's complete `L·2^Δ` path set | The source decoder selects among candidates across all declared paths. [CITED: https://arxiv.org/html/2605.06547v2] |
+| Overcomplete projection | Informal row duplication or a new measured syndrome | Explicit `M` with verified `H_oc=M H_ext` and `z_oc=M z_ext` | The mapping is part of the paper method and must leave the original observation immutable. [CITED: https://arxiv.org/html/2605.06547v2] |
+| Native/reference unification | Import author C++ as the canonical kernel | Isolated pinned executable reference plus canonical policy implementation | The native interface, Pauli order, selection rule, and instrumentation differ from the canonical evidence contract. [VERIFIED: pinned repository audit 2026-10-06] |
 
 **Key insight:** the difficult part is preserving semantic independence among the joint channel, Pauli factor graph, source policy, and evaluator. Reusing equations without those boundaries would make an implementation fast to write but scientifically unauditable. [VERIFIED: AGENTS.md:59-64]
 
@@ -417,6 +551,22 @@ The package boundary is a recommendation that makes the second mathematical kern
 **How to avoid:** Use independent symplectic evaluator code, hand fixtures, vector BP4, and exhaustive enumeration. [ASSUMED]
 
 **Warning signs:** All algebra tests are round trips through one common function. [ASSUMED]
+
+### Pitfall 9: Rejecting useful aSCED candidates with the virtual syndrome
+
+**What goes wrong:** A candidate that corrects the immutable original syndrome is discarded because it did not satisfy the particular augmented path syndrome. [CITED: https://arxiv.org/html/2605.06547v2]
+
+**Why it happens:** The pinned native implementation uses per-path `syndromes_match`, which checks the extended path condition, while the paper's candidate set is defined by the original syndrome. [VERIFIED: pinned repository audit 2026-10-06]
+
+**How to avoid:** Compute and ledger extended and original validity independently; selection filters only on original validity. [CITED: https://arxiv.org/html/2605.06547v2]
+
+**Warning signs:** Canonical aSCED reproduces the native candidate count while disagreeing with a direct original-syndrome enumeration. [ASSUMED]
+
+### Pitfall 10: Treating native aggregate output as paired evidence
+
+**What goes wrong:** Runs at the same physical `p` are described as shot matched even though native samples and seeds are inaccessible. [VERIFIED: pinned native binding audit 2026-10-06]
+
+**How to avoid:** Pair canonical BP4/aSCED exactly; mark native shot identity and per-shot counters `unavailable` with reasons and compare only the prespecified mechanism fields the interface exposes. [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:47-50]
 
 ## Code Examples
 
@@ -508,40 +658,40 @@ Returning both arrays preserves the literal source weights and the normalization
 | A3 | Lock a combined CSS syndrome row order during Phase 10 planning. | Canonical Mathematical Contract | Cross-component syndrome evidence could drift. |
 | A4 | Select quaternary saturation through Wave 0 differential tests rather than inherit `25.0`. | Numerical Contract | Numerical behavior and source comparisons depend on the bound. |
 | A5 | Strict user priors must already sum to one; only explicitly source-literal weights may be normalized with raw values retained. | Sampling / Q-BPGD | A different API policy changes rejection and provenance semantics. |
-| A6 | Include a general Pauli stabilizer/logical model, with CSS as a compiled subset. | Independent Evaluation | CSS-only scope would need a different five-qubit validation path. |
-| A7 | Continue committed Q-BP messages across Q-BPGD rounds. | Q-BPGD Contract | The paper does not fully resolve buffer reset behavior; trajectories may differ. |
-| A8 | Normalize Yao's literal fixation weights by their common sum for the probability API. | Q-BPGD Contract | This is source-ratio preserving but remains an interpretation. |
-| A9 | Use lowest qubit ID and Pauli order `I<X<Y<Z` for unresolved ties. | Q-BPGD / hard decision | A different tie rule changes deterministic trajectories. |
-| A10 | MBP4 may be deferred after required baseline and Q-BPGD without failing QBP-04. | Policy Compatibility | The planner may interpret “compositions” as requiring MBP4 now. |
+| A6 | Use `rank(T Λ Hᵀ)=Δ` with rank growth, CSS type, weight, and cycle checks as the canonical executable splitter qualification. | aSCED Source Resolution | A different formalization could admit the wrong affine partition. |
+| A7 | Use stable `(batch index, virtual path index)` to resolve equal-weight aSCED candidates. | aSCED Source Resolution | The paper does not specify ties; trajectory identity with another implementation may differ. |
+| A8 | Use GB46 with `Δ=2` as the bounded paper-linked demonstration. | Bounded Mechanism Evidence | A different small profile may be easier to build or verify. |
+| A9 | Apply a pinned build-only pybind11 overlay and out-of-tree path-corrected driver to the native checkout. | Native Reference Gate | Native upstream may publish a repair before execution. |
+| A10 | Native licensing remains unresolved until a human verifies authoritative license information. | Native Reference Gate | Copying or redistribution without resolution creates legal/provenance risk. |
 | A11 | Use the proposed `canonical/quaternary/` module layout. | Architecture Patterns | Repository maintainers may prefer the current flat module convention. |
 | A12 | The author implementation identity for Yao Q-BPGD remains unresolved; the current project record must not be read as proof of absence. | Open Questions | Reproduction planning could miss an available source implementation. |
 
 ## Open Questions
 
-1. **Does Phase 10 lock general stabilizer support or CSS-only public execution?**
-   - What we know: the source BP4 equations and the strongest Y fixture are general stabilizer equations, while Yao's published Q-BPGD section and the project's next experiment targets are CSS. [CITED: https://arxiv.org/html/2002.06502] [CITED: https://arxiv.org/html/2312.10950v2]
-   - What's unclear: no Phase 10 `CONTEXT.md` chooses the public model boundary. [VERIFIED: gsd init.phase-op 10 on 2026-10-06]
-   - Recommendation: implement a general Pauli check model and CSS compiler so the kernel is not artificially restricted; permit the planner to split non-CSS logical evaluation into a later task if scope pressure appears. [ASSUMED]
-
-2. **What is the exact persisted combined syndrome order for compiled CSS artifacts?**
+1. **What is the exact persisted combined syndrome order for compiled CSS artifacts?**
    - What we know: current code separately identifies Z checks and X checks, and the source formulas use one ordered stabilizer matrix. [VERIFIED: src/bp_registry/sampling.py:105-114] [CITED: https://arxiv.org/html/2312.10950v2]
    - What's unclear: no current quaternary artifact schema exists. [VERIFIED: repository file audit 2026-10-06]
    - Recommendation: lock row order and roles in semantic bytes before kernel work. [ASSUMED]
 
-3. **What finite saturation and boundary behavior define the canonical quaternary numerical profile?**
+2. **What finite saturation and boundary behavior define the canonical quaternary numerical profile?**
    - What we know: current binary saturation is `25.0`; source Q-BP specifies real LLRs and stable log operations but not this project's finite bound. [VERIFIED: src/bp_registry/canonical/numerics.py:15-41] [CITED: https://arxiv.org/html/2104.00304]
    - What's unclear: the smallest bound that preserves oracle agreement over intended priors and degrees. [ASSUMED]
    - Recommendation: parameterize it, sweep adversarial tiny-tree fixtures, and freeze the selected profile before public manifests. [ASSUMED]
 
-4. **How exactly are Q-BPGD buffers treated between rounds, and how are ties resolved?**
+3. **Can authoritative Q-BPGD code refine the locked continuation interpretation?**
    - What we know: Algorithm 3 says to run Q-BP for `T` iterations, then decimate using maximum marginal reliability. [CITED: https://arxiv.org/html/2312.10950v2]
-   - What's unclear: author-code identity, message reset/continuation, equal-reliability ties, and equal-component ties remain unresolved; the existing project record calls the author implementation identity unverified rather than absent. [VERIFIED: literature_policies/yao-2024-guided-decimation/paper_reproduction/PAPER.md:3-8,27-33]
-   - Recommendation: persist the chosen interpretation, add sensitivity fixtures, and update it only if an authoritative implementation resolves the ambiguity. [ASSUMED]
+   - What's unclear: author-code identity remains unresolved; D-14 through D-16 already lock continuation, literal-weight normalization, and ties as explicit canonical interpretations. [VERIFIED: literature_policies/yao-2024-guided-decimation/paper_reproduction/PAPER.md:3-8,27-33] [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:52-58]
+   - Recommendation: implement the locked choices and change source-status labeling only if authoritative code is later qualified. [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:52-58]
 
-5. **Should MBP4 be implemented in this phase?**
-   - What we know: MBP4 has a source-defined compatible recurrence, while Q-BPGD is explicitly required. [CITED: https://arxiv.org/html/2104.13659] [VERIFIED: .planning/REQUIREMENTS.md:139]
-   - What's unclear: plan capacity after the new model, sampler, evaluator, kernel, ledger, and Q-BPGD path. [ASSUMED]
-   - Recommendation: treat MBP4 as the first stretch plan, never as a substitute for Q-BPGD. [ASSUMED]
+4. **What authoritative license and repaired build identity govern the native aSCED reference?**
+   - What we know: commit `816772071486615dfc7d71d1e15df597edc58a26` is audited, but its declared pybind11 submodule and demo matrix path do not resolve from that tree. [VERIFIED: pinned repository audit 2026-10-06]
+   - What's unclear: authoritative license terms and the exact upstream-compatible pybind11 revision. [ASSUMED]
+   - Recommendation: make license verification plus a hashed, build-only overlay a checkpoint before native execution; never block canonical implementation on native instrumentation. [ASSUMED]
+
+5. **Which paper-linked bounded aSCED profile should be frozen?**
+   - What we know: the paper/repository provide GB46 and toric ordinary/overcomplete examples, but D-13 deliberately does not prescribe a curve or sample count. [CITED: https://arxiv.org/html/2605.06547v2] [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:60-63]
+   - What's unclear: the smallest run that exercises both ordinary and overcomplete paths within the available HPC budget. [ASSUMED]
+   - Recommendation: preflight GB46, `Δ=2`, one batch per option, a small fixed shot set, and source-profile decoder settings; persist any different choice before sampling. [ASSUMED]
 
 ## Environment Availability
 
@@ -554,8 +704,13 @@ Returning both arrays preserves the literal source weights and the normalization
 | pytest | Validation | ✓ | `9.0.3` | — [VERIFIED: environment probe 2026-10-06] |
 | Kuo C reference | Optional native differential/reference work | Source available | commit `402a83e…` | Paper equations + canonical/vector oracles [CITED: https://github.com/kywukuo/qLDPC_dec/tree/402a83e8afd0df5203693aeeed1e42f1900e344d] |
 | Yao Q-BPGD author code | Source reproduction identity | Unresolved | — | Implement paper Algorithm 3 and label interpretations [VERIFIED: literature_policies/yao-2024-guided-decimation/paper_reproduction/PAPER.md:3-8] [ASSUMED] |
+| `kit-cel/quantum_asced` | Required native reference | Source ✓; build ✗ | commit `8167720…` | Canonical aSCED proceeds; native run waits for isolated build gate. [VERIFIED: pinned repository and environment probes 2026-10-06] |
+| C++ compiler | Native aSCED | ✓ | GCC `11.5.0` | — [VERIFIED: environment probe 2026-10-06] |
+| CMake | Native aSCED | ✗ | — | Install in isolated native environment and record version. [VERIFIED: environment probe 2026-10-06] |
+| `uv` | Author README entry point | ✗ | — | Use a frozen isolated environment only after human package verification. [VERIFIED: environment probe 2026-10-06] |
+| Conda | Native environment bootstrap | executable unhealthy | `24.11.3`; `libmambapy.QueryFormat` error | Repair solver or use another isolated environment; preserve diagnostics. [VERIFIED: environment probe 2026-10-06] |
 
-**Missing dependencies with no fallback:** None for canonical Phase 10 execution. [VERIFIED: environment probe and Standard Stack recommendation 2026-10-06]
+**Missing dependencies with no fallback:** The required native reference cannot currently build until CMake, the pybind11 overlay, and a working isolated environment are supplied; canonical Phase 10 execution is not blocked. [VERIFIED: environment and pinned repository probes 2026-10-06]
 
 **Missing dependencies with fallback:** The unresolved Yao author implementation identity does not block a paper-equation canonical realization, but it blocks any claim of author-code trajectory agreement. [VERIFIED: literature_policies/yao-2024-guided-decimation/paper_reproduction/PAPER.md:3-8]
 
@@ -570,7 +725,7 @@ Returning both arrays preserves the literal source weights and the normalization
 | Quick run command | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/quaternary -x` [ASSUMED] |
 | Full suite command | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q` [VERIFIED: .planning/config.json workflow.test_command, read 2026-10-06] |
 
-The existing targeted baseline `tests/canonical/test_numerics.py tests/test_sampling.py tests/test_css_small.py tests/test_phase6_public_execution.py` passed `24` tests in `1.28s` on 2026-10-06. [VERIFIED: pytest probe 2026-10-06]
+The existing targeted baseline `tests/canonical/test_numerics.py tests/test_sampling.py tests/test_css_small.py tests/test_phase6_public_execution.py` passed `24` tests in `1.76s` on 2026-10-06. [VERIFIED: pytest probe 2026-10-06]
 
 ### Phase Requirements → Test Map
 
@@ -580,14 +735,19 @@ The existing targeted baseline `tests/canonical/test_numerics.py tests/test_samp
 | QBP-02 | Strict joint priors, one categorical Pauli draw, Y and correlation fixtures | unit + property | `pytest -q tests/canonical/quaternary/test_sampling.py -x` | ❌ Wave 0 [VERIFIED: repository file audit 2026-10-06] |
 | QBP-03 | Independent syndrome/exact/stabilizer/logical outcomes | unit + exhaustive | `pytest -q tests/canonical/quaternary/test_evaluator.py -x` | ❌ Wave 0 [VERIFIED: repository file audit 2026-10-06] |
 | QBP-04 | Closed compatibility, Q-BPGD semantics, trace/replay and unsupported-policy rejection | unit + integration | `pytest -q tests/canonical/quaternary/test_bpgd.py tests/canonical/quaternary/test_public_execution.py -x` | ❌ Wave 0 [VERIFIED: repository file audit 2026-10-06] |
+| D-08 | Fixed-`α` MBP4 posterior scaling, unscaled edge inhibition, schedule compatibility, AMBP4 rejection | unit + differential | `pytest -q tests/canonical/quaternary/test_mbp4.py -x` | ❌ Wave 0 [VERIFIED: repository file audit 2026-10-06] |
+| D-10/D-11 | CSS splitter qualification, all virtual paths, original-valid selection, non-CSS rejection | unit + exhaustive | `pytest -q tests/canonical/quaternary/test_asced_splitters.py tests/canonical/quaternary/test_asced_ensemble.py -x` | ❌ Wave 0 [VERIFIED: repository file audit 2026-10-06] |
+| D-10 | Overcomplete matrix/syndrome mapping and immutable-original evaluation | unit + fixture | `pytest -q tests/canonical/quaternary/test_asced_overcomplete.py -x` | ❌ Wave 0 [VERIFIED: repository file audit 2026-10-06] |
+| D-12/D-13 | Pinned native identity/build diagnostics and bounded `not_assessed` matched-shot evidence with qualified missingness | integration + evidence | `pytest -q tests/canonical/quaternary/test_asced_evidence.py -x` | ❌ Wave 0 [VERIFIED: repository file audit 2026-10-06] |
 
 ### Required Oracle Ladder
 
 1. **Hand algebra:** full 4×4 commutation table and every single-Pauli syndrome. [CITED: https://arxiv.org/html/2002.06502]
 2. **Exact enumeration:** enumerate every Pauli assignment on tiny problems, condition on syndrome, and compute normalized posterior marginals. [ASSUMED]
 3. **Conventional vector BP4:** compare each iteration/message/marginal with scalar LLR-BP4 on trees. [CITED: https://arxiv.org/html/2002.06502]
-4. **Source fixtures:** five-qubit `IIIYI`, depolarizing prior, Q-BPGD fixation/reliability, and MBP4 recurrence if implemented. [CITED: https://arxiv.org/html/2002.06502] [CITED: https://arxiv.org/html/2312.10950v2] [CITED: https://arxiv.org/html/2104.13659]
-5. **Public evidence:** manifest round trip, semantic hashes, truth-boundary tests, work reconstruction, trace truncation, replay, and tamper rejection. [VERIFIED: .planning/research/ARCHITECTURE.md:63-73]
+4. **Source fixtures:** five-qubit `IIIYI`, depolarizing prior, Q-BPGD fixation/reliability, fixed-`α` MBP4 recurrence, and pinned aSCED H/H0/M artifacts. [CITED: https://arxiv.org/html/2002.06502] [CITED: https://arxiv.org/html/2312.10950v2] [CITED: https://arxiv.org/html/2104.13659] [VERIFIED: pinned aSCED artifact audit 2026-10-06]
+5. **aSCED exhaustive oracle:** for tiny CSS matrices, enumerate stabilizer elements to prove the splitter partition, enumerate every virtual syndrome, recompute both extended and original syndromes independently, and compare selection with a direct minimum over the original-valid candidate pool. [ASSUMED]
+6. **Public evidence:** manifest round trip, semantic hashes, truth-boundary tests, all-path work reconstruction, native qualified missingness, replay, and tamper rejection. [VERIFIED: .planning/research/ARCHITECTURE.md:63-73]
 
 ### Sampling Rate
 
@@ -604,6 +764,11 @@ The existing targeted baseline `tests/canonical/test_numerics.py tests/test_samp
 - [ ] `tests/canonical/quaternary/test_evaluator.py` — QBP-03 exhaustive outcome and CSS/general-Pauli agreement. [ASSUMED]
 - [ ] `tests/canonical/quaternary/test_schedules.py` — source flooding versus variable-serial freshness and `IIIYI`. [ASSUMED]
 - [ ] `tests/canonical/quaternary/test_bpgd.py` — QBP-04 reliability, undecimated selection, raw/resolved fixation, state continuation, early success, round cap, work and ties. [ASSUMED]
+- [ ] `tests/canonical/quaternary/test_mbp4.py` — D-08 fixed inhibition, `1/α` posterior scaling, flooding/serial semantics, invalid `α`, and AMBP4 boundary. [ASSUMED]
+- [ ] `tests/canonical/quaternary/test_asced_splitters.py` — D-10/D-11 rank, detectable-component, CSS type, weight, cycle, even-`Δ`, hash, and non-CSS rejection gates. [ASSUMED]
+- [ ] `tests/canonical/quaternary/test_asced_ensemble.py` — D-10 all `L·2^Δ` paths, bit order, original-valid pool, stable tie, type-I failure, lineage, work, and immutable observation. [ASSUMED]
+- [ ] `tests/canonical/quaternary/test_asced_overcomplete.py` — D-10 `H_oc=M H_ext`, `z_oc=M z_ext`, pinned artifact fixtures, and tamper rejection. [ASSUMED]
+- [ ] `tests/canonical/quaternary/test_asced_evidence.py` — D-12/D-13 pinned native revision/build record, canonical paired shots, `not_assessed`, unavailable native counters, and paper/native discrepancy preservation. [ASSUMED]
 - [ ] `tests/canonical/quaternary/test_public_execution.py` — QBP-04 preflight, closed registry, manifests, ledger grammar, replay, tamper and truth boundary. [ASSUMED]
 - [ ] Shared exact-enumeration fixtures and independent evaluator helpers under `tests/canonical/quaternary/conftest.py`. [ASSUMED]
 - [ ] No framework install is needed. [VERIFIED: environment probe 2026-10-06]
@@ -637,6 +802,7 @@ Security enforcement is enabled at ASVS level 1 in the project configuration. [V
 
 ### Primary repository sources (HIGH confidence)
 
+- `.planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:12-131` — D-01 through D-17, discretion, canonical references, and deferred scope. [VERIFIED: .planning/phases/10-correlated-quaternary-execution/10-CONTEXT.md:12-131]
 - `.planning/REQUIREMENTS.md:134-139` — QBP-01 through QBP-04. [VERIFIED: .planning/REQUIREMENTS.md:134-139]
 - `.planning/ROADMAP.md:523-537` — Phase 10 goal, dependency, success criteria, research focus, and priority. [VERIFIED: .planning/ROADMAP.md:523-537]
 - `.planning/research/ARCHITECTURE.md:35-88` — kernel-family boundary, joint Pauli semantics, lifecycle, ownership, and compatibility. [VERIFIED: .planning/research/ARCHITECTURE.md:35-88]
@@ -655,12 +821,14 @@ Security enforcement is enabled at ASVS level 1 in the project configuration. [V
 - [Kuo and Lai, arXiv:2002.06502v2](https://arxiv.org/html/2002.06502) — conventional vector BP4, scalar delta-rule BP4, serial schedule, normalization, and five-qubit `IIIYI` fixture. [CITED: https://arxiv.org/html/2002.06502]
 - [Lai and Kuo, arXiv:2104.00304v3](https://arxiv.org/html/2104.00304) — identity-referenced LLRs, commutation quantizer, scalar box-plus updates, stable numerical recommendations, schedules, normalization, and offset. [CITED: https://arxiv.org/html/2104.00304]
 - [Kuo and Lai, arXiv:2104.13659v2](https://arxiv.org/html/2104.13659) — MBP4 recurrence, fixed inhibition, schedules, and adaptive boundary. [CITED: https://arxiv.org/html/2104.13659]
+- [Wursthorn et al., arXiv:2605.06547v2](https://arxiv.org/html/2605.06547v2) — aSCED splitter theorem, CSS batch construction, virtual syndromes, original-syndrome selection, overcomplete mapping, and source experiment settings. [CITED: https://arxiv.org/html/2605.06547v2]
+- [kit-cel `quantum_asced` at commit `8167720…`](https://github.com/kit-cel/quantum_asced/tree/816772071486615dfc7d71d1e15df597edc58a26) — exact audited author implementation, artifacts, build manifests, bindings, and implementation divergences. [VERIFIED: https://github.com/kit-cel/quantum_asced/tree/816772071486615dfc7d71d1e15df597edc58a26]
 - [NumPy 2.2 `logaddexp`](https://numpy.org/doc/2.2/reference/generated/numpy.logaddexp.html) — official stable log-sum primitive. [CITED: https://numpy.org/doc/2.2/reference/generated/numpy.logaddexp.html]
 - [Kuo `qLDPC_dec` repository at commit `402a83e…`](https://github.com/kywukuo/qLDPC_dec/tree/402a83e8afd0df5203693aeeed1e42f1900e344d) — GPL C reference archive and its stated paper association. [CITED: https://github.com/kywukuo/qLDPC_dec/tree/402a83e8afd0df5203693aeeed1e42f1900e344d]
 
 ### Tertiary (LOW confidence / requires planning confirmation)
 
-- Module layout, general-stabilizer public scope, finite saturation selection, Q-BPGD state continuation, source-weight normalization, and tie rules are the explicit assumptions A1–A12 above. [ASSUMED]
+- Module layout, finite saturation, splitter qualification formalization, aSCED candidate ties/demo profile, native overlay, and licensing are the explicit assumptions A1–A12 above. [ASSUMED]
 
 ## Metadata
 
@@ -670,7 +838,10 @@ Security enforcement is enabled at ASVS level 1 in the project configuration. [V
 - Mathematical kernel: MEDIUM — equations and equivalence claims come from primary paper versions retrieved through a seam classified MEDIUM. [CITED: https://arxiv.org/html/2104.00304]
 - Architecture: HIGH for existing boundaries; MEDIUM for the proposed quaternary package/data model. [VERIFIED: .planning/research/ARCHITECTURE.md:35-88] [ASSUMED]
 - Q-BPGD semantics: MEDIUM for paper-literal behavior; LOW for reset, normalization, and tie interpretations. [CITED: https://arxiv.org/html/2312.10950v2] [ASSUMED]
-- Pitfalls and validation: MEDIUM overall — source facts are cited and project-specific oracle design is explicit as assumptions. [CITED: https://arxiv.org/html/2002.06502] [ASSUMED]
+- MBP4 semantics: MEDIUM — the required fixed-`α` recurrence and AMBP4 boundary come from the primary paper; code-specific `α` remains a manifest decision. [CITED: https://arxiv.org/html/2104.13659]
+- aSCED semantics: MEDIUM — paper v2 and exact author commit were inspected; paper/native differences and unresolved ties are recorded explicitly. [CITED: https://arxiv.org/html/2605.06547v2] [VERIFIED: pinned repository audit 2026-10-06]
+- Native aSCED execution: LOW until the build overlay, environment, and license checkpoint are resolved; instrumentation limits are HIGH-confidence source findings. [ASSUMED] [VERIFIED: pinned repository audit 2026-10-06]
+- Pitfalls and validation: MEDIUM overall — source facts are cited and project-specific oracle design is explicit as assumptions. [CITED: https://arxiv.org/html/2002.06502] [CITED: https://arxiv.org/html/2605.06547v2] [ASSUMED]
 
 **Research date:** 2026-10-06  
-**Valid until:** 2026-11-05 for implementation planning; recheck source-code identity and installed environment before reproduction planning. [ASSUMED]
+**Valid until:** 2026-11-05 for canonical mathematics; re-audit the native repository revision immediately before building. [ASSUMED]
