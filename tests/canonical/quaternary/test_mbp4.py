@@ -99,7 +99,8 @@ def test_fixed_alpha_mbp4_rejects_invalid_alpha_schedules_adaptive_search_and_bi
         module.Mbp4Spec(alpha=0.7, schedule="qbp_flooding", algorithm="ambp4")
     with pytest.raises(ValueError, match="alpha search|fixed alpha"):
         module.Mbp4Spec(alpha=(1.0, 0.8), schedule="qbp_flooding")
-    with pytest.raises(ValueError, match="work cap"):
-        module.FixedAlphaMbp4Kernel(module.Mbp4Spec(alpha=0.7, schedule="qbp_flooding", max_iterations=1)).new_session(
-            _problem(), _priors(), budgets=BudgetTree(limits=(BudgetLimit("attempt", "bp_calls", 0),), parents={})
-        ).run()
+    capped = module.FixedAlphaMbp4Kernel(module.Mbp4Spec(alpha=0.7, schedule="qbp_flooding", max_iterations=1)).new_session(
+        _problem(), _priors(), budgets=BudgetTree(limits=(BudgetLimit("attempt", "bp_calls", 0),), parents={})
+    ).run()
+    assert capped.termination == "work_cap"
+    assert capped.work.bp_calls == 0
