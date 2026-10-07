@@ -7,6 +7,7 @@ the encoding and commutation convention visible at the test boundary.
 from __future__ import annotations
 
 import numpy as np
+import pytest
 
 
 PAULI_BITS = ((0, 0), (1, 0), (1, 1), (0, 1))
@@ -33,3 +34,14 @@ def hand_syndrome(checks: object, error: object) -> np.ndarray:
             parity ^= int(not COMMUTES[int(label)][int(value)])
         answer[row] = parity
     return answer
+
+
+@pytest.fixture
+def pauli_oracle() -> dict[str, object]:
+    """Expose independent tables to tests without importing production code."""
+    return {
+        "bits": PAULI_BITS,
+        "products": PAULI_PRODUCTS,
+        "commutes": COMMUTES,
+        "syndrome": hand_syndrome,
+    }
