@@ -17,8 +17,11 @@ from typing import Literal
 
 import numpy as np
 
+from ..canonical.budgets import BudgetTree, WorkVector
 from ..css import CssCode, gf2_rank, semantic_sha256
 from .algebra import Pauli, to_symplectic
+from .kernel import QbpSweep, ScalarLlrBp4Kernel
+from .mbp4 import FixedAlphaMbp4Kernel
 from .problems import PauliCode, QuaternaryOriginalProblem
 from ..canonical.lineage import LineageEdge, LineageId, stable_lineage_id
 
@@ -356,6 +359,211 @@ class AscedBatch:
             raise ValueError("aSCED materialization requires an explicit certified transform and lift")
 
 
+@dataclass(frozen=True, slots=True)
+class AscedSpec:
+    """Closed controller limits for one CSS aSCED ensemble."""
+
+    max_iterations: int
+    path_cap: int
+
+    def __post_init__(self) -> None:
+        if type(self.max_iterations) is not int or self.max_iterations < 0:
+            raise ValueError("aSCED max_iterations must be a nonnegative integer")
+        if type(self.path_cap) is not int or self.path_cap < 1:
+            raise ValueError("aSCED path_cap must be a positive integer")
+
+
+@dataclass(frozen=True, slots=True)
+class AscedPathResult:
+    """Complete immutable evidence for one declared virtual syndrome path."""
+
+    batch_index: int
+    path_index: int
+    batch_id: str
+    graph_identity: str
+    virtual_bits: tuple[int, ...]
+    extended_syndrome: tuple[int, ...]
+    candidate: tuple[int, ...]
+    extended_valid: bool
+    original_valid: bool
+    pauli_weight: int
+    terminal: str
+    work: WorkVector
+    kernel_profile: str
+
+
+@dataclass(frozen=True, slots=True)
+class AscedResult:
+    """All retained path terminals and the paper-rule original-space choice."""
+
+    spec: AscedSpec
+    paths: tuple[AscedPathResult, ...]
+    selected_candidate: tuple[int, ...] | None
+    selected_origin: tuple[int, int] | None
+    original_valid_pool: tuple[tuple[int, int], ...]
+    termination: Literal["selected", "type_i_failure"]
+    work: WorkVector
+    component_ids: dict[str, str]
+    interpretation_ids: dict[str, str]
+    run_fidelity: RunFidelity = "canonical_adaptation"
+
+    def as_evidence(self) -> dict[str, object]:
+        return {
+            "spec": {"max_iterations": self.spec.max_iterations, "path_cap": self.spec.path_cap},
+            "paths": [
+                {
+                    "batch_index": path.batch_index, "path_index": path.path_index,
+                    "batch_id": path.batch_id, "graph_identity": path.graph_identity,
+                    "virtual_bits": list(path.virtual_bits), "extended_syndrome": list(path.extended_syndrome),
+                    "candidate": list(path.candidate), "extended_valid": path.extended_valid,
+                    "original_valid": path.original_valid, "pauli_weight": path.pauli_weight,
+                    "terminal": path.terminal, "work": path.work.as_evidence(structural_event_version=4),
+                    "kernel_profile": path.kernel_profile,
+                }
+                for path in self.paths
+            ],
+            "selected_candidate": None if self.selected_candidate is None else list(self.selected_candidate),
+            "selected_origin": None if self.selected_origin is None else list(self.selected_origin),
+            "original_valid_pool": [list(item) for item in self.original_valid_pool],
+            "termination": self.termination, "work": self.work.as_evidence(structural_event_version=4),
+            "component_ids": dict(self.component_ids), "interpretation_ids": dict(self.interpretation_ids),
+            "run_fidelity": self.run_fidelity,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class _AscedSessionCode:
+    """Decoder-only immutable check view; it intentionally has no stabilizer claim."""
+
+    checks: np.ndarray
+
+    def __post_init__(self) -> None:
+        checked = _readonly_pauli(self.checks, name="aSCED session checks")
+        object.__setattr__(self, "checks", checked)
+
+    @property
+    def n(self) -> int:
+        return int(self.checks.shape[1])
+
+    def syndrome(self, candidate: object) -> np.ndarray:
+        from .algebra import syndrome
+        return syndrome(self.checks, candidate)
+
+
+@dataclass(frozen=True, slots=True)
+class _AscedSessionProblem:
+    code: _AscedSessionCode
+    syndrome: np.ndarray
+    lineage_id: str
+
+    def __post_init__(self) -> None:
+        observed = _readonly_binary(self.syndrome, name="aSCED session syndrome", ndim=1)
+        if observed.shape != (self.code.checks.shape[0],) or not self.lineage_id:
+            raise ValueError("aSCED session syndrome must match decoder checks")
+        object.__setattr__(self, "syndrome", observed)
+
+
+def _virtual_bits(path_index: int, delta: int) -> tuple[int, ...]:
+    return tuple((path_index >> offset) & 1 for offset in range(delta))
+
+
+def _path_syndrome(original: QuaternaryOriginalProblem, batch: AscedBatch, bits: tuple[int, ...]) -> np.ndarray:
+    x_rows = batch.qualified.code.hx.shape[0]
+    z_rows = batch.qualified.code.hz.shape[0]
+    x_splitters = sum(row.role == "x" for row in batch.qualified.rows)
+    g_x = np.asarray(bits[:x_splitters], dtype=np.uint8)
+    g_z = np.asarray(bits[x_splitters:], dtype=np.uint8)
+    result = np.concatenate((original.syndrome[:x_rows], g_x, original.syndrome[x_rows:x_rows + z_rows], g_z))
+    result.setflags(write=False)
+    return result
+
+
+class AscedController:
+    """Run every receipt-bound CSS aSCED virtual path before selection."""
+
+    def __init__(self, spec: AscedSpec) -> None:
+        if not isinstance(spec, AscedSpec):
+            raise ValueError("aSCED controller requires AscedSpec")
+        self.spec = spec
+
+    def run(
+        self,
+        original: QuaternaryOriginalProblem,
+        batches: tuple[AscedBatch, ...] | list[AscedBatch],
+        priors: object,
+        *,
+        kernel: ScalarLlrBp4Kernel | FixedAlphaMbp4Kernel,
+        budgets: BudgetTree | None = None,
+    ) -> AscedResult:
+        if not isinstance(original, QuaternaryOriginalProblem):
+            raise ValueError("aSCED execution requires a CSS-derived immutable original problem")
+        declared = tuple(batches)
+        if not declared:
+            raise ValueError("aSCED execution requires preflighted materialized batches")
+        if not isinstance(kernel, (ScalarLlrBp4Kernel, FixedAlphaMbp4Kernel)):
+            raise ValueError("aSCED supports only scalar BP4 or fixed-alpha MBP4 kernels")
+        total = sum(batch.path_count for batch in declared)
+        if total > self.spec.path_cap:
+            raise ValueError("aSCED path cardinality exceeds the declared preflight cap")
+        if tuple((batch.local_order, batch.batch_id) for batch in declared) != tuple(sorted((batch.local_order, batch.batch_id) for batch in declared)):
+            raise ValueError("aSCED batches must retain their stable materialized order")
+        for batch in declared:
+            _verify_qualified_batch(batch.qualified)
+            if batch.working.original.semantic_sha256 != original.semantic_sha256:
+                raise ValueError("aSCED batch must retain the immutable original problem observation")
+        path_results: list[AscedPathResult] = []
+        for batch_index, batch in enumerate(declared):
+            for path_index in range(batch.path_count):
+                bits = _virtual_bits(path_index, len(batch.qualified.rows))
+                z_ext = _path_syndrome(original, batch, bits)
+                problem = _AscedSessionProblem(
+                    _AscedSessionCode(batch.working.checks), z_ext,
+                    f"asced-path-{batch.batch_id}-{path_index}",
+                )
+                # A session owns exactly one leaf.  Sharing one BudgetTree here
+                # would make later path evidence include earlier path work and
+                # would make replay depend on caller mutation history.
+                session = kernel.new_session(
+                    problem, priors, budgets=BudgetTree(limits=(), parents={}), budget_scope="attempt",
+                )
+                if isinstance(kernel, ScalarLlrBp4Kernel):
+                    sweep: QbpSweep = session.run(max_iterations=self.spec.max_iterations)
+                    candidate, terminal, work = sweep.candidate, sweep.terminal, sweep.work
+                else:
+                    decoded = session.run()
+                    candidate, terminal, work = decoded.candidate, decoded.termination, decoded.work
+                extended_valid = bool(np.array_equal(problem.code.syndrome(candidate), z_ext))
+                original_valid = bool(np.array_equal(original.code.syndrome(candidate), original.syndrome))
+                path_results.append(AscedPathResult(
+                    batch_index, path_index, batch.batch_id, batch.graph_identity, bits,
+                    tuple(int(value) for value in z_ext), tuple(int(value) for value in candidate),
+                    extended_valid, original_valid, int(np.count_nonzero(candidate)), terminal, work,
+                    kernel.profile.profile_id,
+                ))
+        pool = tuple((path.batch_index, path.path_index) for path in path_results if path.original_valid)
+        selected = min((path for path in path_results if path.original_valid), key=lambda path: (path.pauli_weight, path.batch_index, path.path_index), default=None)
+        return AscedResult(
+            self.spec, tuple(path_results), None if selected is None else selected.candidate,
+            None if selected is None else (selected.batch_index, selected.path_index), pool,
+            "type_i_failure" if selected is None else "selected", WorkVector.sum(path.work for path in path_results),
+            {"css_batching": "wursthorn-et-al-asced-css-batching", "virtual_lsb": "kit-cel-quantum-asced-pinned-lsb"},
+            {"virtual_bit_order": "least_significant_bit_first", "stable_tie": "batch_index_then_path_index"},
+        )
+
+
+def reconstruct_asced(
+    spec: AscedSpec, original: QuaternaryOriginalProblem, batches: tuple[AscedBatch, ...] | list[AscedBatch], priors: object,
+    expected: AscedResult, *, kernel: ScalarLlrBp4Kernel | FixedAlphaMbp4Kernel,
+) -> AscedResult:
+    """Independently re-run decoder-visible paths and reject altered evidence."""
+    if not isinstance(expected, AscedResult):
+        raise ValueError("aSCED replay requires an AscedResult")
+    rebuilt = AscedController(spec).run(original, batches, priors, kernel=kernel)
+    if rebuilt.as_evidence() != expected.as_evidence():
+        raise ValueError("aSCED replay evidence differs from declared all-path execution")
+    return rebuilt
+
+
 def augment_css(code: CssCode, rows: tuple[AscedSplitterRow, ...]) -> tuple[np.ndarray, tuple[tuple[str, str, int], ...]]:
     """Build the fixed Phase-10 order ``[H_X, T_X, H_Z, T_Z]``."""
     validated = code.validate()
@@ -616,7 +824,7 @@ def materialize_asced_batches(
 
 
 __all__ = [
-    "AscedBatch", "AscedSplitterRow", "AscedWorkingGraph", "ConstructedSplitterReceipt", "QualifiedAscedBatch", "SplitterQualification",
+    "AscedBatch", "AscedController", "AscedPathResult", "AscedResult", "AscedSpec", "AscedSplitterRow", "AscedWorkingGraph", "ConstructedSplitterReceipt", "QualifiedAscedBatch", "SplitterQualification",
     "SplitterSearchExhausted", "SplitterSearchReceipt", "augment_css", "construct_splitter_batch", "gb46_canonical_fixture_payload",
-    "materialize_asced_batches", "parse_pinned_gb46_css", "qualify_splitter_batch",
+    "materialize_asced_batches", "parse_pinned_gb46_css", "qualify_splitter_batch", "reconstruct_asced",
 ]

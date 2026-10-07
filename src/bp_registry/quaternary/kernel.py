@@ -41,6 +41,28 @@ def _priors(value: object, *, n: int) -> np.ndarray:
     return result
 
 
+def _session_problem(value: object) -> bool:
+    """Admit immutable decoder graphs, including certified aSCED transforms.
+
+    CSS aSCED graphs can deliberately contain noncommuting splitter rows and
+    therefore cannot be represented as ``QuaternaryOriginalProblem``.  BP4
+    only consumes immutable ordered checks, an ordered syndrome, and ``n``.
+    """
+    code = getattr(value, "code", None)
+    checks = getattr(code, "checks", None)
+    syndrome = getattr(value, "syndrome", None)
+    n = getattr(code, "n", None)
+    return (
+        isinstance(n, int) and n > 0 and isinstance(checks, np.ndarray)
+        and checks.ndim == 2 and checks.shape[1] == n
+        and isinstance(syndrome, np.ndarray) and syndrome.shape == (checks.shape[0],)
+        and np.issubdtype(checks.dtype, np.integer) and np.issubdtype(syndrome.dtype, np.integer)
+        and np.all((checks >= Pauli.I) & (checks <= Pauli.Z))
+        and np.all((syndrome == 0) | (syndrome == 1))
+        and not checks.flags.writeable and not syndrome.flags.writeable
+    )
+
+
 @dataclass(frozen=True, slots=True)
 class QbpSweep:
     """Immutable state after one admitted scalar BP4 sweep or terminal boundary."""
@@ -155,8 +177,8 @@ class QbpSession:
         budgets: BudgetTree | None = None,
         budget_scope: str = "attempt",
     ) -> None:
-        if not isinstance(kernel, ScalarLlrBp4Kernel) or not isinstance(problem, QuaternaryOriginalProblem):
-            raise ValueError("QBP sessions require a scalar kernel and immutable original problem")
+        if not isinstance(kernel, ScalarLlrBp4Kernel) or not _session_problem(problem):
+            raise ValueError("QBP sessions require a scalar kernel and immutable check/syndrome problem")
         if not isinstance(budget_scope, str) or not budget_scope:
             raise ValueError("budget_scope must be nonempty")
         self.kernel = kernel

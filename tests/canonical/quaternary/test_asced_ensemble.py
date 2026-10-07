@@ -45,8 +45,8 @@ def test_all_paths_are_lsb_first_and_selection_uses_original_syndrome() -> None:
         kernel=ScalarLlrBp4Kernel(), budgets=BudgetTree(limits=(), parents={}),
     )
     assert len(result.paths) == 4
-    assert [path.virtual_bits for path in result.paths] == ((0, 0), (1, 0), (0, 1), (1, 1))
-    assert all(path.extended_syndrome[:1] == (0,) and path.extended_syndrome[3:] == (0,) for path in result.paths)
+    assert tuple(path.virtual_bits for path in result.paths) == ((0, 0), (1, 0), (0, 1), (1, 1))
+    assert all(path.extended_syndrome[0] == 0 and path.extended_syndrome[2] == 0 for path in result.paths)
     assert result.run_fidelity == "canonical_adaptation"
     assert result.termination in {"selected", "type_i_failure"}
     module.reconstruct_asced(module.AscedSpec(max_iterations=1, path_cap=4), _original(), _batch(), np.full((4, 4), 0.25), result, kernel=ScalarLlrBp4Kernel())

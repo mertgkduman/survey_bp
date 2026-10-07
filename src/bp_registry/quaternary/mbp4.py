@@ -19,7 +19,7 @@ import numpy as np
 
 from ..canonical.budgets import BudgetTree, WorkVector
 from .algebra import Pauli, anticommutes
-from .kernel import QbpSweep, ScalarLlrBp4Kernel, _priors
+from .kernel import QbpSweep, ScalarLlrBp4Kernel, _priors, _session_problem
 from .numerics import QBP4_F64_V1, QuaternaryNumericalFailure, QuaternaryNumericalProfile, llrs_to_probabilities
 from .problems import QuaternaryOriginalProblem
 
@@ -180,8 +180,8 @@ class Mbp4Session:
         self, kernel: FixedAlphaMbp4Kernel, problem: QuaternaryOriginalProblem, priors: object, *, budgets: BudgetTree | None = None,
         budget_scope: str = "attempt",
     ) -> None:
-        if not isinstance(kernel, FixedAlphaMbp4Kernel) or not isinstance(problem, QuaternaryOriginalProblem):
-            raise ValueError("MBP4 requires its quaternary kernel and immutable original problem")
+        if not isinstance(kernel, FixedAlphaMbp4Kernel) or not _session_problem(problem):
+            raise ValueError("MBP4 requires its quaternary kernel and immutable check/syndrome problem")
         if not budget_scope:
             raise ValueError("MBP4 budget scope must be nonempty")
         self.kernel, self.problem = kernel, problem
