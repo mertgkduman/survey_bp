@@ -147,7 +147,7 @@ def test_compatibility_distinguishes_component_and_run_fidelity_for_qbpgd():
 @pytest.mark.parametrize(
     "kwargs,match",
     [
-        ({"schedule": "parallel"}, "unsupported binary"),
+        ({"schedule": "layered"}, "unsupported binary"),
         ({"transforms": ("normalized_min_sum",)}, "unsupported binary"),
         ({"intervention": "ambp4"}, "AMBP4"),
         ({"intervention": "asced", "css_only": False}, "non-CSS aSCED"),
