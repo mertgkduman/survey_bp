@@ -28,6 +28,7 @@ from .manifests import (
     CanonicalExperimentV8,
     ManifestV1,
     QuaternaryExperimentV1,
+    QuaternaryExperimentV2,
     executable_canonical_policy_effects,
     manifest_digest,
     preflight,
@@ -36,6 +37,7 @@ from .manifests import (
 )
 from . import evaluator, sampling
 from .quaternary.execution import run_quaternary_tracer, verify_quaternary_tracer
+from .quaternary.compatibility import resolve_quaternary_composition
 
 
 def _native_reference():
@@ -219,9 +221,9 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
 def preflight_quaternary(manifest_path: str | Path) -> dict[str, Any]:
     """Validate the distinct four-state public tracer before sampling."""
     manifest = preflight(manifest_path).manifest
-    if not isinstance(manifest, QuaternaryExperimentV1):
-        raise ValueError("quaternary execution requires QuaternaryExperimentV1")
-    return {
+    if not isinstance(manifest, (QuaternaryExperimentV1, QuaternaryExperimentV2)):
+        raise ValueError("quaternary execution requires a quaternary experiment manifest")
+    report = {
         "run_id": manifest.run_id,
         "manifest_sha256": manifest_digest(manifest),
         "shot_budget": 1,
@@ -232,21 +234,42 @@ def preflight_quaternary(manifest_path: str | Path) -> dict[str, Any]:
         "fixture": manifest.evidence.fixture,
         "assessment_status": manifest.evidence.assessment_status,
     }
+    if isinstance(manifest, QuaternaryExperimentV2):
+        resolved = resolve_quaternary_composition(manifest.composition)
+        report["shot_budget"] = manifest.shot_budget
+        report["composition"] = resolved.model_dump(mode="json")
+    return report
 
 
 def run_quaternary(manifest_path: str | Path, output: str | Path, *, shot_id: int | None = None) -> dict[str, Any]:
     """Run the single bounded joint-Pauli tracer through the public path."""
     report = preflight_quaternary(manifest_path)
-    if shot_id not in (None, 0):
+    manifest = preflight(manifest_path).manifest
+    if not isinstance(manifest, (QuaternaryExperimentV1, QuaternaryExperimentV2)):
+        raise ValueError("quaternary execution requires a quaternary experiment manifest")
+    if shot_id not in (None, 0) or (isinstance(manifest, QuaternaryExperimentV2) and (shot_id or 0) >= manifest.shot_budget):
         raise ValueError("quaternary shot ID is outside the manifest budget")
     output_path = Path(output)
-    result = run_quaternary_tracer(preflight(manifest_path).manifest, output_path, shot_id=0)
+    persisted_manifest = output_path / "manifest.json"
+    if isinstance(manifest_path, (str, Path)):
+        manifest_reference = str(Path(manifest_path))
+    else:
+        output_path.mkdir(parents=True, exist_ok=True)
+        persisted_manifest.write_text(json.dumps(manifest.model_dump(mode="json"), sort_keys=True) + "\n", encoding="utf-8")
+        manifest_reference = str(persisted_manifest)
+    result = run_quaternary_tracer(manifest, output_path, shot_id=0)
+    if isinstance(manifest, QuaternaryExperimentV2):
+        ledger_path = output_path / "events.jsonl"
+        events = [json.loads(line) for line in ledger_path.read_text(encoding="utf-8").splitlines()]
+        events[0]["data"]["resolved_composition"] = report["composition"]
+        events[0]["data"]["public_schema"] = "quaternary_experiment_v2"
+        ledger_path.write_text("".join(json.dumps(event, sort_keys=True, separators=(",", ":")) + "\n" for event in events), encoding="utf-8")
     ledger_path = output_path / "events.jsonl"
     public = {
         **report, "output": str(output_path), "final_row_count": 1,
         "termination": result.termination, "outcome": result.outcome,
         "ledger_sha256": sha256(ledger_path.read_bytes()).hexdigest(),
-        "manifest_path": str(Path(manifest_path)), "ledger_path": str(ledger_path),
+        "manifest_path": manifest_reference, "ledger_path": str(ledger_path),
         "statistical_claim": "not_assessed; development fixture, not a source-curve reproduction or performance result",
     }
     (output_path / "result.json").write_text(json.dumps(public, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -263,7 +286,20 @@ def verify_quaternary_run(output: str | Path) -> dict[str, Any]:
     report = preflight_quaternary(manifest_path)
     if result.get("manifest_sha256") != report["manifest_sha256"] or result.get("ledger_sha256") != sha256((output_path / "events.jsonl").read_bytes()).hexdigest():
         raise ValueError("quaternary result identity differs from immutable evidence")
-    replay = verify_quaternary_tracer(preflight(manifest_path).manifest, output_path, shot_id=0)
+    manifest = preflight(manifest_path).manifest
+    if isinstance(manifest, QuaternaryExperimentV2):
+        scratch = output_path / ".public-v2-replay"
+        run_quaternary(manifest_path, scratch, shot_id=0)
+        expected = (scratch / "events.jsonl").read_bytes()
+        actual = (output_path / "events.jsonl").read_bytes()
+        for child in scratch.iterdir():
+            child.unlink()
+        scratch.rmdir()
+        if actual != expected:
+            raise ValueError("quaternary public ledger differs from deterministic replay")
+        replay = {"run_id": manifest.run_id, "shot_id": 0, "verified": True}
+    else:
+        replay = verify_quaternary_tracer(manifest, output_path, shot_id=0)
     return {**report, "output": str(output_path), "final_row_count": 1, **replay}
 
 

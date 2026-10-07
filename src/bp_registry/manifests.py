@@ -24,6 +24,7 @@ from .canonical.contracts import (
     CanonicalCompositionSpecV6, MemoryCompositionSpec, Phase5InterventionContract,
     RelaySpecV4, parse_canonical_manifest, validate_composition,
 )
+from .quaternary.contracts import QuaternaryCompositionSpec
 from .css import CssCode, fixture_code
 
 
@@ -761,7 +762,15 @@ class QuaternaryExperimentV1(StrictModel):
         return self
 
 
-ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | CanonicalExperimentV6 | CanonicalExperimentV7 | CanonicalExperimentV8 | QuaternaryExperimentV1
+class QuaternaryExperimentV2(QuaternaryExperimentV1):
+    """Additive full public contract; V1 remains the byte-stable tracer schema."""
+
+    schema_version: Literal["quaternary_experiment_v2"]
+    composition: QuaternaryCompositionSpec
+    shot_budget: int = Field(ge=1, le=MAX_SHOTS)
+
+
+ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | CanonicalExperimentV6 | CanonicalExperimentV7 | CanonicalExperimentV8 | QuaternaryExperimentV1 | QuaternaryExperimentV2
 
 
 _EXECUTABLE_BASELINE_KINDS = {
@@ -850,13 +859,15 @@ def _read_value(value: dict[str, Any] | str | Path) -> dict[str, Any]:
     return decoded
 
 
-def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | CanonicalExperimentV6 | CanonicalExperimentV7 | dict[str, Any] | str | Path) -> ManifestRecord:
+def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | CanonicalExperimentV6 | CanonicalExperimentV7 | QuaternaryExperimentV2 | dict[str, Any] | str | Path) -> ManifestRecord:
     """Dispatch complete native and canonical schemas without changing v1 meanings."""
-    if isinstance(value, (ManifestV1, CanonicalManifestV2, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV6, CanonicalExperimentV7, QuaternaryExperimentV1)):
+    if isinstance(value, (ManifestV1, CanonicalManifestV2, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV6, CanonicalExperimentV7, QuaternaryExperimentV1, QuaternaryExperimentV2)):
         return value
     decoded = _read_value(value)
     if decoded.get("schema_version") == "quaternary_experiment_v1":
         return QuaternaryExperimentV1.model_validate(decoded)
+    if decoded.get("schema_version") == "quaternary_experiment_v2":
+        return QuaternaryExperimentV2.model_validate(decoded)
     if decoded.get("schema_version") == 8:
         return CanonicalExperimentV8.model_validate(decoded)
     if decoded.get("schema_version") == 7 and "ensemble" in decoded:
@@ -877,11 +888,13 @@ def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | CanonicalExperiment
 
 
 def _parse_for_preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ManifestRecord:
-    if isinstance(value, (ManifestV1, LegacyManifestV1, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV6, CanonicalExperimentV7, QuaternaryExperimentV1)):
+    if isinstance(value, (ManifestV1, LegacyManifestV1, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV6, CanonicalExperimentV7, QuaternaryExperimentV1, QuaternaryExperimentV2)):
         return value
     decoded = _read_value(value)
     if decoded.get("schema_version") == "quaternary_experiment_v1":
         return QuaternaryExperimentV1.model_validate(decoded)
+    if decoded.get("schema_version") == "quaternary_experiment_v2":
+        return QuaternaryExperimentV2.model_validate(decoded)
     if decoded.get("schema_version") == 8:
         return CanonicalExperimentV8.model_validate(decoded)
     if decoded.get("schema_version") == 7 and "ensemble" in decoded:
@@ -1014,7 +1027,7 @@ def _resolved_artifact_root(root: str) -> str:
 def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedExperiment:
     """Resolve immutable CSS input and runtime identity before any simulation work."""
     manifest = _parse_for_preflight(value)
-    if isinstance(manifest, QuaternaryExperimentV1):
+    if isinstance(manifest, (QuaternaryExperimentV1, QuaternaryExperimentV2)):
         # The new kernel has no CSS artifact; model validation is the complete
         # public preflight and occurs before sampling or decoder construction.
         return ResolvedExperiment(manifest=manifest, code=None, artifact=None)
