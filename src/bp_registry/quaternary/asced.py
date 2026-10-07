@@ -18,7 +18,8 @@ import numpy as np
 
 from ..css import CssCode, gf2_rank, semantic_sha256
 from .algebra import Pauli, to_symplectic
-from .problems import PauliCode
+from .problems import PauliCode, QuaternaryOriginalProblem
+from ..canonical.lineage import LineageEdge, LineageId, stable_lineage_id
 
 
 SplitterRole = Literal["x", "z"]
@@ -255,6 +256,58 @@ class QualifiedAscedBatch:
         object.__setattr__(self, "h_ext", h_ext)
 
 
+@dataclass(frozen=True, slots=True)
+class AscedWorkingGraph:
+    """A transformed factor graph whose splitter checks need not mutually commute.
+
+    It intentionally is not ``QuaternaryWorkingProblem``: the latter models a
+    stabilizer code and rejects the nonzero ``T Lambda H^T`` required by the
+    aSCED affine partition.  It retains the same immutable-original and typed
+    transform/lift lineage contract for the decoder-visible working graph.
+    """
+
+    lineage_id: str
+    original: QuaternaryOriginalProblem
+    parent_edge: LineageEdge
+    checks: np.ndarray
+    syndrome: np.ndarray
+    row_map: tuple[tuple[str, str, int], ...]
+    transform_identity: str
+    lift_identity: str
+
+    def __post_init__(self) -> None:
+        checks = _readonly_pauli(self.checks, name="aSCED working checks")
+        syndrome = _readonly_binary(self.syndrome, name="aSCED working syndrome", ndim=1)
+        if not self.lineage_id.startswith("working-") or checks.shape[0] != syndrome.size or checks.shape[1] != self.original.code.n:
+            raise ValueError("aSCED working graph dimensions or lineage are invalid")
+        if len(self.row_map) != checks.shape[0] or self.parent_edge != LineageEdge(
+            "transform", LineageId("original", self.original.lineage_id), LineageId("working", self.lineage_id),
+        ):
+            raise ValueError("aSCED working graph requires a certified transform from its immutable original")
+        if not self.transform_identity or not self.lift_identity:
+            raise ValueError("aSCED working graph requires explicit transform and lift identities")
+        object.__setattr__(self, "checks", checks)
+        object.__setattr__(self, "syndrome", syndrome)
+
+
+@dataclass(frozen=True, slots=True)
+class AscedBatch:
+    """One closed, receipt-bound augmented graph and its preflight path count."""
+
+    batch_id: str
+    local_order: int
+    qualified: QualifiedAscedBatch
+    working: AscedWorkingGraph
+    graph_identity: str
+    path_count: int
+
+    def __post_init__(self) -> None:
+        if not self.batch_id or self.local_order < 0 or self.path_count != 2 ** len(self.qualified.rows):
+            raise ValueError("aSCED batch identity, order, and path count must be receipt-derived")
+        if self.working.parent_edge.relation != "transform" or not self.working.transform_identity or not self.working.lift_identity:
+            raise ValueError("aSCED materialization requires an explicit certified transform and lift")
+
+
 def augment_css(code: CssCode, rows: tuple[AscedSplitterRow, ...]) -> tuple[np.ndarray, tuple[tuple[str, str, int], ...]]:
     """Build the fixed Phase-10 order ``[H_X, T_X, H_Z, T_Z]``."""
     validated = code.validate()
@@ -386,8 +439,88 @@ def construct_splitter_batch(code: CssCode | PauliCode, *, delta: int, row_weigh
     return QualifiedAscedBatch(validated, complete_rows, splitter, h_ext, row_map, receipt, qualification)
 
 
+def _verify_qualified_batch(batch: QualifiedAscedBatch) -> None:
+    """Fail closed when any graph, witness, or receipt byte no longer agrees."""
+    if not isinstance(batch, QualifiedAscedBatch):
+        raise ValueError("materialization accepts only a complete QualifiedAscedBatch")
+    if batch.receipt.run_fidelity != "canonical_adaptation" or batch.receipt.terminal_status != "completed":
+        raise ValueError("materialization requires a completed canonical-adaptation construction receipt")
+    expected_splitter, expected_h_ext, expected_map, expected_qualification = qualify_splitter_batch(
+        batch.code, batch.rows, row_weight=batch.qualification.row_weights[0],
+    )
+    if (
+        not np.array_equal(expected_splitter, batch.splitter)
+        or not np.array_equal(expected_h_ext, batch.h_ext)
+        or expected_map != batch.h_ext_row_map
+        or expected_qualification != batch.qualification
+    ):
+        raise ValueError("materialization rejected a mismatched splitter graph or qualification witness")
+    splitter_sha = sha256(_canonical_bytes(batch.splitter.tolist())).hexdigest()
+    h_ext_sha = sha256(_canonical_bytes({"rows": batch.h_ext.tolist(), "row_map": [list(item) for item in batch.h_ext_row_map]})).hexdigest()
+    if batch.receipt.splitter_sha256 != splitter_sha or batch.receipt.h_ext_sha256 != h_ext_sha:
+        raise ValueError("materialization rejected a receipt/content digest mismatch")
+
+
+def materialize_asced_batches(
+    original: QuaternaryOriginalProblem,
+    batches: tuple[QualifiedAscedBatch, ...] | list[QualifiedAscedBatch],
+    *, path_cap: int,
+) -> tuple[AscedBatch, ...]:
+    """Freeze all validated aSCED graphs and their closed virtual path cardinality."""
+    if not isinstance(original, QuaternaryOriginalProblem):
+        raise ValueError("aSCED materialization requires an immutable quaternary original problem")
+    declared = tuple(batches)
+    if not declared or type(path_cap) is not int or path_cap < 1:
+        raise ValueError("aSCED materialization requires nonempty batches and a positive path cap")
+    total_paths = sum(2 ** len(batch.rows) for batch in declared if isinstance(batch, QualifiedAscedBatch))
+    if len(declared) != len([batch for batch in declared if isinstance(batch, QualifiedAscedBatch)]):
+        raise ValueError("materialization rejects raw rows, partial searches, and exhausted terminals")
+    if total_paths > path_cap:
+        raise ValueError("aSCED path cardinality exceeds the declared preflight cap")
+    materialized: list[AscedBatch] = []
+    identities: set[str] = set()
+    for local_order, qualified in enumerate(declared):
+        _verify_qualified_batch(qualified)
+        h, roles = _css_pauli_rows(qualified.code)
+        if not np.array_equal(original.code.checks, h) or tuple(original.code.row_roles) != roles:
+            raise ValueError("materialization requires a splitter batch matching the immutable original CSS graph")
+        x_count = qualified.code.hx.shape[0]
+        z_count = qualified.code.hz.shape[0]
+        x_splitters = sum(row.role == "x" for row in qualified.rows)
+        z_splitters = sum(row.role == "z" for row in qualified.rows)
+        extended_syndrome = np.concatenate((
+            original.syndrome[:x_count], np.zeros(x_splitters, dtype=np.uint8),
+            original.syndrome[x_count:x_count + z_count], np.zeros(z_splitters, dtype=np.uint8),
+        ))
+        graph_payload = {
+            "original": original.semantic_sha256,
+            "receipt": qualified.receipt.receipt_sha256,
+            "qualification": qualified.qualification.qualification_sha256,
+            "row_map": [list(item) for item in qualified.h_ext_row_map],
+            "local_order": local_order,
+        }
+        graph_identity = _identity("asced-graph", graph_payload)
+        if graph_identity in identities:
+            raise ValueError("materialization requires distinct declared batch graph identities")
+        identities.add(graph_identity)
+        transform_identity = _identity("asced-transform", graph_payload)
+        lift_identity = _identity("asced-lift", {"original": original.semantic_sha256, "graph": graph_identity})
+        working_id = stable_lineage_id("working", {"original": original.lineage_id, "graph": graph_identity}).value
+        working = AscedWorkingGraph(
+            working_id, original,
+            LineageEdge("transform", LineageId("original", original.lineage_id), LineageId("working", working_id)),
+            checks=qualified.h_ext, syndrome=extended_syndrome, row_map=qualified.h_ext_row_map,
+            transform_identity=transform_identity, lift_identity=lift_identity,
+        )
+        materialized.append(AscedBatch(
+            f"asced-batch-{local_order}-{qualified.receipt.receipt_sha256[:16]}", local_order,
+            qualified, working, graph_identity, 2 ** len(qualified.rows),
+        ))
+    return tuple(materialized)
+
+
 __all__ = [
-    "AscedSplitterRow", "ConstructedSplitterReceipt", "QualifiedAscedBatch", "SplitterQualification",
+    "AscedBatch", "AscedSplitterRow", "AscedWorkingGraph", "ConstructedSplitterReceipt", "QualifiedAscedBatch", "SplitterQualification",
     "SplitterSearchExhausted", "SplitterSearchReceipt", "augment_css", "construct_splitter_batch", "gb46_canonical_fixture_payload",
-    "parse_pinned_gb46_css", "qualify_splitter_batch",
+    "materialize_asced_batches", "parse_pinned_gb46_css", "qualify_splitter_batch",
 ]

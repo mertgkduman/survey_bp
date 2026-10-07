@@ -108,6 +108,64 @@ def test_source_components_are_distinct_from_project_run_fidelity() -> None:
 
 def test_materializes_preflighted_batches_with_stable_transform_lineage() -> None:
     """Complete receipt-bound batches become fixed working graphs before shots."""
-    from bp_registry.quaternary import asced
+    from bp_registry.quaternary.asced import QualifiedAscedBatch, construct_splitter_batch, materialize_asced_batches
+    from bp_registry.quaternary.problems import QuaternaryOriginalProblem, compile_css_artifact
 
-    assert hasattr(asced, "materialize_asced_batches"), "receipt-bound batch materialization is required"
+    qualified = construct_splitter_batch(_small_css(), delta=2, row_weight=2, attempt_cap=16)
+    assert isinstance(qualified, QualifiedAscedBatch)
+    original = QuaternaryOriginalProblem(
+        "original-asced-small", compile_css_artifact(_small_css(), source_artifact_identity="asced-small-css"),
+        np.zeros(4, dtype=np.uint8),
+    )
+
+    batches = materialize_asced_batches(original, (qualified,), path_cap=4)
+
+    assert len(batches) == 1
+    assert batches[0].path_count == 4
+    assert batches[0].working.parent_edge.relation == "transform"
+    assert batches[0].working.transform_identity.startswith("asced-transform-")
+    assert batches[0].working.lift_identity.startswith("asced-lift-")
+    with pytest.raises(ValueError, match="preflight cap"):
+        materialize_asced_batches(original, (qualified,), path_cap=3)
+
+
+def test_materialization_rejects_raw_exhausted_and_tampered_batches() -> None:
+    """Only an intact completed receipt can cross the preflight boundary."""
+    from bp_registry.quaternary.asced import (
+        QualifiedAscedBatch, SplitterSearchExhausted, construct_splitter_batch, materialize_asced_batches,
+    )
+    from bp_registry.quaternary.problems import QuaternaryOriginalProblem, compile_css_artifact
+
+    original = QuaternaryOriginalProblem(
+        "original-asced-tamper", compile_css_artifact(_small_css(), source_artifact_identity="asced-small-css"),
+        np.zeros(4, dtype=np.uint8),
+    )
+    qualified = construct_splitter_batch(_small_css(), delta=2, row_weight=2, attempt_cap=16)
+    assert isinstance(qualified, QualifiedAscedBatch)
+    exhausted = construct_splitter_batch(_small_css(), delta=2, row_weight=2, attempt_cap=1)
+    assert isinstance(exhausted, SplitterSearchExhausted)
+    with pytest.raises(ValueError, match="raw rows"):
+        materialize_asced_batches(original, (exhausted,), path_cap=4)
+    object.__setattr__(qualified, "h_ext", np.zeros_like(qualified.h_ext))
+    with pytest.raises(ValueError, match="mismatched splitter graph"):
+        materialize_asced_batches(original, (qualified,), path_cap=4)
+
+
+def test_materializes_the_exact_gb46_canonical_fixture_before_shots() -> None:
+    """The pinned input's project-generated receipt gives one closed four-path batch."""
+    from bp_registry.quaternary.asced import QualifiedAscedBatch, construct_splitter_batch, materialize_asced_batches, parse_pinned_gb46_css
+    from bp_registry.quaternary.problems import QuaternaryOriginalProblem, compile_css_artifact
+
+    code = parse_pinned_gb46_css(_gb46_raw())
+    qualified = construct_splitter_batch(code, delta=2, row_weight=4, attempt_cap=10_000)
+    assert isinstance(qualified, QualifiedAscedBatch)
+    original = QuaternaryOriginalProblem(
+        "original-asced-gb46", compile_css_artifact(code, source_artifact_identity="pinned-gb46-h44"),
+        np.zeros(44, dtype=np.uint8),
+    )
+
+    materialized = materialize_asced_batches(original, (qualified,), path_cap=4)
+
+    assert materialized[0].path_count == 4
+    assert materialized[0].qualified.receipt.run_fidelity == "canonical_adaptation"
+    assert materialized[0].working.checks.shape == (46, 46)
