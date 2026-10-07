@@ -169,6 +169,17 @@ def test_compatibility_rejects_empty_or_unowned_compositions():
             kernel=None,
             schedule=QuaternaryPolicySpec(kind="qbp_flooding", binding_id="schedule"),
         )
+
+
+def test_css_asced_composition_is_an_explicit_canonical_adaptation() -> None:
+    from bp_registry.quaternary.compatibility import resolve_quaternary_composition
+
+    resolved = resolve_quaternary_composition(
+        _composition(intervention="asced", css_only=True), problem_kind="css"
+    )
+    assert resolved.run_fidelity == "canonical_adaptation"
+    assert resolved.component_fidelity["intervention"] == "source_backed"
+    assert "project_constructed_splitter_and_map" in resolved.adaptation_reasons
     with pytest.raises(ValueError, match="owns state"):
         resolve_quaternary_composition(
             _composition(intervention="qbpgd", continued_messages=True, prior_profile="depolarizing").model_copy(
