@@ -128,3 +128,13 @@ def test_approved_build_emits_a_digest_bound_success_receipt(tmp_path: Path) -> 
     payload = json.loads(receipt.read_text(encoding="utf-8"))
     assert payload["terminal"] == "build_success"
     assert payload["source_spec_sha256"] == "55359962431c055cf971171f81d75997282beb29e8928a8d82e023fbb6c1f24e"
+
+
+def test_native_pauli_translation_is_bijective_and_native_identity_is_distinct() -> None:
+    """The native I/X/Z/Y representation must not be mistaken for canonical I/X/Y/Z."""
+    from bp_registry.quaternary.native_asced import NativeAscedIdentity
+
+    identity = NativeAscedIdentity.approved()
+    assert identity.canonical_to_native(("I", "X", "Y", "Z")) == ("I", "X", "Z", "Y")
+    assert identity.native_to_canonical(("I", "X", "Z", "Y")) == ("I", "X", "Y", "Z")
+    assert identity.source_commit == "816772071486615dfc7d71d1e15df597edc58a26"
