@@ -21,7 +21,7 @@ from bp_registry.quaternary.numerics import (
 from bp_registry.quaternary.problems import PauliCode, QuaternaryOriginalProblem
 from bp_registry.canonical.budgets import BudgetLimit, BudgetTree
 
-from test_vector_oracle import exact_one_check, vector_bp4_one_check
+from .test_vector_oracle import exact_one_check, vector_bp4_one_check
 
 
 def test_scalar_llr_bp4_kernel_is_available() -> None:
