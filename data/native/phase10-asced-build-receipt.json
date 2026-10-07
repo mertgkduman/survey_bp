@@ -1,0 +1,226 @@
+{
+  "approval_summary": ".planning/phases/10-correlated-quaternary-execution/10-14-SUMMARY.md",
+  "cmake": {
+    "executable_sha256": "1b8bffb9e82925587e70a6211d5e539e06133cae978610917e1ed90e111bd208",
+    "path": "/tmp/phase10-asced-native/tools/cmake-4.2.0-linux-x86_64/bin/cmake",
+    "version": "cmake version 4.2.0\n\nCMake suite maintained and supported by Kitware (kitware.com/cmake).\n"
+  },
+  "commands": [
+    {
+      "command": [
+        "git",
+        "clone",
+        "--no-checkout",
+        "https://github.com/kit-cel/quantum_asced.git",
+        "/tmp/phase10-asced-native/source/quantum_asced"
+      ],
+      "cwd": null,
+      "returncode": 0,
+      "stderr": "Cloning into '/tmp/phase10-asced-native/source/quantum_asced'...\n",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "fetch",
+        "--depth",
+        "1",
+        "origin",
+        "816772071486615dfc7d71d1e15df597edc58a26"
+      ],
+      "cwd": "/tmp/phase10-asced-native/source/quantum_asced",
+      "returncode": 0,
+      "stderr": "From https://github.com/kit-cel/quantum_asced\n * branch            816772071486615dfc7d71d1e15df597edc58a26 -> FETCH_HEAD\n",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "git",
+        "checkout",
+        "--detach",
+        "816772071486615dfc7d71d1e15df597edc58a26"
+      ],
+      "cwd": "/tmp/phase10-asced-native/source/quantum_asced",
+      "returncode": 0,
+      "stderr": "HEAD is now at 8167720 Updated README\n",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "/tmp/phase10-asced-native/venv/bin/python",
+        "-m",
+        "pip",
+        "install",
+        "--no-deps",
+        "/tmp/phase10-asced-native/downloads/numpy-2.5.3-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
+      ],
+      "cwd": null,
+      "returncode": 0,
+      "stderr": "\n[notice] A new release of pip is available: 24.0 -> 26.2.1\n[notice] To update, run: /tmp/phase10-asced-native/venv/bin/python -m pip install --upgrade pip\n",
+      "stdout": "Processing /tmp/phase10-asced-native/downloads/numpy-2.5.3-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl\nInstalling collected packages: numpy\nSuccessfully installed numpy-2.5.3\n"
+    },
+    {
+      "command": [
+        "/tmp/phase10-asced-native/venv/bin/python",
+        "-m",
+        "pip",
+        "install",
+        "--no-deps",
+        "/tmp/phase10-asced-native/downloads/galois-0.4.11-py3-none-any.whl"
+      ],
+      "cwd": null,
+      "returncode": 0,
+      "stderr": "\n[notice] A new release of pip is available: 24.0 -> 26.2.1\n[notice] To update, run: /tmp/phase10-asced-native/venv/bin/python -m pip install --upgrade pip\n",
+      "stdout": "Processing /tmp/phase10-asced-native/downloads/galois-0.4.11-py3-none-any.whl\nInstalling collected packages: galois\nSuccessfully installed galois-0.4.11\n"
+    },
+    {
+      "command": [
+        "/tmp/phase10-asced-native/venv/bin/python",
+        "-m",
+        "pip",
+        "install",
+        "--no-deps",
+        "/tmp/phase10-asced-native/downloads/matplotlib-3.11.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl"
+      ],
+      "cwd": null,
+      "returncode": 0,
+      "stderr": "\n[notice] A new release of pip is available: 24.0 -> 26.2.1\n[notice] To update, run: /tmp/phase10-asced-native/venv/bin/python -m pip install --upgrade pip\n",
+      "stdout": "Processing /tmp/phase10-asced-native/downloads/matplotlib-3.11.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl\nInstalling collected packages: matplotlib\nSuccessfully installed matplotlib-3.11.2\n"
+    },
+    {
+      "command": [
+        "/tmp/phase10-asced-native/venv/bin/python",
+        "-m",
+        "pip",
+        "install",
+        "--no-deps",
+        "/tmp/phase10-asced-native/downloads/scikit_build_core-1.1.1-py3-none-any.whl"
+      ],
+      "cwd": null,
+      "returncode": 0,
+      "stderr": "\n[notice] A new release of pip is available: 24.0 -> 26.2.1\n[notice] To update, run: /tmp/phase10-asced-native/venv/bin/python -m pip install --upgrade pip\n",
+      "stdout": "Processing /tmp/phase10-asced-native/downloads/scikit_build_core-1.1.1-py3-none-any.whl\nInstalling collected packages: scikit-build-core\nSuccessfully installed scikit-build-core-1.1.1\n"
+    },
+    {
+      "command": [
+        "/tmp/phase10-asced-native/venv/bin/python",
+        "-m",
+        "pip",
+        "install",
+        "--no-deps",
+        "/tmp/phase10-asced-native/downloads/pybind11-3.1.0-py3-none-any.whl"
+      ],
+      "cwd": null,
+      "returncode": 0,
+      "stderr": "\n[notice] A new release of pip is available: 24.0 -> 26.2.1\n[notice] To update, run: /tmp/phase10-asced-native/venv/bin/python -m pip install --upgrade pip\n",
+      "stdout": "Processing /tmp/phase10-asced-native/downloads/pybind11-3.1.0-py3-none-any.whl\nInstalling collected packages: pybind11\nSuccessfully installed pybind11-3.1.0\n"
+    },
+    {
+      "command": [
+        "/tmp/phase10-asced-native/tools/cmake-4.2.0-linux-x86_64/bin/cmake",
+        "-S",
+        "/tmp/phase10-asced-native/source/quantum_asced",
+        "-B",
+        "/tmp/phase10-asced-native/build",
+        "-DCMAKE_INSTALL_PREFIX=/tmp/phase10-asced-native/prefix",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": null,
+      "returncode": 0,
+      "stderr": "Using compatibility mode for Python, set PYBIND11_FINDPYTHON to NEW/OLD to silence this message\n",
+      "stdout": "-- The C compiler identification is GNU 11.5.0\n-- The CXX compiler identification is GNU 11.5.0\n-- Detecting C compiler ABI info\n-- Detecting C compiler ABI info - done\n-- Check for working C compiler: /usr/bin/cc - skipped\n-- Detecting C compile features\n-- Detecting C compile features - done\n-- Detecting CXX compiler ABI info\n-- Detecting CXX compiler ABI info - done\n-- Check for working CXX compiler: /usr/bin/c++ - skipped\n-- Detecting CXX compile features\n-- Detecting CXX compile features - done\n-- Found OpenMP_C: -fopenmp (found version \"4.5\")\n-- Found OpenMP_CXX: -fopenmp (found version \"4.5\")\n-- Found OpenMP: TRUE (found version \"4.5\")\n-- pybind11 v3.1.0 \n-- Found Python: /tmp/phase10-asced-native/venv/bin/python3.12 (found suitable version \"3.12.2\", minimum required is \"3.9\") found components: Interpreter Development.Module Development.Embed\n-- Performing Test HAS_FLTO_AUTO\n-- Performing Test HAS_FLTO_AUTO - Success\n-- Configuring done (3.0s)\n-- Generating done (0.0s)\n-- Build files have been written to: /tmp/phase10-asced-native/build\n"
+    },
+    {
+      "command": [
+        "/tmp/phase10-asced-native/tools/cmake-4.2.0-linux-x86_64/bin/cmake",
+        "--build",
+        "/tmp/phase10-asced-native/build",
+        "--parallel",
+        "1"
+      ],
+      "cwd": null,
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "[  3%] Building CXX object CMakeFiles/QEC_lib.dir/src/Channel/BSC.cpp.o\n[  7%] Building CXX object CMakeFiles/QEC_lib.dir/src/Channel/Channel.cpp.o\n[ 10%] Building CXX object CMakeFiles/QEC_lib.dir/src/Channel/Pauli_Channel.cpp.o\n[ 14%] Building CXX object CMakeFiles/QEC_lib.dir/src/Decoder/BP/BP4_Decoder.cpp.o\n[ 17%] Building CXX object CMakeFiles/QEC_lib.dir/src/Decoder/BP/BP_CN_Processing/BP_MSA.cpp.o\n[ 21%] Building CXX object CMakeFiles/QEC_lib.dir/src/Decoder/BP/BP_CN_Processing/BP_SPA.cpp.o\n[ 25%] Building CXX object CMakeFiles/QEC_lib.dir/src/Decoder/BP/BP_CN_Processing/BP_SPA_Phi.cpp.o\n[ 28%] Building CXX object CMakeFiles/QEC_lib.dir/src/Decoder/BP/BP_Decoder.cpp.o\n[ 32%] Building CXX object CMakeFiles/QEC_lib.dir/src/Decoder/BP/BP_Scheduling/BP_Parallel.cpp.o\n[ 35%] Building CXX object CMakeFiles/QEC_lib.dir/src/Decoder/BP/BP_Scheduling/BP_Serial_CN.cpp.o\n[ 39%] Building CXX object CMakeFiles/QEC_lib.dir/src/Decoder/BP/BP_Scheduling/BP_Serial_VN.cpp.o\n[ 42%] Building CXX object CMakeFiles/QEC_lib.dir/src/Decoder/Decoder.cpp.o\n[ 46%] Building CXX object CMakeFiles/QEC_lib.dir/src/Decoder/Ensemble/Ensemble_Decoder.cpp.o\n[ 50%] Building CXX object CMakeFiles/QEC_lib.dir/src/Decoder/Ensemble/Ensemble_Processing/Identity_Processing.cpp.o\n[ 53%] Building CXX object CMakeFiles/QEC_lib.dir/src/Decoder/Ensemble/Ensemble_Processing/aSCED_Processing.cpp.o\n[ 57%] Building CXX object CMakeFiles/QEC_lib.dir/src/Decoder/Ensemble/Ensemble_Selection/Ensemble_Selection.cpp.o\n[ 60%] Building CXX object CMakeFiles/QEC_lib.dir/src/Decoder/Ensemble/Ensemble_Selection/Frequency_Weighted_Selection.cpp.o\n[ 64%] Building CXX object CMakeFiles/QEC_lib.dir/src/Decoder/Ensemble/Ensemble_Selection/Logical_Clustering_Selection.cpp.o\n[ 67%] Building CXX object CMakeFiles/QEC_lib.dir/src/Decoder/Ensemble/Ensemble_Selection/Minimum_Weight_Selection.cpp.o\n[ 71%] Building CXX object CMakeFiles/QEC_lib.dir/src/Decoder/XZ_Decoder.cpp.o\n[ 75%] Building CXX object CMakeFiles/QEC_lib.dir/src/Graph_Optimization/Graph_Optimization.cpp.o\n[ 78%] Building CXX object CMakeFiles/QEC_lib.dir/src/Graph_Optimization/Graph_Optimization_GF2.cpp.o\n[ 82%] Building CXX object CMakeFiles/QEC_lib.dir/src/Graph_Optimization/Graph_Optimization_GF4.cpp.o\n[ 85%] Building CXX object CMakeFiles/QEC_lib.dir/src/Pybind11_Module.cpp.o\n[ 89%] Building CXX object CMakeFiles/QEC_lib.dir/src/Simulation_Env.cpp.o\n[ 92%] Linking CXX static library libQEC_lib.a\n[ 92%] Built target QEC_lib\n[ 96%] Building CXX object CMakeFiles/QEC.dir/src/Pybind11_Module.cpp.o\n[100%] Linking CXX shared module QEC.cpython-312-x86_64-linux-gnu.so\n[100%] Built target QEC\n"
+    },
+    {
+      "command": [
+        "/tmp/phase10-asced-native/tools/cmake-4.2.0-linux-x86_64/bin/cmake",
+        "--install",
+        "/tmp/phase10-asced-native/build"
+      ],
+      "cwd": null,
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "-- Install configuration: \"Release\"\n-- Installing: /tmp/phase10-asced-native/prefix/./QEC.cpython-312-x86_64-linux-gnu.so\n"
+    },
+    {
+      "command": [
+        "/tmp/phase10-asced-native/venv/bin/python",
+        "-c",
+        "import sys; sys.path.insert(0, sys.argv[1]); import QEC; assert hasattr(QEC, 'Simulation_Env'); print(QEC.__file__)",
+        "/tmp/phase10-asced-native/prefix"
+      ],
+      "cwd": null,
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "/tmp/phase10-asced-native/prefix/QEC.cpython-312-x86_64-linux-gnu.so\n"
+    }
+  ],
+  "completed_at": 1791417277.35326,
+  "disposable_root": "/tmp/phase10-asced-native",
+  "packages": {
+    "galois": {
+      "artifact": "/tmp/phase10-asced-native/downloads/galois-0.4.11-py3-none-any.whl",
+      "sha256": "d2e12a2b7fd44b108cc15d7de27dabcb8a98a556ea2c69c94fe695139629d9aa"
+    },
+    "matplotlib": {
+      "artifact": "/tmp/phase10-asced-native/downloads/matplotlib-3.11.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+      "sha256": "df4f7784aca81a94f254c0a2767d592ee25f407e488f5fa7203e51093fb6ca27"
+    },
+    "numpy": {
+      "artifact": "/tmp/phase10-asced-native/downloads/numpy-2.5.3-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+      "sha256": "b7e18c623bb5c95acb3b3328861272816ba199fb531921c5d6d0b675f1fde9e3"
+    },
+    "pybind11": {
+      "artifact": "/tmp/phase10-asced-native/downloads/pybind11-3.1.0-py3-none-any.whl",
+      "sha256": "b8488090f8acffbcb6b5d6a85571a6827a0a2981ffb75e5a0b27b87c4a6b7dd0"
+    },
+    "scikit-build-core": {
+      "artifact": "/tmp/phase10-asced-native/downloads/scikit_build_core-1.1.1-py3-none-any.whl",
+      "sha256": "6f6d6cf600e2e9639fd258ecd11cfc19bd189354b968916a519c6793e7e26237"
+    }
+  },
+  "primary_environment_sha256_after": "adff1f54bb2f574a9eec84fc71ff16720d8e29b0051818484612b29c541a7cd4",
+  "primary_environment_sha256_before": "adff1f54bb2f574a9eec84fc71ff16720d8e29b0051818484612b29c541a7cd4",
+  "schema": "phase10-asced-build-receipt-v1",
+  "source_digests_after": {
+    ".gitmodules": "d97bea252de1fdc5cb012e2be44b7aae00e1984c16b36a1854304d55ac899bb0",
+    "CMakeLists.txt": "23c7041b6cfe74502222cb3044b5e7ab6e887d1e6541e1fee8c08f32f199667c",
+    "environment.yml": "b75200e91befc226a559dd0995073dea4d7c8ec366e8b5cc44b7992751947b8c",
+    "include/Decoder/BP/BP4_Decoder.h": "43f54507744bdf019c6a33c29249f3eb562f806ac62cda8cc17b8d5feace4823",
+    "include/Decoder/Ensemble/Ensemble_Processing/aSCED_Processing.h": "4229352162e0c4a72f26dc82164b777c5d2e983c897f0b47c462d4337cce7e3e",
+    "pyproject.toml": "0a05c0ee366bf234b016c270059ac20e59bdaaf0bbdb0042ef03a8a189477fdd",
+    "src/Channel/Pauli_Channel.cpp": "e9a6a711701e0b8ae2c11db7d6eab574ddfc6d7adc263fd42cca4e7563326839",
+    "src/Decoder/BP/BP4_Decoder.cpp": "5d689fb7de0654efdc9d46563ef6633fc3178e5806227a67a48111b10f511809",
+    "src/Decoder/Ensemble/Ensemble_Processing/aSCED_Processing.cpp": "cf7534c185ae9d2fb4395bc0cdb3675643e3a2319072f92fa8f84d28f3e3a85d",
+    "src/Decoder/Ensemble/Ensemble_Selection/Minimum_Weight_Selection.cpp": "b03e0ae676a1dba7d1312efb07b1a9ff96fc2052fb980f87263efd1fa11c67c4",
+    "src/Pybind11_Module.cpp": "23f0d1d5ce3b431748c3b09228ebff5642840c048b94952543db2e99352de1d1"
+  },
+  "source_digests_before": {
+    ".gitmodules": "d97bea252de1fdc5cb012e2be44b7aae00e1984c16b36a1854304d55ac899bb0",
+    "CMakeLists.txt": "23c7041b6cfe74502222cb3044b5e7ab6e887d1e6541e1fee8c08f32f199667c",
+    "environment.yml": "b75200e91befc226a559dd0995073dea4d7c8ec366e8b5cc44b7992751947b8c",
+    "include/Decoder/BP/BP4_Decoder.h": "43f54507744bdf019c6a33c29249f3eb562f806ac62cda8cc17b8d5feace4823",
+    "include/Decoder/Ensemble/Ensemble_Processing/aSCED_Processing.h": "4229352162e0c4a72f26dc82164b777c5d2e983c897f0b47c462d4337cce7e3e",
+    "pyproject.toml": "0a05c0ee366bf234b016c270059ac20e59bdaaf0bbdb0042ef03a8a189477fdd",
+    "src/Channel/Pauli_Channel.cpp": "e9a6a711701e0b8ae2c11db7d6eab574ddfc6d7adc263fd42cca4e7563326839",
+    "src/Decoder/BP/BP4_Decoder.cpp": "5d689fb7de0654efdc9d46563ef6633fc3178e5806227a67a48111b10f511809",
+    "src/Decoder/Ensemble/Ensemble_Processing/aSCED_Processing.cpp": "cf7534c185ae9d2fb4395bc0cdb3675643e3a2319072f92fa8f84d28f3e3a85d",
+    "src/Decoder/Ensemble/Ensemble_Selection/Minimum_Weight_Selection.cpp": "b03e0ae676a1dba7d1312efb07b1a9ff96fc2052fb980f87263efd1fa11c67c4",
+    "src/Pybind11_Module.cpp": "23f0d1d5ce3b431748c3b09228ebff5642840c048b94952543db2e99352de1d1"
+  },
+  "source_spec_sha256": "55359962431c055cf971171f81d75997282beb29e8928a8d82e023fbb6c1f24e",
+  "started_at": 1791417079.0726552,
+  "terminal": "build_success"
+}

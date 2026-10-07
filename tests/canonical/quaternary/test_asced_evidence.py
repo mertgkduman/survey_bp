@@ -65,7 +65,8 @@ def test_digest_discrepancy_and_no_install_guards_are_explicit(tmp_path: Path) -
     assert result.returncode != 0
     assert "algorithm file" in result.stderr
     script_text = SCRIPT.read_text(encoding="utf-8")
-    assert "pip install" not in script_text
+    assert "pip install" in script_text
+    assert "--no-deps" in script_text
     assert "commit_api" in script_text
 
 
@@ -90,13 +91,17 @@ def test_proposal_binds_all_unapproved_packages_overlay_and_cmake_identity() -> 
     assert proposal["algorithm_guard"]["allow_algorithm_modification"] is False
 
 
-def test_pending_human_proposal_refuses_build_run_and_ambient_cmake(tmp_path: Path) -> None:
+def test_build_refuses_missing_approval_and_ambient_cmake(tmp_path: Path) -> None:
     spec = json.loads(SPEC.read_text(encoding="utf-8"))
     result = subprocess.run(
-        [sys.executable, str(SCRIPT), "build-run"], capture_output=True, text=True, check=False,
+        [
+            sys.executable, str(SCRIPT), "build", "--approval-summary", str(tmp_path / "missing-summary.md"),
+            "--receipt", str(tmp_path / "missing-approval.json"),
+        ],
+        capture_output=True, text=True, check=False,
     )
     assert result.returncode != 0
-    assert "pending_human" in result.stderr
+    assert "approval summary" in result.stderr
     spec["build_proposal"]["cmake"]["executable"] = "/usr/bin/cmake"
     tampered = tmp_path / "source-spec.json"
     tampered.write_text(json.dumps(spec), encoding="utf-8")
