@@ -432,8 +432,6 @@ def run_quaternary_asced(
         syndrome=problem.syndrome,
     )
     batches = materialize_asced_batches(original, (constructed,), path_cap=path_cap)
-    if sum(batch.path_count for batch in batches) * iterations > max_work:
-        raise ValueError("public aSCED declared all-path BP work exceeds the manifest cap before sampling")
     use_overcomplete = intervention["kind"] == "asced_overcomplete" or config.get("overcomplete") is True
     maps = None
     if use_overcomplete:
@@ -452,8 +450,10 @@ def run_quaternary_asced(
         kernel = FixedAlphaMbp4Kernel(Mbp4Spec(alpha=kernel_config.get("alpha"), schedule=payload["composition"]["schedule"]["kind"], max_iterations=iterations))
     else:
         kernel = ScalarLlrBp4Kernel()
-    result = AscedController(AscedSpec(max_iterations=iterations, path_cap=path_cap)).run(
-        original, batches, priors, kernel=kernel, budgets=BudgetTree(limits=(BudgetLimit("attempt", "bp_calls", max_work),), parents={}), overcomplete=maps,
+    result = AscedController(AscedSpec(
+        max_iterations=iterations, path_cap=path_cap, max_total_bp_calls=max_work,
+    )).run(
+        original, batches, priors, kernel=kernel, overcomplete=maps,
     )
     candidate = None if result.selected_candidate is None else np.asarray(result.selected_candidate, dtype=np.uint8)
     outcome, logical = ("invalid_syndrome", None) if candidate is None else _evaluate(problem, hidden, candidate)
@@ -464,6 +464,8 @@ def run_quaternary_asced(
             "resolved_composition": dict(resolved_composition), "run_fidelity": "canonical_adaptation",
             "splitter_receipt": constructed.receipt.receipt_sha256, "h_ext_sha256": constructed.receipt.h_ext_sha256,
             "path_count": sum(batch.path_count for batch in batches), "overcomplete": use_overcomplete,
+            "overcomplete_map_receipt": None if maps is None else maps[batches[0].batch_id][1].receipt_sha256,
+            "graph_identity": result.paths[0].graph_identity,
         }),
         _event("sample", {"sample_identity": _digest({"manifest": manifest_sha256, "shot": shot_id}), "channel": channel.tolist(), "decoder_priors": priors.tolist(), "decoder_smoothing": smoothing, "hidden_truth_sealed": True}),
     ]
@@ -472,6 +474,7 @@ def run_quaternary_asced(
         "virtual_bits_lsb_first": list(path.virtual_bits), "extended_syndrome": list(path.extended_syndrome),
         "candidate": list(path.candidate), "extended_valid": path.extended_valid, "original_valid": path.original_valid,
         "pauli_weight": path.pauli_weight, "terminal": path.terminal, "work": path.work.as_evidence(structural_event_version=4),
+        "overcomplete_map_receipt": path.overcomplete_map_receipt,
     }) for path in result.paths)
     events.extend((
         _event("selection", {"original_valid_pool": [list(item) for item in result.original_valid_pool], "selected_origin": None if result.selected_origin is None else list(result.selected_origin), "selected_candidate": None if candidate is None else candidate.tolist(), "tie_rule": "batch_index_then_path_index"}),

@@ -222,6 +222,26 @@ def test_public_asced_rejects_non_css_before_sampling() -> None:
         preflight_quaternary(data)
 
 
+def test_public_overcomplete_asced_ledger_binds_map_receipt_and_graph_identity(tmp_path) -> None:
+    data = _public_v2_manifest()
+    data.update(
+        run_id="public-asced-overcomplete", max_iterations=1, max_work=10_000,
+        problem={"checks": [[1, 1, 0, 0], [0, 0, 3, 3]], "syndrome": [0, 0]},
+        channel={"probabilities": [[1.0, 0.0, 0.0, 0.0]] * 4, "decoder_smoothing": 1e-12},
+    )
+    data["composition"]["intervention"] = {
+        "kind": "asced_overcomplete", "binding_id": "asced",
+        "config": {"css_only": True, "delta": 2, "row_weight": 1, "attempt_cap": 4, "path_cap": 4, "overcomplete": True},
+    }
+    run_quaternary(data, tmp_path)
+    events = [json.loads(line) for line in (tmp_path / "events.jsonl").read_text(encoding="utf-8").splitlines()]
+    preflight = next(event["data"] for event in events if event["kind"] == "preflight")
+    paths = [event["data"] for event in events if event["kind"] == "asced_path"]
+    assert preflight["overcomplete_map_receipt"]
+    assert all(path["overcomplete_map_receipt"] == preflight["overcomplete_map_receipt"] for path in paths)
+    assert all(path["graph_identity"] == preflight["graph_identity"] for path in paths)
+
+
 def _public_v2_manifest() -> dict:
     data = manifest_value()
     data["schema_version"] = "quaternary_experiment_v2"

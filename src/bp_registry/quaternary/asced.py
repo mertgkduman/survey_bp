@@ -17,7 +17,7 @@ from typing import Literal, Mapping
 
 import numpy as np
 
-from ..canonical.budgets import BudgetTree, WorkVector
+from ..canonical.budgets import WorkVector
 from ..css import CssCode, gf2_rank, semantic_sha256
 from .algebra import Pauli, to_symplectic
 from .kernel import QbpSweep, ScalarLlrBp4Kernel
@@ -365,12 +365,15 @@ class AscedSpec:
 
     max_iterations: int
     path_cap: int
+    max_total_bp_calls: int
 
     def __post_init__(self) -> None:
         if type(self.max_iterations) is not int or self.max_iterations < 0:
             raise ValueError("aSCED max_iterations must be a nonnegative integer")
         if type(self.path_cap) is not int or self.path_cap < 1:
             raise ValueError("aSCED path_cap must be a positive integer")
+        if type(self.max_total_bp_calls) is not int or self.max_total_bp_calls < 0:
+            raise ValueError("aSCED max_total_bp_calls must be a nonnegative integer")
 
 
 @dataclass(frozen=True, slots=True)
@@ -390,6 +393,7 @@ class AscedPathResult:
     terminal: str
     work: WorkVector
     kernel_profile: str
+    overcomplete_map_receipt: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -418,7 +422,7 @@ class AscedResult:
                     "candidate": list(path.candidate), "extended_valid": path.extended_valid,
                     "original_valid": path.original_valid, "pauli_weight": path.pauli_weight,
                     "terminal": path.terminal, "work": path.work.as_evidence(structural_event_version=4),
-                    "kernel_profile": path.kernel_profile,
+                    "kernel_profile": path.kernel_profile, "overcomplete_map_receipt": path.overcomplete_map_receipt,
                 }
                 for path in self.paths
             ],
@@ -493,7 +497,6 @@ class AscedController:
         priors: object,
         *,
         kernel: ScalarLlrBp4Kernel | FixedAlphaMbp4Kernel,
-        budgets: BudgetTree | None = None,
         overcomplete: Mapping[str, tuple[object, object, tuple[object, ...]]] | None = None,
     ) -> AscedResult:
         if not isinstance(original, QuaternaryOriginalProblem):
@@ -506,6 +509,8 @@ class AscedController:
         total = sum(batch.path_count for batch in declared)
         if total > self.spec.path_cap:
             raise ValueError("aSCED path cardinality exceeds the declared preflight cap")
+        if total * self.spec.max_iterations > self.spec.max_total_bp_calls:
+            raise ValueError("aSCED declared all-path BP work exceeds the controller cap before paths start")
         if tuple((batch.local_order, batch.batch_id) for batch in declared) != tuple(sorted((batch.local_order, batch.batch_id) for batch in declared)):
             raise ValueError("aSCED batches must retain their stable materialized order")
         for batch in declared:
@@ -519,15 +524,12 @@ class AscedController:
             for path_index in range(batch.path_count):
                 bits = _virtual_bits(path_index, len(batch.qualified.rows))
                 z_ext = _path_syndrome(original, batch, bits)
-                checks, observed = batch.working.checks, z_ext
+                checks, observed, graph_identity, map_receipt = batch.working.checks, z_ext, batch.graph_identity, None
                 if overcomplete is not None:
-                    checks, observed = _overcomplete_path_inputs(batch, z_ext, overcomplete[batch.batch_id])
+                    checks, observed, graph_identity, map_receipt = _overcomplete_path_inputs(batch, z_ext, overcomplete[batch.batch_id])
                 problem = _AscedSessionProblem(_AscedSessionCode(checks), observed, f"asced-path-{batch.batch_id}-{path_index}")
-                # A session owns exactly one leaf.  Sharing one BudgetTree here
-                # would make later path evidence include earlier path work and
-                # would make replay depend on caller mutation history.
                 session = kernel.new_session(
-                    problem, priors, budgets=BudgetTree(limits=(), parents={}), budget_scope="attempt",
+                    problem, priors, budget_scope="attempt",
                 )
                 if isinstance(kernel, ScalarLlrBp4Kernel):
                     sweep: QbpSweep = session.run(max_iterations=self.spec.max_iterations)
@@ -538,10 +540,10 @@ class AscedController:
                 extended_valid = bool(np.array_equal(problem.code.syndrome(candidate), observed))
                 original_valid = bool(np.array_equal(original.code.syndrome(candidate), original.syndrome))
                 path_results.append(AscedPathResult(
-                    batch_index, path_index, batch.batch_id, batch.graph_identity, bits,
+                    batch_index, path_index, batch.batch_id, graph_identity, bits,
                     tuple(int(value) for value in z_ext), tuple(int(value) for value in candidate),
                     extended_valid, original_valid, int(np.count_nonzero(candidate)), terminal, work,
-                    kernel.profile.profile_id,
+                    kernel.profile.profile_id, map_receipt,
                 ))
         pool = tuple((path.batch_index, path.path_index) for path in path_results if path.original_valid)
         selected = min((path for path in path_results if path.original_valid), key=lambda path: (path.pauli_weight, path.batch_index, path.path_index), default=None)
@@ -570,25 +572,40 @@ def reconstruct_asced(
 
 def _overcomplete_path_inputs(
     batch: AscedBatch, z_ext: np.ndarray, value: tuple[object, object, tuple[object, ...]],
-) -> tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, str, str]:
     """Bind one path to the full verified splitter/map receipt pair."""
-    from .asced_overcomplete import AscedOvercompleteMap, ConstructedOvercompleteReceipt, map_overcomplete_syndrome
+    from .asced_overcomplete import (
+        AscedOvercompleteMap, ConstructedOvercompleteReceipt, OvercompleteSearchExhausted,
+        OvercompleteSearchReceipt, construct_overcomplete_map, map_overcomplete_syndrome,
+    )
 
     map_, receipt, searches = value
-    if not isinstance(map_, AscedOvercompleteMap) or not isinstance(receipt, ConstructedOvercompleteReceipt):
+    if (
+        not isinstance(map_, AscedOvercompleteMap) or not isinstance(receipt, ConstructedOvercompleteReceipt)
+        or not isinstance(searches, tuple) or len(searches) != 2
+        or any(not isinstance(search, OvercompleteSearchReceipt) for search in searches)
+    ):
         raise ValueError("aSCED execution requires typed constructed overcomplete receipts")
     if map_.comparison_only or map_.fidelity != "canonical_adaptation":
         raise ValueError("source comparison maps cannot enter canonical aSCED execution")
-    if receipt.constructed_splitter_receipt_sha256 != batch.qualified.receipt.receipt_sha256:
-        raise ValueError("aSCED overcomplete receipt is bound to a different splitter batch")
-    if receipt.h_ext_sha256 != batch.qualified.receipt.h_ext_sha256:
-        raise ValueError("aSCED overcomplete receipt has a mismatched H_ext digest")
-    if receipt.mapping_sha256 != map_.mapping_sha256 or receipt.h_oc_sha256 != map_.h_oc_sha256:
-        raise ValueError("aSCED overcomplete receipt/map digest mismatch")
-    if map_.row_origin_map != batch.qualified.h_ext_row_map or not np.array_equal(map_.h_ext, batch.qualified.h_ext != 0):
-        raise ValueError("aSCED overcomplete map must retain exact H_ext bytes and typed row order")
-    if len(searches) != 2 or tuple(getattr(search, "role", None) for search in searches) != ("x", "z"):
-        raise ValueError("aSCED overcomplete map requires one X then one Z constructed row")
+    pair_cap = searches[0].pair_cap
+    if pair_cap != searches[1].pair_cap:
+        raise ValueError("aSCED overcomplete search receipts disagree on pair cap")
+    rebuilt = construct_overcomplete_map(batch.qualified, pair_cap=pair_cap)
+    if isinstance(rebuilt, OvercompleteSearchExhausted):
+        raise ValueError("aSCED overcomplete reconstruction unexpectedly exhausted")
+    expected_map, expected_receipt, expected_searches = rebuilt
+    if (
+        receipt != expected_receipt or searches != expected_searches
+        or map_.row_order != expected_map.row_order or map_.row_origin_map != expected_map.row_origin_map
+        or map_.fidelity != expected_map.fidelity or map_.comparison_only != expected_map.comparison_only
+        or map_.h_ext_sha256 != expected_map.h_ext_sha256 or map_.row_origin_sha256 != expected_map.row_origin_sha256
+        or map_.mapping_sha256 != expected_map.mapping_sha256 or map_.h_oc_sha256 != expected_map.h_oc_sha256
+        or map_.qualification_sha256 != expected_map.qualification_sha256
+        or not np.array_equal(map_.h_ext, expected_map.h_ext) or not np.array_equal(map_.mapping, expected_map.mapping)
+        or not np.array_equal(map_.h_oc, expected_map.h_oc)
+    ):
+        raise ValueError("aSCED overcomplete receipt pair does not match deterministic batch construction")
     raw = np.array(batch.qualified.h_ext, dtype=np.uint8, copy=True)
     extras: list[np.ndarray] = []
     for search in searches:
@@ -600,7 +617,11 @@ def _overcomplete_path_inputs(
     checks = np.vstack((raw, *extras))
     if not np.array_equal((checks != 0).astype(np.uint8), map_.h_oc):
         raise ValueError("aSCED overcomplete checks do not equal the certified H_oc")
-    return checks, map_overcomplete_syndrome(map_, z_ext)
+    graph_identity = _identity("asced-overcomplete-graph", {
+        "batch_graph": batch.graph_identity, "map_receipt": receipt.receipt_sha256,
+        "h_oc_sha256": map_.h_oc_sha256,
+    })
+    return checks, map_overcomplete_syndrome(map_, z_ext), graph_identity, receipt.receipt_sha256
 
 
 def augment_css(code: CssCode, rows: tuple[AscedSplitterRow, ...]) -> tuple[np.ndarray, tuple[tuple[str, str, int], ...]]:
