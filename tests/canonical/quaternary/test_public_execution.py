@@ -217,3 +217,37 @@ def test_full_public_replay_rejects_resolved_identity_and_event_order_tampering(
     path.write_text("\n".join(events) + "\n", encoding="utf-8")
     with pytest.raises(ValueError, match="differs"):
         verify_quaternary_run(tmp_path)
+
+
+def _qbpgd_public_manifest(*, prior_profile: str = "depolarizing") -> dict:
+    data = _public_v2_manifest()
+    data["composition"]["intervention"] = {
+        "kind": "qbpgd", "binding_id": "qbpgd",
+        "config": {
+            "continued_messages": True, "prior_profile": prior_profile,
+            "iterations_per_round": 1, "epsilon": 0.01,
+        },
+    }
+    return data
+
+
+def test_qbpgd_public_run_keeps_source_component_fidelity_separate_from_adapted_trajectory(tmp_path):
+    manifest = _qbpgd_public_manifest()
+    report = preflight_quaternary(manifest)
+    assert report["composition"]["component_fidelity"]["intervention"] == "source_backed"
+    assert report["composition"]["run_fidelity"] == "canonical_adaptation"
+    result = run_quaternary(manifest, tmp_path)
+    events = [json.loads(line) for line in (tmp_path / "events.jsonl").read_text(encoding="utf-8").splitlines()]
+    assert result["run_fidelity"] == "canonical_adaptation"
+    assert result["component_fidelity"]["depolarizing_setup"] == "source_backed"
+    assert result["source_author_code_identity"] == "unverified"
+    assert any(event["kind"] == "qbpgd_round" for event in events)
+    assert events[0]["data"]["resolved_composition"]["run_fidelity"] == "canonical_adaptation"
+    assert verify_quaternary_run(tmp_path)["verified"] is True
+
+
+def test_qbpgd_general_prior_is_a_distinct_adaptation_reason(tmp_path):
+    result = run_quaternary(_qbpgd_public_manifest(prior_profile="general_joint"), tmp_path)
+    assert result["run_fidelity"] == "canonical_adaptation"
+    assert "general_joint_prior" in result["adaptation_reasons"]
+    assert "continued_message_buffers" in result["adaptation_reasons"]
