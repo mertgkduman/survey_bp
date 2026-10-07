@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 8
+open_count: 9
 waived_count: 0
 fixed_count: 3
-total_count: 11
-last_updated: 2026-10-06T04:59:35.849Z
+total_count: 12
+last_updated: 2026-10-07T03:20:07.789Z
 ---
 
 # Broken Windows Ledger
@@ -26,6 +26,7 @@ last_updated: 2026-10-06T04:59:35.849Z
 | 9 | 04 | unrun-verify | tests/test_canonical_cli.py | 21 | Inherited canonical CLI verification is blocked because .venv subprocesses cannot import bp_registry. | open |  | 2026-09-24T23:03:30.055Z |  |
 | 10 | 04 | unrun-verify | scripts/qualify_relay_v022.py |  | Author decode_144_12_12 full native test exceeded the 720-second qualification bound and remains inconclusive. | open |  | 2026-09-25T02:50:48.185Z |  |
 | 11 | 07 | unrun-verify | tests/canonical/test_postprocessing_handoff.py |  | Planned SI handoff regression was unavailable because the test file is absent from this checkout. | open |  | 2026-10-06T04:59:35.849Z |  |
+| 12 | 10 | deviation | scripts/qualify_phase10_native_asced.py |  | Replaced unreliable exact-commit git ls-remote query with pinned GitHub commit API identity | open |  | 2026-10-07T03:20:07.789Z |  |
 
 ````json
 [
@@ -169,6 +170,19 @@ last_updated: 2026-10-06T04:59:35.849Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-10-06T04:59:35.849Z",
+    "resolved_at": null,
+    "milestone": "v1.0"
+  },
+  {
+    "id": 12,
+    "kind": "deviation",
+    "phase": "10",
+    "file": "scripts/qualify_phase10_native_asced.py",
+    "line": null,
+    "description": "Replaced unreliable exact-commit git ls-remote query with pinned GitHub commit API identity",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-10-07T03:20:07.789Z",
     "resolved_at": null,
     "milestone": "v1.0"
   }
