@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 9
+open_count: 11
 waived_count: 0
 fixed_count: 3
-total_count: 12
-last_updated: 2026-10-07T03:20:07.789Z
+total_count: 14
+last_updated: 2026-10-07T19:54:56.747Z
 ---
 
 # Broken Windows Ledger
@@ -27,6 +27,8 @@ last_updated: 2026-10-07T03:20:07.789Z
 | 10 | 04 | unrun-verify | scripts/qualify_relay_v022.py |  | Author decode_144_12_12 full native test exceeded the 720-second qualification bound and remains inconclusive. | open |  | 2026-09-25T02:50:48.185Z |  |
 | 11 | 07 | unrun-verify | tests/canonical/test_postprocessing_handoff.py |  | Planned SI handoff regression was unavailable because the test file is absent from this checkout. | open |  | 2026-10-06T04:59:35.849Z |  |
 | 12 | 10 | deviation | scripts/qualify_phase10_native_asced.py |  | Replaced unreliable exact-commit git ls-remote query with pinned GitHub commit API identity | open |  | 2026-10-07T03:20:07.789Z |  |
+| 13 | 10 | deviation | src/bp_registry/quaternary/asced.py |  | Partial splitter search uses incremental rank/detectability before full even-Delta qualification. | open |  | 2026-10-07T19:54:56.115Z |  |
+| 14 | 10 | deviation | src/bp_registry/quaternary/asced.py |  | aSCED affine graphs use a dedicated immutable working graph because qualified splitter rows are noncommuting. | open |  | 2026-10-07T19:54:56.747Z |  |
 
 ````json
 [
@@ -183,6 +185,32 @@ last_updated: 2026-10-07T03:20:07.789Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-10-07T03:20:07.789Z",
+    "resolved_at": null,
+    "milestone": "v1.0"
+  },
+  {
+    "id": 13,
+    "kind": "deviation",
+    "phase": "10",
+    "file": "src/bp_registry/quaternary/asced.py",
+    "line": null,
+    "description": "Partial splitter search uses incremental rank/detectability before full even-Delta qualification.",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-10-07T19:54:56.115Z",
+    "resolved_at": null,
+    "milestone": "v1.0"
+  },
+  {
+    "id": 14,
+    "kind": "deviation",
+    "phase": "10",
+    "file": "src/bp_registry/quaternary/asced.py",
+    "line": null,
+    "description": "aSCED affine graphs use a dedicated immutable working graph because qualified splitter rows are noncommuting.",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-10-07T19:54:56.747Z",
     "resolved_at": null,
     "milestone": "v1.0"
   }
