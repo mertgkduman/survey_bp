@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 10
 current_phase_name: Correlated Quaternary Execution
-current_plan: 10
+current_plan: 11
 status: executing
-stopped_at: Completed 10-08-PLAN.md
-last_updated: "2026-10-07T05:11:51.920Z"
+stopped_at: Completed 10-09-PLAN.md
+last_updated: "2026-10-07T05:28:40.148Z"
 last_activity: 2026-10-06
 last_activity_desc: Phase 10 execution started
-state_head: b818a496043ea7c1afa3b1270347c70ba9e803ef
+state_head: e5c7cf6323d3fa638ec102b0b58d5b38142f78d2
 progress:
   total_phases: 14
   completed_phases: 5
   total_plans: 111
-  completed_plans: 96
+  completed_plans: 97
 ---
 
 # Project State
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 ## Current Position
 
 Phase: 10 (Correlated Quaternary Execution) — EXECUTING
-Plan: 10 of 16
+Plan: 11 of 16
 Total Phases: 14
-Current Plan: 10
+Current Plan: 11
 Total Plans in Phase: 16
 Status: Ready to execute
 Last activity: 2026-10-06 — Phase 10 execution started
@@ -90,6 +90,7 @@ Progress: [████░░░░░░] 5 of 14 phases complete (36%)
 | Phase 10 P06 | 10m 14s | 2 tasks | 2 files |
 | Phase 10-correlated-quaternary-execution P07 | 33m | 2 tasks | 5 files |
 | Phase 10 P08 | 7m | 2 tasks | 6 files |
+| Phase 10-correlated-quaternary-execution P09 | 7m | 2 tasks | 6 files |
 
 Phase 02 P10–P16 gap-closure metrics are recorded in their individual summaries.
 
@@ -176,6 +177,8 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - [Phase 10]: Phase 10 Plan 07: quaternary_experiment_v2 is additive; V1 tracer parsing and replay semantics remain stable.
 - [Phase 10]: Q-BPGD records source-backed setup components separately from the D-14 continued-message canonical-adaptation run.
 - [Phase 10]: Q-BPGD preserves raw literal fixation weights and records common-sum normalized decoder priors for replay.
+- [Phase 10]: Phase 10 Plan 09: fixed-alpha MBP4 scales only posterior anticommuting sums; destination-edge inhibition remains unscaled.
+- [Phase 10]: Phase 10 Plan 09: non-source-defined MBP4 transform combinations remain canonical_adaptation despite source-backed components.
 
 ### Pending Todos
 
@@ -233,8 +236,8 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 **Resume file:** None
 
-Last session: 2026-10-07T05:11:48.829Z
-Stopped at: Completed 10-08-PLAN.md
+Last session: 2026-10-07T05:28:36.879Z
+Stopped at: Completed 10-09-PLAN.md
 Next command: $gsd-discuss-phase 10, then $gsd-plan-phase 10; use the Phase 07 handoff only when optional postprocessing is reprioritized.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
