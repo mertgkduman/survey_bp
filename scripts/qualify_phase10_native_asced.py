@@ -160,9 +160,11 @@ def audit_source(spec: dict[str, object]) -> dict[str, object]:
     verify_source_spec(spec)
     source = _require_source(spec)
     commit = str(source["commit"])
-    remote = str(source["repository"])
-    listed = subprocess.run(["git", "ls-remote", remote, commit], check=False, capture_output=True, text=True)
-    if listed.returncode != 0 or not any(line.startswith(commit) for line in listed.stdout.splitlines()):
+    commit_api = source.get("commit_api")
+    if not isinstance(commit_api, str):
+        raise ValueError("source commit API identity is required")
+    remote_commit = json.loads(_download(commit_api).decode("utf-8"))
+    if not isinstance(remote_commit, dict) or remote_commit.get("sha") != commit:
         raise ValueError("remote did not resolve the exact audited commit")
     digests = source["source_digests"]
     assert isinstance(digests, dict)
