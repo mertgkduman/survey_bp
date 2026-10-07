@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib.util
 import numpy as np
 import pytest
 
@@ -16,6 +17,13 @@ from bp_registry.quaternary.numerics import (
     pauli_hard_decision,
     probabilities_to_llrs,
 )
+
+
+def test_scalar_llr_bp4_kernel_is_available() -> None:
+    """QBP-01 needs a production-owned scalar LLR-BP4 session, not an adapter."""
+    assert importlib.util.find_spec("bp_registry.quaternary.kernel") is not None, (
+        "bp_registry.quaternary.kernel is absent"
+    )
 
 
 def test_numerics_profile_persists_complete_binding_contract() -> None:
