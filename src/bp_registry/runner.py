@@ -36,7 +36,7 @@ from .manifests import (
     validate_executable_canonical_baseline,
 )
 from . import evaluator, sampling
-from .quaternary.execution import run_quaternary_tracer, verify_quaternary_tracer
+from .quaternary.execution import run_quaternary_qbpgd, run_quaternary_tracer, verify_quaternary_tracer
 from .quaternary.compatibility import resolve_quaternary_composition
 
 
@@ -257,8 +257,12 @@ def run_quaternary(manifest_path: str | Path, output: str | Path, *, shot_id: in
         output_path.mkdir(parents=True, exist_ok=True)
         persisted_manifest.write_text(json.dumps(manifest.model_dump(mode="json"), sort_keys=True) + "\n", encoding="utf-8")
         manifest_reference = str(persisted_manifest)
-    result = run_quaternary_tracer(manifest, output_path, shot_id=0)
-    if isinstance(manifest, QuaternaryExperimentV2):
+    qbpgd = isinstance(manifest, QuaternaryExperimentV2) and manifest.composition.intervention is not None and manifest.composition.intervention.kind == "qbpgd"
+    if qbpgd:
+        result: Any = run_quaternary_qbpgd(manifest, output_path, resolved_composition=report["composition"], shot_id=0)
+    else:
+        result = run_quaternary_tracer(manifest, output_path, shot_id=0)
+    if isinstance(manifest, QuaternaryExperimentV2) and not qbpgd:
         ledger_path = output_path / "events.jsonl"
         events = [json.loads(line) for line in ledger_path.read_text(encoding="utf-8").splitlines()]
         events[0]["data"]["resolved_composition"] = report["composition"]
@@ -267,11 +271,19 @@ def run_quaternary(manifest_path: str | Path, output: str | Path, *, shot_id: in
     ledger_path = output_path / "events.jsonl"
     public = {
         **report, "output": str(output_path), "final_row_count": 1,
-        "termination": result.termination, "outcome": result.outcome,
+        "termination": result["termination"] if qbpgd else result.termination,
+        "outcome": result["outcome"] if qbpgd else result.outcome,
         "ledger_sha256": sha256(ledger_path.read_bytes()).hexdigest(),
         "manifest_path": manifest_reference, "ledger_path": str(ledger_path),
         "statistical_claim": "not_assessed; development fixture, not a source-curve reproduction or performance result",
     }
+    if qbpgd:
+        public.update({
+            "run_fidelity": result["run_fidelity"], "component_fidelity": result["component_fidelity"],
+            "component_ids": result["component_ids"], "interpretation_ids": result["interpretation_ids"],
+            "source_author_code_identity": result["source_author_code_identity"],
+            "work": result["work"], "adaptation_reasons": report["composition"]["adaptation_reasons"],
+        })
     (output_path / "result.json").write_text(json.dumps(public, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return public
 

@@ -36,6 +36,7 @@ class QbpgdSpec:
     iterations_per_round: int
     epsilon: float
     round_limit: int | None = None
+    prior_profile: str = "depolarizing"
     algorithm_component_id: str = "yao-2023-qbpgd-algorithm-3-v2"
     fixation_component_id: str = "yao-2023-qbpgd-literal-fixation-v2"
     depolarizing_component_id: str = "yao-2023-qbpgd-depolarizing-setup-v2"
@@ -51,6 +52,8 @@ class QbpgdSpec:
             raise ValueError("Q-BPGD epsilon must be finite and strictly between zero and one")
         if self.round_limit is not None and (isinstance(self.round_limit, bool) or not isinstance(self.round_limit, numbers.Integral) or self.round_limit < 1):
             raise ValueError("Q-BPGD round_limit must be a positive integer when supplied")
+        if self.prior_profile not in {"depolarizing", "general_joint"}:
+            raise ValueError("Q-BPGD prior_profile must be depolarizing or general_joint")
         if self.source_author_code_identity != "unverified":
             raise ValueError("Q-BPGD author implementation identity remains unverified")
         if (self.continued_messages_interpretation_id, self.normalization_interpretation_id, self.tie_interpretation_id) != ("D-14", "D-15", "D-16"):
@@ -210,7 +213,10 @@ class QbpgdController:
         }
         result = QbpgdResult(
             spec_identity=_digest(asdict(self.spec)), run_fidelity="canonical_adaptation",
-            component_fidelity={name: "source_backed" for name in component_ids}, component_ids=component_ids,
+            component_fidelity={
+                "algorithm": "source_backed", "fixation": "source_backed",
+                "depolarizing_setup": "source_backed" if self.spec.prior_profile == "depolarizing" else "canonical_adaptation",
+            }, component_ids=component_ids,
             interpretation_ids={"continued_messages": self.spec.continued_messages_interpretation_id, "normalization": self.spec.normalization_interpretation_id, "ties": self.spec.tie_interpretation_id},
             source_author_code_identity=self.spec.source_author_code_identity,
             initial_message_digest=initial_digest, final_message_digest=session.state_digest,

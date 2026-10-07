@@ -17,6 +17,10 @@ from typing import Any, Mapping
 import numpy as np
 
 from ..canonical.numerics import boxplus
+from ..canonical.budgets import BudgetLimit, BudgetTree
+from .kernel import ScalarLlrBp4Kernel
+from .problems import PauliCode, QuaternaryOriginalProblem
+from .qbpgd import QbpgdController, QbpgdSpec
 
 
 class PauliValue(IntEnum):
@@ -245,6 +249,80 @@ def run_quaternary_tracer(manifest: Any, output: str | Path, *, shot_id: int = 0
     output_path = Path(output)
     _write_events(output_path / "events.jsonl", events)
     return TracerQbpResult(candidate, marginals, work, termination, outcome, logical)
+
+
+def run_quaternary_qbpgd(
+    manifest: Any, output: str | Path, *, resolved_composition: Mapping[str, Any], shot_id: int = 0,
+) -> dict[str, Any]:
+    """Execute resolved Q-BPGD while retaining source components separately from run fidelity."""
+    problem, channel, run_id, _iterations, max_work, smoothing, manifest_sha256 = _manifest_parts(manifest)
+    payload = manifest.model_dump(mode="json") if hasattr(manifest, "model_dump") else manifest
+    config = payload["composition"]["intervention"]["config"]
+    if not isinstance(config, Mapping):
+        raise ValueError("Q-BPGD public binding requires an explicit configuration")
+    iterations, epsilon, rounds, profile = (
+        config.get("iterations_per_round"), config.get("epsilon"),
+        config.get("round_limit"), config.get("prior_profile"),
+    )
+    if isinstance(iterations, bool) or not isinstance(iterations, int) or isinstance(epsilon, bool) or not isinstance(epsilon, (int, float)):
+        raise ValueError("Q-BPGD public binding requires numeric iterations_per_round and epsilon")
+    if rounds is not None and (isinstance(rounds, bool) or not isinstance(rounds, int)):
+        raise ValueError("Q-BPGD public round_limit must be an integer when supplied")
+    if profile not in {"depolarizing", "general_joint"}:
+        raise ValueError("Q-BPGD public binding requires depolarizing or general_joint prior_profile")
+    physical_identity = _digest({"checks": problem.checks.tolist(), "channel": channel.tolist(), "run_id": run_id})
+    hidden = _sample(channel, seed_identity=f"{physical_identity}:shot:{shot_id}")
+    if not np.array_equal(syndrome_for(problem, hidden), problem.syndrome):
+        raise ValueError("manifest observation does not match its deterministic categorical sample")
+    priors = np.maximum(channel, smoothing)
+    priors /= priors.sum(axis=1, keepdims=True)
+    original = QuaternaryOriginalProblem(
+        lineage_id=f"original-qbpgd-{manifest_sha256[:16]}",
+        code=PauliCode(checks=problem.checks, source_artifact_identity=f"public-manifest:{manifest_sha256}"),
+        syndrome=problem.syndrome,
+    )
+    decoded = QbpgdController(QbpgdSpec(
+        iterations_per_round=iterations, epsilon=float(epsilon), round_limit=rounds, prior_profile=str(profile),
+    )).run(ScalarLlrBp4Kernel().new_session(
+        original, priors, budgets=BudgetTree(limits=(BudgetLimit("attempt", "bp_calls", max_work),), parents={}),
+    ))
+    candidate = np.asarray(decoded.candidate, dtype=np.uint8)
+    outcome, logical = _evaluate(problem, hidden, candidate)
+    events = [
+        _event("preflight", {
+            "run_id": run_id, "shot_id": shot_id, "manifest_sha256": manifest_sha256,
+            "pauli_encoding": "I=0,X=1,Y=2,Z=3", "observation": problem.syndrome.tolist(),
+            "public_schema": "quaternary_experiment_v2", "resolved_composition": dict(resolved_composition),
+        }),
+        _event("sample", {
+            "sample_identity": _digest({"manifest": manifest_sha256, "shot": shot_id}), "channel": channel.tolist(),
+            "decoder_priors": priors.tolist(), "decoder_smoothing": smoothing, "hidden_truth_sealed": True,
+            "sampling": "one_categorical_I_X_Y_Z_value_per_qubit",
+        }),
+    ]
+    for round_ in decoded.rounds:
+        events.append(_event("qbpgd_round", {
+            "index": round_.index, "eligibility_set": list(round_.eligibility_set),
+            "selected_target": round_.selected_target, "selected_pauli": round_.selected_pauli,
+            "reliability": round_.reliability, "target_ties": list(round_.target_ties),
+            "pauli_ties": list(round_.pauli_ties), "raw_prior": None if round_.raw_prior is None else list(round_.raw_prior),
+            "resolved_prior": None if round_.resolved_prior is None else list(round_.resolved_prior),
+            "message_digest_before": round_.message_digest_before, "message_digest_after": round_.message_digest_after,
+            "original_syndrome_valid": round_.original_syndrome_valid, "terminal_reason": round_.terminal_reason,
+            "work": round_.sweeps[-1].work.as_evidence(structural_event_version=4) if round_.sweeps else {},
+        }))
+    events.extend((
+        _event("candidate_freeze", {"candidate": candidate.tolist(), "marginals": []}),
+        _event("evaluation", {"outcome": outcome, "logical_action_agrees": logical, "logical_action_unavailable_reason": "non-CSS tracer has no declared logical basis"}),
+        _event("termination", {"termination": decoded.termination, "candidate": candidate.tolist(), "outcome": outcome, "assessment_status": "not_assessed"}),
+    ))
+    _write_events(Path(output) / "events.jsonl", events)
+    return {
+        "termination": decoded.termination, "outcome": outcome, "run_fidelity": decoded.run_fidelity,
+        "component_fidelity": dict(decoded.component_fidelity), "component_ids": dict(decoded.component_ids),
+        "interpretation_ids": dict(decoded.interpretation_ids), "source_author_code_identity": decoded.source_author_code_identity,
+        "work": decoded.work.as_evidence(structural_event_version=4),
+    }
 
 
 def verify_quaternary_tracer(manifest: Any, output: str | Path, *, shot_id: int = 0) -> dict[str, Any]:
