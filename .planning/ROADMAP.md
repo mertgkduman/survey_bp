@@ -535,7 +535,7 @@ Plans:
 
 **Research focus:** Quaternary factor equations, scalar/vector message representations, memory/numeric choices, and policy-specific compatibility derivations.
 **Priority decision:** Begin this phase next, ahead of campaign infrastructure and reproduction, while Phase 7 optional postprocessing remains paused. Reuse the verified CSS execution lifecycle where mathematically compatible; keep correlated quaternary factors in their own canonical kernel family.
-**Plans:** 6/16 plans executed.
+**Plans:** 7/16 plans executed.
 
 Plans:
 
@@ -558,7 +558,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 10-06-PLAN.md — Add quaternary schedules, normalization, and offset.
+- [x] 10-06-PLAN.md — Add quaternary schedules, normalization, and offset.
 - [ ] 10-11-PLAN.md — Bind and verify overcomplete aSCED maps.
 - [ ] 10-15-PLAN.md — Build and run the pinned native aSCED reference.
 
@@ -662,7 +662,7 @@ Plans:
 | 7. Optional Postprocessing | 6/15 | Paused by user; POST-01 qualification failed |  |
 | 8. Reproducible Campaigns and Statistical Assessment | 0/TBD | Not started | - |
 | 9. CSS Reproduction and Controlled Comparisons | 0/TBD | Not started | - |
-| 10. Correlated Quaternary Execution | 6/16 | In Progress|  |
+| 10. Correlated Quaternary Execution | 7/16 | In Progress|  |
 | 11. Quaternary Reproduction and Comparisons | 0/TBD | Not started | - |
 | 12. Circuit Models and Canonical Integration | 0/TBD | Not started | - |
 | 13. Circuit Reproduction and Comparisons | 0/TBD | Not started | - |
