@@ -2,7 +2,12 @@
 
 from __future__ import annotations
 
+import json
+import subprocess
+import sys
 from pathlib import Path
+
+import pytest
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -11,6 +16,54 @@ SPEC = ROOT / "data" / "native" / "phase10-asced-source-spec.json"
 
 
 def test_source_identity_records_exact_commit_and_audited_discrepancies() -> None:
-    """The qualification artifact must exist before it can assert source facts."""
+    """Freeze the only admissible native identity and every source discrepancy."""
     assert SCRIPT.exists(), "the read-only aSCED qualification command is required"
     assert SPEC.exists(), "the digest-bound aSCED source specification is required"
+    spec = json.loads(SPEC.read_text(encoding="utf-8"))
+    assert spec["source"]["repository"] == "https://github.com/kit-cel/quantum_asced.git"
+    assert spec["source"]["commit"] == "816772071486615dfc7d71d1e15df597edc58a26"
+    assert len(spec["source"]["source_digests"]) >= 8
+    assert set(spec["discrepancies"]) == {
+        "pybind11_gitlink", "demo_path", "license", "pauli_translation",
+        "selection", "channel", "instrumentation",
+    }
+    assert spec["discrepancies"]["license"]["status"] == "unresolved"
+    assert spec["discrepancies"]["pauli_translation"]["native"] == ["I", "X", "Z", "Y"]
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        ("commit", "main", "exact full 40-character commit"),
+        ("repository", "https://github.com/example/substitute.git", "only kit-cel/quantum_asced"),
+    ],
+)
+def test_source_identity_rejects_moving_or_substitute_source(
+    tmp_path: Path, field: str, value: str, message: str,
+) -> None:
+    spec = json.loads(SPEC.read_text(encoding="utf-8"))
+    spec["source"][field] = value
+    tampered = tmp_path / "source-spec.json"
+    tampered.write_text(json.dumps(spec), encoding="utf-8")
+    result = subprocess.run(
+        [sys.executable, str(SCRIPT), "--spec", str(tampered), "verify-proposal"],
+        capture_output=True, text=True, check=False,
+    )
+    assert result.returncode != 0
+    assert message in result.stderr
+
+
+def test_digest_discrepancy_and_no_install_guards_are_explicit(tmp_path: Path) -> None:
+    spec = json.loads(SPEC.read_text(encoding="utf-8"))
+    spec["source"]["algorithm_files"] = ["missing.cpp"]
+    tampered = tmp_path / "source-spec.json"
+    tampered.write_text(json.dumps(spec), encoding="utf-8")
+    result = subprocess.run(
+        [sys.executable, str(SCRIPT), "--spec", str(tampered), "verify-proposal"],
+        capture_output=True, text=True, check=False,
+    )
+    assert result.returncode != 0
+    assert "algorithm file" in result.stderr
+    script_text = SCRIPT.read_text(encoding="utf-8")
+    assert "pip install" not in script_text
+    assert "subprocess.run([\"git\", \"ls-remote\"" in script_text

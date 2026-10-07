@@ -1,0 +1,67 @@
+{
+  "schema": "phase10-asced-source-spec-v1",
+  "status": "pending_human",
+  "resolution_timestamp": "2026-10-07T03:08:35Z",
+  "purpose": "Read-only qualification record; it grants no install, build, import, or execution authority.",
+  "source": {
+    "publisher": "kit-cel",
+    "repository": "https://github.com/kit-cel/quantum_asced.git",
+    "commit": "816772071486615dfc7d71d1e15df597edc58a26",
+    "commit_api": "https://api.github.com/repos/kit-cel/quantum_asced/git/commits/816772071486615dfc7d71d1e15df597edc58a26",
+    "tree": "a87af78b8f014e25f9659d0926ef5f9f5452882e",
+    "source_digests": {
+      "CMakeLists.txt": "23c7041b6cfe74502222cb3044b5e7ab6e887d1e6541e1fee8c08f32f199667c",
+      ".gitmodules": "d97bea252de1fdc5cb012e2be44b7aae00e1984c16b36a1854304d55ac899bb0",
+      "pyproject.toml": "0a05c0ee366bf234b016c270059ac20e59bdaaf0bbdb0042ef03a8a189477fdd",
+      "environment.yml": "b75200e91befc226a559dd0995073dea4d7c8ec366e8b5cc44b7992751947b8c",
+      "src/Pybind11_Module.cpp": "23f0d1d5ce3b431748c3b09228ebff5642840c048b94952543db2e99352de1d1",
+      "src/Decoder/BP/BP4_Decoder.cpp": "5d689fb7de0654efdc9d46563ef6633fc3178e5806227a67a48111b10f511809",
+      "src/Decoder/Ensemble/Ensemble_Processing/aSCED_Processing.cpp": "cf7534c185ae9d2fb4395bc0cdb3675643e3a2319072f92fa8f84d28f3e3a85d",
+      "src/Decoder/Ensemble/Ensemble_Selection/Minimum_Weight_Selection.cpp": "b03e0ae676a1dba7d1312efb07b1a9ff96fc2052fb980f87263efd1fa11c67c4",
+      "src/Channel/Pauli_Channel.cpp": "e9a6a711701e0b8ae2c11db7d6eab574ddfc6d7adc263fd42cca4e7563326839",
+      "include/Decoder/BP/BP4_Decoder.h": "43f54507744bdf019c6a33c29249f3eb562f806ac62cda8cc17b8d5feace4823",
+      "include/Decoder/Ensemble/Ensemble_Processing/aSCED_Processing.h": "4229352162e0c4a72f26dc82164b777c5d2e983c897f0b47c462d4337cce7e3e"
+    },
+    "algorithm_files": [
+      "src/Decoder/BP/BP4_Decoder.cpp",
+      "src/Decoder/Ensemble/Ensemble_Processing/aSCED_Processing.cpp",
+      "src/Decoder/Ensemble/Ensemble_Selection/Minimum_Weight_Selection.cpp",
+      "src/Channel/Pauli_Channel.cpp",
+      "include/Decoder/BP/BP4_Decoder.h",
+      "include/Decoder/Ensemble/Ensemble_Processing/aSCED_Processing.h"
+    ]
+  },
+  "author_dependency_lower_bounds": {
+    "python": ">=3.10",
+    "numpy": ">=1.24",
+    "galois": ">=0.4",
+    "matplotlib": ">=3.7",
+    "scikit-build-core": ">=0.10",
+    "pybind11": ">=2.12",
+    "cmake": ">=3.20"
+  },
+  "discrepancies": {
+    "pybind11_gitlink": {"status": "missing", "fact": "The tree declares pybind11 on branch stable but contains no populated gitlink."},
+    "demo_path": {"status": "mismatch", "fact": "README names Examples/demo_bp4.py; that path is absent from the pinned tree."},
+    "license": {"status": "unresolved", "fact": "No LICENSE/COPYING file was located in the pinned tree; this does not prove any license status."},
+    "pauli_translation": {"canonical": ["I", "X", "Y", "Z"], "native": ["I", "X", "Z", "Y"], "translation_required": true},
+    "selection": {"paper": "original-syndrome-valid candidate selection", "native": "path-local syndromes_match filtering", "same": false},
+    "channel": {"native_restriction": "equal-proportion Pauli channel parameters", "canonical_difference": "general joint I/X/Y/Z probability tables are supported"},
+    "instrumentation": {
+      "unavailable": ["shot_error_injection", "random_seed", "per_shot_identity", "per_path_counters", "native_edge_updates", "native_control_flow_events"],
+      "reason": "The audited native binding exposes aggregate simulation output rather than canonical shot/path receipts."
+    }
+  },
+  "package_resolution_policy": {
+    "registry": "https://pypi.org/pypi/{project}/json",
+    "rule": "official PyPI project; newest visible non-prerelease satisfying the author lower bound with a Python 3.12-compatible artifact",
+    "projects": ["numpy", "galois", "matplotlib", "scikit-build-core", "pybind11"],
+    "classification": "SUS"
+  },
+  "build_proposal": null,
+  "human_decision": {
+    "required_plan": "10-14",
+    "status": "pending_human",
+    "required_evidence": ["authoritative license or permission", "package and build-input approval", "isolated build approval"]
+  }
+}
