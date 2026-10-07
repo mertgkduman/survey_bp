@@ -1,0 +1,393 @@
+"""Deterministic canonical-adaptation CSS aSCED splitter construction.
+
+The pinned author implementation supplies the rank-growth and same-component
+co-neighbor-removal ideas, but generates supports through unseeded ``rand()``.
+This module therefore records those source components while making its
+lexicographic search and its detectability gate explicit project conventions.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from hashlib import sha256
+from itertools import combinations
+import json
+from typing import Literal
+
+import numpy as np
+
+from ..css import CssCode, gf2_rank, semantic_sha256
+from .algebra import Pauli, to_symplectic
+from .problems import PauliCode
+
+
+SplitterRole = Literal["x", "z"]
+RunFidelity = Literal["canonical_adaptation"]
+
+_SOURCE_COMPONENT_IDS = (
+    "kit-cel/quantum_asced@816772071486615dfc7d71d1e15df597edc58a26:"
+    "src/Graph_Optimization/Graph_Optimization_GF4.cpp:add_splitters:rank_growth",
+    "kit-cel/quantum_asced@816772071486615dfc7d71d1e15df597edc58a26:"
+    "src/Graph_Optimization/Graph_Optimization.cpp:remove_infeasible_indices:co_neighbor_removal",
+)
+_GB46_COMMIT = "816772071486615dfc7d71d1e15df597edc58a26"
+_GB46_PATH = "Codes/GB_46_2/GB_46_2_H_44.alist"
+_GB46_RAW_SHA256 = "4bd60bc22ccda388780ad2ad2a29b63143b3f024e599e57ef5bcb983f51cb9b2"
+
+
+def _canonical_bytes(value: object) -> bytes:
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")
+
+
+def _identity(prefix: str, value: object) -> str:
+    return f"{prefix}-{sha256(_canonical_bytes(value)).hexdigest()}"
+
+
+def _readonly_binary(value: object, *, name: str, ndim: int) -> np.ndarray:
+    array = np.asarray(value)
+    if array.ndim != ndim or not np.issubdtype(array.dtype, np.integer) or np.any((array != 0) & (array != 1)):
+        raise ValueError(f"{name} must be a {ndim}D binary integer array")
+    result = np.array(array, dtype=np.uint8, copy=True)
+    result.setflags(write=False)
+    return result
+
+
+def _readonly_pauli(value: object, *, name: str) -> np.ndarray:
+    array = np.asarray(value)
+    if array.ndim != 2 or not np.issubdtype(array.dtype, np.integer) or np.any((array < 0) | (array > 3)):
+        raise ValueError(f"{name} must be a two-dimensional I/X/Y/Z array")
+    result = np.array(array, dtype=np.uint8, copy=True)
+    result.setflags(write=False)
+    return result
+
+
+def _pauli_row(role: SplitterRole, support: tuple[int, ...], n: int) -> np.ndarray:
+    row = np.zeros(n, dtype=np.uint8)
+    row[list(support)] = Pauli.X if role == "x" else Pauli.Z
+    return row
+
+
+def _css_pauli_rows(code: CssCode) -> tuple[np.ndarray, tuple[SplitterRole, ...]]:
+    validated = code.validate()
+    x = np.where(validated.hx == 1, Pauli.X, Pauli.I).astype(np.uint8)
+    z = np.where(validated.hz == 1, Pauli.Z, Pauli.I).astype(np.uint8)
+    return np.vstack((x, z)), ("x",) * len(x) + ("z",) * len(z)
+
+
+def _artifact_sha256(code: CssCode) -> str:
+    """Identify a validated CSS artifact even when no logical basis is supplied."""
+    if code.lx is not None and code.lz is not None:
+        return semantic_sha256(code)
+    return sha256(_canonical_bytes({"hx": code.hx.tolist(), "hz": code.hz.tolist(), "logical_basis": None})).hexdigest()
+
+
+def parse_pinned_gb46_css(raw: bytes) -> CssCode:
+    """Parse the one admitted GB46 aList input after binding its raw source bytes."""
+    if sha256(raw).hexdigest() != _GB46_RAW_SHA256:
+        raise ValueError("GB46 input must match the pinned raw SHA-256")
+    try:
+        lines = [line.split() for line in raw.decode("utf-8").splitlines()]
+        n, m = (int(value) for value in lines[0])
+        row_weights = [int(value) for value in lines[3]]
+    except (UnicodeDecodeError, IndexError, ValueError) as error:
+        raise ValueError("GB46 input is not a readable quaternary aList") from error
+    if (n, m) != (46, 44) or len(row_weights) != m:
+        raise ValueError("GB46 input must describe exactly 44 checks on 46 qubits")
+    indices_start = 4 + n
+    values_start = indices_start + m
+    if len(lines) < values_start + m:
+        raise ValueError("GB46 input must retain quaternary aList row values")
+    matrix = np.zeros((m, n), dtype=np.uint8)
+    for row, weight in enumerate(row_weights):
+        if weight < 1 or len(lines[indices_start + row]) < weight or len(lines[values_start + row]) < weight:
+            raise ValueError("GB46 input has a truncated check row")
+        for column_text, value_text in zip(lines[indices_start + row][:weight], lines[values_start + row][:weight]):
+            column, value = int(column_text) - 1, int(value_text)
+            if not 0 <= column < n or value not in {1, 2} or matrix[row, column] != 0:
+                raise ValueError("GB46 input has invalid or mixed Pauli entries")
+            matrix[row, column] = value
+    if np.any(matrix[:22] == 2) or np.any(matrix[22:] == 1) or int(np.count_nonzero(matrix == 1)) != 176 or int(np.count_nonzero(matrix == 2)) != 176:
+        raise ValueError("GB46 input must retain 22 ordered X-only rows followed by 22 Z-only rows")
+    return CssCode((matrix[:22] == 1).astype(np.uint8), (matrix[22:] == 2).astype(np.uint8)).validate()
+
+
+def gb46_canonical_fixture_payload(raw: bytes) -> dict[str, object]:
+    """Construct the immutable, project-owned GB46 fixture from exact input bytes."""
+    code = parse_pinned_gb46_css(raw)
+    result = construct_splitter_batch(code, delta=2, row_weight=4, attempt_cap=10_000)
+    if isinstance(result, SplitterSearchExhausted):
+        raise ValueError("the pinned GB46 canonical construction unexpectedly exhausted")
+    return {
+        "schema": "asced-gb46-canonical-fixture-v1",
+        "run_fidelity": "canonical_adaptation",
+        "source_input": {"commit": _GB46_COMMIT, "path": _GB46_PATH, "raw_sha256": _GB46_RAW_SHA256, "rows": 44, "qubits": 46},
+        "construction_profile": {"delta": 2, "batches": 1, "row_weight": 4, "attempt_cap_per_role": 10_000, "order": "x_then_z", "search": "lexicographic_first_support"},
+        "splitter": result.splitter.tolist(),
+        "h_ext": result.h_ext.tolist(),
+        "h_ext_row_map": [list(item) for item in result.h_ext_row_map],
+        "receipt": {
+            "run_fidelity": result.receipt.run_fidelity,
+            "constructor_identity": result.receipt.constructor_identity,
+            "source_component_ids": list(result.receipt.source_component_ids),
+            "artifact_sha256": result.receipt.artifact_sha256,
+            "profile_sha256": result.receipt.profile_sha256,
+            "splitter_sha256": result.receipt.splitter_sha256,
+            "h_ext_sha256": result.receipt.h_ext_sha256,
+            "terminal_status": result.receipt.terminal_status,
+            "constructed_receipt_sha256": result.receipt.receipt_sha256,
+        },
+        "qualification": {
+            "rank_before": result.qualification.rank_before, "rank_after": result.qualification.rank_after,
+            "rank_growth": result.qualification.rank_growth, "detectable_rank": result.qualification.detectable_rank,
+            "row_weights": list(result.qualification.row_weights), "max_same_role_overlap": result.qualification.max_same_role_overlap,
+            "virtual_path_count": result.qualification.virtual_path_count, "qualification_sha256": result.qualification.qualification_sha256,
+        },
+    }
+
+
+def _symplectic_rank(rows: np.ndarray) -> int:
+    bits = to_symplectic(rows)
+    return gf2_rank(np.concatenate((bits[..., 0], bits[..., 1]), axis=1))
+
+
+def _commutation(left: np.ndarray, right: np.ndarray) -> np.ndarray:
+    left_bits, right_bits = to_symplectic(left), to_symplectic(right)
+    return np.asarray(
+        (left_bits[:, None, :, 0].astype(np.int64) * right_bits[None, :, :, 1].astype(np.int64)
+         + left_bits[:, None, :, 1].astype(np.int64) * right_bits[None, :, :, 0].astype(np.int64)).sum(axis=2) % 2,
+        dtype=np.uint8,
+    )
+
+
+def _same_role_cycle_free(candidate: np.ndarray, existing: np.ndarray, roles: tuple[SplitterRole, ...], role: SplitterRole) -> bool:
+    support = candidate != Pauli.I
+    return all(int(np.count_nonzero(support & (row != Pauli.I))) <= 1 for row, row_role in zip(existing, roles) if row_role == role)
+
+
+@dataclass(frozen=True, slots=True)
+class AscedSplitterRow:
+    """One accepted splitter with its deterministic support-search ordinal."""
+
+    role: SplitterRole
+    support: tuple[int, ...]
+    candidate_ordinal: int
+
+    def __post_init__(self) -> None:
+        if self.role not in {"x", "z"} or not self.support or tuple(sorted(set(self.support))) != self.support:
+            raise ValueError("splitter rows require a role and a strictly ordered nonempty support")
+        if type(self.candidate_ordinal) is not int or self.candidate_ordinal < 0:
+            raise ValueError("splitter candidate ordinal must be nonnegative")
+
+
+@dataclass(frozen=True, slots=True)
+class SplitterSearchReceipt:
+    """Audit trail for the bounded canonical lexicographic support search."""
+
+    role: SplitterRole
+    attempt_cap: int
+    candidates_examined: int
+    accepted_ordinal: int | None
+    rejected_cycle: int
+    rejected_rank: int
+    rejected_detectability: int
+
+
+@dataclass(frozen=True, slots=True)
+class SplitterSearchExhausted:
+    """Typed terminal proving that no partial splitter batch was emitted."""
+
+    role: SplitterRole
+    attempt_cap: int
+    receipts: tuple[SplitterSearchReceipt, ...]
+    terminal_status: Literal["exhausted"] = "exhausted"
+
+
+@dataclass(frozen=True, slots=True)
+class SplitterQualification:
+    """Independent project qualification for a complete ordered CSS splitter matrix."""
+
+    rank_before: int
+    rank_after: int
+    rank_growth: int
+    detectable_rank: int
+    row_weights: tuple[int, ...]
+    max_same_role_overlap: int
+    virtual_path_count: int
+    qualification_sha256: str
+
+
+@dataclass(frozen=True, slots=True)
+class ConstructedSplitterReceipt:
+    """Content-addressed receipt for project-generated, never author-generated rows."""
+
+    run_fidelity: RunFidelity
+    constructor_identity: str
+    source_component_ids: tuple[str, str]
+    artifact_sha256: str
+    profile_sha256: str
+    splitter_sha256: str
+    h_ext_sha256: str
+    terminal_status: Literal["completed"]
+    search_receipts: tuple[SplitterSearchReceipt, ...]
+    receipt_sha256: str
+
+
+@dataclass(frozen=True, slots=True)
+class QualifiedAscedBatch:
+    """Immutable CSS splitter rows, graph bytes, receipt, and qualification witnesses."""
+
+    code: CssCode
+    rows: tuple[AscedSplitterRow, ...]
+    splitter: np.ndarray
+    h_ext: np.ndarray
+    h_ext_row_map: tuple[tuple[str, str, int], ...]
+    receipt: ConstructedSplitterReceipt
+    qualification: SplitterQualification
+
+    def __post_init__(self) -> None:
+        splitter = _readonly_pauli(self.splitter, name="splitter")
+        h_ext = _readonly_pauli(self.h_ext, name="extended check matrix")
+        if splitter.shape[0] != len(self.rows) or h_ext.shape[1] != self.code.n:
+            raise ValueError("splitter and extended graph dimensions must match the CSS code")
+        if h_ext.shape[0] != self.code.hx.shape[0] + len(self.rows) + self.code.hz.shape[0]:
+            raise ValueError("extended graph must contain original and splitter rows")
+        object.__setattr__(self, "splitter", splitter)
+        object.__setattr__(self, "h_ext", h_ext)
+
+
+def augment_css(code: CssCode, rows: tuple[AscedSplitterRow, ...]) -> tuple[np.ndarray, tuple[tuple[str, str, int], ...]]:
+    """Build the fixed Phase-10 order ``[H_X, T_X, H_Z, T_Z]``."""
+    validated = code.validate()
+    x_rows = tuple(row for row in rows if row.role == "x")
+    z_rows = tuple(row for row in rows if row.role == "z")
+    tx = np.vstack([_pauli_row("x", row.support, validated.n) for row in x_rows]) if x_rows else np.empty((0, validated.n), dtype=np.uint8)
+    tz = np.vstack([_pauli_row("z", row.support, validated.n) for row in z_rows]) if z_rows else np.empty((0, validated.n), dtype=np.uint8)
+    hx = np.where(validated.hx == 1, Pauli.X, Pauli.I).astype(np.uint8)
+    hz = np.where(validated.hz == 1, Pauli.Z, Pauli.I).astype(np.uint8)
+    row_map = (
+        tuple(("x", "original", index) for index in range(len(hx)))
+        + tuple(("x", "splitter", index) for index in range(len(tx)))
+        + tuple(("z", "original", index) for index in range(len(hz)))
+        + tuple(("z", "splitter", index) for index in range(len(tz)))
+    )
+    return np.vstack((hx, tx, hz, tz)), row_map
+
+
+def qualify_splitter_batch(code: CssCode, rows: tuple[AscedSplitterRow, ...], *, row_weight: int) -> tuple[np.ndarray, np.ndarray, tuple[tuple[str, str, int], ...], SplitterQualification]:
+    """Independently prove the rank, detectability, type, weight, and cycle gates."""
+    validated = code.validate()
+    if len(rows) == 0 or len(rows) % 2:
+        raise ValueError("splitter delta must be a positive even number")
+    if tuple(row.role for row in rows) != ("x",) * (len(rows) // 2) + ("z",) * (len(rows) // 2):
+        raise ValueError("splitter rows must be ordered X then Z with equal counts")
+    if any(len(row.support) != row_weight or any(index < 0 or index >= validated.n for index in row.support) for row in rows):
+        raise ValueError("splitter rows must have the declared bounded weight")
+    h, h_roles = _css_pauli_rows(validated)
+    splitter = np.vstack([_pauli_row(row.role, row.support, validated.n) for row in rows])
+    rank_before = _symplectic_rank(h)
+    rank_after = _symplectic_rank(np.vstack((h, splitter)))
+    detectable_rank = gf2_rank(_commutation(splitter, h))
+    combined = np.vstack((h, splitter))
+    roles = h_roles + tuple(row.role for row in rows)
+    max_overlap = max(
+        (int(np.count_nonzero((left != Pauli.I) & (right != Pauli.I)))
+         for index, left in enumerate(combined)
+         for other_index, right in enumerate(combined[:index])
+         if roles[index] == roles[other_index] and index >= len(h)),
+        default=0,
+    )
+    if rank_after != rank_before + len(rows):
+        raise ValueError("splitter rows do not achieve the required rank growth")
+    if detectable_rank != len(rows):
+        raise ValueError("splitter rows do not achieve project detectable rank")
+    if max_overlap > 1:
+        raise ValueError("splitter rows introduce a same-role 4-cycle")
+    h_ext, row_map = augment_css(validated, rows)
+    payload = {
+        "rank_before": rank_before, "rank_after": rank_after, "detectable_rank": detectable_rank,
+        "rows": [(row.role, list(row.support), row.candidate_ordinal) for row in rows],
+        "h_ext": h_ext.tolist(), "row_map": [list(item) for item in row_map],
+        "row_weight": row_weight, "max_same_role_overlap": max_overlap,
+    }
+    qualification = SplitterQualification(
+        rank_before, rank_after, rank_after - rank_before, detectable_rank,
+        tuple(len(row.support) for row in rows), max_overlap, 2 ** len(rows),
+        sha256(_canonical_bytes(payload)).hexdigest(),
+    )
+    return splitter, h_ext, row_map, qualification
+
+
+def construct_splitter_batch(code: CssCode | PauliCode, *, delta: int, row_weight: int, attempt_cap: int) -> QualifiedAscedBatch | SplitterSearchExhausted:
+    """Construct one bounded, deterministic CSS splitter batch before any shot exists."""
+    if not isinstance(code, CssCode):
+        raise ValueError("aSCED splitter construction requires a CSS artifact; general Pauli inputs are rejected")
+    validated = code.validate()
+    if type(delta) is not int or delta <= 0 or delta % 2:
+        raise ValueError("splitter delta must be a positive even integer")
+    if type(row_weight) is not int or not 1 <= row_weight <= validated.n:
+        raise ValueError("splitter row weight must be bounded by the CSS block length")
+    if type(attempt_cap) is not int or attempt_cap < 1:
+        raise ValueError("splitter attempt cap must be positive")
+    h, h_roles = _css_pauli_rows(validated)
+    rows: list[AscedSplitterRow] = []
+    search_receipts: list[SplitterSearchReceipt] = []
+    for role in ("x",) * (delta // 2) + ("z",) * (delta // 2):
+        cycle_rejections = rank_rejections = detectability_rejections = 0
+        accepted: AscedSplitterRow | None = None
+        for ordinal, support in enumerate(combinations(range(validated.n), row_weight)):
+            if ordinal >= attempt_cap:
+                break
+            candidate = _pauli_row(role, support, validated.n)
+            existing = np.vstack((h, *[_pauli_row(item.role, item.support, validated.n) for item in rows])) if rows else h
+            existing_roles = h_roles + tuple(item.role for item in rows)
+            if not _same_role_cycle_free(candidate, existing, existing_roles, role):
+                cycle_rejections += 1
+                continue
+            trial = np.vstack((existing, candidate))
+            trial_splitters = np.vstack([_pauli_row(item.role, item.support, validated.n) for item in (*rows, AscedSplitterRow(role, support, ordinal))])
+            if _symplectic_rank(trial) != _symplectic_rank(h) + len(rows) + 1:
+                rank_rejections += 1
+                continue
+            if gf2_rank(_commutation(trial_splitters, h)) != len(rows) + 1:
+                detectability_rejections += 1
+                continue
+            trial_rows = tuple(rows + [AscedSplitterRow(role, support, ordinal)])
+            accepted = trial_rows[-1]
+            rows.append(accepted)
+            break
+        search_receipts.append(SplitterSearchReceipt(
+            role, attempt_cap, min(attempt_cap, len(tuple(combinations(range(validated.n), row_weight)))),
+            None if accepted is None else accepted.candidate_ordinal,
+            cycle_rejections, rank_rejections, detectability_rejections,
+        ))
+        if accepted is None:
+            return SplitterSearchExhausted(role, attempt_cap, tuple(search_receipts))
+    complete_rows = tuple(rows)
+    splitter, h_ext, row_map, qualification = qualify_splitter_batch(validated, complete_rows, row_weight=row_weight)
+    profile = {"delta": delta, "row_weight": row_weight, "attempt_cap": attempt_cap, "order": "x_then_z", "search": "lexicographic_first_support"}
+    artifact_sha = _artifact_sha256(validated)
+    splitter_sha = sha256(_canonical_bytes(splitter.tolist())).hexdigest()
+    h_ext_sha = sha256(_canonical_bytes({"rows": h_ext.tolist(), "row_map": [list(item) for item in row_map]})).hexdigest()
+    receipt_payload = {
+        "run_fidelity": "canonical_adaptation", "source_component_ids": _SOURCE_COMPONENT_IDS,
+        "artifact_sha256": artifact_sha, "profile": profile, "splitter_sha256": splitter_sha,
+        "h_ext_sha256": h_ext_sha, "qualification_sha256": qualification.qualification_sha256,
+        "search": [receipt.__dict__ if hasattr(receipt, "__dict__") else {
+            "role": receipt.role, "attempt_cap": receipt.attempt_cap, "candidates_examined": receipt.candidates_examined,
+            "accepted_ordinal": receipt.accepted_ordinal, "rejected_cycle": receipt.rejected_cycle,
+            "rejected_rank": receipt.rejected_rank, "rejected_detectability": receipt.rejected_detectability,
+        } for receipt in search_receipts],
+    }
+    receipt = ConstructedSplitterReceipt(
+        "canonical_adaptation", "asced-css-lexicographic-v1", _SOURCE_COMPONENT_IDS, artifact_sha,
+        sha256(_canonical_bytes(profile)).hexdigest(), splitter_sha, h_ext_sha, "completed",
+        tuple(search_receipts), sha256(_canonical_bytes(receipt_payload)).hexdigest(),
+    )
+    return QualifiedAscedBatch(validated, complete_rows, splitter, h_ext, row_map, receipt, qualification)
+
+
+__all__ = [
+    "AscedSplitterRow", "ConstructedSplitterReceipt", "QualifiedAscedBatch", "SplitterQualification",
+    "SplitterSearchExhausted", "SplitterSearchReceipt", "augment_css", "construct_splitter_batch", "gb46_canonical_fixture_payload",
+    "parse_pinned_gb46_css", "qualify_splitter_batch",
+]
