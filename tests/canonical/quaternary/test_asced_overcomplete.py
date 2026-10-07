@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib
+from dataclasses import replace
 from hashlib import sha256
 import json
 from pathlib import Path
@@ -10,7 +11,11 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from bp_registry.quaternary.asced import ConstructedSplitterReceipt, SplitterSearchReceipt
+from bp_registry.css import CssCode
+from bp_registry.quaternary.asced import (
+    AscedSplitterRow, ConstructedSplitterReceipt, QualifiedAscedBatch,
+    SplitterQualification, SplitterSearchReceipt,
+)
 
 
 FIXTURE = Path("data/fixtures/quaternary/asced-gb46-canonical-fixture.json")
@@ -36,6 +41,29 @@ def _splitter_receipt(payload: dict[str, object]) -> ConstructedSplitterReceipt:
         receipt["artifact_sha256"], receipt["profile_sha256"], receipt["splitter_sha256"], receipt["h_ext_sha256"],
         receipt["terminal_status"], searches, receipt["constructed_receipt_sha256"],
     )
+
+
+def _qualified_batch(payload: dict[str, object]) -> QualifiedAscedBatch:
+    """Reconstruct the complete Plan 10-10 typed object from its frozen receipt."""
+    h_ext = np.asarray(payload["h_ext"], dtype=np.uint8)
+    row_map = tuple(tuple(item) for item in payload["h_ext_row_map"])
+    h_x = np.asarray([row for row, item in zip(h_ext, row_map) if item[:2] == ("x", "original")], dtype=np.uint8)
+    h_z = np.asarray([row for row, item in zip(h_ext, row_map) if item[:2] == ("z", "original")], dtype=np.uint8)
+    code = CssCode((h_x == 1).astype(np.uint8), (h_z == 3).astype(np.uint8)).validate()
+    splitter = np.asarray(payload["splitter"], dtype=np.uint8)
+    receipt = _splitter_receipt(payload)
+    rows = tuple(
+        AscedSplitterRow(role, tuple(np.flatnonzero(row != 0).tolist()), int(search.accepted_ordinal))
+        for role, row, search in zip(("x", "z"), splitter, receipt.search_receipts)
+    )
+    qualification_data = payload["qualification"]
+    qualification = SplitterQualification(
+        qualification_data["rank_before"], qualification_data["rank_after"], qualification_data["rank_growth"],
+        qualification_data["detectable_rank"], tuple(qualification_data["row_weights"]),
+        qualification_data["max_same_role_overlap"], qualification_data["virtual_path_count"],
+        qualification_data["qualification_sha256"],
+    )
+    return QualifiedAscedBatch(code, rows, splitter, h_ext, row_map, receipt, qualification)
 
 
 def test_generic_matrix_relation_and_syndrome_mapping() -> None:
@@ -66,10 +94,7 @@ def test_gb46_constructed_splitter_binding_exact_h_ext_digest_deterministic_nont
     from bp_registry.quaternary.asced_overcomplete import OvercompleteSearchExhausted, construct_overcomplete_map
 
     payload = json.loads(FIXTURE.read_text(encoding="utf-8"))
-    result = construct_overcomplete_map(
-        h_ext=np.asarray(payload["h_ext"], dtype=np.uint8), h_ext_row_map=tuple(tuple(item) for item in payload["h_ext_row_map"]),
-        constructed_splitter_receipt=_splitter_receipt(payload), pair_cap=1000,
-    )
+    result = construct_overcomplete_map(_qualified_batch(payload), pair_cap=1000)
     assert not isinstance(result, OvercompleteSearchExhausted)
     overcomplete, receipt, searches = result
     assert overcomplete.mapping.shape == (48, 46)
@@ -87,10 +112,7 @@ def test_all_virtual_bits_syndrome_mapping_preserves_delta_two_paths() -> None:
     )
 
     payload = json.loads(FIXTURE.read_text(encoding="utf-8"))
-    result = construct_overcomplete_map(
-        h_ext=np.asarray(payload["h_ext"], dtype=np.uint8), h_ext_row_map=tuple(tuple(item) for item in payload["h_ext_row_map"]),
-        constructed_splitter_receipt=_splitter_receipt(payload), pair_cap=1000,
-    )
+    result = construct_overcomplete_map(_qualified_batch(payload), pair_cap=1000)
     assert not isinstance(result, OvercompleteSearchExhausted)
     overcomplete, _receipt, _searches = result
     for g_x in (0, 1):
@@ -116,34 +138,28 @@ def test_immutable_tampered_h_ext_or_block_permutation_rejected() -> None:
     from bp_registry.quaternary.asced_overcomplete import construct_overcomplete_map
 
     payload = json.loads(FIXTURE.read_text(encoding="utf-8"))
-    h_ext = np.asarray(payload["h_ext"], dtype=np.uint8)
+    batch = _qualified_batch(payload)
+    h_ext = np.array(batch.h_ext, copy=True)
     h_ext[0, 0] ^= 1
-    with pytest.raises(ValueError, match="receipt mismatch"):
-        construct_overcomplete_map(
-            h_ext=h_ext, h_ext_row_map=tuple(tuple(item) for item in payload["h_ext_row_map"]),
-            constructed_splitter_receipt=_splitter_receipt(payload), pair_cap=1000,
-        )
-    swapped = tuple(tuple(item) for item in payload["h_ext_row_map"])
+    with pytest.raises(ValueError, match="mismatched splitter graph"):
+        construct_overcomplete_map(replace(batch, h_ext=h_ext), pair_cap=1000)
+    swapped = tuple(batch.h_ext_row_map)
     swapped = swapped[:22] + (swapped[-1],) + swapped[23:-1] + (swapped[22],)
-    with pytest.raises(ValueError, match="block order"):
-        construct_overcomplete_map(
-            h_ext=np.asarray(payload["h_ext"], dtype=np.uint8), h_ext_row_map=swapped,
-            constructed_splitter_receipt=_splitter_receipt(payload), pair_cap=1000,
-        )
+    with pytest.raises(ValueError, match="mismatched splitter graph"):
+        construct_overcomplete_map(replace(batch, h_ext_row_map=swapped), pair_cap=1000)
+    with pytest.raises(ValueError, match="complete QualifiedAscedBatch"):
+        construct_overcomplete_map(object(), pair_cap=1000)
+    forged = replace(batch.receipt, receipt_sha256="0" * 64)
+    with pytest.raises(ValueError, match="constructed receipt digest"):
+        construct_overcomplete_map(replace(batch, receipt=forged), pair_cap=1000)
 
 
 def test_search_cap_exhaustion_has_no_runnable_partial_map() -> None:
     """A bounded search reports exhaustion instead of returning only identity rows."""
-    from bp_registry.quaternary.asced_overcomplete import OvercompleteSearchExhausted, construct_overcomplete_map
+    from bp_registry.quaternary.asced_overcomplete import OvercompleteSearchExhausted, _search_extra_row
 
-    raw = np.array([[1, 0, 0], [0, 1, 0], [3, 0, 0], [0, 3, 0]], dtype=np.uint8)
-    row_map = (("x", "original", 0), ("x", "splitter", 0), ("z", "original", 0), ("z", "splitter", 0))
-    h_ext_sha = _digest({"rows": raw.tolist(), "row_map": [list(item) for item in row_map]})
-    source = ConstructedSplitterReceipt(
-        "canonical_adaptation", "test", ("source:x", "source:z"), "a" * 64, "b" * 64, "c" * 64,
-        h_ext_sha, "completed", (), "d" * 64,
-    )
-    exhausted = construct_overcomplete_map(h_ext=raw, h_ext_row_map=row_map, constructed_splitter_receipt=source, pair_cap=1)
+    h_ext = np.array([[1, 0, 0], [1, 0, 0]], dtype=np.uint8)
+    exhausted = _search_extra_row(h_ext, (0, 1), role="x", pair_cap=1)
     assert isinstance(exhausted, OvercompleteSearchExhausted)
     assert exhausted.terminal_status == "exhausted"
 
@@ -168,14 +184,11 @@ def test_constructed_map_receipt_matches_the_frozen_gb46_fixture() -> None:
 
     splitter_payload = json.loads(FIXTURE.read_text(encoding="utf-8"))
     map_payload = json.loads(MAP_FIXTURE.read_text(encoding="utf-8"))
-    result = construct_overcomplete_map(
-        h_ext=np.asarray(splitter_payload["h_ext"], dtype=np.uint8),
-        h_ext_row_map=tuple(tuple(item) for item in splitter_payload["h_ext_row_map"]),
-        constructed_splitter_receipt=_splitter_receipt(splitter_payload), pair_cap=1000,
-    )
+    result = construct_overcomplete_map(_qualified_batch(splitter_payload), pair_cap=1000)
     assert not isinstance(result, OvercompleteSearchExhausted)
     overcomplete, receipt, searches = result
     assert map_payload["run_fidelity"] == "canonical_adaptation"
+    assert map_payload["admission_boundary"] == "qualified_asced_batch_reverified_v1"
     assert map_payload["constructed_splitter_receipt_sha256"] == splitter_payload["receipt"]["constructed_receipt_sha256"]
     assert map_payload["mapping"] == overcomplete.mapping.tolist()
     assert map_payload["h_oc"] == overcomplete.h_oc.tolist()
@@ -205,6 +218,7 @@ def test_gb46_and_toric_source_identities_are_comparison_only() -> None:
     """Pinned author triplets are retained as auditable, non-executable comparisons."""
     comparison = json.loads(Path("tests/canonical/quaternary/fixtures/asced-overcomplete.json").read_text(encoding="utf-8"))
     assert comparison["canonical_construction"]["run_fidelity"] == "canonical_adaptation"
+    assert comparison["canonical_construction"]["admission_boundary"] == "qualified_asced_batch_reverified_v1"
     for fixture in comparison["source_comparisons"]:
         assert fixture["comparison_only"] and fixture["execution_status"] == "comparison_only"
         assert fixture["gf2_relation"] == "verified_on_pinned_checkout"

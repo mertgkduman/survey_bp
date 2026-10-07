@@ -1,6 +1,7 @@
 {
   "schema": "asced-overcomplete-comparison-fixtures-v1",
   "canonical_construction": {
+    "admission_boundary": "qualified_asced_batch_reverified_v1",
     "row_order": ["H_X", "T_X", "H_Z", "T_Z"],
     "pair_cap_per_type": 1000,
     "run_fidelity": "canonical_adaptation",

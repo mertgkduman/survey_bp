@@ -1,4 +1,5 @@
 {
+  "admission_boundary": "qualified_asced_batch_reverified_v1",
   "constructed_splitter_receipt_sha256": "d28362b1d8b97eb01768d8fd33c7f6d04c1050ad828b767c5ebb089da59c8fc9",
   "construction_profile": {
     "extras": "one_x_then_one_z",

@@ -17,7 +17,7 @@ from typing import Literal
 import numpy as np
 
 from ..css import gf2_rank
-from .asced import ConstructedSplitterReceipt
+from .asced import QualifiedAscedBatch, _verify_qualified_batch
 
 
 RunFidelity = Literal["canonical_adaptation", "source_comparison"]
@@ -284,28 +284,27 @@ def _search_extra_row(
 
 
 def construct_overcomplete_map(
+    batch: QualifiedAscedBatch,
     *,
-    h_ext: object,
-    h_ext_row_map: object,
-    constructed_splitter_receipt: ConstructedSplitterReceipt,
     pair_cap: int = 1000,
 ) -> tuple[AscedOvercompleteMap, ConstructedOvercompleteReceipt, tuple[OvercompleteSearchReceipt, ...]] | OvercompleteSearchExhausted:
     """Build the selected deterministic two-extra-row canonical map.
 
-    ``h_ext`` is the exact receipt-bound Pauli matrix from Plan 10-10.  Search
-    works on its binary supports, with one lexicographically first new XOR image
-    from each same-type block.  An exhausted terminal has no map to execute.
+    Only a complete :class:`QualifiedAscedBatch` crosses this boundary.  The
+    Plan 10-10 verifier replays every splitter witness and receipt before its
+    immutable ``H_ext`` and typed row map become construction inputs.  Search
+    works on binary supports, with one lexicographically first new XOR image
+    from each same-type block. An exhausted terminal has no runnable map.
     """
-    if not isinstance(constructed_splitter_receipt, ConstructedSplitterReceipt):
-        raise ValueError("canonical overcomplete construction requires a typed ConstructedSplitterReceipt")
-    if constructed_splitter_receipt.run_fidelity != "canonical_adaptation" or constructed_splitter_receipt.terminal_status != "completed":
-        raise ValueError("canonical overcomplete construction requires a completed canonical-adaptation splitter receipt")
+    if not isinstance(batch, QualifiedAscedBatch):
+        raise ValueError("canonical overcomplete construction requires a complete QualifiedAscedBatch")
     if type(pair_cap) is not int or not 1 <= pair_cap <= 1000:
         raise ValueError("overcomplete pair cap must be an integer in [1, 1000]")
-    row_map = _normalise_row_map(h_ext_row_map, rows=np.asarray(h_ext).shape[0])
-    raw, extended = _pauli_support_matrix(h_ext, row_map=row_map)
+    _verify_qualified_batch(batch)
+    row_map = _normalise_row_map(batch.h_ext_row_map, rows=batch.h_ext.shape[0])
+    raw, extended = _pauli_support_matrix(batch.h_ext, row_map=row_map)
     source_h_ext_digest = _digest({"rows": raw.tolist(), "row_map": [list(item) for item in row_map]})
-    if source_h_ext_digest != constructed_splitter_receipt.h_ext_sha256:
+    if source_h_ext_digest != batch.receipt.h_ext_sha256:
         raise ValueError("canonical overcomplete construction rejected an H_ext/constructed-splitter receipt mismatch")
     x_indices = tuple(index for index, (role, _origin, _local) in enumerate(row_map) if role == "x")
     z_indices = tuple(index for index, (role, _origin, _local) in enumerate(row_map) if role == "z")
@@ -335,7 +334,7 @@ def construct_overcomplete_map(
     profile = {"pair_cap_per_type": pair_cap, "search": "lexicographic_first_same_type_xor", "extras": "one_x_then_one_z"}
     receipt_payload = {
         "run_fidelity": "canonical_adaptation",
-        "constructed_splitter_receipt_sha256": constructed_splitter_receipt.receipt_sha256,
+        "constructed_splitter_receipt_sha256": batch.receipt.receipt_sha256,
         "h_ext_sha256": source_h_ext_digest,
         "h_ext_row_map_sha256": _digest([list(item) for item in row_map]),
         "construction_profile_sha256": _digest(profile),
