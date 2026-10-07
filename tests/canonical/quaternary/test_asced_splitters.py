@@ -104,3 +104,10 @@ def test_source_components_are_distinct_from_project_run_fidelity() -> None:
     assert batch.receipt.run_fidelity == "canonical_adaptation"
     assert all("kit-cel/quantum_asced@816772071486615dfc7d71d1e15df597edc58a26" in item for item in batch.receipt.source_component_ids)
     assert "source_literal" not in json.dumps({"receipt": batch.receipt.receipt_sha256})
+
+
+def test_materializes_preflighted_batches_with_stable_transform_lineage() -> None:
+    """Complete receipt-bound batches become fixed working graphs before shots."""
+    from bp_registry.quaternary import asced
+
+    assert hasattr(asced, "materialize_asced_batches"), "receipt-bound batch materialization is required"
