@@ -6,6 +6,6 @@ The pinned author generator uses unseeded `std::rand()` and does not retain its 
 
 ## Native aSCED gate
 
-The user sent `approved phase10 native spec 55359962431c055cf971171f81d75997282beb29e8928a8d82e023fbb6c1f24e` on 2026-10-07. The exact source specification remains `pending_human`: its license field is unresolved, and Plan 10-14 requires authoritative license or written permission in addition to digest approval. The user's subsequent statement, “author is communicated,” does not yet identify a grant, terms, or source. Clarification has been requested. No Plan 10-14 approval summary or native build/run may be issued until that evidence is reviewed and recorded.
+The user sent `approved phase10 native spec 55359962431c055cf971171f81d75997282beb29e8928a8d82e023fbb6c1f24e` on 2026-10-07. The user then clarified on 2026-10-07 that the author is a collaborator and has given permission verbally. Plan 10-14 records this user-attested verbal author permission as sufficient for the exact bounded isolated build and run, while explicitly recording that no written permission text or repository license was supplied or located. This is a user-approved deviation from the plan's request for written evidence. The digest-bound source spec remains byte-for-byte unchanged; its `pending_human` field describes the pre-decision proposal, with `10-14-SUMMARY.md` serving as the decision record.
 
 The canonical adaptation decision does not authorize replacing the required native reference in Plans 10-15–10-16 or claiming source-faithful reproduction.
