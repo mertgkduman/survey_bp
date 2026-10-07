@@ -27,6 +27,7 @@ from .manifests import (
     CanonicalExperimentV7,
     CanonicalExperimentV8,
     ManifestV1,
+    QuaternaryExperimentV1,
     executable_canonical_policy_effects,
     manifest_digest,
     preflight,
@@ -34,6 +35,7 @@ from .manifests import (
     validate_executable_canonical_baseline,
 )
 from . import evaluator, sampling
+from .quaternary.execution import run_quaternary_tracer, verify_quaternary_tracer
 
 
 def _native_reference():
@@ -212,6 +214,57 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
                 ),
             }
     return report
+
+
+def preflight_quaternary(manifest_path: str | Path) -> dict[str, Any]:
+    """Validate the distinct four-state public tracer before sampling."""
+    manifest = preflight(manifest_path).manifest
+    if not isinstance(manifest, QuaternaryExperimentV1):
+        raise ValueError("quaternary execution requires QuaternaryExperimentV1")
+    return {
+        "run_id": manifest.run_id,
+        "manifest_sha256": manifest_digest(manifest),
+        "shot_budget": 1,
+        "pauli_encoding": "I=0,X=1,Y=2,Z=3",
+        "max_iterations": manifest.max_iterations,
+        "max_work": manifest.max_work,
+        "relation": manifest.evidence.relation,
+        "fixture": manifest.evidence.fixture,
+        "assessment_status": manifest.evidence.assessment_status,
+    }
+
+
+def run_quaternary(manifest_path: str | Path, output: str | Path, *, shot_id: int | None = None) -> dict[str, Any]:
+    """Run the single bounded joint-Pauli tracer through the public path."""
+    report = preflight_quaternary(manifest_path)
+    if shot_id not in (None, 0):
+        raise ValueError("quaternary shot ID is outside the manifest budget")
+    output_path = Path(output)
+    result = run_quaternary_tracer(preflight(manifest_path).manifest, output_path, shot_id=0)
+    ledger_path = output_path / "events.jsonl"
+    public = {
+        **report, "output": str(output_path), "final_row_count": 1,
+        "termination": result.termination, "outcome": result.outcome,
+        "ledger_sha256": sha256(ledger_path.read_bytes()).hexdigest(),
+        "manifest_path": str(Path(manifest_path)), "ledger_path": str(ledger_path),
+        "statistical_claim": "not_assessed; development fixture, not a source-curve reproduction or performance result",
+    }
+    (output_path / "result.json").write_text(json.dumps(public, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return public
+
+
+def verify_quaternary_run(output: str | Path) -> dict[str, Any]:
+    """Verify result identity and exact replay for a joint-Pauli tracer output."""
+    output_path = Path(output)
+    result = json.loads((output_path / "result.json").read_text(encoding="utf-8"))
+    if result.get("assessment_status") != "not_assessed" or result.get("statistical_claim", "").find("not_assessed") < 0:
+        raise ValueError("quaternary result must remain not_assessed")
+    manifest_path = Path(result["manifest_path"])
+    report = preflight_quaternary(manifest_path)
+    if result.get("manifest_sha256") != report["manifest_sha256"] or result.get("ledger_sha256") != sha256((output_path / "events.jsonl").read_bytes()).hexdigest():
+        raise ValueError("quaternary result identity differs from immutable evidence")
+    replay = verify_quaternary_tracer(preflight(manifest_path).manifest, output_path, shot_id=0)
+    return {**report, "output": str(output_path), "final_row_count": 1, **replay}
 
 
 def _without_none(value: object) -> object:

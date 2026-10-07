@@ -683,7 +683,85 @@ class CanonicalExperimentV8(CanonicalExperimentV3):
         return self
 
 
-ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | CanonicalExperimentV6 | CanonicalExperimentV7 | CanonicalExperimentV8
+class QuaternaryProblemV1(StrictModel):
+    """Immutable non-CSS Pauli rows in explicit I/X/Y/Z encoding."""
+
+    checks: tuple[tuple[int, ...], ...] = Field(min_length=1)
+    syndrome: tuple[int, ...] = Field(min_length=1)
+
+    @field_validator("checks", mode="before")
+    @classmethod
+    def rows_are_tuples(cls, value: Any) -> Any:
+        return tuple(tuple(row) if isinstance(row, list) else row for row in value) if isinstance(value, list) else value
+
+    @field_validator("syndrome", mode="before")
+    @classmethod
+    def syndrome_is_tuple(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @model_validator(mode="after")
+    def nonempty_rectangular_pauli_rows(self) -> "QuaternaryProblemV1":
+        width = len(self.checks[0]) if self.checks else 0
+        if width == 0 or any(len(row) != width for row in self.checks):
+            raise ValueError("quaternary checks must be nonempty rectangular rows")
+        if len(self.syndrome) != len(self.checks) or any(type(bit) is not int or bit not in (0, 1) for bit in self.syndrome):
+            raise ValueError("quaternary syndrome must be binary and match checks")
+        if any(type(label) is not int or label not in (0, 1, 2, 3) for row in self.checks for label in row):
+            raise ValueError("quaternary checks use explicit I=0, X=1, Y=2, Z=3 values")
+        return self
+
+
+class QuaternaryChannelV1(StrictModel):
+    """Joint physical channel and separately declared decoder smoothing."""
+
+    probabilities: tuple[tuple[float, float, float, float], ...] = Field(min_length=1)
+    decoder_smoothing: float = Field(gt=0.0, lt=0.25)
+
+    @field_validator("probabilities", mode="before")
+    @classmethod
+    def probability_rows_are_tuples(cls, value: Any) -> Any:
+        return tuple(tuple(row) if isinstance(row, list) else row for row in value) if isinstance(value, list) else value
+
+    @model_validator(mode="after")
+    def rows_are_joint_probabilities(self) -> "QuaternaryChannelV1":
+        for row in self.probabilities:
+            if len(row) != 4 or any(not math.isfinite(value) or value < 0.0 for value in row) or not math.isclose(sum(row), 1.0, abs_tol=1e-12, rel_tol=0.0):
+                raise ValueError("quaternary channel rows must be finite I/X/Y/Z probabilities summing to one")
+        return self
+
+
+class QuaternaryEvidenceV1(StrictModel):
+    relation: Literal["canonical_implemented"]
+    fixture: Literal["development_fixture"]
+    assessment_status: Literal["not_assessed"]
+    sources: tuple[str, ...] = Field(min_length=1)
+    interpretation: str = Field(min_length=1)
+
+    @field_validator("sources", mode="before")
+    @classmethod
+    def sources_are_tuple(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+
+class QuaternaryExperimentV1(StrictModel):
+    """First strict public joint-Pauli execution contract."""
+
+    schema_version: Literal["quaternary_experiment_v1"]
+    run_id: str = Field(min_length=1)
+    problem: QuaternaryProblemV1
+    channel: QuaternaryChannelV1
+    max_iterations: int = Field(ge=1, le=10_000)
+    max_work: int = Field(ge=1, le=10_000_000)
+    evidence: QuaternaryEvidenceV1
+
+    @model_validator(mode="after")
+    def channel_matches_immutable_problem(self) -> "QuaternaryExperimentV1":
+        if len(self.channel.probabilities) != len(self.problem.checks[0]):
+            raise ValueError("quaternary channel must contain one joint row per qubit")
+        return self
+
+
+ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | CanonicalExperimentV6 | CanonicalExperimentV7 | CanonicalExperimentV8 | QuaternaryExperimentV1
 
 
 _EXECUTABLE_BASELINE_KINDS = {
@@ -755,7 +833,7 @@ class ResolvedExperiment:
     """Preflight output; runner receives verified code instead of manifest paths."""
 
     manifest: ManifestRecord
-    code: CssCode
+    code: CssCode | None
     artifact: LoadedArtifact | None
 
 
@@ -774,9 +852,11 @@ def _read_value(value: dict[str, Any] | str | Path) -> dict[str, Any]:
 
 def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | CanonicalExperimentV6 | CanonicalExperimentV7 | dict[str, Any] | str | Path) -> ManifestRecord:
     """Dispatch complete native and canonical schemas without changing v1 meanings."""
-    if isinstance(value, (ManifestV1, CanonicalManifestV2, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV6, CanonicalExperimentV7)):
+    if isinstance(value, (ManifestV1, CanonicalManifestV2, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV6, CanonicalExperimentV7, QuaternaryExperimentV1)):
         return value
     decoded = _read_value(value)
+    if decoded.get("schema_version") == "quaternary_experiment_v1":
+        return QuaternaryExperimentV1.model_validate(decoded)
     if decoded.get("schema_version") == 8:
         return CanonicalExperimentV8.model_validate(decoded)
     if decoded.get("schema_version") == 7 and "ensemble" in decoded:
@@ -797,9 +877,11 @@ def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | CanonicalExperiment
 
 
 def _parse_for_preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ManifestRecord:
-    if isinstance(value, (ManifestV1, LegacyManifestV1, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV6, CanonicalExperimentV7)):
+    if isinstance(value, (ManifestV1, LegacyManifestV1, CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV6, CanonicalExperimentV7, QuaternaryExperimentV1)):
         return value
     decoded = _read_value(value)
+    if decoded.get("schema_version") == "quaternary_experiment_v1":
+        return QuaternaryExperimentV1.model_validate(decoded)
     if decoded.get("schema_version") == 8:
         return CanonicalExperimentV8.model_validate(decoded)
     if decoded.get("schema_version") == 7 and "ensemble" in decoded:
@@ -932,6 +1014,10 @@ def _resolved_artifact_root(root: str) -> str:
 def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedExperiment:
     """Resolve immutable CSS input and runtime identity before any simulation work."""
     manifest = _parse_for_preflight(value)
+    if isinstance(manifest, QuaternaryExperimentV1):
+        # The new kernel has no CSS artifact; model validation is the complete
+        # public preflight and occurs before sampling or decoder construction.
+        return ResolvedExperiment(manifest=manifest, code=None, artifact=None)
     if isinstance(manifest, LegacyManifestV1):
         # Original minimal v1 tracer records are immutable historical evidence.
         # They are retained for replay only; new records must use ManifestV1.

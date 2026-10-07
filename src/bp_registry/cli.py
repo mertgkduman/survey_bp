@@ -16,12 +16,12 @@ import numpy as np
 
 from . import evaluator, evidence, sampling
 from .ledger import read_canonical_events, reconcile, summarize
-from .manifests import CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV7, CanonicalExperimentV8, ManifestV1, manifest_digest, preflight, qualify_cluster_artifact
+from .manifests import CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV7, CanonicalExperimentV8, ManifestV1, QuaternaryExperimentV1, manifest_digest, preflight, qualify_cluster_artifact
 from .canonical.verification import validate_canonical_shot, validate_phase4_shot
 from .canonical.phase7 import validate_phase7_shot
 from .runner import (
     canonical_public_shot_context, canonical_terminal_rows, preflight_canonical,
-    preflight_pilot, run_canonical_one, run_one,
+    preflight_pilot, preflight_quaternary, run_canonical_one, run_one, run_quaternary, verify_quaternary_run,
 )
 
 
@@ -559,11 +559,12 @@ def main(argv: list[str] | None = None) -> None:
         records = evidence.load_seed_records(args.records)
         _dump({"records": str(args.records), "paper_experiments": sorted(records["paper_experiments"]), "status": "valid"})
     elif args.command == "preflight":
-        _dump(preflight_canonical(args.manifest) if isinstance(preflight(args.manifest).manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV7, CanonicalExperimentV8)) else preflight_pilot(args.manifest))
+        parsed = preflight(args.manifest).manifest
+        _dump(preflight_quaternary(args.manifest) if isinstance(parsed, QuaternaryExperimentV1) else preflight_canonical(args.manifest) if isinstance(parsed, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4, CanonicalExperimentV5, CanonicalExperimentV7, CanonicalExperimentV8)) else preflight_pilot(args.manifest))
     elif args.command == "pilot":
         _dump(run_pilot(args.manifest, args.output))
     elif args.command == "canonical":
-        _dump(run_canonical(args.manifest, args.output, shot_id=args.shot))
+        _dump(run_quaternary(args.manifest, args.output, shot_id=args.shot) if isinstance(preflight(args.manifest).manifest, QuaternaryExperimentV1) else run_canonical(args.manifest, args.output, shot_id=args.shot))
     elif args.command == "verify-canonical-shot":
         _dump(verify_canonical_shot(args.manifest, args.output, shot_id=args.shot))
     elif args.command == "canonical-observation":
@@ -582,7 +583,9 @@ def main(argv: list[str] | None = None) -> None:
     elif args.command == "reconcile":
         _dump(_reconcile_report(args.ledger))
     elif args.command == "verify-run":
-        _dump(verify_run(args.output))
+        result_path = args.output / "result.json"
+        result = _read_json(result_path) if result_path.exists() else {}
+        _dump(verify_quaternary_run(args.output) if result.get("pauli_encoding") == "I=0,X=1,Y=2,Z=3" else verify_run(args.output))
     elif args.command == "qualify-cluster-artifact":
         qualification = qualify_cluster_artifact(args.specification, approved_root=args.approved_root)
         _dump(qualification.report())
