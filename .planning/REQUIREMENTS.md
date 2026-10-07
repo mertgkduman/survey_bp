@@ -133,10 +133,10 @@ paragraph records the September 26 review state, not an open implementation gap.
 
 ### Correlated quaternary code-capacity
 
-- [ ] **QBP-01**: A researcher can execute a canonical four-state Pauli BP kernel using source-defined commutation factors, message representation, numerical conventions, and joint X/Z inference.
-- [ ] **QBP-02**: A researcher can sample a declared joint I/X/Y/Z channel, including correlated X/Z behavior, and verify priors, error-rate conventions, and Y-error fixtures.
-- [ ] **QBP-03**: Quaternary outputs pass independent syndrome, exact/degenerate/logical-outcome checks against the common code-capacity mathematical conventions.
-- [ ] **QBP-04**: A researcher can run source-backed compatible policy compositions in the quaternary kernel, including the published quaternary BPGD case, with unsupported ports explicitly rejected or labeled new adaptations.
+- [x] **QBP-01**: A researcher can execute a canonical four-state Pauli BP kernel using source-defined commutation factors, message representation, numerical conventions, and joint X/Z inference.
+- [x] **QBP-02**: A researcher can sample a declared joint I/X/Y/Z channel, including correlated X/Z behavior, and verify priors, error-rate conventions, and Y-error fixtures.
+- [x] **QBP-03**: Quaternary outputs pass independent syndrome, exact/degenerate/logical-outcome checks against the common code-capacity mathematical conventions.
+- [x] **QBP-04**: A researcher can run source-backed compatible policy compositions in the quaternary kernel, including the published quaternary BPGD case, with unsupported ports explicitly rejected or labeled new adaptations.
 - [ ] **QEV-01**: A researcher can execute selected quaternary source experiments and assess canonical reproduction within declared statistical tolerances, preserving reference availability and discrepancy records.
 - [ ] **QEV-02**: A researcher can compare joint quaternary and separate binary decoding on the same sampled joint Pauli channel and declared budgets, with source-backed policy ablations and provenance.
 
@@ -255,10 +255,10 @@ Every v1 requirement has exactly one owning phase; later phases may use or stren
 | EVAL-01 | Phase 9 | Pending |
 | EVAL-02 | Phase 9 | Pending |
 | EVAL-03 | Phase 9 | Pending |
-| QBP-01 | Phase 10 | Pending |
-| QBP-02 | Phase 10 | Pending |
-| QBP-03 | Phase 10 | Pending |
-| QBP-04 | Phase 10 | Pending |
+| QBP-01 | Phase 10 | Complete |
+| QBP-02 | Phase 10 | Complete |
+| QBP-03 | Phase 10 | Complete |
+| QBP-04 | Phase 10 | Complete |
 | QEV-01 | Phase 11 | Pending |
 | QEV-02 | Phase 11 | Pending |
 | CIR-01 | Phase 12 | Pending |
