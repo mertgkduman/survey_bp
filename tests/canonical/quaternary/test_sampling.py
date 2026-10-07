@@ -24,7 +24,7 @@ except ImportError:
     sample_joint_pauli = None
 
 
-def _problem(n: int = 1) -> QuaternaryOriginalProblem:
+def _problem(n: int = 2) -> QuaternaryOriginalProblem:
     """A small commuting code whose rows expose X and Z components separately."""
     checks = np.vstack((
         np.full(n, Pauli.X, dtype=np.uint8),
@@ -32,6 +32,13 @@ def _problem(n: int = 1) -> QuaternaryOriginalProblem:
     ))
     code = PauliCode(checks=checks, row_roles=("x", "z"))
     return QuaternaryOriginalProblem("original-sampling-fixture", code, np.zeros(2, dtype=np.uint8))
+
+
+def _one_pauli_channel(label: Pauli) -> JointPauliChannel:
+    """Put one deterministic Pauli on the first of two CSS-overlapping qubits."""
+    row = np.zeros(4, dtype=np.float64)
+    row[int(label)] = 1.0
+    return JointPauliChannel.explicit([row, [1.0, 0.0, 0.0, 0.0]], n=2)
 
 
 def test_public_joint_pauli_sampling_module_is_available():
@@ -117,26 +124,25 @@ def test_categorical_exact_pauli_channels_produce_one_deterministic_pauli(label)
     probabilities = np.zeros(4, dtype=np.float64)
     probabilities[int(label)] = 1.0
     sample = sample_joint_pauli(
-        _problem(),
-        channel=JointPauliChannel.explicit(probabilities, n=1),
+        _problem(), channel=_one_pauli_channel(label),
         shot_id=7,
         manifest_identity="sampling-deterministic-v1",
     )
 
-    assert sample.hidden.paulis.tolist() == [label]
-    assert sample.hidden.x.tolist() == [int(label in (Pauli.X, Pauli.Y))]
-    assert sample.hidden.z.tolist() == [int(label in (Pauli.Y, Pauli.Z))]
+    assert sample.hidden.paulis.tolist() == [label, Pauli.I]
+    assert sample.hidden.x.tolist() == [int(label in (Pauli.X, Pauli.Y)), 0]
+    assert sample.hidden.z.tolist() == [int(label in (Pauli.Y, Pauli.Z)), 0]
     assert sample.observation.syndrome.tolist() == [int(label in (Pauli.Y, Pauli.Z)), int(label in (Pauli.X, Pauli.Y))]
 
 
 def test_single_y_flips_both_css_component_observations():
     sample = sample_joint_pauli(
-        _problem(), channel=JointPauliChannel.explicit([0.0, 0.0, 1.0, 0.0], n=1),
+        _problem(), channel=_one_pauli_channel(Pauli.Y),
         shot_id=0, manifest_identity="single-y-v1",
     )
 
     assert sample.observation.syndrome.tolist() == [1, 1]
-    assert sample.hidden.paulis.tolist() == [Pauli.Y]
+    assert sample.hidden.paulis.tolist() == [Pauli.Y, Pauli.I]
 
 
 def test_correlated_joint_distribution_retains_y_mass_and_xz_covariance():
@@ -159,7 +165,7 @@ def test_exact_cumulative_boundaries_use_i_x_y_z_ownership(monkeypatch):
 
 
 def test_replay_identity_binds_channel_order_and_shot_and_rejects_tampering():
-    channel = JointPauliChannel.depolarizing(0.4, n=1)
+    channel = JointPauliChannel.depolarizing(0.4, n=2)
     first = sample_joint_pauli(_problem(), channel=channel, shot_id=3, manifest_identity="replay-v1")
     second = sample_joint_pauli(_problem(), channel=channel, shot_id=3, manifest_identity="replay-v1")
 

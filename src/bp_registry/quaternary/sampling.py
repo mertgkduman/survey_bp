@@ -10,12 +10,17 @@ separate object so exact physical zeros remain part of the experiment identity.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from decimal import Decimal
 import hashlib
 import json
 import math
+from types import MappingProxyType
 from typing import Literal
 
 import numpy as np
+
+from .algebra import Pauli, to_symplectic
+from .problems import QuaternaryOriginalProblem
 
 
 PAULI_ORDER = "I,X,Y,Z"
@@ -206,4 +211,168 @@ class DecoderPriorSmoothing:
         return {"identity": self.identity, "kind": "replace_zero_prior", "floor": self.floor}
 
 
-__all__ = ["DecoderPriorSmoothing", "JointPauliChannel", "PAULI_ORDER", "ROW_SUM_TOLERANCE"]
+def _rng(manifest_identity: str, shot_id: int) -> np.random.Generator:
+    material = hashlib.sha256(
+        f"bp-registry-joint-pauli-sample-v1\0{manifest_identity}\0{shot_id}".encode("utf-8")
+    ).digest()
+    words = np.frombuffer(material, dtype="<u4").astype(np.uint32, copy=False)
+    return np.random.Generator(np.random.PCG64(np.random.SeedSequence(words)))
+
+
+def _sample_identity(manifest_identity: str, channel_identity: str, shot_id: int) -> str:
+    payload = f"joint-pauli-sample-v1\0{manifest_identity}\0{channel_identity}\0{shot_id}".encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _validate_shot(shot_id: int, manifest_identity: str) -> None:
+    if type(shot_id) is not int or shot_id < 0:
+        raise ValueError("shot_id must be a nonnegative integer")
+    if not isinstance(manifest_identity, str) or not manifest_identity:
+        raise ValueError("manifest_identity must be a nonempty string")
+
+
+def _categorical(row: np.ndarray, draw: float) -> Pauli:
+    """Map one uniform draw using right-owned exact cumulative boundaries.
+
+    ``searchsorted(..., side='right')`` gives I the interval beginning at zero
+    and each later Pauli the exact preceding cumulative boundary: e.g. a draw
+    exactly at ``P(I)`` belongs to X.  This is the recorded stable I<X<Y<Z
+    convention.  A row sum allowed by the persisted tolerance may finish just
+    below one, so only a final-tolerance tail is assigned to Z.
+    """
+    if not math.isfinite(draw) or draw < 0.0 or draw > 1.0:
+        raise ValueError("categorical RNG draw must be finite in [0, 1]")
+    # Decimal(str(...)) fixes the CDF convention at the persisted float text,
+    # avoiding platform-dependent binary accumulation at user-declared ties
+    # such as 0.1 + 0.2 = 0.3.
+    threshold = Decimal(str(draw))
+    cumulative = Decimal("0")
+    for index, probability in enumerate(row):
+        cumulative += Decimal(str(float(probability)))
+        if threshold < cumulative:
+            return Pauli(index)
+    if threshold <= cumulative + Decimal(str(ROW_SUM_TOLERANCE)):
+        return Pauli.Z
+    raise RuntimeError("categorical draw exceeded probability row beyond tolerance")
+
+
+@dataclass(frozen=True, slots=True)
+class PauliHiddenTruth:
+    """Immutable categorical physical truth, withheld from decoder-visible input."""
+
+    paulis: np.ndarray
+    x: np.ndarray
+    z: np.ndarray
+
+    def __post_init__(self) -> None:
+        values = np.asarray(self.paulis)
+        if values.ndim != 1 or not np.issubdtype(values.dtype, np.integer) or np.any((values < Pauli.I) | (values > Pauli.Z)):
+            raise ValueError("hidden Pauli truth must be a one-dimensional I,X,Y,Z vector")
+        labels = np.array(values, dtype=np.uint8, copy=True)
+        symplectic = to_symplectic(labels)
+        expected_x, expected_z = symplectic[:, 0], symplectic[:, 1]
+        supplied_x = np.asarray(self.x)
+        supplied_z = np.asarray(self.z)
+        if supplied_x.shape != labels.shape or supplied_z.shape != labels.shape or not np.array_equal(supplied_x, expected_x) or not np.array_equal(supplied_z, expected_z):
+            raise ValueError("hidden symplectic bits must derive from the categorical Pauli values")
+        labels.setflags(write=False)
+        frozen_x = np.array(expected_x, dtype=np.uint8, copy=True)
+        frozen_z = np.array(expected_z, dtype=np.uint8, copy=True)
+        frozen_x.setflags(write=False)
+        frozen_z.setflags(write=False)
+        object.__setattr__(self, "paulis", labels)
+        object.__setattr__(self, "x", frozen_x)
+        object.__setattr__(self, "z", frozen_z)
+
+
+@dataclass(frozen=True, slots=True)
+class PauliShotSample:
+    """Replayable sample exposing only the full syndrome to decoding code."""
+
+    shot_id: int
+    sample_identity: str
+    hidden: PauliHiddenTruth
+    observation: QuaternaryOriginalProblem
+    ledger: MappingProxyType
+    decoder_smoothing_identity: str | None = None
+
+    def __post_init__(self) -> None:
+        if type(self.shot_id) is not int or self.shot_id < 0:
+            raise ValueError("shot_id must be a nonnegative integer")
+        if not isinstance(self.sample_identity, str) or len(self.sample_identity) != 64:
+            raise ValueError("sample_identity must be a sha256 hex string")
+        if self.hidden.paulis.shape != (self.observation.code.n,):
+            raise ValueError("hidden truth and decoder observation must share qubit count")
+        object.__setattr__(self, "ledger", MappingProxyType(dict(self.ledger)))
+
+
+def sample_joint_pauli(
+    problem: QuaternaryOriginalProblem,
+    *,
+    channel: JointPauliChannel,
+    shot_id: int,
+    manifest_identity: str,
+    decoder_smoothing: DecoderPriorSmoothing | None = None,
+) -> PauliShotSample:
+    """Sample exactly one categorical Pauli per qubit and derive a full syndrome.
+
+    The returned ``observation`` is a new immutable original problem for the
+    sampled measurement.  It contains the declared code and syndrome only;
+    hidden Pauli labels and symplectic bits stay in ``hidden`` for independent
+    evaluation after decoding.
+    """
+    if not isinstance(problem, QuaternaryOriginalProblem):
+        raise ValueError("problem must be an immutable quaternary original problem")
+    if not isinstance(channel, JointPauliChannel):
+        raise ValueError("channel must be a JointPauliChannel")
+    if decoder_smoothing is not None and not isinstance(decoder_smoothing, DecoderPriorSmoothing):
+        raise ValueError("decoder_smoothing must be a DecoderPriorSmoothing or None")
+    _validate_shot(shot_id, manifest_identity)
+    if channel.n != problem.code.n:
+        raise ValueError("channel row count must match the original problem qubit count")
+
+    generator = _rng(manifest_identity, shot_id)
+    labels = np.asarray(
+        [_categorical(channel.resolved_probabilities[index], float(generator.random())) for index in range(channel.n)],
+        dtype=np.uint8,
+    )
+    bits = to_symplectic(labels)
+    hidden = PauliHiddenTruth(labels, bits[:, 0], bits[:, 1])
+    sample_identity = _sample_identity(manifest_identity, channel.identity, shot_id)
+    observed_syndrome = problem.code.syndrome(hidden.paulis)
+    observation = QuaternaryOriginalProblem(
+        f"original-sample-{sample_identity[:16]}", problem.code, observed_syndrome
+    )
+    ledger = {
+        "sample_identity": sample_identity,
+        "manifest_identity": manifest_identity,
+        "shot_id": shot_id,
+        "channel_identity": channel.identity,
+        "channel_kind": channel.kind,
+        "pauli_order": PAULI_ORDER,
+        "row_sum_tolerance": ROW_SUM_TOLERANCE,
+        "resolved_physical_probabilities": channel.resolved_probabilities.tolist(),
+        "physical_nonidentity_rates": channel.physical_nonidentity_rates.tolist(),
+        "scalar_physical_p": channel.scalar_physical_p,
+        "decoder_smoothing_identity": None if decoder_smoothing is None else decoder_smoothing.identity,
+        "observation_syndrome": observed_syndrome.tolist(),
+    }
+    return PauliShotSample(
+        shot_id=shot_id,
+        sample_identity=sample_identity,
+        hidden=hidden,
+        observation=observation,
+        ledger=ledger,
+        decoder_smoothing_identity=None if decoder_smoothing is None else decoder_smoothing.identity,
+    )
+
+
+__all__ = [
+    "DecoderPriorSmoothing",
+    "JointPauliChannel",
+    "PAULI_ORDER",
+    "PauliHiddenTruth",
+    "PauliShotSample",
+    "ROW_SUM_TOLERANCE",
+    "sample_joint_pauli",
+]
