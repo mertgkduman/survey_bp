@@ -17,6 +17,12 @@ def test_quaternary_source_schedule_module_is_available() -> None:
     assert importlib.util.find_spec("bp_registry.quaternary.schedules") is not None
 
 
+def test_quaternary_check_transform_contract_is_available() -> None:
+    """D-07 exposes dedicated scalar-C2V normalization and offset policies."""
+    module = importlib.import_module("bp_registry.quaternary.schedules")
+    assert hasattr(module, "QuaternaryCheckTransform")
+
+
 def _problem(checks: object, error: object, *, lineage: str = "original-qbp-schedule") -> QuaternaryOriginalProblem:
     code = PauliCode(checks=np.asarray(checks, dtype=np.uint8))
     return QuaternaryOriginalProblem(
