@@ -67,3 +67,9 @@ def test_digest_discrepancy_and_no_install_guards_are_explicit(tmp_path: Path) -
     script_text = SCRIPT.read_text(encoding="utf-8")
     assert "pip install" not in script_text
     assert "subprocess.run([\"git\", \"ls-remote\"" in script_text
+
+
+def test_proposal_binds_all_unapproved_packages_overlay_and_cmake_identity() -> None:
+    spec = json.loads(SPEC.read_text(encoding="utf-8"))
+    proposal = spec["build_proposal"]
+    assert proposal is not None, "an inert human-review proposal is required"
