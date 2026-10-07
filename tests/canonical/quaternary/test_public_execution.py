@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import inspect
+import importlib.util
 import json
 from pathlib import Path
 
@@ -97,3 +98,80 @@ def test_tracer_replay_rejects_semantic_tampering(tmp_path):
     path.write_text(path.read_text().replace('"not_assessed"', '"assessed"', 1), encoding="utf-8")
     with pytest.raises(ValueError, match="differs"):
         verify_quaternary_tracer(manifest, tmp_path)
+
+
+def _composition(*, schedule: str = "qbp_flooding", transforms=(), intervention: str = "identity", **intervention_config):
+    from bp_registry.quaternary.contracts import QuaternaryCompositionSpec, QuaternaryPolicySpec
+
+    return QuaternaryCompositionSpec(
+        kernel=QuaternaryPolicySpec(kind="qbp_scalar_llr", binding_id="kernel"),
+        schedule=QuaternaryPolicySpec(kind=schedule, binding_id="schedule"),
+        transforms=tuple(
+            QuaternaryPolicySpec(kind=kind, binding_id=f"transform-{index}")
+            for index, kind in enumerate(transforms)
+        ),
+        intervention=QuaternaryPolicySpec(kind=intervention, binding_id="intervention", config=intervention_config),
+    )
+
+
+def test_compatibility_resolves_qualified_baseline_with_complete_evidence():
+    assert importlib.util.find_spec("bp_registry.quaternary.compatibility") is not None
+    from bp_registry.quaternary.compatibility import resolve_quaternary_composition
+
+    resolved = resolve_quaternary_composition(
+        _composition(transforms=("qbp_c2v_normalization",)), problem_kind="general_pauli"
+    )
+
+    assert resolved.run_fidelity == "source_backed"
+    assert resolved.component_fidelity["kernel"] == "source_backed"
+    assert resolved.effective_order == (
+        "qbp_scalar_llr", "qbp_flooding", "qbp_c2v_normalization", "identity",
+    )
+    assert resolved.lifecycle["schedule_freshness"] == "complete_old_v2c_snapshot_then_complete_commit"
+    assert "scalar_commutation_c2v" in resolved.equations
+
+
+def test_compatibility_distinguishes_component_and_run_fidelity_for_qbpgd():
+    from bp_registry.quaternary.compatibility import resolve_quaternary_composition
+
+    resolved = resolve_quaternary_composition(
+        _composition(intervention="qbpgd", continued_messages=True, prior_profile="depolarizing")
+    )
+
+    assert resolved.component_fidelity["intervention"] == "source_backed"
+    assert resolved.run_fidelity == "canonical_adaptation"
+    assert "continued_message_buffers" in resolved.adaptation_reasons
+    assert resolved.procedure_basis == "canonical_qbpgd_interpretation_v1"
+
+
+@pytest.mark.parametrize(
+    "kwargs,match",
+    [
+        ({"schedule": "parallel"}, "unsupported binary"),
+        ({"transforms": ("normalized_min_sum",)}, "unsupported binary"),
+        ({"intervention": "ambp4"}, "AMBP4"),
+        ({"intervention": "asced", "css_only": False}, "non-CSS aSCED"),
+    ],
+)
+def test_compatibility_rejects_unqualified_ports(kwargs, match):
+    from bp_registry.quaternary.compatibility import resolve_quaternary_composition
+
+    with pytest.raises(ValueError, match=match):
+        resolve_quaternary_composition(_composition(**kwargs), problem_kind="general_pauli")
+
+
+def test_compatibility_rejects_empty_or_unowned_compositions():
+    from bp_registry.quaternary.compatibility import resolve_quaternary_composition
+    from bp_registry.quaternary.contracts import QuaternaryCompositionSpec, QuaternaryPolicySpec
+
+    with pytest.raises(ValueError, match="requires kernel"):
+        QuaternaryCompositionSpec(
+            kernel=None,
+            schedule=QuaternaryPolicySpec(kind="qbp_flooding", binding_id="schedule"),
+        )
+    with pytest.raises(ValueError, match="owns state"):
+        resolve_quaternary_composition(
+            _composition(intervention="qbpgd", continued_messages=True, prior_profile="depolarizing").model_copy(
+                update={"intervention": QuaternaryPolicySpec(kind="qbpgd", binding_id="intervention")}
+            )
+        )

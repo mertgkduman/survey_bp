@@ -1,0 +1,9 @@
+{
+  "command": ".venv/bin/python -c '<run test_compatibility_resolves_qualified_baseline_with_complete_evidence as a TAP-emitting assertion test>'",
+  "exitCode": 1,
+  "targetTest": "test_compatibility_resolves_qualified_baseline_with_complete_evidence",
+  "targetFile": "tests/canonical/quaternary/test_public_execution.py",
+  "output": "TAP version 13\nnot ok 1 - test_compatibility_resolves_qualified_baseline_with_complete_evidence\n  ---\n  message: AssertionError: bp_registry.quaternary.compatibility is absent\n  ...\n1..1\n# tests 1\n# pass 0\n# fail 1",
+  "expected": "A closed quaternary compatibility resolver classifies a qualified baseline before sampling.",
+  "actual": "The target import failed because the compatibility resolver module did not exist."
+}
