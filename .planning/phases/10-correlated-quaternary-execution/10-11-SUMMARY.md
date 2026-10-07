@@ -25,15 +25,16 @@ key-decisions:
   - "Canonical GB46 overcomplete construction uses identity rows followed by the first valid X pair image and first valid Z pair image under a 1000-pair cap."
   - "The map accepts named [s_X,g_X,s_Z,g_Z] segments and binds their typed H_ext row order before applying M."
   - "Pinned author triplets remain digest-recorded comparison artifacts and cannot enter canonical execution."
+  - "Canonical map construction admits only a reverified QualifiedAscedBatch, never caller-supplied graph bytes or a standalone receipt."
 patterns-established:
   - "Derived check transforms retain full matrix, row-origin, construction, and qualification digests."
 requirements-completed: [QBP-04]
 plan_head_before: 331f6a348af670d9b24417433282087b84e0ded5
-commits: 3
+commits: 6
 actuals:
-  tokens: 23827
+  tokens: 24027
   tasks: 1
-  commits: 3
+  commits: 6
 coverage:
   - id: D1
     description: Qualified generic and canonical overcomplete maps preserve GF(2) check and syndrome relations with receipt-bound order.
@@ -56,7 +57,7 @@ Receipt-bound canonical GB46 overcomplete mapping with an identity-preserving GF
 ## Accomplishments
 
 - Added immutable generic overcomplete-map qualification that rejects incompatible dimensions, rank loss, content tampering, implicit row order, and broken `H_oc=M H_ext` equations.
-- Constructed the canonical GB46 map from the repaired Plan 10-10 splitter receipt: a 46-row identity prefix followed by one deterministic X pair image and one deterministic Z pair image under the 1000-pair bound.
+- Constructed the canonical GB46 map only after replaying the complete repaired Plan 10-10 `QualifiedAscedBatch`: a 46-row identity prefix followed by one deterministic X pair image and one deterministic Z pair image under the 1000-pair bound.
 - Bound `M`, `H_oc`, the source `H_ext`, typed row-origin map, construction profile, and qualification into a `ConstructedOvercompleteReceipt`; all four Delta=2 virtual syndrome paths use named `[s_X,g_X,s_Z,g_Z]` assembly before `z_oc=M z_ext`.
 - Recorded and independently audited pinned GB46 and toric author matrix identities as standalone comparison-only evidence. They are rejected from canonical syndrome mapping.
 
@@ -65,6 +66,7 @@ Receipt-bound canonical GB46 overcomplete mapping with an identity-preserving GF
 1. **Task 1: Qualify and apply generic overcomplete aSCED mappings**
    - `ed49bcc` `test(10-11): add failing overcomplete map contract`
    - `b91f9bc` `feat(10-11): qualify canonical overcomplete aSCED maps`
+   - `9968ea3` `fix(10-11): require verified splitter batches for canonical maps`
 
 ## Verification
 
@@ -75,16 +77,25 @@ Receipt-bound canonical GB46 overcomplete mapping with an identity-preserving GF
 ## TDD Gate Compliance
 
 - RED evidence: `RED_EVIDENCE_OK` for `test_generic_matrix_relation_and_syndrome_mapping`.
-- GREEN: the focused contract and full related splitter/overcomplete suites pass.
+- GREEN: the focused contract and full related splitter/overcomplete suites pass after the admission-boundary hardening.
 
 ## Decisions Made
 
 - Retain all original extended observation bits by requiring `rank(M)=rows(H_ext)` and placing its identity block first.
 - Make source comparison fixtures non-executable at the syndrome mapping boundary, preventing substitution into the canonical receipt chain.
+- Replay the full splitter construction receipt and qualification at canonical-map admission so a matching H_ext digest alone cannot authorize execution.
 
 ## Deviations from Plan
 
-None - plan executed exactly as written.
+### Auto-fixed Issues
+
+**1. [Rule 1 - Bug] Closed the standalone-receipt canonical-map admission path**
+- **Found during:** Postcompletion audit of Task 1.
+- **Issue:** A caller could supply arbitrary H_ext, row-map, and a fabricated typed splitter receipt whose H_ext digest matched, bypassing the full splitter receipt, source identity, qualification, and search-witness checks.
+- **Fix:** `construct_overcomplete_map` now accepts only `QualifiedAscedBatch` and invokes Plan 10-10's full `_verify_qualified_batch` gate before deriving any map input. Tests cover raw-object rejection, altered graph rows/order, and forged receipt digests.
+- **Files modified:** `src/bp_registry/quaternary/asced_overcomplete.py`, `tests/canonical/quaternary/test_asced_overcomplete.py`, both overcomplete fixtures.
+- **Verification:** Focused overcomplete suite: 8 passed; combined overcomplete/splitter suite: 16 passed.
+- **Committed in:** `9968ea3`.
 
 ## Known Stubs
 
@@ -92,8 +103,8 @@ None.
 
 ## Next Phase Readiness
 
-Plan 10-12 can require the exact constructed splitter/map receipt pair and build all decoder paths from the typed virtual-syndrome order.
+Plan 10-12 can require the exact constructed splitter/map receipt pair and build all decoder paths from the typed virtual-syndrome order. Its constructor call now supplies the full verified `QualifiedAscedBatch`.
 
 ## Self-Check: PASSED
 
-All declared module, fixture, test, and canonical map receipt files exist. The two Task 1 commits are present.
+All declared module, fixture, test, and canonical map receipt files exist. The three Task 1 commits are present.
