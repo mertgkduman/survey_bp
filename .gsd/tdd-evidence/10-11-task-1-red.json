@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/quaternary/test_asced_overcomplete.py::test_generic_matrix_relation_and_syndrome_mapping",
+  "exitCode": 1,
+  "targetTest": "test_generic_matrix_relation_and_syndrome_mapping",
+  "targetFile": "tests/canonical/quaternary/test_asced_overcomplete.py",
+  "output": "TAP version 13\nnot ok 1 - test_generic_matrix_relation_and_syndrome_mapping\n  ---\n  message: AssertionError: qualified aSCED overcomplete mapping module must exist\n  ...\n1..1\n# tests 1\n# pass 0\n# fail 1\n",
+  "expected": "A qualified GF(2) map applies identically to checks and extended syndromes.",
+  "actual": "The target assertion failed because bp_registry.quaternary.asced_overcomplete did not exist."
+}
