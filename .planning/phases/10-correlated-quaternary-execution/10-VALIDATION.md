@@ -46,7 +46,7 @@ The focused command above exercises the named test files. Each task also has its
 | 10-08-02 | 08 | 6 | QBP-04 | Task 2: Expose source components and canonical-adaptation Q-BPGD runs publicly | test_bpgd.py | green |
 | 10-09-01 | 09 | 7 | QBP-01,QBP-04 | Task 1: Execute the fixed-alpha MBP4 recurrence | test_mbp4.py | green |
 | 10-09-02 | 09 | 7 | QBP-01,QBP-04 | Task 2: Run and replay fixed-alpha MBP4 publicly | test_mbp4.py | green |
-| 10-10-01 | 10 | 3 | QBP-04 | Task 1: Construct canonical splitter batches and verify the pinned source fixture | test_asced_splitters.py | green |
+| 10-10-01 | 10 | 3 | QBP-04 | Task 1: Construct and independently qualify deterministic splitter batches from pinned GB46 H; label generated T/H_ext `canonical_adaptation` | test_asced_splitters.py and immutable canonical fixture | green |
 | 10-10-02 | 10 | 3 | QBP-04 | Task 2: Materialize stable batch graphs and transform lineage | test_asced_splitters.py | green |
 | 10-11-01 | 11 | 4 | QBP-04 | Task 1: Qualify and apply generic overcomplete aSCED mappings | test_asced_overcomplete.py | green |
 | 10-12-01 | 12 | 8 | QBP-04 | Task 1: Run all CSS aSCED paths and select by the paper rule | test_asced_ensemble.py, test_public_execution.py | green |
