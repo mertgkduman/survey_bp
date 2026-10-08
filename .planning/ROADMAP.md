@@ -522,7 +522,7 @@ Plans:
 
 ### Phase 10: Correlated Quaternary Execution
 
-**Goal:** A researcher can decode joint Pauli errors through a canonical quaternary BP kernel with verified correlation semantics and explicitly compatible policies.
+**Goal:** As a researcher, I want to decode joint Pauli errors through a canonical quaternary BP kernel, so that correlation semantics and policy compatibility are verified.
 **Mode:** mvp
 **Depends on:** Phase 6
 **Requirements:** QBP-01, QBP-02, QBP-03, QBP-04
