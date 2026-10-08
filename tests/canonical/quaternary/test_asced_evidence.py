@@ -105,7 +105,7 @@ def test_build_refuses_missing_approval_and_ambient_cmake(tmp_path: Path) -> Non
     result = subprocess.run(
         [
             sys.executable, str(SCRIPT), "build", "--approval-summary", str(tmp_path / "missing-summary.md"),
-            "--receipt", str(tmp_path / "missing-approval.json"), "--work-root", str(tmp_path / "native"),
+            "--receipt", str(tmp_path / "missing-approval.json"), "--work-root", str(tmp_path / "native"), "--integration-mode", "development_integration",
         ],
         capture_output=True, text=True, check=False,
     )
@@ -131,7 +131,7 @@ def test_network_build_requires_an_explicit_marker_and_new_unique_work_root(tmp_
         [
             sys.executable, str(SCRIPT), "build", "--spec", str(SPEC),
             "--approval-summary", str(summary), "--receipt", str(receipt),
-            "--work-root", str(unselected_root),
+            "--work-root", str(unselected_root), "--integration-mode", "development_integration",
         ],
         capture_output=True, text=True, check=False,
     )
@@ -142,7 +142,7 @@ def test_network_build_requires_an_explicit_marker_and_new_unique_work_root(tmp_
         [
             sys.executable, str(SCRIPT), "build", "--spec", str(SPEC),
             "--approval-summary", str(summary), "--receipt", str(receipt),
-            "--work-root", str(tmp_path), "--integration-network",
+            "--work-root", str(tmp_path), "--integration-network", "--integration-mode", "development_integration",
         ],
         capture_output=True, text=True, check=False,
     )

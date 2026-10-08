@@ -205,7 +205,7 @@ def _download_exact(url: str, destination: Path, expected: str) -> None:
         raise QualificationError("download", f"SHA-256 mismatch for {destination.name}")
 
 
-def _build(spec_path: Path, summary: Path, receipt_path: Path, *, work_root: Path, integration_network: bool) -> dict[str, Any]:
+def _build(spec_path: Path, summary: Path, receipt_path: Path, *, work_root: Path, integration_network: bool, integration_mode: str) -> dict[str, Any]:
     spec = _load_spec(spec_path)
     verify_source_spec(spec)
     approval_digest = _approval(spec_path, summary)
@@ -213,12 +213,16 @@ def _build(spec_path: Path, summary: Path, receipt_path: Path, *, work_root: Pat
     assert isinstance(proposal, dict)
     if not integration_network:
         raise QualificationError("integration", "native build requires explicit --integration-network")
-    if work_root.exists():
+    if integration_mode not in {"approved_native", "development_integration"}:
+        raise QualificationError("integration", "native build requires an explicit integration mode")
+    approved_root = Path(str(proposal["disposable_root"])).resolve()
+    if integration_mode == "approved_native" and work_root.resolve() != approved_root:
+        raise QualificationError("work_root", "approved native evidence requires the exact approved disposable root")
+    if integration_mode == "development_integration" and work_root.exists():
         raise QualificationError("work_root", "native build work root must be a new unique directory")
-    approved_root = Path(str(proposal["disposable_root"]))
     root = work_root.resolve()
     commands: list[dict[str, Any]] = []
-    receipt: dict[str, Any] = {"schema": "phase10-asced-build-receipt-v1", "source_spec_sha256": approval_digest, "approval_summary": str(summary), "disposable_root": str(root), "started_at": time.time(), "commands": commands}
+    receipt: dict[str, Any] = {"schema": "phase10-asced-build-receipt-v1", "source_spec_sha256": approval_digest, "approval_summary": str(summary), "disposable_root": str(root), "approved_disposable_root": str(approved_root), "execution_authority": integration_mode, "started_at": time.time(), "commands": commands}
     try:
         root.mkdir(parents=True, exist_ok=True)
         primary = ROOT / str(proposal["primary_environment"])
@@ -459,6 +463,7 @@ def _parser() -> argparse.ArgumentParser:
     build.add_argument("--receipt", type=Path, required=True)
     build.add_argument("--work-root", type=Path, required=True, help="new unique disposable directory for this integration build")
     build.add_argument("--integration-network", action="store_true", help="explicitly permit the provisioned networked integration build")
+    build.add_argument("--integration-mode", choices=("approved_native", "development_integration"), required=True, help="development roots cannot qualify native evidence")
     run = command("run")
     run.add_argument("--build-receipt", type=Path, required=True)
     run.add_argument("--output-receipt", type=Path, required=True)
@@ -488,7 +493,7 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(spec["build_proposal"], sort_keys=True))
         return 0
     if args.command == "build":
-        print(json.dumps(_build(args.spec, args.approval_summary, args.receipt, work_root=args.work_root, integration_network=args.integration_network), sort_keys=True))
+        print(json.dumps(_build(args.spec, args.approval_summary, args.receipt, work_root=args.work_root, integration_network=args.integration_network, integration_mode=args.integration_mode), sort_keys=True))
         return 0
     if args.command == "run":
         print(json.dumps(_run_native(args.spec, args.build_receipt, args.output_receipt, code=args.code, rate=args.physical_error_rate, workers=args.workers, max_trials=args.max_trials, target_errors=args.target_errors), sort_keys=True))

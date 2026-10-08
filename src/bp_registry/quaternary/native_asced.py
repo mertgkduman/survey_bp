@@ -119,6 +119,8 @@ def verify_native_asced_receipt(
     build = json.loads(build_path.read_text(encoding="utf-8"))
     if (build.get("schema") != "phase10-asced-build-receipt-v1" or build.get("terminal") != "build_success"
             or build.get("source_spec_sha256") != _SPEC_SHA256
+            or build.get("execution_authority", "approved_native") != "approved_native"
+            or build.get("disposable_root") != str(Path(spec["build_proposal"]["disposable_root"]).resolve())
             or build.get("source_digests_before") != source.get("source_digests")
             or build.get("source_digests_after") != source.get("source_digests")):
         raise ValueError("build receipt does not retain the approved source chain")
