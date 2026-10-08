@@ -12,6 +12,7 @@ from dataclasses import asdict, dataclass
 from hashlib import sha256
 import json
 import numbers
+from collections.abc import Callable
 from typing import Mapping
 
 import numpy as np
@@ -126,9 +127,13 @@ class QbpgdController:
     def _reserve(self, session: QbpSession, delta: WorkVector, leaf: str):
         return session.budgets.reserve(session.budget_scope, delta, leaf_id=leaf)
 
-    def run(self, session: QbpSession) -> QbpgdResult:
+    def run(
+        self, session: QbpSession, *, sweep_once: Callable[[], QbpSweep] | None = None,
+    ) -> QbpgdResult:
         if not isinstance(session, QbpSession):
             raise ValueError("Q-BPGD requires one persistent QBP session")
+        if sweep_once is not None and not callable(sweep_once):
+            raise ValueError("Q-BPGD schedule must provide a callable sweep")
         limit = min(session.problem.code.n, self.spec.round_limit or session.problem.code.n)
         eligible = tuple(range(session.problem.code.n))
         rounds: list[QbpgdRound] = []
@@ -141,7 +146,7 @@ class QbpgdController:
             reason: str | None = None
             for _ in range(self.spec.iterations_per_round):
                 try:
-                    sweep = session.sweep(stop_on_convergence=False)
+                    sweep = session.sweep(stop_on_convergence=False) if sweep_once is None else sweep_once()
                 except Exception:
                     reason = "numerical_failure"
                     break

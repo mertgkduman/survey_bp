@@ -25,6 +25,7 @@ from .kernel import ScalarLlrBp4Kernel
 from .mbp4 import FixedAlphaMbp4Kernel, Mbp4Spec
 from .problems import PauliCode, QuaternaryOriginalProblem, compile_css_artifact
 from .qbpgd import QbpgdController, QbpgdSpec
+from .schedules import QbpFloodingSchedule, QbpVariableSerialSchedule, QuaternaryCheckTransform
 
 
 class PauliValue(IntEnum):
@@ -226,6 +227,82 @@ def _manifest_parts(manifest: Any) -> tuple[TracerPauliProblem, np.ndarray, str,
     return problem, channel, str(payload["run_id"]), int(payload["max_iterations"]), int(payload["max_work"]), float(payload["channel"]["decoder_smoothing"]), _digest(payload)
 
 
+def _public_scalar_schedule(session: Any, composition: Mapping[str, Any]) -> QbpFloodingSchedule | QbpVariableSerialSchedule:
+    """Construct the declared scalar schedule and C2V transforms at the public boundary."""
+    schedule = composition.get("schedule")
+    transforms = composition.get("transforms")
+    if not isinstance(schedule, Mapping) or not isinstance(transforms, (list, tuple)):
+        raise ValueError("public scalar execution requires declared schedule and transform bindings")
+    typed: list[QuaternaryCheckTransform] = []
+    for binding in transforms:
+        if not isinstance(binding, Mapping) or not isinstance(binding.get("config"), Mapping):
+            raise ValueError("public C2V transforms require an explicit parameter configuration")
+        config = binding["config"]
+        if binding.get("kind") == "qbp_c2v_normalization":
+            if "alpha_c" not in config:
+                raise ValueError("public normalization requires alpha_c")
+            typed.append(QuaternaryCheckTransform.normalization(config["alpha_c"]))
+        elif binding.get("kind") == "qbp_c2v_offset":
+            if "beta" not in config:
+                raise ValueError("public offset requires beta")
+            typed.append(QuaternaryCheckTransform.offset(config["beta"]))
+        else:
+            raise ValueError("public scalar execution received an unsupported C2V transform")
+    if schedule.get("kind") == "qbp_flooding":
+        return QbpFloodingSchedule(session, transforms=typed)
+    if schedule.get("kind") == "qbp_variable_serial":
+        return QbpVariableSerialSchedule(session, transforms=typed)
+    raise ValueError("public scalar execution received an unsupported schedule")
+
+
+def run_quaternary_scalar(
+    manifest: Any, output: str | Path, *, resolved_composition: Mapping[str, Any], shot_id: int = 0,
+) -> dict[str, Any]:
+    """Execute a public V2 scalar BP composition through its typed schedule."""
+    problem, channel, run_id, iterations, max_work, smoothing, manifest_sha256 = _manifest_parts(manifest)
+    payload = manifest.model_dump(mode="json") if hasattr(manifest, "model_dump") else manifest
+    physical_identity = _digest({"checks": problem.checks.tolist(), "channel": channel.tolist(), "run_id": run_id})
+    hidden = _sample(channel, seed_identity=f"{physical_identity}:shot:{shot_id}")
+    if not np.array_equal(syndrome_for(problem, hidden), problem.syndrome):
+        raise ValueError("manifest observation does not match its deterministic categorical sample")
+    priors = np.maximum(channel, smoothing); priors /= priors.sum(axis=1, keepdims=True)
+    original = QuaternaryOriginalProblem(
+        lineage_id=f"original-qbp-{manifest_sha256[:16]}",
+        code=PauliCode(checks=problem.checks, source_artifact_identity=f"public-manifest:{manifest_sha256}"),
+        syndrome=problem.syndrome,
+    )
+    session = ScalarLlrBp4Kernel().new_session(
+        original, priors, budgets=BudgetTree(limits=(BudgetLimit("attempt", "bp_calls", max_work),), parents={}),
+    )
+    schedule = _public_scalar_schedule(session, payload["composition"])
+    trace = None
+    for _ in range(iterations):
+        trace = schedule.sweep()
+        if trace.result.converged or trace.result.terminal == "capped":
+            break
+    sweep = session.last
+    termination = "completed" if sweep.converged else ("work_budget_exhausted" if sweep.terminal == "capped" else "max_iterations")
+    candidate = np.asarray(sweep.candidate, dtype=np.uint8)
+    outcome, logical = _evaluate(problem, hidden, candidate)
+    schedule_evidence = {"kind": schedule.__class__.__name__, "transform_order": [] if trace is None else list(trace.transform_order)}
+    events = [
+        _event("preflight", {"run_id": run_id, "shot_id": shot_id, "manifest_sha256": manifest_sha256,
+            "pauli_encoding": "I=0,X=1,Y=2,Z=3", "observation": problem.syndrome.tolist(),
+            "public_schema": "quaternary_experiment_v2", "resolved_composition": dict(resolved_composition)}),
+        _event("sample", {"sample_identity": _digest({"manifest": manifest_sha256, "shot": shot_id}), "channel": channel.tolist(),
+            "decoder_priors": priors.tolist(), "decoder_smoothing": smoothing, "hidden_truth_sealed": True}),
+        _event("scalar_schedule", {**schedule_evidence, "work": sweep.work.as_evidence(structural_event_version=4)}),
+        _event("candidate_freeze", {"candidate": candidate.tolist(), "marginals": sweep.marginals.tolist()}),
+        _event("evaluation", {"outcome": outcome, "logical_action_agrees": logical, "logical_action_unavailable_reason": "non-CSS tracer has no declared logical basis"}),
+        _event("termination", {"termination": termination, "candidate": candidate.tolist(), "outcome": outcome, "assessment_status": "not_assessed"}),
+    ]
+    _write_events(Path(output) / "events.jsonl", events)
+    return {"termination": termination, "outcome": outcome, "run_fidelity": resolved_composition["run_fidelity"],
+        "component_fidelity": resolved_composition["component_fidelity"], "component_ids": {"kernel": "scalar-llr-bp4"},
+        "interpretation_ids": {"schedule": "typed_public_schedule"}, "source_author_code_identity": "unverified",
+        "work": sweep.work.as_evidence(structural_event_version=4)}
+
+
 def run_quaternary_tracer(manifest: Any, output: str | Path, *, shot_id: int = 0) -> TracerQbpResult:
     """Sample, decode, freeze, evaluate, and persist one bounded public shot."""
     problem, channel, run_id, iterations, max_work, epsilon, manifest_sha256 = _manifest_parts(manifest)
@@ -285,11 +362,13 @@ def run_quaternary_qbpgd(
         code=PauliCode(checks=problem.checks, source_artifact_identity=f"public-manifest:{manifest_sha256}"),
         syndrome=problem.syndrome,
     )
+    session = ScalarLlrBp4Kernel().new_session(
+        original, priors, budgets=BudgetTree(limits=(BudgetLimit("attempt", "bp_calls", max_work),), parents={}),
+    )
+    schedule = _public_scalar_schedule(session, payload["composition"])
     decoded = QbpgdController(QbpgdSpec(
         iterations_per_round=iterations, epsilon=float(epsilon), round_limit=rounds, prior_profile=str(profile),
-    )).run(ScalarLlrBp4Kernel().new_session(
-        original, priors, budgets=BudgetTree(limits=(BudgetLimit("attempt", "bp_calls", max_work),), parents={}),
-    ))
+    )).run(session, sweep_once=lambda: schedule.sweep().result)
     candidate = np.asarray(decoded.candidate, dtype=np.uint8)
     outcome, logical = _evaluate(problem, hidden, candidate)
     events = [
@@ -336,6 +415,8 @@ def run_quaternary_mbp4(
     problem, channel, run_id, iterations, max_work, smoothing, manifest_sha256 = _manifest_parts(manifest)
     payload = manifest.model_dump(mode="json") if hasattr(manifest, "model_dump") else manifest
     composition = payload["composition"]
+    if composition.get("transforms"):
+        raise ValueError("public MBP4 does not execute scalar C2V transforms")
     kernel_config = composition["kernel"].get("config")
     if not isinstance(kernel_config, Mapping):
         raise ValueError("public fixed-alpha MBP4 requires an explicit kernel configuration")
@@ -415,6 +496,11 @@ def run_quaternary_asced(
     """Execute the complete receipt-bound CSS aSCED ensemble through the public ledger."""
     problem, channel, run_id, iterations, max_work, smoothing, manifest_sha256 = _manifest_parts(manifest)
     payload = manifest.model_dump(mode="json") if hasattr(manifest, "model_dump") else manifest
+    composition = payload["composition"]
+    if composition.get("transforms"):
+        raise ValueError("public aSCED does not execute scalar C2V transforms")
+    if composition["schedule"]["kind"] != "qbp_flooding":
+        raise ValueError("public aSCED supports only its implemented flooding schedule")
     intervention = payload["composition"]["intervention"]
     config = intervention.get("config", {})
     if not isinstance(config, Mapping) or config.get("css_only") is not True:

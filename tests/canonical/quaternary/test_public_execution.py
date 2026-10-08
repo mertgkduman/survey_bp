@@ -274,6 +274,25 @@ def test_full_public_manifest_resolves_before_sampling_and_replays(tmp_path):
     assert verify_quaternary_run(tmp_path)["verified"] is True
 
 
+def test_public_scalar_schedule_and_transform_are_executed(tmp_path) -> None:
+    data = _public_v2_manifest()
+    data["composition"]["schedule"] = {"kind": "qbp_variable_serial", "binding_id": "schedule"}
+    data["composition"]["transforms"] = [{"kind": "qbp_c2v_normalization", "binding_id": "normalization", "config": {"alpha_c": 2.0}}]
+    run_quaternary(data, tmp_path)
+    events = [json.loads(line) for line in (tmp_path / "events.jsonl").read_text().splitlines()]
+    schedule = next(event["data"] for event in events if event["kind"] == "scalar_schedule")
+    assert schedule["kind"] == "QbpVariableSerialSchedule"
+    assert schedule["transform_order"] == ["lai-kuo-2021-c2v-divide-alpha-c"]
+    assert verify_quaternary_run(tmp_path)["verified"] is True
+
+
+def test_public_transform_without_its_declared_parameter_fails_closed(tmp_path) -> None:
+    data = _public_v2_manifest()
+    data["composition"]["transforms"] = [{"kind": "qbp_c2v_offset", "binding_id": "offset"}]
+    with pytest.raises(ValueError, match="beta"):
+        run_quaternary(data, tmp_path)
+
+
 def test_v2_public_manifest_rejects_unimplemented_multi_shot_budget() -> None:
     """V2 has one immutable observation, so its budget cannot imply a sample set."""
     data = _public_v2_manifest()
@@ -352,16 +371,13 @@ def test_mbp4_public_source_run_records_fixed_recurrence_and_replays(tmp_path):
     assert verify_quaternary_run(tmp_path)["verified"] is True
 
 
-def test_mbp4_public_unsourced_composition_is_canonical_adaptation_and_tampering_fails_replay(tmp_path):
+def test_mbp4_public_transform_composition_fails_closed_until_the_recurrence_executes_it(tmp_path):
     manifest = _mbp4_public_manifest(transforms=("qbp_c2v_normalization",))
     report = preflight_quaternary(manifest)
     assert report["composition"]["run_fidelity"] == "canonical_adaptation"
     assert "mbp4_with_qbp_c2v_normalization" in report["composition"]["adaptation_reasons"]
-    run_quaternary(manifest, tmp_path)
-    path = tmp_path / "events.jsonl"
-    path.write_text(path.read_text(encoding="utf-8").replace('"alpha":0.75', '"alpha":0.5', 1), encoding="utf-8")
-    with pytest.raises(ValueError, match="differs"):
-        verify_quaternary_run(tmp_path)
+    with pytest.raises(ValueError, match="does not execute scalar C2V transforms"):
+        run_quaternary(manifest, tmp_path)
 
 
 @pytest.mark.parametrize(
