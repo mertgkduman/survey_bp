@@ -67,4 +67,4 @@ The user's exact digest approval signal was `approved phase10 native spec 553599
 
 ## Verification and handoff
 
-`sha256sum data/native/phase10-asced-source-spec.json` matched `source_spec_sha256`; `OMP_NUM_THREADS=1 .venv/bin/python scripts/qualify_phase10_native_asced.py --spec data/native/phase10-asced-source-spec.json verify-proposal` returned `verified_pending_human` before this decision. The spec bytes remain unchanged. Plan 10-15 may consume this summary as the approval record and must enforce exact input identities and isolation at build time.
+The source spec file's SHA-256 matched `source_spec_sha256`; its `verify-proposal` check returned `verified_pending_human` before this decision. The spec bytes remain unchanged. Plan 10-15 may consume this summary as the approval record and must enforce exact input identities and isolation at build time.
