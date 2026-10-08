@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+from hashlib import sha256
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -18,6 +20,7 @@ PHASE10_GATE = ROOT / "scripts" / "run_phase10_quaternary_gate.py"
 PHASE10_STUDY = ROOT / "data" / "studies" / "phase10-quaternary-b1-gate.json"
 BP4_MANIFEST = ROOT / "data" / "manifests" / "quaternary-gb46-bp4.json"
 ASCED_MANIFEST = ROOT / "data" / "manifests" / "quaternary-gb46-asced.json"
+PHASE10_OUTPUT = ROOT / "data" / "results" / "phase10-quaternary-b1-gate"
 
 
 def test_source_identity_records_exact_commit_and_audited_discrepancies() -> None:
@@ -205,3 +208,46 @@ def test_phase10_gate_rejects_design_and_native_receipt_tampering(tmp_path: Path
     )
     assert result.returncode != 0
     assert "native aSCED terminal" in result.stderr
+
+
+def test_phase10_persisted_evidence_independently_verifies() -> None:
+    """The retained bounded study must pass its separately invoked verifier."""
+    assert (PHASE10_OUTPUT / "canonical-ledger.jsonl").is_file()
+    assert (PHASE10_OUTPUT / "study-receipt.json").is_file()
+    result = subprocess.run(
+        [
+            sys.executable, str(PHASE10_GATE), "verify", "--study", str(PHASE10_STUDY),
+            "--native-receipt", str(RUN_RECEIPT), "--output", str(PHASE10_OUTPUT),
+        ],
+        capture_output=True, text=True, check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    verified = json.loads(result.stdout)
+    assert verified == {
+        "asced_paths": 2048, "canonical_terminals": 768,
+        "native_logical_errors": 10, "native_trials": 160, "verified": True,
+    }
+
+
+def test_phase10_verifier_rejects_tampered_event_identity(tmp_path: Path) -> None:
+    """A persisted event ID must bind its exact payload rather than only its count."""
+    copied = tmp_path / "result"
+    shutil.copytree(PHASE10_OUTPUT, copied)
+    ledger = copied / "canonical-ledger.jsonl"
+    first, *remaining = ledger.read_text(encoding="utf-8").splitlines()
+    event = json.loads(first)
+    event["event_id"] = "phase10-tampered"
+    ledger.write_text("\n".join([json.dumps(event, sort_keys=True), *remaining]) + "\n", encoding="utf-8")
+    receipt = copied / "study-receipt.json"
+    receipt_payload = json.loads(receipt.read_text(encoding="utf-8"))
+    receipt_payload["canonical_ledger_sha256"] = sha256(ledger.read_bytes()).hexdigest()
+    receipt.write_text(json.dumps(receipt_payload, sort_keys=True, indent=2) + "\n", encoding="utf-8")
+    result = subprocess.run(
+        [
+            sys.executable, str(PHASE10_GATE), "verify", "--study", str(PHASE10_STUDY),
+            "--native-receipt", str(RUN_RECEIPT), "--output", str(copied),
+        ],
+        capture_output=True, text=True, check=False,
+    )
+    assert result.returncode != 0
+    assert "ledger event identity" in result.stderr

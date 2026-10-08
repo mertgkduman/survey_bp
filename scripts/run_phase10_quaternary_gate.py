@@ -13,6 +13,7 @@ from typing import Any
 import numpy as np
 
 from bp_registry.css import CssCode
+from bp_registry.quaternary.algebra import syndrome as pauli_syndrome
 from bp_registry.quaternary.asced import AscedController, AscedSpec, construct_splitter_batch, materialize_asced_batches
 from bp_registry.quaternary.asced_overcomplete import construct_overcomplete_map
 from bp_registry.quaternary.kernel import ScalarLlrBp4Kernel
@@ -104,10 +105,10 @@ def _fixture_batch(study: dict[str, Any], asced: dict[str, Any]):
             or overcomplete.mapping.tolist() != map_fixture["mapping"]
             or overcomplete.h_oc.tolist() != map_fixture["h_oc"] or map_receipt_obj.receipt_sha256 != _MAP_RECEIPT):
         _fail("reconstructed canonical overcomplete map differs from the frozen fixture")
-    return batch, overcomplete, map_receipt_obj
+    return batch, overcomplete, map_receipt_obj, _searches
 
 
-def _validate(study_path: Path, native_path: Path) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any], Any, Any, Any]:
+def _validate(study_path: Path, native_path: Path) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any], Any, Any, Any, Any]:
     study = _load(study_path)
     if study.get("schema") != "phase10-quaternary-mechanism-study-v1":
         _fail("Phase 10 study schema is not admitted")
@@ -141,8 +142,8 @@ def _validate(study_path: Path, native_path: Path) -> tuple[dict[str, Any], dict
             or not isinstance(aggregate, dict) or not isinstance(aggregate.get("trials"), int)
             or not isinstance(aggregate.get("logical_errors"), int)):
         _fail("native aSCED terminal does not retain the required exact aggregate facts")
-    batch, overcomplete, map_receipt = _fixture_batch(study, asced)
-    return study, bp4, asced, native, batch, overcomplete, map_receipt
+    batch, overcomplete, map_receipt, searches = _fixture_batch(study, asced)
+    return study, bp4, asced, native, batch, overcomplete, map_receipt, searches
 
 
 def _sample(seed: int, shot_id: int, probabilities: list[float], n: int) -> np.ndarray:
@@ -170,7 +171,7 @@ def _path_payload(path: Any, original: QuaternaryOriginalProblem, sample_digest:
 
 
 def run(study_path: Path, native_path: Path, output: Path) -> None:
-    study, bp4, asced, native, batch, overcomplete, map_receipt = _validate(study_path, native_path)
+    study, bp4, asced, native, batch, overcomplete, map_receipt, searches = _validate(study_path, native_path)
     if output.exists() and any(output.iterdir()):
         _fail(f"run-once output already exists and is nonempty: {output}")
     output.mkdir(parents=True, exist_ok=True)
@@ -180,9 +181,10 @@ def run(study_path: Path, native_path: Path, output: Path) -> None:
     for shot_id in study["admitted_shot_ids"]:
         hidden = _sample(10, shot_id, channel, batch.code.n)
         sample_digest = sha256(hidden.tobytes()).hexdigest()
-        syndrome = batch.code.syndrome(hidden)
+        code = compile_css_artifact(batch.code, source_artifact_identity="pinned-gb46-h44")
+        syndrome = code.syndrome(hidden)
         original = QuaternaryOriginalProblem(
-            f"original-phase10-gb46-{shot_id}", compile_css_artifact(batch.code, source_artifact_identity="pinned-gb46-h44"), syndrome,
+            f"original-phase10-gb46-{shot_id}", code, syndrome,
         )
         priors = np.tile(np.asarray(channel, dtype=np.float64), (batch.code.n, 1))
         priors = np.maximum(priors, float(bp4["decoder_smoothing"])); priors /= priors.sum(axis=1, keepdims=True)
@@ -194,7 +196,7 @@ def run(study_path: Path, native_path: Path, output: Path) -> None:
             "iteration_cap": 25, "run_fidelity": "canonical_adaptation", "assessment": "not_assessed",
         }))
         batches = materialize_asced_batches(original, (batch,), path_cap=4)
-        for arm, cap, maps in (("asced_ordinary", 25, None), ("asced_overcomplete", 12, {batches[0].batch_id: (overcomplete, map_receipt, construct_overcomplete_map(batch, pair_cap=1000)[2])})):
+        for arm, cap, maps in (("asced_ordinary", 25, None), ("asced_overcomplete", 12, {batches[0].batch_id: (overcomplete, map_receipt, searches)})):
             result = AscedController(AscedSpec(max_iterations=cap, path_cap=4, max_total_bp_calls=int(asced["ordinary"]["max_work"]))).run(
                 original, batches, priors, kernel=kernel, overcomplete=maps,
             )
@@ -227,25 +229,66 @@ def run(study_path: Path, native_path: Path, output: Path) -> None:
 
 
 def verify(study_path: Path, native_path: Path, output: Path) -> None:
-    study, _bp4, _asced, native, _batch, _overcomplete, _map_receipt = _validate(study_path, native_path)
+    study, _bp4, _asced, native, batch, overcomplete, _map_receipt, searches = _validate(study_path, native_path)
     ledger = output / "canonical-ledger.jsonl"; receipt_path = output / "study-receipt.json"
     if not ledger.is_file() or not receipt_path.is_file():
         _fail("persisted run output is incomplete")
     receipt = _load(receipt_path)
     lines = [json.loads(line) for line in ledger.read_text(encoding="utf-8").splitlines()]
-    if receipt.get("study_sha256") != _digest(study) or receipt.get("canonical_ledger_sha256") != sha256(ledger.read_bytes()).hexdigest():
+    if (receipt.get("schema") != "phase10-quaternary-mechanism-run-v1"
+            or receipt.get("study_sha256") != _digest(study)
+            or receipt.get("canonical_ledger_sha256") != sha256(ledger.read_bytes()).hexdigest()
+            or receipt.get("canonical_terminal_count") != 768
+            or receipt.get("asced_path_terminal_count") != 2048
+            or receipt.get("assessment") != "not_assessed"
+            or receipt.get("constructed_receipt_pair") != {
+                "splitter": _SPLITTER_RECEIPT, "map": _MAP_RECEIPT, "h_ext": _H_EXT,
+                "mapping": _MAPPING, "h_oc": _H_OC,
+            }):
         _fail("persisted study receipt digest differs from the frozen design or ledger")
+    event_ids: set[str] = set()
+    for event in lines:
+        event_id = event.get("event_id")
+        raw = {"kind": event.get("kind"), "data": event.get("data")}
+        if not isinstance(event_id, str) or event_id != f"phase10-{_digest(raw)[:20]}" or event_id in event_ids:
+            _fail("ledger event identity is missing, duplicated, or does not bind its payload")
+        event_ids.add(event_id)
     terminals = [event["data"] for event in lines if event.get("kind") == "canonical_terminal"]
     paths = [event["data"] for event in lines if event.get("kind") == "asced_path"]
     if len(terminals) != 768 or len(paths) != 2048:
         _fail("persisted evidence does not contain exactly 768 canonical terminals and 2048 aSCED paths")
+    original_code = compile_css_artifact(batch.code, source_artifact_identity="pinned-gb46-h44")
+    overcomplete_checks = np.array(batch.h_ext, dtype=np.uint8, copy=True)
+    for index, search in enumerate(searches):
+        pauli = 1 if search.role == "x" else 3
+        overcomplete_checks = np.vstack((overcomplete_checks, np.where(overcomplete.h_oc[len(batch.h_ext) + index], pauli, 0).astype(np.uint8)))
     by_shot: dict[int, dict[str, str]] = {}
+    expected_syndromes: dict[int, np.ndarray] = {}
     for terminal in terminals:
         if terminal.get("assessment") != "not_assessed" or terminal.get("run_fidelity") != "canonical_adaptation":
             _fail("canonical terminal assessment or fidelity drifted")
         shot = terminal.get("shot_id"); arm = terminal.get("arm"); digest = terminal.get("sample_digest")
         if not isinstance(shot, int) or arm not in study["arms"] or not isinstance(digest, str):
             _fail("canonical terminal identity is incomplete")
+        expected_hidden = _sample(10, shot, study["channel"]["probabilities"], 46)
+        expected_syndrome = original_code.syndrome(expected_hidden)
+        candidate = terminal.get("candidate")
+        if candidate is None:
+            if arm == "bp4":
+                _fail("standalone BP4 terminal must retain a 46-qubit Pauli candidate")
+            candidate_array = None
+        else:
+            if (not isinstance(candidate, list) or len(candidate) != 46
+                    or any(type(value) is not int or not 0 <= value <= 3 for value in candidate)):
+                _fail("canonical terminal candidate is not a 46-qubit Pauli vector")
+            candidate_array = np.asarray(candidate, dtype=np.uint8)
+        original = QuaternaryOriginalProblem(f"original-phase10-verify-{shot}", original_code, expected_syndrome)
+        if (digest != sha256(expected_hidden.tobytes()).hexdigest()
+                or terminal.get("original_syndrome") != expected_syndrome.tolist()
+                or terminal.get("outcome") != _outcome(original, expected_hidden, candidate_array)
+                or not terminal.get("work")):
+            _fail("canonical terminal sample reconstruction or retained work check failed")
+        expected_syndromes[shot] = expected_syndrome
         by_shot.setdefault(shot, {})[arm] = digest
     if set(by_shot) != set(range(256)) or any(set(arms) != set(study["arms"]) or len(set(arms.values())) != 1 for arms in by_shot.values()):
         _fail("canonical arms do not share exactly one physical sample for every admitted shot")
@@ -261,6 +304,32 @@ def verify(study_path: Path, native_path: Path, output: Path) -> None:
                 _fail("each aSCED arm must retain paths 0..3 for every admitted shot")
             if any(item.get("sample_digest") != by_shot[shot][arm] for item in group):
                 _fail("aSCED path sample identity differs from its canonical arm terminal")
+            for item in group:
+                index = item["path_index"]
+                candidate = item.get("candidate")
+                expected_extended = np.concatenate((
+                    expected_syndromes[shot][:22], [index & 1], expected_syndromes[shot][22:], [(index >> 1) & 1],
+                )).astype(np.uint8)
+                if (not isinstance(candidate, list) or len(candidate) != 46
+                        or any(type(value) is not int or not 0 <= value <= 3 for value in candidate)):
+                    _fail("aSCED path candidate is absent or not a 46-qubit Pauli vector")
+                candidate_array = np.asarray(candidate, dtype=np.uint8)
+                observed = pauli_syndrome(batch.h_ext if arm == "asced_ordinary" else overcomplete_checks, candidate_array)
+                expected_observed = expected_extended if arm == "asced_ordinary" else np.asarray(
+                    (overcomplete.mapping.astype(np.int64) @ expected_extended.astype(np.int64)) % 2, dtype=np.uint8,
+                )
+                if (item.get("virtual_bits_lsb_first") != [index & 1, (index >> 1) & 1]
+                        or len(item.get("extended_syndrome", [])) != 46
+                        or item.get("extended_syndrome") != expected_extended.tolist()
+                        or item.get("original_syndrome") != expected_syndromes[shot].tolist()
+                        or item.get("extended_valid") is not bool(np.array_equal(observed, expected_observed))
+                        or item.get("original_valid") is not bool(np.array_equal(original_code.syndrome(candidate_array), expected_syndromes[shot]))
+                        or not item.get("work")):
+                    _fail("aSCED path does not retain replayable LSB virtual bits, typed syndrome dimensions, or work")
+                if arm == "asced_ordinary" and item.get("overcomplete_map_receipt") is not None:
+                    _fail("ordinary aSCED path unexpectedly binds an overcomplete map")
+                if arm == "asced_overcomplete" and item.get("overcomplete_map_receipt") != _MAP_RECEIPT:
+                    _fail("overcomplete aSCED path does not bind the exact constructed map receipt")
     aggregate = native["aggregate"]
     if receipt.get("native_aggregate") != {"trials": aggregate["trials"], "logical_errors": aggregate["logical_errors"], "sample_matching": "unavailable_aggregate_only"}:
         _fail("native aggregate facts or qualified unavailable matching claim drifted")

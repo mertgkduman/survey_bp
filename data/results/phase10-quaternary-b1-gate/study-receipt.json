@@ -1,0 +1,20 @@
+{
+  "asced_path_terminal_count": 2048,
+  "assessment": "not_assessed",
+  "canonical_ledger_sha256": "feab6c27ebe429d87fe72c6a8c10c939e643d0c68100edda4f3e770209e5357f",
+  "canonical_terminal_count": 768,
+  "constructed_receipt_pair": {
+    "h_ext": "2a50c370f69f9f751e711fd97dd48178844c14bc2117d85e31f12af0f70c6355",
+    "h_oc": "105463db1e405e01cfea9064c3247cbb6902c48d34fcd5b86b162cdc60c8d768",
+    "map": "9f40262f7afe0f109759871179b86b369f42711bd607248f87461db7dc2a4177",
+    "mapping": "4c1c8b14e7a64e1841b2710c93f774638334a776ab33e86e5cb6d6fcfa9b0453",
+    "splitter": "d28362b1d8b97eb01768d8fd33c7f6d04c1050ad828b767c5ebb089da59c8fc9"
+  },
+  "native_aggregate": {
+    "logical_errors": 10,
+    "sample_matching": "unavailable_aggregate_only",
+    "trials": 160
+  },
+  "schema": "phase10-quaternary-mechanism-run-v1",
+  "study_sha256": "87d9cd1e86f3a52d4bfb8cb2fb1cf030b610a12f5572da22b4d9ba91a0b31352"
+}
