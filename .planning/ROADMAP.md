@@ -6,7 +6,7 @@ Build a provenance-preserving research platform from paper evidence through nati
 
 **Milestone:** v1.0 — platform and first journal-paper evidence.
 **Structure:** End-to-end capability slices (`mvp` mode), fine granularity. Fourteen phases are used because the three required regimes each need distinct implementation and experimental qualification; phase counts are not a reason to merge those gates or defer publication scope.
-**Planning status:** Phases 1–4 and 6 are complete. Phase 5 implementation is technically verified with human visual review still open. Phase 7 is paused at 6/15 completed plans by user direction to prioritize BP variants; its failed OSD qualification remains recorded. Phase 10 quaternary BP execution is next. Campaign and reproduction work remains in the first journal milestone. Later plan counts remain TBD.
+**Planning status:** Phases 1–4, 6, and 10 are complete. Phase 5 implementation is technically verified with human visual review still open. Phase 7 is paused at 6/15 completed plans by user direction to prioritize BP variants; its failed OSD qualification remains recorded. Campaign and reproduction work remains in the first journal milestone. Later plan counts remain TBD.
 
 ## Phases
 
@@ -649,7 +649,7 @@ Plans:
 
 ## Progress
 
-**Execution order:** Phases 1–6 are complete or technically verified as recorded above. Phase 7 is paused. Execute Phase 10 quaternary BP next, then Phase 8 campaign controls before statistical assessment in Phases 9 and 11. The later circuit and journal phases retain their dependencies. Independent plans within a phase may execute in parallel once their dependencies are verified.
+**Execution order:** Phases 1–6 are complete or technically verified as recorded above. Phase 7 is paused, and Phase 10 quaternary BP is complete. Phase 8 campaign controls precede statistical assessment in Phases 9 and 11. The later circuit and journal phases retain their dependencies. Independent plans within a phase may execute in parallel once their dependencies are verified.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
