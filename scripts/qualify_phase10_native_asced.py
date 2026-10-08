@@ -213,6 +213,15 @@ def _build(spec_path: Path, summary: Path, receipt_path: Path) -> dict[str, Any]
         root.mkdir(parents=True, exist_ok=True)
         primary = ROOT / str(proposal["primary_environment"])
         receipt["primary_environment_sha256_before"] = _file_sha256(primary)
+        compiler = shutil.which("c++")
+        if compiler is None:
+            raise QualificationError("compiler", "no C++ compiler is available for the approved native build")
+        receipt["environment"] = {
+            "builder_python": sys.executable,
+            "builder_python_version": sys.version,
+            "omp_num_threads": "1",
+        }
+        receipt["compiler"] = {"path": compiler, "version": _run([compiler, "--version"])["stdout"]}
         source_dir = _prepare_source(spec, commands)
         receipt["source_digests_before"] = _algorithm_digests(source_dir, spec)
         downloads = root / "downloads"
@@ -252,6 +261,15 @@ def _build(spec_path: Path, summary: Path, receipt_path: Path) -> dict[str, Any]
         build_dir, prefix = Path(str(proposal["driver"]["build_directory"])), Path(str(proposal["driver"]["install_prefix"]))
         build_env = {"PATH": f"{venv_dir / 'bin'}:{os.environ.get('PATH', '')}", "HOME": str(root), "PYTHONNOUSERSITE": "1", "OMP_NUM_THREADS": "1"}
         commands.append(_run([str(cmake_path), "-S", str(source_dir), "-B", str(build_dir), f"-DCMAKE_INSTALL_PREFIX={prefix}", "-DCMAKE_BUILD_TYPE=Release"], env=build_env, timeout=600))
+        nlohmann_header = build_dir / "_deps" / "nlohmann_json-src" / "json.hpp"
+        if not nlohmann_header.is_file():
+            raise QualificationError("build_input", "the source-declared nlohmann/json header was not materialized")
+        receipt["source_declared_transitive_build_input"] = {
+            "component": "nlohmann/json",
+            "declared_by": "pinned source CMakeLists.txt FetchContent URL v3.11.3",
+            "path": str(nlohmann_header),
+            "observed_sha256": _file_sha256(nlohmann_header),
+        }
         commands.append(_run([str(cmake_path), "--build", str(build_dir), "--parallel", "1"], env=build_env, timeout=900))
         commands.append(_run([str(cmake_path), "--install", str(build_dir)], env=build_env, timeout=180))
         probe = "import sys; sys.path.insert(0, sys.argv[1]); import QEC; assert hasattr(QEC, 'Simulation_Env'); print(QEC.__file__)"

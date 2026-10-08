@@ -129,6 +129,8 @@ def test_approved_build_emits_a_digest_bound_success_receipt(tmp_path: Path) -> 
     payload = json.loads(receipt.read_text(encoding="utf-8"))
     assert payload["terminal"] == "build_success"
     assert payload["source_spec_sha256"] == "55359962431c055cf971171f81d75997282beb29e8928a8d82e023fbb6c1f24e"
+    assert payload["compiler"]["path"]
+    assert len(payload["source_declared_transitive_build_input"]["observed_sha256"]) == 64
 
 
 def test_native_pauli_translation_is_bijective_and_native_identity_is_distinct() -> None:

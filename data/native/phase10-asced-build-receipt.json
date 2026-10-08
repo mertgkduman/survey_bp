@@ -128,7 +128,7 @@
       "cwd": null,
       "returncode": 0,
       "stderr": "Using compatibility mode for Python, set PYBIND11_FINDPYTHON to NEW/OLD to silence this message\n",
-      "stdout": "-- The C compiler identification is GNU 11.5.0\n-- The CXX compiler identification is GNU 11.5.0\n-- Detecting C compiler ABI info\n-- Detecting C compiler ABI info - done\n-- Check for working C compiler: /usr/bin/cc - skipped\n-- Detecting C compile features\n-- Detecting C compile features - done\n-- Detecting CXX compiler ABI info\n-- Detecting CXX compiler ABI info - done\n-- Check for working CXX compiler: /usr/bin/c++ - skipped\n-- Detecting CXX compile features\n-- Detecting CXX compile features - done\n-- Found OpenMP_C: -fopenmp (found version \"4.5\")\n-- Found OpenMP_CXX: -fopenmp (found version \"4.5\")\n-- Found OpenMP: TRUE (found version \"4.5\")\n-- pybind11 v3.1.0 \n-- Found Python: /tmp/phase10-asced-native/venv/bin/python3.12 (found suitable version \"3.12.2\", minimum required is \"3.9\") found components: Interpreter Development.Module Development.Embed\n-- Performing Test HAS_FLTO_AUTO\n-- Performing Test HAS_FLTO_AUTO - Success\n-- Configuring done (3.0s)\n-- Generating done (0.0s)\n-- Build files have been written to: /tmp/phase10-asced-native/build\n"
+      "stdout": "-- pybind11 v3.1.0 \n-- Configuring done (0.3s)\n-- Generating done (0.0s)\n-- Build files have been written to: /tmp/phase10-asced-native/build\n"
     },
     {
       "command": [
@@ -167,8 +167,17 @@
       "stdout": "/tmp/phase10-asced-native/prefix/QEC.cpython-312-x86_64-linux-gnu.so\n"
     }
   ],
-  "completed_at": 1791417277.35326,
+  "compiler": {
+    "path": "/usr/bin/c++",
+    "version": "c++ (GCC) 11.5.0 20240719 (Red Hat 11.5.0-14)\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n"
+  },
+  "completed_at": 1791418046.8383048,
   "disposable_root": "/tmp/phase10-asced-native",
+  "environment": {
+    "builder_python": "/hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python",
+    "builder_python_version": "3.12.2 | packaged by Anaconda, Inc. | (main, Feb 27 2024, 17:35:02) [GCC 11.2.0]",
+    "omp_num_threads": "1"
+  },
   "packages": {
     "galois": {
       "artifact": "/tmp/phase10-asced-native/downloads/galois-0.4.11-py3-none-any.whl",
@@ -194,6 +203,12 @@
   "primary_environment_sha256_after": "adff1f54bb2f574a9eec84fc71ff16720d8e29b0051818484612b29c541a7cd4",
   "primary_environment_sha256_before": "adff1f54bb2f574a9eec84fc71ff16720d8e29b0051818484612b29c541a7cd4",
   "schema": "phase10-asced-build-receipt-v1",
+  "source_declared_transitive_build_input": {
+    "component": "nlohmann/json",
+    "declared_by": "pinned source CMakeLists.txt FetchContent URL v3.11.3",
+    "observed_sha256": "9bea4c8066ef4a1c206b2be5a36302f8926f7fdc6087af5d20b417d0cf103ea6",
+    "path": "/tmp/phase10-asced-native/build/_deps/nlohmann_json-src/json.hpp"
+  },
   "source_digests_after": {
     ".gitmodules": "d97bea252de1fdc5cb012e2be44b7aae00e1984c16b36a1854304d55ac899bb0",
     "CMakeLists.txt": "23c7041b6cfe74502222cb3044b5e7ab6e887d1e6541e1fee8c08f32f199667c",
@@ -221,6 +236,6 @@
     "src/Pybind11_Module.cpp": "23f0d1d5ce3b431748c3b09228ebff5642840c048b94952543db2e99352de1d1"
   },
   "source_spec_sha256": "55359962431c055cf971171f81d75997282beb29e8928a8d82e023fbb6c1f24e",
-  "started_at": 1791417079.0726552,
+  "started_at": 1791417861.1053371,
   "terminal": "build_success"
 }

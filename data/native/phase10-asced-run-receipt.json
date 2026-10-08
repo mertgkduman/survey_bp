@@ -8,7 +8,7 @@
     "code": "GB46",
     "failure_I": 10,
     "failure_II": 0,
-    "logical_error_rate": 0.03460207612456748,
+    "logical_error_rate": 0.0625,
     "logical_errors": 10,
     "native_pauli_order": [
       "I",
@@ -17,12 +17,12 @@
       "Y"
     ],
     "physical_error_rate": 0.05,
-    "success_I": 266,
+    "success_I": 131,
     "success_II": 0,
-    "trials": 289
+    "trials": 160
   },
   "assessment": "not_assessed",
-  "build_receipt_sha256": "4c7ee6fa78865cc51c24e8ecda90ec59962bf4797fd7ad840acefb2665449841",
+  "build_receipt_sha256": "76b31006136ccecef1c3c4a27e8f4476ee1dd999a284bbbee4701682b7d7dcff",
   "build_terminal": "build_success",
   "code": "GB46",
   "commands": [
@@ -40,10 +40,10 @@
       "cwd": null,
       "returncode": 0,
       "stderr": "",
-      "stdout": "{\"channel_proportions\": {\"X\": 0.016666666666666666, \"Y\": 0.016666666666666666, \"Z\": 0.016666666666666666}, \"code\": \"GB46\", \"failure_I\": 10, \"failure_II\": 0, \"logical_error_rate\": 0.03460207612456748, \"logical_errors\": 10, \"native_pauli_order\": [\"I\", \"X\", \"Z\", \"Y\"], \"physical_error_rate\": 0.05, \"success_I\": 266, \"success_II\": 0, \"trials\": 289}\n"
+      "stdout": "{\"channel_proportions\": {\"X\": 0.016666666666666666, \"Y\": 0.016666666666666666, \"Z\": 0.016666666666666666}, \"code\": \"GB46\", \"failure_I\": 10, \"failure_II\": 0, \"logical_error_rate\": 0.0625, \"logical_errors\": 10, \"native_pauli_order\": [\"I\", \"X\", \"Z\", \"Y\"], \"physical_error_rate\": 0.05, \"success_I\": 131, \"success_II\": 0, \"trials\": 160}\n"
     }
   ],
-  "completed_at": 1791417504.4924092,
+  "completed_at": 1791418062.1260462,
   "max_trials": 10000,
   "metric_facts": [
     {
@@ -54,7 +54,7 @@
       "scope": "native_aggregate_probe",
       "unavailable_reason": null,
       "unit": "trials",
-      "value": 289
+      "value": 160
     },
     {
       "method": "QEC.Simulation_Stats.logical_errors",
@@ -166,7 +166,7 @@
     "src/Pybind11_Module.cpp": "23f0d1d5ce3b431748c3b09228ebff5642840c048b94952543db2e99352de1d1"
   },
   "source_spec_sha256": "55359962431c055cf971171f81d75997282beb29e8928a8d82e023fbb6c1f24e",
-  "started_at": 1791417501.2759104,
+  "started_at": 1791418060.3983052,
   "target_errors": 10,
   "terminal": "native_success",
   "workers": 1
