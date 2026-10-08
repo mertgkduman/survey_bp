@@ -14,6 +14,10 @@ ROOT = Path(__file__).resolve().parents[3]
 SCRIPT = ROOT / "scripts" / "qualify_phase10_native_asced.py"
 SPEC = ROOT / "data" / "native" / "phase10-asced-source-spec.json"
 RUN_RECEIPT = ROOT / "data" / "native" / "phase10-asced-run-receipt.json"
+PHASE10_GATE = ROOT / "scripts" / "run_phase10_quaternary_gate.py"
+PHASE10_STUDY = ROOT / "data" / "studies" / "phase10-quaternary-b1-gate.json"
+BP4_MANIFEST = ROOT / "data" / "manifests" / "quaternary-gb46-bp4.json"
+ASCED_MANIFEST = ROOT / "data" / "manifests" / "quaternary-gb46-asced.json"
 
 
 def test_source_identity_records_exact_commit_and_audited_discrepancies() -> None:
@@ -153,3 +157,51 @@ def test_native_run_receipt_preserves_aggregate_and_qualified_missingness() -> N
     assert result.assessment == "not_assessed"
     assert result.metric("native_shot_identity").missingness.value == "unavailable"
     assert result.metric("native_edge_updates").value is None
+
+
+def test_phase10_mechanism_design_freezes_the_exact_canonical_adaptation_pair() -> None:
+    """D-13 fixes GB46, p=.05, seed 10, and every shared canonical sample."""
+    assert PHASE10_GATE.exists(), "the digest-checked Phase 10 mechanism gate is required"
+    assert PHASE10_STUDY.exists() and BP4_MANIFEST.exists() and ASCED_MANIFEST.exists()
+    study = json.loads(PHASE10_STUDY.read_text(encoding="utf-8"))
+    bp4 = json.loads(BP4_MANIFEST.read_text(encoding="utf-8"))
+    asced = json.loads(ASCED_MANIFEST.read_text(encoding="utf-8"))
+    assert study["profile"] == {"code": "GB46", "physical_error_rate": 0.05, "canonical_seed": 10}
+    assert study["admitted_shot_ids"] == list(range(256))
+    assert study["assessment"] == "not_assessed"
+    assert study["phase11_boundary"] == "no_curve_reproduction_or_performance_ranking"
+    assert bp4["run_fidelity"] == "canonical_adaptation"
+    assert asced["run_fidelity"] == "canonical_adaptation"
+    assert asced["ordinary"]["iteration_cap"] == 25
+    assert asced["overcomplete"]["iteration_cap"] == 12
+    assert asced["ordinary"]["paths_per_shot"] == asced["overcomplete"]["paths_per_shot"] == 4
+    pair = asced["constructed_receipt_pair"]
+    assert pair["row_order"] == ["H_X", "T_X", "H_Z", "T_Z"]
+    assert pair["constructed_splitter_receipt_sha256"] == "d28362b1d8b97eb01768d8fd33c7f6d04c1050ad828b767c5ebb089da59c8fc9"
+    assert pair["constructed_map_receipt_sha256"] == "9f40262f7afe0f109759871179b86b369f42711bd607248f87461db7dc2a4177"
+    assert study["native_requirement"]["required_terminal"] == "native_success"
+
+
+def test_phase10_gate_rejects_design_and_native_receipt_tampering(tmp_path: Path) -> None:
+    """The study cannot silently drift or accept a failed native substitute."""
+    study = json.loads(PHASE10_STUDY.read_text(encoding="utf-8"))
+    study["profile"]["physical_error_rate"] = 0.1
+    tampered_study = tmp_path / "study.json"
+    tampered_study.write_text(json.dumps(study), encoding="utf-8")
+    result = subprocess.run(
+        [sys.executable, str(PHASE10_GATE), "freeze", "--study", str(tampered_study), "--native-receipt", str(RUN_RECEIPT)],
+        capture_output=True, text=True, check=False,
+    )
+    assert result.returncode != 0
+    assert "p=0.05" in result.stderr
+
+    native = json.loads(RUN_RECEIPT.read_text(encoding="utf-8"))
+    native["terminal"] = "native_failed"
+    tampered_native = tmp_path / "native.json"
+    tampered_native.write_text(json.dumps(native), encoding="utf-8")
+    result = subprocess.run(
+        [sys.executable, str(PHASE10_GATE), "freeze", "--study", str(PHASE10_STUDY), "--native-receipt", str(tampered_native)],
+        capture_output=True, text=True, check=False,
+    )
+    assert result.returncode != 0
+    assert "native aSCED terminal" in result.stderr
