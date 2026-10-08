@@ -19,7 +19,7 @@ Build a provenance-preserving research platform from paper evidence through nati
 - [ ] **Phase 7: Optional Postprocessing** — Paused by user after 6/15 plans to prioritize BP variants; retain the isolated OSD qualification failure and completed LSD/SI/OTF work for later resumption.
 - [ ] **Phase 8: Reproducible Campaigns and Statistical Assessment** — Run paired, resumable campaigns with prespecified statistical criteria.
 - [ ] **Phase 9: CSS Reproduction and Controlled Comparisons** — Qualify selected source results and isolate policy contributions in CSS decoding.
-- [ ] **Phase 10: Correlated Quaternary Execution** — Add joint Pauli inference and explicitly compatible policy compositions.
+- [x] **Phase 10: Correlated Quaternary Execution** — Add joint Pauli inference and explicitly compatible policy compositions. (completed 2026-10-08)
 - [ ] **Phase 11: Quaternary Reproduction and Comparisons** — Qualify correlated decoding and compare it with separate binary inference.
 - [ ] **Phase 12: Circuit Models and Canonical Integration** — Decode noisy extraction circuits with validated detector/observable semantics.
 - [ ] **Phase 13: Circuit Reproduction and Comparisons** — Qualify source-faithful circuit experiments and controlled policy comparisons.
@@ -535,7 +535,7 @@ Plans:
 
 **Research focus:** Quaternary factor equations, scalar/vector message representations, memory/numeric choices, and policy-specific compatibility derivations.
 **Priority decision:** Begin this phase next, ahead of campaign infrastructure and reproduction, while Phase 7 optional postprocessing remains paused. Reuse the verified CSS execution lifecycle where mathematically compatible; keep correlated quaternary factors in their own canonical kernel family.
-**Plans:** 16/16 plans executed.
+**Plans:** 16/16 plans complete
 
 Plans:
 
@@ -662,7 +662,7 @@ Plans:
 | 7. Optional Postprocessing | 6/15 | Paused by user; POST-01 qualification failed |  |
 | 8. Reproducible Campaigns and Statistical Assessment | 0/TBD | Not started | - |
 | 9. CSS Reproduction and Controlled Comparisons | 0/TBD | Not started | - |
-| 10. Correlated Quaternary Execution | 16/16 | In Progress|  |
+| 10. Correlated Quaternary Execution | 16/16 | Complete    | 2026-10-08 |
 | 11. Quaternary Reproduction and Comparisons | 0/TBD | Not started | - |
 | 12. Circuit Models and Canonical Integration | 0/TBD | Not started | - |
 | 13. Circuit Reproduction and Comparisons | 0/TBD | Not started | - |
