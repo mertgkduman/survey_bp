@@ -1,6 +1,6 @@
 ---
 phase: 10-correlated-quaternary-execution
-verified: 2026-10-08T09:17:00Z
+verified: 2026-10-08T09:19:00Z
 status: passed
 score: 8/8 must-haves verified
 covered_files:
@@ -94,7 +94,7 @@ covered_files:
   - tests/canonical/quaternary/test_sampling.py
   - tests/canonical/quaternary/test_schedules.py
   - tests/canonical/quaternary/test_vector_oracle.py
-covered_digest: "v1:sha256:ea2b8370c9b3da95f3afb4050a608754368c7ad0284824c1b56d649cc1285880"
+covered_digest: "v1:sha256:9a803136d434884680706e5b79ccff97f4bc42af176a0d757390331a74b65b0f"
 behavior_unverified: 0
 overrides_applied: 0
 re_verification:
@@ -109,7 +109,7 @@ re_verification:
 # Phase 10: Correlated Quaternary Execution Verification Report
 
 **Phase Goal:** As a researcher, I want to decode joint Pauli errors through a canonical quaternary BP kernel, so that correlation semantics and policy compatibility are verified.
-**Verified:** 2026-10-08T09:17:00Z
+**Verified:** 2026-10-08T09:19:00Z
 **Status:** passed
 **Re-verification:** Yes — after the complete 256-shot decoder replay closed the prior behavior-verification item and after inspecting the final phase-completion metadata refresh. The completion marker and Plan 10-14 wording clarification do not change the phase goal, requirements, approval boundary, or executable evidence.
 
@@ -229,5 +229,5 @@ The final metadata refresh marks Phase 10 complete and clarifies the Plan 10-14 
 
 ---
 
-_Verified: 2026-10-08T09:17:00Z_
+_Verified: 2026-10-08T09:19:00Z_
 _Verifier: the agent (gsd-verifier)_
