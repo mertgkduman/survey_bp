@@ -1,0 +1,16 @@
+{
+  "schema": "phase10-quaternary-arm-v1",
+  "arm": "bp4",
+  "code": "GB46",
+  "physical_sample_namespace": "phase10-quaternary-b1-gate/seed-10/shot-id",
+  "kernel": "quaternary-bp4-f64-v1",
+  "iteration_cap": 25,
+  "max_work": 1000000,
+  "decoder_smoothing": 1e-12,
+  "tie_rule": "I_then_X_then_Y_then_Z",
+  "source_component_ids": [
+    "lai-kuo-2104.00304:scalar-llr-bp4-check-and-variable-equations"
+  ],
+  "run_fidelity": "canonical_adaptation",
+  "assessment": "not_assessed"
+}

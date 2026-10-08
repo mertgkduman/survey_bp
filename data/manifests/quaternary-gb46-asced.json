@@ -1,0 +1,40 @@
+{
+  "schema": "phase10-quaternary-asced-arms-v1",
+  "code": "GB46",
+  "physical_sample_namespace": "phase10-quaternary-b1-gate/seed-10/shot-id",
+  "run_fidelity": "canonical_adaptation",
+  "assessment": "not_assessed",
+  "source_component_ids": [
+    "wursthorn-et-al-2605.06547:css-affine-subcode-ensemble",
+    "kit-cel/quantum_asced@816772071486615dfc7d71d1e15df597edc58a26:bp4-and-selection-components"
+  ],
+  "ordinary": {
+    "paths_per_shot": 4,
+    "iteration_cap": 25,
+    "max_work": 1000000,
+    "L": 1,
+    "Delta": 2,
+    "selection_tie_rule": "minimum_pauli_weight_then_batch_then_path"
+  },
+  "overcomplete": {
+    "paths_per_shot": 4,
+    "iteration_cap": 12,
+    "max_work": 1000000,
+    "L": 1,
+    "Delta": 2,
+    "selection_tie_rule": "minimum_pauli_weight_then_batch_then_path"
+  },
+  "constructed_receipt_pair": {
+    "splitter_fixture": "data/fixtures/quaternary/asced-gb46-canonical-fixture.json",
+    "overcomplete_map_fixture": "data/fixtures/quaternary/asced-gb46-canonical-overcomplete-map.json",
+    "constructed_splitter_receipt_sha256": "d28362b1d8b97eb01768d8fd33c7f6d04c1050ad828b767c5ebb089da59c8fc9",
+    "constructed_map_receipt_sha256": "9f40262f7afe0f109759871179b86b369f42711bd607248f87461db7dc2a4177",
+    "h_ext_sha256": "2a50c370f69f9f751e711fd97dd48178844c14bc2117d85e31f12af0f70c6355",
+    "mapping_sha256": "4c1c8b14e7a64e1841b2710c93f774638334a776ab33e86e5cb6d6fcfa9b0453",
+    "h_oc_sha256": "105463db1e405e01cfea9064c3247cbb6902c48d34fcd5b86b162cdc60c8d768",
+    "row_order": ["H_X", "T_X", "H_Z", "T_Z"],
+    "typed_h_ext_row_order": "[H_X,T_X,H_Z,T_Z]",
+    "virtual_extension_order": "[s_X,g_X,s_Z,g_Z]",
+    "overcomplete_syndrome": "z_oc=M*z_ext"
+  }
+}
