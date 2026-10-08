@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib.util
 import json
 from hashlib import sha256
 import shutil
@@ -210,8 +211,8 @@ def test_phase10_gate_rejects_design_and_native_receipt_tampering(tmp_path: Path
     assert "native aSCED terminal" in result.stderr
 
 
-def test_phase10_persisted_evidence_independently_verifies() -> None:
-    """The retained bounded study must pass its separately invoked verifier."""
+def test_phase10_persisted_evidence_requires_explicit_full_decoder_replay() -> None:
+    """Hashes and syndrome checks cannot certify that a decoder made the result."""
     assert (PHASE10_OUTPUT / "canonical-ledger.jsonl").is_file()
     assert (PHASE10_OUTPUT / "study-receipt.json").is_file()
     result = subprocess.run(
@@ -221,12 +222,24 @@ def test_phase10_persisted_evidence_independently_verifies() -> None:
         ],
         capture_output=True, text=True, check=False,
     )
-    assert result.returncode == 0, result.stderr
-    verified = json.loads(result.stdout)
-    assert verified == {
-        "asced_paths": 2048, "canonical_terminals": 768,
-        "native_logical_errors": 10, "native_trials": 160, "verified": True,
-    }
+    assert result.returncode != 0
+    assert "requires explicit --replay" in result.stderr
+
+
+def test_phase10_replay_compares_regenerated_decoder_ledger(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A syntactically valid submitted ledger still needs executable replay bytes."""
+    spec = importlib.util.spec_from_file_location("phase10_gate", PHASE10_GATE)
+    assert spec is not None and spec.loader is not None
+    gate = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(gate)
+
+    def forged_replay(_study: Path, _native: Path, output: Path) -> None:
+        output.mkdir(parents=True)
+        (output / "canonical-ledger.jsonl").write_text("forged\n", encoding="utf-8")
+
+    monkeypatch.setattr(gate, "run", forged_replay)
+    with pytest.raises(ValueError, match="differs from full deterministic decoder replay"):
+        gate.verify(PHASE10_STUDY, RUN_RECEIPT, PHASE10_OUTPUT, replay=True)
 
 
 def test_phase10_verifier_rejects_tampered_event_identity(tmp_path: Path) -> None:

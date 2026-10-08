@@ -8,6 +8,7 @@ from hashlib import sha256
 import json
 from pathlib import Path
 import sys
+import tempfile
 from typing import Any
 
 import numpy as np
@@ -228,7 +229,12 @@ def run(study_path: Path, native_path: Path, output: Path) -> None:
     (output / "study-receipt.json").write_text(json.dumps(receipt, sort_keys=True, indent=2) + "\n", encoding="utf-8")
 
 
-def verify(study_path: Path, native_path: Path, output: Path) -> None:
+def verify(study_path: Path, native_path: Path, output: Path, *, replay: bool = False) -> None:
+    """Verify retained structure and, explicitly, regenerate decoder output.
+
+    Event hashes bind submitted payloads only.  Decoder-result verification is
+    therefore unavailable until the full frozen batch is replayed.
+    """
     study, _bp4, _asced, native, batch, overcomplete, _map_receipt, searches = _validate(study_path, native_path)
     ledger = output / "canonical-ledger.jsonl"; receipt_path = output / "study-receipt.json"
     if not ledger.is_file() or not receipt_path.is_file():
@@ -253,6 +259,8 @@ def verify(study_path: Path, native_path: Path, output: Path) -> None:
         if not isinstance(event_id, str) or event_id != f"phase10-{_digest(raw)[:20]}" or event_id in event_ids:
             _fail("ledger event identity is missing, duplicated, or does not bind its payload")
         event_ids.add(event_id)
+    if not replay:
+        _fail("canonical decoder output requires explicit --replay verification")
     terminals = [event["data"] for event in lines if event.get("kind") == "canonical_terminal"]
     paths = [event["data"] for event in lines if event.get("kind") == "asced_path"]
     if len(terminals) != 768 or len(paths) != 2048:
@@ -333,6 +341,16 @@ def verify(study_path: Path, native_path: Path, output: Path) -> None:
     aggregate = native["aggregate"]
     if receipt.get("native_aggregate") != {"trials": aggregate["trials"], "logical_errors": aggregate["logical_errors"], "sample_matching": "unavailable_aggregate_only"}:
         _fail("native aggregate facts or qualified unavailable matching claim drifted")
+    # Reuse the run path so candidates, terminals, work, selections, and paths
+    # are compared to executable controller output rather than self-reported
+    # event fields.
+    with tempfile.TemporaryDirectory(prefix="phase10-replay-", dir=output.parent) as temporary:
+        expected_output = Path(temporary) / "expected"
+        run(study_path, native_path, expected_output)
+        if ledger.read_bytes() != (expected_output / "canonical-ledger.jsonl").read_bytes():
+            _fail("canonical ledger differs from full deterministic decoder replay")
+        if receipt_path.read_bytes() != (expected_output / "study-receipt.json").read_bytes():
+            _fail("study receipt differs from full deterministic decoder replay")
     print(json.dumps({"verified": True, "canonical_terminals": len(terminals), "asced_paths": len(paths), "native_trials": aggregate["trials"], "native_logical_errors": aggregate["logical_errors"]}, sort_keys=True))
 
 
@@ -342,6 +360,7 @@ def main() -> None:
     parser.add_argument("--study", type=Path, required=True)
     parser.add_argument("--native-receipt", type=Path, required=True)
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--replay", action="store_true", help="regenerate all 256 canonical shots before declaring decoder output verified")
     args = parser.parse_args()
     try:
         if args.command == "freeze":
@@ -351,7 +370,7 @@ def main() -> None:
             run(args.study, args.native_receipt, args.output)
         else:
             if args.output is None: _fail("verify requires --output")
-            verify(args.study, args.native_receipt, args.output)
+            verify(args.study, args.native_receipt, args.output, replay=args.replay)
     except (ValueError, KeyError, TypeError) as error:
         print(str(error), file=sys.stderr); raise SystemExit(1)
 
