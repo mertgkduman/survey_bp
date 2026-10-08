@@ -15,6 +15,7 @@ Make BP decoder differences explicit, reproducible, and fairly comparable by exp
 - ✓ Versioned mapping protocol, initial source-linked screening records, and CSS evidence taxonomy — Phase 1. This is an initial mapped set, not the completed literature study.
 - ✓ Strict manifest and immutable CSS artifact preflight, with independently checked algebra and ordered hashes — Phase 1.
 - ✓ Pinned native binary BP CSS pilot with a durable shot ledger and independent outcome evaluation — Phase 1. The 32-shot run is `pilot_adaptation` and `not_assessed`, not a statistical paper reproduction.
+- ✓ Canonical four-state joint-Pauli BP execution, correlated I/X/Y/Z sampling, independent code-capacity evaluation, and explicitly compatible quaternary policies — Phase 10. The bounded GB46 mechanism study is `not_assessed`; statistical reproduction and comparisons remain Phase 11 work.
 
 ### Active
 
@@ -30,7 +31,6 @@ Make BP decoder differences explicit, reproducible, and fairly comparable by exp
 - [ ] Make OSD/LSD-style postprocessing an optional addition for nonconvergence, independently configurable so the effects of the BP modifications can be evaluated.
 - [ ] Import or integrate published third-party implementations as executable references, including BP-OSD, BP-LSD, and RelayBP, and evaluate corresponding canonical policy compositions against published results.
 - [ ] Begin with CSS code-capacity decoding using separate X/Z decoding and support for a bit-flip noise model.
-- [ ] Extend to code-capacity quaternary BP that decodes correlated X/Z errors jointly.
 - [ ] Extend to circuit-level decoding after the code-capacity stages; define its noise, observation, and decoding semantics during dedicated research and planning.
 - [ ] Associate every supported paper with a machine-readable reproduction manifest and an executable experiment entry.
 - [ ] Validate reproduction of reported curves within documented statistical tolerances, with numerical tolerances specified where applicable to other outputs.
@@ -60,6 +60,8 @@ The intended users are researchers studying, reproducing, and comparing BP-famil
 The user identified existing BP-LSD, BP-OSD, and RelayBP implementations as important references. Phase 1 pinned initial BPGD and impulse paper revisions, selected and froze a Bravyi BB-144 CSS artifact, and ran a 32-shot pilot through `ldpc.BpDecoder`. The pilot is an adaptation with no statistical reproduction assessment. Author-code identities and some paper-specific CSS code identities remain unresolved; future reproduction configurations still need source qualification.
 
 Reference execution and canonical execution are complementary: the first preserves access to published implementations, and the second exposes behavior through common policy semantics for controlled comparison. Neither access to a reference implementation nor a superficial API match alone establishes successful reproduction.
+
+Phase 10 added a verified canonical quaternary BP kernel and compatible policy compositions. Its 256-shot GB46 mechanism ledger passed full deterministic replay. The deterministic aSCED splitter/map is labelled `canonical_adaptation`; the exact pinned native aSCED execution is retained separately as a 160-trial/10-logical-error aggregate without matched shot identities. Neither lane is assessed as a reproduced source curve.
 
 ### Reproduction manifest contract
 
@@ -123,6 +125,9 @@ All three stages belong to the same intended journal-paper scope. The literature
 | Require manifests, event ledgers, and detailed discrepancy documentation | Preserve provenance and make results interpretable and auditable | — Pending |
 | Treat the Phase 1 native BB-144 run as a pilot adaptation | Source paper and selected native decoder do not specify the same experiment | 32 shots retained as `not_assessed`; no reproduction claim |
 | Freeze source-derived CSS matrices and ordered logicals with independent checks | Prevent matching code parameters from standing in for exact artifact identity | Bravyi revision and `bposd` provider bytes pinned for the selected artifact |
+| Keep one canonical quaternary BP kernel with independent Pauli evaluation | Make joint X/Z inference and compatible policy semantics inspectable | Phase 10 goal verified 8/8; full project suite and 256-shot decoder replay passed |
+| Label deterministic GB46 aSCED splitter and map generation as canonical adaptation | The pinned author code does not retain exact generated T/H_ext bytes | Immutable project-generated T/H_ext and map receipts; no source-faithful fixture claim |
+| Keep exact native aSCED execution in a separate aggregate evidence lane | Preserve the pinned executable reference without implying matched shots or a curve result | User-attested verbal collaborator-author permission for the bounded isolated run; 160 trials/10 logical errors, `not_assessed` |
 
 ## Evolution
 
@@ -142,4 +147,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with the current software, evidence, and research state.
 
 ---
-*Last updated: 2026-09-22 after Phase 1*
+*Last updated: 2026-10-08 after Phase 10*

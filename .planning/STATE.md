@@ -22,27 +22,27 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-09-22)
+See: .planning/PROJECT.md (updated 2026-10-08)
 
 **Core value:** Make BP decoder differences explicit, reproducible, and fairly comparable through canonical policy execution and published evidence.
-**Current focus:** Phase 10 — Correlated Quaternary Execution
+**Current focus:** Phase 5 — pending notebook and offline HTML human review
 
 ## Current Position
 
 Phase: 5 — Guided and Perturbative BP Interventions
-Plan: 16 of 16
+Plan: 14 of 14 implemented; human review pending
 Total Phases: 14
 Current Plan: Not started
 Total Plans in Phase: 16
-Status: Ready to plan
+Status: Awaiting Phase 5 human review
 Last activity: 2026-10-08 — Phase 10 complete, transitioned to Phase 5
 Last Activity Description: Phase 10 complete, transitioned to Phase 5
 
-Progress: [████░░░░░░] 5 of 14 phases complete ([████░░░░░░] 43%)
+Progress: [████░░░░░░] 6 of 14 phases complete (43%); 103/111 plans complete
 
 ## Performance Metrics
 
-- Total plans completed: 58
+- Total plans completed: 103
 - Average duration: N/A
 - Total execution time: 0 hours
 - Recent trend: Phase 1 completed 9 plans; Phase 2 completed 16 plans, including seven review-driven gap plans, and passed goal, code, security, and validation gates.
@@ -170,7 +170,7 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - [Phase 10]: Phase 10: Persisted Pauli labels use I=0, X=1, Y=2, Z=3 with fixed symplectic pairs and owned read-only arrays.
 - [Phase 10]: Phase 10: CSS compilation persists X rows then Z rows, giving [s_X,s_Z]=[H_x z,H_z x], with roles, row indices, logical availability, and source identity in semantic bytes.
 - [Phase 10]: Phase 10: Derived quaternary working graphs require explicit transform and lift witnesses; identity edges cannot change graph or syndrome.
-- [Phase 10]: Native aSCED source is fixed to kit-cel/quantum_asced commit 816772071486615dfc7d71d1e15df597edc58a26; all build inputs remain pending human approval.
+- [Phase 10]: Native aSCED source is fixed to kit-cel/quantum_asced commit 816772071486615dfc7d71d1e15df597edc58a26; the exact digest was approved, and the bounded isolated build and native run succeeded.
 - [Phase 10]: Phase 10 Plan 03: evaluator-local symplectic and GF(2) routines are the authority for four-outcome Pauli classification.
 - [Phase 10]: Phase 10 Plan 03: logical residual actions use immutable (x, z) coordinates, while absent bases yield explicit unavailable reasons.
 - [Phase 10]: Phase 10 Plan 04: physical I/X/Y/Z rows remain unchanged after strict validation, while decoder smoothing is separately identified.
@@ -194,6 +194,7 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - [Phase 10]: Canonical aSCED runs bind verified constructed splitter and overcomplete receipts and remain canonical_adaptation even when paper components are source-backed.
 - [Phase 10]: Phase 10 Plan 15: isolated native aSCED aggregate evidence remains distinct from canonical execution and retains unavailable native instrumentation.
 - [Phase 10]: Retained the 256-shot GB46 p=0.05 seed-10 all-path ledger as canonical_adaptation mechanism evidence; native 160/10 remains aggregate-only with unavailable matched-shot identity.
+- [Phase 10]: Full 256-shot decoder replay exited 0 and byte-matched all retained events; the bounded mechanism evidence remains `not_assessed` for curve reproduction or ranking.
 
 ### Pending Todos
 
@@ -211,6 +212,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 - Original BPGD/impulse code identities remain unverified; exact SI/OTF variants and generic mixing/memory/voting definitions need source specifications.
 - Statistical targets and compute budgets for publication campaigns remain to be prespecified.
+- Phase 11 must prespecify its quaternary comparison and statistical assessment; Phase 10 mechanism evidence and the native aggregate do not establish source-curve agreement or matched-shot performance.
 - The observed development environment is node-specific; recheck package and backend identity before interpreting runs elsewhere.
 - Circuit fault correlations and observable semantics require dedicated qualification; a CSS adaptation does not reproduce a circuit paper.
 - Phase 07 POST-01 / Plan 07-03: approved standalone OSD commit builds in isolation but does not expose complete higher-order candidate solutions and scores; qualification receipt is failed/non-runnable. The user paused postprocessing, so no OSD source patch or reduced evidence contract is being pursued now.
@@ -251,9 +253,9 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 **Resume file:** None
 
-Last session: 2026-10-08T04:01:54.288Z
-Stopped at: Phase 10 complete, ready to plan Phase 5
-Next command: $gsd-discuss-phase 10, then $gsd-plan-phase 10; use the Phase 07 handoff only when optional postprocessing is reprioritized.
+Last session: 2026-10-08T09:12:53.810Z
+Stopped at: Phase 10 complete; Phase 5 implementation complete with one notebook/HTML UAT item pending
+Next command: $gsd-verify-work 5 for the pending human notebook/HTML review; use the Phase 07 handoff only when optional postprocessing is reprioritized.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
 Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md`.
