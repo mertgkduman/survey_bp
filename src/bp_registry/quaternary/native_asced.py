@@ -78,21 +78,81 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def verify_native_asced_receipt(receipt_path: Path, *, spec_path: Path) -> dict[str, object]:
-    """Independently validate receipt identity and native aggregate completeness."""
+def _required_successful_command(commands: object, *, contains: tuple[str, ...], label: str) -> None:
+    if not isinstance(commands, list):
+        raise ValueError(f"{label} receipt lacks command records")
+    for record in commands:
+        if not isinstance(record, dict) or record.get("returncode") != 0:
+            continue
+        command = record.get("command")
+        if isinstance(command, list) and all(token in command for token in contains):
+            return
+    raise ValueError(f"{label} receipt lacks the required successful {' '.join(contains)} command")
+
+
+def _build_receipt_for(run_receipt: Path, explicit: Path | None) -> Path:
+    if explicit is not None:
+        return explicit
+    name = run_receipt.name
+    if "-run-receipt" not in name:
+        raise ValueError("native run receipt needs an explicit build receipt path")
+    return run_receipt.with_name(name.replace("-run-receipt", "-build-receipt"))
+
+
+def verify_native_asced_receipt(
+    receipt_path: Path, *, spec_path: Path, build_receipt_path: Path | None = None,
+) -> dict[str, object]:
+    """Verify the source, build, run, command, and aggregate evidence chain."""
     receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
     if receipt.get("schema") != "phase10-asced-run-receipt-v1" or receipt.get("terminal") != "native_success":
         raise ValueError("receipt must be a successful native aSCED terminal")
     if _sha256(spec_path) != _SPEC_SHA256 or receipt.get("source_spec_sha256") != _SPEC_SHA256:
         raise ValueError("receipt does not bind the approved source specification")
+    spec = json.loads(spec_path.read_text(encoding="utf-8"))
+    source = spec.get("source")
+    proposal = spec.get("build_proposal")
+    if not isinstance(source, dict) or not isinstance(proposal, dict):
+        raise ValueError("approved source specification is incomplete")
+    build_path = _build_receipt_for(receipt_path, build_receipt_path)
+    if not build_path.is_file() or receipt.get("build_receipt_sha256") != _sha256(build_path):
+        raise ValueError("native receipt does not bind the actual build receipt")
+    build = json.loads(build_path.read_text(encoding="utf-8"))
+    if (build.get("schema") != "phase10-asced-build-receipt-v1" or build.get("terminal") != "build_success"
+            or build.get("source_spec_sha256") != _SPEC_SHA256
+            or build.get("source_digests_before") != source.get("source_digests")
+            or build.get("source_digests_after") != source.get("source_digests")):
+        raise ValueError("build receipt does not retain the approved source chain")
+    _required_successful_command(build.get("commands"), contains=("git", "checkout"), label="build")
+    _required_successful_command(build.get("commands"), contains=("--build",), label="build")
+    _required_successful_command(build.get("commands"), contains=("--install",), label="build")
+    if receipt.get("build_terminal") != "build_success":
+        raise ValueError("native receipt does not retain a successful build terminal")
+    if receipt.get("source_digests_before_run") != source.get("source_digests") or receipt.get("source_digests_after_run") != source.get("source_digests"):
+        raise ValueError("native receipt source digests do not match the approved build")
+    _required_successful_command(receipt.get("commands"), contains=(str(receipt.get("physical_error_rate")),), label="native run")
     identity = receipt.get("native_identity")
     aggregate = receipt.get("aggregate")
     if not isinstance(identity, dict) or identity.get("commit") != _SOURCE_COMMIT:
         raise ValueError("receipt source commit differs from the approved native identity")
     if not isinstance(aggregate, dict) or aggregate.get("native_pauli_order") != list(_NATIVE):
         raise ValueError("receipt does not preserve native I/X/Z/Y order")
-    if not isinstance(aggregate.get("trials"), int) or aggregate["trials"] <= 0:
+    counters = ("trials", "logical_errors", "failure_I", "failure_II", "success_I", "success_II")
+    if any(type(aggregate.get(counter)) is not int for counter in counters) or aggregate["trials"] <= 0:
         raise ValueError("receipt lacks an actual native trial denominator")
+    if any(aggregate[counter] < 0 or aggregate[counter] > aggregate["trials"] for counter in counters[1:]):
+        raise ValueError("native aggregate counters are outside the actual denominator")
+    if aggregate["logical_errors"] != aggregate["failure_I"] + aggregate["failure_II"]:
+        raise ValueError("native logical-error aggregate does not equal retained failure classes")
+    rate = aggregate.get("logical_error_rate")
+    if not isinstance(rate, (int, float)) or isinstance(rate, bool) or rate != aggregate["logical_errors"] / aggregate["trials"]:
+        raise ValueError("native logical-error rate does not match its aggregate counters")
+    bounds = proposal.get("native_bounds")
+    if (not isinstance(bounds, dict) or receipt.get("code") != "GB46"
+            or receipt.get("workers") != bounds.get("workers")
+            or receipt.get("max_trials") != bounds.get("max_trials")
+            or receipt.get("target_errors") != bounds.get("target_errors")
+            or receipt.get("physical_error_rate") != 0.05):
+        raise ValueError("native receipt command configuration differs from the approved probe")
     return receipt
 
 

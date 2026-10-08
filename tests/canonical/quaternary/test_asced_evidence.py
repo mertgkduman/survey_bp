@@ -163,6 +163,33 @@ def test_native_run_receipt_preserves_aggregate_and_qualified_missingness() -> N
     assert result.metric("native_edge_updates").value is None
 
 
+@pytest.mark.parametrize(
+    ("path", "mutate", "message"),
+    [
+        ("run", lambda receipt: receipt["aggregate"].update({"logical_errors": 161}), "outside the actual denominator"),
+        ("run", lambda receipt: receipt.update({"build_receipt_sha256": "0" * 64}), "does not bind the actual build receipt"),
+        ("build", lambda receipt: next(record for record in receipt["commands"] if "checkout" in record["command"]).update({"returncode": 1}), "required successful"),
+    ],
+)
+def test_native_receipt_rejects_forged_build_chain_or_aggregate(
+    tmp_path: Path, path: str, mutate: object, message: str,
+) -> None:
+    from bp_registry.quaternary.native_asced import verify_native_asced_receipt
+
+    build = json.loads((ROOT / "data/native/phase10-asced-build-receipt.json").read_text(encoding="utf-8"))
+    run = json.loads(RUN_RECEIPT.read_text(encoding="utf-8"))
+    target = build if path == "build" else run
+    assert callable(mutate)
+    mutate(target)
+    build_path, run_path = tmp_path / "phase10-asced-build-receipt.json", tmp_path / "phase10-asced-run-receipt.json"
+    build_path.write_text(json.dumps(build), encoding="utf-8")
+    if run["build_receipt_sha256"] != "0" * 64:
+        run["build_receipt_sha256"] = sha256(build_path.read_bytes()).hexdigest()
+    run_path.write_text(json.dumps(run), encoding="utf-8")
+    with pytest.raises(ValueError, match=message):
+        verify_native_asced_receipt(run_path, spec_path=SPEC, build_receipt_path=build_path)
+
+
 def test_phase10_mechanism_design_freezes_the_exact_canonical_adaptation_pair() -> None:
     """D-13 fixes GB46, p=.05, seed 10, and every shared canonical sample."""
     assert PHASE10_GATE.exists(), "the digest-checked Phase 10 mechanism gate is required"
