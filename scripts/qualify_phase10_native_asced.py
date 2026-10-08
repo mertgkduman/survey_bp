@@ -176,12 +176,17 @@ def _write_receipt(path: Path, payload: dict[str, Any]) -> None:
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
-def _prepare_source(spec: dict[str, Any], commands: list[dict[str, Any]]) -> Path:
+def _relocate(approved_root: Path, work_root: Path, configured: str) -> Path:
+    """Keep approved relative layout while requiring a fresh caller-owned root."""
+    try:
+        return work_root / Path(configured).relative_to(approved_root)
+    except ValueError as error:
+        raise QualificationError("work_root", "approved build path escapes its disposable root") from error
+
+
+def _prepare_source(spec: dict[str, Any], commands: list[dict[str, Any]], *, checkout: Path) -> Path:
     proposal, source = spec["build_proposal"], _require_source(spec)
     assert isinstance(proposal, dict)
-    checkout = Path(str(proposal["driver"]["source_checkout"]))
-    if checkout.exists():
-        shutil.rmtree(checkout)
     checkout.parent.mkdir(parents=True, exist_ok=True)
     commands.append(_run(["git", "clone", "--no-checkout", str(source["repository"]), str(checkout)], timeout=180))
     commands.append(_run(["git", "fetch", "--depth", "1", "origin", str(source["commit"])], cwd=checkout, timeout=180))
@@ -200,13 +205,18 @@ def _download_exact(url: str, destination: Path, expected: str) -> None:
         raise QualificationError("download", f"SHA-256 mismatch for {destination.name}")
 
 
-def _build(spec_path: Path, summary: Path, receipt_path: Path) -> dict[str, Any]:
+def _build(spec_path: Path, summary: Path, receipt_path: Path, *, work_root: Path, integration_network: bool) -> dict[str, Any]:
     spec = _load_spec(spec_path)
     verify_source_spec(spec)
     approval_digest = _approval(spec_path, summary)
     proposal = spec["build_proposal"]
     assert isinstance(proposal, dict)
-    root = Path(str(proposal["disposable_root"]))
+    if not integration_network:
+        raise QualificationError("integration", "native build requires explicit --integration-network")
+    if work_root.exists():
+        raise QualificationError("work_root", "native build work root must be a new unique directory")
+    approved_root = Path(str(proposal["disposable_root"]))
+    root = work_root.resolve()
     commands: list[dict[str, Any]] = []
     receipt: dict[str, Any] = {"schema": "phase10-asced-build-receipt-v1", "source_spec_sha256": approval_digest, "approval_summary": str(summary), "disposable_root": str(root), "started_at": time.time(), "commands": commands}
     try:
@@ -222,12 +232,10 @@ def _build(spec_path: Path, summary: Path, receipt_path: Path) -> dict[str, Any]
             "omp_num_threads": "1",
         }
         receipt["compiler"] = {"path": compiler, "version": _run([compiler, "--version"])["stdout"]}
-        source_dir = _prepare_source(spec, commands)
+        source_dir = _prepare_source(spec, commands, checkout=_relocate(approved_root, root, str(proposal["driver"]["source_checkout"])))
         receipt["source_digests_before"] = _algorithm_digests(source_dir, spec)
         downloads = root / "downloads"
         venv_dir = root / "venv"
-        if venv_dir.exists():
-            shutil.rmtree(venv_dir)
         venv.EnvBuilder(with_pip=True, clear=True).create(venv_dir)
         python = venv_dir / "bin" / "python"
         packages: dict[str, Any] = {}
@@ -239,9 +247,7 @@ def _build(spec_path: Path, summary: Path, receipt_path: Path) -> dict[str, Any]
         overlay = proposal["pybind11_overlay"]
         overlay_archive = downloads / "pybind11-v3.1.0.tar.gz"
         _download_exact(str(overlay["archive_url"]), overlay_archive, str(overlay["archive_sha256"]))
-        mount = Path(str(overlay["mount"]))
-        if mount.exists():
-            shutil.rmtree(mount)
+        mount = _relocate(approved_root, root, str(overlay["mount"]))
         with tarfile.open(overlay_archive, "r:gz") as archive:
             archive.extractall(mount.parent, filter="data")
         extracted = next(mount.parent.glob("pybind11-*"))
@@ -253,12 +259,13 @@ def _build(spec_path: Path, summary: Path, receipt_path: Path) -> dict[str, Any]
         tools_dir.mkdir(parents=True, exist_ok=True)
         with tarfile.open(cmake_archive, "r:gz") as archive:
             archive.extractall(tools_dir, filter="data")
-        cmake_path = Path(str(cmake["executable"]))
+        cmake_path = _relocate(approved_root, root, str(cmake["executable"]))
         if not cmake_path.is_file() or _file_sha256(cmake_path) != cmake["executable_sha256"]:
             raise QualificationError("cmake", "approved CMake executable is absent or has a mismatched SHA-256")
         receipt["packages"] = packages
         receipt["cmake"] = {"path": str(cmake_path), "executable_sha256": _file_sha256(cmake_path), "version": _run([str(cmake_path), "--version"])["stdout"]}
-        build_dir, prefix = Path(str(proposal["driver"]["build_directory"])), Path(str(proposal["driver"]["install_prefix"]))
+        build_dir = _relocate(approved_root, root, str(proposal["driver"]["build_directory"]))
+        prefix = _relocate(approved_root, root, str(proposal["driver"]["install_prefix"]))
         build_env = {"PATH": f"{venv_dir / 'bin'}:{os.environ.get('PATH', '')}", "HOME": str(root), "PYTHONNOUSERSITE": "1", "OMP_NUM_THREADS": "1"}
         commands.append(_run([str(cmake_path), "-S", str(source_dir), "-B", str(build_dir), f"-DCMAKE_INSTALL_PREFIX={prefix}", "-DCMAKE_BUILD_TYPE=Release"], env=build_env, timeout=600))
         nlohmann_header = build_dir / "_deps" / "nlohmann_json-src" / "json.hpp"
@@ -358,8 +365,11 @@ def _run_native(spec_path: Path, build_receipt: Path, output_receipt: Path, *, c
         raise QualificationError("arguments", "only a positive bounded GB46 aggregate probe is admitted")
     if (workers, max_trials, target_errors) != (bounds["workers"], bounds["max_trials"], bounds["target_errors"]):
         raise QualificationError("arguments", "native worker, trial, or error bounds differ from the approved values")
-    root = Path(str(proposal["disposable_root"]))
-    driver = Path(str(proposal["driver"]["path"]))
+    approved_root = Path(str(proposal["disposable_root"]))
+    root = Path(str(build.get("disposable_root", "")))
+    if not root.is_dir():
+        raise QualificationError("build_chain", "verified build receipt lacks an existing caller-provided work root")
+    driver = _relocate(approved_root, root, str(proposal["driver"]["path"]))
     commands: list[dict[str, Any]] = []
     receipt: dict[str, Any] = {
         "schema": "phase10-asced-run-receipt-v1",
@@ -376,8 +386,8 @@ def _run_native(spec_path: Path, build_receipt: Path, output_receipt: Path, *, c
         "commands": commands,
     }
     try:
-        source_dir = Path(str(proposal["driver"]["source_checkout"]))
-        prefix = Path(str(proposal["driver"]["install_prefix"]))
+        source_dir = _relocate(approved_root, root, str(proposal["driver"]["source_checkout"]))
+        prefix = _relocate(approved_root, root, str(proposal["driver"]["install_prefix"]))
         python = root / "venv" / "bin" / "python"
         if not python.is_file() or not prefix.is_dir():
             raise QualificationError("build_chain", "verified isolated build prefix is absent")
@@ -447,6 +457,8 @@ def _parser() -> argparse.ArgumentParser:
     build = command("build")
     build.add_argument("--approval-summary", type=Path, required=True)
     build.add_argument("--receipt", type=Path, required=True)
+    build.add_argument("--work-root", type=Path, required=True, help="new unique disposable directory for this integration build")
+    build.add_argument("--integration-network", action="store_true", help="explicitly permit the provisioned networked integration build")
     run = command("run")
     run.add_argument("--build-receipt", type=Path, required=True)
     run.add_argument("--output-receipt", type=Path, required=True)
@@ -476,7 +488,7 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(spec["build_proposal"], sort_keys=True))
         return 0
     if args.command == "build":
-        print(json.dumps(_build(args.spec, args.approval_summary, args.receipt), sort_keys=True))
+        print(json.dumps(_build(args.spec, args.approval_summary, args.receipt, work_root=args.work_root, integration_network=args.integration_network), sort_keys=True))
         return 0
     if args.command == "run":
         print(json.dumps(_run_native(args.spec, args.build_receipt, args.output_receipt, code=args.code, rate=args.physical_error_rate, workers=args.workers, max_trials=args.max_trials, target_errors=args.target_errors), sort_keys=True))

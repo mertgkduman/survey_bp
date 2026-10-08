@@ -105,7 +105,7 @@ def test_build_refuses_missing_approval_and_ambient_cmake(tmp_path: Path) -> Non
     result = subprocess.run(
         [
             sys.executable, str(SCRIPT), "build", "--approval-summary", str(tmp_path / "missing-summary.md"),
-            "--receipt", str(tmp_path / "missing-approval.json"),
+            "--receipt", str(tmp_path / "missing-approval.json"), "--work-root", str(tmp_path / "native"),
         ],
         capture_output=True, text=True, check=False,
     )
@@ -122,23 +122,32 @@ def test_build_refuses_missing_approval_and_ambient_cmake(tmp_path: Path) -> Non
     assert "only the recorded disposable-root CMake executable" in result.stderr
 
 
-def test_approved_build_emits_a_digest_bound_success_receipt(tmp_path: Path) -> None:
-    """The approved proposal must build only through the guarded CLI path."""
+def test_network_build_requires_an_explicit_marker_and_new_unique_work_root(tmp_path: Path) -> None:
+    """Normal tests must never download, build, or reuse another integration root."""
     receipt = tmp_path / "build-receipt.json"
     summary = ROOT / ".planning" / "phases" / "10-correlated-quaternary-execution" / "10-14-SUMMARY.md"
+    unselected_root = tmp_path / "unselected-native-build"
     result = subprocess.run(
         [
             sys.executable, str(SCRIPT), "build", "--spec", str(SPEC),
             "--approval-summary", str(summary), "--receipt", str(receipt),
+            "--work-root", str(unselected_root),
         ],
         capture_output=True, text=True, check=False,
     )
-    assert result.returncode == 0, result.stderr
-    payload = json.loads(receipt.read_text(encoding="utf-8"))
-    assert payload["terminal"] == "build_success"
-    assert payload["source_spec_sha256"] == "55359962431c055cf971171f81d75997282beb29e8928a8d82e023fbb6c1f24e"
-    assert payload["compiler"]["path"]
-    assert len(payload["source_declared_transitive_build_input"]["observed_sha256"]) == 64
+    assert result.returncode != 0
+    assert "explicit --integration-network" in result.stderr
+    assert not unselected_root.exists()
+    result = subprocess.run(
+        [
+            sys.executable, str(SCRIPT), "build", "--spec", str(SPEC),
+            "--approval-summary", str(summary), "--receipt", str(receipt),
+            "--work-root", str(tmp_path), "--integration-network",
+        ],
+        capture_output=True, text=True, check=False,
+    )
+    assert result.returncode != 0
+    assert "new unique directory" in result.stderr
 
 
 def test_native_pauli_translation_is_bijective_and_native_identity_is_distinct() -> None:
