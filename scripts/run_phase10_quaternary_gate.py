@@ -18,7 +18,7 @@ from bp_registry.quaternary.algebra import syndrome as pauli_syndrome
 from bp_registry.quaternary.asced import AscedController, AscedSpec, construct_splitter_batch, materialize_asced_batches
 from bp_registry.quaternary.asced_overcomplete import construct_overcomplete_map
 from bp_registry.quaternary.kernel import ScalarLlrBp4Kernel
-from bp_registry.quaternary.native_asced import verify_native_asced_receipt
+from bp_registry.quaternary.native_asced import admit_phase10_native_asced_evidence
 from bp_registry.quaternary.problems import QuaternaryOriginalProblem, compile_css_artifact
 
 
@@ -136,7 +136,7 @@ def _validate(study_path: Path, native_path: Path) -> tuple[dict[str, Any], dict
     native_requirement = study.get("native_requirement")
     if not isinstance(native_requirement, dict) or native_requirement.get("required_terminal") != "native_success":
         _fail("study must require the successful native aSCED terminal")
-    native = verify_native_asced_receipt(native_path, spec_path=ROOT / str(native_requirement.get("source_spec", "")))
+    native = admit_phase10_native_asced_evidence(native_path, spec_path=ROOT / str(native_requirement.get("source_spec", "")))
     aggregate = native.get("aggregate")
     if (native.get("native_identity", {}).get("commit") != _COMMIT or native.get("workers") != 1
             or native.get("max_trials") != 10000 or native.get("target_errors") != 10

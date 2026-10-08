@@ -199,6 +199,30 @@ def test_native_receipt_rejects_forged_build_chain_or_aggregate(
         verify_native_asced_receipt(run_path, spec_path=SPEC, build_receipt_path=build_path)
 
 
+def test_phase10_evidence_rejects_a_coherent_forged_aggregate_receipt(tmp_path: Path) -> None:
+    """Generic structure is insufficient to turn a copied aggregate into evidence."""
+    from bp_registry.quaternary.native_asced import (
+        admit_phase10_native_asced_evidence,
+        verify_native_asced_receipt,
+    )
+
+    build_path = tmp_path / "phase10-asced-build-receipt.json"
+    run_path = tmp_path / "phase10-asced-run-receipt.json"
+    build_path.write_bytes((ROOT / "data/native/phase10-asced-build-receipt.json").read_bytes())
+    run = json.loads(RUN_RECEIPT.read_text(encoding="utf-8"))
+    run["build_receipt_sha256"] = sha256(build_path.read_bytes()).hexdigest()
+    run["aggregate"].update({"logical_errors": 8, "failure_I": 8, "failure_II": 0, "logical_error_rate": 0.05})
+    for fact in run["metric_facts"]:
+        if fact["metric"] == "native_logical_errors":
+            fact["value"] = 8
+    run_path.write_text(json.dumps(run), encoding="utf-8")
+
+    # The generic API correctly recognizes internal consistency only.
+    assert verify_native_asced_receipt(run_path, spec_path=SPEC, build_receipt_path=build_path)["aggregate"] == run["aggregate"]
+    with pytest.raises(ValueError, match="not the endorsed Phase 10 retained observation"):
+        admit_phase10_native_asced_evidence(run_path, spec_path=SPEC, build_receipt_path=build_path)
+
+
 def test_phase10_mechanism_design_freezes_the_exact_canonical_adaptation_pair() -> None:
     """D-13 fixes GB46, p=.05, seed 10, and every shared canonical sample."""
     assert PHASE10_GATE.exists(), "the digest-checked Phase 10 mechanism gate is required"

@@ -12,6 +12,10 @@ from ..canonical.metrics import MetricFact
 
 _SOURCE_COMMIT = "816772071486615dfc7d71d1e15df597edc58a26"
 _SPEC_SHA256 = "55359962431c055cf971171f81d75997282beb29e8928a8d82e023fbb6c1f24e"
+# This is an endorsement of the exact retained aggregate observation, separate
+# from generic receipt structure.  A self-consistent copied receipt can prove
+# its own arithmetic and build linkage, but cannot become Phase 10 evidence.
+_PHASE10_RETAINED_RUN_RECEIPT_SHA256 = "c13a5cd8a511e2619da07089fae31ed4948115599a590d5e7c285273dca0240d"
 _CANONICAL = ("I", "X", "Y", "Z")
 _NATIVE = ("I", "X", "Z", "Y")
 
@@ -102,7 +106,12 @@ def _build_receipt_for(run_receipt: Path, explicit: Path | None) -> Path:
 def verify_native_asced_receipt(
     receipt_path: Path, *, spec_path: Path, build_receipt_path: Path | None = None,
 ) -> dict[str, object]:
-    """Verify the source, build, run, command, and aggregate evidence chain."""
+    """Validate generic native-receipt structure, linkage, and arithmetic.
+
+    This deliberately does not attest that a structurally valid receipt is the
+    retained Phase 10 observation.  Use ``admit_phase10_native_asced_evidence``
+    at a Phase 10 evidence boundary.
+    """
     receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
     if receipt.get("schema") != "phase10-asced-run-receipt-v1" or receipt.get("terminal") != "native_success":
         raise ValueError("receipt must be a successful native aSCED terminal")
@@ -158,9 +167,21 @@ def verify_native_asced_receipt(
     return receipt
 
 
+def admit_phase10_native_asced_evidence(
+    receipt_path: Path, *, spec_path: Path, build_receipt_path: Path | None = None,
+) -> dict[str, object]:
+    """Admit only the independently pinned retained native aggregate receipt."""
+    receipt = verify_native_asced_receipt(
+        receipt_path, spec_path=spec_path, build_receipt_path=build_receipt_path,
+    )
+    if _sha256(receipt_path) != _PHASE10_RETAINED_RUN_RECEIPT_SHA256:
+        raise ValueError("native receipt is structurally valid but is not the endorsed Phase 10 retained observation")
+    return receipt
+
+
 def run_native_asced_reference(receipt_path: Path, *, spec_path: Path) -> NativeAscedResult:
-    """Load a completed native receipt without invoking or substituting canonical code."""
-    receipt = verify_native_asced_receipt(receipt_path, spec_path=spec_path)
+    """Load the endorsed Phase 10 native evidence without invoking native code."""
+    receipt = admit_phase10_native_asced_evidence(receipt_path, spec_path=spec_path)
     aggregate = receipt["aggregate"]
     assert isinstance(aggregate, dict)
     facts = tuple(MetricFact.from_evidence(fact) for fact in receipt["metric_facts"])
@@ -172,4 +193,4 @@ def run_native_asced_reference(receipt_path: Path, *, spec_path: Path) -> Native
     )
 
 
-__all__ = ["NativeAscedIdentity", "NativeAscedResult", "run_native_asced_reference", "verify_native_asced_receipt"]
+__all__ = ["NativeAscedIdentity", "NativeAscedResult", "admit_phase10_native_asced_evidence", "run_native_asced_reference", "verify_native_asced_receipt"]
