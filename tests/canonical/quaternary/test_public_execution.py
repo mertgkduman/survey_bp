@@ -274,6 +274,14 @@ def test_full_public_manifest_resolves_before_sampling_and_replays(tmp_path):
     assert verify_quaternary_run(tmp_path)["verified"] is True
 
 
+def test_v2_public_manifest_rejects_unimplemented_multi_shot_budget() -> None:
+    """V2 has one immutable observation, so its budget cannot imply a sample set."""
+    data = _public_v2_manifest()
+    data["shot_budget"] = 2
+    with pytest.raises(Exception, match="1|shot_budget"):
+        parse_manifest(data)
+
+
 def test_full_public_replay_rejects_resolved_identity_and_event_order_tampering(tmp_path):
     run_quaternary(_public_v2_manifest(), tmp_path)
     path = tmp_path / "events.jsonl"

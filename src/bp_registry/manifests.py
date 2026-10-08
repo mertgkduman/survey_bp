@@ -767,7 +767,11 @@ class QuaternaryExperimentV2(QuaternaryExperimentV1):
 
     schema_version: Literal["quaternary_experiment_v2"]
     composition: QuaternaryCompositionSpec
-    shot_budget: int = Field(ge=1, le=MAX_SHOTS)
+    # The V2 public facade persists one immutable observation and currently
+    # executes exactly that observation as shot zero.  Do not advertise a
+    # statistical denominator until the manifest carries a per-shot sampling
+    # contract and the runner can execute every declared observation.
+    shot_budget: Literal[1] = 1
 
 
 ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | CanonicalExperimentV6 | CanonicalExperimentV7 | CanonicalExperimentV8 | QuaternaryExperimentV1 | QuaternaryExperimentV2
