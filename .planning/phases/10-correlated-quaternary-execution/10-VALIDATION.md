@@ -23,6 +23,7 @@ The final 16 plans contain **28 tasks**. All 28 are represented below. The plan-
 | Full suite | Post-review **1030 passed, 1 skipped, 6 warnings in 1091.57s** on 2026-10-08; exit 0 |
 | Native evidence | Exact `build_success` and `native_success` receipts verified; native 160 trials, 10 logical errors |
 | Decoder replay | `verify --replay` active for the frozen 256-shot ledger; no result claimed until terminal exit 0 |
+| Post-review spot check | Fresh shot-0 execution matched all 11 retained events byte-for-byte; the full replay remains required |
 
 ## Per-Task Verification Map
 
@@ -64,6 +65,7 @@ The focused command above exercises the named test files. Each task also has its
 - Native proposal digest: `55359962431c055cf971171f81d75997282beb29e8928a8d82e023fbb6c1f24e`. The user approved this exact digest and attested verbal collaborator-author permission for the bounded isolated build; see `10-14-SUMMARY.md`. No formal repository license or written grant is claimed.
 - Native run receipt SHA-256: `c13a5cd8a511e2619da07089fae31ed4948115599a590d5e7c285273dca0240d`. Exact evidence admission and coherent-forgery regression pass.
 - The frozen 256-shot canonical ledger has 768 arm terminals and 2,048 aSCED paths. Its structural checks passed before review. A full deterministic decoder replay is required after CR-03 hardening:
+- The first post-review full replay was interrupted by `SIGKILL` before a terminal result and is not counted as evidence. A single detached rerun began 2026-10-08T06:04:38Z; its command output and exit status are captured at `/tmp/phase10-replay-durable.log` and `/tmp/phase10-replay-durable.exit`. No success claim is made until the exit file records `0` and the output reports `verified: true`.
 
 ```bash
 OMP_NUM_THREADS=1 .venv/bin/python scripts/run_phase10_quaternary_gate.py verify \
