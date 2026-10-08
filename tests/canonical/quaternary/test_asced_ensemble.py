@@ -104,3 +104,15 @@ def test_asced_total_bp_call_cap_fails_before_paths_start() -> None:
         module.AscedController(module.AscedSpec(max_iterations=1, path_cap=4, max_total_bp_calls=3)).run(
             _original(), _batch(), np.full((4, 4), 0.25), kernel=ScalarLlrBp4Kernel(),
         )
+
+
+def test_asced_mbp4_requires_the_same_iteration_cap_used_for_work_preflight() -> None:
+    from bp_registry.quaternary.asced import AscedController, AscedSpec
+    from bp_registry.quaternary.mbp4 import FixedAlphaMbp4Kernel, Mbp4Spec
+
+    controller = AscedController(AscedSpec(max_iterations=1, path_cap=4, max_total_bp_calls=4))
+    with pytest.raises(ValueError, match="iteration cap must equal"):
+        controller.run(
+            _original(), _batch(), np.full((4, 4), 0.25, dtype=np.float64),
+            kernel=FixedAlphaMbp4Kernel(Mbp4Spec(alpha=0.75, schedule="qbp_flooding", max_iterations=2)),
+        )

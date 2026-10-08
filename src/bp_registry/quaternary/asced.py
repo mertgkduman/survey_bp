@@ -506,6 +506,8 @@ class AscedController:
             raise ValueError("aSCED execution requires preflighted materialized batches")
         if not isinstance(kernel, (ScalarLlrBp4Kernel, FixedAlphaMbp4Kernel)):
             raise ValueError("aSCED supports only scalar BP4 or fixed-alpha MBP4 kernels")
+        if isinstance(kernel, FixedAlphaMbp4Kernel) and kernel.spec.max_iterations != self.spec.max_iterations:
+            raise ValueError("aSCED MBP4 iteration cap must equal the controller BP-work cap")
         total = sum(batch.path_count for batch in declared)
         if total > self.spec.path_cap:
             raise ValueError("aSCED path cardinality exceeds the declared preflight cap")
@@ -536,6 +538,8 @@ class AscedController:
                     candidate, terminal, work = sweep.candidate, sweep.terminal, sweep.work
                 else:
                     decoded = session.run()
+                    if len(decoded.sweeps) > self.spec.max_iterations:
+                        raise RuntimeError("MBP4 exceeded the aSCED preflight BP-work cap")
                     candidate, terminal, work = decoded.candidate, decoded.termination, decoded.work
                 extended_valid = bool(np.array_equal(problem.code.syndrome(candidate), observed))
                 original_valid = bool(np.array_equal(original.code.syndrome(candidate), original.syndrome))
