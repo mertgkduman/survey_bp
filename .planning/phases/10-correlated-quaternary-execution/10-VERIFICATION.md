@@ -1,6 +1,6 @@
 ---
 phase: 10-correlated-quaternary-execution
-verified: 2026-10-08T09:12:00Z
+verified: 2026-10-08T09:17:00Z
 status: passed
 score: 8/8 must-haves verified
 covered_files:
@@ -94,7 +94,7 @@ covered_files:
   - tests/canonical/quaternary/test_sampling.py
   - tests/canonical/quaternary/test_schedules.py
   - tests/canonical/quaternary/test_vector_oracle.py
-covered_digest: "v1:sha256:dfa0ed3d28bbba8a70cc8eb84b8cdaeffcad86fc5a16a5a0e23b01a820d245dd"
+covered_digest: "v1:sha256:ea2b8370c9b3da95f3afb4050a608754368c7ad0284824c1b56d649cc1285880"
 behavior_unverified: 0
 overrides_applied: 0
 re_verification:
@@ -109,9 +109,9 @@ re_verification:
 # Phase 10: Correlated Quaternary Execution Verification Report
 
 **Phase Goal:** As a researcher, I want to decode joint Pauli errors through a canonical quaternary BP kernel, so that correlation semantics and policy compatibility are verified.
-**Verified:** 2026-10-08T09:12:00Z
+**Verified:** 2026-10-08T09:17:00Z
 **Status:** passed
-**Re-verification:** Yes — after the complete 256-shot decoder replay closed the prior behavior-verification item.
+**Re-verification:** Yes — after the complete 256-shot decoder replay closed the prior behavior-verification item and after inspecting the final phase-completion metadata refresh. The completion marker and Plan 10-14 wording clarification do not change the phase goal, requirements, approval boundary, or executable evidence.
 
 ## User Flow Coverage
 
@@ -225,7 +225,9 @@ The decision-coverage checker reported 17/17 trackable context decisions honored
 
 No failed truth, missing artifact, stub, broken production link, unmet QBP requirement, behavior-unverified item, or human-verification item remains. The persisted full replay receipt closes the prior evidence item, so the phase goal is achieved.
 
+The final metadata refresh marks Phase 10 complete and clarifies the Plan 10-14 verification prose without changing its user-attested verbal collaborator-author permission record. The runner, study, ledger, native receipt, study receipt, and replay receipt retain the exact hashes verified above.
+
 ---
 
-_Verified: 2026-10-08T09:12:00Z_
+_Verified: 2026-10-08T09:17:00Z_
 _Verifier: the agent (gsd-verifier)_
