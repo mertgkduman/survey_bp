@@ -20,7 +20,7 @@ The final 16 plans contain **28 tasks**. All 28 are represented below. The plan-
 | Config | `pyproject.toml` (`testpaths = ["tests"]`, `pythonpath = ["src"]`) |
 | Focused command | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/quaternary -x` |
 | Focused result after review fixes | **169 passed in 22.24s** on 2026-10-08 |
-| Full suite | Last pre-review result **1021 passed, 1 skipped, 6 warnings**; post-fix rerun pending |
+| Full suite | Post-review **1030 passed, 1 skipped, 6 warnings in 1091.57s** on 2026-10-08; exit 0 |
 | Native evidence | Exact `build_success` and `native_success` receipts verified; native 160 trials, 10 logical errors |
 | Decoder replay | `verify --replay` active for the frozen 256-shot ledger; no result claimed until terminal exit 0 |
 
@@ -84,7 +84,7 @@ OMP_NUM_THREADS=1 .venv/bin/python scripts/run_phase10_quaternary_gate.py verify
 - [x] Wave-0 test files exist and the quaternary suite passes.
 - [x] Native source/build/run receipts pass exact admission checks.
 - [ ] Full 256-shot decoder replay exits 0 against the retained ledger.
-- [ ] Post-review full project test suite passes.
+- [x] Post-review full project test suite passes.
 - [ ] Set `nyquist_compliant: true` after both remaining checks.
 
-**Approval:** Pending the full replay and post-review regression result.
+**Approval:** Pending the full replay result.
