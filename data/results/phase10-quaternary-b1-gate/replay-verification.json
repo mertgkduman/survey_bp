@@ -1,0 +1,39 @@
+{
+  "command": [
+    ".venv/bin/python",
+    "scripts/run_phase10_quaternary_gate.py",
+    "verify",
+    "--study",
+    "data/studies/phase10-quaternary-b1-gate.json",
+    "--native-receipt",
+    "data/native/phase10-asced-run-receipt.json",
+    "--output",
+    "data/results/phase10-quaternary-b1-gate",
+    "--replay"
+  ],
+  "environment": {
+    "OMP_NUM_THREADS": "1"
+  },
+  "exit_code": 0,
+  "finished_utc": "2026-10-08T09:08:33Z",
+  "prior_attempt": {
+    "qualified": false,
+    "terminal": "SIGKILL"
+  },
+  "result": {
+    "asced_paths": 2048,
+    "canonical_terminals": 768,
+    "native_logical_errors": 10,
+    "native_trials": 160,
+    "verified": true
+  },
+  "schema": "phase10-quaternary-full-replay-verification-v1",
+  "sha256": {
+    "canonical_ledger": "feab6c27ebe429d87fe72c6a8c10c939e643d0c68100edda4f3e770209e5357f",
+    "native_run_receipt": "c13a5cd8a511e2619da07089fae31ed4948115599a590d5e7c285273dca0240d",
+    "runner": "644035632930da588594b68fafb93c1430d9a686b529f39c988a2c6c5da8903e",
+    "study": "020262042fc3d9660a3cbcc63d9a6f5fedf8a681570a1e77c2b32ec18138baf2",
+    "study_receipt": "5318dee4fcb407495e0b231c5d66b7d5d90480dd248184b958360ce5229e0ded"
+  },
+  "started_utc": "2026-10-08T06:04:38Z"
+}
