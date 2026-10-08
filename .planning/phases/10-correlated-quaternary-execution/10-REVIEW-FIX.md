@@ -1,10 +1,10 @@
 ---
 phase: 10
-fixed_at: 2026-10-08T00:32:28-04:00
+fixed_at: 2026-10-08T00:51:43-04:00
 review_path: .planning/phases/10-correlated-quaternary-execution/10-REVIEW.md
-iteration: 1
-findings_in_scope: 6
-fixed: 6
+iteration: 2
+findings_in_scope: 1
+fixed: 1
 skipped: 0
 status: all_fixed
 verification_environment: main checkout
@@ -12,14 +12,15 @@ verification_environment: main checkout
 
 # Phase 10: Code Review Fix Report
 
-**Fixed at:** 2026-10-08T00:32:28-04:00  
+**Fixed at:** 2026-10-08T00:51:43-04:00
+
 **Source review:** `.planning/phases/10-correlated-quaternary-execution/10-REVIEW.md`  
-**Iteration:** 1
+**Iteration:** 2 (remediation re-review)
 
 ## Summary
 
-- Findings in scope: 6
-- Fixed: 6
+- Findings in scope: 1
+- Fixed: 1
 - Skipped: 0
 - Verification ran in the main checkout using its existing `.venv`; implementation edits were made and committed in an isolated worktree before fast-forwarding this branch.
 
@@ -49,9 +50,9 @@ Verification now fails closed unless `--replay` is supplied. The explicit replay
 ### CR-04: Native-success receipt did not verify build/run provenance or arithmetic
 
 **Files modified:** `src/bp_registry/quaternary/native_asced.py`, `tests/canonical/quaternary/test_asced_evidence.py`  
-**Commit:** `d1c4f4f`
+**Commits:** `d1c4f4f`, `9d17715`
 
-Native verification now binds the actual build receipt, validates pinned source digests and successful checkout/build/install/run command records, and checks aggregate counters, failure-class arithmetic, rate arithmetic, and approved probe configuration.
+Native verification binds the actual build receipt, validates pinned source digests and successful checkout/build/install/run command records, and checks aggregate counters, failure-class arithmetic, rate arithmetic, and approved probe configuration. The remediation re-review found that a coherent aggregate could still be forged. Phase 10 evidence admission now also requires the exact SHA-256 content digest of the retained native run receipt. Generic structural receipt validation remains available for structural checks, but the gate and `run_native_asced_reference()` require the endorsed retained observation before treating a receipt as Phase 10 native evidence.
 
 ### WR-01: MBP4 aSCED execution could exceed the preflight work cap
 
@@ -69,6 +70,9 @@ Native builds now require `--integration-network`, an explicit integration mode,
 
 ## Verification
 
+- `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/quaternary/test_asced_evidence.py -k 'native_run_receipt or native_receipt_rejects or coherent_forged or gate_rejects_design' -x` — **6 passed, 12 deselected in 5.55s**. The regression copies the genuine build receipt, coherently changes `logical_errors`, failure classes, rate, and matching metric fact, confirms generic structural validation accepts that self-consistent record, then confirms Phase 10 evidence admission rejects it by content digest.
+- `OMP_NUM_THREADS=1 .venv/bin/python scripts/run_phase10_quaternary_gate.py freeze --study data/studies/phase10-quaternary-b1-gate.json --native-receipt data/native/phase10-asced-run-receipt.json` — **passed** for the exact retained receipt.
+- Retained immutable inputs were re-hashed and unchanged: `phase10-asced-source-spec.json` is `55359962431c055cf971171f81d75997282beb29e8928a8d82e023fbb6c1f24e`; `phase10-asced-run-receipt.json` is `c13a5cd8a511e2619da07089fae31ed4948115599a590d5e7c285273dca0240d`.
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/canonical/quaternary -x` — **168 passed in 14.75s**.
 - Focused syntax checks passed for each modified Python module with `.venv/bin/python -m py_compile`.
 - Focused receipt, replay-gating, schedule, public-execution, and aSCED-cap tests passed before their respective commits.
@@ -86,6 +90,7 @@ Native builds now require `--integration-network`, an explicit integration mode,
 
 ---
 
-_Fixed: 2026-10-08T00:32:28-04:00_  
+_Fixed: 2026-10-08T00:51:43-04:00_
+
 _Fixer: the agent (gsd-code-fixer)_  
-_Iteration: 1_
+_Iteration: 2_
