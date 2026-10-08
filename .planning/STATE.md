@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 10
 current_phase_name: Correlated Quaternary Execution
-current_plan: 15
+current_plan: 16
 status: executing
-stopped_at: Completed 10-15-PLAN.md
-last_updated: "2026-10-08T00:09:20.411Z"
+stopped_at: Completed 10-16-PLAN.md
+last_updated: "2026-10-08T04:01:58.918Z"
 last_activity: 2026-10-06
 last_activity_desc: Phase 10 execution started
-state_head: d9225bdca16585a95d57f6d52cbc2410c62cc78b
+state_head: f73635d074c56aea5167e13a85f8f2a07f57b98d
 progress:
   total_phases: 14
   completed_phases: 5
   total_plans: 111
-  completed_plans: 102
+  completed_plans: 103
 ---
 
 # Project State
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-09-22)
 ## Current Position
 
 Phase: 10 (Correlated Quaternary Execution) — EXECUTING
-Plan: 15 of 16
+Plan: 16 of 16
 Total Phases: 14
-Current Plan: 15
+Current Plan: 16
 Total Plans in Phase: 16
 Status: Ready to execute
 Last activity: 2026-10-06 — Phase 10 execution started
@@ -95,6 +95,7 @@ Progress: [████░░░░░░] 5 of 14 phases complete (36%)
 | Phase 10 P11 | 11m | 1 tasks | 4 files |
 | Phase 10 P12 | 10m | 2 tasks | 7 files |
 | Phase 10 P15 | 22m | 2 tasks | 5 files |
+| Phase 10 P16 | 3h 23m bounded run plus verification | 2 tasks | 8 files |
 
 Phase 02 P10–P16 gap-closure metrics are recorded in their individual summaries.
 
@@ -191,6 +192,7 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - [Phase 10]: aSCED executes every declared CSS virtual path in LSB order and selects only original-syndrome-valid minimum-weight candidates with stable batch/path ties.
 - [Phase 10]: Canonical aSCED runs bind verified constructed splitter and overcomplete receipts and remain canonical_adaptation even when paper components are source-backed.
 - [Phase 10]: Phase 10 Plan 15: isolated native aSCED aggregate evidence remains distinct from canonical execution and retains unavailable native instrumentation.
+- [Phase 10]: Retained the 256-shot GB46 p=0.05 seed-10 all-path ledger as canonical_adaptation mechanism evidence; native 160/10 remains aggregate-only with unavailable matched-shot identity.
 
 ### Pending Todos
 
@@ -248,8 +250,8 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 **Resume file:** None
 
-Last session: 2026-10-08T00:09:17.351Z
-Stopped at: Completed 10-15-PLAN.md
+Last session: 2026-10-08T04:01:54.288Z
+Stopped at: Completed 10-16-PLAN.md
 Next command: $gsd-discuss-phase 10, then $gsd-plan-phase 10; use the Phase 07 handoff only when optional postprocessing is reprioritized.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
