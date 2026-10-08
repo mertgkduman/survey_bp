@@ -13,6 +13,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[3]
 SCRIPT = ROOT / "scripts" / "qualify_phase10_native_asced.py"
 SPEC = ROOT / "data" / "native" / "phase10-asced-source-spec.json"
+RUN_RECEIPT = ROOT / "data" / "native" / "phase10-asced-run-receipt.json"
 
 
 def test_source_identity_records_exact_commit_and_audited_discrepancies() -> None:
@@ -65,7 +66,7 @@ def test_digest_discrepancy_and_no_install_guards_are_explicit(tmp_path: Path) -
     assert result.returncode != 0
     assert "algorithm file" in result.stderr
     script_text = SCRIPT.read_text(encoding="utf-8")
-    assert "pip install" in script_text
+    assert "venv.EnvBuilder" in script_text
     assert "--no-deps" in script_text
     assert "commit_api" in script_text
 
@@ -138,3 +139,15 @@ def test_native_pauli_translation_is_bijective_and_native_identity_is_distinct()
     assert identity.canonical_to_native(("I", "X", "Y", "Z")) == ("I", "X", "Z", "Y")
     assert identity.native_to_canonical(("I", "X", "Z", "Y")) == ("I", "X", "Y", "Z")
     assert identity.source_commit == "816772071486615dfc7d71d1e15df597edc58a26"
+
+
+def test_native_run_receipt_preserves_aggregate_and_qualified_missingness() -> None:
+    """A successful aggregate terminal remains native, bounded, and not assessed."""
+    from bp_registry.quaternary.native_asced import run_native_asced_reference
+
+    result = run_native_asced_reference(RUN_RECEIPT, spec_path=SPEC)
+    assert result.trials > 0
+    assert 0 <= result.logical_errors <= result.trials
+    assert result.assessment == "not_assessed"
+    assert result.metric("native_shot_identity").missingness.value == "unavailable"
+    assert result.metric("native_edge_updates").value is None

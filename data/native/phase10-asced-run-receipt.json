@@ -1,0 +1,173 @@
+{
+  "aggregate": {
+    "channel_proportions": {
+      "X": 0.016666666666666666,
+      "Y": 0.016666666666666666,
+      "Z": 0.016666666666666666
+    },
+    "code": "GB46",
+    "failure_I": 10,
+    "failure_II": 0,
+    "logical_error_rate": 0.03460207612456748,
+    "logical_errors": 10,
+    "native_pauli_order": [
+      "I",
+      "X",
+      "Z",
+      "Y"
+    ],
+    "physical_error_rate": 0.05,
+    "success_I": 266,
+    "success_II": 0,
+    "trials": 289
+  },
+  "assessment": "not_assessed",
+  "build_receipt_sha256": "4c7ee6fa78865cc51c24e8ecda90ec59962bf4797fd7ad840acefb2665449841",
+  "build_terminal": "build_success",
+  "code": "GB46",
+  "commands": [
+    {
+      "command": [
+        "/tmp/phase10-asced-native/venv/bin/python",
+        "/tmp/phase10-asced-native/driver/demo_bp4.py",
+        "/tmp/phase10-asced-native/prefix",
+        "/tmp/phase10-asced-native/source/quantum_asced",
+        "0.05",
+        "1",
+        "10000",
+        "10"
+      ],
+      "cwd": null,
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "{\"channel_proportions\": {\"X\": 0.016666666666666666, \"Y\": 0.016666666666666666, \"Z\": 0.016666666666666666}, \"code\": \"GB46\", \"failure_I\": 10, \"failure_II\": 0, \"logical_error_rate\": 0.03460207612456748, \"logical_errors\": 10, \"native_pauli_order\": [\"I\", \"X\", \"Z\", \"Y\"], \"physical_error_rate\": 0.05, \"success_I\": 266, \"success_II\": 0, \"trials\": 289}\n"
+    }
+  ],
+  "completed_at": 1791417504.4924092,
+  "max_trials": 10000,
+  "metric_facts": [
+    {
+      "method": "QEC.Simulation_Stats.trials",
+      "metric": "native_trials",
+      "missingness": "observed",
+      "qualification": "native_aggregate",
+      "scope": "native_aggregate_probe",
+      "unavailable_reason": null,
+      "unit": "trials",
+      "value": 289
+    },
+    {
+      "method": "QEC.Simulation_Stats.logical_errors",
+      "metric": "native_logical_errors",
+      "missingness": "observed",
+      "qualification": "native_aggregate",
+      "scope": "native_aggregate_probe",
+      "unavailable_reason": null,
+      "unit": "logical_errors",
+      "value": 10
+    },
+    {
+      "method": "audited native QEC binding",
+      "metric": "native_random_seed",
+      "missingness": "unavailable",
+      "qualification": "opaque_native_internal",
+      "scope": "native_aggregate_probe",
+      "unavailable_reason": "The audited native binding exposes aggregate output only.",
+      "unit": "not_applicable",
+      "value": null
+    },
+    {
+      "method": "audited native QEC binding",
+      "metric": "native_shot_identity",
+      "missingness": "unavailable",
+      "qualification": "opaque_native_internal",
+      "scope": "native_aggregate_probe",
+      "unavailable_reason": "The audited native binding exposes aggregate output only.",
+      "unit": "not_applicable",
+      "value": null
+    },
+    {
+      "method": "audited native QEC binding",
+      "metric": "native_injected_error",
+      "missingness": "unavailable",
+      "qualification": "opaque_native_internal",
+      "scope": "native_aggregate_probe",
+      "unavailable_reason": "The audited native binding exposes aggregate output only.",
+      "unit": "not_applicable",
+      "value": null
+    },
+    {
+      "method": "audited native QEC binding",
+      "metric": "native_per_path_counters",
+      "missingness": "unavailable",
+      "qualification": "opaque_native_internal",
+      "scope": "native_aggregate_probe",
+      "unavailable_reason": "The audited native binding exposes aggregate output only.",
+      "unit": "not_applicable",
+      "value": null
+    },
+    {
+      "method": "audited native QEC binding",
+      "metric": "native_edge_updates",
+      "missingness": "unavailable",
+      "qualification": "opaque_native_internal",
+      "scope": "native_aggregate_probe",
+      "unavailable_reason": "The audited native binding exposes aggregate output only.",
+      "unit": "not_applicable",
+      "value": null
+    },
+    {
+      "method": "audited native QEC binding",
+      "metric": "native_control_flow_events",
+      "missingness": "unavailable",
+      "qualification": "opaque_native_internal",
+      "scope": "native_aggregate_probe",
+      "unavailable_reason": "The audited native binding exposes aggregate output only.",
+      "unit": "not_applicable",
+      "value": null
+    }
+  ],
+  "native_identity": {
+    "commit": "816772071486615dfc7d71d1e15df597edc58a26",
+    "native_pauli_order": [
+      "I",
+      "X",
+      "Z",
+      "Y"
+    ],
+    "repository": "https://github.com/kit-cel/quantum_asced.git"
+  },
+  "physical_error_rate": 0.05,
+  "schema": "phase10-asced-run-receipt-v1",
+  "source_digests_after_run": {
+    ".gitmodules": "d97bea252de1fdc5cb012e2be44b7aae00e1984c16b36a1854304d55ac899bb0",
+    "CMakeLists.txt": "23c7041b6cfe74502222cb3044b5e7ab6e887d1e6541e1fee8c08f32f199667c",
+    "environment.yml": "b75200e91befc226a559dd0995073dea4d7c8ec366e8b5cc44b7992751947b8c",
+    "include/Decoder/BP/BP4_Decoder.h": "43f54507744bdf019c6a33c29249f3eb562f806ac62cda8cc17b8d5feace4823",
+    "include/Decoder/Ensemble/Ensemble_Processing/aSCED_Processing.h": "4229352162e0c4a72f26dc82164b777c5d2e983c897f0b47c462d4337cce7e3e",
+    "pyproject.toml": "0a05c0ee366bf234b016c270059ac20e59bdaaf0bbdb0042ef03a8a189477fdd",
+    "src/Channel/Pauli_Channel.cpp": "e9a6a711701e0b8ae2c11db7d6eab574ddfc6d7adc263fd42cca4e7563326839",
+    "src/Decoder/BP/BP4_Decoder.cpp": "5d689fb7de0654efdc9d46563ef6633fc3178e5806227a67a48111b10f511809",
+    "src/Decoder/Ensemble/Ensemble_Processing/aSCED_Processing.cpp": "cf7534c185ae9d2fb4395bc0cdb3675643e3a2319072f92fa8f84d28f3e3a85d",
+    "src/Decoder/Ensemble/Ensemble_Selection/Minimum_Weight_Selection.cpp": "b03e0ae676a1dba7d1312efb07b1a9ff96fc2052fb980f87263efd1fa11c67c4",
+    "src/Pybind11_Module.cpp": "23f0d1d5ce3b431748c3b09228ebff5642840c048b94952543db2e99352de1d1"
+  },
+  "source_digests_before_run": {
+    ".gitmodules": "d97bea252de1fdc5cb012e2be44b7aae00e1984c16b36a1854304d55ac899bb0",
+    "CMakeLists.txt": "23c7041b6cfe74502222cb3044b5e7ab6e887d1e6541e1fee8c08f32f199667c",
+    "environment.yml": "b75200e91befc226a559dd0995073dea4d7c8ec366e8b5cc44b7992751947b8c",
+    "include/Decoder/BP/BP4_Decoder.h": "43f54507744bdf019c6a33c29249f3eb562f806ac62cda8cc17b8d5feace4823",
+    "include/Decoder/Ensemble/Ensemble_Processing/aSCED_Processing.h": "4229352162e0c4a72f26dc82164b777c5d2e983c897f0b47c462d4337cce7e3e",
+    "pyproject.toml": "0a05c0ee366bf234b016c270059ac20e59bdaaf0bbdb0042ef03a8a189477fdd",
+    "src/Channel/Pauli_Channel.cpp": "e9a6a711701e0b8ae2c11db7d6eab574ddfc6d7adc263fd42cca4e7563326839",
+    "src/Decoder/BP/BP4_Decoder.cpp": "5d689fb7de0654efdc9d46563ef6633fc3178e5806227a67a48111b10f511809",
+    "src/Decoder/Ensemble/Ensemble_Processing/aSCED_Processing.cpp": "cf7534c185ae9d2fb4395bc0cdb3675643e3a2319072f92fa8f84d28f3e3a85d",
+    "src/Decoder/Ensemble/Ensemble_Selection/Minimum_Weight_Selection.cpp": "b03e0ae676a1dba7d1312efb07b1a9ff96fc2052fb980f87263efd1fa11c67c4",
+    "src/Pybind11_Module.cpp": "23f0d1d5ce3b431748c3b09228ebff5642840c048b94952543db2e99352de1d1"
+  },
+  "source_spec_sha256": "55359962431c055cf971171f81d75997282beb29e8928a8d82e023fbb6c1f24e",
+  "started_at": 1791417501.2759104,
+  "target_errors": 10,
+  "terminal": "native_success",
+  "workers": 1
+}

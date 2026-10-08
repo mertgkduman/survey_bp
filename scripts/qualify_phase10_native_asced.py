@@ -271,6 +271,129 @@ def _build(spec_path: Path, summary: Path, receipt_path: Path) -> dict[str, Any]
     return receipt
 
 
+_DRIVER_SOURCE = '''import json
+import sys
+from pathlib import Path
+
+prefix, source, rate, workers, max_trials, target_errors = sys.argv[1:]
+sys.path.insert(0, prefix)
+sys.path.insert(0, source)
+import numpy as np
+from Codes.file_reader import load_AList
+import QEC
+
+rate = float(rate)
+workers, max_trials, target_errors = map(int, (workers, max_trials, target_errors))
+root = Path(source)
+code = "GB_46_2"
+H = load_AList(root / "Codes" / code / f"{code}_H_44.alist")
+L = load_AList(root / "Codes" / code / f"{code}_L.alist")
+channel = QEC.Pauli_Channel_Config()
+# The native audited implementation realizes its documented equal proportions
+# through pX for all three branches; all supplied proportions remain equal.
+channel.pX = rate / 3.0
+channel.pY = rate / 3.0
+channel.pZ = rate / 3.0
+path_configs = []
+for _ in range(4):
+    graph = QEC.Graph_Optimization_GF4(H)
+    graph.add_splitters(4, 2)
+    config = QEC.BP4_Decoder_Config(graph.H)
+    config.max_iterations = 25
+    path_configs.extend([config] * 4)
+decoder = QEC.Ensemble_Decoder_Config(H, path_configs)
+decoder.processing = QEC.aSCED_Processing_Config()
+decoder.selection = QEC.Minimum_Weight_Selection_Config()
+sim = QEC.Simulation_Env(L)
+sim.init(channel, decoder)
+sim.num_threads = workers
+sim.max_trials = max_trials
+sim.target_errors = target_errors
+sim.get_error_rates(np.array([rate]))
+stats = sim.stats
+key = rate
+payload = {
+    "code": "GB46",
+    "physical_error_rate": rate,
+    "native_pauli_order": ["I", "X", "Z", "Y"],
+    "channel_proportions": {"X": rate / 3.0, "Y": rate / 3.0, "Z": rate / 3.0},
+    "trials": int(stats.trials[key]),
+    "logical_errors": int(stats.logical_errors[key]),
+    "failure_I": int(stats.failure_I[key]),
+    "failure_II": int(stats.failure_II[key]),
+    "success_I": int(stats.success_I[key]),
+    "success_II": int(stats.success_II[key]),
+    "logical_error_rate": float(sim.LER[key]),
+}
+print(json.dumps(payload, sort_keys=True))
+'''
+
+
+def _run_native(spec_path: Path, build_receipt: Path, output_receipt: Path, *, code: str, rate: float, workers: int, max_trials: int, target_errors: int) -> dict[str, Any]:
+    spec = _load_spec(spec_path)
+    verify_source_spec(spec)
+    build = verify_receipt(spec_path, build_receipt, "build_success")
+    proposal = spec["build_proposal"]
+    assert isinstance(proposal, dict)
+    bounds = proposal["native_bounds"]
+    if code != "GB46" or not 0.0 < rate < 1.0:
+        raise QualificationError("arguments", "only a positive bounded GB46 aggregate probe is admitted")
+    if (workers, max_trials, target_errors) != (bounds["workers"], bounds["max_trials"], bounds["target_errors"]):
+        raise QualificationError("arguments", "native worker, trial, or error bounds differ from the approved values")
+    root = Path(str(proposal["disposable_root"]))
+    driver = Path(str(proposal["driver"]["path"]))
+    commands: list[dict[str, Any]] = []
+    receipt: dict[str, Any] = {
+        "schema": "phase10-asced-run-receipt-v1",
+        "source_spec_sha256": _file_sha256(spec_path),
+        "build_receipt_sha256": _file_sha256(build_receipt),
+        "build_terminal": build["terminal"],
+        "started_at": time.time(),
+        "code": code,
+        "physical_error_rate": rate,
+        "workers": workers,
+        "max_trials": max_trials,
+        "target_errors": target_errors,
+        "native_identity": {"repository": spec["source"]["repository"], "commit": spec["source"]["commit"], "native_pauli_order": ["I", "X", "Z", "Y"]},
+        "commands": commands,
+    }
+    try:
+        source_dir = Path(str(proposal["driver"]["source_checkout"]))
+        prefix = Path(str(proposal["driver"]["install_prefix"]))
+        python = root / "venv" / "bin" / "python"
+        if not python.is_file() or not prefix.is_dir():
+            raise QualificationError("build_chain", "verified isolated build prefix is absent")
+        receipt["source_digests_before_run"] = _algorithm_digests(source_dir, spec)
+        driver.parent.mkdir(parents=True, exist_ok=True)
+        driver.write_text(_DRIVER_SOURCE, encoding="utf-8")
+        env = {"PATH": f"{root / 'venv' / 'bin'}:{os.environ.get('PATH', '')}", "HOME": str(root), "PYTHONNOUSERSITE": "1", "OMP_NUM_THREADS": "1"}
+        commands.append(_run([str(python), str(driver), str(prefix), str(source_dir), str(rate), str(workers), str(max_trials), str(target_errors)], env=env, timeout=1800))
+        output = commands[-1]["stdout"].strip().splitlines()
+        aggregate = json.loads(output[-1])
+        expected = {"code", "physical_error_rate", "native_pauli_order", "channel_proportions", "trials", "logical_errors", "failure_I", "failure_II", "success_I", "success_II", "logical_error_rate"}
+        if set(aggregate) != expected or aggregate["trials"] <= 0:
+            raise QualificationError("native_output", "native aggregate output is incomplete")
+        receipt["aggregate"] = aggregate
+        receipt["metric_facts"] = [
+            {"metric": "native_trials", "missingness": "observed", "value": aggregate["trials"], "method": "QEC.Simulation_Stats.trials", "scope": "native_aggregate_probe", "unit": "trials", "qualification": "native_aggregate", "unavailable_reason": None},
+            {"metric": "native_logical_errors", "missingness": "observed", "value": aggregate["logical_errors"], "method": "QEC.Simulation_Stats.logical_errors", "scope": "native_aggregate_probe", "unit": "logical_errors", "qualification": "native_aggregate", "unavailable_reason": None},
+        ] + [
+            {"metric": metric, "missingness": "unavailable", "value": None, "method": "audited native QEC binding", "scope": "native_aggregate_probe", "unit": "not_applicable", "qualification": "opaque_native_internal", "unavailable_reason": "The audited native binding exposes aggregate output only."}
+            for metric in ("native_random_seed", "native_shot_identity", "native_injected_error", "native_per_path_counters", "native_edge_updates", "native_control_flow_events")
+        ]
+        receipt["source_digests_after_run"] = _algorithm_digests(source_dir, spec)
+        receipt["assessment"] = "not_assessed"
+        receipt["terminal"] = "native_success"
+    except Exception as error:
+        receipt["terminal"] = f"native_unavailable_run_{getattr(error, 'stage', 'unexpected')}"
+        receipt["error"] = str(error)
+        _write_receipt(output_receipt, receipt)
+        raise QualificationError("run", str(error)) from error
+    receipt["completed_at"] = time.time()
+    _write_receipt(output_receipt, receipt)
+    return receipt
+
+
 def verify_receipt(spec_path: Path, receipt_path: Path, required_terminal: str) -> dict[str, Any]:
     spec = _load_spec(spec_path)
     verify_source_spec(spec)
@@ -283,6 +406,12 @@ def verify_receipt(spec_path: Path, receipt_path: Path, required_terminal: str) 
         source = _require_source(spec)
         if payload.get("source_digests_before") != source["source_digests"] or payload.get("source_digests_after") != source["source_digests"]:
             raise ValueError("build receipt algorithm guard is incomplete or mismatched")
+    if required_terminal == "native_success":
+        if payload.get("build_terminal") != "build_success" or not isinstance(payload.get("aggregate"), dict):
+            raise ValueError("native receipt lacks its verified build chain or aggregate result")
+        aggregate = payload["aggregate"]
+        if aggregate.get("native_pauli_order") != ["I", "X", "Z", "Y"] or aggregate.get("trials", 0) <= 0:
+            raise ValueError("native receipt lacks its Pauli-order or denominator evidence")
     return payload
 
 
@@ -300,6 +429,14 @@ def _parser() -> argparse.ArgumentParser:
     build = command("build")
     build.add_argument("--approval-summary", type=Path, required=True)
     build.add_argument("--receipt", type=Path, required=True)
+    run = command("run")
+    run.add_argument("--build-receipt", type=Path, required=True)
+    run.add_argument("--output-receipt", type=Path, required=True)
+    run.add_argument("--code", required=True)
+    run.add_argument("--physical-error-rate", type=float, required=True)
+    run.add_argument("--workers", type=int, required=True)
+    run.add_argument("--max-trials", type=int, required=True)
+    run.add_argument("--target-errors", type=int, required=True)
     verify = command("verify-receipt")
     verify.add_argument("--receipt", type=Path, required=True)
     verify.add_argument("--require-terminal", required=True)
@@ -322,6 +459,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "build":
         print(json.dumps(_build(args.spec, args.approval_summary, args.receipt), sort_keys=True))
+        return 0
+    if args.command == "run":
+        print(json.dumps(_run_native(args.spec, args.build_receipt, args.output_receipt, code=args.code, rate=args.physical_error_rate, workers=args.workers, max_trials=args.max_trials, target_errors=args.target_errors), sort_keys=True))
         return 0
     if args.command == "verify-receipt":
         print(json.dumps(verify_receipt(args.spec, args.receipt, args.require_terminal), sort_keys=True))
