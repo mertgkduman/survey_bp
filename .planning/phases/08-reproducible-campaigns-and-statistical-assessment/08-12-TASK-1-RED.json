@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'cli and preflight' -x",
+  "exitCode": 1,
+  "targetTest": "test_cli_preflight_and_plan_freeze_identity_before_any_execution",
+  "targetFile": "tests/test_campaign_execution.py",
+  "expected": "bp_registry.campaigns.cli provides a strict campaign preflight command",
+  "actual": "ModuleNotFoundError: No module named 'bp_registry.campaigns.cli'",
+  "output": "TAP version 13\nnot ok 1 - test_cli_preflight_and_plan_freeze_identity_before_any_execution\n  ---\n  message: ModuleNotFoundError: No module named 'bp_registry.campaigns.cli'\n  ...\n1..1\n# tests 1\n# pass 0\n# fail 1\n"
+}

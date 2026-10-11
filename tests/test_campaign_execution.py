@@ -6,6 +6,8 @@ from hashlib import sha256
 import importlib
 import json
 from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 
@@ -522,3 +524,32 @@ def test_scheduler_receipt_preemption_cancellation_and_duplicate_delivery_are_in
                 _scheduler_observation(api, task_id="0"),
             ),
         )
+
+
+def _write_cli_campaign(path: Path) -> Path:
+    path.write_text(json.dumps({"campaign_spec": _spec_payload()}, sort_keys=True), encoding="utf-8")
+    return path
+
+
+def _run_campaign_module(*arguments: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [sys.executable, "-m", "bp_registry.campaigns.cli", *arguments],
+        cwd=ROOT, text=True, capture_output=True, check=False,
+    )
+
+
+def test_cli_preflight_and_plan_freeze_identity_before_any_execution(tmp_path: Path):
+    """The public command rejects drift before it can write a run receipt."""
+    campaign = _write_cli_campaign(tmp_path / "campaign.json")
+    output_root = tmp_path / "campaign-output"
+
+    preflight = _run_campaign_module(
+        "preflight", "--campaign", str(campaign), "--campaign-root", str(ROOT),
+        "--output-root", str(output_root),
+    )
+
+    assert preflight.returncode == 0, preflight.stderr
+    payload = json.loads(preflight.stdout)
+    assert payload["status"] == "ok"
+    assert len(payload["campaign_spec_digest"]) == 64
+    assert not output_root.exists()
