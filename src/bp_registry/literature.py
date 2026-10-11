@@ -605,3 +605,163 @@ def qualify_rabeti_source_record(directory: str | Path) -> RabetiSourceDispositi
         executable=MappingProxyType(executable), qualification="canonical_adaptation_not_assessed",
         unresolved=_RABETI_UNRESOLVED,
     )
+
+
+_PHASE9_SOURCE_SPECS = (
+    ("bhatnagar", "first-convergence-0", "literature_policies/bhatnagar-2026-impulse-decoding/first-convergence-0.spec.toml", "c66b32606067b6aaa598b8d3a735a85f3e2d8788b32287af3a4006989cef8099"),
+    ("bhatnagar", "first-convergence-1", "literature_policies/bhatnagar-2026-impulse-decoding/first-convergence-1.spec.toml", "3528635ed1ab9de8af997dce055bc170e5357f89362fcdbce8bfe3d6df0e52fe"),
+    ("bhatnagar", "minimum-weight-1", "literature_policies/bhatnagar-2026-impulse-decoding/minimum-weight-1.spec.toml", "9352a8936aa3a708989f51a64770ac2c455d1b86c9e74acda6eb0fe0d6657ff4"),
+    ("rabeti", "mbbp-ld", "literature_policies/rabeti-2026-multiple-bases-bp-list-decoding/mbbp-ld.spec.toml", "ce330e0212982047165ac1f8aba244dbb16853b1445a411ac8b957450f642f2e"),
+    ("yao", "bp-t100", "literature_policies/yao-2024-guided-decimation/bp-t100.spec.toml", "7b0540d334025e654af4c90d78453f2d9908ba58229803bedd489ad201b7405a"),
+    ("yao", "bpgd-t001", "literature_policies/yao-2024-guided-decimation/bpgd-t001.spec.toml", "ca3832a5fa3ead750d331028752cbbe7776ee7bcdfba9274be5aacbc8ada2f8a"),
+    ("yao", "bpgd-t010", "literature_policies/yao-2024-guided-decimation/bpgd-t010.spec.toml", "f800a9d6dd689ccbb020c2541661c1389adf5a601027bc0562cfd8f46a2eee59"),
+    ("yao", "bpgd-t070", "literature_policies/yao-2024-guided-decimation/bpgd-t070.spec.toml", "4ef743753a220310ab87e9114282a63c6de6cab2d766d5380f181d631a07a0a3"),
+    ("yao", "bpgd-t100", "literature_policies/yao-2024-guided-decimation/bpgd-t100.spec.toml", "5b1f956643bf6da2a2f507f6853dded7d402e4e9e675f9f945ce9c928104b324"),
+    ("yao", "bpgd-t100-r002", "literature_policies/yao-2024-guided-decimation/bpgd-t100-r002.spec.toml", "e66ce9ff55d05ca36f31200febb95ec3ec208f550cbc0f8d299a6109bd2f0fe8"),
+    ("yao", "bpgd-t100-r005", "literature_policies/yao-2024-guided-decimation/bpgd-t100-r005.spec.toml", "fc4b60550e34959a5778f07713609a6b9b974ff9aa75b32403a942dc264157d7"),
+    ("yao", "bpgd-t100-r010", "literature_policies/yao-2024-guided-decimation/bpgd-t100-r010.spec.toml", "421a1209008bf4f685089e78d7d8afa3b5d9623aaf31bc643254355fe47a3319"),
+    ("yao", "bpgd-t100-r050", "literature_policies/yao-2024-guided-decimation/bpgd-t100-r050.spec.toml", "27e1d813fcd7ed37280a909ee43f8700ac4794af68d40fb9a532cb4560671a97"),
+    ("yao", "bpgd-t100-r882", "literature_policies/yao-2024-guided-decimation/bpgd-t100-r882.spec.toml", "f41ffa51fc0c6bc46557ddd532124a8ac3c0b3cc6b56cfac5f9c354eb36cff29"),
+)
+_PHASE9_RUNNABLE_COUNTERPARTS = {
+    ("bhatnagar", "first-convergence-0"): "literature_policies/bhatnagar-2026-impulse-decoding/first-convergence-0.toml",
+    ("rabeti", "mbbp-ld"): "literature_policies/rabeti-2026-multiple-bases-bp-list-decoding/mbbp-ld.toml",
+    ("yao", "bp-t100"): "literature_policies/yao-2024-guided-decimation/bp-t100.toml",
+    ("yao", "bpgd-t001"): "literature_policies/yao-2024-guided-decimation/bpgd-t001.toml",
+    ("yao", "bpgd-t100-r002"): "literature_policies/yao-2024-guided-decimation/bpgd-t100-r002.toml",
+}
+_PHASE9_RECEIPTS = {
+    "bhatnagar": "literature_policies/bhatnagar-2026-impulse-decoding/paper_reproduction/source-qualification-v1.json",
+    "rabeti": "literature_policies/rabeti-2026-multiple-bases-bp-list-decoding/paper_reproduction/source-targets-v1.json",
+    "yao": "literature_policies/yao-2024-guided-decimation/paper_reproduction/source-targets-v1.json",
+}
+
+
+def _phase9_json(path: Path) -> dict[str, Any]:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise ValueError(f"Phase 9 qualification receipt is unreadable: {path}") from error
+    if not isinstance(value, dict):
+        raise ValueError(f"Phase 9 qualification receipt must be a JSON object: {path}")
+    return value
+
+
+def _phase9_receipt_summary(root: Path, family: str) -> tuple[dict[str, Any], tuple[str, ...], dict[str, Any]]:
+    """Validate each paper receipt while retaining every observed discrepancy."""
+    relative = _PHASE9_RECEIPTS[family]
+    path = root / relative
+    receipt = _phase9_json(path)
+    digest = sha256(path.read_bytes()).hexdigest()
+    if family == "bhatnagar":
+        paper = receipt.get("paper")
+        figure = receipt.get("vector_figure")
+        if (not isinstance(paper, dict) or paper.get("revision") != "arXiv:2606.18240v1"
+                or paper.get("sha256") != "ad7b63a456b9ec16a20aa7712b8be1f1c8d0cad48f6702583746b05363940208"
+                or not isinstance(figure, dict)
+                or figure.get("sha256") != "7e49980c87891a7bd21bbeca29563e2026713ef59e447e34e654118f96a454d1"
+                or receipt.get("target_extraction", {}).get("status") != "blocked"
+                or receipt.get("author_numeric_data", {}).get("status") != "unavailable_to_workspace"
+                or receipt.get("author_implementation", {}).get("status") != "identity_unverified"):
+            raise ValueError("Bhatnagar receipt does not retain its pinned unavailable evidence state")
+        blockers = tuple(receipt.get("source_experiment_blockers", ()))
+        target = {"status": "blocked", "reason": "author_data_unavailable_to_workspace_and_digitization_unperformed"}
+    else:
+        archive = receipt.get("source_archive")
+        qualifications = receipt.get("source_experiment_qualifications")
+        targets = receipt.get("targets")
+        expected = {
+            "yao": ("arXiv:2312.10950v2", "8ddade4c50c9b12853e5431c53f4906fd29913bbf3be306422bafd984a05d654"),
+            "rabeti": ("arXiv:2605.14170v1", "467622e2f17f01d302d6c790b13078569f17d71cd83910558535019a594e07c1"),
+        }[family]
+        if (not isinstance(archive, dict) or (archive.get("revision"), archive.get("sha256")) != expected
+                or not isinstance(qualifications, list) or not qualifications
+                or not isinstance(targets, list) or not targets):
+            raise ValueError(f"{family} receipt does not retain its pinned source targets")
+        first = qualifications[0]
+        if not isinstance(first, dict) or not isinstance(first.get("qualification_blockers"), list):
+            raise ValueError(f"{family} receipt lacks source-qualification blockers")
+        blockers = tuple(first["qualification_blockers"])
+        if family == "rabeti":
+            snapshot = first.get("source_experiment", {}).get("paper_snapshot", {})
+            if not isinstance(snapshot, dict) or snapshot.get("sha256") != "7b19e17fb1ffe04c3e61aef38d02967715cba84e568667206bce2a525a79928f":
+                raise ValueError("Rabeti live-source digest discrepancy is missing from the qualification receipt")
+            blockers += ("live_source_digest_discrepancy_unresolved",)
+        target = {"status": "authored_targets_available", "count": len(targets)}
+    if not all(isinstance(blocker, str) and blocker for blocker in blockers):
+        raise ValueError(f"{family} receipt has malformed source-qualification blockers")
+    return {"path": relative, "sha256": digest}, tuple(sorted(set(blockers))), target
+
+
+def qualify_phase9_source_inventory(root: str | Path | None = None) -> bytes:
+    """Compile the complete, sorted Phase 9 inventory from pinned inputs.
+
+    The output lists source and runnable identities separately.  It never uses
+    numerical agreement or another variant's settings to grant faithfulness.
+    """
+    workspace = Path(root) if root is not None else Path(__file__).resolve().parents[2]
+    workspace = workspace.resolve()
+    policies = workspace / "literature_policies"
+    if not policies.is_dir():
+        raise ValueError("Phase 9 qualification root lacks literature_policies")
+    receipt_data = {family: _phase9_receipt_summary(workspace, family) for family in _PHASE9_RECEIPTS}
+    identities: set[str] = set()
+    records: list[dict[str, Any]] = []
+    for family, variant_id, relative, expected_digest in _PHASE9_SOURCE_SPECS:
+        identity = f"{family}:{variant_id}"
+        if identity in identities:
+            raise ValueError(f"duplicate Phase 9 variant identity: {identity}")
+        identities.add(identity)
+        path = workspace / relative
+        raw = path.read_bytes()
+        actual_digest = sha256(raw).hexdigest()
+        if actual_digest != expected_digest:
+            raise ValueError(f"Phase 9 source specification digest mismatch: {relative}")
+        document = _source_record(path)
+        source = document.get("source")
+        if (document.get("record_kind") != "literature_policy_spec"
+                or document.get("variant_id") != variant_id
+                or document.get("execution_status") != "not_runnable"
+                or not isinstance(source, dict)
+                or not isinstance(source.get("revision"), str)):
+            raise ValueError(f"Phase 9 source specification is malformed: {relative}")
+        receipt_ref, receipt_blockers, target = receipt_data[family]
+        blockers = set(receipt_blockers)
+        raw_blockers = document.get("blocking_features", ())
+        if not isinstance(raw_blockers, list) or not all(isinstance(item, str) and item for item in raw_blockers):
+            raise ValueError(f"Phase 9 source specification lacks explicit blockers: {relative}")
+        blockers.update(raw_blockers)
+        blockers.update(("ordered_paper_experiment_artifact_identity", "author_implementation_identity"))
+        counterpart_relative = _PHASE9_RUNNABLE_COUNTERPARTS.get((family, variant_id))
+        counterpart = None
+        if counterpart_relative is not None:
+            counterpart_path = workspace / counterpart_relative
+            counterpart = {
+                "path": counterpart_relative,
+                "sha256": sha256(counterpart_path.read_bytes()).hexdigest(),
+                "execution_status": "runnable_canonical_adaptation",
+                "qualification": "canonical_adaptation_not_assessed",
+            }
+        records.append({
+            "assessment_eligibility": "not_eligible",
+            "blockers": sorted(blockers),
+            "identity": identity,
+            "native_status": "identity_unverified",
+            "qualification": "canonical_adaptation_not_assessed",
+            "receipt": receipt_ref,
+            "runnable_counterpart": counterpart,
+            "source_execution_status": "not_runnable",
+            "source_faithful": False,
+            "source_revision": source["revision"],
+            "source_spec": relative,
+            "source_spec_sha256": actual_digest,
+            "target_status": target,
+        })
+    if len(records) != 14:
+        raise ValueError("Phase 9 inventory must contain exactly fourteen selected variants")
+    records.sort(key=lambda record: record["identity"])
+    return (json.dumps({
+        "evidence_kind": "phase9_css_source_qualification_inventory_v1",
+        "format_version": 1,
+        "records": records,
+    }, indent=2, sort_keys=True) + "\n").encode("utf-8")

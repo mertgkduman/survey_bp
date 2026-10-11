@@ -4,6 +4,11 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import shutil
+
+import pytest
+
+from bp_registry.literature import qualify_phase9_source_inventory
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -44,3 +49,36 @@ def test_bhatnagar_unavailable_receipt_requires_complete_later_author_admission(
         "byte_snapshot", "communication_or_access_date", "curve_or_column_identity", "revision",
     }
     assert receipt["pinned_digitization"]["status"] == "eligible_unperformed"
+
+
+def test_inventory_has_fourteen_sorted_unfaithful_records_and_matches_compiler() -> None:
+    compiled = qualify_phase9_source_inventory(ROOT)
+    checked_in = (ROOT / "literature_policies/qualification-v1.json").read_bytes()
+
+    assert compiled == checked_in
+    inventory = json.loads(compiled)
+    records = inventory["records"]
+    assert len(records) == 14
+    assert [record["identity"] for record in records] == sorted(
+        record["identity"] for record in records
+    )
+    assert all(record["source_faithful"] is False for record in records)
+    assert all(record["assessment_eligibility"] == "not_eligible" for record in records)
+    assert {
+        record["qualification"]
+        for record in records
+        if record["runnable_counterpart"] is not None
+    } == {"canonical_adaptation_not_assessed"}
+
+
+def test_inventory_preserves_rabeti_digest_discrepancy_and_rejects_input_tampering(tmp_path: Path) -> None:
+    workspace = tmp_path / "workspace"
+    shutil.copytree(ROOT / "literature_policies", workspace / "literature_policies")
+    compiled = json.loads(qualify_phase9_source_inventory(workspace))
+    rabeti = next(record for record in compiled["records"] if record["identity"] == "rabeti:mbbp-ld")
+    assert "live_source_digest_discrepancy_unresolved" in rabeti["blockers"]
+
+    source_spec = workspace / "literature_policies/yao-2024-guided-decimation/bp-t100.spec.toml"
+    source_spec.write_text(source_spec.read_text(encoding="utf-8") + "\n# altered\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="digest mismatch"):
+        qualify_phase9_source_inventory(workspace)
