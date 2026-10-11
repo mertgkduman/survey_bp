@@ -8,7 +8,17 @@ import importlib
 import pytest
 from scipy.stats import binomtest
 
-from bp_registry.campaigns.contracts import TargetReferenceV1
+from bp_registry.campaigns.contracts import (
+    AssessmentFamilyV1,
+    CampaignAssessmentV1,
+    ExactIntervalV1,
+    FiniteLookStoppingV1,
+    LookAlphaAllocationV1,
+    OutcomeMatrixV1,
+    OutcomeTreatmentV1,
+    ScientificResourceCapsV1,
+    TargetReferenceV1,
+)
 _HASH = "a" * 64
 
 
@@ -129,3 +139,121 @@ def test_target_decision_clips_to_probability_domain_and_requires_source_n_when_
     assert result.verdict == "inconclusive"
     assert result.reason == "missing_required_source_denominator"
     assert math.isfinite(result.computed_interval[1])
+
+
+def _finite_assessment() -> CampaignAssessmentV1:
+    target = TargetReferenceV1(
+        target_id="p050",
+        target_receipt_sha256="b" * 64,
+        lower=0.0,
+        upper=0.10,
+        absolute_tolerance=0.15,
+    )
+    allocations = tuple(
+        LookAlphaAllocationV1(family_id="family", target_id="p050", look=look, alpha=0.01)
+        for look in (10, 20)
+    )
+    treatments = (
+        OutcomeTreatmentV1(terminal_status="exact", all_shot="success", conditional="accepted"),
+        OutcomeTreatmentV1(terminal_status="stabilizer_equivalent", all_shot="success", conditional="accepted"),
+        OutcomeTreatmentV1(terminal_status="wrong_logical_action", all_shot="failure", conditional="accepted"),
+        OutcomeTreatmentV1(terminal_status="invalid_syndrome", all_shot="failure", conditional="excluded"),
+        OutcomeTreatmentV1(terminal_status="no_proposal", all_shot="failure", conditional="excluded"),
+        OutcomeTreatmentV1(terminal_status="nonconvergence", all_shot="failure", conditional="excluded"),
+        OutcomeTreatmentV1(terminal_status="timeout", all_shot="failure", conditional="excluded"),
+        OutcomeTreatmentV1(terminal_status="postselected_rejection", all_shot="failure", conditional="excluded"),
+        OutcomeTreatmentV1(terminal_status="infrastructure_interruption", all_shot="incomplete", conditional="incomplete"),
+    )
+    return CampaignAssessmentV1(
+        schema="campaign_assessment_v1",
+        targets=(target,),
+        interval=ExactIntervalV1(method="exact_clopper_pearson", confidence_level=0.95),
+        families=(AssessmentFamilyV1(family_id="family", alpha=0.05, member_target_ids=("p050",)),),
+        stopping=FiniteLookStoppingV1(
+            mode="finite_look",
+            cumulative_looks=(10, 20),
+            batch_sizes=(5, 5),
+            minimum_terminal_shots=10,
+            stop_rule="all_primary_decisions_resolved_or_maximum_reached",
+            alpha_allocations=allocations,
+        ),
+        outcome_matrix=OutcomeMatrixV1(rule_id="all_shot_v1", treatments=treatments),
+        decision_rule="target_interval_containment_v1",
+        resources=ScientificResourceCapsV1(
+            max_shots=20,
+            max_looks=2,
+            max_batch_size=5,
+            max_decoder_work=100,
+            max_events=100,
+            max_evidence_bytes=10_000,
+            max_storage_bytes=10_000,
+        ),
+    )
+
+
+def _finite_look_assessment(*args: object, **kwargs: object) -> object:
+    api = _statistics_api()
+    assert api is not None and hasattr(api, "finite_look_assessment"), (
+        "campaign statistics module must provide finite-look assessment"
+    )
+    return api.finite_look_assessment(*args, **kwargs)
+
+
+def _look(*, look: int, dispatched: int, realized: int, failures: int) -> object:
+    api = _statistics_api()
+    assert api is not None and hasattr(api, "FiniteLookObservationV1"), (
+        "campaign statistics module must provide finite-look observations"
+    )
+    return api.FiniteLookObservationV1(
+        look=look,
+        dispatched_shots=dispatched,
+        realized_shots=realized,
+        failures_by_target={"p050": failures},
+        count_receipt_sha256_by_target={"p050": _HASH},
+    )
+
+
+def test_finite_look_uses_declared_alpha_and_stops_only_after_a_completed_look() -> None:
+    result = _finite_look_assessment(
+        _finite_assessment(),
+        observations=(
+            _look(look=10, dispatched=10, realized=10, failures=0),
+            _look(look=20, dispatched=20, realized=20, failures=0),
+        ),
+        input_receipt_hashes={"assessment": "c" * 64},
+    )
+    assert result.status == "complete"
+    assert result.completed_looks == (10, 20)
+    assert result.stop_reason == "all_primary_decisions_resolved"
+    assert tuple(record.alpha_spent for record in result.look_records) == (0.01, 0.01)
+    assert result.look_records[1].target_decisions["p050"].verdict == "pass"
+
+
+def test_finite_look_retains_whole_completed_batch_overshoot() -> None:
+    result = _finite_look_assessment(
+        _finite_assessment(),
+        observations=(_look(look=10, dispatched=15, realized=15, failures=0),),
+        input_receipt_hashes={"assessment": "c" * 64},
+    )
+    record = result.look_records[0]
+    assert result.status == "complete"
+    assert record.planned_boundary == 10
+    assert record.dispatched_shots == record.realized_shots == 15
+    assert record.overshoot == 5
+
+
+def test_finite_look_partial_batch_and_undeclared_peeking_are_inconclusive_or_rejected() -> None:
+    partial = _finite_look_assessment(
+        _finite_assessment(),
+        observations=(_look(look=10, dispatched=15, realized=9, failures=0),),
+        input_receipt_hashes={"assessment": "c" * 64},
+    )
+    assert partial.status == "inconclusive_partial_batch"
+    assert partial.completed_looks == ()
+    assert partial.stop_reason == "partial_batch"
+    with pytest.raises(ValueError, match="declared"):
+        _finite_look_assessment(
+            _finite_assessment(),
+            observations=(_look(look=15, dispatched=15, realized=15, failures=0),),
+            input_receipt_hashes={"assessment": "c" * 64},
+        )

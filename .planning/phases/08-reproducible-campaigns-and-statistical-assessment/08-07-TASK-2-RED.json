@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_statistics.py -k 'stopping or finite_look or alpha or overshoot or partial or peeking' -x",
+  "exitCode": 1,
+  "targetTest": "test_finite_look_uses_declared_alpha_and_stops_only_after_a_completed_look",
+  "targetFile": "tests/test_campaign_statistics.py",
+  "expected": "Finite-look assessment records only declared complete looks with their local alpha allocation.",
+  "actual": "AssertionError: campaign statistics module must provide finite-look observations",
+  "output": "TAP version 13\nnot ok 1 - test_finite_look_uses_declared_alpha_and_stops_only_after_a_completed_look\n  ---\n  message: campaign statistics module must provide finite-look observations\n  ...\n1..1\n# tests 1\n# pass 0\n# fail 1\n"
+}
