@@ -26,16 +26,16 @@ This is the pre-execution test contract. The planner assigns task IDs and waves;
 
 | Requirement | Planned verification | Test file | Current status |
 |-------------|----------------------|-----------|----------------|
-| LED-05 | Valid, incomplete, duplicate, conflicting, and corrupt shards; replay from retained evidence | `tests/test_campaign_shards.py` | Wave 0 |
-| SIM-01 | Same physical sample identities across arm order and worker count; persisted-sample fallback | `tests/test_campaign_execution.py` | Wave 0 |
-| SIM-02 | Local and synthetic Slurm runs consume the same plan and retain resource, timing, and work facts | `tests/test_campaign_execution.py` | Wave 0 |
-| SIM-03 | Resume is exact missing-unit subtraction; source, environment, and rule drift are rejected | `tests/test_campaign_shards.py` | Wave 0 |
-| STAT-01 | Manifest freezes targets, effects, methods, families, stopping, and decision rules | `tests/test_campaign_contracts.py` | Wave 0 |
-| STAT-02 | Integer counts and exact rare-event intervals, including positive zero-failure upper bound | `tests/test_campaign_statistics.py` | Wave 0 |
-| STAT-03 | Fixed and finite-look stopping, alpha allocation, overshoot, and partial-run evidence | `tests/test_campaign_statistics.py` | Wave 0 |
-| STAT-04 | Source/table/figure and digitization bytes, calibration, precision, and missing sample n | `tests/test_campaign_targets.py` | Wave 0 |
-| STAT-05 | Exact paired cells, difference intervals, multiplicity, denominator and acceptance rules | `tests/test_campaign_statistics.py` | Wave 0 |
-| Operational gate | Representative decoder/replay throughput, ledger bytes, and shard-cost bound | `tests/test_campaign_profile_gate.py` | Wave 0 |
+| LED-05 | 08-01 T1; 08-05 T1-T2; 08-06 T1-T2; 08-11 T1; 08-14 T2 — durable validation, exact merge, replay, resume, and reconstruction | `tests/test_campaign_shards.py` | Wave 0 |
+| SIM-01 | 08-04 T1-T2; 08-09 T1-T2; 08-14 T2 — arm/worker invariance and persisted-sample fallback | `tests/test_campaign_execution.py` | Wave 0 |
+| SIM-02 | 08-09 T1; 08-10 T1-T2; 08-12 T2; 08-14 T2 — one plan across local/Slurm with resource, timing, and work facts | `tests/test_campaign_execution.py` | Wave 0 |
+| SIM-03 | 08-02 T1-T2; 08-06 T1-T2; 08-10 T2; 08-12 T1 — exact resume and identity/rule/dependency drift rejection | `tests/test_campaign_shards.py` | Wave 0 |
+| STAT-01 | 08-02 T1-T2; 08-03 T1-T2; 08-07 T1; 08-11 T1 — prespecified targets, effects, methods, families, stopping, and decisions | `tests/test_campaign_contracts.py` | Wave 0 |
+| STAT-02 | 08-01 T1; 08-07 T1; 08-11 T2 — integer counts and exact rare-event boundary intervals | `tests/test_campaign_statistics.py` | Wave 0 |
+| STAT-03 | 08-02 T2; 08-06 T2; 08-07 T2; 08-09 T2 — fixed/finite looks, alpha, overshoot, and partial evidence | `tests/test_campaign_statistics.py` | Wave 0 |
+| STAT-04 | 08-03 T1-T2; 08-07 T1; 08-11 T1 — source and digitization bytes, calibration, precision, and missing sample n | `tests/test_campaign_targets.py` | Wave 0 |
+| STAT-05 | 08-02 T2; 08-08 T1-T2; 08-11 T2 — paired cells, intervals, multiplicity, denominators, and acceptance | `tests/test_campaign_statistics.py` | Wave 0 |
+| Operational gate | 08-13 T1-T2; 08-14 T1-T2 — representative decoder/replay throughput, storage, scheduler cost, and authorization | `tests/test_campaign_profile_gate.py` | Wave 0 |
 
 ## Wave 0 Requirements
 

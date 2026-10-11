@@ -500,7 +500,47 @@ Plans:
 **Research focus:** Paper-specific precision and budgets, sequential inference, digitization, multiplicity, sample replay, durable shard protocol, and site execution limits.
 **Operational gate:** Profile decoder and replay throughput, ledger size, and HPC shard cost on representative nontrivial CSS samples before approving large campaigns; choose resource and storage budgets from measured evidence.
 **Scope carry-forward:** Design future CSS campaigns from a newly prespecified question, precision target, stopping rule and measured budget. The cancelled Phase 4 grid is historical evidence, not a required or automatically funded Phase 8 run.
-**Plans:** TBD
+**Plans:** 14 plans
+
+Plans:
+
+**Wave 1**
+
+- [ ] 08-01-PLAN.md — Prove one fixed-shot campaign from preflight through immutable evidence and reconstruction.
+
+**Wave 2**
+
+- [ ] 08-02-PLAN.md — Freeze campaign, stopping, assessment, resource, and denominator contracts.
+
+**Wave 3**
+
+- [ ] 08-03-PLAN.md — Preserve source targets and plot-digitization precision.
+- [ ] 08-04-PLAN.md — Freeze arm-neutral samples, atomic unit keys, and disjoint shards.
+- [ ] 08-07-PLAN.md — Implement exact fixed-shot and finite-look inference.
+
+**Wave 4**
+
+- [ ] 08-05-PLAN.md — Seal, validate, replay, and merge immutable shard evidence.
+- [ ] 08-08-PLAN.md — Implement paired comparisons, multiplicity, acceptance, and denominators.
+
+**Wave 5**
+
+- [ ] 08-06-PLAN.md — Resume by verified set subtraction and reject identity drift.
+- [ ] 08-09-PLAN.md — Run bounded matched campaigns locally with topology-independent science.
+
+**Wave 6**
+
+- [ ] 08-10-PLAN.md — Map the frozen shard plan to bounded Slurm transport.
+- [ ] 08-11-PLAN.md — Reconstruct explicit statistical and resource reports from verified evidence.
+
+**Wave 7**
+
+- [ ] 08-12-PLAN.md — Expose the full campaign lifecycle through an installed command.
+- [ ] 08-13-PLAN.md — Measure representative costs and authorize or deny larger work.
+
+**Wave 8**
+
+- [ ] 08-14-PLAN.md — Run and retain the bounded BB-144 operational gate and final verification.
 
 ### Phase 9: CSS Reproduction and Controlled Comparisons
 
