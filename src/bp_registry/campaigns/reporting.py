@@ -567,3 +567,92 @@ def verify_campaign_report(**kwargs: Any) -> bool:
     if report.semantic_bytes() != expected.semantic_bytes() or report.report_sha256 != expected.report_sha256:
         raise ValueError("campaign report differs from independent reconstruction")
     return True
+
+
+def _route_report_projection(report: CampaignReportV1) -> dict[str, Any]:
+    """Keep only report facts that must agree across executor routes."""
+    def science(value: Any) -> Any:
+        if isinstance(value, Mapping):
+            return {
+                key: science(item) for key, item in value.items()
+                if key not in {"report_sha256", "merge_receipt_sha256", "count_receipt_sha256"}
+            }
+        if isinstance(value, tuple):
+            if len(value) == 2 and value[0] == "merge":
+                return None
+            return tuple(item for item in (science(item) for item in value) if item is not None)
+        if isinstance(value, list):
+            return [item for item in (science(item) for item in value) if item is not None]
+        return value
+
+    projection = science(asdict(report))
+    for point in projection["point_reports"]:
+        point["work_and_resources"]["observations"] = []
+    return projection
+
+
+def _route_merge_projection(merge_receipt: Mapping[str, Any]) -> dict[str, Any]:
+    """Compare canonical terminal science while excluding profiler-only facts."""
+    fields = (
+        "campaign_plan_digest", "terminal_unit_keys", "explicit_final_nonterminal_keys",
+        "incomplete_unit_keys", "authorized_undispatched_keys", "unexpected_unit_keys",
+        "conflicting_unit_keys", "missing_unit_keys", "terminal_facts",
+    )
+    if not isinstance(merge_receipt, Mapping) or any(field not in merge_receipt for field in fields):
+        raise ValueError("route verification requires independently reconstructed merge receipts")
+    events = merge_receipt.get("events")
+    if not isinstance(events, list):
+        raise ValueError("route merge receipt lacks canonical events")
+    normalized_events: list[dict[str, Any]] = []
+    for event in events:
+        if not isinstance(event, Mapping) or not isinstance(event.get("data"), Mapping):
+            raise ValueError("route merge event has an invalid canonical shape")
+        normalized = dict(event)
+        normalized.pop("event_id", None)
+        data = dict(normalized["data"])
+        for observation in ("profile", "decode_runtime", "setup_runtime"):
+            data.pop(observation, None)
+        normalized["data"] = data
+        normalized_events.append(normalized)
+    # Merge receipts sort event records by event ID.  Those IDs include the
+    # profiler observations removed above, so establish route-neutral order
+    # only after retaining every remaining canonical semantic field.
+    normalized_events.sort(key=canonical_json_bytes)
+    return {**{field: merge_receipt[field] for field in fields}, "events": normalized_events}
+
+
+def verify_campaign_routes(
+    *, local_report: CampaignReportV1, slurm_report: CampaignReportV1,
+    local_merge_receipt: Mapping[str, Any], slurm_merge_receipt: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Prove route-neutral campaign science after both routes are independently replayed."""
+    if not isinstance(local_report, CampaignReportV1) or not isinstance(slurm_report, CampaignReportV1):
+        raise ValueError("route verification requires two reconstructed campaign reports")
+    local_science = {
+        "report": _route_report_projection(local_report),
+        "merge": _route_merge_projection(local_merge_receipt),
+    }
+    slurm_science = {
+        "report": _route_report_projection(slurm_report),
+        "merge": _route_merge_projection(slurm_merge_receipt),
+    }
+    if canonical_json_bytes(local_science) != canonical_json_bytes(slurm_science):
+        raise ValueError("local and Slurm routes differ in scientific campaign evidence")
+    local_observations = {
+        item.point_id: asdict(item.work_and_resources)["observations"]
+        for item in local_report.point_reports
+    }
+    slurm_observations = {
+        item.point_id: asdict(item.work_and_resources)["observations"]
+        for item in slurm_report.point_reports
+    }
+    differences = {
+        point_id: {"local": local_observations[point_id], "slurm": slurm_observations[point_id]}
+        for point_id in sorted(set(local_observations) | set(slurm_observations))
+        if local_observations.get(point_id) != slurm_observations.get(point_id)
+    }
+    return {
+        "schema": "campaign_route_equivalence_v1",
+        "scientific_records_match": True,
+        "observational_differences": differences,
+    }

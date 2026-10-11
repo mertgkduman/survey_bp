@@ -28,7 +28,7 @@ from .execution import (
 )
 from .planning import CampaignCoordinateV1, CampaignWorkPlan, freeze_campaign_work_spec, freeze_work_plan
 from .shards import derive_resume_plan, merge_verified_attempts
-from .reporting import reconstruct_campaign_report
+from .reporting import reconstruct_campaign_report, verify_campaign_report, verify_campaign_routes
 from .shards import reconstruct_fixed_shot, verify_shard
 from .slurm import (
     SchedulerObservation,
@@ -568,6 +568,23 @@ def _paired_report_inputs(
     }
 
 
+def _verify_paired_report(
+    *, report_path: str, plan: CampaignWorkPlan, spec: CampaignWorkSpecV1, merged: Mapping[str, Any],
+) -> tuple[Any, str]:
+    """Reconstruct a retained report before accepting any of its cache bytes."""
+    report_file = Path(report_path)
+    retained = _read_json(report_path)
+    expected = reconstruct_campaign_report(**_paired_report_inputs(plan=plan, spec=spec, merged=merged))
+    expected_payload = asdict(expected)
+    expected_bytes = canonical_json_bytes(expected_payload) + b"\n"
+    if _json_bytes(report_file) != expected_bytes or canonical_json_bytes(retained) != canonical_json_bytes(expected_payload):
+        raise ValueError("retained campaign report differs from independent reconstruction")
+    # The byte check binds the persisted cache; this delegated check keeps the
+    # public report-verification contract exercised on every installed replay.
+    verify_campaign_report(report=expected, **_paired_report_inputs(plan=plan, spec=spec, merged=merged))
+    return expected, sha256(expected_bytes).hexdigest()
+
+
 def _paired_scientific_identity(plan: CampaignWorkPlan) -> dict[str, str]:
     """Construct the complete route-independent identity required for retry reduction."""
     spec = plan.work_spec
@@ -663,6 +680,18 @@ def _run(args: argparse.Namespace, *, route: str) -> dict[str, Any]:
 
 def _verify(args: argparse.Namespace) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
+    if args.report is not None:
+        if args.plan is None or args.merge is None:
+            raise ValueError("report verification requires --plan and --merge")
+        spec, plan, payload = _load_work_plan(args.plan, root)
+        merged = _paired_merge_payload(args.merge, plan=plan)
+        report, artifact_sha = _verify_paired_report(
+            report_path=args.report, plan=plan, spec=spec, merged=merged,
+        )
+        return _artifact(status="ok", plan=payload, phase="verify", verified=True,
+                         report_path=str(Path(args.report).resolve()), report_sha256=report.report_sha256,
+                         report_artifact_sha256=artifact_sha,
+                         merge_receipt_sha256=report.merge_receipt_sha256)
     if args.plan is not None and _read_json(args.plan).get("schema") == "campaign_work_plan_v1":
         _spec, plan, payload = _load_work_plan(args.plan, root)
         attempts = _paired_attempts(args.receipt, plan=plan)
@@ -681,6 +710,46 @@ def _verify(args: argparse.Namespace) -> dict[str, Any]:
     }
     return _artifact(status="ok", plan=plan, phase="verify", verified=True, receipt_path=str(receipt.resolve()),
                      receipt_sha256=sha256(receipt.read_bytes()).hexdigest(), report=report)
+
+
+def _verify_routes(args: argparse.Namespace) -> dict[str, Any]:
+    """Replay both route chains, then publish an input-bound equivalence receipt."""
+    root = _existing_root(args.campaign_root, name="campaign_root")
+    spec, plan, payload = _load_work_plan(args.plan, root)
+    local_merged = _paired_merge_payload(args.local_merge, plan=plan)
+    slurm_merged = _paired_merge_payload(args.slurm_merge, plan=plan)
+    local_report, local_report_artifact_sha = _verify_paired_report(
+        report_path=args.local_report, plan=plan, spec=spec, merged=local_merged,
+    )
+    slurm_report, slurm_report_artifact_sha = _verify_paired_report(
+        report_path=args.slurm_report, plan=plan, spec=spec, merged=slurm_merged,
+    )
+    compared = verify_campaign_routes(
+        local_report=local_report, slurm_report=slurm_report,
+        local_merge_receipt=local_merged, slurm_merge_receipt=slurm_merged,
+    )
+    output_path = Path(args.output)
+    output_parent = _existing_root(str(output_path.parent), name="route receipt output parent")
+    if not output_path.name:
+        raise ValueError("route receipt output must name a file")
+    artifact = _publish_json(output_parent / output_path.name, {
+        **compared,
+        "campaign_spec_digest": plan.campaign_spec_digest,
+        "campaign_plan_digest": plan.campaign_plan_digest,
+        "local": {
+            "merge_sha256": sha256(_json_bytes(Path(args.local_merge))).hexdigest(),
+            "report_sha256": local_report.report_sha256,
+            "report_artifact_sha256": local_report_artifact_sha,
+        },
+        "slurm": {
+            "merge_sha256": sha256(_json_bytes(Path(args.slurm_merge))).hexdigest(),
+            "report_sha256": slurm_report.report_sha256,
+            "report_artifact_sha256": slurm_report_artifact_sha,
+        },
+    })
+    return _artifact(status="ok", plan=payload, phase="verify_routes", verified=True,
+                     scientific_records_match=True, artifact_path=str(artifact),
+                     artifact_sha256=sha256(artifact.read_bytes()).hexdigest())
 
 
 def _verify_operational_gate(args: argparse.Namespace) -> dict[str, Any]:
@@ -1082,15 +1151,21 @@ def _parser() -> argparse.ArgumentParser:
     item.add_argument("--allocation", required=True); item.add_argument("--site-allowlists", required=True)
     item.set_defaults(handler=_emit_slurm)
     item = commands.add_parser("verify")
-    item.add_argument("--receipt"); item.add_argument("--plan"); item.add_argument("--campaign")
+    verification_input = item.add_mutually_exclusive_group()
+    verification_input.add_argument("--receipt"); verification_input.add_argument("--report"); verification_input.add_argument("--campaign")
+    item.add_argument("--merge"); item.add_argument("--plan")
     item.add_argument("--campaign-root", required=True); item.add_argument("--output")
-    item.set_defaults(handler=lambda args: _verify_operational_gate(args) if args.campaign is not None else _verify(args) if args.receipt is not None else (_ for _ in ()).throw(ValueError("verify requires --receipt or --campaign")))
+    item.set_defaults(handler=lambda args: _verify_operational_gate(args) if args.campaign is not None else _verify(args) if args.receipt is not None or args.report is not None else (_ for _ in ()).throw(ValueError("verify requires --receipt, --report, or --campaign")))
     item = commands.add_parser("merge")
     item.add_argument("--receipt", action="append", required=True); item.add_argument("--plan"); item.add_argument("--campaign-root", required=True); item.add_argument("--output-root", required=True); item.set_defaults(handler=_merge)
     item = commands.add_parser("resume")
     item.add_argument("--plan", required=True); item.add_argument("--merge", required=True); item.add_argument("--campaign-root", required=True); item.set_defaults(handler=_resume)
     item = commands.add_parser("assess")
     item.add_argument("--merge", required=True); item.add_argument("--plan"); item.add_argument("--campaign-root", required=True); item.add_argument("--output-root"); item.set_defaults(handler=_assess)
+    item = commands.add_parser("verify-routes")
+    item.add_argument("--plan", required=True); item.add_argument("--local-merge", required=True); item.add_argument("--local-report", required=True)
+    item.add_argument("--slurm-merge", required=True); item.add_argument("--slurm-report", required=True)
+    item.add_argument("--campaign-root", required=True); item.add_argument("--output", required=True); item.set_defaults(handler=_verify_routes)
     item = commands.add_parser("site-capability")
     item.add_argument("--scontrol"); item.add_argument("--sacct"); item.set_defaults(handler=_site_capability)
     item = commands.add_parser("operational-fixture")

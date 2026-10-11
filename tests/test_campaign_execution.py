@@ -856,6 +856,110 @@ def test_installed_assess_emits_complete_campaign_report(tmp_path: Path) -> None
     assert sha256(report_path.read_bytes()).hexdigest() == payload["artifact_sha256"]
 
 
+def test_installed_report_verify_reconstructs_retained_report(tmp_path: Path) -> None:
+    """The installed verifier replays report inputs instead of trusting JSON cache bytes."""
+    document = tmp_path / "paired.json"
+    document.write_text(json.dumps({"campaign_work_spec": _paired_work_spec_payload()}), encoding="utf-8")
+    planned = _run_installed_campaign(
+        "plan", "--campaign", str(document), "--campaign-root", str(ROOT),
+        "--output-root", str(tmp_path / "plan"),
+    )
+    assert planned.returncode == 0, planned.stdout
+    plan_path = json.loads(planned.stdout)["artifact_path"]
+    run = _run_installed_campaign(
+        "run-local", "--plan", plan_path, "--campaign-root", str(ROOT),
+        "--output-root", str(tmp_path / "run"),
+    )
+    merged = _run_installed_campaign(
+        "merge", "--plan", plan_path, "--receipt", json.loads(run.stdout)["artifact_path"],
+        "--campaign-root", str(ROOT), "--output-root", str(tmp_path / "merge"),
+    )
+    assessed = _run_installed_campaign(
+        "assess", "--plan", plan_path, "--merge", json.loads(merged.stdout)["artifact_path"],
+        "--campaign-root", str(ROOT), "--output-root", str(tmp_path / "assessment"),
+    )
+    assert assessed.returncode == 0, assessed.stdout
+    assessment = json.loads(assessed.stdout)
+    verified = _run_installed_campaign(
+        "verify", "--report", assessment["artifact_path"], "--plan", plan_path,
+        "--merge", json.loads(merged.stdout)["artifact_path"], "--campaign-root", str(ROOT),
+    )
+    assert verified.returncode == 0, verified.stdout
+    assert json.loads(verified.stdout)["verified"] is True
+    tampered = json.loads(Path(assessment["artifact_path"]).read_text(encoding="utf-8"))
+    tampered["status"] = "inconclusive"
+    tampered_path = tmp_path / "tampered-assessment.json"
+    tampered_path.write_text(json.dumps(tampered, sort_keys=True) + "\n", encoding="utf-8")
+    rejected = _run_installed_campaign(
+        "verify", "--report", str(tampered_path), "--plan", plan_path,
+        "--merge", json.loads(merged.stdout)["artifact_path"], "--campaign-root", str(ROOT),
+    )
+    assert rejected.returncode != 0
+
+
+def test_installed_route_equivalence_verify_reconstructs_both_routes(tmp_path: Path) -> None:
+    """Local and selected Slurm chains must be separately replayed before comparison."""
+    document = tmp_path / "paired.json"
+    document.write_text(json.dumps({"campaign_work_spec": _paired_work_spec_payload()}), encoding="utf-8")
+    planned = _run_installed_campaign(
+        "plan", "--campaign", str(document), "--campaign-root", str(ROOT),
+        "--output-root", str(tmp_path / "plan"),
+    )
+    assert planned.returncode == 0, planned.stdout
+    plan_path = json.loads(planned.stdout)["artifact_path"]
+    local = _run_installed_campaign(
+        "run-local", "--plan", plan_path, "--campaign-root", str(ROOT),
+        "--output-root", str(tmp_path / "local"),
+    )
+    assert local.returncode == 0, local.stdout
+    allocation = tmp_path / "allocation.json"
+    allocation.write_text(json.dumps({
+        "partition": "research", "qos": "short", "account": "bp", "wall_minutes": 10,
+        "memory_mb": 256, "cpus_per_task": 1, "max_concurrent_tasks": 1,
+    }), encoding="utf-8")
+    observation = tmp_path / "observation.json"
+    observation.write_text(json.dumps({
+        "job_id": "81234", "task_id": "0", "allocated_cpus": 1, "elapsed_seconds": 1,
+        "state": "COMPLETED", "exit_code": 0, "accounting_available": None,
+        "accounting_unavailable_reason": "sacct unavailable", "launch_overhead_seconds": 0,
+        "shard_fixed_cost_seconds": 0,
+    }), encoding="utf-8")
+    slurm = _run_installed_campaign(
+        "run-shard", "--plan", plan_path, "--campaign-root", str(ROOT),
+        "--output-root", str(tmp_path / "slurm"), "--array-task-id", "0",
+        "--allocation", str(allocation), "--scheduler-observation", str(observation),
+    )
+    assert slurm.returncode == 0, slurm.stdout
+    local_merge = _run_installed_campaign(
+        "merge", "--plan", plan_path, "--receipt", json.loads(local.stdout)["artifact_path"],
+        "--campaign-root", str(ROOT), "--output-root", str(tmp_path / "local-merge"),
+    )
+    slurm_merge = _run_installed_campaign(
+        "merge", "--plan", plan_path, "--receipt", json.loads(slurm.stdout)["artifact_path"],
+        "--campaign-root", str(ROOT), "--output-root", str(tmp_path / "slurm-merge"),
+    )
+    assert local_merge.returncode == slurm_merge.returncode == 0
+    local_assessment = _run_installed_campaign(
+        "assess", "--plan", plan_path, "--merge", json.loads(local_merge.stdout)["artifact_path"],
+        "--campaign-root", str(ROOT), "--output-root", str(tmp_path / "local-report"),
+    )
+    slurm_assessment = _run_installed_campaign(
+        "assess", "--plan", plan_path, "--merge", json.loads(slurm_merge.stdout)["artifact_path"],
+        "--campaign-root", str(ROOT), "--output-root", str(tmp_path / "slurm-report"),
+    )
+    assert local_assessment.returncode == slurm_assessment.returncode == 0
+    receipt = _run_installed_campaign(
+        "verify-routes", "--plan", plan_path,
+        "--local-merge", json.loads(local_merge.stdout)["artifact_path"],
+        "--local-report", json.loads(local_assessment.stdout)["artifact_path"],
+        "--slurm-merge", json.loads(slurm_merge.stdout)["artifact_path"],
+        "--slurm-report", json.loads(slurm_assessment.stdout)["artifact_path"],
+        "--campaign-root", str(ROOT), "--output", str(tmp_path / "route-equivalence.json"),
+    )
+    assert receipt.returncode == 0, receipt.stdout
+    assert json.loads(receipt.stdout)["scientific_records_match"] is True
+
+
 def test_paired_canonical_local_and_slurm_routes_match(tmp_path: Path) -> None:
     """A selected scheduler shard replays the same frozen canonical evidence."""
     document = tmp_path / "paired.json"
