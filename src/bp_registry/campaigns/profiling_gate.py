@@ -168,11 +168,26 @@ class RepresentativeProfileAggregateV1:
     def replay_shots_per_second(self) -> float:
         return self.sample_count * 1_000_000_000 / self.replay_wall_time_ns
 
+    @property
+    def decoder_ns_per_event(self) -> float | None:
+        return None if self.event_count == 0 else self.decoder_wall_time_ns / self.event_count
+
+    @property
+    def ledger_bytes_per_event(self) -> float | None:
+        return None if self.event_count == 0 else self.ledger_bytes / self.event_count
+
+    @property
+    def sidecar_bytes_per_event(self) -> float | None:
+        return None if self.event_count == 0 else self.sidecar_bytes / self.event_count
+
     def as_evidence(self) -> dict[str, object]:
         return {field.name: getattr(self, field.name) for field in fields(self)} | {
             "memory_available": self.memory_available,
             "decoder_shots_per_second": self.decoder_shots_per_second,
             "replay_shots_per_second": self.replay_shots_per_second,
+            "decoder_ns_per_event": self.decoder_ns_per_event,
+            "ledger_bytes_per_event": self.ledger_bytes_per_event,
+            "sidecar_bytes_per_event": self.sidecar_bytes_per_event,
         }
 
 
@@ -215,6 +230,9 @@ def aggregate_representative_evidence(records: tuple[OperationalEvidenceV1, ...]
             for record in records
         ]
     }
+    total_events = _sum_bounded([record.event_count for record in records], name="event_count")
+    if total_events == 0:
+        missing.add("event_count")
     return RepresentativeProfileAggregateV1(
         campaign_spec_digest=first.campaign_spec_digest,
         campaign_plan_digest=first.campaign_plan_digest,
@@ -224,7 +242,7 @@ def aggregate_representative_evidence(records: tuple[OperationalEvidenceV1, ...]
         profile_receipt_sha256s=tuple(sorted({record.profile_receipt_sha256 for record in records})),
         sample_count=len(records), fast_path_samples=sum(record.path_class == "fast" for record in records),
         slow_path_samples=sum(record.path_class == "slow" for record in records),
-        event_count=_sum_bounded([record.event_count for record in records], name="event_count"),
+        event_count=total_events,
         decoder_wall_time_ns=_sum_bounded(decoder_wall, name="decoder_wall_time_ns"),
         decoder_cpu_time_ns=_sum_bounded(decoder_cpu, name="decoder_cpu_time_ns"),
         replay_wall_time_ns=_sum_bounded([record.replay_wall_time_ns for record in records], name="replay_wall_time_ns"),

@@ -118,6 +118,8 @@ def test_representative_clean_profiled_evidence_measures_throughput_storage_and_
     assert aggregate.memory_available is True
     assert aggregate.decoder_shots_per_second > 0
     assert aggregate.replay_shots_per_second > 0
+    assert aggregate.decoder_ns_per_event == 50
+    assert aggregate.ledger_bytes_per_event == 150
 
 
 def test_semantic_mismatch_and_post_outcome_selection_never_enter_a_projection() -> None:
