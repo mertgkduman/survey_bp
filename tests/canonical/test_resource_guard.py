@@ -148,7 +148,6 @@ def test_materialized_authorization_must_bind_derived_profile_before_writes(tmp_
             ledger_path=ledger, runtime_authorization=wrong,
         )
     assert not ledger.exists()
-
     too_small = CanonicalRuntimeAuthorizationV1(
         profile_digest=derived.digest, mode="strict_full_unit",
         **{**kwargs, "max_events": derived.derived_events_per_unit - 1},
@@ -159,3 +158,34 @@ def test_materialized_authorization_must_bind_derived_profile_before_writes(tmp_
             ledger_path=ledger, runtime_authorization=too_small,
         )
     assert not ledger.exists()
+
+
+def test_guarded_artifact_exact_fit_and_denied_replace_preserve_bytes(tmp_path):
+    from bp_registry.ledger import CanonicalResourceInterruption
+    from bp_registry.runner import (
+        CanonicalRuntimeAuthorizationV1, CanonicalRuntimeGuardV1, guarded_atomic_write_bytes,
+    )
+
+    guard = CanonicalRuntimeGuardV1(CanonicalRuntimeAuthorizationV1.interruptible_unit(
+        profile_digest="a" * 64, authorization_identity="artifact", max_events=1,
+        max_evidence_bytes=1, max_storage_bytes=3, control_receipt_reserve_bytes=4,
+    ))
+    target = tmp_path / "sample.json"
+    guarded_atomic_write_bytes(target, b"abc", resource_guard=guard, boundary="sample")
+    assert target.read_bytes() == b"abc"
+    assert guard.snapshot().scientific_storage_bytes == 3
+    with pytest.raises(CanonicalResourceInterruption):
+        guarded_atomic_write_bytes(target, b"x", resource_guard=guard, boundary="replacement")
+    assert target.read_bytes() == b"abc"
+    assert guard.snapshot().scientific_storage_bytes == 3
+    control = tmp_path / "partial.json"
+    guarded_atomic_write_bytes(
+        control, b"halt", resource_guard=guard, boundary="interruption", control_receipt=True,
+    )
+    assert control.read_bytes() == b"halt"
+    with pytest.raises(CanonicalResourceInterruption):
+        guarded_atomic_write_bytes(
+            tmp_path / "second.json", b"x", resource_guard=guard,
+            boundary="second-control", control_receipt=True,
+        )
+    assert not (tmp_path / "second.json").exists()
