@@ -21,7 +21,7 @@ from typing import Any, Callable, Mapping
 from pydantic import ValidationError
 
 from ..manifests import preflight as preflight_manifest
-from .contracts import CampaignSpecV1, CampaignWorkSpecV1, build_one_unit_plan, canonical_json_bytes
+from .contracts import CampaignSpecV1, CampaignWorkSpecV1, MaterializedPhysicalSampleV1, build_one_unit_plan, canonical_json_bytes
 from .execution import (
     _build_look_merge_receipt, _deterministic_look_stop_receipt, _sealed_local_records,
     dispatch_finite_looks, run_canonical_work_plan, run_one_unit, verify_canonical_attempt,
@@ -352,28 +352,220 @@ def _paired_attempts(receipt_path: str, *, plan: CampaignWorkPlan) -> tuple[dict
     return tuple(verify_canonical_attempt(record=item, plan=plan) for item in attempts)
 
 
+def _route_neutral_trace(events: object) -> bytes:
+    """Remove only canonical profiler observations from a semantic event trace."""
+    if not isinstance(events, list):
+        raise ValueError("mixed-route delivery requires canonical event records")
+    trace = []
+    for event in events:
+        if not isinstance(event, Mapping):
+            raise ValueError("mixed-route delivery requires canonical event mappings")
+        retained = dict(event)
+        retained.pop("event_id", None)  # event IDs hash the excluded profiler values.
+        data = retained.get("data")
+        if not isinstance(data, Mapping):
+            raise ValueError("mixed-route delivery event lacks canonical data")
+        semantic_data = dict(data)
+        # The runner records process timing/RSS beneath these keys.  They are
+        # executor observations; every other canonical field remains exact.
+        for observation in ("profile", "decode_runtime", "setup_runtime"):
+            semantic_data.pop(observation, None)
+        retained["data"] = semantic_data
+        trace.append(retained)
+    return canonical_json_bytes(trace)
+
+
+def _route_neutral_attempts(
+    attempts: tuple[dict[str, Any], ...], *, plan: CampaignWorkPlan,
+) -> tuple[dict[str, Any], ...]:
+    """Collapse equivalent cross-route delivery before the lineage reducer.
+
+    Paths and scheduler observations identify delivery, never the scientific
+    attempt.  A second delivery is accepted only when its sealed canonical
+    facts, materialized bytes, and selected frozen shard exactly agree.
+    """
+    by_unit: dict[str, list[dict[str, Any]]] = {}
+    for record in attempts:
+        by_unit.setdefault(str(record["unit_key"]), []).append(record)
+    selected: list[dict[str, Any]] = []
+    fields = (
+        "campaign_spec_digest", "campaign_plan_digest", "unit_key", "selected_shard_id",
+        "arm_manifest_sha256", "materialized_sample_sha256", "physical_error_sha256",
+        "terminal_bytes_sha256", "terminal_fact", "work_vector",
+    )
+    for unit in plan.units:
+        records = by_unit.get(unit.key, [])
+        if not records:
+            continue
+        reference = canonical_json_bytes({field: records[0][field] for field in fields})
+        reference_trace = _route_neutral_trace(records[0]["events"])
+        if any(
+            canonical_json_bytes({field: record[field] for field in fields}) != reference
+            or _route_neutral_trace(record["events"]) != reference_trace
+            for record in records[1:]
+        ):
+            raise ValueError("mixed-route delivery has conflicting canonical terminal evidence")
+        selected.append(min(records, key=lambda record: str(record["receipt_sha256"])))
+    return tuple(selected)
+
+
+def _materialized_sample_index(attempts: tuple[dict[str, Any], ...]) -> dict[str, dict[str, Any]]:
+    """Re-read every retained sample artifact into a deterministic evidence index."""
+    by_identity: dict[str, dict[str, Any]] = {}
+    for record in attempts:
+        sample_path = Path(record["materialized_sample_path"])
+        if sample_path.is_symlink() or not sample_path.is_file():
+            raise ValueError("paired merge materialized sample must be a regular file")
+        artifact = MaterializedPhysicalSampleV1.model_validate_json(sample_path.read_bytes())
+        if (artifact.materialized_sample_sha256 != record["materialized_sample_sha256"]
+                or artifact.physical_error_sha256 != record["physical_error_sha256"]):
+            raise ValueError("paired merge materialized sample differs from verified attempt")
+        entry = by_identity.setdefault(artifact.physical_sample_identity, {
+            "physical_sample_identity": artifact.physical_sample_identity,
+            "materialized_sample_sha256": artifact.materialized_sample_sha256,
+            "physical_error_sha256": artifact.physical_error_sha256,
+            "cohort_id": artifact.cohort_id,
+            "point_id": artifact.point_id,
+            "sample_namespace": artifact.sample_namespace,
+            "sample_id": artifact.sample_id,
+            "paths": [],
+        })
+        if (entry["materialized_sample_sha256"] != artifact.materialized_sample_sha256
+                or entry["physical_error_sha256"] != artifact.physical_error_sha256):
+            raise ValueError("paired merge physical identity has conflicting materialized bytes")
+        entry["paths"].append(str(sample_path.resolve(strict=True)))
+    return {
+        identity: {**entry, "paths": sorted(set(entry["paths"]))}
+        for identity, entry in sorted(by_identity.items())
+    }
+
+
+def _load_indexed_materialized_samples(
+    index: Mapping[str, Any], *, artifact_roots: tuple[Path, ...],
+) -> dict[str, MaterializedPhysicalSampleV1]:
+    """Rehydrate typed samples from the independently checked merge descriptors."""
+    if not isinstance(index, Mapping) or not index:
+        raise ValueError("paired merge artifact lacks materialized sample descriptors")
+    samples: dict[str, MaterializedPhysicalSampleV1] = {}
+    required = {
+        "physical_sample_identity", "materialized_sample_sha256", "physical_error_sha256",
+        "cohort_id", "point_id", "sample_namespace", "sample_id", "paths",
+    }
+    for identity, descriptor in index.items():
+        if not isinstance(identity, str) or not isinstance(descriptor, Mapping) or set(descriptor) != required:
+            raise ValueError("paired merge materialized sample descriptor has an invalid field set")
+        paths = descriptor["paths"]
+        if not isinstance(paths, list) or not paths or any(not isinstance(path, str) for path in paths):
+            raise ValueError("paired merge materialized sample descriptor lacks paths")
+        loaded: list[MaterializedPhysicalSampleV1] = []
+        for raw_path in paths:
+            path = Path(raw_path)
+            if (path.is_symlink() or not path.is_file()
+                    or not any(path.resolve(strict=True).is_relative_to(root) for root in artifact_roots)):
+                raise ValueError("paired merge materialized sample path is unavailable")
+            artifact = MaterializedPhysicalSampleV1.model_validate_json(path.read_bytes())
+            if any(getattr(artifact, name) != descriptor[name] for name in required - {"paths"}):
+                raise ValueError("paired merge materialized sample descriptor differs from retained bytes")
+            loaded.append(artifact)
+        if any(item.primitive_bytes() != loaded[0].primitive_bytes() for item in loaded[1:]):
+            raise ValueError("paired merge materialized sample paths differ for one physical identity")
+        if identity != loaded[0].physical_sample_identity:
+            raise ValueError("paired merge materialized sample index key differs from retained identity")
+        samples[identity] = loaded[0]
+    return samples
+
+
 def _paired_merge(args: argparse.Namespace, *, root: Path, plan: CampaignWorkPlan, payload: Mapping[str, Any]) -> dict[str, Any]:
-    attempts = tuple(item for receipt in args.receipt for item in _paired_attempts(receipt, plan=plan))
-    merged = merge_verified_attempts(plan=plan, verified_attempts=attempts)
+    artifact_index = []
+    attempts = []
+    for receipt in args.receipt:
+        receipt_path = Path(receipt).resolve(strict=True)
+        artifact_index.append({"path": str(receipt_path), "sha256": sha256(receipt_path.read_bytes()).hexdigest()})
+        attempts.extend(_paired_attempts(str(receipt_path), plan=plan))
+    all_attempts = tuple(attempts)
+    merged = merge_verified_attempts(plan=plan, verified_attempts=_route_neutral_attempts(all_attempts, plan=plan))
     persisted = {key: value for key, value in merged.items() if key != "receipt_bytes"}
-    persisted["verified_attempts"] = list(attempts)
+    envelope = {
+        "schema": "campaign_paired_merge_envelope_v1",
+        "canonical_merge": persisted,
+        "verified_attempts": list(all_attempts),
+        "attempt_artifacts": sorted(artifact_index, key=lambda item: (item["path"], item["sha256"])),
+        "materialized_samples_by_identity": _materialized_sample_index(all_attempts),
+    }
     output = _output_root(args.output_root)
-    artifact = _publish_json(output / "campaign-paired-merge.json", persisted)
+    artifact = _publish_json(output / "campaign-paired-merge.json", envelope)
     return _artifact(status="ok", plan=payload, phase="merge", artifact_path=str(artifact),
-                     artifact_sha256=sha256(artifact.read_bytes()).hexdigest(), member_count=len(attempts))
+                     artifact_sha256=sha256(artifact.read_bytes()).hexdigest(), member_count=len(all_attempts))
 
 
 def _paired_merge_payload(path: str, *, plan: CampaignWorkPlan) -> dict[str, Any]:
     payload = _read_json(path)
-    attempts = payload.pop("verified_attempts", None)
+    required = {"schema", "canonical_merge", "verified_attempts", "attempt_artifacts", "materialized_samples_by_identity"}
+    if set(payload) != required or payload.get("schema") != "campaign_paired_merge_envelope_v1":
+        raise ValueError("paired merge artifact has an invalid envelope")
+    attempts = payload["verified_attempts"]
     if not isinstance(attempts, list):
         raise ValueError("paired merge artifact lacks independently verified attempts")
     verified = tuple(verify_canonical_attempt(record=item, plan=plan) for item in attempts)
-    full = merge_verified_attempts(plan=plan, verified_attempts=verified)
+    reduced_attempts = _route_neutral_attempts(verified, plan=plan)
+    full = merge_verified_attempts(plan=plan, verified_attempts=reduced_attempts)
     expected = {key: value for key, value in full.items() if key != "receipt_bytes"}
-    if payload != expected:
+    artifacts = payload["attempt_artifacts"]
+    if (not isinstance(artifacts, list) or not artifacts
+            or any(not isinstance(item, Mapping) or set(item) != {"path", "sha256"} for item in artifacts)):
+        raise ValueError("paired merge artifact lacks bounded attempt indexes")
+    for item in artifacts:
+        receipt = Path(str(item["path"]))
+        if receipt.is_symlink() or not receipt.is_file() or sha256(receipt.read_bytes()).hexdigest() != item["sha256"]:
+            raise ValueError("paired merge artifact input receipt index differs from retained bytes")
+    artifact_roots = tuple(
+        Path(str(item["path"])).resolve(strict=True).parent for item in artifacts
+    )
+    indexed_samples = _load_indexed_materialized_samples(
+        payload["materialized_samples_by_identity"], artifact_roots=artifact_roots,
+    )
+    if (payload["canonical_merge"] != expected
+            or payload["attempt_artifacts"] != sorted((dict(item) for item in artifacts), key=lambda item: (str(item["path"]), str(item["sha256"])))
+            or payload["materialized_samples_by_identity"] != _materialized_sample_index(verified)):
         raise ValueError("paired merge artifact differs from verified attempt reduction")
-    return {**full, "verified_attempts": verified}
+    return {**full, "verified_attempts": reduced_attempts,
+            "materialized_samples_by_identity": indexed_samples}
+
+
+def _paired_scientific_identity(plan: CampaignWorkPlan) -> dict[str, str]:
+    """Construct the complete route-independent identity required for retry reduction."""
+    spec = plan.work_spec
+    if not isinstance(spec, CampaignWorkSpecV1):
+        raise ValueError("paired resume requires a frozen paired work specification")
+    return {
+        "campaign_spec_digest": plan.campaign_spec_digest,
+        "campaign_plan_digest": plan.campaign_plan_digest,
+        "source_lock_sha256": spec.source_lock_sha256,
+        "environment_lock_sha256": spec.environment_lock_sha256,
+        "dependency_lock_sha256": spec.dependency_lock_sha256,
+        "sample_namespace_digest": sha256(canonical_json_bytes({
+            "namespace": spec.shared_sampler.physical_sample_namespace,
+            "sampler_contract_sha256": spec.shared_sampler.digest(),
+        })).hexdigest(),
+        "stopping_rule_digest": sha256(canonical_json_bytes(
+            spec.assessment.stopping.model_dump(mode="json")
+        )).hexdigest(),
+        "assessment_digest": spec.assessment.digest(),
+    }
+
+
+def _paired_resume_decision(*, look: int, terminal_records: tuple[dict[str, Any], ...]) -> dict[str, Any]:
+    """A fixed-shot campaign has no early-stop decision to reconstruct.
+
+    Finite-look campaigns are reduced by the shared statistical entry point
+    before publication.  Returning false here keeps their later units blocked
+    until that evidence is provided, rather than inventing a stop decision.
+    """
+    digest = sha256(canonical_json_bytes({"look": look, "terminal_records": terminal_records})).hexdigest()
+    return {
+        "decision_input_hashes": [digest], "decision_result": {"look": look},
+        "stop_reason": "no_cli_stop_decision", "should_stop": False,
+    }
 
 
 def _preflight(args: argparse.Namespace) -> dict[str, Any]:
@@ -629,10 +821,17 @@ def _resume(args: argparse.Namespace) -> dict[str, Any]:
     if _read_json(args.plan).get("schema") == "campaign_work_plan_v1":
         _spec, work_plan, payload = _load_work_plan(args.plan, root)
         merged = _paired_merge_payload(args.merge, plan=work_plan)
-        completed = set(merged["terminal_unit_keys"])
-        missing = [unit.key for unit in work_plan.units if unit.key not in completed]
+        resumed = derive_resume_plan(
+            plan=work_plan, verified_attempts=merged["verified_attempts"],
+            scientific_identity=_paired_scientific_identity(work_plan),
+            decision_for_look=_paired_resume_decision,
+        )
+        missing = resumed["resumable_unit_keys"]
         return _artifact(status="ok", plan=payload, phase="resume", resumable_unit_keys=missing,
-                         exact_missing_set=missing, complete=not missing)
+                         exact_missing_set=missing, complete=not missing,
+                         attempt_plans=resumed["attempt_plans"],
+                         recovered_look_stop_receipts=resumed["recovered_look_stop_receipts"],
+                         authorized_undispatched_keys=resumed["authorized_undispatched_keys"])
     _spec, plan = _load_plan(args.plan, root)
     merge = _verified_merge(args.merge, root)
     if merge.get("schema") != _MERGE_SCHEMA or merge.get("campaign_spec_digest") != plan["campaign_spec_digest"] or merge.get("campaign_plan_digest") != plan["campaign_plan_digest"]:
@@ -649,7 +848,10 @@ def _assess(args: argparse.Namespace) -> dict[str, Any]:
     if plan_path is not None and _read_json(plan_path).get("schema") == "campaign_work_plan_v1":
         spec, work_plan, payload = _load_work_plan(plan_path, root)
         merged = _paired_merge_payload(args.merge, plan=work_plan)
-        receipt = {key: value for key, value in merged.items() if key != "verified_attempts"}
+        receipt = {
+            key: value for key, value in merged.items()
+            if key not in {"verified_attempts", "materialized_samples_by_identity"}
+        }
         report = reconstruct_campaign_report(
             plan=work_plan, assessment=spec.assessment, merge_receipt=receipt,
             input_receipt_hashes={
@@ -659,6 +861,8 @@ def _assess(args: argparse.Namespace) -> dict[str, Any]:
             },
             source_denominator_required_by_target=spec.source_denominator_required_by_target,
             source_denominators=spec.source_denominators, target_arm_ids=spec.target_arm_ids,
+            materialized_samples_by_identity=merged["materialized_samples_by_identity"],
+            work_vectors_by_unit={item["unit_key"]: item["work_vector"] for item in merged["verified_attempts"]},
         )
         return _artifact(status="ok", plan=payload, phase="assess", assessment_status="evidence_reconstructed",
                          report=asdict(report))

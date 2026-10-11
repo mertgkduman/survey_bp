@@ -6,7 +6,7 @@ from .contracts import (
 )
 from .execution import run_canonical_work_plan, run_one_unit, verify_canonical_attempt
 from .planning import CampaignWorkPlan, freeze_campaign_work_spec
-from .shards import reconstruct_fixed_shot, verify_shard
+from .shards import derive_resume_plan, reconstruct_fixed_shot, verify_shard
 
 __all__ = [
     "CampaignPlanV1",
@@ -17,6 +17,7 @@ __all__ = [
     "MaterializedPhysicalSampleV1",
     "SharedSamplerContractV1",
     "build_one_unit_plan",
+    "derive_resume_plan",
     "freeze_campaign_work_spec",
     "reconstruct_fixed_shot",
     "run_one_unit",

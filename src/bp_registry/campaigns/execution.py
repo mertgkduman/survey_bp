@@ -678,6 +678,15 @@ def _campaign_attempt(
         "infrastructure_interruption",
     }:
         raise ValueError("canonical terminal outcome cannot be mapped into the frozen campaign taxonomy")
+    work_vectors = [event.get("data", {}).get("work_vector") for event in events if isinstance(event.get("data"), Mapping) and "work_vector" in event["data"]]
+    if not work_vectors or any(not isinstance(vector, Mapping) for vector in work_vectors):
+        raise ValueError("canonical ledger lacks a named work vector")
+    work_vector = dict(work_vectors[-1])
+    if (not work_vector or any(not isinstance(name, str) or not name or type(value) is not int or value < 0
+                               for name, value in work_vector.items())):
+        raise ValueError("canonical ledger work vector is invalid")
+    if any(dict(vector) != work_vector for vector in work_vectors):
+        raise ValueError("canonical ledger work vectors conflict")
     attempt = {
         "schema": "campaign_attempt_receipt_v1", "attempt_id": _sample_digest("bp-registry-campaign-attempt-v1", {"plan": plan.campaign_plan_digest, "unit": unit.key}),
         "campaign_plan_digest": plan.campaign_plan_digest, "unit_key": unit.key,
@@ -696,7 +705,7 @@ def _campaign_attempt(
         "materialized_sample_sha256": materialized.materialized_sample_sha256,
         "physical_error_sha256": materialized.physical_error_sha256,
         "canonical_ledger_path": str(ledger_path), "canonical_ledger_sha256": sha256(ledger_bytes).hexdigest(),
-        "terminal_fact": terminal_fact,
+        "terminal_fact": terminal_fact, "work_vector": dict(sorted(work_vector.items())),
     }
     receipt_bytes = canonical_json_bytes(receipt)
     return {**receipt, "receipt_sha256": sha256(receipt_bytes).hexdigest(), "events": events,
@@ -709,7 +718,7 @@ def verify_canonical_attempt(*, record: Mapping[str, Any], plan: CampaignWorkPla
     """Independently rehash paired evidence before it can enter a campaign merge."""
     if not isinstance(plan.work_spec, CampaignWorkSpecV1) or not isinstance(record, Mapping):
         raise ValueError("canonical attempt verification requires a frozen paired work plan")
-    required = {"schema", "attempt", "campaign_spec_digest", "campaign_plan_digest", "unit_key", "selected_shard_id", "arm_manifest_path", "arm_manifest_sha256", "materialized_sample_path", "materialized_sample_sha256", "physical_error_sha256", "canonical_ledger_path", "canonical_ledger_sha256", "terminal_fact", "receipt_sha256", "events", "terminal_bytes_sha256", "persisted_sample_sha256", "validation_status", "replay_status"}
+    required = {"schema", "attempt", "campaign_spec_digest", "campaign_plan_digest", "unit_key", "selected_shard_id", "arm_manifest_path", "arm_manifest_sha256", "materialized_sample_path", "materialized_sample_sha256", "physical_error_sha256", "canonical_ledger_path", "canonical_ledger_sha256", "terminal_fact", "work_vector", "receipt_sha256", "events", "terminal_bytes_sha256", "persisted_sample_sha256", "validation_status", "replay_status"}
     if set(record) != required or record["schema"] != "campaign_canonical_attempt_v1":
         raise ValueError("canonical attempt receipt has an invalid field set")
     unsigned = {key: value for key, value in record.items() if key not in {"receipt_sha256", "events", "terminal_bytes_sha256", "persisted_sample_sha256", "validation_status", "replay_status"}}
@@ -747,6 +756,10 @@ def verify_canonical_attempt(*, record: Mapping[str, Any], plan: CampaignWorkPla
         terminal_fact["outcome"] = "wrong_logical_action"
     if events != record["events"] or terminal_fact != record["terminal_fact"]:
         raise ValueError("canonical attempt terminal differs from retained ledger")
+    vectors = [event.get("data", {}).get("work_vector") for event in events if isinstance(event.get("data"), Mapping) and "work_vector" in event["data"]]
+    if (not vectors or any(not isinstance(vector, Mapping) for vector in vectors)
+            or any(dict(vector) != record["work_vector"] for vector in vectors)):
+        raise ValueError("canonical attempt work vector differs from retained ledger")
     return dict(record)
 
 

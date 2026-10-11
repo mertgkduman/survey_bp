@@ -887,6 +887,57 @@ def test_paired_canonical_slurm_array_is_bounded(tmp_path: Path) -> None:
     assert payload["sbatch_argv"][:2] == ["sbatch", "--array=0-0%1"]
 
 
+def test_paired_canonical_mixed_route_merge_and_resume(tmp_path: Path) -> None:
+    """Verified duplicate route delivery merges once and leaves no retry work."""
+    document = tmp_path / "paired.json"
+    document.write_text(json.dumps({"campaign_work_spec": _paired_work_spec_payload()}), encoding="utf-8")
+    planned = _run_campaign_module(
+        "plan", "--campaign", str(document), "--campaign-root", str(ROOT),
+        "--output-root", str(tmp_path / "plan"),
+    )
+    assert planned.returncode == 0, planned.stdout
+    plan_path = json.loads(planned.stdout)["artifact_path"]
+    local = _run_campaign_module(
+        "run-local", "--plan", plan_path, "--campaign-root", str(ROOT),
+        "--output-root", str(tmp_path / "local"),
+    )
+    assert local.returncode == 0, local.stdout
+    allocation = tmp_path / "allocation.json"
+    allocation.write_text(json.dumps({
+        "partition": "research", "qos": "short", "account": "bp", "wall_minutes": 10,
+        "memory_mb": 256, "cpus_per_task": 1, "max_concurrent_tasks": 1,
+    }), encoding="utf-8")
+    observation = tmp_path / "observation.json"
+    observation.write_text(json.dumps({
+        "job_id": "81234", "task_id": "0", "allocated_cpus": 1, "elapsed_seconds": 1,
+        "state": "COMPLETED", "exit_code": 0, "accounting_available": None,
+        "accounting_unavailable_reason": "sacct unavailable", "launch_overhead_seconds": 0,
+        "shard_fixed_cost_seconds": 0,
+    }), encoding="utf-8")
+    shard = _run_campaign_module(
+        "run-shard", "--plan", plan_path, "--campaign-root", str(ROOT),
+        "--output-root", str(tmp_path / "slurm"), "--array-task-id", "0",
+        "--allocation", str(allocation), "--scheduler-observation", str(observation),
+    )
+    assert shard.returncode == 0, shard.stdout
+    merged = _run_campaign_module(
+        "merge", "--plan", plan_path, "--campaign-root", str(ROOT),
+        "--output-root", str(tmp_path / "merge"),
+        "--receipt", json.loads(local.stdout)["artifact_path"],
+        "--receipt", json.loads(shard.stdout)["artifact_path"],
+    )
+    assert merged.returncode == 0, merged.stdout
+    merge_path = json.loads(merged.stdout)["artifact_path"]
+    envelope = json.loads(Path(merge_path).read_text(encoding="utf-8"))
+    assert envelope["canonical_merge"]["terminal_unit_keys"]
+    assert len(envelope["materialized_samples_by_identity"]) == 1
+    resumed = _run_campaign_module(
+        "resume", "--plan", plan_path, "--merge", merge_path, "--campaign-root", str(ROOT),
+    )
+    assert resumed.returncode == 0, resumed.stdout
+    assert json.loads(resumed.stdout)["exact_missing_set"] == []
+
+
 @pytest.mark.parametrize("raw_profile", (
     '{"measured":NaN,"limit":1.0,"unit":"seconds"}',
     '{"measured":true,"limit":1.0,"unit":"seconds"}',
