@@ -427,6 +427,65 @@ def _rewrite_rehashed_canonical_ledger(output: Path, mutate):
     result_path.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
+def test_public_v7_vote_manifest_replays_and_rejects_rehashed_vote_tampering(tmp_path):
+    """The manifest tie bit must drive both V7 execution and independent replay."""
+    from bp_registry.cli import run_canonical, verify_run
+
+    manifest = json.loads((REPOSITORY_ROOT / CANONICAL_MANIFEST).read_text())
+    manifest["schema_version"] = 7
+    manifest["numerical_profile"] = "cpu-float64-min-sum-v1"
+    manifest["policies"]["update"] = {
+        "binding_id": "research-update-normalized-min-sum", "state_lifetime": "attempt",
+        "kind": "normalized_min_sum", "parameter_assignment": {"shape": "scalar", "value": 0.875},
+    }
+    manifest["policies"]["schedule"] = {
+        "binding_id": "research-schedule-check-node-serial", "state_lifetime": "attempt", "kind": "check_node_serial",
+    }
+    manifest["policies"]["state_memory"].update({"kind": "identity"})
+    manifest["ensemble"] = {
+        "kind": "mbbp_ld", "source_status": "canonical_adaptation", "member_state": "independent",
+        "max_iterations": 8, "max_member_c2v_updates": 100, "max_total_members": 1,
+        "no_member_terminal": "no_member_converged_zero_return",
+        "bases": [{"member_id": "member-0", "local_ordinal": 0, "partition_identity": "p0",
+                    "permutation_identity": "q0", "transform_kind": "one_hot_original_check_rows",
+                    "redundant_transforms": [[1]]}],
+    }
+    manifest["list_selection"] = {"kind": "frequency_over_weight_plus_one", "tie_rule": "local_ordinal_then_lineage"}
+    manifest["vote"] = {"object": "correction_bits", "electorate_rule": "admitted_members",
+                        "aggregation": "coordinate_majority", "tie_bit": 1}
+    manifest_path = tmp_path / "vote.json"
+    manifest_path.write_text(json.dumps(manifest))
+    output = tmp_path / "output"
+    assert run_canonical(manifest_path, output)["final_row_count"] == 2
+    assert verify_run(output)["final_row_count"] == 2
+    def flip_ballot(events):
+        correction = next(event for event in events if event["kind"] == "vote_ballot")["data"]["payload"]["correction"]
+        correction[0] = 1 - correction[0]
+
+    def flip_aggregate(events):
+        correction = next(event for event in events if event["kind"] == "vote_aggregate")["data"]["payload"]["correction"]
+        correction[0] = 1 - correction[0]
+
+    mutations = {
+        "electorate": lambda events: next(event for event in events if event["kind"] == "vote_electorate")["data"]["payload"].__setitem__("electorate", ["forged"]),
+        "tie": lambda events: next(event for event in events if event["kind"] == "vote_electorate")["data"]["payload"].__setitem__("tie_bit", 0),
+        "ballot": flip_ballot,
+        "aggregate": flip_aggregate,
+        "lineage": lambda events: next(event for event in events if event["kind"] == "vote_aggregate")["data"]["payload"].__setitem__("vote_lineage_id", "forged"),
+        "validity": lambda events: next(event for event in events if event["kind"] == "vote_validation")["data"]["payload"].__setitem__("original_valid", False),
+        "work": lambda events: next(event for event in events if event["kind"] == "termination")["data"]["payload"]["work_vector"].__setitem__(
+            "check_to_variable_updates",
+            next(event for event in events if event["kind"] == "termination")["data"]["payload"]["work_vector"]["check_to_variable_updates"] + 1,
+        ),
+    }
+    for label, mutate in mutations.items():
+        tampered = tmp_path / label
+        assert run_canonical(manifest_path, tampered)["final_row_count"] == 2
+        _rewrite_rehashed_canonical_ledger(tampered, mutate)
+        with pytest.raises(ValueError, match="Phase 6 event"):
+            verify_run(tampered)
+
+
 @pytest.mark.parametrize(
     ("label", "mutate", "message"),
     [

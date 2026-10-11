@@ -395,6 +395,7 @@ _CANONICAL_EVENT_KINDS = frozenset({
     "work", "runtime", "missingness", "trace_link", "trace_truncated",
     "transform", "lift", "original_check", "evaluation",
     "basis", "member", "candidate_origin", "duplicate_group", "work_leaf",
+    "vote_electorate", "vote_exclusion", "vote_ballot", "vote_aggregate", "vote_validation",
     "bp_only", "final",
 })
 

@@ -1083,10 +1083,13 @@ def run_phase6_structural_shot(
     result = MbbpController(MbbpSpec(
         bases, max_iterations=parsed.ensemble.max_iterations, max_member_c2v_updates=parsed.ensemble.max_member_c2v_updates,
     )).run(original, error_rate=parsed.error_rate)
-    projection = phase6_events(original, bases=bases, result=result)
+    projection = phase6_events(
+        original, bases=bases, result=result,
+        vote_tie_bit=None if parsed.vote is None else parsed.vote.tie_bit,
+    )
     identity_data = {"execution_identity": identity, "source_status": parsed.ensemble.source_status,
                      "ensemble_kind": parsed.ensemble.kind}
-    candidate = None if result.selected_candidate is None else np.asarray(result.selected_candidate, dtype=np.uint8)
+    candidate = None if projection.candidate is None else np.asarray(projection.candidate, dtype=np.uint8)
     if candidate is not None and not np.array_equal((validated.hz @ candidate) % 2, observation.syndrome):
         raise ValueError("MBBP selected a candidate failing the original syndrome")
     assessment = None if candidate is None else evaluate(validated, true_x=hidden_truth.x, true_z=hidden_truth.z, candidate_x=candidate)

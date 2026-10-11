@@ -1179,8 +1179,11 @@ def validate_phase6_shot(events: Sequence[Mapping[str, Any]], context: PublicSho
     result = MbbpController(MbbpSpec(bases, max_iterations=parsed.ensemble.max_iterations,
                                      max_member_c2v_updates=parsed.ensemble.max_member_c2v_updates)).run(
                                          original, error_rate=context.error_rate)
-    projection = phase6_events(original, bases=bases, result=result)
-    candidate = None if result.selected_candidate is None else np.asarray(result.selected_candidate, dtype=np.uint8)
+    projection = phase6_events(
+        original, bases=bases, result=result,
+        vote_tie_bit=None if parsed.vote is None else parsed.vote.tie_bit,
+    )
+    candidate = None if projection.candidate is None else np.asarray(projection.candidate, dtype=np.uint8)
     if candidate is not None and not np.array_equal((code.hz @ candidate) % 2, original.syndrome):
         raise CanonicalStructuralVerificationError("replayed Phase 6 selection fails the original syndrome")
     assessment = None if candidate is None else evaluator.evaluate_candidate(
@@ -1210,7 +1213,7 @@ def validate_phase6_shot(events: Sequence[Mapping[str, Any]], context: PublicSho
                 raise CanonicalStructuralVerificationError("Phase 6 header differs from deterministic replay")
         elif data.get("identity") != identity_data or data.get("payload") != payload:
             raise CanonicalStructuralVerificationError(f"Phase 6 event {index} differs from deterministic replay")
-        if kind == "termination" and event.get("termination") != result.terminal_status:
+        if kind == "termination" and event.get("termination") != projection.terminal:
             raise CanonicalStructuralVerificationError("Phase 6 terminal status differs from deterministic replay")
     if result.terminal_status == "no_member_converged_zero_return":
         forbidden = {"selection", "original_check", "evaluation"}
