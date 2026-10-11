@@ -161,6 +161,9 @@ def test_public_campaign_facade_exports_work_plan() -> None:
         "MaterializedPhysicalSampleV1",
         "freeze_campaign_work_spec",
         "run_canonical_work_plan",
+        "reconstruct_campaign_report",
+        "verify_campaign_report",
+        "verify_campaign_routes",
     }
     assert expected <= set(api.__all__)
 
