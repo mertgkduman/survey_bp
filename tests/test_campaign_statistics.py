@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import base64
+from dataclasses import replace
+from hashlib import sha256
 import math
 import importlib
 
@@ -588,6 +591,47 @@ def _report_work(plan: object) -> dict[str, dict[str, int]]:
     }
 
 
+def _materialized_samples(plan: object) -> dict[str, object]:
+    from bp_registry.campaigns.contracts import MaterializedPhysicalSampleV1, canonical_json_bytes
+
+    artifacts: dict[str, object] = {}
+    for unit in plan.units:
+        if unit.physical_sample_identity in artifacts:
+            continue
+        x_bytes = bytes((unit.sample_id + 1,))
+        z_bytes = bytes((unit.sample_id + 3,))
+        x_b64 = base64.b64encode(x_bytes).decode("ascii")
+        z_b64 = base64.b64encode(z_bytes).decode("ascii")
+        error_payload = canonical_json_bytes({"x": x_b64, "z": z_b64})
+        error_digest = sha256(b"bp-registry-physical-error-v1\0" + error_payload).hexdigest()
+        unsigned = {
+            "schema": "materialized_physical_sample_v1",
+            "physical_sample_identity": unit.physical_sample_identity,
+            "sample_seed_identity": "1" * 64,
+            "cohort_id": unit.cohort_id,
+            "point_id": unit.point_id,
+            "sample_namespace": unit.sample_namespace,
+            "sample_id": unit.sample_id,
+            "sampler_contract_sha256": "2" * 64,
+            "x_dtype": "uint8",
+            "x_shape": (1,),
+            "x_bytes_b64": x_b64,
+            "z_dtype": "uint8",
+            "z_shape": (1,),
+            "z_bytes_b64": z_b64,
+            "observations": {"X": {"bits": x_b64}},
+            "physical_error_sha256": error_digest,
+        }
+        sample_digest = sha256(
+            b"bp-registry-materialized-sample-v1\0" + canonical_json_bytes(unsigned)
+        ).hexdigest()
+        artifacts[unit.physical_sample_identity] = MaterializedPhysicalSampleV1(
+            **unsigned,
+            materialized_sample_sha256=sample_digest,
+        )
+    return artifacts
+
+
 def test_report_reconstructs_from_merged_terminals_and_replays_byte_stably() -> None:
     api = importlib.import_module("bp_registry.campaigns.reporting")
     plan, assessment, merged, hashes = _report_inputs()
@@ -779,3 +823,33 @@ def test_report_serializes_denominator_uncertainty_per_arm() -> None:
     assert {item[0] for item in point.outcome_treatment_table} == {
         treatment.terminal_status for treatment in assessment.outcome_matrix.treatments
     }
+
+
+def test_report_merge_hash_and_context_tamper_are_bound_to_semantic_bytes() -> None:
+    from bp_registry.campaigns.reporting import reconstruct_campaign_report, verify_campaign_report
+
+    plan, assessment, merged, hashes = _report_inputs()
+    kwargs = {
+        "plan": plan,
+        "assessment": assessment,
+        "merge_receipt": merged,
+        "input_receipt_hashes": hashes,
+        "target_arm_ids": {"p050": "first"},
+        "work_vectors_by_unit": _report_work(plan),
+        "materialized_samples_by_identity": _materialized_samples(plan),
+        "observations": {"environment": {"OMP_NUM_THREADS": "1"}, "timing": {"wall_time_ns": 1}},
+    }
+    report = reconstruct_campaign_report(**kwargs)
+
+    assert report.merge_receipt_sha256 == merged["receipt_sha256"]
+    receipt_hashes = dict(report.input_receipt_hashes)
+    assert any(name.startswith("materialized_sample:") for name in receipt_hashes)
+    assert any(name.startswith("physical_error:") for name in receipt_hashes)
+    assert verify_campaign_report(report=report, **kwargs) is True
+    with pytest.raises(ValueError, match="campaign report"):
+        verify_campaign_report(report=replace(report, merge_receipt_sha256="0" * 64), **kwargs)
+    with pytest.raises(ValueError, match="campaign report"):
+        verify_campaign_report(
+            report=report,
+            **{**kwargs, "observations": {"environment": {"OMP_NUM_THREADS": "1"}, "timing": {"wall_time_ns": 2}}},
+        )
