@@ -167,6 +167,11 @@ def test_source_experiment_identity_rejects_unknown_or_unbounded_evidence_and_du
     with pytest.raises(ValidationError):
         type(identity).model_validate(payload)
 
+    unbounded = identity.model_dump(mode="json", by_alias=True)
+    unbounded["locator"]["curve_id"] = "x" * 513
+    with pytest.raises(ValidationError):
+        type(identity).model_validate(unbounded)
+
     duplicate_path = identity.model_copy(
         update={"ordered_logical_artifacts": (identity.ordered_check_artifacts[0], identity.ordered_logical_artifacts[1])},
     )
@@ -228,6 +233,7 @@ def test_qualification_receipt_rejects_discrepant_or_incomplete_native_evidence_
         target_id=identity.target_id,
         status="executed",
         reasons=(),
+        source_snapshot=ByteSnapshotV1.from_bytes("native/source.tar", b"native source"),
         repository_uri="https://example.test/native",
         repository_revision="1234abcd",
         environment_snapshot=ByteSnapshotV1.from_bytes("native/environment.txt", b"python=3.12"),
@@ -252,7 +258,14 @@ def test_qualification_receipt_rejects_discrepant_or_incomplete_native_evidence_
     assert later.faithful_eligible is True
     assert later.digest() != earlier.digest()
 
-    discrepant = executed.model_copy(update={"status": "execution_discrepant", "discrepancy_evidence": ("native output differs",)})
+    incomplete = executed.model_dump(mode="json", by_alias=True)
+    incomplete.pop("output_snapshot")
+    with pytest.raises(ValidationError):
+        NativeReferenceAssessmentV1.model_validate(incomplete)
+
+    discrepant_payload = executed.model_dump(mode="json", by_alias=True)
+    discrepant_payload.update(status="execution_discrepant", discrepancy_evidence=["native output differs"])
+    discrepant = NativeReferenceAssessmentV1.model_validate(discrepant_payload)
     with pytest.raises(ValidationError):
         SourceExperimentQualificationReceiptV1(
             schema="campaign_source_experiment_qualification_v1",

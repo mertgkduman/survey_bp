@@ -262,6 +262,162 @@ class SourceExperimentIdentityV1(StrictModel):
         return _receipt_digest("bp-registry-campaign-source-experiment-identity-v1", self)
 
 
+class NativeMetricV1(StrictModel):
+    """One native measurement with explicit observed or unavailable meaning."""
+
+    name: Literal["decoder_work", "runtime_seconds", "counters"]
+    status: Literal["observed", "unavailable"]
+    value: float | None = Field(default=None, ge=0.0)
+    reason: str | None = Field(default=None, min_length=1, max_length=1_024)
+
+    @field_validator("value")
+    @classmethod
+    def finite_value(cls, value: float | None) -> float | None:
+        if value is not None:
+            return _finite(value, name="native measurement")
+        return value
+
+    @model_validator(mode="after")
+    def explicit_measurement_status(self) -> "NativeMetricV1":
+        if self.status == "observed":
+            if self.value is None or self.reason is not None:
+                raise ValueError("observed native measurement needs a value and no unavailable reason")
+        elif self.value is not None or self.reason is None:
+            raise ValueError("unavailable native measurement needs a reason and no numeric default")
+        return self
+
+
+class NativeReferenceAssessmentV1(StrictModel):
+    """Per-target native-reference observation that never treats absence as zero."""
+
+    schema_name: Literal["campaign_native_reference_assessment_v1"] = Field(alias="schema", serialization_alias="schema")
+    target_id: str = Field(min_length=1, max_length=256)
+    status: Literal[
+        "identity_unverified", "source_obtained_not_executable", "executed", "execution_discrepant",
+    ]
+    reasons: tuple[str, ...] = Field(default=(), max_length=_MAX_QUALIFICATION_BLOCKERS)
+    source_snapshot: ByteSnapshotV1 | None = None
+    repository_uri: str | None = Field(default=None, min_length=1, max_length=2_048)
+    repository_revision: str | None = Field(default=None, min_length=1, max_length=512)
+    environment_snapshot: ByteSnapshotV1 | None = None
+    settings_snapshot: ByteSnapshotV1 | None = None
+    command_snapshot: ByteSnapshotV1 | None = None
+    output_snapshot: ByteSnapshotV1 | None = None
+    metrics: tuple[NativeMetricV1, ...] = Field(min_length=3, max_length=3)
+    discrepancy_evidence: tuple[str, ...] = Field(default=(), max_length=_MAX_QUALIFICATION_BLOCKERS)
+
+    @field_validator("reasons", "discrepancy_evidence", mode="before")
+    @classmethod
+    def tuple_strings(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @field_validator("reasons", "discrepancy_evidence")
+    @classmethod
+    def bounded_strings(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        if any(not item or len(item) > 1_024 for item in value) or len(set(value)) != len(value):
+            raise ValueError("native assessment reasons must be unique bounded nonempty strings")
+        return value
+
+    @field_validator("repository_uri")
+    @classmethod
+    def https_repository_uri(cls, value: str | None) -> str | None:
+        if value is not None and not value.startswith("https://"):
+            raise ValueError("native repository URI must use HTTPS")
+        return value
+
+    @field_validator("metrics", mode="before")
+    @classmethod
+    def tuple_metrics(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @model_validator(mode="after")
+    def status_specific_evidence(self) -> "NativeReferenceAssessmentV1":
+        expected_names = ("decoder_work", "runtime_seconds", "counters")
+        if tuple(metric.name for metric in self.metrics) != expected_names:
+            raise ValueError("native metrics must retain the declared work, runtime, counter order")
+        execution_fields = (
+            self.repository_uri, self.repository_revision, self.environment_snapshot,
+            self.settings_snapshot, self.command_snapshot, self.output_snapshot,
+        )
+        all_unavailable = all(metric.status == "unavailable" for metric in self.metrics)
+        if self.status == "identity_unverified":
+            if not self.reasons or self.source_snapshot is not None or any(field is not None for field in execution_fields):
+                raise ValueError("unverified native identity needs reasons and no inferred execution evidence")
+            if not all_unavailable or self.discrepancy_evidence:
+                raise ValueError("unverified native identity requires unavailable metrics only")
+        elif self.status == "source_obtained_not_executable":
+            if not self.reasons or self.source_snapshot is None or any(field is not None for field in execution_fields):
+                raise ValueError("obtained but non-executable source needs snapshot, reasons, and no execution evidence")
+            if not all_unavailable or self.discrepancy_evidence:
+                raise ValueError("non-executable native source requires unavailable metrics only")
+        else:
+            if self.source_snapshot is None or any(field is None for field in execution_fields):
+                raise ValueError("executed native receipt needs source, repository, environment, settings, command, and output evidence")
+            if self.reasons:
+                raise ValueError("executed native receipt cannot use unavailable-state reasons")
+            if self.status == "executed" and self.discrepancy_evidence:
+                raise ValueError("executed native receipt cannot carry discrepancy evidence")
+            if self.status == "execution_discrepant" and not self.discrepancy_evidence:
+                raise ValueError("discrepant native receipt needs explicit discrepancy evidence")
+        snapshots = tuple(
+            snapshot for snapshot in (
+                self.source_snapshot, self.environment_snapshot, self.settings_snapshot,
+                self.command_snapshot, self.output_snapshot,
+            ) if snapshot is not None
+        )
+        paths = tuple(snapshot.relative_path for snapshot in snapshots)
+        if len(paths) != len(set(paths)):
+            raise ValueError("native evidence snapshots must have distinct confined paths")
+        return self
+
+    @property
+    def executed_successfully(self) -> bool:
+        return self.status == "executed"
+
+    def digest(self) -> str:
+        return _receipt_digest("bp-registry-campaign-native-reference-assessment-v1", self)
+
+
+class SourceExperimentQualificationReceiptV1(StrictModel):
+    """A digest-bound eligibility event; later evidence creates a new receipt."""
+
+    schema_name: Literal["campaign_source_experiment_qualification_v1"] = Field(alias="schema", serialization_alias="schema")
+    source_experiment: SourceExperimentIdentityV1
+    target_receipt_sha256: str = Field(pattern=_SHA256)
+    native_assessment: NativeReferenceAssessmentV1
+    qualification_blockers: tuple[str, ...] = Field(default=(), max_length=_MAX_QUALIFICATION_BLOCKERS)
+    faithful_eligible: bool
+    prior_qualification_receipt_sha256: str | None = Field(default=None, pattern=_SHA256)
+
+    @field_validator("qualification_blockers", mode="before")
+    @classmethod
+    def tuple_blockers(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @field_validator("qualification_blockers")
+    @classmethod
+    def valid_blockers(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        if any(not blocker or len(blocker) > 1_024 for blocker in value) or len(set(value)) != len(value):
+            raise ValueError("qualification receipt blockers must be unique bounded nonempty strings")
+        return value
+
+    @model_validator(mode="after")
+    def source_faithful_gate(self) -> "SourceExperimentQualificationReceiptV1":
+        if self.native_assessment.target_id != self.source_experiment.target_id:
+            raise ValueError("native assessment must bind the same target as the source experiment")
+        expected_eligibility = (
+            self.source_experiment.complete_for_faithful_assessment
+            and self.native_assessment.executed_successfully
+            and not self.qualification_blockers
+        )
+        if self.faithful_eligible != expected_eligibility:
+            raise ValueError("faithful eligibility must exactly match complete source and native evidence")
+        return self
+
+    def digest(self) -> str:
+        return _receipt_digest("bp-registry-campaign-source-experiment-qualification-v1", self)
+
+
 class TableTargetReceiptV1(StrictModel):
     """A direct source/table target frozen before simulation assessment."""
 
