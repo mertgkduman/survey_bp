@@ -437,6 +437,12 @@ def reconstruct_campaign_report(
     target_arms_by_id: dict[str, str] = {}
     for target in assessment.targets:
         matching = rows_by_point.get(target.target_id, [])
+        # A prespecified target ID need not be the physical point ID.  The
+        # one-point campaign has an unambiguous point even when its target is
+        # named for the development claim; multi-point work still requires
+        # exact point-ID binding rather than guessing.
+        if not matching and len(all_plan_by_point) == 1:
+            matching = next(iter(rows_by_point.values()))
         point_arms = sorted({row["unit"].arm_id for row in matching})
         selected_arm = target_arms.get(target.target_id)
         if selected_arm is None and len(point_arms) != 1:

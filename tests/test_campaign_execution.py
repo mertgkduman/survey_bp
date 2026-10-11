@@ -1214,6 +1214,91 @@ def test_paired_canonical_gate_definition_and_documented_lifecycle(tmp_path: Pat
     assert "never described as matched decoder evidence" in documentation
 
 
+def test_retained_paired_canonical_gate_verifies(tmp_path: Path) -> None:
+    """Replay both retained real routes and their shared physical sample bytes."""
+    root = ROOT / "data/results/phase8-paired-canonical-gate-v1"
+    plan = root / "campaign-work-plan.json"
+    routes = (
+        (root / "local" / "campaign-paired-merge.json", root / "assessment.json"),
+        (root / "slurm-route" / "campaign-paired-merge.json", root / "slurm-route" / "assessment.json"),
+    )
+    samples: dict[int, bytes] = {}
+    for merge_path, report_path in routes:
+        checked = _run_installed_campaign(
+            "verify", "--report", str(report_path), "--plan", str(plan),
+            "--merge", str(merge_path), "--campaign-root", str(ROOT),
+        )
+        assert checked.returncode == 0, checked.stdout
+        assert json.loads(checked.stdout)["verified"] is True
+        merge = json.loads(merge_path.read_text(encoding="utf-8"))
+        assert len(merge["verified_attempts"]) == 4
+        for attempt in merge["verified_attempts"]:
+            sample_id = json.loads(Path(attempt["materialized_sample_path"]).read_text())["sample_id"]
+            material = Path(attempt["materialized_sample_path"]).read_bytes()
+            assert samples.setdefault(sample_id, material) == material
+            assert len(attempt["canonical_ledger_sha256"]) == 64
+            assert len(attempt["physical_error_sha256"]) == 64
+            assert attempt["terminal_fact"]["outcome"] == "nonconvergence"
+            canonical_terminal = json.loads(Path(attempt["canonical_ledger_path"]).read_text().splitlines()[-1])
+            assert canonical_terminal["data"]["outcome"] is None
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+        assert report["merge_receipt_sha256"] == merge["canonical_merge"]["receipt_sha256"]
+        point = report["point_reports"][0]
+        assert point["planned_samples"] == 4 and point["terminal_samples"] == 4
+        assert {item["arm_id"] for item in point["outcome_denominator_summaries"]} == {"fast", "slow"}
+        assert all(item["acceptance_probability"]["denominator"] == 2 for item in point["outcome_denominator_summaries"])
+        assert all(item["conditional_performance"] is None and item["conditional_unavailable_reason"] == "zero accepted samples"
+                   for item in point["outcome_denominator_summaries"])
+        assert point["work_and_resources"]["work_vectors"]
+        assert point["outcome_treatment_table"]
+    assert set(samples) == {0, 1}
+    routes_checked = _run_installed_campaign(
+        "verify-routes", "--plan", str(plan), "--local-merge", str(routes[0][0]),
+        "--local-report", str(routes[0][1]), "--slurm-merge", str(routes[1][0]),
+        "--slurm-report", str(routes[1][1]), "--campaign-root", str(ROOT),
+        "--output", str(tmp_path / "route-check.json"),
+    )
+    assert routes_checked.returncode == 0, routes_checked.stdout
+    assert json.loads(routes_checked.stdout)["scientific_records_match"] is True
+
+
+def test_retained_paired_canonical_gate_rejects_tampering(tmp_path: Path) -> None:
+    """Changed labels, sample bytes, and ledger bytes fail attempt replay."""
+    from bp_registry.campaigns.cli import _load_work_plan
+    from bp_registry.campaigns.execution import verify_canonical_attempt
+
+    root = ROOT / "data/results/phase8-paired-canonical-gate-v1"
+    _spec, plan, _payload = _load_work_plan(str(root / "campaign-work-plan.json"), ROOT)
+    merge = json.loads((root / "local" / "campaign-paired-merge.json").read_text())
+    original = merge["verified_attempts"][0]
+    for field, value in (("unit_key", "wrong-unit"), ("physical_error_sha256", "0" * 64)):
+        changed = {**original, field: value}
+        with pytest.raises(ValueError):
+            verify_canonical_attempt(record=changed, plan=plan)
+    for field, source in (("materialized_sample_path", "materialized_sample_path"),
+                          ("canonical_ledger_path", "canonical_ledger_path")):
+        copied = tmp_path / Path(original[source]).name
+        copied.write_bytes(Path(original[source]).read_bytes() + b" ")
+        with pytest.raises(ValueError):
+            verify_canonical_attempt(record={**original, field: str(copied)}, plan=plan)
+    extra_receipt = root / "slurm-route" / "shard-0" / "paired-shard-run.json"
+    altered_merge = dict(merge)
+    altered_merge["attempt_artifacts"] = sorted(
+        [*merge["attempt_artifacts"], {"path": str(extra_receipt),
+                                     "sha256": sha256(extra_receipt.read_bytes()).hexdigest()}],
+        key=lambda item: (item["path"], item["sha256"]),
+    )
+    altered_path = tmp_path / "unrelated-indexed-delivery.json"
+    altered_path.write_text(json.dumps(altered_merge, sort_keys=True), encoding="utf-8")
+    rejected = _run_installed_campaign(
+        "verify", "--report", str(root / "assessment.json"),
+        "--plan", str(root / "campaign-work-plan.json"),
+        "--merge", str(altered_path), "--campaign-root", str(ROOT),
+    )
+    assert rejected.returncode != 0
+    assert "attempts differ from indexed run receipts" in json.loads(rejected.stdout)["error"]
+
+
 def test_operational_fixture_recovers_a_post_decision_crash_without_next_look(tmp_path: Path):
     """The bounded gate retains its stop-receipt recovery proof on disk."""
     study = ROOT / "data/studies/phase8-operational-gate-v1.json"

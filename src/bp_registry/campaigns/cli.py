@@ -9,6 +9,7 @@ contracts.
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 from dataclasses import asdict
 from hashlib import sha256
 import json
@@ -441,7 +442,7 @@ def _materialized_sample_index(attempts: tuple[dict[str, Any], ...]) -> dict[str
 
 
 def _load_indexed_materialized_samples(
-    index: Mapping[str, Any], *, artifact_roots: tuple[Path, ...],
+    index: Mapping[str, Any], *, artifact_roots: tuple[Path, ...], max_bytes: int,
 ) -> dict[str, MaterializedPhysicalSampleV1]:
     """Rehydrate typed samples from the independently checked merge descriptors."""
     if not isinstance(index, Mapping) or not index:
@@ -461,6 +462,7 @@ def _load_indexed_materialized_samples(
         for raw_path in paths:
             path = Path(raw_path)
             if (path.is_symlink() or not path.is_file()
+                    or path.stat().st_size > max_bytes
                     or not any(path.resolve(strict=True).is_relative_to(root) for root in artifact_roots)):
                 raise ValueError("paired merge materialized sample path is unavailable")
             artifact = MaterializedPhysicalSampleV1.model_validate_json(path.read_bytes())
@@ -518,11 +520,20 @@ def _paired_merge_payload(path: str, *, plan: CampaignWorkPlan) -> dict[str, Any
         receipt = Path(str(item["path"]))
         if receipt.is_symlink() or not receipt.is_file() or sha256(receipt.read_bytes()).hexdigest() != item["sha256"]:
             raise ValueError("paired merge artifact input receipt index differs from retained bytes")
+    indexed_attempts = tuple(
+        attempt for item in artifacts
+        for attempt in _paired_attempts(str(item["path"]), plan=plan)
+    )
+    if Counter(canonical_json_bytes(item) for item in indexed_attempts) != Counter(
+        canonical_json_bytes(item) for item in verified
+    ):
+        raise ValueError("paired merge attempts differ from indexed run receipts")
     artifact_roots = tuple(
         Path(str(item["path"])).resolve(strict=True).parent for item in artifacts
     )
     indexed_samples = _load_indexed_materialized_samples(
         payload["materialized_samples_by_identity"], artifact_roots=artifact_roots,
+        max_bytes=plan.work_spec.assessment.resources.max_storage_bytes,
     )
     if (payload["canonical_merge"] != expected
             or payload["attempt_artifacts"] != sorted((dict(item) for item in artifacts), key=lambda item: (str(item["path"]), str(item["sha256"])))

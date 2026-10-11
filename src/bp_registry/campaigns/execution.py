@@ -659,25 +659,36 @@ def materialize_campaign_sample(
     return reloaded
 
 
-def _campaign_attempt(
-    *, plan: CampaignWorkPlan, unit: Any, arm_path: Path, sample_path: Path,
-    materialized: MaterializedPhysicalSampleV1, ledger_path: Path,
-) -> dict[str, Any]:
-    ledger_bytes = ledger_path.read_bytes()
-    events = read_canonical_events(ledger_path)
-    terminal_fact = _terminal_fact(events, unit_key=unit.key)
-    # Canonical structural evidence labels its binary evaluator outcome as
-    # ``logical_failure``.  Campaign assessment has the explicit terminal
-    # taxonomy, so translate only in the outer receipt; the canonical event is
-    # retained byte-for-byte and is never rewritten.
+def _campaign_terminal_fact(events: list[dict[str, Any]], *, unit_key: str) -> dict[str, Any]:
+    """Translate only supported canonical terminal semantics into campaign classes."""
+    terminal_fact = _terminal_fact(events, unit_key=unit_key)
     if terminal_fact["outcome"] == "logical_failure":
         terminal_fact["outcome"] = "wrong_logical_action"
+    elif terminal_fact["outcome"] is None and terminal_fact["termination"] == "max_iterations":
+        terminal_fact["outcome"] = "nonconvergence"
+    elif (terminal_fact["outcome"] is None and terminal_fact["termination"] == "completed"
+          and next(event for event in events if event["kind"] == "termination")["data"].get("selection_status") == "unavailable_due_to_stopping"
+          and any(event.get("kind") == "work" and event.get("data", {}).get("relay_stopping_reason") == "leg_limit"
+                  for event in events)):
+        terminal_fact["outcome"] = "nonconvergence"
     elif terminal_fact["outcome"] not in {
         "exact", "stabilizer_equivalent", "wrong_logical_action", "invalid_syndrome",
         "no_proposal", "nonconvergence", "timeout", "postselected_rejection",
         "infrastructure_interruption",
     }:
         raise ValueError("canonical terminal outcome cannot be mapped into the frozen campaign taxonomy")
+    return terminal_fact
+
+
+def _campaign_attempt(
+    *, plan: CampaignWorkPlan, unit: Any, arm_path: Path, sample_path: Path,
+    materialized: MaterializedPhysicalSampleV1, ledger_path: Path,
+) -> dict[str, Any]:
+    ledger_bytes = ledger_path.read_bytes()
+    events = read_canonical_events(ledger_path)
+    # The canonical ledger remains byte-for-byte unchanged.  The outer
+    # receipt supplies the assessment taxonomy and verification repeats it.
+    terminal_fact = _campaign_terminal_fact(events, unit_key=unit.key)
     work_vectors = [event.get("data", {}).get("work_vector") for event in events if isinstance(event.get("data"), Mapping) and "work_vector" in event["data"]]
     if not work_vectors or any(not isinstance(vector, Mapping) for vector in work_vectors):
         raise ValueError("canonical ledger lacks a named work vector")
@@ -731,7 +742,8 @@ def verify_canonical_attempt(*, record: Mapping[str, Any], plan: CampaignWorkPla
     if shard is None or record["selected_shard_id"] != shard.shard_id:
         raise ValueError("canonical attempt selected shard differs from the frozen plan")
     sample_path = Path(record["materialized_sample_path"])
-    if sample_path.is_symlink() or not sample_path.is_file():
+    if (sample_path.is_symlink() or not sample_path.is_file()
+            or sample_path.stat().st_size > plan.work_spec.assessment.resources.max_storage_bytes):
         raise ValueError("canonical attempt materialized sample must be a regular file")
     materialized = MaterializedPhysicalSampleV1.model_validate_json(sample_path.read_bytes())
     if (materialized.physical_sample_identity != unit.physical_sample_identity
@@ -746,14 +758,15 @@ def verify_canonical_attempt(*, record: Mapping[str, Any], plan: CampaignWorkPla
     if manifest.is_symlink() or not manifest.is_file() or sha256(manifest.read_bytes()).hexdigest() != arm.manifest_sha256 or record["arm_manifest_sha256"] != arm.manifest_sha256:
         raise ValueError("canonical attempt manifest bytes differ from frozen arm")
     ledger = Path(record["canonical_ledger_path"])
+    if (ledger.is_symlink() or not ledger.is_file()
+            or ledger.stat().st_size > plan.work_spec.assessment.resources.max_evidence_bytes):
+        raise ValueError("canonical attempt ledger must be a bounded regular file")
     if (materialized.materialized_sample_sha256 != record["materialized_sample_sha256"]
             or materialized.physical_error_sha256 != record["physical_error_sha256"]
             or sha256(ledger.read_bytes()).hexdigest() != record["canonical_ledger_sha256"]):
         raise ValueError("canonical attempt hash binding differs from retained evidence")
     events = read_canonical_events(ledger)
-    terminal_fact = _terminal_fact(events, unit_key=unit.key)
-    if terminal_fact["outcome"] == "logical_failure":
-        terminal_fact["outcome"] = "wrong_logical_action"
+    terminal_fact = _campaign_terminal_fact(events, unit_key=unit.key)
     if events != record["events"] or terminal_fact != record["terminal_fact"]:
         raise ValueError("canonical attempt terminal differs from retained ledger")
     vectors = [event.get("data", {}).get("work_vector") for event in events if isinstance(event.get("data"), Mapping) and "work_vector" in event["data"]]
