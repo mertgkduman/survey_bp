@@ -137,3 +137,25 @@ def test_merge_rejects_terminal_conflicts_and_validates_authorized_tail() -> Non
     stop["authorized_undispatched"] = []
     with pytest.raises(ValueError, match="tail"):
         merge_verified_attempts(plan=plan, verified_attempts=(first_terminal,), look_stop_receipt=stop)
+
+
+def test_merge_records_byte_identical_terminal_retries_without_double_counting() -> None:
+    from bp_registry.campaigns.shards import merge_verified_attempts
+
+    plan = _work_plan()
+    first, second = plan.unit_keys
+    interrupted = _verified_attempt(
+        unit_key=first, plan_digest=plan.campaign_plan_digest, attempt_id="a", state="sealed_interrupted",
+    )
+    retry_a = _verified_attempt(
+        unit_key=first, plan_digest=plan.campaign_plan_digest, attempt_id="b", state="sealed_terminal",
+        terminal="exact", parent="a",
+    )
+    retry_b = _verified_attempt(
+        unit_key=first, plan_digest=plan.campaign_plan_digest, attempt_id="c", state="sealed_terminal",
+        terminal="exact", parent="a",
+    )
+    merged = merge_verified_attempts(plan=plan, verified_attempts=(retry_b, interrupted, retry_a))
+    assert merged["terminal_unit_keys"] == [first]
+    assert merged["redundant_attempt_receipt_hashes"] == [max(retry_a["receipt_sha256"], retry_b["receipt_sha256"])]
+    assert merged["missing_unit_keys"] == [second]

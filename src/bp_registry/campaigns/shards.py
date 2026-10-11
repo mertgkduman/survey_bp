@@ -15,6 +15,7 @@ from ..canonical.verification import validate_canonical_shot
 from ..ledger import read_canonical_events_bytes
 from ..runner import canonical_public_shot_context
 from .contracts import CampaignSpecV1, build_one_unit_plan, canonical_json_bytes
+from .planning import CampaignWorkPlan
 
 
 _MAX_SIDECARS = 1_000
@@ -331,3 +332,149 @@ def reconstruct_fixed_shot(verified_shard: Mapping[str, Any]) -> dict[str, Any]:
         },
         "status": "fixed_shot_complete",
     }
+
+
+def verify_look_stop_receipt(
+    *, plan: CampaignWorkPlan, receipt: Mapping[str, Any], terminal_unit_keys: set[str],
+) -> tuple[str, ...]:
+    """Verify a completed-look stop receipt before authorizing undispatched work."""
+    required = {
+        "schema", "campaign_plan_digest", "completed_look", "decision_input_hashes", "decision_result",
+        "stop_reason", "realized_count", "overshoot_count", "authorized_undispatched",
+    }
+    if not isinstance(receipt, Mapping) or set(receipt) != required or receipt.get("schema") != "campaign_look_stop_receipt_v1":
+        raise ValueError("look stop receipt has an invalid field set")
+    if receipt["campaign_plan_digest"] != plan.campaign_plan_digest:
+        raise ValueError("look stop receipt differs from frozen campaign plan")
+    look = receipt["completed_look"]
+    if type(look) is not int:
+        raise ValueError("look stop receipt requires a declared completed look")
+    prefix = set(plan.completed_prefix(look))
+    if not prefix.issubset(terminal_unit_keys):
+        raise ValueError("look stop receipt requires a fully terminal completed look")
+    hashes = receipt["decision_input_hashes"]
+    if not isinstance(hashes, list) or not hashes or len(set(hashes)) != len(hashes) or not all(_is_digest(value) for value in hashes):
+        raise ValueError("look stop receipt requires unique decision input hashes")
+    if not isinstance(receipt["decision_result"], Mapping) or not isinstance(receipt["stop_reason"], str) or not receipt["stop_reason"]:
+        raise ValueError("look stop receipt lacks its decision facts")
+    if any(type(receipt[field]) is not int or receipt[field] < 0 for field in ("realized_count", "overshoot_count")):
+        raise ValueError("look stop receipt has invalid realized or overshoot count")
+    if receipt["realized_count"] != len(terminal_unit_keys) or receipt["overshoot_count"] != len(terminal_unit_keys - prefix):
+        raise ValueError("look stop receipt count facts differ from verified terminals")
+    expected = tuple(key for key in plan.authorized_tail(look) if key not in terminal_unit_keys)
+    actual = receipt["authorized_undispatched"]
+    if not isinstance(actual, list) or tuple(actual) != expected:
+        raise ValueError("look stop receipt has an invalid authorized undispatched tail")
+    return expected
+
+
+def _verified_attempt_record(record: Mapping[str, Any], *, plan: CampaignWorkPlan) -> tuple[str, Mapping[str, Any]]:
+    if not isinstance(record, Mapping):
+        raise ValueError("merge requires verified attempt records")
+    if record.get("validation_status") != "verified" or record.get("replay_status") != "verified":
+        raise ValueError("merge accepts only independently verified attempt records")
+    if not _is_digest(record.get("receipt_sha256")):
+        raise ValueError("verified attempt record requires its immutable receipt hash")
+    attempt = record.get("attempt")
+    if not isinstance(attempt, Mapping):
+        raise ValueError("verified attempt record lacks attempt receipt")
+    if attempt.get("campaign_plan_digest") != plan.campaign_plan_digest:
+        raise ValueError("verified attempt record differs from frozen campaign plan")
+    unit_key = attempt.get("unit_key")
+    if not isinstance(unit_key, str) or not unit_key:
+        raise ValueError("verified attempt record lacks unit key")
+    if attempt.get("state") == "sealed_terminal":
+        terminal = record.get("terminal_fact")
+        events = record.get("events")
+        if not _is_digest(record.get("terminal_bytes_sha256")) or not isinstance(terminal, Mapping) or terminal.get("unit_key") != unit_key:
+            raise ValueError("verified terminal record lacks immutable terminal facts")
+        if not isinstance(events, (list, tuple)) or any(not isinstance(event, Mapping) or not isinstance(event.get("event_id"), str) for event in events):
+            raise ValueError("verified terminal record lacks reconstructed events")
+    elif "terminal_fact" in record or "terminal_bytes_sha256" in record:
+        raise ValueError("nonterminal attempt cannot claim terminal evidence")
+    return unit_key, attempt
+
+
+def merge_verified_attempts(
+    *, plan: CampaignWorkPlan, verified_attempts: tuple[Mapping[str, Any], ...] | list[Mapping[str, Any]],
+    look_stop_receipt: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Reduce validated immutable attempt snapshots by exact frozen unit coverage.
+
+    This function deliberately accepts only records already returned by an
+    independent shard verifier.  It never reads shard summaries and never
+    assigns a denominator contribution to an unverified or open attempt.
+    """
+    if not isinstance(plan, CampaignWorkPlan):
+        raise ValueError("merge requires a frozen CampaignWorkPlan")
+    if not isinstance(verified_attempts, (tuple, list)):
+        raise ValueError("merge requires an ordered collection of verified attempts")
+    expected = tuple(plan.unit_keys)
+    expected_set = set(expected)
+    by_unit: dict[str, list[Mapping[str, Any]]] = {}
+    unexpected: set[str] = set()
+    for record in verified_attempts:
+        unit_key, _ = _verified_attempt_record(record, plan=plan)
+        if unit_key not in expected_set:
+            unexpected.add(unit_key)
+            continue
+        by_unit.setdefault(unit_key, []).append(record)
+
+    terminals: dict[str, Mapping[str, Any]] = {}
+    terminal_events: list[tuple[int, str, Mapping[str, Any]]] = []
+    explicit_final: set[str] = set()
+    incomplete: set[str] = set()
+    redundant_hashes: set[str] = set()
+    attempt_hashes: set[str] = set()
+    for unit_key, records in by_unit.items():
+        lineage = validate_attempt_lineage([record["attempt"] for record in records])
+        if lineage["unit_key"] != unit_key or lineage["campaign_plan_digest"] != plan.campaign_plan_digest:
+            raise ValueError("verified attempt lineage differs from frozen unit")
+        attempt_hashes.update(str(record["receipt_sha256"]) for record in records)
+        terminal_records = sorted(
+            (record for record in records if record["attempt"]["state"] == "sealed_terminal"),
+            key=lambda record: str(record["receipt_sha256"]),
+        )
+        if terminal_records:
+            first = terminal_records[0]
+            first_digest = first["terminal_bytes_sha256"]
+            first_fact = canonical_json_bytes(first["terminal_fact"])
+            for record in terminal_records[1:]:
+                if record["terminal_bytes_sha256"] != first_digest or canonical_json_bytes(record["terminal_fact"]) != first_fact:
+                    raise ValueError("conflicting terminal retries for one frozen unit")
+                redundant_hashes.add(str(record["receipt_sha256"]))
+            terminals[unit_key] = first
+            position = expected.index(unit_key)
+            terminal_events.extend((position, str(event["event_id"]), event) for event in first["events"])
+        elif any(record.get("final_nonterminal") is True for record in records):
+            explicit_final.add(unit_key)
+        else:
+            incomplete.add(unit_key)
+
+    terminal_keys = set(terminals)
+    authorized_tail: tuple[str, ...] = ()
+    stop_hashes: tuple[str, ...] = ()
+    if look_stop_receipt is not None:
+        authorized_tail = verify_look_stop_receipt(plan=plan, receipt=look_stop_receipt, terminal_unit_keys=terminal_keys)
+        stop_hashes = (attempt_receipt_digest(look_stop_receipt),)
+    accounted = terminal_keys | explicit_final | incomplete | set(authorized_tail)
+    missing = expected_set - accounted
+    ordered_events = [dict(event) for _, _, event in sorted(terminal_events, key=lambda item: (item[0], item[1]))]
+    payload = {
+        "schema": "campaign_merge_receipt_v1",
+        "campaign_plan_digest": plan.campaign_plan_digest,
+        "terminal_unit_keys": [key for key in expected if key in terminal_keys],
+        "explicit_final_nonterminal_keys": [key for key in expected if key in explicit_final],
+        "incomplete_unit_keys": [key for key in expected if key in incomplete],
+        "authorized_undispatched_keys": list(authorized_tail),
+        "unexpected_unit_keys": sorted(unexpected),
+        "redundant_attempt_receipt_hashes": sorted(redundant_hashes),
+        "conflicting_unit_keys": [],
+        "missing_unit_keys": [key for key in expected if key in missing],
+        "attempt_receipt_hashes": sorted(attempt_hashes),
+        "stop_receipt_hashes": list(stop_hashes),
+        "terminal_facts": [dict(terminals[key]["terminal_fact"]) for key in expected if key in terminals],
+        "events": ordered_events,
+    }
+    receipt_bytes = canonical_json_bytes(payload)
+    return {**payload, "receipt_bytes": receipt_bytes, "receipt_sha256": _digest(receipt_bytes)}
