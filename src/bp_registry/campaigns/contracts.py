@@ -166,6 +166,55 @@ class FiniteLookStoppingV1(StrictModel):
         return self
 
 
+class FailureCountStoppingV1(StrictModel):
+    """A bounded, ordered negative-binomial stopping record.
+
+    The target-th decoder failure is the inferential terminal. Completed shots
+    later in that already-authorized batch remain provenance and cost evidence,
+    never additional inverse-binomial trials.
+    """
+
+    mode: Literal["failure_count"]
+    target_failures: int = Field(ge=1, le=_MAX_EVENTS)
+    batch_size: int = Field(ge=1, le=_MAX_EVENTS)
+    shot_order: Literal["campaign_cohort_point_sample_ordinal_v1"]
+    failure_event: Literal["decoder_logical_failure_v1"]
+    terminal_batch_authorization_sha256: str = Field(pattern=_SHA256)
+    cap_authorization_sha256: str = Field(pattern=_SHA256)
+    terminal_state: Literal["target_reached", "cap_censored"]
+    terminal_failure_ordinal: int | None = Field(default=None, ge=1, le=_MAX_EVENTS)
+    cumulative_failures_before_terminal: int | None = Field(default=None, ge=0, le=_MAX_EVENTS)
+    cumulative_failures_at_terminal: int = Field(ge=0, le=_MAX_EVENTS)
+    authorized_tail_ordinals: tuple[int, ...] = Field(default=(), max_length=_MAX_EVENTS)
+
+    @field_validator("authorized_tail_ordinals", mode="before")
+    @classmethod
+    def tuple_tail_ordinals(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @model_validator(mode="after")
+    def exact_target_prefix_or_censored_cap(self) -> "FailureCountStoppingV1":
+        if self.terminal_state == "target_reached":
+            if self.terminal_failure_ordinal is None or self.cumulative_failures_before_terminal is None:
+                raise ValueError("target-reached stopping requires the exact target-th-failure ordinal and prefix count")
+            if (self.cumulative_failures_before_terminal != self.target_failures - 1
+                    or self.cumulative_failures_at_terminal != self.target_failures):
+                raise ValueError("target-reached stopping must bind the exact target-th failure prefix")
+            terminal_batch_end = ((self.terminal_failure_ordinal - 1) // self.batch_size + 1) * self.batch_size
+            if (tuple(sorted(self.authorized_tail_ordinals)) != self.authorized_tail_ordinals
+                    or len(set(self.authorized_tail_ordinals)) != len(self.authorized_tail_ordinals)
+                    or any(ordinal <= self.terminal_failure_ordinal or ordinal > terminal_batch_end
+                           for ordinal in self.authorized_tail_ordinals)):
+                raise ValueError("authorized tail ordinals must be unique later shots in the terminal batch")
+        else:
+            if (self.terminal_failure_ordinal is not None
+                    or self.cumulative_failures_before_terminal is not None
+                    or self.cumulative_failures_at_terminal >= self.target_failures
+                    or self.authorized_tail_ordinals):
+                raise ValueError("cap-censored stopping cannot claim a target terminal or authorized tail")
+        return self
+
+
 class OutcomeTreatmentV1(StrictModel):
     terminal_status: Literal[
         "exact", "stabilizer_equivalent", "wrong_logical_action", "invalid_syndrome",
