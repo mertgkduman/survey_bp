@@ -22,7 +22,10 @@ from .. import sampling
 from ..canonical.verification import validate_canonical_shot
 from ..ledger import read_canonical_events
 from ..runner import canonical_public_manifest_context, canonical_public_shot_context, run_canonical_materialized_one, run_canonical_one
-from .contracts import CampaignSpecV1, CampaignWorkSpecV1, MaterializedPhysicalSampleV1, build_one_unit_plan, canonical_json_bytes
+from .contracts import (
+    CampaignSpecV1, CampaignWorkSpecV1, FailureCountStoppingV1,
+    MaterializedPhysicalSampleV1, build_one_unit_plan, canonical_json_bytes,
+)
 from .identity import validate_matched_sample_hashes
 from .planning import CampaignWorkPlan, ShardPlan
 from .shards import _resolve_manifest, _terminal_fact, publish_sealed_shard, seal_receipt
@@ -376,6 +379,283 @@ def _existing_stop_receipt(path: Path, *, plan: CampaignWorkPlan) -> dict[str, A
     if receipt.get("campaign_spec_digest") != plan.campaign_spec_digest or receipt.get("campaign_plan_digest") != plan.campaign_plan_digest:
         raise ValueError("retained finite-look receipt differs from frozen scientific identity")
     return receipt
+
+
+def _failure_count_receipt_path(root: Path) -> Path:
+    return root / "failure-count-receipt.json"
+
+
+def _failure_count_unit_records(
+    *, plan: CampaignWorkPlan, root: Path,
+) -> tuple[dict[str, Any], ...]:
+    """Load only sealed failure-count worker products in frozen ordinal order.
+
+    A retried interrupted unit gets a new immutable attempt directory.  The
+    reducer selects its one sealed terminal and rejects competing terminals,
+    rather than reopening or replacing any retained receipt.
+    """
+    expected = {unit.key: (ordinal, unit) for ordinal, unit in enumerate(plan.units, start=1)}
+    by_key: dict[str, list[dict[str, Any]]] = {}
+    evidence_root = root / "failure-count-units"
+    if not evidence_root.exists():
+        return ()
+    if evidence_root.is_symlink() or not evidence_root.is_dir():
+        raise ValueError("failure-count evidence root must be a regular directory")
+    for receipt_path in sorted(evidence_root.glob("*/receipt.json")):
+        if receipt_path.is_symlink() or not receipt_path.is_file():
+            raise ValueError("failure-count unit receipt must be a regular file")
+        raw = receipt_path.read_bytes()
+        try:
+            record = json.loads(raw)
+        except json.JSONDecodeError as error:
+            raise ValueError("failure-count unit receipt is unreadable") from error
+        if not isinstance(record, dict) or record.get("schema") != "campaign_failure_count_unit_receipt_v1":
+            raise ValueError("failure-count unit receipt has an invalid schema")
+        key, ordinal = record.get("unit_key"), record.get("ordinal")
+        expected_unit = expected.get(key) if isinstance(key, str) else None
+        if expected_unit is None or ordinal != expected_unit[0]:
+            raise ValueError("failure-count unit receipt differs from frozen ordinal identity")
+        if record.get("campaign_spec_digest") != plan.campaign_spec_digest or record.get("campaign_plan_digest") != plan.campaign_plan_digest:
+            raise ValueError("failure-count unit receipt differs from frozen plan")
+        if record.get("state") not in {"sealed_terminal", "sealed_interrupted"}:
+            raise ValueError("failure-count unit receipt has an invalid sealed state")
+        if canonical_json_bytes(record) + b"\n" != raw:
+            raise ValueError("failure-count unit receipt is not canonical sealed bytes")
+        by_key.setdefault(key, []).append({**record, "receipt_path": str(receipt_path), "receipt_sha256": sha256(raw).hexdigest()})
+    selected: list[dict[str, Any]] = []
+    for key, (ordinal, unit) in expected.items():
+        records = by_key.get(key, [])
+        terminals = [record for record in records if record["state"] == "sealed_terminal"]
+        if len(terminals) > 1:
+            raise ValueError("failure-count evidence has competing terminal attempts")
+        if terminals:
+            record = terminals[0]
+            scientific = record.get("scientific")
+            if not isinstance(scientific, Mapping) or scientific.get("unit_key") != key:
+                raise ValueError("failure-count terminal receipt lacks frozen scientific facts")
+            terminal = scientific.get("terminal_fact")
+            if (not isinstance(terminal, Mapping) or terminal.get("unit_key") != key
+                    or type(terminal.get("logical_failure")) is not bool):
+                raise ValueError("failure-count terminal receipt lacks a verified failure fact")
+            selected.append(record)
+        elif records:
+            # An interruption is preserved and makes the campaign incomplete;
+            # it may be retried only in a fresh attempt directory.
+            selected.append(max(records, key=lambda item: int(item.get("attempt", 0))))
+    return tuple(sorted(selected, key=lambda item: int(item["ordinal"])))
+
+
+def _failure_count_merge(
+    *, plan: CampaignWorkPlan, terminal_records: tuple[dict[str, Any], ...],
+) -> dict[str, Any]:
+    """Build the compact, digest-bound merge used by a stop or censor receipt."""
+    ordered: list[dict[str, Any]] = []
+    for record in terminal_records:
+        scientific = record["scientific"]
+        ordered.append({
+            "ordinal": record["ordinal"], "unit_key": record["unit_key"],
+            "receipt_sha256": record["receipt_sha256"],
+            "terminal_fact": scientific["terminal_fact"], "work_vector": scientific["work_vector"],
+        })
+    return {
+        "schema": "failure_count_merge_receipt_v1",
+        "campaign_spec_digest": plan.campaign_spec_digest,
+        "campaign_plan_digest": plan.campaign_plan_digest,
+        "ordered_terminal_records": ordered,
+    }
+
+
+def _publish_failure_count_unit(
+    *, root: Path, plan: CampaignWorkPlan, unit: Mapping[str, Any], ordinal: int,
+    attempt: int, unit_runner: Callable[[dict[str, Any], str], Mapping[str, Any]],
+) -> None:
+    """Run one frozen shot and publish an immutable terminal/interruption fact."""
+    evidence_root = root / "failure-count-units"
+    evidence_root.mkdir(parents=True, exist_ok=True)
+    destination = evidence_root / f"{ordinal:09d}-{unit['unit_key']}-attempt-{attempt:03d}"
+    if destination.exists():
+        raise ValueError("failure-count attempt destination already exists")
+    staging_input = tempfile.mkdtemp(prefix=".failure-count-input-", dir=root)
+    started = time.monotonic_ns()
+    environment = _allowlisted_thread_environment()
+    try:
+        try:
+            result = unit_runner(dict(unit), staging_input)
+            ended = time.monotonic_ns()
+            local = _unit_record(
+                unit=unit, result=result, started_ns=started, ended_ns=ended,
+                environment=environment, process_id=os.getpid(),
+            )
+            record: dict[str, Any] = {
+                "schema": "campaign_failure_count_unit_receipt_v1", "state": "sealed_terminal",
+                "campaign_spec_digest": plan.campaign_spec_digest, "campaign_plan_digest": plan.campaign_plan_digest,
+                "unit_key": unit["unit_key"], "ordinal": ordinal, "attempt": attempt,
+                "scientific": local["scientific"], "observation": local["observation"],
+            }
+        except BaseException as error:
+            ended = time.monotonic_ns()
+            record = {
+                "schema": "campaign_failure_count_unit_receipt_v1", "state": "sealed_interrupted",
+                "campaign_spec_digest": plan.campaign_spec_digest, "campaign_plan_digest": plan.campaign_plan_digest,
+                "unit_key": unit["unit_key"], "ordinal": ordinal, "attempt": attempt,
+                "error_type": type(error).__name__,
+                "observation": {"started_monotonic_ns": started, "ended_monotonic_ns": ended,
+                                "process_id": os.getpid(), "environment": environment},
+            }
+        staging = Path(tempfile.mkdtemp(prefix=".failure-count-unit-", dir=evidence_root))
+        try:
+            seal_receipt(path=staging / "receipt.json", receipt=record)
+            publish_sealed_shard(staging=staging, destination=destination)
+        except BaseException:
+            if staging.exists():
+                shutil.rmtree(staging)
+            raise
+    finally:
+        shutil.rmtree(staging_input, ignore_errors=True)
+
+
+def _failure_count_receipt(
+    *, plan: CampaignWorkPlan, stopping: FailureCountStoppingV1,
+    terminal_records: tuple[dict[str, Any], ...], max_shots: int,
+) -> dict[str, Any]:
+    """Reconstruct a terminal receipt exclusively from sealed ordered evidence."""
+    terminal = tuple(record for record in terminal_records if record["state"] == "sealed_terminal")
+    if tuple(record["ordinal"] for record in terminal) != tuple(range(1, len(terminal) + 1)):
+        raise ValueError("failure-count completion must be an exact ordered prefix")
+    merge = _failure_count_merge(plan=plan, terminal_records=terminal)
+    failure_ordinals = tuple(
+        int(record["ordinal"]) for record in terminal
+        if record["scientific"]["terminal_fact"]["logical_failure"]
+    )
+    reached = len(failure_ordinals) >= stopping.target_failures
+    if reached:
+        target_ordinal = failure_ordinals[stopping.target_failures - 1]
+        batch_end = ((target_ordinal - 1) // stopping.batch_size + 1) * stopping.batch_size
+        if len(terminal) != min(batch_end, len(plan.units)):
+            raise ValueError("target receipt requires the complete authorized terminal batch")
+        tail = tuple(range(target_ordinal + 1, len(terminal) + 1))
+        state = "target_reached"
+        assessment_status = "target_reached_pending_statistical_assessment"
+        prefix = terminal[:target_ordinal]
+    else:
+        if len(terminal) != max_shots:
+            raise ValueError("cap-censored receipt requires the frozen first cap")
+        target_ordinal = None
+        tail = ()
+        state = "cap_censored"
+        assessment_status = "inconclusive_cap_censored"
+        prefix = terminal
+    prefix_digest = sha256(canonical_json_bytes(_failure_count_merge(plan=plan, terminal_records=prefix))).hexdigest()
+    tail_records = tuple(record for record in terminal if int(record["ordinal"]) in set(tail))
+    tail_digest = sha256(canonical_json_bytes(_failure_count_merge(plan=plan, terminal_records=tail_records))).hexdigest()
+    payload: dict[str, Any] = {
+        "schema": "failure_count_stop_receipt_v1" if reached else "failure_count_censor_receipt_v1",
+        "campaign_spec_digest": plan.campaign_spec_digest, "campaign_plan_digest": plan.campaign_plan_digest,
+        "terminal_state": state, "assessment_status": assessment_status,
+        "target_failures": stopping.target_failures, "batch_size": stopping.batch_size,
+        "max_shots": max_shots, "total_completed_shots": len(terminal),
+        "cumulative_failures": len(failure_ordinals), "terminal_failure_ordinal": target_ordinal,
+        "inferential_prefix_count": len(prefix), "inferential_prefix_sha256": prefix_digest,
+        "authorized_tail_ordinals": list(tail), "authorized_tail_count": len(tail),
+        "authorized_tail_sha256": tail_digest,
+        "sealed_merge": merge, "sealed_merge_sha256": sha256(canonical_json_bytes(merge)).hexdigest(),
+        "actual_work": {"completed_shots": len(terminal), "tail_shots": len(tail),
+                        "bp_calls": sum(int(record["scientific"]["work_vector"].get("bp_calls", 0)) for record in terminal)},
+    }
+    if reached:
+        payload["cumulative_failures_before_terminal"] = stopping.target_failures - 1
+        payload["cumulative_failures_at_terminal"] = stopping.target_failures
+    return payload
+
+
+def verify_failure_count_receipt(*, plan: CampaignWorkPlan, output_root: str | Path) -> dict[str, Any]:
+    """Independently rebuild and byte-compare a failure-count terminal receipt."""
+    root = Path(output_root)
+    path = _failure_count_receipt_path(root)
+    if path.is_symlink() or not path.is_file():
+        raise ValueError("failure-count terminal receipt is unavailable")
+    try:
+        retained = json.loads(path.read_bytes())
+    except json.JSONDecodeError as error:
+        raise ValueError("failure-count terminal receipt is unreadable") from error
+    if not isinstance(retained, dict):
+        raise ValueError("failure-count terminal receipt has an invalid shape")
+    stopping = FailureCountStoppingV1(
+        mode="failure_count", target_failures=retained.get("target_failures"), batch_size=retained.get("batch_size"),
+        shot_order="campaign_cohort_point_sample_ordinal_v1", failure_event="decoder_logical_failure_v1",
+        terminal_batch_authorization_sha256="0" * 64, cap_authorization_sha256="0" * 64,
+        terminal_state="cap_censored", cumulative_failures_at_terminal=0,
+    )
+    records = _failure_count_unit_records(plan=plan, root=root)
+    if any(record["state"] != "sealed_terminal" for record in records):
+        raise ValueError("failure-count terminal receipt cannot use interrupted evidence")
+    expected = _failure_count_receipt(
+        plan=plan, stopping=stopping, terminal_records=records, max_shots=retained.get("max_shots"),
+    )
+    if retained != expected or path.read_bytes() != canonical_json_bytes(expected) + b"\n":
+        raise ValueError("failure-count receipt differs from sealed evidence")
+    return expected
+
+
+def dispatch_failure_count_batches(
+    plan: CampaignWorkPlan, *, output_root: str | Path, workers: int,
+    unit_runner: Callable[[dict[str, Any], str], Mapping[str, Any]], stopping: FailureCountStoppingV1,
+    max_shots: int | None = None, fault_after_terminal_merge: bool = False,
+) -> dict[str, Any]:
+    """Run whole local batches until the target-th failure or the frozen cap.
+
+    The controller deliberately accepts one arm per plan: an ordinal is a
+    physical shot, not an arm-dependent completion event.  Multi-arm controlled
+    comparisons retain their existing paired execution path and need an
+    explicit per-arm failure-count reducer before they can enter this route.
+    """
+    if not isinstance(plan, CampaignWorkPlan) or not isinstance(stopping, FailureCountStoppingV1):
+        raise ValueError("failure-count dispatch requires a frozen plan and stopping contract")
+    if type(workers) is not int or workers != 1:
+        raise ValueError("failure-count local dispatch currently requires exactly one worker")
+    if not callable(unit_runner) or type(fault_after_terminal_merge) is not bool:
+        raise ValueError("failure-count dispatch received invalid runner or fault flag")
+    if plan.units_per_sample_group != 1:
+        raise ValueError("failure-count dispatch requires one frozen decoder arm")
+    cap = len(plan.units) if max_shots is None else max_shots
+    if type(cap) is not int or cap < stopping.batch_size or cap > len(plan.units) or cap % stopping.batch_size:
+        raise ValueError("failure-count max_shots must be a whole authorized batch within the frozen plan")
+    root = Path(output_root)
+    root.mkdir(parents=True, exist_ok=True)
+    path = _failure_count_receipt_path(root)
+    if path.exists():
+        receipt = verify_failure_count_receipt(plan=plan, output_root=root)
+        if receipt["max_shots"] != cap:
+            raise ValueError("failure-count retained receipt differs from requested frozen cap")
+        return {"status": "terminal", "receipt": receipt, "recovered_receipt": False,
+                "terminal_unit_keys": [record["unit_key"] for record in _failure_count_unit_records(plan=plan, root=root)]}
+    records = _failure_count_unit_records(plan=plan, root=root)
+    if any(record["state"] != "sealed_terminal" for record in records):
+        return {"status": "incomplete", "receipt": None, "recovered_receipt": False,
+                "incomplete_unit_keys": [record["unit_key"] for record in records if record["state"] != "sealed_terminal"]}
+    completed = len(records)
+    failures = sum(bool(record["scientific"]["terminal_fact"]["logical_failure"]) for record in records)
+    while completed < cap and failures < stopping.target_failures:
+        batch_end = min(completed + stopping.batch_size, cap)
+        for ordinal in range(completed + 1, batch_end + 1):
+            unit = plan.units[ordinal - 1].payload()
+            attempts = sum(record["unit_key"] == unit["unit_key"] for record in records) + 1
+            _publish_failure_count_unit(root=root, plan=plan, unit=unit, ordinal=ordinal,
+                                        attempt=attempts, unit_runner=unit_runner)
+        records = _failure_count_unit_records(plan=plan, root=root)
+        if any(record["state"] != "sealed_terminal" for record in records):
+            return {"status": "incomplete", "receipt": None, "recovered_receipt": False,
+                    "incomplete_unit_keys": [record["unit_key"] for record in records if record["state"] != "sealed_terminal"]}
+        completed = len(records)
+        failures = sum(bool(record["scientific"]["terminal_fact"]["logical_failure"]) for record in records)
+    receipt = _failure_count_receipt(plan=plan, stopping=stopping, terminal_records=records, max_shots=cap)
+    merge_path = root / "failure-count-merge.json"
+    _publish_stop_receipt(path=merge_path, receipt=receipt["sealed_merge"])
+    if fault_after_terminal_merge:
+        raise InterruptedError("injected interruption after terminal merge before stop receipt")
+    _publish_stop_receipt(path=path, receipt=receipt)
+    return {"status": "terminal", "receipt": verify_failure_count_receipt(plan=plan, output_root=root),
+            "recovered_receipt": True, "terminal_unit_keys": [record["unit_key"] for record in records]}
 
 
 def dispatch_finite_looks(
