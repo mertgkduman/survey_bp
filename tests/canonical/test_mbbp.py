@@ -208,6 +208,44 @@ def test_public_v7_manifest_admits_a_complete_coordinate_vote_declaration() -> N
     assert parsed.vote is not None and parsed.vote.tie_bit == 1
 
 
+def test_vote_projection_classifies_nonconvergence_and_is_order_invariant() -> None:
+    from bp_registry.canonical.phase6 import phase6_events
+
+    result = _two_solution_vote_result()
+    nonconverged = replace(
+        result.members[0], status="iteration_cap", candidate=None, original_valid=None, terminal_posterior=None,
+    )
+    mixed = replace(result, members=(nonconverged, result.members[1]))
+    bases = (_basis("basis-a", 0), _basis("basis-b", 1, ((1, 0),)))
+    projection = phase6_events(_original(), bases=bases, result=mixed, vote_tie_bit=1)
+
+    exclusion = next(payload for kind, payload in projection.events if kind == "vote_exclusion")
+    assert exclusion["disposition"] == "nonconvergence"
+    electorate = next(payload for kind, payload in projection.events if kind == "vote_electorate")
+    ballots = [payload for kind, payload in projection.events if kind == "vote_ballot"]
+    assert electorate["tie_bit"] == 1
+    assert electorate["electorate"] == [ballots[0]["member_id"]]
+    assert "selection" not in [kind for kind, _ in projection.events]
+
+
+def test_vote_projection_retains_ties_invalid_aggregate_and_stable_lineage() -> None:
+    from bp_registry.canonical.phase6 import phase6_events
+
+    result = _two_solution_vote_result()
+    bases = (_basis("basis-a", 0), _basis("basis-b", 1, ((1, 0),)))
+    tied = phase6_events(_original(), bases=bases, result=result, vote_tie_bit=1)
+    reversed_members = phase6_events(_original(), bases=bases, result=replace(result, members=tuple(reversed(result.members))), vote_tie_bit=1)
+    invalid = phase6_events(_original(), bases=bases, result=result, vote_tie_bit=0)
+
+    assert tied.events == reversed_members.events
+    aggregate = next(payload for kind, payload in tied.events if kind == "vote_aggregate")
+    assert aggregate["correction"] == [1, 1, 1]
+    assert aggregate["candidate_lineage_id"] and aggregate["vote_lineage_id"]
+    validation = next(payload for kind, payload in invalid.events if kind == "vote_validation")
+    assert invalid.terminal == "vote_aggregate_original_invalid"
+    assert validation["original_valid"] is False and invalid.candidate is None
+
+
 def test_no_member_converged_returns_typed_zero_sentinel_without_candidate_admission() -> None:
     from bp_registry.canonical.mbbp import MbbpController, MbbpSpec
 

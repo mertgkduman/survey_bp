@@ -42,6 +42,8 @@ def test_vote_evidence_names_correction_bit_object() -> None:
     )
 
     assert result.as_evidence()["object"] == "correction_bits"
+    assert result.as_evidence()["candidate_lineage_id"]
+    assert result.as_evidence()["vote_lineage_id"]
 
 
 def test_invalid_coordinate_majority_is_retained_but_never_eligible() -> None:
