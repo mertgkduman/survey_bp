@@ -20,6 +20,8 @@ from .planning import CampaignWorkPlan
 
 
 _MAX_SIDECARS = 1_000
+_MAX_ATTEMPTS_PER_UNIT = 64
+_MAX_VERIFIED_ATTEMPTS = 1_000_000
 _SEALED_STATES = frozenset({"sealed_interrupted", "sealed_terminal"})
 
 
@@ -102,6 +104,8 @@ def validate_attempt_lineage(attempts: tuple[Mapping[str, Any], ...] | list[Mapp
     """
     if not isinstance(attempts, (tuple, list)) or not attempts:
         raise ValueError("attempt lineage must contain at least one receipt")
+    if len(attempts) > _MAX_ATTEMPTS_PER_UNIT:
+        raise ValueError("attempt lineage exceeds the per-unit receipt cap")
     by_id: dict[str, Mapping[str, Any]] = {}
     for receipt in attempts:
         if not isinstance(receipt, Mapping) or receipt.get("schema") != "campaign_attempt_receipt_v1":
@@ -429,6 +433,8 @@ def merge_verified_attempts(
         raise ValueError("merge requires a frozen CampaignWorkPlan")
     if not isinstance(verified_attempts, (tuple, list)):
         raise ValueError("merge requires an ordered collection of verified attempts")
+    if len(verified_attempts) > min(_MAX_VERIFIED_ATTEMPTS, len(plan.units) * _MAX_ATTEMPTS_PER_UNIT):
+        raise ValueError("verified attempt collection exceeds the frozen plan receipt cap")
     expected = tuple(plan.unit_keys)
     expected_set = set(expected)
     by_unit: dict[str, list[Mapping[str, Any]]] = {}

@@ -45,6 +45,17 @@ def test_seal_rejects_reopening_and_attempt_lineage_is_immutable(tmp_path: Path)
         validate_attempt_lineage((cyclic, terminal))
 
 
+def test_attempt_lineage_rejects_unbounded_retry_receipts() -> None:
+    from bp_registry.campaigns.shards import validate_attempt_lineage
+
+    attempts = tuple(
+        _attempt(attempt_id=f"attempt-{index}", state="sealed_interrupted")
+        for index in range(65)
+    )
+    with pytest.raises(ValueError, match="receipt cap"):
+        validate_attempt_lineage(attempts)
+
+
 def test_seal_rejects_non_private_or_non_regular_staging_products(tmp_path: Path) -> None:
     from bp_registry.campaigns.shards import publish_sealed_shard
 
