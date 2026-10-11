@@ -296,6 +296,20 @@ class CampaignSpecV1(StrictModel):
             raise ValueError("alpha must be finite")
         return value
 
+    @model_validator(mode="after")
+    def assessment_stopping_matches_campaign_look(self) -> "CampaignSpecV1":
+        """Legacy one-unit records have no assessment; assessed campaigns bind its look index."""
+        if self.assessment is None:
+            return self
+        expected_final_look = (
+            1
+            if isinstance(self.assessment.stopping, FixedShotStoppingV1)
+            else len(self.assessment.stopping.cumulative_looks)
+        )
+        if self.final_look != expected_final_look:
+            raise ValueError("campaign final_look must equal the frozen assessment final look")
+        return self
+
     def primitive_bytes(self) -> bytes:
         """Canonical bytes before any derived unit or plan identity exists."""
         return canonical_json_bytes(self.model_dump(mode="json", by_alias=True))

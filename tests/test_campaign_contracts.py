@@ -125,3 +125,37 @@ def test_stopping_rejects_fixed_interim_look_and_unbounded_alpha_spending():
     ]
     with pytest.raises(ValidationError):
         CampaignAssessmentV1.model_validate(finite)
+
+
+def test_outcome_denominator_matrix_is_total_and_interruption_stays_partial():
+    from bp_registry.campaigns.contracts import CampaignAssessmentV1
+
+    uncovered = _assessment_payload()
+    uncovered["outcome_matrix"]["treatments"].pop()
+    with pytest.raises(ValidationError):
+        CampaignAssessmentV1.model_validate(uncovered)
+
+    dropped_interruption = _assessment_payload()
+    dropped_interruption["outcome_matrix"]["treatments"][-1] = {
+        "terminal_status": "infrastructure_interruption",
+        "all_shot": "failure",
+        "conditional": "excluded",
+    }
+    with pytest.raises(ValidationError):
+        CampaignAssessmentV1.model_validate(dropped_interruption)
+
+
+def test_finite_look_requires_complete_declared_alpha_grid():
+    from bp_registry.campaigns.contracts import CampaignAssessmentV1
+
+    finite = _assessment_payload(mode="finite_look")
+    finite["resources"]["max_looks"] = 2
+    finite["stopping"]["alpha_allocations"] = [
+        {"family_id": "primary", "target_id": "curve-p100", "look": 40, "alpha": 0.025},
+        {"family_id": "primary", "target_id": "curve-p100", "look": 100, "alpha": 0.025},
+    ]
+    assert CampaignAssessmentV1.model_validate(finite).stopping.mode == "finite_look"
+
+    finite["stopping"]["alpha_allocations"].pop()
+    with pytest.raises(ValidationError):
+        CampaignAssessmentV1.model_validate(finite)
