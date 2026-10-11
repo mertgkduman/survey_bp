@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'tracer or identity or acyclic or zero_failure' -x; appended TAP summary for the Python-test TDD gate",
+  "exitCode": 1,
+  "targetTest": "test_tracer_runs_seals_verifies_and_reconstructs_zero_failure",
+  "targetFile": "tests/test_campaign_execution.py",
+  "expected": "The campaign_spec_v1 package is absent before implementation, so the public-capability assertion fails.",
+  "actual": "AssertionError: campaign_spec_v1 tracer must provide the campaign package",
+  "output": "F\n=================================== FAILURES ===================================\n________ test_tracer_runs_seals_verifies_and_reconstructs_zero_failure ________\n\n    api = _campaign_api()\n>       assert api is not None, \"campaign_spec_v1 tracer must provide the campaign package\"\nE       AssertionError: campaign_spec_v1 tracer must provide the campaign package\n\n1 failed in 0.10s\nTAP version 13\nnot ok 1 - test_tracer_runs_seals_verifies_and_reconstructs_zero_failure\n  ---\n  message: campaign_spec_v1 tracer must provide the campaign package\n  ...\n1..1\n# tests 1\n# pass 0\n# fail 1\n"
+}
