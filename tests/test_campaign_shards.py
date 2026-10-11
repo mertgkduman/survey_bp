@@ -159,3 +159,72 @@ def test_merge_records_byte_identical_terminal_retries_without_double_counting()
     assert merged["terminal_unit_keys"] == [first]
     assert merged["redundant_attempt_receipt_hashes"] == [max(retry_a["receipt_sha256"], retry_b["receipt_sha256"])]
     assert merged["missing_unit_keys"] == [second]
+
+
+def _resume_identity(plan, *, source: str = "1" * 64, environment: str = "2" * 64,
+                     dependency: str = "3" * 64) -> dict[str, str]:
+    """Frozen facts that must match before any prior evidence is reusable."""
+    return {
+        "campaign_spec_digest": plan.campaign_spec_digest,
+        "campaign_plan_digest": plan.campaign_plan_digest,
+        "source_lock_sha256": source,
+        "environment_lock_sha256": environment,
+        "dependency_lock_sha256": dependency,
+        "sample_namespace_digest": "4" * 64,
+        "stopping_rule_digest": "5" * 64,
+        "assessment_digest": "6" * 64,
+    }
+
+
+def _stopping_decision(*, look: int, terminal_records: tuple[dict[str, object], ...]) -> dict[str, object]:
+    assert look == 1
+    assert len(terminal_records) == 1
+    return {
+        "decision_input_hashes": ["7" * 64],
+        "decision_result": {"status": "pass"},
+        "stop_reason": "all_primary_decisions_resolved",
+        "should_stop": True,
+    }
+
+
+def test_resume_recovers_stop_receipt_before_set_subtraction_without_mutating_evidence() -> None:
+    """The post-decision/pre-publication crash cannot dispatch the next look."""
+    from bp_registry.campaigns.shards import derive_resume_plan
+
+    plan = _work_plan()
+    first, second = plan.unit_keys
+    completed = _verified_attempt(
+        unit_key=first, plan_digest=plan.campaign_plan_digest, attempt_id="a",
+        state="sealed_terminal", terminal="exact",
+    )
+    original = (completed["receipt_sha256"], completed["terminal_bytes_sha256"])
+    resumed = derive_resume_plan(
+        plan=plan, verified_attempts=(completed,), scientific_identity=_resume_identity(plan),
+        decision_for_look=_stopping_decision,
+    )
+    assert resumed["recovered_look_stop_receipts"]
+    assert resumed["authorized_undispatched_keys"] == [second]
+    assert resumed["resumable_unit_keys"] == []
+    assert resumed["attempt_plans"] == []
+    assert (completed["receipt_sha256"], completed["terminal_bytes_sha256"]) == original
+
+
+def test_resume_rejects_scientific_drift_but_not_executor_observation() -> None:
+    """Allocation can move; every frozen scientific or dependency fact cannot."""
+    from bp_registry.campaigns.shards import derive_resume_plan
+
+    plan = _work_plan()
+    identity = _resume_identity(plan)
+    with pytest.raises(ValueError, match="identity"):
+        derive_resume_plan(
+            plan=plan, verified_attempts=(), scientific_identity={**identity, "source_lock_sha256": "a" * 64},
+            prior_scientific_identity=identity, decision_for_look=_stopping_decision,
+        )
+    accepted = derive_resume_plan(
+        plan=plan, verified_attempts=(), scientific_identity=identity,
+        prior_scientific_identity=identity,
+        executor_allocation={"worker_count": 1},
+        prior_executor_allocation={"worker_count": 32},
+        decision_for_look=_stopping_decision,
+    )
+    assert accepted["resumable_unit_keys"] == list(plan.unit_keys)
