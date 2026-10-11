@@ -419,7 +419,9 @@ def _budget_tree(execution_controls: Mapping[str, Any] | None) -> BudgetTree:
     return BudgetTree(limits=limits, parents={"search": "shot", "attempt": "search"})
 
 
-def _public_trace_sink(execution_controls: Mapping[str, Any] | None, ledger_path: Path) -> TraceSink | None:
+def _public_trace_sink(
+    execution_controls: Mapping[str, Any] | None, ledger_path: Path, *, resource_guard: Any | None = None,
+) -> TraceSink | None:
     """Materialize the manifest-declared observer inside its output root."""
     declared = None if execution_controls is None else execution_controls.get("trace_plan")
     if not isinstance(declared, Mapping) or declared.get("level") == "off":
@@ -431,7 +433,7 @@ def _public_trace_sink(execution_controls: Mapping[str, Any] | None, ledger_path
         )
     except (KeyError, TypeError, ValueError) as error:
         raise ValueError("canonical execution controls contain an invalid trace plan") from error
-    return TraceSink(plan)
+    return TraceSink(plan, resource_guard=resource_guard)
 
 
 def _memory_execution_context(execution_context: Mapping[str, str] | None, *, identity: str, shot_id: int) -> dict[str, str]:
@@ -731,6 +733,14 @@ def _run_relay_structural_shot(
         memory_tuning=parsed.relay.memory_tuning,
     )
 
+    def observe_relay_boundary(boundary: str) -> None:
+        if resource_guard is None:
+            return
+        if boundary.endswith(":before_work"):
+            resource_guard.before_work(boundary)
+        else:
+            resource_guard.after_work(boundary)
+
     for attempt_ordinal in range(30):
         try:
             with CanonicalEventWriter(path, resource_guard=resource_guard) as ledger:
@@ -758,6 +768,7 @@ def _run_relay_structural_shot(
                     legs=parsed.relay.legs, budgets=budgets, scope="attempt", lineage_prefix=attempt_id.value,
                     solution_limit=parsed.relay.solution_limit, transfer=parsed.relay.transfer,
                     sample_seed_identity=sample_seed_identity,
+                    boundary_observer=observe_relay_boundary if resource_guard is not None else None,
                 )
                 for transfer in run.transfers:
                     ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="relay_transfer", data={
@@ -1212,6 +1223,7 @@ def run_canonical_structural_shot(
             parsed, code=code, observation=observation, hidden_truth=hidden_truth, shot_id=shot_id,
             ledger_path=ledger_path, sample_seed_identity=sample_seed_identity, context=context,
             execution_controls=execution_controls, verification_context=verification_context, evaluate=evaluate,
+            resource_guard=resource_guard,
         )
     if type(shot_id) is not int or shot_id < 0 or observation.check_type != "Z":
         raise ValueError("canonical tracer accepts a nonnegative Z-check shot")
@@ -1231,7 +1243,7 @@ def run_canonical_structural_shot(
     )
     if existing is not None:
         return existing
-    trace_sink = _public_trace_sink(execution_controls, path)
+    trace_sink = _public_trace_sink(execution_controls, path, resource_guard=resource_guard)
     memory_context = _memory_execution_context(memory_execution_context, identity=identity, shot_id=shot_id)
     trace_context = {
         **memory_context,

@@ -189,8 +189,9 @@ class TraceResult:
 class TraceSink:
     """Collect optional records under quotas without changing decoding control flow."""
 
-    def __init__(self, plan: TracePlan):
+    def __init__(self, plan: TracePlan, *, resource_guard: Any | None = None):
         self.plan = plan
+        self.resource_guard = resource_guard
         self._records: list[dict[str, object]] = []
         self._truncated = False
         self._dropped = 0
@@ -319,14 +320,28 @@ class TraceSink:
             if leaf.is_symlink() or leaf.read_bytes() != raw:
                 raise ValueError("content-addressed trace sidecar conflicts with existing file")
         else:
+            reservation = None
             try:
+                if self.resource_guard is not None:
+                    reservation = self.resource_guard.reserve_artifact_write(
+                        len(raw), boundary=f"trace_sidecar:{digest}",
+                    )
                 with leaf.open("xb") as handle:
                     handle.write(raw)
                     handle.flush()
                     os.fsync(handle.fileno())
             except FileExistsError:
+                if reservation is not None:
+                    self.resource_guard.release(reservation)
                 if leaf.is_symlink() or leaf.read_bytes() != raw:
                     raise ValueError("content-addressed trace sidecar conflicts with existing file")
+            except BaseException:
+                if reservation is not None:
+                    self.resource_guard.release(reservation)
+                raise
+            else:
+                if reservation is not None:
+                    self.resource_guard.commit(reservation)
         relative = leaf.relative_to(Path(self.plan.root).resolve(strict=True)).as_posix()
         self._finished = TraceResult(relative, digest, len(self._records), len(raw), self._truncated, self._dropped, self.plan.selection_basis())
         return self._finished

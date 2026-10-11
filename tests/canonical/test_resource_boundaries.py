@@ -49,6 +49,38 @@ def _v7_manifest() -> dict[str, object]:
     return value
 
 
+def _relay_manifest():
+    from bp_registry.canonical.contracts import CanonicalManifestV4
+
+    return CanonicalManifestV4.model_validate({
+        "schema_version": 4, "run_id": "relay-boundary", "numerical_profile": "cpu-float64-spa-v1",
+        "max_iterations": 2, "error_rate": 0.1,
+        "policies": {
+            "update": {"kind": "binary_spa", "binding_id": "update", "state_lifetime": "message"},
+            "schedule": {"kind": "flooding", "binding_id": "schedule", "state_lifetime": "iteration"},
+            "state_memory": {"kind": "identity", "binding_id": "memory", "state_lifetime": "leg"},
+            "intervention": {"kind": "identity", "binding_id": "intervention", "state_lifetime": "search"},
+            "stopping": {"kind": "syndrome_or_budget", "binding_id": "stopping", "state_lifetime": "iteration"},
+            "selection": {"kind": "stable_first", "binding_id": "selection", "state_lifetime": "attempt"},
+            "postprocessing": {"kind": "identity", "binding_id": "post", "state_lifetime": "attempt"},
+        },
+        "memory_bindings": [{
+            "binding_id": "relay-prior", "kind": "affine_prior", "target": "prior",
+            "order": 0, "alpha": 0.5, "state_lifetime": "leg",
+        }],
+        "relay": {"total_leg_limit": 2, "legs": [{"max_iterations": 2}, {"max_iterations": 2}]},
+    })
+
+
+def _work_controls() -> dict[str, object]:
+    from bp_registry.canonical.budgets import WorkVector
+
+    return {"work_limits": {
+        scope: {resource: 100 for resource in WorkVector.zero().as_evidence(structural_event_version=2)}
+        for scope in ("shot", "search", "attempt")
+    }}
+
+
 def test_mbbp_inside_local_step_crossing_latches_before_later_member() -> None:
     from bp_registry.canonical.mbbp import MbbpBasis, MbbpController, MbbpSpec
     from bp_registry.canonical.problems import OriginalProblem
@@ -123,6 +155,67 @@ def test_phase5_inside_sweep_crossing_latches_before_later_phase5_work() -> None
     assert snapshot.boundary == "phase5:phase5-boundary:baseline:sweep:0:after_work"
     assert snapshot.overshoot_ns == 2
     assert len(budget.leaf_events()) == 1
+
+
+def test_relay_inside_sweep_crossing_latches_before_later_leg_or_projection(tmp_path) -> None:
+    from bp_registry.canonical.execution import run_canonical_structural_shot
+    from bp_registry.css import fixture_code
+    from bp_registry.ledger import CanonicalResourceInterruption
+    from bp_registry.runner import CanonicalRuntimeGuardV1
+    from bp_registry.sampling import DecoderObservation, HiddenTruth
+
+    code = fixture_code()
+    hidden_x = np.asarray([1, 0, 0], dtype=np.uint8)
+    ticks = iter((10, 11, 14))
+    guard = CanonicalRuntimeGuardV1(_authorization(deadline_ns=12), clock_ns=lambda: next(ticks))
+    path = tmp_path / "relay.jsonl"
+
+    with pytest.raises(CanonicalResourceInterruption):
+        run_canonical_structural_shot(
+            _relay_manifest(), code=code, observation=DecoderObservation("Z", code.hz @ hidden_x % 2),
+            hidden_truth=HiddenTruth(hidden_x, np.zeros(code.n, dtype=np.uint8)), shot_id=0,
+            ledger_path=path, sample_seed_identity="relay-seed", context={}, execution_controls=_work_controls(),
+            resource_guard=guard,
+        )
+    prefix = [json.loads(line) for line in path.read_text().splitlines()]
+    assert [event["kind"] for event in prefix] == ["shot_begin", "attempt"]
+    assert guard.snapshot().boundary.endswith(":leg:0:sweep:1:after_work")
+    assert guard.snapshot().overshoot_ns == 2
+
+
+def test_trace_sidecar_reserves_exact_bytes_before_creating_file(tmp_path) -> None:
+    from bp_registry.canonical.tracing import TracePlan, TraceSink
+    from bp_registry.ledger import CanonicalResourceInterruption
+    from bp_registry.runner import CanonicalRuntimeAuthorizationV1, CanonicalRuntimeGuardV1
+
+    plan = TracePlan(root=tmp_path, max_records=2, max_bytes=4_096)
+    baseline = TraceSink(plan)
+    baseline.observe(kind="edge", iteration=0, payload={"message": [1, 0]})
+    bytes_required = baseline.finish().bytes_written
+    for path in tmp_path.glob("trace-sidecars/*.json"):
+        path.unlink()
+
+    exact_guard = CanonicalRuntimeGuardV1(CanonicalRuntimeAuthorizationV1.interruptible_unit(
+        profile_digest="e" * 64, authorization_identity="trace-exact", max_events=1,
+        max_evidence_bytes=1, max_storage_bytes=bytes_required, control_receipt_reserve_bytes=1,
+    ))
+    exact = TraceSink(plan, resource_guard=exact_guard)
+    exact.observe(kind="edge", iteration=0, payload={"message": [1, 0]})
+    assert exact.finish().bytes_written == bytes_required
+    assert exact_guard.snapshot().scientific_storage_bytes == bytes_required
+
+    for path in tmp_path.glob("trace-sidecars/*.json"):
+        path.unlink()
+    denied_guard = CanonicalRuntimeGuardV1(CanonicalRuntimeAuthorizationV1.interruptible_unit(
+        profile_digest="f" * 64, authorization_identity="trace-over", max_events=1,
+        max_evidence_bytes=1, max_storage_bytes=bytes_required - 1, control_receipt_reserve_bytes=1,
+    ))
+    denied = TraceSink(plan, resource_guard=denied_guard)
+    denied.observe(kind="edge", iteration=0, payload={"message": [1, 0]})
+    with pytest.raises(CanonicalResourceInterruption):
+        denied.finish()
+    assert list(tmp_path.glob("trace-sidecars/*.json")) == []
+    assert denied_guard.snapshot().scientific_storage_bytes == 0
 
 
 def test_v7_interrupt_keeps_open_prefix_and_skips_projection_and_terminal(tmp_path) -> None:

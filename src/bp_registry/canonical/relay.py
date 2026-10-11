@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from hashlib import sha256
 import math
-from typing import Iterable, Literal
+from typing import Callable, Iterable, Literal
 
 import numpy as np
 
@@ -384,6 +384,7 @@ class RelayController:
         error_rate: float, legs: tuple[RelayLegSpec, ...] | None, budgets: BudgetTree, scope: str, lineage_prefix: str,
         solution_limit: int | None = None, transfer: Literal["posterior_only", "disabled"] | None = None,
         sample_seed_identity: str | None = None,
+        boundary_observer: Callable[[str], None] | None = None,
     ) -> RelayRunResult:
         if not math.isfinite(error_rate) or not 0.0 < error_rate < 1.0:
             raise ValueError("Relay requires a finite error rate strictly between zero and one")
@@ -437,14 +438,20 @@ class RelayController:
                 tuple(leg_results), tuple(transfers), accounting.leaves(), termination, stopping_reason,
             )
 
+        def observe(boundary: str, *, completed: bool) -> None:
+            if boundary_observer is not None:
+                boundary_observer(f"{boundary}:{'after_work' if completed else 'before_work'}")
+
         for index, leg in enumerate(active_legs):
             lineage_id = f"{lineage_prefix}:leg:{index}"
+            observe(f"relay:{lineage_prefix}:leg:{index}", completed=False)
             prior = base_prior
             posterior_for_memory = np.array(base_prior, dtype=np.float64, copy=True)
             if previous is not None and active_transfer == "posterior_only":
                 transfer_leaf_id = "relay-transfer:" + sha256(
                     f"{previous.producer_leg_lineage_id}:{previous.digest}".encode("utf-8")
                 ).hexdigest()[:20]
+                observe(f"relay:{lineage_prefix}:leg:{index}:transfer", completed=False)
                 transfer_reservation = budgets.reserve(
                     scope, WorkVector(relay_transfers=1), leaf_id=transfer_leaf_id,
                 )
@@ -466,6 +473,7 @@ class RelayController:
                     delta=WorkVector(relay_transfers=1),
                 )
                 transfers.append(previous)
+                observe(f"relay:{lineage_prefix}:leg:{index}:transfer", completed=True)
 
             memory_application: RelayMemoryApplication | None = None
             gamma: np.ndarray | None = None
@@ -506,8 +514,10 @@ class RelayController:
                 proposed = WorkVector.from_flooding_counts(
                     edge_count=edge_table.edge_count, variable_count=edge_table.variable_count,
                 )
+                sweep_boundary = f"relay:{lineage_prefix}:leg:{index}:sweep:{iteration}"
+                observe(sweep_boundary, completed=False)
                 reservation = budgets.reserve(
-                    scope, proposed, leaf_id=f"relay:{lineage_prefix}:leg:{index}:sweep:{iteration}",
+                    scope, proposed, leaf_id=sweep_boundary,
                 )
                 if reservation is None:
                     # Retain a started leg even when only a prefix of its
@@ -539,8 +549,9 @@ class RelayController:
                 reservation.commit_once()
                 accounting.commit(
                     kind="leg", leg_index=index, lineage_id=lineage_id,
-                    leaf_id=f"relay:{lineage_prefix}:leg:{index}:sweep:{iteration}", delta=proposed,
+                    leaf_id=sweep_boundary, delta=proposed,
                 )
+                observe(sweep_boundary, completed=True)
                 if np.array_equal((check_matrix.astype(np.int64) @ candidate.astype(np.int64)) % 2, syndrome):
                     converged = True
                     break
@@ -563,6 +574,7 @@ class RelayController:
                 posterior, producer_leg_lineage_id=lineage_id, numerical_profile=self.numerical_profile,
                 clipping_evidence="canonical_finite_saturate:relay_belief_assembly",
             )
+            observe(f"relay:{lineage_prefix}:leg:{index}", completed=True)
             if len(tuple(leg_result for leg_result in leg_results if leg_result.converged)) >= active_solution_limit:
                 return finish("completed", "solution_limit")
         return finish("completed", "leg_limit")
