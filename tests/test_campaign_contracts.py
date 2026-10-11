@@ -392,11 +392,28 @@ def test_terminal_receipt_is_post_run_only_and_records_boundary_overshoot():
     )
     assert receipt.wall_boundaries[0][2] == 25
     assert receipt.terminal_failure_ordinal == 8
+    predeadline = FailureCountTerminalReceiptV1.model_validate(
+        {**receipt.model_dump(by_alias=True), "wall_boundaries": [(1_000, 999, 0)]},
+    )
+    assert predeadline.wall_boundaries == ((1_000, 999, 0),)
+    cap_before_dispatch = FailureCountTerminalReceiptV1(
+        schema="failure_count_terminal_receipt_v1",
+        policy_sha256="a" * 64, campaign_plan_sha256="6" * 64,
+        executable_limit_receipt_sha256="b" * 64, batch_authorization_sha256="c" * 64,
+        terminal_state="cap_censored", cumulative_failures=0, total_completed_shots=0,
+        first_exhausted_cap="storage", realized_decoder_work=0, realized_events=0,
+        realized_evidence_bytes=0, realized_storage_bytes=0, wall_boundaries=(),
+    )
+    assert cap_before_dispatch.total_completed_shots == 0
     with pytest.raises(ValidationError):
         FailureCountTerminalReceiptV1.model_validate(
             {**receipt.model_dump(by_alias=True), "terminal_state": "cap_censored"},
         )
     with pytest.raises(ValidationError):
         FailureCountTerminalReceiptV1.model_validate(
-            {**receipt.model_dump(by_alias=True), "wall_boundaries": [(1_000, 999, 0)]},
+            {**receipt.model_dump(by_alias=True), "wall_boundaries": [(1_000, 999, 1)]},
+        )
+    with pytest.raises(ValidationError):
+        FailureCountTerminalReceiptV1.model_validate(
+            {**receipt.model_dump(by_alias=True), "total_completed_shots": 0},
         )
