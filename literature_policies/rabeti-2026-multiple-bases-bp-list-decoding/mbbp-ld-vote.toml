@@ -1,0 +1,91 @@
+# Bounded canonical two-member coordinate-majority vote adaptation of MBBP-LD.
+# The paper's maximal-subtree partition identity remains unresolved.
+schema_version = 1
+record_kind = "literature_policy"
+variant_id = "mbbp-ld-vote"
+execution_status = "runnable"
+qualification = "canonical_adaptation_not_assessed"
+
+[source]
+paper = "Rabeti and Mahdavifar, Multiple-Bases Belief Propagation List Decoding for Quantum LDPC Codes"
+revision = "arxiv:2605.14170v1"
+url = "https://arxiv.org/pdf/2605.14170v1"
+anchors = ["Sec. III-A", "Eq. (4)", "Algorithm 1", "Algorithm 2", "Sec. III-B", "Sec. IV", "Figure 5"]
+note = "This declared coordinate-majority vote is a canonical mechanism adaptation, not the source's unresolved maximal-subtree ensemble or Figure 5 realization."
+
+[equations]
+augmented_matrix = "H^(t)=[H;H_t], with H_t made of selected original check rows."
+augmented_syndrome = "Duplicate each selected original check syndrome bit alongside its row."
+list_score = "candidate frequency divided by original Hamming weight plus one."
+vote = "Coordinate majority over admitted member correction bits, with a declared tie bit."
+
+[explanations]
+basis = "Two one-row redundant bases use original check indices 0 and 1; they are a bounded nonmaximal pilot."
+state_memory = "Each member starts a fresh serial BP session; public state_memory identity contributes no shared state."
+selection = "The seven-role selection remains stable_first within a BP member; the terminal decision is the declared coordinate-majority vote."
+source_scope = "This policy tests a canonical voting mechanism and command. It does not reproduce the source's partition or Figure 5 curve."
+
+[unresolved]
+source_partition_permutation = "Paper experiment partition/permutation and seed are unverified; pilot descriptors are declared below."
+augmented_syndrome_notation = "The source pseudocode passes s to augmented BP; the canonical adaptation duplicates corresponding check syndrome bits."
+candidate_score_ties = "The source does not specify score ties; this policy declares local ordinal then lineage."
+author_implementation_identity = "unverified"
+ordered_paper_experiment_artifact_identity = "unverified"
+
+[update]
+kind = "normalized_min_sum"
+parameter_assignment = { shape = "scalar", value = 0.875 }
+
+[schedule]
+kind = "check_node_serial"
+
+[state_memory]
+kind = "identity"
+
+[intervention]
+kind = "identity"
+
+[stopping]
+kind = "syndrome_or_budget"
+max_iterations = 100
+
+[selection]
+kind = "stable_first"
+
+[postprocessing]
+kind = "identity"
+
+[ensemble]
+kind = "mbbp_ld"
+source_status = "canonical_adaptation"
+member_state = "independent"
+max_iterations = 100
+max_member_c2v_updates = 1000000
+max_total_members = 2
+no_member_terminal = "no_member_converged_zero_return"
+
+[[ensemble.bases]]
+member_id = "pilot-original-check-0"
+local_ordinal = 0
+partition_identity = "nonmaximal-two-member-pilot-v1"
+permutation_identity = "ascending-original-check-index-v1"
+transform_kind = "one_hot_original_check_rows"
+source_rows = [0]
+
+[[ensemble.bases]]
+member_id = "pilot-original-check-1"
+local_ordinal = 1
+partition_identity = "nonmaximal-two-member-pilot-v1"
+permutation_identity = "ascending-original-check-index-v1"
+transform_kind = "one_hot_original_check_rows"
+source_rows = [1]
+
+[list_selection]
+kind = "frequency_over_weight_plus_one"
+tie_rule = "local_ordinal_then_lineage"
+
+[vote]
+object = "correction_bits"
+electorate_rule = "admitted_members"
+aggregation = "coordinate_majority"
+tie_bit = 1

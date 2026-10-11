@@ -1,7 +1,7 @@
 """Closed, source-grounded decoder policy documents.
 
-Only the seven registered policy roles and their declared numerical controls are
-projected into execution.  Paper prose remains immutable request provenance.
+Only the seven registered policy roles and closed, declared terminal controls
+are projected into execution. Paper prose remains immutable request provenance.
 """
 
 from __future__ import annotations
@@ -63,6 +63,12 @@ _BHATNAGAR_UNRESOLVED = (
     "source_schedule_unspecified", "infinite_prior_finite_runtime_surrogate",
     "source_experiment_identity_unverified",
 )
+_RABETI_VOTE = {
+    "object": "correction_bits",
+    "electorate_rule": "admitted_members",
+    "aggregation": "coordinate_majority",
+    "tie_bit": 1,
+}
 
 
 def _canonical_bytes(value: Any) -> bytes:
@@ -306,18 +312,20 @@ def parse_literature_policy(path: str | Path) -> LiteraturePolicy:
                 or not isinstance(document.get("unresolved"), dict)
                 or not set(expected.unresolved) <= set(document["unresolved"])):
             raise ValueError("Bhatnagar runnable policy must match its closed source variant and qualification")
-    if (source["revision"] == "arxiv:2605.14170v1" or document["variant_id"] == "mbbp-ld"):
+    if (source["revision"] == "arxiv:2605.14170v1" or document["variant_id"] in {"mbbp-ld", "mbbp-ld-vote"}):
         expected = qualify_rabeti_source_record(source_path.parent)
         ensemble = executable.get("ensemble")
         score = executable.get("list_selection")
-        if (document["variant_id"] != expected.variant_id
+        is_vote = document["variant_id"] == "mbbp-ld-vote"
+        vote = executable.get("vote")
+        if (document["variant_id"] not in {expected.variant_id, "mbbp-ld-vote"}
                 or source["revision"] != "arxiv:2605.14170v1"
                 or document["qualification"] != expected.qualification
                 or {role: executable[role] for role in ROLES} != {role: expected.executable[role] for role in ROLES}
                 or not isinstance(ensemble, dict)
                 or not isinstance(score, dict)
                 or score != expected.executable["list_selection"]
-                or "vote" in executable
+                or (vote != _RABETI_VOTE if is_vote else vote is not None)
                 or not isinstance(document.get("unresolved"), dict)
                 or not set(expected.unresolved) <= set(document["unresolved"])):
             raise ValueError("Rabeti runnable policy must match its closed source controls and qualification")

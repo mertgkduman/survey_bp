@@ -12,7 +12,7 @@ from bp_registry.literature import parse_literature_policy
 from bp_registry.manifests import _resolved_artifact_root
 from bp_registry.study import _concretize_multi_decoder_study
 from scripts.run_css_literature_gate import (
-    QUALIFICATION, ROOT, SELECTED, _study, qualification_inventory, verify,
+    QUALIFICATION, ROOT, SELECTED, VOTE_POLICY, _study, qualification_inventory, run_vote, verify,
 )
 
 
@@ -89,3 +89,10 @@ def test_gate_documentation_keeps_claim_limits_and_phase5_review_visible() -> No
     assert "fair-beam-relay-css-v2" in guide
     for _family, folder, variant in SELECTED:
         assert f"{folder}/{variant}.toml" in guide
+
+
+def test_common_gate_exposes_a_separate_closed_vote_policy_branch() -> None:
+    policy = parse_literature_policy(VOTE_POLICY)
+    assert policy.provenance["qualification"] == "canonical_adaptation_not_assessed"
+    assert policy.executable["vote"]["tie_bit"] == 1
+    assert callable(run_vote)

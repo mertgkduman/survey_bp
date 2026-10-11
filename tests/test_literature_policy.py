@@ -442,6 +442,47 @@ def test_mbbp_ld_runnable_public_compute_reuse_and_receipt(tmp_path: Path, monke
     assert any(event["kind"] == "evaluation" for event in events)
 
 
+def test_mbbp_vote_policy_compiles_runs_and_replays_as_a_canonical_adaptation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A declared vote must use the same public study and replay boundary."""
+    monkeypatch.setenv("OMP_NUM_THREADS", "1")
+    monkeypatch.setattr("bp_registry.study._source_identity", lambda: "mbbp-vote-test-source-snapshot")
+    root = ROOT / "literature_policies/rabeti-2026-multiple-bases-bp-list-decoding"
+    policy_path = root / "mbbp-ld-vote.toml"
+    policy = parse_literature_policy(policy_path)
+    projection = policy.decoder_projection(code_block_length=72, code_check_count=36)
+    assert projection["vote"] == {
+        "object": "correction_bits", "electorate_rule": "admitted_members",
+        "aggregation": "coordinate_majority", "tie_bit": 1,
+    }
+    assert policy.execution_identity != parse_literature_policy(root / "mbbp-ld.toml").execution_identity
+
+    first = ensure_study(_mbbp_bb72_study(tmp_path), policy_path, results_root=tmp_path / "results")
+    second = ensure_study(_mbbp_bb72_study(tmp_path), policy_path, results_root=tmp_path / "results")
+    assert first["status"] == "computed" and second["status"] == "reused"
+    assert first["result"]["assessment_status"] == "not_assessed"
+    events = [json.loads(line) for line in (Path(first["output"]) / "events.jsonl").read_text().splitlines()]
+    assert events[0]["data"]["identity"]["source_status"] == "canonical_adaptation"
+    assert any(event["kind"] == "vote_electorate" for event in events)
+    assert events[-1]["termination"] in {
+        "vote_selected_original_valid_candidate", "vote_aggregate_original_invalid", "no_eligible_vote_candidate",
+    }
+
+
+def test_mbbp_vote_policy_rejects_incomplete_or_unknown_vote_controls(tmp_path: Path) -> None:
+    root = ROOT / "literature_policies/rabeti-2026-multiple-bases-bp-list-decoding"
+    (tmp_path / "mbbp-ld.spec.toml").write_bytes((root / "mbbp-ld.spec.toml").read_bytes())
+    policy = (root / "mbbp-ld-vote.toml").read_text()
+    incomplete = tmp_path / "mbbp-ld-vote.toml"
+    incomplete.write_text(policy.replace("tie_bit = 1\n", ""))
+    with pytest.raises(ValueError, match="closed source controls"):
+        parse_literature_policy(incomplete)
+    incomplete.write_text(policy.replace("tie_bit = 1\n", "tie_bit = 1\nunknown_vote_control = 7\n"))
+    with pytest.raises(ValueError, match="closed source controls"):
+        parse_literature_policy(incomplete)
+
+
 def test_mbbp_ld_installed_command_computes_then_reuses(tmp_path: Path) -> None:
     policy = ROOT / "literature_policies/rabeti-2026-multiple-bases-bp-list-decoding/mbbp-ld.toml"
     study = _mbbp_bb72_study(tmp_path)

@@ -32,6 +32,7 @@ SELECTED = (
     ("bhatnagar", "bhatnagar-2026-impulse-decoding", "first-convergence-0"),
     ("rabeti", "rabeti-2026-multiple-bases-bp-list-decoding", "mbbp-ld"),
 )
+VOTE_POLICY = ROOT / "literature_policies/rabeti-2026-multiple-bases-bp-list-decoding/mbbp-ld-vote.toml"
 
 
 def _json_bytes(value: Any) -> bytes:
@@ -212,6 +213,41 @@ def run(study: Path, output: Path) -> dict[str, Any]:
     return {"status": "verified", "requests": statuses, "index": str(output / "evidence-index.json")}
 
 
+def run_vote(study: Path, output: Path) -> dict[str, Any]:
+    """Run and replay the separately declared Rabeti vote policy in caller-owned cache."""
+    policy = parse_literature_policy(VOTE_POLICY)
+    if (policy.disposition != "runnable" or policy.provenance.get("qualification") != "canonical_adaptation_not_assessed"
+            or policy.executable.get("vote") != {
+                "object": "correction_bits", "electorate_rule": "admitted_members",
+                "aggregation": "coordinate_majority", "tie_bit": 1,
+            }):
+        raise ValueError("vote policy is not the closed canonical adaptation")
+    response = ensure_study(study, VOTE_POLICY, results_root=output / "cache")
+    if response["status"] not in {"computed", "reused"}:
+        raise ValueError("vote policy did not compute through the public study API")
+    run = Path(response["output"])
+    result = json.loads((run / "result.json").read_text())
+    events = read_canonical_events(run / "events.jsonl")
+    if (result.get("assessment_status") != "not_assessed"
+            or not any(event["kind"] == "vote_electorate" for event in events)
+            or not any(event["kind"] == "termination" and event["termination"] in {
+                "vote_selected_original_valid_candidate", "vote_aggregate_original_invalid", "no_eligible_vote_candidate",
+            } for event in events)
+            or not all(event["data"].get("identity", {}).get("source_status") == "canonical_adaptation"
+                       for event in events)):
+        raise ValueError("vote output lacks canonical-adaptation labels or complete terminal evidence")
+    verification = verify_run(run)
+    return {
+        "status": verification["status"] if "status" in verification else "verified",
+        "policy": str(VOTE_POLICY.relative_to(ROOT)),
+        "policy_sha256": _sha(VOTE_POLICY),
+        "cache_key": response["cache_key"],
+        "output": str(run),
+        "final_row_count": verification["final_row_count"],
+        "assessment_status": "not_assessed",
+    }
+
+
 def _index(study: Path, output: Path) -> dict[str, Any]:
     index = json.loads((output / "evidence-index.json").read_text())
     if (index.get("schema_version") != 1 or index.get("study_sha256") != _sha(study)
@@ -289,7 +325,7 @@ def verify(study: Path, output: Path) -> dict[str, Any]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("prepare", "run", "cli-smoke", "verify"))
+    parser.add_argument("command", choices=("prepare", "run", "vote", "cli-smoke", "verify"))
     parser.add_argument("--study", type=Path, required=True)
     parser.add_argument("--output", type=Path, default=ROOT / "data/results/css-literature-gate-v1")
     parser.add_argument("--bp-registry", type=Path, default=ROOT / ".venv/bin/bp-registry")
@@ -300,6 +336,8 @@ def main() -> None:
         result = prepare(study)
     elif args.command == "run":
         result = run(study, output)
+    elif args.command == "vote":
+        result = run_vote(study, output)
     elif args.command == "cli-smoke":
         result = cli_smoke(study, output, args.bp_registry.resolve())
     else:
