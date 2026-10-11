@@ -86,6 +86,44 @@ class ExactIntervalV1(StrictModel):
         return _finite_probability(value, name="confidence_level")
 
 
+class ExactInverseBinomialIntervalV1(StrictModel):
+    """Exact interval input for a completed ordered failure-count prefix."""
+
+    method: Literal["exact_inverse_binomial"]
+    confidence_level: float
+    stopping_event: Literal["decoder_logical_failure_v1"]
+    target_failures: int = Field(ge=1, le=_MAX_EVENTS)
+    inferential_trials: int = Field(ge=1, le=_MAX_EVENTS)
+    inferential_prefix_sha256: str = Field(pattern=_SHA256)
+    authorized_tail_count: int = Field(ge=0, le=_MAX_EVENTS)
+    authorized_tail_sha256: str = Field(pattern=_SHA256)
+
+    @field_validator("confidence_level")
+    @classmethod
+    def finite_confidence_level(cls, value: float) -> float:
+        return _finite_probability(value, name="confidence_level")
+
+    @model_validator(mode="after")
+    def target_fits_prefix(self) -> "ExactInverseBinomialIntervalV1":
+        if self.inferential_trials < self.target_failures:
+            raise ValueError("inverse-binomial inferential trials cannot precede target failures")
+        return self
+
+
+class MultiplicativeTargetRuleV1(StrictModel):
+    """Frozen equivalence factor, separate from source target precision."""
+
+    rule: Literal["multiplicative_target_interval_containment_v1"]
+    factor: float
+
+    @field_validator("factor")
+    @classmethod
+    def finite_factor(cls, value: float) -> float:
+        if not math.isfinite(value) or value <= 1.0 or value > 100.0:
+            raise ValueError("multiplicative target factor must be finite and in (1, 100]")
+        return value
+
+
 class AssessmentFamilyV1(StrictModel):
     family_id: str = Field(min_length=1, max_length=128)
     alpha: float
@@ -254,11 +292,11 @@ class CampaignAssessmentV1(StrictModel):
 
     schema_name: Literal["campaign_assessment_v1"] = Field(alias="schema", serialization_alias="schema")
     targets: tuple[TargetReferenceV1, ...] = Field(min_length=1, max_length=1_000)
-    interval: ExactIntervalV1
+    interval: ExactIntervalV1 | ExactInverseBinomialIntervalV1 | None
     families: tuple[AssessmentFamilyV1, ...] = Field(min_length=1, max_length=1_000)
-    stopping: FixedShotStoppingV1 | FiniteLookStoppingV1
+    stopping: FixedShotStoppingV1 | FiniteLookStoppingV1 | FailureCountStoppingV1
     outcome_matrix: OutcomeMatrixV1
-    decision_rule: Literal["target_interval_containment_v1"]
+    decision_rule: Literal["target_interval_containment_v1"] | MultiplicativeTargetRuleV1
     resources: ScientificResourceCapsV1
 
     @field_validator("targets", "families", mode="before")
@@ -279,7 +317,9 @@ class CampaignAssessmentV1(StrictModel):
         if isinstance(self.stopping, FixedShotStoppingV1):
             if self.resources.max_looks != 1 or self.resources.max_shots != self.stopping.final_shots:
                 raise ValueError("fixed-shot resources must declare exactly one final look")
-        else:
+            if not isinstance(self.interval, ExactIntervalV1) or self.decision_rule != "target_interval_containment_v1":
+                raise ValueError("fixed-shot assessments require the historical exact interval and decision rule")
+        elif isinstance(self.stopping, FiniteLookStoppingV1):
             if self.resources.max_looks != len(self.stopping.cumulative_looks) or self.resources.max_shots != self.stopping.cumulative_looks[-1]:
                 raise ValueError("finite-look resources must match the declared final look")
             if self.resources.max_batch_size < max(self.stopping.batch_sizes):
@@ -297,6 +337,26 @@ class CampaignAssessmentV1(StrictModel):
                 spent = sum(value for (family_id, _, _), value in allocations.items() if family_id == family.family_id)
                 if spent > family.alpha + 1e-15:
                     raise ValueError("finite-look alpha allocations cannot exceed their family alpha")
+            if not isinstance(self.interval, ExactIntervalV1) or self.decision_rule != "target_interval_containment_v1":
+                raise ValueError("finite-look assessments require the historical exact interval and decision rule")
+        else:
+            if (self.resources.max_looks != 1
+                    or self.resources.max_batch_size < self.stopping.batch_size
+                    or self.resources.max_shots < self.stopping.batch_size
+                    or self.resources.max_shots % self.stopping.batch_size):
+                raise ValueError("failure-count resources must authorize whole bounded batches and one terminal assessment")
+            if not isinstance(self.decision_rule, MultiplicativeTargetRuleV1):
+                raise ValueError("failure-count assessments require a multiplicative target rule")
+            if self.stopping.terminal_state == "target_reached":
+                if not isinstance(self.interval, ExactInverseBinomialIntervalV1):
+                    raise ValueError("target-reached failure-count assessments require an inverse-binomial interval")
+                if (self.interval.stopping_event != self.stopping.failure_event
+                        or self.interval.target_failures != self.stopping.target_failures
+                        or self.interval.inferential_trials != self.stopping.terminal_failure_ordinal
+                        or self.interval.authorized_tail_count != len(self.stopping.authorized_tail_ordinals)):
+                    raise ValueError("inverse-binomial interval must bind the exact failure prefix and separate terminal tail")
+            elif self.interval is not None:
+                raise ValueError("cap-censored failure-count evidence cannot request an inferential interval")
         return self
 
     def primitive_bytes(self) -> bytes:
@@ -351,11 +411,9 @@ class CampaignSpecV1(StrictModel):
         """Legacy one-unit records have no assessment; assessed campaigns bind its look index."""
         if self.assessment is None:
             return self
-        expected_final_look = (
-            1
-            if isinstance(self.assessment.stopping, FixedShotStoppingV1)
-            else len(self.assessment.stopping.cumulative_looks)
-        )
+        expected_final_look = 1 if isinstance(
+            self.assessment.stopping, (FixedShotStoppingV1, FailureCountStoppingV1),
+        ) else len(self.assessment.stopping.cumulative_looks)
         if self.final_look != expected_final_look:
             raise ValueError("campaign final_look must equal the frozen assessment final look")
         return self

@@ -81,9 +81,9 @@ def _failure_count_payload() -> dict[str, object]:
                 "stopping_event": "decoder_logical_failure_v1",
                 "target_failures": 100,
                 "inferential_trials": 117,
-                "inferential_prefix_sha256": _hash("prefix"),
+                "inferential_prefix_sha256": _hash("b"),
                 "authorized_tail_count": 3,
-                "authorized_tail_sha256": _hash("tail"),
+                "authorized_tail_sha256": _hash("c"),
             },
             "stopping": {
                 "mode": "failure_count",
