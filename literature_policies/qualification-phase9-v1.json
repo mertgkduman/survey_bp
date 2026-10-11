@@ -1,0 +1,455 @@
+{
+  "evidence_kind": "phase9_css_source_qualification_inventory_v1",
+  "format_version": 1,
+  "records": [
+    {
+      "assessment_eligibility": "not_eligible",
+      "blockers": [
+        "author_implementation_identity",
+        "author_implementation_revision_unverified",
+        "exact_infinity_realization_unresolved",
+        "message_schedule_unresolved",
+        "ordered_b1_checks_and_logicals_unverified",
+        "ordered_paper_experiment_artifact_identity",
+        "policy_file_phase5_intervention_dispatch",
+        "source_experiment_identity_check"
+      ],
+      "identity": "bhatnagar:first-convergence-0",
+      "native_status": "identity_unverified",
+      "qualification": "canonical_adaptation_not_assessed",
+      "receipt": {
+        "path": "literature_policies/bhatnagar-2026-impulse-decoding/paper_reproduction/source-qualification-v1.json",
+        "sha256": "9ab056405d890de1b85ef840464e0689daf4c9dec11949891df1e4680a342e23"
+      },
+      "runnable_counterpart": {
+        "execution_status": "runnable_canonical_adaptation",
+        "path": "literature_policies/bhatnagar-2026-impulse-decoding/first-convergence-0.toml",
+        "qualification": "canonical_adaptation_not_assessed",
+        "sha256": "e6d7abeccd599d8df05786b6ab0e054b7bd631c2618bc967183bef11341293e6"
+      },
+      "source_execution_status": "not_runnable",
+      "source_faithful": false,
+      "source_revision": "arxiv:2606.18240v1",
+      "source_spec": "literature_policies/bhatnagar-2026-impulse-decoding/first-convergence-0.spec.toml",
+      "source_spec_sha256": "c66b32606067b6aaa598b8d3a735a85f3e2d8788b32287af3a4006989cef8099",
+      "target_status": {
+        "reason": "author_data_unavailable_to_workspace_and_digitization_unperformed",
+        "status": "blocked"
+      }
+    },
+    {
+      "assessment_eligibility": "not_eligible",
+      "blockers": [
+        "author_implementation_identity",
+        "author_implementation_revision_unverified",
+        "exact_infinity_realization_unresolved",
+        "message_schedule_unresolved",
+        "ordered_b1_checks_and_logicals_unverified",
+        "ordered_paper_experiment_artifact_identity",
+        "policy_file_phase5_intervention_dispatch",
+        "source_experiment_identity_check"
+      ],
+      "identity": "bhatnagar:first-convergence-1",
+      "native_status": "identity_unverified",
+      "qualification": "canonical_adaptation_not_assessed",
+      "receipt": {
+        "path": "literature_policies/bhatnagar-2026-impulse-decoding/paper_reproduction/source-qualification-v1.json",
+        "sha256": "9ab056405d890de1b85ef840464e0689daf4c9dec11949891df1e4680a342e23"
+      },
+      "runnable_counterpart": null,
+      "source_execution_status": "not_runnable",
+      "source_faithful": false,
+      "source_revision": "arxiv:2606.18240v1",
+      "source_spec": "literature_policies/bhatnagar-2026-impulse-decoding/first-convergence-1.spec.toml",
+      "source_spec_sha256": "3528635ed1ab9de8af997dce055bc170e5357f89362fcdbce8bfe3d6df0e52fe",
+      "target_status": {
+        "reason": "author_data_unavailable_to_workspace_and_digitization_unperformed",
+        "status": "blocked"
+      }
+    },
+    {
+      "assessment_eligibility": "not_eligible",
+      "blockers": [
+        "author_implementation_identity",
+        "author_implementation_revision_unverified",
+        "exact_infinity_realization_unresolved",
+        "message_schedule_unresolved",
+        "ordered_b1_checks_and_logicals_unverified",
+        "ordered_paper_experiment_artifact_identity",
+        "policy_file_phase5_intervention_dispatch",
+        "source_experiment_identity_check"
+      ],
+      "identity": "bhatnagar:minimum-weight-1",
+      "native_status": "identity_unverified",
+      "qualification": "canonical_adaptation_not_assessed",
+      "receipt": {
+        "path": "literature_policies/bhatnagar-2026-impulse-decoding/paper_reproduction/source-qualification-v1.json",
+        "sha256": "9ab056405d890de1b85ef840464e0689daf4c9dec11949891df1e4680a342e23"
+      },
+      "runnable_counterpart": null,
+      "source_execution_status": "not_runnable",
+      "source_faithful": false,
+      "source_revision": "arxiv:2606.18240v1",
+      "source_spec": "literature_policies/bhatnagar-2026-impulse-decoding/minimum-weight-1.spec.toml",
+      "source_spec_sha256": "9352a8936aa3a708989f51a64770ac2c455d1b86c9e74acda6eb0fe0d6657ff4",
+      "target_status": {
+        "reason": "author_data_unavailable_to_workspace_and_digitization_unperformed",
+        "status": "blocked"
+      }
+    },
+    {
+      "assessment_eligibility": "not_eligible",
+      "blockers": [
+        "augmented_syndrome_and_score_ties_unverified",
+        "author_implementation_and_settings_unverified",
+        "author_implementation_identity",
+        "frequency_weighted_list_selection",
+        "independent_member_accounting",
+        "live_source_digest_discrepancy_unresolved",
+        "local_b1_ghp_882_is_project_derived_candidate",
+        "maximal_subtree_partition_and_permutation_unverified",
+        "ordered_paper_checks_and_logicals_unverified",
+        "ordered_paper_experiment_artifact_identity",
+        "source_experiment_identity_check",
+        "subtree_redundant_check_ensemble"
+      ],
+      "identity": "rabeti:mbbp-ld",
+      "native_status": "identity_unverified",
+      "qualification": "canonical_adaptation_not_assessed",
+      "receipt": {
+        "path": "literature_policies/rabeti-2026-multiple-bases-bp-list-decoding/paper_reproduction/source-targets-v1.json",
+        "sha256": "e369b3f17e700d51eae29644dbdb3a8e0f96b7b30a59ff3e12826c3f02b6535e"
+      },
+      "runnable_counterpart": {
+        "execution_status": "runnable_canonical_adaptation",
+        "path": "literature_policies/rabeti-2026-multiple-bases-bp-list-decoding/mbbp-ld.toml",
+        "qualification": "canonical_adaptation_not_assessed",
+        "sha256": "51c770e05d11144188236c6f33b482c2463710ae4e2fedf8195abcb9546797d4"
+      },
+      "source_execution_status": "not_runnable",
+      "source_faithful": false,
+      "source_revision": "arxiv:2605.14170v1",
+      "source_spec": "literature_policies/rabeti-2026-multiple-bases-bp-list-decoding/mbbp-ld.spec.toml",
+      "source_spec_sha256": "ce330e0212982047165ac1f8aba244dbb16853b1445a411ac8b957450f642f2e",
+      "target_status": {
+        "count": 7,
+        "status": "authored_targets_available"
+      }
+    },
+    {
+      "assessment_eligibility": "not_eligible",
+      "blockers": [
+        "author_implementation_and_settings_unverified",
+        "author_implementation_identity",
+        "displayed_algorithm_zero_bias_boundary_unresolved",
+        "local_b1_ghp_882_is_project_derived_candidate",
+        "ordered_paper_checks_and_logicals_unverified",
+        "ordered_paper_experiment_artifact_identity",
+        "source_experiment_identity_check",
+        "source_metadata_policy_file_schema"
+      ],
+      "identity": "yao:bp-t100",
+      "native_status": "identity_unverified",
+      "qualification": "canonical_adaptation_not_assessed",
+      "receipt": {
+        "path": "literature_policies/yao-2024-guided-decimation/paper_reproduction/source-targets-v1.json",
+        "sha256": "a6fc4ae8ef7ea038797719b4640e1f3e3184eb4674dd6e3dae61219d4b553a05"
+      },
+      "runnable_counterpart": {
+        "execution_status": "runnable_canonical_adaptation",
+        "path": "literature_policies/yao-2024-guided-decimation/bp-t100.toml",
+        "qualification": "canonical_adaptation_not_assessed",
+        "sha256": "6851edd81f9bd980f7afe6171c9800ec07d2d07166d7a3a1c46e338a66e5ac97"
+      },
+      "source_execution_status": "not_runnable",
+      "source_faithful": false,
+      "source_revision": "arxiv:2312.10950v2",
+      "source_spec": "literature_policies/yao-2024-guided-decimation/bp-t100.spec.toml",
+      "source_spec_sha256": "7b0540d334025e654af4c90d78453f2d9908ba58229803bedd489ad201b7405a",
+      "target_status": {
+        "count": 70,
+        "status": "authored_targets_available"
+      }
+    },
+    {
+      "assessment_eligibility": "not_eligible",
+      "blockers": [
+        "author_implementation_and_settings_unverified",
+        "author_implementation_identity",
+        "displayed_algorithm_zero_bias_boundary_unresolved",
+        "local_b1_ghp_882_is_project_derived_candidate",
+        "ordered_paper_checks_and_logicals_unverified",
+        "ordered_paper_experiment_artifact_identity",
+        "policy_file_phase5_intervention_dispatch",
+        "source_experiment_identity_check"
+      ],
+      "identity": "yao:bpgd-t001",
+      "native_status": "identity_unverified",
+      "qualification": "canonical_adaptation_not_assessed",
+      "receipt": {
+        "path": "literature_policies/yao-2024-guided-decimation/paper_reproduction/source-targets-v1.json",
+        "sha256": "a6fc4ae8ef7ea038797719b4640e1f3e3184eb4674dd6e3dae61219d4b553a05"
+      },
+      "runnable_counterpart": {
+        "execution_status": "runnable_canonical_adaptation",
+        "path": "literature_policies/yao-2024-guided-decimation/bpgd-t001.toml",
+        "qualification": "canonical_adaptation_not_assessed",
+        "sha256": "0da8bb4e8c0b7cc3da916c89402b3570f5f4549618b66f60846be3263d1682b6"
+      },
+      "source_execution_status": "not_runnable",
+      "source_faithful": false,
+      "source_revision": "arxiv:2312.10950v2",
+      "source_spec": "literature_policies/yao-2024-guided-decimation/bpgd-t001.spec.toml",
+      "source_spec_sha256": "ca3832a5fa3ead750d331028752cbbe7776ee7bcdfba9274be5aacbc8ada2f8a",
+      "target_status": {
+        "count": 70,
+        "status": "authored_targets_available"
+      }
+    },
+    {
+      "assessment_eligibility": "not_eligible",
+      "blockers": [
+        "author_implementation_and_settings_unverified",
+        "author_implementation_identity",
+        "displayed_algorithm_zero_bias_boundary_unresolved",
+        "local_b1_ghp_882_is_project_derived_candidate",
+        "ordered_paper_checks_and_logicals_unverified",
+        "ordered_paper_experiment_artifact_identity",
+        "policy_file_phase5_intervention_dispatch",
+        "source_experiment_identity_check"
+      ],
+      "identity": "yao:bpgd-t010",
+      "native_status": "identity_unverified",
+      "qualification": "canonical_adaptation_not_assessed",
+      "receipt": {
+        "path": "literature_policies/yao-2024-guided-decimation/paper_reproduction/source-targets-v1.json",
+        "sha256": "a6fc4ae8ef7ea038797719b4640e1f3e3184eb4674dd6e3dae61219d4b553a05"
+      },
+      "runnable_counterpart": null,
+      "source_execution_status": "not_runnable",
+      "source_faithful": false,
+      "source_revision": "arxiv:2312.10950v2",
+      "source_spec": "literature_policies/yao-2024-guided-decimation/bpgd-t010.spec.toml",
+      "source_spec_sha256": "f800a9d6dd689ccbb020c2541661c1389adf5a601027bc0562cfd8f46a2eee59",
+      "target_status": {
+        "count": 70,
+        "status": "authored_targets_available"
+      }
+    },
+    {
+      "assessment_eligibility": "not_eligible",
+      "blockers": [
+        "author_implementation_and_settings_unverified",
+        "author_implementation_identity",
+        "displayed_algorithm_zero_bias_boundary_unresolved",
+        "local_b1_ghp_882_is_project_derived_candidate",
+        "ordered_paper_checks_and_logicals_unverified",
+        "ordered_paper_experiment_artifact_identity",
+        "policy_file_phase5_intervention_dispatch",
+        "source_experiment_identity_check"
+      ],
+      "identity": "yao:bpgd-t070",
+      "native_status": "identity_unverified",
+      "qualification": "canonical_adaptation_not_assessed",
+      "receipt": {
+        "path": "literature_policies/yao-2024-guided-decimation/paper_reproduction/source-targets-v1.json",
+        "sha256": "a6fc4ae8ef7ea038797719b4640e1f3e3184eb4674dd6e3dae61219d4b553a05"
+      },
+      "runnable_counterpart": null,
+      "source_execution_status": "not_runnable",
+      "source_faithful": false,
+      "source_revision": "arxiv:2312.10950v2",
+      "source_spec": "literature_policies/yao-2024-guided-decimation/bpgd-t070.spec.toml",
+      "source_spec_sha256": "4ef743753a220310ab87e9114282a63c6de6cab2d766d5380f181d631a07a0a3",
+      "target_status": {
+        "count": 70,
+        "status": "authored_targets_available"
+      }
+    },
+    {
+      "assessment_eligibility": "not_eligible",
+      "blockers": [
+        "author_implementation_and_settings_unverified",
+        "author_implementation_identity",
+        "displayed_algorithm_zero_bias_boundary_unresolved",
+        "local_b1_ghp_882_is_project_derived_candidate",
+        "ordered_paper_checks_and_logicals_unverified",
+        "ordered_paper_experiment_artifact_identity",
+        "policy_file_phase5_intervention_dispatch",
+        "source_experiment_identity_check"
+      ],
+      "identity": "yao:bpgd-t100",
+      "native_status": "identity_unverified",
+      "qualification": "canonical_adaptation_not_assessed",
+      "receipt": {
+        "path": "literature_policies/yao-2024-guided-decimation/paper_reproduction/source-targets-v1.json",
+        "sha256": "a6fc4ae8ef7ea038797719b4640e1f3e3184eb4674dd6e3dae61219d4b553a05"
+      },
+      "runnable_counterpart": null,
+      "source_execution_status": "not_runnable",
+      "source_faithful": false,
+      "source_revision": "arxiv:2312.10950v2",
+      "source_spec": "literature_policies/yao-2024-guided-decimation/bpgd-t100.spec.toml",
+      "source_spec_sha256": "5b1f956643bf6da2a2f507f6853dded7d402e4e9e675f9f945ce9c928104b324",
+      "target_status": {
+        "count": 70,
+        "status": "authored_targets_available"
+      }
+    },
+    {
+      "assessment_eligibility": "not_eligible",
+      "blockers": [
+        "author_implementation_and_settings_unverified",
+        "author_implementation_identity",
+        "displayed_algorithm_zero_bias_boundary_unresolved",
+        "local_b1_ghp_882_is_project_derived_candidate",
+        "ordered_paper_checks_and_logicals_unverified",
+        "ordered_paper_experiment_artifact_identity",
+        "policy_file_phase5_intervention_dispatch",
+        "source_experiment_identity_check"
+      ],
+      "identity": "yao:bpgd-t100-r002",
+      "native_status": "identity_unverified",
+      "qualification": "canonical_adaptation_not_assessed",
+      "receipt": {
+        "path": "literature_policies/yao-2024-guided-decimation/paper_reproduction/source-targets-v1.json",
+        "sha256": "a6fc4ae8ef7ea038797719b4640e1f3e3184eb4674dd6e3dae61219d4b553a05"
+      },
+      "runnable_counterpart": {
+        "execution_status": "runnable_canonical_adaptation",
+        "path": "literature_policies/yao-2024-guided-decimation/bpgd-t100-r002.toml",
+        "qualification": "canonical_adaptation_not_assessed",
+        "sha256": "f94f4ff8acb2f5bd13346b93943083b250ec5e3648e153e9b35b9d610406665b"
+      },
+      "source_execution_status": "not_runnable",
+      "source_faithful": false,
+      "source_revision": "arxiv:2312.10950v2",
+      "source_spec": "literature_policies/yao-2024-guided-decimation/bpgd-t100-r002.spec.toml",
+      "source_spec_sha256": "e66ce9ff55d05ca36f31200febb95ec3ec208f550cbc0f8d299a6109bd2f0fe8",
+      "target_status": {
+        "count": 70,
+        "status": "authored_targets_available"
+      }
+    },
+    {
+      "assessment_eligibility": "not_eligible",
+      "blockers": [
+        "author_implementation_and_settings_unverified",
+        "author_implementation_identity",
+        "displayed_algorithm_zero_bias_boundary_unresolved",
+        "local_b1_ghp_882_is_project_derived_candidate",
+        "ordered_paper_checks_and_logicals_unverified",
+        "ordered_paper_experiment_artifact_identity",
+        "policy_file_phase5_intervention_dispatch",
+        "source_experiment_identity_check"
+      ],
+      "identity": "yao:bpgd-t100-r005",
+      "native_status": "identity_unverified",
+      "qualification": "canonical_adaptation_not_assessed",
+      "receipt": {
+        "path": "literature_policies/yao-2024-guided-decimation/paper_reproduction/source-targets-v1.json",
+        "sha256": "a6fc4ae8ef7ea038797719b4640e1f3e3184eb4674dd6e3dae61219d4b553a05"
+      },
+      "runnable_counterpart": null,
+      "source_execution_status": "not_runnable",
+      "source_faithful": false,
+      "source_revision": "arxiv:2312.10950v2",
+      "source_spec": "literature_policies/yao-2024-guided-decimation/bpgd-t100-r005.spec.toml",
+      "source_spec_sha256": "fc4b60550e34959a5778f07713609a6b9b974ff9aa75b32403a942dc264157d7",
+      "target_status": {
+        "count": 70,
+        "status": "authored_targets_available"
+      }
+    },
+    {
+      "assessment_eligibility": "not_eligible",
+      "blockers": [
+        "author_implementation_and_settings_unverified",
+        "author_implementation_identity",
+        "displayed_algorithm_zero_bias_boundary_unresolved",
+        "local_b1_ghp_882_is_project_derived_candidate",
+        "ordered_paper_checks_and_logicals_unverified",
+        "ordered_paper_experiment_artifact_identity",
+        "policy_file_phase5_intervention_dispatch",
+        "source_experiment_identity_check"
+      ],
+      "identity": "yao:bpgd-t100-r010",
+      "native_status": "identity_unverified",
+      "qualification": "canonical_adaptation_not_assessed",
+      "receipt": {
+        "path": "literature_policies/yao-2024-guided-decimation/paper_reproduction/source-targets-v1.json",
+        "sha256": "a6fc4ae8ef7ea038797719b4640e1f3e3184eb4674dd6e3dae61219d4b553a05"
+      },
+      "runnable_counterpart": null,
+      "source_execution_status": "not_runnable",
+      "source_faithful": false,
+      "source_revision": "arxiv:2312.10950v2",
+      "source_spec": "literature_policies/yao-2024-guided-decimation/bpgd-t100-r010.spec.toml",
+      "source_spec_sha256": "421a1209008bf4f685089e78d7d8afa3b5d9623aaf31bc643254355fe47a3319",
+      "target_status": {
+        "count": 70,
+        "status": "authored_targets_available"
+      }
+    },
+    {
+      "assessment_eligibility": "not_eligible",
+      "blockers": [
+        "author_implementation_and_settings_unverified",
+        "author_implementation_identity",
+        "displayed_algorithm_zero_bias_boundary_unresolved",
+        "local_b1_ghp_882_is_project_derived_candidate",
+        "ordered_paper_checks_and_logicals_unverified",
+        "ordered_paper_experiment_artifact_identity",
+        "policy_file_phase5_intervention_dispatch",
+        "source_experiment_identity_check"
+      ],
+      "identity": "yao:bpgd-t100-r050",
+      "native_status": "identity_unverified",
+      "qualification": "canonical_adaptation_not_assessed",
+      "receipt": {
+        "path": "literature_policies/yao-2024-guided-decimation/paper_reproduction/source-targets-v1.json",
+        "sha256": "a6fc4ae8ef7ea038797719b4640e1f3e3184eb4674dd6e3dae61219d4b553a05"
+      },
+      "runnable_counterpart": null,
+      "source_execution_status": "not_runnable",
+      "source_faithful": false,
+      "source_revision": "arxiv:2312.10950v2",
+      "source_spec": "literature_policies/yao-2024-guided-decimation/bpgd-t100-r050.spec.toml",
+      "source_spec_sha256": "27e1d813fcd7ed37280a909ee43f8700ac4794af68d40fb9a532cb4560671a97",
+      "target_status": {
+        "count": 70,
+        "status": "authored_targets_available"
+      }
+    },
+    {
+      "assessment_eligibility": "not_eligible",
+      "blockers": [
+        "author_implementation_and_settings_unverified",
+        "author_implementation_identity",
+        "displayed_algorithm_zero_bias_boundary_unresolved",
+        "local_b1_ghp_882_is_project_derived_candidate",
+        "ordered_paper_checks_and_logicals_unverified",
+        "ordered_paper_experiment_artifact_identity",
+        "policy_file_phase5_intervention_dispatch",
+        "source_experiment_identity_check"
+      ],
+      "identity": "yao:bpgd-t100-r882",
+      "native_status": "identity_unverified",
+      "qualification": "canonical_adaptation_not_assessed",
+      "receipt": {
+        "path": "literature_policies/yao-2024-guided-decimation/paper_reproduction/source-targets-v1.json",
+        "sha256": "a6fc4ae8ef7ea038797719b4640e1f3e3184eb4674dd6e3dae61219d4b553a05"
+      },
+      "runnable_counterpart": null,
+      "source_execution_status": "not_runnable",
+      "source_faithful": false,
+      "source_revision": "arxiv:2312.10950v2",
+      "source_spec": "literature_policies/yao-2024-guided-decimation/bpgd-t100-r882.spec.toml",
+      "source_spec_sha256": "f41ffa51fc0c6bc46557ddd532124a8ac3c0b3cc6b56cfac5f9c354eb36cff29",
+      "target_status": {
+        "count": 70,
+        "status": "authored_targets_available"
+      }
+    }
+  ]
+}

@@ -8,7 +8,10 @@ import shutil
 
 import pytest
 
-from bp_registry.literature import qualify_phase9_source_inventory
+from bp_registry.literature import (
+    PHASE9_QUALIFICATION_INVENTORY_PATH,
+    qualify_phase9_source_inventory,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -53,7 +56,7 @@ def test_bhatnagar_unavailable_receipt_requires_complete_later_author_admission(
 
 def test_inventory_has_fourteen_sorted_unfaithful_records_and_matches_compiler() -> None:
     compiled = qualify_phase9_source_inventory(ROOT)
-    checked_in = (ROOT / "literature_policies/qualification-v1.json").read_bytes()
+    checked_in = (ROOT / PHASE9_QUALIFICATION_INVENTORY_PATH).read_bytes()
 
     assert compiled == checked_in
     inventory = json.loads(compiled)

@@ -19,7 +19,7 @@ key-files:
     - literature_policies/bhatnagar-2026-impulse-decoding/paper_reproduction/source-qualification-v1.json
   modified:
     - literature_policies/bhatnagar-2026-impulse-decoding/paper_reproduction/PAPER.md
-    - literature_policies/qualification-v1.json
+    - literature_policies/qualification-phase9-v1.json
     - src/bp_registry/literature.py
     - tests/test_phase9_source_qualification.py
 key-decisions:
@@ -45,7 +45,7 @@ status: complete
 - Added the Bhatnagar receipt for the pinned paper and embedded Figure 5 vector bytes, explicit author-data and implementation unavailability, target-extraction block, later author-artifact requirements, and unperformed two-pass digitization route.
 - Updated the Bhatnagar paper record to link the receipt and retain `first-convergence-0.toml` as a canonical adaptation.
 - Added `qualify_phase9_source_inventory()`, which validates all approved source-spec digests and paper receipts, rejects duplicate identities or tampered inputs, and emits the checked-in sorted registry.
-- Rebuilt `qualification-v1.json` with explicit target, native, source-execution, runnable-counterpart, assessment, and blocker states for every selected variant.
+- Rebuilt `qualification-phase9-v1.json` with explicit target, native, source-execution, runnable-counterpart, assessment, and blocker states for every selected variant.
 - Retained the Rabeti live archive SHA-256 `7b19e17fb1ffe04c3e61aef38d02967715cba84e568667206bce2a525a79928f` mismatch as `live_source_digest_discrepancy_unresolved`.
 
 ## Verification
@@ -53,7 +53,7 @@ status: complete
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_source_qualification.py -k 'bhatnagar and unavailable' -x` — 2 passed.
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_source_qualification.py -k 'inventory or fourteen or monotone or faithful or tamper' -x` — 2 passed.
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_source_qualification.py -x` — 4 passed.
-- Recompiled the inventory twice and compared both outputs with `qualification-v1.json` byte for byte — passed.
+- Recompiled the inventory twice and compared both outputs with `qualification-phase9-v1.json` byte for byte — passed.
 
 ## Task Commits
 
@@ -81,3 +81,7 @@ None.
 
 - Found the Bhatnagar receipt, compiled inventory, compiler, and focused tests.
 - Found both task commits in repository history.
+
+## Addendum: Frozen Phase 3 Gate Artifact Restored
+
+The initial inventory publication replaced `literature_policies/qualification-v1.json`, which Phase 3 treats as a frozen B1 gate input. The exact pre-09-03 bytes from `0a49c99^` were restored (SHA-256 `834149a6ad54623f71da644175b032e299b24767832a709923057e414c3881d4`). The Phase 9 derived inventory now lives at `literature_policies/qualification-phase9-v1.json`; this preserves the Phase 3 replay contract while retaining all Phase 9 qualification states and the Rabeti live-source discrepancy.

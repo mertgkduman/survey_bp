@@ -635,6 +635,7 @@ _PHASE9_RECEIPTS = {
     "rabeti": "literature_policies/rabeti-2026-multiple-bases-bp-list-decoding/paper_reproduction/source-targets-v1.json",
     "yao": "literature_policies/yao-2024-guided-decimation/paper_reproduction/source-targets-v1.json",
 }
+PHASE9_QUALIFICATION_INVENTORY_PATH = "literature_policies/qualification-phase9-v1.json"
 
 
 def _phase9_json(path: Path) -> dict[str, Any]:
@@ -696,8 +697,10 @@ def _phase9_receipt_summary(root: Path, family: str) -> tuple[dict[str, Any], tu
 def qualify_phase9_source_inventory(root: str | Path | None = None) -> bytes:
     """Compile the complete, sorted Phase 9 inventory from pinned inputs.
 
-    The output lists source and runnable identities separately.  It never uses
-    numerical agreement or another variant's settings to grant faithfulness.
+    The output is stored separately at
+    ``literature_policies/qualification-phase9-v1.json``.  It lists source and
+    runnable identities separately, and never uses numerical agreement or
+    another variant's settings to grant faithfulness.
     """
     workspace = Path(root) if root is not None else Path(__file__).resolve().parents[2]
     workspace = workspace.resolve()
