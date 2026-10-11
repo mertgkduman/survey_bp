@@ -417,16 +417,13 @@ class FailureCountPolicyV1(StrictModel):
                 or authorization.max_evidence_bytes_per_batch < expected_evidence
                 or authorization.max_storage_bytes_per_batch < expected_storage):
             raise ValueError("batch authorization is below a derived executable maximum")
-        shots = self.caps.max_shots
-        campaign_work = _checked_product(limits.derived_work_per_unit, shots, name="campaign work", maximum=_MAX_DECODER_WORK)
-        campaign_events = _checked_product(limits.derived_events_per_unit, shots, name="campaign events", maximum=_MAX_EVENTS)
-        campaign_evidence = _checked_product(limits.derived_evidence_bytes_per_unit, shots, name="campaign evidence", maximum=_MAX_EVIDENCE_BYTES) + limits.partial_receipt_reserve_bytes
-        campaign_storage = _checked_product(limits.derived_storage_bytes_per_unit, shots, name="campaign storage", maximum=_MAX_STORAGE_BYTES) + limits.partial_receipt_reserve_bytes
-        if campaign_evidence > _MAX_EVIDENCE_BYTES or campaign_storage > _MAX_STORAGE_BYTES:
-            raise ValueError("campaign caps cannot represent the derived receipt reserve")
-        if (self.caps.max_decoder_work < campaign_work or self.caps.max_events < campaign_events
-                or self.caps.max_evidence_bytes < campaign_evidence or self.caps.max_storage_bytes < campaign_storage):
-            raise ValueError("campaign cap is below an independently derived executable maximum")
+        # A campaign cap may deliberately stop before its shot cap.  It must
+        # still admit one complete authorized batch (and its control reserve)
+        # so the executor can make bounded forward progress honestly.
+        if (self.caps.max_decoder_work < expected_work or self.caps.max_events < expected_events
+                or self.caps.max_evidence_bytes < expected_evidence
+                or self.caps.max_storage_bytes < expected_storage):
+            raise ValueError("campaign cap is below one independently derived executable batch")
         return self
 
     def primitive_bytes(self) -> bytes:
@@ -447,7 +444,7 @@ class FailureCountTerminalReceiptV1(StrictModel):
     terminal_state: Literal["target_reached", "cap_censored"]
     terminal_failure_ordinal: int | None = Field(default=None, ge=1, le=_MAX_EVENTS)
     cumulative_failures: int = Field(ge=0, le=_MAX_EVENTS)
-    total_completed_shots: int = Field(ge=1, le=_MAX_EVENTS)
+    total_completed_shots: int = Field(ge=0, le=_MAX_EVENTS)
     inferential_prefix_sha256: str | None = Field(default=None, pattern=_SHA256)
     authorized_tail_ordinals: tuple[int, ...] = Field(default=(), max_length=_MAX_EVENTS)
     authorized_tail_sha256: str | None = Field(default=None, pattern=_SHA256)
@@ -456,7 +453,7 @@ class FailureCountTerminalReceiptV1(StrictModel):
     realized_events: int = Field(ge=0, le=_MAX_EVENTS)
     realized_evidence_bytes: int = Field(ge=0, le=_MAX_EVIDENCE_BYTES)
     realized_storage_bytes: int = Field(ge=0, le=_MAX_STORAGE_BYTES)
-    wall_boundaries: tuple[tuple[int, int, int], ...] = Field(min_length=1, max_length=_MAX_EVENTS)
+    wall_boundaries: tuple[tuple[int, int, int], ...] = Field(default=(), max_length=_MAX_EVENTS)
 
     @field_validator("authorized_tail_ordinals", "wall_boundaries", mode="before")
     @classmethod
@@ -466,10 +463,12 @@ class FailureCountTerminalReceiptV1(StrictModel):
     @model_validator(mode="after")
     def sealed_terminal_shape(self) -> "FailureCountTerminalReceiptV1":
         for deadline, observed, overshoot in self.wall_boundaries:
-            if deadline < 0 or observed < deadline or overshoot != observed - deadline:
-                raise ValueError("wall boundary observations must expose nonnegative overshoot")
+            if deadline < 0 or observed < 0 or overshoot != max(0, observed - deadline):
+                raise ValueError("wall boundary observations must expose exact nonnegative overshoot")
+        if self.total_completed_shots and not self.wall_boundaries:
+            raise ValueError("dispatched terminal evidence requires a wall boundary observation")
         if self.terminal_state == "target_reached":
-            if (self.terminal_failure_ordinal is None or self.cumulative_failures < 1
+            if (self.total_completed_shots < 1 or self.terminal_failure_ordinal is None or self.cumulative_failures < 1
                     or self.inferential_prefix_sha256 is None or self.authorized_tail_sha256 is None
                     or self.first_exhausted_cap is not None):
                 raise ValueError("target receipt requires exact observed prefix and tail facts")
