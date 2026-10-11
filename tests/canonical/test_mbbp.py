@@ -240,6 +240,7 @@ def test_vote_projection_retains_ties_invalid_aggregate_and_stable_lineage() -> 
     assert tied.events == reversed_members.events
     aggregate = next(payload for kind, payload in tied.events if kind == "vote_aggregate")
     assert aggregate["correction"] == [1, 1, 1]
+    assert aggregate["tie_coordinates"] == [0, 1, 2]
     assert aggregate["candidate_lineage_id"] and aggregate["vote_lineage_id"]
     validation = next(payload for kind, payload in invalid.events if kind == "vote_validation")
     assert invalid.terminal == "vote_aggregate_original_invalid"
