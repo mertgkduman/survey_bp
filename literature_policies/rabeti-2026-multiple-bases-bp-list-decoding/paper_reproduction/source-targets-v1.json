@@ -1,0 +1,397 @@
+{
+  "format_version": 1,
+  "evidence_kind": "authored_css_source_target_receipts_v1",
+  "paper_id": "rabeti-2026-multiple-bases-bp-list-decoding",
+  "source_archive": {
+    "uri": "https://export.arxiv.org/e-print/2605.14170v1",
+    "revision": "arXiv:2605.14170v1",
+    "sha256": "467622e2f17f01d302d6c790b13078569f17d71cd83910558535019a594e07c1",
+    "byte_count": null,
+    "accessed_on": "2026-10-11",
+    "integrity_statement": "sha256_integrity_linkage_not_authorship_v1",
+    "verification_status": "pinned_research_receipt; current live-byte verification must be retained separately before native qualification"
+  },
+  "candidate_artifact": {
+    "code_id": "b1-ghp-882",
+    "artifact": {
+      "path": "data/artifacts/b1-panteleev-kalachev-v3.npz",
+      "sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+      "byte_count": 5729
+    },
+    "logical_provenance": {
+      "status": "project-derived",
+      "author_supplied": false
+    },
+    "paper_identity_status": "unverified"
+  },
+  "canonical_adaptation": {
+    "policy_path": "literature_policies/rabeti-2026-multiple-bases-bp-list-decoding/mbbp-ld.toml",
+    "policy_sha256": "51c770e05d11144188236c6f33b482c2463710ae4e2fedf8195abcb9546797d4",
+    "assessment_label": "canonical_adaptation"
+  },
+  "targets": [
+    {
+      "target_id": "rabeti-fig5-mbbp-ld-p004",
+      "figure": "Figure 5",
+      "curve": "MBBP-LD",
+      "variant": "mbbp-ld",
+      "p_literal": "0.04",
+      "literal_decimal": "8.139e-7",
+      "rounding_interval": {
+        "lower": 3e-7,
+        "upper": 0.0000013
+      },
+      "locator": {
+        "figure": "Figure 5",
+        "curve": "MBBP-LD",
+        "point": "p=0.04",
+        "source_member": "paper source TeX numeric vector"
+      },
+      "stopping": {
+        "status": "observed",
+        "rule": "100 decoding failures",
+        "locator": "Section IV source experiment description"
+      },
+      "identity_gaps": [
+        "ordered_paper_checks_and_logicals_unverified",
+        "author_implementation_and_settings_unverified",
+        "maximal_subtree_partition_and_permutation_unverified",
+        "augmented_syndrome_and_score_ties_unverified",
+        "local_b1_ghp_882_is_project_derived_candidate"
+      ],
+      "faithful_eligible": false
+    },
+    {
+      "target_id": "rabeti-fig5-mbbp-ld-p005",
+      "figure": "Figure 5",
+      "curve": "MBBP-LD",
+      "variant": "mbbp-ld",
+      "p_literal": "0.05",
+      "literal_decimal": "6.833e-5",
+      "rounding_interval": {
+        "lower": 0.0000678,
+        "upper": 0.0000688
+      },
+      "locator": {
+        "figure": "Figure 5",
+        "curve": "MBBP-LD",
+        "point": "p=0.05",
+        "source_member": "paper source TeX numeric vector"
+      },
+      "stopping": {
+        "status": "observed",
+        "rule": "100 decoding failures",
+        "locator": "Section IV source experiment description"
+      },
+      "identity_gaps": [
+        "ordered_paper_checks_and_logicals_unverified",
+        "author_implementation_and_settings_unverified",
+        "maximal_subtree_partition_and_permutation_unverified",
+        "augmented_syndrome_and_score_ties_unverified",
+        "local_b1_ghp_882_is_project_derived_candidate"
+      ],
+      "faithful_eligible": false
+    },
+    {
+      "target_id": "rabeti-fig5-mbbp-ld-p006",
+      "figure": "Figure 5",
+      "curve": "MBBP-LD",
+      "variant": "mbbp-ld",
+      "p_literal": "0.06",
+      "literal_decimal": "2.030e-3",
+      "rounding_interval": {
+        "lower": 0.0020295,
+        "upper": 0.0020305
+      },
+      "locator": {
+        "figure": "Figure 5",
+        "curve": "MBBP-LD",
+        "point": "p=0.06",
+        "source_member": "paper source TeX numeric vector"
+      },
+      "stopping": {
+        "status": "observed",
+        "rule": "100 decoding failures",
+        "locator": "Section IV source experiment description"
+      },
+      "identity_gaps": [
+        "ordered_paper_checks_and_logicals_unverified",
+        "author_implementation_and_settings_unverified",
+        "maximal_subtree_partition_and_permutation_unverified",
+        "augmented_syndrome_and_score_ties_unverified",
+        "local_b1_ghp_882_is_project_derived_candidate"
+      ],
+      "faithful_eligible": false
+    },
+    {
+      "target_id": "rabeti-fig5-mbbp-ld-p007",
+      "figure": "Figure 5",
+      "curve": "MBBP-LD",
+      "variant": "mbbp-ld",
+      "p_literal": "0.07",
+      "literal_decimal": "3.622e-2",
+      "rounding_interval": {
+        "lower": 0.0362195,
+        "upper": 0.0362205
+      },
+      "locator": {
+        "figure": "Figure 5",
+        "curve": "MBBP-LD",
+        "point": "p=0.07",
+        "source_member": "paper source TeX numeric vector"
+      },
+      "stopping": {
+        "status": "observed",
+        "rule": "100 decoding failures",
+        "locator": "Section IV source experiment description"
+      },
+      "identity_gaps": [
+        "ordered_paper_checks_and_logicals_unverified",
+        "author_implementation_and_settings_unverified",
+        "maximal_subtree_partition_and_permutation_unverified",
+        "augmented_syndrome_and_score_ties_unverified",
+        "local_b1_ghp_882_is_project_derived_candidate"
+      ],
+      "faithful_eligible": false
+    },
+    {
+      "target_id": "rabeti-fig5-mbbp-ld-p008",
+      "figure": "Figure 5",
+      "curve": "MBBP-LD",
+      "variant": "mbbp-ld",
+      "p_literal": "0.08",
+      "literal_decimal": "2.028e-1",
+      "rounding_interval": {
+        "lower": 0.2027995,
+        "upper": 0.2028005
+      },
+      "locator": {
+        "figure": "Figure 5",
+        "curve": "MBBP-LD",
+        "point": "p=0.08",
+        "source_member": "paper source TeX numeric vector"
+      },
+      "stopping": {
+        "status": "observed",
+        "rule": "100 decoding failures",
+        "locator": "Section IV source experiment description"
+      },
+      "identity_gaps": [
+        "ordered_paper_checks_and_logicals_unverified",
+        "author_implementation_and_settings_unverified",
+        "maximal_subtree_partition_and_permutation_unverified",
+        "augmented_syndrome_and_score_ties_unverified",
+        "local_b1_ghp_882_is_project_derived_candidate"
+      ],
+      "faithful_eligible": false
+    },
+    {
+      "target_id": "rabeti-fig5-mbbp-ld-p009",
+      "figure": "Figure 5",
+      "curve": "MBBP-LD",
+      "variant": "mbbp-ld",
+      "p_literal": "0.09",
+      "literal_decimal": "5.155e-1",
+      "rounding_interval": {
+        "lower": 0.5154995,
+        "upper": 0.5155005
+      },
+      "locator": {
+        "figure": "Figure 5",
+        "curve": "MBBP-LD",
+        "point": "p=0.09",
+        "source_member": "paper source TeX numeric vector"
+      },
+      "stopping": {
+        "status": "observed",
+        "rule": "100 decoding failures",
+        "locator": "Section IV source experiment description"
+      },
+      "identity_gaps": [
+        "ordered_paper_checks_and_logicals_unverified",
+        "author_implementation_and_settings_unverified",
+        "maximal_subtree_partition_and_permutation_unverified",
+        "augmented_syndrome_and_score_ties_unverified",
+        "local_b1_ghp_882_is_project_derived_candidate"
+      ],
+      "faithful_eligible": false
+    },
+    {
+      "target_id": "rabeti-fig5-mbbp-ld-p010",
+      "figure": "Figure 5",
+      "curve": "MBBP-LD",
+      "variant": "mbbp-ld",
+      "p_literal": "0.10",
+      "literal_decimal": "8.197e-1",
+      "rounding_interval": {
+        "lower": 0.8196995,
+        "upper": 0.8197005
+      },
+      "locator": {
+        "figure": "Figure 5",
+        "curve": "MBBP-LD",
+        "point": "p=0.10",
+        "source_member": "paper source TeX numeric vector"
+      },
+      "stopping": {
+        "status": "observed",
+        "rule": "100 decoding failures",
+        "locator": "Section IV source experiment description"
+      },
+      "identity_gaps": [
+        "ordered_paper_checks_and_logicals_unverified",
+        "author_implementation_and_settings_unverified",
+        "maximal_subtree_partition_and_permutation_unverified",
+        "augmented_syndrome_and_score_ties_unverified",
+        "local_b1_ghp_882_is_project_derived_candidate"
+      ],
+      "faithful_eligible": false
+    }
+  ],
+  "table_target_receipts": [
+    {
+      "schema": "campaign_table_target_v1",
+      "target_id": "rabeti-fig5-mbbp-ld-p004",
+      "source": {
+        "uri_or_doi": "https://arxiv.org/abs/2605.14170",
+        "revision": "arXiv:2605.14170v1",
+        "accessed_on": "2026-10-11"
+      },
+      "location": {
+        "table_id": "Figure 5",
+        "row_id": "p=0.04",
+        "column_id": "MBBP-LD",
+        "marker_id": "mbbp-ld"
+      },
+      "source_snapshot": {
+        "relative_path": "arxiv/2605.14170-arXiv:2605.14170v1.tar",
+        "sha256": "7b19e17fb1ffe04c3e61aef38d02967715cba84e568667206bce2a525a79928f",
+        "byte_count": 24443,
+        "integrity_statement": "sha256_integrity_linkage_not_authorship_v1"
+      },
+      "reported": {
+        "value": 8.139e-7,
+        "lower_error": 0,
+        "upper_error": 0,
+        "precision": 0.000001
+      },
+      "source_denominator": {
+        "status": "unavailable",
+        "reason": "The paper reports failure-count stopping but not a point denominator."
+      }
+    }
+  ],
+  "source_experiment_qualifications": [
+    {
+      "schema": "campaign_source_experiment_qualification_v1",
+      "source_experiment": {
+        "schema": "campaign_source_experiment_identity_v1",
+        "target_id": "rabeti-fig5-mbbp-ld-p004",
+        "paper": {
+          "uri_or_doi": "https://arxiv.org/abs/2605.14170",
+          "revision": "arXiv:2605.14170v1",
+          "accessed_on": "2026-10-11"
+        },
+        "paper_snapshot": {
+          "relative_path": "arxiv/2605.14170-arXiv:2605.14170v1.tar",
+          "sha256": "7b19e17fb1ffe04c3e61aef38d02967715cba84e568667206bce2a525a79928f",
+          "byte_count": 24443,
+          "integrity_statement": "sha256_integrity_linkage_not_authorship_v1"
+        },
+        "locator": {
+          "paper_id": "2605.14170",
+          "figure_or_table_id": "Figure 5",
+          "curve_id": "MBBP-LD",
+          "variant_id": "mbbp-ld",
+          "point_id": "0.04"
+        },
+        "ordered_check_artifacts": [
+          {
+            "relative_path": "data/artifacts/b1-panteleev-kalachev-v3.npz",
+            "sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+            "byte_count": 5729,
+            "integrity_statement": "sha256_integrity_linkage_not_authorship_v1"
+          },
+          {
+            "relative_path": "data/artifacts/b1-panteleev-kalachev-v3.json",
+            "sha256": "6b5f02376ead40a4d7d667231ce085586656b3f9f447d5f54f41367296716191",
+            "byte_count": 2180,
+            "integrity_statement": "sha256_integrity_linkage_not_authorship_v1"
+          }
+        ],
+        "ordered_logical_artifacts": [
+          {
+            "relative_path": "literature_policies/qualification-v1.json",
+            "sha256": "834149a6ad54623f71da644175b032e299b24767832a709923057e414c3881d4",
+            "byte_count": 13110,
+            "integrity_statement": "sha256_integrity_linkage_not_authorship_v1"
+          },
+          {
+            "relative_path": "literature_policies/rabeti-2026-multiple-bases-bp-list-decoding/mbbp-ld.toml",
+            "sha256": "51c770e05d11144188236c6f33b482c2463710ae4e2fedf8195abcb9546797d4",
+            "byte_count": 3168,
+            "integrity_statement": "sha256_integrity_linkage_not_authorship_v1"
+          }
+        ],
+        "channel_convention": "independent_x_error_css_code_capacity_v1",
+        "source_denominator": {
+          "status": "unavailable",
+          "reason": "The paper reports failure-count stopping but not a point denominator."
+        },
+        "stopping": {
+          "status": "observed",
+          "rule": "100 decoding failures",
+          "snapshot": {
+            "relative_path": "arxiv/2605.14170-arXiv:2605.14170v1-stopping.txt",
+            "sha256": "7b19e17fb1ffe04c3e61aef38d02967715cba84e568667206bce2a525a79928f",
+            "byte_count": 24443,
+            "integrity_statement": "sha256_integrity_linkage_not_authorship_v1"
+          }
+        },
+        "author_implementation_status": "unverified",
+        "executable_policy_sha256": "51c770e05d11144188236c6f33b482c2463710ae4e2fedf8195abcb9546797d4",
+        "qualification_blockers": [
+          "ordered_paper_checks_and_logicals_unverified",
+          "author_implementation_and_settings_unverified",
+          "maximal_subtree_partition_and_permutation_unverified",
+          "augmented_syndrome_and_score_ties_unverified",
+          "local_b1_ghp_882_is_project_derived_candidate"
+        ]
+      },
+      "target_receipt_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "native_assessment": {
+        "schema": "campaign_native_reference_assessment_v1",
+        "target_id": "rabeti-fig5-mbbp-ld-p004",
+        "status": "identity_unverified",
+        "reasons": [
+          "Author implementation identity is unverified; no native execution is claimed."
+        ],
+        "metrics": [
+          {
+            "name": "decoder_work",
+            "status": "unavailable",
+            "reason": "Native implementation identity is unverified."
+          },
+          {
+            "name": "runtime_seconds",
+            "status": "unavailable",
+            "reason": "Native implementation identity is unverified."
+          },
+          {
+            "name": "counters",
+            "status": "unavailable",
+            "reason": "Native implementation identity is unverified."
+          }
+        ]
+      },
+      "qualification_blockers": [
+        "ordered_paper_checks_and_logicals_unverified",
+        "author_implementation_and_settings_unverified",
+        "maximal_subtree_partition_and_permutation_unverified",
+        "augmented_syndrome_and_score_ties_unverified",
+        "local_b1_ghp_882_is_project_derived_candidate"
+      ],
+      "faithful_eligible": false
+    }
+  ]
+}
