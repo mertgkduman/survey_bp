@@ -731,3 +731,37 @@ def test_report_keeps_work_resources_and_missingness_separate() -> None:
             target_arm_ids={"p050": "first"},
             observations={"environment": {"DATABASE_PASSWORD": "leak"}},
         )
+
+
+def test_report_serializes_denominator_uncertainty_per_arm() -> None:
+    """Reports retain the frozen denominator treatment for each decoder arm."""
+    from bp_registry.campaigns.reporting import reconstruct_campaign_report
+
+    plan, assessment, merged, hashes = _report_inputs()
+    work = {
+        unit.key: {"bp_calls": index + 1, "message_work": (index + 1) * 10}
+        for index, unit in enumerate(plan.units)
+    }
+    report = reconstruct_campaign_report(
+        plan=plan,
+        assessment=assessment,
+        merge_receipt=merged,
+        input_receipt_hashes=hashes,
+        target_arm_ids={"p050": "first"},
+        work_vectors_by_unit=work,
+    )
+
+    point = report.point_reports[0]
+    summaries = {summary.arm_id: summary for summary in point.outcome_denominator_summaries}
+    assert set(summaries) == {"first", "second"}
+    assert summaries["first"].planned_samples == summaries["first"].dispatched_samples == 2
+    assert summaries["first"].acceptance_probability.numerator == 1
+    assert summaries["first"].acceptance_probability.denominator == 2
+    assert summaries["first"].conditional_performance is not None
+    assert summaries["first"].conditional_performance.shots == 1
+    assert summaries["second"].all_shot_performance.failures == 1
+    assert summaries["first"].actual_work == {"bp_calls": 4, "message_work": 40}
+    assert summaries["second"].actual_work == {"bp_calls": 6, "message_work": 60}
+    assert {item[0] for item in point.outcome_treatment_table} == {
+        treatment.terminal_status for treatment in assessment.outcome_matrix.treatments
+    }
