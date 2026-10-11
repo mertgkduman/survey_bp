@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from hashlib import sha256
 import re
-from typing import Final
+from typing import Final, Iterable, Mapping
 
 from pydantic import Field, model_validator
 
@@ -120,3 +120,26 @@ def verify_persisted_sample(receipt: PersistedSampleReceiptV1, artifact: bytes) 
     if sha256(artifact).hexdigest() != receipt.artifact_sha256:
         raise ValueError("persisted sample digest differs from receipt")
     return artifact
+
+
+def validate_matched_sample_hashes(records: Iterable[Mapping[str, object]]) -> dict[str, str | None]:
+    """Require every observed arm of one physical sample to use the same bytes.
+
+    A missing artifact hash means the backend generates the sample reproducibly.
+    Mixing that mode with persisted bytes for one matched sample is ambiguous.
+    """
+    matched: dict[str, str | None] = {}
+    for record in records:
+        identity = record.get("physical_sample_identity")
+        digest = record.get("persisted_sample_sha256")
+        if not isinstance(identity, str):
+            raise ValueError("matched sample requires physical sample identity")
+        _sha256(identity, name="physical_sample_identity")
+        if digest is not None:
+            if not isinstance(digest, str):
+                raise ValueError("persisted sample hash must be a SHA-256 digest")
+            _sha256(digest, name="persisted_sample_sha256")
+        if identity in matched and matched[identity] != digest:
+            raise ValueError("matched arms have different persisted sample hashes")
+        matched[identity] = digest
+    return matched

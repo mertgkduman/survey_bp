@@ -15,6 +15,7 @@ from ..canonical.verification import validate_canonical_shot
 from ..ledger import read_canonical_events_bytes
 from ..runner import canonical_public_shot_context
 from .contracts import CampaignSpecV1, build_one_unit_plan, canonical_json_bytes
+from .identity import validate_matched_sample_hashes
 from .planning import CampaignWorkPlan
 
 
@@ -449,7 +450,9 @@ def merge_verified_attempts(
             first_digest = first["terminal_bytes_sha256"]
             first_fact = canonical_json_bytes(first["terminal_fact"])
             for record in terminal_records[1:]:
-                if record["terminal_bytes_sha256"] != first_digest or canonical_json_bytes(record["terminal_fact"]) != first_fact:
+                if (record["terminal_bytes_sha256"] != first_digest
+                        or canonical_json_bytes(record["terminal_fact"]) != first_fact
+                        or record.get("persisted_sample_sha256") != first.get("persisted_sample_sha256")):
                     raise ValueError("conflicting terminal retries for one frozen unit")
                 redundant_hashes.add(str(record["receipt_sha256"]))
             terminals[unit_key] = first
@@ -460,6 +463,16 @@ def merge_verified_attempts(
         else:
             incomplete.add(unit_key)
 
+    # A plan-derived physical identity is shared by matched arms.  Recheck
+    # persisted sample bytes here because scheduler shards can arrive separately.
+    planned_units = {unit.key: unit for unit in plan.units}
+    validate_matched_sample_hashes(
+        {
+            "physical_sample_identity": planned_units[key].physical_sample_identity,
+            "persisted_sample_sha256": terminals[key].get("persisted_sample_sha256"),
+        }
+        for key in expected if key in terminals
+    )
     terminal_keys = set(terminals)
     authorized_tail: tuple[str, ...] = ()
     stop_hashes: tuple[str, ...] = ()

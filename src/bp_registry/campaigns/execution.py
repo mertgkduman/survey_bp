@@ -19,6 +19,7 @@ from typing import Any, Callable, Mapping
 
 from ..runner import canonical_public_shot_context, run_canonical_one
 from .contracts import CampaignSpecV1, build_one_unit_plan
+from .identity import validate_matched_sample_hashes
 from .planning import CampaignWorkPlan, ShardPlan
 from .shards import _resolve_manifest, _terminal_fact, publish_sealed_shard, seal_receipt
 
@@ -198,6 +199,7 @@ def execute_local_work_plan(
     terminal = tuple(record["unit_key"] for record in ordered_records if record["state"] == "sealed_terminal")
     incomplete = tuple(record["unit_key"] for record in ordered_records if record["state"] != "sealed_terminal")
     scientific = tuple(record["scientific"] for record in ordered_records if record["state"] == "sealed_terminal")
+    validate_matched_sample_hashes(scientific)
     return {
         "schema": "campaign_local_execution_v1",
         "campaign_spec_digest": plan.campaign_spec_digest,

@@ -67,6 +67,30 @@ def _work_plan():
     )
 
 
+def test_merge_rejects_different_persisted_sample_hashes_across_arms() -> None:
+    from bp_registry.campaigns.planning import CampaignCoordinateV1, freeze_work_plan
+    from bp_registry.campaigns.shards import merge_verified_attempts
+
+    plan = freeze_work_plan(
+        campaign_spec_digest="b" * 64,
+        coordinates=(CampaignCoordinateV1(
+            cohort_id="cohort", point_id="point", sample_namespace="samples", sample_ids=(0,),
+        ),),
+        arm_seed_identities={"fast": "seed-fast", "slow": "seed-slow"},
+        look_sample_boundaries=(1,), units_per_shard=1,
+    )
+    records = []
+    for index, unit in enumerate(plan.units):
+        record = _verified_attempt(
+            unit_key=unit.key, plan_digest=plan.campaign_plan_digest,
+            attempt_id=f"arm-{index}", state="sealed_terminal", terminal="exact",
+        )
+        record["persisted_sample_sha256"] = sha256(f"sample-{index}".encode()).hexdigest()
+        records.append(record)
+    with pytest.raises(ValueError, match="matched arms"):
+        merge_verified_attempts(plan=plan, verified_attempts=records)
+
+
 def _verified_attempt(*, unit_key: str, plan_digest: str, attempt_id: str, state: str,
                       terminal: str | None = None, parent: str | None = None) -> dict[str, object]:
     attempt = _attempt(attempt_id=attempt_id, state=state, parent=parent)

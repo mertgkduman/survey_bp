@@ -232,6 +232,28 @@ def _failing_unit_runner(unit: dict[str, object], staging: str) -> dict[str, obj
     return _bounded_unit_runner(unit, staging)
 
 
+def _mismatched_sample_runner(unit: dict[str, object], staging: str) -> dict[str, object]:
+    result = _bounded_unit_runner(unit, staging)
+    result["persisted_sample_bytes"] = str(unit["arm_id"]).encode("ascii")
+    return result
+
+
+def test_local_matched_arms_reject_different_persisted_sample_bytes(tmp_path: Path):
+    from bp_registry.campaigns.execution import execute_local_work_plan
+    from bp_registry.campaigns.planning import freeze_work_plan
+
+    digest, coordinates, arms = _planning_inputs()
+    plan = freeze_work_plan(
+        campaign_spec_digest=digest, coordinates=coordinates, arm_seed_identities=arms,
+        look_sample_boundaries=(1, 2), units_per_shard=2,
+    )
+    with pytest.raises(ValueError, match="matched arms"):
+        execute_local_work_plan(
+            plan, output_root=tmp_path / "mismatched", workers=1,
+            unit_runner=_mismatched_sample_runner,
+        )
+
+
 def test_local_workers_and_arm_order_preserve_frozen_scientific_evidence(tmp_path: Path):
     """Changing bounded pool topology cannot change frozen arm/sample facts."""
     from bp_registry.campaigns.execution import execute_local_work_plan
