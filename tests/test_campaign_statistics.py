@@ -95,7 +95,7 @@ def _rate(failures: int, shots: int) -> object:
 def test_target_decision_uses_containment_disjointness_and_overlap() -> None:
     target = _target()
     passed = _target_interval_decision(
-        _rate(35, 100), target, input_receipt_hashes={"target": "b" * 64},
+        _rate(350, 1000), target, input_receipt_hashes={"target": "b" * 64},
     )
     failed = _target_interval_decision(
         _rate(0, 100), target, input_receipt_hashes={"target": "b" * 64},
@@ -125,7 +125,7 @@ def test_target_decision_clips_to_probability_domain_and_requires_source_n_when_
         source_denominator_required=True,
         source_denominator=None,
     )
-    assert result.acceptable_interval == (0.0, 0.12)
+    assert result.acceptable_interval == pytest.approx((0.0, 0.12))
     assert result.verdict == "inconclusive"
     assert result.reason == "missing_required_source_denominator"
     assert math.isfinite(result.computed_interval[1])
