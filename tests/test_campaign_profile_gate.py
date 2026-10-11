@@ -13,6 +13,10 @@ from bp_registry.campaigns.contracts import CampaignAssessmentV1
 from test_campaign_contracts import _assessment_payload
 
 
+def _assessment() -> CampaignAssessmentV1:
+    return CampaignAssessmentV1.model_validate(_assessment_payload())
+
+
 def _api():
     try:
         module = importlib.import_module("bp_registry.campaigns.profiling_gate")
@@ -72,6 +76,7 @@ def _run(*, sample: str, path_class: str, memory: int | None = 8_192, mismatch: 
     )
     return api.OperationalEvidenceV1(
         campaign_spec_digest="e" * 64, campaign_plan_digest="f" * 64,
+        assessment_digest=_assessment().digest(),
         shard_receipt_sha256="1" * 64, merge_receipt_sha256="2" * 64,
         replay_receipt_sha256="3" * 64, profile_receipt_sha256=("4" if path_class == "fast" else "5") * 64,
         verified_shard=True, verified_merge=True, verified_replay=True,
@@ -96,7 +101,7 @@ def _proposal():
     return api.ProposedCampaignV1(
         campaign_spec_digest="e" * 64, campaign_plan_digest="f" * 64,
         total_shots=10, max_shard_shots=2,
-        assessment=CampaignAssessmentV1.model_validate(_assessment_payload()),
+        assessment=_assessment(),
         operational_allocation={"workers": 4, "cpus_per_worker": 1},
     )
 
@@ -260,3 +265,16 @@ def test_authorization_rejects_proposals_above_frozen_scientific_caps() -> None:
     )
     assert receipt.assessment_digest == proposal.assessment.digest()
     assert receipt.scientific_caps["max_shots"] == 100
+
+
+def test_authorization_rejects_assessment_substitution_for_same_plan_hash() -> None:
+    api = _api()
+    payload = _assessment_payload()
+    payload["stopping"]["final_shots"] = 200
+    payload["resources"]["max_shots"] = 200
+    substituted = replace(_proposal(), assessment=CampaignAssessmentV1.model_validate(payload))
+    with pytest.raises(ValueError, match="proposal assessment does not match"):
+        api.authorize_campaign(
+            aggregate=_aggregate(), proposal=substituted, site=_site(),
+            safety_factor=api.SafetyFactorV1(1, 1),
+        )

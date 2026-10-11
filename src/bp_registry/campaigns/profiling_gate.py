@@ -81,6 +81,7 @@ class OperationalEvidenceV1:
 
     campaign_spec_digest: str
     campaign_plan_digest: str
+    assessment_digest: str
     shard_receipt_sha256: str
     merge_receipt_sha256: str
     replay_receipt_sha256: str
@@ -103,7 +104,8 @@ class OperationalEvidenceV1:
 
     def __post_init__(self) -> None:
         for name in (
-            "campaign_spec_digest", "campaign_plan_digest", "shard_receipt_sha256", "merge_receipt_sha256",
+            "campaign_spec_digest", "campaign_plan_digest", "assessment_digest",
+            "shard_receipt_sha256", "merge_receipt_sha256",
             "replay_receipt_sha256", "profile_receipt_sha256",
         ):
             _require_digest(getattr(self, name), name=name)
@@ -140,6 +142,7 @@ class RepresentativeProfileAggregateV1:
 
     campaign_spec_digest: str
     campaign_plan_digest: str
+    assessment_digest: str
     merge_receipt_sha256: str
     shard_receipt_sha256s: tuple[str, ...]
     replay_receipt_sha256s: tuple[str, ...]
@@ -203,8 +206,8 @@ def aggregate_representative_evidence(records: tuple[OperationalEvidenceV1, ...]
         raise ValueError("representative evidence records must be typed")
     first = records[0]
     if any(
-        (record.campaign_spec_digest, record.campaign_plan_digest, record.merge_receipt_sha256)
-        != (first.campaign_spec_digest, first.campaign_plan_digest, first.merge_receipt_sha256)
+        (record.campaign_spec_digest, record.campaign_plan_digest, record.assessment_digest, record.merge_receipt_sha256)
+        != (first.campaign_spec_digest, first.campaign_plan_digest, first.assessment_digest, first.merge_receipt_sha256)
         for record in records
     ):
         raise ValueError("representative evidence must bind one verified campaign and merge receipt")
@@ -239,6 +242,10 @@ def aggregate_representative_evidence(records: tuple[OperationalEvidenceV1, ...]
         raise ValueError("required throughput measurement is unavailable")
     assert all(value is not None for value in decoder_wall + decoder_cpu)
     payload = {
+        "campaign_spec_digest": first.campaign_spec_digest,
+        "campaign_plan_digest": first.campaign_plan_digest,
+        "assessment_digest": first.assessment_digest,
+        "merge_receipt_sha256": first.merge_receipt_sha256,
         "records": [
             {
                 "shard": record.shard_receipt_sha256, "replay": record.replay_receipt_sha256,
@@ -255,6 +262,7 @@ def aggregate_representative_evidence(records: tuple[OperationalEvidenceV1, ...]
     return RepresentativeProfileAggregateV1(
         campaign_spec_digest=first.campaign_spec_digest,
         campaign_plan_digest=first.campaign_plan_digest,
+        assessment_digest=first.assessment_digest,
         merge_receipt_sha256=first.merge_receipt_sha256,
         shard_receipt_sha256s=tuple(sorted({record.shard_receipt_sha256 for record in records})),
         replay_receipt_sha256s=tuple(sorted({record.replay_receipt_sha256 for record in records})),
@@ -421,6 +429,8 @@ def authorize_campaign(*, aggregate: RepresentativeProfileAggregateV1, proposal:
         raise ValueError("authorization requires typed aggregate, proposal, site, and safety factor")
     if (aggregate.campaign_spec_digest, aggregate.campaign_plan_digest) != (proposal.campaign_spec_digest, proposal.campaign_plan_digest):
         raise ValueError("proposal identity does not match profiling evidence")
+    if aggregate.assessment_digest != proposal.assessment.digest():
+        raise ValueError("proposal assessment does not match frozen profiling evidence")
     bytes_per_sample = _per_sample(_sum_bounded([aggregate.ledger_bytes, aggregate.sidecar_bytes], name="storage bytes"), aggregate.sample_count)
     scheduler_unit_cost = _sum_bounded([aggregate.scheduler_launch_overhead_ns, aggregate.shard_fixed_cost_ns], name="scheduler cost")
     projections: dict[str, int | None] = {
