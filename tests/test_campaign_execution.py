@@ -152,6 +152,19 @@ def test_persisted_sample_receipt_rejects_tampered_bytes_before_decoder_use():
         verify_persisted_sample(receipt, b"X" + artifact[1:])
 
 
+def test_public_campaign_facade_exports_work_plan() -> None:
+    """The supported facade exposes the general paired-work contract."""
+    api = _campaign_api()
+    assert api is not None
+    expected = {
+        "CampaignWorkSpecV1",
+        "MaterializedPhysicalSampleV1",
+        "freeze_campaign_work_spec",
+        "run_canonical_work_plan",
+    }
+    assert expected <= set(api.__all__)
+
+
 def _planning_inputs():
     from bp_registry.campaigns.planning import CampaignCoordinateV1
 
