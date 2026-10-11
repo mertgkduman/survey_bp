@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_statistics.py -k 'inverse_binomial or ordered_stop or authorized_tail or coverage or boundary' -x",
+  "exitCode": 1,
+  "targetTest": "test_inverse_binomial_uses_exact_ordered_target_failure_not_terminal_batch",
+  "targetFile": "tests/test_campaign_statistics.py",
+  "output": "TAP version 13\nnot ok 1 - test_inverse_binomial_uses_exact_ordered_target_failure_not_terminal_batch\n  ---\n  message: AssertionError: campaign statistics module must provide exact inverse-binomial rates\n  ...\n1..1\n# tests 1\n# pass 0\n# fail 1",
+  "expected": "A completed ordered target-th failure prefix yields a two-sided exact inverse-binomial interval using T_r, regardless of its position in the authorized terminal batch.",
+  "actual": "The named target assertion failed because exact_inverse_binomial_rate did not exist."
+}

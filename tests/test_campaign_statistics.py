@@ -9,12 +9,14 @@ import math
 import importlib
 
 import pytest
-from scipy.stats import binomtest
+from scipy.stats import binomtest, nbinom
 
 from bp_registry.campaigns.contracts import (
     AssessmentFamilyV1,
     CampaignAssessmentV1,
+    ExactInverseBinomialIntervalV1,
     ExactIntervalV1,
+    FailureCountStoppingV1,
     FiniteLookStoppingV1,
     LookAlphaAllocationV1,
     OutcomeMatrixV1,
@@ -42,6 +44,160 @@ def _target_interval_decision(*args: object, **kwargs: object) -> object:
     api = _statistics_api()
     assert api is not None, "campaign statistics module must provide target decisions"
     return api.target_interval_decision(*args, **kwargs)
+
+
+def _exact_inverse_binomial_rate(*args: object, **kwargs: object) -> object:
+    api = _statistics_api()
+    assert api is not None and hasattr(api, "exact_inverse_binomial_rate"), (
+        "campaign statistics module must provide exact inverse-binomial rates"
+    )
+    return api.exact_inverse_binomial_rate(*args, **kwargs)
+
+
+def _failure_count_stopping(
+    *,
+    target_failures: int = 2,
+    terminal_failure_ordinal: int = 8,
+    batch_size: int = 5,
+    tail: tuple[int, ...] = (9, 10),
+) -> FailureCountStoppingV1:
+    return FailureCountStoppingV1(
+        mode="failure_count",
+        target_failures=target_failures,
+        batch_size=batch_size,
+        shot_order="campaign_cohort_point_sample_ordinal_v1",
+        failure_event="decoder_logical_failure_v1",
+        terminal_batch_authorization_sha256="c" * 64,
+        cap_authorization_sha256="d" * 64,
+        terminal_state="target_reached",
+        terminal_failure_ordinal=terminal_failure_ordinal,
+        cumulative_failures_before_terminal=target_failures - 1,
+        cumulative_failures_at_terminal=target_failures,
+        authorized_tail_ordinals=tail,
+    )
+
+
+def _inverse_interval(
+    stopping: FailureCountStoppingV1,
+    *,
+    alpha: float = 0.05,
+    prefix_hash: str = "e" * 64,
+    tail_hash: str = "f" * 64,
+) -> ExactInverseBinomialIntervalV1:
+    assert stopping.terminal_failure_ordinal is not None
+    return ExactInverseBinomialIntervalV1(
+        method="exact_inverse_binomial",
+        confidence_level=1.0 - alpha,
+        stopping_event="decoder_logical_failure_v1",
+        target_failures=stopping.target_failures,
+        inferential_trials=stopping.terminal_failure_ordinal,
+        inferential_prefix_sha256=prefix_hash,
+        authorized_tail_count=len(stopping.authorized_tail_ordinals),
+        authorized_tail_sha256=tail_hash,
+    )
+
+
+@pytest.mark.parametrize(
+    ("terminal_failure_ordinal", "tail"),
+    ((6, (7, 8, 9, 10)), (8, (9, 10)), (10, ())),
+)
+def test_inverse_binomial_uses_exact_ordered_target_failure_not_terminal_batch(
+    terminal_failure_ordinal: int, tail: tuple[int, ...],
+) -> None:
+    """The target-th failure fixes T_r whether it is first, middle, or last."""
+    stopping = _failure_count_stopping(
+        terminal_failure_ordinal=terminal_failure_ordinal,
+        tail=tail,
+    )
+    result = _exact_inverse_binomial_rate(
+        stopping=stopping,
+        interval_spec=_inverse_interval(stopping),
+        total_completed_shots=10,
+        count_receipt_sha256=_HASH,
+    )
+    assert result.stopping_shot_ordinal == terminal_failure_ordinal
+    assert result.inferential_trials == terminal_failure_ordinal
+    assert result.nonfailures == terminal_failure_ordinal - 2
+    assert result.total_completed_shots == 10
+    assert result.authorized_tail_count == len(tail)
+    assert result.estimate == pytest.approx(2 / terminal_failure_ordinal)
+
+
+def test_inverse_binomial_inverts_ordered_stopping_tails_and_excludes_tail() -> None:
+    stopping = _failure_count_stopping()
+    baseline = _exact_inverse_binomial_rate(
+        stopping=stopping,
+        interval_spec=_inverse_interval(stopping, tail_hash="1" * 64),
+        total_completed_shots=10,
+        count_receipt_sha256=_HASH,
+    )
+    changed_tail = _exact_inverse_binomial_rate(
+        stopping=stopping,
+        interval_spec=_inverse_interval(stopping, tail_hash="2" * 64),
+        total_completed_shots=10,
+        count_receipt_sha256="b" * 64,
+    )
+    failures_before_stop = stopping.terminal_failure_ordinal - stopping.target_failures
+    assert nbinom.cdf(failures_before_stop, 2, baseline.interval[0]) == pytest.approx(
+        baseline.alpha / 2.0, abs=1e-10,
+    )
+    assert nbinom.sf(failures_before_stop - 1, 2, baseline.interval[1]) == pytest.approx(
+        baseline.alpha / 2.0, abs=1e-10,
+    )
+    assert baseline.interval == pytest.approx(changed_tail.interval)
+    assert baseline.estimate == changed_tail.estimate
+    assert baseline.authorized_tail_sha256 != changed_tail.authorized_tail_sha256
+    assert baseline.count_receipt_sha256 != changed_tail.count_receipt_sha256
+
+
+def test_inverse_binomial_rejects_censored_short_and_inconsistent_evidence() -> None:
+    stopping = _failure_count_stopping()
+    interval = _inverse_interval(stopping)
+    with pytest.raises(ValueError, match="total_completed_shots"):
+        _exact_inverse_binomial_rate(
+            stopping=stopping, interval_spec=interval,
+            total_completed_shots=9, count_receipt_sha256=_HASH,
+        )
+    with pytest.raises(ValueError, match="inferential_trials"):
+        _exact_inverse_binomial_rate(
+            stopping=stopping,
+            interval_spec=interval.model_copy(update={"inferential_trials": 10}),
+            total_completed_shots=10,
+            count_receipt_sha256=_HASH,
+        )
+    censored = FailureCountStoppingV1(
+        mode="failure_count", target_failures=2, batch_size=5,
+        shot_order="campaign_cohort_point_sample_ordinal_v1",
+        failure_event="decoder_logical_failure_v1",
+        terminal_batch_authorization_sha256="c" * 64,
+        cap_authorization_sha256="d" * 64,
+        terminal_state="cap_censored",
+        cumulative_failures_at_terminal=1,
+    )
+    with pytest.raises(ValueError, match="target_reached"):
+        _exact_inverse_binomial_rate(
+            stopping=censored, interval_spec=interval,
+            total_completed_shots=5, count_receipt_sha256=_HASH,
+        )
+
+
+def test_inverse_binomial_boundary_and_representative_intervals_are_finite() -> None:
+    first = _failure_count_stopping(
+        target_failures=1, terminal_failure_ordinal=1, batch_size=1, tail=(),
+    )
+    representative = _failure_count_stopping(
+        target_failures=100, terminal_failure_ordinal=250, batch_size=10,
+        tail=(),
+    )
+    for stopping in (first, representative):
+        result = _exact_inverse_binomial_rate(
+            stopping=stopping,
+            interval_spec=_inverse_interval(stopping),
+            total_completed_shots=stopping.terminal_failure_ordinal or 1,
+            count_receipt_sha256=_HASH,
+        )
+        assert 0.0 <= result.interval[0] <= result.interval[1] <= 1.0
+        assert all(math.isfinite(bound) for bound in result.interval)
 
 
 @pytest.mark.parametrize("shots", range(1, 8))
