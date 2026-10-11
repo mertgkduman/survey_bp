@@ -1,0 +1,8 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_contracts.py -k 'campaign or identity or resource or drift or strict' -x",
+  "exit_code": 1,
+  "failing_test": "tests/test_campaign_contracts.py::test_campaign_assessment_is_strict_and_digest_bound",
+  "expected_result": "CampaignAssessmentV1 must provide strict, digest-bound assessment preflight.",
+  "actual_result": "ImportError: cannot import name 'CampaignAssessmentV1' from bp_registry.campaigns.contracts",
+  "intentional": true
+}
