@@ -564,7 +564,10 @@ def _report_inputs(*, statuses: dict[tuple[int, str], str] | None = None):
         ),
         outcome_matrix=_finite_assessment().outcome_matrix,
         decision_rule="target_interval_containment_v1",
-        resources=_finite_assessment().resources,
+        resources=ScientificResourceCapsV1(
+            max_shots=2, max_looks=1, max_batch_size=2, max_decoder_work=100,
+            max_events=100, max_evidence_bytes=10_000, max_storage_bytes=10_000,
+        ),
     )
     hashes = {
         "campaign": plan.campaign_spec_digest, "plan": plan.campaign_plan_digest,
@@ -581,7 +584,7 @@ def test_report_reconstructs_from_merged_terminals_and_replays_byte_stably() -> 
     report = api.reconstruct_campaign_report(
         plan=plan, assessment=assessment, merge_receipt=merged,
         input_receipt_hashes=hashes, source_denominator_required_by_target={"p050": True},
-        source_denominators={"p050": 100},
+        source_denominators={"p050": 100}, target_arm_ids={"p050": "first"},
     )
     assert report.status == "complete"
     assert report.point_reports[0].all_shot.failures == 2
@@ -590,7 +593,7 @@ def test_report_reconstructs_from_merged_terminals_and_replays_byte_stably() -> 
     assert api.verify_campaign_report(
         report=report, plan=plan, assessment=assessment, merge_receipt=merged,
         input_receipt_hashes=hashes, source_denominator_required_by_target={"p050": True},
-        source_denominators={"p050": 100},
+        source_denominators={"p050": 100}, target_arm_ids={"p050": "first"},
     ) is True
 
 
@@ -600,7 +603,7 @@ def test_report_rejects_tampered_merged_evidence_target_or_receipt(mutation: str
     plan, assessment, merged, hashes = _report_inputs()
     report = api.reconstruct_campaign_report(
         plan=plan, assessment=assessment, merge_receipt=merged,
-        input_receipt_hashes=hashes,
+        input_receipt_hashes=hashes, target_arm_ids={"p050": "first"},
     )
     if mutation == "terminal":
         merged["terminal_facts"][0]["outcome"] = "timeout"
@@ -614,7 +617,7 @@ def test_report_rejects_tampered_merged_evidence_target_or_receipt(mutation: str
     with pytest.raises(ValueError):
         api.verify_campaign_report(
             report=report, plan=plan, assessment=assessment, merge_receipt=merged,
-            input_receipt_hashes=hashes,
+            input_receipt_hashes=hashes, target_arm_ids={"p050": "first"},
         )
 
 
@@ -624,7 +627,7 @@ def test_report_marks_missing_source_denominator_inconclusive() -> None:
     report = api.reconstruct_campaign_report(
         plan=plan, assessment=assessment, merge_receipt=merged,
         input_receipt_hashes=hashes, source_denominator_required_by_target={"p050": True},
-        source_denominators={"p050": None},
+        source_denominators={"p050": None}, target_arm_ids={"p050": "first"},
     )
     assert report.status == "inconclusive"
     assert report.verdicts["p050"].reason == "missing_required_source_denominator"
