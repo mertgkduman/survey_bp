@@ -565,7 +565,7 @@ Plans:
 
 **Research focus:** Final CSS paper/code/rate grid, faithful parameter extraction, meaningful ablation design, precision/power, and cost calibration.
 **Scope carry-forward:** Reconsider memory/Relay comparisons alongside other CSS policies only after Phase 8 campaign rules are ready. Size a focused comparison from its scientific question and available compute; do not inherit the cancelled Phase 4 448-shot/14-arm grid by default.
-**Plans:** 6/19 complete
+**Plans:** 7/19 complete
 
 **Wave 1**
 
@@ -581,7 +581,7 @@ Plans:
 **Wave 3** *(blocked on Wave 2 completion)*
 
 - [x] 09-03-PLAN.md
-- [ ] 09-16-PLAN.md
+- [x] 09-16-PLAN.md
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
