@@ -44,6 +44,9 @@ _MISSING_WORK_DIMENSIONS = (
     "candidate_work", "fallback_work", "runtime", "cpu", "memory", "shard_bytes",
     "parallel_allocation",
 )
+_THREAD_ENVIRONMENT = frozenset({
+    "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS",
+})
 
 
 def _sha256(value: object, *, name: str) -> str:
@@ -220,8 +223,39 @@ def _work_and_resources(
     supplied_observations = observations or {}
     if not isinstance(supplied_observations, Mapping) or set(supplied_observations) - allowed_observations:
         raise ValueError("report observations must use the allowlisted operational fields")
-    for name in supplied_observations:
-        unavailable.pop(name, None)
+    environment = supplied_observations.get("environment")
+    if environment is not None:
+        if not isinstance(environment, Mapping) or set(environment) - _THREAD_ENVIRONMENT or any(
+            not isinstance(value, str) or not value.isdecimal() or int(value) < 1
+            for value in environment.values()
+        ):
+            raise ValueError("environment observations must use allowlisted positive thread settings")
+    timing = supplied_observations.get("timing")
+    if timing is not None:
+        if not isinstance(timing, Mapping) or set(timing) - {"wall_time_ns", "cpu_time_ns"} or any(
+            type(value) is not int or value < 0 for value in timing.values()
+        ):
+            raise ValueError("timing observations must contain allowlisted nonnegative measurements")
+        if "wall_time_ns" in timing:
+            unavailable.pop("runtime", None)
+        if "cpu_time_ns" in timing:
+            unavailable.pop("cpu", None)
+    resources = supplied_observations.get("resources")
+    if resources is not None:
+        resource_names = {"cpu_time_ns": "cpu", "memory_bytes": "memory", "shard_bytes": "shard_bytes"}
+        if not isinstance(resources, Mapping) or set(resources) - set(resource_names) or any(
+            type(value) is not int or value < 0 for value in resources.values()
+        ):
+            raise ValueError("resource observations must contain allowlisted nonnegative measurements")
+        for name in resources:
+            unavailable.pop(resource_names[name], None)
+    allocation = supplied_observations.get("parallel_allocation")
+    if allocation is not None:
+        if not isinstance(allocation, Mapping) or set(allocation) - {"workers", "tasks"} or any(
+            type(value) is not int or value < 1 for value in allocation.values()
+        ):
+            raise ValueError("parallel allocation must contain allowlisted positive measurements")
+        unavailable.pop("parallel_allocation", None)
     return WorkAndResourceReportV1(
         work_vectors=tuple(vectors), unavailable=tuple(sorted(unavailable.items())),
         observations=tuple(sorted((str(name), value) for name, value in supplied_observations.items())),
