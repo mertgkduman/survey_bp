@@ -232,7 +232,7 @@ def test_failure_count_stopping_binds_ordered_prefix_tail_and_censoring():
     assert FailureCountStoppingV1.model_validate(censored).terminal_state == "cap_censored"
 
 
-def test_failure_count_assessment_requires_inverse_binomial_and_multiplicative_rule():
+def test_failure_count_assessment_rejects_legacy_terminal_observations():
     from bp_registry.campaigns import contracts
 
     assert hasattr(contracts, "ExactInverseBinomialIntervalV1"), "inverse-binomial intervals must be explicit"
@@ -240,21 +240,8 @@ def test_failure_count_assessment_requires_inverse_binomial_and_multiplicative_r
     CampaignAssessmentV1 = contracts.CampaignAssessmentV1
 
     payload = _failure_count_payload()
-    assessment = CampaignAssessmentV1.model_validate(payload)
-    assert assessment.interval.method == "exact_inverse_binomial"
-    assert assessment.interval.inferential_trials == assessment.stopping.terminal_failure_ordinal
-    assert assessment.interval.authorized_tail_count == len(assessment.stopping.authorized_tail_ordinals)
-    assert assessment.decision_rule.factor == 1.5
-
-    tail_as_trials = copy.deepcopy(payload)
-    tail_as_trials["interval"]["inferential_trials"] = 120
-    with pytest.raises(ValidationError):
-        CampaignAssessmentV1.model_validate(tail_as_trials)
-
-    bad_factor = copy.deepcopy(payload)
-    bad_factor["decision_rule"]["factor"] = 1.0
-    with pytest.raises(ValidationError):
-        CampaignAssessmentV1.model_validate(bad_factor)
+    with pytest.raises(ValidationError, match="parser-only"):
+        CampaignAssessmentV1.model_validate(payload)
 
     fixed_with_inverse = _assessment_payload()
     fixed_with_inverse["interval"] = payload["interval"]
@@ -271,18 +258,6 @@ def test_failure_count_assessment_requires_inverse_binomial_and_multiplicative_r
     with pytest.raises(ValidationError):
         CampaignAssessmentV1.model_validate(finite_with_inverse)
 
-    censored = copy.deepcopy(payload)
-    censored["stopping"].update(
-        {
-            "terminal_state": "cap_censored",
-            "terminal_failure_ordinal": None,
-            "cumulative_failures_before_terminal": None,
-            "cumulative_failures_at_terminal": 99,
-            "authorized_tail_ordinals": [],
-        }
-    )
-    censored["interval"] = None
-    assert CampaignAssessmentV1.model_validate(censored).interval is None
 
 
 def test_outcome_denominator_matrix_is_total_and_interruption_stays_partial():

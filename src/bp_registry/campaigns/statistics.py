@@ -18,6 +18,8 @@ from scipy.stats import binomtest, nbinom
 from .contracts import (
     CampaignAssessmentV1,
     ExactInverseBinomialIntervalV1,
+    FailureCountPolicyV1,
+    FailureCountTerminalReceiptV1,
     FiniteLookStoppingV1,
     FailureCountStoppingV1,
     MultiplicativeTargetRuleV1,
@@ -254,19 +256,85 @@ def _negative_binomial_root(
     return (lower + upper) / 2.0
 
 
+def _inverse_binomial_rate_from_terminal(
+    *,
+    target_failures: int,
+    terminal_failure_ordinal: int,
+    total_completed_shots: int,
+    authorized_tail_ordinals: Sequence[int],
+    confidence_level: float,
+    inferential_prefix_sha256: str,
+    authorized_tail_sha256: str,
+    count_receipt_sha256: str,
+) -> ExactInverseBinomialRateV1:
+    """Perform numerical inversion only after a caller validates evidence."""
+    terminal = _bounded_int(
+        terminal_failure_ordinal, name="terminal_failure_ordinal", minimum=target_failures,
+    )
+    completed = _bounded_int(total_completed_shots, name="total_completed_shots", minimum=terminal)
+    tail_count = len(authorised_tail := tuple(authorized_tail_ordinals))
+    if completed != terminal + tail_count:
+        raise ValueError("total_completed_shots must equal T_r plus the authorized tail count")
+    alpha = _probability(float(1.0 - confidence_level), name="alpha")
+    prefix = _sha256(inferential_prefix_sha256, name="inferential_prefix_sha256")
+    tail = _sha256(authorized_tail_sha256, name="authorized_tail_sha256")
+    receipt = _sha256(count_receipt_sha256, name="count_receipt_sha256")
+    nonfailures = terminal - target_failures
+    lower = _negative_binomial_root(
+        tail="cdf", nonfailures=nonfailures, target_failures=target_failures,
+        target_probability=alpha / 2.0,
+    )
+    upper = 1.0 if nonfailures == 0 else _negative_binomial_root(
+        tail="sf", nonfailures=nonfailures, target_failures=target_failures,
+        target_probability=alpha / 2.0,
+    )
+    if not (math.isfinite(lower) and math.isfinite(upper) and 0.0 <= lower <= upper <= 1.0):
+        raise ValueError("negative-binomial inversion produced an invalid interval")
+    return ExactInverseBinomialRateV1(
+        target_failures=target_failures, stopping_shot_ordinal=terminal,
+        inferential_trials=terminal, nonfailures=nonfailures,
+        total_completed_shots=completed, authorized_tail_count=tail_count,
+        authorized_tail_sha256=tail, estimate=target_failures / terminal,
+        alpha=alpha, confidence_level=confidence_level,
+        method="exact_inverse_binomial", sidedness="two_sided", interval=(lower, upper),
+        inferential_prefix_sha256=prefix, count_receipt_sha256=receipt,
+    )
+
+
 def exact_inverse_binomial_rate(
     *,
-    stopping: FailureCountStoppingV1,
-    interval_spec: ExactInverseBinomialIntervalV1,
-    total_completed_shots: int,
-    count_receipt_sha256: str,
+    policy: FailureCountPolicyV1 | None = None,
+    terminal_receipt: FailureCountTerminalReceiptV1 | None = None,
+    stopping: FailureCountStoppingV1 | None = None,
+    interval_spec: ExactInverseBinomialIntervalV1 | None = None,
+    total_completed_shots: int | None = None,
+    count_receipt_sha256: str | None = None,
 ) -> ExactInverseBinomialRateV1:
     """Invert the completed target-th-failure stopping distribution exactly.
 
-    The function accepts only a target-reached, order-validated stopping
-    record.  It therefore cannot reinterpret a cap-censored result or append
-    later authorized terminal-batch shots to ``T_r``.
+    New callers must provide separate prospective policy and sealed terminal
+    receipt.  The legacy arguments remain readable for pre-existing retained
+    evidence, but cannot manufacture a prospective campaign identity.
     """
+    if policy is not None or terminal_receipt is not None:
+        if not isinstance(policy, FailureCountPolicyV1) or not isinstance(terminal_receipt, FailureCountTerminalReceiptV1):
+            raise ValueError("inverse-binomial inference requires policy and terminal receipt together")
+        terminal_receipt.validate_against(policy)
+        if terminal_receipt.terminal_state != "target_reached":
+            raise ValueError("inverse-binomial inference requires target_reached terminal evidence")
+        assert terminal_receipt.terminal_failure_ordinal is not None
+        assert terminal_receipt.inferential_prefix_sha256 is not None
+        assert terminal_receipt.authorized_tail_sha256 is not None
+        return _inverse_binomial_rate_from_terminal(
+            target_failures=policy.target_failures,
+            terminal_failure_ordinal=terminal_receipt.terminal_failure_ordinal,
+            total_completed_shots=terminal_receipt.total_completed_shots,
+            authorized_tail_ordinals=terminal_receipt.authorized_tail_ordinals,
+            confidence_level=policy.procedure.confidence_level,
+            inferential_prefix_sha256=terminal_receipt.inferential_prefix_sha256,
+            authorized_tail_sha256=terminal_receipt.authorized_tail_sha256,
+            count_receipt_sha256=terminal_receipt.digest(),
+        )
     if not isinstance(stopping, FailureCountStoppingV1):
         raise ValueError("stopping must be a FailureCountStoppingV1")
     if not isinstance(interval_spec, ExactInverseBinomialIntervalV1):
@@ -289,45 +357,17 @@ def exact_inverse_binomial_rate(
     tail_count = len(stopping.authorized_tail_ordinals)
     if interval_spec.authorized_tail_count != tail_count:
         raise ValueError("interval_spec authorized_tail_count differs from stopping record")
-    completed = _bounded_int(total_completed_shots, name="total_completed_shots", minimum=terminal)
-    if completed != terminal + tail_count:
-        raise ValueError("total_completed_shots must equal T_r plus the authorized tail count")
-    alpha = 1.0 - interval_spec.confidence_level
-    alpha = _probability(float(alpha), name="alpha")
-    prefix = _sha256(interval_spec.inferential_prefix_sha256, name="inferential_prefix_sha256")
-    tail = _sha256(interval_spec.authorized_tail_sha256, name="authorized_tail_sha256")
-    receipt = _sha256(count_receipt_sha256, name="count_receipt_sha256")
-    nonfailures = terminal - stopping.target_failures
-    lower = _negative_binomial_root(
-        tail="cdf",
-        nonfailures=nonfailures,
+    if total_completed_shots is None or count_receipt_sha256 is None:
+        raise ValueError("legacy inverse-binomial inference requires completed-shot receipt facts")
+    return _inverse_binomial_rate_from_terminal(
         target_failures=stopping.target_failures,
-        target_probability=alpha / 2.0,
-    )
-    upper = 1.0 if nonfailures == 0 else _negative_binomial_root(
-        tail="sf",
-        nonfailures=nonfailures,
-        target_failures=stopping.target_failures,
-        target_probability=alpha / 2.0,
-    )
-    if not (math.isfinite(lower) and math.isfinite(upper) and 0.0 <= lower <= upper <= 1.0):
-        raise ValueError("negative-binomial inversion produced an invalid interval")
-    return ExactInverseBinomialRateV1(
-        target_failures=stopping.target_failures,
-        stopping_shot_ordinal=terminal,
-        inferential_trials=terminal,
-        nonfailures=nonfailures,
-        total_completed_shots=completed,
-        authorized_tail_count=tail_count,
-        authorized_tail_sha256=tail,
-        estimate=stopping.target_failures / terminal,
-        alpha=alpha,
+        terminal_failure_ordinal=terminal,
+        total_completed_shots=total_completed_shots,
+        authorized_tail_ordinals=stopping.authorized_tail_ordinals,
         confidence_level=interval_spec.confidence_level,
-        method="exact_inverse_binomial",
-        sidedness="two_sided",
-        interval=(lower, upper),
-        inferential_prefix_sha256=prefix,
-        count_receipt_sha256=receipt,
+        inferential_prefix_sha256=interval_spec.inferential_prefix_sha256,
+        authorized_tail_sha256=interval_spec.authorized_tail_sha256,
+        count_receipt_sha256=count_receipt_sha256,
     )
 
 

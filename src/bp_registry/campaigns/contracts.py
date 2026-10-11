@@ -558,9 +558,9 @@ class CampaignAssessmentV1(StrictModel):
 
     schema_name: Literal["campaign_assessment_v1"] = Field(alias="schema", serialization_alias="schema")
     targets: tuple[TargetReferenceV1, ...] = Field(min_length=1, max_length=1_000)
-    interval: ExactIntervalV1 | ExactInverseBinomialIntervalV1 | None
+    interval: ExactIntervalV1 | ExactInverseBinomialIntervalV1 | InverseBinomialProcedureV1 | None
     families: tuple[AssessmentFamilyV1, ...] = Field(min_length=1, max_length=1_000)
-    stopping: FixedShotStoppingV1 | FiniteLookStoppingV1 | FailureCountStoppingV1
+    stopping: FixedShotStoppingV1 | FiniteLookStoppingV1 | FailureCountStoppingV1 | FailureCountPolicyV1
     outcome_matrix: OutcomeMatrixV1
     decision_rule: Literal["target_interval_containment_v1"] | MultiplicativeTargetRuleV1
     resources: ScientificResourceCapsV1
@@ -605,24 +605,23 @@ class CampaignAssessmentV1(StrictModel):
                     raise ValueError("finite-look alpha allocations cannot exceed their family alpha")
             if not isinstance(self.interval, ExactIntervalV1) or self.decision_rule != "target_interval_containment_v1":
                 raise ValueError("finite-look assessments require the historical exact interval and decision rule")
+        elif isinstance(self.stopping, FailureCountPolicyV1):
+            policy = self.stopping
+            if (self.resources.max_looks != 1 or self.resources.max_shots != policy.caps.max_shots
+                    or self.resources.max_batch_size < policy.batch_size
+                    or self.resources.max_decoder_work != policy.caps.max_decoder_work
+                    or self.resources.max_events != policy.caps.max_events
+                    or self.resources.max_evidence_bytes != policy.caps.max_evidence_bytes
+                    or self.resources.max_storage_bytes != policy.caps.max_storage_bytes):
+                raise ValueError("failure-count assessment resources must exactly bind prospective policy caps")
+            if self.interval is not None:
+                raise ValueError("failure-count procedure belongs only to the prospective policy")
+            if self.decision_rule != policy.multiplicative_rule:
+                raise ValueError("failure-count assessment rule must bind the prospective policy")
         else:
-            if (self.resources.max_looks != 1
-                    or self.resources.max_batch_size < self.stopping.batch_size
-                    or self.resources.max_shots < self.stopping.batch_size
-                    or self.resources.max_shots % self.stopping.batch_size):
-                raise ValueError("failure-count resources must authorize whole bounded batches and one terminal assessment")
-            if not isinstance(self.decision_rule, MultiplicativeTargetRuleV1):
-                raise ValueError("failure-count assessments require a multiplicative target rule")
-            if self.stopping.terminal_state == "target_reached":
-                if not isinstance(self.interval, ExactInverseBinomialIntervalV1):
-                    raise ValueError("target-reached failure-count assessments require an inverse-binomial interval")
-                if (self.interval.stopping_event != self.stopping.failure_event
-                        or self.interval.target_failures != self.stopping.target_failures
-                        or self.interval.inferential_trials != self.stopping.terminal_failure_ordinal
-                        or self.interval.authorized_tail_count != len(self.stopping.authorized_tail_ordinals)):
-                    raise ValueError("inverse-binomial interval must bind the exact failure prefix and separate terminal tail")
-            elif self.interval is not None:
-                raise ValueError("cap-censored failure-count evidence cannot request an inferential interval")
+            # The former mixed model remains available as a typed parser for
+            # retained receipt evidence, but cannot be frozen into a new plan.
+            raise ValueError("legacy mixed failure-count stopping is parser-only; use FailureCountPolicyV1")
         return self
 
     def primitive_bytes(self) -> bytes:
@@ -678,7 +677,7 @@ class CampaignSpecV1(StrictModel):
         if self.assessment is None:
             return self
         expected_final_look = 1 if isinstance(
-            self.assessment.stopping, (FixedShotStoppingV1, FailureCountStoppingV1),
+            self.assessment.stopping, (FixedShotStoppingV1, FailureCountPolicyV1),
         ) else len(self.assessment.stopping.cumulative_looks)
         if self.final_look != expected_final_look:
             raise ValueError("campaign final_look must equal the frozen assessment final look")
