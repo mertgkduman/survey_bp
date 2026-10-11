@@ -381,20 +381,25 @@ This call shape and `tie_bit` domain are verified; `parsed.vote` integration and
 | A3 | Bhatnagar digitization uncertainty can be conservatively represented by two-pass spread plus one curve-width/pixel allowance. | Target Extraction | Undercoverage if calibration or rendering error is larger. |
 | A4 | Proposed evidence and failure-count state names will fit existing serialization without migration conflicts. | Architecture | Planner may need different names or schema versioning after code inspection. |
 
-## Open Questions
+## Planning Dispositions for External Unknowns (RESOLVED)
+
+These questions are resolved for Phase 9 planning. The external facts remain unverified, and no disposition below asserts that they have been obtained.
 
 1. **Are author implementations and exact B1 experiment artifacts obtainable?**
    - What we know: all three current records say author implementation identity is unverified; local B1 logicals are project-derived. [VERIFIED: three PAPER.md records; data/artifacts/b1-panteleev-kalachev-v3.json:32-37]
    - What's unclear: repository/revision, ordered matrices, logical basis, and exact launch settings.
    - Recommendation: time-box direct author/source searches and emit typed unavailable/unverified receipts; do not block adaptation assessment.
+   - **RESOLVED planning disposition:** Require typed `identity_unverified`/unavailable native and source-artifact receipts. Continue only under a declared canonical-adaptation label, and permit later digest-bound source qualification without rewriting earlier evidence.
 2. **What exact tolerance supports the intended journal claim?**
    - What we know: source runs use about 100 observed failures but generally do not publish actual per-point shot denominators or source intervals. [CITED: the three primary paper revisions]
    - What's unclear: whether factor-1.5 equivalence is acceptable to the target venue.
    - Recommendation: use it for the bounded tracer only; freeze manuscript-scale margins after source denominators/author data and target-journal expectations are known.
+   - **RESOLVED planning disposition:** Freeze the factor-1.5 band for the bounded Yao `p=0.10` adaptation tracer only. It cannot establish source-faithful curve reproduction or journal-wide equivalence. Manuscript-scale margins await source denominators, author data, and venue criteria.
 3. **Which site ceilings permit a larger B1 campaign?**
    - What we know: Slurm tools are installed, but Phase 8 production authorization is denied because site ceilings/accounting were unobserved. [VERIFIED: environment probe; docs/campaigns.md:101-116]
    - What's unclear: permitted wall, CPU, RSS, storage, replay, and scheduler cost.
    - Recommendation: keep this as an authorization checkpoint, not a guessed planning constant.
+   - **RESOLVED planning disposition:** Publication-scale Slurm authorization remains denied. Only local/direct work within family-specific measured resource receipts may proceed; unknown ceilings remain typed unavailable facts.
 
 ## Environment Availability
 

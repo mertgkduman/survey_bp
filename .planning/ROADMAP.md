@@ -566,6 +566,41 @@ Plans:
 **Research focus:** Final CSS paper/code/rate grid, faithful parameter extraction, meaningful ablation design, precision/power, and cost calibration.
 **Scope carry-forward:** Reconsider memory/Relay comparisons alongside other CSS policies only after Phase 8 campaign rules are ready. Size a focused comparison from its scientific question and available compute; do not inherit the cancelled Phase 4 448-shot/14-arm grid by default.
 **Plans:** TBD
+**Wave 1**
+
+- [ ] 09-01-PLAN.md
+- [ ] 09-04-PLAN.md
+- [ ] 09-07-PLAN.md
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 09-02-PLAN.md
+- [ ] 09-05-PLAN.md
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 09-03-PLAN.md
+- [ ] 09-06-PLAN.md
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 09-08-PLAN.md
+- [ ] 09-09-PLAN.md
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
+- [ ] 09-10-PLAN.md
+- [ ] 09-11-PLAN.md
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
+- [ ] 09-12-PLAN.md
+- [ ] 09-13-PLAN.md
+- [ ] 09-14-PLAN.md
+
+**Wave 7** *(blocked on Wave 6 completion)*
+
+- [ ] 09-15-PLAN.md
 
 ### Phase 10: Correlated Quaternary Execution
 
@@ -708,7 +743,7 @@ Plans:
 | 6. Beam Search, Ensembles, and Candidate Selection | 9/9 | Complete    | 2026-10-05 |
 | 7. Optional Postprocessing | 6/15 | Paused by user; POST-01 qualification failed |  |
 | 8. Reproducible Campaigns and Statistical Assessment | 20/20 | Complete    | 2026-10-11 |
-| 9. CSS Reproduction and Controlled Comparisons | 0/TBD | Not started | - |
+| 9. CSS Reproduction and Controlled Comparisons | 0/15 | Planned    |  |
 | 10. Correlated Quaternary Execution | 16/16 | Complete    | 2026-10-08 |
 | 11. Quaternary Reproduction and Comparisons | 0/TBD | Not started | - |
 | 12. Circuit Models and Canonical Integration | 0/TBD | Not started | - |
