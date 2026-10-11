@@ -77,6 +77,24 @@ def canonical_serialized_event_size(event: Mapping[str, Any]) -> int:
     return len(_canonical_event_bytes(event)) + 1
 
 
+def canonical_event_template_bounds(events: Mapping[str, Mapping[str, Any]]) -> dict[str, int]:
+    """Measure a closed set of canonical event templates.
+
+    Resource profiles use this deliberately small primitive rather than a
+    guessed JSON allowance.  Every template passes the same event validator
+    and serializer used by :class:`CanonicalEventWriter`; the returned values
+    include the JSONL line-feed framing byte.
+    """
+    if not isinstance(events, Mapping) or not events:
+        raise ValueError("canonical event template bounds require a nonempty mapping")
+    measured: dict[str, int] = {}
+    for name, event in events.items():
+        if not isinstance(name, str) or not name or not isinstance(event, Mapping):
+            raise ValueError("canonical event templates require named event mappings")
+        measured[name] = canonical_serialized_event_size(event)
+    return measured
+
+
 def _key(run_id: str, shot_id: int) -> ShotKey:
     if not isinstance(run_id, str) or not run_id:
         raise ValueError("run_id must be a nonempty string")
