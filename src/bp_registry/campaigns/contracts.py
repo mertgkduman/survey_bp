@@ -253,6 +253,272 @@ class FailureCountStoppingV1(StrictModel):
         return self
 
 
+def _checked_product(left: int, right: int, *, name: str, maximum: int) -> int:
+    """Multiply nonnegative bounded integers without accepting an overflow."""
+    if type(left) is not int or type(right) is not int or left < 0 or right < 0:
+        raise ValueError(f"{name} operands must be nonnegative integers")
+    if left and right > maximum // left:
+        raise ValueError(f"{name} exceeds the executable checked-arithmetic bound")
+    return left * right
+
+
+class InverseBinomialProcedureV1(StrictModel):
+    """Inference procedure frozen before any failure-count work begins."""
+
+    method: Literal["exact_inverse_binomial"]
+    confidence_level: float
+    sidedness: Literal["two_sided"]
+
+    @field_validator("confidence_level")
+    @classmethod
+    def finite_confidence_level(cls, value: float) -> float:
+        return _finite_probability(value, name="confidence_level")
+
+
+class FailureCountCampaignCapsV1(StrictModel):
+    """Prospective finite caps; wall time is an observed-boundary authorization."""
+
+    max_shots: int = Field(ge=1, le=_MAX_EVENTS)
+    max_decoder_work: int = Field(ge=1, le=_MAX_DECODER_WORK)
+    max_events: int = Field(ge=1, le=_MAX_EVENTS)
+    max_evidence_bytes: int = Field(ge=1, le=_MAX_EVIDENCE_BYTES)
+    max_storage_bytes: int = Field(ge=1, le=_MAX_STORAGE_BYTES)
+    max_wall_seconds: float = Field(gt=0.0, le=86_400.0)
+
+    @field_validator("max_wall_seconds")
+    @classmethod
+    def finite_wall_cap(cls, value: float) -> float:
+        if not math.isfinite(value):
+            raise ValueError("max_wall_seconds must be finite")
+        return value
+
+
+class FailureCountExecutableLimitReceiptV1(StrictModel):
+    """Independently derived per-unit maxima for a prospective policy.
+
+    The derived fields are checked equations over validated manifest, decoder,
+    ledger, serializer, and artifact dimensions.  They are therefore evidence
+    of executable limits, not a second set of user-declared caps.
+    """
+
+    schema_name: Literal["failure_count_executable_limit_receipt_v1"] = Field(alias="schema", serialization_alias="schema")
+    derivation_version: Literal["v1"]
+    manifest_dimensions_sha256: str = Field(pattern=_SHA256)
+    policy_binding_sha256: str = Field(pattern=_SHA256)
+    serializer_sha256: str = Field(pattern=_SHA256)
+    artifact_layout_sha256: str = Field(pattern=_SHA256)
+    verifier_sha256: str = Field(pattern=_SHA256)
+    max_decoder_iterations: int = Field(ge=1, le=_MAX_EVENTS)
+    work_per_iteration: int = Field(ge=1, le=_MAX_DECODER_WORK)
+    max_ledger_events_per_unit: int = Field(ge=1, le=_MAX_EVENTS)
+    serializer_bytes_per_event: int = Field(ge=1, le=_MAX_EVIDENCE_BYTES)
+    artifact_storage_bytes_per_unit: int = Field(ge=0, le=_MAX_STORAGE_BYTES)
+    partial_receipt_reserve_bytes: int = Field(ge=1, le=_MAX_STORAGE_BYTES)
+    derived_work_per_unit: int = Field(ge=1, le=_MAX_DECODER_WORK)
+    derived_events_per_unit: int = Field(ge=1, le=_MAX_EVENTS)
+    derived_evidence_bytes_per_unit: int = Field(ge=1, le=_MAX_EVIDENCE_BYTES)
+    derived_storage_bytes_per_unit: int = Field(ge=1, le=_MAX_STORAGE_BYTES)
+
+    @model_validator(mode="after")
+    def derived_values_match_executable_dimensions(self) -> "FailureCountExecutableLimitReceiptV1":
+        work = _checked_product(
+            self.max_decoder_iterations, self.work_per_iteration,
+            name="derived work", maximum=_MAX_DECODER_WORK,
+        )
+        evidence_without_reserve = _checked_product(
+            self.max_ledger_events_per_unit, self.serializer_bytes_per_event,
+            name="derived evidence", maximum=_MAX_EVIDENCE_BYTES,
+        )
+        evidence = evidence_without_reserve + self.partial_receipt_reserve_bytes
+        storage = self.artifact_storage_bytes_per_unit + evidence
+        if evidence > _MAX_EVIDENCE_BYTES or storage > _MAX_STORAGE_BYTES:
+            raise ValueError("derived executable bytes exceed the supported bound")
+        if (self.derived_work_per_unit, self.derived_events_per_unit,
+                self.derived_evidence_bytes_per_unit, self.derived_storage_bytes_per_unit) != (
+                    work, self.max_ledger_events_per_unit, evidence, storage,
+                ):
+            raise ValueError("derived executable maxima must match validated dimensions")
+        return self
+
+    def primitive_bytes(self) -> bytes:
+        return canonical_json_bytes(self.model_dump(mode="json", by_alias=True))
+
+    def digest(self) -> str:
+        return _digest("bp-registry-failure-count-executable-limits-v1", self.primitive_bytes())
+
+
+class FailureCountBatchAuthorizationV1(StrictModel):
+    """Finite local authorization; timeout is enforced only at boundaries."""
+
+    schema_name: Literal["failure_count_batch_authorization_v1"] = Field(alias="schema", serialization_alias="schema")
+    executable_limit_receipt_sha256: str = Field(pattern=_SHA256)
+    policy_binding_sha256: str = Field(pattern=_SHA256)
+    max_local_workers: int = Field(ge=1, le=1_024)
+    max_shots_per_batch: int = Field(ge=1, le=_MAX_EVENTS)
+    max_work_per_batch: int = Field(ge=1, le=_MAX_DECODER_WORK)
+    max_events_per_batch: int = Field(ge=1, le=_MAX_EVENTS)
+    max_evidence_bytes_per_batch: int = Field(ge=1, le=_MAX_EVIDENCE_BYTES)
+    max_storage_bytes_per_batch: int = Field(ge=1, le=_MAX_STORAGE_BYTES)
+    monotonic_clock: Literal["monotonic_ns_v1"]
+    per_unit_timeout_ns: int = Field(ge=1, le=86_400 * 1_000_000_000)
+
+    def primitive_bytes(self) -> bytes:
+        return canonical_json_bytes(self.model_dump(mode="json", by_alias=True))
+
+    def digest(self) -> str:
+        return _digest("bp-registry-failure-count-batch-authorization-v1", self.primitive_bytes())
+
+
+class FailureCountPolicyV1(StrictModel):
+    """Outcome-independent identity for a bounded failure-count campaign."""
+
+    schema_name: Literal["failure_count_policy_v1"] = Field(alias="schema", serialization_alias="schema")
+    policy_binding_sha256: str = Field(pattern=_SHA256)
+    campaign_plan_sha256: str = Field(pattern=_SHA256)
+    target_failures: int = Field(ge=1, le=_MAX_EVENTS)
+    batch_size: int = Field(ge=1, le=_MAX_EVENTS)
+    shot_order: Literal["campaign_cohort_point_sample_ordinal_v1"]
+    failure_event: Literal["decoder_logical_failure_v1"]
+    procedure: InverseBinomialProcedureV1
+    multiplicative_rule: MultiplicativeTargetRuleV1
+    caps: FailureCountCampaignCapsV1
+    cap_precedence: tuple[Literal["wall", "storage", "evidence", "events", "work", "shots"], ...] = Field(min_length=6, max_length=6)
+    executable_limits: FailureCountExecutableLimitReceiptV1
+    batch_authorization: FailureCountBatchAuthorizationV1
+
+    @field_validator("cap_precedence", mode="before")
+    @classmethod
+    def tuple_cap_precedence(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @model_validator(mode="after")
+    def independently_authorized_bounds(self) -> "FailureCountPolicyV1":
+        if set(self.cap_precedence) != {"wall", "storage", "evidence", "events", "work", "shots"}:
+            raise ValueError("cap precedence must contain each finite cap exactly once")
+        if self.caps.max_shots < self.batch_size or self.caps.max_shots % self.batch_size:
+            raise ValueError("failure-count shot cap must contain whole authorized batches")
+        limits = self.executable_limits
+        authorization = self.batch_authorization
+        if limits.policy_binding_sha256 != self.policy_binding_sha256:
+            raise ValueError("executable limits bind a different prospective policy")
+        if (authorization.policy_binding_sha256 != self.policy_binding_sha256
+                or authorization.executable_limit_receipt_sha256 != limits.digest()):
+            raise ValueError("batch authorization does not bind the verified executable limits")
+        batch = authorization.max_shots_per_batch
+        expected_work = _checked_product(limits.derived_work_per_unit, batch, name="batch work", maximum=_MAX_DECODER_WORK)
+        expected_events = _checked_product(limits.derived_events_per_unit, batch, name="batch events", maximum=_MAX_EVENTS)
+        expected_evidence = _checked_product(limits.derived_evidence_bytes_per_unit, batch, name="batch evidence", maximum=_MAX_EVIDENCE_BYTES) + limits.partial_receipt_reserve_bytes
+        expected_storage = _checked_product(limits.derived_storage_bytes_per_unit, batch, name="batch storage", maximum=_MAX_STORAGE_BYTES) + limits.partial_receipt_reserve_bytes
+        if expected_evidence > _MAX_EVIDENCE_BYTES or expected_storage > _MAX_STORAGE_BYTES:
+            raise ValueError("batch authorization cannot represent the derived receipt reserve")
+        if (authorization.max_shots_per_batch < self.batch_size
+                or authorization.max_work_per_batch < expected_work
+                or authorization.max_events_per_batch < expected_events
+                or authorization.max_evidence_bytes_per_batch < expected_evidence
+                or authorization.max_storage_bytes_per_batch < expected_storage):
+            raise ValueError("batch authorization is below a derived executable maximum")
+        shots = self.caps.max_shots
+        campaign_work = _checked_product(limits.derived_work_per_unit, shots, name="campaign work", maximum=_MAX_DECODER_WORK)
+        campaign_events = _checked_product(limits.derived_events_per_unit, shots, name="campaign events", maximum=_MAX_EVENTS)
+        campaign_evidence = _checked_product(limits.derived_evidence_bytes_per_unit, shots, name="campaign evidence", maximum=_MAX_EVIDENCE_BYTES) + limits.partial_receipt_reserve_bytes
+        campaign_storage = _checked_product(limits.derived_storage_bytes_per_unit, shots, name="campaign storage", maximum=_MAX_STORAGE_BYTES) + limits.partial_receipt_reserve_bytes
+        if campaign_evidence > _MAX_EVIDENCE_BYTES or campaign_storage > _MAX_STORAGE_BYTES:
+            raise ValueError("campaign caps cannot represent the derived receipt reserve")
+        if (self.caps.max_decoder_work < campaign_work or self.caps.max_events < campaign_events
+                or self.caps.max_evidence_bytes < campaign_evidence or self.caps.max_storage_bytes < campaign_storage):
+            raise ValueError("campaign cap is below an independently derived executable maximum")
+        return self
+
+    def primitive_bytes(self) -> bytes:
+        return canonical_json_bytes(self.model_dump(mode="json", by_alias=True))
+
+    def digest(self) -> str:
+        return _digest("bp-registry-failure-count-policy-v1", self.primitive_bytes())
+
+
+class FailureCountTerminalReceiptV1(StrictModel):
+    """Sealed observed terminal facts; this type is forbidden from plans."""
+
+    schema_name: Literal["failure_count_terminal_receipt_v1"] = Field(alias="schema", serialization_alias="schema")
+    policy_sha256: str = Field(pattern=_SHA256)
+    campaign_plan_sha256: str = Field(pattern=_SHA256)
+    executable_limit_receipt_sha256: str = Field(pattern=_SHA256)
+    batch_authorization_sha256: str = Field(pattern=_SHA256)
+    terminal_state: Literal["target_reached", "cap_censored"]
+    terminal_failure_ordinal: int | None = Field(default=None, ge=1, le=_MAX_EVENTS)
+    cumulative_failures: int = Field(ge=0, le=_MAX_EVENTS)
+    total_completed_shots: int = Field(ge=1, le=_MAX_EVENTS)
+    inferential_prefix_sha256: str | None = Field(default=None, pattern=_SHA256)
+    authorized_tail_ordinals: tuple[int, ...] = Field(default=(), max_length=_MAX_EVENTS)
+    authorized_tail_sha256: str | None = Field(default=None, pattern=_SHA256)
+    first_exhausted_cap: Literal["wall", "storage", "evidence", "events", "work", "shots"] | None = None
+    realized_decoder_work: int = Field(ge=0, le=_MAX_DECODER_WORK)
+    realized_events: int = Field(ge=0, le=_MAX_EVENTS)
+    realized_evidence_bytes: int = Field(ge=0, le=_MAX_EVIDENCE_BYTES)
+    realized_storage_bytes: int = Field(ge=0, le=_MAX_STORAGE_BYTES)
+    wall_boundaries: tuple[tuple[int, int, int], ...] = Field(min_length=1, max_length=_MAX_EVENTS)
+
+    @field_validator("authorized_tail_ordinals", "wall_boundaries", mode="before")
+    @classmethod
+    def tuple_observed_values(cls, value: Any) -> Any:
+        return tuple(tuple(item) if isinstance(item, list) else item for item in value) if isinstance(value, list) else value
+
+    @model_validator(mode="after")
+    def sealed_terminal_shape(self) -> "FailureCountTerminalReceiptV1":
+        for deadline, observed, overshoot in self.wall_boundaries:
+            if deadline < 0 or observed < deadline or overshoot != observed - deadline:
+                raise ValueError("wall boundary observations must expose nonnegative overshoot")
+        if self.terminal_state == "target_reached":
+            if (self.terminal_failure_ordinal is None or self.cumulative_failures < 1
+                    or self.inferential_prefix_sha256 is None or self.authorized_tail_sha256 is None
+                    or self.first_exhausted_cap is not None):
+                raise ValueError("target receipt requires exact observed prefix and tail facts")
+            if self.terminal_failure_ordinal > self.total_completed_shots:
+                raise ValueError("target terminal ordinal cannot exceed completed shots")
+            if (tuple(sorted(self.authorized_tail_ordinals)) != self.authorized_tail_ordinals
+                    or any(item <= self.terminal_failure_ordinal for item in self.authorized_tail_ordinals)
+                    or self.total_completed_shots != self.terminal_failure_ordinal + len(self.authorized_tail_ordinals)):
+                raise ValueError("target receipt tail must be the later completed terminal-batch evidence")
+        elif (self.terminal_failure_ordinal is not None or self.inferential_prefix_sha256 is not None
+              or self.authorized_tail_ordinals or self.authorized_tail_sha256 is not None
+              or self.first_exhausted_cap is None):
+            raise ValueError("cap-censored receipt cannot claim inference and must name an exhausted cap")
+        return self
+
+    def primitive_bytes(self) -> bytes:
+        return canonical_json_bytes(self.model_dump(mode="json", by_alias=True))
+
+    def digest(self) -> str:
+        return _digest("bp-registry-failure-count-terminal-receipt-v1", self.primitive_bytes())
+
+    def validate_against(self, policy: FailureCountPolicyV1) -> "FailureCountTerminalReceiptV1":
+        if not isinstance(policy, FailureCountPolicyV1):
+            raise ValueError("terminal receipt requires a prospective failure-count policy")
+        if (self.policy_sha256 != policy.digest() or self.campaign_plan_sha256 != policy.campaign_plan_sha256
+                or self.executable_limit_receipt_sha256 != policy.executable_limits.digest()
+                or self.batch_authorization_sha256 != policy.batch_authorization.digest()):
+            raise ValueError("terminal receipt does not bind the frozen policy and authorizations")
+        if self.total_completed_shots > policy.caps.max_shots:
+            raise ValueError("terminal receipt exceeds the frozen shot cap")
+        if (self.realized_decoder_work > policy.caps.max_decoder_work or self.realized_events > policy.caps.max_events
+                or self.realized_evidence_bytes > policy.caps.max_evidence_bytes
+                or self.realized_storage_bytes > policy.caps.max_storage_bytes):
+            raise ValueError("terminal receipt exceeds a frozen resource cap")
+        if self.terminal_state == "target_reached":
+            if self.cumulative_failures != policy.target_failures:
+                raise ValueError("target receipt cumulative failures differ from policy target")
+            assert self.terminal_failure_ordinal is not None
+            batch_end = ((self.terminal_failure_ordinal - 1) // policy.batch_size + 1) * policy.batch_size
+            if any(item > batch_end for item in self.authorized_tail_ordinals):
+                raise ValueError("target receipt tail escapes the authorized terminal batch")
+        else:
+            if self.first_exhausted_cap not in policy.cap_precedence:
+                raise ValueError("cap-censored receipt names an unauthorized cap")
+            if self.cumulative_failures >= policy.target_failures:
+                raise ValueError("cap-censored receipt cannot contain the target failure")
+        return self
+
+
 class OutcomeTreatmentV1(StrictModel):
     terminal_status: Literal[
         "exact", "stabilizer_equivalent", "wrong_logical_action", "invalid_syndrome",

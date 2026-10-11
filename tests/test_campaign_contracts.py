@@ -387,24 +387,22 @@ def test_prospective_failure_count_has_no_terminal_facts_and_limits_are_derived(
     assert policy.executable_limits.derived_evidence_bytes_per_unit == 160
     assert "terminal_state" not in policy.model_dump()
     with pytest.raises(ValidationError, match="extra_forbidden"):
-        FailureCountPolicyV1.model_validate({**policy.model_dump(), "terminal_state": "target_reached"})
+        FailureCountPolicyV1.model_validate({**policy.model_dump(by_alias=True), "terminal_state": "target_reached"})
     with pytest.raises(ValidationError, match="derived"):
         FailureCountExecutableLimitReceiptV1.model_validate(
-            {**limits.model_dump(), "derived_work_per_unit": 39},
+            {**limits.model_dump(by_alias=True), "derived_work_per_unit": 39},
         )
     with pytest.raises(ValidationError, match="batch"):
-        FailureCountBatchAuthorizationV1.model_validate(
-            {**authorization.model_dump(), "max_events_per_batch": 14},
-        )
+        FailureCountPolicyV1.model_validate({
+            **policy.model_dump(by_alias=True),
+            "batch_authorization": {
+                **authorization.model_dump(by_alias=True), "max_events_per_batch": 14,
+            },
+        })
 
 
 def test_terminal_receipt_is_post_run_only_and_records_boundary_overshoot():
     from bp_registry.campaigns.contracts import FailureCountTerminalReceiptV1
-    from test_campaign_contracts import test_prospective_failure_count_has_no_terminal_facts_and_limits_are_derived
-
-    # Build the shared policy through the public contract above without relying
-    # on an execution result: every observed fact below is terminal evidence.
-    del test_prospective_failure_count_has_no_terminal_facts_and_limits_are_derived
     receipt = FailureCountTerminalReceiptV1(
         schema="failure_count_terminal_receipt_v1",
         policy_sha256="a" * 64, campaign_plan_sha256="6" * 64,
@@ -421,9 +419,9 @@ def test_terminal_receipt_is_post_run_only_and_records_boundary_overshoot():
     assert receipt.terminal_failure_ordinal == 8
     with pytest.raises(ValidationError):
         FailureCountTerminalReceiptV1.model_validate(
-            {**receipt.model_dump(), "terminal_state": "cap_censored"},
+            {**receipt.model_dump(by_alias=True), "terminal_state": "cap_censored"},
         )
     with pytest.raises(ValidationError):
         FailureCountTerminalReceiptV1.model_validate(
-            {**receipt.model_dump(), "wall_boundaries": [(1_000, 999, 0)]},
+            {**receipt.model_dump(by_alias=True), "wall_boundaries": [(1_000, 999, 0)]},
         )
