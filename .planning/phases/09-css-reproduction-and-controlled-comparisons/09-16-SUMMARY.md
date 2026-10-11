@@ -16,7 +16,7 @@ affects: [09-17, 09-18, failure-count execution]
 actuals:
   tokens: 11000
   tasks: 2
-  commits: 4
+  commits: 7
 plan_head_before: cef20e6
 tech-stack:
   added: []
@@ -65,11 +65,13 @@ Failure-count campaigns now separate their outcome-independent authorization fro
 - Added target-reached and cap-censored terminal receipts that retain ordered prefix and tail identities, realized resources, and boundary-time overshoot.
 - Routed new failure-count assessments through the prospective policy and rejected the legacy mixed stopping record for new assessment construction.
 - Added receipt-bound inverse-binomial inference while preserving retained legacy statistical evidence parsing and fixed-shot/finite-look behavior.
+- Corrected the terminal contract so normal predeadline completion and cap-first zero-dispatch censoring remain representable.
 
 ## Task Commits
 
 1. **Task 1: Separate prospective policy from terminal evidence** - `930c66d` (test), `65c3cb1` (feat)
 2. **Task 2: Join verified terminal evidence to inverse-binomial inference** - `40aad9a` (test), `622074a` (feat)
+3. **Post-review contract correction** - `83e9113`, `a8875b0` (tests), `bf069a6` (fix)
 
 ## Verification
 
@@ -77,6 +79,7 @@ Failure-count campaigns now separate their outcome-independent authorization fro
 - `tests/test_campaign_statistics.py` focused receipt and inverse-binomial subset: 9 passed.
 - Fixed-shot and finite-look regression subset: 5 passed.
 - Combined contract and statistics modules: 63 passed.
+- Post-review prospective/terminal contracts: 2 passed; receipt/statistics subset: 9 passed.
 
 ## Decisions Made
 
@@ -85,8 +88,16 @@ Failure-count campaigns now separate their outcome-independent authorization fro
 
 ## Deviations from Plan
 
-None - plan executed as specified. The legacy mixed record remains a typed parser for retained evidence, while new `CampaignAssessmentV1` construction rejects it.
+### Auto-fixed Issues
+
+**1. [Rule 1 - Contract bug] Permit ordinary predeadline terminals and cap-first censoring**
+- **Issue:** Terminal records incorrectly required a deadline crossing and at least one completed shot. Policy caps also had to fund the full shot cap, preventing an honest non-shot cap from censoring first.
+- **Fix:** Boundary observations now use `max(0, observed - deadline)`, zero-dispatch cap-censored terminals are valid, target-reached terminals still require a completed shot, and policy caps must fund one authorized batch plus reserve.
+- **Verification:** Focused contract/statistics checks and combined modules passed.
+- **Committed in:** `bf069a6`
+
+The legacy mixed record remains a typed parser for retained evidence, while new `CampaignAssessmentV1` construction rejects it.
 
 ## Self-Check: PASSED
 
-All four task commits exist and the four modified implementation/test files are present. No stubs, skipped tests, or unrun required verification remain.
+All task and correction commits exist and the four modified implementation/test files are present. No stubs, skipped tests, or unrun required verification remain.
