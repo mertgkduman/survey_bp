@@ -684,10 +684,14 @@ def _campaign_attempt(
         "state": "sealed_terminal", "lifecycle": ["planned", "running", "sealed_terminal"],
         "parent_attempt_receipt": None,
     }
+    shard = next((item for item in plan.shards if unit.key in item.unit_keys), None)
+    if shard is None:
+        raise ValueError("canonical attempt unit is absent from the frozen shard plan")
     receipt = {
         "schema": "campaign_canonical_attempt_v1", "attempt": attempt,
         "campaign_spec_digest": plan.campaign_spec_digest, "campaign_plan_digest": plan.campaign_plan_digest,
-        "unit_key": unit.key, "arm_manifest_path": str(arm_path),
+        "unit_key": unit.key, "selected_shard_id": shard.shard_id,
+        "arm_manifest_path": str(arm_path), "arm_manifest_sha256": sha256(arm_path.read_bytes()).hexdigest(),
         "materialized_sample_path": str(sample_path),
         "materialized_sample_sha256": materialized.materialized_sample_sha256,
         "physical_error_sha256": materialized.physical_error_sha256,
@@ -705,21 +709,38 @@ def verify_canonical_attempt(*, record: Mapping[str, Any], plan: CampaignWorkPla
     """Independently rehash paired evidence before it can enter a campaign merge."""
     if not isinstance(plan.work_spec, CampaignWorkSpecV1) or not isinstance(record, Mapping):
         raise ValueError("canonical attempt verification requires a frozen paired work plan")
-    required = {"schema", "attempt", "campaign_spec_digest", "campaign_plan_digest", "unit_key", "arm_manifest_path", "materialized_sample_path", "materialized_sample_sha256", "physical_error_sha256", "canonical_ledger_path", "canonical_ledger_sha256", "terminal_fact", "receipt_sha256", "events", "terminal_bytes_sha256", "persisted_sample_sha256", "validation_status", "replay_status"}
+    required = {"schema", "attempt", "campaign_spec_digest", "campaign_plan_digest", "unit_key", "selected_shard_id", "arm_manifest_path", "arm_manifest_sha256", "materialized_sample_path", "materialized_sample_sha256", "physical_error_sha256", "canonical_ledger_path", "canonical_ledger_sha256", "terminal_fact", "receipt_sha256", "events", "terminal_bytes_sha256", "persisted_sample_sha256", "validation_status", "replay_status"}
     if set(record) != required or record["schema"] != "campaign_canonical_attempt_v1":
         raise ValueError("canonical attempt receipt has an invalid field set")
     unsigned = {key: value for key, value in record.items() if key not in {"receipt_sha256", "events", "terminal_bytes_sha256", "persisted_sample_sha256", "validation_status", "replay_status"}}
     if sha256(canonical_json_bytes(unsigned)).hexdigest() != record["receipt_sha256"]:
         raise ValueError("canonical attempt receipt bytes differ from its hash")
-    materialized = MaterializedPhysicalSampleV1.model_validate_json(Path(record["materialized_sample_path"]).read_bytes())
+    unit = next((item for item in plan.units if item.key == record["unit_key"]), None)
+    if unit is None:
+        raise ValueError("canonical attempt unit is absent from the frozen plan")
+    shard = next((item for item in plan.shards if unit.key in item.unit_keys), None)
+    if shard is None or record["selected_shard_id"] != shard.shard_id:
+        raise ValueError("canonical attempt selected shard differs from the frozen plan")
+    sample_path = Path(record["materialized_sample_path"])
+    if sample_path.is_symlink() or not sample_path.is_file():
+        raise ValueError("canonical attempt materialized sample must be a regular file")
+    materialized = MaterializedPhysicalSampleV1.model_validate_json(sample_path.read_bytes())
+    if (materialized.physical_sample_identity != unit.physical_sample_identity
+            or materialized.cohort_id != unit.cohort_id or materialized.point_id != unit.point_id
+            or materialized.sample_namespace != unit.sample_namespace or materialized.sample_id != unit.sample_id
+            or materialized.sampler_contract_sha256 != plan.work_spec.shared_sampler.digest()):
+        raise ValueError("canonical attempt materialized sample differs from frozen sampling bindings")
+    arm = next((item for item in plan.work_spec.arms if item.arm_id == unit.arm_id), None)
+    if arm is None or record["arm_manifest_path"] != str(Path(arm.manifest_path)) and Path(record["arm_manifest_path"]).name != Path(arm.manifest_path).name:
+        raise ValueError("canonical attempt manifest path differs from frozen arm")
+    manifest = Path(record["arm_manifest_path"])
+    if manifest.is_symlink() or not manifest.is_file() or sha256(manifest.read_bytes()).hexdigest() != arm.manifest_sha256 or record["arm_manifest_sha256"] != arm.manifest_sha256:
+        raise ValueError("canonical attempt manifest bytes differ from frozen arm")
     ledger = Path(record["canonical_ledger_path"])
     if (materialized.materialized_sample_sha256 != record["materialized_sample_sha256"]
             or materialized.physical_error_sha256 != record["physical_error_sha256"]
             or sha256(ledger.read_bytes()).hexdigest() != record["canonical_ledger_sha256"]):
         raise ValueError("canonical attempt hash binding differs from retained evidence")
-    unit = next((item for item in plan.units if item.key == record["unit_key"]), None)
-    if unit is None:
-        raise ValueError("canonical attempt unit is absent from the frozen plan")
     events = read_canonical_events(ledger)
     terminal_fact = _terminal_fact(events, unit_key=unit.key)
     if terminal_fact["outcome"] == "logical_failure":
@@ -731,6 +752,7 @@ def verify_canonical_attempt(*, record: Mapping[str, Any], plan: CampaignWorkPla
 
 def run_canonical_work_plan(
     plan: CampaignWorkPlan, *, campaign_root: str | Path, output_root: str | Path,
+    shards: tuple[ShardPlan, ...] | None = None,
 ) -> dict[str, Any]:
     """Execute every paired arm against one retained physical sample per group."""
     if not isinstance(plan, CampaignWorkPlan) or not isinstance(plan.work_spec, CampaignWorkSpecV1):
@@ -741,10 +763,16 @@ def run_canonical_work_plan(
         raise ValueError("campaign output root must be a non-symlink directory")
     arm_contexts = _preflight_work_arms(plan.work_spec, root)
     destination.mkdir(parents=True, exist_ok=True)
-    arms = {arm.arm_id: arm for arm in plan.work_spec.arms}
+    selected_shards = plan.shards if shards is None else tuple(shards)
+    known_shards = {shard.shard_id: shard for shard in plan.shards}
+    if not selected_shards or any(known_shards.get(shard.shard_id) != shard for shard in selected_shards):
+        raise ValueError("canonical execution must consume a nonempty exact subset of frozen shards")
+    selected_keys = {key for shard in selected_shards for key in shard.unit_keys}
     samples: dict[str, MaterializedPhysicalSampleV1] = {}
     verified: list[dict[str, Any]] = []
     for unit in plan.units:
+        if unit.key not in selected_keys:
+            continue
         materialized = samples.get(unit.physical_sample_identity)
         sample_path = destination / "samples" / f"{unit.physical_sample_identity}.json"
         arm_path, context = arm_contexts[unit.arm_id]
@@ -753,6 +781,11 @@ def run_canonical_work_plan(
             samples[unit.physical_sample_identity] = materialized
         else:
             materialized = MaterializedPhysicalSampleV1.model_validate_json(sample_path.read_bytes())
+        if (materialized.physical_sample_identity != unit.physical_sample_identity
+                or materialized.cohort_id != unit.cohort_id or materialized.point_id != unit.point_id
+                or materialized.sample_namespace != unit.sample_namespace or materialized.sample_id != unit.sample_id
+                or materialized.sampler_contract_sha256 != plan.work_spec.shared_sampler.digest()):
+            raise ValueError("materialized sample differs from frozen plan bindings")
         ledger_path = destination / "units" / unit.key / "events.jsonl"
         ledger_path.parent.mkdir(parents=True, exist_ok=True)
         run_canonical_materialized_one(arm_path, sample=_shot_from_materialized(materialized),
@@ -764,4 +797,5 @@ def run_canonical_work_plan(
         receipt_path.write_bytes(canonical_json_bytes({key: value for key, value in record.items() if key not in {"receipt_sha256", "events", "terminal_bytes_sha256", "persisted_sample_sha256", "validation_status", "replay_status"}}) + b"\n")
         verified.append(verify_canonical_attempt(record=record, plan=plan))
     return {"schema": "campaign_canonical_work_execution_v1", "campaign_plan_digest": plan.campaign_plan_digest,
+            "shard_ids": tuple(shard.shard_id for shard in selected_shards),
             "materialized_samples": tuple(samples.values()), "verified_attempts": tuple(verified)}

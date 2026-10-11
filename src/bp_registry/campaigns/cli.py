@@ -36,6 +36,7 @@ from .slurm import (
     build_sbatch_argv,
     execute_synthetic_slurm_array,
     parse_site_capabilities,
+    select_array_shard,
 )
 
 
@@ -292,25 +293,56 @@ def _load_work_plan(plan_path: str, root: Path) -> tuple[CampaignWorkSpecV1, Cam
     return spec, freeze_campaign_work_spec(spec), payload
 
 
-def _paired_run(args: argparse.Namespace, *, root: Path, output: Path) -> dict[str, Any]:
+def _paired_run(
+    args: argparse.Namespace, *, root: Path, output: Path,
+    shards: tuple[Any, ...] | None = None,
+    allocation: SlurmAllocation | None = None,
+    observation: SchedulerObservation | None = None,
+) -> dict[str, Any]:
     _spec, plan, payload = _load_work_plan(args.plan, root)
-    execution = run_canonical_work_plan(plan, campaign_root=root, output_root=output)
-    serializable = {
-        "schema": "campaign_paired_run_v1", "campaign_spec_digest": plan.campaign_spec_digest,
-        "campaign_plan_digest": plan.campaign_plan_digest,
-        "attempts": list(execution["verified_attempts"]),
-        "materialized_sample_sha256s": [item.materialized_sample_sha256 for item in execution["materialized_samples"]],
-    }
-    artifact = _publish_json(output / "paired-run.json", serializable)
-    return _artifact(status="ok", plan=payload, phase="run_local", executor_route="local",
+    selected = plan.shards if shards is None else tuple(shards)
+    if observation is not None and observation.state != "COMPLETED":
+        serializable = {
+            "schema": "campaign_paired_shard_run_v1", "campaign_spec_digest": plan.campaign_spec_digest,
+            "campaign_plan_digest": plan.campaign_plan_digest, "selected_shard_id": selected[0].shard_id,
+            "attempts": [], "materialized_sample_sha256s": [], "physical_error_sha256s": [],
+            "incomplete_unit_keys": list(selected[0].unit_keys),
+            "executor_receipt": {"requested_allocation": allocation.payload(), "scheduler": observation.payload()},
+        }
+    else:
+        execution = run_canonical_work_plan(plan, campaign_root=root, output_root=output, shards=selected)
+        serializable = {
+            "schema": "campaign_paired_run_v1" if shards is None else "campaign_paired_shard_run_v1",
+            "campaign_spec_digest": plan.campaign_spec_digest,
+            "campaign_plan_digest": plan.campaign_plan_digest,
+            "attempts": list(execution["verified_attempts"]),
+            "materialized_sample_sha256s": [item.materialized_sample_sha256 for item in execution["materialized_samples"]],
+            "physical_error_sha256s": [item.physical_error_sha256 for item in execution["materialized_samples"]],
+        }
+        if shards is not None:
+            serializable.update({
+                "selected_shard_id": selected[0].shard_id,
+                "incomplete_unit_keys": [],
+                "executor_receipt": {"requested_allocation": allocation.payload(), "scheduler": observation.payload()},
+            })
+    artifact = _publish_json(output / ("paired-run.json" if shards is None else "paired-shard-run.json"), serializable)
+    attempts = serializable["attempts"]
+    return _artifact(status="ok", plan=payload, phase="run_local" if shards is None else "run_shard",
+                     executor_route="local" if shards is None else "slurm",
                      artifact_path=str(artifact), artifact_sha256=sha256(artifact.read_bytes()).hexdigest(),
-                     unit_count=len(plan.units), shard_count=len(plan.shards))
+                     unit_count=len(plan.units) if shards is None else len(selected[0].unit_keys),
+                     shard_count=len(plan.shards) if shards is None else 1,
+                     terminal_unit_keys=[item["unit_key"] for item in attempts],
+                     incomplete_unit_keys=serializable.get("incomplete_unit_keys", []),
+                     materialized_sample_sha256s=serializable["materialized_sample_sha256s"],
+                     physical_error_sha256s=serializable["physical_error_sha256s"])
 
 
 def _paired_attempts(receipt_path: str, *, plan: CampaignWorkPlan) -> tuple[dict[str, Any], ...]:
     payload = _read_json(receipt_path)
-    required = {"schema", "campaign_spec_digest", "campaign_plan_digest", "attempts", "materialized_sample_sha256s"}
-    if set(payload) != required or payload.get("schema") != "campaign_paired_run_v1":
+    required = {"schema", "campaign_spec_digest", "campaign_plan_digest", "attempts", "materialized_sample_sha256s", "physical_error_sha256s"}
+    shard_required = required | {"selected_shard_id", "incomplete_unit_keys", "executor_receipt"}
+    if frozenset(payload) not in {frozenset(required), frozenset(shard_required)} or payload.get("schema") not in {"campaign_paired_run_v1", "campaign_paired_shard_run_v1"}:
         raise ValueError("paired run artifact has an invalid schema or field set")
     if payload["campaign_spec_digest"] != plan.campaign_spec_digest or payload["campaign_plan_digest"] != plan.campaign_plan_digest:
         raise ValueError("paired run artifact differs from the frozen plan")
@@ -377,9 +409,18 @@ def _plan(args: argparse.Namespace) -> dict[str, Any]:
 def _run(args: argparse.Namespace, *, route: str) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
     if _read_json(args.plan).get("schema") == "campaign_work_plan_v1":
-        if route != "local":
-            raise ValueError("paired local lifecycle does not expose a synthetic shard route")
-        return _paired_run(args, root=root, output=_output_root(args.output_root))
+        if route == "local":
+            return _paired_run(args, root=root, output=_output_root(args.output_root))
+        if args.allocation is None or args.scheduler_observation is None:
+            raise ValueError("paired run-shard requires allocation and scheduler observation receipts")
+        _spec, work_plan, _payload = _load_work_plan(args.plan, root)
+        shard = select_array_shard(work_plan, args.array_task_id)
+        allocation = SlurmAllocation(**_read_json(args.allocation))
+        observation = SchedulerObservation(**_read_json(args.scheduler_observation))
+        if observation.task_id != args.array_task_id or observation.allocated_cpus > allocation.cpus_per_task:
+            raise ValueError("scheduler observation differs from the bounded selected allocation")
+        return _paired_run(args, root=root, output=_output_root(args.output_root), shards=(shard,),
+                           allocation=allocation, observation=observation)
     spec, plan = _load_plan(args.plan, root)
     if route == "slurm" and args.array_task_id != "0":
         raise ValueError("one-unit campaign plans expose only frozen Slurm array task 0")
@@ -632,18 +673,21 @@ def _assess(args: argparse.Namespace) -> dict[str, Any]:
 
 def _emit_slurm(args: argparse.Namespace) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
-    spec, plan = _load_plan(args.plan, root)
-    work_plan = freeze_work_plan(
-        campaign_spec_digest=plan["campaign_spec_digest"],
-        coordinates=(CampaignCoordinateV1(cohort_id=spec.cohort_id, point_id=spec.point_id,
-                                          sample_namespace=spec.sample_namespace, sample_ids=(spec.sample_id,)),),
-        arm_seed_identities={spec.arm_id: spec.decoder_seed_identity}, look_sample_boundaries=(1,), units_per_shard=1,
-    )
+    if _read_json(args.plan).get("schema") == "campaign_work_plan_v1":
+        _spec, work_plan, plan = _load_work_plan(args.plan, root)
+    else:
+        spec, plan = _load_plan(args.plan, root)
+        work_plan = freeze_work_plan(
+            campaign_spec_digest=plan["campaign_spec_digest"],
+            coordinates=(CampaignCoordinateV1(cohort_id=spec.cohort_id, point_id=spec.point_id,
+                                              sample_namespace=spec.sample_namespace, sample_ids=(spec.sample_id,)),),
+            arm_seed_identities={spec.arm_id: spec.decoder_seed_identity}, look_sample_boundaries=(1,), units_per_shard=1,
+        )
     allocation = SlurmAllocation(**_read_json(args.allocation))
     allowlists = _read_json(args.site_allowlists)
     argv = build_sbatch_argv(work_plan, allocation=allocation, allowed_values=allowlists,
                              entrypoint=("bp-registry-campaign", "run-shard", "--plan", str(Path(args.plan).resolve())))
-    return _artifact(status="ok", plan=plan, phase="emit_slurm", sbatch_argv=list(argv), shard_count=1)
+    return _artifact(status="ok", plan=plan, phase="emit_slurm", sbatch_argv=list(argv), shard_count=len(work_plan.shards))
 
 
 def _site_capability(args: argparse.Namespace) -> dict[str, Any]:
@@ -798,6 +842,8 @@ def _parser() -> argparse.ArgumentParser:
         item.add_argument("--output-root", required=True)
         if route == "slurm":
             item.add_argument("--array-task-id", required=True)
+            item.add_argument("--allocation")
+            item.add_argument("--scheduler-observation")
         item.set_defaults(handler=lambda args, selected=route: _run(args, route=selected))
     item = commands.add_parser("emit-slurm")
     item.add_argument("--plan", required=True); item.add_argument("--campaign-root", required=True)
