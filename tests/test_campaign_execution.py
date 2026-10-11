@@ -441,3 +441,82 @@ def test_slurm_capability_parser_preserves_missing_accounting_as_unavailable():
     assert capabilities["accounting_available"] == {
         "value": None, "unavailable_reason": "sacct output was not supplied",
     }
+
+
+def _slurm_allocation(api):
+    return api.SlurmAllocation(
+        partition="research", qos="short", account="bp", wall_minutes=30,
+        memory_mb=512, cpus_per_task=1, max_concurrent_tasks=1,
+    )
+
+
+def _scheduler_observation(api, *, task_id: str, state: str = "COMPLETED"):
+    return api.SchedulerObservation(
+        job_id="81234", task_id=task_id, allocated_cpus=1, elapsed_seconds=2,
+        state=state, exit_code=0 if state == "COMPLETED" else 1,
+        accounting_available=None, accounting_unavailable_reason="sacct was unavailable",
+    )
+
+
+def test_executor_equivalence_keeps_scheduler_receipts_out_of_scientific_results(tmp_path: Path):
+    """Synthetic array delivery must reproduce local frozen science byte-for-byte."""
+    api = _slurm_api()
+    assert api is not None and hasattr(api, "execute_synthetic_slurm_array"), (
+        "campaigns must execute frozen shards through the synthetic Slurm harness"
+    )
+    from bp_registry.campaigns.execution import execute_local_work_plan
+    from bp_registry.campaigns.planning import freeze_work_plan
+
+    digest, coordinates, arms = _planning_inputs()
+    plan = freeze_work_plan(
+        campaign_spec_digest=digest, coordinates=coordinates, arm_seed_identities=arms,
+        look_sample_boundaries=(1, 2), units_per_shard=2,
+    )
+    local = execute_local_work_plan(
+        plan, output_root=tmp_path / "local", workers=1, unit_runner=_bounded_unit_runner,
+    )
+    slurm = api.execute_synthetic_slurm_array(
+        plan, output_root=tmp_path / "slurm", unit_runner=_bounded_unit_runner,
+        allocation=_slurm_allocation(api),
+        observations=tuple(_scheduler_observation(api, task_id=str(index)) for index in range(len(plan.shards))),
+    )
+    assert slurm["terminal_unit_keys"] == local["terminal_unit_keys"]
+    assert slurm["scientific_records"] == local["scientific_records"]
+    assert slurm["merge_receipt_sha256"] == api.scientific_records_digest(local["scientific_records"])
+    assert all("scheduler" not in record for record in slurm["scientific_records"])
+    assert all(receipt["executor_receipt"]["scheduler"]["accounting_available"] is None for receipt in slurm["task_receipts"])
+
+
+def test_scheduler_receipt_preemption_cancellation_and_duplicate_delivery_are_incomplete(tmp_path: Path):
+    """Scheduler outcomes retain observations and leave only their frozen units resumable."""
+    api = _slurm_api()
+    assert api is not None and hasattr(api, "execute_slurm_array_task"), (
+        "campaigns must retain scheduler receipts for one frozen array task"
+    )
+    from bp_registry.campaigns.planning import freeze_work_plan
+
+    digest, coordinates, arms = _planning_inputs()
+    plan = freeze_work_plan(
+        campaign_spec_digest=digest, coordinates=coordinates, arm_seed_identities=arms,
+        look_sample_boundaries=(1, 2), units_per_shard=2,
+    )
+    for state in ("FAILED", "PREEMPTED", "CANCELLED"):
+        receipt = api.execute_slurm_array_task(
+            plan, array_task_id="0", output_root=tmp_path / state,
+            unit_runner=_bounded_unit_runner, allocation=_slurm_allocation(api),
+            observation=_scheduler_observation(api, task_id="0", state=state),
+        )
+        assert receipt["terminal_unit_keys"] == ()
+        assert receipt["incomplete_unit_keys"] == plan.shards[0].unit_keys
+        assert receipt["resume_unit_keys"] == plan.shards[0].unit_keys
+        assert receipt["executor_receipt"]["scheduler"]["state"] == state
+        assert receipt["executor_receipt"]["scheduler"]["accounting_available"] is None
+    with pytest.raises(ValueError, match="duplicate"):
+        api.execute_synthetic_slurm_array(
+            plan, output_root=tmp_path / "duplicate", unit_runner=_bounded_unit_runner,
+            allocation=_slurm_allocation(api),
+            observations=(
+                _scheduler_observation(api, task_id="0"),
+                _scheduler_observation(api, task_id="0"),
+            ),
+        )
