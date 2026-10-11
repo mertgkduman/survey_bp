@@ -97,3 +97,65 @@ def test_executable_maxima_are_context_derived_and_reject_stale_field():
         verify_declared_executable_limits(
             declared, expected_policy_binding=maxima.policy_binding_sha256, derived=maxima,
         )
+
+
+def test_pending_reservations_cannot_be_double_spent_or_replayed():
+    from bp_registry.ledger import CanonicalResourceInterruption
+    from bp_registry.runner import CanonicalRuntimeAuthorizationV1, CanonicalRuntimeGuardV1
+
+    auth = CanonicalRuntimeAuthorizationV1.interruptible_unit(
+        profile_digest="e" * 64, authorization_identity="pending", max_events=1,
+        max_evidence_bytes=2, max_storage_bytes=2, control_receipt_reserve_bytes=3,
+    )
+    guard = CanonicalRuntimeGuardV1(auth)
+    first = guard.reserve_ledger_append(b"a\n", boundary="first")
+    with pytest.raises(CanonicalResourceInterruption):
+        guard.reserve_ledger_append(b"b\n", boundary="second")
+    guard.commit(first)
+    with pytest.raises(TypeError, match="unknown canonical runtime reservation"):
+        guard.commit(first)
+    assert guard.snapshot().scientific_events == 1
+    assert guard.snapshot().scientific_evidence_bytes == 2
+
+
+def test_materialized_authorization_must_bind_derived_profile_before_writes(tmp_path):
+    from bp_registry.runner import (
+        CanonicalRuntimeAuthorizationV1, canonical_public_manifest_context,
+        derive_canonical_executable_maxima, run_canonical_materialized_one,
+    )
+    from bp_registry.sampling import sample_shot
+
+    path = "data/manifests/canonical-three-qubit-development.json"
+    context = canonical_public_manifest_context(path)
+    derived = derive_canonical_executable_maxima(context)
+    manifest = context.manifest
+    anchor = manifest.randomness.physical_sample_identity or context.manifest_sha256
+    sample = sample_shot(
+        context.code, shot_id=0, seed=0, x_error_rate=manifest.error_rate,
+        manifest_identity=anchor,
+    )
+    ledger = tmp_path / "events.jsonl"
+    kwargs = dict(
+        authorization_identity="bound-unit", max_events=derived.derived_events_per_unit,
+        max_evidence_bytes=derived.derived_evidence_bytes_per_unit,
+        max_storage_bytes=derived.derived_storage_bytes_per_unit,
+        control_receipt_reserve_bytes=derived.partial_receipt_reserve_bytes,
+    )
+    wrong = CanonicalRuntimeAuthorizationV1.interruptible_unit(profile_digest="0" * 64, **kwargs)
+    with pytest.raises(ValueError, match="profile_digest"):
+        run_canonical_materialized_one(
+            path, sample=sample, materialized_sample_sha256="f" * 64,
+            ledger_path=ledger, runtime_authorization=wrong,
+        )
+    assert not ledger.exists()
+
+    too_small = CanonicalRuntimeAuthorizationV1(
+        profile_digest=derived.digest, mode="strict_full_unit",
+        **{**kwargs, "max_events": derived.derived_events_per_unit - 1},
+    )
+    with pytest.raises(ValueError, match="strict_full_unit"):
+        run_canonical_materialized_one(
+            path, sample=sample, materialized_sample_sha256="f" * 64,
+            ledger_path=ledger, runtime_authorization=too_small,
+        )
+    assert not ledger.exists()

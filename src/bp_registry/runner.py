@@ -107,6 +107,8 @@ class CanonicalRuntimeAuthorizationV1:
     monotonic_deadline_ns: int | None = None
 
     def __post_init__(self) -> None:
+        if self.mode not in {"strict_full_unit", "interruptible_unit"}:
+            raise ValueError("runtime authorization mode is not registered")
         if (not isinstance(self.profile_digest, str) or len(self.profile_digest) != 64
                 or not isinstance(self.authorization_identity, str) or not self.authorization_identity):
             raise ValueError("runtime authorization requires stable digest and identity")
@@ -122,9 +124,10 @@ class CanonicalRuntimeAuthorizationV1:
     def strict_full_unit(cls, *, derived_events: int, derived_evidence_bytes: int,
                          derived_storage_bytes: int, **kwargs: object) -> "CanonicalRuntimeAuthorizationV1":
         authorization = cls(mode="strict_full_unit", **kwargs)  # type: ignore[arg-type]
+        reserve = authorization.control_receipt_reserve_bytes
         if (authorization.max_events < derived_events
-                or authorization.max_evidence_bytes < derived_evidence_bytes
-                or authorization.max_storage_bytes < derived_storage_bytes):
+                or authorization.max_evidence_bytes < derived_evidence_bytes - reserve
+                or authorization.max_storage_bytes < derived_storage_bytes - reserve):
             raise ValueError("strict_full_unit authorization must fit every derived maximum")
         return authorization
 
@@ -173,6 +176,7 @@ class CanonicalRuntimeGuardV1:
         self._before_ns: int | None = None
         self._after_ns: int | None = None
         self._pending_before: dict[str, int] = {}
+        self._pending_reservations: dict[int, _RuntimeReservation] = {}
 
     def snapshot(self) -> CanonicalRuntimeSnapshotV1:
         deadline = self.authorization.monotonic_deadline_ns
@@ -203,35 +207,46 @@ class CanonicalRuntimeGuardV1:
                                 evidence: int, storage: int, boundary: str) -> _RuntimeReservation:
         if self._latched:
             self._interrupt("already_interrupted", boundary=boundary)
-        if self._events + events > self.authorization.max_events:
+        pending_events = sum(item.events for item in self._pending_reservations.values())
+        pending_evidence = sum(item.evidence_bytes for item in self._pending_reservations.values())
+        pending_storage = sum(item.storage_bytes for item in self._pending_reservations.values())
+        if self._events + pending_events + events > self.authorization.max_events:
             self._interrupt("events", boundary=boundary, attempted_bytes=events)
-        if self._evidence + evidence > self.authorization.max_evidence_bytes:
+        if self._evidence + pending_evidence + evidence > self.authorization.max_evidence_bytes:
             self._interrupt("evidence_bytes", boundary=boundary, attempted_bytes=evidence)
-        if self._storage + storage > self.authorization.max_storage_bytes:
+        if self._storage + pending_storage + storage > self.authorization.max_storage_bytes:
             self._interrupt("storage_bytes", boundary=boundary, attempted_bytes=storage)
         return _RuntimeReservation(kind, events, evidence, storage, 0)
 
     def reserve_ledger_append(self, payload: bytes, *, boundary: str) -> _RuntimeReservation:
         if not isinstance(payload, bytes) or not payload.endswith(b"\n"):
             raise ValueError("ledger reservation requires exact framed bytes")
-        return self._scientific_reservation(kind="ledger", events=1, evidence=len(payload), storage=len(payload), boundary=boundary)
+        reservation = self._scientific_reservation(kind="ledger", events=1, evidence=len(payload), storage=len(payload), boundary=boundary)
+        self._pending_reservations[id(reservation)] = reservation
+        return reservation
 
     def reserve_artifact_write(self, byte_count: int, *, boundary: str) -> _RuntimeReservation:
         if type(byte_count) is not int or byte_count < 0:
             raise ValueError("artifact reservation requires a nonnegative exact byte count")
-        return self._scientific_reservation(kind="artifact", events=0, evidence=0, storage=byte_count, boundary=boundary)
+        reservation = self._scientific_reservation(kind="artifact", events=0, evidence=0, storage=byte_count, boundary=boundary)
+        self._pending_reservations[id(reservation)] = reservation
+        return reservation
 
     def reserve_control_receipt(self, byte_count: int) -> _RuntimeReservation:
         if type(byte_count) is not int or byte_count < 1:
             raise ValueError("control receipt requires a positive exact byte count")
         if not self._latched:
             raise CanonicalResourceInterruption("control receipt is available only after interruption", snapshot=self.snapshot())
-        if self._control or byte_count > self.authorization.control_receipt_reserve_bytes:
+        if (self._control or any(item.kind == "control" for item in self._pending_reservations.values())
+                or byte_count > self.authorization.control_receipt_reserve_bytes):
             raise CanonicalResourceInterruption("control receipt reserve is single use", snapshot=self.snapshot())
-        return _RuntimeReservation("control", 0, 0, 0, byte_count)
+        reservation = _RuntimeReservation("control", 0, 0, 0, byte_count)
+        self._pending_reservations[id(reservation)] = reservation
+        return reservation
 
     def commit(self, reservation: object) -> None:
-        if not isinstance(reservation, _RuntimeReservation):
+        if (not isinstance(reservation, _RuntimeReservation)
+                or self._pending_reservations.pop(id(reservation), None) is not reservation):
             raise TypeError("unknown canonical runtime reservation")
         self._events += reservation.events
         self._evidence += reservation.evidence_bytes
@@ -239,7 +254,8 @@ class CanonicalRuntimeGuardV1:
         self._control += reservation.control_bytes
 
     def release(self, reservation: object) -> None:
-        if not isinstance(reservation, _RuntimeReservation):
+        if (not isinstance(reservation, _RuntimeReservation)
+                or self._pending_reservations.pop(id(reservation), None) is not reservation):
             raise TypeError("unknown canonical runtime reservation")
         # Reservations are only committed after durable I/O succeeds; release
         # therefore intentionally leaves accounting unchanged.
@@ -292,8 +308,13 @@ class CanonicalExecutableMaximaV1:
     derived_storage_bytes_per_unit: int
 
     def as_evidence(self) -> dict[str, object]:
+        # This is intentionally the exact Plan 09-16
+        # FailureCountExecutableLimitReceiptV1 declaration surface.  ``route``
+        # is retained as engine-local explanatory metadata, not a campaign
+        # receipt field; admitting it here would make a valid Plan 09-16
+        # declaration fail the required exact-field check.
         return {
-            "derivation_version": self.derivation_version, "route": self.route,
+            "derivation_version": self.derivation_version,
             "manifest_dimensions_sha256": self.manifest_dimensions_sha256,
             "policy_binding_sha256": self.policy_binding_sha256,
             "serializer_sha256": self.serializer_sha256, "artifact_layout_sha256": self.artifact_layout_sha256,
@@ -1108,6 +1129,22 @@ def run_canonical_materialized_one(
         raise ValueError("materialized sample requires a SHA-256 identity")
     public = canonical_public_manifest_context(manifest_path, manifest_bytes=manifest_bytes)
     manifest = public.manifest
+    if runtime_authorization is not None:
+        derived = derive_canonical_executable_maxima(public)
+        if runtime_authorization.profile_digest != derived.digest:
+            raise ValueError("runtime authorization profile_digest differs from executable route")
+        if runtime_authorization.control_receipt_reserve_bytes < derived.partial_receipt_reserve_bytes:
+            raise ValueError("runtime authorization control receipt reserve is smaller than derived")
+        if runtime_authorization.mode == "strict_full_unit" and (
+            runtime_authorization.max_events < derived.derived_events_per_unit
+            or runtime_authorization.max_evidence_bytes < (
+                derived.derived_evidence_bytes_per_unit - derived.partial_receipt_reserve_bytes
+            )
+            or runtime_authorization.max_storage_bytes < (
+                derived.derived_storage_bytes_per_unit - derived.partial_receipt_reserve_bytes
+            )
+        ):
+            raise ValueError("strict_full_unit runtime authorization is below derived maxima")
     if not 0 <= sample.shot_id < manifest.budgets.max_shots:
         raise ValueError("materialized sample shot ID is outside the canonical manifest budget")
     anchor = manifest.randomness.physical_sample_identity or public.manifest_sha256
