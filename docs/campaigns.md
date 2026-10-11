@@ -63,7 +63,11 @@ emits literal `sbatch` argv and accepts only a precomputed array index. The
 synthetic harness is the normal Phase 8 equivalence check. A real array is
 attempted only after `site-capability` reports actual safe defaults. The Phase
 8 operational receipt records unavailable capability facts rather than filling
-them with guessed values.
+them with guessed values. A positive accounting capability requires a bounded
+`sacct --parsable2` observation with `JobIDRaw|State|Elapsed|AllocCPUS` header
+and at least one well-formed row; blank or malformed text remains explicitly
+unavailable. Profile-gate measurements and limits must be finite numeric JSON
+values, never booleans or non-finite literals.
 
 ## Stopping, outcomes, and reports
 

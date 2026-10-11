@@ -525,6 +525,19 @@ def test_slurm_capability_parser_preserves_missing_accounting_as_unavailable():
         "value": None, "unavailable_reason": "sacct output was not supplied",
     }
 
+    verified = api.parse_site_capabilities(
+        scontrol_text=None,
+        sacct_text="JobIDRaw|State|Elapsed|AllocCPUS|\n42|COMPLETED|00:00:01|1|\n",
+    )
+    assert verified["accounting_available"] == {"value": True, "unavailable_reason": None}
+    for malformed, reason in (
+        ("", "sacct output was empty"),
+        ("not an accounting record", "sacct output did not contain a bounded accounting record"),
+        ("JobIDRaw|State|Elapsed|AllocCPUS\n42|COMPLETED|not-time|1\n", "sacct output contained a malformed accounting record"),
+    ):
+        unavailable = api.parse_site_capabilities(scontrol_text=None, sacct_text=malformed)
+        assert unavailable["accounting_available"] == {"value": None, "unavailable_reason": reason}
+
 
 def _slurm_allocation(api):
     return api.SlurmAllocation(
@@ -675,6 +688,27 @@ def _run_installed_campaign(*arguments: str) -> subprocess.CompletedProcess[str]
     command = shutil.which("bp-registry-campaign", path=str(Path(sys.executable).parent))
     assert command is not None, "bp-registry-campaign must be installed into the active environment"
     return subprocess.run([command, *arguments], cwd=ROOT, text=True, capture_output=True, check=False)
+
+
+@pytest.mark.parametrize("raw_profile", (
+    '{"measured":NaN,"limit":1.0,"unit":"seconds"}',
+    '{"measured":true,"limit":1.0,"unit":"seconds"}',
+    '{"measured":0.5,"limit":Infinity,"unit":"seconds"}',
+))
+def test_cli_profile_gate_rejects_nonfinite_and_boolean_measurements(tmp_path: Path, raw_profile: str):
+    """Profile budgets are finite numeric observations with strict JSON output."""
+    profile = tmp_path / "profile.json"
+    profile.write_text(raw_profile, encoding="utf-8")
+    rejected = _run_campaign_module("profile-gate", "--profile", str(profile))
+    assert rejected.returncode != 0
+    error = json.loads(rejected.stdout)
+    assert error["status"] == "error"
+    assert "NaN" not in rejected.stdout and "Infinity" not in rejected.stdout
+
+    profile.write_text('{"measured":0.5,"limit":1.0,"unit":"seconds"}', encoding="utf-8")
+    accepted = _run_campaign_module("profile-gate", "--profile", str(profile))
+    assert accepted.returncode == 0, accepted.stdout
+    assert json.loads(accepted.stdout)["profile"]["measured"] == 0.5
 
 
 def test_cli_preflight_and_plan_freeze_identity_before_any_execution(tmp_path: Path):

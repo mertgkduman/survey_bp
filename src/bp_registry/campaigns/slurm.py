@@ -27,7 +27,13 @@ _MAX_MEMORY_MB: Final = 1_048_576
 _MAX_WALL_MINUTES: Final = 10_080
 _MAX_IDENTIFIER_LENGTH: Final = 64
 _MAX_ELAPSED_SECONDS: Final = 31_622_400
+_MAX_ACCOUNTING_RECORDS: Final = 1_024
+_MAX_ACCOUNTING_BYTES: Final = 64 * 1024
 _IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,63}\Z")
+_ACCOUNTING_JOB_ID = re.compile(r"\d+(?:_\d+)?(?:\.[A-Za-z0-9_.-]+)?\Z")
+_ACCOUNTING_STATE = re.compile(r"[A-Z][A-Z_]*(?:\+[A-Z_]+)?\Z")
+_ACCOUNTING_ELAPSED = re.compile(r"(?:\d+-)?\d{1,4}:\d{2}:\d{2}\Z")
+_ACCOUNTING_HEADER: Final = ("JobIDRaw", "State", "Elapsed", "AllocCPUS")
 
 
 def _bounded_integer(value: object, *, name: str, maximum: int) -> int:
@@ -242,6 +248,35 @@ def _reported_integer(text: str | None, field: str) -> int | None:
     return value if value <= _MAX_MEMORY_MB else None
 
 
+def _accounting_unavailable_reason(sacct_text: str | None) -> str | None:
+    """Validate a bounded `sacct --parsable2` record before trusting it exists."""
+    if sacct_text is None:
+        return "sacct output was not supplied"
+    if not sacct_text.strip():
+        return "sacct output was empty"
+    if len(sacct_text.encode("utf-8")) > _MAX_ACCOUNTING_BYTES:
+        return "sacct output exceeds the bounded accounting record size"
+    lines = [line for line in sacct_text.splitlines() if line.strip()]
+    if len(lines) < 2 or len(lines) - 1 > _MAX_ACCOUNTING_RECORDS:
+        return "sacct output did not contain a bounded accounting record"
+    if tuple(lines[0].rstrip("|").split("|")) != _ACCOUNTING_HEADER:
+        return "sacct output did not use the documented accounting header"
+    for line in lines[1:]:
+        fields = line.rstrip("|").split("|")
+        if len(fields) != len(_ACCOUNTING_HEADER):
+            return "sacct output contained a malformed accounting record"
+        job_id, state, elapsed, allocated_cpus = fields
+        if (
+            _ACCOUNTING_JOB_ID.fullmatch(job_id) is None
+            or _ACCOUNTING_STATE.fullmatch(state) is None
+            or _ACCOUNTING_ELAPSED.fullmatch(elapsed) is None
+            or not allocated_cpus.isdecimal()
+            or not 1 <= int(allocated_cpus) <= _MAX_ARRAY_TASKS * _MAX_CPUS_PER_TASK
+        ):
+            return "sacct output contained a malformed accounting record"
+    return None
+
+
 def parse_site_capabilities(
     *, scontrol_text: str | None, sacct_text: str | None,
 ) -> dict[str, dict[str, int | bool | str | None]]:
@@ -258,12 +293,13 @@ def parse_site_capabilities(
     max_array_size = _reported_integer(scontrol_text, "MaxArraySize")
     default_memory = _reported_integer(scontrol_text, "DefMemPerCPU")
     unavailable_scontrol = "scontrol output was not supplied" if scontrol_text is None else "field not reported by site"
+    accounting_reason = _accounting_unavailable_reason(sacct_text)
     return {
         "max_array_size": _capability(max_array_size, None if max_array_size is not None else unavailable_scontrol),
         "default_memory_mb": _capability(default_memory, None if default_memory is not None else unavailable_scontrol),
         "accounting_available": _capability(
-            True if sacct_text is not None else None,
-            None if sacct_text is not None else "sacct output was not supplied",
+            True if accounting_reason is None else None,
+            accounting_reason,
         ),
     }
 

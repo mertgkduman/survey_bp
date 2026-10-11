@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 from hashlib import sha256
 import json
+import math
 from pathlib import Path, PurePosixPath
 import sys
 import tempfile
@@ -627,7 +628,12 @@ def _operational_fixture(args: argparse.Namespace) -> dict[str, Any]:
 def _profile_gate(args: argparse.Namespace) -> dict[str, Any]:
     profile = _read_json(args.profile)
     required = {"measured", "limit", "unit"}
-    if set(profile) != required or not isinstance(profile["measured"], (int, float)) or not isinstance(profile["limit"], (int, float)) or not isinstance(profile["unit"], str):
+    numeric = (profile.get("measured"), profile.get("limit"))
+    if (
+        set(profile) != required
+        or any(type(value) not in (int, float) or not math.isfinite(float(value)) for value in numeric)
+        or not isinstance(profile["unit"], str)
+    ):
         raise ValueError("profile gate requires measured, limit, and unit fields")
     if profile["measured"] < 0 or profile["limit"] <= 0 or profile["measured"] > profile["limit"]:
         raise ValueError("profile gate rejects an absent, negative, or over-limit measurement")
@@ -681,9 +687,9 @@ def main(argv: list[str] | None = None) -> None:
         args = parser.parse_args(argv)
         result = args.handler(args)
     except (AttributeError, OSError, ValidationError, ValueError) as error:
-        print(json.dumps({"schema": _CLI_SCHEMA, "status": "error", "error": str(error)}, sort_keys=True))
+        print(json.dumps({"schema": _CLI_SCHEMA, "status": "error", "error": str(error)}, sort_keys=True, allow_nan=False))
         raise SystemExit(2) from error
-    print(json.dumps(result, sort_keys=True))
+    print(json.dumps(result, sort_keys=True, allow_nan=False))
 
 
 if __name__ == "__main__":
