@@ -301,7 +301,7 @@ def reconstruct_campaign_report(
             unit, terminal = row["unit"], row["terminal"]
             status = terminal["outcome"]
             statuses[status] = statuses.get(status, 0) + 1
-            if status != "infrastructure_interruption":
+            if treatments[status].all_shot != "incomplete":
                 terminal_count += 1
                 failures += int(treatments[status].all_shot == "failure")
                 accepted += int(treatments[status].conditional == "accepted")
@@ -323,6 +323,7 @@ def reconstruct_campaign_report(
         if len(arm_ids) == 2:
             completion: PairedCompletionSummaryV1 = paired_completion_summary(
                 outcomes=paired_outcomes, arm_ids=(arm_ids[0], arm_ids[1]),
+                outcome_matrix=assessment.outcome_matrix,
             )
             pair_status = completion.paired_inference_status
             if pair_status == "complete":
@@ -353,7 +354,10 @@ def reconstruct_campaign_report(
                 raise ValueError("assessment target arm has no verified terminal evidence")
             matching = [row for row in matching if row["unit"].arm_id == selected_arm]
         target_arms_by_id[target.target_id] = selected_arm or point_arms[0]
-        completed = [row for row in matching if row["terminal"]["outcome"] != "infrastructure_interruption"]
+        completed = [
+            row for row in matching
+            if treatments[row["terminal"]["outcome"]].all_shot != "incomplete"
+        ]
         if not completed:
             raise ValueError("assessment target has no completed all-shot terminals")
         target_rates[target.target_id] = exact_binomial_rate(
@@ -391,7 +395,11 @@ def reconstruct_campaign_report(
                     if unit.key in prefix and unit.point_id == target.target_id
                     and unit.arm_id == target_arms_by_id[target.target_id]
                 ]
-                completed_statuses = [terminal_by_key[unit.key]["outcome"] for unit in planned_units if unit.key in terminal_by_key]
+                completed_statuses = [
+                    terminal_by_key[unit.key]["outcome"] for unit in planned_units
+                    if unit.key in terminal_by_key
+                    and treatments[terminal_by_key[unit.key]["outcome"]].all_shot != "incomplete"
+                ]
                 counts[target.target_id] = (
                     len(planned_units), len(completed_statuses),
                     sum(treatments[status].all_shot == "failure" for status in completed_statuses),

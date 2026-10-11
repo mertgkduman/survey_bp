@@ -626,6 +626,33 @@ def test_report_uses_frozen_outcome_matrix_for_rates_pairs_and_looks() -> None:
     assert report.stopping["records"][0].target_decisions["p050"].computed_interval[0] == 0.0
 
 
+def test_report_withholds_incomplete_mapped_outcomes_from_denominators_and_pairs() -> None:
+    from bp_registry.campaigns.reporting import reconstruct_campaign_report
+
+    statuses = {
+        (0, "first"): "postselected_rejection", (0, "second"): "exact",
+        (1, "first"): "exact", (1, "second"): "exact",
+    }
+    plan, assessment, merged, hashes = _report_inputs(statuses=statuses)
+    payload = assessment.model_dump(mode="json", by_alias=True)
+    for item in payload["outcome_matrix"]["treatments"]:
+        if item["terminal_status"] == "postselected_rejection":
+            item["all_shot"] = "incomplete"
+            item["conditional"] = "incomplete"
+    changed = CampaignAssessmentV1.model_validate(payload)
+    hashes["assessment"] = changed.digest()
+    report = reconstruct_campaign_report(
+        plan=plan, assessment=changed, merge_receipt=merged,
+        input_receipt_hashes=hashes, target_arm_ids={"p050": "first"},
+    )
+    point = report.point_reports[0]
+    assert point.all_shot.shots == 3
+    assert point.incomplete_samples == 1
+    assert point.pair_status == "inconclusive_incomplete_pairs"
+    assert point.paired is None
+    assert report.stopping["finite_look_status"] == "inconclusive_partial_batch"
+
+
 @pytest.mark.parametrize("mutation", ("terminal", "target", "receipt"))
 def test_report_rejects_tampered_merged_evidence_target_or_receipt(mutation: str) -> None:
     api = importlib.import_module("bp_registry.campaigns.reporting")

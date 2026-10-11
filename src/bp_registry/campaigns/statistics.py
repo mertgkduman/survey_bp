@@ -278,6 +278,8 @@ def _all_shot_failure(status: str, outcome_matrix: OutcomeMatrixV1 | None = None
         if not isinstance(outcome_matrix, OutcomeMatrixV1):
             raise ValueError("paired comparison requires a validated outcome matrix")
         treatment = next(item for item in outcome_matrix.treatments if item.terminal_status == status)
+        if treatment.all_shot == "incomplete":
+            raise ValueError("incomplete mapped outcome cannot enter paired inference")
         return treatment.all_shot == "failure"
     return status not in _ALL_SHOT_SUCCESSES
 
@@ -649,6 +651,7 @@ def outcome_denominator_summary(
 
 def paired_completion_summary(
     *, outcomes: Sequence[PairedArmOutcomeV1], arm_ids: tuple[str, str],
+    outcome_matrix: OutcomeMatrixV1 | None = None,
 ) -> PairedCompletionSummaryV1:
     """Retain partial sample coverage and withhold paired inference until complete."""
     if not isinstance(arm_ids, tuple) or len(arm_ids) != 2:
@@ -677,11 +680,19 @@ def paired_completion_summary(
         raise ValueError("paired completion must use one identical campaign, cohort, and point")
     missing: dict[str, tuple[str, ...]] = {}
     complete = 0
+    treatments = None if outcome_matrix is None else {
+        item.terminal_status: item.all_shot for item in outcome_matrix.treatments
+    }
     for identity, arms in by_sample.items():
-        if set(arms) == expected:
+        eligible = {
+            arm for arm, outcome in arms.items()
+            if (outcome.terminal_status != "infrastructure_interruption" if treatments is None
+                else treatments[outcome.terminal_status] != "incomplete")
+        }
+        if eligible == expected:
             complete += 1
         else:
-            missing[identity[-1]] = tuple(sorted(expected - set(arms)))
+            missing[identity[-1]] = tuple(sorted(expected - eligible))
     return PairedCompletionSummaryV1(
         complete_pairs=complete,
         incomplete_pairs=len(missing),
