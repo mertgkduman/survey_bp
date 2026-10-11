@@ -317,3 +317,113 @@ def test_finite_look_requires_complete_declared_alpha_grid():
     finite["stopping"]["alpha_allocations"].pop()
     with pytest.raises(ValidationError):
         CampaignAssessmentV1.model_validate(finite)
+
+
+def test_prospective_failure_count_has_no_terminal_facts_and_limits_are_derived():
+    from bp_registry.campaigns.contracts import (
+        FailureCountBatchAuthorizationV1,
+        FailureCountCampaignCapsV1,
+        FailureCountExecutableLimitReceiptV1,
+        FailureCountPolicyV1,
+        InverseBinomialProcedureV1,
+        MultiplicativeTargetRuleV1,
+    )
+
+    limits = FailureCountExecutableLimitReceiptV1(
+        schema="failure_count_executable_limit_receipt_v1",
+        derivation_version="v1",
+        manifest_dimensions_sha256="1" * 64,
+        policy_binding_sha256="2" * 64,
+        serializer_sha256="3" * 64,
+        artifact_layout_sha256="4" * 64,
+        verifier_sha256="5" * 64,
+        max_decoder_iterations=10,
+        work_per_iteration=4,
+        max_ledger_events_per_unit=3,
+        serializer_bytes_per_event=20,
+        artifact_storage_bytes_per_unit=50,
+        partial_receipt_reserve_bytes=100,
+        derived_work_per_unit=40,
+        derived_events_per_unit=3,
+        derived_evidence_bytes_per_unit=160,
+        derived_storage_bytes_per_unit=210,
+    )
+    authorization = FailureCountBatchAuthorizationV1(
+        schema="failure_count_batch_authorization_v1",
+        executable_limit_receipt_sha256=limits.digest(),
+        policy_binding_sha256="2" * 64,
+        max_local_workers=1,
+        max_shots_per_batch=5,
+        max_work_per_batch=200,
+        max_events_per_batch=15,
+        max_evidence_bytes_per_batch=900,
+        max_storage_bytes_per_batch=1150,
+        monotonic_clock="monotonic_ns_v1",
+        per_unit_timeout_ns=1_000,
+    )
+    policy = FailureCountPolicyV1(
+        schema="failure_count_policy_v1",
+        policy_binding_sha256="2" * 64,
+        campaign_plan_sha256="6" * 64,
+        target_failures=2,
+        batch_size=5,
+        shot_order="campaign_cohort_point_sample_ordinal_v1",
+        failure_event="decoder_logical_failure_v1",
+        procedure=InverseBinomialProcedureV1(
+            method="exact_inverse_binomial", confidence_level=0.95, sidedness="two_sided",
+        ),
+        multiplicative_rule=MultiplicativeTargetRuleV1(
+            rule="multiplicative_target_interval_containment_v1", factor=1.5,
+        ),
+        caps=FailureCountCampaignCapsV1(
+            max_shots=10, max_decoder_work=400, max_events=30,
+            max_evidence_bytes=1700, max_storage_bytes=2200, max_wall_seconds=10.0,
+        ),
+        cap_precedence=("wall", "storage", "evidence", "events", "work", "shots"),
+        executable_limits=limits,
+        batch_authorization=authorization,
+    )
+    assert policy.target_failures == 2
+    assert policy.executable_limits.derived_evidence_bytes_per_unit == 160
+    assert "terminal_state" not in policy.model_dump()
+    with pytest.raises(ValidationError, match="extra_forbidden"):
+        FailureCountPolicyV1.model_validate({**policy.model_dump(), "terminal_state": "target_reached"})
+    with pytest.raises(ValidationError, match="derived"):
+        FailureCountExecutableLimitReceiptV1.model_validate(
+            {**limits.model_dump(), "derived_work_per_unit": 39},
+        )
+    with pytest.raises(ValidationError, match="batch"):
+        FailureCountBatchAuthorizationV1.model_validate(
+            {**authorization.model_dump(), "max_events_per_batch": 14},
+        )
+
+
+def test_terminal_receipt_is_post_run_only_and_records_boundary_overshoot():
+    from bp_registry.campaigns.contracts import FailureCountTerminalReceiptV1
+    from test_campaign_contracts import test_prospective_failure_count_has_no_terminal_facts_and_limits_are_derived
+
+    # Build the shared policy through the public contract above without relying
+    # on an execution result: every observed fact below is terminal evidence.
+    del test_prospective_failure_count_has_no_terminal_facts_and_limits_are_derived
+    receipt = FailureCountTerminalReceiptV1(
+        schema="failure_count_terminal_receipt_v1",
+        policy_sha256="a" * 64, campaign_plan_sha256="6" * 64,
+        executable_limit_receipt_sha256="b" * 64, batch_authorization_sha256="c" * 64,
+        terminal_state="target_reached", terminal_failure_ordinal=8,
+        cumulative_failures=2, total_completed_shots=10,
+        inferential_prefix_sha256="d" * 64, authorized_tail_ordinals=(9, 10),
+        authorized_tail_sha256="e" * 64,
+        realized_decoder_work=40, realized_events=10,
+        realized_evidence_bytes=300, realized_storage_bytes=500,
+        wall_boundaries=((1_000, 1_025, 25),),
+    )
+    assert receipt.wall_boundaries[0][2] == 25
+    assert receipt.terminal_failure_ordinal == 8
+    with pytest.raises(ValidationError):
+        FailureCountTerminalReceiptV1.model_validate(
+            {**receipt.model_dump(), "terminal_state": "cap_censored"},
+        )
+    with pytest.raises(ValidationError):
+        FailureCountTerminalReceiptV1.model_validate(
+            {**receipt.model_dump(), "wall_boundaries": [(1_000, 999, 0)]},
+        )
