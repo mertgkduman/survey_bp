@@ -9,7 +9,7 @@ from typing import Final, Mapping, Sequence
 from pydantic import Field, field_validator, model_validator
 
 from ..manifests import StrictModel
-from .contracts import CampaignWorkSpecV1, canonical_json_bytes
+from .contracts import CampaignWorkSpecV1, FailureCountWorkSpecV1, canonical_json_bytes
 from .identity import decoder_randomness_identity, physical_sample_identity, unit_key
 
 
@@ -108,7 +108,7 @@ class CampaignWorkPlan:
     units_per_sample_group: int
     campaign_plan_preimage: bytes
     campaign_plan_digest: str
-    work_spec: CampaignWorkSpecV1 | None = None
+    work_spec: CampaignWorkSpecV1 | FailureCountWorkSpecV1 | None = None
 
     @property
     def unit_keys(self) -> tuple[str, ...]:
@@ -257,6 +257,41 @@ def freeze_campaign_work_spec(spec: CampaignWorkSpecV1) -> CampaignWorkPlan:
         look_boundaries=plan.look_boundaries, units_per_sample_group=plan.units_per_sample_group,
         campaign_plan_preimage=plan.campaign_plan_preimage, campaign_plan_digest=plan.campaign_plan_digest,
         work_spec=spec,
+    )
+
+
+def freeze_failure_count_work_spec(spec: FailureCountWorkSpecV1) -> CampaignWorkPlan:
+    """Freeze one-arm failure-count ordinals before any outcome is observed."""
+    if not isinstance(spec, FailureCountWorkSpecV1):
+        raise ValueError("freeze_failure_count_work_spec requires FailureCountWorkSpecV1")
+    campaign = spec.campaign_work_spec
+    plan = freeze_work_plan(
+        campaign_spec_digest=spec.digest(),
+        coordinates=tuple(CampaignCoordinateV1(
+            cohort_id=item.cohort_id, point_id=item.point_id,
+            sample_namespace=item.sample_namespace, sample_ids=item.sample_ids,
+        ) for item in campaign.coordinates),
+        arm_seed_identities={arm.arm_id: arm.decoder_seed_identity for arm in campaign.arms},
+        look_sample_boundaries=campaign.look_sample_boundaries,
+        units_per_shard=campaign.units_per_shard,
+        max_total_units=spec.policy.caps.max_shots,
+        max_shards=min(_MAX_SHARDS, spec.policy.caps.max_shots),
+        max_serialized_bytes=spec.policy.caps.max_evidence_bytes,
+    )
+    unsigned = {
+        "schema": "failure_count_campaign_work_plan_v1",
+        "failure_count_work_spec": spec.model_dump(mode="json", by_alias=True),
+        "units": [unit.payload() for unit in plan.units],
+        "shards": [shard.payload() for shard in plan.shards],
+        "shot_ordinals": [unit.key for unit in plan.units],
+    }
+    preimage = canonical_json_bytes(unsigned)
+    if len(preimage) > spec.policy.caps.max_evidence_bytes:
+        raise ValueError("failure-count plan exceeds the frozen evidence cap")
+    return CampaignWorkPlan(
+        campaign_spec_digest=plan.campaign_spec_digest, units=plan.units, shards=plan.shards,
+        look_boundaries=plan.look_boundaries, units_per_sample_group=1,
+        campaign_plan_preimage=preimage, campaign_plan_digest=_plan_digest(unsigned), work_spec=spec,
     )
 
 

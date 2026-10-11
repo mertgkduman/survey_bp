@@ -23,7 +23,7 @@ from ..canonical.verification import validate_canonical_shot
 from ..ledger import read_canonical_events
 from ..runner import canonical_public_manifest_context, canonical_public_shot_context, run_canonical_materialized_one, run_canonical_one
 from .contracts import (
-    CampaignSpecV1, CampaignWorkSpecV1, FailureCountStoppingV1,
+    CampaignSpecV1, CampaignWorkSpecV1, FailureCountStoppingV1, FailureCountWorkSpecV1,
     MaterializedPhysicalSampleV1, build_one_unit_plan, canonical_json_bytes,
 )
 from .identity import validate_matched_sample_hashes
@@ -35,6 +35,16 @@ _THREAD_ENVIRONMENT = (
     "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS",
 )
 _MAX_LOCAL_WORKERS = 64
+
+
+def _campaign_work_spec(plan: CampaignWorkPlan) -> CampaignWorkSpecV1:
+    """Return the shared canonical work contract without erasing FC policy."""
+    spec = plan.work_spec
+    if isinstance(spec, FailureCountWorkSpecV1):
+        return spec.campaign_work_spec
+    if isinstance(spec, CampaignWorkSpecV1):
+        return spec
+    raise ValueError("canonical execution requires a frozen campaign work specification")
 
 
 def _allowlisted_thread_environment() -> dict[str, str]:
@@ -1022,8 +1032,9 @@ def _campaign_attempt(
 
 def verify_canonical_attempt(*, record: Mapping[str, Any], plan: CampaignWorkPlan) -> dict[str, Any]:
     """Independently rehash paired evidence before it can enter a campaign merge."""
-    if not isinstance(plan.work_spec, CampaignWorkSpecV1) or not isinstance(record, Mapping):
-        raise ValueError("canonical attempt verification requires a frozen paired work plan")
+    if not isinstance(record, Mapping):
+        raise ValueError("canonical attempt verification requires a frozen work plan")
+    spec = _campaign_work_spec(plan)
     required = {"schema", "attempt", "campaign_spec_digest", "campaign_plan_digest", "unit_key", "selected_shard_id", "arm_manifest_path", "arm_manifest_sha256", "materialized_sample_path", "materialized_sample_sha256", "physical_error_sha256", "canonical_ledger_path", "canonical_ledger_sha256", "terminal_fact", "work_vector", "receipt_sha256", "events", "terminal_bytes_sha256", "persisted_sample_sha256", "validation_status", "replay_status"}
     if set(record) != required or record["schema"] != "campaign_canonical_attempt_v1":
         raise ValueError("canonical attempt receipt has an invalid field set")
@@ -1038,15 +1049,15 @@ def verify_canonical_attempt(*, record: Mapping[str, Any], plan: CampaignWorkPla
         raise ValueError("canonical attempt selected shard differs from the frozen plan")
     sample_path = Path(record["materialized_sample_path"])
     if (sample_path.is_symlink() or not sample_path.is_file()
-            or sample_path.stat().st_size > plan.work_spec.assessment.resources.max_storage_bytes):
+            or sample_path.stat().st_size > spec.assessment.resources.max_storage_bytes):
         raise ValueError("canonical attempt materialized sample must be a regular file")
     materialized = MaterializedPhysicalSampleV1.model_validate_json(sample_path.read_bytes())
     if (materialized.physical_sample_identity != unit.physical_sample_identity
             or materialized.cohort_id != unit.cohort_id or materialized.point_id != unit.point_id
             or materialized.sample_namespace != unit.sample_namespace or materialized.sample_id != unit.sample_id
-            or materialized.sampler_contract_sha256 != plan.work_spec.shared_sampler.digest()):
+            or materialized.sampler_contract_sha256 != spec.shared_sampler.digest()):
         raise ValueError("canonical attempt materialized sample differs from frozen sampling bindings")
-    arm = next((item for item in plan.work_spec.arms if item.arm_id == unit.arm_id), None)
+    arm = next((item for item in spec.arms if item.arm_id == unit.arm_id), None)
     if arm is None or record["arm_manifest_path"] != str(Path(arm.manifest_path)) and Path(record["arm_manifest_path"]).name != Path(arm.manifest_path).name:
         raise ValueError("canonical attempt manifest path differs from frozen arm")
     manifest = Path(record["arm_manifest_path"])
@@ -1054,7 +1065,7 @@ def verify_canonical_attempt(*, record: Mapping[str, Any], plan: CampaignWorkPla
         raise ValueError("canonical attempt manifest bytes differ from frozen arm")
     ledger = Path(record["canonical_ledger_path"])
     if (ledger.is_symlink() or not ledger.is_file()
-            or ledger.stat().st_size > plan.work_spec.assessment.resources.max_evidence_bytes):
+            or ledger.stat().st_size > spec.assessment.resources.max_evidence_bytes):
         raise ValueError("canonical attempt ledger must be a bounded regular file")
     if (materialized.materialized_sample_sha256 != record["materialized_sample_sha256"]
             or materialized.physical_error_sha256 != record["physical_error_sha256"]
@@ -1120,3 +1131,125 @@ def run_canonical_work_plan(
     return {"schema": "campaign_canonical_work_execution_v1", "campaign_plan_digest": plan.campaign_plan_digest,
             "shard_ids": tuple(shard.shard_id for shard in selected_shards),
             "materialized_samples": tuple(samples.values()), "verified_attempts": tuple(verified)}
+
+
+def _failure_count_executable_projection(
+    *, plan: CampaignWorkPlan, campaign_root: Path, first_ordinal: int, batch_size: int,
+) -> tuple[CampaignWorkSpecV1, dict[str, int]]:
+    """Revalidate executable facts before any bounded unit is materialized."""
+    if not isinstance(plan.work_spec, FailureCountWorkSpecV1):
+        raise ValueError("bounded canonical execution requires FailureCountWorkSpecV1")
+    spec, policy = plan.work_spec.campaign_work_spec, plan.work_spec.policy
+    if batch_size != policy.batch_size or first_ordinal < 1 or first_ordinal + batch_size - 1 > len(plan.units):
+        raise ValueError("bounded canonical execution requires one exact declared ordinal batch")
+    if first_ordinal + batch_size - 1 > policy.caps.max_shots:
+        raise ValueError("requested ordinal batch exceeds the frozen shot cap")
+    arm = spec.arms[0]
+    manifest_path = (campaign_root / arm.manifest_path).resolve(strict=True)
+    context = canonical_public_manifest_context(manifest_path)
+    limits = policy.executable_limits
+    if context.manifest.budgets.attempt.max_iterations != limits.max_decoder_iterations:
+        raise ValueError("failure-count executable limit is stale or understates manifest iterations")
+    if (limits.work_per_iteration < 1 or limits.max_ledger_events_per_unit < 1
+            or limits.serializer_bytes_per_event < 1 or limits.artifact_storage_bytes_per_unit < 1):
+        raise ValueError("failure-count executable limit has invalid independent dimensions")
+    projection = {
+        "shots": batch_size,
+        "work": batch_size * limits.derived_work_per_unit,
+        "events": batch_size * limits.derived_events_per_unit,
+        "evidence_bytes": batch_size * limits.derived_evidence_bytes_per_unit + limits.partial_receipt_reserve_bytes,
+        "storage_bytes": batch_size * limits.derived_storage_bytes_per_unit + limits.partial_receipt_reserve_bytes,
+    }
+    authorization = policy.batch_authorization
+    if (projection["shots"] > authorization.max_shots_per_batch
+            or projection["work"] > authorization.max_work_per_batch
+            or projection["events"] > authorization.max_events_per_batch
+            or projection["evidence_bytes"] > authorization.max_evidence_bytes_per_batch
+            or projection["storage_bytes"] > authorization.max_storage_bytes_per_batch):
+        raise ValueError("bounded canonical batch exceeds its verified authorization")
+    cap_values = {
+        "shots": policy.caps.max_shots, "work": policy.caps.max_decoder_work,
+        "events": policy.caps.max_events, "evidence_bytes": policy.caps.max_evidence_bytes,
+        "storage_bytes": policy.caps.max_storage_bytes,
+    }
+    if any(projection[name] > cap_values[name] for name in projection):
+        raise ValueError("bounded canonical batch cannot fit every hard resource cap")
+    return spec, projection
+
+
+def run_canonical_bounded_batch(
+    plan: CampaignWorkPlan, *, campaign_root: str | Path, output_root: str | Path,
+    first_ordinal: int, batch_size: int,
+) -> dict[str, Any]:
+    """Execute exactly one frozen contiguous failure-count ordinal batch.
+
+    This deliberately has no scheduler path and never calls
+    :func:`run_canonical_work_plan`; every attempted shot is independently
+    verified before the caller may use it for failure-count stopping.
+    """
+    root = Path(campaign_root).resolve(strict=True)
+    destination = Path(output_root)
+    if destination.exists() and (destination.is_symlink() or not destination.is_dir()):
+        raise ValueError("bounded campaign output root must be a regular directory")
+    spec, projection = _failure_count_executable_projection(
+        plan=plan, campaign_root=root, first_ordinal=first_ordinal, batch_size=batch_size,
+    )
+    policy = plan.work_spec.policy  # narrowed by the preflight above
+    assert isinstance(policy, object)
+    destination.mkdir(parents=True, exist_ok=True)
+    arm_contexts = _preflight_work_arms(spec, root)
+    deadline_ns = time.monotonic_ns() + plan.work_spec.policy.batch_authorization.per_unit_timeout_ns
+    verified: list[dict[str, Any]] = []
+    materialized_samples: list[MaterializedPhysicalSampleV1] = []
+    observations: list[tuple[int, int, int]] = []
+    for ordinal in range(first_ordinal, first_ordinal + batch_size):
+        before = time.monotonic_ns()
+        if before >= deadline_ns:
+            raise TimeoutError("bounded canonical wall authorization expired before new work")
+        unit = plan.units[ordinal - 1]
+        arm_path, context = arm_contexts[unit.arm_id]
+        sample_path = destination / "samples" / f"{unit.physical_sample_identity}.json"
+        materialized = materialize_campaign_sample(
+            plan=plan, unit=unit, spec=spec, context=context, destination=sample_path,
+        )
+        ledger_path = destination / "units" / unit.key / "events.jsonl"
+        ledger_path.parent.mkdir(parents=True, exist_ok=True)
+        run_canonical_materialized_one(
+            arm_path, sample=_shot_from_materialized(materialized),
+            materialized_sample_sha256=materialized.materialized_sample_sha256,
+            ledger_path=ledger_path, manifest_bytes=arm_path.read_bytes(),
+        )
+        observed = time.monotonic_ns()
+        observations.append((deadline_ns, observed, max(0, observed - deadline_ns)))
+        record = _campaign_attempt(
+            plan=plan, unit=unit, arm_path=arm_path, sample_path=sample_path,
+            materialized=materialized, ledger_path=ledger_path,
+        )
+        receipt_path = ledger_path.parent / "attempt.json"
+        receipt_path.write_bytes(canonical_json_bytes({
+            key: value for key, value in record.items()
+            if key not in {"receipt_sha256", "events", "terminal_bytes_sha256", "persisted_sample_sha256", "validation_status", "replay_status"}
+        }) + b"\n")
+        verified.append(verify_canonical_attempt(record=record, plan=plan))
+        materialized_samples.append(materialized)
+        if observed >= deadline_ns:
+            break
+    if len(verified) != batch_size:
+        raise TimeoutError("bounded canonical wall authorization stopped a partial batch")
+    actual_evidence = sum(Path(item["canonical_ledger_path"]).stat().st_size for item in verified)
+    actual_storage = actual_evidence + sum(Path(item["materialized_sample_path"]).stat().st_size for item in verified)
+    actual_storage += sum((destination / "units" / item["unit_key"] / "attempt.json").stat().st_size for item in verified)
+    if actual_evidence > plan.work_spec.policy.caps.max_evidence_bytes or actual_storage > plan.work_spec.policy.caps.max_storage_bytes:
+        raise ValueError("bounded canonical execution exceeded a declared evidence or storage cap")
+    return {
+        "schema": "failure_count_canonical_bounded_batch_v1",
+        "campaign_plan_digest": plan.campaign_plan_digest,
+        "ordinals": tuple(range(first_ordinal, first_ordinal + batch_size)),
+        "authorization_projection": {"dispatch_allowed": True, **projection},
+        "actual_resources": {
+            "completed_shots": len(verified), "evidence_bytes": actual_evidence,
+            "storage_bytes": actual_storage,
+        },
+        "wall_boundaries": tuple(observations),
+        "materialized_samples": tuple(materialized_samples), "verified_attempts": tuple(verified),
+    }

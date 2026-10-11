@@ -751,10 +751,10 @@ class CampaignWorkCoordinateV1(StrictModel):
 
 
 class CampaignWorkSpecV1(StrictModel):
-    """Strict primitive input for a complete, paired canonical campaign."""
+    """Strict primitive input for a complete canonical campaign."""
 
     schema_name: Literal["campaign_work_spec_v1"] = Field(alias="schema", serialization_alias="schema")
-    arms: tuple[CampaignArmV1, ...] = Field(min_length=2, max_length=128)
+    arms: tuple[CampaignArmV1, ...] = Field(min_length=1, max_length=128)
     shared_sampler: SharedSamplerContractV1
     coordinates: tuple[CampaignWorkCoordinateV1, ...] = Field(min_length=1, max_length=_MAX_EVENTS)
     look_sample_boundaries: tuple[int, ...] = Field(min_length=1, max_length=1_000)
@@ -799,6 +799,36 @@ class CampaignWorkSpecV1(StrictModel):
 
     def digest(self) -> str:
         return _digest("bp-registry-campaign-work-spec-v1", self.primitive_bytes())
+
+
+class FailureCountWorkSpecV1(StrictModel):
+    """Outcome-independent authorization for one canonical failure-count arm.
+
+    The nested work specification retains the established manifest, sampler,
+    coordinate, and lock grammar.  Restricting it to exactly one arm makes an
+    ordinal a scientific shot rather than a completion-order observation.
+    """
+
+    schema_name: Literal["failure_count_work_spec_v1"] = Field(alias="schema", serialization_alias="schema")
+    campaign_work_spec: CampaignWorkSpecV1
+    policy: FailureCountPolicyV1
+
+    @model_validator(mode="after")
+    def one_arm_prospective_contract(self) -> "FailureCountWorkSpecV1":
+        campaign = self.campaign_work_spec
+        if len(campaign.arms) != 1:
+            raise ValueError("failure-count canonical work requires exactly one declared arm")
+        if campaign.assessment.stopping != self.policy:
+            raise ValueError("failure-count work assessment must bind the prospective policy exactly")
+        if campaign.assessment.resources.max_shots != self.policy.caps.max_shots:
+            raise ValueError("failure-count work resources must bind the prospective policy caps")
+        return self
+
+    def primitive_bytes(self) -> bytes:
+        return canonical_json_bytes(self.model_dump(mode="json", by_alias=True))
+
+    def digest(self) -> str:
+        return _digest("bp-registry-failure-count-work-spec-v1", self.primitive_bytes())
 
 
 class MaterializedPhysicalSampleV1(StrictModel):
