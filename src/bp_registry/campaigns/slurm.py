@@ -16,6 +16,7 @@ import re
 from typing import Any, Callable, Final, Mapping, Sequence
 
 from .execution import execute_local_work_plan
+from .identity import validate_matched_sample_hashes
 from .planning import CampaignWorkPlan, ShardPlan
 
 
@@ -388,6 +389,7 @@ def execute_synthetic_slurm_array(
         for record in receipt["scientific_records"]
     }
     scientific = tuple(records_by_key[key] for key in plan.unit_keys if key in records_by_key)
+    validate_matched_sample_hashes(scientific)
     terminal = tuple(record["unit_key"] for record in scientific)
     incomplete = tuple(
         key for receipt in task_receipts for key in receipt["incomplete_unit_keys"]

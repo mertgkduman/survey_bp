@@ -20,7 +20,10 @@ from pydantic import ValidationError
 
 from ..manifests import preflight as preflight_manifest
 from .contracts import CampaignSpecV1, build_one_unit_plan, canonical_json_bytes
-from .execution import dispatch_finite_looks, run_one_unit
+from .execution import (
+    _build_look_merge_receipt, _deterministic_look_stop_receipt, _sealed_local_records,
+    dispatch_finite_looks, run_one_unit,
+)
 from .planning import CampaignCoordinateV1, freeze_work_plan
 from .shards import reconstruct_fixed_shot, verify_shard
 from .slurm import (
@@ -325,6 +328,40 @@ def _verify_operational_gate(args: argparse.Namespace) -> dict[str, Any]:
     finite = _read_json(str(paths["finite-look-recovery.json"]))
     if finite.get("recovered_stop_receipt") is not True or finite.get("next_look_submissions") != 0 or finite.get("pre_crash_receipt_sha256s") != finite.get("post_crash_receipt_sha256s"):
         raise ValueError("operational gate finite-look recovery proof is incomplete")
+    campaign_document = _read_json(args.campaign)
+    gate = campaign_document.get("operational_gate")
+    if not isinstance(gate, Mapping):
+        raise ValueError("operational gate metadata is missing")
+    work_plan = _operational_work_plan(spec, root, gate)
+    finite_root = _existing_root(output / "finite-look", name="finite-look evidence")
+    actual_hashes = _finite_evidence_hashes(finite_root)
+    if (finite.get("campaign_spec_digest") != work_plan.campaign_spec_digest
+            or finite.get("campaign_plan_digest") != work_plan.campaign_plan_digest
+            or actual_hashes != finite["pre_crash_receipt_sha256s"]
+            or "look-1-merge-receipt.json" not in actual_hashes):
+        raise ValueError("operational gate finite-look evidence differs from frozen plan")
+    records = _sealed_local_records(finite_root)
+    terminals = tuple(record for record in records if record["state"] == "sealed_terminal")
+    prefix = work_plan.completed_prefix(1)
+    if {record["unit_key"] for record in terminals} != set(prefix):
+        raise ValueError("operational gate finite-look terminal set differs from completed boundary")
+    expected_merge = _build_look_merge_receipt(
+        plan=work_plan, look=1, terminal_records=terminals, root=finite_root,
+    )
+    merge_file = _confined_file(finite_root, "look-1-merge-receipt.json", name="finite-look merge")
+    if merge_file.read_bytes() != canonical_json_bytes(expected_merge) + b"\n":
+        raise ValueError("operational gate finite-look merge differs from sealed units")
+    terminal_by_key = {record["unit_key"]: record for record in terminals}
+    decision = _operational_stop_decision(
+        look=1, terminal_records=tuple(terminal_by_key[key]["scientific"]["terminal_fact"] for key in prefix),
+    )
+    expected_stop = _deterministic_look_stop_receipt(
+        plan=work_plan, look=1, terminal_records=terminals, decision=decision,
+        merge_receipt_sha256=sha256(merge_file.read_bytes()).hexdigest(),
+    )
+    stop_file = _confined_file(finite_root, "look-stop-receipt.json", name="finite-look stop")
+    if stop_file.read_bytes() != canonical_json_bytes(expected_stop) + b"\n":
+        raise ValueError("operational gate finite-look stop differs from reconstructed merge and decision")
     scheduler = _read_json(str(paths["scheduler-capability.json"]))
     capabilities = scheduler.get("capabilities")
     if not isinstance(capabilities, Mapping) or capabilities.get("accounting_available", {}).get("value") is not None:
@@ -442,6 +479,30 @@ def _operational_stop_decision(*, look: int, terminal_records: tuple[dict[str, A
     }
 
 
+def _operational_work_plan(spec: CampaignSpecV1, root: Path, gate: Mapping[str, Any]):
+    manifests = gate["eligible_manifests"]
+    sample_ids = tuple(gate["preselected_sample_ids"])
+    seeds: dict[str, str] = {}
+    for arm, entry in manifests.items():
+        manifest = preflight_manifest(_confined_file(root, entry[0], name="operational_gate manifest")).manifest
+        seeds[str(arm)] = manifest.randomness.decoder_seed_identity
+    return freeze_work_plan(
+        campaign_spec_digest=build_one_unit_plan(spec).campaign_spec_digest,
+        coordinates=(CampaignCoordinateV1(
+            cohort_id=spec.cohort_id, point_id=spec.point_id,
+            sample_namespace=spec.sample_namespace, sample_ids=sample_ids,
+        ),),
+        arm_seed_identities=seeds, look_sample_boundaries=(1, 2), units_per_shard=2,
+    )
+
+
+def _finite_evidence_hashes(root: Path) -> dict[str, str]:
+    paths = sorted((*root.glob("unit-*/receipt.json"), *root.glob("look-*-merge-receipt.json")))
+    if any(path.is_symlink() or not path.is_file() for path in paths):
+        raise ValueError("finite-look evidence must contain regular receipt files")
+    return {str(path.relative_to(root)): sha256(path.read_bytes()).hexdigest() for path in paths}
+
+
 def _operational_fixture(args: argparse.Namespace) -> dict[str, Any]:
     """Retain the bounded local/Slurm finite-look transport proof for Phase 8."""
     root = _existing_root(args.campaign_root, name="campaign_root")
@@ -450,20 +511,7 @@ def _operational_fixture(args: argparse.Namespace) -> dict[str, Any]:
     gate = document.get("operational_gate")
     if not isinstance(gate, Mapping):
         raise ValueError("operational fixture requires operational_gate metadata")
-    manifests = gate["eligible_manifests"]
-    sample_ids = tuple(gate["preselected_sample_ids"])
-    seeds: dict[str, str] = {}
-    for arm, entry in manifests.items():
-        manifest = preflight_manifest(_confined_file(root, entry[0], name="operational_gate manifest")).manifest
-        seeds[str(arm)] = manifest.randomness.decoder_seed_identity
-    work_plan = freeze_work_plan(
-        campaign_spec_digest=build_one_unit_plan(spec).campaign_spec_digest,
-        coordinates=(CampaignCoordinateV1(
-            cohort_id=spec.cohort_id, point_id=spec.point_id,
-            sample_namespace=spec.sample_namespace, sample_ids=sample_ids,
-        ),),
-        arm_seed_identities=seeds, look_sample_boundaries=(1, 2), units_per_shard=2,
-    )
+    work_plan = _operational_work_plan(spec, root, gate)
     output = _output_root(args.output_root)
     finite_root = output / "finite-look"
     try:
@@ -476,18 +524,12 @@ def _operational_fixture(args: argparse.Namespace) -> dict[str, Any]:
         pass
     else:
         raise ValueError("operational fixture fault injection did not interrupt")
-    pre_crash = {
-        str(path.relative_to(finite_root)): sha256(path.read_bytes()).hexdigest()
-        for path in sorted(finite_root.glob("unit-*/receipt.json"))
-    }
+    pre_crash = _finite_evidence_hashes(finite_root)
     recovered = dispatch_finite_looks(
         work_plan, output_root=finite_root, workers=1,
         unit_runner=_operational_unit_runner, decision_for_look=_operational_stop_decision,
     )
-    post_crash = {
-        str(path.relative_to(finite_root)): sha256(path.read_bytes()).hexdigest()
-        for path in sorted(finite_root.glob("unit-*/receipt.json"))
-    }
+    post_crash = _finite_evidence_hashes(finite_root)
     if not recovered["recovered_stop_receipt"] or pre_crash != post_crash:
         raise ValueError("operational fixture did not recover immutable pre-crash evidence")
     allocation = SlurmAllocation(

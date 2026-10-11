@@ -309,6 +309,35 @@ def _stop_after_first_complete_look(*, look: int, terminal_records: tuple[dict[s
     }
 
 
+def _never_stop(*, look: int, terminal_records: tuple[dict[str, object], ...]) -> dict[str, object]:
+    decision = _stop_after_first_complete_look(look=look, terminal_records=terminal_records)
+    decision["should_stop"] = False
+    return decision
+
+
+def test_retained_stop_rejects_changed_decision_before_next_look(tmp_path: Path):
+    from bp_registry.campaigns.execution import dispatch_finite_looks
+    from bp_registry.campaigns.planning import freeze_work_plan
+
+    digest, coordinates, arms = _planning_inputs()
+    plan = freeze_work_plan(
+        campaign_spec_digest=digest, coordinates=coordinates, arm_seed_identities=arms,
+        look_sample_boundaries=(1, 2), units_per_shard=2,
+    )
+    root = tmp_path / "retained-stop"
+    dispatch_finite_looks(
+        plan, output_root=root, workers=1, unit_runner=_bounded_unit_runner,
+        decision_for_look=_stop_after_first_complete_look,
+    )
+    first_look_receipts = tuple(sorted(root.glob("unit-*/receipt.json")))
+    with pytest.raises(ValueError, match="conflicts with reconstructed decision"):
+        dispatch_finite_looks(
+            plan, output_root=root, workers=1, unit_runner=_bounded_unit_runner,
+            decision_for_look=_never_stop,
+        )
+    assert tuple(sorted(root.glob("unit-*/receipt.json"))) == first_look_receipts
+
+
 def test_finite_look_recovers_stop_receipt_before_any_later_dispatch(tmp_path: Path):
     """A post-decision crash recovers its exact receipt before the next look runs."""
     from bp_registry.campaigns.execution import dispatch_finite_looks
@@ -327,6 +356,8 @@ def test_finite_look_recovers_stop_receipt_before_any_later_dispatch(tmp_path: P
         )
     first_look = set(plan.completed_prefix(1))
     assert {path.parent.name.removeprefix("unit-") for path in root.glob("unit-*/receipt.json")} == first_look
+    merge_path = root / "look-1-merge-receipt.json"
+    pre_crash_merge = merge_path.read_bytes()
     recovered = dispatch_finite_looks(
         plan, output_root=root, workers=1, unit_runner=_bounded_unit_runner,
         decision_for_look=_stop_after_first_complete_look,
@@ -335,6 +366,8 @@ def test_finite_look_recovers_stop_receipt_before_any_later_dispatch(tmp_path: P
     assert recovered["authorized_undispatched_keys"] == plan.authorized_tail(1)
     assert {path.parent.name.removeprefix("unit-") for path in root.glob("unit-*/receipt.json")} == first_look
     assert (root / "look-stop-receipt.json").is_file()
+    assert merge_path.read_bytes() == pre_crash_merge
+    assert recovered["stop_receipt"]["merge_receipt_sha256"] == sha256(pre_crash_merge).hexdigest()
 
 
 def test_finite_look_rejects_a_forged_retained_stop_tail(tmp_path: Path):
@@ -361,6 +394,31 @@ def test_finite_look_rejects_a_forged_retained_stop_tail(tmp_path: Path):
             plan, output_root=root, workers=1, unit_runner=_bounded_unit_runner,
             decision_for_look=_stop_after_first_complete_look,
         )
+
+
+def test_finite_look_rejects_a_mutated_completed_merge(tmp_path: Path):
+    from bp_registry.campaigns.execution import dispatch_finite_looks
+    from bp_registry.campaigns.planning import freeze_work_plan
+
+    digest, coordinates, arms = _planning_inputs()
+    plan = freeze_work_plan(
+        campaign_spec_digest=digest, coordinates=coordinates, arm_seed_identities=arms,
+        look_sample_boundaries=(1, 2), units_per_shard=2,
+    )
+    root = tmp_path / "mutated-merge"
+    dispatch_finite_looks(
+        plan, output_root=root, workers=1, unit_runner=_bounded_unit_runner,
+        decision_for_look=_stop_after_first_complete_look,
+    )
+    merge_path = root / "look-1-merge-receipt.json"
+    merge_path.write_bytes(merge_path.read_bytes() + b" ")
+    first_look_receipts = tuple(sorted(root.glob("unit-*/receipt.json")))
+    with pytest.raises(ValueError, match="conflicts with reconstruction"):
+        dispatch_finite_looks(
+            plan, output_root=root, workers=1, unit_runner=_bounded_unit_runner,
+            decision_for_look=_stop_after_first_complete_look,
+        )
+    assert tuple(sorted(root.glob("unit-*/receipt.json"))) == first_look_receipts
 
 
 def test_finite_look_maximum_retains_all_realized_units(tmp_path: Path):
@@ -512,6 +570,23 @@ def test_executor_equivalence_keeps_scheduler_receipts_out_of_scientific_results
     assert all("scheduler" not in record for record in slurm["scientific_records"])
     assert all(receipt["executor_receipt"]["scheduler"]["accounting_available"] is None for receipt in slurm["task_receipts"])
     assert all(receipt["executor_receipt"]["scheduler"]["launch_overhead_seconds"] == 1 for receipt in slurm["task_receipts"])
+
+
+def test_synthetic_slurm_rejects_cross_shard_sample_mismatch(tmp_path: Path):
+    from bp_registry.campaigns.planning import freeze_work_plan
+    from bp_registry.campaigns.slurm import execute_synthetic_slurm_array
+    api = _slurm_api()
+    digest, coordinates, arms = _planning_inputs()
+    plan = freeze_work_plan(
+        campaign_spec_digest=digest, coordinates=coordinates, arm_seed_identities=arms,
+        look_sample_boundaries=(1, 2), units_per_shard=1,
+    )
+    with pytest.raises(ValueError, match="matched arms"):
+        execute_synthetic_slurm_array(
+            plan, output_root=tmp_path / "slurm", unit_runner=_mismatched_sample_runner,
+            allocation=_slurm_allocation(api),
+            observations=tuple(_scheduler_observation(api, task_id=str(index)) for index in range(len(plan.shards))),
+        )
 
 
 def test_scheduler_receipt_preemption_cancellation_and_duplicate_delivery_are_incomplete(tmp_path: Path):

@@ -72,9 +72,11 @@ The bounded synthetic matched-arm fixture exercises the paired family and the
 finite-look route. Its deterministic fault is injected after a complete look
 has been assessed and before the atomic stop receipt is published. Resume must
 reconstruct and publish that receipt before it subtracts any unit from the next
-look. The retained proof therefore records the authorized undispatched tail,
-zero next-look submission, and byte-identical pre-crash shard and merge
-evidence.
+look. This local finite-look controller seals a separate per-look merge receipt
+from its unit receipts before assessing the stop. The retained proof records
+the authorized undispatched tail, zero next-look submission, and byte-identical
+pre-crash unit and local merge evidence. The legacy single-unit CLI merge uses
+a different receipt format; it does not consume this local merge receipt.
 
 Reports reconstruct claims from terminal receipts and their hashes. Target
 references retain a source byte digest, its uncertainty and precision, and an
