@@ -249,6 +249,69 @@ def test_paired_canonical_rejects_attempt_or_ledger_tamper(tmp_path: Path) -> No
         api.verify_canonical_attempt(record=tampered, plan=plan)
 
 
+def _single_arm_failure_count_work_spec_payload() -> dict[str, object]:
+    """A one-shot canonical adaptation with prospective failure-count caps."""
+    payload = _paired_work_spec_payload()
+    payload["arms"] = [payload["arms"][0]]  # type: ignore[index]
+    payload["units_per_shard"] = 1
+    resources = payload["assessment"]["resources"]  # type: ignore[index]
+    resources.update({"max_shots": 1, "max_batch_size": 1, "max_events": 1})
+    limits = {
+        "schema": "failure_count_executable_limit_receipt_v1", "derivation_version": "v1",
+        "manifest_dimensions_sha256": "1" * 64, "policy_binding_sha256": "2" * 64,
+        "serializer_sha256": "3" * 64, "artifact_layout_sha256": "4" * 64,
+        "verifier_sha256": "5" * 64, "max_decoder_iterations": 25,
+        "work_per_iteration": 4, "max_ledger_events_per_unit": 12,
+        "serializer_bytes_per_event": 4096, "artifact_storage_bytes_per_unit": 4096,
+        "partial_receipt_reserve_bytes": 4096, "derived_work_per_unit": 100,
+        "derived_events_per_unit": 12, "derived_evidence_bytes_per_unit": 53248,
+        "derived_storage_bytes_per_unit": 57344,
+    }
+    authorization = {
+        "schema": "failure_count_batch_authorization_v1", "policy_binding_sha256": "2" * 64,
+        "executable_limit_receipt_sha256": __import__("bp_registry.campaigns.contracts", fromlist=["FailureCountExecutableLimitReceiptV1"]).FailureCountExecutableLimitReceiptV1.model_validate(limits).digest(),
+        "max_local_workers": 1, "max_shots_per_batch": 1, "max_work_per_batch": 100,
+        "max_events_per_batch": 12, "max_evidence_bytes_per_batch": 57344,
+        "max_storage_bytes_per_batch": 61440, "monotonic_clock": "monotonic_ns_v1",
+        "per_unit_timeout_ns": 1_000_000_000,
+    }
+    policy = {
+        "schema": "failure_count_policy_v1", "policy_binding_sha256": "2" * 64,
+        "campaign_plan_sha256": "6" * 64, "target_failures": 1, "batch_size": 1,
+        "shot_order": "campaign_cohort_point_sample_ordinal_v1",
+        "failure_event": "decoder_logical_failure_v1",
+        "procedure": {"method": "exact_inverse_binomial", "confidence_level": 0.95, "sidedness": "two_sided"},
+        "multiplicative_rule": {"rule": "multiplicative_target_interval_containment_v1", "factor": 1.5},
+        "caps": {"max_shots": 1, "max_decoder_work": 100, "max_events": 12,
+                 "max_evidence_bytes": 57344, "max_storage_bytes": 61440, "max_wall_seconds": 60.0},
+        "cap_precedence": ["wall", "storage", "evidence", "events", "work", "shots"],
+        "executable_limits": limits, "batch_authorization": authorization,
+    }
+    payload["assessment"].update({  # type: ignore[index]
+        "interval": {"method": "exact_inverse_binomial", "confidence_level": 0.95, "sidedness": "two_sided"},
+        "stopping": policy,
+        "decision_rule": {"rule": "multiplicative_target_interval_containment_v1", "factor": 1.5},
+    })
+    return {"schema": "failure_count_work_spec_v1", "campaign_work_spec": payload, "policy": policy}
+
+
+def test_single_arm_work_spec_runs_one_verified_canonical_bounded_unit(tmp_path: Path) -> None:
+    """A failure-count request runs only its frozen ordinal through canonical evidence."""
+    from bp_registry.campaigns.contracts import FailureCountWorkSpecV1
+    from bp_registry.campaigns.execution import run_canonical_bounded_batch
+    from bp_registry.campaigns.planning import freeze_failure_count_work_spec
+
+    spec = FailureCountWorkSpecV1.model_validate(_single_arm_failure_count_work_spec_payload())
+    plan = freeze_failure_count_work_spec(spec)
+    result = run_canonical_bounded_batch(
+        plan, campaign_root=ROOT, output_root=tmp_path, first_ordinal=1, batch_size=1,
+    )
+    assert result["ordinals"] == (1,)
+    assert len(result["verified_attempts"]) == 1
+    assert result["verified_attempts"][0]["unit_key"] == plan.units[0].key
+    assert result["authorization_projection"]["dispatch_allowed"] is True
+
+
 def _planning_inputs():
     from bp_registry.campaigns.planning import CampaignCoordinateV1
 
