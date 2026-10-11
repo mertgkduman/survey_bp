@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 import importlib.util
+import json
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -106,6 +109,103 @@ def test_worker_completion_order_cannot_change_selection_lineage_or_work() -> No
     reversed_order = MbbpController(spec).run(_original(), error_rate=0.1, completion_order=("basis-b", "basis-a"))
 
     assert forward.as_evidence() == reversed_order.as_evidence()
+
+
+def test_declared_vote_uses_only_admitted_members_and_validates_the_aggregate() -> None:
+    """The public decision closes over member terminals, not hidden truth."""
+    from bp_registry.canonical.mbbp import MbbpController, MbbpSpec
+    from bp_registry.canonical import phase6
+
+    assert hasattr(phase6, "execute_declared_mbbp_decision")
+
+    result = MbbpController(MbbpSpec(
+        bases=(_basis("basis-a", 0), _basis("basis-b", 1, ((1, 0),))), max_iterations=8,
+    )).run(_original(), error_rate=0.1)
+
+    decision = phase6.execute_declared_mbbp_decision(_original(), result=result, vote_tie_bit=1)
+
+    assert decision.terminal_status == "vote_selected_original_valid_candidate"
+    assert decision.vote is not None and decision.vote.original_valid is True
+    assert decision.electorate == tuple(sorted(
+        (member.lineage_id for member in result.members if member.admitted), key=lambda identifier: identifier.value,
+    ))
+    assert len(decision.ballots) == len(decision.electorate)
+    assert decision.exclusions == ()
+    assert decision.selected_candidate == decision.vote.correction
+
+
+def _two_solution_vote_result():
+    """Freeze two individually valid, coordinate-tied member terminals."""
+    from bp_registry.canonical.mbbp import MbbpController, MbbpSpec
+
+    result = MbbpController(MbbpSpec(
+        bases=(_basis("basis-a", 0), _basis("basis-b", 1, ((1, 0),))), max_iterations=8,
+    )).run(_original(), error_rate=0.1)
+    members = (
+        replace(result.members[0], status="converged_original_valid", candidate=(1, 0, 0), original_valid=True),
+        replace(result.members[1], status="converged_original_valid", candidate=(0, 1, 1), original_valid=True),
+    )
+    return replace(result, members=members)
+
+
+def test_declared_vote_retains_invalid_aggregate_without_list_fallback() -> None:
+    from bp_registry.canonical.phase6 import execute_declared_mbbp_decision
+
+    decision = execute_declared_mbbp_decision(_original(), result=_two_solution_vote_result(), vote_tie_bit=0)
+
+    assert decision.terminal_status == "vote_aggregate_original_invalid"
+    assert decision.selected_candidate is None and decision.selected_origin_id is None
+    assert decision.vote is not None
+    assert decision.vote.correction == (0, 0, 0)
+    assert decision.vote.original_valid is False
+
+
+def test_declared_vote_records_each_nonadmitted_member_and_empty_electorate() -> None:
+    from bp_registry.canonical.phase6 import execute_declared_mbbp_decision
+
+    result = _two_solution_vote_result()
+    denied = replace(
+        result.members[0], status="budget_denied", candidate=None, original_valid=None, terminal_posterior=None,
+    )
+    invalid = replace(result.members[1], status="converged_original_invalid", original_valid=False)
+    decision = execute_declared_mbbp_decision(
+        _original(), result=replace(result, members=(denied, invalid)), vote_tie_bit=1,
+    )
+
+    assert decision.terminal_status == "no_eligible_vote_candidate"
+    assert decision.electorate == () and decision.ballots == () and decision.vote is None
+    assert [(item.member_id, item.disposition) for item in decision.exclusions] == [
+        (denied.member_id, "budget_denied"), (invalid.member_id, "original_invalid"),
+    ]
+
+
+def test_public_v7_manifest_admits_a_complete_coordinate_vote_declaration() -> None:
+    from bp_registry.manifests import CanonicalExperimentV7, parse_manifest
+
+    value = json.loads(Path("data/manifests/canonical-three-qubit-development.json").read_text())
+    value["schema_version"] = 7
+    value["numerical_profile"] = "cpu-float64-min-sum-v1"
+    policies = value["policies"]
+    assert isinstance(policies, dict)
+    policies["update"].update({"kind": "normalized_min_sum", "parameter_assignment": {"shape": "scalar", "value": 0.875}})
+    policies["schedule"].update({"kind": "check_node_serial"})
+    policies["state_memory"].update({"kind": "identity"})
+    value["ensemble"] = {
+        "kind": "mbbp_ld", "source_status": "canonical_adaptation", "member_state": "independent",
+        "max_iterations": 8, "max_member_c2v_updates": 100, "max_total_members": 1,
+        "no_member_terminal": "no_member_converged_zero_return",
+        "bases": [{"member_id": "member-0", "local_ordinal": 0, "partition_identity": "p0",
+                    "permutation_identity": "q0", "transform_kind": "one_hot_original_check_rows",
+                    "redundant_transforms": [[1]]}],
+    }
+    value["list_selection"] = {"kind": "frequency_over_weight_plus_one", "tie_rule": "local_ordinal_then_lineage"}
+    value["vote"] = {"object": "correction_bits", "electorate_rule": "admitted_members",
+                     "aggregation": "coordinate_majority", "tie_bit": 1}
+
+    parsed = parse_manifest(value)
+
+    assert isinstance(parsed, CanonicalExperimentV7)
+    assert parsed.vote is not None and parsed.vote.tie_bit == 1
 
 
 def test_no_member_converged_returns_typed_zero_sentinel_without_candidate_admission() -> None:
