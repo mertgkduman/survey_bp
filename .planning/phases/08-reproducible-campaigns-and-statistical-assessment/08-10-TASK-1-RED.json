@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'slurm and (argv or array or injection or bound or capability)' -x",
+  "exitCode": 1,
+  "targetTest": "test_slurm_argv_and_array_selection_are_bounded_and_shell_free",
+  "targetFile": "tests/test_campaign_execution.py",
+  "expected": "A bounded Slurm adapter maps each array index to exactly one frozen shard through an argv array without shell interpolation.",
+  "actual": "AssertionError: campaigns must provide the bounded Slurm adapter",
+  "output": "TAP version 13\nnot ok 1 - test_slurm_argv_and_array_selection_are_bounded_and_shell_free\n  ---\n  message: AssertionError: campaigns must provide the bounded Slurm adapter\n  ...\n1..1\n# tests 1\n# pass 0\n# fail 1\n"
+}

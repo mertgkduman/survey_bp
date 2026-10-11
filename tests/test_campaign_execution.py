@@ -362,3 +362,77 @@ def test_finite_look_maximum_retains_all_realized_units(tmp_path: Path):
     assert result["stop_receipt"]["stop_reason"] == "maximum_reached"
     assert result["authorized_undispatched_keys"] == ()
     assert len(result["records"]) == len(plan.unit_keys)
+
+
+def _slurm_api():
+    """Keep Slurm transport RED evidence focused on the public adapter."""
+    try:
+        return importlib.import_module("bp_registry.campaigns.slurm")
+    except ModuleNotFoundError:
+        return None
+
+
+def test_slurm_argv_and_array_selection_are_bounded_and_shell_free():
+    """A scheduler can select one frozen shard without gaining planning authority."""
+    api = _slurm_api()
+    assert api is not None, "campaigns must provide the bounded Slurm adapter"
+
+    from bp_registry.campaigns.planning import freeze_work_plan
+
+    digest, coordinates, arms = _planning_inputs()
+    plan = freeze_work_plan(
+        campaign_spec_digest=digest, coordinates=coordinates, arm_seed_identities=arms,
+        look_sample_boundaries=(1, 2), units_per_shard=2,
+    )
+    allocation = api.SlurmAllocation(
+        partition="research", qos="short", account="bp", wall_minutes=30,
+        memory_mb=512, cpus_per_task=1, max_concurrent_tasks=1,
+    )
+    argv = api.build_sbatch_argv(
+        plan, allocation=allocation,
+        allowed_values={"partition": {"research"}, "qos": {"short"}, "account": {"bp"}},
+        entrypoint=("/usr/bin/python3", "-m", "bp_registry.campaigns.slurm_entry"),
+    )
+    assert argv == (
+        "sbatch", "--array=0-1%1", "--cpus-per-task=1", "--mem=512M", "--time=30",
+        "--partition=research", "--qos=short", "--account=bp", "--",
+        "/usr/bin/python3", "-m", "bp_registry.campaigns.slurm_entry",
+    )
+    assert api.select_array_shard(plan, "1") == plan.shards[1]
+    for invalid in (None, "", "-1", "2", "1;touch", " 1"):
+        with pytest.raises(ValueError):
+            api.select_array_shard(plan, invalid)
+    with pytest.raises(ValueError, match="allowlist"):
+        api.build_sbatch_argv(
+            plan,
+            allocation=api.SlurmAllocation(
+                partition="research;touch", qos="short", account="bp", wall_minutes=30,
+                memory_mb=512, cpus_per_task=1, max_concurrent_tasks=1,
+            ),
+            allowed_values={"partition": {"research"}, "qos": {"short"}, "account": {"bp"}},
+            entrypoint=("/usr/bin/python3",),
+        )
+    with pytest.raises(ValueError, match="cpus_per_task"):
+        api.SlurmAllocation(
+            partition="research", qos="short", account="bp", wall_minutes=30,
+            memory_mb=512, cpus_per_task=65, max_concurrent_tasks=1,
+        )
+
+
+def test_slurm_capability_parser_preserves_missing_accounting_as_unavailable():
+    """Unknown site policy remains unavailable and cannot become a campaign default."""
+    api = _slurm_api()
+    assert api is not None, "campaigns must provide the bounded Slurm adapter"
+
+    capabilities = api.parse_site_capabilities(
+        scontrol_text="MaxArraySize=32 DefMemPerCPU=2048", sacct_text=None,
+    )
+    assert capabilities["max_array_size"] == {
+        "value": 32, "unavailable_reason": None,
+    }
+    assert capabilities["default_memory_mb"] == {
+        "value": 2048, "unavailable_reason": None,
+    }
+    assert capabilities["accounting_available"] == {
+        "value": None, "unavailable_reason": "sacct output was not supplied",
+    }
