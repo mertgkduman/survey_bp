@@ -158,3 +158,213 @@ class TableTargetReceiptV1(StrictModel):
 
     def digest(self) -> str:
         return _receipt_digest("bp-registry-campaign-table-target-v1", self)
+
+
+class AxisCalibrationPointV1(StrictModel):
+    """One WebPlotDigitizer-style calibration point with pixel and data values."""
+
+    pixel_x: float
+    pixel_y: float
+    value: float
+
+    @field_validator("pixel_x", "pixel_y", "value")
+    @classmethod
+    def finite_coordinates(cls, value: float, info: Any) -> float:
+        return _finite(value, name=info.field_name)
+
+
+class XYCalibrationV1(StrictModel):
+    """The four X1/X2/Y1/Y2 evidence points and their declared axis scales."""
+
+    x_scale: Literal["linear", "log10"]
+    y_scale: Literal["linear", "log10"]
+    x1: AxisCalibrationPointV1
+    x2: AxisCalibrationPointV1
+    y1: AxisCalibrationPointV1
+    y2: AxisCalibrationPointV1
+
+    @model_validator(mode="after")
+    def usable_four_point_calibration(self) -> "XYCalibrationV1":
+        if self.x1.pixel_x == self.x2.pixel_x or self.x1.value == self.x2.value:
+            raise ValueError("X1 and X2 must have distinct pixel-x and data values")
+        if self.y1.pixel_y == self.y2.pixel_y or self.y1.value == self.y2.value:
+            raise ValueError("Y1 and Y2 must have distinct pixel-y and data values")
+        if self.x_scale == "log10" and (self.x1.value <= 0.0 or self.x2.value <= 0.0):
+            raise ValueError("logarithmic X calibration values must be positive")
+        if self.y_scale == "log10" and (self.y1.value <= 0.0 or self.y2.value <= 0.0):
+            raise ValueError("logarithmic Y calibration values must be positive")
+        return self
+
+    @staticmethod
+    def _transform(pixel: float, first: AxisCalibrationPointV1, second: AxisCalibrationPointV1, scale: Literal["linear", "log10"], *, coordinate: Literal["x", "y"]) -> float:
+        numerator = pixel - (first.pixel_x if coordinate == "x" else first.pixel_y)
+        denominator = (second.pixel_x if coordinate == "x" else second.pixel_y) - (first.pixel_x if coordinate == "x" else first.pixel_y)
+        fraction = numerator / denominator
+        if scale == "linear":
+            return first.value + fraction * (second.value - first.value)
+        return 10.0 ** (math.log10(first.value) + fraction * (math.log10(second.value) - math.log10(first.value)))
+
+    def transformed_values(self, pixel_x: float, pixel_y: float) -> tuple[float, float]:
+        """Return the data values implied by this immutable calibration."""
+        return (
+            self._transform(pixel_x, self.x1, self.x2, self.x_scale, coordinate="x"),
+            self._transform(pixel_y, self.y1, self.y2, self.y_scale, coordinate="y"),
+        )
+
+
+class FigureLocatorV1(StrictModel):
+    """Exact page, panel, curve, crop, dimensions, and image transform identity."""
+
+    figure_id: str = Field(min_length=1, max_length=256)
+    page: int = Field(ge=1, le=100_000)
+    panel_id: str = Field(min_length=1, max_length=256)
+    curve_id: str = Field(min_length=1, max_length=256)
+    image_width: int = Field(ge=1, le=100_000)
+    image_height: int = Field(ge=1, le=100_000)
+    crop_left: int = Field(ge=0)
+    crop_top: int = Field(ge=0)
+    crop_width: int = Field(ge=1)
+    crop_height: int = Field(ge=1)
+    image_transform: Literal["source_page_to_crop_pixels_v1"]
+
+    @model_validator(mode="after")
+    def crop_is_inside_image(self) -> "FigureLocatorV1":
+        if self.crop_left + self.crop_width > self.image_width or self.crop_top + self.crop_height > self.image_height:
+            raise ValueError("figure crop must lie within recorded image dimensions")
+        return self
+
+    def contains_pixel(self, pixel_x: float, pixel_y: float) -> bool:
+        return (
+            self.crop_left <= pixel_x <= self.crop_left + self.crop_width
+            and self.crop_top <= pixel_y <= self.crop_top + self.crop_height
+        )
+
+
+class DigitizedClickV1(StrictModel):
+    """A raw click and its tool-produced data coordinates for one curve point."""
+
+    point_id: str = Field(min_length=1, max_length=256)
+    pixel_x: float
+    pixel_y: float
+    x: float
+    y: float
+
+    @field_validator("pixel_x", "pixel_y", "x", "y")
+    @classmethod
+    def finite_click_values(cls, value: float, info: Any) -> float:
+        return _finite(value, name=info.field_name)
+
+
+class DigitizationExtractionPassV1(StrictModel):
+    """One independently attributed WebPlotDigitizer project/export observation."""
+
+    pass_id: str = Field(min_length=1, max_length=256)
+    operator_label: str = Field(min_length=1, max_length=256)
+    extracted_at: str = Field(min_length=1, max_length=64)
+    project_snapshot: ByteSnapshotV1
+    export_snapshot: ByteSnapshotV1
+    clicks: tuple[DigitizedClickV1, ...] = Field(min_length=1, max_length=10_000)
+
+    @field_validator("clicks", mode="before")
+    @classmethod
+    def tuple_clicks(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @field_validator("extracted_at")
+    @classmethod
+    def timezone_timestamp(cls, value: str) -> str:
+        try:
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError as error:
+            raise ValueError("extraction timestamp must be ISO-8601") from error
+        if parsed.tzinfo is None:
+            raise ValueError("extraction timestamp must include a timezone")
+        return value
+
+    @model_validator(mode="after")
+    def unique_points(self) -> "DigitizationExtractionPassV1":
+        ids = tuple(click.point_id for click in self.clicks)
+        if len(set(ids)) != len(ids):
+            raise ValueError("an extraction pass cannot contain duplicate point IDs")
+        return self
+
+
+class FrozenDigitizationIntervalV1(StrictModel):
+    """The exact min/max interval and repeated-pass spread frozen before simulation."""
+
+    point_id: str = Field(min_length=1, max_length=256)
+    x_lower: float
+    x_upper: float
+    y_lower: float
+    y_upper: float
+    x_spread: float = Field(ge=0.0)
+    y_spread: float = Field(ge=0.0)
+
+    @field_validator("x_lower", "x_upper", "y_lower", "y_upper", "x_spread", "y_spread")
+    @classmethod
+    def finite_interval_values(cls, value: float, info: Any) -> float:
+        return _finite(value, name=info.field_name)
+
+    @model_validator(mode="after")
+    def ordered_interval(self) -> "FrozenDigitizationIntervalV1":
+        if self.x_lower > self.x_upper or self.y_lower > self.y_upper:
+            raise ValueError("digitization interval bounds must be ordered")
+        if not math.isclose(self.x_spread, self.x_upper - self.x_lower, rel_tol=1e-12, abs_tol=1e-15):
+            raise ValueError("x spread must equal the frozen interval width")
+        if not math.isclose(self.y_spread, self.y_upper - self.y_lower, rel_tol=1e-12, abs_tol=1e-15):
+            raise ValueError("y spread must equal the frozen interval width")
+        return self
+
+
+class DigitizationTargetReceiptV1(StrictModel):
+    """A reconstructable publication figure target with independent extractions."""
+
+    schema_name: Literal["campaign_digitization_target_v1"] = Field(alias="schema", serialization_alias="schema")
+    target_id: str = Field(min_length=1, max_length=256)
+    source: SourceIdentityV1
+    source_snapshot: ByteSnapshotV1
+    image_snapshot: ByteSnapshotV1
+    figure: FigureLocatorV1
+    tool_name: str = Field(min_length=1, max_length=256)
+    tool_version: str = Field(min_length=1, max_length=256)
+    calibration: XYCalibrationV1
+    passes: tuple[DigitizationExtractionPassV1, ...] = Field(min_length=2, max_length=100)
+    intervals: tuple[FrozenDigitizationIntervalV1, ...] = Field(min_length=1, max_length=10_000)
+    source_denominator: SourceDenominatorV1
+
+    @field_validator("passes", "intervals", mode="before")
+    @classmethod
+    def tuple_records(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @model_validator(mode="after")
+    def reconstructable_repeated_extraction(self) -> "DigitizationTargetReceiptV1":
+        pass_ids = tuple(item.pass_id for item in self.passes)
+        operators = tuple(item.operator_label for item in self.passes)
+        if len(set(pass_ids)) != len(pass_ids) or len(set(operators)) != len(operators):
+            raise ValueError("publication target passes must have distinct pass and operator identities")
+        expected_ids = tuple(click.point_id for click in self.passes[0].clicks)
+        if any(tuple(click.point_id for click in item.clicks) != expected_ids for item in self.passes[1:]):
+            raise ValueError("every extraction pass must retain the same ordered point IDs")
+        for extraction in self.passes:
+            for click in extraction.clicks:
+                if not self.figure.contains_pixel(click.pixel_x, click.pixel_y):
+                    raise ValueError("digitization click must lie inside the retained crop")
+                expected_x, expected_y = self.calibration.transformed_values(click.pixel_x, click.pixel_y)
+                if not math.isclose(click.x, expected_x, rel_tol=1e-12, abs_tol=1e-15) or not math.isclose(click.y, expected_y, rel_tol=1e-12, abs_tol=1e-15):
+                    raise ValueError("digitized values must match the frozen calibration transform")
+        interval_by_id = {item.point_id: item for item in self.intervals}
+        if len(interval_by_id) != len(self.intervals) or set(interval_by_id) != set(expected_ids):
+            raise ValueError("frozen intervals must cover each extracted point exactly once")
+        for point_id, interval in interval_by_id.items():
+            clicks = [next(click for click in extraction.clicks if click.point_id == point_id) for extraction in self.passes]
+            x_values = [click.x for click in clicks]
+            y_values = [click.y for click in clicks]
+            expected = (min(x_values), max(x_values), min(y_values), max(y_values))
+            observed = (interval.x_lower, interval.x_upper, interval.y_lower, interval.y_upper)
+            if any(not math.isclose(actual, frozen, rel_tol=1e-12, abs_tol=1e-15) for actual, frozen in zip(observed, expected, strict=True)):
+                raise ValueError("frozen interval must exactly cover repeated extraction extrema")
+        return self
+
+    def digest(self) -> str:
+        return _receipt_digest("bp-registry-campaign-digitization-target-v1", self)

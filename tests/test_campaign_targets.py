@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import date
 from hashlib import sha256
 import copy
+import json
 import math
 
 import pytest
@@ -149,7 +150,7 @@ def _digitized_receipt():
 def test_digitization_round_trip_binds_calibration_clicks_and_repeated_precision():
     receipt = _digitized_receipt()
     encoded = receipt.model_dump(mode="json", by_alias=True)
-    rebuilt = type(receipt).model_validate(encoded)
+    rebuilt = type(receipt).model_validate_json(json.dumps(encoded))
     assert rebuilt.digest() == receipt.digest()
     assert receipt.intervals[0].x_spread > 0.0
     assert receipt.intervals[0].y_spread > 0.0
@@ -157,12 +158,12 @@ def test_digitization_round_trip_binds_calibration_clicks_and_repeated_precision
     axis_drift = copy.deepcopy(encoded)
     axis_drift["calibration"]["x_scale"] = "linear"
     with pytest.raises(ValidationError):
-        type(receipt).model_validate(axis_drift)
+        type(receipt).model_validate_json(json.dumps(axis_drift))
 
     click_drift = copy.deepcopy(encoded)
     click_drift["passes"][0]["clicks"][0]["pixel_x"] += 1.0
     with pytest.raises(ValidationError):
-        type(receipt).model_validate(click_drift)
+        type(receipt).model_validate_json(json.dumps(click_drift))
 
 
 def test_digitization_rejects_single_pass_bad_log_calibration_and_tuned_interval():
@@ -172,14 +173,14 @@ def test_digitization_rejects_single_pass_bad_log_calibration_and_tuned_interval
     one_pass = copy.deepcopy(payload)
     one_pass["passes"] = one_pass["passes"][:1]
     with pytest.raises(ValidationError):
-        type(receipt).model_validate(one_pass)
+        type(receipt).model_validate_json(json.dumps(one_pass))
 
     invalid_log = copy.deepcopy(payload)
     invalid_log["calibration"]["x1"]["value"] = 0.0
     with pytest.raises(ValidationError):
-        type(receipt).model_validate(invalid_log)
+        type(receipt).model_validate_json(json.dumps(invalid_log))
 
     tuned_interval = copy.deepcopy(payload)
     tuned_interval["intervals"][0]["y_upper"] += 0.01
     with pytest.raises(ValidationError):
-        type(receipt).model_validate(tuned_interval)
+        type(receipt).model_validate_json(json.dumps(tuned_interval))
