@@ -13,11 +13,13 @@ import math
 import re
 from typing import Literal, Mapping, Sequence
 
-from scipy.stats import binomtest
+from scipy.stats import binomtest, nbinom
 
 from .contracts import (
     CampaignAssessmentV1,
+    ExactInverseBinomialIntervalV1,
     FiniteLookStoppingV1,
+    FailureCountStoppingV1,
     OutcomeMatrixV1,
     TargetReferenceV1,
 )
@@ -81,6 +83,33 @@ class ExactBinomialRateV1:
     method: Literal["exact_clopper_pearson"]
     sidedness: Literal["two_sided"]
     interval: tuple[float, float]
+    count_receipt_sha256: str
+
+
+@dataclass(frozen=True, slots=True)
+class ExactInverseBinomialRateV1:
+    """A two-sided exact rate interval from an ordered failure-count stop.
+
+    SciPy's negative-binomial variate counts nonfailures before a fixed number
+    of failures.  Here decoder logical failures are those fixed successes, so
+    the observed variate is ``T_r - r``.  The terminal-batch tail remains
+    retained cost evidence and never becomes an inferential trial.
+    """
+
+    target_failures: int
+    stopping_shot_ordinal: int
+    inferential_trials: int
+    nonfailures: int
+    total_completed_shots: int
+    authorized_tail_count: int
+    authorized_tail_sha256: str
+    estimate: float
+    alpha: float
+    confidence_level: float
+    method: Literal["exact_inverse_binomial"]
+    sidedness: Literal["two_sided"]
+    interval: tuple[float, float]
+    inferential_prefix_sha256: str
     count_receipt_sha256: str
 
 
@@ -169,6 +198,113 @@ def exact_binomial_rate(
         method="exact_clopper_pearson",
         sidedness="two_sided",
         interval=(lower, upper),
+        count_receipt_sha256=receipt,
+    )
+
+
+def _negative_binomial_root(
+    *,
+    tail: Literal["cdf", "sf"],
+    nonfailures: int,
+    target_failures: int,
+    target_probability: float,
+) -> float:
+    """Invert one monotone negative-binomial tail on the finite unit bracket."""
+    lower, upper = 0.0, 1.0
+    for _ in range(128):
+        midpoint = (lower + upper) / 2.0
+        if tail == "cdf":
+            value = float(nbinom.cdf(nonfailures, target_failures, midpoint))
+            if not math.isfinite(value):
+                raise ValueError("SciPy returned a nonfinite negative-binomial CDF")
+            if value < target_probability:
+                lower = midpoint
+            else:
+                upper = midpoint
+        else:
+            value = float(nbinom.sf(nonfailures - 1, target_failures, midpoint))
+            if not math.isfinite(value):
+                raise ValueError("SciPy returned a nonfinite negative-binomial survival probability")
+            if value > target_probability:
+                lower = midpoint
+            else:
+                upper = midpoint
+    return (lower + upper) / 2.0
+
+
+def exact_inverse_binomial_rate(
+    *,
+    stopping: FailureCountStoppingV1,
+    interval_spec: ExactInverseBinomialIntervalV1,
+    total_completed_shots: int,
+    count_receipt_sha256: str,
+) -> ExactInverseBinomialRateV1:
+    """Invert the completed target-th-failure stopping distribution exactly.
+
+    The function accepts only a target-reached, order-validated stopping
+    record.  It therefore cannot reinterpret a cap-censored result or append
+    later authorized terminal-batch shots to ``T_r``.
+    """
+    if not isinstance(stopping, FailureCountStoppingV1):
+        raise ValueError("stopping must be a FailureCountStoppingV1")
+    if not isinstance(interval_spec, ExactInverseBinomialIntervalV1):
+        raise ValueError("interval_spec must be an ExactInverseBinomialIntervalV1")
+    if stopping.terminal_state != "target_reached":
+        raise ValueError("inverse-binomial inference requires target_reached stopping")
+    terminal = stopping.terminal_failure_ordinal
+    if terminal is None:
+        raise ValueError("target_reached stopping requires terminal_failure_ordinal")
+    if stopping.cumulative_failures_before_terminal != stopping.target_failures - 1:
+        raise ValueError("stopping record lacks the target-th failure prefix")
+    if stopping.cumulative_failures_at_terminal != stopping.target_failures:
+        raise ValueError("stopping record lacks the completed target-th failure")
+    if interval_spec.stopping_event != stopping.failure_event:
+        raise ValueError("interval_spec stopping event differs from stopping record")
+    if interval_spec.target_failures != stopping.target_failures:
+        raise ValueError("interval_spec target_failures differs from stopping record")
+    if interval_spec.inferential_trials != terminal:
+        raise ValueError("interval_spec inferential_trials must equal terminal_failure_ordinal")
+    tail_count = len(stopping.authorized_tail_ordinals)
+    if interval_spec.authorized_tail_count != tail_count:
+        raise ValueError("interval_spec authorized_tail_count differs from stopping record")
+    completed = _bounded_int(total_completed_shots, name="total_completed_shots", minimum=terminal)
+    if completed != terminal + tail_count:
+        raise ValueError("total_completed_shots must equal T_r plus the authorized tail count")
+    alpha = 1.0 - interval_spec.confidence_level
+    alpha = _probability(float(alpha), name="alpha")
+    prefix = _sha256(interval_spec.inferential_prefix_sha256, name="inferential_prefix_sha256")
+    tail = _sha256(interval_spec.authorized_tail_sha256, name="authorized_tail_sha256")
+    receipt = _sha256(count_receipt_sha256, name="count_receipt_sha256")
+    nonfailures = terminal - stopping.target_failures
+    lower = _negative_binomial_root(
+        tail="cdf",
+        nonfailures=nonfailures,
+        target_failures=stopping.target_failures,
+        target_probability=alpha / 2.0,
+    )
+    upper = 1.0 if nonfailures == 0 else _negative_binomial_root(
+        tail="sf",
+        nonfailures=nonfailures,
+        target_failures=stopping.target_failures,
+        target_probability=alpha / 2.0,
+    )
+    if not (math.isfinite(lower) and math.isfinite(upper) and 0.0 <= lower <= upper <= 1.0):
+        raise ValueError("negative-binomial inversion produced an invalid interval")
+    return ExactInverseBinomialRateV1(
+        target_failures=stopping.target_failures,
+        stopping_shot_ordinal=terminal,
+        inferential_trials=terminal,
+        nonfailures=nonfailures,
+        total_completed_shots=completed,
+        authorized_tail_count=tail_count,
+        authorized_tail_sha256=tail,
+        estimate=stopping.target_failures / terminal,
+        alpha=alpha,
+        confidence_level=interval_spec.confidence_level,
+        method="exact_inverse_binomial",
+        sidedness="two_sided",
+        interval=(lower, upper),
+        inferential_prefix_sha256=prefix,
         count_receipt_sha256=receipt,
     )
 
