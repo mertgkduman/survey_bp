@@ -146,3 +146,63 @@ def test_missing_memory_remains_explicit_and_denies_authorization() -> None:
     aggregate = _aggregate(memory=None)
     assert aggregate.memory_available is False
     assert "peak_host_memory" in aggregate.missing_measurements
+
+
+def test_authorization_binds_all_measured_receipts_before_allowing_boundary() -> None:
+    api = _api()
+    boundary = api.authorize_campaign(
+        aggregate=_aggregate(), proposal=_proposal(), site=_site(), safety_factor=api.SafetyFactorV1(1, 1),
+    )
+
+    assert boundary.decision == "allow"
+    assert boundary.replay_receipt_sha256s == ("3" * 64,)
+    assert boundary.profile_receipt_sha256s == tuple(sorted(("4" * 64, "5" * 64)))
+
+
+@pytest.mark.parametrize("field", [
+    "max_cpu_time_ns", "max_wall_time_ns", "max_storage_bytes", "max_shard_bytes",
+    "max_replay_time_ns", "max_peak_memory_bytes", "max_scheduler_cost_ns",
+])
+def test_authorization_denies_each_ceiling_exceedance(field: str) -> None:
+    api = _api()
+    receipt = api.authorize_campaign(
+        aggregate=_aggregate(), proposal=_proposal(), site=_site(**{field: 1}), safety_factor=api.SafetyFactorV1(1, 1),
+    )
+    assert receipt.decision == "deny"
+    assert any(field in reason for reason in receipt.reasons)
+
+
+def test_missing_memory_and_site_capability_are_fail_closed() -> None:
+    api = _api()
+    missing_memory = api.authorize_campaign(
+        aggregate=_aggregate(memory=None), proposal=_proposal(), site=_site(), safety_factor=api.SafetyFactorV1(1, 1),
+    )
+    missing_site = api.authorize_campaign(
+        aggregate=_aggregate(), proposal=_proposal(), site=_site(max_storage_bytes=None), safety_factor=api.SafetyFactorV1(1, 1),
+    )
+
+    assert missing_memory.decision == "deny"
+    assert "missing_measurement:peak_host_memory" in missing_memory.reasons
+    assert missing_site.decision == "deny"
+    assert "missing_site_ceiling:max_storage_bytes" in missing_site.reasons
+
+
+def test_safety_factor_changes_receipt_but_worker_topology_is_not_scientific_identity() -> None:
+    api = _api()
+    aggregate = _aggregate()
+    proposal = _proposal()
+    boundary = api.authorize_campaign(
+        aggregate=aggregate, proposal=proposal, site=_site(), safety_factor=api.SafetyFactorV1(1, 1),
+    )
+    changed_margin = api.authorize_campaign(
+        aggregate=aggregate, proposal=proposal, site=_site(), safety_factor=api.SafetyFactorV1(2, 1),
+    )
+    moved_payload = {field: getattr(proposal, field) for field in proposal.__dataclass_fields__}
+    moved_payload["operational_allocation"] = {"workers": 8, "cpus_per_worker": 1}
+    moved_workers = api.ProposedCampaignV1(**moved_payload)
+
+    assert changed_margin.decision == "deny"
+    assert boundary.receipt_sha256 != changed_margin.receipt_sha256
+    assert boundary.scientific_identity == api.scientific_authorization_identity(proposal)
+    assert boundary.scientific_identity == api.scientific_authorization_identity(moved_workers)
+    assert boundary.operational_allocation != moved_workers.operational_allocation
