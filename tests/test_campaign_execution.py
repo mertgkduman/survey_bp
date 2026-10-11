@@ -200,15 +200,15 @@ def _paired_work_spec_payload() -> dict[str, object]:
         "coordinates": [{"cohort_id": "paired", "point_id": "p100", "sample_namespace": public.randomness.physical_sample_identity or context.manifest_sha256, "sample_ids": [0]}],
         "look_sample_boundaries": [1], "units_per_shard": 2,
         "assessment": {
-            "schema": "campaign_assessment_v1", "targets": [{"target_id": "paired-target", "target_receipt_sha256": "a" * 64, "lower": 0.0, "upper": 1.0, "absolute_tolerance": 0.0}],
+            "schema": "campaign_assessment_v1", "targets": [{"target_id": "p100", "target_receipt_sha256": "a" * 64, "lower": 0.0, "upper": 1.0, "absolute_tolerance": 0.0}],
             "interval": {"method": "exact_clopper_pearson", "confidence_level": 0.95},
-            "families": [{"family_id": "paired-family", "alpha": 0.05, "member_target_ids": ["paired-target"]}],
+            "families": [{"family_id": "paired-family", "alpha": 0.05, "member_target_ids": ["p100"]}],
             "stopping": {"mode": "fixed_shot", "final_shots": 1, "batch_size": 1},
             "outcome_matrix": {"rule_id": "all_shot_v1", "treatments": outcomes}, "decision_rule": "target_interval_containment_v1",
             "resources": {"max_shots": 1, "max_looks": 1, "max_batch_size": 1, "max_decoder_work": 1000, "max_events": 2, "max_evidence_bytes": 1_000_000, "max_storage_bytes": 1_000_000},
         },
         "source_lock_sha256": "b" * 64, "environment_lock_sha256": "c" * 64, "dependency_lock_sha256": "d" * 64,
-        "target_arm_ids": {"paired-target": "left"}, "source_denominator_required_by_target": {}, "source_denominators": {},
+        "target_arm_ids": {"p100": "left"}, "source_denominator_required_by_target": {}, "source_denominators": {},
     }
 
 
@@ -782,6 +782,42 @@ def _run_installed_campaign(*arguments: str) -> subprocess.CompletedProcess[str]
     command = shutil.which("bp-registry-campaign", path=str(Path(sys.executable).parent))
     assert command is not None, "bp-registry-campaign must be installed into the active environment"
     return subprocess.run([command, *arguments], cwd=ROOT, text=True, capture_output=True, check=False)
+
+
+def test_installed_paired_canonical_local_lifecycle(tmp_path: Path) -> None:
+    """The installed command plans and executes the real paired local path."""
+    document = tmp_path / "paired.json"
+    document.write_text(json.dumps({"campaign_work_spec": _paired_work_spec_payload()}), encoding="utf-8")
+    planned = _run_installed_campaign(
+        "plan", "--campaign", str(document), "--campaign-root", str(ROOT),
+        "--output-root", str(tmp_path / "plan"),
+    )
+    assert planned.returncode == 0, planned.stdout
+    plan_path = json.loads(planned.stdout)["artifact_path"]
+    run = _run_installed_campaign(
+        "run-local", "--plan", plan_path, "--campaign-root", str(ROOT),
+        "--output-root", str(tmp_path / "run"),
+    )
+    assert run.returncode == 0, run.stdout
+    result = json.loads(run.stdout)
+    assert result["unit_count"] == 2
+    assert (tmp_path / "run" / "samples").is_dir()
+    verified = _run_installed_campaign(
+        "verify", "--plan", plan_path, "--receipt", result["artifact_path"],
+        "--campaign-root", str(ROOT),
+    )
+    assert verified.returncode == 0, verified.stdout
+    merged = _run_installed_campaign(
+        "merge", "--plan", plan_path, "--receipt", result["artifact_path"],
+        "--campaign-root", str(ROOT), "--output-root", str(tmp_path / "merge"),
+    )
+    assert merged.returncode == 0, merged.stdout
+    merge_path = json.loads(merged.stdout)["artifact_path"]
+    resumed = _run_installed_campaign("resume", "--plan", plan_path, "--merge", merge_path, "--campaign-root", str(ROOT))
+    assert resumed.returncode == 0, resumed.stdout
+    assert json.loads(resumed.stdout)["exact_missing_set"] == []
+    assessed = _run_installed_campaign("assess", "--plan", plan_path, "--merge", merge_path, "--campaign-root", str(ROOT))
+    assert assessed.returncode == 0, assessed.stdout
 
 
 @pytest.mark.parametrize("raw_profile", (

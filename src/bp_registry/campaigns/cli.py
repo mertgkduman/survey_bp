@@ -9,6 +9,7 @@ contracts.
 from __future__ import annotations
 
 import argparse
+from dataclasses import asdict
 from hashlib import sha256
 import json
 import math
@@ -20,12 +21,14 @@ from typing import Any, Callable, Mapping
 from pydantic import ValidationError
 
 from ..manifests import preflight as preflight_manifest
-from .contracts import CampaignSpecV1, build_one_unit_plan, canonical_json_bytes
+from .contracts import CampaignSpecV1, CampaignWorkSpecV1, build_one_unit_plan, canonical_json_bytes
 from .execution import (
     _build_look_merge_receipt, _deterministic_look_stop_receipt, _sealed_local_records,
-    dispatch_finite_looks, run_one_unit,
+    dispatch_finite_looks, run_canonical_work_plan, run_one_unit, verify_canonical_attempt,
 )
-from .planning import CampaignCoordinateV1, freeze_work_plan
+from .planning import CampaignCoordinateV1, CampaignWorkPlan, freeze_campaign_work_spec, freeze_work_plan
+from .shards import derive_resume_plan, merge_verified_attempts
+from .reporting import reconstruct_campaign_report
 from .shards import reconstruct_fixed_shot, verify_shard
 from .slurm import (
     SchedulerObservation,
@@ -249,6 +252,98 @@ def _artifact(*, status: str, plan: Mapping[str, Any], **values: Any) -> dict[st
     }
 
 
+def _work_document(campaign_path: str, root: Path) -> CampaignWorkSpecV1:
+    document = _read_json(campaign_path)
+    if set(document) != {"campaign_work_spec"} or not isinstance(document["campaign_work_spec"], Mapping):
+        raise ValueError("paired campaign document must contain exactly campaign_work_spec")
+    spec = CampaignWorkSpecV1.model_validate(document["campaign_work_spec"])
+    # This is intentionally a no-write preflight.  The executor repeats it
+    # before sampling so no plan artifact can authorize input drift.
+    from .execution import _preflight_work_arms
+    _preflight_work_arms(spec, root)
+    return spec
+
+
+def _work_plan_payload(spec: CampaignWorkSpecV1) -> dict[str, Any]:
+    plan = freeze_campaign_work_spec(spec)
+    return {
+        "schema": "campaign_work_plan_v1",
+        "campaign_work_spec": spec.model_dump(mode="json", by_alias=True),
+        "campaign_spec_digest": plan.campaign_spec_digest,
+        "campaign_plan_digest": plan.campaign_plan_digest,
+        "assessment_digest": spec.assessment.digest(),
+        "units": [unit.payload() for unit in plan.units],
+        "shards": [shard.payload() for shard in plan.shards],
+        "look_sample_boundaries": list(plan.look_boundaries),
+    }
+
+
+def _load_work_plan(plan_path: str, root: Path) -> tuple[CampaignWorkSpecV1, CampaignWorkPlan, dict[str, Any]]:
+    payload = _read_json(plan_path)
+    required = {"schema", "campaign_work_spec", "campaign_spec_digest", "campaign_plan_digest", "assessment_digest", "units", "shards", "look_sample_boundaries"}
+    if set(payload) != required or payload.get("schema") != "campaign_work_plan_v1" or not isinstance(payload.get("campaign_work_spec"), Mapping):
+        raise ValueError("paired campaign plan has an invalid schema or field set")
+    spec = CampaignWorkSpecV1.model_validate(payload["campaign_work_spec"])
+    expected = _work_plan_payload(spec)
+    if payload != expected:
+        raise ValueError("paired campaign plan differs from its frozen scientific inputs")
+    from .execution import _preflight_work_arms
+    _preflight_work_arms(spec, root)
+    return spec, freeze_campaign_work_spec(spec), payload
+
+
+def _paired_run(args: argparse.Namespace, *, root: Path, output: Path) -> dict[str, Any]:
+    _spec, plan, payload = _load_work_plan(args.plan, root)
+    execution = run_canonical_work_plan(plan, campaign_root=root, output_root=output)
+    serializable = {
+        "schema": "campaign_paired_run_v1", "campaign_spec_digest": plan.campaign_spec_digest,
+        "campaign_plan_digest": plan.campaign_plan_digest,
+        "attempts": list(execution["verified_attempts"]),
+        "materialized_sample_sha256s": [item.materialized_sample_sha256 for item in execution["materialized_samples"]],
+    }
+    artifact = _publish_json(output / "paired-run.json", serializable)
+    return _artifact(status="ok", plan=payload, phase="run_local", executor_route="local",
+                     artifact_path=str(artifact), artifact_sha256=sha256(artifact.read_bytes()).hexdigest(),
+                     unit_count=len(plan.units), shard_count=len(plan.shards))
+
+
+def _paired_attempts(receipt_path: str, *, plan: CampaignWorkPlan) -> tuple[dict[str, Any], ...]:
+    payload = _read_json(receipt_path)
+    required = {"schema", "campaign_spec_digest", "campaign_plan_digest", "attempts", "materialized_sample_sha256s"}
+    if set(payload) != required or payload.get("schema") != "campaign_paired_run_v1":
+        raise ValueError("paired run artifact has an invalid schema or field set")
+    if payload["campaign_spec_digest"] != plan.campaign_spec_digest or payload["campaign_plan_digest"] != plan.campaign_plan_digest:
+        raise ValueError("paired run artifact differs from the frozen plan")
+    attempts = payload.get("attempts")
+    if not isinstance(attempts, list):
+        raise ValueError("paired run artifact lacks attempts")
+    return tuple(verify_canonical_attempt(record=item, plan=plan) for item in attempts)
+
+
+def _paired_merge(args: argparse.Namespace, *, root: Path, plan: CampaignWorkPlan, payload: Mapping[str, Any]) -> dict[str, Any]:
+    attempts = tuple(item for receipt in args.receipt for item in _paired_attempts(receipt, plan=plan))
+    merged = merge_verified_attempts(plan=plan, verified_attempts=attempts)
+    persisted = {key: value for key, value in merged.items() if key != "receipt_bytes"}
+    persisted["verified_attempts"] = list(attempts)
+    output = _output_root(args.output_root)
+    artifact = _publish_json(output / "campaign-paired-merge.json", persisted)
+    return _artifact(status="ok", plan=payload, phase="merge", artifact_path=str(artifact),
+                     artifact_sha256=sha256(artifact.read_bytes()).hexdigest(), member_count=len(attempts))
+
+
+def _paired_merge_payload(path: str, *, plan: CampaignWorkPlan) -> dict[str, Any]:
+    payload = _read_json(path)
+    attempts = payload.pop("verified_attempts", None)
+    if not isinstance(attempts, list):
+        raise ValueError("paired merge artifact lacks independently verified attempts")
+    verified = tuple(verify_canonical_attempt(record=item, plan=plan) for item in attempts)
+    full = merge_verified_attempts(plan=plan, verified_attempts=verified)
+    expected = {key: value for key, value in full.items() if key != "receipt_bytes"}
+    if payload != expected:
+        raise ValueError("paired merge artifact differs from verified attempt reduction")
+    return {**full, "verified_attempts": verified}
+
+
 def _preflight(args: argparse.Namespace) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
     # Validate the explicit future root but leave it absent: preflight never writes.
@@ -263,6 +358,15 @@ def _preflight(args: argparse.Namespace) -> dict[str, Any]:
 
 def _plan(args: argparse.Namespace) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
+    document = _read_json(args.campaign)
+    if "campaign_work_spec" in document:
+        spec = _work_document(args.campaign, root)
+        payload = _work_plan_payload(spec)
+        output = _output_root(args.output_root)
+        artifact = _publish_json(output / "campaign-work-plan.json", payload)
+        return _artifact(status="ok", plan=payload, phase="plan", artifact_path=str(artifact),
+                         artifact_sha256=sha256(artifact.read_bytes()).hexdigest(),
+                         unit_count=len(payload["units"]), shard_count=len(payload["shards"]))
     spec, target_receipts = _campaign_spec(args.campaign, root)
     payload = _plan_payload(spec, target_receipts)
     output = _output_root(args.output_root)
@@ -272,6 +376,10 @@ def _plan(args: argparse.Namespace) -> dict[str, Any]:
 
 def _run(args: argparse.Namespace, *, route: str) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
+    if _read_json(args.plan).get("schema") == "campaign_work_plan_v1":
+        if route != "local":
+            raise ValueError("paired local lifecycle does not expose a synthetic shard route")
+        return _paired_run(args, root=root, output=_output_root(args.output_root))
     spec, plan = _load_plan(args.plan, root)
     if route == "slurm" and args.array_task_id != "0":
         raise ValueError("one-unit campaign plans expose only frozen Slurm array task 0")
@@ -286,6 +394,13 @@ def _run(args: argparse.Namespace, *, route: str) -> dict[str, Any]:
 
 def _verify(args: argparse.Namespace) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
+    if args.plan is not None and _read_json(args.plan).get("schema") == "campaign_work_plan_v1":
+        _spec, plan, payload = _load_work_plan(args.plan, root)
+        attempts = _paired_attempts(args.receipt, plan=plan)
+        return _artifact(status="ok", plan=payload, phase="verify", verified=True,
+                         receipt_path=str(Path(args.receipt).resolve()),
+                         receipt_sha256=sha256(Path(args.receipt).read_bytes()).hexdigest(),
+                         verified_attempt_count=len(attempts))
     receipt = Path(args.receipt)
     checked = verify_shard(receipt, campaign_root=root)
     report = reconstruct_fixed_shot(checked)
@@ -380,6 +495,9 @@ def _verify_operational_gate(args: argparse.Namespace) -> dict[str, Any]:
 
 def _merge(args: argparse.Namespace) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
+    if args.plan is not None and _read_json(args.plan).get("schema") == "campaign_work_plan_v1":
+        _spec, plan, payload = _load_work_plan(args.plan, root)
+        return _paired_merge(args, root=root, plan=plan, payload=payload)
     if not args.receipt:
         raise ValueError("merge requires at least one preserved receipt")
     members = []
@@ -467,6 +585,13 @@ def _verified_merge(merge_path: str, campaign_root: Path) -> dict[str, Any]:
 
 def _resume(args: argparse.Namespace) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
+    if _read_json(args.plan).get("schema") == "campaign_work_plan_v1":
+        _spec, work_plan, payload = _load_work_plan(args.plan, root)
+        merged = _paired_merge_payload(args.merge, plan=work_plan)
+        completed = set(merged["terminal_unit_keys"])
+        missing = [unit.key for unit in work_plan.units if unit.key not in completed]
+        return _artifact(status="ok", plan=payload, phase="resume", resumable_unit_keys=missing,
+                         exact_missing_set=missing, complete=not missing)
     _spec, plan = _load_plan(args.plan, root)
     merge = _verified_merge(args.merge, root)
     if merge.get("schema") != _MERGE_SCHEMA or merge.get("campaign_spec_digest") != plan["campaign_spec_digest"] or merge.get("campaign_plan_digest") != plan["campaign_plan_digest"]:
@@ -479,6 +604,23 @@ def _resume(args: argparse.Namespace) -> dict[str, Any]:
 
 def _assess(args: argparse.Namespace) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
+    plan_path = getattr(args, "plan", None)
+    if plan_path is not None and _read_json(plan_path).get("schema") == "campaign_work_plan_v1":
+        spec, work_plan, payload = _load_work_plan(plan_path, root)
+        merged = _paired_merge_payload(args.merge, plan=work_plan)
+        receipt = {key: value for key, value in merged.items() if key != "verified_attempts"}
+        report = reconstruct_campaign_report(
+            plan=work_plan, assessment=spec.assessment, merge_receipt=receipt,
+            input_receipt_hashes={
+                "campaign": work_plan.campaign_spec_digest, "plan": work_plan.campaign_plan_digest,
+                "assessment": spec.assessment.digest(), "merge": receipt["receipt_sha256"],
+                **{f"target:{item.target_id}": item.target_receipt_sha256 for item in spec.assessment.targets},
+            },
+            source_denominator_required_by_target=spec.source_denominator_required_by_target,
+            source_denominators=spec.source_denominators, target_arm_ids=spec.target_arm_ids,
+        )
+        return _artifact(status="ok", plan=payload, phase="assess", assessment_status="evidence_reconstructed",
+                         report=asdict(report))
     merge = _verified_merge(args.merge, root)
     reports = [member["report"] for member in merge["members"]]
     failures = sum(report["failures"] for report in reports)
@@ -662,15 +804,15 @@ def _parser() -> argparse.ArgumentParser:
     item.add_argument("--allocation", required=True); item.add_argument("--site-allowlists", required=True)
     item.set_defaults(handler=_emit_slurm)
     item = commands.add_parser("verify")
-    item.add_argument("--receipt"); item.add_argument("--campaign")
+    item.add_argument("--receipt"); item.add_argument("--plan"); item.add_argument("--campaign")
     item.add_argument("--campaign-root", required=True); item.add_argument("--output")
     item.set_defaults(handler=lambda args: _verify_operational_gate(args) if args.campaign is not None else _verify(args) if args.receipt is not None else (_ for _ in ()).throw(ValueError("verify requires --receipt or --campaign")))
     item = commands.add_parser("merge")
-    item.add_argument("--receipt", action="append", required=True); item.add_argument("--campaign-root", required=True); item.add_argument("--output-root", required=True); item.set_defaults(handler=_merge)
+    item.add_argument("--receipt", action="append", required=True); item.add_argument("--plan"); item.add_argument("--campaign-root", required=True); item.add_argument("--output-root", required=True); item.set_defaults(handler=_merge)
     item = commands.add_parser("resume")
     item.add_argument("--plan", required=True); item.add_argument("--merge", required=True); item.add_argument("--campaign-root", required=True); item.set_defaults(handler=_resume)
     item = commands.add_parser("assess")
-    item.add_argument("--merge", required=True); item.add_argument("--campaign-root", required=True); item.set_defaults(handler=_assess)
+    item.add_argument("--merge", required=True); item.add_argument("--plan"); item.add_argument("--campaign-root", required=True); item.set_defaults(handler=_assess)
     item = commands.add_parser("site-capability")
     item.add_argument("--scontrol"); item.add_argument("--sacct"); item.set_defaults(handler=_site_capability)
     item = commands.add_parser("operational-fixture")
