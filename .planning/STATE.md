@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 09
 current_phase_name: CSS Reproduction and Controlled Comparisons
-current_plan: Not started
-status: planning
-stopped_at: Phase 9 context gathered
-last_updated: "2026-10-11T19:08:57.486Z"
+current_plan: 09-17
+status: executing
+stopped_at: Wave 4 passed; Plan 09-17 in execution
+last_updated: "2026-10-11T22:40:55Z"
 last_activity: 2026-10-11
-last_activity_desc: Phase 09 planning complete — 15 plans ready
+last_activity_desc: Phase 09 Wave 4 passed; 8 of 19 plans complete
 state_head: 4dbe834d9a93d1f266a31909c2454d01fd10d22d
 progress:
   total_phases: 14
   completed_phases: 7
-  total_plans: 146
-  completed_plans: 123
+  total_plans: 150
+  completed_plans: 130
 ---
 
 # Project State
@@ -24,20 +24,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-11)
 
 **Core value:** Make BP decoder differences explicit, reproducible, and fairly comparable through canonical policy execution and published evidence.
-**Current focus:** Phase 5 human notebook/HTML review after Phase 8 completion
+**Current focus:** Phase 9 CSS reproduction and controlled comparisons; Wave 5 bounded campaign execution
 
 ## Current Position
 
-Phase: 09 (CSS Reproduction and Controlled Comparisons) — READY TO EXECUTE
-Plan: 14 of 14 implemented; human review pending
+Phase: 09 (CSS Reproduction and Controlled Comparisons) — EXECUTING
+Plan: 09-17 of 19; 8 plans passed wave gates
 Total Phases: 14
-Current Plan: Technical work complete
-Total Plans in Phase: 15
-Status: Awaiting Phase 5 human verification
-Last activity: 2026-10-11 — Phase 08 complete, transitioned to Phase 5
-Last Activity Description: Phase 09 planning complete — 15 plans ready
+Current Plan: 09-17 bounded canonical execution
+Total Plans in Phase: 19
+Status: Executing Wave 5 after Wave 4 full-suite gate
+Last activity: 2026-10-11 — Phase 09 Wave 4 full suite passed
+Last Activity Description: Public MBBP vote policy executed and independently replayed
 
-Progress: 7 of 14 phases complete (50%); 123/131 plans complete
+Progress: 7 of 14 phases complete (50%); Phase 9 has 8 of 19 plans complete
 
 ## Performance Metrics
 
@@ -254,9 +254,9 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 **Resume file:** .planning/phases/09-css-reproduction-and-controlled-comparisons/09-CONTEXT.md
 
-Last session: 2026-10-11T18:16:44.269Z
-Stopped at: Phase 9 context gathered
-Next command: $gsd-verify-work 5 for the pending human notebook/HTML review; use the Phase 07 handoff only when optional postprocessing is reprioritized.
+Last session: 2026-10-11T22:40:55Z
+Stopped at: Phase 9 Wave 4 passed; Plan 09-17 executing
+Next command: Continue $gsd-execute-phase 9 through the remaining dependency waves and measured gates. Phase 5 human review remains separately open; Phase 7 stays paused.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
 Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md`.
