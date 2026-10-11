@@ -36,3 +36,37 @@ def test_yao_tracer_refuses_faithful_eligibility_when_any_d02_gap_remains():
         candidate = copy.deepcopy(tracer)
         candidate["identity_gaps"].remove(gap)
         assert candidate["faithful_eligible"] is False
+
+
+def test_authored_coordinates_are_unique_and_keep_locator_specific_stopping_status():
+    yao = _load(YAO)
+    rabeti = _load(RABETI)
+
+    assert len(yao["targets"]) == 70
+    assert len({(item["figure"], item["curve"], item["p_literal"]) for item in yao["targets"]}) == 70
+    assert len(rabeti["targets"]) == 7
+    assert {item["p_literal"] for item in rabeti["targets"]} == {"0.04", "0.05", "0.06", "0.07", "0.08", "0.09", "0.10"}
+    assert all(item["stopping"]["status"] == "unavailable" for item in yao["targets"] if item["figure"] == "Figure 6")
+    assert all(item["stopping"]["status"] == "observed" for item in rabeti["targets"])
+
+
+def test_source_receipt_models_validate_and_candidate_b1_never_becomes_author_supplied():
+    from bp_registry.campaigns.targets import SourceExperimentQualificationReceiptV1, TableTargetReceiptV1
+
+    for path in (YAO, RABETI):
+        payload = _load(path)
+        for receipt in payload["table_target_receipts"]:
+            TableTargetReceiptV1.model_validate_json(json.dumps(receipt))
+        for receipt in payload["source_experiment_qualifications"]:
+            qualified = SourceExperimentQualificationReceiptV1.model_validate_json(json.dumps(receipt))
+            assert qualified.faithful_eligible is False
+            assert qualified.native_assessment.status == "identity_unverified"
+        assert payload["candidate_artifact"]["logical_provenance"]["author_supplied"] is False
+        assert payload["canonical_adaptation"]["assessment_label"] == "canonical_adaptation"
+
+
+def test_source_archive_digest_and_literal_receipts_are_stable():
+    for path in (YAO, RABETI):
+        payload = _load(path)
+        assert len(payload["source_archive"]["sha256"]) == 64
+        assert all(item["literal_decimal"] for item in payload["targets"])
