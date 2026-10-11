@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'local_workers_and_arm_order' -x",
+  "exitCode": 1,
+  "targetTest": "test_local_workers_and_arm_order_preserve_frozen_scientific_evidence",
+  "targetFile": "tests/test_campaign_execution.py",
+  "expected": "A bounded local executor preserves frozen scientific evidence across worker counts.",
+  "actual": "ImportError: execute_local_work_plan is unavailable",
+  "output": "TAP version 13\nnot ok 1 - test_local_workers_and_arm_order_preserve_frozen_scientific_evidence\n  ---\n  message: ImportError: execute_local_work_plan is unavailable\n  ...\n1..1\n# tests 1\n# pass 0\n# fail 1\n"
+}

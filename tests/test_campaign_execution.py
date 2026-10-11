@@ -204,3 +204,45 @@ def test_shard_plan_rejects_duplicate_coordinates_and_excessive_bounds():
             campaign_spec_digest=digest, coordinates=coordinates, arm_seed_identities=arms,
             look_sample_boundaries=(1, 2), units_per_shard=2, max_total_units=3,
         )
+
+
+def _bounded_unit_runner(unit: dict[str, object], staging: str) -> dict[str, object]:
+    """Pickle-safe deterministic worker fixture for frozen campaign units."""
+    del staging
+    return {
+        "terminal_fact": {
+            "unit_key": unit["unit_key"],
+            "termination": "converged",
+            "outcome": "exact",
+            "logical_failure": False,
+        },
+        "work_vector": {"bp_calls": 1},
+        "persisted_sample_bytes": (
+            "sample:" + str(unit["physical_sample_identity"])
+        ).encode("ascii"),
+    }
+
+
+def test_local_workers_and_arm_order_preserve_frozen_scientific_evidence(tmp_path: Path):
+    """Changing bounded pool topology cannot change frozen arm/sample facts."""
+    from bp_registry.campaigns.execution import execute_local_work_plan
+    from bp_registry.campaigns.planning import freeze_work_plan
+
+    digest, coordinates, arms = _planning_inputs()
+    plan = freeze_work_plan(
+        campaign_spec_digest=digest, coordinates=coordinates, arm_seed_identities=arms,
+        look_sample_boundaries=(1, 2), units_per_shard=2,
+    )
+    serial = execute_local_work_plan(
+        plan, output_root=tmp_path / "serial", workers=1, unit_runner=_bounded_unit_runner,
+    )
+    parallel = execute_local_work_plan(
+        plan, output_root=tmp_path / "parallel", workers=2, unit_runner=_bounded_unit_runner,
+    )
+    assert serial["scientific_records"] == parallel["scientific_records"]
+    assert serial["terminal_unit_keys"] == plan.unit_keys
+    assert parallel["observed_concurrency"] <= 2
+    assert set(parallel["environment"]) <= {
+        "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS",
+    }
+    assert all("unavailable_reason" in item for item in parallel["resource_observations"])
