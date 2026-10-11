@@ -1239,6 +1239,10 @@ def run_canonical_bounded_batch(
     actual_evidence = sum(Path(item["canonical_ledger_path"]).stat().st_size for item in verified)
     actual_storage = actual_evidence + sum(Path(item["materialized_sample_path"]).stat().st_size for item in verified)
     actual_storage += sum((destination / "units" / item["unit_key"] / "attempt.json").stat().st_size for item in verified)
+    actual_work = sum(
+        value for item in verified for value in item["work_vector"].values()
+        if type(value) is int
+    )
     if actual_evidence > plan.work_spec.policy.caps.max_evidence_bytes or actual_storage > plan.work_spec.policy.caps.max_storage_bytes:
         raise ValueError("bounded canonical execution exceeded a declared evidence or storage cap")
     return {
@@ -1247,7 +1251,8 @@ def run_canonical_bounded_batch(
         "ordinals": tuple(range(first_ordinal, first_ordinal + batch_size)),
         "authorization_projection": {"dispatch_allowed": True, **projection},
         "actual_resources": {
-            "completed_shots": len(verified), "evidence_bytes": actual_evidence,
+            "completed_shots": len(verified), "decoder_work": actual_work,
+            "evidence_bytes": actual_evidence,
             "storage_bytes": actual_storage,
         },
         "wall_boundaries": tuple(observations),
