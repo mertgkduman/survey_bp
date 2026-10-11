@@ -46,7 +46,7 @@ def _assessment_payload(*, mode: str = "fixed_shot") -> dict[str, object]:
         "stopping": stopping,
         "outcome_matrix": {"rule_id": "all_shot_v1", "treatments": _outcomes()},
         "decision_rule": "target_interval_containment_v1",
-        "resources": {"max_shots": 100, "max_looks": 2, "max_batch_size": 20, "max_decoder_work": 10000, "max_events": 1000, "max_evidence_bytes": 1000000, "max_storage_bytes": 2000000},
+        "resources": {"max_shots": 100, "max_looks": 1, "max_batch_size": 20, "max_decoder_work": 10000, "max_events": 1000, "max_evidence_bytes": 1000000, "max_storage_bytes": 2000000},
     }
 
 
