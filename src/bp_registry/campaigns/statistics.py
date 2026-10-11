@@ -270,10 +270,15 @@ class PairedOutcomeTableV1:
     count_receipt_sha256: str
 
 
-def _all_shot_failure(status: str) -> bool:
+def _all_shot_failure(status: str, outcome_matrix: OutcomeMatrixV1 | None = None) -> bool:
     """Apply the frozen all-shot mapping before paired inference."""
     if status == "infrastructure_interruption":
         raise ValueError("infrastructure interruption leaves a partial paired outcome")
+    if outcome_matrix is not None:
+        if not isinstance(outcome_matrix, OutcomeMatrixV1):
+            raise ValueError("paired comparison requires a validated outcome matrix")
+        treatment = next(item for item in outcome_matrix.treatments if item.terminal_status == status)
+        return treatment.all_shot == "failure"
     return status not in _ALL_SHOT_SUCCESSES
 
 
@@ -283,6 +288,7 @@ def paired_outcome_table(
     arm_ids: tuple[str, str],
     alpha: float,
     count_receipt_sha256: str,
+    outcome_matrix: OutcomeMatrixV1 | None = None,
 ) -> PairedOutcomeTableV1:
     """Join two arms on the entire frozen physical-sample identity.
 
@@ -325,8 +331,8 @@ def paired_outcome_table(
         "first_failure_second_failure": 0,
     }
     for arms in by_sample.values():
-        first_failure = _all_shot_failure(arms[first_arm].terminal_status)
-        second_failure = _all_shot_failure(arms[second_arm].terminal_status)
+        first_failure = _all_shot_failure(arms[first_arm].terminal_status, outcome_matrix)
+        second_failure = _all_shot_failure(arms[second_arm].terminal_status, outcome_matrix)
         table[(
             "first_failure_second_failure" if first_failure and second_failure
             else "first_failure_second_success" if first_failure

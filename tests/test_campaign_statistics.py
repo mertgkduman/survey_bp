@@ -601,6 +601,31 @@ def test_report_reconstructs_from_merged_terminals_and_replays_byte_stably() -> 
     ) is True
 
 
+def test_report_uses_frozen_outcome_matrix_for_rates_pairs_and_looks() -> None:
+    from bp_registry.campaigns.reporting import reconstruct_campaign_report
+
+    statuses = {
+        (0, "first"): "postselected_rejection", (0, "second"): "wrong_logical_action",
+        (1, "first"): "postselected_rejection", (1, "second"): "exact",
+    }
+    plan, assessment, merged, hashes = _report_inputs(statuses=statuses)
+    payload = assessment.model_dump(mode="json", by_alias=True)
+    for item in payload["outcome_matrix"]["treatments"]:
+        if item["terminal_status"] in {"postselected_rejection", "wrong_logical_action"}:
+            item["all_shot"] = "success"
+    changed = CampaignAssessmentV1.model_validate(payload)
+    hashes["assessment"] = changed.digest()
+    report = reconstruct_campaign_report(
+        plan=plan, assessment=changed, merge_receipt=merged,
+        input_receipt_hashes=hashes, target_arm_ids={"p050": "first"},
+    )
+    point = report.point_reports[0]
+    assert point.all_shot.failures == 0
+    assert point.paired is not None
+    assert point.paired.table["first_success_second_success"] == 2
+    assert report.stopping["records"][0].target_decisions["p050"].computed_interval[0] == 0.0
+
+
 @pytest.mark.parametrize("mutation", ("terminal", "target", "receipt"))
 def test_report_rejects_tampered_merged_evidence_target_or_receipt(mutation: str) -> None:
     api = importlib.import_module("bp_registry.campaigns.reporting")

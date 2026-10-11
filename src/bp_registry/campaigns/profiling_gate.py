@@ -112,6 +112,8 @@ class OperationalEvidenceV1:
             raise ValueError("operational evidence requires typed replay and profile facts")
         if self.path_class not in {"fast", "slow"}:
             raise ValueError("representative evidence path class must be fast or slow")
+        if self.replay_link.cohort.stratum != self.path_class:
+            raise ValueError("representative path class differs from prespecified cohort stratum")
         if not self.replay_link.cohort.population_estimate_eligible:
             raise ValueError("representative evidence must be selected before outcome")
         agreement = compare_semantics(self.clean_semantics, self.profiled_semantics)
@@ -144,6 +146,7 @@ class RepresentativeProfileAggregateV1:
     sample_count: int
     fast_path_samples: int
     slow_path_samples: int
+    inclusion_probability: float
     event_count: int
     decoder_wall_time_ns: int
     decoder_cpu_time_ns: int
@@ -208,6 +211,19 @@ def aggregate_representative_evidence(records: tuple[OperationalEvidenceV1, ...]
     paths = {record.path_class for record in records}
     if len(samples) < 2 or paths != {"fast", "slow"}:
         raise ValueError("representative evidence requires multiple physical samples and fast/slow eligible paths")
+    if len(samples) != len(records):
+        raise ValueError("representative evidence cannot count one physical sample more than once")
+    receipt_tuples = {
+        (record.shard_receipt_sha256, record.replay_receipt_sha256, record.profile_receipt_sha256)
+        for record in records
+    }
+    if len(receipt_tuples) != len(records):
+        raise ValueError("representative evidence contains duplicate receipt tuples")
+    probabilities = {record.replay_link.cohort.inclusion_probability for record in records}
+    if len(probabilities) != 1:
+        raise ValueError("representative projection requires one common inclusion probability")
+    inclusion_probability = probabilities.pop()
+    assert isinstance(inclusion_probability, float)
     decoder_wall = [_measurement_value(record.profile, "wall_time") for record in records]
     decoder_cpu = [_measurement_value(record.profile, "process_cpu_time") for record in records]
     missing = set()
@@ -226,6 +242,8 @@ def aggregate_representative_evidence(records: tuple[OperationalEvidenceV1, ...]
             {
                 "shard": record.shard_receipt_sha256, "replay": record.replay_receipt_sha256,
                 "profile": record.profile_receipt_sha256, "sample": record.replay_link.sample_identity,
+                "path_class": record.path_class,
+                "inclusion_probability": record.replay_link.cohort.inclusion_probability,
             }
             for record in records
         ]
@@ -242,6 +260,7 @@ def aggregate_representative_evidence(records: tuple[OperationalEvidenceV1, ...]
         profile_receipt_sha256s=tuple(sorted({record.profile_receipt_sha256 for record in records})),
         sample_count=len(records), fast_path_samples=sum(record.path_class == "fast" for record in records),
         slow_path_samples=sum(record.path_class == "slow" for record in records),
+        inclusion_probability=inclusion_probability,
         event_count=total_events,
         decoder_wall_time_ns=_sum_bounded(decoder_wall, name="decoder_wall_time_ns"),
         decoder_cpu_time_ns=_sum_bounded(decoder_cpu, name="decoder_cpu_time_ns"),

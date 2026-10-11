@@ -276,6 +276,7 @@ def reconstruct_campaign_report(
     terminal_rows = _verified_merge(plan=plan, merge_receipt=merge_receipt)
     if not terminal_rows:
         raise ValueError("report cannot compute an interval without verified terminal evidence")
+    treatments = {item.terminal_status: item for item in assessment.outcome_matrix.treatments}
     required = source_denominator_required_by_target or {}
     source_counts = source_denominators or {}
     target_arms = target_arm_ids or {}
@@ -302,10 +303,8 @@ def reconstruct_campaign_report(
             statuses[status] = statuses.get(status, 0) + 1
             if status != "infrastructure_interruption":
                 terminal_count += 1
-                failures += int(status in _ALL_SHOT_FAILURES)
-                accepted += int(assessment.outcome_matrix.treatments[
-                    [item.terminal_status for item in assessment.outcome_matrix.treatments].index(status)
-                ].conditional == "accepted")
+                failures += int(treatments[status].all_shot == "failure")
+                accepted += int(treatments[status].conditional == "accepted")
             paired_outcomes.append(PairedArmOutcomeV1(
                 campaign_spec_digest=plan.campaign_spec_digest, cohort_id=unit.cohort_id,
                 point_id=point_id, sample_identity=unit.physical_sample_identity,
@@ -330,6 +329,7 @@ def reconstruct_campaign_report(
                 paired = paired_outcome_table(
                     outcomes=paired_outcomes, arm_ids=(arm_ids[0], arm_ids[1]),
                     alpha=assessment.families[0].alpha, count_receipt_sha256=dict(hashes)["merge"],
+                    outcome_matrix=assessment.outcome_matrix,
                 )
         report_points.append(PointReportV1(
             point_id=point_id, planned_samples=len(point_units), dispatched_samples=len(rows),
@@ -357,7 +357,7 @@ def reconstruct_campaign_report(
         if not completed:
             raise ValueError("assessment target has no completed all-shot terminals")
         target_rates[target.target_id] = exact_binomial_rate(
-            failures=sum(row["terminal"]["outcome"] in _ALL_SHOT_FAILURES for row in completed),
+            failures=sum(treatments[row["terminal"]["outcome"]].all_shot == "failure" for row in completed),
             shots=len(completed), alpha=1.0 - assessment.interval.confidence_level,
             count_receipt_sha256=dict(hashes)["merge"],
         )
@@ -394,7 +394,7 @@ def reconstruct_campaign_report(
                 completed_statuses = [terminal_by_key[unit.key]["outcome"] for unit in planned_units if unit.key in terminal_by_key]
                 counts[target.target_id] = (
                     len(planned_units), len(completed_statuses),
-                    sum(status in _ALL_SHOT_FAILURES for status in completed_statuses),
+                    sum(treatments[status].all_shot == "failure" for status in completed_statuses),
                 )
             dispatched_counts = {item[0] for item in counts.values()}
             realized_counts = {item[1] for item in counts.values()}

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib
+from dataclasses import replace
 
 import pytest
 
@@ -47,7 +48,8 @@ def _profile(*, memory: int | None = 8_192) -> ProfileMeasurement:
     )
 
 
-def _run(*, sample: str, path_class: str, memory: int | None = 8_192, mismatch: bool = False):
+def _run(*, sample: str, path_class: str, memory: int | None = 8_192, mismatch: bool = False,
+         inclusion_probability: float = 0.5):
     api = _api()
     semantics = {
         "candidate": "candidate", "termination": "converged", "work": {"bp_calls": 1},
@@ -57,7 +59,7 @@ def _run(*, sample: str, path_class: str, memory: int | None = 8_192, mismatch: 
     if mismatch:
         profiled["candidate"] = "different"
     cohort = CohortSelection.representative(
-        run_identity=sample, stratum=path_class, inclusion_probability=0.5,
+        run_identity=sample, stratum=path_class, inclusion_probability=inclusion_probability,
     )
     link = ReplayLink.create(
         clean_run_id=f"clean-{sample}", profile_run_id=f"profile-{sample}",
@@ -120,6 +122,29 @@ def test_representative_clean_profiled_evidence_measures_throughput_storage_and_
     assert aggregate.replay_shots_per_second > 0
     assert aggregate.decoder_ns_per_event == 50
     assert aggregate.ledger_bytes_per_event == 150
+    assert aggregate.inclusion_probability == 0.5
+
+
+def test_representative_aggregation_rejects_misstratification_duplicate_samples_and_weights() -> None:
+    api = _api()
+    fast = _run(sample="sample-1", path_class="fast")
+    slow = _run(sample="sample-2", path_class="slow")
+    with pytest.raises(ValueError, match="stratum"):
+        replace(fast, path_class="slow")
+    duplicate = replace(
+        slow, replay_link=replace(
+            slow.replay_link, sample_identity="sample-1",
+            cohort=replace(slow.replay_link.cohort, run_identity="sample-1"),
+        ),
+        shard_receipt_sha256="7" * 64, replay_receipt_sha256="8" * 64,
+        profile_receipt_sha256="9" * 64,
+    )
+    with pytest.raises(ValueError, match="one physical sample"):
+        api.aggregate_representative_evidence((fast, slow, duplicate))
+    with pytest.raises(ValueError, match="inclusion probability"):
+        api.aggregate_representative_evidence((
+            fast, _run(sample="sample-2", path_class="slow", inclusion_probability=0.25),
+        ))
 
 
 def test_semantic_mismatch_and_post_outcome_selection_never_enter_a_projection() -> None:
