@@ -120,6 +120,9 @@ class RepresentativeProfileAggregateV1:
     campaign_spec_digest: str
     campaign_plan_digest: str
     merge_receipt_sha256: str
+    shard_receipt_sha256s: tuple[str, ...]
+    replay_receipt_sha256s: tuple[str, ...]
+    profile_receipt_sha256s: tuple[str, ...]
     sample_count: int
     fast_path_samples: int
     slow_path_samples: int
@@ -198,6 +201,9 @@ def aggregate_representative_evidence(records: tuple[OperationalEvidenceV1, ...]
         campaign_spec_digest=first.campaign_spec_digest,
         campaign_plan_digest=first.campaign_plan_digest,
         merge_receipt_sha256=first.merge_receipt_sha256,
+        shard_receipt_sha256s=tuple(sorted({record.shard_receipt_sha256 for record in records})),
+        replay_receipt_sha256s=tuple(sorted({record.replay_receipt_sha256 for record in records})),
+        profile_receipt_sha256s=tuple(sorted({record.profile_receipt_sha256 for record in records})),
         sample_count=len(records), fast_path_samples=sum(record.path_class == "fast" for record in records),
         slow_path_samples=sum(record.path_class == "slow" for record in records),
         event_count=sum(record.event_count for record in records),
@@ -303,6 +309,9 @@ class AuthorizationReceiptV1:
     campaign_plan_digest: str
     gate_evidence_sha256: str
     merge_receipt_sha256: str
+    shard_receipt_sha256s: tuple[str, ...]
+    replay_receipt_sha256s: tuple[str, ...]
+    profile_receipt_sha256s: tuple[str, ...]
     site_capability_sha256: str
     safety_factor: SafetyFactorV1
     projections: Mapping[str, int | None]
@@ -314,6 +323,9 @@ class AuthorizationReceiptV1:
             "operational_allocation": dict(self.operational_allocation), "campaign_spec_digest": self.campaign_spec_digest,
             "campaign_plan_digest": self.campaign_plan_digest, "gate_evidence_sha256": self.gate_evidence_sha256,
             "merge_receipt_sha256": self.merge_receipt_sha256, "site_capability_sha256": self.site_capability_sha256,
+            "shard_receipt_sha256s": list(self.shard_receipt_sha256s),
+            "replay_receipt_sha256s": list(self.replay_receipt_sha256s),
+            "profile_receipt_sha256s": list(self.profile_receipt_sha256s),
             "safety_factor": self.safety_factor.as_evidence(), "projections": dict(self.projections),
             "receipt_sha256": self.receipt_sha256,
         }
@@ -359,6 +371,9 @@ def authorize_campaign(*, aggregate: RepresentativeProfileAggregateV1, proposal:
         "operational_allocation": dict(proposal.operational_allocation),
         "campaign_spec_digest": proposal.campaign_spec_digest, "campaign_plan_digest": proposal.campaign_plan_digest,
         "gate_evidence_sha256": aggregate.evidence_sha256, "merge_receipt_sha256": aggregate.merge_receipt_sha256,
+        "shard_receipt_sha256s": aggregate.shard_receipt_sha256s,
+        "replay_receipt_sha256s": aggregate.replay_receipt_sha256s,
+        "profile_receipt_sha256s": aggregate.profile_receipt_sha256s,
         "site_capability_sha256": site.site_capability_sha256, "safety_factor": safety_factor.as_evidence(),
         "projections": projections,
     }
@@ -367,5 +382,8 @@ def authorize_campaign(*, aggregate: RepresentativeProfileAggregateV1, proposal:
         operational_allocation=proposal.operational_allocation, campaign_spec_digest=proposal.campaign_spec_digest,
         campaign_plan_digest=proposal.campaign_plan_digest, gate_evidence_sha256=aggregate.evidence_sha256,
         merge_receipt_sha256=aggregate.merge_receipt_sha256, site_capability_sha256=site.site_capability_sha256,
+        shard_receipt_sha256s=aggregate.shard_receipt_sha256s,
+        replay_receipt_sha256s=aggregate.replay_receipt_sha256s,
+        profile_receipt_sha256s=aggregate.profile_receipt_sha256s,
         safety_factor=safety_factor, projections=MappingProxyType(projections), receipt_sha256=_digest(preimage),
     )
