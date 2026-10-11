@@ -416,3 +416,95 @@ def test_holm_orders_ties_by_id_and_applies_running_maximum() -> None:
     assert [member.rank for member in result.members] == [1, 2, 3]
     assert [member.multiplier for member in result.members] == [3, 2, 1]
     assert [member.adjusted_p_value for member in result.members] == pytest.approx([0.03, 0.03, 0.03])
+
+
+def _denominator_summary(*args: object, **kwargs: object) -> object:
+    api = _statistics_api()
+    assert api is not None and hasattr(api, "outcome_denominator_summary"), (
+        "campaign statistics module must provide outcome denominator summaries"
+    )
+    return api.outcome_denominator_summary(*args, **kwargs)
+
+
+def _campaign_outcome(*, sample: str, status: str, work: int = 7) -> object:
+    api = _statistics_api()
+    assert api is not None and hasattr(api, "CampaignTerminalOutcomeV1"), (
+        "campaign statistics module must provide terminal campaign outcomes"
+    )
+    return api.CampaignTerminalOutcomeV1(
+        sample_identity=sample,
+        arm_id="first",
+        terminal_status=status,
+        actual_work=work,
+    )
+
+
+def test_outcome_summary_exposes_all_shot_acceptance_and_conditional_denominators() -> None:
+    summary = _denominator_summary(
+        outcomes=(
+            _campaign_outcome(sample="success", status="exact", work=2),
+            _campaign_outcome(sample="timeout", status="timeout", work=3),
+            _campaign_outcome(sample="wrong", status="wrong_logical_action", work=5),
+            _campaign_outcome(sample="interrupted", status="infrastructure_interruption", work=11),
+        ),
+        arm_id="first",
+        planned_samples=5,
+        dispatched_samples=4,
+        outcome_matrix=_finite_assessment().outcome_matrix,
+        alpha=0.05,
+        count_receipt_sha256=_HASH,
+    )
+    assert summary.planned_samples == 5
+    assert summary.dispatched_samples == 4
+    assert summary.terminal_samples == 3
+    assert summary.incomplete_samples == 1
+    assert summary.accepted_samples == summary.conditional_performance.shots == 2
+    assert summary.all_shot_performance.failures == 2
+    assert summary.all_shot_performance.shots == 3
+    assert summary.conditional_performance.failures == 1
+    assert summary.acceptance_probability.failures == 2
+    assert summary.acceptance_probability.shots == 3
+    assert summary.status_counts["timeout"] == 1
+    assert summary.status_counts["infrastructure_interruption"] == 1
+    assert summary.actual_work == 21
+
+
+def test_outcome_summary_keeps_postselection_and_invalid_results_visible() -> None:
+    summary = _denominator_summary(
+        outcomes=(
+            _campaign_outcome(sample="invalid", status="invalid_syndrome"),
+            _campaign_outcome(sample="none", status="no_proposal"),
+            _campaign_outcome(sample="nonconv", status="nonconvergence"),
+            _campaign_outcome(sample="post", status="postselected_rejection"),
+        ),
+        arm_id="first",
+        planned_samples=4,
+        dispatched_samples=4,
+        outcome_matrix=_finite_assessment().outcome_matrix,
+        alpha=0.05,
+        count_receipt_sha256=_HASH,
+    )
+    assert summary.all_shot_performance.failures == summary.all_shot_performance.shots == 4
+    assert summary.accepted_samples == 0
+    assert summary.conditional_performance is None
+    assert summary.status_counts == {
+        "invalid_syndrome": 1, "no_proposal": 1, "nonconvergence": 1,
+        "postselected_rejection": 1,
+    }
+
+
+def test_incomplete_pair_summary_blocks_paired_inference_until_finalized() -> None:
+    api = _statistics_api()
+    assert api is not None and hasattr(api, "paired_completion_summary")
+    summary = api.paired_completion_summary(
+        outcomes=(
+            _paired_outcome(sample="complete", arm="first", failure=False),
+            _paired_outcome(sample="complete", arm="second", failure=True),
+            _paired_outcome(sample="partial", arm="first", failure=False),
+        ),
+        arm_ids=("first", "second"),
+    )
+    assert summary.complete_pairs == 1
+    assert summary.incomplete_pairs == 1
+    assert summary.paired_inference_status == "inconclusive_incomplete_pairs"
+    assert summary.missing_arms_by_sample == {"partial": ("second",)}
