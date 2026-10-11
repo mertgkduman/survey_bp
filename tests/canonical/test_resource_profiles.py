@@ -99,6 +99,46 @@ def test_local_and_phase5_work_profiles_cover_all_v4_fields(tmp_path):
     phase5 = derive_canonical_executable_maxima(phase5_context)
     assert phase5.derived_work_per_unit >= sum(phase5_context.manifest.intervention_limits.work_caps.values())
 
+
+def test_strict_guarded_local_and_phase5_routes_reach_terminal(tmp_path):
+    from bp_registry.runner import (
+        CANONICAL_GUARDED_ARTIFACT_BYTE_CEILING_V1,
+        CanonicalRuntimeAuthorizationV1,
+        derive_canonical_executable_maxima,
+        run_canonical_materialized_one,
+    )
+    from bp_registry.sampling import sample_shot
+
+    for ordinal, path in enumerate((
+        Path("data/manifests/phase3-hsu-group-pilot.json"),
+        _phase5_guided(tmp_path, damped=True),
+    )):
+        context = _context(path)
+        profile = derive_canonical_executable_maxima(context)
+        manifest = context.manifest
+        sample = sample_shot(
+            context.code, shot_id=0, seed=0, x_error_rate=manifest.error_rate,
+            manifest_identity=manifest.randomness.physical_sample_identity or context.manifest_sha256,
+        )
+        authorization = CanonicalRuntimeAuthorizationV1.strict_full_unit(
+            profile_digest=profile.digest, authorization_identity=f"strict-route-{ordinal}",
+            max_events=profile.derived_events_per_unit,
+            max_evidence_bytes=profile.derived_evidence_bytes_per_unit,
+            max_storage_bytes=profile.derived_storage_bytes_per_unit,
+            control_receipt_reserve_bytes=profile.partial_receipt_reserve_bytes,
+            max_event_bytes=profile.serializer_bytes_per_event,
+            max_artifact_bytes=CANONICAL_GUARDED_ARTIFACT_BYTE_CEILING_V1,
+            derived_events=profile.derived_events_per_unit,
+            derived_evidence_bytes=profile.derived_evidence_bytes_per_unit,
+            derived_storage_bytes=profile.derived_storage_bytes_per_unit,
+        )
+        result = run_canonical_materialized_one(
+            path, sample=sample, materialized_sample_sha256="f" * 64,
+            ledger_path=tmp_path / f"events-{ordinal}.jsonl",
+            runtime_authorization=authorization,
+        )
+        assert result.status == "terminal"
+
 def test_profile_work_bounds_cover_complete_engine_work_vectors_and_reject_one_under(tmp_path):
     """The scalar profile bound counts every persisted WorkVector dimension."""
     from bp_registry.canonical.budgets import WorkVector
