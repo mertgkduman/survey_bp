@@ -22,6 +22,9 @@ def _campaign_api():
 
 def _spec_payload() -> dict[str, object]:
     manifest_bytes = (ROOT / INNER_MANIFEST).read_bytes()
+    from bp_registry.manifests import manifest_digest, preflight
+
+    manifest_namespace = manifest_digest(preflight(ROOT / INNER_MANIFEST).manifest)
     return {
         "schema": "campaign_spec_v1",
         "inner_manifest_path": INNER_MANIFEST,
@@ -30,8 +33,8 @@ def _spec_payload() -> dict[str, object]:
         "environment_lock_sha256": "2" * 64,
         "cohort_id": "tracer",
         "point_id": "p100",
-        "sample_namespace": sha256(manifest_bytes).hexdigest(),
-        "sample_id": 0,
+        "sample_namespace": manifest_namespace,
+        "sample_id": 1,
         "arm_id": "identity",
         "decoder_seed_identity": "canonical-deterministic-no-local-randomness-v1",
         "final_look": 1,
@@ -57,8 +60,8 @@ def test_tracer_runs_seals_verifies_and_reconstructs_zero_failure(tmp_path: Path
     assert first["physical_sample_identity"] == second["physical_sample_identity"]
     assert first["terminal_fact"] == second["terminal_fact"]
     assert "campaign_plan_digest" not in first["unit_key"]
-    assert "campaign_plan_digest" not in first["campaign_spec_bytes"]
-    assert "campaign_plan_digest" not in first["campaign_plan_preimage"]
+    assert b"campaign_plan_digest" not in first["campaign_spec_bytes"]
+    assert b"campaign_plan_digest" not in first["campaign_plan_preimage"]
 
     checked = api.verify_shard(first["receipt_path"], campaign_root=ROOT)
     report = api.reconstruct_fixed_shot(checked)
@@ -83,5 +86,5 @@ def test_identity_is_acyclic_and_changes_only_with_scientific_primitives():
     assert original_plan.campaign_spec_digest != changed_plan.campaign_spec_digest
     assert original_plan.unit_key != changed_plan.unit_key
     assert original_plan.campaign_plan_digest != changed_plan.campaign_plan_digest
-    assert "campaign_plan_digest" not in original_plan.campaign_spec_bytes
-    assert "campaign_plan_digest" not in original_plan.campaign_plan_preimage
+    assert b"campaign_plan_digest" not in original_plan.campaign_spec_bytes
+    assert b"campaign_plan_digest" not in original_plan.campaign_plan_preimage
