@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, is_dataclass, replace
 import json
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
 
@@ -13,6 +13,7 @@ from .contracts import Phase5InterventionContract
 from .guided_decimation import GuidedDecimationController
 from .impulse import ImpulseController, ImpulseSpec
 from .intervention_session import BpSession
+from .intervention_session import observe_phase5_boundaries
 from .kernel import BinarySpaKernel
 from .interventions import (
     FreezingController, FreezingSpec, SignFlipController, SignFlipSpec,
@@ -167,7 +168,7 @@ def _identity_baseline(
     )
 
 
-def execute_phase5_controller(
+def _execute_phase5_controller(
     spec: Phase5InterventionContract, original: OriginalProblem,
     *, error_rate: float, budgets: BudgetTree, max_iterations: int,
     owner_identity: str, wall_clock: WallClockLimit | None = None,
@@ -232,6 +233,23 @@ def execute_phase5_controller(
         )).run(original, error_rate=error_rate, budgets=budgets, wall_clock=wall_clock, damping_gamma=damping_gamma)
         return _project(result, rows_field="branches", candidate_field="selected_candidate", origin_field="selected_origin")
     raise ValueError("unregistered Phase 5 intervention kind")
+
+
+def execute_phase5_controller(
+    spec: Phase5InterventionContract, original: OriginalProblem,
+    *, error_rate: float, budgets: BudgetTree, max_iterations: int,
+    owner_identity: str, wall_clock: WallClockLimit | None = None,
+    damping_gamma: float | None = None,
+    update_kind: str = "binary_spa",
+    boundary_observer: Callable[[str], None] | None = None,
+) -> Phase5Outcome:
+    """Dispatch one controller with optional post-commit work observation."""
+    with observe_phase5_boundaries(boundary_observer):
+        return _execute_phase5_controller(
+            spec, original, error_rate=error_rate, budgets=budgets,
+            max_iterations=max_iterations, owner_identity=owner_identity,
+            wall_clock=wall_clock, damping_gamma=damping_gamma, update_kind=update_kind,
+        )
 
 
 def phase5_work_evidence(outcome: Phase5Outcome) -> dict[str, Any]:

@@ -375,6 +375,8 @@ class MbbpController:
                 original=original, system=systems[member_id], tree=tree, scope=scopes[member_id],
                 error_rate=error_rate, boundary_observer=boundary_observer,
             ))
+            if boundary_observer is not None:
+                boundary_observer(f"mbbp:{member_id}:after_member")
         members = tuple(sorted(attempted, key=lambda member: (member.local_ordinal, member.member_id)))
         origins = tuple(CandidateOrigin(
             lineage_id=member.lineage_id, local_ordinal=member.local_ordinal, candidate=member.candidate,

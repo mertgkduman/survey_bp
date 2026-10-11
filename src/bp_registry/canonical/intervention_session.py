@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass
 from hashlib import sha256
 import json
 import math
 from types import MappingProxyType
-from typing import Literal, Mapping
+from typing import Callable, Iterator, Literal, Mapping
 
 import numpy as np
 
@@ -16,6 +18,33 @@ from .contracts import FinitePriorBiasAction
 from .kernel import BinarySpaKernel
 from .memory import V2CDamping, V2CDampingState, TargetMemoryProposal
 from .schedules import EdgeTable, FloodingSchedule
+
+
+_phase5_boundary_observer: ContextVar[Callable[[str], None] | None] = ContextVar(
+    "phase5_boundary_observer", default=None,
+)
+
+
+@contextmanager
+def observe_phase5_boundaries(observer: Callable[[str], None] | None) -> Iterator[None]:
+    """Scope optional runtime boundary observation to one Phase-5 controller call."""
+    token = _phase5_boundary_observer.set(observer)
+    try:
+        yield
+    finally:
+        _phase5_boundary_observer.reset(token)
+
+
+def _before_phase5_work(leaf_id: str) -> None:
+    observer = _phase5_boundary_observer.get()
+    if observer is not None:
+        observer(f"phase5:{leaf_id}:before_work")
+
+
+def _after_phase5_work(leaf_id: str) -> None:
+    observer = _phase5_boundary_observer.get()
+    if observer is not None:
+        observer(f"phase5:{leaf_id}:after_work")
 
 
 def _frozen_f64(value: np.ndarray, length: int, name: str) -> np.ndarray:
@@ -241,6 +270,7 @@ class BpSession:
                 or not proposal.child_lineage_id.startswith("working-")
                 or proposal.target_index not in proposal.target_order):
             raise ValueError("untrusted intervention proposal action or work declaration")
+        _before_phase5_work(leaf_id)
         if wall_clock is not None and wall_clock.check("candidate_selection_boundary", scope="attempt") is not None:
             return SessionTransition(False, state, "wall_clock_deadline", None)
         reservation = budgets.reserve("attempt", proposal.anticipated_work, leaf_id=leaf_id)
@@ -263,6 +293,7 @@ class BpSession:
             raise
         reservation.commit_once()
         self._state = next_state
+        _after_phase5_work(leaf_id)
         return SessionTransition(True, next_state, None, leaf_id)
 
     def advance(
@@ -284,6 +315,7 @@ class BpSession:
         ) if state.pending_sign_target is not None else ()
         if pending_edges:
             work = work + WorkVector(variable_to_check_updates=len(pending_edges))
+        _before_phase5_work(leaf_id)
         if wall_clock is not None and wall_clock.check("iteration_boundary", scope="attempt") is not None:
             return SessionTransition(False, state, "wall_clock_deadline", None)
         reservation = budgets.reserve("attempt", work, leaf_id=leaf_id)
@@ -332,6 +364,7 @@ class BpSession:
             assert self._damping_policy is not None and self._damping_state is not None
             self._damping_state = self._damping_policy.commit(memory_proposal, self._damping_state)
         self._state = next_state
+        _after_phase5_work(leaf_id)
         return SessionTransition(True, next_state, None, leaf_id)
 
     def original_syndrome_valid(self, check_matrix: np.ndarray) -> bool:
@@ -373,6 +406,7 @@ class BpSession:
             or (owner_identity is not None and owner_identity != self.state.owner_identity)
         ):
             raise ValueError("incompatible graph, coordinate, prior, dtype, or owner for preserved BP state")
+        _before_phase5_work(leaf_id)
         if wall_clock is not None and wall_clock.check("candidate_selection_boundary", scope="attempt") is not None:
             raise ValueError("reset denied by wall-clock deadline; parent state remains unchanged")
         reservation = budgets.reserve("attempt", WorkVector(intervention_actions=1), leaf_id=leaf_id)
@@ -403,6 +437,7 @@ class BpSession:
             reservation.rollback()
             raise
         reservation.commit_once()
+        _after_phase5_work(leaf_id)
         return child
 
     def mutate_posterior_sign(
@@ -416,6 +451,7 @@ class BpSession:
             raise ValueError("posterior sign mutation requires a completed sweep and valid target")
         edge_indices = tuple(i for i, (_, variable) in enumerate(self.edge_table.edges) if variable == target_index)
         work = WorkVector(intervention_actions=1, variable_to_check_updates=len(edge_indices), candidate_constructions=1)
+        _before_phase5_work(leaf_id)
         if wall_clock is not None and wall_clock.check("candidate_selection_boundary", scope="attempt") is not None:
             return SessionTransition(False, state, "wall_clock_deadline", None)
         reservation = budgets.reserve("attempt", work, leaf_id=leaf_id)
@@ -441,6 +477,7 @@ class BpSession:
             raise
         reservation.commit_once()
         self._state = next_state
+        _after_phase5_work(leaf_id)
         return SessionTransition(True, next_state, None, leaf_id)
 
     def stage_posterior_sign(
@@ -452,6 +489,7 @@ class BpSession:
         if (type(target_index) is not int or not 0 <= target_index < self.edge_table.variable_count
                 or state.source_iteration == 0 or state.pending_sign_target is not None):
             raise ValueError("staged posterior sign requires a completed sweep and no pending mutation")
+        _before_phase5_work(leaf_id)
         if wall_clock is not None and wall_clock.check("candidate_selection_boundary", scope="attempt") is not None:
             return SessionTransition(False, state, "wall_clock_deadline", None)
         reservation = budgets.reserve(
@@ -478,6 +516,7 @@ class BpSession:
             raise
         reservation.commit_once()
         self._state = next_state
+        _after_phase5_work(leaf_id)
         return SessionTransition(True, next_state, None, leaf_id)
 
 

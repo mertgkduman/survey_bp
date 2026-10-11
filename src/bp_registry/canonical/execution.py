@@ -872,10 +872,15 @@ def _run_guided_structural_shot(
         })
         for round_index in range(parsed.intervention.round_limit):
             for sweep_index in range(parsed.intervention.sweeps_per_round):
+                boundary = f"guided:{round_index}:{sweep_index}"
+                if resource_guard is not None:
+                    resource_guard.before_work(f"{boundary}:before_work")
                 transition = session.advance(
                     budgets=budgets, leaf_id=f"guided-sweep:{shot_id}:{round_index}:{sweep_index}",
                     bp_call_start=sweep_index == 0,
                 )
+                if resource_guard is not None:
+                    resource_guard.after_work(f"{boundary}:after_work")
                 if not transition.admitted:
                     termination = transition.termination or "count_budget_exhausted"
                     break
@@ -887,7 +892,12 @@ def _run_guided_structural_shot(
             if selected is not None or termination == "count_budget_exhausted":
                 break
             before = session.state
+            boundary = f"guided:{round_index}:intervention"
+            if resource_guard is not None:
+                resource_guard.before_work(f"{boundary}:before_work")
             guided = controller.fix_one(session, posterior=before.posterior, budgets=budgets)
+            if resource_guard is not None:
+                resource_guard.after_work(f"{boundary}:after_work")
             ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="intervention", data={
                 **common,
                 "action": "finite_prior_bias", "admitted": guided.admitted,
@@ -992,12 +1002,22 @@ def _run_phase5_structural_shot(
                 if wall_clock is not None:
                     wall_clock.check("attempt_start", scope="attempt")
                 decode_started_ns = _performance_clock_ns()
+
+                def observe_phase5_boundary(boundary: str) -> None:
+                    if resource_guard is None:
+                        return
+                    if boundary.endswith(":before_work"):
+                        resource_guard.before_work(boundary)
+                    else:
+                        resource_guard.after_work(boundary)
+
                 outcome = execute_phase5_controller(
                     spec, original, error_rate=parsed.error_rate, budgets=budgets,
                     max_iterations=parsed.max_iterations, owner_identity=identity,
                     wall_clock=wall_clock,
                     damping_gamma=damping_gamma,
                     update_kind=parsed.policies.update.kind,
+                    boundary_observer=observe_phase5_boundary if resource_guard is not None else None,
                 )
                 outcome = finalize_phase5_deadline(outcome, wall_clock)
                 decode_runtime = Measurement.observed(
@@ -1098,23 +1118,32 @@ def run_phase6_structural_shot(
         else:
             resource_guard.after_work(boundary)
 
-    result = MbbpController(MbbpSpec(
-        bases, max_iterations=parsed.ensemble.max_iterations, max_member_c2v_updates=parsed.ensemble.max_member_c2v_updates,
-    )).run(original, error_rate=parsed.error_rate, boundary_observer=observe_mbbp_boundary if resource_guard is not None else None)
-    projection = phase6_events(
-        original, bases=bases, result=result,
-        vote_tie_bit=None if parsed.vote is None else parsed.vote.tie_bit,
-    )
     identity_data = {"execution_identity": identity, "source_status": parsed.ensemble.source_status,
                      "ensemble_kind": parsed.ensemble.kind}
-    candidate = None if projection.candidate is None else np.asarray(projection.candidate, dtype=np.uint8)
-    if candidate is not None and not np.array_equal((validated.hz @ candidate) % 2, observation.syndrome):
-        raise ValueError("MBBP selected a candidate failing the original syndrome")
-    assessment = None if candidate is None else evaluate(validated, true_x=hidden_truth.x, true_z=hidden_truth.z, candidate_x=candidate)
+    # Begin the durable prefix before any member work.  A guard interruption
+    # therefore leaves an owned, syntactically valid prefix while deliberately
+    # skipping the incomplete electorate's projection, selection, and truth use.
     with CanonicalEventWriter(ledger_path, structural_event_version=6, resource_guard=resource_guard) as ledger:
         ledger.begin(run_id=parsed.run_id, shot_id=shot_id, sample_seed_identity=sample_seed_identity,
                      schema_version=7, identity=identity_data,
                      payload={"original_lineage_id": original.lineage_id, "syndrome": original.syndrome.tolist()})
+        result = MbbpController(MbbpSpec(
+            bases, max_iterations=parsed.ensemble.max_iterations,
+            max_member_c2v_updates=parsed.ensemble.max_member_c2v_updates,
+        )).run(
+            original, error_rate=parsed.error_rate,
+            boundary_observer=observe_mbbp_boundary if resource_guard is not None else None,
+        )
+        projection = phase6_events(
+            original, bases=bases, result=result,
+            vote_tie_bit=None if parsed.vote is None else parsed.vote.tie_bit,
+        )
+        candidate = None if projection.candidate is None else np.asarray(projection.candidate, dtype=np.uint8)
+        if candidate is not None and not np.array_equal((validated.hz @ candidate) % 2, observation.syndrome):
+            raise ValueError("MBBP selected a candidate failing the original syndrome")
+        assessment = None if candidate is None else evaluate(
+            validated, true_x=hidden_truth.x, true_z=hidden_truth.z, candidate_x=candidate,
+        )
         terminal_payload: Mapping[str, Any] | None = None
         for kind, payload in projection.events:
             if kind == "header":
@@ -1426,7 +1455,12 @@ def run_canonical_structural_shot(
                                 # of the E selected C2V commits, not one local commit.
                                 while local_progress.iteration < parsed.max_iterations:
                                     proposal = local_schedule.propose_local_step(messages, c2v, cache, observation.syndrome, error_rate=parsed.error_rate)
+                                    boundary = f"local:{parsed.policies.schedule.kind}:{local_progress.iteration}:{local_progress.local_steps}"
+                                    if resource_guard is not None:
+                                        resource_guard.before_work(f"{boundary}:before_work")
                                     step = local_schedule.execute_local_step(executor, proposal, v2c=messages, c2v=c2v, cache=cache, progress=local_progress, is_converged=lambda proposed: bool(np.array_equal((validated.hz.astype(np.int64) @ proposed.astype(np.int64)) % 2, observation.syndrome)))
+                                    if resource_guard is not None:
+                                        resource_guard.after_work(f"{boundary}:after_work")
                                     local_progress, cache, c2v = step.progress, step.cache, step.c2v
                                     if not step.admitted:
                                         return candidate, local_progress.local_steps, False, step.termination
@@ -1483,6 +1517,9 @@ def run_canonical_structural_shot(
                                 if local_memory is not None:
                                     local_memory.begin_step()
                                 try:
+                                    boundary = f"local:{parsed.policies.schedule.kind}:{local_progress.iteration}:{local_progress.local_steps}"
+                                    if resource_guard is not None:
+                                        resource_guard.before_work(f"{boundary}:before_work")
                                     step = local_schedule.execute_local_step(
                                         executor, messages, observation.syndrome,
                                         error_rate=parsed.error_rate, progress=progress_for_step,
@@ -1496,6 +1533,8 @@ def run_canonical_structural_shot(
                                             "transform_v2c": local_memory.transform_v2c,
                                         } if local_memory is not None else {}),
                                     )
+                                    if resource_guard is not None:
+                                        resource_guard.after_work(f"{boundary}:after_work")
                                 except BaseException:
                                     if local_memory is not None:
                                         local_memory.discard()
