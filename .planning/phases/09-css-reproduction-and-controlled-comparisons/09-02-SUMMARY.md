@@ -29,10 +29,10 @@ key-decisions:
   - "The Rabeti planning digest remains pinned while a changed live source-byte digest is retained as a qualification blocker."
 requirements-completed: [EVAL-01, EVAL-02]
 actuals:
-  tokens: 11400
+  tokens: 24974
   tasks: 2
   commits: 4
-plan_head_before: 17b6a8e2b9835e470698db336eed88816a338dad
+plan_head_before: 17b6a8e1dea14567d4d98eb7eb7843d4c550fdef
 duration: 19m
 completed: 2026-10-11
 status: complete
