@@ -11,9 +11,9 @@ provides:
   - fail-closed digest-bound resource and storage authorization receipts
 affects: [08-14, campaign-dispatch, phase-09, phase-11]
 actuals:
-  tokens: 7888
+  tokens: 8110
   tasks: 2
-  commits: 5
+  commits: 6
 plan_head_before: 6effd76d052ea8ace96114498acc767b7937c6a1
 tech-stack:
   added: []
@@ -71,6 +71,7 @@ status: complete
 - Added typed, pre-outcome representative operational evidence that requires verified shard, merge, and replay receipts plus clean/profile semantic agreement.
 - Aggregated decoder and replay throughput, ledger and sidecar storage, event counts, scheduler fixed costs, and explicit peak-memory availability across fast and slow paths on multiple physical samples.
 - Added a fail-closed authorization receipt that binds campaign, gate, merge, shard, replay, profile, site-capability, safety-margin, allocation, and projection facts.
+- Exposed per-event decoder and ledger measurements, leaving zero-event evidence explicitly unavailable.
 - Denies missing required observations, absent site ceilings, every tested resource-ceiling exceedance, and unbounded arithmetic before a large campaign can be authorized.
 
 ## Task Commits
@@ -78,6 +79,7 @@ status: complete
 1. **Task 1: Aggregate representative clean/profiled operational evidence** - `c692721`, `23b8240` (test → feat)
 2. **Task 2: Choose measured resource and storage ceilings and authorize or deny** - `392b677`, `28e8e0c` (test → feat)
 3. **Security correction during Task 2** - `096008f` (fix)
+4. **Measurement correction during Task 1** - `9e5dda2` (fix)
 
 ## Files Created/Modified
 
@@ -102,7 +104,16 @@ status: complete
 - **Verification:** `test_resource_gate_rejects_unbounded_campaign_arithmetic` and the 14-test profile-gate suite pass.
 - **Committed in:** `096008f`
 
-**Total deviations:** 1 auto-fixed (Rule 2).
+**2. [Rule 2 - Missing Critical Functionality] Explicit per-event measurements**
+
+- **Found during:** Task 1 verification
+- **Issue:** Aggregate evidence retained event counts but did not expose the required per-event decoder and storage measurements.
+- **Fix:** Added per-event measurement properties and explicit zero-event missingness.
+- **Files modified:** `src/bp_registry/campaigns/profiling_gate.py`, `tests/test_campaign_profile_gate.py`
+- **Verification:** `test_representative_clean_profiled_evidence_measures_throughput_storage_and_memory` and the 14-test profile-gate suite pass.
+- **Committed in:** `9e5dda2`
+
+**Total deviations:** 2 auto-fixed (Rule 2).
 
 ## TDD Gate Compliance
 
@@ -122,4 +133,4 @@ Phase 8 can use the profiling gate in its bounded local/HPC-equivalent campaign.
 ## Self-Check: PASSED
 
 - `src/bp_registry/campaigns/profiling_gate.py` and `tests/test_campaign_profile_gate.py` exist.
-- Task commits `c692721`, `23b8240`, `392b677`, `28e8e0c`, and `096008f` exist.
+- Task commits `c692721`, `23b8240`, `392b677`, `28e8e0c`, `096008f`, and `9e5dda2` exist.
