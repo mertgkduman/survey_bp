@@ -6,6 +6,7 @@ from hashlib import sha256
 import importlib
 import json
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 
@@ -573,6 +574,12 @@ def _run_campaign_module(*arguments: str) -> subprocess.CompletedProcess[str]:
     )
 
 
+def _run_installed_campaign(*arguments: str) -> subprocess.CompletedProcess[str]:
+    command = shutil.which("bp-registry-campaign", path=str(Path(sys.executable).parent))
+    assert command is not None, "bp-registry-campaign must be installed into the active environment"
+    return subprocess.run([command, *arguments], cwd=ROOT, text=True, capture_output=True, check=False)
+
+
 def test_cli_preflight_and_plan_freeze_identity_before_any_execution(tmp_path: Path):
     """The public command rejects drift before it can write a run receipt."""
     campaign = _write_cli_campaign(tmp_path / "campaign.json")
@@ -683,3 +690,33 @@ def test_cli_scheduler_route_emits_literal_argv_and_executes_one_frozen_shard(tm
     )
     assert malformed.returncode != 0
     assert not (tmp_path / "invalid-task").exists()
+
+
+def test_installed_cli_exposes_lifecycle_help_and_preserves_route_science(tmp_path: Path):
+    """The installed command has every lifecycle verb and route-neutral science."""
+    help_result = _run_installed_campaign("--help")
+    assert help_result.returncode == 0, help_result.stderr
+    for command in ("preflight", "plan", "run-local", "run-shard", "emit-slurm", "merge", "resume", "assess", "verify", "profile-gate", "site-capability"):
+        assert command in help_result.stdout
+
+    campaign = _write_cli_campaign(tmp_path / "campaign.json")
+    plan_root = tmp_path / "planned"
+    planned = _run_installed_campaign(
+        "plan", "--campaign", str(campaign), "--campaign-root", str(ROOT),
+        "--output-root", str(plan_root),
+    )
+    assert planned.returncode == 0, planned.stdout
+    plan_path = plan_root / "campaign-plan.json"
+    local = _run_installed_campaign(
+        "run-local", "--plan", str(plan_path), "--campaign-root", str(ROOT),
+        "--output-root", str(tmp_path / "local"),
+    )
+    shard = _run_installed_campaign(
+        "run-shard", "--plan", str(plan_path), "--campaign-root", str(ROOT),
+        "--output-root", str(tmp_path / "slurm"), "--array-task-id", "0",
+    )
+    assert local.returncode == shard.returncode == 0
+    local_payload, shard_payload = json.loads(local.stdout), json.loads(shard.stdout)
+    assert local_payload["terminal_fact"] == shard_payload["terminal_fact"]
+    assert local_payload["unit_key"] == shard_payload["unit_key"]
+    assert local_payload["executor_route"] != shard_payload["executor_route"]
