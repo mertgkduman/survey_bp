@@ -213,9 +213,9 @@ def _plan(args: argparse.Namespace) -> dict[str, Any]:
 def _run(args: argparse.Namespace, *, route: str) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
     spec, plan = _load_plan(args.plan, root)
-    output = _output_root(args.output_root)
     if route == "slurm" and args.array_task_id != "0":
         raise ValueError("one-unit campaign plans expose only frozen Slurm array task 0")
+    output = _output_root(args.output_root)
     run = run_one_unit(spec, campaign_root=root, output_root=output, worker_label=route)
     return _artifact(
         status="ok", plan=plan, phase="run_shard" if route == "slurm" else "run_local",
