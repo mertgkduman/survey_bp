@@ -527,7 +527,42 @@ def test_scheduler_receipt_preemption_cancellation_and_duplicate_delivery_are_in
 
 
 def _write_cli_campaign(path: Path) -> Path:
-    path.write_text(json.dumps({"campaign_spec": _spec_payload()}, sort_keys=True), encoding="utf-8")
+    payload = _spec_payload()
+    target_sha256 = sha256((ROOT / INNER_MANIFEST).read_bytes()).hexdigest()
+    payload["assessment"] = {
+        "schema": "campaign_assessment_v1",
+        "targets": [{
+            "target_id": "tracer-target", "target_receipt_sha256": target_sha256,
+            "lower": 0.0, "upper": 1.0, "absolute_tolerance": 0.0,
+        }],
+        "interval": {"method": "exact_clopper_pearson", "confidence_level": 0.95},
+        "families": [{"family_id": "tracer-family", "alpha": 0.05, "member_target_ids": ["tracer-target"]}],
+        "stopping": {"mode": "fixed_shot", "final_shots": 1, "batch_size": 1},
+        "outcome_matrix": {
+            "rule_id": "all_shot_v1",
+            "treatments": [
+                {"terminal_status": "exact", "all_shot": "success", "conditional": "accepted"},
+                {"terminal_status": "stabilizer_equivalent", "all_shot": "success", "conditional": "accepted"},
+                {"terminal_status": "wrong_logical_action", "all_shot": "failure", "conditional": "accepted"},
+                {"terminal_status": "invalid_syndrome", "all_shot": "failure", "conditional": "excluded"},
+                {"terminal_status": "no_proposal", "all_shot": "failure", "conditional": "excluded"},
+                {"terminal_status": "nonconvergence", "all_shot": "failure", "conditional": "excluded"},
+                {"terminal_status": "timeout", "all_shot": "failure", "conditional": "excluded"},
+                {"terminal_status": "postselected_rejection", "all_shot": "failure", "conditional": "excluded"},
+                {"terminal_status": "infrastructure_interruption", "all_shot": "incomplete", "conditional": "incomplete"},
+            ],
+        },
+        "decision_rule": "target_interval_containment_v1",
+        "resources": {
+            "max_shots": 1, "max_looks": 1, "max_batch_size": 1,
+            "max_decoder_work": 64, "max_events": 64,
+            "max_evidence_bytes": 1_000_000, "max_storage_bytes": 1_000_000,
+        },
+    }
+    path.write_text(json.dumps({
+        "campaign_spec": payload,
+        "target_receipts": {"tracer-target": INNER_MANIFEST},
+    }, sort_keys=True), encoding="utf-8")
     return path
 
 
@@ -553,3 +588,98 @@ def test_cli_preflight_and_plan_freeze_identity_before_any_execution(tmp_path: P
     assert payload["status"] == "ok"
     assert len(payload["campaign_spec_digest"]) == 64
     assert not output_root.exists()
+
+
+def test_cli_lifecycle_uses_preserved_receipts_and_rejects_plan_drift(tmp_path: Path):
+    """One bounded manifest reaches each lifecycle stage without mutable inputs."""
+    campaign = _write_cli_campaign(tmp_path / "campaign.json")
+    planned_root = tmp_path / "planned"
+    planned = _run_campaign_module(
+        "plan", "--campaign", str(campaign), "--campaign-root", str(ROOT),
+        "--output-root", str(planned_root),
+    )
+    assert planned.returncode == 0, planned.stdout
+    plan_path = planned_root / "campaign-plan.json"
+
+    local = _run_campaign_module(
+        "run-local", "--plan", str(plan_path), "--campaign-root", str(ROOT),
+        "--output-root", str(tmp_path / "local"),
+    )
+    assert local.returncode == 0, local.stdout
+    local_payload = json.loads(local.stdout)
+    assert local_payload["executor_route"] == "local"
+
+    verified = _run_campaign_module(
+        "verify", "--receipt", local_payload["receipt_path"], "--campaign-root", str(ROOT),
+    )
+    assert verified.returncode == 0, verified.stdout
+    assert json.loads(verified.stdout)["verified"] is True
+
+    merged_root = tmp_path / "merged"
+    merged = _run_campaign_module(
+        "merge", "--receipt", local_payload["receipt_path"], "--campaign-root", str(ROOT),
+        "--output-root", str(merged_root),
+    )
+    assert merged.returncode == 0, merged.stdout
+    merge_path = merged_root / "campaign-merge.json"
+
+    resumed = _run_campaign_module(
+        "resume", "--plan", str(plan_path), "--merge", str(merge_path),
+        "--campaign-root", str(ROOT),
+    )
+    assert resumed.returncode == 0, resumed.stdout
+    assert json.loads(resumed.stdout)["exact_missing_set"] == []
+
+    assessed = _run_campaign_module("assess", "--merge", str(merge_path))
+    assert assessed.returncode == 0, assessed.stdout
+    assert json.loads(assessed.stdout)["assessment_status"] == "evidence_reconstructed"
+
+    drifted = json.loads(plan_path.read_text(encoding="utf-8"))
+    drifted["campaign_plan_digest"] = "0" * 64
+    drifted_path = tmp_path / "drifted-plan.json"
+    drifted_path.write_text(json.dumps(drifted), encoding="utf-8")
+    rejected_root = tmp_path / "must-not-exist"
+    rejected = _run_campaign_module(
+        "run-local", "--plan", str(drifted_path), "--campaign-root", str(ROOT),
+        "--output-root", str(rejected_root),
+    )
+    assert rejected.returncode != 0
+    assert json.loads(rejected.stdout)["status"] == "error"
+    assert not rejected_root.exists()
+
+
+def test_cli_scheduler_route_emits_literal_argv_and_executes_one_frozen_shard(tmp_path: Path):
+    """The scheduler path selects task zero from exactly the planned campaign."""
+    campaign = _write_cli_campaign(tmp_path / "campaign.json")
+    plan_root = tmp_path / "planned"
+    assert _run_campaign_module(
+        "plan", "--campaign", str(campaign), "--campaign-root", str(ROOT),
+        "--output-root", str(plan_root),
+    ).returncode == 0
+    allocation = tmp_path / "allocation.json"
+    allocation.write_text(json.dumps({
+        "partition": "research", "qos": "short", "account": "bp", "wall_minutes": 10,
+        "memory_mb": 256, "cpus_per_task": 1, "max_concurrent_tasks": 1,
+    }), encoding="utf-8")
+    allowlists = tmp_path / "allowlists.json"
+    allowlists.write_text(json.dumps({"partition": ["research"], "qos": ["short"], "account": ["bp"]}), encoding="utf-8")
+    plan_path = plan_root / "campaign-plan.json"
+    emitted = _run_campaign_module(
+        "emit-slurm", "--plan", str(plan_path), "--campaign-root", str(ROOT),
+        "--allocation", str(allocation), "--site-allowlists", str(allowlists),
+    )
+    assert emitted.returncode == 0, emitted.stdout
+    assert json.loads(emitted.stdout)["sbatch_argv"][:2] == ["sbatch", "--array=0-0%1"]
+
+    shard = _run_campaign_module(
+        "run-shard", "--plan", str(plan_path), "--campaign-root", str(ROOT),
+        "--output-root", str(tmp_path / "shard"), "--array-task-id", "0",
+    )
+    assert shard.returncode == 0, shard.stdout
+    assert json.loads(shard.stdout)["executor_route"] == "slurm"
+    malformed = _run_campaign_module(
+        "run-shard", "--plan", str(plan_path), "--campaign-root", str(ROOT),
+        "--output-root", str(tmp_path / "invalid-task"), "--array-task-id", "1;touch",
+    )
+    assert malformed.returncode != 0
+    assert not (tmp_path / "invalid-task").exists()
