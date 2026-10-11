@@ -9,6 +9,8 @@ import pytest
 
 from bp_registry.canonical.budgets import Measurement, RuntimeResourceFacts
 from bp_registry.canonical.profiling import CohortSelection, ProfileMeasurement, ReplayLink
+from bp_registry.campaigns.contracts import CampaignAssessmentV1
+from test_campaign_contracts import _assessment_payload
 
 
 def _api():
@@ -93,7 +95,8 @@ def _proposal():
     api = _api()
     return api.ProposedCampaignV1(
         campaign_spec_digest="e" * 64, campaign_plan_digest="f" * 64,
-        total_shots=10, max_shard_shots=2, scientific_caps={"max_shots": 10, "max_bp_calls": 10},
+        total_shots=10, max_shard_shots=2,
+        assessment=CampaignAssessmentV1.model_validate(_assessment_payload()),
         operational_allocation={"workers": 4, "cpus_per_worker": 1},
     )
 
@@ -241,5 +244,19 @@ def test_resource_gate_rejects_unbounded_campaign_arithmetic() -> None:
         api.ProposedCampaignV1(
             campaign_spec_digest="e" * 64, campaign_plan_digest="f" * 64,
             total_shots=1 << 63, max_shard_shots=1,
-            scientific_caps={"max_shots": 1}, operational_allocation={"workers": 1},
+            assessment=_proposal().assessment, operational_allocation={"workers": 1},
         )
+
+
+def test_authorization_rejects_proposals_above_frozen_scientific_caps() -> None:
+    api = _api()
+    proposal = _proposal()
+    with pytest.raises(ValueError, match="shots exceed assessment scientific cap"):
+        replace(proposal, total_shots=101)
+    with pytest.raises(ValueError, match="shard shots exceed assessment batch cap"):
+        replace(proposal, total_shots=21, max_shard_shots=21)
+    receipt = api.authorize_campaign(
+        aggregate=_aggregate(), proposal=proposal, site=_site(), safety_factor=api.SafetyFactorV1(1, 1),
+    )
+    assert receipt.assessment_digest == proposal.assessment.digest()
+    assert receipt.scientific_caps["max_shots"] == 100

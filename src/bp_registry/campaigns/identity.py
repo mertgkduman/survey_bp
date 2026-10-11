@@ -73,13 +73,15 @@ def decoder_randomness_identity(
 
 
 def unit_key(
-    *, campaign_spec_digest: str, cohort_id: str, point_id: str, sample_id: int, arm_id: str,
+    *, campaign_spec_digest: str, cohort_id: str, point_id: str, sample_namespace: str,
+    sample_id: int, arm_id: str,
 ) -> str:
     """Identify one atomic arm contribution before the plan digest exists."""
     return _digest("bp-registry-campaign-unit-v1", {
         "campaign_spec_digest": _sha256(campaign_spec_digest, name="campaign_spec_digest"),
         "cohort_id": _label(cohort_id, name="cohort_id"),
         "point_id": _label(point_id, name="point_id"),
+        "sample_namespace": _label(sample_namespace, name="sample_namespace"),
         "sample_id": _sample_id(sample_id),
         "arm_id": _label(arm_id, name="arm_id"),
     })

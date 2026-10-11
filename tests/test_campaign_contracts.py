@@ -8,6 +8,26 @@ import pytest
 from pydantic import ValidationError
 
 
+def test_work_plan_distinguishes_accepted_physical_sample_namespaces() -> None:
+    from bp_registry.campaigns.planning import CampaignCoordinateV1, freeze_work_plan
+
+    coordinates = tuple(
+        CampaignCoordinateV1(
+            cohort_id="cohort", point_id="point", sample_namespace=namespace,
+            sample_ids=(7,),
+        )
+        for namespace in ("source-a", "source-b")
+    )
+    plan = freeze_work_plan(
+        campaign_spec_digest="a" * 64, coordinates=coordinates,
+        arm_seed_identities={"bp": "seed"}, look_sample_boundaries=(2,),
+        units_per_shard=1,
+    )
+    assert len(plan.units) == 2
+    assert len(set(plan.unit_keys)) == 2
+    assert len({unit.physical_sample_identity for unit in plan.units}) == 2
+
+
 def _hash(char: str) -> str:
     return char * 64
 

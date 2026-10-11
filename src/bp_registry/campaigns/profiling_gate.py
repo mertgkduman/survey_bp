@@ -14,6 +14,7 @@ from types import MappingProxyType
 from typing import Literal, Mapping
 
 from bp_registry.canonical.profiling import ProfileMeasurement, ReplayLink, compare_semantics
+from bp_registry.campaigns.contracts import CampaignAssessmentV1
 
 
 _DIGEST_LENGTH = 64
@@ -330,8 +331,12 @@ class ProposedCampaignV1:
     campaign_plan_digest: str
     total_shots: int
     max_shard_shots: int
-    scientific_caps: Mapping[str, int]
+    assessment: CampaignAssessmentV1
     operational_allocation: Mapping[str, int]
+
+    @property
+    def scientific_caps(self) -> Mapping[str, int]:
+        return MappingProxyType(self.assessment.resources.model_dump(mode="python"))
 
     def __post_init__(self) -> None:
         _require_digest(self.campaign_spec_digest, name="campaign_spec_digest")
@@ -340,7 +345,12 @@ class ProposedCampaignV1:
         _nonnegative(self.max_shard_shots, name="max_shard_shots", positive=True)
         if self.max_shard_shots > self.total_shots:
             raise ValueError("maximum shard shots cannot exceed total shots")
-        object.__setattr__(self, "scientific_caps", _integer_mapping(self.scientific_caps, name="scientific_caps"))
+        if not isinstance(self.assessment, CampaignAssessmentV1):
+            raise ValueError("proposal requires a frozen typed campaign assessment")
+        if self.total_shots > self.assessment.resources.max_shots:
+            raise ValueError("requested shots exceed assessment scientific cap")
+        if self.max_shard_shots > self.assessment.resources.max_batch_size:
+            raise ValueError("requested shard shots exceed assessment batch cap")
         object.__setattr__(self, "operational_allocation", _integer_mapping(self.operational_allocation, name="operational_allocation"))
 
 
@@ -353,6 +363,7 @@ def scientific_authorization_identity(proposal: ProposedCampaignV1) -> str:
         "campaign_plan_digest": proposal.campaign_plan_digest,
         "total_shots": proposal.total_shots,
         "max_shard_shots": proposal.max_shard_shots,
+        "assessment_digest": proposal.assessment.digest(),
         "scientific_caps": dict(proposal.scientific_caps),
     })
 
@@ -364,6 +375,8 @@ class AuthorizationReceiptV1:
     decision: Literal["allow", "deny"]
     reasons: tuple[str, ...]
     scientific_identity: str
+    assessment_digest: str
+    scientific_caps: Mapping[str, int]
     operational_allocation: Mapping[str, int]
     campaign_spec_digest: str
     campaign_plan_digest: str
@@ -380,6 +393,7 @@ class AuthorizationReceiptV1:
     def as_evidence(self) -> dict[str, object]:
         return {
             "decision": self.decision, "reasons": list(self.reasons), "scientific_identity": self.scientific_identity,
+            "assessment_digest": self.assessment_digest, "scientific_caps": dict(self.scientific_caps),
             "operational_allocation": dict(self.operational_allocation), "campaign_spec_digest": self.campaign_spec_digest,
             "campaign_plan_digest": self.campaign_plan_digest, "gate_evidence_sha256": self.gate_evidence_sha256,
             "merge_receipt_sha256": self.merge_receipt_sha256, "site_capability_sha256": self.site_capability_sha256,
@@ -432,6 +446,7 @@ def authorize_campaign(*, aggregate: RepresentativeProfileAggregateV1, proposal:
     preimage = {
         "decision": "allow" if not reasons else "deny", "reasons": reasons,
         "scientific_identity": scientific_authorization_identity(proposal),
+        "assessment_digest": proposal.assessment.digest(), "scientific_caps": dict(proposal.scientific_caps),
         "operational_allocation": dict(proposal.operational_allocation),
         "campaign_spec_digest": proposal.campaign_spec_digest, "campaign_plan_digest": proposal.campaign_plan_digest,
         "gate_evidence_sha256": aggregate.evidence_sha256, "merge_receipt_sha256": aggregate.merge_receipt_sha256,
@@ -443,6 +458,7 @@ def authorize_campaign(*, aggregate: RepresentativeProfileAggregateV1, proposal:
     }
     return AuthorizationReceiptV1(
         decision=preimage["decision"], reasons=tuple(reasons), scientific_identity=preimage["scientific_identity"],
+        assessment_digest=proposal.assessment.digest(), scientific_caps=proposal.scientific_caps,
         operational_allocation=proposal.operational_allocation, campaign_spec_digest=proposal.campaign_spec_digest,
         campaign_plan_digest=proposal.campaign_plan_digest, gate_evidence_sha256=aggregate.evidence_sha256,
         merge_receipt_sha256=aggregate.merge_receipt_sha256, site_capability_sha256=site.site_capability_sha256,

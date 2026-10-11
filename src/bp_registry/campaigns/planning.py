@@ -183,7 +183,8 @@ def freeze_work_plan(
     units = tuple(
         UnitKey(
             key=unit_key(campaign_spec_digest=digest, cohort_id=coordinate.cohort_id,
-                         point_id=coordinate.point_id, sample_id=sample_id, arm_id=arm_id),
+                         point_id=coordinate.point_id, sample_namespace=coordinate.sample_namespace,
+                         sample_id=sample_id, arm_id=arm_id),
             campaign_spec_digest=digest, cohort_id=coordinate.cohort_id, point_id=coordinate.point_id,
             sample_namespace=coordinate.sample_namespace, sample_id=sample_id, arm_id=arm_id,
             physical_sample_identity=physical_sample_identity(
