@@ -11,7 +11,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import math
 import re
-from typing import Literal, Mapping
+from typing import Literal, Mapping, Sequence
 
 from scipy.stats import binomtest
 
@@ -21,6 +21,12 @@ from .contracts import CampaignAssessmentV1, FiniteLookStoppingV1, TargetReferen
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
 _MAX_SHOTS = 1_000_000
 _RULE_ID = "target_interval_containment_v1"
+_TERMINAL_STATUSES = frozenset({
+    "exact", "stabilizer_equivalent", "wrong_logical_action", "invalid_syndrome",
+    "no_proposal", "nonconvergence", "timeout", "postselected_rejection",
+    "infrastructure_interruption",
+})
+_ALL_SHOT_SUCCESSES = frozenset({"exact", "stabilizer_equivalent"})
 
 
 def _bounded_int(value: int, *, name: str, minimum: int = 0) -> int:
@@ -38,6 +44,12 @@ def _probability(value: float, *, name: str) -> float:
 def _sha256(value: str, *, name: str) -> str:
     if not isinstance(value, str) or _SHA256.fullmatch(value) is None:
         raise ValueError(f"{name} must be a lowercase SHA-256 digest")
+    return value
+
+
+def _identifier(value: str, *, name: str) -> str:
+    if not isinstance(value, str) or not value or len(value) > 256:
+        raise ValueError(f"{name} must be a nonempty bounded string")
     return value
 
 
@@ -211,6 +223,250 @@ def target_interval_decision(
         input_receipt_hashes=receipts,
         source_denominator_required=source_denominator_required,
         source_denominator=source_denominator,
+    )
+
+
+@dataclass(frozen=True, slots=True)
+class PairedArmOutcomeV1:
+    """One terminal arm result, bound to its shared physical sample identity."""
+
+    campaign_spec_digest: str
+    cohort_id: str
+    point_id: str
+    sample_identity: str
+    arm_id: str
+    terminal_status: str
+
+    def __post_init__(self) -> None:
+        _sha256(self.campaign_spec_digest, name="campaign_spec_digest")
+        _identifier(self.cohort_id, name="cohort_id")
+        _identifier(self.point_id, name="point_id")
+        _identifier(self.sample_identity, name="sample_identity")
+        _identifier(self.arm_id, name="arm_id")
+        if self.terminal_status not in _TERMINAL_STATUSES:
+            raise ValueError("terminal_status is not in the frozen outcome matrix domain")
+
+
+@dataclass(frozen=True, slots=True)
+class PairedOutcomeTableV1:
+    """Complete matched failure table and conservative paired effect evidence."""
+
+    arm_ids: tuple[str, str]
+    complete_pairs: int
+    table: Mapping[str, int]
+    first_failure_rate: float
+    second_failure_rate: float
+    risk_difference: float
+    risk_difference_interval: tuple[float, float]
+    risk_difference_method: Literal["simultaneous_exact_discordant_cells_v1"]
+    exact_discordance_p_value: float
+    exact_discordance_method: Literal["exact_conditional_mcnemar_v1"]
+    alpha: float
+    count_receipt_sha256: str
+
+
+def _all_shot_failure(status: str) -> bool:
+    """Apply the frozen all-shot mapping before paired inference."""
+    if status == "infrastructure_interruption":
+        raise ValueError("infrastructure interruption leaves a partial paired outcome")
+    return status not in _ALL_SHOT_SUCCESSES
+
+
+def paired_outcome_table(
+    *,
+    outcomes: Sequence[PairedArmOutcomeV1],
+    arm_ids: tuple[str, str],
+    alpha: float,
+    count_receipt_sha256: str,
+) -> PairedOutcomeTableV1:
+    """Join two arms on the entire frozen physical-sample identity.
+
+    The table is intentionally unavailable for partial or duplicate arms.  A
+    caller must resume/finalize those samples through its declared incomplete
+    policy rather than silently turn unequal samples into a paired result.
+    """
+    if not isinstance(arm_ids, tuple) or len(arm_ids) != 2:
+        raise ValueError("paired comparison requires exactly two arm IDs")
+    first_arm, second_arm = (_identifier(arm_ids[0], name="first arm ID"), _identifier(arm_ids[1], name="second arm ID"))
+    if first_arm == second_arm:
+        raise ValueError("paired comparison requires distinct arm IDs")
+    if not isinstance(outcomes, Sequence) or isinstance(outcomes, (str, bytes)) or not outcomes:
+        raise ValueError("paired comparison requires at least one paired terminal outcome")
+    alpha = _probability(alpha, name="alpha")
+    receipt = _sha256(count_receipt_sha256, name="count_receipt_sha256")
+    by_sample: dict[tuple[str, str, str, str], dict[str, PairedArmOutcomeV1]] = {}
+    campaign_points: set[tuple[str, str, str]] = set()
+    for outcome in outcomes:
+        if not isinstance(outcome, PairedArmOutcomeV1):
+            raise ValueError("paired outcomes must be PairedArmOutcomeV1 records")
+        if outcome.arm_id not in {first_arm, second_arm}:
+            raise ValueError("paired outcome has an undeclared arm ID")
+        campaign_point = (outcome.campaign_spec_digest, outcome.cohort_id, outcome.point_id)
+        campaign_points.add(campaign_point)
+        identity = (*campaign_point, outcome.sample_identity)
+        arms = by_sample.setdefault(identity, {})
+        if outcome.arm_id in arms:
+            raise ValueError("paired comparison has duplicate arm evidence for a sample identity")
+        arms[outcome.arm_id] = outcome
+    if len(campaign_points) != 1:
+        raise ValueError("paired comparison must use one identical campaign, cohort, and point")
+    expected_arms = {first_arm, second_arm}
+    if any(set(arms) != expected_arms for arms in by_sample.values()):
+        raise ValueError("paired comparison has a partial matched sample")
+    table = {
+        "first_success_second_success": 0,
+        "first_failure_second_success": 0,
+        "first_success_second_failure": 0,
+        "first_failure_second_failure": 0,
+    }
+    for arms in by_sample.values():
+        first_failure = _all_shot_failure(arms[first_arm].terminal_status)
+        second_failure = _all_shot_failure(arms[second_arm].terminal_status)
+        table[(
+            "first_failure_second_failure" if first_failure and second_failure
+            else "first_failure_second_success" if first_failure
+            else "first_success_second_failure" if second_failure
+            else "first_success_second_success"
+        )] += 1
+    pairs = len(by_sample)
+    first_only = table["first_failure_second_success"]
+    second_only = table["first_success_second_failure"]
+    first_rate = (first_only + table["first_failure_second_failure"]) / pairs
+    second_rate = (second_only + table["first_failure_second_failure"]) / pairs
+    difference = first_rate - second_rate
+    # Two simultaneous exact intervals each receive half of the frozen alpha.
+    first_discordant = exact_binomial_rate(
+        failures=first_only, shots=pairs, alpha=alpha / 2.0, count_receipt_sha256=receipt,
+    )
+    second_discordant = exact_binomial_rate(
+        failures=second_only, shots=pairs, alpha=alpha / 2.0, count_receipt_sha256=receipt,
+    )
+    interval = (
+        first_discordant.interval[0] - second_discordant.interval[1],
+        first_discordant.interval[1] - second_discordant.interval[0],
+    )
+    discordant = first_only + second_only
+    exact_p = 1.0 if discordant == 0 else float(binomtest(first_only, n=discordant, p=0.5).pvalue)
+    return PairedOutcomeTableV1(
+        arm_ids=(first_arm, second_arm),
+        complete_pairs=pairs,
+        table=table,
+        first_failure_rate=first_rate,
+        second_failure_rate=second_rate,
+        risk_difference=difference,
+        risk_difference_interval=interval,
+        risk_difference_method="simultaneous_exact_discordant_cells_v1",
+        exact_discordance_p_value=exact_p,
+        exact_discordance_method="exact_conditional_mcnemar_v1",
+        alpha=alpha,
+        count_receipt_sha256=receipt,
+    )
+
+
+@dataclass(frozen=True, slots=True)
+class HolmFamilyMemberV1:
+    """One predeclared comparison, including an explicit unavailable value."""
+
+    comparison_id: str
+    raw_p_value: float | None
+
+    def __post_init__(self) -> None:
+        _identifier(self.comparison_id, name="comparison_id")
+        if self.raw_p_value is not None and (
+            type(self.raw_p_value) is not float
+            or not math.isfinite(self.raw_p_value)
+            or not 0.0 <= self.raw_p_value <= 1.0
+        ):
+            raise ValueError("raw_p_value must be finite in [0, 1], or unavailable")
+
+
+@dataclass(frozen=True, slots=True)
+class HolmMemberResultV1:
+    comparison_id: str
+    status: Literal["available", "unavailable"]
+    order: int
+    rank: int
+    multiplier: int
+    raw_p_value: float | None
+    sentinel_p_value: float
+    adjusted_p_value: float
+    conclusion: Literal["rejected", "not_rejected", "inconclusive"]
+
+
+@dataclass(frozen=True, slots=True)
+class HolmFamilyResultV1:
+    family_id: str
+    alpha: float
+    frozen_family_size: int
+    members: tuple[HolmMemberResultV1, ...]
+    verdict: Literal["rejected", "not_rejected", "inconclusive"]
+
+
+def holm_adjusted_family(
+    *, family_id: str, alpha: float, members: Sequence[HolmFamilyMemberV1],
+) -> HolmFamilyResultV1:
+    """Apply Holm to a frozen family without letting missing results reduce it."""
+    family_id = _identifier(family_id, name="family_id")
+    alpha = _probability(alpha, name="alpha")
+    if not isinstance(members, Sequence) or isinstance(members, (str, bytes)) or not members:
+        raise ValueError("Holm adjustment requires a nonempty frozen family")
+    if any(not isinstance(member, HolmFamilyMemberV1) for member in members):
+        raise ValueError("Holm members must be HolmFamilyMemberV1 records")
+    member_ids = [member.comparison_id for member in members]
+    if len(set(member_ids)) != len(member_ids):
+        raise ValueError("Holm comparison IDs must be unique")
+    available = sorted(
+        (member for member in members if member.raw_p_value is not None),
+        key=lambda member: (member.raw_p_value, member.comparison_id),
+    )
+    unavailable = sorted(
+        (member for member in members if member.raw_p_value is None),
+        key=lambda member: member.comparison_id,
+    )
+    ordered = [*available, *unavailable]
+    family_size = len(ordered)
+    results: list[HolmMemberResultV1] = []
+    running_adjusted = 0.0
+    for order, member in enumerate(ordered, start=1):
+        multiplier = family_size - order + 1
+        if member.raw_p_value is None:
+            results.append(HolmMemberResultV1(
+                comparison_id=member.comparison_id,
+                status="unavailable",
+                order=order,
+                rank=order,
+                multiplier=multiplier,
+                raw_p_value=None,
+                sentinel_p_value=1.0,
+                adjusted_p_value=1.0,
+                conclusion="inconclusive",
+            ))
+            continue
+        candidate = min(1.0, multiplier * member.raw_p_value)
+        running_adjusted = max(running_adjusted, candidate)
+        results.append(HolmMemberResultV1(
+            comparison_id=member.comparison_id,
+            status="available",
+            order=order,
+            rank=order,
+            multiplier=multiplier,
+            raw_p_value=member.raw_p_value,
+            sentinel_p_value=member.raw_p_value,
+            adjusted_p_value=running_adjusted,
+            conclusion="rejected" if running_adjusted <= alpha else "not_rejected",
+        ))
+    if unavailable:
+        verdict: Literal["rejected", "not_rejected", "inconclusive"] = "inconclusive"
+    elif any(result.conclusion == "rejected" for result in results):
+        verdict = "rejected"
+    else:
+        verdict = "not_rejected"
+    return HolmFamilyResultV1(
+        family_id=family_id,
+        alpha=alpha,
+        frozen_family_size=family_size,
+        members=tuple(results),
+        verdict=verdict,
     )
 
 
