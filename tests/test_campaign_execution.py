@@ -223,6 +223,12 @@ def _bounded_unit_runner(unit: dict[str, object], staging: str) -> dict[str, obj
     }
 
 
+def _failing_unit_runner(unit: dict[str, object], staging: str) -> dict[str, object]:
+    if str(unit["arm_id"]) == "ms":
+        raise RuntimeError("injected worker interruption")
+    return _bounded_unit_runner(unit, staging)
+
+
 def test_local_workers_and_arm_order_preserve_frozen_scientific_evidence(tmp_path: Path):
     """Changing bounded pool topology cannot change frozen arm/sample facts."""
     from bp_registry.campaigns.execution import execute_local_work_plan
@@ -246,3 +252,23 @@ def test_local_workers_and_arm_order_preserve_frozen_scientific_evidence(tmp_pat
         "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS",
     }
     assert all("unavailable_reason" in item for item in parallel["resource_observations"])
+
+
+def test_local_worker_failure_seals_incomplete_and_retains_completed_units(tmp_path: Path):
+    """An interrupted shard retains completed units and leaves only missing work resumable."""
+    from bp_registry.campaigns.execution import execute_local_work_plan
+    from bp_registry.campaigns.planning import freeze_work_plan
+
+    digest, coordinates, arms = _planning_inputs()
+    plan = freeze_work_plan(
+        campaign_spec_digest=digest, coordinates=coordinates, arm_seed_identities=arms,
+        look_sample_boundaries=(1, 2), units_per_shard=2,
+    )
+    result = execute_local_work_plan(
+        plan, output_root=tmp_path / "interrupted", workers=2, unit_runner=_failing_unit_runner,
+    )
+    assert result["incomplete_unit_keys"]
+    assert set(result["terminal_unit_keys"]).isdisjoint(result["incomplete_unit_keys"])
+    sealed = {record["unit_key"] for record in result["records"]}
+    assert sealed < set(plan.unit_keys)
+    assert all(Path(record["receipt_path"]).is_file() for record in result["records"])
