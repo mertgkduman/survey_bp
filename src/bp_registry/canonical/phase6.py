@@ -182,8 +182,14 @@ def phase6_events(original: OriginalProblem, *, bases: tuple[MbbpBasis, ...], re
             events.append(("vote_ballot", {"correction": list(ballot.correction), "member_id": ballot.member_id.value}))
         if decision.vote is not None:
             vote_evidence = decision.vote.as_evidence()
+            tie_coordinates = [
+                coordinate for coordinate in range(len(decision.vote.correction))
+                if 2 * sum(ballot.correction[coordinate] for ballot in decision.vote.ballots)
+                == len(decision.vote.ballots)
+            ]
             events.append(("vote_aggregate", {"candidate_lineage_id": vote_evidence["candidate_lineage_id"],
-                           "correction": vote_evidence["correction"], "vote_lineage_id": vote_evidence["vote_lineage_id"]}))
+                           "correction": vote_evidence["correction"], "tie_coordinates": tie_coordinates,
+                           "vote_lineage_id": vote_evidence["vote_lineage_id"]}))
             events.append(("vote_validation", {"eligible": decision.vote.eligible,
                            "original_valid": decision.vote.original_valid, "vote_lineage_id": decision.vote.lineage_id.value}))
     for leaf_id, scope, work in result.work_leaves:
