@@ -57,7 +57,7 @@ status: complete
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'paired_canonical_local_and_slurm_routes_match or paired_canonical_slurm_array_is_bounded' -x` — passed (2 selected).
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'paired_canonical_resume or mixed_route_merge or stop_before_resubmit' -x` — passed (1 selected).
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'installed_paired_canonical_local_lifecycle' -x` — passed (1 selected).
-- Broader `tests/test_campaign_execution.py tests/test_campaign_shards.py -x` initially exposed the new Phase 08-17 materialized-sample/work-vector report requirement; the compatibility fix above was verified by the installed lifecycle regression.
+- Broader `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py tests/test_campaign_shards.py -x` — passed (48 tests in 168.99 seconds). The first broad attempt exposed the new Phase 08-17 materialized-sample/work-vector report requirement; the compatibility fix is included in this result.
 
 ## Task Commits
 
