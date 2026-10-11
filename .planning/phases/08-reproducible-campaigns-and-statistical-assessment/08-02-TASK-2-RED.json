@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_contracts.py -k 'stopping_rejects_fixed_interim_look' -x",
+  "exitCode": 1,
+  "targetTest": "test_stopping_rejects_fixed_interim_look_and_unbounded_alpha_spending",
+  "targetFile": "tests/test_campaign_contracts.py",
+  "expected": "A fixed-shot campaign permits only its final analysis look; finite look alpha allocations may not exceed family alpha.",
+  "actual": "Failed: DID NOT RAISE ValidationError for a fixed-shot campaign declaring final_look=2.",
+  "output": "TAP version 13\nnot ok 1 - test_stopping_rejects_fixed_interim_look_and_unbounded_alpha_spending\n  ---\n  message: Failed: DID NOT RAISE ValidationError for a fixed-shot campaign declaring final_look=2\n  ...\n1..1\n# tests 1\n# pass 0\n# fail 1\n"
+}

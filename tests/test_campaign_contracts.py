@@ -105,3 +105,23 @@ def test_campaign_rejects_identity_drift_and_nonfinite_resource_values():
     bad_resource["resources"]["max_decoder_work"] = float("inf")
     with pytest.raises(ValidationError):
         CampaignAssessmentV1.model_validate(bad_resource)
+
+
+def test_stopping_rejects_fixed_interim_look_and_unbounded_alpha_spending():
+    from bp_registry.campaigns.contracts import CampaignAssessmentV1, CampaignSpecV1
+    from test_campaign_execution import _spec_payload
+
+    fixed_campaign = _spec_payload()
+    fixed_campaign["assessment"] = _assessment_payload()
+    fixed_campaign["final_look"] = 2
+    with pytest.raises(ValidationError):
+        CampaignSpecV1.model_validate(fixed_campaign)
+
+    finite = _assessment_payload(mode="finite_look")
+    finite["resources"]["max_looks"] = 2
+    finite["stopping"]["alpha_allocations"] = [
+        {"family_id": "primary", "target_id": "curve-p100", "look": 40, "alpha": 0.03},
+        {"family_id": "primary", "target_id": "curve-p100", "look": 100, "alpha": 0.03},
+    ]
+    with pytest.raises(ValidationError):
+        CampaignAssessmentV1.model_validate(finite)
