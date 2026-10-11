@@ -10,7 +10,7 @@ from typing import Literal, Mapping
 import numpy as np
 
 from .budgets import BudgetLimit, BudgetTree, WallClockLimit, WorkVector
-from .intervention_session import BpSession
+from .intervention_session import BpSession, after_phase5_work, before_phase5_work
 from .lineage import stable_lineage_id
 from .numerics import NumericalFailure
 from .problems import OriginalProblem
@@ -182,6 +182,7 @@ def _valid(original: OriginalProblem, candidate: tuple[int, ...]) -> bool:
 
 
 def _reserve_compute(budgets: BudgetTree, leaf_id: str, work: WorkVector, compute):
+    before_phase5_work(leaf_id)
     reservation = budgets.reserve("attempt", work, leaf_id=leaf_id)
     if reservation is None:
         return False, None
@@ -191,6 +192,7 @@ def _reserve_compute(budgets: BudgetTree, leaf_id: str, work: WorkVector, comput
         reservation.rollback()
         raise
     reservation.commit_once()
+    after_phase5_work(leaf_id, budgets)
     return True, result
 
 
@@ -335,10 +337,12 @@ class RestartController:
         open_leaf = f"{owner}:branch:{branch_order}:open"
         if _deadline(wall_clock):
             return RestartBranch(branch_order, root_target, branch_id, None, (), "wall_clock_deadline")
+        before_phase5_work(open_leaf)
         reservation = budgets.reserve("attempt", WorkVector(branch_expansions=1), leaf_id=open_leaf)
         if reservation is None:
             return RestartBranch(branch_order, root_target, branch_id, None, (), "count_budget_exhausted")
         reservation.commit_once()
+        after_phase5_work(open_leaf, budgets)
         inserted: list[int] = []
         next_target: int | None = root_target
         rows: list[RestartResidual] = []
@@ -353,6 +357,7 @@ class RestartController:
                 rows.append(self._denied_row(original, inserted, target, residual_order, "wall_clock_deadline"))
                 branch_term = "wall_clock_deadline"
                 break
+            before_phase5_work(insertion_leaf)
             reservation = budgets.reserve(
                 "attempt", WorkVector(intervention_actions=1, fixation_actions=1),
                 leaf_id=insertion_leaf,
@@ -362,6 +367,7 @@ class RestartController:
                 branch_term = "count_budget_exhausted"
                 break
             reservation.commit_once()
+            after_phase5_work(insertion_leaf, budgets)
             inserted.append(target)
             transform_leaf = f"{branch_id}:residual:{residual_order}:transform"
             if _deadline(wall_clock):
@@ -466,6 +472,7 @@ class RestartController:
                 if _deadline(wall_clock):
                     local_term = "wall_clock_deadline"
                 else:
+                    before_phase5_work(target_leaf)
                     target_reservation = budgets.reserve(
                         "attempt", WorkVector(order_selection=1, ranking_scans=original.hz.shape[1]),
                         leaf_id=target_leaf,
@@ -488,6 +495,7 @@ class RestartController:
                             target_reservation.rollback()
                             raise
                         target_reservation.commit_once()
+                        after_phase5_work(target_leaf, budgets)
             row = RestartResidual(
                 residual_order, _bits(error), tuple(inserted), _bits(residual_syndrome),
                 shortened.lineage_id, residual_view.lineage_id, session.owner_identity,

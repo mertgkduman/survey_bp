@@ -13,7 +13,7 @@ import numpy as np
 
 from .budgets import BudgetLimit, BudgetTree, WallClockLimit, WorkVector
 from .contracts import InterventionSpec
-from .intervention_session import BpSession, InterventionProposal, SessionTransition
+from .intervention_session import BpSession, InterventionProposal, SessionTransition, after_phase5_work, before_phase5_work
 from .numerics import NumericalFailure
 from .schedules import EdgeTable
 
@@ -95,12 +95,14 @@ class GuidedDecimationController:
         state = session.state
         if wall_clock is not None and wall_clock.check("candidate_selection_boundary", scope="attempt") is not None:
             return GuidedTransition(False, "wall_clock_deadline", None, SessionTransition(False, state, "wall_clock_deadline", None), ())
+        selection_leaf = f"guided-target-order:{state.owner_identity}:{state.revision}:{len(budgets.leaf_events())}"
+        before_phase5_work(selection_leaf)
         selection = budgets.reserve(
             "attempt", WorkVector(
                 order_generation=1, order_selection=1,
                 ranking_scans=session.edge_table.variable_count,
             ),
-            leaf_id=f"guided-target-order:{state.owner_identity}:{state.revision}:{len(budgets.leaf_events())}",
+            leaf_id=selection_leaf,
         )
         if selection is None:
             return GuidedTransition(False, "count_budget_exhausted", None, SessionTransition(False, state, "count_budget_exhausted", None), ())
@@ -118,13 +120,16 @@ class GuidedDecimationController:
             raise
         if not eligible:
             selection.commit_once()
+            after_phase5_work(selection_leaf, budgets)
             return GuidedTransition(False, "no_eligible_target", None, SessionTransition(False, state, "no_eligible_target", None), ())
         if values is None:
             selection.commit_once()
+            after_phase5_work(selection_leaf, budgets)
             return GuidedTransition(False, "no_posterior", None, SessionTransition(False, state, "no_posterior", None), eligible)
         # Infinity is rejected alongside NaN for this finite-prior procedure.
         if values.shape != (session.edge_table.variable_count,) or not np.all(np.isfinite(values)):
             selection.commit_once()
+            after_phase5_work(selection_leaf, budgets)
             return GuidedTransition(False, "numerical_failure", None, SessionTransition(False, state, "numerical_failure", None), eligible)
         try:
             reliability = max(abs(float(values[index])) for index in eligible)
@@ -136,6 +141,7 @@ class GuidedDecimationController:
             selection.rollback()
             raise
         selection.commit_once()
+        after_phase5_work(selection_leaf, budgets)
         proposal = session.propose_finite_prior(
             target, signed, source_variant=self.spec.variant, target_order=eligible,
         )
@@ -186,6 +192,7 @@ class GuidedDecimationController:
                     round_reason = "wall_clock_deadline"
                     sweeps.append(GuidedSweep(sweep_index, before, session.state.digest, True, transition.leaf_id, None, None, round_reason, None))
                     break
+                before_phase5_work(check_leaf)
                 reservation = budgets.reserve("attempt", WorkVector(original_checks=1), leaf_id=check_leaf)
                 if reservation is None:
                     round_reason = "count_budget_exhausted"
@@ -197,6 +204,7 @@ class GuidedDecimationController:
                     reservation.rollback()
                     raise
                 reservation.commit_once()
+                after_phase5_work(check_leaf, budgets)
                 visible = tuple(int(bit) for bit in session.state.candidate)
                 sweeps.append(GuidedSweep(
                     sweep_index, before, session.state.digest, True, transition.leaf_id,

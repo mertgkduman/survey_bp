@@ -99,11 +99,11 @@ def test_mbbp_inside_local_step_crossing_latches_before_later_member() -> None:
     ticks = iter((10, 11, 14))
     guard = CanonicalRuntimeGuardV1(_authorization(deadline_ns=12), clock_ns=lambda: next(ticks))
 
-    def observe(boundary: str) -> None:
+    def observe(boundary: str, committed_work=None, leaf_id=None) -> None:
         if boundary.endswith(("before_member", "before_work")):
             guard.before_work(boundary)
         else:
-            guard.after_work(boundary)
+            guard.after_work(boundary, committed_work=committed_work, leaf_id=leaf_id)
 
     with pytest.raises(CanonicalResourceInterruption):
         MbbpController(MbbpSpec(bases, max_iterations=2)).run(
@@ -112,9 +112,40 @@ def test_mbbp_inside_local_step_crossing_latches_before_later_member() -> None:
     snapshot = guard.snapshot()
     assert snapshot.boundary == "mbbp:first:0:0:after_work"
     assert snapshot.overshoot_ns == 2
+    assert snapshot.committed_work.check_to_variable_updates == 2
+    assert snapshot.last_work_leaf_id == "mbbp-member:first:local-step:0:check_node_serial:0"
     assert guard.interrupted
     with pytest.raises(CanonicalResourceInterruption):
         guard.before_work("mbbp:later:before_member")
+
+
+def test_mbbp_reports_ensemble_cumulative_work_across_member_boundaries() -> None:
+    from bp_registry.canonical.mbbp import MbbpBasis, MbbpController, MbbpSpec
+    from bp_registry.canonical.problems import OriginalProblem
+
+    original = OriginalProblem(
+        "mbbp-cumulative", np.zeros((1, 3), dtype=np.uint8),
+        np.asarray([[1, 1, 0], [0, 1, 1]], dtype=np.uint8), np.asarray([1, 0], dtype=np.uint8),
+    )
+    bases = (
+        MbbpBasis("first", 0, "p0", "q0", ((1, 1),)),
+        MbbpBasis("later", 1, "p1", "q1", ((1, 0),)),
+    )
+    totals = []
+
+    def observe(boundary: str, committed_work=None, leaf_id=None) -> None:
+        if boundary.endswith(":after_work") and committed_work is not None:
+            totals.append(committed_work)
+
+    MbbpController(MbbpSpec(bases, max_iterations=1)).run(
+        original, error_rate=0.1, boundary_observer=observe,
+    )
+    assert len(totals) >= 2
+    evidence = [total.as_evidence(structural_event_version=4) for total in totals]
+    assert all(
+        all(later[name] >= earlier[name] for name in earlier)
+        for earlier, later in zip(evidence, evidence[1:])
+    )
 
 
 def test_phase5_inside_sweep_crossing_latches_before_later_phase5_work() -> None:
@@ -140,11 +171,11 @@ def test_phase5_inside_sweep_crossing_latches_before_later_phase5_work() -> None
     guard = CanonicalRuntimeGuardV1(_authorization(deadline_ns=12), clock_ns=lambda: next(ticks))
     budget = BudgetTree(limits=(), parents={"search": "shot", "attempt": "search"})
 
-    def observe(boundary: str) -> None:
+    def observe(boundary: str, committed_work=None, leaf_id=None) -> None:
         if boundary.endswith(":before_work"):
             guard.before_work(boundary)
         else:
-            guard.after_work(boundary)
+            guard.after_work(boundary, committed_work=committed_work, leaf_id=leaf_id)
 
     with pytest.raises(CanonicalResourceInterruption):
         execute_phase5_controller(
@@ -155,6 +186,8 @@ def test_phase5_inside_sweep_crossing_latches_before_later_phase5_work() -> None
     assert snapshot.boundary == "phase5:phase5-boundary:baseline:sweep:0:after_work"
     assert snapshot.overshoot_ns == 2
     assert len(budget.leaf_events()) == 1
+    assert snapshot.committed_work == budget.summary("attempt")
+    assert snapshot.last_work_leaf_id == "phase5-boundary:baseline:sweep:0"
 
 
 def test_relay_inside_sweep_crossing_latches_before_later_leg_or_projection(tmp_path) -> None:
@@ -181,6 +214,8 @@ def test_relay_inside_sweep_crossing_latches_before_later_leg_or_projection(tmp_
     assert [event["kind"] for event in prefix] == ["shot_begin", "attempt"]
     assert guard.snapshot().boundary.endswith(":leg:0:sweep:1:after_work")
     assert guard.snapshot().overshoot_ns == 2
+    assert guard.snapshot().committed_work.relay_transfers == 0
+    assert guard.snapshot().committed_work.check_to_variable_updates > 0
 
 
 def test_trace_sidecar_reserves_exact_bytes_before_creating_file(tmp_path) -> None:
@@ -216,6 +251,8 @@ def test_trace_sidecar_reserves_exact_bytes_before_creating_file(tmp_path) -> No
         denied.finish()
     assert list(tmp_path.glob("trace-sidecars/*.json")) == []
     assert denied_guard.snapshot().scientific_storage_bytes == 0
+    from bp_registry.canonical.budgets import WorkVector
+    assert denied_guard.snapshot().committed_work == WorkVector.zero()
 
 
 def test_v7_interrupt_keeps_open_prefix_and_skips_projection_and_terminal(tmp_path) -> None:
@@ -249,3 +286,46 @@ def test_v7_interrupt_keeps_open_prefix_and_skips_projection_and_terminal(tmp_pa
     # writes its separate interruption receipt.
     with CanonicalEventWriter(path, structural_event_version=6):
         pass
+
+
+@pytest.mark.parametrize("with_vote", [False, True])
+def test_v7_strict_materialized_terminal_preserves_monotonic_member_work(tmp_path, with_vote: bool) -> None:
+    """Both V7 terminal routes retain one aggregate member-work total."""
+    from bp_registry.runner import (
+        CANONICAL_GUARDED_ARTIFACT_BYTE_CEILING_V1, CanonicalRuntimeAuthorizationV1,
+        canonical_public_manifest_context,
+        derive_canonical_executable_maxima, run_canonical_materialized_one,
+    )
+    from bp_registry.sampling import sample_shot
+
+    manifest = _v7_manifest()
+    if with_vote:
+        manifest["vote"] = {
+            "object": "correction_bits", "electorate_rule": "admitted_members",
+            "aggregation": "coordinate_majority", "tie_bit": 1,
+        }
+    path = tmp_path / ("v7-vote.json" if with_vote else "v7-list.json")
+    path.write_text(json.dumps(manifest))
+    public = canonical_public_manifest_context(path)
+    profile = derive_canonical_executable_maxima(public)
+    sample = sample_shot(
+        public.code, shot_id=0, seed=0, x_error_rate=public.manifest.error_rate,
+        manifest_identity=public.manifest.randomness.physical_sample_identity or public.manifest_sha256,
+    )
+    authorization = CanonicalRuntimeAuthorizationV1.strict_full_unit(
+        profile_digest=profile.digest, authorization_identity="v7-work-total",
+        max_events=profile.derived_events_per_unit,
+        max_evidence_bytes=profile.derived_evidence_bytes_per_unit,
+        max_storage_bytes=profile.derived_storage_bytes_per_unit,
+        control_receipt_reserve_bytes=profile.partial_receipt_reserve_bytes,
+        max_event_bytes=profile.serializer_bytes_per_event,
+        max_artifact_bytes=CANONICAL_GUARDED_ARTIFACT_BYTE_CEILING_V1,
+        derived_events=profile.derived_events_per_unit,
+        derived_evidence_bytes=profile.derived_evidence_bytes_per_unit,
+        derived_storage_bytes=profile.derived_storage_bytes_per_unit,
+    )
+    result = run_canonical_materialized_one(
+        path, sample=sample, materialized_sample_sha256="f" * 64,
+        ledger_path=tmp_path / "events.jsonl", runtime_authorization=authorization,
+    )
+    assert result.status == "terminal"

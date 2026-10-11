@@ -273,7 +273,8 @@ class MbbpController:
 
     def _member(
         self, *, original: OriginalProblem, system: AugmentedBasisSystem, tree: BudgetTree, scope: str,
-        error_rate: float, boundary_observer: Callable[[str], None] | None = None,
+        error_rate: float,
+        boundary_observer: Callable[[str, WorkVector | None, str | None], None] | None = None,
     ) -> MbbpMember:
         table = EdgeTable.from_check_matrix(system.check_matrix)
         alpha = ParameterAssignment(shape="scalar", value=self.spec.alpha)
@@ -301,13 +302,16 @@ class MbbpController:
             for check_index in range(schedule.unit_count):
                 progress = ScheduleProgress(iteration=iteration, local_steps=progress.local_steps, cursor=(check_index,))
                 if boundary_observer is not None:
-                    boundary_observer(f"mbbp:{system.member_id}:{iteration}:{check_index}:before_work")
+                    boundary_observer(f"mbbp:{system.member_id}:{iteration}:{check_index}:before_work", None, None)
                 step = schedule.execute_local_step(
                     executor, messages, system.syndrome, error_rate=error_rate, progress=progress,
                     is_converged=lambda candidate: self._valid(system.check_matrix, system.syndrome, tuple(candidate.tolist())),
                 )
                 if boundary_observer is not None:
-                    boundary_observer(f"mbbp:{system.member_id}:{iteration}:{check_index}:after_work")
+                    boundary_observer(
+                        f"mbbp:{system.member_id}:{iteration}:{check_index}:after_work",
+                        tree.summary("mbbp-ensemble"), tree.leaf_events()[-1][0] if step.admitted else None,
+                    )
                 if not step.admitted:
                     return MbbpMember(
                         system.member_id, system.local_ordinal, lineage_id, system.content_identity, initial_identity,
@@ -323,9 +327,14 @@ class MbbpController:
                     system.check_matrix, system.syndrome, tuple(step.candidate.tolist()),
                 ):
                     candidate = tuple(int(value) for value in step.candidate.tolist())
+                    check_leaf = f"{scope}:original-syndrome-check:{iteration}:{check_index}"
+                    if boundary_observer is not None:
+                        boundary_observer(
+                            f"mbbp:{system.member_id}:{iteration}:{check_index}:original_check:before_work", None, None,
+                        )
                     check = tree.reserve(
                         scope, WorkVector(original_checks=1),
-                        leaf_id=f"{scope}:original-syndrome-check:{iteration}:{check_index}",
+                        leaf_id=check_leaf,
                     )
                     if check is None:
                         return MbbpMember(
@@ -335,6 +344,11 @@ class MbbpController:
                         )
                     original_valid = self._valid(original.hz, original.syndrome, candidate)
                     check.commit_once()
+                    if boundary_observer is not None:
+                        boundary_observer(
+                            f"mbbp:{system.member_id}:{iteration}:{check_index}:original_check:after_work",
+                            tree.summary("mbbp-ensemble"), check_leaf,
+                        )
                     return MbbpMember(
                         system.member_id, system.local_ordinal, lineage_id, system.content_identity, initial_identity,
                         "check_node_serial", self.spec.alpha,
@@ -349,7 +363,7 @@ class MbbpController:
 
     def run(
         self, original: OriginalProblem, *, error_rate: float, completion_order: tuple[str, ...] | None = None,
-        boundary_observer: Callable[[str], None] | None = None,
+        boundary_observer: Callable[[str, WorkVector | None, str | None], None] | None = None,
     ) -> MbbpResult:
         """Execute declared members in any supplied completion order, then freeze order."""
         if not isinstance(original, OriginalProblem):
@@ -370,13 +384,13 @@ class MbbpController:
         attempted = []
         for member_id in order:
             if boundary_observer is not None:
-                boundary_observer(f"mbbp:{member_id}:before_member")
+                boundary_observer(f"mbbp:{member_id}:before_member", None, None)
             attempted.append(self._member(
                 original=original, system=systems[member_id], tree=tree, scope=scopes[member_id],
                 error_rate=error_rate, boundary_observer=boundary_observer,
             ))
             if boundary_observer is not None:
-                boundary_observer(f"mbbp:{member_id}:after_member")
+                boundary_observer(f"mbbp:{member_id}:after_member", None, None)
         members = tuple(sorted(attempted, key=lambda member: (member.local_ordinal, member.member_id)))
         origins = tuple(CandidateOrigin(
             lineage_id=member.lineage_id, local_ordinal=member.local_ordinal, candidate=member.candidate,

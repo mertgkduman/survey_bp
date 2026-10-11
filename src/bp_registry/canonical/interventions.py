@@ -18,7 +18,7 @@ from typing import Mapping, Sequence
 import numpy as np
 
 from .budgets import BudgetLimit, BudgetTree, WallClockLimit, WorkVector
-from .intervention_session import BpSession, decoder_stream_identity
+from .intervention_session import BpSession, after_phase5_work, before_phase5_work, decoder_stream_identity
 from .kernel import BinarySpaKernel
 from .numerics import MIN_SUM_CPU_F64, NumericalFailure
 from .problems import OriginalProblem
@@ -51,6 +51,7 @@ def _original_valid(original: OriginalProblem, candidate: Sequence[int]) -> bool
 
 
 def _checked(budgets: BudgetTree, leaf_id: str, compute, *, lifted: int = 0):
+    before_phase5_work(leaf_id)
     reservation = budgets.reserve(
         "attempt", WorkVector(original_checks=1, lifted_coordinates=lifted), leaf_id=leaf_id,
     )
@@ -62,6 +63,7 @@ def _checked(budgets: BudgetTree, leaf_id: str, compute, *, lifted: int = 0):
         reservation.rollback()
         raise
     reservation.commit_once()
+    after_phase5_work(leaf_id, budgets)
     return True, result
 
 
@@ -98,10 +100,12 @@ class IdempotentActionGate:
                 return previous[3]
             if expected_revision != self.revision:
                 raise ValueError("stale intervention proposal revision")
+            before_phase5_work(leaf_id)
             reservation = self.budgets.reserve("attempt", work, leaf_id=leaf_id)
             if reservation is None:
                 return None
             reservation.commit_once()
+            after_phase5_work(leaf_id, self.budgets)
             self._committed[key] = record
             self.revision += 1
             return value
@@ -214,9 +218,11 @@ class FreezingController:
             gate = IdempotentActionGate(root, budgets)
             choices: list[tuple[int, int, str]] = []
             seen: set[int] = set()
+            target_order_leaf = root + ":target-order"
+            before_phase5_work(target_order_leaf)
             target_order = budgets.reserve(
                 "attempt", WorkVector(order_generation=1, order_selection=1, ranking_scans=original.hz.shape[0] + original.hz.shape[1]),
-                leaf_id=root + ":target-order",
+                leaf_id=target_order_leaf,
             )
             if target_order is None:
                 return FreezingResult(
@@ -241,6 +247,7 @@ class FreezingController:
                 target_order.rollback()
                 raise
             target_order.commit_once()
+            after_phase5_work(target_order_leaf, budgets)
             for order, (check, target, stream) in enumerate(choices[:self.spec.retry_cap]):
                 owner = f"{root}:trial:{order}:target:{target}"
                 action_leaf = owner + ":freeze"
@@ -273,7 +280,9 @@ class FreezingController:
                 if _deadline(wall_clock):
                     local_term = "wall_clock_deadline"
                 else:
-                    contradiction = budgets.reserve("attempt", WorkVector(candidate_checks=1), leaf_id=owner + ":contradiction-check")
+                    contradiction_leaf = owner + ":contradiction-check"
+                    before_phase5_work(contradiction_leaf)
+                    contradiction = budgets.reserve("attempt", WorkVector(candidate_checks=1), leaf_id=contradiction_leaf)
                     if contradiction is None:
                         local_term = "count_budget_exhausted"
                     else:
@@ -286,6 +295,7 @@ class FreezingController:
                             contradiction.rollback()
                             raise
                         contradiction.commit_once()
+                        after_phase5_work(contradiction_leaf, budgets)
                         local_term = "contradictory_empty_check" if contradictory else "lifetime_expired"
                 if local_term == "contradictory_empty_check":
                     pass
@@ -498,9 +508,11 @@ class SyndromeFlipController:
             if _deadline(wall_clock):
                 termination = "wall_clock_deadline"
             else:
+                generation_leaf = root + ":test-order"
+                before_phase5_work(generation_leaf)
                 generation = budgets.reserve(
                     "attempt", WorkVector(order_generation=1, ranking_scans=n),
-                    leaf_id=root + ":test-order",
+                    leaf_id=generation_leaf,
                 )
                 if generation is None:
                     return SyndromeFlipResult(
@@ -528,6 +540,7 @@ class SyndromeFlipController:
                         generation.rollback()
                         raise
                     generation.commit_once()
+                    after_phase5_work(generation_leaf, budgets)
                 gate = IdempotentActionGate(root, budgets)
                 for order, t in enumerate(declared[:self.spec.test_cap]):
                     owner = f"{root}:test:{order}"
@@ -723,9 +736,11 @@ class SignFlipController:
                 termination = "wall_clock_deadline"
                 trigger = "trunk_deadline"
             else:
+                target_reservation_leaf = root + ":target-order"
+                before_phase5_work(target_reservation_leaf)
                 target_reservation = budgets.reserve(
                     "attempt", WorkVector(order_generation=1, order_selection=1, ranking_scans=original.hz.shape[0] + original.hz.shape[1]),
-                    leaf_id=root + ":target-order",
+                    leaf_id=target_reservation_leaf,
                 )
                 if target_reservation is None:
                     termination = "count_budget_exhausted"
@@ -742,6 +757,7 @@ class SignFlipController:
                         target_reservation.rollback()
                         raise
                     target_reservation.commit_once()
+                    after_phase5_work(target_reservation_leaf, budgets)
         action_state: str | None = None
         continuation_state: str | None = None
         selected = _bits(before.candidate) if baseline_valid else None

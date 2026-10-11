@@ -384,7 +384,7 @@ class RelayController:
         error_rate: float, legs: tuple[RelayLegSpec, ...] | None, budgets: BudgetTree, scope: str, lineage_prefix: str,
         solution_limit: int | None = None, transfer: Literal["posterior_only", "disabled"] | None = None,
         sample_seed_identity: str | None = None,
-        boundary_observer: Callable[[str], None] | None = None,
+        boundary_observer: Callable[[str, WorkVector | None, str | None], None] | None = None,
     ) -> RelayRunResult:
         if not math.isfinite(error_rate) or not 0.0 < error_rate < 1.0:
             raise ValueError("Relay requires a finite error rate strictly between zero and one")
@@ -438,9 +438,15 @@ class RelayController:
                 tuple(leg_results), tuple(transfers), accounting.leaves(), termination, stopping_reason,
             )
 
-        def observe(boundary: str, *, completed: bool) -> None:
+        def observe(
+            boundary: str, *, completed: bool,
+            committed_work: WorkVector | None = None, leaf_id: str | None = None,
+        ) -> None:
             if boundary_observer is not None:
-                boundary_observer(f"{boundary}:{'after_work' if completed else 'before_work'}")
+                boundary_observer(
+                    f"{boundary}:{'after_work' if completed else 'before_work'}",
+                    committed_work, leaf_id,
+                )
 
         for index, leg in enumerate(active_legs):
             lineage_id = f"{lineage_prefix}:leg:{index}"
@@ -473,7 +479,10 @@ class RelayController:
                     delta=WorkVector(relay_transfers=1),
                 )
                 transfers.append(previous)
-                observe(f"relay:{lineage_prefix}:leg:{index}:transfer", completed=True)
+                observe(
+                    f"relay:{lineage_prefix}:leg:{index}:transfer", completed=True,
+                    committed_work=budgets.summary(scope), leaf_id=transfer_leaf_id,
+                )
 
             memory_application: RelayMemoryApplication | None = None
             gamma: np.ndarray | None = None
@@ -490,11 +499,16 @@ class RelayController:
                     )
                 else:
                     assert assignment is not None and assignment_state is not None and sample_seed_identity is not None
+                    assignment_boundary = f"relay:{lineage_prefix}:leg:{index}:memory_assignment"
+                    observe(assignment_boundary, completed=False)
                     gamma, assignment_state, memory_application = self._later_leg_assignment(
                         tuning=tuning, edge_table=edge_table, sample_seed_identity=sample_seed_identity,
                         leg_index=index, budgets=budgets, scope=scope, assignment=assignment,
                         assignment_state=assignment_state,
                     )
+                    assignment_leaf = budgets.leaf_events()[-1][0]
+                    observe(assignment_boundary, completed=True,
+                            committed_work=budgets.summary(scope), leaf_id=assignment_leaf)
 
             # Each leg resets C2V/V2C state to channel priors.  The flooding
             # topology is constructed once per leg; only its vector-prior
@@ -551,7 +565,10 @@ class RelayController:
                     kind="leg", leg_index=index, lineage_id=lineage_id,
                     leaf_id=sweep_boundary, delta=proposed,
                 )
-                observe(sweep_boundary, completed=True)
+                observe(
+                    sweep_boundary, completed=True,
+                    committed_work=budgets.summary(scope), leaf_id=sweep_boundary,
+                )
                 if np.array_equal((check_matrix.astype(np.int64) @ candidate.astype(np.int64)) % 2, syndrome):
                     converged = True
                     break

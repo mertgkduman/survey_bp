@@ -12,7 +12,7 @@ from .budgets import BudgetTree, WallClockLimit, WorkVector
 from .contracts import Phase5InterventionContract
 from .guided_decimation import GuidedDecimationController
 from .impulse import ImpulseController, ImpulseSpec
-from .intervention_session import BpSession
+from .intervention_session import BpSession, after_phase5_work, before_phase5_work
 from .intervention_session import observe_phase5_boundaries
 from .kernel import BinarySpaKernel
 from .interventions import (
@@ -137,6 +137,7 @@ def _identity_baseline(
             rows.append({"index": index, "state_before": before, "state_after": session.state.digest,
                          "sweep_leaf": moved.leaf_id, "validation_leaf": None, "original_valid": None, "termination": termination})
             break
+        before_phase5_work(check_leaf)
         reservation = budgets.reserve("attempt", WorkVector(original_checks=1), leaf_id=check_leaf)
         if reservation is None:
             termination = "count_budget_exhausted"
@@ -149,6 +150,7 @@ def _identity_baseline(
             reservation.rollback()
             raise
         reservation.commit_once()
+        after_phase5_work(check_leaf, budgets)
         rows.append({"index": index, "state_before": before, "state_after": session.state.digest,
                      "sweep_leaf": moved.leaf_id, "validation_leaf": check_leaf, "original_valid": valid,
                      "candidate": [int(bit) for bit in session.state.candidate], "termination": None})
@@ -241,7 +243,7 @@ def execute_phase5_controller(
     owner_identity: str, wall_clock: WallClockLimit | None = None,
     damping_gamma: float | None = None,
     update_kind: str = "binary_spa",
-    boundary_observer: Callable[[str], None] | None = None,
+    boundary_observer: Callable[[str, WorkVector | None, str | None], None] | None = None,
 ) -> Phase5Outcome:
     """Dispatch one controller with optional post-commit work observation."""
     with observe_phase5_boundaries(boundary_observer):

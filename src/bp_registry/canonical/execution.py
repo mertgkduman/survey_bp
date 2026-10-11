@@ -362,22 +362,27 @@ class AtomicFloodingExecutor:
                     cache={},
                     is_converged=(lambda _messages: is_converged(completed[-1])) if is_converged is not None else (lambda _messages: False),
                 )
+                if result.admitted and isinstance(self.schedule, MemoryFloodingSchedule):
+                    # The retained schedule state is part of the committed sweep.
+                    self.schedule.commit(completed[-1])
+                    self.schedule.observe_candidate(
+                        origin={
+                            "candidate_origin": "last_committed_sweep",
+                            "source_iteration": iteration - 1,
+                            "status": "diagnostic",
+                        },
+                        candidate=completed[-1].candidate,
+                    )
                 if self.resource_guard is not None:
-                    self.resource_guard.after_work(f"flooding:{iteration}:after_work")
+                    self.resource_guard.after_work(
+                        f"flooding:{iteration}:after_work",
+                        committed_work=self.budgets.summary(self.scope) if result.admitted else None,
+                        leaf_id=f"{self.scope}:local-step:{iteration - 1}:flooding:{iteration}" if result.admitted else None,
+                    )
             except BaseException:
                 raise
             if not result.admitted:
                 return AtomicFloodingResult(state, iteration - 1, result.termination, last_sweep)
-            if isinstance(self.schedule, MemoryFloodingSchedule):
-                self.schedule.commit(completed[-1])
-                self.schedule.observe_candidate(
-                    origin={
-                        "candidate_origin": "last_committed_sweep",
-                        "source_iteration": iteration - 1,
-                        "status": "diagnostic",
-                    },
-                    candidate=completed[-1].candidate,
-                )
             progress = result.progress
             last_sweep = completed[-1]
             if result.converged:
@@ -733,13 +738,15 @@ def _run_relay_structural_shot(
         memory_tuning=parsed.relay.memory_tuning,
     )
 
-    def observe_relay_boundary(boundary: str) -> None:
+    def observe_relay_boundary(
+        boundary: str, committed_work: WorkVector | None = None, leaf_id: str | None = None,
+    ) -> None:
         if resource_guard is None:
             return
         if boundary.endswith(":before_work"):
             resource_guard.before_work(boundary)
         else:
-            resource_guard.after_work(boundary)
+            resource_guard.after_work(boundary, committed_work=committed_work, leaf_id=leaf_id)
 
     for attempt_ordinal in range(30):
         try:
@@ -891,7 +898,10 @@ def _run_guided_structural_shot(
                     bp_call_start=sweep_index == 0,
                 )
                 if resource_guard is not None:
-                    resource_guard.after_work(f"{boundary}:after_work")
+                    resource_guard.after_work(
+                        f"{boundary}:after_work", committed_work=budgets.summary("attempt") if transition.admitted else None,
+                        leaf_id=transition.leaf_id if transition.admitted else None,
+                    )
                 if not transition.admitted:
                     termination = transition.termination or "count_budget_exhausted"
                     break
@@ -908,7 +918,10 @@ def _run_guided_structural_shot(
                 resource_guard.before_work(f"{boundary}:before_work")
             guided = controller.fix_one(session, posterior=before.posterior, budgets=budgets)
             if resource_guard is not None:
-                resource_guard.after_work(f"{boundary}:after_work")
+                resource_guard.after_work(
+                    f"{boundary}:after_work", committed_work=budgets.summary("attempt") if guided.admitted else None,
+                    leaf_id=guided.session_transition.leaf_id if guided.admitted else None,
+                )
             ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="intervention", data={
                 **common,
                 "action": "finite_prior_bias", "admitted": guided.admitted,
@@ -1014,13 +1027,15 @@ def _run_phase5_structural_shot(
                     wall_clock.check("attempt_start", scope="attempt")
                 decode_started_ns = _performance_clock_ns()
 
-                def observe_phase5_boundary(boundary: str) -> None:
+                def observe_phase5_boundary(
+                    boundary: str, committed_work: WorkVector | None = None, leaf_id: str | None = None,
+                ) -> None:
                     if resource_guard is None:
                         return
                     if boundary.endswith(":before_work"):
                         resource_guard.before_work(boundary)
                     else:
-                        resource_guard.after_work(boundary)
+                        resource_guard.after_work(boundary, committed_work=committed_work, leaf_id=leaf_id)
 
                 outcome = execute_phase5_controller(
                     spec, original, error_rate=parsed.error_rate, budgets=budgets,
@@ -1121,13 +1136,15 @@ def run_phase6_structural_shot(
         item.member_id, item.local_ordinal, item.partition_identity, item.permutation_identity,
         item.redundant_transforms,
     ) for item in parsed.ensemble.bases)
-    def observe_mbbp_boundary(boundary: str) -> None:
+    def observe_mbbp_boundary(
+        boundary: str, committed_work: WorkVector | None = None, leaf_id: str | None = None,
+    ) -> None:
         if resource_guard is None:
             return
         if boundary.endswith("before_work") or boundary.endswith("before_member"):
             resource_guard.before_work(boundary)
         else:
-            resource_guard.after_work(boundary)
+            resource_guard.after_work(boundary, committed_work=committed_work, leaf_id=leaf_id)
 
     identity_data = {"execution_identity": identity, "source_status": parsed.ensemble.source_status,
                      "ensemble_kind": parsed.ensemble.kind}
@@ -1430,6 +1447,10 @@ def run_canonical_structural_shot(
                     )
                     return CanonicalExecutionResult(parsed.run_id, shot_id, termination.reason, None, None)
                 attempt_reservation.commit_once()
+                if resource_guard is not None:
+                    resource_guard.record_work(
+                        budgets.summary("attempt"), leaf_id=f"attempt:{shot_id}:bp-call",
+                    )
                 try:
                     def admitted_attempt() -> tuple[np.ndarray | None, int, bool, BudgetTermination | None]:
                         nonlocal local_progress, local_schedule, local_random_state, setup_inside_profile_ns, memory_schedule, local_memory
@@ -1460,7 +1481,14 @@ def run_canonical_structural_shot(
                                 from .residual import ResidualSetupBudgetDenied
                                 c2v = np.zeros(edge_table.edge_count, dtype=np.float64)
                                 try:
+                                    if resource_guard is not None:
+                                        resource_guard.before_work("local:residual:setup:before_work")
                                     cache = local_schedule.initialize(messages, c2v, observation.syndrome, error_rate=parsed.error_rate, budgets=budgets)
+                                    if resource_guard is not None:
+                                        resource_guard.after_work(
+                                            "local:residual:setup:after_work", committed_work=budgets.summary("attempt"),
+                                            leaf_id=budgets.leaf_events()[-1][0],
+                                        )
                                 except ResidualSetupBudgetDenied as error:
                                     return None, 0, False, error.termination
                                 # A residual source iteration is a complete traversal
@@ -1472,7 +1500,11 @@ def run_canonical_structural_shot(
                                         resource_guard.before_work(f"{boundary}:before_work")
                                     step = local_schedule.execute_local_step(executor, proposal, v2c=messages, c2v=c2v, cache=cache, progress=local_progress, is_converged=lambda proposed: bool(np.array_equal((validated.hz.astype(np.int64) @ proposed.astype(np.int64)) % 2, observation.syndrome)))
                                     if resource_guard is not None:
-                                        resource_guard.after_work(f"{boundary}:after_work")
+                                        resource_guard.after_work(
+                                            f"{boundary}:after_work",
+                                            committed_work=budgets.summary("attempt") if step.admitted else None,
+                                            leaf_id=budgets.leaf_events()[-1][0] if step.admitted else None,
+                                        )
                                     local_progress, cache, c2v = step.progress, step.cache, step.c2v
                                     if not step.admitted:
                                         return candidate, local_progress.local_steps, False, step.termination
@@ -1496,7 +1528,15 @@ def run_canonical_structural_shot(
                                 if local_memory is not None and local_progress.cursor == (0,):
                                     local_prior_llrs = local_memory.begin_source_iteration()
                                 if parsed.policies.schedule.kind == "group_shuffled" and local_progress.cursor == (0,):
+                                    if resource_guard is not None:
+                                        resource_guard.before_work("local:group_shuffled:refresh:before_work")
                                     refreshed, order_termination = local_schedule.refresh_order(local_progress, budgets=budgets)
+                                    if resource_guard is not None:
+                                        resource_guard.after_work(
+                                            "local:group_shuffled:refresh:after_work",
+                                            committed_work=budgets.summary("attempt") if refreshed else None,
+                                            leaf_id=budgets.leaf_events()[-1][0] if refreshed else None,
+                                        )
                                     if not refreshed:
                                         return candidate, local_progress.local_steps, False, order_termination
                                 if randomized_plan is not None:
@@ -1511,10 +1551,19 @@ def run_canonical_structural_shot(
                                         elif local_progress.iteration == 0:
                                             boundary = randomized_plan.refresh_scope
                                         if boundary is not None:
+                                            refresh_boundary = f"local:randomized:{boundary}:refresh"
+                                            if resource_guard is not None:
+                                                resource_guard.before_work(f"{refresh_boundary}:before_work")
                                             refresh = randomized_plan.refresh(
                                                 local_random_state, boundary=boundary,
                                                 budgets=budgets, budget_scope="attempt",
                                             )
+                                            if resource_guard is not None:
+                                                resource_guard.after_work(
+                                                    f"{refresh_boundary}:after_work",
+                                                    committed_work=budgets.summary("attempt") if refresh.admitted else None,
+                                                    leaf_id=budgets.leaf_events()[-1][0] if refresh.admitted else None,
+                                                )
                                             if not refresh.admitted:
                                                 return candidate, local_progress.local_steps, False, refresh.termination
                                             local_random_state = refresh.state
@@ -1546,7 +1595,11 @@ def run_canonical_structural_shot(
                                         } if local_memory is not None else {}),
                                     )
                                     if resource_guard is not None:
-                                        resource_guard.after_work(f"{boundary}:after_work")
+                                        resource_guard.after_work(
+                                            f"{boundary}:after_work",
+                                            committed_work=budgets.summary("attempt") if step.admitted else None,
+                                            leaf_id=budgets.leaf_events()[-1][0] if step.admitted else None,
+                                        )
                                 except BaseException:
                                     if local_memory is not None:
                                         local_memory.discard()

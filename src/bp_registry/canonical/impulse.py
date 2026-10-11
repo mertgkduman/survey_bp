@@ -10,7 +10,7 @@ from typing import Callable, Literal, Mapping, Sequence, TypeVar
 import numpy as np
 
 from .budgets import BudgetLimit, BudgetTree, WallClockLimit, WorkVector
-from .intervention_session import BpSession, SessionTransition
+from .intervention_session import BpSession, SessionTransition, after_phase5_work, before_phase5_work
 from .numerics import NumericalFailure
 from .problems import OriginalProblem
 from .schedules import EdgeTable
@@ -138,6 +138,7 @@ def _valid(original: OriginalProblem, bits: tuple[int, ...]) -> bool:
 def _reserve_check(
     budgets: BudgetTree, leaf_id: str, compute: Callable[[], T], *, lifted: int = 0,
 ) -> tuple[bool, T | None]:
+    before_phase5_work(leaf_id)
     reservation = budgets.reserve(
         "attempt", WorkVector(original_checks=1, lifted_coordinates=lifted), leaf_id=leaf_id,
     )
@@ -149,6 +150,7 @@ def _reserve_check(
         reservation.rollback()
         raise
     reservation.commit_once()
+    after_phase5_work(leaf_id, budgets)
     return True, result
 
 
@@ -191,6 +193,7 @@ class _ForcedBitSession(BpSession):
         work = WorkVector.from_flooding_counts(
             edge_count=self.edge_table.edge_count, variable_count=self.edge_table.variable_count,
         ) + WorkVector(bp_calls=int(bp_call_start))
+        before_phase5_work(leaf_id)
         if wall_clock is not None and wall_clock.check("iteration_boundary", scope="attempt") is not None:
             return SessionTransition(False, state, "wall_clock_deadline", None)
         reservation = budgets.reserve("attempt", work, leaf_id=leaf_id)
@@ -225,6 +228,7 @@ class _ForcedBitSession(BpSession):
             raise
         reservation.commit_once()
         self._state = next_state
+        after_phase5_work(leaf_id, budgets)
         return SessionTransition(True, next_state, None, leaf_id)
 
 
@@ -287,9 +291,11 @@ class ImpulseController:
                 None, "wall_clock_deadline", budgets.summary("attempt"), budgets.leaf_events(),
                 self.spec.v2c_clip, _clip_boundary(self.spec.v2c_clip),
             )
+        order_leaf = f"{root}:coordinate-order"
+        before_phase5_work(order_leaf)
         order_reservation = budgets.reserve(
             "attempt", WorkVector(order_generation=1, order_selection=1, ranking_scans=n),
-            leaf_id=f"{root}:coordinate-order",
+            leaf_id=order_leaf,
         )
         if order_reservation is None:
             return ImpulseResult(
@@ -309,6 +315,7 @@ class ImpulseController:
             order_reservation.rollback()
             raise
         order_reservation.commit_once()
+        after_phase5_work(order_leaf, budgets)
         baseline_valid: bool | None = None
         baseline_term = "baseline_sweep_cap"
         for index in range(self.spec.baseline_sweeps):
@@ -365,6 +372,7 @@ class ImpulseController:
                 if wall_clock is not None and wall_clock.check("candidate_selection_boundary", scope="attempt") is not None:
                     termination = "wall_clock_deadline"
                 else:
+                    before_phase5_work(rank_leaf)
                     reservation = budgets.reserve(
                         "attempt", WorkVector(ranking_scans=len(attempts)), leaf_id=rank_leaf,
                     )
@@ -377,6 +385,7 @@ class ImpulseController:
                             reservation.rollback()
                             raise
                         reservation.commit_once()
+                        after_phase5_work(rank_leaf, budgets)
                         if selected is not None:
                             selected_candidate = selected.lifted_candidate
                             termination = "impulse_valid"
@@ -406,6 +415,7 @@ class ImpulseController:
         )
         if wall_clock is not None and wall_clock.check("candidate_selection_boundary", scope="attempt") is not None:
             return self._row(order, target, mode, original.lineage_id, "", owner, None, None, None, None, None, "wall_clock_deadline", None, (), None)
+        before_phase5_work(action_leaf)
         reservation = budgets.reserve("attempt", action_work, leaf_id=action_leaf)
         if reservation is None:
             return self._row(order, target, mode, original.lineage_id, "", owner, None, None, None, None, None, "count_budget_exhausted", None, (), None)
@@ -431,6 +441,7 @@ class ImpulseController:
             reservation.rollback()
             raise
         reservation.commit_once()
+        after_phase5_work(action_leaf, budgets)
         initial = session.state.digest
         sweep_leaves: list[str] = []
         lifted: tuple[int, ...] | None = None

@@ -20,13 +20,15 @@ from .memory import V2CDamping, V2CDampingState, TargetMemoryProposal
 from .schedules import EdgeTable, FloodingSchedule
 
 
-_phase5_boundary_observer: ContextVar[Callable[[str], None] | None] = ContextVar(
+_phase5_boundary_observer: ContextVar[Callable[[str, WorkVector | None, str | None], None] | None] = ContextVar(
     "phase5_boundary_observer", default=None,
 )
 
 
 @contextmanager
-def observe_phase5_boundaries(observer: Callable[[str], None] | None) -> Iterator[None]:
+def observe_phase5_boundaries(
+    observer: Callable[[str, WorkVector | None, str | None], None] | None,
+) -> Iterator[None]:
     """Scope optional runtime boundary observation to one Phase-5 controller call."""
     token = _phase5_boundary_observer.set(observer)
     try:
@@ -38,13 +40,23 @@ def observe_phase5_boundaries(observer: Callable[[str], None] | None) -> Iterato
 def _before_phase5_work(leaf_id: str) -> None:
     observer = _phase5_boundary_observer.get()
     if observer is not None:
-        observer(f"phase5:{leaf_id}:before_work")
+        observer(f"phase5:{leaf_id}:before_work", None, None)
 
 
-def _after_phase5_work(leaf_id: str) -> None:
+def _after_phase5_work(leaf_id: str, budgets: BudgetTree, *, scope: str = "attempt") -> None:
     observer = _phase5_boundary_observer.get()
     if observer is not None:
-        observer(f"phase5:{leaf_id}:after_work")
+        observer(f"phase5:{leaf_id}:after_work", budgets.summary(scope), leaf_id)
+
+
+def before_phase5_work(leaf_id: str) -> None:
+    """Expose a named pre-commit boundary for controller-owned atomic work."""
+    _before_phase5_work(leaf_id)
+
+
+def after_phase5_work(leaf_id: str, budgets: BudgetTree, *, scope: str = "attempt") -> None:
+    """Expose an exact post-commit boundary for controller-owned atomic work."""
+    _after_phase5_work(leaf_id, budgets, scope=scope)
 
 
 def _frozen_f64(value: np.ndarray, length: int, name: str) -> np.ndarray:
@@ -293,7 +305,7 @@ class BpSession:
             raise
         reservation.commit_once()
         self._state = next_state
-        _after_phase5_work(leaf_id)
+        _after_phase5_work(leaf_id, budgets)
         return SessionTransition(True, next_state, None, leaf_id)
 
     def advance(
@@ -364,7 +376,7 @@ class BpSession:
             assert self._damping_policy is not None and self._damping_state is not None
             self._damping_state = self._damping_policy.commit(memory_proposal, self._damping_state)
         self._state = next_state
-        _after_phase5_work(leaf_id)
+        _after_phase5_work(leaf_id, budgets)
         return SessionTransition(True, next_state, None, leaf_id)
 
     def original_syndrome_valid(self, check_matrix: np.ndarray) -> bool:
@@ -437,7 +449,7 @@ class BpSession:
             reservation.rollback()
             raise
         reservation.commit_once()
-        _after_phase5_work(leaf_id)
+        _after_phase5_work(leaf_id, budgets)
         return child
 
     def mutate_posterior_sign(
@@ -477,7 +489,7 @@ class BpSession:
             raise
         reservation.commit_once()
         self._state = next_state
-        _after_phase5_work(leaf_id)
+        _after_phase5_work(leaf_id, budgets)
         return SessionTransition(True, next_state, None, leaf_id)
 
     def stage_posterior_sign(
@@ -516,7 +528,7 @@ class BpSession:
             raise
         reservation.commit_once()
         self._state = next_state
-        _after_phase5_work(leaf_id)
+        _after_phase5_work(leaf_id, budgets)
         return SessionTransition(True, next_state, None, leaf_id)
 
 
