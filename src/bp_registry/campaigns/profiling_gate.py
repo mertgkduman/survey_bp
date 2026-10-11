@@ -10,7 +10,6 @@ from __future__ import annotations
 from dataclasses import dataclass, fields
 from hashlib import sha256
 import json
-from math import ceil
 from types import MappingProxyType
 from typing import Literal, Mapping
 
@@ -18,6 +17,7 @@ from bp_registry.canonical.profiling import ProfileMeasurement, ReplayLink, comp
 
 
 _DIGEST_LENGTH = 64
+_MAX_COUNT = (1 << 63) - 1
 _FORBIDDEN_CONTEXT_PARTS = ("secret", "token", "password", "authorization", "cookie", "api_key")
 _CEILING_FIELDS = (
     "max_cpu_time_ns", "max_wall_time_ns", "max_storage_bytes", "max_shard_bytes",
@@ -35,9 +35,27 @@ def _require_digest(value: str, *, name: str) -> None:
 
 
 def _nonnegative(value: int, *, name: str, positive: bool = False) -> None:
-    if type(value) is not int or value < (1 if positive else 0):
+    if type(value) is not int or value < (1 if positive else 0) or value > _MAX_COUNT:
         qualifier = "positive" if positive else "nonnegative"
-        raise ValueError(f"{name} must be a {qualifier} integer")
+        raise ValueError(f"{name} must be a bounded {qualifier} integer")
+
+
+def _sum_bounded(values: tuple[int, ...] | list[int], *, name: str) -> int:
+    total = 0
+    for value in values:
+        _nonnegative(value, name=name)
+        if value > _MAX_COUNT - total:
+            raise ValueError(f"{name} exceeds bounded arithmetic")
+        total += value
+    return total
+
+
+def _multiply_bounded(left: int, right: int, *, name: str) -> int:
+    _nonnegative(left, name=name)
+    _nonnegative(right, name=name)
+    if left and right > _MAX_COUNT // left:
+        raise ValueError(f"{name} exceeds bounded arithmetic")
+    return left * right
 
 
 def _integer_mapping(value: Mapping[str, int], *, name: str, allow_empty: bool = False) -> Mapping[str, int]:
@@ -51,7 +69,7 @@ def _measurement_value(profile: ProfileMeasurement, field: str) -> int | None:
     fact = getattr(profile.runtime, field)
     if fact.value is None:
         return None
-    if type(fact.value) is not int or fact.value < 0:
+    if type(fact.value) is not int or fact.value < 0 or fact.value > _MAX_COUNT:
         raise ValueError(f"profile {field} must be an observed nonnegative integer")
     return fact.value
 
@@ -206,10 +224,12 @@ def aggregate_representative_evidence(records: tuple[OperationalEvidenceV1, ...]
         profile_receipt_sha256s=tuple(sorted({record.profile_receipt_sha256 for record in records})),
         sample_count=len(records), fast_path_samples=sum(record.path_class == "fast" for record in records),
         slow_path_samples=sum(record.path_class == "slow" for record in records),
-        event_count=sum(record.event_count for record in records),
-        decoder_wall_time_ns=sum(decoder_wall), decoder_cpu_time_ns=sum(decoder_cpu),
-        replay_wall_time_ns=sum(record.replay_wall_time_ns for record in records),
-        ledger_bytes=sum(record.ledger_bytes for record in records), sidecar_bytes=sum(record.sidecar_bytes for record in records),
+        event_count=_sum_bounded([record.event_count for record in records], name="event_count"),
+        decoder_wall_time_ns=_sum_bounded(decoder_wall, name="decoder_wall_time_ns"),
+        decoder_cpu_time_ns=_sum_bounded(decoder_cpu, name="decoder_cpu_time_ns"),
+        replay_wall_time_ns=_sum_bounded([record.replay_wall_time_ns for record in records], name="replay_wall_time_ns"),
+        ledger_bytes=_sum_bounded([record.ledger_bytes for record in records], name="ledger_bytes"),
+        sidecar_bytes=_sum_bounded([record.sidecar_bytes for record in records], name="sidecar_bytes"),
         scheduler_launch_overhead_ns=max(record.scheduler_launch_overhead_ns for record in records),
         shard_fixed_cost_ns=max(record.shard_fixed_cost_ns for record in records),
         peak_host_memory_bytes=None if any(value is None for value in peak_memory) else max(peak_memory),
@@ -232,7 +252,10 @@ class SafetyFactorV1:
 
     def apply(self, value: int) -> int:
         _nonnegative(value, name="projected value")
-        return ceil(value * self.numerator / self.denominator)
+        projected = (value * self.numerator + self.denominator - 1) // self.denominator
+        if projected > _MAX_COUNT:
+            raise ValueError("projected value exceeds bounded arithmetic")
+        return projected
 
     def as_evidence(self) -> dict[str, int]:
         return {"numerator": self.numerator, "denominator": self.denominator}
@@ -332,7 +355,9 @@ class AuthorizationReceiptV1:
 
 
 def _per_sample(total: int, count: int) -> int:
-    return ceil(total / count)
+    _nonnegative(total, name="sample total")
+    _nonnegative(count, name="sample count", positive=True)
+    return (total + count - 1) // count
 
 
 def authorize_campaign(*, aggregate: RepresentativeProfileAggregateV1, proposal: ProposedCampaignV1,
@@ -345,14 +370,16 @@ def authorize_campaign(*, aggregate: RepresentativeProfileAggregateV1, proposal:
         raise ValueError("authorization requires typed aggregate, proposal, site, and safety factor")
     if (aggregate.campaign_spec_digest, aggregate.campaign_plan_digest) != (proposal.campaign_spec_digest, proposal.campaign_plan_digest):
         raise ValueError("proposal identity does not match profiling evidence")
+    bytes_per_sample = _per_sample(_sum_bounded([aggregate.ledger_bytes, aggregate.sidecar_bytes], name="storage bytes"), aggregate.sample_count)
+    scheduler_unit_cost = _sum_bounded([aggregate.scheduler_launch_overhead_ns, aggregate.shard_fixed_cost_ns], name="scheduler cost")
     projections: dict[str, int | None] = {
-        "max_cpu_time_ns": safety_factor.apply(_per_sample(aggregate.decoder_cpu_time_ns, aggregate.sample_count) * proposal.total_shots),
-        "max_wall_time_ns": safety_factor.apply(_per_sample(aggregate.decoder_wall_time_ns, aggregate.sample_count) * proposal.total_shots),
-        "max_storage_bytes": safety_factor.apply(_per_sample(aggregate.ledger_bytes + aggregate.sidecar_bytes, aggregate.sample_count) * proposal.total_shots),
-        "max_shard_bytes": safety_factor.apply(_per_sample(aggregate.ledger_bytes + aggregate.sidecar_bytes, aggregate.sample_count) * proposal.max_shard_shots),
-        "max_replay_time_ns": safety_factor.apply(_per_sample(aggregate.replay_wall_time_ns, aggregate.sample_count) * proposal.total_shots),
+        "max_cpu_time_ns": safety_factor.apply(_multiply_bounded(_per_sample(aggregate.decoder_cpu_time_ns, aggregate.sample_count), proposal.total_shots, name="cpu projection")),
+        "max_wall_time_ns": safety_factor.apply(_multiply_bounded(_per_sample(aggregate.decoder_wall_time_ns, aggregate.sample_count), proposal.total_shots, name="wall projection")),
+        "max_storage_bytes": safety_factor.apply(_multiply_bounded(bytes_per_sample, proposal.total_shots, name="storage projection")),
+        "max_shard_bytes": safety_factor.apply(_multiply_bounded(bytes_per_sample, proposal.max_shard_shots, name="shard storage projection")),
+        "max_replay_time_ns": safety_factor.apply(_multiply_bounded(_per_sample(aggregate.replay_wall_time_ns, aggregate.sample_count), proposal.total_shots, name="replay projection")),
         "max_peak_memory_bytes": None if aggregate.peak_host_memory_bytes is None else safety_factor.apply(aggregate.peak_host_memory_bytes),
-        "max_scheduler_cost_ns": safety_factor.apply((aggregate.scheduler_launch_overhead_ns + aggregate.shard_fixed_cost_ns) * ceil(proposal.total_shots / proposal.max_shard_shots)),
+        "max_scheduler_cost_ns": safety_factor.apply(_multiply_bounded(scheduler_unit_cost, _per_sample(proposal.total_shots, proposal.max_shard_shots), name="scheduler projection")),
     }
     reasons = [f"missing_measurement:{item}" for item in aggregate.missing_measurements]
     for field in _CEILING_FIELDS:

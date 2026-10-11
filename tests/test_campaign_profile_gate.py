@@ -206,3 +206,13 @@ def test_safety_factor_changes_receipt_but_worker_topology_is_not_scientific_ide
     assert boundary.scientific_identity == api.scientific_authorization_identity(proposal)
     assert boundary.scientific_identity == api.scientific_authorization_identity(moved_workers)
     assert boundary.operational_allocation != moved_workers.operational_allocation
+
+
+def test_resource_gate_rejects_unbounded_campaign_arithmetic() -> None:
+    api = _api()
+    with pytest.raises(ValueError, match="bounded"):
+        api.ProposedCampaignV1(
+            campaign_spec_digest="e" * 64, campaign_plan_digest="f" * 64,
+            total_shots=1 << 63, max_shard_shots=1,
+            scientific_caps={"max_shots": 1}, operational_allocation={"workers": 1},
+        )
