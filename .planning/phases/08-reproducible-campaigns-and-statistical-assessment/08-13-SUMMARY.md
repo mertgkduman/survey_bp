@@ -49,7 +49,7 @@ coverage:
         ref: "tests/test_campaign_profile_gate.py -k 'authorization or projection or ceiling or deny or identity'"
         status: pass
     human_judgment: false
-duration: 3 min
+duration: 4 min
 completed: 2026-10-11
 status: complete
 ---
@@ -60,9 +60,9 @@ status: complete
 
 ## Performance
 
-- **Duration:** 3 min
+- **Duration:** 4 min
 - **Started:** 2026-10-11T06:49:41Z
-- **Completed:** 2026-10-11T06:52:41Z
+- **Completed:** 2026-10-11T06:53:59Z
 - **Tasks:** 2/2
 - **Files modified:** 2
 
