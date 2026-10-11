@@ -51,7 +51,10 @@ def _assessment_payload(*, mode: str = "fixed_shot") -> dict[str, object]:
 
 
 def test_campaign_assessment_is_strict_and_digest_bound():
-    from bp_registry.campaigns.contracts import CampaignAssessmentV1
+    from bp_registry.campaigns import contracts
+
+    assert hasattr(contracts, "CampaignAssessmentV1"), "strict campaign assessment contract must be public"
+    CampaignAssessmentV1 = contracts.CampaignAssessmentV1
 
     payload = _assessment_payload()
     first = CampaignAssessmentV1.model_validate(payload)
