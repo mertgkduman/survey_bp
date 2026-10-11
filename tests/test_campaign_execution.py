@@ -597,6 +597,33 @@ def test_cli_preflight_and_plan_freeze_identity_before_any_execution(tmp_path: P
     assert not output_root.exists()
 
 
+def test_operational_gate_preflight_binds_both_paths_without_creating_evidence(tmp_path: Path):
+    """The retained Phase 8 gate cannot switch a representative path at launch."""
+    study = ROOT / "data/studies/phase8-operational-gate-v1.json"
+    output_root = tmp_path / "operational-gate-output"
+
+    accepted = _run_campaign_module(
+        "preflight", "--campaign", str(study), "--campaign-root", str(ROOT),
+        "--output-root", str(output_root),
+    )
+
+    assert accepted.returncode == 0, accepted.stdout
+    assert json.loads(accepted.stdout)["sampling_performed"] is False
+    assert not output_root.exists()
+
+    drifted = json.loads(study.read_text(encoding="utf-8"))
+    drifted["operational_gate"]["eligible_manifests"]["slow"][1] = "0" * 64
+    drifted_path = tmp_path / "operational-gate-drifted.json"
+    drifted_path.write_text(json.dumps(drifted), encoding="utf-8")
+    rejected = _run_campaign_module(
+        "preflight", "--campaign", str(drifted_path), "--campaign-root", str(ROOT),
+        "--output-root", str(tmp_path / "must-not-exist"),
+    )
+
+    assert rejected.returncode != 0
+    assert "operational_gate manifest SHA-256" in json.loads(rejected.stdout)["error"]
+
+
 def test_cli_lifecycle_uses_preserved_receipts_and_rejects_plan_drift(tmp_path: Path):
     """One bounded manifest reaches each lifecycle stage without mutable inputs."""
     campaign = _write_cli_campaign(tmp_path / "campaign.json")

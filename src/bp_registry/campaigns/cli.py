@@ -128,8 +128,11 @@ def _validated_target_receipts(spec: CampaignSpecV1, value: object, campaign_roo
 
 def _campaign_spec(campaign_path: str, campaign_root: Path) -> tuple[CampaignSpecV1, dict[str, str]]:
     document = _read_json(campaign_path)
-    if set(document) != {"campaign_spec", "target_receipts"} or not isinstance(document["campaign_spec"], Mapping):
+    permitted_fields = {"campaign_spec", "target_receipts", "operational_gate"}
+    if set(document) not in ({"campaign_spec", "target_receipts"}, permitted_fields) or not isinstance(document["campaign_spec"], Mapping):
         raise ValueError("campaign document must contain campaign_spec and target_receipts")
+    if "operational_gate" in document:
+        _validate_operational_gate(document["operational_gate"], campaign_root)
     spec = CampaignSpecV1.model_validate(document["campaign_spec"])
     manifest = _confined_file(campaign_root, spec.inner_manifest_path, name="inner_manifest_path")
     if sha256(manifest.read_bytes()).hexdigest() != spec.inner_manifest_sha256:
@@ -137,6 +140,53 @@ def _campaign_spec(campaign_path: str, campaign_root: Path) -> tuple[CampaignSpe
     preflight_manifest(manifest)
     target_receipts = _validated_target_receipts(spec, document["target_receipts"], campaign_root)
     return spec, target_receipts
+
+
+def _validate_operational_gate(value: object, campaign_root: Path) -> None:
+    """Validate non-scientific Phase 8 gate metadata before any artifact write.
+
+    The metadata names the additional fast/slow fixtures used by the bounded
+    operational check.  It never enters a one-unit scientific digest, but it
+    must be complete and content-bound so a preflight cannot silently switch
+    the representative paths or declare a publication assessment.
+    """
+    if not isinstance(value, Mapping):
+        raise ValueError("operational_gate must be an object")
+    expected = {
+        "schema", "label", "assessment_status", "physical_sample_identity",
+        "preselected_sample_ids", "eligible_manifests", "synthetic_fixtures",
+    }
+    if set(value) != expected or value.get("schema") != "phase8_operational_gate_v1":
+        raise ValueError("operational_gate has an invalid schema or field set")
+    if value.get("label") != "development_fixture" or value.get("assessment_status") != "not_assessed":
+        raise ValueError("operational_gate must remain a development_fixture and not_assessed")
+    if not isinstance(value.get("physical_sample_identity"), str) or not value["physical_sample_identity"]:
+        raise ValueError("operational_gate requires a shared physical sample identity")
+    sample_ids = value.get("preselected_sample_ids")
+    if not isinstance(sample_ids, list) or len(sample_ids) < 2 or any(type(item) is not int or item < 0 for item in sample_ids) or len(set(sample_ids)) != len(sample_ids):
+        raise ValueError("operational_gate requires multiple unique preselected sample IDs")
+    manifests = value.get("eligible_manifests")
+    if not isinstance(manifests, Mapping) or set(manifests) != {"fast", "slow"}:
+        raise ValueError("operational_gate requires fast and slow eligible manifests")
+    for entry in manifests.values():
+        if not isinstance(entry, list) or len(entry) != 2:
+            raise ValueError("operational_gate manifest entries must be path/digest pairs")
+        path_text, expected_sha = entry
+        if not isinstance(path_text, str) or not isinstance(expected_sha, str):
+            raise ValueError("operational_gate manifest entries must be path/digest pairs")
+        path = _confined_file(campaign_root, path_text, name="operational_gate manifest")
+        if sha256(path.read_bytes()).hexdigest() != expected_sha:
+            raise ValueError("operational_gate manifest SHA-256 differs from frozen metadata")
+        preflight_manifest(path)
+    fixtures = value.get("synthetic_fixtures")
+    if not isinstance(fixtures, Mapping) or set(fixtures) != {"fixed_shot", "finite_look_post_decision_crash"}:
+        raise ValueError("operational_gate requires fixed-shot and finite-look crash fixtures")
+    fixed = fixtures["fixed_shot"]
+    finite = fixtures["finite_look_post_decision_crash"]
+    if not isinstance(fixed, Mapping) or fixed.get("mode") != "fixed_shot":
+        raise ValueError("operational_gate fixed-shot fixture is invalid")
+    if not isinstance(finite, Mapping) or finite.get("mode") != "finite_look" or finite.get("fault") != "after_decision_before_receipt_publication":
+        raise ValueError("operational_gate finite-look crash fixture is invalid")
 
 
 def _plan_payload(spec: CampaignSpecV1, target_receipts: Mapping[str, str]) -> dict[str, Any]:
