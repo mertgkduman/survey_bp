@@ -508,3 +508,123 @@ def test_incomplete_pair_summary_blocks_paired_inference_until_finalized() -> No
     assert summary.incomplete_pairs == 1
     assert summary.paired_inference_status == "inconclusive_incomplete_pairs"
     assert summary.missing_arms_by_sample == {"partial": ("second",)}
+
+
+def _report_inputs(*, statuses: dict[tuple[int, str], str] | None = None):
+    """Build independently merged terminal evidence for report reconstruction."""
+    from bp_registry.campaigns.planning import CampaignCoordinateV1, freeze_work_plan
+    from bp_registry.campaigns.shards import merge_verified_attempts
+
+    plan = freeze_work_plan(
+        campaign_spec_digest="d" * 64,
+        coordinates=(CampaignCoordinateV1(
+            cohort_id="bb72", point_id="p050", sample_namespace="shared", sample_ids=(0, 1),
+        ),),
+        arm_seed_identities={"first": "first-seed", "second": "second-seed"},
+        look_sample_boundaries=(2,), units_per_shard=2,
+    )
+    resolved = statuses or {
+        (0, "first"): "exact", (0, "second"): "wrong_logical_action",
+        (1, "first"): "timeout", (1, "second"): "exact",
+    }
+    attempts = []
+    for index, unit in enumerate(plan.units):
+        status = resolved[(unit.sample_id, unit.arm_id)]
+        attempt = {
+            "schema": "campaign_attempt_receipt_v1", "attempt_id": f"attempt-{index}",
+            "unit_key": unit.key, "campaign_plan_digest": plan.campaign_plan_digest,
+            "lifecycle": ["planned", "running", "sealed_terminal"], "state": "sealed_terminal",
+        }
+        terminal = {
+            "unit_key": unit.key, "termination": "converged", "outcome": status,
+            "logical_failure": status not in {"exact", "stabilizer_equivalent"},
+        }
+        attempts.append({
+            "attempt": attempt, "receipt_sha256": f"{index:x}".zfill(64),
+            "validation_status": "verified", "replay_status": "verified",
+            "terminal_bytes_sha256": (f"{index + 32:x}").zfill(64),
+            "terminal_fact": terminal, "events": [{"event_id": f"event-{index}"}],
+        })
+    merged = merge_verified_attempts(plan=plan, verified_attempts=attempts)
+    assessment = CampaignAssessmentV1(
+        schema="campaign_assessment_v1",
+        targets=(TargetReferenceV1(
+            target_id="p050", target_receipt_sha256="e" * 64,
+            lower=0.0, upper=1.0, absolute_tolerance=0.0,
+        ),),
+        interval=ExactIntervalV1(method="exact_clopper_pearson", confidence_level=0.95),
+        families=(AssessmentFamilyV1(family_id="family", alpha=0.05, member_target_ids=("p050",)),),
+        stopping=FiniteLookStoppingV1(
+            mode="finite_look", cumulative_looks=(2,), batch_sizes=(2,),
+            minimum_terminal_shots=2,
+            stop_rule="all_primary_decisions_resolved_or_maximum_reached",
+            alpha_allocations=(
+                LookAlphaAllocationV1(family_id="family", target_id="p050", look=2, alpha=0.05),
+            ),
+        ),
+        outcome_matrix=_finite_assessment().outcome_matrix,
+        decision_rule="target_interval_containment_v1",
+        resources=_finite_assessment().resources,
+    )
+    hashes = {
+        "campaign": plan.campaign_spec_digest, "plan": plan.campaign_plan_digest,
+        "merge": merged["receipt_sha256"], "assessment": assessment.digest(),
+        "target:p050": "e" * 64,
+    }
+    return plan, assessment, merged, hashes
+
+
+def test_report_reconstructs_from_merged_terminals_and_replays_byte_stably() -> None:
+    api = importlib.import_module("bp_registry.campaigns.reporting")
+    plan, assessment, merged, hashes = _report_inputs()
+
+    report = api.reconstruct_campaign_report(
+        plan=plan, assessment=assessment, merge_receipt=merged,
+        input_receipt_hashes=hashes, source_denominator_required_by_target={"p050": True},
+        source_denominators={"p050": 100},
+    )
+    assert report.status == "complete"
+    assert report.point_reports[0].all_shot.failures == 2
+    assert report.point_reports[0].pair_status == "complete"
+    assert report.verdicts["p050"].verdict == "pass"
+    assert api.verify_campaign_report(
+        report=report, plan=plan, assessment=assessment, merge_receipt=merged,
+        input_receipt_hashes=hashes, source_denominator_required_by_target={"p050": True},
+        source_denominators={"p050": 100},
+    ) is True
+
+
+@pytest.mark.parametrize("mutation", ("terminal", "target", "receipt"))
+def test_report_rejects_tampered_merged_evidence_target_or_receipt(mutation: str) -> None:
+    api = importlib.import_module("bp_registry.campaigns.reporting")
+    plan, assessment, merged, hashes = _report_inputs()
+    report = api.reconstruct_campaign_report(
+        plan=plan, assessment=assessment, merge_receipt=merged,
+        input_receipt_hashes=hashes,
+    )
+    if mutation == "terminal":
+        merged["terminal_facts"][0]["outcome"] = "timeout"
+    elif mutation == "target":
+        assessment = assessment.model_copy(update={"targets": (TargetReferenceV1(
+            target_id="p050", target_receipt_sha256="e" * 64,
+            lower=0.1, upper=0.2, absolute_tolerance=0.0,
+        ),)})
+    else:
+        hashes = {**hashes, "merge": "f" * 64}
+    with pytest.raises(ValueError):
+        api.verify_campaign_report(
+            report=report, plan=plan, assessment=assessment, merge_receipt=merged,
+            input_receipt_hashes=hashes,
+        )
+
+
+def test_report_marks_missing_source_denominator_inconclusive() -> None:
+    api = importlib.import_module("bp_registry.campaigns.reporting")
+    plan, assessment, merged, hashes = _report_inputs()
+    report = api.reconstruct_campaign_report(
+        plan=plan, assessment=assessment, merge_receipt=merged,
+        input_receipt_hashes=hashes, source_denominator_required_by_target={"p050": True},
+        source_denominators={"p050": None},
+    )
+    assert report.status == "inconclusive"
+    assert report.verdicts["p050"].reason == "missing_required_source_denominator"

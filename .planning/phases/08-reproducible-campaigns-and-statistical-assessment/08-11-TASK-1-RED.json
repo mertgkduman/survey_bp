@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_statistics.py -k 'report or reconstruct or receipt or tamper or inconclusive' -x",
+  "exitCode": 1,
+  "targetTest": "test_report_reconstructs_from_merged_terminals_and_replays_byte_stably",
+  "targetFile": "tests/test_campaign_statistics.py",
+  "expected": "bp_registry.campaigns.reporting provides evidence-only campaign report reconstruction",
+  "actual": "ModuleNotFoundError: No module named 'bp_registry.campaigns.reporting'",
+  "output": "TAP version 13\nnot ok 1 - test_report_reconstructs_from_merged_terminals_and_replays_byte_stably\n  ---\n  message: ModuleNotFoundError: No module named 'bp_registry.campaigns.reporting'\n  ...\n1..1\n# tests 1\n# pass 0\n# fail 1\n"
+}
