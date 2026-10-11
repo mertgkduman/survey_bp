@@ -500,7 +500,7 @@ Plans:
 **Research focus:** Paper-specific precision and budgets, sequential inference, digitization, multiplicity, sample replay, durable shard protocol, and site execution limits.
 **Operational gate:** Profile decoder and replay throughput, ledger size, and HPC shard cost on representative nontrivial CSS samples before approving large campaigns; choose resource and storage budgets from measured evidence.
 **Scope carry-forward:** Design future CSS campaigns from a newly prespecified question, precision target, stopping rule and measured budget. The cancelled Phase 4 grid is historical evidence, not a required or automatically funded Phase 8 run.
-**Plans:** 19/20 plans executed
+**Plans:** 20/20 plans executed
 
 Plans:
 
@@ -509,7 +509,7 @@ Plans:
 - [x] 08-17-PLAN.md
 - [x] 08-18-PLAN.md
 - [x] 08-19-PLAN.md
-- [ ] 08-20-PLAN.md
+- [x] 08-20-PLAN.md
 
 **Wave 1**
 
@@ -707,7 +707,7 @@ Plans:
 | 5. Guided and Perturbative BP Interventions | 14/14 | Human review pending |  |
 | 6. Beam Search, Ensembles, and Candidate Selection | 9/9 | Complete    | 2026-10-05 |
 | 7. Optional Postprocessing | 6/15 | Paused by user; POST-01 qualification failed |  |
-| 8. Reproducible Campaigns and Statistical Assessment | 19/20 | In Progress|  |
+| 8. Reproducible Campaigns and Statistical Assessment | 20/20 | In Progress|  |
 | 9. CSS Reproduction and Controlled Comparisons | 0/TBD | Not started | - |
 | 10. Correlated Quaternary Execution | 16/16 | Complete    | 2026-10-08 |
 | 11. Quaternary Reproduction and Comparisons | 0/TBD | Not started | - |
