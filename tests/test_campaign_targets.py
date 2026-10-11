@@ -93,6 +93,87 @@ def test_unavailable_denominator_never_infers_an_observed_count():
         SourceDenominatorV1(status="observed")
 
 
+def _complete_source_experiment_identity():
+    from bp_registry.campaigns.targets import (
+        ByteSnapshotV1,
+        SourceDenominatorV1,
+        SourceExperimentIdentityV1,
+        SourceIdentityV1,
+        SourceStoppingEvidenceV1,
+        SourceTargetLocatorV1,
+    )
+
+    return SourceExperimentIdentityV1(
+        schema="campaign_source_experiment_identity_v1",
+        target_id="synthetic-source-p010",
+        paper=SourceIdentityV1(
+            uri_or_doi="https://doi.org/10.0000/synthetic",
+            revision="arxiv-v2",
+            accessed_on=date(2026, 10, 11),
+        ),
+        paper_snapshot=ByteSnapshotV1.from_bytes("papers/synthetic/source.tar", b"source bytes"),
+        locator=SourceTargetLocatorV1(
+            paper_id="Synthetic et al.", figure_or_table_id="Figure 3", curve_id="BP",
+            variant_id="baseline", point_id="p010",
+        ),
+        ordered_check_artifacts=(
+            ByteSnapshotV1.from_bytes("artifacts/hx.txt", b"Hx"),
+            ByteSnapshotV1.from_bytes("artifacts/hz.txt", b"Hz"),
+        ),
+        ordered_logical_artifacts=(
+            ByteSnapshotV1.from_bytes("artifacts/lx.txt", b"Lx"),
+            ByteSnapshotV1.from_bytes("artifacts/lz.txt", b"Lz"),
+        ),
+        channel_convention="independent_xz_code_capacity_v1",
+        source_denominator=SourceDenominatorV1(status="observed", count=1000),
+        stopping=SourceStoppingEvidenceV1(
+            status="observed", rule="fixed_1000_shots", snapshot=ByteSnapshotV1.from_bytes(
+                "papers/synthetic/stopping.txt", b"1000 shots",
+            ),
+        ),
+        author_implementation_status="verified",
+        author_implementation_uri="https://example.test/synthetic",
+        author_implementation_revision="deadbeef",
+        author_environment_snapshot=ByteSnapshotV1.from_bytes("author/environment.txt", b"python=3.12"),
+        author_settings_snapshot=ByteSnapshotV1.from_bytes("author/settings.toml", b"iterations=50"),
+        executable_policy_sha256=sha256(b"policy").hexdigest(),
+        qualification_blockers=(),
+    )
+
+
+def test_source_experiment_identity_binds_ordered_identity_and_rejects_incomplete_faithful_tuple():
+    identity = _complete_source_experiment_identity()
+    encoded = identity.model_dump_json(by_alias=True)
+    assert type(identity).model_validate_json(encoded) == identity
+    assert identity.complete_for_faithful_assessment is True
+
+    reordered = identity.model_copy(
+        update={"ordered_check_artifacts": tuple(reversed(identity.ordered_check_artifacts))},
+    )
+    assert reordered.digest() != identity.digest()
+
+    incomplete = identity.model_copy(
+        update={"author_implementation_status": "unverified", "author_implementation_uri": None,
+                "author_implementation_revision": None, "author_environment_snapshot": None,
+                "author_settings_snapshot": None, "qualification_blockers": ("author settings unavailable",)},
+    )
+    assert incomplete.complete_for_faithful_assessment is False
+
+
+def test_source_experiment_identity_rejects_unknown_or_unbounded_evidence_and_duplicate_paths():
+    identity = _complete_source_experiment_identity()
+    payload = identity.model_dump(mode="json", by_alias=True)
+    payload["unknown"] = "not permitted"
+    with pytest.raises(ValidationError):
+        type(identity).model_validate(payload)
+
+    duplicate_path = identity.model_copy(
+        update={"ordered_logical_artifacts": (identity.ordered_check_artifacts[0], identity.ordered_logical_artifacts[1])},
+    )
+    with pytest.raises(ValidationError):
+        type(identity).model_validate(duplicate_path.model_dump(mode="json", by_alias=True))
+
+
 def _digitized_receipt():
     from bp_registry.campaigns.targets import (
         AxisCalibrationPointV1,
