@@ -129,18 +129,17 @@ def test_semantic_mismatch_and_post_outcome_selection_never_enter_a_projection()
         ))
 
     record = _run(sample="sample-1", path_class="fast")
+    replacement = {field: getattr(record, field) for field in record.__dataclass_fields__}
+    replacement["replay_link"] = ReplayLink.create(
+        clean_run_id="new-clean", profile_run_id="new-profile", manifest_identity="b" * 64,
+        sample_identity="sample-1", decoder_randomness_identity="c" * 64,
+        ordering_identity="d" * 64,
+        cohort=CohortSelection.diagnostic(run_identity="sample-1", stratum="fast", reason="outcome"),
+        profiling_level="representative", overhead_ns=2,
+        clean_semantics=record.clean_semantics, profiled_semantics=record.profiled_semantics,
+    )
     with pytest.raises(ValueError, match="representative"):
-        api.OperationalEvidenceV1(
-            **{field: getattr(record, field) for field in record.__dataclass_fields__},
-            replay_link=ReplayLink.create(
-                clean_run_id="new-clean", profile_run_id="new-profile", manifest_identity="b" * 64,
-                sample_identity="sample-1", decoder_randomness_identity="c" * 64,
-                ordering_identity="d" * 64,
-                cohort=CohortSelection.diagnostic(run_identity="sample-1", stratum="fast", reason="outcome"),
-                profiling_level="representative", overhead_ns=2,
-                clean_semantics=record.clean_semantics, profiled_semantics=record.profiled_semantics,
-            ),
-        )
+        api.OperationalEvidenceV1(**replacement)
 
 
 def test_missing_memory_remains_explicit_and_denies_authorization() -> None:
