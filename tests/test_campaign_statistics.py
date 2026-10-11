@@ -472,7 +472,7 @@ def test_outcome_summary_exposes_all_shot_acceptance_and_conditional_denominator
     assert summary.actual_work == {"message_work": 21}
 
 
-def test_outcome_summary_keeps_postselection_and_invalid_results_visible() -> None:
+def test_zero_acceptance_keeps_treatment_visible_with_explicit_conditional_reason() -> None:
     summary = _denominator_summary(
         outcomes=(
             _campaign_outcome(sample="invalid", status="invalid_syndrome"),
@@ -490,6 +490,7 @@ def test_outcome_summary_keeps_postselection_and_invalid_results_visible() -> No
     assert summary.all_shot_performance.failures == summary.all_shot_performance.shots == 4
     assert summary.accepted_samples == 0
     assert summary.conditional_performance is None
+    assert summary.conditional_unavailable_reason == "zero accepted samples"
     assert summary.status_counts == {
         "invalid_syndrome": 1, "no_proposal": 1, "nonconvergence": 1,
         "postselected_rejection": 1,
@@ -641,6 +642,7 @@ def test_report_reconstructs_from_merged_terminals_and_replays_byte_stably() -> 
         input_receipt_hashes=hashes, source_denominator_required_by_target={"p050": True},
         source_denominators={"p050": 100}, target_arm_ids={"p050": "first"},
         work_vectors_by_unit=_report_work(plan),
+        materialized_samples_by_identity=_materialized_samples(plan),
     )
     assert report.status == "complete"
     assert report.point_reports[0].all_shot.failures == 2
@@ -651,6 +653,7 @@ def test_report_reconstructs_from_merged_terminals_and_replays_byte_stably() -> 
         input_receipt_hashes=hashes, source_denominator_required_by_target={"p050": True},
         source_denominators={"p050": 100}, target_arm_ids={"p050": "first"},
         work_vectors_by_unit=_report_work(plan),
+        materialized_samples_by_identity=_materialized_samples(plan),
     ) is True
 
 
@@ -672,6 +675,7 @@ def test_report_uses_frozen_outcome_matrix_for_rates_pairs_and_looks() -> None:
         plan=plan, assessment=changed, merge_receipt=merged,
         input_receipt_hashes=hashes, target_arm_ids={"p050": "first"},
         work_vectors_by_unit=_report_work(plan),
+        materialized_samples_by_identity=_materialized_samples(plan),
     )
     point = report.point_reports[0]
     assert point.all_shot.failures == 0
@@ -699,6 +703,7 @@ def test_report_withholds_incomplete_mapped_outcomes_from_denominators_and_pairs
         plan=plan, assessment=changed, merge_receipt=merged,
         input_receipt_hashes=hashes, target_arm_ids={"p050": "first"},
         work_vectors_by_unit=_report_work(plan),
+        materialized_samples_by_identity=_materialized_samples(plan),
     )
     point = report.point_reports[0]
     assert point.all_shot.shots == 3
@@ -716,6 +721,7 @@ def test_report_rejects_tampered_merged_evidence_target_or_receipt(mutation: str
         plan=plan, assessment=assessment, merge_receipt=merged,
         input_receipt_hashes=hashes, target_arm_ids={"p050": "first"},
         work_vectors_by_unit=_report_work(plan),
+        materialized_samples_by_identity=_materialized_samples(plan),
     )
     if mutation == "terminal":
         merged["terminal_facts"][0]["outcome"] = "timeout"
@@ -741,6 +747,7 @@ def test_report_marks_missing_source_denominator_inconclusive() -> None:
         input_receipt_hashes=hashes, source_denominator_required_by_target={"p050": True},
         source_denominators={"p050": None}, target_arm_ids={"p050": "first"},
         work_vectors_by_unit=_report_work(plan),
+        materialized_samples_by_identity=_materialized_samples(plan),
     )
     assert report.status == "inconclusive"
     assert report.verdicts["p050"].reason == "missing_required_source_denominator"
@@ -753,6 +760,7 @@ def test_report_replays_every_declared_finite_look() -> None:
         plan=plan, assessment=assessment, merge_receipt=merged,
         input_receipt_hashes=hashes, target_arm_ids={"p050": "first"},
         work_vectors_by_unit=_report_work(plan),
+        materialized_samples_by_identity=_materialized_samples(plan),
     )
     assert report.stopping["completed_looks"] == (1, 2)
     assert [record.planned_boundary for record in report.stopping["records"]] == [1, 2]
@@ -767,6 +775,7 @@ def test_report_keeps_work_resources_and_missingness_separate() -> None:
     report = api.reconstruct_campaign_report(
         plan=plan, assessment=assessment, merge_receipt=merged, input_receipt_hashes=hashes,
         target_arm_ids={"p050": "first"}, work_vectors_by_unit=work,
+        materialized_samples_by_identity=_materialized_samples(plan),
         observations={
             "environment": {"OMP_NUM_THREADS": "1"},
             "timing": {"wall_time_ns": 41},
@@ -787,6 +796,7 @@ def test_report_keeps_work_resources_and_missingness_separate() -> None:
             plan=plan, assessment=assessment, merge_receipt=merged, input_receipt_hashes=hashes,
             target_arm_ids={"p050": "first"},
             work_vectors_by_unit=_report_work(plan),
+            materialized_samples_by_identity=_materialized_samples(plan),
             observations={"environment": {"DATABASE_PASSWORD": "leak"}},
         )
 
@@ -807,6 +817,7 @@ def test_report_serializes_denominator_uncertainty_per_arm() -> None:
         input_receipt_hashes=hashes,
         target_arm_ids={"p050": "first"},
         work_vectors_by_unit=work,
+        materialized_samples_by_identity=_materialized_samples(plan),
     )
 
     point = report.point_reports[0]
@@ -853,3 +864,32 @@ def test_report_merge_hash_and_context_tamper_are_bound_to_semantic_bytes() -> N
             report=report,
             **{**kwargs, "observations": {"environment": {"OMP_NUM_THREADS": "1"}, "timing": {"wall_time_ns": 2}}},
         )
+    sample_identity, sample = next(iter(kwargs["materialized_samples_by_identity"].items()))
+    with pytest.raises(ValueError, match="physical error digest"):
+        reconstruct_campaign_report(
+            **{**kwargs, "materialized_samples_by_identity": {
+                **kwargs["materialized_samples_by_identity"],
+                sample_identity: sample.model_copy(update={"physical_error_sha256": "0" * 64}),
+            }},
+        )
+
+
+def test_report_named_work_rejects_missing_or_extra_terminal_vectors() -> None:
+    from bp_registry.campaigns.reporting import reconstruct_campaign_report
+
+    plan, assessment, merged, hashes = _report_inputs()
+    kwargs = {
+        "plan": plan,
+        "assessment": assessment,
+        "merge_receipt": merged,
+        "input_receipt_hashes": hashes,
+        "target_arm_ids": {"p050": "first"},
+        "materialized_samples_by_identity": _materialized_samples(plan),
+    }
+    work = _report_work(plan)
+    with pytest.raises(ValueError, match="cover every verified terminal"):
+        reconstruct_campaign_report(**kwargs, work_vectors_by_unit={
+            key: vector for key, vector in work.items() if key != plan.units[0].key
+        })
+    with pytest.raises(ValueError, match="cover every verified terminal"):
+        reconstruct_campaign_report(**kwargs, work_vectors_by_unit={**work, "extra": {"bp_calls": 1}})

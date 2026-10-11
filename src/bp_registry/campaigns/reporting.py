@@ -12,7 +12,12 @@ from dataclasses import asdict, dataclass
 from hashlib import sha256
 from typing import Any, Literal, Mapping, Sequence
 
-from .contracts import CampaignAssessmentV1, TargetReferenceV1, canonical_json_bytes
+from .contracts import (
+    CampaignAssessmentV1,
+    MaterializedPhysicalSampleV1,
+    TargetReferenceV1,
+    canonical_json_bytes,
+)
 from .planning import CampaignWorkPlan, UnitKey
 from .statistics import (
     CampaignTerminalOutcomeV1,
@@ -176,6 +181,7 @@ class CampaignReportV1:
     schema: Literal["campaign_report_v1"]
     status: Literal["complete", "inconclusive"]
     inconclusive_reasons: tuple[str, ...]
+    merge_receipt_sha256: str
     input_receipt_hashes: tuple[tuple[str, str], ...]
     point_reports: tuple[PointReportV1, ...]
     verdicts: Mapping[str, TargetIntervalDecisionV1]
@@ -266,12 +272,53 @@ def _work_and_resources(
     )
 
 
+def _verified_materialized_sample_hashes(
+    *,
+    terminal_rows: Sequence[dict[str, Any]],
+    materialized_samples_by_identity: Mapping[str, MaterializedPhysicalSampleV1] | None,
+) -> tuple[tuple[str, str], ...]:
+    """Revalidate immutable samples before their digests enter report provenance."""
+    if materialized_samples_by_identity is None:
+        raise ValueError("every report requires verified materialized sample evidence")
+    if not isinstance(materialized_samples_by_identity, Mapping):
+        raise ValueError("materialized samples must be keyed by frozen physical sample identity")
+    expected: dict[str, Any] = {}
+    for row in terminal_rows:
+        unit = row["unit"]
+        expected[unit.physical_sample_identity] = unit
+    if set(materialized_samples_by_identity) != set(expected):
+        raise ValueError("materialized samples must cover every verified physical sample exactly once")
+    hashes: list[tuple[str, str]] = []
+    for identity in sorted(expected):
+        artifact = materialized_samples_by_identity[identity]
+        if not isinstance(artifact, MaterializedPhysicalSampleV1):
+            raise ValueError("materialized samples must be validated immutable artifacts")
+        verified = MaterializedPhysicalSampleV1.model_validate(
+            artifact.model_dump(mode="json", by_alias=True)
+        )
+        unit = expected[identity]
+        if (
+            verified.physical_sample_identity != identity
+            or verified.cohort_id != unit.cohort_id
+            or verified.point_id != unit.point_id
+            or verified.sample_namespace != unit.sample_namespace
+            or verified.sample_id != unit.sample_id
+        ):
+            raise ValueError("materialized sample differs from frozen point/sample identity")
+        hashes.extend((
+            (f"materialized_sample:{identity}", verified.materialized_sample_sha256),
+            (f"physical_error:{identity}", verified.physical_error_sha256),
+        ))
+    return tuple(sorted(hashes))
+
+
 def reconstruct_campaign_report(
     *, plan: CampaignWorkPlan, assessment: CampaignAssessmentV1, merge_receipt: Mapping[str, Any],
     input_receipt_hashes: Mapping[str, str], source_denominator_required_by_target: Mapping[str, bool] | None = None,
     source_denominators: Mapping[str, int | None] | None = None,
     target_arm_ids: Mapping[str, str] | None = None,
     work_vectors_by_unit: Mapping[str, Mapping[str, int]] | None = None,
+    materialized_samples_by_identity: Mapping[str, MaterializedPhysicalSampleV1] | None = None,
     observations: Mapping[str, Any] | None = None,
 ) -> CampaignReportV1:
     """Recompute all report rows from a verified merge receipt and frozen inputs."""
@@ -280,6 +327,13 @@ def reconstruct_campaign_report(
     terminal_rows = _verified_merge(plan=plan, merge_receipt=merge_receipt)
     if not terminal_rows:
         raise ValueError("report cannot compute an interval without verified terminal evidence")
+    materialized_hashes = _verified_materialized_sample_hashes(
+        terminal_rows=terminal_rows,
+        materialized_samples_by_identity=materialized_samples_by_identity,
+    )
+    if set(name for name, _ in hashes) & set(name for name, _ in materialized_hashes):
+        raise ValueError("report input hashes cannot shadow verified materialized sample hashes")
+    hashes = tuple(sorted((*hashes, *materialized_hashes)))
     validated_work = {
         key: dict(vector)
         for key, vector in _work_and_resources(
@@ -487,12 +541,14 @@ def reconstruct_campaign_report(
     status: Literal["complete", "inconclusive"] = "inconclusive" if reasons else "complete"
     preliminary = CampaignReportV1(
         schema="campaign_report_v1", status=status, inconclusive_reasons=tuple(sorted(set(reasons))),
-        input_receipt_hashes=hashes, point_reports=tuple(report_points), verdicts=verdicts,
+        merge_receipt_sha256=dict(hashes)["merge"], input_receipt_hashes=hashes,
+        point_reports=tuple(report_points), verdicts=verdicts,
         stopping=stopping, report_sha256="",
     )
     return CampaignReportV1(
         schema=preliminary.schema, status=preliminary.status,
         inconclusive_reasons=preliminary.inconclusive_reasons,
+        merge_receipt_sha256=preliminary.merge_receipt_sha256,
         input_receipt_hashes=preliminary.input_receipt_hashes,
         point_reports=preliminary.point_reports, verdicts=preliminary.verdicts,
         stopping=preliminary.stopping,
