@@ -623,6 +623,12 @@ def derive_resume_plan(
             raise ValueError("later stop receipt exists after an earlier reconstructed stop")
         break
 
+    effective_look = set()
+    if effective_stop is not None:
+        effective_look.add(int(effective_stop["completed_look"]))
+    if set(receipts_by_look) != effective_look:
+        raise ValueError("retained stop receipt does not correspond to a complete reconstructed stop")
+
     merged = merge_verified_attempts(
         plan=plan, verified_attempts=verified_attempts, look_stop_receipt=effective_stop,
     )
