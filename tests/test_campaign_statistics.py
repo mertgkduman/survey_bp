@@ -510,7 +510,7 @@ def test_incomplete_pair_summary_blocks_paired_inference_until_finalized() -> No
     assert summary.missing_arms_by_sample == {"partial": ("second",)}
 
 
-def _report_inputs(*, statuses: dict[tuple[int, str], str] | None = None):
+def _report_inputs(*, statuses: dict[tuple[int, str], str] | None = None, looks: tuple[int, ...] = (2,), target_upper: float = 1.0):
     """Build independently merged terminal evidence for report reconstruction."""
     from bp_registry.campaigns.planning import CampaignCoordinateV1, freeze_work_plan
     from bp_registry.campaigns.shards import merge_verified_attempts
@@ -521,7 +521,7 @@ def _report_inputs(*, statuses: dict[tuple[int, str], str] | None = None):
             cohort_id="bb72", point_id="p050", sample_namespace="shared", sample_ids=(0, 1),
         ),),
         arm_seed_identities={"first": "first-seed", "second": "second-seed"},
-        look_sample_boundaries=(2,), units_per_shard=2,
+        look_sample_boundaries=looks, units_per_shard=2,
     )
     resolved = statuses or {
         (0, "first"): "exact", (0, "second"): "wrong_logical_action",
@@ -550,22 +550,26 @@ def _report_inputs(*, statuses: dict[tuple[int, str], str] | None = None):
         schema="campaign_assessment_v1",
         targets=(TargetReferenceV1(
             target_id="p050", target_receipt_sha256="e" * 64,
-            lower=0.0, upper=1.0, absolute_tolerance=0.0,
+            lower=0.0, upper=target_upper, absolute_tolerance=0.0,
         ),),
         interval=ExactIntervalV1(method="exact_clopper_pearson", confidence_level=0.95),
         families=(AssessmentFamilyV1(family_id="family", alpha=0.05, member_target_ids=("p050",)),),
         stopping=FiniteLookStoppingV1(
-            mode="finite_look", cumulative_looks=(2,), batch_sizes=(2,),
-            minimum_terminal_shots=2,
+            mode="finite_look", cumulative_looks=looks,
+            batch_sizes=(looks[0], *(right - left for left, right in zip(looks, looks[1:]))),
+            minimum_terminal_shots=looks[0],
             stop_rule="all_primary_decisions_resolved_or_maximum_reached",
-            alpha_allocations=(
-                LookAlphaAllocationV1(family_id="family", target_id="p050", look=2, alpha=0.05),
+            alpha_allocations=tuple(
+                LookAlphaAllocationV1(family_id="family", target_id="p050", look=look, alpha=0.05 / len(looks))
+                for look in looks
             ),
         ),
         outcome_matrix=_finite_assessment().outcome_matrix,
         decision_rule="target_interval_containment_v1",
         resources=ScientificResourceCapsV1(
-            max_shots=2, max_looks=1, max_batch_size=2, max_decoder_work=100,
+            max_shots=looks[-1], max_looks=len(looks), max_batch_size=max((
+                looks[0], *(right - left for left, right in zip(looks, looks[1:])),
+            )), max_decoder_work=100,
             max_events=100, max_evidence_bytes=10_000, max_storage_bytes=10_000,
         ),
     )
@@ -631,6 +635,17 @@ def test_report_marks_missing_source_denominator_inconclusive() -> None:
     )
     assert report.status == "inconclusive"
     assert report.verdicts["p050"].reason == "missing_required_source_denominator"
+
+
+def test_report_replays_every_declared_finite_look() -> None:
+    api = importlib.import_module("bp_registry.campaigns.reporting")
+    plan, assessment, merged, hashes = _report_inputs(looks=(1, 2), target_upper=0.2)
+    report = api.reconstruct_campaign_report(
+        plan=plan, assessment=assessment, merge_receipt=merged,
+        input_receipt_hashes=hashes, target_arm_ids={"p050": "first"},
+    )
+    assert report.stopping["completed_looks"] == (1, 2)
+    assert [record.planned_boundary for record in report.stopping["records"]] == [1, 2]
 
 
 def test_report_keeps_work_resources_and_missingness_separate() -> None:

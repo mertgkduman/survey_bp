@@ -341,6 +341,7 @@ def reconstruct_campaign_report(
             ),
         ))
     target_rates: dict[str, ExactBinomialRateV1] = {}
+    target_arms_by_id: dict[str, str] = {}
     for target in assessment.targets:
         matching = rows_by_point.get(target.target_id, [])
         point_arms = sorted({row["unit"].arm_id for row in matching})
@@ -351,6 +352,7 @@ def reconstruct_campaign_report(
             if selected_arm not in point_arms:
                 raise ValueError("assessment target arm has no verified terminal evidence")
             matching = [row for row in matching if row["unit"].arm_id == selected_arm]
+        target_arms_by_id[target.target_id] = selected_arm or point_arms[0]
         completed = [row for row in matching if row["terminal"]["outcome"] != "infrastructure_interruption"]
         if not completed:
             raise ValueError("assessment target has no completed all-shot terminals")
@@ -361,19 +363,6 @@ def reconstruct_campaign_report(
         )
     verdicts: dict[str, TargetIntervalDecisionV1] = {}
     reasons: list[str] = []
-    for target in assessment.targets:
-        if target.target_id not in target_rates:
-            raise ValueError("assessment target has no frozen campaign point")
-        needed, source_count = _source_denominator(
-            target_id=target.target_id, required=required, values=source_counts,
-        )
-        verdict = target_interval_decision(
-            target_rates[target.target_id], target, input_receipt_hashes=dict(hashes),
-            source_denominator_required=needed, source_denominator=source_count,
-        )
-        verdicts[target.target_id] = verdict
-        if verdict.verdict == "inconclusive":
-            reasons.append(f"target:{target.target_id}:{verdict.reason}")
     merge_incomplete = any(merge_receipt[field] for field in (
         "explicit_final_nonterminal_keys", "incomplete_unit_keys", "missing_unit_keys",
     ))
@@ -391,19 +380,64 @@ def reconstruct_campaign_report(
         "authorized_undispatched": tuple(merge_receipt["authorized_undispatched_keys"]),
     }
     if assessment.stopping.mode == "finite_look":
-        last = assessment.stopping.cumulative_looks[-1]
-        observation = FiniteLookObservationV1(
-            look=last, dispatched_shots=max(rate.shots for rate in target_rates.values()),
-            realized_shots=max(rate.shots for rate in target_rates.values()),
-            failures_by_target={target.target_id: target_rates[target.target_id].failures for target in assessment.targets},
-            count_receipt_sha256_by_target={target.target_id: dict(hashes)["merge"] for target in assessment.targets},
+        terminal_by_key = {row["unit"].key: row["terminal"] for row in terminal_rows}
+        observations_for_looks: list[FiniteLookObservationV1] = []
+        for look_index, boundary in enumerate(assessment.stopping.cumulative_looks, start=1):
+            prefix = set(plan.completed_prefix(look_index))
+            counts: dict[str, tuple[int, int, int]] = {}
+            for target in assessment.targets:
+                planned_units = [
+                    unit for unit in plan.units
+                    if unit.key in prefix and unit.point_id == target.target_id
+                    and unit.arm_id == target_arms_by_id[target.target_id]
+                ]
+                completed_statuses = [terminal_by_key[unit.key]["outcome"] for unit in planned_units if unit.key in terminal_by_key]
+                counts[target.target_id] = (
+                    len(planned_units), len(completed_statuses),
+                    sum(status in _ALL_SHOT_FAILURES for status in completed_statuses),
+                )
+            dispatched_counts = {item[0] for item in counts.values()}
+            realized_counts = {item[1] for item in counts.values()}
+            if len(dispatched_counts) != 1 or len(realized_counts) != 1:
+                raise ValueError("finite-look report requires equal target denominators at each declared look")
+            dispatched = dispatched_counts.pop()
+            realized = realized_counts.pop()
+            if dispatched != boundary:
+                raise ValueError("finite-look report target denominator differs from frozen look boundary")
+            observations_for_looks.append(FiniteLookObservationV1(
+                look=boundary, dispatched_shots=dispatched, realized_shots=realized,
+                failures_by_target={target_id: values[2] for target_id, values in counts.items()},
+                count_receipt_sha256_by_target={target.target_id: dict(hashes)["merge"] for target in assessment.targets},
+            ))
+            if realized < dispatched:
+                break
+        finite = finite_look_assessment(
+            assessment, observations=tuple(observations_for_looks), input_receipt_hashes=dict(hashes),
         )
-        finite = finite_look_assessment(assessment, observations=(observation,), input_receipt_hashes=dict(hashes))
         stopping["finite_look_status"] = finite.status
         stopping["completed_looks"] = finite.completed_looks
         stopping["records"] = finite.look_records
         if finite.status != "complete":
             reasons.append(finite.status)
+        if finite.look_records and finite.look_records[-1].complete:
+            verdicts.update(finite.look_records[-1].target_decisions)
+    for target in assessment.targets:
+        if target.target_id not in target_rates:
+            raise ValueError("assessment target has no frozen campaign point")
+        needed, source_count = _source_denominator(
+            target_id=target.target_id, required=required, values=source_counts,
+        )
+        if needed:
+            verdicts[target.target_id] = target_interval_decision(
+                target_rates[target.target_id], target, input_receipt_hashes=dict(hashes),
+                source_denominator_required=True, source_denominator=source_count,
+            )
+        elif target.target_id not in verdicts:
+            verdicts[target.target_id] = target_interval_decision(
+                target_rates[target.target_id], target, input_receipt_hashes=dict(hashes),
+            )
+        if verdicts[target.target_id].verdict == "inconclusive":
+            reasons.append(f"target:{target.target_id}:{verdicts[target.target_id].reason}")
     status: Literal["complete", "inconclusive"] = "inconclusive" if reasons else "complete"
     preliminary = CampaignReportV1(
         schema="campaign_report_v1", status=status, inconclusive_reasons=tuple(sorted(set(reasons))),
