@@ -532,6 +532,42 @@ def _paired_merge_payload(path: str, *, plan: CampaignWorkPlan) -> dict[str, Any
             "materialized_samples_by_identity": indexed_samples}
 
 
+def _paired_report_inputs(
+    *, plan: CampaignWorkPlan, spec: CampaignWorkSpecV1, merged: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Build report inputs only from the independently verified merge envelope."""
+    if spec.assessment is None:
+        raise ValueError("paired report requires a frozen assessment")
+    receipt = {
+        key: value for key, value in merged.items()
+        if key not in {"verified_attempts", "materialized_samples_by_identity"}
+    }
+    attempts = merged.get("verified_attempts")
+    if not isinstance(attempts, tuple):
+        raise ValueError("paired report requires reverified terminal attempts")
+    return {
+        "plan": plan,
+        "assessment": spec.assessment,
+        "merge_receipt": receipt,
+        "input_receipt_hashes": {
+            "campaign": plan.campaign_spec_digest,
+            "plan": plan.campaign_plan_digest,
+            "assessment": spec.assessment.digest(),
+            "merge": receipt["receipt_sha256"],
+            **{f"target:{item.target_id}": item.target_receipt_sha256 for item in spec.assessment.targets},
+        },
+        "source_denominator_required_by_target": spec.source_denominator_required_by_target,
+        "source_denominators": spec.source_denominators,
+        "target_arm_ids": spec.target_arm_ids,
+        "materialized_samples_by_identity": merged["materialized_samples_by_identity"],
+        "work_vectors_by_unit": {item["unit_key"]: item["work_vector"] for item in attempts},
+        # Canonical attempt ledgers presently expose no report allowlisted
+        # executor observations.  The reporting contract records this typed
+        # missingness instead of manufacturing host or scheduler values.
+        "observations": {},
+    }
+
+
 def _paired_scientific_identity(plan: CampaignWorkPlan) -> dict[str, str]:
     """Construct the complete route-independent identity required for retry reduction."""
     spec = plan.work_spec
@@ -848,24 +884,16 @@ def _assess(args: argparse.Namespace) -> dict[str, Any]:
     if plan_path is not None and _read_json(plan_path).get("schema") == "campaign_work_plan_v1":
         spec, work_plan, payload = _load_work_plan(plan_path, root)
         merged = _paired_merge_payload(args.merge, plan=work_plan)
-        receipt = {
-            key: value for key, value in merged.items()
-            if key not in {"verified_attempts", "materialized_samples_by_identity"}
-        }
-        report = reconstruct_campaign_report(
-            plan=work_plan, assessment=spec.assessment, merge_receipt=receipt,
-            input_receipt_hashes={
-                "campaign": work_plan.campaign_spec_digest, "plan": work_plan.campaign_plan_digest,
-                "assessment": spec.assessment.digest(), "merge": receipt["receipt_sha256"],
-                **{f"target:{item.target_id}": item.target_receipt_sha256 for item in spec.assessment.targets},
-            },
-            source_denominator_required_by_target=spec.source_denominator_required_by_target,
-            source_denominators=spec.source_denominators, target_arm_ids=spec.target_arm_ids,
-            materialized_samples_by_identity=merged["materialized_samples_by_identity"],
-            work_vectors_by_unit={item["unit_key"]: item["work_vector"] for item in merged["verified_attempts"]},
-        )
+        if args.output_root is None:
+            raise ValueError("paired assess requires --output-root for immutable report publication")
+        report = reconstruct_campaign_report(**_paired_report_inputs(
+            plan=work_plan, spec=spec, merged=merged,
+        ))
+        artifact = _publish_json(_output_root(args.output_root) / "assessment.json", asdict(report))
         return _artifact(status="ok", plan=payload, phase="assess", assessment_status="evidence_reconstructed",
-                         report=asdict(report))
+                         artifact_path=str(artifact), artifact_sha256=sha256(artifact.read_bytes()).hexdigest(),
+                         report=asdict(report), report_sha256=report.report_sha256,
+                         merge_receipt_sha256=report.merge_receipt_sha256)
     merge = _verified_merge(args.merge, root)
     reports = [member["report"] for member in merge["members"]]
     failures = sum(report["failures"] for report in reports)
@@ -1062,7 +1090,7 @@ def _parser() -> argparse.ArgumentParser:
     item = commands.add_parser("resume")
     item.add_argument("--plan", required=True); item.add_argument("--merge", required=True); item.add_argument("--campaign-root", required=True); item.set_defaults(handler=_resume)
     item = commands.add_parser("assess")
-    item.add_argument("--merge", required=True); item.add_argument("--plan"); item.add_argument("--campaign-root", required=True); item.set_defaults(handler=_assess)
+    item.add_argument("--merge", required=True); item.add_argument("--plan"); item.add_argument("--campaign-root", required=True); item.add_argument("--output-root"); item.set_defaults(handler=_assess)
     item = commands.add_parser("site-capability")
     item.add_argument("--scontrol"); item.add_argument("--sacct"); item.set_defaults(handler=_site_capability)
     item = commands.add_parser("operational-fixture")

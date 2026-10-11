@@ -816,8 +816,44 @@ def test_installed_paired_canonical_local_lifecycle(tmp_path: Path) -> None:
     resumed = _run_installed_campaign("resume", "--plan", plan_path, "--merge", merge_path, "--campaign-root", str(ROOT))
     assert resumed.returncode == 0, resumed.stdout
     assert json.loads(resumed.stdout)["exact_missing_set"] == []
-    assessed = _run_installed_campaign("assess", "--plan", plan_path, "--merge", merge_path, "--campaign-root", str(ROOT))
+    assessed = _run_installed_campaign(
+        "assess", "--plan", plan_path, "--merge", merge_path, "--campaign-root", str(ROOT),
+        "--output-root", str(tmp_path / "assessment"),
+    )
     assert assessed.returncode == 0, assessed.stdout
+
+
+def test_installed_assess_emits_complete_campaign_report(tmp_path: Path) -> None:
+    """The installed assessor publishes an immutable, complete paired report."""
+    document = tmp_path / "paired.json"
+    document.write_text(json.dumps({"campaign_work_spec": _paired_work_spec_payload()}), encoding="utf-8")
+    planned = _run_installed_campaign(
+        "plan", "--campaign", str(document), "--campaign-root", str(ROOT),
+        "--output-root", str(tmp_path / "plan"),
+    )
+    assert planned.returncode == 0, planned.stdout
+    plan_path = json.loads(planned.stdout)["artifact_path"]
+    run = _run_installed_campaign(
+        "run-local", "--plan", plan_path, "--campaign-root", str(ROOT),
+        "--output-root", str(tmp_path / "run"),
+    )
+    assert run.returncode == 0, run.stdout
+    merged = _run_installed_campaign(
+        "merge", "--plan", plan_path, "--receipt", json.loads(run.stdout)["artifact_path"],
+        "--campaign-root", str(ROOT), "--output-root", str(tmp_path / "merge"),
+    )
+    assert merged.returncode == 0, merged.stdout
+    assessed = _run_installed_campaign(
+        "assess", "--plan", plan_path, "--merge", json.loads(merged.stdout)["artifact_path"],
+        "--campaign-root", str(ROOT), "--output-root", str(tmp_path / "assessment"),
+    )
+    assert assessed.returncode == 0, assessed.stdout
+    payload = json.loads(assessed.stdout)
+    assert payload["report"]["schema"] == "campaign_report_v1"
+    assert len(payload["report"]["report_sha256"]) == 64
+    report_path = Path(payload["artifact_path"])
+    assert report_path.name == "assessment.json"
+    assert sha256(report_path.read_bytes()).hexdigest() == payload["artifact_sha256"]
 
 
 def test_paired_canonical_local_and_slurm_routes_match(tmp_path: Path) -> None:
