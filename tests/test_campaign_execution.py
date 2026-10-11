@@ -147,3 +147,60 @@ def test_persisted_sample_receipt_rejects_tampered_bytes_before_decoder_use():
     assert verify_persisted_sample(receipt, artifact) == artifact
     with pytest.raises(ValueError, match="digest"):
         verify_persisted_sample(receipt, b"X" + artifact[1:])
+
+
+def _planning_inputs():
+    from bp_registry.campaigns.planning import CampaignCoordinateV1
+
+    return (
+        "a" * 64,
+        (CampaignCoordinateV1(
+            cohort_id="bb144", point_id="p005", sample_namespace="shared-errors-v1",
+            sample_ids=(2, 7),
+        ),),
+        {"spa": "spa-seed-v1", "ms": "ms-seed-v1"},
+    )
+
+
+def test_unit_key_and_shard_plan_are_acyclic_complete_and_topology_invariant():
+    """Scientific shards are fixed before a local or scheduler allocation exists."""
+    from bp_registry.campaigns.planning import freeze_work_plan, validate_executor_allocation
+
+    digest, coordinates, arms = _planning_inputs()
+    plan = freeze_work_plan(
+        campaign_spec_digest=digest, coordinates=coordinates, arm_seed_identities=arms,
+        look_sample_boundaries=(1, 2), units_per_shard=2,
+    )
+    permuted = freeze_work_plan(
+        campaign_spec_digest=digest, coordinates=coordinates,
+        arm_seed_identities={"ms": "ms-seed-v1", "spa": "spa-seed-v1"},
+        look_sample_boundaries=(1, 2), units_per_shard=2,
+    )
+    assert plan.campaign_plan_digest == permuted.campaign_plan_digest
+    assert plan.unit_keys == permuted.unit_keys
+    assert len(plan.unit_keys) == 4
+    assert len(set(plan.unit_keys)) == 4
+    assert set(key for shard in plan.shards for key in shard.unit_keys) == set(plan.unit_keys)
+    assert b"campaign_plan_digest" not in plan.campaign_plan_preimage
+    assert set(plan.completed_prefix(1)).isdisjoint(plan.authorized_tail(1))
+    assert set(plan.completed_prefix(1)) | set(plan.authorized_tail(1)) == set(plan.unit_keys)
+    assert validate_executor_allocation(plan, {shard.shard_id: index for index, shard in enumerate(plan.shards)})
+    with pytest.raises(ValueError, match="exactly"):
+        validate_executor_allocation(plan, {plan.shards[0].shard_id: 0})
+
+
+def test_shard_plan_rejects_duplicate_coordinates_and_excessive_bounds():
+    """A campaign fails before materializing ambiguous or unbounded work."""
+    from bp_registry.campaigns.planning import CampaignCoordinateV1, freeze_work_plan
+
+    with pytest.raises(ValueError, match="unique"):
+        CampaignCoordinateV1(
+            cohort_id="bb144", point_id="p005", sample_namespace="shared-errors-v1",
+            sample_ids=(7, 7),
+        )
+    digest, coordinates, arms = _planning_inputs()
+    with pytest.raises(ValueError, match="max_total_units"):
+        freeze_work_plan(
+            campaign_spec_digest=digest, coordinates=coordinates, arm_seed_identities=arms,
+            look_sample_boundaries=(1, 2), units_per_shard=2, max_total_units=3,
+        )
