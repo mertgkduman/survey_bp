@@ -79,6 +79,8 @@ class PublicMbbpDecision:
 def _exclusion(member: MbbpMember) -> VoteExclusion:
     if member.status == "budget_denied":
         disposition: VoteExclusionDisposition = "budget_denied"
+    elif member.status == "iteration_cap":
+        disposition = "nonconvergence"
     elif member.status == "converged_original_invalid" or member.original_valid is False:
         disposition = "original_invalid"
     elif member.candidate is None:
