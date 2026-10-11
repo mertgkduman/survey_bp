@@ -1,7 +1,7 @@
 ---
 phase: "08"
 slug: "reproducible-campaigns-and-statistical-assessment"
-status: complete
+status: validated
 nyquist_compliant: true
 wave_0_complete: true
 created: "2026-10-11"
@@ -63,3 +63,14 @@ Site allocation ceilings and production campaign budgets require later user/site
 - [x] Set `nyquist_compliant: true` after the execution audit.
 
 **Approval:** automated evidence complete; production campaign authorization remains denied until measured site ceilings are supplied.
+
+## Validation Audit 2026-10-11
+
+| Metric | Count |
+|--------|-------|
+| Requirements with automated coverage | 9 |
+| Coverage gaps found | 0 |
+| Gaps resolved | 0 |
+| Escalated | 0 |
+
+The requirement map above was checked against the Phase 8 test modules and all fourteen plan summaries. The targeted campaign suite passed 95 tests, the full suite passed 1,125 tests with one skip, and the retained operational gate verified its receipts. Site ceilings remain a separate production authorization condition.
