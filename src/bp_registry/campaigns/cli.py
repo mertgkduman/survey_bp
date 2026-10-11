@@ -629,6 +629,13 @@ def _preflight(args: argparse.Namespace) -> dict[str, Any]:
         raise ValueError("output_root must be a non-symlink directory when it exists")
     if not output.exists() and (not output.parent.is_dir() or output.parent.is_symlink()):
         raise ValueError("output_root parent must be an existing non-symlink directory")
+    document = _read_json(args.campaign)
+    if "campaign_work_spec" in document:
+        spec = _work_document(args.campaign, root)
+        return _artifact(
+            status="ok", plan=_work_plan_payload(spec), phase="preflight",
+            sampling_performed=False,
+        )
     spec, target_receipts = _campaign_spec(args.campaign, root)
     return _artifact(status="ok", plan=_plan_payload(spec, target_receipts), phase="preflight", sampling_performed=False)
 

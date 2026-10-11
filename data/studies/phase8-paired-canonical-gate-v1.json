@@ -1,0 +1,93 @@
+{
+  "campaign_work_spec": {
+    "schema": "campaign_work_spec_v1",
+    "arms": [
+      {
+        "arm_id": "fast",
+        "manifest_path": "data/manifests/phase8-paired-bb144-fast.json",
+        "manifest_sha256": "1b22724f9f0090311dc8eabbe0090538ed741af78c7c66ce79cca454ba29e4ff",
+        "decoder_seed_identity": "phase8-paired-bb144-fast-policy-stream-v1"
+      },
+      {
+        "arm_id": "slow",
+        "manifest_path": "data/manifests/phase8-paired-bb144-slow.json",
+        "manifest_sha256": "8ce0688ac121cf8f4b9d78eb0fff17a91fb7b8472071c7353003c5cf06a47317",
+        "decoder_seed_identity": "phase8-paired-bb144-slow-relay-policy-stream-v1"
+      }
+    ],
+    "shared_sampler": {
+      "code_id": "gross-bb-144",
+      "artifact_raw_sha256": "2c02a3b99bf7267acf35efe28e0a2ef0d3827e5a22b948d53da14ae8df68ceb0",
+      "artifact_semantic_sha256": "e175e67c0f9ae6f4e0968461ad2f87ba38ad5344166b793c53dd038976d4f427",
+      "matrix_sha256": "f9585ea6008c4186cbf0e1928f2346822ec0242f3a41c0a83b51f7127edeb1a7",
+      "channel_family": "css_code_capacity_v1",
+      "x_error_rate": 0.05,
+      "z_error_rate": 0.0,
+      "sampler_algorithm": "bp_registry_sample_shot_v1",
+      "sampler_version": "v1",
+      "physical_sample_namespace": "phase8-paired-bb144-canonical-gate-shared-physical-samples-v1",
+      "physical_sample_seed": 317
+    },
+    "coordinates": [
+      {
+        "cohort_id": "gross-bb-144",
+        "point_id": "p050",
+        "sample_namespace": "phase8-paired-bb144-canonical-gate-shared-physical-samples-v1",
+        "sample_ids": [0, 1]
+      }
+    ],
+    "look_sample_boundaries": [2],
+    "units_per_shard": 2,
+    "assessment": {
+      "schema": "campaign_assessment_v1",
+      "targets": [
+        {
+          "target_id": "development_fixture-not_assessed-all-domain",
+          "target_receipt_sha256": "1b22724f9f0090311dc8eabbe0090538ed741af78c7c66ce79cca454ba29e4ff",
+          "lower": 0.0,
+          "upper": 1.0,
+          "absolute_tolerance": 1.0
+        }
+      ],
+      "interval": {"method": "exact_clopper_pearson", "confidence_level": 0.95},
+      "families": [
+        {
+          "family_id": "phase8-paired-development-fixture-v1",
+          "alpha": 0.05,
+          "member_target_ids": ["development_fixture-not_assessed-all-domain"]
+        }
+      ],
+      "stopping": {"mode": "fixed_shot", "final_shots": 2, "batch_size": 2},
+      "outcome_matrix": {
+        "rule_id": "all_shot_v1",
+        "treatments": [
+          {"terminal_status": "exact", "all_shot": "success", "conditional": "accepted"},
+          {"terminal_status": "stabilizer_equivalent", "all_shot": "success", "conditional": "accepted"},
+          {"terminal_status": "wrong_logical_action", "all_shot": "failure", "conditional": "accepted"},
+          {"terminal_status": "invalid_syndrome", "all_shot": "failure", "conditional": "excluded"},
+          {"terminal_status": "no_proposal", "all_shot": "failure", "conditional": "excluded"},
+          {"terminal_status": "nonconvergence", "all_shot": "failure", "conditional": "excluded"},
+          {"terminal_status": "timeout", "all_shot": "failure", "conditional": "excluded"},
+          {"terminal_status": "postselected_rejection", "all_shot": "failure", "conditional": "excluded"},
+          {"terminal_status": "infrastructure_interruption", "all_shot": "incomplete", "conditional": "incomplete"}
+        ]
+      },
+      "decision_rule": "target_interval_containment_v1",
+      "resources": {
+        "max_shots": 2,
+        "max_looks": 1,
+        "max_batch_size": 2,
+        "max_decoder_work": 20000,
+        "max_events": 4,
+        "max_evidence_bytes": 4194304,
+        "max_storage_bytes": 8388608
+      }
+    },
+    "source_lock_sha256": "2c02a3b99bf7267acf35efe28e0a2ef0d3827e5a22b948d53da14ae8df68ceb0",
+    "environment_lock_sha256": "adff1f54bb2f574a9eec84fc71ff16720d8e29b0051818484612b29c541a7cd4",
+    "dependency_lock_sha256": "61aea04e4a4b7a498ff8799af5261fbda3d1a50bc977da53e00a987b5f6507d0",
+    "target_arm_ids": {"development_fixture-not_assessed-all-domain": "fast"},
+    "source_denominator_required_by_target": {"development_fixture-not_assessed-all-domain": false},
+    "source_denominators": {"development_fixture-not_assessed-all-domain": null}
+  }
+}
