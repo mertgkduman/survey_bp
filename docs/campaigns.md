@@ -45,13 +45,18 @@ bp-registry-campaign run-local --plan <plan-root>/campaign-plan.json --campaign-
 bp-registry-campaign verify --receipt <local-root>/shard-*/receipt.json --campaign-root .
 bp-registry-campaign merge --receipt <local-root>/shard-*/receipt.json --campaign-root . --output-root <merge-root>
 bp-registry-campaign resume --plan <plan-root>/campaign-plan.json --merge <merge-root>/campaign-merge.json --campaign-root .
-bp-registry-campaign assess --merge <merge-root>/campaign-merge.json
+bp-registry-campaign assess --merge <merge-root>/campaign-merge.json --campaign-root .
 ```
 
 All receipt publication is immutable. Re-running a sealed shard into its
 existing destination is an error. Merge accepts exactly one frozen identity and
-unique unit keys. Resume reconstructs the exact missing set from preserved
-receipts; it never guesses work from a scheduler array index.
+unique unit keys, and records a canonical content SHA-256. Both resume and
+assessment re-verify every listed shard and require the merge JSON bytes and
+content hash to equal their canonical reconstruction. Resume
+reconstructs the exact missing set from preserved receipts; it never guesses
+work from a scheduler array index. The one-unit tracer reducer rejects an
+assessment declaring more than one fixed shot rather than reporting a partial
+receipt as complete.
 
 The same frozen unit may be delivered through the bounded Slurm route. It
 emits literal `sbatch` argv and accepts only a precomputed array index. The

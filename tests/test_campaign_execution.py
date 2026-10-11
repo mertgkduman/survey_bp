@@ -794,9 +794,37 @@ def test_cli_lifecycle_uses_preserved_receipts_and_rejects_plan_drift(tmp_path: 
     assert resumed.returncode == 0, resumed.stdout
     assert json.loads(resumed.stdout)["exact_missing_set"] == []
 
-    assessed = _run_campaign_module("assess", "--merge", str(merge_path))
+    assessed = _run_campaign_module(
+        "assess", "--merge", str(merge_path), "--campaign-root", str(ROOT),
+    )
     assert assessed.returncode == 0, assessed.stdout
     assert json.loads(assessed.stdout)["assessment_status"] == "evidence_reconstructed"
+
+    tampered = json.loads(merge_path.read_text(encoding="utf-8"))
+    tampered["members"][0]["report"]["failures"] = 0
+    tampered_path = tmp_path / "tampered-merge.json"
+    tampered_path.write_text(json.dumps(tampered, sort_keys=True) + "\n", encoding="utf-8")
+    rejected_resume = _run_campaign_module(
+        "resume", "--plan", str(plan_path), "--merge", str(tampered_path),
+        "--campaign-root", str(ROOT),
+    )
+    rejected_assess = _run_campaign_module(
+        "assess", "--merge", str(tampered_path), "--campaign-root", str(ROOT),
+    )
+    assert rejected_resume.returncode != 0
+    assert rejected_assess.returncode != 0
+    assert "canonical reconstruction" in json.loads(rejected_assess.stdout)["error"]
+
+    # Valid JSON with different raw bytes must also be rejected: consumers
+    # rehash the retained receipt rather than trusting its merge counter.
+    receipt_path = Path(json.loads(local.stdout)["receipt_path"])
+    receipt_path.write_bytes(receipt_path.read_bytes() + b"\n")
+    receipt_changed = _run_campaign_module(
+        "resume", "--plan", str(plan_path), "--merge", str(merge_path),
+        "--campaign-root", str(ROOT),
+    )
+    assert receipt_changed.returncode != 0
+    assert "canonical reconstruction" in json.loads(receipt_changed.stdout)["error"]
 
     drifted = json.loads(plan_path.read_text(encoding="utf-8"))
     drifted["campaign_plan_digest"] = "0" * 64
@@ -810,6 +838,53 @@ def test_cli_lifecycle_uses_preserved_receipts_and_rejects_plan_drift(tmp_path: 
     assert rejected.returncode != 0
     assert json.loads(rejected.stdout)["status"] == "error"
     assert not rejected_root.exists()
+
+
+def test_one_unit_cli_uses_frozen_confidence_and_refuses_multi_shot_assessment(tmp_path: Path):
+    """A tracer uses its frozen confidence level and cannot complete more shots."""
+    campaign = _write_cli_campaign(tmp_path / "campaign.json")
+    document = json.loads(campaign.read_text(encoding="utf-8"))
+    assessment = document["campaign_spec"]["assessment"]
+    assessment["interval"]["confidence_level"] = 0.9
+    campaign.write_text(json.dumps(document, sort_keys=True), encoding="utf-8")
+    plan_root = tmp_path / "one-shot-planned"
+    planned = _run_campaign_module(
+        "plan", "--campaign", str(campaign), "--campaign-root", str(ROOT),
+        "--output-root", str(plan_root),
+    )
+    assert planned.returncode == 0, planned.stdout
+    local = _run_campaign_module(
+        "run-local", "--plan", str(plan_root / "campaign-plan.json"),
+        "--campaign-root", str(ROOT), "--output-root", str(tmp_path / "one-shot-local"),
+    )
+    assert local.returncode == 0, local.stdout
+    verified = _run_campaign_module(
+        "verify", "--receipt", json.loads(local.stdout)["receipt_path"],
+        "--campaign-root", str(ROOT),
+    )
+    assert verified.returncode == 0, verified.stdout
+    assert json.loads(verified.stdout)["report"]["interval"]["confidence_level"] == 0.9
+
+    assessment["stopping"] = {"mode": "fixed_shot", "final_shots": 2, "batch_size": 1}
+    assessment["resources"]["max_shots"] = 2
+    campaign.write_text(json.dumps(document, sort_keys=True), encoding="utf-8")
+    plan_root = tmp_path / "planned"
+    planned = _run_campaign_module(
+        "plan", "--campaign", str(campaign), "--campaign-root", str(ROOT),
+        "--output-root", str(plan_root),
+    )
+    assert planned.returncode == 0, planned.stdout
+    local = _run_campaign_module(
+        "run-local", "--plan", str(plan_root / "campaign-plan.json"),
+        "--campaign-root", str(ROOT), "--output-root", str(tmp_path / "local"),
+    )
+    assert local.returncode == 0, local.stdout
+    rejected = _run_campaign_module(
+        "verify", "--receipt", json.loads(local.stdout)["receipt_path"],
+        "--campaign-root", str(ROOT),
+    )
+    assert rejected.returncode != 0
+    assert "final_shots other than one" in json.loads(rejected.stdout)["error"]
 
 
 def test_cli_scheduler_route_emits_literal_argv_and_executes_one_frozen_shard(tmp_path: Path):

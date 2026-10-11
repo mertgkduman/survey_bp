@@ -394,10 +394,7 @@ def _merge(args: argparse.Namespace) -> dict[str, Any]:
     if len(identity) != 1 or len({member["unit_key"] for member in members}) != len(members):
         raise ValueError("merge requires unique receipts for exactly one frozen campaign")
     spec_digest, plan_digest = identity.pop()
-    payload = {
-        "schema": _MERGE_SCHEMA, "campaign_spec_digest": spec_digest, "campaign_plan_digest": plan_digest,
-        "members": sorted(members, key=lambda member: str(member["unit_key"])),
-    }
+    payload = _canonical_merge_payload(spec_digest=spec_digest, plan_digest=plan_digest, members=members)
     output = _output_root(args.output_root)
     artifact = _publish_json(output / "campaign-merge.json", payload)
     return {"schema": _CLI_SCHEMA, "status": "ok", "phase": "merge", "campaign_spec_digest": spec_digest,
@@ -405,10 +402,72 @@ def _merge(args: argparse.Namespace) -> dict[str, Any]:
             "artifact_sha256": sha256(artifact.read_bytes()).hexdigest(), "member_count": len(members)}
 
 
+def _canonical_merge_payload(
+    *, spec_digest: str, plan_digest: str, members: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Return the canonical merge and a hash over its non-recursive content."""
+    unsigned = {
+        "schema": _MERGE_SCHEMA,
+        "campaign_spec_digest": spec_digest,
+        "campaign_plan_digest": plan_digest,
+        "members": sorted(members, key=lambda item: str(item["unit_key"])),
+    }
+    return {
+        **unsigned,
+        "merge_content_sha256": sha256(canonical_json_bytes(unsigned)).hexdigest(),
+    }
+
+
+def _verified_merge(merge_path: str, campaign_root: Path) -> dict[str, Any]:
+    """Rebuild a merge receipt from verified immutable shard bytes.
+
+    Merge JSON is a cache of a canonical reduction, never evidence by itself.
+    Every consumer re-verifies the referenced shard and requires byte-for-byte
+    equality with the reduction it reconstructs.
+    """
+    merge_file = Path(merge_path)
+    payload = _read_json(merge_path)
+    expected_fields = {
+        "schema", "campaign_spec_digest", "campaign_plan_digest", "members", "merge_content_sha256",
+    }
+    if set(payload) != expected_fields or payload.get("schema") != _MERGE_SCHEMA:
+        raise ValueError("merge receipt has an invalid schema or field set")
+    raw_members = payload.get("members")
+    if not isinstance(raw_members, list) or not raw_members:
+        raise ValueError("merge receipt requires nonempty members")
+    members: list[dict[str, Any]] = []
+    for member in raw_members:
+        expected_member_fields = {
+            "receipt_path", "receipt_sha256", "campaign_spec_digest",
+            "campaign_plan_digest", "unit_key", "report",
+        }
+        if not isinstance(member, Mapping) or set(member) != expected_member_fields:
+            raise ValueError("merge receipt member has an invalid field set")
+        receipt_path = Path(str(member["receipt_path"]))
+        checked = verify_shard(receipt_path, campaign_root=campaign_root)
+        reconstructed = {
+            "receipt_path": str(receipt_path.resolve()),
+            "receipt_sha256": sha256(receipt_path.read_bytes()).hexdigest(),
+            "campaign_spec_digest": checked["campaign_spec_digest"],
+            "campaign_plan_digest": checked["campaign_plan_digest"],
+            "unit_key": checked["unit_key"],
+            "report": reconstruct_fixed_shot(checked),
+        }
+        members.append(reconstructed)
+    identity = {(member["campaign_spec_digest"], member["campaign_plan_digest"]) for member in members}
+    if len(identity) != 1 or len({member["unit_key"] for member in members}) != len(members):
+        raise ValueError("merge receipt has incomplete or duplicate frozen unit coverage")
+    spec_digest, plan_digest = identity.pop()
+    expected = _canonical_merge_payload(spec_digest=spec_digest, plan_digest=plan_digest, members=members)
+    if payload != expected or merge_file.read_bytes() != canonical_json_bytes(expected) + b"\n":
+        raise ValueError("merge receipt differs from verified canonical reconstruction")
+    return expected
+
+
 def _resume(args: argparse.Namespace) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
     _spec, plan = _load_plan(args.plan, root)
-    merge = _read_json(args.merge)
+    merge = _verified_merge(args.merge, root)
     if merge.get("schema") != _MERGE_SCHEMA or merge.get("campaign_spec_digest") != plan["campaign_spec_digest"] or merge.get("campaign_plan_digest") != plan["campaign_plan_digest"]:
         raise ValueError("merge receipt differs from the frozen campaign plan")
     units = [member.get("unit_key") for member in merge.get("members", [])]
@@ -418,17 +477,11 @@ def _resume(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def _assess(args: argparse.Namespace) -> dict[str, Any]:
-    merge = _read_json(args.merge)
-    if merge.get("schema") != _MERGE_SCHEMA or not isinstance(merge.get("members"), list) or not merge["members"]:
-        raise ValueError("assessment requires a nonempty verified campaign merge")
-    first = merge["members"][0]
-    if not isinstance(first, Mapping) or not isinstance(first.get("report"), Mapping):
-        raise ValueError("merge record lacks verified report evidence")
-    reports = [member.get("report") for member in merge["members"]]
-    if any(not isinstance(report, Mapping) for report in reports):
-        raise ValueError("merge member report is malformed")
-    failures = sum(int(report["failures"]) for report in reports)
-    completed = sum(int(report["completed"]) for report in reports)
+    root = _existing_root(args.campaign_root, name="campaign_root")
+    merge = _verified_merge(args.merge, root)
+    reports = [member["report"] for member in merge["members"]]
+    failures = sum(report["failures"] for report in reports)
+    completed = sum(report["completed"] for report in reports)
     return {"schema": _CLI_SCHEMA, "status": "ok", "phase": "assess",
             "campaign_spec_digest": merge["campaign_spec_digest"], "campaign_plan_digest": merge["campaign_plan_digest"],
             "completed": completed, "failures": failures, "assessment_status": "evidence_reconstructed"}
@@ -611,7 +664,7 @@ def _parser() -> argparse.ArgumentParser:
     item = commands.add_parser("resume")
     item.add_argument("--plan", required=True); item.add_argument("--merge", required=True); item.add_argument("--campaign-root", required=True); item.set_defaults(handler=_resume)
     item = commands.add_parser("assess")
-    item.add_argument("--merge", required=True); item.set_defaults(handler=_assess)
+    item.add_argument("--merge", required=True); item.add_argument("--campaign-root", required=True); item.set_defaults(handler=_assess)
     item = commands.add_parser("site-capability")
     item.add_argument("--scontrol"); item.add_argument("--sacct"); item.set_defaults(handler=_site_capability)
     item = commands.add_parser("operational-fixture")

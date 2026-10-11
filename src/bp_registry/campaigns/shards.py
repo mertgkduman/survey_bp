@@ -14,7 +14,7 @@ from scipy.stats import binomtest
 from ..canonical.verification import validate_canonical_shot
 from ..ledger import read_canonical_events_bytes
 from ..runner import canonical_public_shot_context
-from .contracts import CampaignSpecV1, build_one_unit_plan, canonical_json_bytes
+from .contracts import CampaignSpecV1, FixedShotStoppingV1, build_one_unit_plan, canonical_json_bytes
 from .identity import validate_matched_sample_hashes
 from .planning import CampaignWorkPlan
 
@@ -313,12 +313,31 @@ def verify_shard(receipt_path: str | Path, *, campaign_root: str | Path) -> dict
 
 
 def reconstruct_fixed_shot(verified_shard: Mapping[str, Any]) -> dict[str, Any]:
-    """Compute the declared one-look all-shot rate from a verified terminal only."""
+    """Compute an assessed fixed-shot result only when one unit is complete.
+
+    This reducer is deliberately a tracer boundary.  A campaign that declares
+    more than one final shot needs a complete frozen-work-plan reduction, not a
+    fabricated complete estimate from one verified terminal receipt.
+    """
     terminal = verified_shard.get("terminal_fact")
     if not isinstance(terminal, Mapping) or not isinstance(terminal.get("logical_failure"), bool):
         raise ValueError("verified shard has no all-shot terminal outcome")
+    spec = CampaignSpecV1.model_validate(verified_shard.get("campaign_spec"))
+    assessment = spec.assessment
+    if assessment is None:
+        confidence_level = 0.95
+        status = "tracer_unassessed"
+    else:
+        if not isinstance(assessment.stopping, FixedShotStoppingV1):
+            raise ValueError("one-unit reconstruction requires a frozen fixed-shot assessment")
+        if assessment.stopping.final_shots != 1:
+            raise ValueError("one-unit reconstruction cannot complete a fixed-shot assessment with final_shots other than one")
+        if assessment.interval.method != "exact_clopper_pearson":
+            raise ValueError("one-unit reconstruction requires the frozen exact interval method")
+        confidence_level = assessment.interval.confidence_level
+        status = "fixed_shot_complete"
     failures, completed = int(terminal["logical_failure"]), 1
-    interval = binomtest(failures, completed).proportion_ci(confidence_level=0.95, method="exact")
+    interval = binomtest(failures, completed).proportion_ci(confidence_level=confidence_level, method="exact")
     return {
         "campaign_spec_digest": verified_shard["campaign_spec_digest"],
         "campaign_plan_digest": verified_shard["campaign_plan_digest"],
@@ -327,11 +346,11 @@ def reconstruct_fixed_shot(verified_shard: Mapping[str, Any]) -> dict[str, Any]:
         "estimate": failures / completed,
         "interval": {
             "method": "exact",
-            "confidence_level": 0.95,
+            "confidence_level": confidence_level,
             "lower": float(interval.low),
             "upper": float(interval.high),
         },
-        "status": "fixed_shot_complete",
+        "status": status,
     }
 
 
