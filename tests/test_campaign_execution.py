@@ -146,4 +146,4 @@ def test_persisted_sample_receipt_rejects_tampered_bytes_before_decoder_use():
     )
     assert verify_persisted_sample(receipt, artifact) == artifact
     with pytest.raises(ValueError, match="digest"):
-        verify_persisted_sample(receipt, artifact + b"!")
+        verify_persisted_sample(receipt, b"X" + artifact[1:])
