@@ -1,4 +1,4 @@
-"""Executable-profile declarations are derived, closed, and tamper evident."""
+"""Audited route inventories and fail-closed executable-profile declarations."""
 
 from __future__ import annotations
 
@@ -8,10 +8,22 @@ from pathlib import Path
 import pytest
 
 
-def _profile(path: str | Path):
-    from bp_registry.runner import canonical_public_manifest_context, derive_canonical_executable_maxima
+def _context(path: str | Path):
+    from bp_registry.runner import canonical_public_manifest_context
 
-    return derive_canonical_executable_maxima(canonical_public_manifest_context(path))
+    return canonical_public_manifest_context(path)
+
+
+def _route_inventory(context: object) -> tuple[str, int, int, dict[str, int]]:
+    from bp_registry.canonical.schedules import EdgeTable
+    from bp_registry.runner import _registered_canonical_route, _route_dimensions
+
+    manifest = context.manifest
+    route, _ = _registered_canonical_route(manifest)
+    iterations, work, inventory = _route_dimensions(
+        manifest, EdgeTable.from_check_matrix(context.code.hz), route,
+    )
+    return route, iterations, work, inventory
 
 
 def _v7(*, vote: bool) -> dict[str, object]:
@@ -43,75 +55,99 @@ def _v7(*, vote: bool) -> dict[str, object]:
     return value
 
 
-def test_registered_profiles_cover_baseline_local_relay_phase5_and_v7(tmp_path):
-    baseline = _profile("data/manifests/canonical-three-qubit-development.json")
-    local = _profile("data/manifests/phase3-hsu-group-pilot.json")
-    relay = _profile("data/manifests/phase4-memory-relay-b1.json")
+def test_registered_route_event_inventory_counts_actual_emission_families(tmp_path):
+    baseline = _route_inventory(_context("data/manifests/canonical-three-qubit-development.json"))
+    local = _route_inventory(_context("data/manifests/phase3-hsu-group-pilot.json"))
+    relay = _route_inventory(_context("data/manifests/phase4-memory-relay-b1.json"))
 
     campaign = json.loads(Path("data/manifests/phase5-b1-calibration.json").read_text())
     assert isinstance(campaign["arm_manifests"], dict)
-    phase5_path = tmp_path / "phase5.json"
+    phase5_path = tmp_path / "phase5-guided.json"
     phase5_path.write_text(json.dumps(campaign["arm_manifests"]["guided_decimation"]))
-    phase5 = _profile(phase5_path)
+    phase5 = _route_inventory(_context(phase5_path))
 
     v7_list_path = tmp_path / "v7-list.json"
     v7_list_path.write_text(json.dumps(_v7(vote=False)))
     v7_vote_path = tmp_path / "v7-vote.json"
     v7_vote_path.write_text(json.dumps(_v7(vote=True)))
-    v7_list, v7_vote = _profile(v7_list_path), _profile(v7_vote_path)
+    v7_list, v7_vote = _route_inventory(_context(v7_list_path)), _route_inventory(_context(v7_vote_path))
 
-    assert (baseline.route, local.route, relay.route, phase5.route) == (
-        "baseline", "local:group_shuffled", "relay", "phase5",
+    assert baseline[0] == "baseline" and sum(baseline[3].values()) == 8
+    assert local[0] == "local:group_shuffled" and sum(local[3].values()) == 8
+    assert relay[0] == "relay" and relay[3]["relay_transfer"] == 1
+    assert phase5[0] == "phase5:guided_decimation"
+    assert phase5[3]["transform"] == phase5[3]["attempt"] == phase5[3]["lift"] == 16
+    assert phase5[3]["attempt_original_check"] == 16
+    # MBBP work leaves are emitted for every completed local-member step plus
+    # its original check. Vote ballots are one event per admitted member,
+    # each carrying the whole coordinate vector.
+    assert v7_list[0] == "v7-list" and v7_list[3]["work_leaf"] > 2
+    assert v7_vote[0] == "v7-vote" and v7_vote[3]["vote_ballot"] == 2
+    assert v7_vote[3]["vote_aggregate"] == 1
+
+
+@pytest.mark.parametrize("path", [
+    "data/manifests/canonical-three-qubit-development.json",
+    "data/manifests/phase3-hsu-group-pilot.json",
+    "data/manifests/phase4-memory-relay-b1.json",
+])
+def test_serializer_bound_fails_closed_until_event_payload_schemas_are_bounded(path):
+    from bp_registry.runner import derive_canonical_executable_maxima
+
+    with pytest.raises(ValueError, match="lacks closed per-kind canonical event payload schemas"):
+        derive_canonical_executable_maxima(_context(path))
+
+
+def _declared_profile():
+    from bp_registry.runner import CanonicalExecutableMaximaV1
+
+    return CanonicalExecutableMaximaV1(
+        "v1", "fixture", "1" * 64, "2" * 64, "3" * 64, "4" * 64, "5" * 64,
+        2, 3, 5, 7, 11, 13, 6, 5, 48, 59,
     )
-    assert (v7_list.route, v7_vote.route) == ("v7-list", "v7-vote")
-    # Coordinate ballots are a distinct reachable V7 event class and cannot
-    # silently inherit the list profile.
-    assert v7_vote.max_ledger_events_per_unit > v7_list.max_ledger_events_per_unit
-    for profile in (baseline, local, relay, phase5, v7_list, v7_vote):
-        assert profile.derived_work_per_unit == profile.max_decoder_iterations * profile.work_per_iteration
-        assert profile.derived_events_per_unit == profile.max_ledger_events_per_unit
-        assert profile.derived_evidence_bytes_per_unit == (
-            profile.max_ledger_events_per_unit * profile.serializer_bytes_per_event
-            + profile.partial_receipt_reserve_bytes
-        )
-        assert profile.derived_storage_bytes_per_unit == (
-            profile.artifact_storage_bytes_per_unit + profile.derived_evidence_bytes_per_unit
-        )
 
 
-def test_each_profile_field_and_digest_is_exactly_verified():
+def test_declaration_verifier_rejects_stale_and_understated_plan16_receipt_fields():
+    from bp_registry.campaigns.contracts import FailureCountExecutableLimitReceiptV1
     from bp_registry.runner import verify_declared_executable_limits
 
-    profile = _profile("data/manifests/canonical-three-qubit-development.json")
-    pristine = profile.as_evidence()
+    profile = _declared_profile()
+    declared = profile.as_evidence()
+    receipt = FailureCountExecutableLimitReceiptV1.model_validate({
+        "schema": "failure_count_executable_limit_receipt_v1", **declared,
+    })
+    assert receipt.derived_storage_bytes_per_unit == 59
     verify_declared_executable_limits(
-        pristine, expected_policy_binding=profile.policy_binding_sha256, derived=profile,
+        declared, expected_policy_binding=profile.policy_binding_sha256, derived=profile,
     )
-    for field, value in pristine.items():
-        altered = dict(pristine)
+    for field, value in declared.items():
+        altered = dict(declared)
         altered[field] = ("0" * 64 if isinstance(value, str) else value - 1)
         with pytest.raises(ValueError, match=field):
             verify_declared_executable_limits(
                 altered, expected_policy_binding=profile.policy_binding_sha256, derived=profile,
             )
-    missing = dict(pristine)
-    missing.pop("derived_storage_bytes_per_unit")
     with pytest.raises(ValueError, match="extra or missing"):
         verify_declared_executable_limits(
-            missing, expected_policy_binding=profile.policy_binding_sha256, derived=profile,
-        )
-    extra = {**pristine, "untrusted_multiplier": 1}
-    with pytest.raises(ValueError, match="extra or missing"):
-        verify_declared_executable_limits(
-            extra, expected_policy_binding=profile.policy_binding_sha256, derived=profile,
-        )
-    with pytest.raises(ValueError, match="policy_binding_sha256"):
-        verify_declared_executable_limits(
-            pristine, expected_policy_binding="0" * 64, derived=profile,
+            {**declared, "untrusted_multiplier": 1},
+            expected_policy_binding=profile.policy_binding_sha256, derived=profile,
         )
 
 
-def test_unregistered_postprocessor_route_fails_closed(tmp_path):
+def test_artifact_layout_and_control_reserve_fail_closed_without_bounded_schemas():
+    from bp_registry.canonical.schedules import EdgeTable
+    from bp_registry.runner import _artifact_layout_bytes, _neutral_interruption_reserve
+
+    context = _context("data/manifests/canonical-three-qubit-development.json")
+    with pytest.raises(ValueError, match="closed materialized-sample and engine-result artifact layout"):
+        _artifact_layout_bytes(context.manifest, EdgeTable.from_check_matrix(context.code.hz))
+    with pytest.raises(ValueError, match="bounded interruption-control receipt schema"):
+        _neutral_interruption_reserve(context.manifest)
+
+
+def test_unregistered_beam_route_fails_closed(tmp_path):
+    from bp_registry.runner import derive_canonical_executable_maxima
+
     value = json.loads(Path("data/manifests/canonical-three-qubit-development.json").read_text())
     value["schema_version"] = 8
     value["postprocessing_config"] = {"enabled": False}
@@ -119,4 +155,4 @@ def test_unregistered_postprocessor_route_fails_closed(tmp_path):
     path.write_text(json.dumps(value))
 
     with pytest.raises(ValueError, match="unregistered canonical manifest route"):
-        _profile(path)
+        derive_canonical_executable_maxima(_context(path))

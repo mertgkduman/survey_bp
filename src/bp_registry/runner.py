@@ -13,10 +13,7 @@ from pathlib import Path
 import time
 from typing import Any, Callable, Literal, Mapping
 
-from .ledger import (
-    canonical_event_template_bounds, canonical_serializer_descriptor,
-    CanonicalResourceInterruption, Writer, read_canonical_events,
-)
+from .ledger import canonical_serializer_descriptor, CanonicalResourceInterruption, Writer, read_canonical_events
 from .canonical.metrics import unavailable_metric
 from .canonical.execution import run_canonical_structural_shot
 from .canonical.verification import PublicShotContext
@@ -352,9 +349,9 @@ def _registered_canonical_route(manifest: object) -> tuple[str, int]:
     if isinstance(manifest, CanonicalExperimentV7):
         return ("v7-vote" if manifest.vote is not None else "v7-list", 6)
     if isinstance(manifest, CanonicalExperimentV6):
-        return ("guided" if manifest.intervention.kind == "guided_decimation" else "phase5", 5)
+        return f"phase5:{manifest.intervention.kind}", 5
     if isinstance(manifest, CanonicalExperimentV5):
-        return "phase5", 5
+        return f"phase5:{manifest.intervention.kind}", 5
     if isinstance(manifest, CanonicalExperimentV4) and manifest.relay is not None:
         return "relay", 4
     if isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4)):
@@ -379,141 +376,107 @@ def _route_dimensions(manifest: object, table: EdgeTable, route: str) -> tuple[i
     """Return named route quantities from validated manifest and code facts."""
     core_sweep_work = 2 * table.edge_count + table.variable_count + table.check_count
     iterations = getattr(manifest, "budgets").attempt.max_iterations
-    named: dict[str, int] = {
-        "shot_begin": 1, "attempt": 1, "work": 1, "termination": 1,
-        "candidate": 1, "selection": 1,
-    }
     if route.startswith("local:"):
-        # The local scheduler uses the same message/update graph but commits a
-        # local boundary after each selected edge/check/variable unit.
-        named.update({"trace_link": 1, "runtime": 1, "missingness": 1})
-        return iterations, core_sweep_work, named
+        # Normal completion is the largest mutually reachable branch.  A
+        # numerical-failure branch adds ``missingness`` but omits candidate and
+        # selection, so it has two fewer events.
+        return iterations, core_sweep_work, {
+            "shot_begin": 1, "attempt": 1, "runtime": 1, "candidate": 1,
+            "selection": 1, "trace_link": 1, "work": 1, "termination": 1,
+        }
     if route == "baseline":
-        named.update({"trace_link": 1, "runtime": 1, "missingness": 1})
-        return iterations, core_sweep_work, named
+        return iterations, core_sweep_work, {
+            "shot_begin": 1, "attempt": 1, "runtime": 1, "candidate": 1,
+            "selection": 1, "trace_link": 1, "work": 1, "termination": 1,
+        }
     if route == "relay":
         legs = manifest.relay.total_leg_limit
-        named["relay_transfer"] = max(0, legs - 1)
-        return _checked_product(iterations, legs, name="relay iteration units"), core_sweep_work, named
-    if route == "guided":
-        rounds = manifest.intervention.round_limit
-        sweeps = manifest.intervention.sweeps_per_round
-        named["intervention"] = rounds
-        return _checked_product(rounds, sweeps, name="guided iteration units"), core_sweep_work, named
-    if route == "phase5":
-        # The V5 controller has one emitted intervention/branch fact for each
-        # admitted bounded action; all limits are already cross-validated by
-        # the public V5 manifest validator.
-        actions = manifest.intervention_limits.max_total_actions
-        named.update({"intervention": actions, "branch": actions, "original_check": actions,
-                      "evaluation": 1, "runtime": 1})
+        return _checked_product(iterations, legs, name="relay iteration units"), core_sweep_work, {
+            "shot_begin": 1, "attempt": 1, "relay_transfer": max(0, legs - 1),
+            "work": 1, "candidate": 1, "selection": 1, "termination": 1,
+        }
+    if route.startswith("phase5:"):
+        kind = route.removeprefix("phase5:")
+        spec = manifest.intervention
+        attempts = {
+            "identity": iterations,
+            "guided_decimation": spec.round_limit,
+            "impulse": spec.attempt_cap,
+            "freezing": spec.retry_cap,
+            "syndrome_flip": spec.test_cap,
+            "sign_flip": 1,
+        }.get(kind)
+        if kind == "restart_belief":
+            attempts = _checked_product(spec.eta, spec.t_cap, name="restart attempts")
+        if attempts is None:
+            raise ValueError(f"unregistered Phase 5 intervention route {kind!r}")
+        # `_run_phase5_structural_shot` emits one header intervention, then
+        # transform/attempt/lift and at most one original-check per projected
+        # controller attempt.  Only Restart exposes branch rows, bounded by
+        # eta; all other controllers expose no branch row.
+        branches = spec.eta if kind == "restart_belief" else 0
+        named = {
+            "shot_begin": 1, "intervention": 1, "branch": branches,
+            "transform": attempts, "attempt": attempts, "lift": attempts,
+            "attempt_original_check": attempts,
+            "candidate": 1, "selected_original_check": 1, "selection": 1,
+            "work": 1, "evaluation": 1, "runtime": 1, "termination": 1,
+        }
         return _checked_product(iterations, manifest.intervention_limits.max_total_attempts,
                                 name="phase5 iteration units"), core_sweep_work, named
     if route in {"v7-list", "v7-vote"}:
         members = len(manifest.ensemble.bases)
-        named.update({
-            "basis": members, "member": members, "candidate_origin": members,
-            "duplicate_group": members, "work_leaf": members, "evaluation": 1,
-        })
+        local_steps = min(_checked_product(iterations, table.check_count, name="MBBP local steps"),
+                          manifest.ensemble.max_member_c2v_updates)
+        work_leaves = _checked_product(members, local_steps + 1, name="MBBP work leaves")
         if route == "v7-vote":
-            named.update({
-                "vote_electorate": 1, "vote_exclusion": members,
-                "vote_ballot": _checked_product(members, table.variable_count, name="vote ballots"),
-                "vote_aggregate": table.variable_count, "vote_validation": 1, "bp_only": members,
-            })
-        return _checked_product(iterations, members, name="MBBP iteration units"), core_sweep_work, named
+            # A ballot contains every coordinate, hence there is one ballot
+            # event per admitted member, rather than one event per bit.
+            return _checked_product(iterations, members, name="MBBP iteration units"), core_sweep_work, {
+                "shot_begin": 1, "basis": members, "member": members,
+                "vote_electorate": 1, "vote_ballot": members,
+                "vote_aggregate": 1, "vote_validation": 1,
+                "work_leaf": work_leaves, "evaluation": 1, "termination": 1,
+            }
+        return _checked_product(iterations, members, name="MBBP iteration units"), core_sweep_work, {
+            "shot_begin": 1, "basis": members, "member": members,
+            "candidate_origin": members, "duplicate_group": members,
+            "selection": 1, "original_check": 1, "work_leaf": work_leaves,
+            "evaluation": 1, "termination": 1,
+        }
     raise ValueError(f"unregistered canonical route {route!r}")
 
 
 def _profile_event_template(*, ledger_version: int, route: str, manifest: object, table: EdgeTable) -> dict[str, dict[str, object]]:
-    """Build serializer-validated upper envelopes for reachable event kinds.
+    """Refuse a fabricated event-byte template until the grammar is closed.
 
-    The event grammar intentionally leaves most ``data`` payloads extensible.
-    These envelopes populate every variable-size datum that an engine route
-    can carry (candidate bits, lineages, policy identity, work leaves and
-    member data) from this manifest's concrete bounds.  They are measured by
-    the production canonical serializer, including JSONL framing.
+    The current canonical validator verifies only the outer event envelope for
+    V2--V4 and allows open ``data`` objects at several real emission sites.
+    V5/V7 narrow two envelope keys but leave their nested payload open.  A
+    candidate-shaped object with invented fields can pass that validator, but
+    is not a template emitted by the engine and cannot prove a byte maximum.
     """
-    _, _, inventory = _route_dimensions(manifest, table, route)
-    identity = {
-        "manifest_sha256": "f" * 64, "execution_identity": "f" * 64,
-        "composition_identity": "f" * 64, "route": route,
-    }
-    payload = {
-        "candidate": [1] * table.variable_count,
-        "syndrome": [1] * table.check_count,
-        "lineage": "f" * 64,
-        "work_vector": {name: 2**31 - 1 for name in getattr(manifest, "budgets").attempt.work_limits.as_evidence()},
-        "member_ids": ["m" * 64] * (len(manifest.ensemble.bases) if isinstance(manifest, CanonicalExperimentV7) else 1),
-    }
-    templates: dict[str, dict[str, object]] = {}
-    for event_name in inventory:
-        # Candidate is accepted by every structural grammar and permits the
-        # full route payload envelope.  The template label records the actual
-        # reachable emission site whose bytes it bounds.
-        event: dict[str, object] = {
-            "kind": "candidate", "ledger_version": ledger_version,
-            "event_id": "canonical-" + "f" * 20, "run_id": manifest.run_id,
-            "shot_id": manifest.budgets.max_shots - 1,
-            "data": {"identity": identity, "payload": {**payload, "bounded_event": event_name}},
-        }
-        if ledger_version in {2, 3, 4, 7}:
-            event["data"] = {**identity, **payload, "bounded_event": event_name}
-        templates[event_name] = event
-    return templates
-
-
-def _canonical_json_size(value: object) -> int:
-    return len(json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False,
-                          allow_nan=False).encode("utf-8"))
+    del ledger_version, manifest, table
+    raise ValueError(
+        f"registered route {route!r} lacks closed per-kind canonical event payload schemas; "
+        "an exact framed-byte maximum cannot be derived"
+    )
 
 
 def _artifact_layout_bytes(manifest: object, table: EdgeTable) -> tuple[int, dict[str, int]]:
-    """Size caller-owned sample/result artifacts separately from the ledger."""
-    # This is the exact MaterializedPhysicalSampleV1 shape, instantiated at
-    # the concrete code dimensions and documented field limits (three 256-byte
-    # identifiers).  It is deliberately not included in ledger evidence.
-    encoded_n = 4 * ((table.variable_count + 2) // 3)
-    encoded_checks = 4 * ((table.check_count + 2) // 3)
-    sample = {
-        "schema": "materialized_physical_sample_v1", "physical_sample_identity": "f" * 64,
-        "sample_seed_identity": "f" * 64, "cohort_id": "x" * 256, "point_id": "x" * 256,
-        "sample_namespace": "x" * 256, "sample_id": manifest.budgets.max_shots - 1,
-        "sampler_contract_sha256": "f" * 64, "x_dtype": "uint8", "x_shape": [table.variable_count],
-        "x_bytes_b64": "A" * encoded_n, "z_dtype": "uint8", "z_shape": [table.variable_count],
-        "z_bytes_b64": "A" * encoded_n,
-        "observations": {name: {"check_type": name, "dtype": "uint8", "shape": [table.check_count],
-                                  "bytes_b64": "A" * encoded_checks} for name in ("X", "Z")},
-        "physical_error_sha256": "f" * 64, "materialized_sample_sha256": "f" * 64,
-    }
-    result = {
-        "schema": "canonical_materialized_terminal_v1", "run_id": manifest.run_id,
-        "shot_id": manifest.budgets.max_shots - 1, "termination": "count_budget_exhausted",
-        "candidate": [1] * table.variable_count, "ledger_sha256": "f" * 64,
-    }
-    trace = 0 if getattr(manifest, "trace_plan").level == "off" else getattr(manifest, "trace_plan").max_bytes
-    layout = {"materialized_sample": _canonical_json_size(sample), "engine_result": _canonical_json_size(result),
-              "trace_sidecar": trace}
-    return sum(layout.values()), layout
+    """Reject unresolved non-ledger layouts before a hard-cap declaration."""
+    del manifest, table
+    raise ValueError(
+        "canonical executable profile requires a closed materialized-sample and engine-result artifact layout"
+    )
 
 
 def _neutral_interruption_reserve(manifest: object) -> int:
-    """Measure the engine-neutral interruption envelope reserved for a caller."""
-    envelope = {
-        "schema": "canonical_materialized_interruption_v1", "snapshot": {
-            "profile_digest": "f" * 64, "authorization_identity": "f" * 64,
-            "scientific_events": 2**63 - 1, "scientific_evidence_bytes": 2**63 - 1,
-            "scientific_storage_bytes": 2**63 - 1, "control_receipt_bytes": 2**63 - 1,
-            "interruption_kind": "evidence_bytes", "boundary": "v7:member:before_work",
-            "attempted_bytes": 2**63 - 1, "deadline_ns": 2**63 - 1,
-            "before_ns": 2**63 - 1, "after_ns": 2**63 - 1, "overshoot_ns": 2**63 - 1,
-        },
-        # The engine passes a digest-sized caller binding, never an arbitrary
-        # path or receipt body.  Plan 09-17 must separately check its concrete
-        # caller receipt against this dedicated reserve before dispatch.
-        "caller_context_sha256": "f" * 64, "run_id": manifest.run_id,
-    }
-    return _canonical_json_size(envelope)
+    """Reject an unbounded caller receipt rather than reserve a guessed size."""
+    del manifest
+    raise ValueError(
+        "canonical executable profile requires a versioned bounded interruption-control receipt schema"
+    )
 
 
 def derive_canonical_executable_maxima(context: "CanonicalPublicManifestContext") -> CanonicalExecutableMaximaV1:
@@ -531,8 +494,8 @@ def derive_canonical_executable_maxima(context: "CanonicalPublicManifestContext"
     iterations, work_per_iteration, event_inventory = _route_dimensions(manifest, table, route)
     events = sum(event_inventory.values())
     serializer = canonical_serializer_descriptor(structural_event_version=ledger_version)
-    template_bounds = canonical_event_template_bounds(
-        _profile_event_template(ledger_version=ledger_version, route=route, manifest=manifest, table=table)
+    template_bounds = _profile_event_template(
+        ledger_version=ledger_version, route=route, manifest=manifest, table=table,
     )
     serializer_bytes = max(template_bounds.values())
     control_reserve = _neutral_interruption_reserve(manifest)

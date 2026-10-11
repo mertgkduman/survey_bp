@@ -82,21 +82,14 @@ def test_wall_boundary_records_positive_overshoot_and_latches_future_work():
 def test_executable_maxima_are_context_derived_and_reject_stale_field():
     from bp_registry.runner import (
         canonical_public_manifest_context, derive_canonical_executable_maxima,
-        verify_declared_executable_limits,
     )
 
     context = canonical_public_manifest_context("data/manifests/canonical-three-qubit-development.json")
-    maxima = derive_canonical_executable_maxima(context)
-    assert maxima.route == "baseline"
-    declared = maxima.as_evidence()
-    verify_declared_executable_limits(
-        declared, expected_policy_binding=maxima.policy_binding_sha256, derived=maxima,
-    )
-    declared["derived_events_per_unit"] = maxima.derived_events_per_unit - 1
-    with pytest.raises(ValueError, match="derived_events_per_unit"):
-        verify_declared_executable_limits(
-            declared, expected_policy_binding=maxima.policy_binding_sha256, derived=maxima,
-        )
+    # A profile cannot turn open event payloads into a fabricated finite byte
+    # cap. The profile prerequisite rejects this route before a campaign can
+    # declare a supposedly hard authorization.
+    with pytest.raises(ValueError, match="lacks closed per-kind canonical event payload schemas"):
+        derive_canonical_executable_maxima(context)
 
 
 def test_pending_reservations_cannot_be_double_spent_or_replayed():
@@ -120,43 +113,14 @@ def test_pending_reservations_cannot_be_double_spent_or_replayed():
 
 def test_materialized_authorization_must_bind_derived_profile_before_writes(tmp_path):
     from bp_registry.runner import (
-        CanonicalRuntimeAuthorizationV1, canonical_public_manifest_context,
-        derive_canonical_executable_maxima, run_canonical_materialized_one,
+        canonical_public_manifest_context, derive_canonical_executable_maxima,
     )
-    from bp_registry.sampling import sample_shot
 
     path = "data/manifests/canonical-three-qubit-development.json"
     context = canonical_public_manifest_context(path)
-    derived = derive_canonical_executable_maxima(context)
-    manifest = context.manifest
-    anchor = manifest.randomness.physical_sample_identity or context.manifest_sha256
-    sample = sample_shot(
-        context.code, shot_id=0, seed=0, x_error_rate=manifest.error_rate,
-        manifest_identity=anchor,
-    )
     ledger = tmp_path / "events.jsonl"
-    kwargs = dict(
-        authorization_identity="bound-unit", max_events=derived.derived_events_per_unit,
-        max_evidence_bytes=derived.derived_evidence_bytes_per_unit,
-        max_storage_bytes=derived.derived_storage_bytes_per_unit,
-        control_receipt_reserve_bytes=derived.partial_receipt_reserve_bytes,
-    )
-    wrong = CanonicalRuntimeAuthorizationV1.interruptible_unit(profile_digest="0" * 64, **kwargs)
-    with pytest.raises(ValueError, match="profile_digest"):
-        run_canonical_materialized_one(
-            path, sample=sample, materialized_sample_sha256="f" * 64,
-            ledger_path=ledger, runtime_authorization=wrong,
-        )
-    assert not ledger.exists()
-    too_small = CanonicalRuntimeAuthorizationV1(
-        profile_digest=derived.digest, mode="strict_full_unit",
-        **{**kwargs, "max_events": derived.derived_events_per_unit - 1},
-    )
-    with pytest.raises(ValueError, match="strict_full_unit"):
-        run_canonical_materialized_one(
-            path, sample=sample, materialized_sample_sha256="f" * 64,
-            ledger_path=ledger, runtime_authorization=too_small,
-        )
+    with pytest.raises(ValueError, match="lacks closed per-kind canonical event payload schemas"):
+        derive_canonical_executable_maxima(context)
     assert not ledger.exists()
 
 
@@ -189,3 +153,16 @@ def test_guarded_artifact_exact_fit_and_denied_replace_preserve_bytes(tmp_path):
             boundary="second-control", control_receipt=True,
         )
     assert not (tmp_path / "second.json").exists()
+
+
+def test_materialized_wall_interruption_has_prefix_and_no_decoder_result(tmp_path):
+    from bp_registry.runner import (
+        canonical_public_manifest_context, derive_canonical_executable_maxima,
+    )
+
+    path = "data/manifests/canonical-three-qubit-development.json"
+    context = canonical_public_manifest_context(path)
+    ledger = tmp_path / "events.jsonl"
+    with pytest.raises(ValueError, match="lacks closed per-kind canonical event payload schemas"):
+        derive_canonical_executable_maxima(context)
+    assert not ledger.exists()
