@@ -455,6 +455,7 @@ def _scheduler_observation(api, *, task_id: str, state: str = "COMPLETED"):
         job_id="81234", task_id=task_id, allocated_cpus=1, elapsed_seconds=2,
         state=state, exit_code=0 if state == "COMPLETED" else 1,
         accounting_available=None, accounting_unavailable_reason="sacct was unavailable",
+        launch_overhead_seconds=1, shard_fixed_cost_seconds=1,
     )
 
 
@@ -485,6 +486,7 @@ def test_executor_equivalence_keeps_scheduler_receipts_out_of_scientific_results
     assert slurm["merge_receipt_sha256"] == api.scientific_records_digest(local["scientific_records"])
     assert all("scheduler" not in record for record in slurm["scientific_records"])
     assert all(receipt["executor_receipt"]["scheduler"]["accounting_available"] is None for receipt in slurm["task_receipts"])
+    assert all(receipt["executor_receipt"]["scheduler"]["launch_overhead_seconds"] == 1 for receipt in slurm["task_receipts"])
 
 
 def test_scheduler_receipt_preemption_cancellation_and_duplicate_delivery_are_incomplete(tmp_path: Path):

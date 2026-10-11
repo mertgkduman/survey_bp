@@ -9,9 +9,13 @@ observations that belong in executor receipts, outside scientific identity.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from hashlib import sha256
+import json
+from pathlib import Path
 import re
-from typing import Final, Mapping
+from typing import Any, Callable, Final, Mapping, Sequence
 
+from .execution import execute_local_work_plan
 from .planning import CampaignWorkPlan, ShardPlan
 
 
@@ -21,6 +25,7 @@ _MAX_CPUS_PER_TASK: Final = 64
 _MAX_MEMORY_MB: Final = 1_048_576
 _MAX_WALL_MINUTES: Final = 10_080
 _MAX_IDENTIFIER_LENGTH: Final = 64
+_MAX_ELAPSED_SECONDS: Final = 31_622_400
 _IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,63}\Z")
 
 
@@ -72,6 +77,69 @@ class SlurmAllocation:
             "memory_mb": self.memory_mb,
             "cpus_per_task": self.cpus_per_task,
             "max_concurrent_tasks": self.max_concurrent_tasks,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class SchedulerObservation:
+    """Allowlisted scheduler facts attached to one array-task receipt.
+
+    The values are deliberately observational.  They are not input to work
+    planning, sample derivation, or assessment and have no place in either
+    campaign digest.
+    """
+
+    job_id: str
+    task_id: str
+    allocated_cpus: int
+    elapsed_seconds: int
+    state: str
+    exit_code: int
+    accounting_available: bool | None
+    accounting_unavailable_reason: str | None
+    launch_overhead_seconds: int
+    shard_fixed_cost_seconds: int
+
+    def __post_init__(self) -> None:
+        _validated_identifier(self.job_id, name="job_id")
+        if not isinstance(self.task_id, str) or not self.task_id.isdecimal() or str(int(self.task_id)) != self.task_id:
+            raise ValueError("task_id must be a canonical decimal Slurm array index")
+        _bounded_integer(self.allocated_cpus, name="allocated_cpus", maximum=_MAX_CPUS_PER_TASK)
+        if type(self.elapsed_seconds) is not int or not 0 <= self.elapsed_seconds <= _MAX_ELAPSED_SECONDS:
+            raise ValueError(f"elapsed_seconds must be an integer in [0, {_MAX_ELAPSED_SECONDS}]")
+        for name in ("launch_overhead_seconds", "shard_fixed_cost_seconds"):
+            value = getattr(self, name)
+            if type(value) is not int or not 0 <= value <= _MAX_ELAPSED_SECONDS:
+                raise ValueError(f"{name} must be an integer in [0, {_MAX_ELAPSED_SECONDS}]")
+        if self.state not in {"COMPLETED", "FAILED", "PREEMPTED", "CANCELLED"}:
+            raise ValueError("scheduler state must be a supported terminal Slurm state")
+        if type(self.exit_code) is not int or not 0 <= self.exit_code <= 255:
+            raise ValueError("exit_code must be an integer in [0, 255]")
+        if self.state == "COMPLETED" and self.exit_code != 0:
+            raise ValueError("COMPLETED scheduler state requires exit code zero")
+        if self.state != "COMPLETED" and self.exit_code == 0:
+            raise ValueError("non-completed scheduler state requires a nonzero exit code")
+        if self.accounting_available is True:
+            if self.accounting_unavailable_reason is not None:
+                raise ValueError("available accounting cannot carry an unavailable reason")
+        elif self.accounting_available is None:
+            if not isinstance(self.accounting_unavailable_reason, str) or not self.accounting_unavailable_reason:
+                raise ValueError("unavailable accounting requires an explicit reason")
+        else:
+            raise ValueError("accounting_available must be true or unavailable")
+
+    def payload(self) -> dict[str, int | str | bool | None]:
+        return {
+            "job_id": self.job_id,
+            "task_id": self.task_id,
+            "allocated_cpus": self.allocated_cpus,
+            "elapsed_seconds": self.elapsed_seconds,
+            "state": self.state,
+            "exit_code": self.exit_code,
+            "accounting_available": self.accounting_available,
+            "accounting_unavailable_reason": self.accounting_unavailable_reason,
+            "launch_overhead_seconds": self.launch_overhead_seconds,
+            "shard_fixed_cost_seconds": self.shard_fixed_cost_seconds,
         }
 
 
@@ -196,4 +264,141 @@ def parse_site_capabilities(
             True if sacct_text is not None else None,
             None if sacct_text is not None else "sacct output was not supplied",
         ),
+    }
+
+
+def scientific_records_digest(records: Sequence[Mapping[str, Any]]) -> str:
+    """Hash only already-reconstructed scientific facts in frozen record order."""
+    if not isinstance(records, (tuple, list)) or any(not isinstance(record, Mapping) for record in records):
+        raise ValueError("scientific records must be an ordered mapping sequence")
+    payload = json.dumps(list(records), sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("ascii")
+    return sha256(payload).hexdigest()
+
+
+def _scheduler_receipt(
+    *, plan: CampaignWorkPlan, shard: ShardPlan, allocation: SlurmAllocation,
+    observation: SchedulerObservation, execution: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    if execution is None:
+        terminal: tuple[str, ...] = ()
+        incomplete = shard.unit_keys
+        scientific: tuple[Mapping[str, Any], ...] = ()
+        records: tuple[Mapping[str, Any], ...] = ()
+    else:
+        terminal = tuple(execution["terminal_unit_keys"])
+        incomplete = tuple(execution["incomplete_unit_keys"])
+        scientific = tuple(execution["scientific_records"])
+        records = tuple(execution["records"])
+    return {
+        "schema": "campaign_slurm_task_receipt_v1",
+        "campaign_spec_digest": plan.campaign_spec_digest,
+        "campaign_plan_digest": plan.campaign_plan_digest,
+        "shard_id": shard.shard_id,
+        "terminal_unit_keys": terminal,
+        "incomplete_unit_keys": incomplete,
+        "resume_unit_keys": incomplete,
+        "scientific_records": scientific,
+        "records": records,
+        "executor_receipt": {
+            "requested_allocation": allocation.payload(),
+            "scheduler": observation.payload(),
+        },
+    }
+
+
+def execute_slurm_array_task(
+    plan: CampaignWorkPlan,
+    *,
+    array_task_id: str,
+    output_root: str | Path,
+    unit_runner: Callable[[dict[str, Any], str], Mapping[str, Any]],
+    allocation: SlurmAllocation,
+    observation: SchedulerObservation,
+) -> dict[str, Any]:
+    """Execute one selected frozen shard, or retain its scheduler interruption.
+
+    A non-completed scheduler task never invokes the decoder.  Its exact
+    selected shard remains visibly incomplete for the established resume
+    reducer, rather than becoming a fabricated scientific terminal.
+    """
+    shard = select_array_shard(plan, array_task_id)
+    if not isinstance(allocation, SlurmAllocation) or not isinstance(observation, SchedulerObservation):
+        raise ValueError("Slurm task execution requires validated receipt observations")
+    if observation.task_id != array_task_id:
+        raise ValueError("scheduler task receipt differs from selected array task")
+    execution: Mapping[str, Any] | None = None
+    if observation.state == "COMPLETED":
+        execution = execute_local_work_plan(
+            plan,
+            output_root=output_root,
+            workers=1,
+            unit_runner=unit_runner,
+            shards=(shard,),
+        )
+    return _scheduler_receipt(
+        plan=plan, shard=shard, allocation=allocation,
+        observation=observation, execution=execution,
+    )
+
+
+def execute_synthetic_slurm_array(
+    plan: CampaignWorkPlan,
+    *,
+    output_root: str | Path,
+    unit_runner: Callable[[dict[str, Any], str], Mapping[str, Any]],
+    allocation: SlurmAllocation,
+    observations: Sequence[SchedulerObservation],
+) -> dict[str, Any]:
+    """Run a bounded, deterministic array harness for transport equivalence tests.
+
+    This is deliberately not a scheduler client.  It supplies documented task
+    observations to the same single-shard entry point so tests can distinguish
+    scheduling receipts from replayable scientific evidence without submitting
+    any work to a site scheduler.
+    """
+    if not isinstance(plan, CampaignWorkPlan) or not isinstance(allocation, SlurmAllocation):
+        raise ValueError("synthetic Slurm execution requires frozen plan and allocation")
+    typed_observations = tuple(observations)
+    if len(typed_observations) != len(plan.shards) or any(
+        not isinstance(item, SchedulerObservation) for item in typed_observations
+    ):
+        raise ValueError("synthetic Slurm execution requires one observation per frozen shard")
+    task_ids = tuple(item.task_id for item in typed_observations)
+    if len(set(task_ids)) != len(task_ids):
+        raise ValueError("synthetic Slurm execution rejects duplicate array delivery")
+    expected_ids = tuple(str(index) for index in range(len(plan.shards)))
+    if set(task_ids) != set(expected_ids):
+        raise ValueError("synthetic Slurm execution requires exact frozen array coverage")
+    root = Path(output_root)
+    root.mkdir(parents=True, exist_ok=True)
+    task_receipts = tuple(
+        execute_slurm_array_task(
+            plan,
+            array_task_id=task_id,
+            output_root=root / f"array-{task_id}",
+            unit_runner=unit_runner,
+            allocation=allocation,
+            observation=next(item for item in typed_observations if item.task_id == task_id),
+        )
+        for task_id in expected_ids
+    )
+    records_by_key = {
+        str(record["unit_key"]): record
+        for receipt in task_receipts
+        for record in receipt["scientific_records"]
+    }
+    scientific = tuple(records_by_key[key] for key in plan.unit_keys if key in records_by_key)
+    terminal = tuple(record["unit_key"] for record in scientific)
+    incomplete = tuple(
+        key for receipt in task_receipts for key in receipt["incomplete_unit_keys"]
+    )
+    return {
+        "schema": "campaign_synthetic_slurm_execution_v1",
+        "campaign_spec_digest": plan.campaign_spec_digest,
+        "campaign_plan_digest": plan.campaign_plan_digest,
+        "terminal_unit_keys": terminal,
+        "incomplete_unit_keys": incomplete,
+        "scientific_records": scientific,
+        "merge_receipt_sha256": scientific_records_digest(scientific),
+        "task_receipts": task_receipts,
     }
