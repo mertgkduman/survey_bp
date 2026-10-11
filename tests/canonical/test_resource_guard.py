@@ -305,3 +305,42 @@ def test_materialized_wall_interruption_has_prefix_and_no_decoder_result(tmp_pat
     assert result.interruption is not None
     assert result.interruption.snapshot.interruption_kind == "wall_deadline"
     assert all(json.loads(line)["kind"] != "termination" for line in ledger.read_text().splitlines())
+
+
+def test_strict_profile_authorizes_one_verified_materialized_terminal(tmp_path):
+    from bp_registry.ledger import read_canonical_events
+    from bp_registry.runner import (
+        CanonicalRuntimeAuthorizationV1, CANONICAL_GUARDED_ARTIFACT_BYTE_CEILING_V1,
+        canonical_public_manifest_context, derive_canonical_executable_maxima,
+        run_canonical_materialized_one,
+    )
+    from bp_registry.sampling import sample_shot
+
+    path = "data/manifests/canonical-three-qubit-development.json"
+    context = canonical_public_manifest_context(path)
+    profile = derive_canonical_executable_maxima(context)
+    manifest = context.manifest
+    sample = sample_shot(
+        context.code, shot_id=0, seed=0, x_error_rate=manifest.error_rate,
+        manifest_identity=manifest.randomness.physical_sample_identity or context.manifest_sha256,
+    )
+    authorization = CanonicalRuntimeAuthorizationV1.strict_full_unit(
+        profile_digest=profile.digest, authorization_identity="strict-unit",
+        max_events=profile.derived_events_per_unit,
+        max_evidence_bytes=profile.derived_evidence_bytes_per_unit,
+        max_storage_bytes=profile.derived_storage_bytes_per_unit,
+        control_receipt_reserve_bytes=profile.partial_receipt_reserve_bytes,
+        max_event_bytes=profile.serializer_bytes_per_event,
+        max_artifact_bytes=CANONICAL_GUARDED_ARTIFACT_BYTE_CEILING_V1,
+        derived_events=profile.derived_events_per_unit,
+        derived_evidence_bytes=profile.derived_evidence_bytes_per_unit,
+        derived_storage_bytes=profile.derived_storage_bytes_per_unit,
+    )
+    ledger = tmp_path / "events.jsonl"
+    result = run_canonical_materialized_one(
+        path, sample=sample, materialized_sample_sha256="f" * 64,
+        ledger_path=ledger, runtime_authorization=authorization,
+    )
+    assert result.status == "terminal"
+    assert result.interruption is None
+    assert read_canonical_events(ledger)[-1]["kind"] == "termination"
