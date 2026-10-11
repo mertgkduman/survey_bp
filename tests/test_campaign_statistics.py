@@ -631,3 +631,36 @@ def test_report_marks_missing_source_denominator_inconclusive() -> None:
     )
     assert report.status == "inconclusive"
     assert report.verdicts["p050"].reason == "missing_required_source_denominator"
+
+
+def test_report_keeps_work_resources_and_missingness_separate() -> None:
+    api = importlib.import_module("bp_registry.campaigns.reporting")
+    plan, assessment, merged, hashes = _report_inputs()
+    work = {
+        plan.units[0].key: {"bp_calls": 12, "message_work": 24, "branch_work": 3},
+        plan.units[1].key: {"bp_calls": 9, "message_work": 18},
+    }
+    report = api.reconstruct_campaign_report(
+        plan=plan, assessment=assessment, merge_receipt=merged, input_receipt_hashes=hashes,
+        target_arm_ids={"p050": "first"}, work_vectors_by_unit=work,
+        observations={
+            "environment": {"OMP_NUM_THREADS": "1"},
+            "timing": {"wall_time_ns": 41},
+            "parallel_allocation": {"workers": 2},
+        },
+    )
+    point = report.point_reports[0]
+    resources = point.work_and_resources
+    assert point.status_counts == (("exact", 2), ("timeout", 1), ("wrong_logical_action", 1))
+    assert point.accepted_samples == 3
+    assert dict(resources.work_vectors)[plan.units[0].key] == (
+        ("bp_calls", 12), ("branch_work", 3), ("message_work", 24),
+    )
+    assert dict(resources.unavailable)["memory"] == "not present in verified merge terminal evidence"
+    assert dict(resources.observations)["environment"] == {"OMP_NUM_THREADS": "1"}
+    with pytest.raises(ValueError, match="allowlisted"):
+        api.reconstruct_campaign_report(
+            plan=plan, assessment=assessment, merge_receipt=merged, input_receipt_hashes=hashes,
+            target_arm_ids={"p050": "first"},
+            observations={"environment": {"DATABASE_PASSWORD": "leak"}},
+        )

@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_statistics.py -k 'denominator or acceptance or work or resource or timeout or missingness' -x",
+  "exitCode": 1,
+  "targetTest": "test_report_keeps_work_resources_and_missingness_separate",
+  "targetFile": "tests/test_campaign_statistics.py",
+  "expected": "Campaign reports expose typed work and resource facts while rejecting secret-bearing environment observations.",
+  "actual": "Failed: DID NOT RAISE <class 'ValueError'> for DATABASE_PASSWORD in environment observation",
+  "output": "TAP version 13\nnot ok 1 - test_report_keeps_work_resources_and_missingness_separate\n  ---\n  message: Failed: DID NOT RAISE <class 'ValueError'>\n  ...\n1..1\n# tests 1\n# pass 0\n# fail 1\n"
+}
