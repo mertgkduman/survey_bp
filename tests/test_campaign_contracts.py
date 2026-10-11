@@ -70,6 +70,53 @@ def _assessment_payload(*, mode: str = "fixed_shot") -> dict[str, object]:
     }
 
 
+def _failure_count_payload() -> dict[str, object]:
+    """A bounded Yao-style design with a realized target-th-failure receipt."""
+    payload = _assessment_payload()
+    payload.update(
+        {
+            "interval": {
+                "method": "exact_inverse_binomial",
+                "confidence_level": 0.95,
+                "stopping_event": "decoder_logical_failure_v1",
+                "target_failures": 100,
+                "inferential_trials": 117,
+                "inferential_prefix_sha256": _hash("prefix"),
+                "authorized_tail_count": 3,
+                "authorized_tail_sha256": _hash("tail"),
+            },
+            "stopping": {
+                "mode": "failure_count",
+                "target_failures": 100,
+                "batch_size": 20,
+                "shot_order": "campaign_cohort_point_sample_ordinal_v1",
+                "failure_event": "decoder_logical_failure_v1",
+                "terminal_batch_authorization_sha256": _hash("d"),
+                "cap_authorization_sha256": _hash("e"),
+                "terminal_state": "target_reached",
+                "terminal_failure_ordinal": 117,
+                "cumulative_failures_before_terminal": 99,
+                "cumulative_failures_at_terminal": 100,
+                "authorized_tail_ordinals": [118, 119, 120],
+            },
+            "decision_rule": {
+                "rule": "multiplicative_target_interval_containment_v1",
+                "factor": 1.5,
+            },
+            "resources": {
+                "max_shots": 200,
+                "max_looks": 1,
+                "max_batch_size": 20,
+                "max_decoder_work": 10000,
+                "max_events": 1000,
+                "max_evidence_bytes": 1000000,
+                "max_storage_bytes": 2000000,
+            },
+        }
+    )
+    return payload
+
+
 def test_campaign_assessment_is_strict_and_digest_bound():
     from bp_registry.campaigns import contracts
 
@@ -145,6 +192,44 @@ def test_stopping_rejects_fixed_interim_look_and_unbounded_alpha_spending():
     ]
     with pytest.raises(ValidationError):
         CampaignAssessmentV1.model_validate(finite)
+
+
+def test_failure_count_stopping_binds_ordered_prefix_tail_and_censoring():
+    from bp_registry.campaigns import contracts
+
+    assert hasattr(contracts, "FailureCountStoppingV1"), "failure-count stopping must be a public strict contract"
+    FailureCountStoppingV1 = contracts.FailureCountStoppingV1
+
+    payload = _failure_count_payload()
+    stopping = FailureCountStoppingV1.model_validate(payload["stopping"])
+    assert stopping.mode == "failure_count"
+    assert stopping.shot_order == "campaign_cohort_point_sample_ordinal_v1"
+    assert stopping.terminal_failure_ordinal == 117
+    assert stopping.cumulative_failures_before_terminal == 99
+    assert stopping.cumulative_failures_at_terminal == 100
+    assert stopping.authorized_tail_ordinals == (118, 119, 120)
+
+    tail_outside_terminal_batch = copy.deepcopy(payload["stopping"])
+    tail_outside_terminal_batch["authorized_tail_ordinals"] = [118, 121]
+    with pytest.raises(ValidationError):
+        FailureCountStoppingV1.model_validate(tail_outside_terminal_batch)
+
+    outcome_dependent_order = copy.deepcopy(payload["stopping"])
+    outcome_dependent_order["shot_order"] = "completion_order"
+    with pytest.raises(ValidationError):
+        FailureCountStoppingV1.model_validate(outcome_dependent_order)
+
+    censored = copy.deepcopy(payload["stopping"])
+    censored.update(
+        {
+            "terminal_state": "cap_censored",
+            "terminal_failure_ordinal": None,
+            "cumulative_failures_before_terminal": None,
+            "cumulative_failures_at_terminal": 99,
+            "authorized_tail_ordinals": [],
+        }
+    )
+    assert FailureCountStoppingV1.model_validate(censored).terminal_state == "cap_censored"
 
 
 def test_outcome_denominator_matrix_is_total_and_interruption_stays_partial():
