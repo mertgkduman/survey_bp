@@ -9,7 +9,7 @@ from typing import Final, Mapping, Sequence
 from pydantic import Field, field_validator, model_validator
 
 from ..manifests import StrictModel
-from .contracts import canonical_json_bytes
+from .contracts import CampaignWorkSpecV1, canonical_json_bytes
 from .identity import decoder_randomness_identity, physical_sample_identity, unit_key
 
 
@@ -108,6 +108,7 @@ class CampaignWorkPlan:
     units_per_sample_group: int
     campaign_plan_preimage: bytes
     campaign_plan_digest: str
+    work_spec: CampaignWorkSpecV1 | None = None
 
     @property
     def unit_keys(self) -> tuple[str, ...]:
@@ -231,6 +232,31 @@ def freeze_work_plan(
         campaign_spec_digest=digest, units=units, shards=tuple(shards), look_boundaries=boundaries,
         units_per_sample_group=len(arms),
         campaign_plan_preimage=preimage, campaign_plan_digest=_plan_digest(unsigned_payload),
+    )
+
+
+def freeze_campaign_work_spec(spec: CampaignWorkSpecV1) -> CampaignWorkPlan:
+    """Freeze a complete paired document through the established work algebra."""
+    if not isinstance(spec, CampaignWorkSpecV1):
+        raise ValueError("freeze_campaign_work_spec requires CampaignWorkSpecV1")
+    plan = freeze_work_plan(
+        campaign_spec_digest=spec.digest(),
+        coordinates=tuple(CampaignCoordinateV1(
+            cohort_id=item.cohort_id, point_id=item.point_id,
+            sample_namespace=item.sample_namespace, sample_ids=item.sample_ids,
+        ) for item in spec.coordinates),
+        arm_seed_identities={arm.arm_id: arm.decoder_seed_identity for arm in spec.arms},
+        look_sample_boundaries=spec.look_sample_boundaries,
+        units_per_shard=spec.units_per_shard,
+        max_total_units=spec.assessment.resources.max_events,
+        max_shards=min(_MAX_SHARDS, spec.assessment.resources.max_events),
+        max_serialized_bytes=spec.assessment.resources.max_evidence_bytes,
+    )
+    return CampaignWorkPlan(
+        campaign_spec_digest=plan.campaign_spec_digest, units=plan.units, shards=plan.shards,
+        look_boundaries=plan.look_boundaries, units_per_sample_group=plan.units_per_sample_group,
+        campaign_plan_preimage=plan.campaign_plan_preimage, campaign_plan_digest=plan.campaign_plan_digest,
+        work_spec=spec,
     )
 
 

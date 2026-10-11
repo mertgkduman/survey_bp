@@ -165,6 +165,87 @@ def test_public_campaign_facade_exports_work_plan() -> None:
     assert expected <= set(api.__all__)
 
 
+def _paired_work_spec_payload() -> dict[str, object]:
+    """One bounded physical error and two real canonical decoder calls."""
+    from bp_registry.runner import canonical_public_manifest_context
+
+    manifest = ROOT / INNER_MANIFEST
+    context = canonical_public_manifest_context(manifest)
+    public = context.manifest
+    matrix = sha256(context.code.hx.tobytes(order="C") + b"\0" + context.code.hz.tobytes(order="C")).hexdigest()
+    outcomes = [
+        {"terminal_status": status, "all_shot": all_shot, "conditional": conditional}
+        for status, all_shot, conditional in (
+            ("exact", "success", "accepted"), ("stabilizer_equivalent", "success", "accepted"),
+            ("wrong_logical_action", "failure", "accepted"), ("invalid_syndrome", "failure", "excluded"),
+            ("no_proposal", "failure", "excluded"), ("nonconvergence", "failure", "excluded"),
+            ("timeout", "failure", "excluded"), ("postselected_rejection", "failure", "excluded"),
+            ("infrastructure_interruption", "incomplete", "incomplete"),
+        )
+    ]
+    return {
+        "schema": "campaign_work_spec_v1",
+        "arms": [
+            {"arm_id": "left", "manifest_path": INNER_MANIFEST, "manifest_sha256": sha256(manifest.read_bytes()).hexdigest(), "decoder_seed_identity": public.randomness.decoder_seed_identity},
+            {"arm_id": "right", "manifest_path": INNER_MANIFEST, "manifest_sha256": sha256(manifest.read_bytes()).hexdigest(), "decoder_seed_identity": public.randomness.decoder_seed_identity},
+        ],
+        "shared_sampler": {
+            "code_id": public.artifact.code_id, "artifact_raw_sha256": public.artifact.raw_sha256,
+            "artifact_semantic_sha256": public.artifact.semantic_sha256, "matrix_sha256": matrix,
+            "channel_family": "css_code_capacity_v1", "x_error_rate": public.error_rate, "z_error_rate": 0.0,
+            "sampler_algorithm": "bp_registry_sample_shot_v1", "sampler_version": "v1",
+            "physical_sample_namespace": public.randomness.physical_sample_identity or context.manifest_sha256,
+            "physical_sample_seed": public.randomness.sample_seed,
+        },
+        "coordinates": [{"cohort_id": "paired", "point_id": "p100", "sample_namespace": public.randomness.physical_sample_identity or context.manifest_sha256, "sample_ids": [0]}],
+        "look_sample_boundaries": [1], "units_per_shard": 2,
+        "assessment": {
+            "schema": "campaign_assessment_v1", "targets": [{"target_id": "paired-target", "target_receipt_sha256": "a" * 64, "lower": 0.0, "upper": 1.0, "absolute_tolerance": 0.0}],
+            "interval": {"method": "exact_clopper_pearson", "confidence_level": 0.95},
+            "families": [{"family_id": "paired-family", "alpha": 0.05, "member_target_ids": ["paired-target"]}],
+            "stopping": {"mode": "fixed_shot", "final_shots": 1, "batch_size": 1},
+            "outcome_matrix": {"rule_id": "all_shot_v1", "treatments": outcomes}, "decision_rule": "target_interval_containment_v1",
+            "resources": {"max_shots": 1, "max_looks": 1, "max_batch_size": 1, "max_decoder_work": 1000, "max_events": 2, "max_evidence_bytes": 1_000_000, "max_storage_bytes": 1_000_000},
+        },
+        "source_lock_sha256": "b" * 64, "environment_lock_sha256": "c" * 64, "dependency_lock_sha256": "d" * 64,
+        "target_arm_ids": {"paired-target": "left"}, "source_denominator_required_by_target": {}, "source_denominators": {},
+    }
+
+
+def test_paired_canonical_replays_identical_error_bytes(tmp_path: Path) -> None:
+    api = _campaign_api()
+    assert api is not None
+    plan = api.freeze_campaign_work_spec(api.CampaignWorkSpecV1.model_validate(_paired_work_spec_payload()))
+    result = api.run_canonical_work_plan(plan, campaign_root=ROOT, output_root=tmp_path)
+    attempts = result["verified_attempts"]
+    assert len(attempts) == 2
+    assert attempts[0]["materialized_sample_sha256"] == attempts[1]["materialized_sample_sha256"]
+    assert attempts[0]["physical_error_sha256"] == attempts[1]["physical_error_sha256"]
+    assert plan.units[0].decoder_randomness_identity != plan.units[1].decoder_randomness_identity
+
+
+def test_paired_canonical_rejects_equal_labels_with_different_material(tmp_path: Path) -> None:
+    api = _campaign_api()
+    assert api is not None
+    payload = _paired_work_spec_payload()
+    payload["shared_sampler"]["x_error_rate"] = 0.2  # type: ignore[index]
+    plan = api.freeze_campaign_work_spec(api.CampaignWorkSpecV1.model_validate(payload))
+    with pytest.raises(ValueError, match="incompatible"):
+        api.run_canonical_work_plan(plan, campaign_root=ROOT, output_root=tmp_path)
+    assert not list(tmp_path.iterdir())
+
+
+def test_paired_canonical_rejects_attempt_or_ledger_tamper(tmp_path: Path) -> None:
+    api = _campaign_api()
+    assert api is not None
+    plan = api.freeze_campaign_work_spec(api.CampaignWorkSpecV1.model_validate(_paired_work_spec_payload()))
+    result = api.run_canonical_work_plan(plan, campaign_root=ROOT, output_root=tmp_path)
+    tampered = dict(result["verified_attempts"][0])
+    tampered["canonical_ledger_sha256"] = "0" * 64
+    with pytest.raises(ValueError, match="receipt bytes"):
+        api.verify_canonical_attempt(record=tampered, plan=plan)
+
+
 def _planning_inputs():
     from bp_registry.campaigns.planning import CampaignCoordinateV1
 

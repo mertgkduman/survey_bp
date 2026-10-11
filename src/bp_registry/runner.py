@@ -567,6 +567,84 @@ def canonical_public_shot_context(manifest_path: str | Path, *, shot_id: int) ->
     return canonical_public_manifest_context(manifest_path).shot_context(shot_id)
 
 
+def run_canonical_materialized_one(
+    manifest_path: str | Path, *, sample: sampling.ShotSample,
+    materialized_sample_sha256: str, ledger_path: str | Path,
+    manifest_bytes: bytes | None = None,
+):
+    """Run one verified caller-supplied physical sample without resampling.
+
+    The supplied sample is evaluator-owned: policy execution receives only its
+    decoder observation through ``run_canonical_structural_shot``.  This seam
+    deliberately does not use ``shot_context`` because that convenience method
+    samples a fresh error for every manifest.
+    """
+    if not isinstance(sample, sampling.ShotSample):
+        raise ValueError("materialized canonical execution requires a ShotSample")
+    if not isinstance(materialized_sample_sha256, str) or len(materialized_sample_sha256) != 64:
+        raise ValueError("materialized sample requires a SHA-256 identity")
+    public = canonical_public_manifest_context(manifest_path, manifest_bytes=manifest_bytes)
+    manifest = public.manifest
+    if not 0 <= sample.shot_id < manifest.budgets.max_shots:
+        raise ValueError("materialized sample shot ID is outside the canonical manifest budget")
+    anchor = manifest.randomness.physical_sample_identity or public.manifest_sha256
+    expected_identity = sha256(
+        f"bp-registry-sample-v1\0{anchor}\0{sample.shot_id}".encode()
+    ).hexdigest()
+    if sample.sample_identity != expected_identity:
+        raise ValueError("materialized sample identity differs from the pinned sampler contract")
+    code = public.code
+    if sample.hidden.x.dtype.name != "uint8" or sample.hidden.z.dtype.name != "uint8":
+        raise ValueError("materialized error vectors must be uint8")
+    if sample.hidden.x.shape != (code.n,) or sample.hidden.z.shape != (code.n,):
+        raise ValueError("materialized error vectors differ from the pinned code size")
+    expected_z = ((code.hz.astype("int64") @ sample.hidden.x) % 2).astype("uint8")
+    expected_x = ((code.hx.astype("int64") @ sample.hidden.z) % 2).astype("uint8")
+    if (set(sample.observations) != {"X", "Z"}
+            or sample.observation.check_type != "Z"
+            or sample.observation.syndrome.dtype.name != "uint8"
+            or not (sample.observation.syndrome == expected_z).all()
+            or not (sample.observations["Z"].syndrome == expected_z).all()
+            or not (sample.observations["X"].syndrome == expected_x).all()):
+        raise ValueError("materialized sample observations differ from recomputed syndromes")
+    verification_context = PublicShotContext(
+        manifest_sha256=public.manifest_sha256,
+        artifact_raw_sha256=manifest.artifact.raw_sha256,
+        artifact_semantic_sha256=manifest.artifact.semantic_sha256,
+        compact_manifest=public.compact_manifest,
+        sample_seed_identity=sample.sample_identity,
+        run_id=manifest.run_id, shot_id=sample.shot_id,
+        check_type=sample.observation.check_type,
+        syndrome=tuple(int(value) for value in sample.observation.syndrome.tolist()),
+        code_id=manifest.artifact.code_id, evidence_relation=manifest.evidence.relation,
+        fixture=manifest.evidence.fixture, assessment_status=manifest.evidence.assessment_status,
+        decoder_seed_identity=manifest.randomness.decoder_seed_identity, code=code,
+        hidden_truth=sample.hidden, error_rate=manifest.error_rate,
+        max_iterations=manifest.budgets.attempt.max_iterations, work_limits=public.work_limits,
+        composition_identity=public.composition_identity, policy_effects=public.policy_effects,
+        profile_plan=public.profile_plan, trace_plan=public.trace_plan,
+        phase5_limits=public._phase5_limits, update_kind=manifest.policies.update.kind,
+        schedule_kind=manifest.policies.schedule.kind,
+    )
+    return run_canonical_structural_shot(
+        public.compact_manifest, code=code, observation=sample.observation,
+        hidden_truth=sample.hidden, shot_id=sample.shot_id, ledger_path=ledger_path,
+        sample_seed_identity=sample.sample_identity, verification_context=verification_context,
+        execution_controls=_canonical_execution_controls(manifest, code),
+        memory_execution_context=verification_context.memory_execution_context,
+        context={
+            "manifest_sha256": public.manifest_sha256,
+            "artifact_raw_sha256": manifest.artifact.raw_sha256,
+            "artifact_semantic_sha256": manifest.artifact.semantic_sha256,
+            "code_id": manifest.artifact.code_id, "evidence_relation": manifest.evidence.relation,
+            "fixture": manifest.evidence.fixture, "assessment_status": manifest.evidence.assessment_status,
+            "decoder_seed_identity": manifest.randomness.decoder_seed_identity,
+            "composition_identity": public.composition_identity,
+            "execution_identity": verification_context.execution_identity,
+        },
+    )
+
+
 def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path):
     """Sample outside the engine, then evaluate only a frozen original-space candidate."""
     verification_context = canonical_public_shot_context(manifest_path, shot_id=shot_id)

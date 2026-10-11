@@ -8,6 +8,7 @@ frozen plan and other campaign modules.
 from __future__ import annotations
 
 from concurrent.futures import ProcessPoolExecutor, as_completed
+import base64
 from hashlib import sha256
 import json
 import os
@@ -17,8 +18,11 @@ import tempfile
 import time
 from typing import Any, Callable, Mapping
 
-from ..runner import canonical_public_shot_context, run_canonical_one
-from .contracts import CampaignSpecV1, build_one_unit_plan
+from .. import sampling
+from ..canonical.verification import validate_canonical_shot
+from ..ledger import read_canonical_events
+from ..runner import canonical_public_manifest_context, canonical_public_shot_context, run_canonical_materialized_one, run_canonical_one
+from .contracts import CampaignSpecV1, CampaignWorkSpecV1, MaterializedPhysicalSampleV1, build_one_unit_plan, canonical_json_bytes
 from .identity import validate_matched_sample_hashes
 from .planning import CampaignWorkPlan, ShardPlan
 from .shards import _resolve_manifest, _terminal_fact, publish_sealed_shard, seal_receipt
@@ -523,3 +527,226 @@ def run_one_unit(
         raise
     return {**receipt, "receipt_path": str(destination / "receipt.json"),
             "campaign_spec_bytes": plan.campaign_spec_bytes, "campaign_plan_preimage": plan.campaign_plan_preimage}
+
+
+def _work_manifest_path(root: Path, path_text: str, expected_sha256: str) -> Path:
+    """Resolve one declared arm without allowing path or byte substitution."""
+    candidate = root.joinpath(*Path(path_text).parts)
+    if candidate.is_symlink() or not candidate.is_file() or root not in candidate.resolve().parents:
+        raise ValueError("campaign arm manifest must be a confined regular file")
+    if sha256(candidate.read_bytes()).hexdigest() != expected_sha256:
+        raise ValueError("campaign arm manifest bytes differ from the frozen hash")
+    return candidate
+
+
+def _matrix_sha256(context: Any) -> str:
+    code = context.code
+    return sha256(code.hx.tobytes(order="C") + b"\0" + code.hz.tobytes(order="C")).hexdigest()
+
+
+def _preflight_work_arms(spec: CampaignWorkSpecV1, root: Path) -> dict[str, tuple[Path, Any]]:
+    """Reject equal labels with unequal physical inputs before any evidence write."""
+    resolved: dict[str, tuple[Path, Any]] = {}
+    required = spec.shared_sampler
+    for arm in spec.arms:
+        path = _work_manifest_path(root, arm.manifest_path, arm.manifest_sha256)
+        context = canonical_public_manifest_context(path, manifest_bytes=path.read_bytes())
+        manifest = context.manifest
+        actual = {
+            "code_id": manifest.artifact.code_id,
+            "artifact_raw_sha256": manifest.artifact.raw_sha256,
+            "artifact_semantic_sha256": manifest.artifact.semantic_sha256,
+            "matrix_sha256": _matrix_sha256(context),
+            "x_error_rate": manifest.error_rate,
+            "physical_sample_namespace": manifest.randomness.physical_sample_identity or context.manifest_sha256,
+            "physical_sample_seed": manifest.randomness.sample_seed,
+        }
+        expected = {
+            "code_id": required.code_id, "artifact_raw_sha256": required.artifact_raw_sha256,
+            "artifact_semantic_sha256": required.artifact_semantic_sha256,
+            "matrix_sha256": required.matrix_sha256, "x_error_rate": required.x_error_rate,
+            "physical_sample_namespace": required.physical_sample_namespace,
+            "physical_sample_seed": required.physical_sample_seed,
+        }
+        if actual != expected:
+            raise ValueError("campaign arms have incompatible code or channel sampling material")
+        if manifest.randomness.decoder_seed_identity != arm.decoder_seed_identity:
+            raise ValueError("campaign arm decoder seed differs from its frozen manifest")
+        resolved[arm.arm_id] = (path, context)
+    return resolved
+
+
+def _sample_digest(domain: str, payload: object) -> str:
+    return sha256(domain.encode("ascii") + b"\0" + canonical_json_bytes(payload)).hexdigest()
+
+
+def _materialized_from_sample(*, plan: CampaignWorkPlan, unit: Any, spec: CampaignWorkSpecV1, sample: sampling.ShotSample) -> MaterializedPhysicalSampleV1:
+    observations = {
+        name: {
+            "check_type": observed.check_type, "dtype": observed.syndrome.dtype.name,
+            "shape": list(observed.syndrome.shape),
+            "bytes_b64": base64.b64encode(observed.syndrome.tobytes(order="C")).decode("ascii"),
+        }
+        for name, observed in sorted(sample.observations.items())
+    }
+    x_b64 = base64.b64encode(sample.hidden.x.tobytes(order="C")).decode("ascii")
+    z_b64 = base64.b64encode(sample.hidden.z.tobytes(order="C")).decode("ascii")
+    error_sha = _sample_digest("bp-registry-physical-error-v1", {"x": x_b64, "z": z_b64})
+    unsigned = {
+        "schema": "materialized_physical_sample_v1", "physical_sample_identity": unit.physical_sample_identity,
+        "sample_seed_identity": sample.sample_identity, "cohort_id": unit.cohort_id, "point_id": unit.point_id,
+        "sample_namespace": unit.sample_namespace, "sample_id": unit.sample_id,
+        "sampler_contract_sha256": spec.shared_sampler.digest(),
+        "x_dtype": "uint8", "x_shape": list(sample.hidden.x.shape), "x_bytes_b64": x_b64,
+        "z_dtype": "uint8", "z_shape": list(sample.hidden.z.shape), "z_bytes_b64": z_b64,
+        "observations": observations, "physical_error_sha256": error_sha,
+    }
+    return MaterializedPhysicalSampleV1.model_validate({
+        **unsigned,
+        "materialized_sample_sha256": _sample_digest("bp-registry-materialized-sample-v1", unsigned),
+    })
+
+
+def _shot_from_materialized(artifact: MaterializedPhysicalSampleV1) -> sampling.ShotSample:
+    """Decode immutable bytes back to the exact typed sample given to the runner."""
+    import numpy as np
+    x = np.frombuffer(base64.b64decode(artifact.x_bytes_b64), dtype=np.uint8).copy().reshape(artifact.x_shape)
+    z = np.frombuffer(base64.b64decode(artifact.z_bytes_b64), dtype=np.uint8).copy().reshape(artifact.z_shape)
+    observations = {}
+    for name, encoded in artifact.observations.items():
+        if set(encoded) != {"check_type", "dtype", "shape", "bytes_b64"} or encoded["dtype"] != "uint8":
+            raise ValueError("materialized observation has an invalid field set")
+        vector = np.frombuffer(base64.b64decode(encoded["bytes_b64"], validate=True), dtype=np.uint8).copy().reshape(tuple(encoded["shape"]))
+        observations[name] = sampling.DecoderObservation(encoded["check_type"], vector)
+    if set(observations) != {"X", "Z"}:
+        raise ValueError("materialized sample must retain both CSS observations")
+    from types import MappingProxyType
+    return sampling.ShotSample(
+        shot_id=artifact.sample_id, sample_identity=artifact.sample_seed_identity,
+        hidden=sampling.HiddenTruth(x, z), observation=observations["Z"],
+        observations=MappingProxyType(observations),
+    )
+
+
+def materialize_campaign_sample(
+    *, plan: CampaignWorkPlan, unit: Any, spec: CampaignWorkSpecV1,
+    context: Any, destination: Path,
+) -> MaterializedPhysicalSampleV1:
+    """Sample once, atomically retain exact bytes, and independently reload them."""
+    sample = sampling.sample_shot(
+        context.code, manifest_identity=spec.shared_sampler.physical_sample_namespace,
+        seed=spec.shared_sampler.physical_sample_seed, shot_id=unit.sample_id,
+        x_error_rate=spec.shared_sampler.x_error_rate, z_error_rate=spec.shared_sampler.z_error_rate,
+    )
+    artifact = _materialized_from_sample(plan=plan, unit=unit, spec=spec, sample=sample)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    payload = artifact.primitive_bytes() + b"\n"
+    if destination.exists():
+        if destination.is_symlink() or destination.read_bytes() != payload:
+            raise ValueError("materialized sample destination conflicts with immutable bytes")
+    else:
+        with tempfile.NamedTemporaryFile(dir=destination.parent, prefix=".materialized-", delete=False) as handle:
+            handle.write(payload)
+            staging = Path(handle.name)
+        try:
+            os.replace(staging, destination)
+        finally:
+            if staging.exists():
+                staging.unlink()
+    reloaded = MaterializedPhysicalSampleV1.model_validate_json(destination.read_bytes())
+    if reloaded.materialized_sample_sha256 != artifact.materialized_sample_sha256 or _shot_from_materialized(reloaded).hidden.x.tobytes() != sample.hidden.x.tobytes():
+        raise ValueError("materialized sample reload differs from the sampled physical bytes")
+    return reloaded
+
+
+def _campaign_attempt(
+    *, plan: CampaignWorkPlan, unit: Any, arm_path: Path, sample_path: Path,
+    materialized: MaterializedPhysicalSampleV1, ledger_path: Path,
+) -> dict[str, Any]:
+    ledger_bytes = ledger_path.read_bytes()
+    events = read_canonical_events(ledger_path)
+    terminal_fact = _terminal_fact(events, unit_key=unit.key)
+    attempt = {
+        "schema": "campaign_attempt_receipt_v1", "attempt_id": _sample_digest("bp-registry-campaign-attempt-v1", {"plan": plan.campaign_plan_digest, "unit": unit.key}),
+        "campaign_plan_digest": plan.campaign_plan_digest, "unit_key": unit.key,
+        "state": "sealed_terminal", "lifecycle": ["planned", "running", "sealed_terminal"],
+        "parent_attempt_receipt": None,
+    }
+    receipt = {
+        "schema": "campaign_canonical_attempt_v1", "attempt": attempt,
+        "campaign_spec_digest": plan.campaign_spec_digest, "campaign_plan_digest": plan.campaign_plan_digest,
+        "unit_key": unit.key, "arm_manifest_path": str(arm_path),
+        "materialized_sample_path": str(sample_path),
+        "materialized_sample_sha256": materialized.materialized_sample_sha256,
+        "physical_error_sha256": materialized.physical_error_sha256,
+        "canonical_ledger_path": str(ledger_path), "canonical_ledger_sha256": sha256(ledger_bytes).hexdigest(),
+        "terminal_fact": terminal_fact,
+    }
+    receipt_bytes = canonical_json_bytes(receipt)
+    return {**receipt, "receipt_sha256": sha256(receipt_bytes).hexdigest(), "events": events,
+            "terminal_bytes_sha256": sha256(canonical_json_bytes(terminal_fact)).hexdigest(),
+            "persisted_sample_sha256": materialized.materialized_sample_sha256,
+            "validation_status": "verified", "replay_status": "verified"}
+
+
+def verify_canonical_attempt(*, record: Mapping[str, Any], plan: CampaignWorkPlan) -> dict[str, Any]:
+    """Independently rehash paired evidence before it can enter a campaign merge."""
+    if not isinstance(plan.work_spec, CampaignWorkSpecV1) or not isinstance(record, Mapping):
+        raise ValueError("canonical attempt verification requires a frozen paired work plan")
+    required = {"schema", "attempt", "campaign_spec_digest", "campaign_plan_digest", "unit_key", "arm_manifest_path", "materialized_sample_path", "materialized_sample_sha256", "physical_error_sha256", "canonical_ledger_path", "canonical_ledger_sha256", "terminal_fact", "receipt_sha256", "events", "terminal_bytes_sha256", "persisted_sample_sha256", "validation_status", "replay_status"}
+    if set(record) != required or record["schema"] != "campaign_canonical_attempt_v1":
+        raise ValueError("canonical attempt receipt has an invalid field set")
+    unsigned = {key: value for key, value in record.items() if key not in {"receipt_sha256", "events", "terminal_bytes_sha256", "persisted_sample_sha256", "validation_status", "replay_status"}}
+    if sha256(canonical_json_bytes(unsigned)).hexdigest() != record["receipt_sha256"]:
+        raise ValueError("canonical attempt receipt bytes differ from its hash")
+    materialized = MaterializedPhysicalSampleV1.model_validate_json(Path(record["materialized_sample_path"]).read_bytes())
+    ledger = Path(record["canonical_ledger_path"])
+    if (materialized.materialized_sample_sha256 != record["materialized_sample_sha256"]
+            or materialized.physical_error_sha256 != record["physical_error_sha256"]
+            or sha256(ledger.read_bytes()).hexdigest() != record["canonical_ledger_sha256"]):
+        raise ValueError("canonical attempt hash binding differs from retained evidence")
+    unit = next((item for item in plan.units if item.key == record["unit_key"]), None)
+    if unit is None:
+        raise ValueError("canonical attempt unit is absent from the frozen plan")
+    events = read_canonical_events(ledger)
+    if events != record["events"] or _terminal_fact(events, unit_key=unit.key) != record["terminal_fact"]:
+        raise ValueError("canonical attempt terminal differs from retained ledger")
+    return dict(record)
+
+
+def run_canonical_work_plan(
+    plan: CampaignWorkPlan, *, campaign_root: str | Path, output_root: str | Path,
+) -> dict[str, Any]:
+    """Execute every paired arm against one retained physical sample per group."""
+    if not isinstance(plan, CampaignWorkPlan) or not isinstance(plan.work_spec, CampaignWorkSpecV1):
+        raise ValueError("run_canonical_work_plan requires a paired CampaignWorkPlan")
+    root = Path(campaign_root).resolve(strict=True)
+    destination = Path(output_root)
+    if destination.exists() and (not destination.is_dir() or destination.is_symlink()):
+        raise ValueError("campaign output root must be a non-symlink directory")
+    arm_contexts = _preflight_work_arms(plan.work_spec, root)
+    destination.mkdir(parents=True, exist_ok=True)
+    arms = {arm.arm_id: arm for arm in plan.work_spec.arms}
+    samples: dict[str, MaterializedPhysicalSampleV1] = {}
+    verified: list[dict[str, Any]] = []
+    for unit in plan.units:
+        materialized = samples.get(unit.physical_sample_identity)
+        sample_path = destination / "samples" / f"{unit.physical_sample_identity}.json"
+        arm_path, context = arm_contexts[unit.arm_id]
+        if materialized is None:
+            materialized = materialize_campaign_sample(plan=plan, unit=unit, spec=plan.work_spec, context=context, destination=sample_path)
+            samples[unit.physical_sample_identity] = materialized
+        else:
+            materialized = MaterializedPhysicalSampleV1.model_validate_json(sample_path.read_bytes())
+        ledger_path = destination / "units" / unit.key / "events.jsonl"
+        ledger_path.parent.mkdir(parents=True, exist_ok=True)
+        run_canonical_materialized_one(arm_path, sample=_shot_from_materialized(materialized),
+                                       materialized_sample_sha256=materialized.materialized_sample_sha256,
+                                       ledger_path=ledger_path, manifest_bytes=arm_path.read_bytes())
+        record = _campaign_attempt(plan=plan, unit=unit, arm_path=arm_path, sample_path=sample_path,
+                                   materialized=materialized, ledger_path=ledger_path)
+        receipt_path = ledger_path.parent / "attempt.json"
+        receipt_path.write_bytes(canonical_json_bytes({key: value for key, value in record.items() if key not in {"receipt_sha256", "events", "terminal_bytes_sha256", "persisted_sample_sha256", "validation_status", "replay_status"}}) + b"\n")
+        verified.append(verify_canonical_attempt(record=record, plan=plan))
+    return {"schema": "campaign_canonical_work_execution_v1", "campaign_plan_digest": plan.campaign_plan_digest,
+            "materialized_samples": tuple(samples.values()), "verified_attempts": tuple(verified)}

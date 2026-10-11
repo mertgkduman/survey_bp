@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from hashlib import sha256
+import base64
 import json
 import math
 from pathlib import PurePosixPath
@@ -316,6 +317,163 @@ class CampaignSpecV1(StrictModel):
 
     def digest(self) -> str:
         return _digest("bp-registry-campaign-spec-v1", self.primitive_bytes())
+
+
+class CampaignArmV1(StrictModel):
+    """One canonical decoder arm confined to its caller-owned campaign root."""
+
+    arm_id: str = Field(min_length=1, max_length=128)
+    manifest_path: str = Field(min_length=1, max_length=512)
+    manifest_sha256: str = Field(pattern=_SHA256)
+    decoder_seed_identity: str = Field(min_length=1, max_length=256)
+
+    @field_validator("manifest_path")
+    @classmethod
+    def confined_manifest_path(cls, value: str) -> str:
+        path = PurePosixPath(value)
+        if path.is_absolute() or any(part in {"", ".", ".."} for part in path.parts):
+            raise ValueError("manifest_path must be a confined relative path")
+        return value
+
+
+class SharedSamplerContractV1(StrictModel):
+    """All material that must agree before one physical error can be paired."""
+
+    code_id: str = Field(min_length=1, max_length=256)
+    artifact_raw_sha256: str = Field(pattern=_SHA256)
+    artifact_semantic_sha256: str = Field(pattern=_SHA256)
+    matrix_sha256: str = Field(pattern=_SHA256)
+    channel_family: Literal["css_code_capacity_v1"]
+    x_error_rate: float = Field(ge=0.0, le=1.0)
+    z_error_rate: float = Field(ge=0.0, le=1.0)
+    sampler_algorithm: Literal["bp_registry_sample_shot_v1"]
+    sampler_version: Literal["v1"]
+    physical_sample_namespace: str = Field(min_length=1, max_length=256)
+    physical_sample_seed: int = Field(ge=0, le=2**63 - 1)
+
+    def primitive_bytes(self) -> bytes:
+        return canonical_json_bytes(self.model_dump(mode="json"))
+
+    def digest(self) -> str:
+        return _digest("bp-registry-shared-sampler-v1", self.primitive_bytes())
+
+
+class CampaignWorkCoordinateV1(StrictModel):
+    """Arm-neutral point and finite physical sample identifiers."""
+
+    cohort_id: str = Field(min_length=1, max_length=256)
+    point_id: str = Field(min_length=1, max_length=256)
+    sample_namespace: str = Field(min_length=1, max_length=256)
+    sample_ids: tuple[int, ...] = Field(min_length=1, max_length=_MAX_EVENTS)
+
+    @field_validator("sample_ids", mode="before")
+    @classmethod
+    def coerce_sequence_to_tuple(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @model_validator(mode="after")
+    def unique_sample_ids(self) -> "CampaignWorkCoordinateV1":
+        if (len(set(self.sample_ids)) != len(self.sample_ids)
+                or any(type(value) is not int or value < 0 or value > _MAX_EVENTS for value in self.sample_ids)):
+            raise ValueError("sample_ids must be unique bounded integers")
+        return self
+
+
+class CampaignWorkSpecV1(StrictModel):
+    """Strict primitive input for a complete, paired canonical campaign."""
+
+    schema_name: Literal["campaign_work_spec_v1"] = Field(alias="schema", serialization_alias="schema")
+    arms: tuple[CampaignArmV1, ...] = Field(min_length=2, max_length=128)
+    shared_sampler: SharedSamplerContractV1
+    coordinates: tuple[CampaignWorkCoordinateV1, ...] = Field(min_length=1, max_length=_MAX_EVENTS)
+    look_sample_boundaries: tuple[int, ...] = Field(min_length=1, max_length=1_000)
+    units_per_shard: int = Field(ge=1, le=_MAX_EVENTS)
+    assessment: CampaignAssessmentV1
+    source_lock_sha256: str = Field(pattern=_SHA256)
+    environment_lock_sha256: str = Field(pattern=_SHA256)
+    dependency_lock_sha256: str = Field(pattern=_SHA256)
+    target_arm_ids: dict[str, str] = Field(min_length=1, max_length=1_000)
+    source_denominator_required_by_target: dict[str, bool] = Field(default_factory=dict)
+    source_denominators: dict[str, int | None] = Field(default_factory=dict)
+
+    @field_validator("arms", "coordinates", "look_sample_boundaries", mode="before")
+    @classmethod
+    def tuple_fields(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @model_validator(mode="after")
+    def complete_pairing_contract(self) -> "CampaignWorkSpecV1":
+        arm_ids = tuple(arm.arm_id for arm in self.arms)
+        coordinate_ids = tuple((item.cohort_id, item.point_id, item.sample_namespace) for item in self.coordinates)
+        sample_count = sum(len(item.sample_ids) for item in self.coordinates)
+        if len(set(arm_ids)) != len(arm_ids) or len(set(coordinate_ids)) != len(coordinate_ids):
+            raise ValueError("campaign work arm and coordinate identities must be unique")
+        if any(item.sample_namespace != self.shared_sampler.physical_sample_namespace for item in self.coordinates):
+            raise ValueError("all coordinates must use the shared physical sample namespace")
+        if (tuple(sorted(self.look_sample_boundaries)) != self.look_sample_boundaries
+                or len(set(self.look_sample_boundaries)) != len(self.look_sample_boundaries)
+                or self.look_sample_boundaries[-1] != sample_count):
+            raise ValueError("look boundaries must cover each planned physical sample exactly once")
+        target_ids = {target.target_id for target in self.assessment.targets}
+        if set(self.target_arm_ids) != target_ids or any(arm_id not in arm_ids for arm_id in self.target_arm_ids.values()):
+            raise ValueError("each assessed target requires one declared arm")
+        if set(self.source_denominator_required_by_target) - target_ids or set(self.source_denominators) - target_ids:
+            raise ValueError("source denominator fields reference an unknown target")
+        if sample_count * len(self.arms) > self.assessment.resources.max_events:
+            raise ValueError("paired work expansion exceeds frozen event cap")
+        return self
+
+    def primitive_bytes(self) -> bytes:
+        return canonical_json_bytes(self.model_dump(mode="json", by_alias=True))
+
+    def digest(self) -> str:
+        return _digest("bp-registry-campaign-work-spec-v1", self.primitive_bytes())
+
+
+class MaterializedPhysicalSampleV1(StrictModel):
+    """Immutable byte-level physical sample retained before either arm decodes."""
+
+    schema_name: Literal["materialized_physical_sample_v1"] = Field(alias="schema", serialization_alias="schema")
+    physical_sample_identity: str = Field(pattern=_SHA256)
+    sample_seed_identity: str = Field(pattern=_SHA256)
+    cohort_id: str = Field(min_length=1, max_length=256)
+    point_id: str = Field(min_length=1, max_length=256)
+    sample_namespace: str = Field(min_length=1, max_length=256)
+    sample_id: int = Field(ge=0, le=_MAX_EVENTS)
+    sampler_contract_sha256: str = Field(pattern=_SHA256)
+    x_dtype: Literal["uint8"]
+    x_shape: tuple[int, ...] = Field(min_length=1, max_length=2)
+    x_bytes_b64: str
+    z_dtype: Literal["uint8"]
+    z_shape: tuple[int, ...] = Field(min_length=1, max_length=2)
+    z_bytes_b64: str
+    observations: dict[str, dict[str, Any]] = Field(min_length=1, max_length=8)
+    physical_error_sha256: str = Field(pattern=_SHA256)
+    materialized_sample_sha256: str = Field(pattern=_SHA256)
+
+    @field_validator("x_shape", "z_shape", mode="before")
+    @classmethod
+    def tuple_shapes(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @model_validator(mode="after")
+    def byte_digests_bind_payload(self) -> "MaterializedPhysicalSampleV1":
+        try:
+            x_bytes, z_bytes = base64.b64decode(self.x_bytes_b64, validate=True), base64.b64decode(self.z_bytes_b64, validate=True)
+        except Exception as error:
+            raise ValueError("materialized sample has invalid base64 bytes") from error
+        error_payload = canonical_json_bytes({"x": self.x_bytes_b64, "z": self.z_bytes_b64})
+        if self.physical_error_sha256 != _digest("bp-registry-physical-error-v1", error_payload):
+            raise ValueError("materialized sample physical error digest differs from bytes")
+        unsigned = self.model_dump(mode="json", by_alias=True, exclude={"materialized_sample_sha256"})
+        if self.materialized_sample_sha256 != _digest("bp-registry-materialized-sample-v1", canonical_json_bytes(unsigned)):
+            raise ValueError("materialized sample digest differs from bytes")
+        if not x_bytes or not z_bytes:
+            raise ValueError("materialized error vectors must be nonempty")
+        return self
+
+    def primitive_bytes(self) -> bytes:
+        return canonical_json_bytes(self.model_dump(mode="json", by_alias=True))
 
 
 @dataclass(frozen=True, slots=True)
