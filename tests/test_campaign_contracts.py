@@ -374,6 +374,18 @@ def test_prospective_failure_count_has_no_terminal_facts_and_limits_are_derived(
                 **authorization.model_dump(by_alias=True), "max_events_per_batch": 14,
             },
         })
+    cap_first_policy = FailureCountPolicyV1.model_validate({
+        **policy.model_dump(by_alias=True),
+        "caps": {
+            **policy.caps.model_dump(),
+            "max_decoder_work": 200,
+            "max_events": 15,
+            "max_evidence_bytes": 900,
+            "max_storage_bytes": 1150,
+        },
+    })
+    assert cap_first_policy.caps.max_shots == 10
+    assert cap_first_policy.caps.max_decoder_work == 200
 
 
 def test_terminal_receipt_is_post_run_only_and_records_boundary_overshoot():
