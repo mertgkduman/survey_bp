@@ -568,9 +568,9 @@ Plans:
 **Plans:** TBD
 **Wave 1**
 
-- [ ] 09-01-PLAN.md
-- [ ] 09-04-PLAN.md
-- [ ] 09-07-PLAN.md
+- [x] 09-01-PLAN.md
+- [x] 09-04-PLAN.md
+- [x] 09-07-PLAN.md
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -743,7 +743,7 @@ Plans:
 | 6. Beam Search, Ensembles, and Candidate Selection | 9/9 | Complete    | 2026-10-05 |
 | 7. Optional Postprocessing | 6/15 | Paused by user; POST-01 qualification failed |  |
 | 8. Reproducible Campaigns and Statistical Assessment | 20/20 | Complete    | 2026-10-11 |
-| 9. CSS Reproduction and Controlled Comparisons | 0/15 | Planned    |  |
+| 9. CSS Reproduction and Controlled Comparisons | 3/15 | In Progress|  |
 | 10. Correlated Quaternary Execution | 16/16 | Complete    | 2026-10-08 |
 | 11. Quaternary Reproduction and Comparisons | 0/TBD | Not started | - |
 | 12. Circuit Models and Canonical Integration | 0/TBD | Not started | - |
