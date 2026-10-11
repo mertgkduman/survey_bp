@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_statistics.py -k 'binomial or zero_failure or all_failure or target or decision' -x",
+  "exitCode": 1,
+  "targetTest": "test_binomial_matches_scipy_for_every_small_count",
+  "targetFile": "tests/test_campaign_statistics.py",
+  "expected": "The campaign statistical API computes exact rates and target decisions.",
+  "actual": "AssertionError: campaign statistics module must provide exact rates",
+  "output": "TAP version 13\nnot ok 1 - test_binomial_matches_scipy_for_every_small_count\n  ---\n  message: campaign statistics module must provide exact rates\n  ...\n1..1\n# tests 1\n# pass 0\n# fail 1\n"
+}
