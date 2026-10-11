@@ -107,6 +107,89 @@ def _inverse_interval(
     )
 
 
+def _prospective_failure_count_evidence(*, censored: bool = False):
+    """A sealed policy and receipt fixture with no pre-run terminal fields."""
+    from bp_registry.campaigns.contracts import (
+        FailureCountBatchAuthorizationV1,
+        FailureCountCampaignCapsV1,
+        FailureCountExecutableLimitReceiptV1,
+        FailureCountPolicyV1,
+        FailureCountTerminalReceiptV1,
+        InverseBinomialProcedureV1,
+    )
+
+    limits = FailureCountExecutableLimitReceiptV1(
+        schema="failure_count_executable_limit_receipt_v1", derivation_version="v1",
+        manifest_dimensions_sha256="1" * 64, policy_binding_sha256="2" * 64,
+        serializer_sha256="3" * 64, artifact_layout_sha256="4" * 64,
+        verifier_sha256="5" * 64, max_decoder_iterations=10, work_per_iteration=4,
+        max_ledger_events_per_unit=3, serializer_bytes_per_event=20,
+        artifact_storage_bytes_per_unit=50, partial_receipt_reserve_bytes=100,
+        derived_work_per_unit=40, derived_events_per_unit=3,
+        derived_evidence_bytes_per_unit=160, derived_storage_bytes_per_unit=210,
+    )
+    authorization = FailureCountBatchAuthorizationV1(
+        schema="failure_count_batch_authorization_v1", executable_limit_receipt_sha256=limits.digest(),
+        policy_binding_sha256="2" * 64, max_local_workers=1, max_shots_per_batch=5,
+        max_work_per_batch=200, max_events_per_batch=15,
+        max_evidence_bytes_per_batch=900, max_storage_bytes_per_batch=1150,
+        monotonic_clock="monotonic_ns_v1", per_unit_timeout_ns=1_000,
+    )
+    policy = FailureCountPolicyV1(
+        schema="failure_count_policy_v1", policy_binding_sha256="2" * 64,
+        campaign_plan_sha256="6" * 64, target_failures=2, batch_size=5,
+        shot_order="campaign_cohort_point_sample_ordinal_v1",
+        failure_event="decoder_logical_failure_v1",
+        procedure=InverseBinomialProcedureV1(
+            method="exact_inverse_binomial", confidence_level=0.95, sidedness="two_sided",
+        ),
+        multiplicative_rule=MultiplicativeTargetRuleV1(
+            rule="multiplicative_target_interval_containment_v1", factor=1.5,
+        ),
+        caps=FailureCountCampaignCapsV1(
+            max_shots=10, max_decoder_work=400, max_events=30,
+            max_evidence_bytes=1700, max_storage_bytes=2200, max_wall_seconds=10.0,
+        ),
+        cap_precedence=("wall", "storage", "evidence", "events", "work", "shots"),
+        executable_limits=limits, batch_authorization=authorization,
+    )
+    terminal = FailureCountTerminalReceiptV1(
+        schema="failure_count_terminal_receipt_v1", policy_sha256=policy.digest(),
+        campaign_plan_sha256=policy.campaign_plan_sha256,
+        executable_limit_receipt_sha256=limits.digest(),
+        batch_authorization_sha256=authorization.digest(),
+        terminal_state="cap_censored" if censored else "target_reached",
+        terminal_failure_ordinal=None if censored else 8,
+        cumulative_failures=1 if censored else 2, total_completed_shots=10 if not censored else 5,
+        inferential_prefix_sha256=None if censored else "d" * 64,
+        authorized_tail_ordinals=() if censored else (9, 10),
+        authorized_tail_sha256=None if censored else "e" * 64,
+        first_exhausted_cap="shots" if censored else None,
+        realized_decoder_work=40, realized_events=10 if not censored else 5,
+        realized_evidence_bytes=300, realized_storage_bytes=500,
+        wall_boundaries=((1_000, 1_025, 25),),
+    )
+    return policy, terminal
+
+
+def test_inverse_binomial_requires_verified_prospective_policy_and_terminal_receipt() -> None:
+    policy, terminal = _prospective_failure_count_evidence()
+    result = _exact_inverse_binomial_rate(policy=policy, terminal_receipt=terminal)
+    assert result.stopping_shot_ordinal == 8
+    assert result.inferential_trials == 8
+    assert result.total_completed_shots == 10
+    assert result.authorized_tail_count == 2
+
+    with pytest.raises(ValueError, match="bind"):
+        _exact_inverse_binomial_rate(
+            policy=policy,
+            terminal_receipt=terminal.model_copy(update={"policy_sha256": "0" * 64}),
+        )
+    censored_policy, censored = _prospective_failure_count_evidence(censored=True)
+    with pytest.raises(ValueError, match="target_reached"):
+        _exact_inverse_binomial_rate(policy=censored_policy, terminal_receipt=censored)
+
+
 @pytest.mark.parametrize(
     ("terminal_failure_ordinal", "tail"),
     ((6, (7, 8, 9, 10)), (8, (9, 10)), (10, ())),
