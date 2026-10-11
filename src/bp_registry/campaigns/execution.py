@@ -666,6 +666,18 @@ def _campaign_attempt(
     ledger_bytes = ledger_path.read_bytes()
     events = read_canonical_events(ledger_path)
     terminal_fact = _terminal_fact(events, unit_key=unit.key)
+    # Canonical structural evidence labels its binary evaluator outcome as
+    # ``logical_failure``.  Campaign assessment has the explicit terminal
+    # taxonomy, so translate only in the outer receipt; the canonical event is
+    # retained byte-for-byte and is never rewritten.
+    if terminal_fact["outcome"] == "logical_failure":
+        terminal_fact["outcome"] = "wrong_logical_action"
+    elif terminal_fact["outcome"] not in {
+        "exact", "stabilizer_equivalent", "wrong_logical_action", "invalid_syndrome",
+        "no_proposal", "nonconvergence", "timeout", "postselected_rejection",
+        "infrastructure_interruption",
+    }:
+        raise ValueError("canonical terminal outcome cannot be mapped into the frozen campaign taxonomy")
     attempt = {
         "schema": "campaign_attempt_receipt_v1", "attempt_id": _sample_digest("bp-registry-campaign-attempt-v1", {"plan": plan.campaign_plan_digest, "unit": unit.key}),
         "campaign_plan_digest": plan.campaign_plan_digest, "unit_key": unit.key,
@@ -709,7 +721,10 @@ def verify_canonical_attempt(*, record: Mapping[str, Any], plan: CampaignWorkPla
     if unit is None:
         raise ValueError("canonical attempt unit is absent from the frozen plan")
     events = read_canonical_events(ledger)
-    if events != record["events"] or _terminal_fact(events, unit_key=unit.key) != record["terminal_fact"]:
+    terminal_fact = _terminal_fact(events, unit_key=unit.key)
+    if terminal_fact["outcome"] == "logical_failure":
+        terminal_fact["outcome"] = "wrong_logical_action"
+    if events != record["events"] or terminal_fact != record["terminal_fact"]:
         raise ValueError("canonical attempt terminal differs from retained ledger")
     return dict(record)
 
