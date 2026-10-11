@@ -565,7 +565,7 @@ Plans:
 
 **Research focus:** Final CSS paper/code/rate grid, faithful parameter extraction, meaningful ablation design, precision/power, and cost calibration.
 **Scope carry-forward:** Reconsider memory/Relay comparisons alongside other CSS policies only after Phase 8 campaign rules are ready. Size a focused comparison from its scientific question and available compute; do not inherit the cancelled Phase 4 448-shot/14-arm grid by default.
-**Plans:** 8/19 complete
+**Plans:** 8/20 complete
 
 **Wave 1**
 
@@ -589,33 +589,37 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 09-17-PLAN.md
+- [ ] 09-20-PLAN.md — independently derived canonical resource limits and guarded execution.
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
-- [ ] 09-06-PLAN.md — local controller committed; public lifecycle remains incomplete.
+- [ ] 09-17-PLAN.md — single-arm adapter committed; guarded partial/resume lifecycle remains incomplete.
 
 **Wave 7** *(blocked on Wave 6 completion)*
+
+- [ ] 09-06-PLAN.md — local controller committed; public lifecycle remains incomplete.
+
+**Wave 8** *(blocked on Wave 7 completion)*
 
 - [ ] 09-09-PLAN.md
 - [ ] 09-18-PLAN.md
 
-**Wave 8** *(blocked on Wave 7 completion)*
+**Wave 9** *(blocked on Wave 8 completion)*
 
 - [ ] 09-10-PLAN.md
 - [ ] 09-11-PLAN.md
 
-**Wave 9** *(blocked on Wave 8 completion)*
+**Wave 10** *(blocked on Wave 9 completion)*
 
 - [ ] 09-19-PLAN.md
 
-**Wave 10** *(blocked on Wave 9 completion)*
+**Wave 11** *(blocked on Wave 10 completion)*
 
 - [ ] 09-12-PLAN.md
 - [ ] 09-13-PLAN.md
 - [ ] 09-14-PLAN.md
 
-**Wave 11** *(blocked on Wave 10 completion)*
+**Wave 12** *(blocked on Wave 11 completion)*
 
 - [ ] 09-15-PLAN.md
 
