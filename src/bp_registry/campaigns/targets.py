@@ -20,6 +20,8 @@ from ..manifests import StrictModel
 
 _SHA256 = r"^[0-9a-f]{64}$"
 _INTEGRITY_STATEMENT = "sha256_integrity_linkage_not_authorship_v1"
+_MAX_SNAPSHOT_BYTES = 64 * 1024 * 1024
+_MAX_QUALIFICATION_BLOCKERS = 256
 
 
 def _canonical_json_bytes(value: object) -> bytes:
@@ -50,7 +52,7 @@ class ByteSnapshotV1(StrictModel):
 
     relative_path: str = Field(min_length=1, max_length=1_024)
     sha256: str = Field(pattern=_SHA256)
-    byte_count: int = Field(ge=0, le=64 * 1024 * 1024)
+    byte_count: int = Field(ge=0, le=_MAX_SNAPSHOT_BYTES)
     integrity_statement: Literal["sha256_integrity_linkage_not_authorship_v1"] = _INTEGRITY_STATEMENT
 
     @field_validator("relative_path")
@@ -72,6 +74,8 @@ def read_confined_snapshot(evidence_root: str | Path, relative_path: str) -> Byt
     """Read one regular evidence file, rejecting traversal and every symlink hop."""
     _confined_relative_path(relative_path)
     root = Path(evidence_root)
+    if root.is_symlink():
+        raise ValueError("evidence root cannot be a symlink")
     if not root.is_dir():
         raise ValueError("evidence root must be an existing directory")
     resolved_root = root.resolve(strict=True)
@@ -83,6 +87,8 @@ def read_confined_snapshot(evidence_root: str | Path, relative_path: str) -> Byt
             raise ValueError("evidence snapshot path cannot traverse a symlink")
     if not candidate.is_file():
         raise ValueError("evidence snapshot path must be a regular file")
+    if candidate.stat().st_size > _MAX_SNAPSHOT_BYTES:
+        raise ValueError("evidence snapshot exceeds the bounded receipt size")
     resolved_candidate = candidate.resolve(strict=True)
     if not resolved_candidate.is_relative_to(resolved_root):
         raise ValueError("evidence snapshot path escapes its root")
@@ -143,6 +149,117 @@ class SourceDenominatorV1(StrictModel):
         elif self.count is not None or self.reason is None:
             raise ValueError("an unavailable or not-applicable denominator needs a reason and no count")
         return self
+
+
+class SourceTargetLocatorV1(StrictModel):
+    """The source location of one named experiment variant and point."""
+
+    paper_id: str = Field(min_length=1, max_length=512)
+    figure_or_table_id: str = Field(min_length=1, max_length=512)
+    curve_id: str = Field(min_length=1, max_length=512)
+    variant_id: str = Field(min_length=1, max_length=512)
+    point_id: str = Field(min_length=1, max_length=512)
+
+
+class SourceStoppingEvidenceV1(StrictModel):
+    """Source stopping evidence whose unknown state cannot become a default."""
+
+    status: Literal["observed", "unavailable"]
+    rule: str | None = Field(default=None, min_length=1, max_length=2_048)
+    snapshot: ByteSnapshotV1 | None = None
+    reason: str | None = Field(default=None, min_length=1, max_length=1_024)
+
+    @model_validator(mode="after")
+    def explicit_stopping_status(self) -> "SourceStoppingEvidenceV1":
+        if self.status == "observed":
+            if self.rule is None or self.snapshot is None or self.reason is not None:
+                raise ValueError("observed source stopping needs rule and snapshot only")
+        elif self.rule is not None or self.snapshot is not None or self.reason is None:
+            raise ValueError("unavailable source stopping needs a reason and no inferred rule")
+        return self
+
+
+class SourceExperimentIdentityV1(StrictModel):
+    """Complete D-02 identity for one paper experiment without fidelity inference."""
+
+    schema_name: Literal["campaign_source_experiment_identity_v1"] = Field(alias="schema", serialization_alias="schema")
+    target_id: str = Field(min_length=1, max_length=256)
+    paper: SourceIdentityV1
+    paper_snapshot: ByteSnapshotV1
+    locator: SourceTargetLocatorV1
+    ordered_check_artifacts: tuple[ByteSnapshotV1, ...] = Field(min_length=1, max_length=128)
+    ordered_logical_artifacts: tuple[ByteSnapshotV1, ...] = Field(min_length=1, max_length=128)
+    channel_convention: str = Field(min_length=1, max_length=1_024)
+    source_denominator: SourceDenominatorV1
+    stopping: SourceStoppingEvidenceV1
+    author_implementation_status: Literal["verified", "unverified", "unavailable"]
+    author_implementation_uri: str | None = Field(default=None, min_length=1, max_length=2_048)
+    author_implementation_revision: str | None = Field(default=None, min_length=1, max_length=512)
+    author_environment_snapshot: ByteSnapshotV1 | None = None
+    author_settings_snapshot: ByteSnapshotV1 | None = None
+    executable_policy_sha256: str = Field(pattern=_SHA256)
+    qualification_blockers: tuple[str, ...] = Field(default=(), max_length=_MAX_QUALIFICATION_BLOCKERS)
+
+    @field_validator("ordered_check_artifacts", "ordered_logical_artifacts", "qualification_blockers", mode="before")
+    @classmethod
+    def tuple_records(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @field_validator("qualification_blockers")
+    @classmethod
+    def bounded_blockers(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        if any(not blocker or len(blocker) > 1_024 for blocker in value):
+            raise ValueError("qualification blockers must be bounded nonempty strings")
+        if len(set(value)) != len(value):
+            raise ValueError("qualification blockers must be unique")
+        return value
+
+    @field_validator("author_implementation_uri")
+    @classmethod
+    def https_implementation_uri(cls, value: str | None) -> str | None:
+        if value is not None and not value.startswith("https://"):
+            raise ValueError("author implementation URI must use HTTPS")
+        return value
+
+    @model_validator(mode="after")
+    def complete_or_explicitly_gapped_author_evidence(self) -> "SourceExperimentIdentityV1":
+        author_fields = (
+            self.author_implementation_uri,
+            self.author_implementation_revision,
+            self.author_environment_snapshot,
+            self.author_settings_snapshot,
+        )
+        if self.author_implementation_status == "verified":
+            if any(field is None for field in author_fields):
+                raise ValueError("verified author implementation needs URI, revision, environment, and settings")
+        elif any(field is not None for field in author_fields):
+            raise ValueError("unverified author implementation fields cannot be inferred")
+        elif not self.qualification_blockers:
+            raise ValueError("unverified author implementation needs an explicit qualification blocker")
+        snapshots = (
+            self.paper_snapshot,
+            *self.ordered_check_artifacts,
+            *self.ordered_logical_artifacts,
+            *(() if self.stopping.snapshot is None else (self.stopping.snapshot,)),
+            *(() if self.author_environment_snapshot is None else (self.author_environment_snapshot,)),
+            *(() if self.author_settings_snapshot is None else (self.author_settings_snapshot,)),
+        )
+        paths = tuple(snapshot.relative_path for snapshot in snapshots)
+        if len(set(paths)) != len(paths):
+            raise ValueError("source identity snapshots must have distinct confined paths")
+        return self
+
+    @property
+    def complete_for_faithful_assessment(self) -> bool:
+        return (
+            self.author_implementation_status == "verified"
+            and self.source_denominator.status == "observed"
+            and self.stopping.status == "observed"
+            and not self.qualification_blockers
+        )
+
+    def digest(self) -> str:
+        return _receipt_digest("bp-registry-campaign-source-experiment-identity-v1", self)
 
 
 class TableTargetReceiptV1(StrictModel):
