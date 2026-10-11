@@ -15,7 +15,12 @@ from typing import Literal, Mapping, Sequence
 
 from scipy.stats import binomtest
 
-from .contracts import CampaignAssessmentV1, FiniteLookStoppingV1, TargetReferenceV1
+from .contracts import (
+    CampaignAssessmentV1,
+    FiniteLookStoppingV1,
+    OutcomeMatrixV1,
+    TargetReferenceV1,
+)
 
 
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
@@ -467,6 +472,215 @@ def holm_adjusted_family(
         frozen_family_size=family_size,
         members=tuple(results),
         verdict=verdict,
+    )
+
+
+@dataclass(frozen=True, slots=True)
+class CampaignTerminalOutcomeV1:
+    """A retained arm terminal with separately accumulated decoder work."""
+
+    sample_identity: str
+    arm_id: str
+    terminal_status: str
+    actual_work: int
+
+    def __post_init__(self) -> None:
+        _identifier(self.sample_identity, name="sample_identity")
+        _identifier(self.arm_id, name="arm_id")
+        if self.terminal_status not in _TERMINAL_STATUSES:
+            raise ValueError("terminal_status is not in the frozen outcome matrix domain")
+        _bounded_int(self.actual_work, name="actual_work")
+
+
+@dataclass(frozen=True, slots=True)
+class ExactProportionV1:
+    """An exact proportion interval whose numerator is named for its estimand."""
+
+    numerator: int
+    denominator: int
+    estimate: float
+    alpha: float
+    interval: tuple[float, float]
+    method: Literal["exact_clopper_pearson"]
+
+
+@dataclass(frozen=True, slots=True)
+class OutcomeDenominatorSummaryV1:
+    """All denominators and retained status counts for one arm."""
+
+    arm_id: str
+    outcome_matrix_rule_id: str
+    planned_samples: int
+    dispatched_samples: int
+    terminal_samples: int
+    incomplete_samples: int
+    accepted_samples: int
+    status_counts: Mapping[str, int]
+    all_shot_performance: ExactBinomialRateV1
+    acceptance_probability: ExactProportionV1
+    conditional_performance: ExactBinomialRateV1 | None
+    actual_work: int
+    count_receipt_sha256: str
+
+
+@dataclass(frozen=True, slots=True)
+class PairedCompletionSummaryV1:
+    """Coverage evidence that must precede paired inferential arithmetic."""
+
+    complete_pairs: int
+    incomplete_pairs: int
+    paired_inference_status: Literal["complete", "inconclusive_incomplete_pairs"]
+    missing_arms_by_sample: Mapping[str, tuple[str, ...]]
+
+
+def _exact_proportion(*, numerator: int, denominator: int, alpha: float) -> ExactProportionV1:
+    numerator = _bounded_int(numerator, name="numerator")
+    denominator = _bounded_int(denominator, name="denominator", minimum=1)
+    if numerator > denominator:
+        raise ValueError("proportion numerator cannot exceed denominator")
+    alpha = _probability(alpha, name="alpha")
+    interval = binomtest(numerator, n=denominator).proportion_ci(
+        confidence_level=1.0 - alpha, method="exact",
+    )
+    return ExactProportionV1(
+        numerator=numerator,
+        denominator=denominator,
+        estimate=numerator / denominator,
+        alpha=alpha,
+        interval=(float(interval.low), float(interval.high)),
+        method="exact_clopper_pearson",
+    )
+
+
+def outcome_denominator_summary(
+    *,
+    outcomes: Sequence[CampaignTerminalOutcomeV1],
+    arm_id: str,
+    planned_samples: int,
+    dispatched_samples: int,
+    outcome_matrix: OutcomeMatrixV1,
+    alpha: float,
+    count_receipt_sha256: str,
+) -> OutcomeDenominatorSummaryV1:
+    """Summarize an arm through its total frozen terminal-status matrix.
+
+    Infrastructure interruptions remain incomplete.  Every other terminal is
+    mapped to the primary all-shot result and, independently, the accepted
+    conditional denominator.  Actual decoder work is reported as a sum rather
+    than renamed as an iteration count.
+    """
+    arm_id = _identifier(arm_id, name="arm_id")
+    planned = _bounded_int(planned_samples, name="planned_samples", minimum=1)
+    dispatched = _bounded_int(dispatched_samples, name="dispatched_samples")
+    if dispatched > planned:
+        raise ValueError("dispatched_samples cannot exceed planned_samples")
+    if not isinstance(outcome_matrix, OutcomeMatrixV1):
+        raise ValueError("outcome_matrix must be a frozen OutcomeMatrixV1")
+    alpha = _probability(alpha, name="alpha")
+    receipt = _sha256(count_receipt_sha256, name="count_receipt_sha256")
+    if not isinstance(outcomes, Sequence) or isinstance(outcomes, (str, bytes)):
+        raise ValueError("outcomes must be a finite sequence of terminal records")
+    status_mapping = {item.terminal_status: item for item in outcome_matrix.treatments}
+    seen_samples: set[str] = set()
+    status_counts: dict[str, int] = {}
+    primary_failures = 0
+    terminal_samples = 0
+    accepted = 0
+    conditional_failures = 0
+    work = 0
+    for outcome in outcomes:
+        if not isinstance(outcome, CampaignTerminalOutcomeV1):
+            raise ValueError("outcomes must be CampaignTerminalOutcomeV1 records")
+        if outcome.arm_id != arm_id:
+            raise ValueError("outcome arm ID differs from denominator-summary arm")
+        if outcome.sample_identity in seen_samples:
+            raise ValueError("outcome denominator summary has duplicate sample evidence")
+        seen_samples.add(outcome.sample_identity)
+        treatment = status_mapping[outcome.terminal_status]
+        status_counts[outcome.terminal_status] = status_counts.get(outcome.terminal_status, 0) + 1
+        work += outcome.actual_work
+        if treatment.all_shot == "incomplete":
+            continue
+        terminal_samples += 1
+        primary_failures += int(treatment.all_shot == "failure")
+        if treatment.conditional == "accepted":
+            accepted += 1
+            conditional_failures += int(treatment.all_shot == "failure")
+    if len(seen_samples) > dispatched:
+        raise ValueError("outcome records cannot exceed dispatched_samples")
+    incomplete = dispatched - terminal_samples
+    all_shot = exact_binomial_rate(
+        failures=primary_failures,
+        shots=terminal_samples,
+        alpha=alpha,
+        count_receipt_sha256=receipt,
+    ) if terminal_samples else None
+    if all_shot is None:
+        raise ValueError("at least one non-incomplete terminal is required for a rate summary")
+    acceptance = _exact_proportion(numerator=accepted, denominator=terminal_samples, alpha=alpha)
+    conditional = exact_binomial_rate(
+        failures=conditional_failures,
+        shots=accepted,
+        alpha=alpha,
+        count_receipt_sha256=receipt,
+    ) if accepted else None
+    return OutcomeDenominatorSummaryV1(
+        arm_id=arm_id,
+        outcome_matrix_rule_id=outcome_matrix.rule_id,
+        planned_samples=planned,
+        dispatched_samples=dispatched,
+        terminal_samples=terminal_samples,
+        incomplete_samples=incomplete,
+        accepted_samples=accepted,
+        status_counts=status_counts,
+        all_shot_performance=all_shot,
+        acceptance_probability=acceptance,
+        conditional_performance=conditional,
+        actual_work=work,
+        count_receipt_sha256=receipt,
+    )
+
+
+def paired_completion_summary(
+    *, outcomes: Sequence[PairedArmOutcomeV1], arm_ids: tuple[str, str],
+) -> PairedCompletionSummaryV1:
+    """Retain partial sample coverage and withhold paired inference until complete."""
+    if not isinstance(arm_ids, tuple) or len(arm_ids) != 2:
+        raise ValueError("paired completion requires exactly two arm IDs")
+    first_arm, second_arm = (_identifier(arm_ids[0], name="first arm ID"), _identifier(arm_ids[1], name="second arm ID"))
+    if first_arm == second_arm:
+        raise ValueError("paired completion requires distinct arm IDs")
+    if not isinstance(outcomes, Sequence) or isinstance(outcomes, (str, bytes)) or not outcomes:
+        raise ValueError("paired completion requires at least one outcome")
+    expected = {first_arm, second_arm}
+    by_sample: dict[tuple[str, str, str, str], dict[str, PairedArmOutcomeV1]] = {}
+    campaign_points: set[tuple[str, str, str]] = set()
+    for outcome in outcomes:
+        if not isinstance(outcome, PairedArmOutcomeV1):
+            raise ValueError("paired completion outcomes must be PairedArmOutcomeV1 records")
+        if outcome.arm_id not in expected:
+            raise ValueError("paired completion has an undeclared arm ID")
+        point = (outcome.campaign_spec_digest, outcome.cohort_id, outcome.point_id)
+        campaign_points.add(point)
+        identity = (*point, outcome.sample_identity)
+        arms = by_sample.setdefault(identity, {})
+        if outcome.arm_id in arms:
+            raise ValueError("paired completion has duplicate arm evidence for a sample identity")
+        arms[outcome.arm_id] = outcome
+    if len(campaign_points) != 1:
+        raise ValueError("paired completion must use one identical campaign, cohort, and point")
+    missing: dict[str, tuple[str, ...]] = {}
+    complete = 0
+    for identity, arms in by_sample.items():
+        if set(arms) == expected:
+            complete += 1
+        else:
+            missing[identity[-1]] = tuple(sorted(expected - set(arms)))
+    return PairedCompletionSummaryV1(
+        complete_pairs=complete,
+        incomplete_pairs=len(missing),
+        paired_inference_status="complete" if not missing else "inconclusive_incomplete_pairs",
+        missing_arms_by_sample=missing,
     )
 
 

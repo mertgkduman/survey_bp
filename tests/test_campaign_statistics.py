@@ -462,8 +462,8 @@ def test_outcome_summary_exposes_all_shot_acceptance_and_conditional_denominator
     assert summary.all_shot_performance.failures == 2
     assert summary.all_shot_performance.shots == 3
     assert summary.conditional_performance.failures == 1
-    assert summary.acceptance_probability.failures == 2
-    assert summary.acceptance_probability.shots == 3
+    assert summary.acceptance_probability.numerator == 2
+    assert summary.acceptance_probability.denominator == 3
     assert summary.status_counts["timeout"] == 1
     assert summary.status_counts["infrastructure_interruption"] == 1
     assert summary.actual_work == 21
