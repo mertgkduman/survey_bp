@@ -20,6 +20,7 @@ from .contracts import (
     ExactInverseBinomialIntervalV1,
     FiniteLookStoppingV1,
     FailureCountStoppingV1,
+    MultiplicativeTargetRuleV1,
     OutcomeMatrixV1,
     TargetReferenceV1,
 )
@@ -125,6 +126,27 @@ class TargetIntervalDecisionV1:
     tolerance: float
     acceptable_interval: tuple[float, float]
     input_receipt_hashes: tuple[tuple[str, str], ...]
+    source_denominator_required: bool
+    source_denominator: int | None
+
+
+@dataclass(frozen=True, slots=True)
+class MultiplicativeTargetDecisionV1:
+    """A replayable target verdict for a completed failure-count interval."""
+
+    verdict: Literal["pass", "discrepant", "inconclusive"]
+    reason: str
+    rule_id: Literal["multiplicative_target_interval_containment_v1"]
+    computed_interval: tuple[float, float] | None
+    target_interval: tuple[float, float]
+    source_absolute_tolerance: float
+    factor: float
+    acceptable_interval: tuple[float, float]
+    input_receipt_hashes: tuple[tuple[str, str], ...]
+    target_receipt_sha256: str
+    inferential_prefix_sha256: str | None
+    authorized_tail_sha256: str | None
+    count_receipt_sha256: str | None
     source_denominator_required: bool
     source_denominator: int | None
 
@@ -362,6 +384,122 @@ def target_interval_decision(
         tolerance=target.absolute_tolerance,
         acceptable_interval=acceptable,
         input_receipt_hashes=receipts,
+        source_denominator_required=source_denominator_required,
+        source_denominator=source_denominator,
+    )
+
+
+def _validated_inverse_rate(rate: ExactInverseBinomialRateV1) -> ExactInverseBinomialRateV1:
+    """Reject hand-built or tampered reports before publication-facing use."""
+    if not isinstance(rate, ExactInverseBinomialRateV1):
+        raise ValueError("rate must be an ExactInverseBinomialRateV1")
+    failures = _bounded_int(rate.target_failures, name="target_failures", minimum=1)
+    terminal = _bounded_int(rate.stopping_shot_ordinal, name="stopping_shot_ordinal", minimum=failures)
+    if rate.inferential_trials != terminal or rate.nonfailures != terminal - failures:
+        raise ValueError("inverse-binomial rate must retain the exact ordered stopping mapping")
+    if rate.total_completed_shots != terminal + rate.authorized_tail_count:
+        raise ValueError("inverse-binomial rate total completed shots must exclude no unrecorded tail")
+    _bounded_int(rate.authorized_tail_count, name="authorized_tail_count")
+    alpha = _probability(rate.alpha, name="alpha")
+    if not math.isclose(rate.confidence_level, 1.0 - alpha, rel_tol=0.0, abs_tol=1e-15):
+        raise ValueError("inverse-binomial rate confidence level must equal one minus alpha")
+    if rate.method != "exact_inverse_binomial" or rate.sidedness != "two_sided":
+        raise ValueError("inverse-binomial rate has an unsupported sampling design")
+    lower, upper = rate.interval
+    if not (math.isfinite(lower) and math.isfinite(upper) and 0.0 <= lower <= upper <= 1.0):
+        raise ValueError("inverse-binomial rate has an invalid interval")
+    if not math.isclose(rate.estimate, failures / terminal, rel_tol=0.0, abs_tol=1e-15):
+        raise ValueError("inverse-binomial rate estimate differs from the ordered stopping record")
+    _sha256(rate.inferential_prefix_sha256, name="inferential_prefix_sha256")
+    _sha256(rate.authorized_tail_sha256, name="authorized_tail_sha256")
+    _sha256(rate.count_receipt_sha256, name="count_receipt_sha256")
+    return rate
+
+
+def multiplicative_target_decision(
+    rate: ExactInverseBinomialRateV1 | None,
+    target: TargetReferenceV1,
+    rule: MultiplicativeTargetRuleV1,
+    *,
+    input_receipt_hashes: Mapping[str, str],
+    source_denominator_required: bool = False,
+    source_denominator: int | None = None,
+    evidence_status: Literal[
+        "cap_censored", "incomplete_count_receipt", "invalid_ordered_stop_receipt",
+    ] | None = None,
+) -> MultiplicativeTargetDecisionV1:
+    """Assess a frozen source band under a separately frozen factor rule.
+
+    A missing completed inverse-binomial report has only one valid path: an
+    explicit inconclusive evidence state.  This makes it impossible to award a
+    source-agreement result to cap-censored or incomplete evidence.
+    """
+    if not isinstance(target, TargetReferenceV1):
+        raise ValueError("target must be a frozen TargetReferenceV1")
+    if not isinstance(rule, MultiplicativeTargetRuleV1):
+        raise ValueError("rule must be a frozen MultiplicativeTargetRuleV1")
+    if type(source_denominator_required) is not bool:
+        raise ValueError("source_denominator_required must be a bool")
+    if source_denominator is not None:
+        source_denominator = _bounded_int(
+            source_denominator, name="source_denominator", minimum=1,
+        )
+    receipts = _receipt_hashes(input_receipt_hashes)
+    target_receipt = _sha256(target.target_receipt_sha256, name="target_receipt_sha256")
+    acceptable = (
+        max(0.0, target.lower / rule.factor),
+        min(1.0, target.upper * rule.factor),
+    )
+    if rate is None:
+        if evidence_status is None:
+            raise ValueError("missing inverse-binomial rate requires an explicit evidence_status")
+        return MultiplicativeTargetDecisionV1(
+            verdict="inconclusive",
+            reason=evidence_status,
+            rule_id=rule.rule,
+            computed_interval=None,
+            target_interval=(target.lower, target.upper),
+            source_absolute_tolerance=target.absolute_tolerance,
+            factor=rule.factor,
+            acceptable_interval=acceptable,
+            input_receipt_hashes=receipts,
+            target_receipt_sha256=target_receipt,
+            inferential_prefix_sha256=None,
+            authorized_tail_sha256=None,
+            count_receipt_sha256=None,
+            source_denominator_required=source_denominator_required,
+            source_denominator=source_denominator,
+        )
+    if evidence_status is not None:
+        raise ValueError("completed inverse-binomial evidence cannot carry an inconclusive evidence_status")
+    rate = _validated_inverse_rate(rate)
+    lower, upper = rate.interval
+    if source_denominator_required and source_denominator is None:
+        verdict: Literal["pass", "discrepant", "inconclusive"] = "inconclusive"
+        reason = "missing_required_source_denominator"
+    elif acceptable[0] <= lower and upper <= acceptable[1]:
+        verdict = "pass"
+        reason = "computed_interval_contained_in_multiplicative_acceptable_interval"
+    elif upper < acceptable[0] or lower > acceptable[1]:
+        verdict = "discrepant"
+        reason = "computed_interval_disjoint_from_multiplicative_acceptable_interval"
+    else:
+        verdict = "inconclusive"
+        reason = "computed_interval_overlaps_multiplicative_acceptable_interval"
+    return MultiplicativeTargetDecisionV1(
+        verdict=verdict,
+        reason=reason,
+        rule_id=rule.rule,
+        computed_interval=(lower, upper),
+        target_interval=(target.lower, target.upper),
+        source_absolute_tolerance=target.absolute_tolerance,
+        factor=rule.factor,
+        acceptable_interval=acceptable,
+        input_receipt_hashes=receipts,
+        target_receipt_sha256=target_receipt,
+        inferential_prefix_sha256=rate.inferential_prefix_sha256,
+        authorized_tail_sha256=rate.authorized_tail_sha256,
+        count_receipt_sha256=rate.count_receipt_sha256,
         source_denominator_required=source_denominator_required,
         source_denominator=source_denominator,
     )

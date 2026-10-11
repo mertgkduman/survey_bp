@@ -6,6 +6,7 @@ import base64
 from dataclasses import replace
 from hashlib import sha256
 import math
+from math import comb
 import importlib
 
 import pytest
@@ -159,6 +160,28 @@ def test_inverse_binomial_inverts_ordered_stopping_tails_and_excludes_tail() -> 
     assert baseline.count_receipt_sha256 != changed_tail.count_receipt_sha256
 
 
+def test_inverse_binomial_small_tail_bounds_match_enumerated_stopping_mass() -> None:
+    """Enumerate the finite CDF tails independently of SciPy's NB methods."""
+    stopping = _failure_count_stopping()
+    result = _exact_inverse_binomial_rate(
+        stopping=stopping,
+        interval_spec=_inverse_interval(stopping),
+        total_completed_shots=10,
+        count_receipt_sha256=_HASH,
+    )
+    r = result.target_failures
+    k = result.nonfailures
+
+    def cumulative(nonfailures: int, probability: float) -> float:
+        return sum(
+            comb(index + r - 1, r - 1) * probability**r * (1.0 - probability)**index
+            for index in range(nonfailures + 1)
+        )
+
+    assert cumulative(k, result.interval[0]) == pytest.approx(result.alpha / 2.0, abs=1e-10)
+    assert cumulative(k - 1, result.interval[1]) == pytest.approx(1.0 - result.alpha / 2.0, abs=1e-10)
+
+
 def test_inverse_binomial_rejects_censored_short_and_inconsistent_evidence() -> None:
     stopping = _failure_count_stopping()
     interval = _inverse_interval(stopping)
@@ -248,7 +271,7 @@ def test_multiplicative_target_decision_keeps_source_band_and_factor_separate() 
         input_receipt_hashes={"assessment": "c" * 64},
     )
     overlap = _multiplicative_target_decision(
-        rate, _multiplicative_target(0.65, 0.75), _factor_rule(),
+        rate, _multiplicative_target(0.32, 0.50), _factor_rule(),
         input_receipt_hashes={"assessment": "c" * 64},
     )
     assert passed.verdict == "pass"
