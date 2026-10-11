@@ -117,6 +117,16 @@ def test_layered_profile_counts_checks_repeated_across_layers():
     assert iterations * work_per_iteration >= 1 + 2 * 2 * (2 * table.edge_count + table.variable_count + 3)
 
 
+def test_guarded_syndrome_flip_rejects_explosive_eager_generation():
+    from bp_registry.runner import _admit_syndrome_flip_generation
+
+    _admit_syndrome_flip_generation(top_k=8, max_weight=1, variables=882)
+    with pytest.raises(ValueError, match="candidate generation exceeds"):
+        _admit_syndrome_flip_generation(top_k=100_000, max_weight=50_000, variables=882)
+    with pytest.raises(ValueError, match="candidate generation exceeds"):
+        _admit_syndrome_flip_generation(top_k=64, max_weight=3, variables=100_000)
+
+
 def test_strict_guarded_local_and_phase5_routes_reach_terminal(tmp_path):
     from bp_registry.runner import (
         CANONICAL_GUARDED_ARTIFACT_BYTE_CEILING_V1,

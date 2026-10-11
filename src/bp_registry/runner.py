@@ -424,6 +424,20 @@ def _work_scalar(vector: WorkVector) -> int:
     return sum(vector.as_evidence(structural_event_version=4).values())
 
 
+def _admit_syndrome_flip_generation(*, top_k: int, max_weight: int, variables: int) -> None:
+    """Bound eager candidate-vector construction before guarded execution."""
+    # The controller presently materializes and shuffles every combination
+    # before applying test_cap.  Its WorkVector charges one order-generation
+    # leaf, so that cap alone cannot bound CPU or memory for a large top_k.
+    combinations = 0
+    current = 1
+    for weight in range(1, min(top_k, max_weight) + 1):
+        current = current * (top_k - weight + 1) // weight
+        combinations += current
+        if combinations > 8192 or combinations * variables > 8_388_608:
+            raise ValueError("guarded syndrome-flip candidate generation exceeds its bounded envelope")
+
+
 def _route_dimensions(manifest: object, table: EdgeTable, route: str) -> tuple[int, int, dict[str, int]]:
     """Return named route quantities from validated manifest and code facts."""
     # This is the scalar over *all* persisted WorkVector V4 fields, rather
@@ -498,6 +512,11 @@ def _route_dimensions(manifest: object, table: EdgeTable, route: str) -> tuple[i
             attempts = _checked_product(spec.eta, spec.t_cap, name="restart attempts")
         if attempts is None:
             raise ValueError(f"unregistered Phase 5 intervention route {kind!r}")
+        if kind == "syndrome_flip":
+            _admit_syndrome_flip_generation(
+                top_k=spec.top_k, max_weight=spec.max_weight,
+                variables=table.variable_count,
+            )
         branches = spec.eta if kind == "restart_belief" else 0
         named = {
             "shot_begin": 1, "intervention": 1, "branch": branches,
