@@ -643,8 +643,6 @@ class CanonicalExperimentV7(CanonicalExperimentV3):
             ("pilot_adaptation", "pilot_adaptation"),
         } or self.evidence.assessment_status != "not_assessed":
             raise ValueError("public MBBP-LD requires a not-assessed canonical or pilot-adaptation evidence label")
-        if self.vote is not None:
-            raise ValueError("coordinate-majority voting is declared but not yet executable in the public MBBP-LD contract")
         if self.ensemble.max_iterations != self.budgets.attempt.max_iterations:
             raise ValueError("MBBP ensemble and public attempt iteration caps must agree")
         total_c2v = len(self.ensemble.bases) * self.ensemble.max_member_c2v_updates
