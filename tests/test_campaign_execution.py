@@ -7,6 +7,8 @@ import importlib
 import json
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 INNER_MANIFEST = "data/manifests/canonical-three-qubit-development.json"
@@ -88,3 +90,60 @@ def test_identity_is_acyclic_and_changes_only_with_scientific_primitives():
     assert original_plan.campaign_plan_digest != changed_plan.campaign_plan_digest
     assert b"campaign_plan_digest" not in original_plan.campaign_spec_bytes
     assert b"campaign_plan_digest" not in original_plan.campaign_plan_preimage
+
+
+def test_sample_identity_is_arm_and_worker_neutral_but_decoder_randomness_is_arm_scoped():
+    """Matched arms retain bytes while decoder-local streams remain independent."""
+    from bp_registry.campaigns.identity import (
+        decoder_randomness_identity,
+        physical_sample_identity,
+    )
+
+    scientific = "a" * 64
+    sample = physical_sample_identity(
+        campaign_spec_digest=scientific,
+        cohort_id="bb144",
+        point_id="p005",
+        sample_namespace="shared-errors-v1",
+        sample_id=7,
+    )
+    assert sample == physical_sample_identity(
+        campaign_spec_digest=scientific,
+        cohort_id="bb144",
+        point_id="p005",
+        sample_namespace="shared-errors-v1",
+        sample_id=7,
+    )
+    left = decoder_randomness_identity(
+        campaign_spec_digest=scientific, arm_id="spa", sample_id=7,
+        decoder_seed_identity="spa-seed-v1",
+    )
+    right = decoder_randomness_identity(
+        campaign_spec_digest=scientific, arm_id="ms", sample_id=7,
+        decoder_seed_identity="ms-seed-v1",
+    )
+    assert left != right
+
+
+def test_persisted_sample_receipt_rejects_tampered_bytes_before_decoder_use():
+    """A non-reproducible backend gets one hash-bound artifact for all arms."""
+    from bp_registry.campaigns.identity import (
+        PersistedSampleReceiptV1,
+        physical_sample_identity,
+        verify_persisted_sample,
+    )
+
+    artifact = b"fixed physical error vector"
+    sample = physical_sample_identity(
+        campaign_spec_digest="a" * 64, cohort_id="bb144", point_id="p005",
+        sample_namespace="shared-errors-v1", sample_id=7,
+    )
+    receipt = PersistedSampleReceiptV1(
+        campaign_spec_digest="a" * 64, cohort_id="bb144", point_id="p005",
+        sample_namespace="shared-errors-v1", sample_id=7,
+        physical_sample_identity=sample, artifact_sha256=sha256(artifact).hexdigest(),
+        artifact_bytes=len(artifact),
+    )
+    assert verify_persisted_sample(receipt, artifact) == artifact
+    with pytest.raises(ValueError, match="digest"):
+        verify_persisted_sample(receipt, artifact + b"!")
