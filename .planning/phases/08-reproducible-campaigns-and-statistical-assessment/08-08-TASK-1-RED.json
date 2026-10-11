@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_statistics.py -k 'paired or discordance or risk_difference or holm or unavailable_family or family' -x",
+  "exitCode": 1,
+  "targetTest": "test_paired_table_exhaustively_retains_cells_marginals_and_exact_discordance",
+  "targetFile": "tests/test_campaign_statistics.py",
+  "expected": "The campaign statistical API produces paired tables and frozen-family Holm results.",
+  "actual": "AssertionError: campaign statistics module must provide paired arm outcomes",
+  "output": "TAP version 13\nnot ok 1 - test_paired_table_exhaustively_retains_cells_marginals_and_exact_discordance\n  ---\n  message: AssertionError: campaign statistics module must provide paired arm outcomes\n  ...\n1..1\n# tests 1\n# pass 0\n# fail 1\n"
+}

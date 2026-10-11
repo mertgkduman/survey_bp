@@ -257,3 +257,162 @@ def test_finite_look_partial_batch_and_undeclared_peeking_are_inconclusive_or_re
             observations=(_look(look=15, dispatched=15, realized=15, failures=0),),
             input_receipt_hashes={"assessment": "c" * 64},
         )
+
+
+def _paired_table(*args: object, **kwargs: object) -> object:
+    api = _statistics_api()
+    assert api is not None and hasattr(api, "paired_outcome_table"), (
+        "campaign statistics module must provide paired outcome tables"
+    )
+    return api.paired_outcome_table(*args, **kwargs)
+
+
+def _paired_outcome(*, sample: str, arm: str, failure: bool) -> object:
+    api = _statistics_api()
+    assert api is not None and hasattr(api, "PairedArmOutcomeV1"), (
+        "campaign statistics module must provide paired arm outcomes"
+    )
+    return api.PairedArmOutcomeV1(
+        campaign_spec_digest="c" * 64,
+        cohort_id="cohort",
+        point_id="p050",
+        sample_identity=sample,
+        arm_id=arm,
+        terminal_status="wrong_logical_action" if failure else "exact",
+    )
+
+
+@pytest.mark.parametrize("both_ok,first_only,second_only,both_failed", [
+    (0, 0, 0, 1), (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (1, 1, 1, 1),
+])
+def test_paired_table_exhaustively_retains_cells_marginals_and_exact_discordance(
+    both_ok: int, first_only: int, second_only: int, both_failed: int,
+) -> None:
+    records: list[object] = []
+    cells = ((0, 0, both_ok), (1, 0, first_only), (0, 1, second_only), (1, 1, both_failed))
+    sample_index = 0
+    for first_failure, second_failure, count in cells:
+        for _ in range(count):
+            sample = f"sample-{sample_index}"
+            records.extend((
+                _paired_outcome(sample=sample, arm="first", failure=bool(first_failure)),
+                _paired_outcome(sample=sample, arm="second", failure=bool(second_failure)),
+            ))
+            sample_index += 1
+    result = _paired_table(
+        outcomes=tuple(records),
+        arm_ids=("first", "second"),
+        alpha=0.05,
+        count_receipt_sha256=_HASH,
+    )
+    assert result.table == {
+        "first_success_second_success": both_ok,
+        "first_failure_second_success": first_only,
+        "first_success_second_failure": second_only,
+        "first_failure_second_failure": both_failed,
+    }
+    total = sum((both_ok, first_only, second_only, both_failed))
+    assert result.complete_pairs == total
+    assert result.first_failure_rate == pytest.approx((first_only + both_failed) / total)
+    assert result.second_failure_rate == pytest.approx((second_only + both_failed) / total)
+    discordant = first_only + second_only
+    expected_p = 1.0 if discordant == 0 else binomtest(first_only, discordant, p=0.5).pvalue
+    assert result.exact_discordance_p_value == pytest.approx(expected_p)
+    assert result.risk_difference == pytest.approx((first_only - second_only) / total)
+    assert result.risk_difference_interval[0] <= result.risk_difference <= result.risk_difference_interval[1]
+
+
+def test_paired_table_rejects_tampered_or_partial_identity_and_keeps_zero_discordance_exact() -> None:
+    complete = _paired_table(
+        outcomes=(
+            _paired_outcome(sample="shared", arm="first", failure=False),
+            _paired_outcome(sample="shared", arm="second", failure=False),
+        ),
+        arm_ids=("first", "second"),
+        alpha=0.05,
+        count_receipt_sha256=_HASH,
+    )
+    assert complete.exact_discordance_p_value == 1.0
+    with pytest.raises(ValueError, match="partial"):
+        _paired_table(
+            outcomes=(_paired_outcome(sample="only-first", arm="first", failure=False),),
+            arm_ids=("first", "second"),
+            alpha=0.05,
+            count_receipt_sha256=_HASH,
+        )
+    with pytest.raises(ValueError, match="duplicate"):
+        _paired_table(
+            outcomes=(
+                _paired_outcome(sample="shared", arm="first", failure=False),
+                _paired_outcome(sample="shared", arm="first", failure=True),
+                _paired_outcome(sample="shared", arm="second", failure=False),
+            ),
+            arm_ids=("first", "second"),
+            alpha=0.05,
+            count_receipt_sha256=_HASH,
+        )
+
+
+def _holm_family(*args: object, **kwargs: object) -> object:
+    api = _statistics_api()
+    assert api is not None and hasattr(api, "holm_adjusted_family"), (
+        "campaign statistics module must provide frozen-family Holm adjustment"
+    )
+    return api.holm_adjusted_family(*args, **kwargs)
+
+
+def _holm_member(comparison_id: str, raw_p_value: float | None) -> object:
+    api = _statistics_api()
+    assert api is not None and hasattr(api, "HolmFamilyMemberV1"), (
+        "campaign statistics module must provide Holm family member records"
+    )
+    return api.HolmFamilyMemberV1(comparison_id=comparison_id, raw_p_value=raw_p_value)
+
+
+def test_holm_uses_the_frozen_full_family_for_unavailable_members() -> None:
+    with_unavailable = _holm_family(
+        family_id="frozen-family",
+        alpha=0.05,
+        members=(
+            _holm_member("a", 0.01),
+            _holm_member("b", None),
+            _holm_member("c", 0.04),
+        ),
+    )
+    explicit_sentinel = _holm_family(
+        family_id="frozen-family",
+        alpha=0.05,
+        members=(
+            _holm_member("a", 0.01),
+            _holm_member("b", 1.0),
+            _holm_member("c", 0.04),
+        ),
+    )
+    unavailable = next(member for member in with_unavailable.members if member.comparison_id == "b")
+    assert with_unavailable.frozen_family_size == 3
+    assert with_unavailable.verdict == "inconclusive"
+    assert unavailable.status == "unavailable"
+    assert unavailable.conclusion == "inconclusive"
+    assert unavailable.sentinel_p_value == unavailable.adjusted_p_value == 1.0
+    for comparison_id in ("a", "c"):
+        first = next(member for member in with_unavailable.members if member.comparison_id == comparison_id)
+        second = next(member for member in explicit_sentinel.members if member.comparison_id == comparison_id)
+        assert (first.rank, first.multiplier, first.adjusted_p_value) == (
+            second.rank, second.multiplier, second.adjusted_p_value,
+        )
+
+
+def test_holm_orders_ties_by_id_and_applies_running_maximum() -> None:
+    result = _holm_family(
+        family_id="family",
+        alpha=0.05,
+        members=(
+            _holm_member("z", 0.01),
+            _holm_member("a", 0.01),
+            _holm_member("later", 0.03),
+        ),
+    )
+    assert [member.comparison_id for member in result.members] == ["a", "z", "later"]
+    assert [member.rank for member in result.members] == [1, 2, 3]
+    assert [member.multiplier for member in result.members] == [3, 2, 1]
+    assert [member.adjusted_p_value for member in result.members] == pytest.approx([0.03, 0.03, 0.03])
