@@ -15,6 +15,7 @@ from typing import Any, Callable, Literal, Mapping
 
 from .ledger import canonical_serializer_descriptor, CanonicalResourceInterruption, Writer, read_canonical_events
 from .canonical.metrics import unavailable_metric
+from .canonical.budgets import WorkVector
 from .canonical.execution import run_canonical_structural_shot
 from .canonical.verification import PublicShotContext
 from .canonical.numerics import MIN_SUM_CPU_F64, REFERENCE_CPU_F64
@@ -84,6 +85,11 @@ def _unavailable_native_metric_facts(stage: str) -> list[dict[str, int | float |
 _REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 _SELECTED_PROVENANCE = _REPOSITORY_ROOT / "data/artifacts/selected-css.provenance.json"
 
+# Versioned hard ceilings for guarded canonical artifact and interruption
+# writes. These are protocol limits, not claims about natural payload maxima.
+CANONICAL_GUARDED_ARTIFACT_BYTE_CEILING_V1 = 262_144
+CANONICAL_GUARDED_CONTROL_RECEIPT_BYTE_CEILING_V1 = 32_768
+
 
 @dataclass(frozen=True, slots=True)
 class CanonicalRuntimeAuthorizationV1:
@@ -102,6 +108,8 @@ class CanonicalRuntimeAuthorizationV1:
     max_storage_bytes: int
     control_receipt_reserve_bytes: int
     monotonic_deadline_ns: int | None = None
+    max_event_bytes: int | None = None
+    max_artifact_bytes: int | None = None
 
     def __post_init__(self) -> None:
         if self.mode not in {"strict_full_unit", "interruptible_unit"}:
@@ -116,6 +124,10 @@ class CanonicalRuntimeAuthorizationV1:
             raise ValueError("runtime authorization limits must be positive integers")
         if self.monotonic_deadline_ns is not None and (type(self.monotonic_deadline_ns) is not int or self.monotonic_deadline_ns < 0):
             raise ValueError("monotonic deadline must be a nonnegative integer or absent")
+        if any(value is not None and (type(value) is not int or value < 1) for value in (
+            self.max_event_bytes, self.max_artifact_bytes,
+        )):
+            raise ValueError("guarded payload ceilings must be positive integers or absent")
 
     @classmethod
     def strict_full_unit(cls, *, derived_events: int, derived_evidence_bytes: int,
@@ -148,6 +160,8 @@ class CanonicalRuntimeSnapshotV1:
     before_ns: int | None
     after_ns: int | None
     overshoot_ns: int | None
+    committed_work: WorkVector
+    last_work_leaf_id: str | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -174,6 +188,8 @@ class CanonicalRuntimeGuardV1:
         self._after_ns: int | None = None
         self._pending_before: dict[str, int] = {}
         self._pending_reservations: dict[int, _RuntimeReservation] = {}
+        self._committed_work = WorkVector.zero()
+        self._last_work_leaf_id: str | None = None
 
     def snapshot(self) -> CanonicalRuntimeSnapshotV1:
         deadline = self.authorization.monotonic_deadline_ns
@@ -183,6 +199,7 @@ class CanonicalRuntimeGuardV1:
             self._interruption_kind, self._boundary, self._attempted_bytes,
             deadline, self._before_ns, self._after_ns,
             None if deadline is None or self._after_ns is None else max(0, self._after_ns - deadline),
+            self._committed_work, self._last_work_leaf_id,
         )
 
     @property
@@ -218,6 +235,8 @@ class CanonicalRuntimeGuardV1:
     def reserve_ledger_append(self, payload: bytes, *, boundary: str) -> _RuntimeReservation:
         if not isinstance(payload, bytes) or not payload.endswith(b"\n"):
             raise ValueError("ledger reservation requires exact framed bytes")
+        if self.authorization.max_event_bytes is not None and len(payload) > self.authorization.max_event_bytes:
+            self._interrupt("unsupported_event_payload", boundary=boundary, attempted_bytes=len(payload))
         reservation = self._scientific_reservation(kind="ledger", events=1, evidence=len(payload), storage=len(payload), boundary=boundary)
         self._pending_reservations[id(reservation)] = reservation
         return reservation
@@ -225,6 +244,8 @@ class CanonicalRuntimeGuardV1:
     def reserve_artifact_write(self, byte_count: int, *, boundary: str) -> _RuntimeReservation:
         if type(byte_count) is not int or byte_count < 0:
             raise ValueError("artifact reservation requires a nonnegative exact byte count")
+        if self.authorization.max_artifact_bytes is not None and byte_count > self.authorization.max_artifact_bytes:
+            self._interrupt("unsupported_artifact_payload", boundary=boundary, attempted_bytes=byte_count)
         reservation = self._scientific_reservation(kind="artifact", events=0, evidence=0, storage=byte_count, boundary=boundary)
         self._pending_reservations[id(reservation)] = reservation
         return reservation
@@ -266,9 +287,27 @@ class CanonicalRuntimeGuardV1:
             self._interrupt("wall_deadline", boundary=boundary, before_ns=now, after_ns=now)
         self._pending_before[boundary] = now
 
-    def after_work(self, boundary: str) -> None:
+    def record_work(self, committed_work: WorkVector, *, leaf_id: str) -> None:
+        """Retain the producer's committed total before an interruption can latch."""
+        if self._latched:
+            self._interrupt("already_interrupted", boundary=leaf_id)
+        if not isinstance(committed_work, WorkVector):
+            raise TypeError("committed canonical work requires a WorkVector")
+        if not isinstance(leaf_id, str) or not leaf_id:
+            raise ValueError("committed canonical work requires a leaf identity")
+        before = self._committed_work.as_evidence(structural_event_version=4)
+        after = committed_work.as_evidence(structural_event_version=4)
+        if any(after[name] < count for name, count in before.items()):
+            raise ValueError("committed canonical work cannot decrease")
+        self._committed_work = committed_work
+        self._last_work_leaf_id = leaf_id
+
+    def after_work(self, boundary: str, *, committed_work: WorkVector | None = None,
+                   leaf_id: str | None = None) -> None:
         if self._latched:
             self._interrupt("already_interrupted", boundary=boundary)
+        if committed_work is not None:
+            self.record_work(committed_work, leaf_id=leaf_id or boundary)
         now = self._clock_ns()
         deadline = self.authorization.monotonic_deadline_ns
         before = self._pending_before.pop(boundary, now)
@@ -418,8 +457,11 @@ def _route_dimensions(manifest: object, table: EdgeTable, route: str) -> tuple[i
         named = {
             "shot_begin": 1, "intervention": 1, "branch": branches,
             "transform": attempts, "attempt": attempts, "lift": attempts,
-            "attempt_original_check": attempts,
-            "candidate": 1, "selected_original_check": 1, "selection": 1,
+            # ``phase5_attempt_events`` emits an original_check for every
+            # valid projected attempt; a selected candidate emits one final
+            # original-space check as well.
+            "original_check": attempts + 1,
+            "candidate": 1, "selection": 1,
             "work": 1, "evaluation": 1, "runtime": 1, "termination": 1,
         }
         return _checked_product(iterations, manifest.intervention_limits.max_total_attempts,
@@ -434,8 +476,11 @@ def _route_dimensions(manifest: object, table: EdgeTable, route: str) -> tuple[i
             # event per admitted member, rather than one event per bit.
             return _checked_product(iterations, members, name="MBBP iteration units"), core_sweep_work, {
                 "shot_begin": 1, "basis": members, "member": members,
-                "vote_electorate": 1, "vote_ballot": members,
-                "vote_aggregate": 1, "vote_validation": 1,
+                # ``phase6_events`` emits an exclusion for every member
+                # that is not admitted before the electorate/ballot branch.
+                "vote_exclusion": members, "vote_electorate": 1,
+                "vote_ballot": members, "vote_aggregate": 1,
+                "vote_validation": 1,
                 "work_leaf": work_leaves, "evaluation": 1, "termination": 1,
             }
         return _checked_product(iterations, members, name="MBBP iteration units"), core_sweep_work, {
@@ -447,37 +492,71 @@ def _route_dimensions(manifest: object, table: EdgeTable, route: str) -> tuple[i
     raise ValueError(f"unregistered canonical route {route!r}")
 
 
-def _profile_event_template(*, ledger_version: int, route: str, manifest: object, table: EdgeTable) -> dict[str, dict[str, object]]:
-    """Refuse a fabricated event-byte template until the grammar is closed.
+def _profile_event_template(*, ledger_version: int, route: str, manifest: object, table: EdgeTable) -> dict[str, object]:
+    """Return the guarded serializer rule instead of inventing event payloads.
 
-    The current canonical validator verifies only the outer event envelope for
-    V2--V4 and allows open ``data`` objects at several real emission sites.
-    V5/V7 narrow two envelope keys but leave their nested payload open.  A
-    candidate-shaped object with invented fields can pass that validator, but
-    is not a template emitted by the engine and cannot prove a byte maximum.
+    Canonical event payload schemas intentionally remain open.  Profiles bind a
+    versioned hard framed-byte ceiling that the guarded writer enforces after
+    exact serialization and before mutation; it is not a measured natural
+    maximum.  Route and structural version remain digest inputs so a later
+    grammar change cannot reuse this authorization silently.
     """
-    del ledger_version, manifest, table
-    raise ValueError(
-        f"registered route {route!r} lacks closed per-kind canonical event payload schemas; "
-        "an exact framed-byte maximum cannot be derived"
-    )
-
-
-def _artifact_layout_bytes(manifest: object, table: EdgeTable) -> tuple[int, dict[str, int]]:
-    """Reject unresolved non-ledger layouts before a hard-cap declaration."""
     del manifest, table
-    raise ValueError(
-        "canonical executable profile requires a closed materialized-sample and engine-result artifact layout"
+    serializer = canonical_serializer_descriptor(structural_event_version=ledger_version)
+    ceiling = serializer.get("guarded_event_ceiling")
+    if not isinstance(ceiling, dict) or type(ceiling.get("max_framed_bytes")) is not int:
+        raise ValueError("canonical serializer lacks a versioned guarded event ceiling")
+    return {"route": route, "ledger_version": ledger_version, **ceiling}
+
+
+def _artifact_layout_bytes(manifest: object, table: EdgeTable) -> tuple[int, dict[str, object]]:
+    """Derive declared non-ledger artifact ceilings for one guarded unit.
+
+    The two regular artifacts (materialized sample and engine result) are each
+    capped by the runtime guard.  A selected trace sidecar is a third bounded
+    artifact.  Plan 09-17 owns passing its concrete artifact writes through
+    that guard; profiles reject a trace configuration above the frozen
+    per-artifact ceiling until that route has a distinct registered rule.
+    """
+    del table
+    trace = getattr(manifest, "trace_plan", None)
+    trace_bytes = 0
+    if trace is not None and getattr(trace, "level", "off") != "off":
+        trace_bytes = getattr(trace, "max_bytes", None)
+        if type(trace_bytes) is not int or trace_bytes < 0:
+            raise ValueError("canonical trace plan lacks a bounded byte ceiling")
+    if trace_bytes > CANONICAL_GUARDED_ARTIFACT_BYTE_CEILING_V1:
+        raise ValueError("canonical trace plan exceeds the registered guarded artifact ceiling")
+    layout: dict[str, object] = {
+        "schema": "canonical-nonledger-artifact-ceilings-v1",
+        "sample_bytes": CANONICAL_GUARDED_ARTIFACT_BYTE_CEILING_V1,
+        "result_bytes": CANONICAL_GUARDED_ARTIFACT_BYTE_CEILING_V1,
+        "trace_sidecar_bytes": trace_bytes,
+        "per_artifact_ceiling_bytes": CANONICAL_GUARDED_ARTIFACT_BYTE_CEILING_V1,
+        "enforcement": "runtime_guard.reserve_artifact_write.exact_bytes",
+        "campaign_integration": "plan-09-17",
+    }
+    return (
+        _checked_product(2, CANONICAL_GUARDED_ARTIFACT_BYTE_CEILING_V1, name="regular artifact ceilings")
+        + trace_bytes,
+        layout,
     )
 
 
 def _neutral_interruption_reserve(manifest: object) -> int:
-    """Reject an unbounded caller receipt rather than reserve a guessed size."""
+    """Return the frozen caller-control receipt reserve, independent of a run."""
     del manifest
-    raise ValueError(
-        "canonical executable profile requires a versioned bounded interruption-control receipt schema"
-    )
+    return CANONICAL_GUARDED_CONTROL_RECEIPT_BYTE_CEILING_V1
 
+
+def _interruption_control_descriptor() -> dict[str, object]:
+    """Describe the dedicated interruption receipt budget bound into profiles."""
+    return {
+        "schema": "canonical-interruption-control-receipt-ceiling-v1",
+        "max_bytes": CANONICAL_GUARDED_CONTROL_RECEIPT_BYTE_CEILING_V1,
+        "enforcement": "runtime_guard.reserve_control_receipt.exact_bytes",
+        "campaign_validation": "plan-09-17",
+    }
 
 def derive_canonical_executable_maxima(context: "CanonicalPublicManifestContext") -> CanonicalExecutableMaximaV1:
     """Derive a conservative, digest-bound maximum without campaign declarations.
@@ -494,11 +573,13 @@ def derive_canonical_executable_maxima(context: "CanonicalPublicManifestContext"
     iterations, work_per_iteration, event_inventory = _route_dimensions(manifest, table, route)
     events = sum(event_inventory.values())
     serializer = canonical_serializer_descriptor(structural_event_version=ledger_version)
-    template_bounds = _profile_event_template(
+    ceiling = _profile_event_template(
         ledger_version=ledger_version, route=route, manifest=manifest, table=table,
     )
-    serializer_bytes = max(template_bounds.values())
+    serializer_bytes = ceiling["max_framed_bytes"]
+    assert type(serializer_bytes) is int
     control_reserve = _neutral_interruption_reserve(manifest)
+    control_descriptor = _interruption_control_descriptor()
     artifact_bytes, artifact_layout = _artifact_layout_bytes(manifest, table)
     evidence = _checked_product(events, serializer_bytes, name="derived evidence") + control_reserve
     storage = artifact_bytes + evidence
@@ -510,10 +591,11 @@ def derive_canonical_executable_maxima(context: "CanonicalPublicManifestContext"
     return CanonicalExecutableMaximaV1(
         "v1", route, _canonical_digest("canonical-manifest-dimensions-v1", dimensions),
         _canonical_digest("canonical-policy-binding-v1", {"identity": context.composition_identity, "effects": context.policy_effects}),
-        _canonical_digest("canonical-serializer-v1", {"descriptor": serializer, "template_bounds": template_bounds}),
+        _canonical_digest("canonical-serializer-v1", {"descriptor": serializer, "route_ceiling": ceiling}),
         _canonical_digest("canonical-artifact-layout-v1", artifact_layout),
         _canonical_digest("canonical-verifier-v1", {"public_context": "v1", "route": route,
-                                                      "inventory": event_inventory}),
+                                                      "inventory": event_inventory,
+                                                      "control_receipt": control_descriptor}),
         iterations, work_per_iteration, events, serializer_bytes, artifact_bytes, control_reserve,
         _checked_product(iterations, work_per_iteration, name="derived decoder work"), events, evidence, storage,
     )
@@ -1096,6 +1178,10 @@ def run_canonical_materialized_one(
         derived = derive_canonical_executable_maxima(public)
         if runtime_authorization.profile_digest != derived.digest:
             raise ValueError("runtime authorization profile_digest differs from executable route")
+        if runtime_authorization.max_event_bytes != derived.serializer_bytes_per_event:
+            raise ValueError("runtime authorization event ceiling differs from executable route")
+        if runtime_authorization.max_artifact_bytes != CANONICAL_GUARDED_ARTIFACT_BYTE_CEILING_V1:
+            raise ValueError("runtime authorization artifact ceiling differs from executable route")
         if runtime_authorization.control_receipt_reserve_bytes < derived.partial_receipt_reserve_bytes:
             raise ValueError("runtime authorization control receipt reserve is smaller than derived")
         if runtime_authorization.mode == "strict_full_unit" and (

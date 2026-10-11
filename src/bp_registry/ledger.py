@@ -25,6 +25,9 @@ CANONICAL_RELAY_LEDGER_VERSION = 4
 CANONICAL_INTERVENTION_LEDGER_VERSION = 5
 CANONICAL_ENSEMBLE_LEDGER_VERSION = 6
 CANONICAL_POSTPROCESSING_LEDGER_VERSION = 7
+# This is a guarded-writer authorization rule.  It is deliberately not an
+# observation or assertion about the largest payload a decoder might produce.
+CANONICAL_GUARDED_EVENT_BYTE_CEILING_V1 = 262_144
 ShotKey = tuple[str, int]
 
 
@@ -68,6 +71,22 @@ def canonical_serializer_descriptor(*, structural_event_version: int) -> dict[st
         "ledger_version": structural_event_version,
         "json": {"sort_keys": True, "separators": [",", ":"], "ensure_ascii": False, "allow_nan": False},
         "framing": "utf8-json-plus-lf",
+        "guarded_event_ceiling": canonical_guarded_event_ceiling_descriptor(),
+    }
+
+
+def canonical_guarded_event_ceiling_descriptor() -> dict[str, object]:
+    """Return the versioned per-event cap enforced by guarded append paths.
+
+    ``CanonicalRuntimeGuardV1.reserve_ledger_append`` receives the exact
+    serialized JSONL bytes from :class:`CanonicalEventWriter` and rejects a
+    larger framed event before any append handle is opened.  Unguarded legacy
+    writers deliberately retain their historical behavior.
+    """
+    return {
+        "schema": "canonical-guarded-event-ceiling-v1",
+        "max_framed_bytes": CANONICAL_GUARDED_EVENT_BYTE_CEILING_V1,
+        "enforcement": "runtime_guard.reserve_ledger_append.exact_framed_bytes",
     }
 
 
