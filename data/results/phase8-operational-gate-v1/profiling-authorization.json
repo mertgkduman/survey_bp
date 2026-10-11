@@ -1,0 +1,40 @@
+{
+  "schema": "phase8_profiling_authorization_v1",
+  "label": "development_fixture",
+  "assessment_status": "not_assessed",
+  "decision": "deny",
+  "reasons": [
+    "missing_site_ceiling:max_cpu_time_ns",
+    "missing_site_ceiling:max_wall_time_ns",
+    "missing_site_ceiling:max_storage_bytes",
+    "missing_site_ceiling:max_shard_bytes",
+    "missing_site_ceiling:max_replay_time_ns",
+    "missing_site_ceiling:max_peak_memory_bytes",
+    "missing_site_ceiling:max_scheduler_cost_ns",
+    "missing_measurement:site_accounting"
+  ],
+  "safety_factor": {"numerator": 2, "denominator": 1},
+  "measured": {
+    "fast_local_elapsed_seconds": 4.063,
+    "fast_local_user_seconds": 1.920,
+    "fast_local_system_seconds": 0.137,
+    "slurm_route_elapsed_seconds": 3.895,
+    "slurm_route_user_seconds": 1.907,
+    "slurm_route_system_seconds": 0.115,
+    "local_shard_storage_bytes": 15378,
+    "synthetic_slurm_storage_bytes": 5034,
+    "local_ledger_bytes": 11842,
+    "real_site_submission_count": 0,
+    "synthetic_array_tasks": 2,
+    "synthetic_array_concurrency": 1,
+    "candidate_real_array_limit": {"tasks": 2, "concurrency": 1, "cpus_per_task": 1, "wall_minutes": 5}
+  },
+  "receipt_sha256s": {
+    "campaign_seal": "72a8488436f9216418c45ab2a27fc6155723f64a77c2319bd8eb0b279d970ae9",
+    "site_capability": "d0f2600225d731792785ba5b6ef80ea6928b3167758726af76ccd9d415c46ebc",
+    "merge": "209e8c1cc39642ff1652a18ae3c5c8c8b9fdfc5b5a8a81c09c17ef9534b52e56",
+    "assessment": "51b217361b9e0ff8abb62376a167a3144827a68f6471757c379bc57b5438f739",
+    "finite_look_recovery": "e232b8397b598609f985da7708d521657bb75f6f74c606de02cd2c5954245895"
+  },
+  "interpretation": "Measurements bound this development gate only. Missing site ceilings and accounting deny production or publication-scale dispatch."
+}

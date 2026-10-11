@@ -624,6 +624,39 @@ def test_operational_gate_preflight_binds_both_paths_without_creating_evidence(t
     assert "operational_gate manifest SHA-256" in json.loads(rejected.stdout)["error"]
 
 
+def test_operational_fixture_recovers_a_post_decision_crash_without_next_look(tmp_path: Path):
+    """The bounded gate retains its stop-receipt recovery proof on disk."""
+    study = ROOT / "data/studies/phase8-operational-gate-v1.json"
+    output_root = tmp_path / "operational-fixture"
+    completed = _run_campaign_module(
+        "operational-fixture", "--campaign", str(study), "--campaign-root", str(ROOT),
+        "--output-root", str(output_root),
+    )
+
+    assert completed.returncode == 0, completed.stdout
+    response = json.loads(completed.stdout)
+    assert response["recovered_stop_receipt"] is True
+    receipt = json.loads((output_root / "finite-look-recovery.json").read_text(encoding="utf-8"))
+    assert receipt["next_look_submissions"] == 0
+    assert receipt["pre_crash_receipt_sha256s"] == receipt["post_crash_receipt_sha256s"]
+    assert receipt["authorized_undispatched_keys"]
+
+
+def test_operational_gate_verify_requires_retained_bounded_evidence() -> None:
+    """The public Phase 8 verification entry point proves the retained gate."""
+    result_root = ROOT / "data/results/phase8-operational-gate-v1"
+    completed = _run_campaign_module(
+        "verify", "--campaign", str(ROOT / "data/studies/phase8-operational-gate-v1.json"),
+        "--campaign-root", str(ROOT), "--output", str(result_root),
+    )
+
+    assert completed.returncode == 0, completed.stdout
+    payload = json.loads(completed.stdout)
+    assert payload["verified"] is True
+    assert payload["production_authorization"] == "deny"
+    assert payload["next_look_submissions"] == 0
+
+
 def test_cli_lifecycle_uses_preserved_receipts_and_rejects_plan_drift(tmp_path: Path):
     """One bounded manifest reaches each lifecycle stage without mutable inputs."""
     campaign = _write_cli_campaign(tmp_path / "campaign.json")

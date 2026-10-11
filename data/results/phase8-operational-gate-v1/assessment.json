@@ -1,0 +1,1 @@
+{"assessment_status": "evidence_reconstructed", "campaign_plan_digest": "94b24f5b722bd878f038945edb3fcfffde4bdcf8dc8f9ccc6731dd8f268bd03f", "campaign_spec_digest": "9e3e9399f089f4378f160e2d7935f9baeb74c6411254daeefc88090165b9f453", "completed": 1, "failures": 1, "phase": "assess", "schema": "bp_registry_campaign_cli_v1", "status": "ok"}

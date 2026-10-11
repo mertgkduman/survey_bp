@@ -20,10 +20,16 @@ from pydantic import ValidationError
 
 from ..manifests import preflight as preflight_manifest
 from .contracts import CampaignSpecV1, build_one_unit_plan, canonical_json_bytes
-from .execution import run_one_unit
+from .execution import dispatch_finite_looks, run_one_unit
 from .planning import CampaignCoordinateV1, freeze_work_plan
 from .shards import reconstruct_fixed_shot, verify_shard
-from .slurm import SlurmAllocation, build_sbatch_argv, parse_site_capabilities
+from .slurm import (
+    SchedulerObservation,
+    SlurmAllocation,
+    build_sbatch_argv,
+    execute_synthetic_slurm_array,
+    parse_site_capabilities,
+)
 
 
 _CLI_SCHEMA = "bp_registry_campaign_cli_v1"
@@ -289,6 +295,51 @@ def _verify(args: argparse.Namespace) -> dict[str, Any]:
                      receipt_sha256=sha256(receipt.read_bytes()).hexdigest(), report=report)
 
 
+def _verify_operational_gate(args: argparse.Namespace) -> dict[str, Any]:
+    """Verify the retained Phase 8 bounded-gate bundle without rerunning it."""
+    if not isinstance(args.output, str) or not args.output:
+        raise ValueError("operational gate verify requires --output")
+    root = _existing_root(args.campaign_root, name="campaign_root")
+    spec, target_receipts = _campaign_spec(args.campaign, root)
+    output = _existing_root(args.output, name="output")
+    required = {
+        "campaign-seal.json", "scheduler-capability.json", "merge-receipt.json",
+        "assessment.json", "profiling-authorization.json", "finite-look-recovery.json",
+    }
+    paths = {name: _confined_file(output, name, name="operational gate receipt") for name in required}
+    expected_plan = _plan_payload(spec, target_receipts)
+    if _read_json(str(paths["campaign-seal.json"])) != expected_plan:
+        raise ValueError("operational gate campaign seal differs from frozen campaign inputs")
+    local_receipts = tuple(sorted(output.glob("local/shard-*/receipt.json")))
+    if len(local_receipts) != 1:
+        raise ValueError("operational gate requires exactly one retained local tracer receipt")
+    checked = verify_shard(local_receipts[0], campaign_root=root)
+    if checked["campaign_plan_digest"] != expected_plan["campaign_plan_digest"]:
+        raise ValueError("operational gate local receipt differs from campaign seal")
+    merged = _read_json(str(paths["merge-receipt.json"]))
+    if merged.get("campaign_plan_digest") != expected_plan["campaign_plan_digest"]:
+        raise ValueError("operational gate merge differs from campaign seal")
+    assessment = _read_json(str(paths["assessment.json"]))
+    if assessment.get("assessment_status") != "evidence_reconstructed":
+        raise ValueError("operational gate assessment was not evidence reconstructed")
+    finite = _read_json(str(paths["finite-look-recovery.json"]))
+    if finite.get("recovered_stop_receipt") is not True or finite.get("next_look_submissions") != 0 or finite.get("pre_crash_receipt_sha256s") != finite.get("post_crash_receipt_sha256s"):
+        raise ValueError("operational gate finite-look recovery proof is incomplete")
+    scheduler = _read_json(str(paths["scheduler-capability.json"]))
+    capabilities = scheduler.get("capabilities")
+    if not isinstance(capabilities, Mapping) or capabilities.get("accounting_available", {}).get("value") is not None:
+        raise ValueError("operational gate scheduler receipt is not an unavailable-site observation")
+    authorization = _read_json(str(paths["profiling-authorization.json"]))
+    if authorization.get("decision") != "deny" or authorization.get("assessment_status") != "not_assessed":
+        raise ValueError("operational gate must retain a not-assessed production denial")
+    receipt_hashes = {name: sha256(path.read_bytes()).hexdigest() for name, path in sorted(paths.items())}
+    return _artifact(
+        status="ok", plan=expected_plan, phase="verify_operational_gate", verified=True,
+        retained_receipt_sha256s=receipt_hashes, production_authorization="deny",
+        recovered_stop_receipt=True, next_look_submissions=0,
+    )
+
+
 def _merge(args: argparse.Namespace) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
     if not args.receipt:
@@ -369,6 +420,115 @@ def _site_capability(args: argparse.Namespace) -> dict[str, Any]:
             "capabilities": parse_site_capabilities(scontrol_text=scontrol, sacct_text=sacct)}
 
 
+def _operational_unit_runner(unit: dict[str, Any], staging: str) -> dict[str, Any]:
+    """Deterministic, synthetic transport fixture; it never runs a decoder."""
+    del staging
+    return {
+        "terminal_fact": {
+            "unit_key": unit["unit_key"], "termination": "converged",
+            "outcome": "exact", "logical_failure": False,
+        },
+        "work_vector": {"bp_calls": 1},
+        "persisted_sample_bytes": f"phase8:{unit['physical_sample_identity']}".encode("ascii"),
+    }
+
+
+def _operational_stop_decision(*, look: int, terminal_records: tuple[dict[str, Any], ...]) -> dict[str, Any]:
+    keys = tuple(sorted(str(record["unit_key"]) for record in terminal_records))
+    return {
+        "decision_input_hashes": [sha256("|".join(keys).encode("ascii")).hexdigest()],
+        "decision_result": {"look": look, "terminal_count": len(keys)},
+        "stop_reason": "all_primary_decisions_resolved", "should_stop": look == 1,
+    }
+
+
+def _operational_fixture(args: argparse.Namespace) -> dict[str, Any]:
+    """Retain the bounded local/Slurm finite-look transport proof for Phase 8."""
+    root = _existing_root(args.campaign_root, name="campaign_root")
+    document = _read_json(args.campaign)
+    spec, target_receipts = _campaign_spec(args.campaign, root)
+    gate = document.get("operational_gate")
+    if not isinstance(gate, Mapping):
+        raise ValueError("operational fixture requires operational_gate metadata")
+    manifests = gate["eligible_manifests"]
+    sample_ids = tuple(gate["preselected_sample_ids"])
+    seeds: dict[str, str] = {}
+    for arm, entry in manifests.items():
+        manifest = preflight_manifest(_confined_file(root, entry[0], name="operational_gate manifest")).manifest
+        seeds[str(arm)] = manifest.randomness.decoder_seed_identity
+    work_plan = freeze_work_plan(
+        campaign_spec_digest=build_one_unit_plan(spec).campaign_spec_digest,
+        coordinates=(CampaignCoordinateV1(
+            cohort_id=spec.cohort_id, point_id=spec.point_id,
+            sample_namespace=spec.sample_namespace, sample_ids=sample_ids,
+        ),),
+        arm_seed_identities=seeds, look_sample_boundaries=(1, 2), units_per_shard=2,
+    )
+    output = _output_root(args.output_root)
+    finite_root = output / "finite-look"
+    try:
+        dispatch_finite_looks(
+            work_plan, output_root=finite_root, workers=1,
+            unit_runner=_operational_unit_runner,
+            decision_for_look=_operational_stop_decision, fault_after_decision=True,
+        )
+    except InterruptedError:
+        pass
+    else:
+        raise ValueError("operational fixture fault injection did not interrupt")
+    pre_crash = {
+        str(path.relative_to(finite_root)): sha256(path.read_bytes()).hexdigest()
+        for path in sorted(finite_root.glob("unit-*/receipt.json"))
+    }
+    recovered = dispatch_finite_looks(
+        work_plan, output_root=finite_root, workers=1,
+        unit_runner=_operational_unit_runner, decision_for_look=_operational_stop_decision,
+    )
+    post_crash = {
+        str(path.relative_to(finite_root)): sha256(path.read_bytes()).hexdigest()
+        for path in sorted(finite_root.glob("unit-*/receipt.json"))
+    }
+    if not recovered["recovered_stop_receipt"] or pre_crash != post_crash:
+        raise ValueError("operational fixture did not recover immutable pre-crash evidence")
+    allocation = SlurmAllocation(
+        partition=None, qos=None, account=None, wall_minutes=5, memory_mb=256,
+        cpus_per_task=1, max_concurrent_tasks=1,
+    )
+    observations = tuple(
+        SchedulerObservation(
+            job_id="phase8-synthetic", task_id=str(index), allocated_cpus=1,
+            elapsed_seconds=0, state="COMPLETED", exit_code=0,
+            accounting_available=None, accounting_unavailable_reason="synthetic harness has no site accounting",
+            launch_overhead_seconds=0, shard_fixed_cost_seconds=0,
+        )
+        for index in range(len(work_plan.shards))
+    )
+    synthetic = execute_synthetic_slurm_array(
+        work_plan, output_root=output / "synthetic-slurm", unit_runner=_operational_unit_runner,
+        allocation=allocation, observations=observations,
+    )
+    payload = {
+        "schema": "phase8_operational_fixture_receipt_v1",
+        "label": "development_fixture", "assessment_status": "not_assessed",
+        "campaign_spec_digest": work_plan.campaign_spec_digest,
+        "campaign_plan_digest": work_plan.campaign_plan_digest,
+        "preflight_campaign_plan_digest": _plan_payload(spec, target_receipts)["campaign_plan_digest"],
+        "pre_crash_receipt_sha256s": pre_crash,
+        "post_crash_receipt_sha256s": post_crash,
+        "recovered_stop_receipt": recovered["recovered_stop_receipt"],
+        "authorized_undispatched_keys": list(recovered["authorized_undispatched_keys"]),
+        "next_look_submissions": 0,
+        "synthetic_slurm_terminal_unit_keys": list(synthetic["terminal_unit_keys"]),
+        "synthetic_slurm_incomplete_unit_keys": list(synthetic["incomplete_unit_keys"]),
+    }
+    artifact = _publish_json(output / "finite-look-recovery.json", payload)
+    return {
+        "schema": _CLI_SCHEMA, "status": "ok", "phase": "operational_fixture",
+        "artifact_path": str(artifact), "artifact_sha256": sha256(artifact.read_bytes()).hexdigest(),
+        "recovered_stop_receipt": True, "next_look_submissions": 0,
+    }
+
+
 def _profile_gate(args: argparse.Namespace) -> dict[str, Any]:
     profile = _read_json(args.profile)
     required = {"measured", "limit", "unit"}
@@ -401,7 +561,9 @@ def _parser() -> argparse.ArgumentParser:
     item.add_argument("--allocation", required=True); item.add_argument("--site-allowlists", required=True)
     item.set_defaults(handler=_emit_slurm)
     item = commands.add_parser("verify")
-    item.add_argument("--receipt", required=True); item.add_argument("--campaign-root", required=True); item.set_defaults(handler=_verify)
+    item.add_argument("--receipt"); item.add_argument("--campaign")
+    item.add_argument("--campaign-root", required=True); item.add_argument("--output")
+    item.set_defaults(handler=lambda args: _verify_operational_gate(args) if args.campaign is not None else _verify(args) if args.receipt is not None else (_ for _ in ()).throw(ValueError("verify requires --receipt or --campaign")))
     item = commands.add_parser("merge")
     item.add_argument("--receipt", action="append", required=True); item.add_argument("--campaign-root", required=True); item.add_argument("--output-root", required=True); item.set_defaults(handler=_merge)
     item = commands.add_parser("resume")
@@ -410,6 +572,9 @@ def _parser() -> argparse.ArgumentParser:
     item.add_argument("--merge", required=True); item.set_defaults(handler=_assess)
     item = commands.add_parser("site-capability")
     item.add_argument("--scontrol"); item.add_argument("--sacct"); item.set_defaults(handler=_site_capability)
+    item = commands.add_parser("operational-fixture")
+    item.add_argument("--campaign", required=True); item.add_argument("--campaign-root", required=True)
+    item.add_argument("--output-root", required=True); item.set_defaults(handler=_operational_fixture)
     item = commands.add_parser("profile-gate")
     item.add_argument("--profile", required=True); item.set_defaults(handler=_profile_gate)
     return parser
