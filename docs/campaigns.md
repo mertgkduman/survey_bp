@@ -104,6 +104,17 @@ observations remain explicit unavailable facts. After both routes have retained
 their independently verified merge and report chains, compare only their
 route-neutral scientific evidence:
 
+The retained `phase8-paired-canonical-gate-v1/slurm-route` evidence ran frozen
+array indexes `0` and `1` directly through `run-shard`; no `sbatch` job was
+submitted. Its `direct-observation-*.json` files are harness inputs. The
+`allocated_cpus: 1` field is a declared request, and the zero elapsed and
+overhead fields are placeholders, not scheduler measurements. Slurm accounting
+is explicitly unavailable. Actual child-process wall and peak RSS measurements
+and cumulative peak child RSS upper bounds are in
+`shard-*-resource-measurement.json`. These measurements size only this
+bounded development run; the production profiling gate remains denied until
+site ceilings and accounting are measured.
+
 ```bash
 OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign verify-routes \
   --plan data/results/phase8-paired-canonical-gate-v1/campaign-work-plan.json \
