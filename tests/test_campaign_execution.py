@@ -314,6 +314,25 @@ def test_single_arm_work_spec_runs_one_verified_canonical_bounded_unit(tmp_path:
     assert result["authorization_projection"]["dispatch_allowed"] is True
 
 
+def test_canonical_bounded_batch_seals_actual_resources_and_rejects_noncontiguous_dispatch(tmp_path: Path) -> None:
+    """The bounded adapter reports actual work and never expands an ordinal slice."""
+    from bp_registry.campaigns.contracts import FailureCountWorkSpecV1
+    from bp_registry.campaigns.execution import run_canonical_bounded_batch
+    from bp_registry.campaigns.planning import freeze_failure_count_work_spec
+
+    plan = freeze_failure_count_work_spec(
+        FailureCountWorkSpecV1.model_validate(_single_arm_failure_count_work_spec_payload()),
+    )
+    result = run_canonical_bounded_batch(
+        plan, campaign_root=ROOT, output_root=tmp_path / "bounded", first_ordinal=1, batch_size=1,
+    )
+    assert result["actual_resources"]["decoder_work"] >= 0
+    with pytest.raises(ValueError, match="exact declared ordinal batch"):
+        run_canonical_bounded_batch(
+            plan, campaign_root=ROOT, output_root=tmp_path / "outside", first_ordinal=2, batch_size=1,
+        )
+
+
 def _planning_inputs():
     from bp_registry.campaigns.planning import CampaignCoordinateV1
 
