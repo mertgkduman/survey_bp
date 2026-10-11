@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from hashlib import sha256
 import json
 import math
-from typing import Literal
+from typing import Callable, Literal
 
 import numpy as np
 
@@ -273,7 +273,7 @@ class MbbpController:
 
     def _member(
         self, *, original: OriginalProblem, system: AugmentedBasisSystem, tree: BudgetTree, scope: str,
-        error_rate: float,
+        error_rate: float, boundary_observer: Callable[[str], None] | None = None,
     ) -> MbbpMember:
         table = EdgeTable.from_check_matrix(system.check_matrix)
         alpha = ParameterAssignment(shape="scalar", value=self.spec.alpha)
@@ -300,10 +300,14 @@ class MbbpController:
         for iteration in range(self.spec.max_iterations):
             for check_index in range(schedule.unit_count):
                 progress = ScheduleProgress(iteration=iteration, local_steps=progress.local_steps, cursor=(check_index,))
+                if boundary_observer is not None:
+                    boundary_observer(f"mbbp:{system.member_id}:{iteration}:{check_index}:before_work")
                 step = schedule.execute_local_step(
                     executor, messages, system.syndrome, error_rate=error_rate, progress=progress,
                     is_converged=lambda candidate: self._valid(system.check_matrix, system.syndrome, tuple(candidate.tolist())),
                 )
+                if boundary_observer is not None:
+                    boundary_observer(f"mbbp:{system.member_id}:{iteration}:{check_index}:after_work")
                 if not step.admitted:
                     return MbbpMember(
                         system.member_id, system.local_ordinal, lineage_id, system.content_identity, initial_identity,
@@ -345,6 +349,7 @@ class MbbpController:
 
     def run(
         self, original: OriginalProblem, *, error_rate: float, completion_order: tuple[str, ...] | None = None,
+        boundary_observer: Callable[[str], None] | None = None,
     ) -> MbbpResult:
         """Execute declared members in any supplied completion order, then freeze order."""
         if not isinstance(original, OriginalProblem):
@@ -362,10 +367,14 @@ class MbbpController:
             for scope in scopes.values()
         ))
         tree = BudgetTree(limits=limits, parents={scope: "mbbp-ensemble" for scope in scopes.values()})
-        attempted = [self._member(
-            original=original, system=systems[member_id], tree=tree, scope=scopes[member_id], error_rate=error_rate,
-        )
-                     for member_id in order]
+        attempted = []
+        for member_id in order:
+            if boundary_observer is not None:
+                boundary_observer(f"mbbp:{member_id}:before_member")
+            attempted.append(self._member(
+                original=original, system=systems[member_id], tree=tree, scope=scopes[member_id],
+                error_rate=error_rate, boundary_observer=boundary_observer,
+            ))
         members = tuple(sorted(attempted, key=lambda member: (member.local_ordinal, member.member_id)))
         origins = tuple(CandidateOrigin(
             lineage_id=member.lineage_id, local_ordinal=member.local_ordinal, candidate=member.candidate,

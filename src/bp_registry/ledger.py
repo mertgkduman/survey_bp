@@ -9,7 +9,7 @@ import json
 import os
 from pathlib import Path
 import socket
-from typing import Any, Iterator, Mapping
+from typing import Any, Iterator, Mapping, Protocol
 from uuid import uuid4
 
 try:
@@ -30,6 +30,51 @@ ShotKey = tuple[str, int]
 
 class ShotOwnershipError(ValueError):
     """A live process already owns this stable run/shot identity."""
+
+
+class CanonicalResourceInterruption(RuntimeError):
+    """A hard resource authorization denied a mutation before it occurred.
+
+    The exception deliberately carries no decoder result.  Callers can retain
+    the valid ledger prefix and serialize their own control receipt from the
+    separately reserved control budget.
+    """
+
+    def __init__(self, message: str, *, snapshot: object | None = None) -> None:
+        super().__init__(message)
+        self.snapshot = snapshot
+
+
+class _CanonicalGuard(Protocol):
+    def reserve_ledger_append(self, payload: bytes, *, boundary: str) -> object: ...
+    def commit(self, reservation: object) -> None: ...
+    def release(self, reservation: object) -> None: ...
+
+
+def canonical_serializer_descriptor(*, structural_event_version: int) -> dict[str, object]:
+    """Return the frozen JSONL framing facts used for canonical evidence.
+
+    Keeping this public makes a resource profile bind the serializer rather
+    than a source-file timestamp or an estimate supplied by campaign code.
+    """
+    if structural_event_version not in {
+        CANONICAL_LEDGER_VERSION, CANONICAL_SCHEDULE_LEDGER_VERSION,
+        CANONICAL_RELAY_LEDGER_VERSION, CANONICAL_INTERVENTION_LEDGER_VERSION,
+        CANONICAL_ENSEMBLE_LEDGER_VERSION, CANONICAL_POSTPROCESSING_LEDGER_VERSION,
+    }:
+        raise ValueError("unsupported canonical structural event version")
+    return {
+        "schema": "canonical-jsonl-serializer-v1",
+        "ledger_version": structural_event_version,
+        "json": {"sort_keys": True, "separators": [",", ":"], "ensure_ascii": False, "allow_nan": False},
+        "framing": "utf8-json-plus-lf",
+    }
+
+
+def canonical_serialized_event_size(event: Mapping[str, Any]) -> int:
+    """Validate and measure one complete framed structural event."""
+    _validate_canonical_event(event)
+    return len(_canonical_event_bytes(event)) + 1
 
 
 def _key(run_id: str, shot_id: int) -> ShotKey:
@@ -644,11 +689,15 @@ def query_canonical_events(
 class CanonicalEventWriter:
     """Durably append sparse versioned control-flow facts for canonical CSS shots."""
 
-    def __init__(self, path: str | Path, *, structural_event_version: int = CANONICAL_LEDGER_VERSION):
+    def __init__(
+        self, path: str | Path, *, structural_event_version: int = CANONICAL_LEDGER_VERSION,
+        resource_guard: _CanonicalGuard | None = None,
+    ):
         if structural_event_version not in {CANONICAL_LEDGER_VERSION, CANONICAL_SCHEDULE_LEDGER_VERSION, CANONICAL_RELAY_LEDGER_VERSION, CANONICAL_INTERVENTION_LEDGER_VERSION, CANONICAL_ENSEMBLE_LEDGER_VERSION, CANONICAL_POSTPROCESSING_LEDGER_VERSION}:
             raise ValueError("unsupported canonical structural event version")
         self.path = Path(path)
         self.structural_event_version = structural_event_version
+        self.resource_guard = resource_guard
         self._owners: dict[ShotKey, Any] = {}
 
     def _append(self, event: dict[str, Any]) -> None:
@@ -687,12 +736,24 @@ class CanonicalEventWriter:
                     raise ValueError("canonical shot_begin is duplicated or follows a terminal event")
             elif state != "open":
                 raise ValueError("canonical structural event requires a prior open shot_begin")
-            _canonical_event_bytes(event)
+            payload = _canonical_event_bytes(event)
+            reservation: object | None = None
+            if self.resource_guard is not None:
+                # The payload is serialized exactly once before the append is
+                # opened.  The guard counts its LF framing too.
+                reservation = self.resource_guard.reserve_ledger_append(payload + b"\n", boundary=event["kind"])
             self.path.parent.mkdir(parents=True, exist_ok=True)
-            with self.path.open("a", encoding="utf-8") as handle:
-                handle.write(_canonical_event_bytes(event).decode("utf-8") + "\n")
-                handle.flush()
-                os.fsync(handle.fileno())
+            try:
+                with self.path.open("ab") as handle:
+                    handle.write(payload + b"\n")
+                    handle.flush()
+                    os.fsync(handle.fileno())
+            except BaseException:
+                if reservation is not None:
+                    self.resource_guard.release(reservation)
+                raise
+            if reservation is not None:
+                self.resource_guard.commit(reservation)
 
     def begin(self, *, run_id: str, shot_id: int, sample_seed_identity: str, **data: Any) -> None:
         key = _key(run_id, shot_id)

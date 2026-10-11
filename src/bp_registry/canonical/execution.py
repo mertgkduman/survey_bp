@@ -305,11 +305,13 @@ class AtomicFloodingExecutor:
         *,
         scope: str,
         wall_clock: WallClockLimit | None = None,
+        resource_guard: Any | None = None,
     ) -> None:
         self.schedule = schedule
         self.budgets = budgets
         self.scope = scope
         self.wall_clock = wall_clock
+        self.resource_guard = resource_guard
 
     def _wall_boundary(self, kind: str) -> BudgetTermination | None:
         return None if self.wall_clock is None else self.wall_clock.check(kind, scope=self.scope)
@@ -350,6 +352,8 @@ class AtomicFloodingExecutor:
                 return sweep.new_v2c
 
             try:
+                if self.resource_guard is not None:
+                    self.resource_guard.before_work(f"flooding:{iteration}:before_work")
                 result = local_steps.execute(
                     LocalStepProposal(f"flooding:{iteration}", proposed, compute),
                     messages=state,
@@ -358,6 +362,8 @@ class AtomicFloodingExecutor:
                     cache={},
                     is_converged=(lambda _messages: is_converged(completed[-1])) if is_converged is not None else (lambda _messages: False),
                 )
+                if self.resource_guard is not None:
+                    self.resource_guard.after_work(f"flooding:{iteration}:after_work")
             except BaseException:
                 raise
             if not result.admitted:
@@ -701,6 +707,7 @@ def _run_relay_structural_shot(
     execution_controls: Mapping[str, Any] | None,
     verification_context: PublicShotContext | None,
     evaluate: Callable[..., evaluator.Evaluation],
+    resource_guard: Any | None = None,
 ) -> CanonicalExecutionResult:
     """Execute the V4 Relay topology while keeping hidden truth outside the controller."""
     if type(shot_id) is not int or shot_id < 0 or observation.check_type != "Z":
@@ -726,7 +733,7 @@ def _run_relay_structural_shot(
 
     for attempt_ordinal in range(30):
         try:
-            with CanonicalEventWriter(path) as ledger:
+            with CanonicalEventWriter(path, resource_guard=resource_guard) as ledger:
                 common = {
                     **dict(context), "canonical_identity": identity,
                     "composition_identity": resolved.semantic_identity,
@@ -826,6 +833,7 @@ def _run_guided_structural_shot(
     execution_controls: Mapping[str, Any] | None,
     verification_context: PublicShotContext | None,
     evaluate: Callable[..., evaluator.Evaluation],
+    resource_guard: Any | None = None,
 ) -> CanonicalExecutionResult:
     """One production BPGD tracer through the original-problem truth boundary."""
     from .guided_decimation import GuidedDecimationController
@@ -855,7 +863,7 @@ def _run_guided_structural_shot(
     }
     selected: OriginalSpaceCandidate | None = None
     termination = "round_limit_without_valid_candidate"
-    with CanonicalEventWriter(ledger_path) as ledger:
+    with CanonicalEventWriter(ledger_path, resource_guard=resource_guard) as ledger:
         ledger.begin(run_id=parsed.run_id, shot_id=shot_id, sample_seed_identity=sample_seed_identity, **common)
         attempt_id = _attempt_lineage_id(working, 0)
         ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="attempt", data={
@@ -937,6 +945,7 @@ def _run_phase5_structural_shot(
     execution_controls: Mapping[str, Any] | None,
     verification_context: PublicShotContext | None,
     evaluate: Callable[..., evaluator.Evaluation],
+    resource_guard: Any | None = None,
 ) -> CanonicalExecutionResult:
     """Run one source-qualified controller behind the sealed public shot boundary."""
     if type(shot_id) is not int or shot_id < 0 or observation.check_type != "Z":
@@ -973,7 +982,7 @@ def _run_phase5_structural_shot(
         identity_data["memory_source_status"] = binding.source_status
     for _ in range(30):
         try:
-            with CanonicalEventWriter(path, structural_event_version=5) as ledger:
+            with CanonicalEventWriter(path, structural_event_version=5, resource_guard=resource_guard) as ledger:
                 ledger.begin(run_id=parsed.run_id, shot_id=shot_id, sample_seed_identity=sample_seed_identity,
                              schema_version=5, compact_schema_version=parsed.schema_version, identity=identity_data,
                              payload={"original_lineage_id": original_id.value, "syndrome": [int(bit) for bit in original.syndrome]})
@@ -1059,6 +1068,7 @@ def run_phase6_structural_shot(
     ledger_path: str | Path, sample_seed_identity: str, context: Mapping[str, Any],
     verification_context: PublicShotContext | None = None,
     evaluate: Callable[..., evaluator.Evaluation] = evaluator.evaluate_candidate,
+    resource_guard: Any | None = None,
 ) -> CanonicalExecutionResult:
     """Execute the V7 MBBP member list, crossing to truth only after selection."""
     # Import lazily: manifests imports canonical contracts during package
@@ -1080,9 +1090,17 @@ def run_phase6_structural_shot(
         item.member_id, item.local_ordinal, item.partition_identity, item.permutation_identity,
         item.redundant_transforms,
     ) for item in parsed.ensemble.bases)
+    def observe_mbbp_boundary(boundary: str) -> None:
+        if resource_guard is None:
+            return
+        if boundary.endswith("before_work") or boundary.endswith("before_member"):
+            resource_guard.before_work(boundary)
+        else:
+            resource_guard.after_work(boundary)
+
     result = MbbpController(MbbpSpec(
         bases, max_iterations=parsed.ensemble.max_iterations, max_member_c2v_updates=parsed.ensemble.max_member_c2v_updates,
-    )).run(original, error_rate=parsed.error_rate)
+    )).run(original, error_rate=parsed.error_rate, boundary_observer=observe_mbbp_boundary if resource_guard is not None else None)
     projection = phase6_events(
         original, bases=bases, result=result,
         vote_tie_bit=None if parsed.vote is None else parsed.vote.tie_bit,
@@ -1093,7 +1111,7 @@ def run_phase6_structural_shot(
     if candidate is not None and not np.array_equal((validated.hz @ candidate) % 2, observation.syndrome):
         raise ValueError("MBBP selected a candidate failing the original syndrome")
     assessment = None if candidate is None else evaluate(validated, true_x=hidden_truth.x, true_z=hidden_truth.z, candidate_x=candidate)
-    with CanonicalEventWriter(ledger_path, structural_event_version=6) as ledger:
+    with CanonicalEventWriter(ledger_path, structural_event_version=6, resource_guard=resource_guard) as ledger:
         ledger.begin(run_id=parsed.run_id, shot_id=shot_id, sample_seed_identity=sample_seed_identity,
                      schema_version=7, identity=identity_data,
                      payload={"original_lineage_id": original.lineage_id, "syndrome": original.syndrome.tolist()})
@@ -1128,6 +1146,7 @@ def run_canonical_structural_shot(
     verification_context: PublicShotContext | None = None,
     memory_execution_context: Mapping[str, str] | None = None,
     evaluate: Callable[..., evaluator.Evaluation] = evaluator.evaluate_candidate,
+    resource_guard: Any | None = None,
 ) -> CanonicalExecutionResult:
     """Run the kernel with v2 structural evidence and an outer truth boundary."""
     if isinstance(manifest, dict) and "postprocessing_config" in manifest:
@@ -1142,6 +1161,7 @@ def run_canonical_structural_shot(
             manifest, code=code, observation=observation, hidden_truth=hidden_truth, shot_id=shot_id,
             ledger_path=ledger_path, sample_seed_identity=sample_seed_identity, context=context,
             verification_context=verification_context, evaluate=evaluate,
+            resource_guard=resource_guard,
         )
     parsed = parse_canonical_manifest(manifest)
     if isinstance(parsed, CanonicalManifestV6):
@@ -1150,13 +1170,13 @@ def run_canonical_structural_shot(
                 parsed, code=code, observation=observation, hidden_truth=hidden_truth,
                 shot_id=shot_id, ledger_path=ledger_path, sample_seed_identity=sample_seed_identity,
                 context=context, execution_controls=execution_controls,
-                verification_context=verification_context, evaluate=evaluate,
+                verification_context=verification_context, evaluate=evaluate, resource_guard=resource_guard,
             )
         return _run_guided_structural_shot(
             parsed, code=code, observation=observation, hidden_truth=hidden_truth,
             shot_id=shot_id, ledger_path=ledger_path, sample_seed_identity=sample_seed_identity,
             context=context, execution_controls=execution_controls,
-            verification_context=verification_context, evaluate=evaluate,
+            verification_context=verification_context, evaluate=evaluate, resource_guard=resource_guard,
         )
     if isinstance(parsed, CanonicalManifestV4):
         return _run_relay_structural_shot(
@@ -1219,7 +1239,7 @@ def run_canonical_structural_shot(
         setup_before_profile_ns = time.perf_counter_ns() - setup_started_ns
     for attempt_ordinal in range(30):
         try:
-            with CanonicalEventWriter(path) as ledger:
+            with CanonicalEventWriter(path, resource_guard=resource_guard) as ledger:
                 policy_effects = None if execution_controls is None else execution_controls.get("policy_effects")
                 common = {
                     **dict(context), "canonical_identity": identity,
@@ -1535,7 +1555,7 @@ def run_canonical_structural_shot(
                                 observation.syndrome,
                             ))
                             return candidate, 0, converged, None
-                        executor = AtomicFloodingExecutor(schedule, budgets, scope="attempt")
+                        executor = AtomicFloodingExecutor(schedule, budgets, scope="attempt", resource_guard=resource_guard)
                         attempt = executor.run_attempt(
                             initialized, observation.syndrome,
                             error_rate=parsed.error_rate, max_iterations=parsed.max_iterations,

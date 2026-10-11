@@ -8,10 +8,12 @@ from dataclasses import dataclass
 from hashlib import sha256
 from importlib.metadata import version
 import json
+import os
 from pathlib import Path
-from typing import Any
+import time
+from typing import Any, Callable, Literal, Mapping
 
-from .ledger import Writer, read_canonical_events
+from .ledger import canonical_serializer_descriptor, CanonicalResourceInterruption, Writer, read_canonical_events
 from .canonical.metrics import unavailable_metric
 from .canonical.execution import run_canonical_structural_shot
 from .canonical.verification import PublicShotContext
@@ -81,6 +83,344 @@ def _unavailable_native_metric_facts(stage: str) -> list[dict[str, int | float |
 
 _REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 _SELECTED_PROVENANCE = _REPOSITORY_ROOT / "data/artifacts/selected-css.provenance.json"
+
+
+@dataclass(frozen=True, slots=True)
+class CanonicalRuntimeAuthorizationV1:
+    """Prospective hard limits for exactly one canonical unit.
+
+    Scientific evidence and storage limits exclude the one-time control
+    reserve.  This prevents a partial execution from spending the bytes needed
+    to make its interruption durable.
+    """
+
+    profile_digest: str
+    authorization_identity: str
+    mode: Literal["strict_full_unit", "interruptible_unit"]
+    max_events: int
+    max_evidence_bytes: int
+    max_storage_bytes: int
+    control_receipt_reserve_bytes: int
+    monotonic_deadline_ns: int | None = None
+
+    def __post_init__(self) -> None:
+        if (not isinstance(self.profile_digest, str) or len(self.profile_digest) != 64
+                or not isinstance(self.authorization_identity, str) or not self.authorization_identity):
+            raise ValueError("runtime authorization requires stable digest and identity")
+        if any(type(value) is not int or value < 1 for value in (
+            self.max_events, self.max_evidence_bytes, self.max_storage_bytes,
+            self.control_receipt_reserve_bytes,
+        )):
+            raise ValueError("runtime authorization limits must be positive integers")
+        if self.monotonic_deadline_ns is not None and (type(self.monotonic_deadline_ns) is not int or self.monotonic_deadline_ns < 0):
+            raise ValueError("monotonic deadline must be a nonnegative integer or absent")
+
+    @classmethod
+    def strict_full_unit(cls, *, derived_events: int, derived_evidence_bytes: int,
+                         derived_storage_bytes: int, **kwargs: object) -> "CanonicalRuntimeAuthorizationV1":
+        authorization = cls(mode="strict_full_unit", **kwargs)  # type: ignore[arg-type]
+        if (authorization.max_events < derived_events
+                or authorization.max_evidence_bytes < derived_evidence_bytes
+                or authorization.max_storage_bytes < derived_storage_bytes):
+            raise ValueError("strict_full_unit authorization must fit every derived maximum")
+        return authorization
+
+    @classmethod
+    def interruptible_unit(cls, **kwargs: object) -> "CanonicalRuntimeAuthorizationV1":
+        return cls(mode="interruptible_unit", **kwargs)  # type: ignore[arg-type]
+
+
+@dataclass(frozen=True, slots=True)
+class CanonicalRuntimeSnapshotV1:
+    profile_digest: str
+    authorization_identity: str
+    scientific_events: int
+    scientific_evidence_bytes: int
+    scientific_storage_bytes: int
+    control_receipt_bytes: int
+    interruption_kind: str | None
+    boundary: str | None
+    attempted_bytes: int | None
+    deadline_ns: int | None
+    before_ns: int | None
+    after_ns: int | None
+    overshoot_ns: int | None
+
+
+@dataclass(frozen=True, slots=True)
+class _RuntimeReservation:
+    kind: Literal["ledger", "artifact", "control"]
+    events: int
+    evidence_bytes: int
+    storage_bytes: int
+    control_bytes: int
+
+
+class CanonicalRuntimeGuardV1:
+    """Mutable one-unit guard with pre-mutation reservations and a permanent latch."""
+
+    def __init__(self, authorization: CanonicalRuntimeAuthorizationV1, *, clock_ns: Callable[[], int] = time.monotonic_ns) -> None:
+        self.authorization = authorization
+        self._clock_ns = clock_ns
+        self._events = self._evidence = self._storage = self._control = 0
+        self._latched = False
+        self._interruption_kind: str | None = None
+        self._boundary: str | None = None
+        self._attempted_bytes: int | None = None
+        self._before_ns: int | None = None
+        self._after_ns: int | None = None
+        self._pending_before: dict[str, int] = {}
+
+    def snapshot(self) -> CanonicalRuntimeSnapshotV1:
+        deadline = self.authorization.monotonic_deadline_ns
+        return CanonicalRuntimeSnapshotV1(
+            self.authorization.profile_digest, self.authorization.authorization_identity,
+            self._events, self._evidence, self._storage, self._control,
+            self._interruption_kind, self._boundary, self._attempted_bytes,
+            deadline, self._before_ns, self._after_ns,
+            None if deadline is None or self._after_ns is None else max(0, self._after_ns - deadline),
+        )
+
+    @property
+    def interrupted(self) -> bool:
+        return self._latched
+
+    def _interrupt(self, kind: str, *, boundary: str, attempted_bytes: int | None = None,
+                   before_ns: int | None = None, after_ns: int | None = None) -> None:
+        if not self._latched:
+            self._latched = True
+            self._interruption_kind = kind
+            self._boundary = boundary
+            self._attempted_bytes = attempted_bytes
+            self._before_ns = before_ns
+            self._after_ns = after_ns
+        raise CanonicalResourceInterruption("canonical resource cap denied mutation", snapshot=self.snapshot())
+
+    def _scientific_reservation(self, *, kind: Literal["ledger", "artifact"], events: int,
+                                evidence: int, storage: int, boundary: str) -> _RuntimeReservation:
+        if self._latched:
+            self._interrupt("already_interrupted", boundary=boundary)
+        if self._events + events > self.authorization.max_events:
+            self._interrupt("events", boundary=boundary, attempted_bytes=events)
+        if self._evidence + evidence > self.authorization.max_evidence_bytes:
+            self._interrupt("evidence_bytes", boundary=boundary, attempted_bytes=evidence)
+        if self._storage + storage > self.authorization.max_storage_bytes:
+            self._interrupt("storage_bytes", boundary=boundary, attempted_bytes=storage)
+        return _RuntimeReservation(kind, events, evidence, storage, 0)
+
+    def reserve_ledger_append(self, payload: bytes, *, boundary: str) -> _RuntimeReservation:
+        if not isinstance(payload, bytes) or not payload.endswith(b"\n"):
+            raise ValueError("ledger reservation requires exact framed bytes")
+        return self._scientific_reservation(kind="ledger", events=1, evidence=len(payload), storage=len(payload), boundary=boundary)
+
+    def reserve_artifact_write(self, byte_count: int, *, boundary: str) -> _RuntimeReservation:
+        if type(byte_count) is not int or byte_count < 0:
+            raise ValueError("artifact reservation requires a nonnegative exact byte count")
+        return self._scientific_reservation(kind="artifact", events=0, evidence=0, storage=byte_count, boundary=boundary)
+
+    def reserve_control_receipt(self, byte_count: int) -> _RuntimeReservation:
+        if type(byte_count) is not int or byte_count < 1:
+            raise ValueError("control receipt requires a positive exact byte count")
+        if not self._latched:
+            raise CanonicalResourceInterruption("control receipt is available only after interruption", snapshot=self.snapshot())
+        if self._control or byte_count > self.authorization.control_receipt_reserve_bytes:
+            raise CanonicalResourceInterruption("control receipt reserve is single use", snapshot=self.snapshot())
+        return _RuntimeReservation("control", 0, 0, 0, byte_count)
+
+    def commit(self, reservation: object) -> None:
+        if not isinstance(reservation, _RuntimeReservation):
+            raise TypeError("unknown canonical runtime reservation")
+        self._events += reservation.events
+        self._evidence += reservation.evidence_bytes
+        self._storage += reservation.storage_bytes
+        self._control += reservation.control_bytes
+
+    def release(self, reservation: object) -> None:
+        if not isinstance(reservation, _RuntimeReservation):
+            raise TypeError("unknown canonical runtime reservation")
+        # Reservations are only committed after durable I/O succeeds; release
+        # therefore intentionally leaves accounting unchanged.
+
+    def before_work(self, boundary: str) -> None:
+        if self._latched:
+            self._interrupt("already_interrupted", boundary=boundary)
+        now = self._clock_ns()
+        deadline = self.authorization.monotonic_deadline_ns
+        if deadline is not None and now >= deadline:
+            self._interrupt("wall_deadline", boundary=boundary, before_ns=now, after_ns=now)
+        self._pending_before[boundary] = now
+
+    def after_work(self, boundary: str) -> None:
+        if self._latched:
+            self._interrupt("already_interrupted", boundary=boundary)
+        now = self._clock_ns()
+        deadline = self.authorization.monotonic_deadline_ns
+        before = self._pending_before.pop(boundary, now)
+        if deadline is not None and now >= deadline:
+            self._interrupt("wall_deadline", boundary=boundary, before_ns=before, after_ns=now)
+
+
+def _canonical_digest(domain: str, value: object) -> str:
+    return sha256(domain.encode("ascii") + b"\0" + json.dumps(
+        value, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False,
+    ).encode("utf-8")).hexdigest()
+
+
+@dataclass(frozen=True, slots=True)
+class CanonicalExecutableMaximaV1:
+    """Independent one-unit maximum derived from a closed public route registry."""
+
+    derivation_version: Literal["v1"]
+    route: str
+    manifest_dimensions_sha256: str
+    policy_binding_sha256: str
+    serializer_sha256: str
+    artifact_layout_sha256: str
+    verifier_sha256: str
+    max_decoder_iterations: int
+    work_per_iteration: int
+    max_ledger_events_per_unit: int
+    serializer_bytes_per_event: int
+    artifact_storage_bytes_per_unit: int
+    partial_receipt_reserve_bytes: int
+    derived_work_per_unit: int
+    derived_events_per_unit: int
+    derived_evidence_bytes_per_unit: int
+    derived_storage_bytes_per_unit: int
+
+    def as_evidence(self) -> dict[str, object]:
+        return {
+            "derivation_version": self.derivation_version, "route": self.route,
+            "manifest_dimensions_sha256": self.manifest_dimensions_sha256,
+            "policy_binding_sha256": self.policy_binding_sha256,
+            "serializer_sha256": self.serializer_sha256, "artifact_layout_sha256": self.artifact_layout_sha256,
+            "verifier_sha256": self.verifier_sha256, "max_decoder_iterations": self.max_decoder_iterations,
+            "work_per_iteration": self.work_per_iteration, "max_ledger_events_per_unit": self.max_ledger_events_per_unit,
+            "serializer_bytes_per_event": self.serializer_bytes_per_event,
+            "artifact_storage_bytes_per_unit": self.artifact_storage_bytes_per_unit,
+            "partial_receipt_reserve_bytes": self.partial_receipt_reserve_bytes,
+            "derived_work_per_unit": self.derived_work_per_unit, "derived_events_per_unit": self.derived_events_per_unit,
+            "derived_evidence_bytes_per_unit": self.derived_evidence_bytes_per_unit,
+            "derived_storage_bytes_per_unit": self.derived_storage_bytes_per_unit,
+        }
+
+    @property
+    def digest(self) -> str:
+        return _canonical_digest("bp-registry-canonical-executable-maxima-v1", self.as_evidence())
+
+
+def _registered_canonical_route(manifest: object) -> tuple[str, int]:
+    """Resolve only the canonical families that Phase 9 can dispatch."""
+    if isinstance(manifest, CanonicalExperimentV7):
+        return ("v7-vote" if manifest.vote is not None else "v7-list", 6)
+    if isinstance(manifest, CanonicalExperimentV5):
+        intervention = getattr(manifest, "intervention", None)
+        return ("phase5" if getattr(intervention, "kind", "") == "phase5" else "guided", 5)
+    if isinstance(manifest, CanonicalExperimentV4) and manifest.relay is not None:
+        return "relay", 4
+    if isinstance(manifest, (CanonicalExperimentV2, CanonicalExperimentV3, CanonicalExperimentV4)):
+        schedule = manifest.policies.schedule.kind
+        return ("baseline" if schedule == "flooding" else f"local:{schedule}", 3 if schedule != "flooding" else 2)
+    raise ValueError("unregistered canonical manifest route")
+
+
+def derive_canonical_executable_maxima(context: "CanonicalPublicManifestContext") -> CanonicalExecutableMaximaV1:
+    """Derive a conservative, digest-bound maximum without campaign declarations.
+
+    This public boundary consumes only a preflight context.  Unsupported
+    compact schemas and policy routes fail before sampling or ledger creation.
+    """
+    if not isinstance(context, CanonicalPublicManifestContext):
+        raise TypeError("executable maxima require a validated public manifest context")
+    manifest = context.manifest
+    route, ledger_version = _registered_canonical_route(manifest)
+    code = context.code
+    table = EdgeTable.from_check_matrix(code.hz)
+    iterations = manifest.budgets.attempt.max_iterations
+    work_per_iteration = max(1, table.edge_count * 2 + table.variable_count + table.check_count)
+    # A route emits an open/attempt/work/termination spine, bounded per-work
+    # facts, and V7's member/vote evidence.  Values are route-owned constants,
+    # never caller multipliers.
+    route_overhead = {
+        "baseline": 5, "relay": 8, "guided": 8, "phase5": 12,
+        "v7-list": 9, "v7-vote": 13,
+    }.get(route, 7)
+    member_factor = len(manifest.ensemble.bases) if isinstance(manifest, CanonicalExperimentV7) else 1
+    events = route_overhead + iterations * member_factor
+    serializer = canonical_serializer_descriptor(structural_event_version=ledger_version)
+    # This bounds a compact canonical object with route/code dimensions. The
+    # byte profile is intentionally detached from live event ordering.
+    template = {
+        "kind": "termination", "ledger_version": ledger_version, "event_id": "f" * 64,
+        "run_id": manifest.run_id, "shot_id": manifest.budgets.max_shots - 1,
+        "termination": "count_budget_exhausted",
+        "data": {"route": route, "code": {"n": code.n, "checks": table.check_count, "edges": table.edge_count},
+                 "iterations": iterations, "member_count": member_factor},
+    }
+    serializer_bytes = len(json.dumps(template, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")) + 1
+    control_reserve = 1024
+    artifact_bytes = 0
+    evidence = events * serializer_bytes + control_reserve
+    storage = artifact_bytes + evidence
+    dimensions = {"schema": manifest.schema_version, "route": route, "n": code.n, "checks": table.check_count,
+                  "edges": table.edge_count, "iterations": iterations, "members": member_factor,
+                  "trace": context.trace_plan}
+    return CanonicalExecutableMaximaV1(
+        "v1", route, _canonical_digest("canonical-manifest-dimensions-v1", dimensions),
+        _canonical_digest("canonical-policy-binding-v1", {"identity": context.composition_identity, "effects": context.policy_effects}),
+        _canonical_digest("canonical-serializer-v1", serializer),
+        _canonical_digest("canonical-artifact-layout-v1", {"materialized": 0, "result": 0}),
+        _canonical_digest("canonical-verifier-v1", {"public_context": "v1", "route": route}),
+        iterations, work_per_iteration, events, serializer_bytes, artifact_bytes, control_reserve,
+        iterations * work_per_iteration, events, evidence, storage,
+    )
+
+
+def verify_declared_executable_limits(
+    declared: Mapping[str, object], *, expected_policy_binding: str, derived: CanonicalExecutableMaximaV1,
+) -> None:
+    """Reject any declaration which differs from the independently derived profile."""
+    if not isinstance(declared, Mapping):
+        raise TypeError("declared executable limits must be a mapping")
+    expected = derived.as_evidence()
+    if expected_policy_binding != derived.policy_binding_sha256:
+        raise ValueError("policy_binding_sha256 differs from the expected binding")
+    if set(declared) != set(expected):
+        raise ValueError("declared executable limits have extra or missing fields")
+    for key, value in expected.items():
+        if declared[key] != value:
+            raise ValueError(f"declared executable limit mismatch: {key}")
+
+
+def guarded_atomic_write_bytes(
+    path: str | Path, payload: bytes, *, resource_guard: CanonicalRuntimeGuardV1,
+    boundary: str, control_receipt: bool = False,
+) -> None:
+    """Replace one caller-owned artifact only after an exact-byte reservation.
+
+    The temporary sibling preserves the repository's atomic-write discipline;
+    failed replacement releases the uncommitted reservation and cannot charge
+    bytes that never became durable evidence.
+    """
+    if not isinstance(payload, bytes):
+        raise TypeError("guarded artifact payload must be bytes")
+    reservation = (resource_guard.reserve_control_receipt(len(payload)) if control_receipt
+                   else resource_guard.reserve_artifact_write(len(payload), boundary=boundary))
+    target = Path(path)
+    temporary = target.with_name(f".{target.name}.canonical-guard.tmp")
+    try:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with temporary.open("wb") as handle:
+            handle.write(payload)
+            handle.flush()
+            os.fsync(handle.fileno())
+        temporary.replace(target)
+    except BaseException:
+        resource_guard.release(reservation)
+        if temporary.exists():
+            temporary.unlink()
+        raise
+    resource_guard.commit(reservation)
 
 
 def preflight_pilot(manifest_path: str | Path) -> dict[str, Any]:
@@ -567,10 +907,34 @@ def canonical_public_shot_context(manifest_path: str | Path, *, shot_id: int) ->
     return canonical_public_manifest_context(manifest_path).shot_context(shot_id)
 
 
+@dataclass(frozen=True, slots=True)
+class CanonicalMaterializedInterruptionV1:
+    """Zero-credit partial attempt evidence, deliberately without decoder outcome facts."""
+
+    schema: Literal["canonical_materialized_interruption_v1"]
+    ledger_path: str
+    ledger_sha256: str | None
+    snapshot: CanonicalRuntimeSnapshotV1
+
+
+@dataclass(frozen=True, slots=True)
+class CanonicalMaterializedRunV1:
+    status: Literal["terminal", "interrupted"]
+    terminal: Any | None = None
+    interruption: CanonicalMaterializedInterruptionV1 | None = None
+
+    def __post_init__(self) -> None:
+        if (self.status == "terminal") != (self.terminal is not None):
+            raise ValueError("materialized terminal wrapper requires only a terminal result")
+        if (self.status == "interrupted") != (self.interruption is not None):
+            raise ValueError("materialized interruption wrapper requires only interruption evidence")
+
+
 def run_canonical_materialized_one(
     manifest_path: str | Path, *, sample: sampling.ShotSample,
     materialized_sample_sha256: str, ledger_path: str | Path,
     manifest_bytes: bytes | None = None,
+    runtime_authorization: CanonicalRuntimeAuthorizationV1 | None = None,
 ):
     """Run one verified caller-supplied physical sample without resampling.
 
@@ -626,23 +990,37 @@ def run_canonical_materialized_one(
         phase5_limits=public._phase5_limits, update_kind=manifest.policies.update.kind,
         schedule_kind=manifest.policies.schedule.kind,
     )
-    return run_canonical_structural_shot(
-        public.compact_manifest, code=code, observation=sample.observation,
-        hidden_truth=sample.hidden, shot_id=sample.shot_id, ledger_path=ledger_path,
-        sample_seed_identity=sample.sample_identity, verification_context=verification_context,
-        execution_controls=_canonical_execution_controls(manifest, code),
-        memory_execution_context=verification_context.memory_execution_context,
-        context={
-            "manifest_sha256": public.manifest_sha256,
-            "artifact_raw_sha256": manifest.artifact.raw_sha256,
-            "artifact_semantic_sha256": manifest.artifact.semantic_sha256,
-            "code_id": manifest.artifact.code_id, "evidence_relation": manifest.evidence.relation,
-            "fixture": manifest.evidence.fixture, "assessment_status": manifest.evidence.assessment_status,
-            "decoder_seed_identity": manifest.randomness.decoder_seed_identity,
-            "composition_identity": public.composition_identity,
-            "execution_identity": verification_context.execution_identity,
-        },
-    )
+    guard = None if runtime_authorization is None else CanonicalRuntimeGuardV1(runtime_authorization)
+    try:
+        result = run_canonical_structural_shot(
+            public.compact_manifest, code=code, observation=sample.observation,
+            hidden_truth=sample.hidden, shot_id=sample.shot_id, ledger_path=ledger_path,
+            sample_seed_identity=sample.sample_identity, verification_context=verification_context,
+            execution_controls=_canonical_execution_controls(manifest, code),
+            memory_execution_context=verification_context.memory_execution_context,
+            resource_guard=guard,
+            context={
+                "manifest_sha256": public.manifest_sha256,
+                "artifact_raw_sha256": manifest.artifact.raw_sha256,
+                "artifact_semantic_sha256": manifest.artifact.semantic_sha256,
+                "code_id": manifest.artifact.code_id, "evidence_relation": manifest.evidence.relation,
+                "fixture": manifest.evidence.fixture, "assessment_status": manifest.evidence.assessment_status,
+                "decoder_seed_identity": manifest.randomness.decoder_seed_identity,
+                "composition_identity": public.composition_identity,
+                "execution_identity": verification_context.execution_identity,
+            },
+        )
+    except CanonicalResourceInterruption as error:
+        if runtime_authorization is None or not isinstance(error.snapshot, CanonicalRuntimeSnapshotV1):
+            raise
+        ledger = Path(ledger_path)
+        return CanonicalMaterializedRunV1(
+            "interrupted", interruption=CanonicalMaterializedInterruptionV1(
+                "canonical_materialized_interruption_v1", str(ledger),
+                None if not ledger.exists() else sha256(ledger.read_bytes()).hexdigest(), error.snapshot,
+            ),
+        )
+    return result if runtime_authorization is None else CanonicalMaterializedRunV1("terminal", terminal=result)
 
 
 def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path):
