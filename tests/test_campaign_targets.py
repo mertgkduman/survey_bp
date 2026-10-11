@@ -174,6 +174,96 @@ def test_source_experiment_identity_rejects_unknown_or_unbounded_evidence_and_du
         type(identity).model_validate(duplicate_path.model_dump(mode="json", by_alias=True))
 
 
+def _unavailable_native_assessment():
+    from bp_registry.campaigns.targets import NativeMetricV1, NativeReferenceAssessmentV1
+
+    reason = "author implementation identity is not verified"
+    return NativeReferenceAssessmentV1(
+        schema="campaign_native_reference_assessment_v1",
+        target_id="synthetic-source-p010",
+        status="identity_unverified",
+        reasons=(reason,),
+        metrics=(
+            NativeMetricV1(name="decoder_work", status="unavailable", reason=reason),
+            NativeMetricV1(name="runtime_seconds", status="unavailable", reason=reason),
+            NativeMetricV1(name="counters", status="unavailable", reason=reason),
+        ),
+    )
+
+
+def test_native_unavailable_receipt_requires_typed_missingness_and_never_defaults_to_zero():
+    native = _unavailable_native_assessment()
+    assert {metric.value for metric in native.metrics} == {None}
+    assert native.executed_successfully is False
+
+    numeric_missingness = native.model_copy(
+        update={"metrics": (native.metrics[0].model_copy(update={"value": 0.0}), *native.metrics[1:])},
+    )
+    with pytest.raises(ValidationError):
+        type(native).model_validate(numeric_missingness.model_dump(mode="json", by_alias=True))
+
+
+def test_qualification_receipt_rejects_discrepant_or_incomplete_native_evidence_and_preserves_prior_receipt():
+    from bp_registry.campaigns.targets import (
+        ByteSnapshotV1,
+        NativeMetricV1,
+        NativeReferenceAssessmentV1,
+        SourceExperimentQualificationReceiptV1,
+    )
+
+    identity = _complete_source_experiment_identity()
+    unavailable = _unavailable_native_assessment()
+    earlier = SourceExperimentQualificationReceiptV1(
+        schema="campaign_source_experiment_qualification_v1",
+        source_experiment=identity,
+        target_receipt_sha256=sha256(b"target").hexdigest(),
+        native_assessment=unavailable,
+        qualification_blockers=("native implementation unavailable",),
+        faithful_eligible=False,
+    )
+    assert earlier.digest()
+
+    executed = NativeReferenceAssessmentV1(
+        schema="campaign_native_reference_assessment_v1",
+        target_id=identity.target_id,
+        status="executed",
+        reasons=(),
+        repository_uri="https://example.test/native",
+        repository_revision="1234abcd",
+        environment_snapshot=ByteSnapshotV1.from_bytes("native/environment.txt", b"python=3.12"),
+        settings_snapshot=ByteSnapshotV1.from_bytes("native/settings.toml", b"iterations=50"),
+        command_snapshot=ByteSnapshotV1.from_bytes("native/command.txt", b"run --seed 1"),
+        output_snapshot=ByteSnapshotV1.from_bytes("native/output.json", b"{}"),
+        metrics=(
+            NativeMetricV1(name="decoder_work", status="observed", value=50.0),
+            NativeMetricV1(name="runtime_seconds", status="observed", value=1.5),
+            NativeMetricV1(name="counters", status="unavailable", reason="source exposes no counters"),
+        ),
+    )
+    later = SourceExperimentQualificationReceiptV1(
+        schema="campaign_source_experiment_qualification_v1",
+        source_experiment=identity,
+        target_receipt_sha256=sha256(b"target").hexdigest(),
+        native_assessment=executed,
+        qualification_blockers=(),
+        faithful_eligible=True,
+        prior_qualification_receipt_sha256=earlier.digest(),
+    )
+    assert later.faithful_eligible is True
+    assert later.digest() != earlier.digest()
+
+    discrepant = executed.model_copy(update={"status": "execution_discrepant", "discrepancy_evidence": ("native output differs",)})
+    with pytest.raises(ValidationError):
+        SourceExperimentQualificationReceiptV1(
+            schema="campaign_source_experiment_qualification_v1",
+            source_experiment=identity,
+            target_receipt_sha256=sha256(b"target").hexdigest(),
+            native_assessment=discrepant,
+            qualification_blockers=(),
+            faithful_eligible=True,
+        )
+
+
 def _digitized_receipt():
     from bp_registry.campaigns.targets import (
         AxisCalibrationPointV1,
