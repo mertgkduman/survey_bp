@@ -100,6 +100,23 @@ def test_local_and_phase5_work_profiles_cover_all_v4_fields(tmp_path):
     assert phase5.derived_work_per_unit >= sum(phase5_context.manifest.intervention_limits.work_caps.values())
 
 
+def test_layered_profile_counts_checks_repeated_across_layers():
+    import numpy as np
+
+    from bp_registry.canonical.schedules import EdgeTable
+    from bp_registry.runner import _route_dimensions
+
+    manifest = SimpleNamespace(
+        budgets=SimpleNamespace(attempt=SimpleNamespace(max_iterations=2)),
+        policies=SimpleNamespace(schedule=SimpleNamespace(
+            partitions=((0,), (0,)), refresh_scope=None,
+        )),
+    )
+    table = EdgeTable.from_check_matrix(np.array([[1, 1]], dtype=np.uint8))
+    iterations, work_per_iteration, _ = _route_dimensions(manifest, table, "local:layered")
+    assert iterations * work_per_iteration >= 1 + 2 * 2 * (2 * table.edge_count + table.variable_count + 3)
+
+
 def test_strict_guarded_local_and_phase5_routes_reach_terminal(tmp_path):
     from bp_registry.runner import (
         CANONICAL_GUARDED_ARTIFACT_BYTE_CEILING_V1,

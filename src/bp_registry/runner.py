@@ -441,9 +441,10 @@ def _route_dimensions(manifest: object, table: EdgeTable, route: str) -> tuple[i
             if policy.partitions is None:
                 raise ValueError("layered work bound requires validated partitions")
             layers = len(policy.partitions)
-            # A traversal visits each declared check once. Each layer may
-            # refresh at most every edge and assembles every variable belief.
-            traversal = edges + layers * (edges + variables + 3)
+            # A validated partition may repeat a check in a later layer.
+            # Each layer can therefore touch all edges in both directions
+            # and assemble every variable belief.
+            traversal = layers * (2 * edges + variables + 3)
             work = 1 + iterations * traversal
             if schedule == "randomized":
                 refreshes = iterations if policy.refresh_scope == "sweep" else 1
