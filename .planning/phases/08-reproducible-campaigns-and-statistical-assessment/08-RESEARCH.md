@@ -427,24 +427,20 @@ Create the staging file in the destination directory and `fsync` the directory a
 
 ## Assumptions Log
 
-No implementation claim in this research depends on an unverified package or unstated compatibility assumption. Site allocation limits and paper-specific Phase 9/11 tolerances remain explicit open inputs rather than assumed values.
+No implementation claim in this research depends on an unverified package or unstated compatibility assumption. Unknown site limits and paper-specific Phase 9/11 tolerances are governed by the resolved dispositions below rather than inferred as implementation values.
 
-## Open Questions
+## Resolved Planning Questions
 
-1. **What are the site's current production limits?**
-   - What we know: Slurm client commands are installed at version 25.11.1, and job arrays support stable task IDs and concurrency caps. [VERIFIED: environment probe 2026-10-11; official Slurm docs]
-   - What's unclear: partition names, `MaxArraySize`, maximum wall time, memory/CPU policy, accounting fields/retention, and project storage quota were not supplied.
-   - Recommendation: implement a site-capability receipt and keep production authorization blocked until the operational gate records these values.
+1. **RESOLVED — unknown site allocation limits do not block bounded Phase 8 work.**
+   - Evidence boundary: Slurm client commands are installed at version 25.11.1, and job arrays provide task identifiers and concurrency caps; partition names, `MaxArraySize`, maximum wall time, memory/CPU policy, accounting fields/retention, and project storage quota remain unknown. [VERIFIED: environment probe 2026-10-11; official Slurm documentation, https://slurm.schedmd.com/job_array.html]
+   - Adopted disposition: run only the bounded, representative, non-assessed operational gate. Collect a read-only site-capability receipt and measured decoder, replay, storage, and shard-cost evidence. When safe site facts are unavailable, retain typed scheduler unavailability and deny publication-scale authorization; do not infer defaults or launch a large campaign. [VERIFIED: `.planning/ROADMAP.md:500-502`; `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-14-PLAN.md:20-25,49-67`]
 
-2. **Which source curves and tolerances will Phase 9 and Phase 11 assess?**
-   - What we know: Phase 8 owns the generic schema and procedures; Phase 9 owns CSS reproduction and Phase 11 owns quaternary reproduction. [VERIFIED: `.planning/ROADMAP.md:505-515`; `.planning/REQUIREMENTS.md:128-143`]
-   - What's unclear: final paper-specific curve points, tolerances, and missing-denominator policies.
-   - Recommendation: Phase 8 should ship synthetic target receipts and validation fixtures. Each later reproduction campaign must freeze its own target receipts and thresholds before sampling.
+2. **RESOLVED — paper-specific target selection and tolerances belong to Phases 9 and 11.**
+   - Evidence boundary: Phase 8 owns the reusable target receipt, uncertainty, and decision contracts, while later reproduction phases own their actual source curves, points, tolerances, and missing-denominator policies. [VERIFIED: `.planning/ROADMAP.md:486-502`; `.planning/REQUIREMENTS.md:122-126`]
+   - Adopted disposition: Phase 8 implements strict direct-source and digitization receipts and validates them with synthetic targets, including source hashes, exact figure/table identity, calibration, extraction precision, and source-denominator status. Phase 8 makes no paper-specific reproduction verdict. Phase 9 and Phase 11 must freeze their own target receipts and thresholds before sampling. [VERIFIED: `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-03-PLAN.md:13-25,35-57`; `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-14-PLAN.md:49-56`]
 
-3. **Is arbitrary continuous optional stopping needed in the first publication campaign?**
-   - What we know: finite-look alpha allocation satisfies the current requirement for justified adaptive stopping and fits the pinned stack.
-   - What's unclear: whether future campaigns need inspection after every shot or an unbounded horizon.
-   - Recommendation: keep V1 finite-look only. Add a time-uniform confidence-sequence method later through a separately sourced and validated design if a concrete campaign requires it.
+3. **RESOLVED — Phase 8 does not support arbitrary continuous outcome peeking.**
+   - Adopted disposition: support one final analysis for fixed-shot campaigns or a finite ordered schedule of prespecified completed looks with local alpha allocations whose total does not exceed the family alpha. Undeclared peeking and partial external batches produce an inconclusive assessed result; whole-batch overshoot is retained. A future time-uniform confidence-sequence method requires a separately sourced and validated design outside Phase 8. [VERIFIED: `.planning/ROADMAP.md:496-498`; `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-07-PLAN.md:13-26,50-60`; Howard et al., 2021, https://doi.org/10.1214/20-AOS1991]
 
 ## Environment Availability
 
