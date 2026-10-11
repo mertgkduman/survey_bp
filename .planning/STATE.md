@@ -1,21 +1,20 @@
 ---
 gsd_state_version: "1.0"
 milestone: v1.0
-current_phase: 5
-current_phase_name: Guided and Perturbative BP Interventions
+current_phase: 8
+current_phase_name: Reproducible Campaigns and Statistical Assessment
 current_plan: Not started
 status: planning
-stopped_at: Phase 10 complete, ready to plan Phase 5
-last_updated: "2026-10-08T09:12:53.810Z"
-last_activity: 2026-10-08
-last_activity_desc: Phase 10 complete, transitioned to Phase 5
-state_head: 0a54c740890294b9ee1eee296287c1aa10a24732
+stopped_at: Phase 8 planned, ready to execute
+last_updated: "2026-10-11T05:30:26.335Z"
+last_activity: 2026-10-11
+last_activity_desc: Phase 8 planning complete — 14 plans ready
+state_head: f93af2e9d690d24d3b6feec63a974391869cf2ff
 progress:
   total_phases: 14
   completed_phases: 6
-  total_plans: 111
+  total_plans: 125
   completed_plans: 103
-  percent: 43
 ---
 
 # Project State
@@ -25,20 +24,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-08)
 
 **Core value:** Make BP decoder differences explicit, reproducible, and fairly comparable through canonical policy execution and published evidence.
-**Current focus:** Phase 5 — pending notebook and offline HTML human review
+**Current focus:** Phase 8 — reproducible campaign execution; Phase 5 notebook and offline HTML human review remains open
 
 ## Current Position
 
-Phase: 5 — Guided and Perturbative BP Interventions
-Plan: 14 of 14 implemented; human review pending
+Phase: 8 (Reproducible Campaigns and Statistical Assessment) — READY TO EXECUTE
+Plan: 0 of 14 implemented
 Total Phases: 14
 Current Plan: Not started
-Total Plans in Phase: 16
-Status: Awaiting Phase 5 human review
-Last activity: 2026-10-08 — Phase 10 complete, transitioned to Phase 5
-Last Activity Description: Phase 10 complete, transitioned to Phase 5
+Total Plans in Phase: 14
+Status: Ready to execute Phase 8
+Last activity: 2026-10-11 — Phase 8 planning complete
+Last Activity Description: Phase 8 planning complete — 14 plans ready
 
-Progress: [████░░░░░░] 6 of 14 phases complete (43%); 103/111 plans complete
+Progress: [████░░░░░░] 6 of 14 phases complete (43%); 103/125 plans complete
 
 ## Performance Metrics
 

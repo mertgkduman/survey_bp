@@ -700,7 +700,7 @@ Plans:
 | 5. Guided and Perturbative BP Interventions | 14/14 | Human review pending |  |
 | 6. Beam Search, Ensembles, and Candidate Selection | 9/9 | Complete    | 2026-10-05 |
 | 7. Optional Postprocessing | 6/15 | Paused by user; POST-01 qualification failed |  |
-| 8. Reproducible Campaigns and Statistical Assessment | 0/TBD | Not started | - |
+| 8. Reproducible Campaigns and Statistical Assessment | 0/14 | Planned | - |
 | 9. CSS Reproduction and Controlled Comparisons | 0/TBD | Not started | - |
 | 10. Correlated Quaternary Execution | 16/16 | Complete    | 2026-10-08 |
 | 11. Quaternary Reproduction and Comparisons | 0/TBD | Not started | - |
