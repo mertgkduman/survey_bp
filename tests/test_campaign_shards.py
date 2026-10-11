@@ -228,3 +228,21 @@ def test_resume_rejects_scientific_drift_but_not_executor_observation() -> None:
         decision_for_look=_stopping_decision,
     )
     assert accepted["resumable_unit_keys"] == list(plan.unit_keys)
+
+
+def test_resume_rejects_stop_receipt_for_an_undeclared_partial_look() -> None:
+    """A forged future receipt cannot turn incomplete work into an authorized tail."""
+    from bp_registry.campaigns.shards import derive_resume_plan
+
+    plan = _work_plan()
+    forged = {
+        "schema": "campaign_look_stop_receipt_v1", "campaign_plan_digest": plan.campaign_plan_digest,
+        "completed_look": 2, "decision_input_hashes": ["c" * 64], "decision_result": {"status": "pass"},
+        "stop_reason": "all_primary_decisions_resolved", "realized_count": 0, "overshoot_count": 0,
+        "authorized_undispatched": [],
+    }
+    with pytest.raises(ValueError, match="stop receipt|undeclared|complete"):
+        derive_resume_plan(
+            plan=plan, verified_attempts=(), scientific_identity=_resume_identity(plan),
+            look_stop_receipts=(forged,), decision_for_look=_stopping_decision,
+        )
