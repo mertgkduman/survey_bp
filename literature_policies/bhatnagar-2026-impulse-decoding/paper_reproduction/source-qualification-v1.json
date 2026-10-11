@@ -1,0 +1,62 @@
+{
+  "format_version": 1,
+  "evidence_kind": "bhatnagar_source_qualification_v1",
+  "paper": {
+    "uri": "https://export.arxiv.org/e-print/2606.18240v1",
+    "revision": "arXiv:2606.18240v1",
+    "sha256": "ad7b63a456b9ec16a20aa7712b8be1f1c8d0cad48f6702583746b05363940208",
+    "accessed_on": "2026-10-11",
+    "integrity_statement": "sha256_integrity_linkage_not_authorship_v1"
+  },
+  "vector_figure": {
+    "archive_member": "Figures/B1_01.pdf",
+    "figure": "Figure 5",
+    "sha256": "7e49980c87891a7bd21bbeca29563e2026713ef59e447e34e654118f96a454d1",
+    "status": "pinned_vector_figure_without_numeric_targets"
+  },
+  "author_numeric_data": {
+    "status": "unavailable_to_workspace",
+    "reason": "No author-provided numeric curve bytes are present in this workspace."
+  },
+  "author_implementation": {
+    "status": "identity_unverified",
+    "reason": "No author implementation URI, revision, environment, or settings snapshot is present in this workspace."
+  },
+  "source_experiment_blockers": [
+    "exact_infinity_realization_unresolved",
+    "message_schedule_unresolved",
+    "ordered_b1_checks_and_logicals_unverified",
+    "author_implementation_revision_unverified"
+  ],
+  "target_extraction": {
+    "status": "blocked",
+    "reason": "The pinned vector figure has no imported numeric targets while author data are unavailable to this workspace."
+  },
+  "later_author_artifact_admission": {
+    "status": "eligible_when_complete",
+    "required_fields": [
+      "byte_snapshot",
+      "communication_or_access_date",
+      "curve_or_column_identity",
+      "revision"
+    ],
+    "event_semantics": "A later content-addressed qualification event supplements this unavailable observation without rewriting it."
+  },
+  "pinned_digitization": {
+    "status": "eligible_unperformed",
+    "required_contract": [
+      "pinned_render_and_image_hash",
+      "page_panel_curve_and_crop_identity",
+      "two_independently_attributed_passes",
+      "calibration_points",
+      "project_export_snapshots",
+      "raw_clicks",
+      "frozen_min_max_spread"
+    ]
+  },
+  "canonical_adaptation": {
+    "policy_path": "literature_policies/bhatnagar-2026-impulse-decoding/first-convergence-0.toml",
+    "qualification": "canonical_adaptation_not_assessed",
+    "source_faithful": false
+  }
+}

@@ -4,7 +4,7 @@
 
 - Paper: Shobhit Bhatnagar, Michele Pacenti, Nithin Raveendran, David Declercq, and Bane Vasić, *Impulse Decoding of Quantum LDPC Codes: Equivalence of Degeneracy and Code-Shortening*, [arXiv:2606.18240v1](https://arxiv.org/pdf/2606.18240v1), 16 June 2026.
 - Anchors: Section IV and Algorithm 1 define the code-capacity impulse procedure and selection; Section V defines the 100-iteration, variable-to-check clipping, and stopping conventions; Figure 5 is the B1 target. Figure 2 uses BB-288 and can serve as a second-code check later.
-- Author implementation identity: unverified. Source curve data are described as available from the authors on request; no numeric points have been imported into this registry.
+- Author implementation identity: unverified. Source curve data are described as available from the authors on request; no numeric points have been imported into this registry. The [Phase 9 source-qualification receipt](source-qualification-v1.json) binds the source and vector-figure identities observed in this workspace, distinguishes workspace unavailability from global nonexistence, and defines a later content-addressed author-data admission route.
 - The three `.spec.toml` files remain non-runnable source records. `first-convergence-0.toml` is a runnable **canonical adaptation**, qualified against those records and the registered impulse controller; it is not a source-faithful Figure 5 reproduction. The other two requested variants have exact typed compiler mappings but no runnable paper-root TOML yet.
 
 ## Requested decoder variants
@@ -23,7 +23,7 @@ The source also plots `Minimum_Weight/0`, but it was not among the requested dec
 - Code/noise: Figure 5 uses the B1 `[[882,24,18 ≤ d ≤ 24]]` lifted-product CSS code under independent X-error code-capacity noise. It reports failure rate over approximately p=0.05–0.10. Section V defines failure as nonconvergence or logical error and states at least 100 failures per plotted point.
 - Candidate repository artifact: `data/artifacts/b1-panteleev-kalachev-v3.npz`. Exact equality to this paper's ordered experimental matrix and logical basis remains unverified.
 - Circuits: the paper also contains circuit-level algorithms, but they are separate later targets. No circuit details are imported into these Algorithm 1 files.
-- Published target points, uncertainty, per-point denominators, and author implementation revision: uncollected. Do not mark Figure 5 reproduced before they and the source manifest are resolved.
+- Published target points, uncertainty, per-point denominators, and author implementation revision: uncollected. Do not mark Figure 5 reproduced before they and the source manifest are resolved. If author bytes remain unavailable, the receipt permits an explicitly pinned two-pass digitization procedure; that procedure has not yet produced numeric points.
 
 ## Reproduction path
 
