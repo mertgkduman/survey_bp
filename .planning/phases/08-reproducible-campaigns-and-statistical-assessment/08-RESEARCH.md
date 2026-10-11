@@ -8,24 +8,24 @@
 
 Phase 8 should add a campaign layer around the existing strict experiment manifests, deterministic samplers, canonical event ledgers, replay verification, and typed profiling facts. It should not create another decoder engine or replace the per-shot evidence contracts. The repository already separates physical sample identity from decoder randomness, hashes full manifests, validates content-addressed events, reconstructs results from terminal evidence, and records unavailable measurements explicitly. [VERIFIED: `src/bp_registry/sampling.py:70-117`; `src/bp_registry/manifests.py:323-366,1198-1208`; `src/bp_registry/ledger.py:402-521,572-625`; `src/bp_registry/canonical/metrics.py:12-100`]
 
-The main missing boundary is a general, typed campaign contract. That contract must freeze sample namespaces, arm manifests, expected unit keys, shard ranges, environment/source identities, denominator rules, interval procedure, finite stopping looks, comparison families, target provenance, and pass/fail/inconclusive rules before dispatch. Shards should be private immutable products with content receipts; merge should validate and replay each shard, detect missing and duplicate unit keys, and reconstruct reports only from verified terminal evidence. This directly implements the Phase 8 goal and all five roadmap success criteria. [VERIFIED: `.planning/ROADMAP.md:486-502`; `.planning/REQUIREMENTS.md:106-126`]
+The main missing boundary is a general, typed campaign contract with an acyclic two-stage identity. Freeze primitive scientific inputs first and hash them as `campaign_spec_digest`; derive physical samples, decoder randomness, atomic unit keys, look prefixes/tails, and shards from that digest; then hash the unsigned complete derived plan as `campaign_plan_digest`, excluding that field from its own preimage. Shards should be private immutable products with content receipts. Merge must retain parent-linked interrupted-to-terminal retry lineages, contribute exactly one terminal per unit, reject competing terminal facts, and reconstruct reports only from verified terminal evidence. Resume subtracts verified terminals, declared final nonterminals, and only a verified stop receipt's exact `authorized_undispatched` tail. [VERIFIED: `.planning/ROADMAP.md:486-502`; `.planning/REQUIREMENTS.md:106-126`; `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-01-PLAN.md:60-62`; `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-05-PLAN.md:60-66`; `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-06-PLAN.md:43-57`]
 
 For statistics, use SciPy's existing exact Clopper-Pearson interval for fixed-shot Bernoulli rates. For adaptive execution, use only a finite, prespecified look schedule in Phase 8 V1 and allocate the family alpha across looks and target/comparison families; compute the same exact interval at each allocated local alpha. This is conservative, transparent, testable, and valid under the declared stopping rule. Do not reuse a nominal fixed-shot interval after repeated peeking. Time-uniform confidence sequences are the broader solution to optional stopping, but implementing one correctly would add a new statistical surface that the current stack does not provide. [VERIFIED: SciPy `BinomTestResult.proportion_ci` official documentation, https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats._result_classes.BinomTestResult.proportion_ci.html] [VERIFIED: Howard et al., 2021, DOI 10.1214/20-AOS1991, https://doi.org/10.1214/20-AOS1991]
 
-**Primary recommendation:** Build a separate `campaign_spec_v1` orchestration and assessment subsystem that wraps existing experiment manifests, uses immutable content-addressed shards, and supports two declared inference modes: final-only exact intervals and finite-look alpha-spent exact intervals.
+**Primary recommendation:** Build a separate `campaign_spec_v1` orchestration and assessment subsystem with a primitive `campaign_spec_digest`, a distinct non-self-referential `campaign_plan_digest`, immutable parent-linked attempt shards, and two declared inference modes: final-only exact intervals and finite-look alpha-spent exact intervals.
 
 <phase_requirements>
 ## Phase Requirements
 
 | ID | Description | Research Support |
 |----|-------------|------------------|
-| LED-05 | A researcher can validate and merge durable ledger shards, detect incomplete or duplicate contributions, and reconstruct reported results from the preserved evidence. | Immutable shard receipts, exact unit-key coverage, independent ledger validation/replay, deterministic merge, and report reconstruction are specified below. [VERIFIED: `.planning/REQUIREMENTS.md:112`] |
+| LED-05 | A researcher can validate and merge durable ledger shards, detect incomplete or duplicate contributions, and reconstruct reported results from the preserved evidence. | Immutable parent-linked attempt receipts, exact classified-set coverage, one accepted terminal per unit, independent replay, deterministic merge, and evidence-only report reconstruction are specified below. [VERIFIED: `.planning/REQUIREMENTS.md:112`; `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-05-PLAN.md:47-66`] |
 | SIM-01 | Controlled comparison arms receive the same identified physical-error/fault samples, with sample generation independent of decoder randomness, worker count, and branch count, or use persisted samples when a backend cannot guarantee that invariance. | Arm-neutral sample namespaces and existing `physical_sample_identity + shot_id` derivation provide the default; persisted sample artifacts are the explicit fallback. [VERIFIED: `.planning/REQUIREMENTS.md:116`; `src/bp_registry/sampling.py:70-117`; `src/bp_registry/runner.py:496-533`] |
-| SIM-02 | A researcher can run the same manifest locally or as bounded parallel/HPC jobs while recording resources, timing boundaries, environment, and actual work/budget consumption. | One deterministic shard map drives local workers or bounded Slurm arrays; shard receipts retain executor, allocation, timing, environment, and terminal work evidence. [VERIFIED: `.planning/REQUIREMENTS.md:117`; official Slurm job-array documentation, https://slurm.schedmd.com/job_array.html] |
-| SIM-03 | A researcher can checkpoint and resume a campaign without double-counting shots or silently changing sample identity, stop rules, configuration, or dependency versions. | Resume is set subtraction over verified unit keys under one campaign digest. Sealed shards are immutable, and changed campaign/source/environment identities are rejected. [VERIFIED: `.planning/REQUIREMENTS.md:118`; `src/bp_registry/study.py:280-305`] |
+| SIM-02 | A researcher can run the same manifest locally or as bounded parallel/HPC jobs while recording resources, timing boundaries, environment, and actual work/budget consumption. | One `campaign_plan_digest` binds the complete deterministic shard map used by local workers or bounded Slurm arrays; attempt receipts retain executor, allocation, timing, environment, and terminal work evidence. [VERIFIED: `.planning/REQUIREMENTS.md:117`; `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-01-PLAN.md:60-62`; official Slurm job-array documentation, https://slurm.schedmd.com/job_array.html] |
+| SIM-03 | A researcher can checkpoint and resume a campaign without double-counting shots or silently changing sample identity, stop rules, configuration, or dependency versions. | Both scientific digests bind resume. Parent-linked retries retain interrupted evidence but contribute one terminal; missing work excludes verified terminals, declared final nonterminals, and the exact tail authorized by a verified completed-look stop receipt. [VERIFIED: `.planning/REQUIREMENTS.md:118`; `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-05-PLAN.md:60-66`; `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-06-PLAN.md:43-57`] |
 | STAT-01 | Before a campaign, a researcher can declare the output/curve points, effect/tolerance, uncertainty method and level, comparison family, and pass/fail/inconclusive rule in the manifest. | A strict assessment-plan schema and deterministic decision algebra are specified below. [VERIFIED: `.planning/REQUIREMENTS.md:122`] |
 | STAT-02 | Analysis retains actual shots and failures and reports valid rare-event uncertainty, including a positive upper bound for zero observed failures rather than an exact zero failure rate. | Reports retain integer counts and use exact Clopper-Pearson limits; a zero-failure regression fixture must assert a positive upper limit. [VERIFIED: `.planning/REQUIREMENTS.md:123`; official SciPy exact interval documentation, https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats._result_classes.BinomTestResult.proportion_ci.html] |
-| STAT-03 | Statistical assessment records planned and realized stopping, batch overshoot and partial runs, and uses an uncertainty procedure justified for fixed-shot or adaptive stopping as applicable. | Final-only and finite-look modes have separate typed contracts; dispatch batches, completed looks, overshoot, partial state, and stop reasons remain evidence. [VERIFIED: `.planning/REQUIREMENTS.md:124`; Howard et al., 2021, https://doi.org/10.1214/20-AOS1991] |
+| STAT-03 | Statistical assessment records planned and realized stopping, batch overshoot and partial runs, and uses an uncertainty procedure justified for fixed-shot or adaptive stopping as applicable. | Final-only and finite-look modes have separate typed contracts; dispatch batches, completed looks, overshoot, partial state, and stop reasons remain evidence, and resume reconstructs complete-look decisions before recovering an implied missing stop receipt. [VERIFIED: `.planning/REQUIREMENTS.md:124`; `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-06-PLAN.md:38-48`; Howard et al., 2021, https://doi.org/10.1214/20-AOS1991] |
 | STAT-04 | Reproduction targets preserve source figure/table/data identity and extraction precision, including plot-digitization uncertainty and missing published sample counts where relevant. | A target receipt retains source/image hashes, panel/curve identity, axis calibration, raw clicks, repeated extraction bounds, and published denominator status. [VERIFIED: `.planning/REQUIREMENTS.md:125`; official WebPlotDigitizer calibration interface, https://webplotdigitizer.bose.dev/] |
 | STAT-05 | Controlled analyses use paired outcomes where samples are shared and declare denominators/treatment for nonconvergence, timeout, discard and post-selection, reporting acceptance rate alongside conditional performance. | Paired 2x2 tables, all-shot primary outcomes, exact discordance tests, conservative paired effect intervals, and explicit acceptance/conditional denominators are specified below. [VERIFIED: `.planning/REQUIREMENTS.md:126`; `src/bp_registry/phase4_analysis.py:48-132`] |
 </phase_requirements>
@@ -48,7 +48,7 @@ For statistics, use SciPy's existing exact Clopper-Pearson interval for fixed-sh
 | Physical sample namespace | API / Backend | Storage | The campaign derives an arm-neutral identity; samplers or persisted artifacts materialize it. |
 | Local and Slurm dispatch | API / Backend | External scheduler | One deterministic shard plan is translated into either local calls or bounded Slurm array tasks. |
 | Shard evidence and receipts | Database / Storage | API / Backend | Private append during execution becomes an immutable verified shard product. |
-| Merge and resume | API / Backend | Database / Storage | Validation computes exact unit-key coverage and missing-work sets from stored receipts. |
+| Merge and resume | API / Backend | Database / Storage | Validation reduces parent-linked attempts to one terminal contribution, verifies completed-look stop receipts, and computes exact missing and authorized-undispatched sets. |
 | Statistical assessment | API / Backend | Database / Storage | Counts and paired cells come only from verified terminals; result artifacts persist methods and decisions. |
 | Target digitization provenance | Database / Storage | API / Backend | Source bytes, calibration, clicks, and uncertainty are immutable inputs to assessment. |
 | Operational profiling gate | API / Backend | External scheduler | Existing typed process metrics combine with shard/job observations to authorize later campaign budgets. |
@@ -93,8 +93,9 @@ flowchart TD
     A[Campaign specification] --> B{Strict preflight}
     T[Target receipts] --> B
     E[Arm experiment manifests] --> B
-    B -->|valid and frozen| P[Deterministic shard plan]
+    B -->|valid and frozen| I[Primitive campaign_spec_digest]
     B -->|invalid| X[No sampling; rejection receipt]
+    I --> P[Derived unit/shard plan + campaign_plan_digest]
     P --> L[Local executor]
     P --> S[Bounded Slurm array adapter]
     L --> H[Private shard workspace]
@@ -105,11 +106,17 @@ flowchart TD
     V -->|conflict| X
     R --> M[Coverage and duplicate-aware merge]
     Q --> M
-    M --> C{All required unit keys or valid stop look?}
-    C -->|missing resumable work| P2[Resume plan = missing unit keys]
+    M --> C{Completed declared look?}
+    C -->|yes| D0[Reconstruct frozen decision]
+    D0 --> C2{Stop?}
+    C2 -->|yes| S0[Verify or atomically recover stop receipt and exact tail]
+    S0 --> C3[Coverage classification]
+    C2 -->|no| C3
+    C -->|no| C3
+    C3 -->|true missing/incomplete| P2[Parent-linked resume attempts]
     P2 --> L
     P2 --> S
-    C -->|assessment ready| Z[Counts, paired tables, work and resource summaries]
+    C3 -->|assessment ready or authorized tail| Z[Counts, paired tables, work and resource summaries]
     Z --> D{Prespecified decision rule}
     D --> O[Pass / Fail / Inconclusive report]
     Z --> G[Operational profiling gate]
@@ -125,7 +132,7 @@ src/bp_registry/campaigns/
 ├── planning.py        # deterministic unit and shard map
 ├── execution.py       # local shard executor over existing one-shot runners
 ├── slurm.py           # bounded argv/job-array adapter; no scientific logic
-├── shards.py          # staging, fsync, sealing, validation, merge, resume set difference
+├── shards.py          # staging, attempt lineage, sealing, merge, stop receipts, exact resume sets
 ├── statistics.py      # fixed and finite-look exact intervals, paired tables, Holm adjustment
 ├── targets.py         # source target and digitization receipts
 ├── profiling_gate.py  # decoder/replay throughput, ledger size, shard cost authorization
@@ -143,33 +150,39 @@ This is a proposed implementation map, not an existing path contract. Keep the p
 
 ### Pattern 1: Outer Campaign, Inner Immutable Experiments
 
-The campaign document owns statistical and execution-wide semantics; each arm points to a frozen existing experiment manifest and its SHA-256. The outer digest must cover the target receipts, source/environment lock, curve points, sample namespaces, arm IDs, expected unit keys, shard plan, stopping plan, denominator rules, and assessment plan. It must not rewrite policy manifests during dispatch.
+The campaign document owns statistical and execution-wide semantics; each arm points to a frozen existing experiment manifest and its SHA-256. Compute `campaign_spec_digest` only from primitive scientific inputs: inner-manifest/source/environment locks, arm-neutral sample namespaces, decoder-seed declarations, point/sample/arm domains, fixed or finite-look stopping, dispatch batches, scientific resource caps, target receipts, denominator mappings, and decision rules. Do not include derived unit keys, look tails, or shard lists in this primitive digest.
+
+After the primitive digest exists, derive the complete ordered unit list, look prefixes and exact tails, and shard plan. Compute `campaign_plan_digest` from an unsigned canonical payload containing `campaign_spec_digest` and that complete derived plan; exclude `campaign_plan_digest` from its own preimage, then attach it to the seal. Unit keys never consume `campaign_plan_digest`. Scientific equality and resume require both digests, while observational scheduler allocation can vary only when it cannot change scientific membership, randomness, look semantics, or caps. [VERIFIED: `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-01-PLAN.md:60-62,75-78`; `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-04-PLAN.md:46-64`]
 
 This matches the existing study path, where canonical manifest bytes plus source identity form a cache key and immutable receipts bind manifest, policy, and source hashes. [VERIFIED: `src/bp_registry/study.py:273-305`]
 
 ### Pattern 2: Arm-Neutral Samples, Arm-Scoped Decoder Randomness
 
-For each cohort and curve point, derive one physical sample namespace without arm or worker identity. Use the same `(sample_namespace, shot_id)` across every controlled arm. Derive decoder-local randomness from `(campaign_digest, arm_id, shot_id, declared decoder seed identity)` and never from worker, process, branch, or completion order. If a backend cannot reproduce samples independently, freeze a content-addressed sample artifact and make all arms read it.
+For each cohort and curve point, derive one physical sample namespace from `campaign_spec_digest`, the declared arm-neutral namespace, point/cohort coordinates, and sample ID without arm or worker identity. Use that same physical identity across every controlled arm. Derive decoder-local randomness from `(campaign_spec_digest, arm_id, sample_id, declared decoder seed identity)` and never from `campaign_plan_digest`, worker, process, branch, or completion order. If a backend cannot reproduce samples independently, freeze a content-addressed sample artifact and make all matched arms read the same artifact hash. [VERIFIED: `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-04-PLAN.md:43-51`]
 
 The current CSS sampler derives both RNG material and `sample_identity` from the manifest/sample anchor and `shot_id`, independently of the decoder. Existing canonical manifests expose `physical_sample_identity` separately from `decoder_seed_identity`, and the runner already uses `physical_sample_identity or manifest_sha256` as the sample anchor. The verbatim persisted fields are `sample_seed`, `decoder_seed_identity`, `sample_derivation`, and `physical_sample_identity`. [VERIFIED: `src/bp_registry/sampling.py:60-117`; `src/bp_registry/manifests.py:323-327`; `src/bp_registry/runner.py:496-533`]
 
 ### Pattern 3: Unit-Key and Shard Algebra
 
-Define the atomic expected contribution as `(campaign_digest, cohort_id, point_id, sample_id, arm_id)`. Partition the sorted unit list into disjoint shards before execution. Each shard receipt contains its exact expected keys, realized terminal keys, open/incomplete keys, ledger hash/bytes, environment/source hashes, executor facts, timing boundaries, and validation/replay status.
+Define the atomic expected contribution as `(campaign_spec_digest, cohort_id, point_id, sample_id, arm_id)`. Partition the complete sorted unit list into disjoint shards, expose each declared look's completed prefix and exact possible remaining tail, then compute `campaign_plan_digest` over the unsigned complete plan. Each attempt receipt binds both digests, `attempt_id`, `unit_key`, optional `parent_attempt_receipt`, state, ledger hash/bytes, environment/source hashes, executor facts, timing boundaries, and validation/replay status. [VERIFIED: `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-04-PLAN.md:56-64`; `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-05-PLAN.md:43-50`]
 
 Merge behavior should be deterministic:
 
-1. Validate the campaign digest and each shard receipt before reading outcome data.
+1. Validate `campaign_spec_digest`, `campaign_plan_digest`, dependency/source locks, and each immutable attempt receipt before reading outcome data.
 2. Validate canonical JSONL structure and event IDs, then invoke the existing independent shot verifier for every terminal.
-3. Collapse byte-identical repeated receipts as detected redundancy and record them; reject any conflicting contribution for one unit key.
-4. Compute `missing = expected - verified_terminal - explicit_nonterminal_final`, retain partial/open evidence, and emit a resume plan for missing keys only.
-5. Sort merged evidence by frozen unit order and event order; reconstruct summaries from terminal evidence rather than concatenated shard summaries.
+3. Reduce each unit's acyclic attempt lineage. Retain interrupted parents and a successful parent-linked terminal child while contributing exactly one terminal to denominators. Record byte-identical terminal delivery as redundancy; reject competing terminal children or any retry after a terminal that changes terminal facts.
+4. Verify a completed-look stop receipt against both digests, the completed-look merge, frozen decision inputs/result, and the plan's exact remaining tail before classifying that tail as `authorized_undispatched`.
+5. Before dispatching resume work, enumerate complete declared looks in order and recompute each pure decision from the frozen plan and verified merged evidence. If the earliest reconstructed stopping look lacks its receipt because execution crashed after decision evaluation, atomically recover the deterministic stop receipt first. A continuing look has no authorized tail; only a verified or recovered stop receipt authorizes its exact tail. [VERIFIED: `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-06-PLAN.md:38-48`; `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-09-PLAN.md:54-65`]
+6. Compute `missing = expected - verified_terminals - declared_final_nonterminals - authorized_undispatched`. Incomplete/interrupted keys remain visible and resumable through new parent-linked attempts.
+7. Sort accepted evidence by frozen unit order and canonical event order; reconstruct summaries from the single accepted terminal per unit rather than concatenated shard summaries.
+
+These lineage, stop-tail, and missing-set rules are the revised execution contract. [VERIFIED: `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-05-PLAN.md:47-66`; `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-06-PLAN.md:43-57`]
 
 Existing event readers already reject invalid JSON, bad event IDs, conflicting duplicate event IDs, terminal events without open shots, and duplicate/following `shot_begin` events. [VERIFIED: `src/bp_registry/ledger.py:572-605`]
 
 ### Pattern 4: Seal, Never Mutate
 
-While a task is live, write inside a private staging directory on the same filesystem as the final shard. Flush and `fsync` every ledger append, write and `fsync` the receipt, then publish with `os.replace`; `fsync` the containing directory after publication. A sealed shard is never reopened for append. Resume produces another shard with a new attempt ID and an exact missing-key set.
+While a task is live, write inside a private staging directory on the same filesystem as the final shard. Flush and `fsync` every ledger append, write and `fsync` the receipt, then publish with `os.replace`; `fsync` the containing directory after publication. A sealed attempt is never reopened for append. Resume produces a new attempt with a distinct ID and, for interrupted work, the prior attempt receipt hash as parent; every retained attempt stays immutable.
 
 The existing ledgers already flush and `fsync` appended evidence, and Python documents successful `os.replace` as atomic. [VERIFIED: `src/bp_registry/ledger.py:148-155,690-694`; official Python docs, https://docs.python.org/3.12/library/os.html#os.replace]
 
@@ -226,8 +239,8 @@ The authorization receipt must bind observed evidence and the chosen safety marg
 
 - **One shared cross-node append file:** private shard files avoid scheduler-order coupling and cross-node lock assumptions.
 - **Manifest digest as the only sample namespace:** policy-specific manifests differ by arm. Require an explicit arm-neutral physical sample identity; existing study preflight already rejects matched comparisons without it. [VERIFIED: `src/bp_registry/study.py:227-246`]
-- **Resume by rerunning a numeric range:** derive missing unit keys from verified receipts, or completed work can be double counted.
-- **Merge by JSONL concatenation:** concatenation cannot prove expected coverage, arm matching, replay validity, or absence of conflicting duplicates.
+- **Resume by rerunning a numeric range:** derive true missing work only after validating both scientific digests, reducing parent-linked attempts, reconstructing all complete-look decisions, recovering any implied missing stop receipt, and subtracting verified terminals, declared final nonterminals, and a verified `authorized_undispatched` tail.
+- **Merge by JSONL concatenation:** concatenation cannot prove expected coverage, arm matching, replay validity, attempt ancestry, exactly one terminal denominator contribution, or absence of competing terminal facts.
 - **Nominal fixed-shot intervals at repeated looks:** repeated peeking changes the coverage contract; use the declared finite-look alpha allocation.
 - **Reporting zero failures as probability zero:** retain `0/n` and a positive exact upper bound.
 - **Dropping timeout/nonconvergence/postselection:** these statuses require a prespecified primary outcome mapping and explicit acceptance denominator.
@@ -248,6 +261,8 @@ At zero observed failures, the estimate is `0/n`, while the exact interval's upp
 Let the manifest declare a finite set of looks `n_1 < ... < n_K`, a family alpha, and nonnegative allocations `alpha[j,k]` whose total across primary target `j` and look `k` is at most the family alpha. At completed look `k`, compute target `j` with confidence `1 - alpha[j,k]`. Because all possible inspections are included in the allocation, decisions can stop at a declared look without applying a fixed-final interval after optional stopping.
 
 Use whole dispatched batches. If a stop criterion becomes true at a look, all already dispatched members of that batch remain in evidence and the realized denominator; record `decision_boundary_n`, `dispatched_n`, `realized_n`, and `batch_overshoot_n`. An external partial batch is retained but cannot trigger a look-based statistical decision unless that exact partial boundary was declared. It therefore ends `inconclusive` or resumes.
+
+Stop-receipt publication is recoverable. Before any resume dispatch, enumerate complete declared looks and recompute their deterministic decisions from the frozen assessment plan and verified inputs. If the earliest reconstructed stopping look lacks its receipt, atomically publish the deterministic recovered stop receipt before returning a resume plan. Only that verified receipt can classify the plan's exact remaining tail as `authorized_undispatched`; its absence never permits later dispatch or tail exclusion. [VERIFIED: `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-06-PLAN.md:38-48`; `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-09-PLAN.md:54-65`]
 
 ### Paired Outcomes
 
@@ -279,7 +294,7 @@ If the source provides neither sample count nor an uncertainty band, the platfor
 | Exact binomial limits | Custom beta inversion/root finder | SciPy `binomtest(...).proportion_ci(method="exact")` | Handles boundary counts and is already pinned. [VERIFIED: official SciPy docs] |
 | Exact paired discordance p-value | Custom combinatorial tail code in the campaign layer | SciPy `binomtest` on discordant pairs | Existing campaigns already use this API. [VERIFIED: `scripts/run_fair_beam_relay_campaign.py:304-317`] |
 | Arbitrary anytime inference | Unreviewed mixture-boundary implementation | Finite declared looks with alpha allocation in Phase 8 V1 | Keeps the validity argument small and testable; future arbitrary peeking can add a separately qualified method. [VERIFIED: Howard et al., 2021] |
-| Distributed work queue | Shared mutable queue/database | Frozen unit list, deterministic shards, local executor, bounded Slurm arrays | The workload is finite and content-addressed; merge/resume are set operations. |
+| Distributed work queue | Shared mutable queue/database | Primitive spec digest, frozen derived plan digest, deterministic shards, local executor, bounded Slurm arrays | The workload is finite and content-addressed; merge/resume use validated attempt lineage and exact classified sets. |
 | Shard integrity | Trust filenames or scheduler success | Canonical bytes, SHA-256 receipts, exact key coverage, replay | Existing project evidence already uses manifest, source, ledger, and event hashes. [VERIFIED: `src/bp_registry/manifests.py:1198-1208`; `src/bp_registry/ledger.py:518-521`; `src/bp_registry/study.py:280-305`] |
 | Plot target uncertainty | A single rounded click | Frozen calibration, raw clicks, repeated extraction bounds, source denominator status | Preserves extraction precision and prevents target tuning after simulation. |
 | Runtime equivalence | Replayed clocks or one universal iteration count | Typed observed timing plus existing `WorkVector` dimensions | The project explicitly keeps work resources distinct and excludes timing from semantic replay. [VERIFIED: `src/bp_registry/manifests.py:259-305`; `src/bp_registry/canonical/profiling.py:296-307`] |
@@ -302,9 +317,9 @@ If the source provides neither sample count nor an uncertainty band, the platfor
 
 **What goes wrong:** A crash or rerun changes bytes behind an existing receipt and invalidates publication evidence.
 
-**How to avoid:** Seal immutable shard products; resume writes a new attempt shard containing only missing unit keys. The merge report records redundant identical receipts and rejects conflicts.
+**How to avoid:** Seal immutable attempt products. Resume writes a new parent-linked attempt only for a true missing/incomplete key after completed-look decision recovery and the full classified-set subtraction. Preserve interrupted parents, count the successful terminal child once, record identical terminal delivery as redundancy, and reject competing terminal facts.
 
-**Warning signs:** Ledger mtime or digest changes after receipt publication; a shard contains unit keys outside its frozen range.
+**Warning signs:** Ledger mtime or digest changes after receipt publication; an attempt lacks required ancestry; a unit contributes two terminal outcomes; a shard contains keys outside the plan; or resume dispatch begins before reconstructing a complete-look decision and recovering its implied missing stop receipt.
 
 ### Pitfall 3: Partial Pairs Quietly Become Complete-Case Analysis
 
@@ -387,17 +402,32 @@ def exact_paired_p(first_only: int, second_only: int) -> float:
 
 This matches the repository's current paired campaign pattern. [VERIFIED: `scripts/run_fair_beam_relay_campaign.py:304-317`; official SciPy `binomtest` docs, https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.binomtest.html]
 
-### Resume as Verified Set Difference
+### Resume as Verified Classified-Set Difference
 
 ```python
-def missing_units(expected, verified_terminals, explicit_final_nonterminals):
-    completed = verified_terminals | explicit_final_nonterminals
-    if not completed <= expected:
-        raise ValueError("shard contributed undeclared campaign units")
-    return tuple(sorted(expected - completed))
+def missing_units(
+    expected,
+    verified_terminals,
+    declared_final_nonterminals,
+    authorized_undispatched,
+):
+    classified = (
+        verified_terminals
+        | declared_final_nonterminals
+        | authorized_undispatched
+    )
+    if not classified <= expected:
+        raise ValueError("receipt classified undeclared campaign units")
+    if (
+        verified_terminals & declared_final_nonterminals
+        or verified_terminals & authorized_undispatched
+        or declared_final_nonterminals & authorized_undispatched
+    ):
+        raise ValueError("unit appears in competing final classifications")
+    return tuple(sorted(expected - classified))
 ```
 
-The executor should materialize `expected`, `verified_terminals`, and `explicit_final_nonterminals` from strict typed records. It must reject conflicting duplicate keys before this calculation.
+The merge layer must reduce parent-linked attempt lineages and reject competing terminal facts before this calculation, so `verified_terminals` contains at most one accepted terminal contribution per unit. It may populate `authorized_undispatched` only from an exact remaining tail bound by a verified completed-look stop receipt. Before calling this function or dispatching resume work, recompute decisions for complete looks in order and atomically recover a missing deterministic receipt for the earliest reconstructed stop. [VERIFIED: `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-05-PLAN.md:60-66`; `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-06-PLAN.md:38-48,51-60`]
 
 ### Atomic Shard Publication
 
@@ -417,7 +447,7 @@ Create the staging file in the destination directory and `fsync` the directory a
 |-------------------------|------------------|--------|
 | One-off campaign scripts with local schema and report logic | Shared strict campaign, shard, target, and assessment contracts | Phase 9 and Phase 11 can use one verified execution/statistics boundary. [VERIFIED: `scripts/run_fair_beam_relay_campaign.py:60-230,299-330`] |
 | Shared append ledger and path locks | Private immutable shard ledgers plus verified deterministic merge | Cross-node execution no longer depends on one append target. |
-| Resume by existing prefix length | Resume by exact verified unit-key set difference | Reordered, duplicated, conflicting, and incomplete contributions are visible. |
+| Resume by existing prefix length | Parent-linked attempt reduction plus exact classified-set subtraction | Interrupted evidence remains visible, one terminal contributes per unit, competing terminal facts fail, and verified early-stop tails remain intentionally undispatched. |
 | Wilson or exact intervals chosen by individual scripts | Manifest-declared exact fixed or finite-look alpha-spent procedure | Rare events, zero failures, and adaptive stopping have one reproducible contract. |
 | Marginal arm counts | Paired cell table, paired difference interval, exact discordance test, and family adjustment | Shared samples are used statistically as well as operationally. |
 | Digitized scalar target | Source/image/calibration/click receipt and target uncertainty interval | Reproduction verdicts can be reconstructed and audited. |
@@ -474,13 +504,13 @@ No implementation claim in this research depends on an unverified package or uns
 
 | Req ID | Behavior | Test Type | Automated Command | File Exists? |
 |--------|----------|-----------|-------------------|-------------|
-| LED-05 | Valid shards merge; exact duplicates are detected; conflicts, missing keys, open shots, bad hashes, and replay failures cannot become reports | integration / corruption | `pytest -q tests/test_campaign_shards.py -x` | ❌ Wave 0 |
+| LED-05 | Valid parent-linked attempts merge; interrupted-to-terminal recovery contributes once; exact duplicate delivery is recorded; competing terminal facts, bad hashes, and replay failures cannot become reports | integration / corruption | `pytest -q tests/test_campaign_shards.py -x` | ❌ Wave 0 |
 | SIM-01 | Worker counts and arm order produce identical sample identities; persisted-sample fallback is byte-bound | deterministic integration | `pytest -q tests/test_campaign_execution.py -x -k sample` | ❌ Wave 0 |
 | SIM-02 | Local and synthetic Slurm adapters consume the same shard plan and retain resource/timing/work context | unit / integration | `pytest -q tests/test_campaign_execution.py -x -k executor` | ❌ Wave 0 |
-| SIM-03 | Resume plans contain exactly missing unit keys and reject campaign/source/environment/stop-rule drift | integration | `pytest -q tests/test_campaign_shards.py -x -k resume` | ❌ Wave 0 |
+| SIM-03 | Both digests bind resume; complete-look decisions are reconstructed and any implied missing stop receipt is recovered before dispatch; resume excludes verified terminals, declared final nonterminals, and only a verified stop receipt's exact authorized tail | integration | `pytest -q tests/test_campaign_shards.py -x -k 'resume or retry or authorized_tail or stop_receipt_recovery'` | ❌ Wave 0 |
 | STAT-01 | Strict manifest requires targets, effects/tolerances, method/level, family, stopping, and deterministic decision rules before launch | schema unit | `pytest -q tests/test_campaign_contracts.py -x -k assessment` | ❌ Wave 0 |
 | STAT-02 | Zero/rare/all failures retain integer counts and exact boundary-safe uncertainty | exhaustive unit | `pytest -q tests/test_campaign_statistics.py -x -k binomial` | ❌ Wave 0 |
-| STAT-03 | Fixed mode analyzes only final n; adaptive mode honors look alpha, records overshoot/partial state, and rejects undeclared peeking | unit / property table | `pytest -q tests/test_campaign_statistics.py -x -k stopping` | ❌ Wave 0 |
+| STAT-03 | Fixed mode analyzes only final n; adaptive mode honors look alpha, records overshoot/partial state, rejects undeclared peeking, reconstructs complete-look decisions, and recovers an implied absent stop receipt | unit / integration | `pytest -q tests/test_campaign_statistics.py tests/test_campaign_shards.py -x -k 'stopping or stop_receipt_recovery'` | ❌ Wave 0 |
 | STAT-04 | Source/image/calibration/click hashes round-trip; changed axes/clicks fail; missing source n restricts verdict as declared | schema / corruption | `pytest -q tests/test_campaign_targets.py -x` | ❌ Wave 0 |
 | STAT-05 | Paired table, difference interval, exact discordance p, Holm family, status mapping, acceptance, and conditional denominators are correct | exhaustive unit | `pytest -q tests/test_campaign_statistics.py -x -k paired` | ❌ Wave 0 |
 | Operational gate | Representative clean/profile replay measures throughput/storage/cost and blocks an over-budget production design | integration with fake clock/scheduler plus bounded smoke | `pytest -q tests/test_campaign_profile_gate.py -x` | ❌ Wave 0 |
@@ -493,9 +523,9 @@ No implementation claim in this research depends on an unverified package or uns
 
 ### Wave 0 Gaps
 
-- [ ] `tests/test_campaign_contracts.py` — strict outer contract and drift fixtures.
+- [ ] `tests/test_campaign_contracts.py` — strict primitive contract, acyclic two-digest identity, and drift fixtures.
 - [ ] `tests/test_campaign_statistics.py` — exhaustive small-n fixed/adaptive/paired/zero-failure fixtures.
-- [ ] `tests/test_campaign_shards.py` — durability, corruption, duplicate, partial, merge, and resume fixtures.
+- [ ] `tests/test_campaign_shards.py` — durability, corruption, parent-linked interruption/retry, duplicate terminal delivery, competing terminal rejection, stop-receipt recovery, authorized-tail, merge, and resume fixtures.
 - [ ] `tests/test_campaign_execution.py` — worker/order invariance and local/Slurm plan equivalence.
 - [ ] `tests/test_campaign_targets.py` — target and digitization provenance.
 - [ ] `tests/test_campaign_profile_gate.py` — measured resource/storage/replay authorization.
@@ -513,7 +543,7 @@ Security enforcement is enabled at ASVS level 1. [VERIFIED: `.planning/config.js
 | V3 Session Management | No session surface | No cookies/tokens/sessions. |
 | V4 Access Control | Yes, filesystem scope | Resolve configured roots, reject absolute/parent traversal, reject symlink escape, and create outputs with caller-only permissions where feasible. Existing trace confinement rejects absolute paths, `..`, symlink traversal, and resolved paths outside the root. [VERIFIED: `src/bp_registry/canonical/tracing.py:99-120`] |
 | V5 Input Validation | Yes | Frozen strict Pydantic models, bounded counts/bytes, canonical finite JSON, exact field sets, and untrusted ledger/target validation before use. [VERIFIED: `src/bp_registry/manifests.py:31-39`; `src/bp_registry/ledger.py:402-515`] |
-| V6 Cryptography | Integrity only | Use SHA-256 for content identity and verify bytes before trust. State explicitly that an unsigned digest provides integrity linkage, not publisher authenticity. [VERIFIED: `src/bp_registry/manifests.py:1198-1208`; `src/bp_registry/ledger.py:518-521`] |
+| V6 Cryptography | Integrity only | Use domain-separated SHA-256 identities. Hash primitive scientific inputs as `campaign_spec_digest`; derive units; hash an unsigned complete-plan payload as `campaign_plan_digest`, excluding its digest field from its own preimage. Verify both before trust and state that unsigned digests provide integrity linkage, not publisher authenticity. [VERIFIED: `src/bp_registry/manifests.py:1198-1208`; `src/bp_registry/ledger.py:518-521`; `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-01-PLAN.md:60-62`] |
 
 ### Known Threat Patterns for the Phase 8 Stack
 
@@ -521,7 +551,9 @@ Security enforcement is enabled at ASVS level 1. [VERIFIED: `.planning/config.js
 |---------|--------|---------------------|
 | Path traversal or symlink escape in shard/target paths | Tampering / Information disclosure | Confined repository/campaign root, relative paths only, component-wise symlink rejection, final resolved containment check. |
 | Malicious or truncated JSONL/JSON | Tampering / Denial of service | File-size/event-count caps, UTF-8 finite JSON only, exact schemas, per-event IDs, terminal lifecycle validation. |
-| Duplicate or conflicting shard contribution | Tampering / Repudiation | Exact unit-key index; record identical redundancy; reject different bytes/terminal claims for one key. |
+| Cyclic or drifted campaign identity | Tampering / Repudiation | Compute `campaign_spec_digest` from primitive inputs first; derive keys/plan; compute `campaign_plan_digest` from the unsigned complete plan with no self-reference; require both digests on every attempt, merge, stop, resume, and report receipt. |
+| Interrupted and competing retry contributions | Tampering / Repudiation | Enforce an acyclic parent-linked attempt state machine; retain interrupted parents; accept one terminal child into the denominator; record identical terminal delivery as redundancy; reject competing terminal facts or changed retries after a terminal. |
+| Forged or missing early-stop tail | Tampering / Repudiation | Reconstruct complete-look decisions before resume; classify `authorized_undispatched` only from a verified stop receipt binding both digests, decision evidence, and the exact frozen tail; atomically recover an implied missing stop receipt before later dispatch. |
 | TOCTOU between validation and merge | Tampering | Read one immutable byte snapshot, hash and parse that snapshot, stage output privately, publish atomically. Existing code already exposes byte-snapshot preflight/read functions. [VERIFIED: `src/bp_registry/manifests.py:927-944`; `src/bp_registry/ledger.py:609-617`] |
 | Scheduler argument injection | Elevation / Tampering | Build argv arrays from validated scalar fields; never interpolate manifest text into a shell command; allowlist partitions/QOS through site config. |
 | Resource exhaustion from huge manifests/shards/traces | Denial of service | Bound shots, looks, arms, array width, events, bytes, sidecars, and decompressed input before allocation. Existing trace caps are verbatim `_MAX_RECORDS = 1_000_000` and `_MAX_BYTES = 64 * 1024 * 1024`. [VERIFIED: `src/bp_registry/canonical/tracing.py:20-23,123-150`] |
