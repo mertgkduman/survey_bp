@@ -310,3 +310,55 @@ def test_finite_look_recovers_stop_receipt_before_any_later_dispatch(tmp_path: P
     assert recovered["authorized_undispatched_keys"] == plan.authorized_tail(1)
     assert {path.parent.name.removeprefix("unit-") for path in root.glob("unit-*/receipt.json")} == first_look
     assert (root / "look-stop-receipt.json").is_file()
+
+
+def test_finite_look_rejects_a_forged_retained_stop_tail(tmp_path: Path):
+    """A retained receipt is checked against the complete frozen boundary again."""
+    from bp_registry.campaigns.execution import dispatch_finite_looks
+    from bp_registry.campaigns.planning import freeze_work_plan
+
+    digest, coordinates, arms = _planning_inputs()
+    plan = freeze_work_plan(
+        campaign_spec_digest=digest, coordinates=coordinates, arm_seed_identities=arms,
+        look_sample_boundaries=(1, 2), units_per_shard=2,
+    )
+    root = tmp_path / "forged-stop"
+    dispatch_finite_looks(
+        plan, output_root=root, workers=1, unit_runner=_bounded_unit_runner,
+        decision_for_look=_stop_after_first_complete_look,
+    )
+    receipt_path = root / "look-stop-receipt.json"
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    receipt["authorized_undispatched"] = []
+    receipt_path.write_text(json.dumps(receipt, sort_keys=True) + "\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="conflicts"):
+        dispatch_finite_looks(
+            plan, output_root=root, workers=1, unit_runner=_bounded_unit_runner,
+            decision_for_look=_stop_after_first_complete_look,
+        )
+
+
+def test_finite_look_maximum_retains_all_realized_units(tmp_path: Path):
+    """The maximum declared look stops only after all matched arm units finish."""
+    from bp_registry.campaigns.execution import dispatch_finite_looks
+    from bp_registry.campaigns.planning import freeze_work_plan
+
+    def maximum(*, look: int, terminal_records: tuple[dict[str, object], ...]) -> dict[str, object]:
+        return {
+            "decision_input_hashes": [sha256(str(look).encode("ascii")).hexdigest()],
+            "decision_result": {"look": look}, "stop_reason": "maximum_reached",
+            "should_stop": look == 2,
+        }
+
+    digest, coordinates, arms = _planning_inputs()
+    plan = freeze_work_plan(
+        campaign_spec_digest=digest, coordinates=coordinates, arm_seed_identities=arms,
+        look_sample_boundaries=(1, 2), units_per_shard=2,
+    )
+    result = dispatch_finite_looks(
+        plan, output_root=tmp_path / "maximum", workers=2, unit_runner=_bounded_unit_runner,
+        decision_for_look=maximum,
+    )
+    assert result["stop_receipt"]["stop_reason"] == "maximum_reached"
+    assert result["authorized_undispatched_keys"] == ()
+    assert len(result["records"]) == len(plan.unit_keys)

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from hashlib import sha256
+import json
 import os
 from pathlib import Path
 import shutil
@@ -158,6 +159,7 @@ def _execute_local_shard(
 def execute_local_work_plan(
     plan: CampaignWorkPlan, *, output_root: str | Path, workers: int,
     unit_runner: Callable[[dict[str, Any], str], Mapping[str, Any]],
+    shards: tuple[ShardPlan, ...] | None = None,
 ) -> dict[str, Any]:
     """Execute supplied immutable shards with a bounded process pool.
 
@@ -174,8 +176,12 @@ def execute_local_work_plan(
     destination = Path(output_root)
     destination.mkdir(parents=True, exist_ok=True)
     units = {unit.key: unit.payload() for unit in plan.units}
+    selected_shards = plan.shards if shards is None else tuple(shards)
+    known_shards = {shard.shard_id: shard for shard in plan.shards}
+    if not selected_shards or any(known_shards.get(shard.shard_id) != shard for shard in selected_shards):
+        raise ValueError("local execution must consume a nonempty exact subset of frozen shards")
     ordered_jobs = tuple(
-        (shard, tuple(units[key] for key in shard.unit_keys)) for shard in plan.shards
+        (shard, tuple(units[key] for key in shard.unit_keys)) for shard in selected_shards
     )
     max_workers = min(workers, len(ordered_jobs))
     completed: list[dict[str, Any]] = []
@@ -208,6 +214,183 @@ def execute_local_work_plan(
         ],
         "records": tuple(ordered_records),
     }
+
+
+def _sealed_local_records(root: Path) -> tuple[dict[str, Any], ...]:
+    """Read only published unit receipts; staging files never influence resume."""
+    records: list[dict[str, Any]] = []
+    for receipt_path in sorted(root.glob("unit-*/receipt.json")):
+        try:
+            payload = json.loads(receipt_path.read_bytes())
+        except (OSError, json.JSONDecodeError) as error:
+            raise ValueError("published local unit receipt is unreadable") from error
+        if not isinstance(payload, dict):
+            raise ValueError("published local unit receipt must be an object")
+        if payload.get("schema") == "campaign_local_unit_receipt_v1":
+            scientific = payload.get("scientific")
+            if not isinstance(scientific, dict) or not isinstance(scientific.get("unit_key"), str):
+                raise ValueError("published terminal receipt lacks scientific identity")
+            records.append({"state": "sealed_terminal", "receipt_path": str(receipt_path), **payload,
+                            "unit_key": scientific["unit_key"]})
+        elif payload.get("schema") == "campaign_local_incomplete_attempt_v1":
+            if not isinstance(payload.get("unit_key"), str):
+                raise ValueError("published interrupted receipt lacks unit identity")
+            records.append({"receipt_path": str(receipt_path), **payload})
+        else:
+            raise ValueError("published local receipt has an unsupported schema")
+    return tuple(records)
+
+
+def _deterministic_look_stop_receipt(
+    *, plan: CampaignWorkPlan, look: int, terminal_records: tuple[dict[str, Any], ...],
+    decision: Mapping[str, Any],
+) -> dict[str, Any]:
+    required = {"decision_input_hashes", "decision_result", "stop_reason", "should_stop"}
+    if set(decision) != required or decision.get("should_stop") is not True:
+        raise ValueError("finite-look decision cannot authorize a stop")
+    hashes = decision["decision_input_hashes"]
+    if not isinstance(hashes, (list, tuple)) or not hashes or any(
+        not isinstance(item, str) or len(item) != 64 for item in hashes
+    ):
+        raise ValueError("finite-look stop decision requires input receipt hashes")
+    prefix = plan.completed_prefix(look)
+    terminal_keys = {record["unit_key"] for record in terminal_records}
+    if not set(prefix).issubset(terminal_keys):
+        raise ValueError("finite-look stop requires every unit in its declared boundary")
+    scientific = [record["scientific"] for record in terminal_records]
+    merge_sha256 = sha256(json.dumps(scientific, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+    return {
+        "schema": "campaign_look_stop_receipt_v2",
+        "campaign_spec_digest": plan.campaign_spec_digest,
+        "campaign_plan_digest": plan.campaign_plan_digest,
+        "completed_look": look,
+        "completed_boundary_units": len(prefix),
+        "merge_receipt_sha256": merge_sha256,
+        "decision_input_hashes": list(hashes),
+        "decision_result": dict(decision["decision_result"]),
+        "stop_reason": decision["stop_reason"],
+        "realized_unit_count": len(terminal_records),
+        "overshoot_unit_count": len(terminal_keys - set(prefix)),
+        "authorized_undispatched": list(
+            key for key in plan.authorized_tail(look) if key not in terminal_keys
+        ),
+    }
+
+
+def _publish_stop_receipt(*, path: Path, receipt: Mapping[str, Any]) -> None:
+    """Atomically replace only the deterministic complete-look receipt."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = json.dumps(dict(receipt), sort_keys=True, separators=(",", ":")).encode("utf-8") + b"\n"
+    if path.exists():
+        if path.read_bytes() != payload:
+            raise ValueError("retained finite-look receipt conflicts with reconstruction")
+        return
+    descriptor, staging_name = tempfile.mkstemp(prefix=".look-stop-", dir=path.parent)
+    os.close(descriptor)
+    staging = Path(staging_name)
+    try:
+        staging.write_bytes(payload)
+        os.replace(staging, path)
+    except BaseException:
+        if staging.exists():
+            staging.unlink()
+        raise
+
+
+def _existing_stop_receipt(path: Path, *, plan: CampaignWorkPlan) -> dict[str, Any] | None:
+    if not path.exists():
+        return None
+    try:
+        receipt = json.loads(path.read_bytes())
+    except (OSError, json.JSONDecodeError) as error:
+        raise ValueError("retained finite-look receipt is unreadable") from error
+    if not isinstance(receipt, dict) or receipt.get("schema") != "campaign_look_stop_receipt_v2":
+        raise ValueError("retained finite-look receipt has an invalid schema")
+    if receipt.get("campaign_spec_digest") != plan.campaign_spec_digest or receipt.get("campaign_plan_digest") != plan.campaign_plan_digest:
+        raise ValueError("retained finite-look receipt differs from frozen scientific identity")
+    return receipt
+
+
+def dispatch_finite_looks(
+    plan: CampaignWorkPlan, *, output_root: str | Path, workers: int,
+    unit_runner: Callable[[dict[str, Any], str], Mapping[str, Any]],
+    decision_for_look: Callable[..., Mapping[str, Any]], fault_after_decision: bool = False,
+) -> dict[str, Any]:
+    """Dispatch whole frozen looks and recover a stop receipt before later work.
+
+    The decision callback is pure assessment algebra supplied by the caller.
+    This controller only establishes complete boundaries, preserves observed
+    records, and atomically retains the resulting authorization receipt.
+    """
+    if not isinstance(plan, CampaignWorkPlan) or not callable(decision_for_look):
+        raise ValueError("finite-look dispatch requires a frozen plan and pure decision callback")
+    if type(fault_after_decision) is not bool:
+        raise ValueError("fault_after_decision must be a boolean test injection")
+    root = Path(output_root)
+    root.mkdir(parents=True, exist_ok=True)
+    receipt_path = root / "look-stop-receipt.json"
+    retained = _existing_stop_receipt(receipt_path, plan=plan)
+
+    for look in range(1, len(plan.look_boundaries) + 1):
+        records = _sealed_local_records(root)
+        terminals = tuple(record for record in records if record["state"] == "sealed_terminal")
+        prefix = plan.completed_prefix(look)
+        terminal_by_key = {record["unit_key"]: record for record in terminals}
+        if set(prefix).issubset(terminal_by_key):
+            decision_records = tuple(terminal_by_key[key]["scientific"]["terminal_fact"] for key in prefix)
+            decision = decision_for_look(look=look, terminal_records=decision_records)
+            if not isinstance(decision, Mapping):
+                raise ValueError("finite-look decision callback must return a mapping")
+            if decision.get("should_stop") is True:
+                receipt = _deterministic_look_stop_receipt(
+                    plan=plan, look=look, terminal_records=terminals, decision=decision,
+                )
+                if fault_after_decision:
+                    raise InterruptedError("injected interruption after decision before receipt publication")
+                _publish_stop_receipt(path=receipt_path, receipt=receipt)
+                return {
+                    "schema": "campaign_finite_look_dispatch_v1", "stopped": True,
+                    "recovered_stop_receipt": retained is None, "stop_receipt": receipt,
+                    "authorized_undispatched_keys": tuple(receipt["authorized_undispatched"]),
+                    "records": _sealed_local_records(root),
+                }
+            continue
+        look_shards = tuple(shard for shard in plan.shards if shard.look == look)
+        execution = execute_local_work_plan(
+            plan, output_root=root, workers=workers, unit_runner=unit_runner, shards=look_shards,
+        )
+        records = _sealed_local_records(root)
+        terminals = tuple(record for record in records if record["state"] == "sealed_terminal")
+        terminal_by_key = {record["unit_key"]: record for record in terminals}
+        if not set(prefix).issubset(terminal_by_key):
+            return {
+                "schema": "campaign_finite_look_dispatch_v1", "stopped": False,
+                "recovered_stop_receipt": False, "stop_receipt": None,
+                "authorized_undispatched_keys": (), "execution": execution, "records": records,
+            }
+        decision_records = tuple(terminal_by_key[key]["scientific"]["terminal_fact"] for key in prefix)
+        decision = decision_for_look(look=look, terminal_records=decision_records)
+        if not isinstance(decision, Mapping):
+            raise ValueError("finite-look decision callback must return a mapping")
+        if decision.get("should_stop") is True:
+            receipt = _deterministic_look_stop_receipt(
+                plan=plan, look=look, terminal_records=terminals, decision=decision,
+            )
+            if fault_after_decision:
+                raise InterruptedError("injected interruption after decision before receipt publication")
+            _publish_stop_receipt(path=receipt_path, receipt=receipt)
+            return {
+                "schema": "campaign_finite_look_dispatch_v1", "stopped": True,
+                "recovered_stop_receipt": False, "stop_receipt": receipt,
+                "authorized_undispatched_keys": tuple(receipt["authorized_undispatched"]),
+                "records": _sealed_local_records(root),
+            }
+    records = _sealed_local_records(root)
+    if retained is not None:
+        raise ValueError("retained finite-look receipt has no reconstructed stopping look")
+    return {"schema": "campaign_finite_look_dispatch_v1", "stopped": False,
+            "recovered_stop_receipt": False, "stop_receipt": None,
+            "authorized_undispatched_keys": (), "records": records}
 
 
 def run_one_unit(
