@@ -5,6 +5,115 @@ that work was delivered. They produce reproducible development evidence. They
 do not establish a source reproduction, a decoder ranking, or an authorization
 to start a publication campaign.
 
+## Paired BB-144 canonical gate
+
+`data/studies/phase8-paired-canonical-gate-v1.json` is the retained real
+two-arm definition. It binds the `phase8-paired-bb144-fast.json` baseline and
+the `phase8-paired-bb144-slow.json` relay policy to the same selected BB-144
+artifact, CSS code-capacity channel, `p=0.05`, sampler seed `317`, physical
+sample namespace, and sample IDs `0` and `1`. The fast and slow arms retain
+different decoder-seed identities. One evaluator-owned physical error artifact
+is sampled once for each point/sample and replayed through both policies.
+
+The canonical event ledger fields and sampler-derived identity do not change
+for the campaign. A separate campaign attempt receipt binds each immutable
+canonical ledger, materialized sample, and realized-error hash before merge.
+The four resulting units are bounded development evidence: the all-domain
+`development_fixture-not_assessed-all-domain` target is explicitly
+`development_fixture` / `not_assessed`, so it supplies no paper-reproduction
+or decoder-superiority verdict.
+
+The historical `phase8-bb144-fast.json` / `phase8-bb144-slow.json` pair is
+synthetic transport and recovery evidence only. Its one-shot inputs use
+different rates (`0.05` and `0.03`) and are never described as matched decoder evidence.
+
+Preflight validates the exact manifest bytes, shared code/channel/sampler
+material, resource caps, and frozen work expansion without creating an output
+directory, physical sample, canonical event ledger, or result receipt:
+
+```bash
+OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign preflight \
+  --campaign data/studies/phase8-paired-canonical-gate-v1.json \
+  --campaign-root . \
+  --output-root data/results/phase8-paired-canonical-gate-v1
+```
+
+After that no-write check, freeze the immutable work artifact before sampling:
+
+```bash
+OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign plan \
+  --campaign data/studies/phase8-paired-canonical-gate-v1.json \
+  --campaign-root . \
+  --output-root data/results/phase8-paired-canonical-gate-v1
+```
+
+The paired command writes
+`data/results/phase8-paired-canonical-gate-v1/campaign-work-plan.json`.
+It reconstructs exactly two samples by two arms; it does not authorize a
+larger shard, sample, evidence, storage, or decoder-work allocation.
+
+Run the retained local route, verify its typed paired-run receipt, merge it,
+derive only any exact resume set, and publish the bounded assessment:
+
+```bash
+OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign run-local \
+  --plan data/results/phase8-paired-canonical-gate-v1/campaign-work-plan.json \
+  --campaign-root . --output-root <local-root>
+OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign verify \
+  --receipt <local-root>/paired-run.json \
+  --plan data/results/phase8-paired-canonical-gate-v1/campaign-work-plan.json \
+  --campaign-root .
+OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign merge \
+  --receipt <local-root>/paired-run.json \
+  --plan data/results/phase8-paired-canonical-gate-v1/campaign-work-plan.json \
+  --campaign-root . --output-root <merge-root>
+OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign resume \
+  --plan data/results/phase8-paired-canonical-gate-v1/campaign-work-plan.json \
+  --merge <merge-root>/campaign-paired-merge.json --campaign-root .
+OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign assess \
+  --plan data/results/phase8-paired-canonical-gate-v1/campaign-work-plan.json \
+  --merge <merge-root>/campaign-paired-merge.json --campaign-root . \
+  --output-root <assessment-root>
+OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign verify \
+  --report <assessment-root>/assessment.json \
+  --plan data/results/phase8-paired-canonical-gate-v1/campaign-work-plan.json \
+  --merge <merge-root>/campaign-paired-merge.json --campaign-root .
+```
+
+The selected Slurm route is a transport route for frozen shards. First record
+measured site capability and retain bounded allocation and scheduler-observation
+receipts; then emit the literal array command and run only its selected shard:
+
+```bash
+OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign site-capability \
+  --scontrol <scontrol-observation.json> --sacct <sacct-observation.txt>
+OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign emit-slurm \
+  --plan data/results/phase8-paired-canonical-gate-v1/campaign-work-plan.json \
+  --campaign-root . --allocation <bounded-allocation.json> \
+  --site-allowlists <measured-site-allowlists.json>
+OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign run-shard \
+  --plan data/results/phase8-paired-canonical-gate-v1/campaign-work-plan.json \
+  --campaign-root . --output-root <slurm-root> --array-task-id <frozen-index> \
+  --allocation <bounded-allocation.json> \
+  --scheduler-observation <scheduler-observation.json>
+```
+
+No real scheduler submission is authorized without measured site ceilings for
+wall time, CPU, memory, storage, replay, and scheduler cost. Unavailable
+observations remain explicit unavailable facts. After both routes have retained
+their independently verified merge and report chains, compare only their
+route-neutral scientific evidence:
+
+```bash
+OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign verify-routes \
+  --plan data/results/phase8-paired-canonical-gate-v1/campaign-work-plan.json \
+  --local-merge <local-merge>/campaign-paired-merge.json \
+  --local-report <local-assessment>/assessment.json \
+  --slurm-merge <slurm-merge>/campaign-paired-merge.json \
+  --slurm-report <slurm-assessment>/assessment.json \
+  --campaign-root . --output <route-equivalence.json>
+```
+
 ## Frozen inputs and identity
 
 `data/studies/phase8-operational-gate-v1.json` is the retained Phase 8 gate.

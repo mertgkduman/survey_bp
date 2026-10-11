@@ -1146,6 +1146,74 @@ def test_operational_gate_preflight_binds_both_paths_without_creating_evidence(t
     assert "operational_gate manifest SHA-256" in json.loads(rejected.stdout)["error"]
 
 
+def test_paired_canonical_gate_definition_and_documented_lifecycle(tmp_path: Path) -> None:
+    """The retained real gate freezes four compatible units before any sampling."""
+    from bp_registry.campaigns.cli import _load_work_plan
+    from bp_registry.manifests import preflight as preflight_manifest
+
+    study_path = ROOT / "data/studies/phase8-paired-canonical-gate-v1.json"
+    study = json.loads(study_path.read_text(encoding="utf-8"))
+    assert set(study) == {"campaign_work_spec"}
+    spec = study["campaign_work_spec"]
+    assert spec["schema"] == "campaign_work_spec_v1"
+    assert spec["coordinates"] == [{
+        "cohort_id": "gross-bb-144", "point_id": "p050",
+        "sample_namespace": "phase8-paired-bb144-canonical-gate-shared-physical-samples-v1",
+        "sample_ids": [0, 1],
+    }]
+    assert spec["look_sample_boundaries"] == [2]
+    assert spec["assessment"]["stopping"] == {"mode": "fixed_shot", "final_shots": 2, "batch_size": 2}
+    assert spec["assessment"]["resources"]["max_events"] == 4
+    assert spec["assessment"]["targets"][0]["target_id"] == "development_fixture-not_assessed-all-domain"
+    assert spec["source_denominator_required_by_target"] == {"development_fixture-not_assessed-all-domain": False}
+    assert spec["source_denominators"] == {"development_fixture-not_assessed-all-domain": None}
+
+    arms = {item["arm_id"]: item for item in spec["arms"]}
+    assert set(arms) == {"fast", "slow"}
+    manifests = {}
+    for arm_id, arm in arms.items():
+        path = ROOT / arm["manifest_path"]
+        assert sha256(path.read_bytes()).hexdigest() == arm["manifest_sha256"]
+        manifests[arm_id] = preflight_manifest(path).manifest
+        assert manifests[arm_id].budgets.max_shots == 2
+        assert manifests[arm_id].randomness.decoder_seed_identity == arm["decoder_seed_identity"]
+    assert manifests["fast"].randomness.decoder_seed_identity != manifests["slow"].randomness.decoder_seed_identity
+    assert manifests["fast"].error_rate == manifests["slow"].error_rate == 0.05
+    assert manifests["fast"].randomness.sample_seed == manifests["slow"].randomness.sample_seed == 317
+    assert manifests["fast"].randomness.physical_sample_identity == manifests["slow"].randomness.physical_sample_identity
+    assert manifests["fast"].randomness.sample_derivation == manifests["slow"].randomness.sample_derivation
+    assert manifests["fast"].artifact.model_dump(mode="json") == manifests["slow"].artifact.model_dump(mode="json")
+
+    preflight_root = tmp_path / "preflight-must-not-write"
+    checked = _run_campaign_module(
+        "preflight", "--campaign", str(study_path), "--campaign-root", str(ROOT),
+        "--output-root", str(preflight_root),
+    )
+    assert checked.returncode == 0, checked.stdout
+    response = json.loads(checked.stdout)
+    assert response["sampling_performed"] is False
+    assert response["campaign_plan_digest"]
+    assert not preflight_root.exists()
+
+    work_plan_path = ROOT / "data/results/phase8-paired-canonical-gate-v1/campaign-work-plan.json"
+    _loaded_spec, work_plan, payload = _load_work_plan(str(work_plan_path), ROOT)
+    assert payload["campaign_spec_digest"] == response["campaign_spec_digest"]
+    assert len(work_plan.units) == 4 and len(work_plan.shards) == 2
+    assert {(unit.sample_id, unit.arm_id) for unit in work_plan.units} == {
+        (0, "fast"), (0, "slow"), (1, "fast"), (1, "slow"),
+    }
+
+    documentation = (ROOT / "docs/campaigns.md").read_text(encoding="utf-8")
+    for verb in ("preflight", "plan", "run-local", "emit-slurm", "run-shard", "verify", "merge", "resume", "assess", "verify-routes"):
+        assert f"bp-registry-campaign {verb}" in documentation
+    assert "canonical event ledger fields and sampler-derived identity do not change" in documentation
+    assert "campaign attempt receipt binds each immutable" in documentation
+    assert "No real scheduler submission is authorized without measured site ceilings" in documentation
+    assert "phase8-bb144-fast.json` / `phase8-bb144-slow.json" in documentation
+    assert "different rates (`0.05` and `0.03`)" in documentation
+    assert "never described as matched decoder evidence" in documentation
+
+
 def test_operational_fixture_recovers_a_post_decision_crash_without_next_look(tmp_path: Path):
     """The bounded gate retains its stop-receipt recovery proof on disk."""
     study = ROOT / "data/studies/phase8-operational-gate-v1.json"
