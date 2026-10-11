@@ -21,11 +21,13 @@ from .statistics import (
     PairedArmOutcomeV1,
     PairedCompletionSummaryV1,
     PairedOutcomeTableV1,
+    OutcomeDenominatorSummaryV1,
     TargetIntervalDecisionV1,
     exact_binomial_rate,
     finite_look_assessment,
     paired_completion_summary,
     paired_outcome_table,
+    outcome_denominator_summary,
     target_interval_decision,
 )
 
@@ -162,6 +164,8 @@ class PointReportV1:
     all_shot: ExactBinomialRateV1
     pair_status: Literal["complete", "inconclusive_incomplete_pairs", "not_applicable"]
     paired: PairedOutcomeTableV1 | None
+    outcome_denominator_summaries: tuple[OutcomeDenominatorSummaryV1, ...]
+    outcome_treatment_table: tuple[tuple[str, str, str], ...]
     work_and_resources: WorkAndResourceReportV1
 
 
@@ -202,12 +206,12 @@ def _work_and_resources(
 ) -> WorkAndResourceReportV1:
     vectors: list[tuple[str, tuple[tuple[str, int], ...]]] = []
     unavailable = {dimension: "not present in verified merge terminal evidence" for dimension in _MISSING_WORK_DIMENSIONS}
-    provided = work_vectors_by_unit or {}
+    provided = work_vectors_by_unit
     if not isinstance(provided, Mapping):
-        raise ValueError("work vectors must be a mapping when supplied")
+        raise ValueError("every verified terminal requires a named work vector")
     terminal_keys = {row["unit"].key for row in terminal_rows}
-    if set(provided) - terminal_keys:
-        raise ValueError("work vector refers to a unit absent from verified terminals")
+    if set(provided) != terminal_keys:
+        raise ValueError("work vectors must cover every verified terminal exactly once")
     for key in sorted(provided):
         vector = provided[key]
         if not isinstance(vector, Mapping) or not vector:
@@ -276,6 +280,14 @@ def reconstruct_campaign_report(
     terminal_rows = _verified_merge(plan=plan, merge_receipt=merge_receipt)
     if not terminal_rows:
         raise ValueError("report cannot compute an interval without verified terminal evidence")
+    validated_work = {
+        key: dict(vector)
+        for key, vector in _work_and_resources(
+            terminal_rows=terminal_rows,
+            work_vectors_by_unit=work_vectors_by_unit,
+            observations=observations,
+        ).work_vectors
+    }
     treatments = {item.terminal_status: item for item in assessment.outcome_matrix.treatments}
     required = source_denominator_required_by_target or {}
     source_counts = source_denominators or {}
@@ -332,13 +344,39 @@ def reconstruct_campaign_report(
                     alpha=assessment.families[0].alpha, count_receipt_sha256=dict(hashes)["merge"],
                     outcome_matrix=assessment.outcome_matrix,
                 )
+        denominator_summaries: list[OutcomeDenominatorSummaryV1] = []
+        for arm_id in arm_ids:
+            arm_units = [unit for unit in point_units if unit.arm_id == arm_id]
+            arm_rows = [row for row in rows if row["unit"].arm_id == arm_id]
+            arm_outcomes = tuple(CampaignTerminalOutcomeV1(
+                sample_identity=row["unit"].physical_sample_identity,
+                arm_id=arm_id,
+                terminal_status=row["terminal"]["outcome"],
+                actual_work=validated_work[row["unit"].key],
+            ) for row in arm_rows)
+            denominator_summaries.append(outcome_denominator_summary(
+                outcomes=arm_outcomes,
+                arm_id=arm_id,
+                planned_samples=len(arm_units),
+                dispatched_samples=len(arm_rows),
+                outcome_matrix=assessment.outcome_matrix,
+                alpha=1.0 - assessment.interval.confidence_level,
+                count_receipt_sha256=dict(hashes)["merge"],
+            ))
         report_points.append(PointReportV1(
             point_id=point_id, planned_samples=len(point_units), dispatched_samples=len(rows),
             terminal_samples=terminal_count, incomplete_samples=len(rows) - terminal_count,
             accepted_samples=accepted, conditional_samples=accepted,
             status_counts=tuple(sorted(statuses.items())), all_shot=rate, pair_status=pair_status,
             paired=paired, work_and_resources=_work_and_resources(
-                terminal_rows=rows, work_vectors_by_unit=work_vectors_by_unit, observations=observations,
+                terminal_rows=rows,
+                work_vectors_by_unit={row["unit"].key: validated_work[row["unit"].key] for row in rows},
+                observations=observations,
+            ),
+            outcome_denominator_summaries=tuple(denominator_summaries),
+            outcome_treatment_table=tuple(
+                (treatment.terminal_status, treatment.all_shot, treatment.conditional)
+                for treatment in assessment.outcome_matrix.treatments
             ),
         ))
     target_rates: dict[str, ExactBinomialRateV1] = {}

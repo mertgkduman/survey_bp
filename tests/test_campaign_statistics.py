@@ -435,7 +435,7 @@ def _campaign_outcome(*, sample: str, status: str, work: int = 7) -> object:
         sample_identity=sample,
         arm_id="first",
         terminal_status=status,
-        actual_work=work,
+        actual_work={"message_work": work},
     )
 
 
@@ -466,7 +466,7 @@ def test_outcome_summary_exposes_all_shot_acceptance_and_conditional_denominator
     assert summary.acceptance_probability.denominator == 3
     assert summary.status_counts["timeout"] == 1
     assert summary.status_counts["infrastructure_interruption"] == 1
-    assert summary.actual_work == 21
+    assert summary.actual_work == {"message_work": 21}
 
 
 def test_outcome_summary_keeps_postselection_and_invalid_results_visible() -> None:
@@ -581,6 +581,13 @@ def _report_inputs(*, statuses: dict[tuple[int, str], str] | None = None, looks:
     return plan, assessment, merged, hashes
 
 
+def _report_work(plan: object) -> dict[str, dict[str, int]]:
+    return {
+        unit.key: {"message_work": index + 1}
+        for index, unit in enumerate(plan.units)
+    }
+
+
 def test_report_reconstructs_from_merged_terminals_and_replays_byte_stably() -> None:
     api = importlib.import_module("bp_registry.campaigns.reporting")
     plan, assessment, merged, hashes = _report_inputs()
@@ -589,6 +596,7 @@ def test_report_reconstructs_from_merged_terminals_and_replays_byte_stably() -> 
         plan=plan, assessment=assessment, merge_receipt=merged,
         input_receipt_hashes=hashes, source_denominator_required_by_target={"p050": True},
         source_denominators={"p050": 100}, target_arm_ids={"p050": "first"},
+        work_vectors_by_unit=_report_work(plan),
     )
     assert report.status == "complete"
     assert report.point_reports[0].all_shot.failures == 2
@@ -598,6 +606,7 @@ def test_report_reconstructs_from_merged_terminals_and_replays_byte_stably() -> 
         report=report, plan=plan, assessment=assessment, merge_receipt=merged,
         input_receipt_hashes=hashes, source_denominator_required_by_target={"p050": True},
         source_denominators={"p050": 100}, target_arm_ids={"p050": "first"},
+        work_vectors_by_unit=_report_work(plan),
     ) is True
 
 
@@ -618,6 +627,7 @@ def test_report_uses_frozen_outcome_matrix_for_rates_pairs_and_looks() -> None:
     report = reconstruct_campaign_report(
         plan=plan, assessment=changed, merge_receipt=merged,
         input_receipt_hashes=hashes, target_arm_ids={"p050": "first"},
+        work_vectors_by_unit=_report_work(plan),
     )
     point = report.point_reports[0]
     assert point.all_shot.failures == 0
@@ -644,6 +654,7 @@ def test_report_withholds_incomplete_mapped_outcomes_from_denominators_and_pairs
     report = reconstruct_campaign_report(
         plan=plan, assessment=changed, merge_receipt=merged,
         input_receipt_hashes=hashes, target_arm_ids={"p050": "first"},
+        work_vectors_by_unit=_report_work(plan),
     )
     point = report.point_reports[0]
     assert point.all_shot.shots == 3
@@ -660,6 +671,7 @@ def test_report_rejects_tampered_merged_evidence_target_or_receipt(mutation: str
     report = api.reconstruct_campaign_report(
         plan=plan, assessment=assessment, merge_receipt=merged,
         input_receipt_hashes=hashes, target_arm_ids={"p050": "first"},
+        work_vectors_by_unit=_report_work(plan),
     )
     if mutation == "terminal":
         merged["terminal_facts"][0]["outcome"] = "timeout"
@@ -684,6 +696,7 @@ def test_report_marks_missing_source_denominator_inconclusive() -> None:
         plan=plan, assessment=assessment, merge_receipt=merged,
         input_receipt_hashes=hashes, source_denominator_required_by_target={"p050": True},
         source_denominators={"p050": None}, target_arm_ids={"p050": "first"},
+        work_vectors_by_unit=_report_work(plan),
     )
     assert report.status == "inconclusive"
     assert report.verdicts["p050"].reason == "missing_required_source_denominator"
@@ -695,6 +708,7 @@ def test_report_replays_every_declared_finite_look() -> None:
     report = api.reconstruct_campaign_report(
         plan=plan, assessment=assessment, merge_receipt=merged,
         input_receipt_hashes=hashes, target_arm_ids={"p050": "first"},
+        work_vectors_by_unit=_report_work(plan),
     )
     assert report.stopping["completed_looks"] == (1, 2)
     assert [record.planned_boundary for record in report.stopping["records"]] == [1, 2]
@@ -703,10 +717,9 @@ def test_report_replays_every_declared_finite_look() -> None:
 def test_report_keeps_work_resources_and_missingness_separate() -> None:
     api = importlib.import_module("bp_registry.campaigns.reporting")
     plan, assessment, merged, hashes = _report_inputs()
-    work = {
-        plan.units[0].key: {"bp_calls": 12, "message_work": 24, "branch_work": 3},
-        plan.units[1].key: {"bp_calls": 9, "message_work": 18},
-    }
+    work = _report_work(plan)
+    work[plan.units[0].key] = {"bp_calls": 12, "message_work": 24, "branch_work": 3}
+    work[plan.units[1].key] = {"bp_calls": 9, "message_work": 18}
     report = api.reconstruct_campaign_report(
         plan=plan, assessment=assessment, merge_receipt=merged, input_receipt_hashes=hashes,
         target_arm_ids={"p050": "first"}, work_vectors_by_unit=work,
@@ -729,6 +742,7 @@ def test_report_keeps_work_resources_and_missingness_separate() -> None:
         api.reconstruct_campaign_report(
             plan=plan, assessment=assessment, merge_receipt=merged, input_receipt_hashes=hashes,
             target_arm_ids={"p050": "first"},
+            work_vectors_by_unit=_report_work(plan),
             observations={"environment": {"DATABASE_PASSWORD": "leak"}},
         )
 

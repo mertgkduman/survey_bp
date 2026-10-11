@@ -490,14 +490,18 @@ class CampaignTerminalOutcomeV1:
     sample_identity: str
     arm_id: str
     terminal_status: str
-    actual_work: int
+    actual_work: Mapping[str, int]
 
     def __post_init__(self) -> None:
         _identifier(self.sample_identity, name="sample_identity")
         _identifier(self.arm_id, name="arm_id")
         if self.terminal_status not in _TERMINAL_STATUSES:
             raise ValueError("terminal_status is not in the frozen outcome matrix domain")
-        _bounded_int(self.actual_work, name="actual_work")
+        if not isinstance(self.actual_work, Mapping) or not self.actual_work:
+            raise ValueError("actual_work must be a nonempty mapping of named work dimensions")
+        for dimension, value in self.actual_work.items():
+            _identifier(dimension, name="actual work dimension")
+            _bounded_int(value, name=f"actual work for {dimension}")
 
 
 @dataclass(frozen=True, slots=True)
@@ -527,7 +531,8 @@ class OutcomeDenominatorSummaryV1:
     all_shot_performance: ExactBinomialRateV1
     acceptance_probability: ExactProportionV1
     conditional_performance: ExactBinomialRateV1 | None
-    actual_work: int
+    conditional_unavailable_reason: Literal["zero accepted samples"] | None
+    actual_work: Mapping[str, int]
     count_receipt_sha256: str
 
 
@@ -595,7 +600,7 @@ def outcome_denominator_summary(
     terminal_samples = 0
     accepted = 0
     conditional_failures = 0
-    work = 0
+    work: dict[str, int] = {}
     for outcome in outcomes:
         if not isinstance(outcome, CampaignTerminalOutcomeV1):
             raise ValueError("outcomes must be CampaignTerminalOutcomeV1 records")
@@ -606,7 +611,8 @@ def outcome_denominator_summary(
         seen_samples.add(outcome.sample_identity)
         treatment = status_mapping[outcome.terminal_status]
         status_counts[outcome.terminal_status] = status_counts.get(outcome.terminal_status, 0) + 1
-        work += outcome.actual_work
+        for dimension, value in outcome.actual_work.items():
+            work[dimension] = work.get(dimension, 0) + value
         if treatment.all_shot == "incomplete":
             continue
         terminal_samples += 1
@@ -644,7 +650,8 @@ def outcome_denominator_summary(
         all_shot_performance=all_shot,
         acceptance_probability=acceptance,
         conditional_performance=conditional,
-        actual_work=work,
+        conditional_unavailable_reason=None if conditional is not None else "zero accepted samples",
+        actual_work=dict(sorted(work.items())),
         count_receipt_sha256=receipt,
     )
 
