@@ -115,6 +115,11 @@ and cumulative peak child RSS upper bounds are in
 bounded development run; the production profiling gate remains denied until
 site ceilings and accounting are measured.
 
+The two `local-failed-*-mapping` directories retain incomplete implementation
+diagnostics from before the campaign terminal mappings were repaired. Each
+contains a `diagnostic.json` with `scientific_denominator_contribution: false`;
+neither enters the verified merge or assessment.
+
 ```bash
 OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign verify-routes \
   --plan data/results/phase8-paired-canonical-gate-v1/campaign-work-plan.json \

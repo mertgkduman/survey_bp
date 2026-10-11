@@ -20,7 +20,7 @@ created: "2026-10-11"
 
 ## Threat Register
 
-The 45 plan-time threats were checked against the implemented boundaries at ASVS Level 1. Evidence paths below are relative to `src/bp_registry/campaigns/`, except `contracts.py` and `planning.py` in the same package.
+The initial 45 plan-time threats and 26 gap-closure threats were checked against the implemented boundaries at ASVS Level 1. Evidence paths below are relative to `src/bp_registry/campaigns/`.
 
 | Threat ID | Category | Component | Severity | Disposition | Planned mitigation | Evidence | Status |
 |---|---|---|---|---|---|---|---|
@@ -70,6 +70,22 @@ The 45 plan-time threats were checked against the implemented boundaries at ASVS
 | T-08-14B | Tampering | retained receipts | high | mitigate | Seal inputs, hash all evidence, independently replay, and byte-verify the report. | cli.py; execution.py; profiling_gate.py | closed |
 | T-08-14C | Repudiation | assessment claim | medium | mitigate | Label not_assessed and retain target, rule, denominator, and authorization reasons. | cli.py; execution.py; profiling_gate.py | closed |
 
+### Gap-closure audit (Plans 08-15–08-20)
+
+The following groups cover every additional threat ID in the six gap plans. Each plan retains its individual category, severity, disposition, and mitigation text. The evidence column names the implementation and adversarial checks reviewed at closure.
+
+| Threat IDs | Evidence reviewed | Status |
+|---|---|---|
+| T-08-15A–D | `contracts.py`, `execution.py`, `cli.py`; exact arm compatibility, immutable sample replay, unchanged canonical ledger, outer attempt hashes and tamper regression | closed |
+| T-08-16A–D | `slurm.py`, `planning.py`, `cli.py`; literal bounded argv, selected shard identity, typed unavailable accounting, exact merge/resume and route tests | closed |
+| T-08-17A–D | `reporting.py`, `statistics.py`; recomputed merge/report hashes, total denominator/treatment table, named nonnegative work, typed observations and zero-acceptance tests | closed |
+| T-08-18A–E | `cli.py`, `reporting.py`; installed assessment/report/route reconstruction, bounded JSON, exact indexed receipt-to-attempt binding and tamper tests | closed |
+| T-08-19A–D | New matched manifests, strict study/work plan, no-write preflight and `docs/campaigns.md`; four-unit cap and explicit `development_fixture` / `not_assessed` classification | closed |
+| T-08-20A–D | Retained local and direct selected-shard ledgers, samples, attempts, merges, reports, route receipt, adversarial regression, measured process use and production denial | closed |
+| T-08-SC | Existing locked virtual environment; no package installation, exact dependency/environment lock checks in the frozen work specification | closed |
+
+The selected-shard route used direct execution, with no Slurm submission. Its typed scheduler/accounting fields explicitly say the allocation is a declared harness request and accounting is unavailable. Process wall time and cumulative RSS upper bounds are retained separately. This evidence does not establish safe site ceilings.
+
 ## Accepted Risks Log
 
 | Risk ID | Threat Ref | Rationale | Accepted By | Date |
@@ -82,11 +98,12 @@ The 45 plan-time threats were checked against the implemented boundaries at ASVS
 
 | Audit Date | Threats Total | Closed | Open | Run By |
 |---|---:|---:|---:|---|
-| 2026-10-11 | 45 | 45 | 0 | GSD security audit and Phase 08 closure |
+| 2026-10-11 | 45 | 45 | 0 | Initial GSD security audit |
+| 2026-10-11 | 71 | 71 | 0 | Gap-closure boundary and retained-evidence audit |
 
 ## Sign-Off
 
-- [x] All 45 planned threats have a disposition and implementation or accepted-risk evidence.
+- [x] All 71 unique planned threats have a disposition and implementation or accepted-risk evidence.
 - [x] All accepted risks are logged above.
 - [x] No high or critical threat remains open; `threats_open: 0`.
 - [x] The bounded gate retains `production_authorization: deny` while site ceilings are unknown.

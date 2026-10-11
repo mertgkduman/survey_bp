@@ -4,7 +4,7 @@ slug: "reproducible-campaigns-and-statistical-assessment"
 status: validated
 nyquist_compliant: true
 wave_0_complete: true
-gap_closure_status: pending
+gap_closure_status: complete
 gap_closure_plans: ["08-15", "08-16", "08-17", "08-18", "08-19", "08-20"]
 created: "2026-10-11"
 ---
@@ -41,23 +41,23 @@ This is the pre-execution test contract. The planner assigns task IDs and waves;
 
 ## Gap-Closure Nyquist Map
 
-The historical statuses and pass counts above describe Plans 08-01 through 08-14. Plans 08-15 through 08-20 add the following focused checks; each remains pending until its executor records the actual result in the plan summary.
+The historical statuses and pass counts above describe Plans 08-01 through 08-14. Plans 08-15 through 08-20 add the following focused checks; all completed with focused checks and the final retained-evidence gate.
 
 | Plan task | Requirements | Focused automated verification | Status |
 |-----------|--------------|---------------------------------|--------|
-| 08-15 T1 | LED-05, SIM-01, SIM-02 | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'public_paired_canonical_local_lifecycle or paired_canonical_replays_identical_error_bytes or paired_canonical_rejects_equal_labels_with_different_material or paired_canonical_rejects_attempt_or_ledger_tamper' -x` | Pending |
-| 08-15 T2 | LED-05, SIM-01, SIM-02 | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'installed_paired_canonical_local_lifecycle or public_campaign_facade_exports_work_plan' -x` | Pending |
-| 08-16 T1 | LED-05, SIM-01, SIM-02 | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'paired_canonical_local_and_slurm_routes_match or paired_canonical_slurm_array_is_bounded' -x` | Pending |
-| 08-16 T2 | LED-05, SIM-02, SIM-03 | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'paired_canonical_resume or mixed_route_merge or stop_before_resubmit' -x` | Pending |
-| 08-17 T1 | LED-05, STAT-02, STAT-05 | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_statistics.py -k 'report_serializes_denominator_uncertainty_per_arm or zero_acceptance or outcome_treatment or named_work' -x` | Pending |
-| 08-17 T2 | LED-05, STAT-02, STAT-05 | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_statistics.py -k 'report and (merge_hash or context_tamper or byte_stable or boundary)' -x` | Pending |
-| 08-18 T1 | LED-05, STAT-01, STAT-02, STAT-03, STAT-05 | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'installed_assess_emits_complete_campaign_report or installed_assess_preserves_partial_and_postselection_treatment' -x` | Pending |
-| 08-18 T2 | LED-05, SIM-02, SIM-03, STAT-01, STAT-02, STAT-03, STAT-05 | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'installed_report_verify or installed_report_tamper or installed_route_equivalence_verify_reconstructs_both_routes or route_equivalence_rejects_sample_or_science_drift or report_reassessment_is_byte_stable' -x` | Pending |
-| 08-19 T1 | SIM-01, SIM-02, STAT-01 | `OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign plan --campaign data/studies/phase8-paired-canonical-gate-v1.json --campaign-root . --output-root data/results/phase8-paired-canonical-gate-v1` | Pending |
-| 08-19 T2 | SIM-01, SIM-02, STAT-01 | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'paired_canonical_gate_definition_and_documented_lifecycle' -x` | Pending |
-| 08-20 T1 | LED-05, SIM-01, SIM-03, STAT-01, STAT-02, STAT-03, STAT-05 | `OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign verify --report data/results/phase8-paired-canonical-gate-v1/assessment.json --plan data/results/phase8-paired-canonical-gate-v1/campaign-work-plan.json --merge data/results/phase8-paired-canonical-gate-v1/local/campaign-merge.json --campaign-root .` | Pending |
-| 08-20 T2 | LED-05, SIM-01, SIM-02, SIM-03, STAT-01, STAT-02, STAT-03, STAT-05 | `OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign verify-routes --plan data/results/phase8-paired-canonical-gate-v1/campaign-work-plan.json --local-merge data/results/phase8-paired-canonical-gate-v1/local/campaign-merge.json --local-report data/results/phase8-paired-canonical-gate-v1/assessment.json --slurm-merge data/results/phase8-paired-canonical-gate-v1/slurm-route/campaign-merge.json --slurm-report data/results/phase8-paired-canonical-gate-v1/slurm-route/assessment.json --campaign-root . --output data/results/phase8-paired-canonical-gate-v1/route-equivalence.json` | Pending |
-| 08-20 T3 | LED-05, SIM-01, SIM-02, SIM-03, STAT-05 | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'retained_paired_canonical_gate_verifies or paired_canonical_rejects_attempt_or_ledger_tamper or operational_gate_verify_requires_retained_bounded_evidence' -x` | Pending |
+| 08-15 T1 | LED-05, SIM-01, SIM-02 | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'public_paired_canonical_local_lifecycle or paired_canonical_replays_identical_error_bytes or paired_canonical_rejects_equal_labels_with_different_material or paired_canonical_rejects_attempt_or_ledger_tamper' -x` | Pass |
+| 08-15 T2 | LED-05, SIM-01, SIM-02 | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'installed_paired_canonical_local_lifecycle or public_campaign_facade_exports_work_plan' -x` | Pass |
+| 08-16 T1 | LED-05, SIM-01, SIM-02 | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'paired_canonical_local_and_slurm_routes_match or paired_canonical_slurm_array_is_bounded' -x` | Pass |
+| 08-16 T2 | LED-05, SIM-02, SIM-03 | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'paired_canonical_resume or mixed_route_merge or stop_before_resubmit' -x` | Pass |
+| 08-17 T1 | LED-05, STAT-02, STAT-05 | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_statistics.py -k 'report_serializes_denominator_uncertainty_per_arm or zero_acceptance or outcome_treatment or named_work' -x` | Pass |
+| 08-17 T2 | LED-05, STAT-02, STAT-05 | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_statistics.py -k 'report and (merge_hash or context_tamper or byte_stable or boundary)' -x` | Pass |
+| 08-18 T1 | LED-05, STAT-01, STAT-02, STAT-03, STAT-05 | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'installed_assess_emits_complete_campaign_report or installed_assess_preserves_partial_and_postselection_treatment' -x` | Pass |
+| 08-18 T2 | LED-05, SIM-02, SIM-03, STAT-01, STAT-02, STAT-03, STAT-05 | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'installed_report_verify or installed_report_tamper or installed_route_equivalence_verify_reconstructs_both_routes or route_equivalence_rejects_sample_or_science_drift or report_reassessment_is_byte_stable' -x` | Pass |
+| 08-19 T1 | SIM-01, SIM-02, STAT-01 | `OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign plan --campaign data/studies/phase8-paired-canonical-gate-v1.json --campaign-root . --output-root data/results/phase8-paired-canonical-gate-v1` | Pass |
+| 08-19 T2 | SIM-01, SIM-02, STAT-01 | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'paired_canonical_gate_definition_and_documented_lifecycle' -x` | Pass |
+| 08-20 T1 | LED-05, SIM-01, SIM-03, STAT-01, STAT-02, STAT-03, STAT-05 | `OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign verify --report data/results/phase8-paired-canonical-gate-v1/assessment.json --plan data/results/phase8-paired-canonical-gate-v1/campaign-work-plan.json --merge data/results/phase8-paired-canonical-gate-v1/local/campaign-paired-merge.json --campaign-root .` | Pass |
+| 08-20 T2 | LED-05, SIM-01, SIM-02, SIM-03, STAT-01, STAT-02, STAT-03, STAT-05 | `OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign verify-routes --plan data/results/phase8-paired-canonical-gate-v1/campaign-work-plan.json --local-merge data/results/phase8-paired-canonical-gate-v1/local/campaign-paired-merge.json --local-report data/results/phase8-paired-canonical-gate-v1/assessment.json --slurm-merge data/results/phase8-paired-canonical-gate-v1/slurm-route/campaign-paired-merge.json --slurm-report data/results/phase8-paired-canonical-gate-v1/slurm-route/assessment.json --campaign-root . --output data/results/phase8-paired-canonical-gate-v1/route-equivalence.json` | Pass |
+| 08-20 T3 | LED-05, SIM-01, SIM-02, SIM-03, STAT-05 | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'retained_paired_canonical_gate_verifies or paired_canonical_rejects_attempt_or_ledger_tamper or operational_gate_verify_requires_retained_bounded_evidence' -x` | Pass |
 
 Gap closure retains the existing Wave 0 infrastructure. The new tests must first prove one materialized physical error is byte-identical across arms, reject equal labels with different code/channel/sample material, reject attempt-receipt or canonical-ledger tampering while leaving canonical event fields and sampler identity unchanged, reconstruct both local and selected Slurm evidence chains, and verify report denominators and merge binding.
 
@@ -82,7 +82,7 @@ Site allocation ceilings and production campaign budgets require later user/site
 
 - [x] Every planned task has an automated command or a named Wave 0 prerequisite.
 - [x] Phase tests cover all nine mapped requirements.
-- [x] Phase suite: 95 passed at the initial sign-off; final full suite: 1141 passed, 1 skipped.
+- [x] Initial sign-off: 95 focused tests and 1,141 full-suite passes with one skip; after gap closure: 205 Phase 8 passes and 1,158 full-suite passes with one skip.
 - [x] The bounded campaign and operational gate receipts replay from retained evidence.
 - [x] Set `nyquist_compliant: true` after the execution audit.
 
@@ -97,4 +97,10 @@ Site allocation ceilings and production campaign budgets require later user/site
 | Gaps resolved | 0 |
 | Escalated | 0 |
 
-The original requirement map was checked against the Phase 8 test modules and all fourteen completed plan summaries. The targeted campaign suite passed 95 tests at the initial sign-off. After review fixes and fixture regeneration, the full suite passed 1,141 tests with one skip. The retained operational gate verified its receipts, including stop recovery and zero next-look submissions. Those counts are historical evidence and are unchanged by the pending 08-15 through 08-20 checks. Site ceilings remain a separate production authorization condition.
+The original requirement map was checked against the Phase 8 test modules and all fourteen initial plan summaries. The targeted campaign suite passed 95 tests at the initial sign-off. After review fixes and fixture regeneration, the full suite passed 1,141 tests with one skip. The retained operational gate verified its receipts, including stop recovery and zero next-look submissions. Those counts are historical evidence superseded by the gap-closure results below. Site ceilings remain a separate production authorization condition.
+
+## Gap-Closure Validation 2026-10-11
+
+Plans 08-15 through 08-20 closed both original verifier gaps. The focused retained-evidence regression passed four selected checks, including exact local/selected-shard replay, report and route reconstruction, receipt/sample/ledger tamper rejection, and the historical operational gate. The Phase 8 suite passed **205** tests. The final workspace suite passed **1,158**, skipped **1**, and reported **25 multiprocessing fork deprecation warnings**; both suites exited zero. Logs and exit-status files are retained beside this validation report.
+
+The final [paired gate receipt](../../../data/results/phase8-paired-canonical-gate-v1/verification.json) binds study/manifests, frozen four-unit plan, two materialized physical samples, local and direct selected-shard attempts/merges/reports, independent route equivalence, process measurements, and the historical synthetic gate. It records `production_authorization: deny`: no fixed site wall, core, memory, storage, replay, or scheduler-cost ceilings were supplied, and no Slurm allocation/accounting was observed.

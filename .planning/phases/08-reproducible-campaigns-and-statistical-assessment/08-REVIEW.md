@@ -1,10 +1,19 @@
 ---
 phase: 08-reproducible-campaigns-and-statistical-assessment
-reviewed: 2026-10-11T08:04:58Z
-depth: deep
-files_reviewed: 22
+reviewed: 2026-10-11T10:26:23Z
+depth: standard
+files_reviewed: 31
 files_reviewed_list:
   - data/results/phase8-operational-gate-v1/profiling-authorization.json
+  - data/manifests/phase8-paired-bb144-fast.json
+  - data/manifests/phase8-paired-bb144-slow.json
+  - data/studies/phase8-paired-canonical-gate-v1.json
+  - data/results/phase8-paired-canonical-gate-v1/campaign-work-plan.json
+  - data/results/phase8-paired-canonical-gate-v1/local/campaign-paired-merge.json
+  - data/results/phase8-paired-canonical-gate-v1/assessment.json
+  - data/results/phase8-paired-canonical-gate-v1/slurm-route/campaign-paired-merge.json
+  - data/results/phase8-paired-canonical-gate-v1/slurm-route/assessment.json
+  - data/results/phase8-paired-canonical-gate-v1/route-equivalence.json
   - data/studies/phase8-operational-gate-v1.json
   - docs/campaigns.md
   - pyproject.toml
@@ -36,9 +45,9 @@ status: clean
 
 # Phase 8: Code Review Report
 
-**Reviewed:** 2026-10-11T08:04:58Z
-**Depth:** deep
-**Files Reviewed:** 22
+**Reviewed:** 2026-10-11T10:26:23Z
+**Depth:** standard gap-closure re-review following the original deep review
+**Files Reviewed:** 31
 **Status:** clean
 
 ## Summary
@@ -51,8 +60,14 @@ All reviewed files meet quality standards. No issues found.
 
 No current findings. The four prior warnings are resolved by the reviewed changes.
 
+## Gap-closure re-review
+
+The paired installed lifecycle added in Plans 08-15–08-20 was reviewed against the frozen work plan, both retained real execution routes, independent report/route verification, adversarial tests, and the historical operational gate. Real execution exposed missing campaign mappings for canonical `outcome: null` at `max_iterations` and Relay leg-limit completion; the outer receipt now maps only those supported cases to `nonconvergence` and the verifier repeats that mapping without changing canonical events. A one-point target with a distinct target ID now resolves only when the frozen plan truly contains one point. Merge verification now proves its indexed run receipts contain exactly the embedded attempts and bounds sample/ledger reads before parsing.
+
+The focused retained-evidence regression passed, the Phase 8 suite passed 205 tests, the full workspace suite passed 1,158 with one skip, and `git diff --check` found no whitespace errors. The recorded fork deprecation warnings did not fail the suite. No unresolved review finding remains.
+
 ---
 
-_Reviewed: 2026-10-11T08:04:58Z_
-_Reviewer: the agent (gsd-code-reviewer)_
-_Depth: deep_
+_Re-reviewed: 2026-10-11T10:26:23Z_
+_Reviewer: Phase 08 GSD execution coordinator_
+_Depth: standard delta review following the original deep review_
