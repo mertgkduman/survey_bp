@@ -1,6 +1,6 @@
 ---
 phase: 08-reproducible-campaigns-and-statistical-assessment
-verified: 2026-10-11T10:43:56Z
+verified: 2026-10-11T10:46:18Z
 status: passed
 score: 7/7 must-haves verified
 covered_files:
@@ -82,7 +82,7 @@ covered_files:
   - tests/test_campaign_statistics.py
   - tests/test_campaign_targets.py
   - tests/test_canonical_cli.py
-covered_digest: "v1:sha256:e5b2c9b0bd6aa89eb730ef7196c20bf2510cd58d565276fe6a684ff945ba4e32"
+covered_digest: "v1:sha256:4c8d4f1ff547023b5b9d9d28e024d3223687d6e834e16b6376f5003b4f876c9b"
 behavior_unverified: 0
 overrides_applied: 0
 re_verification:
@@ -124,3 +124,5 @@ LED-05; SIM-01, SIM-02, SIM-03; and STAT-01 through STAT-05 are satisfied for Ph
 ## Human Verification
 
 None is required for the scoped Phase 8 development contract. Missing site ceilings are a later production authorization condition, explicitly denied in the retained gate rather than inferred from this small run.
+
+Post-completion fingerprint refresh: ROADMAP and REQUIREMENTS now mark Phase 8 complete; the verified behavior and retained evidence are unchanged.
