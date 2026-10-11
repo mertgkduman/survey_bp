@@ -19,6 +19,7 @@ from bp_registry.campaigns.contracts import (
     FailureCountStoppingV1,
     FiniteLookStoppingV1,
     LookAlphaAllocationV1,
+    MultiplicativeTargetRuleV1,
     OutcomeMatrixV1,
     OutcomeTreatmentV1,
     ScientificResourceCapsV1,
@@ -52,6 +53,14 @@ def _exact_inverse_binomial_rate(*args: object, **kwargs: object) -> object:
         "campaign statistics module must provide exact inverse-binomial rates"
     )
     return api.exact_inverse_binomial_rate(*args, **kwargs)
+
+
+def _multiplicative_target_decision(*args: object, **kwargs: object) -> object:
+    api = _statistics_api()
+    assert api is not None and hasattr(api, "multiplicative_target_decision"), (
+        "campaign statistics module must provide multiplicative target decisions"
+    )
+    return api.multiplicative_target_decision(*args, **kwargs)
 
 
 def _failure_count_stopping(
@@ -198,6 +207,78 @@ def test_inverse_binomial_boundary_and_representative_intervals_are_finite() -> 
         )
         assert 0.0 <= result.interval[0] <= result.interval[1] <= 1.0
         assert all(math.isfinite(bound) for bound in result.interval)
+
+
+def _representative_inverse_rate() -> object:
+    stopping = _failure_count_stopping(
+        target_failures=100, terminal_failure_ordinal=125, batch_size=5, tail=(),
+    )
+    return _exact_inverse_binomial_rate(
+        stopping=stopping,
+        interval_spec=_inverse_interval(stopping),
+        total_completed_shots=125,
+        count_receipt_sha256=_HASH,
+    )
+
+
+def _multiplicative_target(lower: float, upper: float) -> TargetReferenceV1:
+    return TargetReferenceV1(
+        target_id="source_curve",
+        target_receipt_sha256="b" * 64,
+        lower=lower,
+        upper=upper,
+        absolute_tolerance=0.02,
+    )
+
+
+def _factor_rule() -> MultiplicativeTargetRuleV1:
+    return MultiplicativeTargetRuleV1(
+        rule="multiplicative_target_interval_containment_v1", factor=1.5,
+    )
+
+
+def test_multiplicative_target_decision_keeps_source_band_and_factor_separate() -> None:
+    rate = _representative_inverse_rate()
+    passed = _multiplicative_target_decision(
+        rate, _multiplicative_target(0.75, 0.90), _factor_rule(),
+        input_receipt_hashes={"assessment": "c" * 64},
+    )
+    discrepant = _multiplicative_target_decision(
+        rate, _multiplicative_target(0.01, 0.02), _factor_rule(),
+        input_receipt_hashes={"assessment": "c" * 64},
+    )
+    overlap = _multiplicative_target_decision(
+        rate, _multiplicative_target(0.65, 0.75), _factor_rule(),
+        input_receipt_hashes={"assessment": "c" * 64},
+    )
+    assert passed.verdict == "pass"
+    assert discrepant.verdict == "discrepant"
+    assert overlap.verdict == "inconclusive"
+    assert passed.target_interval == pytest.approx((0.75, 0.90))
+    assert passed.source_absolute_tolerance == 0.02
+    assert passed.factor == 1.5
+    assert passed.acceptable_interval == pytest.approx((0.5, 1.0))
+
+
+def test_multiplicative_target_decision_clips_and_preserves_censored_inconclusive() -> None:
+    rate = _representative_inverse_rate()
+    clipped = _multiplicative_target_decision(
+        rate, _multiplicative_target(0.0, 0.80), _factor_rule(),
+        input_receipt_hashes={"assessment": "c" * 64},
+        source_denominator_required=True,
+        source_denominator=None,
+    )
+    censored = _multiplicative_target_decision(
+        None, _multiplicative_target(0.75, 0.90), _factor_rule(),
+        input_receipt_hashes={"assessment": "c" * 64},
+        evidence_status="cap_censored",
+    )
+    assert clipped.acceptable_interval == pytest.approx((0.0, 1.0))
+    assert clipped.verdict == "inconclusive"
+    assert clipped.reason == "missing_required_source_denominator"
+    assert censored.verdict == "inconclusive"
+    assert censored.reason == "cap_censored"
+    assert censored.computed_interval is None
 
 
 @pytest.mark.parametrize("shots", range(1, 8))

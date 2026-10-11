@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_statistics.py -k 'multiplicative or containment or discrepant or inconclusive or target' -x",
+  "exitCode": 1,
+  "targetTest": "test_multiplicative_target_decision_keeps_source_band_and_factor_separate",
+  "targetFile": "tests/test_campaign_statistics.py",
+  "output": "TAP version 13\nnot ok 1 - test_multiplicative_target_decision_keeps_source_band_and_factor_separate\n  ---\n  message: AssertionError: campaign statistics module must provide multiplicative target decisions\n  ...\n1..1\n# tests 1\n# pass 0\n# fail 1",
+  "expected": "A frozen source target and factor-1.5 rule produce only pass, discrepant, or inconclusive results while retaining the source uncertainty separately.",
+  "actual": "The named target assertion failed because multiplicative_target_decision did not exist."
+}
