@@ -406,11 +406,16 @@ def test_slurm_argv_and_array_selection_are_bounded_and_shell_free():
         api.build_sbatch_argv(
             plan,
             allocation=api.SlurmAllocation(
-                partition="research;touch", qos="short", account="bp", wall_minutes=30,
+                partition="unapproved", qos="short", account="bp", wall_minutes=30,
                 memory_mb=512, cpus_per_task=1, max_concurrent_tasks=1,
             ),
             allowed_values={"partition": {"research"}, "qos": {"short"}, "account": {"bp"}},
             entrypoint=("/usr/bin/python3",),
+        )
+    with pytest.raises(ValueError, match="scheduler identifier"):
+        api.SlurmAllocation(
+            partition="research;touch", qos="short", account="bp", wall_minutes=30,
+            memory_mb=512, cpus_per_task=1, max_concurrent_tasks=1,
         )
     with pytest.raises(ValueError, match="cpus_per_task"):
         api.SlurmAllocation(
