@@ -272,3 +272,41 @@ def test_local_worker_failure_seals_incomplete_and_retains_completed_units(tmp_p
     sealed = {record["unit_key"] for record in result["records"]}
     assert sealed < set(plan.unit_keys)
     assert all(Path(record["receipt_path"]).is_file() for record in result["records"])
+
+
+def _stop_after_first_complete_look(*, look: int, terminal_records: tuple[dict[str, object], ...]) -> dict[str, object]:
+    inputs = sorted(str(record["unit_key"]) for record in terminal_records)
+    return {
+        "decision_input_hashes": [sha256("|".join(inputs).encode("ascii")).hexdigest()],
+        "decision_result": {"look": look, "terminal_count": len(inputs)},
+        "stop_reason": "all_primary_decisions_resolved",
+        "should_stop": look == 1,
+    }
+
+
+def test_finite_look_recovers_stop_receipt_before_any_later_dispatch(tmp_path: Path):
+    """A post-decision crash recovers its exact receipt before the next look runs."""
+    from bp_registry.campaigns.execution import dispatch_finite_looks
+    from bp_registry.campaigns.planning import freeze_work_plan
+
+    digest, coordinates, arms = _planning_inputs()
+    plan = freeze_work_plan(
+        campaign_spec_digest=digest, coordinates=coordinates, arm_seed_identities=arms,
+        look_sample_boundaries=(1, 2), units_per_shard=2,
+    )
+    root = tmp_path / "finite-look"
+    with pytest.raises(InterruptedError, match="after decision"):
+        dispatch_finite_looks(
+            plan, output_root=root, workers=2, unit_runner=_bounded_unit_runner,
+            decision_for_look=_stop_after_first_complete_look, fault_after_decision=True,
+        )
+    first_look = set(plan.completed_prefix(1))
+    assert {path.parent.name.removeprefix("unit-") for path in root.glob("unit-*/receipt.json")} == first_look
+    recovered = dispatch_finite_looks(
+        plan, output_root=root, workers=1, unit_runner=_bounded_unit_runner,
+        decision_for_look=_stop_after_first_complete_look,
+    )
+    assert recovered["recovered_stop_receipt"] is True
+    assert recovered["authorized_undispatched_keys"] == plan.authorized_tail(1)
+    assert {path.parent.name.removeprefix("unit-") for path in root.glob("unit-*/receipt.json")} == first_look
+    assert (root / "look-stop-receipt.json").is_file()

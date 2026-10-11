@@ -1,0 +1,9 @@
+{
+  "command": "OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'finite_look_recovers_stop_receipt' -x",
+  "exitCode": 1,
+  "targetTest": "test_finite_look_recovers_stop_receipt_before_any_later_dispatch",
+  "targetFile": "tests/test_campaign_execution.py",
+  "expected": "A complete stopping look recovers its deterministic receipt before later dispatch after interruption.",
+  "actual": "ImportError: dispatch_finite_looks is unavailable",
+  "output": "TAP version 13\nnot ok 1 - test_finite_look_recovers_stop_receipt_before_any_later_dispatch\n  ---\n  message: ImportError: dispatch_finite_looks is unavailable\n  ...\n1..1\n# tests 1\n# pass 0\n# fail 1\n"
+}
