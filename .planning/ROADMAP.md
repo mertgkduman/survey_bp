@@ -485,7 +485,7 @@ Plans:
 
 ### Phase 8: Reproducible Campaigns and Statistical Assessment
 
-**Goal:** A researcher can run, resume, and statistically assess paired experiments without losing samples, changing stopping semantics, or hiding uncertainty.
+**Goal:** As a researcher, I want to run, resume, and statistically assess paired experiments, so that I can preserve sample identity and stopping semantics while reporting uncertainty.
 **Mode:** mvp
 **Depends on:** Phase 6
 **Requirements:** LED-05, SIM-01, SIM-02, SIM-03, STAT-01, STAT-02, STAT-03, STAT-04, STAT-05
