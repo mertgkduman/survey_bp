@@ -17,7 +17,7 @@ Build a provenance-preserving research platform from paper evidence through nati
 - [ ] **Phase 5: Guided and Perturbative BP Interventions** — Implement BPGD, impulse, freezing, syndrome/sign flips, and restarting.
 - [x] **Phase 6: Beam Search, Ensembles, and Candidate Selection** — Expose branching, pruning, lists, and voting as auditable policies, and qualify the first three-paper CSS policy-file gate. (completed 2026-10-05)
 - [ ] **Phase 7: Optional Postprocessing** — Paused by user after 6/15 plans to prioritize BP variants; retain the isolated OSD qualification failure and completed LSD/SI/OTF work for later resumption.
-- [ ] **Phase 8: Reproducible Campaigns and Statistical Assessment** — Run paired, resumable campaigns with prespecified statistical criteria.
+- [x] **Phase 8: Reproducible Campaigns and Statistical Assessment** — Run paired, resumable campaigns with prespecified statistical criteria. (completed 2026-10-11)
 - [ ] **Phase 9: CSS Reproduction and Controlled Comparisons** — Qualify selected source results and isolate policy contributions in CSS decoding.
 - [x] **Phase 10: Correlated Quaternary Execution** — Add joint Pauli inference and explicitly compatible policy compositions. (completed 2026-10-08)
 - [ ] **Phase 11: Quaternary Reproduction and Comparisons** — Qualify correlated decoding and compare it with separate binary inference.
@@ -500,7 +500,7 @@ Plans:
 **Research focus:** Paper-specific precision and budgets, sequential inference, digitization, multiplicity, sample replay, durable shard protocol, and site execution limits.
 **Operational gate:** Profile decoder and replay throughput, ledger size, and HPC shard cost on representative nontrivial CSS samples before approving large campaigns; choose resource and storage budgets from measured evidence.
 **Scope carry-forward:** Design future CSS campaigns from a newly prespecified question, precision target, stopping rule and measured budget. The cancelled Phase 4 grid is historical evidence, not a required or automatically funded Phase 8 run.
-**Plans:** 20/20 plans executed
+**Plans:** 20/20 plans complete
 
 Plans:
 
@@ -707,7 +707,7 @@ Plans:
 | 5. Guided and Perturbative BP Interventions | 14/14 | Human review pending |  |
 | 6. Beam Search, Ensembles, and Candidate Selection | 9/9 | Complete    | 2026-10-05 |
 | 7. Optional Postprocessing | 6/15 | Paused by user; POST-01 qualification failed |  |
-| 8. Reproducible Campaigns and Statistical Assessment | 20/20 | In Progress|  |
+| 8. Reproducible Campaigns and Statistical Assessment | 20/20 | Complete    | 2026-10-11 |
 | 9. CSS Reproduction and Controlled Comparisons | 0/TBD | Not started | - |
 | 10. Correlated Quaternary Execution | 16/16 | Complete    | 2026-10-08 |
 | 11. Quaternary Reproduction and Comparisons | 0/TBD | Not started | - |

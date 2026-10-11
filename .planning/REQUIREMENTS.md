@@ -109,21 +109,21 @@ paragraph records the September 26 review state, not an open implementation gap.
 - [x] **LED-02**: Canonical runs record linked control-flow events for attempts, interventions, branches/pruning, relay transfers, candidates, fallback, and selection; per-edge message tracing can be selectively enabled without removing required shot/control-flow evidence.
 - [x] **LED-03**: A researcher can jointly analyze iterations, BP calls/message work, branch/relay work, candidate checks, fallback work, runtime, and parallel-resource context, without equating them to one universal iteration count.
 - [x] **LED-04**: Native-reference results explicitly mark unavailable internal events or counters and their reasons; missing instrumentation is never reported as zero or reconstructed as observed fact.
-- [ ] **LED-05**: A researcher can validate and merge durable ledger shards, detect incomplete or duplicate contributions, and reconstruct reported results from the preserved evidence.
+- [x] **LED-05**: A researcher can validate and merge durable ledger shards, detect incomplete or duplicate contributions, and reconstruct reported results from the preserved evidence.
 
 ### Simulation execution
 
-- [ ] **SIM-01**: Controlled comparison arms receive the same identified physical-error/fault samples, with sample generation independent of decoder randomness, worker count, and branch count, or use persisted samples when a backend cannot guarantee that invariance.
-- [ ] **SIM-02**: A researcher can run the same manifest locally or as bounded parallel/HPC jobs while recording resources, timing boundaries, environment, and actual work/budget consumption.
-- [ ] **SIM-03**: A researcher can checkpoint and resume a campaign without double-counting shots or silently changing sample identity, stop rules, configuration, or dependency versions.
+- [x] **SIM-01**: Controlled comparison arms receive the same identified physical-error/fault samples, with sample generation independent of decoder randomness, worker count, and branch count, or use persisted samples when a backend cannot guarantee that invariance.
+- [x] **SIM-02**: A researcher can run the same manifest locally or as bounded parallel/HPC jobs while recording resources, timing boundaries, environment, and actual work/budget consumption.
+- [x] **SIM-03**: A researcher can checkpoint and resume a campaign without double-counting shots or silently changing sample identity, stop rules, configuration, or dependency versions.
 
 ### Statistical assessment
 
-- [ ] **STAT-01**: Before a campaign, a researcher can declare the output/curve points, effect/tolerance, uncertainty method and level, comparison family, and pass/fail/inconclusive rule in the manifest.
-- [ ] **STAT-02**: Analysis retains actual shots and failures and reports valid rare-event uncertainty, including a positive upper bound for zero observed failures rather than an exact zero failure rate.
-- [ ] **STAT-03**: Statistical assessment records planned and realized stopping, batch overshoot and partial runs, and uses an uncertainty procedure justified for fixed-shot or adaptive stopping as applicable.
-- [ ] **STAT-04**: Reproduction targets preserve source figure/table/data identity and extraction precision, including plot-digitization uncertainty and missing published sample counts where relevant.
-- [ ] **STAT-05**: Controlled analyses use paired outcomes where samples are shared and declare denominators/treatment for nonconvergence, timeout, discard and post-selection, reporting acceptance rate alongside conditional performance.
+- [x] **STAT-01**: Before a campaign, a researcher can declare the output/curve points, effect/tolerance, uncertainty method and level, comparison family, and pass/fail/inconclusive rule in the manifest.
+- [x] **STAT-02**: Analysis retains actual shots and failures and reports valid rare-event uncertainty, including a positive upper bound for zero observed failures rather than an exact zero failure rate.
+- [x] **STAT-03**: Statistical assessment records planned and realized stopping, batch overshoot and partial runs, and uses an uncertainty procedure justified for fixed-shot or adaptive stopping as applicable.
+- [x] **STAT-04**: Reproduction targets preserve source figure/table/data identity and extraction precision, including plot-digitization uncertainty and missing published sample counts where relevant.
+- [x] **STAT-05**: Controlled analyses use paired outcomes where samples are shared and declare denominators/treatment for nonconvergence, timeout, discard and post-selection, reporting acceptance rate alongside conditional performance.
 
 ### CSS reproduction and comparison
 
@@ -243,15 +243,15 @@ Every v1 requirement has exactly one owning phase; later phases may use or stren
 | LED-02 | Phase 2 | Complete |
 | LED-03 | Phase 2 | Complete |
 | LED-04 | Phase 2 | Complete |
-| LED-05 | Phase 8 | Pending |
-| SIM-01 | Phase 8 | Pending |
-| SIM-02 | Phase 8 | Pending |
-| SIM-03 | Phase 8 | Pending |
-| STAT-01 | Phase 8 | Pending |
-| STAT-02 | Phase 8 | Pending |
-| STAT-03 | Phase 8 | Pending |
-| STAT-04 | Phase 8 | Pending |
-| STAT-05 | Phase 8 | Pending |
+| LED-05 | Phase 8 | Complete |
+| SIM-01 | Phase 8 | Complete |
+| SIM-02 | Phase 8 | Complete |
+| SIM-03 | Phase 8 | Complete |
+| STAT-01 | Phase 8 | Complete |
+| STAT-02 | Phase 8 | Complete |
+| STAT-03 | Phase 8 | Complete |
+| STAT-04 | Phase 8 | Complete |
+| STAT-05 | Phase 8 | Complete |
 | EVAL-01 | Phase 9 | Pending |
 | EVAL-02 | Phase 9 | Pending |
 | EVAL-03 | Phase 9 | Pending |

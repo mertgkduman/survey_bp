@@ -1,50 +1,51 @@
 ---
 gsd_state_version: "1.0"
 milestone: v1.0
-current_phase: 08
-current_phase_name: Reproducible Campaigns and Statistical Assessment
-current_plan: 1
-status: executing
-stopped_at: Phase 8 planned, ready to execute
-last_updated: "2026-10-11T05:31:32.355Z"
+current_phase: 5
+current_phase_name: Guided and Perturbative BP Interventions
+current_plan: Not started
+status: planning
+stopped_at: Phase 08 complete, ready to plan Phase 5
+last_updated: "2026-10-11T10:44:23.756Z"
 last_activity: 2026-10-11
-last_activity_desc: Phase 08 execution started
-state_head: 7cef605d5f2d049bb4de3131438478eb9e1cb20c
+last_activity_desc: Phase 08 complete, transitioned to Phase 5
+state_head: 3acef198ac09b728d1e446fd0382b4c896c95183
 progress:
   total_phases: 14
-  completed_phases: 6
-  total_plans: 125
-  completed_plans: 103
+  completed_phases: 7
+  total_plans: 131
+  completed_plans: 123
+  percent: 50
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-10-08)
+See: .planning/PROJECT.md (updated 2026-10-11)
 
 **Core value:** Make BP decoder differences explicit, reproducible, and fairly comparable through canonical policy execution and published evidence.
-**Current focus:** Phase 08 — Reproducible Campaigns and Statistical Assessment
+**Current focus:** Phase 5 human notebook/HTML review after Phase 8 completion
 
 ## Current Position
 
-Phase: 08 (Reproducible Campaigns and Statistical Assessment) — EXECUTING
-Plan: 1 of 14
+Phase: 5 — Guided and Perturbative BP Interventions
+Plan: 14 of 14 implemented; human review pending
 Total Phases: 14
-Current Plan: 1
+Current Plan: Technical work complete
 Total Plans in Phase: 14
-Status: Executing Phase 08
-Last activity: 2026-10-11 — Phase 08 execution started
-Last Activity Description: Phase 08 execution started
+Status: Awaiting Phase 5 human verification
+Last activity: 2026-10-11 — Phase 08 complete, transitioned to Phase 5
+Last Activity Description: Phase 08 complete, transitioned to Phase 5
 
-Progress: [████░░░░░░] 6 of 14 phases complete (43%); 103/125 plans complete
+Progress: 7 of 14 phases complete (50%); 123/131 plans complete
 
 ## Performance Metrics
 
-- Total plans completed: 103
+- Total plans completed: 123
 - Average duration: N/A
 - Total execution time: 0 hours
-- Recent trend: Phase 1 completed 9 plans; Phase 2 completed 16 plans, including seven review-driven gap plans, and passed goal, code, security, and validation gates.
+- Recent trend: Phase 8 completed 20 plans, including six goal-verification gap plans, and passed goal, code, security, and validation gates.
 
 **Per-Plan Metrics:**
 
@@ -109,6 +110,8 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - Canonical engines are defined per compatible kernel family. BP modifications are primary; OSD/LSD is optional additional processing for nonconvergence.
 - Reproduction requires declared statistical agreement, not bitwise identity; source semantics and outcome correctness require separate checks.
 - Preserve faithful source configurations and controlled shared-sample/work-budget comparisons as separate evaluation views.
+- [Phase 08]: Paired canonical CSS campaigns freeze one physical sample for both arms, verify local and direct selected-shard deliveries independently, and report exact denominator uncertainty and merge provenance.
+- [Phase 08]: The two-sample BB-144 run is development evidence only; site ceilings and scheduler accounting are unavailable, so production authorization remains denied.
 - Autonomous execution, fine phases, parallel independent agents, Git-tracked planning, full instructions, research/checking/verification enabled; saved Codex model/effort overrides retained.
 - Phase 1 selected a source-pinned Bravyi BB-144 artifact and kept its 32-shot native BP pilot labeled `pilot_adaptation` and `not_assessed`.
 - Phase 1 preserves ordered CSS matrix/logical identity, strict manifest preflight, and a durable shot ledger with independent outcome evaluation.
@@ -201,7 +204,7 @@ None outside the roadmap.
 
 ### Blockers/Concerns
 
-- Current: Phase 4 passed goal verification (4/4 revised criteria; 6/6 requirements), validation and ASVS L1 security. The user stopped the oversized comprehensive experiment; its terminal manifest disables resume. B1 selection remains inconclusive, and the 159 completed plus one interrupted B1 records are receipts without a qualified performance denominator. Fresh evaluation, native-pair and factorial results remain absent. Phase 5 has 14 independently verified plans ready to execute. See the [cancellation record](phases/04-memory-policies-and-relay-bp/04-13-CANCELLATION-20260930.md) and `04-VERIFICATION.md`. Entries below are historical checkpoints, not live progress.
+- Current: Phase 4 passed goal verification (4/4 revised criteria; 6/6 requirements), validation and ASVS L1 security. The user stopped the oversized comprehensive experiment; its terminal manifest disables resume. B1 selection remains inconclusive, and the 159 completed plus one interrupted B1 records are receipts without a qualified performance denominator. Fresh evaluation, native-pair and factorial results remain absent. Phase 5 has 14 implemented and technically verified plans; human notebook/HTML review remains open. See the [cancellation record](phases/04-memory-policies-and-relay-bp/04-13-CANCELLATION-20260930.md) and `04-VERIFICATION.md`. Entries below are historical checkpoints, not live progress.
 
 - New-chat progress audit: calibration running with 3,716/5,824 retained attempts (63.8%) at 2026-09-27T17:20:42.542Z. See `.planning/HANDOFF.json` for the measured snapshot and async resume context. Phase 1/2 verification reports are now flagged stale by GSD and need refreshing; Phase 3 remains passed. No completed plans were rerun or removed.
 - Phase 4 calibration remains `running` (PID 2702938); Plans 04-12/13/14 remain incomplete. Independent local PD-prime/momentum/affine execution, semantic failure-prefix traces, exact-byte terminal readers, immutable shot contexts and notebook views are verified in isolated source `62fe977`: 532 tests passed, one existing skip. Both notebooks execute all 14 cells without errors. The completed benchmark summary retains a real incomplete B1 p=.07 arm, so its rows remain explicitly unqualified. Fresh production evidence, retained histories/additional lifetimes, other local schedules, disordered local affine and Relay traces remain. Keep source changes separate from the live campaign. See [implementation continuation](phases/04-memory-policies-and-relay-bp/04-IMPLEMENTATION-CONTINUATION-20260927.md) and [coding handoff](phases/04-memory-policies-and-relay-bp/04-CODING-RESUME-HANDOFF.md).
@@ -246,14 +249,14 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 ## Deferred Items
 
-No requested decoding regime or named policy family is deferred beyond the first journal milestone. The cancelled comprehensive Phase 4 CSS evaluation/factorial is deferred from Phase 4; Phases 8–9 will scope any later CSS campaign afresh. Relay circuit-curve assessment remains in Phase 13.
+No requested decoding regime or named policy family is deferred beyond the first journal milestone. The cancelled comprehensive Phase 4 CSS evaluation/factorial is deferred from Phase 4; Phase 8 supplied bounded campaign infrastructure and Phase 9 must scope any CSS publication campaign afresh. Relay circuit-curve assessment remains in Phase 13.
 
 ## Session Continuity
 
 **Resume file:** None
 
-Last session: 2026-10-08T09:12:53.810Z
-Stopped at: Phase 10 complete; Phase 5 implementation complete with one notebook/HTML UAT item pending
+Last session: 2026-10-11T10:44:23.756Z
+Stopped at: Phase 08 complete; Phase 5 notebook/HTML human verification remains open
 Next command: $gsd-verify-work 5 for the pending human notebook/HTML review; use the Phase 07 handoff only when optional postprocessing is reprioritized.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.

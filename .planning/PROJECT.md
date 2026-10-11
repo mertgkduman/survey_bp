@@ -15,6 +15,7 @@ Make BP decoder differences explicit, reproducible, and fairly comparable by exp
 - ✓ Versioned mapping protocol, initial source-linked screening records, and CSS evidence taxonomy — Phase 1. This is an initial mapped set, not the completed literature study.
 - ✓ Strict manifest and immutable CSS artifact preflight, with independently checked algebra and ordered hashes — Phase 1.
 - ✓ Pinned native binary BP CSS pilot with a durable shot ledger and independent outcome evaluation — Phase 1. The 32-shot run is `pilot_adaptation` and `not_assessed`, not a statistical paper reproduction.
+- ✓ Bounded paired CSS campaign infrastructure with immutable shared samples, exact merge/resume, denominator uncertainty, and independently verified local/selected-shard reports — Phase 8. The two-sample BB-144 gate is `development_fixture` and `not_assessed`; production dispatch still requires measured site ceilings.
 - ✓ Canonical four-state joint-Pauli BP execution, correlated I/X/Y/Z sampling, independent code-capacity evaluation, and explicitly compatible quaternary policies — Phase 10. The bounded GB46 mechanism study is `not_assessed`; statistical reproduction and comparisons remain Phase 11 work.
 
 ### Active
@@ -128,6 +129,8 @@ All three stages belong to the same intended journal-paper scope. The literature
 | Keep one canonical quaternary BP kernel with independent Pauli evaluation | Make joint X/Z inference and compatible policy semantics inspectable | Phase 10 goal verified 8/8; full project suite and 256-shot decoder replay passed |
 | Label deterministic GB46 aSCED splitter and map generation as canonical adaptation | The pinned author code does not retain exact generated T/H_ext bytes | Immutable project-generated T/H_ext and map receipts; no source-faithful fixture claim |
 | Keep exact native aSCED execution in a separate aggregate evidence lane | Preserve the pinned executable reference without implying matched shots or a curve result | User-attested verbal collaborator-author permission for the bounded isolated run; 160 trials/10 logical errors, `not_assessed` |
+| Freeze one physical sample once and replay its bytes through paired canonical arms | Prevent arm-specific sampling drift while retaining distinct decoder randomness | Phase 8 local and direct selected-shard routes verified exact sample/error equality and route-neutral science |
+| Deny publication-scale campaign dispatch until site ceilings and accounting are measured | Small process measurements do not define safe HPC limits | Phase 8 retained gate records process use and `production_authorization: deny` |
 
 ## Evolution
 
@@ -147,4 +150,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with the current software, evidence, and research state.
 
 ---
-*Last updated: 2026-10-08 after Phase 10*
+*Last updated: 2026-10-11 after Phase 8*
