@@ -58,7 +58,7 @@ Site allocation ceilings and production campaign budgets require later user/site
 
 - [x] Every planned task has an automated command or a named Wave 0 prerequisite.
 - [x] Phase tests cover all nine mapped requirements.
-- [x] Phase suite: 95 passed; full suite: 1125 passed, 1 skipped.
+- [x] Phase suite: 95 passed at the initial sign-off; final full suite: 1141 passed, 1 skipped.
 - [x] The bounded campaign and operational gate receipts replay from retained evidence.
 - [x] Set `nyquist_compliant: true` after the execution audit.
 
@@ -73,4 +73,4 @@ Site allocation ceilings and production campaign budgets require later user/site
 | Gaps resolved | 0 |
 | Escalated | 0 |
 
-The requirement map above was checked against the Phase 8 test modules and all fourteen plan summaries. The targeted campaign suite passed 95 tests, the full suite passed 1,125 tests with one skip, and the retained operational gate verified its receipts. Site ceilings remain a separate production authorization condition.
+The requirement map above was checked against the Phase 8 test modules and all fourteen plan summaries. The targeted campaign suite passed 95 tests at the initial sign-off. After review fixes and fixture regeneration, the full suite passed 1,141 tests with one skip. The retained operational gate verified its receipts, including stop recovery and zero next-look submissions. Site ceilings remain a separate production authorization condition.
