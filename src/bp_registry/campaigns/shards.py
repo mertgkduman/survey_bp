@@ -7,7 +7,7 @@ import json
 import os
 from pathlib import Path
 import stat
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 
 from scipy.stats import binomtest
 
@@ -413,8 +413,17 @@ def merge_verified_attempts(
     expected_set = set(expected)
     by_unit: dict[str, list[Mapping[str, Any]]] = {}
     unexpected: set[str] = set()
+    seen_receipts: dict[str, bytes] = {}
     for record in verified_attempts:
         unit_key, _ = _verified_attempt_record(record, plan=plan)
+        receipt_hash = str(record["receipt_sha256"])
+        record_bytes = canonical_json_bytes(dict(record))
+        existing = seen_receipts.get(receipt_hash)
+        if existing is not None:
+            if existing != record_bytes:
+                raise ValueError("verified attempt receipt hash aliases different evidence")
+            continue
+        seen_receipts[receipt_hash] = record_bytes
         if unit_key not in expected_set:
             unexpected.add(unit_key)
             continue
@@ -478,3 +487,181 @@ def merge_verified_attempts(
     }
     receipt_bytes = canonical_json_bytes(payload)
     return {**payload, "receipt_bytes": receipt_bytes, "receipt_sha256": _digest(receipt_bytes)}
+
+
+_RESUME_IDENTITY_FIELDS = frozenset({
+    "campaign_spec_digest",
+    "campaign_plan_digest",
+    "source_lock_sha256",
+    "environment_lock_sha256",
+    "dependency_lock_sha256",
+    "sample_namespace_digest",
+    "stopping_rule_digest",
+    "assessment_digest",
+})
+
+
+def _validated_resume_identity(
+    *, plan: CampaignWorkPlan, identity: Mapping[str, Any], name: str,
+) -> dict[str, str]:
+    """Accept one complete immutable scientific identity, never an executor label."""
+    if not isinstance(identity, Mapping) or set(identity) != _RESUME_IDENTITY_FIELDS:
+        raise ValueError(f"{name} scientific identity has an invalid field set")
+    result = dict(identity)
+    if result["campaign_spec_digest"] != plan.campaign_spec_digest or result["campaign_plan_digest"] != plan.campaign_plan_digest:
+        raise ValueError(f"{name} scientific identity differs from the frozen campaign plan")
+    if not all(_is_digest(value) for value in result.values()):
+        raise ValueError(f"{name} scientific identity requires SHA-256 digests")
+    return result
+
+
+def _deterministic_stop_receipt(
+    *, plan: CampaignWorkPlan, look: int, terminal_keys: set[str], decision: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Materialize the only stop receipt that a complete declared look permits."""
+    required = {"decision_input_hashes", "decision_result", "stop_reason", "should_stop"}
+    if not isinstance(decision, Mapping) or set(decision) != required or decision.get("should_stop") is not True:
+        raise ValueError("reconstructed look decision cannot authorize a stop")
+    decision_hashes = decision["decision_input_hashes"]
+    if not isinstance(decision_hashes, (list, tuple)) or not decision_hashes:
+        raise ValueError("reconstructed look decision lacks input receipt hashes")
+    if not all(_is_digest(value) for value in decision_hashes) or len(set(decision_hashes)) != len(decision_hashes):
+        raise ValueError("reconstructed look decision has invalid input receipt hashes")
+    if not isinstance(decision["decision_result"], Mapping):
+        raise ValueError("reconstructed look decision lacks a result")
+    if not isinstance(decision["stop_reason"], str) or not decision["stop_reason"]:
+        raise ValueError("reconstructed look decision lacks a stop reason")
+    prefix = set(plan.completed_prefix(look))
+    if not prefix.issubset(terminal_keys):
+        raise ValueError("reconstructed stop requires a complete declared look")
+    return {
+        "schema": "campaign_look_stop_receipt_v1",
+        "campaign_plan_digest": plan.campaign_plan_digest,
+        "completed_look": look,
+        "decision_input_hashes": list(decision_hashes),
+        "decision_result": dict(decision["decision_result"]),
+        "stop_reason": decision["stop_reason"],
+        "realized_count": len(terminal_keys),
+        "overshoot_count": len(terminal_keys - prefix),
+        "authorized_undispatched": list(key for key in plan.authorized_tail(look) if key not in terminal_keys),
+    }
+
+
+def derive_resume_plan(
+    *,
+    plan: CampaignWorkPlan,
+    verified_attempts: tuple[Mapping[str, Any], ...] | list[Mapping[str, Any]],
+    scientific_identity: Mapping[str, Any],
+    decision_for_look: Callable[..., Mapping[str, Any]],
+    prior_scientific_identity: Mapping[str, Any] | None = None,
+    look_stop_receipts: tuple[Mapping[str, Any], ...] | list[Mapping[str, Any]] = (),
+    executor_allocation: Mapping[str, Any] | None = None,
+    prior_executor_allocation: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Recover the earliest deterministic stop before deriving immutable retries.
+
+    Scientific identity is deliberately complete and exact.  Executor allocation
+    is accepted only as an observational mapping and never joins this equality
+    test, because it cannot change the frozen unit plan.
+    """
+    current_identity = _validated_resume_identity(plan=plan, identity=scientific_identity, name="current")
+    if prior_scientific_identity is not None:
+        prior_identity = _validated_resume_identity(plan=plan, identity=prior_scientific_identity, name="prior")
+        if prior_identity != current_identity:
+            raise ValueError("prior scientific identity drift blocks campaign resume")
+    if executor_allocation is not None and not isinstance(executor_allocation, Mapping):
+        raise ValueError("executor allocation must be an observational mapping")
+    if prior_executor_allocation is not None and not isinstance(prior_executor_allocation, Mapping):
+        raise ValueError("prior executor allocation must be an observational mapping")
+    if not isinstance(look_stop_receipts, (tuple, list)):
+        raise ValueError("look stop receipts must be an ordered collection")
+    if not callable(decision_for_look):
+        raise ValueError("resume requires a pure declared-look decision reconstructor")
+
+    # Build all terminal evidence first.  Do not use merge's missing field here:
+    # interrupted evidence is intentionally resumable in the exact subtraction.
+    preliminary = merge_verified_attempts(plan=plan, verified_attempts=verified_attempts)
+    terminal_keys = set(preliminary["terminal_unit_keys"])
+    terminal_by_key: dict[str, dict[str, Any]] = {
+        str(item["unit_key"]): dict(item) for item in preliminary["terminal_facts"]
+    }
+    receipts_by_look: dict[int, list[Mapping[str, Any]]] = {}
+    for receipt in look_stop_receipts:
+        if not isinstance(receipt, Mapping) or type(receipt.get("completed_look")) is not int:
+            raise ValueError("look stop receipt has an invalid completed look")
+        receipts_by_look.setdefault(int(receipt["completed_look"]), []).append(receipt)
+
+    recovered: list[dict[str, Any]] = []
+    effective_stop: Mapping[str, Any] | None = None
+    for look in range(1, len(plan.look_boundaries) + 1):
+        prefix = plan.completed_prefix(look)
+        if not set(prefix).issubset(terminal_keys):
+            break
+        decision = decision_for_look(look=look, terminal_records=tuple(terminal_by_key[key] for key in prefix))
+        if not isinstance(decision, Mapping) or decision.get("should_stop") is not True:
+            if receipts_by_look.get(look):
+                raise ValueError("a retained stop receipt conflicts with reconstructed decision")
+            continue
+        expected_receipt = _deterministic_stop_receipt(
+            plan=plan, look=look, terminal_keys=terminal_keys, decision=decision,
+        )
+        retained = receipts_by_look.get(look, [])
+        if len(retained) > 1:
+            raise ValueError("conflicting retained look stop receipts")
+        if retained:
+            verify_look_stop_receipt(plan=plan, receipt=retained[0], terminal_unit_keys=terminal_keys)
+            if canonical_json_bytes(dict(retained[0])) != canonical_json_bytes(expected_receipt):
+                raise ValueError("retained look stop receipt differs from deterministic reconstruction")
+            effective_stop = retained[0]
+        else:
+            # The caller may atomically publish these exact bytes before it
+            # submits more work.  Returning them makes that crash window
+            # explicit and reproducible without modifying sealed shards.
+            recovered.append(expected_receipt)
+            effective_stop = expected_receipt
+        if any(candidate_look > look for candidate_look in receipts_by_look):
+            raise ValueError("later stop receipt exists after an earlier reconstructed stop")
+        break
+
+    merged = merge_verified_attempts(
+        plan=plan, verified_attempts=verified_attempts, look_stop_receipt=effective_stop,
+    )
+    excluded = set(merged["terminal_unit_keys"])
+    excluded.update(merged["explicit_final_nonterminal_keys"])
+    excluded.update(merged["authorized_undispatched_keys"])
+    resumable = [key for key in plan.unit_keys if key not in excluded]
+    records_by_unit: dict[str, list[Mapping[str, Any]]] = {}
+    for record in verified_attempts:
+        unit_key, _ = _verified_attempt_record(record, plan=plan)
+        records_by_unit.setdefault(unit_key, []).append(record)
+    attempt_plans: list[dict[str, Any]] = []
+    for key in resumable:
+        records = records_by_unit.get(key, [])
+        parent = max(records, key=lambda record: str(record["receipt_sha256"]), default=None)
+        parent_hash = str(parent["receipt_sha256"]) if parent is not None else None
+        parent_id = str(parent["attempt"]["attempt_id"]) if parent is not None else None
+        attempt_payload = {
+            "campaign_plan_digest": plan.campaign_plan_digest,
+            "unit_key": key,
+            "parent_attempt_receipt_sha256": parent_hash,
+        }
+        attempt_plans.append({
+            "schema": "campaign_attempt_plan_v1",
+            "attempt_id": _digest(canonical_json_bytes(attempt_payload)),
+            "unit_key": key,
+            "parent_attempt_receipt": parent_id,
+            "parent_attempt_receipt_sha256": parent_hash,
+        })
+    return {
+        "schema": "campaign_resume_plan_v1",
+        "campaign_plan_digest": plan.campaign_plan_digest,
+        "scientific_identity": current_identity,
+        "terminal_unit_keys": merged["terminal_unit_keys"],
+        "explicit_final_nonterminal_keys": merged["explicit_final_nonterminal_keys"],
+        "incomplete_unit_keys": merged["incomplete_unit_keys"],
+        "authorized_undispatched_keys": merged["authorized_undispatched_keys"],
+        "resumable_unit_keys": resumable,
+        "attempt_plans": attempt_plans,
+        "recovered_look_stop_receipts": recovered,
+        "stop_receipt": dict(effective_stop) if effective_stop is not None else None,
+    }
