@@ -267,9 +267,7 @@ def test_writer_applies_framed_event_ceiling_before_append(tmp_path):
     assert denied_guard.snapshot().scientific_evidence_bytes == 0
 
 
-def test_materialized_wall_interruption_has_prefix_and_no_decoder_result(tmp_path):
-    import json
-
+def test_expired_materialized_authorization_stops_before_scientific_writes(tmp_path):
     from bp_registry.runner import (
         CanonicalRuntimeAuthorizationV1, CANONICAL_GUARDED_ARTIFACT_BYTE_CEILING_V1,
         canonical_public_manifest_context, derive_canonical_executable_maxima,
@@ -304,7 +302,8 @@ def test_materialized_wall_interruption_has_prefix_and_no_decoder_result(tmp_pat
     assert result.terminal is None
     assert result.interruption is not None
     assert result.interruption.snapshot.interruption_kind == "wall_deadline"
-    assert all(json.loads(line)["kind"] != "termination" for line in ledger.read_text().splitlines())
+    assert result.interruption.snapshot.scientific_events == 0
+    assert not ledger.exists()
 
 
 def test_strict_profile_authorizes_one_verified_materialized_terminal(tmp_path):

@@ -411,26 +411,74 @@ def _checked_product(left: int, right: int, *, name: str) -> int:
     return result
 
 
+def _ceil_div(numerator: int, denominator: int, *, name: str) -> int:
+    if type(numerator) is not int or type(denominator) is not int or numerator < 0 or denominator < 1:
+        raise ValueError(f"{name} requires a nonnegative numerator and positive denominator")
+    if numerator > 2**63 - 1:
+        raise ValueError(f"{name} exceeds the executable counter range")
+    return (numerator + denominator - 1) // denominator
+
+
+def _work_scalar(vector: WorkVector) -> int:
+    """Sum every V4 work dimension retained by guarded campaign accounting."""
+    return sum(vector.as_evidence(structural_event_version=4).values())
+
+
 def _route_dimensions(manifest: object, table: EdgeTable, route: str) -> tuple[int, int, dict[str, int]]:
     """Return named route quantities from validated manifest and code facts."""
-    core_sweep_work = 2 * table.edge_count + table.variable_count + table.check_count
+    # This is the scalar over *all* persisted WorkVector V4 fields, rather
+    # than the former edge-only proxy.  The added BP-call slot is a safe
+    # per-iteration allocation for the single call charged at attempt start.
+    flooding_work = _work_scalar(WorkVector.from_flooding_counts(
+        edge_count=table.edge_count, variable_count=table.variable_count,
+    ))
     iterations = getattr(manifest, "budgets").attempt.max_iterations
     if route.startswith("local:"):
-        # Normal completion is the largest mutually reachable branch.  A
-        # numerical-failure branch adds ``missingness`` but omits candidate and
-        # selection, so it has two fewer events.
-        return iterations, core_sweep_work, {
+        edges, variables, checks = table.edge_count, table.variable_count, table.check_count
+        schedule = route.removeprefix("local:")
+        policy = manifest.policies.schedule
+        if schedule in {"layered", "randomized"}:
+            if policy.partitions is None:
+                raise ValueError("layered work bound requires validated partitions")
+            layers = len(policy.partitions)
+            # A traversal visits each declared check once. Each layer may
+            # refresh at most every edge and assembles every variable belief.
+            traversal = edges + layers * (edges + variables + 3)
+            work = 1 + iterations * traversal
+            if schedule == "randomized":
+                refreshes = iterations if policy.refresh_scope == "sweep" else 1
+                work += 2 * layers * refreshes
+        elif schedule == "check_node_serial":
+            work = 1 + iterations * (edges + checks * edges + checks * variables + 3 * checks)
+        elif schedule == "variable_node_serial":
+            work = 1 + iterations * (2 * edges + 4 * variables)
+        elif schedule == "group_shuffled":
+            if checks < 2:
+                raise ValueError("group shuffled work bound requires two checks")
+            traversals = _ceil_div(iterations, checks - 1, name="group traversals")
+            work = 1 + traversals * checks + iterations * (3 * edges + variables + 4)
+        elif schedule == "residual":
+            max_degree = max((sum(1 for _, variable in table.edges if variable == index)
+                              for index in range(variables)), default=0)
+            work = 1 + 4 * edges + iterations * edges * (6 * edges + max_degree + variables + 1)
+        else:
+            raise ValueError(f"unregistered local schedule {schedule!r}")
+        return iterations, _ceil_div(work, iterations, name="local work per iteration"), {
             "shot_begin": 1, "attempt": 1, "runtime": 1, "candidate": 1,
             "selection": 1, "trace_link": 1, "work": 1, "termination": 1,
         }
     if route == "baseline":
-        return iterations, core_sweep_work, {
+        return iterations, flooding_work + 1, {
             "shot_begin": 1, "attempt": 1, "runtime": 1, "candidate": 1,
             "selection": 1, "trace_link": 1, "work": 1, "termination": 1,
         }
     if route == "relay":
         legs = manifest.relay.total_leg_limit
-        return _checked_product(iterations, legs, name="relay iteration units"), core_sweep_work, {
+        relay_iterations = sum(leg.max_iterations for leg in manifest.relay.legs)
+        relay_work = _checked_product(relay_iterations, flooding_work, name="relay sweep work")
+        if manifest.relay.transfer == "posterior_only":
+            relay_work += max(0, legs - 1)
+        return relay_iterations, _ceil_div(relay_work, relay_iterations, name="relay work per iteration"), {
             "shot_begin": 1, "attempt": 1, "relay_transfer": max(0, legs - 1),
             "work": 1, "candidate": 1, "selection": 1, "termination": 1,
         }
@@ -449,32 +497,43 @@ def _route_dimensions(manifest: object, table: EdgeTable, route: str) -> tuple[i
             attempts = _checked_product(spec.eta, spec.t_cap, name="restart attempts")
         if attempts is None:
             raise ValueError(f"unregistered Phase 5 intervention route {kind!r}")
-        # `_run_phase5_structural_shot` emits one header intervention, then
-        # transform/attempt/lift and at most one original-check per projected
-        # controller attempt.  Only Restart exposes branch rows, bounded by
-        # eta; all other controllers expose no branch row.
         branches = spec.eta if kind == "restart_belief" else 0
         named = {
             "shot_begin": 1, "intervention": 1, "branch": branches,
             "transform": attempts, "attempt": attempts, "lift": attempts,
-            # ``phase5_attempt_events`` emits an original_check for every
-            # valid projected attempt; a selected candidate emits one final
-            # original-space check as well.
-            "original_check": attempts + 1,
-            "candidate": 1, "selection": 1,
+            "original_check": attempts + 1, "candidate": 1, "selection": 1,
             "work": 1, "evaluation": 1, "runtime": 1, "termination": 1,
         }
-        return _checked_product(iterations, manifest.intervention_limits.max_total_attempts,
-                                name="phase5 iteration units"), core_sweep_work, named
+        # Public V5/V6 admission requires every V4 WorkVector cap. The
+        # BudgetTree enforces each cap before committing any producer work.
+        # Their scalar sum therefore bounds every route and nested branch.
+        work = sum(manifest.intervention_limits.work_caps.values())
+        units = _checked_product(iterations, manifest.intervention_limits.max_total_attempts,
+                                 name="phase5 iteration units")
+        return units, _ceil_div(work, units, name="phase5 work per iteration"), named
     if route in {"v7-list", "v7-vote"}:
         members = len(manifest.ensemble.bases)
         local_steps = min(_checked_product(iterations, table.check_count, name="MBBP local steps"),
                           manifest.ensemble.max_member_c2v_updates)
         work_leaves = _checked_product(members, local_steps + 1, name="MBBP work leaves")
+        # Each basis can append its declared redundant checks.  A serial local
+        # step has at least one C2V update, hence its count is capped by the
+        # per-member C2V cap; V2C refreshes can touch every augmented edge.
+        augmented_edges = max(
+            table.edge_count + len(basis.redundant_transforms) * table.variable_count
+            for basis in manifest.ensemble.bases
+        )
+        member_work = _checked_product(
+            local_steps, 2 * augmented_edges + table.variable_count + 3,
+            name="MBBP member work",
+        ) + 1
+        total_mbbp_work = _checked_product(members, member_work, name="MBBP ensemble work")
+        mbbp_iterations = _checked_product(iterations, members, name="MBBP iteration units")
+        work_per_iteration = _ceil_div(total_mbbp_work, mbbp_iterations, name="MBBP work per iteration")
         if route == "v7-vote":
             # A ballot contains every coordinate, hence there is one ballot
             # event per admitted member, rather than one event per bit.
-            return _checked_product(iterations, members, name="MBBP iteration units"), core_sweep_work, {
+            return mbbp_iterations, work_per_iteration, {
                 "shot_begin": 1, "basis": members, "member": members,
                 # ``phase6_events`` emits an exclusion for every member
                 # that is not admitted before the electorate/ballot branch.
@@ -483,7 +542,7 @@ def _route_dimensions(manifest: object, table: EdgeTable, route: str) -> tuple[i
                 "vote_validation": 1,
                 "work_leaf": work_leaves, "evaluation": 1, "termination": 1,
             }
-        return _checked_product(iterations, members, name="MBBP iteration units"), core_sweep_work, {
+        return mbbp_iterations, work_per_iteration, {
             "shot_begin": 1, "basis": members, "member": members,
             "candidate_origin": members, "duplicate_group": members,
             "selection": 1, "original_check": 1, "work_leaf": work_leaves,
@@ -1237,6 +1296,8 @@ def run_canonical_materialized_one(
     )
     guard = None if runtime_authorization is None else CanonicalRuntimeGuardV1(runtime_authorization)
     try:
+        if guard is not None:
+            guard.before_work("materialized:before_unit")
         result = run_canonical_structural_shot(
             public.compact_manifest, code=code, observation=sample.observation,
             hidden_truth=sample.hidden, shot_id=sample.shot_id, ledger_path=ledger_path,

@@ -88,6 +88,69 @@ def test_registered_route_event_inventory_counts_actual_emission_families(tmp_pa
     assert v7_vote[3]["vote_aggregate"] == 1
 
 
+
+def test_local_and_phase5_work_profiles_cover_all_v4_fields(tmp_path):
+    from bp_registry.runner import derive_canonical_executable_maxima
+
+    local_context = _context("data/manifests/phase3-hsu-group-pilot.json")
+    local = derive_canonical_executable_maxima(local_context)
+    assert local.derived_work_per_unit >= 1 + local_context.manifest.budgets.attempt.max_iterations
+    phase5_context = _context(_phase5_guided(tmp_path))
+    phase5 = derive_canonical_executable_maxima(phase5_context)
+    assert phase5.derived_work_per_unit >= sum(phase5_context.manifest.intervention_limits.work_caps.values())
+
+def test_profile_work_bounds_cover_complete_engine_work_vectors_and_reject_one_under(tmp_path):
+    """The scalar profile bound counts every persisted WorkVector dimension."""
+    from bp_registry.canonical.budgets import WorkVector
+    from bp_registry.canonical.schedules import EdgeTable
+    from bp_registry.runner import derive_canonical_executable_maxima, verify_declared_executable_limits
+
+    baseline_context = _context("data/manifests/canonical-three-qubit-development.json")
+    baseline = derive_canonical_executable_maxima(baseline_context)
+    table = EdgeTable.from_check_matrix(baseline_context.code.hz)
+    one_flooding_unit = WorkVector.from_flooding_counts(
+        edge_count=table.edge_count, variable_count=table.variable_count,
+    ) + WorkVector(bp_calls=1)
+    assert baseline.work_per_iteration >= sum(one_flooding_unit.as_evidence(structural_event_version=4).values())
+
+    relay_context = _context("data/manifests/phase4-memory-relay-b1.json")
+    relay = derive_canonical_executable_maxima(relay_context)
+    relay_table = EdgeTable.from_check_matrix(relay_context.code.hz)
+    relay_sweep = sum(WorkVector.from_flooding_counts(
+        edge_count=relay_table.edge_count, variable_count=relay_table.variable_count,
+    ).as_evidence(structural_event_version=4).values())
+    assert relay.work_per_iteration >= relay_sweep
+
+    # V7 bounds use the per-member C2V admission cap and each declared
+    # augmented row's worst-case all-variable support, rather than baseline
+    # edge counts.  This catches the former undercount on member work.
+    v7_path = tmp_path / "v7-work.json"
+    v7_path.write_text(json.dumps(_v7(vote=True)))
+    v7_context = _context(v7_path)
+    v7 = derive_canonical_executable_maxima(v7_context)
+    v7_manifest = v7_context.manifest
+    v7_table = EdgeTable.from_check_matrix(v7_context.code.hz)
+    augmented_edges = max(
+        v7_table.edge_count + len(basis.redundant_transforms) * v7_table.variable_count
+        for basis in v7_manifest.ensemble.bases
+    )
+    local_steps = min(
+        v7_manifest.budgets.attempt.max_iterations * v7_table.check_count,
+        v7_manifest.ensemble.max_member_c2v_updates,
+    )
+    expected_v7_work = len(v7_manifest.ensemble.bases) * (
+        local_steps * (2 * augmented_edges + v7_table.variable_count + 3) + 1
+    )
+    assert v7.derived_work_per_unit >= expected_v7_work
+
+    understated = baseline.as_evidence()
+    understated["work_per_iteration"] = baseline.work_per_iteration - 1
+    with pytest.raises(ValueError, match="work_per_iteration"):
+        verify_declared_executable_limits(
+            understated, expected_policy_binding=baseline.policy_binding_sha256, derived=baseline,
+        )
+
+
 def test_registered_route_profiles_bind_versioned_guarded_ceilings(tmp_path):
     from bp_registry.ledger import CANONICAL_GUARDED_EVENT_BYTE_CEILING_V1, canonical_serializer_descriptor
     from bp_registry.runner import (
