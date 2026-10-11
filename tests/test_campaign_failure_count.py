@@ -37,12 +37,16 @@ def _stopping(target: int = 3, batch: int = 5) -> FailureCountStoppingV1:
 
 _FAILURES: set[int] = set()
 _RUNS: list[int] = []
+_INTERRUPT_ONCE: set[int] = set()
 
 
 def _runner(unit: dict[str, object], staging: str) -> dict[str, object]:
     del staging
     ordinal = int(unit["sample_id"]) + 1
     _RUNS.append(ordinal)
+    if ordinal in _INTERRUPT_ONCE:
+        _INTERRUPT_ONCE.remove(ordinal)
+        raise RuntimeError("injected worker interruption")
     failure = ordinal in _FAILURES
     return {
         "terminal_fact": {
@@ -111,6 +115,26 @@ def test_censor_is_inconclusive_and_resume_rebuilds_missing_stop_without_rerun(t
     assert censored["assessment_status"] == "inconclusive_cap_censored"
     assert "verdict" not in censored
     assert censored["total_completed_shots"] == 5
+
+
+def test_interrupted_unit_retries_only_the_missing_frozen_key(tmp_path: Path) -> None:
+    from bp_registry.campaigns.execution import dispatch_failure_count_batches
+
+    global _FAILURES, _RUNS, _INTERRUPT_ONCE
+    _FAILURES, _RUNS, _INTERRUPT_ONCE = {1, 2, 6}, [], {3}
+    incomplete = dispatch_failure_count_batches(
+        _plan(), output_root=tmp_path, workers=1, unit_runner=_runner, stopping=_stopping(),
+    )
+    assert incomplete["status"] == "incomplete"
+    assert incomplete["resumable_unit_keys"] == [_plan().units[2].key]
+    # The rest of the authorized batch remains retained; only its failed
+    # ordinal is retried on resume.
+    assert _RUNS == [1, 2, 3, 4, 5]
+    completed = dispatch_failure_count_batches(
+        _plan(), output_root=tmp_path, workers=1, unit_runner=_runner, stopping=_stopping(),
+    )
+    assert completed["receipt"]["terminal_failure_ordinal"] == 6
+    assert _RUNS == [1, 2, 3, 4, 5, 3, 6, 7, 8, 9, 10]
 
 
 def test_replay_rejects_tampered_order_tail_or_resource_receipt(tmp_path: Path) -> None:

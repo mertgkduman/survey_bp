@@ -630,9 +630,23 @@ def dispatch_failure_count_batches(
         return {"status": "terminal", "receipt": receipt, "recovered_receipt": False,
                 "terminal_unit_keys": [record["unit_key"] for record in _failure_count_unit_records(plan=plan, root=root)]}
     records = _failure_count_unit_records(plan=plan, root=root)
-    if any(record["state"] != "sealed_terminal" for record in records):
-        return {"status": "incomplete", "receipt": None, "recovered_receipt": False,
-                "incomplete_unit_keys": [record["unit_key"] for record in records if record["state"] != "sealed_terminal"]}
+    terminals = tuple(record for record in records if record["state"] == "sealed_terminal")
+    interrupted = tuple(record for record in records if record["state"] != "sealed_terminal")
+    if interrupted:
+        if len(interrupted) != 1:
+            raise ValueError("failure-count interruption does not leave one resumable unit")
+        retry = interrupted[0]
+        _publish_failure_count_unit(
+            root=root, plan=plan, unit=plan.units[int(retry["ordinal"]) - 1].payload(),
+            ordinal=int(retry["ordinal"]), attempt=int(retry["attempt"]) + 1, unit_runner=unit_runner,
+        )
+        records = _failure_count_unit_records(plan=plan, root=root)
+        if any(record["state"] != "sealed_terminal" for record in records):
+            return {"status": "incomplete", "receipt": None, "recovered_receipt": False,
+                    "incomplete_unit_keys": [record["unit_key"] for record in records if record["state"] != "sealed_terminal"],
+                    "resumable_unit_keys": [record["unit_key"] for record in records if record["state"] != "sealed_terminal"]}
+    if tuple(record["ordinal"] for record in records) != tuple(range(1, len(records) + 1)):
+        raise ValueError("failure-count completed evidence is not an ordered frozen prefix")
     completed = len(records)
     failures = sum(bool(record["scientific"]["terminal_fact"]["logical_failure"]) for record in records)
     while completed < cap and failures < stopping.target_failures:
@@ -645,7 +659,8 @@ def dispatch_failure_count_batches(
         records = _failure_count_unit_records(plan=plan, root=root)
         if any(record["state"] != "sealed_terminal" for record in records):
             return {"status": "incomplete", "receipt": None, "recovered_receipt": False,
-                    "incomplete_unit_keys": [record["unit_key"] for record in records if record["state"] != "sealed_terminal"]}
+                    "incomplete_unit_keys": [record["unit_key"] for record in records if record["state"] != "sealed_terminal"],
+                    "resumable_unit_keys": [record["unit_key"] for record in records if record["state"] != "sealed_terminal"]}
         completed = len(records)
         failures = sum(bool(record["scientific"]["terminal_fact"]["logical_failure"]) for record in records)
     receipt = _failure_count_receipt(plan=plan, stopping=stopping, terminal_records=records, max_shots=cap)
