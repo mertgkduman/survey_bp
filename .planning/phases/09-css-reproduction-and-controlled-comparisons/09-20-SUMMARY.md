@@ -33,6 +33,7 @@ actuals:
 - Binds versioned, engine-enforced 262,144-byte framed event and artifact ceilings. Exact byte reservations precede durable ledger and artifact writes. A separate 32,768-byte reserve permits one interruption control receipt after scientific caps are exhausted.
 - Implements strict and interruptible one-unit authorizations, digest verification, permanent cap latching, named monotonic work boundaries, positive wall overshoot, and producer-committed cumulative WorkVector snapshots. A guarded materialized shot returns a typed terminal or interruption with no decoder outcome on interruption.
 - Covers flooding, local/residual, guided/Phase 5 branches, Relay legs/transfers, V7 list/vote members, and trace sidecars. The unguarded interface remains source compatible.
+- Bounds repeated check membership across layered partitions and rejects syndrome-flip manifests whose eager candidate construction exceeds the guarded generation envelope.
 
 The byte ceilings are protocol limits because canonical event payloads contain open nested structures; they are not claims of naturally exact maximum payload sizes. Plan 09-17 owns campaign sample/result artifact writes and partial-attempt receipt publication.
 
@@ -40,11 +41,12 @@ The byte ceilings are protocol limits because canonical event payloads contain o
 
 - Combined focused guard, profile, boundary, Relay, tracing, V7, ledger, and CLI suite: 164 passed in 112.88 seconds.
 - Real strict guarded Hsu local and damped guided-decimation materialized shots both reached terminal; retained as a regression in `test_resource_profiles.py`.
+- One strict guarded shot for each of the seven Phase 5 kinds (identity, guided decimation, impulse, freezing, syndrome flip, sign flip, and restart belief) reached terminal in a local smoke run.
 - V7 list/vote guarded terminal regression and producer-boundary tests: 59 focused tests passed in the boundary agent's run.
 
 ## Commits
 
-`10b2ada`, `d938b8a`, `1e3731f`, `4f7d142`, `47d406b`, `f6e5503`, `e9df161`, `d8b5bf2`, and `dd9bed3` contain the implementation and focused tests. Interleaved Plan 09-20 documentation commits specify the enforced ceilings and committed-work contract.
+`10b2ada`, `d938b8a`, `1e3731f`, `4f7d142`, `47d406b`, `f6e5503`, `e9df161`, `d8b5bf2`, `dd9bed3`, `a6ff0c6`, `5b2d375`, and `ef82c3d` contain the implementation and focused tests. Interleaved Plan 09-20 documentation commits specify the enforced ceilings and committed-work contract.
 
 ## Self-Check: PASSED
 
