@@ -1213,7 +1213,7 @@ def _seal_failure_count_partial_attempt(
     *, plan: CampaignWorkPlan, unit: Any, policy: Any, authorization: CanonicalRuntimeAuthorizationV1,
     materialized: MaterializedPhysicalSampleV1 | None, sample_path: Path, ledger_path: Path,
     snapshot: Any, receipt_path: Path, resource_guard: CanonicalRuntimeGuardV1,
-    parent_partial_receipt_sha256: str | None,
+    parent_partial_receipt_sha256: str | None, attempt_sequence: int,
 ) -> tuple[FailureCountPartialAttemptV1, str]:
     """Use the guard's reserved control bytes to retain zero-credit evidence."""
     kind, cap = _partial_interruption_fields(snapshot)
@@ -1225,6 +1225,7 @@ def _seal_failure_count_partial_attempt(
             "authorization": authorization.authorization_identity,
         })).hexdigest(),
         attempt_ordinal=next(index for index, candidate in enumerate(plan.units, start=1) if candidate.key == unit.key),
+        attempt_sequence=attempt_sequence,
         unit_key=unit.key, parent_partial_receipt_sha256=parent_partial_receipt_sha256,
         campaign_spec_digest=plan.campaign_spec_digest, campaign_plan_digest=plan.campaign_plan_digest,
         policy_sha256=policy.digest(), authorization_sha256=sha256(canonical_json_bytes(authorization.__dict__ if hasattr(authorization, "__dict__") else {
@@ -1313,26 +1314,37 @@ def verify_failure_count_partial_attempt(
 
 
 def _resume_parent_for_ordinal(
-    *, destination: Path, unit_key: str, parent_partial_receipt_sha256: str | None,
+    *, destination: Path, plan: CampaignWorkPlan, ordinal: int, parent_partial_receipt_sha256: str | None,
 ) -> tuple[int, str | None]:
     """Preserve immutable attempts and allow only one digest-linked retry."""
+    unit_key = plan.units[ordinal - 1].key
     attempts_root = destination / "attempts"
     if not attempts_root.exists():
         return 1, None
     partials: list[FailureCountPartialAttemptV1] = []
+    terminals: set[int] = set()
     for directory in attempts_root.iterdir():
         if directory.is_symlink() or not directory.is_dir():
             raise ValueError("bounded attempt directory must be a regular directory")
         terminal = directory / "attempt.json"
         if terminal.exists():
             raw = json.loads(terminal.read_bytes())
-            if raw.get("unit_key") == unit_key:
-                raise ValueError("completed ordinal cannot be dispatched again")
+            terminal_key = raw.get("unit_key")
+            if isinstance(terminal_key, str):
+                terminal_ordinal = next((index for index, item in enumerate(plan.units, 1) if item.key == terminal_key), None)
+                if terminal_ordinal is None:
+                    raise ValueError("terminal attempt names a unit outside the frozen plan")
+                terminals.add(terminal_ordinal)
         partial_path = directory / "partial-attempt.json"
         if partial_path.exists():
             partial = FailureCountPartialAttemptV1.model_validate_json(partial_path.read_bytes())
+            verify_failure_count_partial_attempt(record=partial, plan=plan, receipt_sha256=partial.digest())
             if partial.unit_key == unit_key:
                 partials.append(partial)
+    if any(item not in terminals for item in range(1, ordinal)):
+        raise ValueError("resume requires a contiguous verified terminal prefix")
+    if ordinal in terminals:
+        raise ValueError("completed ordinal cannot be dispatched again")
     if not partials:
         if parent_partial_receipt_sha256 is not None:
             raise ValueError("resume parent does not name a pending ordinal")
@@ -1356,6 +1368,7 @@ def _resume_parent_for_ordinal(
 def run_canonical_bounded_batch(
     plan: CampaignWorkPlan, *, campaign_root: str | Path, output_root: str | Path,
     first_ordinal: int, batch_size: int, parent_partial_receipt_sha256: str | None = None,
+    clock_ns: Callable[[], int] = time.monotonic_ns,
 ) -> dict[str, Any]:
     """Execute exactly one frozen contiguous failure-count ordinal batch.
 
@@ -1381,12 +1394,12 @@ def run_canonical_bounded_batch(
     for ordinal in range(first_ordinal, first_ordinal + batch_size):
         unit = plan.units[ordinal - 1]
         attempt_number, linked_parent = _resume_parent_for_ordinal(
-            destination=destination, unit_key=unit.key,
+            destination=destination, plan=plan, ordinal=ordinal,
             parent_partial_receipt_sha256=parent_partial_receipt_sha256,
         )
         arm_path, context = arm_contexts[unit.arm_id]
         sample_path = destination / "samples" / f"{unit.physical_sample_identity}.json"
-        deadline_ns = time.monotonic_ns() + policy.batch_authorization.per_unit_timeout_ns
+        deadline_ns = clock_ns() + policy.batch_authorization.per_unit_timeout_ns
         authorization_identity = sha256(canonical_json_bytes({
             "campaign_plan_digest": plan.campaign_plan_digest, "ordinal": ordinal,
             "attempt_number": attempt_number, "policy": policy.digest(), "derived": derived.digest,
@@ -1415,7 +1428,7 @@ def run_canonical_bounded_batch(
             ) if policy.dispatch_mode == "strict_full_batch"
             else CanonicalRuntimeAuthorizationV1.interruptible_unit(**authorization_kwargs)
         )
-        guard = CanonicalRuntimeGuardV1(authorization)
+        guard = CanonicalRuntimeGuardV1(authorization, clock_ns=clock_ns)
         attempt_dir = destination / "attempts" / f"{ordinal:08d}-{authorization_identity[:16]}"
         ledger_path = attempt_dir / "events.jsonl"
         ledger_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1429,7 +1442,7 @@ def run_canonical_bounded_batch(
                 plan=plan, unit=unit, policy=policy, authorization=authorization,
                 materialized=None, sample_path=sample_path, ledger_path=ledger_path,
                 snapshot=error.snapshot, receipt_path=attempt_dir / "partial-attempt.json",
-                resource_guard=guard, parent_partial_receipt_sha256=linked_parent,
+                resource_guard=guard, parent_partial_receipt_sha256=linked_parent, attempt_sequence=attempt_number,
             )
             return {
                 "schema": "failure_count_canonical_bounded_batch_v1",
@@ -1447,7 +1460,7 @@ def run_canonical_bounded_batch(
             ledger_path=ledger_path, manifest_bytes=arm_path.read_bytes(),
             runtime_guard=guard,
         )
-        observed = time.monotonic_ns()
+        observed = clock_ns()
         observations.append((deadline_ns, observed, max(0, observed - deadline_ns)))
         if engine_result.status == "interrupted":
             assert engine_result.interruption is not None
@@ -1455,7 +1468,7 @@ def run_canonical_bounded_batch(
                 plan=plan, unit=unit, policy=policy, authorization=authorization,
                 materialized=materialized, sample_path=sample_path, ledger_path=ledger_path,
                 snapshot=engine_result.interruption.snapshot, receipt_path=attempt_dir / "partial-attempt.json",
-                resource_guard=guard, parent_partial_receipt_sha256=linked_parent,
+                resource_guard=guard, parent_partial_receipt_sha256=linked_parent, attempt_sequence=attempt_number,
             )
             return {
                 "schema": "failure_count_canonical_bounded_batch_v1",

@@ -457,6 +457,7 @@ class FailureCountPartialAttemptV1(StrictModel):
     schema_name: Literal["failure_count_partial_attempt_v1"] = Field(alias="schema", serialization_alias="schema")
     attempt_id: str = Field(pattern=_SHA256)
     attempt_ordinal: int = Field(ge=1, le=_MAX_EVENTS)
+    attempt_sequence: int = Field(ge=1, le=_MAX_EVENTS)
     unit_key: str = Field(min_length=1, max_length=512)
     parent_partial_receipt_sha256: str | None = Field(default=None, pattern=_SHA256)
     campaign_spec_digest: str = Field(pattern=_SHA256)

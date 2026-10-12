@@ -394,6 +394,7 @@ def test_interruptible_unit_seals_an_immutable_zero_credit_partial_attempt(tmp_p
         parent_partial_receipt_sha256=result["partial_attempt_sha256"],
     )
     assert resumed["partial_attempt"].attempt_id != partial.attempt_id
+    assert resumed["partial_attempt"].attempt_sequence == partial.attempt_sequence + 1
     assert resumed["partial_attempt"].parent_partial_receipt_sha256 == result["partial_attempt_sha256"]
     assert len(list((tmp_path / "attempts").glob("*/partial-attempt.json"))) == 2
     receipt.write_bytes(original.replace(b'"consumed_events":0', b'"consumed_events":1'))
@@ -402,6 +403,52 @@ def test_interruptible_unit_seals_an_immutable_zero_credit_partial_attempt(tmp_p
             record=__import__("bp_registry.campaigns.contracts", fromlist=["FailureCountPartialAttemptV1"]).FailureCountPartialAttemptV1.model_validate_json(receipt.read_bytes()),
             plan=plan, receipt_sha256=result["partial_attempt_sha256"],
         )
+
+
+def test_interruptible_storage_denial_seals_before_materialized_sample_write(tmp_path: Path) -> None:
+    """A denied sample write leaves no scientific artifact and spends only control reserve."""
+    from bp_registry.campaigns.contracts import FailureCountWorkSpecV1
+    from bp_registry.campaigns.execution import run_canonical_bounded_batch, verify_failure_count_partial_attempt
+    from bp_registry.campaigns.planning import freeze_failure_count_work_spec
+
+    payload = _single_arm_failure_count_work_spec_payload()
+    policy = payload["policy"]
+    assert isinstance(policy, dict)
+    policy.update({"dispatch_mode": "interruptible_unit", "interruptible_evidence_bytes": 1_000_000,
+                   "interruptible_storage_bytes": 1})
+    plan = freeze_failure_count_work_spec(FailureCountWorkSpecV1.model_validate(payload))
+    result = run_canonical_bounded_batch(plan, campaign_root=ROOT, output_root=tmp_path, first_ordinal=1, batch_size=1)
+    partial = result["partial_attempt"]
+    assert partial.interruption_kind == "interrupted_storage"
+    assert partial.materialized_sample_sha256 is None
+    assert not Path(partial.materialized_sample_path).exists()
+    assert partial.attempted_bytes is not None and partial.attempted_bytes > partial.consumed_storage_bytes
+    verify_failure_count_partial_attempt(record=partial, plan=plan, receipt_sha256=result["partial_attempt_sha256"])
+
+
+def test_interruptible_wall_partial_retains_positive_boundary_overshoot(tmp_path: Path) -> None:
+    """The campaign records the guard's first inside-unit deadline observation."""
+    from bp_registry.campaigns.contracts import FailureCountWorkSpecV1
+    from bp_registry.campaigns.execution import run_canonical_bounded_batch
+    from bp_registry.campaigns.planning import freeze_failure_count_work_spec
+
+    payload = _single_arm_failure_count_work_spec_payload()
+    policy = payload["policy"]
+    assert isinstance(policy, dict)
+    policy.update({"dispatch_mode": "interruptible_unit", "interruptible_evidence_bytes": 3_000_000,
+                   "interruptible_storage_bytes": 3_000_000})
+    authorization = policy["batch_authorization"]
+    assert isinstance(authorization, dict)
+    authorization["per_unit_timeout_ns"] = 1
+    plan = freeze_failure_count_work_spec(FailureCountWorkSpecV1.model_validate(payload))
+    ticks = iter((0, 0, 0, 2, 3, 4, 5))
+    result = run_canonical_bounded_batch(
+        plan, campaign_root=ROOT, output_root=tmp_path, first_ordinal=1, batch_size=1,
+        clock_ns=lambda: next(ticks),
+    )
+    partial = result["partial_attempt"]
+    assert partial.interruption_kind == "interrupted_wall"
+    assert partial.overshoot_ns is not None and partial.overshoot_ns > 0
 
 
 def test_canonical_bounded_batch_seals_actual_resources_and_rejects_noncontiguous_dispatch(tmp_path: Path) -> None:
