@@ -243,6 +243,34 @@ def test_controlled_mbbp_recovers_after_member_set_seals_before_list(tmp_path: P
     assert controlled_mbbp.verify_mbbp_controlled_unit(**arguments).digest() == receipt.digest()
 
 
+def test_controlled_public_run_retains_interruption_and_exact_missing_unit(tmp_path: Path, monkeypatch) -> None:
+    from bp_registry.campaigns import controlled_public
+    from bp_registry.campaigns.contracts import OrderedCampaignWorkSpecV1
+    from bp_registry.campaigns.planning import freeze_ordered_campaign_work_spec
+
+    study = json.loads((ROOT / "data/studies/phase9-control-relay_beam-ordered-work-v2.json").read_text())
+    plan = freeze_ordered_campaign_work_spec(OrderedCampaignWorkSpecV1.model_validate(
+        study["ordered_campaign_work_spec"]))
+    unit = plan.units[0]
+
+    def interrupted(**_kwargs):
+        raise RuntimeError("private execution detail")
+
+    monkeypatch.setattr(controlled_public, "run_fair_controlled_unit", interrupted)
+    with pytest.raises(RuntimeError, match="private execution detail"):
+        controlled_public.run_local(root=ROOT, plan=plan, output_root=tmp_path, max_units=1)
+    interruption_path = tmp_path / "interruptions" / f"{unit.key}-00000001.json"
+    interruption = json.loads(interruption_path.read_bytes())
+    assert interruption["campaign_plan_digest"] == plan.campaign_plan_digest
+    assert interruption["unit_key"] == unit.key
+    assert interruption["attempt_ordinal"] == 1
+    assert "private execution detail" not in interruption_path.read_text()
+    assert not (tmp_path / "units" / f"{unit.key}.json").exists()
+    with pytest.raises(RuntimeError, match="private execution detail"):
+        controlled_public.run_local(root=ROOT, plan=plan, output_root=tmp_path, max_units=1)
+    assert (tmp_path / "interruptions" / f"{unit.key}-00000002.json").exists()
+
+
 def test_controlled_partial_resume_assess_and_byte_replay_through_public_cli(tmp_path: Path) -> None:
     from bp_registry.campaigns.contracts import OrderedCampaignWorkSpecV1
     from bp_registry.campaigns.planning import freeze_ordered_campaign_work_spec

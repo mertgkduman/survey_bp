@@ -127,10 +127,27 @@ def run_local(*, root: Path, plan: CampaignWorkPlan, output_root: Path, max_unit
                 "terminal_unit_keys": list(plan.unit_keys), "missing_unit_keys": [],
                 "artifact_path": None}
     for unit in selected:
-        (run_fair_controlled_unit if _family(plan)[0] == "relay_beam" else run_mbbp_controlled_unit)(
-            plan=plan, unit=unit, arm_manifest=_arm_manifest(root, plan, unit.arm_id),
-            campaign_root=root, output_root=output_root,
-        )
+        try:
+            (run_fair_controlled_unit if _family(plan)[0] == "relay_beam" else run_mbbp_controlled_unit)(
+                plan=plan, unit=unit, arm_manifest=_arm_manifest(root, plan, unit.arm_id),
+                campaign_root=root, output_root=output_root,
+            )
+        except Exception as exc:
+            # Keep a durable, non-sensitive record of a failed dispatch. The
+            # missing unit remains eligible for exact-prefix recovery.
+            interruption_root = output_root / "interruptions"
+            attempt_ordinal = 1 + len(tuple(interruption_root.glob(f"{unit.key}-*.json")))
+            _publish(interruption_root / f"{unit.key}-{attempt_ordinal:08d}.json", {
+                "schema": "controlled_unit_interruption_v1",
+                "campaign_spec_digest": plan.campaign_spec_digest,
+                "campaign_plan_digest": plan.campaign_plan_digest,
+                "unit_key": unit.key,
+                "attempt_ordinal": attempt_ordinal,
+                "physical_sample_identity": unit.physical_sample_identity,
+                "arm_id": unit.arm_id,
+                "exception_type": type(exc).__name__,
+            })
+            raise
     after = _existing_units(root=root, plan=plan, run_root=output_root)
     first, last = len(before) + 1, len(after)
     envelope = {
