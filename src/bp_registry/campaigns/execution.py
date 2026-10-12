@@ -28,7 +28,7 @@ from ..runner import (
     run_canonical_one, verify_declared_executable_limits,
 )
 from .contracts import (
-    CampaignSpecV1, CampaignWorkSpecV1, FailureCountPartialAttemptV1, FailureCountStoppingV1, FailureCountWorkSpecV1,
+    CampaignSpecV1, CampaignWorkSpecV1, FailureCountPartialAttemptV1, FailureCountStoppingV1, FailureCountTerminalReceiptV1, FailureCountWorkSpecV1,
     MaterializedPhysicalSampleV1, build_one_unit_plan, canonical_json_bytes,
 )
 from .identity import validate_matched_sample_hashes
@@ -1193,8 +1193,11 @@ def _failure_count_executable_projection(
         "events": policy.caps.max_events, "evidence_bytes": policy.caps.max_evidence_bytes,
         "storage_bytes": policy.caps.max_storage_bytes,
     }
-    if any(projection[name] > cap_values[name] for name in projection):
-        raise ValueError("bounded canonical batch cannot fit every hard resource cap")
+    exhausted = next((cap for cap in policy.cap_precedence if cap != "wall" and projection.get(
+        {"storage": "storage_bytes", "evidence": "evidence_bytes", "events": "events", "work": "work", "shots": "shots"}[cap], 0
+    ) > cap_values[{"storage": "storage_bytes", "evidence": "evidence_bytes", "events": "events", "work": "work", "shots": "shots"}[cap]]), None)
+    if exhausted is not None:
+        raise ValueError(f"bounded canonical batch cannot fit hard resource cap: {exhausted}")
     return spec, projection, context, derived, manifest_path
 
 
@@ -1365,6 +1368,27 @@ def _resume_parent_for_ordinal(
     return len(partials) + 1, digest
 
 
+def _retained_partial_for_ordinal(*, destination: Path, plan: CampaignWorkPlan, ordinal: int) -> tuple[FailureCountPartialAttemptV1, str] | None:
+    root = destination / "attempts"
+    if not root.exists():
+        return None
+    matches: list[FailureCountPartialAttemptV1] = []
+    for receipt in root.glob("*/partial-attempt.json"):
+        if receipt.is_symlink() or not receipt.is_file():
+            raise ValueError("partial attempt receipt must be a regular file")
+        partial = FailureCountPartialAttemptV1.model_validate_json(receipt.read_bytes())
+        if partial.attempt_ordinal == ordinal:
+            verify_failure_count_partial_attempt(record=partial, plan=plan, receipt_sha256=partial.digest())
+            matches.append(partial)
+    if not matches:
+        return None
+    children = {item.parent_partial_receipt_sha256 for item in matches if item.parent_partial_receipt_sha256}
+    leaves = [item for item in matches if item.digest() not in children]
+    if len(leaves) != 1:
+        raise ValueError("retained partial attempts fork the pending ordinal")
+    return leaves[0], leaves[0].digest()
+
+
 def run_canonical_bounded_batch(
     plan: CampaignWorkPlan, *, campaign_root: str | Path, output_root: str | Path,
     first_ordinal: int, batch_size: int, parent_partial_receipt_sha256: str | None = None,
@@ -1380,11 +1404,40 @@ def run_canonical_bounded_batch(
     destination = Path(output_root)
     if destination.exists() and (destination.is_symlink() or not destination.is_dir()):
         raise ValueError("bounded campaign output root must be a regular directory")
-    spec, projection, _context, derived, _manifest_path = _failure_count_executable_projection(
-        plan=plan, campaign_root=root, first_ordinal=first_ordinal, batch_size=batch_size,
-    )
     policy = plan.work_spec.policy  # narrowed by the preflight above
     assert isinstance(policy, object)
+    try:
+        spec, projection, _context, derived, _manifest_path = _failure_count_executable_projection(
+            plan=plan, campaign_root=root, first_ordinal=first_ordinal, batch_size=batch_size,
+        )
+    except ValueError as error:
+        prefix = "bounded canonical batch cannot fit hard resource cap: "
+        if not str(error).startswith(prefix):
+            raise
+        partial_pair = _retained_partial_for_ordinal(destination=destination, plan=plan, ordinal=first_ordinal)
+        if partial_pair is None:
+            raise
+        partial, partial_digest = partial_pair
+        cap = str(error)[len(prefix):]
+        terminal = FailureCountTerminalReceiptV1(
+            schema="failure_count_terminal_receipt_v1", policy_sha256=policy.digest(),
+            campaign_plan_sha256=policy.campaign_plan_sha256,
+            executable_limit_receipt_sha256=policy.executable_limits.digest(),
+            batch_authorization_sha256=policy.batch_authorization.digest(),
+            terminal_state="cap_censored", terminal_failure_ordinal=None,
+            cumulative_failures=0, total_completed_shots=0, inferential_prefix_sha256=None,
+            authorized_tail_ordinals=(), authorized_tail_sha256=None, first_exhausted_cap=cap,
+            realized_decoder_work=partial.consumed_decoder_work, realized_events=partial.consumed_events,
+            realized_evidence_bytes=partial.consumed_evidence_bytes,
+            realized_storage_bytes=partial.consumed_storage_bytes + partial.consumed_control_receipt_bytes,
+            wall_boundaries=(),
+        ).validate_against(policy)
+        return {"schema": "failure_count_canonical_bounded_batch_v1", "campaign_plan_digest": plan.campaign_plan_digest,
+                "terminal_receipt": terminal, "retained_partial_attempt_sha256": partial_digest,
+                "verified_attempts": (), "materialized_samples": (),
+                "actual_resources": {"completed_shots": 0, "decoder_work": partial.consumed_decoder_work,
+                                     "events": partial.consumed_events, "evidence_bytes": partial.consumed_evidence_bytes,
+                                     "storage_bytes": partial.consumed_storage_bytes + partial.consumed_control_receipt_bytes}}
     destination.mkdir(parents=True, exist_ok=True)
     arm_contexts = _preflight_work_arms(spec, root)
     verified: list[dict[str, Any]] = []
