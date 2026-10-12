@@ -230,7 +230,11 @@ def test_every_controlled_family_binds_public_sample_major_order() -> None:
         assert frozen.campaign_plan_digest == record["ordered_plan_digest"] == public["campaign_plan_digest"]
         assert spec.digest() == record["ordered_work_spec_sha256"]
         assert list(spec.execution_order.arm_order) == record["arm_order"]
-        assert _preflight_ordered_arms(spec, ROOT) == "controlled_planning_only"
+        assert _preflight_ordered_arms(spec, ROOT) == {
+            "schedule": "controlled_ordinary_v1",
+            "relay_beam": "controlled_fair_leg_v1",
+            "mbbp_list_vote": "controlled_shared_mbbp_v1",
+        }[family]
         assert len(public["groups"]) == record["bounded_evaluative_n"]
         assert len(public["units"]) == record["bounded_evaluative_n"] * len(record["arm_order"])
         for ordinal, group in enumerate(public["groups"], start=1):
