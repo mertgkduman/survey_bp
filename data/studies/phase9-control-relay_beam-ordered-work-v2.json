@@ -1,0 +1,181 @@
+{
+  "ordered_campaign_work_spec": {
+    "campaign_work_spec": {
+      "arms": [
+        {
+          "arm_id": "initial_bp",
+          "decoder_seed_identity": "phase9-relay_beam-initial_bp-policy-stream-v1",
+          "manifest_path": "data/manifests/phase9-control-initial-bp-bb72-p080-v1.json",
+          "manifest_sha256": "c79dac7f50f74d1ef9760356d64f01adbd4a1ada201265a4610f1ef90cc2c90e"
+        },
+        {
+          "arm_id": "relay",
+          "decoder_seed_identity": "phase9-relay_beam-relay-policy-stream-v1",
+          "manifest_path": "data/manifests/phase9-control-relay-bb72-p080-v1.json",
+          "manifest_sha256": "4341c29d601342f9bf5703e06ee9e2e40a4bfa56e16aafe314e406daf4d612cf"
+        },
+        {
+          "arm_id": "beam",
+          "decoder_seed_identity": "phase9-relay_beam-beam-policy-stream-v1",
+          "manifest_path": "data/manifests/phase9-control-beam-bb72-p080-v1.json",
+          "manifest_sha256": "6e1d0da2ab21ba1960f7b20befcf1bce5180c366737365aeb635074a78bb9fbd"
+        }
+      ],
+      "assessment": {
+        "decision_rule": "target_interval_containment_v1",
+        "families": [
+          {
+            "alpha": 0.05,
+            "family_id": "relay_beam",
+            "member_target_ids": [
+              "relay_beam-order-only-not_assessed"
+            ]
+          }
+        ],
+        "interval": {
+          "confidence_level": 0.95,
+          "method": "exact_clopper_pearson"
+        },
+        "outcome_matrix": {
+          "rule_id": "all_shot_v1",
+          "treatments": [
+            {
+              "all_shot": "success",
+              "conditional": "accepted",
+              "terminal_status": "exact"
+            },
+            {
+              "all_shot": "success",
+              "conditional": "accepted",
+              "terminal_status": "stabilizer_equivalent"
+            },
+            {
+              "all_shot": "failure",
+              "conditional": "accepted",
+              "terminal_status": "wrong_logical_action"
+            },
+            {
+              "all_shot": "failure",
+              "conditional": "excluded",
+              "terminal_status": "invalid_syndrome"
+            },
+            {
+              "all_shot": "failure",
+              "conditional": "excluded",
+              "terminal_status": "no_proposal"
+            },
+            {
+              "all_shot": "failure",
+              "conditional": "excluded",
+              "terminal_status": "nonconvergence"
+            },
+            {
+              "all_shot": "failure",
+              "conditional": "excluded",
+              "terminal_status": "timeout"
+            },
+            {
+              "all_shot": "failure",
+              "conditional": "excluded",
+              "terminal_status": "postselected_rejection"
+            },
+            {
+              "all_shot": "incomplete",
+              "conditional": "incomplete",
+              "terminal_status": "infrastructure_interruption"
+            }
+          ]
+        },
+        "resources": {
+          "max_batch_size": 16,
+          "max_decoder_work": 223400,
+          "max_events": 48,
+          "max_evidence_bytes": 8388608,
+          "max_looks": 1,
+          "max_shots": 16,
+          "max_storage_bytes": 16777216
+        },
+        "schema": "campaign_assessment_v1",
+        "stopping": {
+          "batch_size": 16,
+          "final_shots": 16,
+          "mode": "fixed_shot"
+        },
+        "targets": [
+          {
+            "absolute_tolerance": 1.0,
+            "lower": 0.0,
+            "target_id": "relay_beam-order-only-not_assessed",
+            "target_receipt_sha256": "12f56fc8623cdec83020e210aca183ba70a96d70ce27661ff28f7fe3a80349f4",
+            "upper": 1.0
+          }
+        ]
+      },
+      "coordinates": [
+        {
+          "cohort_id": "bravyi-bb-72",
+          "point_id": "p080",
+          "sample_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "sample_namespace": "phase9-control-relay-beam-eval-v1"
+        }
+      ],
+      "dependency_lock_sha256": "61aea04e4a4b7a498ff8799af5261fbda3d1a50bc977da53e00a987b5f6507d0",
+      "environment_lock_sha256": "ddc52347cb51bbbff8fdf33ad9ea498ec730ca1200a0d6945863fce1725c4919",
+      "look_sample_boundaries": [
+        16
+      ],
+      "schema": "campaign_work_spec_v1",
+      "shared_sampler": {
+        "artifact_raw_sha256": "8cb3af882fecf8d16ff3b84c2c69939cdafde122fd48ab0d87a7e113d4e91227",
+        "artifact_semantic_sha256": "ff81d1e31a0fd2bb5a7ecc980298fdbaf2a65fe70a806e8a20764d047ce94aad",
+        "channel_family": "css_code_capacity_v1",
+        "code_id": "bravyi-bb-72",
+        "matrix_sha256": "d768430df84b339582febda192cd1f2212c25dd06d0990276fa46f3d06393344",
+        "physical_sample_namespace": "phase9-control-relay-beam-eval-v1",
+        "physical_sample_seed": 9101301,
+        "sampler_algorithm": "bp_registry_sample_shot_v1",
+        "sampler_version": "v1",
+        "x_error_rate": 0.08,
+        "z_error_rate": 0.0
+      },
+      "source_denominator_required_by_target": {
+        "relay_beam-order-only-not_assessed": false
+      },
+      "source_denominators": {
+        "relay_beam-order-only-not_assessed": null
+      },
+      "source_lock_sha256": "76c4c239f566bae9b71ca0a9bc521154daa1e9496b3739c576df02a366afc733",
+      "target_arm_ids": {
+        "relay_beam-order-only-not_assessed": "initial_bp"
+      },
+      "units_per_shard": 3
+    },
+    "execution_order": {
+      "arm_order": [
+        "initial_bp",
+        "relay",
+        "beam"
+      ],
+      "rule": "coordinate_point_namespace_sample_declared_arm_v1",
+      "schema": "campaign_execution_order_v1"
+    },
+    "schema": "ordered_campaign_work_spec_v1"
+  }
+}

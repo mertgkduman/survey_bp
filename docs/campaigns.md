@@ -306,14 +306,16 @@ development tests or synthetic scheduler equivalence checks.
 
 ## Phase 9 measured controlled design
 
-`data/studies/phase9-controlled-design-v1.json` freezes three separate matched
+`data/studies/phase9-controlled-design-v2.json` freezes three separate matched
 CSS comparisons before any evaluative sample: B1 SPA flooding versus SPA
-check-node serial at p=0.10, BB72 Beam versus Relay after a common initial BP
+check-node serial at p=0.10, BB72 initial BP versus Relay and initial BP versus Beam in one Holm family
 at p=0.08, and B1 MBBP list selection versus coordinate vote at p=0.000001.
 The bounded local denominators are respectively 3, 16, and 2 complete pairs.
 They are exploratory. Exact paired McNemar sizing with a 0.05 relevant
-all-shot risk difference, three-question alpha allocation, and an explicit
-worst-case discordance assumption q=1 requires 4,188 pairs for 80% power.
+all-shot risk difference, one contrast for schedule and MBBP and two
+prespecified baseline contrasts for Relay/Beam, and an explicit worst-case
+discordance assumption q=1 requires 3,143 pairs for the one-contrast families
+and 3,820 for the two-contrast family to reach 80% power.
 The q=1 input is a conservative planning assumption; the one-shot calibration
 runs cannot estimate discordance.
 

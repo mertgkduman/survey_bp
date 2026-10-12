@@ -440,7 +440,7 @@ def _preflight_ordered_arms(spec: OrderedCampaignWorkSpecV1, root: Path) -> str:
                 or document.get("publication_slurm_authorization") != "deny"):
             raise ValueError("controlled arm definition differs from frozen ordered sampler")
         route = document.get("runner")
-        if (route == "controlled_fair_leg_v1" and arm.arm_id not in {"beam", "relay"}) or (
+        if (route == "controlled_fair_leg_v1" and arm.arm_id not in {"initial_bp", "relay", "beam"}) or (
                 route == "controlled_shared_mbbp_v1" and arm.arm_id not in {"list", "vote"}) or route not in {
                     "controlled_fair_leg_v1", "controlled_shared_mbbp_v1"
                 }:

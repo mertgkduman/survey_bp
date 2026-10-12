@@ -9,21 +9,21 @@ dependency_graph:
   provides: [exact paired sizing, distinct mechanism profiles, frozen positive-N controlled design]
   affects: [09-19, 09-12, 09-13, 09-14]
 key_files:
-  created: [src/bp_registry/campaigns/sizing.py, scripts/phase9_control_profiles.py, data/studies/phase9-control-profiles-v1.json, data/studies/phase9-controlled-design-v1.json, data/results/phase9-control-profiles-v1, data/results/phase9-controlled-design-v1, tests/test_campaign_sizing.py]
+  created: [src/bp_registry/campaigns/sizing.py, scripts/phase9_control_profiles.py, data/studies/phase9-control-profiles-v1.json, data/studies/phase9-controlled-design-v2.json, data/results/phase9-control-profiles-v1, data/results/phase9-controlled-design-v2, tests/test_campaign_sizing.py]
   modified: [src/bp_registry/campaigns/cli.py, docs/campaigns.md]
 actuals:
   tasks: 2
-  commits: 2
+  commits: 3
 ---
 
 # Phase 09 Plan 11: Measured Controlled Design
 
 ## Delivered
 
-- Added exact unconditional paired McNemar sizing with a two-sided three-question alpha allocation, explicit disjoint calibration/evaluation namespaces, minimal powered N, and a blocked-precision result. The prospective 0.05 all-shot risk difference, 0.80 target power, and conservative q=1 planning assumption require 4,188 pairs. q=1 is not presented as an estimate from the tiny calibration samples.
+- Added exact unconditional paired McNemar sizing with two-sided family alpha allocation, explicit disjoint calibration/evaluation namespaces, minimal powered N, and a blocked-precision result. The prospective 0.05 all-shot risk difference, 0.80 target power, and conservative q=1 planning assumption require 3,143 pairs for either one-contrast family and 3,820 for the two-contrast Relay/Beam family. q=1 is not presented as an estimate from the tiny calibration samples.
 - Measured and independently replayed separate Beam, Relay, MBBP, SPA flooding, and SPA check-node serial profiles. Beam and Relay have distinct inner wall/work fields and conservative full shared-process wall/CPU/RSS/storage bounds. MBBP's two-shot member ledger supports a separate 75-work-unit per-pair upper bound. Schedule profiles were rerun from the tracked Phase 3 manifests because the older Phase 3 run ledgers fail the current manifest-digest verifier; those old ledgers do not authorize cost projections.
-- Froze the three families in `data/studies/phase9-controlled-design-v1.json` before evaluative sampling. The local matched denominators are schedule **3** at B1 p=0.10, Beam/Relay **16** at BB72 p=0.08, and MBBP list/vote **2** at B1 p=0.000001. Achieved exact powers at these caps are 0, approximately 0.004897, and 0. The design therefore labels all three exploratory and leaves EVAL-03 incomplete pending their frozen evaluative pairs.
-- Published a public `OrderedCampaignWorkSpecV1` plan for each complete arm sequence and sample-major group order. Their plan digests are `439e5b745bdbc915df755a6e7eb47f8a0780788ef49bf7fd36797404c9308760`, `0d3e947f54da233582ce4db2cab4a8f72bb80ade2461cf82ffb41eaf38e835bb`, and `30a113e8b15944af0637e9aaa906fb196fef6545943b1012c234231587b1b306`. The generic ordered runner rejects these planning-only controlled targets; Plan 09-19 supplies their dedicated execution route.
+- Froze the corrected three-family design in `data/studies/phase9-controlled-design-v2.json` before evaluative sampling. The local matched denominators are schedule **3** at B1 p=0.10, initial BP/Relay/Beam **16** at BB72 p=0.08, and MBBP list/vote **2** at B1 p=0.000001. The Relay/Beam family has exactly two prespecified baseline contrasts in one Holm family. Achieved power at the small caps is below 0.80 in every family. The design therefore labels all three exploratory and leaves EVAL-03 incomplete pending their frozen evaluative pairs. The initial v1 two-arm work design was superseded before any evaluation sample because it omitted the required baseline arm.
+- Published a public `OrderedCampaignWorkSpecV1` plan for each complete arm sequence and sample-major group order. Their current plan digests are `439e5b745bdbc915df755a6e7eb47f8a0780788ef49bf7fd36797404c9308760`, `c14296cd14ac0f485301139edda3a2695be6163fa49953a53c2d5d2a9e1a34df`, and `30a113e8b15944af0637e9aaa906fb196fef6545943b1012c234231587b1b306`. The generic ordered runner rejects these planning-only controlled targets; Plan 09-19 supplies their dedicated execution route.
 - Kept site wall/core/memory/storage/accounting ceilings unavailable and publication Slurm denied. No profile sample belongs to an evaluation namespace. Production commits: `d52aec4`, `585d742`.
 
 ## Verification

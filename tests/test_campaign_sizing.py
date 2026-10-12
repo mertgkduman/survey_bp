@@ -163,7 +163,7 @@ def test_missing_mechanism_measurement_blocks_local_readiness() -> None:
 
 
 ROOT = Path(__file__).resolve().parents[1]
-CONTROLLED = ROOT / "data/studies/phase9-controlled-design-v1.json"
+CONTROLLED = ROOT / "data/studies/phase9-controlled-design-v2.json"
 
 
 def test_positive_n_and_distinct_representative_profile_origins() -> None:
@@ -171,8 +171,12 @@ def test_positive_n_and_distinct_representative_profile_origins() -> None:
 
     receipt = json.loads(CONTROLLED.read_text())
     assert receipt["evaluation_started"] is False
+    assert receipt["schema"] == "phase9_controlled_design_v2"
     assert receipt["publication_slurm_authorization"] == "deny"
     assert set(receipt["families"]) == {"schedule", "relay_beam", "mbbp_list_vote"}
+    assert receipt["families"]["relay_beam"]["arm_order"] == ["initial_bp", "relay", "beam"]
+    assert receipt["families"]["relay_beam"]["primary_contrasts"] == [
+        ["initial_bp", "relay"], ["initial_bp", "beam"]]
     assert receipt["site_ceilings"] == {key: "unavailable" for key in
                                         ("wall", "cores", "memory", "storage", "accounting")}
     expected_methods = {
