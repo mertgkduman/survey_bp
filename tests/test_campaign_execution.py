@@ -478,6 +478,175 @@ def test_bounded_batch_charges_verified_prior_terminal_before_next_dispatch(tmp_
     assert len(list((tmp_path / "attempts").glob("*/attempt.json"))) == 1
 
 
+def test_bounded_cap_censor_after_terminal_and_wall_partial_replays_costs(tmp_path: Path) -> None:
+    """A later partial retains the earlier terminal's denominator and wall evidence."""
+    from bp_registry.campaigns.contracts import FailureCountWorkSpecV1
+    from bp_registry.campaigns.execution import run_canonical_bounded_batch
+    from bp_registry.campaigns.planning import freeze_failure_count_work_spec
+
+    def two_shot_payload() -> dict[str, object]:
+        payload = _single_arm_failure_count_work_spec_payload()
+        campaign = payload["campaign_work_spec"]
+        policy = payload["policy"]
+        assert isinstance(campaign, dict) and isinstance(policy, dict)
+        campaign["coordinates"][0]["sample_ids"] = [0, 1]
+        campaign["look_sample_boundaries"] = [2]
+        campaign["assessment"]["resources"]["max_shots"] = 2
+        policy["caps"]["max_shots"] = 2
+        policy["target_failures"] = 2
+        policy["dispatch_mode"] = "interruptible_unit"
+        policy["interruptible_evidence_bytes"] = 3_000_000
+        policy["interruptible_storage_bytes"] = 3_000_000
+        limits = policy["executable_limits"]
+        assert isinstance(limits, dict)
+        policy["caps"]["max_decoder_work"] = 2 * limits["derived_work_per_unit"]
+        policy["caps"]["max_events"] = 2 * limits["derived_events_per_unit"]
+        policy["caps"]["max_evidence_bytes"] = 2 * limits["derived_evidence_bytes_per_unit"]
+        policy["caps"]["max_storage_bytes"] = 2 * limits["derived_storage_bytes_per_unit"]
+        campaign["assessment"]["resources"].update({
+            "max_decoder_work": policy["caps"]["max_decoder_work"],
+            "max_events": policy["caps"]["max_events"],
+            "max_evidence_bytes": policy["caps"]["max_evidence_bytes"],
+            "max_storage_bytes": policy["caps"]["max_storage_bytes"],
+        })
+        return payload
+
+    trial = freeze_failure_count_work_spec(FailureCountWorkSpecV1.model_validate(two_shot_payload()))
+    measured = run_canonical_bounded_batch(
+        trial, campaign_root=ROOT, output_root=tmp_path / "trial",
+        first_ordinal=1, batch_size=1, clock_ns=lambda: 0,
+    )["actual_resources"]["storage_bytes"]
+    payload = two_shot_payload()
+    policy = payload["policy"]
+    campaign = payload["campaign_work_spec"]
+    assert isinstance(policy, dict) and isinstance(campaign, dict)
+    limits = policy["executable_limits"]
+    assert isinstance(limits, dict)
+    # One more maximum unit fits after the first terminal, but a partial's
+    # measured storage makes a fresh retry unaffordable.
+    policy["caps"]["max_storage_bytes"] = limits["derived_storage_bytes_per_unit"] + limits["partial_receipt_reserve_bytes"] + measured + 1_000
+    campaign["assessment"]["resources"]["max_storage_bytes"] = policy["caps"]["max_storage_bytes"]
+    plan = freeze_failure_count_work_spec(FailureCountWorkSpecV1.model_validate(payload))
+    root = tmp_path / "retained"
+    first = run_canonical_bounded_batch(
+        plan, campaign_root=ROOT, output_root=root, first_ordinal=1, batch_size=1,
+        clock_ns=lambda: 0,
+    )
+    assert len(first["verified_attempts"]) == 1
+    ticks = iter((0, 0, 0, 2_000_000_000, 2_000_000_001, 2_000_000_002))
+    second = run_canonical_bounded_batch(
+        plan, campaign_root=ROOT, output_root=root, first_ordinal=2, batch_size=1,
+        clock_ns=lambda: next(ticks),
+    )
+    assert second["partial_attempt"].interruption_kind == "interrupted_wall"
+    censored = run_canonical_bounded_batch(
+        plan, campaign_root=ROOT, output_root=root, first_ordinal=2, batch_size=1,
+        parent_partial_receipt_sha256=second["partial_attempt_sha256"],
+    )
+    terminal = censored["terminal_receipt"]
+    assert terminal.terminal_state == "cap_censored"
+    assert terminal.total_completed_shots == 1
+    assert terminal.realized_storage_bytes >= first["actual_resources"]["storage_bytes"]
+    assert len(terminal.wall_boundaries) == 1
+    assert censored["retained_partial_attempt_sha256"] == second["partial_attempt_sha256"]
+    censor_path = Path(censored["terminal_receipt_path"])
+    retained = censor_path.read_bytes()
+    assert sha256(retained).hexdigest() == censored["terminal_receipt_sha256"]
+    assert censored["actual_resources"]["storage_bytes"] == terminal.realized_storage_bytes
+    replay = run_canonical_bounded_batch(
+        plan, campaign_root=ROOT, output_root=root, first_ordinal=2, batch_size=1,
+        parent_partial_receipt_sha256=second["partial_attempt_sha256"],
+    )
+    assert replay["terminal_receipt_sha256"] == censored["terminal_receipt_sha256"]
+    censor_path.write_bytes(retained.replace(b'"cap_censored"', b'"target_reached"'))
+    with pytest.raises(ValueError, match="conflicts with verified evidence"):
+        run_canonical_bounded_batch(
+            plan, campaign_root=ROOT, output_root=root, first_ordinal=2, batch_size=1,
+            parent_partial_receipt_sha256=second["partial_attempt_sha256"],
+        )
+
+
+def test_interruptible_wall_partial_retries_same_ordinal_under_remaining_budget(tmp_path: Path) -> None:
+    """A fresh attempt can complete the same shot when its frozen caps still fit."""
+    from bp_registry.campaigns.contracts import FailureCountWorkSpecV1
+    from bp_registry.campaigns.execution import run_canonical_bounded_batch
+    from bp_registry.campaigns.planning import freeze_failure_count_work_spec
+
+    payload = _single_arm_failure_count_work_spec_payload()
+    campaign = payload["campaign_work_spec"]
+    policy = payload["policy"]
+    assert isinstance(campaign, dict) and isinstance(policy, dict)
+    policy["dispatch_mode"] = "interruptible_unit"
+    policy["interruptible_evidence_bytes"] = 3_000_000
+    policy["interruptible_storage_bytes"] = 3_000_000
+    for cap_name in ("max_decoder_work", "max_events", "max_evidence_bytes", "max_storage_bytes"):
+        policy["caps"][cap_name] *= 2
+        campaign["assessment"]["resources"][cap_name] = policy["caps"][cap_name]
+    plan = freeze_failure_count_work_spec(FailureCountWorkSpecV1.model_validate(payload))
+    ticks = iter((0, 0, 0, 2_000_000_000, 2_000_000_001, 2_000_000_002))
+    first = run_canonical_bounded_batch(
+        plan, campaign_root=ROOT, output_root=tmp_path, first_ordinal=1, batch_size=1,
+        clock_ns=lambda: next(ticks),
+    )
+    assert first["partial_attempt"].interruption_kind == "interrupted_wall"
+    resumed = run_canonical_bounded_batch(
+        plan, campaign_root=ROOT, output_root=tmp_path, first_ordinal=1, batch_size=1,
+        parent_partial_receipt_sha256=first["partial_attempt_sha256"],
+    )
+    assert len(resumed["verified_attempts"]) == 1
+    assert resumed["verified_attempts"][0]["unit_key"] == plan.units[0].key
+    assert len(list((tmp_path / "attempts").glob("*/partial-attempt.json"))) == 1
+    assert len(list((tmp_path / "attempts").glob("*/attempt.json"))) == 1
+
+
+def test_strict_batch_wall_boundary_censors_without_dispatching_tail(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """A boundary-observed wall cap keeps the completed prefix and leaves the rest undispatched."""
+    import bp_registry.campaigns.execution as execution
+    from bp_registry.campaigns.contracts import FailureCountWorkSpecV1
+    from bp_registry.campaigns.planning import freeze_failure_count_work_spec
+
+    payload = _single_arm_failure_count_work_spec_payload()
+    campaign = payload["campaign_work_spec"]
+    policy = payload["policy"]
+    assert isinstance(campaign, dict) and isinstance(policy, dict)
+    campaign["coordinates"][0]["sample_ids"] = [0, 1]
+    campaign["look_sample_boundaries"] = [2]
+    campaign["assessment"]["resources"].update({"max_shots": 2, "max_batch_size": 2})
+    policy["target_failures"] = 2
+    policy["batch_size"] = 2
+    policy["caps"]["max_shots"] = 2
+    policy["batch_authorization"]["max_shots_per_batch"] = 2
+    for name, auth_name in (
+        ("max_decoder_work", "max_work_per_batch"), ("max_events", "max_events_per_batch"),
+        ("max_evidence_bytes", "max_evidence_bytes_per_batch"),
+        ("max_storage_bytes", "max_storage_bytes_per_batch"),
+    ):
+        policy["caps"][name] *= 2
+        campaign["assessment"]["resources"][name] = policy["caps"][name]
+        policy["batch_authorization"][auth_name] = policy["caps"][name]
+    plan = freeze_failure_count_work_spec(FailureCountWorkSpecV1.model_validate(payload))
+    original = execution.run_canonical_materialized_one
+    completed_first = False
+
+    def finish_first_then_advance_clock(*args: object, **kwargs: object) -> object:
+        nonlocal completed_first
+        result = original(*args, **kwargs)
+        completed_first = True
+        return result
+
+    monkeypatch.setattr(execution, "run_canonical_materialized_one", finish_first_then_advance_clock)
+    result = execution.run_canonical_bounded_batch(
+        plan, campaign_root=ROOT, output_root=tmp_path, first_ordinal=1, batch_size=2,
+        clock_ns=lambda: 2_000_000_000 if completed_first else 0,
+    )
+    assert result["terminal_receipt"].terminal_state == "cap_censored"
+    assert result["terminal_receipt"].first_exhausted_cap == "wall"
+    assert result["pending_ordinal"] == 2
+    assert result["actual_resources"]["completed_shots"] == 1
+    assert result["wall_boundaries"][0][2] > 0
+    assert len(list((tmp_path / "attempts").glob("*/attempt.json"))) == 1
+
+
 def test_canonical_bounded_batch_seals_actual_resources_and_rejects_noncontiguous_dispatch(tmp_path: Path) -> None:
     """The bounded adapter reports actual work and never expands an ordinal slice."""
     from bp_registry.campaigns.contracts import FailureCountWorkSpecV1

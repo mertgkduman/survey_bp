@@ -492,6 +492,8 @@ class FailureCountPartialAttemptV1(StrictModel):
                 raise ValueError("wall partial requires exact deadline observation and overshoot")
         elif any(value is not None for value in (self.deadline_ns, self.observed_ns, self.overshoot_ns)):
             raise ValueError("byte partial cannot claim wall interruption facts")
+        elif self.attempted_bytes is None:
+            raise ValueError("byte partial requires the denied operation's attempted bytes")
         return self
 
     def primitive_bytes(self) -> bytes:
