@@ -1,6 +1,6 @@
 ---
 phase: 09-css-reproduction-and-controlled-comparisons
-verified: 2026-10-12T05:55:31Z
+verified: 2026-10-12T05:58:44Z
 status: passed
 score: 5/5 bounded phase must-haves verified
 gaps: []
@@ -23,7 +23,7 @@ human_verification: []
 
 - **CAN-02:** The public policy-file voting and matched list control execute, retain eligible ballots and lineage, independently validate the aggregate, and replay.
 - **EVAL-03:** All three predeclared positive matched sets and mechanism-specific profiles are complete. Their small N permits exploratory comparisons only.
-- **EVAL-01 / EVAL-02:** Source identities, target receipts, native availability, and adaptation assessments have explicit states. Exact author experiment artifacts, source settings, and executable native references remain unavailable or unverified, so no source-faithful run or published-curve agreement is asserted. The one bounded Yao adaptation is cap censored.
+- **EVAL-01 / EVAL-02:** Source identities, target receipts, native availability, and adaptation assessments have explicit states. The literal publication-experiment capabilities remain pending in `REQUIREMENTS.md`: exact author experiment artifacts, source settings, and executable native references are unavailable or unverified, and the one bounded Yao adaptation is cap censored. No source-faithful run or published-curve agreement is asserted. Phase 9 closes its bounded execution contract while retaining these requirement debts.
 
 ## Verification limits
 

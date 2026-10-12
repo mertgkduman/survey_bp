@@ -3,6 +3,7 @@
 The [Phase 9 evidence index](../data/results/phase9-css-evidence-index-v1.json) binds fourteen selected source variants, the bounded Yao B1 adaptation, and three controlled comparisons to retained receipts. It distinguishes source qualification from project-owned canonical execution. All controlled results below are small, bounded explorations; none establishes decoder superiority or source-faithful curve reproduction.
 
 The index records `phase_status=complete` and `eval03_complete=true` because all three prospectively frozen positive matched sample sets and the required Phase 9 receipt gates are complete. It records no phase-execution blocker. Its source and publication limitations below remain open facts for later work; the censored Yao tracer did not pass its paper target.
+The literal source-execution and published-curve capabilities in EVAL-01 and EVAL-02 remain pending in `REQUIREMENTS.md` until exact author artifacts/settings and a qualifying assessment exist.
 
 ## Source and target status
 

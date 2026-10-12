@@ -1,20 +1,21 @@
 ---
 gsd_state_version: "1.0"
 milestone: v1.0
-current_phase: 09
-current_phase_name: CSS Reproduction and Controlled Comparisons
-current_plan: 09-10
-status: executing
-stopped_at: Wave 8 passed; Plan 09-10 bounded Yao B1 tracer next
-last_updated: "2026-10-12T02:41:53Z"
-last_activity: 2026-10-11
-last_activity_desc: Phase 09 Wave 8 passed; 13 of 20 plans complete after measured profile and ordered work
-state_head: 13e0002d2f53323af506eb1c01c17643d19d7a2c
+current_phase: 5
+current_phase_name: Guided and Perturbative BP Interventions
+current_plan: Not started
+status: planning
+stopped_at: Phase 9 bounded execution complete; Phase 5 human review remains open
+last_updated: "2026-10-12T05:58:44Z"
+last_activity: 2026-10-12
+last_activity_desc: Phase 9 bounded execution complete; Phase 5 human review pending
+state_head: 1acf02a9adaee9590bde32253a43ea759224562d
 progress:
   total_phases: 14
-  completed_phases: 7
+  completed_phases: 8
   total_plans: 151
-  completed_plans: 135
+  completed_plans: 143
+  percent: 57
 ---
 
 # Project State
@@ -24,27 +25,27 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-11)
 
 **Core value:** Make BP decoder differences explicit, reproducible, and fairly comparable through canonical policy execution and published evidence.
-**Current focus:** Phase 9 CSS reproduction and controlled comparisons; Wave 9 bounded B1 tracer and controlled design
+**Current focus:** Phase 5 human notebook/HTML review after Phase 9 bounded CSS execution closed
 
 ## Current Position
 
-Phase: 09 (CSS Reproduction and Controlled Comparisons) — EXECUTING
-Plan: 09-10 of 20; 13 plans passed wave gates
+Phase: 5 — Guided and Perturbative BP Interventions
+Plan: Phase 5 technical plans complete; human review remains open
 Total Phases: 14
-Current Plan: 09-10 bounded Yao B1 tracer
-Total Plans in Phase: 20
-Status: Wave 8 passed; Wave 9 ready
-Last activity: 2026-10-11 — Phase 09 Wave 8 full suite passed
-Last Activity Description: Measured small profile and ordered matched-arm lifecycle passed the full-suite gate
+Current Plan: Not started
+Total Plans in Phase: 14
+Status: Awaiting Phase 5 human review
+Last activity: 2026-10-12 — Phase 9 complete, transitioned to Phase 5
+Last Activity Description: Phase 9 complete, transitioned to Phase 5
 
-Progress: 7 of 14 phases complete (50%); Phase 9 has 13 of 20 plans complete
+Progress: 8 of 14 phases complete (57%); Phase 9 has 20 of 20 plans complete
 
 ## Performance Metrics
 
-- Total plans completed: 135
+- Total plans completed: 143
 - Average duration: N/A
 - Total execution time: 0 hours
-- Recent trend: Phase 8 completed 20 plans, including six goal-verification gap plans, and passed goal, code, security, and validation gates.
+- Recent trend: Phase 9 completed 20 bounded CSS plans and passed goal, code, security, and validation gates; source-faithful EVAL-01/02 evidence remains pending.
 
 **Per-Plan Metrics:**
 
@@ -255,7 +256,7 @@ No requested decoding regime or named policy family is deferred beyond the first
 **Resume file:** .planning/phases/09-css-reproduction-and-controlled-comparisons/09-CONTEXT.md
 
 Last session: 2026-10-11T22:40:55Z
-Stopped at: Phase 9 Wave 4 passed; Plan 09-20 prerequisite planned
+Stopped at: Phase 9 complete, ready to plan Phase 5
 Next command: Continue $gsd-execute-phase 9 through the remaining dependency waves and measured gates. Phase 5 human review remains separately open; Phase 7 stays paused.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.

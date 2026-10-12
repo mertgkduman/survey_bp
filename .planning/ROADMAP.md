@@ -18,7 +18,7 @@ Build a provenance-preserving research platform from paper evidence through nati
 - [x] **Phase 6: Beam Search, Ensembles, and Candidate Selection** — Expose branching, pruning, lists, and voting as auditable policies, and qualify the first three-paper CSS policy-file gate. (completed 2026-10-05)
 - [ ] **Phase 7: Optional Postprocessing** — Paused by user after 6/15 plans to prioritize BP variants; retain the isolated OSD qualification failure and completed LSD/SI/OTF work for later resumption.
 - [x] **Phase 8: Reproducible Campaigns and Statistical Assessment** — Run paired, resumable campaigns with prespecified statistical criteria. (completed 2026-10-11)
-- [ ] **Phase 9: CSS Reproduction and Controlled Comparisons** — Qualify selected source results and isolate policy contributions in CSS decoding.
+- [x] **Phase 9: CSS Reproduction and Controlled Comparisons** — Qualify selected source results and isolate policy contributions in CSS decoding. (completed 2026-10-12)
 - [x] **Phase 10: Correlated Quaternary Execution** — Add joint Pauli inference and explicitly compatible policy compositions. (completed 2026-10-08)
 - [ ] **Phase 11: Quaternary Reproduction and Comparisons** — Qualify correlated decoding and compare it with separate binary inference.
 - [ ] **Phase 12: Circuit Models and Canonical Integration** — Decode noisy extraction circuits with validated detector/observable semantics.
@@ -565,7 +565,7 @@ Plans:
 
 **Research focus:** Final CSS paper/code/rate grid, faithful parameter extraction, meaningful ablation design, precision/power, and cost calibration.
 **Scope carry-forward:** Reconsider memory/Relay comparisons alongside other CSS policies only after Phase 8 campaign rules are ready. Size a focused comparison from its scientific question and available compute; do not inherit the cancelled Phase 4 448-shot/14-arm grid by default.
-**Plans:** 13/20 complete
+**Plans:** 20/20 plans complete
 
 **Wave 1**
 
@@ -606,22 +606,22 @@ Plans:
 
 **Wave 9** *(blocked on Wave 8 completion)*
 
-- [ ] 09-10-PLAN.md
-- [ ] 09-11-PLAN.md
+- [x] 09-10-PLAN.md
+- [x] 09-11-PLAN.md
 
 **Wave 10** *(blocked on Wave 9 completion)*
 
-- [ ] 09-19-PLAN.md
+- [x] 09-19-PLAN.md
 
 **Wave 11** *(blocked on Wave 10 completion)*
 
-- [ ] 09-12-PLAN.md
-- [ ] 09-13-PLAN.md
-- [ ] 09-14-PLAN.md
+- [x] 09-12-PLAN.md
+- [x] 09-13-PLAN.md
+- [x] 09-14-PLAN.md
 
 **Wave 12** *(blocked on Wave 11 completion)*
 
-- [ ] 09-15-PLAN.md
+- [x] 09-15-PLAN.md
 
 ### Phase 10: Correlated Quaternary Execution
 
@@ -764,7 +764,7 @@ Plans:
 | 6. Beam Search, Ensembles, and Candidate Selection | 9/9 | Complete    | 2026-10-05 |
 | 7. Optional Postprocessing | 6/15 | Paused by user; POST-01 qualification failed |  |
 | 8. Reproducible Campaigns and Statistical Assessment | 20/20 | Complete    | 2026-10-11 |
-| 9. CSS Reproduction and Controlled Comparisons | 11/20 | In Progress|  |
+| 9. CSS Reproduction and Controlled Comparisons | 20/20 | Complete    | 2026-10-12 |
 | 10. Correlated Quaternary Execution | 16/16 | Complete    | 2026-10-08 |
 | 11. Quaternary Reproduction and Comparisons | 0/TBD | Not started | - |
 | 12. Circuit Models and Canonical Integration | 0/TBD | Not started | - |

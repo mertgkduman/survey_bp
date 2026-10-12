@@ -93,7 +93,7 @@ paragraph records the September 26 review state, not an open implementation gap.
 ### Candidate selection
 
 - [x] **CAN-01**: A researcher can select from a candidate list using declared eligibility, scoring, and deterministic tie rules, preserving rejected candidates and their origins.
-- [ ] **CAN-02**: A researcher can apply a precisely defined voting policy over a declared object and eligible set, with final original-problem validity checked rather than assumed. Phase 6 delivered and tested the importable kernel primitive; Phase 9 owns public policy-file execution, ledger replay, and matched CSS assessment.
+- [x] **CAN-02**: A researcher can apply a precisely defined voting policy over a declared object and eligible set, with final original-problem validity checked rather than assumed. Phase 6 delivered and tested the importable kernel primitive; Phase 9 owns public policy-file execution, ledger replay, and matched CSS assessment.
 
 ### Optional postprocessing
 
@@ -129,7 +129,7 @@ paragraph records the September 26 review state, not an open implementation gap.
 
 - [ ] **EVAL-01**: A researcher can run the selected CSS publication experiments under their source settings and inspect native-reference assessments, with code/source gaps and discrepancies explicit.
 - [ ] **EVAL-02**: A researcher can assess canonical CSS realizations against selected reported curves using the declared statistical criteria, with source-faithful reproduction distinguished from adaptation and unsupported results not labeled reproduced.
-- [ ] **EVAL-03**: A researcher can compare and ablate eligible CSS policies on shared codes/noise/samples and explicit computational budgets, reporting logical outcomes, convergence, iterations, work, runtime, and optional-fallback effects separately.
+- [x] **EVAL-03**: A researcher can compare and ablate eligible CSS policies on shared codes/noise/samples and explicit computational budgets, reporting logical outcomes, convergence, iterations, work, runtime, and optional-fallback effects separately.
 
 ### Correlated quaternary code-capacity
 
@@ -233,7 +233,7 @@ Every v1 requirement has exactly one owning phase; later phases may use or stren
 | INT-04 | Phase 5 | Pending |
 | INT-05 | Phase 6 | Complete |
 | CAN-01 | Phase 6 | Complete |
-| CAN-02 | Phase 9 | Pending |
+| CAN-02 | Phase 9 | Complete |
 | POST-01 | Phase 7 | Pending |
 | POST-02 | Phase 7 | Pending |
 | POST-03 | Phase 7 | Pending |
@@ -254,7 +254,7 @@ Every v1 requirement has exactly one owning phase; later phases may use or stren
 | STAT-05 | Phase 8 | Complete |
 | EVAL-01 | Phase 9 | Pending |
 | EVAL-02 | Phase 9 | Pending |
-| EVAL-03 | Phase 9 | Pending |
+| EVAL-03 | Phase 9 | Complete |
 | QBP-01 | Phase 10 | Complete |
 | QBP-02 | Phase 10 | Complete |
 | QBP-03 | Phase 10 | Complete |
