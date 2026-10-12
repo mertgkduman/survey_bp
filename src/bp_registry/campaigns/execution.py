@@ -1564,7 +1564,7 @@ def _retained_bounded_actuals(
 def _publish_bounded_cap_censor(
     *, destination: Path, plan: CampaignWorkPlan, partial_digest: str | None,
     exhausted_cap: str, actuals: Mapping[str, int], terminals: tuple[dict[str, Any], ...],
-    walls: tuple[tuple[int, int, int], ...],
+    walls: tuple[tuple[int, int, int], ...], pending_ordinal: int,
 ) -> tuple[FailureCountTerminalReceiptV1, Path, str]:
     """Seal an immutable campaign control receipt from verified retained costs."""
     policy = plan.work_spec.policy
@@ -1587,6 +1587,7 @@ def _publish_bounded_cap_censor(
         envelope = {
             "schema": "failure_count_bounded_cap_censor_v1",
             "campaign_plan_digest": plan.campaign_plan_digest,
+            "pending_ordinal": pending_ordinal,
             "retained_partial_attempt_sha256": partial_digest,
             "terminal_receipt": terminal.model_dump(mode="json", by_alias=True),
         }
@@ -1643,6 +1644,35 @@ def run_canonical_bounded_batch(
     accumulated, retained_terminals, retained_walls = _retained_bounded_actuals(
         destination=destination, campaign_root=root, plan=plan,
     )
+    retained_censor_path = destination / "failure-count-cap-censor.json"
+    if retained_censor_path.exists():
+        if retained_censor_path.is_symlink() or not retained_censor_path.is_file():
+            raise ValueError("retained bounded cap censor must be a regular file")
+        retained_censor = json.loads(retained_censor_path.read_bytes())
+        if (not isinstance(retained_censor, dict)
+                or retained_censor.get("schema") != "failure_count_bounded_cap_censor_v1"
+                or retained_censor.get("campaign_plan_digest") != plan.campaign_plan_digest
+                or retained_censor.get("pending_ordinal") != first_ordinal
+                or not isinstance(retained_censor.get("terminal_receipt"), dict)):
+            raise ValueError("retained bounded cap censor forbids further dispatch")
+        claimed_cap = retained_censor["terminal_receipt"].get("first_exhausted_cap")
+        claimed_partial = retained_censor.get("retained_partial_attempt_sha256")
+        if claimed_partial != parent_partial_receipt_sha256:
+            raise ValueError("retained bounded cap censor requires the exact pending parent digest")
+        if claimed_partial is not None and (retained_before_projection is None or claimed_partial != retained_before_projection[1]):
+            raise ValueError("retained bounded cap censor differs from the pending partial")
+        terminal, censor_path, censor_sha256 = _publish_bounded_cap_censor(
+            destination=destination, plan=plan, partial_digest=claimed_partial,
+            exhausted_cap=claimed_cap, actuals=accumulated, terminals=retained_terminals,
+            walls=retained_walls, pending_ordinal=first_ordinal,
+        )
+        return {"schema": "failure_count_canonical_bounded_batch_v1", "campaign_plan_digest": plan.campaign_plan_digest,
+                "terminal_receipt": terminal, "retained_partial_attempt_sha256": claimed_partial,
+                "terminal_receipt_path": str(censor_path), "terminal_receipt_sha256": censor_sha256,
+                "verified_attempts": (), "materialized_samples": (), "pending_ordinal": first_ordinal,
+                "actual_resources": {"completed_shots": accumulated["shots"], "decoder_work": accumulated["work"],
+                                     "events": accumulated["events"], "evidence_bytes": accumulated["evidence_bytes"],
+                                     "storage_bytes": terminal.realized_storage_bytes}}
     try:
         spec, projection, _context, derived, _manifest_path = _failure_count_executable_projection(
             plan=plan, campaign_root=root, first_ordinal=first_ordinal, batch_size=batch_size,
@@ -1662,7 +1692,7 @@ def run_canonical_bounded_batch(
         terminal, censor_path, censor_sha256 = _publish_bounded_cap_censor(
             destination=destination, plan=plan, partial_digest=partial_digest,
             exhausted_cap=cap, actuals=accumulated, terminals=retained_terminals,
-            walls=retained_walls,
+            walls=retained_walls, pending_ordinal=first_ordinal,
         )
         return {"schema": "failure_count_canonical_bounded_batch_v1", "campaign_plan_digest": plan.campaign_plan_digest,
                 "terminal_receipt": terminal, "retained_partial_attempt_sha256": partial_digest,
@@ -1831,6 +1861,7 @@ def run_canonical_bounded_batch(
         terminal, censor_path, censor_sha256 = _publish_bounded_cap_censor(
             destination=destination, plan=plan, partial_digest=None,
             exhausted_cap="wall", actuals=spent, terminals=retained, walls=walls,
+            pending_ordinal=first_ordinal + len(verified),
         )
         return {
             "schema": "failure_count_canonical_bounded_batch_v1",

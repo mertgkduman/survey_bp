@@ -558,6 +558,10 @@ def test_bounded_cap_censor_after_terminal_and_wall_partial_replays_costs(tmp_pa
         parent_partial_receipt_sha256=second["partial_attempt_sha256"],
     )
     assert replay["terminal_receipt_sha256"] == censored["terminal_receipt_sha256"]
+    with pytest.raises(ValueError, match="forbids further dispatch"):
+        run_canonical_bounded_batch(
+            plan, campaign_root=ROOT, output_root=root, first_ordinal=1, batch_size=1,
+        )
     censor_path.write_bytes(retained.replace(b'"cap_censored"', b'"target_reached"'))
     with pytest.raises(ValueError, match="conflicts with verified evidence"):
         run_canonical_bounded_batch(
