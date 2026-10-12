@@ -987,7 +987,11 @@ def _campaign_terminal_fact(events: list[dict[str, Any]], *, unit_key: str) -> d
         terminal_fact["logical_failure"] = terminal_fact["outcome"] not in {"exact", "stabilizer_equivalent"}
     if terminal_fact["outcome"] == "logical_failure":
         terminal_fact["outcome"] = "wrong_logical_action"
-    elif terminal_fact["outcome"] is None and terminal_fact["termination"] == "max_iterations":
+    elif terminal_fact["outcome"] is None and terminal_fact["termination"] == "wall_clock_deadline":
+        terminal_fact["outcome"] = "timeout"
+    elif terminal_fact["outcome"] is None and terminal_fact["termination"] in {
+        "max_iterations", "count_budget_exhausted",
+    }:
         terminal_fact["outcome"] = "nonconvergence"
     elif (terminal_fact["outcome"] is None and terminal_fact["termination"] == "completed"
           and next(event for event in events if event["kind"] == "termination")["data"].get("selection_status") == "unavailable_due_to_stopping"
@@ -1278,7 +1282,11 @@ def _partial_interruption_fields(snapshot: Any) -> tuple[str, str]:
         return "interrupted_evidence", "evidence"
     if snapshot.interruption_kind == "storage_bytes":
         return "interrupted_storage", "storage"
-    raise ValueError("strict canonical guard interruption is not a resumable campaign partial")
+    raise ValueError(
+        "strict canonical guard interruption is not a resumable campaign partial: "
+        f"kind={snapshot.interruption_kind}, boundary={snapshot.boundary}, "
+        f"attempted_bytes={snapshot.attempted_bytes}"
+    )
 
 
 def _seal_failure_count_partial_attempt(

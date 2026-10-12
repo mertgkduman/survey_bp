@@ -1,0 +1,14 @@
+{
+  "schema": "phase9_b1_campaign_adapter_diagnostic_v1",
+  "campaign_plan_digest": "e44cec66b592630f799659a78abc65a5f9b7d7d04a1bb81f989ab0ca2dd70ac1",
+  "ledger_path": "data/results/phase9-yao-b1-t001-p010-v4/run/attempts/00000001-1f232b19bca2d453/events.jsonl",
+  "ledger_sha256": "e6a29e31b999be00d72455e1db04a450a61899aa80f197db35ff889eef23f7ec",
+  "ledger_bytes": 6256082,
+  "event_count": 1782,
+  "canonical_termination": "wall_clock_deadline",
+  "canonical_decode_runtime_ns": 600531302610,
+  "campaign_adapter_error": "canonical terminal outcome cannot be mapped into the frozen campaign taxonomy",
+  "completed_shot_credit": 0,
+  "failure_credit": 0,
+  "disposition": "retained_unsealed_diagnostic_retried_under_same_frozen_scientific_plan"
+}

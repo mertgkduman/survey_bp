@@ -17,8 +17,8 @@ from ..manifests import StrictModel
 
 _SHA256 = r"^[0-9a-f]{64}$"
 _MAX_EVENTS = 1_000_000
-_MAX_EVIDENCE_BYTES = 64 * 1024 * 1024
-_MAX_STORAGE_BYTES = 1_024 * 1024 * 1024
+_MAX_EVIDENCE_BYTES = 16 * 1_024 * 1024 * 1024
+_MAX_STORAGE_BYTES = 16 * 1_024 * 1024 * 1024
 _MAX_DECODER_WORK = 1_000_000_000_000
 _TERMINAL_STATUSES = frozenset({
     "exact", "stabilizer_equivalent", "wrong_logical_action", "invalid_syndrome",

@@ -1,0 +1,217 @@
+{
+  "artifact": {
+    "code_id": "b1-ghp-882",
+    "format_version": 1,
+    "matrix_hashes": {
+      "hx_raw_sha256": "b5ac3b78f4f9e3df7b7dcce71ff0a82a708876732d981e085af94d81cd7f5366",
+      "hx_semantic_sha256": "95556ccbda843fc06576206698d5e8931aeebf24d7e3785b86ca4ba3a3de24d9",
+      "hz_raw_sha256": "e66f9af2f546591faab8c812db497ee23eba80cbdef064d30c32a71e98bce662",
+      "hz_semantic_sha256": "6d8738b4aff3cead4a44dab9d26d3d2473781c54bae7c78e20e978e3cd6288f2",
+      "lx_raw_sha256": "a710640a7c0afe275fb0394bf6388c6ba0a8a07bdad9bcabff3ac7a12fe8ca74",
+      "lx_semantic_sha256": "d5c335893b922e6205f9f7a7f08644a68d6c29c6570f82b0bdb2297fbd22de12",
+      "lz_raw_sha256": "0fa1f2fa849ac334621118b395098232d1e3b1327b0eb4750055dde0c357f6a2",
+      "lz_semantic_sha256": "f609b3f1c83119e567e7d4274d2fc43e2f406c2fd8a49407047bc91c3d833889"
+    },
+    "path": "b1-panteleev-kalachev-v3.npz",
+    "raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+    "root": "data/artifacts",
+    "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+  },
+  "budgets": {
+    "attempt": {
+      "max_iterations": 1,
+      "work_limits": {
+        "belief_assemblies": 100000000,
+        "bp_calls": 1000000,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 100000000,
+        "check_to_variable_updates": 100000000,
+        "fallback_calls": 0,
+        "intervention_actions": 2000,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 100000000,
+        "variable_to_check_updates": 100000000
+      }
+    },
+    "denominator_rule": "all_terminal_shots",
+    "max_shots": 128,
+    "search": {
+      "max_iterations": 1,
+      "work_limits": {
+        "belief_assemblies": 100000000,
+        "bp_calls": 1000000,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 100000000,
+        "check_to_variable_updates": 100000000,
+        "fallback_calls": 0,
+        "intervention_actions": 2000,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 100000000,
+        "variable_to_check_updates": 100000000
+      }
+    },
+    "shot": {
+      "max_iterations": 1,
+      "work_limits": {
+        "belief_assemblies": 100000000,
+        "bp_calls": 1000000,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 100000000,
+        "check_to_variable_updates": 100000000,
+        "fallback_calls": 0,
+        "intervention_actions": 2000,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 100000000,
+        "variable_to_check_updates": 100000000
+      }
+    }
+  },
+  "environment": {
+    "backend": "cpu",
+    "numpy": "2.2.6",
+    "omp_num_threads": 1,
+    "python": "3.12.2",
+    "scipy": "1.17.1"
+  },
+  "error_rate": 0.1,
+  "evidence": {
+    "assessment_status": "not_assessed",
+    "discrepancies": [
+      "Ordered paper check and logical artifacts are unverified.",
+      "Author implementation and exact settings are unverified.",
+      "Project B1 logical basis is derived locally, not supplied by the Yao authors.",
+      "The zero-bias and final-round source interpretations remain unresolved."
+    ],
+    "fixture": "pilot_adaptation",
+    "procedure": "Yao Figure 3 BPGD T=1 canonical Algorithm 1 adaptation on project B1 artifact; prespecified failure-count assessment is in the campaign document.",
+    "relation": "pilot_adaptation",
+    "sources": [
+      "literature_policies/yao-2024-guided-decimation/bpgd-t001.toml",
+      "literature_policies/yao-2024-guided-decimation/paper_reproduction/source-targets-v1.json"
+    ]
+  },
+  "guarded_event_ceiling_bytes": 1048576,
+  "intervention": {
+    "final_round_rule": "return_after_last_fixation",
+    "finite_bias_magnitude": 25.0,
+    "kind": "guided_decimation",
+    "lift_rule": "identity",
+    "native_availability": "unverified",
+    "operator": "finite_prior_bias",
+    "preserved_fields": [
+      "graph",
+      "syndrome",
+      "messages"
+    ],
+    "qualification": "algorithm_interpretation",
+    "reset_rule": "continue_messages",
+    "round_limit": 882,
+    "selection": "max_abs_reliability",
+    "source_revision": "arxiv:2312.10950v2",
+    "stream_status": "not_applicable",
+    "sweeps_per_round": 1,
+    "trigger": "failed_bp_round",
+    "unresolved": [
+      "zero_bias_boundary",
+      "final_round_source_interpretation",
+      "author_implementation_identity",
+      "ordered_paper_experiment_artifact_identity"
+    ],
+    "variant": "algorithm1_v2_interpretation",
+    "zero_rule": "positive_prior_for_zero_posterior"
+  },
+  "intervention_limits": {
+    "max_runtime_seconds": 600.0,
+    "max_total_actions": 2000,
+    "max_total_attempts": 1000,
+    "max_trace_bytes": 0,
+    "max_trace_records": 0,
+    "work_caps": {
+      "belief_assemblies": 100000000,
+      "bp_calls": 1000000,
+      "branch_expansions": 0,
+      "branch_prunes": 0,
+      "candidate_checks": 100000000,
+      "candidate_constructions": 100000000,
+      "check_to_variable_updates": 100000000,
+      "convergence_checks": 100000000,
+      "fallback_calls": 0,
+      "fixation_actions": 1000,
+      "intervention_actions": 2000,
+      "lifted_coordinates": 0,
+      "order_generation": 100000000,
+      "order_selection": 100000000,
+      "original_checks": 100000000,
+      "priority_maintenance": 100000000,
+      "ranking_scans": 100000000,
+      "relay_transfers": 0,
+      "residual_differences": 100000000,
+      "residual_precomputations": 100000000,
+      "residual_priority_evaluations": 100000000,
+      "transformations": 0,
+      "variable_to_check_updates": 100000000
+    }
+  },
+  "numerical_profile": "cpu-float64-spa-v1",
+  "policies": {
+    "intervention": {
+      "binding_id": "research-intervention-guided-decimation",
+      "kind": "guided_decimation",
+      "state_lifetime": "search"
+    },
+    "postprocessing": {
+      "binding_id": "research-postprocessing-identity",
+      "kind": "identity",
+      "state_lifetime": "attempt"
+    },
+    "schedule": {
+      "binding_id": "research-schedule-flooding",
+      "kind": "flooding",
+      "state_lifetime": "iteration"
+    },
+    "selection": {
+      "binding_id": "research-selection-stable-first",
+      "kind": "stable_first",
+      "state_lifetime": "attempt"
+    },
+    "state_memory": {
+      "binding_id": "research-state-memory-stateless",
+      "kind": "stateless",
+      "state_lifetime": "attempt"
+    },
+    "stopping": {
+      "binding_id": "research-stopping-syndrome-or-budget",
+      "kind": "syndrome_or_budget",
+      "state_lifetime": "iteration"
+    },
+    "update": {
+      "binding_id": "research-update-binary-spa",
+      "kind": "binary_spa",
+      "state_lifetime": "message"
+    }
+  },
+  "profile_plan": {
+    "cohort": "clean",
+    "enabled": true,
+    "level": "low_overhead",
+    "selected_before_outcome": true
+  },
+  "randomness": {
+    "decoder_seed_identity": "canonical-deterministic-no-local-randomness-v1",
+    "physical_sample_identity": "phase9-yao-b1-t001-p010-v1",
+    "sample_derivation": "sha256-manifest-shot-v1",
+    "sample_seed": 120102
+  },
+  "run_id": "phase9-yao-b1-t001-p010-v3",
+  "schema_version": 5,
+  "trace_plan": {
+    "label": "development_default",
+    "level": "off",
+    "max_bytes": 0,
+    "max_records": 0,
+    "relative_dir": "trace-sidecars"
+  }
+}

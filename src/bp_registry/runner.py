@@ -580,11 +580,17 @@ def _profile_event_template(*, ledger_version: int, route: str, manifest: object
     maximum.  Route and structural version remain digest inputs so a later
     grammar change cannot reuse this authorization silently.
     """
-    del manifest, table
+    del table
     serializer = canonical_serializer_descriptor(structural_event_version=ledger_version)
     ceiling = serializer.get("guarded_event_ceiling")
     if not isinstance(ceiling, dict) or type(ceiling.get("max_framed_bytes")) is not int:
         raise ValueError("canonical serializer lacks a versioned guarded event ceiling")
+    expanded = getattr(manifest, "guarded_event_ceiling_bytes", None)
+    if expanded is not None:
+        if expanded not in {1_048_576, 4_194_304} or route != "phase5:guided_decimation":
+            raise ValueError("expanded event ceiling requires the guided decimation route")
+        ceiling = {**ceiling, "schema": "canonical-guarded-event-ceiling-v2",
+                   "max_framed_bytes": expanded}
     return {"route": route, "ledger_version": ledger_version, **ceiling}
 
 
@@ -655,6 +661,10 @@ def derive_canonical_executable_maxima(context: "CanonicalPublicManifestContext"
     ceiling = _profile_event_template(
         ledger_version=ledger_version, route=route, manifest=manifest, table=table,
     )
+    if ceiling["schema"] == "canonical-guarded-event-ceiling-v2":
+        serializer["guarded_event_ceiling"] = {
+            key: value for key, value in ceiling.items() if key not in {"route", "ledger_version"}
+        }
     serializer_bytes = ceiling["max_framed_bytes"]
     assert type(serializer_bytes) is int
     control_reserve = _neutral_interruption_reserve(manifest)

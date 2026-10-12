@@ -448,9 +448,16 @@ class CanonicalExperimentV5(CanonicalExperimentV4):
     relay: None = None
     intervention: Phase5InterventionContract
     intervention_limits: Phase5ExecutionLimits
+    guarded_event_ceiling_bytes: int | None = Field(default=None, ge=262_144, le=4_194_304)
 
     @model_validator(mode="after")
     def intervention_is_compatible_before_artifacts(self) -> "CanonicalExperimentV5":
+        if self.guarded_event_ceiling_bytes is not None and (
+            type(self.guarded_event_ceiling_bytes) is not int
+            or self.guarded_event_ceiling_bytes not in {1_048_576, 4_194_304}
+            or self.intervention.kind != "guided_decimation"
+        ):
+            raise ValueError("expanded event ceiling is available only for guided decimation")
         if self.policies.intervention.kind != self.intervention.kind:
             raise ValueError("public intervention policy and control kind disagree")
         # BPGD retains its decoder session inside its intervention controller.
@@ -1195,6 +1202,8 @@ def preflight(value: ManifestRecord | dict[str, Any] | str | Path) -> ResolvedEx
 
 def manifest_digest(manifest: ManifestRecord) -> str:
     document = manifest.model_dump(mode="json")
+    if document.get("guarded_event_ceiling_bytes") is None:
+        document.pop("guarded_event_ceiling_bytes", None)
     # Preserve the legacy digest when this optional extension is absent: that
     # digest is also the default deterministic physical-sample identity.
     randomness = document.get("randomness")

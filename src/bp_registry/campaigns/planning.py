@@ -341,7 +341,7 @@ def freeze_failure_count_work_spec(spec: FailureCountWorkSpecV1) -> CampaignWork
         units_per_shard=campaign.units_per_shard,
         max_total_units=spec.policy.caps.max_shots,
         max_shards=min(_MAX_SHARDS, spec.policy.caps.max_shots),
-        max_serialized_bytes=spec.policy.caps.max_evidence_bytes,
+        max_serialized_bytes=min(spec.policy.caps.max_evidence_bytes, _MAX_SERIALIZED_BYTES),
     )
     unsigned = {
         "schema": "failure_count_campaign_work_plan_v1",
