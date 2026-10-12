@@ -50,6 +50,28 @@ has zero completed-shot and failure credit; its consumed resources and pending
 ordinal remain visible. Publication Slurm dispatch for this route remains
 denied until site ceilings are measured.
 
+## Phase 9 ordered controlled campaigns
+
+An ordered document has one top-level `ordered_campaign_work_spec` with a
+validated `campaign_work_spec` and `execution_order`. Its `arm_order` lists
+every arm exactly once. `plan` freezes coordinate, sample-group, and unit
+ordinals in that order; changing the declaration changes the plan digest.
+This route accepts fixed-shot or finite-look work and runs locally only.
+
+```bash
+bp-registry-campaign plan --campaign <ordered-document.json> --campaign-root . --output-root <plan-root>
+bp-registry-campaign run-local --plan <plan-root>/campaign-ordered-plan.json --campaign-root . --output-root <run-root> --max-units 1
+bp-registry-campaign merge --plan <plan-root>/campaign-ordered-plan.json --receipt <run-root>/ordered-run-00000001-00000001.json --campaign-root . --output-root <partial-merge-root>
+bp-registry-campaign resume --plan <plan-root>/campaign-ordered-plan.json --merge <partial-merge-root>/campaign-ordered-merge.json --campaign-root .
+```
+
+Repeat `run-local` in the same run root to execute the exact remaining unit
+prefix; pass all returned ordered run receipts to a fresh `merge` directory.
+Partial merge and `verify --receipt ... --merge ...` report the exact missing
+units and groups, including a group with one completed arm. `assess` requires
+every frozen group to be complete. Then use `verify --report ... --merge ...`
+to replay the terminal report. The route carries a publication Slurm denial.
+
 Phase 8 campaigns separate frozen scientific work from observations about how
 that work was delivered. They produce reproducible development evidence. They
 do not establish a source reproduction, a decoder ranking, or an authorization

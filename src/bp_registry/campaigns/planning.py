@@ -9,7 +9,7 @@ from typing import Final, Mapping, Sequence
 from pydantic import Field, field_validator, model_validator
 
 from ..manifests import StrictModel
-from .contracts import CampaignWorkSpecV1, FailureCountWorkSpecV1, canonical_json_bytes
+from .contracts import CampaignWorkSpecV1, FailureCountWorkSpecV1, OrderedCampaignWorkSpecV1, canonical_json_bytes
 from .identity import decoder_randomness_identity, physical_sample_identity, unit_key
 
 
@@ -147,6 +147,7 @@ def freeze_work_plan(
     max_total_units: int = _MAX_UNITS,
     max_shards: int = _MAX_SHARDS,
     max_serialized_bytes: int = _MAX_SERIALIZED_BYTES,
+    arm_order: Sequence[str] | None = None,
 ) -> CampaignWorkPlan:
     """Derive and seal all work before local or scheduler allocation is chosen."""
     digest = _validate_digest(campaign_spec_digest)
@@ -163,7 +164,13 @@ def freeze_work_plan(
         raise ValueError("campaign coordinates must be unique")
     if not arm_seed_identities:
         raise ValueError("arm_seed_identities must not be empty")
-    arms = tuple(sorted(arm_seed_identities.items()))
+    if arm_order is None:
+        arms = tuple(sorted(arm_seed_identities.items()))
+    else:
+        declared = tuple(arm_order)
+        if len(declared) != len(arm_seed_identities) or len(set(declared)) != len(declared) or set(declared) != set(arm_seed_identities):
+            raise ValueError("declared arm order must cover each frozen arm exactly once")
+        arms = tuple((arm, arm_seed_identities[arm]) for arm in declared)
     if any(not isinstance(arm, str) or not arm or not isinstance(seed, str) or not seed for arm, seed in arms):
         raise ValueError("arm IDs and decoder seed identities must be nonempty strings")
 
@@ -260,6 +267,64 @@ def freeze_campaign_work_spec(spec: CampaignWorkSpecV1) -> CampaignWorkPlan:
     )
 
 
+def freeze_ordered_campaign_work_spec(spec: OrderedCampaignWorkSpecV1) -> CampaignWorkPlan:
+    """Freeze complete matched groups in the declared arm sequence."""
+    if not isinstance(spec, OrderedCampaignWorkSpecV1):
+        raise ValueError("freeze_ordered_campaign_work_spec requires OrderedCampaignWorkSpecV1")
+    campaign = spec.campaign_work_spec
+    plan = freeze_work_plan(
+        campaign_spec_digest=spec.digest(),
+        coordinates=tuple(CampaignCoordinateV1(
+            cohort_id=item.cohort_id, point_id=item.point_id,
+            sample_namespace=item.sample_namespace, sample_ids=item.sample_ids,
+        ) for item in campaign.coordinates),
+        arm_seed_identities={arm.arm_id: arm.decoder_seed_identity for arm in campaign.arms},
+        arm_order=spec.execution_order.arm_order,
+        look_sample_boundaries=campaign.look_sample_boundaries,
+        units_per_shard=campaign.units_per_shard,
+        max_total_units=campaign.assessment.resources.max_events,
+        max_shards=min(_MAX_SHARDS, campaign.assessment.resources.max_events),
+        max_serialized_bytes=campaign.assessment.resources.max_evidence_bytes,
+    )
+    width = len(spec.execution_order.arm_order)
+    groups = []
+    ordinal_units = []
+    for start in range(0, len(plan.units), width):
+        members = plan.units[start:start + width]
+        if len(members) != width or tuple(unit.arm_id for unit in members) != spec.execution_order.arm_order:
+            raise ValueError("ordered campaign contains an incomplete matched group")
+        group_ordinal = start // width + 1
+        groups.append({
+            "group_ordinal": group_ordinal,
+            "cohort_id": members[0].cohort_id,
+            "point_id": members[0].point_id,
+            "sample_namespace": members[0].sample_namespace,
+            "sample_id": members[0].sample_id,
+            "unit_keys": [unit.key for unit in members],
+        })
+        ordinal_units.extend({**unit.payload(), "group_ordinal": group_ordinal,
+                              "unit_ordinal": start + offset + 1}
+                             for offset, unit in enumerate(members))
+    unsigned = {
+        "schema": "ordered_campaign_work_plan_v1",
+        "ordered_work_spec": spec.normalized_payload(),
+        "campaign_spec_digest": spec.digest(),
+        "execution_order": spec.execution_order.model_dump(mode="json", by_alias=True),
+        "groups": groups,
+        "units": ordinal_units,
+        "shards": [shard.payload() for shard in plan.shards],
+        "look_sample_boundaries": list(plan.look_boundaries),
+    }
+    preimage = canonical_json_bytes(unsigned)
+    if len(preimage) > campaign.assessment.resources.max_evidence_bytes:
+        raise ValueError("ordered campaign plan exceeds the frozen evidence cap")
+    digest = sha256(b"bp-registry-ordered-campaign-plan-v1\0" + preimage).hexdigest()
+    return CampaignWorkPlan(
+        campaign_spec_digest=spec.digest(), units=plan.units, shards=plan.shards,
+        look_boundaries=plan.look_boundaries, units_per_sample_group=width,
+        campaign_plan_preimage=preimage, campaign_plan_digest=digest,
+        work_spec=campaign,
+    )
 def freeze_failure_count_work_spec(spec: FailureCountWorkSpecV1) -> CampaignWorkPlan:
     """Freeze one-arm failure-count ordinals before any outcome is observed."""
     if not isinstance(spec, FailureCountWorkSpecV1):

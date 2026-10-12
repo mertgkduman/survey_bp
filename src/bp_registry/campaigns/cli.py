@@ -22,19 +22,19 @@ from typing import Any, Callable, Mapping
 from pydantic import ValidationError
 
 from ..manifests import preflight as preflight_manifest
-from .contracts import CampaignSpecV1, CampaignWorkSpecV1, FailureCountWorkSpecV1, MaterializedPhysicalSampleV1, build_one_unit_plan, canonical_json_bytes
+from .contracts import CampaignSpecV1, CampaignWorkSpecV1, FailureCountWorkSpecV1, OrderedCampaignWorkSpecV1, MaterializedPhysicalSampleV1, build_one_unit_plan, canonical_json_bytes
 from .execution import (
     _build_look_merge_receipt, _deterministic_look_stop_receipt, _sealed_local_records,
     dispatch_finite_looks, run_canonical_work_plan, run_one_unit, verify_canonical_attempt,
 )
-from .planning import CampaignCoordinateV1, CampaignWorkPlan, failure_count_plan_binding, freeze_campaign_work_spec, freeze_failure_count_work_spec, freeze_work_plan
+from .planning import CampaignCoordinateV1, CampaignWorkPlan, failure_count_plan_binding, freeze_campaign_work_spec, freeze_failure_count_work_spec, freeze_ordered_campaign_work_spec, freeze_work_plan
 from .failure_count_public import (
     dispatch_public_failure_count_batch, failure_count_merge_payload,
     failure_count_report_payload, reconstruct_failure_count_state,
     verify_failure_count_merge,
 )
 from .shards import derive_resume_plan, merge_verified_attempts
-from .reporting import reconstruct_campaign_report, verify_campaign_report, verify_campaign_routes
+from .reporting import reconstruct_campaign_report, require_complete_ordered_campaign, verify_campaign_report, verify_campaign_routes
 from .shards import reconstruct_fixed_shot, verify_shard
 from .slurm import (
     SchedulerObservation,
@@ -401,6 +401,48 @@ def _load_work_plan(plan_path: str, root: Path) -> tuple[CampaignWorkSpecV1, Cam
     return spec, freeze_campaign_work_spec(spec), payload
 
 
+def _ordered_document(campaign_path: str, root: Path) -> OrderedCampaignWorkSpecV1:
+    document = _read_json(campaign_path)
+    if set(document) != {"ordered_campaign_work_spec"} or not isinstance(document["ordered_campaign_work_spec"], Mapping):
+        raise ValueError("ordered campaign document must contain exactly ordered_campaign_work_spec")
+    spec = OrderedCampaignWorkSpecV1.model_validate(document["ordered_campaign_work_spec"])
+    from .execution import _preflight_work_arms
+    _preflight_work_arms(spec.campaign_work_spec, root)
+    return spec
+
+
+def _ordered_plan_payload(spec: OrderedCampaignWorkSpecV1) -> dict[str, Any]:
+    plan = freeze_ordered_campaign_work_spec(spec)
+    preimage = json.loads(plan.campaign_plan_preimage)
+    return {
+        "schema": "ordered_campaign_public_plan_v1",
+        "ordered_campaign_work_spec": spec.normalized_payload(),
+        "campaign_spec_digest": plan.campaign_spec_digest,
+        "campaign_plan_digest": plan.campaign_plan_digest,
+        "assessment_digest": spec.campaign_work_spec.assessment.digest(),
+        "execution_order": preimage["execution_order"],
+        "groups": preimage["groups"],
+        "units": preimage["units"],
+        "shards": preimage["shards"],
+        "look_sample_boundaries": preimage["look_sample_boundaries"],
+        "executor_route": "local",
+        "publication_slurm_authorization": "deny",
+    }
+
+
+def _load_ordered_plan(path: str, root: Path) -> tuple[OrderedCampaignWorkSpecV1, CampaignWorkPlan, dict[str, Any]]:
+    payload = _read_json(path)
+    if payload.get("schema") != "ordered_campaign_public_plan_v1" or not isinstance(payload.get("ordered_campaign_work_spec"), Mapping):
+        raise ValueError("ordered campaign plan has an invalid schema")
+    spec = OrderedCampaignWorkSpecV1.model_validate(payload["ordered_campaign_work_spec"])
+    expected = _ordered_plan_payload(spec)
+    if payload != expected or _json_bytes(Path(path)) != canonical_json_bytes(expected) + b"\n":
+        raise ValueError("ordered campaign plan differs from prospective inputs")
+    from .execution import _preflight_work_arms
+    _preflight_work_arms(spec.campaign_work_spec, root)
+    return spec, freeze_ordered_campaign_work_spec(spec), payload
+
+
 def _paired_run(
     args: argparse.Namespace, *, root: Path, output: Path,
     shards: tuple[Any, ...] | None = None,
@@ -458,6 +500,84 @@ def _paired_attempts(receipt_path: str, *, plan: CampaignWorkPlan) -> tuple[dict
     if not isinstance(attempts, list):
         raise ValueError("paired run artifact lacks attempts")
     return tuple(verify_canonical_attempt(record=item, plan=plan) for item in attempts)
+
+
+def _ordered_projection(plan: CampaignWorkPlan, terminal_keys: tuple[str, ...]) -> dict[str, Any]:
+    preimage = json.loads(plan.campaign_plan_preimage)
+    if preimage.get("schema") != "ordered_campaign_work_plan_v1":
+        raise ValueError("ordered projection requires a frozen ordered plan")
+    complete = set(terminal_keys)
+    groups = preimage["groups"]
+    missing = [unit.key for unit in plan.units if unit.key not in complete]
+    return {
+        "execution_order": preimage["execution_order"],
+        "complete_group_ordinals": [group["group_ordinal"] for group in groups if set(group["unit_keys"]) <= complete],
+        "missing_group_ordinals": [group["group_ordinal"] for group in groups if not set(group["unit_keys"]) <= complete],
+        "terminal_unit_keys": [unit.key for unit in plan.units if unit.key in complete],
+        "missing_unit_keys": missing,
+        "complete": not missing,
+    }
+
+
+def _ordered_run_attempts(path: Path, *, plan: CampaignWorkPlan) -> tuple[dict[str, Any], ...]:
+    import re
+
+    if _json_bytes(path) != canonical_json_bytes(_read_json(str(path))) + b"\n":
+        raise ValueError("ordered run receipt has noncanonical bytes")
+    match = re.fullmatch(r"ordered-run-(\d{8})-(\d{8})\.json", path.name)
+    if match is None:
+        raise ValueError("ordered run receipt name lacks frozen ordinals")
+    first, last = (int(match.group(1)), int(match.group(2)))
+    if first < 1 or last < first or last > len(plan.units):
+        raise ValueError("ordered run receipt ordinals are outside frozen plan")
+    attempts = _paired_attempts(str(path), plan=plan)
+    if tuple(item["unit_key"] for item in attempts) != plan.unit_keys[first - 1:last]:
+        raise ValueError("ordered run receipt changed frozen unit sequence")
+    return attempts
+
+
+def _ordered_existing_runs(output: Path, *, plan: CampaignWorkPlan) -> tuple[tuple[Path, ...], tuple[dict[str, Any], ...]]:
+    paths = tuple(sorted(output.glob("ordered-run-*.json")))
+    by_key: dict[str, dict[str, Any]] = {}
+    for path in paths:
+        if path.is_symlink() or not path.is_file():
+            raise ValueError("ordered run artifact must be a regular file")
+        for attempt in _ordered_run_attempts(path, plan=plan):
+            key = attempt["unit_key"]
+            if key in by_key:
+                raise ValueError("ordered execution has a duplicate completed unit")
+            by_key[key] = attempt
+    prefix = plan.unit_keys[:len(by_key)]
+    if set(by_key) != set(prefix):
+        raise ValueError("ordered execution receipts must cover one frozen prefix")
+    return paths, tuple(by_key[key] for key in prefix)
+
+
+def _ordered_run(args: argparse.Namespace, *, root: Path, output: Path) -> dict[str, Any]:
+    _spec, plan, payload = _load_ordered_plan(args.plan, root)
+    _paths, prior = _ordered_existing_runs(output, plan=plan)
+    pending = plan.unit_keys[len(prior):]
+    if not pending:
+        return _artifact(status="ok", plan=payload, phase="run_local", executor_route="local",
+                         complete=True, terminal_unit_keys=list(plan.unit_keys), missing_unit_keys=[])
+    limit = getattr(args, "max_units", None)
+    if limit is not None and (type(limit) is not int or limit < 1):
+        raise ValueError("max-units must be a positive integer")
+    selected = pending if limit is None else pending[:limit]
+    execution = run_canonical_work_plan(plan, campaign_root=root, output_root=output, selected_unit_keys=selected)
+    serializable = {
+        "schema": "campaign_paired_run_v1", "campaign_spec_digest": plan.campaign_spec_digest,
+        "campaign_plan_digest": plan.campaign_plan_digest,
+        "attempts": list(execution["verified_attempts"]),
+        "materialized_sample_sha256s": [item.materialized_sample_sha256 for item in execution["materialized_samples"]],
+        "physical_error_sha256s": [item.physical_error_sha256 for item in execution["materialized_samples"]],
+    }
+    first, last = len(prior) + 1, len(prior) + len(selected)
+    artifact = _publish_json(output / f"ordered-run-{first:08d}-{last:08d}.json", serializable)
+    projection = _ordered_projection(plan, plan.unit_keys[:last])
+    return _artifact(status="ok", plan=payload, phase="run_local", executor_route="local",
+                     artifact_path=str(artifact), artifact_sha256=sha256(artifact.read_bytes()).hexdigest(),
+                     **projection)
 
 
 def _route_neutral_trace(events: object) -> bytes:
@@ -607,10 +727,48 @@ def _paired_merge(args: argparse.Namespace, *, root: Path, plan: CampaignWorkPla
                      artifact_sha256=sha256(artifact.read_bytes()).hexdigest(), member_count=len(all_attempts))
 
 
-def _paired_merge_payload(path: str, *, plan: CampaignWorkPlan) -> dict[str, Any]:
+def _ordered_merge(args: argparse.Namespace, *, root: Path, plan: CampaignWorkPlan, payload: Mapping[str, Any]) -> dict[str, Any]:
+    indexes = []
+    attempts = []
+    seen_paths: set[Path] = set()
+    for receipt in args.receipt:
+        supplied = Path(receipt)
+        if supplied.is_symlink() or not supplied.is_file():
+            raise ValueError("ordered merge requires regular non-symlink receipts")
+        path = supplied.resolve(strict=True)
+        if path in seen_paths or path.is_symlink() or not path.name.startswith("ordered-run-"):
+            raise ValueError("ordered merge requires unique ordered run receipts")
+        seen_paths.add(path)
+        indexes.append({"path": str(path), "sha256": sha256(path.read_bytes()).hexdigest()})
+        attempts.extend(_ordered_run_attempts(path, plan=plan))
+    by_key = {item["unit_key"]: item for item in attempts}
+    if len(by_key) != len(attempts):
+        raise ValueError("ordered merge rejects duplicate unit delivery")
+    if set(by_key) != set(plan.unit_keys[:len(by_key)]):
+        raise ValueError("ordered merge requires a frozen unit prefix")
+    ordered = tuple(by_key[key] for key in plan.unit_keys[:len(by_key)])
+    merged = merge_verified_attempts(plan=plan, verified_attempts=ordered)
+    projection = _ordered_projection(plan, tuple(merged["terminal_unit_keys"]))
+    envelope = {
+        "schema": "campaign_ordered_merge_envelope_v1",
+        "canonical_merge": {key: value for key, value in merged.items() if key != "receipt_bytes"},
+        "verified_attempts": list(ordered),
+        "attempt_artifacts": sorted(indexes, key=lambda item: (item["path"], item["sha256"])),
+        "materialized_samples_by_identity": _materialized_sample_index(ordered),
+        "ordered_projection": projection,
+    }
+    artifact = _publish_json(_output_root(args.output_root) / "campaign-ordered-merge.json", envelope)
+    return _artifact(status="ok", plan=payload, phase="merge", artifact_path=str(artifact),
+                     artifact_sha256=sha256(artifact.read_bytes()).hexdigest(), member_count=len(ordered),
+                     **projection)
+
+
+def _paired_merge_payload(path: str, *, plan: CampaignWorkPlan, ordered: bool = False) -> dict[str, Any]:
     payload = _read_json(path)
     required = {"schema", "canonical_merge", "verified_attempts", "attempt_artifacts", "materialized_samples_by_identity"}
-    if set(payload) != required or payload.get("schema") != "campaign_paired_merge_envelope_v1":
+    if ordered:
+        required.add("ordered_projection")
+    if set(payload) != required or payload.get("schema") != ("campaign_ordered_merge_envelope_v1" if ordered else "campaign_paired_merge_envelope_v1"):
         raise ValueError("paired merge artifact has an invalid envelope")
     attempts = payload["verified_attempts"]
     if not isinstance(attempts, list):
@@ -629,7 +787,8 @@ def _paired_merge_payload(path: str, *, plan: CampaignWorkPlan) -> dict[str, Any
             raise ValueError("paired merge artifact input receipt index differs from retained bytes")
     indexed_attempts = tuple(
         attempt for item in artifacts
-        for attempt in _paired_attempts(str(item["path"]), plan=plan)
+        for attempt in (_ordered_run_attempts(Path(str(item["path"])), plan=plan) if ordered
+                        else _paired_attempts(str(item["path"]), plan=plan))
     )
     if Counter(canonical_json_bytes(item) for item in indexed_attempts) != Counter(
         canonical_json_bytes(item) for item in verified
@@ -646,8 +805,18 @@ def _paired_merge_payload(path: str, *, plan: CampaignWorkPlan) -> dict[str, Any
             or payload["attempt_artifacts"] != sorted((dict(item) for item in artifacts), key=lambda item: (str(item["path"]), str(item["sha256"])))
             or payload["materialized_samples_by_identity"] != _materialized_sample_index(verified)):
         raise ValueError("paired merge artifact differs from verified attempt reduction")
+    if ordered:
+        by_key = {item["unit_key"]: item for item in verified}
+        if len(by_key) != len(verified) or set(by_key) != set(plan.unit_keys[:len(by_key)]):
+            raise ValueError("ordered merge attempts differ from the frozen prefix")
+        expected_order = tuple(by_key[key] for key in plan.unit_keys[:len(by_key)])
+        if list(expected_order) != attempts:
+            raise ValueError("ordered merge changed frozen unit order")
+        if payload["ordered_projection"] != _ordered_projection(plan, tuple(full["terminal_unit_keys"])):
+            raise ValueError("ordered merge projection differs from frozen groups")
     return {**full, "verified_attempts": reduced_attempts,
-            "materialized_samples_by_identity": indexed_samples}
+            "materialized_samples_by_identity": indexed_samples,
+            **({"ordered_projection": payload["ordered_projection"]} if ordered else {})}
 
 
 def _paired_report_inputs(
@@ -658,7 +827,7 @@ def _paired_report_inputs(
         raise ValueError("paired report requires a frozen assessment")
     receipt = {
         key: value for key, value in merged.items()
-        if key not in {"verified_attempts", "materialized_samples_by_identity"}
+        if key not in {"verified_attempts", "materialized_samples_by_identity", "ordered_projection"}
     }
     attempts = merged.get("verified_attempts")
     if not isinstance(attempts, tuple):
@@ -752,6 +921,11 @@ def _preflight(args: argparse.Namespace) -> dict[str, Any]:
         spec = _failure_count_document(args.campaign, root)
         return _artifact(status="ok", plan=_failure_count_plan_payload(spec), phase="preflight",
                          sampling_performed=False, executor_route="local")
+    if "ordered_campaign_work_spec" in document:
+        spec = _ordered_document(args.campaign, root)
+        return _artifact(status="ok", plan=_ordered_plan_payload(spec), phase="preflight",
+                         sampling_performed=False, executor_route="local",
+                         publication_slurm_authorization="deny")
     if "campaign_work_spec" in document:
         spec = _work_document(args.campaign, root)
         return _artifact(
@@ -773,6 +947,14 @@ def _plan(args: argparse.Namespace) -> dict[str, Any]:
                          artifact_sha256=sha256(artifact.read_bytes()).hexdigest(),
                          unit_count=len(payload["units"]), shard_count=len(payload["shards"]),
                          executor_route="local", publication_slurm_authorization="deny")
+    if "ordered_campaign_work_spec" in document:
+        spec = _ordered_document(args.campaign, root)
+        payload = _ordered_plan_payload(spec)
+        artifact = _publish_json(_output_root(args.output_root) / "campaign-ordered-plan.json", payload)
+        return _artifact(status="ok", plan=payload, phase="plan", artifact_path=str(artifact),
+                         artifact_sha256=sha256(artifact.read_bytes()).hexdigest(),
+                         unit_count=len(payload["units"]), shard_count=len(payload["shards"]),
+                         executor_route="local", publication_slurm_authorization="deny")
     if "campaign_work_spec" in document:
         spec = _work_document(args.campaign, root)
         payload = _work_plan_payload(spec)
@@ -790,6 +972,12 @@ def _plan(args: argparse.Namespace) -> dict[str, Any]:
 
 def _run(args: argparse.Namespace, *, route: str) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
+    if _read_json(args.plan).get("schema") == "ordered_campaign_public_plan_v1":
+        if route != "local":
+            raise ValueError("ordered controlled campaigns authorize local execution only")
+        return _ordered_run(args, root=root, output=_output_root(args.output_root))
+    if getattr(args, "max_units", None) is not None:
+        raise ValueError("max-units applies only to ordered controlled campaigns")
     if _read_json(args.plan).get("schema") == "failure_count_public_plan_v1":
         if route != "local":
             raise ValueError("failure-count campaigns authorize local bounded execution only")
@@ -830,6 +1018,29 @@ def _run(args: argparse.Namespace, *, route: str) -> dict[str, Any]:
 
 def _verify(args: argparse.Namespace) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
+    if args.plan is not None and _read_json(args.plan).get("schema") == "ordered_campaign_public_plan_v1":
+        spec, plan, payload = _load_ordered_plan(args.plan, root)
+        if args.merge is None:
+            raise ValueError("ordered verification requires --merge")
+        merged = _paired_merge_payload(args.merge, plan=plan, ordered=True)
+        projection = merged["ordered_projection"]
+        if args.report is not None:
+            require_complete_ordered_campaign(plan=plan, merged=merged)
+            report, artifact_sha = _verify_paired_report(
+                report_path=args.report, plan=plan, spec=spec.campaign_work_spec, merged=merged)
+            return _artifact(status="ok", plan=payload, phase="verify", verified=True,
+                             report_sha256=report.report_sha256, report_artifact_sha256=artifact_sha,
+                             merge_receipt_sha256=report.merge_receipt_sha256, **projection)
+        if args.receipt is None:
+            raise ValueError("ordered verification requires --receipt or --report")
+        receipt = Path(args.receipt).resolve(strict=True)
+        artifact_paths = {item["path"] for item in _read_json(args.merge)["attempt_artifacts"]}
+        if str(receipt) not in artifact_paths:
+            raise ValueError("ordered receipt is absent from verified merge inputs")
+        attempts = _ordered_run_attempts(receipt, plan=plan)
+        return _artifact(status="ok", plan=payload, phase="verify", verified=True,
+                         receipt_sha256=sha256(receipt.read_bytes()).hexdigest(),
+                         verified_attempt_count=len(attempts), **projection)
     if args.plan is not None and _read_json(args.plan).get("schema") == "failure_count_public_plan_v1":
         _spec, plan, payload = _load_failure_count_plan(args.plan, root)
         if args.merge is None:
@@ -1007,6 +1218,9 @@ def _verify_operational_gate(args: argparse.Namespace) -> dict[str, Any]:
 
 def _merge(args: argparse.Namespace) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
+    if args.plan is not None and _read_json(args.plan).get("schema") == "ordered_campaign_public_plan_v1":
+        _spec, plan, payload = _load_ordered_plan(args.plan, root)
+        return _ordered_merge(args, root=root, plan=plan, payload=payload)
     if args.plan is not None and _read_json(args.plan).get("schema") == "failure_count_public_plan_v1":
         _spec, plan, payload = _load_failure_count_plan(args.plan, root)
         bounded_roots = {_failure_count_receipt_root(item) for item in args.receipt}
@@ -1109,6 +1323,12 @@ def _verified_merge(merge_path: str, campaign_root: Path) -> dict[str, Any]:
 
 def _resume(args: argparse.Namespace) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
+    if _read_json(args.plan).get("schema") == "ordered_campaign_public_plan_v1":
+        _spec, plan, payload = _load_ordered_plan(args.plan, root)
+        merged = _paired_merge_payload(args.merge, plan=plan, ordered=True)
+        projection = merged["ordered_projection"]
+        return _artifact(status="ok", plan=payload, phase="resume", exact_missing_set=projection["missing_unit_keys"],
+                         resumable_unit_keys=projection["missing_unit_keys"], **projection)
     if _read_json(args.plan).get("schema") == "failure_count_public_plan_v1":
         _spec, plan, payload = _load_failure_count_plan(args.plan, root)
         merged, state = _failure_count_verified_merge(args.merge, plan=plan, root=root)
@@ -1163,6 +1383,19 @@ def _resume(args: argparse.Namespace) -> dict[str, Any]:
 def _assess(args: argparse.Namespace) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
     plan_path = getattr(args, "plan", None)
+    if plan_path is not None and _read_json(plan_path).get("schema") == "ordered_campaign_public_plan_v1":
+        spec, plan, payload = _load_ordered_plan(plan_path, root)
+        merged = _paired_merge_payload(args.merge, plan=plan, ordered=True)
+        require_complete_ordered_campaign(plan=plan, merged=merged)
+        if args.output_root is None:
+            raise ValueError("ordered assess requires --output-root")
+        report = reconstruct_campaign_report(**_paired_report_inputs(
+            plan=plan, spec=spec.campaign_work_spec, merged=merged))
+        artifact = _publish_json(_output_root(args.output_root) / "ordered-assessment.json", asdict(report))
+        return _artifact(status="ok", plan=payload, phase="assess", assessment_status="evidence_reconstructed",
+                         artifact_path=str(artifact), artifact_sha256=sha256(artifact.read_bytes()).hexdigest(),
+                         report_sha256=report.report_sha256, merge_receipt_sha256=report.merge_receipt_sha256,
+                         **merged["ordered_projection"])
     if plan_path is not None and _read_json(plan_path).get("schema") == "failure_count_public_plan_v1":
         _spec, plan, payload = _load_failure_count_plan(plan_path, root)
         merged, state = _failure_count_verified_merge(args.merge, plan=plan, root=root)
@@ -1199,6 +1432,8 @@ def _assess(args: argparse.Namespace) -> dict[str, Any]:
 
 def _emit_slurm(args: argparse.Namespace) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
+    if _read_json(args.plan).get("schema") == "ordered_campaign_public_plan_v1":
+        raise ValueError("ordered controlled publication Slurm is not authorized without measured site ceilings")
     if _read_json(args.plan).get("schema") == "failure_count_public_plan_v1":
         raise ValueError("failure-count publication Slurm is not authorized without measured site ceilings")
     if _read_json(args.plan).get("schema") == "campaign_work_plan_v1":
@@ -1368,6 +1603,8 @@ def _parser() -> argparse.ArgumentParser:
         item.add_argument("--plan", required=True)
         item.add_argument("--campaign-root", required=True)
         item.add_argument("--output-root", required=True)
+        if route == "local":
+            item.add_argument("--max-units", type=int)
         if route == "slurm":
             item.add_argument("--array-task-id", required=True)
             item.add_argument("--allocation")

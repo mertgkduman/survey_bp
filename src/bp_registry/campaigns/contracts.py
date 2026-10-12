@@ -873,6 +873,60 @@ class CampaignWorkSpecV1(StrictModel):
         return _digest("bp-registry-campaign-work-spec-v1", self.primitive_bytes())
 
 
+class CampaignExecutionOrderV1(StrictModel):
+    """Prospective sample-major order for a matched multi-arm campaign."""
+
+    schema_name: Literal["campaign_execution_order_v1"] = Field(alias="schema", serialization_alias="schema")
+    rule: Literal["coordinate_point_namespace_sample_declared_arm_v1"]
+    arm_order: tuple[str, ...] = Field(min_length=2, max_length=256)
+
+    @field_validator("arm_order", mode="before")
+    @classmethod
+    def tuple_arm_order(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @model_validator(mode="after")
+    def complete_unique_arm_order(self) -> "CampaignExecutionOrderV1":
+        if len(set(self.arm_order)) != len(self.arm_order) or any(not arm for arm in self.arm_order):
+            raise ValueError("declared arm order requires unique nonempty arm IDs")
+        return self
+
+
+class OrderedCampaignWorkSpecV1(StrictModel):
+    """Additive fixed/finite wrapper; historical work-spec bytes stay intact."""
+
+    schema_name: Literal["ordered_campaign_work_spec_v1"] = Field(alias="schema", serialization_alias="schema")
+    campaign_work_spec: CampaignWorkSpecV1
+    execution_order: CampaignExecutionOrderV1
+
+    @model_validator(mode="after")
+    def declared_arms_match_fixed_or_finite_work(self) -> "OrderedCampaignWorkSpecV1":
+        declared = self.execution_order.arm_order
+        actual = tuple(arm.arm_id for arm in self.campaign_work_spec.arms)
+        if len(actual) != len(declared) or set(actual) != set(declared):
+            raise ValueError("declared arm order must cover the exact frozen arm set")
+        if not isinstance(self.campaign_work_spec.assessment.stopping, (FixedShotStoppingV1, FiniteLookStoppingV1)):
+            raise ValueError("ordered multi-arm work requires fixed-shot or finite-look stopping")
+        return self
+
+    def normalized_payload(self) -> dict[str, Any]:
+        payload = self.model_dump(mode="json", by_alias=True)
+        inner = payload["campaign_work_spec"]
+        inner["arms"] = sorted(inner["arms"], key=lambda item: item["arm_id"])
+        inner["coordinates"] = sorted(inner["coordinates"], key=lambda item: (
+            item["cohort_id"], item["point_id"], item["sample_namespace"],
+        ))
+        for coordinate in inner["coordinates"]:
+            coordinate["sample_ids"] = sorted(coordinate["sample_ids"])
+        return payload
+
+    def primitive_bytes(self) -> bytes:
+        return canonical_json_bytes(self.normalized_payload())
+
+    def digest(self) -> str:
+        return _digest("bp-registry-ordered-campaign-work-spec-v1", self.primitive_bytes())
+
+
 class FailureCountWorkSpecV1(StrictModel):
     """Outcome-independent authorization for one canonical failure-count arm.
 

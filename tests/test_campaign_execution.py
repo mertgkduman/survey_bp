@@ -296,6 +296,156 @@ def _single_arm_failure_count_work_spec_payload() -> dict[str, object]:
     return {"schema": "failure_count_work_spec_v1", "campaign_work_spec": payload, "policy": policy}
 
 
+def _ordered_work_spec_payload() -> dict[str, object]:
+    base = _paired_work_spec_payload()
+    base["coordinates"] = [
+        {"cohort_id": "zeta", "point_id": "p100", "sample_namespace": base["shared_sampler"]["physical_sample_namespace"], "sample_ids": [1]},
+        {"cohort_id": "alpha", "point_id": "p100", "sample_namespace": base["shared_sampler"]["physical_sample_namespace"], "sample_ids": [0]},
+    ]
+    base["look_sample_boundaries"] = [2]
+    base["units_per_shard"] = 1
+    base["assessment"]["stopping"]["final_shots"] = 2
+    base["assessment"]["resources"].update({"max_shots": 2, "max_batch_size": 2, "max_events": 4})
+    return {"schema": "ordered_campaign_work_spec_v1", "campaign_work_spec": base,
+            "execution_order": {"schema": "campaign_execution_order_v1",
+                                "rule": "coordinate_point_namespace_sample_declared_arm_v1",
+                                "arm_order": ["right", "left"]}}
+
+
+def test_ordered_work_spec_freezes_declared_arm_order_and_group_ordinals() -> None:
+    from bp_registry.campaigns.contracts import OrderedCampaignWorkSpecV1
+    from bp_registry.campaigns.planning import freeze_ordered_campaign_work_spec
+
+    spec = OrderedCampaignWorkSpecV1.model_validate(_ordered_work_spec_payload())
+    plan = freeze_ordered_campaign_work_spec(spec)
+    assert [unit.arm_id for unit in plan.units] == ["right", "left", "right", "left"]
+    assert [unit.cohort_id for unit in plan.units] == ["alpha", "alpha", "zeta", "zeta"]
+    preimage = json.loads(plan.campaign_plan_preimage)
+    assert preimage["execution_order"]["arm_order"] == ["right", "left"]
+    assert [group["group_ordinal"] for group in preimage["groups"]] == [1, 2]
+    assert [entry["unit_ordinal"] for entry in preimage["units"]] == [1, 2, 3, 4]
+    assert preimage["groups"][0]["unit_keys"] == [plan.units[0].key, plan.units[1].key]
+
+
+def test_declared_arm_order_changes_identity_but_input_topology_permutation_does_not() -> None:
+    from bp_registry.campaigns.contracts import CampaignWorkSpecV1, OrderedCampaignWorkSpecV1
+    from bp_registry.campaigns.planning import freeze_campaign_work_spec, freeze_ordered_campaign_work_spec
+
+    original = _ordered_work_spec_payload()
+    historical = CampaignWorkSpecV1.model_validate(original["campaign_work_spec"])
+    historical_bytes = historical.primitive_bytes()
+    historical_plan_bytes = freeze_campaign_work_spec(historical).campaign_plan_preimage
+    baseline = freeze_ordered_campaign_work_spec(OrderedCampaignWorkSpecV1.model_validate(original))
+    permuted = json.loads(json.dumps(original))
+    permuted["campaign_work_spec"]["arms"].reverse()
+    permuted["campaign_work_spec"]["coordinates"].reverse()
+    assert freeze_ordered_campaign_work_spec(OrderedCampaignWorkSpecV1.model_validate(permuted)).campaign_plan_preimage == baseline.campaign_plan_preimage
+    reversed_order = json.loads(json.dumps(original))
+    reversed_order["execution_order"]["arm_order"] = ["left", "right"]
+    assert freeze_ordered_campaign_work_spec(OrderedCampaignWorkSpecV1.model_validate(reversed_order)).campaign_plan_digest != baseline.campaign_plan_digest
+    assert historical.primitive_bytes() == historical_bytes
+    assert freeze_campaign_work_spec(historical).campaign_plan_preimage == historical_plan_bytes
+    assert [unit.arm_id for unit in freeze_campaign_work_spec(historical).units[:2]] == ["left", "right"]
+
+
+@pytest.mark.parametrize("arms", (["left"], ["left", "left"], ["left", "unknown"], ["right", "left", "extra"]))
+def test_ordered_work_spec_rejects_invalid_declared_arm_membership(arms: list[str]) -> None:
+    from bp_registry.campaigns.contracts import OrderedCampaignWorkSpecV1
+
+    payload = _ordered_work_spec_payload()
+    payload["execution_order"]["arm_order"] = arms
+    with pytest.raises(ValueError, match="arm"):
+        OrderedCampaignWorkSpecV1.model_validate(payload)
+
+
+def test_installed_ordered_campaign_inside_group_partial_resume_and_terminal(tmp_path: Path) -> None:
+    document = tmp_path / "ordered.json"
+    ordered = _ordered_work_spec_payload()
+    coordinate = ordered["campaign_work_spec"]["coordinates"][0]
+    coordinate["sample_ids"] = [1, 0]
+    ordered["campaign_work_spec"]["coordinates"] = [coordinate]
+    document.write_text(json.dumps({"ordered_campaign_work_spec": ordered}), encoding="utf-8")
+    planned = _run_installed_campaign("plan", "--campaign", str(document), "--campaign-root", str(ROOT),
+                                      "--output-root", str(tmp_path / "plan"))
+    assert planned.returncode == 0, planned.stdout
+    plan_path = json.loads(planned.stdout)["artifact_path"]
+    frozen = json.loads(Path(plan_path).read_text())
+    assert frozen["publication_slurm_authorization"] == "deny"
+    assert frozen["execution_order"]["arm_order"] == ["right", "left"]
+    run_root = tmp_path / "run"
+    first = _run_installed_campaign("run-local", "--plan", plan_path, "--campaign-root", str(ROOT),
+                                    "--output-root", str(run_root), "--max-units", "1")
+    assert first.returncode == 0, first.stdout
+    first_path = json.loads(first.stdout)["artifact_path"]
+    partial = _run_installed_campaign("merge", "--plan", plan_path, "--receipt", first_path,
+                                      "--campaign-root", str(ROOT), "--output-root", str(tmp_path / "partial"))
+    assert partial.returncode == 0, partial.stdout
+    partial_info = json.loads(partial.stdout)
+    assert partial_info["complete"] is False
+    assert partial_info["terminal_unit_keys"] == [frozen["units"][0]["unit_key"]]
+    assert partial_info["missing_group_ordinals"] == [1, 2]
+    partial_merge = partial_info["artifact_path"]
+    verified = _run_installed_campaign("verify", "--plan", plan_path, "--merge", partial_merge,
+                                       "--receipt", first_path, "--campaign-root", str(ROOT))
+    assert verified.returncode == 0, verified.stdout
+    assert json.loads(verified.stdout)["complete"] is False
+    resumed = _run_installed_campaign("resume", "--plan", plan_path, "--merge", partial_merge,
+                                      "--campaign-root", str(ROOT))
+    assert resumed.returncode == 0, resumed.stdout
+    assert json.loads(resumed.stdout)["exact_missing_set"] == [unit["unit_key"] for unit in frozen["units"][1:]]
+    premature = _run_installed_campaign("assess", "--plan", plan_path, "--merge", partial_merge,
+                                        "--campaign-root", str(ROOT), "--output-root", str(tmp_path / "premature"))
+    assert premature.returncode != 0
+    second = _run_installed_campaign("run-local", "--plan", plan_path, "--campaign-root", str(ROOT),
+                                     "--output-root", str(run_root))
+    assert second.returncode == 0, second.stdout
+    second_path = json.loads(second.stdout)["artifact_path"]
+    assert len(json.loads(Path(second_path).read_text())["attempts"]) == 3
+    terminal = _run_installed_campaign("merge", "--plan", plan_path, "--receipt", second_path,
+                                       "--receipt", first_path, "--campaign-root", str(ROOT),
+                                       "--output-root", str(tmp_path / "terminal"))
+    assert terminal.returncode == 0, terminal.stdout
+    terminal_info = json.loads(terminal.stdout)
+    assert terminal_info["complete"] is True
+    assessment = _run_installed_campaign("assess", "--plan", plan_path, "--merge", terminal_info["artifact_path"],
+                                         "--campaign-root", str(ROOT), "--output-root", str(tmp_path / "assessment"))
+    assert assessment.returncode == 0, assessment.stdout
+    checked = _run_installed_campaign("verify", "--plan", plan_path, "--merge", terminal_info["artifact_path"],
+                                      "--report", json.loads(assessment.stdout)["artifact_path"],
+                                      "--campaign-root", str(ROOT))
+    assert checked.returncode == 0, checked.stdout
+    reordered = json.loads(Path(second_path).read_text())
+    reordered["attempts"].reverse()
+    forged = tmp_path / Path(second_path).name
+    forged.write_text(json.dumps(reordered), encoding="utf-8")
+    rejected = _run_installed_campaign("merge", "--plan", plan_path, "--receipt", first_path,
+                                       "--receipt", str(forged), "--campaign-root", str(ROOT),
+                                       "--output-root", str(tmp_path / "reordered"))
+    assert rejected.returncode != 0
+    duplicate = _run_installed_campaign("merge", "--plan", plan_path, "--receipt", first_path,
+                                        "--receipt", first_path, "--campaign-root", str(ROOT),
+                                        "--output-root", str(tmp_path / "duplicate"))
+    assert duplicate.returncode != 0
+    denied = _run_installed_campaign("run-shard", "--plan", plan_path, "--array-task-id", "0",
+                                     "--campaign-root", str(ROOT), "--output-root", str(tmp_path / "denied"))
+    assert denied.returncode != 0
+
+
+def test_ordered_tamper_rejects_changed_arm_sequence(tmp_path: Path) -> None:
+    document = tmp_path / "ordered.json"
+    document.write_text(json.dumps({"ordered_campaign_work_spec": _ordered_work_spec_payload()}), encoding="utf-8")
+    planned = _run_installed_campaign("plan", "--campaign", str(document), "--campaign-root", str(ROOT),
+                                      "--output-root", str(tmp_path / "plan"))
+    assert planned.returncode == 0, planned.stdout
+    original = json.loads(Path(json.loads(planned.stdout)["artifact_path"]).read_text())
+    original["execution_order"]["arm_order"].reverse()
+    tampered = tmp_path / "tampered-plan.json"
+    tampered.write_text(json.dumps(original), encoding="utf-8")
+    rejected = _run_installed_campaign("run-local", "--plan", str(tampered), "--campaign-root", str(ROOT),
+                                       "--output-root", str(tmp_path / "run"))
+    assert rejected.returncode != 0
+
+
 def test_single_arm_work_spec_runs_one_verified_canonical_bounded_unit(tmp_path: Path) -> None:
     """A failure-count request runs only its frozen ordinal through canonical evidence."""
     from bp_registry.campaigns.contracts import FailureCountWorkSpecV1

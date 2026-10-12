@@ -1114,6 +1114,7 @@ def verify_canonical_attempt(*, record: Mapping[str, Any], plan: CampaignWorkPla
 def run_canonical_work_plan(
     plan: CampaignWorkPlan, *, campaign_root: str | Path, output_root: str | Path,
     shards: tuple[ShardPlan, ...] | None = None,
+    selected_unit_keys: tuple[str, ...] | None = None,
 ) -> dict[str, Any]:
     """Execute every paired arm against one retained physical sample per group."""
     if not isinstance(plan, CampaignWorkPlan) or not isinstance(plan.work_spec, CampaignWorkSpecV1):
@@ -1129,6 +1130,13 @@ def run_canonical_work_plan(
     if not selected_shards or any(known_shards.get(shard.shard_id) != shard for shard in selected_shards):
         raise ValueError("canonical execution must consume a nonempty exact subset of frozen shards")
     selected_keys = {key for shard in selected_shards for key in shard.unit_keys}
+    if selected_unit_keys is not None:
+        requested = tuple(selected_unit_keys)
+        if not requested or len(set(requested)) != len(requested) or any(key not in selected_keys for key in requested):
+            raise ValueError("selected units must be a nonempty unique subset of frozen shards")
+        if requested != tuple(unit.key for unit in plan.units if unit.key in set(requested)):
+            raise ValueError("selected units must follow frozen plan order")
+        selected_keys = set(requested)
     samples: dict[str, MaterializedPhysicalSampleV1] = {}
     verified: list[dict[str, Any]] = []
     for unit in plan.units:

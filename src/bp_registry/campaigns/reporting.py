@@ -147,6 +147,26 @@ def _verified_merge(*, plan: CampaignWorkPlan, merge_receipt: Mapping[str, Any])
     return tuple(reconstructed)
 
 
+def require_complete_ordered_campaign(*, plan: CampaignWorkPlan, merged: Mapping[str, Any]) -> None:
+    """Allow controlled inference only after every frozen matched group closes."""
+    from json import loads
+
+    preimage = loads(plan.campaign_plan_preimage)
+    if preimage.get("schema") != "ordered_campaign_work_plan_v1":
+        raise ValueError("ordered assessment requires an ordered frozen plan")
+    terminal = merged.get("terminal_unit_keys")
+    if terminal != list(plan.unit_keys):
+        raise ValueError("ordered assessment requires every frozen matched group to be complete")
+    if any(merged.get(field) for field in (
+        "missing_unit_keys", "incomplete_unit_keys", "explicit_final_nonterminal_keys",
+        "unexpected_unit_keys", "conflicting_unit_keys", "authorized_undispatched_keys",
+    )):
+        raise ValueError("ordered assessment rejects partial or conflicting evidence")
+    if any(group["unit_keys"] != list(plan.unit_keys[(group["group_ordinal"] - 1) * plan.units_per_sample_group:group["group_ordinal"] * plan.units_per_sample_group])
+           for group in preimage["groups"]):
+        raise ValueError("ordered assessment group membership differs from frozen order")
+
+
 @dataclass(frozen=True, slots=True)
 class WorkAndResourceReportV1:
     """Separate observed work dimensions from explicitly unavailable measurements."""
