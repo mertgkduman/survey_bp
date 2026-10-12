@@ -632,6 +632,13 @@ def test_interruptible_wall_partial_retries_same_ordinal_under_remaining_budget(
     assert resumed["verified_attempts"][0]["unit_key"] == plan.units[0].key
     assert len(list((tmp_path / "attempts").glob("*/partial-attempt.json"))) == 1
     assert len(list((tmp_path / "attempts").glob("*/attempt.json"))) == 1
+    terminal_path = next((tmp_path / "attempts").glob("*/attempt.json"))
+    observation = json.loads(terminal_path.read_bytes())["attempt"]["resource_observation"]
+    partial = first["partial_attempt"]
+    assert resumed["actual_resources"]["storage_bytes"] == (
+        partial.consumed_storage_bytes + partial.consumed_control_receipt_bytes
+        + observation["scientific_storage_bytes"]
+    )
 
 
 def test_strict_batch_wall_boundary_censors_without_dispatching_tail(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

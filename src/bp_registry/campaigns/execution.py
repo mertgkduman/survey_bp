@@ -1908,24 +1908,21 @@ def run_canonical_bounded_batch(
                                  "events": spent["events"], "evidence_bytes": spent["evidence_bytes"],
                                  "storage_bytes": terminal.realized_storage_bytes},
         }
-    actual_evidence = sum(Path(item["canonical_ledger_path"]).stat().st_size for item in verified)
-    actual_storage = actual_evidence + sum(Path(item["materialized_sample_path"]).stat().st_size for item in verified)
-    actual_storage += sum((Path(item["canonical_ledger_path"]).parent / "attempt.json").stat().st_size for item in verified)
-    actual_work = sum(
-        value for item in verified for value in item["work_vector"].values()
-        if type(value) is int
-    )
-    if actual_evidence > plan.work_spec.policy.caps.max_evidence_bytes or actual_storage > plan.work_spec.policy.caps.max_storage_bytes:
-        raise ValueError("bounded canonical execution exceeded a declared evidence or storage cap")
+    spent, _, _ = _retained_bounded_actuals(destination=destination, campaign_root=root, plan=plan)
+    if (spent["shots"] > policy.caps.max_shots or spent["work"] > policy.caps.max_decoder_work
+            or spent["events"] > policy.caps.max_events
+            or spent["evidence_bytes"] > policy.caps.max_evidence_bytes
+            or spent["storage_bytes"] > policy.caps.max_storage_bytes):
+        raise ValueError("bounded canonical execution exceeded a declared campaign cap")
     return {
         "schema": "failure_count_canonical_bounded_batch_v1",
         "campaign_plan_digest": plan.campaign_plan_digest,
         "ordinals": tuple(range(first_ordinal, first_ordinal + batch_size)),
         "authorization_projection": {"dispatch_allowed": True, **projection},
         "actual_resources": {
-            "completed_shots": len(verified), "decoder_work": actual_work,
-            "evidence_bytes": actual_evidence,
-            "storage_bytes": actual_storage,
+            "completed_shots": spent["shots"], "decoder_work": spent["work"],
+            "events": spent["events"], "evidence_bytes": spent["evidence_bytes"],
+            "storage_bytes": spent["storage_bytes"],
         },
         "wall_boundaries": tuple(observations),
         "materialized_samples": tuple(materialized_samples), "verified_attempts": tuple(verified),
