@@ -17,6 +17,9 @@ Make BP decoder differences explicit, reproducible, and fairly comparable by exp
 - ✓ Pinned native binary BP CSS pilot with a durable shot ledger and independent outcome evaluation — Phase 1. The 32-shot run is `pilot_adaptation` and `not_assessed`, not a statistical paper reproduction.
 - ✓ Bounded paired CSS campaign infrastructure with immutable shared samples, exact merge/resume, denominator uncertainty, and independently verified local/selected-shard reports — Phase 8. The two-sample BB-144 gate is `development_fixture` and `not_assessed`; production dispatch still requires measured site ceilings.
 - ✓ Canonical four-state joint-Pauli BP execution, correlated I/X/Y/Z sampling, independent code-capacity evaluation, and explicitly compatible quaternary policies — Phase 10. The bounded GB46 mechanism study is `not_assessed`; statistical reproduction and comparisons remain Phase 11 work.
+- ✓ Public CSS voting over a declared MBBP member set with ballot lineage, independent original-problem validation, and ledger replay — Phase 9. The matched list/vote result is a two-sample canonical adaptation.
+- ✓ Bounded matched CSS controls for update schedule, initial BP/Relay/Beam, and MBBP list/vote with shared samples, distinct measured profiles, typed costs, exact replay, and uncertainty — Phase 9. Their completed sample counts are 3, 16, and 2; no superiority claim follows.
+- ✓ A deterministic 14-variant CSS source qualification inventory and honest bounded Yao B1 adaptation assessment — Phase 9. The Yao study is cap censored; EVAL-01/02 source-faithful publication capabilities remain pending.
 
 ### Active
 
@@ -35,6 +38,7 @@ Make BP decoder differences explicit, reproducible, and fairly comparable by exp
 - [ ] Extend to circuit-level decoding after the code-capacity stages; define its noise, observation, and decoding semantics during dedicated research and planning.
 - [ ] Associate every supported paper with a machine-readable reproduction manifest and an executable experiment entry.
 - [ ] Validate reproduction of reported curves within documented statistical tolerances, with numerical tolerances specified where applicable to other outputs.
+- [ ] Obtain exact selected CSS author experiment artifacts/settings and executable native reference assessments before closing EVAL-01/02 or claiming source-faithful curve agreement.
 - [ ] Produce a provenance-preserving event ledger for every simulation that supports joint analysis of iteration count, computational work, syndrome validity, exact recovery, degenerate recovery, logical failure, termination reason, and post-selection.
 - [ ] Provide both faithful reproductions under published settings and controlled comparisons under shared codes, noise, error samples, and explicit computational budgets.
 - [ ] Report logical performance, convergence, iterations, computational work, and runtime separately, retaining enough provenance to interpret each measure.
@@ -131,6 +135,8 @@ All three stages belong to the same intended journal-paper scope. The literature
 | Keep exact native aSCED execution in a separate aggregate evidence lane | Preserve the pinned executable reference without implying matched shots or a curve result | User-attested verbal collaborator-author permission for the bounded isolated run; 160 trials/10 logical errors, `not_assessed` |
 | Freeze one physical sample once and replay its bytes through paired canonical arms | Prevent arm-specific sampling drift while retaining distinct decoder randomness | Phase 8 local and direct selected-shard routes verified exact sample/error equality and route-neutral science |
 | Deny publication-scale campaign dispatch until site ceilings and accounting are measured | Small process measurements do not define safe HPC limits | Phase 8 retained gate records process use and `production_authorization: deny` |
+| Keep bounded Phase 9 adaptation and source qualification separate | Missing ordered author artifacts and native settings cannot be inferred from numerical agreement | Fourteen variants indexed; Yao B1 cap censored with no paper-target verdict; EVAL-01/02 remain pending |
+| Compare CSS mechanisms only on prospectively frozen matched samples | Small N and shared computation require exact sample identity, separate costs, and uncertainty | Schedule 3, Relay/Beam 16, MBBP list/vote 2 matched samples; exploratory only |
 
 ## Evolution
 
@@ -150,4 +156,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with the current software, evidence, and research state.
 
 ---
-*Last updated: 2026-10-11 after Phase 8*
+*Last updated: 2026-10-12 after Phase 9*

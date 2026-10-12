@@ -6,7 +6,7 @@ current_phase_name: Guided and Perturbative BP Interventions
 current_plan: Not started
 status: planning
 stopped_at: Phase 9 bounded execution complete; Phase 5 human review remains open
-last_updated: "2026-10-12T05:58:44Z"
+last_updated: "2026-10-12T06:01:03Z"
 last_activity: 2026-10-12
 last_activity_desc: Phase 9 bounded execution complete; Phase 5 human review pending
 state_head: 1acf02a9adaee9590bde32253a43ea759224562d
@@ -22,7 +22,7 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-10-11)
+See: .planning/PROJECT.md (updated 2026-10-12)
 
 **Core value:** Make BP decoder differences explicit, reproducible, and fairly comparable through canonical policy execution and published evidence.
 **Current focus:** Phase 5 human notebook/HTML review after Phase 9 bounded CSS execution closed
@@ -112,6 +112,9 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - Preserve faithful source configurations and controlled shared-sample/work-budget comparisons as separate evaluation views.
 - [Phase 08]: Paired canonical CSS campaigns freeze one physical sample for both arms, verify local and direct selected-shard deliveries independently, and report exact denominator uncertainty and merge provenance.
 - [Phase 08]: The two-sample BB-144 run is development evidence only; site ceilings and scheduler accounting are unavailable, so production authorization remains denied.
+- [Phase 09]: The 14-variant CSS inventory and capped Yao B1 run preserve unavailable source/native facts; EVAL-01/02 remain pending, and timeout terminals never become a paper-rate estimate.
+- [Phase 09]: Three prospectively frozen matched controls completed at N=3, 16, and 2 with separate profiles, typed shared-work costs, and no decoder-superiority claim.
+- [Phase 09]: Public controlled retry reuses sealed initial/member receipts and recovers orphaned sealed units into merge envelopes; publication Slurm stays denied without site limits.
 - Autonomous execution, fine phases, parallel independent agents, Git-tracked planning, full instructions, research/checking/verification enabled; saved Codex model/effort overrides retained.
 - Phase 1 selected a source-pinned Bravyi BB-144 artifact and kept its 32-shot native BP pilot labeled `pilot_adaptation` and `not_assessed`.
 - Phase 1 preserves ordered CSS matrix/logical identity, strict manifest preflight, and a durable shot ledger with independent outcome evaluation.
@@ -204,6 +207,8 @@ None outside the roadmap.
 
 ### Blockers/Concerns
 
+- [Phase 09] Exact author experiment artifacts, source settings, and executable native assessments are still unverified; EVAL-01/02 remain pending. The Yao B1 adaptation is cap censored. Site resource ceilings and scheduler accounting remain unavailable, so publication dispatch is denied.
+
 - Current: Phase 4 passed goal verification (4/4 revised criteria; 6/6 requirements), validation and ASVS L1 security. The user stopped the oversized comprehensive experiment; its terminal manifest disables resume. B1 selection remains inconclusive, and the 159 completed plus one interrupted B1 records are receipts without a qualified performance denominator. Fresh evaluation, native-pair and factorial results remain absent. Phase 5 has 14 implemented and technically verified plans; human notebook/HTML review remains open. See the [cancellation record](phases/04-memory-policies-and-relay-bp/04-13-CANCELLATION-20260930.md) and `04-VERIFICATION.md`. Entries below are historical checkpoints, not live progress.
 
 - New-chat progress audit: calibration running with 3,716/5,824 retained attempts (63.8%) at 2026-09-27T17:20:42.542Z. See `.planning/HANDOFF.json` for the measured snapshot and async resume context. Phase 1/2 verification reports are now flagged stale by GSD and need refreshing; Phase 3 remains passed. No completed plans were rerun or removed.
@@ -249,15 +254,15 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 ## Deferred Items
 
-No requested decoding regime or named policy family is deferred beyond the first journal milestone. The cancelled comprehensive Phase 4 CSS evaluation/factorial is deferred from Phase 4; Phase 8 supplied bounded campaign infrastructure and Phase 9 must scope any CSS publication campaign afresh. Relay circuit-curve assessment remains in Phase 13.
+No requested decoding regime or named policy family is deferred beyond the first journal milestone. The cancelled comprehensive Phase 4 CSS evaluation/factorial is deferred from Phase 4; Phase 8 supplied bounded campaign infrastructure and Phase 9 completed exploratory CSS controls. Source-faithful CSS publication assessments remain pending exact author evidence. Relay circuit-curve assessment remains in Phase 13.
 
 ## Session Continuity
 
-**Resume file:** .planning/phases/09-css-reproduction-and-controlled-comparisons/09-CONTEXT.md
+**Resume file:** None
 
-Last session: 2026-10-11T22:40:55Z
-Stopped at: Phase 9 complete, ready to plan Phase 5
-Next command: Continue $gsd-execute-phase 9 through the remaining dependency waves and measured gates. Phase 5 human review remains separately open; Phase 7 stays paused.
+Last session: 2026-10-12T06:01:03Z
+Stopped at: Phase 9 bounded execution complete; Phase 5 human notebook/HTML review remains open
+Next command: `$gsd-verify-work 5` for the pending Phase 5 human review, or `$gsd-progress` for current routing. Phase 7 stays paused.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
 Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md`.
