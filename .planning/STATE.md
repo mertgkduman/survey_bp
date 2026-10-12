@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 09
 current_phase_name: CSS Reproduction and Controlled Comparisons
-current_plan: 09-20
+current_plan: 09-17
 status: executing
-stopped_at: Wave 4 passed; Plan 09-20 resource guard prerequisite planned
-last_updated: "2026-10-11T22:40:55Z"
+stopped_at: Wave 5 passed; Plan 09-17 bounded canonical campaign adapter next
+last_updated: "2026-10-12T00:15:36Z"
 last_activity: 2026-10-11
-last_activity_desc: Phase 09 Wave 4 passed; 8 of 20 plans complete after resource guard replan
-state_head: 4dbe834d9a93d1f266a31909c2454d01fd10d22d
+last_activity_desc: Phase 09 Wave 5 passed; 9 of 20 plans complete after canonical resource guard
+state_head: f25ec1c6df353293c15a070defd6a7d987596ffb
 progress:
   total_phases: 14
   completed_phases: 7
   total_plans: 151
-  completed_plans: 130
+  completed_plans: 131
 ---
 
 # Project State
@@ -24,20 +24,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-11)
 
 **Core value:** Make BP decoder differences explicit, reproducible, and fairly comparable through canonical policy execution and published evidence.
-**Current focus:** Phase 9 CSS reproduction and controlled comparisons; Wave 5 canonical resource guard
+**Current focus:** Phase 9 CSS reproduction and controlled comparisons; Wave 6 bounded canonical campaign adapter
 
 ## Current Position
 
 Phase: 09 (CSS Reproduction and Controlled Comparisons) — EXECUTING
-Plan: 09-20 of 20; 8 plans passed wave gates
+Plan: 09-17 of 20; 9 plans passed wave gates
 Total Phases: 14
-Current Plan: 09-20 canonical resource guard
+Current Plan: 09-17 bounded canonical campaign adapter
 Total Plans in Phase: 20
-Status: Wave 5 planned after Wave 4 full-suite gate
-Last activity: 2026-10-11 — Phase 09 Wave 4 full suite passed
-Last Activity Description: Public MBBP vote policy executed and independently replayed
+Status: Wave 5 passed; Wave 6 ready
+Last activity: 2026-10-11 — Phase 09 Wave 5 full suite passed
+Last Activity Description: Canonical resource profiles and guarded execution passed the full-suite gate
 
-Progress: 7 of 14 phases complete (50%); Phase 9 has 8 of 20 plans complete
+Progress: 7 of 14 phases complete (50%); Phase 9 has 9 of 20 plans complete
 
 ## Performance Metrics
 
