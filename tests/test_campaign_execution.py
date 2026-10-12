@@ -389,14 +389,13 @@ def test_interruptible_unit_seals_an_immutable_zero_credit_partial_attempt(tmp_p
     verify_failure_count_partial_attempt(
         record=partial, plan=plan, receipt_sha256=result["partial_attempt_sha256"],
     )
-    resumed = run_canonical_bounded_batch(
+    censored = run_canonical_bounded_batch(
         plan, campaign_root=ROOT, output_root=tmp_path, first_ordinal=1, batch_size=1,
         parent_partial_receipt_sha256=result["partial_attempt_sha256"],
     )
-    assert resumed["partial_attempt"].attempt_id != partial.attempt_id
-    assert resumed["partial_attempt"].attempt_sequence == partial.attempt_sequence + 1
-    assert resumed["partial_attempt"].parent_partial_receipt_sha256 == result["partial_attempt_sha256"]
-    assert len(list((tmp_path / "attempts").glob("*/partial-attempt.json"))) == 2
+    assert censored["terminal_receipt"].terminal_state == "cap_censored"
+    assert censored["terminal_receipt"].total_completed_shots == 0
+    assert censored["retained_partial_attempt_sha256"] == result["partial_attempt_sha256"]
     receipt.write_bytes(original.replace(b'"consumed_events":0', b'"consumed_events":1'))
     with pytest.raises(ValueError, match="differ from its hash"):
         verify_failure_count_partial_attempt(

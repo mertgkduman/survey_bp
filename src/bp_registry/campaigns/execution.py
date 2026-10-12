@@ -1154,6 +1154,7 @@ def _checked_add(left: int, right: int, *, name: str) -> int:
 
 def _failure_count_executable_projection(
     *, plan: CampaignWorkPlan, campaign_root: Path, first_ordinal: int, batch_size: int,
+    accumulated: Mapping[str, int] | None = None,
 ) -> tuple[CampaignWorkSpecV1, dict[str, int], Any, Any, Path]:
     """Revalidate executable facts before any bounded unit is materialized."""
     if not isinstance(plan.work_spec, FailureCountWorkSpecV1):
@@ -1181,12 +1182,18 @@ def _failure_count_executable_projection(
         "evidence_bytes": _checked_add(batch_size * derived.derived_evidence_bytes_per_unit, derived.partial_receipt_reserve_bytes, name="projected evidence"),
         "storage_bytes": _checked_add(batch_size * derived.derived_storage_bytes_per_unit, derived.partial_receipt_reserve_bytes, name="projected storage"),
     }
+    fresh_projection = dict(projection)
+    if accumulated is not None:
+        projection = {
+            name: _checked_add(value, accumulated.get(name, 0), name=f"accumulated {name}")
+            for name, value in projection.items()
+        }
     authorization = policy.batch_authorization
-    if (projection["shots"] > authorization.max_shots_per_batch
-            or projection["work"] > authorization.max_work_per_batch
-            or projection["events"] > authorization.max_events_per_batch
-            or projection["evidence_bytes"] > authorization.max_evidence_bytes_per_batch
-            or projection["storage_bytes"] > authorization.max_storage_bytes_per_batch):
+    if (fresh_projection["shots"] > authorization.max_shots_per_batch
+            or fresh_projection["work"] > authorization.max_work_per_batch
+            or fresh_projection["events"] > authorization.max_events_per_batch
+            or fresh_projection["evidence_bytes"] > authorization.max_evidence_bytes_per_batch
+            or fresh_projection["storage_bytes"] > authorization.max_storage_bytes_per_batch):
         raise ValueError("bounded canonical batch exceeds its verified authorization")
     cap_values = {
         "shots": policy.caps.max_shots, "work": policy.caps.max_decoder_work,
@@ -1406,15 +1413,27 @@ def run_canonical_bounded_batch(
         raise ValueError("bounded campaign output root must be a regular directory")
     policy = plan.work_spec.policy  # narrowed by the preflight above
     assert isinstance(policy, object)
+    retained_before_projection = _retained_partial_for_ordinal(
+        destination=destination, plan=plan, ordinal=first_ordinal,
+    )
+    accumulated = None if retained_before_projection is None else {
+        "shots": 0,
+        "work": retained_before_projection[0].consumed_decoder_work,
+        "events": retained_before_projection[0].consumed_events,
+        "evidence_bytes": retained_before_projection[0].consumed_evidence_bytes,
+        "storage_bytes": (retained_before_projection[0].consumed_storage_bytes
+                          + retained_before_projection[0].consumed_control_receipt_bytes),
+    }
     try:
         spec, projection, _context, derived, _manifest_path = _failure_count_executable_projection(
             plan=plan, campaign_root=root, first_ordinal=first_ordinal, batch_size=batch_size,
+            accumulated=accumulated,
         )
     except ValueError as error:
         prefix = "bounded canonical batch cannot fit hard resource cap: "
         if not str(error).startswith(prefix):
             raise
-        partial_pair = _retained_partial_for_ordinal(destination=destination, plan=plan, ordinal=first_ordinal)
+        partial_pair = retained_before_projection
         if partial_pair is None:
             raise
         partial, partial_digest = partial_pair
