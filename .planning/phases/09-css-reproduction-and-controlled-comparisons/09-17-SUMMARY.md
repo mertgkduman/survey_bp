@@ -2,13 +2,12 @@
 phase: 09-css-reproduction-and-controlled-comparisons
 plan: "17"
 subsystem: campaigns
-tags: [failure-count, canonical, bounded-batch, blocked]
-status: blocked
-plan_head_before: 7fec771
-commits: 4
+tags: [failure-count, canonical, bounded-batch, complete]
+status: complete
+plan_head_before: 2ff908b
 dependency_graph:
-  requires: [09-08, 09-16]
-  provides: [single-arm canonical bounded execution seam]
+  requires: [09-08, 09-16, 09-20]
+  provides: [derived bounded admission, guarded canonical batches, immutable partial attempts, cap-censored replay]
   affects: [09-06, 09-18]
 key_files:
   modified:
@@ -17,42 +16,28 @@ key_files:
     - src/bp_registry/campaigns/execution.py
     - tests/test_campaign_execution.py
 actuals:
-  tokens: 9500
-  tasks: 1
-  commits: 4
+  tasks: 2
 ---
 
 # Phase 09 Plan 17: Bounded Canonical Execution Summary
 
-Implemented and verified the single-arm canonical bounded-unit seam, then stopped before claiming the required engine-level hard guards.
+## Delivered
 
-## Completed Work
-
-### Task 1: Execute one real canonical failure-count unit end to end
-
-- Added `FailureCountWorkSpecV1`, which binds an exactly-one-arm canonical work specification to an outcome-independent `FailureCountPolicyV1`.
-- Added `freeze_failure_count_work_spec()`. Its preimage includes the prospective work specification and ordered unit keys, so unit ordinals are frozen before execution and remain independent of completion order.
-- Added `run_canonical_bounded_batch()` for an exact contiguous ordinal range. It does not call `run_canonical_work_plan()` and runs each selected unit through the existing materialized-sample, canonical-ledger, `_campaign_attempt()`, and `verify_canonical_attempt()` path.
-- The adapter rechecks manifest iteration bounds and batch/campaign work, event, evidence, storage, worker, and ordinal projections before dispatch. It seals measured work, evidence, storage, receipt, and wall-boundary observations after a completed batch.
+- `FailureCountWorkSpecV1` freezes one arm, exact ordinals, policy, and the canonical work plan. The bounded adapter verifies Plan 09-20's independently derived executable maxima before materialization and admits only the next declared strict batch or one explicitly interruptible development unit.
+- Admission checks retained, independently replayed terminal and partial actuals plus the next maximum against shots, work, events, evidence, and storage in frozen cap precedence. The nominal per-unit timeout must fit the prospective wall cap. The closed partial receipt schema has a 10,626-byte serialized maximum, below the 32,768-byte control reserve.
+- One runtime guard charges the materialized sample, canonical ledger, and terminal attempt. The terminal attempt includes a durable wall/resource observation checked against the retained sample, ledger, profile, and guarded artifact sizes. Historical unguarded fixed-shot, finite-look, and V7 routes retain their existing bytes.
+- Wall, evidence, and storage interruptions seal immutable zero-credit `FailureCountPartialAttemptV1` receipts with the denied operation, consumed resources, exact pending ordinal, fresh attempt identity, and digest-linked retry lineage. Replay rejects altered paths, counters, profile, ordinal, parent, sample, or ledger. A retry reuses the materialized sample and charges it once.
+- If no new maximum fits after a partial, or a strict batch reaches its wall boundary between units, the adapter seals an immutable cap-censored receipt. It retains completed prefix shots and costs, the prior wall observations, the pending ordinal, and any partial digest; repeated calls replay the same bytes and cannot dispatch a different ordinal.
 
 ## Verification
 
-- `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py tests/test_campaign_failure_count.py -k 'single_arm_work_spec or executable_limit or understated_bound or canonical_bounded_unit or tracer_ordered_stop or paired_canonical_replays' -x` — 5 passed, 46 deselected.
-- `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py tests/test_campaign_failure_count.py -k 'canonical_bounded_batch or failure_count_resource_cap or understated_bound or receipt_reserve or predispatch_cap or batch_projection or mid_unit_cap or wall_boundary_overshoot or no_work_after_timeout or evidence_cap or storage_cap or bounded_interruption or tracer_ordered_stop' -x` — 4 passed, 48 deselected.
+- Plan 09-17 focused task selectors passed with nonzero selections; additional accumulated-cap, retry, wall-boundary, and censor replay regressions passed.
+- Canonical guard, ledger, campaign execution, failure-count, and CLI cross-route command: 162 passed in 337.21 seconds. The final committed revision then passed the full repository suite: 1,247 passed, 1 skipped in 883.70 seconds, peak pytest RSS 388,664 KiB. The full suite contains the cross-route tests and the later added cap regressions.
 
-## Blocking Plan Gap
+## Commits
 
-Task 2 requires byte guards before every canonical ledger append and artifact write, plus an iteration-boundary timeout that emits a resumable partial attempt. The owned wrapper cannot implement those facts truthfully: `run_canonical_materialized_one()` calls `canonical.execution.run_canonical_structural_shot()`, which constructs `CanonicalEventWriter` internally and exposes no resource-guard or interruption-receipt injection point. The runner only supplies static execution controls.
-
-Implementing the remaining guarantees requires changing the canonical engine API and its event-writer lifecycle in `src/bp_registry/canonical/execution.py`, then threading a typed guard through `runner.py` and `ledger.py`. That is a public execution-engine contract change outside this plan's listed ownership and affects every canonical decoder path, so this is a Rule 4 architectural blocker. The current adapter must not be presented as enforcing mid-unit evidence/storage stops, boundary-observed timeout interruption receipts, or resume lineage.
-
-## Task Commits
-
-- `dcd1944` test(09-17): add failing bounded canonical unit test
-- `941ee70` feat(09-17): run one bounded canonical failure-count unit
-- `6a12431` test(09-17): add bounded batch receipt regression
-- `7c8fd38` feat(09-17): seal bounded canonical batch resources
+`a9653a0`, `2fe79f1`, `507b5a1`, `34a1bcd`, `4381c32`, `e5f8bca`, `34a1f58`, `d4a5eab`, `3046e4e`, `194410a`, and `d15e152` complete the retained earlier bounded adapter. Plan 09-06 owns public lifecycle orchestration, target inference, and report presentation.
 
 ## Self-Check: PASSED
 
-The bounded adapter, strict work-spec freezer, focused regression tests, and all four task commits exist. The summary intentionally remains blocked because Task 2's mandatory dynamic guard and immutable partial-receipt behavior is absent.
+Both tasks and the Phase 9 Wave 6 full-suite gate passed. No publication-scale scheduler authorization was introduced.
