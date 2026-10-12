@@ -422,6 +422,8 @@ class FailureCountPolicyV1(StrictModel):
         if (authorization.policy_binding_sha256 != self.policy_binding_sha256
                 or authorization.executable_limit_receipt_sha256 != limits.digest()):
             raise ValueError("batch authorization does not bind the verified executable limits")
+        if authorization.per_unit_timeout_ns > int(self.caps.max_wall_seconds * 1_000_000_000):
+            raise ValueError("per-unit wall authorization exceeds the prospective campaign wall cap")
         required_units = self.batch_size if self.dispatch_mode == "strict_full_batch" else 1
         expected_work = _checked_product(limits.derived_work_per_unit, required_units, name="dispatch work", maximum=_MAX_DECODER_WORK)
         expected_events = _checked_product(limits.derived_events_per_unit, required_units, name="dispatch events", maximum=_MAX_EVENTS)

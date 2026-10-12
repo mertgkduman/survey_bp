@@ -337,6 +337,9 @@ def test_failure_count_interruptible_policy_is_explicit_and_default_bytes_stay_s
     resources["max_batch_size"] = 2
     explicit = FailureCountWorkSpecV1.model_validate(payload)
     assert explicit.policy.dispatch_mode == "interruptible_unit"
+    policy["caps"]["max_wall_seconds"] = 0.5
+    with pytest.raises(ValueError, match="per-unit wall authorization exceeds"):
+        FailureCountWorkSpecV1.model_validate(payload)
 
 
 def test_bounded_batch_charges_sample_ledger_and_terminal_receipt_to_one_guard(tmp_path: Path) -> None:
@@ -471,10 +474,38 @@ def test_bounded_batch_charges_verified_prior_terminal_before_next_dispatch(tmp_
         plan, campaign_root=ROOT, output_root=tmp_path, first_ordinal=1, batch_size=1,
     )
     assert len(first["verified_attempts"]) == 1
-    with pytest.raises(ValueError, match="hard resource cap"):
+    with pytest.raises(ValueError, match="hard resource cap: storage"):
         run_canonical_bounded_batch(
             plan, campaign_root=ROOT, output_root=tmp_path, first_ordinal=2, batch_size=1,
         )
+    assert len(list((tmp_path / "attempts").glob("*/attempt.json"))) == 1
+
+
+@pytest.mark.parametrize("selected_cap", ("work", "events", "evidence", "storage"))
+def test_bounded_batch_checks_each_accumulated_hard_cap_before_dispatch(tmp_path: Path, selected_cap: str) -> None:
+    """A spent first unit makes the next maximum fail one selected hard cap."""
+    from bp_registry.campaigns.contracts import FailureCountWorkSpecV1
+    from bp_registry.campaigns.execution import run_canonical_bounded_batch
+    from bp_registry.campaigns.planning import freeze_failure_count_work_spec
+
+    payload = _single_arm_failure_count_work_spec_payload()
+    campaign = payload["campaign_work_spec"]
+    policy = payload["policy"]
+    assert isinstance(campaign, dict) and isinstance(policy, dict)
+    campaign["coordinates"][0]["sample_ids"] = [0, 1]
+    campaign["look_sample_boundaries"] = [2]
+    campaign["assessment"]["resources"]["max_shots"] = 2
+    policy["caps"]["max_shots"] = 2
+    names = {"work": "max_decoder_work", "events": "max_events",
+             "evidence": "max_evidence_bytes", "storage": "max_storage_bytes"}
+    for cap, name in names.items():
+        if cap != selected_cap:
+            policy["caps"][name] *= 2
+        campaign["assessment"]["resources"][name] = policy["caps"][name]
+    plan = freeze_failure_count_work_spec(FailureCountWorkSpecV1.model_validate(payload))
+    run_canonical_bounded_batch(plan, campaign_root=ROOT, output_root=tmp_path, first_ordinal=1, batch_size=1)
+    with pytest.raises(ValueError, match=f"hard resource cap: {selected_cap}"):
+        run_canonical_bounded_batch(plan, campaign_root=ROOT, output_root=tmp_path, first_ordinal=2, batch_size=1)
     assert len(list((tmp_path / "attempts").glob("*/attempt.json"))) == 1
 
 
