@@ -1,0 +1,55 @@
+{
+  "assessment_status": "not_assessed",
+  "evaluation_namespaces": [
+    "phase9-control-schedule-eval-v1",
+    "phase9-control-relay-beam-eval-v1",
+    "phase9-control-mbbp-eval-v1"
+  ],
+  "fair_profile": {
+    "damping_arm": "g0500",
+    "design_path": "data/studies/phase9-control-profiles-fair-v1.json",
+    "design_sha256": "f5a2990862709749883c0d5480da2db6895ac831003a5e6a58958918a5405946",
+    "methods": [
+      "beam",
+      "relay"
+    ],
+    "profile_namespace": "phase9-control-profile-fair-v1",
+    "rate": 0.08,
+    "sample_ids": [
+      0
+    ]
+  },
+  "mbbp_profile": {
+    "design_path": "data/studies/css-literature-b1-gate-v1.json",
+    "design_sha256": "4c024765e50ea27606b39d14127204459e02eb45047bb51a34852c6ef627e3af",
+    "policy_path": "literature_policies/rabeti-2026-multiple-bases-bp-list-decoding/mbbp-ld-vote.toml",
+    "profile_namespace": "css-literature-b1-gate-v1-matched",
+    "sample_ids": [
+      0,
+      1
+    ]
+  },
+  "schedule_profile": {
+    "profile_namespace": "phase3-b1-matched-physical-samples-v1",
+    "sample_ids": [0],
+    "source_run_roots": {
+      "spa_flooding": "data/results/phase3-pilots/runs/phase3-b1-spa",
+      "spa_check_node_serial": "data/results/phase3-pilots/runs/phase3-b1-cn"
+    },
+    "source_manifest_paths": {
+      "spa_flooding": "data/results/phase3-pilots/manifests/phase3-b1-spa.json",
+      "spa_check_node_serial": "data/results/phase3-pilots/manifests/phase3-b1-cn.json"
+    },
+    "provenance": "verified_tracked_phase3_b1_one_shot_p003_profiles"
+  },
+  "publication_slurm_authorization": "deny",
+  "sample_role": "pre_outcome_calibration_only",
+  "schema": "phase9_control_profiles_v1",
+  "site": {
+    "core_ceiling": "unavailable",
+    "memory_ceiling": "unavailable",
+    "scheduler_accounting": "unavailable",
+    "storage_ceiling": "unavailable",
+    "wall_ceiling": "unavailable"
+  }
+}

@@ -406,9 +406,53 @@ def _ordered_document(campaign_path: str, root: Path) -> OrderedCampaignWorkSpec
     if set(document) != {"ordered_campaign_work_spec"} or not isinstance(document["ordered_campaign_work_spec"], Mapping):
         raise ValueError("ordered campaign document must contain exactly ordered_campaign_work_spec")
     spec = OrderedCampaignWorkSpecV1.model_validate(document["ordered_campaign_work_spec"])
-    from .execution import _preflight_work_arms
-    _preflight_work_arms(spec.campaign_work_spec, root)
+    _preflight_ordered_arms(spec, root)
     return spec
+
+
+def _preflight_ordered_arms(spec: OrderedCampaignWorkSpecV1, root: Path) -> str:
+    """Admit sealed controlled arm definitions for ordering only."""
+    from .execution import _preflight_work_arms, _work_manifest_path
+
+    arms = spec.campaign_work_spec.arms
+    paths = [_work_manifest_path(root, arm.manifest_path, arm.manifest_sha256) for arm in arms]
+    documents = [_read_json(str(path)) for path in paths]
+    custom = [document.get("schema") == "phase9_control_arm_manifest_v1" for document in documents]
+    if not any(custom):
+        _preflight_work_arms(spec.campaign_work_spec, root)
+        if all(target.target_id.endswith("-order-only-not_assessed")
+               for target in spec.campaign_work_spec.assessment.targets):
+            return "controlled_planning_only"
+        return "canonical"
+    if not all(custom):
+        raise ValueError("ordered controlled work cannot mix canonical and custom arm manifests")
+    sampler = spec.campaign_work_spec.shared_sampler
+    for arm, document in zip(arms, documents):
+        if (document.get("arm_id") != arm.arm_id
+                or document.get("code_id") != sampler.code_id
+                or document.get("artifact_raw_sha256") != sampler.artifact_raw_sha256
+                or document.get("artifact_semantic_sha256") != sampler.artifact_semantic_sha256
+                or document.get("matrix_sha256") != sampler.matrix_sha256
+                or document.get("error_rate") != sampler.x_error_rate
+                or document.get("evaluation_namespace") != sampler.physical_sample_namespace
+                or document.get("physical_sample_seed") != sampler.physical_sample_seed
+                or document.get("assessment_status") != "not_assessed"
+                or document.get("publication_slurm_authorization") != "deny"):
+            raise ValueError("controlled arm definition differs from frozen ordered sampler")
+        route = document.get("runner")
+        if (route == "controlled_fair_leg_v1" and arm.arm_id not in {"beam", "relay"}) or (
+                route == "controlled_shared_mbbp_v1" and arm.arm_id not in {"list", "vote"}) or route not in {
+                    "controlled_fair_leg_v1", "controlled_shared_mbbp_v1"
+                }:
+            raise ValueError("controlled arm runner and ID are incompatible")
+        source_path = document.get("fair_control_design_path") or document.get("source_gate_path")
+        source_sha = document.get("fair_control_design_sha256") or document.get("source_gate_sha256")
+        if not isinstance(source_path, str) or not isinstance(source_sha, str):
+            raise ValueError("controlled arm lacks its source design digest")
+        _work_manifest_path(root, source_path, source_sha)
+        if route == "controlled_shared_mbbp_v1":
+            _work_manifest_path(root, document["policy_path"], document["policy_sha256"])
+    return "controlled_planning_only"
 
 
 def _ordered_plan_payload(spec: OrderedCampaignWorkSpecV1) -> dict[str, Any]:
@@ -438,8 +482,7 @@ def _load_ordered_plan(path: str, root: Path) -> tuple[OrderedCampaignWorkSpecV1
     expected = _ordered_plan_payload(spec)
     if payload != expected or _json_bytes(Path(path)) != canonical_json_bytes(expected) + b"\n":
         raise ValueError("ordered campaign plan differs from prospective inputs")
-    from .execution import _preflight_work_arms
-    _preflight_work_arms(spec.campaign_work_spec, root)
+    _preflight_ordered_arms(spec, root)
     return spec, freeze_ordered_campaign_work_spec(spec), payload
 
 
@@ -555,6 +598,8 @@ def _ordered_existing_runs(output: Path, *, plan: CampaignWorkPlan) -> tuple[tup
 
 def _ordered_run(args: argparse.Namespace, *, root: Path, output: Path) -> dict[str, Any]:
     _spec, plan, payload = _load_ordered_plan(args.plan, root)
+    if _preflight_ordered_arms(_spec, root) == "controlled_planning_only":
+        raise ValueError("controlled ordered work requires the dedicated controlled executor")
     _paths, prior = _ordered_existing_runs(output, plan=plan)
     pending = plan.unit_keys[len(prior):]
     if not pending:

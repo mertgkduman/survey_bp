@@ -303,3 +303,36 @@ is unavailable or exceeded. This is the expected Phase 8 result until a site
 provides explicit wall-time, CPU, memory, storage, replay, and scheduler cost
 ceilings. A denial keeps the bounded gate evidence; it does not prevent normal
 development tests or synthetic scheduler equivalence checks.
+
+## Phase 9 measured controlled design
+
+`data/studies/phase9-controlled-design-v1.json` freezes three separate matched
+CSS comparisons before any evaluative sample: B1 SPA flooding versus SPA
+check-node serial at p=0.10, BB72 Beam versus Relay after a common initial BP
+at p=0.08, and B1 MBBP list selection versus coordinate vote at p=0.000001.
+The bounded local denominators are respectively 3, 16, and 2 complete pairs.
+They are exploratory. Exact paired McNemar sizing with a 0.05 relevant
+all-shot risk difference, three-question alpha allocation, and an explicit
+worst-case discordance assumption q=1 requires 4,188 pairs for 80% power.
+The q=1 input is a conservative planning assumption; the one-shot calibration
+runs cannot estimate discordance.
+
+Each mechanism has a separate immutable profile receipt under
+`data/results/phase9-control-profiles-v1/`. Beam and Relay retain distinct
+inner runtime and work, while their full matched process wall, CPU, memory,
+and storage serve as conservative shared-process bounds. MBBP work comes from
+the two verified member-work ledgers; the two decision arms share one member
+set per evaluative sample. The schedule profiles are fresh runs from the
+tracked Phase 3 manifests: the older Phase 3 run ledgers did not pass the
+current manifest digest verifier, so those old results are not used as verified
+cost receipts. Schedule calibration used p=0.03 and is projected to p=0.10
+with a twofold cost factor and a small local cap.
+
+Every family has a public `OrderedCampaignWorkSpecV1` plan under
+`data/results/phase9-controlled-design-v1/`, with a complete declared arm
+sequence and sample-major group ordinals. These work plans freeze membership
+and order only. The ordinary ordered campaign runner rejects their
+`order-only-not_assessed` targets; Plans 09-19 and 09-12 through 09-14 own the
+controlled execution and paired inference. No calibration sample may enter
+the evaluative denominator. Site wall, core, memory, storage, and accounting
+ceilings remain unavailable, and publication Slurm authorization is denied.

@@ -1,0 +1,25 @@
+{
+  "assessment_status": "not_assessed",
+  "denominators": {
+    "all_terminal_shots": 1,
+    "outcome_unavailable": 1
+  },
+  "final_row_count": 1,
+  "fixture": "pilot_adaptation",
+  "ledger_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase9-control-profiles-v1/schedule/spa_check_node_serial/events.jsonl",
+  "ledger_sha256": "520b9a50cd946f41916f06286723087126d0ed4faa31f5b74a3ac39771e1a039",
+  "manifest_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/results/phase3-pilots/manifests/phase3-b1-cn.json",
+  "manifest_sha256": "9bf9f3c4a7b53ddc80ac3c2f6a5d4c87a50967166990a638e5622cf1c2ab3e71",
+  "policy_identity": "413f4001c462e60f53ce25ab4cd074cf699d3cb2ced422981b604dcf0ae56fac",
+  "relation": "pilot_adaptation",
+  "run_id": "phase3-b1-cn",
+  "schema_version": 2,
+  "shot_ids": [
+    0
+  ],
+  "statistical_claim": "not_assessed; bounded pilot adaptation, not a statistical reproduction, performance ranking, or superiority claim",
+  "terminations": {
+    "count_budget_exhausted": 1
+  },
+  "title": "phase3-b1-cn \u2014 pilot_adaptation pilot_adaptation not_assessed"
+}

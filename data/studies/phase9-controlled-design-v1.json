@@ -1,0 +1,427 @@
+{
+  "assessment_status": "prespecified_before_evaluation",
+  "calibration_profile_design_path": "data/studies/phase9-control-profiles-v1.json",
+  "calibration_profile_design_sha256": "76c4c239f566bae9b71ca0a9bc521154daa1e9496b3739c576df02a366afc733",
+  "dependency_lock_path": "pyproject.toml",
+  "dependency_lock_sha256": "61aea04e4a4b7a498ff8799af5261fbda3d1a50bc977da53e00a987b5f6507d0",
+  "environment_lock_path": "data/studies/phase9-control-environment-lock-v1.json",
+  "environment_lock_sha256": "ddc52347cb51bbbff8fdf33ad9ea498ec730ca1200a0d6945863fce1725c4919",
+  "eval03_completion": false,
+  "evaluation_started": false,
+  "families": {
+    "mbbp_list_vote": {
+      "arm_order": [
+        "list",
+        "vote"
+      ],
+      "bounded_achieved_power": 0.0,
+      "bounded_evaluative_n": 2,
+      "calibration_discordance_basis": "q=1 worst-case prospective planning assumption, not an estimate from one-shot calibration",
+      "calibration_profiles": {
+        "mbbp": {
+          "path": "data/results/phase9-control-profiles-v1/mbbp-profile-v2.json",
+          "projection": {
+            "achieved_power": 0.0,
+            "bounded_n": 2,
+            "design_sha256": "a5a30e5680b74e1d53f5dbc31ad7375ff857d2344c2e5dbe10fe2de102de6d92",
+            "local_caps": {
+              "rss_bytes": 536870912,
+              "storage_bytes": 67108864,
+              "wall_ns": 900000000000
+            },
+            "missing_measurements": [],
+            "profile_method": "mbbp",
+            "projected_costs": {
+              "evidence_bytes": 12751232,
+              "execution_cpu_ns": 810257692000,
+              "execution_wall_ns": 826251956824,
+              "peak_rss_bytes": 651575296,
+              "replay_wall_ns": 247652743516,
+              "storage_bytes": 13127296
+            },
+            "projection_sha256": "178618bd026f40cdc17e0b284c6c1711fec8354b6913f4b42c8858e28ff59636",
+            "publication_slurm_authorization": "deny",
+            "replay_receipt_sha256": "cef25fffb8ff5affc2951c829ed9eba574feff0f7c2049e8007b1b44871a913f",
+            "safety_factor": {
+              "denominator": 1,
+              "numerator": 2
+            },
+            "schema": "measured_resource_projection_v1",
+            "site_ceiling_status": "unavailable",
+            "source_receipt_sha256": "6b5cace058de244479edba43d3a4a2dda4cc5a5796699dd0db84eb8494d60589",
+            "status": "bounded_exploratory"
+          },
+          "sha256": "d455f9433345a3a3c28dcb7db1c08e1f6810d95370212d07c48824cc3f488b04"
+        }
+      },
+      "claim_status": "exploratory_inconclusive_until_frozen_n_complete",
+      "code_id": "b1-ghp-882",
+      "denominator_rule": "all_frozen_matched_terminal_pairs_only",
+      "group_rule": "coordinate_point_namespace_sample_declared_arm_v1",
+      "local_caps": {
+        "administrative_pair_cap": 16,
+        "cores": 1,
+        "rss_bytes": 536870912,
+        "storage_bytes": 67108864,
+        "wall_ns": 900000000000
+      },
+      "noise_model": "independent_x_only_css_code_capacity",
+      "ordered_plan_digest": "30a113e8b15944af0637e9aaa906fb196fef6545943b1012c234231587b1b306",
+      "ordered_work_file_sha256": "fb27cf1760654877551c071e4ab16ffb0e90130a6f1b32480326ea05bbd4cbbf",
+      "ordered_work_path": "data/studies/phase9-control-mbbp_list_vote-ordered-work-v1.json",
+      "ordered_work_spec_sha256": "8e620f0f19dd71a1dce3d870973a3e2b80760e933945ae4046c756bc5da05bb5",
+      "outcome_matrix": "all_shot_v1",
+      "paired_design": {
+        "arm_order": [
+          "list",
+          "vote"
+        ],
+        "calibration_discordance": 1.0,
+        "calibration_namespace": "css-literature-b1-gate-v1-matched",
+        "calibration_receipt_sha256": "ddf48e740a582f421cd73d74e7c916724e3b9bdc02d2f61ac7509fcc85ee71fa",
+        "estimand": "paired_all_shot_risk_difference_v1",
+        "evaluation_namespace": "phase9-control-mbbp-eval-v1",
+        "evaluation_namespace_sha256": "321a836263ed17651c6af631a3e322caaf3e699d775bd229c133debe2677dd59",
+        "family_id": "mbbp_list_vote",
+        "family_size": 3,
+        "familywise_alpha": 0.05,
+        "max_pairs": 5000,
+        "minimum_relevant_difference": 0.05,
+        "schema": "paired_design_v1",
+        "target_power": 0.8
+      },
+      "paired_design_sha256": "a5a30e5680b74e1d53f5dbc31ad7375ff857d2344c2e5dbe10fe2de102de6d92",
+      "powered_achieved_power": 0.8000318761946713,
+      "powered_required_n": 4188,
+      "profile_sample_role": "calibration_only_disjoint_from_evaluation",
+      "projected_per_pair": {
+        "decoder_work": 150,
+        "evidence_bytes": 6375616,
+        "rss_bytes": 325787648,
+        "storage_bytes": 6563648,
+        "wall_ns": 413125978412
+      },
+      "projected_total": {
+        "decoder_work": 300,
+        "evidence_bytes": 12751232,
+        "rss_bytes": 325787648,
+        "storage_bytes": 13127296,
+        "wall_ns": 826251956824
+      },
+      "public_ordered_plan_path": "data/results/phase9-controlled-design-v1/mbbp_list_vote/plan/campaign-ordered-plan.json",
+      "public_ordered_plan_sha256": "775c98eb6691a07c09beb288aa2718c3f94cfb02e496100226f6d9ca17d639b8",
+      "resource_combination_rule": "one shared two-shot member process upper bound per evaluative pair with factor two",
+      "source_label": "controlled_canonical_adaptation",
+      "status": "bounded_exploratory",
+      "x_error_rate": 1e-06,
+      "z_error_rate": 0.0
+    },
+    "relay_beam": {
+      "arm_order": [
+        "beam",
+        "relay"
+      ],
+      "bounded_achieved_power": 0.004897338778793972,
+      "bounded_evaluative_n": 16,
+      "calibration_discordance_basis": "q=1 worst-case prospective planning assumption, not an estimate from one-shot calibration",
+      "calibration_profiles": {
+        "beam": {
+          "path": "data/results/phase9-control-profiles-v1/beam-profile-v2.json",
+          "projection": {
+            "achieved_power": 0.013697292216530429,
+            "bounded_n": 31,
+            "design_sha256": "5e661b9585417177101814416c03e5efa074022fbc777ae1412457d8096cd5ed",
+            "local_caps": {
+              "rss_bytes": 268435456,
+              "storage_bytes": 67108864,
+              "wall_ns": 120000000000
+            },
+            "missing_measurements": [],
+            "profile_method": "beam",
+            "projected_costs": {
+              "evidence_bytes": 2887402,
+              "execution_cpu_ns": 65554398000,
+              "execution_wall_ns": 118485368894,
+              "peak_rss_bytes": 3413114880,
+              "replay_wall_ns": 105938030668,
+              "storage_bytes": 3242042
+            },
+            "projection_sha256": "a17b4f6dc57f7f81973fa33871878937e221f14d0bdd72e1608eda06cb0eeb20",
+            "publication_slurm_authorization": "deny",
+            "replay_receipt_sha256": "94b7c4b00427b100f0076e30b6abbd22b005ef34d7e3856f7693b314c91b237c",
+            "safety_factor": {
+              "denominator": 1,
+              "numerator": 2
+            },
+            "schema": "measured_resource_projection_v1",
+            "site_ceiling_status": "unavailable",
+            "source_receipt_sha256": "12f65b3bcadc191e1ccb157faad4df1f9994bb31fe1099b9ddab1b921bca697f",
+            "status": "bounded_exploratory"
+          },
+          "sha256": "6d8687270edc9dd73e85d253b9c0ed6dcd8d60ed18bb27f9e091f0eaf80d8363"
+        },
+        "relay": {
+          "path": "data/results/phase9-control-profiles-v1/relay-profile-v2.json",
+          "projection": {
+            "achieved_power": 0.013697292216530429,
+            "bounded_n": 31,
+            "design_sha256": "5e661b9585417177101814416c03e5efa074022fbc777ae1412457d8096cd5ed",
+            "local_caps": {
+              "rss_bytes": 268435456,
+              "storage_bytes": 67108864,
+              "wall_ns": 120000000000
+            },
+            "missing_measurements": [],
+            "profile_method": "relay",
+            "projected_costs": {
+              "evidence_bytes": 2887402,
+              "execution_cpu_ns": 65554398000,
+              "execution_wall_ns": 118485368894,
+              "peak_rss_bytes": 3413114880,
+              "replay_wall_ns": 105938030668,
+              "storage_bytes": 3242042
+            },
+            "projection_sha256": "829c04d7d6a14fced35a64820f4c9a82f9bd819abef9e6b01a7b26c2b84244e7",
+            "publication_slurm_authorization": "deny",
+            "replay_receipt_sha256": "94b7c4b00427b100f0076e30b6abbd22b005ef34d7e3856f7693b314c91b237c",
+            "safety_factor": {
+              "denominator": 1,
+              "numerator": 2
+            },
+            "schema": "measured_resource_projection_v1",
+            "site_ceiling_status": "unavailable",
+            "source_receipt_sha256": "12f65b3bcadc191e1ccb157faad4df1f9994bb31fe1099b9ddab1b921bca697f",
+            "status": "bounded_exploratory"
+          },
+          "sha256": "d849a7ec9bd1d4de4dc4e441dac1c2012920d372f553236912c7878946711567"
+        }
+      },
+      "claim_status": "exploratory_inconclusive_until_frozen_n_complete",
+      "code_id": "bravyi-bb-72",
+      "denominator_rule": "all_frozen_matched_terminal_pairs_only",
+      "group_rule": "coordinate_point_namespace_sample_declared_arm_v1",
+      "local_caps": {
+        "administrative_pair_cap": 16,
+        "cores": 1,
+        "rss_bytes": 268435456,
+        "storage_bytes": 67108864,
+        "wall_ns": 120000000000
+      },
+      "noise_model": "independent_x_only_css_code_capacity",
+      "ordered_plan_digest": "0d3e947f54da233582ce4db2cab4a8f72bb80ade2461cf82ffb41eaf38e835bb",
+      "ordered_work_file_sha256": "1a3903175edf48820f381f64c266cd7a2799bd8954e09e6f1fc3fcc07f9e06d6",
+      "ordered_work_path": "data/studies/phase9-control-relay_beam-ordered-work-v1.json",
+      "ordered_work_spec_sha256": "ff5f1ac81fe0424c7f2358385a603e4706b49e33d84f65722c2e7863ef71fa70",
+      "outcome_matrix": "all_shot_v1",
+      "paired_design": {
+        "arm_order": [
+          "beam",
+          "relay"
+        ],
+        "calibration_discordance": 1.0,
+        "calibration_namespace": "phase9-control-profile-fair-v1",
+        "calibration_receipt_sha256": "12f56fc8623cdec83020e210aca183ba70a96d70ce27661ff28f7fe3a80349f4",
+        "estimand": "paired_all_shot_risk_difference_v1",
+        "evaluation_namespace": "phase9-control-relay-beam-eval-v1",
+        "evaluation_namespace_sha256": "4d94ed262d15b8634e4462ee4b083e0f0382448737d6343b7fd2991e99f7957a",
+        "family_id": "relay_beam",
+        "family_size": 3,
+        "familywise_alpha": 0.05,
+        "max_pairs": 5000,
+        "minimum_relevant_difference": 0.05,
+        "schema": "paired_design_v1",
+        "target_power": 0.8
+      },
+      "paired_design_sha256": "5e661b9585417177101814416c03e5efa074022fbc777ae1412457d8096cd5ed",
+      "powered_achieved_power": 0.8000318761946713,
+      "powered_required_n": 4188,
+      "profile_sample_role": "calibration_only_disjoint_from_evaluation",
+      "projected_per_pair": {
+        "decoder_work": 13900,
+        "evidence_bytes": 93142,
+        "rss_bytes": 110100480,
+        "storage_bytes": 104582,
+        "wall_ns": 3822108674
+      },
+      "projected_total": {
+        "decoder_work": 222400,
+        "evidence_bytes": 1490272,
+        "rss_bytes": 110100480,
+        "storage_bytes": 1673312,
+        "wall_ns": 61153738784
+      },
+      "public_ordered_plan_path": "data/results/phase9-controlled-design-v1/relay_beam/plan/campaign-ordered-plan.json",
+      "public_ordered_plan_sha256": "49d712f61e4ea64378c2d53d48ab9d18057e0205796adc33632f4f09665f3181",
+      "resource_combination_rule": "one shared full paired process upper bound with factor two",
+      "source_label": "controlled_canonical_adaptation",
+      "status": "bounded_exploratory",
+      "x_error_rate": 0.08,
+      "z_error_rate": 0.0
+    },
+    "schedule": {
+      "arm_order": [
+        "spa_flooding",
+        "spa_check_node_serial"
+      ],
+      "bounded_achieved_power": 0.0,
+      "bounded_evaluative_n": 3,
+      "calibration_discordance_basis": "q=1 worst-case prospective planning assumption, not an estimate from one-shot calibration",
+      "calibration_profiles": {
+        "spa_check_node_serial": {
+          "path": "data/results/phase9-control-profiles-v1/spa_check_node_serial-profile.json",
+          "projection": {
+            "achieved_power": 0.0,
+            "bounded_n": 5,
+            "design_sha256": "682e2b79f9d2c659f50d84ed5cffeff70704952c37a81f12210c0b3337e775d6",
+            "local_caps": {
+              "rss_bytes": 268435456,
+              "storage_bytes": 67108864,
+              "wall_ns": 600000000000
+            },
+            "missing_measurements": [],
+            "profile_method": "spa_check_node_serial",
+            "projected_costs": {
+              "evidence_bytes": 220570,
+              "execution_cpu_ns": 490605440000,
+              "execution_wall_ns": 503314430020,
+              "peak_rss_bytes": 709795840,
+              "replay_wall_ns": 495144367880,
+              "storage_bytes": 268100
+            },
+            "projection_sha256": "5cdf20618e852004dbe808378e950acf88984d53dbbb3f8dec47fd24a7607505",
+            "publication_slurm_authorization": "deny",
+            "replay_receipt_sha256": "f244710babd4a64393683adfe6a51e814814d4b3cefc354ca307c2626d553e5f",
+            "safety_factor": {
+              "denominator": 1,
+              "numerator": 2
+            },
+            "schema": "measured_resource_projection_v1",
+            "site_ceiling_status": "unavailable",
+            "source_receipt_sha256": "520b9a50cd946f41916f06286723087126d0ed4faa31f5b74a3ac39771e1a039",
+            "status": "bounded_exploratory"
+          },
+          "sha256": "5136b710cfe982cbcaa8e10eb928cba120f8fc46cfdd724b4b9e2e29eb7e0d53"
+        },
+        "spa_flooding": {
+          "path": "data/results/phase9-control-profiles-v1/spa_flooding-profile.json",
+          "projection": {
+            "achieved_power": 0.0,
+            "bounded_n": 6,
+            "design_sha256": "682e2b79f9d2c659f50d84ed5cffeff70704952c37a81f12210c0b3337e775d6",
+            "local_caps": {
+              "rss_bytes": 268435456,
+              "storage_bytes": 67108864,
+              "wall_ns": 600000000000
+            },
+            "missing_measurements": [],
+            "profile_method": "spa_flooding",
+            "projected_costs": {
+              "evidence_bytes": 140376,
+              "execution_cpu_ns": 502674684000,
+              "execution_wall_ns": 518225704344,
+              "peak_rss_bytes": 838828032,
+              "replay_wall_ns": 515935390656,
+              "storage_bytes": 196824
+            },
+            "projection_sha256": "406a34a95acfee6e8bd5742e8ec33b57fe5b9516ee2299eb1b84eff4e9be89b6",
+            "publication_slurm_authorization": "deny",
+            "replay_receipt_sha256": "04fb0a201eb20fd64071d69fab4892d86c6ba0d7ea9943443684853ab9b992bd",
+            "safety_factor": {
+              "denominator": 1,
+              "numerator": 2
+            },
+            "schema": "measured_resource_projection_v1",
+            "site_ceiling_status": "unavailable",
+            "source_receipt_sha256": "82dc4b40f9ee3132ecdb6c93ea353174dddacf59cd33a58022818833aa133482",
+            "status": "bounded_exploratory"
+          },
+          "sha256": "8ba82247708c2ba3295dee6c472428458cc9b852cd62770b8ea2672afb886e8b"
+        }
+      },
+      "claim_status": "exploratory_inconclusive_until_frozen_n_complete",
+      "code_id": "b1-ghp-882",
+      "denominator_rule": "all_frozen_matched_terminal_pairs_only",
+      "group_rule": "coordinate_point_namespace_sample_declared_arm_v1",
+      "local_caps": {
+        "administrative_pair_cap": 16,
+        "cores": 1,
+        "rss_bytes": 268435456,
+        "storage_bytes": 67108864,
+        "wall_ns": 600000000000
+      },
+      "noise_model": "independent_x_only_css_code_capacity",
+      "ordered_plan_digest": "439e5b745bdbc915df755a6e7eb47f8a0780788ef49bf7fd36797404c9308760",
+      "ordered_work_file_sha256": "fd5411c915cc6be1c28c8b631a4f43dfc55f4003f9a4e649f45e640e58ab4c56",
+      "ordered_work_path": "data/studies/phase9-control-schedule-ordered-work-v1.json",
+      "ordered_work_spec_sha256": "52191d0db002d12bec6a6059f8cf36deb3da421b9f3456d1b7a2e08130225791",
+      "outcome_matrix": "all_shot_v1",
+      "paired_design": {
+        "arm_order": [
+          "spa_flooding",
+          "spa_check_node_serial"
+        ],
+        "calibration_discordance": 1.0,
+        "calibration_namespace": "phase3-b1-matched-physical-samples-v1",
+        "calibration_receipt_sha256": "e6721ba95d929a9abc2bddaf896a23cc44c81be618ec0208497ac0e929df6432",
+        "estimand": "paired_all_shot_risk_difference_v1",
+        "evaluation_namespace": "phase9-control-schedule-eval-v1",
+        "evaluation_namespace_sha256": "b97eb9f47a29f5fa45d712687af9da170ec88cbf40c4d57436a5d77661b34384",
+        "family_id": "schedule",
+        "family_size": 3,
+        "familywise_alpha": 0.05,
+        "max_pairs": 5000,
+        "minimum_relevant_difference": 0.05,
+        "schema": "paired_design_v1",
+        "target_power": 0.8
+      },
+      "paired_design_sha256": "682e2b79f9d2c659f50d84ed5cffeff70704952c37a81f12210c0b3337e775d6",
+      "powered_achieved_power": 0.8000318761946713,
+      "powered_required_n": 4188,
+      "profile_sample_role": "calibration_only_disjoint_from_evaluation",
+      "projected_per_pair": {
+        "decoder_work": 27880,
+        "evidence_bytes": 67510,
+        "rss_bytes": 141959168,
+        "storage_bytes": 86424,
+        "wall_ns": 187033836728
+      },
+      "projected_total": {
+        "decoder_work": 83640,
+        "evidence_bytes": 202530,
+        "rss_bytes": 141959168,
+        "storage_bytes": 259272,
+        "wall_ns": 561101510184
+      },
+      "public_ordered_plan_path": "data/results/phase9-controlled-design-v1/schedule/plan/campaign-ordered-plan.json",
+      "public_ordered_plan_sha256": "be7a1cbc2ef44b65b934347b0f8dbc32e4b18700d8fe3b96d71f5aad8048fab9",
+      "resource_combination_rule": "two distinct full arm processes summed with factor two",
+      "source_label": "controlled_canonical_adaptation",
+      "status": "bounded_exploratory",
+      "x_error_rate": 0.1,
+      "z_error_rate": 0.0
+    }
+  },
+  "familywise_alpha": 0.05,
+  "limitations": [
+    "One-shot profiles cannot estimate paired discordance; q=1 is a conservative prospective planning assumption.",
+    "Schedule p=0.03 calibration costs are projected to p=0.10 evaluation with a twofold safety factor.",
+    "Generic ordered-work assessment fields are topology placeholders; paired inference is defined by the paired_design and requires the controlled runner.",
+    "The first local N is deliberately small and exploratory because 80% power requires thousands of pairs."
+  ],
+  "minimum_relevant_all_shot_risk_difference": 0.05,
+  "overall_status": "bounded_exploratory",
+  "publication_slurm_authorization": "deny",
+  "safety_factor": {
+    "denominator": 1,
+    "numerator": 2
+  },
+  "schema": "phase9_controlled_design_v1",
+  "site_ceilings": {
+    "accounting": "unavailable",
+    "cores": "unavailable",
+    "memory": "unavailable",
+    "storage": "unavailable",
+    "wall": "unavailable"
+  },
+  "target_power": 0.8
+}

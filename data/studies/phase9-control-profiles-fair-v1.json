@@ -1,0 +1,51 @@
+{
+  "artifact_path": "data/artifacts/bb72-css.json",
+  "artifact_raw_sha256": "8cb3af882fecf8d16ff3b84c2c69939cdafde122fd48ab0d87a7e113d4e91227",
+  "artifact_semantic_sha256": "ff81d1e31a0fd2bb5a7ecc980298fdbaf2a65fe70a806e8a20764d047ce94aad",
+  "assessment_status": "not_assessed",
+  "comparison_contract": {
+    "beam_source_profile": "paper_v2_masked_min_sum_css_adaptation",
+    "damping_arms": "g1000 undamped and g0500 half-mixed; each damping level shares its initial BP between Beam and Relay",
+    "extra_unit": "Relay disordered-memory leg or Beam masked branch",
+    "physical_matching": "Both damping levels and both methods use identical shot IDs and physical sample identities",
+    "relay_rng": "PCG64 seed from first 16 bytes of SHA256(relay_seed:per_shot_sample_identity:leg_index), Uniform(low,high) per variable",
+    "relay_source_profile": "relay_v022_disordered_memory_after_shared_bp_css_adaptation",
+    "selection": "valid original-syndrome candidate, minimum channel-prior weight, stable first tie",
+    "shared_extra_cap": "8640 check-to-variable updates per decoder per shot",
+    "shared_initial": "identical min-sum flooding, V2C damping, 20-iteration cap, sample and observation"
+  },
+  "controls": {
+    "beam_rounds": 2,
+    "beam_width": 2,
+    "extra_iterations_per_unit": 20,
+    "initial_iterations": 20,
+    "max_extra_c2v_updates": 8640,
+    "max_extra_units": 4,
+    "relay_gamma_high": 0.66,
+    "relay_gamma_low": -0.24,
+    "relay_seed": "fair-beam-relay-css-v1-disordered",
+    "solution_limit": 1,
+    "v2c_gamma": 0.5
+  },
+  "damping_gammas": [
+    1.0,
+    0.5
+  ],
+  "error_rate": 0.08,
+  "limitations": [
+    "One prespecified BB72 p=0.08 calibration shot; no evaluative denominator or decoder ranking.",
+    "Beam and Relay share the initial BP; only their extra work and runtime are mechanism-specific.",
+    "This CSS code-capacity profile is a controlled adaptation, not either source circuit experiment."
+  ],
+  "noise_model": "independent_x_only_css_code_capacity",
+  "physical_sample_identity": "phase9-control-profile-fair-v1",
+  "sample_seed": 9101101,
+  "schema_version": 1,
+  "shots": 1,
+  "source_links": {
+    "beam": "https://arxiv.org/html/2512.07057v2",
+    "relay": "https://arxiv.org/html/2506.01779v2"
+  },
+  "source_status": "controlled_css_adaptation",
+  "study_id": "fair-beam-relay-css-v1"
+}

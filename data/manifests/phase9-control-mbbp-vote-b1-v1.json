@@ -1,0 +1,22 @@
+{
+  "arm_id": "vote",
+  "artifact_path": "data/artifacts/b1-panteleev-kalachev-v3.npz",
+  "artifact_raw_sha256": "3b3fb669daf18cb294049c2c20a457a2da997ad1a7da9f0667171d3b48eb38a6",
+  "artifact_semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548",
+  "assessment_status": "not_assessed",
+  "code_id": "b1-ghp-882",
+  "error_rate": 1e-06,
+  "evaluation_namespace": "phase9-control-mbbp-eval-v1",
+  "family": "mbbp_list_vote",
+  "matrix_sha256": "528760a97a8c97316d3c774b5378f2a99f35fa340994791fcd3771b66a2b465b",
+  "member_execution_rule": "one_shared_member_set_per_sample_before_both_decisions",
+  "physical_sample_seed": 9101401,
+  "policy_path": "literature_policies/rabeti-2026-multiple-bases-bp-list-decoding/mbbp-ld-vote.toml",
+  "policy_sha256": "9dc2c40461b2a5fd9b3bfc8487e99b964db838f60378bf8c4d4bffda9f07725e",
+  "publication_slurm_authorization": "deny",
+  "runner": "controlled_shared_mbbp_v1",
+  "schema": "phase9_control_arm_manifest_v1",
+  "source_gate_path": "data/studies/css-literature-b1-gate-v1.json",
+  "source_gate_sha256": "4c024765e50ea27606b39d14127204459e02eb45047bb51a34852c6ef627e3af",
+  "source_status": "canonical_adaptation"
+}

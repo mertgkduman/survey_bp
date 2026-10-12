@@ -1,0 +1,11 @@
+{
+  "numpy": "2.2.6",
+  "omp_num_threads": "1",
+  "platform": "Linux",
+  "publication_slurm_authorization": "deny",
+  "pydantic": "2.13.5",
+  "python": "3.12.2",
+  "schema": "phase9_control_environment_lock_v1",
+  "scipy": "1.17.1",
+  "site_ceiling_status": "unavailable"
+}
