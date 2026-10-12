@@ -25,3 +25,7 @@
 ## Reproduction path
 
 The runnable policy duplicates original check rows 0 and 1 into two independent augmented members and duplicates the corresponding syndrome bits. It fixes the paper's reported normalized min-sum factor, serial check schedule, and 100-iteration limit, and maps the paper's no-convergence zero return to a typed failure with no selected correction. Its two members are a declared canonical adaptation; they are not asserted to be the source partition. Run deterministic fixtures and a bounded B1 command gate before a paper-scale study. Match the paper's ordered artifact, source partition and other frozen experiment details before claiming Figure 5 agreement.
+
+## Phase 9 controlled result
+
+The [two-pair list/vote control](../../../data/studies/phase9-mbbp-list-vote-control-v1.json) ran one sealed two-member set per physical sample and derived both decisions from it. Both pairs jointly succeeded, with zero discordance and a wide risk-difference interval [-0.8882, 0.8882]. This is bounded canonical mechanism evidence, not a Figure 5 reproduction or source-ensemble qualification. The [Phase 9 evidence index](../../../data/results/phase9-css-evidence-index-v1.json) preserves the source digest discrepancy and unverified author experiment identity separately.

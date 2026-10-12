@@ -183,6 +183,15 @@
         "policy_file_phase5_intervention_dispatch",
         "source_experiment_identity_check"
       ],
+      "canonical_assessment": {
+        "completed_shots": 2,
+        "path": "data/studies/phase9-yao-b1-t001-p010-v4-assessment.json",
+        "sha256": "4e4d4742994cbbaed6b3b63ad6374cedc8a52c73c135b0b1429776d5059c0647",
+        "source_label": "canonical_adaptation",
+        "status": "inconclusive_cap_censored",
+        "target_failures": 100,
+        "target_id": "yao-fig3-bpgd-t001-p010"
+      },
       "identity": "yao:bpgd-t001",
       "native_status": "identity_unverified",
       "qualification": "canonical_adaptation_not_assessed",

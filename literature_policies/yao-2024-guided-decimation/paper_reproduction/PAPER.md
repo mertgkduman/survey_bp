@@ -35,3 +35,7 @@
 ## Reproduction path
 
 The [bounded B1 policy-file gate](../../../docs/css-literature-gate.md) exercises `bpgd-t100-r002.toml` on matched near-zero-noise samples for interface and provenance validation. `bpgd-t001.toml` is likewise a canonical adaptation, not native execution or source-faithful reproduction. Later bind this paper's ordered B1 artifact, noise grid, stopping/denominator rule, expected points, tolerance, environment, and ledger to a reproduction manifest. A cross-paper B1 or BB code run is a controlled adaptation unless it exactly matches this paper's experiment.
+
+## Phase 9 bounded assessment
+
+The [B1 T=1 p=0.10 adaptation assessment](../../../data/studies/phase9-yao-b1-t001-p010-v4-assessment.json) is `inconclusive_cap_censored`: two sealed timeout terminals exhausted the frozen wall cap before 100 failures. No inverse-binomial rate, interval, `T_100`, or source-target verdict was computed. The earlier unsealed attempts remain zero-credit diagnostics. The [Phase 9 evidence index](../../../data/results/phase9-css-evidence-index-v1.json) keeps this adaptation separate from all ten unverified source variants and from a source-faithful claim.

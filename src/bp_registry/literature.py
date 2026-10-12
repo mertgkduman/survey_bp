@@ -771,6 +771,29 @@ def qualify_phase9_source_inventory(root: str | Path | None = None) -> bytes:
     if len(records) != 14:
         raise ValueError("Phase 9 inventory must contain exactly fourteen selected variants")
     records.sort(key=lambda record: record["identity"])
+    assessment_relative = "data/studies/phase9-yao-b1-t001-p010-v4-assessment.json"
+    assessment_path = workspace / assessment_relative
+    if assessment_path.exists():
+        if assessment_path.is_symlink() or not assessment_path.is_file():
+            raise ValueError("Phase 9 Yao adaptation assessment must be a regular file")
+        assessment = json.loads(assessment_path.read_bytes())
+        report_ref = assessment.get("artifacts", {}).get("report", {})
+        report_path = workspace / report_ref.get("path", "")
+        if (assessment.get("schema") != "phase9_yao_b1_t001_p010_assessment_v1"
+                or assessment.get("source_label") != "canonical_adaptation"
+                or assessment.get("source_faithful") is not False
+                or assessment.get("assessment_status") != "inconclusive_cap_censored"
+                or assessment.get("verified") is not True
+                or report_path.is_symlink() or not report_path.is_file()
+                or sha256(report_path.read_bytes()).hexdigest() != report_ref.get("sha256")):
+            raise ValueError("Phase 9 Yao adaptation assessment differs from verified receipts")
+        selected = next(record for record in records if record["identity"] == "yao:bpgd-t001")
+        selected["canonical_assessment"] = {
+            "status": "inconclusive_cap_censored", "source_label": "canonical_adaptation",
+            "path": assessment_relative, "sha256": sha256(assessment_path.read_bytes()).hexdigest(),
+            "target_id": "yao-fig3-bpgd-t001-p010", "completed_shots": assessment["completed_shots"],
+            "target_failures": assessment["frozen_target_failures"],
+        }
     return (json.dumps({
         "evidence_kind": "phase9_css_source_qualification_inventory_v1",
         "format_version": 1,

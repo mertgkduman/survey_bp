@@ -36,3 +36,7 @@ bp-registry path/to/study.json --decoder literature_policies/bhatnagar-2026-impu
 ```
 
 The study must pin the code artifact, physical sample identity, iteration and work budgets. The symbolic one-attempt-per-coordinate cap and ascending coordinate order resolve from the validated artifact block length before execution and cache identity are formed. The policy records flooding and a finite magnitude-25 forced LLR as declared interpretations; the paper's message schedule and exact infinity realization are unresolved.
+
+## Phase 9 evidence state
+
+The [Phase 9 evidence index](../../../data/results/phase9-css-evidence-index-v1.json) retains all three selected variants as source-unqualified and not assessed. Author numeric data are unavailable to this workspace and no pinned two-pass digitization has been completed. The runnable canonical first-convergence pilot supplies mechanism evidence only; it has no Figure 5 curve verdict.
