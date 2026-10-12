@@ -1,5 +1,55 @@
 # Bounded campaign evidence
 
+## Phase 9 local failure-count campaigns
+
+A failure-count document has one top-level `failure_count_work_spec` containing
+the prospective `campaign_work_spec` and `policy`. It freezes one arm, one
+target, ordered sample IDs, a target failure count, a whole-batch size, the
+inverse-binomial procedure, independently derived executable limits, and
+finite shot, work, event, evidence, storage, and wall caps. The policy's
+`campaign_plan_sha256` is the acyclic binding returned by
+`failure_count_plan_binding(CampaignWorkSpecV1.model_validate(campaign_work_spec))`;
+set that value in both policy copies before `plan`. The plan contains no
+observed failure count, stopping ordinal, interval, or verdict.
+
+The local commands run one next bounded batch at a time. `run-local` returns
+the preserved `receipt_path`; pass that path to `merge`. Use a fresh merge
+output directory for each progress snapshot because merge receipts are
+immutable. `resume` reports the exact next missing ordinal. Repeat the run,
+merge, and resume steps until the state is `target_reached` or `cap_censored`.
+
+```bash
+OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign preflight \
+  --campaign <failure-count-document.json> --campaign-root . --output-root <run-root>
+OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign plan \
+  --campaign <failure-count-document.json> --campaign-root . --output-root <plan-root>
+OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign run-local \
+  --plan <plan-root>/failure-count-plan.json --campaign-root . --output-root <run-root>
+OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign merge \
+  --receipt <receipt_path-returned-by-run-local> \
+  --plan <plan-root>/failure-count-plan.json --campaign-root . --output-root <merge-root>
+OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign resume \
+  --plan <plan-root>/failure-count-plan.json \
+  --merge <merge-root>/failure-count-merge.json --campaign-root .
+OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign assess \
+  --plan <plan-root>/failure-count-plan.json \
+  --merge <merge-root>/failure-count-merge.json --campaign-root . \
+  --output-root <assessment-root>
+OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign verify \
+  --report <assessment-root>/failure-count-assessment.json \
+  --plan <plan-root>/failure-count-plan.json \
+  --merge <merge-root>/failure-count-merge.json --campaign-root .
+```
+
+The verified target receipt identifies `T_r`, the exact ordinal of the
+target-th logical failure. Inference uses only the ordered prefix through
+`T_r`; later shots completed in that terminal batch are authorized tail and
+remain in total work, runtime, and resource costs. A cap-censored receipt has
+no inverse-binomial interval or source-agreement verdict. A partial attempt
+has zero completed-shot and failure credit; its consumed resources and pending
+ordinal remain visible. Publication Slurm dispatch for this route remains
+denied until site ceilings are measured.
+
 Phase 8 campaigns separate frozen scientific work from observations about how
 that work was delivered. They produce reproducible development evidence. They
 do not establish a source reproduction, a decoder ranking, or an authorization

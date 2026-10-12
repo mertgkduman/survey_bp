@@ -295,6 +295,20 @@ def freeze_failure_count_work_spec(spec: FailureCountWorkSpecV1) -> CampaignWork
     )
 
 
+def failure_count_plan_binding(spec: CampaignWorkSpecV1) -> str:
+    """Bind the work layout without hashing the policy back into itself.
+
+    The policy lives inside ``assessment.stopping``.  Replacing only that
+    occurrence with a fixed domain marker gives its ``campaign_plan_sha256``
+    an independently reproducible, acyclic pre-run meaning.
+    """
+    if not isinstance(spec, CampaignWorkSpecV1):
+        raise ValueError("failure-count plan binding requires a work specification")
+    payload = spec.model_dump(mode="json", by_alias=True)
+    payload["assessment"]["stopping"] = {"mode": "failure_count_policy_binding_placeholder_v1"}
+    return sha256(b"bp-registry-failure-count-plan-binding-v1\0" + canonical_json_bytes(payload)).hexdigest()
+
+
 def validate_executor_allocation(plan: CampaignWorkPlan, allocation: Mapping[str, int]) -> bool:
     """Accept only a pure frozen-shard-to-slot mapping; it cannot repartition work."""
     if not isinstance(plan, CampaignWorkPlan):

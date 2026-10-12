@@ -22,12 +22,17 @@ from typing import Any, Callable, Mapping
 from pydantic import ValidationError
 
 from ..manifests import preflight as preflight_manifest
-from .contracts import CampaignSpecV1, CampaignWorkSpecV1, MaterializedPhysicalSampleV1, build_one_unit_plan, canonical_json_bytes
+from .contracts import CampaignSpecV1, CampaignWorkSpecV1, FailureCountWorkSpecV1, MaterializedPhysicalSampleV1, build_one_unit_plan, canonical_json_bytes
 from .execution import (
     _build_look_merge_receipt, _deterministic_look_stop_receipt, _sealed_local_records,
     dispatch_finite_looks, run_canonical_work_plan, run_one_unit, verify_canonical_attempt,
 )
-from .planning import CampaignCoordinateV1, CampaignWorkPlan, freeze_campaign_work_spec, freeze_work_plan
+from .planning import CampaignCoordinateV1, CampaignWorkPlan, failure_count_plan_binding, freeze_campaign_work_spec, freeze_failure_count_work_spec, freeze_work_plan
+from .failure_count_public import (
+    dispatch_public_failure_count_batch, failure_count_merge_payload,
+    failure_count_report_payload, reconstruct_failure_count_state,
+    verify_failure_count_merge,
+)
 from .shards import derive_resume_plan, merge_verified_attempts
 from .reporting import reconstruct_campaign_report, verify_campaign_report, verify_campaign_routes
 from .shards import reconstruct_fixed_shot, verify_shard
@@ -264,6 +269,108 @@ def _work_document(campaign_path: str, root: Path) -> CampaignWorkSpecV1:
     from .execution import _preflight_work_arms
     _preflight_work_arms(spec, root)
     return spec
+
+
+def _failure_count_document(campaign_path: str, root: Path) -> FailureCountWorkSpecV1:
+    document = _read_json(campaign_path)
+    if set(document) != {"failure_count_work_spec"} or not isinstance(document["failure_count_work_spec"], Mapping):
+        raise ValueError("failure-count campaign document must contain exactly failure_count_work_spec")
+    spec = FailureCountWorkSpecV1.model_validate(document["failure_count_work_spec"])
+    if spec.policy.campaign_plan_sha256 != failure_count_plan_binding(spec.campaign_work_spec):
+        raise ValueError("failure-count policy does not bind the prospective work layout")
+    if len(spec.campaign_work_spec.assessment.targets) != 1:
+        raise ValueError("public failure-count lifecycle requires one frozen target")
+    if len(spec.campaign_work_spec.coordinates) != 1:
+        raise ValueError("public failure-count lifecycle requires one frozen coordinate")
+    from .execution import _failure_count_executable_projection, _preflight_work_arms
+    _preflight_work_arms(spec.campaign_work_spec, root)
+    plan = freeze_failure_count_work_spec(spec)
+    if len(plan.units) != spec.policy.caps.max_shots:
+        raise ValueError("failure-count frozen ordinals must equal the prospective shot cap")
+    _failure_count_executable_projection(
+        plan=plan, campaign_root=root, first_ordinal=1,
+        batch_size=spec.policy.batch_size if spec.policy.dispatch_mode == "strict_full_batch" else 1,
+        accumulated={"shots": 0, "work": 0, "events": 0, "evidence_bytes": 0, "storage_bytes": 0},
+    )
+    return spec
+
+
+def _failure_count_plan_payload(spec: FailureCountWorkSpecV1) -> dict[str, Any]:
+    plan = freeze_failure_count_work_spec(spec)
+    return {
+        "schema": "failure_count_public_plan_v1",
+        "failure_count_work_spec": spec.model_dump(mode="json", by_alias=True),
+        "campaign_spec_digest": plan.campaign_spec_digest,
+        "campaign_plan_digest": plan.campaign_plan_digest,
+        "policy_sha256": spec.policy.digest(),
+        "assessment_digest": spec.campaign_work_spec.assessment.digest(),
+        "units": [unit.payload() for unit in plan.units],
+        "shards": [shard.payload() for shard in plan.shards],
+        "shot_ordinals": [unit.key for unit in plan.units],
+        "executor_route": "local",
+        "publication_slurm_authorization": "deny",
+    }
+
+
+def _load_failure_count_plan(plan_path: str, root: Path) -> tuple[FailureCountWorkSpecV1, CampaignWorkPlan, dict[str, Any]]:
+    payload = _read_json(plan_path)
+    if payload.get("schema") != "failure_count_public_plan_v1" or not isinstance(payload.get("failure_count_work_spec"), Mapping):
+        raise ValueError("failure-count public plan has an invalid schema")
+    spec = FailureCountWorkSpecV1.model_validate(payload["failure_count_work_spec"])
+    if spec.policy.campaign_plan_sha256 != failure_count_plan_binding(spec.campaign_work_spec):
+        raise ValueError("failure-count policy does not bind the prospective work layout")
+    expected = _failure_count_plan_payload(spec)
+    if payload != expected or _json_bytes(Path(plan_path)) != canonical_json_bytes(expected) + b"\n":
+        raise ValueError("failure-count public plan differs from prospective inputs")
+    from .execution import _failure_count_executable_projection, _preflight_work_arms
+    _preflight_work_arms(spec.campaign_work_spec, root)
+    plan = freeze_failure_count_work_spec(spec)
+    if len(spec.campaign_work_spec.assessment.targets) != 1 or len(spec.campaign_work_spec.coordinates) != 1:
+        raise ValueError("public failure-count plan requires one target and one coordinate")
+    if len(plan.units) != spec.policy.caps.max_shots:
+        raise ValueError("failure-count frozen ordinals must equal the prospective shot cap")
+    _failure_count_executable_projection(
+        plan=plan, campaign_root=root, first_ordinal=1,
+        batch_size=spec.policy.batch_size if spec.policy.dispatch_mode == "strict_full_batch" else 1,
+        accumulated={"shots": 0, "work": 0, "events": 0, "evidence_bytes": 0, "storage_bytes": 0},
+    )
+    return spec, plan, payload
+
+
+def _failure_count_evidence_path(root: Path, state: Mapping[str, Any]) -> Path:
+    terminal = state["terminal_path"]
+    if terminal is not None:
+        return terminal
+    partial_paths = tuple(sorted((root / "attempts").glob("*/partial-attempt.json")))
+    if state["partial"] is not None and partial_paths:
+        matching = [path for path in partial_paths if sha256(path.read_bytes()).hexdigest() == sha256(state["partial"].primitive_bytes() + b"\n").hexdigest()]
+        if len(matching) != 1:
+            raise ValueError("pending partial evidence path is ambiguous")
+        return matching[0]
+    attempts = tuple(sorted((root / "attempts").glob("*/attempt.json")))
+    if attempts:
+        return attempts[-1]
+    raise ValueError("failure-count run produced no preserved evidence")
+
+
+def _failure_count_receipt_root(receipt_text: str) -> Path:
+    receipt = Path(receipt_text)
+    if receipt.is_symlink() or not receipt.is_file():
+        raise ValueError("failure-count merge requires a regular preserved receipt")
+    if receipt.name in {"failure-count-target-stop.json", "failure-count-cap-censor.json"}:
+        return receipt.parent.resolve(strict=True)
+    if receipt.name in {"attempt.json", "partial-attempt.json"} and receipt.parent.parent.name == "attempts":
+        return receipt.parent.parent.parent.resolve(strict=True)
+    raise ValueError("failure-count receipt is outside the bounded attempt grammar")
+
+
+def _failure_count_verified_merge(merge_path: str, *, plan: CampaignWorkPlan, root: Path) -> tuple[dict[str, Any], dict[str, Any]]:
+    merge_file = Path(merge_path)
+    payload = _read_json(merge_path)
+    expected, state = verify_failure_count_merge(payload=payload, plan=plan, campaign_root=root)
+    if merge_file.read_bytes() != canonical_json_bytes(expected) + b"\n":
+        raise ValueError("failure-count merge has noncanonical bytes")
+    return expected, state
 
 
 def _work_plan_payload(spec: CampaignWorkSpecV1) -> dict[str, Any]:
@@ -641,6 +748,10 @@ def _preflight(args: argparse.Namespace) -> dict[str, Any]:
     if not output.exists() and (not output.parent.is_dir() or output.parent.is_symlink()):
         raise ValueError("output_root parent must be an existing non-symlink directory")
     document = _read_json(args.campaign)
+    if "failure_count_work_spec" in document:
+        spec = _failure_count_document(args.campaign, root)
+        return _artifact(status="ok", plan=_failure_count_plan_payload(spec), phase="preflight",
+                         sampling_performed=False, executor_route="local")
     if "campaign_work_spec" in document:
         spec = _work_document(args.campaign, root)
         return _artifact(
@@ -654,6 +765,14 @@ def _preflight(args: argparse.Namespace) -> dict[str, Any]:
 def _plan(args: argparse.Namespace) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
     document = _read_json(args.campaign)
+    if "failure_count_work_spec" in document:
+        spec = _failure_count_document(args.campaign, root)
+        payload = _failure_count_plan_payload(spec)
+        artifact = _publish_json(_output_root(args.output_root) / "failure-count-plan.json", payload)
+        return _artifact(status="ok", plan=payload, phase="plan", artifact_path=str(artifact),
+                         artifact_sha256=sha256(artifact.read_bytes()).hexdigest(),
+                         unit_count=len(payload["units"]), shard_count=len(payload["shards"]),
+                         executor_route="local", publication_slurm_authorization="deny")
     if "campaign_work_spec" in document:
         spec = _work_document(args.campaign, root)
         payload = _work_plan_payload(spec)
@@ -671,6 +790,19 @@ def _plan(args: argparse.Namespace) -> dict[str, Any]:
 
 def _run(args: argparse.Namespace, *, route: str) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
+    if _read_json(args.plan).get("schema") == "failure_count_public_plan_v1":
+        if route != "local":
+            raise ValueError("failure-count campaigns authorize local bounded execution only")
+        _spec, work_plan, payload = _load_failure_count_plan(args.plan, root)
+        output = _output_root(args.output_root)
+        state = dispatch_public_failure_count_batch(plan=work_plan, campaign_root=root, bounded_root=output)
+        receipt = _failure_count_evidence_path(output, state)
+        return _artifact(status="ok", plan=payload, phase="run_local", executor_route="local",
+                         receipt_path=str(receipt), receipt_sha256=sha256(receipt.read_bytes()).hexdigest(),
+                         bounded_output_root=str(output), campaign_state=state["state"],
+                         completed_shots=len(state["ordered"]), cumulative_failures=sum(item["logical_failure"] for item in state["ordered"]),
+                         pending_ordinal=len(state["ordered"]) + 1 if state["state"] == "progress" else None,
+                         partial_attempt_sha256=state["partial_digest"])
     if _read_json(args.plan).get("schema") == "campaign_work_plan_v1":
         if route == "local":
             return _paired_run(args, root=root, output=_output_root(args.output_root))
@@ -698,6 +830,30 @@ def _run(args: argparse.Namespace, *, route: str) -> dict[str, Any]:
 
 def _verify(args: argparse.Namespace) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
+    if args.plan is not None and _read_json(args.plan).get("schema") == "failure_count_public_plan_v1":
+        _spec, plan, payload = _load_failure_count_plan(args.plan, root)
+        if args.merge is None:
+            raise ValueError("failure-count verification requires --merge")
+        merged, state = _failure_count_verified_merge(args.merge, plan=plan, root=root)
+        if args.report is not None:
+            expected = failure_count_report_payload(plan=plan, merge=merged, state=state)
+            if _json_bytes(Path(args.report)) != canonical_json_bytes(expected) + b"\n":
+                raise ValueError("failure-count report differs from independent reconstruction")
+            return _artifact(status="ok", plan=payload, phase="verify", verified=True,
+                             report_sha256=expected["report_sha256"],
+                             merge_receipt_sha256=merged["merge_content_sha256"],
+                             campaign_state=state["state"])
+        if args.receipt is None:
+            raise ValueError("failure-count verification requires --receipt or --report")
+        receipt = Path(args.receipt)
+        if _failure_count_receipt_root(args.receipt) != Path(merged["bounded_output_root"]):
+            raise ValueError("failure-count receipt differs from verified merge root")
+        if receipt.is_symlink() or not receipt.is_file():
+            raise ValueError("failure-count receipt is unavailable")
+        return _artifact(status="ok", plan=payload, phase="verify", verified=True,
+                         receipt_sha256=sha256(receipt.read_bytes()).hexdigest(),
+                         merge_receipt_sha256=merged["merge_content_sha256"],
+                         campaign_state=state["state"])
     if args.report is not None:
         if args.plan is None or args.merge is None:
             raise ValueError("report verification requires --plan and --merge")
@@ -851,6 +1007,18 @@ def _verify_operational_gate(args: argparse.Namespace) -> dict[str, Any]:
 
 def _merge(args: argparse.Namespace) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
+    if args.plan is not None and _read_json(args.plan).get("schema") == "failure_count_public_plan_v1":
+        _spec, plan, payload = _load_failure_count_plan(args.plan, root)
+        bounded_roots = {_failure_count_receipt_root(item) for item in args.receipt}
+        if len(bounded_roots) != 1:
+            raise ValueError("failure-count merge requires one bounded campaign root")
+        bounded_root = bounded_roots.pop()
+        merged = failure_count_merge_payload(plan=plan, campaign_root=root, bounded_root=bounded_root)
+        artifact = _publish_json(_output_root(args.output_root) / "failure-count-merge.json", merged)
+        return _artifact(status="ok", plan=payload, phase="merge", artifact_path=str(artifact),
+                         artifact_sha256=sha256(artifact.read_bytes()).hexdigest(),
+                         merge_receipt_sha256=merged["merge_content_sha256"],
+                         campaign_state=merged["state"], completed_shots=len(merged["ordered"]))
     if args.plan is not None and _read_json(args.plan).get("schema") == "campaign_work_plan_v1":
         _spec, plan, payload = _load_work_plan(args.plan, root)
         return _paired_merge(args, root=root, plan=plan, payload=payload)
@@ -941,6 +1109,33 @@ def _verified_merge(merge_path: str, campaign_root: Path) -> dict[str, Any]:
 
 def _resume(args: argparse.Namespace) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
+    if _read_json(args.plan).get("schema") == "failure_count_public_plan_v1":
+        _spec, plan, payload = _load_failure_count_plan(args.plan, root)
+        merged, state = _failure_count_verified_merge(args.merge, plan=plan, root=root)
+        recovered = state["recoverable_target"] is not None or state["next_cap"] is not None
+        if recovered:
+            # A verified complete target batch or exhausted cap can have a
+            # missing final control file after a crash.  Resume publishes it
+            # from retained evidence without invoking a decoder.
+            state = dispatch_public_failure_count_batch(
+                plan=plan, campaign_root=root,
+                bounded_root=Path(merged["bounded_output_root"]),
+            )
+        next_ordinal = len(state["ordered"]) + 1
+        if state["terminal"] is not None or next_ordinal > len(plan.units):
+            missing = []
+        else:
+            policy = plan.work_spec.policy
+            next_size = (1 if policy.dispatch_mode == "interruptible_unit"
+                         else policy.batch_size - ((next_ordinal - 1) % policy.batch_size))
+            missing = [item.key for item in plan.units[next_ordinal - 1:next_ordinal - 1 + next_size]]
+        return _artifact(status="ok", plan=payload, phase="resume", campaign_state=state["state"],
+                         complete=state["terminal"] is not None, resumable_unit_keys=missing,
+                         exact_missing_set=missing, pending_ordinal=next_ordinal if missing else None,
+                         partial_attempt_sha256=state["partial_digest"],
+                         recovered_terminal_receipt=recovered,
+                         needs_merge_refresh=recovered,
+                         merge_receipt_sha256=merged["merge_content_sha256"])
     if _read_json(args.plan).get("schema") == "campaign_work_plan_v1":
         _spec, work_plan, payload = _load_work_plan(args.plan, root)
         merged = _paired_merge_payload(args.merge, plan=work_plan)
@@ -968,6 +1163,18 @@ def _resume(args: argparse.Namespace) -> dict[str, Any]:
 def _assess(args: argparse.Namespace) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
     plan_path = getattr(args, "plan", None)
+    if plan_path is not None and _read_json(plan_path).get("schema") == "failure_count_public_plan_v1":
+        _spec, plan, payload = _load_failure_count_plan(plan_path, root)
+        merged, state = _failure_count_verified_merge(args.merge, plan=plan, root=root)
+        if args.output_root is None:
+            raise ValueError("failure-count assess requires --output-root")
+        report = failure_count_report_payload(plan=plan, merge=merged, state=state)
+        artifact = _publish_json(_output_root(args.output_root) / "failure-count-assessment.json", report)
+        return _artifact(status="ok", plan=payload, phase="assess", assessment_status=report["assessment_status"],
+                         campaign_state=state["state"], artifact_path=str(artifact),
+                         artifact_sha256=sha256(artifact.read_bytes()).hexdigest(),
+                         report=report, report_sha256=report["report_sha256"],
+                         merge_receipt_sha256=merged["merge_content_sha256"])
     if plan_path is not None and _read_json(plan_path).get("schema") == "campaign_work_plan_v1":
         spec, work_plan, payload = _load_work_plan(plan_path, root)
         merged = _paired_merge_payload(args.merge, plan=work_plan)
@@ -992,6 +1199,8 @@ def _assess(args: argparse.Namespace) -> dict[str, Any]:
 
 def _emit_slurm(args: argparse.Namespace) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
+    if _read_json(args.plan).get("schema") == "failure_count_public_plan_v1":
+        raise ValueError("failure-count publication Slurm is not authorized without measured site ceilings")
     if _read_json(args.plan).get("schema") == "campaign_work_plan_v1":
         _spec, work_plan, plan = _load_work_plan(args.plan, root)
     else:

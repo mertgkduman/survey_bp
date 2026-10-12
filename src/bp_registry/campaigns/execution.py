@@ -1161,7 +1161,12 @@ def _failure_count_executable_projection(
     if not isinstance(plan.work_spec, FailureCountWorkSpecV1):
         raise ValueError("bounded canonical execution requires FailureCountWorkSpecV1")
     spec, policy = plan.work_spec.campaign_work_spec, plan.work_spec.policy
-    required_batch = policy.batch_size if policy.dispatch_mode == "strict_full_batch" else 1
+    # A fresh strict dispatch begins at a batch boundary.  After a sealed
+    # partial, only the still missing suffix of that same batch may resume.
+    required_batch = (
+        policy.batch_size - ((first_ordinal - 1) % policy.batch_size)
+        if policy.dispatch_mode == "strict_full_batch" else 1
+    )
     if batch_size != required_batch or first_ordinal < 1 or first_ordinal + batch_size - 1 > len(plan.units):
         raise ValueError("bounded canonical execution requires one exact declared ordinal batch")
     if first_ordinal + batch_size - 1 > policy.caps.max_shots:
@@ -1482,6 +1487,8 @@ def _retained_bounded_actuals(
     arms = {arm.arm_id: arm for arm in _campaign_work_spec(plan).arms}
     terminal_by_ordinal: dict[int, dict[str, Any]] = {}
     wall_by_ordinal: dict[int, tuple[int, int, int]] = {}
+    partials_by_ordinal: dict[int, list[FailureCountPartialAttemptV1]] = {}
+    terminal_sequence_by_ordinal: dict[int, int] = {}
     for directory in sorted(attempts_root.iterdir()):
         if directory.is_symlink() or not directory.is_dir():
             raise ValueError("bounded attempt directory must be a regular directory")
@@ -1497,6 +1504,10 @@ def _retained_bounded_actuals(
             if raw != partial.primitive_bytes() + b"\n":
                 raise ValueError("partial attempt receipt has noncanonical bytes")
             verify_failure_count_partial_attempt(record=partial, plan=plan, receipt_sha256=partial.digest())
+            match = units.get(partial.unit_key)
+            if match is None or match[0] != partial.attempt_ordinal:
+                raise ValueError("partial attempt differs from its frozen ordinal")
+            partials_by_ordinal.setdefault(partial.attempt_ordinal, []).append(partial)
             for name, amount in (
                 ("work", partial.consumed_decoder_work), ("events", partial.consumed_events),
                 ("evidence_bytes", partial.consumed_evidence_bytes),
@@ -1566,6 +1577,7 @@ def _retained_bounded_actuals(
                 or overshoot != max(0, observed - deadline)):
             raise ValueError("bounded terminal wall observation is invalid")
         wall_by_ordinal[ordinal] = (deadline, observed, overshoot)
+        terminal_sequence_by_ordinal[ordinal] = observation["attempt_sequence"]
         ledger_size = ledger_path.stat().st_size
         sample_size = sample_path.stat().st_size
         scientific_storage = observation["scientific_storage_bytes"]
@@ -1588,6 +1600,21 @@ def _retained_bounded_actuals(
             totals[name] = _checked_add(totals[name], amount, name=f"retained {name}")
     if tuple(sorted(terminal_by_ordinal)) != tuple(range(1, len(terminal_by_ordinal) + 1)):
         raise ValueError("bounded terminal evidence is not a contiguous frozen prefix")
+    for ordinal, partials in partials_by_ordinal.items():
+        if ordinal > len(terminal_by_ordinal) + 1:
+            raise ValueError("partial attempt lies beyond the pending ordinal")
+        by_sequence = {partial.attempt_sequence: partial for partial in partials}
+        if len(by_sequence) != len(partials) or set(by_sequence) != set(range(1, len(partials) + 1)):
+            raise ValueError("partial attempt sequence is duplicated or noncontiguous")
+        previous = None
+        for sequence in range(1, len(partials) + 1):
+            current = by_sequence[sequence]
+            if current.parent_partial_receipt_sha256 != previous:
+                raise ValueError("partial attempt parent chain is not contiguous")
+            previous = current.digest()
+    for ordinal, sequence in terminal_sequence_by_ordinal.items():
+        if sequence != len(partials_by_ordinal.get(ordinal, ())) + 1:
+            raise ValueError("terminal attempt sequence differs from partial retry lineage")
     return (totals, tuple(terminal_by_ordinal[index] for index in sorted(terminal_by_ordinal)),
             tuple(wall_by_ordinal[index] for index in sorted(wall_by_ordinal)))
 
