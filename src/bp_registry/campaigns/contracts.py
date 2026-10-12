@@ -390,6 +390,12 @@ class FailureCountPolicyV1(StrictModel):
     dispatch_mode: Literal["strict_full_batch", "interruptible_unit"] = Field(
         default="strict_full_batch", exclude_if=lambda value: value == "strict_full_batch",
     )
+    interruptible_evidence_bytes: int | None = Field(
+        default=None, ge=1, le=_MAX_EVIDENCE_BYTES, exclude_if=lambda value: value is None,
+    )
+    interruptible_storage_bytes: int | None = Field(
+        default=None, ge=1, le=_MAX_STORAGE_BYTES, exclude_if=lambda value: value is None,
+    )
 
     @field_validator("cap_precedence", mode="before")
     @classmethod
@@ -400,6 +406,12 @@ class FailureCountPolicyV1(StrictModel):
     def independently_authorized_bounds(self) -> "FailureCountPolicyV1":
         if set(self.cap_precedence) != {"wall", "storage", "evidence", "events", "work", "shots"}:
             raise ValueError("cap precedence must contain each finite cap exactly once")
+        if self.dispatch_mode == "strict_full_batch" and (
+                self.interruptible_evidence_bytes is not None or self.interruptible_storage_bytes is not None):
+            raise ValueError("strict failure-count policy cannot declare interruptible byte budgets")
+        if self.dispatch_mode == "interruptible_unit" and (
+                self.interruptible_evidence_bytes is None or self.interruptible_storage_bytes is None):
+            raise ValueError("interruptible failure-count policy requires both scientific byte budgets")
         if (self.dispatch_mode == "strict_full_batch"
                 and (self.caps.max_shots < self.batch_size or self.caps.max_shots % self.batch_size)):
             raise ValueError("failure-count shot cap must contain whole authorized batches")
@@ -437,6 +449,55 @@ class FailureCountPolicyV1(StrictModel):
 
     def digest(self) -> str:
         return _digest("bp-registry-failure-count-policy-v1", self.primitive_bytes())
+
+
+class FailureCountPartialAttemptV1(StrictModel):
+    """Immutable zero-credit evidence for one interrupted failure-count ordinal."""
+
+    schema_name: Literal["failure_count_partial_attempt_v1"] = Field(alias="schema", serialization_alias="schema")
+    attempt_id: str = Field(pattern=_SHA256)
+    attempt_ordinal: int = Field(ge=1, le=_MAX_EVENTS)
+    unit_key: str = Field(min_length=1, max_length=512)
+    parent_partial_receipt_sha256: str | None = Field(default=None, pattern=_SHA256)
+    campaign_spec_digest: str = Field(pattern=_SHA256)
+    campaign_plan_digest: str = Field(pattern=_SHA256)
+    policy_sha256: str = Field(pattern=_SHA256)
+    authorization_sha256: str = Field(pattern=_SHA256)
+    profile_sha256: str = Field(pattern=_SHA256)
+    materialized_sample_path: str = Field(min_length=1, max_length=4096)
+    materialized_sample_sha256: str | None = Field(default=None, pattern=_SHA256)
+    canonical_ledger_path: str = Field(min_length=1, max_length=4096)
+    canonical_ledger_sha256: str | None = Field(default=None, pattern=_SHA256)
+    interruption_kind: Literal["interrupted_wall", "interrupted_evidence", "interrupted_storage"]
+    first_exhausted_cap: Literal["wall", "evidence", "storage"]
+    last_completed_boundary: str | None = Field(default=None, max_length=512)
+    attempted_bytes: int | None = Field(default=None, ge=1, le=_MAX_STORAGE_BYTES)
+    deadline_ns: int | None = Field(default=None, ge=0)
+    observed_ns: int | None = Field(default=None, ge=0)
+    overshoot_ns: int | None = Field(default=None, ge=0)
+    consumed_decoder_work: int = Field(ge=0, le=_MAX_DECODER_WORK)
+    consumed_events: int = Field(ge=0, le=_MAX_EVENTS)
+    consumed_evidence_bytes: int = Field(ge=0, le=_MAX_EVIDENCE_BYTES)
+    consumed_storage_bytes: int = Field(ge=0, le=_MAX_STORAGE_BYTES)
+    consumed_control_receipt_bytes: int = Field(ge=0, le=_MAX_STORAGE_BYTES)
+    completed_shot_credit: Literal[0] = 0
+    failure_credit: Literal[0] = 0
+
+    @model_validator(mode="after")
+    def partial_is_zero_credit_and_has_exact_wall_facts(self) -> "FailureCountPartialAttemptV1":
+        if self.interruption_kind == "interrupted_wall":
+            if (self.deadline_ns is None or self.observed_ns is None or self.overshoot_ns is None
+                    or self.overshoot_ns != max(0, self.observed_ns - self.deadline_ns)):
+                raise ValueError("wall partial requires exact deadline observation and overshoot")
+        elif any(value is not None for value in (self.deadline_ns, self.observed_ns, self.overshoot_ns)):
+            raise ValueError("byte partial cannot claim wall interruption facts")
+        return self
+
+    def primitive_bytes(self) -> bytes:
+        return canonical_json_bytes(self.model_dump(mode="json", by_alias=True))
+
+    def digest(self) -> str:
+        return _digest("bp-registry-failure-count-partial-attempt-v1", self.primitive_bytes())
 
 
 class FailureCountTerminalReceiptV1(StrictModel):

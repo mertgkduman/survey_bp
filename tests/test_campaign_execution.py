@@ -299,7 +299,7 @@ def _single_arm_failure_count_work_spec_payload() -> dict[str, object]:
 def test_single_arm_work_spec_runs_one_verified_canonical_bounded_unit(tmp_path: Path) -> None:
     """A failure-count request runs only its frozen ordinal through canonical evidence."""
     from bp_registry.campaigns.contracts import FailureCountWorkSpecV1
-    from bp_registry.campaigns.execution import run_canonical_bounded_batch
+    from bp_registry.campaigns.execution import run_canonical_bounded_batch, verify_failure_count_partial_attempt
     from bp_registry.campaigns.planning import freeze_failure_count_work_spec
 
     spec = FailureCountWorkSpecV1.model_validate(_single_arm_failure_count_work_spec_payload())
@@ -324,6 +324,10 @@ def test_failure_count_interruptible_policy_is_explicit_and_default_bytes_stay_s
     assert isinstance(policy, dict)
     policy["dispatch_mode"] = "interruptible_unit"
     policy["batch_size"] = 2
+    limits = policy["executable_limits"]
+    assert isinstance(limits, dict)
+    policy["interruptible_evidence_bytes"] = limits["derived_evidence_bytes_per_unit"]
+    policy["interruptible_storage_bytes"] = limits["derived_storage_bytes_per_unit"]
     campaign = payload["campaign_work_spec"]
     assert isinstance(campaign, dict)
     assessment = campaign["assessment"]
@@ -338,7 +342,7 @@ def test_failure_count_interruptible_policy_is_explicit_and_default_bytes_stay_s
 def test_bounded_batch_charges_sample_ledger_and_terminal_receipt_to_one_guard(tmp_path: Path) -> None:
     """Every durable unit artifact consumes the same per-unit authorization."""
     from bp_registry.campaigns.contracts import FailureCountWorkSpecV1
-    from bp_registry.campaigns.execution import run_canonical_bounded_batch
+    from bp_registry.campaigns.execution import run_canonical_bounded_batch, verify_failure_count_partial_attempt
     from bp_registry.campaigns.planning import freeze_failure_count_work_spec
 
     plan = freeze_failure_count_work_spec(
@@ -349,13 +353,55 @@ def test_bounded_batch_charges_sample_ledger_and_terminal_receipt_to_one_guard(t
     )
     snapshot = result["runtime_snapshots"][0]
     attempt = result["verified_attempts"][0]
-    receipt = tmp_path / "units" / attempt["unit_key"] / "attempt.json"
+    receipt = Path(attempt["canonical_ledger_path"]).parent / "attempt.json"
     assert snapshot.scientific_evidence_bytes == Path(attempt["canonical_ledger_path"]).stat().st_size
     assert snapshot.scientific_storage_bytes == (
         Path(attempt["canonical_ledger_path"]).stat().st_size
         + Path(attempt["materialized_sample_path"]).stat().st_size
         + receipt.stat().st_size
     )
+
+
+def test_interruptible_unit_seals_an_immutable_zero_credit_partial_attempt(tmp_path: Path) -> None:
+    """A denied ledger append preserves the exact pending ordinal without outcome credit."""
+    from bp_registry.campaigns.contracts import FailureCountWorkSpecV1
+    from bp_registry.campaigns.execution import run_canonical_bounded_batch, verify_failure_count_partial_attempt
+    from bp_registry.campaigns.planning import freeze_failure_count_work_spec
+
+    payload = _single_arm_failure_count_work_spec_payload()
+    policy = payload["policy"]
+    assert isinstance(policy, dict)
+    policy.update({
+        "dispatch_mode": "interruptible_unit", "interruptible_evidence_bytes": 1,
+        "interruptible_storage_bytes": 1_000_000,
+    })
+    plan = freeze_failure_count_work_spec(FailureCountWorkSpecV1.model_validate(payload))
+    result = run_canonical_bounded_batch(
+        plan, campaign_root=ROOT, output_root=tmp_path, first_ordinal=1, batch_size=1,
+    )
+    partial = result["partial_attempt"]
+    assert partial.interruption_kind == "interrupted_evidence"
+    assert partial.completed_shot_credit == partial.failure_credit == 0
+    receipt = Path(partial.canonical_ledger_path).parent / "partial-attempt.json"
+    original = receipt.read_bytes()
+    assert partial.consumed_control_receipt_bytes == len(original)
+    assert not result["verified_attempts"]
+    verify_failure_count_partial_attempt(
+        record=partial, plan=plan, receipt_sha256=result["partial_attempt_sha256"],
+    )
+    resumed = run_canonical_bounded_batch(
+        plan, campaign_root=ROOT, output_root=tmp_path, first_ordinal=1, batch_size=1,
+        parent_partial_receipt_sha256=result["partial_attempt_sha256"],
+    )
+    assert resumed["partial_attempt"].attempt_id != partial.attempt_id
+    assert resumed["partial_attempt"].parent_partial_receipt_sha256 == result["partial_attempt_sha256"]
+    assert len(list((tmp_path / "attempts").glob("*/partial-attempt.json"))) == 2
+    receipt.write_bytes(original.replace(b'"consumed_events":0', b'"consumed_events":1'))
+    with pytest.raises(ValueError, match="differ from its hash"):
+        verify_failure_count_partial_attempt(
+            record=__import__("bp_registry.campaigns.contracts", fromlist=["FailureCountPartialAttemptV1"]).FailureCountPartialAttemptV1.model_validate_json(receipt.read_bytes()),
+            plan=plan, receipt_sha256=result["partial_attempt_sha256"],
+        )
 
 
 def test_canonical_bounded_batch_seals_actual_resources_and_rejects_noncontiguous_dispatch(tmp_path: Path) -> None:

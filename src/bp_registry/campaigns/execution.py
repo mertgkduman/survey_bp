@@ -20,7 +20,7 @@ from typing import Any, Callable, Mapping
 
 from .. import sampling
 from ..canonical.verification import validate_canonical_shot
-from ..ledger import read_canonical_events
+from ..ledger import CanonicalResourceInterruption, read_canonical_events
 from ..runner import (
     CANONICAL_GUARDED_ARTIFACT_BYTE_CEILING_V1, CanonicalRuntimeAuthorizationV1,
     CanonicalRuntimeGuardV1, canonical_public_manifest_context, canonical_public_shot_context,
@@ -28,7 +28,7 @@ from ..runner import (
     run_canonical_one, verify_declared_executable_limits,
 )
 from .contracts import (
-    CampaignSpecV1, CampaignWorkSpecV1, FailureCountStoppingV1, FailureCountWorkSpecV1,
+    CampaignSpecV1, CampaignWorkSpecV1, FailureCountPartialAttemptV1, FailureCountStoppingV1, FailureCountWorkSpecV1,
     MaterializedPhysicalSampleV1, build_one_unit_plan, canonical_json_bytes,
 )
 from .identity import validate_matched_sample_hashes
@@ -1198,9 +1198,164 @@ def _failure_count_executable_projection(
     return spec, projection, context, derived, manifest_path
 
 
+def _partial_interruption_fields(snapshot: Any) -> tuple[str, str]:
+    """Map the engine's closed guard outcomes into campaign receipt names."""
+    if snapshot.interruption_kind == "wall_deadline":
+        return "interrupted_wall", "wall"
+    if snapshot.interruption_kind == "evidence_bytes":
+        return "interrupted_evidence", "evidence"
+    if snapshot.interruption_kind == "storage_bytes":
+        return "interrupted_storage", "storage"
+    raise ValueError("strict canonical guard interruption is not a resumable campaign partial")
+
+
+def _seal_failure_count_partial_attempt(
+    *, plan: CampaignWorkPlan, unit: Any, policy: Any, authorization: CanonicalRuntimeAuthorizationV1,
+    materialized: MaterializedPhysicalSampleV1 | None, sample_path: Path, ledger_path: Path,
+    snapshot: Any, receipt_path: Path, resource_guard: CanonicalRuntimeGuardV1,
+    parent_partial_receipt_sha256: str | None,
+) -> tuple[FailureCountPartialAttemptV1, str]:
+    """Use the guard's reserved control bytes to retain zero-credit evidence."""
+    kind, cap = _partial_interruption_fields(snapshot)
+    ledger_digest = None if not ledger_path.exists() else sha256(ledger_path.read_bytes()).hexdigest()
+    partial = FailureCountPartialAttemptV1(
+        schema="failure_count_partial_attempt_v1",
+        attempt_id=sha256(canonical_json_bytes({
+            "plan": plan.campaign_plan_digest, "unit": unit.key,
+            "authorization": authorization.authorization_identity,
+        })).hexdigest(),
+        attempt_ordinal=next(index for index, candidate in enumerate(plan.units, start=1) if candidate.key == unit.key),
+        unit_key=unit.key, parent_partial_receipt_sha256=parent_partial_receipt_sha256,
+        campaign_spec_digest=plan.campaign_spec_digest, campaign_plan_digest=plan.campaign_plan_digest,
+        policy_sha256=policy.digest(), authorization_sha256=sha256(canonical_json_bytes(authorization.__dict__ if hasattr(authorization, "__dict__") else {
+            "profile_digest": authorization.profile_digest, "authorization_identity": authorization.authorization_identity,
+            "mode": authorization.mode, "max_events": authorization.max_events,
+            "max_evidence_bytes": authorization.max_evidence_bytes, "max_storage_bytes": authorization.max_storage_bytes,
+            "control_receipt_reserve_bytes": authorization.control_receipt_reserve_bytes,
+            "monotonic_deadline_ns": authorization.monotonic_deadline_ns,
+            "max_event_bytes": authorization.max_event_bytes, "max_artifact_bytes": authorization.max_artifact_bytes,
+        })).hexdigest(),
+        profile_sha256=authorization.profile_digest,
+        materialized_sample_path=str(sample_path), materialized_sample_sha256=(
+            None if materialized is None else materialized.materialized_sample_sha256
+        ),
+        canonical_ledger_path=str(ledger_path), canonical_ledger_sha256=ledger_digest,
+        interruption_kind=kind, first_exhausted_cap=cap,
+        last_completed_boundary=snapshot.boundary, attempted_bytes=snapshot.attempted_bytes,
+        deadline_ns=snapshot.deadline_ns if kind == "interrupted_wall" else None,
+        observed_ns=snapshot.after_ns if kind == "interrupted_wall" else None,
+        overshoot_ns=snapshot.overshoot_ns if kind == "interrupted_wall" else None,
+        consumed_decoder_work=sum(snapshot.committed_work.as_evidence(structural_event_version=4).values()),
+        consumed_events=snapshot.scientific_events, consumed_evidence_bytes=snapshot.scientific_evidence_bytes,
+        consumed_storage_bytes=snapshot.scientific_storage_bytes,
+        consumed_control_receipt_bytes=0,
+    )
+    # The control receipt records its own exact byte consumption.  Iterate to
+    # a fixed point because changing the decimal representation can change the
+    # serialized length by one byte at a power-of-ten boundary.
+    for _ in range(4):
+        payload = partial.primitive_bytes() + b"\n"
+        adjusted = partial.model_copy(update={"consumed_control_receipt_bytes": len(payload)})
+        if adjusted.primitive_bytes() + b"\n" == payload:
+            partial = adjusted
+            break
+        partial = adjusted
+    else:
+        raise ValueError("partial receipt byte accounting did not stabilize")
+    payload = partial.primitive_bytes() + b"\n"
+    guarded_atomic_write_bytes(
+        receipt_path, payload, resource_guard=resource_guard,
+        boundary="campaign:partial_attempt", control_receipt=True,
+    )
+    sealed = FailureCountPartialAttemptV1.model_validate_json(receipt_path.read_bytes())
+    if sealed != partial or sha256(receipt_path.read_bytes()).hexdigest() != sha256(payload).hexdigest():
+        raise ValueError("partial attempt receipt did not survive atomic publication")
+    return sealed, sealed.digest()
+
+
+def verify_failure_count_partial_attempt(
+    *, record: FailureCountPartialAttemptV1 | Mapping[str, Any], plan: CampaignWorkPlan,
+    receipt_sha256: str,
+) -> FailureCountPartialAttemptV1:
+    """Rehash zero-credit evidence before it can influence a resume decision."""
+    partial = record if isinstance(record, FailureCountPartialAttemptV1) else FailureCountPartialAttemptV1.model_validate(record)
+    if partial.digest() != receipt_sha256:
+        raise ValueError("partial attempt receipt bytes differ from its hash")
+    if not isinstance(plan.work_spec, FailureCountWorkSpecV1):
+        raise ValueError("partial attempt requires a frozen failure-count plan")
+    policy = plan.work_spec.policy
+    if (partial.campaign_spec_digest != plan.campaign_spec_digest
+            or partial.campaign_plan_digest != plan.campaign_plan_digest
+            or partial.policy_sha256 != policy.digest()):
+        raise ValueError("partial attempt differs from the frozen campaign identity")
+    if not 1 <= partial.attempt_ordinal <= len(plan.units):
+        raise ValueError("partial attempt ordinal is outside the frozen campaign")
+    if plan.units[partial.attempt_ordinal - 1].key != partial.unit_key:
+        raise ValueError("partial attempt ordinal and unit key differ")
+    sample_path = Path(partial.materialized_sample_path)
+    if partial.materialized_sample_sha256 is None:
+        if sample_path.exists():
+            raise ValueError("partial attempt unexpectedly names an unhashed materialized sample")
+    else:
+        if sample_path.is_symlink() or not sample_path.is_file():
+            raise ValueError("partial attempt materialized sample is not a regular file")
+        sample = MaterializedPhysicalSampleV1.model_validate_json(sample_path.read_bytes())
+        if sample.materialized_sample_sha256 != partial.materialized_sample_sha256:
+            raise ValueError("partial attempt materialized sample differs from retained bytes")
+    ledger_path = Path(partial.canonical_ledger_path)
+    if partial.canonical_ledger_sha256 is None:
+        if ledger_path.exists():
+            raise ValueError("partial attempt unexpectedly names an unhashed ledger")
+    elif (ledger_path.is_symlink() or not ledger_path.is_file()
+          or sha256(ledger_path.read_bytes()).hexdigest() != partial.canonical_ledger_sha256):
+        raise ValueError("partial attempt ledger hash differs from retained bytes")
+    return partial
+
+
+def _resume_parent_for_ordinal(
+    *, destination: Path, unit_key: str, parent_partial_receipt_sha256: str | None,
+) -> tuple[int, str | None]:
+    """Preserve immutable attempts and allow only one digest-linked retry."""
+    attempts_root = destination / "attempts"
+    if not attempts_root.exists():
+        return 1, None
+    partials: list[FailureCountPartialAttemptV1] = []
+    for directory in attempts_root.iterdir():
+        if directory.is_symlink() or not directory.is_dir():
+            raise ValueError("bounded attempt directory must be a regular directory")
+        terminal = directory / "attempt.json"
+        if terminal.exists():
+            raw = json.loads(terminal.read_bytes())
+            if raw.get("unit_key") == unit_key:
+                raise ValueError("completed ordinal cannot be dispatched again")
+        partial_path = directory / "partial-attempt.json"
+        if partial_path.exists():
+            partial = FailureCountPartialAttemptV1.model_validate_json(partial_path.read_bytes())
+            if partial.unit_key == unit_key:
+                partials.append(partial)
+    if not partials:
+        if parent_partial_receipt_sha256 is not None:
+            raise ValueError("resume parent does not name a pending ordinal")
+        return 1, None
+    by_digest = {partial.digest(): partial for partial in partials}
+    if len(by_digest) != len(partials):
+        raise ValueError("pending ordinal has duplicate partial attempts")
+    children = {partial.parent_partial_receipt_sha256 for partial in partials if partial.parent_partial_receipt_sha256 is not None}
+    if any(parent not in by_digest for parent in children):
+        raise ValueError("pending ordinal partial parent is absent")
+    roots = [digest for digest, partial in by_digest.items() if partial.parent_partial_receipt_sha256 is None]
+    leaves = [digest for digest in by_digest if digest not in children]
+    if len(roots) != 1 or len(leaves) != 1:
+        raise ValueError("pending ordinal has competing partial attempts")
+    digest = leaves[0]
+    if parent_partial_receipt_sha256 != digest:
+        raise ValueError("resume requires the exact pending partial receipt digest")
+    return len(partials) + 1, digest
+
+
 def run_canonical_bounded_batch(
     plan: CampaignWorkPlan, *, campaign_root: str | Path, output_root: str | Path,
-    first_ordinal: int, batch_size: int,
+    first_ordinal: int, batch_size: int, parent_partial_receipt_sha256: str | None = None,
 ) -> dict[str, Any]:
     """Execute exactly one frozen contiguous failure-count ordinal batch.
 
@@ -1225,18 +1380,28 @@ def run_canonical_bounded_batch(
     runtime_snapshots: list[Any] = []
     for ordinal in range(first_ordinal, first_ordinal + batch_size):
         unit = plan.units[ordinal - 1]
+        attempt_number, linked_parent = _resume_parent_for_ordinal(
+            destination=destination, unit_key=unit.key,
+            parent_partial_receipt_sha256=parent_partial_receipt_sha256,
+        )
         arm_path, context = arm_contexts[unit.arm_id]
         sample_path = destination / "samples" / f"{unit.physical_sample_identity}.json"
         deadline_ns = time.monotonic_ns() + policy.batch_authorization.per_unit_timeout_ns
         authorization_identity = sha256(canonical_json_bytes({
             "campaign_plan_digest": plan.campaign_plan_digest, "ordinal": ordinal,
-            "policy": policy.digest(), "derived": derived.digest,
+            "attempt_number": attempt_number, "policy": policy.digest(), "derived": derived.digest,
         })).hexdigest()
         authorization_kwargs = {
             "profile_digest": derived.digest, "authorization_identity": authorization_identity,
             "max_events": derived.derived_events_per_unit,
-            "max_evidence_bytes": derived.derived_evidence_bytes_per_unit - derived.partial_receipt_reserve_bytes,
-            "max_storage_bytes": derived.derived_storage_bytes_per_unit - derived.partial_receipt_reserve_bytes,
+            "max_evidence_bytes": (
+                derived.derived_evidence_bytes_per_unit - derived.partial_receipt_reserve_bytes
+                if policy.dispatch_mode == "strict_full_batch" else policy.interruptible_evidence_bytes
+            ),
+            "max_storage_bytes": (
+                derived.derived_storage_bytes_per_unit - derived.partial_receipt_reserve_bytes
+                if policy.dispatch_mode == "strict_full_batch" else policy.interruptible_storage_bytes
+            ),
             "control_receipt_reserve_bytes": derived.partial_receipt_reserve_bytes,
             "monotonic_deadline_ns": deadline_ns,
             "max_event_bytes": derived.serializer_bytes_per_event,
@@ -1251,12 +1416,31 @@ def run_canonical_bounded_batch(
             else CanonicalRuntimeAuthorizationV1.interruptible_unit(**authorization_kwargs)
         )
         guard = CanonicalRuntimeGuardV1(authorization)
-        materialized = materialize_campaign_sample(
-            plan=plan, unit=unit, spec=spec, context=context, destination=sample_path,
-            resource_guard=guard,
-        )
-        ledger_path = destination / "units" / unit.key / "events.jsonl"
+        attempt_dir = destination / "attempts" / f"{ordinal:08d}-{authorization_identity[:16]}"
+        ledger_path = attempt_dir / "events.jsonl"
         ledger_path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            materialized = materialize_campaign_sample(
+                plan=plan, unit=unit, spec=spec, context=context, destination=sample_path,
+                resource_guard=guard,
+            )
+        except CanonicalResourceInterruption as error:
+            partial, partial_digest = _seal_failure_count_partial_attempt(
+                plan=plan, unit=unit, policy=policy, authorization=authorization,
+                materialized=None, sample_path=sample_path, ledger_path=ledger_path,
+                snapshot=error.snapshot, receipt_path=attempt_dir / "partial-attempt.json",
+                resource_guard=guard, parent_partial_receipt_sha256=linked_parent,
+            )
+            return {
+                "schema": "failure_count_canonical_bounded_batch_v1",
+                "campaign_plan_digest": plan.campaign_plan_digest, "ordinals": (ordinal,),
+                "authorization_projection": {"dispatch_allowed": True, **projection},
+                "actual_resources": {"completed_shots": len(verified)},
+                "wall_boundaries": tuple(observations), "materialized_samples": tuple(materialized_samples),
+                "verified_attempts": tuple(verified), "partial_attempt": partial,
+                "partial_attempt_sha256": partial_digest, "interruption": error,
+                "runtime_snapshots": (guard.snapshot(),),
+            }
         engine_result = run_canonical_materialized_one(
             arm_path, sample=_shot_from_materialized(materialized),
             materialized_sample_sha256=materialized.materialized_sample_sha256,
@@ -1266,6 +1450,13 @@ def run_canonical_bounded_batch(
         observed = time.monotonic_ns()
         observations.append((deadline_ns, observed, max(0, observed - deadline_ns)))
         if engine_result.status == "interrupted":
+            assert engine_result.interruption is not None
+            partial, partial_digest = _seal_failure_count_partial_attempt(
+                plan=plan, unit=unit, policy=policy, authorization=authorization,
+                materialized=materialized, sample_path=sample_path, ledger_path=ledger_path,
+                snapshot=engine_result.interruption.snapshot, receipt_path=attempt_dir / "partial-attempt.json",
+                resource_guard=guard, parent_partial_receipt_sha256=linked_parent,
+            )
             return {
                 "schema": "failure_count_canonical_bounded_batch_v1",
                 "campaign_plan_digest": plan.campaign_plan_digest,
@@ -1274,13 +1465,14 @@ def run_canonical_bounded_batch(
                 "actual_resources": {"completed_shots": len(verified)},
                 "wall_boundaries": tuple(observations),
                 "materialized_samples": tuple(materialized_samples), "verified_attempts": tuple(verified),
-                "interruption": engine_result.interruption,
+                "partial_attempt": partial, "partial_attempt_sha256": partial_digest,
+                "interruption": engine_result.interruption, "runtime_snapshots": (guard.snapshot(),),
             }
         record = _campaign_attempt(
             plan=plan, unit=unit, arm_path=arm_path, sample_path=sample_path,
             materialized=materialized, ledger_path=ledger_path,
         )
-        receipt_path = ledger_path.parent / "attempt.json"
+        receipt_path = attempt_dir / "attempt.json"
         receipt_payload = canonical_json_bytes({
             key: value for key, value in record.items()
             if key not in {"receipt_sha256", "events", "terminal_bytes_sha256", "persisted_sample_sha256", "validation_status", "replay_status"}
@@ -1298,7 +1490,7 @@ def run_canonical_bounded_batch(
         raise TimeoutError("bounded canonical wall authorization stopped a partial batch")
     actual_evidence = sum(Path(item["canonical_ledger_path"]).stat().st_size for item in verified)
     actual_storage = actual_evidence + sum(Path(item["materialized_sample_path"]).stat().st_size for item in verified)
-    actual_storage += sum((destination / "units" / item["unit_key"] / "attempt.json").stat().st_size for item in verified)
+    actual_storage += sum((Path(item["canonical_ledger_path"]).parent / "attempt.json").stat().st_size for item in verified)
     actual_work = sum(
         value for item in verified for value in item["work_vector"].values()
         if type(value) is int
