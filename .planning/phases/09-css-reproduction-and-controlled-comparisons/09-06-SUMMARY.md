@@ -2,79 +2,41 @@
 phase: 09-css-reproduction-and-controlled-comparisons
 plan: "06"
 subsystem: campaigns
-tags: [failure-count, immutable-receipts, lifecycle, blocked]
-status: blocked
+tags: [failure-count, canonical, immutable-receipts, public-lifecycle]
+status: complete
 plan_head_before: 9c917b8d3ac1944e19dc49ea2fdd467f591bba6f
-commits: 2
 dependency_graph:
-  requires: [09-04, 09-05]
-  provides: [local one-arm failure-count stop/censor receipt primitive]
-  affects: [09-08, 09-10, public campaign lifecycle]
-tech_stack:
-  added: []
-  patterns: [sealed immutable unit attempts, ordinal replay, terminal-batch tail separation]
+  requires: [09-04, 09-05, 09-16, 09-17]
+  provides: [public local failure-count plan, bounded dispatch, ordered merge, resume, assessment, independent replay]
+  affects: [09-09, 09-10, 09-18]
 key_files:
-  created: [tests/test_campaign_failure_count.py]
-  modified: [src/bp_registry/campaigns/execution.py]
-decisions:
-  - "Do not expose the local controller as the existing public campaign lifecycle until failure terminal facts are moved out of the frozen assessment plan."
-metrics:
-  duration: partial execution
-  completed_date: 2026-10-11
+  created: [src/bp_registry/campaigns/failure_count_public.py, tests/test_campaign_failure_count.py]
+  modified: [src/bp_registry/campaigns/execution.py, src/bp_registry/campaigns/planning.py, src/bp_registry/campaigns/cli.py, docs/campaigns.md]
 actuals:
-  tokens: 14500
-  tasks: 1
-  commits: 2
+  tasks: 2
+  commits: 3
 ---
 
-# Phase 09 Plan 06: Failure-Count Lifecycle Summary
+# Phase 09 Plan 06: Public Failure-Count Lifecycle
 
-Implemented a sealed local one-arm failure-count controller, then stopped before the incompatible public CLI/report integration.
+## Delivered
 
-## Completed Work
-
-### Task 1: Dispatch, seal, and resume one target-reached failure-count campaign
-
-- `dispatch_failure_count_batches()` freezes ordinal order from the work plan, dispatches whole local batches, and stops only after the target-th ordered failure or a whole-batch cap.
-- Unit attempts, including interruptions, are immutable. Resume retries only the interrupted ordinal in a fresh attempt directory and does not rerun completed shots.
-- `verify_failure_count_receipt()` rebuilds stop/censor evidence from sealed receipt bytes. It rejects altered order, counts, tails, and work facts.
-- A target receipt separates the exact inferential prefix through `T_r` from already-completed terminal-batch tail. Tail shots remain in actual work counts.
-- A cap-first terminal is emitted as `inconclusive_cap_censored` with no verdict.
-
-**Commits:**
-
-- `f0a3dfe` feat(09-06): seal ordered failure-count lifecycle
-- `1f4f9f8` fix(09-06): resume only interrupted failure units
-
-## Blocking Plan Gap
-
-Task 2 remains unimplemented. The current public `plan`, `run-local`, `verify`, `merge`, `resume`, and `assess` path cannot honestly consume the new lifecycle without a persistent-contract redesign.
-
-`CampaignAssessmentV1` freezes `FailureCountStoppingV1.terminal_state`, the observed `terminal_failure_ordinal`, prefix/tail hashes, and the inverse-binomial interval before execution. Those fields are only knowable after ordered terminal evidence has been sealed. Separately, `_paired_run()` calls `run_canonical_work_plan()` over all frozen units at once, so it cannot stop at a verified target batch or recover a missing terminal receipt before dispatching more work.
-
-The controller therefore has no safe way to make the existing public commands claim failure-count support. It currently accepts one arm and a test-supplied unit runner; it is not a substitute for canonical paired execution.
-
-## Required Replan Interface
-
-1. Split the prospective failure-count policy (target failures, batch size, declared ordering, cap authorizations, resource caps) from a new post-run terminal receipt containing `target_reached` or `cap_censored`, `T_r`, prefix/tail digests, and observed counts.
-2. Add a canonical single-unit/bounded-batch execution adapter that produces verified canonical attempt receipts without scheduling all work-plan units at once.
-3. Route `plan`, `run-local`, `merge`, `resume`, `assess`, and `verify` by the prospective policy. Their failure-count form must retain and replay the ordered merge, exact prefix/tail split, terminal receipt, actual work/resources, and cap censoring.
-4. Define the public ordinal for multi-arm plans before allowing controlled comparisons through this path; the current controller deliberately rejects `units_per_sample_group != 1`.
-5. Enforce all frozen shot, work, evidence, storage, and wall authorizations before each whole batch. The completed primitive currently enforces the whole-shot cap only.
-6. Preserve the existing rule that Phase 9 has no publication Slurm submission until site ceilings are measured.
+- Task 1's earlier local controller seals ordered target and cap receipts, retries only the interrupted ordinal, and separates the exact target-th-failure prefix from completed terminal-batch tail. Its commits are `f0a3dfe` and `1f4f9f8`.
+- Task 2 adds an acyclic prospective work-layout binding for `campaign_plan_sha256`, validates independent executable maxima and all initial caps at public plan/preflight time, and freezes exactly one arm, one coordinate, one target, and a complete ordinal set equal to the shot cap. The plan contains no terminal facts.
+- The six public verbs now handle `failure_count_public_plan_v1`: `plan` freezes local-only work; `run-local` dispatches one guarded next batch; `merge` independently replays retained sample, ledger, attempt, partial, target/censor, and resource evidence; `resume` returns the exact next batch or recovers a missing terminal control receipt without decoding; `assess` produces a versioned report; `verify` byte-compares it with fresh reconstruction.
+- Target-reached inference uses only `T_r`. Authorized terminal-batch tail remains in completed-shot, work, wall, event, evidence, and storage accounting. Cap-censored assessment is inconclusive. A mid-unit interruption has zero shot/failure credit and retains its pending ordinal, spent resources, wall overshoot when observed, and parent-linked retry lineage.
+- Report and merge receipts expose exact ordered attempt membership, all partial attempt lineage, prefix and tail hashes, cap state, target decision, and observed resource costs. Byte-interrupted attempts have typed unavailable wall timing because their receipt has no wall clock observation. Publication Slurm remains denied. The public route and regressions were committed in `b0e6f75`.
 
 ## Verification
 
-- `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_failure_count.py -k 'tracer or ordered_stop or terminal_batch_tail or censor or resume or interruption' -x` — 4 passed, 2 deselected.
-- `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'matched or finite_look or stop_receipt_recovery or crash_window or early_stop or authorized_tail or batch or overshoot or persisted or interruption' -x` — 6 passed, 38 deselected.
-- Full local lifecycle test module — 6 passed.
+- Plan 09-06 Task 1 selectors passed during its earlier local-controller implementation: 4 selected lifecycle tests and 6 selected inherited Phase 8 regressions.
+- Final Task 2 lifecycle selector: 8 passed, nonzero selection. Final report/tamper selector: 4 passed, nonzero selection. The full failure-count module passed 16 tests, and the campaign cross-route command passed 197 tests before the final replay refinements.
+- Wave 7 full repository gate on committed `b0e6f75`: **1,257 passed, 1 skipped, 25 warnings in 874.68 seconds**; wrapper elapsed 877.08 seconds; peak pytest child RSS 384,176 KiB; exit status 0. Warnings are multiprocessing fork deprecations.
 
-## Deviations from Plan
+## Deviation
 
-### Architectural blocker
-
-Task 2 requires changing the persisted assessment/plan grammar and the canonical public execution path. This is a Rule 4 architectural change, so it was not made inline. The summary is deliberately `blocked`; Plan 09-06 is not complete.
+The additive report reducer lives in `failure_count_public.py` instead of changing the historical `reporting.py` schema. This keeps fixed-shot, finite-look, and Phase 8 paired report bytes stable while providing a separate versioned failure-count report.
 
 ## Self-Check: PASSED
 
-`src/bp_registry/campaigns/execution.py`, `tests/test_campaign_failure_count.py`, and both task commits exist. The summary accurately records that Task 2 and the plan-level public lifecycle acceptance criteria remain unmet.
+Both tasks and the Phase 9 Wave 7 full-suite gate passed. No publication scheduler job was submitted or authorized.

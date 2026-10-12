@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 09
 current_phase_name: CSS Reproduction and Controlled Comparisons
-current_plan: 09-06
+current_plan: 09-09
 status: executing
-stopped_at: Wave 6 passed; Plan 09-06 public failure-count lifecycle next
-last_updated: "2026-10-12T01:20:51Z"
+stopped_at: Wave 7 passed; Plan 09-09 measured small profile gate next
+last_updated: "2026-10-12T01:59:02Z"
 last_activity: 2026-10-11
-last_activity_desc: Phase 09 Wave 6 passed; 10 of 20 plans complete after guarded bounded campaign adapter
+last_activity_desc: Phase 09 Wave 7 passed; 11 of 20 plans complete after public failure-count lifecycle
 state_head: f25ec1c6df353293c15a070defd6a7d987596ffb
 progress:
   total_phases: 14
   completed_phases: 7
   total_plans: 151
-  completed_plans: 132
+  completed_plans: 133
 ---
 
 # Project State
@@ -24,24 +24,24 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-11)
 
 **Core value:** Make BP decoder differences explicit, reproducible, and fairly comparable through canonical policy execution and published evidence.
-**Current focus:** Phase 9 CSS reproduction and controlled comparisons; Wave 7 public failure-count lifecycle
+**Current focus:** Phase 9 CSS reproduction and controlled comparisons; Wave 8 measured profile gate and ordered work
 
 ## Current Position
 
 Phase: 09 (CSS Reproduction and Controlled Comparisons) — EXECUTING
-Plan: 09-06 of 20; 10 plans passed wave gates
+Plan: 09-09 of 20; 11 plans passed wave gates
 Total Phases: 14
-Current Plan: 09-06 public failure-count lifecycle
+Current Plan: 09-09 measured small profile gate
 Total Plans in Phase: 20
-Status: Wave 6 passed; Wave 7 ready
-Last activity: 2026-10-11 — Phase 09 Wave 6 full suite passed
-Last Activity Description: Guarded bounded campaign execution passed the full-suite gate
+Status: Wave 7 passed; Wave 8 ready
+Last activity: 2026-10-11 — Phase 09 Wave 7 full suite passed
+Last Activity Description: Public bounded failure-count lifecycle passed the full-suite gate
 
-Progress: 7 of 14 phases complete (50%); Phase 9 has 10 of 20 plans complete
+Progress: 7 of 14 phases complete (50%); Phase 9 has 11 of 20 plans complete
 
 ## Performance Metrics
 
-- Total plans completed: 132
+- Total plans completed: 133
 - Average duration: N/A
 - Total execution time: 0 hours
 - Recent trend: Phase 8 completed 20 plans, including six goal-verification gap plans, and passed goal, code, security, and validation gates.
