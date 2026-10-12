@@ -173,6 +173,76 @@ def test_controlled_shared_initial_group_resumes_without_initial_bp_rerun(tmp_pa
             campaign_root=ROOT, output_root=tmp_path)
 
 
+def test_controlled_initial_recovers_after_shared_receipt_seals_before_arm(tmp_path: Path, monkeypatch) -> None:
+    from bp_registry.campaigns import controlled_execution
+    from bp_registry.campaigns.contracts import OrderedCampaignWorkSpecV1
+    from bp_registry.campaigns.planning import freeze_ordered_campaign_work_spec
+    from bp_registry.canonical.fair_legs import FairLegController
+
+    study = json.loads((ROOT / "data/studies/phase9-control-relay_beam-ordered-work-v2.json").read_text())
+    plan = freeze_ordered_campaign_work_spec(OrderedCampaignWorkSpecV1.model_validate(
+        study["ordered_campaign_work_spec"]))
+    unit = plan.units[0]
+    arm = next(item for item in plan.work_spec.arms if item.arm_id == unit.arm_id)
+    manifest = json.loads((ROOT / arm.manifest_path).read_text())
+    arguments = {"plan": plan, "unit": unit, "arm_manifest": manifest,
+                 "campaign_root": ROOT, "output_root": tmp_path}
+    original_receipt = controlled_execution._receipt_with_bytes
+
+    def interrupted(**_kwargs):
+        raise RuntimeError("interrupted after shared seal")
+
+    monkeypatch.setattr(controlled_execution, "_receipt_with_bytes", interrupted)
+    with pytest.raises(RuntimeError, match="interrupted after shared seal"):
+        controlled_execution.run_fair_controlled_unit(**arguments)
+    shared_path = tmp_path / "shared" / f"{unit.physical_sample_identity}.json"
+    shared_bytes = shared_path.read_bytes()
+    monkeypatch.setattr(controlled_execution, "_receipt_with_bytes", original_receipt)
+
+    def no_new_initial(self):
+        raise AssertionError("sealed initial BP must not run again")
+
+    monkeypatch.setattr(FairLegController, "initial_bp", no_new_initial)
+    receipt = controlled_execution.run_fair_controlled_unit(**arguments)
+    assert shared_path.read_bytes() == shared_bytes
+    assert controlled_execution.verify_fair_controlled_unit(**arguments).digest() == receipt.digest()
+
+
+def test_controlled_mbbp_recovers_after_member_set_seals_before_list(tmp_path: Path, monkeypatch) -> None:
+    from bp_registry.campaigns import controlled_mbbp
+    from bp_registry.campaigns.contracts import OrderedCampaignWorkSpecV1
+    from bp_registry.campaigns.planning import freeze_ordered_campaign_work_spec
+    from bp_registry.canonical.mbbp import MbbpController
+
+    study = json.loads((ROOT / "data/studies/phase9-control-mbbp_list_vote-ordered-work-v1.json").read_text())
+    plan = freeze_ordered_campaign_work_spec(OrderedCampaignWorkSpecV1.model_validate(
+        study["ordered_campaign_work_spec"]))
+    unit = plan.units[0]
+    arm = next(item for item in plan.work_spec.arms if item.arm_id == unit.arm_id)
+    manifest = json.loads((ROOT / arm.manifest_path).read_text())
+    arguments = {"plan": plan, "unit": unit, "arm_manifest": manifest,
+                 "campaign_root": ROOT, "output_root": tmp_path}
+    original_receipt = controlled_mbbp._receipt_with_bytes
+
+    def interrupted(**_kwargs):
+        raise RuntimeError("interrupted after member seal")
+
+    monkeypatch.setattr(controlled_mbbp, "_receipt_with_bytes", interrupted)
+    with pytest.raises(RuntimeError, match="interrupted after member seal"):
+        controlled_mbbp.run_mbbp_controlled_unit(**arguments)
+    shared_path = tmp_path / "shared" / f"{unit.physical_sample_identity}.json"
+    shared_bytes = shared_path.read_bytes()
+    monkeypatch.setattr(controlled_mbbp, "_receipt_with_bytes", original_receipt)
+
+    def no_new_members(self, *_args, **_kwargs):
+        raise AssertionError("sealed members must not run again")
+
+    monkeypatch.setattr(MbbpController, "run", no_new_members)
+    receipt = controlled_mbbp.run_mbbp_controlled_unit(**arguments)
+    assert shared_path.read_bytes() == shared_bytes
+    assert controlled_mbbp.verify_mbbp_controlled_unit(**arguments).digest() == receipt.digest()
+
+
 def test_controlled_partial_resume_assess_and_byte_replay_through_public_cli(tmp_path: Path) -> None:
     from bp_registry.campaigns.contracts import OrderedCampaignWorkSpecV1
     from bp_registry.campaigns.planning import freeze_ordered_campaign_work_spec

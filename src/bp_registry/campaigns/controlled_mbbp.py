@@ -173,10 +173,16 @@ def run_mbbp_controlled_unit(
         destination=output_root / "samples" / f"{unit.physical_sample_identity}.json")
     sample = _shot_from_materialized(materialized)
     original = _original(loaded.code, sample, unit)
+    shared_path = _shared_path(output_root, unit)
     shared = (_produce_shared(root=output_root, unit=unit, original=original, policy=policy,
                               error_rate=plan.work_spec.shared_sampler.x_error_rate,
                               provenance=arm.manifest_sha256)
-              if unit.arm_id == "list" else _load_shared(output_root, unit, original))
+              if unit.arm_id == "list" and not (shared_path.exists() or shared_path.is_symlink())
+              else _load_shared(output_root, unit, original))
+    list_manifest_sha = next(item.manifest_sha256 for item in plan.work_spec.arms
+                             if item.arm_id == "list")
+    if any(component.provenance_sha256 != list_manifest_sha for component in shared.components):
+        raise ValueError("shared MBBP provenance differs from frozen list arm")
     result = shared.to_result(original)
     vote_bit = None if unit.arm_id == "list" else policy["vote"]["tie_bit"]
     started = perf_counter_ns()
@@ -246,6 +252,11 @@ def verify_mbbp_controlled_unit(
             or receipt.physical_sample_identity != unit.physical_sample_identity
             or receipt.sample_id != unit.sample_id
             or receipt.materialized_sample_sha256 != sample_record.materialized_sample_sha256
+            or sample_record.physical_sample_identity != unit.physical_sample_identity
+            or sample_record.cohort_id != unit.cohort_id
+            or sample_record.point_id != unit.point_id
+            or sample_record.sample_namespace != unit.sample_namespace
+            or sample_record.sample_id != unit.sample_id
             or sample_record.sampler_contract_sha256 != plan.work_spec.shared_sampler.digest()):
         raise ValueError("controlled MBBP arm or sample differs from frozen plan")
     _arm(campaign_root, plan, unit, arm_manifest)
@@ -256,6 +267,10 @@ def verify_mbbp_controlled_unit(
     sample = _shot_from_materialized(sample_record)
     original = _original(loaded.code, sample, unit)
     shared = _load_shared(output_root, unit, original)
+    list_manifest_sha = next(item.manifest_sha256 for item in plan.work_spec.arms
+                             if item.arm_id == "list")
+    if any(component.provenance_sha256 != list_manifest_sha for component in shared.components):
+        raise ValueError("shared MBBP provenance differs from frozen list arm")
     result = shared.to_result(original)
     if (tuple(shared.member_ids) != tuple(item.member_id for item in _spec_for_original(policy, original.hz.shape[0]).bases)
             or receipt.shared_input_receipt_sha256 != shared.digest()):

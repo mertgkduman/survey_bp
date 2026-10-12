@@ -204,11 +204,17 @@ def run_fair_controlled_unit(
     )
     assert isinstance(materialized, MaterializedPhysicalSampleV1)
     sample = _shot_from_materialized(materialized)
+    shared_path = output_root / "shared" / f"{unit.physical_sample_identity}.json"
     shared = (_sealed_initial(
         plan=plan, unit=unit, code=code, sample=sample, config=config,
         source_status=arm_manifest["source_status"], provenance_sha256=manifest_sha,
         destination=output_root,
-    ) if unit.arm_id == "initial_bp" else _load_initial(output_root, unit))
+    ) if unit.arm_id == "initial_bp" and not (shared_path.exists() or shared_path.is_symlink())
+        else _load_initial(output_root, unit))
+    initial_manifest_sha = next(item.manifest_sha256 for item in plan.work_spec.arms
+                                if item.arm_id == "initial_bp")
+    if shared.component.provenance_sha256 != initial_manifest_sha:
+        raise ValueError("shared initial BP provenance differs from frozen baseline")
     controller = FairLegController(code.hz, sample.observation.syndrome,
                                    error_rate=plan.work_spec.shared_sampler.x_error_rate, config=config)
     initial = controller.adopt_verified_initial(shared.to_segment())
@@ -308,6 +314,10 @@ def verify_fair_controlled_unit(
             or receipt.arm_id != unit.arm_id
             or receipt.materialized_sample_sha256 != materialized.materialized_sample_sha256
             or materialized.physical_sample_identity != unit.physical_sample_identity
+            or materialized.cohort_id != unit.cohort_id
+            or materialized.point_id != unit.point_id
+            or materialized.sample_namespace != unit.sample_namespace
+            or materialized.sample_id != unit.sample_id
             or materialized.sampler_contract_sha256 != plan.work_spec.shared_sampler.digest()):
         raise ValueError("controlled arm or sample differs from frozen plan")
     event_bytes = event_path.read_bytes()
@@ -324,6 +334,10 @@ def verify_fair_controlled_unit(
     shared = _load_initial(output_root, unit)
     if receipt.shared_input_receipt_sha256 != shared.digest():
         raise ValueError("controlled arm shared initial digest differs from sealed input")
+    initial_manifest_sha = next(item.manifest_sha256 for item in plan.work_spec.arms
+                                if item.arm_id == "initial_bp")
+    if shared.component.provenance_sha256 != initial_manifest_sha:
+        raise ValueError("shared initial BP provenance differs from frozen baseline")
     shared_event_path = output_root / "events" / f"shared-{unit.physical_sample_identity}.jsonl"
     if shared_event_path.is_symlink() or not shared_event_path.is_file():
         raise ValueError("shared initial event ledger is absent")
