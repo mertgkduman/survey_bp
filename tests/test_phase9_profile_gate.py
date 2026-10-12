@@ -6,6 +6,8 @@ from argparse import Namespace
 from hashlib import sha256
 import json
 from pathlib import Path
+import subprocess
+import sys
 
 from bp_registry.campaigns import cli
 from bp_registry.literature import parse_literature_policy
@@ -56,7 +58,8 @@ def test_tracer_public_policy_ledger_seal_merge_and_verify(tmp_path: Path) -> No
 
 
 def test_measured_replay_receipt_denies_publication_and_retains_missing_site_facts() -> None:
-    gate = json.loads((ROOT / "data/results/phase9-css-profile-tracer-v1/profile-gate.json").read_text())
+    output = ROOT / "data/results/phase9-css-profile-tracer-v1"
+    gate = json.loads((output / "profile-gate.json").read_text())
     assert gate["schema"] == "phase9_css_profile_gate_v1"
     assert gate["label"] == "development_fixture"
     assert gate["assessment_status"] == "not_assessed"
@@ -66,3 +69,14 @@ def test_measured_replay_receipt_denies_publication_and_retains_missing_site_fac
     assert gate["measurements"]["replay_wall_ns"]["value"] > 0
     assert gate["site"]["wall_ceiling"]["status"] == "unavailable"
     assert gate["site"]["scheduler_accounting"]["status"] == "unavailable"
+    assert all(value["status"] == "unavailable" for value in gate["site"].values())
+    assert all(value["producer"] == "scripts/phase9_profile_gate.py" and value["unit"]
+               and value["method"] and value["scope"]
+               and value["support_receipt_sha256"] == gate["merge_receipt_sha256"]
+               for value in gate["measurements"].values())
+    assert "verdict" not in gate and "curve" not in gate
+    replay = subprocess.run(
+        [sys.executable, str(ROOT / "scripts/phase9_profile_gate.py"), "verify", "--output-root", str(output)],
+        cwd=ROOT, capture_output=True, text=True, check=True,
+    )
+    assert json.loads(replay.stdout)["publication_slurm_authorization"] == "deny"
