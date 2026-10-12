@@ -450,6 +450,34 @@ def test_interruptible_wall_partial_retains_positive_boundary_overshoot(tmp_path
     assert partial.overshoot_ns is not None and partial.overshoot_ns > 0
 
 
+def test_bounded_batch_charges_verified_prior_terminal_before_next_dispatch(tmp_path: Path) -> None:
+    """One complete shot's actual bytes must reduce the next batch authorization."""
+    from bp_registry.campaigns.contracts import FailureCountWorkSpecV1
+    from bp_registry.campaigns.execution import run_canonical_bounded_batch
+    from bp_registry.campaigns.planning import freeze_failure_count_work_spec
+
+    payload = _single_arm_failure_count_work_spec_payload()
+    campaign = payload["campaign_work_spec"]
+    policy = payload["policy"]
+    assert isinstance(campaign, dict) and isinstance(policy, dict)
+    campaign["coordinates"][0]["sample_ids"] = [0, 1]
+    campaign["look_sample_boundaries"] = [2]
+    campaign["assessment"]["resources"]["max_shots"] = 2
+    policy["caps"]["max_shots"] = 2
+    # The original byte caps admit one maximum-sized batch, but the first
+    # terminal consumes positive bytes before the second batch is considered.
+    plan = freeze_failure_count_work_spec(FailureCountWorkSpecV1.model_validate(payload))
+    first = run_canonical_bounded_batch(
+        plan, campaign_root=ROOT, output_root=tmp_path, first_ordinal=1, batch_size=1,
+    )
+    assert len(first["verified_attempts"]) == 1
+    with pytest.raises(ValueError, match="hard resource cap"):
+        run_canonical_bounded_batch(
+            plan, campaign_root=ROOT, output_root=tmp_path, first_ordinal=2, batch_size=1,
+        )
+    assert len(list((tmp_path / "attempts").glob("*/attempt.json"))) == 1
+
+
 def test_canonical_bounded_batch_seals_actual_resources_and_rejects_noncontiguous_dispatch(tmp_path: Path) -> None:
     """The bounded adapter reports actual work and never expands an ordinal slice."""
     from bp_registry.campaigns.contracts import FailureCountWorkSpecV1

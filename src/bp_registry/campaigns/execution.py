@@ -1396,6 +1396,95 @@ def _retained_partial_for_ordinal(*, destination: Path, plan: CampaignWorkPlan, 
     return leaves[0], leaves[0].digest()
 
 
+def _retained_bounded_actuals(
+    *, destination: Path, campaign_root: Path, plan: CampaignWorkPlan,
+) -> tuple[dict[str, int], tuple[dict[str, Any], ...]]:
+    """Reconstruct spent resources from sealed attempts before a new admission.
+
+    A receipt path alone is not evidence: terminal facts are rebuilt from the
+    retained sample and ledger, and partial bytes are checked before charging.
+    """
+    totals = {"shots": 0, "work": 0, "events": 0, "evidence_bytes": 0, "storage_bytes": 0}
+    attempts_root = destination / "attempts"
+    if not attempts_root.exists():
+        return totals, ()
+    if attempts_root.is_symlink() or not attempts_root.is_dir():
+        raise ValueError("bounded attempt root must be a regular directory")
+    units = {unit.key: (ordinal, unit) for ordinal, unit in enumerate(plan.units, 1)}
+    arms = {arm.arm_id: arm for arm in _campaign_work_spec(plan).arms}
+    terminal_by_ordinal: dict[int, dict[str, Any]] = {}
+    samples_charged_by_partial: set[Path] = set()
+    terminal_samples: set[Path] = set()
+    for directory in sorted(attempts_root.iterdir()):
+        if directory.is_symlink() or not directory.is_dir():
+            raise ValueError("bounded attempt directory must be a regular directory")
+        terminal_path = directory / "attempt.json"
+        partial_path = directory / "partial-attempt.json"
+        if terminal_path.exists() and partial_path.exists():
+            raise ValueError("bounded attempt cannot be both terminal and partial")
+        if partial_path.exists():
+            if partial_path.is_symlink() or not partial_path.is_file():
+                raise ValueError("partial attempt receipt must be a regular file")
+            raw = partial_path.read_bytes()
+            partial = FailureCountPartialAttemptV1.model_validate_json(raw)
+            if raw != partial.primitive_bytes() + b"\n":
+                raise ValueError("partial attempt receipt has noncanonical bytes")
+            verify_failure_count_partial_attempt(record=partial, plan=plan, receipt_sha256=partial.digest())
+            for name, amount in (
+                ("work", partial.consumed_decoder_work), ("events", partial.consumed_events),
+                ("evidence_bytes", partial.consumed_evidence_bytes),
+                ("storage_bytes", partial.consumed_storage_bytes + partial.consumed_control_receipt_bytes),
+            ):
+                totals[name] = _checked_add(totals[name], amount, name=f"retained {name}")
+            if partial.materialized_sample_sha256 is not None:
+                samples_charged_by_partial.add(Path(partial.materialized_sample_path))
+            continue
+        if not terminal_path.exists():
+            raise ValueError("bounded attempt directory has no sealed receipt")
+        if terminal_path.is_symlink() or not terminal_path.is_file():
+            raise ValueError("terminal attempt receipt must be a regular file")
+        raw = terminal_path.read_bytes()
+        saved = json.loads(raw)
+        match = units.get(saved.get("unit_key")) if isinstance(saved, dict) else None
+        if match is None:
+            raise ValueError("terminal attempt names a unit outside the frozen plan")
+        ordinal, unit = match
+        if ordinal in terminal_by_ordinal:
+            raise ValueError("bounded evidence contains competing terminal attempts")
+        sample_path = destination / "samples" / f"{unit.physical_sample_identity}.json"
+        ledger_path = directory / "events.jsonl"
+        if any(path.is_symlink() or not path.is_file() for path in (sample_path, ledger_path)):
+            raise ValueError("terminal attempt lacks a regular sample or ledger")
+        materialized = MaterializedPhysicalSampleV1.model_validate_json(sample_path.read_bytes())
+        arm_path = campaign_root / arms[unit.arm_id].manifest_path
+        rebuilt = _campaign_attempt(
+            plan=plan, unit=unit, arm_path=arm_path, sample_path=sample_path,
+            materialized=materialized, ledger_path=ledger_path,
+        )
+        unsigned = {key: value for key, value in rebuilt.items() if key not in {
+            "receipt_sha256", "events", "terminal_bytes_sha256", "persisted_sample_sha256",
+            "validation_status", "replay_status",
+        }}
+        if raw != canonical_json_bytes(unsigned) + b"\n":
+            raise ValueError("terminal attempt differs from verified canonical reconstruction")
+        verified = verify_canonical_attempt(record=rebuilt, plan=plan)
+        terminal_by_ordinal[ordinal] = verified
+        terminal_samples.add(sample_path)
+        for name, amount in (
+            ("shots", 1), ("work", sum(verified["work_vector"].values())),
+            ("events", len(verified["events"])), ("evidence_bytes", ledger_path.stat().st_size),
+            ("storage_bytes", ledger_path.stat().st_size + len(raw)),
+        ):
+            totals[name] = _checked_add(totals[name], amount, name=f"retained {name}")
+    for sample_path in terminal_samples - samples_charged_by_partial:
+        totals["storage_bytes"] = _checked_add(
+            totals["storage_bytes"], sample_path.stat().st_size, name="retained sample storage",
+        )
+    if tuple(sorted(terminal_by_ordinal)) != tuple(range(1, len(terminal_by_ordinal) + 1)):
+        raise ValueError("bounded terminal evidence is not a contiguous frozen prefix")
+    return totals, tuple(terminal_by_ordinal[index] for index in sorted(terminal_by_ordinal))
+
+
 def run_canonical_bounded_batch(
     plan: CampaignWorkPlan, *, campaign_root: str | Path, output_root: str | Path,
     first_ordinal: int, batch_size: int, parent_partial_receipt_sha256: str | None = None,
@@ -1416,14 +1505,9 @@ def run_canonical_bounded_batch(
     retained_before_projection = _retained_partial_for_ordinal(
         destination=destination, plan=plan, ordinal=first_ordinal,
     )
-    accumulated = None if retained_before_projection is None else {
-        "shots": 0,
-        "work": retained_before_projection[0].consumed_decoder_work,
-        "events": retained_before_projection[0].consumed_events,
-        "evidence_bytes": retained_before_projection[0].consumed_evidence_bytes,
-        "storage_bytes": (retained_before_projection[0].consumed_storage_bytes
-                          + retained_before_projection[0].consumed_control_receipt_bytes),
-    }
+    accumulated, retained_terminals = _retained_bounded_actuals(
+        destination=destination, campaign_root=root, plan=plan,
+    )
     try:
         spec, projection, _context, derived, _manifest_path = _failure_count_executable_projection(
             plan=plan, campaign_root=root, first_ordinal=first_ordinal, batch_size=batch_size,
@@ -1444,19 +1528,20 @@ def run_canonical_bounded_batch(
             executable_limit_receipt_sha256=policy.executable_limits.digest(),
             batch_authorization_sha256=policy.batch_authorization.digest(),
             terminal_state="cap_censored", terminal_failure_ordinal=None,
-            cumulative_failures=0, total_completed_shots=0, inferential_prefix_sha256=None,
+            cumulative_failures=sum(bool(item["terminal_fact"]["logical_failure"]) for item in retained_terminals),
+            total_completed_shots=accumulated["shots"], inferential_prefix_sha256=None,
             authorized_tail_ordinals=(), authorized_tail_sha256=None, first_exhausted_cap=cap,
-            realized_decoder_work=partial.consumed_decoder_work, realized_events=partial.consumed_events,
-            realized_evidence_bytes=partial.consumed_evidence_bytes,
-            realized_storage_bytes=partial.consumed_storage_bytes + partial.consumed_control_receipt_bytes,
+            realized_decoder_work=accumulated["work"], realized_events=accumulated["events"],
+            realized_evidence_bytes=accumulated["evidence_bytes"],
+            realized_storage_bytes=accumulated["storage_bytes"],
             wall_boundaries=(),
         ).validate_against(policy)
         return {"schema": "failure_count_canonical_bounded_batch_v1", "campaign_plan_digest": plan.campaign_plan_digest,
                 "terminal_receipt": terminal, "retained_partial_attempt_sha256": partial_digest,
                 "verified_attempts": (), "materialized_samples": (),
-                "actual_resources": {"completed_shots": 0, "decoder_work": partial.consumed_decoder_work,
-                                     "events": partial.consumed_events, "evidence_bytes": partial.consumed_evidence_bytes,
-                                     "storage_bytes": partial.consumed_storage_bytes + partial.consumed_control_receipt_bytes}}
+                "actual_resources": {"completed_shots": accumulated["shots"], "decoder_work": accumulated["work"],
+                                     "events": accumulated["events"], "evidence_bytes": accumulated["evidence_bytes"],
+                                     "storage_bytes": accumulated["storage_bytes"]}}
     destination.mkdir(parents=True, exist_ok=True)
     arm_contexts = _preflight_work_arms(spec, root)
     verified: list[dict[str, Any]] = []
