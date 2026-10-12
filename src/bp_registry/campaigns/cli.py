@@ -765,6 +765,8 @@ def _ordered_merge(args: argparse.Namespace, *, root: Path, plan: CampaignWorkPl
 
 def _paired_merge_payload(path: str, *, plan: CampaignWorkPlan, ordered: bool = False) -> dict[str, Any]:
     payload = _read_json(path)
+    if ordered and _json_bytes(Path(path)) != canonical_json_bytes(payload) + b"\n":
+        raise ValueError("ordered merge envelope has noncanonical bytes")
     required = {"schema", "canonical_merge", "verified_attempts", "attempt_artifacts", "materialized_samples_by_identity"}
     if ordered:
         required.add("ordered_projection")

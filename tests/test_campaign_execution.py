@@ -414,6 +414,11 @@ def test_installed_ordered_campaign_inside_group_partial_resume_and_terminal(tmp
                                       "--report", json.loads(assessment.stdout)["artifact_path"],
                                       "--campaign-root", str(ROOT))
     assert checked.returncode == 0, checked.stdout
+    noncanonical_merge = tmp_path / "noncanonical-ordered-merge.json"
+    noncanonical_merge.write_text(json.dumps(json.loads(Path(terminal_info["artifact_path"]).read_text()), indent=2), encoding="utf-8")
+    noncanonical = _run_installed_campaign("verify", "--plan", plan_path, "--merge", str(noncanonical_merge),
+                                           "--receipt", first_path, "--campaign-root", str(ROOT))
+    assert noncanonical.returncode != 0
     reordered = json.loads(Path(second_path).read_text())
     reordered["attempts"].reverse()
     forged = tmp_path / Path(second_path).name
