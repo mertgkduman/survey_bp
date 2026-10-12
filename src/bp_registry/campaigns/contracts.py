@@ -385,6 +385,11 @@ class FailureCountPolicyV1(StrictModel):
     cap_precedence: tuple[Literal["wall", "storage", "evidence", "events", "work", "shots"], ...] = Field(min_length=6, max_length=6)
     executable_limits: FailureCountExecutableLimitReceiptV1
     batch_authorization: FailureCountBatchAuthorizationV1
+    # Historical policy bytes were strict before guarded interruption support.
+    # Pydantic's explicit exclusion keeps those frozen documents byte-stable.
+    dispatch_mode: Literal["strict_full_batch", "interruptible_unit"] = Field(
+        default="strict_full_batch", exclude_if=lambda value: value == "strict_full_batch",
+    )
 
     @field_validator("cap_precedence", mode="before")
     @classmethod
@@ -395,7 +400,8 @@ class FailureCountPolicyV1(StrictModel):
     def independently_authorized_bounds(self) -> "FailureCountPolicyV1":
         if set(self.cap_precedence) != {"wall", "storage", "evidence", "events", "work", "shots"}:
             raise ValueError("cap precedence must contain each finite cap exactly once")
-        if self.caps.max_shots < self.batch_size or self.caps.max_shots % self.batch_size:
+        if (self.dispatch_mode == "strict_full_batch"
+                and (self.caps.max_shots < self.batch_size or self.caps.max_shots % self.batch_size)):
             raise ValueError("failure-count shot cap must contain whole authorized batches")
         limits = self.executable_limits
         authorization = self.batch_authorization
@@ -404,14 +410,14 @@ class FailureCountPolicyV1(StrictModel):
         if (authorization.policy_binding_sha256 != self.policy_binding_sha256
                 or authorization.executable_limit_receipt_sha256 != limits.digest()):
             raise ValueError("batch authorization does not bind the verified executable limits")
-        batch = authorization.max_shots_per_batch
-        expected_work = _checked_product(limits.derived_work_per_unit, batch, name="batch work", maximum=_MAX_DECODER_WORK)
-        expected_events = _checked_product(limits.derived_events_per_unit, batch, name="batch events", maximum=_MAX_EVENTS)
-        expected_evidence = _checked_product(limits.derived_evidence_bytes_per_unit, batch, name="batch evidence", maximum=_MAX_EVIDENCE_BYTES) + limits.partial_receipt_reserve_bytes
-        expected_storage = _checked_product(limits.derived_storage_bytes_per_unit, batch, name="batch storage", maximum=_MAX_STORAGE_BYTES) + limits.partial_receipt_reserve_bytes
+        required_units = self.batch_size if self.dispatch_mode == "strict_full_batch" else 1
+        expected_work = _checked_product(limits.derived_work_per_unit, required_units, name="dispatch work", maximum=_MAX_DECODER_WORK)
+        expected_events = _checked_product(limits.derived_events_per_unit, required_units, name="dispatch events", maximum=_MAX_EVENTS)
+        expected_evidence = _checked_product(limits.derived_evidence_bytes_per_unit, required_units, name="dispatch evidence", maximum=_MAX_EVIDENCE_BYTES) + limits.partial_receipt_reserve_bytes
+        expected_storage = _checked_product(limits.derived_storage_bytes_per_unit, required_units, name="dispatch storage", maximum=_MAX_STORAGE_BYTES) + limits.partial_receipt_reserve_bytes
         if expected_evidence > _MAX_EVIDENCE_BYTES or expected_storage > _MAX_STORAGE_BYTES:
             raise ValueError("batch authorization cannot represent the derived receipt reserve")
-        if (authorization.max_shots_per_batch < self.batch_size
+        if (authorization.max_shots_per_batch < required_units
                 or authorization.max_work_per_batch < expected_work
                 or authorization.max_events_per_batch < expected_events
                 or authorization.max_evidence_bytes_per_batch < expected_evidence

@@ -21,7 +21,12 @@ from typing import Any, Callable, Mapping
 from .. import sampling
 from ..canonical.verification import validate_canonical_shot
 from ..ledger import read_canonical_events
-from ..runner import canonical_public_manifest_context, canonical_public_shot_context, run_canonical_materialized_one, run_canonical_one
+from ..runner import (
+    CANONICAL_GUARDED_ARTIFACT_BYTE_CEILING_V1, CanonicalRuntimeAuthorizationV1,
+    CanonicalRuntimeGuardV1, canonical_public_manifest_context, canonical_public_shot_context,
+    derive_canonical_executable_maxima, guarded_atomic_write_bytes, run_canonical_materialized_one,
+    run_canonical_one, verify_declared_executable_limits,
+)
 from .contracts import (
     CampaignSpecV1, CampaignWorkSpecV1, FailureCountStoppingV1, FailureCountWorkSpecV1,
     MaterializedPhysicalSampleV1, build_one_unit_plan, canonical_json_bytes,
@@ -935,7 +940,7 @@ def _shot_from_materialized(artifact: MaterializedPhysicalSampleV1) -> sampling.
 
 def materialize_campaign_sample(
     *, plan: CampaignWorkPlan, unit: Any, spec: CampaignWorkSpecV1,
-    context: Any, destination: Path,
+    context: Any, destination: Path, resource_guard: CanonicalRuntimeGuardV1 | None = None,
 ) -> MaterializedPhysicalSampleV1:
     """Sample once, atomically retain exact bytes, and independently reload them."""
     sample = sampling.sample_shot(
@@ -949,7 +954,7 @@ def materialize_campaign_sample(
     if destination.exists():
         if destination.is_symlink() or destination.read_bytes() != payload:
             raise ValueError("materialized sample destination conflicts with immutable bytes")
-    else:
+    elif resource_guard is None:
         with tempfile.NamedTemporaryFile(dir=destination.parent, prefix=".materialized-", delete=False) as handle:
             handle.write(payload)
             staging = Path(handle.name)
@@ -958,6 +963,11 @@ def materialize_campaign_sample(
         finally:
             if staging.exists():
                 staging.unlink()
+    else:
+        guarded_atomic_write_bytes(
+            destination, payload, resource_guard=resource_guard,
+            boundary="campaign:materialized_sample",
+        )
     reloaded = MaterializedPhysicalSampleV1.model_validate_json(destination.read_bytes())
     if reloaded.materialized_sample_sha256 != artifact.materialized_sample_sha256 or _shot_from_materialized(reloaded).hidden.x.tobytes() != sample.hidden.x.tobytes():
         raise ValueError("materialized sample reload differs from the sampled physical bytes")
@@ -1133,32 +1143,43 @@ def run_canonical_work_plan(
             "materialized_samples": tuple(samples.values()), "verified_attempts": tuple(verified)}
 
 
+def _checked_add(left: int, right: int, *, name: str) -> int:
+    if type(left) is not int or type(right) is not int or left < 0 or right < 0:
+        raise ValueError(f"{name} requires nonnegative integer values")
+    total = left + right
+    if total > 2**63 - 1:
+        raise ValueError(f"{name} exceeds the supported counter range")
+    return total
+
+
 def _failure_count_executable_projection(
     *, plan: CampaignWorkPlan, campaign_root: Path, first_ordinal: int, batch_size: int,
-) -> tuple[CampaignWorkSpecV1, dict[str, int]]:
+) -> tuple[CampaignWorkSpecV1, dict[str, int], Any, Any, Path]:
     """Revalidate executable facts before any bounded unit is materialized."""
     if not isinstance(plan.work_spec, FailureCountWorkSpecV1):
         raise ValueError("bounded canonical execution requires FailureCountWorkSpecV1")
     spec, policy = plan.work_spec.campaign_work_spec, plan.work_spec.policy
-    if batch_size != policy.batch_size or first_ordinal < 1 or first_ordinal + batch_size - 1 > len(plan.units):
+    required_batch = policy.batch_size if policy.dispatch_mode == "strict_full_batch" else 1
+    if batch_size != required_batch or first_ordinal < 1 or first_ordinal + batch_size - 1 > len(plan.units):
         raise ValueError("bounded canonical execution requires one exact declared ordinal batch")
     if first_ordinal + batch_size - 1 > policy.caps.max_shots:
         raise ValueError("requested ordinal batch exceeds the frozen shot cap")
     arm = spec.arms[0]
     manifest_path = (campaign_root / arm.manifest_path).resolve(strict=True)
     context = canonical_public_manifest_context(manifest_path)
-    limits = policy.executable_limits
-    if context.manifest.budgets.attempt.max_iterations != limits.max_decoder_iterations:
-        raise ValueError("failure-count executable limit is stale or understates manifest iterations")
-    if (limits.work_per_iteration < 1 or limits.max_ledger_events_per_unit < 1
-            or limits.serializer_bytes_per_event < 1 or limits.artifact_storage_bytes_per_unit < 1):
-        raise ValueError("failure-count executable limit has invalid independent dimensions")
+    derived = derive_canonical_executable_maxima(context)
+    declared = policy.executable_limits.model_dump(mode="json", by_alias=True, exclude={"schema_name"})
+    verify_declared_executable_limits(
+        declared, expected_policy_binding=policy.policy_binding_sha256, derived=derived,
+    )
+    if policy.executable_limits.digest() != policy.batch_authorization.executable_limit_receipt_sha256:
+        raise ValueError("batch authorization does not bind the verified executable limit receipt")
     projection = {
         "shots": batch_size,
-        "work": batch_size * limits.derived_work_per_unit,
-        "events": batch_size * limits.derived_events_per_unit,
-        "evidence_bytes": batch_size * limits.derived_evidence_bytes_per_unit + limits.partial_receipt_reserve_bytes,
-        "storage_bytes": batch_size * limits.derived_storage_bytes_per_unit + limits.partial_receipt_reserve_bytes,
+        "work": batch_size * derived.derived_work_per_unit,
+        "events": batch_size * derived.derived_events_per_unit,
+        "evidence_bytes": _checked_add(batch_size * derived.derived_evidence_bytes_per_unit, derived.partial_receipt_reserve_bytes, name="projected evidence"),
+        "storage_bytes": _checked_add(batch_size * derived.derived_storage_bytes_per_unit, derived.partial_receipt_reserve_bytes, name="projected storage"),
     }
     authorization = policy.batch_authorization
     if (projection["shots"] > authorization.max_shots_per_batch
@@ -1174,7 +1195,7 @@ def _failure_count_executable_projection(
     }
     if any(projection[name] > cap_values[name] for name in projection):
         raise ValueError("bounded canonical batch cannot fit every hard resource cap")
-    return spec, projection
+    return spec, projection, context, derived, manifest_path
 
 
 def run_canonical_bounded_batch(
@@ -1191,47 +1212,86 @@ def run_canonical_bounded_batch(
     destination = Path(output_root)
     if destination.exists() and (destination.is_symlink() or not destination.is_dir()):
         raise ValueError("bounded campaign output root must be a regular directory")
-    spec, projection = _failure_count_executable_projection(
+    spec, projection, _context, derived, _manifest_path = _failure_count_executable_projection(
         plan=plan, campaign_root=root, first_ordinal=first_ordinal, batch_size=batch_size,
     )
     policy = plan.work_spec.policy  # narrowed by the preflight above
     assert isinstance(policy, object)
     destination.mkdir(parents=True, exist_ok=True)
     arm_contexts = _preflight_work_arms(spec, root)
-    deadline_ns = time.monotonic_ns() + plan.work_spec.policy.batch_authorization.per_unit_timeout_ns
     verified: list[dict[str, Any]] = []
     materialized_samples: list[MaterializedPhysicalSampleV1] = []
     observations: list[tuple[int, int, int]] = []
+    runtime_snapshots: list[Any] = []
     for ordinal in range(first_ordinal, first_ordinal + batch_size):
-        before = time.monotonic_ns()
-        if before >= deadline_ns:
-            raise TimeoutError("bounded canonical wall authorization expired before new work")
         unit = plan.units[ordinal - 1]
         arm_path, context = arm_contexts[unit.arm_id]
         sample_path = destination / "samples" / f"{unit.physical_sample_identity}.json"
+        deadline_ns = time.monotonic_ns() + policy.batch_authorization.per_unit_timeout_ns
+        authorization_identity = sha256(canonical_json_bytes({
+            "campaign_plan_digest": plan.campaign_plan_digest, "ordinal": ordinal,
+            "policy": policy.digest(), "derived": derived.digest,
+        })).hexdigest()
+        authorization_kwargs = {
+            "profile_digest": derived.digest, "authorization_identity": authorization_identity,
+            "max_events": derived.derived_events_per_unit,
+            "max_evidence_bytes": derived.derived_evidence_bytes_per_unit - derived.partial_receipt_reserve_bytes,
+            "max_storage_bytes": derived.derived_storage_bytes_per_unit - derived.partial_receipt_reserve_bytes,
+            "control_receipt_reserve_bytes": derived.partial_receipt_reserve_bytes,
+            "monotonic_deadline_ns": deadline_ns,
+            "max_event_bytes": derived.serializer_bytes_per_event,
+            "max_artifact_bytes": CANONICAL_GUARDED_ARTIFACT_BYTE_CEILING_V1,
+        }
+        authorization = (
+            CanonicalRuntimeAuthorizationV1.strict_full_unit(
+                **authorization_kwargs, derived_events=derived.derived_events_per_unit,
+                derived_evidence_bytes=derived.derived_evidence_bytes_per_unit,
+                derived_storage_bytes=derived.derived_storage_bytes_per_unit,
+            ) if policy.dispatch_mode == "strict_full_batch"
+            else CanonicalRuntimeAuthorizationV1.interruptible_unit(**authorization_kwargs)
+        )
+        guard = CanonicalRuntimeGuardV1(authorization)
         materialized = materialize_campaign_sample(
             plan=plan, unit=unit, spec=spec, context=context, destination=sample_path,
+            resource_guard=guard,
         )
         ledger_path = destination / "units" / unit.key / "events.jsonl"
         ledger_path.parent.mkdir(parents=True, exist_ok=True)
-        run_canonical_materialized_one(
+        engine_result = run_canonical_materialized_one(
             arm_path, sample=_shot_from_materialized(materialized),
             materialized_sample_sha256=materialized.materialized_sample_sha256,
             ledger_path=ledger_path, manifest_bytes=arm_path.read_bytes(),
+            runtime_guard=guard,
         )
         observed = time.monotonic_ns()
         observations.append((deadline_ns, observed, max(0, observed - deadline_ns)))
+        if engine_result.status == "interrupted":
+            return {
+                "schema": "failure_count_canonical_bounded_batch_v1",
+                "campaign_plan_digest": plan.campaign_plan_digest,
+                "ordinals": tuple(range(first_ordinal, ordinal + 1)),
+                "authorization_projection": {"dispatch_allowed": True, **projection},
+                "actual_resources": {"completed_shots": len(verified)},
+                "wall_boundaries": tuple(observations),
+                "materialized_samples": tuple(materialized_samples), "verified_attempts": tuple(verified),
+                "interruption": engine_result.interruption,
+            }
         record = _campaign_attempt(
             plan=plan, unit=unit, arm_path=arm_path, sample_path=sample_path,
             materialized=materialized, ledger_path=ledger_path,
         )
         receipt_path = ledger_path.parent / "attempt.json"
-        receipt_path.write_bytes(canonical_json_bytes({
+        receipt_payload = canonical_json_bytes({
             key: value for key, value in record.items()
             if key not in {"receipt_sha256", "events", "terminal_bytes_sha256", "persisted_sample_sha256", "validation_status", "replay_status"}
-        }) + b"\n")
+        }) + b"\n"
+        guarded_atomic_write_bytes(
+            receipt_path, receipt_payload, resource_guard=guard,
+            boundary="campaign:terminal_attempt",
+        )
         verified.append(verify_canonical_attempt(record=record, plan=plan))
         materialized_samples.append(materialized)
+        runtime_snapshots.append(guard.snapshot())
         if observed >= deadline_ns:
             break
     if len(verified) != batch_size:
@@ -1257,4 +1317,5 @@ def run_canonical_bounded_batch(
         },
         "wall_boundaries": tuple(observations),
         "materialized_samples": tuple(materialized_samples), "verified_attempts": tuple(verified),
+        "runtime_snapshots": tuple(runtime_snapshots),
     }

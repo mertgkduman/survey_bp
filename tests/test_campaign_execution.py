@@ -251,41 +251,40 @@ def test_paired_canonical_rejects_attempt_or_ledger_tamper(tmp_path: Path) -> No
 
 def _single_arm_failure_count_work_spec_payload() -> dict[str, object]:
     """A one-shot canonical adaptation with prospective failure-count caps."""
+    from bp_registry.runner import canonical_public_manifest_context, derive_canonical_executable_maxima
+
     payload = _paired_work_spec_payload()
     payload["arms"] = [payload["arms"][0]]  # type: ignore[index]
     payload["units_per_shard"] = 1
+    arm = payload["arms"][0]  # type: ignore[index]
+    assert isinstance(arm, dict)
+    derived = derive_canonical_executable_maxima(
+        canonical_public_manifest_context(ROOT / str(arm["manifest_path"]))
+    )
+    limits = {"schema": "failure_count_executable_limit_receipt_v1", **derived.as_evidence()}
+    batch_evidence = derived.derived_evidence_bytes_per_unit + derived.partial_receipt_reserve_bytes
+    batch_storage = derived.derived_storage_bytes_per_unit + derived.partial_receipt_reserve_bytes
     resources = payload["assessment"]["resources"]  # type: ignore[index]
-    resources.update({"max_shots": 1, "max_batch_size": 1, "max_events": 12,
-                      "max_decoder_work": 32, "max_evidence_bytes": 57344,
-                      "max_storage_bytes": 61440})
-    limits = {
-        "schema": "failure_count_executable_limit_receipt_v1", "derivation_version": "v1",
-        "manifest_dimensions_sha256": "1" * 64, "policy_binding_sha256": "2" * 64,
-        "serializer_sha256": "3" * 64, "artifact_layout_sha256": "4" * 64,
-        "verifier_sha256": "5" * 64, "max_decoder_iterations": 8,
-        "work_per_iteration": 4, "max_ledger_events_per_unit": 12,
-        "serializer_bytes_per_event": 4096, "artifact_storage_bytes_per_unit": 4096,
-        "partial_receipt_reserve_bytes": 4096, "derived_work_per_unit": 32,
-        "derived_events_per_unit": 12, "derived_evidence_bytes_per_unit": 53248,
-        "derived_storage_bytes_per_unit": 57344,
-    }
+    resources.update({"max_shots": 1, "max_batch_size": 1, "max_events": derived.derived_events_per_unit,
+                      "max_decoder_work": derived.derived_work_per_unit, "max_evidence_bytes": batch_evidence,
+                      "max_storage_bytes": batch_storage})
     authorization = {
-        "schema": "failure_count_batch_authorization_v1", "policy_binding_sha256": "2" * 64,
+        "schema": "failure_count_batch_authorization_v1", "policy_binding_sha256": derived.policy_binding_sha256,
         "executable_limit_receipt_sha256": __import__("bp_registry.campaigns.contracts", fromlist=["FailureCountExecutableLimitReceiptV1"]).FailureCountExecutableLimitReceiptV1.model_validate(limits).digest(),
-        "max_local_workers": 1, "max_shots_per_batch": 1, "max_work_per_batch": 32,
-        "max_events_per_batch": 12, "max_evidence_bytes_per_batch": 57344,
-        "max_storage_bytes_per_batch": 61440, "monotonic_clock": "monotonic_ns_v1",
+        "max_local_workers": 1, "max_shots_per_batch": 1, "max_work_per_batch": derived.derived_work_per_unit,
+        "max_events_per_batch": derived.derived_events_per_unit, "max_evidence_bytes_per_batch": batch_evidence,
+        "max_storage_bytes_per_batch": batch_storage, "monotonic_clock": "monotonic_ns_v1",
         "per_unit_timeout_ns": 1_000_000_000,
     }
     policy = {
-        "schema": "failure_count_policy_v1", "policy_binding_sha256": "2" * 64,
+        "schema": "failure_count_policy_v1", "policy_binding_sha256": derived.policy_binding_sha256,
         "campaign_plan_sha256": "6" * 64, "target_failures": 1, "batch_size": 1,
         "shot_order": "campaign_cohort_point_sample_ordinal_v1",
         "failure_event": "decoder_logical_failure_v1",
         "procedure": {"method": "exact_inverse_binomial", "confidence_level": 0.95, "sidedness": "two_sided"},
         "multiplicative_rule": {"rule": "multiplicative_target_interval_containment_v1", "factor": 1.5},
-        "caps": {"max_shots": 1, "max_decoder_work": 32, "max_events": 12,
-                 "max_evidence_bytes": 57344, "max_storage_bytes": 61440, "max_wall_seconds": 60.0},
+        "caps": {"max_shots": 1, "max_decoder_work": derived.derived_work_per_unit, "max_events": derived.derived_events_per_unit,
+                 "max_evidence_bytes": batch_evidence, "max_storage_bytes": batch_storage, "max_wall_seconds": 60.0},
         "cap_precedence": ["wall", "storage", "evidence", "events", "work", "shots"],
         "executable_limits": limits, "batch_authorization": authorization,
     }
@@ -312,6 +311,51 @@ def test_single_arm_work_spec_runs_one_verified_canonical_bounded_unit(tmp_path:
     assert len(result["verified_attempts"]) == 1
     assert result["verified_attempts"][0]["unit_key"] == plan.units[0].key
     assert result["authorization_projection"]["dispatch_allowed"] is True
+
+
+def test_failure_count_interruptible_policy_is_explicit_and_default_bytes_stay_strict() -> None:
+    """Development interruption is frozen, while historical strict bytes do not drift."""
+    from bp_registry.campaigns.contracts import FailureCountWorkSpecV1
+
+    payload = _single_arm_failure_count_work_spec_payload()
+    default = FailureCountWorkSpecV1.model_validate(payload)
+    assert "dispatch_mode" not in default.policy.model_dump(mode="json", by_alias=True)
+    policy = payload["policy"]
+    assert isinstance(policy, dict)
+    policy["dispatch_mode"] = "interruptible_unit"
+    policy["batch_size"] = 2
+    campaign = payload["campaign_work_spec"]
+    assert isinstance(campaign, dict)
+    assessment = campaign["assessment"]
+    assert isinstance(assessment, dict)
+    resources = assessment["resources"]
+    assert isinstance(resources, dict)
+    resources["max_batch_size"] = 2
+    explicit = FailureCountWorkSpecV1.model_validate(payload)
+    assert explicit.policy.dispatch_mode == "interruptible_unit"
+
+
+def test_bounded_batch_charges_sample_ledger_and_terminal_receipt_to_one_guard(tmp_path: Path) -> None:
+    """Every durable unit artifact consumes the same per-unit authorization."""
+    from bp_registry.campaigns.contracts import FailureCountWorkSpecV1
+    from bp_registry.campaigns.execution import run_canonical_bounded_batch
+    from bp_registry.campaigns.planning import freeze_failure_count_work_spec
+
+    plan = freeze_failure_count_work_spec(
+        FailureCountWorkSpecV1.model_validate(_single_arm_failure_count_work_spec_payload())
+    )
+    result = run_canonical_bounded_batch(
+        plan, campaign_root=ROOT, output_root=tmp_path, first_ordinal=1, batch_size=1,
+    )
+    snapshot = result["runtime_snapshots"][0]
+    attempt = result["verified_attempts"][0]
+    receipt = tmp_path / "units" / attempt["unit_key"] / "attempt.json"
+    assert snapshot.scientific_evidence_bytes == Path(attempt["canonical_ledger_path"]).stat().st_size
+    assert snapshot.scientific_storage_bytes == (
+        Path(attempt["canonical_ledger_path"]).stat().st_size
+        + Path(attempt["materialized_sample_path"]).stat().st_size
+        + receipt.stat().st_size
+    )
 
 
 def test_canonical_bounded_batch_seals_actual_resources_and_rejects_noncontiguous_dispatch(tmp_path: Path) -> None:

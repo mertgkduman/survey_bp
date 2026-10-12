@@ -1239,6 +1239,7 @@ def run_canonical_materialized_one(
     materialized_sample_sha256: str, ledger_path: str | Path,
     manifest_bytes: bytes | None = None,
     runtime_authorization: CanonicalRuntimeAuthorizationV1 | None = None,
+    runtime_guard: CanonicalRuntimeGuardV1 | None = None,
 ):
     """Run one verified caller-supplied physical sample without resampling.
 
@@ -1253,22 +1254,25 @@ def run_canonical_materialized_one(
         raise ValueError("materialized sample requires a SHA-256 identity")
     public = canonical_public_manifest_context(manifest_path, manifest_bytes=manifest_bytes)
     manifest = public.manifest
-    if runtime_authorization is not None:
+    if runtime_authorization is not None and runtime_guard is not None:
+        raise ValueError("materialized execution accepts either an authorization or a shared runtime guard")
+    authorization = runtime_authorization if runtime_guard is None else runtime_guard.authorization
+    if authorization is not None:
         derived = derive_canonical_executable_maxima(public)
-        if runtime_authorization.profile_digest != derived.digest:
+        if authorization.profile_digest != derived.digest:
             raise ValueError("runtime authorization profile_digest differs from executable route")
-        if runtime_authorization.max_event_bytes != derived.serializer_bytes_per_event:
+        if authorization.max_event_bytes != derived.serializer_bytes_per_event:
             raise ValueError("runtime authorization event ceiling differs from executable route")
-        if runtime_authorization.max_artifact_bytes != CANONICAL_GUARDED_ARTIFACT_BYTE_CEILING_V1:
+        if authorization.max_artifact_bytes != CANONICAL_GUARDED_ARTIFACT_BYTE_CEILING_V1:
             raise ValueError("runtime authorization artifact ceiling differs from executable route")
-        if runtime_authorization.control_receipt_reserve_bytes < derived.partial_receipt_reserve_bytes:
+        if authorization.control_receipt_reserve_bytes < derived.partial_receipt_reserve_bytes:
             raise ValueError("runtime authorization control receipt reserve is smaller than derived")
-        if runtime_authorization.mode == "strict_full_unit" and (
-            runtime_authorization.max_events < derived.derived_events_per_unit
-            or runtime_authorization.max_evidence_bytes < (
+        if authorization.mode == "strict_full_unit" and (
+            authorization.max_events < derived.derived_events_per_unit
+            or authorization.max_evidence_bytes < (
                 derived.derived_evidence_bytes_per_unit - derived.partial_receipt_reserve_bytes
             )
-            or runtime_authorization.max_storage_bytes < (
+            or authorization.max_storage_bytes < (
                 derived.derived_storage_bytes_per_unit - derived.partial_receipt_reserve_bytes
             )
         ):
@@ -1314,7 +1318,9 @@ def run_canonical_materialized_one(
         phase5_limits=public._phase5_limits, update_kind=manifest.policies.update.kind,
         schedule_kind=manifest.policies.schedule.kind,
     )
-    guard = None if runtime_authorization is None else CanonicalRuntimeGuardV1(runtime_authorization)
+    guard = runtime_guard if runtime_guard is not None else (
+        None if runtime_authorization is None else CanonicalRuntimeGuardV1(runtime_authorization)
+    )
     try:
         if guard is not None:
             guard.before_work("materialized:before_unit")
@@ -1337,7 +1343,7 @@ def run_canonical_materialized_one(
             },
         )
     except CanonicalResourceInterruption as error:
-        if runtime_authorization is None or not isinstance(error.snapshot, CanonicalRuntimeSnapshotV1):
+        if authorization is None or not isinstance(error.snapshot, CanonicalRuntimeSnapshotV1):
             raise
         ledger = Path(ledger_path)
         return CanonicalMaterializedRunV1(
@@ -1346,7 +1352,7 @@ def run_canonical_materialized_one(
                 None if not ledger.exists() else sha256(ledger.read_bytes()).hexdigest(), error.snapshot,
             ),
         )
-    return result if runtime_authorization is None else CanonicalMaterializedRunV1("terminal", terminal=result)
+    return result if authorization is None else CanonicalMaterializedRunV1("terminal", terminal=result)
 
 
 def run_canonical_one(manifest_path: str | Path, *, shot_id: int, ledger_path: str | Path):
