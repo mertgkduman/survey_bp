@@ -978,6 +978,13 @@ def materialize_campaign_sample(
 def _campaign_terminal_fact(events: list[dict[str, Any]], *, unit_key: str) -> dict[str, Any]:
     """Translate only supported canonical terminal semantics into campaign classes."""
     terminal_fact = _terminal_fact(events, unit_key=unit_key)
+    terminal_event = next(event for event in events if event["kind"] == "termination")
+    nested = terminal_event["data"].get("payload")
+    if terminal_fact["outcome"] is None and isinstance(nested, Mapping):
+        if nested.get("termination") != terminal_fact["termination"]:
+            raise ValueError("nested canonical terminal termination differs from its ledger envelope")
+        terminal_fact["outcome"] = nested.get("outcome")
+        terminal_fact["logical_failure"] = terminal_fact["outcome"] not in {"exact", "stabilizer_equivalent"}
     if terminal_fact["outcome"] == "logical_failure":
         terminal_fact["outcome"] = "wrong_logical_action"
     elif terminal_fact["outcome"] is None and terminal_fact["termination"] == "max_iterations":
@@ -996,6 +1003,20 @@ def _campaign_terminal_fact(events: list[dict[str, Any]], *, unit_key: str) -> d
     return terminal_fact
 
 
+def _campaign_work_vectors(events: list[dict[str, Any]]) -> list[Mapping[str, Any]]:
+    """Read the declared work vector from either supported ledger envelope."""
+    vectors = [event["data"]["work_vector"] for event in events
+               if isinstance(event.get("data"), Mapping) and "work_vector" in event["data"]]
+    if not vectors:
+        terminal = next(event for event in events if event["kind"] == "termination")
+        nested = terminal["data"].get("payload")
+        if isinstance(nested, Mapping) and isinstance(nested.get("work_vector"), Mapping):
+            vectors = [nested["work_vector"]]
+    if not vectors or any(not isinstance(vector, Mapping) for vector in vectors):
+        raise ValueError("canonical ledger lacks a named work vector")
+    return vectors
+
+
 def _campaign_attempt(
     *, plan: CampaignWorkPlan, unit: Any, arm_path: Path, sample_path: Path,
     materialized: MaterializedPhysicalSampleV1, ledger_path: Path,
@@ -1005,9 +1026,7 @@ def _campaign_attempt(
     # The canonical ledger remains byte-for-byte unchanged.  The outer
     # receipt supplies the assessment taxonomy and verification repeats it.
     terminal_fact = _campaign_terminal_fact(events, unit_key=unit.key)
-    work_vectors = [event.get("data", {}).get("work_vector") for event in events if isinstance(event.get("data"), Mapping) and "work_vector" in event["data"]]
-    if not work_vectors or any(not isinstance(vector, Mapping) for vector in work_vectors):
-        raise ValueError("canonical ledger lacks a named work vector")
+    work_vectors = _campaign_work_vectors(events)
     work_vector = dict(work_vectors[-1])
     if (not work_vector or any(not isinstance(name, str) or not name or type(value) is not int or value < 0
                                for name, value in work_vector.items())):
@@ -1086,9 +1105,8 @@ def verify_canonical_attempt(*, record: Mapping[str, Any], plan: CampaignWorkPla
     terminal_fact = _campaign_terminal_fact(events, unit_key=unit.key)
     if events != record["events"] or terminal_fact != record["terminal_fact"]:
         raise ValueError("canonical attempt terminal differs from retained ledger")
-    vectors = [event.get("data", {}).get("work_vector") for event in events if isinstance(event.get("data"), Mapping) and "work_vector" in event["data"]]
-    if (not vectors or any(not isinstance(vector, Mapping) for vector in vectors)
-            or any(dict(vector) != record["work_vector"] for vector in vectors)):
+    vectors = _campaign_work_vectors(events)
+    if any(dict(vector) != record["work_vector"] for vector in vectors):
         raise ValueError("canonical attempt work vector differs from retained ledger")
     return dict(record)
 

@@ -1,0 +1,214 @@
+{
+  "artifact": {
+    "code_id": "project-three-qubit-css-fixture",
+    "format_version": 1,
+    "matrix_hashes": {
+      "hx_raw_sha256": "fa81a63939636a8d6184ff498c46e93fc2ab837d080c5852d691bb4f23b8920d",
+      "hx_semantic_sha256": "c0ff96e5b6433755fb67cb5280ed266d8c27fc211cc9f76cb9099489100d6edd",
+      "hz_raw_sha256": "7cbf797444cc052926f6dd17990f417a61ee2340377d7e3f89ff1e66c895abb3",
+      "hz_semantic_sha256": "a3ee6a716269bd21164dfcb5b52554c185a70db554c7040120ce224317667fe2",
+      "lx_raw_sha256": "9995179b267ee1c40c900fe8212f5f64cf8a8daf9c69732ddb20826a56ff25ca",
+      "lx_semantic_sha256": "72ec5303a315712d4046ebeaeb3bf479ff2bfa98b40d9c2aad29ed63134837bf",
+      "lz_raw_sha256": "fa81a63939636a8d6184ff498c46e93fc2ab837d080c5852d691bb4f23b8920d",
+      "lz_semantic_sha256": "bc4640878fdd40fe9d3d355070f5982703b8e2da039c169054ba386bb5552e08"
+    },
+    "path": "project-three-qubit-css-fixture.json",
+    "raw_sha256": "87328ebbe70907d74a5dd3ee67d6a4b8e87b2c82b66270aee1b71594b4a78d25",
+    "root": "data/artifacts",
+    "semantic_sha256": "6ee26cb7bf253c42265a326821219b057ceca35cad64fb382f2c4117141e6f4e"
+  },
+  "budgets": {
+    "attempt": {
+      "max_iterations": 1,
+      "work_limits": {
+        "belief_assemblies": 100000000,
+        "bp_calls": 1000000,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 100000000,
+        "check_to_variable_updates": 100000000,
+        "fallback_calls": 0,
+        "intervention_actions": 2000,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 100000000,
+        "variable_to_check_updates": 100000000
+      }
+    },
+    "denominator_rule": "all_terminal_shots",
+    "max_shots": 2,
+    "search": {
+      "max_iterations": 1,
+      "work_limits": {
+        "belief_assemblies": 100000000,
+        "bp_calls": 1000000,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 100000000,
+        "check_to_variable_updates": 100000000,
+        "fallback_calls": 0,
+        "intervention_actions": 2000,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 100000000,
+        "variable_to_check_updates": 100000000
+      }
+    },
+    "shot": {
+      "max_iterations": 1,
+      "work_limits": {
+        "belief_assemblies": 100000000,
+        "bp_calls": 1000000,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "candidate_checks": 100000000,
+        "check_to_variable_updates": 100000000,
+        "fallback_calls": 0,
+        "intervention_actions": 2000,
+        "relay_transfers": 0,
+        "residual_priority_evaluations": 100000000,
+        "variable_to_check_updates": 100000000
+      }
+    }
+  },
+  "environment": {
+    "backend": "cpu",
+    "numpy": "2.2.6",
+    "omp_num_threads": 1,
+    "python": "3.12.2",
+    "scipy": "1.17.1"
+  },
+  "error_rate": 0.1,
+  "evidence": {
+    "assessment_status": "not_assessed",
+    "discrepancies": [
+      "Author implementation identity and ordered paper experiment artifact are unverified.",
+      "The small fixture is an operational profile only and supplies no paper curve or decoder ranking."
+    ],
+    "fixture": "development_fixture",
+    "procedure": "Yao bpgd-t001 Algorithm 1 canonical adaptation on a preselected three-qubit CSS algebraic fixture; one flooding sweep per round and resolved R=n=3.",
+    "relation": "canonical_implemented",
+    "sources": [
+      "literature_policies/yao-2024-guided-decimation/bpgd-t001.toml",
+      "arxiv:2312.10950v2 Algorithm 1"
+    ]
+  },
+  "intervention": {
+    "final_round_rule": "return_after_last_fixation",
+    "finite_bias_magnitude": 25.0,
+    "kind": "guided_decimation",
+    "lift_rule": "identity",
+    "native_availability": "unverified",
+    "operator": "finite_prior_bias",
+    "preserved_fields": [
+      "graph",
+      "syndrome",
+      "messages"
+    ],
+    "qualification": "algorithm_interpretation",
+    "reset_rule": "continue_messages",
+    "round_limit": 3,
+    "selection": "max_abs_reliability",
+    "source_revision": "arxiv:2312.10950v2",
+    "stream_status": "not_applicable",
+    "sweeps_per_round": 1,
+    "trigger": "failed_bp_round",
+    "unresolved": [
+      "zero_bias_boundary",
+      "final_round_source_interpretation",
+      "author_implementation_identity",
+      "ordered_paper_experiment_artifact_identity"
+    ],
+    "variant": "algorithm1_v2_interpretation",
+    "zero_rule": "positive_prior_for_zero_posterior"
+  },
+  "intervention_limits": {
+    "max_runtime_seconds": 600.0,
+    "max_total_actions": 2000,
+    "max_total_attempts": 1000,
+    "max_trace_bytes": 0,
+    "max_trace_records": 0,
+    "work_caps": {
+      "belief_assemblies": 100000000,
+      "bp_calls": 1000000,
+      "branch_expansions": 0,
+      "branch_prunes": 0,
+      "candidate_checks": 100000000,
+      "candidate_constructions": 100000000,
+      "check_to_variable_updates": 100000000,
+      "convergence_checks": 100000000,
+      "fallback_calls": 0,
+      "fixation_actions": 1000,
+      "intervention_actions": 2000,
+      "lifted_coordinates": 0,
+      "order_generation": 100000000,
+      "order_selection": 100000000,
+      "original_checks": 100000000,
+      "priority_maintenance": 100000000,
+      "ranking_scans": 100000000,
+      "relay_transfers": 0,
+      "residual_differences": 100000000,
+      "residual_precomputations": 100000000,
+      "residual_priority_evaluations": 100000000,
+      "transformations": 0,
+      "variable_to_check_updates": 100000000
+    }
+  },
+  "numerical_profile": "cpu-float64-spa-v1",
+  "policies": {
+    "intervention": {
+      "binding_id": "research-intervention-guided-decimation",
+      "kind": "guided_decimation",
+      "state_lifetime": "search"
+    },
+    "postprocessing": {
+      "binding_id": "research-postprocessing-identity",
+      "kind": "identity",
+      "state_lifetime": "attempt"
+    },
+    "schedule": {
+      "binding_id": "research-schedule-flooding",
+      "kind": "flooding",
+      "state_lifetime": "iteration"
+    },
+    "selection": {
+      "binding_id": "research-selection-stable-first",
+      "kind": "stable_first",
+      "state_lifetime": "attempt"
+    },
+    "state_memory": {
+      "binding_id": "research-state-memory-stateless",
+      "kind": "stateless",
+      "state_lifetime": "attempt"
+    },
+    "stopping": {
+      "binding_id": "research-stopping-syndrome-or-budget",
+      "kind": "syndrome_or_budget",
+      "state_lifetime": "iteration"
+    },
+    "update": {
+      "binding_id": "research-update-binary-spa",
+      "kind": "binary_spa",
+      "state_lifetime": "message"
+    }
+  },
+  "profile_plan": {
+    "cohort": "clean",
+    "enabled": true,
+    "level": "low_overhead",
+    "selected_before_outcome": true
+  },
+  "randomness": {
+    "decoder_seed_identity": "canonical-deterministic-no-local-randomness-v1",
+    "physical_sample_identity": "phase9-yao-small-profile-v1",
+    "sample_derivation": "sha256-manifest-shot-v1",
+    "sample_seed": 12
+  },
+  "run_id": "phase9-yao-small-profile-74dc9681e668",
+  "schema_version": 5,
+  "trace_plan": {
+    "label": "development_default",
+    "level": "off",
+    "max_bytes": 0,
+    "max_records": 0,
+    "relative_dir": "trace-sidecars"
+  }
+}

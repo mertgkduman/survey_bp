@@ -1,0 +1,10 @@
+{
+  "absolute_tolerance": 1.0,
+  "assessment_status": "not_assessed",
+  "label": "development_fixture",
+  "lower": 0.0,
+  "purpose": "Operational execution and resource profiling only; no source curve or ranking.",
+  "schema": "phase9_development_target_receipt_v1",
+  "target_id": "development_fixture-not_assessed-all-domain",
+  "upper": 1.0
+}
