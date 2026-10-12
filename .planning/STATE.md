@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 09
 current_phase_name: CSS Reproduction and Controlled Comparisons
-current_plan: 09-09
+current_plan: 09-10
 status: executing
-stopped_at: Wave 7 passed; Plan 09-09 measured small profile gate next
-last_updated: "2026-10-12T01:59:02Z"
+stopped_at: Wave 8 passed; Plan 09-10 bounded Yao B1 tracer next
+last_updated: "2026-10-12T02:41:53Z"
 last_activity: 2026-10-11
-last_activity_desc: Phase 09 Wave 7 passed; 11 of 20 plans complete after public failure-count lifecycle
-state_head: f25ec1c6df353293c15a070defd6a7d987596ffb
+last_activity_desc: Phase 09 Wave 8 passed; 13 of 20 plans complete after measured profile and ordered work
+state_head: 13e0002d2f53323af506eb1c01c17643d19d7a2c
 progress:
   total_phases: 14
   completed_phases: 7
   total_plans: 151
-  completed_plans: 133
+  completed_plans: 135
 ---
 
 # Project State
@@ -24,24 +24,24 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-11)
 
 **Core value:** Make BP decoder differences explicit, reproducible, and fairly comparable through canonical policy execution and published evidence.
-**Current focus:** Phase 9 CSS reproduction and controlled comparisons; Wave 8 measured profile gate and ordered work
+**Current focus:** Phase 9 CSS reproduction and controlled comparisons; Wave 9 bounded B1 tracer and controlled design
 
 ## Current Position
 
 Phase: 09 (CSS Reproduction and Controlled Comparisons) — EXECUTING
-Plan: 09-09 of 20; 11 plans passed wave gates
+Plan: 09-10 of 20; 13 plans passed wave gates
 Total Phases: 14
-Current Plan: 09-09 measured small profile gate
+Current Plan: 09-10 bounded Yao B1 tracer
 Total Plans in Phase: 20
-Status: Wave 7 passed; Wave 8 ready
-Last activity: 2026-10-11 — Phase 09 Wave 7 full suite passed
-Last Activity Description: Public bounded failure-count lifecycle passed the full-suite gate
+Status: Wave 8 passed; Wave 9 ready
+Last activity: 2026-10-11 — Phase 09 Wave 8 full suite passed
+Last Activity Description: Measured small profile and ordered matched-arm lifecycle passed the full-suite gate
 
-Progress: 7 of 14 phases complete (50%); Phase 9 has 11 of 20 plans complete
+Progress: 7 of 14 phases complete (50%); Phase 9 has 13 of 20 plans complete
 
 ## Performance Metrics
 
-- Total plans completed: 133
+- Total plans completed: 135
 - Average duration: N/A
 - Total execution time: 0 hours
 - Recent trend: Phase 8 completed 20 plans, including six goal-verification gap plans, and passed goal, code, security, and validation gates.
