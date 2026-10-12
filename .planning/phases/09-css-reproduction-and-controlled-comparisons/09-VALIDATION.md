@@ -1,11 +1,11 @@
 ---
 phase: "09"
 slug: "css-reproduction-and-controlled-comparisons"
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: validated
+nyquist_compliant: true
+wave_0_complete: true
 created: "2026-10-11"
-updated: "2026-10-11"
+updated: "2026-10-12"
 ---
 
 # Phase 9 — Validation Strategy
@@ -58,20 +58,20 @@ updated: "2026-10-11"
 | 09-08-02 | 4 | EVAL-01, CAN-02 | Tracked vote policy compiles and replays with explicit adaptation status | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_literature_policy.py tests/test_css_literature_gate.py -k 'vote or policy_file or replay or cache or adaptation' -x` | existing, expanded in task | green |
 | 09-09-01 | 8 | EVAL-02, EVAL-03 | Small public policy path reaches a verified sealed merge under bounded caps | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_profile_gate.py -k 'tracer or policy or ledger or seal or merge' -x` | created in task | green |
 | 09-09-02 | 8 | EVAL-02, EVAL-03 | Independent replay emits receipt-linked measurements and leaves production denied | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_profile_gate.py -k 'measured or replay or unavailable or denied or receipt' -x` | created in task | green |
-| 09-10-01 | 9 | EVAL-01, EVAL-02 | Bounded Yao B1 launches only after the measured gate and retains its first whole batch | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_yao_b1_tracer.py -k 'profile_gate or preflight or first_batch or replay or label' -x` | created in task | pending |
-| 09-10-02 | 9 | EVAL-01, EVAL-02 | Resume closes at exact T_100 with tail excluded or an honest cap-censored terminal | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_yao_b1_tracer.py -k 'resume or target_reached or target_ordinal or authorized_tail or censor or final_report or interruption' -x` | created in task | pending |
-| 09-11-01 | 9 | EVAL-03 | Paired sizing uses disjoint calibration and reports powered and bounded boundaries | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_sizing.py -k 'paired or power or disjoint or blocked or boundary' -x` | created in task | pending |
-| 09-11-02 | 9 | EVAL-03 | Relay, Beam, and MBBP use separate profiles and positive bounded N while Slurm stays denied | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_sizing.py -k 'resource or representative_profile or relay or beam or mbbp or positive_n or slurm or missing' -x` | created in task | pending |
-| 09-19-01 | 10 | EVAL-03, CAN-02 | Public controlled lifecycle retains typed leaves, one shared initial receipt, completed arms inside partial groups, exact missing sets, terminal assessment, and byte replay | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'controlled_component or shared_initial_receipt or controlled_partial or controlled_inside_group_partial or controlled_resume or controlled_assess or controlled_byte_replay or paired_canonical_replays' -x` | existing, expanded in task | pending |
-| 09-19-02 | 10 | EVAL-03, CAN-02 | Frozen three-arm Holm plus public six-verb ordinary-two-arm and shared-MBBP lifecycles preserve one member set, exact resume, costs, and replay | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py tests/test_campaign_statistics.py -k 'three_arm_family or shared_initial_receipt or shared_mbbp_member_set or member_no_rerun or public_two_arm_plan or public_two_arm_run_local or public_two_arm_merge or public_two_arm_resume or public_two_arm_assess or public_two_arm_verify or public_shared_mbbp_plan or public_shared_mbbp_run_local or public_shared_mbbp_merge or public_shared_mbbp_resume or public_shared_mbbp_assess or public_shared_mbbp_verify or common_incremental_cost or controlled_replay_drift or holm or paired_canonical_replays' -x` | existing, expanded in task | pending |
-| 09-12-01 | 11 | EVAL-03 | Schedule control changes one factor and uses public two-arm plan/run-local/merge/resume for frozen positive-N typed evidence | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_update_schedule_control.py -k 'one_factor or positive_n or matched_evidence or paired_execution or typed_evidence or public_two_arm_plan or public_two_arm_run_local or public_two_arm_merge or public_two_arm_resume or phase_incomplete or label' -x` | created in task | pending |
-| 09-12-02 | 11 | EVAL-03 | Public two-arm assess/verify invokes no decoder and byte-reconstructs completion, denominators, typed actuals, and costs | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_update_schedule_control.py -k 'assessment or cost or replay or public_two_arm_assess or public_two_arm_verify or no_decoder or byte_replay or exact_missing_set or all_shot or conditional' -x` | created in task | pending |
-| 09-13-01 | 11 | EVAL-03 | Frozen three-arm family uses one shared initial BP receipt plus distinct typed Relay leaves and costs | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_beam_relay_control.py -k 'relay or relay_profile or positive_n or three_arm_family or shared_initial_receipt or public_lifecycle or convergence or iterations or extra_work or phase_incomplete' -x` | created in task | pending |
-| 09-13-02 | 11 | EVAL-03 | Beam consumes the same initial receipt; exact replay reconstructs both baseline contrasts and one Holm family | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_beam_relay_control.py -k 'beam or beam_profile or positive_n or shared_initial_receipt or convergence or iterations or holm or no_decoder or byte_replay or incomplete or replay' -x` | created in task | pending |
-| 09-14-01 | 11 | EVAL-03, CAN-02 | Public shared-MBBP plan/run-local/merge/resume produces one typed member receipt for list and vote without rerun | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_vote_list_control.py -k 'mbbp_profile or positive_n or shared_members or shared_member_receipt or member_no_rerun or public_shared_mbbp_plan or public_shared_mbbp_run_local or public_shared_mbbp_merge or public_shared_mbbp_resume or convergence or iterations or vote or list or disposition or original_validation or phase_incomplete' -x` | created in task | pending |
-| 09-14-02 | 11 | EVAL-03, CAN-02 | Public shared-MBBP assess/verify replays without decoder and preserves typed leaves, completion, denominators, labels, and costs | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_vote_list_control.py -k 'cost or replay or public_shared_mbbp_assess or public_shared_mbbp_verify or no_decoder or byte_replay or shared_member_receipt or convergence or iterations or completion or label or assessment or denominator' -x` | created in task | pending |
-| 09-15-01 | 12 | EVAL-01, EVAL-02, EVAL-03, CAN-02 | Index audits Plans 09-01..09-20 and reconstructs policy/terminal, verified limits, cap receipts, ordered lifecycle, typed shared-input controls, and phase completion | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_css_evidence_index.py -k 'coverage or gap_plan or plan_16 or plan_17 or plan_18 or plan_19 or plan_20 or fourteen or ordered_stop or executable_limit or dynamic_cap or shared_input or tail or positive_n or convergence or iterations or phase_status or reconstruct or tamper or cost' -x` | created in task | pending |
-| 09-15-02 | 12 | EVAL-01, EVAL-02, EVAL-03, CAN-02 | Guide preserves completion blockers, typed fields, external unknowns, denied Slurm, and no-overclaim labels | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_css_evidence_index.py -k 'guide or paper_records or ordered_stop or completion_blocker or convergence or iterations or external_unknown or no_overclaim or slurm_denied' -x` | created in task | pending |
+| 09-10-01 | 9 | EVAL-01, EVAL-02 | Bounded Yao B1 launches only after the measured gate and retains its first whole batch | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_yao_b1_tracer.py -k 'profile_gate or preflight or first_batch or replay or label' -x` | created in task | green |
+| 09-10-02 | 9 | EVAL-01, EVAL-02 | Resume closes at exact T_100 with tail excluded or an honest cap-censored terminal | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_yao_b1_tracer.py -k 'resume or target_reached or target_ordinal or authorized_tail or censor or final_report or interruption' -x` | created in task | green |
+| 09-11-01 | 9 | EVAL-03 | Paired sizing uses disjoint calibration and reports powered and bounded boundaries | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_sizing.py -k 'paired or power or disjoint or blocked or boundary' -x` | created in task | green |
+| 09-11-02 | 9 | EVAL-03 | Relay, Beam, and MBBP use separate profiles and positive bounded N while Slurm stays denied | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_sizing.py -k 'resource or representative_profile or relay or beam or mbbp or positive_n or slurm or missing' -x` | created in task | green |
+| 09-19-01 | 10 | EVAL-03, CAN-02 | Public controlled lifecycle retains typed leaves, one shared initial receipt, completed arms inside partial groups, exact missing sets, terminal assessment, and byte replay | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py -k 'controlled_component or shared_initial_receipt or controlled_partial or controlled_inside_group_partial or controlled_resume or controlled_assess or controlled_byte_replay or paired_canonical_replays' -x` | existing, expanded in task | green |
+| 09-19-02 | 10 | EVAL-03, CAN-02 | Frozen three-arm Holm plus public six-verb ordinary-two-arm and shared-MBBP lifecycles preserve one member set, exact resume, costs, and replay | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_campaign_execution.py tests/test_campaign_statistics.py -k 'three_arm_family or shared_initial_receipt or shared_mbbp_member_set or member_no_rerun or public_two_arm_plan or public_two_arm_run_local or public_two_arm_merge or public_two_arm_resume or public_two_arm_assess or public_two_arm_verify or public_shared_mbbp_plan or public_shared_mbbp_run_local or public_shared_mbbp_merge or public_shared_mbbp_resume or public_shared_mbbp_assess or public_shared_mbbp_verify or common_incremental_cost or controlled_replay_drift or holm or paired_canonical_replays' -x` | existing, expanded in task | green |
+| 09-12-01 | 11 | EVAL-03 | Schedule control changes one factor and uses public two-arm plan/run-local/merge/resume for frozen positive-N typed evidence | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_update_schedule_control.py -k 'one_factor or positive_n or matched_evidence or paired_execution or typed_evidence or public_two_arm_plan or public_two_arm_run_local or public_two_arm_merge or public_two_arm_resume or phase_incomplete or label' -x` | created in task | green |
+| 09-12-02 | 11 | EVAL-03 | Public two-arm assess/verify invokes no decoder and byte-reconstructs completion, denominators, typed actuals, and costs | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_update_schedule_control.py -k 'assessment or cost or replay or public_two_arm_assess or public_two_arm_verify or no_decoder or byte_replay or exact_missing_set or all_shot or conditional' -x` | created in task | green |
+| 09-13-01 | 11 | EVAL-03 | Frozen three-arm family uses one shared initial BP receipt plus distinct typed Relay leaves and costs | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_relay_beam_control.py -k 'three_arm_family_shared_initial_receipt' -x` | created in task | green |
+| 09-13-02 | 11 | EVAL-03 | Beam consumes the same initial receipt; exact replay reconstructs both baseline contrasts and one Holm family | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_relay_beam_control.py -k 'replay_cost_corrects_no_candidate' -x` | created in task | green |
+| 09-14-01 | 11 | EVAL-03, CAN-02 | Public shared-MBBP plan/run-local/merge/resume produces one typed member receipt for list and vote without rerun | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_mbbp_list_vote_control.py -k 'shared_mbbp_member_set_list_vote' -x` | created in task | green |
+| 09-14-02 | 11 | EVAL-03, CAN-02 | Public shared-MBBP assess/verify replays without decoder and preserves typed leaves, completion, denominators, labels, and costs | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_mbbp_list_vote_control.py -k 'public_shared_mbbp_assess_verify' -x` | created in task | green |
+| 09-15-01 | 12 | EVAL-01, EVAL-02, EVAL-03, CAN-02 | Index audits Plans 09-01..09-20 and reconstructs policy/terminal, verified limits, cap receipts, ordered lifecycle, typed shared-input controls, and phase completion | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_css_evidence_index.py -k 'coverage or gap_plan or plan_16 or plan_17 or plan_18 or plan_19 or plan_20 or fourteen or ordered_stop or executable_limit or dynamic_cap or shared_input or tail or positive_n or convergence or iterations or phase_status or reconstruct or tamper or cost' -x` | created in task | green |
+| 09-15-02 | 12 | EVAL-01, EVAL-02, EVAL-03, CAN-02 | Guide preserves completion blockers, typed fields, external unknowns, denied Slurm, and no-overclaim labels | `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase9_css_evidence_index.py -k 'guide or paper_records or ordered_stop or completion_blocker or convergence or iterations or external_unknown or no_overclaim or slurm_denied' -x` | created in task | green |
 
 *Status values: pending, green, red, flaky. “Created in task” means the task uses TDD and must make the selected test fail before implementation.*
 
@@ -89,6 +89,10 @@ Plan 09-20 exact task selectors passed with nonzero selections: Task 1 selected 
 | 6 | 09-17 | 1,247 passed, 1 skipped | 883.70 s | 388,664 KiB | green |
 | 7 | 09-06 | 1,257 passed, 1 skipped | 874.68 s | 384,176 KiB | green |
 | 8 | 09-09, 09-18 | 1,268 passed, 1 skipped | 953.04 s | 390,160 KiB | green |
+| 9 | 09-10, 09-11 | Focused commands passed; no separate full suite | unavailable | unavailable | covered by final gate |
+| 10 | 09-19 | Focused commands passed; no separate full suite | unavailable | unavailable | covered by final gate |
+| 11 | 09-12, 09-13, 09-14 | Focused commands passed; no separate full suite | unavailable | unavailable | covered by final gate |
+| 12 | 09-15 and combined closeout | 1,316 passed, 1 skipped | 1,235.44 s | unavailable (not measured) | green |
 
 The observed peak is for the pytest child process, measured with `resource.getrusage(RUSAGE_CHILDREN).ru_maxrss`; it is a local test-suite measurement, not an HPC job allocation or production campaign ceiling.
 
@@ -103,28 +107,41 @@ No separate Wave 0 is required. Every new fixture/test file is owned by the same
 | Source-authored numeric target or digitization audit | EVAL-01, EVAL-02 | Manual source inspection; unavailable artifacts remain blocked | Compare literal points, locator, source digest, rounding/digitization interval, and extraction receipt before freezing an assessment. Never infer absent coordinates. |
 | Native executable/source receipt qualification | EVAL-01 | External artifacts may remain unavailable or unverified | Record request/provenance facts and exact blocker. Qualify later only from a digest-bound executable/source receipt; do not silently substitute the canonical adaptation. |
 | Journal-grade reproduction tolerance | EVAL-02 | External scientific/venue criterion remains unknown | Apply factor 1.5 only to the frozen bounded Yao tracer and label it accordingly. Do not promote it to a manuscript-scale or source-faithful curve criterion. |
-| Publication-scale site authorization | EVAL-03 | Denied pending measured resource and site-policy receipts | Inspect measured wall time, cores, memory, storage, allocation/accounting policy, and profiling-gate receipt. This draft authorizes no publication Slurm submission. |
+| Publication-scale site authorization | EVAL-03 | Denied pending measured resource and site-policy receipts | Inspect measured wall time, cores, memory, storage, allocation/accounting policy, and profiling-gate receipt. The verified phase authorizes no publication Slurm submission. |
 
 ## Validation Sign-Off
 
-- [ ] Every task's exact automated command selects at least one test and passes.
-- [ ] Every inherited automated command named in a plan also passes.
-- [ ] Full suite passes after every wave.
-- [ ] Focused and full-suite latency are measured.
-- [ ] Receipt reconstruction independently detects tamper and missing inputs.
-- [ ] Prospective failure-count plans contain no terminal state, T_r, realized count/resource, prefix/tail digest, or computed interval; those facts appear only in verified post-run receipts.
-- [ ] Work/event/evidence/storage bounds are independently derived from executable manifest/policy/ledger/serializer/artifact maxima, including a mandatory partial/interruption-receipt reserve; understated or stale bounds fail before plan freeze.
-- [ ] Before every whole failure-count batch, hard resource bounds and nominal wall/local-worker authorizations are checked; evidence/storage stop before append/write, while wall timeout is observed at boundaries with explicit within-iteration overshoot and no later dispatch.
-- [ ] New single-arm and multi-arm plans bind their ordinal rule and declared arm order before execution; controlled comparisons reconstruct complete sample-major matched groups.
-- [ ] Ordered partial merge/verify exposes the exact resumable missing set, while public assess and terminal verify require every frozen group.
-- [ ] Inverse-binomial replay uses exact `T_r`; authorized terminal tail is excluded from inference and included in actual cost.
-- [ ] Relay, Beam, and MBBP projections each trace to their own representative pre-outcome profile receipt; cross-family/Yao substitution fails.
-- [ ] Update/schedule, memory/intervention, and search/selection each contain the frozen positive N complete matched evaluative samples; otherwise `phase_status=incomplete` is verified.
-- [ ] Convergence and iterations remain separate through Relay/Beam/MBBP leaves, reports, and evidence index, with typed N/A/unavailable reasons.
-- [ ] Initial/Relay/Beam share one initial receipt per sample in a frozen three-arm/two-contrast Holm family; MBBP list/vote share one member-set receipt with no decoder rerun.
-- [ ] Ordinary two-arm schedule controls and shared-MBBP controls each pass public plan/run-local/merge/resume/assess/verify, including partial inside-group retention and exact no-duplicate resume.
-- [ ] The closeout audit explicitly covers Plans 09-01 through 09-20 and fails phase completion if a required gap-plan summary or receipt is missing.
-- [ ] External blockers remain typed `unavailable`, `unverified`, or `blocked` until qualifying evidence exists.
-- [ ] `nyquist_compliant: true` and `wave_0_complete: true` are set only after execution evidence supports them.
+- [x] Every task selector collects at least one test, and the final full suite passes all selected tests.
+- [x] Every inherited test named in a plan is included in the passing final full suite.
+- [ ] A separate full suite passed after each of Waves 9–11. The final combined suite passed; this cadence deviation is recorded below.
+- [x] Focused and final full-suite latency are measured; final peak RSS was not measured.
+- [x] Receipt reconstruction independently detects tamper and missing inputs.
+- [x] Prospective failure-count plans contain no terminal state, T_r, realized count/resource, prefix/tail digest, or computed interval; those facts appear only in verified post-run receipts.
+- [x] Work/event/evidence/storage bounds are independently derived from executable manifest/policy/ledger/serializer/artifact maxima, including a mandatory partial/interruption-receipt reserve; understated or stale bounds fail before plan freeze.
+- [x] Before every whole failure-count batch, hard resource bounds and nominal wall/local-worker authorizations are checked; evidence/storage stop before append/write, while wall timeout is observed at boundaries with explicit within-iteration overshoot and no later dispatch.
+- [x] New single-arm and multi-arm plans bind their ordinal rule and declared arm order before execution; controlled comparisons reconstruct complete sample-major matched groups.
+- [x] Ordered partial merge/verify exposes the exact resumable missing set, while public assess and terminal verify require every frozen group.
+- [x] Inverse-binomial replay uses exact `T_r`; authorized terminal tail is excluded from inference and included in actual cost.
+- [x] Relay, Beam, and MBBP projections each trace to their own representative pre-outcome profile receipt; cross-family/Yao substitution fails.
+- [x] Update/schedule, memory/intervention, and search/selection each contain the frozen positive N complete matched evaluative samples; otherwise `phase_status=incomplete` is verified.
+- [x] Convergence and iterations remain separate through Relay/Beam/MBBP leaves, reports, and evidence index, with typed N/A/unavailable reasons.
+- [x] Initial/Relay/Beam share one initial receipt per sample in a frozen three-arm/two-contrast Holm family; MBBP list/vote share one member-set receipt with no decoder rerun.
+- [x] Ordinary two-arm schedule controls and shared-MBBP controls each pass public plan/run-local/merge/resume/assess/verify, including partial inside-group retention and exact no-duplicate resume.
+- [x] The closeout audit explicitly covers Plans 09-01 through 09-20 and fails phase completion if a required gap-plan summary or receipt is missing.
+- [x] External blockers remain typed `unavailable`, `unverified`, or `blocked` until qualifying evidence exists.
+- [x] `nyquist_compliant: true` and `wave_0_complete: true` are set only after execution evidence supports them.
 
-**Approval:** pending plan execution and independent verification
+**Approval:** validated for Phase 9's bounded execution scope; publication source and site gates remain external.
+
+## Validation Audit 2026-10-12
+
+| Metric | Result |
+|---|---:|
+| Pending task selectors audited | 14 |
+| Selectors with zero tests | 0 |
+| Missing test files corrected | 2 (Plans 09-13 and 09-14) |
+| Final full suite | 1,316 passed, 1 skipped; 1,235.44 s |
+| Independent retained-report replay | 4 of 4 verified; evidence index byte matched (40,533 bytes) |
+| Open automated coverage gaps | 0 |
+
+The final full suite ran after the combined Wave 9–12 changes. Separate post-wave full suites were not run for Waves 9–11; focused commands and the combined regression cover their code. This is a recorded cadence deviation, not a claim of missing test coverage. Missing author artifacts, journal tolerance, and HPC site ceilings remain typed external facts; they do not become test passes.
