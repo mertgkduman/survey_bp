@@ -29,7 +29,8 @@ from ..runner import (
 )
 from .contracts import (
     CampaignSpecV1, CampaignWorkSpecV1, FailureCountPartialAttemptV1, FailureCountStoppingV1, FailureCountTerminalReceiptV1, FailureCountWorkSpecV1,
-    MaterializedPhysicalSampleV1, build_one_unit_plan, canonical_json_bytes,
+    MaterializedPhysicalSampleV1, _MAX_DECODER_WORK, _MAX_EVIDENCE_BYTES,
+    _MAX_EVENTS, _MAX_STORAGE_BYTES, build_one_unit_plan, canonical_json_bytes,
 )
 from .identity import validate_matched_sample_hashes
 from .planning import CampaignWorkPlan, ShardPlan
@@ -1173,6 +1174,8 @@ def _failure_count_executable_projection(
     verify_declared_executable_limits(
         declared, expected_policy_binding=policy.policy_binding_sha256, derived=derived,
     )
+    if _maximum_failure_count_partial_receipt_bytes() > derived.partial_receipt_reserve_bytes:
+        raise ValueError("failure-count partial receipt cannot fit the verified control reserve")
     if policy.executable_limits.digest() != policy.batch_authorization.executable_limit_receipt_sha256:
         raise ValueError("batch authorization does not bind the verified executable limit receipt")
     projection = {
@@ -1206,6 +1209,34 @@ def _failure_count_executable_projection(
     if exhausted is not None:
         raise ValueError(f"bounded canonical batch cannot fit hard resource cap: {exhausted}")
     return spec, projection, context, derived, manifest_path
+
+
+def _maximum_failure_count_partial_receipt_bytes() -> int:
+    """Bound the closed partial schema before any scientific artifact is made."""
+    maximum = 2**63 - 1
+    common = {
+        "schema": "failure_count_partial_attempt_v1", "attempt_id": "a" * 64,
+        "attempt_ordinal": _MAX_EVENTS, "attempt_sequence": _MAX_EVENTS,
+        "unit_key": "u" * 512, "parent_partial_receipt_sha256": "a" * 64,
+        "campaign_spec_digest": "a" * 64, "campaign_plan_digest": "a" * 64,
+        "policy_sha256": "a" * 64, "authorization_sha256": "a" * 64,
+        "profile_sha256": "a" * 64, "materialized_sample_path": "s" * 4096,
+        "materialized_sample_sha256": "a" * 64, "canonical_ledger_path": "l" * 4096,
+        "canonical_ledger_sha256": "a" * 64, "last_completed_boundary": "b" * 512,
+        "attempted_bytes": _MAX_STORAGE_BYTES, "consumed_decoder_work": _MAX_DECODER_WORK,
+        "consumed_events": _MAX_EVENTS, "consumed_evidence_bytes": _MAX_EVIDENCE_BYTES,
+        "consumed_storage_bytes": _MAX_STORAGE_BYTES, "consumed_control_receipt_bytes": _MAX_STORAGE_BYTES,
+        "completed_shot_credit": 0, "failure_credit": 0,
+    }
+    wall = FailureCountPartialAttemptV1(
+        **common, interruption_kind="interrupted_wall", first_exhausted_cap="wall",
+        deadline_ns=0, observed_ns=maximum, overshoot_ns=maximum,
+    )
+    byte = FailureCountPartialAttemptV1(
+        **common, interruption_kind="interrupted_storage", first_exhausted_cap="storage",
+        deadline_ns=None, observed_ns=None, overshoot_ns=None,
+    )
+    return max(len(wall.primitive_bytes()), len(byte.primitive_bytes())) + 1
 
 
 def _partial_interruption_fields(snapshot: Any) -> tuple[str, str]:
