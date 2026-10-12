@@ -44,6 +44,23 @@ def test_matched_initial_is_single_owned_stage_and_extra_units_are_distinct():
             assert np.array_equal(H @ result.candidate % 2, S)
 
 
+def test_verified_initial_can_feed_later_continuations_without_initial_rerun(monkeypatch):
+    initial = _controller().initial_bp()
+    continuation = _controller()
+    continuation.adopt_verified_initial(initial)
+    original = continuation._bp_segment
+
+    def count_only_continuations(*, stage_id, **kwargs):
+        assert stage_id != "initial-bp"
+        return original(stage_id=stage_id, **kwargs)
+
+    monkeypatch.setattr(continuation, "_bp_segment", count_only_continuations)
+    assert continuation.run_relay(initial, sample_seed_identity="physical-0").initial is initial
+    assert continuation.run_beam(initial).initial is initial
+    with pytest.raises(ValueError, match="already"):
+        continuation.adopt_verified_initial(initial)
+
+
 def test_initial_success_stops_both_without_extra_work():
     zero = np.zeros(2, dtype=np.uint8)
     controller = FairLegController(H, zero, error_rate=0.1, config=FairLegConfig(initial_iterations=1))

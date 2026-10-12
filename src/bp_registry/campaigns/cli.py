@@ -422,6 +422,18 @@ def _preflight_ordered_arms(spec: OrderedCampaignWorkSpecV1, root: Path) -> str:
         _preflight_work_arms(spec.campaign_work_spec, root)
         if all(target.target_id.endswith("-order-only-not_assessed")
                for target in spec.campaign_work_spec.assessment.targets):
+            if spec.execution_order.arm_order == ("spa_flooding", "spa_check_node_serial"):
+                left, right = json.loads(json.dumps(documents[0])), json.loads(json.dumps(documents[1]))
+                if {left["policies"]["schedule"]["kind"], right["policies"]["schedule"]["kind"]} != {
+                    "flooding", "check_node_serial"}:
+                    raise ValueError("ordinary schedule control lacks its declared one-factor treatments")
+                for document in (left, right):
+                    document.pop("run_id", None)
+                    document["policies"].pop("schedule", None)
+                    document["randomness"].pop("decoder_seed_identity", None)
+                if left != right:
+                    raise ValueError("ordinary schedule arms differ outside the declared schedule factor")
+                return "controlled_ordinary_v1"
             return "controlled_planning_only"
         return "canonical"
     if not all(custom):
@@ -452,6 +464,25 @@ def _preflight_ordered_arms(spec: OrderedCampaignWorkSpecV1, root: Path) -> str:
         _work_manifest_path(root, source_path, source_sha)
         if route == "controlled_shared_mbbp_v1":
             _work_manifest_path(root, document["policy_path"], document["policy_sha256"])
+    routes = {document["runner"] for document in documents}
+    if routes == {"controlled_fair_leg_v1"}:
+        if (spec.execution_order.arm_order != ("initial_bp", "relay", "beam")
+                or len({canonical_json_bytes(document["controls"]) for document in documents}) != 1):
+            raise ValueError("controlled fair family requires one shared initial-BP configuration")
+        return "controlled_fair_leg_v1"
+    if routes == {"controlled_shared_mbbp_v1"}:
+        if spec.execution_order.arm_order != ("list", "vote"):
+            raise ValueError("controlled MBBP family requires declared list then vote order")
+        import tomllib
+
+        policies = [tomllib.loads((root / document["policy_path"]).read_text()) for document in documents]
+        operative = ("update", "schedule", "state_memory", "intervention", "stopping",
+                     "selection", "postprocessing", "ensemble", "list_selection")
+        if (any(policies[0].get(name) != policies[1].get(name) for name in operative)
+                or policies[0].get("vote") is not None
+                or policies[1].get("vote", {}).get("tie_bit") not in (0, 1)):
+            raise ValueError("controlled MBBP decisions must share one frozen ensemble")
+        return "controlled_shared_mbbp_v1"
     return "controlled_planning_only"
 
 
@@ -598,7 +629,15 @@ def _ordered_existing_runs(output: Path, *, plan: CampaignWorkPlan) -> tuple[tup
 
 def _ordered_run(args: argparse.Namespace, *, root: Path, output: Path) -> dict[str, Any]:
     _spec, plan, payload = _load_ordered_plan(args.plan, root)
-    if _preflight_ordered_arms(_spec, root) == "controlled_planning_only":
+    route = _preflight_ordered_arms(_spec, root)
+    if route in {"controlled_fair_leg_v1", "controlled_shared_mbbp_v1"}:
+        from .controlled_public import run_local
+
+        result = run_local(root=root, plan=plan, output_root=output,
+                           max_units=getattr(args, "max_units", None))
+        return _artifact(status="ok", plan=payload, phase="run_local", executor_route="local",
+                         **{key: value for key, value in result.items() if key != "schema"})
+    if route == "controlled_planning_only":
         raise ValueError("controlled ordered work requires the dedicated controlled executor")
     _paths, prior = _ordered_existing_runs(output, plan=plan)
     pending = plan.unit_keys[len(prior):]
@@ -773,6 +812,14 @@ def _paired_merge(args: argparse.Namespace, *, root: Path, plan: CampaignWorkPla
 
 
 def _ordered_merge(args: argparse.Namespace, *, root: Path, plan: CampaignWorkPlan, payload: Mapping[str, Any]) -> dict[str, Any]:
+    spec = OrderedCampaignWorkSpecV1.model_validate(payload["ordered_campaign_work_spec"])
+    if _preflight_ordered_arms(spec, root) in {"controlled_fair_leg_v1", "controlled_shared_mbbp_v1"}:
+        from .controlled_public import merge
+
+        result = merge(root=root, plan=plan, run_paths=[Path(item) for item in args.receipt],
+                       output_root=_output_root(args.output_root))
+        return _artifact(status="ok", plan=payload, phase="merge",
+                         **{key: value for key, value in result.items() if key != "schema"})
     indexes = []
     attempts = []
     seen_paths: set[Path] = set()
@@ -1067,6 +1114,39 @@ def _verify(args: argparse.Namespace) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
     if args.plan is not None and _read_json(args.plan).get("schema") == "ordered_campaign_public_plan_v1":
         spec, plan, payload = _load_ordered_plan(args.plan, root)
+        if _preflight_ordered_arms(spec, root) == "controlled_ordinary_v1" and args.report is not None:
+            from .controlled_public import verify_ordinary_report
+
+            if args.merge is None:
+                raise ValueError("ordinary controlled verification requires --merge")
+            merged = _paired_merge_payload(args.merge, plan=plan, ordered=True)
+            report = verify_ordinary_report(root=root, plan=plan, merged=merged,
+                                            report_path=Path(args.report))
+            return _artifact(status="ok", plan=payload, phase="verify", verified=True,
+                             complete=True, report_sha256=report["report_sha256"],
+                             missing_unit_keys=[])
+        if _preflight_ordered_arms(spec, root) in {"controlled_fair_leg_v1", "controlled_shared_mbbp_v1"}:
+            from .controlled_public import verify_merge, verify_report
+
+            if args.merge is None:
+                raise ValueError("controlled fair verification requires --merge")
+            merged = verify_merge(root=root, plan=plan, merge_path=Path(args.merge))
+            if args.report is not None:
+                report = verify_report(root=root, plan=plan, merge_path=Path(args.merge),
+                                       report_path=Path(args.report))
+                return _artifact(status="ok", plan=payload, phase="verify", verified=True,
+                                 complete=True, report_sha256=report["report_sha256"],
+                                 missing_unit_keys=[])
+            if args.receipt is None:
+                raise ValueError("controlled fair verification requires --receipt or --report")
+            supplied = str(Path(args.receipt).resolve(strict=True))
+            indexed = {item["path"] for item in merged["run_envelopes"]}
+            if supplied not in indexed:
+                raise ValueError("controlled fair receipt is absent from verified merge")
+            return _artifact(status="ok", plan=payload, phase="verify", verified=True,
+                             complete=not merged["missing_unit_keys"],
+                             receipt_sha256=sha256(Path(args.receipt).read_bytes()).hexdigest(),
+                             missing_unit_keys=merged["missing_unit_keys"])
         if args.merge is None:
             raise ValueError("ordered verification requires --merge")
         merged = _paired_merge_payload(args.merge, plan=plan, ordered=True)
@@ -1372,6 +1452,14 @@ def _resume(args: argparse.Namespace) -> dict[str, Any]:
     root = _existing_root(args.campaign_root, name="campaign_root")
     if _read_json(args.plan).get("schema") == "ordered_campaign_public_plan_v1":
         _spec, plan, payload = _load_ordered_plan(args.plan, root)
+        if _preflight_ordered_arms(_spec, root) in {"controlled_fair_leg_v1", "controlled_shared_mbbp_v1"}:
+            from .controlled_public import verify_merge
+
+            merged = verify_merge(root=root, plan=plan, merge_path=Path(args.merge))
+            missing = merged["missing_unit_keys"]
+            return _artifact(status="ok", plan=payload, phase="resume", complete=not missing,
+                             exact_missing_set=missing, resumable_unit_keys=missing,
+                             terminal_unit_keys=[item["unit_key"] for item in merged["verified_units"]])
         merged = _paired_merge_payload(args.merge, plan=plan, ordered=True)
         projection = merged["ordered_projection"]
         return _artifact(status="ok", plan=payload, phase="resume", exact_missing_set=projection["missing_unit_keys"],
@@ -1432,6 +1520,25 @@ def _assess(args: argparse.Namespace) -> dict[str, Any]:
     plan_path = getattr(args, "plan", None)
     if plan_path is not None and _read_json(plan_path).get("schema") == "ordered_campaign_public_plan_v1":
         spec, plan, payload = _load_ordered_plan(plan_path, root)
+        if _preflight_ordered_arms(spec, root) == "controlled_ordinary_v1":
+            from .controlled_public import publish_ordinary_report
+
+            merged = _paired_merge_payload(args.merge, plan=plan, ordered=True)
+            if args.output_root is None:
+                raise ValueError("ordinary controlled assess requires --output-root")
+            result = publish_ordinary_report(root=root, plan=plan, merged=merged,
+                                             output_root=_output_root(args.output_root))
+            return _artifact(status="ok", plan=payload, phase="assess", assessment_status="evidence_reconstructed",
+                             **result)
+        if _preflight_ordered_arms(spec, root) in {"controlled_fair_leg_v1", "controlled_shared_mbbp_v1"}:
+            from .controlled_public import assess
+
+            if args.output_root is None:
+                raise ValueError("controlled fair assess requires --output-root")
+            result = assess(root=root, plan=plan, merge_path=Path(args.merge),
+                            output_root=_output_root(args.output_root))
+            return _artifact(status="ok", plan=payload, phase="assess", assessment_status="evidence_reconstructed",
+                             **{key: value for key, value in result.items() if key != "schema"})
         merged = _paired_merge_payload(args.merge, plan=plan, ordered=True)
         require_complete_ordered_campaign(plan=plan, merged=merged)
         if args.output_root is None:

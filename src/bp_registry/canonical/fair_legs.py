@@ -285,6 +285,35 @@ class FairLegController:
             self._initial = self._bp_segment(fixed=(), iterations=self.config.initial_iterations, stage_id="initial-bp")
         return self._initial
 
+    def adopt_verified_initial(self, initial: BPSegment) -> BPSegment:
+        """Install a replay-verified initial state for a later continuation arm.
+
+        The caller verifies the content-bound receipt.  This boundary checks
+        that its decoder-visible shape belongs to this controller's problem,
+        then preserves object identity for the ordinary extension methods.
+        """
+        if self._initial is not None:
+            raise ValueError("initial BP has already been installed or executed")
+        n = self.h.shape[1]
+        expected_edges = tuple((check, variable) for check, variable in EdgeTable.from_check_matrix(self.h).edges)
+        if (not isinstance(initial, BPSegment) or initial.stage_id != "initial-bp"
+                or initial.fixed or initial.unmasked != tuple(range(n))
+                or initial.candidate.dtype != np.uint8
+                or initial.candidate.shape != (n,) or initial.posterior.shape != (n,)
+                or initial.sum_llr.shape != (n,)
+                or np.any((initial.candidate != 0) & (initial.candidate != 1))
+                or any(not np.all(np.isfinite(value)) for value in (initial.posterior, initial.sum_llr))
+                or tuple((check, variable) for check, variable, _ in initial.edge_messages) != expected_edges
+                or any(not math.isfinite(value) for _, _, value in initial.edge_messages)
+                or initial.iterations > self.config.initial_iterations
+                or (initial.converged and not self._valid(initial.candidate))):
+            raise ValueError("verified initial BP state is incompatible with this controller")
+        initial.candidate.setflags(write=False)
+        initial.posterior.setflags(write=False)
+        initial.sum_llr.setflags(write=False)
+        self._initial = initial
+        return initial
+
     def _require_initial(self, initial: BPSegment) -> None:
         if initial is not self.initial_bp():
             raise ValueError("extensions must use this controller’s exact matched initial BP run")

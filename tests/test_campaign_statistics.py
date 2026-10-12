@@ -8,6 +8,8 @@ from hashlib import sha256
 import math
 from math import comb
 import importlib
+import json
+from pathlib import Path
 
 import pytest
 from scipy.stats import binomtest, nbinom
@@ -27,6 +29,7 @@ from bp_registry.campaigns.contracts import (
     TargetReferenceV1,
 )
 _HASH = "a" * 64
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def _statistics_api() -> object:
@@ -1236,3 +1239,67 @@ def test_report_named_work_rejects_missing_or_extra_terminal_vectors() -> None:
         })
     with pytest.raises(ValueError, match="cover every verified terminal"):
         reconstruct_campaign_report(**kwargs, work_vectors_by_unit={**work, "extra": {"bp_calls": 1}})
+
+
+def test_three_arm_family_uses_one_holm_family_and_only_complete_frozen_groups() -> None:
+    from bp_registry.campaigns.contracts import OrderedCampaignWorkSpecV1
+    from bp_registry.campaigns.planning import freeze_ordered_campaign_work_spec
+    from bp_registry.campaigns.reporting import reconstruct_controlled_family
+
+    document = json.loads((ROOT / "data/studies/phase9-control-relay_beam-ordered-work-v2.json").read_text())
+    spec = OrderedCampaignWorkSpecV1.model_validate(document["ordered_campaign_work_spec"])
+    plan = freeze_ordered_campaign_work_spec(spec)
+    design_sha = "a" * 64
+    statuses = {unit.key: ("wrong_logical_action" if unit.arm_id == "initial_bp" else "exact")
+                for unit in plan.units}
+    missing_key = plan.units[1].key
+    partial = reconstruct_controlled_family(
+        plan=plan, family_id="relay_beam", source_design_sha256=design_sha,
+        terminal_status_by_unit={key: value for key, value in statuses.items() if key != missing_key},
+        alpha=0.05,
+    )
+    assert partial.status == "inconclusive_partial"
+    assert partial.missing_unit_keys == (missing_key,)
+    assert partial.paired_tables == {}
+    assert partial.holm_result["frozen_family_size"] == 2
+    assert partial.holm_result["verdict"] == "inconclusive"
+    complete = reconstruct_controlled_family(
+        plan=plan, family_id="relay_beam", source_design_sha256=design_sha,
+        terminal_status_by_unit=statuses, alpha=0.05,
+    )
+    assert complete.status == "complete"
+    assert complete.arm_order == ("initial_bp", "relay", "beam")
+    assert set(complete.paired_tables) == {"initial_bp-vs-relay", "initial_bp-vs-beam"}
+    assert {table["complete_pairs"] for table in complete.paired_tables.values()} == {16}
+    assert complete.holm_result["frozen_family_size"] == 2
+    assert complete.holm_result["verdict"] == "rejected"
+    assert complete.digest() == type(complete).model_validate_json(complete.primitive_bytes()).digest()
+    with pytest.raises(ValueError, match="order"):
+        type(complete).model_validate_json(complete.primitive_bytes().replace(
+            b'"initial_bp","relay","beam"', b'"initial_bp","beam","relay"'))
+
+
+def test_shared_mbbp_family_keeps_frozen_pair_set_when_one_vote_is_missing() -> None:
+    from bp_registry.campaigns.contracts import OrderedCampaignWorkSpecV1
+    from bp_registry.campaigns.planning import freeze_ordered_campaign_work_spec
+    from bp_registry.campaigns.reporting import reconstruct_controlled_family
+
+    document = json.loads((ROOT / "data/studies/phase9-control-mbbp_list_vote-ordered-work-v1.json").read_text())
+    plan = freeze_ordered_campaign_work_spec(OrderedCampaignWorkSpecV1.model_validate(
+        document["ordered_campaign_work_spec"]))
+    statuses = {unit.key: "nonconvergence" if unit.arm_id == "list" else "exact" for unit in plan.units}
+    missing_key = plan.units[-1].key
+    partial = reconstruct_controlled_family(
+        plan=plan, family_id="mbbp_list_vote", source_design_sha256="a" * 64,
+        terminal_status_by_unit={key: value for key, value in statuses.items() if key != missing_key},
+        alpha=0.05,
+    )
+    assert partial.missing_unit_keys == (missing_key,)
+    assert partial.holm_result["members"][0]["status"] == "unavailable"
+    complete = reconstruct_controlled_family(
+        plan=plan, family_id="mbbp_list_vote", source_design_sha256="a" * 64,
+        terminal_status_by_unit=statuses, alpha=0.05,
+    )
+    assert complete.status == "complete"
+    assert complete.comparisons == (("list", "vote"),)
+    assert complete.paired_tables["list-vs-vote"]["complete_pairs"] == 2

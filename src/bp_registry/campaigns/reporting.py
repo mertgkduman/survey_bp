@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from hashlib import sha256
+import json
 from typing import Any, Literal, Mapping, Sequence
 
 from .contracts import (
@@ -34,7 +35,11 @@ from .statistics import (
     paired_outcome_table,
     outcome_denominator_summary,
     target_interval_decision,
+    HolmFamilyMemberV1,
+    holm_adjusted_family,
 )
+
+from .controlled import ControlledFamilyReceiptV1
 
 
 _SHA256_LENGTH = 64
@@ -682,3 +687,84 @@ def verify_campaign_routes(
         "scientific_records_match": True,
         "observational_differences": differences,
     }
+
+
+def reconstruct_controlled_family(
+    *, plan: CampaignWorkPlan, family_id: str, source_design_sha256: str,
+    terminal_status_by_unit: Mapping[str, str], alpha: float,
+) -> ControlledFamilyReceiptV1:
+    """Assess only the complete frozen groups and primary family contrasts.
+
+    A partial family retains its exact missing unit set.  Its paired tables
+    remain absent and Holm receives unavailable members at the full frozen
+    family size, so no completed subset can acquire a significance claim.
+    """
+    if plan.work_spec is None or not isinstance(terminal_status_by_unit, Mapping):
+        raise ValueError("controlled family requires a frozen plan and terminal mapping")
+    preimage = json.loads(plan.campaign_plan_preimage)
+    if preimage.get("schema") != "ordered_campaign_work_plan_v1":
+        raise ValueError("controlled family requires a frozen ordered work plan")
+    families = {
+        "relay_beam": (("initial_bp", "relay", "beam"),
+                       (("initial_bp", "relay"), ("initial_bp", "beam"))),
+        "mbbp_list_vote": (("list", "vote"), (("list", "vote"),)),
+        "schedule": (("spa_flooding", "spa_check_node_serial"),
+                     (("spa_flooding", "spa_check_node_serial"),)),
+    }
+    if family_id not in families:
+        raise ValueError("unknown controlled family")
+    arm_order, comparisons = families[family_id]
+    if tuple(preimage["execution_order"]["arm_order"]) != arm_order:
+        raise ValueError("controlled family arm order differs from frozen plan")
+    if set(terminal_status_by_unit) - set(plan.unit_keys):
+        raise ValueError("controlled family contains an undeclared unit")
+    by_key = {unit.key: unit for unit in plan.units}
+    missing = tuple(key for key in plan.unit_keys if key not in terminal_status_by_unit)
+    expected = tuple(by_key[group["unit_keys"][0]].physical_sample_identity for group in preimage["groups"])
+    complete = tuple(by_key[group["unit_keys"][0]].physical_sample_identity
+                     for group in preimage["groups"] if all(key in terminal_status_by_unit for key in group["unit_keys"]))
+    tables: dict[str, dict[str, Any]] = {}
+    holm_members = []
+    for first_arm, second_arm in comparisons:
+        comparison_id = f"{first_arm}-vs-{second_arm}"
+        if missing:
+            holm_members.append(HolmFamilyMemberV1(comparison_id, None))
+            continue
+        selected = []
+        for group in preimage["groups"]:
+            for key in group["unit_keys"]:
+                unit = by_key[key]
+                if unit.arm_id not in {first_arm, second_arm}:
+                    continue
+                selected.append(PairedArmOutcomeV1(
+                    campaign_spec_digest=plan.campaign_spec_digest,
+                    cohort_id=unit.cohort_id, point_id=unit.point_id,
+                    sample_identity=unit.physical_sample_identity, arm_id=unit.arm_id,
+                    terminal_status=terminal_status_by_unit[key],
+                ))
+        count_digest = sha256(b"bp-registry-controlled-contrast-v1\0" + canonical_json_bytes({
+            "campaign_plan_digest": plan.campaign_plan_digest,
+            "source_design_sha256": source_design_sha256,
+            "comparison_id": comparison_id,
+            "outcomes": [asdict(item) for item in selected],
+        })).hexdigest()
+        table = paired_outcome_table(
+            outcomes=selected, arm_ids=(first_arm, second_arm), alpha=alpha,
+            count_receipt_sha256=count_digest,
+            outcome_matrix=plan.work_spec.assessment.outcome_matrix,
+        )
+        tables[comparison_id] = asdict(table)
+        holm_members.append(HolmFamilyMemberV1(comparison_id, table.exact_discordance_p_value))
+    holm = holm_adjusted_family(family_id=family_id, alpha=alpha, members=holm_members)
+    return ControlledFamilyReceiptV1.model_validate({
+        "schema": "controlled_family_receipt_v1", "family_id": family_id,
+        "campaign_spec_digest": plan.campaign_spec_digest,
+        "campaign_plan_digest": plan.campaign_plan_digest,
+        "source_design_sha256": source_design_sha256,
+        "arm_order": arm_order, "comparisons": comparisons,
+        "expected_sample_identities": expected,
+        "complete_sample_identities": complete,
+        "missing_unit_keys": missing, "paired_tables": tables,
+        "holm_result": asdict(holm),
+        "status": "inconclusive_partial" if missing else "complete",
+    })

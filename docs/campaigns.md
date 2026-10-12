@@ -331,10 +331,46 @@ cost receipts. Schedule calibration used p=0.03 and is projected to p=0.10
 with a twofold cost factor and a small local cap.
 
 Every family has a public `OrderedCampaignWorkSpecV1` plan under
-`data/results/phase9-controlled-design-v1/`, with a complete declared arm
-sequence and sample-major group ordinals. These work plans freeze membership
-and order only. The ordinary ordered campaign runner rejects their
-`order-only-not_assessed` targets; Plans 09-19 and 09-12 through 09-14 own the
-controlled execution and paired inference. No calibration sample may enter
-the evaluative denominator. Site wall, core, memory, storage, and accounting
-ceilings remain unavailable, and publication Slurm authorization is denied.
+`data/results/phase9-controlled-design-v1/` or its version-two successor,
+with a complete declared arm sequence and sample-major group ordinals.
+The public `plan`, `run-local`, `merge`, `resume`, `assess`, and `verify`
+commands execute the frozen schedule pair, the shared-initial BP/Relay/Beam
+family, and the shared-member MBBP list/vote family. A partial merge retains
+completed arms, reports the exact missing set, and cannot be assessed.
+Relay and Beam consume one sealed initial BP state per sample; list and vote
+consume one sealed MBBP member set. Shared work is charged once in the typed
+cost projection. Complete matched groups alone enter paired inference and the
+declared Holm family. No calibration sample may enter the evaluative
+denominator. Site wall, core, memory, storage, and accounting ceilings remain
+unavailable, and publication Slurm authorization is denied.
+
+## Phase 9 Yao B1 bounded adaptation
+
+`data/studies/phase9-yao-b1-t001-p010-v4.json` is the current frozen local
+campaign for the project B1 artifact, Yao Figure 3 `bpgd-t001` at p=0.10.
+It targets 100 logical failures under a 95% exact inverse-binomial rule and a
+separately frozen factor 1.5 comparison to the published rate. The profile
+gate and source target are digest-bound. The execution uses one local worker,
+an 1,800 second campaign wall cap, and an explicit 4 MiB ceiling for each
+guided-decimation event. Publication Slurm authorization remains denied.
+
+The v1 run reached its 600 second wall cap without a completed shot and
+retains a sealed zero-credit partial. The v2 and v3 attempts encountered
+guarded event-size limits before a terminal shot; their unsealed ledgers are
+diagnostic evidence with no shot or failure credit. The first v4 attempt
+completed a canonical `wall_clock_deadline` terminal, but the campaign adapter
+rejected that outcome before sealing its shot receipt. Its full ledger is
+retained as diagnostic evidence, without campaign credit. The adapter now
+maps that exact canonical terminal to the frozen `timeout` class, and a fresh
+run under the unchanged v4 scientific plan records a new execution observation.
+The later versions have new study and manifest identities only where their
+executable bounds changed. These failed attempts cannot enter inverse-binomial
+inference. The credited v4 run sealed two timeout terminals and reached the
+1,800 second campaign wall cap before the target of 100 failures. Its report is
+`inconclusive_cap_censored`: no inverse-binomial rate, interval, or paper-target
+verdict is computed. The two terminal attempts retained 3,591 events,
+9,470,745 decoder work units, 12,596,648 evidence bytes, and 2,104,202,730,786
+nanoseconds of measured wall boundaries. The frozen all-shot matrix counts
+both timeout terminals as decoder failures; this is not an observed
+paper-style logical error rate. Every result remains a `canonical_adaptation`:
+the original source settings and exact paper artifact have not been established.

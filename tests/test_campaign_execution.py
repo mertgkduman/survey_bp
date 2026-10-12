@@ -17,6 +17,526 @@ ROOT = Path(__file__).resolve().parents[1]
 INNER_MANIFEST = "data/manifests/canonical-three-qubit-development.json"
 
 
+def test_controlled_component_keeps_convergence_iterations_and_missingness_distinct() -> None:
+    from bp_registry.campaigns.controlled import ControlledComponentEvidenceV1
+
+    payload = {
+        "schema": "controlled_component_evidence_v1", "component_id": "initial-bp",
+        "role": "initial_bp", "source_status": "controlled_css_adaptation",
+        "convergence_status": {"status": "observed", "value": False},
+        "iterations": {"status": "observed", "value": 0},
+        "configured_limits": {"iterations": 20, "check_to_variable_updates": 8640},
+        "actual_work": {"bp_calls": 1, "check_to_variable_updates": 0},
+        "runtime_ns": {"status": "observed", "value": 900},
+        "peak_rss_bytes": {"status": "unavailable", "reason": "per-component RSS is unavailable"},
+        "events": {"status": "observed", "value": 1},
+        "evidence_bytes": {"status": "observed", "value": 100},
+        "storage_bytes": {"status": "observed", "value": 100},
+        "interruption": {"status": "not_applicable", "reason": "completed component"},
+        "provenance_sha256": "a" * 64,
+    }
+    component = ControlledComponentEvidenceV1.model_validate(payload)
+    assert component.convergence_status.value is False
+    assert component.iterations.value == 0
+    assert component.peak_rss_bytes.reason
+    assert len(component.digest()) == 64
+    changed = json.loads(json.dumps(payload))
+    changed["peak_rss_bytes"].pop("reason")
+    with pytest.raises(ValueError):
+        ControlledComponentEvidenceV1.model_validate(changed)
+    changed = json.loads(json.dumps(payload))
+    changed["iterations"]["value"] = False
+    with pytest.raises(ValueError):
+        ControlledComponentEvidenceV1.model_validate(changed)
+
+
+def test_canonical_wall_deadline_maps_to_frozen_timeout_failure() -> None:
+    from bp_registry.campaigns.execution import _campaign_terminal_fact
+
+    terminal = {
+        "kind": "termination", "termination": "wall_clock_deadline",
+        "data": {"outcome": None, "payload": {
+            "termination": "wall_clock_deadline", "outcome": None,
+        }},
+    }
+    assert _campaign_terminal_fact([terminal], unit_key="unit") == {
+        "unit_key": "unit", "termination": "wall_clock_deadline",
+        "outcome": "timeout", "logical_failure": True,
+    }
+
+
+def test_canonical_count_budget_exhaustion_maps_to_frozen_nonconvergence() -> None:
+    from bp_registry.campaigns.execution import _campaign_terminal_fact
+
+    terminal = {"kind": "termination", "termination": "count_budget_exhausted",
+                "data": {"outcome": None, "budget_termination": {
+                    "reason": "count_budget_exhausted", "resource": "variable_to_check_updates",
+                    "binding_scope": "attempt", "configured_limit": 4000,
+                    "consumed_amount": 3996}}}
+    assert _campaign_terminal_fact([terminal], unit_key="unit") == {
+        "unit_key": "unit", "termination": "count_budget_exhausted",
+        "outcome": "nonconvergence", "logical_failure": True,
+    }
+
+
+def test_common_incremental_cost_charges_initial_once_and_validation_separately() -> None:
+    from bp_registry.campaigns.controlled import ControlledComponentEvidenceV1, project_controlled_costs
+
+    def component(role: str, work: dict[str, int], runtime: int, shared: str | None = None):
+        return ControlledComponentEvidenceV1.model_validate({
+            "schema": "controlled_component_evidence_v1", "component_id": role,
+            "role": role, "source_status": "controlled_css_adaptation",
+            "convergence_status": {"status": "observed", "value": True},
+            "iterations": {"status": "observed", "value": 1},
+            "configured_limits": {"iterations": 20}, "actual_work": work,
+            "runtime_ns": {"status": "observed", "value": runtime},
+            "peak_rss_bytes": {"status": "unavailable", "reason": "shared process"},
+            "events": {"status": "observed", "value": 1},
+            "evidence_bytes": {"status": "observed", "value": 10},
+            "storage_bytes": {"status": "observed", "value": 10},
+            "interruption": {"status": "not_applicable", "reason": "completed"},
+            "provenance_sha256": "a" * 64, "shared_input_receipt_sha256": shared,
+        })
+
+    initial = component("initial_bp", {"bp_calls": 1, "check_to_variable_updates": 10}, 100)
+    relay = component("relay", {"bp_calls": 2, "check_to_variable_updates": 20}, 200, "b" * 64)
+    validation = component("original_validation", {"original_checks": 1}, 50)
+    projection = project_controlled_costs(
+        shared=(initial,), shared_input_receipt_sha256="b" * 64,
+        incremental={"relay": relay}, validation={"relay": validation},
+    )
+    assert projection.common_work["bp_calls"] == 1
+    assert projection.incremental_work["relay"]["bp_calls"] == 2
+    assert projection.validation_work["relay"]["original_checks"] == 1
+    assert projection.total_work["bp_calls"] == 3
+    assert projection.total_runtime_ns.value == 350
+    with pytest.raises(ValueError, match="duplicates"):
+        project_controlled_costs(
+            shared=(initial,), shared_input_receipt_sha256="b" * 64,
+            incremental={"initial_bp": initial}, validation={},
+        )
+
+
+def test_controlled_shared_initial_group_resumes_without_initial_bp_rerun(tmp_path: Path, monkeypatch) -> None:
+    from bp_registry.campaigns.contracts import OrderedCampaignWorkSpecV1
+    from bp_registry.campaigns.controlled_execution import run_fair_controlled_unit, verify_fair_controlled_unit
+    from bp_registry.campaigns.planning import freeze_ordered_campaign_work_spec
+    from bp_registry.canonical.fair_legs import FairLegController
+
+    study = json.loads((ROOT / "data/studies/phase9-control-relay_beam-ordered-work-v2.json").read_text())
+    plan = freeze_ordered_campaign_work_spec(OrderedCampaignWorkSpecV1.model_validate(
+        study["ordered_campaign_work_spec"]))
+    group = plan.units[:3]
+    assert tuple(unit.arm_id for unit in group) == ("initial_bp", "relay", "beam")
+
+    def run(unit):
+        arm = next(arm for arm in plan.work_spec.arms if arm.arm_id == unit.arm_id)
+        manifest = json.loads((ROOT / arm.manifest_path).read_text())
+        return run_fair_controlled_unit(
+            plan=plan, unit=unit, arm_manifest=manifest,
+            campaign_root=ROOT, output_root=tmp_path,
+        )
+
+    baseline = run(group[0])
+    shared_path = tmp_path / "shared" / f"{group[0].physical_sample_identity}.json"
+    shared_bytes = shared_path.read_bytes()
+    original_bp = FairLegController._bp_segment
+
+    def no_new_initial(self, *, stage_id, **kwargs):
+        assert stage_id != "initial-bp"
+        return original_bp(self, stage_id=stage_id, **kwargs)
+
+    monkeypatch.setattr(FairLegController, "_bp_segment", no_new_initial)
+    relay = run(group[1])
+    beam = run(group[2])
+    assert shared_path.read_bytes() == shared_bytes
+    assert len(list((tmp_path / "shared").glob("*.json"))) == 1
+    assert {item.shared_input_receipt_sha256 for item in (baseline, relay, beam)} == {
+        baseline.shared_input_receipt_sha256}
+    assert {item.materialized_sample_sha256 for item in (baseline, relay, beam)} == {
+        baseline.materialized_sample_sha256}
+    assert {item.unit_key for item in (baseline, relay, beam)} == {unit.key for unit in group}
+    for unit in group:
+        arm = next(arm for arm in plan.work_spec.arms if arm.arm_id == unit.arm_id)
+        manifest = json.loads((ROOT / arm.manifest_path).read_text())
+        verified = verify_fair_controlled_unit(
+            plan=plan, unit=unit, arm_manifest=manifest, campaign_root=ROOT, output_root=tmp_path)
+        assert verified.unit_key == unit.key
+    relay_receipt_path = tmp_path / "units" / f"{group[1].key}.json"
+    changed = json.loads(relay_receipt_path.read_text())
+    changed["component"]["storage_bytes"]["value"] += 1
+    relay_receipt_path.write_text(json.dumps(changed, sort_keys=True, separators=(",", ":")) + "\n")
+    relay_manifest = json.loads((ROOT / next(arm for arm in plan.work_spec.arms if arm.arm_id == "relay").manifest_path).read_text())
+    with pytest.raises(ValueError, match="cost differs"):
+        verify_fair_controlled_unit(
+            plan=plan, unit=group[1], arm_manifest=relay_manifest,
+            campaign_root=ROOT, output_root=tmp_path)
+
+
+def test_controlled_partial_resume_assess_and_byte_replay_through_public_cli(tmp_path: Path) -> None:
+    from bp_registry.campaigns.contracts import OrderedCampaignWorkSpecV1
+    from bp_registry.campaigns.planning import freeze_ordered_campaign_work_spec
+
+    fixture_root = tmp_path / "fixture"
+
+    def write(relative: str, payload: bytes) -> None:
+        target = fixture_root / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(payload)
+
+    write("data/artifacts/bb72-css.json", (ROOT / "data/artifacts/bb72-css.json").read_bytes())
+    fair_design_path = "data/studies/phase9-control-profiles-fair-v1.json"
+    write(fair_design_path, (ROOT / fair_design_path).read_bytes())
+    source = json.loads((ROOT / "data/studies/phase9-control-relay_beam-ordered-work-v2.json").read_text())
+    spec = source["ordered_campaign_work_spec"]
+    campaign = spec["campaign_work_spec"]
+    sampler = campaign["shared_sampler"]
+    sampler["physical_sample_namespace"] = "phase9-public-controlled-test-only"
+    sampler["physical_sample_seed"] = 260912
+    campaign["coordinates"][0]["sample_namespace"] = sampler["physical_sample_namespace"]
+    campaign["coordinates"][0]["sample_ids"] = [0]
+    campaign["look_sample_boundaries"] = [1]
+    campaign["assessment"]["stopping"]["final_shots"] = 1
+    campaign["assessment"]["stopping"]["batch_size"] = 1
+    campaign["assessment"]["resources"]["max_shots"] = 1
+    campaign["assessment"]["resources"]["max_batch_size"] = 1
+    campaign["assessment"]["resources"]["max_events"] = 3
+    for arm in campaign["arms"]:
+        original = json.loads((ROOT / arm["manifest_path"]).read_text())
+        original["evaluation_namespace"] = sampler["physical_sample_namespace"]
+        original["physical_sample_seed"] = sampler["physical_sample_seed"]
+        write(arm["manifest_path"], json.dumps(original, sort_keys=True, separators=(",", ":")).encode() + b"\n")
+        arm["manifest_sha256"] = sha256((fixture_root / arm["manifest_path"]).read_bytes()).hexdigest()
+    frozen = freeze_ordered_campaign_work_spec(OrderedCampaignWorkSpecV1.model_validate(spec))
+    design = {"evaluation_started": False, "families": {"relay_beam": {
+        "ordered_plan_digest": frozen.campaign_plan_digest,
+        "arm_order": ["initial_bp", "relay", "beam"],
+        "primary_contrasts": [["initial_bp", "relay"], ["initial_bp", "beam"]],
+        "paired_design": {"familywise_alpha": 0.05},
+        "status": "bounded_exploratory",
+    }}}
+    write("data/studies/phase9-controlled-design-v2.json",
+          json.dumps(design, sort_keys=True, separators=(",", ":")).encode() + b"\n")
+    campaign_path = fixture_root / "campaign.json"
+    campaign_path.write_text(json.dumps(source, sort_keys=True, separators=(",", ":")) + "\n")
+
+    def cli(*args: str, fail: bool = False) -> dict:
+        command = [sys.executable, "-m", "bp_registry.campaigns.cli", *args]
+        response = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, check=False)
+        assert (response.returncode != 0 if fail else response.returncode == 0), response.stdout + response.stderr
+        return json.loads(response.stdout)
+
+    planned = cli("plan", "--campaign", str(campaign_path), "--campaign-root", str(fixture_root),
+                  "--output-root", str(fixture_root / "plan"))
+    plan_path = planned["artifact_path"]
+    run_root = fixture_root / "run"
+    first = cli("run-local", "--plan", plan_path, "--campaign-root", str(fixture_root),
+                "--output-root", str(run_root), "--max-units", "2")
+    assert len(first["missing_unit_keys"]) == 1
+    merged_first = cli("merge", "--plan", plan_path, "--campaign-root", str(fixture_root),
+                       "--output-root", str(fixture_root / "merge1"), "--receipt", first["artifact_path"])
+    resumed = cli("resume", "--plan", plan_path, "--merge", merged_first["artifact_path"],
+                  "--campaign-root", str(fixture_root))
+    assert resumed["exact_missing_set"] == first["missing_unit_keys"]
+    cli("assess", "--plan", plan_path, "--merge", merged_first["artifact_path"],
+        "--campaign-root", str(fixture_root), "--output-root", str(fixture_root / "incomplete-report"), fail=True)
+    checked = cli("verify", "--plan", plan_path, "--merge", merged_first["artifact_path"],
+                  "--receipt", first["artifact_path"], "--campaign-root", str(fixture_root))
+    assert checked["verified"] and checked["missing_unit_keys"] == first["missing_unit_keys"]
+
+    second = cli("run-local", "--plan", plan_path, "--campaign-root", str(fixture_root),
+                 "--output-root", str(run_root), "--max-units", "1")
+    assert second["complete"]
+    merged = cli("merge", "--plan", plan_path, "--campaign-root", str(fixture_root),
+                 "--output-root", str(fixture_root / "merge2"),
+                 "--receipt", first["artifact_path"], "--receipt", second["artifact_path"])
+    assert merged["complete"] and merged["verified_unit_count"] == 3
+    report = cli("assess", "--plan", plan_path, "--merge", merged["artifact_path"],
+                 "--campaign-root", str(fixture_root), "--output-root", str(fixture_root / "report"))
+    verified = cli("verify", "--plan", plan_path, "--merge", merged["artifact_path"],
+                   "--report", report["artifact_path"], "--campaign-root", str(fixture_root))
+    assert verified["verified"] and verified["report_sha256"] == report["report_sha256"]
+
+
+def test_public_two_arm_plan_run_local_merge_resume_assess_verify_complete_pair(tmp_path: Path) -> None:
+    from bp_registry.campaigns.contracts import OrderedCampaignWorkSpecV1
+    from bp_registry.campaigns.planning import freeze_ordered_campaign_work_spec
+
+    root = tmp_path / "fixture"
+    artifact = root / "data/artifacts/project-three-qubit-css-fixture.json"
+    artifact.parent.mkdir(parents=True)
+    artifact.write_bytes((ROOT / "data/artifacts/project-three-qubit-css-fixture.json").read_bytes())
+    base_manifest = json.loads((ROOT / INNER_MANIFEST).read_text())
+    arms = []
+    for name, schedule in (("spa_flooding", "flooding"), ("spa_check_node_serial", "check_node_serial")):
+        manifest = json.loads(json.dumps(base_manifest))
+        manifest["run_id"] = f"synthetic-{name}"
+        manifest["schema_version"] = 3
+        manifest["randomness"]["physical_sample_identity"] = "synthetic-schedule-shared-sample-v1"
+        manifest["policies"]["schedule"] = {
+            "kind": schedule, "binding_id": f"schedule-{schedule}-v1",
+            "state_lifetime": "iteration", "owned_state": [], "requires": [], "provides": [],
+        }
+        path = f"data/manifests/{name}.json"
+        target = root / path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(json.dumps(manifest, sort_keys=True, separators=(",", ":")) + "\n")
+        arms.append({"arm_id": name, "manifest_path": path,
+                     "manifest_sha256": sha256(target.read_bytes()).hexdigest(),
+                     "decoder_seed_identity": "canonical-deterministic-no-local-randomness-v1"})
+    campaign = _paired_work_spec_payload()
+    campaign["arms"] = arms
+    campaign["shared_sampler"]["physical_sample_namespace"] = "synthetic-schedule-shared-sample-v1"
+    campaign["coordinates"][0]["sample_namespace"] = "synthetic-schedule-shared-sample-v1"
+    campaign["coordinates"][0]["sample_ids"] = [0]
+    campaign["look_sample_boundaries"] = [1]
+    campaign["assessment"]["stopping"].update({"final_shots": 1, "batch_size": 1})
+    campaign["assessment"]["resources"].update({"max_shots": 1, "max_batch_size": 1})
+    campaign["assessment"]["targets"][0]["target_id"] = "p100-order-only-not_assessed"
+    campaign["assessment"]["families"][0]["member_target_ids"] = ["p100-order-only-not_assessed"]
+    campaign["target_arm_ids"] = {"p100-order-only-not_assessed": "spa_flooding"}
+    ordered = {"schema": "ordered_campaign_work_spec_v1", "campaign_work_spec": campaign,
+               "execution_order": {"schema": "campaign_execution_order_v1",
+                                   "rule": "coordinate_point_namespace_sample_declared_arm_v1",
+                                   "arm_order": ["spa_flooding", "spa_check_node_serial"]}}
+    frozen = freeze_ordered_campaign_work_spec(OrderedCampaignWorkSpecV1.model_validate(ordered))
+    design = {"families": {"schedule": {"ordered_plan_digest": frozen.campaign_plan_digest,
+               "arm_order": ["spa_flooding", "spa_check_node_serial"],
+               "primary_contrasts": [["spa_flooding", "spa_check_node_serial"]],
+               "paired_design": {"familywise_alpha": 0.05}}}}
+    design_path = root / "data/studies/phase9-controlled-design-v2.json"
+    design_path.parent.mkdir(parents=True, exist_ok=True)
+    design_path.write_text(json.dumps(design, sort_keys=True, separators=(",", ":")) + "\n")
+    source = root / "campaign.json"
+    source.write_text(json.dumps({"ordered_campaign_work_spec": ordered}) + "\n")
+
+    def call(*args: str, fail: bool = False) -> dict:
+        response = subprocess.run([sys.executable, "-m", "bp_registry.campaigns.cli", *args],
+                                  cwd=ROOT, capture_output=True, text=True, check=False)
+        assert (response.returncode != 0 if fail else response.returncode == 0), response.stdout + response.stderr
+        return json.loads(response.stdout)
+
+    plan = call("plan", "--campaign", str(source), "--campaign-root", str(root),
+                "--output-root", str(root / "plan"))["artifact_path"]
+    first = call("run-local", "--plan", plan, "--campaign-root", str(root),
+                 "--output-root", str(root / "run"), "--max-units", "1")
+    partial = call("merge", "--plan", plan, "--receipt", first["artifact_path"],
+                   "--campaign-root", str(root), "--output-root", str(root / "partial"))
+    assert partial["complete"] is False
+    assert call("resume", "--plan", plan, "--merge", partial["artifact_path"],
+                "--campaign-root", str(root))["exact_missing_set"] == [frozen.units[1].key]
+    call("assess", "--plan", plan, "--merge", partial["artifact_path"],
+         "--campaign-root", str(root), "--output-root", str(root / "premature"), fail=True)
+    second = call("run-local", "--plan", plan, "--campaign-root", str(root),
+                  "--output-root", str(root / "run"))
+    merged = call("merge", "--plan", plan, "--receipt", first["artifact_path"],
+                  "--receipt", second["artifact_path"], "--campaign-root", str(root),
+                  "--output-root", str(root / "merged"))
+    assert merged["complete"]
+    report = call("assess", "--plan", plan, "--merge", merged["artifact_path"],
+                  "--campaign-root", str(root), "--output-root", str(root / "report"))
+    verified = call("verify", "--plan", plan, "--merge", merged["artifact_path"],
+                    "--report", report["artifact_path"], "--campaign-root", str(root))
+    assert verified["verified"] and verified["report_sha256"] == report["report_sha256"]
+
+
+def test_public_shared_mbbp_plan_run_local_merge_resume_assess_verify_reuses_one_member_set(tmp_path: Path) -> None:
+    from bp_registry.campaigns.contracts import OrderedCampaignWorkSpecV1
+    from bp_registry.campaigns.planning import freeze_ordered_campaign_work_spec
+
+    root = tmp_path / "fixture"
+
+    def write(relative: str, content: bytes) -> Path:
+        target = root / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(content)
+        return target
+
+    write("data/artifacts/project-three-qubit-css-fixture.json",
+          (ROOT / "data/artifacts/project-three-qubit-css-fixture.json").read_bytes())
+    gate = "data/studies/css-literature-b1-gate-v1.json"
+    write(gate, (ROOT / gate).read_bytes())
+    base = _paired_work_spec_payload()
+    sampler = base["shared_sampler"]
+    sampler["physical_sample_namespace"] = "synthetic-shared-mbbp-v1"
+    base["coordinates"][0]["sample_namespace"] = sampler["physical_sample_namespace"]
+    base["coordinates"][0]["sample_ids"] = [0]
+    base["look_sample_boundaries"] = [1]
+    base["assessment"]["stopping"].update({"final_shots": 1, "batch_size": 1})
+    base["assessment"]["resources"].update({"max_shots": 1, "max_batch_size": 1})
+    base["assessment"]["targets"][0]["target_id"] = "p100-order-only-not_assessed"
+    base["assessment"]["families"][0]["member_target_ids"] = ["p100-order-only-not_assessed"]
+    base["target_arm_ids"] = {"p100-order-only-not_assessed": "list"}
+    arms = []
+    for name, policy_name in (("list", "mbbp-ld.toml"), ("vote", "mbbp-ld-vote.toml")):
+        policy_relative = f"literature_policies/synthetic/{policy_name}"
+        policy_source = ROOT / "literature_policies/rabeti-2026-multiple-bases-bp-list-decoding" / policy_name
+        policy_bytes = (policy_source.read_bytes()
+                        .replace(b"max_iterations = 100", b"max_iterations = 2")
+                        .replace(b"source_rows = [1]", b"source_rows = [0]"))
+        policy_path = write(policy_relative, policy_bytes)
+        manifest = {
+            "schema": "phase9_control_arm_manifest_v1", "arm_id": name,
+            "artifact_path": "data/artifacts/project-three-qubit-css-fixture.json",
+            "artifact_raw_sha256": sampler["artifact_raw_sha256"],
+            "artifact_semantic_sha256": sampler["artifact_semantic_sha256"],
+            "code_id": sampler["code_id"], "matrix_sha256": sampler["matrix_sha256"],
+            "error_rate": sampler["x_error_rate"],
+            "evaluation_namespace": sampler["physical_sample_namespace"],
+            "physical_sample_seed": sampler["physical_sample_seed"],
+            "assessment_status": "not_assessed", "publication_slurm_authorization": "deny",
+            "runner": "controlled_shared_mbbp_v1", "source_status": "canonical_adaptation",
+            "family": "mbbp_list_vote", "policy_path": policy_relative,
+            "policy_sha256": sha256(policy_path.read_bytes()).hexdigest(),
+            "source_gate_path": gate, "source_gate_sha256": sha256((root / gate).read_bytes()).hexdigest(),
+            "member_execution_rule": "one_shared_member_set_per_sample_before_both_decisions",
+        }
+        relative = f"data/manifests/synthetic-mbbp-{name}.json"
+        path = write(relative, json.dumps(manifest, sort_keys=True, separators=(",", ":")).encode() + b"\n")
+        arms.append({"arm_id": name, "manifest_path": relative,
+                     "manifest_sha256": sha256(path.read_bytes()).hexdigest(),
+                     "decoder_seed_identity": "canonical-deterministic-no-local-randomness-v1"})
+    base["arms"] = arms
+    ordered = {"schema": "ordered_campaign_work_spec_v1", "campaign_work_spec": base,
+               "execution_order": {"schema": "campaign_execution_order_v1",
+                                   "rule": "coordinate_point_namespace_sample_declared_arm_v1",
+                                   "arm_order": ["list", "vote"]}}
+    frozen = freeze_ordered_campaign_work_spec(OrderedCampaignWorkSpecV1.model_validate(ordered))
+    design = {"evaluation_started": False, "families": {"mbbp_list_vote": {
+        "ordered_plan_digest": frozen.campaign_plan_digest, "arm_order": ["list", "vote"],
+        "primary_contrasts": [["list", "vote"]], "paired_design": {"familywise_alpha": 0.05},
+        "status": "bounded_exploratory"}}}
+    write("data/studies/phase9-controlled-design-v2.json",
+          json.dumps(design, sort_keys=True, separators=(",", ":")).encode() + b"\n")
+    source = write("campaign.json", json.dumps({"ordered_campaign_work_spec": ordered}).encode() + b"\n")
+
+    def call(*args: str, fail: bool = False) -> dict:
+        response = subprocess.run([sys.executable, "-m", "bp_registry.campaigns.cli", *args],
+                                  cwd=ROOT, capture_output=True, text=True, check=False)
+        assert (response.returncode != 0 if fail else response.returncode == 0), response.stdout + response.stderr
+        return json.loads(response.stdout)
+
+    plan = call("plan", "--campaign", str(source), "--campaign-root", str(root),
+                "--output-root", str(root / "plan"))["artifact_path"]
+    first = call("run-local", "--plan", plan, "--campaign-root", str(root),
+                 "--output-root", str(root / "run"), "--max-units", "1")
+    shared_path = root / "run/shared" / f"{frozen.units[0].physical_sample_identity}.json"
+    original_shared_bytes = shared_path.read_bytes()
+    partial = call("merge", "--plan", plan, "--receipt", first["artifact_path"],
+                   "--campaign-root", str(root), "--output-root", str(root / "partial"))
+    assert partial["missing_unit_keys"] == [frozen.units[1].key]
+    assert call("resume", "--plan", plan, "--merge", partial["artifact_path"],
+                "--campaign-root", str(root))["exact_missing_set"] == [frozen.units[1].key]
+    call("assess", "--plan", plan, "--merge", partial["artifact_path"],
+         "--campaign-root", str(root), "--output-root", str(root / "premature"), fail=True)
+    second = call("run-local", "--plan", plan, "--campaign-root", str(root),
+                  "--output-root", str(root / "run"))
+    assert shared_path.read_bytes() == original_shared_bytes
+    assert len(list((root / "run/shared").glob("*.json"))) == 1
+    merged = call("merge", "--plan", plan, "--receipt", first["artifact_path"],
+                  "--receipt", second["artifact_path"], "--campaign-root", str(root),
+                  "--output-root", str(root / "merged"))
+    assert merged["complete"]
+    report = call("assess", "--plan", plan, "--merge", merged["artifact_path"],
+                  "--campaign-root", str(root), "--output-root", str(root / "report"))
+    verified = call("verify", "--plan", plan, "--merge", merged["artifact_path"],
+                    "--report", report["artifact_path"], "--campaign-root", str(root))
+    assert verified["verified"] and verified["report_sha256"] == report["report_sha256"]
+    changed = json.loads(shared_path.read_bytes())
+    changed["components"][0]["actual_work"]["bp_calls"] += 1
+    shared_path.write_text(json.dumps(changed, sort_keys=True, separators=(",", ":")) + "\n")
+    call("verify", "--plan", plan, "--merge", merged["artifact_path"],
+         "--report", report["artifact_path"], "--campaign-root", str(root), fail=True)
+
+
+def test_shared_initial_receipt_roundtrips_decoder_visible_messages() -> None:
+    import numpy as np
+    from bp_registry.canonical.budgets import WorkVector
+    from bp_registry.canonical.fair_legs import BPSegment
+    from bp_registry.campaigns.controlled import SharedInitialBPReceiptV1
+
+    segment = BPSegment(
+        candidate=np.array([0, 1], dtype=np.uint8),
+        posterior=np.array([1.25, -2.0], dtype=np.float64),
+        sum_llr=np.array([1.25, -2.0], dtype=np.float64),
+        edge_messages=((0, 0, 0.25), (0, 1, -0.5)),
+        unmasked=(0, 1), fixed=(), iterations=1, converged=False,
+        work=WorkVector(bp_calls=1, check_to_variable_updates=2), stage_id="initial-bp",
+    )
+    component_payload = {
+        "schema": "controlled_component_evidence_v1", "component_id": "initial-bp", "role": "initial_bp",
+        "source_status": "controlled_css_adaptation",
+        "convergence_status": {"status": "observed", "value": False},
+        "iterations": {"status": "observed", "value": 1},
+        "configured_limits": {"iterations": 20},
+        "actual_work": {"bp_calls": 1, "check_to_variable_updates": 2},
+        "runtime_ns": {"status": "observed", "value": 1000},
+        "peak_rss_bytes": {"status": "unavailable", "reason": "one process holds all arms"},
+        "events": {"status": "observed", "value": 1},
+        "evidence_bytes": {"status": "observed", "value": 100},
+        "storage_bytes": {"status": "observed", "value": 100},
+        "interruption": {"status": "not_applicable", "reason": "completed"},
+        "provenance_sha256": "a" * 64,
+    }
+    receipt = SharedInitialBPReceiptV1.from_segment(
+        sample_identity="b" * 64, sample_id=0, component=component_payload, segment=segment)
+    rebuilt = SharedInitialBPReceiptV1.model_validate_json(receipt.primitive_bytes()).to_segment()
+    assert rebuilt.edge_messages == segment.edge_messages
+    assert np.array_equal(rebuilt.candidate, segment.candidate)
+    assert np.array_equal(rebuilt.posterior, segment.posterior)
+    assert receipt.digest() == SharedInitialBPReceiptV1.model_validate_json(receipt.primitive_bytes()).digest()
+    tampered = json.loads(receipt.primitive_bytes())
+    tampered["state"]["edge_messages"][0][2] = 999.0
+    assert SharedInitialBPReceiptV1.model_validate(tampered).digest() != receipt.digest()
+
+
+def test_shared_mbbp_member_set_replays_list_and_vote_without_member_execution() -> None:
+    import numpy as np
+    from bp_registry.campaigns.controlled import ControlledComponentEvidenceV1, SharedMBBPMemberSetReceiptV1
+    from bp_registry.canonical.mbbp import MbbpBasis, MbbpController, MbbpSpec
+    from bp_registry.canonical.phase6 import execute_declared_mbbp_decision
+    from bp_registry.canonical.problems import OriginalProblem
+
+    original = OriginalProblem(
+        "controlled-mbbp-fixture", np.zeros((1, 3), dtype=np.uint8),
+        np.asarray([[1, 1, 0], [0, 1, 1]], dtype=np.uint8), np.asarray([1, 0], dtype=np.uint8),
+    )
+    bases = tuple(MbbpBasis(
+        member_id=f"basis-{index}", local_ordinal=index,
+        partition_identity="declared-partition", permutation_identity="declared-permutation",
+        redundant_transforms=((1, 1),),
+    ) for index in range(2))
+    result = MbbpController(MbbpSpec(bases=bases, max_iterations=8)).run(original, error_rate=0.1)
+    components = tuple(ControlledComponentEvidenceV1.model_validate({
+        "schema": "controlled_component_evidence_v1", "component_id": member.member_id,
+        "role": "mbbp_member", "source_status": "canonical_adaptation",
+        "convergence_status": {"status": "observed", "value": member.converged},
+        "iterations": {"status": "unavailable", "reason": "member terminal does not expose completed iterations"},
+        "configured_limits": {"iterations": 8},
+        "actual_work": member.work.as_evidence(structural_event_version=4),
+        "runtime_ns": {"status": "unavailable", "reason": "per-member timing unavailable in this fixture"},
+        "peak_rss_bytes": {"status": "unavailable", "reason": "per-member RSS unavailable"},
+        "events": {"status": "observed", "value": 1},
+        "evidence_bytes": {"status": "observed", "value": 0},
+        "storage_bytes": {"status": "observed", "value": 0},
+        "interruption": {"status": "not_applicable", "reason": "completed member"},
+        "provenance_sha256": "a" * 64,
+    }) for member in result.members)
+    receipt = SharedMBBPMemberSetReceiptV1.from_result(
+        sample_identity="b" * 64, sample_id=0, original_lineage_id=original.lineage_id,
+        result=result, components=components,
+    )
+    replayed = SharedMBBPMemberSetReceiptV1.model_validate_json(receipt.primitive_bytes()).to_result(original)
+    assert replayed.as_evidence() == result.as_evidence()
+    for tie in (None, 0):
+        assert execute_declared_mbbp_decision(original, result=replayed, vote_tie_bit=tie).as_evidence() == (
+            execute_declared_mbbp_decision(original, result=result, vote_tie_bit=tie).as_evidence())
+    changed = json.loads(receipt.primitive_bytes())
+    changed["result"]["members"][0]["status"] = "iteration_cap"
+    with pytest.raises(ValueError, match="member|selection|result"):
+        SharedMBBPMemberSetReceiptV1.model_validate_json(json.dumps(changed)).to_result(original)
+
+
 def _campaign_api():
     """Keep the RED failure an assertion about the public campaign capability."""
     try:
