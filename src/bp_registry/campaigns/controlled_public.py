@@ -113,19 +113,59 @@ def _existing_units(*, root: Path, plan: CampaignWorkPlan, run_root: Path) -> li
     return [by_key[key] for key in prefix]
 
 
+def _seal_run_envelope(
+    *, plan: CampaignWorkPlan, run_root: Path, first: int, units: list[dict[str, Any]],
+) -> Path:
+    last = first + len(units) - 1
+    if not units or [item["unit_key"] for item in units] != list(plan.unit_keys[first - 1:last]):
+        raise ValueError("controlled run envelope requires one nonempty frozen unit segment")
+    envelope = {
+        "schema": f"controlled_{_family(plan)[0]}_run_v1",
+        "campaign_spec_digest": plan.campaign_spec_digest,
+        "campaign_plan_digest": plan.campaign_plan_digest,
+        "run_root": str(run_root.resolve(strict=True)),
+        "first_unit_ordinal": first, "last_unit_ordinal": last,
+        "units": units,
+    }
+    return _publish(run_root / f"controlled-run-{first:08d}-{last:08d}.json", envelope)
+
+
+def _covered_run_prefix(*, root: Path, plan: CampaignWorkPlan, run_root: Path,
+                        sealed: list[dict[str, Any]]) -> int:
+    covered: dict[str, dict[str, Any]] = {}
+    for path in sorted(run_root.glob("controlled-run-*.json")):
+        _envelope, items = _verified_run_envelope(path=path, root=root, plan=plan)
+        for item in items:
+            if item["unit_key"] in covered:
+                raise ValueError("controlled run envelope repeats a sealed unit")
+            covered[item["unit_key"]] = item
+    count = len(covered)
+    if count > len(sealed) or set(covered) != set(plan.unit_keys[:count]):
+        raise ValueError("controlled run envelopes do not cover one frozen prefix")
+    if any(covered[key] != sealed[index] for index, key in enumerate(plan.unit_keys[:count])):
+        raise ValueError("controlled run envelope differs from sealed unit prefix")
+    return count
+
+
 def run_local(*, root: Path, plan: CampaignWorkPlan, output_root: Path, max_units: int | None) -> dict[str, Any]:
     """Run only the missing frozen prefix, sealing each unit before advancing."""
     _design(root=root, plan=plan)
     if max_units is not None and (type(max_units) is not int or max_units < 1):
         raise ValueError("max-units must be a positive integer")
     before = _existing_units(root=root, plan=plan, run_root=output_root)
+    covered = _covered_run_prefix(root=root, plan=plan, run_root=output_root, sealed=before)
+    recovered = (_seal_run_envelope(plan=plan, run_root=output_root, first=covered + 1,
+                                    units=before[covered:]) if covered < len(before) else None)
     selected = plan.units[len(before):]
     if max_units is not None:
         selected = selected[:max_units]
     if not selected:
         return {"schema": f"controlled_{_family(plan)[0]}_run_result_v1", "complete": True,
                 "terminal_unit_keys": list(plan.unit_keys), "missing_unit_keys": [],
-                "artifact_path": None}
+                "artifact_path": None if recovered is None else str(recovered),
+                **({} if recovered is None else {"artifact_sha256": sha256(recovered.read_bytes()).hexdigest()}),
+                "run_envelope_paths": [str(path.resolve(strict=True)) for path in
+                                       sorted(output_root.glob("controlled-run-*.json"))]}
     for unit in selected:
         try:
             (run_fair_controlled_unit if _family(plan)[0] == "relay_beam" else run_mbbp_controlled_unit)(
@@ -147,22 +187,21 @@ def run_local(*, root: Path, plan: CampaignWorkPlan, output_root: Path, max_unit
                 "arm_id": unit.arm_id,
                 "exception_type": type(exc).__name__,
             })
+            after_interruption = _existing_units(root=root, plan=plan, run_root=output_root)
+            if len(after_interruption) > len(before):
+                _seal_run_envelope(plan=plan, run_root=output_root,
+                                   first=len(before) + 1, units=after_interruption[len(before):])
             raise
     after = _existing_units(root=root, plan=plan, run_root=output_root)
     first, last = len(before) + 1, len(after)
-    envelope = {
-        "schema": f"controlled_{_family(plan)[0]}_run_v1",
-        "campaign_spec_digest": plan.campaign_spec_digest,
-        "campaign_plan_digest": plan.campaign_plan_digest,
-        "run_root": str(output_root.resolve(strict=True)),
-        "first_unit_ordinal": first, "last_unit_ordinal": last,
-        "units": after[len(before):],
-    }
-    artifact = _publish(output_root / f"controlled-run-{first:08d}-{last:08d}.json", envelope)
+    artifact = _seal_run_envelope(plan=plan, run_root=output_root,
+                                  first=first, units=after[len(before):])
     return {"schema": f"controlled_{_family(plan)[0]}_run_result_v1", "complete": last == len(plan.units),
             "terminal_unit_keys": list(plan.unit_keys[:last]),
             "missing_unit_keys": list(plan.unit_keys[last:]),
-            "artifact_path": str(artifact), "artifact_sha256": sha256(artifact.read_bytes()).hexdigest()}
+            "artifact_path": str(artifact), "artifact_sha256": sha256(artifact.read_bytes()).hexdigest(),
+            "run_envelope_paths": [str(path.resolve(strict=True)) for path in
+                                   sorted(output_root.glob("controlled-run-*.json"))]}
 
 
 def _verified_run_envelope(*, path: Path, root: Path, plan: CampaignWorkPlan) -> tuple[dict[str, Any], list[dict[str, Any]]]:

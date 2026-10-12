@@ -337,6 +337,11 @@ The public `plan`, `run-local`, `merge`, `resume`, `assess`, and `verify`
 commands execute the frozen schedule pair, the shared-initial BP/Relay/Beam
 family, and the shared-member MBBP list/vote family. A partial merge retains
 completed arms, reports the exact missing set, and cannot be assessed.
+`run-local` returns `run_envelope_paths` for every sealed segment to pass as
+`--receipt` inputs to `merge`. If execution stops after a unit seals but before
+its envelope is published, the next `run-local` call verifies that prefix and
+publishes the missing envelope without repeating the unit. Recoverable
+dispatch errors retain numbered interruption receipts without exception text.
 Relay and Beam consume one sealed initial BP state per sample; list and vote
 consume one sealed MBBP member set. Shared work is charged once in the typed
 cost projection. Complete matched groups alone enter paired inference and the

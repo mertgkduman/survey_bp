@@ -271,6 +271,53 @@ def test_controlled_public_run_retains_interruption_and_exact_missing_unit(tmp_p
     assert (tmp_path / "interruptions" / f"{unit.key}-00000002.json").exists()
 
 
+@pytest.mark.parametrize("orphan_before_dispatch", [False, True])
+def test_controlled_run_recovers_sealed_prefix_without_an_envelope(
+    tmp_path: Path, monkeypatch, orphan_before_dispatch: bool,
+) -> None:
+    from bp_registry.campaigns import controlled_public
+    from bp_registry.campaigns.contracts import OrderedCampaignWorkSpecV1
+    from bp_registry.campaigns.planning import freeze_ordered_campaign_work_spec
+
+    study = json.loads((ROOT / "data/studies/phase9-control-relay_beam-ordered-work-v2.json").read_text())
+    plan = freeze_ordered_campaign_work_spec(OrderedCampaignWorkSpecV1.model_validate(
+        study["ordered_campaign_work_spec"]))
+    baseline = plan.units[0]
+    real_run = controlled_public.run_fair_controlled_unit
+    if orphan_before_dispatch:
+        arm = next(item for item in plan.work_spec.arms if item.arm_id == baseline.arm_id)
+        real_run(plan=plan, unit=baseline,
+                 arm_manifest=json.loads((ROOT / arm.manifest_path).read_text()),
+                 campaign_root=ROOT, output_root=tmp_path)
+
+    def interrupt_after_baseline(**kwargs):
+        if kwargs["unit"].key == baseline.key and not orphan_before_dispatch:
+            return real_run(**kwargs)
+        raise RuntimeError("next arm interrupted")
+
+    monkeypatch.setattr(controlled_public, "run_fair_controlled_unit", interrupt_after_baseline)
+    with pytest.raises(RuntimeError, match="next arm interrupted"):
+        controlled_public.run_local(root=ROOT, plan=plan, output_root=tmp_path, max_units=2)
+    envelope = tmp_path / "controlled-run-00000001-00000001.json"
+    assert envelope.is_file()
+    sealed = json.loads(envelope.read_bytes())
+    assert [item["unit_key"] for item in sealed["units"]] == [baseline.key]
+    partial = controlled_public.merge(root=ROOT, plan=plan, run_paths=[envelope],
+                                      output_root=tmp_path / "merge")
+    assert partial["complete"] is False
+    assert partial["missing_unit_keys"] == list(plan.unit_keys[1:])
+    if orphan_before_dispatch:
+        monkeypatch.setattr(controlled_public, "run_fair_controlled_unit", real_run)
+        resumed = controlled_public.run_local(root=ROOT, plan=plan,
+                                              output_root=tmp_path, max_units=2)
+        assert len(resumed["run_envelope_paths"]) == 2
+        merged = controlled_public.merge(root=ROOT, plan=plan,
+                                         run_paths=[Path(path) for path in resumed["run_envelope_paths"]],
+                                         output_root=tmp_path / "resumed-merge")
+        assert merged["verified_unit_count"] == 3
+        assert merged["missing_unit_keys"] == list(plan.unit_keys[3:])
+
+
 def test_controlled_partial_resume_assess_and_byte_replay_through_public_cli(tmp_path: Path) -> None:
     from bp_registry.campaigns.contracts import OrderedCampaignWorkSpecV1
     from bp_registry.campaigns.planning import freeze_ordered_campaign_work_spec
