@@ -1,0 +1,47 @@
+{
+  "schema": "phase11_fixed_marginal_correlation_design_v1",
+  "study_label": "fixed-marginal Y-cooccurrence sweep; total nonidentity is allowed to vary",
+  "pauli_order": ["I", "X", "Y", "Z"],
+  "point_order": ["lower_y", "independence", "higher_y"],
+  "rows": [
+    {
+      "point_id": "lower_y",
+      "probabilities": ["1681/1800", "59/1800", "1/1800", "59/1800"],
+      "derived": {"q_x": "1/30", "q_z": "1/30", "total_nonidentity": "119/1800", "x_z_covariance": "-1/1800"}
+    },
+    {
+      "point_id": "independence",
+      "probabilities": ["841/900", "29/900", "1/900", "29/900"],
+      "derived": {"q_x": "1/30", "q_z": "1/30", "total_nonidentity": "59/900", "x_z_covariance": "0"}
+    },
+    {
+      "point_id": "higher_y",
+      "probabilities": ["19/20", "1/60", "1/60", "1/60"],
+      "derived": {"q_x": "1/30", "q_z": "1/30", "total_nonidentity": "1/20", "x_z_covariance": "7/450"}
+    }
+  ],
+  "lead_estimand": "D_y=P(fail_joint)-P(fail_separate); report D_y first for every point",
+  "simultaneous_inference": {
+    "family_id": "phase11_fixed_marginal_correlation_v1",
+    "familywise_alpha": 0.05,
+    "method": "bonferroni_exact_six_arm_rates_v1",
+    "arm_rate_members": ["lower_y:joint", "lower_y:separate", "independence:joint", "independence:separate", "higher_y:joint", "higher_y:separate"],
+    "contrast_order": ["lower_y_minus_independence", "higher_y_minus_independence"],
+    "sample_contract": "Each point contains complete joint/separate matched pairs; physical samples are disjoint across points. Pointwise paired tests are not used for cross-point conclusions."
+  },
+  "sizing": {
+    "pilot_evidence_identity": "3333333333333333333333333333333333333333333333333333333333333333",
+    "calibration_namespace": "phase11-fixed-marginal-pilot-v1",
+    "evaluation_namespace": "phase11-fixed-marginal-evaluation-v1",
+    "evaluation_namespace_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+    "arm_order": ["joint", "separate"],
+    "estimand": "paired_all_shot_risk_difference_v1",
+    "minimum_relevant_difference": 0.02,
+    "calibration_discordance": 0.1,
+    "target_power": 0.8,
+    "familywise_alpha": 0.05,
+    "family_size": 2,
+    "maximum_pairs_per_point": 5000,
+    "stopping_rule": "fixed paired count per point; no comparison outcome can change sizing"
+  }
+}

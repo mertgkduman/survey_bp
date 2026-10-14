@@ -9,7 +9,11 @@ outcomes.  Exact binomial limits are deliberately delegated to SciPy's
 from __future__ import annotations
 
 from dataclasses import dataclass
+from fractions import Fraction
+from hashlib import sha256
+import json
 import math
+from pathlib import Path
 import re
 from typing import Literal, Mapping, Sequence
 
@@ -24,7 +28,9 @@ from .contracts import (
     FailureCountStoppingV1,
     MultiplicativeTargetRuleV1,
     OutcomeMatrixV1,
+    PauliMatchedPairV1,
     TargetReferenceV1,
+    canonical_json_bytes,
 )
 
 
@@ -1166,4 +1172,258 @@ def finite_look_assessment(
         look_records=tuple(records),
         stop_reason=stop_reason,
         input_receipt_hashes=receipts,
+    )
+
+
+@dataclass(frozen=True, slots=True)
+class FixedMarginalChannelRowV1:
+    """One exact I/X/Y/Z row whose two binary marginals are fixed."""
+
+    point_id: Literal["lower_y", "independence", "higher_y"]
+    probabilities: tuple[float, float, float, float]
+    q_x: float
+    q_z: float
+    total_nonidentity: float
+    x_z_covariance: float
+
+
+@dataclass(frozen=True, slots=True)
+class FixedMarginalCorrelationDesignV1:
+    """The immutable D-09--D-12 design represented by its source bytes."""
+
+    design_sha256: str
+    study_label: str
+    point_order: tuple[Literal["lower_y", "independence", "higher_y"], ...]
+    rows: tuple[FixedMarginalChannelRowV1, ...]
+    family_id: str
+    familywise_alpha: float
+    contrast_order: tuple[str, str]
+    arm_rate_members: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class CorrelationSweepPointResultV1:
+    """One report row, deliberately led by the paired logical-failure difference."""
+
+    point_id: str
+    d_y: float
+    d_y_interval: tuple[float, float]
+    joint_failure_rate: ExactBinomialRateV1
+    separate_failure_rate: ExactBinomialRateV1
+    complete_pairs: int
+    component_terminal_status_counts: Mapping[str, int]
+    arm_work: Mapping[str, int]
+    runtime_status: Literal["unavailable_in_pauli_matched_pair_v1"]
+
+
+@dataclass(frozen=True, slots=True)
+class CorrelationSweepContrastV1:
+    """One predeclared independent-point change in the lead estimand."""
+
+    contrast_id: str
+    change: float
+    interval: tuple[float, float]
+
+
+@dataclass(frozen=True, slots=True)
+class CorrelationSweepSimultaneousFamilyV1:
+    """The rate-level contract from which all reported bounds are derived."""
+
+    family_id: str
+    familywise_alpha: float
+    arm_rate_alpha: float
+    method: Literal["bonferroni_exact_six_arm_rates_v1"]
+    member_ids: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class CorrelationSweepResultV1:
+    """D-12 report receipt for exactly the three frozen D-09/D-10 points."""
+
+    design_sha256: str
+    rows: tuple[CorrelationSweepPointResultV1, ...]
+    contrasts: tuple[CorrelationSweepContrastV1, CorrelationSweepContrastV1]
+    simultaneous_family: CorrelationSweepSimultaneousFamilyV1
+
+
+_FIXED_MARGINAL_POINT_ORDER = ("lower_y", "independence", "higher_y")
+_FIXED_MARGINAL_CONTRAST_ORDER = (
+    "lower_y_minus_independence", "higher_y_minus_independence",
+)
+_RATIONAL = re.compile(r"^-?\d+(?:/\d+)?$")
+
+
+def _exact_rational(value: object, *, name: str) -> Fraction:
+    if not isinstance(value, str) or not _RATIONAL.fullmatch(value):
+        raise ValueError(f"{name} must be an exact integer or rational string")
+    try:
+        return Fraction(value)
+    except ZeroDivisionError as error:
+        raise ValueError(f"{name} denominator cannot be zero") from error
+
+
+def load_fixed_marginal_design(path: str | Path) -> FixedMarginalCorrelationDesignV1:
+    """Read the one canonical three-point sweep without repairing its contents."""
+    design_path = Path(path)
+    try:
+        raw = design_path.read_bytes()
+        payload = json.loads(raw)
+    except (OSError, json.JSONDecodeError) as error:
+        raise ValueError("fixed-marginal design must be a readable JSON artifact") from error
+    if not isinstance(payload, dict) or payload.get("schema") != "phase11_fixed_marginal_correlation_design_v1":
+        raise ValueError("fixed-marginal design has an unsupported schema")
+    if payload.get("pauli_order") != ["I", "X", "Y", "Z"]:
+        raise ValueError("fixed-marginal design must retain canonical I,X,Y,Z order")
+    if tuple(payload.get("point_order", ())) != _FIXED_MARGINAL_POINT_ORDER:
+        raise ValueError("fixed-marginal design must contain exactly lower_y, independence, higher_y")
+    label = payload.get("study_label")
+    if not isinstance(label, str) or "fixed-total" in label.lower():
+        raise ValueError("fixed-marginal sweep must not be labeled fixed-total-error-rate")
+    raw_rows = payload.get("rows")
+    if not isinstance(raw_rows, list) or len(raw_rows) != 3:
+        raise ValueError("fixed-marginal design must contain exactly three rows")
+    rows: list[FixedMarginalChannelRowV1] = []
+    for expected_point, raw_row in zip(_FIXED_MARGINAL_POINT_ORDER, raw_rows, strict=True):
+        if not isinstance(raw_row, dict) or raw_row.get("point_id") != expected_point:
+            raise ValueError("fixed-marginal design row order differs from the frozen point order")
+        probabilities = raw_row.get("probabilities")
+        derived = raw_row.get("derived")
+        if not isinstance(probabilities, list) or len(probabilities) != 4 or not isinstance(derived, dict):
+            raise ValueError("fixed-marginal design row is incomplete")
+        row = tuple(_exact_rational(value, name="channel probability") for value in probabilities)
+        if any(value < 0 or value > 1 for value in row) or sum(row) != 1:
+            raise ValueError("fixed-marginal channel row is not normalized")
+        i_probability, x_probability, y_probability, z_probability = row
+        expected_derived = {
+            "q_x": x_probability + y_probability,
+            "q_z": z_probability + y_probability,
+            "total_nonidentity": 1 - i_probability,
+            "x_z_covariance": y_probability - (x_probability + y_probability) * (z_probability + y_probability),
+        }
+        declared = {name: _exact_rational(derived.get(name), name=name) for name in expected_derived}
+        if declared != expected_derived:
+            raise ValueError("fixed-marginal channel derived quantities differ from its exact row")
+        rows.append(FixedMarginalChannelRowV1(
+            point_id=expected_point, probabilities=tuple(float(value) for value in row),
+            q_x=float(declared["q_x"]), q_z=float(declared["q_z"]),
+            total_nonidentity=float(declared["total_nonidentity"]),
+            x_z_covariance=float(declared["x_z_covariance"]),
+        ))
+    if any(Fraction(row.q_x).limit_denominator() != Fraction(1, 30)
+           or Fraction(row.q_z).limit_denominator() != Fraction(1, 30) for row in rows):
+        raise ValueError("fixed-marginal design must hold both binary marginals at 1/30")
+    if len({row.total_nonidentity for row in rows}) == 1:
+        raise ValueError("fixed-marginal design must retain its varying total nonidentity rate")
+    inference = payload.get("simultaneous_inference")
+    if not isinstance(inference, dict):
+        raise ValueError("fixed-marginal design lacks simultaneous inference")
+    family_id = _identifier(inference.get("family_id"), name="simultaneous family ID")
+    alpha = _probability(inference.get("familywise_alpha"), name="simultaneous familywise alpha")
+    members = tuple(inference.get("arm_rate_members", ()))
+    expected_members = tuple(f"{point}:{arm}" for point in _FIXED_MARGINAL_POINT_ORDER for arm in ("joint", "separate"))
+    if (inference.get("method") != "bonferroni_exact_six_arm_rates_v1" or members != expected_members
+            or tuple(inference.get("contrast_order", ())) != _FIXED_MARGINAL_CONTRAST_ORDER):
+        raise ValueError("fixed-marginal simultaneous family differs from the frozen six-rate contract")
+    return FixedMarginalCorrelationDesignV1(
+        design_sha256=sha256(raw).hexdigest(), study_label=label,
+        point_order=_FIXED_MARGINAL_POINT_ORDER, rows=tuple(rows), family_id=family_id,
+        familywise_alpha=alpha, contrast_order=_FIXED_MARGINAL_CONTRAST_ORDER,
+        arm_rate_members=expected_members,
+    )
+
+
+def _sweep_receipt(design_sha256: str, point_id: str, pairs: Sequence[PauliMatchedPairV1]) -> str:
+    return sha256(canonical_json_bytes({
+        "design_sha256": design_sha256, "point_id": point_id,
+        "records": [pair.record_sha256 for pair in pairs],
+    })).hexdigest()
+
+
+def _validated_sweep_pairs(
+    *, design: FixedMarginalCorrelationDesignV1,
+    point_pairs: Mapping[str, Sequence[PauliMatchedPairV1]],
+) -> dict[str, tuple[PauliMatchedPairV1, ...]]:
+    if not isinstance(point_pairs, Mapping) or set(point_pairs) != set(design.point_order):
+        raise ValueError("correlation sweep requires exactly the three frozen point IDs")
+    seen_physical: set[str] = set()
+    seen_records: set[str] = set()
+    checked: dict[str, tuple[PauliMatchedPairV1, ...]] = {}
+    for point_id in design.point_order:
+        records = point_pairs[point_id]
+        if not isinstance(records, Sequence) or isinstance(records, (str, bytes)) or not records:
+            raise ValueError("each correlation point requires complete matched pairs")
+        point_records: list[PauliMatchedPairV1] = []
+        for record in records:
+            if not isinstance(record, PauliMatchedPairV1):
+                raise ValueError("correlation sweep requires PauliMatchedPairV1 records")
+            record.verify_replay()
+            if record.physical_sample_identity in seen_physical or record.record_sha256 in seen_records:
+                raise ValueError("correlation sweep physical samples must be disjoint across every point")
+            for arm in (record.joint, record.separate):
+                if arm.all_shot == "incomplete":
+                    raise ValueError("partial Pauli matched pairs cannot enter correlation inference")
+                if _all_shot_failure(arm.terminal_status) != (arm.all_shot == "failure"):
+                    raise ValueError("Pauli matched arm all-shot outcome differs from terminal status")
+            seen_physical.add(record.physical_sample_identity)
+            seen_records.add(record.record_sha256)
+            point_records.append(record)
+        checked[point_id] = tuple(point_records)
+    return checked
+
+
+def assess_correlation_sweep(
+    *, design_path: str | Path, point_pairs: Mapping[str, Sequence[PauliMatchedPairV1]],
+) -> CorrelationSweepResultV1:
+    """Assess D-12 changes using point-disjoint matched pairs and one family."""
+    design = load_fixed_marginal_design(design_path)
+    checked = _validated_sweep_pairs(design=design, point_pairs=point_pairs)
+    arm_alpha = design.familywise_alpha / len(design.arm_rate_members)
+    rows: list[CorrelationSweepPointResultV1] = []
+    for point_id in design.point_order:
+        pairs = checked[point_id]
+        receipt = _sweep_receipt(design.design_sha256, point_id, pairs)
+        joint_rate = exact_binomial_rate(
+            failures=sum(pair.joint.all_shot == "failure" for pair in pairs), shots=len(pairs),
+            alpha=arm_alpha, count_receipt_sha256=receipt,
+        )
+        separate_rate = exact_binomial_rate(
+            failures=sum(pair.separate.all_shot == "failure" for pair in pairs), shots=len(pairs),
+            alpha=arm_alpha, count_receipt_sha256=receipt,
+        )
+        component_counts: dict[str, int] = {}
+        arm_work: dict[str, int] = {}
+        for pair in pairs:
+            for component in pair.components:
+                key = f"{component.component}:{component.terminal_status}"
+                component_counts[key] = component_counts.get(key, 0) + 1
+            for arm in (pair.joint, pair.separate):
+                for name, amount in arm.work.items():
+                    key = f"{arm.arm_id}:{name}"
+                    arm_work[key] = arm_work.get(key, 0) + amount
+        rows.append(CorrelationSweepPointResultV1(
+            point_id=point_id, d_y=joint_rate.estimate - separate_rate.estimate,
+            d_y_interval=(joint_rate.interval[0] - separate_rate.interval[1],
+                          joint_rate.interval[1] - separate_rate.interval[0]),
+            joint_failure_rate=joint_rate, separate_failure_rate=separate_rate,
+            complete_pairs=len(pairs), component_terminal_status_counts=dict(sorted(component_counts.items())),
+            arm_work=dict(sorted(arm_work.items())), runtime_status="unavailable_in_pauli_matched_pair_v1",
+        ))
+    by_point = {row.point_id: row for row in rows}
+    contrasts = tuple(
+        CorrelationSweepContrastV1(
+            contrast_id=contrast_id,
+            change=by_point[source].d_y - by_point["independence"].d_y,
+            interval=(by_point[source].d_y_interval[0] - by_point["independence"].d_y_interval[1],
+                      by_point[source].d_y_interval[1] - by_point["independence"].d_y_interval[0]),
+        )
+        for contrast_id, source in (("lower_y_minus_independence", "lower_y"),
+                                    ("higher_y_minus_independence", "higher_y"))
+    )
+    return CorrelationSweepResultV1(
+        design_sha256=design.design_sha256, rows=tuple(rows), contrasts=contrasts,
+        simultaneous_family=CorrelationSweepSimultaneousFamilyV1(
+            family_id=design.family_id, familywise_alpha=design.familywise_alpha,
+            arm_rate_alpha=arm_alpha, method="bonferroni_exact_six_arm_rates_v1",
+            member_ids=design.arm_rate_members,
+        ),
     )
