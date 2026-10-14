@@ -215,7 +215,6 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - [Phase 11]: Phase 11: pinned native aSCED aggregate evidence is not matched-shot evidence; a proposed injected-input derivative stays unapplied until rights and semantic review approve a separate identity.
 - [Phase 11]: D-12 reports D_y first across three fixed-marginal channel rows with simultaneous six-arm exact bounds.
 - [Phase 11]: Phase 11 paired precision is frozen from a pilot identity, two-contrast alpha family, fixed stopping rule, and 5,000-pair cap.
-- [Phase 11]: Phase 11 paired precision is frozen from a pilot identity, two-contrast alpha family, fixed stopping rule, and 5,000-pair cap.
 
 ### Pending Todos
 
