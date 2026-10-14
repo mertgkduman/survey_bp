@@ -24,7 +24,7 @@
       "qualification_path": "data/results/phase11-mbp4-figures8-9/assessment.json",
       "qualification_status": "deterministic_mechanism_assessed",
       "declared_changed_field": "recurrence",
-      "anchors": ["independence"],
+      "anchors": ["lower_y", "independence", "higher_y"],
       "baseline": {
         "recurrence": "scalar_llr_bp4",
         "alpha": 1.5,
@@ -43,6 +43,32 @@
         "stopping": "syndrome_or_iteration_cap",
         "postprocessing": "none"
       }
+    },
+    {
+      "comparison_id": "gb46-ordinary-asced",
+      "method": "aSCED",
+      "comparison_kind": "ordinary",
+      "qualification_path": "data/source-targets/phase11-asced-figure2-gb46.json",
+      "construction": "ordinary_gb46_css",
+      "settings": {"delta": 2, "path_cap": 16, "row_weight": 4},
+      "anchors": ["lower_y", "independence", "higher_y"],
+      "canonical_controlled_eligible": true,
+      "canonical_fidelity": "canonical_adaptation",
+      "native_match_status": "unavailable",
+      "native_qualification_path": "data/native/phase11-asced-matched-input-qualification.json"
+    },
+    {
+      "comparison_id": "gb46-overcomplete-asced",
+      "method": "aSCED",
+      "comparison_kind": "overcomplete",
+      "qualification_path": "data/source-targets/phase11-asced-figure2-gb46.json",
+      "construction": "overcomplete_gb46_css",
+      "settings": {"delta": 2, "pair_cap": 1000, "path_cap": 16, "row_weight": 4},
+      "anchors": ["lower_y", "independence", "higher_y"],
+      "canonical_controlled_eligible": true,
+      "canonical_fidelity": "canonical_adaptation",
+      "native_match_status": "unavailable",
+      "native_qualification_path": "data/native/phase11-asced-matched-input-qualification.json"
     }
   ]
 }

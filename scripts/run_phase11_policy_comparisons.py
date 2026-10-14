@@ -83,6 +83,9 @@ def validate_policy_study(root: Path, study: dict[str, Any]) -> None:
 
 
 def _validate_comparison(root: Path, comparison: dict[str, Any]) -> None:
+    if comparison.get("method") == "aSCED":
+        _validate_asced_comparison(root, comparison)
+        return
     required = {"comparison_id", "method", "qualification_path", "qualification_status", "declared_changed_field", "anchors", "baseline", "variant"}
     if set(comparison) != required or comparison["method"] != "MBP4":
         raise ValueError("policy comparison is not a qualified MBP4 comparison")
@@ -106,6 +109,27 @@ def _validate_comparison(root: Path, comparison: dict[str, Any]) -> None:
     changed = {key for key in baseline if baseline[key] != variant[key]}
     if changed != {comparison["declared_changed_field"]}:
         raise ValueError("policy comparison must change exactly one declared field")
+    _validate_anchor_order(comparison["anchors"])
+
+
+def _validate_anchor_order(anchors: object) -> None:
+    if anchors != ["lower_y", "independence", "higher_y"]:
+        raise ValueError("policy comparison anchors must be exactly lower_y, independence, higher_y")
+
+
+def _validate_asced_comparison(root: Path, comparison: dict[str, Any]) -> None:
+    required = {"comparison_id", "method", "comparison_kind", "qualification_path", "construction", "settings", "anchors", "canonical_controlled_eligible", "canonical_fidelity", "native_match_status", "native_qualification_path"}
+    if set(comparison) != required or comparison["comparison_kind"] not in {"ordinary", "overcomplete"}:
+        raise ValueError("aSCED comparison schema is invalid")
+    if not (root / comparison["qualification_path"]).is_file() or comparison["canonical_controlled_eligible"] is not True:
+        raise ValueError("aSCED controlled qualification is unavailable")
+    if comparison["canonical_fidelity"] != "canonical_adaptation":
+        raise ValueError("aSCED controlled fidelity must remain canonical adaptation")
+    native_path = root / comparison["native_qualification_path"]
+    native = json.loads(native_path.read_bytes()) if native_path.is_file() else {}
+    if native.get("terminal") != "declined_unavailable" or comparison["native_match_status"] != "unavailable":
+        raise ValueError("aSCED native availability differs from preserve_unavailable")
+    _validate_anchor_order(comparison["anchors"])
 
 
 def _probabilities(root: Path, anchor: str) -> tuple[float, float, float, float]:
@@ -163,6 +187,8 @@ def run_policy_comparisons(root: Path, output_root: Path) -> dict[str, Any]:
     output_root.mkdir(parents=True, exist_ok=True)
     records = 0
     for comparison in study["comparisons"]:
+        if comparison["method"] != "MBP4":
+            continue
         for anchor in comparison["anchors"]:
             record = _decode_pair(root, comparison, anchor, 0, study["bounded_limits"]["max_iterations"])
             _write_exact(output_root / "records" / comparison["comparison_id"] / f"{anchor}.json", record)
@@ -177,6 +203,8 @@ def verify_policy_comparisons(root: Path, output_root: Path) -> dict[str, Any]:
     validate_policy_study(root, study)
     replayed = 0
     for comparison in study["comparisons"]:
+        if comparison["method"] != "MBP4":
+            continue
         for anchor in comparison["anchors"]:
             path = output_root / "records" / comparison["comparison_id"] / f"{anchor}.json"
             if path.is_symlink() or not path.is_file():
