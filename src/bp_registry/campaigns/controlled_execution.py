@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import base64
 from dataclasses import dataclass
+from fractions import Fraction
 from hashlib import sha256
 import json
 import os
@@ -642,3 +643,287 @@ def run_joint_separate_unit(
         "components": tuple(component.model_dump(mode="json") for component in components),
     }
     return PauliMatchedPairV1.model_validate({**unsigned, "record_sha256": _matched_digest(unsigned)})
+
+
+def preflight_phase11_controlled_design(*, root: Path, design_path: Path) -> dict[str, Any]:
+    """Validate the bounded GB46 controlled-calibration identity before writes.
+
+    This admission gate deliberately consumes only the project-owned, pinned
+    GB46 check artifact and the frozen fixed-marginal design.  Source-study
+    targets and source-campaign fields are rejected here so a caller cannot
+    accidentally turn calibration evidence into reproduction evidence.
+    """
+    from .statistics import load_fixed_marginal_design
+    from ..quaternary.asced import parse_pinned_gb46_css
+
+    root = root.resolve(strict=True)
+    resolved = design_path.resolve(strict=True)
+    if root not in (resolved, *resolved.parents) or resolved.is_symlink() or not resolved.is_file():
+        raise ValueError("controlled design must be a regular file beneath the campaign root")
+    raw = resolved.read_bytes()
+    try:
+        design = json.loads(raw)
+    except json.JSONDecodeError as error:
+        raise ValueError("controlled design is not valid JSON") from error
+    if not isinstance(design, dict):
+        raise ValueError("controlled design must be a JSON object")
+    prohibited = {"source_target", "source_campaign", "source_target_fields", "paper_target"}
+    if prohibited & set(design):
+        raise ValueError("controlled design must not contain source-campaign fields")
+    required = {
+        "schema", "study_id", "evidence_lane", "code", "fixed_marginal_design",
+        "sample_ranges", "calibration_limits", "claim_scope", "publication_authorization",
+    }
+    if set(design) != required or design["schema"] != "phase11_controlled_calibration_v1":
+        raise ValueError("controlled design has an invalid field set or schema")
+    if design["evidence_lane"] != "controlled_canonical_adaptation":
+        raise ValueError("controlled design must remain in the canonical-adaptation lane")
+    if design["publication_authorization"] != "deny" or "no_source_reproduction" not in design["claim_scope"]:
+        raise ValueError("controlled design must retain its calibration-only, deny-by-default scope")
+    code = design["code"]
+    if not isinstance(code, dict) or set(code) != {"code_id", "artifact_path", "artifact_sha256", "source", "run_fidelity"}:
+        raise ValueError("controlled GB46 code identity is incomplete")
+    artifact = (root / code["artifact_path"]).resolve()
+    if root not in (artifact, *artifact.parents) or artifact.is_symlink() or not artifact.is_file():
+        raise ValueError("controlled GB46 artifact is unavailable")
+    artifact_bytes = artifact.read_bytes()
+    if code["code_id"] != "GB46" or code["run_fidelity"] != "canonical_adaptation" or sha256(artifact_bytes).hexdigest() != code["artifact_sha256"]:
+        raise ValueError("controlled GB46 artifact identity differs from the frozen design")
+    parsed_code = parse_pinned_gb46_css(artifact_bytes)
+    fixed = design["fixed_marginal_design"]
+    if not isinstance(fixed, dict) or set(fixed) != {"path", "sha256", "point_order"}:
+        raise ValueError("controlled fixed-marginal identity is incomplete")
+    fixed_path = (root / fixed["path"]).resolve()
+    if root not in (fixed_path, *fixed_path.parents) or fixed_path.is_symlink() or not fixed_path.is_file():
+        raise ValueError("controlled fixed-marginal design is unavailable")
+    if sha256(fixed_path.read_bytes()).hexdigest() != fixed["sha256"]:
+        raise ValueError("controlled fixed-marginal design digest differs from the frozen design")
+    sweep = load_fixed_marginal_design(fixed_path)
+    if tuple(fixed["point_order"]) != sweep.point_order:
+        raise ValueError("controlled fixed-marginal point order differs from the frozen design")
+    ranges = design["sample_ranges"]
+    if not isinstance(ranges, dict) or set(ranges) != set(sweep.point_order):
+        raise ValueError("controlled sample ranges must cover exactly the frozen channel rows")
+    assigned: set[int] = set()
+    for point in sweep.point_order:
+        pair = ranges[point]
+        if (not isinstance(pair, list) or len(pair) != 2 or any(type(value) is not int or value < 0 for value in pair)
+                or pair[0] > pair[1]):
+            raise ValueError("controlled sample ranges must be nonnegative inclusive pairs")
+        members = set(range(pair[0], pair[1] + 1))
+        if assigned & members:
+            raise ValueError("controlled sample ranges must be disjoint")
+        assigned |= members
+    limits = design["calibration_limits"]
+    if (not isinstance(limits, dict) or set(limits) != {"max_pairs_per_point", "max_iterations", "max_wall_seconds_per_pair", "max_output_bytes"}
+            or any(type(limits[key]) is not int or limits[key] < 1 for key in limits)):
+        raise ValueError("controlled calibration limits must be bounded positive integers")
+    if any((ranges[point][1] - ranges[point][0] + 1) > limits["max_pairs_per_point"] for point in sweep.point_order):
+        raise ValueError("controlled sample range exceeds the calibration pair cap")
+    return {
+        "schema": "phase11_controlled_preflight_v1",
+        "study_id": design["study_id"], "design_sha256": sha256(raw).hexdigest(),
+        "code_artifact_sha256": code["artifact_sha256"], "code_qubits": parsed_code.n,
+        "fixed_marginal_design_sha256": fixed["sha256"], "point_order": list(sweep.point_order),
+        "sample_ranges": ranges, "publication_authorization": "deny",
+    }
+
+
+def _phase11_digest(domain: str, payload: object) -> str:
+    return sha256(domain.encode("ascii") + b"\0" + canonical_json_bytes(payload)).hexdigest()
+
+
+def _phase11_safe_root(path: Path) -> Path:
+    """Admit an explicitly selected regular output directory without links."""
+    resolved = path.resolve()
+    if path.exists() and (path.is_symlink() or not path.is_dir()):
+        raise ValueError("controlled output root must be a regular directory")
+    return resolved
+
+
+def _phase11_sample(*, code: Any, design_sha256: str, point_id: str, sample_id: int,
+                    probabilities: tuple[float, float, float, float]) -> MaterializedPhysicalSampleV1:
+    """Materialize one sealed I/X/Y/Z sample before either decoder sees it."""
+    physical_identity = _phase11_digest("phase11-gb46-physical-sample-v1", {
+        "design_sha256": design_sha256, "point_id": point_id, "sample_id": sample_id,
+    })
+    seed_identity = _phase11_digest("phase11-gb46-sampler-v1", {"physical_sample_identity": physical_identity})
+    seed = int.from_bytes(sha256(seed_identity.encode("ascii")).digest()[:16], "big")
+    values = np.random.Generator(np.random.PCG64(seed)).choice(4, size=code.n, p=np.asarray(probabilities))
+    x = np.isin(values, (1, 2)).astype(np.uint8)
+    z = np.isin(values, (2, 3)).astype(np.uint8)
+    x_b64, z_b64 = base64.b64encode(x.tobytes()).decode("ascii"), base64.b64encode(z.tobytes()).decode("ascii")
+    z_syndrome = ((code.hz.astype(np.int64) @ x) % 2).astype(np.uint8)
+    x_syndrome = ((code.hx.astype(np.int64) @ z) % 2).astype(np.uint8)
+    def observed(check_type: str, bits: np.ndarray) -> dict[str, Any]:
+        return {"check_type": check_type, "dtype": "uint8", "shape": list(bits.shape),
+                "bytes_b64": base64.b64encode(bits.tobytes()).decode("ascii")}
+    unsigned = {
+        "schema": "materialized_physical_sample_v1", "physical_sample_identity": physical_identity,
+        "sample_seed_identity": seed_identity, "cohort_id": "phase11-gb46-controlled-calibration",
+        "point_id": point_id, "sample_namespace": "phase11-gb46-fixed-marginal-v1", "sample_id": sample_id,
+        "sampler_contract_sha256": _phase11_digest("phase11-gb46-sampler-contract-v1", {
+            "code_n": code.n, "probabilities": probabilities, "pauli_order": "I,X,Y,Z"}),
+        "x_dtype": "uint8", "x_shape": [code.n], "x_bytes_b64": x_b64,
+        "z_dtype": "uint8", "z_shape": [code.n], "z_bytes_b64": z_b64,
+        "observations": {"X": observed("X", x_syndrome), "Z": observed("Z", z_syndrome)},
+        "physical_error_sha256": _phase11_digest("bp-registry-physical-error-v1", {"x": x_b64, "z": z_b64}),
+    }
+    return MaterializedPhysicalSampleV1.model_validate({
+        **unsigned,
+        "materialized_sample_sha256": _phase11_digest("bp-registry-materialized-sample-v1", unsigned),
+    })
+
+
+def _phase11_joint_decoder(code: Any, *, max_iterations: int, max_work: int) -> Callable[[JointArmInputV1], JointArmResultV1]:
+    """Adapt the project's scalar four-state canonical kernel to the public seam."""
+    from ..quaternary.execution import TracerPauliProblem, _decode
+
+    checks = np.vstack((np.where(code.hx, 1, 0), np.where(code.hz, 3, 0))).astype(np.uint8)
+    def decode(input_: JointArmInputV1) -> JointArmResultV1:
+        problem = TracerPauliProblem(checks=checks, syndrome=np.asarray(input_.x_syndrome + input_.z_syndrome, dtype=np.uint8))
+        candidate, _marginals, work, terminal = _decode(
+            problem, channel=np.asarray(input_.probabilities, dtype=np.float64),
+            max_iterations=max_iterations, max_work=max_work, epsilon=1e-12,
+        )
+        return JointArmResultV1(
+            candidate_x=tuple(int(value in (1, 2)) for value in candidate),
+            candidate_z=tuple(int(value in (2, 3)) for value in candidate),
+            terminal_status="exact" if terminal == "completed" else "nonconvergence",
+            iterations=max_iterations if terminal == "max_iterations" else min(max_iterations, 1), work=work,
+        )
+    return decode
+
+
+def _phase11_binary_decoder(code: Any, *, max_iterations: int) -> Callable[[BinaryArmInputV1], BinaryArmResultV1]:
+    """Use the existing canonical binary SPA kernel on each declared marginal."""
+    from ..canonical.kernel import BinarySpaKernel
+
+    kernel = BinarySpaKernel()
+    def decode(input_: BinaryArmInputV1) -> BinaryArmResultV1:
+        matrix = code.hz if input_.component == "X" else code.hx
+        prior = float(input_.prior[0])
+        result = kernel.run(matrix, np.asarray(input_.syndrome, dtype=np.uint8), error_rate=prior, max_iterations=max_iterations)
+        return BinaryArmResultV1(
+            candidate=tuple(int(value) for value in result.candidate),
+            terminal_status="exact" if result.converged else "nonconvergence",
+            iterations=result.iterations,
+            work={"canonical_spa_iterations": result.iterations},
+        )
+    return decode
+
+
+def _phase11_pair_path(output_root: Path, point_id: str, sample_id: int) -> Path:
+    return output_root / "pairs" / point_id / f"{sample_id}.json"
+
+
+def _phase11_load_pairs(*, output_root: Path, preflight: dict[str, Any]) -> dict[str, list[PauliMatchedPairV1]]:
+    pairs: dict[str, list[PauliMatchedPairV1]] = {point: [] for point in preflight["point_order"]}
+    seen: set[str] = set()
+    for point_id in preflight["point_order"]:
+        lower, upper = preflight["sample_ranges"][point_id]
+        for sample_id in range(lower, upper + 1):
+            path = _phase11_pair_path(output_root, point_id, sample_id)
+            if path.is_symlink() or not path.is_file():
+                continue
+            pair = PauliMatchedPairV1.model_validate_json(path.read_bytes())
+            pair.verify_replay()
+            if pair.physical_sample_identity in seen:
+                raise ValueError("controlled pair output duplicates a physical sample")
+            seen.add(pair.physical_sample_identity)
+            pairs[point_id].append(pair)
+    return pairs
+
+
+def run_phase11_controlled(*, root: Path, design_path: Path, output_root: Path, resume: bool = False) -> dict[str, Any]:
+    """Run or resume only the predeclared bounded GB46 calibration pairs."""
+    from .statistics import load_fixed_marginal_design
+    from ..quaternary.asced import parse_pinned_gb46_css
+
+    preflight = preflight_phase11_controlled_design(root=root, design_path=design_path)
+    destination = _phase11_safe_root(output_root)
+    destination.mkdir(parents=True, exist_ok=True)
+    identity = {"schema": "phase11_controlled_identity_v1", "preflight": preflight}
+    _publish_exact(destination / "identity.json", _json_line(identity))
+    design = load_fixed_marginal_design(root / "data/studies/phase11-fixed-marginal-design.json")
+    raw = (root / "data/artifacts/gb46-h44.alist").read_bytes()
+    code = parse_pinned_gb46_css(raw)
+    rows = {row.point_id: row for row in design.rows}
+    limits = json.loads(design_path.read_text(encoding="utf-8"))["calibration_limits"]
+    completed = 0
+    for point_id in preflight["point_order"]:
+        probabilities = rows[point_id].probabilities
+        for sample_id in range(*[preflight["sample_ranges"][point_id][0], preflight["sample_ranges"][point_id][1] + 1]):
+            path = _phase11_pair_path(destination, point_id, sample_id)
+            if path.exists() or path.is_symlink():
+                if not resume:
+                    existing = PauliMatchedPairV1.model_validate_json(path.read_bytes())
+                    expected = _phase11_sample(code=code, design_sha256=preflight["design_sha256"], point_id=point_id,
+                                               sample_id=sample_id, probabilities=probabilities)
+                    if existing.physical_sample_identity != expected.physical_sample_identity:
+                        raise ValueError("existing controlled pair has a changed sample identity")
+                continue
+            sample = _phase11_sample(code=code, design_sha256=preflight["design_sha256"], point_id=point_id,
+                                     sample_id=sample_id, probabilities=probabilities)
+            pair = run_joint_separate_unit(
+                code=code, materialized_sample=sample,
+                joint_probabilities=tuple(probabilities for _ in range(code.n)),
+                joint_decoder=_phase11_joint_decoder(code, max_iterations=limits["max_iterations"], max_work=1000000),
+                binary_decoder=_phase11_binary_decoder(code, max_iterations=limits["max_iterations"]),
+            )
+            _publish_exact(path, pair.primitive_bytes() + b"\n")
+            completed += 1
+    verified = verify_phase11_controlled(root=root, design_path=design_path, output_root=destination)
+    return {"schema": "phase11_controlled_run_v1", "new_pairs": completed, **verified}
+
+
+def verify_phase11_controlled(*, root: Path, design_path: Path, output_root: Path) -> dict[str, Any]:
+    """Fail closed on missing, altered, duplicate, or cross-design pair evidence."""
+    preflight = preflight_phase11_controlled_design(root=root, design_path=design_path)
+    destination = _phase11_safe_root(output_root)
+    identity_path = destination / "identity.json"
+    if identity_path.is_symlink() or not identity_path.is_file() or identity_path.read_bytes() != _json_line({"schema": "phase11_controlled_identity_v1", "preflight": preflight}):
+        raise ValueError("controlled output identity differs from the admitted design")
+    pairs = _phase11_load_pairs(output_root=destination, preflight=preflight)
+    expected = sum(upper - lower + 1 for lower, upper in preflight["sample_ranges"].values())
+    actual = sum(len(value) for value in pairs.values())
+    if actual != expected:
+        raise ValueError("controlled output lacks one or more complete matched pairs")
+    return {"schema": "phase11_controlled_verify_v1", "design_sha256": preflight["design_sha256"],
+            "complete_pairs": actual, "publication_authorization": "deny"}
+
+
+def replay_phase11_controlled(*, root: Path, design_path: Path, output_root: Path) -> dict[str, Any]:
+    """Recompute pair identities and records, rejecting any nondeterministic output."""
+    from .statistics import load_fixed_marginal_design
+    from ..quaternary.asced import parse_pinned_gb46_css
+
+    verified = verify_phase11_controlled(root=root, design_path=design_path, output_root=output_root)
+    preflight = preflight_phase11_controlled_design(root=root, design_path=design_path)
+    code = parse_pinned_gb46_css((root / "data/artifacts/gb46-h44.alist").read_bytes())
+    rows = {row.point_id: row for row in load_fixed_marginal_design(root / "data/studies/phase11-fixed-marginal-design.json").rows}
+    pairs = _phase11_load_pairs(output_root=output_root, preflight=preflight)
+    for point_id, values in pairs.items():
+        for pair in values:
+            expected = _phase11_sample(code=code, design_sha256=preflight["design_sha256"], point_id=point_id,
+                                       sample_id=next(i for i in range(*[preflight["sample_ranges"][point_id][0], preflight["sample_ranges"][point_id][1] + 1]) if _phase11_sample(code=code, design_sha256=preflight["design_sha256"], point_id=point_id, sample_id=i, probabilities=rows[point_id].probabilities).physical_sample_identity == pair.physical_sample_identity), probabilities=rows[point_id].probabilities)
+            if expected.materialized_sample_sha256 != pair.materialized_sample_sha256:
+                raise ValueError("controlled replay sample differs from retained pair")
+    return {"schema": "phase11_controlled_replay_v1", **verified}
+
+
+def assess_phase11_controlled(*, root: Path, design_path: Path, output_root: Path) -> dict[str, Any]:
+    """Produce the fixed-design assessment only from verified complete pairs."""
+    from .statistics import assess_correlation_sweep
+    verify_phase11_controlled(root=root, design_path=design_path, output_root=output_root)
+    preflight = preflight_phase11_controlled_design(root=root, design_path=design_path)
+    result = assess_correlation_sweep(
+        design_path=root / "data/studies/phase11-fixed-marginal-design.json",
+        point_pairs=_phase11_load_pairs(output_root=output_root, preflight=preflight),
+    )
+    payload = {"schema": "phase11_controlled_assessment_v1", "publication_authorization": "deny",
+               "assessment": {"design_sha256": result.design_sha256,
+                              "rows": [{"point_id": row.point_id, "d_y": row.d_y,
+                                        "complete_pairs": row.complete_pairs} for row in result.rows]}}
+    _publish_exact(_phase11_safe_root(output_root) / "assessment.json", _json_line(payload))
+    return payload
