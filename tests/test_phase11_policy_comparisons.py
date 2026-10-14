@@ -97,3 +97,17 @@ def test_policy_study_rejects_renamed_missing_or_fourth_anchor() -> None:
         bad["comparisons"][0]["anchors"] = anchors
         with pytest.raises(ValueError, match="anchors"):
             module.validate_policy_study(ROOT, bad)
+
+
+def test_complete_methods_keeps_canonical_asced_eligible_without_native_matching() -> None:
+    module = _api()
+    manifest = module.load_complete_methods(ROOT)
+    module.validate_complete_methods(ROOT, manifest)
+    methods = {row["method_id"]: row for row in manifest["methods"]}
+    assert set(methods) == {"ordinary_bp4", "qbpgd", "mbp4", "canonical_asced"}
+    asced = methods["canonical_asced"]
+    assert asced["canonical_controlled_eligible"] is True
+    assert asced["native_match_eligible"] is False
+    assert asced["fidelity"] == "canonical_adaptation"
+    assert all(row["status"] == "unavailable" for row in asced["native_lane"]) 
+    assert methods["qbpgd"]["executable"] is False
