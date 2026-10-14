@@ -69,8 +69,37 @@ def test_asced_source_target_model_rejects_demo_substitution_and_post_freeze_mut
 
     changed = copy.deepcopy(payload)
     changed["members"][0]["decoder"]["K"] = 15
-    with pytest.raises(ValueError, match="digest|frozen"):
+    with pytest.raises(ValueError, match="digest|freeze"):
         QuaternarySourceTargetV1.model_validate(changed)
+
+
+def test_asced_overcomplete_member_is_separate_and_freezes_obp4_settings_and_manifest_binding():
+    payload = _json(TARGET)
+    members = {member["member_id"]: member for member in payload["members"]}
+    ordinary = members["asced-figure2-gb46-ordinary"]
+    assert "asced-figure2-gb46-overcomplete" in members
+    overcomplete = members["asced-figure2-gb46-overcomplete"]
+
+    assert set(members) == {"asced-figure2-gb46-ordinary", "asced-figure2-gb46-overcomplete"}
+    assert ordinary["target_slot"] != overcomplete["target_slot"]
+    assert overcomplete["decoder"] == {
+        "baseline": "OBP4",
+        "variant": "OBP4-aSCED",
+        "iterations": 12,
+        "p0": 0.3,
+        "K": 16,
+        "Delta": 2,
+        "L": 4,
+    }
+    assert overcomplete["extraction"]["status"] == "blocked_metadata"
+    assert overcomplete["eligibility"] == "blocked_metadata"
+    assert overcomplete["admitted_shots"] == 0
+
+    manifest = _json(MANIFEST)
+    assert manifest["target_document_sha256"] == hashlib.sha256(TARGET.read_bytes()).hexdigest()
+    assert manifest["target_receipt_sha256"] == payload["target_receipt_sha256"]
+    assert manifest["source_only"] is True
+    assert manifest["controlled_comparison"] is False
 
 
 def test_asced_preflight_writes_only_deterministic_blocked_assessment_before_sampling():

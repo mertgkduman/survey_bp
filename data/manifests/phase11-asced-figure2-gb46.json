@@ -1,0 +1,29 @@
+{
+  "schema": "phase11-asced-source-manifest-v1",
+  "target_document_sha256": "e9875959e02da790acfdeb1979c9bf402e3a03f8f9ba5d61900ee24d9644c03a",
+  "target_receipt_sha256": "b136b0aa81cc67bca48fc2bdfdb444f51cb6e77d9dd78715094252fece224013",
+  "paper": {
+    "panel": "Figure 2",
+    "code": "GB46",
+    "channel": "depolarizing"
+  },
+  "members": [
+    {
+      "member_id": "asced-figure2-gb46-ordinary",
+      "baseline": "BP4",
+      "variant": "BP4-aSCED",
+      "target_slot": "figure2-gb46-ordinary-bp4-versus-asced"
+    },
+    {
+      "member_id": "asced-figure2-gb46-overcomplete",
+      "baseline": "OBP4",
+      "variant": "OBP4-aSCED",
+      "target_slot": "figure2-gb46-overcomplete-obp4-versus-asced"
+    }
+  ],
+  "source_only": true,
+  "controlled_comparison": false,
+  "run_fidelity": "canonical_adaptation",
+  "admission": "blocked_until_reviewed_target_and_native_route",
+  "review_instructions": "Review the Figure 2 crop, calibration, selected clicks, transformed intervals, curve legends, uncertainty, and tolerance before interpreting a non-blocked assessment."
+}

@@ -5,7 +5,7 @@
     "code": "GB46"
   },
   "source_snapshot_sha256": "f9a13950d5764968e6fbb5ebfbb5bbb574f1276d722b1b49411a5e26dfb1e2a3",
-  "target_receipt_sha256": "c8063359d87c0dfeeb69b5a7d2bf16434b08413629ef59dcf6d05a2d543e5972",
+  "target_receipt_sha256": "b136b0aa81cc67bca48fc2bdfdb444f51cb6e77d9dd78715094252fece224013",
   "members": [
     {
       "member_id": "asced-figure2-gb46-ordinary",
@@ -42,6 +42,45 @@
       "blockers": [
         "digitized_clicks_unavailable",
         "missing_reviewed_figure2_ordinary_coordinates",
+        "native_source_route_is_aggregate_only"
+      ]
+    },
+    {
+      "member_id": "asced-figure2-gb46-overcomplete",
+      "target_slot": "figure2-gb46-overcomplete-obp4-versus-asced",
+      "evidence_kind": "paper_figure",
+      "channel": "depolarizing",
+      "decoder": {
+        "baseline": "OBP4",
+        "variant": "OBP4-aSCED",
+        "iterations": 12,
+        "p0": 0.3,
+        "K": 16,
+        "Delta": 2,
+        "L": 4
+      },
+      "stopping": {
+        "minimum_logical_errors": 400,
+        "maximum_trials": 1000000
+      },
+      "source_denominator": {
+        "status": "unavailable",
+        "reason": "Figure 2 denominator is not yet available in a reviewed extraction receipt."
+      },
+      "extraction": {
+        "status": "blocked_metadata",
+        "blockers": [
+          "digitized_clicks_unavailable",
+          "axis_calibration_unavailable",
+          "extraction_uncertainty_unavailable",
+          "reviewer_signoff_unavailable"
+        ]
+      },
+      "eligibility": "blocked_metadata",
+      "admitted_shots": 0,
+      "blockers": [
+        "digitized_clicks_unavailable",
+        "missing_reviewed_figure2_overcomplete_coordinates",
         "native_source_route_is_aggregate_only"
       ]
     }
