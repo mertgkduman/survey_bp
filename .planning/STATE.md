@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
-current_plan: 3
+current_plan: 4
 status: executing
-stopped_at: Completed 11-07-PLAN.md
-last_updated: "2026-10-14T19:46:37.423Z"
+stopped_at: Completed 11-02-PLAN.md
+last_updated: "2026-10-14T20:07:46.258Z"
 last_activity: 2026-10-14
 last_activity_desc: Phase 11 execution started
-state_head: 02a20850cd50a97954fc7d2923a8406f96e69050
+state_head: 82f655a705d7042909750f80f987313b4835bd88
 progress:
   total_phases: 14
   completed_phases: 8
   total_plans: 166
-  completed_plans: 145
+  completed_plans: 146
 ---
 
 # Project State
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-10-12)
 ## Current Position
 
 Phase: 11 (Quaternary Reproduction and Comparisons) — EXECUTING
-Plan: 3 of 15
+Plan: 4 of 15
 Total Phases: 14
-Current Plan: 3
+Current Plan: 4
 Total Plans in Phase: 15
 Status: Ready to execute
 Last activity: 2026-10-14 — Phase 11 execution started
@@ -98,6 +98,7 @@ Progress: 8 of 14 phases complete (57%); Phase 9 has 20 of 20 plans complete
 | Phase 10 P16 | 3h 23m bounded run plus verification | 2 tasks | 8 files |
 | Phase 11 P01 | 3m 27s | 2 tasks | 6 files |
 | Phase 11-quaternary-reproduction-and-comparisons P07 | 322s | 2 tasks | 3 files |
+| Phase 11 P02 | 12m | 2 tasks | 8 files |
 
 Phase 02 P10–P16 gap-closure metrics are recorded in their individual summaries.
 
@@ -205,6 +206,10 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - [Phase 11]: Ordinary and overcomplete aSCED source members remain separately receipted; canonical adaptation fidelity is not promoted by target agreement.
 - [Phase 11]: D-05 binary callbacks receive only component priors, syndromes, and arm-neutral identities.
 - [Phase 11]: D-08 maps retained separate-arm nonconvergence to all-shot failure without dropping paired evidence.
+- [Phase 11]: A5 reconstructs from the published l=90 polynomial pair while its distance interval remains source reported.
+- [Phase 11]: Figure 7 source settings remain frozen; the one-sweep canonical-adaptation probe cannot assess the Figure 7 curve.
+- [Phase 11]: A5 reconstructs from the published l=90 polynomial pair while its distance interval remains source reported.
+- [Phase 11]: Figure 7 source settings remain frozen; the one-sweep canonical-adaptation probe cannot assess the Figure 7 curve.
 
 ### Pending Todos
 
@@ -266,8 +271,8 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 **Resume file:** None
 
-Last session: 2026-10-14T19:46:26.572Z
-Stopped at: Completed 11-07-PLAN.md
+Last session: 2026-10-14T20:07:33.111Z
+Stopped at: Completed 11-02-PLAN.md
 Next command: $gsd-execute-phase 11; Phase 5 human review remains open and Phase 7 stays paused.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.

@@ -34,6 +34,7 @@ actuals:
   tokens: 25283
   tasks: 2
   commits: 2
+commits: 2
 plan_head_before: 2bc3fec6304562d1786fe32637b9242faea48c09
 duration: 12m
 completed: 2026-10-14
