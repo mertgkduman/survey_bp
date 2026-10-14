@@ -52,6 +52,72 @@ def _receipt_digest(payload: dict[str, Any]) -> str:
     return sha256(_canonical_bytes(frozen)).hexdigest()
 
 
+def _asced_native_reference(path: Path | None) -> dict[str, Any]:
+    """Return only the independently qualified native matched-input state."""
+    if path is None:
+        return {
+            "eligibility": "unavailable",
+            "terminal": "unavailable_receipt_missing",
+            "source_fidelity_claim": "none",
+            "qualification_sha256": None,
+            "paired_values": None,
+            "failed_gates": ["native_qualification_receipt_missing"],
+        }
+    qualification = _load(path)
+    if qualification.get("schema") != "phase11-asced-matched-input-qualification-v1":
+        raise ValueError("native aSCED qualification schema is not admitted")
+    digest = sha256(path.read_bytes()).hexdigest()
+    if (
+        qualification.get("terminal") == "declined_unavailable"
+        and qualification.get("matched_input_status") == "unavailable"
+        and qualification.get("source_fidelity_claim") == "none"
+        and qualification.get("source_operations") == []
+    ):
+        return {
+            "eligibility": "unavailable",
+            "terminal": "declined_unavailable",
+            "source_fidelity_claim": "none",
+            "qualification_sha256": digest,
+            "paired_values": None,
+            "failed_gates": ["matched_native_route_declined_unavailable"],
+        }
+    return {
+        "eligibility": "blocked",
+        "terminal": "qualification_not_admitted",
+        "source_fidelity_claim": "none",
+        "qualification_sha256": digest,
+        "paired_values": None,
+        "failed_gates": ["native_qualification_not_successful"],
+    }
+
+
+def _source_dispatch_authorization(path: Path | None) -> dict[str, Any]:
+    """Read the sealed publication decision and fail closed for source dispatch."""
+    if path is None:
+        return {
+            "decision": "deny",
+            "receipt_sha256": None,
+            "dispatch_attempted": False,
+            "failed_gates": ["production_authorization_receipt_missing"],
+        }
+    package = _load(path)
+    receipt = package.get("receipt")
+    if not isinstance(receipt, dict) or receipt.get("schema") != "phase11_authorization_receipt_v1":
+        raise ValueError("Phase 11 source dispatch needs a sealed authorization receipt")
+    if receipt.get("decision") != "deny" or receipt.get("dispatch_token") is not None:
+        raise ValueError("Phase 11 source dispatch is not admitted without an exact source-lane allow receipt")
+    expected = dict(receipt)
+    claimed_digest = expected.pop("receipt_sha256", None)
+    if claimed_digest != sha256(_canonical_bytes(expected)).hexdigest():
+        raise ValueError("Phase 11 authorization receipt digest differs from sealed evidence")
+    return {
+        "decision": "deny",
+        "receipt_sha256": claimed_digest,
+        "dispatch_attempted": False,
+        "failed_gates": ["production_authorization_denied"],
+    }
+
+
 def _validated_qbpgd(target_path: Path, manifest_path: Path | None) -> tuple[dict[str, Any], dict[str, Any] | None, str]:
     target_bytes = target_path.read_bytes()
     target = _load(target_path)
@@ -229,7 +295,15 @@ def _mbp4_assessment(target: dict[str, Any], target_document_sha256: str) -> dic
     return payload
 
 
-def _blocked_assessment(target: QuaternarySourceTargetV1, target_document_sha256: str) -> dict[str, Any]:
+def _blocked_assessment(
+    target: QuaternarySourceTargetV1,
+    target_document_sha256: str,
+    *,
+    native_qualification_path: Path | None = None,
+    authorization_path: Path | None = None,
+) -> dict[str, Any]:
+    native_reference = _asced_native_reference(native_qualification_path)
+    authorization = _source_dispatch_authorization(authorization_path)
     members = []
     for member in target.members:
         if member.eligibility != "blocked_metadata":
@@ -241,6 +315,13 @@ def _blocked_assessment(target: QuaternarySourceTargetV1, target_document_sha256
             "admitted_shots": 0,
             "blockers": list(member.blockers),
             "discrepancy": "not_assessed_due_to_blocked_source_metadata",
+            "canonical_adaptation": {
+                "eligibility": "blocked",
+                "fidelity": "canonical_adaptation",
+                "dispatch_attempted": False,
+                "failed_gates": [*member.blockers, *authorization["failed_gates"]],
+            },
+            "matched_native": native_reference,
         })
     payload = {
         "schema": "phase11-asced-source-assessment-v1",
@@ -250,6 +331,7 @@ def _blocked_assessment(target: QuaternarySourceTargetV1, target_document_sha256
         "run_fidelity": "canonical_adaptation",
         "source_fidelity": "not_promoted",
         "admitted_shots": 0,
+        "authorization": authorization,
         "members": members,
     }
     payload["assessment_sha256"] = sha256(_canonical_bytes(payload)).hexdigest()
@@ -328,24 +410,46 @@ def _run_qbpgd_qualification(target: dict[str, Any]) -> dict[str, Any]:
     return evidence
 
 
-def preflight(target_path: Path, manifest_path: Path | None, assessment_path: Path) -> dict[str, Any]:
+def preflight(
+    target_path: Path,
+    manifest_path: Path | None,
+    assessment_path: Path,
+    *,
+    native_qualification_path: Path | None = None,
+    authorization_path: Path | None = None,
+) -> dict[str, Any]:
     target, _manifest, document_digest = _validated(target_path, manifest_path)
     if isinstance(target, dict) and target.get("schema") == _MBP4_SCHEMA:
         assessment = _mbp4_assessment(target, document_digest)
     else:
-        assessment = _qbpgd_assessment(target, document_digest) if isinstance(target, dict) else _blocked_assessment(target, document_digest)
+        assessment = _qbpgd_assessment(target, document_digest) if isinstance(target, dict) else _blocked_assessment(
+            target, document_digest,
+            native_qualification_path=native_qualification_path,
+            authorization_path=authorization_path,
+        )
     assessment_path.parent.mkdir(parents=True, exist_ok=True)
     assessment_path.write_bytes(_canonical_bytes(assessment) + b"\n")
     return assessment
 
 
-def verify(target_path: Path, manifest_path: Path | None, assessment_path: Path) -> dict[str, Any]:
+def verify(
+    target_path: Path,
+    manifest_path: Path | None,
+    assessment_path: Path,
+    *,
+    native_qualification_path: Path | None = None,
+    authorization_path: Path | None = None,
+) -> dict[str, Any]:
     target, _manifest, document_digest = _validated(target_path, manifest_path)
     assessment = _load(assessment_path)
     if isinstance(target, dict) and target.get("schema") == _MBP4_SCHEMA:
         expected = _mbp4_assessment(target, document_digest)
     else:
-        expected = _qbpgd_assessment(target, document_digest) if isinstance(target, dict) else _blocked_assessment(target, document_digest)
+        expected = _qbpgd_assessment(target, document_digest) if isinstance(target, dict) else _blocked_assessment(
+            target, document_digest,
+            native_qualification_path=native_qualification_path,
+            authorization_path=authorization_path,
+        )
     if assessment == expected:
         return assessment
     if not isinstance(target, dict) or assessment.get("preflight") != expected:
@@ -353,7 +457,14 @@ def verify(target_path: Path, manifest_path: Path | None, assessment_path: Path)
     return assessment
 
 
-def run(target_path: Path, manifest_path: Path | None, assessment_path: Path) -> dict[str, Any]:
+def run(
+    target_path: Path,
+    manifest_path: Path | None,
+    assessment_path: Path,
+    *,
+    native_qualification_path: Path | None = None,
+    authorization_path: Path | None = None,
+) -> dict[str, Any]:
     target, _manifest, document_digest = _validated(target_path, manifest_path)
     if isinstance(target, dict) and target.get("schema") == _MBP4_SCHEMA:
         result = _mbp4_assessment(target, document_digest)
@@ -368,7 +479,11 @@ def run(target_path: Path, manifest_path: Path | None, assessment_path: Path) ->
         assessment_path.parent.mkdir(parents=True, exist_ok=True)
         assessment_path.write_bytes(_canonical_bytes(result) + b"\n")
         return result
-    assessment = _blocked_assessment(target, document_digest)
+    assessment = _blocked_assessment(
+        target, document_digest,
+        native_qualification_path=native_qualification_path,
+        authorization_path=authorization_path,
+    )
     if assessment["status"] == "blocked_metadata":
         raise ValueError("source assessment is blocked_metadata; sampling is not admitted")
     raise ValueError("unreachable source-study execution state")
@@ -379,15 +494,29 @@ def main() -> None:
     parser.add_argument("command", choices=("preflight", "run", "assess", "verify"))
     parser.add_argument("--target", type=Path, required=True)
     parser.add_argument("--manifest", type=Path)
+    parser.add_argument("--native-qualification", type=Path)
+    parser.add_argument("--authorization", type=Path)
     parser.add_argument("--assessment", type=Path, required=True)
     args = parser.parse_args()
     try:
         if args.command in {"preflight", "assess"}:
-            result = preflight(args.target, args.manifest, args.assessment)
+            result = preflight(
+                args.target, args.manifest, args.assessment,
+                native_qualification_path=args.native_qualification,
+                authorization_path=args.authorization,
+            )
         elif args.command == "verify":
-            result = verify(args.target, args.manifest, args.assessment)
+            result = verify(
+                args.target, args.manifest, args.assessment,
+                native_qualification_path=args.native_qualification,
+                authorization_path=args.authorization,
+            )
         else:
-            result = run(args.target, args.manifest, args.assessment)
+            result = run(
+                args.target, args.manifest, args.assessment,
+                native_qualification_path=args.native_qualification,
+                authorization_path=args.authorization,
+            )
     except ValueError as error:
         print(str(error), file=sys.stderr)
         raise SystemExit(2) from error
