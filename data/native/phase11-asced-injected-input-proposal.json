@@ -1,0 +1,142 @@
+{
+  "after_source_digests": {
+    "include/Simulation_Env.h": "fed9bc34eaa5be4528e3db8488c2614b893859fb30c07ceef3c42c252fd08c24",
+    "src/Pybind11_Module.cpp": "e05d0786a90cc0d76f6f34a38c3736bfafb89c10ad681d61783a211f2baa428b",
+    "src/Simulation_Env.cpp": "ff409d307d3161a512f666b35c366e2d76599090feb15756d6ba0807b9e237f9"
+  },
+  "aggregate_receipt_limits": [
+    "no_injected_error",
+    "no_per_shot_identity",
+    "no_paired_outcomes",
+    "no_random_seed"
+  ],
+  "apply_authorized": false,
+  "approval_questions": [
+    "Do the authors or rights holder approve this exact source modification and resulting derivative identity?",
+    "Does review agree that bypassing only channel sampling preserves the intended source algorithm semantics?",
+    "Will the derivative receive separately approved source, build, run, and matched-shot receipt identities before any execution?"
+  ],
+  "authorization_required": true,
+  "before_source_digests": {
+    "include/Simulation_Env.h": "9a96b9f1c5b04f692897c1be579753f827be46e43e67366766f7e07a6ae68cd3",
+    "src/Pybind11_Module.cpp": "23f0d1d5ce3b431748c3b09228ebff5642840c048b94952543db2e99352de1d1",
+    "src/Simulation_Env.cpp": "c4b9f8e7696fc61cd0736809d9cee54ef12d873283b2d2bceaa62e75260d8886"
+  },
+  "build_authorized": false,
+  "build_isolation": {
+    "separate_derivative_build_identity_required": true,
+    "separate_derivative_run_identity_required": true,
+    "separate_derivative_source_identity_required": true,
+    "workers": 1
+  },
+  "build_receipt_sha256": "76b31006136ccecef1c3c4a27e8f4476ee1dd999a284bbbee4701682b7d7dcff",
+  "canonical_order": [
+    "I",
+    "X",
+    "Y",
+    "Z"
+  ],
+  "current_matched_input_status": "unavailable",
+  "derivative_execution_authorized": false,
+  "diff_sha256": "dd8a31965372ba8aa736134d71c66183c1d044b5ae6910dee48068e04cec2229",
+  "fidelity_claim": "none",
+  "forbidden_changes": [
+    "algorithm source",
+    "Pauli semantics",
+    "candidate selection",
+    "channel code"
+  ],
+  "injected_vector_digest": {
+    "algorithm": "sha256",
+    "encoding": "canonical compact JSON array of native-order Pauli labels",
+    "required_before_execution": true,
+    "value": null
+  },
+  "native_order": [
+    "I",
+    "X",
+    "Z",
+    "Y"
+  ],
+  "prior_authorization_scope": "out-of-tree demo/artifact path correction and aggregate entry point only",
+  "proposed_build_identity": null,
+  "proposed_run_identity": null,
+  "proposed_source_identity": null,
+  "purpose": "Unapplied review-only source proposal; it grants no apply, build, execution, fidelity, or rights authorization.",
+  "run_receipt_sha256": "c13a5cd8a511e2619da07089fae31ed4948115599a590d5e7c285273dca0240d",
+  "schema": "phase11-asced-injected-input-proposal-v1",
+  "selection_discrepancy": "Native path-local syndromes_match filtering differs from the paper's original-syndrome-valid selection rule and remains unresolved.",
+  "source": {
+    "commit": "816772071486615dfc7d71d1e15df597edc58a26",
+    "repository": "https://github.com/kit-cel/quantum_asced.git",
+    "tree": "a87af78b8f014e25f9659d0926ef5f9f5452882e"
+  },
+  "source_spec_sha256": "55359962431c055cf971171f81d75997282beb29e8928a8d82e023fbb6c1f24e",
+  "splitter_randomness_limit": "The native randomized splitter selection has no public seed in the audited binding; matched samples do not make internal splitter paths reproducible.",
+  "touched_files": [
+    "include/Simulation_Env.h",
+    "src/Simulation_Env.cpp",
+    "src/Pybind11_Module.cpp"
+  ],
+  "touched_symbols": {
+    "include/Simulation_Env.h": [
+      "Simulation_Env::run_injected_error declaration"
+    ],
+    "src/Pybind11_Module.cpp": [
+      "Simulation_Env.run_injected_error binding"
+    ],
+    "src/Simulation_Env.cpp": [
+      "Simulation_Env::run_injected_error"
+    ]
+  },
+  "translation_round_trips": [
+    {
+      "canonical": [
+        "I",
+        "X",
+        "Y",
+        "Z"
+      ],
+      "native": [
+        "I",
+        "X",
+        "Z",
+        "Y"
+      ],
+      "round_trip": [
+        "I",
+        "X",
+        "Y",
+        "Z"
+      ]
+    },
+    {
+      "canonical": [
+        "Y",
+        "Z",
+        "Y",
+        "X"
+      ],
+      "native": [
+        "Z",
+        "Y",
+        "Z",
+        "X"
+      ],
+      "round_trip": [
+        "Y",
+        "Z",
+        "Y",
+        "X"
+      ]
+    }
+  ],
+  "unchanged_downstream_symbols": [
+    "channel.simulate_syndrome_extraction",
+    "decoder.decode",
+    "decoder.syndromes_match",
+    "channel.check_logical_equivalence",
+    "channel.check_physical_equivalence",
+    "Simulation_Env::get_error_rates"
+  ]
+}
