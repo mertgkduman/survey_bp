@@ -641,3 +641,146 @@ class DigitizationTargetReceiptV1(StrictModel):
 
     def digest(self) -> str:
         return _receipt_digest("bp-registry-campaign-digitization-target-v1", self)
+
+
+class QuaternaryDecoderSettingsV1(StrictModel):
+    """Paper-bound BP4/aSCED settings for one Figure 2 curve member."""
+
+    baseline: Literal["BP4", "OBP4"]
+    variant: Literal["BP4-aSCED", "OBP4-aSCED"]
+    iterations: int = Field(ge=1, le=1_000_000)
+    K: int = Field(ge=1, le=1_000_000)
+    Delta: int = Field(ge=1, le=1_000_000)
+    L: int = Field(ge=1, le=1_000_000)
+    p0: float | None = Field(default=None, gt=0.0, lt=1.0)
+
+    @model_validator(mode="after")
+    def paper_curve_configuration(self) -> "QuaternaryDecoderSettingsV1":
+        if self.baseline == "BP4":
+            if self.variant != "BP4-aSCED" or self.p0 is not None:
+                raise ValueError("BP4 Figure 2 members require BP4-aSCED and no p0")
+        elif self.variant != "OBP4-aSCED" or self.p0 is None:
+            raise ValueError("OBP4 Figure 2 members require OBP4-aSCED and p0")
+        return self
+
+
+class QuaternaryStoppingRuleV1(StrictModel):
+    """A source stopping rule that cannot silently become a local default."""
+
+    minimum_logical_errors: int = Field(ge=1)
+    maximum_trials: int = Field(ge=1)
+
+    @model_validator(mode="after")
+    def feasible_rule(self) -> "QuaternaryStoppingRuleV1":
+        if self.minimum_logical_errors > self.maximum_trials:
+            raise ValueError("stopping logical-error target cannot exceed maximum trials")
+        return self
+
+
+class QuaternaryExtractionEvidenceV1(StrictModel):
+    """A reviewed digitization or an explicit, non-numeric blocked state."""
+
+    status: Literal["reviewed", "blocked_metadata"]
+    digitization: DigitizationTargetReceiptV1 | None = None
+    selected_point: FrozenDigitizationIntervalV1 | None = None
+    acceptance_tolerance: float | None = Field(default=None, gt=0.0)
+    reviewer: str | None = Field(default=None, min_length=1, max_length=256)
+    blockers: tuple[str, ...] = Field(default=(), max_length=_MAX_QUALIFICATION_BLOCKERS)
+
+    @field_validator("blockers", mode="before")
+    @classmethod
+    def tuple_blockers(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @model_validator(mode="after")
+    def reviewed_or_explicitly_blocked(self) -> "QuaternaryExtractionEvidenceV1":
+        if len(set(self.blockers)) != len(self.blockers) or any(not item for item in self.blockers):
+            raise ValueError("extraction blockers must be unique nonempty strings")
+        if self.status == "reviewed":
+            if (self.digitization is None or self.selected_point is None
+                    or self.acceptance_tolerance is None or self.reviewer is None or self.blockers):
+                raise ValueError("reviewed extraction needs digitization, point, tolerance, and reviewer only")
+        elif (self.digitization is not None or self.selected_point is not None
+              or self.acceptance_tolerance is not None or self.reviewer is not None or not self.blockers):
+            raise ValueError("blocked extraction needs blockers and no inferred coordinates or tolerance")
+        return self
+
+
+class QuaternarySourceTargetMemberV1(StrictModel):
+    """One separately assessed ordinary or overcomplete aSCED curve member."""
+
+    member_id: str = Field(min_length=1, max_length=256)
+    target_slot: str = Field(min_length=1, max_length=256)
+    evidence_kind: Literal["paper_figure"]
+    channel: Literal["depolarizing"]
+    decoder: QuaternaryDecoderSettingsV1
+    stopping: QuaternaryStoppingRuleV1
+    source_denominator: SourceDenominatorV1
+    extraction: QuaternaryExtractionEvidenceV1
+    source_experiment: SourceExperimentIdentityV1 | None = None
+    eligibility: Literal["eligible", "blocked_metadata"]
+    admitted_shots: int = Field(ge=0)
+    blockers: tuple[str, ...] = Field(default=(), max_length=_MAX_QUALIFICATION_BLOCKERS)
+
+    @field_validator("blockers", mode="before")
+    @classmethod
+    def tuple_blockers(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @model_validator(mode="after")
+    def immutable_admission_gate(self) -> "QuaternarySourceTargetMemberV1":
+        if len(set(self.blockers)) != len(self.blockers) or any(not item for item in self.blockers):
+            raise ValueError("member blockers must be unique nonempty strings")
+        complete = (
+            self.extraction.status == "reviewed"
+            and self.source_experiment is not None
+            and self.source_experiment.complete_for_faithful_assessment
+            and not self.blockers
+        )
+        if self.eligibility == "eligible":
+            if not complete or self.admitted_shots != 0:
+                raise ValueError("eligible target must be complete and freeze zero shots before execution")
+        elif self.admitted_shots != 0 or not self.blockers or self.extraction.status != "blocked_metadata":
+            raise ValueError("blocked target must retain blockers and admit zero shots")
+        return self
+
+
+class QuaternarySourceTargetV1(StrictModel):
+    """Frozen source-only aSCED Figure 2 GB46 target contract."""
+
+    schema_name: Literal["campaign_quaternary_source_target_v1"] = Field(alias="schema", serialization_alias="schema")
+    source_panel: dict[Literal["figure", "code"], str]
+    source_snapshot_sha256: str = Field(pattern=_SHA256)
+    members: tuple[QuaternarySourceTargetMemberV1, ...] = Field(min_length=1, max_length=2)
+    target_receipt_sha256: str | None = Field(default=None, pattern=_SHA256)
+
+    @field_validator("members", mode="before")
+    @classmethod
+    def tuple_members(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
+    @model_validator(mode="after")
+    def exact_figure_two_members(self) -> "QuaternarySourceTargetV1":
+        if self.source_panel != {"figure": "Figure 2", "code": "GB46"}:
+            raise ValueError("the first quaternary source target must be exactly aSCED Figure 2 GB46")
+        expected_ids = {"asced-figure2-gb46-ordinary", "asced-figure2-gb46-overcomplete"}
+        actual_ids = {member.member_id for member in self.members}
+        if not actual_ids.issubset(expected_ids) or "asced-figure2-gb46-ordinary" not in actual_ids:
+            raise ValueError("Figure 2 target must contain its exact ordinary member and no unrelated curves")
+        ordinary = next(member for member in self.members if member.member_id.endswith("ordinary"))
+        if (ordinary.decoder.baseline, ordinary.decoder.iterations, ordinary.decoder.K, ordinary.decoder.Delta, ordinary.decoder.L) != ("BP4", 25, 16, 2, 4):
+            raise ValueError("ordinary Figure 2 settings must freeze BP4 25 and K=16, Delta=2, L=4")
+        if "asced-figure2-gb46-overcomplete" in actual_ids:
+            overcomplete = next(member for member in self.members if member.member_id.endswith("overcomplete"))
+            if (overcomplete.decoder.baseline, overcomplete.decoder.iterations, overcomplete.decoder.p0, overcomplete.decoder.K, overcomplete.decoder.Delta, overcomplete.decoder.L) != ("OBP4", 12, 0.3, 16, 2, 4):
+                raise ValueError("overcomplete Figure 2 settings must freeze OBP4 12, p0=0.3 and K=16, Delta=2, L=4")
+        expected_stopping = QuaternaryStoppingRuleV1(minimum_logical_errors=400, maximum_trials=1_000_000)
+        if any(member.stopping != expected_stopping for member in self.members):
+            raise ValueError("all Figure 2 members must retain the paper stopping rule")
+        if self.target_receipt_sha256 is not None and self.target_receipt_sha256 != self.digest():
+            raise ValueError("frozen target receipt digest does not match its immutable content")
+        return self
+
+    def digest(self) -> str:
+        payload = self.model_dump(mode="json", by_alias=True, exclude={"target_receipt_sha256"})
+        return sha256(_canonical_json_bytes(payload)).hexdigest()
