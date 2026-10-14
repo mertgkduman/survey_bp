@@ -73,3 +73,59 @@ def test_public_cli_verifies_only_the_exact_default_deny_authorization_package(t
     )
     assert rejected.returncode == 2
     assert json.loads(rejected.stdout)["status"] == "error"
+
+
+def test_record_authorization_preserve_deny_seals_the_verified_package(tmp_path: Path) -> None:
+    """A reviewed denial is durable evidence, never an implicit dispatch path."""
+    package_path = tmp_path / "authorization.json"
+    package_path.write_bytes((ROOT / "data/results/phase11-production-authorization.json").read_bytes())
+    package = json.loads(package_path.read_text(encoding="utf-8"))
+
+    result = subprocess.run(
+        [
+            sys.executable, "scripts/run_phase11_controlled.py", "record-authorization",
+            "--package", str(package_path), "--decision", "preserve_deny",
+            "--reviewer", "chat_user", "--reason",
+            "Missing site ceilings, account/partition, quota/cost, runtime profiles, and source-route eligibility.",
+            "--reviewed-package-sha256", package["package_sha256"],
+        ],
+        cwd=ROOT, text=True, capture_output=True, check=False,
+    )
+
+    assert result.returncode == 0, result.stdout
+    stored = json.loads(package_path.read_text(encoding="utf-8"))
+    receipt = stored["receipt"]
+    assert receipt["schema"] == "phase11_authorization_receipt_v1"
+    assert receipt["decision"] == "deny"
+    assert receipt["reviewer"] == "chat_user"
+    assert receipt["reviewed_package_sha256"] == package["package_sha256"]
+    assert receipt["dispatch_token"] is None
+    assert set(receipt["denied_campaign_ids"]) == {
+        "gb46-controlled", "bb72-controlled", "gb46-source", "bb72-source",
+    }
+    _api().validate_phase11_dispatch_package(ROOT, stored)
+
+
+def test_record_authorization_ineligible_allow_request_is_sealed_as_deny(tmp_path: Path) -> None:
+    """A resume request cannot turn a package with failed gates into an allow."""
+    package_path = tmp_path / "authorization.json"
+    package_path.write_bytes((ROOT / "data/results/phase11-production-authorization.json").read_bytes())
+    package = json.loads(package_path.read_text(encoding="utf-8"))
+
+    result = subprocess.run(
+        [
+            sys.executable, "scripts/run_phase11_controlled.py", "record-authorization",
+            "--package", str(package_path), "--decision", "authorize_exact_manifests",
+            "--reviewer", "chat_user", "--reason", "Attempt an exact manifest review.",
+            "--reviewed-package-sha256", package["package_sha256"],
+            "--approved-manifest-sha256", package["calibrations"][0]["manifest_sha256"],
+        ],
+        cwd=ROOT, text=True, capture_output=True, check=False,
+    )
+
+    assert result.returncode == 0, result.stdout
+    receipt = json.loads(package_path.read_text(encoding="utf-8"))["receipt"]
+    assert receipt["decision"] == "deny"
+    assert receipt["approved_manifest_sha256s"] == []
+    assert "authorization_request_ineligible_manifest" in receipt["reasons"]
+    assert receipt["dispatch_token"] is None
