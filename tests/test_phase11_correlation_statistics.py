@@ -110,3 +110,34 @@ def test_fixed_marginal_sweep_rejects_overlapping_point_samples() -> None:
             design_path=DESIGN,
             point_pairs={**rows, "higher_y": (duplicate, *rows["higher_y"][1:])},
         )
+
+
+def test_sizing_receipt_is_deterministic_and_binds_frozen_inputs() -> None:
+    api = importlib.import_module("bp_registry.campaigns.sizing")
+    assert hasattr(api, "calibrate_paired_sweep_design"), (
+        "campaign sizing must provide a fixed-marginal paired-sweep preflight receipt"
+    )
+    calibrate = api.calibrate_paired_sweep_design
+    pilot = "3" * 64
+    first = calibrate(design_path=DESIGN, pilot_evidence_identity=pilot)
+    second = calibrate(design_path=DESIGN, pilot_evidence_identity=pilot)
+    assert first.receipt_sha256 == second.receipt_sha256
+    assert first.design_sha256 == sha256(DESIGN.read_bytes()).hexdigest()
+    assert first.paired_design.max_pairs == 5_000
+    assert first.paired_sizing.status in {"powered", "blocked_precision"}
+    assert first.stopping_rule == "fixed paired count per point; no comparison outcome can change sizing"
+
+
+def test_sizing_rejects_empty_duplicate_and_partial_pilot_pairs() -> None:
+    from bp_registry.campaigns.sizing import calibrate_paired_sweep_design
+
+    with pytest.raises(ValueError, match="pilot"):
+        calibrate_paired_sweep_design(
+            design_path=DESIGN, pilot_evidence_identity="3" * 64, pilot_pairs={},
+        )
+    rows = _hand_counted_rows()
+    with pytest.raises(ValueError, match="disjoint"):
+        calibrate_paired_sweep_design(
+            design_path=DESIGN, pilot_evidence_identity="3" * 64,
+            pilot_pairs={**rows, "higher_y": (rows["lower_y"][0], *rows["higher_y"][1:])},
+        )
