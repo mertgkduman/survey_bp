@@ -78,3 +78,19 @@ def test_gb46_empty_shard_is_explicitly_incomplete(tmp_path: Path) -> None:
     )
     assert result.returncode == 0, result.stderr
     assert '"assessment_status": "incomplete_shard"' in result.stdout
+
+
+def test_bb72_tracer_preflight_binds_artifact_provenance_and_qualifications() -> None:
+    """The second-code tracer retains source limits as qualified metadata."""
+    from bp_registry.campaigns.controlled_execution import preflight_phase11_controlled_design
+
+    receipt = preflight_phase11_controlled_design(
+        root=ROOT, design_path=ROOT / "data/studies/phase11-bb72-joint-separate.json",
+    )
+
+    assert receipt["code_id"] == "BB72"
+    assert receipt["code_artifact_sha256"]
+    assert receipt["code_provenance_sha256"]
+    assert receipt["distance_qualification"] == "source_reported_distance_6_not_platform_verified"
+    assert receipt["logical_operator_qualification"] == "project_derived_logicals_not_independent_distance_verification"
+    assert receipt["publication_authorization"] == "deny"
