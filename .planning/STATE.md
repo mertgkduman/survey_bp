@@ -201,9 +201,6 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - [Phase 10]: Retained the 256-shot GB46 p=0.05 seed-10 all-path ledger as canonical_adaptation mechanism evidence; native 160/10 remains aggregate-only with unavailable matched-shot identity.
 - [Phase 10]: Full 256-shot decoder replay exited 0 and byte-matched all retained events; the bounded mechanism evidence remains `not_assessed` for curve reproduction or ranking.
 - [Phase 11]: Figure 2 GB46 aSCED targets remain blocked_metadata until reviewed digitization and native execution evidence exist.
-- [Phase 11]: Figure 2 GB46 aSCED targets remain blocked_metadata until reviewed digitization and native execution evidence exist.
-- [Phase 11]: Ordinary and overcomplete aSCED source members remain separately receipted; canonical adaptation fidelity is not promoted by target agreement.
-- [Phase 11]: Ordinary and overcomplete aSCED source members remain separately receipted; canonical adaptation fidelity is not promoted by target agreement.
 - [Phase 11]: Ordinary and overcomplete aSCED source members remain separately receipted; canonical adaptation fidelity is not promoted by target agreement.
 
 ### Pending Todos
