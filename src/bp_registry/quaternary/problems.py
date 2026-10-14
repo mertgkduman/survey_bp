@@ -10,6 +10,7 @@ from typing import Literal
 import numpy as np
 
 from ..canonical.lineage import LineageEdge, LineageId
+from ..code_constructions import derive_css_logicals
 from ..css import CssCode, gf2_rank, semantic_sha256 as css_semantic_sha256
 from .algebra import Pauli, syndrome, to_symplectic
 
@@ -239,10 +240,72 @@ def compile_css_artifact(code: CssCode, *, source_artifact_identity: str | None 
     )
 
 
+def build_qbpgd_a5_css_artifact() -> tuple[CssCode, dict[str, object]]:
+    """Rebuild the A5 generalized-bicycle code from its published polynomials.
+
+    The source reports the distance interval; this constructor only certifies
+    the binary matrix algebra and the resulting ``[[180, 10]]`` dimensions.
+    """
+    l = 90
+    a_exponents = (0, 28, 80, 89)
+    b_exponents = (0, 2, 21, 25)
+    identity = np.eye(l, dtype=np.uint8)
+
+    def circulant(exponents: tuple[int, ...]) -> np.ndarray:
+        result = np.zeros((l, l), dtype=np.uint8)
+        for exponent in exponents:
+            result ^= np.roll(identity, exponent, axis=1)
+        return result
+
+    a, b = circulant(a_exponents), circulant(b_exponents)
+    hx = np.hstack((a, b))
+    hz = np.hstack((b.T, a.T))
+    lx, lz = derive_css_logicals(hx, hz)
+    css = CssCode(hx, hz, lx, lz).validate()
+    hx_rank, hz_rank = gf2_rank(css.hx), gf2_rank(css.hz)
+    receipt: dict[str, object] = {
+        "construction": {
+            "l": l,
+            "a_exponents": list(a_exponents),
+            "b_exponents": list(b_exponents),
+            "circulant_convention": "row_i_column_(i+exponent)_mod_l",
+        },
+        "checks": {
+            "hx_rank": hx_rank,
+            "hz_rank": hz_rank,
+            "commutes": not bool(np.any((css.hx.astype(np.int64) @ css.hz.astype(np.int64).T) % 2)),
+            "claimed_parameters": {"n": css.n, "k": css.k},
+        },
+        "distance": {
+            "status": "source_reported_bounds",
+            "source_reported": "15<=d<=18",
+            "independently_verified": False,
+        },
+        "artifact": {
+            "semantic_sha256": css_semantic_sha256(css),
+            "matrix_sha256": {
+                "hx": sha256(css.hx.tobytes()).hexdigest(),
+                "hz": sha256(css.hz.tobytes()).hexdigest(),
+            },
+        },
+    }
+    return css, receipt
+
+
+def construct_qbpgd_a5_css() -> tuple[PauliCode, dict[str, object]]:
+    """Compile the checked A5 CSS artifact for the quaternary execution path."""
+    css, receipt = build_qbpgd_a5_css_artifact()
+    code = compile_css_artifact(css, source_artifact_identity="yao-2023-a5-polynomial-circulant-v1")
+    receipt["artifact"]["pauli_semantic_sha256"] = code.semantic_sha256  # type: ignore[index]
+    return code, receipt
+
+
 __all__ = [
     "PauliCandidate",
     "PauliCode",
     "QuaternaryOriginalProblem",
     "QuaternaryWorkingProblem",
     "compile_css_artifact",
+    "build_qbpgd_a5_css_artifact",
+    "construct_qbpgd_a5_css",
 ]
