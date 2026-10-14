@@ -1,0 +1,21 @@
+{
+  "accounting_partition": {"account": null, "partition": null, "status": "unavailable"},
+  "calibrations": [
+    {"bounded_evidence_status": "qualified_public_calibration_lifecycle", "code_artifact_sha256": "4bd60bc22ccda388780ad2ad2a29b63143b3f024e599e57ef5bcb983f51cb9b2", "code_id": "GB46", "code_provenance_sha256": null, "manifest_path": "data/studies/phase11-gb46-joint-separate.json", "manifest_sha256": "5b2f439f7d66086717bc5fe159fe85f1f873eec4349775d1572ca75334c18de4", "runtime_work_status": "typed_native_units_and_wall_boundary_required_for_dispatch"},
+    {"bounded_evidence_status": "qualified_public_calibration_lifecycle", "code_artifact_sha256": "8cb3af882fecf8d16ff3b84c2c69939cdafde122fd48ab0d87a7e113d4e91227", "code_id": "BB72", "code_provenance_sha256": "ad87b60e8072b262e5ce8284841dcfc22e49eb94ae6c0633876f4e85299d73c0", "manifest_path": "data/studies/phase11-bb72-joint-separate.json", "manifest_sha256": "db6cbc41ef296bf87310ca0d17b05b7efa02636b31f94f3ead56962ef799baf5", "runtime_work_status": "typed_native_units_and_wall_boundary_required_for_dispatch"}
+  ],
+  "forecast": {"predicted_memory_bytes": null, "predicted_typed_work": null, "predicted_wall_time_ns": null, "status": "blocked_no_persisted_profile"},
+  "package_sha256": "4f53f8ce6af2961831830105dde34b4050632751960c9e8c475e9cc7ac16334a",
+  "precision_feasibility": {"cap_pairs_per_point": 5000, "receipt_sha256": "4e413039b888f2dd26982bf7b6ddea428ee6cf5419a326e6bda0653199e3efd2", "required_pairs_per_point": 2454, "status": "powered"},
+  "proposal_id": "phase11-two-code-production-v1",
+  "quota_cost": {"allocation": null, "cost_estimate": null, "status": "unavailable"},
+  "receipt": {"authorization_contract": "AuthorizationReceiptV1 decision literal retained; Plan 11-11 human gate required for allow", "decision": "deny", "dispatch_token": null, "reasons": ["missing_site_ceiling:max_cpu_time_ns", "missing_site_ceiling:max_wall_time_ns", "missing_site_ceiling:max_storage_bytes", "missing_site_ceiling:max_shard_bytes", "missing_site_ceiling:max_replay_time_ns", "missing_site_ceiling:max_peak_memory_bytes", "missing_site_ceiling:max_scheduler_cost_ns", "missing_accounting_partition_evidence", "missing_quota_or_cost_evidence", "source_route_ineligible", "missing_persisted_calibration_profile"]},
+  "requested_campaigns": [
+    {"campaign_id": "gb46-controlled", "code_id": "GB46", "lane": "controlled", "pairs_per_point": 2454, "source_eligible": false},
+    {"campaign_id": "bb72-controlled", "code_id": "BB72", "lane": "controlled", "pairs_per_point": 2454, "source_eligible": false},
+    {"campaign_id": "gb46-source", "code_id": "GB46", "lane": "source", "pairs_per_point": null, "source_eligible": false},
+    {"campaign_id": "bb72-source", "code_id": "BB72", "lane": "source", "pairs_per_point": null, "source_eligible": false}
+  ],
+  "schema": "phase11_dispatch_proposal_v1",
+  "site_capability": {"installed_slurm_clients": false, "max_cpu_time_ns": null, "max_peak_memory_bytes": null, "max_replay_time_ns": null, "max_scheduler_cost_ns": null, "max_shard_bytes": null, "max_storage_bytes": null, "max_wall_time_ns": null}
+}

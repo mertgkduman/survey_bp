@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, fields
 from hashlib import sha256
 import json
+from pathlib import Path
 from types import MappingProxyType
 from typing import Literal, Mapping
 
@@ -24,6 +25,117 @@ _CEILING_FIELDS = (
     "max_cpu_time_ns", "max_wall_time_ns", "max_storage_bytes", "max_shard_bytes",
     "max_replay_time_ns", "max_peak_memory_bytes", "max_scheduler_cost_ns",
 )
+
+
+@dataclass(frozen=True, slots=True)
+class Phase11DispatchProposalV1:
+    """A review package that can describe a production request but never authorize it.
+
+    The ordinary Phase 8 site and authorization types remain the source of
+    capability semantics.  This wrapper adds Phase 11's two-code calibration,
+    source-route, and precision receipts while hard-coding the separation
+    between package preparation and the Plan 11-11 human decision.
+    """
+
+    payload: Mapping[str, object]
+
+    def __post_init__(self) -> None:
+        receipt = self.payload.get("receipt")
+        if not isinstance(receipt, Mapping) or receipt.get("decision") != "deny" or receipt.get("dispatch_token") is not None:
+            raise ValueError("Phase 11 proposal must retain a default-deny receipt without a dispatch token")
+
+    def as_evidence(self) -> dict[str, object]:
+        return dict(self.payload)
+
+
+def _phase11_path(root: Path, relative: str) -> Path:
+    path = (root / relative).resolve(strict=True)
+    if root not in (path, *path.parents) or path.is_symlink() or not path.is_file():
+        raise ValueError("Phase 11 package references a regular file beneath the project root")
+    return path
+
+
+def build_phase11_dispatch_package(root: Path) -> dict[str, object]:
+    """Build the deterministic two-code package for the blocking human gate.
+
+    It records present calibration and mathematical precision facts while
+    making missing scheduler ceilings, allocation accounting, quota/cost, and
+    source eligibility explicit.  No installed scheduler client can change the
+    receipt because client discovery is not capacity evidence.
+    """
+    root = root.resolve(strict=True)
+    from .controlled_execution import preflight_phase11_controlled_design
+    from .sizing import calibrate_paired_sweep_design
+
+    calibration_rows: list[dict[str, object]] = []
+    for code_id, relative in (
+        ("GB46", "data/studies/phase11-gb46-joint-separate.json"),
+        ("BB72", "data/studies/phase11-bb72-joint-separate.json"),
+    ):
+        manifest = _phase11_path(root, relative)
+        raw = manifest.read_bytes()
+        preflight = preflight_phase11_controlled_design(root=root, design_path=manifest)
+        if preflight["code_id"] != code_id:
+            raise ValueError("Phase 11 calibration manifest code identity differs from its proposal row")
+        calibration_rows.append({
+            "code_id": code_id, "manifest_path": relative, "manifest_sha256": sha256(raw).hexdigest(),
+            "code_artifact_sha256": preflight["code_artifact_sha256"],
+            "code_provenance_sha256": preflight.get("code_provenance_sha256"),
+            "bounded_evidence_status": "qualified_public_calibration_lifecycle",
+            "runtime_work_status": "typed_native_units_and_wall_boundary_required_for_dispatch",
+        })
+    design_path = _phase11_path(root, "data/studies/phase11-fixed-marginal-design.json")
+    design = json.loads(design_path.read_bytes())
+    sizing = calibrate_paired_sweep_design(
+        design_path=str(design_path), pilot_evidence_identity=design["sizing"]["pilot_evidence_identity"],
+    )
+    reasons = [
+        "missing_site_ceiling:max_cpu_time_ns", "missing_site_ceiling:max_wall_time_ns",
+        "missing_site_ceiling:max_storage_bytes", "missing_site_ceiling:max_shard_bytes",
+        "missing_site_ceiling:max_replay_time_ns", "missing_site_ceiling:max_peak_memory_bytes",
+        "missing_site_ceiling:max_scheduler_cost_ns", "missing_accounting_partition_evidence",
+        "missing_quota_or_cost_evidence", "source_route_ineligible", "missing_persisted_calibration_profile",
+    ]
+    payload: dict[str, object] = {
+        "schema": "phase11_dispatch_proposal_v1", "proposal_id": "phase11-two-code-production-v1",
+        "calibrations": calibration_rows,
+        "requested_campaigns": [
+            {"campaign_id": "gb46-controlled", "lane": "controlled", "code_id": "GB46", "pairs_per_point": sizing.proposed_pairs_per_point, "source_eligible": False},
+            {"campaign_id": "bb72-controlled", "lane": "controlled", "code_id": "BB72", "pairs_per_point": sizing.proposed_pairs_per_point, "source_eligible": False},
+            {"campaign_id": "gb46-source", "lane": "source", "code_id": "GB46", "pairs_per_point": None, "source_eligible": False},
+            {"campaign_id": "bb72-source", "lane": "source", "code_id": "BB72", "pairs_per_point": None, "source_eligible": False},
+        ],
+        "precision_feasibility": {"status": sizing.paired_sizing.status, "required_pairs_per_point": sizing.proposed_pairs_per_point,
+                                  "cap_pairs_per_point": sizing.capped_pairs_per_point, "receipt_sha256": sizing.receipt_sha256},
+        "site_capability": {"installed_slurm_clients": False, **{field: None for field in _CEILING_FIELDS}},
+        "accounting_partition": {"status": "unavailable", "account": None, "partition": None},
+        "quota_cost": {"status": "unavailable", "allocation": None, "cost_estimate": None},
+        "forecast": {"status": "blocked_no_persisted_profile", "predicted_memory_bytes": None,
+                     "predicted_wall_time_ns": None, "predicted_typed_work": None},
+        "receipt": {"decision": "deny", "dispatch_token": None, "reasons": reasons,
+                    "authorization_contract": "AuthorizationReceiptV1 decision literal retained; Plan 11-11 human gate required for allow"},
+    }
+    payload["package_sha256"] = _digest({key: value for key, value in payload.items() if key != "package_sha256"})
+    return Phase11DispatchProposalV1(payload).as_evidence()
+
+
+def validate_phase11_dispatch_package(root: Path, package: Mapping[str, object]) -> None:
+    """Reject stale, client-only, or self-authorizing Phase 11 package bytes."""
+    if not isinstance(package, Mapping):
+        raise ValueError("Phase 11 dispatch package must be a mapping")
+    receipt = package.get("receipt")
+    if not isinstance(receipt, Mapping) or receipt.get("decision") != "deny" or receipt.get("dispatch_token") is not None:
+        raise ValueError("Phase 11 dispatch receipt must remain deny without a dispatch token")
+    expected = build_phase11_dispatch_package(root)
+    if package == expected:
+        return
+    site = package.get("site_capability")
+    if isinstance(site, Mapping) and site != expected["site_capability"]:
+        raise ValueError("site capability differs from the unavailable measured-evidence package")
+    calibrations = package.get("calibrations")
+    if calibrations != expected["calibrations"]:
+        raise ValueError("calibration identity is stale or differs from the frozen package")
+    raise ValueError("Phase 11 dispatch package differs from its default-deny evidence")
 
 
 def _digest(value: object) -> str:
