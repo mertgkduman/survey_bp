@@ -835,7 +835,26 @@ def _phase11_load_pairs(*, output_root: Path, preflight: dict[str, Any]) -> dict
     return pairs
 
 
-def run_phase11_controlled(*, root: Path, design_path: Path, output_root: Path, resume: bool = False) -> dict[str, Any]:
+def _phase11_shard_ranges(preflight: dict[str, Any], shard: tuple[str, int, int] | None) -> dict[str, tuple[int, int]]:
+    declared = {point: tuple(bounds) for point, bounds in preflight["sample_ranges"].items()}
+    if shard is None:
+        return declared
+    point_id, lower, upper = shard
+    if point_id not in declared or type(lower) is not int or type(upper) is not int:
+        raise ValueError("controlled shard must name one declared point and integer range")
+    start, end = declared[point_id]
+    # An inverted in-bounds interval is a valid empty shard; it writes no pair.
+    if lower > upper:
+        if not (start <= upper + 1 <= lower <= end + 1):
+            raise ValueError("empty controlled shard must lie at a declared range boundary")
+        return {point_id: (lower, upper)}
+    if not (start <= lower <= upper <= end):
+        raise ValueError("controlled shard escapes its declared deterministic range")
+    return {point_id: (lower, upper)}
+
+
+def run_phase11_controlled(*, root: Path, design_path: Path, output_root: Path, resume: bool = False,
+                           shard: tuple[str, int, int] | None = None) -> dict[str, Any]:
     """Run or resume only the predeclared bounded GB46 calibration pairs."""
     from .statistics import load_fixed_marginal_design
     from ..quaternary.asced import parse_pinned_gb46_css
@@ -851,9 +870,13 @@ def run_phase11_controlled(*, root: Path, design_path: Path, output_root: Path, 
     rows = {row.point_id: row for row in design.rows}
     limits = json.loads(design_path.read_text(encoding="utf-8"))["calibration_limits"]
     completed = 0
+    shard_ranges = _phase11_shard_ranges(preflight, shard)
     for point_id in preflight["point_order"]:
+        if point_id not in shard_ranges:
+            continue
         probabilities = rows[point_id].probabilities
-        for sample_id in range(*[preflight["sample_ranges"][point_id][0], preflight["sample_ranges"][point_id][1] + 1]):
+        lower, upper = shard_ranges[point_id]
+        for sample_id in range(lower, upper + 1):
             path = _phase11_pair_path(destination, point_id, sample_id)
             if path.exists() or path.is_symlink():
                 if not resume:
@@ -873,6 +896,12 @@ def run_phase11_controlled(*, root: Path, design_path: Path, output_root: Path, 
             )
             _publish_exact(path, pair.primitive_bytes() + b"\n")
             completed += 1
+    # A partial shard is deliberately not assessed or presented as complete.
+    if set(shard_ranges) != set(preflight["point_order"]) or any(
+        list(shard_ranges[point]) != preflight["sample_ranges"][point] for point in shard_ranges
+    ):
+        return {"schema": "phase11_controlled_shard_v1", "new_pairs": completed,
+                "shard": shard, "assessment_status": "incomplete_shard", "publication_authorization": "deny"}
     verified = verify_phase11_controlled(root=root, design_path=design_path, output_root=destination)
     return {"schema": "phase11_controlled_run_v1", "new_pairs": completed, **verified}
 
@@ -889,8 +918,21 @@ def verify_phase11_controlled(*, root: Path, design_path: Path, output_root: Pat
     actual = sum(len(value) for value in pairs.values())
     if actual != expected:
         raise ValueError("controlled output lacks one or more complete matched pairs")
+    failures = {"joint": 0, "separate": 0}
+    work: dict[str, int] = {}
+    terminals: dict[str, int] = {}
+    for point_pairs in pairs.values():
+        for pair in point_pairs:
+            for arm in (pair.joint, pair.separate):
+                failures[arm.arm_id] += int(arm.all_shot == "failure")
+                terminals[f"{arm.arm_id}:{arm.terminal_status}"] = terminals.get(f"{arm.arm_id}:{arm.terminal_status}", 0) + 1
+                for name, amount in arm.work.items():
+                    key = f"{arm.arm_id}:{name}"
+                    work[key] = work.get(key, 0) + amount
     return {"schema": "phase11_controlled_verify_v1", "design_sha256": preflight["design_sha256"],
-            "complete_pairs": actual, "publication_authorization": "deny"}
+            "complete_pairs": actual, "paired_denominators": {point: len(values) for point, values in pairs.items()},
+            "arm_failures": failures, "terminal_status_counts": dict(sorted(terminals.items())),
+            "arm_work": dict(sorted(work.items())), "publication_authorization": "deny"}
 
 
 def replay_phase11_controlled(*, root: Path, design_path: Path, output_root: Path) -> dict[str, Any]:

@@ -23,10 +23,11 @@ DEFAULT_DESIGN = ROOT / "data/studies/phase11-gb46-joint-separate.json"
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
-    for name in ("preflight", "run", "resume", "replay", "verify", "assess"):
+    for name in ("preflight", "run", "resume", "merge", "replay", "verify", "assess"):
         command = commands.add_parser(name)
         command.add_argument("--design", type=Path, default=DEFAULT_DESIGN)
         command.add_argument("--output-root", type=Path, default=ROOT / "data/results/phase11-gb46-controlled-calibration")
+        command.add_argument("--shard", metavar="POINT:START:END", help="one declared inclusive range; inverted bounds are an empty shard")
     return parser
 
 
@@ -34,10 +35,16 @@ def main(argv: list[str] | None = None) -> None:
     args = _parser().parse_args(argv)
     try:
         receipt = preflight_phase11_controlled_design(root=ROOT, design_path=args.design)
+        shard = None
+        if args.shard is not None:
+            point, start, end = args.shard.split(":", 2)
+            shard = (point, int(start), int(end))
         if args.command == "run":
-            receipt = run_phase11_controlled(root=ROOT, design_path=args.design, output_root=args.output_root)
+            receipt = run_phase11_controlled(root=ROOT, design_path=args.design, output_root=args.output_root, shard=shard)
         elif args.command == "resume":
-            receipt = run_phase11_controlled(root=ROOT, design_path=args.design, output_root=args.output_root, resume=True)
+            receipt = run_phase11_controlled(root=ROOT, design_path=args.design, output_root=args.output_root, resume=True, shard=shard)
+        elif args.command == "merge":
+            receipt = verify_phase11_controlled(root=ROOT, design_path=args.design, output_root=args.output_root)
         elif args.command == "replay":
             receipt = replay_phase11_controlled(root=ROOT, design_path=args.design, output_root=args.output_root)
         elif args.command == "verify":

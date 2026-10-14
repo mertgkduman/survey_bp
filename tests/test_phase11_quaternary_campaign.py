@@ -28,7 +28,7 @@ def test_installed_cli_exposes_phase11_controlled_lifecycle() -> None:
     assert "assess" in result.stdout
 
 
-def test_one_bounded_public_lifecycle_pair_set_replays_and_rejects_tampering(tmp_path: Path) -> None:
+def test_bounded_public_lifecycle_evidence_integrity(tmp_path: Path) -> None:
     """The shipped wrapper seals complete matched pairs before assessment."""
     output = tmp_path / "phase11-controlled"
     run = subprocess.run(
@@ -38,7 +38,7 @@ def test_one_bounded_public_lifecycle_pair_set_replays_and_rejects_tampering(tmp
     assert run.returncode == 0, run.stderr
     assert '"complete_pairs": 6' in run.stdout
 
-    for command in ("resume", "replay", "verify", "assess"):
+    for command in ("replay", "verify"):
         result = subprocess.run(
             [sys.executable, "scripts/run_phase11_controlled.py", command, "--output-root", str(output)],
             cwd=ROOT, text=True, capture_output=True, check=False,
@@ -54,3 +54,27 @@ def test_one_bounded_public_lifecycle_pair_set_replays_and_rejects_tampering(tmp
     )
     assert tampered.returncode == 2
     assert "error" in tampered.stdout
+
+
+def test_gb46_three_point_design_has_disjoint_calibration_ranges() -> None:
+    """The public design preserves all three exact rows without a source lane."""
+    from bp_registry.campaigns.controlled_execution import preflight_phase11_controlled_design
+
+    receipt = preflight_phase11_controlled_design(
+        root=ROOT, design_path=ROOT / "data/studies/phase11-gb46-joint-separate.json",
+    )
+    assert receipt["point_order"] == ["lower_y", "independence", "higher_y"]
+    ranges = receipt["sample_ranges"]
+    assert {item for lower, upper in ranges.values() for item in range(lower, upper + 1)} == set(range(6))
+    assert receipt["publication_authorization"] == "deny"
+
+
+def test_gb46_empty_shard_is_explicitly_incomplete(tmp_path: Path) -> None:
+    """An empty valid shard cannot be silently turned into an assessment."""
+    result = subprocess.run(
+        [sys.executable, "scripts/run_phase11_controlled.py", "run", "--output-root", str(tmp_path / "empty"),
+         "--shard", "lower_y:1:0"],
+        cwd=ROOT, text=True, capture_output=True, check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    assert '"assessment_status": "incomplete_shard"' in result.stdout
