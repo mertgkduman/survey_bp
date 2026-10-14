@@ -497,6 +497,9 @@ def run_joint_separate_unit(
     """
     if not isinstance(materialized_sample, MaterializedPhysicalSampleV1):
         raise ValueError("matched comparison requires a validated materialized physical sample")
+    materialized_sample = MaterializedPhysicalSampleV1.model_validate(
+        materialized_sample.model_dump(mode="json", by_alias=True)
+    )
     validated = code.validate()
     if len(joint_probabilities) != validated.n or any(len(row) != 4 for row in joint_probabilities):
         raise ValueError("joint probabilities must provide one I,X,Y,Z row per code qubit")

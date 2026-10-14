@@ -1074,6 +1074,11 @@ class PauliMatchedPairV1(StrictModel):
     components: tuple[BinaryComponentTerminalV1, BinaryComponentTerminalV1]
     record_sha256: str = Field(pattern=_SHA256)
 
+    @field_validator("decision_ids", "components", mode="before")
+    @classmethod
+    def tuple_pair_members(cls, value: Any) -> Any:
+        return tuple(value) if isinstance(value, list) else value
+
     @model_validator(mode="after")
     def complete_and_replayable_pair(self) -> "PauliMatchedPairV1":
         if self.decision_ids != ("D-05", "D-06", "D-08"):

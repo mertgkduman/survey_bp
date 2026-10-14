@@ -6,6 +6,7 @@ import base64
 from hashlib import sha256
 
 import numpy as np
+import pytest
 
 from bp_registry.campaigns.contracts import MaterializedPhysicalSampleV1, canonical_json_bytes
 from bp_registry.campaigns.controlled_execution import (
@@ -77,3 +78,86 @@ def test_tracer_identical_sample_marginals_and_hidden_truth_boundary():
     assert [item.prior for item in binary_inputs] == [(0.06, 0.06), (0.06, 0.06)]
     assert record.joint.evaluation["outcome"] == "exact"
     assert record.separate.evaluation["outcome"] == "exact"
+
+
+@pytest.mark.parametrize("x_status,z_status", [
+    ("nonconvergence", "exact"), ("exact", "nonconvergence"), ("nonconvergence", "nonconvergence"),
+])
+def test_partial_nonconvergence_keeps_components_and_all_shot_pair(x_status: str, z_status: str):
+    code, sample = _sample()
+
+    def joint(_: JointArmInputV1) -> JointArmResultV1:
+        return JointArmResultV1(candidate_x=(1, 0), candidate_z=(0, 1), terminal_status="exact", work={"sweeps": 1})
+
+    def binary(input_: BinaryArmInputV1) -> BinaryArmResultV1:
+        status = x_status if input_.component == "X" else z_status
+        candidate = (1, 0) if input_.component == "X" else (0, 1)
+        return BinaryArmResultV1(candidate=candidate, terminal_status=status, iterations=4, work={"sweeps": 4})
+
+    record = run_joint_separate_unit(
+        code=code, materialized_sample=sample,
+        joint_probabilities=((0.9, 0.04, 0.02, 0.04),) * 2,
+        joint_decoder=joint, binary_decoder=binary,
+    )
+
+    assert tuple(component.terminal_status for component in record.components) == (x_status, z_status)
+    assert record.separate.candidate_x == (1, 0)
+    assert record.separate.candidate_z == (0, 1)
+    assert record.separate.terminal_status == "nonconvergence"
+    assert record.separate.evaluation["outcome"] == "exact"
+
+
+def test_replay_and_tamper_reject_changed_evidence():
+    code, sample = _sample()
+
+    def joint(_: JointArmInputV1) -> JointArmResultV1:
+        return JointArmResultV1(candidate_x=(1, 0), candidate_z=(0, 1), terminal_status="exact", work={"sweeps": 1})
+
+    def binary(input_: BinaryArmInputV1) -> BinaryArmResultV1:
+        return BinaryArmResultV1(candidate=(1, 0) if input_.component == "X" else (0, 1), terminal_status="exact", work={"sweeps": 1})
+
+    record = run_joint_separate_unit(
+        code=code, materialized_sample=sample,
+        joint_probabilities=((0.9, 0.04, 0.02, 0.04),) * 2,
+        joint_decoder=joint, binary_decoder=binary,
+    )
+    assert record.verify_replay().record_sha256 == record.record_sha256
+    tampered = record.model_dump(mode="json", by_alias=True)
+    tampered["components"][0]["candidate"] = [0, 0]
+    with pytest.raises(ValueError, match="digest"):
+        type(record).model_validate(tampered)
+    changed_sample = sample.model_copy(update={"x_bytes_b64": base64.b64encode(b"\0\0").decode("ascii")})
+    with pytest.raises(ValueError, match="physical error digest"):
+        run_joint_separate_unit(
+            code=code, materialized_sample=changed_sample,
+            joint_probabilities=((0.9, 0.04, 0.02, 0.04),) * 2,
+            joint_decoder=joint, binary_decoder=binary,
+        )
+
+
+def test_duplicate_or_partial_pair_evidence_is_rejected():
+    code, sample = _sample()
+
+    def joint(_: JointArmInputV1) -> JointArmResultV1:
+        return JointArmResultV1(candidate_x=(1, 0), candidate_z=(0, 1), terminal_status="exact", work={"sweeps": 1})
+
+    def binary(input_: BinaryArmInputV1) -> BinaryArmResultV1:
+        return BinaryArmResultV1(candidate=(1, 0) if input_.component == "X" else (0, 1), terminal_status="exact", work={"sweeps": 1})
+
+    record = run_joint_separate_unit(
+        code=code, materialized_sample=sample,
+        joint_probabilities=((0.9, 0.04, 0.02, 0.04),) * 2,
+        joint_decoder=joint, binary_decoder=binary,
+    )
+    duplicate = record.model_dump(mode="json", by_alias=True)
+    duplicate["separate"]["arm_id"] = "joint"
+    with pytest.raises(ValueError, match="exactly one joint"):
+        type(record).model_validate(duplicate)
+    swapped = record.model_dump(mode="json", by_alias=True)
+    swapped["components"] = list(reversed(swapped["components"]))
+    with pytest.raises(ValueError, match="ordered X then Z"):
+        type(record).model_validate(swapped)
+    partial = record.model_dump(mode="json", by_alias=True)
+    partial.pop("separate")
+    with pytest.raises(ValueError, match="Field required"):
+        type(record).model_validate(partial)
