@@ -32,7 +32,7 @@ decisions:
   - "Joint BP4 and separate binary arms report native named work beside callback-wall runtime without cross-unit conversion."
   - "The Phase 11 package is immutable deny-only: missing site capacity, accounting, quota/cost, source eligibility, or persisted profiles prevents a dispatch token."
 metrics:
-  duration: 31m
+  duration: 20m 32s
   completed: 2026-10-14
 status: complete
 actuals:
