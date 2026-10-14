@@ -453,6 +453,8 @@ class JointArmResultV1(StrictModel):
     ]
     iterations: int = 0
     work: dict[str, int]
+    runtime_ns: int = 0
+    timing_boundary: Literal["decoder_callback_wall_v1"] = "decoder_callback_wall_v1"
 
 
 class BinaryArmResultV1(StrictModel):
@@ -464,6 +466,8 @@ class BinaryArmResultV1(StrictModel):
     ]
     iterations: int = 0
     work: dict[str, int]
+    runtime_ns: int = 0
+    timing_boundary: Literal["decoder_callback_wall_v1"] = "decoder_callback_wall_v1"
 
 
 def canonical_binary_materialized_decoder(
@@ -486,6 +490,7 @@ def canonical_binary_materialized_decoder(
         from ..runner import CanonicalMaterializedRunV1, run_canonical_materialized_one
 
         ledger_path = ledger_directory / f"{input_.component.lower()}-events.jsonl"
+        started = perf_counter_ns()
         result = run_canonical_materialized_one(
             manifest_paths[input_.component], sample=_shot_from_materialized(materialized_sample),
             materialized_sample_sha256=input_.materialized_sample_sha256, ledger_path=ledger_path,
@@ -493,7 +498,7 @@ def canonical_binary_materialized_decoder(
         if isinstance(result, CanonicalMaterializedRunV1):
             if result.status == "interrupted":
                 return BinaryArmResultV1(candidate=None, terminal_status="infrastructure_interruption", iterations=0,
-                                         work={"canonical_iterations": 0})
+                                         work={"canonical_iterations": 0}, runtime_ns=perf_counter_ns() - started)
             result = result.terminal
         if result is None:
             raise ValueError("canonical binary materialized runner returned no terminal result")
@@ -513,7 +518,7 @@ def canonical_binary_materialized_decoder(
         return BinaryArmResultV1(
             candidate=selected, terminal_status=status if selected is not None else "no_proposal",
             iterations=int(getattr(result, "iterations", 0)),
-            work={"canonical_iterations": int(getattr(result, "iterations", 0))},
+            work={"canonical_iterations": int(getattr(result, "iterations", 0))}, runtime_ns=perf_counter_ns() - started,
         )
 
     return decode
@@ -612,9 +617,11 @@ def run_joint_separate_unit(
             raise ValueError("matched comparison terminal work must be explicit nonnegative integers")
     components = (
         BinaryComponentTerminalV1(component="X", candidate=x_result.candidate, terminal_status=x_result.terminal_status,
-                                  iterations=x_result.iterations, work=x_result.work, syndrome_sha256=_syndrome_digest(expected_z)),
+                                  iterations=x_result.iterations, work=x_result.work, runtime_ns=x_result.runtime_ns,
+                                  timing_boundary=x_result.timing_boundary, syndrome_sha256=_syndrome_digest(expected_z)),
         BinaryComponentTerminalV1(component="Z", candidate=z_result.candidate, terminal_status=z_result.terminal_status,
-                                  iterations=z_result.iterations, work=z_result.work, syndrome_sha256=_syndrome_digest(expected_x)),
+                                  iterations=z_result.iterations, work=z_result.work, runtime_ns=z_result.runtime_ns,
+                                  timing_boundary=z_result.timing_boundary, syndrome_sha256=_syndrome_digest(expected_x)),
     )
     joint_evaluation = _arm_evaluation(code=validated, true_x=true_x, true_z=true_z,
                                        candidate_x=joint_result.candidate_x, candidate_z=joint_result.candidate_z)
@@ -625,7 +632,8 @@ def run_joint_separate_unit(
         candidate_x=joint_result.candidate_x, candidate_z=joint_result.candidate_z,
         terminal_status=(joint_result.terminal_status if joint_evaluation["outcome"] == "no_proposal" else joint_evaluation["outcome"]),
         all_shot=_all_shot(joint_result.terminal_status if joint_evaluation["outcome"] == "no_proposal" else joint_evaluation["outcome"]),
-        evaluation=joint_evaluation, work=dict(joint_result.work),
+        evaluation=joint_evaluation, work=dict(joint_result.work), runtime_ns=joint_result.runtime_ns,
+        timing_boundary=joint_result.timing_boundary,
     )
     separate_status = ("nonconvergence" if any(item.terminal_status == "nonconvergence" for item in components)
                        else separate_evaluation["outcome"])
@@ -634,6 +642,7 @@ def run_joint_separate_unit(
         candidate_x=x_result.candidate, candidate_z=z_result.candidate,
         terminal_status=separate_status, all_shot=_all_shot(separate_status), evaluation=separate_evaluation,
         work={f"{component.component.lower()}_{name}": amount for component in components for name, amount in component.work.items()},
+        runtime_ns=x_result.runtime_ns + z_result.runtime_ns, timing_boundary=x_result.timing_boundary,
     )
     unsigned = {
         "schema": "pauli_matched_pair_v1", "decision_ids": ("D-05", "D-06", "D-08"),
@@ -818,6 +827,7 @@ def _phase11_joint_decoder(code: Any, *, max_iterations: int, max_work: int) -> 
 
     checks = np.vstack((np.where(code.hx, 1, 0), np.where(code.hz, 3, 0))).astype(np.uint8)
     def decode(input_: JointArmInputV1) -> JointArmResultV1:
+        started = perf_counter_ns()
         problem = TracerPauliProblem(checks=checks, syndrome=np.asarray(input_.x_syndrome + input_.z_syndrome, dtype=np.uint8))
         candidate, _marginals, work, terminal = _decode(
             problem, channel=np.asarray(input_.probabilities, dtype=np.float64),
@@ -828,6 +838,7 @@ def _phase11_joint_decoder(code: Any, *, max_iterations: int, max_work: int) -> 
             candidate_z=tuple(int(value in (2, 3)) for value in candidate),
             terminal_status="exact" if terminal == "completed" else "nonconvergence",
             iterations=max_iterations if terminal == "max_iterations" else min(max_iterations, 1), work=work,
+            runtime_ns=perf_counter_ns() - started,
         )
     return decode
 
@@ -838,14 +849,15 @@ def _phase11_binary_decoder(code: Any, *, max_iterations: int) -> Callable[[Bina
 
     kernel = BinarySpaKernel()
     def decode(input_: BinaryArmInputV1) -> BinaryArmResultV1:
+        started = perf_counter_ns()
         matrix = code.hz if input_.component == "X" else code.hx
         prior = float(input_.prior[0])
         result = kernel.run(matrix, np.asarray(input_.syndrome, dtype=np.uint8), error_rate=prior, max_iterations=max_iterations)
         return BinaryArmResultV1(
             candidate=tuple(int(value) for value in result.candidate),
             terminal_status="exact" if result.converged else "nonconvergence",
-            iterations=result.iterations,
-            work={"canonical_spa_iterations": result.iterations},
+            iterations=result.iterations, work={"canonical_spa_iterations": result.iterations},
+            runtime_ns=perf_counter_ns() - started,
         )
     return decode
 
@@ -955,6 +967,9 @@ def verify_phase11_controlled(*, root: Path, design_path: Path, output_root: Pat
         raise ValueError("controlled output lacks one or more complete matched pairs")
     failures = {"joint": 0, "separate": 0}
     work: dict[str, int] = {}
+    arm_runtime_ns = {"joint": 0, "separate": 0}
+    component_runtime_ns = {"X": 0, "Z": 0}
+    timing_boundaries: set[str] = set()
     terminals: dict[str, int] = {}
     for point_pairs in pairs.values():
         for pair in point_pairs:
@@ -964,10 +979,23 @@ def verify_phase11_controlled(*, root: Path, design_path: Path, output_root: Pat
                 for name, amount in arm.work.items():
                     key = f"{arm.arm_id}:{name}"
                     work[key] = work.get(key, 0) + amount
+                if arm.runtime_ns is None or arm.timing_boundary is None:
+                    raise ValueError("controlled verification requires typed arm runtime evidence")
+                arm_runtime_ns[arm.arm_id] += arm.runtime_ns
+                timing_boundaries.add(arm.timing_boundary)
+            for component in pair.components:
+                if component.runtime_ns is None or component.timing_boundary is None:
+                    raise ValueError("controlled verification requires typed binary component runtime evidence")
+                component_runtime_ns[component.component] += component.runtime_ns
+                timing_boundaries.add(component.timing_boundary)
+    if timing_boundaries != {"decoder_callback_wall_v1"}:
+        raise ValueError("controlled verification requires one disclosed decoder timing boundary")
     return {"schema": "phase11_controlled_verify_v1", "design_sha256": preflight["design_sha256"],
             "complete_pairs": actual, "paired_denominators": {point: len(values) for point, values in pairs.items()},
             "arm_failures": failures, "terminal_status_counts": dict(sorted(terminals.items())),
-            "arm_work": dict(sorted(work.items())), "publication_authorization": "deny"}
+            "arm_work": dict(sorted(work.items())), "arm_runtime_ns": arm_runtime_ns,
+            "component_runtime_ns": component_runtime_ns, "timing_boundary": "decoder_callback_wall_v1",
+            "publication_authorization": "deny"}
 
 
 def replay_phase11_controlled(*, root: Path, design_path: Path, output_root: Path) -> dict[str, Any]:

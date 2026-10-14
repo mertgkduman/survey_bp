@@ -1015,6 +1015,8 @@ class BinaryComponentTerminalV1(StrictModel):
     ]
     iterations: int = Field(ge=0, le=_MAX_EVENTS)
     work: dict[str, int]
+    runtime_ns: int | None = Field(default=None, ge=0, le=2**63 - 1)
+    timing_boundary: Literal["decoder_callback_wall_v1"] | None = None
     syndrome_sha256: str = Field(pattern=_SHA256)
 
     @field_validator("candidate", mode="before")
@@ -1050,6 +1052,8 @@ class PauliMatchedArmV1(StrictModel):
     all_shot: Literal["success", "failure", "incomplete"]
     evaluation: dict[str, Any]
     work: dict[str, int]
+    runtime_ns: int | None = Field(default=None, ge=0, le=2**63 - 1)
+    timing_boundary: Literal["decoder_callback_wall_v1"] | None = None
 
     @field_validator("candidate_x", "candidate_z", mode="before")
     @classmethod
@@ -1093,6 +1097,23 @@ class PauliMatchedPairV1(StrictModel):
             raise ValueError("matched pair components must be ordered X then Z")
         unsigned = self.model_dump(mode="json", by_alias=True, exclude={"record_sha256"})
         expected = _digest("bp-registry-pauli-matched-pair-v1", canonical_json_bytes(unsigned))
+        runtime_members = (self.joint, self.separate, *self.components)
+        boundaries = tuple(member.timing_boundary for member in runtime_members)
+        if any(boundary is not None for boundary in boundaries) and (None in boundaries or len(set(boundaries)) != 1):
+            raise ValueError("matched pair must retain one declared wall-timing boundary for every decoder arm")
+        if self.record_sha256 != expected:
+            # Phase 11 adds typed timing evidence without invalidating retained
+            # pre-timing records that were already content-addressed.
+            legacy = self.model_dump(mode="json", by_alias=True, exclude={"record_sha256"})
+            for key in ("joint", "separate"):
+                if legacy[key]["runtime_ns"] is None and legacy[key]["timing_boundary"] is None:
+                    legacy[key].pop("runtime_ns")
+                    legacy[key].pop("timing_boundary")
+            for component in legacy["components"]:
+                if component["runtime_ns"] is None and component["timing_boundary"] is None:
+                    component.pop("runtime_ns")
+                    component.pop("timing_boundary")
+            expected = _digest("bp-registry-pauli-matched-pair-v1", canonical_json_bytes(legacy))
         if self.record_sha256 != expected:
             raise ValueError("matched pair record digest differs from retained evidence")
         return self
