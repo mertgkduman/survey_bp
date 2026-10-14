@@ -302,3 +302,14 @@ def verify_all_controlled_evaluations(
     }
     verification["receipt_sha256"] = receipt_digest(verification)
     return verification
+
+
+def write_controlled_evaluation_verification(
+    *, root: Path, package_path: Path, receipt_paths: Mapping[str, Path], verification_path: Path,
+) -> dict[str, object]:
+    """Seal the independent two-code verification receipt with immutable bytes."""
+    verification = verify_all_controlled_evaluations(
+        root=root, package_path=package_path, receipt_paths=receipt_paths,
+    )
+    _publish_exact(verification_path, canonical_receipt_bytes(verification))
+    return verification

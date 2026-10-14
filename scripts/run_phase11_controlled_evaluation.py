@@ -10,8 +10,8 @@ from pathlib import Path
 from bp_registry.campaigns.controlled_evaluation import (
     execute_authorized_controlled_manifest,
     preflight_controlled_manifest,
-    verify_all_controlled_evaluations,
     verify_controlled_evaluation_receipt,
+    write_controlled_evaluation_verification,
 )
 
 
@@ -33,7 +33,8 @@ def _parser() -> argparse.ArgumentParser:
         command.add_argument("--code", choices=tuple(DESIGNS), required=True)
         command.add_argument("--design", type=Path)
         command.add_argument("--receipt", type=Path)
-    commands.add_parser("verify-all")
+    verify_all = commands.add_parser("verify-all")
+    verify_all.add_argument("--verification", type=Path, default=RESULTS / "verification.json")
     return parser
 
 
@@ -60,12 +61,13 @@ def main(argv: list[str] | None = None) -> None:
                 root=ROOT, package_path=package, design_path=_design(args), receipt_path=_receipt(args),
             )
         else:
-            receipt = verify_all_controlled_evaluations(
+            receipt = write_controlled_evaluation_verification(
                 root=ROOT, package_path=package,
                 receipt_paths={
                     "GB46": RESULTS / "gb46" / "evaluation-receipt.json",
                     "BB72": RESULTS / "bb72" / "evaluation-receipt.json",
                 },
+                verification_path=args.verification,
             )
     except (OSError, ValueError) as error:
         print(json.dumps({"schema": "phase11_controlled_evaluation_cli_v1", "status": "error", "error": str(error)}, sort_keys=True))

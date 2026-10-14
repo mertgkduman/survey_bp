@@ -106,9 +106,11 @@ def test_verify_all_requires_exact_terminal_coverage_and_exposes_no_calibration_
 
     )
 
-    verification = module.verify_all_controlled_evaluations(
+    verification_path = tmp_path / "verification.json"
+    verification = module.write_controlled_evaluation_verification(
         root=ROOT, package_path=PACKAGE,
         receipt_paths={"GB46": gb46_destination, "BB72": bb72_destination},
+        verification_path=verification_path,
     )
 
     assert verification["terminal_coverage"] == {"BB72": "denied", "GB46": "denied"}
@@ -118,6 +120,7 @@ def test_verify_all_requires_exact_terminal_coverage_and_exposes_no_calibration_
     assert verification["receipt_sha256"] == sha256(
         module.canonical_receipt_bytes({k: v for k, v in verification.items() if k != "receipt_sha256"})
     ).hexdigest()
+    assert json.loads(verification_path.read_text(encoding="utf-8"))["receipt_sha256"] == verification["receipt_sha256"]
 
 
 def test_allow_receipt_without_an_approved_nonzero_bounded_dispatch_is_rejected(tmp_path: Path) -> None:
