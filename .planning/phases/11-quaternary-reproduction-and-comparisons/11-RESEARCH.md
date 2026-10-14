@@ -540,32 +540,39 @@ The exact discordant cell key strings are quoted from the current table implemen
 | A19 | The listed environment fallbacks allow all bounded canonical work while native work can be skipped explicitly. [ASSUMED] | Environment Availability | An undeclared native or scheduler dependency could block a planned task. |
 | A20 | A 30-day validity window is appropriate for stable source and repository evidence. [ASSUMED] | Metadata | Upstream source or site policy could change earlier. |
 
-## Open Questions
+## Open Questions (RESOLVED for planning; evidence pending)
+
+These questions do not block PLAN.md creation: each has a frozen current disposition, an execution gate, and a terminal outcome if later evidence remains unavailable. The dispositions decide what the plan does; they do not assert that missing paper facts, permissions, or measurements have been resolved. [ASSUMED]
 
 1. **What are the exact GB46 Figure 2 x/y coordinates and digitization tolerance?**
-   - What we know: The panel, code, decoder iteration limits, ensemble labels, channel family, and stopping rule are identifiable. [CITED: https://arxiv.org/html/2605.06547v2]
-   - What's unclear: The inspected paper representation does not expose machine-readable point coordinates or digitization uncertainty. [CITED: https://arxiv.org/html/2605.06547v2]
-   - Recommendation: Create and review a frozen digitization receipt before any reproduction run. [ASSUMED]
+   - Evidence state: The panel, code, decoder iteration limits, ensemble labels, channel family, and stopping rule are identifiable, while the inspected paper representation does not expose machine-readable point coordinates or digitization uncertainty. [CITED: https://arxiv.org/html/2605.06547v2]
+   - Current planning disposition: The GB46 Figure 2 target is selected, but its reproduction run is blocked pending a reviewed digitization receipt; the author demo cannot substitute for that receipt. [ASSUMED]
+   - Execution gate: Freeze and review the plotted point list, axis transform, extraction method/uncertainty, curve eligibility, and acceptance tolerance before generating an executable source manifest. [ASSUMED]
+   - Terminal outcome: If the review passes, execute only the approved points; if exact target extraction remains unresolved, record the target as `blocked_metadata` in planning evidence and do not run or infer the curve. [ASSUMED]
 
 2. **Can native aSCED accept matched injected errors under an approved scope?**
-   - What we know: The pinned binding lacks injection and the prior approval forbade algorithm-source changes. [VERIFIED: `data/native/phase10-asced-source-spec.json:50-53,73-78`]
-   - What's unclear: Whether a minimal derivative is authorized and whether randomized splitter construction can be replayed faithfully. [ASSUMED]
-   - Recommendation: Gate a source-diff proposal and author/rights review before build or execution. [ASSUMED]
+   - Evidence state: The pinned binding lacks injection, and the prior approval forbade algorithm-source changes. [VERIFIED: `data/native/phase10-asced-source-spec.json:50-53,73-78`]
+   - Current planning disposition: Matched native evidence is unavailable at the start of Phase 11; aggregate Phase 10 evidence must not enter a paired assessment. [VERIFIED: `data/native/phase10-asced-source-spec.json:50-53`; VERIFIED: `.planning/phases/11-quaternary-reproduction-and-comparisons/11-CONTEXT.md:17-18`]
+   - Execution gate: Require explicit rights/scope approval, a reviewed minimal source diff, unchanged downstream algorithm-file evidence, exact Pauli-translation tests, and replayable injected-error identity before building or running a separately identified derivative. [ASSUMED]
+   - Terminal outcome: If every gate passes, run only a bounded instrumented-native qualification before admitting paired shots; otherwise preserve explicit `unavailable` evidence with the failed gate reason and make no native/canonical pairing claim. [ASSUMED]
 
 3. **Can Q-BPGD Figure 7 reach source-qualified status?**
-   - What we know: The paper supplies A5, BP iteration settings, decimation rule, fixation vector, and reported stopping count. [CITED: https://arxiv.org/html/2312.10950v2]
-   - What's unclear: Message continuation/reset details, tie rules, normalization, exact point coordinates, and an authoritative author implementation identity were not resolved. [VERIFIED: `src/bp_registry/quaternary/qbpgd.py:1-6`; ASSUMED]
-   - Recommendation: Retain `canonical_adaptation` and an inconclusive source assessment unless each gap is closed. [ASSUMED]
+   - Evidence state: The paper supplies A5, BP iteration settings, decimation rule, fixation vector, and reported stopping count; message continuation/reset details, tie rules, normalization, exact plotted coordinates, and an authoritative author-implementation identity remain unresolved. [CITED: https://arxiv.org/html/2312.10950v2; VERIFIED: `src/bp_registry/quaternary/qbpgd.py:1-6`; ASSUMED]
+   - Current planning disposition: Execute bounded mechanism and controlled-study work only as `canonical_adaptation`; do not plan a source-faithful promotion from apparent curve agreement. [VERIFIED: `src/bp_registry/quaternary/qbpgd.py:1-6,219-228`; VERIFIED: `.planning/phases/11-quaternary-reproduction-and-comparisons/11-CONTEXT.md:19`]
+   - Execution gate: Freeze primary-source evidence for every unresolved message, tie, normalization, target-coordinate, stopping, and code-construction field, then review source-equivalence and discrepancies before promotion. [ASSUMED]
+   - Terminal outcome: If all fidelity fields close, admit a separately receipted source assessment; otherwise retain `canonical_adaptation` and emit an inconclusive or metadata-blocked source result without changing the label. [ASSUMED]
 
 4. **What metadata completes an MBP4 statistical curve target?**
-   - What we know: The paper specifies the fixed-inhibition recurrence and provides several curve settings. [CITED: https://arxiv.org/html/2104.13659]
-   - What's unclear: Exact iteration cap, denominator/stopping, point coordinates, and the stated 95% interval method for the candidate first curve. [CITED: https://arxiv.org/html/2104.13659]
-   - Recommendation: Complete Figures 8–9 first and retain the curve as `blocked_metadata` until primary evidence resolves these fields. [ASSUMED]
+   - Evidence state: The paper specifies the fixed-inhibition recurrence and provides several curve settings, but the exact iteration cap, denominator/stopping, point coordinates, and stated 95% interval method for the candidate broader curve remain unresolved. [CITED: https://arxiv.org/html/2104.13659]
+   - Current planning disposition: Proceed with the fully specified Figures 8–9 deterministic mechanism as the Phase 11 MBP4 target; exclude the broader statistical curve from executable reproduction scope. [CITED: https://arxiv.org/html/2104.13659; ASSUMED]
+   - Execution gate: Add a broader curve only after primary evidence freezes its iteration limit, denominator/stopping rule, point coordinates, interval method, and acceptance tolerance. [ASSUMED]
+   - Terminal outcome: If that evidence passes review, create a separate curve target receipt; otherwise preserve the broader curve as `blocked_metadata` while completing the Figures 8–9 mechanism assessment. [ASSUMED]
 
 5. **What evaluation sample size is feasible?**
-   - What we know: The current one-point design caps pairs at `5_000`, and site resource ceilings remain unmeasured. [VERIFIED: `src/bp_registry/campaigns/sizing.py:21-34`; VERIFIED: `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-VERIFICATION.md`]
-   - What's unclear: Discordance at the three chosen points, runtime distribution by method/code, and allocation/accounting ceilings. [ASSUMED]
-   - Recommendation: Use disjoint bounded calibration and stop at `blocked_precision` when the frozen cap is insufficient. [ASSUMED]
+   - Evidence state: The current one-point design caps pairs at `5_000`, while discordance at the three selected points, method/code runtime distributions, and site allocation/accounting ceilings remain unmeasured. [VERIFIED: `src/bp_registry/campaigns/sizing.py:21-34`; VERIFIED: `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-VERIFICATION.md`; ASSUMED]
+   - Current planning disposition: Plan only disjoint bounded calibration and profiling before fixing evaluation `N`; no publication-scale dispatch is authorized by this research. [VERIFIED: `.planning/phases/08-reproducible-campaigns-and-statistical-assessment/08-VERIFICATION.md`; ASSUMED]
+   - Execution gate: Freeze calibration receipts, minimum relevant change, simultaneous-alpha design, required pair count, per-method resource projections, and measured site ceilings before creating an evaluation or scheduler manifest. [ASSUMED]
+   - Terminal outcome: If the frozen design fits the `5_000`-pair and measured resource caps, execute that fixed evaluation size; if it does not, emit `blocked_precision` and retain an inconclusive assessment rather than increasing the cap after observing evaluation data. [VERIFIED: `src/bp_registry/campaigns/sizing.py:21-34,68-75`; ASSUMED]
 
 ## Environment Availability
 
