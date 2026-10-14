@@ -698,13 +698,13 @@ Plans:
 3. Source-backed compatible policy ablations produce replayable results, outcome/work analysis and discrepancy records, with no forced assumption that every binary policy has a faithful quaternary counterpart.
 
 **Research focus:** Quaternary paper targets and native-code availability, matched baseline priors, correlated-noise ablations, and kernel-aware cost comparisons.
-**Plans:** 15 plans
+**Plans:** 1/15 plans executed
 
 Plans:
 
 **Wave 1**
 
-- [ ] 11-01-PLAN.md — Freeze the aSCED Figure 2 GB46 target and carry one member to terminal assessment.
+- [x] 11-01-PLAN.md — Freeze the aSCED Figure 2 GB46 target and carry one member to terminal assessment.
 - [ ] 11-07-PLAN.md — Execute one identical Pauli sample through joint and separate inference.
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -804,7 +804,7 @@ Plans:
 | 8. Reproducible Campaigns and Statistical Assessment | 20/20 | Complete    | 2026-10-11 |
 | 9. CSS Reproduction and Controlled Comparisons | 20/20 | Complete    | 2026-10-12 |
 | 10. Correlated Quaternary Execution | 16/16 | Complete    | 2026-10-08 |
-| 11. Quaternary Reproduction and Comparisons | 0/TBD | Not started | - |
+| 11. Quaternary Reproduction and Comparisons | 1/15 | In Progress|  |
 | 12. Circuit Models and Canonical Integration | 0/TBD | Not started | - |
 | 13. Circuit Reproduction and Comparisons | 0/TBD | Not started | - |
 | 14. Completed Mapping Study and Journal Evidence | 0/TBD | Not started | - |
