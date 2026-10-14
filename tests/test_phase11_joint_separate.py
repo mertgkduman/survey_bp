@@ -191,3 +191,31 @@ def test_component_adapter_uses_canonical_materialized_runner(tmp_path: Path, mo
     assert result.candidate == (1, 0)
     assert result.terminal_status == "exact"
     assert calls[0]["materialized_sample_sha256"] == sample.materialized_sample_sha256
+
+
+def test_bb72_typed_work_and_wall_runtime_are_retained_without_unit_conversion():
+    """Each arm keeps its own named work and identical timing boundary."""
+    code, sample = _sample()
+
+    def joint(_: JointArmInputV1) -> JointArmResultV1:
+        return JointArmResultV1(
+            candidate_x=(1, 0), candidate_z=(0, 1), terminal_status="exact", work={"bp4_sweeps": 2},
+            runtime_ns=20, timing_boundary="decoder_callback_wall_v1",
+        )
+
+    def binary(input_: BinaryArmInputV1) -> BinaryArmResultV1:
+        return BinaryArmResultV1(
+            candidate=(1, 0) if input_.component == "X" else (0, 1), terminal_status="exact",
+            work={"binary_spa_iterations": 3}, runtime_ns=10, timing_boundary="decoder_callback_wall_v1",
+        )
+
+    record = run_joint_separate_unit(
+        code=code, materialized_sample=sample, joint_probabilities=((0.9, 0.04, 0.02, 0.04),) * 2,
+        joint_decoder=joint, binary_decoder=binary,
+    )
+
+    assert record.joint.work == {"bp4_sweeps": 2}
+    assert record.separate.work == {"x_binary_spa_iterations": 3, "z_binary_spa_iterations": 3}
+    assert record.joint.runtime_ns == 20
+    assert record.separate.runtime_ns == 20
+    assert record.joint.timing_boundary == record.separate.timing_boundary == "decoder_callback_wall_v1"
