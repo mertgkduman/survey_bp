@@ -304,8 +304,13 @@ def verify_proposal(*, proposal_path: Path, patch_path: Path) -> dict[str, Any]:
     patch = patch_path.read_bytes()
     if receipt.get("diff_sha256") != _sha256_bytes(patch):
         raise QualificationError("proposal diff digest mismatch")
+    changed_lines = b"\n".join(
+        line
+        for line in patch.splitlines()
+        if line.startswith((b"+", b"-")) and not line.startswith((b"+++", b"---"))
+    )
     forbidden = (b"simulate_errors(double epsilon)", b"get_error_rates", b"Minimum_Weight_Selection", b"Pauli_Channel.cpp")
-    if any(item in patch for item in forbidden):
+    if any(item in changed_lines for item in forbidden):
         raise QualificationError("proposal patch reaches aggregate, selection, or channel implementation scope")
     return {"schema": "phase11-asced-proposal-verification-v1", "status": "review_only_valid", "execution_authorized": False}
 

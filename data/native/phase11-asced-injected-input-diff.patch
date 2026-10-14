@@ -1,0 +1,50 @@
+--- a/include/Simulation_Env.h
++++ b/include/Simulation_Env.h
+@@ -82,6 +82,9 @@
+     void get_error_rates(std::vector<double> epsilon_set);
+     void init(const std::shared_ptr<Channel_Config> channel_config, const std::shared_ptr<Decoder_Config> decoder_config);
+ 
++    // Proposal-only entry point: bypasses channel sampling.
++    std::string run_injected_error(const vector& injected_error);
++
+ private:
+     // Per-thread objects & pointers
+     std::vector<std::unique_ptr<Channel>> channel_set;
+--- a/src/Simulation_Env.cpp
++++ b/src/Simulation_Env.cpp
+@@ -57,6 +57,24 @@
+     }
+     return QEC_Outcome::no_error;
+ }
++
++std::string Simulation_Env::run_injected_error(const vector& injected_error)
++{
++    if (injected_error.size() != n)
++        throw std::invalid_argument("Injected Pauli vector has wrong length");
++    if (channel_set.size() != 1 || decoder_set.size() != 1)
++        throw std::invalid_argument("Injected-error proposal requires exactly one initialized worker");
++
++    vector error = injected_error;
++    Channel& channel = *channel_set.front();
++    Decoder& decoder = *decoder_set.front();
++    channel.simulate_syndrome_extraction(decoder, error);
++    decoder.decode();
++    if (!decoder.syndromes_match) return "failure_I";
++    if (!channel.check_logical_equivalence(error, decoder.error_estimate)) return "failure_II";
++    return channel.check_physical_equivalence(error, decoder.error_estimate) ? "success_I" : "success_II";
++}
++
+ 
+ bool Simulation_Env::check_lower_bound_error(const Decoder& decoder, const vector& error)
+ {
+--- a/src/Pybind11_Module.cpp
++++ b/src/Pybind11_Module.cpp
+@@ -235,6 +235,8 @@
+             pybind11::arg("channel_config"),
+             pybind11::arg("decoder_config"))
+ 
++        .def("run_injected_error", &Simulation_Env::run_injected_error, pybind11::arg("injected_error"))
++
+         .def_readwrite("num_threads", &Simulation_Env::num_threads)
+         .def_readwrite("target_errors", &Simulation_Env::target_errors)
+         .def_readwrite("max_trials", &Simulation_Env::max_trials)
