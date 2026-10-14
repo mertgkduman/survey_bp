@@ -1,0 +1,12 @@
+{
+  "schema": "phase11_complete_methods_v1",
+  "study_id": "phase11-complete-methods-bounded",
+  "claim_scope": "controlled_complete_method_evidence_not_source_reproduction_or_work_unit_ranking",
+  "shared_sample_contract": "materialized_physical_pauli_samples_are_frozen_per_code_anchor_and_never_substituted",
+  "methods": [
+    {"method_id": "ordinary_bp4", "executable": true, "canonical_controlled_eligible": true, "native_match_eligible": false, "fidelity": "canonical_adaptation", "supported_codes": ["GB46", "BB72"], "qualification_path": "data/manifests/quaternary-gb46-bp4.json", "reason": "qualified canonical controlled baseline", "native_lane": [{"status": "not_applicable", "reason": "canonical baseline has no native match request"}]},
+    {"method_id": "qbpgd", "executable": false, "canonical_controlled_eligible": false, "native_match_eligible": false, "fidelity": "canonical_adaptation", "supported_codes": [], "qualification_path": "data/source-targets/phase11-qbpgd-figure7-a5.json", "reason": "continued-message, tie, normalization, and author-identity qualifications remain unresolved", "native_lane": [{"status": "not_applicable", "reason": "no matched native Q-BPGD lane is qualified"}]},
+    {"method_id": "mbp4", "executable": true, "canonical_controlled_eligible": true, "native_match_eligible": false, "fidelity": "canonical_adaptation", "supported_codes": ["GB46"], "qualification_path": "data/results/phase11-mbp4-figures8-9/assessment.json", "reason": "fixed-alpha deterministic recurrence mechanism is qualified for bounded canonical evidence", "native_lane": [{"status": "not_applicable", "reason": "no matched native MBP4 lane is qualified"}]},
+    {"method_id": "canonical_asced", "executable": true, "canonical_controlled_eligible": true, "native_match_eligible": false, "fidelity": "canonical_adaptation", "supported_codes": ["GB46"], "qualification_path": "data/manifests/quaternary-gb46-asced.json", "reason": "receipt-bound canonical ordinary and overcomplete construction/settings are qualified separately", "native_lane": [{"status": "unavailable", "reason": "Plan 11-06 selected preserve_unavailable; native matched input was declined"}, {"status": "unavailable", "reason": "aggregate-only native evidence has no matched shot identity"}]}
+  ]
+}

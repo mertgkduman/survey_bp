@@ -35,6 +35,7 @@ from bp_registry.quaternary.problems import QuaternaryOriginalProblem, compile_c
 
 
 STUDY_PATH = Path("data/studies/phase11-policy-comparisons.json")
+COMPLETE_METHODS_PATH = Path("data/manifests/phase11-complete-methods.json")
 _SHARED_FIELDS = frozenset({"alpha", "schedule", "initialization", "construction", "stopping", "postprocessing"})
 
 
@@ -60,6 +61,34 @@ def load_policy_study(root: Path) -> dict[str, Any]:
         return json.loads(path.read_bytes())
     except json.JSONDecodeError as error:
         raise ValueError("policy comparison study is not JSON") from error
+
+
+def load_complete_methods(root: Path) -> dict[str, Any]:
+    path = root / COMPLETE_METHODS_PATH
+    if path.is_symlink() or not path.is_file():
+        raise ValueError("complete method manifest is unavailable")
+    return json.loads(path.read_bytes())
+
+
+def validate_complete_methods(root: Path, manifest: dict[str, Any]) -> None:
+    required = {"schema", "study_id", "claim_scope", "shared_sample_contract", "methods"}
+    if set(manifest) != required or manifest["schema"] != "phase11_complete_methods_v1":
+        raise ValueError("complete method manifest schema is invalid")
+    methods = manifest["methods"]
+    if not isinstance(methods, list) or {row.get("method_id") for row in methods} != {"ordinary_bp4", "qbpgd", "mbp4", "canonical_asced"}:
+        raise ValueError("complete method manifest must retain all four methods")
+    rows = {row["method_id"]: row for row in methods}
+    for row in methods:
+        if not (root / row.get("qualification_path", "")).is_file() or row.get("fidelity") != "canonical_adaptation":
+            raise ValueError("complete method qualification or fidelity differs")
+        if not isinstance(row.get("native_lane"), list):
+            raise ValueError("complete method native lane is missing")
+    if rows["qbpgd"]["executable"] or rows["qbpgd"]["canonical_controlled_eligible"]:
+        raise ValueError("Q-BPGD must retain its unresolved qualification gap")
+    asced = rows["canonical_asced"]
+    native = json.loads((root / "data/native/phase11-asced-matched-input-qualification.json").read_bytes())
+    if not asced["canonical_controlled_eligible"] or asced["native_match_eligible"] or native.get("terminal") != "declined_unavailable":
+        raise ValueError("canonical and native aSCED eligibility must remain independent")
 
 
 def validate_policy_study(root: Path, study: dict[str, Any]) -> None:
