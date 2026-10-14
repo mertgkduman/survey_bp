@@ -698,22 +698,44 @@ Plans:
 3. Source-backed compatible policy ablations produce replayable results, outcome/work analysis and discrepancy records, with no forced assumption that every binary policy has a faithful quaternary counterpart.
 
 **Research focus:** Quaternary paper targets and native-code availability, matched baseline priors, correlated-noise ablations, and kernel-aware cost comparisons.
-**Plans:** 14 plans
+**Plans:** 15 plans
 
 Plans:
+
+**Wave 1**
+
 - [ ] 11-01-PLAN.md — Freeze the aSCED Figure 2 GB46 target and carry one member to terminal assessment.
-- [ ] 11-02-PLAN.md — Reconstruct Q-BPGD A5 and freeze the Figure 7 adaptation target.
-- [ ] 11-03-PLAN.md — Reproduce the MBP4 Figures 8–9 deterministic five-qubit mechanism.
-- [ ] 11-04-PLAN.md — Prove native aSCED matched-input limits and prepare an unapplied narrow proposal.
-- [ ] 11-05-PLAN.md — Decide aSCED derivative rights and source-change qualification.
-- [ ] 11-06-PLAN.md — Materialize the authorized or unavailable native aSCED route.
 - [ ] 11-07-PLAN.md — Execute one identical Pauli sample through joint and separate inference.
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 11-02-PLAN.md — Reconstruct Q-BPGD A5 and freeze the Figure 7 adaptation target.
+- [ ] 11-04-PLAN.md — Prove native aSCED matched-input limits and prepare an unapplied narrow proposal.
 - [ ] 11-08-PLAN.md — Freeze exact fixed-marginal estimands, simultaneous inference, and sizing.
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 11-03-PLAN.md — Reproduce the MBP4 Figures 8–9 deterministic five-qubit mechanism.
+- [ ] 11-05-PLAN.md — Decide aSCED derivative rights and source-change qualification.
 - [ ] 11-09-PLAN.md — Qualify the public bounded GB46 comparison lifecycle.
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 11-06-PLAN.md — Materialize the authorized or unavailable native aSCED route.
 - [ ] 11-10-PLAN.md — Calibrate BB72 and assemble the measured resource gate.
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
 - [ ] 11-11-PLAN.md — Decide digest-scoped publication campaign dispatch.
-- [ ] 11-12-PLAN.md — Execute or explicitly close all selected source evidence lanes.
 - [ ] 11-13-PLAN.md — Run one-change and complete qualified-method comparisons.
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
+- [ ] 11-12-PLAN.md — Execute or explicitly close all selected source evidence lanes.
+- [ ] 11-15-PLAN.md — Execute or explicitly close each authorized GB46 and BB72 controlled evaluation and seal code-specific receipts.
+
+**Wave 7** *(blocked on Wave 6 completion)*
+
 - [ ] 11-14-PLAN.md — Publish the verified Phase 11 source and controlled assessment index.
 
 ### Phase 12: Circuit Models and Canonical Integration
