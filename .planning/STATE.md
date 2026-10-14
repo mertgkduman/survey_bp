@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
-current_plan: 5
+current_plan: 6
 status: executing
-stopped_at: Completed 11-04-PLAN.md
-last_updated: "2026-10-14T20:20:37.919Z"
+stopped_at: Completed 11-08-PLAN.md
+last_updated: "2026-10-14T20:40:07.398Z"
 last_activity: 2026-10-14
 last_activity_desc: Phase 11 execution started
-state_head: d9152b4d0d78f2d8d4118de0927b326618821731
+state_head: 0ae05e3fa5af0c5d569ff561233e313a528e9416
 progress:
   total_phases: 14
   completed_phases: 8
   total_plans: 166
-  completed_plans: 147
+  completed_plans: 148
 ---
 
 # Project State
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-10-12)
 ## Current Position
 
 Phase: 11 (Quaternary Reproduction and Comparisons) — EXECUTING
-Plan: 5 of 15
+Plan: 6 of 15
 Total Phases: 14
-Current Plan: 5
+Current Plan: 6
 Total Plans in Phase: 15
 Status: Ready to execute
 Last activity: 2026-10-14 — Phase 11 execution started
@@ -100,6 +100,7 @@ Progress: 8 of 14 phases complete (57%); Phase 9 has 20 of 20 plans complete
 | Phase 11-quaternary-reproduction-and-comparisons P07 | 322s | 2 tasks | 3 files |
 | Phase 11 P02 | 12m | 2 tasks | 8 files |
 | Phase 11-quaternary-reproduction-and-comparisons P04 | 17m | 2 tasks | 4 files |
+| Phase 11 P08 | 8m 38s | 2 tasks | 4 files |
 
 Phase 02 P10–P16 gap-closure metrics are recorded in their individual summaries.
 
@@ -212,6 +213,9 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - [Phase 11]: A5 reconstructs from the published l=90 polynomial pair while its distance interval remains source reported.
 - [Phase 11]: Figure 7 source settings remain frozen; the one-sweep canonical-adaptation probe cannot assess the Figure 7 curve.
 - [Phase 11]: Phase 11: pinned native aSCED aggregate evidence is not matched-shot evidence; a proposed injected-input derivative stays unapplied until rights and semantic review approve a separate identity.
+- [Phase 11]: D-12 reports D_y first across three fixed-marginal channel rows with simultaneous six-arm exact bounds.
+- [Phase 11]: Phase 11 paired precision is frozen from a pilot identity, two-contrast alpha family, fixed stopping rule, and 5,000-pair cap.
+- [Phase 11]: Phase 11 paired precision is frozen from a pilot identity, two-contrast alpha family, fixed stopping rule, and 5,000-pair cap.
 
 ### Pending Todos
 
@@ -273,8 +277,8 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 **Resume file:** None
 
-Last session: 2026-10-14T20:20:26.407Z
-Stopped at: Completed 11-04-PLAN.md
+Last session: 2026-10-14T20:39:53.787Z
+Stopped at: Completed 11-08-PLAN.md
 Next command: $gsd-execute-phase 11; Phase 5 human review remains open and Phase 7 stays paused.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
