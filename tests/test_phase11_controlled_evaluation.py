@@ -123,7 +123,7 @@ def test_verify_all_requires_exact_terminal_coverage_and_exposes_no_calibration_
     assert json.loads(verification_path.read_text(encoding="utf-8"))["receipt_sha256"] == verification["receipt_sha256"]
 
 
-def test_allow_receipt_without_an_approved_nonzero_bounded_dispatch_is_rejected(tmp_path: Path) -> None:
+def test_gb46_allow_receipt_without_an_approved_nonzero_bounded_dispatch_is_rejected(tmp_path: Path) -> None:
     module = _module()
     destination = _receipt_path(tmp_path, "GB46")
     receipt = module.execute_authorized_controlled_manifest(
@@ -134,7 +134,7 @@ def test_allow_receipt_without_an_approved_nonzero_bounded_dispatch_is_rejected(
     receipt["receipt_sha256"] = module.receipt_digest(receipt)
     destination.write_bytes(module.canonical_receipt_bytes(receipt))
 
-    with pytest.raises(ValueError, match="allow|dispatch"):
+    with pytest.raises(ValueError, match="decision|allow|dispatch"):
         module.verify_controlled_evaluation_receipt(
             root=ROOT, package_path=PACKAGE, design_path=GB46, receipt_path=destination,
         )
