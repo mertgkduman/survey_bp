@@ -65,7 +65,7 @@ def test_gb46_stale_design_or_foreign_allow_fails_closed_without_dispatch(tmp_pa
     assert receipt["attempted_pairs"] == []
 
 
-def test_bb72_deny_retains_qualified_artifact_caveats_and_its_own_output(tmp_path: Path) -> None:
+def test_bb72_cross_code_denial_retains_qualified_artifact_caveats_and_its_own_output(tmp_path: Path) -> None:
     module = _module()
     gb46_destination = _receipt_path(tmp_path, "GB46")
     bb72_destination = _receipt_path(tmp_path, "BB72")
@@ -80,6 +80,8 @@ def test_bb72_deny_retains_qualified_artifact_caveats_and_its_own_output(tmp_pat
     assert receipt["code_id"] == "BB72"
     assert receipt["terminal_status"] == "denied"
     assert receipt["dispatch"]["state"] == "zero_dispatch"
+    assert receipt["approved_envelope"]["requested_pairs_per_point"] == 2454
+    assert receipt["approved_envelope"]["manifest_sha256"] == "db6cbc41ef296bf87310ca0d17b05b7efa02636b31f94f3ead56962ef799baf5"
     assert receipt["code_qualification"]["distance_qualification"] == (
         "source_reported_distance_6_not_platform_verified"
     )
@@ -133,4 +135,3 @@ def test_allow_receipt_without_an_approved_nonzero_bounded_dispatch_is_rejected(
         module.verify_controlled_evaluation_receipt(
             root=ROOT, package_path=PACKAGE, design_path=GB46, receipt_path=destination,
         )
-

@@ -127,6 +127,8 @@ def _zero_dispatch_receipt(
             "partition": sealed["partition"],
         },
         "approved_envelope": {
+            "manifest_sha256": context["manifest_sha256"],
+            "requested_pairs_per_point": context["campaign"]["pairs_per_point"],
             "pairs_per_point": None,
             "max_workers": None,
             "max_wall_time_ns": None,
