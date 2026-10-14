@@ -106,6 +106,24 @@ def test_diff_scope_is_limited_and_preserves_existing_aggregate_entrypoint(tmp_p
     assert receipt["proposed_run_identity"] is None
 
 
+def test_proposal_checked_in_review_package_is_an_unapplied_validated_derivative() -> None:
+    """The repository carries review bytes, never an applied or runnable derivative."""
+    completed = _run(
+        "verify-proposal",
+        "--proposal-path",
+        str(ROOT / "data/native/phase11-asced-injected-input-proposal.json"),
+        "--patch-path",
+        str(ROOT / "data/native/phase11-asced-injected-input-diff.patch"),
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    assert json.loads(completed.stdout) == {
+        "execution_authorized": False,
+        "schema": "phase11-asced-proposal-verification-v1",
+        "status": "review_only_valid",
+    }
+
+
 def test_proposal_rejects_tampered_receipt_or_patch(tmp_path: Path) -> None:
     proposal = tmp_path / "proposal.json"
     patch = tmp_path / "proposal.patch"
