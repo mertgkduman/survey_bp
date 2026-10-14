@@ -94,3 +94,29 @@ def test_bb72_tracer_preflight_binds_artifact_provenance_and_qualifications() ->
     assert receipt["distance_qualification"] == "source_reported_distance_6_not_platform_verified"
     assert receipt["logical_operator_qualification"] == "project_derived_logicals_not_independent_distance_verification"
     assert receipt["publication_authorization"] == "deny"
+
+
+def test_bb72_three_point_calibration_replays_named_work_and_wall_runtime(tmp_path: Path) -> None:
+    """All frozen rows use the same public lifecycle and retain native units."""
+    from bp_registry.campaigns.controlled_execution import (
+        assess_phase11_controlled,
+        replay_phase11_controlled,
+        run_phase11_controlled,
+    )
+
+    design = ROOT / "data/studies/phase11-bb72-joint-separate.json"
+    output = tmp_path / "bb72"
+    run = run_phase11_controlled(root=ROOT, design_path=design, output_root=output)
+    replay = replay_phase11_controlled(root=ROOT, design_path=design, output_root=output)
+    assessment = assess_phase11_controlled(root=ROOT, design_path=design, output_root=output)
+
+    assert run["complete_pairs"] == 6
+    assert replay["complete_pairs"] == 6
+    assert assessment["publication_authorization"] == "deny"
+    assert "joint:check_to_variable_updates" in run["arm_work"]
+    assert "joint:variable_to_check_updates" in run["arm_work"]
+    assert "separate:x_canonical_spa_iterations" in run["arm_work"]
+    assert "separate:z_canonical_spa_iterations" in run["arm_work"]
+    assert run["arm_runtime_ns"]["joint"] > 0
+    assert run["arm_runtime_ns"]["separate"] > 0
+    assert run["timing_boundary"] == "decoder_callback_wall_v1"
