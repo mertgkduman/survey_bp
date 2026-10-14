@@ -11,8 +11,10 @@ import argparse
 import difflib
 import hashlib
 import json
+import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -25,6 +27,14 @@ DEFAULT_RUN = NATIVE / "phase10-asced-run-receipt.json"
 DEFAULT_SOURCE = Path("/tmp/phase10-asced-native/source/quantum_asced")
 COMMIT = "816772071486615dfc7d71d1e15df597edc58a26"
 SCHEMA = "phase11-asced-injected-input-proposal-v1"
+QUALIFICATION_SCHEMA = "phase11-asced-matched-input-qualification-v1"
+# These terminals are the source of truth for qualification receipts.  A
+# separately instrumented derivative can only use the authorized terminals
+# after its own implementation has been explicitly approved.
+QUALIFICATION_TERMINALS = frozenset(
+    {"authorized_success", "authorized_discrepant", "authorized_failed", "declined_unavailable"}
+)
+MATCHED_INPUT_UNAVAILABLE = "unavailable"
 TOUCHED_FILES = (
     "include/Simulation_Env.h",
     "src/Simulation_Env.cpp",
@@ -315,9 +325,107 @@ def verify_proposal(*, proposal_path: Path, patch_path: Path) -> dict[str, Any]:
     return {"schema": "phase11-asced-proposal-verification-v1", "status": "review_only_valid", "execution_authorized": False}
 
 
+def _summary_value(summary: str, label: str) -> str:
+    """Read exactly one decision field from the human-reviewed Plan 11-05 summary."""
+    matches = re.findall(
+        rf"^\s*-\s+\*\*{re.escape(label)}:\*\*\s+`([^`]+)`\s*$",
+        summary,
+        flags=re.MULTILINE,
+    )
+    if len(matches) != 1:
+        raise QualificationError(f"Plan 11-05 decision has an ambiguous or missing {label}")
+    return matches[0]
+
+
+def _decision_from_summary(summary_path: Path) -> dict[str, str]:
+    try:
+        summary = summary_path.read_text(encoding="utf-8")
+    except OSError as error:
+        raise QualificationError(f"cannot read Plan 11-05 decision summary: {error}") from error
+    selection = _summary_value(summary, "Selected outcome")
+    scope_digests = re.findall(
+        r"^\s*-\s+\*\*Decision scope:\*\*.*?SHA-256 `([0-9a-f]{64})`\s*$",
+        summary,
+        flags=re.MULTILINE,
+    )
+    if len(scope_digests) != 1:
+        raise QualificationError("Plan 11-05 decision scope lacks an exact patch SHA-256")
+    return {"selection": selection, "diff_sha256": scope_digests[0]}
+
+
+def _declined_qualification(*, decision: dict[str, str], proposal_path: Path, patch_path: Path) -> dict[str, Any]:
+    """Create the only terminal allowed by the selected preserve-unavailable route."""
+    proposal = _load_json(proposal_path)
+    verify_proposal(proposal_path=proposal_path, patch_path=patch_path)
+    proposal_sha256 = _sha256_file(proposal_path)
+    if decision["diff_sha256"] != _sha256_file(patch_path) or proposal.get("diff_sha256") != decision["diff_sha256"]:
+        raise QualificationError("Plan 11-05 decision digest does not match the exact reviewed patch")
+    if decision["selection"] != "preserve_unavailable":
+        if decision["selection"] == "authorize_derivative":
+            raise QualificationError("authorized derivative handling is not available in this no-operation qualifier")
+        raise QualificationError("Plan 11-05 decision selects an unsupported qualification terminal")
+    terminal = "declined_unavailable"
+    if terminal not in QUALIFICATION_TERMINALS:
+        raise QualificationError("qualification terminal is not defined by the production contract")
+    return {
+        "schema": QUALIFICATION_SCHEMA,
+        "terminal": terminal,
+        "matched_input_status": MATCHED_INPUT_UNAVAILABLE,
+        "decision": {
+            "plan": "11-05",
+            "selection": decision["selection"],
+            "proposal_sha256": proposal_sha256,
+            "diff_sha256": decision["diff_sha256"],
+        },
+        "native_identity": {
+            "source_commit": COMMIT,
+            "source_spec_sha256": proposal["source_spec_sha256"],
+            "aggregate_evidence": "aggregate_only",
+        },
+        "matched_rows": {
+            "status": MATCHED_INPUT_UNAVAILABLE,
+            "reason": "native matched-input route was declined",
+        },
+        "source_operations": [],
+        "source_fidelity_claim": "none",
+    }
+
+
+def verify_qualification_receipt(*, receipt_path: Path, proposal_path: Path, patch_path: Path) -> dict[str, Any]:
+    """Reject a receipt that attempts to turn a declined route into native evidence."""
+    receipt = _load_json(receipt_path)
+    if receipt.get("schema") != QUALIFICATION_SCHEMA or receipt.get("terminal") != "declined_unavailable":
+        raise QualificationError("qualification receipt must be the declined-unavailable terminal")
+    if receipt.get("terminal") not in QUALIFICATION_TERMINALS:
+        raise QualificationError("qualification receipt uses an undefined terminal")
+    decision = receipt.get("decision")
+    if not isinstance(decision, dict) or decision.get("selection") != "preserve_unavailable" or decision.get("plan") != "11-05":
+        raise QualificationError("qualification receipt does not retain the selected Plan 11-05 decision")
+    verify_proposal(proposal_path=proposal_path, patch_path=patch_path)
+    if decision.get("proposal_sha256") != _sha256_file(proposal_path) or decision.get("diff_sha256") != _sha256_file(patch_path):
+        raise QualificationError("qualification receipt decision binding has drifted")
+    if receipt.get("matched_input_status") != MATCHED_INPUT_UNAVAILABLE or receipt.get("matched_rows") != {
+        "status": MATCHED_INPUT_UNAVAILABLE,
+        "reason": "native matched-input route was declined",
+    }:
+        raise QualificationError("declined receipt must retain explicit unavailable matched rows")
+    if receipt.get("source_operations") != [] or receipt.get("source_fidelity_claim") != "none":
+        raise QualificationError("declined receipt cannot retain a source operation or fidelity claim")
+    return receipt
+
+
 def _write_json(path: Path, value: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def _write_qualification(path: Path, value: dict[str, Any]) -> None:
+    """Publish a complete terminal atomically after every fail-closed check passes."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent, prefix=f".{path.name}.", suffix=".tmp", delete=False) as handle:
+        handle.write(json.dumps(value, indent=2, sort_keys=True) + "\n")
+        staged = Path(handle.name)
+    staged.replace(path)
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -335,6 +443,15 @@ def _parser() -> argparse.ArgumentParser:
     verify = subparsers.add_parser("verify-proposal")
     verify.add_argument("--proposal-path", type=Path, required=True)
     verify.add_argument("--patch-path", type=Path, required=True)
+    qualify = subparsers.add_parser("qualify")
+    qualify.add_argument("--decision-summary", type=Path, required=True)
+    qualify.add_argument("--proposal-path", type=Path, required=True)
+    qualify.add_argument("--patch-path", type=Path, required=True)
+    qualify.add_argument("--qualification-path", type=Path, required=True)
+    verify_qualification = subparsers.add_parser("verify-qualification")
+    verify_qualification.add_argument("--qualification-path", type=Path, required=True)
+    verify_qualification.add_argument("--proposal-path", type=Path, required=True)
+    verify_qualification.add_argument("--patch-path", type=Path, required=True)
     return parser
 
 
@@ -350,8 +467,26 @@ def main(argv: list[str] | None = None) -> int:
             args.patch_path.parent.mkdir(parents=True, exist_ok=True)
             args.patch_path.write_text(patch, encoding="utf-8")
             print(json.dumps({"proposal": str(args.proposal_path), "patch": str(args.patch_path), "status": "review_only"}, sort_keys=True))
-        else:
+        elif args.command == "verify-proposal":
             print(json.dumps(verify_proposal(proposal_path=args.proposal_path, patch_path=args.patch_path), sort_keys=True))
+        elif args.command == "qualify":
+            receipt = _declined_qualification(
+                decision=_decision_from_summary(args.decision_summary),
+                proposal_path=args.proposal_path,
+                patch_path=args.patch_path,
+            )
+            _write_qualification(args.qualification_path, receipt)
+            print(json.dumps(verify_qualification_receipt(
+                receipt_path=args.qualification_path,
+                proposal_path=args.proposal_path,
+                patch_path=args.patch_path,
+            ), sort_keys=True))
+        else:
+            print(json.dumps(verify_qualification_receipt(
+                receipt_path=args.qualification_path,
+                proposal_path=args.proposal_path,
+                patch_path=args.patch_path,
+            ), sort_keys=True))
     except (OSError, QualificationError, ValueError) as error:
         print(f"qualification failed: {error}", file=sys.stderr)
         return 2

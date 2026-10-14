@@ -134,3 +134,89 @@ def test_proposal_rejects_tampered_receipt_or_patch(tmp_path: Path) -> None:
 
     assert completed.returncode != 0
     assert "unsupported proposal schema" in completed.stderr
+
+
+def test_decision_preserve_unavailable_writes_a_strict_no_operation_terminal(tmp_path: Path) -> None:
+    """The recorded decision becomes evidence, never a derivative operation."""
+    qualification = tmp_path / "qualification.json"
+
+    completed = _run(
+        "qualify",
+        "--decision-summary",
+        str(ROOT / ".planning/phases/11-quaternary-reproduction-and-comparisons/11-05-SUMMARY.md"),
+        "--proposal-path",
+        str(ROOT / "data/native/phase11-asced-injected-input-proposal.json"),
+        "--patch-path",
+        str(ROOT / "data/native/phase11-asced-injected-input-diff.patch"),
+        "--qualification-path",
+        str(qualification),
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    receipt = json.loads(qualification.read_text(encoding="utf-8"))
+    assert receipt["terminal"] == "declined_unavailable"
+    assert receipt["matched_input_status"] == "unavailable"
+    assert receipt["decision"] == {
+        "plan": "11-05",
+        "selection": "preserve_unavailable",
+        "proposal_sha256": "166caf98692c7a6b1730b69cff950b8542344906af552153c74bcdbc1092301a",
+        "diff_sha256": "dd8a31965372ba8aa736134d71c66183c1d044b5ae6910dee48068e04cec2229",
+    }
+    assert receipt["matched_rows"] == {"status": "unavailable", "reason": "native matched-input route was declined"}
+    assert receipt["source_operations"] == []
+    assert receipt["source_fidelity_claim"] == "none"
+
+
+def test_decision_digest_drift_or_authorize_selection_writes_no_partial_receipt(tmp_path: Path) -> None:
+    """Only the exact recorded decline can produce a no-operation receipt here."""
+    summary = (ROOT / ".planning/phases/11-quaternary-reproduction-and-comparisons/11-05-SUMMARY.md").read_text(encoding="utf-8")
+    authorize = tmp_path / "authorize-summary.md"
+    authorize.write_text(summary.replace("`preserve_unavailable`", "`authorize_derivative`", 2), encoding="utf-8")
+    qualification = tmp_path / "qualification.json"
+
+    completed = _run(
+        "qualify",
+        "--decision-summary",
+        str(authorize),
+        "--proposal-path",
+        str(ROOT / "data/native/phase11-asced-injected-input-proposal.json"),
+        "--patch-path",
+        str(ROOT / "data/native/phase11-asced-injected-input-diff.patch"),
+        "--qualification-path",
+        str(qualification),
+    )
+
+    assert completed.returncode != 0
+    assert "not available in this no-operation qualifier" in completed.stderr
+    assert not qualification.exists()
+
+
+def test_decision_digest_drift_writes_no_partial_receipt(tmp_path: Path) -> None:
+    """A changed decision scope cannot be rebound to a different reviewed patch."""
+    summary = (ROOT / ".planning/phases/11-quaternary-reproduction-and-comparisons/11-05-SUMMARY.md").read_text(encoding="utf-8")
+    drifted = tmp_path / "drifted-summary.md"
+    drifted.write_text(
+        summary.replace(
+            "the exact reviewed injected-input patch, SHA-256 `dd8a31965372ba8aa736134d71c66183c1d044b5ae6910dee48068e04cec2229`",
+            f"the exact reviewed injected-input patch, SHA-256 `{'0' * 64}`",
+            1,
+        ),
+        encoding="utf-8",
+    )
+    qualification = tmp_path / "qualification.json"
+
+    completed = _run(
+        "qualify",
+        "--decision-summary",
+        str(drifted),
+        "--proposal-path",
+        str(ROOT / "data/native/phase11-asced-injected-input-proposal.json"),
+        "--patch-path",
+        str(ROOT / "data/native/phase11-asced-injected-input-diff.patch"),
+        "--qualification-path",
+        str(qualification),
+    )
+
+    assert completed.returncode != 0
+    assert "does not match the exact reviewed patch" in completed.stderr
+    assert not qualification.exists()

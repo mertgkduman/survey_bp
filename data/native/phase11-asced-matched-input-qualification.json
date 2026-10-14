@@ -1,0 +1,22 @@
+{
+  "decision": {
+    "diff_sha256": "dd8a31965372ba8aa736134d71c66183c1d044b5ae6910dee48068e04cec2229",
+    "plan": "11-05",
+    "proposal_sha256": "166caf98692c7a6b1730b69cff950b8542344906af552153c74bcdbc1092301a",
+    "selection": "preserve_unavailable"
+  },
+  "matched_input_status": "unavailable",
+  "matched_rows": {
+    "reason": "native matched-input route was declined",
+    "status": "unavailable"
+  },
+  "native_identity": {
+    "aggregate_evidence": "aggregate_only",
+    "source_commit": "816772071486615dfc7d71d1e15df597edc58a26",
+    "source_spec_sha256": "55359962431c055cf971171f81d75997282beb29e8928a8d82e023fbb6c1f24e"
+  },
+  "schema": "phase11-asced-matched-input-qualification-v1",
+  "source_fidelity_claim": "none",
+  "source_operations": [],
+  "terminal": "declined_unavailable"
+}
