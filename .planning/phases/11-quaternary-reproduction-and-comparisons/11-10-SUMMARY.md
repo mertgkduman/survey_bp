@@ -41,7 +41,7 @@ actuals:
   commits: 7
 commits: 7
 plan_head_before: 153039d5fd4b3699abc07042f44a1fed196b0d23
-requirements-completed: [QEV-01, QEV-02]
+requirements-assessed: [QEV-01, QEV-02]
 ---
 
 # Phase 11 Plan 10: BB72 Calibration and Default-Deny Authorization Summary
@@ -92,6 +92,10 @@ requirements-completed: [QEV-01, QEV-02]
 ## Known Stubs
 
 The production package intentionally retains unavailable `predicted_memory_bytes`, `predicted_wall_time_ns`, and `predicted_typed_work` because no persistent, scheduler-qualified calibration profile or site ceilings exist. These values block dispatch and are tracked in the package receipt rather than used as estimates.
+
+## Next Phase Readiness
+
+Plan 11-11 remains the blocking human authorization gate. QEV-01 and QEV-02 retain their plan-declared manual review flags; this package supplies evidence and cannot resolve those judgments or enable a production dispatch.
 
 ## Self-Check: PASSED
 
