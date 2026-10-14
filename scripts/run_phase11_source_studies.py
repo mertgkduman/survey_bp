@@ -137,6 +137,8 @@ def _validated_mbp4(target_path: Path, manifest_path: Path | None) -> tuple[dict
         raise ValueError("MBP4 target must bind the Figures 8-9 source")
     if target.get("source_settings") != {"beta": 0.0, "epsilon": 0.003, "error": [0, 0, 0, 2, 0], "schedule": "qbp_flooding"}:
         raise ValueError("MBP4 target settings differ from the selected source mechanism")
+    if target.get("alpha_only_contrast") != {"varying_field": "alpha", "held_constant": ["five_qubit_checks", "IIIYI_error", "epsilon", "schedule", "beta", "numerical_profile", "observation_horizon"]}:
+        raise ValueError("MBP4 target must freeze every setting except alpha")
     if target.get("observation_horizon", {}).get("kind") != "frozen_sweeps" or target["observation_horizon"].get("sweeps") != 20:
         raise ValueError("MBP4 target requires the frozen 20-sweep observation horizon")
     if target.get("claim_scope") != _MBP4_SCOPE or target.get("source_author_code_identity") != "unverified":
@@ -219,6 +221,7 @@ def _mbp4_assessment(target: dict[str, Any], target_document_sha256: str) -> dic
         "target_receipt_sha256": target["target_receipt_sha256"], "target_document_sha256": target_document_sha256,
         "run_fidelity": "canonical_adaptation", "source_fidelity": "not_promoted", "admitted_shots": 2,
         "claim_scope": _MBP4_SCOPE, "ledger": ledger,
+        "alpha_only_contrast": target["alpha_only_contrast"],
         "blocked_targets": {"figure6": {"status": "blocked_metadata", "missing_metadata": _FIGURE6_MISSING, "assessment": "not_admitted"}},
         "deterministic_replay": {"ledger_sha256": sha256(ledger_bytes).hexdigest(), "replay_ledger_sha256": sha256(replay_bytes).hexdigest()},
     }

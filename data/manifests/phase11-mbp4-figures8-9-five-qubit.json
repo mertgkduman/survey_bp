@@ -10,6 +10,6 @@
   "run_fidelity": "canonical_adaptation",
   "schema": "phase11-mbp4-figures8-9-five-qubit-manifest-v1",
   "source_only": true,
-  "target_document_sha256": "d7538a4fb978ec4e55f73af315c648fe0a888aa07bb4cc86f20433fe640eb1f0",
-  "target_receipt_sha256": "3e20000e8c9bc8c6414aef03bc7fbe59576e11af125f2bc6140c8214dff53023"
+  "target_document_sha256": "9a6a8ecb6846843817967f9e3ca945221f897a2fff3ece969b07efa188908f4f",
+  "target_receipt_sha256": "0f64159f55cac9a4549c931990f9f8caf0d06a66d59a4b850674f9de698a37cd"
 }

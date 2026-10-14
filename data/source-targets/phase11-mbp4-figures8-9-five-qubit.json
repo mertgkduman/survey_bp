@@ -1,4 +1,8 @@
 {
+  "alpha_only_contrast": {
+    "held_constant": ["five_qubit_checks", "IIIYI_error", "epsilon", "schedule", "beta", "numerical_profile", "observation_horizon"],
+    "varying_field": "alpha"
+  },
   "claim_scope": "deterministic_mechanism_only_not_a_curve_or_ranking",
   "observation_horizon": {
     "kind": "frozen_sweeps",
@@ -64,5 +68,5 @@
   "source_author_code_identity": "unverified",
   "source_settings": {"beta":0.0,"epsilon":0.003,"error":[0,0,0,2,0],"schedule":"qbp_flooding"},
   "target_id": "mbp4-figures8-9-five-qubit",
-  "target_receipt_sha256": "3e20000e8c9bc8c6414aef03bc7fbe59576e11af125f2bc6140c8214dff53023"
+  "target_receipt_sha256": "0f64159f55cac9a4549c931990f9f8caf0d06a66d59a4b850674f9de698a37cd"
 }

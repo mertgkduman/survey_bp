@@ -73,6 +73,20 @@ def test_alpha_one_point_five_convergence_uses_original_problem_evaluation() -> 
     assert candidate == target["source_settings"]["error"]
 
 
+def test_alpha_only_contrast_holds_all_non_alpha_settings_and_work_evidence_fixed() -> None:
+    target = _json(TARGET)
+    assessment = _json(ASSESSMENT)
+    expected = {
+        "varying_field": "alpha",
+        "held_constant": ["five_qubit_checks", "IIIYI_error", "epsilon", "schedule", "beta", "numerical_profile", "observation_horizon"],
+    }
+    assert target["alpha_only_contrast"] == expected == assessment["alpha_only_contrast"]
+    paths = assessment["ledger"]["paths"]
+    assert set(paths) == {"alpha_one", "alpha_one_point_five"}
+    assert paths["alpha_one"]["work"]["bp_calls"] == 20
+    assert paths["alpha_one_point_five"]["work"]["bp_calls"] == 13
+
+
 def test_replay_and_digest_bind_target_manifest_ledger_and_assessment() -> None:
     target = _json(TARGET)
     manifest = _json(MANIFEST)
