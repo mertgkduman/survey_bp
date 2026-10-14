@@ -29,6 +29,21 @@ def _parser() -> argparse.ArgumentParser:
         help="read and validate the default-deny Phase 11 production package without dispatching work",
     )
     authorization.add_argument("--package", type=Path, default=DEFAULT_AUTHORIZATION_PACKAGE)
+    record_authorization = commands.add_parser(
+        "record-authorization",
+        help="seal an explicit human review decision without dispatching campaign work",
+    )
+    record_authorization.add_argument("--package", type=Path, default=DEFAULT_AUTHORIZATION_PACKAGE)
+    record_authorization.add_argument(
+        "--decision", required=True, choices=("authorize_exact_manifests", "preserve_deny"),
+    )
+    record_authorization.add_argument("--reviewer")
+    record_authorization.add_argument("--reason")
+    record_authorization.add_argument("--reviewed-package-sha256")
+    record_authorization.add_argument("--confirmed-ceilings-sha256")
+    record_authorization.add_argument("--account")
+    record_authorization.add_argument("--partition")
+    record_authorization.add_argument("--approved-manifest-sha256", action="append", default=[])
     for name in ("preflight", "run", "resume", "merge", "replay", "verify", "assess"):
         command = commands.add_parser(name)
         command.add_argument("--design", type=Path, default=DEFAULT_DESIGN)
@@ -49,6 +64,17 @@ def main(argv: list[str] | None = None) -> None:
             package = json.loads(package_path.read_bytes())
             validate_phase11_dispatch_package(ROOT, package)
             receipt = package
+        elif args.command == "record-authorization":
+            from bp_registry.campaigns.profiling_gate import materialize_phase11_authorization_receipt
+
+            package_path = args.package if args.package.is_absolute() else ROOT / args.package
+            receipt = materialize_phase11_authorization_receipt(
+                ROOT, package_path, decision=args.decision, reviewer=args.reviewer, reason=args.reason,
+                reviewed_package_sha256=args.reviewed_package_sha256,
+                confirmed_ceilings_sha256=args.confirmed_ceilings_sha256,
+                account=args.account, partition=args.partition,
+                approved_manifest_sha256s=tuple(args.approved_manifest_sha256),
+            )
         else:
             receipt = preflight_phase11_controlled_design(root=ROOT, design_path=args.design)
             shard = None

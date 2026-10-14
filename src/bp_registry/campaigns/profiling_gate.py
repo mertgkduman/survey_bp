@@ -8,9 +8,12 @@ pairs and denies an authorization whenever evidence or site ceilings are absent.
 from __future__ import annotations
 
 from dataclasses import dataclass, fields
+from datetime import datetime, timezone
 from hashlib import sha256
 import json
+import os
 from pathlib import Path
+import tempfile
 from types import MappingProxyType
 from typing import Literal, Mapping
 
@@ -46,6 +49,60 @@ class Phase11DispatchProposalV1:
 
     def as_evidence(self) -> dict[str, object]:
         return dict(self.payload)
+
+
+@dataclass(frozen=True, slots=True)
+class Phase11AuthorizationReceiptV1:
+    """One sealed, digest-bound human decision about a Phase 11 package."""
+
+    decision: Literal["allow", "deny"]
+    reviewer: str
+    reason: str
+    recorded_at: str
+    reviewed_package_sha256: str
+    confirmed_ceilings_sha256: str
+    account: str | None
+    partition: str | None
+    approved_manifest_sha256s: tuple[str, ...]
+    denied_campaign_ids: tuple[str, ...]
+    reasons: tuple[str, ...]
+    receipt_sha256: str
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.reviewer, str) or not self.reviewer.strip():
+            raise ValueError("authorization reviewer must be a nonempty string")
+        if not isinstance(self.reason, str) or not self.reason.strip():
+            raise ValueError("authorization reason must be a nonempty string")
+        if not isinstance(self.recorded_at, str):
+            raise ValueError("authorization recorded_at must be an ISO timestamp")
+        try:
+            datetime.fromisoformat(self.recorded_at.replace("Z", "+00:00"))
+        except ValueError as error:
+            raise ValueError("authorization recorded_at must be an ISO timestamp") from error
+        for name in ("reviewed_package_sha256", "confirmed_ceilings_sha256", "receipt_sha256"):
+            _require_digest(getattr(self, name), name=name)
+        if any(value is not None and (not isinstance(value, str) or not value) for value in (self.account, self.partition)):
+            raise ValueError("authorization account and partition must be explicit strings or unavailable")
+        if (not self.denied_campaign_ids or any(not isinstance(item, str) or not item for item in self.denied_campaign_ids)
+                or len(set(self.denied_campaign_ids)) != len(self.denied_campaign_ids)):
+            raise ValueError("authorization denied campaign ids must be a unique nonempty set")
+        if any(not isinstance(item, str) or not item for item in self.reasons):
+            raise ValueError("authorization reasons must be nonempty strings")
+        for digest in self.approved_manifest_sha256s:
+            _require_digest(digest, name="approved manifest digest")
+
+    def as_evidence(self) -> dict[str, object]:
+        payload = {
+            "schema": "phase11_authorization_receipt_v1", "decision": self.decision,
+            "reviewer": self.reviewer, "reason": self.reason, "recorded_at": self.recorded_at,
+            "reviewed_package_sha256": self.reviewed_package_sha256,
+            "confirmed_ceilings_sha256": self.confirmed_ceilings_sha256,
+            "account": self.account, "partition": self.partition,
+            "approved_manifest_sha256s": list(self.approved_manifest_sha256s),
+            "denied_campaign_ids": list(self.denied_campaign_ids), "reasons": list(self.reasons),
+            "dispatch_token": None,
+        }
+        return {**payload, "receipt_sha256": self.receipt_sha256}
 
 
 def _phase11_path(root: Path, relative: str) -> Path:
@@ -119,32 +176,235 @@ def build_phase11_dispatch_package(root: Path) -> dict[str, object]:
     return Phase11DispatchProposalV1(payload).as_evidence()
 
 
+def _phase11_receipt_preimage(receipt: Mapping[str, object]) -> dict[str, object]:
+    return {key: value for key, value in receipt.items() if key != "receipt_sha256"}
+
+
+def _validate_phase11_authorization_receipt(expected: Mapping[str, object], receipt: Mapping[str, object]) -> None:
+    """Validate a sealed decision against the immutable package it reviewed."""
+    if receipt.get("schema") != "phase11_authorization_receipt_v1":
+        raise ValueError("Phase 11 authorization receipt schema is invalid")
+    decision = receipt.get("decision")
+    if decision not in {"allow", "deny"} or receipt.get("dispatch_token") is not None:
+        raise ValueError("Phase 11 authorization receipt cannot contain a dispatch token")
+    candidate = Phase11AuthorizationReceiptV1(
+        decision=decision, reviewer=receipt.get("reviewer"), reason=receipt.get("reason"),
+        recorded_at=receipt.get("recorded_at"), reviewed_package_sha256=receipt.get("reviewed_package_sha256"),
+        confirmed_ceilings_sha256=receipt.get("confirmed_ceilings_sha256"), account=receipt.get("account"),
+        partition=receipt.get("partition"), approved_manifest_sha256s=tuple(receipt.get("approved_manifest_sha256s", ())),
+        denied_campaign_ids=tuple(receipt.get("denied_campaign_ids", ())), reasons=tuple(receipt.get("reasons", ())),
+        receipt_sha256=receipt.get("receipt_sha256"),
+    )
+    if candidate.reviewed_package_sha256 != expected["package_sha256"]:
+        raise ValueError("Phase 11 authorization receipt reviewed package digest is stale")
+    if candidate.confirmed_ceilings_sha256 != _digest(expected["site_capability"]):
+        raise ValueError("Phase 11 authorization receipt ceiling digest is stale")
+    if candidate.receipt_sha256 != _digest(_phase11_receipt_preimage(receipt)):
+        raise ValueError("Phase 11 authorization receipt digest differs from its sealed evidence")
+    campaign_ids = {campaign["campaign_id"] for campaign in expected["requested_campaigns"]}
+    if set(candidate.denied_campaign_ids) - campaign_ids:
+        raise ValueError("Phase 11 authorization receipt names an unknown campaign")
+    manifests = {row["manifest_sha256"] for row in expected["calibrations"]}
+    if set(candidate.approved_manifest_sha256s) - manifests:
+        raise ValueError("Phase 11 authorization receipt names an unknown manifest")
+    eligible = _phase11_eligible_manifest_digests(expected)
+    if candidate.decision == "allow":
+        if not candidate.approved_manifest_sha256s or set(candidate.approved_manifest_sha256s) - eligible:
+            raise ValueError("Phase 11 authorization receipt cannot allow an ineligible manifest")
+        accounting = expected["accounting_partition"]
+        if (not isinstance(accounting, Mapping) or candidate.account != accounting.get("account")
+                or candidate.partition != accounting.get("partition")):
+            raise ValueError("Phase 11 authorization receipt account or partition differs from reviewed evidence")
+        manifest_for_code = {row["code_id"]: row["manifest_sha256"] for row in expected["calibrations"]}
+        expected_denied = {
+            campaign["campaign_id"] for campaign in expected["requested_campaigns"]
+            if manifest_for_code[campaign["code_id"]] not in candidate.approved_manifest_sha256s
+        }
+        if set(candidate.denied_campaign_ids) != expected_denied:
+            raise ValueError("Phase 11 authorization receipt denies an incorrect campaign set")
+    elif set(candidate.denied_campaign_ids) != campaign_ids or candidate.approved_manifest_sha256s:
+        raise ValueError("Phase 11 denial must retain every campaign and no approved manifest")
+
+
 def validate_phase11_dispatch_package(root: Path, package: Mapping[str, object]) -> None:
-    """Reject stale, client-only, or self-authorizing Phase 11 package bytes."""
+    """Reject stale packages and validate either default or sealed deny evidence."""
     if not isinstance(package, Mapping):
         raise ValueError("Phase 11 dispatch package must be a mapping")
-    receipt = package.get("receipt")
-    if not isinstance(receipt, Mapping) or receipt.get("decision") != "deny" or receipt.get("dispatch_token") is not None:
-        raise ValueError("Phase 11 dispatch receipt must remain deny without a dispatch token")
-    requested = package.get("requested_campaigns")
-    if not isinstance(requested, list) or any(
-        not isinstance(campaign, Mapping) or campaign.get("source_eligible") is not False
-        for campaign in requested
-    ):
-        raise ValueError("Phase 11 dispatch package cannot report an ineligible campaign as eligible")
-    declared_digest = package.get("package_sha256")
-    if declared_digest != _digest({key: value for key, value in package.items() if key != "package_sha256"}):
-        raise ValueError("Phase 11 dispatch package digest differs from its retained evidence")
     expected = build_phase11_dispatch_package(root)
     if package == expected:
         return
+    receipt = package.get("receipt")
+    if not isinstance(receipt, Mapping):
+        raise ValueError("Phase 11 dispatch receipt must be a mapping")
+    baseline = dict(package)
+    baseline["receipt"] = expected["receipt"]
+    if baseline != expected:
+        raise ValueError("Phase 11 dispatch package differs from its frozen evidence")
+    if receipt.get("schema") != "phase11_authorization_receipt_v1":
+        if receipt.get("decision") != "deny" or receipt.get("dispatch_token") is not None:
+            raise ValueError("Phase 11 dispatch receipt must remain deny without a dispatch token")
+        raise ValueError("Phase 11 dispatch package has an unsealed authorization receipt")
+    _validate_phase11_authorization_receipt(expected, receipt)
+
+
+def _phase11_receipt_reasons(package: Mapping[str, object]) -> list[str]:
+    default = package["receipt"]
+    if not isinstance(default, Mapping):
+        raise ValueError("Phase 11 package has no default receipt")
+    reasons = default.get("reasons")
+    if not isinstance(reasons, list) or any(not isinstance(reason, str) for reason in reasons):
+        raise ValueError("Phase 11 package has invalid default denial reasons")
+    return list(reasons)
+
+
+def _phase11_eligible_manifest_digests(package: Mapping[str, object]) -> set[str]:
+    """Return the manifest allowlist only when every linked gate is present."""
     site = package.get("site_capability")
-    if isinstance(site, Mapping) and site != expected["site_capability"]:
-        raise ValueError("site capability differs from the unavailable measured-evidence package")
+    accounting = package.get("accounting_partition")
+    quota = package.get("quota_cost")
+    forecast = package.get("forecast")
+    precision = package.get("precision_feasibility")
     calibrations = package.get("calibrations")
-    if calibrations != expected["calibrations"]:
-        raise ValueError("calibration identity is stale or differs from the frozen package")
-    raise ValueError("Phase 11 dispatch package differs from its default-deny evidence")
+    requested = package.get("requested_campaigns")
+    if not all(isinstance(value, Mapping) for value in (site, accounting, quota, forecast, precision)):
+        return set()
+    if not isinstance(calibrations, list) or not isinstance(requested, list):
+        return set()
+    if (precision.get("status") != "powered" or accounting.get("status") != "available"
+            or quota.get("status") != "available" or forecast.get("status") != "available"):
+        return set()
+    if (not isinstance(accounting.get("account"), str) or not accounting["account"]
+            or not isinstance(accounting.get("partition"), str) or not accounting["partition"]):
+        return set()
+    if any(type(site.get(field)) is not int or site[field] <= 0 for field in _CEILING_FIELDS):
+        return set()
+    if any(type(forecast.get(field)) is not int or forecast[field] < 0 for field in (
+        "predicted_memory_bytes", "predicted_wall_time_ns", "predicted_typed_work",
+    )):
+        return set()
+    if quota.get("allocation") is None or quota.get("cost_estimate") is None:
+        return set()
+    rows = {
+        row.get("code_id"): row.get("manifest_sha256") for row in calibrations
+        if isinstance(row, Mapping) and isinstance(row.get("code_id"), str) and isinstance(row.get("manifest_sha256"), str)
+    }
+    if len(rows) != len(calibrations):
+        return set()
+    eligible_codes = {
+        campaign.get("code_id") for campaign in requested
+        if isinstance(campaign, Mapping) and campaign.get("source_eligible") is True
+    }
+    if {campaign.get("code_id") for campaign in requested if isinstance(campaign, Mapping)} != eligible_codes:
+        return set()
+    return {rows[code_id] for code_id in eligible_codes if code_id in rows}
+
+
+def materialize_phase11_authorization_receipt(
+    root: Path, package_path: Path, *, decision: str, reviewer: str | None, reason: str | None,
+    reviewed_package_sha256: str | None, confirmed_ceilings_sha256: str | None,
+    account: str | None, partition: str | None, approved_manifest_sha256s: tuple[str, ...],
+) -> dict[str, object]:
+    """Seal a reviewed decision and atomically replace only the authorization package.
+
+    The current package is revalidated before use.  If it is stale or malformed,
+    the known default-deny package replaces it with an explicit failed-input reason.
+    This makes an interrupted or invalid resume fail closed without dispatching work.
+    """
+    root = root.resolve(strict=True)
+    package_path = package_path.resolve()
+    if package_path.is_symlink() or not package_path.is_file():
+        raise ValueError("authorization package must be a regular file")
+    expected = build_phase11_dispatch_package(root)
+    input_reasons: list[str] = []
+    try:
+        current = json.loads(package_path.read_bytes())
+        validate_phase11_dispatch_package(root, current)
+    except (OSError, ValueError, json.JSONDecodeError) as error:
+        input_reasons.append(f"authorization_input_unverified:{type(error).__name__}")
+    package = dict(expected)
+    reasons = _phase11_receipt_reasons(expected) + input_reasons
+    requested_manifests = tuple(approved_manifest_sha256s)
+    if decision not in {"authorize_exact_manifests", "preserve_deny"}:
+        reasons.append("authorization_request_invalid_decision")
+    if not isinstance(reviewer, str) or not reviewer.strip():
+        reasons.append("authorization_request_missing_reviewer")
+        reviewer = "unattributed"
+    if not isinstance(reason, str) or not reason.strip():
+        reasons.append("authorization_request_missing_reason")
+        reason = "No reviewer reason was supplied; authorization remains denied."
+    if reviewed_package_sha256 != expected["package_sha256"]:
+        reasons.append("authorization_request_stale_package_digest")
+    ceiling_digest = _digest(expected["site_capability"])
+    if confirmed_ceilings_sha256 is not None and confirmed_ceilings_sha256 != ceiling_digest:
+        reasons.append("authorization_request_stale_ceiling_digest")
+    known_manifests = {row["manifest_sha256"] for row in expected["calibrations"]}
+    if len(set(requested_manifests)) != len(requested_manifests):
+        reasons.append("authorization_request_duplicate_manifest")
+    if set(requested_manifests) - known_manifests:
+        reasons.append("authorization_request_unknown_manifest")
+    if decision == "authorize_exact_manifests":
+        if not requested_manifests:
+            reasons.append("authorization_request_empty_allowlist")
+        if confirmed_ceilings_sha256 is None:
+            reasons.append("authorization_request_missing_ceiling_digest")
+    if decision == "preserve_deny":
+        requested_manifests = ()
+    site_accounting = expected["accounting_partition"]
+    if not isinstance(site_accounting, Mapping):
+        raise ValueError("Phase 11 package has invalid accounting evidence")
+    eligible_manifests = _phase11_eligible_manifest_digests(expected)
+    if decision == "authorize_exact_manifests" and set(requested_manifests) - eligible_manifests:
+        reasons.append("authorization_request_ineligible_manifest")
+    if decision == "authorize_exact_manifests" and (
+        account != site_accounting.get("account") or partition != site_accounting.get("partition")
+    ):
+        reasons.append("authorization_request_accounting_mismatch")
+    allow = (
+        decision == "authorize_exact_manifests" and bool(requested_manifests)
+        and not reasons and set(requested_manifests) <= eligible_manifests
+    )
+    manifest_for_code = {row["code_id"]: row["manifest_sha256"] for row in expected["calibrations"]}
+    denied_campaign_ids = sorted(
+        campaign["campaign_id"] for campaign in expected["requested_campaigns"]
+        if not allow or manifest_for_code[campaign["code_id"]] not in requested_manifests
+    )
+    receipt_payload: dict[str, object] = {
+        "schema": "phase11_authorization_receipt_v1", "decision": "allow" if allow else "deny", "reviewer": reviewer,
+        "reason": reason, "recorded_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "reviewed_package_sha256": expected["package_sha256"], "confirmed_ceilings_sha256": ceiling_digest,
+        "account": site_accounting.get("account"), "partition": site_accounting.get("partition"),
+        "approved_manifest_sha256s": sorted(requested_manifests) if allow else [],
+        "denied_campaign_ids": denied_campaign_ids,
+        "reasons": sorted(set(reasons)) if reasons else ["human_reviewed_exact_manifest_allow"], "dispatch_token": None,
+    }
+    receipt_payload["receipt_sha256"] = _digest(_phase11_receipt_preimage(receipt_payload))
+    sealed = Phase11AuthorizationReceiptV1(
+        decision=receipt_payload["decision"], reviewer=receipt_payload["reviewer"], reason=receipt_payload["reason"],
+        recorded_at=receipt_payload["recorded_at"], reviewed_package_sha256=receipt_payload["reviewed_package_sha256"],
+        confirmed_ceilings_sha256=receipt_payload["confirmed_ceilings_sha256"], account=receipt_payload["account"],
+        partition=receipt_payload["partition"], approved_manifest_sha256s=tuple(receipt_payload["approved_manifest_sha256s"]),
+        denied_campaign_ids=tuple(receipt_payload["denied_campaign_ids"]), reasons=tuple(receipt_payload["reasons"]),
+        receipt_sha256=receipt_payload["receipt_sha256"],
+    )
+    package["receipt"] = sealed.as_evidence()
+    _write_phase11_package_atomic(package_path, package)
+    reloaded = json.loads(package_path.read_bytes())
+    validate_phase11_dispatch_package(root, reloaded)
+    return reloaded
+
+
+def _write_phase11_package_atomic(path: Path, package: Mapping[str, object]) -> None:
+    """Publish one fully-written receipt package without exposing partial JSON."""
+    payload = json.dumps(package, sort_keys=True, separators=(",", ":"), allow_nan=False).encode() + b"\n"
+    with tempfile.NamedTemporaryFile(dir=path.parent, prefix=".phase11-authorization-", delete=False) as handle:
+        handle.write(payload)
+        handle.flush()
+        os.fsync(handle.fileno())
+        temporary = Path(handle.name)
+    try:
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def _digest(value: object) -> str:

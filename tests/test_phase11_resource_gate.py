@@ -129,3 +129,95 @@ def test_record_authorization_ineligible_allow_request_is_sealed_as_deny(tmp_pat
     assert receipt["approved_manifest_sha256s"] == []
     assert "authorization_request_ineligible_manifest" in receipt["reasons"]
     assert receipt["dispatch_token"] is None
+
+
+def test_record_authorization_stale_digest_rewrites_a_sealed_deny(tmp_path: Path) -> None:
+    """A stale review cannot preserve or create any prior authorization."""
+    package_path = tmp_path / "authorization.json"
+    package_path.write_bytes((ROOT / "data/results/phase11-production-authorization.json").read_bytes())
+
+    result = subprocess.run(
+        [
+            sys.executable, "scripts/run_phase11_controlled.py", "record-authorization",
+            "--package", str(package_path), "--decision", "preserve_deny",
+            "--reviewer", "chat_user", "--reason", "Record a stale review as denied.",
+            "--reviewed-package-sha256", "0" * 64,
+        ],
+        cwd=ROOT, text=True, capture_output=True, check=False,
+    )
+
+    assert result.returncode == 0, result.stdout
+    receipt = json.loads(package_path.read_text(encoding="utf-8"))["receipt"]
+    assert receipt["decision"] == "deny"
+    assert "authorization_request_stale_package_digest" in receipt["reasons"]
+    assert receipt["dispatch_token"] is None
+
+
+def test_record_authorization_interrupted_write_leaves_existing_package_intact(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The deny receipt publication uses replacement, so a failed replacement is not durable."""
+    package_path = tmp_path / "authorization.json"
+    original = (ROOT / "data/results/phase11-production-authorization.json").read_bytes()
+    package_path.write_bytes(original)
+    module = _api()
+
+    def fail_replace(source: Path, destination: Path) -> None:
+        raise OSError("simulated replacement interruption")
+
+    monkeypatch.setattr(module.os, "replace", fail_replace)
+    with pytest.raises(OSError, match="simulated replacement interruption"):
+        module.materialize_phase11_authorization_receipt(
+            ROOT, package_path, decision="preserve_deny", reviewer="chat_user",
+            reason="Exercise atomic failure handling.",
+            reviewed_package_sha256=json.loads(original)["package_sha256"],
+            confirmed_ceilings_sha256=None, account=None, partition=None,
+            approved_manifest_sha256s=(),
+        )
+
+    assert package_path.read_bytes() == original
+    assert not list(tmp_path.glob(".phase11-authorization-*"))
+
+
+def test_exact_digest_allow_subset_requires_every_gate_and_keeps_other_campaigns_denied() -> None:
+    """The receipt validator accepts only a reviewed subset of an eligible package."""
+    module = _api()
+    package = module.build_phase11_dispatch_package(ROOT)
+    package["requested_campaigns"] = [
+        {**campaign, "source_eligible": True} for campaign in package["requested_campaigns"]
+    ]
+    package["site_capability"] = {
+        "installed_slurm_clients": False,
+        "max_cpu_time_ns": 10, "max_wall_time_ns": 10, "max_storage_bytes": 10,
+        "max_shard_bytes": 10, "max_replay_time_ns": 10, "max_peak_memory_bytes": 10,
+        "max_scheduler_cost_ns": 10,
+    }
+    package["accounting_partition"] = {"status": "available", "account": "research", "partition": "cpu"}
+    package["quota_cost"] = {"status": "available", "allocation": 10, "cost_estimate": 10}
+    package["forecast"] = {
+        "status": "available", "predicted_memory_bytes": 1,
+        "predicted_wall_time_ns": 1, "predicted_typed_work": 1,
+    }
+    package["receipt"] = {"decision": "deny", "dispatch_token": None, "reasons": []}
+    chosen = package["calibrations"][0]["manifest_sha256"]
+    denied = [
+        campaign["campaign_id"] for campaign in package["requested_campaigns"]
+        if campaign["code_id"] != package["calibrations"][0]["code_id"]
+    ]
+    receipt = {
+        "schema": "phase11_authorization_receipt_v1", "decision": "allow", "reviewer": "chat_user",
+        "reason": "Exact reviewed subset.", "recorded_at": "2026-10-14T22:44:29Z",
+        "reviewed_package_sha256": package["package_sha256"],
+        "confirmed_ceilings_sha256": module._digest(package["site_capability"]),
+        "account": "research", "partition": "cpu", "approved_manifest_sha256s": [chosen],
+        "denied_campaign_ids": denied, "reasons": ["human_reviewed_exact_manifest_allow"],
+        "dispatch_token": None,
+    }
+    receipt["receipt_sha256"] = module._digest({key: value for key, value in receipt.items() if key != "receipt_sha256"})
+
+    module._validate_phase11_authorization_receipt(package, receipt)
+
+    receipt["approved_manifest_sha256s"].append("0" * 64)
+    receipt["receipt_sha256"] = module._digest({key: value for key, value in receipt.items() if key != "receipt_sha256"})
+    with pytest.raises(ValueError, match="unknown manifest"):
+        module._validate_phase11_authorization_receipt(package, receipt)
