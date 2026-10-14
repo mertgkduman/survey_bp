@@ -56,7 +56,7 @@ requirements-assessed: [QEV-01, QEV-02]
 - Added `Phase11DispatchProposalV1` and a deterministic package covering both code calibrations, controlled/source campaign requests, paired precision, site evidence, accounting, quota/cost, forecasts, and authorization status.
 - Wrote the checked-in package at `data/results/phase11-production-authorization.json`; it has `decision: deny`, no dispatch token, and explicit reasons for every missing external prerequisite.
 
-## Verification
+## Checks Run
 
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase11_joint_separate.py tests/test_phase11_quaternary_campaign.py -k 'bb72 and (tracer or independence or provenance or distance or replay)' -x` — passed (2 tests).
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase11_quaternary_campaign.py tests/test_phase11_resource_gate.py -k 'bb72 and (three_point or work or runtime or resource or limit or merge)' -x` — passed (1 test).
