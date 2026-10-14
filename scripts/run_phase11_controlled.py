@@ -18,11 +18,17 @@ from bp_registry.campaigns.controlled_execution import (
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DESIGN = ROOT / "data/studies/phase11-gb46-joint-separate.json"
+DEFAULT_AUTHORIZATION_PACKAGE = ROOT / "data/results/phase11-production-authorization.json"
 
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
+    authorization = commands.add_parser(
+        "verify-authorization",
+        help="read and validate the default-deny Phase 11 production package without dispatching work",
+    )
+    authorization.add_argument("--package", type=Path, default=DEFAULT_AUTHORIZATION_PACKAGE)
     for name in ("preflight", "run", "resume", "merge", "replay", "verify", "assess"):
         command = commands.add_parser(name)
         command.add_argument("--design", type=Path, default=DEFAULT_DESIGN)
@@ -34,23 +40,33 @@ def _parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> None:
     args = _parser().parse_args(argv)
     try:
-        receipt = preflight_phase11_controlled_design(root=ROOT, design_path=args.design)
-        shard = None
-        if args.shard is not None:
-            point, start, end = args.shard.split(":", 2)
-            shard = (point, int(start), int(end))
-        if args.command == "run":
-            receipt = run_phase11_controlled(root=ROOT, design_path=args.design, output_root=args.output_root, shard=shard)
-        elif args.command == "resume":
-            receipt = run_phase11_controlled(root=ROOT, design_path=args.design, output_root=args.output_root, resume=True, shard=shard)
-        elif args.command == "merge":
-            receipt = verify_phase11_controlled(root=ROOT, design_path=args.design, output_root=args.output_root)
-        elif args.command == "replay":
-            receipt = replay_phase11_controlled(root=ROOT, design_path=args.design, output_root=args.output_root)
-        elif args.command == "verify":
-            receipt = verify_phase11_controlled(root=ROOT, design_path=args.design, output_root=args.output_root)
-        elif args.command == "assess":
-            receipt = assess_phase11_controlled(root=ROOT, design_path=args.design, output_root=args.output_root)
+        if args.command == "verify-authorization":
+            from bp_registry.campaigns.profiling_gate import validate_phase11_dispatch_package
+
+            package_path = args.package if args.package.is_absolute() else ROOT / args.package
+            if package_path.is_symlink() or not package_path.is_file():
+                raise ValueError("authorization package must be a regular file")
+            package = json.loads(package_path.read_bytes())
+            validate_phase11_dispatch_package(ROOT, package)
+            receipt = package
+        else:
+            receipt = preflight_phase11_controlled_design(root=ROOT, design_path=args.design)
+            shard = None
+            if args.shard is not None:
+                point, start, end = args.shard.split(":", 2)
+                shard = (point, int(start), int(end))
+            if args.command == "run":
+                receipt = run_phase11_controlled(root=ROOT, design_path=args.design, output_root=args.output_root, shard=shard)
+            elif args.command == "resume":
+                receipt = run_phase11_controlled(root=ROOT, design_path=args.design, output_root=args.output_root, resume=True, shard=shard)
+            elif args.command == "merge":
+                receipt = verify_phase11_controlled(root=ROOT, design_path=args.design, output_root=args.output_root)
+            elif args.command == "replay":
+                receipt = replay_phase11_controlled(root=ROOT, design_path=args.design, output_root=args.output_root)
+            elif args.command == "verify":
+                receipt = verify_phase11_controlled(root=ROOT, design_path=args.design, output_root=args.output_root)
+            elif args.command == "assess":
+                receipt = assess_phase11_controlled(root=ROOT, design_path=args.design, output_root=args.output_root)
     except (OSError, ValueError) as error:
         print(json.dumps({"schema": "phase11_controlled_cli_v1", "status": "error", "error": str(error)}, sort_keys=True))
         raise SystemExit(2) from error

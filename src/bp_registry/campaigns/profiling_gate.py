@@ -126,6 +126,15 @@ def validate_phase11_dispatch_package(root: Path, package: Mapping[str, object])
     receipt = package.get("receipt")
     if not isinstance(receipt, Mapping) or receipt.get("decision") != "deny" or receipt.get("dispatch_token") is not None:
         raise ValueError("Phase 11 dispatch receipt must remain deny without a dispatch token")
+    requested = package.get("requested_campaigns")
+    if not isinstance(requested, list) or any(
+        not isinstance(campaign, Mapping) or campaign.get("source_eligible") is not False
+        for campaign in requested
+    ):
+        raise ValueError("Phase 11 dispatch package cannot report an ineligible campaign as eligible")
+    declared_digest = package.get("package_sha256")
+    if declared_digest != _digest({key: value for key, value in package.items() if key != "package_sha256"}):
+        raise ValueError("Phase 11 dispatch package digest differs from its retained evidence")
     expected = build_phase11_dispatch_package(root)
     if package == expected:
         return

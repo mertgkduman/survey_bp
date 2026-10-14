@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 import importlib
 from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 
@@ -47,3 +49,27 @@ def test_checked_in_phase11_authorization_package_is_valid_and_deny_only() -> No
     package = json.loads((ROOT / "data/results/phase11-production-authorization.json").read_text(encoding="utf-8"))
     _api().validate_phase11_dispatch_package(ROOT, package)
     assert package["receipt"]["decision"] == "deny"
+
+
+def test_public_cli_verifies_only_the_exact_default_deny_authorization_package(tmp_path: Path) -> None:
+    package = ROOT / "data/results/phase11-production-authorization.json"
+    command = [sys.executable, "scripts/run_phase11_controlled.py", "verify-authorization", "--package", str(package)]
+
+    valid = subprocess.run(command, cwd=ROOT, text=True, capture_output=True, check=False)
+
+    assert valid.returncode == 0, valid.stdout
+    receipt = json.loads(valid.stdout)
+    assert receipt["status"] == "ok"
+    assert receipt["receipt"]["decision"] == "deny"
+    assert receipt["receipt"]["dispatch_token"] is None
+    assert all(not campaign["source_eligible"] for campaign in receipt["requested_campaigns"])
+
+    tampered = json.loads(package.read_text(encoding="utf-8"))
+    tampered["requested_campaigns"][0]["source_eligible"] = True
+    altered = tmp_path / "allowing.json"
+    altered.write_text(json.dumps(tampered), encoding="utf-8")
+    rejected = subprocess.run(
+        [*command[:-1], str(altered)], cwd=ROOT, text=True, capture_output=True, check=False,
+    )
+    assert rejected.returncode == 2
+    assert json.loads(rejected.stdout)["status"] == "error"

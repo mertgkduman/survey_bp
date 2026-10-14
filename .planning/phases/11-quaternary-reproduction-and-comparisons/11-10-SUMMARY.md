@@ -55,12 +55,14 @@ requirements-assessed: [QEV-01, QEV-02]
 - Extended matched-pair evidence with arm and X/Z component callback-wall runtimes. Native BP4 and binary SPA work mappings stay named independently, and verifier output reports them side by side without a conversion factor.
 - Added `Phase11DispatchProposalV1` and a deterministic package covering both code calibrations, controlled/source campaign requests, paired precision, site evidence, accounting, quota/cost, forecasts, and authorization status.
 - Wrote the checked-in package at `data/results/phase11-production-authorization.json`; it has `decision: deny`, no dispatch token, and explicit reasons for every missing external prerequisite.
+- Added the read-only `verify-authorization` public command. It validates the exact retained package digest, both calibration manifests, site/accounting/precision facts, and deny-only eligibility before printing the receipt.
 
 ## Checks Run
 
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase11_joint_separate.py tests/test_phase11_quaternary_campaign.py -k 'bb72 and (tracer or independence or provenance or distance or replay)' -x` — passed (2 tests).
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase11_quaternary_campaign.py tests/test_phase11_resource_gate.py -k 'bb72 and (three_point or work or runtime or resource or limit or merge)' -x` — passed (1 test).
 - `OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/test_phase11_resource_gate.py -k 'proposal or deny or ceiling or accounting or stale or source or precision or digest' -x` — passed (5 tests).
+- `OMP_NUM_THREADS=1 .venv/bin/python scripts/run_phase11_controlled.py verify-authorization --package data/results/phase11-production-authorization.json` — passed; returned the retained deny receipt with no dispatch token.
 
 ## TDD Evidence
 
