@@ -216,6 +216,12 @@ class QbpgdController:
             "algorithm": self.spec.algorithm_component_id, "fixation": self.spec.fixation_component_id,
             "depolarizing_setup": self.spec.depolarizing_component_id,
         }
+        terminal_leaf = f"qbpgd:terminal-evaluation:{session.problem.lineage_id}"
+        terminal_evaluation = self._reserve(session, WorkVector(candidate_checks=1), terminal_leaf)
+        if terminal_evaluation is None:
+            termination = "work_cap"
+        else:
+            terminal_evaluation.commit_once()
         result = QbpgdResult(
             spec_identity=_digest(asdict(self.spec)), run_fidelity="canonical_adaptation",
             component_fidelity={

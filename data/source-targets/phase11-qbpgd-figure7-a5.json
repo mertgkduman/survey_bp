@@ -1,0 +1,65 @@
+{
+  "artifact": {
+    "path": "data/artifacts/quaternary-a5.json",
+    "provenance_path": "data/artifacts/quaternary-a5.provenance.json",
+    "provenance_sha256": "307e954408c7968be084bfe14e395b9c5d518718c673aa14ac007cd544ddc845",
+    "raw_sha256": "ccdc45572ac867ce80c13f04d1e1108996e699805a4a7a55fbcc80e98506dd1c"
+  },
+  "bounded_qualification": {
+    "canonical_iterations_per_round": 1,
+    "depolarizing_p": 0.03,
+    "limitation": "one-sweep canonical-adaptation qualification probe; not a Figure 7 performance point",
+    "max_bp_calls": 1,
+    "max_events": 32,
+    "max_storage_bytes": 1000000,
+    "max_wall_seconds": 30,
+    "round_limit": 1,
+    "shot_id": 0
+  },
+  "canonical_interpretations": {
+    "continued_messages": "D-14",
+    "normalization": "D-15",
+    "ties": "D-16"
+  },
+  "extraction": {
+    "reason": "reviewed Figure 7 coordinates and tolerance are unavailable",
+    "status": "blocked_metadata"
+  },
+  "paper": {
+    "channel": "depolarizing",
+    "code": "A5",
+    "figure": "Figure 7"
+  },
+  "qualification_blockers": [
+    "continued_message_lifecycle_unresolved",
+    "tie_rule_unresolved",
+    "normalization_interface_unresolved",
+    "figure_coordinates_unreviewed",
+    "author_implementation_identity_unverified"
+  ],
+  "run_fidelity": "canonical_adaptation",
+  "schema": "phase11-qbpgd-source-target-v1",
+  "settings": {
+    "ordinary_qbp": {
+      "iterations": 100
+    },
+    "qbpgd": {
+      "early_syndrome_stop": true,
+      "epsilon": 1e-10,
+      "iterations_per_round": 10,
+      "maximum_decimation_rounds": 180
+    }
+  },
+  "source_author_code_identity": "unverified",
+  "source_components": {
+    "algorithm": "yao-2023-qbpgd-algorithm-3-v2",
+    "depolarizing_setup": "yao-2023-qbpgd-depolarizing-setup-v2",
+    "fixation": "yao-2023-qbpgd-literal-fixation-v2"
+  },
+  "source_stopping": {
+    "denominator": "trials_until_100_error_cases",
+    "error_cases": 100
+  },
+  "target_id": "qbpgd-figure7-a5",
+  "target_receipt_sha256": "96a83d407555e498334c3fdda8bb5da73050d30b192d7f9853a5785bfe7dd8b4"
+}

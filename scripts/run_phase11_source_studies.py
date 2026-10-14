@@ -8,7 +8,10 @@ from hashlib import sha256
 import json
 from pathlib import Path
 import sys
+import time
 from typing import Any
+
+import numpy as np
 
 from bp_registry.campaigns.targets import QuaternarySourceTargetV1
 
@@ -27,8 +30,78 @@ def _load(path: Path) -> dict[str, Any]:
     return loaded
 
 
-def _validated(target_path: Path, manifest_path: Path | None) -> tuple[QuaternarySourceTargetV1, dict[str, Any] | None, str]:
+_A5_SETTINGS = {
+    "qbpgd": {"iterations_per_round": 10, "epsilon": 1e-10, "maximum_decimation_rounds": 180, "early_syndrome_stop": True},
+    "ordinary_qbp": {"iterations": 100},
+}
+_A5_BLOCKERS = {
+    "continued_message_lifecycle_unresolved", "tie_rule_unresolved",
+    "normalization_interface_unresolved", "figure_coordinates_unreviewed",
+    "author_implementation_identity_unverified",
+}
+_A5_COMPONENTS = {
+    "algorithm": "yao-2023-qbpgd-algorithm-3-v2",
+    "fixation": "yao-2023-qbpgd-literal-fixation-v2",
+    "depolarizing_setup": "yao-2023-qbpgd-depolarizing-setup-v2",
+}
+
+
+def _receipt_digest(payload: dict[str, Any]) -> str:
+    frozen = dict(payload)
+    frozen.pop("target_receipt_sha256", None)
+    return sha256(_canonical_bytes(frozen)).hexdigest()
+
+
+def _validated_qbpgd(target_path: Path, manifest_path: Path | None) -> tuple[dict[str, Any], dict[str, Any] | None, str]:
     target_bytes = target_path.read_bytes()
+    target = _load(target_path)
+    if target.get("schema") != "phase11-qbpgd-source-target-v1":
+        raise ValueError("Q-BPGD source target schema is not admitted")
+    if target.get("paper") != {"figure": "Figure 7", "code": "A5", "channel": "depolarizing"}:
+        raise ValueError("Q-BPGD target must freeze Figure 7 A5 depolarizing evidence")
+    if target.get("settings") != _A5_SETTINGS:
+        raise ValueError("Q-BPGD target settings differ from Figure 7")
+    if target.get("source_stopping") != {"error_cases": 100, "denominator": "trials_until_100_error_cases"}:
+        raise ValueError("Q-BPGD target source stopping must retain 100 error cases")
+    if target.get("run_fidelity") != "canonical_adaptation" or target.get("source_author_code_identity") != "unverified":
+        raise ValueError("Q-BPGD target cannot promote source or author-code fidelity")
+    if target.get("source_components") != _A5_COMPONENTS or target.get("canonical_interpretations") != {"continued_messages": "D-14", "normalization": "D-15", "ties": "D-16"}:
+        raise ValueError("Q-BPGD source components and canonical interpretations must remain separately bound")
+    blockers = target.get("qualification_blockers")
+    if not isinstance(blockers, list) or len(blockers) != len(set(blockers)) or not _A5_BLOCKERS.issubset(blockers):
+        raise ValueError("Q-BPGD target must preserve every named fidelity blocker")
+    if target.get("target_receipt_sha256") != _receipt_digest(target):
+        raise ValueError("Q-BPGD target receipt digest differs from frozen content")
+    root = Path(__file__).resolve().parents[1]
+    artifact = target.get("artifact")
+    if not isinstance(artifact, dict) or artifact.get("path") != "data/artifacts/quaternary-a5.json" or artifact.get("provenance_path") != "data/artifacts/quaternary-a5.provenance.json":
+        raise ValueError("Q-BPGD target must bind only the frozen A5 artifact and provenance")
+    artifact_path = root / str(artifact["path"])
+    provenance_path = root / str(artifact["provenance_path"])
+    if artifact.get("raw_sha256") != sha256(artifact_path.read_bytes()).hexdigest() or artifact.get("provenance_sha256") != sha256(provenance_path.read_bytes()).hexdigest():
+        raise ValueError("A5 artifact or provenance digest differs from the Q-BPGD target")
+    provenance = _load(provenance_path)
+    if provenance.get("artifact", {}).get("raw_sha256") != artifact.get("raw_sha256") or provenance.get("distance", {}).get("independently_verified") is not False:
+        raise ValueError("A5 provenance does not retain the checked artifact and source-reported distance boundary")
+    qualification = target.get("bounded_qualification")
+    if qualification != {"shot_id": 0, "depolarizing_p": 0.03, "canonical_iterations_per_round": 1, "round_limit": 1, "max_bp_calls": 1, "max_events": 32, "max_storage_bytes": 1_000_000, "max_wall_seconds": 30, "limitation": "one-sweep canonical-adaptation qualification probe; not a Figure 7 performance point"}:
+        raise ValueError("Q-BPGD bounded qualification limits are incomplete or drifted")
+    if manifest_path is None:
+        return target, None, sha256(target_bytes).hexdigest()
+    manifest = _load(manifest_path)
+    if manifest.get("schema") != "phase11-qbpgd-source-manifest-v1":
+        raise ValueError("Q-BPGD source manifest schema is not admitted")
+    if manifest.get("target_document_sha256") != sha256(target_bytes).hexdigest() or manifest.get("target_receipt_sha256") != _receipt_digest(target):
+        raise ValueError("Q-BPGD source manifest target digest differs")
+    if manifest.get("artifact") != artifact or manifest.get("source_only") is not True or manifest.get("controlled_comparison") is not False or manifest.get("run_fidelity") != "canonical_adaptation":
+        raise ValueError("Q-BPGD source manifest cannot alter source identity or fidelity")
+    return target, manifest, sha256(target_bytes).hexdigest()
+
+
+def _validated(target_path: Path, manifest_path: Path | None) -> tuple[Any, dict[str, Any] | None, str]:
+    target_bytes = target_path.read_bytes()
+    if _load(target_path).get("schema") == "phase11-qbpgd-source-target-v1":
+        return _validated_qbpgd(target_path, manifest_path)
     target = QuaternarySourceTargetV1.model_validate_json(target_bytes)
     if manifest_path is None:
         return target, None, sha256(target_bytes).hexdigest()
@@ -73,9 +146,81 @@ def _blocked_assessment(target: QuaternarySourceTargetV1, target_document_sha256
     return payload
 
 
+def _qbpgd_assessment(target: dict[str, Any], target_document_sha256: str) -> dict[str, Any]:
+    payload = {
+        "schema": "phase11-qbpgd-source-assessment-v1",
+        "status": "inconclusive",
+        "target_receipt_sha256": _receipt_digest(target),
+        "target_document_sha256": target_document_sha256,
+        "run_fidelity": "canonical_adaptation",
+        "source_fidelity": "not_promoted",
+        "admitted_shots": 0,
+        "qualification_blockers": list(target["qualification_blockers"]),
+        "discrepancy": "not_assessed_due_to_unresolved_figure_coordinates_and_author_identity",
+    }
+    payload["assessment_sha256"] = sha256(_canonical_bytes(payload)).hexdigest()
+    return payload
+
+
+def _run_qbpgd_qualification(target: dict[str, Any]) -> dict[str, Any]:
+    """Run one bounded deterministic canonical shot without creating a curve verdict."""
+    from bp_registry.canonical.budgets import BudgetLimit, BudgetTree
+    from bp_registry.quaternary.problems import QuaternaryOriginalProblem, construct_qbpgd_a5_css
+    from bp_registry.quaternary.qbpgd import QbpgdController, QbpgdSpec, ScalarLlrBp4Kernel, reconstruct_qbpgd
+
+    limits = target["bounded_qualification"]
+    started = time.monotonic()
+    code, _receipt = construct_qbpgd_a5_css()
+    p = float(limits["depolarizing_p"])
+    rng = np.random.default_rng(np.random.SeedSequence([11, 2, int(limits["shot_id"])]))
+    hidden = rng.choice(4, size=code.n, p=[1.0 - p, p / 3.0, p / 3.0, p / 3.0]).astype(np.uint8)
+    problem = QuaternaryOriginalProblem(
+        lineage_id="original-phase11-qbpgd-a5-qualification-000",
+        code=code,
+        syndrome=code.syndrome(hidden),
+    )
+    priors = np.repeat(np.asarray([[1.0 - p, p / 3.0, p / 3.0, p / 3.0]], dtype=np.float64), code.n, axis=0)
+    spec = QbpgdSpec(iterations_per_round=int(limits["canonical_iterations_per_round"]), epsilon=1e-10, round_limit=1)
+    budgets = (BudgetLimit("attempt", "bp_calls", int(limits["max_bp_calls"])),)
+    result = QbpgdController(spec).run(ScalarLlrBp4Kernel().new_session(problem, priors, budgets=BudgetTree(limits=budgets, parents={})))
+    elapsed = time.monotonic() - started
+    if elapsed > float(limits["max_wall_seconds"]):
+        raise ValueError("Q-BPGD qualification exceeded frozen wall-time cap")
+    # ``reconstruct_qbpgd`` performs the complete evidence comparison and
+    # raises on any transition, fidelity, or typed-work disagreement.
+    reconstruct_qbpgd(spec, problem, priors, result, budget_limits=budgets)
+    rounds = [
+        {
+            "index": round_.index,
+            "sweeps": len(round_.sweeps),
+            "ranking_scan_count": len(round_.eligibility_set) if round_.selection_leaf is not None else 0,
+            "selection_leaf": round_.selection_leaf,
+            "fixation_leaf": round_.fixation_leaf,
+            "original_check_leaf": round_.original_check_leaf,
+            "terminal_reason": round_.terminal_reason,
+        }
+        for round_ in result.rounds
+    ]
+    evidence = {
+        "shot_id": limits["shot_id"],
+        "execution_kind": "one-sweep_canonical_adaptation_qualification_probe",
+        "limitation": limits["limitation"],
+        "hidden_truth_sha256": sha256(hidden.tobytes()).hexdigest(),
+        "termination": result.termination,
+        "rounds": rounds,
+        "work": result.work.as_evidence(structural_event_version=4),
+        "elapsed_seconds": elapsed,
+        "replay": "passed",
+        "performance_verdict": "not_assessed",
+    }
+    if len(rounds) > int(limits["max_events"]) or len(_canonical_bytes(evidence)) > int(limits["max_storage_bytes"]):
+        raise ValueError("Q-BPGD qualification exceeded frozen event or storage cap")
+    return evidence
+
+
 def preflight(target_path: Path, manifest_path: Path | None, assessment_path: Path) -> dict[str, Any]:
     target, _manifest, document_digest = _validated(target_path, manifest_path)
-    assessment = _blocked_assessment(target, document_digest)
+    assessment = _qbpgd_assessment(target, document_digest) if isinstance(target, dict) else _blocked_assessment(target, document_digest)
     assessment_path.parent.mkdir(parents=True, exist_ok=True)
     assessment_path.write_bytes(_canonical_bytes(assessment) + b"\n")
     return assessment
@@ -84,14 +229,24 @@ def preflight(target_path: Path, manifest_path: Path | None, assessment_path: Pa
 def verify(target_path: Path, manifest_path: Path | None, assessment_path: Path) -> dict[str, Any]:
     target, _manifest, document_digest = _validated(target_path, manifest_path)
     assessment = _load(assessment_path)
-    expected = _blocked_assessment(target, document_digest)
-    if assessment != expected:
+    expected = _qbpgd_assessment(target, document_digest) if isinstance(target, dict) else _blocked_assessment(target, document_digest)
+    if assessment == expected:
+        return assessment
+    if not isinstance(target, dict) or assessment.get("preflight") != expected:
         raise ValueError("assessment digest or blocked source evidence drifted")
     return assessment
 
 
 def run(target_path: Path, manifest_path: Path | None, assessment_path: Path) -> dict[str, Any]:
     target, _manifest, document_digest = _validated(target_path, manifest_path)
+    if isinstance(target, dict):
+        preflight_receipt = _qbpgd_assessment(target, document_digest)
+        evidence = _run_qbpgd_qualification(target)
+        result = {**preflight_receipt, "admitted_shots": 1, "qualification": evidence, "preflight": preflight_receipt}
+        result["assessment_sha256"] = sha256(_canonical_bytes({key: value for key, value in result.items() if key != "assessment_sha256"})).hexdigest()
+        assessment_path.parent.mkdir(parents=True, exist_ok=True)
+        assessment_path.write_bytes(_canonical_bytes(result) + b"\n")
+        return result
     assessment = _blocked_assessment(target, document_digest)
     if assessment["status"] == "blocked_metadata":
         raise ValueError("source assessment is blocked_metadata; sampling is not admitted")

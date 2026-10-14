@@ -1,0 +1,31 @@
+{
+  "admission": "bounded_qualification_only_until_coordinates_and_author_identity_are_resolved",
+  "artifact": {
+    "path": "data/artifacts/quaternary-a5.json",
+    "provenance_path": "data/artifacts/quaternary-a5.provenance.json",
+    "provenance_sha256": "307e954408c7968be084bfe14e395b9c5d518718c673aa14ac007cd544ddc845",
+    "raw_sha256": "ccdc45572ac867ce80c13f04d1e1108996e699805a4a7a55fbcc80e98506dd1c"
+  },
+  "canonical_interpretations": {
+    "continued_messages": "D-14",
+    "normalization": "D-15",
+    "ties": "D-16"
+  },
+  "controlled_comparison": false,
+  "paper": {
+    "channel": "depolarizing",
+    "code": "A5",
+    "figure": "Figure 7"
+  },
+  "review_instructions": "Review Figure 7 coordinates, calibration, tolerance, Algorithm 3 message lifecycle, tie and normalization semantics, and authoritative author implementation identity before a statistical assessment.",
+  "run_fidelity": "canonical_adaptation",
+  "schema": "phase11-qbpgd-source-manifest-v1",
+  "source_component_identity": {
+    "algorithm": "yao-2023-qbpgd-algorithm-3-v2",
+    "depolarizing_setup": "yao-2023-qbpgd-depolarizing-setup-v2",
+    "fixation": "yao-2023-qbpgd-literal-fixation-v2"
+  },
+  "source_only": true,
+  "target_document_sha256": "55119ab6debe2a2480b707a16441ba0fb31644679257994ba1474abf8fb441b6",
+  "target_receipt_sha256": "96a83d407555e498334c3fdda8bb5da73050d30b192d7f9853a5785bfe7dd8b4"
+}
