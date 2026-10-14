@@ -287,6 +287,18 @@ def _mbp4_assessment(target: dict[str, Any], target_document_sha256: str) -> dic
         "target_receipt_sha256": target["target_receipt_sha256"], "target_document_sha256": target_document_sha256,
         "run_fidelity": "canonical_adaptation", "source_fidelity": "not_promoted", "admitted_shots": 2,
         "claim_scope": _MBP4_SCOPE, "ledger": ledger,
+        "evidence_kind": "deterministic_mechanism",
+        "source_denominator": {
+            "status": "not_applicable",
+            "reason": "finite deterministic trace has no stochastic trial denominator",
+        },
+        "stopping": {"kind": "frozen_sweeps", "sweeps": int(target["observation_horizon"]["sweeps"])},
+        "claim_limits": {
+            "curve": "ineligible",
+            "decoder_ranking": "ineligible",
+            "paper_performance": "ineligible",
+            "threshold": "ineligible",
+        },
         "alpha_only_contrast": target["alpha_only_contrast"],
         "blocked_targets": {"figure6": {"status": "blocked_metadata", "missing_metadata": _FIGURE6_MISSING, "assessment": "not_admitted"}},
         "deterministic_replay": {"ledger_sha256": sha256(ledger_bytes).hexdigest(), "replay_ledger_sha256": sha256(replay_bytes).hexdigest()},
