@@ -450,6 +450,59 @@ class BinaryArmResultV1(StrictModel):
     work: dict[str, int]
 
 
+def canonical_binary_materialized_decoder(
+    *, materialized_sample: MaterializedPhysicalSampleV1,
+    manifest_paths: dict[Literal["X", "Z"], Path], ledger_directory: Path,
+) -> Callable[[BinaryArmInputV1], BinaryArmResultV1]:
+    """Adapt the canonical materialized runner without exposing physical truth.
+
+    The closure owns the evaluator-only materialized bytes and gives the
+    canonical runner the exact shared digest for both components.  The decoder
+    callback itself receives only :class:`BinaryArmInputV1`, making D-05's
+    marginal-information boundary auditable at the public seam.
+    """
+    if not isinstance(materialized_sample, MaterializedPhysicalSampleV1):
+        raise ValueError("canonical binary adapter requires a materialized sample")
+    if set(manifest_paths) != {"X", "Z"}:
+        raise ValueError("canonical binary adapter requires one X and one Z manifest")
+
+    def decode(input_: BinaryArmInputV1) -> BinaryArmResultV1:
+        from ..runner import CanonicalMaterializedRunV1, run_canonical_materialized_one
+
+        ledger_path = ledger_directory / f"{input_.component.lower()}-events.jsonl"
+        result = run_canonical_materialized_one(
+            manifest_paths[input_.component], sample=_shot_from_materialized(materialized_sample),
+            materialized_sample_sha256=input_.materialized_sample_sha256, ledger_path=ledger_path,
+        )
+        if isinstance(result, CanonicalMaterializedRunV1):
+            if result.status == "interrupted":
+                return BinaryArmResultV1(candidate=None, terminal_status="infrastructure_interruption", iterations=0,
+                                         work={"canonical_iterations": 0})
+            result = result.terminal
+        if result is None:
+            raise ValueError("canonical binary materialized runner returned no terminal result")
+        # Canonical ledgers retain selected output; accepting no candidate keeps
+        # D-08's all-shot record explicit instead of manufacturing a recovery.
+        selected: tuple[int, ...] | None = None
+        if ledger_path.is_file():
+            for line in reversed(ledger_path.read_text(encoding="utf-8").splitlines()):
+                event = json.loads(line)
+                data = event.get("data", event)
+                output = data.get("selected_output") if isinstance(data, dict) else None
+                if isinstance(output, list) and all(type(bit) is int and bit in (0, 1) for bit in output):
+                    selected = tuple(output)
+                    break
+        raw_outcome = getattr(result, "outcome", None)
+        status = _status_from_evaluation(raw_outcome) if isinstance(raw_outcome, str) else "no_proposal"
+        return BinaryArmResultV1(
+            candidate=selected, terminal_status=status if selected is not None else "no_proposal",
+            iterations=int(getattr(result, "iterations", 0)),
+            work={"canonical_iterations": int(getattr(result, "iterations", 0))},
+        )
+
+    return decode
+
+
 def _matched_digest(payload: object) -> str:
     return sha256(b"bp-registry-pauli-matched-pair-v1\0" + canonical_json_bytes(payload)).hexdigest()
 

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import base64
 from hashlib import sha256
+from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -14,6 +16,7 @@ from bp_registry.campaigns.controlled_execution import (
     BinaryArmResultV1,
     JointArmInputV1,
     JointArmResultV1,
+    canonical_binary_materialized_decoder,
     run_joint_separate_unit,
 )
 from bp_registry.css import CssCode
@@ -161,3 +164,29 @@ def test_duplicate_or_partial_pair_evidence_is_rejected():
     partial.pop("separate")
     with pytest.raises(ValueError, match="Field required"):
         type(record).model_validate(partial)
+
+
+def test_component_adapter_uses_canonical_materialized_runner(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    _, sample = _sample()
+    calls: list[dict[str, object]] = []
+
+    def fake_runner(_: Path, **kwargs: object) -> SimpleNamespace:
+        calls.append(kwargs)
+        ledger = Path(str(kwargs["ledger_path"]))
+        ledger.parent.mkdir(parents=True, exist_ok=True)
+        ledger.write_text('{"data":{"selected_output":[1,0]}}\n', encoding="utf-8")
+        return SimpleNamespace(outcome="exact", iterations=7)
+
+    monkeypatch.setattr("bp_registry.runner.run_canonical_materialized_one", fake_runner)
+    decoder = canonical_binary_materialized_decoder(
+        materialized_sample=sample,
+        manifest_paths={"X": tmp_path / "x.json", "Z": tmp_path / "z.json"}, ledger_directory=tmp_path,
+    )
+    result = decoder(BinaryArmInputV1(
+        component="X", prior=(0.06, 0.06), syndrome=(1,),
+        physical_sample_identity=sample.physical_sample_identity,
+        materialized_sample_sha256=sample.materialized_sample_sha256,
+    ))
+    assert result.candidate == (1, 0)
+    assert result.terminal_status == "exact"
+    assert calls[0]["materialized_sample_sha256"] == sample.materialized_sample_sha256
