@@ -141,3 +141,48 @@ def test_sizing_rejects_empty_duplicate_and_partial_pilot_pairs() -> None:
             design_path=DESIGN, pilot_evidence_identity="3" * 64,
             pilot_pairs={**rows, "higher_y": (rows["lower_y"][0], *rows["higher_y"][1:])},
         )
+    payload = rows["lower_y"][0].model_dump(mode="json", by_alias=True)
+    payload["joint"]["terminal_status"] = "infrastructure_interruption"
+    payload["joint"]["all_shot"] = "incomplete"
+    unsigned = {key: value for key, value in payload.items() if key != "record_sha256"}
+    partial = PauliMatchedPairV1.model_validate({
+        **unsigned, "record_sha256": _digest("bp-registry-pauli-matched-pair-v1", unsigned),
+    })
+    with pytest.raises(ValueError, match="partial"):
+        calibrate_paired_sweep_design(
+            design_path=DESIGN, pilot_evidence_identity="3" * 64,
+            pilot_pairs={**rows, "lower_y": (partial, *rows["lower_y"][1:])},
+        )
+
+
+def test_precision_ceiling_zero_discordance_and_tied_extreme_pairs_are_defined() -> None:
+    from bp_registry.campaigns.sizing import PairedDesignV1, paired_design_size
+    from bp_registry.campaigns.statistics import assess_correlation_sweep
+
+    with pytest.raises(ValueError, match="relevant effect"):
+        PairedDesignV1(
+            schema="paired_design_v1", family_id="test", arm_order=("joint", "separate"),
+            estimand="paired_all_shot_risk_difference_v1", minimum_relevant_difference=0.01,
+            calibration_discordance=0.0, target_power=0.8, familywise_alpha=0.05,
+            family_size=2, max_pairs=5_000, calibration_namespace="pilot", evaluation_namespace="evaluation",
+            calibration_receipt_sha256="1" * 64, evaluation_namespace_sha256="2" * 64,
+        )
+    blocked_design = PairedDesignV1(
+        schema="paired_design_v1", family_id="test", arm_order=("joint", "separate"),
+        estimand="paired_all_shot_risk_difference_v1", minimum_relevant_difference=0.0001,
+        calibration_discordance=1.0, target_power=0.999, familywise_alpha=0.05,
+        family_size=2, max_pairs=5_000, calibration_namespace="pilot", evaluation_namespace="evaluation",
+        calibration_receipt_sha256="1" * 64, evaluation_namespace_sha256="2" * 64,
+    )
+    blocked = paired_design_size(blocked_design)
+    assert blocked.status == "blocked_precision"
+    assert blocked.required_n is None
+    assert blocked.achieved_power_at_cap < blocked_design.target_power
+
+    tied = {
+        point: tuple(_pair(point=point, ordinal=index, joint_failure=False, separate_failure=False) for index in range(2))
+        for point in ("lower_y", "independence", "higher_y")
+    }
+    result = assess_correlation_sweep(design_path=DESIGN, point_pairs=tied)
+    assert tuple(row.d_y for row in result.rows) == (0.0, 0.0, 0.0)
+    assert tuple(contrast.change for contrast in result.contrasts) == (0.0, 0.0)

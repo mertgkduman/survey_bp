@@ -1199,6 +1199,7 @@ class FixedMarginalCorrelationDesignV1:
     familywise_alpha: float
     contrast_order: tuple[str, str]
     arm_rate_members: tuple[str, ...]
+    sizing: Mapping[str, object]
 
 
 @dataclass(frozen=True, slots=True)
@@ -1328,7 +1329,7 @@ def load_fixed_marginal_design(path: str | Path) -> FixedMarginalCorrelationDesi
         design_sha256=sha256(raw).hexdigest(), study_label=label,
         point_order=_FIXED_MARGINAL_POINT_ORDER, rows=tuple(rows), family_id=family_id,
         familywise_alpha=alpha, contrast_order=_FIXED_MARGINAL_CONTRAST_ORDER,
-        arm_rate_members=expected_members,
+        arm_rate_members=expected_members, sizing=dict(payload.get("sizing", {})),
     )
 
 

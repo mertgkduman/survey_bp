@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from hashlib import sha256
 import math
+import re
 from typing import Any, Literal, Mapping
 
 import numpy as np
@@ -13,6 +14,7 @@ from scipy.stats import binom
 
 from ..manifests import StrictModel
 from .contracts import canonical_json_bytes
+from .statistics import _validated_sweep_pairs, load_fixed_marginal_design
 
 
 _SHA256 = r"^[0-9a-f]{64}$"
@@ -84,6 +86,20 @@ class PairedSizingResultV1:
         })
 
 
+@dataclass(frozen=True, slots=True)
+class PairedSweepSizingReceiptV1:
+    """Pre-outcome calibration receipt for the immutable three-point sweep."""
+
+    design_sha256: str
+    pilot_evidence_identity: str
+    paired_design: PairedDesignV1
+    paired_sizing: PairedSizingResultV1
+    stopping_rule: str
+    proposed_pairs_per_point: int | None
+    capped_pairs_per_point: int
+    receipt_sha256: str
+
+
 def _conditional_rejection_probability(m: int, *, alternative: float, alpha: float) -> float:
     if m == 0:
         return 0.0
@@ -125,6 +141,75 @@ def paired_design_size(design: PairedDesignV1) -> PairedSizingResultV1:
         design_sha256=design.digest(), required_n=required,
         power_at_required_n=power_at_required, achieved_power_at_cap=achieved,
         assumptions=assumptions,
+    )
+
+
+def calibrate_paired_sweep_design(
+    *, design_path: str, pilot_evidence_identity: str,
+    pilot_pairs: Mapping[str, tuple[object, ...]] | None = None,
+) -> PairedSweepSizingReceiptV1:
+    """Freeze D-12 paired precision before comparison outcomes are admitted.
+
+    Pilot pair records are accepted only to verify complete, disjoint physical
+    evidence.  Their arm outcomes are deliberately absent from the receipt and
+    cannot change the prespecified discordance scenario or its required size.
+    """
+    design = load_fixed_marginal_design(design_path)
+    sizing = design.sizing
+    required = (
+        "pilot_evidence_identity", "calibration_namespace", "evaluation_namespace",
+        "evaluation_namespace_sha256", "arm_order", "estimand",
+        "minimum_relevant_difference", "calibration_discordance", "target_power",
+        "familywise_alpha", "family_size", "maximum_pairs_per_point", "stopping_rule",
+    )
+    if not isinstance(sizing, Mapping) or any(name not in sizing for name in required):
+        raise ValueError("fixed-marginal design lacks a complete paired sizing contract")
+    if not isinstance(pilot_evidence_identity, str) or not re.fullmatch(_SHA256, pilot_evidence_identity):
+        raise ValueError("pilot evidence identity must be a SHA-256 digest")
+    if pilot_evidence_identity != sizing["pilot_evidence_identity"]:
+        raise ValueError("pilot evidence identity differs from the frozen sizing contract")
+    if pilot_pairs is not None:
+        if not isinstance(pilot_pairs, Mapping) or not pilot_pairs:
+            raise ValueError("pilot pair evidence must contain all three frozen points")
+        _validated_sweep_pairs(design=design, point_pairs=pilot_pairs)
+    maximum_pairs = sizing["maximum_pairs_per_point"]
+    if type(maximum_pairs) is not int or maximum_pairs != 5_000:
+        raise ValueError("fixed-marginal paired precision cap must remain 5,000 pairs per point")
+    family_size = sizing["family_size"]
+    if type(family_size) is not int or family_size != 2:
+        raise ValueError("fixed-marginal sizing must retain both prespecified cross-point contrasts")
+    arm_order = sizing["arm_order"]
+    if arm_order != ["joint", "separate"] or sizing["estimand"] != "paired_all_shot_risk_difference_v1":
+        raise ValueError("fixed-marginal sizing must retain the joint/separate paired estimand")
+    paired_design = PairedDesignV1(
+        schema="paired_design_v1", family_id=design.family_id, arm_order=tuple(arm_order),
+        estimand="paired_all_shot_risk_difference_v1",
+        minimum_relevant_difference=sizing["minimum_relevant_difference"],
+        calibration_discordance=sizing["calibration_discordance"], target_power=sizing["target_power"],
+        familywise_alpha=sizing["familywise_alpha"], family_size=family_size, max_pairs=maximum_pairs,
+        calibration_namespace=sizing["calibration_namespace"], evaluation_namespace=sizing["evaluation_namespace"],
+        calibration_receipt_sha256=pilot_evidence_identity,
+        evaluation_namespace_sha256=sizing["evaluation_namespace_sha256"],
+    )
+    paired_sizing = paired_design_size(paired_design)
+    stopping_rule = sizing["stopping_rule"]
+    if not isinstance(stopping_rule, str) or not stopping_rule:
+        raise ValueError("fixed-marginal sizing must declare a stopping rule")
+    unsigned = {
+        "schema": "phase11_paired_sweep_sizing_receipt_v1", "design_sha256": design.design_sha256,
+        "pilot_evidence_identity": pilot_evidence_identity, "paired_design_sha256": paired_design.digest(),
+        "paired_sizing": {
+            "status": paired_sizing.status, "required_n": paired_sizing.required_n,
+            "power_at_required_n": paired_sizing.power_at_required_n,
+            "achieved_power_at_cap": paired_sizing.achieved_power_at_cap,
+        },
+        "stopping_rule": stopping_rule, "capped_pairs_per_point": maximum_pairs,
+    }
+    return PairedSweepSizingReceiptV1(
+        design_sha256=design.design_sha256, pilot_evidence_identity=pilot_evidence_identity,
+        paired_design=paired_design, paired_sizing=paired_sizing, stopping_rule=stopping_rule,
+        proposed_pairs_per_point=paired_sizing.required_n, capped_pairs_per_point=maximum_pairs,
+        receipt_sha256=sha256(b"bp-registry-phase11-paired-sweep-sizing-v1\0" + canonical_json_bytes(unsigned)).hexdigest(),
     )
 
 
