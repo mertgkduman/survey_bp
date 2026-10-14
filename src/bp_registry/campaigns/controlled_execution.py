@@ -22,6 +22,7 @@ import numpy as np
 
 from ..artifacts import load_artifact
 from ..canonical.fair_legs import FairLegConfig, FairLegController
+from ..css import CssCode
 from ..evaluator import evaluate_candidate
 from ..manifests import StrictModel
 from .contracts import (
@@ -645,8 +646,51 @@ def run_joint_separate_unit(
     return PauliMatchedPairV1.model_validate({**unsigned, "record_sha256": _matched_digest(unsigned)})
 
 
+def _phase11_load_code(*, root: Path, code: dict[str, Any]) -> tuple[Any, dict[str, Any]]:
+    """Load a digest-bound controlled code while retaining its qualification."""
+    required = {"code_id", "artifact_path", "artifact_sha256", "source", "run_fidelity"}
+    if code.get("code_id") == "GB46":
+        if set(code) != required:
+            raise ValueError("controlled GB46 code identity is incomplete")
+        artifact = (root / code["artifact_path"]).resolve()
+        if root not in (artifact, *artifact.parents) or artifact.is_symlink() or not artifact.is_file():
+            raise ValueError("controlled GB46 artifact is unavailable")
+        artifact_bytes = artifact.read_bytes()
+        if code["run_fidelity"] != "canonical_adaptation" or sha256(artifact_bytes).hexdigest() != code["artifact_sha256"]:
+            raise ValueError("controlled GB46 artifact identity differs from the frozen design")
+        from ..quaternary.asced import parse_pinned_gb46_css
+        return parse_pinned_gb46_css(artifact_bytes), {"code_id": "GB46"}
+    required |= {"provenance_path", "provenance_sha256", "distance_qualification", "logical_operator_qualification"}
+    if code.get("code_id") != "BB72" or set(code) != required:
+        raise ValueError("controlled BB72 code identity is incomplete")
+    artifact = (root / code["artifact_path"]).resolve()
+    provenance = (root / code["provenance_path"]).resolve()
+    if any(root not in (path, *path.parents) or path.is_symlink() or not path.is_file() for path in (artifact, provenance)):
+        raise ValueError("controlled BB72 artifact or provenance is unavailable")
+    if sha256(artifact.read_bytes()).hexdigest() != code["artifact_sha256"] or sha256(provenance.read_bytes()).hexdigest() != code["provenance_sha256"]:
+        raise ValueError("controlled BB72 artifact or provenance identity differs from the frozen design")
+    try:
+        payload, provenance_payload = json.loads(artifact.read_bytes()), json.loads(provenance.read_bytes())
+        parsed = CssCode(
+            hx=np.asarray(payload["hx"], dtype=np.uint8), hz=np.asarray(payload["hz"], dtype=np.uint8),
+            lx=np.asarray(payload["lx"], dtype=np.uint8), lz=np.asarray(payload["lz"], dtype=np.uint8),
+        ).validate()
+    except (KeyError, TypeError, ValueError, json.JSONDecodeError) as error:
+        raise ValueError("controlled BB72 artifact is not a valid qualified CSS code") from error
+    if (provenance_payload.get("distance", {}).get("status") != "source_reported"
+            or provenance_payload.get("distance", {}).get("value") != 6
+            or provenance_payload.get("logical_provider", {}).get("status") != "project_derived"
+            or provenance_payload.get("logical_provider", {}).get("source_logical_equivalence") != "not_assessed"):
+        raise ValueError("controlled BB72 provenance qualifications differ from the frozen design")
+    return parsed, {
+        "code_id": "BB72", "code_provenance_sha256": code["provenance_sha256"],
+        "distance_qualification": code["distance_qualification"],
+        "logical_operator_qualification": code["logical_operator_qualification"],
+    }
+
+
 def preflight_phase11_controlled_design(*, root: Path, design_path: Path) -> dict[str, Any]:
-    """Validate the bounded GB46 controlled-calibration identity before writes.
+    """Validate a bounded, source-qualified controlled-calibration identity before writes.
 
     This admission gate deliberately consumes only the project-owned, pinned
     GB46 check artifact and the frozen fixed-marginal design.  Source-study
@@ -654,7 +698,6 @@ def preflight_phase11_controlled_design(*, root: Path, design_path: Path) -> dic
     accidentally turn calibration evidence into reproduction evidence.
     """
     from .statistics import load_fixed_marginal_design
-    from ..quaternary.asced import parse_pinned_gb46_css
 
     root = root.resolve(strict=True)
     resolved = design_path.resolve(strict=True)
@@ -681,15 +724,9 @@ def preflight_phase11_controlled_design(*, root: Path, design_path: Path) -> dic
     if design["publication_authorization"] != "deny" or "no_source_reproduction" not in design["claim_scope"]:
         raise ValueError("controlled design must retain its calibration-only, deny-by-default scope")
     code = design["code"]
-    if not isinstance(code, dict) or set(code) != {"code_id", "artifact_path", "artifact_sha256", "source", "run_fidelity"}:
-        raise ValueError("controlled GB46 code identity is incomplete")
-    artifact = (root / code["artifact_path"]).resolve()
-    if root not in (artifact, *artifact.parents) or artifact.is_symlink() or not artifact.is_file():
-        raise ValueError("controlled GB46 artifact is unavailable")
-    artifact_bytes = artifact.read_bytes()
-    if code["code_id"] != "GB46" or code["run_fidelity"] != "canonical_adaptation" or sha256(artifact_bytes).hexdigest() != code["artifact_sha256"]:
-        raise ValueError("controlled GB46 artifact identity differs from the frozen design")
-    parsed_code = parse_pinned_gb46_css(artifact_bytes)
+    if not isinstance(code, dict) or code.get("run_fidelity") != "canonical_adaptation":
+        raise ValueError("controlled code identity must retain canonical-adaptation fidelity")
+    parsed_code, code_receipt = _phase11_load_code(root=root, code=code)
     fixed = design["fixed_marginal_design"]
     if not isinstance(fixed, dict) or set(fixed) != {"path", "sha256", "point_order"}:
         raise ValueError("controlled fixed-marginal identity is incomplete")
@@ -723,7 +760,7 @@ def preflight_phase11_controlled_design(*, root: Path, design_path: Path) -> dic
     return {
         "schema": "phase11_controlled_preflight_v1",
         "study_id": design["study_id"], "design_sha256": sha256(raw).hexdigest(),
-        "code_artifact_sha256": code["artifact_sha256"], "code_qubits": parsed_code.n,
+        "code_artifact_sha256": code["artifact_sha256"], "code_qubits": parsed_code.n, **code_receipt,
         "fixed_marginal_design_sha256": fixed["sha256"], "point_order": list(sweep.point_order),
         "sample_ranges": ranges, "publication_authorization": "deny",
     }
@@ -857,7 +894,6 @@ def run_phase11_controlled(*, root: Path, design_path: Path, output_root: Path, 
                            shard: tuple[str, int, int] | None = None) -> dict[str, Any]:
     """Run or resume only the predeclared bounded GB46 calibration pairs."""
     from .statistics import load_fixed_marginal_design
-    from ..quaternary.asced import parse_pinned_gb46_css
 
     preflight = preflight_phase11_controlled_design(root=root, design_path=design_path)
     destination = _phase11_safe_root(output_root)
@@ -865,8 +901,7 @@ def run_phase11_controlled(*, root: Path, design_path: Path, output_root: Path, 
     identity = {"schema": "phase11_controlled_identity_v1", "preflight": preflight}
     _publish_exact(destination / "identity.json", _json_line(identity))
     design = load_fixed_marginal_design(root / "data/studies/phase11-fixed-marginal-design.json")
-    raw = (root / "data/artifacts/gb46-h44.alist").read_bytes()
-    code = parse_pinned_gb46_css(raw)
+    code = _phase11_load_code(root=root, code=json.loads(design_path.read_text(encoding="utf-8"))["code"])[0]
     rows = {row.point_id: row for row in design.rows}
     limits = json.loads(design_path.read_text(encoding="utf-8"))["calibration_limits"]
     completed = 0
@@ -938,11 +973,10 @@ def verify_phase11_controlled(*, root: Path, design_path: Path, output_root: Pat
 def replay_phase11_controlled(*, root: Path, design_path: Path, output_root: Path) -> dict[str, Any]:
     """Recompute pair identities and records, rejecting any nondeterministic output."""
     from .statistics import load_fixed_marginal_design
-    from ..quaternary.asced import parse_pinned_gb46_css
 
     verified = verify_phase11_controlled(root=root, design_path=design_path, output_root=output_root)
     preflight = preflight_phase11_controlled_design(root=root, design_path=design_path)
-    code = parse_pinned_gb46_css((root / "data/artifacts/gb46-h44.alist").read_bytes())
+    code = _phase11_load_code(root=root, code=json.loads(design_path.read_text(encoding="utf-8"))["code"])[0]
     rows = {row.point_id: row for row in load_fixed_marginal_design(root / "data/studies/phase11-fixed-marginal-design.json").rows}
     pairs = _phase11_load_pairs(output_root=output_root, preflight=preflight)
     for point_id, values in pairs.items():
