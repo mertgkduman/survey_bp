@@ -16,6 +16,11 @@ import numpy as np
 from bp_registry.campaigns.targets import QuaternarySourceTargetV1
 
 
+ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_ASCED_NATIVE_QUALIFICATION = ROOT / "data/native/phase11-asced-matched-input-qualification.json"
+DEFAULT_SOURCE_AUTHORIZATION = ROOT / "data/results/phase11-production-authorization.json"
+
+
 def _canonical_bytes(value: object) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")
 
@@ -530,23 +535,33 @@ def main() -> None:
     parser.add_argument("--assessment", type=Path, required=True)
     args = parser.parse_args()
     try:
+        # aSCED's checked-in receipt is an assessment of its source lane, so
+        # its default lifecycle must bind the independently retained native
+        # terminal and sealed dispatch decision rather than silently dropping
+        # them when an older caller omits the optional CLI paths.
+        is_asced_target = _load(args.target).get("schema") == "campaign_quaternary_source_target_v1"
+        native_qualification = args.native_qualification
+        authorization = args.authorization
+        if is_asced_target:
+            native_qualification = native_qualification or DEFAULT_ASCED_NATIVE_QUALIFICATION
+            authorization = authorization or DEFAULT_SOURCE_AUTHORIZATION
         if args.command in {"preflight", "assess"}:
             result = preflight(
                 args.target, args.manifest, args.assessment,
-                native_qualification_path=args.native_qualification,
-                authorization_path=args.authorization,
+                native_qualification_path=native_qualification,
+                authorization_path=authorization,
             )
         elif args.command == "verify":
             result = verify(
                 args.target, args.manifest, args.assessment,
-                native_qualification_path=args.native_qualification,
-                authorization_path=args.authorization,
+                native_qualification_path=native_qualification,
+                authorization_path=authorization,
             )
         else:
             result = run(
                 args.target, args.manifest, args.assessment,
-                native_qualification_path=args.native_qualification,
-                authorization_path=args.authorization,
+                native_qualification_path=native_qualification,
+                authorization_path=authorization,
             )
     except ValueError as error:
         print(str(error), file=sys.stderr)
