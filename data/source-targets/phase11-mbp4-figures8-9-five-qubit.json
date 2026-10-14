@@ -1,0 +1,68 @@
+{
+  "claim_scope": "deterministic_mechanism_only_not_a_curve_or_ranking",
+  "observation_horizon": {
+    "kind": "frozen_sweeps",
+    "reason": "Figures 8-9 show a finite deterministic mechanism; the source text inspected for Figure 6 does not supply a curve iteration cap.",
+    "sweeps": 20
+  },
+  "paper": {
+    "figures": ["Figure 8", "Figure 9"],
+    "source": "https://arxiv.org/html/2104.13659"
+  },
+  "paths": {
+    "alpha_one": {
+      "alpha": 1.0,
+      "expected_relation": "oscillatory",
+      "expected_trajectory": [
+        {"beliefs_sha256":"40a714c70b6895632affd4c41d60872acd4807a04e9df418e1dd1207dcba4625","candidate":[2,2,2,2,2],"iteration":1},
+        {"beliefs_sha256":"3e4c1e9e61a7422cd91a92483fd27e4b60401ed7a3e601cf22bce1abc0d2b3cc","candidate":[0,0,0,0,0],"iteration":2},
+        {"beliefs_sha256":"24a1d8b8c4a53a7c9aff4f3b6c7e8919ec00f4729640718398a031e40e92cc23","candidate":[2,2,2,2,2],"iteration":3},
+        {"beliefs_sha256":"0db28b0eaba9f0a275d6d799b99f42a2a91ac1a7f46e17de4fa66be3581bafd5","candidate":[0,0,0,0,0],"iteration":4},
+        {"beliefs_sha256":"8dc00e30b9f0a90f0942454a6d0a6721ae963eb72d13dbdb1060e6f98e8b37c2","candidate":[2,2,2,2,2],"iteration":5},
+        {"beliefs_sha256":"fb6c1e204ee7fe86daaa456c9281d69be597f5940e314445f7080a3c7895b30a","candidate":[0,0,0,0,0],"iteration":6},
+        {"beliefs_sha256":"fa11026e1c4155e35bc5aaa5b542fae5453432069b447f1930f579935c274983","candidate":[2,2,2,2,2],"iteration":7},
+        {"beliefs_sha256":"2a6fd6e5e00903053c6dc075df589b8a92ea5eb8ede7345000e93d49c88de4e8","candidate":[0,0,0,0,0],"iteration":8},
+        {"beliefs_sha256":"bd8862e6b87bad3c3814083b103acf758ae075cd43a79796b23aeee32d376e57","candidate":[2,2,2,2,2],"iteration":9},
+        {"beliefs_sha256":"43efc66999bf9cfc29e0fa5c71e18b2f360484c24dfb062301db9df52f47797c","candidate":[0,0,0,0,0],"iteration":10},
+        {"beliefs_sha256":"e1f0f765bd176d38a088dd960aef77b869c243c85ed0e91fb2782879a9de8998","candidate":[2,2,2,2,2],"iteration":11},
+        {"beliefs_sha256":"af958b88cb39a83d9246d17d2aa29687c1d83094fe52fa60152b36617a00f6ef","candidate":[0,0,0,0,0],"iteration":12},
+        {"beliefs_sha256":"5f959cb171b0f9e11376437fe57acefcae50d3e9337965888a17d238fe3a7d16","candidate":[2,2,2,2,2],"iteration":13},
+        {"beliefs_sha256":"379ab7642b804f7954d63ee2f7d4d4ac889263aad24b2c223033031655181933","candidate":[0,0,0,0,0],"iteration":14},
+        {"beliefs_sha256":"321c5f945c5d2ff562efd0ea6179c0fa876f2d5b4c43923673bfd2f0f05c4b54","candidate":[2,2,2,2,2],"iteration":15},
+        {"beliefs_sha256":"f1e31daaba95fd6be6aa3d98682cbe28190ca9bd35fbaf00961f41a1c7320148","candidate":[0,0,0,0,0],"iteration":16},
+        {"beliefs_sha256":"f74939dbfa378544d4ff37841237bd90ca5bd54d4302b24fc2a0f40a1313262d","candidate":[2,2,2,2,2],"iteration":17},
+        {"beliefs_sha256":"767dbe1baeb5dcef8e350576534402fe4ec07cbc4178e58bc56d744ba9b71f42","candidate":[0,0,0,0,0],"iteration":18},
+        {"beliefs_sha256":"fa8d9d87aba605e5741cee78b14c0c9edbb15af231902e4a00bee3d346f366f0","candidate":[2,2,2,2,2],"iteration":19},
+        {"beliefs_sha256":"0eb5b55197c3d20631398ce816f72583b69c0efbe1bec7b6d851bbdb2a945811","candidate":[0,0,0,0,0],"iteration":20}
+      ]
+    },
+    "alpha_one_point_five": {
+      "alpha": 1.5,
+      "expected_relation": "correct_convergence",
+      "expected_trajectory": [
+        {"beliefs_sha256":"ed0f4b06d25f745b5d86f1b60be82e37baae72bfee40ca64284012ec7d668f52","candidate":[2,2,2,2,2],"iteration":1},
+        {"beliefs_sha256":"56d64d5c5a9885b6046d6394b5a0208b7e9461d065a575a070a34180cfd76cc7","candidate":[0,0,0,0,0],"iteration":2},
+        {"beliefs_sha256":"7110af45b7d43f33cfda52696e19727abe6d460bcd41b66b916f3ac0ba2e4378","candidate":[2,2,2,2,2],"iteration":3},
+        {"beliefs_sha256":"76d1ba245a831f52adac738977bb011aec606101919331fd3d4d247d90e29664","candidate":[0,0,0,0,0],"iteration":4},
+        {"beliefs_sha256":"09ea3203221137b863a0c427942e18db197cc99851055882a9cda7e874429dff","candidate":[2,2,2,2,2],"iteration":5},
+        {"beliefs_sha256":"6b6857483770fab779f47273381f5dd2e04757d1ecd4d9b68efbbbf474339b6d","candidate":[0,0,0,0,0],"iteration":6},
+        {"beliefs_sha256":"2837babb99f31c2fa8582520cb178e46cfe185d92c34c0461bd1be37b5df85aa","candidate":[2,2,2,2,2],"iteration":7},
+        {"beliefs_sha256":"0731bb9480a6a4f0506f1f7c513624e5d0e276bf50876fe73c8342345c95ff61","candidate":[0,0,0,0,0],"iteration":8},
+        {"beliefs_sha256":"d3be32e07fa7938111fc11e6ed7a95554344cd91bd989962a26588fbe9975c90","candidate":[2,2,2,2,2],"iteration":9},
+        {"beliefs_sha256":"699ac63a078e19e388aab7d071dbe8340d439730d9b87b1babad7307d7a2b24c","candidate":[0,0,0,0,0],"iteration":10},
+        {"beliefs_sha256":"3b5e7fcb2cd8c294ce3df73cdb463eee4172ea9a7afaf69b88e0b9a3161f0129","candidate":[2,2,2,2,2],"iteration":11},
+        {"beliefs_sha256":"fe1694941fa537b09d6ba0f3c2fd9b7c007d0781dba161ffa5e6e7ec2bd3a7be","candidate":[0,0,0,0,0],"iteration":12},
+        {"beliefs_sha256":"881efd7863531cc73307bb3a950dad38f281c35042b9680385f1d0e5d0742c44","candidate":[0,0,0,2,0],"iteration":13}
+      ]
+    }
+  },
+  "problem": {
+    "checks": [[1,3,3,1,0],[0,1,3,3,1],[1,0,1,3,3],[3,1,0,1,3]],
+    "syndrome": [1,1,1,1]
+  },
+  "schema": "phase11-mbp4-figures8-9-five-qubit-target-v1",
+  "source_author_code_identity": "unverified",
+  "source_settings": {"beta":0.0,"epsilon":0.003,"error":[0,0,0,2,0],"schedule":"qbp_flooding"},
+  "target_id": "mbp4-figures8-9-five-qubit",
+  "target_receipt_sha256": "3e20000e8c9bc8c6414aef03bc7fbe59576e11af125f2bc6140c8214dff53023"
+}

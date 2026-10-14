@@ -100,8 +100,11 @@ def _validated_qbpgd(target_path: Path, manifest_path: Path | None) -> tuple[dic
 
 def _validated(target_path: Path, manifest_path: Path | None) -> tuple[Any, dict[str, Any] | None, str]:
     target_bytes = target_path.read_bytes()
-    if _load(target_path).get("schema") == "phase11-qbpgd-source-target-v1":
+    schema = _load(target_path).get("schema")
+    if schema == "phase11-qbpgd-source-target-v1":
         return _validated_qbpgd(target_path, manifest_path)
+    if schema == "phase11-mbp4-figures8-9-five-qubit-target-v1":
+        return _validated_mbp4(target_path, manifest_path)
     target = QuaternarySourceTargetV1.model_validate_json(target_bytes)
     if manifest_path is None:
         return target, None, sha256(target_bytes).hexdigest()
@@ -117,6 +120,110 @@ def _validated(target_path: Path, manifest_path: Path | None) -> tuple[Any, dict
     if manifest.get("run_fidelity") != "canonical_adaptation":
         raise ValueError("source target cannot promote canonical adaptation fidelity")
     return target, manifest, sha256(target_bytes).hexdigest()
+
+
+_MBP4_SCHEMA = "phase11-mbp4-figures8-9-five-qubit-target-v1"
+_MBP4_MANIFEST_SCHEMA = "phase11-mbp4-figures8-9-five-qubit-manifest-v1"
+_MBP4_SCOPE = "deterministic_mechanism_only_not_a_curve_or_ranking"
+_FIGURE6_MISSING = ["iteration_cap", "denominator", "stopping_rule", "exact_coordinates", "interval_method"]
+
+
+def _validated_mbp4(target_path: Path, manifest_path: Path | None) -> tuple[dict[str, Any], dict[str, Any] | None, str]:
+    target_bytes = target_path.read_bytes()
+    target = _load(target_path)
+    if target.get("schema") != _MBP4_SCHEMA or target.get("target_id") != "mbp4-figures8-9-five-qubit":
+        raise ValueError("MBP4 target schema or identity is not admitted")
+    if target.get("paper") != {"figures": ["Figure 8", "Figure 9"], "source": "https://arxiv.org/html/2104.13659"}:
+        raise ValueError("MBP4 target must bind the Figures 8-9 source")
+    if target.get("source_settings") != {"beta": 0.0, "epsilon": 0.003, "error": [0, 0, 0, 2, 0], "schedule": "qbp_flooding"}:
+        raise ValueError("MBP4 target settings differ from the selected source mechanism")
+    if target.get("observation_horizon", {}).get("kind") != "frozen_sweeps" or target["observation_horizon"].get("sweeps") != 20:
+        raise ValueError("MBP4 target requires the frozen 20-sweep observation horizon")
+    if target.get("claim_scope") != _MBP4_SCOPE or target.get("source_author_code_identity") != "unverified":
+        raise ValueError("MBP4 target cannot promote a curve, ranking, or author-code claim")
+    if target.get("target_receipt_sha256") != _receipt_digest(target):
+        raise ValueError("MBP4 target receipt digest differs from frozen content")
+    paths = target.get("paths")
+    if not isinstance(paths, dict) or paths.get("alpha_one", {}).get("alpha") != 1.0 or paths.get("alpha_one_point_five", {}).get("alpha") != 1.5:
+        raise ValueError("MBP4 target must compare only the frozen alpha=1 and alpha=1.5 paths")
+    if paths["alpha_one"].get("expected_relation") != "oscillatory" or paths["alpha_one_point_five"].get("expected_relation") != "correct_convergence":
+        raise ValueError("MBP4 target relation drifted")
+    if len(paths["alpha_one"].get("expected_trajectory", [])) != 20 or not paths["alpha_one_point_five"].get("expected_trajectory"):
+        raise ValueError("MBP4 target must retain both independent finite trajectories")
+    if manifest_path is None:
+        return target, None, sha256(target_bytes).hexdigest()
+    manifest = _load(manifest_path)
+    if manifest.get("schema") != _MBP4_MANIFEST_SCHEMA or manifest.get("target_document_sha256") != sha256(target_bytes).hexdigest():
+        raise ValueError("MBP4 manifest target digest differs")
+    if manifest.get("target_receipt_sha256") != _receipt_digest(target) or manifest.get("source_only") is not True or manifest.get("controlled_comparison") is not False:
+        raise ValueError("MBP4 manifest cannot alter the source-only target")
+    if manifest.get("claim_scope") != _MBP4_SCOPE or manifest.get("figure6") != {"assessment": "not_admitted", "missing_metadata": _FIGURE6_MISSING, "status": "blocked_metadata"}:
+        raise ValueError("MBP4 manifest must retain Figure 6 metadata gaps and mechanism-only scope")
+    return target, manifest, sha256(target_bytes).hexdigest()
+
+
+def _mbp4_evidence(target: dict[str, Any]) -> dict[str, Any]:
+    """Run the declared finite mechanism and bind each sweep to source evidence."""
+    from bp_registry.canonical.budgets import BudgetLimit, BudgetTree
+    from bp_registry.canonical.lineage import LineageEdge, LineageId
+    from bp_registry.quaternary.evaluator import evaluate_pauli_candidate
+    from bp_registry.quaternary.mbp4 import FixedAlphaMbp4Kernel, Mbp4Spec
+    from bp_registry.quaternary.problems import PauliCandidate, PauliCode, QuaternaryOriginalProblem, QuaternaryWorkingProblem
+
+    problem_data, settings = target["problem"], target["source_settings"]
+    hidden = np.asarray(settings["error"], dtype=np.uint8)
+    code = PauliCode(checks=np.asarray(problem_data["checks"], dtype=np.uint8), source_artifact_identity="kuo-lai-2021-five-qubit-figures8-9")
+    original = QuaternaryOriginalProblem("original-phase11-mbp4-five-qubit", code, np.asarray(problem_data["syndrome"], dtype=np.uint8))
+    if not np.array_equal(code.syndrome(hidden), original.syndrome):
+        raise ValueError("MBP4 source error does not produce the frozen syndrome")
+    priors = np.repeat(np.asarray([[1.0 - settings["epsilon"], settings["epsilon"] / 3.0, settings["epsilon"] / 3.0, settings["epsilon"] / 3.0]], dtype=np.float64), code.n, axis=0)
+    working = QuaternaryWorkingProblem(
+        "working-phase11-mbp4-five-qubit", original,
+        LineageEdge("identity", LineageId("original", original.lineage_id), LineageId("working", "working-phase11-mbp4-five-qubit")),
+    )
+    paths: dict[str, Any] = {}
+    for name, declared in target["paths"].items():
+        alpha = float(declared["alpha"])
+        result = FixedAlphaMbp4Kernel(Mbp4Spec(alpha=alpha, schedule=settings["schedule"], max_iterations=int(target["observation_horizon"]["sweeps"]))).new_session(
+            original, priors, budgets=BudgetTree(limits=(BudgetLimit("attempt", "bp_calls", int(target["observation_horizon"]["sweeps"])),), parents={}),
+        ).run()
+        sweeps = [
+            {"iteration": sweep.iteration, "candidate": sweep.candidate.tolist(), "beliefs_sha256": sha256(_canonical_bytes(sweep.beliefs.tolist())).hexdigest(), "syndrome": code.syndrome(sweep.candidate).tolist(), "work": sweep.work.as_evidence(structural_event_version=4)}
+            for sweep in result.sweeps
+        ]
+        expected = declared["expected_trajectory"]
+        if [{key: step[key] for key in ("iteration", "candidate", "beliefs_sha256")} for step in sweeps] != expected:
+            raise ValueError(f"MBP4 {name} trajectory differs from independent frozen oracle")
+        frozen = PauliCandidate(f"candidate-phase11-mbp4-{name}", working, result.candidate, 0)
+        evaluation = evaluate_pauli_candidate(frozen, hidden_truth=hidden)
+        paths[name] = {
+            "alpha": alpha, "relation": declared["expected_relation"], "termination": result.termination,
+            "candidate": result.candidate.tolist(), "sweeps": sweeps, "work": result.work.as_evidence(structural_event_version=4),
+            "original_problem_evaluation": {"outcome": evaluation.outcome, "logical_action": evaluation.logical_action, "logical_action_unavailable_reason": evaluation.logical_action_unavailable_reason},
+        }
+    if paths["alpha_one"]["termination"] != "max_iterations" or paths["alpha_one_point_five"]["termination"] != "converged":
+        raise ValueError("MBP4 paths do not preserve the frozen oscillation/convergence contrast")
+    if paths["alpha_one_point_five"]["original_problem_evaluation"]["outcome"] != "exact":
+        raise ValueError("MBP4 alpha=1.5 did not recover the source error under independent evaluation")
+    return {"paths": paths, "source_settings": settings, "problem": problem_data}
+
+
+def _mbp4_assessment(target: dict[str, Any], target_document_sha256: str) -> dict[str, Any]:
+    ledger = _mbp4_evidence(target)
+    replay = _mbp4_evidence(target)
+    ledger_bytes, replay_bytes = _canonical_bytes(ledger), _canonical_bytes(replay)
+    if ledger_bytes != replay_bytes:
+        raise ValueError("MBP4 deterministic replay ledger bytes differ")
+    payload = {
+        "schema": "phase11-mbp4-figures8-9-five-qubit-assessment-v1", "status": "deterministic_mechanism_assessed",
+        "target_receipt_sha256": target["target_receipt_sha256"], "target_document_sha256": target_document_sha256,
+        "run_fidelity": "canonical_adaptation", "source_fidelity": "not_promoted", "admitted_shots": 2,
+        "claim_scope": _MBP4_SCOPE, "ledger": ledger,
+        "blocked_targets": {"figure6": {"status": "blocked_metadata", "missing_metadata": _FIGURE6_MISSING, "assessment": "not_admitted"}},
+        "deterministic_replay": {"ledger_sha256": sha256(ledger_bytes).hexdigest(), "replay_ledger_sha256": sha256(replay_bytes).hexdigest()},
+    }
+    payload["assessment_sha256"] = sha256(_canonical_bytes(payload)).hexdigest()
+    return payload
 
 
 def _blocked_assessment(target: QuaternarySourceTargetV1, target_document_sha256: str) -> dict[str, Any]:
@@ -220,7 +327,10 @@ def _run_qbpgd_qualification(target: dict[str, Any]) -> dict[str, Any]:
 
 def preflight(target_path: Path, manifest_path: Path | None, assessment_path: Path) -> dict[str, Any]:
     target, _manifest, document_digest = _validated(target_path, manifest_path)
-    assessment = _qbpgd_assessment(target, document_digest) if isinstance(target, dict) else _blocked_assessment(target, document_digest)
+    if isinstance(target, dict) and target.get("schema") == _MBP4_SCHEMA:
+        assessment = _mbp4_assessment(target, document_digest)
+    else:
+        assessment = _qbpgd_assessment(target, document_digest) if isinstance(target, dict) else _blocked_assessment(target, document_digest)
     assessment_path.parent.mkdir(parents=True, exist_ok=True)
     assessment_path.write_bytes(_canonical_bytes(assessment) + b"\n")
     return assessment
@@ -229,7 +339,10 @@ def preflight(target_path: Path, manifest_path: Path | None, assessment_path: Pa
 def verify(target_path: Path, manifest_path: Path | None, assessment_path: Path) -> dict[str, Any]:
     target, _manifest, document_digest = _validated(target_path, manifest_path)
     assessment = _load(assessment_path)
-    expected = _qbpgd_assessment(target, document_digest) if isinstance(target, dict) else _blocked_assessment(target, document_digest)
+    if isinstance(target, dict) and target.get("schema") == _MBP4_SCHEMA:
+        expected = _mbp4_assessment(target, document_digest)
+    else:
+        expected = _qbpgd_assessment(target, document_digest) if isinstance(target, dict) else _blocked_assessment(target, document_digest)
     if assessment == expected:
         return assessment
     if not isinstance(target, dict) or assessment.get("preflight") != expected:
@@ -239,6 +352,11 @@ def verify(target_path: Path, manifest_path: Path | None, assessment_path: Path)
 
 def run(target_path: Path, manifest_path: Path | None, assessment_path: Path) -> dict[str, Any]:
     target, _manifest, document_digest = _validated(target_path, manifest_path)
+    if isinstance(target, dict) and target.get("schema") == _MBP4_SCHEMA:
+        result = _mbp4_assessment(target, document_digest)
+        assessment_path.parent.mkdir(parents=True, exist_ok=True)
+        assessment_path.write_bytes(_canonical_bytes(result) + b"\n")
+        return result
     if isinstance(target, dict):
         preflight_receipt = _qbpgd_assessment(target, document_digest)
         evidence = _run_qbpgd_qualification(target)

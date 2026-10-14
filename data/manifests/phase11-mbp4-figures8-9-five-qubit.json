@@ -1,0 +1,15 @@
+{
+  "admission": "deterministic_mechanism_only",
+  "claim_scope": "deterministic_mechanism_only_not_a_curve_or_ranking",
+  "controlled_comparison": false,
+  "figure6": {
+    "assessment": "not_admitted",
+    "missing_metadata": ["iteration_cap", "denominator", "stopping_rule", "exact_coordinates", "interval_method"],
+    "status": "blocked_metadata"
+  },
+  "run_fidelity": "canonical_adaptation",
+  "schema": "phase11-mbp4-figures8-9-five-qubit-manifest-v1",
+  "source_only": true,
+  "target_document_sha256": "d7538a4fb978ec4e55f73af315c648fe0a888aa07bb4cc86f20433fe640eb1f0",
+  "target_receipt_sha256": "3e20000e8c9bc8c6414aef03bc7fbe59576e11af125f2bc6140c8214dff53023"
+}
