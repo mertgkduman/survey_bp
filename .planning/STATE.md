@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
-current_plan: 10
+current_plan: 11
 status: executing
-stopped_at: Completed 11-10-PLAN.md
-last_updated: "2026-10-14T21:54:40.107Z"
+stopped_at: Completed 11-05-PLAN.md
+last_updated: "2026-10-14T22:31:30.352Z"
 last_activity: 2026-10-14
 last_activity_desc: Phase 11 execution started
-state_head: 565d5581e509c18cba50d67e3773c67922ec9e07
+state_head: 2481ca67052f7eca54ed58c44485c873f27751e6
 progress:
   total_phases: 14
   completed_phases: 8
   total_plans: 166
-  completed_plans: 151
+  completed_plans: 152
 ---
 
 # Project State
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-10-12)
 ## Current Position
 
 Phase: 11 (Quaternary Reproduction and Comparisons) — EXECUTING
-Plan: 10 of 15
+Plan: 11 of 15
 Total Phases: 14
-Current Plan: 10
+Current Plan: 11
 Total Plans in Phase: 15
 Status: Ready to execute
 Last activity: 2026-10-14 — Phase 11 execution started
@@ -104,6 +104,7 @@ Progress: 8 of 14 phases complete (57%); Phase 9 has 20 of 20 plans complete
 | Phase 11 P03 | 11m | 2 tasks | 5 files |
 | Phase 11 P09 | 34m | 2 tasks | 5 files |
 | Phase 11 P10 | 31m | 3 tasks | 8 files |
+| Phase 11-quaternary-reproduction-and-comparisons P05 | 4m | 1 tasks | 1 files |
 
 Phase 02 P10–P16 gap-closure metrics are recorded in their individual summaries.
 
@@ -224,6 +225,7 @@ Full decisions are in PROJECT.md; workflow choices are in config.json.
 - [Phase 11]: BB72 calibration retains source-reported distance 6 and project-derived logical qualifications; neither becomes a platform verification claim.
 - [Phase 11]: Joint BP4 and separate binary arms report native named work beside callback-wall runtime without cross-unit conversion.
 - [Phase 11]: The Phase 11 package is immutable deny-only: missing site capacity, accounting, quota/cost, source eligibility, or persisted profiles prevents a dispatch token.
+- [Phase 11]: User selected preserve_unavailable for the verified Phase 11 aSCED derivative patch dd8a31965372ba8aa736134d71c66183c1d044b5ae6910dee48068e04cec2229; native matched-input evidence remains unavailable and canonical work continues.
 
 ### Pending Todos
 
@@ -285,8 +287,8 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 **Resume file:** None
 
-Last session: 2026-10-14T21:51:20.445Z
-Stopped at: Completed 11-10-PLAN.md
+Last session: 2026-10-14T22:31:18.671Z
+Stopped at: Completed 11-05-PLAN.md
 Next command: $gsd-execute-phase 11; Phase 5 human review remains open and Phase 7 stays paused.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
