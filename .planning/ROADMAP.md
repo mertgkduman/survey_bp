@@ -698,7 +698,23 @@ Plans:
 3. Source-backed compatible policy ablations produce replayable results, outcome/work analysis and discrepancy records, with no forced assumption that every binary policy has a faithful quaternary counterpart.
 
 **Research focus:** Quaternary paper targets and native-code availability, matched baseline priors, correlated-noise ablations, and kernel-aware cost comparisons.
-**Plans:** TBD
+**Plans:** 14 plans
+
+Plans:
+- [ ] 11-01-PLAN.md — Freeze the aSCED Figure 2 GB46 target and carry one member to terminal assessment.
+- [ ] 11-02-PLAN.md — Reconstruct Q-BPGD A5 and freeze the Figure 7 adaptation target.
+- [ ] 11-03-PLAN.md — Reproduce the MBP4 Figures 8–9 deterministic five-qubit mechanism.
+- [ ] 11-04-PLAN.md — Prove native aSCED matched-input limits and prepare an unapplied narrow proposal.
+- [ ] 11-05-PLAN.md — Decide aSCED derivative rights and source-change qualification.
+- [ ] 11-06-PLAN.md — Materialize the authorized or unavailable native aSCED route.
+- [ ] 11-07-PLAN.md — Execute one identical Pauli sample through joint and separate inference.
+- [ ] 11-08-PLAN.md — Freeze exact fixed-marginal estimands, simultaneous inference, and sizing.
+- [ ] 11-09-PLAN.md — Qualify the public bounded GB46 comparison lifecycle.
+- [ ] 11-10-PLAN.md — Calibrate BB72 and assemble the measured resource gate.
+- [ ] 11-11-PLAN.md — Decide digest-scoped publication campaign dispatch.
+- [ ] 11-12-PLAN.md — Execute or explicitly close all selected source evidence lanes.
+- [ ] 11-13-PLAN.md — Run one-change and complete qualified-method comparisons.
+- [ ] 11-14-PLAN.md — Publish the verified Phase 11 source and controlled assessment index.
 
 ### Phase 12: Circuit Models and Canonical Integration
 
