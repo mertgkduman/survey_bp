@@ -107,6 +107,7 @@ def test_partial_nonconvergence_keeps_components_and_all_shot_pair(x_status: str
     assert record.separate.candidate_x == (1, 0)
     assert record.separate.candidate_z == (0, 1)
     assert record.separate.terminal_status == "nonconvergence"
+    assert record.separate.all_shot == "failure"
     assert record.separate.evaluation["outcome"] == "exact"
 
 

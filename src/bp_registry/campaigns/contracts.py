@@ -1047,6 +1047,7 @@ class PauliMatchedArmV1(StrictModel):
         "no_proposal", "nonconvergence", "timeout", "postselected_rejection",
         "infrastructure_interruption",
     ]
+    all_shot: Literal["success", "failure", "incomplete"]
     evaluation: dict[str, Any]
     work: dict[str, int]
 

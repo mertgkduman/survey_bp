@@ -25,7 +25,7 @@ from ..evaluator import evaluate_candidate
 from ..manifests import StrictModel
 from .contracts import (
     BinaryComponentTerminalV1, MaterializedPhysicalSampleV1, PauliMatchedArmV1,
-    PauliMatchedPairV1, canonical_json_bytes,
+    OutcomeMatrixV1, OutcomeTreatmentV1, PauliMatchedPairV1, canonical_json_bytes,
 )
 from .controlled import ControlledArmReceiptV1, ControlledComponentEvidenceV1, SharedInitialBPReceiptV1
 from .execution import _shot_from_materialized, materialize_campaign_sample
@@ -406,6 +406,20 @@ _MATCHED_TERMINALS = (
     "infrastructure_interruption",
 )
 
+_MATCHED_OUTCOME_MATRIX = OutcomeMatrixV1(
+    rule_id="all_shot_v1",
+    treatments=tuple(
+        OutcomeTreatmentV1(
+            terminal_status=status,
+            all_shot=("incomplete" if status == "infrastructure_interruption" else
+                      "success" if status in {"exact", "stabilizer_equivalent"} else "failure"),
+            conditional=("incomplete" if status == "infrastructure_interruption" else
+                         "accepted" if status in {"exact", "stabilizer_equivalent", "wrong_logical_action", "postselected_rejection"} else "excluded"),
+        )
+        for status in _MATCHED_TERMINALS
+    ),
+)
+
 
 class JointArmInputV1(StrictModel):
     """Decoder-visible joint input; physical truth is deliberately absent."""
@@ -518,6 +532,10 @@ def _status_from_evaluation(outcome: str) -> str:
     return "wrong_logical_action" if outcome == "logical_failure" else outcome
 
 
+def _all_shot(status: str) -> Literal["success", "failure", "incomplete"]:
+    return next(item.all_shot for item in _MATCHED_OUTCOME_MATRIX.treatments if item.terminal_status == status)
+
+
 def _arm_evaluation(*, code: Any, true_x: np.ndarray, true_z: np.ndarray,
                     candidate_x: tuple[int, ...] | None, candidate_z: tuple[int, ...] | None) -> dict[str, Any]:
     if candidate_x is None or candidate_z is None:
@@ -604,6 +622,7 @@ def run_joint_separate_unit(
         arm_id="joint", materialized_sample_sha256=materialized_sample.materialized_sample_sha256,
         candidate_x=joint_result.candidate_x, candidate_z=joint_result.candidate_z,
         terminal_status=(joint_result.terminal_status if joint_evaluation["outcome"] == "no_proposal" else joint_evaluation["outcome"]),
+        all_shot=_all_shot(joint_result.terminal_status if joint_evaluation["outcome"] == "no_proposal" else joint_evaluation["outcome"]),
         evaluation=joint_evaluation, work=dict(joint_result.work),
     )
     separate_status = ("nonconvergence" if any(item.terminal_status == "nonconvergence" for item in components)
@@ -611,7 +630,7 @@ def run_joint_separate_unit(
     separate = PauliMatchedArmV1(
         arm_id="separate", materialized_sample_sha256=materialized_sample.materialized_sample_sha256,
         candidate_x=x_result.candidate, candidate_z=z_result.candidate,
-        terminal_status=separate_status, evaluation=separate_evaluation,
+        terminal_status=separate_status, all_shot=_all_shot(separate_status), evaluation=separate_evaluation,
         work={f"{component.component.lower()}_{name}": amount for component in components for name, amount in component.work.items()},
     )
     unsigned = {
