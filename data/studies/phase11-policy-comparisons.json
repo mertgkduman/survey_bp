@@ -1,0 +1,48 @@
+{
+  "schema": "phase11_policy_comparison_study_v1",
+  "study_id": "phase11-gb46-bounded-policy-mechanisms",
+  "evidence_lane": "controlled_canonical_adaptation",
+  "claim_scope": "bounded_policy_mechanism_comparison_not_reproduction_or_performance_ranking",
+  "fixed_marginal_design": {
+    "path": "data/studies/phase11-fixed-marginal-design.json",
+    "sha256": "8548f2d32cb700c11ebe7990d39b90d9329efe6a65c5a4aba90ee364b85446b6"
+  },
+  "code": {
+    "code_id": "GB46",
+    "design_path": "data/studies/phase11-gb46-joint-separate.json",
+    "run_fidelity": "canonical_adaptation"
+  },
+  "bounded_limits": {
+    "samples_per_anchor": 1,
+    "max_iterations": 4,
+    "max_output_bytes": 1048576
+  },
+  "comparisons": [
+    {
+      "comparison_id": "gb46-mbp4-alpha",
+      "method": "MBP4",
+      "qualification_path": "data/results/phase11-mbp4-figures8-9/assessment.json",
+      "qualification_status": "deterministic_mechanism_assessed",
+      "declared_changed_field": "recurrence",
+      "anchors": ["independence"],
+      "baseline": {
+        "recurrence": "scalar_llr_bp4",
+        "alpha": 1.5,
+        "schedule": "qbp_flooding",
+        "initialization": "joint_channel_priors",
+        "construction": "GB46_css",
+        "stopping": "syndrome_or_iteration_cap",
+        "postprocessing": "none"
+      },
+      "variant": {
+        "recurrence": "kuo-lai-2023-mbp4-fixed-inhibition-eq15-18",
+        "alpha": 1.5,
+        "schedule": "qbp_flooding",
+        "initialization": "joint_channel_priors",
+        "construction": "GB46_css",
+        "stopping": "syndrome_or_iteration_cap",
+        "postprocessing": "none"
+      }
+    }
+  ]
+}
