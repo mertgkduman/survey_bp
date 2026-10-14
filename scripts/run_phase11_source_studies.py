@@ -338,7 +338,12 @@ def _blocked_assessment(
     return payload
 
 
-def _qbpgd_assessment(target: dict[str, Any], target_document_sha256: str) -> dict[str, Any]:
+def _qbpgd_assessment(
+    target: dict[str, Any],
+    target_document_sha256: str,
+    *,
+    authorization_path: Path | None = None,
+) -> dict[str, Any]:
     payload = {
         "schema": "phase11-qbpgd-source-assessment-v1",
         "status": "inconclusive",
@@ -350,6 +355,16 @@ def _qbpgd_assessment(target: dict[str, Any], target_document_sha256: str) -> di
         "qualification_blockers": list(target["qualification_blockers"]),
         "discrepancy": "not_assessed_due_to_unresolved_figure_coordinates_and_author_identity",
     }
+    if authorization_path is not None:
+        authorization = _source_dispatch_authorization(authorization_path)
+        payload["authorization"] = authorization
+        payload["source_stopping"] = target["source_stopping"]
+        payload["canonical_adaptation"] = {
+            "eligibility": "blocked",
+            "fidelity": "canonical_adaptation",
+            "dispatch_attempted": False,
+            "failed_gates": [*target["qualification_blockers"], *authorization["failed_gates"]],
+        }
     payload["assessment_sha256"] = sha256(_canonical_bytes(payload)).hexdigest()
     return payload
 
@@ -422,7 +437,7 @@ def preflight(
     if isinstance(target, dict) and target.get("schema") == _MBP4_SCHEMA:
         assessment = _mbp4_assessment(target, document_digest)
     else:
-        assessment = _qbpgd_assessment(target, document_digest) if isinstance(target, dict) else _blocked_assessment(
+        assessment = _qbpgd_assessment(target, document_digest, authorization_path=authorization_path) if isinstance(target, dict) else _blocked_assessment(
             target, document_digest,
             native_qualification_path=native_qualification_path,
             authorization_path=authorization_path,
@@ -445,7 +460,7 @@ def verify(
     if isinstance(target, dict) and target.get("schema") == _MBP4_SCHEMA:
         expected = _mbp4_assessment(target, document_digest)
     else:
-        expected = _qbpgd_assessment(target, document_digest) if isinstance(target, dict) else _blocked_assessment(
+        expected = _qbpgd_assessment(target, document_digest, authorization_path=authorization_path) if isinstance(target, dict) else _blocked_assessment(
             target, document_digest,
             native_qualification_path=native_qualification_path,
             authorization_path=authorization_path,
@@ -472,7 +487,11 @@ def run(
         assessment_path.write_bytes(_canonical_bytes(result) + b"\n")
         return result
     if isinstance(target, dict):
-        preflight_receipt = _qbpgd_assessment(target, document_digest)
+        preflight_receipt = _qbpgd_assessment(target, document_digest, authorization_path=authorization_path)
+        if authorization_path is not None:
+            assessment_path.parent.mkdir(parents=True, exist_ok=True)
+            assessment_path.write_bytes(_canonical_bytes(preflight_receipt) + b"\n")
+            return preflight_receipt
         evidence = _run_qbpgd_qualification(target)
         result = {**preflight_receipt, "admitted_shots": 1, "qualification": evidence, "preflight": preflight_receipt}
         result["assessment_sha256"] = sha256(_canonical_bytes({key: value for key, value in result.items() if key != "assessment_sha256"})).hexdigest()
