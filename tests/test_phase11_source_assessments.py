@@ -14,6 +14,8 @@ ASCED_TARGET = ROOT / "data/source-targets/phase11-asced-figure2-gb46.json"
 ASCED_MANIFEST = ROOT / "data/manifests/phase11-asced-figure2-gb46.json"
 NATIVE_QUALIFICATION = ROOT / "data/native/phase11-asced-matched-input-qualification.json"
 AUTHORIZATION = ROOT / "data/results/phase11-production-authorization.json"
+QBPGD_TARGET = ROOT / "data/source-targets/phase11-qbpgd-figure7-a5.json"
+QBPGD_MANIFEST = ROOT / "data/manifests/phase11-qbpgd-figure7-a5.json"
 
 
 def _json(path: Path) -> dict:
@@ -65,3 +67,31 @@ def test_asced_ordinary_and_overcomplete_denied_assessment_keeps_unavailable_nat
         assert native["terminal"] == "declined_unavailable"
         assert native["source_fidelity_claim"] == "none"
         assert native["paired_values"] is None
+
+
+def test_qbpgd_a5_denied_setting_gap_adaptation_stopping_assessment_keeps_discrepancy(tmp_path: Path) -> None:
+    """Deny must suppress even the bounded probe while retaining source gaps."""
+    assessment_path = tmp_path / "assessment.json"
+    result = _run(
+        "run",
+        "--target", str(QBPGD_TARGET),
+        "--manifest", str(QBPGD_MANIFEST),
+        "--authorization", str(AUTHORIZATION),
+        "--assessment", str(assessment_path),
+    )
+    assert result.returncode == 0, result.stderr
+
+    assessment = _json(assessment_path)
+    assert assessment["status"] == "inconclusive"
+    assert assessment["admitted_shots"] == 0
+    assert assessment["run_fidelity"] == "canonical_adaptation"
+    assert assessment["source_fidelity"] == "not_promoted"
+    assert assessment["authorization"]["decision"] == "deny"
+    assert assessment["authorization"]["dispatch_attempted"] is False
+    assert assessment["source_stopping"] == {
+        "error_cases": 100,
+        "denominator": "trials_until_100_error_cases",
+    }
+    assert "continued_message_lifecycle_unresolved" in assessment["qualification_blockers"]
+    assert assessment["discrepancy"] == "not_assessed_due_to_unresolved_figure_coordinates_and_author_identity"
+    assert "qualification" not in assessment
