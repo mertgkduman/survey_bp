@@ -6,6 +6,8 @@ therefore resume the missing arm without repeating initial BP.
 
 from __future__ import annotations
 
+import base64
+from dataclasses import dataclass
 from hashlib import sha256
 import json
 import os
@@ -13,14 +15,18 @@ from pathlib import Path
 import tempfile
 from time import perf_counter_ns
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, Callable, Literal
 
 import numpy as np
 
 from ..artifacts import load_artifact
 from ..canonical.fair_legs import FairLegConfig, FairLegController
 from ..evaluator import evaluate_candidate
-from .contracts import MaterializedPhysicalSampleV1, canonical_json_bytes
+from ..manifests import StrictModel
+from .contracts import (
+    BinaryComponentTerminalV1, MaterializedPhysicalSampleV1, PauliMatchedArmV1,
+    PauliMatchedPairV1, canonical_json_bytes,
+)
 from .controlled import ControlledArmReceiptV1, ControlledComponentEvidenceV1, SharedInitialBPReceiptV1
 from .execution import _shot_from_materialized, materialize_campaign_sample
 from .planning import CampaignWorkPlan, UnitKey
@@ -392,3 +398,172 @@ def verify_fair_controlled_unit(
             or receipt.component.storage_bytes.value != len(decode_bytes) + len(raw)):
         raise ValueError("controlled continuation cost differs from actual bytes")
     return receipt
+
+
+_MATCHED_TERMINALS = (
+    "exact", "stabilizer_equivalent", "wrong_logical_action", "invalid_syndrome",
+    "no_proposal", "nonconvergence", "timeout", "postselected_rejection",
+    "infrastructure_interruption",
+)
+
+
+class JointArmInputV1(StrictModel):
+    """Decoder-visible joint input; physical truth is deliberately absent."""
+
+    probabilities: tuple[tuple[float, ...], ...]
+    x_syndrome: tuple[int, ...]
+    z_syndrome: tuple[int, ...]
+    physical_sample_identity: str
+    materialized_sample_sha256: str
+
+
+class BinaryArmInputV1(StrictModel):
+    """D-05 narrow view for a separate binary component."""
+
+    component: Literal["X", "Z"]
+    prior: tuple[float, ...]
+    syndrome: tuple[int, ...]
+    physical_sample_identity: str
+    materialized_sample_sha256: str
+
+
+class JointArmResultV1(StrictModel):
+    candidate_x: tuple[int, ...] | None = None
+    candidate_z: tuple[int, ...] | None = None
+    terminal_status: Literal[
+        "exact", "stabilizer_equivalent", "wrong_logical_action", "invalid_syndrome",
+        "no_proposal", "nonconvergence", "timeout", "postselected_rejection",
+        "infrastructure_interruption",
+    ]
+    iterations: int = 0
+    work: dict[str, int]
+
+
+class BinaryArmResultV1(StrictModel):
+    candidate: tuple[int, ...] | None = None
+    terminal_status: Literal[
+        "exact", "stabilizer_equivalent", "wrong_logical_action", "invalid_syndrome",
+        "no_proposal", "nonconvergence", "timeout", "postselected_rejection",
+        "infrastructure_interruption",
+    ]
+    iterations: int = 0
+    work: dict[str, int]
+
+
+def _matched_digest(payload: object) -> str:
+    return sha256(b"bp-registry-pauli-matched-pair-v1\0" + canonical_json_bytes(payload)).hexdigest()
+
+
+def _matched_bits(encoded: str, shape: tuple[int, ...]) -> np.ndarray:
+    bits = np.frombuffer(base64.b64decode(encoded, validate=True), dtype=np.uint8).copy().reshape(shape)
+    if bits.ndim != 1 or np.any((bits != 0) & (bits != 1)):
+        raise ValueError("materialized matched-comparison errors must be binary vectors")
+    return bits
+
+
+def _status_from_evaluation(outcome: str) -> str:
+    return "wrong_logical_action" if outcome == "logical_failure" else outcome
+
+
+def _arm_evaluation(*, code: Any, true_x: np.ndarray, true_z: np.ndarray,
+                    candidate_x: tuple[int, ...] | None, candidate_z: tuple[int, ...] | None) -> dict[str, Any]:
+    if candidate_x is None or candidate_z is None:
+        return {"outcome": "no_proposal", "logical_action_agrees": None}
+    evaluation = evaluate_candidate(
+        code, true_x=true_x, true_z=true_z,
+        candidate_x=np.asarray(candidate_x, dtype=np.uint8),
+        candidate_z=np.asarray(candidate_z, dtype=np.uint8),
+    )
+    return {"outcome": _status_from_evaluation(evaluation.outcome), "logical_action_agrees": evaluation.logical_action_agrees}
+
+
+def _syndrome_digest(syndrome: tuple[int, ...]) -> str:
+    return sha256(canonical_json_bytes(list(syndrome))).hexdigest()
+
+
+def run_joint_separate_unit(
+    *, code: Any, materialized_sample: MaterializedPhysicalSampleV1,
+    joint_probabilities: tuple[tuple[float, ...], ...],
+    joint_decoder: Callable[[JointArmInputV1], JointArmResultV1],
+    binary_decoder: Callable[[BinaryArmInputV1], BinaryArmResultV1],
+) -> PauliMatchedPairV1:
+    """Run D-06 paired inference from one immutable Pauli sample.
+
+    Callback inputs model the actual decoder boundary.  The evaluator-owned
+    materialized error is decoded only after both arms return, and never enters
+    either callback object.  Production adapters may call the existing
+    ``run_canonical_materialized_one`` behind ``binary_decoder``; this narrow
+    seam keeps the marginal isolation testable without another binary engine.
+    """
+    if not isinstance(materialized_sample, MaterializedPhysicalSampleV1):
+        raise ValueError("matched comparison requires a validated materialized physical sample")
+    validated = code.validate()
+    if len(joint_probabilities) != validated.n or any(len(row) != 4 for row in joint_probabilities):
+        raise ValueError("joint probabilities must provide one I,X,Y,Z row per code qubit")
+    rows = np.asarray(joint_probabilities, dtype=np.float64)
+    if not np.all(np.isfinite(rows)) or np.any(rows < 0) or not np.allclose(rows.sum(axis=1), 1.0, atol=1e-12, rtol=0.0):
+        raise ValueError("joint probabilities must be finite I,X,Y,Z rows summing to one")
+    true_x = _matched_bits(materialized_sample.x_bytes_b64, materialized_sample.x_shape)
+    true_z = _matched_bits(materialized_sample.z_bytes_b64, materialized_sample.z_shape)
+    if true_x.shape != (validated.n,) or true_z.shape != (validated.n,):
+        raise ValueError("materialized sample and comparison code have incompatible sizes")
+    expected_z = tuple(int(value) for value in ((validated.hz.astype(np.int64) @ true_x) % 2).tolist())
+    expected_x = tuple(int(value) for value in ((validated.hx.astype(np.int64) @ true_z) % 2).tolist())
+    observed = materialized_sample.observations
+    if set(observed) != {"X", "Z"}:
+        raise ValueError("matched comparison requires both immutable CSS observations")
+    # Decoder calls occur before evaluator access to the materialized error.
+    joint_result = joint_decoder(JointArmInputV1(
+        probabilities=tuple(tuple(float(value) for value in row) for row in rows),
+        x_syndrome=expected_x, z_syndrome=expected_z,
+        physical_sample_identity=materialized_sample.physical_sample_identity,
+        materialized_sample_sha256=materialized_sample.materialized_sample_sha256,
+    ))
+    x_result = binary_decoder(BinaryArmInputV1(
+        component="X", prior=tuple(float(value) for value in rows[:, 1] + rows[:, 2]), syndrome=expected_z,
+        physical_sample_identity=materialized_sample.physical_sample_identity,
+        materialized_sample_sha256=materialized_sample.materialized_sample_sha256,
+    ))
+    z_result = binary_decoder(BinaryArmInputV1(
+        component="Z", prior=tuple(float(value) for value in rows[:, 2] + rows[:, 3]), syndrome=expected_x,
+        physical_sample_identity=materialized_sample.physical_sample_identity,
+        materialized_sample_sha256=materialized_sample.materialized_sample_sha256,
+    ))
+    if not isinstance(joint_result, JointArmResultV1) or not isinstance(x_result, BinaryArmResultV1) or not isinstance(z_result, BinaryArmResultV1):
+        raise ValueError("matched comparison decoder callbacks must return typed terminal results")
+    for result in (joint_result, x_result, z_result):
+        if result.iterations < 0 or not result.work or any(type(value) is not int or value < 0 for value in result.work.values()):
+            raise ValueError("matched comparison terminal work must be explicit nonnegative integers")
+    components = (
+        BinaryComponentTerminalV1(component="X", candidate=x_result.candidate, terminal_status=x_result.terminal_status,
+                                  iterations=x_result.iterations, work=x_result.work, syndrome_sha256=_syndrome_digest(expected_z)),
+        BinaryComponentTerminalV1(component="Z", candidate=z_result.candidate, terminal_status=z_result.terminal_status,
+                                  iterations=z_result.iterations, work=z_result.work, syndrome_sha256=_syndrome_digest(expected_x)),
+    )
+    joint_evaluation = _arm_evaluation(code=validated, true_x=true_x, true_z=true_z,
+                                       candidate_x=joint_result.candidate_x, candidate_z=joint_result.candidate_z)
+    separate_evaluation = _arm_evaluation(code=validated, true_x=true_x, true_z=true_z,
+                                          candidate_x=x_result.candidate, candidate_z=z_result.candidate)
+    joint = PauliMatchedArmV1(
+        arm_id="joint", materialized_sample_sha256=materialized_sample.materialized_sample_sha256,
+        candidate_x=joint_result.candidate_x, candidate_z=joint_result.candidate_z,
+        terminal_status=(joint_result.terminal_status if joint_evaluation["outcome"] == "no_proposal" else joint_evaluation["outcome"]),
+        evaluation=joint_evaluation, work=dict(joint_result.work),
+    )
+    separate_status = ("nonconvergence" if any(item.terminal_status == "nonconvergence" for item in components)
+                       else separate_evaluation["outcome"])
+    separate = PauliMatchedArmV1(
+        arm_id="separate", materialized_sample_sha256=materialized_sample.materialized_sample_sha256,
+        candidate_x=x_result.candidate, candidate_z=z_result.candidate,
+        terminal_status=separate_status, evaluation=separate_evaluation,
+        work={f"{component.component.lower()}_{name}": amount for component in components for name, amount in component.work.items()},
+    )
+    unsigned = {
+        "schema": "pauli_matched_pair_v1", "decision_ids": ("D-05", "D-06", "D-08"),
+        "physical_sample_identity": materialized_sample.physical_sample_identity,
+        "physical_error_sha256": materialized_sample.physical_error_sha256,
+        "materialized_sample_sha256": materialized_sample.materialized_sample_sha256,
+        "joint": joint.model_dump(mode="json"), "separate": separate.model_dump(mode="json"),
+        "components": tuple(component.model_dump(mode="json") for component in components),
+    }
+    return PauliMatchedPairV1.model_validate({**unsigned, "record_sha256": _matched_digest(unsigned)})

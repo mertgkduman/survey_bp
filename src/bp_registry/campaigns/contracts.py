@@ -1003,6 +1003,101 @@ class MaterializedPhysicalSampleV1(StrictModel):
         return canonical_json_bytes(self.model_dump(mode="json", by_alias=True))
 
 
+class BinaryComponentTerminalV1(StrictModel):
+    """D-08 terminal evidence for one marginal-only binary component."""
+
+    component: Literal["X", "Z"]
+    candidate: tuple[int, ...] | None = None
+    terminal_status: Literal[
+        "exact", "stabilizer_equivalent", "wrong_logical_action", "invalid_syndrome",
+        "no_proposal", "nonconvergence", "timeout", "postselected_rejection",
+        "infrastructure_interruption",
+    ]
+    iterations: int = Field(ge=0, le=_MAX_EVENTS)
+    work: dict[str, int]
+    syndrome_sha256: str = Field(pattern=_SHA256)
+
+    @field_validator("candidate", mode="before")
+    @classmethod
+    def binary_candidate(cls, value: Any) -> Any:
+        if value is None:
+            return value
+        candidate = tuple(value)
+        if not candidate or any(type(bit) is not int or bit not in (0, 1) for bit in candidate):
+            raise ValueError("binary component candidate must be a nonempty binary vector")
+        return candidate
+
+    @field_validator("work")
+    @classmethod
+    def nonnegative_work(cls, value: dict[str, int]) -> dict[str, int]:
+        if not value or any(not key or type(amount) is not int or amount < 0 for key, amount in value.items()):
+            raise ValueError("component work must be a nonempty nonnegative integer mapping")
+        return dict(sorted(value.items()))
+
+
+class PauliMatchedArmV1(StrictModel):
+    """One arm in a D-06 same-materialized-sample comparison."""
+
+    arm_id: Literal["joint", "separate"]
+    materialized_sample_sha256: str = Field(pattern=_SHA256)
+    candidate_x: tuple[int, ...] | None = None
+    candidate_z: tuple[int, ...] | None = None
+    terminal_status: Literal[
+        "exact", "stabilizer_equivalent", "wrong_logical_action", "invalid_syndrome",
+        "no_proposal", "nonconvergence", "timeout", "postselected_rejection",
+        "infrastructure_interruption",
+    ]
+    evaluation: dict[str, Any]
+    work: dict[str, int]
+
+    @field_validator("candidate_x", "candidate_z", mode="before")
+    @classmethod
+    def binary_recovery(cls, value: Any) -> Any:
+        return BinaryComponentTerminalV1.binary_candidate(value)
+
+    @field_validator("work")
+    @classmethod
+    def arm_work(cls, value: dict[str, int]) -> dict[str, int]:
+        return BinaryComponentTerminalV1.nonnegative_work(value)
+
+
+class PauliMatchedPairV1(StrictModel):
+    """Complete D-05/D-06/D-08 evidence for one physical Pauli sample."""
+
+    schema_name: Literal["pauli_matched_pair_v1"] = Field(alias="schema", serialization_alias="schema")
+    decision_ids: tuple[Literal["D-05", "D-06", "D-08"], ...]
+    physical_sample_identity: str = Field(pattern=_SHA256)
+    physical_error_sha256: str = Field(pattern=_SHA256)
+    materialized_sample_sha256: str = Field(pattern=_SHA256)
+    joint: PauliMatchedArmV1
+    separate: PauliMatchedArmV1
+    components: tuple[BinaryComponentTerminalV1, BinaryComponentTerminalV1]
+    record_sha256: str = Field(pattern=_SHA256)
+
+    @model_validator(mode="after")
+    def complete_and_replayable_pair(self) -> "PauliMatchedPairV1":
+        if self.decision_ids != ("D-05", "D-06", "D-08"):
+            raise ValueError("matched pair must cite D-05, D-06, and D-08 in order")
+        if self.joint.arm_id != "joint" or self.separate.arm_id != "separate":
+            raise ValueError("matched pair requires exactly one joint and one separate arm")
+        if (self.joint.materialized_sample_sha256 != self.materialized_sample_sha256
+                or self.separate.materialized_sample_sha256 != self.materialized_sample_sha256):
+            raise ValueError("both decoder arms must bind the same materialized Pauli sample")
+        if tuple(item.component for item in self.components) != ("X", "Z"):
+            raise ValueError("matched pair components must be ordered X then Z")
+        unsigned = self.model_dump(mode="json", by_alias=True, exclude={"record_sha256"})
+        expected = _digest("bp-registry-pauli-matched-pair-v1", canonical_json_bytes(unsigned))
+        if self.record_sha256 != expected:
+            raise ValueError("matched pair record digest differs from retained evidence")
+        return self
+
+    def primitive_bytes(self) -> bytes:
+        return canonical_json_bytes(self.model_dump(mode="json", by_alias=True))
+
+    def verify_replay(self) -> "PauliMatchedPairV1":
+        return type(self).model_validate_json(self.primitive_bytes())
+
+
 @dataclass(frozen=True, slots=True)
 class CampaignPlanV1:
     """The one-unit frozen plan derived from a primitive campaign specification."""
