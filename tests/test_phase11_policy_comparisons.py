@@ -29,7 +29,7 @@ def test_tracer_mbp4_one_change_contract_and_replay(tmp_path: Path) -> None:
     module = _api()
     study = module.load_policy_study(ROOT)
     tracer = next(item for item in study["comparisons"] if item["comparison_id"] == "gb46-mbp4-alpha")
-    assert tracer["anchors"] == ["independence"]
+    assert "independence" in tracer["anchors"]
     assert tracer["declared_changed_field"] == "recurrence"
     assert tracer["baseline"]["schedule"] == tracer["variant"]["schedule"]
     assert tracer["baseline"]["initialization"] == tracer["variant"]["initialization"]
@@ -37,9 +37,9 @@ def test_tracer_mbp4_one_change_contract_and_replay(tmp_path: Path) -> None:
     assert tracer["variant"]["recurrence"] == "kuo-lai-2023-mbp4-fixed-inhibition-eq15-18"
     result = module.run_policy_comparisons(ROOT, tmp_path)
     assert result["status"] == "verified"
-    assert result["comparison_count"] == 1
+    assert result["comparison_count"] >= 1
     verification = module.verify_policy_comparisons(ROOT, tmp_path)
-    assert verification["replayed_records"] == 1
+    assert verification["replayed_records"] >= 1
     record = json.loads((tmp_path / "records" / "gb46-mbp4-alpha" / "independence.json").read_text())
     assert record["sample_identity"] == record["baseline"]["sample_identity"] == record["variant"]["sample_identity"]
     assert record["baseline"]["terminal"] and record["variant"]["terminal"]
@@ -73,4 +73,27 @@ def test_independence_cli_runs_and_replays_bounded_tracer(tmp_path: Path) -> Non
         cwd=ROOT, text=True, capture_output=True, check=False,
     )
     assert replay.returncode == 0, replay.stdout + replay.stderr
-    assert json.loads(replay.stdout)["replayed_records"] == 1
+    assert json.loads(replay.stdout)["replayed_records"] >= 1
+
+
+def test_three_anchor_policy_rows_keep_asced_lanes_separate_and_native_unavailable() -> None:
+    """D-14 requires all policy rows at exactly the frozen channel anchors."""
+    module = _api()
+    study = module.load_policy_study(ROOT)
+    module.validate_policy_study(ROOT, study)
+    assert all(item["anchors"] == ["lower_y", "independence", "higher_y"] for item in study["comparisons"])
+    rows = {item["comparison_id"]: item for item in study["comparisons"]}
+    assert set(rows) >= {"gb46-mbp4-alpha", "gb46-ordinary-asced", "gb46-overcomplete-asced"}
+    assert rows["gb46-ordinary-asced"]["construction"] != rows["gb46-overcomplete-asced"]["construction"]
+    assert rows["gb46-ordinary-asced"]["native_match_status"] == "unavailable"
+    assert rows["gb46-overcomplete-asced"]["canonical_controlled_eligible"] is True
+
+
+def test_policy_study_rejects_renamed_missing_or_fourth_anchor() -> None:
+    module = _api()
+    study = module.load_policy_study(ROOT)
+    for anchors in (["lower_y", "independence"], ["lower_y", "independent", "higher_y"], ["lower_y", "independence", "higher_y", "extra"]):
+        bad = json.loads(json.dumps(study))
+        bad["comparisons"][0]["anchors"] = anchors
+        with pytest.raises(ValueError, match="anchors"):
+            module.validate_policy_study(ROOT, bad)
