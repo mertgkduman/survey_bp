@@ -119,5 +119,5 @@ def test_figure7_verifier_rejects_resigned_qualification_claim(tmp_path: Path):
     assessment.write_text(json.dumps(changed, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8")
 
     verify = _run("verify", "--target", str(TARGET), "--manifest", str(MANIFEST), "--assessment", str(assessment))
-    assert verify.returncode == 1
+    assert verify.returncode == 2
     assert "qualification deterministic evidence" in verify.stderr
