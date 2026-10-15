@@ -1428,3 +1428,229 @@ def assess_correlation_sweep(
             member_ids=design.arm_rate_members,
         ),
     )
+
+
+_PHASE11_SOURCE_ASSESSMENTS = (
+    ("asced_figure2", "data/results/phase11-asced-figure2/assessment.json",
+     "source reproduction qualification; neither canonical adaptation nor unavailable native evidence is a controlled effect"),
+    ("qbpgd_figure7", "data/results/phase11-qbpgd-figure7/assessment.json",
+     "source reproduction qualification only; unresolved source semantics remain explicit"),
+    ("mbp4_figures8_9", "data/results/phase11-mbp4-figures8-9/assessment.json",
+     "deterministic mechanism evidence only; no curve, threshold, ranking, or paper-performance claim"),
+)
+_PHASE11_CONTROLLED = (
+    ("GB46", "data/studies/phase11-gb46-joint-separate.json",
+     "data/results/phase11-controlled-evaluation/gb46/evaluation-receipt.json"),
+    ("BB72", "data/studies/phase11-bb72-joint-separate.json",
+     "data/results/phase11-controlled-evaluation/bb72/evaluation-receipt.json"),
+)
+_PHASE11_POLICY_VERIFICATION = "data/results/phase11-policy-comparisons/verification.json"
+_PHASE11_CONTROLLED_VERIFICATION = "data/results/phase11-controlled-evaluation/verification.json"
+
+
+def _phase11_regular_json(root: Path, relative: str, *, label: str) -> tuple[dict[str, object], str]:
+    """Read one allowlisted Phase 11 artifact without accepting path substitution."""
+    candidate = (root / relative).resolve(strict=True)
+    if not candidate.is_relative_to(root) or candidate.is_symlink() or not candidate.is_file():
+        raise ValueError(f"{label} must be a regular allowlisted project artifact")
+    try:
+        payload = json.loads(candidate.read_bytes())
+    except (OSError, json.JSONDecodeError) as error:
+        raise ValueError(f"{label} must be readable JSON") from error
+    if not isinstance(payload, dict):
+        raise ValueError(f"{label} must be a JSON object")
+    return payload, sha256(candidate.read_bytes()).hexdigest()
+
+
+def _phase11_digest(payload: Mapping[str, object], *, field: str) -> str:
+    return sha256(canonical_json_bytes({key: value for key, value in payload.items() if key != field})).hexdigest()
+
+
+def _phase11_source_reference(root: Path, *, source_id: str, relative: str, question: str) -> dict[str, object]:
+    payload, file_sha256 = _phase11_regular_json(root, relative, label=f"{source_id} assessment")
+    declared = payload.get("assessment_sha256")
+    if not isinstance(declared, str) or declared != _phase11_digest(payload, field="assessment_sha256"):
+        raise ValueError(f"{source_id} assessment digest differs from its content")
+    status = payload.get("status")
+    if not isinstance(status, str):
+        raise ValueError(f"{source_id} assessment lacks a status")
+    limitations: list[str] = []
+    for key in ("discrepancy", "claim_scope", "source_fidelity"):
+        value = payload.get(key)
+        if isinstance(value, str):
+            limitations.append(value)
+    return {
+        "source_id": source_id,
+        "question": question,
+        "assessment_path": relative,
+        "assessment_file_sha256": file_sha256,
+        "assessment_sha256": declared,
+        "status": status,
+        "run_fidelity": payload.get("run_fidelity"),
+        "source_fidelity": payload.get("source_fidelity"),
+        "admitted_shots": payload.get("admitted_shots"),
+        "limitations": limitations,
+        "permitted_claim": "source_qualification_only" if source_id != "mbp4_figures8_9" else "deterministic_mechanism_only",
+    }
+
+
+def _phase11_controlled_rows(design: FixedMarginalCorrelationDesignV1, *, evidence_status: str) -> list[dict[str, object]]:
+    """Retain all frozen rows even when no completed pair permits arithmetic."""
+    return [
+        {
+            "point_id": row.point_id,
+            "d_y": None,
+            "d_y_interval": None,
+            "joint_failure_rate": None,
+            "separate_failure_rate": None,
+            "paired_uncertainty": "unavailable_no_complete_pairs",
+            "convergence": {},
+            "all_shot_denominator": 0,
+            "typed_work": {},
+            "same_condition_runtime": "unavailable_no_complete_pairs",
+            "evidence_status": evidence_status,
+            "channel": {
+                "probabilities": row.probabilities,
+                "q_x": row.q_x,
+                "q_z": row.q_z,
+                "total_nonidentity": row.total_nonidentity,
+                "x_z_covariance": row.x_z_covariance,
+            },
+        }
+        for row in design.rows
+    ]
+
+
+def _phase11_controlled_assessment(
+    root: Path, *, code_id: str, design_relative: str, receipt_relative: str,
+) -> dict[str, object]:
+    """Produce one code-specific assessment from verified evaluation evidence only."""
+    # Import lazily: controlled execution itself imports this module for the frozen design parser.
+    from .controlled_evaluation import verify_controlled_evaluation_receipt
+
+    receipt = verify_controlled_evaluation_receipt(
+        root=root,
+        package_path=root / "data/results/phase11-production-authorization.json",
+        design_path=root / design_relative,
+        receipt_path=root / receipt_relative,
+    )
+    if receipt.get("code_id") != code_id:
+        raise ValueError("controlled receipt code identity differs from its assessment lane")
+    design = load_fixed_marginal_design(root / "data/studies/phase11-fixed-marginal-design.json")
+    complete_pairs = receipt.get("complete_pairs")
+    ready_refs = receipt.get("evidence_scope", {}).get("assessment_ready_ledger_refs") if isinstance(receipt.get("evidence_scope"), Mapping) else None
+    if not isinstance(complete_pairs, list) or not isinstance(ready_refs, list):
+        raise ValueError("controlled receipt lacks bounded complete-pair evidence")
+    if complete_pairs or ready_refs:
+        # Current Phase 11 consumer intentionally has no decoder for an unreviewed future pair schema.
+        # Refusing it prevents a new dispatcher from silently changing the prespecified analysis.
+        raise ValueError("controlled assessment requires a reviewed complete-pair ledger decoder")
+    terminal_status = receipt.get("terminal_status")
+    if not isinstance(terminal_status, str):
+        raise ValueError("controlled receipt lacks a terminal status")
+    status = "inconclusive_zero_complete_pairs"
+    return {
+        "code_id": code_id,
+        "question": "paired logical-failure difference: joint BP4 minus separate binary inference",
+        "design_path": "data/studies/phase11-fixed-marginal-design.json",
+        "design_sha256": design.design_sha256,
+        "receipt_path": receipt_relative,
+        "controlled_evaluation_receipt_sha256": receipt.get("receipt_sha256"),
+        "terminal_status": terminal_status,
+        "terminal_reason": receipt.get("terminal_reason"),
+        "authorization": receipt.get("authorization"),
+        "dispatch": receipt.get("dispatch"),
+        "attempted_pair_count": len(receipt.get("attempted_pairs", [])),
+        "complete_pair_count": 0,
+        "interruptions": receipt.get("interruptions"),
+        "typed_work": receipt.get("typed_work"),
+        "calibration_provenance": receipt.get("calibration_provenance"),
+        "calibration_substitution_prohibited": receipt.get("calibration_provenance", {}).get("forbidden_as_evaluation_evidence") is True,
+        "code_qualification": receipt.get("code_qualification"),
+        "status": status,
+        "permitted_claim": "no_controlled_effect_claim",
+        "rows": _phase11_controlled_rows(design, evidence_status=status),
+        "contrasts": [
+            {"contrast_id": contrast_id, "change": None, "interval": None,
+             "status": "unavailable_no_complete_pairs"}
+            for contrast_id in design.contrast_order
+        ],
+        "simultaneous_family": {
+            "family_id": design.family_id,
+            "familywise_alpha": design.familywise_alpha,
+            "method": "bonferroni_exact_six_arm_rates_v1",
+            "members": design.arm_rate_members,
+        },
+    }
+
+
+def build_phase11_assessment(*, root: str | Path) -> dict[str, object]:
+    """Build the reference-only Phase 11 index with lane-specific claim bounds."""
+    project_root = Path(root).resolve(strict=True)
+    sources = {
+        source_id: _phase11_source_reference(project_root, source_id=source_id, relative=relative, question=question)
+        for source_id, relative, question in _PHASE11_SOURCE_ASSESSMENTS
+    }
+    controlled = {
+        code_id: _phase11_controlled_assessment(
+            project_root, code_id=code_id, design_relative=design_relative, receipt_relative=receipt_relative,
+        )
+        for code_id, design_relative, receipt_relative in _PHASE11_CONTROLLED
+    }
+    controlled_verification, controlled_verification_sha256 = _phase11_regular_json(
+        project_root, _PHASE11_CONTROLLED_VERIFICATION, label="controlled evaluation verification",
+    )
+    if controlled_verification.get("schema") != "phase11_controlled_evaluation_verification_v1":
+        raise ValueError("controlled evaluation verification has an unsupported schema")
+    if controlled_verification.get("receipt_sha256") != _phase11_digest(controlled_verification, field="receipt_sha256"):
+        raise ValueError("controlled evaluation verification digest differs from its content")
+    if controlled_verification.get("terminal_coverage") != {"BB72": "denied", "GB46": "denied"}:
+        raise ValueError("controlled evaluation verification loses exact terminal coverage")
+    policy, policy_sha256 = _phase11_regular_json(project_root, _PHASE11_POLICY_VERIFICATION, label="policy comparison verification")
+    if policy.get("schema") != "phase11_policy_comparison_verification_v1" or policy.get("status") != "verified":
+        raise ValueError("policy comparison verification is not a verified lane")
+    assessment: dict[str, object] = {
+        "schema": "phase11_final_assessment_v1",
+        "claim_boundary": "source reproduction, primary controlled inference, and policy comparisons are separate lanes and cannot lend claims to one another",
+        "source_reproduction": sources,
+        "primary_controlled": controlled,
+        "controlled_verification": {
+            "path": _PHASE11_CONTROLLED_VERIFICATION,
+            "file_sha256": controlled_verification_sha256,
+            "receipt_sha256": controlled_verification.get("receipt_sha256"),
+            "terminal_coverage": controlled_verification.get("terminal_coverage"),
+            "assessment_ready": controlled_verification.get("assessment_ready"),
+        },
+        "policy_comparisons": {
+            "question": "one-change and complete-qualified-method mechanism comparisons",
+            "verification_path": _PHASE11_POLICY_VERIFICATION,
+            "verification_file_sha256": policy_sha256,
+            "status": policy.get("status"),
+            "claim_scope": policy.get("claim_scope"),
+            "publication_authorization": policy.get("publication_authorization"),
+            "permitted_claim": "bounded_policy_mechanism_comparison_only",
+        },
+    }
+    assessment["assessment_sha256"] = _phase11_digest(assessment, field="assessment_sha256")
+    return assessment
+
+
+def verify_phase11_assessment(*, root: str | Path, assessment: Mapping[str, object]) -> dict[str, object]:
+    """Fail closed when an indexed reference, lane, or claim boundary changes."""
+    if not isinstance(assessment, Mapping) or assessment.get("schema") != "phase11_final_assessment_v1":
+        raise ValueError("final Phase 11 assessment has an unsupported schema")
+    if assessment.get("assessment_sha256") != _phase11_digest(assessment, field="assessment_sha256"):
+        raise ValueError("final Phase 11 assessment digest differs from its content")
+    expected = build_phase11_assessment(root=root)
+    if canonical_json_bytes(dict(assessment)) != canonical_json_bytes(expected):
+        raise ValueError("final Phase 11 assessment differs from independently reconstructed evidence")
+    return {
+        "schema": "phase11_final_assessment_verification_v1",
+        "status": "verified",
+        "assessment_sha256": assessment["assessment_sha256"],
+        "source_lanes": tuple(expected["source_reproduction"]),
+        "controlled_codes": tuple(expected["primary_controlled"]),
+        "controlled_claims": {code: row["permitted_claim"] for code, row in expected["primary_controlled"].items()},
+        "policy_claim": expected["policy_comparisons"]["permitted_claim"],
+        "lane_pooling_prohibited": True,
+    }

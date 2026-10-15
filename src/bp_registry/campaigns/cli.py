@@ -44,6 +44,7 @@ from .slurm import (
     parse_site_capabilities,
     select_array_shard,
 )
+from .statistics import build_phase11_assessment, verify_phase11_assessment
 
 
 _CLI_SCHEMA = "bp_registry_campaign_cli_v1"
@@ -1743,6 +1744,36 @@ def _profile_gate(args: argparse.Namespace) -> dict[str, Any]:
     return {"schema": _CLI_SCHEMA, "status": "ok", "phase": "profile_gate", "profile": profile}
 
 
+def _phase11_assess(args: argparse.Namespace) -> dict[str, Any]:
+    """Publish the reference-only Phase 11 index from allowlisted evidence."""
+    root = _existing_root(args.campaign_root, name="campaign_root")
+    assessment = build_phase11_assessment(root=root)
+    artifact = _publish_json(_output_root(args.output_root) / "assessment.json", assessment)
+    return {
+        "schema": _CLI_SCHEMA,
+        "status": "ok",
+        "phase": "phase11_assess",
+        "artifact_path": str(artifact),
+        "assessment_sha256": assessment["assessment_sha256"],
+    }
+
+
+def _phase11_verify(args: argparse.Namespace) -> dict[str, Any]:
+    """Independently reconstruct the Phase 11 index and seal its verification."""
+    root = _existing_root(args.campaign_root, name="campaign_root")
+    assessment_path = _confined_file(root, args.assessment, name="assessment")
+    assessment = _read_json(str(assessment_path))
+    verification = verify_phase11_assessment(root=root, assessment=assessment)
+    artifact = _publish_json(_output_root(args.output_root) / "verification.json", verification)
+    return {
+        "schema": _CLI_SCHEMA,
+        "status": "ok",
+        "phase": "phase11_verify",
+        "artifact_path": str(artifact),
+        **verification,
+    }
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -1791,6 +1822,12 @@ def _parser() -> argparse.ArgumentParser:
     item.add_argument("--output-root", required=True); item.set_defaults(handler=_operational_fixture)
     item = commands.add_parser("profile-gate")
     item.add_argument("--profile", required=True); item.set_defaults(handler=_profile_gate)
+    item = commands.add_parser("phase11-assess")
+    item.add_argument("--campaign-root", required=True); item.add_argument("--output-root", required=True)
+    item.set_defaults(handler=_phase11_assess)
+    item = commands.add_parser("phase11-verify")
+    item.add_argument("--campaign-root", required=True); item.add_argument("--assessment", required=True)
+    item.add_argument("--output-root", required=True); item.set_defaults(handler=_phase11_verify)
     return parser
 
 
