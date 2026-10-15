@@ -423,6 +423,27 @@ _MATCHED_OUTCOME_MATRIX = OutcomeMatrixV1(
 )
 
 
+# A separate arm cannot be successful unless both marginal decoders finished
+# successfully.  When both components failed, retain one deterministic terminal
+# rather than letting candidate evaluation overwrite either component result.
+_SEPARATE_COMPONENT_TERMINAL_PRECEDENCE = (
+    "infrastructure_interruption", "timeout", "invalid_syndrome", "nonconvergence",
+    "no_proposal", "postselected_rejection", "wrong_logical_action",
+)
+_SUCCESSFUL_COMPONENT_TERMINALS = frozenset({"exact", "stabilizer_equivalent"})
+
+
+def _separate_component_terminal(components: tuple[BinaryComponentTerminalV1, BinaryComponentTerminalV1]) -> str | None:
+    """Return the controlling component terminal, or ``None`` if both succeeded."""
+    statuses = {component.terminal_status for component in components}
+    for status in _SEPARATE_COMPONENT_TERMINAL_PRECEDENCE:
+        if status in statuses:
+            return status
+    if statuses <= _SUCCESSFUL_COMPONENT_TERMINALS:
+        return None
+    raise ValueError("separate comparison has an unsupported component terminal")
+
+
 class JointArmInputV1(StrictModel):
     """Decoder-visible joint input; physical truth is deliberately absent."""
 
@@ -635,8 +656,8 @@ def run_joint_separate_unit(
         evaluation=joint_evaluation, work=dict(joint_result.work), runtime_ns=joint_result.runtime_ns,
         timing_boundary=joint_result.timing_boundary,
     )
-    separate_status = ("nonconvergence" if any(item.terminal_status == "nonconvergence" for item in components)
-                       else separate_evaluation["outcome"])
+    component_terminal = _separate_component_terminal(components)
+    separate_status = component_terminal if component_terminal is not None else separate_evaluation["outcome"]
     separate = PauliMatchedArmV1(
         arm_id="separate", materialized_sample_sha256=materialized_sample.materialized_sample_sha256,
         candidate_x=x_result.candidate, candidate_z=z_result.candidate,

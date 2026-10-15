@@ -111,6 +111,39 @@ def test_partial_nonconvergence_keeps_components_and_all_shot_pair(x_status: str
     assert record.separate.evaluation["outcome"] == "exact"
 
 
+@pytest.mark.parametrize("status, expected_all_shot", [
+    ("wrong_logical_action", "failure"),
+    ("postselected_rejection", "failure"),
+    ("no_proposal", "failure"),
+    ("nonconvergence", "failure"),
+    ("invalid_syndrome", "failure"),
+    ("timeout", "failure"),
+    ("infrastructure_interruption", "incomplete"),
+])
+def test_unsuccessful_component_prevents_separate_success(status: str, expected_all_shot: str):
+    """Candidate agreement cannot override a component's terminal evidence."""
+    code, sample = _sample()
+
+    def joint(_: JointArmInputV1) -> JointArmResultV1:
+        return JointArmResultV1(candidate_x=(1, 0), candidate_z=(0, 1), terminal_status="exact", work={"sweeps": 1})
+
+    def binary(input_: BinaryArmInputV1) -> BinaryArmResultV1:
+        return BinaryArmResultV1(
+            candidate=(1, 0) if input_.component == "X" else (0, 1),
+            terminal_status=status if input_.component == "X" else "exact", work={"sweeps": 1},
+        )
+
+    record = run_joint_separate_unit(
+        code=code, materialized_sample=sample,
+        joint_probabilities=((0.9, 0.04, 0.02, 0.04),) * 2,
+        joint_decoder=joint, binary_decoder=binary,
+    )
+
+    assert record.separate.evaluation["outcome"] == "exact"
+    assert record.separate.terminal_status == status
+    assert record.separate.all_shot == expected_all_shot
+
+
 def test_replay_and_tamper_reject_changed_evidence():
     code, sample = _sample()
 
