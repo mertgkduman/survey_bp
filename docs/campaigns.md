@@ -379,3 +379,35 @@ nanoseconds of measured wall boundaries. The frozen all-shot matrix counts
 both timeout terminals as decoder failures; this is not an observed
 paper-style logical error rate. Every result remains a `canonical_adaptation`:
 the original source settings and exact paper artifact have not been established.
+
+## Phase 11 final assessment index
+
+The Phase 11 index is a reference-only reconciliation of three evidence lanes.
+It does not copy samples between them or pool their estimands. Rebuild the
+checked assessment and independently verify every allowlisted reference with:
+
+```bash
+OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign phase11-assess \
+  --campaign-root . --output-root data/results/phase11-assessment
+OMP_NUM_THREADS=1 .venv/bin/bp-registry-campaign phase11-verify \
+  --campaign-root . \
+  --assessment data/results/phase11-assessment/assessment.json \
+  --output-root data/results/phase11-assessment
+```
+
+`source_reproduction` records the selected aSCED, Q-BPGD, and MBP4 source
+qualifications and their gaps. `primary_controlled` records GB46 and BB72
+separately. Its leading estimand at each frozen fixed-marginal channel row is
+`D_y = joint BP4 logical-failure rate - separate binary-inference
+logical-failure rate`; the two changes from independence use the frozen
+six-rate Bonferroni family. All rows retain paired uncertainty, convergence,
+all-shot denominator, typed work, and same-condition runtime, including
+explicit unavailable values when no assessment-ready pair exists.
+
+Only Plan 11-15 complete-pair ledger references may enter the controlled
+denominator. Calibration is resource-forecast provenance and is never a
+substitute. The sealed authorization in this release denies dispatch, so both
+code-specific controlled results have zero complete pairs and permit no effect
+claim. The index retains their zero-dispatch and interruption fields rather
+than inferring performance. `policy_comparisons` remains bounded mechanism
+evidence and cannot establish source reproduction or a decoder ranking.

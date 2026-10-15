@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 from pathlib import Path
+from hashlib import sha256
 
 import pytest
+
+from bp_registry.campaigns.contracts import canonical_json_bytes
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -66,4 +69,28 @@ def test_phase11_index_has_complete_lane_matrix_and_rejects_lane_tamper() -> Non
         "data/results/phase11-controlled-evaluation/bb72/evaluation-receipt.json"
     )
     with pytest.raises(ValueError, match="digest|differs"):
+        verify_phase11_assessment(root=ROOT, assessment=assessment)
+
+
+@pytest.mark.parametrize("mutation", ["source", "receipt", "calibration", "claim"])
+def test_phase11_verifier_rejects_resigned_cross_lane_and_claim_substitutions(mutation: str) -> None:
+    """A valid-looking digest cannot authorize a changed source or controlled conclusion."""
+    from bp_registry.campaigns.statistics import build_phase11_assessment, verify_phase11_assessment
+
+    assessment = build_phase11_assessment(root=ROOT)
+    if mutation == "source":
+        assessment["source_reproduction"]["asced_figure2"]["assessment_path"] = "data/results/missing.json"
+    elif mutation == "receipt":
+        assessment["primary_controlled"]["GB46"]["receipt_path"] = (
+            "data/results/phase11-controlled-evaluation/bb72/evaluation-receipt.json"
+        )
+    elif mutation == "calibration":
+        assessment["primary_controlled"]["BB72"]["calibration_substitution_prohibited"] = False
+    else:
+        assessment["primary_controlled"]["GB46"]["permitted_claim"] = "decoder_superiority"
+    assessment["assessment_sha256"] = sha256(canonical_json_bytes({
+        key: value for key, value in assessment.items() if key != "assessment_sha256"
+    })).hexdigest()
+
+    with pytest.raises(ValueError, match="differs"):
         verify_phase11_assessment(root=ROOT, assessment=assessment)

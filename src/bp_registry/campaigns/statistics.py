@@ -1632,6 +1632,33 @@ def build_phase11_assessment(*, root: str | Path) -> dict[str, object]:
     policy, policy_sha256 = _phase11_regular_json(project_root, _PHASE11_POLICY_VERIFICATION, label="policy comparison verification")
     if policy.get("schema") != "phase11_policy_comparison_verification_v1" or policy.get("status") != "verified":
         raise ValueError("policy comparison verification is not a verified lane")
+    completeness_matrix: list[dict[str, object]] = []
+    for source_id, source in sources.items():
+        completeness_matrix.append({
+            "lane": "source_reproduction", "item_id": source_id,
+            "qualification": source["source_fidelity"], "evidence_status": source["status"],
+            "limitation": source["limitations"], "permitted_claim": source["permitted_claim"],
+        })
+    for code_id, result in controlled.items():
+        completeness_matrix.append({
+            "lane": "primary_controlled", "item_id": code_id, "code_id": code_id,
+            "qualification": result["code_qualification"], "evidence_status": result["status"],
+            "limitation": result["terminal_reason"], "permitted_claim": result["permitted_claim"],
+            "methods": result["method_eligibility"],
+        })
+        for row in result["rows"]:
+            completeness_matrix.append({
+                "lane": "primary_controlled", "item_id": f"{code_id}:{row['point_id']}",
+                "code_id": code_id, "channel_anchor": row["point_id"],
+                "qualification": result["code_qualification"], "evidence_status": row["evidence_status"],
+                "limitation": "no assessment-ready complete pairs", "permitted_claim": result["permitted_claim"],
+            })
+    completeness_matrix.append({
+        "lane": "policy_comparisons", "item_id": "phase11_policy_comparisons",
+        "qualification": policy.get("status"), "evidence_status": policy.get("publication_authorization"),
+        "limitation": policy.get("claim_scope"),
+        "permitted_claim": "bounded_policy_mechanism_comparison_only",
+    })
     assessment: dict[str, object] = {
         "schema": "phase11_final_assessment_v1",
         "claim_boundary": "source reproduction, primary controlled inference, and policy comparisons are separate lanes and cannot lend claims to one another",
@@ -1658,6 +1685,7 @@ def build_phase11_assessment(*, root: str | Path) -> dict[str, object]:
             "file_sha256": methods_sha256,
             "claim_scope": methods.get("claim_scope"),
         },
+        "completeness_matrix": completeness_matrix,
     }
     assessment["assessment_sha256"] = _phase11_digest(assessment, field="assessment_sha256")
     return assessment
