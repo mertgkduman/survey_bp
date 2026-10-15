@@ -102,6 +102,17 @@ def test_gb46_empty_shard_is_explicitly_incomplete(tmp_path: Path) -> None:
     assert '"assessment_status": "incomplete_shard"' in result.stdout
 
 
+def test_controlled_output_root_rejects_dangling_symlink(tmp_path: Path) -> None:
+    """A selected output root cannot redirect immutable records through a link."""
+    from bp_registry.campaigns.controlled_execution import _phase11_safe_root
+    import pytest
+
+    redirected = tmp_path / "redirected"
+    redirected.symlink_to(tmp_path / "outside", target_is_directory=True)
+    with pytest.raises(ValueError, match="must not contain a symlink"):
+        _phase11_safe_root(redirected)
+
+
 def test_bb72_tracer_preflight_binds_artifact_provenance_and_qualifications() -> None:
     """The second-code tracer retains source limits as qualified metadata."""
     from bp_registry.campaigns.controlled_execution import preflight_phase11_controlled_design

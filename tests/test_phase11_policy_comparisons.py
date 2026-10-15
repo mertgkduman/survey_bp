@@ -62,6 +62,16 @@ def test_unsupported_or_multi_change_policy_is_rejected_before_output(tmp_path: 
     assert not list(tmp_path.rglob("*.json"))
 
 
+def test_policy_record_writer_rejects_dangling_directory_symlink(tmp_path: Path) -> None:
+    """Policy records use the Phase 11 no-follow writer for nested paths."""
+    import pytest
+
+    module = _api()
+    (tmp_path / "records").symlink_to(tmp_path / "outside", target_is_directory=True)
+    with pytest.raises(OSError):
+        module._write_exact(tmp_path, ("records", "record.json"), {"schema": "test"})
+
+
 def test_independence_cli_runs_and_replays_bounded_tracer(tmp_path: Path) -> None:
     run = subprocess.run(
         [sys.executable, str(SCRIPT), "run", "--output-root", str(tmp_path)],

@@ -13,6 +13,8 @@ from hashlib import sha256
 import json
 import os
 from pathlib import Path
+import secrets
+import stat
 import tempfile
 from time import perf_counter_ns
 from types import SimpleNamespace
@@ -802,10 +804,69 @@ def _phase11_digest(domain: str, payload: object) -> str:
 
 def _phase11_safe_root(path: Path) -> Path:
     """Admit an explicitly selected regular output directory without links."""
-    resolved = path.resolve()
-    if path.exists() and (path.is_symlink() or not path.is_dir()):
+    # ``resolve`` follows a dangling output-root symlink, which turns a
+    # caller-selected local destination into an arbitrary write target.  Keep
+    # the lexical absolute path and reject links at every existing component.
+    lexical = path.expanduser().absolute()
+    for component in (lexical, *lexical.parents):
+        if component.is_symlink():
+            raise ValueError("controlled output root must not contain a symlink")
+    if lexical.exists() and not lexical.is_dir():
         raise ValueError("controlled output root must be a regular directory")
-    return resolved
+    return lexical
+
+
+def _phase11_publish_exact(root: Path, relative: tuple[str, ...], payload: bytes) -> None:
+    """Publish immutable Phase 11 bytes below a verified root without links."""
+    if not relative or any(not part or part in {".", ".."} or "/" in part for part in relative):
+        raise ValueError("controlled evidence requires a relative output path")
+    root = _phase11_safe_root(root)
+    root.mkdir(parents=True, exist_ok=True)
+    flags = os.O_RDONLY | os.O_DIRECTORY | getattr(os, "O_NOFOLLOW", 0)
+    directory_fd = os.open(root, flags)
+    try:
+        for component in relative[:-1]:
+            try:
+                os.mkdir(component, mode=0o755, dir_fd=directory_fd)
+            except FileExistsError:
+                pass
+            next_fd = os.open(component, flags, dir_fd=directory_fd)
+            os.close(directory_fd)
+            directory_fd = next_fd
+        leaf = relative[-1]
+        try:
+            existing = os.stat(leaf, dir_fd=directory_fd, follow_symlinks=False)
+        except FileNotFoundError:
+            existing = None
+        if existing is not None:
+            if not stat.S_ISREG(existing.st_mode):
+                raise ValueError("controlled evidence path conflicts with immutable bytes")
+            read_fd = os.open(leaf, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0), dir_fd=directory_fd)
+            try:
+                if os.read(read_fd, len(payload) + 1) != payload or os.read(read_fd, 1):
+                    raise ValueError("controlled evidence path conflicts with immutable bytes")
+            finally:
+                os.close(read_fd)
+            return
+        stage = f".phase11-{os.getpid()}-{secrets.token_hex(12)}"
+        create_flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
+        stage_fd = os.open(stage, create_flags, 0o600, dir_fd=directory_fd)
+        try:
+            os.write(stage_fd, payload)
+            os.fsync(stage_fd)
+        finally:
+            os.close(stage_fd)
+        try:
+            os.link(stage, leaf, src_dir_fd=directory_fd, dst_dir_fd=directory_fd, follow_symlinks=False)
+        except FileExistsError as error:
+            raise ValueError("controlled evidence path conflicts with immutable bytes") from error
+        finally:
+            try:
+                os.unlink(stage, dir_fd=directory_fd)
+            except FileNotFoundError:
+                pass
+    finally:
+        os.close(directory_fd)
 
 
 def _phase11_sample(*, code: Any, design_sha256: str, point_id: str, sample_id: int,
@@ -984,9 +1045,8 @@ def run_phase11_controlled(*, root: Path, design_path: Path, output_root: Path, 
     """Run or resume only the predeclared bounded GB46 calibration pairs."""
     preflight = preflight_phase11_controlled_design(root=root, design_path=design_path)
     destination = _phase11_safe_root(output_root)
-    destination.mkdir(parents=True, exist_ok=True)
     identity = {"schema": "phase11_controlled_identity_v1", "preflight": preflight}
-    _publish_exact(destination / "identity.json", _json_line(identity))
+    _phase11_publish_exact(destination, ("identity.json",), _json_line(identity))
     code, rows, limits = _phase11_execution_context(root=root, design_path=design_path, preflight=preflight)
     completed = 0
     shard_ranges = _phase11_shard_ranges(preflight, shard)
@@ -1008,7 +1068,7 @@ def run_phase11_controlled(*, root: Path, design_path: Path, output_root: Path, 
             _sample, pair = _phase11_expected_pair(
                 code=code, rows=rows, limits=limits, preflight=preflight, point_id=point_id, sample_id=sample_id,
             )
-            _publish_exact(path, pair.primitive_bytes() + b"\n")
+            _phase11_publish_exact(destination, ("pairs", point_id, f"{sample_id}.json"), pair.primitive_bytes() + b"\n")
             completed += 1
     # A partial shard is deliberately not assessed or presented as complete.
     if set(shard_ranges) != set(preflight["point_order"]) or any(
@@ -1101,5 +1161,5 @@ def assess_phase11_controlled(*, root: Path, design_path: Path, output_root: Pat
                "assessment": {"design_sha256": result.design_sha256,
                               "rows": [{"point_id": row.point_id, "d_y": row.d_y,
                                         "complete_pairs": row.complete_pairs} for row in result.rows]}}
-    _publish_exact(_phase11_safe_root(output_root) / "assessment.json", _json_line(payload))
+    _phase11_publish_exact(_phase11_safe_root(output_root), ("assessment.json",), _json_line(payload))
     return payload

@@ -26,7 +26,7 @@ if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
 from bp_registry.campaigns.contracts import canonical_json_bytes
-from bp_registry.campaigns.controlled_execution import _phase11_load_code, _phase11_sample
+from bp_registry.campaigns.controlled_execution import _phase11_load_code, _phase11_publish_exact, _phase11_safe_root, _phase11_sample
 from bp_registry.campaigns.statistics import load_fixed_marginal_design
 from bp_registry.quaternary.execution import TracerPauliProblem, _evaluate
 from bp_registry.quaternary.kernel import ScalarLlrBp4Kernel
@@ -43,14 +43,10 @@ def _digest(value: object) -> str:
     return sha256(canonical_json_bytes(value)).hexdigest()
 
 
-def _write_exact(path: Path, payload: dict[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
+def _write_exact(output_root: Path, relative: tuple[str, ...], payload: dict[str, Any]) -> None:
+    """Seal one policy record under the selected no-symlink output root."""
     encoded = canonical_json_bytes(payload) + b"\n"
-    if path.exists():
-        if path.is_symlink() or path.read_bytes() != encoded:
-            raise ValueError("policy comparison output conflicts with sealed bytes")
-        return
-    path.write_bytes(encoded)
+    _phase11_publish_exact(output_root, relative, encoded)
 
 
 def load_policy_study(root: Path) -> dict[str, Any]:
@@ -213,23 +209,24 @@ def _decode_pair(root: Path, comparison: dict[str, Any], anchor: str, sample_id:
 def run_policy_comparisons(root: Path, output_root: Path) -> dict[str, Any]:
     study = load_policy_study(root)
     validate_policy_study(root, study)
-    output_root.mkdir(parents=True, exist_ok=True)
+    output_root = _phase11_safe_root(output_root)
     records = 0
     for comparison in study["comparisons"]:
         if comparison["method"] != "MBP4":
             continue
         for anchor in comparison["anchors"]:
             record = _decode_pair(root, comparison, anchor, 0, study["bounded_limits"]["max_iterations"])
-            _write_exact(output_root / "records" / comparison["comparison_id"] / f"{anchor}.json", record)
+            _write_exact(output_root, ("records", comparison["comparison_id"], f"{anchor}.json"), record)
             records += 1
     verification = verify_policy_comparisons(root, output_root)
-    _write_exact(output_root / "verification.json", verification)
+    _write_exact(output_root, ("verification.json",), verification)
     return {"status": "verified", "comparison_count": len(study["comparisons"]), "records": records, **verification}
 
 
 def verify_policy_comparisons(root: Path, output_root: Path) -> dict[str, Any]:
     study = load_policy_study(root)
     validate_policy_study(root, study)
+    output_root = _phase11_safe_root(output_root)
     replayed = 0
     for comparison in study["comparisons"]:
         if comparison["method"] != "MBP4":
