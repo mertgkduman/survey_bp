@@ -137,8 +137,8 @@ paragraph records the September 26 review state, not an open implementation gap.
 - [x] **QBP-02**: A researcher can sample a declared joint I/X/Y/Z channel, including correlated X/Z behavior, and verify priors, error-rate conventions, and Y-error fixtures.
 - [x] **QBP-03**: Quaternary outputs pass independent syndrome, exact/degenerate/logical-outcome checks against the common code-capacity mathematical conventions.
 - [x] **QBP-04**: A researcher can run source-backed compatible policy compositions in the quaternary kernel, including the published quaternary BPGD case, with unsupported ports explicitly rejected or labeled new adaptations.
-- [x] **QEV-01**: A researcher can execute selected quaternary source experiments and assess canonical reproduction within declared statistical tolerances, preserving reference availability and discrepancy records.
-- [x] **QEV-02**: A researcher can compare joint quaternary and separate binary decoding on the same sampled joint Pauli channel and declared budgets, with source-backed policy ablations and provenance.
+- [ ] **QEV-01**: A researcher can execute selected quaternary source experiments and assess canonical reproduction within declared statistical tolerances, preserving reference availability and discrepancy records.
+- [ ] **QEV-02**: A researcher can compare joint quaternary and separate binary decoding on the same sampled joint Pauli channel and declared budgets, with source-backed policy ablations and provenance.
 
 ### Circuit-level decoding
 
@@ -259,8 +259,8 @@ Every v1 requirement has exactly one owning phase; later phases may use or stren
 | QBP-02 | Phase 10 | Complete |
 | QBP-03 | Phase 10 | Complete |
 | QBP-04 | Phase 10 | Complete |
-| QEV-01 | Phase 11 | Complete |
-| QEV-02 | Phase 11 | Complete |
+| QEV-01 | Phase 11 | Gaps Found |
+| QEV-02 | Phase 11 | Gaps Found |
 | CIR-01 | Phase 12 | Pending |
 | CIR-02 | Phase 12 | Pending |
 | CIR-03 | Phase 12 | Pending |
