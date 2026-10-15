@@ -72,6 +72,21 @@ def test_policy_record_writer_rejects_dangling_directory_symlink(tmp_path: Path)
         module._write_exact(tmp_path, ("records", "record.json"), {"schema": "test"})
 
 
+def test_policy_replay_rejects_tampered_stored_record_digest(tmp_path: Path) -> None:
+    """Replay validates the receipt before normalizing observational timing."""
+    import pytest
+
+    module = _api()
+    module.run_policy_comparisons(ROOT, tmp_path)
+    record_path = tmp_path / "records" / "gb46-mbp4-alpha" / "independence.json"
+    changed = json.loads(record_path.read_text(encoding="utf-8"))
+    changed["record_sha256"] = "0" * 64
+    record_path.write_text(json.dumps(changed, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="record digest"):
+        module.verify_policy_comparisons(ROOT, tmp_path)
+
+
 def test_independence_cli_runs_and_replays_bounded_tracer(tmp_path: Path) -> None:
     run = subprocess.run(
         [sys.executable, str(SCRIPT), "run", "--output-root", str(tmp_path)],

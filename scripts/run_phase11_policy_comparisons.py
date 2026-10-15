@@ -236,13 +236,20 @@ def verify_policy_comparisons(root: Path, output_root: Path) -> dict[str, Any]:
             if path.is_symlink() or not path.is_file():
                 raise ValueError("policy comparison record is missing")
             observed = json.loads(path.read_bytes())
+            stored_digest = observed.get("record_sha256")
+            unsigned = {key: value for key, value in observed.items() if key != "record_sha256"}
+            if stored_digest != _digest(unsigned):
+                raise ValueError("policy comparison record digest differs from sealed bytes")
             expected = _decode_pair(root, comparison, anchor, 0, study["bounded_limits"]["max_iterations"])
-            # Timing is observational; replay verifies identities, terminals, outcomes and typed work.
+            # Timing is observational for replay, after the original record has
+            # already passed its stored receipt-integrity check above.
+            replayed_observed = json.loads(json.dumps(observed))
+            replayed_expected = json.loads(json.dumps(expected))
             for arm in ("baseline", "variant"):
-                observed[arm]["runtime_ns"] = expected[arm]["runtime_ns"]
-            observed["record_sha256"] = _digest({key: value for key, value in observed.items() if key != "record_sha256"})
-            expected["record_sha256"] = observed["record_sha256"]
-            if observed != expected:
+                replayed_observed[arm]["runtime_ns"] = replayed_expected[arm]["runtime_ns"]
+            replayed_observed.pop("record_sha256")
+            replayed_expected.pop("record_sha256")
+            if replayed_observed != replayed_expected:
                 raise ValueError("policy comparison replay differs from sealed record")
             replayed += 1
     return {"schema": "phase11_policy_comparison_verification_v1", "status": "verified", "replayed_records": replayed,
