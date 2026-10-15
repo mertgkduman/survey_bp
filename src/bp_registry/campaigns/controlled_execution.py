@@ -887,7 +887,52 @@ def _phase11_pair_path(output_root: Path, point_id: str, sample_id: int) -> Path
     return output_root / "pairs" / point_id / f"{sample_id}.json"
 
 
-def _phase11_load_pairs(*, output_root: Path, preflight: dict[str, Any]) -> dict[str, list[PauliMatchedPairV1]]:
+def _phase11_execution_context(*, root: Path, design_path: Path, preflight: dict[str, Any]) -> tuple[Any, dict[str, Any], dict[str, int]]:
+    """Load the sealed code, channel rows, and bounded decoder limits once."""
+    from .statistics import load_fixed_marginal_design
+
+    design = json.loads(design_path.read_bytes())
+    code = _phase11_load_code(root=root, code=design["code"])[0]
+    fixed = load_fixed_marginal_design(root / "data/studies/phase11-fixed-marginal-design.json")
+    rows = {row.point_id: row for row in fixed.rows}
+    limits = design["calibration_limits"]
+    if set(rows) != set(preflight["point_order"]):
+        raise ValueError("controlled execution rows differ from admitted preflight")
+    return code, rows, limits
+
+
+def _phase11_pair_semantics(pair: PauliMatchedPairV1) -> dict[str, Any]:
+    """Retain only deterministic evidence; callback wall time is observational."""
+    evidence = pair.model_dump(mode="json", by_alias=True, exclude={"record_sha256"})
+    for arm in ("joint", "separate"):
+        evidence[arm].pop("runtime_ns", None)
+        evidence[arm].pop("timing_boundary", None)
+    for component in evidence["components"]:
+        component.pop("runtime_ns", None)
+        component.pop("timing_boundary", None)
+    return evidence
+
+
+def _phase11_expected_pair(
+    *, code: Any, rows: dict[str, Any], limits: dict[str, int], preflight: dict[str, Any], point_id: str, sample_id: int,
+) -> tuple[MaterializedPhysicalSampleV1, PauliMatchedPairV1]:
+    probabilities = rows[point_id].probabilities
+    sample = _phase11_sample(
+        code=code, design_sha256=preflight["design_sha256"], point_id=point_id,
+        sample_id=sample_id, probabilities=probabilities,
+    )
+    pair = run_joint_separate_unit(
+        code=code, materialized_sample=sample,
+        joint_probabilities=tuple(probabilities for _ in range(code.n)),
+        joint_decoder=_phase11_joint_decoder(code, max_iterations=limits["max_iterations"], max_work=1000000),
+        binary_decoder=_phase11_binary_decoder(code, max_iterations=limits["max_iterations"]),
+    )
+    return sample, pair
+
+
+def _phase11_load_pairs(
+    *, output_root: Path, preflight: dict[str, Any], code: Any, rows: dict[str, Any], limits: dict[str, int],
+) -> dict[str, list[PauliMatchedPairV1]]:
     pairs: dict[str, list[PauliMatchedPairV1]] = {point: [] for point in preflight["point_order"]}
     seen: set[str] = set()
     for point_id in preflight["point_order"]:
@@ -898,6 +943,17 @@ def _phase11_load_pairs(*, output_root: Path, preflight: dict[str, Any]) -> dict
                 continue
             pair = PauliMatchedPairV1.model_validate_json(path.read_bytes())
             pair.verify_replay()
+            sample, expected_pair = _phase11_expected_pair(
+                code=code, rows=rows, limits=limits, preflight=preflight, point_id=point_id, sample_id=sample_id,
+            )
+            if (
+                pair.physical_sample_identity != sample.physical_sample_identity
+                or pair.physical_error_sha256 != sample.physical_error_sha256
+                or pair.materialized_sample_sha256 != sample.materialized_sample_sha256
+            ):
+                raise ValueError("controlled pair does not bind the deterministic materialized sample")
+            if _phase11_pair_semantics(pair) != _phase11_pair_semantics(expected_pair):
+                raise ValueError("controlled pair deterministic arm evidence differs from replay")
             if pair.physical_sample_identity in seen:
                 raise ValueError("controlled pair output duplicates a physical sample")
             seen.add(pair.physical_sample_identity)
@@ -926,17 +982,12 @@ def _phase11_shard_ranges(preflight: dict[str, Any], shard: tuple[str, int, int]
 def run_phase11_controlled(*, root: Path, design_path: Path, output_root: Path, resume: bool = False,
                            shard: tuple[str, int, int] | None = None) -> dict[str, Any]:
     """Run or resume only the predeclared bounded GB46 calibration pairs."""
-    from .statistics import load_fixed_marginal_design
-
     preflight = preflight_phase11_controlled_design(root=root, design_path=design_path)
     destination = _phase11_safe_root(output_root)
     destination.mkdir(parents=True, exist_ok=True)
     identity = {"schema": "phase11_controlled_identity_v1", "preflight": preflight}
     _publish_exact(destination / "identity.json", _json_line(identity))
-    design = load_fixed_marginal_design(root / "data/studies/phase11-fixed-marginal-design.json")
-    code = _phase11_load_code(root=root, code=json.loads(design_path.read_text(encoding="utf-8"))["code"])[0]
-    rows = {row.point_id: row for row in design.rows}
-    limits = json.loads(design_path.read_text(encoding="utf-8"))["calibration_limits"]
+    code, rows, limits = _phase11_execution_context(root=root, design_path=design_path, preflight=preflight)
     completed = 0
     shard_ranges = _phase11_shard_ranges(preflight, shard)
     for point_id in preflight["point_order"]:
@@ -954,13 +1005,8 @@ def run_phase11_controlled(*, root: Path, design_path: Path, output_root: Path, 
                     if existing.physical_sample_identity != expected.physical_sample_identity:
                         raise ValueError("existing controlled pair has a changed sample identity")
                 continue
-            sample = _phase11_sample(code=code, design_sha256=preflight["design_sha256"], point_id=point_id,
-                                     sample_id=sample_id, probabilities=probabilities)
-            pair = run_joint_separate_unit(
-                code=code, materialized_sample=sample,
-                joint_probabilities=tuple(probabilities for _ in range(code.n)),
-                joint_decoder=_phase11_joint_decoder(code, max_iterations=limits["max_iterations"], max_work=1000000),
-                binary_decoder=_phase11_binary_decoder(code, max_iterations=limits["max_iterations"]),
+            _sample, pair = _phase11_expected_pair(
+                code=code, rows=rows, limits=limits, preflight=preflight, point_id=point_id, sample_id=sample_id,
             )
             _publish_exact(path, pair.primitive_bytes() + b"\n")
             completed += 1
@@ -981,7 +1027,8 @@ def verify_phase11_controlled(*, root: Path, design_path: Path, output_root: Pat
     identity_path = destination / "identity.json"
     if identity_path.is_symlink() or not identity_path.is_file() or identity_path.read_bytes() != _json_line({"schema": "phase11_controlled_identity_v1", "preflight": preflight}):
         raise ValueError("controlled output identity differs from the admitted design")
-    pairs = _phase11_load_pairs(output_root=destination, preflight=preflight)
+    code, rows, limits = _phase11_execution_context(root=root, design_path=design_path, preflight=preflight)
+    pairs = _phase11_load_pairs(output_root=destination, preflight=preflight, code=code, rows=rows, limits=limits)
     expected = sum(upper - lower + 1 for lower, upper in preflight["sample_ranges"].values())
     actual = sum(len(value) for value in pairs.values())
     if actual != expected:
@@ -1021,17 +1068,20 @@ def verify_phase11_controlled(*, root: Path, design_path: Path, output_root: Pat
 
 def replay_phase11_controlled(*, root: Path, design_path: Path, output_root: Path) -> dict[str, Any]:
     """Recompute pair identities and records, rejecting any nondeterministic output."""
-    from .statistics import load_fixed_marginal_design
-
     verified = verify_phase11_controlled(root=root, design_path=design_path, output_root=output_root)
     preflight = preflight_phase11_controlled_design(root=root, design_path=design_path)
-    code = _phase11_load_code(root=root, code=json.loads(design_path.read_text(encoding="utf-8"))["code"])[0]
-    rows = {row.point_id: row for row in load_fixed_marginal_design(root / "data/studies/phase11-fixed-marginal-design.json").rows}
-    pairs = _phase11_load_pairs(output_root=output_root, preflight=preflight)
+    code, rows, limits = _phase11_execution_context(root=root, design_path=design_path, preflight=preflight)
+    pairs = _phase11_load_pairs(output_root=output_root, preflight=preflight, code=code, rows=rows, limits=limits)
     for point_id, values in pairs.items():
         for pair in values:
-            expected = _phase11_sample(code=code, design_sha256=preflight["design_sha256"], point_id=point_id,
-                                       sample_id=next(i for i in range(*[preflight["sample_ranges"][point_id][0], preflight["sample_ranges"][point_id][1] + 1]) if _phase11_sample(code=code, design_sha256=preflight["design_sha256"], point_id=point_id, sample_id=i, probabilities=rows[point_id].probabilities).physical_sample_identity == pair.physical_sample_identity), probabilities=rows[point_id].probabilities)
+            sample_id = next(
+                sample_id for sample_id in range(preflight["sample_ranges"][point_id][0], preflight["sample_ranges"][point_id][1] + 1)
+                if _phase11_sample(code=code, design_sha256=preflight["design_sha256"], point_id=point_id,
+                                   sample_id=sample_id, probabilities=rows[point_id].probabilities).physical_sample_identity == pair.physical_sample_identity
+            )
+            expected, _pair = _phase11_expected_pair(
+                code=code, rows=rows, limits=limits, preflight=preflight, point_id=point_id, sample_id=sample_id,
+            )
             if expected.materialized_sample_sha256 != pair.materialized_sample_sha256:
                 raise ValueError("controlled replay sample differs from retained pair")
     return {"schema": "phase11_controlled_replay_v1", **verified}
@@ -1042,9 +1092,10 @@ def assess_phase11_controlled(*, root: Path, design_path: Path, output_root: Pat
     from .statistics import assess_correlation_sweep
     verify_phase11_controlled(root=root, design_path=design_path, output_root=output_root)
     preflight = preflight_phase11_controlled_design(root=root, design_path=design_path)
+    code, rows, limits = _phase11_execution_context(root=root, design_path=design_path, preflight=preflight)
     result = assess_correlation_sweep(
         design_path=root / "data/studies/phase11-fixed-marginal-design.json",
-        point_pairs=_phase11_load_pairs(output_root=output_root, preflight=preflight),
+        point_pairs=_phase11_load_pairs(output_root=output_root, preflight=preflight, code=code, rows=rows, limits=limits),
     )
     payload = {"schema": "phase11_controlled_assessment_v1", "publication_authorization": "deny",
                "assessment": {"design_sha256": result.design_sha256,
