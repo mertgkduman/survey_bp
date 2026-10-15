@@ -1446,6 +1446,7 @@ _PHASE11_CONTROLLED = (
 )
 _PHASE11_POLICY_VERIFICATION = "data/results/phase11-policy-comparisons/verification.json"
 _PHASE11_CONTROLLED_VERIFICATION = "data/results/phase11-controlled-evaluation/verification.json"
+_PHASE11_COMPLETE_METHODS = "data/manifests/phase11-complete-methods.json"
 
 
 def _phase11_regular_json(root: Path, relative: str, *, label: str) -> tuple[dict[str, object], str]:
@@ -1523,6 +1524,7 @@ def _phase11_controlled_rows(design: FixedMarginalCorrelationDesignV1, *, eviden
 
 def _phase11_controlled_assessment(
     root: Path, *, code_id: str, design_relative: str, receipt_relative: str,
+    method_rows: Sequence[Mapping[str, object]],
 ) -> dict[str, object]:
     """Produce one code-specific assessment from verified evaluation evidence only."""
     # Import lazily: controlled execution itself imports this module for the frozen design parser.
@@ -1548,6 +1550,21 @@ def _phase11_controlled_assessment(
     terminal_status = receipt.get("terminal_status")
     if not isinstance(terminal_status, str):
         raise ValueError("controlled receipt lacks a terminal status")
+    method_eligibility: list[dict[str, object]] = []
+    for method in method_rows:
+        method_id = method.get("method_id")
+        supported_codes = method.get("supported_codes")
+        if not isinstance(method_id, str) or not isinstance(supported_codes, list) or not all(
+            isinstance(item, str) for item in supported_codes
+        ):
+            raise ValueError("complete-method manifest has an invalid method row")
+        method_eligibility.append({
+            "method_id": method_id,
+            "supported_for_code": code_id in supported_codes,
+            "canonical_controlled_eligible": method.get("canonical_controlled_eligible"),
+            "reason": method.get("reason"),
+        })
+    exclusions = [row for row in method_eligibility if not row["supported_for_code"]]
     status = "inconclusive_zero_complete_pairs"
     return {
         "code_id": code_id,
@@ -1567,6 +1584,8 @@ def _phase11_controlled_assessment(
         "calibration_provenance": receipt.get("calibration_provenance"),
         "calibration_substitution_prohibited": receipt.get("calibration_provenance", {}).get("forbidden_as_evaluation_evidence") is True,
         "code_qualification": receipt.get("code_qualification"),
+        "method_eligibility": method_eligibility,
+        "unsupported_method_exclusions": exclusions,
         "status": status,
         "permitted_claim": "no_controlled_effect_claim",
         "rows": _phase11_controlled_rows(design, evidence_status=status),
@@ -1591,9 +1610,13 @@ def build_phase11_assessment(*, root: str | Path) -> dict[str, object]:
         source_id: _phase11_source_reference(project_root, source_id=source_id, relative=relative, question=question)
         for source_id, relative, question in _PHASE11_SOURCE_ASSESSMENTS
     }
+    methods, methods_sha256 = _phase11_regular_json(project_root, _PHASE11_COMPLETE_METHODS, label="complete-method manifest")
+    if methods.get("schema") != "phase11_complete_methods_v1" or not isinstance(methods.get("methods"), list):
+        raise ValueError("complete-method manifest has an unsupported schema")
     controlled = {
         code_id: _phase11_controlled_assessment(
             project_root, code_id=code_id, design_relative=design_relative, receipt_relative=receipt_relative,
+            method_rows=methods["methods"],
         )
         for code_id, design_relative, receipt_relative in _PHASE11_CONTROLLED
     }
@@ -1629,6 +1652,11 @@ def build_phase11_assessment(*, root: str | Path) -> dict[str, object]:
             "claim_scope": policy.get("claim_scope"),
             "publication_authorization": policy.get("publication_authorization"),
             "permitted_claim": "bounded_policy_mechanism_comparison_only",
+        },
+        "complete_method_manifest": {
+            "path": _PHASE11_COMPLETE_METHODS,
+            "file_sha256": methods_sha256,
+            "claim_scope": methods.get("claim_scope"),
         },
     }
     assessment["assessment_sha256"] = _phase11_digest(assessment, field="assessment_sha256")
