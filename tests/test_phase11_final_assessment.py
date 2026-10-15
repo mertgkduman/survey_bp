@@ -26,3 +26,21 @@ def test_tracer_gb46_terminal_assessment_is_three_row_and_inconclusive() -> None
     assert gb46["permitted_claim"] == "no_controlled_effect_claim"
     assert gb46["complete_pair_count"] == 0
     assert gb46["calibration_substitution_prohibited"] is True
+
+
+def test_bb72_terminal_assessment_retains_provenance_and_method_exclusions() -> None:
+    """BB72 cannot borrow GB46 support or hide methods ineligible for its code."""
+    from bp_registry.campaigns.statistics import build_phase11_assessment
+
+    bb72 = build_phase11_assessment(root=ROOT)["primary_controlled"]["BB72"]
+
+    assert bb72["code_qualification"]["distance_qualification"] == (
+        "source_reported_distance_6_not_platform_verified"
+    )
+    assert bb72["code_qualification"]["logical_operator_qualification"] == (
+        "project_derived_logicals_not_independent_distance_verification"
+    )
+    assert {row["method_id"] for row in bb72["unsupported_method_exclusions"]} == {
+        "canonical_asced", "mbp4", "qbpgd",
+    }
+    assert bb72["permitted_claim"] == "no_controlled_effect_claim"
