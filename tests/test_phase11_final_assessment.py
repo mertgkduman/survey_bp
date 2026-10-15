@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -44,3 +46,24 @@ def test_bb72_terminal_assessment_retains_provenance_and_method_exclusions() -> 
         "canonical_asced", "mbp4", "qbpgd",
     }
     assert bb72["permitted_claim"] == "no_controlled_effect_claim"
+
+
+def test_phase11_index_has_complete_lane_matrix_and_rejects_lane_tamper() -> None:
+    """The public index keeps all source, primary, and policy conclusions apart."""
+    from bp_registry.campaigns.statistics import build_phase11_assessment, verify_phase11_assessment
+
+    assessment = build_phase11_assessment(root=ROOT)
+    matrix = assessment["completeness_matrix"]
+    assert {(row["lane"], row["item_id"]) for row in matrix} >= {
+        ("source_reproduction", "asced_figure2"),
+        ("source_reproduction", "qbpgd_figure7"),
+        ("source_reproduction", "mbp4_figures8_9"),
+        ("primary_controlled", "GB46"),
+        ("primary_controlled", "BB72"),
+        ("policy_comparisons", "phase11_policy_comparisons"),
+    }
+    assessment["primary_controlled"]["GB46"]["receipt_path"] = (
+        "data/results/phase11-controlled-evaluation/bb72/evaluation-receipt.json"
+    )
+    with pytest.raises(ValueError, match="digest|differs"):
+        verify_phase11_assessment(root=ROOT, assessment=assessment)
