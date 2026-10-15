@@ -10,7 +10,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_tracer_gb46_terminal_assessment_is_three_row_and_inconclusive() -> None:
     """A denied zero-dispatch receipt retains its frozen rows without an effect claim."""
-    from bp_registry.campaigns.statistics import build_phase11_assessment
+    from bp_registry.campaigns import statistics
+
+    assert hasattr(statistics, "build_phase11_assessment")
+    build_phase11_assessment = statistics.build_phase11_assessment
 
     assessment = build_phase11_assessment(root=ROOT)
     gb46 = assessment["primary_controlled"]["GB46"]
