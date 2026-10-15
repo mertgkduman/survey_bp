@@ -687,7 +687,7 @@ Plans:
 
 ### Phase 11: Quaternary Reproduction and Comparisons
 
-**Goal:** A researcher can qualify selected correlated code-capacity results and compare joint versus separate inference on identical physical samples.
+**Goal:** As a researcher, I want to qualify selected correlated code-capacity results and compare joint versus separate inference on identical physical samples, so that I can assess published evidence and decoder differences under matched conditions.
 **Mode:** mvp
 **Depends on:** Phase 8 and Phase 10
 **Requirements:** QEV-01, QEV-02
