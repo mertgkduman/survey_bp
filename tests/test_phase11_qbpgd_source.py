@@ -104,3 +104,20 @@ def test_figure7_bounded_qualification_records_decimation_work_and_replays(tmp_p
     assert qualification["rounds"][0]["ranking_scan_count"] == 180
     verify = _run("verify", "--target", str(TARGET), "--manifest", str(MANIFEST), "--assessment", str(assessment))
     assert verify.returncode == 0, verify.stderr
+
+
+def test_figure7_verifier_rejects_resigned_qualification_claim(tmp_path: Path):
+    """A copied preflight and recomputed receipt digest cannot bless altered evidence."""
+    assessment = tmp_path / "qualification.json"
+    run = _run("run", "--target", str(TARGET), "--manifest", str(MANIFEST), "--assessment", str(assessment))
+    assert run.returncode == 0, run.stderr
+    changed = json.loads(assessment.read_text(encoding="utf-8"))
+    changed["qualification"]["performance_verdict"] = "fabricated_performance_claim"
+    changed["assessment_sha256"] = sha256(
+        json.dumps({key: value for key, value in changed.items() if key != "assessment_sha256"}, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")
+    ).hexdigest()
+    assessment.write_text(json.dumps(changed, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8")
+
+    verify = _run("verify", "--target", str(TARGET), "--manifest", str(MANIFEST), "--assessment", str(assessment))
+    assert verify.returncode == 1
+    assert "qualification deterministic evidence" in verify.stderr

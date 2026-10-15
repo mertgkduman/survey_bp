@@ -442,6 +442,41 @@ def _run_qbpgd_qualification(target: dict[str, Any]) -> dict[str, Any]:
     return evidence
 
 
+def _verify_qbpgd_qualification(target: dict[str, Any], qualification: object) -> None:
+    """Replay the bounded probe while treating elapsed wall time as a cap."""
+    if not isinstance(qualification, dict):
+        raise ValueError("Q-BPGD completed assessment lacks a qualification object")
+    expected = _run_qbpgd_qualification(target)
+    if set(qualification) != set(expected):
+        raise ValueError("Q-BPGD qualification fields differ from the bounded schema")
+    elapsed = qualification.get("elapsed_seconds")
+    cap = float(target["bounded_qualification"]["max_wall_seconds"])
+    if type(elapsed) not in (int, float) or not 0 <= elapsed <= cap:
+        raise ValueError("Q-BPGD qualification elapsed time differs from the frozen cap")
+    # Timing is observational.  All provenance, terminal, candidate, and work
+    # evidence must equal a fresh deterministic reconstruction.
+    expected["elapsed_seconds"] = elapsed
+    if qualification != expected:
+        raise ValueError("Q-BPGD qualification deterministic evidence differs from replay")
+
+
+def _verify_completed_qbpgd_assessment(target: dict[str, Any], expected_preflight: dict[str, Any], assessment: dict[str, Any]) -> None:
+    """Validate the sealed one-shot qualification receipt, including its digest."""
+    required = set(expected_preflight) | {"qualification", "preflight"}
+    if set(assessment) != required or assessment.get("admitted_shots") != 1:
+        raise ValueError("Q-BPGD completed assessment has an unapproved schema or shot count")
+    if assessment.get("preflight") != expected_preflight:
+        raise ValueError("Q-BPGD completed assessment preflight differs from frozen evidence")
+    for key, value in expected_preflight.items():
+        if key not in {"admitted_shots", "assessment_sha256"} and assessment.get(key) != value:
+            raise ValueError("Q-BPGD completed assessment claim boundary differs from preflight")
+    claimed_digest = assessment.get("assessment_sha256")
+    unsigned = {key: value for key, value in assessment.items() if key != "assessment_sha256"}
+    if claimed_digest != sha256(_canonical_bytes(unsigned)).hexdigest():
+        raise ValueError("Q-BPGD completed assessment digest differs from retained evidence")
+    _verify_qbpgd_qualification(target, assessment.get("qualification"))
+
+
 def preflight(
     target_path: Path,
     manifest_path: Path | None,
@@ -484,9 +519,12 @@ def verify(
         )
     if assessment == expected:
         return assessment
+    if isinstance(target, dict) and target.get("schema") != _MBP4_SCHEMA:
+        _verify_completed_qbpgd_assessment(target, expected, assessment)
+        return assessment
     if not isinstance(target, dict) or assessment.get("preflight") != expected:
         raise ValueError("assessment digest or blocked source evidence drifted")
-    return assessment
+    raise ValueError("assessment digest or blocked source evidence drifted")
 
 
 def run(
