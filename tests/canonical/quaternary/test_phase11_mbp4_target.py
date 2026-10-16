@@ -10,6 +10,8 @@ from __future__ import annotations
 from hashlib import sha256
 import json
 from pathlib import Path
+import subprocess
+import sys
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -17,6 +19,18 @@ TARGET = ROOT / "data/source-targets/phase11-mbp4-figures8-9-five-qubit.json"
 MANIFEST = ROOT / "data/manifests/phase11-mbp4-figures8-9-five-qubit.json"
 ASSESSMENT = ROOT / "data/results/phase11-mbp4-figures8-9/assessment.json"
 STUDY = ROOT / "scripts/run_phase11_source_studies.py"
+CURVE_REVIEW = ROOT / "data/source-targets/phase11-mbp4-curve-review.json"
+CURVE_SCRIPT = ROOT / "scripts/review_phase11_mbp4_curve.py"
+
+
+def _verify_curve_review(review: Path = CURVE_REVIEW) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [sys.executable, str(CURVE_SCRIPT), "verify-candidate", "--review", str(review)],
+        cwd=ROOT,
+        check=False,
+        text=True,
+        capture_output=True,
+    )
 
 
 def _json(path: Path) -> dict:
@@ -109,3 +123,62 @@ def test_figure6_remains_blocked_and_never_inherits_the_mechanism_verdict() -> N
     }
     assert figure6["assessment"] == "not_admitted"
     assert assessment["claim_scope"] == "deterministic_mechanism_only_not_a_curve_or_ranking"
+
+
+def test_figure6_curve_review_covers_the_selected_alpha_series_without_authorizing_execution() -> None:
+    """The Figure 6 review is a complete, separate, zero-shot contract."""
+    result = _verify_curve_review()
+    assert result.returncode == 0, result.stderr
+
+    review = _json(CURVE_REVIEW)
+    assert review["schema"] == "phase11-mbp4-figure6-curve-review-v1"
+    assert review["target_id"] == "phase11-mbp4-figure6-alpha-1.5-curve"
+    assert review["authorizes_execution"] is False
+    assert review["source_execution"] == {
+        "admitted_shots": 0,
+        "eligible": False,
+        "status": "blocked_metadata",
+    }
+    assert review["mechanism_evidence"] == {
+        "assessment_path": "data/results/phase11-mbp4-figures8-9/assessment.json",
+        "claim_scope": "deterministic_mechanism_only_not_a_curve_or_ranking",
+        "relation": "separate_non_aliasing_evidence",
+    }
+    points = review["curve"]["points"]
+    assert len(points) == review["curve"]["point_count"]
+    assert {point["point_id"] for point in points} == {
+        f"mbp4_alpha_1_5_marker_{ordinal:02d}" for ordinal in range(1, review["curve"]["point_count"] + 1)
+    }
+    for point in points:
+        assert point["axis_coordinates"]["status"] == "blocked_metadata"
+        assert point["axis_coordinates"]["raw_pdf_coordinates"] is None
+        assert point["axis_coordinates"]["transformed_interval"] is None
+        assert point["field_blockers"]
+        assert point["source_locator"]["page"] == 10
+
+
+def test_figure6_curve_review_binds_all_required_fields_and_rejects_tampering(tmp_path: Path) -> None:
+    result = _verify_curve_review()
+    assert result.returncode == 0, result.stderr
+    review = _json(CURVE_REVIEW)
+    assert review["source"]["sha256"] == "37d3a734c1e617eecc45ed1cd641dd92b89adfd7e15390ef403d90637c547f23"
+    assert review["field_blockers"] == sorted(set(review["field_blockers"]))
+    assert {
+        "iteration_cap",
+        "denominator",
+        "stopping_rule",
+        "digitization_uncertainty",
+        "tolerance",
+        "resource_ceiling",
+    } <= set(review["field_blockers"])
+    assert review["recurrence_compatibility"]["status"] == "compatible_but_not_source_equivalent"
+
+    review["curve"]["points"] = review["curve"]["points"][:-1]
+    review["review_digest"] = sha256(_canonical_bytes({
+        key: value for key, value in review.items() if key != "review_digest"
+    })).hexdigest()
+    tampered = tmp_path / "missing-point.json"
+    tampered.write_text(json.dumps(review), encoding="utf-8")
+    result = _verify_curve_review(tampered)
+    assert result.returncode != 0
+    assert "point" in result.stderr.lower() or "coverage" in result.stderr.lower()
