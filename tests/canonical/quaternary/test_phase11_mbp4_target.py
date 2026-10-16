@@ -139,11 +139,17 @@ def test_figure6_curve_review_covers_the_selected_alpha_series_without_authorizi
         "eligible": False,
         "status": "blocked_metadata",
     }
-    assert review["mechanism_evidence"] == {
+    assert {
+        key: review["mechanism_evidence"][key] for key in (
+            "assessment_path", "claim_scope", "relation",
+        )
+    } == {
         "assessment_path": "data/results/phase11-mbp4-figures8-9/assessment.json",
         "claim_scope": "deterministic_mechanism_only_not_a_curve_or_ranking",
         "relation": "separate_non_aliasing_evidence",
     }
+    assert review["mechanism_evidence"]["assessment_sha256"]
+    assert review["mechanism_evidence"]["target_id"] == "mbp4-figures8-9-five-qubit"
     points = review["curve"]["points"]
     assert len(points) == review["curve"]["point_count"]
     assert {point["point_id"] for point in points} == {
@@ -151,7 +157,7 @@ def test_figure6_curve_review_covers_the_selected_alpha_series_without_authorizi
     }
     for point in points:
         assert point["axis_coordinates"]["status"] == "blocked_metadata"
-        assert point["axis_coordinates"]["raw_pdf_coordinates"] is None
+        assert len(point["axis_coordinates"]["raw_pdf_coordinates"]) == 2
         assert point["axis_coordinates"]["transformed_interval"] is None
         assert point["field_blockers"]
         assert point["source_locator"]["page"] == 10

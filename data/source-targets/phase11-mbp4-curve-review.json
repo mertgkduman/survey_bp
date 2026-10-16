@@ -1,0 +1,662 @@
+{
+  "authorizes_execution": false,
+  "curve": {
+    "legend_label": "MBP4, alpha=1.5",
+    "panel": "Figure 6",
+    "point_count": 11,
+    "points": [
+      {
+        "axis_coordinates": {
+          "raw_pdf_coordinates": [
+            83.40110778808594,
+            188.94699096679688
+          ],
+          "status": "blocked_metadata",
+          "transformed_interval": null
+        },
+        "field_blockers": [
+          "transformed_coordinates",
+          "digitization_uncertainty",
+          "interval_method",
+          "tolerance"
+        ],
+        "point_id": "mbp4_alpha_1_5_marker_01",
+        "source_locator": {
+          "anchor": "Figure 6 red down-triangle marker 01 ordered left-to-right",
+          "kind": "primary_pdf_vector_marker",
+          "page": 10
+        }
+      },
+      {
+        "axis_coordinates": {
+          "raw_pdf_coordinates": [
+            103.21946716308594,
+            177.64712524414062
+          ],
+          "status": "blocked_metadata",
+          "transformed_interval": null
+        },
+        "field_blockers": [
+          "transformed_coordinates",
+          "digitization_uncertainty",
+          "interval_method",
+          "tolerance"
+        ],
+        "point_id": "mbp4_alpha_1_5_marker_02",
+        "source_locator": {
+          "anchor": "Figure 6 red down-triangle marker 02 ordered left-to-right",
+          "kind": "primary_pdf_vector_marker",
+          "page": 10
+        }
+      },
+      {
+        "axis_coordinates": {
+          "raw_pdf_coordinates": [
+            123.03788757324219,
+            167.50827026367188
+          ],
+          "status": "blocked_metadata",
+          "transformed_interval": null
+        },
+        "field_blockers": [
+          "transformed_coordinates",
+          "digitization_uncertainty",
+          "interval_method",
+          "tolerance"
+        ],
+        "point_id": "mbp4_alpha_1_5_marker_03",
+        "source_locator": {
+          "anchor": "Figure 6 red down-triangle marker 03 ordered left-to-right",
+          "kind": "primary_pdf_vector_marker",
+          "page": 10
+        }
+      },
+      {
+        "axis_coordinates": {
+          "raw_pdf_coordinates": [
+            142.85629272460938,
+            156.85194396972656
+          ],
+          "status": "blocked_metadata",
+          "transformed_interval": null
+        },
+        "field_blockers": [
+          "transformed_coordinates",
+          "digitization_uncertainty",
+          "interval_method",
+          "tolerance"
+        ],
+        "point_id": "mbp4_alpha_1_5_marker_04",
+        "source_locator": {
+          "anchor": "Figure 6 red down-triangle marker 04 ordered left-to-right",
+          "kind": "primary_pdf_vector_marker",
+          "page": 10
+        }
+      },
+      {
+        "axis_coordinates": {
+          "raw_pdf_coordinates": [
+            162.67471313476562,
+            143.10565185546875
+          ],
+          "status": "blocked_metadata",
+          "transformed_interval": null
+        },
+        "field_blockers": [
+          "transformed_coordinates",
+          "digitization_uncertainty",
+          "interval_method",
+          "tolerance"
+        ],
+        "point_id": "mbp4_alpha_1_5_marker_05",
+        "source_locator": {
+          "anchor": "Figure 6 red down-triangle marker 05 ordered left-to-right",
+          "kind": "primary_pdf_vector_marker",
+          "page": 10
+        }
+      },
+      {
+        "axis_coordinates": {
+          "raw_pdf_coordinates": [
+            182.49307250976562,
+            132.23590087890625
+          ],
+          "status": "blocked_metadata",
+          "transformed_interval": null
+        },
+        "field_blockers": [
+          "transformed_coordinates",
+          "digitization_uncertainty",
+          "interval_method",
+          "tolerance"
+        ],
+        "point_id": "mbp4_alpha_1_5_marker_06",
+        "source_locator": {
+          "anchor": "Figure 6 red down-triangle marker 06 ordered left-to-right",
+          "kind": "primary_pdf_vector_marker",
+          "page": 10
+        }
+      },
+      {
+        "axis_coordinates": {
+          "raw_pdf_coordinates": [
+            202.31149291992188,
+            99.10411071777344
+          ],
+          "status": "blocked_metadata",
+          "transformed_interval": null
+        },
+        "field_blockers": [
+          "transformed_coordinates",
+          "digitization_uncertainty",
+          "interval_method",
+          "tolerance"
+        ],
+        "point_id": "mbp4_alpha_1_5_marker_07",
+        "source_locator": {
+          "anchor": "Figure 6 red down-triangle marker 07 ordered left-to-right",
+          "kind": "primary_pdf_vector_marker",
+          "page": 10
+        }
+      },
+      {
+        "axis_coordinates": {
+          "raw_pdf_coordinates": [
+            222.12989807128906,
+            92.74429321289062
+          ],
+          "status": "blocked_metadata",
+          "transformed_interval": null
+        },
+        "field_blockers": [
+          "transformed_coordinates",
+          "digitization_uncertainty",
+          "interval_method",
+          "tolerance"
+        ],
+        "point_id": "mbp4_alpha_1_5_marker_08",
+        "source_locator": {
+          "anchor": "Figure 6 red down-triangle marker 08 ordered left-to-right",
+          "kind": "primary_pdf_vector_marker",
+          "page": 10
+        }
+      },
+      {
+        "axis_coordinates": {
+          "raw_pdf_coordinates": [
+            241.94833374023438,
+            83.02734375
+          ],
+          "status": "blocked_metadata",
+          "transformed_interval": null
+        },
+        "field_blockers": [
+          "transformed_coordinates",
+          "digitization_uncertainty",
+          "interval_method",
+          "tolerance"
+        ],
+        "point_id": "mbp4_alpha_1_5_marker_09",
+        "source_locator": {
+          "anchor": "Figure 6 red down-triangle marker 09 ordered left-to-right",
+          "kind": "primary_pdf_vector_marker",
+          "page": 10
+        }
+      },
+      {
+        "axis_coordinates": {
+          "raw_pdf_coordinates": [
+            261.76666259765625,
+            79.1103515625
+          ],
+          "status": "blocked_metadata",
+          "transformed_interval": null
+        },
+        "field_blockers": [
+          "transformed_coordinates",
+          "digitization_uncertainty",
+          "interval_method",
+          "tolerance"
+        ],
+        "point_id": "mbp4_alpha_1_5_marker_10",
+        "source_locator": {
+          "anchor": "Figure 6 red down-triangle marker 10 ordered left-to-right",
+          "kind": "primary_pdf_vector_marker",
+          "page": 10
+        }
+      },
+      {
+        "axis_coordinates": {
+          "raw_pdf_coordinates": [
+            281.5850830078125,
+            70.85488891601562
+          ],
+          "status": "blocked_metadata",
+          "transformed_interval": null
+        },
+        "field_blockers": [
+          "transformed_coordinates",
+          "digitization_uncertainty",
+          "interval_method",
+          "tolerance"
+        ],
+        "point_id": "mbp4_alpha_1_5_marker_11",
+        "source_locator": {
+          "anchor": "Figure 6 red down-triangle marker 11 ordered left-to-right",
+          "kind": "primary_pdf_vector_marker",
+          "page": 10
+        }
+      }
+    ],
+    "series_id": "mbp4_alpha_1_5"
+  },
+  "evidence_entries": [
+    {
+      "compatibility_verdict": "unresolved",
+      "discrepancy_or_blocker": "beta is absent from the Figure 6 statistical-panel contract",
+      "excerpt": "Fig. 6. Decoding the [[5, 1, 3]] code using Algorithm 1 with various alpha.",
+      "excerpt_sha256": "9f46792c47acd871b098909007d00e5a28bcd4a6d7c0963f1153401aaaef2691",
+      "field_id": "alpha_beta",
+      "locator": {
+        "anchor": "Figure 6 caption and legend",
+        "kind": "primary_pdf",
+        "page": 10
+      },
+      "normalized_interpretation": "Alpha=1.5 is identified by the legend. Figure 6 does not state a beta value, so beta is not inherited from Figures 8-9.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Kuo and Lai, Modified Belief Propagation Decoding Algorithms for Quantum LDPC Codes, arXiv:2104.13659",
+        "id": "kuo-lai-2021-mbp4-primary-pdf",
+        "path": "/tmp/phase11-mbp4.pdf",
+        "sha256": "37d3a734c1e617eecc45ed1cd641dd92b89adfd7e15390ef403d90637c547f23"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "discrepancy_or_blocker": "author implementation identity is not verified",
+      "excerpt": "The Figure 6 page identifies Algorithm 1 but supplies no repository URL, revision, or executable artifact digest.",
+      "excerpt_sha256": "fa0959b60e1a0f486115004a8b97e8fa25f4835ee996ac461cd66839afc7fec2",
+      "field_id": "author_implementation_identity",
+      "locator": {
+        "anchor": "Figure 6 and surrounding primary-source page",
+        "kind": "primary_pdf",
+        "page": 10
+      },
+      "normalized_interpretation": "No author implementation is pinned, so canonical recurrence compatibility is not implementation equivalence.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Kuo and Lai, Modified Belief Propagation Decoding Algorithms for Quantum LDPC Codes, arXiv:2104.13659",
+        "id": "kuo-lai-2021-mbp4-primary-pdf",
+        "path": "/tmp/phase11-mbp4.pdf",
+        "sha256": "37d3a734c1e617eecc45ed1cd641dd92b89adfd7e15390ef403d90637c547f23"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "discrepancy_or_blocker": "axis calibration and transform parameters are not reviewed",
+      "excerpt": "The x-axis is epsilon (depolarizing error rate) and the y-axis is logical error rate; both axes display logarithmic decade ticks.",
+      "excerpt_sha256": "cc03eec7dd0b7835307c546ece490abcf21bd9b63169ac28025156a50803806e",
+      "field_id": "axis_transform",
+      "locator": {
+        "anchor": "Figure 6 axes",
+        "kind": "primary_pdf",
+        "page": 10
+      },
+      "normalized_interpretation": "The axis semantics are known, but a reviewed calibration for source coordinates is not yet frozen.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Kuo and Lai, Modified Belief Propagation Decoding Algorithms for Quantum LDPC Codes, arXiv:2104.13659",
+        "id": "kuo-lai-2021-mbp4-primary-pdf",
+        "path": "/tmp/phase11-mbp4.pdf",
+        "sha256": "37d3a734c1e617eecc45ed1cd641dd92b89adfd7e15390ef403d90637c547f23"
+      }
+    },
+    {
+      "compatibility_verdict": "compatible",
+      "discrepancy_or_blocker": null,
+      "excerpt": "The Figure 6 x-axis is epsilon (depolarizing error rate) and the caption identifies the [[5, 1, 3]] code.",
+      "excerpt_sha256": "8936028248112ab231b3c33e4ed53b51a15bf23dc784042ffd280de0eb0b1649",
+      "field_id": "code_channel",
+      "locator": {
+        "anchor": "Figure 6 axes and caption",
+        "kind": "primary_pdf",
+        "page": 10
+      },
+      "normalized_interpretation": "The series is a depolarizing-channel logical-error-rate plot for the five-qubit code.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Kuo and Lai, Modified Belief Propagation Decoding Algorithms for Quantum LDPC Codes, arXiv:2104.13659",
+        "id": "kuo-lai-2021-mbp4-primary-pdf",
+        "path": "/tmp/phase11-mbp4.pdf",
+        "sha256": "37d3a734c1e617eecc45ed1cd641dd92b89adfd7e15390ef403d90637c547f23"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "discrepancy_or_blocker": "physical epsilon and logical-error coordinates require reviewed digitization",
+      "excerpt": "The selected alpha=1.5 series is represented by red down-triangle markers in Figure 6.",
+      "excerpt_sha256": "feac972b3d2571708632d1f0b0931847916630ff3feec19b09465c41d83a1afb",
+      "field_id": "coordinate_extraction",
+      "locator": {
+        "anchor": "Figure 6 selected series",
+        "kind": "primary_pdf",
+        "page": 10
+      },
+      "normalized_interpretation": "Eleven PDF-space marker centers are inventoried, while their physical coordinates and intervals remain unreviewed.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Kuo and Lai, Modified Belief Propagation Decoding Algorithms for Quantum LDPC Codes, arXiv:2104.13659",
+        "id": "kuo-lai-2021-mbp4-primary-pdf",
+        "path": "/tmp/phase11-mbp4.pdf",
+        "sha256": "37d3a734c1e617eecc45ed1cd641dd92b89adfd7e15390ef403d90637c547f23"
+      }
+    },
+    {
+      "compatibility_verdict": "compatible",
+      "discrepancy_or_blocker": null,
+      "excerpt": "The Figure 6 legend labels MBP4 alpha=1, alpha=1.4, alpha=1.5, alpha=1.6, alpha=1.8, Uncoded, and BDD, t=1.",
+      "excerpt_sha256": "c0ea0b7f492ab112755033768a80f08eef4a156f4f42edc89ecf56471a19a35c",
+      "field_id": "curve_legend_identity",
+      "locator": {
+        "anchor": "Figure 6 legend",
+        "kind": "primary_pdf",
+        "page": 10
+      },
+      "normalized_interpretation": "The reviewed selected series is MBP4 alpha=1.5, drawn with red down-triangle markers.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Kuo and Lai, Modified Belief Propagation Decoding Algorithms for Quantum LDPC Codes, arXiv:2104.13659",
+        "id": "kuo-lai-2021-mbp4-primary-pdf",
+        "path": "/tmp/phase11-mbp4.pdf",
+        "sha256": "37d3a734c1e617eecc45ed1cd641dd92b89adfd7e15390ef403d90637c547f23"
+      }
+    },
+    {
+      "compatibility_verdict": "compatible",
+      "discrepancy_or_blocker": null,
+      "excerpt": "Fig. 6. Decoding the [[5, 1, 3]] code using Algorithm 1 with various alpha.",
+      "excerpt_sha256": "9f46792c47acd871b098909007d00e5a28bcd4a6d7c0963f1153401aaaef2691",
+      "field_id": "curve_panel_identity",
+      "locator": {
+        "anchor": "Figure 6 caption",
+        "kind": "primary_pdf",
+        "page": 10
+      },
+      "normalized_interpretation": "The selected panel is Figure 6, not the deterministic Figures 8-9 mechanism.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Kuo and Lai, Modified Belief Propagation Decoding Algorithms for Quantum LDPC Codes, arXiv:2104.13659",
+        "id": "kuo-lai-2021-mbp4-primary-pdf",
+        "path": "/tmp/phase11-mbp4.pdf",
+        "sha256": "37d3a734c1e617eecc45ed1cd641dd92b89adfd7e15390ef403d90637c547f23"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "discrepancy_or_blocker": "per-point stochastic denominator is not reported",
+      "excerpt": "\u2018Uncoded\u2019 is uncoded block error rate of N = 5.",
+      "excerpt_sha256": "269c49c22571d91af5909b5582cb39b5115725f6d6519968851becdff8362bd6",
+      "field_id": "denominator",
+      "locator": {
+        "anchor": "Figure 6 caption",
+        "kind": "primary_pdf",
+        "page": 10
+      },
+      "normalized_interpretation": "N=5 describes the uncoded block calculation; it is not a stochastic trial denominator for the MBP4 points.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Kuo and Lai, Modified Belief Propagation Decoding Algorithms for Quantum LDPC Codes, arXiv:2104.13659",
+        "id": "kuo-lai-2021-mbp4-primary-pdf",
+        "path": "/tmp/phase11-mbp4.pdf",
+        "sha256": "37d3a734c1e617eecc45ed1cd641dd92b89adfd7e15390ef403d90637c547f23"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "discrepancy_or_blocker": "digitization uncertainty is not specified",
+      "excerpt": "Figure 6 provides plotted markers rather than a tabulated coordinate list.",
+      "excerpt_sha256": "4e00843737cf1adb6e1b6bf1b7acf5ad3e58c6bf0b410b1c8c88065a8996595a",
+      "field_id": "digitization_uncertainty",
+      "locator": {
+        "anchor": "Figure 6 selected series",
+        "kind": "primary_pdf",
+        "page": 10
+      },
+      "normalized_interpretation": "No uncertainty model has been approved for converting PDF-space marker centers into physical coordinates.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Kuo and Lai, Modified Belief Propagation Decoding Algorithms for Quantum LDPC Codes, arXiv:2104.13659",
+        "id": "kuo-lai-2021-mbp4-primary-pdf",
+        "path": "/tmp/phase11-mbp4.pdf",
+        "sha256": "37d3a734c1e617eecc45ed1cd641dd92b89adfd7e15390ef403d90637c547f23"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "discrepancy_or_blocker": "interval method is not reported",
+      "excerpt": "Figure 6 shows logical-error-rate curves without error bars or a stated confidence-interval procedure.",
+      "excerpt_sha256": "2d240e57f6a6e6322027867e4936296d94bb49885356daff8687db895288efaf",
+      "field_id": "interval_method",
+      "locator": {
+        "anchor": "Figure 6 panel",
+        "kind": "primary_pdf",
+        "page": 10
+      },
+      "normalized_interpretation": "No interval method is available for a source-faithful statistical assessment.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Kuo and Lai, Modified Belief Propagation Decoding Algorithms for Quantum LDPC Codes, arXiv:2104.13659",
+        "id": "kuo-lai-2021-mbp4-primary-pdf",
+        "path": "/tmp/phase11-mbp4.pdf",
+        "sha256": "37d3a734c1e617eecc45ed1cd641dd92b89adfd7e15390ef403d90637c547f23"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "discrepancy_or_blocker": "iteration cap is not reported for Figure 6",
+      "excerpt": "Fig. 6. Decoding the [[5, 1, 3]] code using Algorithm 1 with various alpha.",
+      "excerpt_sha256": "9f46792c47acd871b098909007d00e5a28bcd4a6d7c0963f1153401aaaef2691",
+      "field_id": "iteration_cap",
+      "locator": {
+        "anchor": "Figure 6 caption and surrounding page text",
+        "kind": "primary_pdf",
+        "page": 10
+      },
+      "normalized_interpretation": "No exact maximum iteration count is printed for the statistical curve.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Kuo and Lai, Modified Belief Propagation Decoding Algorithms for Quantum LDPC Codes, arXiv:2104.13659",
+        "id": "kuo-lai-2021-mbp4-primary-pdf",
+        "path": "/tmp/phase11-mbp4.pdf",
+        "sha256": "37d3a734c1e617eecc45ed1cd641dd92b89adfd7e15390ef403d90637c547f23"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "discrepancy_or_blocker": "numerical profile is not reported for Figure 6",
+      "excerpt": "The Figure 6 caption identifies Algorithm 1 and alpha variants but supplies no precision, clipping, normalization, or tie conventions.",
+      "excerpt_sha256": "b069feb17f3c1710a59da7cbd2226abeb7d41f3f00a74e91ea4c7840585153be",
+      "field_id": "numerical_profile",
+      "locator": {
+        "anchor": "Figure 6 caption and panel",
+        "kind": "primary_pdf",
+        "page": 10
+      },
+      "normalized_interpretation": "The canonical numerical profile cannot be promoted to a source-equivalent profile.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Kuo and Lai, Modified Belief Propagation Decoding Algorithms for Quantum LDPC Codes, arXiv:2104.13659",
+        "id": "kuo-lai-2021-mbp4-primary-pdf",
+        "path": "/tmp/phase11-mbp4.pdf",
+        "sha256": "37d3a734c1e617eecc45ed1cd641dd92b89adfd7e15390ef403d90637c547f23"
+      }
+    },
+    {
+      "compatibility_verdict": "compatible",
+      "discrepancy_or_blocker": null,
+      "excerpt": "Figure 6 identifies Algorithm 1 with MBP4 alpha variants.",
+      "excerpt_sha256": "44f2ca45490fc5bd64267bd2c6f3b9c3bf62bbf69dbad0b7ee497ccb160beac9",
+      "field_id": "recurrence_compatibility",
+      "locator": {
+        "anchor": "Figure 6 caption; src/bp_registry/quaternary/mbp4.py fixed-inhibition boundary",
+        "kind": "primary_pdf",
+        "page": 10
+      },
+      "normalized_interpretation": "The platform fixed-inhibition MBP4 recurrence supports an alpha=1.5 canonical route; unresolved schedule/numerics/author-code facts prevent source-equivalence promotion.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Kuo and Lai, Modified Belief Propagation Decoding Algorithms for Quantum LDPC Codes, arXiv:2104.13659",
+        "id": "kuo-lai-2021-mbp4-primary-pdf",
+        "path": "/tmp/phase11-mbp4.pdf",
+        "sha256": "37d3a734c1e617eecc45ed1cd641dd92b89adfd7e15390ef403d90637c547f23"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "discrepancy_or_blocker": "resource ceiling is not reported",
+      "excerpt": "Figure 6 reports a curve but gives no compute, time, memory, or work bound.",
+      "excerpt_sha256": "da71d1e898221f2a362ec084a096a5ff506cf472a91d1d8b2f3ba847d60fde67",
+      "field_id": "resource_ceiling",
+      "locator": {
+        "anchor": "Figure 6 caption and panel",
+        "kind": "primary_pdf",
+        "page": 10
+      },
+      "normalized_interpretation": "A later campaign must independently freeze a resource ceiling.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Kuo and Lai, Modified Belief Propagation Decoding Algorithms for Quantum LDPC Codes, arXiv:2104.13659",
+        "id": "kuo-lai-2021-mbp4-primary-pdf",
+        "path": "/tmp/phase11-mbp4.pdf",
+        "sha256": "37d3a734c1e617eecc45ed1cd641dd92b89adfd7e15390ef403d90637c547f23"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "discrepancy_or_blocker": "schedule is not explicit for the Figure 6 curve",
+      "excerpt": "Fig. 6. Decoding the [[5, 1, 3]] code using Algorithm 1 with various alpha.",
+      "excerpt_sha256": "9f46792c47acd871b098909007d00e5a28bcd4a6d7c0963f1153401aaaef2691",
+      "field_id": "schedule",
+      "locator": {
+        "anchor": "Figure 6 caption",
+        "kind": "primary_pdf",
+        "page": 10
+      },
+      "normalized_interpretation": "The figure cites Algorithm 1 but does not state the curve's execution schedule as a frozen campaign setting.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Kuo and Lai, Modified Belief Propagation Decoding Algorithms for Quantum LDPC Codes, arXiv:2104.13659",
+        "id": "kuo-lai-2021-mbp4-primary-pdf",
+        "path": "/tmp/phase11-mbp4.pdf",
+        "sha256": "37d3a734c1e617eecc45ed1cd641dd92b89adfd7e15390ef403d90637c547f23"
+      }
+    },
+    {
+      "compatibility_verdict": "compatible",
+      "discrepancy_or_blocker": null,
+      "excerpt": "Figure 6 appears on PDF page 10 of the pinned MBP4 primary source.",
+      "excerpt_sha256": "e113bba63541899204150eee8e85ebdce5c3365f8e78bb52d144f6326a95c9b6",
+      "field_id": "source_identity",
+      "locator": {
+        "anchor": "pinned PDF identity and Figure 6 page",
+        "kind": "primary_pdf",
+        "page": 10
+      },
+      "normalized_interpretation": "The candidate binds the supplied primary-PDF SHA-256; it does not establish author-code identity.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Kuo and Lai, Modified Belief Propagation Decoding Algorithms for Quantum LDPC Codes, arXiv:2104.13659",
+        "id": "kuo-lai-2021-mbp4-primary-pdf",
+        "path": "/tmp/phase11-mbp4.pdf",
+        "sha256": "37d3a734c1e617eecc45ed1cd641dd92b89adfd7e15390ef403d90637c547f23"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "discrepancy_or_blocker": "stopping rule is not reported for Figure 6",
+      "excerpt": "Fig. 6. Decoding the [[5, 1, 3]] code using Algorithm 1 with various alpha.",
+      "excerpt_sha256": "9f46792c47acd871b098909007d00e5a28bcd4a6d7c0963f1153401aaaef2691",
+      "field_id": "stopping_rule",
+      "locator": {
+        "anchor": "Figure 6 caption and panel",
+        "kind": "primary_pdf",
+        "page": 10
+      },
+      "normalized_interpretation": "The panel does not state a trial/error stopping rule.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Kuo and Lai, Modified Belief Propagation Decoding Algorithms for Quantum LDPC Codes, arXiv:2104.13659",
+        "id": "kuo-lai-2021-mbp4-primary-pdf",
+        "path": "/tmp/phase11-mbp4.pdf",
+        "sha256": "37d3a734c1e617eecc45ed1cd641dd92b89adfd7e15390ef403d90637c547f23"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "discrepancy_or_blocker": "curve tolerance is not reported",
+      "excerpt": "Figure 6 has no stated numerical curve-agreement tolerance.",
+      "excerpt_sha256": "f03d5cb537d5043b6e2bb678dc1ba3b50a1fdfa224cffb1c63d5498b1de98d55",
+      "field_id": "tolerance",
+      "locator": {
+        "anchor": "Figure 6 caption and panel",
+        "kind": "primary_pdf",
+        "page": 10
+      },
+      "normalized_interpretation": "Visual agreement cannot become an acceptance threshold.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Kuo and Lai, Modified Belief Propagation Decoding Algorithms for Quantum LDPC Codes, arXiv:2104.13659",
+        "id": "kuo-lai-2021-mbp4-primary-pdf",
+        "path": "/tmp/phase11-mbp4.pdf",
+        "sha256": "37d3a734c1e617eecc45ed1cd641dd92b89adfd7e15390ef403d90637c547f23"
+      }
+    }
+  ],
+  "field_blockers": [
+    "author_implementation_identity",
+    "beta",
+    "denominator",
+    "digitization_uncertainty",
+    "interval_method",
+    "iteration_cap",
+    "numerical_profile",
+    "resource_ceiling",
+    "schedule",
+    "stopping_rule",
+    "tolerance",
+    "transformed_coordinates"
+  ],
+  "mechanism_evidence": {
+    "assessment_path": "data/results/phase11-mbp4-figures8-9/assessment.json",
+    "assessment_sha256": "bae83eea99067a3ce56f94a29c6e24fb29bcca05a4e8151c8ab580beca30870d",
+    "claim_scope": "deterministic_mechanism_only_not_a_curve_or_ranking",
+    "relation": "separate_non_aliasing_evidence",
+    "target_id": "mbp4-figures8-9-five-qubit"
+  },
+  "recurrence_compatibility": {
+    "canonical_route": "fixed_inhibition_mbp4_alpha",
+    "source_locator": "Figure 6 caption; Algorithm 1",
+    "status": "compatible_but_not_source_equivalent",
+    "unresolved_fields": [
+      "schedule",
+      "numerical_profile",
+      "author_implementation_identity"
+    ]
+  },
+  "review_decision": "pending_human_review",
+  "review_digest": "bc4678ef8da5d02d3c57c6f6392fc7b8334a6048980fdfe9486791e06fc17184",
+  "review_id": "phase11_mbp4_curve_review_v1",
+  "schema": "phase11-mbp4-figure6-curve-review-v1",
+  "source": {
+    "citation": "Kuo and Lai, Modified Belief Propagation Decoding Algorithms for Quantum LDPC Codes, arXiv:2104.13659",
+    "id": "kuo-lai-2021-mbp4-primary-pdf",
+    "path": "/tmp/phase11-mbp4.pdf",
+    "sha256": "37d3a734c1e617eecc45ed1cd641dd92b89adfd7e15390ef403d90637c547f23"
+  },
+  "source_execution": {
+    "admitted_shots": 0,
+    "eligible": false,
+    "status": "blocked_metadata"
+  },
+  "target_id": "phase11-mbp4-figure6-alpha-1.5-curve"
+}
