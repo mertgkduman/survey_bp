@@ -50,6 +50,53 @@ def test_malformed_receipt_type_fails_even_with_resealed_digest(mutation) -> Non
         module.ControlledEvaluationReceipt.from_mapping(checked)
 
 
+def test_receipt_type_package_export_and_both_checked_denials() -> None:
+    from bp_registry.campaigns import ControlledEvaluationReceipt
+
+    module = _module()
+    assert ControlledEvaluationReceipt is module.ControlledEvaluationReceipt
+    for code in ("gb46", "bb72"):
+        checked = json.loads((ROOT / f"data/results/phase11-controlled-evaluation/{code}/evaluation-receipt.json").read_text())
+        assert ControlledEvaluationReceipt.from_mapping(checked).to_primitive() == checked
+
+
+def test_receipt_type_rejects_cross_code_and_incomplete_allow() -> None:
+    module = _module()
+    checked = json.loads((ROOT / "data/results/phase11-controlled-evaluation/gb46/evaluation-receipt.json").read_text())
+    checked["campaign_id"] = "bb72-controlled"
+    checked["receipt_sha256"] = module.receipt_digest(checked)
+    with pytest.raises(ValueError, match="campaign"):
+        module.ControlledEvaluationReceipt.from_mapping(checked)
+
+    checked["campaign_id"] = "gb46-controlled"
+    checked["authorization"]["decision"] = "allow"
+    checked["authorization"]["approved_manifest_sha256s"] = [checked["manifest"]["sha256"]]
+    checked["authorization"]["account"] = "account"
+    checked["authorization"]["partition"] = "partition"
+    checked["receipt_sha256"] = module.receipt_digest(checked)
+    with pytest.raises(ValueError, match="allow receipt"):
+        module.ControlledEvaluationReceipt.from_mapping(checked)
+
+
+@pytest.mark.parametrize("field,value", [
+    ("path", "data/studies/foreign.json"),
+    ("fixed_marginal_design_sha256", "0" * 64),
+])
+def test_verified_receipt_rejects_resealed_manifest_identity(tmp_path: Path, field: str, value: str) -> None:
+    module = _module()
+    destination = _receipt_path(tmp_path, "GB46")
+    receipt = module.execute_authorized_controlled_manifest(
+        root=ROOT, package_path=PACKAGE, design_path=GB46, receipt_path=destination,
+    )
+    receipt["manifest"][field] = value
+    receipt["receipt_sha256"] = module.receipt_digest(receipt)
+    destination.write_bytes(module.canonical_receipt_bytes(receipt))
+    with pytest.raises(ValueError, match="manifest|design"):
+        module.verify_controlled_evaluation_receipt(
+            root=ROOT, package_path=PACKAGE, design_path=GB46, receipt_path=destination,
+        )
+
+
 def test_gb46_deny_tracer_writes_digest_bound_zero_dispatch_receipt(tmp_path: Path) -> None:
     module = _module()
     destination = _receipt_path(tmp_path, "GB46")

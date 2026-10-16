@@ -63,7 +63,7 @@ class ControlledEvaluationReceipt(StrictModel):
     until then, allow-shaped receipts cannot be admitted as evidence.
     """
 
-    schema: Literal["phase11_controlled_evaluation_receipt_v1"]
+    schema_id: Literal["phase11_controlled_evaluation_receipt_v1"] = Field(alias="schema")
     code_id: Literal["GB46", "BB72"]
     campaign_id: str
     manifest: dict[str, object]
@@ -88,7 +88,7 @@ class ControlledEvaluationReceipt(StrictModel):
         return cls.model_validate(dict(value))
 
     def to_primitive(self) -> dict[str, object]:
-        return self.model_dump(mode="json")
+        return self.model_dump(mode="json", by_alias=True)
 
     def canonical_bytes(self) -> bytes:
         return canonical_receipt_bytes(self.to_primitive())
@@ -283,7 +283,7 @@ def _zero_dispatch_receipt(
         },
     }
     receipt["receipt_sha256"] = receipt_digest(receipt)
-    return receipt
+    return ControlledEvaluationReceipt.from_mapping(receipt).to_primitive()
 
 
 def _stale_zero_dispatch_receipt(*, package_path: Path, design_path: Path, error: ValueError) -> dict[str, object]:
@@ -306,7 +306,7 @@ def _stale_zero_dispatch_receipt(*, package_path: Path, design_path: Path, error
                            "calibration_reuse_prohibited": True},
     }
     receipt["receipt_sha256"] = receipt_digest(receipt)
-    return receipt
+    return ControlledEvaluationReceipt.from_mapping(receipt).to_primitive()
 
 
 def preflight_controlled_manifest(*, root: Path, package_path: Path, design_path: Path) -> dict[str, object]:
@@ -364,34 +364,32 @@ def verify_controlled_evaluation_receipt(
     root = root.resolve(strict=True)
     package = _package_context(root=root, package_path=package_path)
     context = _design_context(root=root, package=package, design_path=design_path)
-    receipt = _read_regular_json(receipt_path, label="controlled evaluation receipt")
-    if receipt.get("schema") != _SCHEMA or receipt.get("receipt_sha256") != receipt_digest(receipt):
-        raise ValueError("controlled evaluation receipt digest differs from its evidence")
+    receipt = ControlledEvaluationReceipt.from_mapping(
+        _read_regular_json(receipt_path, label="controlled evaluation receipt")
+    ).to_primitive()
     if receipt.get("code_id") != context["code_id"] or receipt.get("campaign_id") != context["campaign_id"]:
         raise ValueError("controlled evaluation receipt code or campaign differs from its design")
-    if receipt.get("manifest", {}).get("sha256") != context["manifest_sha256"]:
+    manifest = receipt["manifest"]
+    if (manifest["sha256"] != context["manifest_sha256"]
+            or manifest["path"] != context["design_path"]
+            or manifest["fixed_marginal_design_sha256"] != context["preflight"]["fixed_marginal_design_sha256"]):
         raise ValueError("controlled evaluation receipt manifest differs from the authorized design")
     if receipt.get("code_qualification") != context["code_qualification"]:
         raise ValueError("controlled evaluation receipt loses code qualification evidence")
     sealed = package["receipt"]
     assert isinstance(sealed, Mapping)
-    authorization = receipt.get("authorization")
-    dispatch = receipt.get("dispatch")
-    if not isinstance(authorization, Mapping) or not isinstance(dispatch, Mapping):
-        raise ValueError("controlled evaluation receipt lacks authorization or dispatch evidence")
-    if authorization.get("decision") != sealed["decision"]:
-        raise ValueError("controlled evaluation receipt decision differs from sealed authorization")
-    if receipt.get("attempted_pairs") != [] or receipt.get("complete_pairs") != []:
-        raise ValueError("zero-dispatch closure cannot contain attempted or complete pairs")
-    if receipt.get("evidence_scope", {}).get("assessment_ready_ledger_refs") != []:
-        raise ValueError("calibration or closure evidence cannot become assessment ready")
-    if receipt.get("calibration_provenance", {}).get("forbidden_as_evaluation_evidence") is not True:
-        raise ValueError("controlled evaluation receipt must prohibit calibration evidence reuse")
+    authorization = receipt["authorization"]
+    if (authorization["decision"] != sealed["decision"]
+            or authorization["package_sha256"] != package["package_sha256"]
+            or authorization["sealed_receipt_sha256"] != sealed["receipt_sha256"]
+            or authorization["approved_manifest_sha256s"] != sealed["approved_manifest_sha256s"]
+            or authorization["account"] != sealed["account"]
+            or authorization["partition"] != sealed["partition"]):
+        raise ValueError("controlled evaluation receipt authorization differs from sealed package")
     if sealed["decision"] == "deny":
-        if receipt.get("terminal_status") != "denied" or dispatch.get("state") != "zero_dispatch":
+        expected_reason = "sealed_authorization_deny:" + ",".join(sorted(str(value) for value in sealed["reasons"]))
+        if receipt["terminal_status"] != "denied" or receipt["terminal_reason"] != expected_reason:
             raise ValueError("denied authorization must produce a zero-dispatch denial closure")
-    elif dispatch.get("state") == "zero_dispatch":
-        raise ValueError("allow authorization cannot be represented as an unqualified zero-dispatch receipt")
     else:
         raise ValueError("allow receipt requires a separately qualified controlled dispatcher")
     return receipt
