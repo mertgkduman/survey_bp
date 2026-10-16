@@ -1,0 +1,2445 @@
+{
+  "candidate_sha256": "a5b9c6eb0bbe8a07743f5be093cc937c50759a07d5f60f8cebc3be557f4b49b5",
+  "execution_authorized": false,
+  "figure": {
+    "axes": {
+      "x": {
+        "quantity": "p",
+        "transform": "linear"
+      },
+      "y": {
+        "quantity": "LER",
+        "transform": "log10"
+      }
+    },
+    "channel": "depolarizing",
+    "code": "GB46",
+    "code_parameters": "[[46, 2, 9]] generalized bicycle",
+    "figure": "Figure 2",
+    "legend": {
+      "baseline": "Baseline",
+      "selected_variant": "K = 16, \u0394 = 2, L = 4",
+      "unselected_configurations": [
+        "K = 4, \u0394 = 2, L = 1",
+        "K = 16, \u0394 = 4, L = 1",
+        "K = 64, \u0394 = 2, L = 16"
+      ]
+    }
+  },
+  "members": [
+    {
+      "construction": "ordinary",
+      "curves": [
+        {
+          "curve_id": "asced-figure2-gb46-ordinary.bp4_baseline",
+          "legend_label": "Baseline",
+          "points": [
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "bp4_baseline"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.03
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p003.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p003.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p003.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p003.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p003.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p003.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p003"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "bp4_baseline"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.04
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p004.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p004.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p004.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p004.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p004.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p004.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p004"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "bp4_baseline"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.05
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p005.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p005.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p005.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p005.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p005.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p005.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p005"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "bp4_baseline"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.06
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p006.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p006.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p006.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p006.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p006.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p006.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p006"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "bp4_baseline"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.07
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p007.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p007.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p007.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p007.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p007.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p007.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p007"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "bp4_baseline"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.08
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p008.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p008.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p008.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p008.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p008.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p008.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p008"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "bp4_baseline"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.09
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p009.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p009.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p009.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p009.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p009.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p009.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p009"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "bp4_baseline"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.1
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p010.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p010.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p010.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p010.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p010.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_baseline.p010.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p010"
+            }
+          ],
+          "role": "baseline"
+        },
+        {
+          "curve_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4",
+          "legend_label": "K = 16, \u0394 = 2, L = 4",
+          "points": [
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "bp4_asced_k16_delta2_l4"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.03
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p003.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p003.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p003.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p003.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p003.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p003.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p003"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "bp4_asced_k16_delta2_l4"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.04
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p004.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p004.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p004.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p004.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p004.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p004.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p004"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "bp4_asced_k16_delta2_l4"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.05
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p005.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p005.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p005.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p005.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p005.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p005.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p005"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "bp4_asced_k16_delta2_l4"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.06
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p006.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p006.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p006.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p006.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p006.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p006.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p006"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "bp4_asced_k16_delta2_l4"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.07
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p007.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p007.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p007.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p007.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p007.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p007.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p007"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "bp4_asced_k16_delta2_l4"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.08
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p008.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p008.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p008.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p008.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p008.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p008.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p008"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "bp4_asced_k16_delta2_l4"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.09
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p009.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p009.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p009.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p009.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p009.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p009.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p009"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "bp4_asced_k16_delta2_l4"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.1
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p010.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p010.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p010.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p010.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p010.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p010.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p010"
+            }
+          ],
+          "role": "variant"
+        }
+      ],
+      "decoder_settings": {
+        "status": "resolved",
+        "value": {
+          "Delta": 2,
+          "K": 16,
+          "L": 4,
+          "baseline": "BP4",
+          "iterations": 25,
+          "variant": "BP4-aSCED"
+        }
+      },
+      "member_id": "asced-figure2-gb46-ordinary",
+      "source_denominator": {
+        "blocker_id": "asced-figure2-gb46-ordinary.source_denominator",
+        "status": "blocked"
+      },
+      "stopping_rule": {
+        "status": "resolved",
+        "value": {
+          "maximum_trials": 1000000,
+          "minimum_logical_errors": 400
+        }
+      },
+      "target_slot": "figure2-gb46-ordinary-bp4-versus-asced"
+    },
+    {
+      "construction": "overcomplete",
+      "curves": [
+        {
+          "curve_id": "asced-figure2-gb46-overcomplete.obp4_baseline",
+          "legend_label": "Baseline",
+          "points": [
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "obp4_baseline"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.03
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p003.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p003.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p003.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p003.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p003.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p003.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p003"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "obp4_baseline"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.04
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p004.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p004.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p004.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p004.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p004.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p004.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p004"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "obp4_baseline"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.05
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p005.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p005.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p005.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p005.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p005.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p005.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p005"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "obp4_baseline"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.06
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p006.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p006.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p006.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p006.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p006.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p006.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p006"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "obp4_baseline"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.07
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p007.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p007.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p007.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p007.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p007.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p007.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p007"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "obp4_baseline"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.08
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p008.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p008.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p008.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p008.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p008.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p008.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p008"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "obp4_baseline"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.09
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p009.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p009.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p009.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p009.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p009.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p009.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p009"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "obp4_baseline"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.1
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p010.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p010.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p010.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p010.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p010.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_baseline.p010.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p010"
+            }
+          ],
+          "role": "baseline"
+        },
+        {
+          "curve_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4",
+          "legend_label": "K = 16, \u0394 = 2, L = 4",
+          "points": [
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "obp4_asced_k16_delta2_l4"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.03
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p003.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p003.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p003.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p003.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p003.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p003.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p003"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "obp4_asced_k16_delta2_l4"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.04
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p004.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p004.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p004.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p004.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p004.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p004.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p004"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "obp4_asced_k16_delta2_l4"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.05
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p005.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p005.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p005.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p005.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p005.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p005.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p005"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "obp4_asced_k16_delta2_l4"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.06
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p006.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p006.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p006.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p006.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p006.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p006.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p006"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "obp4_asced_k16_delta2_l4"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.07
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p007.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p007.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p007.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p007.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p007.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p007.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p007"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "obp4_asced_k16_delta2_l4"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.08
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p008.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p008.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p008.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p008.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p008.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p008.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p008"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "obp4_asced_k16_delta2_l4"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.09
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p009.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p009.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p009.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p009.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p009.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p009.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p009"
+            },
+            {
+              "bindings": {
+                "axis_definitions": {
+                  "status": "resolved",
+                  "value": {
+                    "x": "p_linear",
+                    "y": "LER_log10"
+                  }
+                },
+                "figure_locator": {
+                  "status": "resolved",
+                  "value": {
+                    "figure": "Figure 2",
+                    "page": 4,
+                    "panel": "GB46"
+                  }
+                },
+                "legend_mapping": {
+                  "status": "resolved",
+                  "value": "obp4_asced_k16_delta2_l4"
+                },
+                "source_crop": {
+                  "status": "resolved",
+                  "value": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0"
+                },
+                "source_snapshot": {
+                  "status": "resolved",
+                  "value": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5"
+                }
+              },
+              "declared_x": {
+                "status": "resolved",
+                "value": {
+                  "parameter": "p",
+                  "value": 0.1
+                }
+              },
+              "evidence_fields": {
+                "axis_calibration_anchors": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p010.axis_calibration_anchors",
+                  "status": "blocked"
+                },
+                "digitization_uncertainty": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p010.digitization_uncertainty",
+                  "status": "blocked"
+                },
+                "extraction_tool_operator": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p010.extraction_tool_operator",
+                  "status": "blocked"
+                },
+                "raw_click_coordinates": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p010.raw_click_coordinates",
+                  "status": "blocked"
+                },
+                "tolerance": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p010.tolerance",
+                  "status": "blocked"
+                },
+                "transformed_coordinate_interval": {
+                  "blocker_id": "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p010.transformed_coordinate_interval",
+                  "status": "blocked"
+                }
+              },
+              "point_id": "p010"
+            }
+          ],
+          "role": "variant"
+        }
+      ],
+      "decoder_settings": {
+        "status": "resolved",
+        "value": {
+          "Delta": 2,
+          "K": 16,
+          "L": 4,
+          "baseline": "OBP4",
+          "iterations": 12,
+          "p0": 0.3,
+          "variant": "OBP4-aSCED"
+        }
+      },
+      "member_id": "asced-figure2-gb46-overcomplete",
+      "source_denominator": {
+        "blocker_id": "asced-figure2-gb46-overcomplete.source_denominator",
+        "status": "blocked"
+      },
+      "stopping_rule": {
+        "status": "resolved",
+        "value": {
+          "maximum_trials": 1000000,
+          "minimum_logical_errors": 400
+        }
+      },
+      "target_slot": "figure2-gb46-overcomplete-obp4-versus-asced"
+    }
+  ],
+  "native_route": {
+    "canonical_fidelity": "canonical_adaptation",
+    "matched_input_status": "unavailable",
+    "qualification_relative_path": "data/native/phase11-asced-matched-input-qualification.json",
+    "qualification_sha256": "58eae2ac80ca68e359c4ca68fbf100e466b48ce896e8c5859ae139901cd38583",
+    "source_fidelity_claim": "none",
+    "terminal": "declined_unavailable"
+  },
+  "numerical_conventions": {
+    "metric": "logical_error_rate",
+    "source_curve_coordinates": "not inferred from rendered plot before human review",
+    "source_pauli_channel": "depolarizing"
+  },
+  "resource_bound": {
+    "execution_authorized": false,
+    "reason": "candidate review package cannot authorize execution",
+    "source_shots_admitted": 0
+  },
+  "review_state": "pending_human_review",
+  "schema": "phase11_asced_figure2_review_v1",
+  "source_crop": {
+    "relative_path": "data/source-targets/phase11-asced-figure2-crop.png",
+    "render_scale": 4,
+    "rendered_dimensions": [
+      1020,
+      880
+    ],
+    "sha256": "e9f8ddb7d2d65ffd4deee1d0eec0d874fd38c011e0ac3783c9ca5b62b5e6abb0",
+    "source_page": 4,
+    "source_page_rect_points": [
+      300.0,
+      55.0,
+      555.0,
+      275.0
+    ]
+  },
+  "source_snapshot": {
+    "integrity_statement": "sha256_integrity_linkage_not_authorship_v1",
+    "revision": "arXiv:2605.06547v2",
+    "sha256": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5",
+    "uri": "https://arxiv.org/pdf/2605.06547v2"
+  },
+  "target_binding": {
+    "target_document_sha256": "e9875959e02da790acfdeb1979c9bf402e3a03f8f9ba5d61900ee24d9644c03a",
+    "target_membership": [
+      "asced-figure2-gb46-ordinary",
+      "asced-figure2-gb46-overcomplete"
+    ],
+    "target_receipt_sha256": "b136b0aa81cc67bca48fc2bdfdb444f51cb6e77d9dd78715094252fece224013",
+    "target_relative_path": "data/source-targets/phase11-asced-figure2-gb46.json"
+  },
+  "unresolved_field_ids": [
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p003.axis_calibration_anchors",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p003.digitization_uncertainty",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p003.extraction_tool_operator",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p003.raw_click_coordinates",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p003.tolerance",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p003.transformed_coordinate_interval",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p004.axis_calibration_anchors",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p004.digitization_uncertainty",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p004.extraction_tool_operator",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p004.raw_click_coordinates",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p004.tolerance",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p004.transformed_coordinate_interval",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p005.axis_calibration_anchors",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p005.digitization_uncertainty",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p005.extraction_tool_operator",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p005.raw_click_coordinates",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p005.tolerance",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p005.transformed_coordinate_interval",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p006.axis_calibration_anchors",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p006.digitization_uncertainty",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p006.extraction_tool_operator",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p006.raw_click_coordinates",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p006.tolerance",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p006.transformed_coordinate_interval",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p007.axis_calibration_anchors",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p007.digitization_uncertainty",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p007.extraction_tool_operator",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p007.raw_click_coordinates",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p007.tolerance",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p007.transformed_coordinate_interval",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p008.axis_calibration_anchors",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p008.digitization_uncertainty",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p008.extraction_tool_operator",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p008.raw_click_coordinates",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p008.tolerance",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p008.transformed_coordinate_interval",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p009.axis_calibration_anchors",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p009.digitization_uncertainty",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p009.extraction_tool_operator",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p009.raw_click_coordinates",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p009.tolerance",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p009.transformed_coordinate_interval",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p010.axis_calibration_anchors",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p010.digitization_uncertainty",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p010.extraction_tool_operator",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p010.raw_click_coordinates",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p010.tolerance",
+    "asced-figure2-gb46-ordinary.bp4_asced_k16_delta2_l4.p010.transformed_coordinate_interval",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p003.axis_calibration_anchors",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p003.digitization_uncertainty",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p003.extraction_tool_operator",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p003.raw_click_coordinates",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p003.tolerance",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p003.transformed_coordinate_interval",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p004.axis_calibration_anchors",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p004.digitization_uncertainty",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p004.extraction_tool_operator",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p004.raw_click_coordinates",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p004.tolerance",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p004.transformed_coordinate_interval",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p005.axis_calibration_anchors",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p005.digitization_uncertainty",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p005.extraction_tool_operator",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p005.raw_click_coordinates",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p005.tolerance",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p005.transformed_coordinate_interval",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p006.axis_calibration_anchors",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p006.digitization_uncertainty",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p006.extraction_tool_operator",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p006.raw_click_coordinates",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p006.tolerance",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p006.transformed_coordinate_interval",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p007.axis_calibration_anchors",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p007.digitization_uncertainty",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p007.extraction_tool_operator",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p007.raw_click_coordinates",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p007.tolerance",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p007.transformed_coordinate_interval",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p008.axis_calibration_anchors",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p008.digitization_uncertainty",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p008.extraction_tool_operator",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p008.raw_click_coordinates",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p008.tolerance",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p008.transformed_coordinate_interval",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p009.axis_calibration_anchors",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p009.digitization_uncertainty",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p009.extraction_tool_operator",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p009.raw_click_coordinates",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p009.tolerance",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p009.transformed_coordinate_interval",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p010.axis_calibration_anchors",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p010.digitization_uncertainty",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p010.extraction_tool_operator",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p010.raw_click_coordinates",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p010.tolerance",
+    "asced-figure2-gb46-ordinary.bp4_baseline.p010.transformed_coordinate_interval",
+    "asced-figure2-gb46-ordinary.source_denominator",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p003.axis_calibration_anchors",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p003.digitization_uncertainty",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p003.extraction_tool_operator",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p003.raw_click_coordinates",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p003.tolerance",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p003.transformed_coordinate_interval",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p004.axis_calibration_anchors",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p004.digitization_uncertainty",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p004.extraction_tool_operator",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p004.raw_click_coordinates",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p004.tolerance",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p004.transformed_coordinate_interval",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p005.axis_calibration_anchors",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p005.digitization_uncertainty",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p005.extraction_tool_operator",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p005.raw_click_coordinates",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p005.tolerance",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p005.transformed_coordinate_interval",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p006.axis_calibration_anchors",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p006.digitization_uncertainty",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p006.extraction_tool_operator",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p006.raw_click_coordinates",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p006.tolerance",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p006.transformed_coordinate_interval",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p007.axis_calibration_anchors",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p007.digitization_uncertainty",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p007.extraction_tool_operator",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p007.raw_click_coordinates",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p007.tolerance",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p007.transformed_coordinate_interval",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p008.axis_calibration_anchors",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p008.digitization_uncertainty",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p008.extraction_tool_operator",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p008.raw_click_coordinates",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p008.tolerance",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p008.transformed_coordinate_interval",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p009.axis_calibration_anchors",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p009.digitization_uncertainty",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p009.extraction_tool_operator",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p009.raw_click_coordinates",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p009.tolerance",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p009.transformed_coordinate_interval",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p010.axis_calibration_anchors",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p010.digitization_uncertainty",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p010.extraction_tool_operator",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p010.raw_click_coordinates",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p010.tolerance",
+    "asced-figure2-gb46-overcomplete.obp4_asced_k16_delta2_l4.p010.transformed_coordinate_interval",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p003.axis_calibration_anchors",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p003.digitization_uncertainty",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p003.extraction_tool_operator",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p003.raw_click_coordinates",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p003.tolerance",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p003.transformed_coordinate_interval",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p004.axis_calibration_anchors",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p004.digitization_uncertainty",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p004.extraction_tool_operator",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p004.raw_click_coordinates",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p004.tolerance",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p004.transformed_coordinate_interval",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p005.axis_calibration_anchors",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p005.digitization_uncertainty",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p005.extraction_tool_operator",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p005.raw_click_coordinates",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p005.tolerance",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p005.transformed_coordinate_interval",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p006.axis_calibration_anchors",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p006.digitization_uncertainty",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p006.extraction_tool_operator",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p006.raw_click_coordinates",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p006.tolerance",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p006.transformed_coordinate_interval",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p007.axis_calibration_anchors",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p007.digitization_uncertainty",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p007.extraction_tool_operator",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p007.raw_click_coordinates",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p007.tolerance",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p007.transformed_coordinate_interval",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p008.axis_calibration_anchors",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p008.digitization_uncertainty",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p008.extraction_tool_operator",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p008.raw_click_coordinates",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p008.tolerance",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p008.transformed_coordinate_interval",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p009.axis_calibration_anchors",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p009.digitization_uncertainty",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p009.extraction_tool_operator",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p009.raw_click_coordinates",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p009.tolerance",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p009.transformed_coordinate_interval",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p010.axis_calibration_anchors",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p010.digitization_uncertainty",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p010.extraction_tool_operator",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p010.raw_click_coordinates",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p010.tolerance",
+    "asced-figure2-gb46-overcomplete.obp4_baseline.p010.transformed_coordinate_interval",
+    "asced-figure2-gb46-overcomplete.source_denominator"
+  ]
+}
