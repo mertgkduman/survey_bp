@@ -698,7 +698,7 @@ Plans:
 3. Source-backed compatible policy ablations produce replayable results, outcome/work analysis and discrepancy records, with no forced assumption that every binary policy has a faithful quaternary counterpart.
 
 **Research focus:** Quaternary paper targets and native-code availability, matched baseline priors, correlated-noise ablations, and kernel-aware cost comparisons.
-**Plans:** 15/15 plans executed
+**Plans:** 15 original plans executed; 10 gap-closure plans planned after verification found open QEV-01/QEV-02 evidence gaps.
 
 Plans:
 
@@ -737,6 +737,31 @@ Plans:
 **Wave 7** *(blocked on Wave 6 completion)*
 
 - [x] 11-14-PLAN.md — Publish the verified Phase 11 source and controlled assessment index.
+
+**Gap closure Wave 1**
+
+- [ ] 11-16-PLAN.md — Implement the declared controlled evaluation receipt contract.
+- [ ] 11-18-PLAN.md — Prepare and review the aSCED Figure 2 source target.
+- [ ] 11-19-PLAN.md — Prepare and review Q-BPGD Figure 7 source equivalence.
+- [ ] 11-20-PLAN.md — Prepare and review an MBP4 statistical curve target.
+
+**Gap closure Wave 2** *(blocked on source reviews)*
+
+- [ ] 11-17-PLAN.md — Complete three-anchor policy replay and derive qualified method comparisons.
+- [ ] 11-21-PLAN.md — Measure site limits and profiles and assemble an exact-digest proposal.
+
+**Gap closure Wave 3** *(blocked on Wave 2 resource qualification)*
+
+- [ ] 11-22-PLAN.md — Enforce readiness before an explicit digest-scoped authorization decision.
+
+**Gap closure Wave 4** *(blocked on Wave 3 authorization outcome)*
+
+- [ ] 11-23-PLAN.md — Execute or explicitly close reviewed source campaigns.
+- [ ] 11-24-PLAN.md — Execute or explicitly close joint-versus-separate paired campaigns.
+
+**Gap closure Wave 5** *(blocked on Wave 4 evidence)*
+
+- [ ] 11-25-PLAN.md — Rebuild and deeply verify the final Phase 11 assessment.
 
 ### Phase 12: Circuit Models and Canonical Integration
 
