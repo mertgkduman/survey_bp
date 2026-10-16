@@ -14,6 +14,28 @@ PROVENANCE = Path("data/artifacts/quaternary-a5.provenance.json")
 TARGET = Path("data/source-targets/phase11-qbpgd-figure7-a5.json")
 MANIFEST = Path("data/manifests/phase11-qbpgd-figure7-a5.json")
 STUDY = Path("scripts/run_phase11_source_studies.py")
+ROOT = Path(__file__).resolve().parents[1]
+REVIEW_SCRIPT = ROOT / "scripts/review_phase11_qbpgd_figure7.py"
+REVIEW = ROOT / "data/source-targets/phase11-qbpgd-figure7-review.json"
+
+REQUIRED_REVIEW_FIELDS = {
+    "message_lifecycle",
+    "update_and_tie_order",
+    "normalization",
+    "fixation_and_decimation",
+    "update_equations",
+    "curve_panel_identity",
+    *(f"coordinate_p_{point:0.02f}" for point in (0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10)),
+    "digitization_uncertainty",
+    "tolerance",
+    "a5_construction",
+    "figure_settings",
+    "author_implementation_identity",
+    "stopping_rule",
+    "denominator",
+    "numerical_conventions",
+    "source_route_fidelity",
+}
 
 
 def test_a5_tracer_reconstructs_the_official_polynomial_css_artifact():
@@ -121,3 +143,102 @@ def test_figure7_verifier_rejects_resigned_qualification_claim(tmp_path: Path):
     verify = _run("verify", "--target", str(TARGET), "--manifest", str(MANIFEST), "--assessment", str(assessment))
     assert verify.returncode == 2
     assert "qualification deterministic evidence" in verify.stderr
+
+
+def _verify_review(review: Path = REVIEW) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [sys.executable, str(REVIEW_SCRIPT), "verify-candidate", "--review", str(review)],
+        cwd=ROOT,
+        check=False,
+        text=True,
+        capture_output=True,
+    )
+
+
+def _redigest_review(review: dict[str, object]) -> None:
+    review["review_digest"] = sha256(
+        json.dumps(
+            {key: value for key, value in review.items() if key != "review_digest"},
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode()
+    ).hexdigest()
+
+
+def test_figure7_review_covers_every_required_field_without_authorizing_execution():
+    result = _verify_review()
+    assert result.returncode == 0, result.stderr
+    review = json.loads(REVIEW.read_text(encoding="utf-8"))
+    assert review["review_decision"] == "pending_human_review"
+    assert review["authorizes_execution"] is False
+    entries = {entry["field_id"]: entry for entry in review["evidence_entries"]}
+    assert set(entries) == REQUIRED_REVIEW_FIELDS
+    for field_id, entry in entries.items():
+        assert entry["source"]["sha256"]
+        assert entry["locator"]["kind"] in {"primary_pdf", "authoritative_source"}
+        assert entry["locator"]["page"] >= 1
+        assert entry["excerpt_sha256"]
+        assert entry["normalized_interpretation"]
+        assert entry["compatibility_verdict"] in {"compatible", "unresolved", "incompatible"}
+        assert entry["reviewer_state"] == "pending_human_review", field_id
+
+
+def test_figure7_review_blocks_canonical_interpretation_inheritance_and_source_shots():
+    review = json.loads(REVIEW.read_text(encoding="utf-8"))
+    entries = {entry["field_id"]: entry for entry in review["evidence_entries"]}
+    for field_id in {
+        "message_lifecycle",
+        "update_and_tie_order",
+        "normalization",
+        "curve_panel_identity",
+        "digitization_uncertainty",
+        "tolerance",
+        "author_implementation_identity",
+        "numerical_conventions",
+        "source_route_fidelity",
+    }:
+        assert entries[field_id]["compatibility_verdict"] == "unresolved"
+        assert entries[field_id]["discrepancy_or_blocker"]
+    assert review["proposed_fidelity"] == "canonical_adaptation"
+    assert review["source_execution"]["admitted_shots"] == 0
+    assert review["source_execution"]["eligible"] is False
+    for point in (0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10):
+        bindings = entries[f"coordinate_p_{point:0.02f}"]["details"]["evidence_bindings"]
+        assert set(bindings) == {
+            "settings_field_id",
+            "author_identity_field_id",
+            "stopping_field_id",
+            "denominator_field_id",
+            "uncertainty_field_id",
+            "tolerance_field_id",
+        }
+
+
+def test_figure7_review_verifier_rejects_drift_and_non_primary_evidence(tmp_path: Path):
+    review = json.loads(REVIEW.read_text(encoding="utf-8"))
+    review["a5"]["artifact_raw_sha256"] = "0" * 64
+    review["authorizes_execution"] = True
+    _redigest_review(review)
+    tampered = tmp_path / "tampered-review.json"
+    tampered.write_text(json.dumps(review), encoding="utf-8")
+    result = _verify_review(tampered)
+    assert result.returncode != 0
+    assert "A5" in result.stderr or "authorizing" in result.stderr
+
+    review = json.loads(REVIEW.read_text(encoding="utf-8"))
+    review["evidence_entries"] = review["evidence_entries"][1:]
+    _redigest_review(review)
+    missing = tmp_path / "missing-field.json"
+    missing.write_text(json.dumps(review), encoding="utf-8")
+    result = _verify_review(missing)
+    assert result.returncode != 0
+    assert "coverage" in result.stderr
+
+    review = json.loads(REVIEW.read_text(encoding="utf-8"))
+    review["evidence_entries"][0]["locator"]["kind"] = "search_result"
+    _redigest_review(review)
+    non_primary = tmp_path / "non-primary.json"
+    non_primary.write_text(json.dumps(review), encoding="utf-8")
+    result = _verify_review(non_primary)
+    assert result.returncode != 0
+    assert "locator" in result.stderr

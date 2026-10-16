@@ -1,0 +1,713 @@
+{
+  "a5": {
+    "artifact_provenance_sha256": "307e954408c7968be084bfe14e395b9c5d518718c673aa14ac007cd544ddc845",
+    "artifact_raw_sha256": "ccdc45572ac867ce80c13f04d1e1108996e699805a4a7a55fbcc80e98506dd1c",
+    "distance_status": {
+      "independently_verified": false,
+      "status": "source_reported_bounds",
+      "value": "15<=d<=18"
+    },
+    "provenance_semantic_sha256": "2c77c863501833d722e5b52a4d225d2524663caf820fcb019431ef663ec7f53d",
+    "source_snapshot_sha256": "139a695295d1392f82a65977c28eb41e43169efc68ff00d87978832cf8c5b693",
+    "target_receipt_sha256": "96a83d407555e498334c3fdda8bb5da73050d30b192d7f9853a5785bfe7dd8b4"
+  },
+  "authorizes_execution": false,
+  "evidence_entries": [
+    {
+      "compatibility_verdict": "compatible",
+      "confidence": "high",
+      "discrepancy_or_blocker": null,
+      "excerpt": "l=90; a(x)=1+x^28+x^80+x^89; b(x)=1+x^2+x^21+x^25; Hx=[A|B] and Hz=[B^T|A^T].",
+      "excerpt_sha256": "f23d4b114283771bc6311a9608b5b5deaa49e123d0868b165cccffdf90f777af",
+      "field_id": "a5_construction",
+      "locator": {
+        "anchor": "Official A5 source transcription recorded in quaternary-a5.provenance.json",
+        "kind": "authoritative_source",
+        "page": 1
+      },
+      "normalized_interpretation": "The frozen project A5 artifact is reconstructed from the official polynomial source; its distance remains source-reported bounds, not independently re-proven here.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Official A5 source definition, arXiv:1904.02703v3",
+        "id": "a5-official-polynomial-transcription",
+        "sha256": "139a695295d1392f82a65977c28eb41e43169efc68ff00d87978832cf8c5b693",
+        "uri": "https://arxiv.org/src/1904.02703v3"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "confidence": "high",
+      "discrepancy_or_blocker": "author_implementation_identity_unverified; name-only existence is insufficient under T-11-19A.",
+      "excerpt": "In our software implementation for the simulation results in this section, we set epsilon = 1 x 10^-10 for numerical stability.",
+      "excerpt_sha256": "2e026f8987418bf5278272dde0d40e4e00b9a35297eb4ea4009ae0c1b1ed7a1b",
+      "field_id": "author_implementation_identity",
+      "locator": {
+        "anchor": "Section 6 implementation statement",
+        "kind": "primary_pdf",
+        "page": 14
+      },
+      "normalized_interpretation": "The paper establishes that an implementation existed and names epsilon, but provides no repository URL, revision, artifact digest, or executable identity for it.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Yao et al., Q-BPGD v2, arXiv:2312.10950v2",
+        "id": "yao-2023-qbpgd-v2-pdf",
+        "path": "/tmp/phase11-qbpgd-v2.pdf",
+        "sha256": "cdc0af68a2edb55ab8c961989333258aac2cb8e30b7943a14c076dab4e719404"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "confidence": "high",
+      "details": {
+        "curves": {
+          "bp_osd_10": {
+            "status": "third_party_ref_15_not_a_qbpgd_target"
+          },
+          "qbp": {
+            "extraction_interval": null,
+            "status": "blocked_metadata",
+            "y": null
+          },
+          "qbpgd": {
+            "extraction_interval": null,
+            "status": "blocked_metadata",
+            "y": null
+          }
+        },
+        "evidence_bindings": {
+          "author_identity_field_id": "author_implementation_identity",
+          "denominator_field_id": "denominator",
+          "settings_field_id": "figure_settings",
+          "stopping_field_id": "stopping_rule",
+          "tolerance_field_id": "tolerance",
+          "uncertainty_field_id": "digitization_uncertainty"
+        },
+        "p": 0.04
+      },
+      "discrepancy_or_blocker": "figure7_y_coordinate_unreviewed_at_p_0.04; no plotted ordinate or extraction interval is admitted.",
+      "excerpt": "Figure 7 x-axis includes the displayed probability tick 0.04 and curves for Q-BP and Q-BPGD, T = 10.",
+      "excerpt_sha256": "b320f2d955bccb27982d21786fa324b32ee62a6d6623b9030969e821f8504842",
+      "field_id": "coordinate_p_0.04",
+      "locator": {
+        "anchor": "Figure 7 x-axis tick and plotted curves",
+        "kind": "primary_pdf",
+        "page": 15
+      },
+      "normalized_interpretation": "x=0.04 is a displayed Figure 7 point location; neither Q-BP nor Q-BPGD y-coordinate or extraction interval is entered without reviewed digitization.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Yao et al., Q-BPGD v2, arXiv:2312.10950v2",
+        "id": "yao-2023-qbpgd-v2-pdf",
+        "path": "/tmp/phase11-qbpgd-v2.pdf",
+        "sha256": "cdc0af68a2edb55ab8c961989333258aac2cb8e30b7943a14c076dab4e719404"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "confidence": "high",
+      "details": {
+        "curves": {
+          "bp_osd_10": {
+            "status": "third_party_ref_15_not_a_qbpgd_target"
+          },
+          "qbp": {
+            "extraction_interval": null,
+            "status": "blocked_metadata",
+            "y": null
+          },
+          "qbpgd": {
+            "extraction_interval": null,
+            "status": "blocked_metadata",
+            "y": null
+          }
+        },
+        "evidence_bindings": {
+          "author_identity_field_id": "author_implementation_identity",
+          "denominator_field_id": "denominator",
+          "settings_field_id": "figure_settings",
+          "stopping_field_id": "stopping_rule",
+          "tolerance_field_id": "tolerance",
+          "uncertainty_field_id": "digitization_uncertainty"
+        },
+        "p": 0.05
+      },
+      "discrepancy_or_blocker": "figure7_y_coordinate_unreviewed_at_p_0.05; no plotted ordinate or extraction interval is admitted.",
+      "excerpt": "Figure 7 x-axis includes the displayed probability tick 0.05 and curves for Q-BP and Q-BPGD, T = 10.",
+      "excerpt_sha256": "fd959b068f19560eef5097fd864d02f2086e1501c2ebd94d2bac420e313d6550",
+      "field_id": "coordinate_p_0.05",
+      "locator": {
+        "anchor": "Figure 7 x-axis tick and plotted curves",
+        "kind": "primary_pdf",
+        "page": 15
+      },
+      "normalized_interpretation": "x=0.05 is a displayed Figure 7 point location; neither Q-BP nor Q-BPGD y-coordinate or extraction interval is entered without reviewed digitization.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Yao et al., Q-BPGD v2, arXiv:2312.10950v2",
+        "id": "yao-2023-qbpgd-v2-pdf",
+        "path": "/tmp/phase11-qbpgd-v2.pdf",
+        "sha256": "cdc0af68a2edb55ab8c961989333258aac2cb8e30b7943a14c076dab4e719404"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "confidence": "high",
+      "details": {
+        "curves": {
+          "bp_osd_10": {
+            "status": "third_party_ref_15_not_a_qbpgd_target"
+          },
+          "qbp": {
+            "extraction_interval": null,
+            "status": "blocked_metadata",
+            "y": null
+          },
+          "qbpgd": {
+            "extraction_interval": null,
+            "status": "blocked_metadata",
+            "y": null
+          }
+        },
+        "evidence_bindings": {
+          "author_identity_field_id": "author_implementation_identity",
+          "denominator_field_id": "denominator",
+          "settings_field_id": "figure_settings",
+          "stopping_field_id": "stopping_rule",
+          "tolerance_field_id": "tolerance",
+          "uncertainty_field_id": "digitization_uncertainty"
+        },
+        "p": 0.06
+      },
+      "discrepancy_or_blocker": "figure7_y_coordinate_unreviewed_at_p_0.06; no plotted ordinate or extraction interval is admitted.",
+      "excerpt": "Figure 7 x-axis includes the displayed probability tick 0.06 and curves for Q-BP and Q-BPGD, T = 10.",
+      "excerpt_sha256": "b1693b9f8aad6641cf2babd0d0bdef3bdb5c68bfa2c38fc857908fc649e0b9b1",
+      "field_id": "coordinate_p_0.06",
+      "locator": {
+        "anchor": "Figure 7 x-axis tick and plotted curves",
+        "kind": "primary_pdf",
+        "page": 15
+      },
+      "normalized_interpretation": "x=0.06 is a displayed Figure 7 point location; neither Q-BP nor Q-BPGD y-coordinate or extraction interval is entered without reviewed digitization.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Yao et al., Q-BPGD v2, arXiv:2312.10950v2",
+        "id": "yao-2023-qbpgd-v2-pdf",
+        "path": "/tmp/phase11-qbpgd-v2.pdf",
+        "sha256": "cdc0af68a2edb55ab8c961989333258aac2cb8e30b7943a14c076dab4e719404"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "confidence": "high",
+      "details": {
+        "curves": {
+          "bp_osd_10": {
+            "status": "third_party_ref_15_not_a_qbpgd_target"
+          },
+          "qbp": {
+            "extraction_interval": null,
+            "status": "blocked_metadata",
+            "y": null
+          },
+          "qbpgd": {
+            "extraction_interval": null,
+            "status": "blocked_metadata",
+            "y": null
+          }
+        },
+        "evidence_bindings": {
+          "author_identity_field_id": "author_implementation_identity",
+          "denominator_field_id": "denominator",
+          "settings_field_id": "figure_settings",
+          "stopping_field_id": "stopping_rule",
+          "tolerance_field_id": "tolerance",
+          "uncertainty_field_id": "digitization_uncertainty"
+        },
+        "p": 0.07
+      },
+      "discrepancy_or_blocker": "figure7_y_coordinate_unreviewed_at_p_0.07; no plotted ordinate or extraction interval is admitted.",
+      "excerpt": "Figure 7 x-axis includes the displayed probability tick 0.07 and curves for Q-BP and Q-BPGD, T = 10.",
+      "excerpt_sha256": "421e600e1ff1ab8e4cc1e908a4085885e37d58462ad6a7ba4fecf681e2a6c42b",
+      "field_id": "coordinate_p_0.07",
+      "locator": {
+        "anchor": "Figure 7 x-axis tick and plotted curves",
+        "kind": "primary_pdf",
+        "page": 15
+      },
+      "normalized_interpretation": "x=0.07 is a displayed Figure 7 point location; neither Q-BP nor Q-BPGD y-coordinate or extraction interval is entered without reviewed digitization.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Yao et al., Q-BPGD v2, arXiv:2312.10950v2",
+        "id": "yao-2023-qbpgd-v2-pdf",
+        "path": "/tmp/phase11-qbpgd-v2.pdf",
+        "sha256": "cdc0af68a2edb55ab8c961989333258aac2cb8e30b7943a14c076dab4e719404"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "confidence": "high",
+      "details": {
+        "curves": {
+          "bp_osd_10": {
+            "status": "third_party_ref_15_not_a_qbpgd_target"
+          },
+          "qbp": {
+            "extraction_interval": null,
+            "status": "blocked_metadata",
+            "y": null
+          },
+          "qbpgd": {
+            "extraction_interval": null,
+            "status": "blocked_metadata",
+            "y": null
+          }
+        },
+        "evidence_bindings": {
+          "author_identity_field_id": "author_implementation_identity",
+          "denominator_field_id": "denominator",
+          "settings_field_id": "figure_settings",
+          "stopping_field_id": "stopping_rule",
+          "tolerance_field_id": "tolerance",
+          "uncertainty_field_id": "digitization_uncertainty"
+        },
+        "p": 0.08
+      },
+      "discrepancy_or_blocker": "figure7_y_coordinate_unreviewed_at_p_0.08; no plotted ordinate or extraction interval is admitted.",
+      "excerpt": "Figure 7 x-axis includes the displayed probability tick 0.08 and curves for Q-BP and Q-BPGD, T = 10.",
+      "excerpt_sha256": "6493994ead2a2717c91928fa397deef348688be8b937e8d4e472f80de08355f9",
+      "field_id": "coordinate_p_0.08",
+      "locator": {
+        "anchor": "Figure 7 x-axis tick and plotted curves",
+        "kind": "primary_pdf",
+        "page": 15
+      },
+      "normalized_interpretation": "x=0.08 is a displayed Figure 7 point location; neither Q-BP nor Q-BPGD y-coordinate or extraction interval is entered without reviewed digitization.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Yao et al., Q-BPGD v2, arXiv:2312.10950v2",
+        "id": "yao-2023-qbpgd-v2-pdf",
+        "path": "/tmp/phase11-qbpgd-v2.pdf",
+        "sha256": "cdc0af68a2edb55ab8c961989333258aac2cb8e30b7943a14c076dab4e719404"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "confidence": "high",
+      "details": {
+        "curves": {
+          "bp_osd_10": {
+            "status": "third_party_ref_15_not_a_qbpgd_target"
+          },
+          "qbp": {
+            "extraction_interval": null,
+            "status": "blocked_metadata",
+            "y": null
+          },
+          "qbpgd": {
+            "extraction_interval": null,
+            "status": "blocked_metadata",
+            "y": null
+          }
+        },
+        "evidence_bindings": {
+          "author_identity_field_id": "author_implementation_identity",
+          "denominator_field_id": "denominator",
+          "settings_field_id": "figure_settings",
+          "stopping_field_id": "stopping_rule",
+          "tolerance_field_id": "tolerance",
+          "uncertainty_field_id": "digitization_uncertainty"
+        },
+        "p": 0.09
+      },
+      "discrepancy_or_blocker": "figure7_y_coordinate_unreviewed_at_p_0.09; no plotted ordinate or extraction interval is admitted.",
+      "excerpt": "Figure 7 x-axis includes the displayed probability tick 0.09 and curves for Q-BP and Q-BPGD, T = 10.",
+      "excerpt_sha256": "0fefdca8ca3f9bbc9a7fe3ddae09289a84982f3db89acf1ca840f6cfd18cb0a8",
+      "field_id": "coordinate_p_0.09",
+      "locator": {
+        "anchor": "Figure 7 x-axis tick and plotted curves",
+        "kind": "primary_pdf",
+        "page": 15
+      },
+      "normalized_interpretation": "x=0.09 is a displayed Figure 7 point location; neither Q-BP nor Q-BPGD y-coordinate or extraction interval is entered without reviewed digitization.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Yao et al., Q-BPGD v2, arXiv:2312.10950v2",
+        "id": "yao-2023-qbpgd-v2-pdf",
+        "path": "/tmp/phase11-qbpgd-v2.pdf",
+        "sha256": "cdc0af68a2edb55ab8c961989333258aac2cb8e30b7943a14c076dab4e719404"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "confidence": "high",
+      "details": {
+        "curves": {
+          "bp_osd_10": {
+            "status": "third_party_ref_15_not_a_qbpgd_target"
+          },
+          "qbp": {
+            "extraction_interval": null,
+            "status": "blocked_metadata",
+            "y": null
+          },
+          "qbpgd": {
+            "extraction_interval": null,
+            "status": "blocked_metadata",
+            "y": null
+          }
+        },
+        "evidence_bindings": {
+          "author_identity_field_id": "author_implementation_identity",
+          "denominator_field_id": "denominator",
+          "settings_field_id": "figure_settings",
+          "stopping_field_id": "stopping_rule",
+          "tolerance_field_id": "tolerance",
+          "uncertainty_field_id": "digitization_uncertainty"
+        },
+        "p": 0.1
+      },
+      "discrepancy_or_blocker": "figure7_y_coordinate_unreviewed_at_p_0.10; no plotted ordinate or extraction interval is admitted.",
+      "excerpt": "Figure 7 x-axis includes the displayed probability tick 0.10 and curves for Q-BP and Q-BPGD, T = 10.",
+      "excerpt_sha256": "696587488d65e0c4a5f4518f12e89303cc6f66446ce61a400446a6f8a7a89c5b",
+      "field_id": "coordinate_p_0.10",
+      "locator": {
+        "anchor": "Figure 7 x-axis tick and plotted curves",
+        "kind": "primary_pdf",
+        "page": 15
+      },
+      "normalized_interpretation": "x=0.10 is a displayed Figure 7 point location; neither Q-BP nor Q-BPGD y-coordinate or extraction interval is entered without reviewed digitization.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Yao et al., Q-BPGD v2, arXiv:2312.10950v2",
+        "id": "yao-2023-qbpgd-v2-pdf",
+        "path": "/tmp/phase11-qbpgd-v2.pdf",
+        "sha256": "cdc0af68a2edb55ab8c961989333258aac2cb8e30b7943a14c076dab4e719404"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "confidence": "high",
+      "discrepancy_or_blocker": "Figure identity is resolved, but the Q-BP and Q-BPGD ordinate coordinates are not source-extracted or reviewed.",
+      "excerpt": "Performance of various decoders on the [[180, 10, 15 <= d <= 18]] A5 code over depolarizing noise; Q-BP and Q-BPGD have locally collected points, while BP-OSD-10 points are taken from [15, Figure 6].",
+      "excerpt_sha256": "ed174688df16f07f47f246142e1a9f6dbda134d1f10b339246ab7392b8d9fab5",
+      "field_id": "curve_panel_identity",
+      "locator": {
+        "anchor": "Figure 7 caption",
+        "kind": "primary_pdf",
+        "page": 15
+      },
+      "normalized_interpretation": "Figure 7 is the A5 depolarizing panel with Q-BP, Q-BPGD T=10, and third-party BP-OSD-10 series.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Yao et al., Q-BPGD v2, arXiv:2312.10950v2",
+        "id": "yao-2023-qbpgd-v2-pdf",
+        "path": "/tmp/phase11-qbpgd-v2.pdf",
+        "sha256": "cdc0af68a2edb55ab8c961989333258aac2cb8e30b7943a14c076dab4e719404"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "confidence": "high",
+      "discrepancy_or_blocker": "figure7_point_denominators_unreported; exact trial counts cannot be reconstructed from the figure.",
+      "excerpt": "The data points of Q-BP and Q-BPGD are collected by running simulations until we observe 100 error cases.",
+      "excerpt_sha256": "2d1a3094f81d942972b84943360a359763c5444f739ec43d7cafcbac28248a33",
+      "field_id": "denominator",
+      "locator": {
+        "anchor": "Figure 7 caption",
+        "kind": "primary_pdf",
+        "page": 15
+      },
+      "normalized_interpretation": "The paper reports an error-count stopping rule, but it does not report per-point trial denominators or a denominator convention in the Figure 7 caption.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Yao et al., Q-BPGD v2, arXiv:2312.10950v2",
+        "id": "yao-2023-qbpgd-v2-pdf",
+        "path": "/tmp/phase11-qbpgd-v2.pdf",
+        "sha256": "cdc0af68a2edb55ab8c961989333258aac2cb8e30b7943a14c076dab4e719404"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "confidence": "high",
+      "discrepancy_or_blocker": "digitization_uncertainty_unreviewed; no y-coordinate may be used as a source target.",
+      "excerpt": "The figure supplies a logarithmic Block Error Rate plot and x-axis labels from 0.04 through 0.10, without a numerical coordinate table.",
+      "excerpt_sha256": "571c01a382d9f11c0f9a3c9f372bd688d1c92f23cd0dc890d8162920e024e3b9",
+      "field_id": "digitization_uncertainty",
+      "locator": {
+        "anchor": "Figure 7 plotted panel",
+        "kind": "primary_pdf",
+        "page": 15
+      },
+      "normalized_interpretation": "No reviewed digitization method, image calibration, or ordinate interval is present in the source package.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Yao et al., Q-BPGD v2, arXiv:2312.10950v2",
+        "id": "yao-2023-qbpgd-v2-pdf",
+        "path": "/tmp/phase11-qbpgd-v2.pdf",
+        "sha256": "cdc0af68a2edb55ab8c961989333258aac2cb8e30b7943a14c076dab4e719404"
+      }
+    },
+    {
+      "compatibility_verdict": "compatible",
+      "confidence": "high",
+      "discrepancy_or_blocker": null,
+      "excerpt": "Figure 7 presents Q-BPGD with T=10 on A5 over depolarizing noise, compared with Q-BP T=100 and BP-OSD order 10 from [15, Figure 6].",
+      "excerpt_sha256": "d22a87d856a84b660b37f4a10f180a5b240dccbcd41687506b3d062eaf2ef2d8",
+      "field_id": "figure_settings",
+      "locator": {
+        "anchor": "Section 6 final paragraph before Figure 7",
+        "kind": "primary_pdf",
+        "page": 14
+      },
+      "normalized_interpretation": "The Figure 7 settings are frozen for review as A5/depolarizing, Q-BPGD T=10, Q-BP T=100, and third-party BP-OSD order 10.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Yao et al., Q-BPGD v2, arXiv:2312.10950v2",
+        "id": "yao-2023-qbpgd-v2-pdf",
+        "path": "/tmp/phase11-qbpgd-v2.pdf",
+        "sha256": "cdc0af68a2edb55ab8c961989333258aac2cb8e30b7943a14c076dab4e719404"
+      }
+    },
+    {
+      "compatibility_verdict": "compatible",
+      "confidence": "high",
+      "discrepancy_or_blocker": null,
+      "excerpt": "For r = 1 to n, run Q-BP for T iterations; on no syndrome match, select the most reliable undecimated node and replace its channel message by the epsilon fixation vector for the selected Pauli state.",
+      "excerpt_sha256": "3dc83a6ba937991a79d64b3f17a5eafc8a7cd783d2be4bebd2055b7a998a4fa6",
+      "field_id": "fixation_and_decimation",
+      "locator": {
+        "anchor": "Algorithm 3 lines 1-16; Eq. (42)",
+        "kind": "primary_pdf",
+        "page": 14
+      },
+      "normalized_interpretation": "Source-backed: at most n rounds, early syndrome stop, selection among undecimated variables, and epsilon=1e-10 literal fixation vectors.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Yao et al., Q-BPGD v2, arXiv:2312.10950v2",
+        "id": "yao-2023-qbpgd-v2-pdf",
+        "path": "/tmp/phase11-qbpgd-v2.pdf",
+        "sha256": "cdc0af68a2edb55ab8c961989333258aac2cb8e30b7943a14c076dab4e719404"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "confidence": "high",
+      "discrepancy_or_blocker": "continued_message_lifecycle_unresolved; D-14 persistence remains a project interpretation, not source evidence.",
+      "excerpt": "Q-BPGD iterates between Q-BP and decimation in rounds with r going from 1 to n, with early termination upon Q-BP convergence.",
+      "excerpt_sha256": "36790a280db80c12251c27d35ac8ba15866e87bf242ad6c7bf8f365cf7f026ef",
+      "field_id": "message_lifecycle",
+      "locator": {
+        "anchor": "Section 6 paragraph after Eq. (43); Algorithm 3 lines 3-15",
+        "kind": "primary_pdf",
+        "page": 14
+      },
+      "normalized_interpretation": "The source establishes rounds and early stopping but does not state whether Q-BP messages are reset or continued between rounds.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Yao et al., Q-BPGD v2, arXiv:2312.10950v2",
+        "id": "yao-2023-qbpgd-v2-pdf",
+        "path": "/tmp/phase11-qbpgd-v2.pdf",
+        "sha256": "cdc0af68a2edb55ab8c961989333258aac2cb8e30b7943a14c076dab4e719404"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "confidence": "high",
+      "discrepancy_or_blocker": "normalization_interface_unresolved; D-15 cannot be treated as a source-defined numerical convention.",
+      "excerpt": "Each variable node contains information of four normalized probabilities; the fixation vectors are written as (1-epsilon, epsilon, epsilon, epsilon).",
+      "excerpt_sha256": "1746b8f1189e4ad8537fbac58ee32a6a81606ee6960a7117eb04bf4bf26a4c0a",
+      "field_id": "normalization",
+      "locator": {
+        "anchor": "Eqs. (38)-(40); Algorithm 3 lines 1 and 10-14",
+        "kind": "primary_pdf",
+        "page": 14
+      },
+      "normalized_interpretation": "The paper names normalized node probabilities and literal fixation vectors but does not specify the message normalization interface used by the implementation.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Yao et al., Q-BPGD v2, arXiv:2312.10950v2",
+        "id": "yao-2023-qbpgd-v2-pdf",
+        "path": "/tmp/phase11-qbpgd-v2.pdf",
+        "sha256": "cdc0af68a2edb55ab8c961989333258aac2cb8e30b7943a14c076dab4e719404"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "confidence": "high",
+      "discrepancy_or_blocker": "numerical_conventions_incomplete; platform float64/saturation choices remain canonical adaptation.",
+      "excerpt": "The paper gives normalized four-state probabilities and epsilon=1 x 10^-10 for numerical stability; it refers to external works for detailed Q-BP and log-domain implementation descriptions.",
+      "excerpt_sha256": "978f9223322d7ca14d75eae8b13b9c0a7a66839bc6a374215259824800ef9d00",
+      "field_id": "numerical_conventions",
+      "locator": {
+        "anchor": "Section 6, Eqs. (38)-(43), and implementation sentence",
+        "kind": "primary_pdf",
+        "page": 14
+      },
+      "normalized_interpretation": "Only the literal epsilon and probability model are source stated; float precision, clipping, convergence tolerance, update schedule, and exact normalization implementation are not pinned.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Yao et al., Q-BPGD v2, arXiv:2312.10950v2",
+        "id": "yao-2023-qbpgd-v2-pdf",
+        "path": "/tmp/phase11-qbpgd-v2.pdf",
+        "sha256": "cdc0af68a2edb55ab8c961989333258aac2cb8e30b7943a14c076dab4e719404"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "confidence": "high",
+      "discrepancy_or_blocker": "source_equivalence_blocked_by_unresolved_required_fields; zero source shots admitted.",
+      "excerpt": "The source supplies Algorithm 3 control flow, depolarizing priors, fixation vectors, epsilon, and Figure 7 settings.",
+      "excerpt_sha256": "754666dde0342e6cb11ca79653a262458564b88641070fd8b5852bf9768480d4",
+      "field_id": "source_route_fidelity",
+      "locator": {
+        "anchor": "Section 6 and Algorithm 3",
+        "kind": "primary_pdf",
+        "page": 14
+      },
+      "normalized_interpretation": "The current platform route remains canonical_adaptation because lifecycle, ties, normalization interface, full Q-BP equations/numerics, author implementation identity, figure ordinates, uncertainty, tolerance, and denominators are unresolved.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Yao et al., Q-BPGD v2, arXiv:2312.10950v2",
+        "id": "yao-2023-qbpgd-v2-pdf",
+        "path": "/tmp/phase11-qbpgd-v2.pdf",
+        "sha256": "cdc0af68a2edb55ab8c961989333258aac2cb8e30b7943a14c076dab4e719404"
+      }
+    },
+    {
+      "compatibility_verdict": "compatible",
+      "confidence": "high",
+      "discrepancy_or_blocker": null,
+      "excerpt": "The data points of Q-BP and Q-BPGD are collected by running simulations until we observe 100 error cases.",
+      "excerpt_sha256": "2d1a3094f81d942972b84943360a359763c5444f739ec43d7cafcbac28248a33",
+      "field_id": "stopping_rule",
+      "locator": {
+        "anchor": "Figure 7 caption",
+        "kind": "primary_pdf",
+        "page": 15
+      },
+      "normalized_interpretation": "Source-backed stopping rule: stop each Q-BP/Q-BPGD point after 100 observed error cases.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Yao et al., Q-BPGD v2, arXiv:2312.10950v2",
+        "id": "yao-2023-qbpgd-v2-pdf",
+        "path": "/tmp/phase11-qbpgd-v2.pdf",
+        "sha256": "cdc0af68a2edb55ab8c961989333258aac2cb8e30b7943a14c076dab4e719404"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "confidence": "high",
+      "discrepancy_or_blocker": "figure_tolerance_unresolved; numerical resemblance cannot authorize source equivalence.",
+      "excerpt": "The caption states the simulated stopping count but supplies no coordinate-extraction tolerance or curve-agreement acceptance rule.",
+      "excerpt_sha256": "6ad1191b038dabad385a71c8f9842921218ce7c95741288a93fbbf0da7d26ce2",
+      "field_id": "tolerance",
+      "locator": {
+        "anchor": "Figure 7 caption and panel",
+        "kind": "primary_pdf",
+        "page": 15
+      },
+      "normalized_interpretation": "No source-qualified numerical tolerance exists for Figure 7 comparison.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Yao et al., Q-BPGD v2, arXiv:2312.10950v2",
+        "id": "yao-2023-qbpgd-v2-pdf",
+        "path": "/tmp/phase11-qbpgd-v2.pdf",
+        "sha256": "cdc0af68a2edb55ab8c961989333258aac2cb8e30b7943a14c076dab4e719404"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "confidence": "high",
+      "discrepancy_or_blocker": "tie_rule_unresolved; the canonical lowest-index selection is not inherited as source-equivalent.",
+      "excerpt": "vi = arg max over undecimated nodes of gamma(vi); gamma_i^* = arg max over j in {0,1,2,3} p_vi,j.",
+      "excerpt_sha256": "5b1a384601add603ee4a351584b150d5c349e8511d18717e7a88d56e4782d967",
+      "field_id": "update_and_tie_order",
+      "locator": {
+        "anchor": "Algorithm 3 lines 4-15; Eqs. (41)-(43)",
+        "kind": "primary_pdf",
+        "page": 14
+      },
+      "normalized_interpretation": "The source orders Q-BP, syndrome check, target argmax, state argmax, and fixation, but gives no tie rule for either argmax.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Yao et al., Q-BPGD v2, arXiv:2312.10950v2",
+        "id": "yao-2023-qbpgd-v2-pdf",
+        "path": "/tmp/phase11-qbpgd-v2.pdf",
+        "sha256": "cdc0af68a2edb55ab8c961989333258aac2cb8e30b7943a14c076dab4e719404"
+      }
+    },
+    {
+      "compatibility_verdict": "unresolved",
+      "confidence": "high",
+      "discrepancy_or_blocker": "qbp_update_equations_not_bound_to_author_implementation; no authoritative implementation identity is pinned.",
+      "excerpt": "For detailed descriptions of Q-BP, we refer readers to [67] and [31, Algorithm 1]; an efficient log domain implementation is discussed in [68].",
+      "excerpt_sha256": "35ace96a76024ec5706a976bc45e49d20f2f4a125d3d1a1167351331044470c2",
+      "field_id": "update_equations",
+      "locator": {
+        "anchor": "Section 6 paragraph beginning 'For detailed descriptions of Q-BP'; Eqs. (38)-(43)",
+        "kind": "primary_pdf",
+        "page": 14
+      },
+      "normalized_interpretation": "The pinned paper supplies Q-BPGD control equations but delegates Q-BP message equations to other works, so it cannot by itself qualify the platform's scalar Q-BP kernel as the author implementation.",
+      "reviewer_state": "pending_human_review",
+      "source": {
+        "citation": "Yao et al., Q-BPGD v2, arXiv:2312.10950v2",
+        "id": "yao-2023-qbpgd-v2-pdf",
+        "path": "/tmp/phase11-qbpgd-v2.pdf",
+        "sha256": "cdc0af68a2edb55ab8c961989333258aac2cb8e30b7943a14c076dab4e719404"
+      }
+    }
+  ],
+  "frozen_settings": {
+    "bp_osd": {
+      "order": 10,
+      "provenance": "third_party_ref_15_figure_6"
+    },
+    "channel": "depolarizing",
+    "code": "A5 [[180,10,15<=d<=18]]",
+    "early_syndrome_stop": true,
+    "epsilon": "1e-10",
+    "points_p": [
+      0.04,
+      0.05,
+      0.06,
+      0.07,
+      0.08,
+      0.09,
+      0.1
+    ],
+    "qbp_iterations": 100,
+    "qbpgd_iterations_per_round": 10,
+    "round_limit": 180,
+    "stopping": {
+      "denominator": "trials_until_100_error_cases",
+      "error_cases": 100
+    }
+  },
+  "frozen_settings_sha256": "0e9a6b23cf7f6981e33b94cd16bf7622584526255510c62d961c93ec8905a5e5",
+  "primary_sources": [
+    {
+      "citation": "Yao et al., Q-BPGD v2, arXiv:2312.10950v2",
+      "id": "yao-2023-qbpgd-v2-pdf",
+      "path": "/tmp/phase11-qbpgd-v2.pdf",
+      "sha256": "cdc0af68a2edb55ab8c961989333258aac2cb8e30b7943a14c076dab4e719404"
+    },
+    {
+      "citation": "Official A5 source definition, arXiv:1904.02703v3",
+      "id": "a5-official-polynomial-transcription",
+      "sha256": "139a695295d1392f82a65977c28eb41e43169efc68ff00d87978832cf8c5b693",
+      "uri": "https://arxiv.org/src/1904.02703v3"
+    }
+  ],
+  "proposed_fidelity": "canonical_adaptation",
+  "review_decision": "pending_human_review",
+  "review_digest": "8e5fce5696676aa707de6228ccf0fdac264664f728d23f3b0f94e944de12200e",
+  "review_id": "phase11_qbpgd_figure7_review_v1",
+  "reviewer": null,
+  "schema": "phase11-qbpgd-figure7-review-v1",
+  "source_execution": {
+    "admitted_shots": 0,
+    "eligible": false,
+    "reason": "review package is non-authorizing and has unresolved required source-equivalence fields"
+  }
+}
