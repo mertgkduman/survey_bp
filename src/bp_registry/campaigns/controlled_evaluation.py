@@ -12,7 +12,12 @@ from __future__ import annotations
 from hashlib import sha256
 import json
 from pathlib import Path
-from typing import Any, Mapping
+import re
+from typing import Any, Literal, Mapping
+
+from pydantic import Field, model_validator
+
+from ..manifests import StrictModel
 
 from .controlled_execution import _publish_exact, preflight_phase11_controlled_design
 from .contracts import canonical_json_bytes
@@ -22,6 +27,7 @@ from .profiling_gate import validate_phase11_dispatch_package
 _SCHEMA = "phase11_controlled_evaluation_receipt_v1"
 _VERIFICATION_SCHEMA = "phase11_controlled_evaluation_verification_v1"
 _CONTROLLED_CAMPAIGNS = {"GB46": "gb46-controlled", "BB72": "bb72-controlled"}
+_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 
 
 def canonical_receipt_bytes(value: object) -> bytes:
@@ -34,6 +40,128 @@ def receipt_digest(receipt: Mapping[str, object]) -> str:
     return sha256(canonical_receipt_bytes({
         key: value for key, value in receipt.items() if key != "receipt_sha256"
     })).hexdigest()
+
+
+def _exact_keys(value: Mapping[str, object], expected: set[str], *, label: str) -> None:
+    if set(value) != expected:
+        raise ValueError(f"{label} has missing or unknown fields")
+
+
+def _digest_field(value: object, *, label: str, optional: bool = False) -> None:
+    if optional and value is None:
+        return
+    if not isinstance(value, str) or _SHA256.fullmatch(value) is None:
+        raise ValueError(f"{label} must be an exact SHA-256 digest")
+
+
+class ControlledEvaluationReceipt(StrictModel):
+    """Strict Phase 11 receipt boundary for D-07, D-08, and D-15.
+
+    The v1 wire contract distinguishes code identity, pair terminals, typed
+    work, authorization, and unavailable resource evidence. A future allow
+    dispatcher must first define and validate its scheduler and pair rows;
+    until then, allow-shaped receipts cannot be admitted as evidence.
+    """
+
+    schema: Literal["phase11_controlled_evaluation_receipt_v1"]
+    code_id: Literal["GB46", "BB72"]
+    campaign_id: str
+    manifest: dict[str, object]
+    code_qualification: dict[str, object]
+    authorization: dict[str, object]
+    approved_envelope: dict[str, object]
+    terminal_status: Literal["denied", "stale_identity", "ineligible"]
+    terminal_reason: str
+    dispatch: dict[str, object]
+    attempted_pairs: list[dict[str, object]]
+    complete_pairs: list[dict[str, object]]
+    typed_work: dict[str, object]
+    interruptions: list[dict[str, object]]
+    calibration_provenance: dict[str, object]
+    evidence_scope: dict[str, object]
+    receipt_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @classmethod
+    def from_mapping(cls, value: Mapping[str, object]) -> "ControlledEvaluationReceipt":
+        if not isinstance(value, Mapping):
+            raise ValueError("controlled evaluation receipt must be a mapping")
+        return cls.model_validate(dict(value))
+
+    def to_primitive(self) -> dict[str, object]:
+        return self.model_dump(mode="json")
+
+    def canonical_bytes(self) -> bytes:
+        return canonical_receipt_bytes(self.to_primitive())
+
+    def digest(self) -> str:
+        return receipt_digest(self.to_primitive())
+
+    @model_validator(mode="after")
+    def validate_evidence(self) -> "ControlledEvaluationReceipt":
+        if self.campaign_id != _CONTROLLED_CAMPAIGNS[self.code_id]:
+            raise ValueError("receipt code and campaign identity differ")
+        if not self.terminal_reason:
+            raise ValueError("receipt terminal reason is required")
+        _exact_keys(self.manifest, {"path", "sha256", "fixed_marginal_design_sha256"}, label="manifest")
+        if not isinstance(self.manifest["path"], str) or not self.manifest["path"]:
+            raise ValueError("manifest path is required")
+        _exact_keys(self.dispatch, {"state", "scheduler_submissions", "scheduler_transitions"}, label="dispatch")
+        if self.dispatch["state"] != "zero_dispatch" or self.dispatch["scheduler_submissions"] != [] or self.dispatch["scheduler_transitions"] != []:
+            raise ValueError("unqualified dispatch or scheduler evidence is forbidden")
+        if self.attempted_pairs or self.complete_pairs or self.typed_work or self.interruptions:
+            raise ValueError("zero-dispatch receipt cannot claim pairs, work, or interruptions")
+        _exact_keys(self.evidence_scope, {"assessment_ready_ledger_refs", "complete_pair_count", "calibration_reuse_prohibited"}, label="evidence scope")
+        if self.evidence_scope != {"assessment_ready_ledger_refs": [], "complete_pair_count": 0, "calibration_reuse_prohibited": True}:
+            raise ValueError("zero-dispatch receipt cannot claim assessment-ready evidence")
+        if self.terminal_status == "stale_identity":
+            _exact_keys(self.code_qualification, {"status"}, label="code qualification")
+            _exact_keys(self.authorization, {"package_path", "decision"}, label="authorization")
+            _exact_keys(self.approved_envelope, {"status"}, label="approved envelope")
+            _exact_keys(self.calibration_provenance, {"status", "forbidden_as_evaluation_evidence"}, label="calibration provenance")
+            if (self.code_qualification["status"] != "unverified" or self.authorization["decision"] != "unverified"
+                    or self.approved_envelope["status"] != "not_approved"
+                    or self.calibration_provenance != {"status": "not_admitted", "forbidden_as_evaluation_evidence": True}):
+                raise ValueError("stale identity receipt must remain unverified and unapproved")
+            if self.manifest["sha256"] is not None or self.manifest["fixed_marginal_design_sha256"] is not None:
+                raise ValueError("stale identity receipt cannot claim a verified manifest")
+        else:
+            _exact_keys(self.authorization, {"package_sha256", "sealed_receipt_sha256", "decision", "approved_manifest_sha256s", "account", "partition"}, label="authorization")
+            envelope_required = {"pairs_per_point", "max_workers", "max_wall_time_ns", "max_peak_memory_bytes", "max_typed_work", "status"}
+            envelope_allowed = envelope_required | {"manifest_sha256", "requested_pairs_per_point"}
+            if not envelope_required <= set(self.approved_envelope) or not set(self.approved_envelope) <= envelope_allowed:
+                raise ValueError("approved envelope has missing or unknown fields")
+            _exact_keys(self.calibration_provenance, {"status", "manifest_sha256", "forbidden_as_evaluation_evidence"}, label="calibration provenance")
+            _digest_field(self.manifest["sha256"], label="manifest digest")
+            _digest_field(self.manifest["fixed_marginal_design_sha256"], label="fixed marginal digest")
+            _digest_field(self.authorization["package_sha256"], label="package digest")
+            _digest_field(self.authorization["sealed_receipt_sha256"], label="authorization digest")
+            if (self.approved_envelope.get("manifest_sha256", self.manifest["sha256"]) != self.manifest["sha256"]
+                    or self.calibration_provenance["manifest_sha256"] != self.manifest["sha256"]):
+                raise ValueError("receipt manifest identity is inconsistent")
+            requested_pairs = self.approved_envelope.get("requested_pairs_per_point")
+            if requested_pairs is not None and (not isinstance(requested_pairs, int) or requested_pairs < 1):
+                raise ValueError("requested pair count must be positive")
+            if self.authorization["decision"] != "deny":
+                raise ValueError("allow receipt requires a qualified dispatcher, exact approved digests, bounded resources, scheduler evidence, and complete-pair reconciliation")
+            if self.terminal_status != "denied" or not self.terminal_reason.startswith("sealed_authorization_deny:"):
+                raise ValueError("denied authorization must have a denial terminal")
+            if (self.authorization["approved_manifest_sha256s"] != [] or self.authorization["account"] is not None
+                    or self.authorization["partition"] is not None or self.approved_envelope["status"] != "not_approved"
+                    or any(self.approved_envelope[key] is not None for key in ("pairs_per_point", "max_workers", "max_wall_time_ns", "max_peak_memory_bytes", "max_typed_work"))):
+                raise ValueError("denied receipt cannot claim an approved resource envelope")
+            if self.calibration_provenance != {"status": "forecast_provenance_only", "manifest_sha256": self.manifest["sha256"], "forbidden_as_evaluation_evidence": True}:
+                raise ValueError("calibration output cannot be evaluation evidence")
+            expected_qualification = {"run_fidelity", "code_artifact_sha256", "code_provenance_sha256"}
+            allowed_qualification = expected_qualification | {"distance_qualification", "logical_operator_qualification"}
+            if not expected_qualification <= set(self.code_qualification) or not set(self.code_qualification) <= allowed_qualification:
+                raise ValueError("code qualification has missing or unknown fields")
+            if self.code_qualification["run_fidelity"] != "canonical_adaptation":
+                raise ValueError("code qualification has unexpected run fidelity")
+            _digest_field(self.code_qualification["code_artifact_sha256"], label="code artifact digest")
+            _digest_field(self.code_qualification["code_provenance_sha256"], label="code provenance digest", optional=True)
+        if self.digest() != self.receipt_sha256:
+            raise ValueError("controlled evaluation receipt digest differs from its evidence")
+        return self
 
 
 def _read_regular_json(path: Path, *, label: str) -> dict[str, Any]:

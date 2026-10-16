@@ -25,6 +25,31 @@ def _receipt_path(tmp_path: Path, code_id: str) -> Path:
     return tmp_path / code_id.lower() / "evaluation-receipt.json"
 
 
+def test_receipt_type_checked_gb46_round_trip() -> None:
+    module = _module()
+    checked = json.loads((ROOT / "data/results/phase11-controlled-evaluation/gb46/evaluation-receipt.json").read_text())
+    typed = module.ControlledEvaluationReceipt.from_mapping(checked)
+    assert typed.to_primitive() == checked
+    assert typed.canonical_bytes() == module.canonical_receipt_bytes(checked)
+    assert typed.digest() == checked["receipt_sha256"]
+
+
+@pytest.mark.parametrize("mutation", [
+    lambda row: row.update({"unexpected": True}),
+    lambda row: row["dispatch"].update({"state": "submitted"}),
+    lambda row: row["attempted_pairs"].append({"pair_id": "forged"}),
+    lambda row: row["evidence_scope"].update({"assessment_ready_ledger_refs": ["calibration"]}),
+    lambda row: row["authorization"].update({"decision": "allow"}),
+])
+def test_malformed_receipt_type_fails_even_with_resealed_digest(mutation) -> None:
+    module = _module()
+    checked = json.loads((ROOT / "data/results/phase11-controlled-evaluation/gb46/evaluation-receipt.json").read_text())
+    mutation(checked)
+    checked["receipt_sha256"] = module.receipt_digest(checked)
+    with pytest.raises(ValueError):
+        module.ControlledEvaluationReceipt.from_mapping(checked)
+
+
 def test_gb46_deny_tracer_writes_digest_bound_zero_dispatch_receipt(tmp_path: Path) -> None:
     module = _module()
     destination = _receipt_path(tmp_path, "GB46")
