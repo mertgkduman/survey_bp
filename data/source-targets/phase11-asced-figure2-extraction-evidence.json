@@ -8,8 +8,103 @@
     "author repository meta target_errors differ from the paper's common 400-error statement for ordinary BP4 and BP4-aSCED",
     "author repository trials exceed the stated 1000000 max_trials for some low-p points",
     "PDF figure does not print per-point denominators; author result files cannot be substituted without review of the discrepancies",
-    "source-curve statistical intervals, agreement tolerance, and reviewer signoff are not established by this extraction"
+    "source-curve statistical intervals, agreement tolerance, and reviewer signoff are not established by this extraction",
+    "Figure 2 GB46 upper BP4 baseline path numerically matches the author repository's Toric_128_2/BP4 data, a cross-code provenance discrepancy requiring review"
   ],
+  "cross_code_match_candidate": {
+    "author_code_n": 128,
+    "author_file_sha256": {
+      "LER.json": "5641bfccf1462425b3ecbcb934ac1ed118ac8c4dc2cc2cd8d2aaf6a8ebbb0d03",
+      "meta.txt": "35dea07f559e8143e3470798cd1d862e2eaf433721c006f13c4fe1373d2083b3"
+    },
+    "author_folder": "Results/Toric_128_2/BP4",
+    "curve_id": "bp4_baseline",
+    "interpretation": "numerical path match only; figure labeling/data provenance requires author or reviewer confirmation",
+    "max_absolute_relative_difference": 0.000166352581639589,
+    "point_count": 10,
+    "points": [
+      {
+        "p": 0.015,
+        "pdf_x": 301.6326599121094,
+        "pdf_y": 118.55867004394531,
+        "plotted_ler": 0.01705192059639101,
+        "relative_difference": 1.8454446550193263e-05,
+        "toric_author_ler": 0.017051605918440994
+      },
+      {
+        "p": 0.03,
+        "pdf_x": 343.6555480957031,
+        "pdf_y": 100.82701110839844,
+        "plotted_ler": 0.06441528963003101,
+        "relative_difference": -4.553516150407045e-05,
+        "toric_author_ler": 0.06441822292421567
+      },
+      {
+        "p": 0.045,
+        "pdf_x": 385.678466796875,
+        "pdf_y": 90.53649139404297,
+        "plotted_ler": 0.13930749824057445,
+        "relative_difference": -2.6427404934820656e-05,
+        "toric_author_ler": 0.13931117987353692
+      },
+      {
+        "p": 0.06,
+        "pdf_x": 427.70135498046875,
+        "pdf_y": 83.78402709960938,
+        "plotted_ler": 0.23109274370406838,
+        "relative_difference": -2.705027212795729e-06,
+        "toric_author_ler": 0.23109336881791973
+      },
+      {
+        "p": 0.075,
+        "pdf_x": 469.7242736816406,
+        "pdf_y": 79.01008605957031,
+        "plotted_ler": 0.3305153206298636,
+        "relative_difference": -4.034358909176507e-05,
+        "toric_author_ler": 0.3305286553421178
+      },
+      {
+        "p": 0.09,
+        "pdf_x": 511.7471923828125,
+        "pdf_y": 75.11392211914062,
+        "plotted_ler": 0.44261156171288113,
+        "relative_difference": -3.360085414370113e-05,
+        "toric_author_ler": 0.4426264343391415
+      },
+      {
+        "p": 0.105,
+        "pdf_x": 553.7700805664062,
+        "pdf_y": 71.84234619140625,
+        "plotted_ler": 0.565616156208014,
+        "relative_difference": -4.7170259834908524e-05,
+        "toric_author_ler": 0.5656428377276433
+      },
+      {
+        "p": 0.12,
+        "pdf_x": 595.79296875,
+        "pdf_y": 69.39724731445312,
+        "plotted_ler": 0.6793861543850277,
+        "relative_difference": -9.961201514576574e-05,
+        "toric_author_ler": 0.6794538361508452
+      },
+      {
+        "p": 0.135,
+        "pdf_x": 637.81591796875,
+        "pdf_y": 67.62352752685547,
+        "plotted_ler": 0.7759902935187275,
+        "relative_difference": -0.000166352581639589,
+        "toric_author_ler": 0.7761194029850746
+      },
+      {
+        "p": 0.15,
+        "pdf_x": 679.8388061523438,
+        "pdf_y": 66.31641387939453,
+        "plotted_ler": 0.8558675017435555,
+        "relative_difference": -3.869535041775518e-05,
+        "toric_author_ler": 0.8559006211180125
+      }
+    ]
+  },
   "curves": [
     {
       "author_file_sha256": {
@@ -776,7 +871,7 @@
       ]
     }
   ],
-  "evidence_sha256": "a397e0f373d5b7ccd750c9540d32ec2a72dfe8d2890f799c79c811efef7bab5f",
+  "evidence_sha256": "a3535d550b695c42da1520cc5cbf00f6606364b9b704285d7b24158fe44d5b31",
   "execution_authorized": false,
   "method": {
     "axis": {

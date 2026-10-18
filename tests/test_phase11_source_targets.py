@@ -230,4 +230,9 @@ def test_asced_figure2_supplemental_evidence_exposes_author_result_discrepancies
     assert curves["obp4_baseline"]["author_meta"]["target_errors"] == "400"
     assert all(not row["author_value_inside_plotted_reading_interval"]
                for row in curves["bp4_baseline"]["points"])
+    cross_code = evidence["cross_code_match_candidate"]
+    assert cross_code["author_folder"] == "Results/Toric_128_2/BP4"
+    assert cross_code["author_code_n"] == 128
+    assert cross_code["point_count"] == 10
+    assert cross_code["max_absolute_relative_difference"] < 0.0002
     assert _json(TARGET)["members"][0]["admitted_shots"] == 0

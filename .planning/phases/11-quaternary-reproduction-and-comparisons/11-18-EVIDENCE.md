@@ -1,6 +1,6 @@
 # aSCED Figure 2 supplemental evidence
 
-This is a non-authorizing supplement to candidate `a5b9c6eb0bbe8a07743f5be093cc937c50759a07d5f60f8cebc3be557f4b49b5`. The candidate and source target remain unchanged, pending scientific review. The [machine-readable extraction](../../../data/source-targets/phase11-asced-figure2-extraction-evidence.json) has digest `a397e0f373d5b7ccd750c9540d32ec2a72dfe8d2890f799c79c811efef7bab5f`.
+This is a non-authorizing supplement to candidate `a5b9c6eb0bbe8a07743f5be093cc937c50759a07d5f60f8cebc3be557f4b49b5`. The candidate and source target remain unchanged, pending scientific review. The [machine-readable extraction](../../../data/source-targets/phase11-asced-figure2-extraction-evidence.json) has digest `a3535d550b695c42da1520cc5cbf00f6606364b9b704285d7b24158fe44d5b31`.
 
 ## Provenance and method
 
@@ -17,6 +17,8 @@ This is a non-authorizing supplement to candidate `a5b9c6eb0bbe8a07743f5be093cc9
 | BP4-aSCED K=16, Δ=2, L=4 | 2000 | none | Author's stopping target differs from the paper's stated 400 errors. |
 | OBP4 baseline | 400 | p=.07 | `trials` at p=.03 is 1,224,872, above `max_trials=1,000,000`. |
 | OBP4-aSCED K=16, Δ=2, L=4 | 400 | p=.09 and .10 | `trials` at p=.03 is 1,739,591, above `max_trials=1,000,000`. |
+
+The upper dotted BP4 path also matches **all ten** values in the pinned author repository's `Results/Toric_128_2/BP4/LER.json`: the transformed vector x coordinates match its p values, and the largest relative ordinate difference is below 0.0002. That file's metadata identifies `n=128`, while the Figure 2 panel is labeled GB46 (`n=46`). This is strong numerical evidence of a cross-code provenance discrepancy; it does not establish how the published figure was assembled or which series the authors intended. The machine-readable evidence retains each of the ten comparisons and hashes the Toric files.
 
 The paper states runs stop after at least 400 logical errors or 10^6 trials, but the repository metadata for ordinary BP4 and BP4-aSCED states 4000 and 2000 target errors respectively. The cause of these differences, including whether files correspond to the exact published run and whether parallel execution explains trial-cap overshoots, is unresolved.
 

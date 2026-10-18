@@ -127,6 +127,41 @@ def build(pdf: Path, author_repo: Path) -> dict:
             "author_meta": {key: settings.get(key) for key in ("target_errors", "max_trials", "max_iterations", "ensemble_size")},
             "points": rows,
         })
+    toric_dir = author_repo / "Results" / "Toric_128_2" / "BP4"
+    toric_ler_file, toric_meta_file = toric_dir / "LER.json", toric_dir / "meta.txt"
+    toric_ler = json.loads(toric_ler_file.read_text())
+    toric_meta = toric_meta_file.read_text()
+    baseline_vertices = _vertices(drawings[62])
+    toric_comparison = []
+    for (pdf_x, pdf_y), (p_text, author_ler) in zip(
+        baseline_vertices, sorted(toric_ler.items(), key=lambda pair: float(pair[0])), strict=True
+    ):
+        p = float(p_text)
+        transformed_p = .03 + (pdf_x - axis_x0) * .07 / (axis_x1 - axis_x0)
+        plotted_ler = 10 ** (-(pdf_y - axis_y0) / decade)
+        if abs(transformed_p - p) > 1e-6:
+            raise ValueError("Toric result abscissas do not match Figure 2 upper baseline vertices")
+        toric_comparison.append({
+            "p": p,
+            "pdf_x": pdf_x,
+            "pdf_y": pdf_y,
+            "plotted_ler": plotted_ler,
+            "toric_author_ler": author_ler,
+            "relative_difference": (plotted_ler - author_ler) / author_ler,
+        })
+    output["cross_code_match_candidate"] = {
+        "curve_id": "bp4_baseline",
+        "author_folder": "Results/Toric_128_2/BP4",
+        "author_code_n": int(next(line.split(":", 1)[1] for line in toric_meta.splitlines() if line.startswith("n:"))),
+        "author_file_sha256": {"LER.json": file_sha256(toric_ler_file), "meta.txt": file_sha256(toric_meta_file)},
+        "point_count": len(toric_comparison),
+        "max_absolute_relative_difference": max(abs(row["relative_difference"]) for row in toric_comparison),
+        "points": toric_comparison,
+        "interpretation": "numerical path match only; figure labeling/data provenance requires author or reviewer confirmation",
+    }
+    output["blockers"].append(
+        "Figure 2 GB46 upper BP4 baseline path numerically matches the author repository's Toric_128_2/BP4 data, a cross-code provenance discrepancy requiring review"
+    )
     output["evidence_sha256"] = sha256(canonical_bytes(output)).hexdigest()
     return output
 
