@@ -1,0 +1,820 @@
+{
+  "author_results": {
+    "commit": "816772071486615dfc7d71d1e15df597edc58a26",
+    "repository": "https://github.com/kit-cel/quantum_asced"
+  },
+  "blockers": [
+    "author repository result files differ from Figure 2 for the ordinary BP4 baseline and some overcomplete points",
+    "author repository meta target_errors differ from the paper's common 400-error statement for ordinary BP4 and BP4-aSCED",
+    "author repository trials exceed the stated 1000000 max_trials for some low-p points",
+    "PDF figure does not print per-point denominators; author result files cannot be substituted without review of the discrepancies",
+    "source-curve statistical intervals, agreement tolerance, and reviewer signoff are not established by this extraction"
+  ],
+  "curves": [
+    {
+      "author_file_sha256": {
+        "LER.json": "8cc6853db725c9d57c213da93961d193a495d67db91b5f3d3000942b3595abeb",
+        "meta.txt": "b90b6cab23fa97c7d014b98ae4a6e7c0a23e60042b21e6a837af03cec55a571e",
+        "stats.json": "3e0cf3ffebc13a3df9be0e352b4c918b5f703e8f650aff4920079b814846409b"
+      },
+      "author_folder": "Results/GB_46_2/BP4",
+      "author_meta": {
+        "ensemble_size": null,
+        "max_iterations": null,
+        "max_trials": "1000000",
+        "target_errors": "4000"
+      },
+      "curve_id": "bp4_baseline",
+      "pdf_drawing_seqno": 62,
+      "pdf_vector_vertices": [
+        [
+          301.6326599121094,
+          118.55867004394531
+        ],
+        [
+          343.6555480957031,
+          100.82701110839844
+        ],
+        [
+          385.678466796875,
+          90.53649139404297
+        ],
+        [
+          427.70135498046875,
+          83.78402709960938
+        ],
+        [
+          469.7242736816406,
+          79.01008605957031
+        ],
+        [
+          511.7471923828125,
+          75.11392211914062
+        ],
+        [
+          553.7700805664062,
+          71.84234619140625
+        ],
+        [
+          595.79296875,
+          69.39724731445312
+        ],
+        [
+          637.81591796875,
+          67.62352752685547
+        ],
+        [
+          679.8388061523438,
+          66.31641387939453
+        ]
+      ],
+      "points": [
+        {
+          "author_ler": 0.018851927353595255,
+          "author_logical_errors": 4069,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 0.2926623083102045,
+          "author_trials": 215840,
+          "author_value_inside_plotted_reading_interval": false,
+          "p": 0.03,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 343.6555480957031,
+          "pdf_y": 100.82701110839844,
+          "plotted_ler": 0.06441528963003101,
+          "plotted_ler_reading_interval": [
+            0.059763515294448934,
+            0.06942914113531386
+          ]
+        },
+        {
+          "author_ler": 0.04273191729441142,
+          "author_logical_errors": 4090,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 0.396679527392688,
+          "author_trials": 95713,
+          "author_value_inside_plotted_reading_interval": false,
+          "p": 0.04,
+          "pdf_path_interpolated_at_p": true,
+          "pdf_x": 371.6708199637277,
+          "pdf_y": 93.96666641147249,
+          "plotted_ler": 0.10772402996262896,
+          "plotted_ler_reading_interval": [
+            0.09994469867678447,
+            0.11610887605872501
+          ]
+        },
+        {
+          "author_ler": 0.07909013407734636,
+          "author_logical_errors": 4082,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 0.47959785968321034,
+          "author_trials": 51612,
+          "author_value_inside_plotted_reading_interval": false,
+          "p": 0.05,
+          "pdf_path_interpolated_at_p": true,
+          "pdf_x": 399.68609183175226,
+          "pdf_y": 88.28567066309782,
+          "plotted_ler": 0.1649092723841343,
+          "plotted_ler_reading_interval": [
+            0.15300028733754073,
+            0.17774520944701466
+          ]
+        },
+        {
+          "author_ler": 0.12782450414260607,
+          "author_logical_errors": 4073,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 0.5531306983937568,
+          "author_trials": 31864,
+          "author_value_inside_plotted_reading_interval": false,
+          "p": 0.06,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 427.7013636997768,
+          "pdf_y": 83.78402569854394,
+          "plotted_ler": 0.23109276797291714,
+          "plotted_ler_reading_interval": [
+            0.2144043169332765,
+            0.24908018725203204
+          ]
+        },
+        {
+          "author_ler": 0.1898118105126541,
+          "author_logical_errors": 4095,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 0.6470433722822246,
+          "author_trials": 21574,
+          "author_value_inside_plotted_reading_interval": false,
+          "p": 0.07,
+          "pdf_path_interpolated_at_p": true,
+          "pdf_x": 455.71663556780135,
+          "pdf_y": 80.60139957449302,
+          "plotted_ler": 0.29335253036153935,
+          "plotted_ler_reading_interval": [
+            0.27216796719568986,
+            0.31618602275720215
+          ]
+        },
+        {
+          "author_ler": 0.2664049721949624,
+          "author_logical_errors": 4072,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 0.73126316099982,
+          "author_trials": 15285,
+          "author_value_inside_plotted_reading_interval": false,
+          "p": 0.08,
+          "pdf_path_interpolated_at_p": true,
+          "pdf_x": 483.73190743582586,
+          "pdf_y": 77.71136528503543,
+          "plotted_ler": 0.3643079350951031,
+          "plotted_ler_reading_interval": [
+            0.3379993007249452,
+            0.39266433773264536
+          ]
+        },
+        {
+          "author_ler": 0.3390536487837388,
+          "author_logical_errors": 4070,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 0.7660298756975604,
+          "author_trials": 12004,
+          "author_value_inside_plotted_reading_interval": false,
+          "p": 0.09,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 511.74717930385043,
+          "pdf_y": 75.11392333175941,
+          "plotted_ler": 0.4426115214827496,
+          "plotted_ler_reading_interval": [
+            0.41064816421009204,
+            0.4770627900555948
+          ]
+        },
+        {
+          "author_ler": 0.42165565648224607,
+          "author_logical_errors": 4085,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 0.8089763186423822,
+          "author_trials": 9688,
+          "author_value_inside_plotted_reading_interval": false,
+          "p": 0.1,
+          "pdf_path_interpolated_at_p": true,
+          "pdf_x": 539.762451171875,
+          "pdf_y": 72.93287150065105,
+          "plotted_ler": 0.5212212604565055,
+          "plotted_ler_reading_interval": [
+            0.48358107135734857,
+            0.561791224766763
+          ]
+        }
+      ]
+    },
+    {
+      "author_file_sha256": {
+        "LER.json": "7f78f880c6032b5345fa75f5ceb652e5403d87a2630feed155cb79a6e511eecd",
+        "meta.txt": "5eeb797e3b3812d7a85e79c2072d3d323104387a3ab55b93109c7d5de8816331",
+        "stats.json": "529eca896a4d2733f7b5c9529c4e35e7746151aff7dff5427561e33e815684bc"
+      },
+      "author_folder": "Results/GB_46_2/BP4_aSCED16_delta2",
+      "author_meta": {
+        "ensemble_size": null,
+        "max_iterations": null,
+        "max_trials": "1000000",
+        "target_errors": "2000"
+      },
+      "curve_id": "bp4_asced_k16_delta2_l4",
+      "pdf_drawing_seqno": 66,
+      "pdf_vector_vertices": [
+        [
+          315.6402893066406,
+          149.78201293945312
+        ],
+        [
+          343.6555480957031,
+          131.11819458007812
+        ],
+        [
+          371.67083740234375,
+          118.09880065917969
+        ],
+        [
+          399.68609619140625,
+          107.61508178710938
+        ],
+        [
+          427.70135498046875,
+          99.6165771484375
+        ],
+        [
+          455.7166442871094,
+          93.47747802734375
+        ],
+        [
+          483.73193359375,
+          87.69339752197266
+        ],
+        [
+          511.7471923828125,
+          83.18389892578125
+        ],
+        [
+          539.762451171875,
+          79.62751770019531
+        ]
+      ],
+      "points": [
+        {
+          "author_ler": 0.006651698460643848,
+          "author_logical_errors": 2059,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 1.000016824773235,
+          "author_trials": 309545,
+          "author_value_inside_plotted_reading_interval": true,
+          "p": 0.03,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 343.6555480957031,
+          "pdf_y": 131.11819458007812,
+          "plotted_ler": 0.006651586549208504,
+          "plotted_ler_reading_interval": [
+            0.006171239728162993,
+            0.007169321817089999
+          ]
+        },
+        {
+          "author_ler": 0.017651389340683797,
+          "author_logical_errors": 2062,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 1.0000824522323788,
+          "author_trials": 116818,
+          "author_value_inside_plotted_reading_interval": true,
+          "p": 0.04,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 371.6708199637277,
+          "pdf_y": 118.09880876333344,
+          "plotted_ler": 0.017649934064218862,
+          "plotted_ler_reading_interval": [
+            0.016375337446300802,
+            0.019023740640022397
+          ]
+        },
+        {
+          "author_ler": 0.03873285556574294,
+          "author_logical_errors": 2070,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 1.0001416421520588,
+          "author_trials": 53443,
+          "author_value_inside_plotted_reading_interval": true,
+          "p": 0.05,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 399.68609183175226,
+          "pdf_y": 107.61508341855554,
+          "plotted_ler": 0.03872737013769306,
+          "plotted_ler_reading_interval": [
+            0.03593065855685867,
+            0.04174176756066128
+          ]
+        },
+        {
+          "author_ler": 0.07053772234716826,
+          "author_logical_errors": 2070,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 1.0000675545689433,
+          "author_trials": 29346,
+          "author_value_inside_plotted_reading_interval": true,
+          "p": 0.06,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 427.7013636997768,
+          "pdf_y": 99.61657465902891,
+          "plotted_ler": 0.07053295752362647,
+          "plotted_ler_reading_interval": [
+            0.06543939350325849,
+            0.07602298601349312
+          ]
+        },
+        {
+          "author_ler": 0.11175033921302578,
+          "author_logical_errors": 2059,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 1.0000272961702323,
+          "author_trials": 18425,
+          "author_value_inside_plotted_reading_interval": true,
+          "p": 0.07,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 455.71663556780135,
+          "pdf_y": 93.47747993803958,
+          "plotted_ler": 0.11174728894000388,
+          "plotted_ler_reading_interval": [
+            0.1036774164959368,
+            0.12044529085975157
+          ]
+        },
+        {
+          "author_ler": 0.17239370995923123,
+          "author_logical_errors": 2072,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 0.9999915953667705,
+          "author_trials": 12019,
+          "author_value_inside_plotted_reading_interval": true,
+          "p": 0.08,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 483.73190743582586,
+          "pdf_y": 87.69340292257864,
+          "plotted_ler": 0.17239515887731213,
+          "plotted_ler_reading_interval": [
+            0.1599455777258489,
+            0.1858137700766866
+          ]
+        },
+        {
+          "author_ler": 0.2417296786389414,
+          "author_logical_errors": 2046,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 1.0000181088135154,
+          "author_trials": 8464,
+          "author_value_inside_plotted_reading_interval": true,
+          "p": 0.09,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 511.74717930385043,
+          "pdf_y": 83.18390103104687,
+          "plotted_ler": 0.24172530128053854,
+          "plotted_ler_reading_interval": [
+            0.224269017854415,
+            0.2605403182221893
+          ]
+        },
+        {
+          "author_ler": 0.31559744603222867,
+          "author_logical_errors": 2076,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 1.0000944823093483,
+          "author_trials": 6578,
+          "author_value_inside_plotted_reading_interval": true,
+          "p": 0.1,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 539.762451171875,
+          "pdf_y": 79.62751770019531,
+          "plotted_ler": 0.3155676304737459,
+          "plotted_ler_reading_interval": [
+            0.2927787955091065,
+            0.3401302653412865
+          ]
+        }
+      ]
+    },
+    {
+      "author_file_sha256": {
+        "LER.json": "94bfd8242bca2867b04b6f0250a131e012e760682c5b1a10c6c69b876ecf5af9",
+        "meta.txt": "040f27678fc12d8f6127f088426e4767d342f5b747803e1ee1f9f1086795d56d",
+        "stats.json": "16ca408a20d436d95c7bcf30c5eaa275fb9d0ef3dd989aa7ef8bcd346508d969"
+      },
+      "author_folder": "Results/GB_46_2/OBP4",
+      "author_meta": {
+        "ensemble_size": null,
+        "max_iterations": null,
+        "max_trials": "1000000",
+        "target_errors": "400"
+      },
+      "curve_id": "obp4_baseline",
+      "pdf_drawing_seqno": 63,
+      "pdf_vector_vertices": [
+        [
+          343.6555480957031,
+          169.7352294921875
+        ],
+        [
+          371.67083740234375,
+          152.03411865234375
+        ],
+        [
+          399.68609619140625,
+          136.86744689941406
+        ],
+        [
+          427.70135498046875,
+          125.62278747558594
+        ],
+        [
+          455.7166442871094,
+          116.4415283203125
+        ],
+        [
+          483.73193359375,
+          108.41024780273438
+        ],
+        [
+          511.7471923828125,
+          102.73141479492188
+        ],
+        [
+          539.762451171875,
+          96.91172790527344
+        ]
+      ],
+      "points": [
+        {
+          "author_ler": 0.00036820173863064874,
+          "author_logical_errors": 451,
+          "author_over_stated_trial_cap": true,
+          "author_to_plotted_ratio": 1.0005857755095149,
+          "author_trials": 1224872,
+          "author_value_inside_plotted_reading_interval": true,
+          "p": 0.03,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 343.6555480957031,
+          "pdf_y": 169.7352294921875,
+          "plotted_ler": 0.00036798618133778116,
+          "plotted_ler_reading_interval": [
+            0.00034141192103362655,
+            0.00039662888526445186
+          ]
+        },
+        {
+          "author_ler": 0.001387443635102324,
+          "author_logical_errors": 464,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 1.0003753044232877,
+          "author_trials": 334428,
+          "author_value_inside_plotted_reading_interval": true,
+          "p": 0.04,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 371.6708199637277,
+          "pdf_y": 152.03412967071563,
+          "plotted_ler": 0.0013869231167218583,
+          "plotted_ler_reading_interval": [
+            0.0012867659429072664,
+            0.0014948761601130585
+          ]
+        },
+        {
+          "author_ler": 0.00432314849512389,
+          "author_logical_errors": 473,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 1.0000677251529952,
+          "author_trials": 109411,
+          "author_value_inside_plotted_reading_interval": true,
+          "p": 0.05,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 399.68609183175226,
+          "pdf_y": 136.8674492596079,
+          "plotted_ler": 0.004322855729058264,
+          "plotted_ler_reading_interval": [
+            0.004010679078881683,
+            0.004659331072548059
+          ]
+        },
+        {
+          "author_ler": 0.010041610054347826,
+          "author_logical_errors": 473,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 0.9999699379363305,
+          "author_trials": 47104,
+          "author_value_inside_plotted_reading_interval": true,
+          "p": 0.06,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 427.7013636997768,
+          "pdf_y": 125.6227839758628,
+          "plotted_ler": 0.010041911934943777,
+          "plotted_ler_reading_interval": [
+            0.009316731492731354,
+            0.010823537781231404
+          ]
+        },
+        {
+          "author_ler": 0.017988965731603076,
+          "author_logical_errors": 463,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 0.9001482328533643,
+          "author_trials": 25738,
+          "author_value_inside_plotted_reading_interval": false,
+          "p": 0.07,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 455.71663556780135,
+          "pdf_y": 116.44153117783168,
+          "plotted_ler": 0.019984448199803898,
+          "plotted_ler_reading_interval": [
+            0.018541263766720526,
+            0.021539964852206248
+          ]
+        },
+        {
+          "author_ler": 0.03648883963906918,
+          "author_logical_errors": 461,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 1.0000624961553304,
+          "author_trials": 12634,
+          "author_value_inside_plotted_reading_interval": true,
+          "p": 0.08,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 483.73190743582586,
+          "pdf_y": 108.4102553015549,
+          "plotted_ler": 0.03648655936938736,
+          "plotted_ler_reading_interval": [
+            0.0338516687798544,
+            0.03932654024454136
+          ]
+        },
+        {
+          "author_ler": 0.05584764575300853,
+          "author_logical_errors": 478,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 1.0000223821838947,
+          "author_trials": 8559,
+          "author_value_inside_plotted_reading_interval": true,
+          "p": 0.09,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 511.74717930385043,
+          "pdf_y": 102.73141744609288,
+          "plotted_ler": 0.05584639578870813,
+          "plotted_ler_reading_interval": [
+            0.05181342734042905,
+            0.06019327581048625
+          ]
+        },
+        {
+          "author_ler": 0.08638928067700988,
+          "author_logical_errors": 490,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 1.000039948787674,
+          "author_trials": 5672,
+          "author_value_inside_plotted_reading_interval": true,
+          "p": 0.1,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 539.762451171875,
+          "pdf_y": 96.91172790527344,
+          "plotted_ler": 0.08638582966784242,
+          "plotted_ler_reading_interval": [
+            0.08014744453110165,
+            0.09310978797964807
+          ]
+        }
+      ]
+    },
+    {
+      "author_file_sha256": {
+        "LER.json": "9bf8a08d102c7aa5e43ea5ec0567ce35fe33971ddb258e3cb6dcef1fd276694f",
+        "meta.txt": "10a4d4c9e795b315fcea0206fbdb6737a9fdb478dfe93f7e1a266af87d2e1bfe",
+        "stats.json": "c13f3b1f53afccd0fec51da765d6a9262d8163b4416dab76e39c650f77ff11db"
+      },
+      "author_folder": "Results/GB_46_2/OBP4_aSCED16_delta2",
+      "author_meta": {
+        "ensemble_size": null,
+        "max_iterations": null,
+        "max_trials": "1000000",
+        "target_errors": "400"
+      },
+      "curve_id": "obp4_asced_k16_delta2_l4",
+      "pdf_drawing_seqno": 68,
+      "pdf_vector_vertices": [
+        [
+          343.6555480957031,
+          184.90902709960938
+        ],
+        [
+          371.67083740234375,
+          164.94419860839844
+        ],
+        [
+          399.68609619140625,
+          149.14076232910156
+        ],
+        [
+          427.70135498046875,
+          136.72923278808594
+        ],
+        [
+          455.7166442871094,
+          125.63725280761719
+        ],
+        [
+          483.73193359375,
+          117.06913757324219
+        ],
+        [
+          511.7471923828125,
+          109.646728515625
+        ],
+        [
+          539.762451171875,
+          103.67619323730469
+        ]
+      ],
+      "points": [
+        {
+          "author_ler": 0.00011841863978371928,
+          "author_logical_errors": 206,
+          "author_over_stated_trial_cap": true,
+          "author_to_plotted_ratio": 1.003549034819069,
+          "author_trials": 1739591,
+          "author_value_inside_plotted_reading_interval": true,
+          "p": 0.03,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 343.6555480957031,
+          "pdf_y": 184.90902709960938,
+          "plotted_ler": 0.00011799985419254488,
+          "plotted_ler_reading_interval": [
+            0.00010947845040024702,
+            0.00012718453301591886
+          ]
+        },
+        {
+          "author_ler": 0.0005274118031358885,
+          "author_logical_errors": 465,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 1.000822659693039,
+          "author_trials": 881664,
+          "author_value_inside_plotted_reading_interval": true,
+          "p": 0.04,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 371.6708199637277,
+          "pdf_y": 164.9442110358617,
+          "plotted_ler": 0.0005269782793463632,
+          "plotted_ler_reading_interval": [
+            0.0004889223449656882,
+            0.0005679963490364561
+          ]
+        },
+        {
+          "author_ler": 0.0017229181100688066,
+          "author_logical_errors": 470,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 1.0000576508571066,
+          "author_trials": 272793,
+          "author_value_inside_plotted_reading_interval": true,
+          "p": 0.05,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 399.68609183175226,
+          "pdf_y": 149.14076478838686,
+          "plotted_ler": 0.001722818788089034,
+          "plotted_ler_reading_interval": [
+            0.0015984047822012943,
+            0.0018569167270038763
+          ]
+        },
+        {
+          "author_ler": 0.004268484831122697,
+          "author_logical_errors": 447,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 0.9772451817761257,
+          "author_trials": 104721,
+          "author_value_inside_plotted_reading_interval": true,
+          "p": 0.06,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 427.7013636997768,
+          "pdf_y": 136.72922892519287,
+          "plotted_ler": 0.0043678750335353934,
+          "plotted_ler_reading_interval": [
+            0.00405244729737635,
+            0.0047078545156981014
+          ]
+        },
+        {
+          "author_ler": 0.01003079431210941,
+          "author_logical_errors": 443,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 0.9999770444105271,
+          "author_trials": 44164,
+          "author_value_inside_plotted_reading_interval": true,
+          "p": 0.07,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 455.71663556780135,
+          "pdf_y": 125.63725625981749,
+          "plotted_ler": 0.010031024580191665,
+          "plotted_ler_reading_interval": [
+            0.009306630372392053,
+            0.010811802994443731
+          ]
+        },
+        {
+          "author_ler": 0.019069597959431556,
+          "author_logical_errors": 471,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 1.0001842234936313,
+          "author_trials": 24699,
+          "author_value_inside_plotted_reading_interval": true,
+          "p": 0.08,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 483.73190743582586,
+          "pdf_y": 117.06914557330622,
+          "plotted_ler": 0.019066085538543772,
+          "plotted_ler_reading_interval": [
+            0.01768922100998839,
+            0.02055012018662694
+          ]
+        },
+        {
+          "author_ler": 0.02625784432456237,
+          "author_logical_errors": 477,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 0.789545152010469,
+          "author_trials": 18166,
+          "author_value_inside_plotted_reading_interval": false,
+          "p": 0.09,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 511.74717930385043,
+          "pdf_y": 109.64673198078687,
+          "plotted_ler": 0.0332569255319982,
+          "plotted_ler_reading_interval": [
+            0.030855264163111174,
+            0.035845523473533335
+          ]
+        },
+        {
+          "author_ler": 0.04803016770864345,
+          "author_logical_errors": 484,
+          "author_over_stated_trial_cap": false,
+          "author_to_plotted_ratio": 0.9231538346434806,
+          "author_trials": 10077,
+          "author_value_inside_plotted_reading_interval": false,
+          "p": 0.1,
+          "pdf_path_interpolated_at_p": false,
+          "pdf_x": 539.762451171875,
+          "pdf_y": 103.67619323730469,
+          "plotted_ler": 0.05202834663758134,
+          "plotted_ler_reading_interval": [
+            0.048271100042843754,
+            0.056078043621084435
+          ]
+        }
+      ]
+    }
+  ],
+  "evidence_sha256": "a397e0f373d5b7ccd750c9540d32ec2a72dfe8d2890f799c79c811efef7bab5f",
+  "execution_authorized": false,
+  "method": {
+    "axis": {
+      "bracket_scope": "conservative visual/vector reading only; excludes Monte Carlo uncertainty and curve identity error",
+      "pdf_coordinate_unit": "point",
+      "pdf_page_one_based": 4,
+      "vector_centerline_bracket_pdf_points": 1.0,
+      "x_anchors": [
+        {
+          "p": 0.03,
+          "pdf_x": 343.6555480957031
+        },
+        {
+          "p": 0.1,
+          "pdf_x": 539.762451171875
+        }
+      ],
+      "x_transform": "linear",
+      "y_anchors": [
+        {
+          "ler": 1.0,
+          "pdf_y": 64.239990234375
+        },
+        {
+          "ler": 1e-05,
+          "pdf_y": 217.8364715576172
+        }
+      ],
+      "y_transform": "log10; log10(LER)=-(pdf_y-y0)/((y5-y0)/5)"
+    },
+    "extractor": "PyMuPDF get_drawings vector paths; linear interpolation in PDF space; axis transform",
+    "pymupdf_version": "1.28.2"
+  },
+  "primary_pdf": {
+    "sha256": "0eec129dde3026f8225ec7d5f2884dbefe37566c9f71d105cae0195e4e4abca5",
+    "url": "https://arxiv.org/pdf/2605.06547v2"
+  },
+  "review_candidate_sha256": "a5b9c6eb0bbe8a07743f5be093cc937c50759a07d5f60f8cebc3be557f4b49b5",
+  "schema": "phase11_asced_figure2_evidence_v1",
+  "scientific_review_state": "supplemental_unreviewed"
+}

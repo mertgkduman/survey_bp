@@ -19,6 +19,7 @@ ASSESSMENT = ROOT / "data/results/phase11-asced-figure2/assessment.json"
 SCRIPT = ROOT / "scripts/run_phase11_source_studies.py"
 REVIEW_SCRIPT = ROOT / "scripts/review_phase11_asced_figure2.py"
 REVIEW = ROOT / "data/source-targets/phase11-asced-figure2-review.json"
+EXTRACTION_EVIDENCE = ROOT / "data/source-targets/phase11-asced-figure2-extraction-evidence.json"
 
 
 def _run_review(*args: str) -> subprocess.CompletedProcess[str]:
@@ -210,3 +211,23 @@ def test_asced_assessment_detects_target_digest_drift_and_never_opens_sampling_f
     run = _run("run", "--target", str(target), "--assessment", str(assessment))
     assert run.returncode != 0
     assert "digest" in run.stderr.lower()
+
+
+def test_asced_figure2_supplemental_evidence_exposes_author_result_discrepancies() -> None:
+    evidence = _json(EXTRACTION_EVIDENCE)
+    assert evidence["review_candidate_sha256"] == _json(REVIEW)["candidate_sha256"]
+    assert evidence["execution_authorized"] is False
+    assert evidence["scientific_review_state"] == "supplemental_unreviewed"
+    assert evidence["evidence_sha256"] == hashlib.sha256(json.dumps(
+        {key: value for key, value in evidence.items() if key != "evidence_sha256"},
+        sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False,
+    ).encode()).hexdigest()
+    curves = {curve["curve_id"]: curve for curve in evidence["curves"]}
+    assert len(curves) == 4
+    assert all(len(curve["points"]) == 8 for curve in curves.values())
+    assert curves["bp4_baseline"]["author_meta"]["target_errors"] == "4000"
+    assert curves["bp4_asced_k16_delta2_l4"]["author_meta"]["target_errors"] == "2000"
+    assert curves["obp4_baseline"]["author_meta"]["target_errors"] == "400"
+    assert all(not row["author_value_inside_plotted_reading_interval"]
+               for row in curves["bp4_baseline"]["points"])
+    assert _json(TARGET)["members"][0]["admitted_shots"] == 0
