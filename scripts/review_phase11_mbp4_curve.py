@@ -20,6 +20,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_REVIEW = ROOT / "data/source-targets/phase11-mbp4-curve-review.json"
+DEFAULT_TARGET = ROOT / "data/source-targets/phase11-mbp4-curve.json"
 MECHANISM_TARGET = ROOT / "data/source-targets/phase11-mbp4-figures8-9-five-qubit.json"
 MECHANISM_ASSESSMENT = ROOT / "data/results/phase11-mbp4-figures8-9/assessment.json"
 SOURCE_PDF = Path("/tmp/phase11-mbp4.pdf")
@@ -252,8 +253,55 @@ def prepare(output: Path) -> None:
     print(json.dumps({"authorizes_execution": False, "review": str(output), "review_digest": candidate["review_digest"]}, sort_keys=True))
 
 
-def materialize(_: Path) -> None:
-    raise ValueError("materialize is reserved for Task 3 after the blocking human review")
+def materialize(review_path: Path, target_path: Path, *, decision: str, reviewer: str, reason: str, reviewed_digest: str) -> None:
+    """Record the explicit review without changing the immutable candidate."""
+    review_path = review_path.resolve(strict=True)
+    if decision != "preserve_mechanism_only":
+        raise ValueError("statistical approval requires complete source metadata")
+    if not reviewer.strip() or not reason.strip():
+        raise ValueError("reviewer and reason are required")
+    review = json.loads(review_path.read_text(encoding="utf-8"))
+    verify_candidate(review)
+    if reviewed_digest != review["review_digest"]:
+        raise ValueError("reviewed candidate digest mismatch")
+    assessment_before = file_sha256(MECHANISM_ASSESSMENT)
+    target: dict[str, object] = {
+        "schema": "phase11-mbp4-figure6-curve-target-v1",
+        "target_id": review["target_id"],
+        "source_review_path": str(review_path.relative_to(ROOT)),
+        "source_review_digest": reviewed_digest,
+        "source_pdf_sha256": review["source"]["sha256"],
+        "review_decision": {
+            "decision": decision,
+            "reviewer": reviewer,
+            "reason": reason,
+            "reviewed_digest": reviewed_digest,
+        },
+        "eligibility": "blocked_metadata",
+        "claim_scope": "deterministic_mechanism_only_not_a_curve_or_ranking",
+        "admitted_shots": 0,
+        "authorizes_execution": False,
+        "blockers": review["field_blockers"],
+        "mechanism_assessment_sha256": assessment_before,
+    }
+    target["target_receipt_sha256"] = digest(target)
+    if target_path.exists():
+        existing = json.loads(target_path.read_text(encoding="utf-8"))
+        if existing != target:
+            raise ValueError("existing statistical target conflicts with requested review decision")
+    else:
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        temporary = target_path.with_name(target_path.name + ".tmp")
+        if temporary.exists() or target_path.is_symlink():
+            raise ValueError("target path is unsafe")
+        temporary.write_text(json.dumps(target, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        temporary.replace(target_path)
+    written = json.loads(target_path.read_text(encoding="utf-8"))
+    if written != target or written["target_receipt_sha256"] != digest({k: v for k, v in written.items() if k != "target_receipt_sha256"}):
+        raise ValueError("materialized target failed reload or digest verification")
+    if file_sha256(MECHANISM_ASSESSMENT) != assessment_before:
+        raise ValueError("mechanism assessment changed during statistical review")
+    print(json.dumps({"target": str(target_path), "decision": decision, "target_receipt_sha256": target["target_receipt_sha256"]}, sort_keys=True))
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -265,6 +313,11 @@ def main(argv: list[str] | None = None) -> int:
     verify_parser.add_argument("--review", type=Path, default=DEFAULT_REVIEW)
     materialize_parser = commands.add_parser("materialize")
     materialize_parser.add_argument("--review", type=Path, default=DEFAULT_REVIEW)
+    materialize_parser.add_argument("--target", type=Path, default=DEFAULT_TARGET)
+    materialize_parser.add_argument("--decision", required=True)
+    materialize_parser.add_argument("--reviewer", required=True)
+    materialize_parser.add_argument("--reason", required=True)
+    materialize_parser.add_argument("--reviewed-digest", required=True)
     args = parser.parse_args(argv)
     try:
         if args.command == "prepare":
@@ -273,7 +326,7 @@ def main(argv: list[str] | None = None) -> int:
             verify_candidate(json.loads(args.review.read_text(encoding="utf-8")))
             print(json.dumps({"review": str(args.review), "verified": True}, sort_keys=True))
         else:
-            materialize(args.review)
+            materialize(args.review, args.target, decision=args.decision, reviewer=args.reviewer, reason=args.reason, reviewed_digest=args.reviewed_digest)
     except (OSError, ValueError, json.JSONDecodeError) as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 1

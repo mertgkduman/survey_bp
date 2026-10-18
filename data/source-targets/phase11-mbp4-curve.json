@@ -1,0 +1,33 @@
+{
+  "admitted_shots": 0,
+  "authorizes_execution": false,
+  "blockers": [
+    "author_implementation_identity",
+    "beta",
+    "denominator",
+    "digitization_uncertainty",
+    "interval_method",
+    "iteration_cap",
+    "numerical_profile",
+    "resource_ceiling",
+    "schedule",
+    "stopping_rule",
+    "tolerance",
+    "transformed_coordinates"
+  ],
+  "claim_scope": "deterministic_mechanism_only_not_a_curve_or_ranking",
+  "eligibility": "blocked_metadata",
+  "mechanism_assessment_sha256": "bae83eea99067a3ce56f94a29c6e24fb29bcca05a4e8151c8ab580beca30870d",
+  "review_decision": {
+    "decision": "preserve_mechanism_only",
+    "reason": "User directed record policy and move on; Figure 6 statistical coordinates, denominators, stopping, uncertainty, and tolerance remain unresolved.",
+    "reviewed_digest": "bc4678ef8da5d02d3c57c6f6392fc7b8334a6048980fdfe9486791e06fc17184",
+    "reviewer": "chat_user"
+  },
+  "schema": "phase11-mbp4-figure6-curve-target-v1",
+  "source_pdf_sha256": "37d3a734c1e617eecc45ed1cd641dd92b89adfd7e15390ef403d90637c547f23",
+  "source_review_digest": "bc4678ef8da5d02d3c57c6f6392fc7b8334a6048980fdfe9486791e06fc17184",
+  "source_review_path": "data/source-targets/phase11-mbp4-curve-review.json",
+  "target_id": "phase11-mbp4-figure6-alpha-1.5-curve",
+  "target_receipt_sha256": "0b83a8e0fbadfae37888c1555469971b4402e9196ff850ce172f22258d292763"
+}

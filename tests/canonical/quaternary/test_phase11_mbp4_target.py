@@ -188,3 +188,41 @@ def test_figure6_curve_review_binds_all_required_fields_and_rejects_tampering(tm
     result = _verify_curve_review(tampered)
     assert result.returncode != 0
     assert "point" in result.stderr.lower() or "coverage" in result.stderr.lower()
+
+
+def test_materialize_curve_review_preserves_mechanism_only_and_zero_shots(tmp_path: Path) -> None:
+    before = ASSESSMENT.read_bytes()
+    target = tmp_path / "curve.json"
+    review = _json(CURVE_REVIEW)
+    result = subprocess.run([
+        sys.executable, str(CURVE_SCRIPT), "materialize",
+        "--review", str(CURVE_REVIEW), "--target", str(target),
+        "--decision", "preserve_mechanism_only", "--reviewer", "chat_user",
+        "--reason", "Figure 6 statistical metadata remain unresolved; retain policy mechanism only.",
+        "--reviewed-digest", review["review_digest"],
+    ], cwd=ROOT, check=False, capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    materialized = _json(target)
+    assert materialized["review_decision"]["reviewed_digest"] == review["review_digest"]
+    assert materialized["eligibility"] == "blocked_metadata"
+    assert materialized["admitted_shots"] == 0
+    assert materialized["authorizes_execution"] is False
+    assert set(review["field_blockers"]) == set(materialized["blockers"])
+    assert materialized["target_receipt_sha256"] == sha256(_canonical_bytes({
+        key: value for key, value in materialized.items() if key != "target_receipt_sha256"
+    })).hexdigest()
+    assert ASSESSMENT.read_bytes() == before
+
+
+def test_materialize_curve_review_rejects_stale_digest_and_unqualified_approval(tmp_path: Path) -> None:
+    target = tmp_path / "curve.json"
+    common = [sys.executable, str(CURVE_SCRIPT), "materialize", "--review", str(CURVE_REVIEW),
+              "--target", str(target), "--reviewer", "chat_user", "--reason", "source metadata missing"]
+    for decision, digest_value in [
+        ("preserve_mechanism_only", "0" * 64),
+        ("approve_statistical_target", _json(CURVE_REVIEW)["review_digest"]),
+    ]:
+        result = subprocess.run(common + ["--decision", decision, "--reviewed-digest", digest_value],
+                                cwd=ROOT, check=False, capture_output=True, text=True)
+        assert result.returncode != 0
+        assert not target.exists()
