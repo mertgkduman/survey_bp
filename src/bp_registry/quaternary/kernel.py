@@ -192,6 +192,12 @@ class QbpSession:
         self._checks = np.asarray(rows, dtype=np.int64)
         self._variables = np.asarray(columns, dtype=np.int64)
         self._labels = np.asarray(problem.code.checks[rows, columns], dtype=np.uint8)
+        # A graph is immutable for the lifetime of a session. Resolve incidence
+        # once, preserving the original check-major edge order for reductions.
+        self._check_incident = tuple(tuple(int(edge) for edge in np.flatnonzero(self._checks == check))
+                                     for check in range(problem.code.checks.shape[0]))
+        self._variable_incident = tuple(tuple(int(edge) for edge in np.flatnonzero(self._variables == variable))
+                                        for variable in range(problem.code.n))
         self._prior_llrs = np.asarray([kernel.prior_llrs(row) for row in self.priors], dtype=np.float64)
         self._c2v = np.zeros(self._labels.size, dtype=np.float64)
         self._v2c = self._prior_llrs[self._variables].copy()
@@ -266,18 +272,24 @@ class QbpSession:
             return self._last
         try:
             next_c2v = np.empty_like(self._c2v)
-            for edge, (check, label) in enumerate(zip(self._checks, self._labels, strict=True)):
-                same_check = np.flatnonzero(self._checks == check)
+            # Quantization depends only on the previous committed V2C value and
+            # its edge label. Every outgoing message at a check reads that same
+            # value, so share it without changing the excluded-neighbor order.
+            quantized_v2c = np.asarray([
+                commutation_llr(self._v2c[edge], int(label), profile=self.kernel.profile)
+                for edge, label in enumerate(self._labels)
+            ], dtype=np.float64)
+            for edge, check in enumerate(self._checks):
                 excluded = [
-                    commutation_llr(self._v2c[index], int(self._labels[index]), profile=self.kernel.profile)
-                    for index in same_check if index != edge
+                    float(quantized_v2c[index])
+                    for index in self._check_incident[int(check)] if index != edge
                 ]
                 next_c2v[edge] = self.kernel.check_message(excluded, int(self.problem.syndrome[check]))
             next_beliefs = np.empty_like(self._beliefs)
             for variable in range(self.problem.code.n):
-                incident = np.flatnonzero(self._variables == variable)
+                incident = self._variable_incident[variable]
                 next_beliefs[variable] = self.kernel.posterior(
-                    self.priors[variable], next_c2v[incident], self._labels[incident],
+                    self.priors[variable], next_c2v[list(incident)], self._labels[list(incident)],
                 )
             next_v2c = np.empty_like(self._v2c)
             for edge, (variable, label) in enumerate(zip(self._variables, self._labels, strict=True)):

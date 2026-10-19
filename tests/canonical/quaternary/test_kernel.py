@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import importlib.util
+from hashlib import sha256
+from pathlib import Path
 import numpy as np
 import pytest
 
@@ -19,6 +21,8 @@ from bp_registry.quaternary.numerics import (
     probabilities_to_llrs,
 )
 from bp_registry.quaternary.problems import PauliCode, QuaternaryOriginalProblem
+from bp_registry.quaternary.asced import parse_pinned_gb46_css
+from bp_registry.quaternary.problems import compile_css_artifact
 from bp_registry.canonical.budgets import BudgetLimit, BudgetTree
 
 from .test_vector_oracle import exact_one_check, vector_bp4_one_check
@@ -105,3 +109,22 @@ def test_session_reserves_full_sweep_work_before_state_mutation_when_capped() ->
     assert result.terminal == "capped"
     assert result.iteration == 0
     assert budget.summary("attempt").bp_calls == 0
+
+
+def test_gb46_sweep_retains_preindexed_message_oracle() -> None:
+    """The performance refactor must preserve ordered floating point buffers."""
+    root = Path(__file__).resolve().parents[3]
+    code = compile_css_artifact(
+        parse_pinned_gb46_css((root / "data/artifacts/gb46-h44.alist").read_bytes()),
+        source_artifact_identity="gb46-h44-pinned-alist",
+    )
+    rng = np.random.default_rng(11019)
+    error = np.zeros(code.n, dtype=np.uint8)
+    selected = rng.random(code.n) < .08
+    error[selected] = rng.choice(np.asarray([1, 2, 3], dtype=np.uint8), size=int(selected.sum()))
+    problem = QuaternaryOriginalProblem("original-gb46-sweep-oracle", code, code.syndrome(error))
+    priors = np.tile([.92, .08/3, .08/3, .08/3], (code.n, 1))
+    sweep = ScalarLlrBp4Kernel().new_session(problem, priors).sweep(stop_on_convergence=False)
+    assert sha256(sweep.c2v.tobytes()).hexdigest() == "72d96a38bbc24e37300c0bf2ab2b1470956129cdda71335b2f427efc7dd5f08c"
+    assert sha256(sweep.v2c.tobytes()).hexdigest() == "0281382a85bd14f96f40eaa7b7739cc6b525da6f423d39d6aa580b24ca9e7bf6"
+    assert sha256(sweep.beliefs.tobytes()).hexdigest() == "31df7094d2f093cd94b7c6092f213deabbbe95bd7c3ebf1d978687944df66db4"
