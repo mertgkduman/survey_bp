@@ -1,0 +1,53 @@
+=== BB72 canonical SPA, one syndrome, max 3 iterations ===
+         64156 function calls in 0.065 seconds
+
+   Ordered by: cumulative time
+   List reduced from 93 to 18 due to restriction <18>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.065    0.065 /hpc/group/pfisterlab/mg551/storage/survey_bp/scripts/profile_bp_kernel_hotspots.py:35(<lambda>)
+        1    0.000    0.000    0.065    0.065 /hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/canonical/kernel.py:81(run)
+        1    0.001    0.001    0.062    0.062 /hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/canonical/schedules.py:132(sweep)
+      216    0.000    0.000    0.058    0.000 /hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/canonical/kernel.py:46(check_message)
+      216    0.000    0.000    0.057    0.000 /hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/canonical/numerics.py:129(check_to_variable)
+      216    0.002    0.000    0.053    0.000 /hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/canonical/numerics.py:116(boxplus)
+      864    0.011    0.000    0.045    0.000 /hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/canonical/numerics.py:95(boxplus_pair)
+     2602    0.009    0.000    0.036    0.000 /hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/canonical/numerics.py:52(finite_saturate)
+     2605    0.002    0.000    0.013    0.000 /hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:2589(all)
+     2612    0.004    0.000    0.011    0.000 /hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:89(_wrapreduction_any_all)
+     2602    0.003    0.000    0.011    0.000 /hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:2241(clip)
+     2638    0.002    0.000    0.009    0.000 /hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:51(_wrapfunc)
+     4341    0.008    0.000    0.008    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+     2602    0.001    0.000    0.007    0.000 {method 'clip' of 'numpy.ndarray' objects}
+     1728    0.002    0.000    0.006    0.000 /hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:69(_wrapreduction)
+     2602    0.005    0.000    0.005    0.000 /hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numpy/_core/_methods.py:99(_clip)
+     1518    0.002    0.000    0.005    0.000 {method 'all' of 'numpy.generic' objects}
+      864    0.001    0.000    0.004    0.000 /hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:3190(min)
+
+
+
+=== GB46 canonical BP4, one flooding sweep ===
+         518533 function calls in 0.574 seconds
+
+   Ordered by: cumulative time
+   List reduced from 119 to 18 due to restriction <18>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.574    0.574 /hpc/group/pfisterlab/mg551/storage/survey_bp/scripts/profile_bp_kernel_hotspots.py:43(<lambda>)
+        1    0.010    0.010    0.574    0.574 /hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/quaternary/kernel.py:254(sweep)
+     2464    0.028    0.000    0.378    0.000 /hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/quaternary/numerics.py:171(commutation_llr)
+    15320    0.028    0.000    0.229    0.000 /hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/quaternary/numerics.py:72(finite_saturate)
+     4576    0.040    0.000    0.176    0.000 /hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/quaternary/algebra.py:64(anticommutes)
+    20340    0.043    0.000    0.160    0.000 /hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/quaternary/numerics.py:50(_float64)
+     4974    0.031    0.000    0.145    0.000 /hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/quaternary/numerics.py:84(ordered_logsumexp)
+     9154    0.051    0.000    0.128    0.000 /hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/quaternary/algebra.py:37(_labels)
+    30344    0.042    0.000    0.128    0.000 /hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:89(_wrapreduction_any_all)
+    21142    0.015    0.000    0.107    0.000 /hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:2589(all)
+      352    0.000    0.000    0.100    0.000 /hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/quaternary/kernel.py:120(check_message)
+      352    0.001    0.000    0.100    0.000 /hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/quaternary/numerics.py:123(check_message)
+      352    0.003    0.000    0.093    0.000 /hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/quaternary/numerics.py:106(ordered_boxplus)
+     2112    0.017    0.000    0.079    0.000 /hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/quaternary/numerics.py:95(_boxplus_pair)
+    15718    0.017    0.000    0.072    0.000 /hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:2241(clip)
+    16116    0.010    0.000    0.056    0.000 /hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:51(_wrapfunc)
+    30485    0.055    0.000    0.055    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+    15718    0.008    0.000    0.043    0.000 {method 'clip' of 'numpy.ndarray' objects}
