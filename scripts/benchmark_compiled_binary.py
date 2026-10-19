@@ -67,9 +67,10 @@ def main() -> None:
         reference = BinarySpaKernel() if rule == 'spa' else BinarySpaKernel(profile=MIN_SUM_CPU_F64, update_rule=MinSumUpdate())
         start = time.perf_counter_ns()
         compiled = CompiledBinaryFlooding.from_check_matrix(h, rule=rule)
+        bound = compiled.bind_error_rate(.08)
         graph_setup_ns = time.perf_counter_ns() - start
         start = time.perf_counter_ns()
-        compiled.run(syndromes[0], error_rate=.08, max_iterations=10)
+        bound.run(syndromes[0], max_iterations=10)
         first_call_ns = time.perf_counter_ns() - start
         schedule = FloodingSchedule(compiled.table, kernel=reference, profile=reference.profile)
         native = ldpc.BpDecoder(h, error_rate=.08, max_iter=10,
@@ -84,7 +85,7 @@ def main() -> None:
                 v2c = sweep.new_v2c
             return sweep.candidate, 10, False
         def run_compiled(s):
-            out = compiled.run(s, error_rate=.08, max_iterations=10)
+            out = bound.run(s, max_iterations=10)
             return out.candidate, out.iterations, out.converged
         def run_native(s):
             candidate = np.asarray(native.decode(s), dtype=np.uint8)

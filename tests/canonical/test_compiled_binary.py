@@ -31,13 +31,17 @@ def test_bb72_fixed_seed_matches_reference_decisions_and_sweeps(rule: str) -> No
     errors = (rng.random((24, h.shape[1])) < .08).astype(np.uint8)
     syndromes = np.asarray((errors @ h.T) % 2, dtype=np.uint8)
     compiled = CompiledBinaryFlooding.from_check_matrix(h, rule=rule)
+    bound = compiled.bind_error_rate(.08)
     reference = _reference(rule)
     schedule = FloodingSchedule(compiled.table, kernel=reference, profile=reference.profile)
     for syndrome in syndromes:
         expected = reference.run(h, syndrome, error_rate=.08, max_iterations=10)
         actual = compiled.run(syndrome, error_rate=.08, max_iterations=10)
+        bound_actual = bound.run(syndrome, max_iterations=10)
         assert (actual.converged, actual.iterations) == (expected.converged, expected.iterations)
         np.testing.assert_array_equal(actual.candidate, expected.candidate)
+        assert (bound_actual.converged, bound_actual.iterations) == (expected.converged, expected.iterations)
+        np.testing.assert_array_equal(bound_actual.candidate, expected.candidate)
     for syndrome in (syndromes[0], syndromes[1], syndromes[2]):
         old_reference = schedule.initialize(.08)
         old_compiled = old_reference.copy()

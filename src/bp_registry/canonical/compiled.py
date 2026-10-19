@@ -142,13 +142,23 @@ class CompiledBinaryFlooding:
     def profile(self):
         return REFERENCE_CPU_F64 if self.rule == "spa" else MIN_SUM_CPU_F64
 
-    def _inputs(self, syndrome: np.ndarray, error_rate: float) -> tuple[np.ndarray, float]:
+    def _syndrome(self, syndrome: np.ndarray) -> np.ndarray:
         s = np.asarray(syndrome)
         if s.shape != (self.table.check_count,) or not np.issubdtype(s.dtype, np.integer) or np.any((s != 0) & (s != 1)):
             raise ValueError("syndrome must be a binary vector matching the graph")
+        return np.asarray(s, dtype=np.uint8)
+
+    def _inputs(self, syndrome: np.ndarray, error_rate: float) -> tuple[np.ndarray, float]:
+        s = self._syndrome(syndrome)
         if not math.isfinite(error_rate) or not 0.0 < error_rate < 1.0:
             raise ValueError("error_rate must be finite and between zero and one")
-        return np.asarray(s, dtype=np.uint8), prior_llr(error_rate, profile=self.profile)
+        return s, prior_llr(error_rate, profile=self.profile)
+
+    def bind_error_rate(self, error_rate: float) -> "BoundBinaryFlooding":
+        """Resolve a fixed prior once for a same-parameter shot batch."""
+        if not math.isfinite(error_rate) or not 0.0 < error_rate < 1.0:
+            raise ValueError("error_rate must be finite and between zero and one")
+        return BoundBinaryFlooding(self, prior_llr(error_rate, profile=self.profile))
 
     def sweep(self, old_v2c: np.ndarray, syndrome: np.ndarray, *, error_rate: float) -> FloodingSweep:
         s, prior = self._inputs(syndrome, error_rate)
@@ -178,4 +188,24 @@ class CompiledBinaryFlooding:
         return KernelResult(candidate, bool(converged), int(iterations))
 
 
-__all__ = ["CompiledBinaryFlooding"]
+@dataclass(frozen=True)
+class BoundBinaryFlooding:
+    """One declared binary graph, rule, and physical error rate."""
+
+    graph: CompiledBinaryFlooding
+    prior: float
+
+    def run(self, syndrome: np.ndarray, *, max_iterations: int) -> KernelResult:
+        s = self.graph._syndrome(syndrome)
+        if type(max_iterations) is not int or max_iterations < 0:
+            raise ValueError("max_iterations must be a nonnegative integer")
+        candidate, converged, iterations = _decode(
+            self.graph.row_ptr, self.graph.variables, self.graph.table.variable_count, s,
+            self.prior, self.graph.profile.saturation, 0 if self.graph.rule == "spa" else 1,
+            max_iterations,
+        )
+        candidate.setflags(write=False)
+        return KernelResult(candidate, bool(converged), int(iterations))
+
+
+__all__ = ["BoundBinaryFlooding", "CompiledBinaryFlooding"]
