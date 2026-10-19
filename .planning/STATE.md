@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 1
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-10-19 — profiled and accelerated canonical BP kernels
-Last Activity Description: Profiled and accelerated canonical BP kernels
+Last activity: 2026-10-19 — reused compiled BP decode buffers and measured same-core effects
+Last Activity Description: Reused compiled BP decode buffers and measured same-core effects
 
 Progress: 8 of 14 phases complete (57%); Phase 9 has 20 of 20 plans complete
 
@@ -273,6 +273,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261019-4l9 | Reuse compiled BP decode buffers and skip unused BP4 marginals | 2026-10-19 | 3c16239 | Verified development prototype | [261019-4l9-reuse-compiled-bp-decode-buffers-and-ski](./quick/261019-4l9-reuse-compiled-bp-decode-buffers-and-ski/) |
 | 261019-18p | Profile and accelerate canonical binary and BP4 kernels | 2026-10-19 | d65e338 | Verified development prototype | [261019-18p-profile-canonical-binary-spa-and-quatern](./quick/261019-18p-profile-canonical-binary-spa-and-quatern/) |
 | 261019-0po | Benchmark canonical BP kernels against Relay Rust, aSCED C++, and ldpc | 2026-10-19 | 91f0559 | Verified development benchmark | [261019-0po-benchmark-canonical-python-bp-kernels-ag](./quick/261019-0po-benchmark-canonical-python-bp-kernels-ag/) |
 | 261012-kia | Defer Phase 5 human review and route to Phase 11 planning | 2026-10-12 | — | Verified | [261012-kia-defer-phase-5-human-review-and-route-to-](./quick/261012-kia-defer-phase-5-human-review-and-route-to-/) |
