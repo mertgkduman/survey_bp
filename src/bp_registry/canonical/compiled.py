@@ -41,9 +41,26 @@ def _flooding_sweep(
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     edge_count = len(variables)
     old = np.empty(edge_count, dtype=np.float64)
-    for edge in range(edge_count):
-        old[edge] = _clip(old_v2c[edge], limit)
     c2v = np.empty(edge_count, dtype=np.float64)
+    beliefs = np.empty(n, dtype=np.float64)
+    candidate = np.empty(n, dtype=np.uint8)
+    new_v2c = np.empty(edge_count, dtype=np.float64)
+    _flooding_sweep_into(row_ptr, variables, n, old_v2c, syndrome, prior, limit, rule,
+                         old, c2v, beliefs, candidate, new_v2c, True)
+    return old, c2v, beliefs, candidate, new_v2c
+
+
+@njit(cache=True)
+def _flooding_sweep_into(
+    row_ptr: np.ndarray, variables: np.ndarray, n: int, old_v2c: np.ndarray,
+    syndrome: np.ndarray, prior: float, limit: float, rule: int,
+    old: np.ndarray, c2v: np.ndarray, beliefs: np.ndarray,
+    candidate: np.ndarray, new_v2c: np.ndarray, clip_old: bool,
+) -> None:
+    edge_count = len(variables)
+    if clip_old:
+        for edge in range(edge_count):
+            old[edge] = _clip(old_v2c[edge], limit)
     for check in range(len(row_ptr) - 1):
         start, stop = row_ptr[check], row_ptr[check + 1]
         for edge in range(start, stop):
@@ -74,17 +91,14 @@ def _flooding_sweep(
             else:
                 message = -magnitude if (negative_count + syndrome[check]) % 2 else magnitude
             c2v[edge] = _clip(message, limit)
-    beliefs = np.full(n, prior, dtype=np.float64)
+    beliefs.fill(prior)
     for edge in range(edge_count):
         beliefs[variables[edge]] += c2v[edge]
-    candidate = np.empty(n, dtype=np.uint8)
     for variable in range(n):
         beliefs[variable] = _clip(beliefs[variable], limit)
         candidate[variable] = 1 if beliefs[variable] < 0.0 else 0
-    new_v2c = np.empty(edge_count, dtype=np.float64)
     for edge in range(edge_count):
         new_v2c[edge] = _clip(beliefs[variables[edge]] - c2v[edge], limit)
-    return old, c2v, beliefs, candidate, new_v2c
 
 
 @njit(cache=True)
@@ -106,11 +120,16 @@ def _decode(
     candidate = np.zeros(n, dtype=np.uint8)
     if len(variables) == 0:
         return candidate, _candidate_matches(row_ptr, variables, candidate, syndrome), 0
-    v2c = np.full(len(variables), prior, dtype=np.float64)
+    v2c = np.full(len(variables), _clip(prior, limit), dtype=np.float64)
+    next_v2c = np.empty_like(v2c)
+    c2v = np.empty_like(v2c)
+    beliefs = np.empty(n, dtype=np.float64)
     for iteration in range(1, max_iterations + 1):
-        _, _, _, candidate, v2c = _flooding_sweep(row_ptr, variables, n, v2c, syndrome, prior, limit, rule)
+        _flooding_sweep_into(row_ptr, variables, n, v2c, syndrome, prior, limit, rule,
+                             v2c, c2v, beliefs, candidate, next_v2c, False)
         if _candidate_matches(row_ptr, variables, candidate, syndrome):
             return candidate, True, iteration
+        v2c, next_v2c = next_v2c, v2c
     return candidate, False, max_iterations
 
 

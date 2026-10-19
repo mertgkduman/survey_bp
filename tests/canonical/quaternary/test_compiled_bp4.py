@@ -81,3 +81,14 @@ def test_one_check_and_invalid_syndrome() -> None:
         np.testing.assert_array_equal(actual.candidate, expected.candidate)
     with pytest.raises(ValueError):
         compiled.run(np.asarray([2], dtype=np.uint8), max_iterations=2)
+
+
+def test_public_sweep_marginals_and_snapshot_survive_decode() -> None:
+    code, priors, syndromes = _gb46()
+    compiled = CompiledBp4Graph.from_code(code, priors)
+    snapshot = compiled.sweep(compiled.initial_v2c(), syndromes[0])
+    saved = tuple(getattr(snapshot, field).copy() for field in ("c2v", "v2c", "beliefs", "marginals", "candidate"))
+    compiled.run(syndromes[1], max_iterations=8, stop_on_convergence=False)
+    for field, expected in zip(("c2v", "v2c", "beliefs", "marginals", "candidate"), saved, strict=True):
+        np.testing.assert_array_equal(getattr(snapshot, field), expected)
+    np.testing.assert_allclose(snapshot.marginals.sum(axis=1), 1.0, rtol=0, atol=1e-15)

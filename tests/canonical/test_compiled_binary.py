@@ -81,3 +81,22 @@ def test_rejects_nonbinary_inputs_and_unknown_policy() -> None:
         compiled.run(np.asarray([2], dtype=np.uint8), error_rate=.1, max_iterations=1)
     with pytest.raises(ValueError):
         compiled.run(np.asarray([1], dtype=np.uint8), error_rate=0, max_iterations=1)
+
+
+@pytest.mark.parametrize("rule", ["spa", "min_sum"])
+def test_clipped_initial_messages_and_public_sweep_snapshot(rule: str) -> None:
+    h = np.asarray([[1, 1, 0], [0, 1, 1]], dtype=np.uint8)
+    syndrome = np.asarray([1, 0], dtype=np.uint8)
+    compiled = CompiledBinaryFlooding.from_check_matrix(h, rule=rule)
+    reference = _reference(rule)
+    for error_rate in (1e-12, 1 - 1e-12):
+        expected = reference.run(h, syndrome, error_rate=error_rate, max_iterations=4)
+        actual = compiled.run(syndrome, error_rate=error_rate, max_iterations=4)
+        assert (actual.converged, actual.iterations) == (expected.converged, expected.iterations)
+        np.testing.assert_array_equal(actual.candidate, expected.candidate)
+        old = np.full(compiled.table.edge_count, 1e6, dtype=np.float64)
+        snapshot = compiled.sweep(old, syndrome, error_rate=error_rate)
+        saved = snapshot.new_v2c.copy()
+        compiled.sweep(snapshot.new_v2c, syndrome, error_rate=error_rate)
+        compiled.run(syndrome, error_rate=error_rate, max_iterations=4)
+        np.testing.assert_array_equal(snapshot.new_v2c, saved)

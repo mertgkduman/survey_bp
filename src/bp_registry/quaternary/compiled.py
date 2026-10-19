@@ -79,9 +79,28 @@ def _sweep(
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     n, edge_count = prior_llrs.shape[0], len(labels)
     quantized = np.empty(edge_count, dtype=np.float64)
+    c2v = np.empty(edge_count, dtype=np.float64)
+    beliefs = np.empty((n, 3), dtype=np.float64)
+    new_v2c = np.empty((edge_count, 3), dtype=np.float64)
+    candidate = np.empty(n, dtype=np.uint8)
+    marginals = np.empty((n, 4), dtype=np.float64)
+    _sweep_into(row_ptr, variable_ptr, variable_edges, variables, labels, old_v2c,
+                prior_llrs, syndrome, limit, quantized, c2v, beliefs, new_v2c, candidate)
+    _normalize_marginals(beliefs, marginals)
+    return c2v, new_v2c, beliefs, marginals, candidate, quantized
+
+
+@njit(cache=True)
+def _sweep_into(
+    row_ptr: np.ndarray, variable_ptr: np.ndarray, variable_edges: np.ndarray,
+    variables: np.ndarray, labels: np.ndarray, old_v2c: np.ndarray,
+    prior_llrs: np.ndarray, syndrome: np.ndarray, limit: float,
+    quantized: np.ndarray, c2v: np.ndarray, beliefs: np.ndarray,
+    new_v2c: np.ndarray, candidate: np.ndarray,
+) -> None:
+    n, edge_count = prior_llrs.shape[0], len(labels)
     for edge in range(edge_count):
         quantized[edge] = _commutation_llr(old_v2c[edge], labels[edge], limit)
-    c2v = np.empty(edge_count, dtype=np.float64)
     for check in range(len(row_ptr) - 1):
         for edge in range(row_ptr[check], row_ptr[check + 1]):
             first = True
@@ -98,7 +117,6 @@ def _sweep(
             if syndrome[check]:
                 message = -message
             c2v[edge] = _clip(message, limit)
-    beliefs = np.empty((n, 3), dtype=np.float64)
     for variable in range(n):
         for state in range(3):
             beliefs[variable, state] = prior_llrs[variable, state]
@@ -110,7 +128,6 @@ def _sweep(
                     beliefs[variable, state - 1] += c2v[edge]
         for state in range(3):
             beliefs[variable, state] = _clip(beliefs[variable, state], limit)
-    new_v2c = np.empty((edge_count, 3), dtype=np.float64)
     for edge in range(edge_count):
         variable, label = variables[edge], labels[edge]
         for state in range(1, 4):
@@ -118,8 +135,6 @@ def _sweep(
             if _anticommutes(label, state):
                 value -= c2v[edge]
             new_v2c[edge, state - 1] = _clip(value, limit)
-    marginals = np.empty((n, 4), dtype=np.float64)
-    candidate = np.empty(n, dtype=np.uint8)
     for variable in range(n):
         x, y, z = beliefs[variable, 0], beliefs[variable, 1], beliefs[variable, 2]
         if x > 0.0 and y > 0.0 and z > 0.0:
@@ -130,7 +145,13 @@ def _sweep(
             candidate[variable] = 2
         else:
             candidate[variable] = 3
-        weights = np.empty(4, dtype=np.float64)
+
+
+@njit(cache=True)
+def _normalize_marginals(beliefs: np.ndarray, marginals: np.ndarray) -> None:
+    weights = np.empty(4, dtype=np.float64)
+    for variable in range(len(beliefs)):
+        x, y, z = beliefs[variable, 0], beliefs[variable, 1], beliefs[variable, 2]
         weights[0], weights[1], weights[2], weights[3] = 0.0, -x, -y, -z
         maximum = max(weights[0], weights[1], weights[2], weights[3])
         total = 0.0
@@ -139,7 +160,6 @@ def _sweep(
             total += weights[state]
         for state in range(4):
             marginals[variable, state] = weights[state] / total
-    return c2v, new_v2c, beliefs, marginals, candidate, quantized
 
 
 @njit(cache=True)
@@ -153,14 +173,19 @@ def _decode(
     if stop_on_convergence and _candidate_matches(row_ptr, variables, labels, candidate, syndrome):
         return candidate, 0, True
     v2c = np.empty((edge_count, 3), dtype=np.float64)
+    next_v2c = np.empty_like(v2c)
+    quantized = np.empty(edge_count, dtype=np.float64)
+    c2v = np.empty(edge_count, dtype=np.float64)
+    beliefs = np.empty((n, 3), dtype=np.float64)
     for edge in range(edge_count):
         for state in range(3):
             v2c[edge, state] = prior_llrs[variables[edge], state]
     for iteration in range(1, max_iterations + 1):
-        _, v2c, _, _, candidate, _ = _sweep(row_ptr, variable_ptr, variable_edges,
-                                               variables, labels, v2c, prior_llrs, syndrome, limit)
+        _sweep_into(row_ptr, variable_ptr, variable_edges, variables, labels, v2c,
+                    prior_llrs, syndrome, limit, quantized, c2v, beliefs, next_v2c, candidate)
         if stop_on_convergence and _candidate_matches(row_ptr, variables, labels, candidate, syndrome):
             return candidate, iteration, True
+        v2c, next_v2c = next_v2c, v2c
     return candidate, max_iterations, _candidate_matches(row_ptr, variables, labels, candidate, syndrome)
 
 
