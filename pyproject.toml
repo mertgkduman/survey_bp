@@ -14,6 +14,9 @@ bp-registry = "bp_registry.study_cli:main"
 bp-registry-campaign = "bp_registry.campaigns.cli:main"
 
 [project.optional-dependencies]
+performance = [
+  "numba==0.64.0",
+]
 analysis = [
   "matplotlib==3.10.9",
   "nbformat==5.10.4",
