@@ -1,0 +1,477 @@
+{
+  "schema": "compiled-binary-benchmark-v1",
+  "host": "dcc-core-ferc-u-ac39-4-1",
+  "affinity": [
+    46
+  ],
+  "python": "3.12.2",
+  "numba": "0.64.0",
+  "ldpc": "2.4.1",
+  "artifact_sha256": "b31c99a754fb377acfb5e2cb2edc2cb7e55c4d1e78feb4aa84c171c051a78c44",
+  "syndrome_sha256": "9ef72dd886d2c63aa5cdc6311821e28d234ed60ee7fa17ff9982042006069fc6",
+  "code": "hgp225",
+  "shape": [
+    108,
+    225
+  ],
+  "edges": 756,
+  "p": 0.08,
+  "cap": 10,
+  "shots": 8,
+  "rules": {
+    "spa": {
+      "graph_setup_ns": 2362482,
+      "first_call_ns": 706007820,
+      "reference": [
+        {
+          "ns_per_shot": 1350265877.875,
+          "candidate_sha256": "7284a2fcc717ce26ebbd6f1e8eaa4f86a80a22be94fc591e4b23fc3a4fd59bfc",
+          "iterations": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "success": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "ns_per_shot": 1344480666.125,
+          "candidate_sha256": "7284a2fcc717ce26ebbd6f1e8eaa4f86a80a22be94fc591e4b23fc3a4fd59bfc",
+          "iterations": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "success": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "ns_per_shot": 1350898716.5,
+          "candidate_sha256": "7284a2fcc717ce26ebbd6f1e8eaa4f86a80a22be94fc591e4b23fc3a4fd59bfc",
+          "iterations": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "success": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        }
+      ],
+      "compiled": [
+        {
+          "ns_per_shot": 2205615.05125,
+          "candidate_sha256": "7284a2fcc717ce26ebbd6f1e8eaa4f86a80a22be94fc591e4b23fc3a4fd59bfc",
+          "iterations": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "success": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "ns_per_shot": 2207318.72875,
+          "candidate_sha256": "7284a2fcc717ce26ebbd6f1e8eaa4f86a80a22be94fc591e4b23fc3a4fd59bfc",
+          "iterations": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "success": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "ns_per_shot": 2200590.58,
+          "candidate_sha256": "7284a2fcc717ce26ebbd6f1e8eaa4f86a80a22be94fc591e4b23fc3a4fd59bfc",
+          "iterations": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "success": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        }
+      ],
+      "ldpc": [
+        {
+          "ns_per_shot": 486159.7175,
+          "candidate_sha256": "7284a2fcc717ce26ebbd6f1e8eaa4f86a80a22be94fc591e4b23fc3a4fd59bfc",
+          "iterations": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "success": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "ns_per_shot": 485287.89,
+          "candidate_sha256": "7284a2fcc717ce26ebbd6f1e8eaa4f86a80a22be94fc591e4b23fc3a4fd59bfc",
+          "iterations": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "success": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "ns_per_shot": 483741.87625,
+          "candidate_sha256": "7284a2fcc717ce26ebbd6f1e8eaa4f86a80a22be94fc591e4b23fc3a4fd59bfc",
+          "iterations": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "success": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        }
+      ],
+      "native_candidates_match": true
+    },
+    "min_sum": {
+      "graph_setup_ns": 2260539,
+      "first_call_ns": 131891,
+      "reference": [
+        {
+          "ns_per_shot": 232144222.375,
+          "candidate_sha256": "be285802ae3de6a7ead0211122d4dbecec73e31617d12e5ed41f9a8ae9207c96",
+          "iterations": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "success": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "ns_per_shot": 233349714.375,
+          "candidate_sha256": "be285802ae3de6a7ead0211122d4dbecec73e31617d12e5ed41f9a8ae9207c96",
+          "iterations": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "success": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "ns_per_shot": 233114311.0,
+          "candidate_sha256": "be285802ae3de6a7ead0211122d4dbecec73e31617d12e5ed41f9a8ae9207c96",
+          "iterations": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "success": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        }
+      ],
+      "compiled": [
+        {
+          "ns_per_shot": 117235.7025,
+          "candidate_sha256": "be285802ae3de6a7ead0211122d4dbecec73e31617d12e5ed41f9a8ae9207c96",
+          "iterations": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "success": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "ns_per_shot": 122725.78125,
+          "candidate_sha256": "be285802ae3de6a7ead0211122d4dbecec73e31617d12e5ed41f9a8ae9207c96",
+          "iterations": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "success": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "ns_per_shot": 123678.4725,
+          "candidate_sha256": "be285802ae3de6a7ead0211122d4dbecec73e31617d12e5ed41f9a8ae9207c96",
+          "iterations": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "success": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        }
+      ],
+      "ldpc": [
+        {
+          "ns_per_shot": 96842.225,
+          "candidate_sha256": "ec3843d66ada2d53d30d904e80ae29c3de6e8b3c72eee056037dc99fd42a2d78",
+          "iterations": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "success": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "ns_per_shot": 96227.775,
+          "candidate_sha256": "ec3843d66ada2d53d30d904e80ae29c3de6e8b3c72eee056037dc99fd42a2d78",
+          "iterations": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "success": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "ns_per_shot": 96451.66875,
+          "candidate_sha256": "ec3843d66ada2d53d30d904e80ae29c3de6e8b3c72eee056037dc99fd42a2d78",
+          "iterations": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "success": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        }
+      ],
+      "native_candidates_match": false
+    }
+  }
+}

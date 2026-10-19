@@ -6,9 +6,9 @@ current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 1
 status: executing
 stopped_at: Completed 11-14-PLAN.md
-last_updated: "2026-10-19T04:42:24Z"
+last_updated: "2026-10-19T05:14:30Z"
 last_activity: 2026-10-19
-last_activity_desc: Completed bounded BP kernel efficiency benchmark
+last_activity_desc: Profiled and accelerated canonical BP kernels
 state_head: 5f93ade1f8743e8a98c17e53fd8acb6160307a0f
 progress:
   total_phases: 14
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 1
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-10-19 — completed bounded BP kernel efficiency benchmark
-Last Activity Description: Completed bounded BP kernel efficiency benchmark
+Last activity: 2026-10-19 — profiled and accelerated canonical BP kernels
+Last Activity Description: Profiled and accelerated canonical BP kernels
 
 Progress: 8 of 14 phases complete (57%); Phase 9 has 20 of 20 plans complete
 
@@ -273,6 +273,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261019-18p | Profile and accelerate canonical binary and BP4 kernels | 2026-10-19 | d65e338 | Verified development prototype | [261019-18p-profile-canonical-binary-spa-and-quatern](./quick/261019-18p-profile-canonical-binary-spa-and-quatern/) |
 | 261019-0po | Benchmark canonical BP kernels against Relay Rust, aSCED C++, and ldpc | 2026-10-19 | 91f0559 | Verified development benchmark | [261019-0po-benchmark-canonical-python-bp-kernels-ag](./quick/261019-0po-benchmark-canonical-python-bp-kernels-ag/) |
 | 261012-kia | Defer Phase 5 human review and route to Phase 11 planning | 2026-10-12 | — | Verified | [261012-kia-defer-phase-5-human-review-and-route-to-](./quick/261012-kia-defer-phase-5-human-review-and-route-to-/) |
 | 261005-le8 | Capture first three-paper CSS literature gate and source specs | 2026-10-05 | a6526e8 | Verified and published | [261005-le8-capture-three-paper-css-literature-gate-](./quick/261005-le8-capture-three-paper-css-literature-gate-/) |

@@ -1,0 +1,80 @@
+{
+  "schema": "bp-component-overhead-v1",
+  "affinity": [
+    46
+  ],
+  "iterations_per_batch": 1000,
+  "repeats": 5,
+  "timings": {
+    "binary_compiled_input_validation": {
+      "ns_per_call": [
+        31968.207,
+        32013.643,
+        32008.362,
+        31826.476,
+        32124.127
+      ],
+      "median_ns": 32008.362
+    },
+    "binary_python_syndrome_evaluation": {
+      "ns_per_call": [
+        9218.047,
+        9231.255,
+        9107.938,
+        9065.128,
+        9086.165
+      ],
+      "median_ns": 9107.938
+    },
+    "binary_compiled_syndrome_evaluation": {
+      "ns_per_call": [
+        652.096,
+        654.466,
+        662.627,
+        646.885,
+        651.234
+      ],
+      "median_ns": 652.096
+    },
+    "bp4_compiled_input_validation": {
+      "ns_per_call": [
+        6151.577,
+        6078.139,
+        5885.796,
+        6367.165,
+        6259.717
+      ],
+      "median_ns": 6151.577
+    },
+    "bp4_python_original_syndrome_evaluation": {
+      "ns_per_call": [
+        96874.344,
+        98128.884,
+        88440.375,
+        89497.627,
+        88368.48
+      ],
+      "median_ns": 89497.627
+    },
+    "bp4_python_session_convergence": {
+      "ns_per_call": [
+        93937.496,
+        94523.123,
+        93057.648,
+        93506.677,
+        93529.32
+      ],
+      "median_ns": 93529.32
+    },
+    "bp4_compiled_syndrome_evaluation": {
+      "ns_per_call": [
+        1726.349,
+        1714.11,
+        1718.669,
+        1722.139,
+        1714.814
+      ],
+      "median_ns": 1718.669
+    }
+  }
+}

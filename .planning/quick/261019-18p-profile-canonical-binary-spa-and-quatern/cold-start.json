@@ -1,0 +1,6 @@
+{
+  "graph_setup_ns": 820600,
+  "first_call_ns": 2178473509,
+  "second_call_ns": 224495,
+  "note": "Empty Numba cache directory; first call includes JIT compilation, second call is warm; separate process on CPU 46."
+}
