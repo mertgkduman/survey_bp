@@ -1,0 +1,33 @@
+# Figure 2 ordinary BP4 baseline; non-runnable source specification.
+schema_version = 1
+record_kind = "literature_policy_spec"
+variant_id = "bp4-ordinary-figure2"
+execution_status = "not_runnable"
+blocking_features = ["figure2_reviewed_coordinates_and_tolerance", "paper_bp4_schedule_and_numerical_profile", "source_matched_native_shots"]
+
+[source]
+paper = "Wursthorn et al., Affine Subcode Ensemble Decoding for Degeneracy-Aware Quantum Error Correction"
+revision = "arxiv:2605.06547v2"
+url = "https://arxiv.org/pdf/2605.06547v2"
+anchors = ["Figure 2 GB46 ordinary Baseline", "data/source-targets/phase11-asced-figure2-review.json"]
+
+[update]
+kind = "quaternary_bp4"
+
+[schedule]
+kind = "source_order_unqualified"
+
+[state_memory]
+kind = "stateless"
+
+[intervention]
+kind = "identity"
+
+[stopping]
+kind = "source_figure2_unqualified"
+
+[selection]
+kind = "source_rule_unqualified"
+
+[postprocessing]
+kind = "identity"

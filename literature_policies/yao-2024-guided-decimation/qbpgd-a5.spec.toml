@@ -1,0 +1,36 @@
+# Quaternary Figure 7 guided decimation; source settings are not an executable route.
+schema_version = 1
+record_kind = "literature_policy_spec"
+variant_id = "qbpgd-a5-figure7"
+execution_status = "not_runnable"
+blocking_features = ["continued_message_lifecycle", "tie_rule", "normalization_interface", "figure7_coordinates_and_tolerance", "author_implementation_identity"]
+
+[source]
+paper = "Yao et al., Belief Propagation Decoding of Quantum LDPC Codes with Guided Decimation"
+revision = "arxiv:2312.10950v2"
+url = "https://arxiv.org/pdf/2312.10950v2"
+anchors = ["Algorithm 3", "Figure 7 A5", "data/source-targets/phase11-qbpgd-figure7-a5.json"]
+
+[update]
+kind = "quaternary_bp"
+
+[schedule]
+kind = "source_order_unqualified"
+
+[state_memory]
+kind = "message_reset_or_continuation_unresolved"
+
+[intervention]
+kind = "quaternary_guided_decimation"
+epsilon = 1e-10
+iterations_per_round = 10
+maximum_decimation_rounds = 180
+
+[stopping]
+kind = "early_syndrome_or_round_budget"
+
+[selection]
+kind = "source_tie_rule_unqualified"
+
+[postprocessing]
+kind = "identity"

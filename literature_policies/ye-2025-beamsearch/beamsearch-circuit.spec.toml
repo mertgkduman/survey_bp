@@ -1,0 +1,37 @@
+# Circuit source specification. Deliberately non-runnable in the CSS policy registry.
+schema_version = 1
+record_kind = "literature_policy_spec"
+variant_id = "beamsearch-circuit"
+execution_status = "not_runnable"
+blocking_features = ["circuit_problem_and_observable_contract", "paper_target_settings_and_sample_rule", "masked_branch_and_prune_transition_qualification"]
+
+[source]
+paper = "Ye, Wecker, and Delfosse, BeamSearch decoder"
+revision = "arxiv:2512.07057v2"
+url = "https://arxiv.org/html/2512.07057v2"
+anchors = ["BeamSearch algorithm", "author StimCircuit inventory"]
+
+[equations]
+update = "source-defined BP on a circuit detector-fault model; qualify the exact check update and numerical profile per selected target"
+branch = "branch on a selected variable, mask fixed variables, continue BP, rank and prune paths with declared source rules"
+
+[update]
+kind = "binary_bp_circuit_unqualified"
+
+[schedule]
+kind = "source_defined_order_unqualified"
+
+[state_memory]
+kind = "branch_local_messages_source_defined"
+
+[intervention]
+kind = "beam_branch_mask_prune_source_defined"
+
+[stopping]
+kind = "source_target_unqualified"
+
+[selection]
+kind = "source_target_unqualified"
+
+[postprocessing]
+kind = "source_target_unqualified"

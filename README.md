@@ -12,7 +12,7 @@ engines.
 
 ## Current status
 
-The current implementation focuses on **binary CSS code-capacity decoding**:
+The current implementation covers **binary CSS and correlated quaternary code-capacity decoding**, with a bounded CPU circuit-integration prototype:
 
 - Versioned experiment manifests, immutable code artifacts, and independent
   algebraic and recovery checks.
@@ -20,16 +20,11 @@ The current implementation focuses on **binary CSS code-capacity decoding**:
   with explicit compatibility rules for flooding and local schedules.
 - Scheduling policies, typed work budgets, event ledgers, and run verification.
 - A native `ldpc.BpDecoder` baseline and source-linked memory/Relay BP work.
+- A separate four-state Pauli BP kernel and Phase 11 quaternary mechanism and assessment records.
+- Pinned Relay-BP and BeamSearch Stim circuit fixtures and an opt-in Sinter adapter for plain binary flooding SPA or min-sum on compatible independent-fault detector models.
 
-Memory and Relay BP qualification is in progress. The calibration campaign has
-finished with B1 inconclusive; fresh evaluation is pending. The default branch preserves
-the source used by that campaign; additional implementation
-and diagnostic work is maintained on
-[`gsd/phase4-memory-integration-20260926`](https://github.com/mertgkduman/survey_bp/tree/gsd/phase4-memory-integration-20260926).
-See the [execution record](.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md)
-for its validation and remaining gates.
+The [current project state](.planning/STATE.md) is Phase 11 quaternary reproduction and comparisons. The circuit adapter is an integration and throughput pilot; paper-specific circuit models, policy compatibility, native references, and reproduction assessments remain Phase 12–13 work. See the [circuit kernel guide](docs/circuit-kernel.md) for exact scope and measurements.
 
-Correlated quaternary code-capacity and circuit-level decoding are planned next.
 All three regimes remain in the intended journal-paper scope. BP-internal
 modifications take priority over substantial optional OSD/LSD postprocessing.
 
@@ -52,6 +47,8 @@ Optional notebook and plotting dependencies:
 ```bash
 .venv/bin/python -m pip install -e '.[analysis]'
 ```
+
+For the optional Stim/Sinter circuit adapter and compiled CPU kernel, install `.[circuit]`.
 
 The currently qualified HPC development environment is documented in
 [environment-pins.md](docs/environment-pins.md). A new installation must pass
@@ -126,9 +123,10 @@ retained.
 | [`src/bp_registry/`](src/bp_registry/) | Registry, manifests, canonical engines, native references, and CLI |
 | [`tests/`](tests/) | Algebra, policy semantics, execution, and provenance checks |
 | [`data/artifacts/`](data/artifacts/) | Code artifacts and their identities |
+| [`data/circuits/`](data/circuits/) | Pinned source circuit archives and representative Stim fixtures |
 | [`data/manifests/`](data/manifests/) | Experiment configurations and schema snapshots |
 | [`data/evidence/`](data/evidence/) | Source, protocol, and artifact provenance |
-| [`literature_policies/`](literature_policies/) | Per-paper source specifications and qualified decoder TOML files |
+| [`literature_policies/`](literature_policies/) | Per-paper source specifications, qualified decoder TOML files, and the [cross-regime paper index](literature_policies/PAPERS.md) |
 | [`data/results/`](data/results/) | Retained development and pilot evidence |
 | [`docs/`](docs/) | Technical guides, source decisions, and development reports |
 | [`scripts/`](scripts/) | Campaign and analysis utilities |

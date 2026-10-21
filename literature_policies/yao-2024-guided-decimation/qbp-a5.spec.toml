@@ -1,0 +1,34 @@
+# Quaternary Figure 7 baseline in the same source revision as binary BPGD.
+schema_version = 1
+record_kind = "literature_policy_spec"
+variant_id = "qbp-a5-figure7"
+execution_status = "not_runnable"
+blocking_features = ["figure7_coordinates_and_tolerance", "author_implementation_identity", "quaternary_source_numerical_profile"]
+
+[source]
+paper = "Yao et al., Belief Propagation Decoding of Quantum LDPC Codes with Guided Decimation"
+revision = "arxiv:2312.10950v2"
+url = "https://arxiv.org/pdf/2312.10950v2"
+anchors = ["Figure 7 A5", "Q-BP baseline", "data/source-targets/phase11-qbpgd-figure7-a5.json"]
+
+[update]
+kind = "quaternary_bp"
+
+[schedule]
+kind = "source_order_unqualified"
+
+[state_memory]
+kind = "stateless"
+
+[intervention]
+kind = "identity"
+
+[stopping]
+kind = "syndrome_or_budget"
+max_iterations = 100
+
+[selection]
+kind = "source_rule_unqualified"
+
+[postprocessing]
+kind = "identity"

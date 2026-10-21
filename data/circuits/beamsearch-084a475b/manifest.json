@@ -1,0 +1,205 @@
+{
+  "archive": "beamsearch-circuits.tar.gz",
+  "archive_sha256": "87cce3d6d18fc75f89a847436a8cb08eb51fc52ad9f039fba14d236a419b888f",
+  "circuits": [
+    {
+      "bytes": 220146,
+      "path": "StimCircuit/BB[[144,12,12]],memory_X,error_rate=0.0005,syndrome_rounds=12.stim",
+      "sha256": "a6e914fda0f2a63599b7f72fa367ad26f4ba2bca7f2dc4f0152fc100a8041925"
+    },
+    {
+      "bytes": 219987,
+      "path": "StimCircuit/BB[[144,12,12]],memory_X,error_rate=0.001,syndrome_rounds=12.stim",
+      "sha256": "6628d4483489cd8ea792da846274e8e245c7168c3560bf4c5e1cd2b3fb736dc3"
+    },
+    {
+      "bytes": 219987,
+      "path": "StimCircuit/BB[[144,12,12]],memory_X,error_rate=0.002,syndrome_rounds=12.stim",
+      "sha256": "c4cf3bf092a6877a4db8c0d481bf719d5ca3ec63d534aba013a12d14deee7cd2"
+    },
+    {
+      "bytes": 219987,
+      "path": "StimCircuit/BB[[144,12,12]],memory_X,error_rate=0.003,syndrome_rounds=12.stim",
+      "sha256": "c22326f0170a657474525acec4eb97b6585bfa9ab512bd543ce6b0f18e7e2ddd"
+    },
+    {
+      "bytes": 219987,
+      "path": "StimCircuit/BB[[144,12,12]],memory_X,error_rate=0.004,syndrome_rounds=12.stim",
+      "sha256": "6b92b0a70d9e8e4e6049d02bc854c7f64b3b503262c730f5313ea4e1ddb6921b"
+    },
+    {
+      "bytes": 219987,
+      "path": "StimCircuit/BB[[144,12,12]],memory_X,error_rate=0.005,syndrome_rounds=12.stim",
+      "sha256": "13999915168d2aabf9f11d68ce5a52badacb5bb5104fc0464db479c2f3f6a1c0"
+    },
+    {
+      "bytes": 219987,
+      "path": "StimCircuit/BB[[144,12,12]],memory_X,error_rate=0.006,syndrome_rounds=12.stim",
+      "sha256": "71c7f9638704f07a8c1af5483b765e7d43bedea979635249538d2dd004afc1e3"
+    },
+    {
+      "bytes": 219772,
+      "path": "StimCircuit/BB[[144,12,12]],memory_Z,error_rate=0.0005,syndrome_rounds=12.stim",
+      "sha256": "8b3e741ea2f99ea0516ee82ee720aa34e4548b2671da5e2d4417a212a197c887"
+    },
+    {
+      "bytes": 219613,
+      "path": "StimCircuit/BB[[144,12,12]],memory_Z,error_rate=0.001,syndrome_rounds=12.stim",
+      "sha256": "106f45471003ecdf6d843ea3b9da45d2f0a766716569a9fababaacbcdeb356db"
+    },
+    {
+      "bytes": 219613,
+      "path": "StimCircuit/BB[[144,12,12]],memory_Z,error_rate=0.002,syndrome_rounds=12.stim",
+      "sha256": "6de26930cd8575daae63bfe244e7ce96a927152de2ef128295f0fc54717cc179"
+    },
+    {
+      "bytes": 219613,
+      "path": "StimCircuit/BB[[144,12,12]],memory_Z,error_rate=0.003,syndrome_rounds=12.stim",
+      "sha256": "690b3b4450ea9cc20bd17d69a5b27379817c705eff7c04860eb0e072010e5e8f"
+    },
+    {
+      "bytes": 219613,
+      "path": "StimCircuit/BB[[144,12,12]],memory_Z,error_rate=0.004,syndrome_rounds=12.stim",
+      "sha256": "44b7238c21acafea1473d254685a6fd9e1689e79c37c41732fa890f282fcf25a"
+    },
+    {
+      "bytes": 219613,
+      "path": "StimCircuit/BB[[144,12,12]],memory_Z,error_rate=0.005,syndrome_rounds=12.stim",
+      "sha256": "75232092c811cbcdd553d257eecb093fbbd8d40f544ac4d09d4161134b5db4a2"
+    },
+    {
+      "bytes": 219613,
+      "path": "StimCircuit/BB[[144,12,12]],memory_Z,error_rate=0.006,syndrome_rounds=12.stim",
+      "sha256": "c07f8f751f1949a87d0f39b88d981b4af38b592ebab142c3a1376581919bd454"
+    },
+    {
+      "bytes": 120890,
+      "path": "StimCircuit/BB[[90,8,10]],memory_X,error_rate=0.002,syndrome_rounds=10,XYZ_circuit.stim",
+      "sha256": "c96c02187fa3635f1efd62eaba50225a3101db018773f2b4ac43e6552b875e57"
+    },
+    {
+      "bytes": 109550,
+      "path": "StimCircuit/BB[[90,8,10]],memory_X,error_rate=0.002,syndrome_rounds=10.stim",
+      "sha256": "9c1b766700910b695e99c07d6adad4c510c8f9d09f33c32b6778283a4eff0d16"
+    },
+    {
+      "bytes": 120890,
+      "path": "StimCircuit/BB[[90,8,10]],memory_X,error_rate=0.003,syndrome_rounds=10,XYZ_circuit.stim",
+      "sha256": "a4f8a89440b5a9288a3dc99ce232c5ef970fe49c9375deea8ba36dd3751be128"
+    },
+    {
+      "bytes": 109550,
+      "path": "StimCircuit/BB[[90,8,10]],memory_X,error_rate=0.003,syndrome_rounds=10.stim",
+      "sha256": "781291bceee198756ed1e54eb316b0b0c57ab6bd49a433e90dd77a9224e0abd8"
+    },
+    {
+      "bytes": 120890,
+      "path": "StimCircuit/BB[[90,8,10]],memory_X,error_rate=0.004,syndrome_rounds=10,XYZ_circuit.stim",
+      "sha256": "6ad05a5a46211a1d81d1112a41a17ad18f399885bcc155028c69d936a8980713"
+    },
+    {
+      "bytes": 109550,
+      "path": "StimCircuit/BB[[90,8,10]],memory_X,error_rate=0.004,syndrome_rounds=10.stim",
+      "sha256": "6410aa8e561b79ac1ba839b44b9265eb157556ed94b89bcbd1d18493ad74407e"
+    },
+    {
+      "bytes": 120890,
+      "path": "StimCircuit/BB[[90,8,10]],memory_X,error_rate=0.005,syndrome_rounds=10,XYZ_circuit.stim",
+      "sha256": "193e9a6656bdad0521b747af2d370ab5777f2a1e1555370f5a6b502ef0b6c974"
+    },
+    {
+      "bytes": 109550,
+      "path": "StimCircuit/BB[[90,8,10]],memory_X,error_rate=0.005,syndrome_rounds=10.stim",
+      "sha256": "b33efa1b9b9cabc13a978682f1e5801fc5f6085205ab95358e159ba2959646c9"
+    },
+    {
+      "bytes": 120990,
+      "path": "StimCircuit/BB[[90,8,10]],memory_Z,error_rate=0.002,syndrome_rounds=10,XYZ_circuit.stim",
+      "sha256": "876efa55b2a180ef22c6d6201a1ea779c94dd098a723377766ad09ffba46a319"
+    },
+    {
+      "bytes": 109812,
+      "path": "StimCircuit/BB[[90,8,10]],memory_Z,error_rate=0.002,syndrome_rounds=10.stim",
+      "sha256": "e74f6532abcc34780affe03be8ece862032f65d9678f494851a172aa094a7bd3"
+    },
+    {
+      "bytes": 120990,
+      "path": "StimCircuit/BB[[90,8,10]],memory_Z,error_rate=0.003,syndrome_rounds=10,XYZ_circuit.stim",
+      "sha256": "527ceffe1eefaed96905bff133622caaba8a010713d5f5ada6c4f33022201e35"
+    },
+    {
+      "bytes": 109812,
+      "path": "StimCircuit/BB[[90,8,10]],memory_Z,error_rate=0.003,syndrome_rounds=10.stim",
+      "sha256": "f953e191366edf1e564d1c26e509fa25dd4c950d9bb81488bc96852b568d99cf"
+    },
+    {
+      "bytes": 120990,
+      "path": "StimCircuit/BB[[90,8,10]],memory_Z,error_rate=0.004,syndrome_rounds=10,XYZ_circuit.stim",
+      "sha256": "8a2ce1a148b21a9f08e0e7c2938ddb892b4608ea1da63b6e4d3454f55720d083"
+    },
+    {
+      "bytes": 109812,
+      "path": "StimCircuit/BB[[90,8,10]],memory_Z,error_rate=0.004,syndrome_rounds=10.stim",
+      "sha256": "17104d030527813d18d03c797a6aed0600d737358700cdcbaa11238c811b5602"
+    },
+    {
+      "bytes": 120990,
+      "path": "StimCircuit/BB[[90,8,10]],memory_Z,error_rate=0.005,syndrome_rounds=10,XYZ_circuit.stim",
+      "sha256": "c457b1bcc6ffa7b2db7265ab40ba8ad6b4b0d03e43f1708b74a47b61c62fd63d"
+    },
+    {
+      "bytes": 109812,
+      "path": "StimCircuit/BB[[90,8,10]],memory_Z,error_rate=0.005,syndrome_rounds=10.stim",
+      "sha256": "6e2ffa4ce4f66c2f910086a1c95e32dc35043a32fc7f8623c18343b953379e25"
+    },
+    {
+      "bytes": 497928,
+      "path": "StimCircuit/HGP[[450,32,8]],memory_X,error_rate=0.002,syndrome_rounds=8.stim",
+      "sha256": "f9ab1b02417876d6ada95bbe860ad65a451cf765a68d0b6144293c9ea7f30591"
+    },
+    {
+      "bytes": 497928,
+      "path": "StimCircuit/HGP[[450,32,8]],memory_X,error_rate=0.003,syndrome_rounds=8.stim",
+      "sha256": "58cbba8380d3e039af528c86555dc196e38c808b87afdf8c815289cf8fadbef2"
+    },
+    {
+      "bytes": 497928,
+      "path": "StimCircuit/HGP[[450,32,8]],memory_X,error_rate=0.004,syndrome_rounds=8.stim",
+      "sha256": "f7bd873325af289c34b3693bec1def3e2f572f819d3317d691f03f9a7916dbc6"
+    },
+    {
+      "bytes": 497928,
+      "path": "StimCircuit/HGP[[450,32,8]],memory_X,error_rate=0.005,syndrome_rounds=8.stim",
+      "sha256": "35716ed5f57e89082efe4566091c82b7360324efe19f7ba87d5906a2fa8406bf"
+    },
+    {
+      "bytes": 496584,
+      "path": "StimCircuit/HGP[[450,32,8]],memory_Z,error_rate=0.002,syndrome_rounds=8.stim",
+      "sha256": "24cb358e4f41a57a7f5e2625c7e0f0e59f7ea2ad6d7c354e7be970ccf7436e41"
+    },
+    {
+      "bytes": 496584,
+      "path": "StimCircuit/HGP[[450,32,8]],memory_Z,error_rate=0.003,syndrome_rounds=8.stim",
+      "sha256": "710b765cf1832dd8ee2905e22449a414f2791c2d98ae2589284a95d338a0a896"
+    },
+    {
+      "bytes": 496584,
+      "path": "StimCircuit/HGP[[450,32,8]],memory_Z,error_rate=0.004,syndrome_rounds=8.stim",
+      "sha256": "806144aea57eadc24fefed17c6495b96ad6deb3980fdc64c30ebfb825a871a09"
+    },
+    {
+      "bytes": 496584,
+      "path": "StimCircuit/HGP[[450,32,8]],memory_Z,error_rate=0.005,syndrome_rounds=8.stim",
+      "sha256": "207dbae96ca409ec88d6d73592b7b3304804d023899c1cb0692e04fdde872780"
+    }
+  ],
+  "license_sha256": "1349a4b6148492b44f629e64eed676612e234fe9a839e4f3b277c1482c8849f1",
+  "representative": {
+    "local_name": "bb144-memory-z-p005.stim",
+    "path": "StimCircuit/BB[[144,12,12]],memory_Z,error_rate=0.005,syndrome_rounds=12.stim"
+  },
+  "schema": "beamsearch_circuit_archive_v1",
+  "thirdparty_license_sha256": "c4f59499f4f2ec966a5bfee6f8337452eeb7e99bd8f222e81d0fee9157db63b3",
+  "upstream_commit": "084a475b05fb64308103317a1ce5a0c4b0be58aa",
+  "upstream_repository": "https://github.com/ionq-publications/BeamSearchDecoder"
+}

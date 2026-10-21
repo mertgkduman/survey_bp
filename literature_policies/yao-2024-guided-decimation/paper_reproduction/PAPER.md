@@ -39,3 +39,7 @@ The [bounded B1 policy-file gate](../../../docs/css-literature-gate.md) exercise
 ## Phase 9 bounded assessment
 
 The [B1 T=1 p=0.10 adaptation assessment](../../../data/studies/phase9-yao-b1-t001-p010-v4-assessment.json) is `inconclusive_cap_censored`: two sealed timeout terminals exhausted the frozen wall cap before 100 failures. No inverse-binomial rate, interval, `T_100`, or source-target verdict was computed. The earlier unsealed attempts remain zero-credit diagnostics. The [Phase 9 evidence index](../../../data/results/phase9-css-evidence-index-v1.json) keeps this adaptation separate from all ten unverified source variants and from a source-faithful claim.
+
+## Separate quaternary Figure 7 A5 target
+
+The same paper revision also reports Q-BP and Q-BPGD on A5 under depolarizing noise. Their [Q-BP baseline](../qbp-a5.spec.toml) and [Q-BPGD Algorithm 3](../qbpgd-a5.spec.toml) are separate, non-runnable quaternary source records. The [Figure 7 target](../../../data/source-targets/phase11-qbpgd-figure7-a5.json) freezes 100 Q-BP iterations, 10 iterations per Q-BPGD round, at most 180 rounds, epsilon `1e-10`, and collection until 100 error cases. Continued-message versus reset semantics, tie rules, normalization, coordinates, author implementation identity, and tolerance remain unresolved in the [review candidate](../../../data/source-targets/phase11-qbpgd-figure7-review.json). The [current assessment](../../../data/results/phase11-qbpgd-figure7/assessment.json) is inconclusive; the binary CSS B1 records above are not Figure 7 evidence.

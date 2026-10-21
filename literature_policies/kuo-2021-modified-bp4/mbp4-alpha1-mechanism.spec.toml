@@ -1,0 +1,35 @@
+# Figures 8–9 oscillating mechanism; non-runnable source specification.
+schema_version = 1
+record_kind = "literature_policy_spec"
+variant_id = "mbp4-alpha1-figures8-9"
+execution_status = "not_runnable"
+blocking_features = ["paper_curve_denominator_and_stopping", "source_numerical_profile", "author_implementation_identity"]
+
+[source]
+paper = "Kuo and Lai, Modified Belief Propagation Decoding Algorithms for Quantum LDPC Codes"
+revision = "arxiv:2104.13659; pinned PDF sha256 37d3a734c1e617eecc45ed1cd641dd92b89adfd7e15390ef403d90637c547f23"
+url = "https://arxiv.org/pdf/2104.13659"
+anchors = ["Algorithm 1", "Figures 8–9 five-qubit mechanism", "data/source-targets/phase11-mbp4-figures8-9-five-qubit.json"]
+
+[update]
+kind = "quaternary_mbp4_fixed_inhibition"
+alpha = 1.0
+beta = 0.0
+
+[schedule]
+kind = "parallel"
+
+[state_memory]
+kind = "fixed_inhibition"
+
+[intervention]
+kind = "identity"
+
+[stopping]
+kind = "mechanism_observation_horizon_not_curve_stopping"
+
+[selection]
+kind = "source_rule_unqualified"
+
+[postprocessing]
+kind = "identity"

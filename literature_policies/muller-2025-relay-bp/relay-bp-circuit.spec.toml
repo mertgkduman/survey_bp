@@ -1,0 +1,37 @@
+# Circuit source specification. Deliberately non-runnable in the CSS policy registry.
+schema_version = 1
+record_kind = "literature_policy_spec"
+variant_id = "relay-bp-circuit"
+execution_status = "not_runnable"
+blocking_features = ["circuit_problem_and_observable_contract", "paper_target_settings_and_sample_rule", "native_canonical_policy_transition_qualification"]
+
+[source]
+paper = "Müller et al., Relay-BP"
+revision = "arxiv:2506.01779v2"
+url = "https://arxiv.org/html/2506.01779v2"
+anchors = ["Relay-BP algorithm", "author repository v0.2.2 Stim/Sinter interface"]
+
+[equations]
+update = "source Rust implementation uses binary min-sum BP on detector-fault parity graphs; exact numerical profile and circuit target settings require source qualification"
+relay = "disordered memory, multiple BP legs, and relay state transfer are source-specific controller semantics"
+
+[update]
+kind = "binary_min_sum_circuit"
+
+[schedule]
+kind = "source_defined_order_unqualified"
+
+[state_memory]
+kind = "disordered_memory_source_defined"
+
+[intervention]
+kind = "relay_state_transfer_source_defined"
+
+[stopping]
+kind = "source_target_unqualified"
+
+[selection]
+kind = "source_target_unqualified"
+
+[postprocessing]
+kind = "source_target_unqualified"

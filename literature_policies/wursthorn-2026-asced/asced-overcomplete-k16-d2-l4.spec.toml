@@ -1,0 +1,37 @@
+# Source-grounded Figure 2 overcomplete-path record; non-runnable paper policy.
+schema_version = 1
+record_kind = "literature_policy_spec"
+variant_id = "asced-overcomplete-k16-d2-l4"
+execution_status = "not_runnable"
+blocking_features = ["figure2_reviewed_coordinates_and_tolerance", "source_matched_native_shots", "overcomplete_construction_and_path_lifecycle_qualification"]
+
+[source]
+paper = "Wursthorn et al., Affine Subcode Ensemble Decoding for Degeneracy-Aware Quantum Error Correction"
+revision = "arxiv:2605.06547v2"
+url = "https://arxiv.org/pdf/2605.06547v2"
+anchors = ["Figure 2 GB46", "overcomplete OBP4 and OBP4-aSCED", "data/source-targets/phase11-asced-figure2-review.json"]
+
+[update]
+kind = "quaternary_bp4"
+
+[schedule]
+kind = "source_path_order_unqualified"
+
+[state_memory]
+kind = "source_path_lifecycle_unqualified"
+
+[intervention]
+kind = "affine_subcode_ensemble"
+construction = "overcomplete"
+k = 16
+delta = 2
+l = 4
+
+[stopping]
+kind = "source_figure2_unqualified"
+
+[selection]
+kind = "source_original_syndrome_weight_rule_unqualified"
+
+[postprocessing]
+kind = "identity"

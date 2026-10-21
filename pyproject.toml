@@ -17,6 +17,11 @@ bp-registry-campaign = "bp_registry.campaigns.cli:main"
 performance = [
   "numba==0.64.0",
 ]
+circuit = [
+  "numba==0.64.0",
+  "stim==1.15.0",
+  "sinter==1.15.0",
+]
 analysis = [
   "matplotlib==3.10.9",
   "nbformat==5.10.4",
