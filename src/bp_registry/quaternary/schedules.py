@@ -196,17 +196,26 @@ class QbpFloodingSchedule:
             return session.last
         try:
             c2v = np.empty_like(session._c2v)
+            # A complete flooding pass reads one old V2C snapshot. Share each
+            # edge's scalar quantization while retaining check-major exclusion
+            # order and applying transforms separately to every C2V message.
+            quantized_v2c = np.asarray([
+                commutation_llr(session._v2c[edge], int(label), profile=session.kernel.profile)
+                for edge, label in enumerate(session._labels)
+            ], dtype=np.float64)
             for edge, check in enumerate(session._checks):
-                same_check = np.flatnonzero(session._checks == check)
                 reduced = [
-                    commutation_llr(session._v2c[index], int(session._labels[index]), profile=session.kernel.profile)
-                    for index in same_check if index != edge
+                    float(quantized_v2c[index])
+                    for index in session._check_incident[int(check)] if index != edge
                 ]
                 c2v[edge] = _apply_transforms(
                     session.kernel.check_message(reduced, int(session.problem.syndrome[check])), self.transforms
                 )
             beliefs = np.asarray([
-                session.kernel.posterior(session.priors[variable], c2v[np.flatnonzero(session._variables == variable)], session._labels[np.flatnonzero(session._variables == variable)])
+                session.kernel.posterior(
+                    session.priors[variable], c2v[list(session._variable_incident[variable])],
+                    session._labels[list(session._variable_incident[variable])],
+                )
                 for variable in range(session.problem.code.n)
             ])
             v2c = np.asarray([
@@ -272,22 +281,21 @@ class QbpVariableSerialSchedule:
             v2c = session._v2c.copy()
             beliefs = session._beliefs.copy()
             for variable in self.variable_order:
-                incident = np.flatnonzero(session._variables == variable)
+                incident = session._variable_incident[variable]
                 for edge in incident:
                     check = int(session._checks[edge])
-                    same_check = np.flatnonzero(session._checks == check)
                     reduced = [
                         commutation_llr(
                             v2c[index], int(session._labels[index]), profile=session.kernel.profile
                         )
-                        for index in same_check
+                        for index in session._check_incident[check]
                         if index != edge
                     ]
                     c2v[edge] = _apply_transforms(
                         session.kernel.check_message(reduced, int(session.problem.syndrome[check])), self.transforms
                     )
                 beliefs[variable] = session.kernel.posterior(
-                    session.priors[variable], c2v[incident], session._labels[incident]
+                    session.priors[variable], c2v[list(incident)], session._labels[list(incident)]
                 )
                 for edge in incident:
                     v2c[edge] = session.kernel.variable_message(

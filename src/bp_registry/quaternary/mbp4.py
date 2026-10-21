@@ -194,6 +194,10 @@ class Mbp4Session:
         self._checks = np.asarray(rows, dtype=np.int64)
         self._variables = np.asarray(columns, dtype=np.int64)
         self._labels = np.asarray(problem.code.checks[rows, columns], dtype=np.uint8)
+        self._check_incident = tuple(tuple(int(edge) for edge in np.flatnonzero(self._checks == check))
+                                     for check in range(problem.code.checks.shape[0]))
+        self._variable_incident = tuple(tuple(int(edge) for edge in np.flatnonzero(self._variables == variable))
+                                        for variable in range(problem.code.n))
         self._prior_llrs = np.asarray([kernel.prior_llrs(row) for row in self.priors], dtype=np.float64)
         self._c2v = np.zeros(self._labels.size, dtype=np.float64)
         self._v2c = self._prior_llrs[self._variables].copy()
@@ -228,10 +232,9 @@ class Mbp4Session:
 
     def _edge_delta(self, edge: int, v2c: np.ndarray) -> float:
         check = int(self._checks[edge])
-        same_check = np.flatnonzero(self._checks == check)
         reduced = [
             self.scalar_commutation(v2c[index], int(self._labels[index]))
-            for index in same_check if index != edge
+            for index in self._check_incident[check] if index != edge
         ]
         return self.kernel.check_message(reduced, int(self.problem.syndrome[check]))
 
@@ -273,9 +276,24 @@ class Mbp4Session:
         return self._last
 
     def _flooding_pass(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-        c2v = np.asarray([self._edge_delta(edge, self._v2c) for edge in range(self._labels.size)])
+        # Flooding reads one complete old V2C snapshot, so each edge's scalar
+        # commutation value is identical for all neighboring exclusions.
+        quantized_v2c = np.asarray([
+            self.scalar_commutation(self._v2c[edge], int(label))
+            for edge, label in enumerate(self._labels)
+        ], dtype=np.float64)
+        c2v = np.asarray([
+            self.kernel.check_message(
+                [float(quantized_v2c[index]) for index in self._check_incident[int(check)] if index != edge],
+                int(self.problem.syndrome[check]),
+            )
+            for edge, check in enumerate(self._checks)
+        ])
         beliefs = np.asarray([
-            self.kernel.posterior(self.priors[variable], c2v[np.flatnonzero(self._variables == variable)], self._labels[np.flatnonzero(self._variables == variable)])
+            self.kernel.posterior(
+                self.priors[variable], c2v[list(self._variable_incident[variable])],
+                self._labels[list(self._variable_incident[variable])],
+            )
             for variable in range(self.problem.code.n)
         ])
         v2c = np.asarray([
@@ -287,7 +305,7 @@ class Mbp4Session:
     def _serial_pass(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         c2v, v2c, beliefs = self._c2v.copy(), self._v2c.copy(), self._beliefs.copy()
         for variable in range(self.problem.code.n):
-            incident = np.flatnonzero(self._variables == variable)
+            incident = list(self._variable_incident[variable])
             for edge in incident:
                 c2v[edge] = self._edge_delta(int(edge), v2c)
             beliefs[variable] = self.kernel.posterior(self.priors[variable], c2v[incident], self._labels[incident])
