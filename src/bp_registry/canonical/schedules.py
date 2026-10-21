@@ -123,6 +123,14 @@ class FloodingSchedule:
             tuple(index for index, (check, _variable) in enumerate(edge_table.edges) if check == current)
             for current in range(edge_table.check_count)
         )
+        self._check_exclusions = tuple(
+            tuple(np.asarray([other for other in edges if other != edge], dtype=np.intp)
+                  for edge in edges)
+            for edges in self._check_edges
+        )
+        for exclusions in self._check_exclusions:
+            for indices in exclusions:
+                indices.setflags(write=False)
         self._edge_variables = tuple(variable for _check, variable in edge_table.edges)
 
     def initialize(self, error_rate: float) -> np.ndarray:
@@ -146,14 +154,16 @@ class FloodingSchedule:
             or np.any((syndrome_bits != 0) & (syndrome_bits != 1))
         ):
             raise ValueError("syndrome must be a binary integer vector matching the check count")
-        old_snapshot = np.array(old, dtype=np.float64, copy=True)
+        # finite_saturate returns a fresh clipped array, so this remains an
+        # owned snapshot without a second full-edge copy.
+        old_snapshot = old
         prior = self.kernel.prior(error_rate) if prior_llrs is None else prior_llrs
         if prior_llrs is not None and prior_llrs.shape != (self.edge_table.variable_count,):
             raise ValueError("prior_llrs must have one value per variable")
         c2v = np.empty(self.edge_table.edge_count, dtype=np.float64)
         for check, edge_indices in enumerate(self._check_edges):
-            for edge_index in edge_indices:
-                incoming = old_snapshot[[other for other in edge_indices if other != edge_index]]
+            for edge_index, other_indices in zip(edge_indices, self._check_exclusions[check], strict=True):
+                incoming = old_snapshot[other_indices]
                 c2v[edge_index] = self.kernel.check_message(
                     incoming, int(syndrome_bits[check]), check_index=check,
                     edge_index=edge_index, source_iteration=source_iteration,

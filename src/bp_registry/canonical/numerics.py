@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+import math
 import numbers
 
 import numpy as np
@@ -99,18 +100,27 @@ def boxplus_pair(
     profile: NumericalProfile = REFERENCE_CPU_F64,
 ) -> float:
     """Stable two-input LLR box-plus, clipped at named calculation boundaries."""
-    pair = finite_saturate(np.asarray([left, right]), boundary="boxplus_pair_input", profile=profile)
-    magnitudes = np.abs(pair)
-    smaller = float(np.min(magnitudes))
-    larger = float(np.max(magnitudes))
-    sign = -1.0 if float(pair[0]) * float(pair[1]) < 0.0 else 1.0
+    try:
+        left_value, right_value = float(left), float(right)
+    except (TypeError, ValueError) as error:
+        raise ValueError("boxplus_pair_input must be float64-compatible") from error
+    if not math.isfinite(left_value) or not math.isfinite(right_value):
+        raise NumericalFailure("nonfinite arithmetic at boxplus_pair_input")
+    limit = profile.saturation
+    left_value = min(limit, max(-limit, left_value))
+    right_value = min(limit, max(-limit, right_value))
+    smaller = min(abs(left_value), abs(right_value))
+    larger = max(abs(left_value), abs(right_value))
+    sign = -1.0 if left_value * right_value < 0.0 else 1.0
     with np.errstate(over="raise", divide="raise", invalid="raise", under="ignore"):
         try:
             correction = np.log1p(np.exp(-(smaller + larger))) - np.log1p(np.exp(-(larger - smaller)))
             result = sign * (smaller + float(correction))
         except FloatingPointError as error:
             raise NumericalFailure("nonfinite arithmetic at boxplus_pair_intermediate") from error
-    return float(finite_saturate(result, boundary="boxplus_pair_output", profile=profile))
+    if not math.isfinite(result):
+        raise NumericalFailure("nonfinite arithmetic at boxplus_pair_output")
+    return min(limit, max(-limit, result))
 
 
 def boxplus(values: np.ndarray, *, profile: NumericalProfile = REFERENCE_CPU_F64) -> float:

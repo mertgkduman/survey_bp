@@ -61,6 +61,29 @@ def test_boxplus_matches_direct_safe_equation_and_extremes_stay_finite():
     assert np.isfinite(numerics.boxplus(np.array([25.0, -25.0, 25.0])))
 
 
+def test_scalar_boxplus_preserves_array_oracle_bits_and_failures() -> None:
+    rng = np.random.default_rng(6201)
+    pairs = np.vstack((rng.uniform(-40, 40, size=(4096, 2)), np.asarray([
+        [-0.0, 0.0], [25.0, -25.0], [1e-300, -1e-300], [40.0, 40.0], [-40.0, -40.0],
+    ])))
+    for profile in (numerics.REFERENCE_CPU_F64, numerics.NumericalProfile(saturation=12.3), numerics.NumericalProfile(saturation=500.0)):
+        expected = []
+        for left, right in pairs:
+            old_pair = numerics.finite_saturate(np.asarray([left, right]), boundary="boxplus_pair_input", profile=profile)
+            magnitudes = np.abs(old_pair)
+            smaller, larger = float(np.min(magnitudes)), float(np.max(magnitudes))
+            sign = -1.0 if float(old_pair[0]) * float(old_pair[1]) < 0.0 else 1.0
+            with np.errstate(over="raise", divide="raise", invalid="raise", under="ignore"):
+                correction = np.log1p(np.exp(-(smaller + larger))) - np.log1p(np.exp(-(larger - smaller)))
+            expected.append(float(numerics.finite_saturate(sign * (smaller + float(correction)), boundary="boxplus_pair_output", profile=profile)))
+        actual = [numerics.boxplus_pair(float(left), float(right), profile=profile) for left, right in pairs]
+        np.testing.assert_array_equal(np.asarray(actual).view(np.uint64), np.asarray(expected).view(np.uint64))
+    with pytest.raises(numerics.NumericalFailure, match="boxplus_pair_input"):
+        numerics.boxplus_pair(np.nan, 1.0)
+    with pytest.raises(ValueError, match="boxplus_pair_input"):
+        numerics.boxplus_pair("invalid", 1.0)
+
+
 def test_degree_one_empty_and_invalid_boundaries_are_explicit():
     profile = _profile_api()
     assert numerics.check_to_variable(np.array([], dtype=np.float64)) == profile.saturation
