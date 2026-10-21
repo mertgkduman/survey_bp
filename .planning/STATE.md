@@ -8,7 +8,7 @@ status: executing
 stopped_at: Completed 11-14-PLAN.md
 last_updated: "2026-10-19T05:14:30Z"
 last_activity: 2026-10-19
-last_activity_desc: Profiled and accelerated canonical BP kernels
+last_activity_desc: Pinned paper circuits and added a canonical CPU Sinter BP adapter
 state_head: 5f93ade1f8743e8a98c17e53fd8acb6160307a0f
 progress:
   total_phases: 14
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 1
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-10-21 — accelerated shared binary BP numerical and flooding paths with exact traces
-Last Activity Description: Accelerated shared binary BP numerical and flooding paths with exact traces
+Last activity: 2026-10-21 — pinned paper circuits and added a canonical CPU Sinter BP adapter
+Last Activity Description: Pinned paper circuits and added a canonical CPU Sinter BP adapter
 
 Progress: 8 of 14 phases complete (57%); Phase 9 has 20 of 20 plans complete
 
@@ -273,6 +273,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261021-pgm | Pin Relay and BeamSearch circuits, add Sinter CPU BP adapter and paper index | 2026-10-21 | 93757e2 | Verified development integration | [261021-pgm-pin-relay-paper-circuits-and-implement-v](./quick/261021-pgm-pin-relay-paper-circuits-and-implement-v/) |
 | 261021-om6 | Optimize shared binary BP numerical and schedule path with exact policy traces | 2026-10-21 | f54ee9d | Verified development optimization | [261021-om6-optimize-shared-binary-bp-numerical-and-](./quick/261021-om6-optimize-shared-binary-bp-numerical-and-/) |
 | 261021-njt | Optimize policy-composable quaternary BP4 flooding and MBP4 incidence | 2026-10-21 | bf6048a | Verified development optimization | [261021-njt-optimize-policy-composable-quaternary-bp](./quick/261021-njt-optimize-policy-composable-quaternary-bp/) |
 | 261019-4l9 | Reuse compiled BP decode buffers and skip unused BP4 marginals | 2026-10-19 | 3c16239 | Verified development prototype | [261019-4l9-reuse-compiled-bp-decode-buffers-and-ski](./quick/261019-4l9-reuse-compiled-bp-decode-buffers-and-ski/) |
