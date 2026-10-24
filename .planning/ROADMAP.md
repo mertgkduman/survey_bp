@@ -6,7 +6,7 @@ Build a provenance-preserving research platform from paper evidence through nati
 
 **Milestone:** v1.0 — platform and first journal-paper evidence.
 **Structure:** End-to-end capability slices (`mvp` mode), fine granularity. Fourteen phases are used because the three required regimes each need distinct implementation and experimental qualification; phase counts are not a reason to merge those gates or defer publication scope.
-**Planning status:** Phases 1–4, 6, and 10 are complete. Phase 5 implementation is technically verified with human visual review still open. Phase 7 is paused at 6/15 completed plans by user direction to prioritize BP variants; its failed OSD qualification remains recorded. Campaign and reproduction work remains in the first journal milestone. Later plan counts remain TBD.
+**Planning status:** Phases 1–4, 6, and 8–10 are complete. Phase 5 implementation is technically verified with human visual review still open. Phase 7 is paused at 6/15 completed plans by user direction to prioritize BP variants; its halted OSD qualification remains recorded. Phase 11 has 17/25 completed plans and open scientific evidence gaps. Circuit and journal phase plan counts remain TBD.
 
 ## Phases
 
@@ -698,7 +698,7 @@ Plans:
 3. Source-backed compatible policy ablations produce replayable results, outcome/work analysis and discrepancy records, with no forced assumption that every binary policy has a faithful quaternary counterpart.
 
 **Research focus:** Quaternary paper targets and native-code availability, matched baseline priors, correlated-noise ablations, and kernel-aware cost comparisons.
-**Plans:** 15 original plans executed; 10 gap-closure plans planned after verification found open QEV-01/QEV-02 evidence gaps.
+**Plans:** 15 original plans and 2 of 10 gap-closure plans completed; 8 gap-closure plans remain open after verification found QEV-01/QEV-02 evidence gaps.
 
 Plans:
 
@@ -740,10 +740,10 @@ Plans:
 
 **Gap closure Wave 1**
 
-- [ ] 11-16-PLAN.md — Implement the declared controlled evaluation receipt contract.
+- [x] 11-16-PLAN.md — Implement the declared controlled evaluation receipt contract.
 - [ ] 11-18-PLAN.md — Prepare and review the aSCED Figure 2 source target.
 - [ ] 11-19-PLAN.md — Prepare and review Q-BPGD Figure 7 source equivalence.
-- [ ] 11-20-PLAN.md — Prepare and review an MBP4 statistical curve target.
+- [x] 11-20-PLAN.md — Prepare and review an MBP4 statistical curve target; review retained the mechanism-only policy and a blocked zero-shot Figure 6 target.
 
 **Gap closure Wave 2** *(blocked on source reviews)*
 
@@ -762,6 +762,8 @@ Plans:
 **Gap closure Wave 5** *(blocked on Wave 4 evidence)*
 
 - [ ] 11-25-PLAN.md — Rebuild and deeply verify the final Phase 11 assessment.
+
+**Open-plan status:** 11-18 awaits the aSCED Figure 2 source review; 11-19 is the Q-BPGD Figure 7 review deferred by user direction. Both review plans may retain a blocked target if primary evidence remains unresolved. Plans 11-17 and 11-21 depend on those reviews and the completed 11-20 review. Plan 11-22 depends on measured resource qualification, 11-23 and 11-24 depend on its authorization outcome, and 11-25 depends on the resulting evidence. The completed 11-16 receipt contract and 11-20 mechanism-only review do not close QEV-01/QEV-02, authorize dispatch, or establish a statistical curve result.
 
 ### Phase 12: Circuit Models and Canonical Integration
 
@@ -815,7 +817,7 @@ Plans:
 
 ## Progress
 
-**Execution order:** Phases 1–6 are complete or technically verified as recorded above. Phase 7 is paused, and Phase 10 quaternary BP is complete. Phase 8 campaign controls precede statistical assessment in Phases 9 and 11. The later circuit and journal phases retain their dependencies. Independent plans within a phase may execute in parallel once their dependencies are verified.
+**Execution order:** Phases 1–6 are complete or technically verified as recorded above. Phase 7 is paused, and Phase 10 quaternary BP is complete. Phase 8 campaign controls precede statistical assessment in Phases 9 and 11. Phase 11 remains open at 17/25; its source review, resource, authorization, and assessment gates retain their dependencies. The later circuit and journal phases retain their dependencies. Independent plans within a phase may execute in parallel once their dependencies are verified.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -829,10 +831,10 @@ Plans:
 | 8. Reproducible Campaigns and Statistical Assessment | 20/20 | Complete    | 2026-10-11 |
 | 9. CSS Reproduction and Controlled Comparisons | 20/20 | Complete    | 2026-10-12 |
 | 10. Correlated Quaternary Execution | 16/16 | Complete    | 2026-10-08 |
-| 11. Quaternary Reproduction and Comparisons | 15/15 | In Progress|  |
+| 11. Quaternary Reproduction and Comparisons | 17/25 | In progress; scientific gaps open |  |
 | 12. Circuit Models and Canonical Integration | 0/TBD | Not started | - |
 | 13. Circuit Reproduction and Comparisons | 0/TBD | Not started | - |
 | 14. Completed Mapping Study and Journal Evidence | 0/TBD | Not started | - |
 
 ---
-*Created: 2026-09-21 in approved autonomous mode. 84 requirements assigned to 14 phases; implementation has not started.*
+*Created: 2026-09-21 in approved autonomous mode. 84 requirements assigned to 14 phases; status reconciled 2026-10-24.*

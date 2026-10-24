@@ -3,18 +3,18 @@ gsd_state_version: "1.0"
 milestone: v1.0
 current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
-current_plan: 1
+current_plan: 17
 status: executing
-stopped_at: Completed 11-14-PLAN.md
-last_updated: "2026-10-19T05:14:30Z"
-last_activity: 2026-10-19
-last_activity_desc: Pinned paper circuits and added a canonical CPU Sinter BP adapter
-state_head: 5f93ade1f8743e8a98c17e53fd8acb6160307a0f
+stopped_at: Completed 11-16 and 11-20; eight Phase 11 gap plans remain open
+last_updated: "2026-10-24T22:43:04Z"
+last_activity: 2026-10-24
+last_activity_desc: Reconciled Phase 11 plan completion and open evidence gates
+state_head: e638751424f33d3464e619829d4498af2bca2568
 progress:
   total_phases: 14
   completed_phases: 8
   total_plans: 176
-  completed_plans: 158
+  completed_plans: 159
 ---
 
 # Project State
@@ -29,22 +29,22 @@ See: .planning/PROJECT.md (updated 2026-10-12)
 ## Current Position
 
 Phase: 11 (Quaternary Reproduction and Comparisons) — EXECUTING
-Plan: 1 of 25
+Plan: 17 of 25
 Total Phases: 14
-Current Plan: 1
+Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-10-21 — pinned paper circuits and added a canonical CPU Sinter BP adapter
-Last Activity Description: Pinned paper circuits and added a canonical CPU Sinter BP adapter
+Last activity: 2026-10-24 — reconciled Phase 11 plan completion and open evidence gates
+Last Activity Description: Reconciled Phase 11 plan completion and open evidence gates
 
-Progress: 8 of 14 phases complete (57%); Phase 9 has 20 of 20 plans complete
+Progress: 8 of 14 phases complete (57%); 159 of 176 plans complete. Phase 11 has 17 of 25 plans complete; plan 17 is the first open number but depends on source reviews 18 and 19, while plan 20's blocked-target review is complete.
 
 ## Performance Metrics
 
-- Total plans completed: 143
+- Total plans completed: 159
 - Average duration: N/A
 - Total execution time: 0 hours
-- Recent trend: Phase 9 completed 20 bounded CSS plans and passed goal, code, security, and validation gates; source-faithful EVAL-01/02 evidence remains pending.
+- Recent trend: Phase 11 completed 15 original and 2 gap-closure plans. Its source-curve, controlled-effect, and policy-replay evidence remains incomplete; publication dispatch remains denied.
 
 **Per-Plan Metrics:**
 
@@ -111,6 +111,8 @@ Progress: 8 of 14 phases complete (57%); Phase 9 has 20 of 20 plans complete
 | Phase 11-quaternary-reproduction-and-comparisons P12 | 11m | 3 tasks | 5 files |
 | Phase 11 P15 | 666s | 3 tasks | 6 files |
 | Phase 11 P14 | 1h | 3 tasks | 6 files |
+| Phase 11 P16 | 30m | 2 tasks | 3 files |
+| Phase 11 P20 | Not recorded | Review decision | Not recorded |
 
 Phase 02 P10–P16 gap-closure metrics are recorded in their individual summaries.
 
@@ -252,6 +254,7 @@ None outside the roadmap.
 
 ### Blockers/Concerns
 
+- [Phase 11] Eight gap plans remain open: 11-18 aSCED Figure 2 review and user-deferred 11-19 Q-BPGD Figure 7 review gate 11-17 policy replay and 11-21 resource qualification; 11-22 authorization, 11-23/24 campaigns, and 11-25 final verification depend on those outcomes. Completed 11-20 retains the MBP4 Figure 6 mechanism-only, zero-shot target. The current preserve-deny decision remains in force; no controlled effect or source-curve reproduction is established.
 - [Phase 09] Exact author experiment artifacts, source settings, and executable native assessments are still unverified; EVAL-01/02 remain pending. The Yao B1 adaptation is cap censored. Site resource ceilings and scheduler accounting remain unavailable, so publication dispatch is denied.
 
 - Current: Phase 4 passed goal verification (4/4 revised criteria; 6/6 requirements), validation and ASVS L1 security. The user stopped the oversized comprehensive experiment; its terminal manifest disables resume. B1 selection remains inconclusive, and the 159 completed plus one interrupted B1 records are receipts without a qualified performance denominator. Fresh evaluation, native-pair and factorial results remain absent. Phase 5 has 14 implemented and technically verified plans; human notebook/HTML review remains open. See the [cancellation record](phases/04-memory-policies-and-relay-bp/04-13-CANCELLATION-20260930.md) and `04-VERIFICATION.md`. Entries below are historical checkpoints, not live progress.
@@ -264,7 +267,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 - Original BPGD/impulse code identities remain unverified; exact SI/OTF variants and generic mixing/memory/voting definitions need source specifications.
 - Statistical targets and compute budgets for publication campaigns remain to be prespecified.
-- Phase 11 must prespecify its quaternary comparison and statistical assessment; Phase 10 mechanism evidence and the native aggregate do not establish source-curve agreement or matched-shot performance.
+- Phase 11's prespecified comparisons still require eligible reviewed targets, measured site resources, authorized complete-pair campaigns, and deep policy replay. Phase 10 mechanism evidence and the native aggregate do not establish source-curve agreement or matched-shot performance.
 - The observed development environment is node-specific; recheck package and backend identity before interpreting runs elsewhere.
 - Circuit fault correlations and observable semantics require dedicated qualification; a CSS adaptation does not reproduce a circuit paper.
 - Phase 07 POST-01 / Plan 07-03: approved standalone OSD commit builds in isolation but does not expose complete higher-order candidate solutions and scores; qualification receipt is failed/non-runnable. The user paused postprocessing, so no OSD source patch or reduced evidence contract is being pursued now.
