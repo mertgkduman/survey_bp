@@ -1,5 +1,5 @@
 ---
-status: in_progress
+status: complete
 type: quick
 date: 2026-10-24
 ---
