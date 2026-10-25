@@ -1,0 +1,13 @@
+code,experiment,p,metric,reported_value,details,provenance
+B1_882_24,vanilla_vs_tuned_bp4,0.10,failure_reduction_factor,17,"ratio of slide LERs is 16.875",user_supplied_slide
+B1_882_24,vanilla_vs_tuned_bp4,0.10,mean_work_vanilla_bp4_iterations,28,,user_supplied_slide
+B1_882_24,vanilla_vs_tuned_bp4,0.10,mean_work_tuned_bp4_iterations,12,,user_supplied_slide
+B1_882_24,vanilla_vs_tuned_bp4,0.06,ler_reduction_factor,470,"ratio of slide LERs is about 470.42",user_supplied_slide
+double_Gross_288_12_18,vanilla_vs_tuned_bp4,0.08,failure_reduction_factor,4.3,"ratio of slide LERs is about 4.286",user_supplied_slide
+double_Gross_288_12_18,vanilla_vs_tuned_bp4,0.08,mean_work_vanilla_bp4_iterations,12,,user_supplied_slide
+double_Gross_288_12_18,vanilla_vs_tuned_bp4,0.08,mean_work_tuned_bp4_iterations,6.7,,user_supplied_slide
+both,quantization_screen,,paired_tuning_trials_per_code,10000,"undamped BP4 SP; T=1000",user_supplied_slide
+both,quantization_screen,,qualitative_result,"s4_and_s8_better_than_s16","no numeric figure values supplied",user_supplied_slide
+unspecified,damping_screen,,damping_old,0.2,"lowers failures; p99 iteration count at least halved",user_supplied_slide
+unspecified,memory_bp_screen,,alpha_mbp,0.95,"does not achieve damping result",user_supplied_slide
+unspecified,iteration_limit_screen,,limit_increase,1000_to_10000,"mean work rises 9-91%; p99 unchanged",user_supplied_slide

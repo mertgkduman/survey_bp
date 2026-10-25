@@ -1,0 +1,17 @@
+{
+  "schema": "presentation-decoder-policy-v1",
+  "id": "binary_tuned_oms",
+  "family": "two_binary_css_bp",
+  "source": "user-provided Dr. Pfister presentation excerpt, Vanilla vs. Tuned BP",
+  "noise": "depolarizing_code_capacity",
+  "channel_handling": "marginal_XZ_p_equals_2p_over_3_assumed",
+  "schedule": "flooding_assumed",
+  "check_rule": "offset_min_sum",
+  "min_sum": {"alpha": 1.0, "beta": 0.25},
+  "damping": {"coefficient_old": 0.1, "target": "variable_to_check_assumed"},
+  "messages": {"format": "signed_q8", "scale": 4, "step": 0.25, "range": [-31.75, 31.75]},
+  "max_iterations": 1000,
+  "tuning": {"at_one_p_then_frozen": true, "selection_seed_separate_from_test_seed": true, "tuning_p": "not_supplied"},
+  "stop": "each_binary_syndrome_matches_assumed",
+  "source_fidelity": "partial: slide omits binary channel handling, rounding order, damping target, and exact schedule"
+}

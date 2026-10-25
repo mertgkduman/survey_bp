@@ -1,0 +1,14 @@
+{
+  "schema": "presentation-decoder-policy-v1",
+  "id": "binary_memory_bp_a095",
+  "family": "binary_css_bp",
+  "source": "user-provided Dr. Pfister presentation excerpt, Knobs for Tuning BP and Damping Helps, Memory-BP Does Not",
+  "alpha_mbp": 0.95,
+  "recurrence": {
+    "belief": "m_v^(t+1) = lambda_v + alpha_MBP^(-1) sum_(c in partial v) mhat_(c->v)^(t+1)",
+    "extrinsic": "m_(v->c)^(t+1) = m_v^(t+1) - mhat_(c->v)^(t+1)"
+  },
+  "reported_conclusion": "alpha_MBP=0.95 does not lower failures or p99 like damping d=0.2",
+  "numeric_figure_data": "not_supplied",
+  "source_fidelity": "partial: check rule, quantization scale, p, code, and full figure counts not supplied"
+}

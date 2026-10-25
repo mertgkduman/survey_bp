@@ -1,0 +1,13 @@
+{
+  "schema": "presentation-decoder-policy-screen-v1",
+  "id": "bp4_quantization_screen",
+  "family": "joint_pauli_bp4",
+  "source": "user-provided Dr. Pfister presentation excerpt, Message Range Matters More Than Resolution",
+  "variants": [
+    {"id": "bp4_sp_q8_s4_d0", "check_rule": "sum_product", "scale": 4, "step": 0.25, "range": [-31.75, 31.75], "damping_old": 0.0, "max_iterations": 1000},
+    {"id": "bp4_sp_q8_s8_d0", "check_rule": "sum_product", "scale": 8, "step": 0.125, "range": [-15.875, 15.875], "damping_old": 0.0, "max_iterations": 1000},
+    {"id": "bp4_sp_q8_s16_d0", "check_rule": "sum_product", "scale": 16, "step": 0.0625, "range": [-7.9375, 7.9375], "damping_old": 0.0, "max_iterations": 1000}
+  ],
+  "study": {"paired_tuning_trials_per_code": 10000, "codes": ["B1_882_24", "double_Gross_288_12_18"], "reported_conclusion": "scale 4 or 8 gives fewer failures than scale 16 on both codes", "numeric_figure_data": "not_supplied"},
+  "source_fidelity": "partial: rounding boundaries and exact figure counts not supplied"
+}

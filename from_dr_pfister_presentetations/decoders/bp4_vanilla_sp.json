@@ -1,0 +1,14 @@
+{
+  "schema": "presentation-decoder-policy-v1",
+  "id": "bp4_vanilla_sp",
+  "family": "joint_pauli_bp4",
+  "source": "user-provided Dr. Pfister presentation excerpt, Vanilla vs. Tuned BP",
+  "noise": "depolarizing_code_capacity",
+  "schedule": "flooding_assumed",
+  "check_rule": "sum_product",
+  "damping": {"coefficient_old": 0.0, "target": "variable_to_check_assumed"},
+  "messages": {"format": "signed_q8", "scale": 16, "step": 0.0625, "range": [-7.9375, 7.9375]},
+  "max_iterations": 1000,
+  "stop": "syndrome_match_assumed",
+  "source_fidelity": "partial: slide omits rounding order, damping target, tie rule, and exact schedule"
+}

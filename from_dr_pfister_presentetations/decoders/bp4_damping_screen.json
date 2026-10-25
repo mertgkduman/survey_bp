@@ -1,0 +1,14 @@
+{
+  "schema": "presentation-decoder-policy-screen-v1",
+  "id": "bp4_damping_screen",
+  "family": "joint_pauli_bp4",
+  "source": "user-provided Dr. Pfister presentation excerpt, Damping Helps, Memory-BP Does Not",
+  "variants": [
+    {"id": "bp4_undamped", "damping_old": 0.0, "max_iterations": 1000},
+    {"id": "bp4_damped_d02", "damping_old": 0.2, "max_iterations": 1000},
+    {"id": "bp4_damped_d02_t10000", "damping_old": 0.2, "max_iterations": 10000}
+  ],
+  "reported_conclusions": ["d=0.2 lowers failures and at least halves p99 iterations", "raising T from 1000 to 10000 adds 9-91 percent mean work and leaves p99 unchanged"],
+  "numeric_figure_data": "not_supplied",
+  "source_fidelity": "partial: baseline rule, scale, code, p, and full figure counts not supplied in excerpt"
+}
