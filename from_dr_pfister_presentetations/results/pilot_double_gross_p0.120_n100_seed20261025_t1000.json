@@ -1,0 +1,67 @@
+{
+  "arms": {
+    "binary_tuned_oms": {
+      "failures": 49,
+      "invalid_syndrome": 48,
+      "ler": 0.49,
+      "mean_bp4_equivalent_work": 360.43,
+      "mean_elapsed_seconds": 0.0056555137,
+      "p99_9_bp4_equivalent_work": 1000.0,
+      "p99_bp4_equivalent_work": 1000.0
+    },
+    "bp4_tuned_sp": {
+      "failures": 36,
+      "invalid_syndrome": 36,
+      "ler": 0.36,
+      "mean_bp4_equivalent_work": 366.36,
+      "mean_elapsed_seconds": 0.10453511003999999,
+      "p99_9_bp4_equivalent_work": 1000.0,
+      "p99_bp4_equivalent_work": 1000.0
+    },
+    "bp4_vanilla_ms": {
+      "failures": 77,
+      "invalid_syndrome": 77,
+      "ler": 0.77,
+      "mean_bp4_equivalent_work": 775.31,
+      "mean_elapsed_seconds": 0.057970056000000006,
+      "p99_9_bp4_equivalent_work": 1000.0,
+      "p99_bp4_equivalent_work": 1000.0
+    },
+    "bp4_vanilla_sp": {
+      "failures": 57,
+      "invalid_syndrome": 57,
+      "ler": 0.57,
+      "mean_bp4_equivalent_work": 573.63,
+      "mean_elapsed_seconds": 0.17187991723000004,
+      "p99_9_bp4_equivalent_work": 1000.0,
+      "p99_bp4_equivalent_work": 1000.0
+    }
+  },
+  "code": "double_Gross_288_12_18",
+  "code_matrix_sha256": {
+    "hx": "c06e721ec6ea114b60e0e6f7187324f6e150e229b8d008888e8a4cc3f4a324a2",
+    "hz": "599e3888110b72dd10de5d22583c12fb3832de67b63052c378e0c828b5968d23"
+  },
+  "event_ledger": "pilot_double_gross_p0.120_n100_seed20261025_t1000.events.jsonl",
+  "event_ledger_sha256": "374ce5110f1c55f419845bfe973d179e2e85e22fb9331480b99f74e0efc486d6",
+  "limitations": [
+    "Q8 stage and rounding assumed",
+    "V2C damping target assumed",
+    "flooding assumed",
+    "binary marginal channel assumed",
+    "timing includes Python call overhead and is not a controlled latency comparison"
+  ],
+  "max_iterations": 1000,
+  "p": 0.12,
+  "paired": {
+    "bp4_tuned_sp_vs_bp4_vanilla_sp": {
+      "loss": 1,
+      "rescue": 22
+    }
+  },
+  "schema": "presentation-paired-pilot-v1",
+  "seed": 20261025,
+  "shots": 100,
+  "status": "exploratory_adaptation",
+  "wall_seconds": 34.480101346969604
+}

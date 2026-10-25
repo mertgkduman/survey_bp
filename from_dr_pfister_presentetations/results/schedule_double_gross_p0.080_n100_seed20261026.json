@@ -1,0 +1,19 @@
+{
+  "arms": {
+    "serial_tuned_sp": {
+      "failures": 5,
+      "mean_iterations": 52.93
+    },
+    "serial_vanilla_sp": {
+      "failures": 11,
+      "mean_iterations": 113.09
+    }
+  },
+  "code": "double_gross",
+  "event_ledger": "schedule_double_gross_p0.080_n100_seed20261026.events.jsonl",
+  "event_ledger_sha256": "d21ff5afbf5532eae7069a9abf345a4f18daff0cb3207717d4ea139f58923378",
+  "p": 0.08,
+  "seed": 20261026,
+  "shots": 100,
+  "status": "schedule_diagnostic_adaptation"
+}

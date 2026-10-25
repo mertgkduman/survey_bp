@@ -1,0 +1,4 @@
+code,p,comparison,trials,rescues,losses,net_failure_reduction,exact_paired_binomial_two_sided_p,pilot_file
+B1_882_24,0.1,bp4_tuned_sp_vs_bp4_vanilla_sp,100,36,1,35,5.529727786779404e-10,pilot_b1_p0.100_n100_seed20261025_t1000.json
+double_Gross_288_12_18,0.08,bp4_tuned_sp_vs_bp4_vanilla_sp,100,10,2,8,0.03857421875,pilot_double_gross_p0.080_n100_seed20261026_t1000.json
+double_Gross_288_12_18,0.12,bp4_tuned_sp_vs_bp4_vanilla_sp,100,22,1,21,5.7220458984375e-06,pilot_double_gross_p0.120_n100_seed20261025_t1000.json

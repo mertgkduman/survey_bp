@@ -1,0 +1,67 @@
+{
+  "arms": {
+    "binary_tuned_oms": {
+      "failures": 2,
+      "invalid_syndrome": 2,
+      "ler": 1.0,
+      "mean_bp4_equivalent_work": 8.75,
+      "mean_elapsed_seconds": 0.213581828,
+      "p99_9_bp4_equivalent_work": 8.9995,
+      "p99_bp4_equivalent_work": 8.995
+    },
+    "bp4_tuned_sp": {
+      "failures": 0,
+      "invalid_syndrome": 0,
+      "ler": 0.0,
+      "mean_bp4_equivalent_work": 5.0,
+      "mean_elapsed_seconds": 0.0016002170000000001,
+      "p99_9_bp4_equivalent_work": 5.998,
+      "p99_bp4_equivalent_work": 5.98
+    },
+    "bp4_vanilla_ms": {
+      "failures": 1,
+      "invalid_syndrome": 1,
+      "ler": 0.5,
+      "mean_bp4_equivalent_work": 10.0,
+      "mean_elapsed_seconds": 0.0008368035000000001,
+      "p99_9_bp4_equivalent_work": 10.0,
+      "p99_bp4_equivalent_work": 10.0
+    },
+    "bp4_vanilla_sp": {
+      "failures": 0,
+      "invalid_syndrome": 0,
+      "ler": 0.0,
+      "mean_bp4_equivalent_work": 6.0,
+      "mean_elapsed_seconds": 1.2675880385,
+      "p99_9_bp4_equivalent_work": 7.996,
+      "p99_bp4_equivalent_work": 7.96
+    }
+  },
+  "code": "double_Gross_288_12_18",
+  "code_matrix_sha256": {
+    "hx": "c06e721ec6ea114b60e0e6f7187324f6e150e229b8d008888e8a4cc3f4a324a2",
+    "hz": "599e3888110b72dd10de5d22583c12fb3832de67b63052c378e0c828b5968d23"
+  },
+  "event_ledger": "pilot_double_gross_p0.080_n2_seed20261024_t10.events.jsonl",
+  "event_ledger_sha256": "7c706b648f899c9ee95c3fc5dd25c8ad27b82b1ea1019a4c3741efc927e44be4",
+  "limitations": [
+    "Q8 stage and rounding assumed",
+    "V2C damping target assumed",
+    "flooding assumed",
+    "binary marginal channel assumed",
+    "timing includes first-call JIT compilation and is not a controlled latency comparison"
+  ],
+  "max_iterations": 10,
+  "p": 0.08,
+  "paired": {
+    "bp4_tuned_sp_vs_bp4_vanilla_sp": {
+      "loss": 0,
+      "rescue": 0
+    }
+  },
+  "schema": "presentation-paired-pilot-v1",
+  "seed": 20261024,
+  "shots": 2,
+  "status": "exploratory_adaptation",
+  "wall_seconds": 2.979858875274658
+}

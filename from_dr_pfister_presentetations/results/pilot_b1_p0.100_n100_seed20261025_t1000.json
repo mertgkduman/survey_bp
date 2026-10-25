@@ -1,0 +1,67 @@
+{
+  "arms": {
+    "binary_tuned_oms": {
+      "failures": 6,
+      "invalid_syndrome": 6,
+      "ler": 0.06,
+      "mean_bp4_equivalent_work": 53.665,
+      "mean_elapsed_seconds": 0.00257977205,
+      "p99_9_bp4_equivalent_work": 525.9505,
+      "p99_bp4_equivalent_work": 525.505
+    },
+    "bp4_tuned_sp": {
+      "failures": 40,
+      "invalid_syndrome": 40,
+      "ler": 0.4,
+      "mean_bp4_equivalent_work": 405.18,
+      "mean_elapsed_seconds": 0.3522022437,
+      "p99_9_bp4_equivalent_work": 1000.0,
+      "p99_bp4_equivalent_work": 1000.0
+    },
+    "bp4_vanilla_ms": {
+      "failures": 87,
+      "invalid_syndrome": 87,
+      "ler": 0.87,
+      "mean_bp4_equivalent_work": 872.49,
+      "mean_elapsed_seconds": 0.19327695552000002,
+      "p99_9_bp4_equivalent_work": 1000.0,
+      "p99_bp4_equivalent_work": 1000.0
+    },
+    "bp4_vanilla_sp": {
+      "failures": 75,
+      "invalid_syndrome": 75,
+      "ler": 0.75,
+      "mean_bp4_equivalent_work": 752.57,
+      "mean_elapsed_seconds": 0.6791360127999998,
+      "p99_9_bp4_equivalent_work": 1000.0,
+      "p99_bp4_equivalent_work": 1000.0
+    }
+  },
+  "code": "B1_882_24",
+  "code_matrix_sha256": {
+    "hx": "c9f29501bc6f5bea3bff9e98115a0fa87c1ff8ef5251b67938be55ededf836f5",
+    "hz": "0d577b9c46fdbc905219fbf4d9404ae7813244b145d66ce3d51bdcfe8bbc10b5"
+  },
+  "event_ledger": "pilot_b1_p0.100_n100_seed20261025_t1000.events.jsonl",
+  "event_ledger_sha256": "91a2779d3233fc25068053abf488e96dd9e8c8ef8dae595393c5a2d4baea5664",
+  "limitations": [
+    "Q8 stage and rounding assumed",
+    "V2C damping target assumed",
+    "flooding assumed",
+    "binary marginal channel assumed",
+    "timing includes Python call overhead and is not a controlled latency comparison"
+  ],
+  "max_iterations": 1000,
+  "p": 0.1,
+  "paired": {
+    "bp4_tuned_sp_vs_bp4_vanilla_sp": {
+      "loss": 1,
+      "rescue": 36
+    }
+  },
+  "schema": "presentation-paired-pilot-v1",
+  "seed": 20261025,
+  "shots": 100,
+  "status": "exploratory_adaptation",
+  "wall_seconds": 123.2533540725708
+}
