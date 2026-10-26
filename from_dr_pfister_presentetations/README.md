@@ -39,6 +39,8 @@ Tuned versus vanilla BP4 paired rescues/losses were 36/1 (B1 p=0.10), 10/2 (doub
 
 The local binary rates happen to be close to the slide at the tested points. At N=100 they are only pilot evidence, and they do not validate the assumed marginal prior or numerical policy.
 
+The BP4 X/Z check-update algebra was audited against the Pauli commutation table and the log-domain BP4 equations. An independent four-state enumeration agreed with 192 compiled check messages, and the pilot graph's X/Z row labels and syndromes matched the canonical CSS graph. See `.planning/debug/resolved/bp4-css-check-update-audit.md`. This establishes the check parity interpretation; it does not identify the remaining slide-versus-pilot performance discrepancy.
+
 ### Does a missing 2/3 conversion explain the curves?
 
 For each slide point, `analyze_p_axis_shift.py` compares the source LER with the paired local pilots at both the labeled `p` and `p_local=2p_slide/3`. The shifted double-Gross `p_local=0.053333...` run used 1,000 shots; the shifted B1 `p_local=0.066666...` run used 100 shots. The original double-Gross `p_local=0.08` pilot supplies the shifted comparison for slide `p=0.12`. All runs use the same physical depolarizing convention `P(X)=P(Y)=P(Z)=p_local/3` and all four decoders see the same errors within a run.
