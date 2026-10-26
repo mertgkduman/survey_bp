@@ -54,6 +54,11 @@ the slide curves. The best local policies are separately labeled as exploratory
 in `decoders/bp4_local_b1_screened.json` and
 `decoders/bp4_local_gross_screened.json`.
 
+The requested BP4 min-sum replay at vanilla `T=1000,s=16,d=0` and
+tuned-knob `T=1000,s=4,d=0.1` is recorded in
+[`results/performance_investigation/MINSUM_FOLLOWUP.md`](results/performance_investigation/MINSUM_FOLLOWUP.md),
+with matched per-shot ledgers and a sum-product comparison plot.
+
 ### Does a missing 2/3 conversion explain the curves?
 
 For each slide point, `analyze_p_axis_shift.py` compares the source LER with the paired local pilots at both the labeled `p` and `p_local=2p_slide/3`. The shifted double-Gross `p_local=0.053333...` run used 1,000 shots; the shifted B1 `p_local=0.066666...` run used 100 shots. The original double-Gross `p_local=0.08` pilot supplies the shifted comparison for slide `p=0.12`. All runs use the same physical depolarizing convention `P(X)=P(Y)=P(Z)=p_local/3` and all four decoders see the same errors within a run.

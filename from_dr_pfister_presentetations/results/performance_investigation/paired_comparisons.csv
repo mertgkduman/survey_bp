@@ -5,6 +5,7 @@ b1_confirmation_p010_n300_seed20261106,binary_oms,q8_s4_d04_p20,9,38,2.490403062
 b1_independent_p010_n100_seed20261101,binary_oms,q8_s16_d0_p10,0,70,1.6940658945086007e-21
 b1_independent_p010_n100_seed20261101,binary_oms,q8_s4_d01_p10,3,39,5.631591193377972e-09
 b1_independent_p010_n100_seed20261101,binary_oms,q8_s4_d02_p20,6,14,0.11531829833984375
+b1_minsum_p010_n200_seed20261101,q8_ms_s16_d0_p10,q8_ms_s4_d01_p10,60,5,4.869560700851427e-13
 b1_screen_p010_n40_seed20261104,binary_oms,q8_s4_d02_p20,2,6,0.2890625
 b1_screen_p010_n40_seed20261104,binary_oms,q8_s4_d03_p20,2,4,0.6875
 b1_screen_p010_n40_seed20261104,binary_oms,q8_s4_d04_p20,2,4,0.6875
@@ -32,6 +33,7 @@ gross_holdout_p008_n1000_seed20261031,binary_oms,f64_p20,21,52,0.000371340115938
 gross_independent_p008_n1000_seed20261031,binary_oms,q8_s16_d0_p08,15,175,9.166444201614699e-36
 gross_independent_p008_n1000_seed20261031,binary_oms,q8_s4_d01_p08,44,48,0.754651749610499
 gross_independent_p008_n1000_seed20261031,binary_oms,q8_s4_d02_p20,61,23,4.0771265506603356e-05
+gross_minsum_p008_n1000_seed20261031,q8_ms_s16_d0_p08,q8_ms_s4_d01_p08,174,11,6.991886709878069e-39
 gross_screen_p008_n80_seed20261030,binary_oms,q8_s16_d0_p08,0,13,0.000244140625
 gross_screen_p008_n80_seed20261030,binary_oms,q8_s4_d01_p08,0,3,0.25
 gross_screen_p008_n80_seed20261030,binary_oms,q8_s2_d01_p08,0,3,0.25
@@ -63,3 +65,7 @@ b1_transfer_p010_n200_seed20261101 vs b1_independent_p010_n100_seed20261101,bina
 b1_transfer_p010_n200_seed20261101 vs b1_independent_p010_n100_seed20261101,q8_s16_d0_p10,q8_s16_d0_p10,5,15,0.04138946533203125
 b1_transfer_p010_n200_seed20261101 vs b1_independent_p010_n100_seed20261101,q8_s4_d01_p10,q8_s4_d01_p10,7,16,0.0931396484375
 b1_transfer_p010_n200_seed20261101 vs b1_independent_p010_n100_seed20261101,q8_s4_d02_p20,q8_s4_d02_p20,1,10,0.01171875
+b1_transfer_p010_n200_seed20261101 vs b1_minsum_p010_n200_seed20261101,q8_s16_d0_p10,q8_ms_s16_d0_p10,2,35,1.0244548320770264e-08
+b1_transfer_p010_n200_seed20261101 vs b1_minsum_p010_n200_seed20261101,q8_s4_d01_p10,q8_ms_s4_d01_p10,10,60,8.004823399455647e-10
+gross_holdout_p008_n1000_seed20261031 vs gross_minsum_p008_n1000_seed20261031,q8_s16_d0_p08,q8_ms_s16_d0_p08,27,112,1.6792503094944683e-13
+gross_holdout_p008_n1000_seed20261031 vs gross_minsum_p008_n1000_seed20261031,q8_s4_d01_p08,q8_ms_s4_d01_p08,17,43,0.0010657657791434353

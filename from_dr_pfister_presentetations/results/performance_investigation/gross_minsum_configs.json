@@ -1,0 +1,4 @@
+[
+  {"id":"q8_ms_s16_d0_p08","kernel":"q8_flood","min_sum":true,"scale":16,"damping":0.0,"initial_p":0.08},
+  {"id":"q8_ms_s4_d01_p08","kernel":"q8_flood","min_sum":true,"scale":4,"damping":0.1,"initial_p":0.08}
+]

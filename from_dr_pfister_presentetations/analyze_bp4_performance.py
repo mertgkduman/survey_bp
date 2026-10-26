@@ -86,6 +86,10 @@ def main() -> None:
                 if arm != "binary_oms":
                     comparisons.append({"run": run.name, "reference": "binary_oms", "new": arm,
                                         **paired(events["binary_oms"], events[arm])})
+        minsum_arms = [item["id"] for item in summary["configs"] if item.get("min_sum") is True]
+        if len(minsum_arms) == 2:
+            comparisons.append({"run": run.name, "reference": minsum_arms[0], "new": minsum_arms[1],
+                                **paired(events[minsum_arms[0]], events[minsum_arms[1]])})
         if summary["code"] == "miao_toric_d4":
             paper = events["paper_like_f64_limit60_p10"]
             canonical = events["canonical_f64_limit25_p10"]
@@ -113,6 +117,14 @@ def main() -> None:
         *[("b1_transfer_p010_n200_seed20261101", arm,
            "b1_independent_p010_n100_seed20261101", (arm,))
           for arm in ("binary_oms", "q8_s16_d0_p10", "q8_s4_d01_p10", "q8_s4_d02_p20")],
+        ("b1_transfer_p010_n200_seed20261101", "q8_s16_d0_p10",
+         "b1_minsum_p010_n200_seed20261101", ("q8_ms_s16_d0_p10",)),
+        ("b1_transfer_p010_n200_seed20261101", "q8_s4_d01_p10",
+         "b1_minsum_p010_n200_seed20261101", ("q8_ms_s4_d01_p10",)),
+        ("gross_holdout_p008_n1000_seed20261031", "q8_s16_d0_p08",
+         "gross_minsum_p008_n1000_seed20261031", ("q8_ms_s16_d0_p08",)),
+        ("gross_holdout_p008_n1000_seed20261031", "q8_s4_d01_p08",
+         "gross_minsum_p008_n1000_seed20261031", ("q8_ms_s4_d01_p08",)),
     ]
     for reference_run, reference_arm, new_run, new_arms in cross_runs:
         if reference_run not in audited or new_run not in audited:
@@ -138,6 +150,7 @@ def main() -> None:
         writer.writeheader()
         writer.writerows(comparisons)
     plot_confirmation(rows)
+    plot_minsum_comparison(rows)
     print(f"Audited {len(rows)} arms, {len(comparisons)} paired comparisons; native replay exact match.")
 
 
@@ -188,6 +201,53 @@ def plot_confirmation(rows: list[dict]) -> None:
         fig.savefig(ROOT / f"confirmation_comparison.{ext}", dpi=180, bbox_inches="tight")
     plt.close(fig)
     svg = ROOT / "confirmation_comparison.svg"
+    svg.write_text("\n".join(line.rstrip() for line in svg.read_text(encoding="utf-8").splitlines())
+                   + "\n", encoding="utf-8")
+
+
+def plot_minsum_comparison(rows: list[dict]) -> None:
+    """Plot matched SP/MS arms with their observed denominators and intervals."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    panels = [
+        ("B1, p = 0.10", "b1_transfer_p010_n200_seed20261101",
+         "b1_minsum_p010_n200_seed20261101",
+         ("q8_s16_d0_p10", "q8_ms_s16_d0_p10", "q8_s4_d01_p10", "q8_ms_s4_d01_p10")),
+        ("double-Gross, p = 0.08", "gross_holdout_p008_n1000_seed20261031",
+         "gross_minsum_p008_n1000_seed20261031",
+         ("q8_s16_d0_p08", "q8_ms_s16_d0_p08", "q8_s4_d01_p08", "q8_ms_s4_d01_p08")),
+    ]
+    if any(not (ROOT / minsum_run / "summary.json").is_file() for _, _, minsum_run, _ in panels):
+        return
+    lookup = {(row["run"], row["arm"]): row for row in rows}
+    fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.7))
+    labels = ("SP vanilla", "MS vanilla", "SP tuned", "MS tuned")
+    for ax, (title, sp_run, ms_run, arms) in zip(axes, panels, strict=True):
+        for index, arm in enumerate(arms):
+            row = lookup[(sp_run if index % 2 == 0 else ms_run, arm)]
+            rate = row["ler"]
+            color = "#315a85" if index % 2 == 0 else "#c04a16"
+            if row["failures"] == 0:
+                position = 1.0 - .05 ** (1.0 / row["shots"])
+                ax.plot(index, position, marker="v", markerfacecolor="white", markeredgecolor=color)
+            else:
+                position = row["ci95_high"]
+                ax.errorbar(index, rate,
+                            yerr=[[rate - row["ci95_low"]], [row["ci95_high"] - rate]],
+                            fmt="o", color=color, capsize=3, markersize=7)
+            ax.annotate(f'{row["failures"]}/{row["shots"]}', (index, position),
+                        xytext=(0, 5), textcoords="offset points", ha="center", fontsize=8)
+        ax.set(title=title, ylabel="Logical error rate", yscale="log", ylim=(.001, 2),
+               xlim=(-.6, 3.6), xticks=range(4), xticklabels=labels)
+        ax.grid(axis="y", alpha=.2)
+    fig.suptitle("BP4 sum-product and min-sum on identical errors; exact 95% intervals", fontsize=11)
+    fig.subplots_adjust(left=.09, right=.98, bottom=.20, top=.79, wspace=.25)
+    for ext in ("png", "svg"):
+        fig.savefig(ROOT / f"minsum_vs_sumproduct.{ext}", dpi=180, bbox_inches="tight")
+    plt.close(fig)
+    svg = ROOT / "minsum_vs_sumproduct.svg"
     svg.write_text("\n".join(line.rstrip() for line in svg.read_text(encoding="utf-8").splitlines())
                    + "\n", encoding="utf-8")
 

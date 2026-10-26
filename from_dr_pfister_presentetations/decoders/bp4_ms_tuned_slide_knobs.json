@@ -1,0 +1,15 @@
+{
+  "schema": "local-decoder-policy-v1",
+  "id": "bp4_ms_tuned_slide_knobs",
+  "family": "joint_pauli_bp4",
+  "source": "user-requested min-sum variant using the presentation's tuned BP4 Q8 scale and damping",
+  "status": "exploratory adaptation; presentation tuned BP4 curve is sum-product",
+  "check_rule": "min_sum",
+  "min_sum": {"alpha": 1.0, "beta": 0.0, "status": "assumed unscaled and unoffset"},
+  "schedule": "flooding_assumed",
+  "damping": {"coefficient_old": 0.1, "target": "variable_to_check_assumed"},
+  "messages": {"format": "signed_q8", "scale": 4, "step": 0.25, "range": [-31.75, 31.75], "rounding": "ties_to_even_after_each_public_message"},
+  "max_iterations": 1000,
+  "stop": "first_syndrome_match",
+  "decoder_prior": "p0 equals physical p for each tested point; source tuned p0 unspecified"
+}

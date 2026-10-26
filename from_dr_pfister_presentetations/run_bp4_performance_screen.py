@@ -101,6 +101,8 @@ def run() -> None:
     for item in configs:
         if item["kernel"] not in ("q8_flood", "q8_variable_serial", "f64_flood", "f64_limit60", "binary_oms"):
             raise ValueError(f"unsupported kernel {item['kernel']}")
+        if "min_sum" in item and (item["kernel"] != "q8_flood" or type(item["min_sum"]) is not bool):
+            raise ValueError("min_sum is a boolean option of q8_flood only")
         if item["kernel"] != "binary_oms":
             initial_p = float(item.get("initial_p", args.p))
             if not 0 < initial_p < 0.75:
@@ -116,7 +118,7 @@ def run() -> None:
             graph = graphs[item["id"]]
             decode_bp4(graph.row_ptr, graph.variable_ptr, graph.variable_edges,
                        graph.variables, graph.labels, graph.prior_llrs, zero, 1,
-                       int(item["scale"]), float(item["damping"]), False)
+                       int(item["scale"]), float(item["damping"]), item.get("min_sum", False))
         elif item["kernel"] == "q8_variable_serial":
             graph = graphs[item["id"]]
             decode_bp4_variable_serial(graph.row_ptr, graph.variable_ptr, graph.variable_edges,
@@ -180,7 +182,8 @@ def run() -> None:
                     candidate, iterations, converged = decode_bp4(
                         graph.row_ptr, graph.variable_ptr, graph.variable_edges,
                         graph.variables, graph.labels, graph.prior_llrs, syndrome,
-                        args.max_iterations, int(item["scale"]), float(item["damping"]), False)
+                        args.max_iterations, int(item["scale"]), float(item["damping"]),
+                        item.get("min_sum", False))
                 elapsed = time.perf_counter() - start
                 valid = bool(np.array_equal(css_syndrome(code, candidate), syndrome))
                 logical = bool(valid and logical_failure(code, truth, candidate))

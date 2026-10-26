@@ -1,0 +1,65 @@
+{
+  "status": "exploratory_policy_screen",
+  "code": "double_gross",
+  "physical_p": 0.08,
+  "shots": 1000,
+  "seed": 20261031,
+  "max_iterations": 1000,
+  "check_selection": "all",
+  "source_check_shape": [
+    [
+      144,
+      288
+    ],
+    [
+      144,
+      288
+    ]
+  ],
+  "executed_check_shape": [
+    [
+      144,
+      288
+    ],
+    [
+      144,
+      288
+    ]
+  ],
+  "configs": [
+    {
+      "id": "q8_ms_s16_d0_p08",
+      "kernel": "q8_flood",
+      "min_sum": true,
+      "scale": 16,
+      "damping": 0.0,
+      "initial_p": 0.08
+    },
+    {
+      "id": "q8_ms_s4_d01_p08",
+      "kernel": "q8_flood",
+      "min_sum": true,
+      "scale": 4,
+      "damping": 0.1,
+      "initial_p": 0.08
+    }
+  ],
+  "counts": {
+    "q8_ms_s16_d0_p08": {
+      "failures": 244,
+      "invalid_syndrome": 244,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 253614.0,
+      "elapsed_seconds": 31.327961047179997
+    },
+    "q8_ms_s4_d01_p08": {
+      "failures": 81,
+      "invalid_syndrome": 81,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 87430.0,
+      "elapsed_seconds": 10.694937854073942
+    }
+  },
+  "event_ledger": "events.jsonl",
+  "event_ledger_sha256": "738f4f89e2bd56da9055c12db2c28ae22dca6b23fa2c40da3dbf0a197de3573f"
+}
