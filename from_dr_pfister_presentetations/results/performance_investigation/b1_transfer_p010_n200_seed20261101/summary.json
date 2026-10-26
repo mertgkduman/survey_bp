@@ -1,0 +1,81 @@
+{
+  "status": "exploratory_policy_screen",
+  "code": "b1",
+  "physical_p": 0.1,
+  "shots": 200,
+  "seed": 20261101,
+  "max_iterations": 1000,
+  "configs": [
+    {
+      "id": "binary_oms",
+      "kernel": "binary_oms"
+    },
+    {
+      "id": "q8_s16_d0_p10",
+      "kernel": "q8_flood",
+      "scale": 16,
+      "damping": 0.0,
+      "initial_p": 0.1
+    },
+    {
+      "id": "q8_s4_d01_p10",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.1,
+      "initial_p": 0.1
+    },
+    {
+      "id": "q8_s4_d02_p20",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.2,
+      "initial_p": 0.2
+    },
+    {
+      "id": "q8_s4_d035_p10",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.35,
+      "initial_p": 0.1
+    }
+  ],
+  "counts": {
+    "binary_oms": {
+      "failures": 10,
+      "invalid_syndrome": 10,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 11304.0,
+      "elapsed_seconds": 0.5473441099748015
+    },
+    "q8_s16_d0_p10": {
+      "failures": 144,
+      "invalid_syndrome": 144,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 145053.0,
+      "elapsed_seconds": 136.29511001054198
+    },
+    "q8_s4_d01_p10": {
+      "failures": 72,
+      "invalid_syndrome": 72,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 73123.0,
+      "elapsed_seconds": 64.23106094449759
+    },
+    "q8_s4_d02_p20": {
+      "failures": 32,
+      "invalid_syndrome": 32,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 33724.0,
+      "elapsed_seconds": 29.727619405835867
+    },
+    "q8_s4_d035_p10": {
+      "failures": 38,
+      "invalid_syndrome": 38,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 39593.0,
+      "elapsed_seconds": 39.309701355174184
+    }
+  },
+  "event_ledger": "events.jsonl",
+  "event_ledger_sha256": "7dc473f3c76f6c270f57f91396a31f6ad12505da70f0673a40e7ecaeca9dddbb"
+}

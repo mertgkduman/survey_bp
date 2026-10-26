@@ -1,0 +1,14 @@
+diff --git a/stabilizerCodes.h b/stabilizerCodes.h
+--- a/stabilizerCodes.h
++++ b/stabilizerCodes.h
+@@ -32,1 +32,10 @@
+     void add_error_given_epsilon(double epsilon);
++    // Audit-only input hook: set an externally sampled Pauli error while
++    // leaving the paper's flooding decoder and success evaluator unchanged.
++    void set_error_for_replay(const std::vector<unsigned> &values) {
++        error = values;
++        errorString.clear();
++        for (unsigned value : error) {
++            if (value != 0) errorString.emplace_back("replayed_error");
++        }
++    }

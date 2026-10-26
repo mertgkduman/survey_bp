@@ -1,0 +1,9 @@
+{
+  "source_pilot_summary": "summary.json",
+  "shots": 10000,
+  "seed": 20261102,
+  "physical_p": 0.075,
+  "source_pauli_order": "I=0,X=1,Z=2,Y=3",
+  "input": "native_input.txt",
+  "input_sha256": "aecec081a44f86df0a280baa533461e56810762866a6a67cc1b65981677511a8"
+}

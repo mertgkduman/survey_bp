@@ -1,0 +1,13 @@
+{
+  "status": "interrupted_without_results",
+  "exit_code": 143,
+  "code": "b1",
+  "physical_p": 0.10,
+  "shots_requested": 200,
+  "seed": 20261101,
+  "independent_checks": true,
+  "event_ledger": "events.jsonl",
+  "events_flushed": 0,
+  "reason": "external SIGTERM; cause not observed",
+  "use_in_analysis": false
+}

@@ -1,0 +1,107 @@
+{
+  "status": "exploratory_policy_screen",
+  "code": "double_gross",
+  "physical_p": 0.08,
+  "shots": 1000,
+  "seed": 20261031,
+  "max_iterations": 1000,
+  "configs": [
+    {
+      "id": "binary_oms",
+      "kernel": "binary_oms"
+    },
+    {
+      "id": "q8_s16_d0_p08",
+      "kernel": "q8_flood",
+      "scale": 16,
+      "damping": 0.0,
+      "initial_p": 0.08
+    },
+    {
+      "id": "q8_s4_d01_p08",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.1,
+      "initial_p": 0.08
+    },
+    {
+      "id": "q8_s4_d035_p08",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.35,
+      "initial_p": 0.08
+    },
+    {
+      "id": "q8_s4_d02_p12",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.2,
+      "initial_p": 0.12
+    },
+    {
+      "id": "q8_s4_d02_p20",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.2,
+      "initial_p": 0.2
+    },
+    {
+      "id": "f64_p20",
+      "kernel": "f64_flood",
+      "initial_p": 0.2
+    }
+  ],
+  "counts": {
+    "binary_oms": {
+      "failures": 35,
+      "invalid_syndrome": 34,
+      "logical_failures_with_valid_syndrome": 1,
+      "iterations": 31206.0,
+      "elapsed_seconds": 0.5048253359273076
+    },
+    "q8_s16_d0_p08": {
+      "failures": 159,
+      "invalid_syndrome": 159,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 163812.0,
+      "elapsed_seconds": 60.97756505198777
+    },
+    "q8_s4_d01_p08": {
+      "failures": 55,
+      "invalid_syndrome": 55,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 59884.0,
+      "elapsed_seconds": 51.289905212819576
+    },
+    "q8_s4_d035_p08": {
+      "failures": 33,
+      "invalid_syndrome": 33,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 38275.0,
+      "elapsed_seconds": 11.496151145547628
+    },
+    "q8_s4_d02_p12": {
+      "failures": 33,
+      "invalid_syndrome": 33,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 38253.0,
+      "elapsed_seconds": 11.002847922034562
+    },
+    "q8_s4_d02_p20": {
+      "failures": 21,
+      "invalid_syndrome": 21,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 26885.0,
+      "elapsed_seconds": 7.761455521918833
+    },
+    "f64_p20": {
+      "failures": 66,
+      "invalid_syndrome": 66,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 75383.0,
+      "elapsed_seconds": 21.555014082230628
+    }
+  },
+  "event_ledger": "events.jsonl",
+  "event_ledger_sha256": "c7bee69fabeb7b86af4ee7a40a5ad2617435744fca54345148821af170f7831f"
+}

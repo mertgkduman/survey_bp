@@ -1,0 +1,53 @@
+{
+  "status": "exploratory_policy_screen",
+  "code": "double_gross",
+  "physical_p": 0.08,
+  "shots": 3000,
+  "seed": 20261105,
+  "max_iterations": 1000,
+  "configs": [
+    {
+      "id": "binary_oms",
+      "kernel": "binary_oms"
+    },
+    {
+      "id": "q8_s4_d01_p08",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.1,
+      "initial_p": 0.08
+    },
+    {
+      "id": "q8_s4_d02_p20",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.2,
+      "initial_p": 0.2
+    }
+  ],
+  "counts": {
+    "binary_oms": {
+      "failures": 100,
+      "invalid_syndrome": 97,
+      "logical_failures_with_valid_syndrome": 3,
+      "iterations": 86579.0,
+      "elapsed_seconds": 1.3865996217355132
+    },
+    "q8_s4_d01_p08": {
+      "failures": 185,
+      "invalid_syndrome": 185,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 199583.0,
+      "elapsed_seconds": 57.361104587092996
+    },
+    "q8_s4_d02_p20": {
+      "failures": 79,
+      "invalid_syndrome": 79,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 96542.0,
+      "elapsed_seconds": 32.506251824088395
+    }
+  },
+  "event_ledger": "events.jsonl",
+  "event_ledger_sha256": "89cee44b3bfd4ce217e715f64d4e44962aa874e20211dab11a2c373ac66c468e"
+}

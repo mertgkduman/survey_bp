@@ -1,0 +1,6 @@
+[
+  {"id":"paper_like_f64_limit60_p10","kernel":"f64_limit60","initial_p":0.1},
+  {"id":"canonical_f64_limit25_p10","kernel":"f64_flood","initial_p":0.1},
+  {"id":"q8_s4_d0_p10","kernel":"q8_flood","scale":4,"damping":0.0,"initial_p":0.1},
+  {"id":"binary_oms","kernel":"binary_oms"}
+]

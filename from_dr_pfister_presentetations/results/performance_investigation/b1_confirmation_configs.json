@@ -1,0 +1,6 @@
+[
+  {"id":"binary_oms","kernel":"binary_oms"},
+  {"id":"q8_s4_d01_p10","kernel":"q8_flood","scale":4,"damping":0.1,"initial_p":0.1},
+  {"id":"q8_s4_d03_p20","kernel":"q8_flood","scale":4,"damping":0.3,"initial_p":0.2},
+  {"id":"q8_s4_d04_p20","kernel":"q8_flood","scale":4,"damping":0.4,"initial_p":0.2}
+]

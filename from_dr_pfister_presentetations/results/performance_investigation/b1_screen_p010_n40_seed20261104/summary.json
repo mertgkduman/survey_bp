@@ -1,0 +1,193 @@
+{
+  "status": "exploratory_policy_screen",
+  "code": "b1",
+  "physical_p": 0.1,
+  "shots": 40,
+  "seed": 20261104,
+  "max_iterations": 1000,
+  "configs": [
+    {
+      "id": "binary_oms",
+      "kernel": "binary_oms"
+    },
+    {
+      "id": "q8_s4_d02_p20",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.2,
+      "initial_p": 0.2
+    },
+    {
+      "id": "q8_s4_d03_p20",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.3,
+      "initial_p": 0.2
+    },
+    {
+      "id": "q8_s4_d04_p20",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.4,
+      "initial_p": 0.2
+    },
+    {
+      "id": "q8_s4_d02_p30",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.2,
+      "initial_p": 0.3
+    },
+    {
+      "id": "q8_s4_d04_p30",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.4,
+      "initial_p": 0.3
+    },
+    {
+      "id": "q8_s4_d06_p30",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.6,
+      "initial_p": 0.3
+    },
+    {
+      "id": "q8_s4_d02_p40",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.2,
+      "initial_p": 0.4
+    },
+    {
+      "id": "q8_s4_d04_p40",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.4,
+      "initial_p": 0.4
+    },
+    {
+      "id": "q8_s2_d03_p30",
+      "kernel": "q8_flood",
+      "scale": 2,
+      "damping": 0.3,
+      "initial_p": 0.3
+    },
+    {
+      "id": "q8_s8_d04_p30",
+      "kernel": "q8_flood",
+      "scale": 8,
+      "damping": 0.4,
+      "initial_p": 0.3
+    },
+    {
+      "id": "q8_serial_s4_d02_p20",
+      "kernel": "q8_variable_serial",
+      "scale": 4,
+      "damping": 0.2,
+      "initial_p": 0.2
+    },
+    {
+      "id": "q8_serial_s4_d04_p30",
+      "kernel": "q8_variable_serial",
+      "scale": 4,
+      "damping": 0.4,
+      "initial_p": 0.3
+    }
+  ],
+  "counts": {
+    "binary_oms": {
+      "failures": 3,
+      "invalid_syndrome": 3,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 3037.0,
+      "elapsed_seconds": 0.2747784350067377
+    },
+    "q8_s4_d02_p20": {
+      "failures": 7,
+      "invalid_syndrome": 7,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 7339.0,
+      "elapsed_seconds": 8.76808428298682
+    },
+    "q8_s4_d03_p20": {
+      "failures": 5,
+      "invalid_syndrome": 5,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 5417.0,
+      "elapsed_seconds": 6.407964376732707
+    },
+    "q8_s4_d04_p20": {
+      "failures": 5,
+      "invalid_syndrome": 5,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 5451.0,
+      "elapsed_seconds": 4.754099224694073
+    },
+    "q8_s4_d02_p30": {
+      "failures": 7,
+      "invalid_syndrome": 7,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 7514.0,
+      "elapsed_seconds": 6.703230537474155
+    },
+    "q8_s4_d04_p30": {
+      "failures": 7,
+      "invalid_syndrome": 7,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 7645.0,
+      "elapsed_seconds": 6.863793131895363
+    },
+    "q8_s4_d06_p30": {
+      "failures": 12,
+      "invalid_syndrome": 12,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 13161.0,
+      "elapsed_seconds": 12.561245003715158
+    },
+    "q8_s4_d02_p40": {
+      "failures": 40,
+      "invalid_syndrome": 40,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 40000.0,
+      "elapsed_seconds": 36.653827141970396
+    },
+    "q8_s4_d04_p40": {
+      "failures": 40,
+      "invalid_syndrome": 40,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 40000.0,
+      "elapsed_seconds": 36.37248435243964
+    },
+    "q8_s2_d03_p30": {
+      "failures": 40,
+      "invalid_syndrome": 40,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 40000.0,
+      "elapsed_seconds": 35.03998285531998
+    },
+    "q8_s8_d04_p30": {
+      "failures": 9,
+      "invalid_syndrome": 9,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 9622.0,
+      "elapsed_seconds": 8.824261566624045
+    },
+    "q8_serial_s4_d02_p20": {
+      "failures": 6,
+      "invalid_syndrome": 6,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 6211.0,
+      "elapsed_seconds": 9.622315442189574
+    },
+    "q8_serial_s4_d04_p30": {
+      "failures": 7,
+      "invalid_syndrome": 7,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 7447.0,
+      "elapsed_seconds": 12.02267732936889
+    }
+  },
+  "event_ledger": "events.jsonl",
+  "event_ledger_sha256": "43edbffe52a0654d94619a49ea98a46449bf14b64bede0e303a7cd2a39f19773"
+}

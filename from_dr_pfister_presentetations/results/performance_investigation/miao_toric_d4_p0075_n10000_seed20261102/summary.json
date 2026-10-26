@@ -1,0 +1,63 @@
+{
+  "status": "exploratory_policy_screen",
+  "code": "miao_toric_d4",
+  "physical_p": 0.075,
+  "shots": 10000,
+  "seed": 20261102,
+  "max_iterations": 25,
+  "configs": [
+    {
+      "id": "paper_like_f64_limit60_p10",
+      "kernel": "f64_limit60",
+      "initial_p": 0.1
+    },
+    {
+      "id": "canonical_f64_limit25_p10",
+      "kernel": "f64_flood",
+      "initial_p": 0.1
+    },
+    {
+      "id": "q8_s4_d0_p10",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.0,
+      "initial_p": 0.1
+    },
+    {
+      "id": "binary_oms",
+      "kernel": "binary_oms"
+    }
+  ],
+  "counts": {
+    "paper_like_f64_limit60_p10": {
+      "failures": 1591,
+      "invalid_syndrome": 1412,
+      "logical_failures_with_valid_syndrome": 179,
+      "iterations": 56020.0,
+      "elapsed_seconds": 0.970579357817769
+    },
+    "canonical_f64_limit25_p10": {
+      "failures": 1591,
+      "invalid_syndrome": 1412,
+      "logical_failures_with_valid_syndrome": 179,
+      "iterations": 56020.0,
+      "elapsed_seconds": 1.0116909807547927
+    },
+    "q8_s4_d0_p10": {
+      "failures": 1644,
+      "invalid_syndrome": 1482,
+      "logical_failures_with_valid_syndrome": 162,
+      "iterations": 57490.0,
+      "elapsed_seconds": 1.0732885785400867
+    },
+    "binary_oms": {
+      "failures": 3617,
+      "invalid_syndrome": 3489,
+      "logical_failures_with_valid_syndrome": 128,
+      "iterations": 62632.0,
+      "elapsed_seconds": 0.17725195176899433
+    }
+  },
+  "event_ledger": "events.jsonl",
+  "event_ledger_sha256": "7effe1f9527d77022dcf93a804f880f95bba30260d1cde8e0ad23bc5fdc1ce5d"
+}

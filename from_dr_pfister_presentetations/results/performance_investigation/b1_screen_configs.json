@@ -1,0 +1,15 @@
+[
+  {"id":"binary_oms","kernel":"binary_oms"},
+  {"id":"q8_s4_d02_p20","kernel":"q8_flood","scale":4,"damping":0.2,"initial_p":0.2},
+  {"id":"q8_s4_d03_p20","kernel":"q8_flood","scale":4,"damping":0.3,"initial_p":0.2},
+  {"id":"q8_s4_d04_p20","kernel":"q8_flood","scale":4,"damping":0.4,"initial_p":0.2},
+  {"id":"q8_s4_d02_p30","kernel":"q8_flood","scale":4,"damping":0.2,"initial_p":0.3},
+  {"id":"q8_s4_d04_p30","kernel":"q8_flood","scale":4,"damping":0.4,"initial_p":0.3},
+  {"id":"q8_s4_d06_p30","kernel":"q8_flood","scale":4,"damping":0.6,"initial_p":0.3},
+  {"id":"q8_s4_d02_p40","kernel":"q8_flood","scale":4,"damping":0.2,"initial_p":0.4},
+  {"id":"q8_s4_d04_p40","kernel":"q8_flood","scale":4,"damping":0.4,"initial_p":0.4},
+  {"id":"q8_s2_d03_p30","kernel":"q8_flood","scale":2,"damping":0.3,"initial_p":0.3},
+  {"id":"q8_s8_d04_p30","kernel":"q8_flood","scale":8,"damping":0.4,"initial_p":0.3},
+  {"id":"q8_serial_s4_d02_p20","kernel":"q8_variable_serial","scale":4,"damping":0.2,"initial_p":0.2},
+  {"id":"q8_serial_s4_d04_p30","kernel":"q8_variable_serial","scale":4,"damping":0.4,"initial_p":0.3}
+]

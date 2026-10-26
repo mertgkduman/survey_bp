@@ -1,0 +1,12 @@
+{
+  "code": "miao_toric_d4",
+  "physical_p": 0.075,
+  "initial_p": 0.1,
+  "shots": 100,
+  "seed": 20261103,
+  "max_iterations": 25,
+  "candidate_disagreements": 0,
+  "outcome_disagreements": 0,
+  "event_ledger": "events.jsonl",
+  "event_ledger_sha256": "a50a1687581282fda866f3f9c76fbd0b041ce690dfe41951daa602dfd6837413"
+}

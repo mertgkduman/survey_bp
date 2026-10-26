@@ -1,0 +1,38 @@
+{
+  "status": "exploratory_policy_screen",
+  "code": "b1",
+  "physical_p": 0.1,
+  "shots": 300,
+  "seed": 20261106,
+  "max_iterations": 1000,
+  "configs": [
+    {
+      "id": "f64_p10",
+      "kernel": "f64_flood",
+      "initial_p": 0.1
+    },
+    {
+      "id": "f64_p20",
+      "kernel": "f64_flood",
+      "initial_p": 0.2
+    }
+  ],
+  "counts": {
+    "f64_p10": {
+      "failures": 202,
+      "invalid_syndrome": 202,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 220007.0,
+      "elapsed_seconds": 368.0705086970702
+    },
+    "f64_p20": {
+      "failures": 145,
+      "invalid_syndrome": 145,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 156921.0,
+      "elapsed_seconds": 178.9781515598297
+    }
+  },
+  "event_ledger": "events.jsonl",
+  "event_ledger_sha256": "092c66dcfccfb4a9716979f05b0e7bc8633719030ed0c6d95b2f555b54280ba7"
+}

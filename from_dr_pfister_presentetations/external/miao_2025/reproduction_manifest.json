@@ -1,0 +1,33 @@
+{
+  "schema": "bp4-literature-control-v1",
+  "paper": {
+    "title": "Quaternary Neural Belief Propagation Decoding of Quantum LDPC Codes With Overcomplete Check Matrices",
+    "authors": "S. Miao, A. Schnerring, H. Li, and L. Schmalen",
+    "venue": "IEEE Access 13 (2025)",
+    "doi": "10.1109/ACCESS.2025.3539475",
+    "comparison": "plain BP4 arm of Fig. 8, toric distance 4",
+    "url": "https://publikationen.bibliothek.kit.edu/1000179617/157326592"
+  },
+  "source_implementation": {
+    "repository": "https://github.com/kit-cel/Quantum-Neural-BP4-demo",
+    "commit": "801ccc34a92f013422a90a421e6ad4e2149db86e",
+    "matrix_path": "PCMs/toric_32_2/toric_32_2_H_30.alist",
+    "matrix_sha256": "21acaad2f5307c03097b9511f9628f0e8eb8001b2a04ff6f8208ca1a0bd1814c",
+    "local_matrix": "toric_32_2_H_30.alist",
+    "native_replay_hook": "native_replay.patch",
+    "native_driver": "native_replay_driver.cpp"
+  },
+  "experiment": {
+    "noise": "code-capacity depolarizing, each of X Y Z at p/3",
+    "physical_p": 0.075,
+    "decoder_initial_p": 0.1,
+    "max_iterations": 25,
+    "schedule": "flooding",
+    "shots": 10000,
+    "seed": 20261102,
+    "local_run": "../../results/performance_investigation/miao_toric_d4_p0075_n10000_seed20261102/summary.json",
+    "paired_native_output": "../../results/performance_investigation/miao_toric_d4_p0075_n10000_seed20261102/native_raw.jsonl"
+  },
+  "status": "native-replay agreement; figure point only qualitatively comparable because raw source counts are unavailable",
+  "finding": "0 success or syndrome-validity disagreements on 10,000 identical errors"
+}

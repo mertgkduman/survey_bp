@@ -1,0 +1,17 @@
+{
+  "schema": "local-decoder-policy-v1",
+  "id": "bp4_local_gross_screened",
+  "family": "joint_pauli_bp4",
+  "status": "exploratory local adaptation, not a presentation policy",
+  "code": "double_Gross_288_12_18",
+  "physical_p_for_selection": 0.08,
+  "prior_depolarizing_p": 0.2,
+  "check_rule": "sum_product",
+  "schedule": "flooding",
+  "damping": {"coefficient_old": 0.2, "target": "variable_to_check"},
+  "messages": {"format": "signed_q8", "scale": 4, "step": 0.25, "range": [-31.75, 31.75], "rounding": "ties_to_even_after_each_public_message"},
+  "max_iterations": 1000,
+  "stop": "first_syndrome_match",
+  "selection": "80-shot screen and 1000-shot comparison; frozen for fresh 3000-shot confirmation",
+  "confirmation": "results/performance_investigation/gross_confirmation_p008_n3000_seed20261105/summary.json"
+}

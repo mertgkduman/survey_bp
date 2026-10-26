@@ -1,0 +1,67 @@
+{
+  "status": "exploratory_policy_screen",
+  "code": "b1",
+  "physical_p": 0.1,
+  "shots": 300,
+  "seed": 20261106,
+  "max_iterations": 1000,
+  "configs": [
+    {
+      "id": "binary_oms",
+      "kernel": "binary_oms"
+    },
+    {
+      "id": "q8_s4_d01_p10",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.1,
+      "initial_p": 0.1
+    },
+    {
+      "id": "q8_s4_d03_p20",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.3,
+      "initial_p": 0.2
+    },
+    {
+      "id": "q8_s4_d04_p20",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.4,
+      "initial_p": 0.2
+    }
+  ],
+  "counts": {
+    "binary_oms": {
+      "failures": 13,
+      "invalid_syndrome": 12,
+      "logical_failures_with_valid_syndrome": 1,
+      "iterations": 15352.0,
+      "elapsed_seconds": 0.7398148132488132
+    },
+    "q8_s4_d01_p10": {
+      "failures": 113,
+      "invalid_syndrome": 113,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 114552.0,
+      "elapsed_seconds": 111.59902960900217
+    },
+    "q8_s4_d03_p20": {
+      "failures": 52,
+      "invalid_syndrome": 52,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 54746.0,
+      "elapsed_seconds": 115.73723309207708
+    },
+    "q8_s4_d04_p20": {
+      "failures": 42,
+      "invalid_syndrome": 42,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 45178.0,
+      "elapsed_seconds": 107.88768346235156
+    }
+  },
+  "event_ledger": "events.jsonl",
+  "event_ledger_sha256": "c53775f49c8e2045ca80288e653aa8f7ebb378f779a8e6170fa1ba823b2ba850"
+}

@@ -1,0 +1,255 @@
+{
+  "status": "exploratory_policy_screen",
+  "code": "double_gross",
+  "physical_p": 0.08,
+  "shots": 80,
+  "seed": 20261030,
+  "max_iterations": 1000,
+  "configs": [
+    {
+      "id": "binary_oms",
+      "kernel": "binary_oms"
+    },
+    {
+      "id": "q8_s16_d0_p08",
+      "kernel": "q8_flood",
+      "scale": 16,
+      "damping": 0.0,
+      "initial_p": 0.08
+    },
+    {
+      "id": "q8_s4_d01_p08",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.1,
+      "initial_p": 0.08
+    },
+    {
+      "id": "q8_s2_d01_p08",
+      "kernel": "q8_flood",
+      "scale": 2,
+      "damping": 0.1,
+      "initial_p": 0.08
+    },
+    {
+      "id": "q8_s8_d01_p08",
+      "kernel": "q8_flood",
+      "scale": 8,
+      "damping": 0.1,
+      "initial_p": 0.08
+    },
+    {
+      "id": "q8_s4_d02_p08",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.2,
+      "initial_p": 0.08
+    },
+    {
+      "id": "q8_s4_d035_p08",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.35,
+      "initial_p": 0.08
+    },
+    {
+      "id": "q8_s4_d01_p04",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.1,
+      "initial_p": 0.04
+    },
+    {
+      "id": "q8_s4_d01_p12",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.1,
+      "initial_p": 0.12
+    },
+    {
+      "id": "q8_s4_d01_p20",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.1,
+      "initial_p": 0.2
+    },
+    {
+      "id": "q8_s4_d02_p12",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.2,
+      "initial_p": 0.12
+    },
+    {
+      "id": "q8_s4_d02_p20",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.2,
+      "initial_p": 0.2
+    },
+    {
+      "id": "q8_serial_s4_d01_p08",
+      "kernel": "q8_variable_serial",
+      "scale": 4,
+      "damping": 0.1,
+      "initial_p": 0.08
+    },
+    {
+      "id": "q8_serial_s4_d01_p12",
+      "kernel": "q8_variable_serial",
+      "scale": 4,
+      "damping": 0.1,
+      "initial_p": 0.12
+    },
+    {
+      "id": "f64_p04",
+      "kernel": "f64_flood",
+      "initial_p": 0.04
+    },
+    {
+      "id": "f64_p08",
+      "kernel": "f64_flood",
+      "initial_p": 0.08
+    },
+    {
+      "id": "f64_p12",
+      "kernel": "f64_flood",
+      "initial_p": 0.12
+    },
+    {
+      "id": "f64_p20",
+      "kernel": "f64_flood",
+      "initial_p": 0.2
+    }
+  ],
+  "counts": {
+    "binary_oms": {
+      "failures": 1,
+      "invalid_syndrome": 1,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 1433.0,
+      "elapsed_seconds": 0.02541886270046234
+    },
+    "q8_s16_d0_p08": {
+      "failures": 14,
+      "invalid_syndrome": 14,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 14365.0,
+      "elapsed_seconds": 4.266442353837192
+    },
+    "q8_s4_d01_p08": {
+      "failures": 4,
+      "invalid_syndrome": 4,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 4395.0,
+      "elapsed_seconds": 1.2585072219371796
+    },
+    "q8_s2_d01_p08": {
+      "failures": 4,
+      "invalid_syndrome": 4,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 4408.0,
+      "elapsed_seconds": 1.2549079433083534
+    },
+    "q8_s8_d01_p08": {
+      "failures": 6,
+      "invalid_syndrome": 6,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 6406.0,
+      "elapsed_seconds": 1.8641133531928062
+    },
+    "q8_s4_d02_p08": {
+      "failures": 4,
+      "invalid_syndrome": 4,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 4387.0,
+      "elapsed_seconds": 1.2561893314123154
+    },
+    "q8_s4_d035_p08": {
+      "failures": 3,
+      "invalid_syndrome": 3,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 3425.0,
+      "elapsed_seconds": 1.0022710720077157
+    },
+    "q8_s4_d01_p04": {
+      "failures": 6,
+      "invalid_syndrome": 6,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 6448.0,
+      "elapsed_seconds": 1.9189472319558263
+    },
+    "q8_s4_d01_p12": {
+      "failures": 5,
+      "invalid_syndrome": 5,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 5391.0,
+      "elapsed_seconds": 1.5114805521443486
+    },
+    "q8_s4_d01_p20": {
+      "failures": 4,
+      "invalid_syndrome": 4,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 4426.0,
+      "elapsed_seconds": 1.246158979833126
+    },
+    "q8_s4_d02_p12": {
+      "failures": 3,
+      "invalid_syndrome": 3,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 3419.0,
+      "elapsed_seconds": 0.9654596485197544
+    },
+    "q8_s4_d02_p20": {
+      "failures": 3,
+      "invalid_syndrome": 3,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 3455.0,
+      "elapsed_seconds": 0.9964561546221375
+    },
+    "q8_serial_s4_d01_p08": {
+      "failures": 4,
+      "invalid_syndrome": 4,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 4235.0,
+      "elapsed_seconds": 2.1874487325549126
+    },
+    "q8_serial_s4_d01_p12": {
+      "failures": 4,
+      "invalid_syndrome": 4,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 4252.0,
+      "elapsed_seconds": 2.150780066847801
+    },
+    "f64_p04": {
+      "failures": 8,
+      "invalid_syndrome": 8,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 10942.0,
+      "elapsed_seconds": 3.1552242636680603
+    },
+    "f64_p08": {
+      "failures": 8,
+      "invalid_syndrome": 8,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 10913.0,
+      "elapsed_seconds": 3.148810762912035
+    },
+    "f64_p12": {
+      "failures": 8,
+      "invalid_syndrome": 8,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 9666.0,
+      "elapsed_seconds": 2.7815868267789483
+    },
+    "f64_p20": {
+      "failures": 6,
+      "invalid_syndrome": 6,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 7442.0,
+      "elapsed_seconds": 2.1191119104623795
+    }
+  },
+  "event_ledger": "events.jsonl",
+  "event_ledger_sha256": "4896469f60336bcc370b97cd759f20476f7494b53fa3128015aa88d6d02537cd"
+}

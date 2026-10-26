@@ -1,0 +1,88 @@
+{
+  "status": "exploratory_policy_screen",
+  "code": "double_gross",
+  "physical_p": 0.08,
+  "shots": 1000,
+  "seed": 20261031,
+  "max_iterations": 1000,
+  "check_selection": "independent",
+  "source_check_shape": [
+    [
+      144,
+      288
+    ],
+    [
+      144,
+      288
+    ]
+  ],
+  "executed_check_shape": [
+    [
+      138,
+      288
+    ],
+    [
+      138,
+      288
+    ]
+  ],
+  "configs": [
+    {
+      "id": "binary_oms",
+      "kernel": "binary_oms"
+    },
+    {
+      "id": "q8_s16_d0_p08",
+      "kernel": "q8_flood",
+      "scale": 16,
+      "damping": 0.0,
+      "initial_p": 0.08
+    },
+    {
+      "id": "q8_s4_d01_p08",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.1,
+      "initial_p": 0.08
+    },
+    {
+      "id": "q8_s4_d02_p20",
+      "kernel": "q8_flood",
+      "scale": 4,
+      "damping": 0.2,
+      "initial_p": 0.2
+    }
+  ],
+  "counts": {
+    "binary_oms": {
+      "failures": 74,
+      "invalid_syndrome": 74,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 53037.5,
+      "elapsed_seconds": 2.0808974159881473
+    },
+    "q8_s16_d0_p08": {
+      "failures": 234,
+      "invalid_syndrome": 234,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 238591.0,
+      "elapsed_seconds": 159.5465712249279
+    },
+    "q8_s4_d01_p08": {
+      "failures": 78,
+      "invalid_syndrome": 78,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 83117.0,
+      "elapsed_seconds": 61.94560914952308
+    },
+    "q8_s4_d02_p20": {
+      "failures": 36,
+      "invalid_syndrome": 36,
+      "logical_failures_with_valid_syndrome": 0,
+      "iterations": 42546.0,
+      "elapsed_seconds": 22.84286176599562
+    }
+  },
+  "event_ledger": "events.jsonl",
+  "event_ledger_sha256": "b134b8b158baa10b255c172ea5e76c029a11aca6cf1046ae297a065c3077abcd"
+}

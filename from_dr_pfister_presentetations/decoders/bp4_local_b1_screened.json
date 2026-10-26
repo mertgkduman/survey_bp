@@ -1,0 +1,17 @@
+{
+  "schema": "local-decoder-policy-v1",
+  "id": "bp4_local_b1_screened",
+  "family": "joint_pauli_bp4",
+  "status": "exploratory local adaptation, not a presentation policy",
+  "code": "B1_882_24",
+  "physical_p_for_selection": 0.10,
+  "prior_depolarizing_p": 0.2,
+  "check_rule": "sum_product",
+  "schedule": "flooding",
+  "damping": {"coefficient_old": 0.4, "target": "variable_to_check"},
+  "messages": {"format": "signed_q8", "scale": 4, "step": 0.25, "range": [-31.75, 31.75], "rounding": "ties_to_even_after_each_public_message"},
+  "max_iterations": 1000,
+  "stop": "first_syndrome_match",
+  "selection": "40-shot screen; frozen for fresh 300-shot confirmation",
+  "confirmation": "results/performance_investigation/b1_confirmation_p010_n300_seed20261106/summary.json"
+}

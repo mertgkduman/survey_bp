@@ -1,0 +1,4 @@
+[
+  {"id":"f64_p10","kernel":"f64_flood","initial_p":0.1},
+  {"id":"f64_p20","kernel":"f64_flood","initial_p":0.2}
+]

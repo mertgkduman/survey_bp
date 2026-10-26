@@ -41,6 +41,19 @@ The local binary rates happen to be close to the slide at the tested points. At 
 
 The BP4 X/Z check-update algebra was audited against the Pauli commutation table and the log-domain BP4 equations. An independent four-state enumeration agreed with 192 compiled check messages, and the pilot graph's X/Z row labels and syndromes matched the canonical CSS graph. See `.planning/debug/resolved/bp4-css-check-update-audit.md`. This establishes the check parity interpretation; it does not identify the remaining slide-versus-pilot performance discrepancy.
 
+### Follow-up performance investigation
+
+The extended matched-shot screen, independent Miao et al. native C++ replay,
+full-rank row diagnostics, and held-out confirmations are documented in
+[`results/performance_investigation/REPORT.md`](results/performance_investigation/REPORT.md).
+On the authors' toric `[[32,2,4]]` matrix, canonical floating point BP4 and
+their C++ BP4 agreed on every one of 10,000 decode outcomes. The B1 and
+double-Gross slide gaps remain under the tested policy settings; local prior
+and damping optimization improves BP4 substantially but does not reproduce
+the slide curves. The best local policies are separately labeled as exploratory
+in `decoders/bp4_local_b1_screened.json` and
+`decoders/bp4_local_gross_screened.json`.
+
 ### Does a missing 2/3 conversion explain the curves?
 
 For each slide point, `analyze_p_axis_shift.py` compares the source LER with the paired local pilots at both the labeled `p` and `p_local=2p_slide/3`. The shifted double-Gross `p_local=0.053333...` run used 1,000 shots; the shifted B1 `p_local=0.066666...` run used 100 shots. The original double-Gross `p_local=0.08` pilot supplies the shifted comparison for slide `p=0.12`. All runs use the same physical depolarizing convention `P(X)=P(Y)=P(Z)=p_local/3` and all four decoders see the same errors within a run.
