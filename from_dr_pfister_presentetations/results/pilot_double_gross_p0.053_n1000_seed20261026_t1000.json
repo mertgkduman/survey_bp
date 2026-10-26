@@ -1,0 +1,67 @@
+{
+  "arms": {
+    "binary_tuned_oms": {
+      "failures": 0,
+      "invalid_syndrome": 0,
+      "ler": 0.0,
+      "mean_bp4_equivalent_work": 5.227,
+      "mean_elapsed_seconds": 9.291565499999999e-05,
+      "p99_9_bp4_equivalent_work": 38.00200000000018,
+      "p99_bp4_equivalent_work": 27.5
+    },
+    "bp4_tuned_sp": {
+      "failures": 7,
+      "invalid_syndrome": 7,
+      "ler": 0.007,
+      "mean_bp4_equivalent_work": 10.665,
+      "mean_elapsed_seconds": 0.0031660354029999995,
+      "p99_9_bp4_equivalent_work": 1000.0,
+      "p99_bp4_equivalent_work": 34.00999999999999
+    },
+    "bp4_vanilla_ms": {
+      "failures": 39,
+      "invalid_syndrome": 39,
+      "ler": 0.039,
+      "mean_bp4_equivalent_work": 46.684,
+      "mean_elapsed_seconds": 0.003290891909,
+      "p99_9_bp4_equivalent_work": 1000.0,
+      "p99_bp4_equivalent_work": 1000.0
+    },
+    "bp4_vanilla_sp": {
+      "failures": 43,
+      "invalid_syndrome": 43,
+      "ler": 0.043,
+      "mean_bp4_equivalent_work": 46.931,
+      "mean_elapsed_seconds": 0.013725733597000002,
+      "p99_9_bp4_equivalent_work": 1000.0,
+      "p99_bp4_equivalent_work": 1000.0
+    }
+  },
+  "code": "double_Gross_288_12_18",
+  "code_matrix_sha256": {
+    "hx": "c06e721ec6ea114b60e0e6f7187324f6e150e229b8d008888e8a4cc3f4a324a2",
+    "hz": "599e3888110b72dd10de5d22583c12fb3832de67b63052c378e0c828b5968d23"
+  },
+  "event_ledger": "pilot_double_gross_p0.053_n1000_seed20261026_t1000.events.jsonl",
+  "event_ledger_sha256": "56ac53c6459153ebfde14c3afff0357ac851ceea95064657bfa4bb555037d101",
+  "limitations": [
+    "Q8 stage and rounding assumed",
+    "V2C damping target assumed",
+    "flooding assumed",
+    "binary marginal channel assumed",
+    "timing includes Python call overhead and is not a controlled latency comparison"
+  ],
+  "max_iterations": 1000,
+  "p": 0.05333333333333334,
+  "paired": {
+    "bp4_tuned_sp_vs_bp4_vanilla_sp": {
+      "loss": 2,
+      "rescue": 38
+    }
+  },
+  "schema": "presentation-paired-pilot-v1",
+  "seed": 20261026,
+  "shots": 1000,
+  "status": "exploratory_adaptation",
+  "wall_seconds": 20.828506469726562
+}

@@ -72,7 +72,10 @@ def main() -> None:
     plt.close(fig)
 
     source_lookup = {(row["code"], row["decoder"], float(row["p"])): float(row["reported_ler"]) for row in rows}
-    selected = sorted(pilots, key=lambda item: (item["code"], item["p"]))
+    selected = sorted((item for item in pilots
+                       if (item["code"], "bp4_vanilla_sp", item["p"]) in source_lookup
+                       and (item["code"], "bp4_tuned_sp", item["p"]) in source_lookup),
+                      key=lambda item: (item["code"], item["p"]))
     if selected:
         fig, axis = plt.subplots(figsize=(10, 4.8), constrained_layout=True)
         positions = np.arange(len(selected))

@@ -39,6 +39,28 @@ Tuned versus vanilla BP4 paired rescues/losses were 36/1 (B1 p=0.10), 10/2 (doub
 
 The local binary rates happen to be close to the slide at the tested points. At N=100 they are only pilot evidence, and they do not validate the assumed marginal prior or numerical policy.
 
+### Does a missing 2/3 conversion explain the curves?
+
+For each slide point, `analyze_p_axis_shift.py` compares the source LER with the paired local pilots at both the labeled `p` and `p_local=2p_slide/3`. The shifted double-Gross `p_local=0.053333...` run used 1,000 shots; the shifted B1 `p_local=0.066666...` run used 100 shots. The original double-Gross `p_local=0.08` pilot supplies the shifted comparison for slide `p=0.12`. All runs use the same physical depolarizing convention `P(X)=P(Y)=P(Z)=p_local/3` and all four decoders see the same errors within a run.
+
+| Slide point | Decoder | Slide LER | Local at `2p_slide/3` |
+|---|---|---:|---:|
+| B1 `p=0.10` | vanilla BP4 SP | 0.0054 | 22/100 = 0.22 |
+| B1 `p=0.10` | tuned BP4 SP | 0.00032 | 8/100 = 0.08 |
+| B1 `p=0.10` | tuned binary OMS | 0.04571 | 0/100 |
+| double-Gross `p=0.08` | vanilla BP4 SP | 0.0033 | 43/1000 = 0.043 |
+| double-Gross `p=0.08` | tuned BP4 SP | 0.00077 | 7/1000 = 0.007 |
+| double-Gross `p=0.08` | tuned binary OMS | 0.03153 | 0/1000 |
+| double-Gross `p=0.12` | vanilla BP4 SP | 0.12195 | 15/100 = 0.15 |
+| double-Gross `p=0.12` | tuned BP4 SP | 0.11455 | 7/100 = 0.07 |
+| double-Gross `p=0.12` | tuned binary OMS | 0.4898 | 3/100 = 0.03 |
+
+The `2/3` shift does **not** reconcile all four decoder arms. It brings double-Gross BP4 at slide `p=0.12` into the range of this small pilot, yet moves its binary rate far from the slide. For double-Gross slide `p=0.08`, both shifted BP4 rates are still 9–13 times the reported rates, while 0/1000 binary failures has a one-sided 95% upper bound of about 0.003, well below the reported 0.03153. The opposite shift, `p_local=3p_slide/2`, is available for the double-Gross slide `p=0.08` point in the comparison table and fits worse. These are tests of a **uniform x-axis reinterpretation**, not of possible decoder-specific prior or kernel errors. Exact binomial comparison p-values in the CSV condition on the slide rates as if known exactly; source uncertainty and policy differences limit that interpretation.
+
+![Slide and local rates under the proposed shift](plots/p_axis_shift_comparison.png)
+
+The full counts, denominators, confidence bounds, and ledger hashes are in `results/p_axis_shift_comparison.csv`; reproduce the table and figure with `.venv/bin/python from_dr_pfister_presentetations/analyze_p_axis_shift.py`.
+
 ![Slide curves](plots/source_curves.png)
 
 ![Slide versus local BP4 pilot](plots/pilot_vs_source.png)
