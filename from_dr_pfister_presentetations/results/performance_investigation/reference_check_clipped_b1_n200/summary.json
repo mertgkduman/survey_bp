@@ -1,0 +1,26 @@
+{
+  "status": "exploratory_numerical_ablation",
+  "code": "b1",
+  "physical_p": 0.1,
+  "prior_p0": 0.1,
+  "shots": 200,
+  "seed": 20261101,
+  "kernel": "reference_check_clipped",
+  "scale": null,
+  "damping": null,
+  "max_iterations": 1000,
+  "counts": {
+    "variant_failed": 105,
+    "variant_invalid": 105,
+    "variant_type_ii": 0,
+    "variant_exact": 60,
+    "variant_degenerate_success": 35,
+    "tie_sites": 729151,
+    "saturated_check_products": 0
+  },
+  "event_ledger": "events.jsonl",
+  "event_ledger_sha256": "15d03e26454a0f8c50d371bf150af47bac9410849953fb82edeb6d73a23f7e56",
+  "posterior_v2c_limit": 25.0,
+  "projection_limit": 25.0,
+  "check_rule": "tanh_product"
+}

@@ -1,5 +1,13 @@
 # BP4 performance investigation
 
+**2026-10-26 follow-up:** The [reference comparison and matched numerical
+ablations](REFERENCE_GAP_AUDIT.md) identify global `±25` clipping in the
+canonical float64 profile as a major cause of local B1/double-Gross
+nonconvergence. A reference-style, unclipped float64 diagnostic failed 0/200
+B1 and 1/1000 double-Gross shots on matched errors; this is an implementation
+of the supplied reference description, not a direct package replay. The
+source-presentation fidelity questions below remain open.
+
 ## Question and verdict
 
 The presentation's BP4 curves for B1 and double-Gross are far better than our

@@ -1,0 +1,13 @@
+code,reference_run,reference_arm,new_run,new_arm,rescues,losses
+b1,tie_q8_b1_n200,ordinary,tie_q8_b1_n200,reference_tie,0,0
+b1,tie_float_b1_n200,ordinary,tie_float_b1_n200,reference_tie,53,0
+b1,tie_float_b1_n200,ordinary,reference_check_clipped_b1_n200,variant,50,0
+b1,tie_float_b1_n200,ordinary,boxplus_unclipped_b1_n200,variant,155,0
+b1,tie_float_b1_n200,ordinary,reference_float_b1_n200,reference_float,155,0
+double_gross,tie_q8_gross_n1000,ordinary,tie_q8_gross_n1000,reference_tie,2,0
+double_gross,tie_float_gross_n1000,ordinary,tie_float_gross_n1000,reference_tie,20,1
+double_gross,tie_float_gross_n1000,ordinary,reference_check_clipped_gross_n1000,variant,24,2
+double_gross,tie_float_gross_n1000,ordinary,projection_clipped_gross_n1000,variant,47,51
+double_gross,tie_float_gross_n1000,ordinary,posterior_v2c_clipped_gross_n1000,variant,24,8
+double_gross,tie_float_gross_n1000,ordinary,boxplus_unclipped_gross_n1000,variant,114,0
+double_gross,tie_float_gross_n1000,ordinary,reference_float_gross_n1000,reference_float,115,0

@@ -54,6 +54,13 @@ the slide curves. The best local policies are separately labeled as exploratory
 in `decoders/bp4_local_b1_screened.json` and
 `decoders/bp4_local_gross_screened.json`.
 
+The [reference BP4 implementation audit](results/performance_investigation/REFERENCE_GAP_AUDIT.md)
+compares encoding, updates, clipping, hard decisions, stopping, and outcome
+classification against the supplied four-weight reference description. Its
+matched numerical ablations identify the canonical float64 global clipping
+policy as a major cause of the local B1/double-Gross gap; the reference package
+itself was not executed in this workspace.
+
 The requested BP4 min-sum replay at vanilla `T=1000,s=16,d=0` and
 tuned-knob `T=1000,s=4,d=0.1` is recorded in
 [`results/performance_investigation/MINSUM_FOLLOWUP.md`](results/performance_investigation/MINSUM_FOLLOWUP.md),

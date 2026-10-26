@@ -1,0 +1,26 @@
+{
+  "status": "exploratory_numerical_ablation",
+  "code": "double_gross",
+  "physical_p": 0.08,
+  "prior_p0": 0.08,
+  "shots": 1000,
+  "seed": 20261031,
+  "kernel": "boxplus_unclipped",
+  "scale": null,
+  "damping": null,
+  "max_iterations": 1000,
+  "counts": {
+    "variant_failed": 2,
+    "variant_invalid": 2,
+    "variant_type_ii": 0,
+    "variant_exact": 910,
+    "variant_degenerate_success": 88,
+    "tie_sites": 0,
+    "saturated_check_products": 0
+  },
+  "event_ledger": "events.jsonl",
+  "event_ledger_sha256": "c76ff665c6b082dfecbe2095864a12802de01637f0931017c0ebdc5b3081d197",
+  "posterior_v2c_limit": null,
+  "projection_limit": null,
+  "check_rule": "boxplus_left_fold"
+}

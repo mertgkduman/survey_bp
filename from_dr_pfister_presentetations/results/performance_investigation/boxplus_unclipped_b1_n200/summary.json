@@ -1,0 +1,26 @@
+{
+  "status": "exploratory_numerical_ablation",
+  "code": "b1",
+  "physical_p": 0.1,
+  "prior_p0": 0.1,
+  "shots": 200,
+  "seed": 20261101,
+  "kernel": "boxplus_unclipped",
+  "scale": null,
+  "damping": null,
+  "max_iterations": 1000,
+  "counts": {
+    "variant_failed": 0,
+    "variant_invalid": 0,
+    "variant_type_ii": 0,
+    "variant_exact": 99,
+    "variant_degenerate_success": 101,
+    "tie_sites": 0,
+    "saturated_check_products": 0
+  },
+  "event_ledger": "events.jsonl",
+  "event_ledger_sha256": "04eb39312eb7936b09582250b584e39b11dd5fc53249e6994d93079fcd49183b",
+  "posterior_v2c_limit": null,
+  "projection_limit": null,
+  "check_rule": "boxplus_left_fold"
+}

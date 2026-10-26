@@ -1,0 +1,26 @@
+{
+  "status": "exploratory_numerical_ablation",
+  "code": "double_gross",
+  "physical_p": 0.08,
+  "prior_p0": 0.08,
+  "shots": 1000,
+  "seed": 20261031,
+  "kernel": "projection_clipped",
+  "scale": null,
+  "damping": null,
+  "max_iterations": 1000,
+  "counts": {
+    "variant_failed": 120,
+    "variant_invalid": 120,
+    "variant_type_ii": 0,
+    "variant_exact": 821,
+    "variant_degenerate_success": 59,
+    "tie_sites": 8915,
+    "saturated_check_products": 0
+  },
+  "event_ledger": "events.jsonl",
+  "event_ledger_sha256": "43be3add7c7a20a8aec9c172845518e45d21fe29621ea134104efd29fb8e9757",
+  "posterior_v2c_limit": null,
+  "projection_limit": 25.0,
+  "check_rule": "tanh_product"
+}
