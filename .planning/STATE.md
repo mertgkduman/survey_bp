@@ -276,6 +276,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261025-s21 | Test two-thirds shift of presentation depolarizing p against paired BP4 and binary pilots | 2026-10-25 | 89d5984 | Verified diagnostic; shift does not reconcile pilots | [261025-s21-test-two-thirds-presentation-p-axis-hypo](./quick/261025-s21-test-two-thirds-presentation-p-axis-hypo/) |
 | 261024-pyb | Reconcile Phase 11 plan completion and planning state | 2026-10-24 | 3868253 | Verified bookkeeping; scientific gaps open | [261024-pyb-reconcile-phase-11-plan-completion-and-p](./quick/261024-pyb-reconcile-phase-11-plan-completion-and-p/) |
 | 261021-pgm | Pin Relay and BeamSearch circuits, add Sinter CPU BP adapter and paper index | 2026-10-21 | 93757e2 | Verified development integration | [261021-pgm-pin-relay-paper-circuits-and-implement-v](./quick/261021-pgm-pin-relay-paper-circuits-and-implement-v/) |
 | 261021-om6 | Optimize shared binary BP numerical and schedule path with exact policy traces | 2026-10-21 | f54ee9d | Verified development optimization | [261021-om6-optimize-shared-binary-bp-numerical-and-](./quick/261021-om6-optimize-shared-binary-bp-numerical-and-/) |
