@@ -117,7 +117,9 @@ def main() -> None:
     axes[0].set_ylabel("Block logical error rate")
     fig.tight_layout()
     fig.savefig(RESULTS / "bp4_heldout_vs_presentation.png", dpi=180)
-    fig.savefig(RESULTS / "bp4_heldout_vs_presentation.pdf")
+    fig.savefig(RESULTS / "bp4_heldout_vs_presentation.pdf", metadata={
+        "Creator": "bp numeric scale-up", "CreationDate": None, "ModDate": None,
+    })
     plt.close(fig)
     print(f"Audited {len(points)} arm-runs and {len(pair_rows)} paired comparisons")
 
