@@ -1,0 +1,106 @@
+{
+  "status": "heldout",
+  "code": "b1",
+  "physical_p": 0.1,
+  "shots": 2000,
+  "seed": 20261102,
+  "max_iterations": 1000,
+  "check_shape": [
+    [
+      441,
+      882
+    ],
+    [
+      441,
+      882
+    ]
+  ],
+  "pauli_order": "I,X,Y,Z",
+  "binary_marginal_prior_by_arm": {
+    "binary_product_e10_d01": 0.06666666666666667,
+    "binary_boxplus_uncapped_d01": 0.06666666666666667,
+    "binary_boxplus_cap50_d0": 0.06666666666666667,
+    "binary_legacy_spa_clip25": 0.06666666666666667,
+    "binary_q8_oms": 0.06666666666666667
+  },
+  "configs": [
+    {
+      "id": "binary_product_e10_d01",
+      "family": "binary_numeric",
+      "check": "product",
+      "product_epsilon": 1e-10,
+      "damping": 0.1
+    },
+    {
+      "id": "binary_boxplus_uncapped_d01",
+      "family": "binary_numeric",
+      "check": "boxplus",
+      "check_cap": null,
+      "damping": 0.1
+    },
+    {
+      "id": "binary_boxplus_cap50_d0",
+      "family": "binary_numeric",
+      "check": "boxplus",
+      "check_cap": 50.0,
+      "damping": 0.0
+    },
+    {
+      "id": "binary_legacy_spa_clip25",
+      "family": "binary_legacy_spa"
+    },
+    {
+      "id": "binary_q8_oms",
+      "family": "binary_oms"
+    }
+  ],
+  "counts": {
+    "binary_product_e10_d01": {
+      "failures": 94,
+      "type_i": 94,
+      "type_ii": 0,
+      "exact_success": 180,
+      "stabilizer_success": 1726,
+      "total_work_iterations": 87548.5,
+      "total_elapsed_seconds": 72.8530806005001
+    },
+    "binary_boxplus_uncapped_d01": {
+      "failures": 94,
+      "type_i": 94,
+      "type_ii": 0,
+      "exact_success": 180,
+      "stabilizer_success": 1726,
+      "total_work_iterations": 87482.5,
+      "total_elapsed_seconds": 96.0872250944376
+    },
+    "binary_boxplus_cap50_d0": {
+      "failures": 145,
+      "type_i": 145,
+      "type_ii": 0,
+      "exact_success": 187,
+      "stabilizer_success": 1668,
+      "total_work_iterations": 194798.5,
+      "total_elapsed_seconds": 222.03080036863685
+    },
+    "binary_legacy_spa_clip25": {
+      "failures": 158,
+      "type_i": 158,
+      "type_ii": 0,
+      "exact_success": 180,
+      "stabilizer_success": 1662,
+      "total_work_iterations": 197580.5,
+      "total_elapsed_seconds": 207.83070083055645
+    },
+    "binary_q8_oms": {
+      "failures": 91,
+      "type_i": 91,
+      "type_ii": 0,
+      "exact_success": 186,
+      "stabilizer_success": 1723,
+      "total_work_iterations": 98988.0,
+      "total_elapsed_seconds": 11.056643235497177
+    }
+  },
+  "event_ledger": "events.jsonl",
+  "event_ledger_sha256": "119e95f1a54f5a919ab91d55bcdc693441de2ab9c40865d21866e5b0c7bee895"
+}

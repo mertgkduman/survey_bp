@@ -1,0 +1,10 @@
+[
+  {"id":"binary_product_e10_d0","family":"binary_numeric","check":"product","product_epsilon":1e-10,"damping":0.0},
+  {"id":"binary_boxplus_cap25_d0","family":"binary_numeric","check":"boxplus","check_cap":25.0,"damping":0.0},
+  {"id":"binary_boxplus_cap50_d0","family":"binary_numeric","check":"boxplus","check_cap":50.0,"damping":0.0},
+  {"id":"binary_boxplus_uncapped_d0","family":"binary_numeric","check":"boxplus","check_cap":null,"damping":0.0},
+  {"id":"binary_product_e10_d01","family":"binary_numeric","check":"product","product_epsilon":1e-10,"damping":0.1},
+  {"id":"binary_boxplus_uncapped_d01","family":"binary_numeric","check":"boxplus","check_cap":null,"damping":0.1},
+  {"id":"binary_legacy_spa_clip25","family":"binary_legacy_spa"},
+  {"id":"binary_q8_oms","family":"binary_oms"}
+]

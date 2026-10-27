@@ -1,0 +1,19 @@
+{
+  "schema": "numerical-decoder-policy-v2",
+  "id": "canonical_binary_spa_f64_v2",
+  "family": "two_binary_css_bp",
+  "profile_id": "binary-spa-flooding-f64-v2",
+  "source_fidelity": "canonical_adaptation; not_presentation_tuned_binary_oms_q8",
+  "noise": "depolarizing_code_capacity",
+  "prior": "independent_X_and_Z_marginals_at_2p0/3; p0=p_in_reported_heldout_runs",
+  "check_rule": "direct_extrinsic_tanh_product",
+  "check_product_unity_epsilon": 1e-10,
+  "check_cap": null,
+  "global_prior_posterior_v2c_clip": null,
+  "damping": {"coefficient_old": 0.1, "target": "variable_to_check"},
+  "schedule": "flooding_independently_on_X_and_Z",
+  "max_iterations_per_binary_decode": 1000,
+  "stop": "first_completed_component_syndrome_match",
+  "default_for_legacy_public_sessions": false,
+  "selection": "screen_seeds_20261031_20261101; heldout_seeds_20261102_20261103"
+}
