@@ -13,6 +13,8 @@ import math
 import numpy as np
 from numba import njit
 
+from bp_registry.resolution import BpFloodingPolicy, round_message
+
 from .kernel import KernelResult
 from .numerics import (
     BinaryNumericalProfileV2, MIN_SUM_CPU_F64,
@@ -202,6 +204,72 @@ def _decode_v2(row_ptr: np.ndarray, variables: np.ndarray, n: int,
     return candidate, False, max_iterations
 
 
+@njit(cache=True)
+def _policy_sweep_into(row_ptr, variables, n, old, syndrome, prior,
+                       format_code, scale, all_state, check_rule,
+                       old_weight, fresh_weight, alpha, beta,
+                       c2v, beliefs, candidate, new):
+    edge_count = len(variables)
+    fixed_bound = ((2 ** ((8 if format_code == 3 else 16 if format_code == 4 else 32) - 1) - 1) / scale
+                   if format_code >= 3 else math.inf)
+    for check in range(len(row_ptr) - 1):
+        start, stop = row_ptr[check], row_ptr[check + 1]
+        for edge in range(start, stop):
+            if check_rule == 1:
+                magnitude = fixed_bound
+                negatives = int(syndrome[check])
+                for other in range(start, stop):
+                    if other != edge:
+                        magnitude = min(magnitude, abs(old[other]))
+                        negatives += int(old[other] < 0.0)
+                if stop - start == 1 and format_code < 3:
+                    magnitude = 23.7189981105
+                message = alpha * max(0.0, magnitude - beta)
+                if negatives % 2:
+                    message = -message
+            else:
+                product = -1.0 if syndrome[check] else 1.0
+                for other in range(start, stop):
+                    if other != edge:
+                        value = old[other]
+                        product *= 1.0 if value > 40.0 else -1.0 if value < -40.0 else math.tanh(value / 2.0)
+                product = min(1.0 - 1e-10, max(-1.0 + 1e-10, product))
+                message = math.log1p(product) - math.log1p(-product)
+            c2v[edge] = round_message(message, format_code, scale)
+    beliefs[:] = prior
+    for edge in range(edge_count):
+        beliefs[variables[edge]] += c2v[edge]
+    for variable in range(n):
+        if all_state:
+            beliefs[variable] = round_message(beliefs[variable], format_code, scale)
+        candidate[variable] = 1 if beliefs[variable] < 0.0 else 0
+    for edge in range(edge_count):
+        proposal = round_message(beliefs[variables[edge]] - c2v[edge], format_code, scale)
+        new[edge] = round_message(old_weight * old[edge] + fresh_weight * proposal, format_code, scale)
+
+
+@njit(cache=True)
+def _decode_policy(row_ptr, variables, n, syndrome, prior, max_iterations,
+                   format_code, scale, all_state, check_rule,
+                   old_weight, fresh_weight, alpha, beta, zero_shortcut):
+    candidate = np.zeros(n, dtype=np.uint8)
+    if zero_shortcut and _candidate_matches(row_ptr, variables, candidate, syndrome):
+        return candidate, True, 0
+    old = np.full(len(variables), round_message(prior, format_code, scale), dtype=np.float64)
+    new = np.empty_like(old)
+    c2v = np.empty_like(old)
+    beliefs = np.empty(n, dtype=np.float64)
+    for iteration in range(1, max_iterations + 1):
+        _policy_sweep_into(row_ptr, variables, n, old, syndrome, prior,
+                           format_code, scale, all_state, check_rule,
+                           old_weight, fresh_weight, alpha, beta,
+                           c2v, beliefs, candidate, new)
+        if _candidate_matches(row_ptr, variables, candidate, syndrome):
+            return candidate, True, iteration
+        old, new = new, old
+    return candidate, _candidate_matches(row_ptr, variables, candidate, syndrome), max_iterations
+
+
 @dataclass(frozen=True)
 class CompiledBinaryFlooding:
     """Preindexed, optional backend for plain SPA or plain min-sum flooding."""
@@ -211,10 +279,17 @@ class CompiledBinaryFlooding:
     variables: np.ndarray
     rule: str
     numerical_profile: NumericalProfile = DEFAULT_BINARY_SPA_F64
+    policy: BpFloodingPolicy | None = None
+
+    @property
+    def effective_numerics(self) -> dict[str, object]:
+        return (self.policy.as_evidence() if self.policy is not None
+                else self.numerical_profile.as_evidence())
 
     @classmethod
     def from_check_matrix(cls, check_matrix: np.ndarray, *, rule: str = "spa",
-                          profile: NumericalProfile | None = None) -> "CompiledBinaryFlooding":
+                          profile: NumericalProfile | None = None,
+                          policy: BpFloodingPolicy | None = None) -> "CompiledBinaryFlooding":
         if rule not in {"spa", "min_sum"}:
             raise ValueError("compiled prototype supports only plain spa or min_sum")
         table = EdgeTable.from_check_matrix(check_matrix)
@@ -229,11 +304,17 @@ class CompiledBinaryFlooding:
         selected = (DEFAULT_BINARY_SPA_F64 if rule == "spa" else MIN_SUM_CPU_F64) if profile is None else profile
         if not isinstance(selected, NumericalProfile):
             raise ValueError("invalid compiled binary numerical profile")
-        if rule == "min_sum" and selected != MIN_SUM_CPU_F64:
+        if policy is not None and not isinstance(policy, BpFloodingPolicy):
+            raise ValueError("binary flooding policy must be a BpFloodingPolicy")
+        if policy is not None and policy.check_rule != ("sum_product" if rule == "spa" else "min_sum"):
+            raise ValueError("binary check rule conflicts with explicit policy")
+        if policy is not None and profile is not None and not isinstance(profile, BinaryNumericalProfileV2):
+            raise ValueError("resolved binary policy requires unbounded v2 prior coordinates")
+        if rule == "min_sum" and selected != MIN_SUM_CPU_F64 and policy is None:
             raise ValueError("compiled min-sum requires its v1 numerical profile")
-        if rule == "spa" and selected == MIN_SUM_CPU_F64:
+        if rule == "spa" and selected == MIN_SUM_CPU_F64 and policy is None:
             raise ValueError("compiled SPA requires an SPA numerical profile")
-        return cls(table, row_ptr, variables, rule, selected)
+        return cls(table, row_ptr, variables, rule, selected, policy)
 
     @property
     def profile(self):
@@ -249,13 +330,16 @@ class CompiledBinaryFlooding:
         s = self._syndrome(syndrome)
         if not math.isfinite(error_rate) or not 0.0 < error_rate < 1.0:
             raise ValueError("error_rate must be finite and between zero and one")
-        return s, prior_llr(error_rate, profile=self.profile)
+        return s, (math.log((1.0 - error_rate) / error_rate) if self.policy is not None
+                   else prior_llr(error_rate, profile=self.profile))
 
     def bind_error_rate(self, error_rate: float) -> "BoundBinaryFlooding":
         """Resolve a fixed prior once for a same-parameter shot batch."""
         if not math.isfinite(error_rate) or not 0.0 < error_rate < 1.0:
             raise ValueError("error_rate must be finite and between zero and one")
-        return BoundBinaryFlooding(self, prior_llr(error_rate, profile=self.profile))
+        prior = (math.log((1.0 - error_rate) / error_rate) if self.policy is not None
+                 else prior_llr(error_rate, profile=self.profile))
+        return BoundBinaryFlooding(self, prior)
 
     def sweep(self, old_v2c: np.ndarray, syndrome: np.ndarray, *, error_rate: float) -> FloodingSweep:
         """Return one completed flooding sweep, including v2 V2C damping."""
@@ -263,7 +347,21 @@ class CompiledBinaryFlooding:
         old = np.asarray(old_v2c, dtype=np.float64)
         if old.shape != (self.table.edge_count,) or not np.all(np.isfinite(old)):
             raise ValueError("old_v2c must be finite and match the graph edges")
-        if isinstance(self.profile, BinaryNumericalProfileV2):
+        if self.policy is not None:
+            policy = self.policy
+            resolution = policy.resolution
+            old = np.asarray([resolution.quantize(value) for value in old], dtype=np.float64)
+            old_weight, fresh_weight, alpha, beta = policy.coefficients
+            c2v = np.empty(self.table.edge_count, dtype=np.float64)
+            beliefs = np.empty(self.table.variable_count, dtype=np.float64)
+            candidate = np.empty(self.table.variable_count, dtype=np.uint8)
+            new = np.empty(self.table.edge_count, dtype=np.float64)
+            _policy_sweep_into(self.row_ptr, self.variables, self.table.variable_count,
+                               old, s, prior, resolution.format_code, resolution.fixed_scale,
+                               resolution.scope == "all_state", 1 if self.rule == "min_sum" else 0,
+                               old_weight, fresh_weight, alpha, beta, c2v, beliefs, candidate, new)
+            arrays = (old.copy(), c2v, beliefs, candidate, new)
+        elif isinstance(self.profile, BinaryNumericalProfileV2):
             c2v = np.empty(self.table.edge_count, dtype=np.float64)
             beliefs = np.empty(self.table.variable_count, dtype=np.float64)
             candidate = np.empty(self.table.variable_count, dtype=np.uint8)
@@ -288,7 +386,16 @@ class CompiledBinaryFlooding:
         s, prior = self._inputs(syndrome, error_rate)
         if type(max_iterations) is not int or max_iterations < 0:
             raise ValueError("max_iterations must be a nonnegative integer")
-        if isinstance(self.profile, BinaryNumericalProfileV2):
+        if self.policy is not None:
+            policy = self.policy
+            resolution = policy.resolution
+            candidate, converged, iterations = _decode_policy(
+                self.row_ptr, self.variables, self.table.variable_count, s, prior,
+                max_iterations, resolution.format_code, resolution.fixed_scale,
+                resolution.scope == "all_state", 1 if self.rule == "min_sum" else 0,
+                *policy.coefficients, policy.zero_syndrome_shortcut,
+            )
+        elif isinstance(self.profile, BinaryNumericalProfileV2):
             candidate, converged, iterations = _decode_v2(
                 self.row_ptr, self.variables, self.table.variable_count, s, prior,
                 max_iterations, math.inf if self.profile.check_cap is None else self.profile.check_cap, self.profile.product_epsilon,
@@ -314,7 +421,17 @@ class BoundBinaryFlooding:
         s = self.graph._syndrome(syndrome)
         if type(max_iterations) is not int or max_iterations < 0:
             raise ValueError("max_iterations must be a nonnegative integer")
-        if isinstance(self.graph.profile, BinaryNumericalProfileV2):
+        if self.graph.policy is not None:
+            policy = self.graph.policy
+            resolution = policy.resolution
+            candidate, converged, iterations = _decode_policy(
+                self.graph.row_ptr, self.graph.variables, self.graph.table.variable_count,
+                s, self.prior, max_iterations, resolution.format_code,
+                resolution.fixed_scale, resolution.scope == "all_state",
+                1 if self.graph.rule == "min_sum" else 0,
+                *policy.coefficients, policy.zero_syndrome_shortcut,
+            )
+        elif isinstance(self.graph.profile, BinaryNumericalProfileV2):
             candidate, converged, iterations = _decode_v2(
                 self.graph.row_ptr, self.graph.variables, self.graph.table.variable_count,
                 s, self.prior, max_iterations, math.inf if self.graph.profile.check_cap is None else self.graph.profile.check_cap,

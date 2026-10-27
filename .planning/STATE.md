@@ -276,6 +276,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261027-q9k | Promote corrected BP4 min-sum and add shared resolution policies | 2026-10-27 | — | Verified compiled development policy; historical manifests unchanged | [261027-q9k-ms-resolution-policy](./quick/261027-q9k-ms-resolution-policy/) |
 | 261027-p6o | Recheck nine vanilla BP4 MS curve points with jointly corrected diagnostic numerics | 2026-10-27 | — | Verified exploratory match; double-Gross p=.06 holdout differs from source point | [261027-p6o-ms-both-changes-curve](./quick/261027-p6o-ms-both-changes-curve/) |
 | 261027-mnotation | Replace v1/v2 comparison with BP message notation | 2026-10-27 | — | Verified | [261027-mnotation-v1-v2](./quick/261027-mnotation-v1-v2/) |
 | 261027-math | Replace v1/v2 comparison with typeset vector equations | 2026-10-27 | — | Superseded by 261027-mnotation | [261027-math-v1-v2-comparison](./quick/261027-math-v1-v2-comparison/) |

@@ -12,6 +12,9 @@ import math
 import numpy as np
 from numba import njit
 
+from bp_registry.css import CssCode
+from bp_registry.resolution import BpFloodingPolicy, DEFAULT_BP4_MIN_SUM, round_message
+
 from .algebra import Pauli
 from .kernel import _priors
 from .numerics import (
@@ -290,6 +293,116 @@ def _decode_v2(
     return candidate, max_iterations, _candidate_matches(row_ptr, variables, labels, candidate, syndrome)
 
 
+@njit(cache=True)
+def _policy_sweep_into(
+    row_ptr, variable_ptr, variable_edges, variables, labels, old_v2c,
+    prior_llrs, syndrome, format_code, scale, scope, check_rule,
+    old_weight, fresh_weight, alpha, beta, hard_decision,
+    comm, c2v, beliefs, new_v2c, candidate,
+):
+    """Corrected MS: exact four-state projection before scalar rounding."""
+    edge_count = len(labels)
+    for edge in range(edge_count):
+        values, label = old_v2c[edge], labels[edge]
+        x, y, z = values[0], values[1], values[2]
+        if label == 1:
+            projected = _logaddexp(0.0, -x) - _logaddexp(-y, -z)
+        elif label == 2:
+            projected = _logaddexp(0.0, -y) - _logaddexp(-x, -z)
+        else:
+            projected = _logaddexp(0.0, -z) - _logaddexp(-x, -y)
+        comm[edge] = round_message(projected, format_code, scale)
+    fixed_bound = ((2 ** ((8 if format_code == 3 else 16 if format_code == 4 else 32) - 1) - 1) / scale
+                   if format_code >= 3 else math.inf)
+    for check in range(len(row_ptr) - 1):
+        start, stop = row_ptr[check], row_ptr[check + 1]
+        for edge in range(start, stop):
+            if check_rule == 1:
+                magnitude = fixed_bound
+                negatives = int(syndrome[check])
+                for other in range(start, stop):
+                    if other != edge:
+                        magnitude = min(magnitude, abs(comm[other]))
+                        negatives += int(comm[other] < 0.0)
+                if stop - start == 1 and format_code < 3:
+                    magnitude = 23.7189981105
+                message = alpha * max(0.0, magnitude - beta)
+                if negatives % 2:
+                    message = -message
+            else:
+                product = -1.0 if syndrome[check] else 1.0
+                for other in range(start, stop):
+                    if other != edge:
+                        value = comm[other]
+                        product *= 1.0 if value > 40.0 else -1.0 if value < -40.0 else math.tanh(value / 2.0)
+                product = min(1.0 - 1e-10, max(-1.0 + 1e-10, product))
+                message = math.log1p(product) - math.log1p(-product)
+            c2v[edge] = round_message(message, format_code, scale)
+    for variable in range(prior_llrs.shape[0]):
+        for state in range(1, 4):
+            value = prior_llrs[variable, state - 1]
+            for position in range(variable_ptr[variable], variable_ptr[variable + 1]):
+                edge = variable_edges[position]
+                if _anticommutes(labels[edge], state):
+                    value += c2v[edge]
+            beliefs[variable, state - 1] = round_message(value, format_code, scale) if scope == 2 else value
+        x, y, z = beliefs[variable, 0], beliefs[variable, 1], beliefs[variable, 2]
+        if x > 0.0 and y > 0.0 and z > 0.0:
+            candidate[variable] = 0
+        elif hard_decision == 0:
+            if x <= y and x <= z:
+                candidate[variable] = 1
+            elif y <= z:
+                candidate[variable] = 2
+            else:
+                candidate[variable] = 3
+        elif x < y and x < z:
+            candidate[variable] = 1
+        elif z < x and z < y:
+            candidate[variable] = 3
+        else:
+            candidate[variable] = 2
+    for edge in range(edge_count):
+        variable, label = variables[edge], labels[edge]
+        for state in range(1, 4):
+            proposal = beliefs[variable, state - 1]
+            if _anticommutes(label, state):
+                proposal -= c2v[edge]
+            if scope >= 1:
+                proposal = round_message(proposal, format_code, scale)
+            value = old_weight * old_v2c[edge, state - 1] + fresh_weight * proposal
+            new_v2c[edge, state - 1] = round_message(value, format_code, scale) if scope >= 1 else value
+
+
+@njit(cache=True)
+def _decode_policy(row_ptr, variable_ptr, variable_edges, variables, labels,
+                   prior_llrs, syndrome, max_iterations, format_code, scale, scope,
+                   check_rule, old_weight, fresh_weight, alpha, beta,
+                   hard_decision, zero_shortcut, stop_on_convergence):
+    n, edge_count = prior_llrs.shape[0], len(labels)
+    candidate = np.zeros(n, dtype=np.uint8)
+    if zero_shortcut and stop_on_convergence and _candidate_matches(row_ptr, variables, labels, candidate, syndrome):
+        return candidate, 0, True
+    old = np.empty((edge_count, 3), dtype=np.float64)
+    new = np.empty_like(old)
+    comm = np.empty(edge_count, dtype=np.float64)
+    c2v = np.empty(edge_count, dtype=np.float64)
+    beliefs = np.empty((n, 3), dtype=np.float64)
+    for edge in range(edge_count):
+        for state in range(3):
+            value = prior_llrs[variables[edge], state]
+            old[edge, state] = round_message(value, format_code, scale) if scope >= 1 else value
+    for iteration in range(1, max_iterations + 1):
+        _policy_sweep_into(row_ptr, variable_ptr, variable_edges, variables, labels,
+                           old, prior_llrs, syndrome, format_code, scale, scope,
+                           check_rule, old_weight, fresh_weight, alpha, beta,
+                           hard_decision, comm, c2v, beliefs, new, candidate)
+        if stop_on_convergence and _candidate_matches(row_ptr, variables, labels, candidate, syndrome):
+            return candidate, iteration, True
+        old, new = new, old
+    return candidate, max_iterations, _candidate_matches(row_ptr, variables, labels, candidate, syndrome)
+
+
 @dataclass(frozen=True)
 class CompiledBp4Sweep:
     c2v: np.ndarray
@@ -318,10 +431,65 @@ class CompiledBp4Graph:
     labels: np.ndarray
     prior_llrs: np.ndarray
     profile: QuaternaryNumericalProfile = QBP4_F64_V2
+    policy: BpFloodingPolicy | None = None
+
+    @property
+    def effective_numerics(self) -> dict[str, object]:
+        return (self.policy.as_evidence() if self.policy is not None
+                else self.profile.as_evidence())
+
+    @classmethod
+    def from_css(cls, code: CssCode, p0: float, *, rule: str = "sum_product",
+                 policy: BpFloodingPolicy | None = None) -> "CompiledBp4Graph":
+        """Index a validated CSS code without a dense Pauli commutation proof.
+
+        X rows precede Z rows. The caller owns the original CSS code's
+        stabilizer and logical validation; this only checks graph shape and
+        cross-check commutation before constructing decoder-visible state.
+        """
+        if not isinstance(code, CssCode) or rule not in {"sum_product", "min_sum"}:
+            raise ValueError("from_css requires a CSS code and a known BP4 check rule")
+        hx, hz = np.asarray(code.hx), np.asarray(code.hz)
+        if (hx.ndim != 2 or hz.ndim != 2 or hx.shape[1] == 0 or hx.shape[1] != hz.shape[1]
+                or not np.issubdtype(hx.dtype, np.integer) or not np.issubdtype(hz.dtype, np.integer)
+                or np.any((hx != 0) & (hx != 1)) or np.any((hz != 0) & (hz != 1))
+                or np.any((hx.astype(np.int64) @ hz.astype(np.int64).T) % 2)):
+            raise ValueError("CSS check matrices must be binary, aligned, and commuting")
+        if (np.any(~np.any(hx, axis=1)) or np.any(~np.any(hz, axis=1))
+                or np.any(~(np.any(hx, axis=0) | np.any(hz, axis=0)))):
+            raise ValueError("CSS BP4 graph cannot have empty checks or isolated qubits")
+        if not math.isfinite(p0) or not 0.0 < p0 < 1.0:
+            raise ValueError("depolarizing decoder prior p0 must lie in (0,1)")
+        if policy is not None and (not isinstance(policy, BpFloodingPolicy) or policy.check_rule != rule):
+            raise ValueError("CSS BP4 policy conflicts with the selected check rule")
+        if policy is None and rule == "min_sum":
+            policy = DEFAULT_BP4_MIN_SUM
+        n = hx.shape[1]
+        x_rows, x_vars = np.nonzero(hx)
+        z_rows, z_vars = np.nonzero(hz)
+        rows = np.concatenate((x_rows, z_rows + hx.shape[0]))
+        variables = np.concatenate((x_vars, z_vars)).astype(np.int64)
+        labels = np.concatenate((np.full(len(x_rows), Pauli.X), np.full(len(z_rows), Pauli.Z))).astype(np.uint8)
+        row_ptr = np.bincount(rows, minlength=hx.shape[0] + hz.shape[0]).astype(np.int64)
+        row_ptr = np.concatenate((np.asarray((0,), dtype=np.int64), np.cumsum(row_ptr)))
+        variable_ptr = np.bincount(variables, minlength=n).astype(np.int64)
+        variable_ptr = np.concatenate((np.asarray((0,), dtype=np.int64), np.cumsum(variable_ptr)))
+        variable_edges = np.empty(len(labels), dtype=np.int64)
+        offsets = variable_ptr[:-1].copy()
+        for edge, variable in enumerate(variables):
+            variable_edges[offsets[variable]] = edge
+            offsets[variable] += 1
+        llr = math.log((1.0 - p0) / (p0 / 3.0))
+        prior_llrs = np.full((n, 3), llr, dtype=np.float64)
+        for array in (row_ptr, variable_ptr, variable_edges, variables, labels, prior_llrs):
+            array.setflags(write=False)
+        return cls(row_ptr, variable_ptr, variable_edges, variables, labels, prior_llrs, QBP4_F64_V2, policy)
 
     @classmethod
     def from_code(cls, code: PauliCode, priors: object, *,
-                  profile: QuaternaryNumericalProfile = QBP4_F64_V2) -> "CompiledBp4Graph":
+                  profile: QuaternaryNumericalProfile = QBP4_F64_V2,
+                  rule: str | None = None,
+                  policy: BpFloodingPolicy | None = None) -> "CompiledBp4Graph":
         if not isinstance(code, PauliCode):
             raise TypeError("compiled BP4 prototype needs a validated PauliCode")
         probabilities = _priors(priors, n=code.n)
@@ -343,12 +511,22 @@ class CompiledBp4Graph:
             offsets[variable] += 1
         if not isinstance(profile, QuaternaryNumericalProfile):
             raise ValueError("invalid compiled BP4 numerical profile")
+        if rule not in {None, "sum_product", "min_sum"}:
+            raise ValueError("compiled BP4 rule must be sum_product or min_sum")
+        if policy is not None and not isinstance(policy, BpFloodingPolicy):
+            raise ValueError("compiled BP4 policy must be a BpFloodingPolicy")
+        if policy is not None and rule is not None and policy.check_rule != rule:
+            raise ValueError("BP4 rule conflicts with explicit policy")
+        if policy is None and rule == "min_sum":
+            policy = DEFAULT_BP4_MIN_SUM
+        if policy is not None and not isinstance(profile, QuaternaryNumericalProfileV2):
+            raise ValueError("resolved BP4 flooding policy requires unbounded v2 numerical coordinates")
         if isinstance(profile, QuaternaryNumericalProfileV2) and profile.check_rule != "tanh_product":
             raise ValueError("compiled v2 BP4 currently supports tanh_product checks")
         prior_llrs = np.asarray([probabilities_to_llrs(row, profile=profile) for row in probabilities], dtype=np.float64)
         for array in (row_ptr, variable_ptr, variable_edges, variables, labels, prior_llrs):
             array.setflags(write=False)
-        return cls(row_ptr, variable_ptr, variable_edges, variables, labels, prior_llrs, profile)
+        return cls(row_ptr, variable_ptr, variable_edges, variables, labels, prior_llrs, profile, policy)
 
     def _syndrome(self, value: np.ndarray) -> np.ndarray:
         syndrome = np.asarray(value)
@@ -357,14 +535,42 @@ class CompiledBp4Graph:
         return np.asarray(syndrome, dtype=np.uint8)
 
     def initial_v2c(self) -> np.ndarray:
-        return np.asarray(self.prior_llrs[self.variables], dtype=np.float64)
+        values = np.asarray(self.prior_llrs[self.variables], dtype=np.float64)
+        if self.policy is not None and self.policy.resolution.scope != "scalar_edges":
+            resolution = self.policy.resolution
+            for index in np.ndindex(values.shape):
+                values[index] = resolution.quantize(values[index])
+        return values
 
     def sweep(self, old_v2c: np.ndarray, syndrome: np.ndarray) -> CompiledBp4Sweep:
         s = self._syndrome(syndrome)
         old = np.asarray(old_v2c, dtype=np.float64)
         if old.shape != (len(self.labels), 3) or not np.all(np.isfinite(old)):
             raise ValueError("old_v2c must be finite with one three-LLR row per edge")
-        if isinstance(self.profile, QuaternaryNumericalProfileV2):
+        if self.policy is not None:
+            policy = self.policy
+            resolution = policy.resolution
+            if resolution.scope != "scalar_edges":
+                old = old.copy()
+                for index in np.ndindex(old.shape):
+                    old[index] = resolution.quantize(old[index])
+            old_weight, fresh_weight, alpha, beta = policy.coefficients
+            comm = np.empty(len(self.labels), dtype=np.float64)
+            c2v = np.empty(len(self.labels), dtype=np.float64)
+            beliefs = np.empty_like(self.prior_llrs)
+            v2c = np.empty_like(old)
+            candidate = np.empty(self.prior_llrs.shape[0], dtype=np.uint8)
+            marginals = np.empty((self.prior_llrs.shape[0], 4), dtype=np.float64)
+            _policy_sweep_into(self.row_ptr, self.variable_ptr, self.variable_edges,
+                               self.variables, self.labels, old, self.prior_llrs, s,
+                               resolution.format_code, resolution.fixed_scale,
+                               {"scalar_edges": 0, "all_messages": 1, "all_state": 2}[resolution.scope],
+                               1 if policy.check_rule == "min_sum" else 0,
+                               old_weight, fresh_weight, alpha, beta,
+                               0 if policy.hard_decision == "min_llr" else 1,
+                               comm, c2v, beliefs, v2c, candidate)
+            _normalize_marginals(beliefs, marginals)
+        elif isinstance(self.profile, QuaternaryNumericalProfileV2):
             comm = np.empty(len(self.labels), dtype=np.float64)
             c2v = np.empty(len(self.labels), dtype=np.float64)
             beliefs = np.empty_like(self.prior_llrs)
@@ -390,7 +596,20 @@ class CompiledBp4Graph:
         s = self._syndrome(syndrome)
         if type(max_iterations) is not int or max_iterations < 0 or type(stop_on_convergence) is not bool:
             raise ValueError("invalid compiled BP4 stopping request")
-        if isinstance(self.profile, QuaternaryNumericalProfileV2):
+        if self.policy is not None:
+            policy = self.policy
+            resolution = policy.resolution
+            candidate, iterations, converged = _decode_policy(
+                self.row_ptr, self.variable_ptr, self.variable_edges, self.variables,
+                self.labels, self.prior_llrs, s, max_iterations,
+                resolution.format_code, resolution.fixed_scale,
+                {"scalar_edges": 0, "all_messages": 1, "all_state": 2}[resolution.scope],
+                1 if policy.check_rule == "min_sum" else 0,
+                *policy.coefficients,
+                0 if policy.hard_decision == "min_llr" else 1,
+                policy.zero_syndrome_shortcut, stop_on_convergence,
+            )
+        elif isinstance(self.profile, QuaternaryNumericalProfileV2):
             candidate, iterations, converged = _decode_v2(
                 self.row_ptr, self.variable_ptr, self.variable_edges, self.variables, self.labels,
                 self.prior_llrs, s, max_iterations, math.inf if self.profile.check_cap is None else self.profile.check_cap,

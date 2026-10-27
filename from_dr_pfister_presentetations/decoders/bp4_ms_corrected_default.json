@@ -1,0 +1,25 @@
+{
+  "id": "bp4_ms_corrected_default_v1",
+  "status": "canonical_compiled_development_policy",
+  "implementation": "CompiledBp4Graph.from_code(code, priors, rule='min_sum')",
+  "policy": {
+    "check_rule": "min_sum",
+    "resolution": {
+      "format": "int8",
+      "scale": 16,
+      "scope": "scalar_edges",
+      "coefficients": "float64",
+      "version": "bp-resolution-v1"
+    },
+    "damping": 0.0,
+    "alpha": 1.0,
+    "beta": 0.0,
+    "hard_decision": "min_llr",
+    "zero_syndrome_shortcut": true,
+    "version": "bp-flooding-policy-v1"
+  },
+  "max_iterations": 1000,
+  "projection": "exact_four_state_logsumexp_difference_then_scalar_rounding",
+  "v2c_coordinates": "unbounded_float64_identity_referenced_X_Y_Z",
+  "evidence": "results/ms_both_changes_curve"
+}

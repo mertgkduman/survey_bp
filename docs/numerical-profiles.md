@@ -11,7 +11,7 @@ repository root.
 | Family | New direct constructor | New public manifest | Resolved profile |
 | --- | --- | --- | --- |
 | Binary SPA | `BinarySpaKernel()` or `CompiledBinaryFlooding.from_check_matrix(...)` | schema `9`, `cpu-float64-spa-v2` by default | `binary-spa-flooding-f64-v2` |
-| Four-state BP4 | `ScalarLlrBp4Kernel()` or `CompiledBp4Graph.from_check_matrix(...)` | `quaternary_experiment_v3`, `quaternary-bp4-f64-v2` by default | `quaternary-bp4-f64-v2` |
+| Four-state BP4 | `ScalarLlrBp4Kernel()` or `CompiledBp4Graph.from_code(...)` | `quaternary_experiment_v3`, `quaternary-bp4-f64-v2` by default | `quaternary-bp4-f64-v2` |
 
 Runnable development manifests are
 [`examples/canonical-v2-default.json`](../examples/canonical-v2-default.json)
@@ -74,8 +74,62 @@ before the product. Products are accumulated in graph edge order. The v2
 profile rejects nonfinite internal values. The code-capacity kernels here
 require strictly positive four-state BP4 priors; exact-zero support from the
 separate Python reference described in the investigation is not implemented.
-These are float64 policies; Q8 rounding, scale, and saturation settings are
-distinct experiments.
+These profile IDs remain float64 profiles. Explicit message resolution is a
+separate flooding policy described below.
+
+## Composable flooding resolution
+
+`ResolutionPolicy` is shared by the compiled binary and BP4 flooding graphs.
+It admits `float16`, `float32`, `float64`, `int8`, `int16`, and `int32`.
+Signed fixed-point formats use step `1/scale`, ties-to-even rounding, and
+symmetric finite range `[-(2^(bits-1)-1)/scale, +(2^(bits-1)-1)/scale]`.
+Floating formats round at declared boundaries; `float16` and `float32`
+saturate at their largest finite values. Check reductions, four-state
+log-sum-exp, posterior accumulation, and damping multiplication use float64
+intermediates. The compiled prototype carries even quantized values in
+float64 arrays, so these policies specify numerical resolution, not actual
+low-bit memory storage or a bit-exact integer implementation.
+
+`scope="scalar_edges"` rounds the BP4 commute/anticommute projection and
+check-to-variable message, while retaining the three identity-referenced
+variable messages and posterior beliefs in float64. This is the new default
+for **compiled BP4 min-sum**: `int8`, `scale=16`, `alpha=1`, `beta=0`,
+`damping=0`, a flooding schedule, and the original minimum-LLR tie rule.
+The projection forms the complete difference of two log-sum-exp values
+before the scalar rounding. The old experimental Q8 path clipped the three
+input LLRs and both log-sum-exp operands and remains frozen for replay.
+`scope="all_messages"` also rounds variable-to-check messages;
+`scope="all_state"` additionally rounds posterior beliefs. For binary BP,
+all variable messages are scalar, so every scope rounds them. When outgoing
+variable messages are rounded, their extrinsic proposals are rounded before
+damping and the damped messages are rounded again.
+
+`coefficients="float64"` retains supplied damping, scale, and offset values.
+`coefficients="same"` rounds each of `d`, `1-d`, `alpha`, and `beta` once at
+policy binding to the chosen resolution. For example, `d=0.1` becomes
+`0.125` and `1-d=0.9` becomes `0.875` in signed int8 with scale 16.
+The effective coefficients and full policy identity are available through
+`BpFloodingPolicy.as_evidence()` and `semantic_identity`.
+
+```python
+from bp_registry.canonical.compiled import CompiledBinaryFlooding
+from bp_registry.quaternary.compiled import CompiledBp4Graph
+from bp_registry.resolution import BpFloodingPolicy, ResolutionPolicy
+
+policy = BpFloodingPolicy(
+    check_rule="min_sum",
+    resolution=ResolutionPolicy("int8", scale=16, scope="scalar_edges", coefficients="same"),
+    damping=0.1,
+)
+bp4 = CompiledBp4Graph.from_css(css_code, p0=0.08, rule="min_sum", policy=policy)
+binary = CompiledBinaryFlooding.from_check_matrix(h, rule="min_sum", policy=policy)
+```
+
+`BpFloodingPolicy.as_spec()` is the data-only JSON contract; `from_spec()`
+validates and restores it. The direct compiled graphs are development
+backends; the historical publication manifest schemas have fixed numerical
+identities and do not silently adopt this policy. A new publication schema
+must bind it and its event ledger before source-curve claims use this path.
 
 ## Versioned compatibility
 

@@ -78,6 +78,12 @@ numerical profiles. See the [profile guide](docs/numerical-profiles.md), the
 explicit historical v1 profile. New v2 manifest examples are
 [`canonical-v2-default.json`](examples/canonical-v2-default.json) and
 [`quaternary-v2-default.json`](examples/quaternary-v2-default.json).
+Compiled BP4 min-sum selected with `rule="min_sum"` now uses the corrected
+int8 scalar-message policy. Binary and BP4 compiled flooding graphs accept a
+shared, explicit `BpFloodingPolicy` for float16/32/64 or signed fixed 8/16/32
+resolution, message scope, and optional coefficient rounding. The
+[resolution contract](docs/numerical-profiles.md#composable-flooding-resolution)
+specifies the exact boundaries and publication-status limit.
 
 ```bash
 OMP_NUM_THREADS=1 .venv/bin/python -m bp_registry.cli preflight \
