@@ -51,6 +51,16 @@ def test_reference_profile_materializes_encoding_clipping_and_ties():
     assert numerics.canonical_min_index(np.array([3.0, 1.0, 1.0]), np.array([4, 9, 2])) == 2
 
 
+def test_binary_spa_v2_has_an_independent_check_bound_and_unbounded_beliefs() -> None:
+    profile = numerics.BINARY_SPA_F64_V2
+    assert profile.as_evidence()["profile_id"] == "binary-spa-flooding-f64-v2"
+    assert numerics.prior_llr(1e-14, profile=profile) > 25.0
+    assert numerics.prior_llr(1e-14, profile=numerics.REFERENCE_CPU_F64) == 25.0
+    assert numerics.check_to_variable(np.asarray([100.0]), profile=profile) == pytest.approx(23.718998, abs=1e-5)
+    assert numerics.check_to_variable(np.asarray([30.0]), profile=profile) > 25.0
+    assert numerics.check_to_variable(np.asarray([100.0]), profile=numerics.REFERENCE_CPU_F64) == 25.0
+
+
 def test_boxplus_matches_direct_safe_equation_and_extremes_stay_finite():
     _profile_api()
     left, right = 1.2, -0.7

@@ -12,7 +12,7 @@ pytest.importorskip("numba")
 
 from bp_registry.canonical.compiled import CompiledBinaryFlooding
 from bp_registry.canonical.kernel import BinarySpaKernel
-from bp_registry.canonical.numerics import MIN_SUM_CPU_F64
+from bp_registry.canonical.numerics import BINARY_SPA_F64_V2, MIN_SUM_CPU_F64, REFERENCE_CPU_F64
 from bp_registry.canonical.schedules import FloodingSchedule
 from bp_registry.canonical.updates import MinSumUpdate
 
@@ -22,6 +22,19 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def _reference(rule: str) -> BinarySpaKernel:
     return BinarySpaKernel() if rule == "spa" else BinarySpaKernel(profile=MIN_SUM_CPU_F64, update_rule=MinSumUpdate())
+
+
+def test_spa_v2_is_selectable_and_frozen_v1_remains_default() -> None:
+    h = np.asarray([[1, 1, 0], [0, 1, 1]], dtype=np.uint8)
+    syndrome = np.asarray([1, 0], dtype=np.uint8)
+    assert BinarySpaKernel(profile=BINARY_SPA_F64_V2).profile is BINARY_SPA_F64_V2
+    assert BinarySpaKernel().profile is REFERENCE_CPU_F64
+    for profile in (BINARY_SPA_F64_V2, REFERENCE_CPU_F64):
+        graph = CompiledBinaryFlooding.from_check_matrix(h, profile=profile)
+        expected = BinarySpaKernel(profile=profile).run(h, syndrome, error_rate=.08, max_iterations=12)
+        actual = graph.run(syndrome, error_rate=.08, max_iterations=12)
+        assert (actual.iterations, actual.converged) == (expected.iterations, expected.converged)
+        np.testing.assert_array_equal(actual.candidate, expected.candidate)
 
 
 @pytest.mark.parametrize("rule", ["spa", "min_sum"])

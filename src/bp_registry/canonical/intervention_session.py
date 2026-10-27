@@ -148,7 +148,8 @@ class BpSession:
         self.error_rate = error_rate
         if kernel is not None and not isinstance(kernel, BinarySpaKernel):
             raise ValueError("intervention session kernel must be a canonical binary kernel")
-        self.kernel = kernel or BinarySpaKernel()
+        from .numerics import REFERENCE_CPU_F64
+        self.kernel = kernel or BinarySpaKernel(profile=REFERENCE_CPU_F64)
         self.schedule = FloodingSchedule(edge_table, kernel=self.kernel)
         if v2c_clip is not None and (
             type(v2c_clip) not in (int, float) or not math.isfinite(v2c_clip) or v2c_clip <= 0.0 or v2c_clip != 25.0

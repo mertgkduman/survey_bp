@@ -6,7 +6,10 @@ from dataclasses import dataclass
 import math
 import numpy as np
 
-from .numerics import NumericalProfile, REFERENCE_CPU_F64, check_to_variable, finite_saturate, hard_decision, prior_llr
+from .numerics import (
+    BinaryNumericalProfileV2, NumericalProfile, REFERENCE_CPU_F64,
+    check_to_variable, finite_saturate, hard_decision, prior_llr,
+)
 from .updates import CheckUpdateRule
 
 
@@ -96,5 +99,12 @@ class BinarySpaKernel:
             candidate = sweep.candidate
             if np.array_equal((h.astype(np.int64) @ candidate) % 2, s):
                 return KernelResult(candidate, True, iteration)
-            v2c = sweep.new_v2c
+            if isinstance(self.profile, BinaryNumericalProfileV2):
+                damping = self.profile.v2c_damping
+                v2c = finite_saturate(
+                    damping * v2c + (1.0 - damping) * sweep.new_v2c,
+                    boundary="binary_spa_v2_damped_v2c", profile=self.profile,
+                )
+            else:
+                v2c = sweep.new_v2c
         return KernelResult(candidate, False, max_iterations)

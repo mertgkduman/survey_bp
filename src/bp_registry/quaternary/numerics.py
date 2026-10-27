@@ -8,6 +8,7 @@ they never collapse the node posterior to a binary state.
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+import math
 import numbers
 
 import numpy as np
@@ -39,12 +40,41 @@ class QuaternaryNumericalProfile:
     nonfinite_policy: str = "reject_input_and_raise_terminal_numerical_failure"
     oracle_gate: str = "vector_and_exact_tree_fixtures_required_before_public_manifest"
 
-    def as_evidence(self) -> dict[str, str | float]:
+    def as_evidence(self) -> dict[str, str | float | None]:
         """Return the complete immutable numerical contract for durable evidence."""
         return asdict(self)
 
 
 QBP4_F64_V1 = QuaternaryNumericalProfile()
+
+
+@dataclass(frozen=True, slots=True)
+class QuaternaryNumericalProfileV2(QuaternaryNumericalProfile):
+    """Unbounded four-state beliefs with a separately specified check rule.
+
+    This is a new evidence identity: the frozen v1 profile remains unchanged.
+    ``damping`` weights the previous V2C message, not the fresh proposal.
+    """
+
+    profile_id: str = "quaternary-bp4-f64-v2"
+    saturation_boundary: str = "legacy_saturation_field_inactive; optional_final_check_cap_and_product_unity_safeguard"
+    reduction_order: str = "declared_edge_order; selected_check_rule"
+    candidate_tie_break: str = "strict_I_then_X_then_Z_else_Y"
+    check_rule: str = "tanh_product"
+    check_cap: float | None = None
+    product_epsilon: float = 1e-10
+    v2c_damping: float = 0.1
+
+    def __post_init__(self) -> None:
+        if self.check_rule not in ("tanh_product", "boxplus"):
+            raise ValueError("v2 check rule must be tanh_product or boxplus")
+        if not ((self.check_cap is None or math.isfinite(self.check_cap) and self.check_cap > 0)
+                and 0 < self.product_epsilon < .5 and 1.0 - self.product_epsilon < 1.0
+                and 0 <= self.v2c_damping < 1):
+            raise ValueError("invalid v2 check cap, product epsilon, or damping")
+
+
+QBP4_F64_V2 = QuaternaryNumericalProfileV2()
 
 
 def _float64(value: object, *, name: str) -> np.ndarray:
@@ -78,7 +108,10 @@ def finite_saturate(
     """Reject nonfinite values and symmetrically clip a public numerical result."""
     if not isinstance(profile, QuaternaryNumericalProfile):
         raise ValueError("profile must be a QuaternaryNumericalProfile")
-    return np.clip(_float64(value, name=boundary), -profile.saturation, profile.saturation)
+    array = _float64(value, name=boundary)
+    if isinstance(profile, QuaternaryNumericalProfileV2):
+        return array
+    return np.clip(array, -profile.saturation, profile.saturation)
 
 
 def ordered_logsumexp(values: object, *, profile: QuaternaryNumericalProfile = QBP4_F64_V1) -> float:
@@ -113,11 +146,17 @@ def ordered_boxplus(values: object, *, profile: QuaternaryNumericalProfile = QBP
     if vector.ndim != 1:
         raise ValueError("ordered_boxplus requires a one-dimensional LLR vector")
     if vector.size == 0:
+        if isinstance(profile, QuaternaryNumericalProfileV2):
+            value = math.log1p(1-profile.product_epsilon) - math.log(profile.product_epsilon)
+            return float(value if profile.check_cap is None else min(profile.check_cap, value))
         return float(profile.saturation)
     result = float(vector[0])
     for value in vector[1:]:
         result = _boxplus_pair(result, float(value), profile=profile)
-    return float(finite_saturate(result, boundary="ordered_boxplus_output", profile=profile))
+    result = float(finite_saturate(result, boundary="ordered_boxplus_output", profile=profile))
+    if isinstance(profile, QuaternaryNumericalProfileV2):
+        return result if profile.check_cap is None else float(np.clip(result, -profile.check_cap, profile.check_cap))
+    return result
 
 
 def check_message(
@@ -127,6 +166,21 @@ def check_message(
     profile: QuaternaryNumericalProfile = QBP4_F64_V1,
 ) -> float:
     """Return the source-defined signed scalar C2V message for one excluded edge."""
+    if isinstance(profile, QuaternaryNumericalProfileV2) and profile.check_rule == "tanh_product":
+        vector = _float64(incoming, name="tanh_product_input")
+        if vector.ndim != 1:
+            raise ValueError("tanh_product requires a one-dimensional LLR vector")
+        product = -1.0 if _syndrome(syndrome) else 1.0
+        for value in vector:
+            scalar = float(value)
+            product *= (1.0 if scalar > 40.0 else -1.0 if scalar < -40.0 else math.tanh(scalar / 2.0))
+        if product >= 1.0:
+            product = 1.0 - profile.product_epsilon
+        elif product <= -1.0:
+            product = -1.0 + profile.product_epsilon
+        result = math.log1p(product) - math.log1p(-product)
+        checked = float(finite_saturate(result, boundary="check_message_output", profile=profile))
+        return checked if profile.check_cap is None else float(np.clip(checked, -profile.check_cap, profile.check_cap))
     message = ordered_boxplus(incoming, profile=profile)
     signed = -message if _syndrome(syndrome) else message
     return float(finite_saturate(signed, boundary="check_message_output", profile=profile))
@@ -195,6 +249,15 @@ def pauli_hard_decision(
     belief = finite_saturate(llrs, boundary="pauli_hard_decision_input", profile=profile)
     if belief.shape != (3,):
         raise ValueError("pauli_hard_decision requires three X/Y/Z LLRs")
+    if isinstance(profile, QuaternaryNumericalProfileV2):
+        x, y, z = (float(value) for value in belief)
+        if x > 0.0 and y > 0.0 and z > 0.0:
+            return Pauli.I
+        if x < y and x < z:
+            return Pauli.X
+        if z < x and z < y:
+            return Pauli.Z
+        return Pauli.Y
     if bool(np.all(belief > 0.0)):
         return Pauli.I
     return Pauli(1 + int(np.argmin(belief)))
@@ -205,8 +268,10 @@ _STATES = np.arange(4, dtype=np.uint8)
 
 __all__ = [
     "QBP4_F64_V1",
+    "QBP4_F64_V2",
     "QuaternaryNumericalFailure",
     "QuaternaryNumericalProfile",
+    "QuaternaryNumericalProfileV2",
     "check_message",
     "commutation_llr",
     "finite_saturate",

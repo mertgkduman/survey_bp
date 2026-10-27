@@ -29,12 +29,37 @@ class NumericalProfile:
     exact_zero_decision: int = 0
     tie_break: str = "ascending_canonical_id"
 
-    def as_evidence(self) -> dict[str, str | float | int]:
+    def as_evidence(self) -> dict[str, str | float | int | None]:
         """Return the complete resolved profile for manifests and ledgers."""
         return asdict(self)
 
 
 REFERENCE_CPU_F64 = NumericalProfile()
+
+
+@dataclass(frozen=True, slots=True)
+class BinaryNumericalProfileV2(NumericalProfile):
+    """SPA with unbounded beliefs and a product-bounded check message."""
+
+    profile_id: str = "binary-spa-flooding-f64-v2"
+    degree_one_rule: str = "product_clamp_epsilon_before_atanh"
+    prior_initialization: str = "log((1-p)/p)_single_ratio"
+    check_rule: str = "tanh_product"
+    check_cap: float | None = None
+    product_epsilon: float = 1e-10
+    v2c_damping: float = 0.1
+    saturation_boundary: str = "legacy_saturation_field_inactive; optional_final_check_cap_and_product_unity_safeguard"
+
+    def __post_init__(self) -> None:
+        if self.check_rule != "tanh_product" or not (
+            (self.check_cap is None or math.isfinite(self.check_cap) and self.check_cap > 0)
+            and 0 < self.product_epsilon < .5 and 1.0 - self.product_epsilon < 1.0
+            and 0 <= self.v2c_damping < 1
+        ):
+            raise ValueError("invalid binary SPA v2 numerical profile")
+
+
+BINARY_SPA_F64_V2 = BinaryNumericalProfileV2()
 MIN_SUM_CPU_F64 = NumericalProfile(
     profile_id="binary-min-sum-flooding-f64-v1",
     normalization="min_sum",
@@ -60,6 +85,8 @@ def finite_saturate(
     array = _float64(value, name=boundary)
     if not np.all(np.isfinite(array)):
         raise NumericalFailure(f"nonfinite arithmetic at {boundary}")
+    if isinstance(profile, BinaryNumericalProfileV2):
+        return array
     return np.clip(array, -profile.saturation, profile.saturation)
 
 
@@ -76,7 +103,8 @@ def probability_to_llr(
         raise ValueError("probability must lie strictly between zero and one")
     with np.errstate(over="raise", divide="raise", invalid="raise", under="ignore"):
         try:
-            llr = np.log1p(-values) - np.log(values)
+            llr = (np.log((1.0 - values) / values) if isinstance(profile, BinaryNumericalProfileV2)
+                   else np.log1p(-values) - np.log(values))
         except FloatingPointError as error:
             raise NumericalFailure("nonfinite arithmetic at probability_to_llr_intermediate") from error
     return finite_saturate(llr, boundary="probability_to_llr_output", profile=profile)
@@ -84,6 +112,11 @@ def probability_to_llr(
 
 def prior_llr(error_rate: float, *, profile: NumericalProfile = REFERENCE_CPU_F64) -> float:
     """Return the profile-clipped independent bit prior for a binary channel."""
+    if isinstance(profile, BinaryNumericalProfileV2):
+        if not math.isfinite(error_rate) or not 0.0 < error_rate < 1.0:
+            raise ValueError("probability must lie strictly between zero and one")
+        return float(finite_saturate(math.log((1.0 - error_rate) / error_rate),
+                                     boundary="binary_spa_v2_prior", profile=profile))
     return float(probability_to_llr(error_rate, profile=profile))
 
 
@@ -106,7 +139,7 @@ def boxplus_pair(
         raise ValueError("boxplus_pair_input must be float64-compatible") from error
     if not math.isfinite(left_value) or not math.isfinite(right_value):
         raise NumericalFailure("nonfinite arithmetic at boxplus_pair_input")
-    limit = profile.saturation
+    limit = math.inf if isinstance(profile, BinaryNumericalProfileV2) else profile.saturation
     left_value = min(limit, max(-limit, left_value))
     right_value = min(limit, max(-limit, right_value))
     smaller = min(abs(left_value), abs(right_value))
@@ -129,6 +162,8 @@ def boxplus(values: np.ndarray, *, profile: NumericalProfile = REFERENCE_CPU_F64
     if vector.ndim != 1:
         raise ValueError("boxplus_input must be a one-dimensional LLR array")
     if vector.size == 0:
+        if isinstance(profile, BinaryNumericalProfileV2):
+            return math.log1p(1-profile.product_epsilon) - math.log(profile.product_epsilon)
         return profile.saturation
     result = float(vector[0])
     for value in vector[1:]:
@@ -143,6 +178,21 @@ def check_to_variable(
     profile: NumericalProfile = REFERENCE_CPU_F64,
 ) -> float:
     """Apply the declared degree-one and syndrome-sign convention to a check update."""
+    if isinstance(profile, BinaryNumericalProfileV2):
+        vector = finite_saturate(incoming, boundary="tanh_product_input", profile=profile)
+        if vector.ndim != 1:
+            raise ValueError("tanh_product requires a one-dimensional LLR vector")
+        product = -1.0 if _syndrome_bit(syndrome) else 1.0
+        for value in vector:
+            scalar = float(value)
+            product *= (1.0 if scalar > 40.0 else -1.0 if scalar < -40.0 else math.tanh(scalar / 2.0))
+        if product >= 1.0:
+            product = 1.0 - profile.product_epsilon
+        elif product <= -1.0:
+            product = -1.0 + profile.product_epsilon
+        result = math.log1p(product) - math.log1p(-product)
+        checked = float(finite_saturate(result, boundary="check_to_variable_output", profile=profile))
+        return checked if profile.check_cap is None else float(np.clip(checked, -profile.check_cap, profile.check_cap))
     message = boxplus(incoming, profile=profile)
     signed = -message if _syndrome_bit(syndrome) else message
     return float(finite_saturate(signed, boundary="check_to_variable_output", profile=profile))

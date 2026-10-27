@@ -12,6 +12,7 @@ from bp_registry.quaternary.algebra import anticommutes
 from bp_registry.quaternary.kernel import ScalarLlrBp4Kernel
 from bp_registry.quaternary.numerics import (
     QBP4_F64_V1,
+    QBP4_F64_V2,
     QuaternaryNumericalFailure,
     check_message,
     commutation_llr,
@@ -41,6 +42,18 @@ def test_numerics_profile_persists_complete_binding_contract() -> None:
     assert evidence["saturation"] == 25.0
     assert evidence["saturation_boundary"] == "symmetric_after_every_public_message_or_belief_primitive"
     assert evidence["oracle_gate"] == "vector_and_exact_tree_fixtures_required_before_public_manifest"
+
+
+def test_v2_default_keeps_large_beliefs_and_preserves_v1_evidence() -> None:
+    assert ScalarLlrBp4Kernel().profile is QBP4_F64_V2
+    assert QBP4_F64_V1.as_evidence()["profile_id"] == "quaternary-bp4-f64-v1"
+    prior = np.asarray((1.0 - 3e-14, 1e-14, 1e-14, 1e-14))
+    assert probabilities_to_llrs(prior, profile=QBP4_F64_V2).min() > 25.0
+    assert probabilities_to_llrs(prior, profile=QBP4_F64_V1).max() == 25.0
+    assert check_message(np.asarray((100.0,)), syndrome=0, profile=QBP4_F64_V2) == pytest.approx(23.718998, abs=1e-5)
+    assert check_message(np.asarray((30.0,)), syndrome=0, profile=QBP4_F64_V2) > 25.0
+    assert pauli_hard_decision(np.asarray((-1., 0., -1.)), profile=QBP4_F64_V2).name == "Y"
+    assert pauli_hard_decision(np.asarray((-1., 0., -1.)), profile=QBP4_F64_V1).name == "X"
 
 
 def test_commutation_llr_matches_direct_four_state_mass_ratio() -> None:
@@ -124,7 +137,7 @@ def test_gb46_sweep_retains_preindexed_message_oracle() -> None:
     error[selected] = rng.choice(np.asarray([1, 2, 3], dtype=np.uint8), size=int(selected.sum()))
     problem = QuaternaryOriginalProblem("original-gb46-sweep-oracle", code, code.syndrome(error))
     priors = np.tile([.92, .08/3, .08/3, .08/3], (code.n, 1))
-    sweep = ScalarLlrBp4Kernel().new_session(problem, priors).sweep(stop_on_convergence=False)
+    sweep = ScalarLlrBp4Kernel(profile=QBP4_F64_V1).new_session(problem, priors).sweep(stop_on_convergence=False)
     assert sha256(sweep.c2v.tobytes()).hexdigest() == "72d96a38bbc24e37300c0bf2ab2b1470956129cdda71335b2f427efc7dd5f08c"
     assert sha256(sweep.v2c.tobytes()).hexdigest() == "0281382a85bd14f96f40eaa7b7739cc6b525da6f423d39d6aa580b24ca9e7bf6"
     assert sha256(sweep.beliefs.tobytes()).hexdigest() == "31df7094d2f093cd94b7c6092f213deabbbe95bd7c3ebf1d978687944df66db4"

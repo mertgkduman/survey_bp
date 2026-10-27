@@ -87,7 +87,7 @@ def main() -> None:
         if not rows:
             continue
         with (RESULTS / name).open("w", newline="", encoding="utf-8") as handle:
-            writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+            writer = csv.DictWriter(handle, fieldnames=list(rows[0]), lineterminator="\n")
             writer.writeheader()
             writer.writerows(rows)
     source = list(csv.DictReader(SOURCE.open(encoding="utf-8")))

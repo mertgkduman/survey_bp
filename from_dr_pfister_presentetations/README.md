@@ -1,5 +1,16 @@
 # BP decoder policies and presentation reproduction
 
+## Latest float64 numerical investigation
+
+The [scaled numerical report](results/numerical_scaleup/NUMERIC_SCALEUP_REPORT.md)
+supersedes the small float64 pilots below. On independent held-out errors,
+the promoted BP4 float64 v2 policy measured 8/20,000 failures on B1 at
+`p=0.10` and 15/20,000 on double-Gross at `p=0.08`, with mean work 12.08
+and 6.86 iterations. Those points are close to the supplied tuned BP4 curve,
+while B1 at `p=0.12` differs and the presentation's Q8 behavior remains
+unreproduced. The report links versioned decoder policies, paired event
+ledgers, exact intervals, and [a comparison plot](results/numerical_scaleup/bp4_heldout_vs_presentation.png).
+
 This folder records the **user-supplied Dr. Pfister presentation excerpt**. The two source curves in `results/source_curves.csv` are transcription, not measurements made by this repository. The presentation's underlying TeX files and raw per-shot data were not supplied, so trial counts are unknown except the zero-failure upper bound at double-Gross `p=0.06` (100,000 trials inferred exactly from the displayed bound). The `p=0.04` double-Gross BP4 point lies below the displayed plot's y-axis lower limit, but is retained.
 
 ## Experiment contract from the slides

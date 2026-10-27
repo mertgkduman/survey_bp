@@ -11,6 +11,7 @@ import pytest
 
 from bp_registry.canonical.budgets import BudgetLimit, BudgetTree
 from bp_registry.quaternary.problems import PauliCode, QuaternaryOriginalProblem
+from bp_registry.quaternary.numerics import QBP4_F64_V1
 
 
 def _problem() -> QuaternaryOriginalProblem:
@@ -30,7 +31,7 @@ def _module():
 
 def _run(*, epsilon: float = 0.01, rounds: int = 2, budget: BudgetTree | None = None):
     module = _module()
-    kernel = module.ScalarLlrBp4Kernel()
+    kernel = module.ScalarLlrBp4Kernel(profile=QBP4_F64_V1)
     priors = np.asarray(((0.25, 0.25, 0.25, 0.25), (0.25, 0.25, 0.25, 0.25)), dtype=np.float64)
     session = kernel.new_session(_problem(), priors, budgets=BudgetTree(limits=(), parents={}) if budget is None else budget)
     spec = module.QbpgdSpec(iterations_per_round=1, epsilon=epsilon, round_limit=rounds)

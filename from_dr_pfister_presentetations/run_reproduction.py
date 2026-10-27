@@ -17,6 +17,7 @@ from bp_registry.canonical.compiled import CompiledBinaryFlooding
 from bp_registry.code_constructions import build_b1_ghp, derive_css_logicals
 from bp_registry.css import CssCode
 from bp_registry.quaternary.compiled import CompiledBp4Graph
+from bp_registry.quaternary.numerics import QBP4_F64_V1
 
 from policy_kernel import binary_prior, decode_binary_oms, decode_bp4
 
@@ -75,7 +76,7 @@ def bp4_graph_from_css(code: CssCode, p: float) -> CompiledBp4Graph:
     prior_llrs = np.tile(np.log((1.0 - p) / (p / 3.0)), (code.n, 3))
     for value in (row_ptr, variable_ptr, variable_edges, variables, labels, prior_llrs):
         value.setflags(write=False)
-    return CompiledBp4Graph(row_ptr, variable_ptr, variable_edges, variables, labels, prior_llrs)
+    return CompiledBp4Graph(row_ptr, variable_ptr, variable_edges, variables, labels, prior_llrs, QBP4_F64_V1)
 
 
 def logical_failure(code: CssCode, truth: np.ndarray, candidate: np.ndarray) -> bool:

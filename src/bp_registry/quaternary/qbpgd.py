@@ -19,6 +19,7 @@ import numpy as np
 
 from ..canonical.budgets import BudgetLimit, BudgetTree, WorkVector
 from .kernel import QbpSession, QbpSweep, ScalarLlrBp4Kernel
+from .numerics import QBP4_F64_V1
 from .problems import QuaternaryOriginalProblem
 
 
@@ -281,7 +282,7 @@ def reconstruct_qbpgd(
     if not isinstance(expected, QbpgdResult):
         raise ValueError("Q-BPGD replay requires QbpgdResult")
     rebuilt = QbpgdController(spec).run(
-        ScalarLlrBp4Kernel().new_session(problem, priors, budgets=BudgetTree(limits=budget_limits, parents={}))
+        ScalarLlrBp4Kernel(profile=QBP4_F64_V1).new_session(problem, priors, budgets=BudgetTree(limits=budget_limits, parents={}))
     )
     if _result_evidence(rebuilt) != _result_evidence(expected):
         raise ValueError("Q-BPGD replay disagrees with transitions, fidelity, or work")

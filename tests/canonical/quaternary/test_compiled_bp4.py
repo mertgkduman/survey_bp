@@ -12,6 +12,7 @@ pytest.importorskip("numba")
 from bp_registry.quaternary.asced import parse_pinned_gb46_css
 from bp_registry.quaternary.compiled import CompiledBp4Graph
 from bp_registry.quaternary.kernel import ScalarLlrBp4Kernel
+from bp_registry.quaternary.numerics import QBP4_F64_V1, QBP4_F64_V2
 from bp_registry.quaternary.problems import PauliCode, QuaternaryOriginalProblem, compile_css_artifact
 
 
@@ -31,6 +32,17 @@ def _gb46() -> tuple[PauliCode, np.ndarray, list[np.ndarray]]:
         selected = rng.random(code.n) < .08
         row[selected] = rng.choice(np.asarray([1, 2, 3], dtype=np.uint8), size=int(selected.sum()))
     return code, priors, [code.syndrome(error) for error in errors]
+
+
+def test_new_compiled_default_and_explicit_v1_replay() -> None:
+    code, priors, syndromes = _gb46()
+    assert CompiledBp4Graph.from_code(code, priors).profile is QBP4_F64_V2
+    old_graph = CompiledBp4Graph.from_code(code, priors, profile=QBP4_F64_V1)
+    problem = QuaternaryOriginalProblem("original-compiled-frozen-v1", code, syndromes[0])
+    expected = ScalarLlrBp4Kernel(profile=QBP4_F64_V1).new_session(problem, priors).run(max_iterations=8)
+    actual = old_graph.run(syndromes[0], max_iterations=8)
+    assert (actual.iterations, actual.converged) == (expected.iteration, expected.converged)
+    np.testing.assert_array_equal(actual.candidate, expected.candidate)
 
 
 def test_gb46_decisions_and_iterations_match_reference_for_early_and_fixed_caps() -> None:

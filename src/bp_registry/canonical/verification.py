@@ -26,7 +26,7 @@ from .phase5 import execute_phase5_controller, finalize_phase5_deadline, phase5_
 from .problems import OriginalProblem
 from .memory_execution import LocalMemoryExecution, MemoryFloodingSchedule
 from .group_shuffled import HsuGroupSchedule
-from .numerics import MIN_SUM_CPU_F64
+from .numerics import MIN_SUM_CPU_F64, REFERENCE_CPU_F64
 from .lineage import stable_lineage_id
 from .profiling import ProfileMeasurement, validate_public_clean_low_overhead_evidence
 from .schedules import (
@@ -495,7 +495,7 @@ def _expected_kernel(context: PublicShotContext, table: EdgeTable) -> BinarySpaK
             )
         return BinarySpaKernel(profile=MIN_SUM_CPU_F64, update_rule=rule)
     if context.update_kind == "binary_spa":
-        return BinarySpaKernel()
+        return BinarySpaKernel(profile=REFERENCE_CPU_F64)
     raise CanonicalStructuralVerificationError(f"unsupported public update rule {context.update_kind!r}")
 
 

@@ -37,7 +37,7 @@ from .group_shuffled import HsuGroupSchedule
 from .profiling import LocalProfiler, ProfilingPlan
 from .lineage import LineageEdge, LineageId, stable_lineage_id
 from .numerics import NumericalFailure
-from .numerics import MIN_SUM_CPU_F64
+from .numerics import MIN_SUM_CPU_F64, REFERENCE_CPU_F64
 from .updates import MinSumUpdate, NormalizedMinSumUpdate, OffsetMinSumUpdate, resolve_generated_configuration_assignment
 from .problems import OriginalProblem, OriginalSpaceCandidate, WorkingProblem, select_stable_candidate
 from .schedules import (
@@ -291,7 +291,7 @@ def _kernel_for_manifest(manifest: CanonicalManifestV2 | CanonicalManifestV3 | C
             ),
         )
     if update == "binary_spa":
-        return BinarySpaKernel()
+        return BinarySpaKernel(profile=REFERENCE_CPU_F64)
     raise ValueError(f"unsupported executable update rule {update!r}")
 
 

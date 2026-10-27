@@ -22,6 +22,7 @@ from ..css import CssCode
 from .asced import AscedController, AscedSpec, SplitterSearchExhausted, construct_splitter_batch, materialize_asced_batches
 from .asced_overcomplete import OvercompleteSearchExhausted, construct_overcomplete_map
 from .kernel import ScalarLlrBp4Kernel
+from .numerics import QBP4_F64_V1
 from .mbp4 import FixedAlphaMbp4Kernel, Mbp4Spec
 from .problems import PauliCode, QuaternaryOriginalProblem, compile_css_artifact
 from .qbpgd import QbpgdController, QbpgdSpec
@@ -271,7 +272,7 @@ def run_quaternary_scalar(
         code=PauliCode(checks=problem.checks, source_artifact_identity=f"public-manifest:{manifest_sha256}"),
         syndrome=problem.syndrome,
     )
-    session = ScalarLlrBp4Kernel().new_session(
+    session = ScalarLlrBp4Kernel(profile=QBP4_F64_V1).new_session(
         original, priors, budgets=BudgetTree(limits=(BudgetLimit("attempt", "bp_calls", max_work),), parents={}),
     )
     schedule = _public_scalar_schedule(session, payload["composition"])
@@ -362,7 +363,7 @@ def run_quaternary_qbpgd(
         code=PauliCode(checks=problem.checks, source_artifact_identity=f"public-manifest:{manifest_sha256}"),
         syndrome=problem.syndrome,
     )
-    session = ScalarLlrBp4Kernel().new_session(
+    session = ScalarLlrBp4Kernel(profile=QBP4_F64_V1).new_session(
         original, priors, budgets=BudgetTree(limits=(BudgetLimit("attempt", "bp_calls", max_work),), parents={}),
     )
     schedule = _public_scalar_schedule(session, payload["composition"])
@@ -535,7 +536,7 @@ def run_quaternary_asced(
     if payload["composition"]["kernel"]["kind"] == "qbp_mbp4_fixed_alpha":
         kernel = FixedAlphaMbp4Kernel(Mbp4Spec(alpha=kernel_config.get("alpha"), schedule=payload["composition"]["schedule"]["kind"], max_iterations=iterations))
     else:
-        kernel = ScalarLlrBp4Kernel()
+        kernel = ScalarLlrBp4Kernel(profile=QBP4_F64_V1)
     result = AscedController(AscedSpec(
         max_iterations=iterations, path_cap=path_cap, max_total_bp_calls=max_work,
     )).run(

@@ -929,7 +929,8 @@ def _phase11_binary_decoder(code: Any, *, max_iterations: int) -> Callable[[Bina
     """Use the existing canonical binary SPA kernel on each declared marginal."""
     from ..canonical.kernel import BinarySpaKernel
 
-    kernel = BinarySpaKernel()
+    from ..canonical.numerics import REFERENCE_CPU_F64
+    kernel = BinarySpaKernel(profile=REFERENCE_CPU_F64)
     def decode(input_: BinaryArmInputV1) -> BinaryArmResultV1:
         started = perf_counter_ns()
         matrix = code.hz if input_.component == "X" else code.hx

@@ -12,11 +12,13 @@ import numpy as np
 from ..canonical.budgets import BudgetTree, WorkVector
 from .algebra import Pauli, anticommutes
 from .numerics import (
-    QBP4_F64_V1,
+    QBP4_F64_V2,
     QuaternaryNumericalFailure,
     QuaternaryNumericalProfile,
+    QuaternaryNumericalProfileV2,
     check_message as numerical_check_message,
     commutation_llr,
+    finite_saturate,
     llrs_to_probabilities,
     pauli_hard_decision,
     probabilities_to_llrs,
@@ -105,7 +107,7 @@ class QbpSweep:
 class ScalarLlrBp4Kernel:
     """Pure source-defined scalar LLR operations; sessions own all mutable buffers."""
 
-    def __init__(self, *, profile: QuaternaryNumericalProfile = QBP4_F64_V1) -> None:
+    def __init__(self, *, profile: QuaternaryNumericalProfile = QBP4_F64_V2) -> None:
         if not isinstance(profile, QuaternaryNumericalProfile):
             raise ValueError("profile must be a QuaternaryNumericalProfile")
         self.profile = profile
@@ -132,7 +134,7 @@ class ScalarLlrBp4Kernel:
             for state in (Pauli.X, Pauli.Y, Pauli.Z):
                 if anticommutes(int(label), int(state)):
                     belief[int(state) - 1] += float(message)
-        return np.clip(belief, -self.profile.saturation, self.profile.saturation)
+        return finite_saturate(belief, boundary="bp4_posterior", profile=self.profile)
 
     def variable_message(self, posterior: object, check_value: float, edge_label: int) -> np.ndarray:
         """Return the three-component excluded V2C LLR message for one edge."""
@@ -145,7 +147,7 @@ class ScalarLlrBp4Kernel:
                 result[int(state) - 1] -= float(check_value)
         if not np.all(np.isfinite(result)):
             raise QuaternaryNumericalFailure("nonfinite arithmetic at variable_message_output")
-        return np.clip(result, -self.profile.saturation, self.profile.saturation)
+        return finite_saturate(result, boundary="bp4_variable_message", profile=self.profile)
 
     def candidate_from_beliefs(self, beliefs: object) -> np.ndarray:
         """Apply the persisted I<X<Y<Z decision to each complete three-LLR belief."""
@@ -294,6 +296,12 @@ class QbpSession:
             next_v2c = np.empty_like(self._v2c)
             for edge, (variable, label) in enumerate(zip(self._variables, self._labels, strict=True)):
                 next_v2c[edge] = self.kernel.variable_message(next_beliefs[variable], next_c2v[edge], int(label))
+            if isinstance(self.kernel.profile, QuaternaryNumericalProfileV2):
+                damping = self.kernel.profile.v2c_damping
+                next_v2c = finite_saturate(
+                    damping * self._v2c + (1.0 - damping) * next_v2c,
+                    boundary="bp4_damped_variable_message", profile=self.kernel.profile,
+                )
             next_marginals = np.asarray([llrs_to_probabilities(row, profile=self.kernel.profile) for row in next_beliefs])
             next_candidate = self.kernel.candidate_from_beliefs(next_beliefs)
         except Exception:
@@ -317,7 +325,7 @@ class QbpSession:
         """Run bounded flooding sweeps, retaining capped and failed terminal state."""
         if isinstance(max_iterations, bool) or not isinstance(max_iterations, numbers.Integral) or max_iterations < 0:
             raise ValueError("max_iterations must be a nonnegative integer")
-        if self._is_converged() and self._iteration == 0:
+        if self._is_converged() and self._iteration == 0 and not isinstance(self.kernel.profile, QuaternaryNumericalProfileV2):
             self._terminal = "converged"
             self._last = self._snapshot(converged=True, terminal="converged", work=WorkVector.zero())
             return self._last

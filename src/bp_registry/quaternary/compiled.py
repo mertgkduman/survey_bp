@@ -14,7 +14,10 @@ from numba import njit
 
 from .algebra import Pauli
 from .kernel import _priors
-from .numerics import QBP4_F64_V1, probabilities_to_llrs
+from .numerics import (
+    QBP4_F64_V1, QBP4_F64_V2, QuaternaryNumericalProfile,
+    QuaternaryNumericalProfileV2, probabilities_to_llrs,
+)
 from .problems import PauliCode
 
 
@@ -189,6 +192,104 @@ def _decode(
     return candidate, max_iterations, _candidate_matches(row_ptr, variables, labels, candidate, syndrome)
 
 
+@njit(cache=True)
+def _v2_check(comm: np.ndarray, start: int, stop: int, target: int,
+              syndrome_bit: int, cap: float, epsilon: float) -> float:
+    product = -1.0 if syndrome_bit else 1.0
+    for other in range(start, stop):
+        if other == target:
+            continue
+        value = comm[other]
+        factor = 1.0 if value > 40.0 else -1.0 if value < -40.0 else math.tanh(value / 2.0)
+        product *= factor
+    if product >= 1.0:
+        product = 1.0 - epsilon
+    elif product <= -1.0:
+        product = -1.0 + epsilon
+    value = math.log1p(product) - math.log1p(-product)
+    if not math.isfinite(value):
+        raise ValueError("nonfinite v2 check message")
+    return _clip(value, cap)
+
+
+@njit(cache=True)
+def _v2_sweep_into(
+    row_ptr: np.ndarray, variable_ptr: np.ndarray, variable_edges: np.ndarray,
+    variables: np.ndarray, labels: np.ndarray, old_v2c: np.ndarray,
+    prior_llrs: np.ndarray, syndrome: np.ndarray, cap: float, epsilon: float,
+    damping: float, comm: np.ndarray, c2v: np.ndarray, beliefs: np.ndarray,
+    new_v2c: np.ndarray, candidate: np.ndarray,
+) -> None:
+    for edge in range(len(labels)):
+        values, label = old_v2c[edge], labels[edge]
+        x, y, z = values[0], values[1], values[2]
+        if label == 1:
+            comm[edge] = _logaddexp(0.0, -x) - _logaddexp(-y, -z)
+        elif label == 2:
+            comm[edge] = _logaddexp(0.0, -y) - _logaddexp(-x, -z)
+        else:
+            comm[edge] = _logaddexp(0.0, -z) - _logaddexp(-x, -y)
+        if not math.isfinite(comm[edge]):
+            raise ValueError("nonfinite v2 BP4 edge projection")
+    for check in range(len(row_ptr) - 1):
+        start, stop = row_ptr[check], row_ptr[check + 1]
+        for edge in range(start, stop):
+            c2v[edge] = _v2_check(comm, start, stop, edge, int(syndrome[check]), cap, epsilon)
+    for variable in range(prior_llrs.shape[0]):
+        for state in range(1, 4):
+            value = prior_llrs[variable, state - 1]
+            for position in range(variable_ptr[variable], variable_ptr[variable + 1]):
+                edge = variable_edges[position]
+                if labels[edge] != state:
+                    value += c2v[edge]
+            if not math.isfinite(value):
+                raise ValueError("nonfinite v2 BP4 posterior")
+            beliefs[variable, state - 1] = value
+        x, y, z = beliefs[variable, 0], beliefs[variable, 1], beliefs[variable, 2]
+        if x > 0.0 and y > 0.0 and z > 0.0:
+            candidate[variable] = 0
+        elif x < y and x < z:
+            candidate[variable] = 1
+        elif z < x and z < y:
+            candidate[variable] = 3
+        else:
+            candidate[variable] = 2
+    for edge in range(len(labels)):
+        variable, label = variables[edge], labels[edge]
+        for state in range(1, 4):
+            proposal = beliefs[variable, state - 1]
+            if label != state:
+                proposal -= c2v[edge]
+            value = damping * old_v2c[edge, state - 1] + (1.0 - damping) * proposal
+            if not math.isfinite(value):
+                raise ValueError("nonfinite v2 BP4 V2C")
+            new_v2c[edge, state - 1] = value
+
+
+@njit(cache=True)
+def _decode_v2(
+    row_ptr: np.ndarray, variable_ptr: np.ndarray, variable_edges: np.ndarray,
+    variables: np.ndarray, labels: np.ndarray, prior_llrs: np.ndarray,
+    syndrome: np.ndarray, max_iterations: int, cap: float, epsilon: float,
+    damping: float, stop_on_convergence: bool,
+) -> tuple[np.ndarray, int, bool]:
+    n, edge_count = prior_llrs.shape[0], len(labels)
+    candidate = np.zeros(n, dtype=np.uint8)
+    old = prior_llrs[variables].copy()
+    new = np.empty_like(old)
+    comm = np.empty(edge_count, dtype=np.float64)
+    c2v = np.empty(edge_count, dtype=np.float64)
+    beliefs = np.empty((n, 3), dtype=np.float64)
+    for iteration in range(1, max_iterations + 1):
+        _v2_sweep_into(row_ptr, variable_ptr, variable_edges, variables, labels, old,
+                       prior_llrs, syndrome, cap, epsilon, damping, comm, c2v,
+                       beliefs, new, candidate)
+        if stop_on_convergence and _candidate_matches(row_ptr, variables, labels, candidate, syndrome):
+            return candidate, iteration, True
+        old, new = new, old
+    return candidate, max_iterations, _candidate_matches(row_ptr, variables, labels, candidate, syndrome)
+
+
 @dataclass(frozen=True)
 class CompiledBp4Sweep:
     c2v: np.ndarray
@@ -216,9 +317,11 @@ class CompiledBp4Graph:
     variables: np.ndarray
     labels: np.ndarray
     prior_llrs: np.ndarray
+    profile: QuaternaryNumericalProfile = QBP4_F64_V2
 
     @classmethod
-    def from_code(cls, code: PauliCode, priors: object) -> "CompiledBp4Graph":
+    def from_code(cls, code: PauliCode, priors: object, *,
+                  profile: QuaternaryNumericalProfile = QBP4_F64_V2) -> "CompiledBp4Graph":
         if not isinstance(code, PauliCode):
             raise TypeError("compiled BP4 prototype needs a validated PauliCode")
         probabilities = _priors(priors, n=code.n)
@@ -238,10 +341,14 @@ class CompiledBp4Graph:
         for edge, variable in enumerate(variables):
             variable_edges[offsets[variable]] = edge
             offsets[variable] += 1
-        prior_llrs = np.asarray([probabilities_to_llrs(row) for row in probabilities], dtype=np.float64)
+        if not isinstance(profile, QuaternaryNumericalProfile):
+            raise ValueError("invalid compiled BP4 numerical profile")
+        if isinstance(profile, QuaternaryNumericalProfileV2) and profile.check_rule != "tanh_product":
+            raise ValueError("compiled v2 BP4 currently supports tanh_product checks")
+        prior_llrs = np.asarray([probabilities_to_llrs(row, profile=profile) for row in probabilities], dtype=np.float64)
         for array in (row_ptr, variable_ptr, variable_edges, variables, labels, prior_llrs):
             array.setflags(write=False)
-        return cls(row_ptr, variable_ptr, variable_edges, variables, labels, prior_llrs)
+        return cls(row_ptr, variable_ptr, variable_edges, variables, labels, prior_llrs, profile)
 
     def _syndrome(self, value: np.ndarray) -> np.ndarray:
         syndrome = np.asarray(value)
@@ -257,10 +364,23 @@ class CompiledBp4Graph:
         old = np.asarray(old_v2c, dtype=np.float64)
         if old.shape != (len(self.labels), 3) or not np.all(np.isfinite(old)):
             raise ValueError("old_v2c must be finite with one three-LLR row per edge")
-        c2v, v2c, beliefs, marginals, candidate, _ = _sweep(
-            self.row_ptr, self.variable_ptr, self.variable_edges, self.variables,
-            self.labels, old, self.prior_llrs, s, QBP4_F64_V1.saturation,
-        )
+        if isinstance(self.profile, QuaternaryNumericalProfileV2):
+            comm = np.empty(len(self.labels), dtype=np.float64)
+            c2v = np.empty(len(self.labels), dtype=np.float64)
+            beliefs = np.empty_like(self.prior_llrs)
+            v2c = np.empty_like(old)
+            candidate = np.empty(self.prior_llrs.shape[0], dtype=np.uint8)
+            marginals = np.empty((self.prior_llrs.shape[0], 4), dtype=np.float64)
+            _v2_sweep_into(self.row_ptr, self.variable_ptr, self.variable_edges, self.variables,
+                           self.labels, old, self.prior_llrs, s, math.inf if self.profile.check_cap is None else self.profile.check_cap,
+                           self.profile.product_epsilon, self.profile.v2c_damping,
+                           comm, c2v, beliefs, v2c, candidate)
+            _normalize_marginals(beliefs, marginals)
+        else:
+            c2v, v2c, beliefs, marginals, candidate, _ = _sweep(
+                self.row_ptr, self.variable_ptr, self.variable_edges, self.variables,
+                self.labels, old, self.prior_llrs, s, QBP4_F64_V1.saturation,
+            )
         converged = _candidate_matches(self.row_ptr, self.variables, self.labels, candidate, s)
         for array in (c2v, v2c, beliefs, marginals, candidate):
             array.setflags(write=False)
@@ -270,10 +390,17 @@ class CompiledBp4Graph:
         s = self._syndrome(syndrome)
         if type(max_iterations) is not int or max_iterations < 0 or type(stop_on_convergence) is not bool:
             raise ValueError("invalid compiled BP4 stopping request")
-        candidate, iterations, converged = _decode(
-            self.row_ptr, self.variable_ptr, self.variable_edges, self.variables, self.labels,
-            self.prior_llrs, s, QBP4_F64_V1.saturation, max_iterations, stop_on_convergence,
-        )
+        if isinstance(self.profile, QuaternaryNumericalProfileV2):
+            candidate, iterations, converged = _decode_v2(
+                self.row_ptr, self.variable_ptr, self.variable_edges, self.variables, self.labels,
+                self.prior_llrs, s, max_iterations, math.inf if self.profile.check_cap is None else self.profile.check_cap,
+                self.profile.product_epsilon, self.profile.v2c_damping, stop_on_convergence,
+            )
+        else:
+            candidate, iterations, converged = _decode(
+                self.row_ptr, self.variable_ptr, self.variable_edges, self.variables, self.labels,
+                self.prior_llrs, s, QBP4_F64_V1.saturation, max_iterations, stop_on_convergence,
+            )
         candidate.setflags(write=False)
         return CompiledBp4Result(candidate, int(iterations), bool(converged))
 
