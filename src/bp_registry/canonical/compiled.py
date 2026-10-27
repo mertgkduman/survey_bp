@@ -16,7 +16,7 @@ from numba import njit
 from .kernel import KernelResult
 from .numerics import (
     BinaryNumericalProfileV2, MIN_SUM_CPU_F64,
-    NumericalProfile, REFERENCE_CPU_F64, prior_llr,
+    DEFAULT_BINARY_SPA_F64, NumericalProfile, REFERENCE_CPU_F64, prior_llr,
 )
 from .schedules import EdgeTable, FloodingSweep, FloodingWork
 
@@ -210,7 +210,7 @@ class CompiledBinaryFlooding:
     row_ptr: np.ndarray
     variables: np.ndarray
     rule: str
-    numerical_profile: NumericalProfile = REFERENCE_CPU_F64
+    numerical_profile: NumericalProfile = DEFAULT_BINARY_SPA_F64
 
     @classmethod
     def from_check_matrix(cls, check_matrix: np.ndarray, *, rule: str = "spa",
@@ -226,7 +226,7 @@ class CompiledBinaryFlooding:
         np.cumsum(row_ptr, out=row_ptr)
         row_ptr.setflags(write=False)
         variables.setflags(write=False)
-        selected = (REFERENCE_CPU_F64 if rule == "spa" else MIN_SUM_CPU_F64) if profile is None else profile
+        selected = (DEFAULT_BINARY_SPA_F64 if rule == "spa" else MIN_SUM_CPU_F64) if profile is None else profile
         if not isinstance(selected, NumericalProfile):
             raise ValueError("invalid compiled binary numerical profile")
         if rule == "min_sum" and selected != MIN_SUM_CPU_F64:
@@ -258,7 +258,7 @@ class CompiledBinaryFlooding:
         return BoundBinaryFlooding(self, prior_llr(error_rate, profile=self.profile))
 
     def sweep(self, old_v2c: np.ndarray, syndrome: np.ndarray, *, error_rate: float) -> FloodingSweep:
-        """Return one raw flooding proposal; ``run`` applies v2 V2C damping."""
+        """Return one completed flooding sweep, including v2 V2C damping."""
         s, prior = self._inputs(syndrome, error_rate)
         old = np.asarray(old_v2c, dtype=np.float64)
         if old.shape != (self.table.edge_count,) or not np.all(np.isfinite(old)):
@@ -270,7 +270,7 @@ class CompiledBinaryFlooding:
             new = np.empty(self.table.edge_count, dtype=np.float64)
             _v2_sweep_into(self.row_ptr, self.variables, self.table.variable_count, old, s,
                            prior, math.inf if self.profile.check_cap is None else self.profile.check_cap, self.profile.product_epsilon,
-                           0.0, c2v, beliefs, candidate, new)
+                           self.profile.v2c_damping, c2v, beliefs, candidate, new)
             arrays = (old.copy(), c2v, beliefs, candidate, new)
         else:
             arrays = _flooding_sweep(self.row_ptr, self.variables, self.table.variable_count, old, s,

@@ -60,10 +60,12 @@ class BinaryNumericalProfileV2(NumericalProfile):
 
 
 BINARY_SPA_F64_V2 = BinaryNumericalProfileV2()
+DEFAULT_BINARY_SPA_F64 = BINARY_SPA_F64_V2
 MIN_SUM_CPU_F64 = NumericalProfile(
     profile_id="binary-min-sum-flooding-f64-v1",
     normalization="min_sum",
 )
+# Compatibility constant for the frozen v1 profile; v2 has no global clip.
 SATURATION = REFERENCE_CPU_F64.saturation
 
 
@@ -79,21 +81,21 @@ def finite_saturate(
     value: np.ndarray | float,
     *,
     boundary: str,
-    profile: NumericalProfile = REFERENCE_CPU_F64,
+    profile: NumericalProfile = DEFAULT_BINARY_SPA_F64,
 ) -> np.ndarray:
     """Reject nonfinite input and apply the profile's symmetric finite clip."""
     array = _float64(value, name=boundary)
     if not np.all(np.isfinite(array)):
         raise NumericalFailure(f"nonfinite arithmetic at {boundary}")
     if isinstance(profile, BinaryNumericalProfileV2):
-        return array
+        return np.array(array, copy=True)
     return np.clip(array, -profile.saturation, profile.saturation)
 
 
 def probability_to_llr(
     probability: np.ndarray | float,
     *,
-    profile: NumericalProfile = REFERENCE_CPU_F64,
+    profile: NumericalProfile = DEFAULT_BINARY_SPA_F64,
 ) -> np.ndarray:
     """Encode bit-one probabilities as natural-log odds, with explicit bounds."""
     values = _float64(probability, name="probability")
@@ -110,8 +112,8 @@ def probability_to_llr(
     return finite_saturate(llr, boundary="probability_to_llr_output", profile=profile)
 
 
-def prior_llr(error_rate: float, *, profile: NumericalProfile = REFERENCE_CPU_F64) -> float:
-    """Return the profile-clipped independent bit prior for a binary channel."""
+def prior_llr(error_rate: float, *, profile: NumericalProfile = DEFAULT_BINARY_SPA_F64) -> float:
+    """Return the independent bit prior using the selected profile's boundary rule."""
     if isinstance(profile, BinaryNumericalProfileV2):
         if not math.isfinite(error_rate) or not 0.0 < error_rate < 1.0:
             raise ValueError("probability must lie strictly between zero and one")
@@ -130,9 +132,9 @@ def boxplus_pair(
     left: float,
     right: float,
     *,
-    profile: NumericalProfile = REFERENCE_CPU_F64,
+    profile: NumericalProfile = DEFAULT_BINARY_SPA_F64,
 ) -> float:
-    """Stable two-input LLR box-plus, clipped at named calculation boundaries."""
+    """Stable two-input LLR box-plus under the selected numerical profile."""
     try:
         left_value, right_value = float(left), float(right)
     except (TypeError, ValueError) as error:
@@ -156,7 +158,7 @@ def boxplus_pair(
     return min(limit, max(-limit, result))
 
 
-def boxplus(values: np.ndarray, *, profile: NumericalProfile = REFERENCE_CPU_F64) -> float:
+def boxplus(values: np.ndarray, *, profile: NumericalProfile = DEFAULT_BINARY_SPA_F64) -> float:
     """Fold incoming LLRs in their supplied canonical order; empty means degree one."""
     vector = finite_saturate(values, boundary="boxplus_input", profile=profile)
     if vector.ndim != 1:
@@ -175,7 +177,7 @@ def check_to_variable(
     incoming: np.ndarray,
     *,
     syndrome: int | np.integer = 0,
-    profile: NumericalProfile = REFERENCE_CPU_F64,
+    profile: NumericalProfile = DEFAULT_BINARY_SPA_F64,
 ) -> float:
     """Apply the declared degree-one and syndrome-sign convention to a check update."""
     if isinstance(profile, BinaryNumericalProfileV2):
@@ -198,7 +200,7 @@ def check_to_variable(
     return float(finite_saturate(signed, boundary="check_to_variable_output", profile=profile))
 
 
-def hard_decision(llrs: np.ndarray, *, profile: NumericalProfile = REFERENCE_CPU_F64) -> np.ndarray:
+def hard_decision(llrs: np.ndarray, *, profile: NumericalProfile = DEFAULT_BINARY_SPA_F64) -> np.ndarray:
     """Decode negative LLRs as one; exact zero deterministically decodes as bit zero."""
     beliefs = finite_saturate(llrs, boundary="hard_decision_input", profile=profile)
     if beliefs.ndim != 1:

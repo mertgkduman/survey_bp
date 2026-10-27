@@ -9,12 +9,13 @@ def test_v2c_damping_uses_previous_damped_output_and_resets_on_new_attempt():
     from bp_registry.canonical.budgets import BudgetTree
     from bp_registry.canonical.intervention_session import BpSession
     from bp_registry.canonical.kernel import BinarySpaKernel
+    from bp_registry.canonical.numerics import REFERENCE_CPU_F64
     from bp_registry.canonical.schedules import EdgeTable, FloodingSchedule
 
     table = EdgeTable.from_check_matrix(np.asarray([[1, 1, 0], [0, 1, 1]], dtype=np.uint8))
     syndrome = np.asarray([1, 0], dtype=np.uint8)
     session = BpSession(table, syndrome, error_rate=0.1, damping_gamma=0.5)
-    reference = FloodingSchedule(table, kernel=BinarySpaKernel())
+    reference = FloodingSchedule(table, kernel=BinarySpaKernel(profile=REFERENCE_CPU_F64))
     initial = reference.initialize(0.1)
     first_fresh = reference.sweep(initial, syndrome, error_rate=0.1, source_iteration=0)
     budget = BudgetTree(limits=(), parents={})

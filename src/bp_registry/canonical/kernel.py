@@ -7,7 +7,7 @@ import math
 import numpy as np
 
 from .numerics import (
-    BinaryNumericalProfileV2, NumericalProfile, REFERENCE_CPU_F64,
+    DEFAULT_BINARY_SPA_F64, NumericalProfile,
     check_to_variable, finite_saturate, hard_decision, prior_llr,
 )
 from .updates import CheckUpdateRule
@@ -30,7 +30,7 @@ class KernelResult:
 class BinarySpaKernel:
     """No native adapter: deterministic float64 LLR SPA with flooding updates."""
 
-    def __init__(self, *, profile: NumericalProfile = REFERENCE_CPU_F64, update_rule: CheckUpdateRule | None = None) -> None:
+    def __init__(self, *, profile: NumericalProfile = DEFAULT_BINARY_SPA_F64, update_rule: CheckUpdateRule | None = None) -> None:
         self.profile = profile
         self.update_rule = update_rule
 
@@ -39,12 +39,12 @@ class BinarySpaKernel:
         return prior_llr(error_rate, profile=self.profile)
 
     def new_session(self, edge_table, syndrome: np.ndarray, *, error_rate: float):
-        """Open an owned Phase 5 session without changing the legacy one-shot run."""
+        """Open an owned flooding session with this kernel's selected profile."""
         from .intervention_session import InterventionSession
 
-        if self.update_rule is not None or self.profile != REFERENCE_CPU_F64:
-            raise ValueError("intervention sessions currently require the reference SPA kernel")
-        return InterventionSession(edge_table, syndrome, error_rate=error_rate)
+        if self.update_rule is not None:
+            raise ValueError("intervention sessions require a plain SPA kernel")
+        return InterventionSession(edge_table, syndrome, error_rate=error_rate, kernel=self)
 
     def check_message(
         self, incoming: np.ndarray, syndrome: int, *, check_index: int = 0,
@@ -99,12 +99,5 @@ class BinarySpaKernel:
             candidate = sweep.candidate
             if np.array_equal((h.astype(np.int64) @ candidate) % 2, s):
                 return KernelResult(candidate, True, iteration)
-            if isinstance(self.profile, BinaryNumericalProfileV2):
-                damping = self.profile.v2c_damping
-                v2c = finite_saturate(
-                    damping * v2c + (1.0 - damping) * sweep.new_v2c,
-                    boundary="binary_spa_v2_damped_v2c", profile=self.profile,
-                )
-            else:
-                v2c = sweep.new_v2c
+            v2c = sweep.new_v2c
         return KernelResult(candidate, False, max_iterations)

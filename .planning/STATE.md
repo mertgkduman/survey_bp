@@ -276,6 +276,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261027-l1l | Promote plain SPA/BP4 float64 v2 defaults and publish version comparison | 2026-10-27 | — | Verified | [261027-l1l-v2-default-canonical](./quick/261027-l1l-v2-default-canonical/) |
 | 261026-ns3 | Run BP4 min-sum at presentation vanilla and tuned knobs on matched B1 and double-Gross errors | 2026-10-26 | c6c50cf | Verified exploratory adaptation | [261026-ns3-run-presentation-vanilla-and-tuned-setti](./quick/261026-ns3-run-presentation-vanilla-and-tuned-setti/) |
 | 261025-s21 | Test two-thirds shift of presentation depolarizing p against paired BP4 and binary pilots | 2026-10-25 | 89d5984 | Verified diagnostic; shift does not reconcile pilots | [261025-s21-test-two-thirds-presentation-p-axis-hypo](./quick/261025-s21-test-two-thirds-presentation-p-axis-hypo/) |
 | 261024-pyb | Reconcile Phase 11 plan completion and planning state | 2026-10-24 | 3868253 | Verified bookkeeping; scientific gaps open | [261024-pyb-reconcile-phase-11-plan-completion-and-p](./quick/261024-pyb-reconcile-phase-11-plan-completion-and-p/) |

@@ -71,6 +71,14 @@ Run these commands from the repository root. The example uses a deterministic,
 two-shot, three-qubit CSS development fixture and writes to a fresh temporary
 directory:
 
+New plain flooding binary SPA and BP4 decoders default to the float64 v2
+numerical profiles. See the [profile guide](docs/numerical-profiles.md), the
+[side-by-side HTML](docs/decoder-numerics-v1-v2.html), and the matching
+[PDF](docs/decoder-numerics-v1-v2.pdf). The checked fixture below retains its
+explicit historical v1 profile. New v2 manifest examples are
+[`canonical-v2-default.json`](examples/canonical-v2-default.json) and
+[`quaternary-v2-default.json`](examples/quaternary-v2-default.json).
+
 ```bash
 OMP_NUM_THREADS=1 .venv/bin/python -m bp_registry.cli preflight \
   data/manifests/canonical-three-qubit-development.json

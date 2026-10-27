@@ -66,9 +66,9 @@ def test_commutation_llr_matches_direct_four_state_mass_ratio() -> None:
 
 
 def test_logsum_and_boxplus_are_ordered_finite_and_symmetrically_clipped() -> None:
-    assert ordered_boxplus(np.asarray((), dtype=np.float64)) == 25.0
-    assert check_message(np.asarray((100.0,), dtype=np.float64), syndrome=1) == -25.0
-    assert -25.0 <= ordered_boxplus(np.asarray((4.0, -3.0, 2.0), dtype=np.float64)) <= 25.0
+    assert ordered_boxplus(np.asarray((), dtype=np.float64), profile=QBP4_F64_V1) == 25.0
+    assert check_message(np.asarray((100.0,), dtype=np.float64), syndrome=1, profile=QBP4_F64_V1) == -25.0
+    assert -25.0 <= ordered_boxplus(np.asarray((4.0, -3.0, 2.0), dtype=np.float64), profile=QBP4_F64_V1) <= 25.0
     with pytest.raises(QuaternaryNumericalFailure, match="nonfinite"):
         ordered_boxplus(np.asarray((np.nan,), dtype=np.float64))
 
@@ -76,7 +76,8 @@ def test_logsum_and_boxplus_are_ordered_finite_and_symmetrically_clipped() -> No
 def test_four_state_normalization_and_persisted_zero_tie_rule() -> None:
     posterior = llrs_to_probabilities(np.asarray((0.0, 0.0, 0.0), dtype=np.float64))
     assert np.allclose(posterior, 0.25)
-    assert pauli_hard_decision(np.asarray((0.0, 0.0, 0.0), dtype=np.float64)).name == "X"
+    assert pauli_hard_decision(np.asarray((0.0, 0.0, 0.0), dtype=np.float64), profile=QBP4_F64_V1).name == "X"
+    assert pauli_hard_decision(np.asarray((0.0, 0.0, 0.0), dtype=np.float64)).name == "Y"
     assert pauli_hard_decision(np.asarray((0.3, 0.2, 0.1), dtype=np.float64)).name == "I"
     assert pauli_hard_decision(np.asarray((0.1, -0.4, -0.4), dtype=np.float64)).name == "Y"
 

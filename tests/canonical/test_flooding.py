@@ -22,7 +22,8 @@ def _api():
 def test_flooding_reads_complete_old_snapshot_then_commits_complete_new_buffer():
     EdgeTable, FloodingSchedule, BinarySpaKernel = _api()
     table = EdgeTable.from_edges(2, 2, [(0, 0), (0, 1), (1, 0), (1, 1)])
-    schedule = FloodingSchedule(table, kernel=BinarySpaKernel())
+    from bp_registry.canonical.numerics import REFERENCE_CPU_F64
+    schedule = FloodingSchedule(table, kernel=BinarySpaKernel(profile=REFERENCE_CPU_F64))
     old_v2c = np.array([1.5, -0.7, 0.2, 2.0])
 
     sweep = schedule.sweep(old_v2c, np.array([0, 1], dtype=np.uint8), error_rate=0.2)

@@ -75,6 +75,7 @@ class QuaternaryNumericalProfileV2(QuaternaryNumericalProfile):
 
 
 QBP4_F64_V2 = QuaternaryNumericalProfileV2()
+DEFAULT_QBP4_F64 = QBP4_F64_V2
 
 
 def _float64(value: object, *, name: str) -> np.ndarray:
@@ -103,18 +104,18 @@ def finite_saturate(
     value: object,
     *,
     boundary: str,
-    profile: QuaternaryNumericalProfile = QBP4_F64_V1,
+    profile: QuaternaryNumericalProfile = DEFAULT_QBP4_F64,
 ) -> np.ndarray:
-    """Reject nonfinite values and symmetrically clip a public numerical result."""
+    """Reject nonfinite values; clip only when the selected profile requires it."""
     if not isinstance(profile, QuaternaryNumericalProfile):
         raise ValueError("profile must be a QuaternaryNumericalProfile")
     array = _float64(value, name=boundary)
     if isinstance(profile, QuaternaryNumericalProfileV2):
-        return array
+        return np.array(array, copy=True)
     return np.clip(array, -profile.saturation, profile.saturation)
 
 
-def ordered_logsumexp(values: object, *, profile: QuaternaryNumericalProfile = QBP4_F64_V1) -> float:
+def ordered_logsumexp(values: object, *, profile: QuaternaryNumericalProfile = DEFAULT_QBP4_F64) -> float:
     """Fold log masses with NumPy ``logaddexp`` in their declared order."""
     vector = _float64(values, name="ordered_logsumexp_input")
     if vector.ndim != 1 or vector.size == 0:
@@ -136,11 +137,11 @@ def _boxplus_pair(left: float, right: float, *, profile: QuaternaryNumericalProf
     return float(finite_saturate(sign * (smaller + float(correction)), boundary="boxplus_pair_output", profile=profile))
 
 
-def ordered_boxplus(values: object, *, profile: QuaternaryNumericalProfile = QBP4_F64_V1) -> float:
+def ordered_boxplus(values: object, *, profile: QuaternaryNumericalProfile = DEFAULT_QBP4_F64) -> float:
     """Apply the exact excluded-neighbor box-plus reduction in edge order.
 
-    An empty reduction represents the degree-one check convention and therefore
-    returns positive saturation before the separate syndrome sign is applied.
+    An empty reduction represents a degree-one check. Its finite output is
+    determined by the selected profile before the syndrome sign is applied.
     """
     vector = finite_saturate(values, boundary="ordered_boxplus_input", profile=profile)
     if vector.ndim != 1:
@@ -163,7 +164,7 @@ def check_message(
     incoming: object,
     *,
     syndrome: int | np.integer,
-    profile: QuaternaryNumericalProfile = QBP4_F64_V1,
+    profile: QuaternaryNumericalProfile = DEFAULT_QBP4_F64,
 ) -> float:
     """Return the source-defined signed scalar C2V message for one excluded edge."""
     if isinstance(profile, QuaternaryNumericalProfileV2) and profile.check_rule == "tanh_product":
@@ -189,7 +190,7 @@ def check_message(
 def llrs_to_probabilities(
     llrs: object,
     *,
-    profile: QuaternaryNumericalProfile = QBP4_F64_V1,
+    profile: QuaternaryNumericalProfile = DEFAULT_QBP4_F64,
 ) -> np.ndarray:
     """Normalize three identity-referenced LLRs to an ``I/X/Y/Z`` posterior."""
     belief = finite_saturate(llrs, boundary="llrs_to_probabilities_input", profile=profile)
@@ -212,7 +213,7 @@ def llrs_to_probabilities(
 def probabilities_to_llrs(
     probabilities: object,
     *,
-    profile: QuaternaryNumericalProfile = QBP4_F64_V1,
+    profile: QuaternaryNumericalProfile = DEFAULT_QBP4_F64,
 ) -> np.ndarray:
     """Encode a strictly positive normalized ``I/X/Y/Z`` prior as X/Y/Z LLRs."""
     values = _float64(probabilities, name="probabilities_to_llrs_input")
@@ -226,9 +227,9 @@ def commutation_llr(
     llrs: object,
     edge_label: int | np.integer,
     *,
-    profile: QuaternaryNumericalProfile = QBP4_F64_V1,
+    profile: QuaternaryNumericalProfile = DEFAULT_QBP4_F64,
 ) -> float:
-    """Quantize a four-state belief to log commute mass over anticommute mass."""
+    """Project a four-state belief to log commute mass over anticommute mass."""
     label = _edge_label(edge_label)
     belief = finite_saturate(llrs, boundary="commutation_llr_input", profile=profile)
     if belief.shape != (3,):
@@ -243,9 +244,9 @@ def commutation_llr(
 def pauli_hard_decision(
     llrs: object,
     *,
-    profile: QuaternaryNumericalProfile = QBP4_F64_V1,
+    profile: QuaternaryNumericalProfile = DEFAULT_QBP4_F64,
 ) -> Pauli:
-    """Choose I only for strictly positive LLRs, then use the persisted I<X<Y<Z tie order."""
+    """Choose a Pauli with the selected profile's explicit tie rule."""
     belief = finite_saturate(llrs, boundary="pauli_hard_decision_input", profile=profile)
     if belief.shape != (3,):
         raise ValueError("pauli_hard_decision requires three X/Y/Z LLRs")
@@ -267,6 +268,7 @@ _STATES = np.arange(4, dtype=np.uint8)
 
 
 __all__ = [
+    "DEFAULT_QBP4_F64",
     "QBP4_F64_V1",
     "QBP4_F64_V2",
     "QuaternaryNumericalFailure",

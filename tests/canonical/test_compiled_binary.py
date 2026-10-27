@@ -24,11 +24,11 @@ def _reference(rule: str) -> BinarySpaKernel:
     return BinarySpaKernel() if rule == "spa" else BinarySpaKernel(profile=MIN_SUM_CPU_F64, update_rule=MinSumUpdate())
 
 
-def test_spa_v2_is_selectable_and_frozen_v1_remains_default() -> None:
+def test_spa_v2_is_default_and_frozen_v1_remains_selectable() -> None:
     h = np.asarray([[1, 1, 0], [0, 1, 1]], dtype=np.uint8)
     syndrome = np.asarray([1, 0], dtype=np.uint8)
     assert BinarySpaKernel(profile=BINARY_SPA_F64_V2).profile is BINARY_SPA_F64_V2
-    assert BinarySpaKernel().profile is REFERENCE_CPU_F64
+    assert BinarySpaKernel().profile is BINARY_SPA_F64_V2
     for profile in (BINARY_SPA_F64_V2, REFERENCE_CPU_F64):
         graph = CompiledBinaryFlooding.from_check_matrix(h, profile=profile)
         expected = BinarySpaKernel(profile=profile).run(h, syndrome, error_rate=.08, max_iterations=12)

@@ -22,7 +22,7 @@ from ..css import CssCode
 from .asced import AscedController, AscedSpec, SplitterSearchExhausted, construct_splitter_batch, materialize_asced_batches
 from .asced_overcomplete import OvercompleteSearchExhausted, construct_overcomplete_map
 from .kernel import ScalarLlrBp4Kernel
-from .numerics import QBP4_F64_V1
+from .numerics import QBP4_F64_V1, QBP4_F64_V2
 from .mbp4 import FixedAlphaMbp4Kernel, Mbp4Spec
 from .problems import PauliCode, QuaternaryOriginalProblem, compile_css_artifact
 from .qbpgd import QbpgdController, QbpgdSpec
@@ -272,7 +272,7 @@ def run_quaternary_scalar(
         code=PauliCode(checks=problem.checks, source_artifact_identity=f"public-manifest:{manifest_sha256}"),
         syndrome=problem.syndrome,
     )
-    session = ScalarLlrBp4Kernel(profile=QBP4_F64_V1).new_session(
+    session = ScalarLlrBp4Kernel(profile=QBP4_F64_V2 if getattr(manifest, "numerical_profile", None) == QBP4_F64_V2.profile_id else QBP4_F64_V1).new_session(
         original, priors, budgets=BudgetTree(limits=(BudgetLimit("attempt", "bp_calls", max_work),), parents={}),
     )
     schedule = _public_scalar_schedule(session, payload["composition"])
@@ -286,10 +286,13 @@ def run_quaternary_scalar(
     candidate = np.asarray(sweep.candidate, dtype=np.uint8)
     outcome, logical = _evaluate(problem, hidden, candidate)
     schedule_evidence = {"kind": schedule.__class__.__name__, "transform_order": [] if trace is None else list(trace.transform_order)}
+    profile_evidence = ({"numerical_profile": QBP4_F64_V2.profile_id}
+                        if getattr(manifest, "numerical_profile", None) == QBP4_F64_V2.profile_id else {})
     events = [
         _event("preflight", {"run_id": run_id, "shot_id": shot_id, "manifest_sha256": manifest_sha256,
             "pauli_encoding": "I=0,X=1,Y=2,Z=3", "observation": problem.syndrome.tolist(),
-            "public_schema": "quaternary_experiment_v2", "resolved_composition": dict(resolved_composition)}),
+            "public_schema": getattr(manifest, "schema_version", "quaternary_experiment_v2"),
+            "resolved_composition": dict(resolved_composition), **profile_evidence}),
         _event("sample", {"sample_identity": _digest({"manifest": manifest_sha256, "shot": shot_id}), "channel": channel.tolist(),
             "decoder_priors": priors.tolist(), "decoder_smoothing": smoothing, "hidden_truth_sealed": True}),
         _event("scalar_schedule", {**schedule_evidence, "work": sweep.work.as_evidence(structural_event_version=4)}),

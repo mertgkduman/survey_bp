@@ -5,6 +5,13 @@ not an adapter to a native decoder, a source-faithful reproduction, or a
 statistical result.  The checked fixture is explicitly labelled
 `canonical_implemented`, `development_fixture`, and `not_assessed`.
 
+**Current plain flooding default:** float64 SPA v2. The example below is a
+frozen v1 fixture, so its v1 equations and expected results remain historical.
+New schema-9 manifests default to `cpu-float64-spa-v2`. See the
+[numerical-profile guide](numerical-profiles.md), [side-by-side HTML](decoder-numerics-v1-v2.html),
+and [PDF](decoder-numerics-v1-v2.pdf) for the current recurrence and version
+boundary.
+
 ## Scope and approved environment
 
 Use the approved `.venv` described in [environment-pins.md](environment-pins.md).
@@ -83,7 +90,7 @@ from an empty trace file.
 
 ## Mathematical and numerical conventions
 
-The persisted public manifest profile is `cpu-float64-spa-v1`; preflight
+The checked historical public manifest profile is `cpu-float64-spa-v1`; preflight
 materializes its resolved engine profile as `binary-spa-flooding-f64-v1` in
 `resolved_numerical_profile`.  That engine profile is materialized by
 `src/bp_registry/canonical/numerics.py` and
@@ -103,7 +110,7 @@ hard-decision tie is resolved deterministically by the profile's canonical
 index/order rule; no physical-error truth or unrecorded random draw chooses a
 tie.
 
-The check update uses the stable LLR-domain SPA (box-plus) procedure: combine
+For this v1 fixture, the check update uses the stable LLR-domain SPA (box-plus) procedure: combine
 incoming messages through the sign/parity and stable magnitude operation, then
 apply the observed syndrome sign.  Variable-to-check values are the channel
 LLR plus the other incoming check messages.  The profile clips finite

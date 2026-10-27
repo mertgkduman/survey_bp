@@ -1,5 +1,12 @@
 # BP decoder policies and presentation reproduction
 
+The repository's new **plain flooding float64** BP4 and binary SPA construction
+defaults to v2. The [profile guide](../docs/numerical-profiles.md) and
+[side-by-side comparison](../docs/decoder-numerics-v1-v2.html) explain the
+recurrences. Slide policy files and completed pilot ledgers in this folder
+retain their recorded settings; v2 does not turn the presentation's Q8 runs
+into float64 runs.
+
 ## Latest float64 numerical investigation
 
 The [scaled numerical report](results/numerical_scaleup/NUMERIC_SCALEUP_REPORT.md)

@@ -96,9 +96,9 @@ def test_scalar_boxplus_preserves_array_oracle_bits_and_failures() -> None:
 
 def test_degree_one_empty_and_invalid_boundaries_are_explicit():
     profile = _profile_api()
-    assert numerics.check_to_variable(np.array([], dtype=np.float64)) == profile.saturation
-    assert numerics.check_to_variable(np.array([], dtype=np.float64), syndrome=1) == -profile.saturation
-    assert numerics.boxplus(np.array([], dtype=np.float64)) == profile.saturation
+    assert numerics.check_to_variable(np.array([], dtype=np.float64), profile=profile) == profile.saturation
+    assert numerics.check_to_variable(np.array([], dtype=np.float64), syndrome=1, profile=profile) == -profile.saturation
+    assert numerics.boxplus(np.array([], dtype=np.float64), profile=profile) == profile.saturation
     assert numerics.probability_to_llr(np.array([], dtype=np.float64)).shape == (0,)
 
     with pytest.raises(ValueError, match="probability"):

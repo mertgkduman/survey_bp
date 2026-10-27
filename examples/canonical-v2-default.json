@@ -1,0 +1,171 @@
+{
+  "schema_version": 9,
+  "run_id": "canonical-three-qubit-f64-v2-example",
+  "error_rate": 0.1,
+  "policies": {
+    "update": {
+      "kind": "binary_spa",
+      "binding_id": "update-binary-spa-v1",
+      "state_lifetime": "message",
+      "owned_state": [],
+      "requires": [],
+      "provides": []
+    },
+    "schedule": {
+      "kind": "flooding",
+      "binding_id": "schedule-flooding-v1",
+      "state_lifetime": "iteration",
+      "owned_state": [],
+      "requires": [],
+      "provides": []
+    },
+    "state_memory": {
+      "kind": "stateless",
+      "binding_id": "state-memory-stateless-v1",
+      "state_lifetime": "attempt",
+      "owned_state": [],
+      "requires": [],
+      "provides": []
+    },
+    "intervention": {
+      "kind": "identity",
+      "binding_id": "intervention-identity-v1",
+      "state_lifetime": "search",
+      "owned_state": [],
+      "requires": [],
+      "provides": []
+    },
+    "stopping": {
+      "kind": "syndrome_or_budget",
+      "binding_id": "stopping-syndrome-budget-v1",
+      "state_lifetime": "iteration",
+      "owned_state": [],
+      "requires": [],
+      "provides": []
+    },
+    "selection": {
+      "kind": "stable_first",
+      "binding_id": "selection-stable-first-v1",
+      "state_lifetime": "attempt",
+      "owned_state": [],
+      "requires": [],
+      "provides": []
+    },
+    "postprocessing": {
+      "kind": "identity",
+      "binding_id": "postprocessing-identity-v1",
+      "state_lifetime": "attempt",
+      "owned_state": [],
+      "requires": [],
+      "provides": []
+    }
+  },
+  "budgets": {
+    "max_shots": 2,
+    "shot": {
+      "max_iterations": 8,
+      "work_limits": {
+        "check_to_variable_updates": 1000,
+        "variable_to_check_updates": 1000,
+        "belief_assemblies": 1000,
+        "residual_priority_evaluations": 0,
+        "bp_calls": 1,
+        "candidate_checks": 1000,
+        "intervention_actions": 0,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "relay_transfers": 0,
+        "fallback_calls": 0
+      }
+    },
+    "search": {
+      "max_iterations": 8,
+      "work_limits": {
+        "check_to_variable_updates": 1000,
+        "variable_to_check_updates": 1000,
+        "belief_assemblies": 1000,
+        "residual_priority_evaluations": 0,
+        "bp_calls": 1,
+        "candidate_checks": 1000,
+        "intervention_actions": 0,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "relay_transfers": 0,
+        "fallback_calls": 0
+      }
+    },
+    "attempt": {
+      "max_iterations": 8,
+      "work_limits": {
+        "check_to_variable_updates": 1000,
+        "variable_to_check_updates": 1000,
+        "belief_assemblies": 1000,
+        "residual_priority_evaluations": 0,
+        "bp_calls": 1,
+        "candidate_checks": 1000,
+        "intervention_actions": 0,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "relay_transfers": 0,
+        "fallback_calls": 0
+      }
+    },
+    "denominator_rule": "all_terminal_shots"
+  },
+  "trace_plan": {
+    "level": "off",
+    "relative_dir": "trace-sidecars",
+    "max_records": 0,
+    "max_bytes": 0,
+    "label": "development_default"
+  },
+  "profile_plan": {
+    "enabled": true,
+    "level": "low_overhead",
+    "cohort": "clean",
+    "selected_before_outcome": true
+  },
+  "environment": {
+    "python": "3.12.2",
+    "numpy": "2.2.6",
+    "scipy": "1.17.1",
+    "backend": "cpu",
+    "omp_num_threads": 1
+  },
+  "artifact": {
+    "root": "data/artifacts",
+    "path": "project-three-qubit-css-fixture.json",
+    "raw_sha256": "87328ebbe70907d74a5dd3ee67d6a4b8e87b2c82b66270aee1b71594b4a78d25",
+    "semantic_sha256": "6ee26cb7bf253c42265a326821219b057ceca35cad64fb382f2c4117141e6f4e",
+    "matrix_hashes": {
+      "hx_raw_sha256": "fa81a63939636a8d6184ff498c46e93fc2ab837d080c5852d691bb4f23b8920d",
+      "hz_raw_sha256": "7cbf797444cc052926f6dd17990f417a61ee2340377d7e3f89ff1e66c895abb3",
+      "lx_raw_sha256": "9995179b267ee1c40c900fe8212f5f64cf8a8daf9c69732ddb20826a56ff25ca",
+      "lz_raw_sha256": "fa81a63939636a8d6184ff498c46e93fc2ab837d080c5852d691bb4f23b8920d",
+      "hx_semantic_sha256": "c0ff96e5b6433755fb67cb5280ed266d8c27fc211cc9f76cb9099489100d6edd",
+      "hz_semantic_sha256": "a3ee6a716269bd21164dfcb5b52554c185a70db554c7040120ce224317667fe2",
+      "lx_semantic_sha256": "72ec5303a315712d4046ebeaeb3bf479ff2bfa98b40d9c2aad29ed63134837bf",
+      "lz_semantic_sha256": "bc4640878fdd40fe9d3d355070f5982703b8e2da039c169054ba386bb5552e08"
+    },
+    "format_version": 1,
+    "code_id": "project-three-qubit-css-fixture"
+  },
+  "randomness": {
+    "sample_seed": 12,
+    "decoder_seed_identity": "canonical-deterministic-no-local-randomness-v1",
+    "sample_derivation": "sha256-manifest-shot-v1"
+  },
+  "evidence": {
+    "relation": "canonical_implemented",
+    "fixture": "development_fixture",
+    "assessment_status": "not_assessed",
+    "procedure": "Project-owned deterministic binary SPA flooding on the immutable three-qubit CSS fixture, followed by independent original-space evaluation.",
+    "sources": [
+      "project-owned canonical procedure basis"
+    ],
+    "discrepancies": [
+      "This development fixture is canonical implementation evidence, not a source-faithful paper reproduction.",
+      "Its fixed two-shot budget is not a statistical assessment or curve comparison."
+    ]
+  }
+}

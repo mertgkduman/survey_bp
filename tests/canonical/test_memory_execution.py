@@ -10,6 +10,7 @@ from bp_registry.canonical.budgets import BudgetLimit, BudgetTree
 from bp_registry.canonical.contracts import MemoryCompositionSpec
 from bp_registry.canonical.execution import AtomicFloodingExecutor
 from bp_registry.canonical.kernel import BinarySpaKernel
+from bp_registry.canonical.numerics import REFERENCE_CPU_F64
 from bp_registry.canonical.schedules import EdgeTable
 from bp_registry.manifests import manifest_digest, parse_manifest
 from bp_registry.runner import _canonical_execution_controls, _canonical_kernel_manifest, canonical_public_shot_context
@@ -90,7 +91,7 @@ def make_schedule(kind, parameters):
     from bp_registry.canonical.memory_execution import MemoryFloodingSchedule
     table = (EdgeTable.from_edges(2, 2, [(0, 0), (0, 1), (1, 0), (1, 1)])
              if kind == "v2c_damping" else EdgeTable.from_edges(1, 2, [(0, 0), (0, 1)]))
-    return MemoryFloodingSchedule(table, kernel=BinarySpaKernel(), memory=composition(kind, parameters))
+    return MemoryFloodingSchedule(table, kernel=BinarySpaKernel(profile=REFERENCE_CPU_F64), memory=composition(kind, parameters))
 
 
 @pytest.mark.parametrize("kind,parameters", [
@@ -295,7 +296,7 @@ def test_repeated_fields_use_disjoint_histories_and_explicit_order():
     from bp_registry.canonical.memory_execution import MemoryFloodingSchedule
     first = composition("pdbp_field_mix", {"gamma": 0.5}, binding_id="first").bindings[0]
     second = first.model_copy(update={"binding_id": "second", "history_owner": "history:second", "order": 1})
-    schedule = MemoryFloodingSchedule(EdgeTable.from_edges(1, 2, [(0, 0), (0, 1)]), kernel=BinarySpaKernel(), memory=MemoryCompositionSpec(bindings=(first, second)))
+    schedule = MemoryFloodingSchedule(EdgeTable.from_edges(1, 2, [(0, 0), (0, 1)]), kernel=BinarySpaKernel(profile=REFERENCE_CPU_F64), memory=MemoryCompositionSpec(bindings=(first, second)))
     initial = schedule.initialize(0.1)
     p = schedule.kernel.prior(0.1)
     step = schedule.sweep(initial, np.array([1], dtype=np.uint8), error_rate=0.1)

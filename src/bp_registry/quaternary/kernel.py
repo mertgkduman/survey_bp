@@ -150,7 +150,7 @@ class ScalarLlrBp4Kernel:
         return finite_saturate(result, boundary="bp4_variable_message", profile=self.profile)
 
     def candidate_from_beliefs(self, beliefs: object) -> np.ndarray:
-        """Apply the persisted I<X<Y<Z decision to each complete three-LLR belief."""
+        """Apply the selected profile's hard-decision rule to each complete belief."""
         values = np.asarray(beliefs, dtype=np.float64)
         if values.ndim != 2 or values.shape[1] != 3:
             raise ValueError("candidate beliefs must have shape (n, 3)")

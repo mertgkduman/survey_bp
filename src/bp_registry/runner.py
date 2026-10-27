@@ -18,7 +18,7 @@ from .canonical.metrics import unavailable_metric
 from .canonical.budgets import WorkVector
 from .canonical.execution import run_canonical_structural_shot
 from .canonical.verification import PublicShotContext
-from .canonical.numerics import MIN_SUM_CPU_F64, REFERENCE_CPU_F64
+from .canonical.numerics import BINARY_SPA_F64_V2, MIN_SUM_CPU_F64, REFERENCE_CPU_F64
 from .canonical.schedules import EdgeTable
 from .canonical.contracts import validate_composition
 from .manifests import (
@@ -796,7 +796,7 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
         "code_id": manifest.artifact.code_id,
         "manifest_sha256": manifest_digest(manifest),
         "numerical_profile": manifest.numerical_profile,
-        "resolved_numerical_profile": (MIN_SUM_CPU_F64 if manifest.numerical_profile == "cpu-float64-min-sum-v1" else REFERENCE_CPU_F64).as_evidence(),
+        "resolved_numerical_profile": (MIN_SUM_CPU_F64 if manifest.numerical_profile == "cpu-float64-min-sum-v1" else BINARY_SPA_F64_V2 if manifest.numerical_profile == "cpu-float64-spa-v2" else REFERENCE_CPU_F64).as_evidence(),
         "policies": manifest.policies.model_dump(mode="json", exclude_none=True),
         "policy_identity": composition.semantic_identity,
         "policy_effects": _canonical_policy_effects(manifest, resolved.code),
@@ -893,9 +893,15 @@ def preflight_quaternary(manifest_path: str | Path) -> dict[str, Any]:
         is_asced = intervention is not None and intervention.kind in {"asced", "asced_overcomplete"}
         if is_asced:
             _css_from_public_problem(TracerPauliProblem(manifest.problem.checks, manifest.problem.syndrome))
-        resolved = resolve_quaternary_composition(manifest.composition, problem_kind="css" if is_asced else "general_pauli")
+        resolved = resolve_quaternary_composition(
+            manifest.composition,
+            problem_kind="css" if is_asced else "general_pauli",
+            numerical_profile=getattr(manifest, "numerical_profile", None),
+        )
         report["shot_budget"] = manifest.shot_budget
         report["composition"] = resolved.model_dump(mode="json")
+        if getattr(manifest, "numerical_profile", None) is not None:
+            report["numerical_profile"] = manifest.numerical_profile
     return report
 
 
@@ -1012,7 +1018,7 @@ def _canonical_kernel_manifest(manifest: CanonicalExperimentV2 | CanonicalExperi
             compact["memory"] = manifest.memory.model_dump(mode="json")
         return compact
     compact: dict[str, object] = {
-        "schema_version": 3 if isinstance(manifest, CanonicalExperimentV4) else manifest.schema_version,
+        "schema_version": 3 if isinstance(manifest, CanonicalExperimentV4) or manifest.schema_version == 9 else manifest.schema_version,
         "run_id": manifest.run_id,
         "numerical_profile": manifest.numerical_profile,
         "max_iterations": manifest.budgets.attempt.max_iterations,

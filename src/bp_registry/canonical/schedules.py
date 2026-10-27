@@ -11,7 +11,7 @@ from typing import Any, Callable, Protocol
 
 import numpy as np
 
-from .numerics import NumericalProfile, REFERENCE_CPU_F64, finite_saturate
+from .numerics import BinaryNumericalProfileV2, NumericalProfile, finite_saturate
 
 
 Edge = tuple[int, int]
@@ -115,10 +115,10 @@ class _FloodingKernel(Protocol):
 class FloodingSchedule:
     """Within-attempt flooding order: old v2c → complete c2v → complete new v2c."""
 
-    def __init__(self, edge_table: EdgeTable, *, kernel: _FloodingKernel, profile: NumericalProfile = REFERENCE_CPU_F64) -> None:
+    def __init__(self, edge_table: EdgeTable, *, kernel: _FloodingKernel, profile: NumericalProfile | None = None) -> None:
         self.edge_table = edge_table
         self.kernel = kernel
-        self.profile = profile
+        self.profile = kernel.profile if profile is None else profile
         self._check_edges = tuple(
             tuple(index for index, (check, _variable) in enumerate(edge_table.edges) if check == current)
             for current in range(edge_table.check_count)
@@ -178,6 +178,11 @@ class FloodingSchedule:
         for edge_index, variable in enumerate(self._edge_variables):
             new_v2c[edge_index] = self.kernel.variable_message(float(beliefs[variable]), float(c2v[edge_index]))
         new_v2c = finite_saturate(new_v2c, boundary="flooding_complete_new_v2c", profile=self.profile)
+        if isinstance(self.profile, BinaryNumericalProfileV2):
+            new_v2c = finite_saturate(
+                self.profile.v2c_damping * old_snapshot + (1.0 - self.profile.v2c_damping) * new_v2c,
+                boundary="binary_spa_v2_damped_v2c", profile=self.profile,
+            )
         if transform_v2c is not None:
             new_v2c = finite_saturate(transform_v2c(new_v2c), boundary="flooding_memory_v2c", profile=self.profile)
         for array in (old_snapshot, c2v, beliefs, candidate, new_v2c):

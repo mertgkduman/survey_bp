@@ -689,6 +689,20 @@ class CanonicalExperimentV8(CanonicalExperimentV3):
         return self
 
 
+class CanonicalExperimentV9(CanonicalExperimentV3):
+    """New plain-flooding SPA runs default to the promoted float64 v2 profile."""
+
+    schema_version: Literal[9]
+    numerical_profile: Literal["cpu-float64-spa-v2"] = "cpu-float64-spa-v2"
+
+    @model_validator(mode="after")
+    def v2_is_plain_flooding_only(self) -> "CanonicalExperimentV9":
+        validate_executable_canonical_baseline(self.policies)
+        if self.policies.update.kind != "binary_spa" or self.policies.schedule.kind != "flooding":
+            raise ValueError("float64 SPA v2 requires plain binary_spa flooding")
+        return self
+
+
 class QuaternaryProblemV1(StrictModel):
     """Immutable non-CSS Pauli rows in explicit I/X/Y/Z encoding."""
 
@@ -779,7 +793,23 @@ class QuaternaryExperimentV2(QuaternaryExperimentV1):
     shot_budget: Literal[1] = 1
 
 
-ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | CanonicalExperimentV6 | CanonicalExperimentV7 | CanonicalExperimentV8 | QuaternaryExperimentV1 | QuaternaryExperimentV2
+class QuaternaryExperimentV3(QuaternaryExperimentV2):
+    """New plain BP4 runs default to the promoted float64 v2 profile."""
+
+    schema_version: Literal["quaternary_experiment_v3"]
+    numerical_profile: Literal["quaternary-bp4-f64-v2"] = "quaternary-bp4-f64-v2"
+
+    @model_validator(mode="after")
+    def v2_is_plain_bp4_only(self) -> "QuaternaryExperimentV3":
+        if (self.composition.kernel is None or self.composition.kernel.kind != "qbp_scalar_llr"
+                or self.composition.schedule is None or self.composition.schedule.kind != "qbp_flooding"
+                or self.composition.transforms
+                or self.composition.intervention is None or self.composition.intervention.kind != "identity"):
+            raise ValueError("quaternary float64 v2 requires plain flooding BP4")
+        return self
+
+
+ManifestRecord: TypeAlias = ManifestV1 | LegacyManifestV1 | CanonicalExperimentV2 | CanonicalExperimentV3 | CanonicalExperimentV4 | CanonicalExperimentV5 | CanonicalExperimentV6 | CanonicalExperimentV7 | CanonicalExperimentV8 | CanonicalExperimentV9 | QuaternaryExperimentV1 | QuaternaryExperimentV2 | QuaternaryExperimentV3
 
 
 _EXECUTABLE_BASELINE_KINDS = {
@@ -877,6 +907,10 @@ def parse_manifest(value: ManifestV1 | CanonicalManifestV2 | CanonicalExperiment
         return QuaternaryExperimentV1.model_validate(decoded)
     if decoded.get("schema_version") == "quaternary_experiment_v2":
         return QuaternaryExperimentV2.model_validate(decoded)
+    if decoded.get("schema_version") == "quaternary_experiment_v3":
+        return QuaternaryExperimentV3.model_validate(decoded)
+    if decoded.get("schema_version") == 9:
+        return CanonicalExperimentV9.model_validate(decoded)
     if decoded.get("schema_version") == 8:
         return CanonicalExperimentV8.model_validate(decoded)
     if decoded.get("schema_version") == 7 and "ensemble" in decoded:
@@ -904,6 +938,10 @@ def _parse_for_preflight(value: ManifestRecord | dict[str, Any] | str | Path) ->
         return QuaternaryExperimentV1.model_validate(decoded)
     if decoded.get("schema_version") == "quaternary_experiment_v2":
         return QuaternaryExperimentV2.model_validate(decoded)
+    if decoded.get("schema_version") == "quaternary_experiment_v3":
+        return QuaternaryExperimentV3.model_validate(decoded)
+    if decoded.get("schema_version") == 9:
+        return CanonicalExperimentV9.model_validate(decoded)
     if decoded.get("schema_version") == 8:
         return CanonicalExperimentV8.model_validate(decoded)
     if decoded.get("schema_version") == 7 and "ensemble" in decoded:

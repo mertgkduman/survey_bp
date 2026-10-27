@@ -40,6 +40,7 @@ def resolve_quaternary_composition(
     composition: QuaternaryCompositionSpec,
     *,
     problem_kind: Literal["general_pauli", "css"] = "general_pauli",
+    numerical_profile: Literal["quaternary-bp4-f64-v2"] | None = None,
 ) -> QuaternaryResolvedComposition:
     """Resolve a closed composition before artifact resolution or sampling.
 
@@ -51,6 +52,8 @@ def resolve_quaternary_composition(
         raise ValueError("quaternary compatibility requires QuaternaryCompositionSpec")
     if problem_kind not in {"general_pauli", "css"}:
         raise ValueError("quaternary problem kind must be general_pauli or css")
+    if numerical_profile not in {None, "quaternary-bp4-f64-v2"}:
+        raise ValueError("unsupported quaternary numerical profile")
 
     assert composition.kernel is not None and composition.schedule is not None and composition.intervention is not None
     kernel, schedule, intervention = composition.kernel, composition.schedule, composition.intervention
@@ -88,6 +91,14 @@ def resolve_quaternary_composition(
     reasons: list[str] = []
     revisions = list(_SOURCE_REVISIONS)
     procedure_basis = "source_scalar_llr_bp4_v1"
+
+    if numerical_profile == "quaternary-bp4-f64-v2":
+        component_fidelity["kernel"] = "canonical_adaptation"
+        procedure_basis = "canonical_scalar_llr_bp4_f64_v2"
+        equations["numerical_check"] = "2atanh(clamp_unit((-1)^s product tanh(lambda/2), 1e-10))"
+        equations["numerical_v2c"] = "0.1 old_v2c + 0.9 fresh_extrinsic_v2c"
+        lifecycle["numerical_profile"] = numerical_profile
+        reasons.append("canonical_float64_v2_numerical_profile")
 
     if kernel.kind == "qbp_mbp4_fixed_alpha":
         # Import here to keep composition data independent of the implementation
