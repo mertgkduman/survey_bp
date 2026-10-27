@@ -1,0 +1,40 @@
+{
+  "schema": "presentation-decoder-policy-v1",
+  "id": "bp4_ms_both_changes_diagnostic",
+  "family": "joint_pauli_bp4",
+  "source_fidelity": "diagnostic_hybrid_not_source_faithful",
+  "noise": "depolarizing_code_capacity",
+  "physical_p": "point_specific",
+  "decoder_p0": "physical_p",
+  "pauli_order": "I,X,Y,Z",
+  "schedule": "flooding",
+  "check_rule": "min_sum",
+  "min_sum": {
+    "alpha": 1.0,
+    "beta": 0.0,
+    "status": "inferred_unscaled_unoffset"
+  },
+  "v2c": {
+    "representation": "three_identity_referenced_llrs_per_edge",
+    "dtype": "float64",
+    "rounding": "none",
+    "clipping": "none",
+    "damping_coefficient_old": 0.0
+  },
+  "commutation_projection": {
+    "rule": "full_logsumexp_commuting_minus_full_logsumexp_anticommuting",
+    "intermediate_clipping": "none",
+    "scalar_output_rounding": "nearest_multiple_of_1_over_16_ties_to_even",
+    "scalar_output_clipping": [-7.9375, 7.9375]
+  },
+  "c2v": {
+    "rounding": "nearest_multiple_of_1_over_16_ties_to_even",
+    "clipping": [-7.9375, 7.9375]
+  },
+  "hard_decision": "original_policy_kernel_I_then_X_Y_Z_minimum_llr_tie_order",
+  "max_iterations": 1000,
+  "stop": "first_syndrome_match",
+  "outcome": "independent_original_code_block_logical_failure",
+  "implementation": "inspect_q8_minsum_clipping._variants()['both_changes']",
+  "interpretation": "The presentation does not specify its internal BP4 message representation or rounding sites."
+}

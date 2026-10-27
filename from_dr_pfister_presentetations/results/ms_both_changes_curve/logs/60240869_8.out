@@ -1,0 +1,11 @@
+double_gross 0.12 1000 / 10000 failures 227 elapsed_s 46.7
+double_gross 0.12 2000 / 10000 failures 469 elapsed_s 97.7
+double_gross 0.12 3000 / 10000 failures 707 elapsed_s 145.6
+double_gross 0.12 4000 / 10000 failures 946 elapsed_s 194.6
+double_gross 0.12 5000 / 10000 failures 1166 elapsed_s 243.7
+double_gross 0.12 6000 / 10000 failures 1376 elapsed_s 289.2
+double_gross 0.12 7000 / 10000 failures 1570 elapsed_s 333.2
+double_gross 0.12 8000 / 10000 failures 1783 elapsed_s 378.5
+double_gross 0.12 9000 / 10000 failures 1966 elapsed_s 421.3
+double_gross 0.12 10000 / 10000 failures 2173 elapsed_s 466.4
+{"check_rule": "unscaled_unoffset_min_sum", "code": "double_gross", "counts": {"exact_success": 5792, "shots": 10000, "stabilizer_success": 2035, "total_iterations": 2739045, "type_i": 2172, "type_ii": 1}, "damping": 0.0, "decoder_p0": 0.12, "elapsed_seconds": 466.42093221470714, "event_ledger": "events.jsonl.gz", "event_ledger_uncompressed_sha256": "552012e336c01a9f16e7a97e1bd485551ba87b8d5cf582d2e3c6d915323b4e63", "failures": 2173, "ler": 0.2173, "lower_95": 0.20925016932035487, "max_iterations": 1000, "mean_iterations": 273.9045, "physical_p": 0.12, "projection": "exact_logsumexp_difference_then_q8_scalar", "q8_scalar_scale": 16, "sampler": "numpy.PCG64; existing full-v2 point seed", "schema": "experimental-bp4-ms-both-changes-curve-v1", "seed": 20261221, "source_ler": 0.21935, "source_point_type": "observed", "upper_95": 0.22551478999276944, "upper_95_one_sided_if_zero": null, "v2c_format": "float64_unbounded_three_identity_llrs"}

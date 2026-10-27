@@ -1,0 +1,11 @@
+double_gross 0.06 1000 / 10000 failures 3 elapsed_s 2.1
+double_gross 0.06 2000 / 10000 failures 6 elapsed_s 4.4
+double_gross 0.06 3000 / 10000 failures 11 elapsed_s 6.9
+double_gross 0.06 4000 / 10000 failures 15 elapsed_s 9.1
+double_gross 0.06 5000 / 10000 failures 19 elapsed_s 11.4
+double_gross 0.06 6000 / 10000 failures 22 elapsed_s 13.6
+double_gross 0.06 7000 / 10000 failures 26 elapsed_s 15.9
+double_gross 0.06 8000 / 10000 failures 30 elapsed_s 18.3
+double_gross 0.06 9000 / 10000 failures 33 elapsed_s 20.5
+double_gross 0.06 10000 / 10000 failures 35 elapsed_s 22.5
+{"check_rule": "unscaled_unoffset_min_sum", "code": "double_gross", "counts": {"exact_success": 9585, "shots": 10000, "stabilizer_success": 380, "total_iterations": 121463, "type_i": 35, "type_ii": 0}, "damping": 0.0, "decoder_p0": 0.06, "elapsed_seconds": 22.539999053813517, "event_ledger": "events.jsonl.gz", "event_ledger_uncompressed_sha256": "be7c23f6ef519681af2513856b420b5d58ee0f0d4c6639eb0b6ad8fca7bf03f3", "failures": 35, "ler": 0.0035, "lower_95": 0.0024390524530913376, "max_iterations": 1000, "mean_iterations": 12.1463, "physical_p": 0.06, "projection": "exact_logsumexp_difference_then_q8_scalar", "q8_scalar_scale": 16, "sampler": "numpy.PCG64; existing full-v2 point seed", "schema": "experimental-bp4-ms-both-changes-curve-v1", "seed": 20261218, "source_ler": 0.00245, "source_point_type": "observed", "upper_95": 0.0048643228515713975, "upper_95_one_sided_if_zero": null, "v2c_format": "float64_unbounded_three_identity_llrs"}

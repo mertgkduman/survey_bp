@@ -1,0 +1,42 @@
+{
+  "check_rule": "unscaled_unoffset_min_sum",
+  "code": "b1",
+  "counts": {
+    "exact_success": 846,
+    "shots": 10000,
+    "stabilizer_success": 3314,
+    "total_iterations": 6672001,
+    "type_i": 5840,
+    "type_ii": 0
+  },
+  "damping": 0.0,
+  "decoder_p0": 0.14,
+  "elapsed_seconds": 3243.218296497129,
+  "end_shot_exclusive": 10000,
+  "event_ledger": "events.jsonl.gz",
+  "event_ledger_uncompressed_sha256": "c1adfc59c2550baa45b46524c472f4d2dc6e6e537c38c33adab88dddc94ee8ad",
+  "failures": 5840,
+  "ler": 0.584,
+  "lower_95": 0.5742661552177148,
+  "max_iterations": 1000,
+  "mean_iterations": 667.2001,
+  "physical_p": 0.14,
+  "projection": "exact_logsumexp_difference_then_q8_scalar",
+  "q8_scalar_scale": 16,
+  "sampler": "numpy.PCG64; existing full-v2 point seed",
+  "schema": "experimental-bp4-ms-both-changes-curve-v1",
+  "seed": 20261215,
+  "shards": [
+    "shards/b1_p0140_shard0",
+    "shards/b1_p0140_shard1",
+    "shards/b1_p0140_shard2",
+    "shards/b1_p0140_shard3",
+    "shards/b1_p0140_shard4"
+  ],
+  "source_ler": 0.581,
+  "source_point_type": "observed",
+  "start_shot": 0,
+  "upper_95": 0.5936848943904853,
+  "upper_95_one_sided_if_zero": null,
+  "v2c_format": "float64_unbounded_three_identity_llrs"
+}

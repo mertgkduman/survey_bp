@@ -1,0 +1,11 @@
+b1 0.12 1000 / 10000 failures 100 elapsed_s 88.4
+b1 0.12 2000 / 10000 failures 181 elapsed_s 175.6
+b1 0.12 3000 / 10000 failures 286 elapsed_s 275.3
+b1 0.12 4000 / 10000 failures 374 elapsed_s 367.9
+b1 0.12 5000 / 10000 failures 475 elapsed_s 472.0
+b1 0.12 6000 / 10000 failures 573 elapsed_s 573.7
+b1 0.12 7000 / 10000 failures 673 elapsed_s 668.7
+b1 0.12 8000 / 10000 failures 772 elapsed_s 761.8
+b1 0.12 9000 / 10000 failures 872 elapsed_s 854.9
+b1 0.12 10000 / 10000 failures 963 elapsed_s 944.6
+{"check_rule": "unscaled_unoffset_min_sum", "code": "b1", "counts": {"exact_success": 2797, "shots": 10000, "stabilizer_success": 6240, "total_iterations": 1852372, "type_i": 963, "type_ii": 0}, "damping": 0.0, "decoder_p0": 0.12, "elapsed_seconds": 944.6413168329746, "event_ledger": "events.jsonl.gz", "event_ledger_uncompressed_sha256": "fd174a3dd1b578486dfac2980190210f7bbc0cc9f4042294742166d9dd39ecc1", "failures": 963, "ler": 0.0963, "lower_95": 0.09058623513727872, "max_iterations": 1000, "mean_iterations": 185.2372, "physical_p": 0.12, "projection": "exact_logsumexp_difference_then_q8_scalar", "q8_scalar_scale": 16, "sampler": "numpy.PCG64; existing full-v2 point seed", "schema": "experimental-bp4-ms-both-changes-curve-v1", "seed": 20261214, "source_ler": 0.0931, "source_point_type": "observed", "upper_95": 0.1022500862650777, "upper_95_one_sided_if_zero": null, "v2c_format": "float64_unbounded_three_identity_llrs"}
