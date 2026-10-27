@@ -74,8 +74,8 @@ before the product. Products are accumulated in graph edge order. The v2
 profile rejects nonfinite internal values. The code-capacity kernels here
 require strictly positive four-state BP4 priors; exact-zero support from the
 separate Python reference described in the investigation is not implemented.
-These are float64 policies, so the presentation's Q8 rounding, scale, and
-saturation settings are distinct experiments.
+These are float64 policies; Q8 rounding, scale, and saturation settings are
+distinct experiments.
 
 ## Versioned compatibility
 
