@@ -16,6 +16,8 @@ Keep presentation source values, decoder policy files, local measurements, and p
 - Use deterministic paired error streams, per-shot JSONL ledgers, seed and denominator fields, and ledger hashes.
 - Verify CSS code parameters and stabilizer/logical outcome semantics before interpreting decoder rates.
 - Mark unspecified source numerical choices as assumptions; never call an adaptation a source-faithful reproduction.
+- Freeze candidate policies on screening seeds before measuring independent holdouts; retain unfavorable arms and inconclusive paired comparisons.
+- Preserve the evidence identity and behavior of frozen numerical v1 profiles. Promote changed clipping, check safeguards, tie rules, or damping under a new profile ID, and replay selected held-out shots through production code.
 
 ## Tools and libraries
 
