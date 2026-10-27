@@ -1,0 +1,51 @@
+{
+  "arms": {
+    "both_changes": {
+      "exact_success": 182,
+      "shots": 200,
+      "stabilizer_success": 18,
+      "total_iterations": 2873,
+      "type_i": 0,
+      "type_ii": 0
+    },
+    "exact_projection_only": {
+      "exact_success": 149,
+      "shots": 200,
+      "stabilizer_success": 8,
+      "total_iterations": 44623,
+      "type_i": 43,
+      "type_ii": 0
+    },
+    "q8_original": {
+      "exact_success": 145,
+      "shots": 200,
+      "stabilizer_success": 4,
+      "total_iterations": 52561,
+      "type_i": 51,
+      "type_ii": 0
+    },
+    "unbounded_v2c_only": {
+      "exact_success": 146,
+      "shots": 200,
+      "stabilizer_success": 4,
+      "total_iterations": 51665,
+      "type_i": 50,
+      "type_ii": 0
+    }
+  },
+  "check_rule": "unscaled_unoffset_min_sum",
+  "code": "double_gross",
+  "damping": 0.0,
+  "decoder_p0": 0.08,
+  "event_ledger_sha256": "fd301791373e007c8b709a20ae8572df02d214a4660f098519ff0c202de98e5a",
+  "first_sweep_original_v2c_proposals_outside_q8_range": 583212,
+  "first_sweep_original_v2c_proposals_total": 1036800,
+  "max_iterations": 1000,
+  "pauli_order": "I,X,Y,Z",
+  "physical_p": 0.08,
+  "q8_scale": 16,
+  "sampler": "numpy.PCG64; shared errors for all arms",
+  "schema": "experimental-bp4-q8-ms-clipping-ablation-v1",
+  "seed": 20261031,
+  "shots": 200
+}
