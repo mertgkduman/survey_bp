@@ -147,6 +147,48 @@ def main() -> None:
     }
     (RESULTS / ("partial_analysis.json" if missing else "analysis.json")).write_text(
         json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    lines = ["# Full v2 presentation-curve comparison", "",
+             f"Completed {report['completed_points']}/{report['required_points']} code/probability jobs; "
+             f"{len(rows)} local arm points for {len(source)} presentation values.", "",
+             "Each count is a block failure out of the stated number of paired code-capacity "
+             "shots. Type I means no syndrome match; Type II means a matched syndrome "
+             "with a nontrivial logical residual. Stabilizer-equivalent outcomes succeed.", "",
+             "The source's observed-point denominators were not provided. Its double-Gross "
+             "BP4 point at p=.06 is an upper bound, not an observed rate. A source rate "
+             "inside a local confidence interval is a descriptive proximity check only.", ""]
+    for code, title in (("b1", "B1 [[882,24]]"),
+                        ("double_gross", "double-Gross [[288,12,18]]")):
+        lines.extend([f"## {title}", "",
+                      "| p | Local arm | Failures / N | Local LER or zero bound | "
+                      "95% local CI | Source rate/bound | Type I / II | Mean BP4 work |",
+                      "|---:|---|---:|---:|---:|---:|---:|---:|"])
+        for r in sorted((r for r in rows if r["code"] == code),
+                        key=lambda x: (x["p"], x["arm"])):
+            local = (float(r["ler"]) if r["failures"] else
+                     float(r["upper_95_one_sided_if_zero"]))
+            suffix = " (upper)" if r["failures"] == 0 else ""
+            source_suffix = " (upper)" if r["source_point_type"] != "observed" else ""
+            lines.append(
+                f"| {r['p']:.3f} | `{r['arm']}` | {r['failures']:,}/{r['shots']:,} | "
+                f"{local:.3g}{suffix} | "
+                f"[{float(r['lower_95_two_sided']):.3g}, {float(r['upper_95_two_sided']):.3g}] | "
+                f"{float(r['source_rate_or_bound']):.3g}{source_suffix} | "
+                f"{r['type_i']:,} / {r['type_ii']:,} | {float(r['mean_work']):.3g} |"
+            )
+        lines.append("")
+    lines.extend(["## Interpretation limits", "",
+                  "The float64 v2 BP4 arms change the presentation's Q8 numerical policy; "
+                  "the binary SPA v2 arm also changes the presentation's OMS check rule. "
+                  "The local Q8 MS/OMS controls are experimental implementations, not "
+                  "the canonical v2 kernels. Differences therefore identify a curve gap "
+                  "but do not by themselves identify its mechanism.", "",
+                  "The planned sample counts were fixed before these runs from the "
+                  "source rates. When a local rate is much higher or lower, its observed "
+                  "failure count can differ substantially from the target of 30.", "",
+                  f"Ledger verification: {ledger_count:,} records checked." if not args.skip_ledger_hash
+                  else "Ledger hash verification was skipped in this analysis run.", ""])
+    markdown = RESULTS / ("partial_report.md" if missing else "REPORT.md")
+    markdown.write_text("\n".join(lines), encoding="utf-8")
     print(json.dumps(report, indent=2))
 
 

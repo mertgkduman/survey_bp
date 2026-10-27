@@ -68,6 +68,6 @@ denominator.
 
 Each `b1_p####` or `double_gross_p####` folder contains `events.jsonl.gz`
 and, on completion, `summary.json`. The analyzer writes `comparison.csv`,
-`curves.png`, and `analysis.json` after all jobs finish. `logs/` retains Slurm
+`curves.png`, `analysis.json`, and `REPORT.md` after all jobs finish. `logs/` retains Slurm
 stdout and stderr. The `smoke_*` and `benchmark_*` directories are preflight
 checks and are excluded from campaign analysis.
