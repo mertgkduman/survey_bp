@@ -1,0 +1,44 @@
+{
+  "status": "heldout",
+  "code": "b1",
+  "physical_p": 0.12,
+  "shots": 5000,
+  "seed": 20261106,
+  "max_iterations": 1000,
+  "check_shape": [
+    [
+      441,
+      882
+    ],
+    [
+      441,
+      882
+    ]
+  ],
+  "pauli_order": "I,X,Y,Z",
+  "binary_marginal_prior_by_arm": {
+    "product_e10_d01": 0.08
+  },
+  "configs": [
+    {
+      "id": "product_e10_d01",
+      "family": "bp4_numeric",
+      "check": "product",
+      "product_epsilon": 1e-10,
+      "damping": 0.1
+    }
+  ],
+  "counts": {
+    "product_e10_d01": {
+      "failures": 35,
+      "type_i": 35,
+      "type_ii": 0,
+      "exact_success": 1312,
+      "stabilizer_success": 3653,
+      "total_work_iterations": 136042.0,
+      "total_elapsed_seconds": 136.5065177399665
+    }
+  },
+  "event_ledger": "events.jsonl",
+  "event_ledger_sha256": "1cf79c68ddeb5a4e10ecc5a385274113368d576ea96b770574bec5628f748ae5"
+}

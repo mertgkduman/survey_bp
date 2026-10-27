@@ -1,0 +1,95 @@
+{
+  "status": "heldout",
+  "code": "b1",
+  "physical_p": 0.1,
+  "shots": 20000,
+  "seed": 20261102,
+  "max_iterations": 1000,
+  "check_shape": [
+    [
+      441,
+      882
+    ],
+    [
+      441,
+      882
+    ]
+  ],
+  "pauli_order": "I,X,Y,Z",
+  "binary_marginal_prior_by_arm": {
+    "product_e10_d01": 0.06666666666666667,
+    "boxplus_cap25_d01": 0.06666666666666667,
+    "boxplus_uncapped_d01": 0.06666666666666667,
+    "product_e10_d0": 0.06666666666666667
+  },
+  "configs": [
+    {
+      "id": "product_e10_d01",
+      "family": "bp4_numeric",
+      "check": "product",
+      "product_epsilon": 1e-10,
+      "damping": 0.1
+    },
+    {
+      "id": "boxplus_cap25_d01",
+      "family": "bp4_numeric",
+      "check": "boxplus",
+      "check_cap": 25.0,
+      "damping": 0.1
+    },
+    {
+      "id": "boxplus_uncapped_d01",
+      "family": "bp4_numeric",
+      "check": "boxplus",
+      "check_cap": null,
+      "damping": 0.1
+    },
+    {
+      "id": "product_e10_d0",
+      "family": "bp4_numeric",
+      "check": "product",
+      "product_epsilon": 1e-10,
+      "damping": 0.0
+    }
+  ],
+  "counts": {
+    "product_e10_d01": {
+      "failures": 8,
+      "type_i": 8,
+      "type_ii": 0,
+      "exact_success": 9668,
+      "stabilizer_success": 10324,
+      "total_work_iterations": 241577.0,
+      "total_elapsed_seconds": 259.1064227949828
+    },
+    "boxplus_cap25_d01": {
+      "failures": 12,
+      "type_i": 12,
+      "type_ii": 0,
+      "exact_success": 9680,
+      "stabilizer_success": 10308,
+      "total_work_iterations": 245017.0,
+      "total_elapsed_seconds": 347.73122949898243
+    },
+    "boxplus_uncapped_d01": {
+      "failures": 46,
+      "type_i": 46,
+      "type_ii": 0,
+      "exact_success": 9584,
+      "stabilizer_success": 10370,
+      "total_work_iterations": 274557.0,
+      "total_elapsed_seconds": 371.2688706954941
+    },
+    "product_e10_d0": {
+      "failures": 19,
+      "type_i": 19,
+      "type_ii": 0,
+      "exact_success": 10242,
+      "stabilizer_success": 9739,
+      "total_work_iterations": 637829.0,
+      "total_elapsed_seconds": 521.3905877070501
+    }
+  },
+  "event_ledger": "events.jsonl",
+  "event_ledger_sha256": "ea170ad798a78285dff7132d9b27b2614373a1c40b4ac30c8d712a5f96eeded7"
+}

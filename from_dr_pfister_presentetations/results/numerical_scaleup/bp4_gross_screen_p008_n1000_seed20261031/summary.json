@@ -1,0 +1,166 @@
+{
+  "status": "exploratory_numeric_policy_screen",
+  "code": "double_gross",
+  "physical_p": 0.08,
+  "shots": 1000,
+  "seed": 20261031,
+  "max_iterations": 1000,
+  "check_shape": [
+    [
+      144,
+      288
+    ],
+    [
+      144,
+      288
+    ]
+  ],
+  "pauli_order": "I,X,Y,Z",
+  "binary_marginal_prior": 0.05333333333333334,
+  "configs": [
+    {
+      "id": "product_e10_d0",
+      "family": "bp4_numeric",
+      "check": "product",
+      "product_epsilon": 1e-10,
+      "damping": 0.0
+    },
+    {
+      "id": "product_e12_d0",
+      "family": "bp4_numeric",
+      "check": "product",
+      "product_epsilon": 1e-12,
+      "damping": 0.0
+    },
+    {
+      "id": "boxplus_cap25_d0",
+      "family": "bp4_numeric",
+      "check": "boxplus",
+      "check_cap": 25.0,
+      "damping": 0.0
+    },
+    {
+      "id": "boxplus_cap50_d0",
+      "family": "bp4_numeric",
+      "check": "boxplus",
+      "check_cap": 50.0,
+      "damping": 0.0
+    },
+    {
+      "id": "boxplus_uncapped_d0",
+      "family": "bp4_numeric",
+      "check": "boxplus",
+      "check_cap": null,
+      "damping": 0.0
+    },
+    {
+      "id": "product_e10_d01",
+      "family": "bp4_numeric",
+      "check": "product",
+      "product_epsilon": 1e-10,
+      "damping": 0.1
+    },
+    {
+      "id": "boxplus_uncapped_d01",
+      "family": "bp4_numeric",
+      "check": "boxplus",
+      "check_cap": null,
+      "damping": 0.1
+    },
+    {
+      "id": "legacy_f64_clip25",
+      "family": "bp4_legacy"
+    },
+    {
+      "id": "slide_q8_s4_d01",
+      "family": "bp4_q8",
+      "scale": 4,
+      "damping": 0.1
+    }
+  ],
+  "counts": {
+    "product_e10_d0": {
+      "failures": 1,
+      "type_i": 1,
+      "type_ii": 0,
+      "exact_success": 908,
+      "stabilizer_success": 91,
+      "total_work_iterations": 10040.0,
+      "total_elapsed_seconds": 2.9791128700599074
+    },
+    "product_e12_d0": {
+      "failures": 1,
+      "type_i": 1,
+      "type_ii": 0,
+      "exact_success": 902,
+      "stabilizer_success": 97,
+      "total_work_iterations": 9740.0,
+      "total_elapsed_seconds": 3.077592760324478
+    },
+    "boxplus_cap25_d0": {
+      "failures": 1,
+      "type_i": 1,
+      "type_ii": 0,
+      "exact_success": 907,
+      "stabilizer_success": 92,
+      "total_work_iterations": 10333.0,
+      "total_elapsed_seconds": 3.890859273262322
+    },
+    "boxplus_cap50_d0": {
+      "failures": 1,
+      "type_i": 1,
+      "type_ii": 0,
+      "exact_success": 909,
+      "stabilizer_success": 90,
+      "total_work_iterations": 9920.0,
+      "total_elapsed_seconds": 3.927935378625989
+    },
+    "boxplus_uncapped_d0": {
+      "failures": 17,
+      "type_i": 17,
+      "type_ii": 0,
+      "exact_success": 898,
+      "stabilizer_success": 85,
+      "total_work_iterations": 23737.0,
+      "total_elapsed_seconds": 8.619097418151796
+    },
+    "product_e10_d01": {
+      "failures": 0,
+      "type_i": 0,
+      "type_ii": 0,
+      "exact_success": 898,
+      "stabilizer_success": 102,
+      "total_work_iterations": 5926.0,
+      "total_elapsed_seconds": 2.0059514539316297
+    },
+    "boxplus_uncapped_d01": {
+      "failures": 2,
+      "type_i": 2,
+      "type_ii": 0,
+      "exact_success": 900,
+      "stabilizer_success": 98,
+      "total_work_iterations": 7614.0,
+      "total_elapsed_seconds": 2.7893019458279014
+    },
+    "legacy_f64_clip25": {
+      "failures": 116,
+      "type_i": 116,
+      "type_ii": 0,
+      "exact_success": 810,
+      "stabilizer_success": 74,
+      "total_work_iterations": 139780.0,
+      "total_elapsed_seconds": 57.253166367299855
+    },
+    "slide_q8_s4_d01": {
+      "failures": 55,
+      "type_i": 55,
+      "type_ii": 0,
+      "exact_success": 867,
+      "stabilizer_success": 78,
+      "total_work_iterations": 59884.0,
+      "total_elapsed_seconds": 26.50597634445876
+    }
+  },
+  "event_ledger": "events.jsonl",
+  "event_ledger_sha256": "eb176ff09fb9514b24e653cc4fde5448cb38abfb59cf0566586f084558a3bed8"
+}

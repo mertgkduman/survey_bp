@@ -1,0 +1,5 @@
+[
+  {"id":"bp4_v2_product_d01_p0_010","family":"bp4_numeric","check":"product","product_epsilon":1e-10,"damping":0.1,"initial_p":0.1},
+  {"id":"bp4_v2_product_d0_p0_010","family":"bp4_numeric","check":"product","product_epsilon":1e-10,"damping":0.0,"initial_p":0.1},
+  {"id":"bp4_v1_clip25_p0_010","family":"bp4_legacy","initial_p":0.1}
+]

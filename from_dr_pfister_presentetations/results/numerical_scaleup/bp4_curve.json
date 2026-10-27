@@ -1,0 +1,5 @@
+[
+  {"id":"product_e10_d01","family":"bp4_numeric","check":"product","product_epsilon":1e-10,"damping":0.1},
+  {"id":"boxplus_cap25_d01","family":"bp4_numeric","check":"boxplus","check_cap":25.0,"damping":0.1},
+  {"id":"boxplus_uncapped_d01","family":"bp4_numeric","check":"boxplus","check_cap":null,"damping":0.1}
+]

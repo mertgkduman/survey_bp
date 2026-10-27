@@ -1,0 +1,20 @@
+{
+  "schema": "numerical-decoder-policy-v2",
+  "id": "canonical_bp4_f64_v2",
+  "family": "joint_pauli_bp4",
+  "profile_id": "quaternary-bp4-f64-v2",
+  "source_fidelity": "canonical_adaptation_of_presentation_tuned_sp; float64_is_not_presentation_q8",
+  "pauli_order": "I,X,Y,Z",
+  "noise": "depolarizing_code_capacity",
+  "prior": "(1-p0,p0/3,p0/3,p0/3); p0=p in reported heldout runs",
+  "check_rule": "direct_extrinsic_tanh_product",
+  "check_product_unity_epsilon": 1e-10,
+  "check_cap": null,
+  "global_prior_posterior_v2c_clip": null,
+  "tie_rule": "strict_I_then_X_then_Z_else_Y",
+  "damping": {"coefficient_old": 0.1, "target": "variable_to_check"},
+  "schedule": "flooding",
+  "max_iterations": 1000,
+  "stop": "first_completed_syndrome_match",
+  "selection": "screen_seeds_20261031_20261101; heldout_seeds_20261102_20261103"
+}

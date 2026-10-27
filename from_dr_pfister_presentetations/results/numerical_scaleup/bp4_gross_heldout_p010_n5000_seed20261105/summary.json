@@ -1,0 +1,78 @@
+{
+  "status": "heldout",
+  "code": "double_gross",
+  "physical_p": 0.1,
+  "shots": 5000,
+  "seed": 20261105,
+  "max_iterations": 1000,
+  "check_shape": [
+    [
+      144,
+      288
+    ],
+    [
+      144,
+      288
+    ]
+  ],
+  "pauli_order": "I,X,Y,Z",
+  "binary_marginal_prior_by_arm": {
+    "product_e10_d01": 0.06666666666666667,
+    "boxplus_cap25_d01": 0.06666666666666667,
+    "boxplus_uncapped_d01": 0.06666666666666667
+  },
+  "configs": [
+    {
+      "id": "product_e10_d01",
+      "family": "bp4_numeric",
+      "check": "product",
+      "product_epsilon": 1e-10,
+      "damping": 0.1
+    },
+    {
+      "id": "boxplus_cap25_d01",
+      "family": "bp4_numeric",
+      "check": "boxplus",
+      "check_cap": 25.0,
+      "damping": 0.1
+    },
+    {
+      "id": "boxplus_uncapped_d01",
+      "family": "bp4_numeric",
+      "check": "boxplus",
+      "check_cap": null,
+      "damping": 0.1
+    }
+  ],
+  "counts": {
+    "product_e10_d01": {
+      "failures": 75,
+      "type_i": 73,
+      "type_ii": 2,
+      "exact_success": 3944,
+      "stabilizer_success": 981,
+      "total_work_iterations": 125181.0,
+      "total_elapsed_seconds": 44.89987764880061
+    },
+    "boxplus_cap25_d01": {
+      "failures": 77,
+      "type_i": 75,
+      "type_ii": 2,
+      "exact_success": 3944,
+      "stabilizer_success": 979,
+      "total_work_iterations": 124620.0,
+      "total_elapsed_seconds": 50.90954539179802
+    },
+    "boxplus_uncapped_d01": {
+      "failures": 99,
+      "type_i": 99,
+      "type_ii": 0,
+      "exact_success": 3933,
+      "stabilizer_success": 968,
+      "total_work_iterations": 142943.0,
+      "total_elapsed_seconds": 67.91559536475688
+    }
+  },
+  "event_ledger": "events.jsonl",
+  "event_ledger_sha256": "6a92a2aeb360a424f7471650a4eb9b77e02f959122ae62fb88beb9ec6e91552e"
+}

@@ -1,0 +1,78 @@
+{
+  "status": "control",
+  "code": "miao_toric_d4",
+  "physical_p": 0.075,
+  "shots": 10000,
+  "seed": 20261104,
+  "max_iterations": 25,
+  "check_shape": [
+    [
+      15,
+      32
+    ],
+    [
+      15,
+      32
+    ]
+  ],
+  "pauli_order": "I,X,Y,Z",
+  "binary_marginal_prior_by_arm": {
+    "bp4_v2_product_d01_p0_010": 0.06666666666666667,
+    "bp4_v2_product_d0_p0_010": 0.06666666666666667,
+    "bp4_v1_clip25_p0_010": 0.06666666666666667
+  },
+  "configs": [
+    {
+      "id": "bp4_v2_product_d01_p0_010",
+      "family": "bp4_numeric",
+      "check": "product",
+      "product_epsilon": 1e-10,
+      "damping": 0.1,
+      "initial_p": 0.1
+    },
+    {
+      "id": "bp4_v2_product_d0_p0_010",
+      "family": "bp4_numeric",
+      "check": "product",
+      "product_epsilon": 1e-10,
+      "damping": 0.0,
+      "initial_p": 0.1
+    },
+    {
+      "id": "bp4_v1_clip25_p0_010",
+      "family": "bp4_legacy",
+      "initial_p": 0.1
+    }
+  ],
+  "counts": {
+    "bp4_v2_product_d01_p0_010": {
+      "failures": 1489,
+      "type_i": 1308,
+      "type_ii": 181,
+      "exact_success": 8262,
+      "stabilizer_success": 249,
+      "total_work_iterations": 55698.0,
+      "total_elapsed_seconds": 1.5509246923029423
+    },
+    "bp4_v2_product_d0_p0_010": {
+      "failures": 1560,
+      "type_i": 1407,
+      "type_ii": 153,
+      "exact_success": 8231,
+      "stabilizer_success": 209,
+      "total_work_iterations": 56613.0,
+      "total_elapsed_seconds": 1.3832223024219275
+    },
+    "bp4_v1_clip25_p0_010": {
+      "failures": 1560,
+      "type_i": 1407,
+      "type_ii": 153,
+      "exact_success": 8231,
+      "stabilizer_success": 209,
+      "total_work_iterations": 55796.0,
+      "total_elapsed_seconds": 1.0331576354801655
+    }
+  },
+  "event_ledger": "events.jsonl",
+  "event_ledger_sha256": "46418c3c3f068e4c2027efe704758e6ca415aadde0c5614a09ad55e2c8763b71"
+}

@@ -1,0 +1,11 @@
+[
+  {"id":"product_e10_d0","family":"bp4_numeric","check":"product","product_epsilon":1e-10,"damping":0.0},
+  {"id":"product_e12_d0","family":"bp4_numeric","check":"product","product_epsilon":1e-12,"damping":0.0},
+  {"id":"boxplus_cap25_d0","family":"bp4_numeric","check":"boxplus","check_cap":25.0,"damping":0.0},
+  {"id":"boxplus_cap50_d0","family":"bp4_numeric","check":"boxplus","check_cap":50.0,"damping":0.0},
+  {"id":"boxplus_uncapped_d0","family":"bp4_numeric","check":"boxplus","check_cap":null,"damping":0.0},
+  {"id":"product_e10_d01","family":"bp4_numeric","check":"product","product_epsilon":1e-10,"damping":0.1},
+  {"id":"boxplus_uncapped_d01","family":"bp4_numeric","check":"boxplus","check_cap":null,"damping":0.1},
+  {"id":"legacy_f64_clip25","family":"bp4_legacy"},
+  {"id":"slide_q8_s4_d01","family":"bp4_q8","scale":4,"damping":0.1}
+]
