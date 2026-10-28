@@ -1,0 +1,1275 @@
+{
+  "design": "fixed paired N chosen before local results; ceil(125 / published Q-BP point estimate)",
+  "expected_source_failures_per_point": 125,
+  "points": [
+    {
+      "code": "a5",
+      "expected_source_failures": 125.10810000000001,
+      "p": 0.1,
+      "planned_shots": 867,
+      "seed": 231210960,
+      "source_qbp_rate": 0.1443
+    },
+    {
+      "code": "b2",
+      "expected_source_failures": 125.055798,
+      "p": 0.1,
+      "planned_shots": 2073,
+      "seed": 231211060,
+      "source_qbp_rate": 0.060326
+    },
+    {
+      "code": "a5",
+      "expected_source_failures": 125.047397,
+      "p": 0.09,
+      "planned_shots": 1333,
+      "seed": 231210959,
+      "source_qbp_rate": 0.093809
+    },
+    {
+      "code": "b2",
+      "expected_source_failures": 125.01644,
+      "p": 0.09,
+      "planned_shots": 4198,
+      "seed": 231211059,
+      "source_qbp_rate": 0.02978
+    },
+    {
+      "code": "a5",
+      "expected_source_failures": 125.01960299999999,
+      "p": 0.08,
+      "planned_shots": 3153,
+      "seed": 231210958,
+      "source_qbp_rate": 0.039651
+    },
+    {
+      "code": "b2",
+      "expected_source_failures": 125.003407,
+      "p": 0.08,
+      "planned_shots": 8291,
+      "seed": 231211058,
+      "source_qbp_rate": 0.015077
+    },
+    {
+      "code": "a5",
+      "expected_source_failures": 125.011624,
+      "p": 0.07,
+      "planned_shots": 10442,
+      "seed": 231210957,
+      "source_qbp_rate": 0.011972
+    },
+    {
+      "code": "b2",
+      "expected_source_failures": 125.00127499999999,
+      "p": 0.07,
+      "planned_shots": 18505,
+      "seed": 231211057,
+      "source_qbp_rate": 0.006755
+    },
+    {
+      "code": "a5",
+      "expected_source_failures": 125.00162999999999,
+      "p": 0.06,
+      "planned_shots": 39570,
+      "seed": 231210956,
+      "source_qbp_rate": 0.003159
+    },
+    {
+      "code": "b2",
+      "expected_source_failures": 125.002402,
+      "p": 0.06,
+      "planned_shots": 48658,
+      "seed": 231211056,
+      "source_qbp_rate": 0.002569
+    },
+    {
+      "code": "a5",
+      "expected_source_failures": 125.00082,
+      "p": 0.05,
+      "planned_shots": 142695,
+      "seed": 231210955,
+      "source_qbp_rate": 0.000876
+    },
+    {
+      "code": "b2",
+      "expected_source_failures": 125.00097500000001,
+      "p": 0.05,
+      "planned_shots": 98815,
+      "seed": 231211055,
+      "source_qbp_rate": 0.001265
+    },
+    {
+      "code": "a5",
+      "expected_source_failures": 125.000232,
+      "p": 0.04,
+      "planned_shots": 529662,
+      "seed": 231210954,
+      "source_qbp_rate": 0.000236
+    },
+    {
+      "code": "b2",
+      "expected_source_failures": 125.000092,
+      "p": 0.04,
+      "planned_shots": 307882,
+      "seed": 231211054,
+      "source_qbp_rate": 0.000406
+    }
+  ],
+  "schema": "yao-vanilla-campaign-plan-v1",
+  "shard_size": 10000,
+  "source_points_sha256": "fec793a8c0ed407d0dde68d66bc3f15f7205cacc0b2046aa229fd4baf3a90f93",
+  "tasks": [
+    {
+      "code": "a5",
+      "index": 0,
+      "output": "results/shards/a5_p10_0000000",
+      "p": 0.1,
+      "seed": 231210960,
+      "shots": 867,
+      "start_shot": 0
+    },
+    {
+      "code": "b2",
+      "index": 1,
+      "output": "results/shards/b2_p10_0000000",
+      "p": 0.1,
+      "seed": 231211060,
+      "shots": 2073,
+      "start_shot": 0
+    },
+    {
+      "code": "a5",
+      "index": 2,
+      "output": "results/shards/a5_p09_0000000",
+      "p": 0.09,
+      "seed": 231210959,
+      "shots": 1333,
+      "start_shot": 0
+    },
+    {
+      "code": "b2",
+      "index": 3,
+      "output": "results/shards/b2_p09_0000000",
+      "p": 0.09,
+      "seed": 231211059,
+      "shots": 4198,
+      "start_shot": 0
+    },
+    {
+      "code": "a5",
+      "index": 4,
+      "output": "results/shards/a5_p08_0000000",
+      "p": 0.08,
+      "seed": 231210958,
+      "shots": 3153,
+      "start_shot": 0
+    },
+    {
+      "code": "b2",
+      "index": 5,
+      "output": "results/shards/b2_p08_0000000",
+      "p": 0.08,
+      "seed": 231211058,
+      "shots": 8291,
+      "start_shot": 0
+    },
+    {
+      "code": "a5",
+      "index": 6,
+      "output": "results/shards/a5_p07_0000000",
+      "p": 0.07,
+      "seed": 231210957,
+      "shots": 10000,
+      "start_shot": 0
+    },
+    {
+      "code": "a5",
+      "index": 7,
+      "output": "results/shards/a5_p07_0010000",
+      "p": 0.07,
+      "seed": 231210957,
+      "shots": 442,
+      "start_shot": 10000
+    },
+    {
+      "code": "b2",
+      "index": 8,
+      "output": "results/shards/b2_p07_0000000",
+      "p": 0.07,
+      "seed": 231211057,
+      "shots": 10000,
+      "start_shot": 0
+    },
+    {
+      "code": "b2",
+      "index": 9,
+      "output": "results/shards/b2_p07_0010000",
+      "p": 0.07,
+      "seed": 231211057,
+      "shots": 8505,
+      "start_shot": 10000
+    },
+    {
+      "code": "a5",
+      "index": 10,
+      "output": "results/shards/a5_p06_0000000",
+      "p": 0.06,
+      "seed": 231210956,
+      "shots": 10000,
+      "start_shot": 0
+    },
+    {
+      "code": "a5",
+      "index": 11,
+      "output": "results/shards/a5_p06_0010000",
+      "p": 0.06,
+      "seed": 231210956,
+      "shots": 10000,
+      "start_shot": 10000
+    },
+    {
+      "code": "a5",
+      "index": 12,
+      "output": "results/shards/a5_p06_0020000",
+      "p": 0.06,
+      "seed": 231210956,
+      "shots": 10000,
+      "start_shot": 20000
+    },
+    {
+      "code": "a5",
+      "index": 13,
+      "output": "results/shards/a5_p06_0030000",
+      "p": 0.06,
+      "seed": 231210956,
+      "shots": 9570,
+      "start_shot": 30000
+    },
+    {
+      "code": "b2",
+      "index": 14,
+      "output": "results/shards/b2_p06_0000000",
+      "p": 0.06,
+      "seed": 231211056,
+      "shots": 10000,
+      "start_shot": 0
+    },
+    {
+      "code": "b2",
+      "index": 15,
+      "output": "results/shards/b2_p06_0010000",
+      "p": 0.06,
+      "seed": 231211056,
+      "shots": 10000,
+      "start_shot": 10000
+    },
+    {
+      "code": "b2",
+      "index": 16,
+      "output": "results/shards/b2_p06_0020000",
+      "p": 0.06,
+      "seed": 231211056,
+      "shots": 10000,
+      "start_shot": 20000
+    },
+    {
+      "code": "b2",
+      "index": 17,
+      "output": "results/shards/b2_p06_0030000",
+      "p": 0.06,
+      "seed": 231211056,
+      "shots": 10000,
+      "start_shot": 30000
+    },
+    {
+      "code": "b2",
+      "index": 18,
+      "output": "results/shards/b2_p06_0040000",
+      "p": 0.06,
+      "seed": 231211056,
+      "shots": 8658,
+      "start_shot": 40000
+    },
+    {
+      "code": "a5",
+      "index": 19,
+      "output": "results/shards/a5_p05_0000000",
+      "p": 0.05,
+      "seed": 231210955,
+      "shots": 10000,
+      "start_shot": 0
+    },
+    {
+      "code": "a5",
+      "index": 20,
+      "output": "results/shards/a5_p05_0010000",
+      "p": 0.05,
+      "seed": 231210955,
+      "shots": 10000,
+      "start_shot": 10000
+    },
+    {
+      "code": "a5",
+      "index": 21,
+      "output": "results/shards/a5_p05_0020000",
+      "p": 0.05,
+      "seed": 231210955,
+      "shots": 10000,
+      "start_shot": 20000
+    },
+    {
+      "code": "a5",
+      "index": 22,
+      "output": "results/shards/a5_p05_0030000",
+      "p": 0.05,
+      "seed": 231210955,
+      "shots": 10000,
+      "start_shot": 30000
+    },
+    {
+      "code": "a5",
+      "index": 23,
+      "output": "results/shards/a5_p05_0040000",
+      "p": 0.05,
+      "seed": 231210955,
+      "shots": 10000,
+      "start_shot": 40000
+    },
+    {
+      "code": "a5",
+      "index": 24,
+      "output": "results/shards/a5_p05_0050000",
+      "p": 0.05,
+      "seed": 231210955,
+      "shots": 10000,
+      "start_shot": 50000
+    },
+    {
+      "code": "a5",
+      "index": 25,
+      "output": "results/shards/a5_p05_0060000",
+      "p": 0.05,
+      "seed": 231210955,
+      "shots": 10000,
+      "start_shot": 60000
+    },
+    {
+      "code": "a5",
+      "index": 26,
+      "output": "results/shards/a5_p05_0070000",
+      "p": 0.05,
+      "seed": 231210955,
+      "shots": 10000,
+      "start_shot": 70000
+    },
+    {
+      "code": "a5",
+      "index": 27,
+      "output": "results/shards/a5_p05_0080000",
+      "p": 0.05,
+      "seed": 231210955,
+      "shots": 10000,
+      "start_shot": 80000
+    },
+    {
+      "code": "a5",
+      "index": 28,
+      "output": "results/shards/a5_p05_0090000",
+      "p": 0.05,
+      "seed": 231210955,
+      "shots": 10000,
+      "start_shot": 90000
+    },
+    {
+      "code": "a5",
+      "index": 29,
+      "output": "results/shards/a5_p05_0100000",
+      "p": 0.05,
+      "seed": 231210955,
+      "shots": 10000,
+      "start_shot": 100000
+    },
+    {
+      "code": "a5",
+      "index": 30,
+      "output": "results/shards/a5_p05_0110000",
+      "p": 0.05,
+      "seed": 231210955,
+      "shots": 10000,
+      "start_shot": 110000
+    },
+    {
+      "code": "a5",
+      "index": 31,
+      "output": "results/shards/a5_p05_0120000",
+      "p": 0.05,
+      "seed": 231210955,
+      "shots": 10000,
+      "start_shot": 120000
+    },
+    {
+      "code": "a5",
+      "index": 32,
+      "output": "results/shards/a5_p05_0130000",
+      "p": 0.05,
+      "seed": 231210955,
+      "shots": 10000,
+      "start_shot": 130000
+    },
+    {
+      "code": "a5",
+      "index": 33,
+      "output": "results/shards/a5_p05_0140000",
+      "p": 0.05,
+      "seed": 231210955,
+      "shots": 2695,
+      "start_shot": 140000
+    },
+    {
+      "code": "b2",
+      "index": 34,
+      "output": "results/shards/b2_p05_0000000",
+      "p": 0.05,
+      "seed": 231211055,
+      "shots": 10000,
+      "start_shot": 0
+    },
+    {
+      "code": "b2",
+      "index": 35,
+      "output": "results/shards/b2_p05_0010000",
+      "p": 0.05,
+      "seed": 231211055,
+      "shots": 10000,
+      "start_shot": 10000
+    },
+    {
+      "code": "b2",
+      "index": 36,
+      "output": "results/shards/b2_p05_0020000",
+      "p": 0.05,
+      "seed": 231211055,
+      "shots": 10000,
+      "start_shot": 20000
+    },
+    {
+      "code": "b2",
+      "index": 37,
+      "output": "results/shards/b2_p05_0030000",
+      "p": 0.05,
+      "seed": 231211055,
+      "shots": 10000,
+      "start_shot": 30000
+    },
+    {
+      "code": "b2",
+      "index": 38,
+      "output": "results/shards/b2_p05_0040000",
+      "p": 0.05,
+      "seed": 231211055,
+      "shots": 10000,
+      "start_shot": 40000
+    },
+    {
+      "code": "b2",
+      "index": 39,
+      "output": "results/shards/b2_p05_0050000",
+      "p": 0.05,
+      "seed": 231211055,
+      "shots": 10000,
+      "start_shot": 50000
+    },
+    {
+      "code": "b2",
+      "index": 40,
+      "output": "results/shards/b2_p05_0060000",
+      "p": 0.05,
+      "seed": 231211055,
+      "shots": 10000,
+      "start_shot": 60000
+    },
+    {
+      "code": "b2",
+      "index": 41,
+      "output": "results/shards/b2_p05_0070000",
+      "p": 0.05,
+      "seed": 231211055,
+      "shots": 10000,
+      "start_shot": 70000
+    },
+    {
+      "code": "b2",
+      "index": 42,
+      "output": "results/shards/b2_p05_0080000",
+      "p": 0.05,
+      "seed": 231211055,
+      "shots": 10000,
+      "start_shot": 80000
+    },
+    {
+      "code": "b2",
+      "index": 43,
+      "output": "results/shards/b2_p05_0090000",
+      "p": 0.05,
+      "seed": 231211055,
+      "shots": 8815,
+      "start_shot": 90000
+    },
+    {
+      "code": "a5",
+      "index": 44,
+      "output": "results/shards/a5_p04_0000000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 0
+    },
+    {
+      "code": "a5",
+      "index": 45,
+      "output": "results/shards/a5_p04_0010000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 10000
+    },
+    {
+      "code": "a5",
+      "index": 46,
+      "output": "results/shards/a5_p04_0020000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 20000
+    },
+    {
+      "code": "a5",
+      "index": 47,
+      "output": "results/shards/a5_p04_0030000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 30000
+    },
+    {
+      "code": "a5",
+      "index": 48,
+      "output": "results/shards/a5_p04_0040000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 40000
+    },
+    {
+      "code": "a5",
+      "index": 49,
+      "output": "results/shards/a5_p04_0050000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 50000
+    },
+    {
+      "code": "a5",
+      "index": 50,
+      "output": "results/shards/a5_p04_0060000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 60000
+    },
+    {
+      "code": "a5",
+      "index": 51,
+      "output": "results/shards/a5_p04_0070000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 70000
+    },
+    {
+      "code": "a5",
+      "index": 52,
+      "output": "results/shards/a5_p04_0080000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 80000
+    },
+    {
+      "code": "a5",
+      "index": 53,
+      "output": "results/shards/a5_p04_0090000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 90000
+    },
+    {
+      "code": "a5",
+      "index": 54,
+      "output": "results/shards/a5_p04_0100000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 100000
+    },
+    {
+      "code": "a5",
+      "index": 55,
+      "output": "results/shards/a5_p04_0110000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 110000
+    },
+    {
+      "code": "a5",
+      "index": 56,
+      "output": "results/shards/a5_p04_0120000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 120000
+    },
+    {
+      "code": "a5",
+      "index": 57,
+      "output": "results/shards/a5_p04_0130000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 130000
+    },
+    {
+      "code": "a5",
+      "index": 58,
+      "output": "results/shards/a5_p04_0140000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 140000
+    },
+    {
+      "code": "a5",
+      "index": 59,
+      "output": "results/shards/a5_p04_0150000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 150000
+    },
+    {
+      "code": "a5",
+      "index": 60,
+      "output": "results/shards/a5_p04_0160000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 160000
+    },
+    {
+      "code": "a5",
+      "index": 61,
+      "output": "results/shards/a5_p04_0170000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 170000
+    },
+    {
+      "code": "a5",
+      "index": 62,
+      "output": "results/shards/a5_p04_0180000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 180000
+    },
+    {
+      "code": "a5",
+      "index": 63,
+      "output": "results/shards/a5_p04_0190000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 190000
+    },
+    {
+      "code": "a5",
+      "index": 64,
+      "output": "results/shards/a5_p04_0200000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 200000
+    },
+    {
+      "code": "a5",
+      "index": 65,
+      "output": "results/shards/a5_p04_0210000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 210000
+    },
+    {
+      "code": "a5",
+      "index": 66,
+      "output": "results/shards/a5_p04_0220000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 220000
+    },
+    {
+      "code": "a5",
+      "index": 67,
+      "output": "results/shards/a5_p04_0230000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 230000
+    },
+    {
+      "code": "a5",
+      "index": 68,
+      "output": "results/shards/a5_p04_0240000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 240000
+    },
+    {
+      "code": "a5",
+      "index": 69,
+      "output": "results/shards/a5_p04_0250000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 250000
+    },
+    {
+      "code": "a5",
+      "index": 70,
+      "output": "results/shards/a5_p04_0260000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 260000
+    },
+    {
+      "code": "a5",
+      "index": 71,
+      "output": "results/shards/a5_p04_0270000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 270000
+    },
+    {
+      "code": "a5",
+      "index": 72,
+      "output": "results/shards/a5_p04_0280000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 280000
+    },
+    {
+      "code": "a5",
+      "index": 73,
+      "output": "results/shards/a5_p04_0290000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 290000
+    },
+    {
+      "code": "a5",
+      "index": 74,
+      "output": "results/shards/a5_p04_0300000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 300000
+    },
+    {
+      "code": "a5",
+      "index": 75,
+      "output": "results/shards/a5_p04_0310000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 310000
+    },
+    {
+      "code": "a5",
+      "index": 76,
+      "output": "results/shards/a5_p04_0320000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 320000
+    },
+    {
+      "code": "a5",
+      "index": 77,
+      "output": "results/shards/a5_p04_0330000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 330000
+    },
+    {
+      "code": "a5",
+      "index": 78,
+      "output": "results/shards/a5_p04_0340000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 340000
+    },
+    {
+      "code": "a5",
+      "index": 79,
+      "output": "results/shards/a5_p04_0350000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 350000
+    },
+    {
+      "code": "a5",
+      "index": 80,
+      "output": "results/shards/a5_p04_0360000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 360000
+    },
+    {
+      "code": "a5",
+      "index": 81,
+      "output": "results/shards/a5_p04_0370000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 370000
+    },
+    {
+      "code": "a5",
+      "index": 82,
+      "output": "results/shards/a5_p04_0380000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 380000
+    },
+    {
+      "code": "a5",
+      "index": 83,
+      "output": "results/shards/a5_p04_0390000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 390000
+    },
+    {
+      "code": "a5",
+      "index": 84,
+      "output": "results/shards/a5_p04_0400000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 400000
+    },
+    {
+      "code": "a5",
+      "index": 85,
+      "output": "results/shards/a5_p04_0410000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 410000
+    },
+    {
+      "code": "a5",
+      "index": 86,
+      "output": "results/shards/a5_p04_0420000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 420000
+    },
+    {
+      "code": "a5",
+      "index": 87,
+      "output": "results/shards/a5_p04_0430000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 430000
+    },
+    {
+      "code": "a5",
+      "index": 88,
+      "output": "results/shards/a5_p04_0440000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 440000
+    },
+    {
+      "code": "a5",
+      "index": 89,
+      "output": "results/shards/a5_p04_0450000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 450000
+    },
+    {
+      "code": "a5",
+      "index": 90,
+      "output": "results/shards/a5_p04_0460000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 460000
+    },
+    {
+      "code": "a5",
+      "index": 91,
+      "output": "results/shards/a5_p04_0470000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 470000
+    },
+    {
+      "code": "a5",
+      "index": 92,
+      "output": "results/shards/a5_p04_0480000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 480000
+    },
+    {
+      "code": "a5",
+      "index": 93,
+      "output": "results/shards/a5_p04_0490000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 490000
+    },
+    {
+      "code": "a5",
+      "index": 94,
+      "output": "results/shards/a5_p04_0500000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 500000
+    },
+    {
+      "code": "a5",
+      "index": 95,
+      "output": "results/shards/a5_p04_0510000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 10000,
+      "start_shot": 510000
+    },
+    {
+      "code": "a5",
+      "index": 96,
+      "output": "results/shards/a5_p04_0520000",
+      "p": 0.04,
+      "seed": 231210954,
+      "shots": 9662,
+      "start_shot": 520000
+    },
+    {
+      "code": "b2",
+      "index": 97,
+      "output": "results/shards/b2_p04_0000000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 0
+    },
+    {
+      "code": "b2",
+      "index": 98,
+      "output": "results/shards/b2_p04_0010000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 10000
+    },
+    {
+      "code": "b2",
+      "index": 99,
+      "output": "results/shards/b2_p04_0020000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 20000
+    },
+    {
+      "code": "b2",
+      "index": 100,
+      "output": "results/shards/b2_p04_0030000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 30000
+    },
+    {
+      "code": "b2",
+      "index": 101,
+      "output": "results/shards/b2_p04_0040000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 40000
+    },
+    {
+      "code": "b2",
+      "index": 102,
+      "output": "results/shards/b2_p04_0050000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 50000
+    },
+    {
+      "code": "b2",
+      "index": 103,
+      "output": "results/shards/b2_p04_0060000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 60000
+    },
+    {
+      "code": "b2",
+      "index": 104,
+      "output": "results/shards/b2_p04_0070000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 70000
+    },
+    {
+      "code": "b2",
+      "index": 105,
+      "output": "results/shards/b2_p04_0080000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 80000
+    },
+    {
+      "code": "b2",
+      "index": 106,
+      "output": "results/shards/b2_p04_0090000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 90000
+    },
+    {
+      "code": "b2",
+      "index": 107,
+      "output": "results/shards/b2_p04_0100000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 100000
+    },
+    {
+      "code": "b2",
+      "index": 108,
+      "output": "results/shards/b2_p04_0110000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 110000
+    },
+    {
+      "code": "b2",
+      "index": 109,
+      "output": "results/shards/b2_p04_0120000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 120000
+    },
+    {
+      "code": "b2",
+      "index": 110,
+      "output": "results/shards/b2_p04_0130000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 130000
+    },
+    {
+      "code": "b2",
+      "index": 111,
+      "output": "results/shards/b2_p04_0140000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 140000
+    },
+    {
+      "code": "b2",
+      "index": 112,
+      "output": "results/shards/b2_p04_0150000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 150000
+    },
+    {
+      "code": "b2",
+      "index": 113,
+      "output": "results/shards/b2_p04_0160000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 160000
+    },
+    {
+      "code": "b2",
+      "index": 114,
+      "output": "results/shards/b2_p04_0170000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 170000
+    },
+    {
+      "code": "b2",
+      "index": 115,
+      "output": "results/shards/b2_p04_0180000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 180000
+    },
+    {
+      "code": "b2",
+      "index": 116,
+      "output": "results/shards/b2_p04_0190000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 190000
+    },
+    {
+      "code": "b2",
+      "index": 117,
+      "output": "results/shards/b2_p04_0200000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 200000
+    },
+    {
+      "code": "b2",
+      "index": 118,
+      "output": "results/shards/b2_p04_0210000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 210000
+    },
+    {
+      "code": "b2",
+      "index": 119,
+      "output": "results/shards/b2_p04_0220000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 220000
+    },
+    {
+      "code": "b2",
+      "index": 120,
+      "output": "results/shards/b2_p04_0230000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 230000
+    },
+    {
+      "code": "b2",
+      "index": 121,
+      "output": "results/shards/b2_p04_0240000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 240000
+    },
+    {
+      "code": "b2",
+      "index": 122,
+      "output": "results/shards/b2_p04_0250000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 250000
+    },
+    {
+      "code": "b2",
+      "index": 123,
+      "output": "results/shards/b2_p04_0260000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 260000
+    },
+    {
+      "code": "b2",
+      "index": 124,
+      "output": "results/shards/b2_p04_0270000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 270000
+    },
+    {
+      "code": "b2",
+      "index": 125,
+      "output": "results/shards/b2_p04_0280000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 280000
+    },
+    {
+      "code": "b2",
+      "index": 126,
+      "output": "results/shards/b2_p04_0290000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 10000,
+      "start_shot": 290000
+    },
+    {
+      "code": "b2",
+      "index": 127,
+      "output": "results/shards/b2_p04_0300000",
+      "p": 0.04,
+      "seed": 231211054,
+      "shots": 7882,
+      "start_shot": 300000
+    }
+  ]
+}

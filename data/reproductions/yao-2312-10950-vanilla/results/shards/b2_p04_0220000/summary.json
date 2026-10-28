@@ -1,0 +1,47 @@
+{
+  "code": "b2",
+  "counts": {
+    "binary_v1": {
+      "elapsed_ns_sum": 108033348735,
+      "exact_success": 9793,
+      "iteration_sum": 79114,
+      "stabilizer_success": 157,
+      "type_i": 50,
+      "type_ii": 0
+    },
+    "binary_v2": {
+      "elapsed_ns_sum": 64458415838,
+      "exact_success": 9793,
+      "iteration_sum": 76092,
+      "stabilizer_success": 165,
+      "type_i": 42,
+      "type_ii": 0
+    },
+    "bp4_v1": {
+      "elapsed_ns_sum": 1548047935523,
+      "exact_success": 6663,
+      "iteration_sum": 487408,
+      "stabilizer_success": 1,
+      "type_i": 3336,
+      "type_ii": 0
+    },
+    "bp4_v2": {
+      "elapsed_ns_sum": 67129904012,
+      "exact_success": 9968,
+      "iteration_sum": 32803,
+      "stabilizer_success": 29,
+      "type_i": 3,
+      "type_ii": 0
+    }
+  },
+  "end_shot_exclusive": 230000,
+  "events_sha256": "a5bb07ea41f21f8f131bbd862d891e94c6b08ef054566c287a9a60114a79ef8c",
+  "manifest_sha256": "9c82efb7d0ba2e61786b32a137ae6a1818b99ba4af0c4c4d97ae681f561e927c",
+  "physical_p": 0.04,
+  "schema": "yao-vanilla-point-summary-v1",
+  "shots": 10000,
+  "source_qbp_rate": 0.000406,
+  "start_shot": 220000,
+  "stop_reason": "fixed_shard_complete",
+  "wall_seconds": 1803.9801751654595
+}

@@ -1,0 +1,4 @@
+results/shards/**/events.jsonl
+results/logs/
+results/aborted-*/shards/
+results/aborted-*/logs/

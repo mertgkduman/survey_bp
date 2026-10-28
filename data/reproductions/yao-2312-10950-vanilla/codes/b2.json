@@ -1,0 +1,26 @@
+{
+  "schema": "reproduction-code-artifact-v1",
+  "code": "B2",
+  "source": "https://arxiv.org/pdf/1904.02703v3",
+  "source_tex": "https://export.arxiv.org/src/1904.02703v3",
+  "source_tex_member": "matrices/ghpc_3_5_N882_K48.tex",
+  "source_tex_member_sha256": "2df0939d53211c549cf965eec1c1007f977a159058a8d4a5cbcf7e92b684adde",
+  "constructor": "bp_registry.code_constructions.build_b2_ghp",
+  "parameters": {"n": 882, "k": 48, "distance_status": "source_reported_16"},
+  "circulant_size": 63,
+  "a_exponents": [
+    [27, null, null, 0, 18, 27, 0],
+    [0, 27, null, null, 0, 18, 27],
+    [27, 0, 27, null, null, 0, 18],
+    [18, 27, 0, 27, null, null, 0],
+    [0, 18, 27, 0, 27, null, null],
+    [null, 0, 18, 27, 0, 27, null],
+    [null, null, 0, 18, 27, 0, 27]
+  ],
+  "b_exponents": [0, 1, 6],
+  "css_semantic_sha256": "a5fe623bbb01d201af4829613a8f72011566fb4348488482686de8654a804594",
+  "hx_sha256": "de8f38b1fd4eeff85d7ae1fcc19f692351ef90d71f50c22bff33f7089b9e904b",
+  "hz_sha256": "94fe6b05a2761f35827fc7851cc0dfb26efb3ebfe3e2887fbb8fdeb890b04957",
+  "reported_check_row_weight": 8,
+  "reported_column_weights": [3, 5]
+}

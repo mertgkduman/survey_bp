@@ -67,6 +67,11 @@ bp-registry data/studies/fair-beam-relay-css-v2.json \
 
 The command verifies and reuses the published BB72 package when present, or produces and verifies it when absent. For a custom composition of registered canonical CSS policies, use `OMP_NUM_THREADS=1 bp-registry examples/three-qubit-study.json --decoder examples/three-qubit-decoder.toml`. Python users can import `ensure_study` from `bp_registry.study`. See the [researcher study command](docs/researcher-study-command.md) for the file formats, result identity, and scope.
 
+The [decoder-file guide](docs/decoder-files.md) explains where to place decoder
+files, how their policy fields are interpreted, and how a reproduction freezes
+them. The [Yao vanilla BP study](data/reproductions/yao-2312-10950-vanilla/README.md)
+contains four named binary/BP4 v1/v2 files and matched A5/B2 code-capacity runs.
+
 Run these commands from the repository root. The example uses a deterministic,
 two-shot, three-qubit CSS development fixture and writes to a fresh temporary
 directory:

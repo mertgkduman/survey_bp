@@ -30,6 +30,16 @@ _B1_A_EXPONENTS: tuple[tuple[int | None, ...], ...] = (
     (None, None, None, None, 0, 54, 27),
 )
 _B1_B_EXPONENTS = (0, 1, 6)
+_B2_A_EXPONENTS: tuple[tuple[int | None, ...], ...] = (
+    (27, None, None, 0, 18, 27, 0),
+    (0, 27, None, None, 0, 18, 27),
+    (27, 0, 27, None, None, 0, 18),
+    (18, 27, 0, 27, None, None, 0),
+    (0, 18, 27, 0, 27, None, None),
+    (None, 0, 18, 27, 0, 27, None),
+    (None, None, 0, 18, 27, 0, 27),
+)
+_B2_B_EXPONENTS = (0, 1, 6)
 _MAX_MATRIX_DIMENSION = 10_000
 _MAX_MATRIX_CELLS = 2_000_000
 _MAX_NPZ_BYTES = 1_000_000
@@ -175,6 +185,28 @@ def build_b1_ghp() -> CssCode:
     hz = np.hstack((b.T, a.T))
     lx, lz = derive_css_logicals(hx, hz)
     return CssCode(hx=hx, hz=hz, lx=lx, lz=lz).validate()
+
+
+def build_b2_ghp() -> CssCode:
+    """Expand Panteleev--Kalachev v3 Appendix-B B2, ``[[882,48,16]]``.
+
+    The 7-by-7 polynomial matrix is taken from
+    ``matrices/ghpc_3_5_N882_K48.tex`` in arXiv:1904.02703v3. The same
+    row-major circulant convention used for B1 fixes every block position.
+    """
+    blocks = [
+        [np.zeros((_B1_ELL, _B1_ELL), dtype=np.uint8) if exponent is None else _circulant(_B1_ELL, (exponent,))
+         for exponent in row]
+        for row in _B2_A_EXPONENTS
+    ]
+    a = np.block(blocks)
+    b = np.kron(np.eye(_B1_BLOCKS, dtype=np.uint8), _circulant(_B1_ELL, _B2_B_EXPONENTS))
+    hx, hz = np.hstack((a, b)), np.hstack((b.T, a.T))
+    lx, lz = derive_css_logicals(hx, hz)
+    code = CssCode(hx=hx, hz=hz, lx=lx, lz=lz).validate()
+    if code.n != 882 or code.k != 48:
+        raise ValueError("B2 polynomial source did not produce [[882,48]]")
+    return code
 
 
 def build_gallager_constituent(*, seed: int = 20260923) -> GallagerConstituent:

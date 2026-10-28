@@ -1,0 +1,42 @@
+{
+  "schema": "published-vanilla-qbp-points-v1",
+  "paper": "Yao et al., Belief Propagation Decoding of Quantum LDPC Codes with Guided Decimation, arXiv:2312.10950v2",
+  "source_pdf": "https://arxiv.org/pdf/2312.10950v2",
+  "source_tex": "https://export.arxiv.org/src/2312.10950v2",
+  "source_tex_archive_sha256": "8ddade4c50c9b12853e5431c53f4906fd29913bbf3be306422bafd984a05d654",
+  "source_main_tex_sha256": "019ef045f0f1c4826267cdb3a9d8f9e64f4d7e4ab8defb8209f8add2",
+  "noise": "code_capacity_depolarizing_X_Y_Z_each_p_over_3",
+  "metric": "block_error_rate_type_i_plus_type_ii",
+  "source_stopping": "each Q-BP point collected until 100 error cases; exact denominators unavailable",
+  "qbp_iterations": 100,
+  "curves": {
+    "a5": {
+      "figure": 7,
+      "code": "A5 [[180,10,15<=d<=18]]",
+      "tex_lines": "1755-1765",
+      "p_to_qbp_rate": {
+        "0.04": 0.000236,
+        "0.05": 0.000876,
+        "0.06": 0.003159,
+        "0.07": 0.011972,
+        "0.08": 0.039651,
+        "0.09": 0.093809,
+        "0.10": 0.144300
+      }
+    },
+    "b2": {
+      "figure": 8,
+      "code": "B2 [[882,48,16]]",
+      "tex_lines": "1838-1848",
+      "p_to_qbp_rate": {
+        "0.04": 0.000406,
+        "0.05": 0.001265,
+        "0.06": 0.002569,
+        "0.07": 0.006755,
+        "0.08": 0.015077,
+        "0.09": 0.029780,
+        "0.10": 0.060326
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "schema": "vanilla-bp-decoder-v1",
+  "id": "bp4_v1",
+  "family": "bp4",
+  "check_rule": "sum_product",
+  "numerical_profile": "quaternary-bp4-f64-v1",
+  "message_resolution": "float64",
+  "damping_old": 0.0,
+  "max_iterations": 100,
+  "prior": "depolarizing_joint_p0_equals_physical_p",
+  "candidate": "first_syndrome_matching_hard_decision",
+  "reference_role": "canonical_v1_adaptation"
+}

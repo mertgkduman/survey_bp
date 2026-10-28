@@ -1,0 +1,15 @@
+{
+  "schema": "vanilla-bp-decoder-v1",
+  "id": "binary_v2",
+  "family": "binary_css_separate",
+  "check_rule": "sum_product",
+  "numerical_profile": "binary-spa-flooding-f64-v2-undamped",
+  "message_resolution": "float64",
+  "damping_old": 0.0,
+  "check_cap": null,
+  "product_epsilon": 1e-10,
+  "max_iterations": 100,
+  "prior": "independent_x_z_marginal_q_equals_2p_over_3",
+  "candidate": "first_syndrome_matching_hard_decision_per_component",
+  "reference_role": "controlled_binary_baseline"
+}
