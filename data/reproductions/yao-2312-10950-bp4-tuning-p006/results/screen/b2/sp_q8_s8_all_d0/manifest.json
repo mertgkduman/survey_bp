@@ -1,0 +1,71 @@
+{
+  "candidate": {
+    "id": "sp_q8_s8_all_d0",
+    "kernel": "policy_flooding",
+    "max_iterations": 100,
+    "p0": 0.06,
+    "policy": {
+      "alpha": 1.0,
+      "beta": 0.0,
+      "check_rule": "sum_product",
+      "damping": 0.0,
+      "hard_decision": "strict_pauli",
+      "resolution": {
+        "coefficients": "same",
+        "format": "int8",
+        "scale": 8,
+        "scope": "all_messages",
+        "version": "bp-resolution-v1"
+      },
+      "version": "bp-flooding-policy-v1",
+      "zero_syndrome_shortcut": false
+    }
+  },
+  "candidate_id": "sp_q8_s8_all_d0",
+  "candidate_registry": "data/reproductions/yao-2312-10950-bp4-tuning-p006/decoders/screen_candidates.json",
+  "candidate_registry_sha256": "174c125c4f82bcfd15c5f3615136a7cfbbe5b9eb9591a8e562ac9e7764651c77",
+  "code": "b2",
+  "code_semantic_sha256": "a5fe623bbb01d201af4829613a8f72011566fb4348488482686de8654a804594",
+  "effective_numerics": {
+    "alpha": 1.0,
+    "beta": 0.0,
+    "check_rule": "sum_product",
+    "damping": 0.0,
+    "effective_coefficients": {
+      "alpha": 1.0,
+      "beta": 0.0,
+      "fresh_weight": 1.0,
+      "old_weight": 0.0
+    },
+    "hard_decision": "strict_pauli",
+    "resolution": {
+      "coefficients": "same",
+      "format": "int8",
+      "scale": 8,
+      "scope": "all_messages",
+      "version": "bp-resolution-v1"
+    },
+    "version": "bp-flooding-policy-v1",
+    "zero_syndrome_shortcut": false
+  },
+  "outcome": "independent original-code Type I + Type II block failure",
+  "physical_p": 0.06,
+  "plan_sha256": "1ec6ad42e611fb10f807a0cf60defe34d78e61a3524c18294c809ea6bb3634e8",
+  "planned_max_shots": 1460,
+  "sampler": "numpy.PCG64; I/X/Y/Z = 1-p,p/3,p/3,p/3",
+  "schema": "yao-bp4-tuning-run-v1",
+  "seed": 620261128,
+  "source_files_sha256": {
+    "data/reproductions/yao-2312-10950-bp4-tuning-p006/runner.py": "50549efa5fa7e3b99fa0ab29c4439cf44c7fd9064492a83dd5eb977069a237e3",
+    "data/reproductions/yao-2312-10950-vanilla/codes/a5.json": "e46c707ffbec989331ef79b38015401f36c5ca2de870a4479b2687e30620955d",
+    "data/reproductions/yao-2312-10950-vanilla/codes/b2.json": "4d12890ff520be5b195e04ca53b52c76e5ccdb4d25d3595042ef758a54ca2b3e",
+    "data/reproductions/yao-2312-10950-vanilla/run.py": "659fd494ef2d0e9aa000eb49b24268b3b80106b46bfcfd0f70aa98bff81a870b",
+    "src/bp_registry/code_constructions.py": "e32f8751c015fe2d83cc3f625b78cc832912c351c80dda5ef9ccef96dcc58d5f",
+    "src/bp_registry/css.py": "898da0ba65a326c4eec887d17f32d6d745d7b50840b1f850deafc0bbc5b2c41a",
+    "src/bp_registry/quaternary/compiled.py": "6eaabe845ecfc4bf734eec536ec210abecb3e294ee80c72ecf98114171245172",
+    "src/bp_registry/quaternary/numerics.py": "94fde610220c2000927de470be293794645d37870f65bf59f5877a5ed438094c",
+    "src/bp_registry/resolution.py": "4b8b2c2873fc72d4ed842125646bba997e88b44c4b9088d80b547e62d41969ef"
+  },
+  "stop_rule": "fixed_shots",
+  "target_failures": null
+}

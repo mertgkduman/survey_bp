@@ -1,0 +1,100 @@
+{
+  "baseline_id": "sp_f64_v2_d02_p0005_t10000",
+  "candidates": [
+    {
+      "check_cap": null,
+      "damping": 0.2,
+      "id": "sp_f64_v2_d02_p0005_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.005,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.2,
+      "id": "sp_f64_v2_d02_p0001_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.001,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.2,
+      "id": "sp_f64_v2_d02_p0002_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.002,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.2,
+      "id": "sp_f64_v2_d02_p0003_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.003,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.2,
+      "id": "sp_f64_v2_d02_p00075_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.0075,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.2,
+      "id": "sp_f64_v2_d02_p001_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.01,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.25,
+      "id": "sp_f64_v2_d025_p0005_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.005,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.3,
+      "id": "sp_f64_v2_d03_p0005_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.005,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.4,
+      "id": "sp_f64_v2_d04_p0005_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.005,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.2,
+      "id": "sp_f64_v2_d02_p0005_t20000",
+      "kernel": "profile_v2",
+      "max_iterations": 20000,
+      "p0": 0.005,
+      "product_epsilon": 1e-10
+    }
+  ],
+  "physical_p": 0.06,
+  "schema": "yao-bp4-tuning-candidates-v1",
+  "selection_status": "independent_d02_local_search",
+  "source_a5_final_neighborhood_plan_sha256": "b7d30f9a6de9924a5a29f3dab873c077604c61e5cc9a862d4004203189c279b1",
+  "source_a5_final_neighborhood_results_sha256": "a3358e64d8e83406953c2c260509d840c21a94c4fcd5f60ee5670a1c8532aba0"
+}

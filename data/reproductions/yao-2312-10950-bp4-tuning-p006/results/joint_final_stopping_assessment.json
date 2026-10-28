@@ -1,0 +1,152 @@
+{
+  "codes": {
+    "a5": {
+      "comparisons": [
+        {
+          "below_incumbent_ci90": false,
+          "candidate_id": "sp_f64_v2_d02_p006_t10000",
+          "failures": 63,
+          "ler": 0.00105,
+          "losses_vs_incumbent": 15,
+          "paired_improvement_p": 0.7789658308029175,
+          "rescues_vs_incumbent": 12,
+          "shots": 60000,
+          "triggers_continued_tuning": false
+        },
+        {
+          "below_incumbent_ci90": false,
+          "candidate_id": "sp_f64_v2_d03_p006_t10000",
+          "failures": 63,
+          "ler": 0.00105,
+          "losses_vs_incumbent": 15,
+          "paired_improvement_p": 0.7789658308029175,
+          "rescues_vs_incumbent": 12,
+          "shots": 60000,
+          "triggers_continued_tuning": false
+        },
+        {
+          "below_incumbent_ci90": false,
+          "candidate_id": "sp_f64_v2_d01_p0045_t10000",
+          "failures": 53,
+          "ler": 0.0008833333333333333,
+          "losses_vs_incumbent": 5,
+          "paired_improvement_p": 0.0717315673828125,
+          "rescues_vs_incumbent": 12,
+          "shots": 60000,
+          "triggers_continued_tuning": true
+        },
+        {
+          "below_incumbent_ci90": false,
+          "candidate_id": "sp_f64_v2_d01_p0075_t10000",
+          "failures": 83,
+          "ler": 0.0013833333333333334,
+          "losses_vs_incumbent": 27,
+          "paired_improvement_p": 0.9999976754188538,
+          "rescues_vs_incumbent": 4,
+          "shots": 60000,
+          "triggers_continued_tuning": false
+        }
+      ],
+      "continued_tuning_triggers": [
+        "sp_f64_v2_d01_p0045_t10000"
+      ],
+      "incumbent_ci90": [
+        0.0007976127551404004,
+        0.0012396784901638062
+      ],
+      "incumbent_failures": 60,
+      "incumbent_id": "sp_f64_v2_d01_p006_t10000",
+      "incumbent_ler": 0.001,
+      "incumbent_shots": 60000,
+      "stop_in_tested_neighborhood": false
+    },
+    "b2": {
+      "comparisons": [
+        {
+          "below_incumbent_ci90": false,
+          "candidate_id": "sp_f64_v2_d005_p015_t5000",
+          "failures": 19,
+          "ler": 0.00031666666666666665,
+          "losses_vs_incumbent": 2,
+          "paired_improvement_p": 0.2265625,
+          "rescues_vs_incumbent": 5,
+          "shots": 60000,
+          "triggers_continued_tuning": false
+        },
+        {
+          "below_incumbent_ci90": false,
+          "candidate_id": "sp_f64_v2_d015_p015_t5000",
+          "failures": 19,
+          "ler": 0.00031666666666666665,
+          "losses_vs_incumbent": 3,
+          "paired_improvement_p": 0.25390625,
+          "rescues_vs_incumbent": 6,
+          "shots": 60000,
+          "triggers_continued_tuning": false
+        },
+        {
+          "below_incumbent_ci90": false,
+          "candidate_id": "sp_f64_v2_d02_p015_t5000",
+          "failures": 23,
+          "ler": 0.00038333333333333334,
+          "losses_vs_incumbent": 6,
+          "paired_improvement_p": 0.7255859375,
+          "rescues_vs_incumbent": 5,
+          "shots": 60000,
+          "triggers_continued_tuning": false
+        },
+        {
+          "below_incumbent_ci90": false,
+          "candidate_id": "sp_f64_v2_d01_p014_t5000",
+          "failures": 17,
+          "ler": 0.00028333333333333335,
+          "losses_vs_incumbent": 2,
+          "paired_improvement_p": 0.08984375,
+          "rescues_vs_incumbent": 7,
+          "shots": 60000,
+          "triggers_continued_tuning": true
+        },
+        {
+          "below_incumbent_ci90": false,
+          "candidate_id": "sp_f64_v2_d01_p016_t5000",
+          "failures": 16,
+          "ler": 0.0002666666666666667,
+          "losses_vs_incumbent": 1,
+          "paired_improvement_p": 0.03515625,
+          "rescues_vs_incumbent": 7,
+          "shots": 60000,
+          "triggers_continued_tuning": true
+        },
+        {
+          "below_incumbent_ci90": false,
+          "candidate_id": "sp_f64_v2_d01_p018_t5000",
+          "failures": 20,
+          "ler": 0.0003333333333333333,
+          "losses_vs_incumbent": 6,
+          "paired_improvement_p": 0.395263671875,
+          "rescues_vs_incumbent": 8,
+          "shots": 60000,
+          "triggers_continued_tuning": false
+        }
+      ],
+      "continued_tuning_triggers": [
+        "sp_f64_v2_d01_p014_t5000",
+        "sp_f64_v2_d01_p016_t5000"
+      ],
+      "incumbent_ci90": [
+        0.00024824160858712407,
+        0.00052353909034499
+      ],
+      "incumbent_failures": 22,
+      "incumbent_id": "sp_f64_v2_d01_p015_t5000",
+      "incumbent_ler": 0.00036666666666666667,
+      "incumbent_shots": 60000,
+      "stop_in_tested_neighborhood": false
+    }
+  },
+  "confidence": 0.9,
+  "schema": "yao-bp4-tuning-stopping-v1",
+  "stage": "joint_final",
+  "stage_plan_sha256": "9bacc12808a4c84fad8649b4bb8f440ada8487e4eb7b37c5b7fd2becd516c637",
+  "stage_results_sha256": "998edf31913466afa4dcc1733949c45b8484cd1c42a9cd704968e3a7dfb03b54"
+}

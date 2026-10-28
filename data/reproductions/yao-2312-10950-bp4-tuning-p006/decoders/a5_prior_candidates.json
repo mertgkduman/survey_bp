@@ -1,0 +1,76 @@
+{
+  "baseline_id": "sp_f64_v2_d01_p0045_t10000",
+  "candidates": [
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p003_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.03,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p0035_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.035,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p004_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.04,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p0045_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.045,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p005_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.05,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p0055_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.055,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p006_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    }
+  ],
+  "physical_p": 0.06,
+  "schema": "yao-bp4-tuning-candidates-v1",
+  "selection_status": "independent_local_prior_confirmation_at_T10000",
+  "source_joint_a5_summary_sha256": {
+    "sp_f64_v2_d01_p0045_t10000": "ff028051cdde42cf13d3fe6c9de6599395afad95b407810bd04955fae5bd310a",
+    "sp_f64_v2_d01_p006_t10000": "3c3f596cdf55e04f67575dcf448e2b5e92be635b94c39377044ed4cdaf7c6c1d"
+  },
+  "source_joint_final_plan_sha256": "9bacc12808a4c84fad8649b4bb8f440ada8487e4eb7b37c5b7fd2becd516c637"
+}

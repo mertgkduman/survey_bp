@@ -108,3 +108,8 @@ excluded from Git. Tracked shard manifests and summaries retain their SHA-256
 digests. The canceled preliminary campaign is documented under
 [`results/aborted-60250663/ABORTED.md`](results/aborted-60250663/ABORTED.md)
 and is excluded from the assessment.
+
+The separate [BP4 tuning study at physical p=0.06](../yao-2312-10950-bp4-tuning-p006/README.md)
+screens numerical and policy settings on A5 and B2, then measures selected
+settings on independent fixed-shot error streams. Its tuned rates are not part
+of the vanilla source comparison above.

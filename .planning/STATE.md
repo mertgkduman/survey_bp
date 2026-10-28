@@ -276,6 +276,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261028-kvb | Tune canonical BP4 on Yao A5/B2 at physical p=0.06 | 2026-10-28 | — | Verified 257-task paired search; selected finite-neighborhood policies | [261028-kvb-tune-vanilla-bp4-at-p-0-06-on-yao-a5-and](./quick/261028-kvb-tune-vanilla-bp4-at-p-0-06-on-yao-a5-and/) |
 | 261027-qsa | Reproduce Yao et al. vanilla Q-BP on A5/B2 with paired binary/BP4 v1/v2 | 2026-10-27 | — | Verified 1,216,144-shot campaign; A5 v2 near source, B2 v2 modestly lower | [261027-qsa-yao-vanilla-bp-reproduction](./quick/261027-qsa-yao-vanilla-bp-reproduction/) |
 | 261027-q9k | Promote corrected BP4 min-sum and add shared resolution policies | 2026-10-27 | — | Verified compiled development policy; historical manifests unchanged | [261027-q9k-ms-resolution-policy](./quick/261027-q9k-ms-resolution-policy/) |
 | 261027-p6o | Recheck nine vanilla BP4 MS curve points with jointly corrected diagnostic numerics | 2026-10-27 | — | Verified exploratory match; double-Gross p=.06 holdout differs from source point | [261027-p6o-ms-both-changes-curve](./quick/261027-p6o-ms-both-changes-curve/) |

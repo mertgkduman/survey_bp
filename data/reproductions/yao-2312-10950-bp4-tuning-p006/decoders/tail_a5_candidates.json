@@ -1,0 +1,40 @@
+{
+  "baseline_id": "sp_f64_v2_d01_p006_t10000",
+  "candidates": [
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p006_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p006_t20000",
+      "kernel": "profile_v2",
+      "max_iterations": 20000,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p006_t50000",
+      "kernel": "profile_v2",
+      "max_iterations": 50000,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    }
+  ],
+  "physical_p": 0.06,
+  "schema": "yao-bp4-tuning-candidates-v1",
+  "selection_status": "late_convergence_cap_tail_new_seed",
+  "source_followup_a5_summary_sha256": {
+    "sp_f64_v2_d01_p006_t10000": "773d51432b103cbbb40ef29daff800e41305058347a620766700de6e282a8444",
+    "sp_f64_v2_d01_p006_t5000": "d6525903a47a490840a7622558da9c2d5cfc60f1895186777c8a27795c8df504"
+  },
+  "source_followup_plan_sha256": "dae5ad330a28870501fafc70b497d8729dee9091a02a0b3d0180b032de364907"
+}

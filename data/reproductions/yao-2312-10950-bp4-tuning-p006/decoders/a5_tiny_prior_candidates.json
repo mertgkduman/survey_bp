@@ -1,0 +1,76 @@
+{
+  "baseline_id": "sp_f64_v2_d01_p0005_t10000",
+  "candidates": [
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p00005_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.0005,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p0001_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.001,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p0002_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.002,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p0003_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.003,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p0005_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.005,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p00075_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.0075,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p001_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.01,
+      "product_epsilon": 1e-10
+    }
+  ],
+  "physical_p": 0.06,
+  "schema": "yao-bp4-tuning-candidates-v1",
+  "selection_status": "independent_tiny_prior_bracketing",
+  "source_a5_low_prior_plan_sha256": "fc16bd78347aad777d95aaa127520cfffedc60c7a36dca6ef3692b329af2ab05",
+  "source_a5_low_prior_summary_sha256": {
+    "sp_f64_v2_d01_p0005_t10000": "304c42028ed0284f580b8fbfb64e6543d58d5a0a56e1fd98a353de269a685708",
+    "sp_f64_v2_d01_p003_t10000": "96dfbf8ab386825eea8223c3f22970acc03fc3fc3184a05b64f220c5ab34a474"
+  }
+}

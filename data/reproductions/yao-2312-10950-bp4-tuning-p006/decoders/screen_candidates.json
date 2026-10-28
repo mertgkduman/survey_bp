@@ -1,0 +1,782 @@
+{
+  "baseline_id": "sp_f64_v2_d0_p006_t100",
+  "candidates": [
+    {
+      "check_cap": null,
+      "damping": 0.0,
+      "id": "sp_f64_v2_d0_p006_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.05,
+      "id": "sp_f64_v2_d005_p006_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p006_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.2,
+      "id": "sp_f64_v2_d02_p006_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.3,
+      "id": "sp_f64_v2_d03_p006_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.5,
+      "id": "sp_f64_v2_d05_p006_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p003_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.03,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p0045_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.045,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p0075_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.075,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p009_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.09,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p012_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.12,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p006_t30",
+      "kernel": "profile_v2",
+      "max_iterations": 30,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p006_t300",
+      "kernel": "profile_v2",
+      "max_iterations": 300,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p006_t1000",
+      "kernel": "profile_v2",
+      "max_iterations": 1000,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": 8.0,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p006_cap8",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": 12.0,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p006_cap12",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": 20.0,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p006_cap20",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": 25.0,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p006_cap25",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p006_eps1e8",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "product_epsilon": 1e-08
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p006_eps1e12",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "product_epsilon": 1e-12
+    },
+    {
+      "id": "sp_policy_f64_d0",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "sum_product",
+        "damping": 0.0,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "float64",
+          "format": "float64",
+          "scale": null,
+          "scope": "all_messages",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "sp_policy_f64_d01",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "sum_product",
+        "damping": 0.1,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "float64",
+          "format": "float64",
+          "scale": null,
+          "scope": "all_messages",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "sp_policy_f64_d02",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "sum_product",
+        "damping": 0.2,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "float64",
+          "format": "float64",
+          "scale": null,
+          "scope": "all_messages",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "sp_policy_f32_d01",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "sum_product",
+        "damping": 0.1,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "float64",
+          "format": "float32",
+          "scale": null,
+          "scope": "all_messages",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "sp_policy_f16_d01",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "sum_product",
+        "damping": 0.1,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "float64",
+          "format": "float16",
+          "scale": null,
+          "scope": "all_messages",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "sp_q8_s4_all_d0",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "sum_product",
+        "damping": 0.0,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 4,
+          "scope": "all_messages",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "sp_q8_s4_all_d02",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "sum_product",
+        "damping": 0.2,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 4,
+          "scope": "all_messages",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "sp_q8_s4_edge_d0",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "sum_product",
+        "damping": 0.0,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 4,
+          "scope": "scalar_edges",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "sp_q8_s4_edge_d02",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "sum_product",
+        "damping": 0.2,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 4,
+          "scope": "scalar_edges",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "sp_q8_s8_all_d0",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "sum_product",
+        "damping": 0.0,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 8,
+          "scope": "all_messages",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "sp_q8_s8_all_d02",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "sum_product",
+        "damping": 0.2,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 8,
+          "scope": "all_messages",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "sp_q8_s8_edge_d0",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "sum_product",
+        "damping": 0.0,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 8,
+          "scope": "scalar_edges",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "sp_q8_s8_edge_d02",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "sum_product",
+        "damping": 0.2,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 8,
+          "scope": "scalar_edges",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "sp_q8_s16_all_d0",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "sum_product",
+        "damping": 0.0,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 16,
+          "scope": "all_messages",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "sp_q8_s16_all_d02",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "sum_product",
+        "damping": 0.2,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 16,
+          "scope": "all_messages",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "sp_q8_s16_edge_d0",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "sum_product",
+        "damping": 0.0,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 16,
+          "scope": "scalar_edges",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "sp_q8_s16_edge_d02",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "sum_product",
+        "damping": 0.2,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 16,
+          "scope": "scalar_edges",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "ms_q8_s4_a1_b0_d0",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "min_sum",
+        "damping": 0.0,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 4,
+          "scope": "all_messages",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "ms_q8_s4_a1_b0_d02",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "min_sum",
+        "damping": 0.2,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 4,
+          "scope": "all_messages",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "ms_q8_s8_a1_b0_d0",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "min_sum",
+        "damping": 0.0,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 8,
+          "scope": "all_messages",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "ms_q8_s8_a1_b0_d02",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "min_sum",
+        "damping": 0.2,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 8,
+          "scope": "all_messages",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "ms_q8_s16_a1_b0_d0",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "min_sum",
+        "damping": 0.0,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 16,
+          "scope": "all_messages",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "ms_q8_s16_a1_b0_d02",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "min_sum",
+        "damping": 0.2,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 16,
+          "scope": "all_messages",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "ms_q8_s4_a08_b0_d02",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 0.8,
+        "beta": 0.0,
+        "check_rule": "min_sum",
+        "damping": 0.2,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 4,
+          "scope": "all_messages",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "ms_q8_s4_a1_b025_d02",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.25,
+        "check_rule": "min_sum",
+        "damping": 0.2,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 4,
+          "scope": "all_messages",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "ms_q8_s8_a08_b0_d02",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 0.8,
+        "beta": 0.0,
+        "check_rule": "min_sum",
+        "damping": 0.2,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 8,
+          "scope": "all_messages",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "ms_q8_s8_a1_b025_d02",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.25,
+        "check_rule": "min_sum",
+        "damping": 0.2,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 8,
+          "scope": "all_messages",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    }
+  ],
+  "physical_p": 0.06,
+  "schema": "yao-bp4-tuning-candidates-v1",
+  "selection_status": "exploratory_screen"
+}

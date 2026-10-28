@@ -1,0 +1,4 @@
+left,right,shots,left_failures,right_failures,rescues_left_to_right,losses_left_to_right,rate_difference_right_minus_left,p_right_better,p_left_better,only_cap_increases,rescue_rate_upper90,left_rate_to_lower_ci90_margin,cap_saturated90
+sp_f64_v2_d01_p006_t10000,sp_f64_v2_d01_p006_t20000,50000,47,46,1,0,-2e-05,0.5,1.0,True,7.779215539144315e-05,0.0002135319841677463,True
+sp_f64_v2_d01_p006_t10000,sp_f64_v2_d01_p006_t50000,50000,47,45,2,0,-4e-05,0.25,1.0,True,0.00010644287031612342,0.0002135319841677463,True
+sp_f64_v2_d01_p006_t20000,sp_f64_v2_d01_p006_t50000,50000,46,45,1,0,-2e-05,0.5,1.0,True,7.779215539144315e-05,0.0002111165087717396,True

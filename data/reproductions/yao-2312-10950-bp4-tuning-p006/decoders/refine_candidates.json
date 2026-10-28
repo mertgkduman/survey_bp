@@ -1,0 +1,349 @@
+{
+  "baseline_id": "sp_f64_v2_d0_p006_t100",
+  "candidates": [
+    {
+      "check_cap": null,
+      "damping": 0.0,
+      "id": "sp_f64_v2_d0_p006_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.05,
+      "id": "sp_f64_v2_d005_p006_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p006_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.2,
+      "id": "sp_f64_v2_d02_p006_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.3,
+      "id": "sp_f64_v2_d03_p006_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.5,
+      "id": "sp_f64_v2_d05_p006_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p003_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.03,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p0045_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.045,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p0075_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.075,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p009_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.09,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p006_t300",
+      "kernel": "profile_v2",
+      "max_iterations": 300,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p006_t1000",
+      "kernel": "profile_v2",
+      "max_iterations": 1000,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "id": "sp_q8_s4_edge_d02",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "sum_product",
+        "damping": 0.2,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 4,
+          "scope": "scalar_edges",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "sp_q8_s8_edge_d02",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "sum_product",
+        "damping": 0.2,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 8,
+          "scope": "scalar_edges",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "id": "sp_policy_f64_d02",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "sum_product",
+        "damping": 0.2,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "float64",
+          "format": "float64",
+          "scale": null,
+          "scope": "all_messages",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "check_cap": null,
+      "damping": 0.2,
+      "id": "sp_f64_v2_d02_p003_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.03,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.2,
+      "id": "sp_f64_v2_d02_p0045_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.045,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.2,
+      "id": "sp_f64_v2_d02_p0075_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.075,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.2,
+      "id": "sp_f64_v2_d02_p009_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.09,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.3,
+      "id": "sp_f64_v2_d03_p003_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.03,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.3,
+      "id": "sp_f64_v2_d03_p0045_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.045,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.3,
+      "id": "sp_f64_v2_d03_p0075_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.075,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.3,
+      "id": "sp_f64_v2_d03_p009_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.09,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p002_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.02,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p015_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.15,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.4,
+      "id": "sp_f64_v2_d04_p006_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p012_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.12,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p006_eps1e8",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "product_epsilon": 1e-08
+    },
+    {
+      "check_cap": 20.0,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p006_cap20",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "id": "sp_q8_s4_edge_d0",
+      "kernel": "policy_flooding",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "policy": {
+        "alpha": 1.0,
+        "beta": 0.0,
+        "check_rule": "sum_product",
+        "damping": 0.0,
+        "hard_decision": "strict_pauli",
+        "resolution": {
+          "coefficients": "same",
+          "format": "int8",
+          "scale": 4,
+          "scope": "scalar_edges",
+          "version": "bp-resolution-v1"
+        },
+        "version": "bp-flooding-policy-v1",
+        "zero_syndrome_shortcut": false
+      }
+    },
+    {
+      "check_cap": null,
+      "damping": 0.2,
+      "id": "sp_f64_v2_d02_p012_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.12,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.3,
+      "id": "sp_f64_v2_d03_p012_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.12,
+      "product_epsilon": 1e-10
+    }
+  ],
+  "physical_p": 0.06,
+  "schema": "yao-bp4-tuning-candidates-v1",
+  "selection_status": "independent_fixed_refinement",
+  "source_screen_results_sha256": "4f0fbf35b2b5aaf9d2d802f3b8d63235c1aa6533b7b05b4b41f455d9b4f9be59"
+}

@@ -1,0 +1,70 @@
+{
+  "codes": {
+    "b2": {
+      "comparisons": [
+        {
+          "below_incumbent_ci90": false,
+          "candidate_id": "sp_f64_v2_d01_p014_t5000",
+          "failures": 38,
+          "ler": 0.00038,
+          "losses_vs_incumbent": 11,
+          "paired_improvement_p": 0.5,
+          "rescues_vs_incumbent": 12,
+          "shots": 100000,
+          "triggers_continued_tuning": false
+        },
+        {
+          "below_incumbent_ci90": false,
+          "candidate_id": "sp_f64_v2_d01_p015_t5000",
+          "failures": 30,
+          "ler": 0.0003,
+          "losses_vs_incumbent": 6,
+          "paired_improvement_p": 0.03917694091796875,
+          "rescues_vs_incumbent": 15,
+          "shots": 100000,
+          "triggers_continued_tuning": true
+        },
+        {
+          "below_incumbent_ci90": false,
+          "candidate_id": "sp_f64_v2_d01_p017_t5000",
+          "failures": 38,
+          "ler": 0.00038,
+          "losses_vs_incumbent": 10,
+          "paired_improvement_p": 0.5,
+          "rescues_vs_incumbent": 11,
+          "shots": 100000,
+          "triggers_continued_tuning": false
+        },
+        {
+          "below_incumbent_ci90": false,
+          "candidate_id": "sp_f64_v2_d01_p016_t10000",
+          "failures": 34,
+          "ler": 0.00034,
+          "losses_vs_incumbent": 0,
+          "paired_improvement_p": 0.03125,
+          "rescues_vs_incumbent": 5,
+          "shots": 100000,
+          "triggers_continued_tuning": true
+        }
+      ],
+      "continued_tuning_triggers": [
+        "sp_f64_v2_d01_p015_t5000",
+        "sp_f64_v2_d01_p016_t10000"
+      ],
+      "incumbent_ci90": [
+        0.0002932824421518405,
+        0.0005093669578845866
+      ],
+      "incumbent_failures": 39,
+      "incumbent_id": "sp_f64_v2_d01_p016_t5000",
+      "incumbent_ler": 0.00039,
+      "incumbent_shots": 100000,
+      "stop_in_tested_neighborhood": false
+    }
+  },
+  "confidence": 0.9,
+  "schema": "yao-bp4-tuning-stopping-v1",
+  "stage": "b2_prior_confirm",
+  "stage_plan_sha256": "ea3ed73f1b700e1d9cba0927d3d4f8fa555db7debf08bda433f596761ecb9373",
+  "stage_results_sha256": "e321a4f127db98fb214c1614b61199fc9deffad4670d691e0581f5dad0a30d05"
+}

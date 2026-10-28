@@ -1,0 +1,81 @@
+{
+  "baseline_id": "sp_f64_v2_d01_p015_t5000",
+  "candidates": [
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p014_t5000",
+      "kernel": "profile_v2",
+      "max_iterations": 5000,
+      "p0": 0.14,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p015_t5000",
+      "kernel": "profile_v2",
+      "max_iterations": 5000,
+      "p0": 0.15,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p016_t5000",
+      "kernel": "profile_v2",
+      "max_iterations": 5000,
+      "p0": 0.16,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p018_t5000",
+      "kernel": "profile_v2",
+      "max_iterations": 5000,
+      "p0": 0.18,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p020_t5000",
+      "kernel": "profile_v2",
+      "max_iterations": 5000,
+      "p0": 0.2,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p015_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.15,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p015_t20000",
+      "kernel": "profile_v2",
+      "max_iterations": 20000,
+      "p0": 0.15,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p016_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.16,
+      "product_epsilon": 1e-10
+    }
+  ],
+  "physical_p": 0.06,
+  "schema": "yao-bp4-tuning-candidates-v1",
+  "selection_status": "fresh_seed_local_prior_and_cap_neighborhood",
+  "source_tail_b2_results_sha256": "4648efd9d68f5613f9da8a87c3cc1a60932b68321114a63c42f1112f32f2373a"
+}

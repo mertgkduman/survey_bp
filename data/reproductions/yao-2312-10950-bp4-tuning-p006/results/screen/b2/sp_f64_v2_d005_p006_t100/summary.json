@@ -1,0 +1,21 @@
+{
+  "candidate_id": "sp_f64_v2_d005_p006_t100",
+  "code": "b2",
+  "counts": {
+    "elapsed_ns": 14220038289,
+    "exact_success": 1435,
+    "iterations": 7711,
+    "stabilizer_success": 21,
+    "type_i": 4,
+    "type_ii": 0
+  },
+  "events_sha256": "99402d599881c4d81717b0708298b4c5bf03ce4f6b7f0a0aaee6ee80f93c1ccf",
+  "manifest_sha256": "8a184afdf5f078e9d079d2fe94c3cd6bb387b2bb43d2c229b1128eff67211a31",
+  "max_shots": 1460,
+  "schema": "yao-bp4-tuning-summary-v1",
+  "seed": 620261128,
+  "shots": 1460,
+  "stop_reason": "fixed_shots",
+  "target_failures": null,
+  "wall_seconds": 15.30081430170685
+}

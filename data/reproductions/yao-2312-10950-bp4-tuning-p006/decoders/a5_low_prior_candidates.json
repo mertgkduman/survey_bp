@@ -1,0 +1,76 @@
+{
+  "baseline_id": "sp_f64_v2_d01_p003_t10000",
+  "candidates": [
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p0005_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.005,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p001_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.01,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p0015_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.015,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p002_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.02,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p0025_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.025,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p003_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.03,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p004_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.04,
+      "product_epsilon": 1e-10
+    }
+  ],
+  "physical_p": 0.06,
+  "schema": "yao-bp4-tuning-candidates-v1",
+  "selection_status": "independent_lower_prior_scan_after_resolved_signal",
+  "source_a5_prior_plan_sha256": "0e9a51436e51ac86559caa78faed6d32aa6bc2dce3f27678840e7ea19fc0f440",
+  "source_a5_prior_summary_sha256": {
+    "sp_f64_v2_d01_p003_t10000": "e60a7a2648bdd1874a3504ae87bad7b9fa189aae12568186a10578e5c1b8d177",
+    "sp_f64_v2_d01_p0045_t10000": "bb14bdcf5db5fe5e7d8a590e44d24d9a5536201e8e3060bdc1a7e687cad22fd7"
+  }
+}

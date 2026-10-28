@@ -70,3 +70,11 @@ the merged report together. The JSON states the requested policy, the manifest
 states what actually ran, and the per-shot ledger records outcomes. A source
 paper's name on a file is provenance, not a claim of numerical identity with
 an undocumented implementation.
+
+The [A5/B2 BP4 tuning study](../data/reproductions/yao-2312-10950-bp4-tuning-p006/README.md)
+uses the same separation between decoder policy and sampled errors. Its
+`decoders/` directory contains frozen candidate registries and selected
+per-code files; its study-specific `runner.py` reads them, and its stage plans
+pin their bytes. The selected files are not accepted by the public
+`bp-registry --decoder` command. They record physical `p=0.06` separately
+from decoder prior `p0`, so a tuned prior need not equal the sampling rate.

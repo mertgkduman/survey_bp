@@ -1,0 +1,21 @@
+{
+  "candidate_id": "ms_q8_s4_a1_b0_d02",
+  "code": "b2",
+  "counts": {
+    "elapsed_ns": 9415277591,
+    "exact_success": 1411,
+    "iterations": 9302,
+    "stabilizer_success": 29,
+    "type_i": 20,
+    "type_ii": 0
+  },
+  "events_sha256": "6bc6a16dd5a003923b1bb8dc8f6f339c280a550359497c8339b629272dee3c22",
+  "manifest_sha256": "bef6fc38cefbbfe622d244fe01f0f55ec8f5b024d786e74cfa87522a32057efd",
+  "max_shots": 1460,
+  "schema": "yao-bp4-tuning-summary-v1",
+  "seed": 620261128,
+  "shots": 1460,
+  "stop_reason": "fixed_shots",
+  "target_failures": null,
+  "wall_seconds": 10.443017941899598
+}

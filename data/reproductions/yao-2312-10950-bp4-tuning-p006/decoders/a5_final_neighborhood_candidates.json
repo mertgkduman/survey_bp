@@ -1,0 +1,64 @@
+{
+  "baseline_id": "sp_f64_v2_d01_p0005_t10000",
+  "candidates": [
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p0005_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.005,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.05,
+      "id": "sp_f64_v2_d005_p0005_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.005,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.15,
+      "id": "sp_f64_v2_d015_p0005_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.005,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.2,
+      "id": "sp_f64_v2_d02_p0005_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.005,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p0005_t5000",
+      "kernel": "profile_v2",
+      "max_iterations": 5000,
+      "p0": 0.005,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p0005_t20000",
+      "kernel": "profile_v2",
+      "max_iterations": 20000,
+      "p0": 0.005,
+      "product_epsilon": 1e-10
+    }
+  ],
+  "physical_p": 0.06,
+  "schema": "yao-bp4-tuning-candidates-v1",
+  "selection_status": "independent_a5_final_neighborhood",
+  "source_a5_tiny_prior_plan_sha256": "0b4fd0379b7202cf8c8f784fab88194022a07aaeae2f655b79070b50c3d1b952",
+  "source_a5_tiny_prior_results_sha256": "883dd329913929d71fffd125644d9d9efe6de0c5dd0254bf5ae2c64b66cd8624"
+}

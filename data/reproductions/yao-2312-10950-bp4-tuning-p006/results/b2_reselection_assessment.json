@@ -1,0 +1,46 @@
+{
+  "comparisons": [
+    {
+      "below_retained_ci90": false,
+      "candidate_id": "sp_f64_v2_d01_p014_t5000",
+      "failures": 38,
+      "losses_vs_retained": 14,
+      "paired_improvement_p": 0.9793052673339844,
+      "rescues_vs_retained": 6,
+      "shots": 100000,
+      "triggers_continued_prior_tuning": false
+    },
+    {
+      "below_retained_ci90": false,
+      "candidate_id": "sp_f64_v2_d01_p016_t5000",
+      "failures": 39,
+      "losses_vs_retained": 15,
+      "paired_improvement_p": 0.9866981506347656,
+      "rescues_vs_retained": 6,
+      "shots": 100000,
+      "triggers_continued_prior_tuning": false
+    },
+    {
+      "below_retained_ci90": false,
+      "candidate_id": "sp_f64_v2_d01_p017_t5000",
+      "failures": 38,
+      "losses_vs_retained": 18,
+      "paired_improvement_p": 0.956420723348856,
+      "rescues_vs_retained": 10,
+      "shots": 100000,
+      "triggers_continued_prior_tuning": false
+    }
+  ],
+  "retained_candidate_id": "sp_f64_v2_d01_p015_t5000",
+  "retained_ci90": [
+    0.00021594778937233,
+    0.00040688332508086145
+  ],
+  "retained_failures": 30,
+  "retained_ler": 0.0003,
+  "retained_shots": 100000,
+  "schema": "yao-bp4-tuning-b2-reselection-v1",
+  "stage_plan_sha256": "ea3ed73f1b700e1d9cba0927d3d4f8fa555db7debf08bda433f596761ecb9373",
+  "stage_results_sha256": "e321a4f127db98fb214c1614b61199fc9deffad4670d691e0581f5dad0a30d05",
+  "stop_in_tested_prior_neighborhood": true
+}

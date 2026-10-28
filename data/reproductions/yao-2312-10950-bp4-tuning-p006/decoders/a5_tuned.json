@@ -1,0 +1,27 @@
+{
+  "baseline_id": "sp_f64_v2_d02_p0005_t10000",
+  "candidates": [
+    {
+      "check_cap": null,
+      "damping": 0.2,
+      "id": "sp_f64_v2_d02_p0005_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.005,
+      "product_epsilon": 1e-10
+    }
+  ],
+  "code": "a5",
+  "code_semantic_sha256": "2c77c863501833d722e5b52a4d225d2524663caf820fcb019431ef663ec7f53d",
+  "physical_p": 0.06,
+  "schema": "yao-bp4-tuning-candidates-v1",
+  "selected_candidate_id": "sp_f64_v2_d02_p0005_t10000",
+  "selection_assessment_sha256": "c05c78bb0c245baa2c88e25ce3d623574b99c5129bf3d963c40ac14f8edf289a",
+  "selection_failures": 43,
+  "selection_shots": 100000,
+  "selection_stage": "a5_d02_neighborhood",
+  "selection_stage_plan_sha256": "91f6c6194dfe7dcef49c978e0c2bcbb4f5e6aac462318c06b3795b24dbe5ad8b",
+  "selection_stage_results_sha256": "8d2b1c86263c4543eb4b494310d8d705c261ba44d428f841bee15a2742e7db1f",
+  "selection_status": "finite_neighborhood_90pct_interval_and_work",
+  "supersedes_selection_sha256": "bc12025836b4278c5b0d172827af8ee4cb728c6a44dc6d32951458c68b5a4c22"
+}

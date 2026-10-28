@@ -1,0 +1,89 @@
+{
+  "codes": {
+    "a5": {
+      "comparisons": [
+        {
+          "below_incumbent_ci90": false,
+          "candidate_id": "sp_f64_v2_d01_p00005_t10000",
+          "failures": 50,
+          "ler": 0.0005,
+          "losses_vs_incumbent": 12,
+          "paired_improvement_p": 0.808344841003418,
+          "rescues_vs_incumbent": 9,
+          "shots": 100000,
+          "triggers_continued_tuning": false
+        },
+        {
+          "below_incumbent_ci90": false,
+          "candidate_id": "sp_f64_v2_d01_p0001_t10000",
+          "failures": 52,
+          "ler": 0.00052,
+          "losses_vs_incumbent": 12,
+          "paired_improvement_p": 0.9164657592773438,
+          "rescues_vs_incumbent": 7,
+          "shots": 100000,
+          "triggers_continued_tuning": false
+        },
+        {
+          "below_incumbent_ci90": false,
+          "candidate_id": "sp_f64_v2_d01_p0002_t10000",
+          "failures": 52,
+          "ler": 0.00052,
+          "losses_vs_incumbent": 12,
+          "paired_improvement_p": 0.9164657592773438,
+          "rescues_vs_incumbent": 7,
+          "shots": 100000,
+          "triggers_continued_tuning": false
+        },
+        {
+          "below_incumbent_ci90": false,
+          "candidate_id": "sp_f64_v2_d01_p0003_t10000",
+          "failures": 52,
+          "ler": 0.00052,
+          "losses_vs_incumbent": 14,
+          "paired_improvement_p": 0.8949801921844482,
+          "rescues_vs_incumbent": 9,
+          "shots": 100000,
+          "triggers_continued_tuning": false
+        },
+        {
+          "below_incumbent_ci90": false,
+          "candidate_id": "sp_f64_v2_d01_p00075_t10000",
+          "failures": 52,
+          "ler": 0.00052,
+          "losses_vs_incumbent": 10,
+          "paired_improvement_p": 0.940765380859375,
+          "rescues_vs_incumbent": 5,
+          "shots": 100000,
+          "triggers_continued_tuning": false
+        },
+        {
+          "below_incumbent_ci90": false,
+          "candidate_id": "sp_f64_v2_d01_p001_t10000",
+          "failures": 52,
+          "ler": 0.00052,
+          "losses_vs_incumbent": 14,
+          "paired_improvement_p": 0.8949801921844482,
+          "rescues_vs_incumbent": 9,
+          "shots": 100000,
+          "triggers_continued_tuning": false
+        }
+      ],
+      "continued_tuning_triggers": [],
+      "incumbent_ci90": [
+        0.00036321642069277107,
+        0.0005993159291710628
+      ],
+      "incumbent_failures": 47,
+      "incumbent_id": "sp_f64_v2_d01_p0005_t10000",
+      "incumbent_ler": 0.00047,
+      "incumbent_shots": 100000,
+      "stop_in_tested_neighborhood": true
+    }
+  },
+  "confidence": 0.9,
+  "schema": "yao-bp4-tuning-stopping-v1",
+  "stage": "a5_tiny_prior",
+  "stage_plan_sha256": "0b4fd0379b7202cf8c8f784fab88194022a07aaeae2f655b79070b50c3d1b952",
+  "stage_results_sha256": "883dd329913929d71fffd125644d9d9efe6de0c5dd0254bf5ae2c64b66cd8624"
+}

@@ -1,0 +1,21 @@
+{
+  "candidate_id": "sp_q8_s16_edge_d0",
+  "code": "a5",
+  "counts": {
+    "elapsed_ns": 1864795593,
+    "exact_success": 1142,
+    "iterations": 4606,
+    "stabilizer_success": 1,
+    "type_i": 5,
+    "type_ii": 0
+  },
+  "events_sha256": "2215e3bd2430d7559bb04e82f9a9ff5cd34439709786832d4c11a61dfd012fcd",
+  "manifest_sha256": "9b728d3c922584c474865b5f2afd4c51ff7876a22c667de892d1940672ba8e19",
+  "max_shots": 1148,
+  "schema": "yao-bp4-tuning-summary-v1",
+  "seed": 620261028,
+  "shots": 1148,
+  "stop_reason": "fixed_shots",
+  "target_failures": null,
+  "wall_seconds": 2.112311227247119
+}

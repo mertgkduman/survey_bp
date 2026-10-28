@@ -1,0 +1,21 @@
+{
+  "candidate_id": "sp_q8_s8_all_d0",
+  "code": "b2",
+  "counts": {
+    "elapsed_ns": 27491823959,
+    "exact_success": 1398,
+    "iterations": 12414,
+    "stabilizer_success": 15,
+    "type_i": 47,
+    "type_ii": 0
+  },
+  "events_sha256": "f2ab548a5dd923120dbd07239eb573d55b33592adba5e563a9b2098ae9006a17",
+  "manifest_sha256": "8a9d10fc9086abd44801e83894d8976bd91802d68c4ae23767638b5316eaad55",
+  "max_shots": 1460,
+  "schema": "yao-bp4-tuning-summary-v1",
+  "seed": 620261128,
+  "shots": 1460,
+  "stop_reason": "fixed_shots",
+  "target_failures": null,
+  "wall_seconds": 28.292297977022827
+}

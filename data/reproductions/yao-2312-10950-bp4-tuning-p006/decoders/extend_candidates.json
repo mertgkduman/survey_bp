@@ -1,0 +1,63 @@
+{
+  "baseline_id": "sp_f64_v2_d01_p006_t2000",
+  "candidates": [
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p006_t1000",
+      "kernel": "profile_v2",
+      "max_iterations": 1000,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p006_t2000",
+      "kernel": "profile_v2",
+      "max_iterations": 2000,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p006_t5000",
+      "kernel": "profile_v2",
+      "max_iterations": 5000,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "sp_f64_v2_d01_p006_t10000",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.2,
+      "id": "sp_f64_v2_d02_p006_t1000",
+      "kernel": "profile_v2",
+      "max_iterations": 1000,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.2,
+      "id": "sp_f64_v2_d02_p006_t2000",
+      "kernel": "profile_v2",
+      "max_iterations": 2000,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    }
+  ],
+  "physical_p": 0.06,
+  "schema": "yao-bp4-tuning-candidates-v1",
+  "selection_status": "post_holdout_iteration_cap_check_on_new_seed",
+  "source_validate_plan_sha256": "8f213a1a131e5c65bb97c92c7d701131864622e0ec54d92f31f1f37ba60e5d8a"
+}

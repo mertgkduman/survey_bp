@@ -1,0 +1,27 @@
+{
+  "cap_increase": {
+    "from": "sp_f64_v2_d02_p0005_t10000",
+    "incumbent_rate_to_lower_ci90_margin": 0.00010186853298511543,
+    "losses": 0,
+    "one_sided_rescue_upper90": 7.993429971267079e-05,
+    "practically_saturated90": true,
+    "rescues": 4,
+    "to": "sp_f64_v2_d02_p0005_t20000"
+  },
+  "ci90": [
+    0.00032813146701488456,
+    0.0005544554977987022
+  ],
+  "failures": 43,
+  "ler": 0.00043,
+  "mean_iterations": 9.20809,
+  "noncap_neighbor_triggers": [],
+  "pairwise_sha256": "77608f8cbd57c1095630d13fe459e60d617575e1affbc414a611b57fa761d1a2",
+  "plan_sha256": "91f6c6194dfe7dcef49c978e0c2bcbb4f5e6aac462318c06b3795b24dbe5ad8b",
+  "results_sha256": "8d2b1c86263c4543eb4b494310d8d705c261ba44d428f841bee15a2742e7db1f",
+  "schema": "yao-bp4-tuning-a5-final-v1",
+  "selection": "sp_f64_v2_d02_p0005_t10000",
+  "shots": 100000,
+  "stop_in_tested_neighborhood_with_cap_rule": true,
+  "stopping_assessment_sha256": "8baa6b3baf986083d547e61b2ebdc7211b675e94b13cabd1065e6624a4059317"
+}

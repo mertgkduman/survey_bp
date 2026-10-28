@@ -1,0 +1,21 @@
+{
+  "candidate_id": "sp_policy_f64_d02",
+  "code": "a5",
+  "counts": {
+    "elapsed_ns": 2005134150,
+    "exact_success": 1141,
+    "iterations": 4259,
+    "stabilizer_success": 4,
+    "type_i": 3,
+    "type_ii": 0
+  },
+  "events_sha256": "54758aa5f221963efffa59395be9bd7eea53057c75c18d7e77a8d11672ee73b1",
+  "manifest_sha256": "9d4be7c0a77604188ce67be60da8d39ac079a8daea2773f90dac3769d3a9dc01",
+  "max_shots": 1148,
+  "schema": "yao-bp4-tuning-summary-v1",
+  "seed": 620261028,
+  "shots": 1148,
+  "stop_reason": "fixed_shots",
+  "target_failures": null,
+  "wall_seconds": 2.338161109946668
+}
