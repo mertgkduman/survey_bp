@@ -1,0 +1,21 @@
+{
+  "candidate_id": "tuned_t100_a5",
+  "code": "a5",
+  "counts": {
+    "elapsed_ns": 175454170093,
+    "exact_success": 99456,
+    "iterations": 388652,
+    "stabilizer_success": 358,
+    "type_i": 186,
+    "type_ii": 0
+  },
+  "events_sha256": "154f51a0d3186ccd58760a5f55eff1e162cc350f28dbb01cdfa11f96ef763338",
+  "manifest_sha256": "aeb29e8bf5b7ef89e5e0b0fbb09dc8acb0b35a3aa0eb257ed1362062b25b776b",
+  "max_shots": 100000,
+  "schema": "yao-bp4-tuning-summary-v1",
+  "seed": 2026102911,
+  "shots": 100000,
+  "stop_reason": "fixed_shots",
+  "target_failures": null,
+  "wall_seconds": 201.12335957959294
+}

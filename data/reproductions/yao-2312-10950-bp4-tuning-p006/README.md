@@ -19,6 +19,10 @@ same error sequence.
 outgoing V2C damping `d=0.2`, and `T=10,000`; B2 uses `p0=0.15`, `d=0.1`,
 and `T=5,000`. The counts, exact 90% intervals, finite-neighborhood decision,
 and limitations are in the [final report](results/REPORT.md).
+The [paired fairness follow-up](fairness_t100/REPORT.md) compares these
+settings with untuned BP4 at equal `T=100` and at approximately equal mean
+iterations. Use that follow-up for tuned-versus-untuned effect claims; the
+selected long-cap rates alone do not control decoding work.
 
 ## Search design
 

@@ -1,0 +1,21 @@
+{
+  "candidate_id": "vanilla_t2400",
+  "code": "b2",
+  "counts": {
+    "elapsed_ns": 236064447307,
+    "exact_success": 19702,
+    "iterations": 136919,
+    "stabilizer_success": 292,
+    "type_i": 6,
+    "type_ii": 0
+  },
+  "events_sha256": "34b08d923cffe135384f757cf6de90d591638ac0d5a7478f39192b8cd47080f1",
+  "manifest_sha256": "0b2758aadebe8c0f1e5eca23599a572991a6cc548fdd089216830410dd27bfca",
+  "max_shots": 20000,
+  "schema": "yao-bp4-tuning-summary-v1",
+  "seed": 2026102902,
+  "shots": 20000,
+  "stop_reason": "fixed_shots",
+  "target_failures": null,
+  "wall_seconds": 250.57256365101784
+}

@@ -1,0 +1,21 @@
+{
+  "candidate_id": "vanilla_t600",
+  "code": "a5",
+  "counts": {
+    "elapsed_ns": 44637765750,
+    "exact_success": 19902,
+    "iterations": 106358,
+    "stabilizer_success": 58,
+    "type_i": 40,
+    "type_ii": 0
+  },
+  "events_sha256": "b061c7994127fbe00c3650064e50066ca788e3f9922131a5b6fb9706edd18cee",
+  "manifest_sha256": "73dc51519b96245f942bd307c919d5c9abdee83e258879ac882ef811995367a5",
+  "max_shots": 20000,
+  "schema": "yao-bp4-tuning-summary-v1",
+  "seed": 2026102901,
+  "shots": 20000,
+  "stop_reason": "fixed_shots",
+  "target_failures": null,
+  "wall_seconds": 50.578621136024594
+}

@@ -1,0 +1,54 @@
+{
+  "baseline_id": "vanilla_t100",
+  "candidates": [
+    {
+      "check_cap": null,
+      "damping": 0.0,
+      "id": "vanilla_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.0,
+      "id": "vanilla_t3000",
+      "kernel": "profile_v2",
+      "max_iterations": 3000,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.0,
+      "id": "vanilla_t3600",
+      "kernel": "profile_v2",
+      "max_iterations": 3600,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.0,
+      "id": "vanilla_t4200",
+      "kernel": "profile_v2",
+      "max_iterations": 4200,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    }
+  ],
+  "design": "A5 pilot extension; rates not assessed",
+  "physical_p": 0.06,
+  "schema": "yao-bp4-tuning-candidates-v1",
+  "source_a5_summary_sha256": {
+    "tuned_selected_a5": "413fe661e038526459d3f241be7606a3067dcac7f5e15736679a66da9445cf9c",
+    "vanilla_t100": "e48e31445582797d88dd2a66f851c58bb1c361d05ce93a6c9fc349b1011ea5dc",
+    "vanilla_t1000": "b638515889074939f1499b45326818a0ed55e8e370f006d6819c19c1518d7463",
+    "vanilla_t1600": "5fb7112a5aea27bf69020ad3e12a2e5e3b8639e39d7bca965d1a4b590078792a",
+    "vanilla_t2400": "0effda635957f26229ff63be2e4802d1c9877707a715f8df8e2302a5ef3f598e",
+    "vanilla_t300": "965ea78e52f14d19cb5759d1c890f339e8dbf7afa642d39bdd3b85ddd9caa3f6",
+    "vanilla_t600": "287c7fc43fc5a45e9e817bd5b40aaef1bcc29ab44141c7e63792663d5ff74a6f"
+  },
+  "source_pilot_plan_sha256": "1cd0d4b2ca3359a1b38c242d4af5e2f758c3fab6489d374fc048d3cd181bed67"
+}

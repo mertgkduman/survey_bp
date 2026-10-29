@@ -1,0 +1,21 @@
+{
+  "candidate_id": "tuned_selected_a5",
+  "code": "a5",
+  "counts": {
+    "elapsed_ns": 77349125619,
+    "exact_success": 19907,
+    "iterations": 188249,
+    "stabilizer_success": 83,
+    "type_i": 10,
+    "type_ii": 0
+  },
+  "events_sha256": "ac118900d881cca31ede1030be46daec7f02fc3dd3289f0d3d2ec24bb4594e68",
+  "manifest_sha256": "185c927e4adbc686a2b0d664fb71fad05def8f3b47dc1f87c69555735be5e5db",
+  "max_shots": 20000,
+  "schema": "yao-bp4-tuning-summary-v1",
+  "seed": 2026102901,
+  "shots": 20000,
+  "stop_reason": "fixed_shots",
+  "target_failures": null,
+  "wall_seconds": 83.11719612777233
+}

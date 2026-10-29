@@ -1,0 +1,66 @@
+{
+  "comparisons": [],
+  "complete": true,
+  "completed_tasks": 4,
+  "interval": "exact two-sided Clopper-Pearson 90%",
+  "missing_task_indices": [],
+  "paired_test": "exact one-sided McNemar; selected policies fixed before this evaluation",
+  "plan_sha256": "6e5ffee02f3ac5fc80778a6b2104b7ffb371312e4b4e869308c776d5b5a969a2",
+  "rows": [
+    {
+      "candidate_id": "vanilla_t100",
+      "ci90_lower": 0.0031135478739002334,
+      "ci90_upper": 0.0045971268536631575,
+      "code": "a5",
+      "failures": 76,
+      "ler": 0.0038,
+      "mean_decode_ms": 1.7438512438999998,
+      "mean_iterations": 3.95055,
+      "shots": 20000,
+      "type_i": 76,
+      "type_ii": 0
+    },
+    {
+      "candidate_id": "vanilla_t3000",
+      "ci90_lower": 0.001079898971917723,
+      "ci90_upper": 0.002033981532598063,
+      "code": "a5",
+      "failures": 30,
+      "ler": 0.0015,
+      "mean_decode_ms": 3.4405846968000002,
+      "mean_iterations": 9.29325,
+      "shots": 20000,
+      "type_i": 30,
+      "type_ii": 0
+    },
+    {
+      "candidate_id": "vanilla_t3600",
+      "ci90_lower": 0.001037487071335383,
+      "ci90_upper": 0.0019765275263651082,
+      "code": "a5",
+      "failures": 29,
+      "ler": 0.00145,
+      "mean_decode_ms": 3.85457086635,
+      "mean_iterations": 10.17305,
+      "shots": 20000,
+      "type_i": 29,
+      "type_ii": 0
+    },
+    {
+      "candidate_id": "vanilla_t4200",
+      "ci90_lower": 0.000995208629210113,
+      "ci90_upper": 0.0019189464787124685,
+      "code": "a5",
+      "failures": 28,
+      "ler": 0.0014,
+      "mean_decode_ms": 4.2013726704500005,
+      "mean_iterations": 11.04075,
+      "shots": 20000,
+      "type_i": 28,
+      "type_ii": 0
+    }
+  ],
+  "schema": "yao-bp4-fairness-assessment-v1",
+  "stage": "pilot_extension",
+  "total_tasks": 4
+}

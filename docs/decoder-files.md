@@ -78,3 +78,6 @@ per-code files; its study-specific `runner.py` reads them, and its stage plans
 pin their bytes. The selected files are not accepted by the public
 `bp-registry --decoder` command. They record physical `p=0.06` separately
 from decoder prior `p0`, so a tuned prior need not equal the sampling rate.
+Its [paired fairness control](../data/reproductions/yao-2312-10950-bp4-tuning-p006/fairness_t100/README.md)
+freezes an additional registry for equal-cap and approximately equal-work
+comparisons; those files use the same study-specific runner contract.

@@ -19,6 +19,20 @@ failure. Exact and stabilizer-equivalent corrections count as successes.
 Elapsed per-decode times are in the stage CSV files; they depend on the HPC
 node and are less portable than the iteration counts.
 
+## Fair comparison with untuned BP4
+
+Comparing these selected rates with an untuned `T=100` rate mixes policy and
+iteration-cap effects. The [paired fairness follow-up](../fairness_t100/REPORT.md)
+uses 100,000 identical physical errors per code and reports both equal-cap
+`T=100` and approximately equal mean-iteration controls. At equal `T=100`,
+the selected priors/damping reduce block failures by 2.11× on A5 and 2.55×
+on B2, with slightly fewer mean iterations. At approximately equal mean work,
+the A5 reduction is 4.24×. B2 has 27 untuned versus 36 tuned failures per
+100,000; that reversed point estimate is unresolved by a two-sided paired
+test (`p=0.188`). The original long-cap selected rates remain valid as
+single-policy measurements, but the earlier cross-cap 7.5–7.7× comparison
+is not an equal-budget effect estimate.
+
 ## Search and stopping evidence
 
 The exploratory [screen](screen_report.md) used a matched prefix ending at

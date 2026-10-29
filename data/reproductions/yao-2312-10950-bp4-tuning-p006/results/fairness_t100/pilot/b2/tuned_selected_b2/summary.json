@@ -1,0 +1,21 @@
+{
+  "candidate_id": "tuned_selected_b2",
+  "code": "b2",
+  "counts": {
+    "elapsed_ns": 204102897418,
+    "exact_success": 19685,
+    "iterations": 120773,
+    "stabilizer_success": 314,
+    "type_i": 1,
+    "type_ii": 0
+  },
+  "events_sha256": "bc17345f9f42e7182f9a6813748d51208c19d2975843b77b4b9505d2ad19749a",
+  "manifest_sha256": "9e31a15583cb7434e46b93f36032193b19514315d94903033c74ac629c469fb8",
+  "max_shots": 20000,
+  "schema": "yao-bp4-tuning-summary-v1",
+  "seed": 2026102902,
+  "shots": 20000,
+  "stop_reason": "fixed_shots",
+  "target_failures": null,
+  "wall_seconds": 217.64207178913057
+}

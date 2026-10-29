@@ -1,0 +1,84 @@
+{
+  "baseline_id": "vanilla_t100",
+  "candidates": [
+    {
+      "check_cap": null,
+      "damping": 0.0,
+      "id": "vanilla_t100",
+      "kernel": "profile_v2",
+      "max_iterations": 100,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.0,
+      "id": "vanilla_t300",
+      "kernel": "profile_v2",
+      "max_iterations": 300,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.0,
+      "id": "vanilla_t600",
+      "kernel": "profile_v2",
+      "max_iterations": 600,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.0,
+      "id": "vanilla_t1000",
+      "kernel": "profile_v2",
+      "max_iterations": 1000,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.0,
+      "id": "vanilla_t1600",
+      "kernel": "profile_v2",
+      "max_iterations": 1600,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.0,
+      "id": "vanilla_t2400",
+      "kernel": "profile_v2",
+      "max_iterations": 2400,
+      "p0": 0.06,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.2,
+      "id": "tuned_selected_a5",
+      "kernel": "profile_v2",
+      "max_iterations": 10000,
+      "p0": 0.005,
+      "product_epsilon": 1e-10
+    },
+    {
+      "check_cap": null,
+      "damping": 0.1,
+      "id": "tuned_selected_b2",
+      "kernel": "profile_v2",
+      "max_iterations": 5000,
+      "p0": 0.15,
+      "product_epsilon": 1e-10
+    }
+  ],
+  "design": "independent mean-iteration calibration pilot; no rate claims",
+  "physical_p": 0.06,
+  "schema": "yao-bp4-tuning-candidates-v1",
+  "source_selected_sha256": {
+    "a5": "8d5b8fba9bbfa4371f571e98a0a3b6daf72d26df956b7a618b4d22ab415cf201",
+    "b2": "5accd7450f9cb9c3ad8b44039d9e0c948d739403558fe72f92943f1c0fd240d4"
+  }
+}

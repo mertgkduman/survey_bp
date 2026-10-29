@@ -1,0 +1,21 @@
+{
+  "candidate_id": "tuned_t100_b2",
+  "code": "b2",
+  "counts": {
+    "elapsed_ns": 1002472926353,
+    "exact_success": 98238,
+    "iterations": 511695,
+    "stabilizer_success": 1662,
+    "type_i": 100,
+    "type_ii": 0
+  },
+  "events_sha256": "afc69c802ebab130e9a16b36888de8b6d8301b62ae5ed5cbfc2cbbd12b90a616",
+  "manifest_sha256": "345b2ee2276b4a49a34fcf81b3e2a2cc02d3b428f0bad8a04839e891f7ff4cb6",
+  "max_shots": 100000,
+  "schema": "yao-bp4-tuning-summary-v1",
+  "seed": 2026102912,
+  "shots": 100000,
+  "stop_reason": "fixed_shots",
+  "target_failures": null,
+  "wall_seconds": 1074.5445630485192
+}

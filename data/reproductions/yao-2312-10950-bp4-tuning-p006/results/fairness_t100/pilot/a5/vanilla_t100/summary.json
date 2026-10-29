@@ -1,0 +1,21 @@
+{
+  "candidate_id": "vanilla_t100",
+  "code": "a5",
+  "counts": {
+    "elapsed_ns": 36440543965,
+    "exact_success": 19867,
+    "iterations": 79011,
+    "stabilizer_success": 57,
+    "type_i": 76,
+    "type_ii": 0
+  },
+  "events_sha256": "cf5d559c76c50d98a2a67cf51dcd9ed1f5fb71315bfa71f7ba5c7028dcdde78d",
+  "manifest_sha256": "95bf4db27a041aea3e764b3a6cf967f2358bc35cc43992e702204ada92974a9e",
+  "max_shots": 20000,
+  "schema": "yao-bp4-tuning-summary-v1",
+  "seed": 2026102901,
+  "shots": 20000,
+  "stop_reason": "fixed_shots",
+  "target_failures": null,
+  "wall_seconds": 42.08641565870494
+}

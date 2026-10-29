@@ -112,4 +112,5 @@ and is excluded from the assessment.
 The separate [BP4 tuning study at physical p=0.06](../yao-2312-10950-bp4-tuning-p006/README.md)
 screens numerical and policy settings on A5 and B2, then measures selected
 settings on independent fixed-shot error streams. Its tuned rates are not part
-of the vanilla source comparison above.
+of the vanilla source comparison above. For a controlled tuned-versus-untuned
+effect estimate, see its [paired equal-cap and mean-work follow-up](../yao-2312-10950-bp4-tuning-p006/fairness_t100/REPORT.md).
