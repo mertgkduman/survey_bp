@@ -1,0 +1,37 @@
+{
+  "code": "a5",
+  "counts": {
+    "control": {
+      "elapsed_ns": 32971780784,
+      "exact_success": 9963,
+      "fixations": 3457,
+      "iterations": 134450,
+      "rounds": 13445,
+      "stabilizer_success": 25,
+      "type_i": 12,
+      "type_ii": 0
+    },
+    "tuned": {
+      "elapsed_ns": 27631366729,
+      "exact_success": 9966,
+      "fixations": 1567,
+      "iterations": 115610,
+      "rounds": 11561,
+      "stabilizer_success": 27,
+      "type_i": 6,
+      "type_ii": 1
+    }
+  },
+  "events_sha256": "9146e62b08aeaec78ef33452c5cde406dbb7ba5c5c2f0bc99c553e26d42cd5d0",
+  "manifest_sha256": "4b1e6d64a425d0758e0ee3c2d03862983387f8529c08beb71d3bd5a40cb6fa0e",
+  "pairs": {
+    "both_fail": 4,
+    "both_succeed": 9985,
+    "losses": 3,
+    "rescues": 8
+  },
+  "schema": "yao-bp4-tuned-qbpgd-summary-v1",
+  "seed": 20261030,
+  "shots": 10000,
+  "wall_seconds": 63.6342292195186
+}

@@ -1,0 +1,76 @@
+{
+  "arms": {
+    "control": {
+      "decoder_p0": 0.06,
+      "numerics": {
+        "backend": "cpu-numpy",
+        "candidate_tie_break": "strict_I_then_X_then_Z_else_Y",
+        "check_cap": null,
+        "check_rule": "tanh_product",
+        "dtype": "float64",
+        "llr_orientation": "log(P(I)/P(W)) for W=X,Y,Z",
+        "message_representation": "scalar_commute_over_anticommute_edge_llr",
+        "nonfinite_policy": "reject_input_and_raise_terminal_numerical_failure",
+        "normalization": "four_state_logsumexp",
+        "oracle_gate": "vector_and_exact_tree_fixtures_required_before_public_manifest",
+        "pauli_order": "I,X,Y,Z",
+        "product_epsilon": 1e-10,
+        "profile_id": "a5-qbpgd-control-f64-v2",
+        "reduction_order": "declared_edge_order; selected_check_rule",
+        "saturation": 25.0,
+        "saturation_boundary": "legacy_saturation_field_inactive; optional_final_check_cap_and_product_unity_safeguard",
+        "smoothing_requirement": "decoder_priors_are_strictly_positive_or_explicitly_smoothed",
+        "v2c_damping": 0.0,
+        "zero_rule": "exact_zero_is_not_positive"
+      }
+    },
+    "tuned": {
+      "decoder_p0": 0.005,
+      "numerics": {
+        "backend": "cpu-numpy",
+        "candidate_tie_break": "strict_I_then_X_then_Z_else_Y",
+        "check_cap": null,
+        "check_rule": "tanh_product",
+        "dtype": "float64",
+        "llr_orientation": "log(P(I)/P(W)) for W=X,Y,Z",
+        "message_representation": "scalar_commute_over_anticommute_edge_llr",
+        "nonfinite_policy": "reject_input_and_raise_terminal_numerical_failure",
+        "normalization": "four_state_logsumexp",
+        "oracle_gate": "vector_and_exact_tree_fixtures_required_before_public_manifest",
+        "pauli_order": "I,X,Y,Z",
+        "product_epsilon": 1e-10,
+        "profile_id": "a5-qbpgd-tuned-f64-v2",
+        "reduction_order": "declared_edge_order; selected_check_rule",
+        "saturation": 25.0,
+        "saturation_boundary": "legacy_saturation_field_inactive; optional_final_check_cap_and_product_unity_safeguard",
+        "smoothing_requirement": "decoder_priors_are_strictly_positive_or_explicitly_smoothed",
+        "v2c_damping": 0.2,
+        "zero_rule": "exact_zero_is_not_positive"
+      },
+      "selected_bp4_sha256": "8d5b8fba9bbfa4371f571e98a0a3b6daf72d26df956b7a618b4d22ab415cf201",
+      "selected_candidate_id": "sp_f64_v2_d02_p0005_t10000"
+    }
+  },
+  "code": "a5",
+  "code_semantic_sha256": "2c77c863501833d722e5b52a4d225d2524663caf820fcb019431ef663ec7f53d",
+  "fidelity": "canonical_adaptation; compiled development backend",
+  "interpretation": "persistent V2C, four-state max-marginal fixation, I/X/Y/Z ties, normalizing raw (1-epsilon,epsilon,epsilon,epsilon)",
+  "physical_p": 0.06,
+  "qbpgd": {
+    "epsilon": 1e-10,
+    "iterations_per_round": 10,
+    "round_limit": "n"
+  },
+  "sampler": "numpy.PCG64; I/X/Y/Z=(1-p,p/3,p/3,p/3)",
+  "schema": "yao-bp4-tuned-qbpgd-manifest-v1",
+  "seed": 20261029,
+  "shots": 1000,
+  "source_files_sha256": {
+    "data/reproductions/yao-2312-10950-bp4-tuned-qbpgd-p006/run.py": "038970c96f44d9a596c8b9b0bce1d33c15d3bdf2b5c91e561fc3e466e36179c3",
+    "data/reproductions/yao-2312-10950-bp4-tuning-p006/decoders/a5_tuned.json": "8d5b8fba9bbfa4371f571e98a0a3b6daf72d26df956b7a618b4d22ab415cf201",
+    "data/reproductions/yao-2312-10950-vanilla/run.py": "659fd494ef2d0e9aa000eb49b24268b3b80106b46bfcfd0f70aa98bff81a870b",
+    "src/bp_registry/quaternary/compiled.py": "c02d017f03f1e2c1435a7a76e3bdd60ca75bdf43a9163e24803b72f6ee224965",
+    "src/bp_registry/quaternary/numerics.py": "94fde610220c2000927de470be293794645d37870f65bf59f5877a5ed438094c"
+  },
+  "stop_rule": "fixed_shots; up to n Q-BPGD rounds per shot; syndrome check after each 10-sweep block"
+}

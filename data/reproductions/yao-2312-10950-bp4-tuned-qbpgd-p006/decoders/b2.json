@@ -1,0 +1,29 @@
+{
+  "code": "b2",
+  "code_semantic_sha256": "a5fe623bbb01d201af4829613a8f72011566fb4348488482686de8654a804594",
+  "comparison": "canonical_adaptation_development",
+  "control": {
+    "check_cap": null,
+    "decoder_p0": 0.06,
+    "kernel": "bp4-f64-v2",
+    "product_epsilon": 1e-10,
+    "v2c_damping": 0.0
+  },
+  "physical_p": 0.06,
+  "qbpgd": {
+    "epsilon": 1e-10,
+    "iterations_per_round": 10,
+    "round_limit": "n"
+  },
+  "schema": "yao-bp4-tuned-qbpgd-policy-v1",
+  "selected_bp4_path": "data/reproductions/yao-2312-10950-bp4-tuning-p006/decoders/b2_tuned.json",
+  "selected_bp4_sha256": "5accd7450f9cb9c3ad8b44039d9e0c948d739403558fe72f92943f1c0fd240d4",
+  "selected_candidate_id": "sp_f64_v2_d01_p015_t5000",
+  "tuned": {
+    "check_cap": null,
+    "decoder_p0": 0.15,
+    "kernel": "bp4-f64-v2",
+    "product_epsilon": 1e-10,
+    "v2c_damping": 0.1
+  }
+}

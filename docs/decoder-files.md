@@ -81,3 +81,11 @@ from decoder prior `p0`, so a tuned prior need not equal the sampling rate.
 Its [paired fairness control](../data/reproductions/yao-2312-10950-bp4-tuning-p006/fairness_t100/README.md)
 freezes an additional registry for equal-cap and approximately equal-work
 comparisons; those files use the same study-specific runner contract.
+
+The [tuned Q-BPGD study](../data/reproductions/yao-2312-10950-bp4-tuned-qbpgd-p006/README.md)
+pins each selected BP4 decoder file by hash, then uses its prior and numerical
+profile for every Q-BPGD sweep. Its per-code JSON files also record the
+ten-sweep decimation block, fixation epsilon, and round cap. Standalone BP4
+iteration caps are not reused as Q-BPGD round settings. The study runner and
+compiled development backend consume these files; the public registry command
+does not.

@@ -19,7 +19,7 @@ import numpy as np
 
 from ..canonical.budgets import BudgetLimit, BudgetTree, WorkVector
 from .kernel import QbpSession, QbpSweep, ScalarLlrBp4Kernel
-from .numerics import QBP4_F64_V1
+from .numerics import QBP4_F64_V1, QuaternaryNumericalProfile
 from .problems import QuaternaryOriginalProblem
 
 
@@ -277,12 +277,13 @@ def _result_evidence(result: QbpgdResult) -> dict[str, object]:
 def reconstruct_qbpgd(
     spec: QbpgdSpec, problem: QuaternaryOriginalProblem, priors: object, expected: QbpgdResult,
     *, budget_limits: tuple[BudgetLimit, ...] = (),
+    profile: QuaternaryNumericalProfile = QBP4_F64_V1,
 ) -> QbpgdResult:
     """Independently regenerate every decoder-visible transition and work leaf."""
     if not isinstance(expected, QbpgdResult):
         raise ValueError("Q-BPGD replay requires QbpgdResult")
     rebuilt = QbpgdController(spec).run(
-        ScalarLlrBp4Kernel(profile=QBP4_F64_V1).new_session(problem, priors, budgets=BudgetTree(limits=budget_limits, parents={}))
+        ScalarLlrBp4Kernel(profile=profile).new_session(problem, priors, budgets=BudgetTree(limits=budget_limits, parents={}))
     )
     if _result_evidence(rebuilt) != _result_evidence(expected):
         raise ValueError("Q-BPGD replay disagrees with transitions, fidelity, or work")
