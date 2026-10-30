@@ -232,6 +232,25 @@ def build_hgp(constituent: np.ndarray) -> CssCode:
     return CssCode(hx=hx, hz=hz, lx=lx, lz=lz).validate()
 
 
+def build_c2_hp() -> CssCode:
+    """Construct Panteleev--Kalachev v3 C2 ``[[1922,50,16]]``.
+
+    The cited source's ``hpc_N1922_K50_D16v2.tex`` specifies the length-31
+    cyclic parity polynomial ``1+x^2+x^5``. Its general HP ansatz gives
+    ``Hx=[H⊗I,I⊗H]`` and ``Hz=[I⊗Hᵀ,Hᵀ⊗I]`` for that circulant H.
+    Logicals use the project's deterministic quotient-basis convention.
+    """
+    h = _circulant(31, (0, 2, 5))
+    identity = np.eye(31, dtype=np.uint8)
+    a, b = np.kron(h, identity), np.kron(identity, h)
+    hx, hz = np.hstack((a, b)), np.hstack((b.T, a.T))
+    lx, lz = derive_css_logicals(hx, hz)
+    code = CssCode(hx=hx, hz=hz, lx=lx, lz=lz).validate()
+    if code.n != 1922 or code.k != 50:
+        raise ValueError("source C2 HP construction has wrong dimensions")
+    return code
+
+
 def _write_npz_arrays(arrays: dict[str, np.ndarray], artifact_path: Path) -> None:
     """Write named primitive arrays with fixed ZIP metadata for byte replay."""
     with zipfile.ZipFile(artifact_path, mode="w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:

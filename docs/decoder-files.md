@@ -89,3 +89,11 @@ ten-sweep decimation block, fixation epsilon, and round cap. Standalone BP4
 iteration caps are not reused as Q-BPGD round settings. The study runner and
 compiled development backend consume these files; the public registry command
 does not.
+
+The [Yao non-OSD figure study](../data/reproductions/yao-2312-10950-non-osd/README.md)
+uses a source-specific compiled binary BP/BPGD path and the existing compiled
+Q-BPGD path. Its runner fixes the paper interpretation in code and writes the
+resolved decoder settings, source hashes, code receipts, and shot bounds into
+each manifest. `codes.json` and `source_points.json` are evidence receipts,
+not decoder-policy files. For this study, the executable policy is the pinned
+runner plus the compiled kernel source identified in the manifest.

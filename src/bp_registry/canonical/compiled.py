@@ -205,6 +205,97 @@ def _decode_v2(row_ptr: np.ndarray, variables: np.ndarray, n: int,
 
 
 @njit(cache=True)
+def _paper_binary_sweep_into(row_ptr, variables, prior_by_variable, old, syndrome,
+                             c2v, beliefs, candidate, new):
+    """Yao v2 binary SPA interpretation: clip only outgoing V2C to 25."""
+    for check in range(len(row_ptr) - 1):
+        start, stop = row_ptr[check], row_ptr[check + 1]
+        for edge in range(start, stop):
+            c2v[edge] = _v2_check(old, start, stop, edge, int(syndrome[check]), math.inf, 1e-10)
+    beliefs[:] = prior_by_variable
+    for edge in range(len(variables)):
+        beliefs[variables[edge]] += c2v[edge]
+    for variable in range(len(beliefs)):
+        if not math.isfinite(beliefs[variable]):
+            raise ValueError("nonfinite paper binary BP posterior")
+        candidate[variable] = 0 if beliefs[variable] > 0.0 else 1
+    for edge in range(len(variables)):
+        new[edge] = _clip(beliefs[variables[edge]] - c2v[edge], 25.0)
+
+
+@njit(cache=True)
+def _paper_binary_run(row_ptr, variables, n, syndrome, prior_llr_value,
+                      sweeps_per_round, max_rounds, mode, gap, random_draws):
+    prior = np.full(n, prior_llr_value, dtype=np.float64)
+    old = prior[variables].copy()
+    new = np.empty_like(old)
+    c2v = np.empty(len(variables), dtype=np.float64)
+    beliefs = np.empty(n, dtype=np.float64)
+    candidate = np.zeros(n, dtype=np.uint8)
+    eligible = np.ones(n, dtype=np.uint8)
+    sweeps = 0
+    fixations = 0
+    for round_index in range(max_rounds):
+        for _ in range(sweeps_per_round):
+            _paper_binary_sweep_into(row_ptr, variables, prior, old, syndrome,
+                                     c2v, beliefs, candidate, new)
+            old, new = new, old
+            sweeps += 1
+        if _candidate_matches(row_ptr, variables, candidate, syndrome):
+            return candidate, True, sweeps, round_index + 1, fixations
+        target = -1
+        best = -1.0
+        for variable in range(n):
+            if eligible[variable] and abs(beliefs[variable]) > best:
+                target, best = variable, abs(beliefs[variable])
+        if mode != 0:
+            threshold = -1.0 if mode == 1 else best - gap
+            count = 0
+            for variable in range(n):
+                if eligible[variable] and abs(beliefs[variable]) >= threshold:
+                    count += 1
+            chosen = min(count - 1, int(random_draws[round_index] * count))
+            for variable in range(n):
+                if eligible[variable] and abs(beliefs[variable]) >= threshold:
+                    if chosen == 0:
+                        target = variable
+                        break
+                    chosen -= 1
+        if target < 0:
+            return candidate, False, sweeps, round_index + 1, fixations
+        eligible[target] = 0
+        prior[target] = 25.0 if beliefs[target] > 0.0 else -25.0
+        fixations += 1
+    return candidate, False, sweeps, max_rounds, fixations
+
+
+@njit(cache=True)
+def _paper_binary_bp(row_ptr, variables, n, syndrome, prior_llr_value, max_iterations):
+    prior = np.full(n, prior_llr_value, dtype=np.float64)
+    old = prior[variables].copy()
+    new = np.empty_like(old)
+    c2v = np.empty(len(variables), dtype=np.float64)
+    beliefs = np.empty(n, dtype=np.float64)
+    candidate = np.zeros(n, dtype=np.uint8)
+    for iteration in range(1, max_iterations + 1):
+        _paper_binary_sweep_into(row_ptr, variables, prior, old, syndrome,
+                                 c2v, beliefs, candidate, new)
+        if _candidate_matches(row_ptr, variables, candidate, syndrome):
+            return candidate, True, iteration
+        old, new = new, old
+    return candidate, False, max_iterations
+
+
+@dataclass(frozen=True)
+class CompiledBinaryBpgdResult:
+    candidate: np.ndarray
+    converged: bool
+    iterations: int
+    rounds: int
+    fixations: int
+
+
+@njit(cache=True)
 def _policy_sweep_into(row_ptr, variables, n, old, syndrome, prior,
                        format_code, scale, all_state, check_rule,
                        old_weight, fresh_weight, alpha, beta,
@@ -409,6 +500,48 @@ class CompiledBinaryFlooding:
         candidate.setflags(write=False)
         return KernelResult(candidate, bool(converged), int(iterations))
 
+    def run_paper_bp(self, syndrome: np.ndarray, *, error_rate: float,
+                     max_iterations: int = 100) -> KernelResult:
+        """Run the paper's binary SPA interpretation with V2C saturation at 25."""
+        s, prior = self._inputs(syndrome, error_rate)
+        if self.rule != "spa" or self.policy is not None or type(max_iterations) is not int or max_iterations < 1:
+            raise ValueError("paper binary BP requires SPA and a positive iteration cap")
+        candidate, converged, iterations = _paper_binary_bp(
+            self.row_ptr, self.variables, self.table.variable_count, s, prior, max_iterations,
+        )
+        candidate.setflags(write=False)
+        return KernelResult(candidate, bool(converged), int(iterations))
+
+    def run_paper_bpgd(self, syndrome: np.ndarray, *, error_rate: float,
+                       sweeps_per_round: int, round_limit: int | None = None,
+                       order: str = "most_reliable", gap: float = 0.0,
+                       random_draws: np.ndarray | None = None) -> CompiledBinaryBpgdResult:
+        """Persistent-message Algorithm 1 blocks; source differences remain explicit."""
+        s, prior = self._inputs(syndrome, error_rate)
+        if self.rule != "spa" or self.policy is not None:
+            raise ValueError("paper BPGD requires binary SPA without a policy overlay")
+        if type(sweeps_per_round) is not int or sweeps_per_round < 1:
+            raise ValueError("sweeps_per_round must be positive")
+        if round_limit is not None and (type(round_limit) is not int or round_limit < 1):
+            raise ValueError("round_limit must be positive")
+        if order not in {"most_reliable", "uniform_random", "top_gap_random"}:
+            raise ValueError("unknown BPGD decimation order")
+        if not math.isfinite(gap) or gap < 0.0:
+            raise ValueError("random reliability gap must be finite and nonnegative")
+        rounds = min(self.table.variable_count, round_limit or self.table.variable_count)
+        draws = np.zeros(rounds, dtype=np.float64) if random_draws is None else np.asarray(random_draws, dtype=np.float64)
+        if draws.shape != (rounds,) or np.any(~np.isfinite(draws)) or np.any((draws < 0.0) | (draws >= 1.0)):
+            raise ValueError("random draws must be one [0,1) value per possible round")
+        candidate, converged, iterations, used_rounds, fixations = _paper_binary_run(
+            self.row_ptr, self.variables, self.table.variable_count, s, prior,
+            sweeps_per_round, rounds,
+            {"most_reliable": 0, "uniform_random": 1, "top_gap_random": 2}[order],
+            gap, draws,
+        )
+        candidate.setflags(write=False)
+        return CompiledBinaryBpgdResult(candidate, bool(converged), int(iterations),
+                                        int(used_rounds), int(fixations))
+
 
 @dataclass(frozen=True)
 class BoundBinaryFlooding:
@@ -447,4 +580,4 @@ class BoundBinaryFlooding:
         return KernelResult(candidate, bool(converged), int(iterations))
 
 
-__all__ = ["BoundBinaryFlooding", "CompiledBinaryFlooding"]
+__all__ = ["BoundBinaryFlooding", "CompiledBinaryFlooding", "CompiledBinaryBpgdResult"]

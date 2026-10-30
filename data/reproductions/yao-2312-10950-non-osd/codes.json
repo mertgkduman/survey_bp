@@ -1,0 +1,81 @@
+{
+  "c2_matrix_source": "matrices/hpc_N1922_K50_D16v2.tex",
+  "c2_matrix_source_sha256": "4e19d0b33fd5e3d1e7c706ec5674d0d043e7a1b93a11dfa8800925bca35f824a",
+  "codes": {
+    "a5": {
+      "constructor": "<lambda>",
+      "hx_sha256": "f2742ac07217593f58dda889e0a39555c5db9857849555aa0915d532afba910e",
+      "hx_shape": [
+        90,
+        180
+      ],
+      "hz_sha256": "e9d9f8265afef5ae302b6a7efa27e96c409210e2af318bd44857b51dbe2107c5",
+      "hz_shape": [
+        90,
+        180
+      ],
+      "k": 10,
+      "lx_sha256": "7a8465586c7c37cd9f2c569512cf3b08ed557fd6f7c77a101128e0be7b8e761c",
+      "lz_sha256": "86fc98a30ffee6ff165870138ff9b5f99ebe8e5f533f9be4b4e932a788ee70ad",
+      "n": 180,
+      "semantic_sha256": "2c77c863501833d722e5b52a4d225d2524663caf820fcb019431ef663ec7f53d"
+    },
+    "b1": {
+      "constructor": "build_b1_ghp",
+      "hx_sha256": "c9f29501bc6f5bea3bff9e98115a0fa87c1ff8ef5251b67938be55ededf836f5",
+      "hx_shape": [
+        441,
+        882
+      ],
+      "hz_sha256": "0d577b9c46fdbc905219fbf4d9404ae7813244b145d66ce3d51bdcfe8bbc10b5",
+      "hz_shape": [
+        441,
+        882
+      ],
+      "k": 24,
+      "lx_sha256": "21786f0596e758a7408b884d384ba3317811e420a81483a08cdb0af1a8206368",
+      "lz_sha256": "f4776fd5ab53db61015c20bd8b92dd4866bb9b3d989ab10530c5c9eb015cb7ed",
+      "n": 882,
+      "semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548"
+    },
+    "b2": {
+      "constructor": "build_b2_ghp",
+      "hx_sha256": "de8f38b1fd4eeff85d7ae1fcc19f692351ef90d71f50c22bff33f7089b9e904b",
+      "hx_shape": [
+        441,
+        882
+      ],
+      "hz_sha256": "94fe6b05a2761f35827fc7851cc0dfb26efb3ebfe3e2887fbb8fdeb890b04957",
+      "hz_shape": [
+        441,
+        882
+      ],
+      "k": 48,
+      "lx_sha256": "2e5908a560dcd386948bcfb2af041b7278bf68eb385532812442072298029a86",
+      "lz_sha256": "e0f1346a2da6b182d6e81cae8396860a41165e6102e7931d856d50760f1f501d",
+      "n": 882,
+      "semantic_sha256": "a5fe623bbb01d201af4829613a8f72011566fb4348488482686de8654a804594"
+    },
+    "c2": {
+      "constructor": "build_c2_hp",
+      "hx_sha256": "844773d52222225d418fc09963fd87068a82918472fd2e8c8322ecec160f69c6",
+      "hx_shape": [
+        961,
+        1922
+      ],
+      "hz_sha256": "d3f7fce998d8ef74afe6a7d9a17be653f84257a8938e07bfb5a5de15cfc85ea9",
+      "hz_shape": [
+        961,
+        1922
+      ],
+      "k": 50,
+      "lx_sha256": "bbfd74e7cf0c774e5c35334dfce60efd5227e1c173a1c3b251ad5538fa8e3b85",
+      "lz_sha256": "3092a9682077a05c199567766bfd77d0c2405ca6fdbbb4446d5ddbac767ba6be",
+      "n": 1922,
+      "semantic_sha256": "a3ea36c9b1a588b133e24dd9ff27fd4964c495cc8a9ae4c875c36b635ac0903b"
+    }
+  },
+  "schema": "yao-non-osd-css-code-receipts-v1",
+  "source_archive_sha256": "5aa90578b1a93e18dedf505784d3b2836b2fd5a9bbe91bff2617e5fc6603975e",
+  "source_code_paper": "https://arxiv.org/pdf/1904.02703v3"
+}
