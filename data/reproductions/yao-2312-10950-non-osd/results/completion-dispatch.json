@@ -1,0 +1,62 @@
+{
+  "schema": "yao-bp-bpgd-completion-dispatch-v1",
+  "fidelity": "bounded_canonical_adaptation_development",
+  "slurm_account": "pfisterlab",
+  "partition": "common",
+  "site_observation": {
+    "observed_group_cpu_limit": 400,
+    "observed_group_memory_limit_mib": 1500000,
+    "observed_partition_wall_limit": "30-00:00:00",
+    "observation_method": "sacctmgr show assoc user=mg551; sinfo; scontrol show job 59184152"
+  },
+  "dispatches": [
+    {
+      "job_id": "60639960",
+      "description": "A5 guided T=10, p=0.06, iid 100-failure run",
+      "tasks": 1,
+      "cpus_per_task": 1,
+      "memory_gib_per_task": 4,
+      "wall_limit_hours_per_task": 8
+    },
+    {
+      "job_id": "60639961",
+      "description": "B2 guided T=10, p=0.06, iid 100-failure run",
+      "tasks": 1,
+      "cpus_per_task": 1,
+      "memory_gib_per_task": 4,
+      "wall_limit_hours_per_task": 8
+    },
+    {
+      "job_id": "60640660",
+      "description": "Direct source-grid completion",
+      "plan": "completion-direct-plan.json",
+      "tasks": 30,
+      "max_simultaneous_tasks": 16,
+      "cpus_per_task": 1,
+      "memory_gib_per_task": 4,
+      "wall_limit_hours_per_task": 8
+    },
+    {
+      "job_id": "60640844",
+      "description": "Fixed-shot rare-event importance pilots",
+      "plan": "completion-importance-plan.json",
+      "tasks": 32,
+      "max_simultaneous_tasks": 16,
+      "cpus_per_task": 1,
+      "memory_gib_per_task": 4,
+      "wall_limit_hours_per_task": 12
+    },
+    {
+      "job_id": "60641591",
+      "description": "Direct moderate-rate source-grid completion",
+      "plan": "completion-mid-plan.json",
+      "tasks": 9,
+      "max_simultaneous_tasks": 9,
+      "cpus_per_task": 1,
+      "memory_gib_per_task": 4,
+      "wall_limit_hours_per_task": 8
+    }
+  ],
+  "worst_case_core_hours_if_every_task_hits_its_wall_limit": 712,
+  "phase_11_publication_dispatch": false
+}

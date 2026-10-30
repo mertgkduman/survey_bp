@@ -1,0 +1,98 @@
+{
+  "jobs": [
+    {
+      "code": "b1",
+      "max_shots": 51221,
+      "method": "bpgd_random_t100",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-mid-b1-bpgd_random_t100-p060-seed20261036",
+      "p": 0.06,
+      "seed": 20261036,
+      "source_rate": 0.005857,
+      "target_failures": 100
+    },
+    {
+      "code": "b1",
+      "max_shots": 77102,
+      "method": "bpgd_t10",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-mid-b1-bpgd_t10-p060-seed20261036",
+      "p": 0.06,
+      "seed": 20261036,
+      "source_rate": 0.003891,
+      "target_failures": 100
+    },
+    {
+      "code": "b1",
+      "max_shots": 98978,
+      "method": "bpgd_t100",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-mid-b1-bpgd_t100-p060-seed20261036",
+      "p": 0.06,
+      "seed": 20261036,
+      "source_rate": 0.003031,
+      "target_failures": 100
+    },
+    {
+      "code": "b1",
+      "max_shots": 31780,
+      "method": "bpgd_t100_r2",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-mid-b1-bpgd_t100_r2-p040-seed20261036",
+      "p": 0.04,
+      "seed": 20261036,
+      "source_rate": 0.00944,
+      "target_failures": 100
+    },
+    {
+      "code": "b1",
+      "max_shots": 88340,
+      "method": "bpgd_t100_r5",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-mid-b1-bpgd_t100_r5-p050-seed20261036",
+      "p": 0.05,
+      "seed": 20261036,
+      "source_rate": 0.003396,
+      "target_failures": 100
+    },
+    {
+      "code": "b1",
+      "max_shots": 43873,
+      "method": "bpgd_t100_r50",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-mid-b1-bpgd_t100_r50-p060-seed20261036",
+      "p": 0.06,
+      "seed": 20261036,
+      "source_rate": 0.006838,
+      "target_failures": 100
+    },
+    {
+      "code": "b1",
+      "max_shots": 81016,
+      "method": "bpgd_t70",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-mid-b1-bpgd_t70-p060-seed20261036",
+      "p": 0.06,
+      "seed": 20261036,
+      "source_rate": 0.003703,
+      "target_failures": 100
+    },
+    {
+      "code": "b2",
+      "max_shots": 64503,
+      "method": "bpgd_t10",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-mid-b2-bpgd_t10-p090-seed20261036",
+      "p": 0.09,
+      "seed": 20261036,
+      "source_rate": 0.004651,
+      "target_failures": 100
+    },
+    {
+      "code": "c2",
+      "max_shots": 51725,
+      "method": "bpgd_t10",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-mid-c2-bpgd_t10-p060-seed20261036",
+      "p": 0.06,
+      "seed": 20261036,
+      "source_rate": 0.0058,
+      "target_failures": 100
+    }
+  ],
+  "max_shots_rule": "ceil(300/source_rate)",
+  "runner_sha256": "89bbc5a825d545dd890ef59a5ed1f7642c1458615fb9b810dae587824d0fee78",
+  "schema": "yao-completion-mid-plan-v1",
+  "target_failures": 100
+}

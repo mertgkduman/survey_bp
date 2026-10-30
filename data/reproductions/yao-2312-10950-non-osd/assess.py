@@ -12,6 +12,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from scipy.stats import beta
+from importance_assess import verified_importance_runs
 
 ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parents[2]
@@ -73,7 +74,7 @@ def verified_runs() -> dict[tuple[str, str, str], dict]:
                                    if len(fixes) > 1 else None)
         summary["evidence_path"] = str(path.relative_to(REPO))
         summary["evidence_tier"] = ("interrupted_prefix" if summary["stop_reason"] == "externally_interrupted_complete_prefix"
-                                    else "pilot" if path.parent.name.startswith(("smoke", "pilot"))
+                                    else "pilot" if path.parent.name.startswith(("smoke", "pilot", "benchmark"))
                                     else "bounded_campaign")
         key = (summary["code"], summary["method"], f'{summary["physical_p"]:.5f}')
         old = selected.get(key)
@@ -102,18 +103,52 @@ def prior_qbp_runs() -> dict[tuple[str, str, str], dict]:
 def build_rows() -> list[dict]:
     runs = verified_runs()
     runs.update(prior_qbp_runs())
+    importance = verified_importance_runs()
     rows = []
     for figure, body in SOURCE["figures"].items():
         for curve, points in body["curves"].items():
+            if curve == "bp_si_external":
+                continue
             for p, published in points.items():
                 method = "bpgd_t100" if curve == "bpgd_t100_r882" else curve
-                item = runs.get((body["code"], method, p))
-                if curve == "bp_si_external":
-                    status = "external_source_only"
-                    reason = "Imported BP-SI result from a different paper; separate algorithm and data"
+                key = (body["code"], method, p)
+                item = runs.get(key)
+                imp = importance.get(key)
+                use_importance = False
+                if imp is not None and imp["raw_failures"] > 0:
+                    direct_width = math.inf if item is None else run_interval(item)[1] - run_interval(item)[0]
+                    importance_width = imp["ci95_high"] - imp["ci95_low"]
+                    use_importance = (item is None or
+                                      item["failures"] < 30 and imp["failure_ess"] >= 20 and importance_width < direct_width)
+                if use_importance:
+                    lo, hi = imp["ci95_low"], imp["ci95_high"]
+                    inside = lo <= published <= hi
+                    relative_halfwidth = math.inf if imp["rate"] == 0 else (hi-lo)/(2*imp["rate"])
+                    if imp["failure_ess"] < 100 or relative_halfwidth > .25:
+                        status = "importance_preliminary"
+                        reason = (f'Mixture importance sampling has effective weighted failure count '
+                                  f'{imp["failure_ess"]:.1f}; target is at least 100 and 25% relative half-width')
+                    else:
+                        status = "importance_95_contains_source" if inside else "importance_95_excludes_source"
+                        reason = "Approximate weighted 95% interval; source Monte Carlo uncertainty not included"
+                    selected = {"shots": imp["shots"], "failures": imp["raw_failures"],
+                                "type_i": imp["raw_type_i"], "type_ii": imp["raw_type_ii"],
+                                "mean_iterations": imp["mean_iterations"],
+                                "mean_fixations": imp["mean_fixations"],
+                                "mean_decode_ms": imp["mean_decode_ms"],
+                                "local_rate": imp["rate"], "ci95_low": lo, "ci95_high": hi,
+                                "zero_failure_upper_one_sided95": None,
+                                "evidence_tier": "importance_sampling",
+                                "evidence_path": ";".join(imp["evidence_paths"]),
+                                "estimator": "mixture_importance"}
                 elif item is None:
                     status = "pending"
                     reason = f"No completed local run; about {math.ceil(100 / published):,} shots expected for 100 failures at the source rate"
+                    selected = {"shots": None, "failures": None, "type_i": None, "type_ii": None,
+                                "mean_iterations": None, "mean_fixations": None, "mean_decode_ms": None,
+                                "local_rate": None, "ci95_low": None, "ci95_high": None,
+                                "zero_failure_upper_one_sided95": None,
+                                "evidence_tier": None, "evidence_path": None, "estimator": None}
                 else:
                     lo, hi = run_interval(item)
                     inside = lo <= published <= hi
@@ -129,23 +164,27 @@ def build_rows() -> list[dict]:
                     else:
                         status = "local_95_contains_source" if inside else "local_95_excludes_source"
                         reason = "Source rate inside local interval" if inside else "Source rate outside local interval; source trial count unavailable"
-                lo, hi = run_interval(item) if item is not None else (None, None)
+                    selected = {"shots": item["shots"], "failures": item["failures"],
+                                "type_i": item["counts"]["type_i"], "type_ii": item["counts"]["type_ii"],
+                                "mean_iterations": item.get("mean_iterations", item["counts"].get("iterations", 0) / item["shots"]),
+                                "mean_fixations": item.get("mean_fixations", item["counts"].get("fixations", 0) / item["shots"]),
+                                "mean_decode_ms": item.get("mean_elapsed_ms", item["counts"].get("elapsed_ns", 0) / item["shots"] / 1e6),
+                                "local_rate": item["failures"] / item["shots"],
+                                "ci95_low": lo, "ci95_high": hi,
+                                "zero_failure_upper_one_sided95": (1.0 - 0.05 ** (1.0 / item["shots"])
+                                                                  if item["failures"] == 0 else None),
+                                "evidence_tier": item["evidence_tier"],
+                                "evidence_path": item["evidence_path"], "estimator": "iid"}
                 rows.append({"figure": int(figure), "code": body["code"], "curve": curve, "p": p,
-                             "published_rate": published, "shots": None if item is None else item["shots"],
-                             "failures": None if item is None else item["failures"],
-                             "type_i": None if item is None else item["counts"]["type_i"],
-                             "type_ii": None if item is None else item["counts"]["type_ii"],
-                             "mean_iterations": None if item is None else item.get("mean_iterations", item["counts"].get("iterations", 0) / item["shots"]),
-                             "mean_fixations": None if item is None else item.get("mean_fixations", item["counts"].get("fixations", 0) / item["shots"]),
-                             "mean_decode_ms": None if item is None else item.get("mean_elapsed_ms", item["counts"].get("elapsed_ns", 0) / item["shots"] / 1e6),
-                             "local_rate": None if item is None else item["failures"] / item["shots"],
-                             "ci95_low": lo, "ci95_high": hi, "assessment": status,
-                             "zero_failure_upper_one_sided95": (1.0 - 0.05 ** (1.0 / item["shots"])
-                                                               if item is not None and item["failures"] == 0 else None),
+                             "published_rate": published, **selected, "assessment": status,
                              "assessment_reason": reason,
                              "expected_shots_for_100_at_source_rate": math.ceil(100 / published),
-                             "evidence_tier": None if item is None else item["evidence_tier"],
-                             "evidence_path": None if item is None else item["evidence_path"]})
+                             "importance_shots": None if imp is None else imp["shots"],
+                             "importance_raw_failures": None if imp is None else imp["raw_failures"],
+                             "importance_failure_ess": None if imp is None else imp["failure_ess"],
+                             "importance_rate": None if imp is None else imp["rate"],
+                             "importance_ci95_low": None if imp is None else imp["ci95_low"],
+                             "importance_ci95_high": None if imp is None else imp["ci95_high"]})
     return rows
 
 
@@ -164,13 +203,15 @@ def write_outputs() -> None:
             axis.plot([float(row["p"]) for row in points], [row["published_rate"] for row in points],
                       marker=".", linewidth=1, label=f"source {curve}")
             local = [row for row in points if row["local_rate"] is not None]
-            positive = [row for row in local if row["failures"] > 0]
-            zero = [row for row in local if row["failures"] == 0]
-            if positive:
-                axis.errorbar([float(row["p"]) for row in positive], [row["local_rate"] for row in positive],
-                              yerr=([row["local_rate"] - row["ci95_low"] for row in positive],
-                                    [row["ci95_high"] - row["local_rate"] for row in positive]),
-                              fmt="x", markersize=4, capsize=2, linewidth=.7, label=f"local {curve}")
+            for estimator, marker in (("iid", "x"), ("mixture_importance", "o")):
+                positive = [row for row in local if row["failures"] > 0 and row["estimator"] == estimator]
+                if positive:
+                    axis.errorbar([float(row["p"]) for row in positive], [row["local_rate"] for row in positive],
+                                  yerr=([row["local_rate"] - row["ci95_low"] for row in positive],
+                                        [row["ci95_high"] - row["local_rate"] for row in positive]),
+                                  fmt=marker, markersize=4, capsize=2, linewidth=.7,
+                                  label=f'{"local" if estimator == "iid" else "IS"} {curve}')
+            zero = [row for row in local if row["failures"] == 0 and row["estimator"] == "iid"]
             if zero:
                 axis.scatter([float(row["p"]) for row in zero], [row["zero_failure_upper_one_sided95"] for row in zero],
                              marker="v", facecolors="none", edgecolors="black", s=30,
@@ -187,11 +228,25 @@ def write_outputs() -> None:
     featured = [row for row in rows if row["p"] == "0.06000" and row["figure"] in (3, 5, 7, 8)
                 and row["curve"] in ("bp", "bpgd_t10", "qbp")]
     runs = verified_runs()
-    lines = ["# Non-OSD Yao reproduction assessment", "",
+    lines = ["# Yao BP/BPGD reproduction assessment", "",
              "Source: [Yao et al., arXiv:2312.10950v2](https://arxiv.org/pdf/2312.10950v2).",
-             "Local two-sided 95% intervals invert the negative-binomial distribution for runs stopped at a fixed failure count, or use Clopper–Pearson bounds for fixed/capped shot runs. Zero-failure triangles mark the exact one-sided 95% upper bound, about 3/N. Source points are published rates; their exact trial counts are not available from the plotted coordinates. Interval inclusion is a descriptive compatibility check, not a formal equivalence claim.", "",
+             "This comparison contains only BP and BPGD. Direct-run two-sided 95% intervals invert the negative-binomial distribution for runs stopped at a fixed failure count, or use Clopper–Pearson bounds for fixed/capped shot runs. Mixture importance-sampling (IS) intervals are approximate normal intervals using the weighted shot variance and are marked separately. Zero-failure triangles mark the exact one-sided 95% upper bound, about 3/N. Source points are published rates; their exact trial counts are not available from the plotted coordinates. Interval inclusion is a descriptive compatibility check, not a formal equivalence claim.", "",
              "## Coverage", ""]
     lines.extend(f"- {key}: {count}" for key, count in sorted(statuses.items()))
+    lines.extend(["", "## Rare-event estimator", "",
+                  "For each IS shot, an iid error is drawn from 0.1 P_p + 0.9 P_q with q>p, decoded using the source p, and its failure indicator is weighted by P_p(error)/(0.1 P_p(error)+0.9 P_q(error)). The estimator averages these weighted indicators. The expected value is the ordinary iid error rate at p; the source simulation itself used direct iid shots. The assessor verifies the exact proposal draw and likelihood weight for every retained shot. IS is promoted from preliminary only when the effective weighted failure count reaches 100 and the approximate 95% relative half-width is at most 25%. This interval does not include uncertainty in the published point."])
+    importance_progress = {}
+    for row in rows:
+        if row["importance_shots"] is not None:
+            method = "bpgd_t100" if row["curve"] == "bpgd_t100_r882" else row["curve"]
+            importance_progress[(row["code"], method, row["p"])] = row
+    if importance_progress:
+        lines.extend(["", "### IS progress by distinct decoder point", "",
+                      "Raw failures are proposal-distribution failures. The effective weighted failure count (ESS) controls precision; an initial pilot with low ESS is not a completed reproduction.", "",
+                      "| Code | Decoder | p | Source | IS rate | Raw failures/shots | Failure ESS |",
+                      "|---|---|---:|---:|---:|---:|---:|"])
+        for (code, method, p), row in sorted(importance_progress.items()):
+            lines.append(f'| {code.upper()} | {method} | {float(p):.2f} | {row["published_rate"]:.6g} | {row["importance_rate"]:.6g} | {row["importance_raw_failures"]}/{row["importance_shots"]} | {row["importance_failure_ess"]:.1f} |')
     lines.extend(["", "## Principal curve points", "",
                   "B1 T=10 uses Figure 3 below; Figure 4's conflicting T=10 targets remain separate in the CSV.", "",
                   "| Code | p | Source plain BP | Local plain BP | Source guided T=10 | Local guided T=10 |", "|---|---:|---:|---:|---:|---:|"])
@@ -200,21 +255,28 @@ def write_outputs() -> None:
             point = {(row["curve"]): row for row in rows if row["figure"] == figure and row["p"] == p}
             source_plain, source_guided = point[plain], point["bpgd_t10"]
             def local_label(row: dict) -> str:
-                return "—" if row["shots"] is None else f'{row["failures"]}/{row["shots"]} ({row["local_rate"]:.4g})'
+                if row["local_rate"] is None:
+                    return "—"
+                if row["estimator"] == "mixture_importance":
+                    return f'IS {row["local_rate"]:.4g} (N={row["shots"]}, ESS={row["importance_failure_ess"]:.1f})'
+                return f'{row["failures"]}/{row["shots"]} ({row["local_rate"]:.4g})'
             lines.append(f'| {code.upper()} | {float(p):.2f} | {source_plain["published_rate"]:.5g} | {local_label(source_plain)} | {source_guided["published_rate"]:.5g} | {local_label(source_guided)} |')
     lines.extend(["", "## Representative p=0.06 points", "",
-                  "| Figure | Code | Decoder | Source | Local failures/shots | Local 95% interval | Assessment |", "|---:|---|---|---:|---:|---:|---|"])
+                  "| Figure | Code | Decoder | Source | Local estimate | Local 95% interval | Assessment |", "|---:|---|---|---:|---:|---:|---|"])
     for row in featured:
-        local = "pending" if row["shots"] is None else f'{row["failures"]}/{row["shots"]}'
+        local = "pending" if row["shots"] is None else (f'IS {row["local_rate"]:.5g} (N={row["shots"]}, ESS={row["importance_failure_ess"]:.1f})'
+                                                      if row["estimator"] == "mixture_importance" else f'{row["failures"]}/{row["shots"]}')
         interval = "—" if row["shots"] is None else f'[{row["ci95_low"]:.5g}, {row["ci95_high"]:.5g}]'
         lines.append(f'| {row["figure"]} | {row["code"].upper()} | {row["curve"]} | {row["published_rate"]:.6g} | {local} | {interval} | {row["assessment"]} |')
-    exclusions = [row for row in rows if row["assessment"] == "local_95_excludes_source"]
+    exclusions = [row for row in rows if row["assessment"] in {"local_95_excludes_source", "importance_95_excludes_source"}]
     lines.extend(["", "## Points outside the local 95% interval", "",
                   "These are point-versus-interval flags, not formal two-sample discrepancy tests; the published estimates also have Monte Carlo uncertainty. Figures repeating the same result are shown once.", "",
-                  "| Figure | Code | Decoder | p | Published | Local failures/shots (rate) | Local 95% interval |",
+                  "| Figure | Code | Decoder | p | Published | Local estimate | Local 95% interval |",
                   "|---:|---|---|---:|---:|---:|---:|"])
     for row in exclusions:
-        lines.append(f'| {row["figure"]} | {row["code"].upper()} | {row["curve"]} | {float(row["p"]):.2f} | {row["published_rate"]:.6g} | {row["failures"]}/{row["shots"]} ({row["local_rate"]:.6g}) | [{row["ci95_low"]:.6g}, {row["ci95_high"]:.6g}] |')
+        label = (f'IS {row["local_rate"]:.6g}, ESS={row["importance_failure_ess"]:.1f}'
+                 if row["estimator"] == "mixture_importance" else f'{row["failures"]}/{row["shots"]} ({row["local_rate"]:.6g})')
+        lines.append(f'| {row["figure"]} | {row["code"].upper()} | {row["curve"]} | {float(row["p"]):.2f} | {row["published_rate"]:.6g} | {label} | [{row["ci95_low"]:.6g}, {row["ci95_high"]:.6g}] |')
     lines.extend(["", "At B1 T=1, p=0.06, the local 100/12,358 estimate excludes the plotted 0.00606 point. Figure 3 says its points were also collected to 100 failures; approximating that source run as 100/16,502 gives a 95% interval that overlaps the local interval. This is a reproducibility lead, not evidence of a specific kernel error."])
     lines.extend(["", "## Table 1: decimated variables", "",
                   "The paper specifies different T values in its prose and caption. The executed T=10 mean is shown separately.", "",
@@ -252,11 +314,11 @@ def write_outputs() -> None:
                   "- Table 1's prose says T=10; its caption says T=100. The local fixations are reported under the actual executed T.",
                   "- Table 2's fixed error bytes were not published; its exact 10,000-run result cannot be reproduced from the source artifact.",
                   "- A superseded Table 2 smoke run remains on disk but is omitted from the table because its historical script bytes were not retained. The two displayed surrogates bind the current script hash.",
-                  "- BP-SI points in Figures 4 and 5 were imported from [du Crest, Mhalla, and Savin](https://arxiv.org/abs/2205.06125). They use serial normalized min-sum (α=0.9), stabilizer inactivation, and a small linear solve; Yao et al. did not generate those shots. They are source-mapped here as a separate reproduction target. BP-OSD is excluded.",
+                  "- The comparison omits BP-OSD and BP-SI. The pinned raw source extraction retains their provenance, but neither appears in this BP/BPGD table or plot.",
                   "- Plain QBP v2 counts are imported from the earlier vanilla campaign, not rerun here. Its archive hash matches this source, but its recorded main.tex hash has a transcription error; this study records the independently verified TeX hash. The earlier count ledgers were not revalidated by this assessor.",
                   "- The new binary path is a compiled interpretation of the paper's V2C clipping and decimation pseudocode. The A5/B2 Q-BPGD path uses the existing compiled BP4 v2 kernel; these are canonical adaptations.",
                   "- All local results include Type I and Type II block failures. A correction differing from the sampled error by a stabilizer counts as success.",
-                  "- Reaching 100 failures at the source B1 T=100, p=0.04 rate of 10⁻⁶ requires about 100 million shots in expectation; B1 T=10 at p=0.04 requires about 16.7 million. The bounded development campaigns do not resolve those rare-event points.",
+                  "- Reaching 100 direct failures at the source B1 T=100, p=0.04 rate of 10⁻⁶ requires about 100 million shots in expectation; B1 T=10 at p=0.04 requires about 16.7 million. Rare-event estimates are explicitly marked IS and require the precision gate above before they are considered resolved.",
                   "", "The complete point table is [comparison.csv](comparison.csv); plots are [comparison.png](comparison.png) and [comparison.pdf](comparison.pdf).", ""])
     (result / "REPORT.md").write_text("\n".join(lines))
 
