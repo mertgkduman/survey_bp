@@ -351,6 +351,14 @@ def write_outputs() -> None:
         interval = "—" if row["shots"] is None else f'[{row["ci95_low"]:.5g}, {row["ci95_high"]:.5g}]'
         lines.append(f'| {row["figure"]} | {row["code"].upper()} | {row["curve"]} | {row["published_rate"]:.6g} | {local} | {interval} | {row["assessment"]} |')
     exclusions = [row for row in rows if row["assessment"] in {"local_95_excludes_source", "importance_95_excludes_source"}]
+    separated = [row for row in rows if row["source_mc_compatibility"] == "separated_95_intervals"]
+    if separated:
+        unique = {(row["code"], row["curve"], row["p"]): row for row in separated}
+        lines.extend(["", "## Source Monte Carlo discrepancies", "",
+                      "The following distinct points have disjoint local and approximate source 95% intervals. The source intervals assume the caption's 100-failure stopping rule; exact source shot counts were not released. These are discrepancies to investigate, not proof of a particular implementation defect.", ""])
+        for row in unique.values():
+            lines.append(f'- {row["code"].upper()} {row["curve"]}, p={float(row["p"]):.2f}: '
+                         f'local {row["local_rate"]:.6g}, source {row["published_rate"]:.6g}.')
     lines.extend(["", "## Points outside the local 95% interval", "",
                   "These are point-versus-interval flags, not formal two-sample discrepancy tests. The source interval below is approximate because its denominator is inferred from the caption's 100-failure rule and the rounded plotted rate. Figures repeating the same result are shown once.", "",
                   "| Figure | Code | Decoder | p | Published | Local estimate | Local 95% interval | Approx. source 95% interval | Overlap? |",
@@ -373,7 +381,11 @@ def write_outputs() -> None:
         lines.extend(["", f'At B1 p=0.08, {b1_p008["counts"]["type_i"]} of {b1_p008["failures"]} local guided failures are syndrome-inconsistent (Type I), while {b1_p008["counts"]["type_ii"]} are logical (Type II). This is consistent with the paper\'s statement that over 90% of these failures are non-convergence cases.'])
     c2_p007 = runs.get(("c2", "bpgd_t10", "0.07000"))
     if c2_p007 is not None:
-        lines.extend(["", f'C2 p=0.07 used a recovered {c2_p007["shots"]}-shot prefix: {c2_p007["counts"]["type_i"]} Type I and {c2_p007["counts"]["type_ii"]} Type II failures. This breakdown refers only to the retained prefix.'])
+        provenance = ("a recovered prefix" if c2_p007.get("evidence_tier") == "interrupted_prefix"
+                      else "a completed direct run")
+        lines.extend(["", f'C2 p=0.07 used {provenance} of {c2_p007["shots"]} shots: '
+                      f'{c2_p007["counts"]["type_i"]} Type I and '
+                      f'{c2_p007["counts"]["type_ii"]} Type II failures.'])
     lines.extend(["", "## Table 2: fixed-error randomized decimation", "",
                   "The published 9,568/10,000 convergences and 111 distinct convergent corrections depend on fixed error bytes that were not released. The paper uses T=10, p=0.08, and top-gap randomization with gap 1.0. The following runs use newly seeded weight-73 errors and are not direct numerical comparisons.", "",
                   "| Local surrogate | Error selection | Trials | Converged | Distinct valid corrections | Distinct all candidates | Type I | Type II |", "|---|---|---:|---:|---:|---:|---:|---:|"])
