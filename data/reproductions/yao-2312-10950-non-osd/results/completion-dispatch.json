@@ -211,8 +211,18 @@
       "cpus_per_task": 1,
       "memory_gib_per_task": 4,
       "wall_limit_hours_per_task": 48
+    },
+    {
+      "job_id": "60648655",
+      "description": "Disjoint B1 guided T=10, p=0.04 extension at q=0.05 selected by verified two-arm proposal screen; q=0.07 screen continues separately",
+      "plan": "completion-importance-extension-stage8.json",
+      "tasks": 10,
+      "max_simultaneous_tasks": 10,
+      "cpus_per_task": 1,
+      "memory_gib_per_task": 4,
+      "wall_limit_hours_per_task": 12
     }
   ],
-  "worst_case_core_hours_if_every_task_hits_its_wall_limit": 1932,
+  "worst_case_core_hours_if_every_task_hits_its_wall_limit": 2052,
   "phase_11_publication_dispatch": false
 }

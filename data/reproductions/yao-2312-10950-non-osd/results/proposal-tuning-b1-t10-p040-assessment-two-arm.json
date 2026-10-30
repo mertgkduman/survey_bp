@@ -1,0 +1,36 @@
+{
+  "plan": "data/reproductions/yao-2312-10950-non-osd/results/proposal-tuning-b1-t10-p040-plan.json",
+  "plan_sha256": "0854283b4df74f5d4a07446395a1851f9dce178631181cff161922aa4e540810",
+  "rows": [
+    {
+      "code": "b1",
+      "failure_ess": 4.127930633035887,
+      "failure_ess_per_shot": 0.0001375976877678629,
+      "method": "bpgd_t10",
+      "p": 0.04,
+      "proposal_p": 0.05,
+      "rate": 1.5631022894338894e-05,
+      "raw_failures": 10,
+      "shots": 30000,
+      "summary_path": "data/reproductions/yao-2312-10950-non-osd/results/proposal-b1-t10-p040-q050-n30000/summary.json",
+      "summary_sha256": "85e5ef550e320d027954f2254ff50bf43e03c1dd32bca36fb8c3df604dd65fae"
+    },
+    {
+      "code": "b1",
+      "failure_ess": 2.960910886416099,
+      "failure_ess_per_shot": 9.86970295472033e-05,
+      "method": "bpgd_t10",
+      "p": 0.04,
+      "proposal_p": 0.055,
+      "rate": 3.065979496377752e-06,
+      "raw_failures": 29,
+      "shots": 30000,
+      "summary_path": "data/reproductions/yao-2312-10950-non-osd/results/proposal-b1-t10-p040-q055-n30000/summary.json",
+      "summary_sha256": "1806c61fe594e0cca1a6ddf2811d984b3a0dc79dfbdce1c2fa58c555cb3fcbcd"
+    }
+  ],
+  "schema": "yao-importance-proposal-screen-assessment-v1",
+  "screen_shots_excluded_from_final_estimate": true,
+  "selected_proposal_p": 0.05,
+  "selection_metric": "effective weighted failure count per shot"
+}
