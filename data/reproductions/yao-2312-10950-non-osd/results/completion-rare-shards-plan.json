@@ -1,0 +1,169 @@
+{
+  "expected_failures_at_source_rate": 232.0,
+  "jobs": [
+    {
+      "code": "b1",
+      "max_shots": 500000,
+      "method": "bpgd_t1",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-rare-shard-b1-bpgd_t1-p040-seed20261044-s01",
+      "p": 0.04,
+      "seed": 20261044,
+      "start_shot": 0,
+      "target_failures": null
+    },
+    {
+      "code": "b1",
+      "max_shots": 500000,
+      "method": "bpgd_t1",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-rare-shard-b1-bpgd_t1-p040-seed20261044-s02",
+      "p": 0.04,
+      "seed": 20261044,
+      "start_shot": 500000,
+      "target_failures": null
+    },
+    {
+      "code": "b1",
+      "max_shots": 500000,
+      "method": "bpgd_t1",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-rare-shard-b1-bpgd_t1-p040-seed20261044-s03",
+      "p": 0.04,
+      "seed": 20261044,
+      "start_shot": 1000000,
+      "target_failures": null
+    },
+    {
+      "code": "b1",
+      "max_shots": 500000,
+      "method": "bpgd_t1",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-rare-shard-b1-bpgd_t1-p040-seed20261044-s04",
+      "p": 0.04,
+      "seed": 20261044,
+      "start_shot": 1500000,
+      "target_failures": null
+    },
+    {
+      "code": "b1",
+      "max_shots": 500000,
+      "method": "bpgd_t1",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-rare-shard-b1-bpgd_t1-p040-seed20261044-s05",
+      "p": 0.04,
+      "seed": 20261044,
+      "start_shot": 2000000,
+      "target_failures": null
+    },
+    {
+      "code": "b1",
+      "max_shots": 500000,
+      "method": "bpgd_t1",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-rare-shard-b1-bpgd_t1-p040-seed20261044-s06",
+      "p": 0.04,
+      "seed": 20261044,
+      "start_shot": 2500000,
+      "target_failures": null
+    },
+    {
+      "code": "b1",
+      "max_shots": 500000,
+      "method": "bpgd_t1",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-rare-shard-b1-bpgd_t1-p040-seed20261044-s07",
+      "p": 0.04,
+      "seed": 20261044,
+      "start_shot": 3000000,
+      "target_failures": null
+    },
+    {
+      "code": "b1",
+      "max_shots": 500000,
+      "method": "bpgd_t1",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-rare-shard-b1-bpgd_t1-p040-seed20261044-s08",
+      "p": 0.04,
+      "seed": 20261044,
+      "start_shot": 3500000,
+      "target_failures": null
+    },
+    {
+      "code": "b1",
+      "max_shots": 500000,
+      "method": "bpgd_t1",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-rare-shard-b1-bpgd_t1-p040-seed20261044-s09",
+      "p": 0.04,
+      "seed": 20261044,
+      "start_shot": 4000000,
+      "target_failures": null
+    },
+    {
+      "code": "b1",
+      "max_shots": 500000,
+      "method": "bpgd_t1",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-rare-shard-b1-bpgd_t1-p040-seed20261044-s10",
+      "p": 0.04,
+      "seed": 20261044,
+      "start_shot": 4500000,
+      "target_failures": null
+    },
+    {
+      "code": "b1",
+      "max_shots": 500000,
+      "method": "bpgd_t1",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-rare-shard-b1-bpgd_t1-p040-seed20261044-s11",
+      "p": 0.04,
+      "seed": 20261044,
+      "start_shot": 5000000,
+      "target_failures": null
+    },
+    {
+      "code": "b1",
+      "max_shots": 500000,
+      "method": "bpgd_t1",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-rare-shard-b1-bpgd_t1-p040-seed20261044-s12",
+      "p": 0.04,
+      "seed": 20261044,
+      "start_shot": 5500000,
+      "target_failures": null
+    },
+    {
+      "code": "b1",
+      "max_shots": 500000,
+      "method": "bpgd_t1",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-rare-shard-b1-bpgd_t1-p040-seed20261044-s13",
+      "p": 0.04,
+      "seed": 20261044,
+      "start_shot": 6000000,
+      "target_failures": null
+    },
+    {
+      "code": "b1",
+      "max_shots": 500000,
+      "method": "bpgd_t1",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-rare-shard-b1-bpgd_t1-p040-seed20261044-s14",
+      "p": 0.04,
+      "seed": 20261044,
+      "start_shot": 6500000,
+      "target_failures": null
+    },
+    {
+      "code": "b1",
+      "max_shots": 500000,
+      "method": "bpgd_t1",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-rare-shard-b1-bpgd_t1-p040-seed20261044-s15",
+      "p": 0.04,
+      "seed": 20261044,
+      "start_shot": 7000000,
+      "target_failures": null
+    },
+    {
+      "code": "b1",
+      "max_shots": 500000,
+      "method": "bpgd_t1",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-rare-shard-b1-bpgd_t1-p040-seed20261044-s16",
+      "p": 0.04,
+      "seed": 20261044,
+      "start_shot": 7500000,
+      "target_failures": null
+    }
+  ],
+  "runner_sha256": "89bbc5a825d545dd890ef59a5ed1f7642c1458615fb9b810dae587824d0fee78",
+  "schema": "yao-completion-rare-shards-plan-v1",
+  "source_rate": 2.9e-05,
+  "total_fixed_shots": 8000000
+}

@@ -20,6 +20,7 @@ REPO = ROOT.parents[2]
 SOURCE = json.loads((ROOT / "source_points.json").read_text())
 PRIOR_QBP = REPO / "data/reproductions/yao-2312-10950-vanilla/results/comparison.csv"
 LEGACY_RUNNER_SHA256 = "4b4912da054fb67f69c3238cca036a3e449c7e3e5a0469e10ae185fd1fc61c76"  # commit 50d6371
+RARE_SHARDS_PLAN = ROOT / "results/completion-rare-shards-plan.json"
 
 
 def exact_interval(failures: int, shots: int) -> tuple[float, float]:
@@ -38,9 +39,52 @@ def run_interval(item: dict) -> tuple[float, float]:
     return exact_interval(failures, shots)
 
 
+def aggregate_fixed_shards(plan: dict, verified: dict[str, dict]) -> dict | None:
+    """Combine only a complete, disjoint, individually audited iid plan."""
+    if plan["schema"] != "yao-completion-rare-shards-plan-v1":
+        raise ValueError("unexpected rare-shard plan schema")
+    jobs = sorted(plan["jobs"], key=lambda item: item["start_shot"])
+    if any(Path(job["output"]).name not in verified for job in jobs):
+        return None
+    if not jobs or jobs[0]["start_shot"] != 0:
+        raise ValueError("rare-shard plan must start at shot zero")
+    reference = (jobs[0]["code"], jobs[0]["method"], jobs[0]["p"], jobs[0]["seed"])
+    counts = {key: 0 for key in verified[Path(jobs[0]["output"]).name]["counts"]}
+    next_shot = 0
+    for job in jobs:
+        if (job["code"], job["method"], job["p"], job["seed"]) != reference:
+            raise ValueError("rare-shard policy/seed mismatch")
+        if job["start_shot"] != next_shot or job["target_failures"] is not None:
+            raise ValueError("rare-shard plan has overlapping/gapped or nonfixed shots")
+        item = verified[Path(job["output"]).name]
+        if (item["code"], item["method"], item["physical_p"], item["seed"],
+                item["start_shot"], item["shots"], item["stop_reason"]) != (
+                job["code"], job["method"], job["p"], job["seed"],
+                job["start_shot"], job["max_shots"], "fixed_shots"):
+            raise ValueError("rare-shard manifest/summary differs from plan")
+        if set(item["counts"]) != set(counts):
+            raise ValueError("rare-shard count fields differ")
+        for key in counts:
+            counts[key] += item["counts"][key]
+        next_shot += item["shots"]
+    if next_shot != plan["total_fixed_shots"]:
+        raise ValueError("rare-shard shot total differs from plan")
+    return {"code": reference[0], "method": reference[1], "physical_p": reference[2],
+            "shots": next_shot, "failures": counts["type_i"] + counts["type_ii"],
+            "counts": counts, "stop_reason": "fixed_shots",
+            "evidence_tier": "direct_shard_aggregate",
+            "evidence_path": str(RARE_SHARDS_PLAN.relative_to(REPO))}
+
+
 def verified_runs() -> dict[tuple[str, str, str], dict]:
     selected = {}
+    rare_shards = {}
+    rare_plan = json.loads(RARE_SHARDS_PLAN.read_text()) if RARE_SHARDS_PLAN.exists() else None
+    rare_plan_ready = (rare_plan is not None and all(
+        (REPO / job["output"] / "summary.json").exists() for job in rare_plan["jobs"]))
     for path in sorted((ROOT / "results").glob("*/summary.json")):
+        if path.parent.name.startswith("completion-rare-shard-") and not rare_plan_ready:
+            continue  # A partial fixed-shot plan cannot produce a curve estimate.
         summary = json.loads(path.read_text())
         if summary.get("schema") != "yao-non-osd-summary-v1":
             continue
@@ -83,10 +127,18 @@ def verified_runs() -> dict[tuple[str, str, str], dict]:
         summary["evidence_tier"] = ("interrupted_prefix" if summary["stop_reason"] == "externally_interrupted_complete_prefix"
                                     else "pilot" if path.parent.name.startswith(("smoke", "pilot", "benchmark"))
                                     else "bounded_campaign")
+        if path.parent.name.startswith("completion-rare-shard-"):
+            rare_shards[path.parent.name] = summary
+            continue
         key = (summary["code"], summary["method"], f'{summary["physical_p"]:.5f}')
         old = selected.get(key)
         if old is None or (summary["evidence_tier"] != "pilot", summary["shots"]) > (old["evidence_tier"] != "pilot", old["shots"]):
             selected[key] = summary
+    if rare_plan_ready:
+        aggregate = aggregate_fixed_shards(rare_plan, rare_shards)
+        if aggregate is not None:
+            key = (aggregate["code"], aggregate["method"], f'{aggregate["physical_p"]:.5f}')
+            selected[key] = aggregate
     return selected
 
 
