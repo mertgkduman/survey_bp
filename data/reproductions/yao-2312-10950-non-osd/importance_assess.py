@@ -7,8 +7,10 @@ from hashlib import sha256
 import json
 import math
 from pathlib import Path
+import re
 
 import numpy as np
+from ledger_io import open_event_ledger
 
 ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parents[2]
@@ -54,8 +56,6 @@ def verified_importance_runs() -> dict[tuple[str, str, str], dict]:
         manifest = json.loads(manifest_path.read_text())
         if manifest["source_files_sha256"][runner_name] != expected_runner_sha:
             raise ValueError(f"importance runner drift: {path}")
-        if sha256(ledger_path.read_bytes()).hexdigest() != summary["events_sha256"]:
-            raise ValueError(f"importance ledger mismatch: {path}")
         code, method, p = summary["code"], summary["method"], summary["physical_target_p"]
         key = (code, method, f"{p:.5f}")
         first, stop = summary["start_shot"], summary["start_shot"]+summary["shots"]
@@ -67,9 +67,11 @@ def verified_importance_runs() -> dict[tuple[str, str, str], dict]:
         totals = {field: 0 for field in summary["counts"]}
         sums = {field: 0.0 for field in summary["weighted_sums"]}
         seen = 0
-        with ledger_path.open() as ledger:
-            for line in ledger:
-                event = json.loads(line)
+        digest = sha256()
+        with open_event_ledger(ledger_path) as ledger:
+            for raw in ledger:
+                digest.update(raw)
+                event = json.loads(raw)
                 if event["shot"] != first + seen or event["schema"] != "yao-importance-shot-v1":
                     raise ValueError(f"importance shot order/schema mismatch: {path}")
                 truth, branch = _sample_error(manifest, event["shot"])
@@ -94,15 +96,24 @@ def verified_importance_runs() -> dict[tuple[str, str, str], dict]:
                 sums["weight"] += weight
                 sums["weight_sq"] += weight*weight
                 seen += 1
+        if digest.hexdigest() != summary["events_sha256"]:
+            raise ValueError(f"importance ledger mismatch: {path}")
         if seen != summary["shots"] or totals != summary["counts"]:
             raise ValueError(f"importance count mismatch: {path}")
         for field, reported in summary["weighted_sums"].items():
             if not math.isclose(sums[field], reported, rel_tol=1e-11, abs_tol=1e-12):
                 raise ValueError(f"importance weighted sum mismatch: {path}, {field}")
         evidence_path = path.relative_to(REPO) if path.is_relative_to(REPO) else path
-        grouped[key].append({**summary, "evidence_path": str(evidence_path)})
+        stage_match = re.search(r"-stage(\d+)-s\d+$", path.parent.name)
+        stage = int(stage_match.group(1)) if stage_match else 0
+        grouped[key].append({**summary, "evidence_path": str(evidence_path), "analysis_stage": stage})
     result = {}
-    for key, shards in grouped.items():
+    for key, all_shards in grouped.items():
+        # The extension size is chosen from pilot outcomes. Using only the
+        # latest independently fixed stage for estimation avoids optional-
+        # stopping bias from pooling that planning pilot into its follow-up.
+        active_stage = max(item["analysis_stage"] for item in all_shards)
+        shards = [item for item in all_shards if item["analysis_stage"] == active_stage]
         shots = sum(item["shots"] for item in shards)
         weighted_failure = sum(item["weighted_sums"]["failure"] for item in shards)
         squared_failure = sum(item["weighted_sums"]["failure_sq"] for item in shards)
@@ -131,5 +142,7 @@ def verified_importance_runs() -> dict[tuple[str, str, str], dict]:
             "evidence_paths": [item["evidence_path"] for item in shards],
             "proposals": sorted(set(item["proposal_p"] for item in shards)),
             "shards": len(shards),
+            "analysis_stage": active_stage,
+            "planning_pilot_shots": sum(item["shots"] for item in all_shards if item["analysis_stage"] < active_stage),
         }
     return result

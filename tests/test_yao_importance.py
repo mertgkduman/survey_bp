@@ -5,6 +5,7 @@ from __future__ import annotations
 import importlib.util
 import json
 from pathlib import Path
+import subprocess
 import sys
 
 import numpy as np
@@ -59,8 +60,26 @@ def test_importance_run_retains_exact_weighted_shot_ledger(tmp_path: Path, monke
                for event in events) == pytest.approx(summary["weighted_sums"]["failure"])
     assert sum(event["outcome"]["type_i"] or event["outcome"]["type_ii"]
                for event in events) == summary["counts"]["type_i"] + summary["counts"]["type_ii"]
+    plain = output / "events.jsonl"
+    subprocess.run(["zstd", "-q", "-3", "-o", str(plain.with_name("events.jsonl.zst")), str(plain)], check=True)
+    plain.unlink()
     monkeypatch.setattr(ASSESS, "RESULTS", tmp_path)
     verified = ASSESS.verified_importance_runs()
     assert verified[("b1", "bpgd_t1", "0.04000")]["shots"] == 4
     assert verified[("b1", "bpgd_t1", "0.04000")]["rate"] == pytest.approx(
         summary["weighted_sums"]["failure"]/4)
+
+
+def test_extension_estimate_excludes_adaptive_planning_pilot(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    pilot = tmp_path / "completion-importance-small"
+    extension = tmp_path / "completion-importance-small-stage1-s01"
+    MODULE.run(code_name="b1", method="bpgd_t1", p=.04, proposal_p=.06,
+               defensive_fraction=.1, seed=8, start_shot=0, shots=4, output=pilot)
+    later = MODULE.run(code_name="b1", method="bpgd_t1", p=.04, proposal_p=.06,
+                       defensive_fraction=.1, seed=8, start_shot=4, shots=4, output=extension)
+    monkeypatch.setattr(ASSESS, "RESULTS", tmp_path)
+    value = ASSESS.verified_importance_runs()[("b1", "bpgd_t1", "0.04000")]
+    assert value["analysis_stage"] == 1
+    assert value["planning_pilot_shots"] == 4
+    assert value["shots"] == 4
+    assert value["rate"] == pytest.approx(later["weighted_sums"]["failure"]/4)

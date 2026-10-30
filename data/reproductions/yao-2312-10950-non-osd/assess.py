@@ -13,6 +13,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from scipy.stats import beta
 from importance_assess import verified_importance_runs
+from ledger_io import open_event_ledger
 
 ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parents[2]
@@ -53,25 +54,31 @@ def verified_runs() -> dict[tuple[str, str, str], dict]:
             sha256((ROOT / "run_point.py").read_bytes()).hexdigest(), LEGACY_RUNNER_SHA256,
         }:
             continue  # Keep old smoke evidence, but do not compare a superseded runner.
-        ledger_bytes = ledger_path.read_bytes()
-        if sha256(ledger_bytes).hexdigest() != summary["events_sha256"]:
-            raise ValueError(f"ledger mismatch: {path}")
-        events = [json.loads(line) for line in ledger_bytes.splitlines()]
-        if len(events) != summary["shots"]:
-            raise ValueError(f"shot count mismatch: {path}")
-        if [event["shot"] for event in events] != list(range(summary["start_shot"], summary["start_shot"] + summary["shots"])):
-            raise ValueError(f"shot sequence mismatch: {path}")
+        digest = sha256()
+        seen = 0
         counts = summary["counts"]
-        for key in ("type_i", "type_ii", "exact_success", "stabilizer_success", "iterations", "rounds", "fixations", "elapsed_ns"):
-            if sum(int(event["outcome"][key]) for event in events) != counts[key]:
-                raise ValueError(f"outcome count mismatch ({key}): {path}")
+        total = {key: 0 for key in counts}
+        fixations_sq = 0
+        with open_event_ledger(ledger_path) as ledger:
+            for raw in ledger:
+                digest.update(raw)
+                event = json.loads(raw)
+                if event["shot"] != summary["start_shot"] + seen:
+                    raise ValueError(f"shot sequence mismatch: {path}")
+                seen += 1
+                for key in total:
+                    total[key] += int(event["outcome"][key])
+                fixations_sq += int(event["outcome"]["fixations"]) ** 2
+        if digest.hexdigest() != summary["events_sha256"] or seen != summary["shots"]:
+            raise ValueError(f"ledger hash/count mismatch: {path}")
+        if total != counts:
+            raise ValueError(f"outcome count mismatch: {path}")
         if counts["type_i"] + counts["type_ii"] != summary["failures"]:
             raise ValueError(f"failure count mismatch: {path}")
         if sum(counts[key] for key in ("type_i", "type_ii", "exact_success", "stabilizer_success")) != summary["shots"]:
             raise ValueError(f"outcome partition mismatch: {path}")
-        fixes = [int(event["outcome"]["fixations"]) for event in events]
-        summary["fixations_se"] = (math.sqrt(max(0.0, (sum(value * value for value in fixes) - sum(fixes) ** 2 / len(fixes)) / (len(fixes) - 1)) / len(fixes))
-                                   if len(fixes) > 1 else None)
+        summary["fixations_se"] = (math.sqrt(max(0.0, (fixations_sq - counts["fixations"]**2 / seen) / (seen-1)) / seen)
+                                   if seen > 1 else None)
         summary["evidence_path"] = str(path.relative_to(REPO))
         summary["evidence_tier"] = ("interrupted_prefix" if summary["stop_reason"] == "externally_interrupted_complete_prefix"
                                     else "pilot" if path.parent.name.startswith(("smoke", "pilot", "benchmark"))
@@ -180,6 +187,8 @@ def build_rows() -> list[dict]:
                              "assessment_reason": reason,
                              "expected_shots_for_100_at_source_rate": math.ceil(100 / published),
                              "importance_shots": None if imp is None else imp["shots"],
+                             "importance_stage": None if imp is None else imp["analysis_stage"],
+                             "importance_planning_pilot_shots": None if imp is None else imp["planning_pilot_shots"],
                              "importance_raw_failures": None if imp is None else imp["raw_failures"],
                              "importance_failure_ess": None if imp is None else imp["failure_ess"],
                              "importance_rate": None if imp is None else imp["rate"],
@@ -234,7 +243,7 @@ def write_outputs() -> None:
              "## Coverage", ""]
     lines.extend(f"- {key}: {count}" for key, count in sorted(statuses.items()))
     lines.extend(["", "## Rare-event estimator", "",
-                  "For each IS shot, an iid error is drawn from 0.1 P_p + 0.9 P_q with q>p, decoded using the source p, and its failure indicator is weighted by P_p(error)/(0.1 P_p(error)+0.9 P_q(error)). The estimator averages these weighted indicators. The expected value is the ordinary iid error rate at p; the source simulation itself used direct iid shots. The assessor verifies the exact proposal draw and likelihood weight for every retained shot. IS is promoted from preliminary only when the effective weighted failure count reaches 100 and the approximate 95% relative half-width is at most 25%. This interval does not include uncertainty in the published point."])
+                  "For each IS shot, an iid error is drawn from 0.1 P_p + 0.9 P_q with q>p, decoded using the source p, and its failure indicator is weighted by P_p(error)/(0.1 P_p(error)+0.9 P_q(error)). The estimator averages these weighted indicators. The expected value is the ordinary iid error rate at p; the source simulation itself used direct iid shots. The assessor verifies the exact proposal draw and likelihood weight for every retained shot. Extension sizes are chosen from pilot data; the reported estimate uses only the latest independently fixed stage so the pilot does not enter its own adaptively sized follow-up. IS is promoted from preliminary only when the effective weighted failure count reaches 100 and the approximate 95% relative half-width is at most 25%. This interval does not include uncertainty in the published point."])
     importance_progress = {}
     for row in rows:
         if row["importance_shots"] is not None:
@@ -243,10 +252,10 @@ def write_outputs() -> None:
     if importance_progress:
         lines.extend(["", "### IS progress by distinct decoder point", "",
                       "Raw failures are proposal-distribution failures. The effective weighted failure count (ESS) controls precision; an initial pilot with low ESS is not a completed reproduction.", "",
-                      "| Code | Decoder | p | Source | IS rate | Raw failures/shots | Failure ESS |",
-                      "|---|---|---:|---:|---:|---:|---:|"])
+                      "| Code | Decoder | p | Stage | Source | IS rate | Raw failures/shots | Failure ESS |",
+                      "|---|---|---:|---:|---:|---:|---:|---:|"])
         for (code, method, p), row in sorted(importance_progress.items()):
-            lines.append(f'| {code.upper()} | {method} | {float(p):.2f} | {row["published_rate"]:.6g} | {row["importance_rate"]:.6g} | {row["importance_raw_failures"]}/{row["importance_shots"]} | {row["importance_failure_ess"]:.1f} |')
+            lines.append(f'| {code.upper()} | {method} | {float(p):.2f} | {row["importance_stage"]} | {row["published_rate"]:.6g} | {row["importance_rate"]:.6g} | {row["importance_raw_failures"]}/{row["importance_shots"]} | {row["importance_failure_ess"]:.1f} |')
     lines.extend(["", "## Principal curve points", "",
                   "B1 T=10 uses Figure 3 below; Figure 4's conflicting T=10 targets remain separate in the CSV.", "",
                   "| Code | p | Source plain BP | Local plain BP | Source guided T=10 | Local guided T=10 |", "|---|---:|---:|---:|---:|---:|"])

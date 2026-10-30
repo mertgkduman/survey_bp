@@ -55,8 +55,28 @@
       "cpus_per_task": 1,
       "memory_gib_per_task": 4,
       "wall_limit_hours_per_task": 8
+    },
+    {
+      "job_id": "60642064",
+      "description": "Direct low-rate feasible-point follow-up",
+      "plan": "completion-low-direct-plan.json",
+      "tasks": 14,
+      "max_simultaneous_tasks": 14,
+      "cpus_per_task": 1,
+      "memory_gib_per_task": 4,
+      "wall_limit_hours_per_task": 18
+    },
+    {
+      "job_id": "60642410",
+      "description": "Disjoint rare-event extension shards for three completed B1 pilots",
+      "plan": "completion-importance-extension-stage1.json",
+      "tasks": 18,
+      "max_simultaneous_tasks": 16,
+      "cpus_per_task": 1,
+      "memory_gib_per_task": 4,
+      "wall_limit_hours_per_task": 12
     }
   ],
-  "worst_case_core_hours_if_every_task_hits_its_wall_limit": 712,
+  "worst_case_core_hours_if_every_task_hits_its_wall_limit": 1180,
   "phase_11_publication_dispatch": false
 }
