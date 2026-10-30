@@ -1,0 +1,21 @@
+{
+  "analysis_rule": "These pilot shots choose a proposal and are excluded from the later independently fixed estimate",
+  "fidelity": "bounded_canonical_adaptation_development",
+  "jobs": [
+    {
+      "code": "b1",
+      "defensive_fraction": 0.1,
+      "method": "bpgd_t10",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/proposal-b1-t10-p040-q070-n30000",
+      "p": 0.04,
+      "proposal_p": 0.07,
+      "seed": 20261041,
+      "shots": 30000,
+      "start_shot": 0
+    }
+  ],
+  "purpose": "Test the q=0.07 variance candidate for B1 guided T=10, p=0.04",
+  "runner_sha256": "387159c5204336c341d7c80984c7733be8292279f2562317dda4e99a2ffb23d9",
+  "schema": "yao-importance-proposal-screen-v1",
+  "selection_metric": "effective weighted failure count per shot"
+}
