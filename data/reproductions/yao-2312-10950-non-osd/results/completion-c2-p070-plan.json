@@ -1,0 +1,17 @@
+{
+  "jobs": [
+    {
+      "code": "c2",
+      "max_shots": 12000,
+      "method": "bpgd_t10",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-c2-bpgd_t10-p070-seed20261047",
+      "p": 0.07,
+      "seed": 20261047,
+      "start_shot": 0,
+      "target_failures": 100
+    }
+  ],
+  "purpose": "Replace recovered 73-failure prefix with a disjoint direct 100-failure source-grid run",
+  "runner_sha256": "89bbc5a825d545dd890ef59a5ed1f7642c1458615fb9b810dae587824d0fee78",
+  "schema": "yao-completion-single-direct-v1"
+}

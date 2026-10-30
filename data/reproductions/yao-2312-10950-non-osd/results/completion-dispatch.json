@@ -240,8 +240,17 @@
       "cpus_per_task": 1,
       "memory_gib_per_task": 4,
       "wall_limit_hours_per_task": 48
+    },
+    {
+      "job_id": "60649889",
+      "description": "Fresh direct iid 100-failure C2 guided T=10, p=0.07 run replacing recovered 73-failure prefix",
+      "plan": "completion-c2-p070-plan.json",
+      "tasks": 1,
+      "cpus_per_task": 1,
+      "memory_gib_per_task": 4,
+      "wall_limit_hours_per_task": 4
     }
   ],
-  "worst_case_core_hours_if_every_task_hits_its_wall_limit": 2292,
+  "worst_case_core_hours_if_every_task_hits_its_wall_limit": 2296,
   "phase_11_publication_dispatch": false
 }
