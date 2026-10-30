@@ -145,8 +145,26 @@
       "cpus_per_task": 1,
       "memory_gib_per_task": 4,
       "wall_limit_hours_per_task": 12
+    },
+    {
+      "job_id": "60646053",
+      "description": "B1 guided T=10, p=0.04 proposal screen at q=0.05",
+      "plan": "proposal-tuning-b1-t10-p040-plan.json",
+      "tasks": 1,
+      "cpus_per_task": 1,
+      "memory_gib_per_task": 4,
+      "wall_limit_hours_per_task": 8
+    },
+    {
+      "job_id": "60646054",
+      "description": "B1 guided T=10, p=0.04 proposal screen at q=0.055",
+      "plan": "proposal-tuning-b1-t10-p040-plan.json",
+      "tasks": 1,
+      "cpus_per_task": 1,
+      "memory_gib_per_task": 4,
+      "wall_limit_hours_per_task": 8
     }
   ],
-  "worst_case_core_hours_if_every_task_hits_its_wall_limit": 1500,
+  "worst_case_core_hours_if_every_task_hits_its_wall_limit": 1516,
   "phase_11_publication_dispatch": false
 }
