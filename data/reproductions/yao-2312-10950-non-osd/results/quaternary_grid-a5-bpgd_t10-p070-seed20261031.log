@@ -1,0 +1,6 @@
+a5 bpgd_t10 0.07 1000 12
+a5 bpgd_t10 0.07 2000 18
+a5 bpgd_t10 0.07 3000 25
+a5 bpgd_t10 0.07 4000 29
+a5 bpgd_t10 0.07 5000 37
+{"code": "a5", "failures": 37, "method": "bpgd_t10", "physical_p": 0.07, "shots": 5000, "stop_reason": "max_shots"}

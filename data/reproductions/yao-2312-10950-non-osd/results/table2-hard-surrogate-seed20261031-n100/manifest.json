@@ -1,0 +1,20 @@
+{
+  "algorithm": "paper-style binary BPGD, T=10, top-gap random",
+  "classification": "new seeded fixed error, not paper's error",
+  "code_semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548",
+  "decoder_p0": 0.08,
+  "error_selection": "first_BP_nonconvergent_weight73",
+  "error_sha256": "1001d0491fc58edbdde91f9824ea3842e67bd6cf0556778025d45945f15b551e",
+  "error_weight": 73,
+  "gap": 1.0,
+  "physical_p": 0.08,
+  "plain_bp_converged": false,
+  "round_limit": 882,
+  "schema": "yao-table2-surrogate-v1",
+  "seed": 20261031,
+  "selection_attempts": 4,
+  "source_error_bytes": "unpublished",
+  "source_sha256": "8c8013cb17169c451ea6cfa03ce1d96b22071ee7b413beed668e109de5e441de",
+  "syndrome_sha256": "35ac6bf12463b82827fcbd21b5debb50f1fc8cadb028b9e98b3dbe435b829426",
+  "trials": 100
+}

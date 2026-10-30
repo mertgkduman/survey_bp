@@ -200,7 +200,7 @@ def run(*, code_name: str, method: str, p: float, seed: int, start_shot: int,
                                  "iterations", "rounds", "fixations", "elapsed_ns")}
     digest = sha256()
     started = time.monotonic()
-    with (output / "events.jsonl").open("x") as ledger:
+    with (output / "events.jsonl").open("x", buffering=1) as ledger:
         for offset in range(max_shots):
             shot = start_shot + offset
             truth = _sample(seed, p_index, shot, code.n, depolarizing=depolarizing)
@@ -243,7 +243,7 @@ def run(*, code_name: str, method: str, p: float, seed: int, start_shot: int,
                 counts[key] += int(record[key])
             n = offset + 1
             failures = counts["type_i"] + counts["type_ii"]
-            if n % 1000 == 0:
+            if n % 100 == 0:
                 ledger.flush()
                 print(code_name, method, p, n, failures, flush=True)
             if target_failures is not None and failures >= target_failures:

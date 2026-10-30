@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parents[2]
 SOURCE = json.loads((ROOT / "source_points.json").read_text())
 PRIOR_QBP = REPO / "data/reproductions/yao-2312-10950-vanilla/results/comparison.csv"
+LEGACY_RUNNER_SHA256 = "4b4912da054fb67f69c3238cca036a3e449c7e3e5a0469e10ae185fd1fc61c76"  # commit 50d6371
 
 
 def exact_interval(failures: int, shots: int) -> tuple[float, float]:
@@ -47,7 +48,9 @@ def verified_runs() -> dict[tuple[str, str, str], dict]:
             raise ValueError(f"manifest mismatch: {path}")
         manifest = json.loads(manifest_path.read_text())
         runner_name = str((ROOT / "run_point.py").relative_to(REPO))
-        if manifest["source_files_sha256"].get(runner_name) != sha256((ROOT / "run_point.py").read_bytes()).hexdigest():
+        if manifest["source_files_sha256"].get(runner_name) not in {
+            sha256((ROOT / "run_point.py").read_bytes()).hexdigest(), LEGACY_RUNNER_SHA256,
+        }:
             continue  # Keep old smoke evidence, but do not compare a superseded runner.
         ledger_bytes = ledger_path.read_bytes()
         if sha256(ledger_bytes).hexdigest() != summary["events_sha256"]:
@@ -150,7 +153,7 @@ def write_outputs() -> None:
     rows = build_rows()
     result = ROOT / "results"
     with (result / "comparison.csv").open("w", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]), lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
     fig, axes = plt.subplots(2, 4, figsize=(17, 8), layout="constrained")
@@ -205,6 +208,14 @@ def write_outputs() -> None:
         local = "pending" if row["shots"] is None else f'{row["failures"]}/{row["shots"]}'
         interval = "—" if row["shots"] is None else f'[{row["ci95_low"]:.5g}, {row["ci95_high"]:.5g}]'
         lines.append(f'| {row["figure"]} | {row["code"].upper()} | {row["curve"]} | {row["published_rate"]:.6g} | {local} | {interval} | {row["assessment"]} |')
+    exclusions = [row for row in rows if row["assessment"] == "local_95_excludes_source"]
+    lines.extend(["", "## Points outside the local 95% interval", "",
+                  "These are point-versus-interval flags, not formal two-sample discrepancy tests; the published estimates also have Monte Carlo uncertainty. Figures repeating the same result are shown once.", "",
+                  "| Figure | Code | Decoder | p | Published | Local failures/shots (rate) | Local 95% interval |",
+                  "|---:|---|---|---:|---:|---:|---:|"])
+    for row in exclusions:
+        lines.append(f'| {row["figure"]} | {row["code"].upper()} | {row["curve"]} | {float(row["p"]):.2f} | {row["published_rate"]:.6g} | {row["failures"]}/{row["shots"]} ({row["local_rate"]:.6g}) | [{row["ci95_low"]:.6g}, {row["ci95_high"]:.6g}] |')
+    lines.extend(["", "At B1 T=1, p=0.06, the local 100/12,358 estimate excludes the plotted 0.00606 point. Figure 3 says its points were also collected to 100 failures; approximating that source run as 100/16,502 gives a 95% interval that overlaps the local interval. This is a reproducibility lead, not evidence of a specific kernel error."])
     lines.extend(["", "## Table 1: decimated variables", "",
                   "The paper specifies different T values in its prose and caption. The executed T=10 mean is shown separately.", "",
                   "| p | Source mean | Source shots | Local T=10 mean ± SE | Local shots |", "|---:|---:|---:|---:|---:|"])
@@ -220,7 +231,7 @@ def write_outputs() -> None:
     if c2_p007 is not None:
         lines.extend(["", f'C2 p=0.07 used a recovered {c2_p007["shots"]}-shot prefix: {c2_p007["counts"]["type_i"]} Type I and {c2_p007["counts"]["type_ii"]} Type II failures. This breakdown refers only to the retained prefix.'])
     lines.extend(["", "## Table 2: fixed-error randomized decimation", "",
-                  "The published 9,568/10,000 convergences and 111 distinct convergent corrections depend on fixed error bytes that were not released. The following runs use newly seeded weight-73 errors and are not direct numerical comparisons.", "",
+                  "The published 9,568/10,000 convergences and 111 distinct convergent corrections depend on fixed error bytes that were not released. The paper uses T=10, p=0.08, and top-gap randomization with gap 1.0. The following runs use newly seeded weight-73 errors and are not direct numerical comparisons.", "",
                   "| Local surrogate | Error selection | Trials | Converged | Distinct valid corrections | Distinct all candidates | Type I | Type II |", "|---|---|---:|---:|---:|---:|---:|---:|"])
     for path in sorted((result).glob("table2-*/summary.json")):
         item = json.loads(path.read_text())

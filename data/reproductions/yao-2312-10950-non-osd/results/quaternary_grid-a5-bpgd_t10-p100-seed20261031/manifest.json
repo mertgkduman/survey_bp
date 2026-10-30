@@ -1,0 +1,40 @@
+{
+  "code": "a5",
+  "code_semantic_sha256": "2c77c863501833d722e5b52a4d225d2524663caf820fcb019431ef663ec7f53d",
+  "decoder": {
+    "check_cap": null,
+    "damping": 0.0,
+    "p0": 0.1,
+    "product_epsilon": 1e-10,
+    "profile_id": "yao-source-qbpgd-undamped-v2"
+  },
+  "fidelity": "canonical_adaptation_compiled_development",
+  "max_shots": 5000,
+  "method": "bpgd_t10",
+  "noise": "depolarizing",
+  "outcome": "independent original-code Type I + Type II block failure; stabilizer-equivalent success",
+  "physical_p": 0.1,
+  "sampler": "PCG64 SeedSequence(seed,p*100000,global_shot); separate random-order stream",
+  "schema": "yao-non-osd-run-v1",
+  "seed": 20261031,
+  "source_archive_sha256": "8ddade4c50c9b12853e5431c53f4906fd29913bbf3be306422bafd984a05d654",
+  "source_files_sha256": {
+    "data/reproductions/yao-2312-10950-non-osd/codes.json": "68e644bf28d8c217ed07bfddf44cd1ff03ce2f3a6de4076407d63bd57d252cac",
+    "data/reproductions/yao-2312-10950-non-osd/run_point.py": "4b4912da054fb67f69c3238cca036a3e449c7e3e5a0469e10ae185fd1fc61c76",
+    "data/reproductions/yao-2312-10950-non-osd/source_points.json": "f42c214770997ae514a4fb0347b52776cb93a8fa800483a4a2215905711aada9",
+    "src/bp_registry/canonical/compiled.py": "cc2fdc4b32019cb0c1cb830884f80660504aff80e538cef2dd6df8135e0a777b",
+    "src/bp_registry/code_constructions.py": "d541281fc93cc26906fe3baa968070ac90a9056b370f94250029b9cacb00f004",
+    "src/bp_registry/quaternary/compiled.py": "c02d017f03f1e2c1435a7a76e3bdd60ca75bdf43a9163e24803b72f6ee224965"
+  },
+  "source_targets": [
+    {
+      "curve": "bpgd_t10",
+      "figure": 7,
+      "physical_p": 0.1,
+      "published_rate": 0.124226
+    }
+  ],
+  "start_shot": 0,
+  "stop_rule": "target_failures_or_max_shots",
+  "target_failures": 100
+}

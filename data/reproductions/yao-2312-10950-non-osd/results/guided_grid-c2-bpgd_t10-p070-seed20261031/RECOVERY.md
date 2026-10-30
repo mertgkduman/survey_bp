@@ -1,0 +1,1 @@
+The runner was externally terminated before writing a summary. `recover_interrupted.py` verified and finalized the first 2,000 complete ledger rows as an interrupted prefix. The original 5,000-shot ceiling and 100-failure target remain in `manifest.json`; the recovered summary records the actual 2,000-shot denominator and interruption status. Unflushed shots are not counted.

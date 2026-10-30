@@ -1,0 +1,3 @@
+b1 bp 0.04 1000 42
+b1 bp 0.04 2000 83
+{"code": "b1", "failures": 100, "method": "bp", "physical_p": 0.04, "shots": 2267, "stop_reason": "target_failures"}

@@ -1,0 +1,32 @@
+{
+  "code": "c2",
+  "counts": {
+    "elapsed_ns": 49061968196,
+    "exact_success": 202,
+    "fixations": 0,
+    "iterations": 28263,
+    "rounds": 0,
+    "stabilizer_success": 392,
+    "type_i": 100,
+    "type_ii": 0
+  },
+  "events_sha256": "890b278bf27a2bbdbd7a56151adc00e93b1bf838c5e8d96ec50cd4944d5ffcdb",
+  "failures": 100,
+  "manifest_sha256": "cc1384b60bc1c63a54c806c13d10d34e4f147380f18c09054939df09a6cd4e97",
+  "method": "bp",
+  "physical_p": 0.05,
+  "schema": "yao-non-osd-summary-v1",
+  "seed": 20261031,
+  "shots": 694,
+  "source_targets": [
+    {
+      "curve": "bp",
+      "figure": 5,
+      "physical_p": 0.05,
+      "published_rate": 0.157581
+    }
+  ],
+  "start_shot": 0,
+  "stop_reason": "target_failures",
+  "wall_seconds": 50.12571722175926
+}

@@ -1,0 +1,13 @@
+{
+  "counts": {
+    "converged": 20,
+    "type_i": 0,
+    "type_ii": 0
+  },
+  "distinct_converged_corrections": 1,
+  "events_sha256": "99015ef1da3729e7d1a4482a37addb2483612052b090f4fa505e10e63ec8c9aa",
+  "manifest_sha256": "625e00b4fbf210ed013ee64a8c83b3535aee21bb01f0d50748b6dd07e3d33b16",
+  "schema": "yao-table2-surrogate-summary-v1",
+  "trials": 20,
+  "wall_seconds": 0.9479237599298358
+}

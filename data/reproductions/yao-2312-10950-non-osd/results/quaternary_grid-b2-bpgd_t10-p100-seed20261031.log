@@ -1,0 +1,6 @@
+b2 bpgd_t10 0.1 1000 11
+b2 bpgd_t10 0.1 2000 16
+b2 bpgd_t10 0.1 3000 26
+b2 bpgd_t10 0.1 4000 37
+b2 bpgd_t10 0.1 5000 50
+{"code": "b2", "failures": 50, "method": "bpgd_t10", "physical_p": 0.1, "shots": 5000, "stop_reason": "max_shots"}

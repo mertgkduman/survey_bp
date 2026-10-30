@@ -1,0 +1,2 @@
+c2 bp 0.04 1000 97
+{"code": "c2", "failures": 100, "method": "bp", "physical_p": 0.04, "shots": 1052, "stop_reason": "target_failures"}

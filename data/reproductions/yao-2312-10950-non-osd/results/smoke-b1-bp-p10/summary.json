@@ -1,0 +1,74 @@
+{
+  "code": "b1",
+  "counts": {
+    "elapsed_ns": 262212035,
+    "exact_success": 0,
+    "fixations": 0,
+    "iterations": 1000,
+    "rounds": 0,
+    "stabilizer_success": 0,
+    "type_i": 10,
+    "type_ii": 0
+  },
+  "events_sha256": "cc6417a3cc5232d0f14e0ec8275f0deec81f1b443d8f380de27a1106ae56f072",
+  "failures": 10,
+  "manifest_sha256": "2b23299612263e25bad7c1562482d13748d78dfdf8de5420426f4959dfde4994",
+  "method": "bp",
+  "physical_p": 0.1,
+  "schema": "yao-non-osd-summary-v1",
+  "seed": 20261030,
+  "shots": 10,
+  "source_targets": [
+    {
+      "curve": "bp",
+      "figure": 2,
+      "physical_p": 0.1,
+      "published_rate": 0.9139
+    },
+    {
+      "curve": "bp",
+      "figure": 2,
+      "physical_p": 0.1,
+      "published_rate": 0.9139
+    },
+    {
+      "curve": "bp",
+      "figure": 3,
+      "physical_p": 0.1,
+      "published_rate": 0.9139
+    },
+    {
+      "curve": "bp",
+      "figure": 3,
+      "physical_p": 0.1,
+      "published_rate": 0.9139
+    },
+    {
+      "curve": "bp",
+      "figure": 4,
+      "physical_p": 0.1,
+      "published_rate": 0.9139
+    },
+    {
+      "curve": "bp",
+      "figure": 4,
+      "physical_p": 0.1,
+      "published_rate": 0.9139
+    },
+    {
+      "curve": "bp",
+      "figure": 6,
+      "physical_p": 0.1,
+      "published_rate": 0.9139
+    },
+    {
+      "curve": "bp",
+      "figure": 6,
+      "physical_p": 0.1,
+      "published_rate": 0.9139
+    }
+  ],
+  "start_shot": 0,
+  "stop_reason": "fixed_shots",
+  "wall_seconds": 0.2702076081186533
+}

@@ -1,0 +1,1 @@
+{"code": "b1", "failures": 56, "method": "bpgd_t100_r50", "physical_p": 0.08, "shots": 200, "stop_reason": "max_shots"}
