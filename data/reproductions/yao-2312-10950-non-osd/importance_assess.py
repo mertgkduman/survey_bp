@@ -144,5 +144,6 @@ def verified_importance_runs() -> dict[tuple[str, str, str], dict]:
             "shards": len(shards),
             "analysis_stage": active_stage,
             "planning_pilot_shots": sum(item["shots"] for item in all_shards if item["analysis_stage"] < active_stage),
+            "next_start_shot": max(item["start_shot"] + item["shots"] for item in all_shards),
         }
     return result

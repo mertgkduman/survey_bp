@@ -19,8 +19,8 @@ RESULTS = ROOT / "results"
 
 
 def _plan_path(stage: str) -> Path:
-    if not stage.isascii() or not stage.isalnum() or len(stage) > 20:
-        raise ValueError("stage must be a short ASCII alphanumeric label")
+    if not stage.startswith("stage") or not stage[5:].isdigit() or not 1 <= int(stage[5:]) <= 99:
+        raise ValueError("stage must be stage1 through stage99")
     return RESULTS / f"completion-importance-extension-{stage}.json"
 
 
@@ -36,11 +36,19 @@ def _direct_keys() -> set[tuple[str, str, str]]:
 
 def write_plan(stage: str) -> list[dict]:
     path = _plan_path(stage)
+    stage_number = int(stage[5:])
     if path.exists():
         raise FileExistsError(path)
     pilot_jobs = json.loads((RESULTS / "completion-importance-plan.json").read_text())["jobs"]
     runs = verified_importance_runs()
     direct_keys = _direct_keys()
+    prior_jobs_by_key = {}
+    if stage_number > 1:
+        prior_path = _plan_path(f"stage{stage_number-1}")
+        if prior_path.exists():
+            for prior in json.loads(prior_path.read_text())["jobs"]:
+                prior_key = (prior["code"], prior["method"], f'{prior["p"]:.5f}')
+                prior_jobs_by_key.setdefault(prior_key, []).append(prior)
     jobs = []
     skipped = []
     for item in pilot_jobs:
@@ -53,21 +61,25 @@ def write_plan(stage: str) -> list[dict]:
         if estimate is None:
             skipped.append({"key": key, "reason": "initial_pilot_incomplete"})
             continue
+        prior_jobs = prior_jobs_by_key.get(key, [])
+        if any(not (REPO / job["output"] / "summary.json").exists() for job in prior_jobs):
+            skipped.append({"key": key, "reason": "prior_extension_stage_incomplete"})
+            continue
+        if estimate["analysis_stage"] >= stage_number:
+            skipped.append({"key": key, "reason": "stage_already_exists"})
+            continue
         ess = estimate["failure_ess"]
         halfwidth = math.inf if estimate["rate"] == 0 else (
             estimate["ci95_high"] - estimate["ci95_low"]) / (2*estimate["rate"])
         if ess >= 100 and halfwidth <= .25:
             skipped.append({"key": key, "reason": "precision_gate_met"})
             continue
-        if estimate["shards"] != 1 or estimate["shots"] != item["shots"]:
-            skipped.append({"key": key, "reason": "additional_shard_already_exists_review_before_next_stage"})
-            continue
         needed = math.ceil(120*estimate["shots"]/ess - estimate["shots"]) if ess > 0 else 500000
         additional = min(500000, max(50000, needed))
         shard_count = math.ceil(additional/50000)
         for shard in range(shard_count):
             count = min(50000, additional-50000*shard)
-            start = item["shots"] + 50000*shard
+            start = estimate["next_start_shot"] + 50000*shard
             output = RESULTS / (f"completion-importance-{code}-{method}-p{int(round(p*1000)):03d}"
                                 f"-q{int(round(item['proposal_p']*1000)):03d}-seed{item['seed']}"
                                 f"-{stage}-s{shard+1:02d}")

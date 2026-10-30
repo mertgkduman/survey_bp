@@ -182,9 +182,27 @@ def build_rows() -> list[dict]:
                                                                   if item["failures"] == 0 else None),
                                 "evidence_tier": item["evidence_tier"],
                                 "evidence_path": item["evidence_path"], "estimator": "iid"}
+                # Figure captions say the plotted BP/BPGD points were collected
+                # until 100 errors; plotted decimals do not reveal exact N.
+                source_shots_approx = round(100 / published)
+                source_lo, source_hi = run_interval({"failures": 100, "shots": source_shots_approx,
+                                                      "stop_reason": "target_failures"})
+                if selected["ci95_low"] is None:
+                    source_mc_compatibility = "unmeasured"
+                elif status in {"importance_preliminary", "pilot_only", "low_count_unresolved",
+                                "low_count_tension"}:
+                    source_mc_compatibility = "not_assessed_low_precision"
+                elif selected["ci95_high"] < source_lo or source_hi < selected["ci95_low"]:
+                    source_mc_compatibility = "separated_95_intervals"
+                else:
+                    source_mc_compatibility = "overlapping_95_intervals"
                 rows.append({"figure": int(figure), "code": body["code"], "curve": curve, "p": p,
                              "published_rate": published, **selected, "assessment": status,
                              "assessment_reason": reason,
+                             "source_inferred_100_failure_shots": source_shots_approx,
+                             "source_approx_ci95_low": source_lo,
+                             "source_approx_ci95_high": source_hi,
+                             "source_mc_compatibility": source_mc_compatibility,
                              "expected_shots_for_100_at_source_rate": math.ceil(100 / published),
                              "importance_shots": None if imp is None else imp["shots"],
                              "importance_stage": None if imp is None else imp["analysis_stage"],
@@ -239,7 +257,7 @@ def write_outputs() -> None:
     runs = verified_runs()
     lines = ["# Yao BP/BPGD reproduction assessment", "",
              "Source: [Yao et al., arXiv:2312.10950v2](https://arxiv.org/pdf/2312.10950v2).",
-             "This comparison contains only BP and BPGD. Direct-run two-sided 95% intervals invert the negative-binomial distribution for runs stopped at a fixed failure count, or use Clopper–Pearson bounds for fixed/capped shot runs. Mixture importance-sampling (IS) intervals are approximate normal intervals using the weighted shot variance and are marked separately. Zero-failure triangles mark the exact one-sided 95% upper bound, about 3/N. Source points are published rates; their exact trial counts are not available from the plotted coordinates. Interval inclusion is a descriptive compatibility check, not a formal equivalence claim.", "",
+             "This comparison contains only BP and BPGD. Direct-run two-sided 95% intervals invert the negative-binomial distribution for runs stopped at a fixed failure count, or use Clopper–Pearson bounds for fixed/capped shot runs. Mixture importance-sampling (IS) intervals are approximate normal intervals using the weighted shot variance and are marked separately. Zero-failure triangles mark the exact one-sided 95% upper bound, about 3/N. Figure captions say source points were collected to 100 errors; approximate source intervals infer N=round(100/plotted rate), because exact denominators were not supplied. Interval overlap is descriptive, not a formal equivalence test.", "",
              "## Coverage", ""]
     lines.extend(f"- {key}: {count}" for key, count in sorted(statuses.items()))
     lines.extend(["", "## Rare-event estimator", "",
@@ -279,13 +297,13 @@ def write_outputs() -> None:
         lines.append(f'| {row["figure"]} | {row["code"].upper()} | {row["curve"]} | {row["published_rate"]:.6g} | {local} | {interval} | {row["assessment"]} |')
     exclusions = [row for row in rows if row["assessment"] in {"local_95_excludes_source", "importance_95_excludes_source"}]
     lines.extend(["", "## Points outside the local 95% interval", "",
-                  "These are point-versus-interval flags, not formal two-sample discrepancy tests; the published estimates also have Monte Carlo uncertainty. Figures repeating the same result are shown once.", "",
-                  "| Figure | Code | Decoder | p | Published | Local estimate | Local 95% interval |",
-                  "|---:|---|---|---:|---:|---:|---:|"])
+                  "These are point-versus-interval flags, not formal two-sample discrepancy tests. The source interval below is approximate because its denominator is inferred from the caption's 100-failure rule and the rounded plotted rate. Figures repeating the same result are shown once.", "",
+                  "| Figure | Code | Decoder | p | Published | Local estimate | Local 95% interval | Approx. source 95% interval | Overlap? |",
+                  "|---:|---|---|---:|---:|---:|---:|---:|---|"])
     for row in exclusions:
         label = (f'IS {row["local_rate"]:.6g}, ESS={row["importance_failure_ess"]:.1f}'
                  if row["estimator"] == "mixture_importance" else f'{row["failures"]}/{row["shots"]} ({row["local_rate"]:.6g})')
-        lines.append(f'| {row["figure"]} | {row["code"].upper()} | {row["curve"]} | {float(row["p"]):.2f} | {row["published_rate"]:.6g} | {label} | [{row["ci95_low"]:.6g}, {row["ci95_high"]:.6g}] |')
+        lines.append(f'| {row["figure"]} | {row["code"].upper()} | {row["curve"]} | {float(row["p"]):.2f} | {row["published_rate"]:.6g} | {label} | [{row["ci95_low"]:.6g}, {row["ci95_high"]:.6g}] | [{row["source_approx_ci95_low"]:.6g}, {row["source_approx_ci95_high"]:.6g}] | {row["source_mc_compatibility"]} |')
     lines.extend(["", "At B1 T=1, p=0.06, the local 100/12,358 estimate excludes the plotted 0.00606 point. Figure 3 says its points were also collected to 100 failures; approximating that source run as 100/16,502 gives a 95% interval that overlaps the local interval. This is a reproducibility lead, not evidence of a specific kernel error."])
     lines.extend(["", "## Table 1: decimated variables", "",
                   "The paper specifies different T values in its prose and caption. The executed T=10 mean is shown separately.", "",
