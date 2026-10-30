@@ -27,7 +27,9 @@ def _plan_path(stage: str) -> Path:
 def _direct_keys() -> set[tuple[str, str, str]]:
     keys = set()
     for name in ("completion-direct-plan.json", "completion-mid-plan.json",
-                 "completion-low-direct-plan.json"):
+                 "completion-low-direct-plan.json", "completion-rare-direct-plan.json"):
+        if not (RESULTS / name).exists():
+            continue
         for item in json.loads((RESULTS / name).read_text())["jobs"]:
             keys.add((item["code"], item["method"], f'{item["p"]:.5f}'))
     keys.update({("a5", "bpgd_t10", "0.06000"), ("b2", "bpgd_t10", "0.06000")})

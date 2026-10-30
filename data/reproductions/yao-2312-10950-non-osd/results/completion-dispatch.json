@@ -202,8 +202,17 @@
       "cpus_per_task": 1,
       "memory_gib_per_task": 4,
       "wall_limit_hours_per_task": 12
+    },
+    {
+      "job_id": "60647885",
+      "description": "Direct iid 100-failure B1 guided T=100, R=10, p=0.04 cross-check",
+      "plan": "completion-rare-direct-plan.json",
+      "tasks": 1,
+      "cpus_per_task": 1,
+      "memory_gib_per_task": 4,
+      "wall_limit_hours_per_task": 48
     }
   ],
-  "worst_case_core_hours_if_every_task_hits_its_wall_limit": 1884,
+  "worst_case_core_hours_if_every_task_hits_its_wall_limit": 1932,
   "phase_11_publication_dispatch": false
 }
