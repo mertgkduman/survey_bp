@@ -258,8 +258,18 @@
       "memory_gib_per_task": 8,
       "wall_limit_hours_per_task": 4,
       "dependency": "afterany of active campaign jobs at 2026-10-30 23:42 UTC, excluding unrelated mobile-gsd job"
+    },
+    {
+      "job_id": "60650899",
+      "description": "After q=0.07 screen, independently audit all three B1 T=10 proposal arms, freeze stage9, and submit ten disjoint shards",
+      "tasks": 1,
+      "cpus_per_task": 1,
+      "memory_gib_per_task": 4,
+      "wall_limit_hours_per_task": 2,
+      "dependency": "afterok:60646291",
+      "script": "freeze_t10_q070_stage.py"
     }
   ],
-  "worst_case_core_hours_if_every_task_hits_its_wall_limit": 2300,
+  "worst_case_core_hours_if_every_task_hits_its_wall_limit": 2302,
   "phase_11_publication_dispatch": false
 }

@@ -14,4 +14,6 @@ The first separated approximate source/local 95% intervals are B2 Q-BPGD at p=0.
 
 B1 guided T=10 at p=0.04 remains hard for the mixture estimator: completed stage 8 at q=0.05 has 68 raw failures in 500,000 shots but weighted failure ESS only 7.72. The independent q=0.07 proposal screen is still running. Do not combine the adaptively selected stages as if they were one prespecified fixed experiment; freeze a fresh disjoint stage after verifying that screen. Its previous stages consumed shot indices through 744,084 for seed 20261035.
 
+Dependent Slurm job `60650899` invokes `freeze_t10_q070_stage.py` only after the q=0.07 screen succeeds. It replays all three proposal screens, freezes stage 9 with 500,000 new disjoint shots beginning at index 744,085, and submits the shard array. Its output and the new stage job ID will appear in `results/freeze-t10-q070-60650899.log` and `completion-dispatch.json`.
+
 Required before completion: let all jobs finish; dispatch additional independent fixed stages wherever rare-point ESS remains below 100; replace any capped direct runs with fresh disjoint follow-ups if they finish below 100 failures; regenerate and inspect all 154 coordinate rows, plot, and report; update README and GSD state; then mark `PLAN.md` complete. The Table 2 fixed error bytes are unavailable and its local surrogates must remain labeled as such.
