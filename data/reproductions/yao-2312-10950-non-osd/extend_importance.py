@@ -28,7 +28,7 @@ def _direct_keys() -> set[tuple[str, str, str]]:
     keys = set()
     for name in ("completion-direct-plan.json", "completion-mid-plan.json",
                  "completion-low-direct-plan.json", "completion-rare-direct-plan.json",
-                 "completion-rare-shards-plan.json"):
+                 "completion-rare-direct-r50-plan.json", "completion-rare-shards-plan.json"):
         if not (RESULTS / name).exists():
             continue
         for item in json.loads((RESULTS / name).read_text())["jobs"]:
