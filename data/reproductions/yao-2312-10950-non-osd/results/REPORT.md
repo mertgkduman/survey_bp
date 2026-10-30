@@ -5,12 +5,12 @@ This comparison contains only BP and BPGD. Direct-run two-sided 95% intervals in
 
 ## Coverage
 
-- importance_preliminary: 13
+- importance_preliminary: 12
 - interrupted_prefix_contains_source: 1
-- local_95_contains_source: 106
+- local_95_contains_source: 109
 - local_95_excludes_source: 16
 - low_count_unresolved: 4
-- pending: 11
+- pending: 9
 - pilot_only: 3
 
 ## Rare-event estimator
@@ -28,11 +28,11 @@ Raw failures are proposal-distribution failures. The effective weighted failure 
 | B1 | bpgd_random_t100 | 0.04 | 5 | 2.3e-05 | 1.31733e-05 | 33/4580 | 3.9 |
 | B1 | bpgd_t1 | 0.04 | 6 | 2.9e-05 | 2.36521e-05 | 169/500000 | 13.3 |
 | B1 | bpgd_t1 | 0.05 | 0 | 0.000391 | 0.000359427 | 480/10000 | 7.9 |
-| B1 | bpgd_t10 | 0.04 | 8 | 3.21835e-06 | 6.41191e-06 | 33/250000 | 3.3 |
+| B1 | bpgd_t10 | 0.04 | 8 | 3.21835e-06 | 5.45654e-06 | 68/500000 | 7.7 |
 | B1 | bpgd_t10 | 0.05 | 0 | 0.000168463 | 0.000112356 | 377/10000 | 20.1 |
 | B1 | bpgd_t10 | 0.06 | 0 | 0.00367353 | 0.00401222 | 410/10000 | 193.6 |
-| B1 | bpgd_t100 | 0.04 | 0 | 1e-06 | 1.00847e-07 | 19/10000 | 3.7 |
-| B1 | bpgd_t100_r10 | 0.04 | 1 | 0.000124 | 0.000180311 | 1527/124046 | 7.2 |
+| B1 | bpgd_t100 | 0.04 | 3 | 1e-06 | 2.71571e-07 | 39/17266 | 5.7 |
+| B1 | bpgd_t100_r10 | 0.04 | 1 | 0.000124 | 0.000203469 | 2088/174046 | 10.6 |
 | B1 | bpgd_t100_r10 | 0.05 | 0 | 0.00094 | 0.000849514 | 761/10000 | 19.3 |
 | B1 | bpgd_t100_r2 | 0.04 | 0 | 0.00944 | 0.00923187 | 743/10000 | 17.4 |
 | B1 | bpgd_t100_r5 | 0.04 | 0 | 0.000588 | 0.000702647 | 232/10000 | 3.8 |
@@ -54,7 +54,7 @@ B1 T=10 uses Figure 3 below; Figure 4's conflicting T=10 targets remain separate
 
 | Code | p | Source plain BP | Local plain BP | Source guided T=10 | Local guided T=10 |
 |---|---:|---:|---:|---:|---:|
-| B1 | 0.04 | 0.0434 | 100/2267 (0.04411) | 6e-06 | IS 6.412e-06 (N=250000, ESS=3.3) |
+| B1 | 0.04 | 0.0434 | 100/2267 (0.04411) | 6e-06 | IS 5.457e-06 (N=500000, ESS=7.7) |
 | B1 | 0.05 | 0.0867 | 100/1226 (0.08157) | 0.000179 | IS 0.0001124 (N=10000, ESS=20.1) |
 | B1 | 0.06 | 0.1449 | 436/3000 (0.1453) | 0.003891 | 100/21372 (0.004679) |
 | B1 | 0.07 | 0.2505 | 100/407 (0.2457) | 0.038801 | 100/2485 (0.04024) |
@@ -96,6 +96,12 @@ B1 T=10 uses Figure 3 below; Figure 4's conflicting T=10 targets remain separate
 | 8 | B2 | bpgd_t10 | 0.000455 | 1/5000 | [5.0635e-06, 0.0011138] | low_count_unresolved |
 | 8 | B2 | qbp | 0.002569 | 110/48658 | [0.0018584, 0.0027241] | local_95_contains_source |
 
+## Source Monte Carlo discrepancies
+
+The following distinct points have disjoint local and approximate source 95% intervals. The source intervals assume the caption's 100-failure stopping rule; exact source shot counts were not released. These are discrepancies to investigate, not proof of a particular implementation defect.
+
+- B2 bpgd_t10, p=0.07: local 0.000595969, source 0.000905.
+
 ## Points outside the local 95% interval
 
 These are point-versus-interval flags, not formal two-sample discrepancy tests. The source interval below is approximate because its denominator is inferred from the caption's 100-failure rule and the rounded plotted rate. Figures repeating the same result are shown once.
@@ -134,7 +140,7 @@ The paper specifies different T values in its prose and caption. The executed T=
 
 At B1 p=0.08, 96 of 100 local guided failures are syndrome-inconsistent (Type I), while 4 are logical (Type II). This is consistent with the paper's statement that over 90% of these failures are non-convergence cases.
 
-C2 p=0.07 used a recovered 2000-shot prefix: 12 Type I and 61 Type II failures. This breakdown refers only to the retained prefix.
+C2 p=0.07 used a recovered prefix of 2000 shots: 12 Type I and 61 Type II failures.
 
 ## Table 2: fixed-error randomized decimation
 
@@ -155,6 +161,7 @@ The published 9,568/10,000 convergences and 111 distinct convergent corrections 
 - The comparison omits BP-OSD and BP-SI. The pinned raw source extraction retains their provenance, but neither appears in this BP/BPGD table or plot.
 - Plain QBP v2 counts are imported from the earlier vanilla campaign, not rerun here. Its archive hash matches this source, but its recorded main.tex hash has a transcription error; this study records the independently verified TeX hash. The earlier count ledgers were not revalidated by this assessor.
 - The new binary path is a compiled interpretation of the paper's V2C clipping and decimation pseudocode. The A5/B2 Q-BPGD path uses the existing compiled BP4 v2 kernel; these are canonical adaptations.
+- Q-BPGD follows Algorithm 3's T-sweep, syndrome-test, maximum-marginal decimation order. Its local V2C state persists between rounds. The paper does not specify its Q-BP numerical safeguards or message restart behavior, so a separated curve point cannot yet be attributed to either policy.
 - All local results include Type I and Type II block failures. A correction differing from the sampled error by a stabilizer counts as success.
 - Reaching 100 direct failures at the source B1 T=100, p=0.04 rate of 10⁻⁶ requires about 100 million shots in expectation; B1 T=10 at p=0.04 requires about 16.7 million. Rare-event estimates are explicitly marked IS and require the precision gate above before they are considered resolved.
 

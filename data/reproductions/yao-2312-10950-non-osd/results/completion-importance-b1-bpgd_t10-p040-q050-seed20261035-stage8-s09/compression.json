@@ -1,0 +1,8 @@
+{
+  "codec": "zstd -3 -T1",
+  "compressed_bytes": 5509657,
+  "compressed_sha256": "46fa18f2029d5931e5e5a349baf55bd3bdae88e8970dcddb23c4db582431d315",
+  "raw_bytes": 28437597,
+  "raw_sha256": "3786cdd58eb96b84295d1dc630ac38f069ebd4641b268316c02e9ab46c8f864c",
+  "schema": "yao-ledger-compression-v1"
+}
