@@ -1,0 +1,384 @@
+{
+  "jobs": [
+    {
+      "code": "b1",
+      "defensive_fraction": 0.1,
+      "method": "bpgd_t100_r50",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-importance-b1-bpgd_t100_r50-p050-q070-seed20261035-stage4-s01",
+      "p": 0.05,
+      "pilot_ess": 7.8160886053708785,
+      "pilot_rate": 0.00034500923121141743,
+      "proposal_p": 0.07,
+      "seed": 20261035,
+      "shots": 50000,
+      "start_shot": 10000
+    },
+    {
+      "code": "b1",
+      "defensive_fraction": 0.1,
+      "method": "bpgd_t100_r50",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-importance-b1-bpgd_t100_r50-p050-q070-seed20261035-stage4-s02",
+      "p": 0.05,
+      "pilot_ess": 7.8160886053708785,
+      "pilot_rate": 0.00034500923121141743,
+      "proposal_p": 0.07,
+      "seed": 20261035,
+      "shots": 50000,
+      "start_shot": 60000
+    },
+    {
+      "code": "b1",
+      "defensive_fraction": 0.1,
+      "method": "bpgd_t100_r50",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-importance-b1-bpgd_t100_r50-p050-q070-seed20261035-stage4-s03",
+      "p": 0.05,
+      "pilot_ess": 7.8160886053708785,
+      "pilot_rate": 0.00034500923121141743,
+      "proposal_p": 0.07,
+      "seed": 20261035,
+      "shots": 43530,
+      "start_shot": 110000
+    },
+    {
+      "code": "b1",
+      "defensive_fraction": 0.1,
+      "method": "bpgd_t70",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-importance-b1-bpgd_t70-p040-q060-seed20261035-stage4-s01",
+      "p": 0.04,
+      "pilot_ess": 3.433835553681179,
+      "pilot_rate": 2.0845996980123834e-07,
+      "proposal_p": 0.06,
+      "seed": 20261035,
+      "shots": 50000,
+      "start_shot": 10000
+    },
+    {
+      "code": "b1",
+      "defensive_fraction": 0.1,
+      "method": "bpgd_t70",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-importance-b1-bpgd_t70-p040-q060-seed20261035-stage4-s02",
+      "p": 0.04,
+      "pilot_ess": 3.433835553681179,
+      "pilot_rate": 2.0845996980123834e-07,
+      "proposal_p": 0.06,
+      "seed": 20261035,
+      "shots": 50000,
+      "start_shot": 60000
+    },
+    {
+      "code": "b1",
+      "defensive_fraction": 0.1,
+      "method": "bpgd_t70",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-importance-b1-bpgd_t70-p040-q060-seed20261035-stage4-s03",
+      "p": 0.04,
+      "pilot_ess": 3.433835553681179,
+      "pilot_rate": 2.0845996980123834e-07,
+      "proposal_p": 0.06,
+      "seed": 20261035,
+      "shots": 50000,
+      "start_shot": 110000
+    },
+    {
+      "code": "b1",
+      "defensive_fraction": 0.1,
+      "method": "bpgd_t70",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-importance-b1-bpgd_t70-p040-q060-seed20261035-stage4-s04",
+      "p": 0.04,
+      "pilot_ess": 3.433835553681179,
+      "pilot_rate": 2.0845996980123834e-07,
+      "proposal_p": 0.06,
+      "seed": 20261035,
+      "shots": 50000,
+      "start_shot": 160000
+    },
+    {
+      "code": "b1",
+      "defensive_fraction": 0.1,
+      "method": "bpgd_t70",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-importance-b1-bpgd_t70-p040-q060-seed20261035-stage4-s05",
+      "p": 0.04,
+      "pilot_ess": 3.433835553681179,
+      "pilot_rate": 2.0845996980123834e-07,
+      "proposal_p": 0.06,
+      "seed": 20261035,
+      "shots": 50000,
+      "start_shot": 210000
+    },
+    {
+      "code": "b1",
+      "defensive_fraction": 0.1,
+      "method": "bpgd_t70",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-importance-b1-bpgd_t70-p040-q060-seed20261035-stage4-s06",
+      "p": 0.04,
+      "pilot_ess": 3.433835553681179,
+      "pilot_rate": 2.0845996980123834e-07,
+      "proposal_p": 0.06,
+      "seed": 20261035,
+      "shots": 50000,
+      "start_shot": 260000
+    },
+    {
+      "code": "b1",
+      "defensive_fraction": 0.1,
+      "method": "bpgd_t70",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-importance-b1-bpgd_t70-p040-q060-seed20261035-stage4-s07",
+      "p": 0.04,
+      "pilot_ess": 3.433835553681179,
+      "pilot_rate": 2.0845996980123834e-07,
+      "proposal_p": 0.06,
+      "seed": 20261035,
+      "shots": 39464,
+      "start_shot": 310000
+    }
+  ],
+  "max_additional_shots_per_point_this_stage": 500000,
+  "max_shots_per_shard": 50000,
+  "planning_ess_target": 120,
+  "precision_target_failure_ess": 100,
+  "runner_sha256": "387159c5204336c341d7c80984c7733be8292279f2562317dda4e99a2ffb23d9",
+  "schema": "yao-importance-extension-plan-v1",
+  "selection_note": "B1 T=1 at p=0.04 is deferred pending q=0.05/0.055 screen; later stage will use independently fixed proposal.",
+  "skipped": [
+    {
+      "key": [
+        "a5",
+        "bpgd_t10",
+        "0.04000"
+      ],
+      "reason": "ordinary_iid_run_planned"
+    },
+    {
+      "key": [
+        "a5",
+        "bpgd_t10",
+        "0.05000"
+      ],
+      "reason": "ordinary_iid_run_planned"
+    },
+    {
+      "key": [
+        "b1",
+        "bpgd_random_t100",
+        "0.04000"
+      ],
+      "reason": "initial_pilot_incomplete"
+    },
+    {
+      "key": [
+        "b1",
+        "bpgd_random_t100",
+        "0.05000"
+      ],
+      "reason": "initial_pilot_incomplete"
+    },
+    {
+      "key": [
+        "b1",
+        "bpgd_random_t100",
+        "0.06000"
+      ],
+      "reason": "ordinary_iid_run_planned"
+    },
+    {
+      "key": [
+        "b1",
+        "bpgd_t1",
+        "0.05000"
+      ],
+      "reason": "ordinary_iid_run_planned"
+    },
+    {
+      "key": [
+        "b1",
+        "bpgd_t10",
+        "0.04000"
+      ],
+      "reason": "prior_extension_stage_incomplete"
+    },
+    {
+      "key": [
+        "b1",
+        "bpgd_t10",
+        "0.05000"
+      ],
+      "reason": "ordinary_iid_run_planned"
+    },
+    {
+      "key": [
+        "b1",
+        "bpgd_t10",
+        "0.06000"
+      ],
+      "reason": "ordinary_iid_run_planned"
+    },
+    {
+      "key": [
+        "b1",
+        "bpgd_t100",
+        "0.04000"
+      ],
+      "reason": "prior_extension_stage_incomplete"
+    },
+    {
+      "key": [
+        "b1",
+        "bpgd_t100",
+        "0.05000"
+      ],
+      "reason": "initial_pilot_incomplete"
+    },
+    {
+      "key": [
+        "b1",
+        "bpgd_t100",
+        "0.06000"
+      ],
+      "reason": "ordinary_iid_run_planned"
+    },
+    {
+      "key": [
+        "b1",
+        "bpgd_t100_r10",
+        "0.04000"
+      ],
+      "reason": "prior_extension_stage_incomplete"
+    },
+    {
+      "key": [
+        "b1",
+        "bpgd_t100_r10",
+        "0.05000"
+      ],
+      "reason": "ordinary_iid_run_planned"
+    },
+    {
+      "key": [
+        "b1",
+        "bpgd_t100_r2",
+        "0.04000"
+      ],
+      "reason": "ordinary_iid_run_planned"
+    },
+    {
+      "key": [
+        "b1",
+        "bpgd_t100_r5",
+        "0.04000"
+      ],
+      "reason": "ordinary_iid_run_planned"
+    },
+    {
+      "key": [
+        "b1",
+        "bpgd_t100_r5",
+        "0.05000"
+      ],
+      "reason": "ordinary_iid_run_planned"
+    },
+    {
+      "key": [
+        "b1",
+        "bpgd_t100_r50",
+        "0.04000"
+      ],
+      "reason": "prior_extension_stage_incomplete"
+    },
+    {
+      "key": [
+        "b1",
+        "bpgd_t100_r50",
+        "0.06000"
+      ],
+      "reason": "ordinary_iid_run_planned"
+    },
+    {
+      "key": [
+        "b1",
+        "bpgd_t70",
+        "0.05000"
+      ],
+      "reason": "initial_pilot_incomplete"
+    },
+    {
+      "key": [
+        "b1",
+        "bpgd_t70",
+        "0.06000"
+      ],
+      "reason": "ordinary_iid_run_planned"
+    },
+    {
+      "key": [
+        "b2",
+        "bpgd_t10",
+        "0.04000"
+      ],
+      "reason": "ordinary_iid_run_planned"
+    },
+    {
+      "key": [
+        "b2",
+        "bpgd_t10",
+        "0.05000"
+      ],
+      "reason": "ordinary_iid_run_planned"
+    },
+    {
+      "key": [
+        "b2",
+        "bpgd_t10",
+        "0.07000"
+      ],
+      "reason": "ordinary_iid_run_planned"
+    },
+    {
+      "key": [
+        "b2",
+        "bpgd_t10",
+        "0.08000"
+      ],
+      "reason": "ordinary_iid_run_planned"
+    },
+    {
+      "key": [
+        "b2",
+        "bpgd_t10",
+        "0.09000"
+      ],
+      "reason": "ordinary_iid_run_planned"
+    },
+    {
+      "key": [
+        "c2",
+        "bpgd_t10",
+        "0.04000"
+      ],
+      "reason": "initial_pilot_incomplete"
+    },
+    {
+      "key": [
+        "c2",
+        "bpgd_t10",
+        "0.05000"
+      ],
+      "reason": "ordinary_iid_run_planned"
+    },
+    {
+      "key": [
+        "c2",
+        "bpgd_t10",
+        "0.06000"
+      ],
+      "reason": "ordinary_iid_run_planned"
+    },
+    {
+      "key": [
+        "b1",
+        "bpgd_t1",
+        "0.04000"
+      ],
+      "reason": "independent_proposal_screen_in_progress"
+    }
+  ],
+  "stage": "stage4"
+}
