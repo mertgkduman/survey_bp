@@ -23,6 +23,7 @@ For the repository's composable decoder-file schema, see [decoder-files.md](../.
 - `results/proposal-tuning-b1-t10-p040-q070-plan.json` adds an independent 30,000-shot q=0.07 screen because the original pilot's estimated importance-sampling second moment favored a larger proposal rate. All three T=10 screens are excluded from the final estimate.
 - The completed two-arm T=10 screen receipt selects q=0.05 over q=0.055; stage 8 fixes an independent q=0.05 estimate while the q=0.07 screen continues. A later fixed stage can use q=0.07 if that screen yields more effective failures per shot.
 - `compress_completed.py --all` verifies a completed ledger's original SHA-256, compresses it with zstd, checks byte-exact decompression, records `compression.json`, and removes the large plaintext file. `ledger_io.py` lets both assessors stream either plaintext or compressed ledgers. A running or unverified ledger is never compressed.
+- Slurm job `60650712` is a dependency-triggered refresh after the currently dispatched jobs finish. It compresses completed ledgers and regenerates the comparison; it does not promote preliminary points or replace the precision gate.
 - `table2_surrogate.py` fixes a newly seeded weight-73 error and repeats top-gap randomized BPGD. It tests the behavior behind Table 2, while explicitly recording that the paper's fixed error is unavailable.
 
 Example from the repository root:
