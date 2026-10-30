@@ -1,0 +1,39 @@
+{
+  "code": "b1",
+  "counts": {
+    "elapsed_ns": 806295190561,
+    "exact_success": 30728,
+    "fixations": 1532458,
+    "iterations": 1582443,
+    "rounds": 1582443,
+    "stabilizer_success": 19255,
+    "type_i": 15,
+    "type_ii": 2
+  },
+  "events_sha256": "a970631bad0158d599ad0b4f7dccb47fd52606a14a10325c24fb945c49c3dba6",
+  "manifest_sha256": "7ea6ceabc16cafca530475d19d8cfd1d02b5339f7a07c4dba892dc9b82d3680c",
+  "method": "bpgd_t1",
+  "physical_target_p": 0.04,
+  "proposal_p": 0.05,
+  "schema": "yao-importance-summary-v1",
+  "seed": 20261035,
+  "shots": 50000,
+  "source_targets": [
+    {
+      "curve": "bpgd_t1",
+      "figure": 3,
+      "physical_p": 0.04,
+      "published_rate": 2.9e-05
+    }
+  ],
+  "start_shot": 901931,
+  "wall_seconds": 835.2333978610113,
+  "weighted_sums": {
+    "failure": 1.2240372748861414,
+    "failure_sq": 0.28720902007780014,
+    "type_i": 1.1690846564996908,
+    "type_ii": 0.05495261838645066,
+    "weight": 50014.063643246605,
+    "weight_sq": 144706.6698769048
+  }
+}

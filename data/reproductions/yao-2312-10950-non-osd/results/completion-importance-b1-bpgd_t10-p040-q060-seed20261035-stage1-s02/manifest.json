@@ -1,0 +1,53 @@
+{
+  "code": "b1",
+  "code_semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548",
+  "decoder": {
+    "bpgd_policy": [
+      10,
+      null,
+      "most_reliable"
+    ],
+    "check_product_epsilon": 1e-10,
+    "method": "bpgd_t10",
+    "prior_p0": 0.04,
+    "profile": "yao-binary-spa-v2c-cap25",
+    "v2c_cap": 25.0
+  },
+  "defensive_fraction": 0.1,
+  "estimator": "mean of P_target(error)/Q_mixture(error) times independent block-failure indicator",
+  "fidelity": "canonical_adaptation_importance_sampling_development",
+  "method": "bpgd_t10",
+  "noise": "bit_flip",
+  "outcome": "independent original-code Type I + Type II block failure; stabilizer-equivalent success",
+  "physical_target_p": 0.04,
+  "proposal_p": 0.06,
+  "sampler": "PCG64 SeedSequence(seed,target_p*100000,proposal_p*100000,global_shot); iid mixture target/shifted",
+  "schema": "yao-importance-run-v1",
+  "seed": 20261035,
+  "shots": 50000,
+  "source_archive_sha256": "8ddade4c50c9b12853e5431c53f4906fd29913bbf3be306422bafd984a05d654",
+  "source_files_sha256": {
+    "data/reproductions/yao-2312-10950-non-osd/codes.json": "68e644bf28d8c217ed07bfddf44cd1ff03ce2f3a6de4076407d63bd57d252cac",
+    "data/reproductions/yao-2312-10950-non-osd/run_importance.py": "387159c5204336c341d7c80984c7733be8292279f2562317dda4e99a2ffb23d9",
+    "data/reproductions/yao-2312-10950-non-osd/run_point.py": "89bbc5a825d545dd890ef59a5ed1f7642c1458615fb9b810dae587824d0fee78",
+    "data/reproductions/yao-2312-10950-non-osd/source_points.json": "f42c214770997ae514a4fb0347b52776cb93a8fa800483a4a2215905711aada9",
+    "src/bp_registry/canonical/compiled.py": "cc2fdc4b32019cb0c1cb830884f80660504aff80e538cef2dd6df8135e0a777b",
+    "src/bp_registry/code_constructions.py": "d541281fc93cc26906fe3baa968070ac90a9056b370f94250029b9cacb00f004",
+    "src/bp_registry/quaternary/compiled.py": "c02d017f03f1e2c1435a7a76e3bdd60ca75bdf43a9163e24803b72f6ee224965"
+  },
+  "source_targets": [
+    {
+      "curve": "bpgd_t10",
+      "figure": 3,
+      "physical_p": 0.04,
+      "published_rate": 6e-06
+    },
+    {
+      "curve": "bpgd_t10",
+      "figure": 4,
+      "physical_p": 0.04,
+      "published_rate": 3.21835e-06
+    }
+  ],
+  "start_shot": 60000
+}
