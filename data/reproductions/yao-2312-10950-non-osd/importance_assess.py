@@ -8,6 +8,7 @@ import json
 import math
 from pathlib import Path
 import re
+from typing import Iterable
 
 import numpy as np
 from ledger_io import open_event_ledger
@@ -40,12 +41,12 @@ def _weight(n: int, k: int, p: float, q: float, d: float) -> float:
     return math.exp(lp - float(np.logaddexp(math.log(d)+lp, math.log1p(-d)+lq)))
 
 
-def verified_importance_runs() -> dict[tuple[str, str, str], dict]:
+def verified_importance_runs(paths: Iterable[Path] | None = None) -> dict[tuple[str, str, str], dict]:
     grouped = defaultdict(list)
     runner_name = str((ROOT / "run_importance.py").relative_to(REPO))
     expected_runner_sha = sha256((ROOT / "run_importance.py").read_bytes()).hexdigest()
     intervals = defaultdict(list)
-    for path in sorted(RESULTS.glob("completion-importance-*/summary.json")):
+    for path in sorted(paths if paths is not None else RESULTS.glob("completion-importance-*/summary.json")):
         summary = json.loads(path.read_text())
         if summary.get("schema") != "yao-importance-summary-v1":
             continue

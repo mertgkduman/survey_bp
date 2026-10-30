@@ -72,6 +72,8 @@ def test_importance_run_retains_exact_weighted_shot_ledger(tmp_path: Path, monke
     assert verified[("b1", "bpgd_t1", "0.04000")]["shots"] == 4
     assert verified[("b1", "bpgd_t1", "0.04000")]["rate"] == pytest.approx(
         summary["weighted_sums"]["failure"]/4)
+    explicit = ASSESS.verified_importance_runs([output / "summary.json"])
+    assert explicit[("b1", "bpgd_t1", "0.04000")]["rate"] == verified[("b1", "bpgd_t1", "0.04000")]["rate"]
 
 
 def test_extension_estimate_excludes_adaptive_planning_pilot(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
