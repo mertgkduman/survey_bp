@@ -1,0 +1,32 @@
+{
+  "analysis_rule": "These pilot shots choose a proposal and are excluded from the later independently fixed estimate",
+  "fidelity": "bounded_canonical_adaptation_development",
+  "jobs": [
+    {
+      "code": "b1",
+      "defensive_fraction": 0.1,
+      "method": "bpgd_t1",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/proposal-b1-t1-p040-q050-n50000",
+      "p": 0.04,
+      "proposal_p": 0.05,
+      "seed": 20261039,
+      "shots": 50000,
+      "start_shot": 0
+    },
+    {
+      "code": "b1",
+      "defensive_fraction": 0.1,
+      "method": "bpgd_t1",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/proposal-b1-t1-p040-q055-n50000",
+      "p": 0.04,
+      "proposal_p": 0.055,
+      "seed": 20261039,
+      "shots": 50000,
+      "start_shot": 0
+    }
+  ],
+  "purpose": "Choose a more efficient proposal for the B1 guided T=1, p=0.04 source point",
+  "runner_sha256": "387159c5204336c341d7c80984c7733be8292279f2562317dda4e99a2ffb23d9",
+  "schema": "yao-importance-proposal-screen-v1",
+  "selection_metric": "effective weighted failure count per shot"
+}
