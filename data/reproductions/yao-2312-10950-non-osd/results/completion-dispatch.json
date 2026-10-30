@@ -172,8 +172,18 @@
       "cpus_per_task": 1,
       "memory_gib_per_task": 4,
       "wall_limit_hours_per_task": 8
+    },
+    {
+      "job_id": "60646505",
+      "description": "Disjoint rare-event extension for randomized B1 guided T=100 at p=0.04; T=1 remains deferred for proposal screen",
+      "plan": "completion-importance-extension-stage5.json",
+      "tasks": 10,
+      "max_simultaneous_tasks": 10,
+      "cpus_per_task": 1,
+      "memory_gib_per_task": 4,
+      "wall_limit_hours_per_task": 12
     }
   ],
-  "worst_case_core_hours_if_every_task_hits_its_wall_limit": 1524,
+  "worst_case_core_hours_if_every_task_hits_its_wall_limit": 1644,
   "phase_11_publication_dispatch": false
 }
