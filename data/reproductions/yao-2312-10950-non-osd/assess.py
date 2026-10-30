@@ -180,7 +180,7 @@ def write_outputs() -> None:
         axis.legend(fontsize=6, ncol=2)
     axes.flat[-1].axis("off")
     fig.savefig(result / "comparison.png", dpi=180)
-    fig.savefig(result / "comparison.pdf")
+    fig.savefig(result / "comparison.pdf", metadata={"CreationDate": None, "ModDate": None})
     plt.close(fig)
     from collections import Counter
     statuses = Counter(row["assessment"] for row in rows)
