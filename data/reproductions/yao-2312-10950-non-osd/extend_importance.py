@@ -43,8 +43,8 @@ def write_plan(stage: str) -> list[dict]:
     runs = verified_importance_runs()
     direct_keys = _direct_keys()
     prior_jobs_by_key = {}
-    if stage_number > 1:
-        prior_path = _plan_path(f"stage{stage_number-1}")
+    for prior_stage in range(1, stage_number):
+        prior_path = _plan_path(f"stage{prior_stage}")
         if prior_path.exists():
             for prior in json.loads(prior_path.read_text())["jobs"]:
                 prior_key = (prior["code"], prior["method"], f'{prior["p"]:.5f}')

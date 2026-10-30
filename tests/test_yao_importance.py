@@ -22,6 +22,10 @@ ASSESS_SPEC = importlib.util.spec_from_file_location("yao_importance_assess", RO
 assert ASSESS_SPEC and ASSESS_SPEC.loader
 ASSESS = importlib.util.module_from_spec(ASSESS_SPEC)
 ASSESS_SPEC.loader.exec_module(ASSESS)
+EXTEND_SPEC = importlib.util.spec_from_file_location("yao_extend_importance", ROOT / "extend_importance.py")
+assert EXTEND_SPEC and EXTEND_SPEC.loader
+EXTEND = importlib.util.module_from_spec(EXTEND_SPEC)
+EXTEND_SPEC.loader.exec_module(EXTEND)
 
 
 @pytest.mark.parametrize("depolarizing", [False, True])
@@ -101,3 +105,21 @@ def test_incomplete_extension_stage_cannot_be_promoted(tmp_path: Path, monkeypat
     value = ASSESS.verified_importance_runs()[("b1", "bpgd_t1", "0.04000")]
     assert value["analysis_stage"] == 1
     assert value["stage_complete"] is False
+
+
+def test_later_extension_skips_any_unfinished_prior_stage(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    key_job = {"code": "b1", "method": "bpgd_t1", "p": .04,
+               "proposal_p": .06, "defensive_fraction": .1, "seed": 9}
+    (tmp_path / "completion-importance-plan.json").write_text(json.dumps({"jobs": [key_job]}))
+    pending = {**key_job, "output": str(tmp_path / "stage1-pending")}
+    (tmp_path / "completion-importance-extension-stage1.json").write_text(json.dumps({"jobs": [pending]}))
+    (tmp_path / "completion-importance-extension-stage2.json").write_text(json.dumps({"jobs": []}))
+    monkeypatch.setattr(EXTEND, "RESULTS", tmp_path)
+    monkeypatch.setattr(EXTEND, "_direct_keys", lambda: set())
+    monkeypatch.setattr(EXTEND, "verified_importance_runs", lambda: {
+        ("b1", "bpgd_t1", "0.04000"): {"analysis_stage": 0,
+             "failure_ess": 2., "rate": 1e-5, "ci95_low": 0., "ci95_high": 2e-5,
+             "shots": 10000, "next_start_shot": 10000}})
+    assert EXTEND.write_plan("stage3") == []
+    skipped = json.loads((tmp_path / "completion-importance-extension-stage3.json").read_text())["skipped"]
+    assert skipped[0]["reason"] == "prior_extension_stage_incomplete"
