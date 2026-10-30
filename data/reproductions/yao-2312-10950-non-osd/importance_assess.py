@@ -114,6 +114,15 @@ def verified_importance_runs() -> dict[tuple[str, str, str], dict]:
         # stopping bias from pooling that planning pilot into its follow-up.
         active_stage = max(item["analysis_stage"] for item in all_shards)
         shards = [item for item in all_shards if item["analysis_stage"] == active_stage]
+        stage_complete = True
+        if active_stage:
+            plan_path = RESULTS / f"completion-importance-extension-stage{active_stage}.json"
+            if plan_path.exists():
+                planned = [job for job in json.loads(plan_path.read_text())["jobs"]
+                           if (job["code"], job["method"], f'{job["p"]:.5f}') == key]
+                observed = {Path(item["evidence_path"]).parent.name for item in shards}
+                stage_complete = bool(planned) and all(
+                    Path(job["output"]).name in observed for job in planned)
         shots = sum(item["shots"] for item in shards)
         weighted_failure = sum(item["weighted_sums"]["failure"] for item in shards)
         squared_failure = sum(item["weighted_sums"]["failure_sq"] for item in shards)
@@ -143,6 +152,7 @@ def verified_importance_runs() -> dict[tuple[str, str, str], dict]:
             "proposals": sorted(set(item["proposal_p"] for item in shards)),
             "shards": len(shards),
             "analysis_stage": active_stage,
+            "stage_complete": stage_complete,
             "planning_pilot_shots": sum(item["shots"] for item in all_shards if item["analysis_stage"] < active_stage),
             "next_start_shot": max(item["start_shot"] + item["shots"] for item in all_shards),
         }

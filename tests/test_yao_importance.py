@@ -83,3 +83,21 @@ def test_extension_estimate_excludes_adaptive_planning_pilot(tmp_path: Path, mon
     assert value["planning_pilot_shots"] == 4
     assert value["shots"] == 4
     assert value["rate"] == pytest.approx(later["weighted_sums"]["failure"]/4)
+
+
+def test_incomplete_extension_stage_cannot_be_promoted(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    pilot = tmp_path / "completion-importance-small"
+    extension = tmp_path / "completion-importance-small-stage1-s01"
+    MODULE.run(code_name="b1", method="bpgd_t1", p=.04, proposal_p=.06,
+               defensive_fraction=.1, seed=9, start_shot=0, shots=2, output=pilot)
+    MODULE.run(code_name="b1", method="bpgd_t1", p=.04, proposal_p=.06,
+               defensive_fraction=.1, seed=9, start_shot=2, shots=2, output=extension)
+    plan = {"jobs": [{"code": "b1", "method": "bpgd_t1", "p": .04,
+                       "output": str(extension)},
+                      {"code": "b1", "method": "bpgd_t1", "p": .04,
+                       "output": str(tmp_path / "completion-importance-small-stage1-s02")}]}
+    (tmp_path / "completion-importance-extension-stage1.json").write_text(json.dumps(plan))
+    monkeypatch.setattr(ASSESS, "RESULTS", tmp_path)
+    value = ASSESS.verified_importance_runs()[("b1", "bpgd_t1", "0.04000")]
+    assert value["analysis_stage"] == 1
+    assert value["stage_complete"] is False

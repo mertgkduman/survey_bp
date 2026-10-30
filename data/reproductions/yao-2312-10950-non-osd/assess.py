@@ -131,10 +131,12 @@ def build_rows() -> list[dict]:
                     lo, hi = imp["ci95_low"], imp["ci95_high"]
                     inside = lo <= published <= hi
                     relative_halfwidth = math.inf if imp["rate"] == 0 else (hi-lo)/(2*imp["rate"])
-                    if imp["failure_ess"] < 100 or relative_halfwidth > .25:
+                    if (not imp["stage_complete"] or imp["failure_ess"] < 100
+                            or relative_halfwidth > .25):
                         status = "importance_preliminary"
                         reason = (f'Mixture importance sampling has effective weighted failure count '
-                                  f'{imp["failure_ess"]:.1f}; target is at least 100 and 25% relative half-width')
+                                  f'{imp["failure_ess"]:.1f}; stage complete={imp["stage_complete"]}; '
+                                  'target is a complete stage, at least 100 ESS, and 25% relative half-width')
                     else:
                         status = "importance_95_contains_source" if inside else "importance_95_excludes_source"
                         reason = "Approximate weighted 95% interval; source Monte Carlo uncertainty not included"
@@ -206,6 +208,7 @@ def build_rows() -> list[dict]:
                              "expected_shots_for_100_at_source_rate": math.ceil(100 / published),
                              "importance_shots": None if imp is None else imp["shots"],
                              "importance_stage": None if imp is None else imp["analysis_stage"],
+                             "importance_stage_complete": None if imp is None else imp["stage_complete"],
                              "importance_planning_pilot_shots": None if imp is None else imp["planning_pilot_shots"],
                              "importance_raw_failures": None if imp is None else imp["raw_failures"],
                              "importance_failure_ess": None if imp is None else imp["failure_ess"],
@@ -261,7 +264,7 @@ def write_outputs() -> None:
              "## Coverage", ""]
     lines.extend(f"- {key}: {count}" for key, count in sorted(statuses.items()))
     lines.extend(["", "## Rare-event estimator", "",
-                  "For each IS shot, an iid error is drawn from 0.1 P_p + 0.9 P_q with q>p, decoded using the source p, and its failure indicator is weighted by P_p(error)/(0.1 P_p(error)+0.9 P_q(error)). The estimator averages these weighted indicators. The expected value is the ordinary iid error rate at p; the source simulation itself used direct iid shots. The assessor verifies the exact proposal draw and likelihood weight for every retained shot. Extension sizes are chosen from pilot data; the reported estimate uses only the latest independently fixed stage so the pilot does not enter its own adaptively sized follow-up. IS is promoted from preliminary only when the effective weighted failure count reaches 100 and the approximate 95% relative half-width is at most 25%. This interval does not include uncertainty in the published point."])
+                  "For each IS shot, an iid error is drawn from 0.1 P_p + 0.9 P_q with q>p, decoded using the source p, and its failure indicator is weighted by P_p(error)/(0.1 P_p(error)+0.9 P_q(error)). The estimator averages these weighted indicators. The expected value is the ordinary iid error rate at p; the source simulation itself used direct iid shots. The assessor verifies the exact proposal draw and likelihood weight for every retained shot. Extension sizes are chosen from pilot data; the reported estimate uses only the latest independently fixed stage so the pilot does not enter its own adaptively sized follow-up. IS is promoted from preliminary only when that stage is complete, the effective weighted failure count reaches 100, and the approximate 95% relative half-width is at most 25%. This interval does not include uncertainty in the published point."])
     importance_progress = {}
     for row in rows:
         if row["importance_shots"] is not None:
