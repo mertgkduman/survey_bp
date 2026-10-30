@@ -1,5 +1,5 @@
 ---
-status: in_progress
+status: complete
 date: 2026-10-29
 ---
 

@@ -276,6 +276,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261029-vdb | Reproduce Yao non-OSD figures and tables with bounded source-linked runs | 2026-10-30 | 50d6371, 7eef1c5 | Verified development evidence; rare-event and imported BP-SI points remain unresolved | [261029-vdb-reproduce-remaining-non-bp-osd-yao-2312-](./quick/261029-vdb-reproduce-remaining-non-bp-osd-yao-2312-/) |
 | 261029-j3n | Apply tuned BP4 profiles inside A5/B2 Q-BPGD on paired errors | 2026-10-29 | — | Verified 20,000-shot main comparison; lower mean work, accuracy unresolved | [261029-j3n-apply-tuned-bp4-profiles-to-a5-and-b2-q-](./quick/261029-j3n-apply-tuned-bp4-profiles-to-a5-and-b2-q-/) |
 | 261029-i1m | Compare tuned and untuned BP4 at equal T=100 and matched mean work on A5/B2 | 2026-10-29 | — | Verified 1,160,000-shot paired controls; B2 equal-work difference unresolved | [261029-i1m-run-paired-equal-cap-t100-bp4-baseline-v](./quick/261029-i1m-run-paired-equal-cap-t100-bp4-baseline-v/) |
 | 261028-kvb | Tune canonical BP4 on Yao A5/B2 at physical p=0.06 | 2026-10-28 | — | Verified 257-task paired search; selected finite-neighborhood policies | [261028-kvb-tune-vanilla-bp4-at-p-0-06-on-yao-a5-and](./quick/261028-kvb-tune-vanilla-bp4-at-p-0-06-on-yao-a5-and/) |
