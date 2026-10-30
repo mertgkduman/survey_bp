@@ -39,6 +39,11 @@ def run_interval(item: dict) -> tuple[float, float]:
     return exact_interval(failures, shots)
 
 
+def evidence_rank(item: dict) -> tuple[bool, bool, int]:
+    """Prefer a precision-qualified direct run over a longer capped prefix."""
+    return (item["evidence_tier"] != "pilot", item["failures"] >= 100, item["shots"])
+
+
 def aggregate_fixed_shards(plan: dict, verified: dict[str, dict]) -> dict | None:
     """Combine only a complete, disjoint, individually audited iid plan."""
     if plan["schema"] != "yao-completion-rare-shards-plan-v1":
@@ -132,7 +137,7 @@ def verified_runs() -> dict[tuple[str, str, str], dict]:
             continue
         key = (summary["code"], summary["method"], f'{summary["physical_p"]:.5f}')
         old = selected.get(key)
-        if old is None or (summary["evidence_tier"] != "pilot", summary["shots"]) > (old["evidence_tier"] != "pilot", old["shots"]):
+        if old is None or evidence_rank(summary) > evidence_rank(old):
             selected[key] = summary
     if rare_plan_ready:
         aggregate = aggregate_fixed_shards(rare_plan, rare_shards)

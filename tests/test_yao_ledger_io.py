@@ -60,3 +60,24 @@ def test_compression_requires_matching_summary_and_preserves_raw_digest(tmp_path
     with MODULE.open_event_ledger(plain) as stream:
         assert sha256(stream.read()).hexdigest() == sha256(content).hexdigest()
     assert COMPRESS.compress(tmp_path) == "not_complete_or_already_compressed"
+
+
+def test_large_compressed_ledger_splits_and_round_trips_exactly(tmp_path: Path) -> None:
+    plain = tmp_path / "events.jsonl"
+    content = b"".join(f'{{"shot":{index},"value":"{index % 13}"}}\n'.encode()
+                       for index in range(1000))
+    plain.write_bytes(content)
+    (tmp_path / "summary.json").write_text(json.dumps({"events_sha256": sha256(content).hexdigest()}))
+    assert COMPRESS.compress(tmp_path) == "compressed"
+    assert COMPRESS.split_compressed(tmp_path, max_part_bytes=100) == "split"
+    receipt = json.loads((tmp_path / "compression.json").read_text())
+    assert len(receipt["parts"]) > 1
+    assert not (tmp_path / "events.jsonl.zst").exists()
+    assert all(item["bytes"] <= 100 for item in receipt["parts"])
+    with MODULE.open_event_ledger(plain) as stream:
+        assert stream.read() == content
+    assert COMPRESS.split_compressed(tmp_path, max_part_bytes=100) == "already_split"
+    part = tmp_path / receipt["parts"][0]["path"]
+    part.write_bytes(b"corrupted" + part.read_bytes())
+    with pytest.raises(ValueError, match="wrong size"):
+        COMPRESS.split_compressed(tmp_path, max_part_bytes=100)

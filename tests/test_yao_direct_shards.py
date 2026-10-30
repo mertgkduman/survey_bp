@@ -54,3 +54,9 @@ def test_fixed_shard_aggregate_rejects_overlap_and_policy_drift() -> None:
     verified[Path(plan["jobs"][1]["output"]).name]["seed"] = 8
     with pytest.raises(ValueError, match="manifest/summary"):
         MODULE.aggregate_fixed_shards(plan, verified)
+
+
+def test_completed_100_failure_run_beats_longer_low_count_prefix() -> None:
+    capped = {"evidence_tier": "bounded_campaign", "failures": 92, "shots": 400000}
+    complete = {"evidence_tier": "bounded_campaign", "failures": 100, "shots": 350000}
+    assert MODULE.evidence_rank(complete) > MODULE.evidence_rank(capped)

@@ -16,4 +16,6 @@ B1 guided T=10 at p=0.04 remains hard for the mixture estimator: completed stage
 
 Dependent Slurm job `60650899` invokes `freeze_t10_q070_stage.py` only after the q=0.07 screen succeeds. It replays all three proposal screens, freezes stage 9 with 500,000 new disjoint shots beginning at index 744,085, and submits the shard array. Its output and the new stage job ID will appear in `results/freeze-t10-q070-60650899.log` and `completion-dispatch.json`.
 
+B2 Q-BPGD p=0.06 stopped at its original 400,000-shot cap with 92 failures. Fresh independent 100-failure job `60651253` uses seed 20261048 and up to 1,200,000 shots. The assessor now prefers a completed 100-failure run over a longer capped low-count run. A5 Q-BPGD p=0.04 completed 100/2,096,500; its 183 MB compressed ledger is split into three verified parts below 64 MiB each, with byte-identical reconstruction confirmed against the summary event hash.
+
 Required before completion: let all jobs finish; dispatch additional independent fixed stages wherever rare-point ESS remains below 100; replace any capped direct runs with fresh disjoint follow-ups if they finish below 100 failures; regenerate and inspect all 154 coordinate rows, plot, and report; update README and GSD state; then mark `PLAN.md` complete. The Table 2 fixed error bytes are unavailable and its local surrogates must remain labeled as such.
