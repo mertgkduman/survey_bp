@@ -1,16 +1,15 @@
 # Yao BP/BPGD reproduction assessment
 
 Source: [Yao et al., arXiv:2312.10950v2](https://arxiv.org/pdf/2312.10950v2).
-This comparison contains only BP and BPGD. Direct-run two-sided 95% intervals invert the negative-binomial distribution for runs stopped at a fixed failure count, or use Clopper–Pearson bounds for fixed/capped shot runs. Mixture importance-sampling (IS) intervals are approximate normal intervals using the weighted shot variance and are marked separately. Zero-failure triangles mark the exact one-sided 95% upper bound, about 3/N. Figure captions say source points were collected to 100 errors; approximate source intervals infer N=round(100/plotted rate), because exact denominators were not supplied. Interval overlap is descriptive, not a formal equivalence test.
+This comparison contains only BP and BPGD. Plots show precision-qualified local estimates; the CSV and tables retain pending, pilot, and preliminary evidence explicitly. Direct-run two-sided 95% intervals invert the negative-binomial distribution for runs stopped at a fixed failure count, or use Clopper–Pearson bounds for fixed/capped shot runs. Mixture importance-sampling (IS) intervals are approximate normal intervals using the weighted shot variance and are marked separately. Zero-failure triangles mark the exact one-sided 95% upper bound, about 3/N. Figure captions say source points were collected to 100 errors; approximate source intervals infer N=round(100/plotted rate), because exact denominators were not supplied. Interval overlap is descriptive, not a formal equivalence test.
 
 ## Coverage
 
 - importance_preliminary: 9
-- interrupted_prefix_contains_source: 1
-- local_95_contains_source: 108
+- local_95_contains_source: 110
 - local_95_excludes_source: 16
 - low_count_tension: 3
-- low_count_unresolved: 8
+- low_count_unresolved: 7
 - pending: 6
 - pilot_only: 3
 
@@ -65,7 +64,7 @@ B1 T=10 uses Figure 3 below; Figure 4's conflicting T=10 targets remain separate
 | C2 | 0.04 | 0.080058 | 100/1052 (0.09506) | 0.000144 | IS 3.544e-05 (N=10000, ESS=1.5) |
 | C2 | 0.05 | 0.15758 | 100/694 (0.1441) | 0.00085 | — |
 | C2 | 0.06 | 0.26847 | 779/3000 (0.2597) | 0.0058 | 100/14752 (0.006779) |
-| C2 | 0.07 | 0.4004 | 100/253 (0.3953) | 0.035 | 73/2000 (0.0365) |
+| C2 | 0.07 | 0.4004 | 100/253 (0.3953) | 0.035 | 100/2525 (0.0396) |
 | C2 | 0.08 | 0.63699 | 100/160 (0.625) | 0.209 | 36/200 (0.18) |
 | C2 | 0.09 | 0.87228 | 100/116 (0.8621) | 0.628 | 86/150 (0.5733) |
 | C2 | 0.10 | 0.98328 | 100/102 (0.9804) | 0.925 | 91/100 (0.91) |

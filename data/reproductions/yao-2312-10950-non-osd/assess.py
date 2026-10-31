@@ -369,7 +369,9 @@ def write_outputs() -> None:
             points = [row for row in group if row["curve"] == curve]
             axis.plot([float(row["p"]) for row in points], [row["published_rate"] for row in points],
                       marker=".", linewidth=1, label=f"source {curve}")
-            local = [row for row in points if row["local_rate"] is not None]
+            local = [row for row in points if row["assessment"] in {
+                "local_95_contains_source", "local_95_excludes_source",
+                "importance_95_contains_source", "importance_95_excludes_source"}]
             for estimator, marker in (("iid", "x"), ("mixture_importance", "o")):
                 positive = [row for row in local if row["failures"] > 0 and row["estimator"] == estimator]
                 if positive:
@@ -397,7 +399,7 @@ def write_outputs() -> None:
     runs = verified_runs()
     lines = ["# Yao BP/BPGD reproduction assessment", "",
              "Source: [Yao et al., arXiv:2312.10950v2](https://arxiv.org/pdf/2312.10950v2).",
-             "This comparison contains only BP and BPGD. Direct-run two-sided 95% intervals invert the negative-binomial distribution for runs stopped at a fixed failure count, or use Clopper–Pearson bounds for fixed/capped shot runs. Mixture importance-sampling (IS) intervals are approximate normal intervals using the weighted shot variance and are marked separately. Zero-failure triangles mark the exact one-sided 95% upper bound, about 3/N. Figure captions say source points were collected to 100 errors; approximate source intervals infer N=round(100/plotted rate), because exact denominators were not supplied. Interval overlap is descriptive, not a formal equivalence test.", "",
+             "This comparison contains only BP and BPGD. Plots show precision-qualified local estimates; the CSV and tables retain pending, pilot, and preliminary evidence explicitly. Direct-run two-sided 95% intervals invert the negative-binomial distribution for runs stopped at a fixed failure count, or use Clopper–Pearson bounds for fixed/capped shot runs. Mixture importance-sampling (IS) intervals are approximate normal intervals using the weighted shot variance and are marked separately. Zero-failure triangles mark the exact one-sided 95% upper bound, about 3/N. Figure captions say source points were collected to 100 errors; approximate source intervals infer N=round(100/plotted rate), because exact denominators were not supplied. Interval overlap is descriptive, not a formal equivalence test.", "",
              "## Coverage", ""]
     lines.extend(f"- {key}: {count}" for key, count in sorted(statuses.items()))
     lines.extend(["", "## Rare-event estimator", "",
