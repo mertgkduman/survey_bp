@@ -5,12 +5,13 @@ This comparison contains only BP and BPGD. Direct-run two-sided 95% intervals in
 
 ## Coverage
 
-- importance_preliminary: 12
+- importance_preliminary: 9
 - interrupted_prefix_contains_source: 1
-- local_95_contains_source: 109
+- local_95_contains_source: 108
 - local_95_excludes_source: 16
-- low_count_unresolved: 4
-- pending: 9
+- low_count_tension: 3
+- low_count_unresolved: 8
+- pending: 6
 - pilot_only: 3
 
 ## Rare-event estimator
@@ -55,7 +56,7 @@ B1 T=10 uses Figure 3 below; Figure 4's conflicting T=10 targets remain separate
 | Code | p | Source plain BP | Local plain BP | Source guided T=10 | Local guided T=10 |
 |---|---:|---:|---:|---:|---:|
 | B1 | 0.04 | 0.0434 | 100/2267 (0.04411) | 6e-06 | IS 5.457e-06 (N=500000, ESS=7.7) |
-| B1 | 0.05 | 0.0867 | 100/1226 (0.08157) | 0.000179 | IS 0.0001124 (N=10000, ESS=20.1) |
+| B1 | 0.05 | 0.0867 | 100/1226 (0.08157) | 0.000179 | 2/10000 (0.0002) |
 | B1 | 0.06 | 0.1449 | 436/3000 (0.1453) | 0.003891 | 100/21372 (0.004679) |
 | B1 | 0.07 | 0.2505 | 100/407 (0.2457) | 0.038801 | 100/2485 (0.04024) |
 | B1 | 0.08 | 0.4448 | 100/244 (0.4098) | 0.21694 | 100/438 (0.2283) |
@@ -68,7 +69,7 @@ B1 T=10 uses Figure 3 below; Figure 4's conflicting T=10 targets remain separate
 | C2 | 0.08 | 0.63699 | 100/160 (0.625) | 0.209 | 36/200 (0.18) |
 | C2 | 0.09 | 0.87228 | 100/116 (0.8621) | 0.628 | 86/150 (0.5733) |
 | C2 | 0.10 | 0.98328 | 100/102 (0.9804) | 0.925 | 91/100 (0.91) |
-| A5 | 0.04 | 0.000236 | 130/529662 (0.0002454) | 5.8e-05 | 1/5000 (0.0002) |
+| A5 | 0.04 | 0.000236 | 130/529662 (0.0002454) | 5.8e-05 | 100/2096500 (4.77e-05) |
 | A5 | 0.05 | 0.000876 | 113/142695 (0.0007919) | 0.000295 | 100/287770 (0.0003475) |
 | A5 | 0.06 | 0.003159 | 131/39570 (0.003311) | 0.001608 | 100/67147 (0.001489) |
 | A5 | 0.07 | 0.011972 | 144/10442 (0.01379) | 0.00614 | 100/15870 (0.006301) |
@@ -77,7 +78,7 @@ B1 T=10 uses Figure 3 below; Figure 4's conflicting T=10 targets remain separate
 | A5 | 0.10 | 0.1443 | 147/867 (0.1696) | 0.12423 | 100/749 (0.1335) |
 | B2 | 0.04 | 0.000406 | 92/307882 (0.0002988) | 8.4e-05 | 0/5000 (0) |
 | B2 | 0.05 | 0.001265 | 89/98815 (0.0009007) | 0.00021 | 0/5000 (0) |
-| B2 | 0.06 | 0.002569 | 110/48658 (0.002261) | 0.000455 | 1/5000 (0.0002) |
+| B2 | 0.06 | 0.002569 | 110/48658 (0.002261) | 0.000455 | 92/400000 (0.00023) |
 | B2 | 0.07 | 0.006755 | 129/18505 (0.006971) | 0.000905 | 100/167794 (0.000596) |
 | B2 | 0.08 | 0.015077 | 101/8291 (0.01218) | 0.001895 | 100/68688 (0.001456) |
 | B2 | 0.09 | 0.02978 | 101/4198 (0.02406) | 0.004651 | 100/28457 (0.003514) |
@@ -93,7 +94,7 @@ B1 T=10 uses Figure 3 below; Figure 4's conflicting T=10 targets remain separate
 | 5 | C2 | bpgd_t10 | 0.0058 | 100/14752 | [0.0055188, 0.0081649] | local_95_contains_source |
 | 7 | A5 | bpgd_t10 | 0.001608 | 100/67147 | [0.0012119, 0.0017947] | local_95_contains_source |
 | 7 | A5 | qbp | 0.003159 | 131/39570 | [0.0027687, 0.0039273] | local_95_contains_source |
-| 8 | B2 | bpgd_t10 | 0.000455 | 1/5000 | [5.0635e-06, 0.0011138] | low_count_unresolved |
+| 8 | B2 | bpgd_t10 | 0.000455 | 92/400000 | [0.00018542, 0.00028207] | low_count_tension |
 | 8 | B2 | qbp | 0.002569 | 110/48658 | [0.0018584, 0.0027241] | local_95_contains_source |
 
 ## Source Monte Carlo discrepancies
@@ -113,14 +114,14 @@ These are point-versus-interval flags, not formal two-sample discrepancy tests. 
 | 3 | B1 | bpgd_t100 | 0.07 | 0.036055 | 100/2217 (0.045106) | [0.0368481, 0.0541241] | [0.0294252, 0.0432954] | overlapping_95_intervals |
 | 4 | B1 | bpgd_t10 | 0.06 | 0.00367353 | 100/21372 (0.00467902) | [0.00380861, 0.00563699] | [0.00298988, 0.00442604] | overlapping_95_intervals |
 | 6 | B1 | bpgd_t100_r2 | 0.04 | 0.00944 | 100/8273 (0.0120875) | [0.00984541, 0.0145517] | [0.00768733, 0.0113677] | overlapping_95_intervals |
+| 6 | B1 | bpgd_t100_r5 | 0.04 | 0.000588 | 100/134045 (0.000746018) | [0.00060703, 0.000899102] | [0.000478445, 0.00070867] | overlapping_95_intervals |
 | 6 | B1 | bpgd_t100_r5 | 0.06 | 0.022356 | 100/5730 (0.017452) | [0.0142216, 0.0209987] | [0.0182261, 0.0268868] | overlapping_95_intervals |
 | 6 | B1 | bpgd_t100_r882 | 0.07 | 0.036055 | 100/2217 (0.045106) | [0.0368481, 0.0541241] | [0.0294252, 0.0432954] | overlapping_95_intervals |
+| 7 | A5 | bpgd_t10 | 0.04 | 5.8e-05 | 100/2096500 (4.76985e-05) | [3.88096e-05, 5.74903e-05] | [4.71914e-05, 6.99064e-05] | overlapping_95_intervals |
 | 7 | A5 | qbp | 0.10 | 0.1443 | 147/867 (0.16955) | [0.145153, 0.196216] | [0.118976, 0.171394] | overlapping_95_intervals |
 | 8 | B2 | bpgd_t10 | 0.07 | 0.000905 | 100/167794 (0.000595969) | [0.00048493, 0.000718273] | [0.000736404, 0.00109069] | separated_95_intervals |
 | 8 | B2 | bpgd_t10 | 0.08 | 0.001895 | 100/68688 (0.00145586) | [0.0011847, 0.00175448] | [0.00154212, 0.00228362] | overlapping_95_intervals |
 | 8 | B2 | bpgd_t10 | 0.09 | 0.004651 | 100/28457 (0.00351407) | [0.00286008, 0.00423402] | [0.00378575, 0.00560319] | overlapping_95_intervals |
-| 8 | B2 | qbp | 0.04 | 0.000406 | 92/307882 (0.000298816) | [0.000240894, 0.000366459] | [0.00033035, 0.000489329] | overlapping_95_intervals |
-| 8 | B2 | qbp | 0.05 | 0.001265 | 89/98815 (0.000900673) | [0.000723375, 0.00110824] | [0.00102937, 0.00152451] | overlapping_95_intervals |
 | 8 | B2 | qbp | 0.08 | 0.015077 | 101/8291 (0.0121819) | [0.009933, 0.0147827] | [0.0122829, 0.0181443] | overlapping_95_intervals |
 | 8 | B2 | qbp | 0.09 | 0.02978 | 101/4198 (0.0240591) | [0.0196382, 0.029158] | [0.0242941, 0.0357881] | overlapping_95_intervals |
 | 8 | B2 | qbp | 0.10 | 0.060326 | 100/2073 (0.0482393) | [0.039419, 0.0583632] | [0.0493397, 0.0722618] | overlapping_95_intervals |
@@ -140,7 +141,7 @@ The paper specifies different T values in its prose and caption. The executed T=
 
 At B1 p=0.08, 96 of 100 local guided failures are syndrome-inconsistent (Type I), while 4 are logical (Type II). This is consistent with the paper's statement that over 90% of these failures are non-convergence cases.
 
-C2 p=0.07 used a recovered prefix of 2000 shots: 12 Type I and 61 Type II failures.
+C2 p=0.07 used a completed direct run of 2525 shots: 24 Type I and 76 Type II failures.
 
 ## Table 2: fixed-error randomized decimation
 

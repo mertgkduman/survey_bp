@@ -1,0 +1,25 @@
+{
+  "codec": "zstd -3 -T1",
+  "compressed_bytes": 183236156,
+  "compressed_sha256": "85c3d7eacedee5ae962671b911c33dcf07c6c5efe3966d67b1418af04938c1ee",
+  "parts": [
+    {
+      "bytes": 67108864,
+      "path": "events.jsonl.zst.part-000",
+      "sha256": "71ba75fe9da29660b2752b38dbaea74a9063dd45fd9926f84f510e5f4e48fc62"
+    },
+    {
+      "bytes": 67108864,
+      "path": "events.jsonl.zst.part-001",
+      "sha256": "c836dfb0c589ab9e6f04e632f5db769ec5bbad368db15c637e21050bfef6cda9"
+    },
+    {
+      "bytes": 49018428,
+      "path": "events.jsonl.zst.part-002",
+      "sha256": "61da4a4ec7d71e6f2d03fc301d3acd1e96a04097a5f8841782847bf770ae73fb"
+    }
+  ],
+  "raw_bytes": 1007308945,
+  "raw_sha256": "ce584f00855c4ea28dd2711e29b8ffe8b028f6facff5a55f4711f0d3a83ac43b",
+  "schema": "yao-ledger-compression-v1"
+}
