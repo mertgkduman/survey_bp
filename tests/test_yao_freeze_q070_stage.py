@@ -72,3 +72,20 @@ def test_freeze_requires_complete_prior_stage(tmp_path: Path, monkeypatch: pytes
     with pytest.raises(ValueError, match="must finish"):
         MODULE.freeze()
     assert not (results / "completion-importance-extension-stage9.json").exists()
+
+
+def test_new_stage_remains_a_refresh_dependency(monkeypatch: pytest.MonkeyPatch) -> None:
+    calls = []
+
+    def fake_run(command: list[str], **kwargs: object):
+        calls.append(command)
+        if command[:3] == ["scontrol", "show", "job"]:
+            return type("Completed", (), {"stdout": (
+                "JobId=60650712 Dependency=afterany:60646291(fulfilled),"
+                "afterany:60651597_*(unfulfilled) JobState=PENDING")})()
+        return type("Completed", (), {"stdout": ""})()
+
+    monkeypatch.setattr(MODULE.subprocess, "run", fake_run)
+    MODULE.add_refresh_dependency("70000000")
+    assert calls[-1] == ["scontrol", "update", "jobid=60650712",
+                         "dependency=afterany:60646291,afterany:60651597_*,afterany:70000000_*"]

@@ -5,6 +5,8 @@ from __future__ import annotations
 from hashlib import sha256
 import json
 from pathlib import Path
+import re
+import subprocess
 
 from assess_proposals import assess
 from extend_importance import submit
@@ -14,6 +16,21 @@ REPO = ROOT.parents[2]
 RESULTS = ROOT / "results"
 KEY = ("b1", "bpgd_t10", 0.04)
 STAGE = "stage9"
+REFRESH_JOB_ID = "60650712"
+
+
+def add_refresh_dependency(stage_job_id: str) -> None:
+    """Keep the deferred report refresh behind the newly dispatched array."""
+    shown = subprocess.run(["scontrol", "show", "job", "-o", REFRESH_JOB_ID],
+                           check=True, capture_output=True, text=True).stdout
+    match = re.search(r"(?:^|\s)Dependency=([^\s]+)", shown)
+    if match is None or match.group(1) == "(null)":
+        raise ValueError("refresh job has no preserved dependency chain")
+    current = re.sub(r"\((?:unfulfilled|fulfilled)\)", "", match.group(1))
+    added = f"afterany:{stage_job_id}_*"
+    if added not in current.split(","):
+        subprocess.run(["scontrol", "update", f"jobid={REFRESH_JOB_ID}",
+                        f"dependency={current},{added}"], check=True)
 
 
 def freeze() -> tuple[Path, Path]:
@@ -78,6 +95,7 @@ def freeze() -> tuple[Path, Path]:
 if __name__ == "__main__":
     stage_path, receipt_path = freeze()
     job_id = submit(STAGE, 10)
+    add_refresh_dependency(job_id)
     dispatch_path = RESULTS / "completion-dispatch.json"
     dispatch = json.loads(dispatch_path.read_text())
     dispatch["dispatches"].append({
