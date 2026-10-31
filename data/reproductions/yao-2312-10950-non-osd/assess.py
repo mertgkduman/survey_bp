@@ -21,6 +21,7 @@ SOURCE = json.loads((ROOT / "source_points.json").read_text())
 PRIOR_QBP = REPO / "data/reproductions/yao-2312-10950-vanilla/results/comparison.csv"
 LEGACY_RUNNER_SHA256 = "4b4912da054fb67f69c3238cca036a3e449c7e3e5a0469e10ae185fd1fc61c76"  # commit 50d6371
 RARE_SHARDS_PLAN = ROOT / "results/completion-rare-shards-plan.json"
+QBP_FOLLOWUP_PLAN = ROOT / "results/completion-qbp-sparse-plan.json"
 
 
 def exact_interval(failures: int, shots: int) -> tuple[float, float]:
@@ -164,9 +165,88 @@ def prior_qbp_runs() -> dict[tuple[str, str, str], dict]:
     return result
 
 
+def verified_qbp_followups() -> dict[tuple[str, str, str], dict]:
+    """Audit the frozen vanilla runner's independent fixed-shot BP4 v2 follow-ups."""
+    if not QBP_FOLLOWUP_PLAN.exists():
+        return {}
+    plan = json.loads(QBP_FOLLOWUP_PLAN.read_text())
+    if plan["schema"] != "yao-completion-qbp-sparse-plan-v1":
+        raise ValueError("unexpected QBP follow-up plan schema")
+    if sha256((REPO / plan["runner"]).read_bytes()).hexdigest() != plan["runner_sha256"]:
+        raise ValueError("QBP follow-up runner drift")
+    code_receipt = json.loads((ROOT / "codes.json").read_text())["codes"]["b2"]["semantic_sha256"]
+    result = {}
+    for job in plan["jobs"]:
+        directory = REPO / job["output"]
+        summary_path = directory / "summary.json"
+        if not summary_path.exists():
+            continue
+        summary = json.loads(summary_path.read_text())
+        manifest_path = directory / "manifest.json"
+        manifest_bytes = manifest_path.read_bytes()
+        manifest = json.loads(manifest_bytes)
+        source_rate = SOURCE["figures"]["8"]["curves"]["qbp"][f'{job["p"]:.5f}']
+        if (summary["schema"] != "yao-vanilla-point-summary-v1"
+                or manifest["schema"] != "yao-vanilla-point-manifest-v1"
+                or sha256(manifest_bytes).hexdigest() != summary["manifest_sha256"]
+                or (manifest["code"], manifest["physical_p"], manifest["seed"],
+                    manifest["start_shot"], manifest["max_shots"]) !=
+                   (job["code"], job["p"], job["seed"], job["start_shot"], job["fixed_shots"])
+                or manifest["stop_rule"] != "fixed_shard"
+                or manifest["source_qbp_rate"] != source_rate
+                or manifest["code_semantic_sha256"] != code_receipt
+                or manifest["campaign_sha256"] is not None
+                or any(manifest["decoder_specs"]["bp4_v2"].get(field) != value for field, value in {
+                    "max_iterations": 100, "check_rule": "sum_product",
+                    "message_resolution": "float64", "damping_old": 0.0,
+                    "numerical_profile": "quaternary-bp4-f64-v2-undamped"}.items())
+                or summary["stop_reason"] != "fixed_shard_complete"
+                or (summary["code"], summary["physical_p"], summary["source_qbp_rate"])
+                   != (job["code"], job["p"], source_rate)
+                or (summary["shots"], summary["start_shot"], summary["end_shot_exclusive"])
+                   != (job["fixed_shots"], job["start_shot"], job["start_shot"] + job["fixed_shots"])):
+            raise ValueError(f"QBP follow-up manifest/summary mismatch: {directory}")
+        fields = ("type_i", "type_ii", "exact_success", "stabilizer_success",
+                  "iteration_sum", "elapsed_ns_sum")
+        if set(summary["counts"]) != {"bp4_v1", "bp4_v2", "binary_v1", "binary_v2"}:
+            raise ValueError(f"QBP follow-up omitted a frozen decoder arm: {directory}")
+        totals = {arm: {field: 0 for field in fields} for arm in summary["counts"]}
+        digest = sha256()
+        seen = 0
+        with open_event_ledger(directory / "events.jsonl") as ledger:
+            for raw in ledger:
+                digest.update(raw)
+                event = json.loads(raw)
+                if (event["schema"] != "yao-vanilla-shot-v1"
+                        or event["shot"] != job["start_shot"] + seen
+                        or set(event["arms"]) != set(totals)):
+                    raise ValueError(f"QBP follow-up event identity mismatch: {directory}")
+                seen += 1
+                for arm, record in event["arms"].items():
+                    if sum(bool(record[field]) for field in fields[:4]) != 1:
+                        raise ValueError(f"QBP follow-up outcome partition invalid: {directory}")
+                    for field in fields[:4]:
+                        totals[arm][field] += int(record[field])
+                    totals[arm]["iteration_sum"] += sum(record["iterations"])
+                    totals[arm]["elapsed_ns_sum"] += record["elapsed_ns"]
+        if (seen != summary["shots"] or digest.hexdigest() != summary["events_sha256"]
+                or totals != summary["counts"]):
+            raise ValueError(f"QBP follow-up ledger mismatch: {directory}")
+        counts = totals["bp4_v2"]
+        key = (job["code"], "qbp", f'{job["p"]:.5f}')
+        result[key] = {"shots": seen, "failures": counts["type_i"] + counts["type_ii"],
+                       "counts": counts, "stop_reason": "fixed_shots",
+                       "mean_iterations": counts["iteration_sum"] / seen,
+                       "mean_elapsed_ms": counts["elapsed_ns_sum"] / seen / 1e6,
+                       "evidence_path": str(summary_path.relative_to(REPO)),
+                       "evidence_tier": "qbp_followup"}
+    return result
+
+
 def build_rows() -> list[dict]:
     runs = verified_runs()
     runs.update(prior_qbp_runs())
+    runs.update(verified_qbp_followups())
     importance = verified_importance_runs()
     rows = []
     for figure, body in SOURCE["figures"].items():
@@ -183,7 +263,7 @@ def build_rows() -> list[dict]:
                     direct_width = math.inf if item is None else run_interval(item)[1] - run_interval(item)[0]
                     importance_width = imp["ci95_high"] - imp["ci95_low"]
                     use_importance = (item is None or
-                                      item["failures"] < 30 and imp["failure_ess"] >= 20 and importance_width < direct_width)
+                                      item["failures"] < 100 and imp["failure_ess"] >= 100 and importance_width < direct_width)
                 if use_importance:
                     lo, hi = imp["ci95_low"], imp["ci95_high"]
                     inside = lo <= published <= hi
@@ -224,9 +304,9 @@ def build_rows() -> list[dict]:
                     elif item["evidence_tier"] == "interrupted_prefix":
                         status = "interrupted_prefix_contains_source" if inside else "interrupted_prefix_excludes_source"
                         reason = "Only complete flushed shots were recovered after external termination"
-                    elif item["failures"] < 30:
+                    elif item["failures"] < 100:
                         status = "low_count_unresolved" if inside else "low_count_tension"
-                        reason = f'Only {item["failures"]} local failures; source uncertainty also unavailable'
+                        reason = f'Only {item["failures"]} local failures; the direct-run target is 100'
                     else:
                         status = "local_95_contains_source" if inside else "local_95_excludes_source"
                         reason = "Source rate inside local interval" if inside else "Source rate outside local interval; source trial count unavailable"

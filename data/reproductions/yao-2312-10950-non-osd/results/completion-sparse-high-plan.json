@@ -1,0 +1,62 @@
+{
+  "jobs": [
+    {
+      "code": "c2",
+      "max_shots": 2393,
+      "method": "bpgd_t10",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-sparse-c2-bpgd_t10-p080-seed20261049",
+      "p": 0.08,
+      "seed": 20261049,
+      "source_rate": 0.209,
+      "start_shot": 0,
+      "target_failures": 100
+    },
+    {
+      "code": "c2",
+      "max_shots": 797,
+      "method": "bpgd_t10",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-sparse-c2-bpgd_t10-p090-seed20261049",
+      "p": 0.09,
+      "seed": 20261049,
+      "source_rate": 0.628,
+      "start_shot": 0,
+      "target_failures": 100
+    },
+    {
+      "code": "c2",
+      "max_shots": 541,
+      "method": "bpgd_t10",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-sparse-c2-bpgd_t10-p100-seed20261049",
+      "p": 0.1,
+      "seed": 20261049,
+      "source_rate": 0.925,
+      "start_shot": 0,
+      "target_failures": 100
+    },
+    {
+      "code": "b1",
+      "max_shots": 7622,
+      "method": "bpgd_t100_r2",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-sparse-b1-bpgd_t100_r2-p060-seed20261049",
+      "p": 0.06,
+      "seed": 20261049,
+      "source_rate": 0.0656,
+      "start_shot": 0,
+      "target_failures": 100
+    },
+    {
+      "code": "b1",
+      "max_shots": 1896,
+      "method": "bpgd_t100_r50",
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/completion-sparse-b1-bpgd_t100_r50-p080-seed20261049",
+      "p": 0.08,
+      "seed": 20261049,
+      "source_rate": 0.263852,
+      "start_shot": 0,
+      "target_failures": 100
+    }
+  ],
+  "purpose": "Replace previously measured 30-99-failure high-rate points with independent direct 100-failure runs",
+  "runner_sha256": "89bbc5a825d545dd890ef59a5ed1f7642c1458615fb9b810dae587824d0fee78",
+  "schema": "yao-completion-sparse-high-plan-v1"
+}

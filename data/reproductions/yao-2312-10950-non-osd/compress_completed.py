@@ -123,7 +123,7 @@ def compress(directory: Path) -> str:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--all", action="store_true", help="all completed completion-* and complete-* directories")
+    parser.add_argument("--all", action="store_true", help="all completed completion-*, complete-*, and qbp-followup-* directories")
     parser.add_argument("--dir", type=Path)
     parser.add_argument("--split-existing", type=Path,
                         help="split a previously compressed ledger above the per-file limit")
@@ -136,7 +136,8 @@ if __name__ == "__main__":
     if args.dir is not None:
         directories = [args.dir]
     else:
-        directories = sorted([*RESULTS.glob("completion-*/"), *RESULTS.glob("complete-*/")])
+        directories = sorted([*RESULTS.glob("completion-*/"), *RESULTS.glob("complete-*/"),
+                              *RESULTS.glob("qbp-followup-*/")])
     for directory in directories:
         status = compress(directory)
         if status == "compressed":

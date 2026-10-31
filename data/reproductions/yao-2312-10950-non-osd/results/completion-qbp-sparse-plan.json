@@ -1,0 +1,24 @@
+{
+  "jobs": [
+    {
+      "code": "b2",
+      "fixed_shots": 500000,
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/qbp-followup-b2-p040-seed20261050",
+      "p": 0.04,
+      "seed": 20261050,
+      "start_shot": 0
+    },
+    {
+      "code": "b2",
+      "fixed_shots": 200000,
+      "output": "data/reproductions/yao-2312-10950-non-osd/results/qbp-followup-b2-p050-seed20261050",
+      "p": 0.05,
+      "seed": 20261050,
+      "start_shot": 0
+    }
+  ],
+  "purpose": "Fresh fixed-shot paired vanilla BP campaign to raise B2 BP4 v2 p=0.04/0.05 beyond 100 failures",
+  "runner": "data/reproductions/yao-2312-10950-vanilla/run.py",
+  "runner_sha256": "659fd494ef2d0e9aa000eb49b24268b3b80106b46bfcfd0f70aa98bff81a870b",
+  "schema": "yao-completion-qbp-sparse-plan-v1"
+}
