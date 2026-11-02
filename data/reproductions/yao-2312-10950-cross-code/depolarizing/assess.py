@@ -246,6 +246,12 @@ def render(rows,pairs):
         lines.append(f"On {c.upper()}, QBP has lower observed LER at {better}/{len(ps)} measured rates. Among points with nonzero QBP failures, the binary/QBP rate ratio spans {min(ratios):.2f}–{max(ratios):.2f}.")
         b,q=lookup[(c,.06,'binary_v2')],lookup[(c,.06,'qbp_v2')]
         lines.extend(['',f"At p=0.06, binary BP has {b['failures']}/{b['shots']:,} failures ({b['rate']:.6g}); QBP has {q['failures']}/{q['shots']:,} ({q['rate']:.6g}). Mean iterations per component are {b['mean_iterations_per_component']:.2f} and {q['mean_iterations_per_component']:.2f}, respectively; mean decoding times are {b['mean_decode_ms']:.3f} ms and {q['mean_decode_ms']:.3f} ms.",''])
+    lines.extend(['','### Failure types at p=0.06','',
+        '| Code | Paired N | BP Type I | BP Type II | QBP Type I | QBP Type II |',
+        '|---|---:|---:|---:|---:|---:|'])
+    for c in ('a5','b2','b1','c2'):
+        b,q=lookup[(c,.06,'binary_v2')],lookup[(c,.06,'qbp_v2')]
+        lines.append(f"| {c.upper()} | {b['shots']:,} | {b['type_i']} | {b['type_ii']} | {q['type_i']} | {q['type_ii']} |")
     lines.extend(['','## Channel comparison','',
         'The earlier B1/C2 X-only study has identical QBP/binary-v2 corrections because only I/X states have prior support. Depolarizing noise permits Y/Z and supplies within-qubit correlation to QBP. The numerical value of p has different marginal meaning between the two channels: binary X-flip probability is p in the X-only channel and 2p/3 in the depolarizing channel.','',
         '| Code | p | X-only binary/QBP LER | Depolarizing binary LER | Depolarizing QBP LER or upper bound |',
