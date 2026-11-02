@@ -4,6 +4,13 @@ Active task: add depolarizing noise for B1/C2 to the completed cross-code study,
 using plain binary BP v2 and QBP v2, T=100, p=0.04,...,0.10. Execution is under
 `data/reproductions/yao-2312-10950-cross-code/depolarizing/`.
 
+Update: all B1 points and C2 through p=0.08 are complete and independently
+audited. Only array tasks 60921740_13 (C2 p=0.09) and _14 (p=0.10) remain
+running. All completed main estimates exceed 100 failures. B1 p=0.06 is
+2063/23530 binary failures versus 242/23530 QBP; C2 p=0.06 is 3945/20000
+versus 568/20000. First ten completed audited final result directories have
+already been committed; stage the remaining five only after completion.
+
 Pilot array 60921180 completed all 14 2,000-shot tasks. Every pilot ledger
 was independently audited before a fresh fixed follow-up was chosen. The
 381,309-shot follow-up is frozen in `campaign.json` with 15 disjoint shards,
