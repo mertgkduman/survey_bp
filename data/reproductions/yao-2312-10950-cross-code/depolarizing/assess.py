@@ -56,9 +56,29 @@ def interval(k,n,alpha=.05):
             1.0 if k==n else float(beta.ppf(1-alpha/2,k+1,n-k)))
 
 
+def verify_fixed_design(plan):
+    """Check pilot exclusion and the independently frozen denominator rule."""
+    if plan['stage']=='pilot':return
+    pilot_path=ROOT/'pilot.json';pilot=json.loads(pilot_path.read_text())
+    if plan['pilot_sha256']!=sha256(pilot_path.read_bytes()).hexdigest():raise ValueError('pilot plan changed')
+    if {j['seed'] for j in pilot['jobs']} & {j['seed'] for j in plan['jobs']}:
+        raise ValueError('pilot and follow-up share a seed namespace')
+    receipts={(r['code'],r['p']):r for r in plan['sample_size_receipts']}
+    observed=defaultdict(int)
+    for j in plan['jobs']:observed[j['code'],j['p']]+=j['shots']
+    if set(receipts)!=set(observed):raise ValueError('cohort receipts differ from executed points')
+    for j in pilot['jobs']:
+        key=j['code'],j['p'];s=json.loads((REPO/j['output']/'summary.json').read_text())
+        k=min(s['counts'][a]['type_i']+s['counts'][a]['type_ii'] for a in ARMS)
+        n=1000000 if k==0 else min(1000000,max(20000,int(np.ceil(400000/k))))
+        if (receipts[key]['pilot_smaller_failure_count']!=k or receipts[key]['fixed_followup_shots']!=n
+                or observed[key]!=n):raise ValueError('follow-up size differs from the prospective pilot rule')
+
+
 def audit_plan(path,replay_stride=10007,wait=False):
     payload=path.read_bytes();plan=json.loads(payload)
     if plan['implementation_sha256']!=implementation_hashes():raise ValueError('implementation changed')
+    verify_fixed_design(plan)
     cohorts=defaultdict(list)
     for j in plan['jobs']:cohorts[(j['code'],j['p'])].append(j)
     for key,jobs in cohorts.items():
