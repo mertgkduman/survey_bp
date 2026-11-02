@@ -1,0 +1,289 @@
+{
+  "timestamp_utc": "2026-11-02T22:42:45.853640+00:00",
+  "root": "/hpc/group/pfisterlab/mg551/storage/survey_bp",
+  "backup_directory": "/hpc/group/pfisterlab/mg551/storage/survey_bp/.git/consolidation-backups/2026-11-02",
+  "refs": [
+    {
+      "ref": "refs/heads/feat/bb72-fixture",
+      "commit": "10032c75a6f4afa4a75aa13d35ec81688da2e320",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/local/feat/bb72-fixture"
+    },
+    {
+      "ref": "refs/heads/feat/fair-beam-relay-campaign",
+      "commit": "0460d0fb1368a168938bffe59237b38646d3e02a",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/local/feat/fair-beam-relay-campaign"
+    },
+    {
+      "ref": "refs/heads/feat/fair-damped-beam-relay",
+      "commit": "d76c0ee06993a5bc33512314b1d2bdb2a7135e9c",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/local/feat/fair-damped-beam-relay"
+    },
+    {
+      "ref": "refs/heads/fix/phase5-source-semantics",
+      "commit": "3a5b1572a1e72d55f93a478935b7f602b5c5771d",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/local/fix/phase5-source-semantics"
+    },
+    {
+      "ref": "refs/heads/fix/relay-source-admission",
+      "commit": "c2075c8ce00991787578dd13bc8b292be7763ad0",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/local/fix/relay-source-admission"
+    },
+    {
+      "ref": "refs/heads/fix/schedule-c2v-audit",
+      "commit": "7d0619c056a1547b9c966ec9eee04d4d0621b6ca",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/local/fix/schedule-c2v-audit"
+    },
+    {
+      "ref": "refs/heads/gsd/phase-01-evidence-registry-native-css",
+      "commit": "0398c702da092d7a3734704938fb8c9519519a63",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/local/gsd/phase-01-evidence-registry-native-css"
+    },
+    {
+      "ref": "refs/heads/gsd/phase-10-correlated-quaternary-execution",
+      "commit": "6b360b90e945d967ae76dd84be0223139107fd39",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/local/gsd/phase-10-correlated-quaternary-execution"
+    },
+    {
+      "ref": "refs/heads/gsd/phase04-low-noise-ler",
+      "commit": "c94064ece55ffe9c09441c9ca8cbf0e3785844ff",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/local/gsd/phase04-low-noise-ler"
+    },
+    {
+      "ref": "refs/heads/gsd/phase10-research",
+      "commit": "4256f25d5e2b5ba5faf3a585d5be5e5c4468ce59",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/local/gsd/phase10-research"
+    },
+    {
+      "ref": "refs/heads/gsd/phase4-memory-integration-20260926",
+      "commit": "263501ecf894c6e51d46de1f4127ec5908961ff4",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/local/gsd/phase4-memory-integration-20260926"
+    },
+    {
+      "ref": "refs/heads/gsd/phase7-plan03-osd",
+      "commit": "5401b11d1622163d8dd9fdab01054d0346a68ee7",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/local/gsd/phase7-plan03-osd"
+    },
+    {
+      "ref": "refs/heads/gsd/phase7-plan05-otf",
+      "commit": "07178d47350929c72102d3dfb1ba7aba58988c03",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/local/gsd/phase7-plan05-otf"
+    },
+    {
+      "ref": "refs/heads/integration/fair-beam-relay-main",
+      "commit": "987663870476be8ccfd2dfded3ce2136a4a6fc54",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/local/integration/fair-beam-relay-main"
+    },
+    {
+      "ref": "refs/heads/integration/verified-bp-comparison",
+      "commit": "306b9c9bb5e19ddf5201a0cb19eb6d9e932aed8b",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/local/integration/verified-bp-comparison"
+    },
+    {
+      "ref": "refs/heads/main",
+      "commit": "7db550ad5f6d51b3d3c5aeffb3fd7b9a39d8ae38",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/local/main"
+    },
+    {
+      "ref": "refs/heads/master",
+      "commit": "7a3c1a9d660fc2ba71bd6f09e62a4ac89c82ee7d",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/local/master"
+    },
+    {
+      "ref": "refs/heads/phase6-beam-search",
+      "commit": "d17c8e79c405656291bbdd22602cb291eb767079",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/local/phase6-beam-search"
+    },
+    {
+      "ref": "refs/heads/worktree-agent-p10-01-1791339803",
+      "commit": "7db550ad5f6d51b3d3c5aeffb3fd7b9a39d8ae38",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/local/worktree-agent-p10-01-1791339803"
+    },
+    {
+      "ref": "refs/heads/worktree-agent-p18-1792177610",
+      "commit": "22801f424b3e3d831adf1443b8912362966c8fb3",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/local/worktree-agent-p18-1792177610"
+    },
+    {
+      "ref": "refs/remotes/origin/feat/bb72-fixture",
+      "commit": "10032c75a6f4afa4a75aa13d35ec81688da2e320",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/remote/feat/bb72-fixture"
+    },
+    {
+      "ref": "refs/remotes/origin/feat/fair-beam-relay-campaign",
+      "commit": "0460d0fb1368a168938bffe59237b38646d3e02a",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/remote/feat/fair-beam-relay-campaign"
+    },
+    {
+      "ref": "refs/remotes/origin/feat/fair-damped-beam-relay",
+      "commit": "d76c0ee06993a5bc33512314b1d2bdb2a7135e9c",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/remote/feat/fair-damped-beam-relay"
+    },
+    {
+      "ref": "refs/remotes/origin/gsd/phase-01-evidence-registry-native-css",
+      "commit": "2407c50a7adbce4eda0ef64b4c328fe2e3e0585b",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/remote/gsd/phase-01-evidence-registry-native-css"
+    },
+    {
+      "ref": "refs/remotes/origin/gsd/phase-10-correlated-quaternary-execution",
+      "commit": "53f13af93c0bf7ac41aecd0bf1af4abda68d445d",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/remote/gsd/phase-10-correlated-quaternary-execution"
+    },
+    {
+      "ref": "refs/remotes/origin/gsd/phase4-memory-integration-20260926",
+      "commit": "263501ecf894c6e51d46de1f4127ec5908961ff4",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/remote/gsd/phase4-memory-integration-20260926"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "commit": "8c8c9d3764179601a008858a843717f6b234deca",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/remote/main"
+    },
+    {
+      "ref": "refs/remotes/origin/phase6-beam-search",
+      "commit": "d17c8e79c405656291bbdd22602cb291eb767079",
+      "archive_tag": "archive/2026-11-02/pre-consolidation/remote/phase6-beam-search"
+    }
+  ],
+  "worktrees": [
+    {
+      "path": "/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "raw": [
+        "worktree /hpc/group/pfisterlab/mg551/storage/survey_bp",
+        "HEAD 6b360b90e945d967ae76dd84be0223139107fd39",
+        "branch refs/heads/gsd/phase-10-correlated-quaternary-execution"
+      ],
+      "tracked_changes": 5,
+      "untracked_files": 14319
+    },
+    {
+      "path": "/hpc/group/pfisterlab/mg551/storage/survey_bp_low_noise_20260925",
+      "raw": [
+        "worktree /hpc/group/pfisterlab/mg551/storage/survey_bp_low_noise_20260925",
+        "HEAD c94064ece55ffe9c09441c9ca8cbf0e3785844ff",
+        "branch refs/heads/gsd/phase04-low-noise-ler"
+      ],
+      "tracked_changes": 0,
+      "untracked_files": 24
+    },
+    {
+      "path": "/hpc/group/pfisterlab/mg551/storage/survey_bp_memory_integration_20260926",
+      "raw": [
+        "worktree /hpc/group/pfisterlab/mg551/storage/survey_bp_memory_integration_20260926",
+        "HEAD 263501ecf894c6e51d46de1f4127ec5908961ff4",
+        "branch refs/heads/gsd/phase4-memory-integration-20260926"
+      ],
+      "tracked_changes": 0,
+      "untracked_files": 40
+    },
+    {
+      "path": "/hpc/home/mg551/gsd-workspaces/bb72-fixture/survey_bp",
+      "raw": [
+        "worktree /hpc/home/mg551/gsd-workspaces/bb72-fixture/survey_bp",
+        "HEAD 10032c75a6f4afa4a75aa13d35ec81688da2e320",
+        "branch refs/heads/feat/bb72-fixture"
+      ],
+      "tracked_changes": 0,
+      "untracked_files": 0
+    },
+    {
+      "path": "/hpc/home/mg551/gsd-workspaces/fair-beam-relay-campaign/survey_bp",
+      "raw": [
+        "worktree /hpc/home/mg551/gsd-workspaces/fair-beam-relay-campaign/survey_bp",
+        "HEAD 0460d0fb1368a168938bffe59237b38646d3e02a",
+        "branch refs/heads/feat/fair-beam-relay-campaign"
+      ],
+      "tracked_changes": 0,
+      "untracked_files": 29
+    },
+    {
+      "path": "/hpc/home/mg551/gsd-workspaces/fair-damped-beam-relay/survey_bp",
+      "raw": [
+        "worktree /hpc/home/mg551/gsd-workspaces/fair-damped-beam-relay/survey_bp",
+        "HEAD d76c0ee06993a5bc33512314b1d2bdb2a7135e9c",
+        "branch refs/heads/feat/fair-damped-beam-relay"
+      ],
+      "tracked_changes": 0,
+      "untracked_files": 0
+    },
+    {
+      "path": "/hpc/home/mg551/gsd-workspaces/fix-phase5-semantics/survey_bp",
+      "raw": [
+        "worktree /hpc/home/mg551/gsd-workspaces/fix-phase5-semantics/survey_bp",
+        "HEAD 3a5b1572a1e72d55f93a478935b7f602b5c5771d",
+        "branch refs/heads/fix/phase5-source-semantics"
+      ],
+      "tracked_changes": 0,
+      "untracked_files": 0
+    },
+    {
+      "path": "/hpc/home/mg551/gsd-workspaces/fix-relay-admission/survey_bp",
+      "raw": [
+        "worktree /hpc/home/mg551/gsd-workspaces/fix-relay-admission/survey_bp",
+        "HEAD c2075c8ce00991787578dd13bc8b292be7763ad0",
+        "branch refs/heads/fix/relay-source-admission"
+      ],
+      "tracked_changes": 0,
+      "untracked_files": 0
+    },
+    {
+      "path": "/hpc/home/mg551/gsd-workspaces/fix-schedule-c2v/survey_bp",
+      "raw": [
+        "worktree /hpc/home/mg551/gsd-workspaces/fix-schedule-c2v/survey_bp",
+        "HEAD 7d0619c056a1547b9c966ec9eee04d4d0621b6ca",
+        "branch refs/heads/fix/schedule-c2v-audit"
+      ],
+      "tracked_changes": 0,
+      "untracked_files": 0
+    },
+    {
+      "path": "/hpc/home/mg551/gsd-workspaces/integration-fair-beam-relay-main/survey_bp",
+      "raw": [
+        "worktree /hpc/home/mg551/gsd-workspaces/integration-fair-beam-relay-main/survey_bp",
+        "HEAD 987663870476be8ccfd2dfded3ce2136a4a6fc54",
+        "branch refs/heads/integration/fair-beam-relay-main"
+      ],
+      "tracked_changes": 0,
+      "untracked_files": 0
+    },
+    {
+      "path": "/hpc/home/mg551/gsd-workspaces/phase6-beam-search/survey_bp",
+      "raw": [
+        "worktree /hpc/home/mg551/gsd-workspaces/phase6-beam-search/survey_bp",
+        "HEAD d17c8e79c405656291bbdd22602cb291eb767079",
+        "branch refs/heads/phase6-beam-search"
+      ],
+      "tracked_changes": 0,
+      "untracked_files": 0
+    },
+    {
+      "path": "/hpc/home/mg551/gsd-workspaces/verified-bp-comparison/survey_bp",
+      "raw": [
+        "worktree /hpc/home/mg551/gsd-workspaces/verified-bp-comparison/survey_bp",
+        "HEAD 306b9c9bb5e19ddf5201a0cb19eb6d9e932aed8b",
+        "branch refs/heads/integration/verified-bp-comparison"
+      ],
+      "tracked_changes": 0,
+      "untracked_files": 0
+    },
+    {
+      "path": "/tmp/survey_bp-phase10-research",
+      "raw": [
+        "worktree /tmp/survey_bp-phase10-research",
+        "HEAD 4256f25d5e2b5ba5faf3a585d5be5e5c4468ce59",
+        "branch refs/heads/gsd/phase10-research",
+        "prunable gitdir file points to non-existent location"
+      ],
+      "tracked_changes": 0,
+      "untracked_files": 0
+    }
+  ],
+  "tracked_refresh_files": [
+    "data/reproductions/yao-2312-10950-non-osd/results/REPORT.md",
+    "data/reproductions/yao-2312-10950-non-osd/results/comparison.csv",
+    "data/reproductions/yao-2312-10950-non-osd/results/comparison.pdf",
+    "data/reproductions/yao-2312-10950-non-osd/results/comparison.png",
+    "data/reproductions/yao-2312-10950-non-osd/results/completion-dispatch.json"
+  ],
+  "working_refresh_commit": "6f99e20c8bfe6a3c8b3499f8261b24daa64c0bb0",
+  "working_refresh_tag": "archive/2026-11-02/unverified-working-refresh"
+}
