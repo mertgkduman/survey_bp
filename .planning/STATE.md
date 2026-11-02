@@ -276,6 +276,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261102-jnd | Add B1/C2 depolarizing plain BP/QBP and four-code comparison at T=100 | 2026-11-02 | b204164 | Verified 381,309 fresh paired samples; all 14 points and 28 arm estimates ≥100 failures | [261102-jnd-extend-plain-binary-bp-and-qbp-compariso](./quick/261102-jnd-extend-plain-binary-bp-and-qbp-compariso/) |
 | 261102-i0p | Add plain BP A5/B2 and plain QBP B1/C2 at T=100 | 2026-11-02 | a95a898 | Verified all 28 code/rate cells; 1,583,664 paired samples, all main arms ≥100 failures | [261102-i0p-add-missing-plain-bp-a5-b2-and-plain-qbp](./quick/261102-i0p-add-missing-plain-bp-a5-b2-and-plain-qbp/) |
 | 261029-vdb | Reproduce Yao non-OSD figures and tables with bounded source-linked runs | 2026-10-30 | 50d6371, 7eef1c5 | Verified development evidence; rare-event and imported BP-SI points remain unresolved | [261029-vdb-reproduce-remaining-non-bp-osd-yao-2312-](./quick/261029-vdb-reproduce-remaining-non-bp-osd-yao-2312-/) |
 | 261029-j3n | Apply tuned BP4 profiles inside A5/B2 Q-BPGD on paired errors | 2026-10-29 | — | Verified 20,000-shot main comparison; lower mean work, accuracy unresolved | [261029-j3n-apply-tuned-bp4-profiles-to-a5-and-b2-q-](./quick/261029-j3n-apply-tuned-bp4-profiles-to-a5-and-b2-q-/) |
