@@ -1,0 +1,57 @@
+{
+  "schema": "branch_consolidation_validation_v1",
+  "timestamp_utc": "2026-11-02T23:48:58.483360+00:00",
+  "tested_commit": "8ec6d14bf247c0857bbb6224b32d1ab9dd15d321",
+  "baseline": {
+    "failure": 26,
+    "error": 0,
+    "skipped": 1,
+    "total": 1503,
+    "passed": 1476,
+    "junit_sha256": "1e515a3350f144d21b29b86a0ace2c77ccd0c9fd84410b135c9618c4b2f8a16d",
+    "log_sha256": "924f40b3d434b2240597bfb2237423d28c331e2878cbb63fe8c894348cc02081",
+    "skips": [
+      {
+        "test": "tests.canonical.test_phase4_evidence::test_notebook_stage_reuse_requires_matching_manifest_source_policy_and_sample_identities",
+        "reason": "B1 semantic digest reconciliation and bounded notebook artifacts are Wave 1 evidence work."
+      }
+    ]
+  },
+  "final": {
+    "failure": 0,
+    "error": 0,
+    "skipped": 1,
+    "total": 1515,
+    "passed": 1514,
+    "junit_sha256": "a284e900e666558ef5f254eae4806c17cdf317a3df3592bae794df17ff5d65a6",
+    "log_sha256": "5099368b07a517a195c5916489ec4e9dd427d9e3d541ff79a427aa5186c144eb",
+    "skips": [
+      {
+        "test": "tests.canonical.test_phase4_evidence::test_notebook_stage_reuse_requires_matching_manifest_source_policy_and_sample_identities",
+        "reason": "B1 semantic digest reconciliation and bounded notebook artifacts are Wave 1 evidence work."
+      }
+    ]
+  },
+  "command": "PATH=\"$PWD/.venv/bin:$PATH\" OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 PYTHONPATH=src:. .venv/bin/python -m pytest -q",
+  "environment": "qualified primary checkout; exact optional analysis dependencies, installed project CLI entry points, retained local evidence and pinned source fixtures; see docs/git-workflow.md",
+  "baseline_failure_explanation": {
+    "missing_external_sources": 7,
+    "notebook_interpreter_and_local_receipt": 2,
+    "uninstalled_cli_entrypoints": 12,
+    "historical_absolute_path_bindings_in_isolated_worktree": 3,
+    "historical_qbpgd_execution_replay_profile_mismatch_fixed": 2
+  },
+  "preserved_research_trees": {
+    "source": "a8b6052",
+    "integration_tip": "8ec6d14bf247c0857bbb6224b32d1ab9dd15d321",
+    "unchanged_trees": {
+      "data/reproductions": "2c317147e109049ffb0f2ba7573332030d390d59",
+      "data/artifacts": "86121546b3459ec306bc69b7d18461f52e3cc65c",
+      "data/manifests": "e3a07e8eed2cf26be53663d86fa5022e32bd9aab",
+      "literature_policies": "6687495bf72335759fdc4b7299105b93bbbf7cf6",
+      "from_dr_pfister_presentetations": "f5f29cc869e0fbb176aebca575ec5b45b7aa6038"
+    }
+  },
+  "local_log_directory": "/hpc/group/pfisterlab/mg551/storage/survey_bp/.git/consolidation-backups/2026-11-02",
+  "scientific_assessment_statuses_changed": false
+}
