@@ -57,6 +57,7 @@ Run from the repository root in a compute allocation:
 PYTHONPATH=src python data/reproductions/yao-2312-10950-cross-code/depolarizing/campaign.py pilot
 PYTHONPATH=src python data/reproductions/yao-2312-10950-cross-code/depolarizing/campaign.py followup
 PYTHONPATH=src python data/reproductions/yao-2312-10950-cross-code/depolarizing/assess.py
+PYTHONPATH=src python data/reproductions/yao-2312-10950-cross-code/depolarizing/assess.py --render
 PYTHONPATH=src pytest -q tests/test_yao_b1c2_depolarizing.py
 ```
 
@@ -75,3 +76,7 @@ failure types, precision labels, mean/p99 iterations, work and timing;
 The fixed-N rate intervals and paired difference intervals answer different
 questions. Timing comparisons between historical A5/B2 and new B1/C2 campaigns
 do not isolate hardware-independent decoder speed.
+
+`--wait` audits the frozen shards in order as they finish, allowing audit and
+execution to overlap. `--render` verifies the saved CSV hashes and rebuilds
+only the report and figures from those audited values.

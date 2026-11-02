@@ -7,6 +7,7 @@ import importlib.util
 import json
 from pathlib import Path
 import sys
+import time
 
 import matplotlib
 matplotlib.use('Agg')
@@ -55,7 +56,7 @@ def interval(k,n,alpha=.05):
             1.0 if k==n else float(beta.ppf(1-alpha/2,k+1,n-k)))
 
 
-def audit_plan(path,replay_stride=10007):
+def audit_plan(path,replay_stride=10007,wait=False):
     payload=path.read_bytes();plan=json.loads(payload)
     if plan['implementation_sha256']!=implementation_hashes():raise ValueError('implementation changed')
     cohorts=defaultdict(list)
@@ -71,6 +72,8 @@ def audit_plan(path,replay_stride=10007):
     for index,job in enumerate(plan['jobs']):
         key=(job['code'],job['p']);code=codes[job['code']];d=REPO/job['output']
         mp,sp=d/'manifest.json',d/'summary.json'
+        while wait and (not sp.exists() or not (d/'compression.json').exists() or (d/'events.jsonl').exists()):
+            print('Awaiting completed shard:',d.name,flush=True);time.sleep(30)
         m,s=json.loads(mp.read_text()),json.loads(sp.read_text())
         if (any(m[k]!=v for k,v in job.items()) or m['plan_sha256']!=sha256(payload).hexdigest()
                 or m['implementation_sha256']!=plan['implementation_sha256'] or m['policies']!=policies()
@@ -179,8 +182,8 @@ def write_csv(path,rows):
         writer.writeheader();writer.writerows(rows)
 
 
-def assess():
-    data,pairs,receipts=audit_plan(ROOT/'campaign.json')
+def assess(*,wait=False):
+    data,pairs,receipts=audit_plan(ROOT/'campaign.json',wait=wait)
     rows=performance_rows(data);pairdata=pair_rows(pairs);old,proof=inherited()
     allrows=sorted(rows+old,key=lambda r:(r['code'],r['p'],r['decoder']))
     results=ROOT/'results'
@@ -204,7 +207,7 @@ def render(rows,pairs):
         'B1/C2 pilot shots choose a fresh fixed sample size and are excluded from every estimate. Fixed cohorts target 200 expected failures using the pilot, with 20,000 minimum and 1,000,000 maximum shots. Low-count estimates remain labeled; zero failures are reported as exact one-sided 95% upper bounds, not observed nonzero rates. A5/B2 points are inherited from the independently audited prior comparison.','',
         '| Code | p | Paired N | Binary BP failures (LER) | QBP failures (LER or 95% upper bound) | QBP precision |',
         '|---|---:|---:|---:|---:|---|']
-    fig,axes=plt.subplots(2,4,figsize=(17,8),layout='constrained')
+    fig,axes=plt.subplots(2,4,figsize=(17,8),sharey='row',layout='constrained')
     fig.suptitle('Depolarizing noise: plain BP and QBP, T=100, float64, no damping',fontsize=14)
     for col,c in enumerate(('a5','b2','b1','c2')):
         ps=sorted({r['p'] for r in rows if r['code']==c})
@@ -234,6 +237,15 @@ def render(rows,pairs):
         '|---|---:|---:|---:|---:|---:|'])
     for r in pairs:
         lines.append(f"| {r['code'].upper()} | {r['p']:.2f} | {r['rescues']} | {r['losses']} | {r['failure_difference_new_minus_old']:.6g} | [{r['paired_ci95_low']:.6g}, {r['paired_ci95_high']:.6g}] |")
+    lines.extend(['','## Observed performance',''])
+    for c in ('b1','c2'):
+        ps=sorted({r['p'] for r in rows if r['code']==c})
+        valid=[p for p in ps if lookup[(c,p,'qbp_v2')]['failures']>0]
+        ratios=[lookup[(c,p,'binary_v2')]['rate']/lookup[(c,p,'qbp_v2')]['rate'] for p in valid]
+        better=sum(lookup[(c,p,'qbp_v2')]['rate']<lookup[(c,p,'binary_v2')]['rate'] for p in ps)
+        lines.append(f"On {c.upper()}, QBP has lower observed LER at {better}/{len(ps)} measured rates. Among points with nonzero QBP failures, the binary/QBP rate ratio spans {min(ratios):.2f}–{max(ratios):.2f}.")
+        b,q=lookup[(c,.06,'binary_v2')],lookup[(c,.06,'qbp_v2')]
+        lines.extend(['',f"At p=0.06, binary BP has {b['failures']}/{b['shots']:,} failures ({b['rate']:.6g}); QBP has {q['failures']}/{q['shots']:,} ({q['rate']:.6g}). Mean iterations per component are {b['mean_iterations_per_component']:.2f} and {q['mean_iterations_per_component']:.2f}, respectively; mean decoding times are {b['mean_decode_ms']:.3f} ms and {q['mean_decode_ms']:.3f} ms.",''])
     lines.extend(['','## Channel comparison','',
         'The earlier B1/C2 X-only study has identical QBP/binary-v2 corrections because only I/X states have prior support. Depolarizing noise permits Y/Z and supplies within-qubit correlation to QBP. The numerical value of p has different marginal meaning between the two channels: binary X-flip probability is p in the X-only channel and 2p/3 in the depolarizing channel.','',
         '| Code | p | X-only binary/QBP LER | Depolarizing binary LER | Depolarizing QBP LER or upper bound |',
@@ -253,5 +265,22 @@ def render(rows,pairs):
     (ROOT/'results/REPORT.md').write_text('\n'.join(lines))
 
 
+def render_saved():
+    results=ROOT/'results';proof=json.loads((results/'audit.json').read_text())
+    for n,value in proof['artifact_sha256'].items():
+        if sha256((results/n).read_bytes()).hexdigest()!=value:raise ValueError('audited artifact changed')
+    rows=list(csv.DictReader((results/'all_depolarizing.csv').open()))
+    pairs=list(csv.DictReader((results/'paired.csv').open()))
+    ints={'T','shots','failures',*FIELDS,'rescues','losses'}
+    strings={'code','channel','decoder','precision','evidence','new','old'}
+    for row in rows+pairs:
+        for k,v in row.items():
+            if k not in strings and v!='':row[k]=int(v) if k in ints else float(v)
+    render(rows,pairs)
+
+
 if __name__=='__main__':
-    assess()
+    import argparse
+    ap=argparse.ArgumentParser();ap.add_argument('--wait',action='store_true');ap.add_argument('--render',action='store_true')
+    args=ap.parse_args()
+    render_saved() if args.render else assess(wait=args.wait)
