@@ -1,0 +1,28 @@
+{
+  "job_id": "60917336",
+  "tasks": 14,
+  "max_parallel": 14,
+  "cpus_per_task": 1,
+  "mem_gib": 4,
+  "wall_limit_hours": 3,
+  "command": [
+    "sbatch",
+    "--parsable",
+    "-J",
+    "yao-cross-plain",
+    "-p",
+    "common",
+    "--account=pfisterlab",
+    "-c",
+    "1",
+    "--mem=4G",
+    "-t",
+    "03:00:00",
+    "--array=0-13%14",
+    "-o",
+    "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/yao-2312-10950-cross-code/results/run-%A_%a.log",
+    "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1",
+    "--wrap",
+    "/hpc/home/mg551/miniconda3/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/yao-2312-10950-cross-code/run.py --index $SLURM_ARRAY_TASK_ID"
+  ]
+}

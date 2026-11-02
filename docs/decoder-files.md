@@ -97,3 +97,11 @@ resolved decoder settings, source hashes, code receipts, and shot bounds into
 each manifest. `codes.json` and `source_points.json` are evidence receipts,
 not decoder-policy files. For this study, the executable policy is the pinned
 runner plus the compiled kernel source identified in the manifest.
+
+The [missing code–decoder baseline study](../data/reproductions/yao-2312-10950-cross-code/README.md)
+uses `decoders.json` with schema `cross-code-plain-bp-policies-v1`, read only
+by that study's `common.policies()` and compiled runners. It fixes plain
+sum-product at T=100 and records the exact X-only versus depolarizing priors,
+float64 resolution, damping and clipping. `campaign.json` and the independent
+B2 follow-up plan hash the policies and implementation before sampling. These
+experiment files are not accepted by the general registry command.

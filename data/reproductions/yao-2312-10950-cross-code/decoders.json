@@ -1,0 +1,14 @@
+{
+  "schema": "cross-code-plain-bp-policies-v1",
+  "max_iterations": 100,
+  "resolution": "float64",
+  "damping_old": 0.0,
+  "check_rule": "sum_product",
+  "schedule": "flooding",
+  "check_product_epsilon": 1e-10,
+  "qbp_check_cap": null,
+  "binary_v2_check_cap": null,
+  "binary_paper_v2c_cap": 25.0,
+  "bit_flip_prior": ["1-p", "p", 0, 0],
+  "excluded_support_guard": "1024+abs(log((1-p)/p))+128*maximum_joint_degree"
+}

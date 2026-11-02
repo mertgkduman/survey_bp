@@ -1,0 +1,25 @@
+{
+  "job_id": "60917728",
+  "command": [
+    "sbatch",
+    "--parsable",
+    "-J",
+    "yao-cross-b2-fixed",
+    "-p",
+    "common",
+    "--account=pfisterlab",
+    "-c",
+    "1",
+    "--mem=4G",
+    "-t",
+    "03:00:00",
+    "--array=0-9%10",
+    "-o",
+    "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/yao-2312-10950-cross-code/results/b2-followup-%A_%a.log",
+    "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1",
+    "--wrap",
+    "/hpc/home/mg551/miniconda3/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/yao-2312-10950-cross-code/run_depolarizing.py --index $SLURM_ARRAY_TASK_ID"
+  ],
+  "cpus_per_task": 1,
+  "wall_limit_hours": 3
+}
