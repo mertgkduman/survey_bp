@@ -389,6 +389,7 @@ def _qbpgd_assessment(
 def _run_qbpgd_qualification(target: dict[str, Any]) -> dict[str, Any]:
     """Run one bounded deterministic canonical shot without creating a curve verdict."""
     from bp_registry.canonical.budgets import BudgetLimit, BudgetTree
+    from bp_registry.quaternary.numerics import QBP4_F64_V1
     from bp_registry.quaternary.problems import QuaternaryOriginalProblem, construct_qbpgd_a5_css
     from bp_registry.quaternary.qbpgd import QbpgdController, QbpgdSpec, ScalarLlrBp4Kernel, reconstruct_qbpgd
 
@@ -406,13 +407,15 @@ def _run_qbpgd_qualification(target: dict[str, Any]) -> dict[str, Any]:
     priors = np.repeat(np.asarray([[1.0 - p, p / 3.0, p / 3.0, p / 3.0]], dtype=np.float64), code.n, axis=0)
     spec = QbpgdSpec(iterations_per_round=int(limits["canonical_iterations_per_round"]), epsilon=1e-10, round_limit=1)
     budgets = (BudgetLimit("attempt", "bp_calls", int(limits["max_bp_calls"])),)
-    result = QbpgdController(spec).run(ScalarLlrBp4Kernel().new_session(problem, priors, budgets=BudgetTree(limits=budgets, parents={})))
+    # This historical qualification predates the v2 default.  Bind execution
+    # and replay to its original profile instead of inheriting a moving default.
+    result = QbpgdController(spec).run(ScalarLlrBp4Kernel(profile=QBP4_F64_V1).new_session(problem, priors, budgets=BudgetTree(limits=budgets, parents={})))
     elapsed = time.monotonic() - started
     if elapsed > float(limits["max_wall_seconds"]):
         raise ValueError("Q-BPGD qualification exceeded frozen wall-time cap")
     # ``reconstruct_qbpgd`` performs the complete evidence comparison and
     # raises on any transition, fidelity, or typed-work disagreement.
-    reconstruct_qbpgd(spec, problem, priors, result, budget_limits=budgets)
+    reconstruct_qbpgd(spec, problem, priors, result, budget_limits=budgets, profile=QBP4_F64_V1)
     rounds = [
         {
             "index": round_.index,
