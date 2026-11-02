@@ -9,6 +9,7 @@ from hashlib import sha256
 import json
 import math
 from pathlib import Path
+import sys
 
 import matplotlib
 matplotlib.use("Agg")
@@ -17,6 +18,9 @@ import numpy as np
 from scipy.stats import beta, binomtest
 
 from run import ARMS, ROOT, _load_code, _sample
+
+sys.path.insert(0, str(ROOT.with_name('yao-2312-10950-non-osd')))
+from ledger_io import open_event_ledger
 
 
 COLORS = {"bp4_v1": "#999999", "bp4_v2": "#1f77b4",
@@ -55,7 +59,7 @@ def _audit_task(task: dict[str, object], code, campaign_sha256: str) -> tuple[di
              "bp4_v2_vs_binary_v2": {"rescue": 0, "loss": 0}}
     first_error = last_error = None
     line_count = 0
-    with ledger_path.open("rb") as handle:
+    with open_event_ledger(ledger_path) as handle:
         for offset, raw in enumerate(handle):
             line_count += 1
             digest.update(raw)

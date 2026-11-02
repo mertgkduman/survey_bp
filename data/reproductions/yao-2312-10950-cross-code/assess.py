@@ -319,7 +319,9 @@ def write():
             writer=csv.DictWriter(f,fieldnames=list(contents[0]))
             writer.writeheader();writer.writerows(contents)
     (results/'logical-outcome-audit.jsonl').write_text(''.join(json.dumps(r,sort_keys=True)+'\n' for r in audits))
-    (results/'audit.json').write_text(json.dumps({'complete':len(aggregates)==28,'code_rate_cells':len(aggregates),
+    (results/'audit.json').write_text(json.dumps({'complete':len(aggregates)==28,
+        'all_main_arms_have_100_failures':all(r['failures']>=100 for r in rows if r['decoder']!='binary_paper'),
+        'code_rate_cells':len(aggregates),
         'legacy_shards_verified':legacy_shards,'nonexact_converged_legacy_candidates_replayed':len(audits),
         'logical_outcomes_corrected':sum(r['legacy_type_ii']!=r['independent_type_ii'] for r in audits),
         'campaign_sha256':sha256((ROOT/'campaign.json').read_bytes()).hexdigest(),
@@ -364,6 +366,20 @@ def make_report(rows,pairs,audits):
     fig.savefig(ROOT/'results/comparison.png',dpi=170)
     fig.savefig(ROOT/'results/comparison.pdf')
     plt.close(fig)
+    lines.extend(['','## Observed performance',''])
+    for code in ('a5','b2'):
+        ps=sorted({r['p'] for r in rows if r['code']==code})
+        ratios=[lookup[(code,p,'binary_v2')]['rate']/lookup[(code,p,'qbp_v2')]['rate'] for p in ps]
+        b,q=lookup[(code,.06,'binary_v2')],lookup[(code,.06,'qbp_v2')]
+        lines.append(f"On {code.upper()} under depolarizing noise, QBP has lower observed LER at every measured p. The BP/QBP rate ratio ranges from {min(ratios):.2f} to {max(ratios):.2f}. At p=0.06, binary BP has {b['failures']}/{b['shots']:,} failures ({b['rate']:.6g}), compared with QBP's {q['failures']}/{q['shots']:,} ({q['rate']:.6g}).")
+        lines.append('')
+    xp=[r for r in pairs if r['code'] in ('b1','c2') and r['old']=='binary_v2']
+    total=sum(r['shots'] for r in xp);cd=sum(r['candidate_differences'] for r in xp)
+    rescues=sum(r['rescues'] for r in xp);losses=sum(r['losses'] for r in xp)
+    lines.extend([f"On the {total:,} paired B1/C2 X-only shots, QBP and binary v2 have {cd:,} different terminal correction digests, with {rescues} QBP rescues and {losses} losses. This supports the expected binary reduction for this channel; it does not imply that QBP and binary BP behave identically under depolarizing noise.",''])
+    overhead=[lookup[(c,p,'qbp_v2')]['mean_decode_ms']/lookup[(c,p,'binary_v2')]['mean_decode_ms']
+              for c in ('b1','c2') for p in sorted({r['p'] for r in rows if r['code']==c})]
+    lines.extend([f"The full QBP graph on these X-only samples takes {min(overhead):.2f}–{max(overhead):.2f} times the mean decoding time of binary v2 across the 14 same-run points. This implementation processes both check types and four-state coordinates even though only I and X have support.",''])
     lines.extend(['','## X-only numerical controls','',
         'The paper-style binary control clips outgoing V2C messages to ±25 and selects X on an exact zero belief. Binary v2 leaves V2C unbounded and selects I on an exact zero belief. QBP v2 leaves its state coordinates unbounded and selects X on an I/X tie under X-only support. Both v2 kernels apply the same tanh-product check rule and endpoint safeguard. No tuning or decimation is used.','',
         '| Code | p | Paper BP failures | Binary v2 failures | QBP v2 failures | QBP vs binary v2 candidate differences | QBP vs paper BP rescues/losses |',
