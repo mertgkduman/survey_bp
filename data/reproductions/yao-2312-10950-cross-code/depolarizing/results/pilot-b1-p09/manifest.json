@@ -1,0 +1,68 @@
+{
+  "arm_timing_order": "rotate by global shot parity",
+  "binary_marginals": [
+    0.06,
+    0.06
+  ],
+  "code": "b1",
+  "code_semantic_sha256": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548",
+  "host": "dcc-dhvimdcore-gpu-ferc-s-p15-11",
+  "implementation_sha256": {
+    "data/reproductions/yao-2312-10950-cross-code/common.py": "65761096c2efc543862b2848d45198d7a5216521ba8ad499832361664fcea1ff",
+    "data/reproductions/yao-2312-10950-cross-code/decoders.json": "c16def2dfde1c8f2c9f5ec325895494e598e6859aeb961d5af5b4610ad4c793e",
+    "data/reproductions/yao-2312-10950-cross-code/depolarizing/decoders.json": "25e3f6d28075e97bc791dfb4e8421ad749d7d9c82a7b59cd10db1e5864043f50",
+    "data/reproductions/yao-2312-10950-cross-code/depolarizing/run.py": "f1e1a56cb0d516c2cb5525549ae9f0319645cd6bb6095421b18ca7847b19b306",
+    "data/reproductions/yao-2312-10950-cross-code/depolarizing/study.py": "e2909bd922fa70ee7ef8a57921dc0c4ae38d262aed0c4d380ff8723fec88464e",
+    "data/reproductions/yao-2312-10950-cross-code/run.py": "de426afd2cd9806b44640c65ef7938b7c3a5719dea99233c66f9e30865929f52",
+    "data/reproductions/yao-2312-10950-non-osd/codes.json": "68e644bf28d8c217ed07bfddf44cd1ff03ce2f3a6de4076407d63bd57d252cac",
+    "data/reproductions/yao-2312-10950-non-osd/run_point.py": "89bbc5a825d545dd890ef59a5ed1f7642c1458615fb9b810dae587824d0fee78",
+    "data/reproductions/yao-2312-10950-vanilla/run.py": "659fd494ef2d0e9aa000eb49b24268b3b80106b46bfcfd0f70aa98bff81a870b",
+    "src/bp_registry/canonical/compiled.py": "cc2fdc4b32019cb0c1cb830884f80660504aff80e538cef2dd6df8135e0a777b",
+    "src/bp_registry/canonical/numerics.py": "ac6f535983376395d142d5192fd78034635c6bac4b8b0bf0611a950b8a95c70d",
+    "src/bp_registry/code_constructions.py": "d541281fc93cc26906fe3baa968070ac90a9056b370f94250029b9cacb00f004",
+    "src/bp_registry/quaternary/compiled.py": "c02d017f03f1e2c1435a7a76e3bdd60ca75bdf43a9163e24803b72f6ee224965",
+    "src/bp_registry/quaternary/numerics.py": "94fde610220c2000927de470be293794645d37870f65bf59f5877a5ed438094c"
+  },
+  "joint_prior": [
+    0.91,
+    0.03,
+    0.03,
+    0.03
+  ],
+  "output": "data/reproductions/yao-2312-10950-cross-code/depolarizing/results/pilot-b1-p09",
+  "p": 0.09,
+  "plan_path": "data/reproductions/yao-2312-10950-cross-code/depolarizing/pilot.json",
+  "plan_sha256": "0717735f86b85ad6821ae6ac2b80a1cde935be44bbc8bf44cf85ab21a31dcba6",
+  "platform": "Linux-5.14.0-687.29.1.el9_8.x86_64-x86_64-with-glibc2.34",
+  "policies": {
+    "arms": [
+      "binary_v2",
+      "qbp_v2"
+    ],
+    "binary_prior": "q_X=q_Z=2p/3",
+    "candidate": "first_syndrome_matching_completed_iteration_per_component",
+    "check_cap": null,
+    "check_product_epsilon": 1e-10,
+    "check_rule": "sum_product",
+    "damping_old": 0.0,
+    "logical_evaluator": "separate_X_and_Z_signatures",
+    "max_iterations": 100,
+    "pauli_order": "I,X,Y,Z",
+    "qbp_prior": [
+      "1-p",
+      "p/3",
+      "p/3",
+      "p/3"
+    ],
+    "resolution": "float64",
+    "schedule": "flooding",
+    "schema": "paired-depolarizing-plain-bp-v1"
+  },
+  "rng": "PCG64(seed); exactly n draws per global shot; disjoint advance(start_shot*n)",
+  "schema": "b1-c2-paired-depolarizing-run-v1",
+  "seed": 20261113,
+  "shots": 2000,
+  "stage": "pilot",
+  "start_shot": 0,
+  "stop_rule": "fixed_shots"
+}

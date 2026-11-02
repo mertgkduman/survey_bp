@@ -1,0 +1,16 @@
+{
+  "schema": "paired-depolarizing-plain-bp-v1",
+  "arms": ["binary_v2", "qbp_v2"],
+  "check_rule": "sum_product",
+  "schedule": "flooding",
+  "resolution": "float64",
+  "max_iterations": 100,
+  "damping_old": 0.0,
+  "check_cap": null,
+  "check_product_epsilon": 1e-10,
+  "binary_prior": "q_X=q_Z=2p/3",
+  "qbp_prior": ["1-p", "p/3", "p/3", "p/3"],
+  "pauli_order": "I,X,Y,Z",
+  "candidate": "first_syndrome_matching_completed_iteration_per_component",
+  "logical_evaluator": "separate_X_and_Z_signatures"
+}

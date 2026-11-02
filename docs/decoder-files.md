@@ -105,3 +105,10 @@ sum-product at T=100 and records the exact X-only versus depolarizing priors,
 float64 resolution, damping and clipping. `campaign.json` and the independent
 B2 follow-up plan hash the policies and implementation before sampling. These
 experiment files are not accepted by the general registry command.
+
+Its [B1/C2 depolarizing extension](../data/reproductions/yao-2312-10950-cross-code/depolarizing/README.md)
+uses a separate `depolarizing/decoders.json` with schema
+`paired-depolarizing-plain-bp-v1`. `study.policies()` validates its two plain
+v2 arms, T=100 and joint-versus-marginal priors; the paired runner consumes it.
+Pilot and independent fixed-cohort plans identify samples and precision
+budgets separately from the decoder policy.

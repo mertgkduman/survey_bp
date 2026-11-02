@@ -1,5 +1,9 @@
 # Missing plain-decoder baselines for the Yao codes
 
+The [B1/C2 depolarizing extension](depolarizing/README.md) runs both plain
+decoders on the same depolarizing channel as A5/B2 and supplies a combined
+four-code analysis. The X-only B1/C2 experiment below remains separate.
+
 This controlled study supplies plain binary BP on A5/B2 and plain quaternary
 BP (QBP/BP4) on B1/C2, which are absent from
 [Yao et al., arXiv:2312.10950v2](https://arxiv.org/pdf/2312.10950v2).

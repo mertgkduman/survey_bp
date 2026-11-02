@@ -1,0 +1,26 @@
+{
+  "job_id": "60921740",
+  "plan": "campaign.json",
+  "tasks": 15,
+  "max_parallel": 24,
+  "command": [
+    "sbatch",
+    "--parsable",
+    "-J",
+    "b1-c2-depolarizing",
+    "-p",
+    "common",
+    "--account=pfisterlab",
+    "-c",
+    "1",
+    "--mem=4G",
+    "-t",
+    "03:00:00",
+    "--array=0-14%24",
+    "-o",
+    "/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/yao-2312-10950-cross-code/depolarizing/results/independent_followup-%A_%a.log",
+    "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1",
+    "--wrap",
+    "/hpc/home/mg551/miniconda3/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/yao-2312-10950-cross-code/depolarizing/run.py --plan /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/yao-2312-10950-cross-code/depolarizing/campaign.json --index $SLURM_ARRAY_TASK_ID"
+  ]
+}
