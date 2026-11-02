@@ -276,6 +276,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261102-i0p | Add plain BP A5/B2 and plain QBP B1/C2 at T=100 | 2026-11-02 | a95a898 | Verified all 28 code/rate cells; 1,583,664 paired samples, all main arms ≥100 failures | [261102-i0p-add-missing-plain-bp-a5-b2-and-plain-qbp](./quick/261102-i0p-add-missing-plain-bp-a5-b2-and-plain-qbp/) |
 | 261029-vdb | Reproduce Yao non-OSD figures and tables with bounded source-linked runs | 2026-10-30 | 50d6371, 7eef1c5 | Verified development evidence; rare-event and imported BP-SI points remain unresolved | [261029-vdb-reproduce-remaining-non-bp-osd-yao-2312-](./quick/261029-vdb-reproduce-remaining-non-bp-osd-yao-2312-/) |
 | 261029-j3n | Apply tuned BP4 profiles inside A5/B2 Q-BPGD on paired errors | 2026-10-29 | — | Verified 20,000-shot main comparison; lower mean work, accuracy unresolved | [261029-j3n-apply-tuned-bp4-profiles-to-a5-and-b2-q-](./quick/261029-j3n-apply-tuned-bp4-profiles-to-a5-and-b2-q-/) |
 | 261029-i1m | Compare tuned and untuned BP4 at equal T=100 and matched mean work on A5/B2 | 2026-10-29 | — | Verified 1,160,000-shot paired controls; B2 equal-work difference unresolved | [261029-i1m-run-paired-equal-cap-t100-bp4-baseline-v](./quick/261029-i1m-run-paired-equal-cap-t100-bp4-baseline-v/) |

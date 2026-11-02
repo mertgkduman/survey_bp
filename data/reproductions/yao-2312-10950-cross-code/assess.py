@@ -338,7 +338,7 @@ def write(*,wait=False):
                           'mcnemar_exact_p':float(binomtest(r,r+l).pvalue) if r+l else 1.0})
     for name,contents in [('performance.csv',rows),('paired.csv',pairs)]:
         with (results/name).open('w') as f:
-            writer=csv.DictWriter(f,fieldnames=list(contents[0]))
+            writer=csv.DictWriter(f,fieldnames=list(contents[0]),lineterminator='\n')
             writer.writeheader();writer.writerows(contents)
     (results/'logical-outcome-audit.jsonl').write_text(''.join(json.dumps(r,sort_keys=True)+'\n' for r in audits))
     (results/'audit.json').write_text(json.dumps({'complete':len(aggregates)==28,

@@ -6,6 +6,6 @@
   "nonexact_converged_legacy_candidates_replayed": 22863,
   "logical_outcomes_corrected": 0,
   "campaign_sha256": "3852c10dc69ba99d8ce7ce8c5d7d04cf136fa27547ea19fc4b571725d59bbcf0",
-  "performance_sha256": "804a6ad7c0c558cfd24c5c2e9f4eef1f3bbebbe54fb4250af069398dec33d49e",
-  "paired_sha256": "184f7d38f8bf89b63463bc5805846c3f1da54bc71c97d09bbc2260abcfa8571d"
+  "performance_sha256": "66f0f67c034ee362c4e2e015fc6e7a35714a3942ca3820261ae97892746dc221",
+  "paired_sha256": "f62461b067aa603e895e5065606f31ad5496cb6cb20e43ed3b2989db12e09453"
 }
