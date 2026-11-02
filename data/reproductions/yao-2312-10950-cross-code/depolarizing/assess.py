@@ -222,7 +222,8 @@ def render(rows,pairs):
             for r in rr:
                 if r['failures']==0:axes[0,col].plot(r['p'],r['zero_failure_upper_one_sided95'],'v',mfc='white',mec=color,ms=7)
             axes[1,col].plot(ps,[r['mean_iterations_per_component'] for r in rr],color=color,marker=marker,ms=4)
-        axes[0,col].set(title=c.upper(),yscale='log',xlabel='Depolarizing probability p')
+        code_info=source.RECEIPTS['codes'][c]
+        axes[0,col].set(title=f"{c.upper()} [[{code_info['n']},{code_info['k']}]]",yscale='log',xlabel='Depolarizing probability p')
         axes[1,col].set(xlabel='Depolarizing probability p',ylabel='Mean iterations per component')
         axes[0,col].legend(fontsize=8)
         for ax in axes[:,col]:ax.grid(True,which='both',alpha=.2)
@@ -268,6 +269,7 @@ def render(rows,pairs):
         'All physical draws, syndrome hashes, manifests, event hashes, counts and disjoint shard boundaries are independently verified. Boundary and fixed-stride corrections and all Type II events are replayed. The independent evaluator retains X/Z logical signatures separately, so logical Y errors cannot cancel. Syndrome-inconsistent outputs are Type I failures; syndrome-valid nontrivial logical residuals are Type II. Stabilizer-equivalent corrections count as successes; all samples enter the denominator.','',
         'Rates use fixed-N Clopper–Pearson 95% intervals. Zero-failure triangles show 1−0.05^(1/N). The paired failure-difference interval is formed from simultaneous 97.5% binomial intervals for rescues and losses, with exact McNemar p-values in paired.csv. Low-count QBP points do not establish a precise rate or a measured error floor. No multiple-comparison adjustment is applied to this exploratory analysis.','',
         'Performance CSVs include mean iterations per component, p99 iteration depth, directed edge updates, and mean/p99 decoding time. Separate binary mean iterations are (I_X+I_Z)/2; depth is max(I_X,I_Z); directed work is twice the edge count per executed component sweep. This is not equal arithmetic cost per edge. Historical A5/B2 timings and new B1/C2 timings are from different campaigns.','',
+        'Across-code LER differences also involve block length, dimension, Tanner graph and convergence within T=100. These are plain-decoder baselines at a shared iteration cap; comparisons of optimized codes or tuned decoders require their own controls. The paired BP/QBP contrast within a code holds its sampled physical errors fixed.','',
         'Files: [all four-code rates](all_depolarizing.csv), [new B1/C2 performance](performance.csv), [paired differences](paired.csv), [plot PNG](comparison.png), [plot PDF](comparison.pdf), [audit](audit.json).',''])
     (ROOT/'results/REPORT.md').write_text('\n'.join(lines))
 
