@@ -188,6 +188,15 @@ def reconstruct_phase4_shot(
     terminal = events[-1]
     if work is not None and terminal["data"].get("work_vector") != work:
         raise CanonicalStructuralVerificationError("Phase 4 terminal work disagrees with reconstructed leaves")
+    work_events = [event for event in events if event["kind"] == "work"]
+    if work_events and "diagnostic_candidate" in work_events[-1]["data"]:
+        recorded = work_events[-1]["data"]["diagnostic_candidate"]
+        if terminal["data"].get("diagnostic_candidate") != recorded:
+            raise CanonicalStructuralVerificationError("Phase 4 diagnostic proposal differs across work and terminal")
+        if terminal["data"].get("diagnostic_candidate_origin") != work_events[-1]["data"].get("diagnostic_candidate_origin"):
+            raise CanonicalStructuralVerificationError("Phase 4 diagnostic proposal origin differs across work and terminal")
+        if recorded is not None and (not isinstance(recorded, list) or any(type(bit) is not int or bit not in (0, 1) for bit in recorded)):
+            raise CanonicalStructuralVerificationError("Phase 4 diagnostic proposal is not a binary vector")
     return {
         "events": events,
         "transfers": [event["data"] for event in events if event["kind"] == "relay_transfer"],

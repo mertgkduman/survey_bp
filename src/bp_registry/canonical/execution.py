@@ -782,9 +782,26 @@ def _run_relay_structural_shot(
                         **common, **transfer.as_evidence(),
                         "reset": ("c2v", "v2c", "leg_history", "iteration", "convergence", "rng_identity"),
                     })
+                # This is a decoder-visible proposal for diagnostics, not a
+                # selected recovery.  Retain the last unconverged leg when no
+                # syndrome-valid leg was selected so the independent analysis
+                # can report syndrome and logical projection as separate axes.
+                diagnostic_candidate = run.candidate
+                diagnostic_origin = (
+                    "selected_recovery" if run.termination == "completed" and diagnostic_candidate is not None
+                    else "valid_unselected_proposal" if diagnostic_candidate is not None
+                    else "last_unconverged_leg"
+                )
+                if diagnostic_candidate is None and run.legs:
+                    diagnostic_candidate = run.legs[-1].candidate
+                if diagnostic_candidate is None:
+                    diagnostic_origin = "unavailable_no_leg"
+                diagnostic_bits = None if diagnostic_candidate is None else diagnostic_candidate.tolist()
                 work = budgets.summary("attempt")
                 ledger.event(run_id=parsed.run_id, shot_id=shot_id, kind="work", data={
                     **common, "work_vector": work.as_evidence(structural_event_version=2),
+                    "diagnostic_candidate": diagnostic_bits,
+                    "diagnostic_candidate_origin": diagnostic_origin,
                     # RelayController retains each reserve/commit fact with
                     # its leg ancestry.  Do not ask the ledger to infer it
                     # from an aggregate after the fact.
@@ -801,7 +818,8 @@ def _run_relay_structural_shot(
                 if run.termination != "completed" or run.candidate is None:
                     ledger.terminal(run_id=parsed.run_id, shot_id=shot_id, termination=run.termination, data={
                         **common, "selection_status": "unavailable_due_to_budget" if run.termination == "budget_exhausted" else "unavailable_due_to_stopping",
-                        "outcome": None,
+                        "outcome": None, "diagnostic_candidate": diagnostic_bits,
+                        "diagnostic_candidate_origin": diagnostic_origin,
                     })
                     return CanonicalExecutionResult(parsed.run_id, shot_id, run.termination, None, None)
                 candidate = np.array(run.candidate, dtype=np.uint8, copy=True)
@@ -825,6 +843,8 @@ def _run_relay_structural_shot(
                 )
                 ledger.terminal(run_id=parsed.run_id, shot_id=shot_id, termination="completed", data={
                     **common, "candidate": selected.candidate.tolist(), "outcome": evaluation_result.outcome,
+                    "diagnostic_candidate": diagnostic_bits,
+                    "diagnostic_candidate_origin": diagnostic_origin,
                     "logical_action_agrees": evaluation_result.logical_action_agrees,
                     "selection_status": "frozen_decoder_visible_candidate",
                     "candidate_lineage_id": selected.lineage_id,

@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "status": "frozen_before_parallel_p0050_sampling",
+  "parent_design": "data/evidence/phase4-low-noise-ler-design-v1.json",
+  "reason": "User requested more compute while the p=.06 serial campaign was running.",
+  "rate_ownership": {
+    "p0060": "original one-CPU serial job 56386510",
+    "p0050": "new four-CPU parallel arm job; distinct output root"
+  },
+  "unchanged": [
+    "code and source pins",
+    "four decoder arms and controlled parameters",
+    "physical sample identity and shot ID at each rate",
+    "four diagnostic proposal cells and missing-proposal accounting",
+    "six prespecified looks, exact intervals, denominator rules, precision target, and shot cap"
+  ],
+  "execution": {
+    "workers": 4,
+    "partition": "one independent arm per worker at a matched shot ID",
+    "threaded_driver_process": true,
+    "one_thread_per_public_decoder_command": true,
+    "journal_ownership": "one append-only journal per arm; no overlap with original job",
+    "wall_cap_seconds": 432000,
+    "shot_boundary_seconds": 900
+  },
+  "handoff": "Cancel original serial job after its p=.06 rate reaches a prespecified terminal look, before it duplicates p=.05. Retain the p=.06 progress snapshot and the independent p=.05 terminal result for reconciliation."
+}
