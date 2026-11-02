@@ -1,0 +1,25 @@
+{
+  "counts": {
+    "binary_v2": {
+      "elapsed_ns_sum": 334805363930,
+      "exact_success": 13445,
+      "iteration_sum": 756007,
+      "stabilizer_success": 8022,
+      "type_i": 2063,
+      "type_ii": 0
+    },
+    "qbp_v2": {
+      "elapsed_ns_sum": 233901903193,
+      "exact_success": 20887,
+      "iteration_sum": 223514,
+      "stabilizer_success": 2401,
+      "type_i": 242,
+      "type_ii": 0
+    }
+  },
+  "events_sha256": "80d6a4661d9a6094f47b15205ad277f47ee75d691f4a6dc4312cfa79d579afb4",
+  "manifest_sha256": "64f69b4ba4970569fcd9509e4169e01f49604132368440f760641340ceecdd12",
+  "schema": "b1-c2-paired-depolarizing-summary-v1",
+  "shots": 23530,
+  "stop_reason": "fixed_shots_complete"
+}
