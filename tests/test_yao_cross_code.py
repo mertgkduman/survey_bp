@@ -45,3 +45,7 @@ def test_logical_x_and_z_signatures_cannot_cancel():
     masks = common.vanilla._logical_masks(code)
     assert common.vanilla._logical_signature(logical_y, masks) == 0
     assert assessment.signature_pair(code, logical_y) != assessment.signature_pair(code, zero)
+    spec = importlib.util.spec_from_file_location('cross_depolarizing_test', ROOT/'run_depolarizing.py')
+    runner = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(runner)
+    assert runner.signature(code, logical_y) != runner.signature(code, zero)

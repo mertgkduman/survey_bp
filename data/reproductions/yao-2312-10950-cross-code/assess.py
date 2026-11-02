@@ -5,6 +5,7 @@ from hashlib import sha256
 import itertools
 import json
 from pathlib import Path
+import time
 
 import matplotlib
 matplotlib.use('Agg')
@@ -280,13 +281,34 @@ def audit_new(plan, aggregates, paired):
             raise ValueError('new ledger aggregate mismatch')
 
 
-def write():
+def wait_for(jobs):
+    """Allow ledger audits to overlap the independent compute arrays."""
+    while True:
+        missing=[]
+        for job in jobs:
+            d=REPO/job['output']
+            if (not (d/'summary.json').exists() or not (d/'compression.json').exists()
+                    or (d/'events.jsonl').exists()):
+                missing.append(job['output'])
+        if not missing:
+            return
+        print(f'Awaiting {len(missing)} completed compressed run(s)',flush=True)
+        time.sleep(30)
+
+
+def write(*,wait=False):
     plan=json.loads((ROOT/'campaign.json').read_text())
     aggregates=defaultdict(lambda:defaultdict(accumulator))
     paired=defaultdict(lambda:defaultdict(lambda:{'shots':0,'rescues':0,'losses':0,'candidate_differences':0}))
     audits=[]
     legacy_shards=audit_legacy(plan,aggregates,paired,audits)
+    print('Historical audit complete:',legacy_shards,'shards,',len(audits),'nonexact replays',flush=True)
+    if wait:
+        wait_for(json.loads((ROOT/'b2-p004-followup.json').read_text())['jobs'])
     audit_depolarizing(aggregates,paired)
+    print('Independent B2 audit complete',flush=True)
+    if wait:
+        wait_for(plan['jobs'])
     audit_new(plan,aggregates,paired)
     results=ROOT/'results'
     rows=[]
@@ -389,6 +411,8 @@ def make_report(rows,pairs,audits):
             b,q,old=[lookup[(code,p,a)] for a in ('binary_v2','qbp_v2','binary_paper')]
             pv=pair_lookup[(code,p,'binary_v2')];po=pair_lookup[(code,p,'binary_paper')]
             lines.append(f"| {code.upper()} | {p:.2f} | {old['failures']} | {b['failures']} | {q['failures']} | {pv['candidate_differences']} | {po['rescues']}/{po['losses']} |")
+    c_old=lookup[('c2',.04,'binary_paper')];c_v2=lookup[('c2',.04,'binary_v2')]
+    lines.extend(['',f"At C2 p=0.04, the paper-style binary control has {c_old['failures']}/{c_old['shots']:,} failures ({c_old['rate']:.6g}), compared with {c_v2['failures']}/{c_v2['shots']:,} ({c_v2['rate']:.6g}) for binary v2. The latter's observed LER is {c_v2['rate']/c_old['rate']:.2f} times as high. The v2 numerical profile therefore does not improve every code/channel combination. Its outgoing-message cap and exact-zero hard decision differ from the paper control; their separate effects are not isolated by this experiment.",''])
     corrections=sum(r['legacy_type_ii']!=r['independent_type_ii'] for r in audits)
     lines.extend(['','## Audit and interpretation','',
         f'The historical evaluator XOR-combined X and Z logical signatures. A simultaneous identical nonzero X/Z signature can cancel under that expression. This assessment keeps both signatures separately and replays every retained nonexact converged A5/B2 v2 correction: {len(audits):,} candidates audited, {corrections} logical classifications corrected. Raw historical ledgers remain immutable; the replay evidence is [logical-outcome-audit.jsonl](logical-outcome-audit.jsonl). Exact-success hashes, all sampled-error hashes, outcome counts, ledger SHA-256 values, and manifest identities are independently checked. New fixed-stride and boundary shots are replayed through all three kernels with the separate-signature evaluator.','',
@@ -401,4 +425,6 @@ def make_report(rows,pairs,audits):
 
 
 if __name__=='__main__':
-    write()
+    import argparse
+    ap=argparse.ArgumentParser();ap.add_argument('--wait',action='store_true')
+    write(wait=ap.parse_args().wait)
