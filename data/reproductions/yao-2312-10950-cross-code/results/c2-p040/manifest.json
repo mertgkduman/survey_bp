@@ -1,0 +1,58 @@
+{
+  "arm_timing_order": "rotate qbp_v2,binary_v2,binary_paper by shot modulo 3",
+  "campaign_sha256": "3852c10dc69ba99d8ce7ce8c5d7d04cf136fa27547ea19fc4b571725d59bbcf0",
+  "code": "c2",
+  "code_semantic_sha256": "a3ea36c9b1a588b133e24dd9ff27fd4964c495cc8a9ae4c875c36b635ac0903b",
+  "decoder_prior": [
+    0.96,
+    0.04,
+    0,
+    0
+  ],
+  "excluded_state_guard": 1795.1780538303478,
+  "fidelity": "controlled_missing_baseline",
+  "host": "dcc-dhvimdcore-gpu-ferc-s-i11-11",
+  "implementation_sha256": {
+    "data/reproductions/yao-2312-10950-cross-code/common.py": "65761096c2efc543862b2848d45198d7a5216521ba8ad499832361664fcea1ff",
+    "data/reproductions/yao-2312-10950-cross-code/decoders.json": "c16def2dfde1c8f2c9f5ec325895494e598e6859aeb961d5af5b4610ad4c793e",
+    "data/reproductions/yao-2312-10950-cross-code/run.py": "de426afd2cd9806b44640c65ef7938b7c3a5719dea99233c66f9e30865929f52",
+    "data/reproductions/yao-2312-10950-non-osd/codes.json": "68e644bf28d8c217ed07bfddf44cd1ff03ce2f3a6de4076407d63bd57d252cac",
+    "data/reproductions/yao-2312-10950-non-osd/run_point.py": "89bbc5a825d545dd890ef59a5ed1f7642c1458615fb9b810dae587824d0fee78",
+    "src/bp_registry/canonical/compiled.py": "cc2fdc4b32019cb0c1cb830884f80660504aff80e538cef2dd6df8135e0a777b",
+    "src/bp_registry/canonical/numerics.py": "ac6f535983376395d142d5192fd78034635c6bac4b8b0bf0611a950b8a95c70d",
+    "src/bp_registry/code_constructions.py": "d541281fc93cc26906fe3baa968070ac90a9056b370f94250029b9cacb00f004",
+    "src/bp_registry/quaternary/compiled.py": "c02d017f03f1e2c1435a7a76e3bdd60ca75bdf43a9163e24803b72f6ee224965",
+    "src/bp_registry/quaternary/numerics.py": "94fde610220c2000927de470be293794645d37870f65bf59f5877a5ed438094c"
+  },
+  "max_iterations": 100,
+  "output": "data/reproductions/yao-2312-10950-cross-code/results/c2-p040",
+  "p": 0.04,
+  "pauli_order": "I,X,Y,Z",
+  "physical_noise": "bit_flip_X_only",
+  "platform": "Linux-5.14.0-687.29.1.el9_8.x86_64-x86_64-with-glibc2.34",
+  "policies": {
+    "binary_paper_v2c_cap": 25.0,
+    "binary_v2_check_cap": null,
+    "bit_flip_prior": [
+      "1-p",
+      "p",
+      0,
+      0
+    ],
+    "check_product_epsilon": 1e-10,
+    "check_rule": "sum_product",
+    "damping_old": 0.0,
+    "excluded_support_guard": "1024+abs(log((1-p)/p))+128*maximum_joint_degree",
+    "max_iterations": 100,
+    "qbp_check_cap": null,
+    "resolution": "float64",
+    "schedule": "flooding",
+    "schema": "cross-code-plain-bp-policies-v1"
+  },
+  "sampler": "PCG64 SeedSequence(seed,p*100000,global_shot)",
+  "schema": "yao-cross-code-paired-v1",
+  "seed": 20261102,
+  "shots": 5000,
+  "source_bp_rate_for_planning": 0.080058,
+  "stop_rule": "fixed_shots"
+}

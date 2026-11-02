@@ -1,0 +1,35 @@
+{
+  "arm_timing_order": "rotate with shot parity",
+  "binary_prior": 0.02666666666666667,
+  "campaign_sha256": "85006f3957ce262b7ace736013ff28165012b906ea0e065a293c4f5492468949",
+  "code": "b2",
+  "host": "dcc-dhvimdcore-gpu-ferc-s-i11-11",
+  "implementation_sha256": {
+    "data/reproductions/yao-2312-10950-cross-code/common.py": "65761096c2efc543862b2848d45198d7a5216521ba8ad499832361664fcea1ff",
+    "data/reproductions/yao-2312-10950-cross-code/decoders.json": "c16def2dfde1c8f2c9f5ec325895494e598e6859aeb961d5af5b4610ad4c793e",
+    "data/reproductions/yao-2312-10950-cross-code/run.py": "de426afd2cd9806b44640c65ef7938b7c3a5719dea99233c66f9e30865929f52",
+    "data/reproductions/yao-2312-10950-non-osd/codes.json": "68e644bf28d8c217ed07bfddf44cd1ff03ce2f3a6de4076407d63bd57d252cac",
+    "data/reproductions/yao-2312-10950-non-osd/run_point.py": "89bbc5a825d545dd890ef59a5ed1f7642c1458615fb9b810dae587824d0fee78",
+    "src/bp_registry/canonical/compiled.py": "cc2fdc4b32019cb0c1cb830884f80660504aff80e538cef2dd6df8135e0a777b",
+    "src/bp_registry/canonical/numerics.py": "ac6f535983376395d142d5192fd78034635c6bac4b8b0bf0611a950b8a95c70d",
+    "src/bp_registry/code_constructions.py": "d541281fc93cc26906fe3baa968070ac90a9056b370f94250029b9cacb00f004",
+    "src/bp_registry/quaternary/compiled.py": "c02d017f03f1e2c1435a7a76e3bdd60ca75bdf43a9163e24803b72f6ee224965",
+    "src/bp_registry/quaternary/numerics.py": "94fde610220c2000927de470be293794645d37870f65bf59f5877a5ed438094c"
+  },
+  "logical_evaluator": "separate_X_Z_signatures",
+  "max_iterations": 100,
+  "output": "data/reproductions/yao-2312-10950-cross-code/results/b2-p040-fixed-s06",
+  "p": 0.04,
+  "physical_noise": "depolarizing",
+  "qbp_prior": [
+    0.96,
+    0.013333333333333334,
+    0.013333333333333334,
+    0.013333333333333334
+  ],
+  "schema": "yao-cross-depolarizing-v1",
+  "seed": 20261103,
+  "shots": 50000,
+  "start_shot": 300000,
+  "stop_rule": "fixed_shots"
+}

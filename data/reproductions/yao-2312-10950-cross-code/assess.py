@@ -347,7 +347,8 @@ def write(*,wait=False):
         'legacy_shards_verified':legacy_shards,'nonexact_converged_legacy_candidates_replayed':len(audits),
         'logical_outcomes_corrected':sum(r['legacy_type_ii']!=r['independent_type_ii'] for r in audits),
         'campaign_sha256':sha256((ROOT/'campaign.json').read_bytes()).hexdigest(),
-        'performance_sha256':sha256((results/'performance.csv').read_bytes()).hexdigest()},indent=2)+'\n')
+        'performance_sha256':sha256((results/'performance.csv').read_bytes()).hexdigest(),
+        'paired_sha256':sha256((results/'paired.csv').read_bytes()).hexdigest()},indent=2)+'\n')
     make_report(rows,pairs,audits)
     print('Verified',len(aggregates),'cells;',len(audits),'nonexact legacy replays;',
           sum(r['legacy_type_ii']!=r['independent_type_ii'] for r in audits),'logical classifications corrected')
@@ -358,6 +359,7 @@ def make_report(rows,pairs,audits):
     pair_lookup={(r['code'],r['p'],r['old']):r for r in pairs}
     src=source.SOURCE['figures']
     fig,axes=plt.subplots(2,4,figsize=(17,8),layout='constrained')
+    fig.suptitle('Plain sum-product BP and QBP: T=100, float64, no damping',fontsize=14)
     lines=['# Plain BP and QBP across four codes','',
         'All plain decoders use flooding sum-product, float64, no damping, and T=100, matching the plain decoder limit for each code in [Yao et al.](https://arxiv.org/pdf/2312.10950v2). Each local comparison uses the same physical errors. These added baselines are controlled experiments; the paper supplies no reference curve for the missing decoder/code combinations.','',
         'A5/B2 retain depolarizing noise, with separate binary priors q_X=q_Z=2p/3 and joint QBP priors (1-p,p/3,p/3,p/3). B1/C2 retain X-only noise, with QBP prior (1-p,p,0,0); they do not use a depolarizing prior. The full quaternary graph is executed. Excluded Y/Z coordinates are held more than 1024 log units below the I/X states by a degree-based guard, so their float64 projection mass is exactly zero. Under this channel the active QBP equations reduce to binary BP; any measured difference comes from numerical details, hard-decision ties, or message clipping.','',
@@ -371,7 +373,8 @@ def make_report(rows,pairs,audits):
             rr=[lookup[(code,p,arm)] for p in ps]
             axes[0,col].errorbar(ps,[r['rate'] for r in rr],
                 yerr=[[r['rate']-r['ci95_low'] for r in rr],[r['ci95_high']-r['rate'] for r in rr]],
-                label='BP v2' if arm=='binary_v2' else 'QBP v2',color=color,marker=marker,ms=4,lw=1,capsize=2)
+                label='BP v2' if arm=='binary_v2' else 'QBP v2',color=color,marker=marker,
+                ms=6 if arm=='binary_v2' else 3,mfc='none' if arm=='binary_v2' else color,lw=1,capsize=2)
             axes[1,col].plot(ps,[r['mean_iterations_per_component'] for r in rr],color=color,marker=marker,ms=4,label=arm)
         curve='bp' if code in ('b1','c2') else 'qbp'
         published=src[figure]['curves'][curve]
@@ -418,13 +421,33 @@ def make_report(rows,pairs,audits):
         f'The historical evaluator XOR-combined X and Z logical signatures. A simultaneous identical nonzero X/Z signature can cancel under that expression. This assessment keeps both signatures separately and replays every retained nonexact converged A5/B2 v2 correction: {len(audits):,} candidates audited, {corrections} logical classifications corrected. Raw historical ledgers remain immutable; the replay evidence is [logical-outcome-audit.jsonl](logical-outcome-audit.jsonl). Exact-success hashes, all sampled-error hashes, outcome counts, ledger SHA-256 values, and manifest identities are independently checked. New fixed-stride and boundary shots are replayed through all three kernels with the separate-signature evaluator.','',
         'Each rate has a fixed-N Clopper–Pearson 95% interval in [performance.csv](performance.csv). [paired.csv](paired.csv) reports QBP rescues (BP fails, QBP succeeds), losses (QBP fails, BP succeeds), exact McNemar p-values and conservative paired difference intervals formed from simultaneous 97.5% binomial intervals for the two discordant probabilities. Comparisons are exploratory; p-values are not adjusted across p or code.','',
         'The independent B2 p=0.04 follow-up was sized after inspecting the original pilot, and only its fresh fixed sample enters this comparison. Its ten 50,000-shot shards were frozen together; the assessor rejects incomplete stages and verifies all sample indices. This cross-code study does not close the unfinished earlier BP/BPGD rare-event reproduction task.','',
-        'Iteration depth for separate binary decoding is max(I_X,I_Z), while mean iterations per component is (I_X+I_Z)/2. Directed edge updates count 2E per executed component sweep; QBP has more arithmetic per edge, so these counts are not flop equivalence. The CSV includes mean edge updates, p99 iteration depth, mean decoding time and p99 decoding time. A5/B2 timings were measured in the historical four-arm run, whereas B1/C2 timings rotate arm order on the same host. Runtime ratios across those campaigns are not controlled speed comparisons. The X-only QBP graph also processes X checks that add no inference information.','',
+        'Iteration depth for separate binary decoding is max(I_X,I_Z), while mean iterations per component is (I_X+I_Z)/2. Directed edge updates count 2E per executed component sweep; QBP has more arithmetic per edge, so these counts are not flop equivalence. The CSV includes mean edge updates, p99 iteration depth, mean decoding time and p99 decoding time. A5/B2 timings come from historical four-arm runs except the fresh two-arm B2 p=0.04 campaign. B1/C2 timings rotate arm order on the same host. Runtime ratios across those campaigns are not controlled speed comparisons. The X-only QBP graph also processes X checks that add no inference information.','',
         'The two channels differ across code groups. A5/B2 versus B1/C2 LER is not an isolated comparison of code quality.','',
         'Artifacts: [performance.csv](performance.csv), [paired.csv](paired.csv), [comparison.png](comparison.png), [comparison.pdf](comparison.pdf), [audit.json](audit.json).',''])
     (ROOT/'results/REPORT.md').write_text('\n'.join(lines))
 
 
+def render_saved():
+    """Rebuild prose/plots from the hash-verified audited CSV artifacts."""
+    results=ROOT/'results';proof=json.loads((results/'audit.json').read_text())
+    for name,key in [('performance.csv','performance_sha256'),('paired.csv','paired_sha256')]:
+        if sha256((results/name).read_bytes()).hexdigest()!=proof[key]:
+            raise ValueError('audited CSV changed before rendering')
+    rows=list(csv.DictReader((results/'performance.csv').open()))
+    pairs=list(csv.DictReader((results/'paired.csv').open()))
+    integers={'T','shots','failures',*FIELDS,'rescues','losses','candidate_differences'}
+    strings={'code','channel','decoder','evidence','new','old'}
+    for row in rows+pairs:
+        for key,value in row.items():
+            if key=='precision_100_failures':row[key]=value=='True'
+            elif key not in strings:row[key]=int(value) if key in integers else float(value)
+    audits=[json.loads(line) for line in (results/'logical-outcome-audit.jsonl').read_text().splitlines()]
+    make_report(rows,pairs,audits)
+
+
 if __name__=='__main__':
     import argparse
     ap=argparse.ArgumentParser();ap.add_argument('--wait',action='store_true')
-    write(wait=ap.parse_args().wait)
+    ap.add_argument('--render',action='store_true')
+    args=ap.parse_args()
+    render_saved() if args.render else write(wait=args.wait)

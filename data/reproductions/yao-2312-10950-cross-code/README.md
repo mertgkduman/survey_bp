@@ -79,6 +79,7 @@ Run from the repository root in an eligible compute allocation:
 PYTHONPATH=src python data/reproductions/yao-2312-10950-cross-code/run.py --index 0
 PYTHONPATH=src python data/reproductions/yao-2312-10950-cross-code/run_depolarizing.py --index 0
 PYTHONPATH=src python data/reproductions/yao-2312-10950-cross-code/assess.py
+PYTHONPATH=src python data/reproductions/yao-2312-10950-cross-code/assess.py --render
 PYTHONPATH=src pytest -q tests/test_yao_cross_code.py
 ```
 
@@ -94,3 +95,8 @@ ledger. Rates use the full fixed denominator; Clopper–Pearson 95% intervals,
 Type I/II counts, directed edge-update counts, iteration depth and runtime
 remain separately inspectable. Runtime comparisons between historical A5/B2
 and new B1/C2 hosts are not controlled speed comparisons.
+
+`--render` rebuilds the report and figures from the audited CSVs after checking
+their hashes. The full command without that flag independently rechecks all
+ledgers and candidate replays. `--wait` allows that audit to overlap pending
+frozen runs, waiting for complete compressed ledgers at each stage.
