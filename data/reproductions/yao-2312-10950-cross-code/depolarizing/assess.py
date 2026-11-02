@@ -222,10 +222,14 @@ def assess(*,wait=False):
 
 def render(rows,pairs):
     lookup={(r['code'],r['p'],r['decoder']):r for r in rows}
+    new_rows=[r for r in rows if r['code'] in ('b1','c2')]
+    total_shots=sum(r['shots'] for r in new_rows if r['decoder']=='qbp_v2')
+    min_failures=min(r['failures'] for r in new_rows)
     lines=['# Plain BP and QBP under depolarizing noise','',
         'All four codes use the same independent code-capacity channel: P(I)=1-p and P(X)=P(Y)=P(Z)=p/3 on every qubit, with perfect syndrome measurements. Binary BP uses separate X/Z marginals 2p/3; QBP uses the joint Pauli prior. Both are plain, undamped float64 flooding sum-product v2 with T=100. B1/C2 depolarizing curves are new controlled results without paper reference points.','',
         'Both kernels start with the same scalar commuting/anticommuting edge LLR, $m_{v\\to c}^{(0)}=\\log[(1-2p/3)/(2p/3)]$. QBP subsequently combines both check types through one four-state qubit belief; separate binary BP retains only the two marginals. A performance difference under these settings therefore is not explained by using the physical p as a binary prior.','',
         'B1/C2 pilot shots choose a fresh fixed sample size and are excluded from every estimate. Fixed cohorts target 200 expected failures using the pilot, with 20,000 minimum and 1,000,000 maximum shots. Low-count estimates remain labeled; zero failures are reported as exact one-sided 95% upper bounds, not observed nonzero rates. A5/B2 points are inherited from the independently audited prior comparison.','',
+        f'The completed B1/C2 follow-up contains {total_shots:,} paired physical errors. Its 28 decoder estimates each have at least {min_failures} failures.','',
         '| Code | p | Paired N | Binary BP failures (LER) | QBP failures (LER or 95% upper bound) | QBP precision |',
         '|---|---:|---:|---:|---:|---|']
     fig,axes=plt.subplots(2,4,figsize=(17,8),sharey='row',layout='constrained')
@@ -250,7 +254,8 @@ def render(rows,pairs):
         for p in ps:
             b,q=lookup[(c,p,'binary_v2')],lookup[(c,p,'qbp_v2')]
             qrate=f"{q['failures']:,} ({q['rate']:.6g})" if q['failures'] else f"0 (<{q['zero_failure_upper_one_sided95']:.6g})"
-            lines.append(f"| {c.upper()} | {p:.2f} | {q['shots']:,} | {b['failures']:,} ({b['rate']:.6g}) | {qrate} | {q['precision']} |")
+            precision={'100_or_more_failures':'≥100 failures','low_count_estimate':'Low count','zero_failure_bound':'95% upper bound'}[q['precision']]
+            lines.append(f"| {c.upper()} | {p:.2f} | {q['shots']:,} | {b['failures']:,} ({b['rate']:.6g}) | {qrate} | {precision} |")
     axes[0,0].set_ylabel('Block logical error rate; 95% interval')
     for suffix in ('png','pdf'):fig.savefig(ROOT/f'results/comparison.{suffix}',dpi=170)
     plt.close(fig)

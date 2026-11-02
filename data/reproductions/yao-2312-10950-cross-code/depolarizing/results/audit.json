@@ -1,0 +1,134 @@
+{
+  "artifact_sha256": {
+    "all_depolarizing.csv": "4b698321977659499b2f112a0faa35bf55aac316d96d7c11499d0f52aad113ce",
+    "paired.csv": "10abe665c3279116c051bd265a0756a49daf92cba625bc8693daf5d3c129db10",
+    "performance.csv": "aa5440e54f4148b02845921878e933b57a6183cb5c7cc276021a896fb1592ac4"
+  },
+  "base_audit": {
+    "all_main_arms_have_100_failures": true,
+    "campaign_sha256": "3852c10dc69ba99d8ce7ce8c5d7d04cf136fa27547ea19fc4b571725d59bbcf0",
+    "code_rate_cells": 28,
+    "complete": true,
+    "legacy_shards_verified": 88,
+    "logical_outcomes_corrected": 0,
+    "nonexact_converged_legacy_candidates_replayed": 22863,
+    "paired_sha256": "f62461b067aa603e895e5065606f31ad5496cb6cb20e43ed3b2989db12e09453",
+    "performance_sha256": "66f0f67c034ee362c4e2e015fc6e7a35714a3942ca3820261ae97892746dc221"
+  },
+  "code_rate_cells": 14,
+  "complete": true,
+  "fixed_stage_shots": 381309,
+  "pilot_excluded": true,
+  "precision_counts": {
+    "100_or_more_failures": 28,
+    "low_count_estimate": 0,
+    "zero_failure_bound": 0
+  },
+  "verified_shards": [
+    {
+      "candidate_replays": 12,
+      "events_sha256": "9f70db7afcb68586f02be2a8ee40c2c025d655fc0947c045d0b91ad8a3c1af6b",
+      "output": "data/reproductions/yao-2312-10950-cross-code/depolarizing/results/fixed-b1-p04-s0000000",
+      "shots": 44445,
+      "summary_sha256": "b89e4d134abff5e19b5b827d84130eb1f85d38b4d5678d6d61590edf9b1c6aed"
+    },
+    {
+      "candidate_replays": 12,
+      "events_sha256": "ab21d1bd1f4c855660be185caf77d4f0866fdc4dc3ea361ba40b79394600909c",
+      "output": "data/reproductions/yao-2312-10950-cross-code/depolarizing/results/fixed-b1-p05-s0000000",
+      "shots": 50000,
+      "summary_sha256": "04b222b8b1d66e2b910d8988a54157d146ce7625168f42e639b92bc73d6bbf09"
+    },
+    {
+      "candidate_replays": 8,
+      "events_sha256": "bbf850264f0ea5a08139db926d9f8213bdd342e35f0ea6701268fb8d76e58865",
+      "output": "data/reproductions/yao-2312-10950-cross-code/depolarizing/results/fixed-b1-p05-s0050000",
+      "shots": 30000,
+      "summary_sha256": "2c8f26c0feff04d82fb8c923f5870efcb0c0b42cab0a5b072cadf97616c1629e"
+    },
+    {
+      "candidate_replays": 8,
+      "events_sha256": "80d6a4661d9a6094f47b15205ad277f47ee75d691f4a6dc4312cfa79d579afb4",
+      "output": "data/reproductions/yao-2312-10950-cross-code/depolarizing/results/fixed-b1-p06-s0000000",
+      "shots": 23530,
+      "summary_sha256": "367d02f2efc24ec646937d86a8014cf87e3af8dabd047b5713b51c9b936cbd80"
+    },
+    {
+      "candidate_replays": 6,
+      "events_sha256": "04939ed4407c3e0e8b3709759ed1dab11e8586d110a03e104ce3d4019d680589",
+      "output": "data/reproductions/yao-2312-10950-cross-code/depolarizing/results/fixed-b1-p07-s0000000",
+      "shots": 20000,
+      "summary_sha256": "c112a16b67994be0595dea816beceba6d64ffc1460cfbfa37d8016e275e52796"
+    },
+    {
+      "candidate_replays": 6,
+      "events_sha256": "6a3aa14f81100b8a5674c2b149970579b0365224b7952213d8b1b8a037ce5891",
+      "output": "data/reproductions/yao-2312-10950-cross-code/depolarizing/results/fixed-b1-p08-s0000000",
+      "shots": 20000,
+      "summary_sha256": "26e590fbc84015e2ed2831cc9ddfac52b5d1b8cd8989221b97f4d9e20b13aa59"
+    },
+    {
+      "candidate_replays": 6,
+      "events_sha256": "860da8c60c17bb37d6e6b17ff75285b712b6e7c2e0373147e45c04b173affcd4",
+      "output": "data/reproductions/yao-2312-10950-cross-code/depolarizing/results/fixed-b1-p09-s0000000",
+      "shots": 20000,
+      "summary_sha256": "c36a9286f59079d7bb5c8d758479b8d9bd4661936176f21bf7e501943e28f6d7"
+    },
+    {
+      "candidate_replays": 7,
+      "events_sha256": "7dbcc3f8ebd856c4b29e0644a304b6592fac64cd8fab95546243c904faa91d04",
+      "output": "data/reproductions/yao-2312-10950-cross-code/depolarizing/results/fixed-b1-p10-s0000000",
+      "shots": 20000,
+      "summary_sha256": "d2c619507059e0f038ed324239b2bd645dcc8a2f0d8c7d50d91ac3ee8dd4fe7f"
+    },
+    {
+      "candidate_replays": 10,
+      "events_sha256": "5b400ec5fbec19d8ddf83e9d769ec7c70c754292fc3bddbb758aae4c71a88e10",
+      "output": "data/reproductions/yao-2312-10950-cross-code/depolarizing/results/fixed-c2-p04-s0000000",
+      "shots": 33334,
+      "summary_sha256": "c239d80767c5a9f60a1607268e9af81d2ec0714a2c468bce959a59686e6d50be"
+    },
+    {
+      "candidate_replays": 7,
+      "events_sha256": "99ec06a05d0d0b9f660f9d2f2c501fac4b9e89ba96fb534d56ceeeaae27d704b",
+      "output": "data/reproductions/yao-2312-10950-cross-code/depolarizing/results/fixed-c2-p05-s0000000",
+      "shots": 20000,
+      "summary_sha256": "c3c8907096ca7bd25d49f8ab80d92e953b97201543b58ac5393705fd941caf4e"
+    },
+    {
+      "candidate_replays": 9,
+      "events_sha256": "b961db80efac0d05322b8959516a33e57193b52178912df5b2237743dc194ef3",
+      "output": "data/reproductions/yao-2312-10950-cross-code/depolarizing/results/fixed-c2-p06-s0000000",
+      "shots": 20000,
+      "summary_sha256": "b94223092b9a1f0936b4fb0386e8ea85eb50d4e150bf00d59bfd898219d69f98"
+    },
+    {
+      "candidate_replays": 11,
+      "events_sha256": "50381b22b727087e8a64ad6bcfa3f9d777c55200edca8e62375d1ab9b48233fd",
+      "output": "data/reproductions/yao-2312-10950-cross-code/depolarizing/results/fixed-c2-p07-s0000000",
+      "shots": 20000,
+      "summary_sha256": "073a6377c4dc05f84bb9fbbe83f17ad16cd5a5ad982c5665fe7851cefbe1a131"
+    },
+    {
+      "candidate_replays": 31,
+      "events_sha256": "a357af3add9f2826713ca8127798061970352c5111651068ca86e886e6020b3c",
+      "output": "data/reproductions/yao-2312-10950-cross-code/depolarizing/results/fixed-c2-p08-s0000000",
+      "shots": 20000,
+      "summary_sha256": "bccab42a138edffac0eaaaf7874840f7726c33569c7b025228548c119225b175"
+    },
+    {
+      "candidate_replays": 26,
+      "events_sha256": "813d7b12bb6c84792837cdfddea3b5967a3dc1bda98bbccc35ae63b9b34e039f",
+      "output": "data/reproductions/yao-2312-10950-cross-code/depolarizing/results/fixed-c2-p09-s0000000",
+      "shots": 20000,
+      "summary_sha256": "cfbd33266c48e50882a1929e42d6c6d6fdb096e0611f091d32420fecf373a0e5"
+    },
+    {
+      "candidate_replays": 80,
+      "events_sha256": "2f73079bac1c69f3ec1fc33e735bde5b8dea8a2c55ed348f89baa7e822c3ebff",
+      "output": "data/reproductions/yao-2312-10950-cross-code/depolarizing/results/fixed-c2-p10-s0000000",
+      "shots": 20000,
+      "summary_sha256": "e7606a5169f9799fe8d2966f961704e97e2b529aa61782882d4f52180c1fe2ab"
+    }
+  ]
+}
