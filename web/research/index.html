@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="An inspectable catalog and portable experiment builder for BP decoder research." />
+    <title>BP Research Registry</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Primary navigation">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">BP</span>
+          <div><strong>Research Registry</strong><small>QLDPC decoding workbench</small></div>
+        </div>
+        <nav class="nav-list" aria-label="Research interface sections">
+          <a href="#papers" data-nav="papers">Papers</a>
+          <a href="#results" data-nav="results">Results</a>
+          <a href="#builder" data-nav="builder">Experiment builder</a>
+          <a href="#circuits" data-nav="circuits">Circuits</a>
+          <a href="#getting-started" data-nav="getting-started">Getting started</a>
+        </nav>
+        <div class="sidebar-note"><span class="status-dot" aria-hidden="true"></span><span id="catalog-status">Loading catalog…</span></div>
+      </aside>
+
+      <main id="main-content" class="main-content" tabindex="-1">
+        <header class="topbar">
+          <div><p class="eyebrow">Policy-based BP research platform</p><h1>Evidence, specifications, and local experiments</h1></div>
+          <button id="refresh-catalog" class="button button-quiet" type="button">Refresh catalog</button>
+        </header>
+
+        <section id="overview" class="intro-card" aria-labelledby="overview-heading">
+          <div><p class="eyebrow">Research workbench</p><h2 id="overview-heading">Compare what was measured. Export what you can reproduce.</h2><p>Results remain attached to their retained evidence and status. Packages are downloaded for local execution; this browser never runs a simulation.</p></div>
+          <dl class="overview-stats" aria-label="Catalog summary"><div><dt id="stat-papers">—</dt><dd>Papers</dd></div><div><dt id="stat-studies">—</dt><dd>Studies</dd></div><div><dt id="stat-results">—</dt><dd>Result series</dd></div></dl>
+        </section>
+
+        <section id="papers" class="panel" aria-labelledby="papers-heading">
+          <div class="section-heading"><div><p class="eyebrow">Literature and local studies</p><h2 id="papers-heading">Papers</h2></div><p id="paper-count" class="muted" aria-live="polite"></p></div>
+          <div class="filters" role="search">
+            <label>Find a paper or study<input id="paper-search" type="search" autocomplete="off" placeholder="Title, author, decoder, code…" /></label>
+            <label>Evidence state<select id="paper-status"><option value="">All states</option></select></label>
+            <label>Regime<select id="paper-regime"><option value="">All regimes</option></select></label>
+          </div>
+          <div id="paper-list" class="paper-list" aria-live="polite"></div>
+        </section>
+
+        <section id="results" class="panel" aria-labelledby="results-heading">
+          <div class="section-heading"><div><p class="eyebrow">Retained, catalog-backed observations</p><h2 id="results-heading">Results</h2></div><button id="export-visible-results" class="button button-quiet" type="button" disabled>Export visible table</button></div>
+          <div class="filters result-filters" aria-label="Exact result selection">
+            <label>Paper<select id="result-paper"><option value="">All catalog papers</option></select></label>
+            <label>Experiment<select id="result-experiment"><option value="">All experiments</option></select></label>
+            <label>Dataset<select id="result-dataset"><option value="">All datasets</option></select></label>
+            <label>Code<select id="result-code"><option value="">All codes</option></select></label>
+            <label>Decoder<select id="result-decoder"><option value="">All decoders</option></select></label>
+          </div>
+          <div id="selection-details" class="selection-details" aria-live="polite"></div>
+          <div class="result-toolbar">
+            <fieldset><legend>Show series</legend><div id="series-legend" class="legend" aria-live="polite"></div></fieldset>
+            <label class="metric-control">Metric<select id="metric-select" disabled></select></label>
+          </div>
+          <figure class="plot-frame"><div id="plot-description" class="sr-only" aria-live="polite"></div><svg id="result-plot" role="group" aria-labelledby="plot-title plot-description" viewBox="0 0 840 380" preserveAspectRatio="xMidYMid meet"><title id="plot-title">Catalog result plot</title></svg><figcaption id="plot-caption">Select a series to inspect retained observations.</figcaption></figure>
+          <div class="table-wrap" tabindex="0"><table id="result-table"><caption class="sr-only">Visible result observations</caption><thead><tr><th scope="col">Series</th><th scope="col">Noise</th><th scope="col">Metric</th><th scope="col">Observed value</th><th scope="col">Samples</th><th scope="col">Failures</th><th scope="col">Type I / II</th><th scope="col">CI</th><th scope="col">Work</th><th scope="col">Time</th><th scope="col">Evidence</th><th scope="col">Availability</th></tr></thead><tbody></tbody></table></div>
+        </section>
+
+        <section id="builder" class="panel builder-panel" aria-labelledby="builder-heading">
+          <div class="section-heading"><div><p class="eyebrow">Portable local execution</p><h2 id="builder-heading">Experiment builder</h2></div><p class="muted">Validated in the browser for guidance; Python is authoritative at run time.</p></div>
+          <div class="builder-layout">
+            <form id="experiment-form" novalidate aria-describedby="form-summary">
+              <p id="form-summary" class="form-summary" role="status" aria-live="polite">Load the catalog to see supported combinations and defaults.</p>
+              <div id="form-fields" class="form-fields"></div>
+              <div class="form-actions"><button id="validate-experiment" class="button button-quiet" type="button">Validate specification</button><button id="download-package" class="button" type="button" disabled>Download local package (.zip)</button></div>
+            </form>
+            <aside class="spec-preview" aria-labelledby="spec-heading"><div class="preview-heading"><h3 id="spec-heading">Exact specification</h3><button id="copy-spec" class="text-button" type="button">Copy JSON</button></div><pre id="spec-output" tabindex="0">{}</pre></aside>
+          </div>
+          <details class="custom-config"><summary>Use custom experiment JSON</summary><label for="custom-json">Custom JSON is checked against the shared contract before it is exported.</label><textarea id="custom-json" rows="13" spellcheck="false" aria-describedby="custom-json-feedback"></textarea><p id="custom-json-feedback" class="field-feedback" aria-live="polite"></p><button id="apply-custom-json" class="button button-quiet" type="button">Apply custom JSON</button></details>
+        </section>
+
+        <section id="circuits" class="panel" aria-labelledby="circuits-heading">
+          <div class="section-heading"><div><p class="eyebrow">Circuit integration</p><h2 id="circuits-heading">Stim workflow</h2></div></div>
+          <div class="circuit-grid"><div><h3>Supported local adapter</h3><p>Choose a cataloged Stim circuit, then export a package for local execution. The qualified adapter accepts independent-fault detector models using flooding SPA or min-sum with the float64 v1 numerical profile.</p><ul><li>Detector and logical-observable semantics remain separate from CSS/Pauli recovery.</li><li>Damping, alternate resolution, and Relay policies are not circuit-adapter options.</li><li>Local execution records a ledger and reports unavailable metrics explicitly.</li></ul></div><div class="circuit-action"><label>Cataloged circuit<select id="circuit-select"><option value="">No circuit records loaded</option></select></label><button id="use-circuit" class="button button-quiet" type="button" disabled>Use in builder</button><label>Or import a local Stim file<input id="circuit-file" type="file" accept=".stim,text/plain" /></label><p id="circuit-note" class="field-feedback" aria-live="polite"></p></div></div>
+        </section>
+
+        <section id="getting-started" class="panel getting-started" aria-labelledby="getting-started-heading">
+          <p class="eyebrow">Local-first workflow</p><h2 id="getting-started-heading">Getting started</h2>
+          <ol><li>Browse cataloged papers, studies, evidence labels, and available result series.</li><li>Inspect or adapt an exact specification; unsupported combinations stay visible as validation errors.</li><li>Download the package, install this repository’s declared Python environment, and run <code>python run.py</code> locally.</li><li>Keep the generated ledger, result summary, and copied specification together for review.</li></ol>
+          <pre class="command-example"><code>git clone git@github.com:mertgkduman/survey_bp.git
+cd survey_bp
+python3.12 -m venv .venv
+.venv/bin/python -m pip install -e '.[performance,circuit,analysis]'
+.venv/bin/python -m bp_registry.research.cli serve --port 8765
+# Open http://127.0.0.1:8765/web/research/
+# In the downloaded package, using this same environment:
+/path/to/survey_bp/.venv/bin/python run.py --repo /path/to/survey_bp --output ./results/run-001</code></pre>
+          <p class="notice">A curve on this page is a retained catalog observation, not a new performance claim. Missing raw data is marked unavailable rather than linked speculatively.</p>
+        </section>
+      </main>
+    </div>
+    <noscript><p class="noscript">This catalog requires JavaScript to load local catalog records and prepare portable packages.</p></noscript>
+    <script src="zip.js"></script><script src="app.js"></script>
+  </body>
+</html>

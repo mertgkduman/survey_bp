@@ -30,6 +30,14 @@ modifications take priority over substantial optional OSD/LSD postprocessing.
 
 ## Installation
 
+The [research interface](docs/research-interface.md) provides paper/study browsing,
+interactive retained results, decoder and code libraries, and downloadable local
+experiment packages. After installation with `.[performance,circuit,analysis]`,
+start it with `.venv/bin/python -m bp_registry.research.cli serve --port 8765`
+and open **http://127.0.0.1:8765/web/research/**. New simulations execute locally
+after download. The browser and terminal exporter share the catalog and strict
+experiment contract; historical evidence remains in its original directories.
+
 The package requires **Python 3.12 or newer**. Exact runtime dependency versions
 are declared in [pyproject.toml](pyproject.toml). From a fresh checkout, create a
 development environment:

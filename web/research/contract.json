@@ -1,0 +1,344 @@
+{
+  "channel_kinds": [
+    "depolarizing",
+    "x_only",
+    "explicit",
+    "embedded_circuit"
+  ],
+  "circuit_rule_profiles": {
+    "min_sum": "binary-min-sum-flooding-f64-v1",
+    "spa": "binary-spa-flooding-f64-v1"
+  },
+  "code_kinds": [
+    "registered",
+    "embedded_css"
+  ],
+  "cross_rule_objects": [
+    {
+      "if": {
+        "decoder.family": "circuit_dem_bp",
+        "decoder.rule": "spa"
+      },
+      "then": {
+        "decoder.numerical_profile": "binary-spa-flooding-f64-v1"
+      }
+    },
+    {
+      "if": {
+        "decoder.family": "circuit_dem_bp",
+        "decoder.rule": "min_sum"
+      },
+      "then": {
+        "decoder.numerical_profile": "binary-min-sum-flooding-f64-v1"
+      }
+    },
+    {
+      "if": {
+        "decoder.variant": "qbpgd"
+      },
+      "then": {
+        "decoder.numerical_profile": "quaternary-bp4-f64-v2",
+        "decoder.policy": null,
+        "decoder.rule": "sum_product"
+      }
+    },
+    {
+      "if": {
+        "decoder.policy": "non_null"
+      },
+      "then": {
+        "decoder.numerical_profile": "*_v2",
+        "decoder.policy.check_rule": "decoder.rule"
+      }
+    },
+    {
+      "if": {
+        "problem.kind": "circuit"
+      },
+      "then": {
+        "channel.kind": "embedded_circuit",
+        "problem.dem.decompose_errors": false,
+        "rate_points.item": {
+          "label": "string"
+        }
+      }
+    }
+  ],
+  "cross_rules": [
+    "custom binary and BP4 execute flooding only; schedules and interventions outside this contract are rejected",
+    "BP4 Q-BPGD requires v2 profile and policy=null",
+    "custom circuit uses the v1 Sinter adapter and its embedded Stim noise; policy/resolution is not accepted",
+    "physical_p and decoder_p0 are independent and serialized for every rate point",
+    "registered historical studies are adapters and are not custom compiled experiments"
+  ],
+  "decoder_families": [
+    "binary_css",
+    "bp4",
+    "circuit_dem_bp"
+  ],
+  "defaults": {
+    "binary": {
+      "numerical_profile": "binary-spa-flooding-f64-v2",
+      "rule": "sum_product",
+      "schedule": "flooding",
+      "stop_on_convergence": true
+    },
+    "bp4": {
+      "numerical_profile": "quaternary-bp4-f64-v2",
+      "rule": "sum_product",
+      "schedule": "flooding",
+      "stop_on_convergence": true
+    },
+    "budgets": {
+      "max_iterations": 30,
+      "max_shots": 32
+    },
+    "circuit": {
+      "max_iterations": 30,
+      "numerical_profile": "binary-spa-flooding-f64-v1",
+      "rule": "spa",
+      "schedule": "flooding",
+      "tie_break": "zero"
+    },
+    "sampling": {
+      "seed": 0,
+      "shot_start": 0,
+      "shots": 32
+    }
+  },
+  "field_sets": {
+    "budgets": [
+      "max_iterations",
+      "max_shots"
+    ],
+    "channel": [
+      "kind"
+    ],
+    "circuit_decoder": [
+      "family",
+      "implementation",
+      "max_iterations",
+      "numerical_profile",
+      "rule",
+      "schedule",
+      "tie_break"
+    ],
+    "circuit_problem": [
+      "circuit",
+      "dem",
+      "kind"
+    ],
+    "circuit_rate_point": [
+      "label"
+    ],
+    "code_problem": [
+      "code",
+      "kind"
+    ],
+    "decoder": [
+      "family",
+      "implementation",
+      "numerical_profile",
+      "policy",
+      "rule",
+      "schedule",
+      "stop_on_convergence",
+      "variant"
+    ],
+    "embedded_css": [
+      "hx",
+      "hz",
+      "kind",
+      "lx",
+      "lz"
+    ],
+    "experiment": [
+      "budgets",
+      "channel",
+      "decoder",
+      "id",
+      "problem",
+      "provenance",
+      "rate_points",
+      "sampling",
+      "schema"
+    ],
+    "explicit_channel": [
+      "kind",
+      "probabilities"
+    ],
+    "explicit_rate_point": [
+      "decoder_p0"
+    ],
+    "inline_stim": [
+      "kind",
+      "text"
+    ],
+    "policy": [
+      "alpha",
+      "beta",
+      "check_rule",
+      "damping",
+      "hard_decision",
+      "resolution",
+      "version",
+      "zero_syndrome_shortcut"
+    ],
+    "provenance": [
+      "notes",
+      "relation",
+      "source_spec_id"
+    ],
+    "qbpgd": [
+      "epsilon",
+      "iterations_per_round",
+      "round_limit"
+    ],
+    "rate_point": [
+      "decoder_p0",
+      "physical_p"
+    ],
+    "registered_input": [
+      "id",
+      "kind"
+    ],
+    "resolution": [
+      "coefficients",
+      "format",
+      "scale",
+      "scope",
+      "version"
+    ],
+    "sampling": [
+      "seed",
+      "shot_start",
+      "shots"
+    ]
+  },
+  "profiles": {
+    "binary_css": [
+      "binary-spa-flooding-f64-v1",
+      "binary-spa-flooding-f64-v2"
+    ],
+    "bp4": [
+      "quaternary-bp4-f64-v1",
+      "quaternary-bp4-f64-v2"
+    ],
+    "circuit_dem_bp": [
+      "binary-spa-flooding-f64-v1",
+      "binary-min-sum-flooding-f64-v1"
+    ]
+  },
+  "registered_circuit_ids": [
+    "relay-surface-d3",
+    "relay-bb144-memory-z",
+    "beamsearch-bb144-memory-z-p005"
+  ],
+  "registered_code_aliases": {
+    "A5": "a5",
+    "B1": "b1",
+    "B1_882_24": "b1",
+    "B2": "b2",
+    "BB72": "bb72",
+    "C2": "c2",
+    "GB46": "gb46",
+    "bb72-css": "bb72",
+    "double_Gross": "double-gross",
+    "double_Gross_288_12_18": "double-gross",
+    "double_gross": "double-gross",
+    "project-three-qubit-css-fixture": "three-qubit"
+  },
+  "registered_code_ids": [
+    "a5",
+    "b2",
+    "b1",
+    "c2",
+    "double-gross",
+    "bb72",
+    "three-qubit"
+  ],
+  "resolution": {
+    "coefficients": [
+      "float64",
+      "same"
+    ],
+    "formats": [
+      "float16",
+      "float32",
+      "float64",
+      "int8",
+      "int16",
+      "int32"
+    ],
+    "scopes": [
+      "scalar_edges",
+      "all_messages",
+      "all_state"
+    ]
+  },
+  "rules": [
+    "sum_product",
+    "min_sum",
+    "spa"
+  ],
+  "rules_by_family": {
+    "binary_css": [
+      "sum_product",
+      "min_sum"
+    ],
+    "bp4": [
+      "sum_product",
+      "min_sum"
+    ],
+    "circuit_dem_bp": [
+      "spa",
+      "min_sum"
+    ]
+  },
+  "schema": "research-experiment-v1",
+  "ui_fields": {
+    "decoder_p0": {
+      "exclusiveMaximum": 1,
+      "exclusiveMinimum": 0,
+      "type": "number"
+    },
+    "max_iterations": {
+      "minimum": 0,
+      "scope": "per_attempt; Q-BPGD total sweeps cap",
+      "type": "integer"
+    },
+    "max_shots": {
+      "constraint": "len(rate_points)*sampling.shots <= budgets.max_shots",
+      "minimum": 1,
+      "scope": "total_experiment",
+      "type": "integer"
+    },
+    "physical_p": {
+      "maximum": 1,
+      "minimum": 0,
+      "type": "number"
+    },
+    "policy": {
+      "alpha": {
+        "exclusiveMinimum": 0
+      },
+      "beta": {
+        "minimum": 0
+      },
+      "damping": {
+        "exclusiveMaximum": 1,
+        "minimum": 0
+      },
+      "resolution_version": "bp-resolution-v1",
+      "version": "bp-flooding-policy-v1"
+    },
+    "shots": {
+      "minimum": 1,
+      "scope": "per_rate_point",
+      "type": "integer"
+    }
+  },
+  "unsupported_registered_codes": {
+    "gb46": "Indexed parity-check evidence; no portable CSS/logical construction is registered for this custom runner."
+  }
+}

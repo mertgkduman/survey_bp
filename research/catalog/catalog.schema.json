@@ -1,0 +1,186 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mertgkduman/survey_bp/research/catalog/catalog.schema.json",
+  "title": "BP research catalog v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "papers",
+    "experiments",
+    "datasets",
+    "decoders",
+    "codes",
+    "circuits",
+    "result_series"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "papers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "paper_id",
+          "title",
+          "kind"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "paper",
+              "local_study"
+            ]
+          }
+        }
+      }
+    },
+    "experiments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "experiment_id",
+          "paper_ids"
+        ]
+      }
+    },
+    "datasets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "dataset_id",
+          "label",
+          "evidence_status",
+          "source_path"
+        ]
+      }
+    },
+    "decoders": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "decoder_id",
+          "label"
+        ]
+      }
+    },
+    "codes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "code_id",
+          "label"
+        ]
+      }
+    },
+    "circuits": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "circuit_id",
+          "label",
+          "asset"
+        ]
+      }
+    },
+    "result_series": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "series_id",
+          "dataset_id",
+          "code_id",
+          "decoder_id",
+          "points"
+        ],
+        "properties": {
+          "points": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/point"
+            }
+          }
+        }
+      }
+    },
+    "channels": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "channel_id",
+          "label",
+          "kind"
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "nullable_number": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "point": {
+      "type": "object",
+      "required": [
+        "x",
+        "y",
+        "n",
+        "failures",
+        "status"
+      ],
+      "properties": {
+        "x": {
+          "$ref": "#/$defs/nullable_number"
+        },
+        "y": {
+          "$ref": "#/$defs/nullable_number"
+        },
+        "n": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "failures": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "ci_low": {
+          "$ref": "#/$defs/nullable_number"
+        },
+        "ci_high": {
+          "$ref": "#/$defs/nullable_number"
+        },
+        "mean_work": {
+          "$ref": "#/$defs/nullable_number"
+        },
+        "work_unit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "mean_seconds": {
+          "$ref": "#/$defs/nullable_number"
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}

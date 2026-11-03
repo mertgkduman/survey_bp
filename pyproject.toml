@@ -12,6 +12,7 @@ dependencies = ["numpy==2.2.6", "scipy==1.17.1", "ldpc==2.4.1", "pydantic==2.13.
 [project.scripts]
 bp-registry = "bp_registry.study_cli:main"
 bp-registry-campaign = "bp_registry.campaigns.cli:main"
+bp-registry-research = "bp_registry.research.cli:main"
 
 [project.optional-dependencies]
 performance = [

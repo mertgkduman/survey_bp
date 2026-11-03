@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "papers": [
+    {
+      "paper_id": "yao-2312-10950-v2",
+      "title": "Belief Propagation Decoding of Quantum LDPC Codes with Guided Decimation",
+      "identity": "arXiv:2312.10950v2",
+      "kind": "paper",
+      "evidence_path": "data/reproductions/yao-2312-10950-non-osd/source_points.json",
+      "registered_scope": "retained study-specific source-command campaigns; no generic ensure_study registration",
+      "source_url": "https://arxiv.org/abs/2312.10950v2"
+    },
+    {
+      "paper_id": "pfister-presentation-excerpt",
+      "title": "Dr. Pfister presentation excerpt",
+      "identity": "user-supplied local presentation excerpt",
+      "kind": "local_study",
+      "evidence_path": "from_dr_pfister_presentetations/README.md",
+      "registered_scope": "local presentation transcription and canonical diagnostic runners only"
+    },
+    {
+      "paper_id": "bravyi-2308-07915",
+      "title": "Bivariate bicycle codes",
+      "identity": "arXiv:2308.07915",
+      "kind": "paper",
+      "evidence_path": "data/studies/bb72-css-bp-v1.json",
+      "registered_scope": "BB72 controlled CSS studies; original circuit-level BP-OSD is not registered here",
+      "source_url": "https://arxiv.org/abs/2308.07915"
+    },
+    {
+      "paper_id": "relaybp-2506-01779-v2",
+      "title": "RelayBP",
+      "identity": "arXiv:2506.01779v2",
+      "kind": "paper",
+      "evidence_path": "data/studies/fair-beam-relay-css-v2.json",
+      "registered_scope": "fair-beam-relay-css-v2 is registered through ensure_study; paper circuit reproduction is not",
+      "source_url": "https://arxiv.org/abs/2506.01779v2"
+    },
+    {
+      "paper_id": "beamsearch-2512-07057-v2",
+      "title": "BeamSearch",
+      "identity": "arXiv:2512.07057v2",
+      "kind": "paper",
+      "evidence_path": "data/studies/fair-beam-relay-css-v2.json",
+      "registered_scope": "fair-beam-relay-css-v2 is registered through ensure_study; paper circuit reproduction is not",
+      "source_url": "https://arxiv.org/abs/2512.07057v2"
+    },
+    {
+      "paper_id": "bpsf-2507-00254-v1",
+      "title": "BP-SF",
+      "identity": "arXiv:2507.00254v1",
+      "kind": "paper",
+      "evidence_path": "data/studies/bb72-bpsf-factorial-v2.json",
+      "registered_scope": "retained BB72 source-command/result package; no generic ensure_study registration",
+      "source_url": "https://arxiv.org/abs/2507.00254v1"
+    },
+    {
+      "paper_id": "bhatnagar-2026-impulse",
+      "title": "Bhatnagar impulse decoding",
+      "identity": "literature policy registry",
+      "kind": "paper",
+      "evidence_path": "literature_policies/PAPERS.md",
+      "registered_scope": "source specification and bounded CSS gate; no source-faithful result",
+      "evidence_status": "mapped_blocked"
+    },
+    {
+      "paper_id": "rabeti-2026-mbbp-ld",
+      "title": "Rabeti\u2013Mahdavifar MBBP-LD",
+      "identity": "literature policy registry",
+      "kind": "paper",
+      "evidence_path": "literature_policies/PAPERS.md",
+      "registered_scope": "source/runnable policy records; evidence remains separately qualified",
+      "evidence_status": "mapped_blocked"
+    },
+    {
+      "paper_id": "wursthorn-2026-asced",
+      "title": "aSCED",
+      "identity": "literature policy registry",
+      "kind": "paper",
+      "evidence_path": "literature_policies/PAPERS.md",
+      "registered_scope": "joint-quaternary mechanism/blocked source assessment",
+      "evidence_status": "mapped_blocked"
+    },
+    {
+      "paper_id": "kuo-2021-mbp4",
+      "title": "Modified BP4",
+      "identity": "literature policy registry",
+      "kind": "paper",
+      "evidence_path": "literature_policies/PAPERS.md",
+      "registered_scope": "mechanism-only assessment",
+      "evidence_status": "mapped_blocked"
+    }
+  ],
+  "study_paths": [
+    "data/studies/bb72-css-bp-v1.json",
+    "data/studies/bb72-bpsf-factorial-v2.json",
+    "data/studies/fair-beam-relay-css-v2.json",
+    "data/studies/phase9-relay-beam-control-v2.json",
+    "data/studies/phase9-mbbp-list-vote-control-v1.json",
+    "data/studies/phase9-update-schedule-control-v1.json",
+    "data/studies/phase11-bb72-joint-separate.json",
+    "data/studies/phase11-gb46-joint-separate.json",
+    "data/studies/phase11-policy-comparisons.json"
+  ]
+}

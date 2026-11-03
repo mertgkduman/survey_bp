@@ -6,10 +6,10 @@ current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
 stopped_at: Completed 11-16 and 11-20; eight Phase 11 gap plans remain open
-last_updated: "2026-11-03T00:06:27Z"
-last_activity: 2026-11-02
-last_activity_desc: Consolidated and validated research history on main; archived and retired old branches
-state_head: 38682530ee7fc8f2fad6893389da26e688bcd6d8
+last_updated: "2026-11-03T22:16:29Z"
+last_activity: 2026-11-03
+last_activity_desc: Delivered reusable research workbench and portable experiments; 83 targeted checks and real browser exports passed
+state_head: dd0718adcb4e67cc10f94243327a70d6ce661443
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-02 — consolidated research branches on main; 1,514 regression tests passed
-Last Activity Description: Consolidated and validated research history on main; preserved open scientific gates
+Last activity: 2026-11-03 — research workbench, reusable catalog, portable exports, and 83 targeted checks plus browser workflows passed
+Last Activity Description: Delivered independent research-interface product slice; scientific phase gates remain unchanged
 
 Progress: 8 of 14 phases complete (57%); 159 of 176 plans complete. Phase 11 has 17 of 25 plans complete; plan 17 is the first open number but depends on source reviews 18 and 19, while plan 20's blocked-target review is complete.
 
@@ -319,6 +319,8 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 | 260930-0vq | Stop Phase 4 comprehensive experiment and right-size plans | 2026-09-30 | db99a51 | Verified | [260930-0vq-stop-phase-4-comprehensive-experiment-an](./quick/260930-0vq-stop-phase-4-comprehensive-experiment-an/) |
 | 260930-nuv | Create a source-backed study-design glossary in Markdown and color-coded PDF, then commit and push to GitHub | 2026-09-30 | 6ddf013 | Verified | [260930-nuv-create-a-source-backed-study-design-glos](./quick/260930-nuv-create-a-source-backed-study-design-glos/) |
 | 261002-in6 | Add explicit Phase 6 candidate-list selection foundation | 2026-10-02 | 77bf533 | Verified | [261002-in6-implement-phase-6-candidate-list-selecti](./quick/261002-in6-implement-phase-6-candidate-list-selecti/) |
+
+| 261103-lyt | Build research catalog, HTML workbench, and portable experiment packages | 2026-11-03 | See quick summary | Verified (83 checks + browser workflows) | [261103-lyt-build-reusable-research-catalog-html-int](./quick/261103-lyt-build-reusable-research-catalog-html-int/) |
 
 ### Roadmap Evolution
 

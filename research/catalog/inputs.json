@@ -1,0 +1,191 @@
+{
+  "schema": "research-input-registry-v1",
+  "codes": [
+    {
+      "code_id": "a5",
+      "aliases": [
+        "A5"
+      ],
+      "label": "A5 [[180,10]]",
+      "artifact_path": "data/artifacts/quaternary-a5.json",
+      "asset_label": "A5 CSS artifact",
+      "asset_kind": "code_artifact",
+      "execution": {
+        "kind": "css_artifact",
+        "path": "data/artifacts/quaternary-a5.json"
+      }
+    },
+    {
+      "code_id": "b2",
+      "aliases": [
+        "B2"
+      ],
+      "label": "B2 [[882,48]]",
+      "artifact_path": "data/reproductions/yao-2312-10950-vanilla/codes/b2.json",
+      "asset_label": "B2 frozen construction",
+      "asset_kind": "code_constructor",
+      "execution": {
+        "kind": "constructor",
+        "id": "b2"
+      }
+    },
+    {
+      "code_id": "b1",
+      "aliases": [
+        "B1",
+        "B1_882_24"
+      ],
+      "label": "B1 [[882,24]]",
+      "artifact_path": "data/artifacts/b1-panteleev-kalachev-v3.json",
+      "asset_label": "B1 CSS artifact",
+      "asset_kind": "code_artifact",
+      "execution": {
+        "kind": "css_artifact",
+        "path": "data/artifacts/b1-panteleev-kalachev-v3.npz"
+      }
+    },
+    {
+      "code_id": "c2",
+      "aliases": [
+        "C2"
+      ],
+      "label": "C2 [[1922,50]]",
+      "artifact_path": "data/reproductions/yao-2312-10950-non-osd/codes.json",
+      "asset_label": "C2 frozen construction",
+      "asset_kind": "code_constructor",
+      "execution": {
+        "kind": "constructor",
+        "id": "c2"
+      }
+    },
+    {
+      "code_id": "double-gross",
+      "aliases": [
+        "double_gross",
+        "double_Gross_288_12_18",
+        "double_Gross"
+      ],
+      "label": "double-Gross [[288,12,18]]",
+      "artifact_path": "from_dr_pfister_presentetations/run_reproduction.py",
+      "asset_label": "double-Gross constructor",
+      "asset_kind": "code_constructor",
+      "execution": {
+        "kind": "constructor",
+        "id": "double-gross"
+      }
+    },
+    {
+      "code_id": "bb72",
+      "aliases": [
+        "BB72",
+        "bb72-css"
+      ],
+      "label": "Bravyi BB72 [[72,12,6]]",
+      "artifact_path": "data/artifacts/bb72-css.json",
+      "asset_label": "BB72 CSS artifact",
+      "asset_kind": "code_artifact",
+      "execution": {
+        "kind": "css_artifact",
+        "path": "data/artifacts/bb72-css.json"
+      }
+    },
+    {
+      "code_id": "gb46",
+      "aliases": [
+        "GB46"
+      ],
+      "label": "GB46",
+      "artifact_path": "data/artifacts/gb46-h44.alist",
+      "asset_label": "GB46 parity check",
+      "asset_kind": "code_artifact",
+      "execution": {
+        "kind": "unsupported",
+        "reason": "Indexed parity-check evidence; no portable CSS/logical construction is registered for this custom runner."
+      }
+    },
+    {
+      "code_id": "three-qubit",
+      "aliases": [
+        "project-three-qubit-css-fixture"
+      ],
+      "label": "three-qubit CSS fixture",
+      "artifact_path": "data/artifacts/project-three-qubit-css-fixture.json",
+      "asset_label": "three-qubit fixture",
+      "asset_kind": "code_artifact",
+      "execution": {
+        "kind": "css_artifact",
+        "path": "data/artifacts/project-three-qubit-css-fixture.json"
+      }
+    }
+  ],
+  "circuits": [
+    {
+      "circuit_id": "relay-surface-d3",
+      "label": "RelayBP rotated surface-code d=3 memory X",
+      "scope": "pinned source fixture for bounded local circuit smoke tests only; not a circuit-level reproduction claim",
+      "path": "data/circuits/relay-v0.2.2/rotated_surface_code_memory_X.stim",
+      "asset_label": "Relay rotated-surface d=3 Stim fixture",
+      "manifest_path": "data/circuits/relay-v0.2.2/manifest.json",
+      "license_paths": [
+        "data/circuits/relay-v0.2.2/LICENSE.txt"
+      ]
+    },
+    {
+      "circuit_id": "relay-bb144-memory-z",
+      "label": "RelayBP BB144 memory Z",
+      "scope": "pinned source circuit; plain adapter only, not a faithful reproduction manifest",
+      "path": "data/circuits/relay-v0.2.2/bicycle_bivariate_144_12_12_memory_Z.stim",
+      "asset_label": "Relay BB144 Stim circuit",
+      "manifest_path": "data/circuits/relay-v0.2.2/manifest.json",
+      "license_paths": [
+        "data/circuits/relay-v0.2.2/LICENSE.txt"
+      ]
+    },
+    {
+      "circuit_id": "beamsearch-bb144-memory-z-p005",
+      "label": "BeamSearch BB144 memory Z p=0.005",
+      "scope": "pinned source circuit; plain adapter only, not a faithful reproduction manifest",
+      "path": "data/circuits/beamsearch-084a475b/bb144-memory-z-p005.stim",
+      "asset_label": "BeamSearch BB144 Stim circuit",
+      "manifest_path": "data/circuits/beamsearch-084a475b/manifest.json",
+      "license_paths": [
+        "data/circuits/beamsearch-084a475b/LICENSE",
+        "data/circuits/beamsearch-084a475b/THIRDPARTY-LICENSES"
+      ]
+    }
+  ],
+  "channels": [
+    {
+      "channel_id": "depolarizing-code-capacity",
+      "kind": "depolarizing",
+      "label": "Code-capacity depolarizing",
+      "regime": "code_capacity",
+      "definition": "Independent qubits: I with probability 1\u2212p, X/Y/Z each p/3; perfect syndrome measurements.",
+      "decoder_prior": "Independent choice p0: binary marginals 2p0/3; BP4 joint depolarizing prior."
+    },
+    {
+      "channel_id": "x-only-code-capacity",
+      "kind": "x_only",
+      "label": "Code-capacity X-only",
+      "regime": "code_capacity",
+      "definition": "Independent qubits: I with probability 1\u2212p and X with probability p; perfect syndrome measurements.",
+      "decoder_prior": "Independent choice p0: binary component priors p0; BP4 uses the separately specified depolarizing joint prior."
+    },
+    {
+      "channel_id": "explicit-pauli-code-capacity",
+      "kind": "explicit",
+      "label": "Explicit Pauli probabilities",
+      "regime": "code_capacity",
+      "definition": "Shared four-state table or n\u00d74 per-qubit table in I,X,Y,Z order. Rows must sum to one without silent normalization.",
+      "decoder_prior": "Custom JSON supplies physical probabilities; decoder p0 remains a separate scalar inference choice."
+    },
+    {
+      "channel_id": "embedded-stim-noise",
+      "kind": "embedded_circuit",
+      "label": "Noise embedded in Stim circuit",
+      "regime": "circuit",
+      "definition": "Stim samples the circuit instruction noise; the adapter derives priors from its independent-mechanism detector error model.",
+      "decoder_prior": "Mechanism probabilities come from the DEM; no code-capacity p or p0 substitution."
+    }
+  ]
+}

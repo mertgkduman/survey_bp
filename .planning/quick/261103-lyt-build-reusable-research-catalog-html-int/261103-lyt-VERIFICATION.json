@@ -1,0 +1,192 @@
+{
+  "schema": "research-interface-browser-verification-v1",
+  "checks": [
+    "paper \u2192 experiment \u2192 A5 BP4 v2 real results and byte-exact decoder export",
+    "code / decoder filters update the plotted series, numerical rows, and exact settings",
+    "original registered study ZIP validates its exact input hashes without launching the campaign",
+    "frozen undamped BP4 v2 import preserves damping, hard decisions, and first-sweep stopping",
+    "visual builder \u2192 browser ZIP \u2192 isolated binary run, plot, and overwrite refusal",
+    "custom matrix validation rejects noncommutation and exports a real BP4 experiment",
+    "pinned source circuit selector exports original license and provenance, then runs four observable-evaluated shots",
+    "custom .stim \u2192 supported adapter package \u2192 genuine seeded Stim and Sinter observable evaluation",
+    "unsupported circuit policies are rejected without substitution",
+    "repository assets resolve at correct routes; missing/local-only assets never become speculative links",
+    "plot geometry follows selected data, keyboard points expose values, and effective receipt preserves runner overrides",
+    "desktop/mobile layouts stay inside viewport and keyboard focus is visible",
+    "Final responsive route check: introductory overview appears only on Papers; all six mobile views fit at 390px with selected library records.",
+    "Source one-sided upper bound is a triangle; corresponding independent local 28-failure rate is a circle, never relabeled as a bound."
+  ],
+  "executed": [
+    {
+      "label": "binary relocated",
+      "rows": [
+        {
+          "ci_high": 0.4898908364545973,
+          "ci_low": 0.0,
+          "ci_method": "wilson_score_95",
+          "ci_status": "zero_failures_upper_bound",
+          "converged_shots": 4,
+          "convergence_rate": 1.0,
+          "decoder_p0": 0.1,
+          "exact_successes": 4,
+          "failure_rate": 0.0,
+          "failures": 0,
+          "ler": 0.0,
+          "mean_decode_seconds": 0.17884506634436548,
+          "mean_iterations": 2.0,
+          "n": 4,
+          "observable_successes": null,
+          "p": 0.1,
+          "rate_index": 0,
+          "requested_shots_per_point": 4,
+          "setting_label": null,
+          "stabilizer_equivalent_successes": 0,
+          "termination_reason_counts": {
+            "all_components_syndrome_match": 4
+          },
+          "total_max_shots": 100000,
+          "type_i": 0,
+          "type_ii": 0,
+          "unconverged_shots": 0,
+          "work_unit": "binary_component_sweeps"
+        }
+      ],
+      "experiment_id": "e81d56fdf34ee2e5b58c9995fa61dd67fdf8df1b60c6a94d24c127c24da4edb4",
+      "implementation_sha256": "6fd40b3fba416e4097e104e57e04a890048d64290801545b95e72105712eeca4",
+      "preserved_existing_output": true,
+      "analysis_png_local": ".git/research-interface-browser-release/binary relocated/result/failure-rate.png"
+    },
+    {
+      "label": "custom bp4",
+      "rows": [
+        {
+          "ci_high": 0.4898908364545973,
+          "ci_low": 0.0,
+          "ci_method": "wilson_score_95",
+          "ci_status": "zero_failures_upper_bound",
+          "converged_shots": 4,
+          "convergence_rate": 1.0,
+          "decoder_p0": 0.1,
+          "exact_successes": 4,
+          "failure_rate": 0.0,
+          "failures": 0,
+          "ler": 0.0,
+          "mean_decode_seconds": 0.1885724477469921,
+          "mean_iterations": 1.0,
+          "n": 4,
+          "observable_successes": null,
+          "p": 0.1,
+          "rate_index": 0,
+          "requested_shots_per_point": 4,
+          "setting_label": null,
+          "stabilizer_equivalent_successes": 0,
+          "termination_reason_counts": {
+            "first_valid": 4
+          },
+          "total_max_shots": 100000,
+          "type_i": 0,
+          "type_ii": 0,
+          "unconverged_shots": 0,
+          "work_unit": "bp4_joint_sweeps"
+        }
+      ],
+      "experiment_id": "39eb2df5317988a07039179fdce0dedcb1beb62f0d5fa3ca2f950d5434a821de",
+      "implementation_sha256": "6fd40b3fba416e4097e104e57e04a890048d64290801545b95e72105712eeca4",
+      "preserved_existing_output": true,
+      "analysis_png_local": ".git/research-interface-browser-release/custom bp4/result/failure-rate.png"
+    },
+    {
+      "label": "registered source stim",
+      "rows": [
+        {
+          "ci_high": 0.4898908364545973,
+          "ci_low": 0.0,
+          "ci_method": "wilson_score_95",
+          "ci_status": "zero_failures_upper_bound",
+          "converged_shots": 4,
+          "convergence_rate": 1.0,
+          "decoder_p0": null,
+          "exact_successes": null,
+          "failure_rate": 0.0,
+          "failures": 0,
+          "ler": null,
+          "mean_decode_seconds": 0.1936566347721964,
+          "mean_iterations": 0.75,
+          "n": 4,
+          "observable_successes": 4,
+          "p": null,
+          "rate_index": 0,
+          "requested_shots_per_point": 4,
+          "setting_label": "embedded_circuit",
+          "stabilizer_equivalent_successes": null,
+          "termination_reason_counts": {
+            "detector_fit": 2,
+            "initial_candidate_fit": 2
+          },
+          "total_max_shots": 100000,
+          "type_i": null,
+          "type_ii": null,
+          "unconverged_shots": 0,
+          "work_unit": "circuit_dem_bp_sweeps"
+        }
+      ],
+      "experiment_id": "89235500d60187a43aa560c0f69c9a07049a3d4992040139635709fb51193d7a",
+      "implementation_sha256": "6fd40b3fba416e4097e104e57e04a890048d64290801545b95e72105712eeca4",
+      "preserved_existing_output": true,
+      "analysis_png_local": ".git/research-interface-browser-release/registered source stim/result/failure-rate.png"
+    },
+    {
+      "label": "stim sinter",
+      "rows": [
+        {
+          "ci_high": 0.4898908364545973,
+          "ci_low": 0.0,
+          "ci_method": "wilson_score_95",
+          "ci_status": "zero_failures_upper_bound",
+          "converged_shots": 4,
+          "convergence_rate": 1.0,
+          "decoder_p0": null,
+          "exact_successes": null,
+          "failure_rate": 0.0,
+          "failures": 0,
+          "ler": null,
+          "mean_decode_seconds": 0.1692375335842371,
+          "mean_iterations": 0.0,
+          "n": 4,
+          "observable_successes": 4,
+          "p": null,
+          "rate_index": 0,
+          "requested_shots_per_point": 4,
+          "setting_label": "embedded_circuit",
+          "stabilizer_equivalent_successes": null,
+          "termination_reason_counts": {
+            "initial_candidate_fit": 4
+          },
+          "total_max_shots": 100000,
+          "type_i": null,
+          "type_ii": null,
+          "unconverged_shots": 0,
+          "work_unit": "circuit_dem_bp_sweeps"
+        }
+      ],
+      "experiment_id": "881d63142daaace09814e78205f835d9681b41ea8b7b9171a2f8e41311dbf24b",
+      "implementation_sha256": "6fd40b3fba416e4097e104e57e04a890048d64290801545b95e72105712eeca4",
+      "preserved_existing_output": true,
+      "analysis_png_local": ".git/research-interface-browser-release/stim sinter/result/failure-rate.png"
+    }
+  ],
+  "errors": [],
+  "artifact_availability": "Execution logs, screenshots, ZIPs, and tiny raw ledgers are local-only under .git/research-interface-browser-release; regenerate them with tests/research/browser_workflows.py.",
+  "python_checks": {
+    "passed": 83,
+    "command": "PYTHONPATH=src:. OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 .git/research-interface-verify/bin/python -m pytest -q tests/research tests/circuit/test_stim_adapter.py tests/canonical/test_resolution_policy.py tests/test_study_entrypoint.py",
+    "duration_seconds": 23.09
+  },
+  "environment": "Separate .git/research-interface-verify venv, editable checkout, installed HPC scientific dependencies via system-site-packages; actual Playwright Chromium.",
+  "limitations": [
+    "Tiny fixtures verify execution and semantics, not performance or published-curve agreement.",
+    "A network-clean dependency installation and other browser engines/screen readers were not executed.",
+    "Python performs authoritative Stim/DEM/kernel validation; browser validation is guidance.",
+    "The portable CSS input explicitly requires nonempty X and Z check families; source-specific procedures retain their original runner."
+  ]
+}
