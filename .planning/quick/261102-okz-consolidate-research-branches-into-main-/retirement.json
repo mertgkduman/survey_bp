@@ -1,0 +1,210 @@
+{
+  "published_main": "22f881f19d354f4f4f027f1ebb669915379d53e7",
+  "retired_remote_refs": [
+    {
+      "ref": "refs/heads/feat/bb72-fixture",
+      "commit": "10032c75a6f4afa4a75aa13d35ec81688da2e320"
+    },
+    {
+      "ref": "refs/heads/feat/fair-beam-relay-campaign",
+      "commit": "0460d0fb1368a168938bffe59237b38646d3e02a"
+    },
+    {
+      "ref": "refs/heads/feat/fair-damped-beam-relay",
+      "commit": "d76c0ee06993a5bc33512314b1d2bdb2a7135e9c"
+    },
+    {
+      "ref": "refs/heads/gsd/phase-01-evidence-registry-native-css",
+      "commit": "2407c50a7adbce4eda0ef64b4c328fe2e3e0585b"
+    },
+    {
+      "ref": "refs/heads/gsd/phase-10-correlated-quaternary-execution",
+      "commit": "53f13af93c0bf7ac41aecd0bf1af4abda68d445d"
+    },
+    {
+      "ref": "refs/heads/gsd/phase4-memory-integration-20260926",
+      "commit": "263501ecf894c6e51d46de1f4127ec5908961ff4"
+    },
+    {
+      "ref": "refs/heads/phase6-beam-search",
+      "commit": "d17c8e79c405656291bbdd22602cb291eb767079"
+    }
+  ],
+  "remote_branch_refs_after": [
+    "22f881f19d354f4f4f027f1ebb669915379d53e7\trefs/heads/main"
+  ],
+  "retired_local_refs": [
+    {
+      "ref": "refs/heads/feat/bb72-fixture",
+      "commit": "10032c75a6f4afa4a75aa13d35ec81688da2e320",
+      "integration": "patch_equivalent_and_archived"
+    },
+    {
+      "ref": "refs/heads/feat/fair-beam-relay-campaign",
+      "commit": "0460d0fb1368a168938bffe59237b38646d3e02a",
+      "integration": "ancestor"
+    },
+    {
+      "ref": "refs/heads/feat/fair-damped-beam-relay",
+      "commit": "d76c0ee06993a5bc33512314b1d2bdb2a7135e9c",
+      "integration": "ancestor"
+    },
+    {
+      "ref": "refs/heads/fix/phase5-source-semantics",
+      "commit": "3a5b1572a1e72d55f93a478935b7f602b5c5771d",
+      "integration": "patch_equivalent_and_archived"
+    },
+    {
+      "ref": "refs/heads/fix/relay-source-admission",
+      "commit": "c2075c8ce00991787578dd13bc8b292be7763ad0",
+      "integration": "patch_equivalent_and_archived"
+    },
+    {
+      "ref": "refs/heads/fix/schedule-c2v-audit",
+      "commit": "7d0619c056a1547b9c966ec9eee04d4d0621b6ca",
+      "integration": "patch_equivalent_and_archived"
+    },
+    {
+      "ref": "refs/heads/gsd/phase-01-evidence-registry-native-css",
+      "commit": "0398c702da092d7a3734704938fb8c9519519a63",
+      "integration": "ancestor"
+    },
+    {
+      "ref": "refs/heads/gsd/phase-10-correlated-quaternary-execution",
+      "commit": "a8b6052dfafade87660897744dfd496a580ddef2",
+      "integration": "ancestor"
+    },
+    {
+      "ref": "refs/heads/gsd/phase04-low-noise-ler",
+      "commit": "c94064ece55ffe9c09441c9ca8cbf0e3785844ff",
+      "integration": "ancestor"
+    },
+    {
+      "ref": "refs/heads/gsd/phase10-research",
+      "commit": "4256f25d5e2b5ba5faf3a585d5be5e5c4468ce59",
+      "integration": "ancestor"
+    },
+    {
+      "ref": "refs/heads/gsd/phase4-memory-integration-20260926",
+      "commit": "263501ecf894c6e51d46de1f4127ec5908961ff4",
+      "integration": "ancestor"
+    },
+    {
+      "ref": "refs/heads/gsd/phase7-plan03-osd",
+      "commit": "5401b11d1622163d8dd9fdab01054d0346a68ee7",
+      "integration": "ancestor"
+    },
+    {
+      "ref": "refs/heads/gsd/phase7-plan05-otf",
+      "commit": "07178d47350929c72102d3dfb1ba7aba58988c03",
+      "integration": "ancestor"
+    },
+    {
+      "ref": "refs/heads/integration/consolidate-main-20261102",
+      "commit": "8ec6d14bf247c0857bbb6224b32d1ab9dd15d321",
+      "integration": "ancestor"
+    },
+    {
+      "ref": "refs/heads/integration/fair-beam-relay-main",
+      "commit": "987663870476be8ccfd2dfded3ce2136a4a6fc54",
+      "integration": "ancestor"
+    },
+    {
+      "ref": "refs/heads/integration/verified-bp-comparison",
+      "commit": "306b9c9bb5e19ddf5201a0cb19eb6d9e932aed8b",
+      "integration": "ancestor"
+    },
+    {
+      "ref": "refs/heads/master",
+      "commit": "7a3c1a9d660fc2ba71bd6f09e62a4ac89c82ee7d",
+      "integration": "ancestor"
+    },
+    {
+      "ref": "refs/heads/phase6-beam-search",
+      "commit": "d17c8e79c405656291bbdd22602cb291eb767079",
+      "integration": "ancestor"
+    },
+    {
+      "ref": "refs/heads/worktree-agent-p10-01-1791339803",
+      "commit": "7db550ad5f6d51b3d3c5aeffb3fd7b9a39d8ae38",
+      "integration": "ancestor"
+    },
+    {
+      "ref": "refs/heads/worktree-agent-p18-1792177610",
+      "commit": "22801f424b3e3d831adf1443b8912362966c8fb3",
+      "integration": "ancestor"
+    }
+  ],
+  "worktrees_after": [
+    "worktree /hpc/group/pfisterlab/mg551/storage/survey_bp\nHEAD 22f881f19d354f4f4f027f1ebb669915379d53e7\nbranch refs/heads/main",
+    "worktree /hpc/group/pfisterlab/mg551/storage/survey_bp_low_noise_20260925\nHEAD c94064ece55ffe9c09441c9ca8cbf0e3785844ff\ndetached",
+    "worktree /hpc/group/pfisterlab/mg551/storage/survey_bp_memory_integration_20260926\nHEAD 263501ecf894c6e51d46de1f4127ec5908961ff4\ndetached",
+    "worktree /hpc/home/mg551/gsd-workspaces/fair-beam-relay-campaign/survey_bp\nHEAD 0460d0fb1368a168938bffe59237b38646d3e02a\ndetached"
+  ],
+  "removed_worktrees": [
+    {
+      "path": "/hpc/home/mg551/gsd-workspaces/bb72-fixture/survey_bp",
+      "commit": "10032c75a6f4afa4a75aa13d35ec81688da2e320",
+      "ignored_files_archived": 44,
+      "archive": "/hpc/group/pfisterlab/mg551/storage/survey_bp/.git/consolidation-backups/2026-11-02/removed-worktree-bb72-fixture.tar.gz",
+      "archive_sha256": "dd6b646f4ecc7559b26ab60ab83dc9609ea33d6df9b8fb9d8cacf46c0675164d"
+    },
+    {
+      "path": "/hpc/home/mg551/gsd-workspaces/fair-damped-beam-relay/survey_bp",
+      "commit": "d76c0ee06993a5bc33512314b1d2bdb2a7135e9c",
+      "ignored_files_archived": 138,
+      "archive": "/hpc/group/pfisterlab/mg551/storage/survey_bp/.git/consolidation-backups/2026-11-02/removed-worktree-fair-damped-beam-relay.tar.gz",
+      "archive_sha256": "5f4da25ea0d26e9c25c663b484476ef77ade7c06d6f7598c3441509bacbc78c1"
+    },
+    {
+      "path": "/hpc/home/mg551/gsd-workspaces/fix-phase5-semantics/survey_bp",
+      "commit": "3a5b1572a1e72d55f93a478935b7f602b5c5771d",
+      "ignored_files_archived": 62,
+      "archive": "/hpc/group/pfisterlab/mg551/storage/survey_bp/.git/consolidation-backups/2026-11-02/removed-worktree-fix-phase5-semantics.tar.gz",
+      "archive_sha256": "078c0f5e161d4f66811f3442e6a4b5f4b381aeb53959b7a6f6a32674d2bcf6ee"
+    },
+    {
+      "path": "/hpc/home/mg551/gsd-workspaces/fix-relay-admission/survey_bp",
+      "commit": "c2075c8ce00991787578dd13bc8b292be7763ad0",
+      "ignored_files_archived": 100,
+      "archive": "/hpc/group/pfisterlab/mg551/storage/survey_bp/.git/consolidation-backups/2026-11-02/removed-worktree-fix-relay-admission.tar.gz",
+      "archive_sha256": "966ded07d63b8a9d8e91c37d81bfa33cfa9b375d9f06b6af662dc64493709565"
+    },
+    {
+      "path": "/hpc/home/mg551/gsd-workspaces/fix-schedule-c2v/survey_bp",
+      "commit": "7d0619c056a1547b9c966ec9eee04d4d0621b6ca",
+      "ignored_files_archived": 52,
+      "archive": "/hpc/group/pfisterlab/mg551/storage/survey_bp/.git/consolidation-backups/2026-11-02/removed-worktree-fix-schedule-c2v.tar.gz",
+      "archive_sha256": "83f6eda62e6a82b29018c6fa82d60df6734b7fa6781d61497f28c7476d1cda66"
+    },
+    {
+      "path": "/hpc/home/mg551/gsd-workspaces/integration-fair-beam-relay-main/survey_bp",
+      "commit": "987663870476be8ccfd2dfded3ce2136a4a6fc54",
+      "ignored_files_archived": 130,
+      "archive": "/hpc/group/pfisterlab/mg551/storage/survey_bp/.git/consolidation-backups/2026-11-02/removed-worktree-integration-fair-beam-relay-main.tar.gz",
+      "archive_sha256": "72f4f7ba6215d19c21e8265b1970af72169509196fb82d5001ae379cc403f5da"
+    },
+    {
+      "path": "/hpc/home/mg551/gsd-workspaces/phase6-beam-search/survey_bp",
+      "commit": "d17c8e79c405656291bbdd22602cb291eb767079",
+      "ignored_files_archived": 37,
+      "archive": "/hpc/group/pfisterlab/mg551/storage/survey_bp/.git/consolidation-backups/2026-11-02/removed-worktree-phase6-beam-search.tar.gz",
+      "archive_sha256": "8d7c9648b521762f2318b6b2b7399f50eacfdeaf56f0b7b079101908c4f4e7a4"
+    },
+    {
+      "path": "/hpc/home/mg551/gsd-workspaces/verified-bp-comparison/survey_bp",
+      "commit": "306b9c9bb5e19ddf5201a0cb19eb6d9e932aed8b",
+      "ignored_files_archived": 103,
+      "archive": "/hpc/group/pfisterlab/mg551/storage/survey_bp/.git/consolidation-backups/2026-11-02/removed-worktree-verified-bp-comparison.tar.gz",
+      "archive_sha256": "634ce6437e6d11f153493e00a0912052d7b1a0a4e38ebf593c727e3206909d19"
+    },
+    {
+      "path": "/hpc/group/pfisterlab/mg551/storage/survey_bp_consolidation_20261102",
+      "commit": "8ec6d14bf247c0857bbb6224b32d1ab9dd15d321",
+      "ignored_files_archived": 374,
+      "archive": "/hpc/group/pfisterlab/mg551/storage/survey_bp/.git/consolidation-backups/2026-11-02/removed-worktree-consolidation.tar.gz",
+      "archive_sha256": "9bbb0abe09942d224403a81fca8e6b3d7d1bbdd43bfa87bdc03eee56a1163190"
+    }
+  ],
+  "pruned_missing_worktree": "/tmp/survey_bp-phase10-research"
+}

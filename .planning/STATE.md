@@ -6,9 +6,9 @@ current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
 stopped_at: Completed 11-16 and 11-20; eight Phase 11 gap plans remain open
-last_updated: "2026-10-24T22:43:04Z"
-last_activity: 2026-10-24
-last_activity_desc: Reconciled Phase 11 plan completion and open evidence gates
+last_updated: "2026-11-03T00:06:27Z"
+last_activity: 2026-11-02
+last_activity_desc: Consolidated and validated research history on main; archived and retired old branches
 state_head: 38682530ee7fc8f2fad6893389da26e688bcd6d8
 progress:
   total_phases: 14
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-10-24 — reconciled Phase 11 plan completion and open evidence gates
-Last Activity Description: Reconciled Phase 11 plan completion and open evidence gates
+Last activity: 2026-11-02 — consolidated research branches on main; 1,514 regression tests passed
+Last Activity Description: Consolidated and validated research history on main; preserved open scientific gates
 
 Progress: 8 of 14 phases complete (57%); 159 of 176 plans complete. Phase 11 has 17 of 25 plans complete; plan 17 is the first open number but depends on source reviews 18 and 19, while plan 20's blocked-target review is complete.
 
@@ -276,6 +276,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261102-okz | Consolidate research branches onto main and preserve recovery/evidence | 2026-11-02 | 22f881f | 1,514 passed, 1 skipped; main only; archived 28 original refs and retained three evidence worktrees | [261102-okz-consolidate-research-branches-into-main-](./quick/261102-okz-consolidate-research-branches-into-main-/) |
 | 261102-jnd | Add B1/C2 depolarizing plain BP/QBP and four-code comparison at T=100 | 2026-11-02 | b204164 | Verified 381,309 fresh paired samples; all 14 points and 28 arm estimates ≥100 failures | [261102-jnd-extend-plain-binary-bp-and-qbp-compariso](./quick/261102-jnd-extend-plain-binary-bp-and-qbp-compariso/) |
 | 261102-i0p | Add plain BP A5/B2 and plain QBP B1/C2 at T=100 | 2026-11-02 | a95a898 | Verified all 28 code/rate cells; 1,583,664 paired samples, all main arms ≥100 failures | [261102-i0p-add-missing-plain-bp-a5-b2-and-plain-qbp](./quick/261102-i0p-add-missing-plain-bp-a5-b2-and-plain-qbp/) |
 | 261029-vdb | Reproduce Yao non-OSD figures and tables with bounded source-linked runs | 2026-10-30 | 50d6371, 7eef1c5 | Verified development evidence; rare-event and imported BP-SI points remain unresolved | [261029-vdb-reproduce-remaining-non-bp-osd-yao-2312-](./quick/261029-vdb-reproduce-remaining-non-bp-osd-yao-2312-/) |
