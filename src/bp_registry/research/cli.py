@@ -6,6 +6,7 @@ import argparse
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import json
+import shutil
 from pathlib import Path
 import subprocess
 from typing import Any
@@ -42,6 +43,9 @@ def build_interface(repository: str | Path | None = None) -> dict[str, Any]:
     ):
         (destination / filename).write_text(
             json.dumps(data, indent=2, sort_keys=True, allow_nan=False) + "\n", encoding="utf-8")
+    policy_source = root / "research/catalog/policies.json"
+    if policy_source.is_file():
+        shutil.copyfile(policy_source, destination / "policies.json")
     return {"status": "built", "directory": str(destination),
             "papers": len(catalog.get("papers", [])),
             "experiments": len(catalog.get("experiments", [])),
@@ -105,7 +109,7 @@ def main(argv: list[str] | None = None) -> None:
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--no-build", action="store_true", help="use the checked-in static catalog")
     listing = actions.add_parser("list", help="list registered catalog entities")
-    listing.add_argument("entity", choices=("papers", "decoders", "codes", "circuits", "experiments", "datasets"))
+    listing.add_argument("entity", choices=("papers", "decoders", "codes", "circuits", "experiments", "datasets", "channels"))
     validate = actions.add_parser("validate", help="validate an experiment without sampling")
     validate.add_argument("spec", type=Path)
     export = actions.add_parser("export", help="create a portable new experiment ZIP")
@@ -114,6 +118,8 @@ def main(argv: list[str] | None = None) -> None:
     registered = actions.add_parser("export-registered", help="package an original registered ensure_study workflow")
     registered.add_argument("experiment_id")
     registered.add_argument("--output", type=Path, required=True)
+    imported = actions.add_parser("import-results", help="verify a generated result directory and add it to the repository catalog")
+    imported.add_argument("results", type=Path)
     run = actions.add_parser("run", help="execute a validated experiment into a new directory")
     run.add_argument("spec", type=Path)
     run.add_argument("--output", type=Path, required=True)
@@ -149,6 +155,9 @@ def main(argv: list[str] | None = None) -> None:
             from .export import export_registered_package
             target = export_registered_package(args.experiment_id, args.output, repository=root)
             result = {"status": "exported_registered_workflow", "path": str(target)}
+        elif args.action == "import-results":
+            from .results import persistent_import
+            result = {"status": "imported", "catalog_path": str(persistent_import(root, args.results))}
         else:
             from .runner import run_experiment
             result = run_experiment(read_spec(args.spec), output=args.output, repository=root)

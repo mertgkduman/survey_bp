@@ -21,7 +21,7 @@ from playwright.sync_api import sync_playwright
 def verify(repository: Path, base: str, output: Path) -> dict:
     output.mkdir(parents=True, exist_ok=False)
     report = {"schema": "research-interface-browser-verification-v1", "checks": [], "executed": [], "errors": []}
-    catalog = json.loads((repository / "web/research/catalog.json").read_text())
+    catalog = json.loads((repository / "web/research/v1/catalog.json").read_text())
 
     def run_package(zip_path: Path, label: str):
         package = output / label
@@ -230,7 +230,7 @@ def verify(repository: Path, base: str, output: Path) -> dict:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo", type=Path, default=Path(__file__).resolve().parents[2])
-    parser.add_argument("--url", default="http://127.0.0.1:8765/web/research/")
+    parser.add_argument("--url", default="http://127.0.0.1:8765/web/research/v1/")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     print(json.dumps(verify(args.repo.resolve(), args.url, args.output.resolve()), indent=2))

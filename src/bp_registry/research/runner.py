@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import csv
-from hashlib import sha256
+from hashlib import sha256, file_digest
 from importlib.metadata import PackageNotFoundError, version
 import json
 from pathlib import Path
@@ -28,6 +28,7 @@ from bp_registry.quaternary.problems import PauliCandidate, QuaternaryWorkingPro
 from bp_registry.quaternary.sampling import JointPauliChannel, sample_joint_pauli
 from bp_registry.resolution import BpFloodingPolicy
 
+from .evidence import timing_boundaries
 from .contracts import _repository_value, interface_contract, materialize_experiment, validate_experiment
 
 
@@ -62,6 +63,25 @@ def _append(records: list[dict[str, object]] | None, emit, record: dict[str, obj
         records.append(record)
     if emit is not None:
         emit(record)
+
+
+_STOP_FIELDS = ("stop_failures", "stop_type_i", "stop_type_ii")
+
+
+def _adaptive_sampling(sampling: Mapping[str, object]) -> bool:
+    return any(sampling.get(field) is not None for field in _STOP_FIELDS)
+
+
+def _stopping_reason(sampling: Mapping[str, object], *, failures: int, type_i: int,
+                     type_ii: int, circuit: bool = False) -> str | None:
+    """Return the first reached configured boundary in a stable public order."""
+    counters = {"stop_failures": failures, "stop_type_i": type_i, "stop_type_ii": type_ii}
+    fields = ("stop_failures",) if circuit else _STOP_FIELDS
+    for field in fields:
+        threshold = sampling.get(field)
+        if threshold is not None and counters[field] >= int(threshold):
+            return field
+    return None
 
 
 def _wilson(failures: int, n: int) -> tuple[float, float]:
@@ -120,6 +140,7 @@ def _binary_rows(spec: Mapping[str, object], code: CssCode, *, emit=None, collec
             "decoder_p0": p0, "decoder_prior_kind": "separate_bernoulli_components",
             "x_bernoulli_probability": prior, "z_bernoulli_probability": prior,
             "physical_channel": dict(channel)})
+        failures = type_i = type_ii = 0
         for offset in range(int(sampling["shots"])):
             shot_id = int(sampling["shot_start"]) + offset
             started = time.perf_counter()
@@ -130,6 +151,10 @@ def _binary_rows(spec: Mapping[str, object], code: CssCode, *, emit=None, collec
             decoded_at = time.perf_counter()
             truth = sample.hidden
             ev = evaluate_candidate(code, true_x=truth.x, true_z=truth.z, candidate_x=x.candidate, candidate_z=z.candidate)
+            failures += ev.outcome not in {"exact", "stabilizer_equivalent"}
+            type_i += ev.outcome == "invalid_syndrome"
+            type_ii += ev.outcome == "logical_failure"
+            stop_reason = _stopping_reason(sampling, failures=failures, type_i=type_i, type_ii=type_ii)
             _append(records, emit, {"kind": "shot", "family": "binary_css", "rate_index": point_index,
                 "p": point.get("physical_p"), "decoder_p0": p0, "shot_id": shot_id, "sample_identity": sample.sample_identity,
                 "physical_channel_identity": sample.ledger["channel_identity"], "physical_pauli_order": sample.ledger["pauli_order"],
@@ -142,7 +167,11 @@ def _binary_rows(spec: Mapping[str, object], code: CssCode, *, emit=None, collec
                             "candidate": sha256(_canonical({"sample": sample.sample_identity,
                                 "x": x.candidate.tolist(), "z": z.candidate.tolist()})).hexdigest()},
                 "iterations": {"x": x.iterations, "z": z.iterations}, "work_units": {"unit": "binary_component_sweeps", "x": x.iterations, "z": z.iterations},
-                "decode_seconds": decoded_at - sampled_at, "end_to_end_seconds": time.perf_counter() - started})
+                "decode_seconds": decoded_at - sampled_at, "end_to_end_seconds": time.perf_counter() - started,
+                "sampling_mode": "adaptive_stopping" if _adaptive_sampling(sampling) else "fixed_shots",
+                "sampling_stop_reason": stop_reason or ("shots_cap" if offset + 1 == int(sampling["shots"]) else None)})
+            if stop_reason is not None:
+                break
     return records or [], effective or {}
 
 
@@ -170,6 +199,7 @@ def _bp4_rows(spec: Mapping[str, object], code: CssCode, *, emit=None, collect: 
             "decoder_prior_pauli_order": "I,X,Y,Z",
             "decoder_prior_probabilities": [1 - p0, p0 / 3, p0 / 3, p0 / 3],
             "physical_channel": dict(channel)})
+        failures = type_i = type_ii = 0
         for offset in range(int(sampling["shots"])):
             shot_id = int(sampling["shot_start"]) + offset
             started = time.perf_counter()
@@ -191,6 +221,10 @@ def _bp4_rows(spec: Mapping[str, object], code: CssCode, *, emit=None, collect: 
                 "candidate": result.candidate.tolist()})).hexdigest()
             candidate = PauliCandidate(candidate_id, working, result.candidate, 0)
             ev = evaluate_pauli_candidate(candidate, hidden_truth=sample.hidden.paulis)
+            failures += ev.outcome not in {"exact", "stabilizer_equivalent"}
+            type_i += ev.outcome == "invalid_syndrome"
+            type_ii += ev.outcome == "logical_failure"
+            stop_reason = _stopping_reason(sampling, failures=failures, type_i=type_i, type_ii=type_ii)
             _append(records, emit, {"kind": "shot", "family": "bp4", "rate_index": point_index, "p": point.get("physical_p"), "decoder_p0": p0,
                 "shot_id": shot_id, "sample_identity": sample.sample_identity,
                 "physical_channel_identity": sample.ledger["channel_identity"], "physical_pauli_order": sample.ledger["pauli_order"], "candidate": result.candidate.tolist(), "outcome": ev.outcome,
@@ -200,7 +234,11 @@ def _bp4_rows(spec: Mapping[str, object], code: CssCode, *, emit=None, collect: 
                     "zero_syndrome_shortcut" if iterations == 0 else "first_valid",
                 "lineage": {"sample": sample.sample_identity, "original_problem": original.lineage_id,
                             "working_problem": working_id, "candidate": candidate_id},
-                "iterations": iterations, "work_units": {"unit": "bp4_joint_sweeps", "value": iterations, **extra}, "decode_seconds": decoded_at - sampled_at, "end_to_end_seconds": time.perf_counter() - started})
+                "iterations": iterations, "work_units": {"unit": "bp4_joint_sweeps", "value": iterations, **extra}, "decode_seconds": decoded_at - sampled_at, "end_to_end_seconds": time.perf_counter() - started,
+                "sampling_mode": "adaptive_stopping" if _adaptive_sampling(sampling) else "fixed_shots",
+                "sampling_stop_reason": stop_reason or ("shots_cap" if offset + 1 == int(sampling["shots"]) else None)})
+            if stop_reason is not None:
+                break
     return records or [], effective or {}
 
 
@@ -231,31 +269,46 @@ def _circuit_rows(spec: Mapping[str, object], repository: Mapping[str, object] |
     start, count = int(sampling["shot_start"]), int(sampling["shots"])
     detector, truth = circuit.compile_detector_sampler(seed=int(sampling["seed"])).sample(shots=start + count, separate_observables=True)
     detector, truth = detector[start:], truth[start:]
-    started = time.perf_counter()
-    prediction = sinter.predict_observables(dem=dem, dets=detector.astype(np.bool_), decoder="portable_canonical_bp", custom_decoders={"portable_canonical_bp": adapter})
-    predicted_at = time.perf_counter()
-    detailed_prediction, converged, iterations = adapter.compile_decoder_for_dem(dem=dem).decode_detailed(detector)
-    decoded_at = time.perf_counter()
-    if not np.array_equal(prediction, detailed_prediction.astype(bool)):
-        raise RuntimeError("Sinter custom-decoder predictions disagree with the detailed canonical adapter")
-    rows = [{"kind": "shot", "family": "circuit_dem_bp", "rate_index": 0, "p": None, "decoder_p0": None,
-             "setting_label": spec["rate_points"][0]["label"],
-             "shot_id": int(sampling["shot_start"]) + index, "detector_events": detector[index].astype(int).tolist(), "observable_truth": truth[index].astype(int).tolist(), "observable_prediction": prediction[index].astype(int).tolist(),
-             "detector_fit": bool(converged[index]), "observable_failure": bool(np.any(prediction[index] != truth[index])), "outcome": "observable_failure" if bool(np.any(prediction[index] != truth[index])) else "observable_success",
-             "termination_reason": "initial_candidate_fit" if int(iterations[index]) == 0 and converged[index] else "detector_fit" if converged[index] else "iteration_cap",
-             "converged": bool(converged[index]), "iterations": int(iterations[index]), "work_units": {"unit": "circuit_dem_bp_sweeps", "value": int(iterations[index])}, "decode_seconds": (predicted_at - started) / len(detector), "end_to_end_seconds": (decoded_at - started_all) / len(detector)}
-            for index in range(len(detector))]
-    batch_end_to_end = (time.perf_counter() - started_all) / len(rows)
-    for row in rows:
-        row["end_to_end_seconds"] = batch_end_to_end
-    if emit is not None:
-        for row in rows: emit(row)
+    # Predictions are intentionally invoked through Sinter one retained shot at
+    # a time.  This makes a failure threshold stop *decoding* rather than only
+    # truncating a precomputed batch.  The bounded Stim prefix is still drawn
+    # for a reproducible shot_start offset (Stim has no portable random access).
+    detailed = adapter.compile_decoder_for_dem(dem=dem)
+    rows: list[dict[str, object]] = []
+    failures = 0
+    for index in range(len(detector)):
+        shot_started = time.perf_counter()
+        one_detector = detector[index:index + 1]
+        prediction = sinter.predict_observables(dem=dem, dets=one_detector.astype(np.bool_), decoder="portable_canonical_bp", custom_decoders={"portable_canonical_bp": adapter})
+        predicted_at = time.perf_counter()
+        detailed_prediction, converged, iterations = detailed.decode_detailed(one_detector)
+        decoded_at = time.perf_counter()
+        if not np.array_equal(prediction, detailed_prediction.astype(bool)):
+            raise RuntimeError("Sinter custom-decoder predictions disagree with the detailed canonical adapter")
+        failure = bool(np.any(prediction[0] != truth[index]))
+        event_ended = time.perf_counter()
+        failures += failure
+        stop_reason = _stopping_reason(sampling, failures=failures, type_i=0, type_ii=0, circuit=True)
+        row = {"kind": "shot", "family": "circuit_dem_bp", "rate_index": 0, "p": None, "decoder_p0": None,
+               "setting_label": spec["rate_points"][0]["label"],
+               "shot_id": int(sampling["shot_start"]) + index, "detector_events": one_detector[0].astype(int).tolist(), "observable_truth": truth[index].astype(int).tolist(), "observable_prediction": prediction[0].astype(int).tolist(),
+               "detector_fit": bool(converged[0]), "observable_failure": failure, "outcome": "observable_failure" if failure else "observable_success",
+               "termination_reason": "initial_candidate_fit" if int(iterations[0]) == 0 and converged[0] else "detector_fit" if converged[0] else "iteration_cap",
+               "converged": bool(converged[0]), "iterations": int(iterations[0]), "work_units": {"unit": "circuit_dem_bp_sweeps", "value": int(iterations[0])}, "decode_seconds": predicted_at - shot_started, "end_to_end_seconds": event_ended - shot_started,
+               "sampling_mode": "adaptive_stopping" if _adaptive_sampling(sampling) else "fixed_shots",
+               "sampling_stop_reason": stop_reason or ("shots_cap" if index + 1 == len(detector) else None)}
+        rows.append(row)
+        if emit is not None:
+            emit(row)
+        if stop_reason is not None:
+            break
     numerics = REFERENCE_CPU_F64 if decoder["rule"] == "spa" else MIN_SUM_CPU_F64
     return rows, {"dem_sha256": sha256(str(dem).encode()).hexdigest(), "adapter": dict(decoder),
         "numerical_profile": {**numerics.as_evidence(), "backend": "cpu-numba-circuit-adapter", "exact_zero_decision": int(decoder["tie_break"] == "one")}, "sinter_prediction": True,
         "detectors": circuit.num_detectors, "observables": circuit.num_observables,
         "dem_projection": "independent_mechanisms; logical-only and detector-free faults follow the existing adapter bias/projection contract",
-        "observable_evaluation": "any declared observable prediction differs from sampled truth"}
+        "observable_evaluation": "any declared observable prediction differs from sampled truth",
+        "sampling_prefix_drawn": start + count}
 
 
 def _provenance(repository: Mapping[str, object] | object | None) -> dict[str, object]:
@@ -285,7 +338,7 @@ def _provenance(repository: Mapping[str, object] | object | None) -> dict[str, o
 
 def _summary_rows(event_path: Path, *, points: list[object], kind: str, sampling: Mapping[str, object], budgets: Mapping[str, object]) -> list[dict[str, object]]:
     """Aggregate the durable JSONL ledger in one pass without retaining shot rows."""
-    buckets = [{"n": 0, "failures": 0, "invalid": 0, "logical": 0, "exact": 0, "equivalent": 0, "iterations": 0.0, "decode_seconds": 0.0, "timed": 0, "converged": 0, "terminations": {}} for _ in points]
+    buckets = [{"n": 0, "failures": 0, "invalid": 0, "logical": 0, "exact": 0, "equivalent": 0, "iterations": 0.0, "decode_seconds": 0.0, "timed": 0, "converged": 0, "terminations": {}, "sampling_termination": None} for _ in points]
     with event_path.open(encoding="utf-8") as handle:
         for line in handle:
             row = json.loads(line); bucket = buckets[row["rate_index"]]
@@ -297,15 +350,18 @@ def _summary_rows(event_path: Path, *, points: list[object], kind: str, sampling
             bucket["converged"] += bool(row["converged"])
             reason = row["termination_reason"]
             bucket["terminations"][reason] = bucket["terminations"].get(reason, 0) + 1
+            if row.get("sampling_stop_reason") is not None:
+                bucket["sampling_termination"] = row["sampling_stop_reason"]
             iteration = row["iterations"]; bucket["iterations"] += sum(iteration.values()) if isinstance(iteration, dict) else iteration
             if row["decode_seconds"] is not None: bucket["decode_seconds"] += row["decode_seconds"]; bucket["timed"] += 1
     unit = {"css_code_capacity": "binary_component_sweeps", "pauli_code_capacity": "bp4_joint_sweeps", "circuit": "circuit_dem_bp_sweeps"}[kind]
     result = []
+    adaptive = _adaptive_sampling(sampling)
     for index, (point, bucket) in enumerate(zip(points, buckets, strict=True)):
         assert isinstance(point, Mapping)
         low, high = _wilson(bucket["failures"], bucket["n"])
         rate = bucket["failures"] / bucket["n"] if bucket["n"] else None
-        result.append({"rate_index": index, "p": point.get("physical_p"), "decoder_p0": point.get("decoder_p0"), "n": bucket["n"], "failures": bucket["failures"], "failure_rate": rate, "ler": rate if kind != "circuit" else None, "ci_low": low, "ci_high": high, "ci_method": "wilson_score_95", "ci_status": "zero_failures_upper_bound" if bucket["failures"] == 0 else "two_sided", "type_i": bucket["invalid"] if kind != "circuit" else None, "type_ii": bucket["logical"] if kind != "circuit" else None, "exact_successes": bucket["exact"] if kind != "circuit" else None, "stabilizer_equivalent_successes": bucket["equivalent"] if kind != "circuit" else None, "observable_successes": bucket["n"] - bucket["failures"] if kind == "circuit" else None, "converged_shots": bucket["converged"], "unconverged_shots": bucket["n"] - bucket["converged"], "convergence_rate": bucket["converged"] / bucket["n"] if bucket["n"] else None, "termination_reason_counts": bucket["terminations"], "mean_iterations": bucket["iterations"] / bucket["n"] if bucket["n"] else None, "work_unit": unit, "mean_decode_seconds": bucket["decode_seconds"] / bucket["timed"] if bucket["timed"] else None, "requested_shots_per_point": int(sampling["shots"]), "total_max_shots": int(budgets["max_shots"])})
+        result.append({"rate_index": index, "p": point.get("physical_p"), "decoder_p0": point.get("decoder_p0"), "n": bucket["n"], "failures": bucket["failures"], "failure_rate": rate, "ler": rate if kind != "circuit" else None, "ci_low": None if adaptive else low, "ci_high": None if adaptive else high, "ci_method": "unavailable_optional_stopping" if adaptive else "wilson_score_95", "ci_status": "not_reported_optional_stopping" if adaptive else ("zero_failures_upper_bound" if bucket["failures"] == 0 else "two_sided"), "sampling_mode": "adaptive_stopping" if adaptive else "fixed_shots", "sampling_termination_reason": bucket["sampling_termination"] or "shots_cap", "type_i": bucket["invalid"] if kind != "circuit" else None, "type_ii": bucket["logical"] if kind != "circuit" else None, "exact_successes": bucket["exact"] if kind != "circuit" else None, "stabilizer_equivalent_successes": bucket["equivalent"] if kind != "circuit" else None, "observable_successes": bucket["n"] - bucket["failures"] if kind == "circuit" else None, "converged_shots": bucket["converged"], "unconverged_shots": bucket["n"] - bucket["converged"], "convergence_rate": bucket["converged"] / bucket["n"] if bucket["n"] else None, "termination_reason_counts": bucket["terminations"], "mean_iterations": bucket["iterations"] / bucket["n"] if bucket["n"] else None, "work_unit": unit, "mean_decode_seconds": bucket["decode_seconds"] / bucket["timed"] if bucket["timed"] else None, "requested_shots_per_point": int(sampling["shots"]), "total_max_shots": int(budgets["max_shots"])})
         result[-1]["setting_label"] = point.get("label")
     return result
 
@@ -360,10 +416,8 @@ def run_experiment(spec: object, *, output: str | Path, repository: Mapping[str,
             input_identity = {"raw_sha256": sha256(str(text).encode()).hexdigest(), "semantic_sha256": effective["dem_sha256"], "dem_decompose_errors": False}
         rows = _summary_rows(event_path, points=normalized["rate_points"], kind=kind, sampling=normalized["sampling"], budgets=normalized["budgets"])
         summary: dict[str, object] = {"schema": "research-run-summary-v1", "experiment_id": experiment_id, "user_label": normalized["id"], "configuration_sha256": configuration_sha256, "input_identity": input_identity, "rows": rows,
-            "effective_configuration": effective, "timing_note": "decode wall time measures the first decoder invocation, includes lazy Numba JIT compilation when not warmed, and is batch-amortized for circuits; see timing_boundaries for setup and audit scope", "provenance": provenance,
-            "timing_boundaries": {"decode_seconds": "first Sinter prediction call, amortized over retained shots" if kind == "circuit" else "one decoder call (both X/Z component calls for binary), excluding graph construction and sampling",
-                "end_to_end_seconds": "parse/DEM/setup + bounded-prefix sampling + first Sinter prediction + second detailed audit decode + observable evaluation and event construction, batch-amortized; excludes file I/O" if kind == "circuit" else "per shot: sampling + decoder + independent recovery evaluation; excludes graph/code setup, file I/O, and run provenance hashing",
-                "audit_second_decode": kind == "circuit"}}
+            "effective_configuration": effective, "timing_note": "decode wall time measures decoder invocation, includes lazy Numba JIT compilation when not warmed; see timing_boundaries for exact per-shot setup and audit scope", "provenance": provenance,
+            "timing_boundaries": timing_boundaries(kind)}
         (destination / "effective-spec.json").write_bytes(_canonical({"schema": "research-effective-spec-v1",
             "experiment": normalized, "numerical_settings": effective, "input_identity": input_identity,
             "implementation_sha256": provenance["implementation_sha256"]}))
@@ -373,8 +427,16 @@ def run_experiment(spec: object, *, output: str | Path, repository: Mapping[str,
             writer.writeheader()
             writer.writerows({key: json.dumps(value, sort_keys=True) if isinstance(value, dict) else value for key, value in row.items()} for row in rows)
         (destination / "status.json").write_bytes(_canonical({"status": "completed", "experiment_id": experiment_id}))
-        hashes = {name: sha256((destination / name).read_bytes()).hexdigest() for name in ("run-manifest.json", "status.json", "requested-spec.json", "effective-spec.json", "events.jsonl", "summary.json", "summary.csv")}
+        hashes = {}
+        for name in ("run-manifest.json", "status.json", "requested-spec.json", "effective-spec.json", "events.jsonl", "summary.json", "summary.csv"):
+            with (destination / name).open("rb") as handle:
+                hashes[name] = file_digest(handle, "sha256").hexdigest()
         (destination / "result-manifest.json").write_bytes(_canonical({"schema": "research-result-manifest-v1", "experiment_id": experiment_id, "files": hashes}))
+        # Deliberately derived and read-only: it is not part of the input/result
+        # hash set, so a browser can validate the seven bound files first and
+        # then compare this convenience catalog entry semantically.
+        from .results import normalize_result_directory
+        (destination / "catalog-entry.json").write_bytes(_canonical(normalize_result_directory(destination)))
         return summary
     except BaseException as error:
         try:

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from hashlib import sha256
+from hashlib import sha256, file_digest
 import json
 from pathlib import Path
 from typing import Any
@@ -13,7 +13,7 @@ RUN_SCRIPT = '''"""Execute this package with the installed survey_bp implementat
 from __future__ import annotations
 import argparse
 from datetime import datetime, timezone
-from hashlib import sha256
+from hashlib import sha256, file_digest
 import json
 from pathlib import Path
 import sys
@@ -63,7 +63,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
-from hashlib import sha256
+from hashlib import sha256, file_digest
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -76,7 +76,9 @@ def main():
             candidate = (args.results / name).resolve()
             if not candidate.is_relative_to(args.results.resolve()) or candidate.is_symlink():
                 raise ValueError("invalid result manifest member")
-            if sha256(candidate.read_bytes()).hexdigest() != expected:
+            with candidate.open("rb") as handle:
+                actual_digest = file_digest(handle, "sha256").hexdigest()
+            if actual_digest != expected:
                 raise ValueError(f"Result file changed: {name}")
     payload = json.loads((args.results / "summary.json").read_text())
     rows = payload.get("rows", payload.get("points", payload.get("results", [])))
@@ -92,9 +94,11 @@ def main():
     if output.exists():
         raise FileExistsError(output)
     x = []
+    physical_axis = any(isinstance(row.get("p"), (int, float)) for row in rows)
+    prior_axis = not physical_axis and any(isinstance(row.get("decoder_p0"), (int, float)) for row in rows)
     for i, row in enumerate(rows):
         value = row.get("p", row.get("physical_error_rate"))
-        x.append(value if isinstance(value, (int, float)) else i)
+        x.append(value if isinstance(value, (int, float)) else row.get("decoder_p0") if prior_axis else i)
     y = [row.get("ler") if isinstance(row.get("ler"), (int, float)) else
          row.get("failure_rate", row.get("rate_estimate", 0)) for row in rows]
     fig, ax = plt.subplots(figsize=(7, 4))
@@ -114,9 +118,10 @@ def main():
             ax.plot(x[i], value, "o", color="#087e8b")
     if plotted and all(value > 0 for value in plotted):
         ax.set_yscale("log")
-    ax.set(xlabel="Physical error probability p (circuit: setting index)",
+    ax.set(xlabel="Physical error probability p" if physical_axis else "Decoder prior probability p0 (explicit physical channel)" if prior_axis else "Circuit setting index",
            ylabel="Measured block / observable failure probability")
-    ax.set_title("Measured results; open downward triangles show zero-failure interval upper limits", fontsize=9)
+    adaptive = any(row.get("sampling_mode") == "adaptive_stopping" for row in rows)
+    ax.set_title("Adaptive stopping: descriptive proportions; confidence intervals unavailable" if adaptive else "Measured results; open triangles show zero-failure interval upper limits", fontsize=9)
     ax.grid(alpha=.2)
     fig.tight_layout()
     fig.savefig(output, dpi=160)
@@ -177,7 +182,7 @@ configuration, summary, and analysis links for historical evidence.
 REGISTERED_RUN_SCRIPT = '''"""Execute the original registered study through ensure_study."""
 from __future__ import annotations
 import argparse
-from hashlib import sha256
+from hashlib import sha256, file_digest
 import json
 from pathlib import Path
 import sys
@@ -231,6 +236,12 @@ experiment schema. Editing them requires a new study identity.
 '''
 
 
+IMPORT_RECEIPT = {"schema": "research-import-receipt-v1",
+    "required_result_files": ["result-manifest.json", "run-manifest.json", "status.json", "requested-spec.json", "effective-spec.json", "events.jsonl", "summary.json", "summary.csv"],
+    "browser_validation": {"require_result_manifest": True, "verify_all_bound_sha256": True, "recompute_ledger_summary_counts": True, "derive_catalog_from_bound_results": True, "uploaded_catalog_entry": "ignored; regenerated from bound evidence", "naked_catalog_entry": "reject"},
+    "repository_persistence": {"command": "bp-registry-research import-results RESULT_DIRECTORY", "api": "bp_registry.research.results.persistent_import", "copies_raw_ledger": False}}
+
+
 def package_template() -> dict[str, Any]:
     """Return precisely the text assets used by Python and browser exporters."""
     return {
@@ -238,6 +249,7 @@ def package_template() -> dict[str, Any]:
         "files": {
             "run.py": RUN_SCRIPT,
             "analyse.py": ANALYSIS_SCRIPT,
+            "import-receipt.json": json.dumps(IMPORT_RECEIPT, indent=2, sort_keys=True) + "\n",
             "README.md": PACKAGE_README,
             "requirements.txt": (
                 "# First install survey_bp from its checkout, as described in README.md.\n"
@@ -284,6 +296,7 @@ def package_files(spec: dict[str, Any], *, repository: str | Path | None = None)
                 for name in item["license_paths"]:
                     files["inputs/" + Path(name).name] = (root / name).read_bytes()
                 break
+    files["import-receipt.json"] = _json(IMPORT_RECEIPT)
     files["package-manifest.json"] = _json({
         "schema": "research-package-manifest-v1",
         "files": {name: sha256(content).hexdigest() for name, content in sorted(files.items())},

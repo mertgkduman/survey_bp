@@ -18,6 +18,7 @@ import numpy as np
 from bp_registry.resolution import BpFloodingPolicy
 from bp_registry.css import CssCode
 from .inputs import input_registry
+from .evidence import timing_boundaries
 
 
 SCHEMA = "research-experiment-v1"
@@ -26,7 +27,11 @@ _RESOLUTION_SCOPES = ("scalar_edges", "all_messages", "all_state")
 _CIRCUIT_RULE_PROFILES = {"spa": "binary-spa-flooding-f64-v1", "min_sum": "binary-min-sum-flooding-f64-v1"}
 CLOSED_FIELDS = {
     "experiment": {"schema", "id", "problem", "channel", "decoder", "rate_points", "sampling", "budgets", "provenance"},
-    "sampling": {"seed", "shot_start", "shots"}, "budgets": {"max_shots", "max_iterations"},
+    # ``sampling`` is the frozen v1 wire shape.  The companion set is an
+    # opt-in extension: absent stopping keys stay absent after validation.
+    "sampling": {"seed", "shot_start", "shots"},
+    "sampling_with_stopping": {"seed", "shot_start", "shots", "stop_failures", "stop_type_i", "stop_type_ii"},
+    "budgets": {"max_shots", "max_iterations"},
     "provenance": {"relation", "source_spec_id", "notes"},
     "code_problem": {"kind", "code"}, "circuit_problem": {"kind", "circuit", "dem"},
     "registered_input": {"kind", "id"}, "inline_stim": {"kind", "text"},
@@ -68,6 +73,25 @@ def _positive_int(value: object, name: str, *, allow_zero: bool = False) -> int:
     if type(value) is not int or value < (0 if allow_zero else 1):
         raise ValueError(f"{name} must be a {'nonnegative' if allow_zero else 'positive'} integer")
     return value
+
+
+def _sampling(value: object) -> dict[str, Any]:
+    """Accept frozen v1 sampling or its explicitly opt-in stopping extension."""
+    if not isinstance(value, Mapping):
+        raise ValueError("sampling must be an object")
+    keys = set(value)
+    core = CLOSED_FIELDS["sampling"]
+    extended = CLOSED_FIELDS["sampling_with_stopping"]
+    if keys != core and not (core.issubset(keys) and keys.issubset(extended)):
+        raise ValueError(f"sampling must contain frozen v1 fields {sorted(core)}, with optional stopping fields")
+    result = dict(value)
+    result["seed"] = _positive_int(result["seed"], "sampling.seed", allow_zero=True)
+    result["shot_start"] = _positive_int(result["shot_start"], "sampling.shot_start", allow_zero=True)
+    result["shots"] = _positive_int(result["shots"], "sampling.shots")
+    for name in ("stop_failures", "stop_type_i", "stop_type_ii"):
+        if name in result and result[name] is not None:
+            result[name] = _positive_int(result[name], f"sampling.{name}")
+    return result
 
 
 def _policy(value: object, *, rule: str) -> dict[str, Any] | None:
@@ -207,6 +231,7 @@ def _rate_points(value: object, *, channel_kind: str, circuit: bool = False) -> 
 def interface_contract() -> dict[str, object]:
     """Machine-readable defaults, enums, and cross-field admission rules for UI clients."""
     return {
+        "timing_boundaries": {kind: timing_boundaries(kind) for kind in ("css_code_capacity", "pauli_code_capacity", "circuit")},
         "schema": SCHEMA,
         "field_sets": {name: sorted(fields) for name, fields in CLOSED_FIELDS.items()},
         "profiles": {"binary_css": ["binary-spa-flooding-f64-v1", "binary-spa-flooding-f64-v2"],
@@ -228,7 +253,7 @@ def interface_contract() -> dict[str, object]:
                      "bp4": {"rule": "sum_product", "numerical_profile": "quaternary-bp4-f64-v2", "schedule": "flooding", "stop_on_convergence": True},
                      "circuit": {"rule": "spa", "numerical_profile": "binary-spa-flooding-f64-v1", "schedule": "flooding", "max_iterations": 30, "tie_break": "zero"}},
         "ui_fields": {"physical_p": {"type": "number", "minimum": 0, "maximum": 1}, "decoder_p0": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
-                      "shots": {"type": "integer", "minimum": 1, "scope": "per_rate_point"}, "max_shots": {"type": "integer", "minimum": 1, "scope": "total_experiment", "constraint": "len(rate_points)*sampling.shots <= budgets.max_shots"}, "max_iterations": {"type": "integer", "minimum": 0, "scope": "per_attempt; Q-BPGD total sweeps cap"},
+                      "shots": {"type": "integer", "minimum": 1, "scope": "per_rate_point"}, "stop_failures": {"type": ["integer", "null"], "minimum": 1, "default": None, "scope": "per_rate_point", "effect": "adaptive_stop"}, "stop_type_i": {"type": ["integer", "null"], "minimum": 1, "default": None, "scope": "per_rate_point", "effect": "adaptive_stop", "families": ["binary_css", "bp4"]}, "stop_type_ii": {"type": ["integer", "null"], "minimum": 1, "default": None, "scope": "per_rate_point", "effect": "adaptive_stop", "families": ["binary_css", "bp4"]}, "max_shots": {"type": "integer", "minimum": 1, "scope": "total_experiment", "constraint": "len(rate_points)*sampling.shots <= budgets.max_shots"}, "max_iterations": {"type": "integer", "minimum": 0, "scope": "per_attempt; Q-BPGD total sweeps cap"},
                       "policy": {"version": "bp-flooding-policy-v1", "resolution_version": "bp-resolution-v1", "damping": {"minimum": 0, "exclusiveMaximum": 1}, "alpha": {"exclusiveMinimum": 0}, "beta": {"minimum": 0}}},
         "cross_rule_objects": [
             {"if": {"decoder.family": "circuit_dem_bp", "decoder.rule": rule}, "then": {"decoder.numerical_profile": profile}} for rule, profile in _CIRCUIT_RULE_PROFILES.items()
@@ -236,6 +261,9 @@ def interface_contract() -> dict[str, object]:
             {"if": {"decoder.variant": "qbpgd"}, "then": {"decoder.numerical_profile": "quaternary-bp4-f64-v2", "decoder.rule": "sum_product", "decoder.policy": None}},
             {"if": {"decoder.policy": "non_null"}, "then": {"decoder.numerical_profile": "*_v2", "decoder.policy.check_rule": "decoder.rule"}},
             {"if": {"problem.kind": "circuit"}, "then": {"channel.kind": "embedded_circuit", "rate_points.item": {"label": "string"}, "problem.dem.decompose_errors": False}},
+            {"if": {"problem.kind": "circuit", "sampling.stop_type_i": "non_null"}, "then": {"error": "circuit observable evaluation has no type-I outcome"}},
+            {"if": {"problem.kind": "circuit", "sampling.stop_type_ii": "non_null"}, "then": {"error": "circuit observable evaluation has no type-II outcome"}},
+            {"if": {"sampling.stop_failures|sampling.stop_type_i|sampling.stop_type_ii": "non_null"}, "then": {"sampling_mode": "adaptive_stopping", "ci_method": "unavailable_optional_stopping"}},
         ],
         "cross_rules": [
             "custom binary and BP4 execute flooding only; schedules and interventions outside this contract are rejected",
@@ -300,10 +328,7 @@ def validate_experiment(spec: object, *, repository: Mapping[str, object] | str 
     if kind == "pauli_code_capacity" and decoder["family"] != "bp4":
         raise ValueError("Pauli code-capacity needs decoder.family=bp4")
     rates = _rate_points(root["rate_points"], channel_kind=channel["kind"], circuit=kind == "circuit")
-    sampling = _object(root["sampling"], "sampling", keys=CLOSED_FIELDS["sampling"])
-    sampling["seed"] = _positive_int(sampling["seed"], "sampling.seed", allow_zero=True)
-    sampling["shot_start"] = _positive_int(sampling["shot_start"], "sampling.shot_start", allow_zero=True)
-    sampling["shots"] = _positive_int(sampling["shots"], "sampling.shots")
+    sampling = _sampling(root["sampling"])
     budgets = _object(root["budgets"], "budgets", keys=CLOSED_FIELDS["budgets"])
     budgets["max_shots"] = _positive_int(budgets["max_shots"], "budgets.max_shots")
     budgets["max_iterations"] = _positive_int(budgets["max_iterations"], "budgets.max_iterations", allow_zero=True)
@@ -315,6 +340,8 @@ def validate_experiment(spec: object, *, repository: Mapping[str, object] | str 
         raise ValueError("decoder.max_iterations exceeds budgets.max_iterations")
     if kind == "circuit" and sampling["shot_start"] + sampling["shots"] > budgets["max_shots"]:
         raise ValueError("circuit shot_start requires replay/discard and exceeds the total max_shots cap")
+    if kind == "circuit" and any(sampling.get(field) is not None for field in ("stop_type_i", "stop_type_ii")):
+        raise ValueError("circuit observable evaluation does not define type-I/type-II stopping")
     if decoder.get("variant") == "qbpgd":
         qbpgd = decoder["qbpgd"]
         assert isinstance(qbpgd, Mapping)

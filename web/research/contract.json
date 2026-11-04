@@ -62,6 +62,33 @@
           "label": "string"
         }
       }
+    },
+    {
+      "if": {
+        "problem.kind": "circuit",
+        "sampling.stop_type_i": "non_null"
+      },
+      "then": {
+        "error": "circuit observable evaluation has no type-I outcome"
+      }
+    },
+    {
+      "if": {
+        "problem.kind": "circuit",
+        "sampling.stop_type_ii": "non_null"
+      },
+      "then": {
+        "error": "circuit observable evaluation has no type-II outcome"
+      }
+    },
+    {
+      "if": {
+        "sampling.stop_failures|sampling.stop_type_i|sampling.stop_type_ii": "non_null"
+      },
+      "then": {
+        "ci_method": "unavailable_optional_stopping",
+        "sampling_mode": "adaptive_stopping"
+      }
     }
   ],
   "cross_rules": [
@@ -213,6 +240,14 @@
       "seed",
       "shot_start",
       "shots"
+    ],
+    "sampling_with_stopping": [
+      "seed",
+      "shot_start",
+      "shots",
+      "stop_failures",
+      "stop_type_i",
+      "stop_type_ii"
     ]
   },
   "profiles": {
@@ -296,6 +331,23 @@
     ]
   },
   "schema": "research-experiment-v1",
+  "timing_boundaries": {
+    "circuit": {
+      "audit_second_decode": true,
+      "decode_seconds": "per retained shot: Sinter prediction call only; excludes detector-prefix sampling, detailed audit decode, observable comparison, and file I/O",
+      "end_to_end_seconds": "per retained shot: Sinter prediction + detailed canonical audit decode + observable comparison and event construction; excludes parse/DEM/setup, bounded-prefix sampling, and file I/O"
+    },
+    "css_code_capacity": {
+      "audit_second_decode": false,
+      "decode_seconds": "one decoder call (both X/Z component calls for binary), excluding graph construction and sampling",
+      "end_to_end_seconds": "per shot: sampling + decoder + independent recovery evaluation; excludes graph/code setup, file I/O, and run provenance hashing"
+    },
+    "pauli_code_capacity": {
+      "audit_second_decode": false,
+      "decode_seconds": "one decoder call (both X/Z component calls for binary), excluding graph construction and sampling",
+      "end_to_end_seconds": "per shot: sampling + decoder + independent recovery evaluation; excludes graph/code setup, file I/O, and run provenance hashing"
+    }
+  },
   "ui_fields": {
     "decoder_p0": {
       "exclusiveMaximum": 1,
@@ -336,6 +388,44 @@
       "minimum": 1,
       "scope": "per_rate_point",
       "type": "integer"
+    },
+    "stop_failures": {
+      "default": null,
+      "effect": "adaptive_stop",
+      "minimum": 1,
+      "scope": "per_rate_point",
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "stop_type_i": {
+      "default": null,
+      "effect": "adaptive_stop",
+      "families": [
+        "binary_css",
+        "bp4"
+      ],
+      "minimum": 1,
+      "scope": "per_rate_point",
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "stop_type_ii": {
+      "default": null,
+      "effect": "adaptive_stop",
+      "families": [
+        "binary_css",
+        "bp4"
+      ],
+      "minimum": 1,
+      "scope": "per_rate_point",
+      "type": [
+        "integer",
+        "null"
+      ]
     }
   },
   "unsupported_registered_codes": {

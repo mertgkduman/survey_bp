@@ -84,8 +84,19 @@
         "type": "object",
         "required": [
           "circuit_id",
-          "label",
-          "asset"
+          "label"
+        ],
+        "anyOf": [
+          {
+            "required": [
+              "asset"
+            ]
+          },
+          {
+            "required": [
+              "input_sha256"
+            ]
+          }
         ]
       }
     },

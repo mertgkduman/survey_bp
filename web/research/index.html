@@ -1,103 +1,127 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="An inspectable catalog and portable experiment builder for BP decoder research." />
-    <title>BP Research Registry</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <a class="skip-link" href="#main-content">Skip to content</a>
-    <div class="app-shell">
-      <aside class="sidebar" aria-label="Primary navigation">
-        <div class="brand">
-          <span class="brand-mark" aria-hidden="true">BP</span>
-          <div><strong>Research Registry</strong><small>QLDPC decoding workbench</small></div>
-        </div>
-        <nav class="nav-list" aria-label="Research interface sections">
-          <a href="#papers" data-nav="papers">Papers</a>
-          <a href="#results" data-nav="results">Results</a>
-          <a href="#builder" data-nav="builder">Experiment builder</a>
-          <a href="#circuits" data-nav="circuits">Circuits</a>
-          <a href="#getting-started" data-nav="getting-started">Getting started</a>
-        </nav>
-        <div class="sidebar-note"><span class="status-dot" aria-hidden="true"></span><span id="catalog-status">Loading catalog…</span></div>
-      </aside>
-
-      <main id="main-content" class="main-content" tabindex="-1">
-        <header class="topbar">
-          <div><p class="eyebrow">Policy-based BP research platform</p><h1>Evidence, specifications, and local experiments</h1></div>
-          <button id="refresh-catalog" class="button button-quiet" type="button">Refresh catalog</button>
-        </header>
-
-        <section id="overview" class="intro-card" aria-labelledby="overview-heading">
-          <div><p class="eyebrow">Research workbench</p><h2 id="overview-heading">Compare what was measured. Export what you can reproduce.</h2><p>Results remain attached to their retained evidence and status. Packages are downloaded for local execution; this browser never runs a simulation.</p></div>
-          <dl class="overview-stats" aria-label="Catalog summary"><div><dt id="stat-papers">—</dt><dd>Papers</dd></div><div><dt id="stat-studies">—</dt><dd>Studies</dd></div><div><dt id="stat-results">—</dt><dd>Result series</dd></div></dl>
-        </section>
-
-        <section id="papers" class="panel" aria-labelledby="papers-heading">
-          <div class="section-heading"><div><p class="eyebrow">Literature and local studies</p><h2 id="papers-heading">Papers</h2></div><p id="paper-count" class="muted" aria-live="polite"></p></div>
-          <div class="filters" role="search">
-            <label>Find a paper or study<input id="paper-search" type="search" autocomplete="off" placeholder="Title, author, decoder, code…" /></label>
-            <label>Evidence state<select id="paper-status"><option value="">All states</option></select></label>
-            <label>Regime<select id="paper-regime"><option value="">All regimes</option></select></label>
-          </div>
-          <div id="paper-list" class="paper-list" aria-live="polite"></div>
-        </section>
-
-        <section id="results" class="panel" aria-labelledby="results-heading">
-          <div class="section-heading"><div><p class="eyebrow">Retained, catalog-backed observations</p><h2 id="results-heading">Results</h2></div><button id="export-visible-results" class="button button-quiet" type="button" disabled>Export visible table</button></div>
-          <div class="filters result-filters" aria-label="Exact result selection">
-            <label>Paper<select id="result-paper"><option value="">All catalog papers</option></select></label>
-            <label>Experiment<select id="result-experiment"><option value="">All experiments</option></select></label>
-            <label>Dataset<select id="result-dataset"><option value="">All datasets</option></select></label>
-            <label>Code<select id="result-code"><option value="">All codes</option></select></label>
-            <label>Decoder<select id="result-decoder"><option value="">All decoders</option></select></label>
-          </div>
-          <div id="selection-details" class="selection-details" aria-live="polite"></div>
-          <div class="result-toolbar">
-            <fieldset><legend>Show series</legend><div id="series-legend" class="legend" aria-live="polite"></div></fieldset>
-            <label class="metric-control">Metric<select id="metric-select" disabled></select></label>
-          </div>
-          <figure class="plot-frame"><div id="plot-description" class="sr-only" aria-live="polite"></div><svg id="result-plot" role="group" aria-labelledby="plot-title plot-description" viewBox="0 0 840 380" preserveAspectRatio="xMidYMid meet"><title id="plot-title">Catalog result plot</title></svg><figcaption id="plot-caption">Select a series to inspect retained observations.</figcaption></figure>
-          <div class="table-wrap" tabindex="0"><table id="result-table"><caption class="sr-only">Visible result observations</caption><thead><tr><th scope="col">Series</th><th scope="col">Noise</th><th scope="col">Metric</th><th scope="col">Observed value</th><th scope="col">Samples</th><th scope="col">Failures</th><th scope="col">Type I / II</th><th scope="col">CI</th><th scope="col">Work</th><th scope="col">Time</th><th scope="col">Evidence</th><th scope="col">Availability</th></tr></thead><tbody></tbody></table></div>
-        </section>
-
-        <section id="builder" class="panel builder-panel" aria-labelledby="builder-heading">
-          <div class="section-heading"><div><p class="eyebrow">Portable local execution</p><h2 id="builder-heading">Experiment builder</h2></div><p class="muted">Validated in the browser for guidance; Python is authoritative at run time.</p></div>
-          <div class="builder-layout">
-            <form id="experiment-form" novalidate aria-describedby="form-summary">
-              <p id="form-summary" class="form-summary" role="status" aria-live="polite">Load the catalog to see supported combinations and defaults.</p>
-              <div id="form-fields" class="form-fields"></div>
-              <div class="form-actions"><button id="validate-experiment" class="button button-quiet" type="button">Validate specification</button><button id="download-package" class="button" type="button" disabled>Download local package (.zip)</button></div>
-            </form>
-            <aside class="spec-preview" aria-labelledby="spec-heading"><div class="preview-heading"><h3 id="spec-heading">Exact specification</h3><button id="copy-spec" class="text-button" type="button">Copy JSON</button></div><pre id="spec-output" tabindex="0">{}</pre></aside>
-          </div>
-          <details class="custom-config"><summary>Use custom experiment JSON</summary><label for="custom-json">Custom JSON is checked against the shared contract before it is exported.</label><textarea id="custom-json" rows="13" spellcheck="false" aria-describedby="custom-json-feedback"></textarea><p id="custom-json-feedback" class="field-feedback" aria-live="polite"></p><button id="apply-custom-json" class="button button-quiet" type="button">Apply custom JSON</button></details>
-        </section>
-
-        <section id="circuits" class="panel" aria-labelledby="circuits-heading">
-          <div class="section-heading"><div><p class="eyebrow">Circuit integration</p><h2 id="circuits-heading">Stim workflow</h2></div></div>
-          <div class="circuit-grid"><div><h3>Supported local adapter</h3><p>Choose a cataloged Stim circuit, then export a package for local execution. The qualified adapter accepts independent-fault detector models using flooding SPA or min-sum with the float64 v1 numerical profile.</p><ul><li>Detector and logical-observable semantics remain separate from CSS/Pauli recovery.</li><li>Damping, alternate resolution, and Relay policies are not circuit-adapter options.</li><li>Local execution records a ledger and reports unavailable metrics explicitly.</li></ul></div><div class="circuit-action"><label>Cataloged circuit<select id="circuit-select"><option value="">No circuit records loaded</option></select></label><button id="use-circuit" class="button button-quiet" type="button" disabled>Use in builder</button><label>Or import a local Stim file<input id="circuit-file" type="file" accept=".stim,text/plain" /></label><p id="circuit-note" class="field-feedback" aria-live="polite"></p></div></div>
-        </section>
-
-        <section id="getting-started" class="panel getting-started" aria-labelledby="getting-started-heading">
-          <p class="eyebrow">Local-first workflow</p><h2 id="getting-started-heading">Getting started</h2>
-          <ol><li>Browse cataloged papers, studies, evidence labels, and available result series.</li><li>Inspect or adapt an exact specification; unsupported combinations stay visible as validation errors.</li><li>Download the package, install this repository’s declared Python environment, and run <code>python run.py</code> locally.</li><li>Keep the generated ledger, result summary, and copied specification together for review.</li></ol>
-          <pre class="command-example"><code>git clone git@github.com:mertgkduman/survey_bp.git
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="View BP-based QLDPC experiment results, reproduce them locally, and build new comparisons.">
+<title>BP-based QLDPC decoding workbench · v2</title>
+<link rel="stylesheet" href="vendor/katex/katex.min.css"><link rel="stylesheet" href="style.css">
+<script defer src="vendor/katex/katex.min.js"></script><script defer src="zip.js"></script><script defer src="contract-ui.js"></script><script defer src="result-import.js"></script><script defer src="app.js"></script>
+</head>
+<body>
+<a class="skip" href="#main-content">Skip to content</a>
+<div class="shell">
+<aside class="sidebar">
+<a class="brand" href="#getting-started"><span class="logo">BP</span><span>Research workbench<small>BP-based QLDPC decoding workbench</small></span></a>
+<nav aria-label="Main navigation">
+<a href="#getting-started" data-nav="getting-started">Getting started</a>
+<a href="#results" data-nav="results">Available experiment results</a>
+<a href="#builder" data-nav="builder">Experiment builder</a>
+<a href="#recommendations" data-nav="recommendations">Version difference and Recommendations</a>
+<a href="#policies" data-nav="policies">Policies</a>
+</nav>
+<div class="sidebar-foot"><span id="catalog-status" role="status">Loading results…</span><a href="v1/">Archived v1 ↗</a></div>
+</aside>
+<main id="main-content" tabindex="-1">
+<header class="page-header"><p class="eyebrow">Research platform for BP-based QLDPC decoders</p><h1>Experiments across codes, circuits, decoder policies, and parameter tuning</h1><span class="version">v2</span></header>
+<p id="global-error" class="error" role="alert" hidden></p>
+<section id="getting-started" class="page" aria-labelledby="getting-heading">
+<p class="eyebrow">Workflow</p><h2 id="getting-heading">Getting started</h2>
+<p class="lead">View results here. Reproduce them or run a new experiment on your machine.</p>
+<div class="workflow">
+<article class="step"><span class="step-number">1</span><div><h3>Browse available experiment results, supported policies, and saved decoders.</h3><p><a href="#results">Open results</a> to compare curves, or <a href="#policies">inspect policy equations</a>.</p><pre><code># In an existing checkout, list registered results and decoder specifications.
+bp-registry-research list datasets
+bp-registry-research list decoders</code></pre></div></article>
+<article class="step"><span class="step-number">2</span><div><h3>Inspect or adapt an exact BP-based decoder specification. Choose a code or circuit.</h3><p>Start from a saved specification in the <a href="#builder">experiment builder</a>. Unsupported combinations remain visible as validation errors.</p><pre><code># After downloading experiment.json, keep it in a new experiment directory.
+# Once step 3 is installed, validate this exact file before running.
+/path/to/survey_bp/.venv/bin/bp-registry-research validate ./experiment.json</code></pre></div></article>
+<article class="step"><span class="step-number">3</span><div><h3>Clone and install the repository. Download the experiment package or JSON file. Run the generated experiment.</h3><pre><code>git clone git@github.com:mertgkduman/survey_bp.git
 cd survey_bp
 python3.12 -m venv .venv
 .venv/bin/python -m pip install -e '.[performance,circuit,analysis]'
-.venv/bin/python -m bp_registry.research.cli serve --port 8765
-# Open http://127.0.0.1:8765/web/research/
-# In the downloaded package, using this same environment:
-/path/to/survey_bp/.venv/bin/python run.py --repo /path/to/survey_bp --output ./results/run-001</code></pre>
-          <p class="notice">A curve on this page is a retained catalog observation, not a new performance claim. Missing raw data is marked unavailable rather than linked speculatively.</p>
-        </section>
-      </main>
-    </div>
-    <noscript><p class="noscript">This catalog requires JavaScript to load local catalog records and prepare portable packages.</p></noscript>
-    <script src="zip.js"></script><script src="app.js"></script>
-  </body>
-</html>
+# Open the workbench locally.
+.venv/bin/python -m bp_registry.research.cli serve --port 8765</code></pre><details><summary>Where to put the download and how to run it</summary><pre><code># Keep downloaded experiments outside the source checkout, each in its own folder.
+mkdir -p ~/bp-experiments/run-001
+cd ~/bp-experiments/run-001
+# Move the downloaded ZIP here, then extract its contents into this folder.
+# Replace the filename with the ZIP you downloaded.
+unzip ~/Downloads/my-bp-experiment.zip
+# Replace /path/to/survey_bp with the absolute path of your checkout.
+/path/to/survey_bp/.venv/bin/python run.py --repo /path/to/survey_bp --validate-only
+/path/to/survey_bp/.venv/bin/python run.py --repo /path/to/survey_bp --output ./results
+/path/to/survey_bp/.venv/bin/python analyse.py ./results
+# If you downloaded only experiment.json, the CLI runs that same specification.
+/path/to/survey_bp/.venv/bin/bp-registry-research run ./experiment.json --output ./results-json</code></pre></details></div></article>
+<article class="step"><span class="step-number">4</span><div><h3>Upload the generated results to add them to the results database.</h3><p>Select the output files together below. Validated results are saved in this browser and appear in Available experiment results. To share them through the repository, use the import command.</p><label class="upload">Generated result files<input id="upload-results" type="file" multiple accept=".json,.jsonl,.csv"></label><p id="upload-feedback" role="status"></p><pre><code># Use the results directory produced in step 3. This adds a catalog entry;
+# raw ledgers stay at their original storage location.
+/path/to/survey_bp/.venv/bin/bp-registry-research import-results ./results
+# Rebuild the shared result index and refresh the browser.
+cd /path/to/survey_bp
+.venv/bin/python -m bp_registry.research.cli build</code></pre></div></article>
+</div>
+</section>
+<section id="results" class="page" aria-labelledby="results-heading" hidden>
+<div class="section-head"><div><h2 id="results-heading">Available experiment results</h2><p>Results measured with this package. Each saved decoder keeps its exact run settings.</p></div><button id="add-plot" type="button">+ Add plot</button></div>
+<div class="results-layout"><div id="plot-grid" class="plot-grid"></div><aside id="availability" class="availability" aria-label="Available policies and codes"></aside></div>
+</section>
+<section id="builder" class="page" aria-labelledby="builder-heading" hidden>
+<h2 id="builder-heading">Experiment builder</h2>
+<form id="builder-form">
+<div class="builder-top"><label>Experiment label<input id="build-id" value="my-bp-experiment" required></label><label>Start from a saved specification<select id="build-preset"></select></label></div>
+<p id="saved-note" class="muted">A new configuration creates a new experiment identity.</p>
+<div class="builder-columns">
+<fieldset><legend>Decoder builder</legend><div class="fields">
+<label>Use for<select id="build-regime"><option value="code">Code</option><option value="circuit">Circuit</option></select></label>
+<label>Decoder<select id="build-family"><option value="binary_css">Binary BP</option><option value="bp4">BP4 · joint Pauli</option></select></label>
+<label>Policy<select id="build-variant"><option value="plain">Plain BP with optional damping / scaling</option><option value="qbpgd">Guided decimation · Q-BPGD</option></select></label>
+<label>Check update<select id="build-rule"><option value="sum_product">Sum-product</option><option value="min_sum">Min-sum</option></select></label>
+<label>Maximum iterations<input id="build-iterations" type="number" min="1" value="100"></label>
+<label>Numerical profile<select id="build-version"><option value="v2">Canonical float64 v2</option><option value="v1">Historical float64 v1</option></select></label>
+</div><details id="numerical-controls"><summary>Damping, scaling, and precision</summary><div class="fields">
+<label>Damping d · old-message weight<input id="build-damping" type="number" min="0" max="0.999" step="0.05" value="0.1"></label>
+<label>Message resolution<select id="build-format"><option>float64</option><option>float32</option><option>float16</option><option>int8</option><option>int16</option><option>int32</option></select></label>
+<label>Fixed-point scale s<input id="build-scale" type="number" min="1" value="16"></label>
+<label>Quantize<select id="build-scope"><option value="scalar_edges">Scalar edge messages</option><option value="all_messages">All messages</option><option value="all_state">Messages and beliefs</option></select></label>
+<label>Coefficients<select id="build-coefficients"><option value="float64">float64</option><option value="same">Same resolution as messages</option></select></label>
+<label>MS scale α<input id="build-alpha" type="number" min="0.001" step="0.1" value="1"></label>
+<label>MS offset β<input id="build-beta" type="number" min="0" step="0.05" value="0"></label>
+<label>BP4 hard decision<select id="build-hard"><option value="strict_pauli">Strict Pauli ladder</option><option value="min_llr">Minimum LLR</option></select></label>
+<label>Zero-syndrome shortcut<select id="build-shortcut"><option value="false">Complete at least one sweep</option><option value="true">Allow zero-syndrome shortcut</option></select></label>
+<label>Stopping<select id="build-stop"><option value="true">First syndrome-matching candidate</option><option value="false">Complete iteration cap · BP4 only</option></select></label>
+</div></details>
+<details id="decimation-controls" hidden><summary>Guided-decimation budget</summary><div class="fields"><label>Sweeps per round<input id="build-per-round" type="number" min="1" value="10"></label><label>Maximum rounds<input id="build-rounds" type="number" min="1" value="2"></label><label>Fixation ε<input id="build-epsilon" type="number" min="0" step="any" value="0.0000000001"></label></div></details>
+<p id="decoder-help" class="muted small"></p>
+</fieldset>
+<fieldset><legend id="input-legend">Code</legend>
+<div id="code-input"><label>Code / check representation<select id="build-code"></select></label><p class="muted small">A code may have different parity-check representations. The selected matrices, row order, and logical basis identify this input.</p><details id="matrix-input"><summary>Parity check matrix</summary><label>CSS matrices · JSON<textarea id="build-matrix" rows="9" spellcheck="false">{"hx":[[1,1,0]],"hz":[[0,0,1]],"lx":[[1,0,0]],"lz":[[1,1,0]]}</textarea></label><label>Or load a CSS matrix file<input id="matrix-file" type="file" accept=".json"></label><p class="small muted">Use binary hx / hz with the same width, commuting over GF(2). Supply both lx / lz or neither. <a href="../../docs/research-interface.md#custom-css-input" target="_blank">Input format ↗</a></p></details></div>
+<div id="circuit-input" hidden><label>Circuit<select id="build-circuit"></select></label><label>Stim circuit text<textarea id="build-stim" rows="12" spellcheck="false">R 0
+X_ERROR(0.1) 0
+M 0
+DETECTOR rec[-1]
+OBSERVABLE_INCLUDE(0) rec[-1]</textarea></label><label>Or upload .stim<input id="stim-file" type="file" accept=".stim"></label><p class="muted small">Noise is embedded in the circuit. The supported adapter uses plain flooding SPA / MS and its historical float64 safeguards.</p></div>
+</fieldset>
+</div>
+<fieldset class="simulation"><legend>Simulation settings</legend><div class="fields">
+<label id="channel-label">Noise model<select id="build-channel"><option value="depolarizing">Depolarizing</option><option value="x_only">X-only</option></select></label>
+<label id="rate-label">Physical p · comma-separated sweep<input id="build-rates" value="0.06"></label>
+<label id="prior-label">Decoder prior p₀<input id="build-prior" placeholder="Matched to p; or enter a fixed p₀"></label>
+<label>Shots per point · maximum<input id="build-shots" type="number" min="1" value="1000"></label>
+<label>Total shot budget<input id="build-maxshots" type="number" min="1" value="1000"></label>
+<label>Stop at total failures · per point<input id="build-failures" type="number" min="1" placeholder="No failure target"></label>
+<label>Stop at Type I failures · per point<input id="build-type-i" type="number" min="1" placeholder="No target"></label>
+<label>Stop at Type II failures · per point<input id="build-type-ii" type="number" min="1" placeholder="No target"></label>
+<label>Random seed<input id="build-seed" type="number" min="0" value="7"></label>
+<label>First shot index<input id="build-start" type="number" min="0" value="0"></label>
+</div><p class="small muted">The first failure target or shot cap reached stops each rate point. Type I: syndrome-inconsistent correction. Type II: syndrome-consistent logical failure. Circuits use observable failures instead.</p></fieldset>
+<p id="builder-feedback" role="status" aria-live="polite"></p>
+<div class="actions"><button id="validate-spec" type="button">Validate configuration</button><button id="download-package" type="button" disabled>Download experiment package</button><button id="download-json" class="secondary" type="button" disabled>Download JSON</button></div>
+<details><summary>Exact configuration / custom JSON</summary><pre id="spec-preview" tabindex="0"></pre><label>Import a complete specification<textarea id="custom-spec" rows="8" spellcheck="false"></textarea></label><div class="actions"><button id="apply-spec" type="button" class="secondary">Use this JSON</button><button id="reset-spec" type="button" class="secondary">Return to visual builder</button></div></details>
+</form>
+</section>
+<section id="recommendations" class="page" aria-labelledby="recommendations-heading" hidden>
+<h2 id="recommendations-heading">Version difference and Recommendations</h2>
+<div class="recommend-grid"><article><h3>1. What moved out of the main workflow</h3><ul><li>Paper, experiment, and dataset selectors: retained in the <a href="v1/">v1 archive</a>. V2 selects code/circuit and a saved decoder; run details remain attached to every curve.</li><li>Published source transcriptions: kept in the source catalog and v1, excluded from v2 measured curves.</li><li>Full provenance, confidence methods, sampling cohorts, and raw-data availability: available under each plot’s run details and in exported receipts.</li><li>Study-specific Relay, Beam, memory, and degeneracy policies: retained in registered workflows. The builder explains compatibility rather than replacing them with plain BP.</li><li>Advanced numerical controls and complete JSON: moved into expandable sections.</li><li>Exact historical identities and ledgers: preserved in their original directories.</li></ul></article><article><h3>2. Further recommendations</h3><ul><li>Add a shared review queue for uploaded results, with server-side hash and ledger verification before publication. This MVP stores browser imports locally; the CLI persists them to the repository index.</li><li>Keep matrix representation and code equivalence separate; support multiple named check representations per code family.</li><li>Use a common policy editor as more interventions become qualified for the portable runner.</li><li>Add paired rescue/loss comparisons, anytime-valid confidence intervals for adaptive sampling, and benchmark machine profiles.</li><li>Offer shared axes and saved comparison layouts for multi-plot analysis.</li><li>Expand circuit-policy qualification and retain detector/observable semantics.</li></ul><p><a href="../../docs/research-interface.md" target="_blank">Full interface and data contracts ↗</a></p></article></div>
+</section>
+<section id="policies" class="page" aria-labelledby="policies-heading" hidden><h2 id="policies-heading">Policies</h2><p>Update equations, tunable parameters, and supported execution routes.</p><div id="policy-list"></div></section>
+<footer>BP research workbench · <a href="v1/">v1 archive</a> · simulations execute locally after download</footer>
+</main></div><noscript>Enable JavaScript to view retained results and prepare experiment packages.</noscript>
+</body></html>

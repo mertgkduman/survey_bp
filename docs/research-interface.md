@@ -1,10 +1,78 @@
-# Research interface and experiment packages
+# Research interface v2 and experiment packages
 
-The workbench in [`web/research/`](../web/research/index.html) browses papers,
-decoder specifications, codes, circuits, experiments, and measured result
-datasets. It runs as static HTML/CSS/JavaScript. Catalog inspection, plots, CSV
+The v2 workbench in [`web/research/`](../web/research/index.html) views measured
+results, compares code/circuit and decoder selections, and exports new experiments.
+Paper and dataset browsing remains in the [v1 archive](../web/research/v1/index.html). It runs as static HTML/CSS/JavaScript. Catalog inspection, plots, CSV
 downloads, and ZIP preparation happen in the browser. New simulations execute
 locally after download.
+
+## V2 workflow
+
+V2 is the default at `/web/research/`. The earlier interface is preserved at
+`/web/research/v1/`, including its frozen static catalog and package templates.
+The sidebar opens on Getting started, followed by Available experiment results,
+Experiment builder, Version difference and Recommendations, and Policies.
+
+Results use **Code/circuit** and **Decoder** selectors. Each saved decoder ID
+includes its original experiment context; selecting only an algorithm name would
+not identify prior, cap, precision, or sampling cohort. Add plot creates independent
+selections, curves, tables, CSV exports, and configuration receipts. Only locally
+measured points appear in v2: source transcriptions and unmeasured coordinates
+remain in v1/the source catalog. Importance estimates keep their declared
+estimator and raw proposal-count semantics. Work/runtime units are not silently
+normalized across incompatible methods or machines.
+
+The builder has decoder/policy and code/circuit columns, followed by simulation
+settings. Saved vanilla SPA specifications can populate editable controls;
+study-specific procedures retain their original runner and display a compatibility
+error rather than becoming plain BP. Matrix representations, row ordering, and
+logical basis remain part of input identity. The complete JSON path preserves
+custom settings that do not have visual controls.
+
+Optional `sampling.stop_failures`, `stop_type_i`, and `stop_type_ii` stop each
+rate point at the first reached target or its shot cap. They are positive integers
+or null; old specifications with only seed/start/shots keep their behavior.
+Circuit experiments accept observable-failure targets and reject Type I/II targets.
+Adaptive runs record actual denominators and terminal reason, and leave confidence
+bounds unavailable (`unavailable_optional_stopping`) rather than claim fixed-N
+coverage. `budgets.max_shots` still bounds the whole planned sweep.
+
+### Upload results
+
+A completed portable run emits derived `catalog-entry.json` alongside its
+manifest-bound evidence. Browser import reconstructs catalog records from the
+bound files and ignores the derived entry, so edits to that convenience JSON
+cannot change a displayed result. In Getting started, select these output files together:
+
+- `result-manifest.json` (`catalog-entry.json` is optional and ignored);
+- `requested-spec.json`, `effective-spec.json`, `run-manifest.json`, `status.json`;
+- `events.jsonl`, `summary.json`, and `summary.csv`.
+
+The browser verifies hashes and summary/ledger counts before adding a local
+catalog overlay. Entries survive reload in browser storage. A naked catalog
+entry, partial run, modified bytes, or conflicting identity is rejected. Browser
+uploads are limited to 100 MB and browser-storage quota; use the CLI for larger
+runs. Browser-local import does not write to the repository or a remote server.
+
+For persistent repository registration:
+
+```bash
+# Run in the installed repository environment; supply the existing result folder.
+bp-registry-research import-results /path/to/experiment/results
+bp-registry-research build
+```
+
+This validates the completed output, writes a normalized JSON under
+`research/imported/`, and registers its path in `research/catalog/sources.json`.
+Raw data remains in the original output folder with hashes and storage instructions.
+Review/commit the new index and generated catalog to share it; raw ledgers are
+never presented as Git downloads merely because they exist locally.
+
+Policies are defined in `research/catalog/policies.json`; equations are rendered
+with vendored KaTeX and do not require a CDN. Named recent methods include primary
+paper links and explicit builder/study/circuit qualification. Version difference
+and Recommendations keeps the material removed from the main workflow visible,
+with separate suggestions for future shared ingestion and policy/circuit work.
 
 ## Open a local preview
 
@@ -31,7 +99,7 @@ loading when double-clicking `index.html`.
 ## Browse a registered result
 
 Select a paper or local study, then an experiment, dataset, code, and decoder.
-The default result view is Yao's A5 vanilla comparison. Select a decoder to see
+In v2, the initial result is the local A5 vanilla BP4 v2 curve. V1 retains the paper/experiment/dataset browsing path described below. Select a decoder to see
 its frozen file and arm-specific effective settings. **Export exact
 specification** downloads that source file byte for byte, including its original
 JSON/TOML format. **Download effective configuration receipt** additionally binds the selected arm and any runner overrides to the source checksum; a shared source file alone may describe several arms. Configuration receipts, analysis scripts, summaries, and raw
@@ -225,6 +293,13 @@ canonical adaptations, and source-faithful reproductions retain separate labels.
 
 ```bash
 PYTHONPATH=src:. OMP_NUM_THREADS=1 .venv/bin/python -m pytest -q tests/research
+```
+
+The legacy `browser_workflows.py` script exercises the v1 archive. V2 has a separate end-to-end check:
+
+```bash
+PYTHONPATH=src:. OMP_NUM_THREADS=1 python tests/research/browser_v2.py \
+  --output /tmp/new-v2-verification
 ```
 
 Optional browser verification uses Playwright in a separate testing environment:

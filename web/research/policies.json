@@ -1,0 +1,580 @@
+{
+  "schema_version": 1,
+  "scope": "Availability is scoped to the custom research builder, the separately registered-study paths, and the pinned circuit adapter. A listed paper or equation is not a claim of source-faithful reproduction.",
+  "policies": [
+    {
+      "id": "flooding_schedule",
+      "label": "Flooding BP schedule",
+      "category": "schedule",
+      "equations": [
+        "m_{c\\to v}^{(t+1)}=F_c(\\{m_{u\\to c}^{(t)}:u\\in N(c)\\setminus\\{v\\}\\},s_c)",
+        "m_{v\\to c}^{(t+1)}=G_v(\\lambda_v,\\{m_{d\\to v}^{(t+1)}:d\\in N(v)\\setminus\\{c\\}\\})"
+      ],
+      "notation": "c and v are check and variable nodes; N(\\cdot) is a Tanner-graph neighbourhood; s_c is the observed syndrome bit; F_c and G_v are the chosen check and variable updates.",
+      "parameters": [
+        {
+          "symbol": "max_iterations",
+          "meaning": "Maximum full flooding sweeps per attempt; Q-BPGD additionally has a round limit."
+        },
+        {
+          "symbol": "stop_on_convergence",
+          "meaning": "Compiled binary and Q-BPGD custom runs require true; the circuit adapter has its own fixed adapter contract."
+        }
+      ],
+      "execution_status": "builder_supported",
+      "execution": {
+        "custom_builder": {
+          "status": "supported",
+          "scope": "Binary CSS and BP4 custom runs accept flooding only."
+        },
+        "registered_study": {
+          "status": "supported_in_study_specific_paths",
+          "scope": "Some retained canonical studies use other declared schedules; they are not builder controls."
+        },
+        "circuit": {
+          "status": "supported_plain_only",
+          "scope": "The pinned Sinter adapter accepts flooding plain BP only."
+        }
+      },
+      "source_url": null,
+      "source_note": "This is the repository execution contract, not a paper-specific algorithm claim."
+    },
+    {
+      "id": "v2c_damping",
+      "label": "V2C message damping",
+      "category": "message update",
+      "equations": [
+        "m_{v\\to c}^{(t+1)}=d\\,m_{v\\to c}^{(t)}+(1-d)\\,\\widetilde m_{v\\to c}^{(t+1)}"
+      ],
+      "notation": "d is the committed-old-message weight and \\widetilde m is the freshly computed V2C message. The stored damped output, not an undamped proposal, is the next old operand.",
+      "parameters": [
+        {
+          "symbol": "damping",
+          "range": "0 <= d < 1",
+          "meaning": "Old-message weight in bp-flooding-policy-v1; d=0 leaves the fresh message unchanged."
+        }
+      ],
+      "execution_status": "builder_supported",
+      "execution": {
+        "custom_builder": {
+          "status": "supported_with_v2_policy",
+          "scope": "An explicit flooding policy is accepted only with the unbounded v2 numerical profiles."
+        },
+        "registered_study": {
+          "status": "supported_when_declared",
+          "scope": "Study-specific damping settings remain arm-specific and cannot be inferred from this generic control."
+        },
+        "circuit": {
+          "status": "unavailable",
+          "scope": "The custom circuit adapter rejects a policy/resolution overlay."
+        }
+      },
+      "source_url": "https://arxiv.org/html/2411.08177v2#S4.SS2",
+      "source_label": "Damping source discussion",
+      "source_note": "The cited damping treatment is a source reference; the builder's exact V2C lifecycle is the local contract above."
+    },
+    {
+      "id": "normalized_offset_min_sum",
+      "label": "Normalized and offset min-sum",
+      "category": "check update",
+      "equations": [
+        "m_{c\\to v}=(-1)^{s_c}\\!\\prod_{u\\in N(c)\\setminus\\{v\\}}\\operatorname{sign}(q_{u\\to c})\\min_{u\\in N(c)\\setminus\\{v\\}}|q_{u\\to c}|",
+        "m_{c\\to v}^{\\mathrm{NMS}}=\\alpha m_{c\\to v}",
+        "m_{c\\to v}^{\\mathrm{OMS}}=\\operatorname{sat}\\!\\left((-1)^{s_c}\\prod\\operatorname{sign}(q_{u\\to c})\\max\\!\\left(0,\\min|q_{u\\to c}|-\\beta\\right)\\right)"
+      ],
+      "notation": "q_{u\\to c} is an incoming check LLR; alpha is a positive scale; beta is a nonnegative offset. The first formula is the undiscounted min-sum check update.",
+      "parameters": [
+        {
+          "symbol": "alpha",
+          "range": "alpha > 0",
+          "meaning": "Normalized-min-sum scale; it is meaningful only for min-sum."
+        },
+        {
+          "symbol": "beta",
+          "range": "beta >= 0",
+          "meaning": "Offset-min-sum magnitude subtraction; it is meaningful only for min-sum."
+        },
+        {
+          "symbol": "check_rule",
+          "values": [
+            "min_sum",
+            "sum_product"
+          ],
+          "meaning": "sum_product requires alpha=1 and beta=0 in the builder policy."
+        }
+      ],
+      "execution_status": "builder_supported",
+      "execution": {
+        "custom_builder": {
+          "status": "supported_with_v2_policy",
+          "scope": "Binary CSS and BP4 accept min_sum with an explicit matching flooding policy; a binary min_sum request without one is rejected."
+        },
+        "registered_study": {
+          "status": "supported_when_declared",
+          "scope": "The actual alpha, beta, clipping, and numerical profile belong to the selected decoder record."
+        },
+        "circuit": {
+          "status": "plain_adapter_only",
+          "scope": "Circuit min-sum has a pinned adapter profile, not this configurable policy overlay."
+        }
+      },
+      "source_url": null,
+      "source_note": "These equations document the canonical min-sum policy; no method-specific source paper is asserted."
+    },
+    {
+      "id": "message_resolution",
+      "label": "Message resolution and coefficient rounding",
+      "category": "numerics",
+      "equations": [
+        "m\\leftarrow Q_{\\rho}(m),\\qquad \\rho=(\\mathrm{format},\\mathrm{scale},\\mathrm{scope},\\mathrm{coefficients})",
+        "Q_{b,s}(x)=\\operatorname{clip}\\!\\left(\\frac{\\operatorname{round}(s x)}{s},-\\frac{2^{b-1}-1}{s},\\frac{2^{b-1}-1}{s}\\right)\\quad\\text{for an integer format with }b\\text{ bits}"
+      ],
+      "notation": "rho declares the boundary at which Q is applied. scalar_edges rounds projected scalar/C2V values, all_messages also rounds V2C state, and all_state also rounds beliefs. Check reductions remain float64 before the declared boundary rounding; this is not a bit-packed arithmetic claim.",
+      "parameters": [
+        {
+          "symbol": "format",
+          "values": [
+            "float16",
+            "float32",
+            "float64",
+            "int8",
+            "int16",
+            "int32"
+          ],
+          "meaning": "Declared message representation at the selected boundaries."
+        },
+        {
+          "symbol": "scale",
+          "meaning": "Positive integer fixed-point scale for integer formats; null for floating formats."
+        },
+        {
+          "symbol": "scope",
+          "values": [
+            "scalar_edges",
+            "all_messages",
+            "all_state"
+          ],
+          "meaning": "Boundary coverage of the quantizer."
+        },
+        {
+          "symbol": "coefficients",
+          "values": [
+            "float64",
+            "same"
+          ],
+          "meaning": "Whether damping/min-sum coefficients stay float64 or receive the same declared quantization."
+        }
+      ],
+      "execution_status": "builder_supported",
+      "execution": {
+        "custom_builder": {
+          "status": "supported_with_v2_policy",
+          "scope": "Resolution is part of bp-flooding-policy-v1 and requires a v2 numerical profile."
+        },
+        "registered_study": {
+          "status": "record_specific",
+          "scope": "A retained result's numerical identity is its decoder record, not a page-level default."
+        },
+        "circuit": {
+          "status": "unavailable",
+          "scope": "The circuit adapter does not accept this policy object."
+        }
+      },
+      "source_url": null,
+      "source_note": "Repository numerical-contract reference."
+    },
+    {
+      "id": "uniform_posterior_memory",
+      "label": "Uniform posterior memory",
+      "category": "state memory",
+      "equations": [
+        "\\lambda_v^{(\\ell+1)}=(1-\\gamma)\\lambda_{v,\\mathrm{channel}}+\\gamma\\,\\lambda_{v,\\mathrm{posterior}}^{(\\ell)}"
+      ],
+      "notation": "ell indexes complete BP legs. The next leg's effective prior blends the channel prior with the previous leg's posterior using one uniform gamma; this is a cross-leg prior transfer, not ordinary within-leg V2C damping.",
+      "parameters": [
+        {
+          "symbol": "gamma",
+          "meaning": "Uniform cross-leg memory weight. Its admissible domain is policy-specific; do not apply the custom builder's damping range to it."
+        },
+        {
+          "symbol": "legs",
+          "meaning": "Number of sequential BP legs; messages/history transfer only if the named study explicitly says so."
+        }
+      ],
+      "execution_status": "registered_study_only",
+      "execution": {
+        "custom_builder": {
+          "status": "unavailable",
+          "scope": "The custom builder has no cross-leg memory control."
+        },
+        "registered_study": {
+          "status": "supported_when_declared",
+          "scope": "Canonical memory compositions are study-specific and retain their own state-lifecycle evidence."
+        },
+        "circuit": {
+          "status": "unavailable",
+          "scope": "No source-faithful circuit memory policy is offered through the custom circuit adapter."
+        }
+      },
+      "source_url": null,
+      "source_note": "Local canonical memory notation; it is deliberately separated from the distinct MBP4 mechanism below."
+    },
+    {
+      "id": "modified_bp4",
+      "label": "Modified BP4 (MBP4)",
+      "category": "quaternary update",
+      "equations": [
+        "\\Gamma_n^W=\\Lambda_n^W+\\alpha^{-1}\\!\\sum_{m:\\langle S_{mn},W\\rangle=1}\\Delta_{m\\to n}",
+        "\\Gamma_{n\\to m}^W=\\Gamma_n^W-\\langle S_{mn},W\\rangle\\Delta_{m\\to n}"
+      ],
+      "notation": "W is a Pauli hypothesis, Lambda is its channel LLR, Delta is a check-to-variable contribution, and the bracket is 1 exactly when W anticommutes with the edge stabilizer label. This registry exposes fixed-alpha MBP4 only; it does not claim an adaptive-alpha variant.",
+      "parameters": [
+        {
+          "symbol": "alpha",
+          "range": "alpha > 0",
+          "meaning": "Fixed inhibition/memory coefficient in the admitted MBP4 mechanism."
+        },
+        {
+          "symbol": "schedule",
+          "values": [
+            "qbp_flooding",
+            "qbp_variable_serial"
+          ],
+          "meaning": "Specialized canonical MBP4 execution choices, not custom research-builder schedule controls."
+        }
+      ],
+      "execution_status": "mapped_mechanism_only",
+      "execution": {
+        "custom_builder": {
+          "status": "unavailable",
+          "scope": "The builder supports plain BP4 and Q-BPGD, not an MBP4 control."
+        },
+        "registered_study": {
+          "status": "mechanism_only",
+          "scope": "The source is mapped in the literature registry; no qualified source-experiment result is implied."
+        },
+        "circuit": {
+          "status": "unavailable",
+          "scope": "No circuit MBP4 route is registered."
+        }
+      },
+      "source_url": "https://arxiv.org/abs/2104.13659",
+      "source_label": "Modified BP4 primary source",
+      "source_note": "Kuo and Lai's Modified BP4 source; implementation identity and source-experiment qualification remain separate."
+    },
+    {
+      "id": "relay_disordered_memory",
+      "label": "RelayBP disordered memory",
+      "category": "state memory",
+      "equations": [
+        "\\lambda_{v,\\mathrm{eff}}^{(\\ell+1)}=(1-\\gamma_v^{(\\ell)})\\lambda_{v,\\mathrm{channel}}+\\gamma_v^{(\\ell)}\\lambda_{v,\\mathrm{posterior}}^{(\\ell)}",
+        "\\gamma_v^{(\\ell)}=\\gamma_{\\mathrm{low}}+w\\,u_v,\\qquad u_v\\sim\\operatorname{Uniform}(0,1)"
+      ],
+      "notation": "A Relay leg transfers posterior information only through its next effective prior. The initial leg may use one uniform gamma; later legs use a seeded per-variable disordered gamma. No message buffer or other history crosses a leg in the registered canonical adaptation.",
+      "parameters": [
+        {
+          "symbol": "initial_gamma",
+          "meaning": "Uniform memory strength for the initial memory leg when that arm declares one."
+        },
+        {
+          "symbol": "later_leg_low and later_leg_width",
+          "meaning": "Seeded interval parameters for later per-variable strengths; source-informed studies can use finite values outside a convex-mixture range."
+        },
+        {
+          "symbol": "legs and iterations_per_leg",
+          "meaning": "Arm-specific topology and BP budget; they are not generic defaults."
+        }
+      ],
+      "execution_status": "registered_study_only",
+      "execution": {
+        "custom_builder": {
+          "status": "unavailable",
+          "scope": "The custom builder exposes no Relay controller."
+        },
+        "registered_study": {
+          "status": "controlled_css_adaptation",
+          "scope": "The registered BB72 fair Relay/Beam study is a controlled CSS adaptation, not a reproduction of the paper's circuit curves."
+        },
+        "circuit": {
+          "status": "unavailable",
+          "scope": "Pinned Relay circuits run through the plain adapter only; they do not expose the source Relay decoder."
+        }
+      },
+      "source_url": "https://arxiv.org/abs/2506.01779v2",
+      "source_label": "RelayBP primary source",
+      "source_note": "RelayBP primary source. The per-leg lifecycle above is explicitly the registered canonical adaptation."
+    },
+    {
+      "id": "binary_guided_decimation",
+      "label": "Binary guided decimation (BPGD)",
+      "category": "intervention",
+      "equations": [
+        "v^\\star=\\operatorname*{arg\\,max}_{v\\in U}|L_v|",
+        "L_{v^\\star}\\leftarrow A\\,\\operatorname{sgn}_+(L_{v^\\star}),\\qquad A=25"
+      ],
+      "notation": "U is the undecimated set and L_v is the post-BP reliability. The project controller declares sgn_+(0)=+1 and a continuing-message lifecycle; the source's zero boundary and final-round treatment are not qualified as author-code exact.",
+      "parameters": [
+        {
+          "symbol": "sweeps_per_round (T)",
+          "meaning": "BP sweeps between decimation decisions."
+        },
+        {
+          "symbol": "round_limit (R)",
+          "meaning": "Maximum number of variable fixations."
+        },
+        {
+          "symbol": "finite_bias_magnitude (A)",
+          "meaning": "The source-record magnitude is 25 in the admitted canonical interpretation."
+        }
+      ],
+      "execution_status": "registered_study_only",
+      "execution": {
+        "custom_builder": {
+          "status": "unavailable",
+          "scope": "The research builder does not expose binary BPGD."
+        },
+        "registered_study": {
+          "status": "canonical_adaptation",
+          "scope": "Paper-root BPGD records are separate from source records and do not establish author-code equivalence."
+        },
+        "circuit": {
+          "status": "not_applicable",
+          "scope": "The mapped target is binary CSS code-capacity decoding, not the pinned circuit adapter."
+        }
+      },
+      "source_url": "https://arxiv.org/abs/2312.10950v2",
+      "source_label": "Guided decimation primary source",
+      "source_note": "Yao et al., Algorithm 1; source implementation identity is unverified."
+    },
+    {
+      "id": "quaternary_guided_decimation",
+      "label": "Quaternary BP guided decimation (Q-BPGD)",
+      "category": "intervention",
+      "equations": [
+        "(v^\\star,W^\\star)=\\operatorname*{arg\\,max}_{v\\in U,\\,W\\in\\{I,X,Y,Z\\}} P_v(W)",
+        "r_{v^\\star}(W)=\\begin{cases}1-\\varepsilon,&W=W^\\star\\\\\\varepsilon,&W\\ne W^\\star\\end{cases},\\qquad p_{v^\\star}(W)=\\frac{r_{v^\\star}(W)}{\\sum_{W'}r_{v^\\star}(W')}"
+      ],
+      "notation": "P_v is the current four-state posterior and U is the remaining qubits. The builder takes the first index among exact posterior ties, replaces that prior by the normalized literal vector, and continues the committed QBP message state. These are declared interpretations, not author-code identity.",
+      "parameters": [
+        {
+          "symbol": "iterations_per_round",
+          "meaning": "Positive number of QBP sweeps before each selection."
+        },
+        {
+          "symbol": "epsilon",
+          "range": "0 < epsilon < 1",
+          "meaning": "Literal nonselected Pauli mass before common-sum normalization."
+        },
+        {
+          "symbol": "round_limit",
+          "meaning": "Positive cap on selected qubits; absent means at most the code length."
+        }
+      ],
+      "execution_status": "builder_supported",
+      "execution": {
+        "custom_builder": {
+          "status": "supported_with_restrictions",
+          "scope": "Compiled BP4 only, quaternary f64 v2, sum_product, flooding, policy=null, and first-valid stopping."
+        },
+        "registered_study": {
+          "status": "canonical_adaptation",
+          "scope": "The A5 Figure 7 source record has unresolved message lifecycle, normalization interface, ties, coordinates, and author implementation identity."
+        },
+        "circuit": {
+          "status": "unavailable",
+          "scope": "The circuit adapter offers no Q-BPGD route."
+        }
+      },
+      "source_url": "https://arxiv.org/abs/2312.10950v2",
+      "source_label": "Q-BPGD primary source",
+      "source_note": "Yao et al., Algorithm 3. The page intentionally distinguishes the source record from the supported canonical adaptation."
+    },
+    {
+      "id": "bpsf_degeneracy_cutting",
+      "label": "BP-SF syndrome-flip degeneracy cutting",
+      "category": "intervention",
+      "equations": [
+        "s^{(j)}=s\\oplus Hf^{(j)}",
+        "e^{(j)}=\\widehat e^{(j)}\\oplus f^{(j)}"
+      ],
+      "notation": "For a binary CSS working problem, f^(j) is a proposed syndrome-flip test vector, H is the checked parity matrix, and e-hat^(j) is its decoded working candidate. The candidate is evaluated on the original problem after lifting. These equations describe the registered CSS adaptation's XOR lift, not a full source-exact BP-SF candidate-selection rule.",
+      "parameters": [
+        {
+          "symbol": "baseline_sweeps",
+          "meaning": "Initial BP sweeps used to collect oscillation information."
+        },
+        {
+          "symbol": "attempt_sweeps, top_k, max_weight, test_cap",
+          "meaning": "Declared bounded test-controller controls; the retained BB72 factorial arm uses 20, 5, 4, 1, and 4 respectively."
+        },
+        {
+          "symbol": "root_seed",
+          "meaning": "Required decoder-only seed for deterministic declared test order in the repository adaptation."
+        }
+      ],
+      "execution_status": "registered_study_only",
+      "execution": {
+        "custom_builder": {
+          "status": "unavailable",
+          "scope": "The custom research builder does not expose BP-SF."
+        },
+        "registered_study": {
+          "status": "controlled_css_adaptation",
+          "scope": "Retained BB72 arms use seeded serial first-valid selection; the BP-SF source uses min-sum and parallel speculative tests."
+        },
+        "circuit": {
+          "status": "unavailable",
+          "scope": "The source's circuit-level comparisons are not exposed through the custom adapter."
+        }
+      },
+      "source_url": "https://arxiv.org/abs/2507.00254v1",
+      "source_label": "BP-SF primary source",
+      "source_note": "BP-SF primary source. Do not infer source parallelism or source runtime from the retained serial CSS adaptation."
+    },
+    {
+      "id": "beam_search",
+      "label": "BeamSearch branching",
+      "category": "branching controller",
+      "equations": [
+        "\\mathcal B_{r+1}=\\operatorname{Top}_{B}\\!\\left(\\bigcup_{b\\in\\mathcal B_r}\\operatorname{branch}(b,v_b)\\right)",
+        "v_b=\\operatorname*{arg\\,min}_{v\\in U_b}|L_v|"
+      ],
+      "notation": "B is the beam width, r is a branching round, b is a live branch, U_b is its unfixed-variable set, and L_v is the branch posterior reliability. The ranking score, mask handling, and source transition edge cases are study-specific rather than generic source-equivalent controls.",
+      "parameters": [
+        {
+          "symbol": "beam_width",
+          "meaning": "Maximum number of retained branches after a declared ranking step."
+        },
+        {
+          "symbol": "branch_round_limit",
+          "meaning": "Maximum number of branching rounds."
+        },
+        {
+          "symbol": "iterations_per_extra_unit",
+          "meaning": "Profile-specific BP effort used by the controlled BB72 study; it is not an equal-work normalization."
+        }
+      ],
+      "execution_status": "registered_study_only",
+      "execution": {
+        "custom_builder": {
+          "status": "unavailable",
+          "scope": "The custom builder has no BeamSearch controller."
+        },
+        "registered_study": {
+          "status": "controlled_css_adaptation",
+          "scope": "The registered BB72 comparison has width 2 and at most four rounds in its selected profiles; it is not a source circuit reproduction."
+        },
+        "circuit": {
+          "status": "unavailable",
+          "scope": "Pinned BeamSearch circuits are run by the plain adapter only; the source BeamSearch decoder is not offered."
+        }
+      },
+      "source_url": "https://arxiv.org/abs/2512.07057v2",
+      "source_label": "BeamSearch primary source",
+      "source_note": "BeamSearch primary source. The displayed controller equations are the controlled CSS adaptation's transparent abstraction, not a claim that it reproduces every source branch transition."
+    }
+  ],
+  "code_families": [
+    {
+      "id": "generalized_bicycle",
+      "label": "Generalized bicycle",
+      "code_ids": [
+        "a5"
+      ],
+      "circuit_code_ids": [],
+      "circuits": [],
+      "availability": "registered_css_artifact",
+      "notes": "A5 is a checked [[180,10]] CSS artifact. Its source-reported distance is bounded, not independently certified by this catalog."
+    },
+    {
+      "id": "generalized_hypergraph_product",
+      "label": "Generalized hypergraph product",
+      "code_ids": [
+        "b1",
+        "b2"
+      ],
+      "circuit_code_ids": [],
+      "circuits": [],
+      "availability": "registered_css_construction",
+      "notes": "B1 and B2 have registered CSS construction/artifact paths; a family label does not qualify every paper experiment using them."
+    },
+    {
+      "id": "hypergraph_product",
+      "label": "Hypergraph product",
+      "code_ids": [
+        "c2"
+      ],
+      "circuit_code_ids": [],
+      "circuits": [],
+      "availability": "registered_css_construction",
+      "notes": "C2 is a registered CSS construction."
+    },
+    {
+      "id": "bivariate_bicycle",
+      "label": "Bivariate bicycle",
+      "code_ids": [
+        "bb72",
+        "double-gross"
+      ],
+      "circuit_code_ids": [],
+      "circuits": [
+        {
+          "id": "relay-bb144-memory-z",
+          "label": "RelayBP BB144 memory Z"
+        },
+        {
+          "id": "beamsearch-bb144-memory-z-p005",
+          "label": "BeamSearch BB144 memory Z p=0.005"
+        }
+      ],
+      "availability": "css_artifacts_and_pinned_circuit_fixtures",
+      "notes": "BB72 and double-gross are CSS inputs. The BB144 entries are pinned source Stim fixtures whose only current execution route is the plain circuit adapter, not the named source decoder.",
+      "source_url": "https://arxiv.org/abs/2308.07915"
+    },
+    {
+      "id": "surface_code",
+      "label": "Surface code",
+      "code_ids": [],
+      "circuit_code_ids": [],
+      "circuits": [
+        {
+          "id": "relay-surface-d3",
+          "label": "Rotated surface-code d=3 memory X"
+        }
+      ],
+      "availability": "pinned_circuit_fixture_only",
+      "notes": "The d=3 rotated-surface Stim file is a bounded source-fixture smoke input, not a source-faithful experiment manifest."
+    },
+    {
+      "id": "unclassified_no_portable_css_construction",
+      "label": "Unclassified / no portable CSS construction",
+      "code_ids": [
+        "gb46"
+      ],
+      "circuit_code_ids": [],
+      "circuits": [],
+      "availability": "unsupported_for_custom_execution",
+      "notes": "GB46 currently contributes indexed parity-check evidence only; no portable CSS/logical construction is registered."
+    },
+    {
+      "id": "project_test_fixture",
+      "label": "Project test fixture",
+      "code_ids": [
+        "three-qubit"
+      ],
+      "circuit_code_ids": [],
+      "circuits": [],
+      "availability": "registered_css_fixture",
+      "notes": "The three-qubit input is a project fixture for small reproducible checks, not a literature code family."
+    },
+    {
+      "id": "color_code",
+      "label": "Color code",
+      "code_ids": [],
+      "circuit_code_ids": [],
+      "circuits": [],
+      "availability": "not_registered",
+      "notes": "The source-fixture archive contains color-memory circuits, but inputs.json currently registers no color-code input or circuit for the builder."
+    }
+  ]
+}

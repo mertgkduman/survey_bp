@@ -1,0 +1,67 @@
+{
+  "checks": [
+    "Workflow-first navigation, equation rendering, and all requested branding",
+    "Independent side-by-side code/decoder selections, real plot/table/CSV, keyboard point inspection",
+    "Unmeasured circuit reports no data rather than borrowing code-capacity results",
+    "Downloaded portable package validates, executes, and honors adaptive failure target without fixed-N confidence claims",
+    "Hash-checked output upload persists in the browser and becomes a selectable measured curve",
+    "Unbound catalog metadata is ignored and cannot alter measured points",
+    "Rehashed but inconsistent confidence fields are rejected before storage",
+    "Circuit builder exports and executes actual Stim/Sinter observable evaluation; Type I/II targets disabled",
+    "Five mobile views fit at 390px with independent plot cards stacked",
+    "Archived v1 stays browsable; repository assets and its exported ZIP still validate"
+  ],
+  "errors": [],
+  "smoke_rows": [
+    {
+      "ci_high": null,
+      "ci_low": null,
+      "ci_method": "unavailable_optional_stopping",
+      "ci_status": "not_reported_optional_stopping",
+      "converged_shots": 2,
+      "convergence_rate": 1.0,
+      "decoder_p0": 0.06,
+      "exact_successes": 1,
+      "failure_rate": 0.5,
+      "failures": 1,
+      "ler": 0.5,
+      "mean_decode_seconds": 0.420001404825598,
+      "mean_iterations": 2.0,
+      "n": 2,
+      "observable_successes": null,
+      "p": 0.4,
+      "rate_index": 0,
+      "requested_shots_per_point": 8,
+      "sampling_mode": "adaptive_stopping",
+      "sampling_termination_reason": "stop_failures",
+      "setting_label": null,
+      "stabilizer_equivalent_successes": 0,
+      "termination_reason_counts": {
+        "all_components_syndrome_match": 2
+      },
+      "total_max_shots": 8,
+      "type_i": 0,
+      "type_ii": 1,
+      "unconverged_shots": 0,
+      "work_unit": "binary_component_sweeps"
+    }
+  ],
+  "python_checks": {
+    "passed": 106,
+    "duration_seconds": 30.61,
+    "command": "PYTHONPATH=src:. OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 .git/research-interface-verify/bin/python -m pytest -q tests/research tests/circuit/test_stim_adapter.py tests/canonical/test_resolution_policy.py tests/test_study_entrypoint.py"
+  },
+  "supplemental_checks": [
+    "Formal JSON-schema validation of a normalized circuit result",
+    "Persistent CLI import and duplicate refusal in an isolated registry",
+    "Archived-file checksum receipt and byte-preserved source snapshots",
+    "No retained scientific data directories modified"
+  ],
+  "environment": "Separate verification venv using installed HPC scientific dependencies, Playwright Chromium; jsonschema installed only in this verification venv.",
+  "artifacts": ".git/research-v2-browser-verified (local-only ZIPs, ledgers, screenshots, logs); regenerate with tests/research/browser_v2.py",
+  "scope_limits": [
+    "Static workbench: new simulations execute locally. Browser imports persist only in browser storage; CLI import registers metadata in the repository.",
+    "Integrity/consistency verification does not authenticate scientific authorship or replace publication review.",
+    "No expensive simulation campaign, remote hosting deployment, other browser engine, or screen-reader audit was run."
+  ]
+}

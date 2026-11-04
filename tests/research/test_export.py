@@ -107,7 +107,9 @@ def test_preview_serves_interface_and_tracked_assets_without_private_files():
     try:
         with urlopen(base + "/") as response:
             assert response.status == 200
-            assert b"Research Registry" in response.read()
+            assert b"BP-based QLDPC decoding workbench" in response.read()
+        with urlopen(base + "/web/research/v1/") as response:
+            assert response.status == 200 and b"Research Registry" in response.read()
         with urlopen(base + "/data/artifacts/project-three-qubit-css-fixture.json") as response:
             assert response.status == 200
         for url in ("/.git/config", "/.venv/pyvenv.cfg", "/%2e%2e/secret", "/src/"):

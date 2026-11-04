@@ -1,562 +1,82 @@
-/* Static evidence browser and package exporter. Simulations execute in Python. */
-(function () {
-  "use strict";
-  const $ = id => document.getElementById(id);
-  const copy = value => JSON.parse(JSON.stringify(value));
-  const S = {catalog: null, contract: null, template: null, series: [], selected: new Set(),
-    custom: null, draft: null, spec: null, valid: false, unsupported: "", metric: "ler"};
-  const colors = ["#067d79", "#b17415", "#5065a8", "#b04844", "#658641", "#895a96"];
-  const idOf = record => record.id || record.experiment_id || record.decoder_id || record.code_id || record.circuit_id || record.dataset_id || record.paper_id;
-  const titleOf = record => record.title || record.label || record.name || idOf(record);
-  const known = value => typeof value === "number" && Number.isFinite(value);
-  const text = value => value == null || value === "" ? "Unavailable" : String(value);
-  function fmt(value) { return known(value) ? (value === 0 ? "0" : Math.abs(value) < .001 ? value.toExponential(3) : Number(value.toPrecision(6)).toString()) : text(value); }
-  const count = value => known(value) ? value.toLocaleString("en-US") : "Not reported";
-  function el(tag, attrs = {}, content) {
-    const node = document.createElement(tag);
-    for (const [name, value] of Object.entries(attrs)) {
-      if (name === "class") node.className = value;
-      else if (name === "text") node.textContent = value;
-      else node.setAttribute(name, value);
-    }
-    if (content != null) node.textContent = content;
-    return node;
-  }
-  function replace(node, children = []) { node.replaceChildren(...children); }
-  function save(filename, content, type = "application/json") {
-    const url = URL.createObjectURL(content instanceof Blob ? content : new Blob([content], {type}));
-    const link = el("a", {href: url, download: filename}); document.body.append(link); link.click(); link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }
-  async function digest(content) {
-    const bytes = typeof content === "string" ? new TextEncoder().encode(content) : content;
-    return [...new Uint8Array(await crypto.subtle.digest("SHA-256", bytes))].map(x => x.toString(16).padStart(2, "0")).join("");
-  }
-  async function json(path) { const response = await fetch(path, {cache: "no-cache"}); if (!response.ok) throw Error(`${path}: HTTP ${response.status}`); return response.json(); }
-  function assetURL(asset) {
-    if (!asset || !asset.url || !["tracked", "available", "repository", "tracked_summary"].includes(asset.availability)) return null;
-    const url = new URL(asset.url.startsWith("http") ? asset.url : "../../" + asset.url.replace(/^\/+/, ""), location.href);
-    return ["https:", "http:"].includes(url.protocol) ? url.href : null;
-  }
-  async function assetBytes(asset) {
-    const url = assetURL(asset); if (!url) throw Error("This input is not downloadable through the repository route.");
-    const response = await fetch(url); if (!response.ok) throw Error(`Input unavailable: ${asset.path}`);
-    const bytes = new Uint8Array(await response.arrayBuffer());
-    if (asset.sha256 && await digest(bytes) !== asset.sha256) throw Error(`Checksum mismatch: ${asset.path}. Rebuild or refresh the catalog.`);
-    return bytes;
-  }
-  function assetList(assets) {
-    const box = el("div", {class: "asset-links"});
-    for (const asset of assets.filter(Boolean)) {
-      const url = assetURL(asset);
-      if (url) box.append(el("a", {href: url, target: "_blank", rel: "noopener", download: ""}, asset.label || asset.path));
-      else {
-        const missing = el("span", {class: "muted"}, `${asset.label || asset.kind}: ${asset.availability || "unavailable"}`);
-        if (asset.local_storage_path) missing.title = `Local storage: ${asset.local_storage_path}\nSHA-256: ${asset.sha256 || "not supplied"}`;
-        box.append(missing);
-      }
-    }
-    return box;
-  }
-  function route(section) {
-    if (section === "main-content") { $("main-content").focus(); return; }
-    if (!$(section)?.classList.contains("panel")) section = "papers";
-    for (const panel of document.querySelectorAll("main > .panel")) panel.hidden = panel.id !== section;
-    document.querySelector(".intro-card").hidden = section !== "papers";
-    for (const link of document.querySelectorAll("[data-nav]")) {
-      if (link.dataset.nav === section) link.setAttribute("aria-current", "page"); else link.removeAttribute("aria-current");
-    }
-    if (location.hash !== "#" + section) history.replaceState(null, "", "#" + section);
-    window.scrollTo({top: 0, behavior: "instant"});
-  }
-  function addLibraries() {
-    const nav = document.querySelector(".nav-list");
-    for (const [id, title] of [["decoders", "Decoder specifications"], ["codes", "Codes & channels"]]) {
-      const link = el("a", {href: "#" + id, "data-nav": id}, title); nav.insertBefore(link, nav.querySelector('[data-nav="builder"]'));
-      const section = el("section", {id, class: "panel", "aria-label": title});
-      section.append(el("h2", {}, title), el("div", {id: id + "-library"}));
-      $("builder").before(section);
-    }
-  }
-  function selectOptions(select, records, empty, wanted) {
-    const previous = wanted !== undefined ? wanted : select.value;
-    replace(select, [el("option", {value: ""}, empty), ...records.map(item => el("option", {value: idOf(item)}, titleOf(item)))]);
-    select.value = records.some(item => String(idOf(item)) === previous) ? previous : "";
-    return select.value;
-  }
-  const record = (kind, id) => S.catalog[kind].find(item => String(idOf(item)) === String(id));
-  function paperExperiments(paper) { return S.catalog.experiments.filter(item => !paper || (item.paper_ids || []).includes(paper)); }
-  function experimentDatasets(experiment) { return experiment ? experiment.dataset_ids || [experiment.dataset_id].filter(Boolean) : null; }
-  function currentSeries() {
-    const paper = $("result-paper").value, experiment = record("experiments", $("result-experiment").value);
-    const datasetIds = experimentDatasets(experiment), dataset = $("result-dataset").value;
-    return S.series.filter(item => (!paper || item.paper_ids.includes(paper)) && (!datasetIds || datasetIds.includes(item.dataset_id)) && (!dataset || item.dataset_id === dataset) && (!$("result-code").value || item.code_id === $("result-code").value) && (!$("result-decoder").value || item.decoder_id === $("result-decoder").value));
-  }
-  function filters(changed) {
-    const paper = $("result-paper").value;
-    if (changed === "paper") { $("result-experiment").value = ""; $("result-dataset").value = ""; $("result-code").value = ""; $("result-decoder").value = ""; }
-    const experiments = paperExperiments(paper);
-    selectOptions($("result-experiment"), experiments, "All registered experiments");
-    const selectedExperiment = record("experiments", $("result-experiment").value), allowed = experimentDatasets(selectedExperiment);
-    if (changed === "experiment") { $("result-dataset").value = ""; $("result-code").value = ""; $("result-decoder").value = ""; }
-    const datasets = S.catalog.datasets.filter(item => (!paper || item.paper_id === paper || item.paper_ids?.includes(paper)) && (!allowed || allowed.includes(item.dataset_id)));
-    selectOptions($("result-dataset"), datasets, "All datasets in this selection");
-    if (changed === "dataset") { $("result-code").value = ""; $("result-decoder").value = ""; }
-    const ids = new Set(datasets.filter(d => !$("result-dataset").value || d.dataset_id === $("result-dataset").value).map(d => d.dataset_id));
-    const candidates = S.series.filter(item => ids.has(item.dataset_id));
-    const codeIds = new Set(candidates.map(item => item.code_id));
-    selectOptions($("result-code"), S.catalog.codes.filter(item => codeIds.has(item.code_id)), "All available codes");
-    if (changed === "code") $("result-decoder").value = "";
-    const decoderIds = new Set(candidates.filter(item => !$("result-code").value || item.code_id === $("result-code").value).map(item => item.decoder_id));
-    selectOptions($("result-decoder"), S.catalog.decoders.filter(item => decoderIds.has(item.decoder_id)), "Compare all available decoders");
-    S.selected = new Set(currentSeries().map(item => item.key));
-    renderResults();
-  }
-  function renderPapers() {
-    const search = $("paper-search").value.toLowerCase(), status = $("paper-status").value;
-    const list = S.catalog.papers.filter(item => JSON.stringify(item).toLowerCase().includes(search) && (!status || item.kind === status));
-    replace($("paper-list")); $("paper-count").textContent = `${list.length} papers / local studies`;
-    for (const paper of list) {
-      const card = el("article", {class: "paper-card"}), body = el("div");
-      body.append(el("h3", {}, paper.title), el("p", {}, paper.identity), el("span", {class: "tag"}, paper.kind === "local_study" ? "Local study · unpublished" : "External paper"), el("p", {}, paper.registered_scope || "No numerical result registered."));
-      if (paper.source_url) body.append(el("a", {href: paper.source_url, target: "_blank", rel: "noopener"}, "Open source paper"));
-      const go = el("button", {type: "button", class: "button button-quiet", "aria-label": "Explore " + paper.title}, "Explore registered work");
-      go.onclick = () => { $("result-paper").value = paper.paper_id; filters("paper"); route("results"); $("result-experiment").focus(); };
-      card.append(body, go); $("paper-list").append(card);
-    }
-  }
-  function details() {
-    const box = $("selection-details"); replace(box);
-    const series = currentSeries(), datasets = [...new Set(series.map(item => item.dataset_id))].map(id => record("datasets", id));
-    const decoder = record("decoders", $("result-decoder").value);
-    const experiment = record("experiments", $("result-experiment").value);
-    box.append(el("h3", {}, experiment ? titleOf(experiment) : "Configuration and evidence"));
-    for (const data of datasets) {
-      box.append(el("p", {}, `${data.label}: ${data.evidence_status}. ${data.caveat || ""}`));
-      if (data.failure_definition || data.denominator_definition || data.uncertainty_method) box.append(el("p", {class: "muted"}, [data.failure_definition, data.denominator_definition, data.uncertainty_method].filter(Boolean).join(" · ")));
-      box.append(assetList(data.assets || []));
-      const raw = series.filter(item => item.dataset_id === data.dataset_id).flatMap(item => item.points.map(p => p.raw_asset).filter(Boolean));
-      const uniqueRaw = [...new Map(raw.map(asset => [asset.path, asset])).values()];
-      if (uniqueRaw.length) { const rawBox = el("details"); rawBox.append(el("summary", {}, `Per-shot raw data · ${uniqueRaw.length} registered files`), assetList(uniqueRaw)); box.append(rawBox); }
-      else if (!(data.assets || []).some(a => /jsonl|ledger|raw/.test(a.kind || ""))) box.append(el("p", {class: "muted"}, "Per-shot raw data: no download is registered for this dataset. Retained summaries and source instructions remain available."));
-    }
-    if (decoder) {
-      box.append(el("h3", {}, /unavailable/.test(decoder.configuration?.settings_status || "") ? "Available specification provenance" : "Frozen decoder specification and effective settings"), el("pre", {id: "frozen-spec", tabindex: "0", "aria-label": "Frozen decoder specification"}, JSON.stringify(decoder.configuration || decoder.effective_settings || decoder, null, 2)));
-      const download = el("button", {type: "button", id: "download-frozen-spec", class: "button button-quiet"}, decoder.configuration?.settings_status === "exact_policy_file" ? "Export exact specification" : "Export original configuration source");
-      download.onclick = () => exportDecoder(decoder).catch(showError);
-      box.append(download, assetList([decoder.asset, ...(decoder.assets || [])]));
-      const receipt = el("button", {type: "button", id: "download-configuration-receipt", class: "button button-quiet"}, "Download effective configuration receipt");
-      receipt.onclick = () => save("decoder-receipt.json", JSON.stringify({schema: "research-decoder-receipt-v1", ...decoder}, null, 2) + "\n"); box.append(receipt);
-      const extend = el("button", {type: "button", id: "extend-selected", class: "button button-quiet"}, "Create a new experiment from these settings");
-      extend.onclick = () => useDecoder(decoder, $("result-code").value); box.append(extend);
-    } else if (series.length) box.append(el("p", {class: "muted"}, "Choose one decoder to inspect and export its complete frozen specification."));
-    if (experiment?.reproduction_recipe) {
-      box.append(el("h3", {}, "Original study entry point"), el("pre", {}, JSON.stringify(experiment.reproduction_recipe, null, 2)));
-      if (experiment.reproduction_recipe.kind === "registered_study") {
-        const download = el("button", {type: "button", id: "download-registered-workflow", class: "button button-quiet"}, "Download original registered workflow");
-        download.onclick = () => downloadRegistered(experiment).catch(showError); box.append(download);
-      }
-    }
-    if (!series.length) box.append(el("p", {}, "This selection has no registered numerical result. Its paper remains indexed without an invented curve."));
-  }
-  function showError(error) { $("form-summary").textContent = error.message; $("form-summary").className = "form-summary error"; }
-  async function exportDecoder(decoder) {
-    if (decoder.asset && assetURL(decoder.asset)) {
-      const bytes = await assetBytes(decoder.asset); save(decoder.asset.path.split("/").pop(), bytes, "application/octet-stream");
-    } else save(`${decoder.decoder_id}.json`, JSON.stringify(decoder.configuration || decoder, null, 2) + "\n");
-  }
-  function valueFor(point) { return S.metric === "work" ? point.mean_work : S.metric === "runtime" ? point.mean_seconds : point.y; }
-  function isBound(point) { return /bound|upper/i.test(point.status || "") || (point.is_rate_estimate === false && /bound|upper/i.test(point.source_point_type || "")) || (point.failures === 0 && point.y === 0 && known(point.ci_high)); }
-  function plotValue(point) { return S.metric === "ler" && isBound(point) && point.y === 0 ? point.ci_high : valueFor(point); }
-  function rows() { return currentSeries().filter(item => S.selected.has(item.key)).flatMap(series => series.points.filter(point => known(point.x) && known(valueFor(point))).map(point => ({series, point}))); }
-  function renderResults() {
-    const series = currentSeries(), legend = $("series-legend"); replace(legend);
-    for (let i = 0; i < series.length; i++) {
-      const item = series[i], label = el("label"), input = el("input", {type: "checkbox", value: item.key}); input.checked = S.selected.has(item.key);
-      input.onchange = () => { if (input.checked) S.selected.add(item.key); else S.selected.delete(item.key); renderTable(); renderPlot(); };
-      label.append(input, el("span", {style: `color:${colors[i % colors.length]}`}, `${titleOf(record("decoders", item.decoder_id) || item)} · ${item.evidence}`)); legend.append(label);
-    }
-    const workUnits = new Set(series.flatMap(item => item.points.filter(p => known(p.mean_work)).map(p => p.work_unit)));
-    selectOptions($("metric-select"), [{id: "ler", label: "Logical failure probability"}, ...(workUnits.size === 1 ? [{id: "work", label: "Mean work · " + [...workUnits][0]}] : []), {id: "runtime", label: "Mean reported time (s; scope per row)"}], "Choose a metric", S.metric);
-    if (!$("metric-select").value) S.metric = $("metric-select").value = "ler";
-    $("metric-select").disabled = !series.length;
-    details(); renderTable(); renderPlot();
-  }
-  function renderTable() {
-    const body = $("result-table").querySelector("tbody"); replace(body);
-    for (const {series, point: p} of rows()) {
-      const tr = el("tr", {"data-code": series.code_id, "data-decoder": series.decoder_id, "data-dataset": series.dataset_id});
-      const estimator = p.estimator || p.sampling_method || p.estimation_method || "";
-      const weighted = /importance|weighted/.test(estimator);
-      const uncertainty = p.ci_method || p.uncertainty_method || record("datasets", series.dataset_id).uncertainty_method || "Method not supplied";
-      const interval = known(p.ci_low) && known(p.ci_high) ? `[${fmt(p.ci_low)}, ${fmt(p.ci_high)}]` : isBound(p) && known(p.ci_high) ? `Upper ≤ ${fmt(p.ci_high)}` : "Unavailable";
-      const cells = [series.label, fmt(p.x), S.metric === "ler" ? (estimator || "Block LER") : S.metric,
-        (isBound(p) && S.metric === "ler" ? "≤ " : "") + fmt(plotValue(p)), weighted ? `${count(p.raw_samples)} raw draws` : count(p.n), weighted ? `${count(p.raw_failures)} raw events` : count(p.failures), `${count(p.type_i)} / ${count(p.type_ii)}`,
-        `${interval} · ${known(p.confidence_level) ? p.confidence_level * 100 + "% · " : ""}${uncertainty}`, known(p.mean_work) ? `${fmt(p.mean_work)} ${p.work_unit || "unit unavailable"}` : "Unavailable",
-        known(p.mean_seconds) ? `${fmt(p.mean_seconds)} s · ${p.runtime_scope || "see source timing boundary"}` : "Unavailable", `${series.evidence} · ${p.status || ""}`, /importance|weighted/.test(estimator) ? "Weighted estimate; counts are raw proposal draws" : "Retained summary"];
-      for (const cell of cells) tr.append(el("td", {}, cell)); body.append(tr);
-    }
-    if (!body.children.length) { const tr = el("tr"); tr.append(el("td", {colspan: 12}, "No measured points for the current selection and metric.")); body.append(tr); }
-    $("export-visible-results").disabled = !rows().length;
-  }
-  function svg(tag, attrs, content) { const n = document.createElementNS("http://www.w3.org/2000/svg", tag); for (const [k, v] of Object.entries(attrs || {})) n.setAttribute(k, v); if (content != null) n.textContent = content; return n; }
-  function renderPlot() {
-    const chart = $("result-plot"), data = rows().filter(r => known(plotValue(r.point)) && (S.metric !== "ler" || plotValue(r.point) > 0));
-    replace(chart, [svg("title", {id: "plot-title"}, "Retained experiment results")]);
-    if (!data.length) { chart.append(svg("text", {x: 420, y: 180, "text-anchor": "middle", class: "plot-label"}, "No plottable measured points in this selection")); $("plot-caption").textContent = "No curve is inferred for missing results."; return; }
-    const log = S.metric === "ler", W = 840, H = 380, left = 78, right = 22, top = 25, bottom = 58;
-    let xmin = Math.min(...data.map(r => r.point.x)), xmax = Math.max(...data.map(r => r.point.x));
-    if (xmin === xmax) { xmin -= .005; xmax += .005; }
-    let ys = data.map(r => plotValue(r.point));
-    if (log) ys = data.flatMap(r => [plotValue(r.point), r.point.ci_low, r.point.ci_high].filter(v => known(v) && v > 0));
-    let ymin = Math.min(...ys), ymax = Math.max(...ys);
-    if (log) { ymin = Math.floor(Math.log10(ymin)); ymax = Math.ceil(Math.log10(ymax)); if (ymin === ymax) ymax++; }
-    else if (ymin === ymax) { ymin = 0; ymax = ymax || 1; }
-    const x = p => left + (p - xmin) / (xmax - xmin) * (W - left - right);
-    const y = p => H - bottom - ((log ? Math.log10(p) : p) - ymin) / (ymax - ymin) * (H - top - bottom);
-    for (let i = 0; i <= 4; i++) {
-      const v = xmin + (xmax - xmin) * i / 4, cx = x(v);
-      chart.append(svg("line", {x1: cx, y1: top, x2: cx, y2: H - bottom, class: "plot-grid"}), svg("text", {x: cx, y: H - bottom + 21, "text-anchor": "middle", class: "plot-label"}, fmt(v)));
-    }
-    const ticks = log ? Array.from({length: Math.min(10, ymax - ymin + 1)}, (_, i) => ymin + i * Math.max(1, Math.ceil((ymax - ymin) / 9))) : [ymin, (ymin + ymax) / 2, ymax];
-    for (const v of ticks) { const raw = log ? 10 ** v : v, cy = y(raw); chart.append(svg("line", {x1: left, y1: cy, x2: W - right, y2: cy, class: "plot-grid"}), svg("text", {x: left - 10, y: cy + 4, "text-anchor": "end", class: "plot-label"}, log ? `10^${v}` : fmt(v))); }
-    const series = currentSeries();
-    for (let i = 0; i < series.length; i++) {
-      const item = series[i], points = data.filter(r => r.series.key === item.key).map(r => r.point).sort((a, b) => a.x - b.x), color = colors[i % colors.length];
-      if (!points.length) continue;
-      chart.append(svg("path", {d: points.map((p, j) => `${j ? "L" : "M"}${x(p.x)},${y(plotValue(p))}`).join(" "), stroke: color, class: /source|transcription/.test(item.evidence) ? "plot-line plot-source" : "plot-line"}));
-      for (const p of points) {
-        const cx = x(p.x), cy = y(plotValue(p)), bound = log && isBound(p);
-        if (log && known(p.ci_low) && p.ci_low > 0 && known(p.ci_high)) chart.append(svg("line", {x1: cx, y1: y(p.ci_low), x2: cx, y2: y(p.ci_high), stroke: color, class: "plot-error"}));
-        const description = `${item.label}; p=${fmt(p.x)}; ${bound ? "interval upper limit " : "estimate "}${fmt(plotValue(p))}; ${count(p.failures)} failures, ${count(p.n)} samples; ${p.estimator || p.sampling_method || item.evidence}`;
-        const mark = bound ? svg("path", {d: `M${cx-5},${cy-4}L${cx+5},${cy-4}L${cx},${cy+5}Z`, fill: "white", stroke: color}) : svg("circle", {cx, cy, r: 4.5, fill: color});
-        mark.setAttribute("class", "plot-point"); mark.setAttribute("tabindex", "0"); mark.setAttribute("role", "button"); mark.setAttribute("aria-label", description); mark.append(svg("title", {}, description));
-        const describe = () => { $("plot-caption").textContent = description; }; mark.onfocus = describe; mark.onclick = describe; mark.onkeydown = event => { if (["Enter", " "].includes(event.key)) { event.preventDefault(); describe(); } }; chart.append(mark);
-      }
-    }
-    chart.append(svg("text", {x: 430, y: H - 12, "text-anchor": "middle", class: "plot-label"}, "Physical error probability p"), svg("text", {x: 18, y: 175, transform: "rotate(-90 18 175)", "text-anchor": "middle", class: "plot-label"}, log ? "Logical failure probability (log scale)" : S.metric));
-    $("plot-caption").textContent = `${data.length} retained points. Dashed: source values. Open triangles: bounds, not observed nonzero rates. Focus a point for details.`;
-    $("plot-description").textContent = $("plot-caption").textContent;
-  }
-  function library() {
-    const decoders = $("decoders-library"), codes = $("codes-library");
-    const channels = el("div"); channels.append(el("h3", {}, "Noise models"));
-    for (const model of S.catalog.channels || []) channels.append(el("h4", {}, model.label), el("p", {}, model.definition), el("p", {class: "field-help"}, model.decoder_prior));
-    codes.after(channels);
-    for (const [box, choices, kind] of [[decoders, S.catalog.decoders, "decoder"], [codes, S.catalog.codes, "code"]]) {
-      const select = el("select", {id: `library-${kind}`, "aria-label": `Registered ${kind}`}), body = el("div");
-      selectOptions(select, choices, `Select a registered ${kind}`); replace(box, [select, body]);
-      select.onchange = () => { replace(body); const item = choices.find(r => idOf(r) === select.value); if (!item) return;
-        body.append(el("h3", {}, titleOf(item)), el("pre", {}, JSON.stringify(item.configuration || item, null, 2)), assetList([item.asset, ...(item.assets || [])]));
-        if (kind === "decoder") { const go = el("button", {type: "button", class: "button"}, "Use as a new experiment"); go.onclick = () => useDecoder(item); body.append(go); }
-        const retained = S.series.find(series => kind === "decoder" ? series.decoder_id === item.decoder_id : series.code_id === item.code_id);
-        if (retained) { const inspect = el("button", {type: "button", class: "button button-quiet"}, "Inspect registered results");
-          inspect.onclick = () => { $("result-paper").value = retained.paper_ids[0]; filters("paper");
-            $("result-dataset").value = retained.dataset_id; filters("dataset"); $("result-code").value = retained.code_id; filters("code");
-            if (kind === "decoder") { $("result-decoder").value = retained.decoder_id; filters("decoder"); } route("results"); };
-          body.append(inspect);
-        }
-      };
-    }
-  }
-  function defaultDraft() {
-    return {id: "my-decoder-experiment", family: "binary_css", variant: "plain", preset: "", code: "three-qubit", codeText: JSON.stringify({hx:[[1,1,0]],hz:[[0,0,1]],lx:[[1,0,0]],lz:[[1,1,0]]}, null, 2),
-      channel: "depolarizing", rates: "0.06", prior: "matched", p0: .06, shots: S.contract.defaults.sampling.shots, seed: 7, start: 0, iterations: 100, maxshots: 100000,
-      rule: "sum_product", version: "v2", policy: false, format: "float64", scale: 16, scope: "scalar_edges", coefficients: "float64", damping: 0, alpha: 1, beta: 0,
-      hard: "min_llr", shortcut: true, stop: true, rounds: 2, perRound: 10, epsilon: 1e-10, circuit: "", circuitText: "R 0\nX_ERROR(0.1) 0\nM 0\nDETECTOR rec[-1]\nOBSERVABLE_INCLUDE(0) rec[-1]\n", tie: "zero"};
-  }
-  function field(container, key, label, options, help, type = "text") {
-    const wrap = el("label", {for: "build-" + key, class: type === "textarea" ? "full-width" : ""}, label);
-    let input;
-    if (options) { input = el("select", {id: "build-" + key}); for (const item of options) { const val = Array.isArray(item) ? item[0] : item; input.append(el("option", {value: String(val)}, Array.isArray(item) ? item[1] : String(item))); } }
-    else input = el(type === "textarea" ? "textarea" : "input", {id: "build-" + key, ...(type === "textarea" ? {rows: 8, spellcheck: "false"} : {type, ...(type === "number" ? {step: "any"} : {})})});
-    input.value = String(S.draft[key]); input.disabled = Boolean(S.custom);
-    input.onchange = () => { const old = S.draft[key]; S.draft[key] = type === "number" ? Number(input.value) : ["policy", "stop", "shortcut"].includes(key) ? input.value === "true" : input.value;
-      if (key === "preset") { useDecoder(record("decoders", input.value)); return; }
-      if (key === "family") { S.draft.rule = input.value === "circuit_dem_bp" ? "spa" : "sum_product"; S.draft.variant = "plain"; S.draft.hard = input.value === "bp4" ? "strict_pauli" : "min_llr"; }
-      if (key === "rule" && input.value === "min_sum") { S.draft.policy = S.draft.family !== "circuit_dem_bp"; S.draft.format = "int8"; S.draft.scope = "scalar_edges"; }
-      if (key === "family" || key === "policy" || key === "code" || key === "channel" || key === "prior" || key === "variant" || key === "format") renderBuilder();
-      else preview();
-      if (old !== S.draft[key]) S.valid = false;
-    };
-    wrap.append(input); if (help) wrap.append(el("span", {class: "field-help"}, help)); container.append(wrap); return input;
-  }
-  function renderBuilder() {
-    if (!S.draft) S.draft = defaultDraft(); const d = S.draft, box = $("form-fields"); replace(box);
-    field(box, "preset", "Start from a frozen specification", [["", "Custom / current visual configuration"], ...S.catalog.decoders.map(item => [item.decoder_id, item.label || item.decoder_id])], "Importing settings creates a new experiment. Exact historical files remain in Results.");
-    field(box, "id", "Experiment label", null, "A content-derived identity is recorded locally; this label is for you.");
-    field(box, "family", "Decoder family / regime", [["binary_css", "Binary CSS code capacity"], ["bp4", "Joint Pauli BP4 code capacity"], ["circuit_dem_bp", "Circuit: Stim / Sinter BP"]]);
-    if (d.family === "circuit_dem_bp") {
-      field(box, "circuit", "Circuit input", [["", "Custom inline Stim text"], ...S.catalog.circuits.map(item => [item.circuit_id, item.label])]);
-      field(box, "circuitText", "Stim circuit text", null, "Noise is embedded in the circuit. Stim parses and validates its detector model locally.", "textarea");
-      field(box, "rule", "Circuit check rule", [["spa", "Sum-product"], ["min_sum", "Min-sum"]]); field(box, "tie", "Zero-belief tie rule", ["zero", "one"]);
-      box.append(el("p", {class: "field-help full-width"}, "Circuit adapter: flooding, float64 v1, decompose_errors=false. Damping, alternate precision, and Relay/Beam policies are unsupported."));
-    } else {
-      field(box, "code", "Code", [["custom", "Custom CSS matrices"], ...S.catalog.codes.filter(item => item.code_id !== "gb46").map(item => [item.code_id, item.label])]);
-      if (d.code === "custom") field(box, "codeText", "CSS input JSON", null, "Binary hx/hz with equal n, commuting checks, optional paired lx/lz. Full validation repeats in Python.", "textarea");
-      field(box, "channel", "Physical noise", [["depolarizing", "Depolarizing: X/Y/Z each p/3"], ["x_only", "X-only independent channel"]]);
-      field(box, "rates", "Physical error probabilities", null, "Comma-separated sweep, for example 0.04, 0.06, 0.08.");
-      field(box, "prior", "Decoder prior", [["matched", "p₀ follows physical p"], ["fixed", "Freeze p₀ across the sweep"]], "BP4 uses a depolarizing joint prior; binary uses component marginals (p₀ for X-only, 2p₀/3 for depolarizing).");
-      if (d.prior === "fixed") field(box, "p0", "Fixed decoder p₀", null, "Sampling p and decoder p₀ remain separate.", "number");
-      field(box, "rule", "Check update", [["sum_product", "Sum-product"], ["min_sum", "Min-sum / normalized / offset"]]);
-      field(box, "version", "Numerical profile", [["v2", "Canonical v2 base profile"], ["v1", "Frozen float64 v1 · plain SPA only"]]);
-      field(box, "policy", "Numerical policy overlay", [[false, "Profile defaults"], [true, "Configure resolution, damping, MS coefficients"]]);
-      if (d.family === "bp4") field(box, "variant", "BP4 procedure", [["plain", "Plain BP4"], ["qbpgd", "Q-BPGD · persistent v2 messages"]]);
-      if (d.policy) {
-        field(box, "format", "Message resolution", S.contract.resolution.formats);
-        if (d.format.startsWith("int")) field(box, "scale", "Fixed-point scale s", null, "Step 1/s; symmetric range ±(2^(bits−1)−1)/s; ties to even.", "number");
-        field(box, "scope", "Quantization boundary", S.contract.resolution.scopes);
-        field(box, "coefficients", "Coefficient resolution", [["float64", "Keep coefficients in float64"], ["same", "Round coefficients in the message resolution"]]);
-        field(box, "damping", "V2C damping: old-message weight d", null, "m ← d m_old + (1−d) m_new; effective rounded coefficients are recorded locally.", "number");
-        if (d.rule === "min_sum") { field(box, "alpha", "Min-sum scale α", null, "α max(0, min |m| − β)", "number"); field(box, "beta", "Min-sum offset β", null, null, "number"); }
-        if (d.family === "bp4") field(box, "hard", "BP4 hard decision", [["min_llr", "Minimum identity-referenced LLR"], ["strict_pauli", "Strict I, X, Z, else Y ladder"]]);
-        field(box, "shortcut", "Zero-syndrome shortcut", [[true, "Enabled"], [false, "At least one completed sweep"]]);
-      }
-      if (d.family === "bp4" && d.variant === "plain") field(box, "stop", "Stopping", [[true, "First syndrome-matching candidate"], [false, "Run the entire iteration cap"]]);
-      if (d.family === "bp4" && d.variant === "qbpgd") {
-        field(box, "perRound", "Sweeps per decimation round", null, null, "number"); field(box, "rounds", "Maximum rounds", null, "Product with sweeps per round must fit the total iteration cap.", "number"); field(box, "epsilon", "Fixation ε", null, null, "number");
-      }
-    }
-    field(box, "shots", "Shots per rate point", null, "Fixed N; every attempted decode enters the denominator.", "number");
-    field(box, "seed", "Sampling seed", null, null, "number"); field(box, "start", "First shot index", null, null, "number");
-    field(box, "iterations", "Iteration / total Q-BPGD sweep cap", null, "Binary: cap per X/Z component; BP4: joint sweeps; Q-BPGD: total sweeps.", "number");
-    field(box, "maxshots", "Total shot budget", null, "Must cover rate points × shots. Circuit skipped prefix also consumes the budget.", "number");
-    if (!$("reset-visual")) { const reset = el("button", {id: "reset-visual", type: "button", class: "button button-quiet"}, "Return to visual builder"); reset.onclick = () => { S.custom = null; S.unsupported = ""; S.draft = defaultDraft(); renderBuilder(); }; $("copy-spec").after(reset); }
-    if (!$("download-experiment-json")) { const download = el("button", {id: "download-experiment-json", type: "button", class: "button button-quiet"}, "Download experiment JSON"); download.onclick = () => { preview(); if (S.spec) save("experiment.json", JSON.stringify(S.spec, null, 2) + "\n"); }; document.querySelector(".form-actions").append(download); }
-    if (d.family !== "circuit_dem_bp" && !d.policy) box.append(el("p", {class: "field-help full-width"}, d.version === "v2" ? "Without an overlay, the v2 profile uses V2C damping d = 0.1. BP4 uses the strict Pauli decision rule and completes at least one sweep. Enable a policy overlay to choose different values." : "Without an overlay, the frozen v1 numerical safeguards and stopping rules apply."));
-    preview();
-  }
-  function visualSpec() {
-    const d = S.draft, circuit = d.family === "circuit_dem_bp", bp4 = d.family === "bp4";
-    let code;
-    if (!circuit) code = d.code === "custom" ? {kind: "embedded_css", ...JSON.parse(d.codeText)} : {kind: "registered", id: d.code};
-    const decoder = circuit ? {family: "circuit_dem_bp", implementation: "canonical_sinter", rule: d.rule, numerical_profile: S.contract.circuit_rule_profiles[d.rule], schedule: "flooding", max_iterations: d.iterations, tie_break: d.tie} :
-      {family: d.family, implementation: "compiled", variant: bp4 ? d.variant : "plain", rule: d.rule, numerical_profile: `${bp4 ? "quaternary-bp4" : "binary-spa-flooding"}-f64-${d.version}`, policy: null, schedule: "flooding", stop_on_convergence: bp4 && d.variant === "plain" ? d.stop : true};
-    if (!circuit && d.policy) decoder.policy = {version: S.contract.ui_fields.policy.version, check_rule: d.rule,
-      resolution: {version: S.contract.ui_fields.policy.resolution_version, format: d.format, scale: d.format.startsWith("int") ? d.scale : null, scope: d.scope, coefficients: d.coefficients}, damping: d.damping, alpha: d.rule === "sum_product" ? 1 : d.alpha, beta: d.rule === "sum_product" ? 0 : d.beta,
-      hard_decision: bp4 ? d.hard : "min_llr", zero_syndrome_shortcut: d.shortcut};
-    if (bp4 && d.variant === "qbpgd") decoder.qbpgd = {iterations_per_round: d.perRound, epsilon: d.epsilon, round_limit: d.rounds};
-    return {schema: S.contract.schema, id: d.id,
-      problem: circuit ? {kind: "circuit", circuit: {kind: "inline_stim", text: d.circuitText}, dem: {decompose_errors: false}} : {kind: bp4 ? "pauli_code_capacity" : "css_code_capacity", code},
-      channel: {kind: circuit ? "embedded_circuit" : d.channel}, decoder,
-      rate_points: circuit ? [{label: "embedded_circuit"}] : d.rates.split(",").map(value => ({physical_p: Number(value.trim()), decoder_p0: d.prior === "matched" ? Number(value.trim()) : d.p0})),
-      sampling: {seed: d.seed, shot_start: d.start, shots: d.shots}, budgets: {max_shots: d.maxshots, max_iterations: d.iterations},
-      provenance: {relation: "canonical_adaptation", source_spec_id: d.preset || null, notes: d.preset ? "New configuration derived from a catalog specification; historical results do not transfer to this experiment." : null}};
-  }
-  function matrix(value, name) {
-    if (!Array.isArray(value) || !value.length || !Array.isArray(value[0]) || !value[0].length || value.some(row => !Array.isArray(row) || row.length !== value[0].length || row.some(bit => bit !== 0 && bit !== 1))) throw Error(`${name} must be a rectangular binary integer matrix.`);
-    return value;
-  }
-  function rank(matrix) { const a = matrix.map(r => r.slice()); let pivot = 0; for (let col = 0; col < a[0].length && pivot < a.length; col++) { const found = a.findIndex((row, i) => i >= pivot && row[col]); if (found < 0) continue; [a[pivot], a[found]] = [a[found], a[pivot]]; for (let i = pivot + 1; i < a.length; i++) if (a[i][col]) for (let j = col; j < a[i].length; j++) a[i][j] ^= a[pivot][j]; pivot++; } return pivot; }
-  function parity(a, b) { let p = 0; for (let i = 0; i < a.length; i++) p ^= a[i] & b[i]; return p; }
-  function css(code) {
-    if (code.kind !== "embedded_css") return;
-    const hx = matrix(code.hx, "hx"), hz = matrix(code.hz, "hz"), n = hx[0].length;
-    if (hz[0].length !== n) throw Error("hx and hz must have the same number of columns.");
-    if ([...hx, ...hz].some(row => row.every(bit => bit === 0))) throw Error("Code-capacity sampling rejects identity-only check rows.");
-    if (hx.some(x => hz.some(z => parity(x, z)))) throw Error("hx and hz do not commute over GF(2).");
-    if ((code.lx == null) !== (code.lz == null)) throw Error("Supply both lx and lz, or neither.");
-    if (code.lx) { const lx = matrix(code.lx, "lx"), lz = matrix(code.lz, "lz"), k = n - rank(hx) - rank(hz);
-      if (lx.length !== k || lz.length !== k || lx[0].length !== n || lz[0].length !== n) throw Error("Logical matrices must have shape (k,n).");
-      if (lx.some(x => hz.some(z => parity(x, z))) || lz.some(z => hx.some(x => parity(x, z)))) throw Error("Logical rows do not commute with the opposite checks.");
-      if (lx.some((x, i) => lz.some((z, j) => parity(x, z) !== Number(i === j)))) throw Error("Logical X/Z rows must have identity pairing.");
-    }
-  }
-  function validate(spec) {
-    const errors = [], check = (condition, message) => { if (!condition) errors.push(message); };
-    const keys = S.contract.field_sets.experiment;
-    if (!spec || typeof spec !== "object" || keys.some(k => !(k in spec)) || Object.keys(spec).some(k => !keys.includes(k))) return ["Use the complete research-experiment-v1 contract; unknown or missing fields are rejected."];
-    const closed = (value, fields, name, optional = []) => {
-      check(value && typeof value === "object" && !Array.isArray(value) && fields.every(k => optional.includes(k) || k in value) && Object.keys(value).every(k => fields.includes(k)), `${name}: unknown or missing fields in the shared contract.`);
-    };
-    const d = spec.decoder, circuit = spec.problem.kind === "circuit";
-    closed(spec.sampling, S.contract.field_sets.sampling, "sampling");
-    closed(spec.budgets, S.contract.field_sets.budgets, "budgets");
-    closed(spec.provenance, S.contract.field_sets.provenance, "provenance");
-    closed(spec.problem, S.contract.field_sets[circuit ? "circuit_problem" : "code_problem"], "problem");
-    closed(spec.channel, S.contract.field_sets[spec.channel.kind === "explicit" ? "explicit_channel" : "channel"], "channel");
-    const decoderFields = [...S.contract.field_sets[circuit ? "circuit_decoder" : "decoder"], ...(!circuit && d.variant === "qbpgd" ? ["qbpgd"] : [])];
-    closed(d, decoderFields, "decoder");
-    if (errors.length) return errors;
-    check(spec.schema === S.contract.schema, "Unsupported experiment schema."); check(typeof spec.id === "string" && spec.id.length > 0, "Supply an experiment label.");
-    check(d.schedule === "flooding", "This execution backend supports flooding only; other schedules require a registered study route.");
-    check(["binary_css", "bp4", "circuit_dem_bp"].includes(d.family), "Unsupported decoder family.");
-    check(Array.isArray(spec.rate_points) && spec.rate_points.length > 0, "Supply at least one rate point.");
-    check(S.contract.profiles[d.family]?.includes(d.numerical_profile), "The numerical profile does not belong to this decoder family.");
-    check(["canonical_adaptation", "development_fixture"].includes(spec.provenance.relation), "A custom experiment cannot inherit a source-faithful result claim.");
-    check(spec.provenance.source_spec_id === null || typeof spec.provenance.source_spec_id === "string", "source_spec_id must be a string or null.");
-    check(spec.provenance.notes === null || typeof spec.provenance.notes === "string", "provenance.notes must be a string or null.");
-    for (const k of ["shots", "seed", "shot_start"]) check(Number.isSafeInteger(spec.sampling[k]) && spec.sampling[k] >= (k === "shots" ? 1 : 0), `${k} must be an integer in its supported range.`);
-    check(Number.isSafeInteger(spec.budgets.max_shots) && spec.budgets.max_shots >= spec.rate_points.length * spec.sampling.shots, "The total shot budget must cover all rate points × shots.");
-    check(Number.isSafeInteger(spec.budgets.max_iterations) && spec.budgets.max_iterations >= (circuit ? 0 : 1), "Supply an integer iteration cap.");
-    if (circuit) {
-      closed(spec.problem.circuit, S.contract.field_sets[spec.problem.circuit?.kind === "registered" ? "registered_input" : "inline_stim"], "circuit");
-      closed(spec.problem.dem, ["decompose_errors"], "dem");
-      check(spec.rate_points.length === 1, "One Stim circuit has one embedded noise setting; use separate circuits for a sweep.");
-      for (const p of spec.rate_points) closed(p, S.contract.field_sets.circuit_rate_point, "circuit rate point");
-      check(d.family === "circuit_dem_bp" && d.implementation === "canonical_sinter" && S.contract.rules_by_family.circuit_dem_bp.includes(d.rule) && d.numerical_profile === S.contract.circuit_rule_profiles[d.rule], "Circuit execution supports only the pinned plain float64 v1 Sinter adapter.");
-      check(!("policy" in d) && !["damping", "resolution", "variant"].some(k => k in d), "Circuit damping, resolution overlays, and interventions are unsupported.");
-      check(spec.channel.kind === "embedded_circuit" && spec.problem.dem?.decompose_errors === false, "Circuit noise comes from Stim text and requires decompose_errors=false.");
-      check(spec.problem.circuit?.kind === "registered" || (spec.problem.circuit?.kind === "inline_stim" && typeof spec.problem.circuit.text === "string" && spec.problem.circuit.text.trim().length > 0), "Supply Stim text or a registered circuit.");
-      check(spec.sampling.shot_start + spec.sampling.shots <= spec.budgets.max_shots, "Circuit skipped prefix consumes the total shot budget.");
-      check(["zero", "one"].includes(d.tie_break), "Unsupported circuit tie policy.");
-      check(Number.isSafeInteger(d.max_iterations) && d.max_iterations >= 0 && d.max_iterations <= spec.budgets.max_iterations, "Circuit decoder iteration cap exceeds the budget.");
-    } else {
-      const input = spec.problem.code;
-      closed(input, S.contract.field_sets[input?.kind === "registered" ? "registered_input" : "embedded_css"], "code", ["lx", "lz"]);
-      check(S.contract.code_kinds.includes(input?.kind), "Unsupported code input format.");
-      check(spec.problem.kind === (d.family === "bp4" ? "pauli_code_capacity" : "css_code_capacity"), "Decoder family and problem regime disagree.");
-      check(["depolarizing", "x_only", "explicit"].includes(spec.channel.kind), "Unsupported code-capacity noise model.");
-      check(S.contract.rules.includes(d.rule), "Unsupported update rule.");
-      check(d.implementation === "compiled", "This custom experiment route uses the compiled canonical implementation.");
-      if (d.family === "binary_css") check(d.variant === "plain" && d.stop_on_convergence === true, "Binary compiled BP uses first-valid stopping and plain BP only.");
-      if (d.family === "binary_css" && d.rule === "min_sum") check(d.policy !== null, "Binary min-sum requires its explicit v2 numerical policy overlay.");
-      if (d.family === "bp4") check(["plain", "qbpgd"].includes(d.variant) && typeof d.stop_on_convergence === "boolean", "Unsupported BP4 procedure or stopping rule.");
-      if (!d.numerical_profile?.endsWith("-v1") && !d.numerical_profile?.endsWith("-v2")) errors.push("Unknown numerical profile.");
-      if (d.numerical_profile?.endsWith("-v1")) check(d.rule === "sum_product" && d.policy === null && d.variant === "plain", "Frozen v1 requires plain sum-product and no numerical overlay.");
-      try { css(spec.problem.code); } catch (error) { errors.push(error.message); }
-      for (const p of spec.rate_points) { closed(p, S.contract.field_sets[spec.channel.kind === "explicit" ? "explicit_rate_point" : "rate_point"], "rate point"); if (spec.channel.kind !== "explicit") check(known(p.physical_p) && p.physical_p >= 0 && p.physical_p <= 1, "Physical p must lie in [0,1]."); check(known(p.decoder_p0) && p.decoder_p0 > 0 && p.decoder_p0 < 1, "Decoder p₀ must lie strictly between 0 and 1."); }
-      if (spec.channel.kind === "explicit") {
-        const probabilities = spec.channel.probabilities, table = Array.isArray(probabilities?.[0]) ? probabilities : [probabilities];
-        check(table.every(row => Array.isArray(row) && row.length === 4 && row.every(p => known(p) && p >= 0 && p <= 1) && Math.abs(row.reduce((a, b) => a + b, 0) - 1) <= 8 * Number.EPSILON), "Explicit Pauli probabilities must be normalized I,X,Y,Z rows.");
-        if (input.kind === "embedded_css") check(table.length === 1 || table.length === input.hx[0].length, "Per-qubit probability rows must match n.");
-      }
-      if (d.policy) {
-        const p = d.policy, r = p.resolution;
-        closed(p, S.contract.field_sets.policy, "policy"); closed(r, S.contract.field_sets.resolution, "resolution");
-        check(d.numerical_profile.endsWith("-v2") && p.check_rule === d.rule && p.version === S.contract.ui_fields.policy.version, "Policy overlay must match the v2 profile and check rule.");
-        check(r && r.version === S.contract.ui_fields.policy.resolution_version && S.contract.resolution.formats.includes(r.format) && S.contract.resolution.scopes.includes(r.scope) && S.contract.resolution.coefficients.includes(r.coefficients), "Unknown resolution policy.");
-        if (r?.format.startsWith("int")) check(Number.isSafeInteger(r.scale) && r.scale > 0 && r.scale <= 2147483647, "Fixed-point scale must be a positive int32-range integer."); else check(r?.scale === null, "Floating formats use scale=null.");
-        check(known(p.damping) && p.damping >= 0 && p.damping < 1 && known(p.alpha) && p.alpha > 0 && known(p.beta) && p.beta >= 0, "Invalid damping, scale, or offset coefficient.");
-        if (d.rule === "sum_product") check(p.alpha === 1 && p.beta === 0, "SPA does not accept min-sum scale or offset.");
-        if (d.family === "binary_css") check(p.hard_decision === "min_llr", "A Pauli hard-decision policy cannot modify a binary decoder.");
-        check(["min_llr", "strict_pauli"].includes(p.hard_decision) && typeof p.zero_syndrome_shortcut === "boolean", "Unsupported hard-decision or shortcut policy.");
-      }
-      if (d.variant === "qbpgd") { closed(d.qbpgd, S.contract.field_sets.qbpgd, "qbpgd"); check(d.family === "bp4" && d.rule === "sum_product" && d.stop_on_convergence === true && d.numerical_profile === "quaternary-bp4-f64-v2" && d.policy === null && Number.isSafeInteger(d.qbpgd?.round_limit) && d.qbpgd.round_limit > 0 && Number.isSafeInteger(d.qbpgd?.iterations_per_round) && d.qbpgd.iterations_per_round > 0 && d.qbpgd.round_limit * d.qbpgd.iterations_per_round <= spec.budgets.max_iterations && known(d.qbpgd.epsilon) && d.qbpgd.epsilon > 0 && d.qbpgd.epsilon < 1, "Q-BPGD needs sum-product v2, first-valid stopping, no resolution overlay, and rounds × sweeps within the total iteration cap."); }
-    }
-    return errors;
-  }
-  function preview() {
-    S.valid = false; $("download-package").disabled = true;
-    try { S.spec = S.custom ? copy(S.custom) : visualSpec(); $("spec-output").textContent = JSON.stringify(S.spec, null, 2); }
-    catch (error) { S.spec = null; $("spec-output").textContent = error.message; }
-    $("form-summary").className = "form-summary";
-    $("form-summary").textContent = S.unsupported || (S.custom ? "Custom JSON mode. Its exact fields will be exported; return to the visual builder to configure controls." : S.draft.preset ? "New experiment derived from a frozen specification. The parent result is available in Results; these edited settings have no measured result yet." : "New experiment: no measured result is claimed. Download and run locally after validation.");
-  }
-  function validateCurrent() {
-    preview(); const errors = S.unsupported ? [S.unsupported] : S.spec ? validate(S.spec) : ["Correct the input JSON first."];
-    S.valid = errors.length === 0; $("form-summary").className = "form-summary " + (S.valid ? "valid" : "error");
-    $("form-summary").textContent = S.valid ? "Structural and policy checks passed. Python repeats the shared contract, CSS/Stim algebra, and kernel compatibility checks before sampling." : errors.join(" ");
-    $("download-package").disabled = !S.valid; return S.valid;
-  }
-  function useDecoder(decoder, code) {
-    if (!decoder) { S.draft.preset = ""; S.unsupported = ""; renderBuilder(); return; }
-    const config = decoder.configuration?.effective_policy || decoder.configuration?.effective_candidate || decoder.configuration;
-    S.custom = null; S.draft = defaultDraft(); S.draft.preset = decoder.decoder_id;
-    if (config?.schema !== "vanilla-bp-decoder-v1" || !["binary_css_separate", "bp4"].includes(config.family) || config.check_rule !== "sum_product") {
-      S.unsupported = "This frozen procedure has a study-specific runner. Export its exact specification and use the original entry point shown in Results. Its settings cannot be imported as a plain compiled decoder; choose Custom to build a new configuration.";
-    } else {
-      S.unsupported = ""; const d = S.draft; d.family = config.family === "bp4" ? "bp4" : "binary_css"; d.code = code || "three-qubit";
-      d.version = /v1/.test(config.numerical_profile) ? "v1" : "v2"; d.rule = "sum_product"; d.iterations = config.max_iterations;
-      d.damping = config.damping_old; d.prior = "matched"; d.hard = d.family === "bp4" && d.version === "v2" ? "strict_pauli" : "min_llr";
-      d.shortcut = d.family !== "bp4" || d.version !== "v2";
-      // Explicit v2 overlay preserves the frozen undamped arm rather than
-      // inheriting the canonical profile's old-message weight of 0.1.
-      d.policy = d.version === "v2"; d.format = "float64"; d.scope = "scalar_edges";
-    }
-    renderBuilder(); route("builder");
-  }
-  async function portableSpec(spec) {
-    const result = copy(spec), problem = result.problem;
-    if (problem.code?.kind === "registered") {
-      const code = record("codes", problem.code.id);
-      if (code?.asset && /\.json$/.test(code.asset.path) && assetURL(code.asset)) {
-        const data = JSON.parse(new TextDecoder().decode(await assetBytes(code.asset)));
-        if (Array.isArray(data.hx) && Array.isArray(data.hz)) { problem.code = {kind: "embedded_css", hx: data.hx, hz: data.hz}; if (data.lx && data.lz) Object.assign(problem.code, {lx: data.lx, lz: data.lz}); }
-      }
-    }
-    if (problem.circuit?.kind === "registered") {
-      const item = record("circuits", problem.circuit.id); if (!item) throw Error("Registered circuit is unavailable.");
-      problem.circuit = {kind: "inline_stim", text: new TextDecoder().decode(await assetBytes(item.asset))};
-    }
-    return result;
-  }
-  async function downloadPackage() {
-    if (!validateCurrent()) return;
-    const button = $("download-package"); button.disabled = true;
-    try {
-      const spec = await portableSpec(S.spec), errors = validate(spec); if (errors.length) throw Error(errors.join(" "));
-      const files = {...S.template.files, "experiment.json": JSON.stringify(spec, null, 2) + "\n", "decoder.json": JSON.stringify(spec.decoder, null, 2) + "\n"};
-      if (spec.problem.code?.kind === "embedded_css") { const code = {...spec.problem.code}; delete code.kind; files["inputs/code.json"] = JSON.stringify(code, null, 2) + "\n"; }
-      if (spec.problem.circuit?.kind === "inline_stim") files["inputs/circuit.stim"] = spec.problem.circuit.text;
-      if (spec.problem.kind === "circuit" && spec.provenance.source_spec_id?.startsWith("circuit:")) {
-        const source = record("circuits", spec.provenance.source_spec_id.slice(8));
-        if (source && await digest(spec.problem.circuit.text) === source.asset.sha256) {
-          files["inputs/circuit-source.json"] = JSON.stringify({circuit_id: source.circuit_id, ...source.source, circuit_sha256: source.asset.sha256}, null, 2) + "\n";
-          for (const item of source.license_assets || []) files["inputs/" + item.path.split("/").pop()] = new TextDecoder().decode(await assetBytes(item));
-        }
-      }
-      const hashes = {}; for (const name of Object.keys(files).sort()) hashes[name] = await digest(files[name]);
-      files["package-manifest.json"] = JSON.stringify({schema: "research-package-manifest-v1", files: hashes}, null, 2) + "\n";
-      save(spec.id.replace(/[^a-zA-Z0-9._-]/g, "-") + ".zip", ResearchZip.create(Object.entries(files).map(([name, content]) => ({name, content}))));
-      $("form-summary").textContent = "Package prepared from this exact configuration. It contains no computed results; run it locally to create new evidence.";
-    } catch (error) { showError(error); } finally { button.disabled = !S.valid; }
-  }
-  async function downloadRegistered(experiment) {
-    const recipe = experiment.reproduction_recipe, files = {...S.template.registered_files}, inputs = {};
-    for (const [key, label] of [["study_path", "original-study"], ["decoder_path", "original-decoder"]]) {
-      const path = recipe[key], response = await fetch(new URL("../../" + path, location.href));
-      if (!response.ok) throw Error(`Registered input unavailable: ${path}`);
-      const bytes = new Uint8Array(await response.arrayBuffer()); inputs[path] = await digest(bytes);
-      const knownAsset = S.catalog.decoders.map(d => d.asset).filter(Boolean).find(a => a.path === path);
-      if (knownAsset?.sha256 && knownAsset.sha256 !== inputs[path]) throw Error("Registered input changed; refresh the catalog.");
-      files[label + "." + path.split(".").pop()] = bytes;
-    }
-    files["registered-experiment.json"] = JSON.stringify({schema: "registered-study-package-v1", experiment_id: experiment.experiment_id, ...recipe, repository_inputs: inputs, evidence_status: experiment.evidence_status}, null, 2) + "\n";
-    const hashes = {}; for (const name of Object.keys(files).sort()) hashes[name] = await digest(files[name]);
-    files["package-manifest.json"] = JSON.stringify({schema: "research-package-manifest-v1", files: hashes}, null, 2) + "\n";
-    save("original-" + experiment.experiment_id + ".zip", ResearchZip.create(Object.entries(files).map(([name, content]) => ({name, content}))));
-  }
-  function renderCircuits() {
-    selectOptions($("circuit-select"), S.catalog.circuits, "Choose a pinned circuit"); $("use-circuit").disabled = !S.catalog.circuits.length;
-    $("use-circuit").onclick = async () => {
-      try { const item = record("circuits", $("circuit-select").value); if (!item) throw Error("Choose a circuit first.");
-        const content = new TextDecoder().decode(await assetBytes(item.asset)); circuitDraft(content, item.circuit_id); $("circuit-note").textContent = item.scope;
-      } catch (error) { $("circuit-note").textContent = error.message; }
-    };
-  }
-  function circuitDraft(content, id = "") { S.custom = null; S.unsupported = ""; S.draft = defaultDraft(); S.draft.family = "circuit_dem_bp"; S.draft.rule = "spa"; S.draft.circuit = id; S.draft.preset = id ? "circuit:" + id : ""; S.draft.circuitText = content; renderBuilder(); route("builder"); }
-  function exportTable() {
-    const header = ["dataset", "code", "decoder", "p", "estimate", "raw_samples", "raw_failures", "type_i", "type_ii", "ci_low", "ci_high", "estimator", "uncertainty_method", "mean_work", "work_unit", "mean_seconds", "evidence"];
-    const lines = rows().map(({series: s, point: p}) => [s.dataset_id, s.code_id, s.decoder_id, p.x, p.y, p.n, p.failures, p.type_i, p.type_ii, p.ci_low, p.ci_high, p.estimator || p.sampling_method, p.ci_method || p.uncertainty_method, p.mean_work, p.work_unit, p.mean_seconds, s.evidence]);
-    save("retained-results.csv", [header, ...lines].map(line => line.map(v => `"${String(v ?? "").replaceAll('"', '""')}"`).join(",")).join("\n") + "\n", "text/csv");
-  }
-  async function load() {
-    try {
-      [S.catalog, S.contract, S.template] = await Promise.all([json("catalog.json"), json("contract.json"), json("package-template.json")]);
-      for (const k of ["papers", "experiments", "datasets", "decoders", "codes", "circuits"]) S.catalog[k] ||= [];
-      S.series = S.catalog.result_series.map((item, i) => { const data = record("datasets", item.dataset_id); if (!data) throw Error(`Dataset relationship missing: ${item.dataset_id}`); return {...item, points: item.points.map(p => ({...p, ...(p.metadata || {})})), key: `${item.dataset_id}:${item.code_id}:${item.decoder_id}:${i}`, paper_ids: data.paper_ids || [data.paper_id], evidence: data.evidence_status}; });
-      $("stat-papers").textContent = S.catalog.papers.filter(p => p.kind === "paper").length;
-      $("stat-studies").textContent = S.catalog.experiments.length; $("stat-results").textContent = S.series.length;
-      $("catalog-status").textContent = `${S.catalog.datasets.length} retained datasets · static catalog`;
-      selectOptions($("paper-status"), [{id: "paper", label: "External papers"}, {id: "local_study", label: "Local studies"}], "All kinds");
-      $("paper-regime").closest("label").hidden = true;
-      selectOptions($("result-paper"), S.catalog.papers, "All papers / studies", "yao-2312-10950-v2");
-      selectOptions($("result-experiment"), paperExperiments("yao-2312-10950-v2"), "All experiments", "yao-vanilla");
-      filters(); $("result-code").value = "a5"; filters("code");
-      renderPapers(); library(); renderCircuits(); renderBuilder(); route(location.hash.slice(1) || "papers");
-    } catch (error) { $("catalog-status").textContent = "Catalog unavailable"; $("paper-list").textContent = error.message + ". Run bp-registry-research build and serve the interface over HTTP."; console.error(error); }
-  }
-  document.addEventListener("DOMContentLoaded", () => {
-    addLibraries(); for (const id of ["paper-search", "paper-status"]) $(id).addEventListener(id === "paper-search" ? "input" : "change", renderPapers);
-    for (const [id, changed] of [["result-paper", "paper"], ["result-experiment", "experiment"], ["result-dataset", "dataset"], ["result-code", "code"], ["result-decoder", "decoder"]]) $(id).onchange = () => filters(changed);
-    $("metric-select").onchange = () => { S.metric = $("metric-select").value; renderTable(); renderPlot(); };
-    $("refresh-catalog").onclick = load; $("validate-experiment").onclick = validateCurrent; $("download-package").onclick = downloadPackage; $("export-visible-results").onclick = exportTable;
-    $("copy-spec").onclick = () => navigator.clipboard?.writeText($("spec-output").textContent);
-    $("apply-custom-json").onclick = () => { try { const value = JSON.parse($("custom-json").value), errors = validate(value); if (errors.length) throw Error(errors.join(" ")); S.custom = value; S.unsupported = ""; renderBuilder(); validateCurrent(); $("custom-json-feedback").textContent = "Custom specification loaded. Exact fields retained; authoritative kernel validation repeats locally."; } catch (error) { $("custom-json-feedback").textContent = error.message; $("custom-json-feedback").className = "field-feedback error"; S.valid = false; $("download-package").disabled = true; } };
-    $("circuit-file").onchange = async () => { const file = $("circuit-file").files[0]; if (file) circuitDraft(await file.text()); };
-    document.querySelectorAll("[data-nav]").forEach(link => link.onclick = event => { event.preventDefault(); route(link.dataset.nav); });
-    window.addEventListener("hashchange", () => route(location.hash.slice(1)));
-    load();
-  });
+/* v2: measured results, reproducible downloads, and a focused experiment builder. */
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id), copy=x=>JSON.parse(JSON.stringify(x));
+const S={catalog:null,contract:null,template:null,policy:null,cards:[],custom:null,blocked:'',spec:null,imports:[]};
+const colors=['#087d78','#b47412','#5066aa','#ac4447','#608333','#8058a2'];
+const known=x=>typeof x==='number'&&Number.isFinite(x);
+const fmt=x=>known(x)?(x===0?'0':Math.abs(x)<.001?x.toExponential(3):Number(x.toPrecision(5)).toString()):'Unavailable';
+const count=x=>known(x)?x.toLocaleString('en-US'):'Not reported';
+function el(tag,attrs={},value){const n=document.createElement(tag);for(const[k,v]of Object.entries(attrs))n.setAttribute(k,v);if(value!=null)n.textContent=value;return n;}
+function options(node,items,selected){node.replaceChildren(...items.map(([id,label])=>el('option',{value:id},label)));if(items.some(x=>x[0]===selected))node.value=selected;}
+function save(name,content,type='application/json'){const url=URL.createObjectURL(content instanceof Blob?content:new Blob([content],{type}));const a=el('a',{href:url,download:name});a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);}
+async function digest(content){const bytes=typeof content==='string'?new TextEncoder().encode(content):content;return [...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(x=>x.toString(16).padStart(2,'0')).join('');}
+async function readJSON(path){const response=await fetch(path,{cache:'no-cache'});if(!response.ok)throw Error(`${path}: HTTP ${response.status}`);return response.json();}
+const record=(kind,id)=>S.catalog[kind]?.find(x=>(x[`${kind.slice(0,-1)}_id`]||x.decoder_id||x.code_id||x.circuit_id||x.dataset_id||x.experiment_id)===id);
+const sourceURL=a=>a?.url&&['tracked','available','repository','tracked_summary'].includes(a.availability)?new URL(a.url.startsWith('http')?a.url:'../../'+a.url,location.href).href:null;
+async function assetBytes(a){const url=sourceURL(a);if(!url)throw Error('This asset has no available repository download.');const response=await fetch(url);if(!response.ok)throw Error(`Unavailable: ${a.path}`);const bytes=new Uint8Array(await response.arrayBuffer());if(a.sha256&&await digest(bytes)!==a.sha256)throw Error(`Checksum mismatch: ${a.path}`);return bytes;}
+function error(e){$('global-error').hidden=false;$('global-error').textContent=e.message||String(e);}
+function route(id){if(id==='main-content'){$('main-content').focus();return;}if(!$(id)?.classList.contains('page'))id='getting-started';for(const page of document.querySelectorAll('.page'))page.hidden=page.id!==id;for(const a of document.querySelectorAll('[data-nav]')){if(a.dataset.nav===id)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');}history.replaceState(null,'','#'+id);window.scrollTo(0,0);}
+function series(){const allowed=new Set(S.catalog.datasets.filter(d=>!['source_transcription','published_source_values'].includes(d.evidence_status)).map(d=>d.dataset_id));return S.catalog.result_series.filter(s=>allowed.has(s.dataset_id)).map(s=>({...s,points:s.points.filter(p=>known(p.y)&&!/^pending|unmeasured|source_only/i.test(p.status||'')).map(p=>({...p,...p.metadata})),evidence:record('datasets',s.dataset_id)?.evidence_status})).filter(s=>s.points.length);}
+function selected(card){return series().filter(s=>(s.code_id===card.input||s.circuit_id===card.input)&&(!card.decoder||s.decoder_id===card.decoder));}
+function points(card){return selected(card).filter(s=>!card.hidden.has(s.series_id)).flatMap(s=>s.points.map(p=>({s,p})));}
+function bound(p){return /bound|upper/i.test(p.status||'')||(p.is_rate_estimate===false&&/bound|upper/i.test(p.source_point_type||''))||(p.failures===0&&p.y===0&&known(p.ci_high));}
+function value(card,p){return card.metric==='work'?p.mean_work:card.metric==='time'?p.mean_seconds:p.y;}
+function plotValue(card,p){return card.metric==='rate'&&bound(p)&&p.y===0?p.ci_high:value(card,p);}
+function addPlot(){const card={id:S.cards.length?Math.max(...S.cards.map(c=>c.id))+1:1,input:S.cards.length?'b2':'a5',decoder:'',hidden:new Set(),metric:'rate'};const initial=series().find(s=>s.code_id===card.input&&s.source_decoder_id==='bp4_v2'&&s.dataset_id==='yao-vanilla-a5-b2');card.decoder=initial?.decoder_id||series().find(s=>s.code_id===card.input)?.decoder_id||'';S.cards.push(card);renderCards();}
+function inputChoices(){return [...new Map([...S.catalog.codes.map(x=>[x.code_id,x.label]),...S.catalog.circuits.map(x=>[x.circuit_id,`${x.label} · circuit`])]).entries()];}
+function renderCards(){const grid=$('plot-grid');grid.classList.toggle('compare',S.cards.length>1);grid.replaceChildren();for(const card of S.cards){const box=el('article',{class:'plot-card','data-plot':card.id});const heading=el('div',{class:'card-heading'});heading.append(el('h3',{},`Plot ${card.id}`));if(S.cards.length>1){const remove=el('button',{type:'button',class:'secondary','aria-label':`Remove plot ${card.id}`},'Remove');remove.onclick=()=>{S.cards=S.cards.filter(c=>c!==card);renderCards();};heading.append(remove);}box.append(heading);
+ const filters=el('div',{class:'selectors'});for(const[key,label]of[['input','Code/circuit'],['decoder','Decoder']]){const wrap=el('label',{},label),select=el('select',{'data-select':key,'aria-label':`${label} for plot ${card.id}`});const choices=key==='input'?inputChoices():[['','Compare available decoders'],...selected({...card,decoder:''}).map(s=>[s.decoder_id,s.label])];options(select,choices,card[key]);select.onchange=()=>{card[key]=select.value;card.hidden.clear();if(key==='input')card.decoder=selected({...card,decoder:''})[0]?.decoder_id||'';renderCards();};wrap.append(select);filters.append(wrap);}box.append(filters);
+ const choices=selected(card);if(!choices.length){box.append(el('p',{class:'empty'},'No measured result is registered for this code/circuit. Build an experiment to generate results locally.'));const go=el('button',{type:'button',class:'secondary'},'Build this experiment');if(!S.contract.registered_code_ids.includes(card.input)&&!S.catalog.circuits.some(c=>c.circuit_id===card.input)){go.disabled=true;go.textContent='Custom matrices required';box.append(el('p',{class:'small muted'},'This code has no portable registered construction. Supply its matrices in the experiment builder.'));}go.onclick=()=>{resetBuilder();if(S.catalog.circuits.some(c=>c.circuit_id===card.input)){$('build-regime').value='circuit';syncBuilder();$('build-circuit').value=card.input;loadCircuit();}else $('build-code').value=card.input;preview();route('builder');};box.append(go);grid.append(box);continue;}
+ const curves=el('fieldset',{class:'curves'});curves.append(el('legend',{},'Show curves'));const list=el('div',{class:'curve-list'});choices.forEach((s,i)=>{const label=el('label',{style:`color:${colors[i%colors.length]}`});const cb=el('input',{type:'checkbox','aria-label':s.label});cb.checked=!card.hidden.has(s.series_id);cb.onchange=()=>{if(cb.checked)card.hidden.delete(s.series_id);else card.hidden.add(s.series_id);renderCards();};label.append(cb,document.createTextNode(s.label));list.append(label);});curves.append(list);box.append(curves);
+ const metricLabel=el('label',{class:'metric'},'Metric'),metric=el('select',{'aria-label':`Metric for plot ${card.id}`});const units=[...new Set(points(card).filter(x=>known(x.p.mean_work)).map(x=>x.p.work_unit))];const metricChoices=[['rate','Logical / observable failure rate']];if(units.length===1)metricChoices.push(['work',`Mean work · ${units[0]}`]);if(points(card).some(x=>known(x.p.mean_seconds)))metricChoices.push(['time','Mean decoding time · s']);if(!metricChoices.some(x=>x[0]===card.metric))card.metric='rate';options(metric,metricChoices,card.metric);metric.onchange=()=>{card.metric=metric.value;renderCards();};metricLabel.append(metric);box.append(metricLabel);if(units.length>1)box.append(el('p',{class:'small muted'},'Work units differ across these curves. Select a decoder before plotting work.'));
+ drawPlot(card,box);drawTable(card,box);const actions=el('div',{class:'actions'}),csv=el('button',{type:'button',class:'secondary'},'Export visible table');csv.onclick=()=>exportTable(card);actions.append(csv);const receipt=el('button',{type:'button',class:'secondary'},'Download run settings');receipt.onclick=()=>save(`plot-${card.id}-settings.json`,JSON.stringify({schema:'research-plot-receipt-v2',series:choices,decoders:choices.map(s=>record('decoders',s.decoder_id)),experiments:S.catalog.experiments.filter(e=>e.dataset_ids?.some(id=>choices.some(s=>s.dataset_id===id)))},null,2)+'\n');actions.append(receipt);if(card.decoder){const reproduce=el('button',{type:'button',class:'secondary'},'Reproduce / extend');reproduce.onclick=()=>{const d=record('decoders',card.decoder),cfg=d.configuration||{};if(cfg.effective_policy?.schema==='vanilla-bp-decoder-v1'||cfg.experiment)useSaved(d,card.input);else{const detail=box.querySelector('.run-details');detail.open=true;detail.scrollIntoView({block:'start'});}};actions.append(reproduce);}box.append(actions);runDetails(card,box);grid.append(box);
+}}
+function svg(tag,attrs={},value){const n=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const[k,v]of Object.entries(attrs))n.setAttribute(k,v);if(value!=null)n.textContent=value;return n;}
+function drawPlot(card,box){const figure=el('figure',{class:'chart'}),chart=svg('svg',{viewBox:'0 0 640 310',role:'group','aria-label':`Measured results for plot ${card.id}`}),caption=el('figcaption',{},'Focus a point for its value and sample count.');figure.append(chart,caption);box.append(figure);const rows=points(card).filter(({p})=>known(p.x)&&known(plotValue(card,p))&&(card.metric!=='rate'||plotValue(card,p)>0));if(!rows.length){caption.textContent='No plottable observations for this selection.';return;}
+ let xmin=Math.min(...rows.map(x=>x.p.x)),xmax=Math.max(...rows.map(x=>x.p.x));if(xmin===xmax){xmin-=.005;xmax+=.005;}const log=card.metric==='rate';let values=rows.map(x=>plotValue(card,x.p));if(log)values=rows.flatMap(x=>[plotValue(card,x.p),x.p.ci_low,x.p.ci_high].filter(v=>known(v)&&v>0));let ymin=Math.min(...values),ymax=Math.max(...values);if(log){ymin=Math.floor(Math.log10(ymin));ymax=Math.ceil(Math.log10(ymax));}if(ymin===ymax){ymin=log?ymin-1:0;ymax=ymax||1;}const X=x=>64+(x-xmin)/(xmax-xmin)*555,Y=y=>258-((log?Math.log10(y):y)-ymin)/(ymax-ymin)*235;
+ for(let i=0;i<=4;i++){const x=xmin+(xmax-xmin)*i/4;chart.append(svg('line',{x1:X(x),x2:X(x),y1:23,y2:258,class:'grid'}),svg('text',{x:X(x),y:279,'text-anchor':'middle'},fmt(x)));const yy=ymin+(ymax-ymin)*i/4;chart.append(svg('line',{x1:64,x2:619,y1:258-i*235/4,y2:258-i*235/4,class:'grid'}),svg('text',{x:56,y:262-i*235/4,'text-anchor':'end'},log?`10^${Number(yy.toFixed(1))}`:fmt(yy)));}
+ selected(card).forEach((s,i)=>{const ps=rows.filter(x=>x.s===s||x.s.series_id===s.series_id).map(x=>x.p).sort((a,b)=>a.x-b.x),color=colors[i%colors.length];if(!ps.length)return;chart.append(svg('path',{d:ps.map((p,j)=>`${j?'L':'M'}${X(p.x)},${Y(plotValue(card,p))}`).join(' '),stroke:color,class:'line'}));for(const p of ps){const x=X(p.x),y=Y(plotValue(card,p));if(log&&known(p.ci_low)&&p.ci_low>0&&known(p.ci_high))chart.append(svg('line',{x1:x,x2:x,y1:Y(p.ci_low),y2:Y(p.ci_high),stroke:color}));const isBound=log&&bound(p),description=`${s.label}; p=${fmt(p.x)}; ${isBound?'upper limit':'estimate'} ${fmt(plotValue(card,p))}; failures ${count(p.failures)}; samples ${count(p.n)}`;const point=isBound?svg('path',{d:`M${x-5},${y-4}L${x+5},${y-4}L${x},${y+5}Z`,fill:'white',stroke:color}):svg('circle',{cx:x,cy:y,r:4,fill:color,stroke:'white'});point.setAttribute('class','point');point.setAttribute('tabindex','0');point.setAttribute('role','button');point.setAttribute('aria-label',description);point.append(svg('title',{},description));point.onfocus=point.onclick=()=>caption.textContent=description;point.onkeydown=e=>{if(['Enter',' '].includes(e.key)){e.preventDefault();caption.textContent=description;}};chart.append(point);}});chart.append(svg('text',{x:340,y:304,'text-anchor':'middle'},points(card)[0]?.p.x_semantics==='circuit_setting_index'?'Circuit setting index':points(card)[0]?.p.x_semantics==='decoder_prior_probability'?'Decoder prior probability p₀':'Physical error probability p'),svg('text',{x:16,y:144,transform:'rotate(-90 16 144)','text-anchor':'middle'},log?'Failure probability · log scale':card.metric==='time'?'Decoding time · s':'Mean work'));}
+const headers=['Series','Noise','Metric','Observed value','Samples','Failures','Type I / II','CI','Work','Time','Evidence','Availability'];
+function tableRows(card){return points(card).map(({s,p})=>{const weighted=/importance|weighted/i.test(p.estimator||p.sampling_method||'');const ci=known(p.ci_low)&&known(p.ci_high)?`[${fmt(p.ci_low)}, ${fmt(p.ci_high)}]`:'Unavailable';return[s.label,p.x_semantics==='circuit_setting_index'?(p.setting_label||'Embedded circuit noise'):p.x_semantics==='decoder_prior_probability'?'Explicit Pauli table; p₀='+fmt(p.x):known(p.x)?fmt(p.x):'Unavailable',card.metric==='rate'?(p.estimator||'Block failure rate'):card.metric,(bound(p)&&card.metric==='rate'?'≤ ':'')+fmt(plotValue(card,p)),weighted?`${count(p.raw_samples)} raw draws`:count(p.n),weighted?`${count(p.raw_failures)} raw events`:count(p.failures),`${count(p.type_i)} / ${count(p.type_ii)}`,`${ci}${known(p.confidence_level)?' · '+100*p.confidence_level+'%':''} · ${p.uncertainty_method||p.ci_method||'method not reported'}`,known(p.mean_work)?`${fmt(p.mean_work)} ${p.work_unit||'unit not reported'}`:'Unavailable',known(p.mean_seconds)?`${fmt(p.mean_seconds)} s · ${p.runtime_scope||'see run details'}`:'Unavailable',`${s.evidence} · ${p.status||''}`,weighted?'Weighted estimate; proposal counts':p.raw_asset?.availability||'Retained summary'];});}
+function drawTable(card,box){const wrap=el('div',{class:'table-wrap',tabindex:'0','aria-label':`Results table for plot ${card.id}`}),table=el('table'),head=el('thead'),tr=el('tr');headers.forEach(h=>tr.append(el('th',{scope:'col'},h)));head.append(tr);table.append(head);const body=el('tbody');for(const row of tableRows(card)){const tr=el('tr');row.forEach(cell=>tr.append(el('td',{},cell)));body.append(tr);}table.append(body);wrap.append(table);box.append(wrap);}
+function exportTable(card){const csv=[headers,...tableRows(card)].map(row=>row.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\n')+'\n';save(`plot-${card.id}-results.csv`,csv,'text/csv');}
+function runDetails(card,box){const details=el('details',{class:'run-details'});details.append(el('summary',{},'Run details and reproduction'));const members=selected(card);for(const s of members){const d=record('datasets',s.dataset_id),decoder=record('decoders',s.decoder_id),exp=S.catalog.experiments.find(e=>e.dataset_ids?.includes(s.dataset_id));const section=el('div');section.append(el('h4',{},s.label),el('p',{},d.caveat||d.description||s.evidence));const config=el('details');config.append(el('summary',{},'Exact decoder settings'),el('pre',{},JSON.stringify(decoder.configuration||decoder,null,2)));section.append(config);const links=el('p');for(const a of[d.assets||[],[decoder.asset],s.points.map(p=>p.raw_asset).filter(Boolean)].flat()){const url=sourceURL(a);if(url)links.append(el('a',{href:url,target:'_blank',rel:'noopener'},a.label||a.path));else if(a)links.append(el('span',{class:'muted'},`${a.label||a.kind}: ${a.availability||'unavailable'}. `));}section.append(links);const actions=el('div',{class:'actions'});const adapt=el('button',{type:'button',class:'secondary'},'Adapt this decoder');adapt.onclick=()=>useSaved(decoder,s.code_id);actions.append(adapt);if(exp?.reproduction_recipe?.kind==='registered_study'){const original=el('button',{type:'button',class:'secondary'},'Download original experiment');original.onclick=()=>downloadOriginal(exp).catch(error);actions.append(original);}section.append(actions);if(exp?.reproduction_recipe){const recipe=el('details');recipe.append(el('summary',{},'Original run / analysis commands'),el('pre',{},JSON.stringify(exp.reproduction_recipe,null,2)));section.append(recipe);}details.append(section);}details.append(el('p',{class:'muted'},'Unknown uncertainty and raw-data availability remain unavailable. Weighted rates use their declared estimator. Timing scopes and work units may differ; these values do not establish cross-machine speed rankings.'));box.append(details);}
+function availability(){const target=$('availability');target.replaceChildren();const policies=el('div');policies.append(el('h3',{},'Available policies'));const list=el('ul');for(const p of S.policy.policies)list.append(el('li',{},p.label));policies.append(list,el('p',{class:'small'},'Some policies use their registered study workflow; see Policies for compatible execution routes.'));const codes=el('div');codes.append(el('h3',{},'Available codes'));for(const family of S.policy.code_families){codes.append(el('div',{class:'family'},family.label));const items=el('ul');for(const id of family.code_ids||[]){const code=record('codes',id);if(code)items.append(el('li',{},code.label+(family.circuit_code_ids?.includes(id)?' (circuit available)':'')));}for(const id of (family.circuit_ids||family.circuits?.map(c=>c.id)||[])){const circuit=record('circuits',id);if(circuit)items.append(el('li',{},circuit.label+' (circuit available)'));}if(!items.children.length)items.append(el('li',{},'No member registered yet'));codes.append(items);}target.append(policies,codes);}
+function policies(){const target=$('policy-list');target.replaceChildren();for(const policy of S.policy.policies){const box=el('article',{class:'policy-card'});box.append(el('h3',{},policy.label));for(const expression of policy.equations||[]){const eq=el('div',{class:'equation'});katex.render(typeof expression==='string'?expression:expression.latex,eq,{displayMode:true,throwOnError:true,trust:false});box.append(eq);}const params=el('div',{class:'parameters'});for(const parameter of policy.parameters||[])params.append(el('span',{class:'parameter'},typeof parameter==='string'?parameter:`${parameter.symbol||parameter.name}: ${parameter.meaning||parameter.label||""}${parameter.range?" · "+parameter.range:""}`));box.append(params);if(policy.notation){const symbols=el('details');symbols.append(el('summary',{},'Symbols'),el('p',{class:'small'},Array.isArray(policy.notation)?policy.notation.join('; '):policy.notation));box.append(symbols);}box.append(el('p',{class:'route'},(policy.execution_status||policy.status||'').replaceAll('_',' ')));if(typeof policy.execution==='object'){const routes=el('details');routes.append(el('summary',{},'Execution routes'));for(const[key,route]of Object.entries(policy.execution))routes.append(el('p',{class:'small'},`${key.replaceAll('_',' ')}: ${route.scope||route.status}`));box.append(routes);}if(policy.source_url)box.append(el('a',{href:policy.source_url,target:'_blank',rel:'noopener'},policy.source_label||'Source paper ↗'));target.append(box);}}
+const valueOf=id=>$(id).value,num=id=>Number(valueOf(id)),optional=id=>valueOf(id).trim()===''?null:num(id);
+function resetBuilder(){S.custom=null;S.blocked='';$('saved-note').textContent='A new configuration creates a new experiment identity.';for(const input of document.querySelectorAll('#builder-form input,#builder-form select,#builder-form textarea'))input.disabled=false;$('builder-form').reset();$('build-code').value='three-qubit';$('build-preset').value='';syncBuilder();preview();}
+function syncBuilder(){const circuit=valueOf('build-regime')==='circuit',bp4=valueOf('build-family')==='bp4',gd=valueOf('build-variant')==='qbpgd';$('input-legend').textContent=circuit?'Circuit':'Code';$('code-input').hidden=circuit;$('circuit-input').hidden=!circuit;for(const id of['channel-label','rate-label','prior-label'])$(id).hidden=circuit;
+ $('build-family').disabled=circuit;$('build-variant').disabled=circuit;$('build-version').disabled=circuit;$('numerical-controls').hidden=circuit||gd||valueOf('build-version')==='v1';$('decimation-controls').hidden=circuit||!gd;for(const id of['build-type-i','build-type-ii'])$(id).disabled=circuit;
+ const desired=circuit?'spa':'sum_product';if(circuit&&!['spa','min_sum'].includes(valueOf('build-rule'))||!circuit&&!['sum_product','min_sum'].includes(valueOf('build-rule')))options($('build-rule'),[[desired,'Sum-product'],['min_sum','Min-sum']],desired);else options($('build-rule'),[[desired,'Sum-product'],['min_sum','Min-sum']],valueOf('build-rule'));
+ $('build-hard').disabled=!bp4;$('build-stop').disabled=!bp4;$('build-alpha').disabled=$('build-beta').disabled=valueOf('build-rule')!=='min_sum';$('build-scale').disabled=!valueOf('build-format').startsWith('int');
+ $('decoder-help').textContent=circuit?'Plain SPA / MS only. Circuit priors come from the detector error model; damping, alternate precision, and guided decimation are unsupported by this adapter.':gd?'Q-BPGD uses its canonical v2 numerical settings. Rounds × sweeps must fit the total iteration budget.':valueOf('build-version')==='v1'?'Historical v1 supports frozen, undamped plain float64 sum-product only.':'Flooding updates. Damping weights old V2C messages. The iteration cap applies per binary component or jointly for BP4. Memory, Relay, Beam, and degeneracy-cutting methods use their registered study workflows.';
+ $('matrix-input').open=valueOf('build-code')==='custom';
+}
+function visualSpec(){const circuit=valueOf('build-regime')==='circuit',family=valueOf('build-family'),bp4=family==='bp4',version=valueOf('build-version'),variant=valueOf('build-variant');const stop={};for(const[key,id]of[['stop_failures','build-failures'],['stop_type_i','build-type-i'],['stop_type_ii','build-type-ii']]){const x=optional(id);if(x!==null&&!($(id).disabled))stop[key]=x;}
+ const sampling={seed:num('build-seed'),shot_start:num('build-start'),shots:num('build-shots'),...stop};let decoder;
+ if(circuit)decoder={family:'circuit_dem_bp',implementation:'canonical_sinter',rule:valueOf('build-rule'),numerical_profile:S.contract.circuit_rule_profiles[valueOf('build-rule')],schedule:'flooding',max_iterations:num('build-iterations'),tie_break:'zero'};
+ else{decoder={family,implementation:'compiled',variant,rule:valueOf('build-rule'),numerical_profile:`${bp4?'quaternary-bp4':'binary-spa-flooding'}-f64-${version}`,policy:null,schedule:'flooding',stop_on_convergence:!bp4||variant==='qbpgd'||valueOf('build-stop')==='true'};
+ if(version==='v2'&&variant==='plain'){const rule=decoder.rule;decoder.policy={version:'bp-flooding-policy-v1',check_rule:rule,resolution:{version:'bp-resolution-v1',format:valueOf('build-format'),scale:valueOf('build-format').startsWith('int')?num('build-scale'):null,scope:valueOf('build-scope'),coefficients:valueOf('build-coefficients')},damping:num('build-damping'),alpha:rule==='min_sum'?num('build-alpha'):1,beta:rule==='min_sum'?num('build-beta'):0,hard_decision:bp4?valueOf('build-hard'):'min_llr',zero_syndrome_shortcut:valueOf('build-shortcut')==='true'};}
+ if(variant==='qbpgd')decoder.qbpgd={iterations_per_round:num('build-per-round'),epsilon:num('build-epsilon'),round_limit:num('build-rounds')};}
+ let code;if(!circuit)code=valueOf('build-code')==='custom'?{kind:'embedded_css',...JSON.parse(valueOf('build-matrix'))}:{kind:'registered',id:valueOf('build-code')};const p0=optional('build-prior');return{schema:'research-experiment-v1',id:valueOf('build-id'),problem:circuit?{kind:'circuit',circuit:{kind:'inline_stim',text:valueOf('build-stim')},dem:{decompose_errors:false}}:{kind:bp4?'pauli_code_capacity':'css_code_capacity',code},channel:{kind:circuit?'embedded_circuit':valueOf('build-channel')},decoder,rate_points:circuit?[{label:'embedded_circuit'}]:valueOf('build-rates').split(',').map(p=>({physical_p:Number(p.trim()),decoder_p0:p0===null?Number(p.trim()):p0})),sampling,budgets:{max_shots:num('build-maxshots'),max_iterations:num('build-iterations')},provenance:{relation:'canonical_adaptation',source_spec_id:valueOf('build-preset')||(circuit&&valueOf('build-circuit')?'circuit:'+valueOf('build-circuit'):null),notes:'New experiment; no existing performance result is inherited.'}};
+}
+function preview(){try{S.spec=S.custom?copy(S.custom):visualSpec();$('spec-preview').textContent=JSON.stringify(S.spec,null,2);}catch(e){S.spec=null;$('spec-preview').textContent=e.message;}for(const input of document.querySelectorAll('#builder-form input,#builder-form select,#builder-form textarea')){if(!['custom-spec','build-preset'].includes(input.id)&&S.custom)input.disabled=true;}for(const id of['download-package','download-json'])$(id).disabled=true;$('builder-feedback').className='muted';$('builder-feedback').textContent=S.blocked||(S.custom?'Exact saved/custom JSON mode. Visual controls are disabled; edit the JSON below or return to the visual builder to create a new configuration.':'Validate the configuration to enable downloads.');}
+function validateCurrent(){preview();let errors=[];try{errors=S.blocked?[S.blocked]:S.spec?ResearchValidation.validate(S.spec,S.contract):['Correct the input JSON.'];}catch(e){errors=[e.message];}const ok=!errors.length;$('builder-feedback').className=ok?'success':'error';$('builder-feedback').textContent=ok?'Configuration checked. Python repeats matrix / Stim and kernel compatibility validation before sampling.':errors.join(' ');for(const id of['download-package','download-json'])$(id).disabled=!ok;return ok;}
+function useSaved(decoder,codeId){resetBuilder();$('build-preset').value=decoder.decoder_id;const config=decoder.configuration||{},policy=config.effective_policy;const request=config.experiment||decoder.experiment_spec||config.portable_experiment;
+ if(request?.schema==='research-experiment-v1'){S.custom=copy(request);S.custom.id=request.id+'-edited';S.custom.provenance={relation:'canonical_adaptation',source_spec_id:decoder.decoder_id,notes:'Derived from a saved run; this is a new experiment.'};$('custom-spec').value=JSON.stringify(S.custom,null,2);}
+ else if(policy?.schema==='vanilla-bp-decoder-v1'&&['bp4','binary_css_separate'].includes(policy.family)){$('build-family').value=policy.family==='bp4'?'bp4':'binary_css';$('build-version').value=/v1/.test(policy.numerical_profile)?'v1':'v2';$('build-code').value=codeId||series().find(s=>s.decoder_id===decoder.decoder_id)?.code_id||'three-qubit';$('build-iterations').value=policy.max_iterations;$('build-damping').value=policy.damping_old;$('build-hard').value=policy.family==='bp4'?'strict_pauli':'min_llr';$('build-shortcut').value=policy.family==='bp4'?'false':'true';}
+ else S.blocked='This saved decoder has a study-specific execution path. Use Run details → Original run / analysis commands (or Download original experiment where available). Its policies cannot be substituted by a plain decoder.';
+ $('saved-note').textContent=`Derived from ${decoder.label||decoder.decoder_id}. Editing creates a new experiment identity.`;syncBuilder();preview();route('builder');}
+async function loadCircuit(){const item=record('circuits',valueOf('build-circuit'));if(item){if(item.asset)$('build-stim').value=new TextDecoder().decode(await assetBytes(item.asset));else{const saved=S.catalog.decoders.find(d=>d.configuration?.experiment?.problem?.kind==='circuit'&&d.configuration.experiment.problem.circuit.text&&S.catalog.result_series.some(s=>s.code_id===item.circuit_id&&s.decoder_id===d.decoder_id));if(!saved)throw Error('Circuit text is unavailable; supply a custom Stim file.');$('build-stim').value=saved.configuration.experiment.problem.circuit.text;}}S.custom=null;preview();}
+async function portableSpec(spec){const out=copy(spec),problem=out.problem;if(problem.code?.kind==='registered'){const code=record('codes',problem.code.id);if(code?.asset?.path?.endsWith('.json')&&sourceURL(code.asset)){const data=JSON.parse(new TextDecoder().decode(await assetBytes(code.asset)));if(Array.isArray(data.hx)&&Array.isArray(data.hz)){problem.code={kind:'embedded_css',hx:data.hx,hz:data.hz};if(data.lx?.length&&data.lz?.length)Object.assign(problem.code,{lx:data.lx,lz:data.lz});}}}return out;}
+async function downloadPackage(){if(!validateCurrent())return;const spec=await portableSpec(S.spec),errors=ResearchValidation.validate(spec,S.contract);if(errors.length)throw Error(errors.join(' '));const files={...S.template.files,'experiment.json':JSON.stringify(spec,null,2)+'\n','decoder.json':JSON.stringify(spec.decoder,null,2)+'\n'};if(spec.problem.code?.kind==='embedded_css'){const code={...spec.problem.code};delete code.kind;files['inputs/code.json']=JSON.stringify(code,null,2)+'\n';}if(spec.problem.circuit?.kind==='inline_stim'){files['inputs/circuit.stim']=spec.problem.circuit.text;const source=S.catalog.circuits.find(c=>spec.provenance.source_spec_id==='circuit:'+c.circuit_id);if(source&&await digest(spec.problem.circuit.text)===source.asset.sha256){files['inputs/circuit-source.json']=JSON.stringify({circuit_id:source.circuit_id,...source.source,circuit_sha256:source.asset.sha256},null,2)+'\n';for(const a of source.license_assets||[])files['inputs/'+a.path.split('/').pop()]=new TextDecoder().decode(await assetBytes(a));}}
+ const hashes={};for(const name of Object.keys(files).sort())hashes[name]=await digest(files[name]);files['package-manifest.json']=JSON.stringify({schema:'research-package-manifest-v1',files:hashes},null,2)+'\n';save(spec.id.replace(/[^a-zA-Z0-9._-]/g,'-')+'.zip',ResearchZip.create(Object.entries(files).map(([name,content])=>({name,content}))));$('builder-feedback').textContent='Package downloaded. Extract it into a new experiment directory and run locally; see Getting started, step 3.';}
+async function downloadOriginal(experiment){const files={...S.template.registered_files},recipe=experiment.reproduction_recipe,inputs={};for(const[field,label]of[['study_path','original-study'],['decoder_path','original-decoder']]){const path=recipe[field],response=await fetch('../../'+path);if(!response.ok)throw Error('Original registered input unavailable: '+path);const bytes=new Uint8Array(await response.arrayBuffer());inputs[path]=await digest(bytes);files[label+'.'+path.split('.').pop()]=new TextDecoder().decode(bytes);}files['registered-experiment.json']=JSON.stringify({schema:'registered-study-package-v1',experiment_id:experiment.experiment_id,...recipe,repository_inputs:inputs,evidence_status:experiment.evidence_status},null,2)+'\n';const hashes={};for(const name of Object.keys(files).sort())hashes[name]=await digest(files[name]);files['package-manifest.json']=JSON.stringify({schema:'research-package-manifest-v1',files:hashes},null,2)+'\n';save('original-'+experiment.experiment_id+'.zip',ResearchZip.create(Object.entries(files).map(([name,content])=>({name,content}))));}
+function mergeExtension(extension){for(const kind of['papers','codes','circuits','channels','decoders','experiments','datasets','result_series']){S.catalog[kind]||=[];const idField=kind==='result_series'?'series_id':kind==='policies'?'policy_id':kind.slice(0,-1)+'_id';for(const item of extension[kind]||[]){const identifier=item[idField];if(typeof identifier!=='string'||!identifier)throw Error(`Uploaded ${kind} record has no stable identifier.`);const prior=S.catalog[kind].find(x=>x[idField]===identifier);if(prior){if(['codes','circuits'].includes(kind)&&prior.input_sha256&&prior.input_sha256===item.input_sha256)continue;if(JSON.stringify(prior)!==JSON.stringify(item))throw Error(`Conflicting imported identity: ${identifier}`);}else S.catalog[kind].push(item);}}}
+async function uploadResults(files){const target=$('upload-feedback');try{target.className='muted';target.textContent='Verifying generated result files…';const {entry,summary}=await ResearchImport.read(files,S.contract);const identifier=summary.experiment_id;if(S.imports.some(x=>x.id===identifier))throw Error('This result is already saved in this browser.');const next=[...S.imports,{id:identifier,extension:entry}],previous=S.catalog;S.catalog=copy(S.catalog);try{mergeExtension(entry);localStorage.setItem('bp-research-v2-results',JSON.stringify(next));}catch(e){S.catalog=previous;throw e;}S.imports=next;fillSavedChoices();renderCards();target.className='success';target.textContent='Verified and added to this browser’s results database. Use import-results to add it to the shared repository catalog.';}catch(e){target.className='error';target.textContent=e.name==='QuotaExceededError'?'Browser storage is full. Use CLI import-results.':e.message;}}
+function fillSavedChoices(){const current=valueOf('build-preset');const allowed=new Set(series().map(s=>s.decoder_id));options($('build-preset'),[['','Custom configuration'],...S.catalog.decoders.filter(d=>allowed.has(d.decoder_id)).map(d=>[d.decoder_id,d.label||d.decoder_id])],current);options($('build-code'),[...S.catalog.codes.filter(c=>S.contract.registered_code_ids.includes(c.code_id)).map(c=>[c.code_id,c.label]),['custom','Custom parity check matrix']],valueOf('build-code')||'three-qubit');options($('build-circuit'),[['','Custom Stim circuit'],...S.catalog.circuits.map(c=>[c.circuit_id,c.label])],valueOf('build-circuit'));}
+function wire(){document.addEventListener('click',event=>{const link=event.target.closest('a[href^="#"]');if(link){event.preventDefault();route(link.getAttribute('href').slice(1));}});$('add-plot').onclick=addPlot;$('builder-form').onsubmit=e=>e.preventDefault();for(const input of document.querySelectorAll('#builder-form input,#builder-form select,#builder-form textarea'))input.addEventListener('change',()=>{if(input.id==='build-preset'){const d=record('decoders',input.value);if(d)useSaved(d);else resetBuilder();return;}if(input.id==='build-rule'&&input.value==='min_sum')$('build-format').value='int8';if(input.id==='build-regime'){S.custom=null;S.blocked='';}syncBuilder();preview();});$('build-circuit').addEventListener('change',()=>loadCircuit().catch(error));$('validate-spec').onclick=validateCurrent;$('download-package').onclick=()=>downloadPackage().catch(e=>{$('builder-feedback').className='error';$('builder-feedback').textContent=e.message;});$('download-json').onclick=async()=>{if(validateCurrent())save('experiment.json',JSON.stringify(await portableSpec(S.spec),null,2)+'\n');};$('apply-spec').onclick=()=>{try{const value=JSON.parse(valueOf('custom-spec')),errors=ResearchValidation.validate(value,S.contract);if(errors.length)throw Error(errors.join(' '));S.custom=value;S.blocked='';preview();validateCurrent();}catch(e){S.blocked=e.message;preview();validateCurrent();}};$('reset-spec').onclick=resetBuilder;$('matrix-file').onchange=async e=>{const file=e.target.files[0];if(file){$('build-matrix').value=await file.text();$('build-code').value='custom';syncBuilder();preview();}};$('stim-file').onchange=async e=>{const file=e.target.files[0];if(file){$('build-regime').value='circuit';$('build-circuit').value='';$('build-stim').value=await file.text();S.custom=null;syncBuilder();preview();}};$('upload-results').onchange=e=>uploadResults(e.target.files);}
+async function load(){try{[S.catalog,S.contract,S.template,S.policy]=await Promise.all([readJSON('catalog.json'),readJSON('contract.json'),readJSON('package-template.json'),readJSON('policies.json')]);const stored=JSON.parse(localStorage.getItem('bp-research-v2-results')||'[]');for(const item of stored){const previous=S.catalog;S.catalog=copy(S.catalog);try{mergeExtension(item.extension);S.imports.push(item);}catch(e){S.catalog=previous;$('upload-feedback').className='error';$('upload-feedback').textContent='A saved browser import could not be loaded: '+e.message;}}fillSavedChoices();wire();syncBuilder();preview();availability();policies();addPlot();$('catalog-status').textContent=`${series().length} measured result curves · v2`;route(location.hash.slice(1)||'getting-started');}catch(e){error(e);}}
+load();
 })();
