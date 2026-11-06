@@ -6,10 +6,10 @@ current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
 stopped_at: Completed 11-16 and 11-20; eight Phase 11 gap plans remain open
-last_updated: "2026-11-06T00:05:20Z"
-last_activity: 2026-11-05
-last_activity_desc: Parameterized v2 decoder labels, searchable curve selection, previews and visible-only details; retired clipping hidden; 111 tests plus browser checks passed
-state_head: 300cb12b81e77c909980519a3d9e2b49c1142571
+last_updated: "2026-11-06T22:28:15Z"
+last_activity: 2026-11-06
+last_activity_desc: Refined v2 evidence views, composable Q-BPGD, circuit sweeps and per-point budgets; 144 tests and 22 browser checks passed
+state_head: dc39055e6db0c2642e62c81d9716797d794785a5
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,7 +34,7 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-05 — parameterized curve labels, prefix selection, toggling/previews, visible-only details and retired-clipping filtering; 111 tests and browser workflows passed
+Last activity: 2026-11-06 — refined v2 evidence views, composable Q-BPGD, circuit sweeps and per-point stopping; 144 tests and 22 browser checks passed
 Last Activity Description: Delivered independent research-interface product slice; scientific phase gates remain unchanged
 
 Progress: 8 of 14 phases complete (57%); 159 of 176 plans complete. Phase 11 has 17 of 25 plans complete; plan 17 is the first open number but depends on source reviews 18 and 19, while plan 20's blocked-target review is complete.
@@ -325,6 +325,8 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 | 261104-n37 | Archive research interface v1 and deliver focused v2 MVP | 2026-11-04 | See quick summary | Verified (106 tests + browser) | [261104-n37-retire-research-html-v1-and-build-simple](./quick/261104-n37-retire-research-html-v1-and-build-simple/) |
 
 | 261105-q2s | Improve v2 parameter labels and interactive curve selection; hide retired clipping | 2026-11-05 | See quick summary | Verified (111 tests + browser) | [261105-q2s-improve-v2-decoder-labels-and-legends-se](./quick/261105-q2s-improve-v2-decoder-labels-and-legends-se/) |
+
+| 261106-nd0 | Refine workbench curves, composable policies, circuit sweeps and per-point budgets | 2026-11-06 | dc39055 | Verified (144 tests + 22 browser checks) | [261106-nd0-refine-workbench-result-semantics-and-co](./quick/261106-nd0-refine-workbench-result-semantics-and-co/) |
 
 ### Roadmap Evolution
 

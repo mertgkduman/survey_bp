@@ -1,0 +1,125 @@
+{
+  "status": "passed",
+  "unit_tests": {
+    "passed": 144,
+    "seconds": 39.99,
+    "command": "PYTHONPATH=src:. OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 .git/research-interface-verify/bin/python -m pytest -q tests/research tests/circuit/test_stim_adapter.py tests/canonical/test_resolution_policy.py tests/test_study_entrypoint.py tests/canonical/quaternary/test_compiled_bp4.py tests/canonical/quaternary/test_compiled_qbpgd_tuned.py"
+  },
+  "browser_runs": [
+    {
+      "artifact_directory": ".git/research-revision-curves-final",
+      "checks": [
+        "Parameter-based decoder labels; retired canonical clipping absent from selectors",
+        "Focus opens available curves; case-insensitive prefix search and keyboard selection add a curve",
+        "Curve click/keyboard toggle updates table and reproduction details; hidden-curve preview is faint and does not add rows",
+        "Run settings and CSV include only enabled curves; legend restores a hidden curve",
+        "Plot states remain independent; corrected Q8 remains available while retired BP4 state clipping is removed",
+        "Saved-specification names share the same parameter labels and retirement filtering",
+        "Mobile layout, no-match state, Escape dismissal and accessible combobox state work"
+      ],
+      "errors": []
+    },
+    {
+      "artifact_directory": ".git/research-revision-regression-final",
+      "checks": [
+        "Workflow-first navigation, equation rendering, and all requested branding",
+        "Independent side-by-side code/decoder selections, real plot/table/CSV, keyboard point inspection",
+        "Retained circuit CPU measurements are registered with honest observable and performance semantics",
+        "Downloaded portable package validates, executes, and honors adaptive failure target without fixed-N confidence claims",
+        "Hash-checked output upload persists in the browser and becomes a selectable measured curve",
+        "Unbound catalog metadata is ignored and cannot alter measured points",
+        "Rehashed but inconsistent confidence fields are rejected before storage",
+        "Circuit builder exports and executes actual Stim/Sinter observable evaluation; explicit Type I/II observable-failure counters enabled",
+        "Five mobile views fit at 390px with independent plot cards stacked",
+        "Archived v1 stays browsable; repository assets and its exported ZIP still validate"
+      ],
+      "errors": []
+    },
+    {
+      "artifact_directory": ".git/research-revision-delivery-final",
+      "checks": [
+        "Q-BP names, comma separators, hidden public fixture, conditional bit-flip axis and retained circuit measurements",
+        "Keyboard saved-decoder search, undamped Q-BP baseline, rendered kernel guide and changing exact code matrices",
+        "Actual exported Q-BPGD composes min-sum scaling/offset, damping and Q8 precision and executes two shots",
+        "Empty targets are unlimited, all-empty budgets rejected, failure-only sampling accepted",
+        "Circuit sweep exports distinct noise-only Stim inputs, executes per-point all-target budgets, partitions observable failures and imports verified results"
+      ],
+      "errors": []
+    }
+  ],
+  "no_expensive_campaign": true,
+  "preview": "http://127.0.0.1:8765/web/research/",
+  "browser_check_groups": 22,
+  "circuit_smoke_rows": [
+    {
+      "ci_high": 0.6576197724933469,
+      "ci_low": 0.0,
+      "ci_method": "wilson_score_95",
+      "ci_status": "zero_failures_upper_bound",
+      "converged_shots": 2,
+      "convergence_rate": 1.0,
+      "decoder_p0": null,
+      "exact_successes": null,
+      "failure_rate": 0.0,
+      "failures": 0,
+      "ler": null,
+      "mean_decode_seconds": 0.3478853772394359,
+      "mean_iterations": 0.5,
+      "n": 2,
+      "observable_successes": 2,
+      "p": 0.2,
+      "rate_index": 0,
+      "requested_shots_per_point": 2,
+      "sampling_mode": "fixed_shots",
+      "sampling_stop_mode": "all",
+      "sampling_stop_semantics": "all configured targets",
+      "sampling_termination_reason": "all_targets",
+      "setting_label": "p = 0.2",
+      "stabilizer_equivalent_successes": null,
+      "termination_reason_counts": {
+        "detector_fit": 1,
+        "initial_candidate_fit": 1
+      },
+      "total_max_shots": null,
+      "type_i": 0,
+      "type_ii": 0,
+      "unconverged_shots": 0,
+      "work_unit": "circuit_dem_bp_sweeps"
+    },
+    {
+      "ci_high": 0.5614970317550454,
+      "ci_low": 5.551115123125783e-17,
+      "ci_method": "wilson_score_95",
+      "ci_status": "zero_failures_upper_bound",
+      "converged_shots": 3,
+      "convergence_rate": 1.0,
+      "decoder_p0": null,
+      "exact_successes": null,
+      "failure_rate": 0.0,
+      "failures": 0,
+      "ler": null,
+      "mean_decode_seconds": 0.0006702160462737083,
+      "mean_iterations": 0.3333333333333333,
+      "n": 3,
+      "observable_successes": 3,
+      "p": 0.3,
+      "rate_index": 1,
+      "requested_shots_per_point": 3,
+      "sampling_mode": "fixed_shots",
+      "sampling_stop_mode": "all",
+      "sampling_stop_semantics": "all configured targets",
+      "sampling_termination_reason": "all_targets",
+      "setting_label": "p = 0.3",
+      "stabilizer_equivalent_successes": null,
+      "termination_reason_counts": {
+        "detector_fit": 1,
+        "initial_candidate_fit": 2
+      },
+      "total_max_shots": null,
+      "type_i": 0,
+      "type_ii": 0,
+      "unconverged_shots": 0,
+      "work_unit": "circuit_dem_bp_sweeps"
+    }
+  ]
+}
