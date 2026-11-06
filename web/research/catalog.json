@@ -15890,17 +15890,37 @@
         "kind": "decoder_source",
         "label": "Exact configuration source",
         "local_storage_path": null,
-        "path": "data/reproductions/yao-2312-10950-non-osd/run_point.py",
-        "sha256": "89bbc5a825d545dd890ef59a5ed1f7642c1458615fb9b810dae587824d0fee78",
-        "url": "data/reproductions/yao-2312-10950-non-osd/run_point.py"
+        "path": "data/reproductions/yao-2312-10950-vanilla/decoders/bp4_v2.json",
+        "sha256": "5c38030ed89858071a8ddc9a1bb4750d2e1fc02a20a73b2242aeeb61fd8e8693",
+        "url": "data/reproductions/yao-2312-10950-vanilla/decoders/bp4_v2.json"
       },
       "configuration": {
+        "effective_policy": {
+          "candidate": "first_syndrome_matching_hard_decision_after_at_least_one_sweep",
+          "check_cap": null,
+          "check_rule": "sum_product",
+          "damping_old": 0.0,
+          "family": "bp4",
+          "id": "bp4_v2",
+          "max_iterations": 100,
+          "message_resolution": "float64",
+          "numerical_profile": "quaternary-bp4-f64-v2-undamped",
+          "prior": "depolarizing_joint_p0_equals_physical_p",
+          "product_epsilon": 1e-10,
+          "reference_role": "canonical_v2_numerical_adaptation",
+          "schema": "vanilla-bp-decoder-v1"
+        },
         "identity_scope": {
           "figure": "7"
         },
-        "settings_status": "policy_fixed_in_runner",
+        "inherited_binding": {
+          "analysis_path": "data/reproductions/yao-2312-10950-non-osd/assess.py",
+          "dataset_id": "yao-vanilla-a5-b2",
+          "decoder_arm": "bp4_v2"
+        },
+        "settings_status": "inherited_vanilla_policy_file",
         "source_arm_id": "qbp",
-        "source_path": "data/reproductions/yao-2312-10950-non-osd/run_point.py"
+        "source_path": "data/reproductions/yao-2312-10950-vanilla/decoders/bp4_v2.json"
       },
       "decoder_id": "yao-non-osd-results:a5:qbp@figure-7",
       "evidence_status": "source_informed_canonical_adaptation",
@@ -16286,17 +16306,37 @@
         "kind": "decoder_source",
         "label": "Exact configuration source",
         "local_storage_path": null,
-        "path": "data/reproductions/yao-2312-10950-non-osd/run_point.py",
-        "sha256": "89bbc5a825d545dd890ef59a5ed1f7642c1458615fb9b810dae587824d0fee78",
-        "url": "data/reproductions/yao-2312-10950-non-osd/run_point.py"
+        "path": "data/reproductions/yao-2312-10950-vanilla/decoders/bp4_v2.json",
+        "sha256": "5c38030ed89858071a8ddc9a1bb4750d2e1fc02a20a73b2242aeeb61fd8e8693",
+        "url": "data/reproductions/yao-2312-10950-vanilla/decoders/bp4_v2.json"
       },
       "configuration": {
+        "effective_policy": {
+          "candidate": "first_syndrome_matching_hard_decision_after_at_least_one_sweep",
+          "check_cap": null,
+          "check_rule": "sum_product",
+          "damping_old": 0.0,
+          "family": "bp4",
+          "id": "bp4_v2",
+          "max_iterations": 100,
+          "message_resolution": "float64",
+          "numerical_profile": "quaternary-bp4-f64-v2-undamped",
+          "prior": "depolarizing_joint_p0_equals_physical_p",
+          "product_epsilon": 1e-10,
+          "reference_role": "canonical_v2_numerical_adaptation",
+          "schema": "vanilla-bp-decoder-v1"
+        },
         "identity_scope": {
           "figure": "8"
         },
-        "settings_status": "policy_fixed_in_runner",
+        "inherited_binding": {
+          "analysis_path": "data/reproductions/yao-2312-10950-non-osd/assess.py",
+          "dataset_id": "yao-vanilla-a5-b2",
+          "decoder_arm": "bp4_v2"
+        },
+        "settings_status": "inherited_vanilla_policy_file",
         "source_arm_id": "qbp",
-        "source_path": "data/reproductions/yao-2312-10950-non-osd/run_point.py"
+        "source_path": "data/reproductions/yao-2312-10950-vanilla/decoders/bp4_v2.json"
       },
       "decoder_id": "yao-non-osd-results:b2:qbp@figure-8",
       "evidence_status": "source_informed_canonical_adaptation",

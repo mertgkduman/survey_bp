@@ -6,10 +6,10 @@ current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
 stopped_at: Completed 11-16 and 11-20; eight Phase 11 gap plans remain open
-last_updated: "2026-11-04T22:12:00Z"
-last_activity: 2026-11-04
-last_activity_desc: Archived interface v1 and delivered simplified v2 with verified adaptive stopping and result import; 106 checks plus browser workflows passed
-state_head: a6297721d83c7cc2cf18ada45d482dc60758df9c
+last_updated: "2026-11-06T00:05:20Z"
+last_activity: 2026-11-05
+last_activity_desc: Parameterized v2 decoder labels, searchable curve selection, previews and visible-only details; retired clipping hidden; 111 tests plus browser checks passed
+state_head: 300cb12b81e77c909980519a3d9e2b49c1142571
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,7 +34,7 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-04 — simplified research interface v2, archived v1, adaptive sampling and verified result imports; 106 tests and browser workflows passed
+Last activity: 2026-11-05 — parameterized curve labels, prefix selection, toggling/previews, visible-only details and retired-clipping filtering; 111 tests and browser workflows passed
 Last Activity Description: Delivered independent research-interface product slice; scientific phase gates remain unchanged
 
 Progress: 8 of 14 phases complete (57%); 159 of 176 plans complete. Phase 11 has 17 of 25 plans complete; plan 17 is the first open number but depends on source reviews 18 and 19, while plan 20's blocked-target review is complete.
@@ -323,6 +323,8 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 | 261103-lyt | Build research catalog, HTML workbench, and portable experiment packages | 2026-11-03 | See quick summary | Verified (83 checks + browser workflows) | [261103-lyt-build-reusable-research-catalog-html-int](./quick/261103-lyt-build-reusable-research-catalog-html-int/) |
 
 | 261104-n37 | Archive research interface v1 and deliver focused v2 MVP | 2026-11-04 | See quick summary | Verified (106 tests + browser) | [261104-n37-retire-research-html-v1-and-build-simple](./quick/261104-n37-retire-research-html-v1-and-build-simple/) |
+
+| 261105-q2s | Improve v2 parameter labels and interactive curve selection; hide retired clipping | 2026-11-05 | See quick summary | Verified (111 tests + browser) | [261105-q2s-improve-v2-decoder-labels-and-legends-se](./quick/261105-q2s-improve-v2-decoder-labels-and-legends-se/) |
 
 ### Roadmap Evolution
 

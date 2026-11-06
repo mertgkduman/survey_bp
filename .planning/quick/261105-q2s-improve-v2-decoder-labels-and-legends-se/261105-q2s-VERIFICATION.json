@@ -1,0 +1,86 @@
+{
+  "checks": [
+    "Parameter-based decoder labels; retired canonical clipping absent from selectors",
+    "Focus opens available curves; case-insensitive prefix search and keyboard selection add a curve",
+    "Curve click/keyboard toggle updates table and reproduction details; hidden-curve preview is faint and does not add rows",
+    "Run settings and CSV include only enabled curves; legend restores a hidden curve",
+    "Plot states remain independent; corrected Q8 remains available while retired BP4 state clipping is removed",
+    "Saved-specification names share the same parameter labels and retirement filtering",
+    "Mobile layout, no-match state, Escape dismissal and accessible combobox state work"
+  ],
+  "errors": [],
+  "python_checks": {
+    "passed": 111,
+    "duration_seconds": 42.97,
+    "command": "PYTHONPATH=src:. OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 .git/research-interface-verify/bin/python -m pytest -q tests/research tests/circuit/test_stim_adapter.py tests/canonical/test_resolution_policy.py tests/test_study_entrypoint.py"
+  },
+  "regression_browser": {
+    "checks": [
+      "Workflow-first navigation, equation rendering, and all requested branding",
+      "Independent side-by-side code/decoder selections, real plot/table/CSV, keyboard point inspection",
+      "Unmeasured circuit reports no data rather than borrowing code-capacity results",
+      "Downloaded portable package validates, executes, and honors adaptive failure target without fixed-N confidence claims",
+      "Hash-checked output upload persists in the browser and becomes a selectable measured curve",
+      "Unbound catalog metadata is ignored and cannot alter measured points",
+      "Rehashed but inconsistent confidence fields are rejected before storage",
+      "Circuit builder exports and executes actual Stim/Sinter observable evaluation; Type I/II targets disabled",
+      "Five mobile views fit at 390px with independent plot cards stacked",
+      "Archived v1 stays browsable; repository assets and its exported ZIP still validate"
+    ],
+    "errors": [],
+    "smoke_rows": [
+      {
+        "ci_high": null,
+        "ci_low": null,
+        "ci_method": "unavailable_optional_stopping",
+        "ci_status": "not_reported_optional_stopping",
+        "converged_shots": 2,
+        "convergence_rate": 1.0,
+        "decoder_p0": 0.06,
+        "exact_successes": 1,
+        "failure_rate": 0.5,
+        "failures": 1,
+        "ler": 0.5,
+        "mean_decode_seconds": 2.649226117413491,
+        "mean_iterations": 2.0,
+        "n": 2,
+        "observable_successes": null,
+        "p": 0.4,
+        "rate_index": 0,
+        "requested_shots_per_point": 8,
+        "sampling_mode": "adaptive_stopping",
+        "sampling_termination_reason": "stop_failures",
+        "setting_label": null,
+        "stabilizer_equivalent_successes": 0,
+        "termination_reason_counts": {
+          "all_components_syndrome_match": 2
+        },
+        "total_max_shots": 8,
+        "type_i": 0,
+        "type_ii": 1,
+        "unconverged_shots": 0,
+        "work_unit": "binary_component_sweeps"
+      }
+    ]
+  },
+  "retirement": {
+    "previous_active_curves": 113,
+    "hidden": 12,
+    "current_visible_curves": 101,
+    "categories": {
+      "canonical_global_clip_v1": 4,
+      "experimental_bp4_state_q8": 8
+    },
+    "retained": "corrected Q8 scalar min-sum, binary OMS Q8, paper-specific V2C caps, registered memory/intervention studies, current circuit adapter"
+  },
+  "preservation_checks": [
+    "Current catalog equals rebuilt Python catalog",
+    "Archived v1 checksums match original archive manifest",
+    "No scientific decoder kernel or retained result data modified"
+  ],
+  "artifact_availability": "Local-only screenshots, exports and logs: .git/research-curve-browser-delivery and .git/research-curve-regression; regenerate using committed browser_curves.py/browser_v2.py.",
+  "limitations": [
+    "Tested Chromium desktop/mobile and keyboard interactions; other browser engines and screen readers not exercised.",
+    "Decoder parameters are read from saved specifications; coefficients may be rounded at execution boundaries as documented in exact settings."
+  ]
+}

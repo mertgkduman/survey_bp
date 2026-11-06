@@ -22,6 +22,30 @@ remain in v1/the source catalog. Importance estimates keep their declared
 estimator and raw proposal-count semantics. Work/runtime units are not silently
 normalized across incompatible methods or machines.
 
+Decoder and saved-specification names use recorded parameter values, for example
+`BP4 · SP · d = 0.1 · T = 1000`. A per-plot Parameter key explains damping,
+check caps, priors, quantization, and controller budgets. Binary component prior
+`q` is distinguished from the joint/depolarizing parameter `p₀`; study coefficient
+`γ` weights fresh V2C messages. Equal settings in different retained cohorts get
+an explicit `N` or `set` suffix rather than being merged. A set can share samples
+with another record; it is not an independence claim. Original IDs and files are
+unchanged beneath these display names.
+
+Use **Add a decoder / curve** to add another curve to the current plot. Focusing
+the box lists available choices; typing filters case-insensitively by the start
+of the name. Arrow keys and Enter select, and Escape dismisses the list. Click a
+curve (or activate its path with Enter/Space) to hide it. The Show curves checkboxes
+restore curves. Hover/focus a name to preview its exact path faintly; previews
+never enter the table, run details, CSV, or configuration receipt. Plot axes and
+colors stay stable while toggling selected curves.
+
+V2 excludes the retired globally clipped binary/BP4 float64 v1 curves and the
+superseded experimental Q8 BP4 state-clipping curves. This hides twelve retained
+series, without deleting them from the catalog or changing the v1 archive.
+Corrected Q8 scalar-message min-sum, binary OMS quantization, study-specific
+paper V2C caps, and the supported circuit adapter remain available. Newly
+imported results use the same profile-based visibility rule.
+
 The builder has decoder/policy and code/circuit columns, followed by simulation
 settings. Saved vanilla SPA specifications can populate editable controls;
 study-specific procedures retain their original runner and display a compatibility

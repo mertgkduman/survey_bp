@@ -723,6 +723,10 @@ def build_catalog(repository: Path) -> dict[str, Any]:
             root = "data/reproductions/yao-2312-10950-cross-code"
             return (f"{root}/decoders.json" if dataset_id.endswith("baselines") else f"{root}/depolarizing/decoders.json", "exact_study_policy_file")
         if dataset_id == "yao-non-osd-results":
+            if arm_id == "qbp":
+                # assess.prior_qbp_runs / verified_qbp_followups inherit the
+                # frozen vanilla BP4 v2 arm, not run_point's Q-BPGD controller.
+                return ("data/reproductions/yao-2312-10950-vanilla/decoders/bp4_v2.json", "inherited_vanilla_policy_file")
             return ("data/reproductions/yao-2312-10950-non-osd/run_point.py", "policy_fixed_in_runner")
         if dataset_id in {"yao-tuned-qbpgd-p006", "yao-tuned-qbpgd-p006-pilot-n1000"}:
             return (f"data/reproductions/yao-2312-10950-bp4-tuned-qbpgd-p006/decoders/{code_id}.json", "exact_code_policy_file")
@@ -811,8 +815,11 @@ def build_catalog(repository: Path) -> dict[str, Any]:
                     configuration["effective_candidate"] = candidate
                 elif setting_status == "exact_candidate_receipt":
                     raise ValueError(f"candidate {raw_arm} missing from {source}")
-            elif setting_status == "exact_policy_file":
+            elif setting_status in {"exact_policy_file", "inherited_vanilla_policy_file"}:
                 configuration["effective_policy"] = candidate_document
+                if setting_status == "inherited_vanilla_policy_file":
+                    configuration["inherited_binding"] = {"dataset_id": "yao-vanilla-a5-b2", "decoder_arm": "bp4_v2",
+                        "analysis_path": "data/reproductions/yao-2312-10950-non-osd/assess.py"}
             elif setting_status == "exact_code_policy_file":
                 if candidate_document.get("code") != raw_code:
                     raise ValueError(f"Q-BPGD source/code mismatch for {raw_code} in {source}")
