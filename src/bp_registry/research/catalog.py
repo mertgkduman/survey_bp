@@ -610,6 +610,95 @@ def _fallback_recipe(dataset_id: str, source_path: str) -> dict[str, Any]:
     })
 
 
+def _wilson_95(failures: int, shots: int) -> tuple[float, float]:
+    """A fixed-shot interval for the retained circuit profiling records."""
+    z = 1.959963984540054
+    rate = failures / shots
+    denominator = 1.0 + z * z / shots
+    center = (rate + z * z / (2.0 * shots)) / denominator
+    radius = z * ((rate * (1.0 - rate) / shots + z * z / (4.0 * shots * shots)) ** .5) / denominator
+    return max(0.0, center - radius), min(1.0, center + radius)
+
+
+def _circuit_profile_datasets(repository: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    """Expose the current canonical circuit CPU profile without relabeling it.
+
+    The current author-v0.2.2 report is one fixed-noise, fixed-shot local
+    measurement.  The v1 report intentionally stays provenance only: it used
+    the same sampled outcomes while comparing a different native package and
+    must not create a second curve or inflate its denominator.
+    """
+    current_path = "reports/circuit-bp-cpu-profile-author-v022.json"
+    prior_path = "reports/circuit-bp-cpu-profile-v1.json"
+    report = _read_json(repository / current_path)
+    aliases = {
+        "rotated_surface_code_memory_X.stim": "relay-surface-d3",
+        "bicycle_bivariate_144_12_12_memory_Z.stim": "relay-bb144-memory-z",
+        "bb144-memory-z-p005.stim": "beamsearch-bb144-memory-z-p005",
+    }
+    grouped: dict[str, list[tuple[str, dict[str, Any]]]] = {"relay": [], "beamsearch": []}
+    for record in report["records"]:
+        identifier = aliases.get(record["circuit"])
+        if identifier is None:
+            # The color-code and BB18 records were useful CPU diagnostics but
+            # have no registered public circuit input, so remain in the report.
+            continue
+        grouped[record["source"]].append((identifier, record))
+    datasets: list[dict[str, Any]] = []
+    series: list[dict[str, Any]] = []
+    decoders: list[dict[str, Any]] = []
+    source_papers = {"relay": "relaybp-2506-01779-v2", "beamsearch": "beamsearch-2512-07057-v2"}
+    labels = {"relay": "Relay circuit CPU profile", "beamsearch": "BeamSearch circuit CPU profile"}
+    for source, records in grouped.items():
+        dataset_id = f"circuit-cpu-profile-{source}"
+        points: list[dict[str, Any]] = []
+        for identifier, record in records:
+            failures, shots = int(record["canonical_observable_errors"]), int(record["shots"])
+            low, high = _wilson_95(failures, shots)
+            point = _point(
+                x=0.005, y=failures / shots, n=shots, failures=failures,
+                ci_low=low, ci_high=high, status="complete",
+                mean_work=float(record["canonical_mean_sweeps"]), work_unit="circuit DEM-BP sweeps",
+                mean_seconds=float(record["canonical_decode_seconds"]) / shots,
+                metadata={
+                    "channel": "embedded_circuit", "physical_rate": 0.005,
+                    "metric": "observable_failure_rate", "max_iterations": int(record["max_iterations"]),
+                    "canonical_converged": int(record["canonical_converged"]),
+                    "canonical_unconverged": shots - int(record["canonical_converged"]),
+                    "uncertainty_method": "wilson_score_95_percent_fixed_shots",
+                    "denominator_definition": "all fixed profile shots; failure means any observable mismatch",
+                    "source_evidence_path": current_path,
+                    "prior_comparison_report": prior_path,
+                    "claim_limit": report["claim_limit"],
+                },
+            )
+            points.append(point)
+            arm = f"circuit-dem-bp-ms-t{record['max_iterations']}-tie-one"
+            series.append({"dataset_id": dataset_id, "code_id": identifier, "decoder_id": arm,
+                           "label": f"{labels[source]}: {identifier}", "points": [point],
+                           "channel_kind": "embedded_circuit"})
+        if not points:
+            continue
+        datasets.append(_dataset(
+            dataset_id, label=labels[source], paper_id=source_papers[source],
+            evidence_status="local_cpu_profile", source_path=current_path, points=points,
+            assets=[_asset(repository, current_path, label="Current canonical CPU profile", kind="json"),
+                    _asset(repository, prior_path, label="Prior native-comparison profile (provenance only)", kind="json")],
+            caveat="Fixed p=0.005 CPU mechanism/throughput profile. It is a local canonical adapter measurement, not a source curve reproduction. Observable failures and detector convergence remain distinct counters.",
+        ))
+        arm = "circuit-dem-bp-ms-t8-tie-one"
+        decoders.append({"decoder_id": arm, "label": "Detector BP MS", "evidence_status": "local_cpu_profile",
+                         "asset": _asset(repository, current_path, label="Exact circuit profile configuration", kind="json"),
+                         "configuration": {"source_path": current_path, "settings_status": "fixed_profile_report",
+                                           "effective_configuration": {"circuit_profile": True, "family": "circuit_dem_bp",
+                                               "check_rule": "min_sum", "message_resolution": "float64",
+                                               "max_iterations": 8, "tie_break": "one", "schedule": "flooding",
+                                               "numerical_profile": "binary-min-sum-flooding-f64-v1"},
+                                           "prior_report": prior_path,
+                                           "claim_limit": report["claim_limit"]}})
+    return datasets, series, decoders
+
+
 def build_catalog(repository: Path) -> dict[str, Any]:
     """Build the portable summary catalog from real checked-out evidence only."""
     repository = repository.resolve()
@@ -651,7 +740,8 @@ def build_catalog(repository: Path) -> dict[str, Any]:
     tuning_validation_path = "data/reproductions/yao-2312-10950-bp4-tuning-p006/results/joint_final_results.csv"
     tuning_validation_rows = _csv_rows(repository / tuning_validation_path)
     tuning_validation = _dataset("yao-bp4-tuning-selected-validation", label="A5/B2 selected BP4 validation", paper_id="yao-2312-10950-v2", evidence_status="canonical_tuning_validation", source_path=tuning_validation_path, points=[_point(x=.06, y=_number(r["ler"]), n=_integer(r["shots"]), failures=_integer(r["failures"]), ci_low=_number(r["ci90_lower"]), ci_high=_number(r["ci90_upper"]), status="complete", mean_work=_number(r["mean_iterations"]), work_unit="BP4 iterations", mean_seconds=(_number(r["mean_decode_ms"]) or 0)/1000, type_i=_integer(r["type_i"]), type_ii=_integer(r["type_ii"]), metadata={"confidence_level": 0.90, "uncertainty_method": "two_sided_exact_binomial_interval", "denominator_definition": "fixed validation-shot cohort"}) for r in tuning_validation_rows], assets=[_asset(repository, tuning_validation_path, label="Joint selected validation", kind="csv"), _asset(repository, "data/reproductions/yao-2312-10950-bp4-tuning-p006/results/joint_final_results.json", label="Joint validation receipt", kind="json")], caveat="Selection/validation evidence is distinct from equal-work fairness.")
-    datasets.extend([vanilla, tuning, tuning_validation, cross_code, non_osd, *qbpgd_datasets, full_v2, ms_curves, depolarizing])
+    circuit_datasets, circuit_series, _ = _circuit_profile_datasets(repository)
+    datasets.extend([vanilla, tuning, tuning_validation, cross_code, non_osd, *qbpgd_datasets, full_v2, ms_curves, depolarizing, *circuit_datasets])
     bb72_datasets, bb72_series, _ = _bb72_datasets(repository)
     datasets.extend(bb72_datasets)
     experiments = [
@@ -693,6 +783,7 @@ def build_catalog(repository: Path) -> dict[str, Any]:
                               code_field="code", decoder_field="decoder", label_prefix="Cross-code depolarizing")
     series.extend(qbpgd_series)
     series.extend(bb72_series)
+    series.extend(circuit_series)
     presentation_v2_files = {
         "binary_tuned_oms_q8": "binary_tuned_oms.json",
         "binary_tuned_spa_v2": "canonical_binary_spa_f64_v2.json",
@@ -734,6 +825,8 @@ def build_catalog(repository: Path) -> dict[str, Any]:
             return ("data/results/fair-beam-relay-css-v2/result.json", "effective_selected_configuration_in_verified_result")
         if dataset_id == "bb72-bpsf-factorial-v2":
             return ("data/studies/bb72-bpsf-factorial-v2.json", "exact_study_configuration")
+        if dataset_id.startswith("circuit-cpu-profile-"):
+            return ("reports/circuit-bp-cpu-profile-author-v022.json", "fixed_profile_report")
         raise ValueError(f"no policy source mapping for {dataset_id}")
 
     fair_design = _read_json(repository / "data/studies/fair-beam-relay-css-v2.json")
@@ -787,6 +880,11 @@ def build_catalog(repository: Path) -> dict[str, Any]:
                 "channel": bpsf_design["channel"],
                 "cohort": bpsf_design["cohort"],
             }
+        if dataset_id.startswith("circuit-cpu-profile-"):
+            return {"circuit_profile": True, "family": "circuit_dem_bp", "check_rule": "min_sum",
+                    "message_resolution": "float64", "max_iterations": 8, "tie_break": "one",
+                    "schedule": "flooding", "numerical_profile": "binary-min-sum-flooding-f64-v1",
+                    "claim_scope": "local_cpu_profile"}
         return None
 
     # Raw arm names collide across studies.  A series therefore names both its
@@ -862,6 +960,16 @@ def build_catalog(repository: Path) -> dict[str, Any]:
     for item in series:
         item["source_code_label"] = item["code_id"]
         item["code_id"] = code_aliases.get(item["code_id"], item["code_id"])
+        if "channel_kind" not in item:
+            dataset_id = item["dataset_id"]
+            if dataset_id.startswith("circuit-cpu-profile-"):
+                item["channel_kind"] = "embedded_circuit"
+            elif dataset_id in {"yao-cross-code-plain-baselines", "yao-non-osd-results"}:
+                item["channel_kind"] = "depolarizing" if item["code_id"] in {"a5", "b2"} else "x_only"
+            elif dataset_id in {"bb72-fair-beam-relay-v2", "bb72-bpsf-factorial-v2"}:
+                item["channel_kind"] = "x_only"
+            else:
+                item["channel_kind"] = "depolarizing"
     grouped_all_series: dict[tuple[str, str, str, str], dict[str, Any]] = {}
     for item in series:
         scope_key = json.dumps(item.get("series_scope", {}), sort_keys=True, separators=(",", ":"))

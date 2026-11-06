@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import csv
 from hashlib import sha256
 from pathlib import Path
 from types import SimpleNamespace
@@ -49,12 +50,96 @@ def test_failure_stopping_terminates_rate_and_withholds_fixed_n_interval(tmp_pat
     assert (row["ci_low"], row["ci_high"], row["ci_method"]) == (None, None, "unavailable_optional_stopping")
 
 
-def test_circuit_rejects_code_capacity_type_stopping_before_adapter_import() -> None:
+def test_all_mode_uses_shots_as_a_target_and_accepts_target_only_runs(tmp_path: Path, monkeypatch) -> None:
+    from bp_registry import research
+    value = specimen()
+    value["sampling"] = {"seed": 9, "shot_start": 0, "shots": 1,
+                         "stop_failures": None, "stop_type_i": 1, "stop_type_ii": 1,
+                         "stop_mode": "all"}
+    value["budgets"]["max_shots"] = None
+    outcomes = iter(("invalid_syndrome", "logical_failure"))
+    monkeypatch.setattr(research.runner, "evaluate_candidate", lambda *args, **kwargs: SimpleNamespace(outcome=next(outcomes), logical_action_agrees=False))
+    summary = run_experiment(value, output=tmp_path / "all")
+    row = summary["rows"][0]
+    assert row["n"] == 2 and row["sampling_termination_reason"] == "all_targets"
+    assert row["sampling_stop_semantics"] == "all configured targets"
+
+
+def test_complete_per_point_limits_require_one_boundary_each() -> None:
+    value = specimen()
+    value["rate_points"] *= 2
+    value["sampling"] = {"seed": 9, "shot_start": 0, "shots": None,
+                         "per_point": [{"shots": 1, "stop_failures": None, "stop_type_i": None, "stop_type_ii": None},
+                                       {"shots": None, "stop_failures": None, "stop_type_i": None, "stop_type_ii": None}]}
+    with pytest.raises(ValueError, match="all empty"):
+        validate_experiment(value)
+
+
+def test_legacy_total_shot_ceiling_aborts_an_unmet_adaptive_target(tmp_path: Path, monkeypatch) -> None:
+    from bp_registry import research
+    value = specimen()
+    value["sampling"] = {"seed": 9, "shot_start": 0, "shots": None, "stop_failures": 2}
+    value["budgets"]["max_shots"] = 1
+    monkeypatch.setattr(research.runner, "evaluate_candidate", lambda *args, **kwargs: SimpleNamespace(outcome="invalid_syndrome", logical_action_agrees=False))
+    with pytest.raises(RuntimeError, match="legacy total max_shots"):
+        run_experiment(value, output=tmp_path / "capped")
+    assert json.loads((tmp_path / "capped" / "status.json").read_text())["status"] == "failed_partial"
+
+
+def test_circuit_accepts_flagged_and_unflagged_observable_failure_stopping() -> None:
     value = specimen()
     value.update({"problem": {"kind": "circuit", "circuit": {"kind": "inline_stim", "text": "R 0\nM 0\nOBSERVABLE_INCLUDE(0) rec[-1]"}, "dem": {"decompose_errors": False}}, "channel": {"kind": "embedded_circuit"}, "decoder": {"family": "circuit_dem_bp", "implementation": "canonical_sinter", "rule": "spa", "numerical_profile": "binary-spa-flooding-f64-v1", "schedule": "flooding", "max_iterations": 1, "tie_break": "zero"}, "rate_points": [{"label": "embedded"}]})
     value["sampling"]["stop_type_i"] = 1
-    with pytest.raises(ValueError, match="type-I/type-II"):
-        validate_experiment(value)
+    assert validate_experiment(value)["sampling"]["stop_type_i"] == 1
+
+
+def test_import_rejects_forged_extended_circuit_outcome_flags(tmp_path: Path) -> None:
+    pytest.importorskip("stim"); pytest.importorskip("sinter")
+    value = specimen()
+    value.update({"problem": {"kind": "circuit", "circuit": {"kind": "inline_stim", "text": "R 0\nM 0\nDETECTOR rec[-1]\nOBSERVABLE_INCLUDE(0) rec[-1]"}, "dem": {"decompose_errors": False}}, "channel": {"kind": "embedded_circuit"}, "decoder": {"family": "circuit_dem_bp", "implementation": "canonical_sinter", "rule": "spa", "numerical_profile": "binary-spa-flooding-f64-v1", "schedule": "flooding", "max_iterations": 1, "tie_break": "zero"}, "rate_points": [{"label": "embedded"}]})
+    value["sampling"]["shots"] = 1; value["budgets"]["max_shots"] = 1
+    result = tmp_path / "flags"; run_experiment(value, output=result)
+    event = json.loads((result / "events.jsonl").read_text())
+    event["observable_failure"] = not event["observable_failure"]
+    (result / "events.jsonl").write_text(json.dumps(event, sort_keys=True) + "\n")
+    rehash_bound_files(result)
+    with pytest.raises(ValueError, match="outcome flags"):
+        normalize_result_directory(result)
+
+
+def test_import_rejects_stripped_required_extended_sampling_marker(tmp_path: Path) -> None:
+    value = specimen()
+    value["sampling"] = {"seed": 9, "shot_start": 0, "shots": None, "stop_failures": 1, "stop_mode": "any"}
+    value["budgets"]["max_shots"] = None
+    result = tmp_path / "stripped"; run_experiment(value, output=result)
+    events = [json.loads(line) for line in (result / "events.jsonl").read_text().splitlines()]
+    for event in events:
+        del event["sampling_stop_mode"]
+    (result / "events.jsonl").write_text("\n".join(json.dumps(event, sort_keys=True) for event in events) + "\n")
+    rehash_bound_files(result)
+    with pytest.raises(ValueError, match="required extended sampling marker"):
+        normalize_result_directory(result)
+
+
+def test_import_accepts_historical_adaptive_ledger_without_new_marker(tmp_path: Path) -> None:
+    value = specimen(); value["sampling"]["stop_failures"] = 1
+    result = tmp_path / "historical-adaptive"; run_experiment(value, output=result)
+    events = [json.loads(line) for line in (result / "events.jsonl").read_text().splitlines()]
+    for event in events: event.pop("sampling_stop_mode")
+    (result / "events.jsonl").write_text("\n".join(json.dumps(event, sort_keys=True) for event in events) + "\n")
+    summary_path = result / "summary.json"; summary = json.loads(summary_path.read_text())
+    for row in summary["rows"]:
+        row.pop("sampling_stop_mode"); row.pop("sampling_stop_semantics")
+    summary_path.write_text(json.dumps(summary, sort_keys=True, separators=(",", ":")))
+    with (result / "summary.csv").open("w", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=list(summary["rows"][0]))
+        writer.writeheader()
+        writer.writerows({
+            key: json.dumps(item, sort_keys=True) if isinstance(item, dict) else item
+            for key, item in row.items()
+        } for row in summary["rows"])
+    rehash_bound_files(result)
+    assert normalize_result_directory(result)["schema"] == "research-catalog-extension-v1"
 
 
 def test_circuit_timing_declaration_matches_per_shot_adapter_path(tmp_path: Path) -> None:

@@ -206,7 +206,14 @@
         "kind": "css_artifact",
         "path": "data/artifacts/quaternary-a5.json"
       },
-      "label": "A5 [[180,10]]"
+      "label": "A5 [[180,10]]",
+      "matrix_asset": {
+        "availability": "tracked",
+        "kind": "css_matrix_preview",
+        "path": "web/research/inputs/a5.json",
+        "sha256": "8cd419746c0018a3067ed894ad500c0c2adca68a0cf7993e68bffc6be34681cb",
+        "url": "web/research/inputs/a5.json"
+      }
     },
     {
       "aliases": [
@@ -229,7 +236,14 @@
         "id": "b2",
         "kind": "constructor"
       },
-      "label": "B2 [[882,48]]"
+      "label": "B2 [[882,48]]",
+      "matrix_asset": {
+        "availability": "tracked",
+        "kind": "css_matrix_preview",
+        "path": "web/research/inputs/b2.json",
+        "sha256": "e3cf89e8e9509758254ff971be43b22d602a87f4c9720c81af32815b62b569de",
+        "url": "web/research/inputs/b2.json"
+      }
     },
     {
       "aliases": [
@@ -253,7 +267,14 @@
         "kind": "css_artifact",
         "path": "data/artifacts/b1-panteleev-kalachev-v3.npz"
       },
-      "label": "B1 [[882,24]]"
+      "label": "B1 [[882,24]]",
+      "matrix_asset": {
+        "availability": "tracked",
+        "kind": "css_matrix_preview",
+        "path": "web/research/inputs/b1.json",
+        "sha256": "c9143bff50d760e3b7bfcec4d0ba1dec423de472adb4dca9eb432ae921b2cd92",
+        "url": "web/research/inputs/b1.json"
+      }
     },
     {
       "aliases": [
@@ -276,7 +297,14 @@
         "id": "c2",
         "kind": "constructor"
       },
-      "label": "C2 [[1922,50]]"
+      "label": "C2 [[1922,50]]",
+      "matrix_asset": {
+        "availability": "tracked",
+        "kind": "css_matrix_preview",
+        "path": "web/research/inputs/c2.json",
+        "sha256": "ddd6db9213806ab265e3f50497a1e653e31994327bf81b709ae8f72ea0a4a2e2",
+        "url": "web/research/inputs/c2.json"
+      }
     },
     {
       "aliases": [
@@ -301,7 +329,14 @@
         "id": "double-gross",
         "kind": "constructor"
       },
-      "label": "double-Gross [[288,12,18]]"
+      "label": "double-Gross [[288,12,18]]",
+      "matrix_asset": {
+        "availability": "tracked",
+        "kind": "css_matrix_preview",
+        "path": "web/research/inputs/double-gross.json",
+        "sha256": "45a687b745edd0da04c1a63803fa01e215ad97c58caa0f173b420b229942e50b",
+        "url": "web/research/inputs/double-gross.json"
+      }
     },
     {
       "aliases": [
@@ -325,7 +360,14 @@
         "kind": "css_artifact",
         "path": "data/artifacts/bb72-css.json"
       },
-      "label": "Bravyi BB72 [[72,12,6]]"
+      "label": "Bravyi BB72 [[72,12,6]]",
+      "matrix_asset": {
+        "availability": "tracked",
+        "kind": "css_matrix_preview",
+        "path": "web/research/inputs/bb72.json",
+        "sha256": "a0d3e7fb21be668605ba32376944cf76b6b64fc7d49e794c85eddf8e035ded58",
+        "url": "web/research/inputs/bb72.json"
+      }
     },
     {
       "aliases": [
@@ -349,29 +391,6 @@
         "reason": "Indexed parity-check evidence; no portable CSS/logical construction is registered for this custom runner."
       },
       "label": "GB46"
-    },
-    {
-      "aliases": [
-        "project-three-qubit-css-fixture"
-      ],
-      "artifact_path": "data/artifacts/project-three-qubit-css-fixture.json",
-      "asset": {
-        "availability": "tracked",
-        "kind": "code_artifact",
-        "label": "three-qubit fixture",
-        "local_storage_path": null,
-        "path": "data/artifacts/project-three-qubit-css-fixture.json",
-        "sha256": "87328ebbe70907d74a5dd3ee67d6a4b8e87b2c82b66270aee1b71594b4a78d25",
-        "url": "data/artifacts/project-three-qubit-css-fixture.json"
-      },
-      "asset_kind": "code_artifact",
-      "asset_label": "three-qubit fixture",
-      "code_id": "three-qubit",
-      "execution": {
-        "kind": "css_artifact",
-        "path": "data/artifacts/project-three-qubit-css-fixture.json"
-      },
-      "label": "three-qubit CSS fixture"
     }
   ],
   "datasets": [
@@ -12968,6 +12987,150 @@
         {
           "availability": "tracked",
           "kind": "json",
+          "label": "Current canonical CPU profile",
+          "local_storage_path": null,
+          "path": "reports/circuit-bp-cpu-profile-author-v022.json",
+          "sha256": "106aae0fff0d1a9d377fb9582864939a981b985e48e6e76acc9c354b4ff19a44",
+          "url": "reports/circuit-bp-cpu-profile-author-v022.json"
+        },
+        {
+          "availability": "tracked",
+          "kind": "json",
+          "label": "Prior native-comparison profile (provenance only)",
+          "local_storage_path": null,
+          "path": "reports/circuit-bp-cpu-profile-v1.json",
+          "sha256": "e64ba6833e78d29dad7227ecf263e742dfee3e953718172bf94eff7f412312af",
+          "url": "reports/circuit-bp-cpu-profile-v1.json"
+        }
+      ],
+      "caveat": "Fixed p=0.005 CPU mechanism/throughput profile. It is a local canonical adapter measurement, not a source curve reproduction. Observable failures and detector convergence remain distinct counters.",
+      "dataset_id": "circuit-cpu-profile-relay",
+      "evidence_status": "local_cpu_profile",
+      "label": "Relay circuit CPU profile",
+      "paper_id": "relaybp-2506-01779-v2",
+      "points": [
+        {
+          "ci_high": 0.028536457601106506,
+          "ci_low": 0.019231598990288437,
+          "failures": 96,
+          "mean_seconds": 5.030624151913798e-06,
+          "mean_work": 1.58740234375,
+          "metadata": {
+            "canonical_converged": 3820,
+            "canonical_unconverged": 276,
+            "channel": "embedded_circuit",
+            "claim_limit": "bounded CPU mechanism and throughput profile; no paper-curve reproduction or equal-algorithm claim",
+            "denominator_definition": "all fixed profile shots; failure means any observable mismatch",
+            "max_iterations": 8,
+            "metric": "observable_failure_rate",
+            "physical_rate": 0.005,
+            "prior_comparison_report": "reports/circuit-bp-cpu-profile-v1.json",
+            "source_evidence_path": "reports/circuit-bp-cpu-profile-author-v022.json",
+            "uncertainty_method": "wilson_score_95_percent_fixed_shots"
+          },
+          "n": 4096,
+          "source_value": null,
+          "status": "complete",
+          "type_i": null,
+          "type_ii": null,
+          "work_unit": "circuit DEM-BP sweeps",
+          "x": 0.005,
+          "y": 0.0234375
+        },
+        {
+          "ci_high": 1.0,
+          "ci_low": 0.9708630437264916,
+          "failures": 128,
+          "mean_seconds": 0.011288641828286927,
+          "mean_work": 8.0,
+          "metadata": {
+            "canonical_converged": 0,
+            "canonical_unconverged": 128,
+            "channel": "embedded_circuit",
+            "claim_limit": "bounded CPU mechanism and throughput profile; no paper-curve reproduction or equal-algorithm claim",
+            "denominator_definition": "all fixed profile shots; failure means any observable mismatch",
+            "max_iterations": 8,
+            "metric": "observable_failure_rate",
+            "physical_rate": 0.005,
+            "prior_comparison_report": "reports/circuit-bp-cpu-profile-v1.json",
+            "source_evidence_path": "reports/circuit-bp-cpu-profile-author-v022.json",
+            "uncertainty_method": "wilson_score_95_percent_fixed_shots"
+          },
+          "n": 128,
+          "source_value": null,
+          "status": "complete",
+          "type_i": null,
+          "type_ii": null,
+          "work_unit": "circuit DEM-BP sweeps",
+          "x": 0.005,
+          "y": 1.0
+        }
+      ],
+      "source_path": "reports/circuit-bp-cpu-profile-author-v022.json"
+    },
+    {
+      "assets": [
+        {
+          "availability": "tracked",
+          "kind": "json",
+          "label": "Current canonical CPU profile",
+          "local_storage_path": null,
+          "path": "reports/circuit-bp-cpu-profile-author-v022.json",
+          "sha256": "106aae0fff0d1a9d377fb9582864939a981b985e48e6e76acc9c354b4ff19a44",
+          "url": "reports/circuit-bp-cpu-profile-author-v022.json"
+        },
+        {
+          "availability": "tracked",
+          "kind": "json",
+          "label": "Prior native-comparison profile (provenance only)",
+          "local_storage_path": null,
+          "path": "reports/circuit-bp-cpu-profile-v1.json",
+          "sha256": "e64ba6833e78d29dad7227ecf263e742dfee3e953718172bf94eff7f412312af",
+          "url": "reports/circuit-bp-cpu-profile-v1.json"
+        }
+      ],
+      "caveat": "Fixed p=0.005 CPU mechanism/throughput profile. It is a local canonical adapter measurement, not a source curve reproduction. Observable failures and detector convergence remain distinct counters.",
+      "dataset_id": "circuit-cpu-profile-beamsearch",
+      "evidence_status": "local_cpu_profile",
+      "label": "BeamSearch circuit CPU profile",
+      "paper_id": "beamsearch-2512-07057-v2",
+      "points": [
+        {
+          "ci_high": 0.9969577980703442,
+          "ci_low": 0.9800865852024431,
+          "failures": 508,
+          "mean_seconds": 0.0011286173248663545,
+          "mean_work": 8.0,
+          "metadata": {
+            "canonical_converged": 0,
+            "canonical_unconverged": 512,
+            "channel": "embedded_circuit",
+            "claim_limit": "bounded CPU mechanism and throughput profile; no paper-curve reproduction or equal-algorithm claim",
+            "denominator_definition": "all fixed profile shots; failure means any observable mismatch",
+            "max_iterations": 8,
+            "metric": "observable_failure_rate",
+            "physical_rate": 0.005,
+            "prior_comparison_report": "reports/circuit-bp-cpu-profile-v1.json",
+            "source_evidence_path": "reports/circuit-bp-cpu-profile-author-v022.json",
+            "uncertainty_method": "wilson_score_95_percent_fixed_shots"
+          },
+          "n": 512,
+          "source_value": null,
+          "status": "complete",
+          "type_i": null,
+          "type_ii": null,
+          "work_unit": "circuit DEM-BP sweeps",
+          "x": 0.005,
+          "y": 0.9921875
+        }
+      ],
+      "source_path": "reports/circuit-bp-cpu-profile-author-v022.json"
+    },
+    {
+      "assets": [
+        {
+          "availability": "tracked",
+          "kind": "json",
           "label": "Verified result",
           "local_storage_path": null,
           "path": "data/results/fair-beam-relay-css-v2/result.json",
@@ -18620,6 +18783,96 @@
       "decoder_id": "bb72-fair-beam-relay-v2:BB72:relay-g1000-i10",
       "evidence_status": "controlled_css_adaptation",
       "label": "BB72 selected BeamSearch/RelayBP settings: relay-g1000-i10"
+    },
+    {
+      "asset": {
+        "availability": "tracked",
+        "kind": "decoder_source",
+        "label": "Exact configuration source",
+        "local_storage_path": null,
+        "path": "reports/circuit-bp-cpu-profile-author-v022.json",
+        "sha256": "106aae0fff0d1a9d377fb9582864939a981b985e48e6e76acc9c354b4ff19a44",
+        "url": "reports/circuit-bp-cpu-profile-author-v022.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "check_rule": "min_sum",
+          "circuit_profile": true,
+          "claim_scope": "local_cpu_profile",
+          "family": "circuit_dem_bp",
+          "max_iterations": 8,
+          "message_resolution": "float64",
+          "numerical_profile": "binary-min-sum-flooding-f64-v1",
+          "schedule": "flooding",
+          "tie_break": "one"
+        },
+        "settings_status": "fixed_profile_report",
+        "source_arm_id": "circuit-dem-bp-ms-t8-tie-one",
+        "source_path": "reports/circuit-bp-cpu-profile-author-v022.json"
+      },
+      "decoder_id": "circuit-cpu-profile-relay:relay-surface-d3:circuit-dem-bp-ms-t8-tie-one",
+      "evidence_status": "local_cpu_profile",
+      "label": "Relay circuit CPU profile: relay-surface-d3"
+    },
+    {
+      "asset": {
+        "availability": "tracked",
+        "kind": "decoder_source",
+        "label": "Exact configuration source",
+        "local_storage_path": null,
+        "path": "reports/circuit-bp-cpu-profile-author-v022.json",
+        "sha256": "106aae0fff0d1a9d377fb9582864939a981b985e48e6e76acc9c354b4ff19a44",
+        "url": "reports/circuit-bp-cpu-profile-author-v022.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "check_rule": "min_sum",
+          "circuit_profile": true,
+          "claim_scope": "local_cpu_profile",
+          "family": "circuit_dem_bp",
+          "max_iterations": 8,
+          "message_resolution": "float64",
+          "numerical_profile": "binary-min-sum-flooding-f64-v1",
+          "schedule": "flooding",
+          "tie_break": "one"
+        },
+        "settings_status": "fixed_profile_report",
+        "source_arm_id": "circuit-dem-bp-ms-t8-tie-one",
+        "source_path": "reports/circuit-bp-cpu-profile-author-v022.json"
+      },
+      "decoder_id": "circuit-cpu-profile-relay:relay-bb144-memory-z:circuit-dem-bp-ms-t8-tie-one",
+      "evidence_status": "local_cpu_profile",
+      "label": "Relay circuit CPU profile: relay-bb144-memory-z"
+    },
+    {
+      "asset": {
+        "availability": "tracked",
+        "kind": "decoder_source",
+        "label": "Exact configuration source",
+        "local_storage_path": null,
+        "path": "reports/circuit-bp-cpu-profile-author-v022.json",
+        "sha256": "106aae0fff0d1a9d377fb9582864939a981b985e48e6e76acc9c354b4ff19a44",
+        "url": "reports/circuit-bp-cpu-profile-author-v022.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "check_rule": "min_sum",
+          "circuit_profile": true,
+          "claim_scope": "local_cpu_profile",
+          "family": "circuit_dem_bp",
+          "max_iterations": 8,
+          "message_resolution": "float64",
+          "numerical_profile": "binary-min-sum-flooding-f64-v1",
+          "schedule": "flooding",
+          "tie_break": "one"
+        },
+        "settings_status": "fixed_profile_report",
+        "source_arm_id": "circuit-dem-bp-ms-t8-tie-one",
+        "source_path": "reports/circuit-bp-cpu-profile-author-v022.json"
+      },
+      "decoder_id": "circuit-cpu-profile-beamsearch:beamsearch-bb144-memory-z-p005:circuit-dem-bp-ms-t8-tie-one",
+      "evidence_status": "local_cpu_profile",
+      "label": "BeamSearch circuit CPU profile: beamsearch-bb144-memory-z-p005"
     }
   ],
   "experiments": [
@@ -19129,6 +19382,60 @@
     },
     {
       "code_ids": [
+        "relay-bb144-memory-z",
+        "relay-surface-d3"
+      ],
+      "dataset_id": "circuit-cpu-profile-relay",
+      "dataset_ids": [
+        "circuit-cpu-profile-relay"
+      ],
+      "decoder_ids": [
+        "circuit-cpu-profile-relay:relay-bb144-memory-z:circuit-dem-bp-ms-t8-tie-one",
+        "circuit-cpu-profile-relay:relay-surface-d3:circuit-dem-bp-ms-t8-tie-one"
+      ],
+      "description": "Fixed p=0.005 CPU mechanism/throughput profile. It is a local canonical adapter measurement, not a source curve reproduction. Observable failures and detector convergence remain distinct counters.",
+      "evidence_status": "local_cpu_profile",
+      "experiment_id": "catalog-circuit-cpu-profile-relay",
+      "paper_ids": [
+        "relaybp-2506-01779-v2"
+      ],
+      "reproduction_recipe": {
+        "budget_note": "No runnable command was found in the retained evidence. Inspect the source record; freeze a new study identity before any extension.",
+        "commands": [],
+        "decoder_path": null,
+        "kind": "retained_result_only",
+        "original_instruction_path": "reports/circuit-bp-cpu-profile-author-v022.json",
+        "study_path": "reports/circuit-bp-cpu-profile-author-v022.json"
+      }
+    },
+    {
+      "code_ids": [
+        "beamsearch-bb144-memory-z-p005"
+      ],
+      "dataset_id": "circuit-cpu-profile-beamsearch",
+      "dataset_ids": [
+        "circuit-cpu-profile-beamsearch"
+      ],
+      "decoder_ids": [
+        "circuit-cpu-profile-beamsearch:beamsearch-bb144-memory-z-p005:circuit-dem-bp-ms-t8-tie-one"
+      ],
+      "description": "Fixed p=0.005 CPU mechanism/throughput profile. It is a local canonical adapter measurement, not a source curve reproduction. Observable failures and detector convergence remain distinct counters.",
+      "evidence_status": "local_cpu_profile",
+      "experiment_id": "catalog-circuit-cpu-profile-beamsearch",
+      "paper_ids": [
+        "beamsearch-2512-07057-v2"
+      ],
+      "reproduction_recipe": {
+        "budget_note": "No runnable command was found in the retained evidence. Inspect the source record; freeze a new study identity before any extension.",
+        "commands": [],
+        "decoder_path": null,
+        "kind": "retained_result_only",
+        "original_instruction_path": "reports/circuit-bp-cpu-profile-author-v022.json",
+        "study_path": "reports/circuit-bp-cpu-profile-author-v022.json"
+      }
+    },
+    {
+      "code_ids": [
         "bb72"
       ],
       "dataset_id": "bb72-bpsf-factorial-v2",
@@ -19269,6 +19576,7 @@
   ],
   "result_series": [
     {
+      "channel_kind": "x_only",
       "code_id": "bb72",
       "dataset_id": "bb72-bpsf-factorial-v2",
       "decoder_id": "bb72-bpsf-factorial-v2:BB72:ms-g0500-bp20",
@@ -19344,6 +19652,7 @@
       "source_decoder_id": "ms-g0500-bp20"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "bb72",
       "dataset_id": "bb72-bpsf-factorial-v2",
       "decoder_id": "bb72-bpsf-factorial-v2:BB72:ms-g0500-bp40",
@@ -19419,6 +19728,7 @@
       "source_decoder_id": "ms-g0500-bp40"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "bb72",
       "dataset_id": "bb72-bpsf-factorial-v2",
       "decoder_id": "bb72-bpsf-factorial-v2:BB72:ms-g0500-bpsf20plus4x5",
@@ -19494,6 +19804,7 @@
       "source_decoder_id": "ms-g0500-bpsf20plus4x5"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "bb72",
       "dataset_id": "bb72-bpsf-factorial-v2",
       "decoder_id": "bb72-bpsf-factorial-v2:BB72:ms-g1000-bp20",
@@ -19569,6 +19880,7 @@
       "source_decoder_id": "ms-g1000-bp20"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "bb72",
       "dataset_id": "bb72-bpsf-factorial-v2",
       "decoder_id": "bb72-bpsf-factorial-v2:BB72:ms-g1000-bp40",
@@ -19644,6 +19956,7 @@
       "source_decoder_id": "ms-g1000-bp40"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "bb72",
       "dataset_id": "bb72-bpsf-factorial-v2",
       "decoder_id": "bb72-bpsf-factorial-v2:BB72:ms-g1000-bpsf20plus4x5",
@@ -19719,6 +20032,7 @@
       "source_decoder_id": "ms-g1000-bpsf20plus4x5"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "bb72",
       "dataset_id": "bb72-bpsf-factorial-v2",
       "decoder_id": "bb72-bpsf-factorial-v2:BB72:spa-g0500-bp20",
@@ -19794,6 +20108,7 @@
       "source_decoder_id": "spa-g0500-bp20"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "bb72",
       "dataset_id": "bb72-bpsf-factorial-v2",
       "decoder_id": "bb72-bpsf-factorial-v2:BB72:spa-g0500-bp40",
@@ -19869,6 +20184,7 @@
       "source_decoder_id": "spa-g0500-bp40"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "bb72",
       "dataset_id": "bb72-bpsf-factorial-v2",
       "decoder_id": "bb72-bpsf-factorial-v2:BB72:spa-g0500-bpsf20plus4x5",
@@ -19944,6 +20260,7 @@
       "source_decoder_id": "spa-g0500-bpsf20plus4x5"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "bb72",
       "dataset_id": "bb72-bpsf-factorial-v2",
       "decoder_id": "bb72-bpsf-factorial-v2:BB72:spa-g1000-bp20",
@@ -20019,6 +20336,7 @@
       "source_decoder_id": "spa-g1000-bp20"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "bb72",
       "dataset_id": "bb72-bpsf-factorial-v2",
       "decoder_id": "bb72-bpsf-factorial-v2:BB72:spa-g1000-bp40",
@@ -20094,6 +20412,7 @@
       "source_decoder_id": "spa-g1000-bp40"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "bb72",
       "dataset_id": "bb72-bpsf-factorial-v2",
       "decoder_id": "bb72-bpsf-factorial-v2:BB72:spa-g1000-bpsf20plus4x5",
@@ -20169,6 +20488,7 @@
       "source_decoder_id": "spa-g1000-bpsf20plus4x5"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "bb72",
       "dataset_id": "bb72-fair-beam-relay-v2",
       "decoder_id": "bb72-fair-beam-relay-v2:BB72:beam-g0500-i05",
@@ -20242,6 +20562,7 @@
       "source_decoder_id": "beam-g0500-i05"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "bb72",
       "dataset_id": "bb72-fair-beam-relay-v2",
       "decoder_id": "bb72-fair-beam-relay-v2:BB72:beam-g1000-i05",
@@ -20284,6 +20605,7 @@
       "source_decoder_id": "beam-g1000-i05"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "bb72",
       "dataset_id": "bb72-fair-beam-relay-v2",
       "decoder_id": "bb72-fair-beam-relay-v2:BB72:beam-g1000-i10",
@@ -20326,6 +20648,7 @@
       "source_decoder_id": "beam-g1000-i10"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "bb72",
       "dataset_id": "bb72-fair-beam-relay-v2",
       "decoder_id": "bb72-fair-beam-relay-v2:BB72:relay-g0500-i20",
@@ -20399,6 +20722,7 @@
       "source_decoder_id": "relay-g0500-i20"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "bb72",
       "dataset_id": "bb72-fair-beam-relay-v2",
       "decoder_id": "bb72-fair-beam-relay-v2:BB72:relay-g1000-i10",
@@ -20472,6 +20796,127 @@
       "source_decoder_id": "relay-g1000-i10"
     },
     {
+      "channel_kind": "embedded_circuit",
+      "code_id": "beamsearch-bb144-memory-z-p005",
+      "dataset_id": "circuit-cpu-profile-beamsearch",
+      "decoder_id": "circuit-cpu-profile-beamsearch:beamsearch-bb144-memory-z-p005:circuit-dem-bp-ms-t8-tie-one",
+      "label": "BeamSearch circuit CPU profile: beamsearch-bb144-memory-z-p005",
+      "points": [
+        {
+          "ci_high": 0.9969577980703442,
+          "ci_low": 0.9800865852024431,
+          "failures": 508,
+          "mean_seconds": 0.0011286173248663545,
+          "mean_work": 8.0,
+          "metadata": {
+            "canonical_converged": 0,
+            "canonical_unconverged": 512,
+            "channel": "embedded_circuit",
+            "claim_limit": "bounded CPU mechanism and throughput profile; no paper-curve reproduction or equal-algorithm claim",
+            "denominator_definition": "all fixed profile shots; failure means any observable mismatch",
+            "max_iterations": 8,
+            "metric": "observable_failure_rate",
+            "physical_rate": 0.005,
+            "prior_comparison_report": "reports/circuit-bp-cpu-profile-v1.json",
+            "source_evidence_path": "reports/circuit-bp-cpu-profile-author-v022.json",
+            "uncertainty_method": "wilson_score_95_percent_fixed_shots"
+          },
+          "n": 512,
+          "source_value": null,
+          "status": "complete",
+          "type_i": null,
+          "type_ii": null,
+          "work_unit": "circuit DEM-BP sweeps",
+          "x": 0.005,
+          "y": 0.9921875
+        }
+      ],
+      "series_id": "series-a0bd29ea27ce6845",
+      "source_code_label": "beamsearch-bb144-memory-z-p005",
+      "source_decoder_id": "circuit-dem-bp-ms-t8-tie-one"
+    },
+    {
+      "channel_kind": "embedded_circuit",
+      "code_id": "relay-bb144-memory-z",
+      "dataset_id": "circuit-cpu-profile-relay",
+      "decoder_id": "circuit-cpu-profile-relay:relay-bb144-memory-z:circuit-dem-bp-ms-t8-tie-one",
+      "label": "Relay circuit CPU profile: relay-bb144-memory-z",
+      "points": [
+        {
+          "ci_high": 1.0,
+          "ci_low": 0.9708630437264916,
+          "failures": 128,
+          "mean_seconds": 0.011288641828286927,
+          "mean_work": 8.0,
+          "metadata": {
+            "canonical_converged": 0,
+            "canonical_unconverged": 128,
+            "channel": "embedded_circuit",
+            "claim_limit": "bounded CPU mechanism and throughput profile; no paper-curve reproduction or equal-algorithm claim",
+            "denominator_definition": "all fixed profile shots; failure means any observable mismatch",
+            "max_iterations": 8,
+            "metric": "observable_failure_rate",
+            "physical_rate": 0.005,
+            "prior_comparison_report": "reports/circuit-bp-cpu-profile-v1.json",
+            "source_evidence_path": "reports/circuit-bp-cpu-profile-author-v022.json",
+            "uncertainty_method": "wilson_score_95_percent_fixed_shots"
+          },
+          "n": 128,
+          "source_value": null,
+          "status": "complete",
+          "type_i": null,
+          "type_ii": null,
+          "work_unit": "circuit DEM-BP sweeps",
+          "x": 0.005,
+          "y": 1.0
+        }
+      ],
+      "series_id": "series-1d8506f5952de811",
+      "source_code_label": "relay-bb144-memory-z",
+      "source_decoder_id": "circuit-dem-bp-ms-t8-tie-one"
+    },
+    {
+      "channel_kind": "embedded_circuit",
+      "code_id": "relay-surface-d3",
+      "dataset_id": "circuit-cpu-profile-relay",
+      "decoder_id": "circuit-cpu-profile-relay:relay-surface-d3:circuit-dem-bp-ms-t8-tie-one",
+      "label": "Relay circuit CPU profile: relay-surface-d3",
+      "points": [
+        {
+          "ci_high": 0.028536457601106506,
+          "ci_low": 0.019231598990288437,
+          "failures": 96,
+          "mean_seconds": 5.030624151913798e-06,
+          "mean_work": 1.58740234375,
+          "metadata": {
+            "canonical_converged": 3820,
+            "canonical_unconverged": 276,
+            "channel": "embedded_circuit",
+            "claim_limit": "bounded CPU mechanism and throughput profile; no paper-curve reproduction or equal-algorithm claim",
+            "denominator_definition": "all fixed profile shots; failure means any observable mismatch",
+            "max_iterations": 8,
+            "metric": "observable_failure_rate",
+            "physical_rate": 0.005,
+            "prior_comparison_report": "reports/circuit-bp-cpu-profile-v1.json",
+            "source_evidence_path": "reports/circuit-bp-cpu-profile-author-v022.json",
+            "uncertainty_method": "wilson_score_95_percent_fixed_shots"
+          },
+          "n": 4096,
+          "source_value": null,
+          "status": "complete",
+          "type_i": null,
+          "type_ii": null,
+          "work_unit": "circuit DEM-BP sweeps",
+          "x": 0.005,
+          "y": 0.0234375
+        }
+      ],
+      "series_id": "series-fb8e54ddd5f4a136",
+      "source_code_label": "relay-surface-d3",
+      "source_decoder_id": "circuit-dem-bp-ms-t8-tie-one"
+    },
+    {
+      "channel_kind": "depolarizing",
       "code_id": "b1",
       "dataset_id": "pfister-presentation-full-v2-curves",
       "decoder_id": "pfister-presentation-full-v2-curves:b1:binary_tuned_oms_q8",
@@ -20609,6 +21054,7 @@
       "source_decoder_id": "binary_tuned_oms_q8"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b1",
       "dataset_id": "pfister-presentation-full-v2-curves",
       "decoder_id": "pfister-presentation-full-v2-curves:b1:binary_tuned_spa_v2",
@@ -20746,6 +21192,7 @@
       "source_decoder_id": "binary_tuned_spa_v2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b1",
       "dataset_id": "pfister-presentation-full-v2-curves",
       "decoder_id": "pfister-presentation-full-v2-curves:b1:bp4_tuned_sp_v2",
@@ -20883,6 +21330,7 @@
       "source_decoder_id": "bp4_tuned_sp_v2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b1",
       "dataset_id": "pfister-presentation-full-v2-curves",
       "decoder_id": "pfister-presentation-full-v2-curves:b1:bp4_vanilla_ms_q8",
@@ -20999,6 +21447,7 @@
       "source_decoder_id": "bp4_vanilla_ms_q8"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b1",
       "dataset_id": "pfister-presentation-full-v2-curves",
       "decoder_id": "pfister-presentation-full-v2-curves:b1:bp4_vanilla_sp_v2",
@@ -21115,6 +21564,7 @@
       "source_decoder_id": "bp4_vanilla_sp_v2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "double-gross",
       "dataset_id": "pfister-presentation-full-v2-curves",
       "decoder_id": "pfister-presentation-full-v2-curves:double_gross:binary_tuned_oms_q8",
@@ -21252,6 +21702,7 @@
       "source_decoder_id": "binary_tuned_oms_q8"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "double-gross",
       "dataset_id": "pfister-presentation-full-v2-curves",
       "decoder_id": "pfister-presentation-full-v2-curves:double_gross:binary_tuned_spa_v2",
@@ -21389,6 +21840,7 @@
       "source_decoder_id": "binary_tuned_spa_v2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "double-gross",
       "dataset_id": "pfister-presentation-full-v2-curves",
       "decoder_id": "pfister-presentation-full-v2-curves:double_gross:bp4_tuned_sp_v2",
@@ -21505,6 +21957,7 @@
       "source_decoder_id": "bp4_tuned_sp_v2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "double-gross",
       "dataset_id": "pfister-presentation-full-v2-curves",
       "decoder_id": "pfister-presentation-full-v2-curves:double_gross:bp4_vanilla_ms_q8",
@@ -21600,6 +22053,7 @@
       "source_decoder_id": "bp4_vanilla_ms_q8"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "double-gross",
       "dataset_id": "pfister-presentation-full-v2-curves",
       "decoder_id": "pfister-presentation-full-v2-curves:double_gross:bp4_vanilla_sp_v2",
@@ -21695,6 +22149,7 @@
       "source_decoder_id": "bp4_vanilla_sp_v2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b1",
       "dataset_id": "pfister-presentation-local-pilots",
       "decoder_id": "pfister-presentation-local-pilots:B1_882_24:binary_tuned_oms",
@@ -21736,6 +22191,7 @@
       "source_decoder_id": "binary_tuned_oms"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b1",
       "dataset_id": "pfister-presentation-local-pilots",
       "decoder_id": "pfister-presentation-local-pilots:B1_882_24:bp4_tuned_sp",
@@ -21777,6 +22233,7 @@
       "source_decoder_id": "bp4_tuned_sp"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b1",
       "dataset_id": "pfister-presentation-local-pilots",
       "decoder_id": "pfister-presentation-local-pilots:B1_882_24:bp4_vanilla_ms",
@@ -21818,6 +22275,7 @@
       "source_decoder_id": "bp4_vanilla_ms"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b1",
       "dataset_id": "pfister-presentation-local-pilots",
       "decoder_id": "pfister-presentation-local-pilots:B1_882_24:bp4_vanilla_sp",
@@ -21859,6 +22317,7 @@
       "source_decoder_id": "bp4_vanilla_sp"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "double-gross",
       "dataset_id": "pfister-presentation-local-pilots",
       "decoder_id": "pfister-presentation-local-pilots:double_Gross_288_12_18:binary_tuned_oms",
@@ -21915,6 +22374,7 @@
       "source_decoder_id": "binary_tuned_oms"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "double-gross",
       "dataset_id": "pfister-presentation-local-pilots",
       "decoder_id": "pfister-presentation-local-pilots:double_Gross_288_12_18:bp4_tuned_sp",
@@ -21971,6 +22431,7 @@
       "source_decoder_id": "bp4_tuned_sp"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "double-gross",
       "dataset_id": "pfister-presentation-local-pilots",
       "decoder_id": "pfister-presentation-local-pilots:double_Gross_288_12_18:bp4_vanilla_ms",
@@ -22027,6 +22488,7 @@
       "source_decoder_id": "bp4_vanilla_ms"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "double-gross",
       "dataset_id": "pfister-presentation-local-pilots",
       "decoder_id": "pfister-presentation-local-pilots:double_Gross_288_12_18:bp4_vanilla_sp",
@@ -22083,6 +22545,7 @@
       "source_decoder_id": "bp4_vanilla_sp"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b1",
       "dataset_id": "pfister-presentation-ms-both-changes",
       "decoder_id": "pfister-presentation-ms-both-changes:b1:bp4_ms_both_changes",
@@ -22199,6 +22662,7 @@
       "source_decoder_id": "bp4_ms_both_changes"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "double-gross",
       "dataset_id": "pfister-presentation-ms-both-changes",
       "decoder_id": "pfister-presentation-ms-both-changes:double_gross:bp4_ms_both_changes",
@@ -22294,6 +22758,7 @@
       "source_decoder_id": "bp4_ms_both_changes"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b1",
       "dataset_id": "pfister-presentation-source-curves",
       "decoder_id": "pfister-presentation-source-curves:B1_882_24:binary_tuned_oms",
@@ -22443,6 +22908,7 @@
       "source_decoder_id": "binary_tuned_oms"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b1",
       "dataset_id": "pfister-presentation-source-curves",
       "decoder_id": "pfister-presentation-source-curves:B1_882_24:bp4_tuned_sp",
@@ -22592,6 +23058,7 @@
       "source_decoder_id": "bp4_tuned_sp"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b1",
       "dataset_id": "pfister-presentation-source-curves",
       "decoder_id": "pfister-presentation-source-curves:B1_882_24:bp4_vanilla_ms",
@@ -22718,6 +23185,7 @@
       "source_decoder_id": "bp4_vanilla_ms"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b1",
       "dataset_id": "pfister-presentation-source-curves",
       "decoder_id": "pfister-presentation-source-curves:B1_882_24:bp4_vanilla_sp",
@@ -22844,6 +23312,7 @@
       "source_decoder_id": "bp4_vanilla_sp"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "double-gross",
       "dataset_id": "pfister-presentation-source-curves",
       "decoder_id": "pfister-presentation-source-curves:double_Gross_288_12_18:binary_tuned_oms",
@@ -22993,6 +23462,7 @@
       "source_decoder_id": "binary_tuned_oms"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "double-gross",
       "dataset_id": "pfister-presentation-source-curves",
       "decoder_id": "pfister-presentation-source-curves:double_Gross_288_12_18:bp4_tuned_sp",
@@ -23119,6 +23589,7 @@
       "source_decoder_id": "bp4_tuned_sp"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "double-gross",
       "dataset_id": "pfister-presentation-source-curves",
       "decoder_id": "pfister-presentation-source-curves:double_Gross_288_12_18:bp4_vanilla_ms",
@@ -23222,6 +23693,7 @@
       "source_decoder_id": "bp4_vanilla_ms"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "double-gross",
       "dataset_id": "pfister-presentation-source-curves",
       "decoder_id": "pfister-presentation-source-curves:double_Gross_288_12_18:bp4_vanilla_sp",
@@ -23325,6 +23797,7 @@
       "source_decoder_id": "bp4_vanilla_sp"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "a5",
       "dataset_id": "yao-bp4-tuning-fairness-p006",
       "decoder_id": "yao-bp4-tuning-fairness-p006:a5:tuned_selected_a5",
@@ -23356,6 +23829,7 @@
       "source_decoder_id": "tuned_selected_a5"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "a5",
       "dataset_id": "yao-bp4-tuning-fairness-p006",
       "decoder_id": "yao-bp4-tuning-fairness-p006:a5:tuned_t100_a5",
@@ -23387,6 +23861,7 @@
       "source_decoder_id": "tuned_t100_a5"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "a5",
       "dataset_id": "yao-bp4-tuning-fairness-p006",
       "decoder_id": "yao-bp4-tuning-fairness-p006:a5:vanilla_t100",
@@ -23418,6 +23893,7 @@
       "source_decoder_id": "vanilla_t100"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "a5",
       "dataset_id": "yao-bp4-tuning-fairness-p006",
       "decoder_id": "yao-bp4-tuning-fairness-p006:a5:vanilla_work_a5",
@@ -23449,6 +23925,7 @@
       "source_decoder_id": "vanilla_work_a5"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "dataset_id": "yao-bp4-tuning-fairness-p006",
       "decoder_id": "yao-bp4-tuning-fairness-p006:b2:tuned_selected_b2",
@@ -23480,6 +23957,7 @@
       "source_decoder_id": "tuned_selected_b2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "dataset_id": "yao-bp4-tuning-fairness-p006",
       "decoder_id": "yao-bp4-tuning-fairness-p006:b2:tuned_t100_b2",
@@ -23511,6 +23989,7 @@
       "source_decoder_id": "tuned_t100_b2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "dataset_id": "yao-bp4-tuning-fairness-p006",
       "decoder_id": "yao-bp4-tuning-fairness-p006:b2:vanilla_t100",
@@ -23542,6 +24021,7 @@
       "source_decoder_id": "vanilla_t100"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "dataset_id": "yao-bp4-tuning-fairness-p006",
       "decoder_id": "yao-bp4-tuning-fairness-p006:b2:vanilla_work_b2",
@@ -23573,6 +24053,7 @@
       "source_decoder_id": "vanilla_work_b2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "a5",
       "dataset_id": "yao-bp4-tuning-selected-validation",
       "decoder_id": "yao-bp4-tuning-selected-validation:a5:sp_f64_v2_d01_p0045_t10000",
@@ -23604,6 +24085,7 @@
       "source_decoder_id": "sp_f64_v2_d01_p0045_t10000"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "a5",
       "dataset_id": "yao-bp4-tuning-selected-validation",
       "decoder_id": "yao-bp4-tuning-selected-validation:a5:sp_f64_v2_d01_p006_t10000",
@@ -23635,6 +24117,7 @@
       "source_decoder_id": "sp_f64_v2_d01_p006_t10000"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "a5",
       "dataset_id": "yao-bp4-tuning-selected-validation",
       "decoder_id": "yao-bp4-tuning-selected-validation:a5:sp_f64_v2_d01_p0075_t10000",
@@ -23666,6 +24149,7 @@
       "source_decoder_id": "sp_f64_v2_d01_p0075_t10000"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "a5",
       "dataset_id": "yao-bp4-tuning-selected-validation",
       "decoder_id": "yao-bp4-tuning-selected-validation:a5:sp_f64_v2_d02_p006_t10000",
@@ -23697,6 +24181,7 @@
       "source_decoder_id": "sp_f64_v2_d02_p006_t10000"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "a5",
       "dataset_id": "yao-bp4-tuning-selected-validation",
       "decoder_id": "yao-bp4-tuning-selected-validation:a5:sp_f64_v2_d03_p006_t10000",
@@ -23728,6 +24213,7 @@
       "source_decoder_id": "sp_f64_v2_d03_p006_t10000"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "dataset_id": "yao-bp4-tuning-selected-validation",
       "decoder_id": "yao-bp4-tuning-selected-validation:b2:sp_f64_v2_d005_p015_t5000",
@@ -23759,6 +24245,7 @@
       "source_decoder_id": "sp_f64_v2_d005_p015_t5000"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "dataset_id": "yao-bp4-tuning-selected-validation",
       "decoder_id": "yao-bp4-tuning-selected-validation:b2:sp_f64_v2_d015_p015_t5000",
@@ -23790,6 +24277,7 @@
       "source_decoder_id": "sp_f64_v2_d015_p015_t5000"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "dataset_id": "yao-bp4-tuning-selected-validation",
       "decoder_id": "yao-bp4-tuning-selected-validation:b2:sp_f64_v2_d01_p014_t5000",
@@ -23821,6 +24309,7 @@
       "source_decoder_id": "sp_f64_v2_d01_p014_t5000"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "dataset_id": "yao-bp4-tuning-selected-validation",
       "decoder_id": "yao-bp4-tuning-selected-validation:b2:sp_f64_v2_d01_p015_t5000",
@@ -23852,6 +24341,7 @@
       "source_decoder_id": "sp_f64_v2_d01_p015_t5000"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "dataset_id": "yao-bp4-tuning-selected-validation",
       "decoder_id": "yao-bp4-tuning-selected-validation:b2:sp_f64_v2_d01_p016_t5000",
@@ -23883,6 +24373,7 @@
       "source_decoder_id": "sp_f64_v2_d01_p016_t5000"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "dataset_id": "yao-bp4-tuning-selected-validation",
       "decoder_id": "yao-bp4-tuning-selected-validation:b2:sp_f64_v2_d01_p018_t5000",
@@ -23914,6 +24405,7 @@
       "source_decoder_id": "sp_f64_v2_d01_p018_t5000"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "dataset_id": "yao-bp4-tuning-selected-validation",
       "decoder_id": "yao-bp4-tuning-selected-validation:b2:sp_f64_v2_d02_p015_t5000",
@@ -23945,6 +24437,7 @@
       "source_decoder_id": "sp_f64_v2_d02_p015_t5000"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "a5",
       "dataset_id": "yao-cross-code-depolarizing",
       "decoder_id": "yao-cross-code-depolarizing:a5:binary_v2",
@@ -24110,6 +24603,7 @@
       "source_decoder_id": "binary_v2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "a5",
       "dataset_id": "yao-cross-code-depolarizing",
       "decoder_id": "yao-cross-code-depolarizing:a5:qbp_v2",
@@ -24275,6 +24769,7 @@
       "source_decoder_id": "qbp_v2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b1",
       "dataset_id": "yao-cross-code-depolarizing",
       "decoder_id": "yao-cross-code-depolarizing:b1:binary_v2",
@@ -24440,6 +24935,7 @@
       "source_decoder_id": "binary_v2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b1",
       "dataset_id": "yao-cross-code-depolarizing",
       "decoder_id": "yao-cross-code-depolarizing:b1:qbp_v2",
@@ -24605,6 +25101,7 @@
       "source_decoder_id": "qbp_v2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "dataset_id": "yao-cross-code-depolarizing",
       "decoder_id": "yao-cross-code-depolarizing:b2:binary_v2",
@@ -24770,6 +25267,7 @@
       "source_decoder_id": "binary_v2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "dataset_id": "yao-cross-code-depolarizing",
       "decoder_id": "yao-cross-code-depolarizing:b2:qbp_v2",
@@ -24935,6 +25433,7 @@
       "source_decoder_id": "qbp_v2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "c2",
       "dataset_id": "yao-cross-code-depolarizing",
       "decoder_id": "yao-cross-code-depolarizing:c2:binary_v2",
@@ -25100,6 +25599,7 @@
       "source_decoder_id": "binary_v2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "c2",
       "dataset_id": "yao-cross-code-depolarizing",
       "decoder_id": "yao-cross-code-depolarizing:c2:qbp_v2",
@@ -25265,6 +25765,7 @@
       "source_decoder_id": "qbp_v2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "a5",
       "dataset_id": "yao-cross-code-plain-baselines",
       "decoder_id": "yao-cross-code-plain-baselines:a5:binary_v2",
@@ -25430,6 +25931,7 @@
       "source_decoder_id": "binary_v2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "a5",
       "dataset_id": "yao-cross-code-plain-baselines",
       "decoder_id": "yao-cross-code-plain-baselines:a5:qbp_v2",
@@ -25595,6 +26097,7 @@
       "source_decoder_id": "qbp_v2"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "b1",
       "dataset_id": "yao-cross-code-plain-baselines",
       "decoder_id": "yao-cross-code-plain-baselines:b1:binary_paper",
@@ -25760,6 +26263,7 @@
       "source_decoder_id": "binary_paper"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "b1",
       "dataset_id": "yao-cross-code-plain-baselines",
       "decoder_id": "yao-cross-code-plain-baselines:b1:binary_v2",
@@ -25925,6 +26429,7 @@
       "source_decoder_id": "binary_v2"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "b1",
       "dataset_id": "yao-cross-code-plain-baselines",
       "decoder_id": "yao-cross-code-plain-baselines:b1:qbp_v2",
@@ -26090,6 +26595,7 @@
       "source_decoder_id": "qbp_v2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "dataset_id": "yao-cross-code-plain-baselines",
       "decoder_id": "yao-cross-code-plain-baselines:b2:binary_v2",
@@ -26255,6 +26761,7 @@
       "source_decoder_id": "binary_v2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "dataset_id": "yao-cross-code-plain-baselines",
       "decoder_id": "yao-cross-code-plain-baselines:b2:qbp_v2",
@@ -26420,6 +26927,7 @@
       "source_decoder_id": "qbp_v2"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "c2",
       "dataset_id": "yao-cross-code-plain-baselines",
       "decoder_id": "yao-cross-code-plain-baselines:c2:binary_paper",
@@ -26585,6 +27093,7 @@
       "source_decoder_id": "binary_paper"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "c2",
       "dataset_id": "yao-cross-code-plain-baselines",
       "decoder_id": "yao-cross-code-plain-baselines:c2:binary_v2",
@@ -26750,6 +27259,7 @@
       "source_decoder_id": "binary_v2"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "c2",
       "dataset_id": "yao-cross-code-plain-baselines",
       "decoder_id": "yao-cross-code-plain-baselines:c2:qbp_v2",
@@ -26915,6 +27425,7 @@
       "source_decoder_id": "qbp_v2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "a5",
       "dataset_id": "yao-non-osd-results",
       "decoder_id": "yao-non-osd-results:a5:bpgd_t10@figure-7",
@@ -27175,6 +27686,7 @@
       "source_decoder_id": "bpgd_t10"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "a5",
       "dataset_id": "yao-non-osd-results",
       "decoder_id": "yao-non-osd-results:a5:qbp@figure-7",
@@ -27435,6 +27947,7 @@
       "source_decoder_id": "qbp"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "b1",
       "dataset_id": "yao-non-osd-results",
       "decoder_id": "yao-non-osd-results:b1:bp@figure-2",
@@ -27695,6 +28208,7 @@
       "source_decoder_id": "bp"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "b1",
       "dataset_id": "yao-non-osd-results",
       "decoder_id": "yao-non-osd-results:b1:bp@figure-3",
@@ -27955,6 +28469,7 @@
       "source_decoder_id": "bp"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "b1",
       "dataset_id": "yao-non-osd-results",
       "decoder_id": "yao-non-osd-results:b1:bp@figure-4",
@@ -28215,6 +28730,7 @@
       "source_decoder_id": "bp"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "b1",
       "dataset_id": "yao-non-osd-results",
       "decoder_id": "yao-non-osd-results:b1:bp@figure-6",
@@ -28475,6 +28991,7 @@
       "source_decoder_id": "bp"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "b1",
       "dataset_id": "yao-non-osd-results",
       "decoder_id": "yao-non-osd-results:b1:bpgd_random_t100@figure-2",
@@ -28735,6 +29252,7 @@
       "source_decoder_id": "bpgd_random_t100"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "b1",
       "dataset_id": "yao-non-osd-results",
       "decoder_id": "yao-non-osd-results:b1:bpgd_t100@figure-2",
@@ -28995,6 +29513,7 @@
       "source_decoder_id": "bpgd_t100"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "b1",
       "dataset_id": "yao-non-osd-results",
       "decoder_id": "yao-non-osd-results:b1:bpgd_t100@figure-3",
@@ -29255,6 +29774,7 @@
       "source_decoder_id": "bpgd_t100"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "b1",
       "dataset_id": "yao-non-osd-results",
       "decoder_id": "yao-non-osd-results:b1:bpgd_t100_r10@figure-6",
@@ -29515,6 +30035,7 @@
       "source_decoder_id": "bpgd_t100_r10"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "b1",
       "dataset_id": "yao-non-osd-results",
       "decoder_id": "yao-non-osd-results:b1:bpgd_t100_r2@figure-6",
@@ -29775,6 +30296,7 @@
       "source_decoder_id": "bpgd_t100_r2"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "b1",
       "dataset_id": "yao-non-osd-results",
       "decoder_id": "yao-non-osd-results:b1:bpgd_t100_r50@figure-6",
@@ -30035,6 +30557,7 @@
       "source_decoder_id": "bpgd_t100_r50"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "b1",
       "dataset_id": "yao-non-osd-results",
       "decoder_id": "yao-non-osd-results:b1:bpgd_t100_r5@figure-6",
@@ -30295,6 +30818,7 @@
       "source_decoder_id": "bpgd_t100_r5"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "b1",
       "dataset_id": "yao-non-osd-results",
       "decoder_id": "yao-non-osd-results:b1:bpgd_t100_r882@figure-6",
@@ -30555,6 +31079,7 @@
       "source_decoder_id": "bpgd_t100_r882"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "b1",
       "dataset_id": "yao-non-osd-results",
       "decoder_id": "yao-non-osd-results:b1:bpgd_t10@figure-3",
@@ -30815,6 +31340,7 @@
       "source_decoder_id": "bpgd_t10"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "b1",
       "dataset_id": "yao-non-osd-results",
       "decoder_id": "yao-non-osd-results:b1:bpgd_t10@figure-4",
@@ -31075,6 +31601,7 @@
       "source_decoder_id": "bpgd_t10"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "b1",
       "dataset_id": "yao-non-osd-results",
       "decoder_id": "yao-non-osd-results:b1:bpgd_t1@figure-3",
@@ -31335,6 +31862,7 @@
       "source_decoder_id": "bpgd_t1"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "b1",
       "dataset_id": "yao-non-osd-results",
       "decoder_id": "yao-non-osd-results:b1:bpgd_t70@figure-3",
@@ -31595,6 +32123,7 @@
       "source_decoder_id": "bpgd_t70"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "dataset_id": "yao-non-osd-results",
       "decoder_id": "yao-non-osd-results:b2:bpgd_t10@figure-8",
@@ -31855,6 +32384,7 @@
       "source_decoder_id": "bpgd_t10"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "dataset_id": "yao-non-osd-results",
       "decoder_id": "yao-non-osd-results:b2:qbp@figure-8",
@@ -32115,6 +32645,7 @@
       "source_decoder_id": "qbp"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "c2",
       "dataset_id": "yao-non-osd-results",
       "decoder_id": "yao-non-osd-results:c2:bp@figure-5",
@@ -32375,6 +32906,7 @@
       "source_decoder_id": "bp"
     },
     {
+      "channel_kind": "x_only",
       "code_id": "c2",
       "dataset_id": "yao-non-osd-results",
       "decoder_id": "yao-non-osd-results:c2:bpgd_t10@figure-5",
@@ -32635,6 +33167,7 @@
       "source_decoder_id": "bpgd_t10"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "a5",
       "cohort_kind": "confirmation",
       "dataset_id": "yao-tuned-qbpgd-p006",
@@ -32672,6 +33205,7 @@
       "summary_path": "data/reproductions/yao-2312-10950-bp4-tuned-qbpgd-p006/results/a5-p006-seed20261030-n10000/summary.json"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "a5",
       "cohort_kind": "confirmation",
       "dataset_id": "yao-tuned-qbpgd-p006",
@@ -32709,6 +33243,7 @@
       "summary_path": "data/reproductions/yao-2312-10950-bp4-tuned-qbpgd-p006/results/a5-p006-seed20261030-n10000/summary.json"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "cohort_kind": "confirmation",
       "dataset_id": "yao-tuned-qbpgd-p006",
@@ -32746,6 +33281,7 @@
       "summary_path": "data/reproductions/yao-2312-10950-bp4-tuned-qbpgd-p006/results/b2-p006-seed20261030-n10000/summary.json"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "cohort_kind": "confirmation",
       "dataset_id": "yao-tuned-qbpgd-p006",
@@ -32783,6 +33319,7 @@
       "summary_path": "data/reproductions/yao-2312-10950-bp4-tuned-qbpgd-p006/results/b2-p006-seed20261030-n10000/summary.json"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "a5",
       "cohort_kind": "pilot",
       "dataset_id": "yao-tuned-qbpgd-p006-pilot-n1000",
@@ -32820,6 +33357,7 @@
       "summary_path": "data/reproductions/yao-2312-10950-bp4-tuned-qbpgd-p006/results/a5-p006-seed20261029-n1000/summary.json"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "a5",
       "cohort_kind": "pilot",
       "dataset_id": "yao-tuned-qbpgd-p006-pilot-n1000",
@@ -32857,6 +33395,7 @@
       "summary_path": "data/reproductions/yao-2312-10950-bp4-tuned-qbpgd-p006/results/a5-p006-seed20261029-n1000/summary.json"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "cohort_kind": "pilot",
       "dataset_id": "yao-tuned-qbpgd-p006-pilot-n1000",
@@ -32894,6 +33433,7 @@
       "summary_path": "data/reproductions/yao-2312-10950-bp4-tuned-qbpgd-p006/results/b2-p006-seed20261029-n1000/summary.json"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "cohort_kind": "pilot",
       "dataset_id": "yao-tuned-qbpgd-p006-pilot-n1000",
@@ -32931,6 +33471,7 @@
       "summary_path": "data/reproductions/yao-2312-10950-bp4-tuned-qbpgd-p006/results/b2-p006-seed20261029-n1000/summary.json"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "a5",
       "dataset_id": "yao-vanilla-a5-b2",
       "decoder_id": "yao-vanilla-a5-b2:a5:binary_v1",
@@ -33047,6 +33588,7 @@
       "source_decoder_id": "binary_v1"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "a5",
       "dataset_id": "yao-vanilla-a5-b2",
       "decoder_id": "yao-vanilla-a5-b2:a5:binary_v2",
@@ -33163,6 +33705,7 @@
       "source_decoder_id": "binary_v2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "a5",
       "dataset_id": "yao-vanilla-a5-b2",
       "decoder_id": "yao-vanilla-a5-b2:a5:bp4_v1",
@@ -33279,6 +33822,7 @@
       "source_decoder_id": "bp4_v1"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "a5",
       "dataset_id": "yao-vanilla-a5-b2",
       "decoder_id": "yao-vanilla-a5-b2:a5:bp4_v2",
@@ -33395,6 +33939,7 @@
       "source_decoder_id": "bp4_v2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "dataset_id": "yao-vanilla-a5-b2",
       "decoder_id": "yao-vanilla-a5-b2:b2:binary_v1",
@@ -33511,6 +34056,7 @@
       "source_decoder_id": "binary_v1"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "dataset_id": "yao-vanilla-a5-b2",
       "decoder_id": "yao-vanilla-a5-b2:b2:binary_v2",
@@ -33627,6 +34173,7 @@
       "source_decoder_id": "binary_v2"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "dataset_id": "yao-vanilla-a5-b2",
       "decoder_id": "yao-vanilla-a5-b2:b2:bp4_v1",
@@ -33743,6 +34290,7 @@
       "source_decoder_id": "bp4_v1"
     },
     {
+      "channel_kind": "depolarizing",
       "code_id": "b2",
       "dataset_id": "yao-vanilla-a5-b2",
       "decoder_id": "yao-vanilla-a5-b2:b2:bp4_v2",

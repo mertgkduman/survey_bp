@@ -30,14 +30,15 @@ CLOSED_FIELDS = {
     # ``sampling`` is the frozen v1 wire shape.  The companion set is an
     # opt-in extension: absent stopping keys stay absent after validation.
     "sampling": {"seed", "shot_start", "shots"},
-    "sampling_with_stopping": {"seed", "shot_start", "shots", "stop_failures", "stop_type_i", "stop_type_ii"},
+    "sampling_with_stopping": {"seed", "shot_start", "shots", "stop_failures", "stop_type_i", "stop_type_ii", "stop_mode", "per_point"},
+    "per_point_sampling": {"shots", "stop_failures", "stop_type_i", "stop_type_ii"},
     "budgets": {"max_shots", "max_iterations"},
     "provenance": {"relation", "source_spec_id", "notes"},
     "code_problem": {"kind", "code"}, "circuit_problem": {"kind", "circuit", "dem"},
     "registered_input": {"kind", "id"}, "inline_stim": {"kind", "text"},
     "embedded_css": {"kind", "hx", "hz", "lx", "lz"},
-    "channel": {"kind"}, "explicit_channel": {"kind", "probabilities"},
-    "rate_point": {"physical_p", "decoder_p0"}, "explicit_rate_point": {"decoder_p0"}, "circuit_rate_point": {"label"},
+    "channel": {"kind"}, "explicit_channel": {"kind", "probabilities"}, "circuit_channel": {"kind", "noise_sweep"},
+    "rate_point": {"physical_p", "decoder_p0"}, "explicit_rate_point": {"decoder_p0"}, "circuit_rate_point": {"label"}, "circuit_sweep_rate_point": {"label", "physical_p"},
     "decoder": {"family", "implementation", "variant", "rule", "numerical_profile", "policy", "schedule", "stop_on_convergence"},
     "circuit_decoder": {"family", "implementation", "rule", "numerical_profile", "schedule", "max_iterations", "tie_break"},
     "qbpgd": {"iterations_per_round", "epsilon", "round_limit"},
@@ -87,11 +88,78 @@ def _sampling(value: object) -> dict[str, Any]:
     result = dict(value)
     result["seed"] = _positive_int(result["seed"], "sampling.seed", allow_zero=True)
     result["shot_start"] = _positive_int(result["shot_start"], "sampling.shot_start", allow_zero=True)
-    result["shots"] = _positive_int(result["shots"], "sampling.shots")
+    if result["shots"] is not None:
+        result["shots"] = _positive_int(result["shots"], "sampling.shots")
     for name in ("stop_failures", "stop_type_i", "stop_type_ii"):
         if name in result and result[name] is not None:
             result[name] = _positive_int(result[name], f"sampling.{name}")
+    if "stop_mode" in result and result["stop_mode"] not in {"any", "all"}:
+        raise ValueError("sampling.stop_mode must be any or all")
+    if "per_point" in result:
+        if not isinstance(result["per_point"], list) or not result["per_point"]:
+            raise ValueError("sampling.per_point must be a nonempty list")
+        points = []
+        for index, limits in enumerate(result["per_point"]):
+            limit = _object(limits, f"sampling.per_point[{index}]", keys=CLOSED_FIELDS["per_point_sampling"])
+            for name in CLOSED_FIELDS["per_point_sampling"]:
+                if limit[name] is not None:
+                    limit[name] = _positive_int(limit[name], f"sampling.per_point[{index}].{name}")
+            points.append(limit)
+        result["per_point"] = points
     return result
+
+
+def resolved_sampling(sampling: Mapping[str, object], point_index: int, point_count: int) -> dict[str, Any]:
+    """Resolve uniform or complete per-rate limits without silently adding a cap."""
+    overrides = sampling.get("per_point")
+    if overrides is not None:
+        if not isinstance(overrides, list) or len(overrides) != point_count:
+            raise ValueError("sampling.per_point must contain one complete limit object per rate point")
+        result = dict(overrides[point_index])
+    else:
+        result = {name: sampling.get(name) for name in CLOSED_FIELDS["per_point_sampling"]}
+    result["stop_mode"] = sampling.get("stop_mode", "any")
+    if not any(result[name] is not None for name in CLOSED_FIELDS["per_point_sampling"]):
+        raise ValueError(f"sampling limits for rate point {point_index} are all empty")
+    return result
+
+
+def sweep_stim_text(text: str, *, source_probability: float, physical_p: float) -> str:
+    """Replace an explicitly declared baseline probability in noisy Stim gates.
+
+    Targets, repeat structure, non-noisy instructions, and noisy arguments that
+    differ from the declared source value are copied byte-for-semantic-byte by
+    Stim.  This avoids a broad text replacement accidentally changing a qubit
+    index, repeat count, coordinate, or an intentionally distinct noise term.
+    """
+    try:
+        import stim
+    except ImportError as error:
+        raise ValueError("circuit probability sweeps require Stim") from error
+    circuit = stim.Circuit(text)
+    replacements = 0
+    def copy_block(block):
+        nonlocal replacements
+        result = stim.Circuit()
+        for instruction in block:
+            if isinstance(instruction, stim.CircuitRepeatBlock):
+                result.append(stim.CircuitRepeatBlock(instruction.repeat_count, copy_block(instruction.body_copy())))
+                continue
+            args = instruction.gate_args_copy()
+            if stim.gate_data(instruction.name).is_noisy_gate:
+                revised = []
+                for value in args:
+                    if abs(float(value) - source_probability) <= 1e-15:
+                        revised.append(physical_p); replacements += 1
+                    else:
+                        revised.append(value)
+                args = revised
+            result.append(instruction.name, instruction.targets_copy(), args, tag=instruction.tag)
+        return result
+    swept = copy_block(circuit)
+    if replacements == 0:
+        raise ValueError("circuit noise_sweep.source_probability did not match any noisy Stim gate argument")
+    return str(swept)
 
 
 def _policy(value: object, *, rule: str) -> dict[str, Any] | None:
@@ -196,10 +264,6 @@ def _decoder(value: object, *, problem_kind: str) -> dict[str, Any]:
         raise ValueError("a flooding resolution policy requires the unbounded v2 numerical profile")
     if decoder["rule"] == "min_sum" and decoder["policy"] is None and not decoder["numerical_profile"].endswith("-v2"):
         raise ValueError("plain compiled min-sum needs its explicit v2 policy; frozen v1 support is sum-product only")
-    if decoder["variant"] == "qbpgd" and decoder["policy"] is not None:
-        raise ValueError("Q-BPGD cannot be combined with a flooding policy overlay")
-    if decoder["variant"] == "qbpgd" and decoder["rule"] != "sum_product":
-        raise ValueError("compiled Q-BPGD supports sum_product only; min-sum installs an incompatible policy")
     if decoder["variant"] == "qbpgd" and decoder["numerical_profile"] != "quaternary-bp4-f64-v2":
         raise ValueError("Q-BPGD requires the quaternary v2 numerical profile")
     if decoder["variant"] == "qbpgd" and decoder["stop_on_convergence"] is not True:
@@ -210,13 +274,16 @@ def _decoder(value: object, *, problem_kind: str) -> dict[str, Any]:
 def _rate_points(value: object, *, channel_kind: str, circuit: bool = False) -> list[dict[str, Any]]:
     if not isinstance(value, list) or not value:
         raise ValueError("rate_points must be a nonempty list")
-    if circuit and len(value) != 1:
-        raise ValueError("one circuit contains one embedded noise setting; export separate circuits for a sweep")
     points: list[dict[str, Any]] = []
     for index, row in enumerate(value):
         if circuit:
-            point = _object(row, f"rate_points[{index}]", keys=CLOSED_FIELDS["circuit_rate_point"])
+            if not isinstance(row, Mapping):
+                raise ValueError(f"rate_points[{index}] must be an object")
+            keys = CLOSED_FIELDS["circuit_sweep_rate_point"] if "physical_p" in row else CLOSED_FIELDS["circuit_rate_point"]
+            point = _object(row, f"rate_points[{index}]", keys=keys)
             point["label"] = _string(point["label"], f"rate_points[{index}].label")
+            if "physical_p" in point:
+                point["physical_p"] = _number(point["physical_p"], f"rate_points[{index}].physical_p")
             points.append(point)
             continue
         keys = CLOSED_FIELDS["explicit_rate_point"] if channel_kind == "explicit" else CLOSED_FIELDS["rate_point"]
@@ -230,6 +297,15 @@ def _rate_points(value: object, *, channel_kind: str, circuit: bool = False) -> 
 
 def interface_contract() -> dict[str, object]:
     """Machine-readable defaults, enums, and cross-field admission rules for UI clients."""
+    # Kept in the contract so browser-side sweep previews share the same
+    # conservative gate boundary as the executable path.  Stim remains the
+    # parser/validator; the static UI never claims a text edit is a run.
+    noisy_gates = ["DEPOLARIZE1", "DEPOLARIZE2", "E", "ELSE_CORRELATED_ERROR", "HERALDED_ERASE", "HERALDED_PAULI_CHANNEL_1", "M", "MR", "MX", "MXR", "MY", "MYR", "MZ", "MZZ", "PAULI_CHANNEL_1", "PAULI_CHANNEL_2", "X_ERROR", "Y_ERROR", "Z_ERROR"]
+    try:
+        import stim
+        noisy_gates = sorted({alias for gate in stim.gate_data().values() if gate.is_noisy_gate for alias in gate.aliases})
+    except (ImportError, AttributeError):
+        pass
     return {
         "timing_boundaries": {kind: timing_boundaries(kind) for kind in ("css_code_capacity", "pauli_code_capacity", "circuit")},
         "schema": SCHEMA,
@@ -247,28 +323,27 @@ def interface_contract() -> dict[str, object]:
         "rules": ["sum_product", "min_sum", "spa"],
         "rules_by_family": {"binary_css": ["sum_product", "min_sum"], "bp4": ["sum_product", "min_sum"], "circuit_dem_bp": list(_CIRCUIT_RULE_PROFILES)},
         "circuit_rule_profiles": dict(_CIRCUIT_RULE_PROFILES),
+        "stim_noise_sweep": {"argument_match_tolerance": 1e-15, "noisy_gate_names": noisy_gates, "replacement": "every matching noisy-gate argument, including inside REPEAT blocks; no other arguments or targets"},
         "resolution": {"formats": list(_RESOLUTION_FORMATS), "scopes": list(_RESOLUTION_SCOPES), "coefficients": ["float64", "same"]},
         "defaults": {"sampling": {"seed": 0, "shot_start": 0, "shots": 32}, "budgets": {"max_shots": 32, "max_iterations": 30},
                      "binary": {"rule": "sum_product", "numerical_profile": "binary-spa-flooding-f64-v2", "schedule": "flooding", "stop_on_convergence": True},
                      "bp4": {"rule": "sum_product", "numerical_profile": "quaternary-bp4-f64-v2", "schedule": "flooding", "stop_on_convergence": True},
                      "circuit": {"rule": "spa", "numerical_profile": "binary-spa-flooding-f64-v1", "schedule": "flooding", "max_iterations": 30, "tie_break": "zero"}},
         "ui_fields": {"physical_p": {"type": "number", "minimum": 0, "maximum": 1}, "decoder_p0": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
-                      "shots": {"type": "integer", "minimum": 1, "scope": "per_rate_point"}, "stop_failures": {"type": ["integer", "null"], "minimum": 1, "default": None, "scope": "per_rate_point", "effect": "adaptive_stop"}, "stop_type_i": {"type": ["integer", "null"], "minimum": 1, "default": None, "scope": "per_rate_point", "effect": "adaptive_stop", "families": ["binary_css", "bp4"]}, "stop_type_ii": {"type": ["integer", "null"], "minimum": 1, "default": None, "scope": "per_rate_point", "effect": "adaptive_stop", "families": ["binary_css", "bp4"]}, "max_shots": {"type": "integer", "minimum": 1, "scope": "total_experiment", "constraint": "len(rate_points)*sampling.shots <= budgets.max_shots"}, "max_iterations": {"type": "integer", "minimum": 0, "scope": "per_attempt; Q-BPGD total sweeps cap"},
+                      "shots": {"type": ["integer", "null"], "minimum": 1, "scope": "per_rate_point", "null_means": "no_shot_limit"}, "stop_failures": {"type": ["integer", "null"], "minimum": 1, "default": None, "scope": "per_rate_point", "effect": "adaptive_stop"}, "stop_type_i": {"type": ["integer", "null"], "minimum": 1, "default": None, "scope": "per_rate_point", "effect": "adaptive_stop", "families": ["binary_css", "bp4", "circuit_dem_bp"]}, "stop_type_ii": {"type": ["integer", "null"], "minimum": 1, "default": None, "scope": "per_rate_point", "effect": "adaptive_stop", "families": ["binary_css", "bp4", "circuit_dem_bp"]}, "stop_mode": {"enum": ["any", "all"], "default": "any", "all_semantics": "shots is a target; continue until every configured limit is reached"}, "per_point": {"complete_fields": sorted(CLOSED_FIELDS["per_point_sampling"]), "scope": "one complete object per rate point"}, "max_shots": {"type": ["integer", "null"], "minimum": 1, "scope": "legacy_total_hard_ceiling"}, "max_iterations": {"type": "integer", "minimum": 0, "scope": "per_attempt; Q-BPGD total sweeps cap"},
                       "policy": {"version": "bp-flooding-policy-v1", "resolution_version": "bp-resolution-v1", "damping": {"minimum": 0, "exclusiveMaximum": 1}, "alpha": {"exclusiveMinimum": 0}, "beta": {"minimum": 0}}},
         "cross_rule_objects": [
             {"if": {"decoder.family": "circuit_dem_bp", "decoder.rule": rule}, "then": {"decoder.numerical_profile": profile}} for rule, profile in _CIRCUIT_RULE_PROFILES.items()
         ] + [
-            {"if": {"decoder.variant": "qbpgd"}, "then": {"decoder.numerical_profile": "quaternary-bp4-f64-v2", "decoder.rule": "sum_product", "decoder.policy": None}},
+            {"if": {"decoder.variant": "qbpgd"}, "then": {"decoder.numerical_profile": "quaternary-bp4-f64-v2"}},
             {"if": {"decoder.policy": "non_null"}, "then": {"decoder.numerical_profile": "*_v2", "decoder.policy.check_rule": "decoder.rule"}},
             {"if": {"problem.kind": "circuit"}, "then": {"channel.kind": "embedded_circuit", "rate_points.item": {"label": "string"}, "problem.dem.decompose_errors": False}},
-            {"if": {"problem.kind": "circuit", "sampling.stop_type_i": "non_null"}, "then": {"error": "circuit observable evaluation has no type-I outcome"}},
-            {"if": {"problem.kind": "circuit", "sampling.stop_type_ii": "non_null"}, "then": {"error": "circuit observable evaluation has no type-II outcome"}},
             {"if": {"sampling.stop_failures|sampling.stop_type_i|sampling.stop_type_ii": "non_null"}, "then": {"sampling_mode": "adaptive_stopping", "ci_method": "unavailable_optional_stopping"}},
         ],
         "cross_rules": [
             "custom binary and BP4 execute flooding only; schedules and interventions outside this contract are rejected",
-            "BP4 Q-BPGD requires v2 profile and policy=null",
-            "custom circuit uses the v1 Sinter adapter and its embedded Stim noise; policy/resolution is not accepted",
+            "Q-BPGD requires v2 and composes its guided-decimation controller with the selected flooding policy; such policy compositions are canonical adaptations unless separately source-qualified",
+            "custom circuit uses the v1 Sinter adapter; noise_sweep replaces only declared matching noisy-gate probabilities",
             "physical_p and decoder_p0 are independent and serialized for every rate point",
             "registered historical studies are adapters and are not custom compiled experiments",
         ],
@@ -315,13 +390,18 @@ def validate_experiment(spec: object, *, repository: Mapping[str, object] | str 
             raise ValueError("circuit DEM extraction is pinned to decompose_errors=false")
     else:
         raise ValueError("problem.kind is unsupported")
-    channel = _object(root["channel"], "channel", keys=CLOSED_FIELDS["explicit_channel"] if isinstance(root["channel"], Mapping) and root["channel"].get("kind") == "explicit" else CLOSED_FIELDS["channel"])
+    raw_channel = root["channel"]
+    channel = _object(raw_channel, "channel", keys=(CLOSED_FIELDS["explicit_channel"] if isinstance(raw_channel, Mapping) and raw_channel.get("kind") == "explicit" else CLOSED_FIELDS["circuit_channel"] if isinstance(raw_channel, Mapping) and raw_channel.get("kind") == "embedded_circuit" and "noise_sweep" in raw_channel else CLOSED_FIELDS["channel"]))
     if channel["kind"] not in {"depolarizing", "x_only", "explicit", "embedded_circuit"}:
         raise ValueError("channel.kind is unsupported")
     if kind == "circuit" and channel["kind"] != "embedded_circuit":
         raise ValueError("circuit sampling is supplied by its Stim text; use channel.kind=embedded_circuit")
     if kind != "circuit" and channel["kind"] == "embedded_circuit":
         raise ValueError("embedded_circuit is only valid for a circuit problem")
+    if "noise_sweep" in channel:
+        sweep = _object(channel["noise_sweep"], "channel.noise_sweep", keys={"source_probability"})
+        sweep["source_probability"] = _number(sweep["source_probability"], "channel.noise_sweep.source_probability", lower=0.0, lower_open=True, upper=1.0, upper_open=True)
+        channel["noise_sweep"] = sweep
     decoder = _decoder(root["decoder"], problem_kind=kind)
     if kind == "css_code_capacity" and decoder["family"] != "binary_css":
         raise ValueError("CSS code-capacity needs decoder.family=binary_css")
@@ -330,18 +410,29 @@ def validate_experiment(spec: object, *, repository: Mapping[str, object] | str 
     rates = _rate_points(root["rate_points"], channel_kind=channel["kind"], circuit=kind == "circuit")
     sampling = _sampling(root["sampling"])
     budgets = _object(root["budgets"], "budgets", keys=CLOSED_FIELDS["budgets"])
-    budgets["max_shots"] = _positive_int(budgets["max_shots"], "budgets.max_shots")
+    if budgets["max_shots"] is not None:
+        budgets["max_shots"] = _positive_int(budgets["max_shots"], "budgets.max_shots")
     budgets["max_iterations"] = _positive_int(budgets["max_iterations"], "budgets.max_iterations", allow_zero=True)
-    if len(rates) * sampling["shots"] > budgets["max_shots"]:
+    if budgets["max_shots"] is not None and sampling["shots"] is not None and len(rates) * sampling["shots"] > budgets["max_shots"]:
         raise ValueError("budgets.max_shots is a total experiment cap; rate points times shots exceeds it")
     if kind != "circuit" and budgets["max_iterations"] == 0:
         raise ValueError("code-capacity execution requires a positive max_iterations budget")
     if kind == "circuit" and decoder["max_iterations"] > budgets["max_iterations"]:
         raise ValueError("decoder.max_iterations exceeds budgets.max_iterations")
-    if kind == "circuit" and sampling["shot_start"] + sampling["shots"] > budgets["max_shots"]:
+    if kind == "circuit" and budgets["max_shots"] is not None and sampling["shots"] is not None and len(rates) * (sampling["shot_start"] + sampling["shots"]) > budgets["max_shots"]:
         raise ValueError("circuit shot_start requires replay/discard and exceeds the total max_shots cap")
-    if kind == "circuit" and any(sampling.get(field) is not None for field in ("stop_type_i", "stop_type_ii")):
-        raise ValueError("circuit observable evaluation does not define type-I/type-II stopping")
+    for index in range(len(rates)):
+        resolved_sampling(sampling, index, len(rates))
+    if kind == "circuit":
+        swept = "noise_sweep" in channel
+        has_physical = all("physical_p" in point for point in rates)
+        if swept != has_physical:
+            raise ValueError("circuit noise_sweep requires physical_p at every point, and physical_p requires noise_sweep")
+        if not swept and len(rates) != 1:
+            raise ValueError("one legacy embedded circuit has one rate point; declare noise_sweep for a circuit sweep")
+        labels = [point["label"] for point in rates]
+        if len(labels) != len(set(labels)):
+            raise ValueError("circuit rate-point labels must be unique")
     if decoder.get("variant") == "qbpgd":
         qbpgd = decoder["qbpgd"]
         assert isinstance(qbpgd, Mapping)
@@ -366,11 +457,17 @@ def validate_experiment(spec: object, *, repository: Mapping[str, object] | str 
             from bp_registry.circuit import CanonicalBpSinterDecoder
         except ImportError as error:
             raise ValueError("Circuit validation requires the repository's circuit extra (Stim/Sinter)") from error
-        circuit = stim.Circuit(value)
-        if circuit.num_observables < 1:
-            raise ValueError("Circuit experiments require at least one declared observable")
-        dem = circuit.detector_error_model(decompose_errors=False)
-        CanonicalBpSinterDecoder(max_iterations=decoder["max_iterations"], rule=decoder["rule"], tie_break=decoder["tie_break"]).compile_decoder_for_dem(dem=dem)
+        texts = [value] if "noise_sweep" not in channel else [
+            sweep_stim_text(value, source_probability=float(channel["noise_sweep"]["source_probability"]), physical_p=float(point["physical_p"]))
+            for point in rates
+        ]
+        adapter = CanonicalBpSinterDecoder(max_iterations=decoder["max_iterations"], rule=decoder["rule"], tie_break=decoder["tie_break"])
+        for rate_index, text in enumerate(texts):
+            circuit = stim.Circuit(text)
+            if circuit.num_observables < 1:
+                raise ValueError(f"circuit rate point {rate_index} has no declared observable")
+            dem = circuit.detector_error_model(decompose_errors=False)
+            adapter.compile_decoder_for_dem(dem=dem)
         if sampling["seed"] >= 2**64:
             raise ValueError("Stim sampling seed must fit uint64")
     else:
@@ -436,10 +533,20 @@ def _repository_value(repository: Mapping[str, object] | str | Path | object, id
         return build_b2_ghp() if identifier == "b2" else build_c2_hp()
     if identifier in {"double-gross", "double_gross", "double_Gross", "double_Gross_288_12_18"}:
         import importlib.util
+        import sys
         source = root / "from_dr_pfister_presentetations/run_reproduction.py"
         module_spec = importlib.util.spec_from_file_location("_portable_double_gross", source)
         if module_spec is None or module_spec.loader is None: raise ValueError("double_gross construction is unavailable")
-        module = importlib.util.module_from_spec(module_spec); module_spec.loader.exec_module(module)
+        module = importlib.util.module_from_spec(module_spec)
+        # The retained constructor imports its sibling policy module by name.
+        # Resolve that local dependency only for this isolated load; do not
+        # make a global repository import-path mutation part of execution.
+        added = str(source.parent) not in sys.path
+        if added: sys.path.insert(0, str(source.parent))
+        try:
+            module_spec.loader.exec_module(module)
+        finally:
+            if added: sys.path.remove(str(source.parent))
         return module.double_gross()
     if identifier == "gb46":
         raise ValueError("gb46 has a retained parity-check artifact but no portable CSS/logical construction for this runner")

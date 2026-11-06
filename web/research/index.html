@@ -5,7 +5,7 @@
 <meta name="description" content="View BP-based QLDPC experiment results, reproduce them locally, and build new comparisons.">
 <title>BP-based QLDPC decoding workbench · v2</title>
 <link rel="stylesheet" href="vendor/katex/katex.min.css"><link rel="stylesheet" href="style.css">
-<script defer src="vendor/katex/katex.min.js"></script><script defer src="zip.js"></script><script defer src="contract-ui.js"></script><script defer src="result-import.js"></script><script defer src="decoder-display.js"></script><script defer src="app.js"></script>
+<script defer src="vendor/katex/katex.min.js"></script><script defer src="zip.js"></script><script defer src="contract-ui.js"></script><script defer src="result-import.js"></script><script defer src="decoder-display.js"></script><script defer src="curve-projection.js"></script><script defer src="plot-data.js"></script><script defer src="app.js"></script>
 </head>
 <body>
 <a class="skip" href="#main-content">Skip to content</a>
@@ -68,11 +68,12 @@ cd /path/to/survey_bp
 <form id="builder-form">
 <div class="builder-top"><label>Experiment label<input id="build-id" value="my-bp-experiment" required></label><label>Start from a saved specification<select id="build-preset"></select></label></div>
 <p id="saved-note" class="muted">A new configuration creates a new experiment identity.</p>
+<div id="decoder-search"></div>
 <div class="builder-columns">
 <fieldset><legend>Decoder builder</legend><div class="fields">
 <label>Use for<select id="build-regime"><option value="code">Code</option><option value="circuit">Circuit</option></select></label>
-<label>Decoder<select id="build-family"><option value="binary_css">Binary BP</option><option value="bp4">BP4 · joint Pauli</option></select></label>
-<label>Policy<select id="build-variant"><option value="plain">Plain BP with optional damping / scaling</option><option value="qbpgd">Guided decimation · Q-BPGD</option></select></label>
+<label>Decoder<select id="build-family"><option value="binary_css">BP, binary CSS</option><option value="bp4">Q-BP, joint Pauli</option></select></label>
+<label>Guided decimation<select id="build-variant"><option value="plain">Off</option><option value="qbpgd">On, Q-BPGD</option></select></label>
 <label>Check update<select id="build-rule"><option value="sum_product">Sum-product</option><option value="min_sum">Min-sum</option></select></label>
 <label>Maximum iterations<input id="build-iterations" type="number" min="1" value="100"></label>
 <label>Numerical profile<select id="build-version"><option value="v2">Canonical float64 v2</option><option value="v1">Historical float64 v1</option></select></label>
@@ -84,34 +85,36 @@ cd /path/to/survey_bp
 <label>Coefficients<select id="build-coefficients"><option value="float64">float64</option><option value="same">Same resolution as messages</option></select></label>
 <label>MS scale α<input id="build-alpha" type="number" min="0.001" step="0.1" value="1"></label>
 <label>MS offset β<input id="build-beta" type="number" min="0" step="0.05" value="0"></label>
-<label>BP4 hard decision<select id="build-hard"><option value="strict_pauli">Strict Pauli ladder</option><option value="min_llr">Minimum LLR</option></select></label>
+<label>Q-BP hard decision<select id="build-hard"><option value="strict_pauli">Strict Pauli ladder</option><option value="min_llr">Minimum LLR</option></select></label>
 <label>Zero-syndrome shortcut<select id="build-shortcut"><option value="false">Complete at least one sweep</option><option value="true">Allow zero-syndrome shortcut</option></select></label>
-<label>Stopping<select id="build-stop"><option value="true">First syndrome-matching candidate</option><option value="false">Complete iteration cap · BP4 only</option></select></label>
+<label>Stopping<select id="build-stop"><option value="true">First syndrome-matching candidate</option><option value="false">Complete iteration cap, Q-BP only</option></select></label>
 </div></details>
 <details id="decimation-controls" hidden><summary>Guided-decimation budget</summary><div class="fields"><label>Sweeps per round<input id="build-per-round" type="number" min="1" value="10"></label><label>Maximum rounds<input id="build-rounds" type="number" min="1" value="2"></label><label>Fixation ε<input id="build-epsilon" type="number" min="0" step="any" value="0.0000000001"></label></div></details>
 <p id="decoder-help" class="muted small"></p>
+<aside id="kernel-guide" class="kernel-guide" aria-label="Canonical decoder update rules"></aside>
 </fieldset>
 <fieldset><legend id="input-legend">Code</legend>
-<div id="code-input"><label>Code / check representation<select id="build-code"></select></label><p class="muted small">A code may have different parity-check representations. The selected matrices, row order, and logical basis identify this input.</p><details id="matrix-input"><summary>Parity check matrix</summary><label>CSS matrices · JSON<textarea id="build-matrix" rows="9" spellcheck="false">{"hx":[[1,1,0]],"hz":[[0,0,1]],"lx":[[1,0,0]],"lz":[[1,1,0]]}</textarea></label><label>Or load a CSS matrix file<input id="matrix-file" type="file" accept=".json"></label><p class="small muted">Use binary hx / hz with the same width, commuting over GF(2). Supply both lx / lz or neither. <a href="../../docs/research-interface.md#custom-css-input" target="_blank">Input format ↗</a></p></details></div>
+<div id="code-input"><label>Code / check representation<select id="build-code"></select></label><p class="muted small">A code may have different parity-check representations. The selected matrices, row order, and logical basis identify this input.</p><details id="matrix-input"><summary>Parity check matrix</summary><p id="matrix-note" class="small muted" role="status"></p><label>CSS matrices, JSON<textarea id="build-matrix" rows="9" spellcheck="false" placeholder='{"hx": [[…]], "hz": [[…]]}'></textarea></label><label>Or load a CSS matrix file<input id="matrix-file" type="file" accept=".json"></label><p class="small muted">Use binary hx / hz with the same width, commuting over GF(2). Supply both lx / lz or neither. <a href="../../docs/research-interface.md#custom-css-input" target="_blank">Input format ↗</a></p></details></div>
 <div id="circuit-input" hidden><label>Circuit<select id="build-circuit"></select></label><label>Stim circuit text<textarea id="build-stim" rows="12" spellcheck="false">R 0
 X_ERROR(0.1) 0
 M 0
 DETECTOR rec[-1]
-OBSERVABLE_INCLUDE(0) rec[-1]</textarea></label><label>Or upload .stim<input id="stim-file" type="file" accept=".stim"></label><p class="muted small">Noise is embedded in the circuit. The supported adapter uses plain flooding SPA / MS and its historical float64 safeguards.</p></div>
+OBSERVABLE_INCLUDE(0) rec[-1]</textarea></label><label>Or upload .stim<input id="stim-file" type="file" accept=".stim"></label><label>Replace this source noise probability<input id="build-circuit-base" type="number" min="0" max="1" step="any" value="0.1"></label><p class="muted small">Enter a rate sweep below to replace matching noise probabilities. Gate targets, coordinates, and other probability values stay as supplied. Each rate gets its own Stim input. The supported circuit adapter uses plain flooding SPA / MS.</p></div>
 </fieldset>
 </div>
 <fieldset class="simulation"><legend>Simulation settings</legend><div class="fields">
 <label id="channel-label">Noise model<select id="build-channel"><option value="depolarizing">Depolarizing</option><option value="x_only">X-only</option></select></label>
 <label id="rate-label">Physical p · comma-separated sweep<input id="build-rates" value="0.06"></label>
 <label id="prior-label">Decoder prior p₀<input id="build-prior" placeholder="Matched to p; or enter a fixed p₀"></label>
-<label>Shots per point · maximum<input id="build-shots" type="number" min="1" value="1000"></label>
-<label>Total shot budget<input id="build-maxshots" type="number" min="1" value="1000"></label>
-<label>Stop at total failures · per point<input id="build-failures" type="number" min="1" placeholder="No failure target"></label>
-<label>Stop at Type I failures · per point<input id="build-type-i" type="number" min="1" placeholder="No target"></label>
-<label>Stop at Type II failures · per point<input id="build-type-ii" type="number" min="1" placeholder="No target"></label>
+<label>Budgets per rate point<select id="build-budget-mode"><option value="uniform">Same budgets at every rate</option><option value="per_point">Separate budgets for each rate</option></select></label>
+<label>Stop when<select id="build-stop-mode"><option value="first">Any requested limit is reached</option><option value="all">All requested targets are reached</option></select></label>
+<label class="uniform-budget">Shot limit per point<input id="build-shots" type="number" min="1" value="1000" placeholder="No shot limit"></label>
+<label class="uniform-budget">Total failure target per point<input id="build-failures" type="number" min="1" placeholder="No failure target"></label>
+<label class="uniform-budget">Type I failure target per point<input id="build-type-i" type="number" min="1" placeholder="No target"></label>
+<label class="uniform-budget">Type II failure target per point<input id="build-type-ii" type="number" min="1" placeholder="No target"></label>
 <label>Random seed<input id="build-seed" type="number" min="0" value="7"></label>
 <label>First shot index<input id="build-start" type="number" min="0" value="0"></label>
-</div><p class="small muted">The first failure target or shot cap reached stops each rate point. Type I: syndrome-inconsistent correction. Type II: syndrome-consistent logical failure. Circuits use observable failures instead.</p></fieldset>
+</div><div id="point-budgets" hidden></div><p id="stopping-help" class="small muted">Budgets apply independently to each rate. Empty fields mean no limit; each point needs at least one limit or target.</p></fieldset>
 <p id="builder-feedback" role="status" aria-live="polite"></p>
 <div class="actions"><button id="validate-spec" type="button">Validate configuration</button><button id="download-package" type="button" disabled>Download experiment package</button><button id="download-json" class="secondary" type="button" disabled>Download JSON</button></div>
 <details><summary>Exact configuration / custom JSON</summary><pre id="spec-preview" tabindex="0"></pre><label>Import a complete specification<textarea id="custom-spec" rows="8" spellcheck="false"></textarea></label><div class="actions"><button id="apply-spec" type="button" class="secondary">Use this JSON</button><button id="reset-spec" type="button" class="secondary">Return to visual builder</button></div></details>

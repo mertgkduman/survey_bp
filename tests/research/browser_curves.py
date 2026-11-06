@@ -18,16 +18,16 @@ def verify(output, url):
         page.locator('[data-nav="results"]').click()
         card=page.locator('[data-plot]').first
         text=card.locator('.curve-list').inner_text()
-        assert 'BP4 · SP' in text and 'd = 0' in text and 'T = 100' in text
+        assert 'Q-BP, SP' in text and 'd = 0' in text and 'T = 100' in text
         assert 'Yao vanilla' not in text
-        options=card.locator('select[data-select="decoder"] option').evaluate_all('nodes=>nodes.map(n=>n.value)')
+        options=card.locator('select[data-select="decoder"] option').evaluate_all('nodes=>nodes.map(n=>n.dataset.decoder||n.value)')
         assert not any(x.endswith(':binary_v1') or x.endswith(':bp4_v1') for x in options)
         checks.append('Parameter-based decoder labels; retired canonical clipping absent from selectors')
         picker=card.locator('.curve-picker input')
         picker.focus()
         assert card.locator('[role=option]').count()>1
-        picker.fill('bp4')
-        assert all(t.lower().startswith('bp4') for t in card.locator('[role=option]').all_text_contents())
+        picker.fill('q-bp')
+        assert all(t.lower().startswith('q-bp') for t in card.locator('[role=option]').all_text_contents())
         page.keyboard.press('ArrowDown')
         active=picker.get_attribute('aria-activedescendant')
         assert active and page.locator('#'+active).get_attribute('aria-selected')=='true'
@@ -77,7 +77,7 @@ def verify(output, url):
         second_state=second.locator('select[data-select="input"]').input_value()
         card.locator('select[data-select="input"]').select_option('b1')
         assert second.locator('select[data-select="input"]').input_value()==second_state
-        code_options=card.locator('select[data-select="decoder"] option').evaluate_all('nodes=>nodes.map(n=>n.value)')
+        code_options=card.locator('select[data-select="decoder"] option').evaluate_all('nodes=>nodes.map(n=>n.dataset.decoder||n.value)')
         assert not any(x.endswith(':bp4_vanilla_ms_q8') for x in code_options)
         assert any('pfister-presentation-ms-both-changes' in x for x in code_options)
         page.screenshot(path=str(output/'desktop.png'))
@@ -86,7 +86,7 @@ def verify(output, url):
         saved=page.locator('#build-preset option').all_text_contents()[1:]
         assert saved and all(' = ' in name for name in saved)
         assert not any('Yao vanilla:' in name for name in saved)
-        values=page.locator('#build-preset option').evaluate_all('nodes=>nodes.map(n=>n.value)')
+        values=page.locator('#build-preset option').evaluate_all('nodes=>nodes.map(n=>n.dataset.decoder||n.value)')
         assert not any(x.endswith(':bp4_v1') or x.endswith(':binary_v1') for x in values)
         checks.append('Saved-specification names share the same parameter labels and retirement filtering')
         page.set_viewport_size({'width':390,'height':844})

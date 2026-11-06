@@ -47,6 +47,12 @@ def validate_catalog(catalog: dict[str, Any]) -> dict[str, Any]:
             raise ValueError(f"duplicate result series {key}; group its points or assign a distinct experiment/decoder")
         series_ids.add(key)
         for kind, value in zip(("datasets", "codes", "decoders"), key, strict=True):
+            # The shared Code/circuit selector deliberately uses the same
+            # result-series slot. A circuit performance record therefore
+            # resolves its middle identity through ``circuits`` rather than
+            # manufacturing a fictitious CSS code record.
+            if kind == "codes" and value in indexes["circuits"]:
+                continue
             if value not in indexes[kind]:
                 raise ValueError(f"result series has an unresolved {kind} relationship: {value}")
         for point in series["points"]:

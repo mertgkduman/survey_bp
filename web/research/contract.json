@@ -37,9 +37,7 @@
         "decoder.variant": "qbpgd"
       },
       "then": {
-        "decoder.numerical_profile": "quaternary-bp4-f64-v2",
-        "decoder.policy": null,
-        "decoder.rule": "sum_product"
+        "decoder.numerical_profile": "quaternary-bp4-f64-v2"
       }
     },
     {
@@ -65,24 +63,6 @@
     },
     {
       "if": {
-        "problem.kind": "circuit",
-        "sampling.stop_type_i": "non_null"
-      },
-      "then": {
-        "error": "circuit observable evaluation has no type-I outcome"
-      }
-    },
-    {
-      "if": {
-        "problem.kind": "circuit",
-        "sampling.stop_type_ii": "non_null"
-      },
-      "then": {
-        "error": "circuit observable evaluation has no type-II outcome"
-      }
-    },
-    {
-      "if": {
         "sampling.stop_failures|sampling.stop_type_i|sampling.stop_type_ii": "non_null"
       },
       "then": {
@@ -93,8 +73,8 @@
   ],
   "cross_rules": [
     "custom binary and BP4 execute flooding only; schedules and interventions outside this contract are rejected",
-    "BP4 Q-BPGD requires v2 profile and policy=null",
-    "custom circuit uses the v1 Sinter adapter and its embedded Stim noise; policy/resolution is not accepted",
+    "Q-BPGD requires v2 and composes its guided-decimation controller with the selected flooding policy; such policy compositions are canonical adaptations unless separately source-qualified",
+    "custom circuit uses the v1 Sinter adapter; noise_sweep replaces only declared matching noisy-gate probabilities",
     "physical_p and decoder_p0 are independent and serialized for every rate point",
     "registered historical studies are adapters and are not custom compiled experiments"
   ],
@@ -141,6 +121,10 @@
     "channel": [
       "kind"
     ],
+    "circuit_channel": [
+      "kind",
+      "noise_sweep"
+    ],
     "circuit_decoder": [
       "family",
       "implementation",
@@ -157,6 +141,10 @@
     ],
     "circuit_rate_point": [
       "label"
+    ],
+    "circuit_sweep_rate_point": [
+      "label",
+      "physical_p"
     ],
     "code_problem": [
       "code",
@@ -201,6 +189,12 @@
       "kind",
       "text"
     ],
+    "per_point_sampling": [
+      "shots",
+      "stop_failures",
+      "stop_type_i",
+      "stop_type_ii"
+    ],
     "policy": [
       "alpha",
       "beta",
@@ -242,10 +236,12 @@
       "shots"
     ],
     "sampling_with_stopping": [
+      "per_point",
       "seed",
       "shot_start",
       "shots",
       "stop_failures",
+      "stop_mode",
       "stop_type_i",
       "stop_type_ii"
     ]
@@ -280,8 +276,7 @@
     "bb72-css": "bb72",
     "double_Gross": "double-gross",
     "double_Gross_288_12_18": "double-gross",
-    "double_gross": "double-gross",
-    "project-three-qubit-css-fixture": "three-qubit"
+    "double_gross": "double-gross"
   },
   "registered_code_ids": [
     "a5",
@@ -289,8 +284,7 @@
     "b1",
     "c2",
     "double-gross",
-    "bb72",
-    "three-qubit"
+    "bb72"
   ],
   "resolution": {
     "coefficients": [
@@ -331,6 +325,38 @@
     ]
   },
   "schema": "research-experiment-v1",
+  "stim_noise_sweep": {
+    "argument_match_tolerance": 1e-15,
+    "noisy_gate_names": [
+      "CORRELATED_ERROR",
+      "DEPOLARIZE1",
+      "DEPOLARIZE2",
+      "E",
+      "ELSE_CORRELATED_ERROR",
+      "HERALDED_ERASE",
+      "HERALDED_PAULI_CHANNEL_1",
+      "II_ERROR",
+      "I_ERROR",
+      "M",
+      "MPP",
+      "MR",
+      "MRX",
+      "MRY",
+      "MRZ",
+      "MX",
+      "MXX",
+      "MY",
+      "MYY",
+      "MZ",
+      "MZZ",
+      "PAULI_CHANNEL_1",
+      "PAULI_CHANNEL_2",
+      "X_ERROR",
+      "Y_ERROR",
+      "Z_ERROR"
+    ],
+    "replacement": "every matching noisy-gate argument, including inside REPEAT blocks; no other arguments or targets"
+  },
   "timing_boundaries": {
     "circuit": {
       "audit_second_decode": true,
@@ -360,10 +386,21 @@
       "type": "integer"
     },
     "max_shots": {
-      "constraint": "len(rate_points)*sampling.shots <= budgets.max_shots",
       "minimum": 1,
-      "scope": "total_experiment",
-      "type": "integer"
+      "scope": "legacy_total_hard_ceiling",
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "per_point": {
+      "complete_fields": [
+        "shots",
+        "stop_failures",
+        "stop_type_i",
+        "stop_type_ii"
+      ],
+      "scope": "one complete object per rate point"
     },
     "physical_p": {
       "maximum": 1,
@@ -386,8 +423,12 @@
     },
     "shots": {
       "minimum": 1,
+      "null_means": "no_shot_limit",
       "scope": "per_rate_point",
-      "type": "integer"
+      "type": [
+        "integer",
+        "null"
+      ]
     },
     "stop_failures": {
       "default": null,
@@ -399,12 +440,21 @@
         "null"
       ]
     },
+    "stop_mode": {
+      "all_semantics": "shots is a target; continue until every configured limit is reached",
+      "default": "any",
+      "enum": [
+        "any",
+        "all"
+      ]
+    },
     "stop_type_i": {
       "default": null,
       "effect": "adaptive_stop",
       "families": [
         "binary_css",
-        "bp4"
+        "bp4",
+        "circuit_dem_bp"
       ],
       "minimum": 1,
       "scope": "per_rate_point",
@@ -418,7 +468,8 @@
       "effect": "adaptive_stop",
       "families": [
         "binary_css",
-        "bp4"
+        "bp4",
+        "circuit_dem_bp"
       ],
       "minimum": 1,
       "scope": "per_rate_point",

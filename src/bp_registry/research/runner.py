@@ -29,7 +29,7 @@ from bp_registry.quaternary.sampling import JointPauliChannel, sample_joint_paul
 from bp_registry.resolution import BpFloodingPolicy
 
 from .evidence import timing_boundaries
-from .contracts import _repository_value, interface_contract, materialize_experiment, validate_experiment
+from .contracts import _repository_value, interface_contract, materialize_experiment, resolved_sampling, sweep_stim_text, validate_experiment
 
 
 def _canonical(value: object) -> bytes:
@@ -68,20 +68,34 @@ def _append(records: list[dict[str, object]] | None, emit, record: dict[str, obj
 _STOP_FIELDS = ("stop_failures", "stop_type_i", "stop_type_ii")
 
 
-def _adaptive_sampling(sampling: Mapping[str, object]) -> bool:
-    return any(sampling.get(field) is not None for field in _STOP_FIELDS)
+def _adaptive_sampling(limits: Mapping[str, object]) -> bool:
+    return any(limits.get(field) is not None for field in _STOP_FIELDS)
 
 
-def _stopping_reason(sampling: Mapping[str, object], *, failures: int, type_i: int,
-                     type_ii: int, circuit: bool = False) -> str | None:
-    """Return the first reached configured boundary in a stable public order."""
+def _stopping_reason(limits: Mapping[str, object], *, shots: int, failures: int, type_i: int,
+                     type_ii: int) -> str | None:
+    """Resolve the declared first/all stopping rule for one rate point."""
     counters = {"stop_failures": failures, "stop_type_i": type_i, "stop_type_ii": type_ii}
-    fields = ("stop_failures",) if circuit else _STOP_FIELDS
-    for field in fields:
-        threshold = sampling.get(field)
-        if threshold is not None and counters[field] >= int(threshold):
+    reached = [field for field in _STOP_FIELDS if limits.get(field) is not None and counters[field] >= int(limits[field])]
+    selected = [field for field in _STOP_FIELDS if limits.get(field) is not None]
+    shot_target = limits.get("shots")
+    if limits["stop_mode"] == "all":
+        targets = selected + (["shots"] if shot_target is not None else [])
+        if all((shots >= int(shot_target) if field == "shots" else field in reached) for field in targets):
+            return "all_targets"
+        return None
+    for field in _STOP_FIELDS:
+        if field in reached:
             return field
+    if shot_target is not None and shots >= int(shot_target):
+        return "shots_cap"
     return None
+
+
+def _point_limits(spec: Mapping[str, object], point_index: int) -> dict[str, object]:
+    sampling = spec["sampling"]
+    assert isinstance(sampling, Mapping)
+    return resolved_sampling(sampling, point_index, len(spec["rate_points"]))
 
 
 def _wilson(failures: int, n: int) -> tuple[float, float]:
@@ -127,8 +141,10 @@ def _binary_rows(spec: Mapping[str, object], code: CssCode, *, emit=None, collec
     pauli_identity = pauli_code.semantic_sha256
     records: list[dict[str, object]] | None = [] if collect else None
     effective: dict[str, object] | None = None
+    total_used = 0
     for point_index, point in enumerate(spec["rate_points"]):
         assert isinstance(point, Mapping)
+        limits = _point_limits(spec, point_index)
         p0 = float(point["decoder_p0"])
         prior = 2.0 * p0 / 3.0 if channel["kind"] in {"depolarizing", "explicit"} else p0
         x_graph = CompiledBinaryFlooding.from_check_matrix(code.hz, rule=rule, profile=profile, policy=policy)
@@ -141,7 +157,10 @@ def _binary_rows(spec: Mapping[str, object], code: CssCode, *, emit=None, collec
             "x_bernoulli_probability": prior, "z_bernoulli_probability": prior,
             "physical_channel": dict(channel)})
         failures = type_i = type_ii = 0
-        for offset in range(int(sampling["shots"])):
+        offset = 0
+        while True:
+            if budget["max_shots"] is not None and total_used >= int(budget["max_shots"]):
+                raise RuntimeError("legacy total max_shots reached before all rate-point stopping targets")
             shot_id = int(sampling["shot_start"]) + offset
             started = time.perf_counter()
             sample = _sample_pauli(code, point, channel, seed=int(sampling["seed"]), shot_id=shot_id, point_index=point_index, prepared_code=pauli_code, code_identity=pauli_identity)
@@ -154,7 +173,7 @@ def _binary_rows(spec: Mapping[str, object], code: CssCode, *, emit=None, collec
             failures += ev.outcome not in {"exact", "stabilizer_equivalent"}
             type_i += ev.outcome == "invalid_syndrome"
             type_ii += ev.outcome == "logical_failure"
-            stop_reason = _stopping_reason(sampling, failures=failures, type_i=type_i, type_ii=type_ii)
+            stop_reason = _stopping_reason(limits, shots=offset + 1, failures=failures, type_i=type_i, type_ii=type_ii)
             _append(records, emit, {"kind": "shot", "family": "binary_css", "rate_index": point_index,
                 "p": point.get("physical_p"), "decoder_p0": p0, "shot_id": shot_id, "sample_identity": sample.sample_identity,
                 "physical_channel_identity": sample.ledger["channel_identity"], "physical_pauli_order": sample.ledger["pauli_order"],
@@ -168,10 +187,12 @@ def _binary_rows(spec: Mapping[str, object], code: CssCode, *, emit=None, collec
                                 "x": x.candidate.tolist(), "z": z.candidate.tolist()})).hexdigest()},
                 "iterations": {"x": x.iterations, "z": z.iterations}, "work_units": {"unit": "binary_component_sweeps", "x": x.iterations, "z": z.iterations},
                 "decode_seconds": decoded_at - sampled_at, "end_to_end_seconds": time.perf_counter() - started,
-                "sampling_mode": "adaptive_stopping" if _adaptive_sampling(sampling) else "fixed_shots",
-                "sampling_stop_reason": stop_reason or ("shots_cap" if offset + 1 == int(sampling["shots"]) else None)})
+                "sampling_mode": "adaptive_stopping" if _adaptive_sampling(limits) else "fixed_shots", "sampling_stop_mode": limits["stop_mode"],
+                "sampling_stop_reason": stop_reason})
+            total_used += 1
             if stop_reason is not None:
                 break
+            offset += 1
     return records or [], effective or {}
 
 
@@ -184,8 +205,10 @@ def _bp4_rows(spec: Mapping[str, object], code: CssCode, *, emit=None, collect: 
     pauli_identity = pauli_code.semantic_sha256
     records: list[dict[str, object]] | None = [] if collect else None
     effective: dict[str, object] | None = None
+    total_used = 0
     for point_index, point in enumerate(spec["rate_points"]):
         assert isinstance(point, Mapping)
+        limits = _point_limits(spec, point_index)
         p0 = float(point["decoder_p0"])
         if profile is QBP4_F64_V1:
             priors = np.tile((1.0 - p0, p0 / 3.0, p0 / 3.0, p0 / 3.0), (code.n, 1))
@@ -200,7 +223,10 @@ def _bp4_rows(spec: Mapping[str, object], code: CssCode, *, emit=None, collect: 
             "decoder_prior_probabilities": [1 - p0, p0 / 3, p0 / 3, p0 / 3],
             "physical_channel": dict(channel)})
         failures = type_i = type_ii = 0
-        for offset in range(int(sampling["shots"])):
+        offset = 0
+        while True:
+            if budget["max_shots"] is not None and total_used >= int(budget["max_shots"]):
+                raise RuntimeError("legacy total max_shots reached before all rate-point stopping targets")
             shot_id = int(sampling["shot_start"]) + offset
             started = time.perf_counter()
             sample = _sample_pauli(code, point, channel, seed=int(sampling["seed"]), shot_id=shot_id, point_index=point_index, prepared_code=pauli_code, code_identity=pauli_identity)
@@ -224,7 +250,7 @@ def _bp4_rows(spec: Mapping[str, object], code: CssCode, *, emit=None, collect: 
             failures += ev.outcome not in {"exact", "stabilizer_equivalent"}
             type_i += ev.outcome == "invalid_syndrome"
             type_ii += ev.outcome == "logical_failure"
-            stop_reason = _stopping_reason(sampling, failures=failures, type_i=type_i, type_ii=type_ii)
+            stop_reason = _stopping_reason(limits, shots=offset + 1, failures=failures, type_i=type_i, type_ii=type_ii)
             _append(records, emit, {"kind": "shot", "family": "bp4", "rate_index": point_index, "p": point.get("physical_p"), "decoder_p0": p0,
                 "shot_id": shot_id, "sample_identity": sample.sample_identity,
                 "physical_channel_identity": sample.ledger["channel_identity"], "physical_pauli_order": sample.ledger["pauli_order"], "candidate": result.candidate.tolist(), "outcome": ev.outcome,
@@ -235,10 +261,12 @@ def _bp4_rows(spec: Mapping[str, object], code: CssCode, *, emit=None, collect: 
                 "lineage": {"sample": sample.sample_identity, "original_problem": original.lineage_id,
                             "working_problem": working_id, "candidate": candidate_id},
                 "iterations": iterations, "work_units": {"unit": "bp4_joint_sweeps", "value": iterations, **extra}, "decode_seconds": decoded_at - sampled_at, "end_to_end_seconds": time.perf_counter() - started,
-                "sampling_mode": "adaptive_stopping" if _adaptive_sampling(sampling) else "fixed_shots",
-                "sampling_stop_reason": stop_reason or ("shots_cap" if offset + 1 == int(sampling["shots"]) else None)})
+                "sampling_mode": "adaptive_stopping" if _adaptive_sampling(limits) else "fixed_shots", "sampling_stop_mode": limits["stop_mode"],
+                "sampling_stop_reason": stop_reason})
+            total_used += 1
             if stop_reason is not None:
                 break
+            offset += 1
     return records or [], effective or {}
 
 
@@ -260,55 +288,68 @@ def _circuit_rows(spec: Mapping[str, object], repository: Mapping[str, object] |
         from bp_registry.circuit import CanonicalBpSinterDecoder
     except ImportError as error:
         raise RuntimeError("circuit execution requires the optional stim and sinter dependencies") from error
-    circuit = stim.Circuit(text)
-    dem = circuit.detector_error_model(decompose_errors=False)
     adapter = CanonicalBpSinterDecoder(max_iterations=int(decoder["max_iterations"]), rule=str(decoder["rule"]), tie_break=str(decoder["tie_break"]))
-    # Stim's detector sampler has no portable random-access shot index. Draw
-    # the bounded prefix so ``shot_start`` changes the actual sampled stream,
-    # then retain precisely the requested contiguous interval.
-    start, count = int(sampling["shot_start"]), int(sampling["shots"])
-    detector, truth = circuit.compile_detector_sampler(seed=int(sampling["seed"])).sample(shots=start + count, separate_observables=True)
-    detector, truth = detector[start:], truth[start:]
-    # Predictions are intentionally invoked through Sinter one retained shot at
-    # a time.  This makes a failure threshold stop *decoding* rather than only
-    # truncating a precomputed batch.  The bounded Stim prefix is still drawn
-    # for a reproducible shot_start offset (Stim has no portable random access).
-    detailed = adapter.compile_decoder_for_dem(dem=dem)
     rows: list[dict[str, object]] = []
-    failures = 0
-    for index in range(len(detector)):
-        shot_started = time.perf_counter()
-        one_detector = detector[index:index + 1]
-        prediction = sinter.predict_observables(dem=dem, dets=one_detector.astype(np.bool_), decoder="portable_canonical_bp", custom_decoders={"portable_canonical_bp": adapter})
-        predicted_at = time.perf_counter()
-        detailed_prediction, converged, iterations = detailed.decode_detailed(one_detector)
-        decoded_at = time.perf_counter()
-        if not np.array_equal(prediction, detailed_prediction.astype(bool)):
-            raise RuntimeError("Sinter custom-decoder predictions disagree with the detailed canonical adapter")
-        failure = bool(np.any(prediction[0] != truth[index]))
-        event_ended = time.perf_counter()
-        failures += failure
-        stop_reason = _stopping_reason(sampling, failures=failures, type_i=0, type_ii=0, circuit=True)
-        row = {"kind": "shot", "family": "circuit_dem_bp", "rate_index": 0, "p": None, "decoder_p0": None,
-               "setting_label": spec["rate_points"][0]["label"],
-               "shot_id": int(sampling["shot_start"]) + index, "detector_events": one_detector[0].astype(int).tolist(), "observable_truth": truth[index].astype(int).tolist(), "observable_prediction": prediction[0].astype(int).tolist(),
-               "detector_fit": bool(converged[0]), "observable_failure": failure, "outcome": "observable_failure" if failure else "observable_success",
-               "termination_reason": "initial_candidate_fit" if int(iterations[0]) == 0 and converged[0] else "detector_fit" if converged[0] else "iteration_cap",
-               "converged": bool(converged[0]), "iterations": int(iterations[0]), "work_units": {"unit": "circuit_dem_bp_sweeps", "value": int(iterations[0])}, "decode_seconds": predicted_at - shot_started, "end_to_end_seconds": event_ended - shot_started,
-               "sampling_mode": "adaptive_stopping" if _adaptive_sampling(sampling) else "fixed_shots",
-               "sampling_stop_reason": stop_reason or ("shots_cap" if index + 1 == len(detector) else None)}
-        rows.append(row)
-        if emit is not None:
-            emit(row)
-        if stop_reason is not None:
-            break
+    total_used = 0
+    sweep = spec["channel"].get("noise_sweep")
+    resolved: list[dict[str, object]] = []
+    for point_index, point in enumerate(spec["rate_points"]):
+        assert isinstance(point, Mapping)
+        current_text = text if sweep is None else sweep_stim_text(text, source_probability=float(sweep["source_probability"]), physical_p=float(point["physical_p"]))
+        circuit = stim.Circuit(current_text)
+        dem = circuit.detector_error_model(decompose_errors=False)
+        detailed = adapter.compile_decoder_for_dem(dem=dem)
+        sampler = circuit.compile_detector_sampler(seed=int(sampling["seed"]) + point_index)
+        start = int(sampling["shot_start"])
+        # Stim's stream is batch-shape dependent.  Advance the skipped prefix
+        # in the same one-shot chunks used for retained evidence, so shot k is
+        # invariant under choosing it as a prefix or a retained decode.
+        budget = spec["budgets"]
+        assert isinstance(budget, Mapping)
+        if budget["max_shots"] is not None and total_used + start > int(budget["max_shots"]):
+            raise RuntimeError("legacy total max_shots reached while drawing the circuit shot prefix")
+        for _ in range(start):
+            sampler.sample(shots=1, separate_observables=True)
+        total_used += start
+        limits = _point_limits(spec, point_index)
+        failures = type_i = type_ii = 0
+        index = 0
+        while True:
+            if budget["max_shots"] is not None and total_used >= int(budget["max_shots"]):
+                raise RuntimeError("legacy total max_shots reached before all rate-point stopping targets")
+            detector, truth = sampler.sample(shots=1, separate_observables=True)
+            shot_started = time.perf_counter()
+            prediction = sinter.predict_observables(dem=dem, dets=detector.astype(np.bool_), decoder="portable_canonical_bp", custom_decoders={"portable_canonical_bp": adapter})
+            predicted_at = time.perf_counter()
+            detailed_prediction, converged, iterations = detailed.decode_detailed(detector)
+            if not np.array_equal(prediction, detailed_prediction.astype(bool)):
+                raise RuntimeError("Sinter custom-decoder predictions disagree with the detailed canonical adapter")
+            failure = bool(np.any(prediction[0] != truth[0]))
+            flagged = failure and not bool(converged[0])
+            unflagged = failure and bool(converged[0])
+            failures += failure; type_i += flagged; type_ii += unflagged
+            stop_reason = _stopping_reason(limits, shots=index + 1, failures=failures, type_i=type_i, type_ii=type_ii)
+            row = {"kind": "shot", "family": "circuit_dem_bp", "rate_index": point_index, "p": point.get("physical_p"), "decoder_p0": None,
+                   "setting_label": point["label"], "shot_id": start + index,
+                   "detector_events": detector[0].astype(int).tolist(), "observable_truth": truth[0].astype(int).tolist(), "observable_prediction": prediction[0].astype(int).tolist(),
+                   "detector_fit": bool(converged[0]), "observable_failure": failure, "type_i": flagged, "type_ii": unflagged,
+                   "outcome": "observable_failure" if failure else "observable_success",
+                   "termination_reason": "initial_candidate_fit" if int(iterations[0]) == 0 and converged[0] else "detector_fit" if converged[0] else "iteration_cap",
+                   "converged": bool(converged[0]), "iterations": int(iterations[0]), "work_units": {"unit": "circuit_dem_bp_sweeps", "value": int(iterations[0])}, "decode_seconds": predicted_at - shot_started, "end_to_end_seconds": time.perf_counter() - shot_started,
+                   "sampling_mode": "adaptive_stopping" if _adaptive_sampling(limits) else "fixed_shots", "sampling_stop_mode": limits["stop_mode"], "sampling_stop_reason": stop_reason}
+            rows.append(row)
+            total_used += 1
+            if emit is not None: emit(row)
+            if stop_reason is not None: break
+            index += 1
+        resolved.append({"label": point["label"], "physical_p": point.get("physical_p"), "stim_sha256": sha256(current_text.encode()).hexdigest(), "dem_sha256": sha256(str(dem).encode()).hexdigest()})
     numerics = REFERENCE_CPU_F64 if decoder["rule"] == "spa" else MIN_SUM_CPU_F64
-    return rows, {"dem_sha256": sha256(str(dem).encode()).hexdigest(), "adapter": dict(decoder),
+    return rows, {"dem_sha256": [item["dem_sha256"] for item in resolved], "adapter": dict(decoder),
         "numerical_profile": {**numerics.as_evidence(), "backend": "cpu-numba-circuit-adapter", "exact_zero_decision": int(decoder["tie_break"] == "one")}, "sinter_prediction": True,
         "detectors": circuit.num_detectors, "observables": circuit.num_observables,
         "dem_projection": "independent_mechanisms; logical-only and detector-free faults follow the existing adapter bias/projection contract",
-        "observable_evaluation": "any declared observable prediction differs from sampled truth",
-        "sampling_prefix_drawn": start + count}
+        "observable_evaluation": "any declared observable prediction differs from sampled truth; type_i is an observable failure without detector fit and type_ii is an observable failure with detector fit",
+        "resolved_circuit_rate_points": resolved, "sampling_prefix_drawn": int(sampling["shot_start"])}
 
 
 def _provenance(repository: Mapping[str, object] | object | None) -> dict[str, object]:
@@ -338,7 +379,7 @@ def _provenance(repository: Mapping[str, object] | object | None) -> dict[str, o
 
 def _summary_rows(event_path: Path, *, points: list[object], kind: str, sampling: Mapping[str, object], budgets: Mapping[str, object]) -> list[dict[str, object]]:
     """Aggregate the durable JSONL ledger in one pass without retaining shot rows."""
-    buckets = [{"n": 0, "failures": 0, "invalid": 0, "logical": 0, "exact": 0, "equivalent": 0, "iterations": 0.0, "decode_seconds": 0.0, "timed": 0, "converged": 0, "terminations": {}, "sampling_termination": None} for _ in points]
+    buckets = [{"n": 0, "failures": 0, "invalid": 0, "logical": 0, "exact": 0, "equivalent": 0, "circuit_type_i": 0, "circuit_type_ii": 0, "extended": False, "iterations": 0.0, "decode_seconds": 0.0, "timed": 0, "converged": 0, "terminations": {}, "sampling_termination": None} for _ in points]
     with event_path.open(encoding="utf-8") as handle:
         for line in handle:
             row = json.loads(line); bucket = buckets[row["rate_index"]]
@@ -347,6 +388,8 @@ def _summary_rows(event_path: Path, *, points: list[object], kind: str, sampling
             bucket["failures"] += outcome not in {"exact", "stabilizer_equivalent", "observable_success"}
             bucket["invalid"] += outcome == "invalid_syndrome"; bucket["logical"] += outcome == "logical_failure"
             bucket["exact"] += outcome == "exact"; bucket["equivalent"] += outcome == "stabilizer_equivalent"
+            bucket["circuit_type_i"] += bool(row.get("type_i")); bucket["circuit_type_ii"] += bool(row.get("type_ii"))
+            bucket["extended"] |= "sampling_stop_mode" in row
             bucket["converged"] += bool(row["converged"])
             reason = row["termination_reason"]
             bucket["terminations"][reason] = bucket["terminations"].get(reason, 0) + 1
@@ -356,13 +399,20 @@ def _summary_rows(event_path: Path, *, points: list[object], kind: str, sampling
             if row["decode_seconds"] is not None: bucket["decode_seconds"] += row["decode_seconds"]; bucket["timed"] += 1
     unit = {"css_code_capacity": "binary_component_sweeps", "pauli_code_capacity": "bp4_joint_sweeps", "circuit": "circuit_dem_bp_sweeps"}[kind]
     result = []
-    adaptive = _adaptive_sampling(sampling)
     for index, (point, bucket) in enumerate(zip(points, buckets, strict=True)):
         assert isinstance(point, Mapping)
+        limits = resolved_sampling(sampling, index, len(points))
+        adaptive = _adaptive_sampling(limits)
         low, high = _wilson(bucket["failures"], bucket["n"])
         rate = bucket["failures"] / bucket["n"] if bucket["n"] else None
-        result.append({"rate_index": index, "p": point.get("physical_p"), "decoder_p0": point.get("decoder_p0"), "n": bucket["n"], "failures": bucket["failures"], "failure_rate": rate, "ler": rate if kind != "circuit" else None, "ci_low": None if adaptive else low, "ci_high": None if adaptive else high, "ci_method": "unavailable_optional_stopping" if adaptive else "wilson_score_95", "ci_status": "not_reported_optional_stopping" if adaptive else ("zero_failures_upper_bound" if bucket["failures"] == 0 else "two_sided"), "sampling_mode": "adaptive_stopping" if adaptive else "fixed_shots", "sampling_termination_reason": bucket["sampling_termination"] or "shots_cap", "type_i": bucket["invalid"] if kind != "circuit" else None, "type_ii": bucket["logical"] if kind != "circuit" else None, "exact_successes": bucket["exact"] if kind != "circuit" else None, "stabilizer_equivalent_successes": bucket["equivalent"] if kind != "circuit" else None, "observable_successes": bucket["n"] - bucket["failures"] if kind == "circuit" else None, "converged_shots": bucket["converged"], "unconverged_shots": bucket["n"] - bucket["converged"], "convergence_rate": bucket["converged"] / bucket["n"] if bucket["n"] else None, "termination_reason_counts": bucket["terminations"], "mean_iterations": bucket["iterations"] / bucket["n"] if bucket["n"] else None, "work_unit": unit, "mean_decode_seconds": bucket["decode_seconds"] / bucket["timed"] if bucket["timed"] else None, "requested_shots_per_point": int(sampling["shots"]), "total_max_shots": int(budgets["max_shots"])})
+        result.append({"rate_index": index, "p": point.get("physical_p"), "decoder_p0": point.get("decoder_p0"), "n": bucket["n"], "failures": bucket["failures"], "failure_rate": rate, "ler": rate if kind != "circuit" else None, "ci_low": None if adaptive else low, "ci_high": None if adaptive else high, "ci_method": "unavailable_optional_stopping" if adaptive else "wilson_score_95", "ci_status": "not_reported_optional_stopping" if adaptive else ("zero_failures_upper_bound" if bucket["failures"] == 0 else "two_sided"), "sampling_mode": "adaptive_stopping" if adaptive else "fixed_shots", "sampling_stop_mode": limits["stop_mode"], "sampling_stop_semantics": "all configured targets" if limits["stop_mode"] == "all" else "first configured target", "sampling_termination_reason": bucket["sampling_termination"] or "shots_cap", "type_i": bucket["invalid"] if kind != "circuit" else bucket["circuit_type_i"], "type_ii": bucket["logical"] if kind != "circuit" else bucket["circuit_type_ii"], "exact_successes": bucket["exact"] if kind != "circuit" else None, "stabilizer_equivalent_successes": bucket["equivalent"] if kind != "circuit" else None, "observable_successes": bucket["n"] - bucket["failures"] if kind == "circuit" else None, "converged_shots": bucket["converged"], "unconverged_shots": bucket["n"] - bucket["converged"], "convergence_rate": bucket["converged"] / bucket["n"] if bucket["n"] else None, "termination_reason_counts": bucket["terminations"], "mean_iterations": bucket["iterations"] / bucket["n"] if bucket["n"] else None, "work_unit": unit, "mean_decode_seconds": bucket["decode_seconds"] / bucket["timed"] if bucket["timed"] else None, "requested_shots_per_point": limits["shots"], "total_max_shots": budgets["max_shots"]})
         result[-1]["setting_label"] = point.get("label")
+        if not bucket["extended"]:
+            # Replaying a manifest-bound v1 ledger must regenerate its original
+            # summary shape.  New runs always write the extension marker.
+            result[-1].pop("sampling_stop_mode"); result[-1].pop("sampling_stop_semantics")
+            if kind == "circuit":
+                result[-1]["type_i"] = None; result[-1]["type_ii"] = None
     return result
 
 

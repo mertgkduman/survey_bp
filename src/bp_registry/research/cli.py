@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from hashlib import sha256
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import json
@@ -27,6 +28,31 @@ def read_spec(path: str | Path) -> dict[str, Any]:
     return value
 
 
+def _write_code_matrix_previews(root: Path, destination: Path, catalog: dict[str, Any]) -> None:
+    """Materialize exact registered CSS matrices for the static builder."""
+    import numpy as np
+    from .contracts import _repository_value
+
+    preview_root = destination / "inputs"
+    preview_root.mkdir(parents=True, exist_ok=True)
+    for code in catalog.get("codes", []):
+        if code.get("execution", {}).get("kind") == "unsupported":
+            continue
+        value = _repository_value(root, code["code_id"])
+        preview = {"schema": "research-css-matrix-preview-v1", "code_id": code["code_id"],
+                   "hx": np.asarray(value.hx, dtype=np.uint8).tolist(),
+                   "hz": np.asarray(value.hz, dtype=np.uint8).tolist()}
+        if value.lx is not None and value.lz is not None:
+            preview["lx"] = np.asarray(value.lx, dtype=np.uint8).tolist()
+            preview["lz"] = np.asarray(value.lz, dtype=np.uint8).tolist()
+        target = preview_root / f"{code['code_id']}.json"
+        encoded = json.dumps(preview, separators=(",", ":"), allow_nan=False).encode("utf-8")
+        target.write_bytes(encoded)
+        relative = target.relative_to(root).as_posix()
+        code["matrix_asset"] = {"path": relative, "url": relative, "kind": "css_matrix_preview",
+                                "availability": "tracked", "sha256": sha256(encoded).hexdigest()}
+
+
 def build_interface(repository: str | Path | None = None) -> dict[str, Any]:
     from .catalog import build_catalog
     from .contracts import interface_contract
@@ -36,6 +62,7 @@ def build_interface(repository: str | Path | None = None) -> dict[str, Any]:
     destination = root / "web/research"
     destination.mkdir(parents=True, exist_ok=True)
     catalog = build_catalog(root)
+    _write_code_matrix_previews(root, destination, catalog)
     for filename, data in (
         ("catalog.json", catalog),
         ("contract.json", interface_contract()),

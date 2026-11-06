@@ -1,15 +1,49 @@
 {
   "schema": "research-experiment-v1",
-  "id": "three-qubit-code-capacity-example",
-  "problem": {"kind": "css_code_capacity", "code": {"kind": "registered", "id": "three-qubit"}},
-  "channel": {"kind": "depolarizing"},
-  "decoder": {
-    "family": "binary_css", "implementation": "compiled", "variant": "plain",
-    "rule": "sum_product", "numerical_profile": "binary-spa-flooding-f64-v2",
-    "policy": null, "schedule": "flooding", "stop_on_convergence": true
+  "id": "bb72-code-capacity-example",
+  "problem": {
+    "kind": "css_code_capacity",
+    "code": {
+      "kind": "registered",
+      "id": "bb72"
+    }
   },
-  "rate_points": [{"physical_p": 0.05, "decoder_p0": 0.05}, {"physical_p": 0.1, "decoder_p0": 0.05}],
-  "sampling": {"seed": 7, "shot_start": 0, "shots": 8},
-  "budgets": {"max_shots": 16, "max_iterations": 8},
-  "provenance": {"relation": "development_fixture", "source_spec_id": null, "notes": "Project-owned small fixture; no statistical performance or paper-reproduction claim."}
+  "channel": {
+    "kind": "depolarizing"
+  },
+  "decoder": {
+    "family": "binary_css",
+    "implementation": "compiled",
+    "variant": "plain",
+    "rule": "sum_product",
+    "numerical_profile": "binary-spa-flooding-f64-v2",
+    "policy": null,
+    "schedule": "flooding",
+    "stop_on_convergence": true
+  },
+  "rate_points": [
+    {
+      "physical_p": 0.05,
+      "decoder_p0": 0.05
+    },
+    {
+      "physical_p": 0.1,
+      "decoder_p0": 0.05
+    }
+  ],
+  "sampling": {
+    "seed": 7,
+    "shot_start": 0,
+    "shots": 8,
+    "stop_mode": "any"
+  },
+  "budgets": {
+    "max_shots": null,
+    "max_iterations": 8
+  },
+  "provenance": {
+    "relation": "canonical_adaptation",
+    "source_spec_id": null,
+    "notes": "Bounded BB72 example; no statistical performance or paper-reproduction claim."
+  }
 }

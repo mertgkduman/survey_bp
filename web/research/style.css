@@ -42,3 +42,10 @@ label { display:grid; gap:.35rem; font-weight:600; font-size:.83rem; min-width:0
 .table-wrap td:first-child,.table-wrap th:first-child { min-width:240px; width:260px; max-width:300px; }
 .plot-grid.compare .chart text { font-size:14px; }
 .metric { max-width:100%; }
+.kernel-guide { margin-top:1rem; padding:.7rem; border-left:3px solid #92bfb1; background:var(--wash); }
+.kernel-guide .equation { overflow-x:auto; font-size:.8rem; }
+.kernel-guide .small { overflow-wrap:anywhere; }
+#point-budgets input { min-width:6rem; max-width:10rem; }
+.axis-note { text-align:center; padding:.3rem; }
+.bound-error-bar { stroke-width:1.5; stroke-dasharray:3 2; }
+textarea[readonly] { background:#f7faf9; }

@@ -22,44 +22,80 @@ remain in v1/the source catalog. Importance estimates keep their declared
 estimator and raw proposal-count semantics. Work/runtime units are not silently
 normalized across incompatible methods or machines.
 
-Decoder and saved-specification names use recorded parameter values, for example
-`BP4 · SP · d = 0.1 · T = 1000`. A per-plot Parameter key explains damping,
-check caps, priors, quantization, and controller budgets. Binary component prior
-`q` is distinguished from the joint/depolarizing parameter `p₀`; study coefficient
-`γ` weights fresh V2C messages. Equal settings in different retained cohorts get
-an explicit `N` or `set` suffix rather than being merged. A set can share samples
-with another record; it is not an independence claim. Original IDs and files are
-unchanged beneath these display names.
+Decoder and saved-specification names show recorded parameters, for example
+`Q-BP, SP, d = 0.1, T = 1000`. Q-BP is the four-Pauli kernel historically
+named BP4 in implementation identities; Q-BPGD adds guided decimation to this
+kernel. Display names do not rename saved implementation identifiers. Parameter
+keys explain coefficients, priors, numerical resolution, and controller budgets.
 
-Use **Add a decoder / curve** to add another curve to the current plot. Focusing
-the box lists available choices; typing filters case-insensitively by the start
-of the name. Arrow keys and Enter select, and Escape dismisses the list. Click a
-curve (or activate its path with Enter/Space) to hide it. The Show curves checkboxes
-restore curves. Hover/focus a name to preview its exact path faintly; previews
-never enter the table, run details, CSV, or configuration receipt. Plot axes and
-colors stay stable while toggling selected curves.
+Use **Add a decoder / curve** to add curves. Focusing lists available choices;
+typing filters by the beginning of the name. Arrow keys and Enter select, and
+Escape dismisses. The builder offers the same interaction as **Search for a
+decoder**, including undamped BP and Q-BP baselines. Click a plotted curve or
+use its keyboard control to hide it; Show curves restores it. Hover/focus its
+name for a faint preview. Only visible curves enter tables, details, CSV exports,
+and configuration receipts.
 
-V2 excludes the retired globally clipped binary/BP4 float64 v1 curves and the
-superseded experimental Q8 BP4 state-clipping curves. This hides twelve retained
-series, without deleting them from the catalog or changing the v1 archive.
-Corrected Q8 scalar-message min-sum, binary OMS quantization, study-specific
-paper V2C caps, and the supported circuit adapter remain available. Newly
-imported results use the same profile-based visibility rule.
+Depolarizing physical probability is always `p`, with X, Y, Z each `p/3`.
+Pure depolarizing plots retain this axis. Mixed X-only/depolarizing plots use
+`p_bit_flip = 2 p_depolarizing / 3`: only depolarizing x coordinates change;
+X-only coordinates and all retained observations stay unchanged. This matches
+component flip probabilities without identifying the two noise channels.
+Zero-failure points appear as unconnected upper confidence bounds with error
+bars to zero (below the logarithmic plot). No rate is invented for an unavailable
+confidence bound.
 
-The builder has decoder/policy and code/circuit columns, followed by simulation
-settings. Saved vanilla SPA specifications can populate editable controls;
-study-specific procedures retain their original runner and display a compatibility
-error rather than becoming plain BP. Matrix representations, row ordering, and
-logical basis remain part of input identity. The complete JSON path preserves
-custom settings that do not have visual controls.
+A curve is a view of evidence, not a new experiment identity. Exact reused
+cohorts count once. Independent fixed-IID seed cohorts may pool only when the
+recorded estimator, code, channel, decoder settings, evaluator, and numerical
+identity agree. Unknown overlap, adaptive/importance samples, and tuning/pilot
+versus confirmation roles remain distinct evidence. Run details and receipts
+retain original members, seeds, specifications, and evidence paths.
 
-Optional `sampling.stop_failures`, `stop_type_i`, and `stop_type_ii` stop each
-rate point at the first reached target or its shot cap. They are positive integers
-or null; old specifications with only seed/start/shots keep their behavior.
-Circuit experiments accept observable-failure targets and reject Type I/II targets.
-Adaptive runs record actual denominators and terminal reason, and leave confidence
-bounds unavailable (`unavailable_optional_stopping`) rather than claim fixed-N
-coverage. `budgets.max_shots` still bounds the whole planned sweep.
+The active interface excludes retired globally clipped code-capacity float64 v1
+curves and superseded Q8 Q-BP state-clipping curves. Frozen identities and the
+v1 archive remain unchanged. Corrected scalar-edge Q8 min-sum, binary OMS,
+study-specific caps, and the pinned circuit adapter remain valid choices. The
+retained circuit CPU profile is a local mechanism/performance measurement,
+not a paper-curve reproduction. Its previous omission was a catalog gap; the
+older native-comparison report repeats its samples and is provenance only.
+The internal three-qubit fixture is absent from the public catalog.
+
+The builder composes supported numerical policies with guided decimation.
+Q-BPGD uses the actual persistent-message kernel between rounds; SP/MS,
+damping, precision, and coefficient settings are explicit canonical adaptations.
+Compatibility validation rejects unsupported families and frozen historical
+combinations. Other qualified study interventions keep their registered workflows.
+An expandable kernel guide shows update equations, damping location, numerical
+safeguards, correction decisions, and the selected resolution. BP and Q-BP
+baseline presets use undamped float64 v2 sum-product with T = 100.
+
+Selecting a code loads its exact matrix representation. Registered matrices
+are read-only; selecting Custom retains a copy that can be edited as a new input.
+Circuit selection loads its Stim input. A circuit rate sweep declares a source
+noise probability and replaces matching noisy-gate probability arguments only,
+including measurement error probabilities and nested REPEAT bodies. Coordinates,
+targets, and nonmatching probability values are unchanged. The package includes
+one Stim input per rate; Python repeats semantic Stim and DEM validation before
+sampling. Custom circuits must declare the source noise value explicitly.
+
+Sampling limits are **per rate point**. Choose uniform budgets or complete
+`sampling.per_point` objects with nullable `shots`, `stop_failures`,
+`stop_type_i`, and `stop_type_ii`. Empty fields mean no limit; every point needs
+at least one enabled condition. `sampling.stop_mode = "any"` stops at the first
+limit reached. With `"all"`, shots is a target, and execution may continue beyond
+it until every enabled target is met. Failure-only sampling has no implicit shot
+cap. The interface exports `budgets.max_shots = null`; numeric total ceilings
+remain supported for historical specifications.
+
+For code capacity, Type I is syndrome-inconsistent correction; Type II is a
+syndrome-consistent logical failure. Stabilizer-equivalent corrections succeed.
+For circuits these targets partition **observable failures**: Type I has no
+detector fit; Type II has detector fit. Detector nonconvergence alone remains a
+separate count and does not become an observable failure. Adaptive sampling
+records denominators and stopping reasons but reports no fixed-N confidence
+interval (`unavailable_optional_stopping`). Old specifications keep their
+first-target stopping behavior and remain importable.
 
 ### Upload results
 
@@ -123,7 +159,7 @@ loading when double-clicking `index.html`.
 ## Browse a registered result
 
 Select a paper or local study, then an experiment, dataset, code, and decoder.
-In v2, the initial result is the local A5 vanilla BP4 v2 curve. V1 retains the paper/experiment/dataset browsing path described below. Select a decoder to see
+In v2, the initial result is the local A5 vanilla Q-BP v2 curve. V1 retains the paper/experiment/dataset browsing path described below. Select a decoder to see
 its frozen file and arm-specific effective settings. **Export exact
 specification** downloads that source file byte for byte, including its original
 JSON/TOML format. **Download effective configuration receipt** additionally binds the selected arm and any runner overrides to the source checksum; a shared source file alone may describe several arms. Configuration receipts, analysis scripts, summaries, and raw
@@ -149,7 +185,7 @@ reported scope; they do not establish an across-machine speed comparison.
 
 ## Create a new experiment
 
-The visual builder exposes compiled plain binary CSS BP, joint Pauli BP4, and
+The visual builder exposes compiled plain binary CSS BP, joint Pauli Q-BP, and
 the existing v2 Q-BPGD path, with explicit physical probabilities, decoder prior,
 sampling seed, rate sweep, and computational caps. Selecting a frozen
 specification creates a **new** request with a parent reference; its historical
@@ -164,8 +200,8 @@ float64 v1/v2 profiles, and supported numerical overlays. Overlays reuse
 normalized/offset min-sum coefficients, hard decisions, and explicit coefficient
 rounding. They model values at declared boundaries with float64 intermediates;
 they do not promise bit-packed storage or native low-precision arithmetic.
-The existing implicit BP4 min-sum policy is recorded when selected. Q-BPGD
-supports its persistent v2 path and rejects a resolution overlay. The shared
+The implicit Q-BP min-sum policy is recorded when selected. Q-BPGD supports
+its persistent v2 path and compatible SP/MS numerical overlays. The shared
 contract rejects unsupported schedules and policies.
 
 Physical depolarizing noise samples I/X/Y/Z with probabilities
@@ -177,9 +213,12 @@ different prior models equivalent. Explicit physical Pauli probability tables
 are available through custom JSON. Decoder priors and physical sampling are
 recorded separately.
 
-`sampling.shots` applies to each point; `budgets.max_shots` bounds their total.
-The binary iteration cap applies separately to each X/Z component, and reported component sweeps are summed. The BP4 cap counts joint sweeps. Q-BPGD rounds times sweeps per round must fit the total sweep cap. Stim skipped
-prefix samples also consume the circuit shot budget. Start with small budgets
+`sampling.shots` applies to each point; the optional `sampling.per_point` objects
+override its uniform limits. Legacy numeric `budgets.max_shots` bounds the total,
+while new UI exports leave it null. Binary iteration caps apply to each X/Z
+component and reported sweeps are summed. Q-BP counts joint sweeps. Q-BPGD
+rounds times sweeps per round must fit the total sweep cap. Stim skipped prefix
+samples consume a declared legacy circuit ceiling. Start with small budgets
 for validation. The retained study-specific campaign runners remain the route
 for their prespecified large campaigns.
 

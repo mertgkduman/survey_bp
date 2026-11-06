@@ -102,20 +102,6 @@
         "kind": "unsupported",
         "reason": "Indexed parity-check evidence; no portable CSS/logical construction is registered for this custom runner."
       }
-    },
-    {
-      "code_id": "three-qubit",
-      "aliases": [
-        "project-three-qubit-css-fixture"
-      ],
-      "label": "three-qubit CSS fixture",
-      "artifact_path": "data/artifacts/project-three-qubit-css-fixture.json",
-      "asset_label": "three-qubit fixture",
-      "asset_kind": "code_artifact",
-      "execution": {
-        "kind": "css_artifact",
-        "path": "data/artifacts/project-three-qubit-css-fixture.json"
-      }
     }
   ],
   "circuits": [

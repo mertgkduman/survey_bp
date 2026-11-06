@@ -557,17 +557,6 @@
       "notes": "GB46 currently contributes indexed parity-check evidence only; no portable CSS/logical construction is registered."
     },
     {
-      "id": "project_test_fixture",
-      "label": "Project test fixture",
-      "code_ids": [
-        "three-qubit"
-      ],
-      "circuit_code_ids": [],
-      "circuits": [],
-      "availability": "registered_css_fixture",
-      "notes": "The three-qubit input is a project fixture for small reproducible checks, not a literature code family."
-    },
-    {
       "id": "color_code",
       "label": "Color code",
       "code_ids": [],

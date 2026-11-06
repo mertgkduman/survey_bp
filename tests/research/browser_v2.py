@@ -32,12 +32,12 @@ def verify(root: Path, output: Path, url: str):
         assert first.locator('select[data-select]').count() == 2
         assert 'source_transcription' not in first.inner_text()
         first.locator('select[data-select="input"]').select_option('b1')
-        first.locator('select[data-select="decoder"]').select_option('pfister-presentation-full-v2-curves:b1:bp4_tuned_sp_v2')
+        first.locator('select[data-select="decoder"]').select_option(first.locator('select[data-select="decoder"] option[data-decoder="pfister-presentation-full-v2-curves:b1:bp4_tuned_sp_v2"]').get_attribute('value'))
         before = first.locator('svg .line').first.get_attribute('d')
         page.locator('#add-plot').click()
         second = page.locator('[data-plot]').nth(1)
         second.locator('select[data-select="input"]').select_option('a5')
-        second.locator('select[data-select="decoder"]').select_option('yao-vanilla-a5-b2:a5:bp4_v2')
+        second.locator('select[data-select="decoder"]').select_option(second.locator('select[data-select="decoder"] option[data-decoder="yao-vanilla-a5-b2:a5:bp4_v2"]').get_attribute('value'))
         assert first.locator('svg .line').first.get_attribute('d') == before
         assert first.bounding_box()['x'] < second.bounding_box()['x']
         first.locator('.point').first.focus()
@@ -51,11 +51,11 @@ def verify(root: Path, output: Path, url: str):
         page.screenshot(path=str(output/'results-desktop.png'))
         checks.append("Independent side-by-side code/decoder selections, real plot/table/CSV, keyboard point inspection")
         first.locator('select[data-select="input"]').select_option('relay-surface-d3')
-        assert 'No measured result' in first.inner_text()
-        checks.append("Unmeasured circuit reports no data rather than borrowing code-capacity results")
+        assert first.locator('tbody tr').count() > 0
+        assert 'circuit' in first.inner_text().lower()
+        checks.append("Retained circuit CPU measurements are registered with honest observable and performance semantics")
         page.locator('[data-nav="builder"]').click()
         page.locator('#build-shots').fill('8')
-        page.locator('#build-maxshots').fill('8')
         page.locator('#build-rates').fill('0.4')
         page.locator('#build-prior').fill('0.06')
         page.locator('#build-iterations').fill('3')
@@ -121,11 +121,10 @@ def verify(root: Path, output: Path, url: str):
         page.locator('[data-nav="builder"]').click()
         page.locator('#build-regime').select_option('circuit')
         assert page.locator('#circuit-input').is_visible()
-        assert page.locator('#build-type-i').is_disabled()
-        assert page.locator('#build-type-ii').is_disabled()
+        assert page.locator('#build-type-i').is_enabled()
+        assert page.locator('#build-type-ii').is_enabled()
         page.locator('#build-failures').fill('')
         page.locator('#build-shots').fill('2')
-        page.locator('#build-maxshots').fill('2')
         page.locator('#validate-spec').click()
         assert page.locator('#download-package').is_enabled()
         with page.expect_download() as download:
@@ -135,7 +134,7 @@ def verify(root: Path, output: Path, url: str):
         with zipfile.ZipFile(circuit_zip) as archive: archive.extractall(circuit_package)
         result = subprocess.run([sys.executable,str(circuit_package/'run.py'),'--repo',str(root),'--output',str(circuit_package/'results')],capture_output=True,text=True,cwd=output)
         assert result.returncode == 0,result.stderr
-        checks.append("Circuit builder exports and executes actual Stim/Sinter observable evaluation; Type I/II targets disabled")
+        checks.append("Circuit builder exports and executes actual Stim/Sinter observable evaluation; explicit Type I/II observable-failure counters enabled")
         page.set_viewport_size({'width':390,'height':844})
         for section in ['getting-started','results','builder','recommendations','policies']:
             page.locator(f'[data-nav="{section}"]').click()

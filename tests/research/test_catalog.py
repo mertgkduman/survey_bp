@@ -31,11 +31,13 @@ def test_catalog_uses_retained_summary_evidence_without_raw_ledger_promotion(tmp
     assert raw["url"] == raw["path"]
     assert all({"x", "y", "n", "failures", "ci_low", "ci_high", "status", "mean_work", "work_unit", "mean_seconds", "type_i", "type_ii", "source_value"} <= set(point)
                for dataset in catalog["datasets"] for point in dataset["points"])
-    assert {series["code_id"] for series in catalog["result_series"]} <= {code["code_id"] for code in catalog["codes"]}
+    public_inputs = {code["code_id"] for code in catalog["codes"]} | {circuit["circuit_id"] for circuit in catalog["circuits"]}
+    assert {series["code_id"] for series in catalog["result_series"]} <= public_inputs
     assert {series["decoder_id"] for series in catalog["result_series"]} <= {decoder["decoder_id"] for decoder in catalog["decoders"]}
     assert len(catalog["decoders"]) == len({decoder["decoder_id"] for decoder in catalog["decoders"]})
     assert {dataset["dataset_id"] for dataset in catalog["datasets"]} <= {experiment.get("dataset_id") for experiment in catalog["experiments"]}
-    assert {"a5", "b2", "b1", "c2", "double-gross", "bb72", "gb46", "three-qubit"} <= {code["code_id"] for code in catalog["codes"]}
+    assert {"a5", "b2", "b1", "c2", "double-gross", "bb72", "gb46"} <= {code["code_id"] for code in catalog["codes"]}
+    assert "three-qubit" not in {code["code_id"] for code in catalog["codes"]}
     gross = next(code for code in catalog["codes"] if code["code_id"] == "double-gross")
     assert gross["artifact_path"] == "from_dr_pfister_presentetations/run_reproduction.py"
     assert any(study["study_id"] == "phase11-gb46-bounded-policy-mechanisms" for study in catalog["studies"])
@@ -43,6 +45,12 @@ def test_catalog_uses_retained_summary_evidence_without_raw_ledger_promotion(tmp
     assert smoke_circuit["asset"]["path"] == "data/circuits/relay-v0.2.2/rotated_surface_code_memory_X.stim"
     assert smoke_circuit["asset"]["availability"] == "tracked"
     assert smoke_circuit["asset"]["sha256"]
+    circuit = [series for series in catalog["result_series"] if series["dataset_id"].startswith("circuit-cpu-profile-")]
+    assert {series["code_id"] for series in circuit} == {"relay-surface-d3", "relay-bb144-memory-z", "beamsearch-bb144-memory-z-p005"}
+    assert all(series["channel_kind"] == "embedded_circuit" for series in circuit)
+    surface = next(series for series in circuit if series["code_id"] == "relay-surface-d3")
+    assert surface["points"][0]["n"] == 4096 and surface["points"][0]["failures"] == 96
+    assert surface["points"][0]["metadata"]["prior_comparison_report"].endswith("circuit-bp-cpu-profile-v1.json")
 
 
 def test_series_policies_are_namespaced_and_never_default_to_another_arm() -> None:

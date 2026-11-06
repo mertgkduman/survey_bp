@@ -484,6 +484,76 @@ def _decode_qbpgd_v2(
     return candidate, sweeps, max_rounds, fixations, False
 
 
+@njit(cache=True)
+def _decode_qbpgd_policy(
+    row_ptr, variable_ptr, variable_edges, variables, labels, original_priors,
+    syndrome, iterations_per_round, epsilon_fix, max_rounds,
+    format_code, scale, scope, check_rule, old_weight, fresh_weight, alpha,
+    beta, hard_decision, zero_shortcut,
+):
+    """Q-BPGD's intervention loop using the shared policy flooding sweep.
+
+    The controller continues to own fixation and its persistent changed prior.
+    It deliberately delegates every BP sweep to ``_policy_sweep_into`` so a
+    damping/resolution/check policy cannot accidentally become a second BP
+    implementation inside guided decimation.
+    """
+    n, edge_count = original_priors.shape[0], len(labels)
+    priors = original_priors.copy()
+    old = np.empty((edge_count, 3), dtype=np.float64)
+    new = np.empty_like(old)
+    comm = np.empty(edge_count, dtype=np.float64)
+    c2v = np.empty(edge_count, dtype=np.float64)
+    beliefs = np.empty((n, 3), dtype=np.float64)
+    marginals = np.empty((n, 4), dtype=np.float64)
+    candidate = np.zeros(n, dtype=np.uint8)
+    eligible = np.ones(n, dtype=np.uint8)
+    if zero_shortcut and _candidate_matches(row_ptr, variables, labels, candidate, syndrome):
+        return candidate, 0, 0, 0, True
+    for edge in range(edge_count):
+        for state in range(3):
+            value = priors[variables[edge], state]
+            old[edge, state] = round_message(value, format_code, scale) if scope >= 1 else value
+    sweeps = 0
+    fixations = 0
+    for round_index in range(max_rounds):
+        for _ in range(iterations_per_round):
+            _policy_sweep_into(row_ptr, variable_ptr, variable_edges, variables,
+                               labels, old, priors, syndrome, format_code, scale,
+                               scope, check_rule, old_weight, fresh_weight, alpha,
+                               beta, hard_decision, comm, c2v, beliefs, new,
+                               candidate)
+            old, new = new, old
+            sweeps += 1
+        if _candidate_matches(row_ptr, variables, labels, candidate, syndrome):
+            return candidate, sweeps, round_index + 1, fixations, True
+        _normalize_marginals(beliefs, marginals)
+        target = -1
+        pauli = 0
+        reliability = -1.0
+        for variable in range(n):
+            if eligible[variable] == 0:
+                continue
+            for state in range(4):
+                value = marginals[variable, state]
+                if value > reliability:
+                    target = variable
+                    pauli = state
+                    reliability = value
+        if target < 0:
+            return candidate, sweeps, round_index + 1, fixations, False
+        eligible[target] = 0
+        total = 1.0 + 2.0 * epsilon_fix
+        for state in range(1, 4):
+            probability = (1.0 - epsilon_fix if state == pauli else epsilon_fix) / total
+            identity = (1.0 - epsilon_fix if pauli == 0 else epsilon_fix) / total
+            priors[target, state - 1] = math.log(identity / probability)
+        # Match the controller contract: a fixation changes the prior only.
+        # The committed V2C buffer remains the input to the next sweep.
+        fixations += 1
+    return candidate, sweeps, max_rounds, fixations, False
+
+
 @dataclass(frozen=True)
 class CompiledBp4Graph:
     """Preindexed plain four-state BP4 with resolved I/X/Y/Z priors."""
@@ -691,21 +761,34 @@ class CompiledBp4Graph:
                   epsilon: float = 1e-10, round_limit: int | None = None) -> CompiledQbpgdResult:
         """Run four-state Q-BPGD with frozen v2 BP4 numerics; development evidence only."""
         s = self._syndrome(syndrome)
-        if not isinstance(self.profile, QuaternaryNumericalProfileV2) or self.policy is not None:
-            raise ValueError("compiled Q-BPGD requires an unquantized float64 v2 BP4 profile")
+        if not isinstance(self.profile, QuaternaryNumericalProfileV2):
+            raise ValueError("compiled Q-BPGD requires the v2 BP4 execution family")
         if type(iterations_per_round) is not int or iterations_per_round < 1:
             raise ValueError("iterations_per_round must be a positive integer")
         if not math.isfinite(epsilon) or not 0.0 < epsilon < 1.0:
             raise ValueError("epsilon must be in (0,1)")
         if round_limit is not None and (type(round_limit) is not int or round_limit < 1):
             raise ValueError("round_limit must be a positive integer")
-        candidate, sweeps, rounds, fixations, converged = _decode_qbpgd_v2(
-            self.row_ptr, self.variable_ptr, self.variable_edges, self.variables,
-            self.labels, self.prior_llrs, s, iterations_per_round, epsilon,
-            min(len(self.prior_llrs), round_limit or len(self.prior_llrs)),
-            math.inf if self.profile.check_cap is None else self.profile.check_cap,
-            self.profile.product_epsilon, self.profile.v2c_damping,
-        )
+        if self.policy is None:
+            candidate, sweeps, rounds, fixations, converged = _decode_qbpgd_v2(
+                self.row_ptr, self.variable_ptr, self.variable_edges, self.variables,
+                self.labels, self.prior_llrs, s, iterations_per_round, epsilon,
+                min(len(self.prior_llrs), round_limit or len(self.prior_llrs)),
+                math.inf if self.profile.check_cap is None else self.profile.check_cap,
+                self.profile.product_epsilon, self.profile.v2c_damping,
+            )
+        else:
+            policy = self.policy
+            resolution = policy.resolution
+            candidate, sweeps, rounds, fixations, converged = _decode_qbpgd_policy(
+                self.row_ptr, self.variable_ptr, self.variable_edges, self.variables,
+                self.labels, self.prior_llrs, s, iterations_per_round, epsilon,
+                min(len(self.prior_llrs), round_limit or len(self.prior_llrs)),
+                resolution.format_code, resolution.fixed_scale,
+                {"scalar_edges": 0, "all_messages": 1, "all_state": 2}[resolution.scope],
+                1 if policy.check_rule == "min_sum" else 0, *policy.coefficients,
+                0 if policy.hard_decision == "min_llr" else 1, policy.zero_syndrome_shortcut,
+            )
         candidate.setflags(write=False)
         return CompiledQbpgdResult(candidate, int(sweeps), int(rounds), int(fixations), bool(converged))
 

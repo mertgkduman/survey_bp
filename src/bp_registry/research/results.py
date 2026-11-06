@@ -15,6 +15,7 @@ import os
 from pathlib import Path
 import tempfile
 from typing import Any, Mapping, Iterator
+from .contracts import resolved_sampling
 
 
 _BOUND_FILES = frozenset({"run-manifest.json", "status.json", "requested-spec.json",
@@ -80,10 +81,30 @@ def _validate_event(event: Mapping[str, Any], *, spec: Mapping[str, Any], point:
         raise ValueError("ledger rate values disagree with the requested point")
     if expected_family == "circuit_dem_bp" and event.get("setting_label") != point.get("label"):
         raise ValueError("circuit ledger setting label disagrees with the requested point")
-    if event.get("sampling_mode") != ("adaptive_stopping" if any(sampling.get(name) is not None for name in ("stop_failures", "stop_type_i", "stop_type_ii")) else "fixed_shots"):
+    limits = resolved_sampling(sampling, int(event["rate_index"]), len(spec["rate_points"]))
+    # The prior portable contract already admitted code-capacity failure
+    # thresholds without an extension marker.  New wire features, rather than
+    # every non-core sampling key, distinguish a marker that must be present.
+    requires_extended_marker = ("stop_mode" in sampling or "per_point" in sampling
+                                or sampling.get("shots") is None or budget.get("max_shots") is None
+                                or "noise_sweep" in spec["channel"]
+                                or expected_family == "circuit_dem_bp" and any(sampling.get(name) is not None for name in ("stop_type_i", "stop_type_ii")))
+    if requires_extended_marker and "sampling_stop_mode" not in event:
+        raise ValueError("ledger omits the required extended sampling marker")
+    if event.get("sampling_mode") != ("adaptive_stopping" if any(limits.get(name) is not None for name in ("stop_failures", "stop_type_i", "stop_type_ii")) else "fixed_shots"):
         raise ValueError("ledger sampling mode disagrees with the requested specification")
+    if "sampling_stop_mode" in event and event.get("sampling_stop_mode") != limits["stop_mode"]:
+        raise ValueError("ledger stop mode disagrees with the requested specification")
     if type(event.get("converged")) is not bool:
         raise ValueError("ledger converged must be boolean")
+    if expected_family == "circuit_dem_bp" and "sampling_stop_mode" in event:
+        failure = event.get("outcome") == "observable_failure"
+        if (type(event.get("detector_fit")) is not bool or type(event.get("observable_failure")) is not bool
+                or type(event.get("type_i")) is not bool or type(event.get("type_ii")) is not bool
+                or event["detector_fit"] != event["converged"] or event["observable_failure"] != failure
+                or event["type_i"] != (failure and not event["converged"])
+                or event["type_ii"] != (failure and event["converged"])):
+            raise ValueError("circuit observable outcome flags disagree with the detailed decoder result")
     _finite_duration(event.get("decode_seconds"), "decode_seconds", allow_none=True)
     _finite_duration(event.get("end_to_end_seconds"), "end_to_end_seconds")
     iterations = event.get("iterations")
@@ -102,11 +123,16 @@ def _validate_event(event: Mapping[str, Any], *, spec: Mapping[str, Any], point:
         unit = "circuit_dem_bp_sweeps" if expected_family == "circuit_dem_bp" else "bp4_joint_sweeps"
         if not isinstance(work, Mapping) or work.get("unit") != unit or work.get("value") != iterations:
             raise ValueError("ledger work units disagree with iterations")
+        if decoder.get("variant") == "qbpgd":
+            rounds, fixations = work.get("rounds"), work.get("fixations")
+            if (type(rounds) is not int or not 0 <= rounds <= decoder["qbpgd"]["round_limit"]
+                    or type(fixations) is not int or not 0 <= fixations <= rounds):
+                raise ValueError("Q-BPGD ledger rounds or fixations are out of range")
 
 
 def _validate_counts(summary: Mapping[str, Any], events: Iterator[dict[str, Any]], *, spec: Mapping[str, Any]) -> None:
     sampling, points, total_cap = spec["sampling"], spec["rate_points"], spec["budgets"]["max_shots"]
-    assert isinstance(sampling, Mapping) and isinstance(points, list) and isinstance(total_cap, int)
+    assert isinstance(sampling, Mapping) and isinstance(points, list)
     rows = summary.get("rows")
     if not isinstance(rows, list) or not rows:
         raise ValueError("summary.json must contain nonempty rows")
@@ -135,18 +161,21 @@ def _validate_counts(summary: Mapping[str, Any], events: Iterator[dict[str, Any]
             raise ValueError("ledger outcome does not belong to its decoder family")
         bucket["n"] += 1
         bucket["failures"] += event["outcome"] not in _SUCCESS
+        if circuit:
+            bucket["type_i"] += bool(event.get("type_i"))
+            bucket["type_ii"] += bool(event.get("type_ii"))
         key = mapping.get(event["outcome"])
         if key:
             bucket[key] += 1
-        if bucket["n"] > sampling["shots"]:
+        limits = resolved_sampling(sampling, event["rate_index"], len(points))
+        if limits["stop_mode"] == "any" and limits["shots"] is not None and bucket["n"] > limits["shots"]:
             raise ValueError("ledger exceeds the requested per-rate shot cap")
-        thresholds = (("stop_failures", bucket["failures"]),) if circuit else (
-            ("stop_failures", bucket["failures"]), ("stop_type_i", bucket["type_i"]), ("stop_type_ii", bucket["type_ii"]))
-        expected_stop = next((name for name, count in thresholds if sampling.get(name) is not None and count >= sampling[name]), None)
+        from .runner import _stopping_reason
+        expected_stop = _stopping_reason(limits, shots=bucket["n"], failures=bucket["failures"], type_i=bucket["type_i"], type_ii=bucket["type_ii"])
         declared_stop = event.get("sampling_stop_reason")
         if expected_stop is not None and declared_stop != expected_stop:
             raise ValueError("ledger omits, overshoots, or mislabels a requested sampling threshold")
-        if expected_stop is None and declared_stop is not None and not (declared_stop == "shots_cap" and bucket["n"] == sampling["shots"]):
+        if expected_stop is None and declared_stop is not None:
             raise ValueError("ledger has an early or unsupported sampling stop")
         if declared_stop is not None:
             bucket["stopped"] = True
@@ -156,7 +185,8 @@ def _validate_counts(summary: Mapping[str, Any], events: Iterator[dict[str, Any]
         expected = buckets[index]
         if expected["n"] == 0:
             raise ValueError("ledger has no valid shot records for a rate point")
-        if not expected["stopped"] or expected["n"] > sampling["shots"]:
+        limits = resolved_sampling(sampling, index, len(points))
+        if not expected["stopped"] or (limits["stop_mode"] == "any" and limits["shots"] is not None and expected["n"] > limits["shots"]):
             raise ValueError("ledger did not terminate each rate point at a valid sampling boundary")
         for name in ("n", "failures"):
             if row.get(name) != expected[name]:
@@ -165,9 +195,14 @@ def _validate_counts(summary: Mapping[str, Any], events: Iterator[dict[str, Any]
             if not expected["circuit"] and row.get(name) != expected[name]:
                 raise ValueError(f"summary {name} disagrees with ledger at rate {index}")
         if expected["circuit"]:
-            if row.get("type_i") is not None or row.get("type_ii") is not None or row.get("observable_successes") != expected["observable_successes"]:
+            if row.get("observable_successes") != expected["observable_successes"]:
                 raise ValueError(f"circuit summary semantics disagree with ledger at rate {index}")
-    if sum(bucket["n"] for bucket in buckets) > total_cap:
+            if row.get("type_i") not in {None, expected["type_i"]} or row.get("type_ii") not in {None, expected["type_ii"]}:
+                raise ValueError(f"circuit type partition disagrees with ledger at rate {index}")
+    consumed = sum(bucket["n"] for bucket in buckets)
+    if spec["problem"]["kind"] == "circuit":
+        consumed += len(buckets) * int(sampling["shot_start"])
+    if total_cap is not None and consumed > total_cap:
         raise ValueError("ledger exceeds the total experiment shot cap")
 
 
@@ -271,17 +306,19 @@ def normalize_result_directory(result_dir: str | Path) -> dict[str, Any]:
     if summary.get("rows") != regenerated_rows:
         raise ValueError("summary rows do not match the canonical ledger aggregation")
     _validate_summary_csv(root / "summary.csv", regenerated_rows)
-    adaptive = any(spec.get("sampling", {}).get(field) is not None for field in ("stop_failures", "stop_type_i", "stop_type_ii"))
-    for row in summary["rows"]:
+    for index, row in enumerate(summary["rows"]):
+        adaptive = any(resolved_sampling(spec["sampling"], index, len(spec["rate_points"])).get(field) is not None for field in ("stop_failures", "stop_type_i", "stop_type_ii"))
         if adaptive and (row.get("ci_method") != "unavailable_optional_stopping" or row.get("ci_low") is not None or row.get("ci_high") is not None):
             raise ValueError("adaptive result must not claim a fixed-N confidence interval")
+        if not adaptive and row.get("ci_method") != "wilson_score_95":
+            raise ValueError("fixed-shot result must retain its Wilson interval")
     input_ref = spec["problem"].get("code", spec["problem"].get("circuit"))
     input_hash = sha256(_canonical(input_ref)).hexdigest()
     short = experiment_id[:16]
     paper_id, code_id, decoder_id, dataset_id = (f"local-run-{short}", f"local-input-{input_hash[:16]}", f"local-decoder-{short}", f"local-dataset-{short}")
     kind = spec["problem"]["kind"]
-    x_semantics = "circuit_setting_index" if kind == "circuit" else ("decoder_prior_probability" if spec["channel"]["kind"] == "explicit" else "physical_error_probability")
-    points = [{"x": row["rate_index"] if kind == "circuit" else (row.get("decoder_p0") if x_semantics == "decoder_prior_probability" else row.get("p")),
+    x_semantics = "physical_circuit_noise_probability" if kind == "circuit" and any("physical_p" in point for point in spec["rate_points"]) else "circuit_setting_index" if kind == "circuit" else ("decoder_prior_probability" if spec["channel"]["kind"] == "explicit" else "physical_error_probability")
+    points = [{"x": row.get("p") if x_semantics == "physical_circuit_noise_probability" else row["rate_index"] if kind == "circuit" else (row.get("decoder_p0") if x_semantics == "decoder_prior_probability" else row.get("p")),
                "y": row.get("ler") if row.get("ler") is not None else row.get("failure_rate"),
                "n": row["n"], "failures": row["failures"], "ci_low": row.get("ci_low"), "ci_high": row.get("ci_high"),
                "mean_work": row.get("mean_iterations"), "mean_seconds": row.get("mean_decode_seconds"),
@@ -290,6 +327,8 @@ def normalize_result_directory(result_dir: str | Path) -> dict[str, Any]:
                "sampling_mode": row.get("sampling_mode"), "sampling_termination_reason": row.get("sampling_termination_reason"),
                "setting_label": row.get("setting_label"), "x_semantics": x_semantics,
                "runtime_scope": summary.get("timing_boundaries", {}).get("decode_seconds"), "summary": dict(row)} for row in summary["rows"]]
+    confidence_methods = {str(row.get("ci_method")) for row in summary["rows"]}
+    confidence_method = next(iter(confidence_methods)) if len(confidence_methods) == 1 else "mixed_by_point"
     extension_digest = sha256(_canonical({"experiment_id": experiment_id, "files": dict(files)})).hexdigest()
     extension_id = f"local-result-{extension_digest[:24]}"
     extension: dict[str, Any] = {"schema": "research-catalog-extension-v1", "import_schema": "research-import-extension-v1", "extension_id": extension_id,
@@ -299,7 +338,7 @@ def normalize_result_directory(result_dir: str | Path) -> dict[str, Any]:
         "circuits": ([{"circuit_id": code_id, "label": "Portable inline Stim circuit", "input_sha256": input_hash}] if kind == "circuit" else []),
         "experiments": [{"experiment_id": experiment_id, "paper_ids": [paper_id], "dataset_ids": [dataset_id], "configuration_sha256": run["configuration_sha256"], "provenance": run.get("provenance")}],
         "datasets": [{"dataset_id": dataset_id, "paper_id": paper_id, "label": "Validated local portable result", "evidence_status": "local_user_run", "source_path": f"research/imported/{extension_id}.json", "asset": {"kind": "portable_result_directory", "label": "Original manifest-bound local result directory", "storage_path": str(root), "storage_instructions": "Retain this directory unchanged; validate result-manifest.json before using its ledger.", "sha256": sha256((root / "result-manifest.json").read_bytes()).hexdigest()}}],
-        "result_series": [{"series_id": f"{dataset_id}:{code_id}:{decoder_id}", "dataset_id": dataset_id, "code_id": code_id, "decoder_id": decoder_id, "label": "Validated local portable result", "confidence_method": "unavailable_optional_stopping" if adaptive else "wilson_score_95", "denominator_definition": "completed decoded shots per rate point", "runtime_scope": summary.get("timing_boundaries", {}).get("decode_seconds"), "points": points}],
+        "result_series": [{"series_id": f"{dataset_id}:{code_id}:{decoder_id}", "dataset_id": dataset_id, "code_id": code_id, "decoder_id": decoder_id, "label": "Validated local portable result", "confidence_method": confidence_method, "denominator_definition": "completed decoded shots per rate point", "runtime_scope": summary.get("timing_boundaries", {}).get("decode_seconds"), "points": points}],
         "inputs": {"problem": spec["problem"], "channel": spec["channel"], "sampling": spec["sampling"], "budgets": spec["budgets"], "decoder": spec["decoder"]},
         "result_integrity": {"result_manifest": result_manifest, "bound_file_hashes": dict(files), "provenance": run.get("provenance"), "input_identity": summary.get("input_identity")},
         "import_manifest": {"experiment_id": experiment_id, "configuration_sha256": run["configuration_sha256"], "result_file_hashes": dict(files), "derived_entry": "catalog-entry.json"}}

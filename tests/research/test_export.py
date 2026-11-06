@@ -58,6 +58,35 @@ def test_exported_zip_is_self_contained_and_validates_after_relocation(tmp_path)
     assert not (relocated / "results").exists()
 
 
+def test_circuit_noise_sweep_exports_one_validated_stim_input_per_rate():
+    pytest.importorskip("stim")
+    value = {"schema": "research-experiment-v1", "id": "sweep",
+        "problem": {"kind": "circuit", "circuit": {"kind": "inline_stim", "text": "R 0\nX_ERROR(0.005) 0\nM(0.005) 0\nDETECTOR rec[-1]\nOBSERVABLE_INCLUDE(0) rec[-1]\n"}, "dem": {"decompose_errors": False}},
+        "channel": {"kind": "embedded_circuit", "noise_sweep": {"source_probability": .005}},
+        "decoder": {"family": "circuit_dem_bp", "implementation": "canonical_sinter", "rule": "spa", "numerical_profile": "binary-spa-flooding-f64-v1", "schedule": "flooding", "max_iterations": 2, "tie_break": "zero"},
+        "rate_points": [{"label": "p=.01", "physical_p": .01}, {"label": "p=.02", "physical_p": .02}],
+        "sampling": {"seed": 1, "shot_start": 0, "shots": 1}, "budgets": {"max_shots": None, "max_iterations": 2},
+        "provenance": {"relation": "development_fixture", "source_spec_id": None, "notes": None}}
+    files = package_files(value, repository=ROOT)
+    assert "inputs/circuit-rate-000.stim" in files and "inputs/circuit-rate-001.stim" in files
+    assert b"X_ERROR(0.01)" in files["inputs/circuit-rate-000.stim"]
+    assert b"X_ERROR(0.02)" in files["inputs/circuit-rate-001.stim"]
+
+
+def test_circuit_sweep_admission_rejects_legacy_multi_rate_and_unmatched_source():
+    from bp_registry.research.contracts import validate_experiment
+    value = {"schema": "research-experiment-v1", "id": "sweep-validation",
+        "problem": {"kind": "circuit", "circuit": {"kind": "inline_stim", "text": "R 0\nX_ERROR(0.005) 0\nM 0\nDETECTOR rec[-1]\nOBSERVABLE_INCLUDE(0) rec[-1]"}, "dem": {"decompose_errors": False}},
+        "channel": {"kind": "embedded_circuit"}, "decoder": {"family": "circuit_dem_bp", "implementation": "canonical_sinter", "rule": "spa", "numerical_profile": "binary-spa-flooding-f64-v1", "schedule": "flooding", "max_iterations": 1, "tie_break": "zero"},
+        "rate_points": [{"label": "a"}, {"label": "b"}], "sampling": {"seed": 1, "shot_start": 0, "shots": 1}, "budgets": {"max_shots": 2, "max_iterations": 1}, "provenance": {"relation": "development_fixture", "source_spec_id": None, "notes": None}}
+    with pytest.raises(ValueError, match="one legacy embedded circuit"):
+        validate_experiment(value)
+    value["channel"] = {"kind": "embedded_circuit", "noise_sweep": {"source_probability": .004}}
+    value["rate_points"] = [{"label": "a", "physical_p": .01}, {"label": "b", "physical_p": .02}]
+    with pytest.raises(ValueError, match="did not match"):
+        validate_experiment(value)
+
+
 def test_package_manifest_rejects_changed_requested_settings(tmp_path):
     files = package_files(specimen(), repository=ROOT)
     for name, content in files.items():

@@ -31,12 +31,12 @@ def test_names_use_recorded_parameters_and_selected_arm_overrides():
     rows=display()
     curve=next(s for s in rows if s['dataset_id']=='pfister-presentation-full-v2-curves' and s['code_id']=='b1' and s['source_decoder_id']=='bp4_tuned_sp_v2')
     label=curve['display']['label']
-    assert label.startswith('BP4 · SP') and 'd = 0.1' in label and 'T = 1000' in label
+    assert label.startswith('Q-BP, SP') and 'd = 0.1' in label and 'T = 1000' in label
     assert 'precision = float64' in label and 'c = none' in label
     for row in rows:
         if row['dataset_id'].startswith('yao-tuned-qbpgd') and row['code_id']=='a5':
             assert ('p₀ = 0.005' if row['source_decoder_id']=='tuned' else 'p₀ = 0.06') in row['display']['label']
-            assert ('N = 1000' if 'pilot' in row['dataset_id'] else 'N = 10000') in row['display']['label']
+            assert 'N =' not in row['display']['label']
 
 
 def test_paper_specific_caps_and_current_circuit_adapter_are_not_retired():
@@ -60,11 +60,11 @@ def test_binary_marginal_prior_and_joint_prior_have_distinct_symbols():
     rows=display()
     binary=next(s for s in rows if s['dataset_id']=='yao-cross-code-depolarizing' and s['source_decoder_id']=='binary_v2')
     joint=next(s for s in rows if s['dataset_id']=='yao-cross-code-depolarizing' and s['source_decoder_id']=='qbp_v2')
-    assert 'q = 2p/3' in binary['display']['label']
+    assert 'p₀ = 2p/3' in binary['display']['label']
     assert 'p₀ = p' in joint['display']['label']
     for s in rows:
         if s['dataset_id']=='yao-non-osd-results' and s['source_decoder_id']=='qbp':
-            assert s['display']['algorithm']=='BP4' and 'p₀ = p' in s['display']['label']
+            assert s['display']['algorithm']=='Q-BP' and 'p₀ = p' in s['display']['label']
     catalog=json.loads((ROOT/'web/research/catalog.json').read_text())
     for d in catalog['decoders']:
         if 'yao-non-osd-results:' in d['decoder_id'] and ':qbp' in d['decoder_id']:

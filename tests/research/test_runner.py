@@ -61,12 +61,11 @@ def test_binary_full_block_runner_writes_immutable_bounded_outputs(tmp_path: Pat
         run_experiment(specimen(), output=output)
 
 
-def test_registered_code_materializes_from_a_confined_repository_path() -> None:
+def test_retired_three_qubit_fixture_is_not_a_public_registered_code() -> None:
     value = specimen()
     value["problem"]["code"] = {"kind": "registered", "id": "three-qubit"}
-    portable = materialize_experiment(value, ROOT)
-    assert portable["problem"]["code"]["kind"] == "embedded_css"
-    assert portable["problem"]["code"]["hx"]
+    with pytest.raises(ValueError, match="unavailable"):
+        materialize_experiment(value, ROOT)
 
 
 def test_bp4_frozen_v1_plain_profile_uses_independent_pauli_evaluation(tmp_path: Path) -> None:
@@ -140,7 +139,7 @@ def test_zero_and_noncommuting_embedded_codes_are_rejected() -> None:
         validate_experiment(noncommuting)
 
 
-def test_circuit_summary_marks_code_capacity_type_errors_not_applicable(tmp_path: Path) -> None:
+def test_circuit_summary_partitions_observable_failures_by_detector_fit(tmp_path: Path) -> None:
     pytest.importorskip("stim")
     pytest.importorskip("sinter")
     value = {"schema": "research-experiment-v1", "id": "circuit-fixture",
@@ -149,13 +148,28 @@ def test_circuit_summary_marks_code_capacity_type_errors_not_applicable(tmp_path
         "rate_points": [{"label": "embedded_circuit"}], "sampling": {"seed": 5, "shot_start": 1, "shots": 1}, "budgets": {"max_shots": 2, "max_iterations": 2}, "provenance": {"relation": "development_fixture", "source_spec_id": None, "notes": None}}
     summary = run_experiment(value, output=tmp_path / "circuit")
     row = summary["rows"][0]
-    assert row["type_i"] is row["type_ii"] is None
+    assert row["type_i"] + row["type_ii"] == row["failures"]
     assert row["work_unit"] == "circuit_dem_bp_sweeps"
     assert row["exact_successes"] is row["stabilizer_equivalent_successes"] is None
     assert row["observable_successes"] + row["failures"] == 1
     event = json.loads((tmp_path / "circuit/events.jsonl").read_text())
     assert event["outcome"] in {"observable_success", "observable_failure"}
     assert event["termination_reason"]
+
+
+def test_circuit_shot_prefix_uses_one_shot_stim_chunks_for_stream_identity() -> None:
+    stim = pytest.importorskip("stim")
+    circuit = stim.Circuit("R 0\nX_ERROR(0.1) 0\nM 0\nDETECTOR rec[-1]\nOBSERVABLE_INCLUDE(0) rec[-1]")
+    prefix = circuit.compile_detector_sampler(seed=21)
+    for _ in range(3):
+        prefix.sample(shots=1, separate_observables=True)
+    actual = prefix.sample(shots=1, separate_observables=True)
+    full = circuit.compile_detector_sampler(seed=21)
+    expected = None
+    for _ in range(4):
+        expected = full.sample(shots=1, separate_observables=True)
+    assert expected is not None
+    assert (actual[0] == expected[0]).all() and (actual[1] == expected[1]).all()
 
 
 @pytest.mark.parametrize("invalid", [0.2, 257, -255])
@@ -180,12 +194,11 @@ def test_explicit_physical_probabilities_and_bp4_graph_validate_before_export():
         validate_experiment(value)
 
 
-def test_qbpgd_min_sum_is_rejected_before_sampling():
+def test_qbpgd_min_sum_policy_composes_with_guided_decimation():
     value = specimen()
     value["problem"]["kind"] = "pauli_code_capacity"
     value["decoder"].update(family="bp4", numerical_profile="quaternary-bp4-f64-v2", variant="qbpgd", rule="min_sum", qbpgd={"iterations_per_round": 1, "round_limit": 2, "epsilon": 1e-10})
-    with pytest.raises(ValueError, match="sum_product"):
-        validate_experiment(value)
+    assert validate_experiment(value)["decoder"]["rule"] == "min_sum"
 
 
 def test_inline_circuit_requires_real_stim_and_observables():
@@ -327,3 +340,33 @@ def test_portable_python_api_rejects_non_json_arrays_before_export(tmp_path):
     value["channel"] = {"kind": "explicit", "probabilities": np.array([.7, .1, .1, .1])}
     with pytest.raises(ValueError, match="JSON-compatible"):
         validate_experiment(value)
+
+
+def test_unmodified_qbpgd_path_remains_the_frozen_v2_recurrence():
+    import numpy as np
+    from bp_registry.css import CssCode
+    from bp_registry.quaternary.compiled import CompiledBp4Graph, _decode_qbpgd_v2
+    from bp_registry.quaternary.numerics import QBP4_F64_V2
+    code = CssCode(np.asarray([[1, 1]], dtype=np.uint8), np.asarray([[1, 1]], dtype=np.uint8)).validate()
+    graph = CompiledBp4Graph.from_css(code, .1)
+    syndrome = np.asarray([1, 0], dtype=np.uint8)
+    expected = _decode_qbpgd_v2(graph.row_ptr, graph.variable_ptr, graph.variable_edges, graph.variables, graph.labels, graph.prior_llrs, syndrome, 1, 1e-10, 2, float("inf"), QBP4_F64_V2.product_epsilon, QBP4_F64_V2.v2c_damping)
+    actual = graph.run_qbpgd(syndrome, iterations_per_round=1, epsilon=1e-10, round_limit=2)
+    assert actual.candidate.tolist() == expected[0].tolist()
+    assert (actual.iterations, actual.rounds, actual.fixations, actual.converged) == tuple(expected[1:])
+
+
+def test_qbpgd_policy_recurrence_preserves_the_committed_message_trajectory_through_fixation():
+    import numpy as np
+    from bp_registry.css import CssCode
+    from bp_registry.quaternary.compiled import CompiledBp4Graph
+    from bp_registry.resolution import BpFloodingPolicy, ResolutionPolicy
+    code = CssCode(np.asarray([[1, 1, 0], [0, 1, 1]], dtype=np.uint8), np.asarray([[1, 1, 1]], dtype=np.uint8)).validate()
+    baseline = CompiledBp4Graph.from_css(code, .1)
+    policy = BpFloodingPolicy(check_rule="sum_product", resolution=ResolutionPolicy("float64", None, "all_messages"), damping=0., hard_decision="strict_pauli", zero_syndrome_shortcut=False)
+    composed = CompiledBp4Graph.from_css(code, .1, policy=policy)
+    syndrome = np.asarray([0, 0, 1], dtype=np.uint8)
+    expected = baseline.run_qbpgd(syndrome, iterations_per_round=1, epsilon=1e-10, round_limit=3)
+    actual = composed.run_qbpgd(syndrome, iterations_per_round=1, epsilon=1e-10, round_limit=3)
+    assert expected.fixations == actual.fixations == 3
+    assert (actual.candidate.tolist(), actual.iterations, actual.rounds, actual.converged) == (expected.candidate.tolist(), expected.iterations, expected.rounds, expected.converged)

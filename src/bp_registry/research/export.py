@@ -267,7 +267,7 @@ def _json(value: Any) -> bytes:
 
 def package_files(spec: dict[str, Any], *, repository: str | Path | None = None) -> dict[str, bytes]:
     """Validate a request and return a complete package, without executing it."""
-    from .contracts import materialize_experiment, validate_experiment
+    from .contracts import materialize_experiment, sweep_stim_text, validate_experiment
 
     validate_experiment(spec, repository=repository)
     portable = materialize_experiment(spec, repository=repository)
@@ -280,6 +280,14 @@ def package_files(spec: dict[str, Any], *, repository: str | Path | None = None)
     circuit = problem.get("circuit", {})
     if isinstance(circuit, dict) and isinstance(circuit.get("text"), str):
         files["inputs/circuit.stim"] = circuit["text"].encode()
+        sweep = portable.get("channel", {}).get("noise_sweep") if isinstance(portable.get("channel"), dict) else None
+        if isinstance(sweep, dict):
+            for index, point in enumerate(portable.get("rate_points", [])):
+                if isinstance(point, dict) and "physical_p" in point:
+                    files[f"inputs/circuit-rate-{index:03d}.stim"] = sweep_stim_text(
+                        circuit["text"], source_probability=float(sweep["source_probability"]),
+                        physical_p=float(point["physical_p"]),
+                    ).encode()
     code = problem.get("code", {})
     if isinstance(code, dict) and code.get("kind") == "embedded_css":
         files["inputs/code.json"] = _json({name: value for name, value in code.items() if name != "kind"})
