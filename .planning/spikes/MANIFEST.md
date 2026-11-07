@@ -16,6 +16,19 @@ Record the BP policies, settings, curves, and conclusions supplied in Dr. Pfiste
 - Apply comparable numerical-policy ablations to binary BP and keep its outcome separate from BP4 selection.
 - Preserve the frozen v1 canonical numerical profiles and their existing ledger semantics when adding a better-performing versioned default.
 
+### canonical-kernel-audit
+
+Audit the binary and quaternary canonical kernels before further HTML work, using independent mathematical oracles, pinned open-source implementations, policy composition probes, and execution-path consistency checks.
+
+**Requirements:**
+
+- Run spikes 008–011 in order, as explicitly approved by the user.
+- Use exact small-graph inference and independently implemented recurrences; agreement between related backends alone is insufficient.
+- Record repository revisions, settings, numerical tolerances, counterexamples, and intentional source-specific differences.
+- Assess both correctness and extension contracts for BP-internal policies; retain incompatible combinations as explicit exclusions.
+- Preserve frozen profile identities and existing evidence. This audit produces reproducible findings and a prioritized stabilization contract before any behavior migration.
+- Reuse prior numerical evidence without treating curve proximity as an algebraic proof.
+
 ## Spikes
 
 | # | Idea | Name | Type | Validates | Verdict | Tags |
@@ -27,3 +40,7 @@ Record the BP policies, settings, curves, and conclusions supplied in Dr. Pfiste
 | 005 | pfister-slide-bp-reproduction | Binary numerical scale-up | comparison | Given the same sampled errors, when binary SPA cap variants decode both CSS halves, then the effect on block LER and work is measurable | VALIDATED | binary, numerics, simulation |
 | 006 | pfister-slide-bp-reproduction | Canonical numerical promotion | standard | Given held-out evidence and algebraic tests, when the best policy becomes a versioned canonical default, then new runs improve without changing frozen v1 replay | VALIDATED | canonical, compatibility |
 | 007 | pfister-slide-bp-reproduction | Full v2 curve sweep | comparison | Given promoted v2 kernels, when every source probability is simulated on paired errors, then source proximity and uncertainty can be assessed point by point | IN_PROGRESS | canonical, reproduction, simulation |
+| 008 | canonical-kernel-audit | Mathematical and numerical correctness | standard | Given small binary and Pauli graphs, when independently evaluated, then messages and decisions satisfy their declared mathematical contract | IN_PROGRESS | mathematics, numerics |
+| 009 | canonical-kernel-audit | Open-source cross-check | comparison | Given pinned upstream implementations and aligned settings, when matched inputs run, then agreement or discrepancies are explained | PENDING | upstream, provenance |
+| 010 | canonical-kernel-audit | Policy extensibility | standard | Given supported policy compositions, when exercised, then order, state isolation, and compatibility are explicit | PENDING | policies, architecture |
+| 011 | canonical-kernel-audit | Execution consistency | comparison | Given identical profiles and observations, when public, scalar, and compiled paths run, then behavior and evidence agree | PENDING | replay, accounting, backends |
