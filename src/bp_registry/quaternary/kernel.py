@@ -151,7 +151,10 @@ class ScalarLlrBp4Kernel:
         return finite_saturate(result, boundary="bp4_variable_message", profile=self.profile)
 
     def damp_variable_messages(self, old: np.ndarray, proposal: np.ndarray) -> np.ndarray:
-        damping = self.profile.v2c_damping if isinstance(self.profile, QuaternaryNumericalProfileV2) else 0.0
+        if not isinstance(self.profile, QuaternaryNumericalProfileV2):
+            # Frozen v1 has no damping stage, including no signed-zero arithmetic.
+            return np.array(proposal, dtype=np.float64, copy=True)
+        damping = self.profile.v2c_damping
         return finite_saturate(damping * old + (1.0 - damping) * proposal,
                                boundary="bp4_damped_variable_message", profile=self.profile)
 

@@ -319,3 +319,9 @@ def test_cumulative_receipt_tamper_is_rejected_and_replay_scratch_cleaned(tmp_pa
     with pytest.raises(ValueError,match='cumulative result work'):
         verify_quaternary_run(out)
     assert not list(out.glob('qbp-replay-*'))
+
+
+def test_frozen_v1_has_no_extra_damping_arithmetic():
+    proposal=np.array([-0.,0.,-0.])
+    result=ScalarLlrBp4Kernel(profile=QBP4_F64_V1).damp_variable_messages(np.ones(3),proposal)
+    np.testing.assert_array_equal(np.signbit(result),np.signbit(proposal))

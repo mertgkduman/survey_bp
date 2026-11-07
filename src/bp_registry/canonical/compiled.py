@@ -338,8 +338,10 @@ def _policy_sweep_into(row_ptr, variables, n, old, syndrome, prior,
 def _decode_policy(row_ptr, variables, n, syndrome, prior, max_iterations,
                    format_code, scale, all_state, check_rule,
                    old_weight, fresh_weight, alpha, beta, zero_shortcut, clamp_band=True, epsilon=1e-10, corrected=False):
-    initial = round_message(prior, format_code, scale) if all_state else prior
-    candidate = np.full(n, int(initial < 0.0) if corrected else 0, dtype=np.uint8)
+    candidate = np.zeros(n, dtype=np.uint8)
+    if corrected:
+        initial = round_message(prior, format_code, scale) if all_state else prior
+        candidate[:] = int(initial < 0.0)
     if zero_shortcut and _candidate_matches(row_ptr, variables, candidate, syndrome):
         return candidate, True, 0
     old = np.full(len(variables), round_message(prior, format_code, scale), dtype=np.float64)
