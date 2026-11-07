@@ -127,6 +127,8 @@ class BpFloodingPolicy:
     hard_decision: str = "min_llr"
     zero_syndrome_shortcut: bool = True
     version: str = "bp-flooding-policy-v1"
+    check_stabilization: str | None = None
+    product_epsilon: float | None = None
 
     def __post_init__(self) -> None:
         if (type(self.check_rule) is not str or type(self.hard_decision) is not str
@@ -135,7 +137,7 @@ class BpFloodingPolicy:
             raise ValueError("BP flooding policy has invalid field types")
         if self.check_rule not in {"min_sum", "sum_product"}:
             raise ValueError("unknown BP check rule")
-        if self.hard_decision not in {"min_llr", "strict_pauli"}:
+        if self.hard_decision not in {"min_llr", "strict_pauli", "map_pauli"}:
             raise ValueError("unknown BP4 hard-decision rule")
         if not isinstance(self.resolution, ResolutionPolicy):
             raise ValueError("resolution must be a ResolutionPolicy")
@@ -145,8 +147,24 @@ class BpFloodingPolicy:
             raise ValueError("invalid BP damping, scale, or offset")
         if self.check_rule == "sum_product" and (self.alpha != 1 or self.beta != 0):
             raise ValueError("sum-product has no min-sum scale or offset")
-        if self.version != "bp-flooding-policy-v1":
+        if self.version == "bp-flooding-policy-v1":
+            if self.check_stabilization is not None or self.product_epsilon is not None or self.hard_decision == "map_pauli":
+                raise ValueError("new numerical choices require bp-flooding-policy-v2")
+        elif self.version == "bp-flooding-policy-v2":
+            if (self.check_stabilization not in {"exact_unity", "epsilon_band"}
+                    or type(self.product_epsilon) not in {int, float}
+                    or not 0 < self.product_epsilon < .5 or not 1.0 - self.product_epsilon < 1.0):
+                raise ValueError("v2 requires explicit check stabilization and representable epsilon")
+        else:
             raise ValueError("unknown BP flooding policy version")
+
+    @property
+    def stabilization_args(self) -> tuple[bool, float]:
+        return (self.check_stabilization != "exact_unity", 1e-10 if self.product_epsilon is None else self.product_epsilon)
+
+    @property
+    def decision_code(self) -> int:
+        return {"min_llr": 0, "strict_pauli": 1, "map_pauli": 2}[self.hard_decision]
 
     @property
     def coefficients(self) -> tuple[float, float, float, float]:
@@ -154,17 +172,32 @@ class BpFloodingPolicy:
         return q(self.damping), q(1.0 - self.damping), q(self.alpha), q(self.beta)
 
     def as_evidence(self) -> dict[str, object]:
-        return {**asdict(self), "effective_coefficients": dict(zip(
+        contract = {} if self.version == "bp-flooding-policy-v1" else {
+            "binary_prior": "log1p(-p)-log(p)",
+            "initial_candidate": "prior_decision; round_prior_only_for_all_state",
+            "shortcut": "check_prior_candidate_when_enabled",
+            "convergence": "final_candidate_validity",
+            "reduction_order": "declared_edge_order; min_sum_two_minima",
+            "coefficient_orientation": "old_weight=damping; fresh_weight=1-damping",
+            "min_sum_degree_one_float_magnitude": 23.7189981105,
+        }
+        return {**self.as_spec(), **contract, "effective_coefficients": dict(zip(
             ("old_weight", "fresh_weight", "alpha", "beta"), self.coefficients, strict=True,
         ))}
 
     def as_spec(self) -> dict[str, object]:
-        return asdict(self)
+        data = asdict(self)
+        if self.version == "bp-flooding-policy-v1":
+            data.pop("check_stabilization")
+            data.pop("product_epsilon")
+        return data
 
     @classmethod
     def from_spec(cls, value: Mapping[str, object]) -> "BpFloodingPolicy":
         required = {"check_rule", "resolution", "damping", "alpha", "beta",
                     "hard_decision", "zero_syndrome_shortcut", "version"}
+        if isinstance(value, Mapping) and value.get("version") == "bp-flooding-policy-v2":
+            required |= {"check_stabilization", "product_epsilon"}
         if not isinstance(value, Mapping) or set(value) != required:
             raise ValueError("BP flooding spec requires all declared policy fields")
         data = dict(value)

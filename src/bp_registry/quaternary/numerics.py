@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 import math
+from bp_registry.check_numerics import stabilized_log_ratio
 import numbers
 
 import numpy as np
@@ -75,7 +76,23 @@ class QuaternaryNumericalProfileV2(QuaternaryNumericalProfile):
 
 
 QBP4_F64_V2 = QuaternaryNumericalProfileV2()
-DEFAULT_QBP4_F64 = QBP4_F64_V2
+@dataclass(frozen=True, slots=True)
+class QuaternaryNumericalProfileV3(QuaternaryNumericalProfileV2):
+    """Generic MAP decisions; retain v2's explicit exact-unity safeguard."""
+
+    profile_id: str = "quaternary-bp4-f64-v3"
+    candidate_tie_break: str = "minimum_of_0_X_Y_Z; ties_I_then_X_then_Y_then_Z"
+    initial_candidate: str = "prior_MAP; no_initial_shortcut; convergence_reports_candidate_validity"
+    check_stabilization: str = "exact_unity"
+
+    def __post_init__(self) -> None:
+        QuaternaryNumericalProfileV2.__post_init__(self)
+        if self.check_stabilization != "exact_unity":
+            raise ValueError("plain v3 uses exact_unity; use an explicit flooding policy for other stabilization")
+
+
+QBP4_F64_V3 = QuaternaryNumericalProfileV3()
+DEFAULT_QBP4_F64 = QBP4_F64_V3
 
 
 def _float64(value: object, *, name: str) -> np.ndarray:
@@ -175,11 +192,7 @@ def check_message(
         for value in vector:
             scalar = float(value)
             product *= (1.0 if scalar > 40.0 else -1.0 if scalar < -40.0 else math.tanh(scalar / 2.0))
-        if product >= 1.0:
-            product = 1.0 - profile.product_epsilon
-        elif product <= -1.0:
-            product = -1.0 + profile.product_epsilon
-        result = math.log1p(product) - math.log1p(-product)
+        result = stabilized_log_ratio(product, profile.product_epsilon)
         checked = float(finite_saturate(result, boundary="check_message_output", profile=profile))
         return checked if profile.check_cap is None else float(np.clip(checked, -profile.check_cap, profile.check_cap))
     message = ordered_boxplus(incoming, profile=profile)
@@ -250,6 +263,8 @@ def pauli_hard_decision(
     belief = finite_saturate(llrs, boundary="pauli_hard_decision_input", profile=profile)
     if belief.shape != (3,):
         raise ValueError("pauli_hard_decision requires three X/Y/Z LLRs")
+    if isinstance(profile, QuaternaryNumericalProfileV3):
+        return Pauli(int(np.argmin(np.concatenate(([0.0], belief)))))
     if isinstance(profile, QuaternaryNumericalProfileV2):
         x, y, z = (float(value) for value in belief)
         if x > 0.0 and y > 0.0 and z > 0.0:
@@ -271,6 +286,8 @@ __all__ = [
     "DEFAULT_QBP4_F64",
     "QBP4_F64_V1",
     "QBP4_F64_V2",
+    "QBP4_F64_V3",
+    "QuaternaryNumericalProfileV3",
     "QuaternaryNumericalFailure",
     "QuaternaryNumericalProfile",
     "QuaternaryNumericalProfileV2",

@@ -7,7 +7,7 @@ import math
 import numpy as np
 
 from .numerics import (
-    DEFAULT_BINARY_SPA_F64, NumericalProfile,
+    DEFAULT_BINARY_SPA_F64, NumericalProfile, BinaryNumericalProfileV3,
     check_to_variable, finite_saturate, hard_decision, prior_llr,
 )
 from .updates import CheckUpdateRule
@@ -30,8 +30,13 @@ class KernelResult:
 class BinarySpaKernel:
     """No native adapter: deterministic float64 LLR SPA with flooding updates."""
 
-    def __init__(self, *, profile: NumericalProfile = DEFAULT_BINARY_SPA_F64, update_rule: CheckUpdateRule | None = None) -> None:
-        self.profile = profile
+    def __init__(self, *, profile: NumericalProfile | None = None, update_rule: CheckUpdateRule | None = None) -> None:
+        selected = (getattr(update_rule, "profile", None) if update_rule is not None else DEFAULT_BINARY_SPA_F64) if profile is None else profile
+        if not isinstance(selected, NumericalProfile):
+            raise ValueError("update rule requires an explicit numerical profile")
+        if update_rule is not None and getattr(update_rule, "profile", None) != selected:
+            raise ValueError("update rule and kernel numerical profiles must agree")
+        self.profile = selected
         self.update_rule = update_rule
 
     def prior(self, error_rate: float) -> float:
@@ -100,4 +105,4 @@ class BinarySpaKernel:
             if np.array_equal((h.astype(np.int64) @ candidate) % 2, s):
                 return KernelResult(candidate, True, iteration)
             v2c = sweep.new_v2c
-        return KernelResult(candidate, False, max_iterations)
+        return KernelResult(candidate, bool(np.array_equal((h.astype(np.int64) @ candidate) % 2, s)) if isinstance(self.profile, BinaryNumericalProfileV3) else False, max_iterations)

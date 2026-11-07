@@ -5,11 +5,11 @@ not an adapter to a native decoder, a source-faithful reproduction, or a
 statistical result.  The checked fixture is explicitly labelled
 `canonical_implemented`, `development_fixture`, and `not_assessed`.
 
-**Current plain flooding default:** float64 SPA v2. The example below is a
+**Current plain flooding default:** float64 SPA v3. See the [stabilization and CPU guide](kernel-stabilization-and-cpu.md). The example below is a
 frozen v1 fixture, so its v1 equations and expected results remain historical.
-New schema-9 manifests default to `cpu-float64-spa-v2`. See the
+Schema 10 selects `cpu-float64-spa-v3`; schema 9 retains `cpu-float64-spa-v2`. See the
 [numerical-profile guide](numerical-profiles.md), [side-by-side HTML](decoder-numerics-v1-v2.html),
-and [PDF](decoder-numerics-v1-v2.pdf) for the current recurrence and version
+and [PDF](decoder-numerics-v1-v2.pdf) for the historical v1/v2 recurrence and version
 boundary.
 
 ## Scope and approved environment

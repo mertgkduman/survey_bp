@@ -10,7 +10,7 @@ import pytest
 
 from bp_registry.canonical.compiled import CompiledBinaryFlooding
 from bp_registry.canonical.kernel import BinarySpaKernel
-from bp_registry.canonical.numerics import BINARY_SPA_F64_V2, REFERENCE_CPU_F64
+from bp_registry.canonical.numerics import BINARY_SPA_F64_V3, BINARY_SPA_F64_V2, REFERENCE_CPU_F64
 from bp_registry.cli import run_canonical, verify_run
 from bp_registry.manifests import (
     CanonicalExperimentV9, QuaternaryExperimentV2, QuaternaryExperimentV3,
@@ -18,22 +18,22 @@ from bp_registry.manifests import (
 )
 from bp_registry.quaternary.compiled import CompiledBp4Graph
 from bp_registry.quaternary.kernel import ScalarLlrBp4Kernel
-from bp_registry.quaternary.numerics import QBP4_F64_V1, QBP4_F64_V2
+from bp_registry.quaternary.numerics import QBP4_F64_V1, QBP4_F64_V2, QBP4_F64_V3
 from bp_registry.runner import preflight_canonical, preflight_quaternary, run_quaternary, verify_quaternary_run
 
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def test_unversioned_plain_constructors_select_v2_and_explicit_v1_is_stable() -> None:
+def test_unversioned_plain_constructors_select_v3_and_explicit_v1_is_stable() -> None:
     h = np.asarray([[1, 1]], dtype=np.uint8)
-    assert BinarySpaKernel().profile is BINARY_SPA_F64_V2
-    assert CompiledBinaryFlooding.from_check_matrix(h).profile is BINARY_SPA_F64_V2
-    assert ScalarLlrBp4Kernel().profile is QBP4_F64_V2
+    assert BinarySpaKernel().profile is BINARY_SPA_F64_V3
+    assert CompiledBinaryFlooding.from_check_matrix(h).profile is BINARY_SPA_F64_V3
+    assert ScalarLlrBp4Kernel().profile is QBP4_F64_V3
     assert BinarySpaKernel(profile=REFERENCE_CPU_F64).profile is REFERENCE_CPU_F64
     assert CompiledBinaryFlooding.from_check_matrix(h, profile=REFERENCE_CPU_F64).profile is REFERENCE_CPU_F64
     assert ScalarLlrBp4Kernel(profile=QBP4_F64_V1).profile is QBP4_F64_V1
-    assert CompiledBp4Graph.__dataclass_fields__["profile"].default is QBP4_F64_V2
+    assert CompiledBp4Graph.__dataclass_fields__["profile"].default is QBP4_F64_V3
 
 
 def test_public_binary_v9_defaults_to_v2_and_historical_v2_stays_v1(tmp_path: Path) -> None:

@@ -40,7 +40,7 @@ def resolve_quaternary_composition(
     composition: QuaternaryCompositionSpec,
     *,
     problem_kind: Literal["general_pauli", "css"] = "general_pauli",
-    numerical_profile: Literal["quaternary-bp4-f64-v2"] | None = None,
+    numerical_profile: Literal["quaternary-bp4-f64-v2", "quaternary-bp4-f64-v3"] | None = None,
 ) -> QuaternaryResolvedComposition:
     """Resolve a closed composition before artifact resolution or sampling.
 
@@ -52,7 +52,7 @@ def resolve_quaternary_composition(
         raise ValueError("quaternary compatibility requires QuaternaryCompositionSpec")
     if problem_kind not in {"general_pauli", "css"}:
         raise ValueError("quaternary problem kind must be general_pauli or css")
-    if numerical_profile not in {None, "quaternary-bp4-f64-v2"}:
+    if numerical_profile not in {None, "quaternary-bp4-f64-v2", "quaternary-bp4-f64-v3"}:
         raise ValueError("unsupported quaternary numerical profile")
 
     assert composition.kernel is not None and composition.schedule is not None and composition.intervention is not None
@@ -99,6 +99,17 @@ def resolve_quaternary_composition(
         equations["numerical_v2c"] = "0.1 old_v2c + 0.9 fresh_extrinsic_v2c"
         lifecycle["numerical_profile"] = numerical_profile
         reasons.append("canonical_float64_v2_numerical_profile")
+
+    if numerical_profile == "quaternary-bp4-f64-v3":
+        if kernel.kind != "qbp_scalar_llr" or composition.intervention.kind != "identity":
+            raise ValueError("quaternary v3 is qualified only for scalar BP4 with identity intervention")
+        component_fidelity["kernel"] = "canonical_adaptation"
+        procedure_basis = "canonical_scalar_llr_bp4_f64_v3"
+        equations["numerical_check"] = "2atanh(exact_unity_safeguard((-1)^s product tanh(lambda/2), 1e-10))"
+        equations["numerical_v2c"] = "0.1 old_v2c + 0.9 fresh_extrinsic_v2c; schedule-local commit"
+        equations["decision"] = "argmin(0, Gamma_X, Gamma_Y, Gamma_Z); ties I<X<Y<Z"
+        lifecycle["numerical_profile"] = numerical_profile
+        reasons.append("canonical_float64_v3_numerical_profile")
 
     if kernel.kind == "qbp_mbp4_fixed_alpha":
         # Import here to keep composition data independent of the implementation

@@ -14,7 +14,6 @@ import math
 
 import numpy as np
 
-from ..canonical.budgets import WorkVector
 from .algebra import Pauli
 from .kernel import QbpSession, QbpSweep
 from .numerics import commutation_llr, llrs_to_probabilities
@@ -183,60 +182,9 @@ class QbpFloodingSchedule:
         )
 
     def _transformed_sweep(self) -> QbpSweep:
-        session = self.session
-        if session._terminal != "running":
-            return session.last
-        next_iteration = session._iteration + 1
-        reservation = session.budgets.reserve(
-            session.budget_scope, session._sweep_work(), leaf_id=f"qbp-flooding:{session.problem.lineage_id}:{next_iteration}"
-        )
-        if reservation is None:
-            session._terminal = "capped"
-            session._last = session._snapshot(converged=False, terminal="capped", work=WorkVector.zero())
-            return session.last
-        try:
-            c2v = np.empty_like(session._c2v)
-            # A complete flooding pass reads one old V2C snapshot. Share each
-            # edge's scalar quantization while retaining check-major exclusion
-            # order and applying transforms separately to every C2V message.
-            quantized_v2c = np.asarray([
-                commutation_llr(session._v2c[edge], int(label), profile=session.kernel.profile)
-                for edge, label in enumerate(session._labels)
-            ], dtype=np.float64)
-            for edge, check in enumerate(session._checks):
-                reduced = [
-                    float(quantized_v2c[index])
-                    for index in session._check_incident[int(check)] if index != edge
-                ]
-                c2v[edge] = _apply_transforms(
-                    session.kernel.check_message(reduced, int(session.problem.syndrome[check])), self.transforms
-                )
-            beliefs = np.asarray([
-                session.kernel.posterior(
-                    session.priors[variable], c2v[list(session._variable_incident[variable])],
-                    session._labels[list(session._variable_incident[variable])],
-                )
-                for variable in range(session.problem.code.n)
-            ])
-            v2c = np.asarray([
-                session.kernel.variable_message(beliefs[variable], c2v[edge], int(label))
-                for edge, (variable, label) in enumerate(zip(session._variables, session._labels, strict=True))
-            ])
-            marginals = np.asarray([llrs_to_probabilities(row, profile=session.kernel.profile) for row in beliefs])
-            candidate = session.kernel.candidate_from_beliefs(beliefs)
-        except Exception:
-            reservation.rollback()
-            session._terminal = "numerical_failure"
-            session._last = session._snapshot(converged=False, terminal="numerical_failure", work=WorkVector.zero())
-            raise
-        reservation.commit_once()
-        session._iteration = next_iteration
-        session._c2v, session._v2c, session._beliefs = c2v, v2c, beliefs
-        session._marginals, session._candidate = marginals, candidate
-        converged = session._is_converged()
-        session._terminal = "converged" if converged else "running"
-        session._last = session._snapshot(converged=converged, terminal=session._terminal, work=session.budgets.summary(session.budget_scope))
-        return session.last
+        # One engine owns reservation, snapshot, beliefs, damping and commit.
+        # A transform changes only the explicitly declared C2V stage.
+        return self.session.sweep(_check_transform=lambda message: _apply_transforms(message, self.transforms))
 
 
 class QbpVariableSerialSchedule:
@@ -274,7 +222,7 @@ class QbpVariableSerialSchedule:
         )
         if reservation is None:
             session._terminal = "capped"
-            session._last = session._snapshot(converged=False, terminal="capped", work=WorkVector.zero())
+            session._last = session._snapshot(converged=False, terminal="capped", work=session.budgets.summary(session.budget_scope))
             return self._evidence(session.last)
         try:
             c2v = session._c2v.copy()
@@ -298,15 +246,16 @@ class QbpVariableSerialSchedule:
                     session.priors[variable], c2v[list(incident)], session._labels[list(incident)]
                 )
                 for edge in incident:
-                    v2c[edge] = session.kernel.variable_message(
+                    proposal = session.kernel.variable_message(
                         beliefs[variable], c2v[edge], int(session._labels[edge])
                     )
+                    v2c[edge] = session.kernel.damp_variable_messages(v2c[edge], proposal)
             marginals = np.asarray([llrs_to_probabilities(row, profile=session.kernel.profile) for row in beliefs])
             candidate = session.kernel.candidate_from_beliefs(beliefs)
         except Exception:
             reservation.rollback()
             session._terminal = "numerical_failure"
-            session._last = session._snapshot(converged=False, terminal="numerical_failure", work=WorkVector.zero())
+            session._last = session._snapshot(converged=False, terminal="numerical_failure", work=session.budgets.summary(session.budget_scope))
             raise
         reservation.commit_once()
         session._iteration = next_iteration

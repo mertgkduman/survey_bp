@@ -12,7 +12,7 @@ from bp_registry.quaternary.algebra import anticommutes
 from bp_registry.quaternary.kernel import ScalarLlrBp4Kernel
 from bp_registry.quaternary.numerics import (
     QBP4_F64_V1,
-    QBP4_F64_V2,
+    QBP4_F64_V2, QBP4_F64_V3,
     QuaternaryNumericalFailure,
     check_message,
     commutation_llr,
@@ -45,7 +45,7 @@ def test_numerics_profile_persists_complete_binding_contract() -> None:
 
 
 def test_v2_default_keeps_large_beliefs_and_preserves_v1_evidence() -> None:
-    assert ScalarLlrBp4Kernel().profile is QBP4_F64_V2
+    assert ScalarLlrBp4Kernel().profile is QBP4_F64_V3
     assert QBP4_F64_V1.as_evidence()["profile_id"] == "quaternary-bp4-f64-v1"
     prior = np.asarray((1.0 - 3e-14, 1e-14, 1e-14, 1e-14))
     assert probabilities_to_llrs(prior, profile=QBP4_F64_V2).min() > 25.0
@@ -77,7 +77,8 @@ def test_four_state_normalization_and_persisted_zero_tie_rule() -> None:
     posterior = llrs_to_probabilities(np.asarray((0.0, 0.0, 0.0), dtype=np.float64))
     assert np.allclose(posterior, 0.25)
     assert pauli_hard_decision(np.asarray((0.0, 0.0, 0.0), dtype=np.float64), profile=QBP4_F64_V1).name == "X"
-    assert pauli_hard_decision(np.asarray((0.0, 0.0, 0.0), dtype=np.float64)).name == "Y"
+    assert pauli_hard_decision(np.asarray((0.0, 0.0, 0.0), dtype=np.float64), profile=QBP4_F64_V2).name == "Y"
+    assert pauli_hard_decision(np.zeros(3)).name == "I"
     assert pauli_hard_decision(np.asarray((0.3, 0.2, 0.1), dtype=np.float64)).name == "I"
     assert pauli_hard_decision(np.asarray((0.1, -0.4, -0.4), dtype=np.float64)).name == "Y"
 

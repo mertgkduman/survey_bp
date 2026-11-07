@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import math
+from bp_registry.check_numerics import stabilized_log_ratio, minsum_summary, tanh_factors
 
 import numpy as np
 from numba import njit
@@ -18,10 +19,20 @@ from bp_registry.resolution import BpFloodingPolicy, DEFAULT_BP4_MIN_SUM, round_
 from .algebra import Pauli
 from .kernel import _priors
 from .numerics import (
+    DEFAULT_QBP4_F64, QuaternaryNumericalProfileV3,
     QBP4_F64_V1, QBP4_F64_V2, QuaternaryNumericalProfile,
     QuaternaryNumericalProfileV2, probabilities_to_llrs,
 )
 from .problems import PauliCode
+
+
+@njit(cache=True)
+def _map_pauli(x, y, z):
+    best, state = 0.0, 0
+    for index, value in enumerate((x, y, z)):
+        if value < best:
+            best, state = value, index + 1
+    return state
 
 
 @njit(cache=True)
@@ -197,19 +208,15 @@ def _decode(
 
 @njit(cache=True)
 def _v2_check(comm: np.ndarray, start: int, stop: int, target: int,
-              syndrome_bit: int, cap: float, epsilon: float) -> float:
+              syndrome_bit: int, cap: float, epsilon: float, precomputed: bool = False) -> float:
     product = -1.0 if syndrome_bit else 1.0
     for other in range(start, stop):
         if other == target:
             continue
         value = comm[other]
-        factor = 1.0 if value > 40.0 else -1.0 if value < -40.0 else math.tanh(value / 2.0)
+        factor = value if precomputed else (1.0 if value > 40.0 else -1.0 if value < -40.0 else math.tanh(value / 2.0))
         product *= factor
-    if product >= 1.0:
-        product = 1.0 - epsilon
-    elif product <= -1.0:
-        product = -1.0 + epsilon
-    value = math.log1p(product) - math.log1p(-product)
+    value = stabilized_log_ratio(product, epsilon)
     if not math.isfinite(value):
         raise ValueError("nonfinite v2 check message")
     return _clip(value, cap)
@@ -221,7 +228,7 @@ def _v2_sweep_into(
     variables: np.ndarray, labels: np.ndarray, old_v2c: np.ndarray,
     prior_llrs: np.ndarray, syndrome: np.ndarray, cap: float, epsilon: float,
     damping: float, comm: np.ndarray, c2v: np.ndarray, beliefs: np.ndarray,
-    new_v2c: np.ndarray, candidate: np.ndarray,
+    new_v2c: np.ndarray, candidate: np.ndarray, corrected: bool = False,
 ) -> None:
     for edge in range(len(labels)):
         values, label = old_v2c[edge], labels[edge]
@@ -234,10 +241,11 @@ def _v2_sweep_into(
             comm[edge] = _logaddexp(0.0, -z) - _logaddexp(-x, -y)
         if not math.isfinite(comm[edge]):
             raise ValueError("nonfinite v2 BP4 edge projection")
+    factors = tanh_factors(comm)
     for check in range(len(row_ptr) - 1):
         start, stop = row_ptr[check], row_ptr[check + 1]
         for edge in range(start, stop):
-            c2v[edge] = _v2_check(comm, start, stop, edge, int(syndrome[check]), cap, epsilon)
+            c2v[edge] = _v2_check(factors, start, stop, edge, int(syndrome[check]), cap, epsilon, True)
     for variable in range(prior_llrs.shape[0]):
         for state in range(1, 4):
             value = prior_llrs[variable, state - 1]
@@ -249,7 +257,9 @@ def _v2_sweep_into(
                 raise ValueError("nonfinite v2 BP4 posterior")
             beliefs[variable, state - 1] = value
         x, y, z = beliefs[variable, 0], beliefs[variable, 1], beliefs[variable, 2]
-        if x > 0.0 and y > 0.0 and z > 0.0:
+        if corrected:
+            candidate[variable] = _map_pauli(x, y, z)
+        elif x > 0.0 and y > 0.0 and z > 0.0:
             candidate[variable] = 0
         elif x < y and x < z:
             candidate[variable] = 1
@@ -274,10 +284,13 @@ def _decode_v2(
     row_ptr: np.ndarray, variable_ptr: np.ndarray, variable_edges: np.ndarray,
     variables: np.ndarray, labels: np.ndarray, prior_llrs: np.ndarray,
     syndrome: np.ndarray, max_iterations: int, cap: float, epsilon: float,
-    damping: float, stop_on_convergence: bool,
+    damping: float, stop_on_convergence: bool, corrected: bool = False,
 ) -> tuple[np.ndarray, int, bool]:
     n, edge_count = prior_llrs.shape[0], len(labels)
     candidate = np.zeros(n, dtype=np.uint8)
+    if corrected:
+        for variable in range(n):
+            candidate[variable] = _map_pauli(prior_llrs[variable, 0], prior_llrs[variable, 1], prior_llrs[variable, 2])
     old = prior_llrs[variables].copy()
     new = np.empty_like(old)
     comm = np.empty(edge_count, dtype=np.float64)
@@ -286,7 +299,7 @@ def _decode_v2(
     for iteration in range(1, max_iterations + 1):
         _v2_sweep_into(row_ptr, variable_ptr, variable_edges, variables, labels, old,
                        prior_llrs, syndrome, cap, epsilon, damping, comm, c2v,
-                       beliefs, new, candidate)
+                       beliefs, new, candidate, corrected)
         if stop_on_convergence and _candidate_matches(row_ptr, variables, labels, candidate, syndrome):
             return candidate, iteration, True
         old, new = new, old
@@ -298,7 +311,7 @@ def _policy_sweep_into(
     row_ptr, variable_ptr, variable_edges, variables, labels, old_v2c,
     prior_llrs, syndrome, format_code, scale, scope, check_rule,
     old_weight, fresh_weight, alpha, beta, hard_decision,
-    comm, c2v, beliefs, new_v2c, candidate,
+    comm, c2v, beliefs, new_v2c, candidate, clamp_band=True, epsilon=1e-10,
 ):
     """Corrected MS: exact four-state projection before scalar rounding."""
     edge_count = len(labels)
@@ -314,16 +327,15 @@ def _policy_sweep_into(
         comm[edge] = round_message(projected, format_code, scale)
     fixed_bound = ((2 ** ((8 if format_code == 3 else 16 if format_code == 4 else 32) - 1) - 1) / scale
                    if format_code >= 3 else math.inf)
+    check_values = comm if check_rule == 1 else tanh_factors(comm)
     for check in range(len(row_ptr) - 1):
         start, stop = row_ptr[check], row_ptr[check + 1]
+        if check_rule == 1:
+            first, second, minimum_edge, negative_count = minsum_summary(comm, start, stop)
         for edge in range(start, stop):
             if check_rule == 1:
-                magnitude = fixed_bound
-                negatives = int(syndrome[check])
-                for other in range(start, stop):
-                    if other != edge:
-                        magnitude = min(magnitude, abs(comm[other]))
-                        negatives += int(comm[other] < 0.0)
+                magnitude = min(fixed_bound, second if edge == minimum_edge else first)
+                negatives = int(syndrome[check]) + negative_count - int(comm[edge] < 0.0)
                 if stop - start == 1 and format_code < 3:
                     magnitude = 23.7189981105
                 message = alpha * max(0.0, magnitude - beta)
@@ -333,10 +345,8 @@ def _policy_sweep_into(
                 product = -1.0 if syndrome[check] else 1.0
                 for other in range(start, stop):
                     if other != edge:
-                        value = comm[other]
-                        product *= 1.0 if value > 40.0 else -1.0 if value < -40.0 else math.tanh(value / 2.0)
-                product = min(1.0 - 1e-10, max(-1.0 + 1e-10, product))
-                message = math.log1p(product) - math.log1p(-product)
+                        product *= check_values[other]
+                message = stabilized_log_ratio(product, epsilon, clamp_band)
             c2v[edge] = round_message(message, format_code, scale)
     for variable in range(prior_llrs.shape[0]):
         for state in range(1, 4):
@@ -347,7 +357,9 @@ def _policy_sweep_into(
                     value += c2v[edge]
             beliefs[variable, state - 1] = round_message(value, format_code, scale) if scope == 2 else value
         x, y, z = beliefs[variable, 0], beliefs[variable, 1], beliefs[variable, 2]
-        if x > 0.0 and y > 0.0 and z > 0.0:
+        if hard_decision == 2:
+            candidate[variable] = _map_pauli(x, y, z)
+        elif x > 0.0 and y > 0.0 and z > 0.0:
             candidate[variable] = 0
         elif hard_decision == 0:
             if x <= y and x <= z:
@@ -378,9 +390,24 @@ def _policy_sweep_into(
 def _decode_policy(row_ptr, variable_ptr, variable_edges, variables, labels,
                    prior_llrs, syndrome, max_iterations, format_code, scale, scope,
                    check_rule, old_weight, fresh_weight, alpha, beta,
-                   hard_decision, zero_shortcut, stop_on_convergence):
+                   hard_decision, zero_shortcut, stop_on_convergence, clamp_band=True, epsilon=1e-10, corrected=False):
     n, edge_count = prior_llrs.shape[0], len(labels)
     candidate = np.zeros(n, dtype=np.uint8)
+    if corrected:
+        for variable in range(n):
+            values = prior_llrs[variable].copy()
+            if scope == 2:
+                for state in range(3):
+                    values[state] = round_message(values[state], format_code, scale)
+            x, y, z = values[0], values[1], values[2]
+            if hard_decision == 2:
+                candidate[variable] = _map_pauli(x, y, z)
+            elif x > 0 and y > 0 and z > 0:
+                candidate[variable] = 0
+            elif hard_decision == 0:
+                candidate[variable] = 1 if x <= y and x <= z else 2 if y <= z else 3
+            else:
+                candidate[variable] = 1 if x < y and x < z else 3 if z < x and z < y else 2
     if zero_shortcut and stop_on_convergence and _candidate_matches(row_ptr, variables, labels, candidate, syndrome):
         return candidate, 0, True
     old = np.empty((edge_count, 3), dtype=np.float64)
@@ -396,7 +423,7 @@ def _decode_policy(row_ptr, variable_ptr, variable_edges, variables, labels,
         _policy_sweep_into(row_ptr, variable_ptr, variable_edges, variables, labels,
                            old, prior_llrs, syndrome, format_code, scale, scope,
                            check_rule, old_weight, fresh_weight, alpha, beta,
-                           hard_decision, comm, c2v, beliefs, new, candidate)
+                           hard_decision, comm, c2v, beliefs, new, candidate, clamp_band, epsilon)
         if stop_on_convergence and _candidate_matches(row_ptr, variables, labels, candidate, syndrome):
             return candidate, iteration, True
         old, new = new, old
@@ -564,7 +591,7 @@ class CompiledBp4Graph:
     variables: np.ndarray
     labels: np.ndarray
     prior_llrs: np.ndarray
-    profile: QuaternaryNumericalProfile = QBP4_F64_V2
+    profile: QuaternaryNumericalProfile = DEFAULT_QBP4_F64
     policy: BpFloodingPolicy | None = None
 
     @property
@@ -621,7 +648,7 @@ class CompiledBp4Graph:
 
     @classmethod
     def from_code(cls, code: PauliCode, priors: object, *,
-                  profile: QuaternaryNumericalProfile = QBP4_F64_V2,
+                  profile: QuaternaryNumericalProfile = DEFAULT_QBP4_F64,
                   rule: str | None = None,
                   policy: BpFloodingPolicy | None = None) -> "CompiledBp4Graph":
         if not isinstance(code, PauliCode):
@@ -701,8 +728,8 @@ class CompiledBp4Graph:
                                {"scalar_edges": 0, "all_messages": 1, "all_state": 2}[resolution.scope],
                                1 if policy.check_rule == "min_sum" else 0,
                                old_weight, fresh_weight, alpha, beta,
-                               0 if policy.hard_decision == "min_llr" else 1,
-                               comm, c2v, beliefs, v2c, candidate)
+                               policy.decision_code,
+                               comm, c2v, beliefs, v2c, candidate, *policy.stabilization_args)
             _normalize_marginals(beliefs, marginals)
         elif isinstance(self.profile, QuaternaryNumericalProfileV2):
             comm = np.empty(len(self.labels), dtype=np.float64)
@@ -714,7 +741,7 @@ class CompiledBp4Graph:
             _v2_sweep_into(self.row_ptr, self.variable_ptr, self.variable_edges, self.variables,
                            self.labels, old, self.prior_llrs, s, math.inf if self.profile.check_cap is None else self.profile.check_cap,
                            self.profile.product_epsilon, self.profile.v2c_damping,
-                           comm, c2v, beliefs, v2c, candidate)
+                           comm, c2v, beliefs, v2c, candidate, isinstance(self.profile, QuaternaryNumericalProfileV3))
             _normalize_marginals(beliefs, marginals)
         else:
             c2v, v2c, beliefs, marginals, candidate, _ = _sweep(
@@ -725,6 +752,11 @@ class CompiledBp4Graph:
         for array in (c2v, v2c, beliefs, marginals, candidate):
             array.setflags(write=False)
         return CompiledBp4Sweep(c2v, v2c, beliefs, marginals, candidate, bool(converged))
+
+    def run_batch(self, syndromes, *, max_iterations: int, workers: int = 1, stop_on_convergence: bool = True):
+        """Decode independent observations using the same qualified flooding loop."""
+        from bp_registry.cpu_batch import pauli_batch
+        return pauli_batch(self, syndromes, max_iterations=max_iterations, workers=workers, stop_on_convergence=stop_on_convergence)
 
     def run(self, syndrome: np.ndarray, *, max_iterations: int, stop_on_convergence: bool = True) -> CompiledBp4Result:
         s = self._syndrome(syndrome)
@@ -740,14 +772,14 @@ class CompiledBp4Graph:
                 {"scalar_edges": 0, "all_messages": 1, "all_state": 2}[resolution.scope],
                 1 if policy.check_rule == "min_sum" else 0,
                 *policy.coefficients,
-                0 if policy.hard_decision == "min_llr" else 1,
-                policy.zero_syndrome_shortcut, stop_on_convergence,
+                policy.decision_code,
+                policy.zero_syndrome_shortcut, stop_on_convergence, *policy.stabilization_args, policy.version == "bp-flooding-policy-v2",
             )
         elif isinstance(self.profile, QuaternaryNumericalProfileV2):
             candidate, iterations, converged = _decode_v2(
                 self.row_ptr, self.variable_ptr, self.variable_edges, self.variables, self.labels,
                 self.prior_llrs, s, max_iterations, math.inf if self.profile.check_cap is None else self.profile.check_cap,
-                self.profile.product_epsilon, self.profile.v2c_damping, stop_on_convergence,
+                self.profile.product_epsilon, self.profile.v2c_damping, stop_on_convergence, isinstance(self.profile, QuaternaryNumericalProfileV3),
             )
         else:
             candidate, iterations, converged = _decode(
@@ -761,6 +793,10 @@ class CompiledBp4Graph:
                   epsilon: float = 1e-10, round_limit: int | None = None) -> CompiledQbpgdResult:
         """Run four-state Q-BPGD with frozen v2 BP4 numerics; development evidence only."""
         s = self._syndrome(syndrome)
+        if self.policy is not None and self.policy.version != "bp-flooding-policy-v1":
+            raise ValueError("compiled Q-BPGD policy v2 is not qualified")
+        if isinstance(self.profile, QuaternaryNumericalProfileV3):
+            raise ValueError("compiled Q-BPGD requires an explicit historical v2 profile")
         if not isinstance(self.profile, QuaternaryNumericalProfileV2):
             raise ValueError("compiled Q-BPGD requires the v2 BP4 execution family")
         if type(iterations_per_round) is not int or iterations_per_round < 1:
@@ -787,7 +823,7 @@ class CompiledBp4Graph:
                 resolution.format_code, resolution.fixed_scale,
                 {"scalar_edges": 0, "all_messages": 1, "all_state": 2}[resolution.scope],
                 1 if policy.check_rule == "min_sum" else 0, *policy.coefficients,
-                0 if policy.hard_decision == "min_llr" else 1, policy.zero_syndrome_shortcut,
+                policy.decision_code, policy.zero_syndrome_shortcut,
             )
         candidate.setflags(write=False)
         return CompiledQbpgdResult(candidate, int(sweeps), int(rounds), int(fixations), bool(converged))

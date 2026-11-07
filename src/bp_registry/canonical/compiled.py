@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import math
+from bp_registry.check_numerics import stabilized_log_ratio, minsum_summary, tanh_factors
 
 import numpy as np
 from numba import njit
@@ -17,7 +18,7 @@ from bp_registry.resolution import BpFloodingPolicy, round_message
 
 from .kernel import KernelResult
 from .numerics import (
-    BinaryNumericalProfileV2, MIN_SUM_CPU_F64,
+    BinaryNumericalProfileV2, BinaryNumericalProfileV3, MIN_SUM_CPU_F64,
     DEFAULT_BINARY_SPA_F64, NumericalProfile, REFERENCE_CPU_F64, prior_llr,
 )
 from .schedules import EdgeTable, FloodingSweep, FloodingWork
@@ -140,7 +141,7 @@ def _decode(
 
 @njit(cache=True)
 def _v2_check(old: np.ndarray, start: int, stop: int, target: int,
-              syndrome_bit: int, cap: float, epsilon: float) -> float:
+              syndrome_bit: int, cap: float, epsilon: float, precomputed: bool = False) -> float:
     product = -1.0 if syndrome_bit else 1.0
     for other in range(start, stop):
         if other == target:
@@ -148,12 +149,8 @@ def _v2_check(old: np.ndarray, start: int, stop: int, target: int,
         value = old[other]
         if not math.isfinite(value):
             raise ValueError("nonfinite binary SPA v2 V2C input")
-        product *= (1.0 if value > 40.0 else -1.0 if value < -40.0 else math.tanh(value / 2.0))
-    if product >= 1.0:
-        product = 1.0 - epsilon
-    elif product <= -1.0:
-        product = -1.0 + epsilon
-    result = math.log1p(product) - math.log1p(-product)
+        product *= value if precomputed else (1.0 if value > 40.0 else -1.0 if value < -40.0 else math.tanh(value / 2.0))
+    result = stabilized_log_ratio(product, epsilon)
     if not math.isfinite(result):
         raise ValueError("nonfinite binary SPA v2 check")
     return _clip(result, cap)
@@ -165,10 +162,11 @@ def _v2_sweep_into(row_ptr: np.ndarray, variables: np.ndarray, n: int,
                    cap: float, epsilon: float, damping: float,
                    c2v: np.ndarray, beliefs: np.ndarray, candidate: np.ndarray,
                    new: np.ndarray) -> None:
+    factors = tanh_factors(old)
     for check in range(len(row_ptr) - 1):
         start, stop = row_ptr[check], row_ptr[check + 1]
         for edge in range(start, stop):
-            c2v[edge] = _v2_check(old, start, stop, edge, int(syndrome[check]), cap, epsilon)
+            c2v[edge] = _v2_check(factors, start, stop, edge, int(syndrome[check]), cap, epsilon, True)
     beliefs[:] = prior
     for edge in range(len(variables)):
         beliefs[variables[edge]] += c2v[edge]
@@ -187,8 +185,8 @@ def _v2_sweep_into(row_ptr: np.ndarray, variables: np.ndarray, n: int,
 @njit(cache=True)
 def _decode_v2(row_ptr: np.ndarray, variables: np.ndarray, n: int,
                syndrome: np.ndarray, prior: float, max_iterations: int,
-               cap: float, epsilon: float, damping: float) -> tuple[np.ndarray, bool, int]:
-    candidate = np.zeros(n, dtype=np.uint8)
+               cap: float, epsilon: float, damping: float, corrected: bool = False) -> tuple[np.ndarray, bool, int]:
+    candidate = np.full(n, int(prior < 0.0) if corrected else 0, dtype=np.uint8)
     if len(variables) == 0:
         return candidate, _candidate_matches(row_ptr, variables, candidate, syndrome), 0
     old = np.full(len(variables), prior, dtype=np.float64)
@@ -201,7 +199,7 @@ def _decode_v2(row_ptr: np.ndarray, variables: np.ndarray, n: int,
         if _candidate_matches(row_ptr, variables, candidate, syndrome):
             return candidate, True, iteration
         old, new = new, old
-    return candidate, False, max_iterations
+    return candidate, _candidate_matches(row_ptr, variables, candidate, syndrome) if corrected else False, max_iterations
 
 
 @njit(cache=True)
@@ -299,20 +297,19 @@ class CompiledBinaryBpgdResult:
 def _policy_sweep_into(row_ptr, variables, n, old, syndrome, prior,
                        format_code, scale, all_state, check_rule,
                        old_weight, fresh_weight, alpha, beta,
-                       c2v, beliefs, candidate, new):
+                       c2v, beliefs, candidate, new, clamp_band=True, epsilon=1e-10):
     edge_count = len(variables)
     fixed_bound = ((2 ** ((8 if format_code == 3 else 16 if format_code == 4 else 32) - 1) - 1) / scale
                    if format_code >= 3 else math.inf)
+    check_values = old if check_rule == 1 else tanh_factors(old)
     for check in range(len(row_ptr) - 1):
         start, stop = row_ptr[check], row_ptr[check + 1]
+        if check_rule == 1:
+            first, second, minimum_edge, negative_count = minsum_summary(old, start, stop)
         for edge in range(start, stop):
             if check_rule == 1:
-                magnitude = fixed_bound
-                negatives = int(syndrome[check])
-                for other in range(start, stop):
-                    if other != edge:
-                        magnitude = min(magnitude, abs(old[other]))
-                        negatives += int(old[other] < 0.0)
+                magnitude = min(fixed_bound, second if edge == minimum_edge else first)
+                negatives = int(syndrome[check]) + negative_count - int(old[edge] < 0.0)
                 if stop - start == 1 and format_code < 3:
                     magnitude = 23.7189981105
                 message = alpha * max(0.0, magnitude - beta)
@@ -322,10 +319,8 @@ def _policy_sweep_into(row_ptr, variables, n, old, syndrome, prior,
                 product = -1.0 if syndrome[check] else 1.0
                 for other in range(start, stop):
                     if other != edge:
-                        value = old[other]
-                        product *= 1.0 if value > 40.0 else -1.0 if value < -40.0 else math.tanh(value / 2.0)
-                product = min(1.0 - 1e-10, max(-1.0 + 1e-10, product))
-                message = math.log1p(product) - math.log1p(-product)
+                        product *= check_values[other]
+                message = stabilized_log_ratio(product, epsilon, clamp_band)
             c2v[edge] = round_message(message, format_code, scale)
     beliefs[:] = prior
     for edge in range(edge_count):
@@ -342,8 +337,9 @@ def _policy_sweep_into(row_ptr, variables, n, old, syndrome, prior,
 @njit(cache=True)
 def _decode_policy(row_ptr, variables, n, syndrome, prior, max_iterations,
                    format_code, scale, all_state, check_rule,
-                   old_weight, fresh_weight, alpha, beta, zero_shortcut):
-    candidate = np.zeros(n, dtype=np.uint8)
+                   old_weight, fresh_weight, alpha, beta, zero_shortcut, clamp_band=True, epsilon=1e-10, corrected=False):
+    initial = round_message(prior, format_code, scale) if all_state else prior
+    candidate = np.full(n, int(initial < 0.0) if corrected else 0, dtype=np.uint8)
     if zero_shortcut and _candidate_matches(row_ptr, variables, candidate, syndrome):
         return candidate, True, 0
     old = np.full(len(variables), round_message(prior, format_code, scale), dtype=np.float64)
@@ -354,7 +350,7 @@ def _decode_policy(row_ptr, variables, n, syndrome, prior, max_iterations,
         _policy_sweep_into(row_ptr, variables, n, old, syndrome, prior,
                            format_code, scale, all_state, check_rule,
                            old_weight, fresh_weight, alpha, beta,
-                           c2v, beliefs, candidate, new)
+                           c2v, beliefs, candidate, new, clamp_band, epsilon)
         if _candidate_matches(row_ptr, variables, candidate, syndrome):
             return candidate, True, iteration
         old, new = new, old
@@ -421,14 +417,14 @@ class CompiledBinaryFlooding:
         s = self._syndrome(syndrome)
         if not math.isfinite(error_rate) or not 0.0 < error_rate < 1.0:
             raise ValueError("error_rate must be finite and between zero and one")
-        return s, (math.log((1.0 - error_rate) / error_rate) if self.policy is not None
+        return s, ((math.log1p(-error_rate) - math.log(error_rate) if self.policy.version == "bp-flooding-policy-v2" else math.log((1.0 - error_rate) / error_rate)) if self.policy is not None
                    else prior_llr(error_rate, profile=self.profile))
 
     def bind_error_rate(self, error_rate: float) -> "BoundBinaryFlooding":
         """Resolve a fixed prior once for a same-parameter shot batch."""
         if not math.isfinite(error_rate) or not 0.0 < error_rate < 1.0:
             raise ValueError("error_rate must be finite and between zero and one")
-        prior = (math.log((1.0 - error_rate) / error_rate) if self.policy is not None
+        prior = ((math.log1p(-error_rate) - math.log(error_rate) if self.policy.version == "bp-flooding-policy-v2" else math.log((1.0 - error_rate) / error_rate)) if self.policy is not None
                  else prior_llr(error_rate, profile=self.profile))
         return BoundBinaryFlooding(self, prior)
 
@@ -450,7 +446,7 @@ class CompiledBinaryFlooding:
             _policy_sweep_into(self.row_ptr, self.variables, self.table.variable_count,
                                old, s, prior, resolution.format_code, resolution.fixed_scale,
                                resolution.scope == "all_state", 1 if self.rule == "min_sum" else 0,
-                               old_weight, fresh_weight, alpha, beta, c2v, beliefs, candidate, new)
+                               old_weight, fresh_weight, alpha, beta, c2v, beliefs, candidate, new, *policy.stabilization_args)
             arrays = (old.copy(), c2v, beliefs, candidate, new)
         elif isinstance(self.profile, BinaryNumericalProfileV2):
             c2v = np.empty(self.table.edge_count, dtype=np.float64)
@@ -473,6 +469,11 @@ class CompiledBinaryFlooding:
                                        self.table.variable_count, self.table.variable_count),
         )
 
+    def run_batch(self, syndromes, *, error_rate: float, max_iterations: int, workers: int = 1):
+        """Decode independent observations on a bounded number of CPU threads."""
+        from bp_registry.cpu_batch import binary_batch
+        return binary_batch(self, syndromes, error_rate=error_rate, max_iterations=max_iterations, workers=workers)
+
     def run(self, syndrome: np.ndarray, *, error_rate: float, max_iterations: int) -> KernelResult:
         s, prior = self._inputs(syndrome, error_rate)
         if type(max_iterations) is not int or max_iterations < 0:
@@ -484,13 +485,13 @@ class CompiledBinaryFlooding:
                 self.row_ptr, self.variables, self.table.variable_count, s, prior,
                 max_iterations, resolution.format_code, resolution.fixed_scale,
                 resolution.scope == "all_state", 1 if self.rule == "min_sum" else 0,
-                *policy.coefficients, policy.zero_syndrome_shortcut,
+                *policy.coefficients, policy.zero_syndrome_shortcut, *policy.stabilization_args, policy.version == "bp-flooding-policy-v2",
             )
         elif isinstance(self.profile, BinaryNumericalProfileV2):
             candidate, converged, iterations = _decode_v2(
                 self.row_ptr, self.variables, self.table.variable_count, s, prior,
                 max_iterations, math.inf if self.profile.check_cap is None else self.profile.check_cap, self.profile.product_epsilon,
-                self.profile.v2c_damping,
+                self.profile.v2c_damping, isinstance(self.profile, BinaryNumericalProfileV3),
             )
         else:
             candidate, converged, iterations = _decode(
@@ -562,13 +563,13 @@ class BoundBinaryFlooding:
                 s, self.prior, max_iterations, resolution.format_code,
                 resolution.fixed_scale, resolution.scope == "all_state",
                 1 if self.graph.rule == "min_sum" else 0,
-                *policy.coefficients, policy.zero_syndrome_shortcut,
+                *policy.coefficients, policy.zero_syndrome_shortcut, *policy.stabilization_args, policy.version == "bp-flooding-policy-v2",
             )
         elif isinstance(self.graph.profile, BinaryNumericalProfileV2):
             candidate, converged, iterations = _decode_v2(
                 self.graph.row_ptr, self.graph.variables, self.graph.table.variable_count,
                 s, self.prior, max_iterations, math.inf if self.graph.profile.check_cap is None else self.graph.profile.check_cap,
-                self.graph.profile.product_epsilon, self.graph.profile.v2c_damping,
+                self.graph.profile.product_epsilon, self.graph.profile.v2c_damping, isinstance(self.graph.profile, BinaryNumericalProfileV3),
             )
         else:
             candidate, converged, iterations = _decode(

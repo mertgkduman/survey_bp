@@ -263,7 +263,7 @@ class Mbp4Session:
         except Exception:
             reservation.rollback()
             self._terminal = "numerical_failure"
-            self._last = self._snapshot(converged=False, terminal="numerical_failure", work=WorkVector.zero())
+            self._last = self._snapshot(converged=False, terminal="numerical_failure", work=self.budgets.summary(self.budget_scope))
             raise
         reservation.commit_once()
         self._iteration += 1

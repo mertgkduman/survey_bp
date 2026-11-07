@@ -28,7 +28,7 @@ def test_spa_v2_is_default_and_frozen_v1_remains_selectable() -> None:
     h = np.asarray([[1, 1, 0], [0, 1, 1]], dtype=np.uint8)
     syndrome = np.asarray([1, 0], dtype=np.uint8)
     assert BinarySpaKernel(profile=BINARY_SPA_F64_V2).profile is BINARY_SPA_F64_V2
-    assert BinarySpaKernel().profile is BINARY_SPA_F64_V2
+    assert BinarySpaKernel().profile.profile_id == "binary-spa-flooding-f64-v3"
     for profile in (BINARY_SPA_F64_V2, REFERENCE_CPU_F64):
         graph = CompiledBinaryFlooding.from_check_matrix(h, profile=profile)
         expected = BinarySpaKernel(profile=profile).run(h, syndrome, error_rate=.08, max_iterations=12)

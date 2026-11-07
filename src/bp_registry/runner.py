@@ -10,6 +10,7 @@ from importlib.metadata import version
 import json
 import os
 from pathlib import Path
+from tempfile import TemporaryDirectory
 import time
 from typing import Any, Callable, Literal, Mapping
 
@@ -18,7 +19,7 @@ from .canonical.metrics import unavailable_metric
 from .canonical.budgets import WorkVector
 from .canonical.execution import run_canonical_structural_shot
 from .canonical.verification import PublicShotContext
-from .canonical.numerics import BINARY_SPA_F64_V2, MIN_SUM_CPU_F64, REFERENCE_CPU_F64
+from .canonical.numerics import BINARY_SPA_F64_V3, BINARY_SPA_F64_V2, MIN_SUM_CPU_F64, REFERENCE_CPU_F64
 from .canonical.schedules import EdgeTable
 from .canonical.contracts import validate_composition
 from .manifests import (
@@ -796,7 +797,7 @@ def preflight_canonical(manifest_path: str | Path) -> dict[str, Any]:
         "code_id": manifest.artifact.code_id,
         "manifest_sha256": manifest_digest(manifest),
         "numerical_profile": manifest.numerical_profile,
-        "resolved_numerical_profile": (MIN_SUM_CPU_F64 if manifest.numerical_profile == "cpu-float64-min-sum-v1" else BINARY_SPA_F64_V2 if manifest.numerical_profile == "cpu-float64-spa-v2" else REFERENCE_CPU_F64).as_evidence(),
+        "resolved_numerical_profile": (MIN_SUM_CPU_F64 if manifest.numerical_profile == "cpu-float64-min-sum-v1" else BINARY_SPA_F64_V3 if manifest.numerical_profile == "cpu-float64-spa-v3" else BINARY_SPA_F64_V2 if manifest.numerical_profile == "cpu-float64-spa-v2" else REFERENCE_CPU_F64).as_evidence(),
         "policies": manifest.policies.model_dump(mode="json", exclude_none=True),
         "policy_identity": composition.semantic_identity,
         "policy_effects": _canonical_policy_effects(manifest, resolved.code),
@@ -905,7 +906,7 @@ def preflight_quaternary(manifest_path: str | Path) -> dict[str, Any]:
     return report
 
 
-def run_quaternary(manifest_path: str | Path, output: str | Path, *, shot_id: int | None = None) -> dict[str, Any]:
+def run_quaternary(manifest_path: str | Path, output: str | Path, *, shot_id: int | None = None, _legacy_accounting: bool = False) -> dict[str, Any]:
     """Run the single bounded joint-Pauli tracer through the public path."""
     report = preflight_quaternary(manifest_path)
     manifest = preflight(manifest_path).manifest
@@ -932,7 +933,7 @@ def run_quaternary(manifest_path: str | Path, output: str | Path, *, shot_id: in
     elif mbp4:
         result = run_quaternary_mbp4(manifest, output_path, resolved_composition=report["composition"], shot_id=0)
     elif scalar_public:
-        result = run_quaternary_scalar(manifest, output_path, resolved_composition=report["composition"], shot_id=0)
+        result = run_quaternary_scalar(manifest, output_path, resolved_composition=report["composition"], shot_id=0, legacy_accounting=_legacy_accounting)
     else:
         result = run_quaternary_tracer(manifest, output_path, shot_id=0)
     ledger_path = output_path / "events.jsonl"
@@ -951,6 +952,8 @@ def run_quaternary(manifest_path: str | Path, output: str | Path, *, shot_id: in
             "source_author_code_identity": result["source_author_code_identity"],
             "work": result["work"], "adaptation_reasons": report["composition"]["adaptation_reasons"],
         })
+    if scalar_public and not _legacy_accounting:
+        public.update({key: result[key] for key in ("work_accounting_version", "committed_sweeps")})
     (output_path / "result.json").write_text(json.dumps(public, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return public
 
@@ -967,16 +970,21 @@ def verify_quaternary_run(output: str | Path) -> dict[str, Any]:
         raise ValueError("quaternary result identity differs from immutable evidence")
     manifest = preflight(manifest_path).manifest
     if isinstance(manifest, QuaternaryExperimentV2):
-        scratch = output_path / ".public-v2-replay"
-        run_quaternary(manifest_path, scratch, shot_id=0)
-        expected = (scratch / "events.jsonl").read_bytes()
+        version = result.get("work_accounting_version")
+        if version not in (None, "cumulative-v2"):
+            raise ValueError("unknown work accounting version")
+        with TemporaryDirectory(prefix="qbp-replay-", dir=output_path) as temporary:
+            scratch = Path(temporary)
+            replay_result = run_quaternary(manifest_path, scratch, shot_id=0, _legacy_accounting=version is None)
+            if version == "cumulative-v2" and any(result.get(key) != replay_result.get(key)
+                    for key in ("work", "committed_sweeps")):
+                raise ValueError("cumulative result work differs from committed replay")
+            expected = (scratch / "events.jsonl").read_bytes()
         actual = (output_path / "events.jsonl").read_bytes()
-        for child in scratch.iterdir():
-            child.unlink()
-        scratch.rmdir()
         if actual != expected:
             raise ValueError("quaternary public ledger differs from deterministic replay")
-        replay = {"run_id": manifest.run_id, "shot_id": 0, "verified": True}
+        replay = {"run_id": manifest.run_id, "shot_id": 0, "verified": True,
+                  "work_accounting_verified": version == "cumulative-v2"}
     else:
         replay = verify_quaternary_tracer(manifest, output_path, shot_id=0)
     return {**report, "output": str(output_path), "final_row_count": 1, **replay}
@@ -1018,7 +1026,7 @@ def _canonical_kernel_manifest(manifest: CanonicalExperimentV2 | CanonicalExperi
             compact["memory"] = manifest.memory.model_dump(mode="json")
         return compact
     compact: dict[str, object] = {
-        "schema_version": 3 if isinstance(manifest, CanonicalExperimentV4) or manifest.schema_version == 9 else manifest.schema_version,
+        "schema_version": 3 if isinstance(manifest, CanonicalExperimentV4) or manifest.schema_version in (9, 10) else manifest.schema_version,
         "run_id": manifest.run_id,
         "numerical_profile": manifest.numerical_profile,
         "max_iterations": manifest.budgets.attempt.max_iterations,

@@ -1,7 +1,7 @@
 # Canonical numerical profiles
 
-New **plain flooding sum-product** decoders use float64 v2 by default in both
-canonical families. The side-by-side [HTML](decoder-numerics-v1-v2.html) and
+New **plain flooding sum-product** decoders use float64 v3 by default in both
+canonical families. See the [stabilization and CPU guide](kernel-stabilization-and-cpu.md) for corrected decisions, priors, work accounting, and migration. The equations below document frozen v2; v3 retains its message equations but uses stable binary log odds and an I-first maximizing-set BP4 decision. The side-by-side [HTML](decoder-numerics-v1-v2.html) and
 [PDF](decoder-numerics-v1-v2.pdf) show the update rules; both are built from
 [`scripts/build_decoder_profile_comparison.py`](../scripts/build_decoder_profile_comparison.py).
 Regenerate them with
@@ -10,14 +10,14 @@ repository root.
 
 | Family | New direct constructor | New public manifest | Resolved profile |
 | --- | --- | --- | --- |
-| Binary SPA | `BinarySpaKernel()` or `CompiledBinaryFlooding.from_check_matrix(...)` | schema `9`, `cpu-float64-spa-v2` by default | `binary-spa-flooding-f64-v2` |
-| Four-state BP4 | `ScalarLlrBp4Kernel()` or `CompiledBp4Graph.from_code(...)` | `quaternary_experiment_v3`, `quaternary-bp4-f64-v2` by default | `quaternary-bp4-f64-v2` |
+| Binary SPA | `BinarySpaKernel()` or `CompiledBinaryFlooding.from_check_matrix(...)` | schema `10`, `cpu-float64-spa-v3` by default | `binary-spa-flooding-f64-v3` |
+| Four-state BP4 | `ScalarLlrBp4Kernel()` or `CompiledBp4Graph.from_code(...)` | `quaternary_experiment_v4`, `quaternary-bp4-f64-v3` by default | `quaternary-bp4-f64-v3` |
 
 Runnable development manifests are
-[`examples/canonical-v2-default.json`](../examples/canonical-v2-default.json)
-and [`examples/quaternary-v2-default.json`](../examples/quaternary-v2-default.json).
+[`examples/canonical-v3-default.json`](../examples/canonical-v3-default.json)
+and [`examples/quaternary-v3-default.json`](../examples/quaternary-v3-default.json).
 Both omit the profile selector deliberately: their new schema versions supply
-the v2 default and preflight records the resolved value. Use the checked v1
+the v3 default and preflight records the resolved value. Use the checked v1
 manifests for a frozen replay, or explicitly pass `REFERENCE_CPU_F64` and
 `QBP4_F64_V1` to direct constructors for an ablation.
 

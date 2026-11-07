@@ -466,7 +466,7 @@ class CanonicalManifestV3(_Strict):
 
     schema_version: Literal[3]
     run_id: str = Field(min_length=1)
-    numerical_profile: Literal["cpu-float64-min-sum-v1", "cpu-float64-spa-v1", "cpu-float64-spa-v2"]
+    numerical_profile: Literal["cpu-float64-min-sum-v1", "cpu-float64-spa-v1", "cpu-float64-spa-v2", "cpu-float64-spa-v3"]
     max_iterations: int = Field(ge=1, le=100_000)
     error_rate: float = Field(ge=0.0, le=1.0)
     policies: CanonicalCompositionSpecV3

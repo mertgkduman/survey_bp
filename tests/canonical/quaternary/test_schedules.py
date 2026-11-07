@@ -76,6 +76,9 @@ def test_variable_serial_makes_earlier_commits_visible_to_later_variables() -> N
 
 
 def test_source_five_qubit_iiiyi_fixture_retains_schedule_sensitive_trace() -> None:
+    from dataclasses import replace
+    from bp_registry.quaternary.numerics import QBP4_F64_V2
+
     checks = (
         (Pauli.X, Pauli.Z, Pauli.Z, Pauli.X, Pauli.I),
         (Pauli.I, Pauli.X, Pauli.Z, Pauli.Z, Pauli.X),
@@ -84,8 +87,10 @@ def test_source_five_qubit_iiiyi_fixture_retains_schedule_sensitive_trace() -> N
     )
     problem = _problem(checks, (Pauli.I, Pauli.I, Pauli.I, Pauli.Y, Pauli.I), lineage="original-qbp-iiiyi")
     priors = np.tile(np.asarray((0.90, 1.0 / 30.0, 1.0 / 30.0, 1.0 / 30.0)), (5, 1))
-    flooding = QbpFloodingSchedule(ScalarLlrBp4Kernel().new_session(problem, priors))
-    serial = QbpVariableSerialSchedule(ScalarLlrBp4Kernel().new_session(problem, priors))
+    flooding = QbpFloodingSchedule(ScalarLlrBp4Kernel(profile=QBP4_F64_V2).new_session(problem, priors))
+    # This historical source fixture used undamped serial updates. Declare it
+    # explicitly now that serial executes the profile damping rather than ignoring it.
+    serial = QbpVariableSerialSchedule(ScalarLlrBp4Kernel(profile=replace(QBP4_F64_V2, v2c_damping=0.)).new_session(problem, priors))
     flood_trace = flooding.sweep()
     serial_trace = serial.sweep()
     assert flood_trace.result.c2v.shape == serial_trace.result.c2v.shape == (16,)

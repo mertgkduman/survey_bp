@@ -57,7 +57,7 @@ def test_bp4_min_sum_default_projects_before_q8_rounding() -> None:
     priors = np.tile((.999997, .000001, .000001, .000001), (2, 1))
     graph = CompiledBp4Graph.from_code(code, priors, rule="min_sum")
     assert graph.policy is DEFAULT_BP4_MIN_SUM
-    assert graph.profile is QBP4_F64_V2
+    assert graph.profile.profile_id == "quaternary-bp4-f64-v3"
     old = graph.initial_v2c()
     old[1] = np.asarray([-20.0, -19.0, 20.0])
     sweep = graph.sweep(old, np.asarray([0], dtype=np.uint8))

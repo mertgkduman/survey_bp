@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from hashlib import sha256
+from collections.abc import Callable
 import json
 import numbers
 
@@ -12,7 +13,7 @@ import numpy as np
 from ..canonical.budgets import BudgetTree, WorkVector
 from .algebra import Pauli, anticommutes
 from .numerics import (
-    QBP4_F64_V2,
+    DEFAULT_QBP4_F64, QuaternaryNumericalProfileV3,
     QuaternaryNumericalFailure,
     QuaternaryNumericalProfile,
     QuaternaryNumericalProfileV2,
@@ -107,7 +108,7 @@ class QbpSweep:
 class ScalarLlrBp4Kernel:
     """Pure source-defined scalar LLR operations; sessions own all mutable buffers."""
 
-    def __init__(self, *, profile: QuaternaryNumericalProfile = QBP4_F64_V2) -> None:
+    def __init__(self, *, profile: QuaternaryNumericalProfile = DEFAULT_QBP4_F64) -> None:
         if not isinstance(profile, QuaternaryNumericalProfile):
             raise ValueError("profile must be a QuaternaryNumericalProfile")
         self.profile = profile
@@ -148,6 +149,11 @@ class ScalarLlrBp4Kernel:
         if not np.all(np.isfinite(result)):
             raise QuaternaryNumericalFailure("nonfinite arithmetic at variable_message_output")
         return finite_saturate(result, boundary="bp4_variable_message", profile=self.profile)
+
+    def damp_variable_messages(self, old: np.ndarray, proposal: np.ndarray) -> np.ndarray:
+        damping = self.profile.v2c_damping if isinstance(self.profile, QuaternaryNumericalProfileV2) else 0.0
+        return finite_saturate(damping * old + (1.0 - damping) * proposal,
+                               boundary="bp4_damped_variable_message", profile=self.profile)
 
     def candidate_from_beliefs(self, beliefs: object) -> np.ndarray:
         """Apply the selected profile's hard-decision rule to each complete belief."""
@@ -247,6 +253,9 @@ class QbpSession:
         return WorkVector.from_flooding_counts(edge_count=int(self._labels.size), variable_count=self.problem.code.n) + WorkVector(bp_calls=1)
 
     def _snapshot(self, *, converged: bool, terminal: str, work: WorkVector) -> QbpSweep:
+        if isinstance(self.kernel.profile, QuaternaryNumericalProfileV3) and terminal in {"capped", "numerical_failure"}:
+            # A denied/rolled-back operation does not change the committed candidate.
+            converged = self._last.converged
         return QbpSweep(
             iteration=self._iteration,
             c2v=self._c2v,
@@ -259,18 +268,22 @@ class QbpSession:
             work=work,
         )
 
-    def sweep(self, *, stop_on_convergence: bool = True) -> QbpSweep:
+    def sweep(self, *, stop_on_convergence: bool = True,
+              _check_transform: Callable[[float], float] | None = None) -> QbpSweep:
         """Reserve all four-state sweep work before calculating or mutating buffers."""
         if not isinstance(stop_on_convergence, bool):
             raise ValueError("stop_on_convergence must be boolean")
         if self._terminal != "running":
             return self._last
+        if _check_transform is not None and not callable(_check_transform):
+            raise ValueError("internal check transform must be callable")
         next_iteration = self._iteration + 1
         work = self._sweep_work()
-        reservation = self.budgets.reserve(self.budget_scope, work, leaf_id=f"qbp:{self.problem.lineage_id}:{next_iteration}")
+        prefix = "qbp" if _check_transform is None else "qbp-flooding"
+        reservation = self.budgets.reserve(self.budget_scope, work, leaf_id=f"{prefix}:{self.problem.lineage_id}:{next_iteration}")
         if reservation is None:
             self._terminal = "capped"
-            self._last = self._snapshot(converged=False, terminal="capped", work=WorkVector.zero())
+            self._last = self._snapshot(converged=False, terminal="capped", work=self.budgets.summary(self.budget_scope))
             return self._last
         try:
             next_c2v = np.empty_like(self._c2v)
@@ -287,6 +300,10 @@ class QbpSession:
                     for index in self._check_incident[int(check)] if index != edge
                 ]
                 next_c2v[edge] = self.kernel.check_message(excluded, int(self.problem.syndrome[check]))
+                if _check_transform is not None:
+                    next_c2v[edge] = _check_transform(float(next_c2v[edge]))
+                    if not np.isfinite(next_c2v[edge]):
+                        raise QuaternaryNumericalFailure("nonfinite transformed check message")
             next_beliefs = np.empty_like(self._beliefs)
             for variable in range(self.problem.code.n):
                 incident = self._variable_incident[variable]
@@ -296,18 +313,13 @@ class QbpSession:
             next_v2c = np.empty_like(self._v2c)
             for edge, (variable, label) in enumerate(zip(self._variables, self._labels, strict=True)):
                 next_v2c[edge] = self.kernel.variable_message(next_beliefs[variable], next_c2v[edge], int(label))
-            if isinstance(self.kernel.profile, QuaternaryNumericalProfileV2):
-                damping = self.kernel.profile.v2c_damping
-                next_v2c = finite_saturate(
-                    damping * self._v2c + (1.0 - damping) * next_v2c,
-                    boundary="bp4_damped_variable_message", profile=self.kernel.profile,
-                )
+            next_v2c = self.kernel.damp_variable_messages(self._v2c, next_v2c)
             next_marginals = np.asarray([llrs_to_probabilities(row, profile=self.kernel.profile) for row in next_beliefs])
             next_candidate = self.kernel.candidate_from_beliefs(next_beliefs)
         except Exception:
             reservation.rollback()
             self._terminal = "numerical_failure"
-            self._last = self._snapshot(converged=False, terminal="numerical_failure", work=WorkVector.zero())
+            self._last = self._snapshot(converged=False, terminal="numerical_failure", work=self.budgets.summary(self.budget_scope))
             raise
         reservation.commit_once()
         self._iteration = next_iteration
@@ -333,7 +345,7 @@ class QbpSession:
             self.sweep()
         if self._terminal == "running":
             self._terminal = "max_iterations"
-            self._last = self._snapshot(converged=False, terminal="max_iterations", work=self.budgets.summary(self.budget_scope))
+            self._last = self._snapshot(converged=self._is_converged() if isinstance(self.kernel.profile, QuaternaryNumericalProfileV3) else False, terminal="max_iterations", work=self.budgets.summary(self.budget_scope))
         return self._last
 
 

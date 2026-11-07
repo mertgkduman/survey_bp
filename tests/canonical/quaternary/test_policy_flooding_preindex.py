@@ -25,7 +25,7 @@ def _fixture() -> tuple[QuaternaryOriginalProblem, np.ndarray]:
 
 
 def test_transformed_flooding_uses_each_old_edge_once_with_exact_exclusion(monkeypatch) -> None:
-    import bp_registry.quaternary.schedules as schedules
+    import bp_registry.quaternary.kernel as engine
 
     problem, priors = _fixture()
     session = ScalarLlrBp4Kernel().new_session(problem, priors)
@@ -41,14 +41,14 @@ def test_transformed_flooding_uses_each_old_edge_once_with_exact_exclusion(monke
             value = transform.apply(value)
         expected.append(value)
     calls = 0
-    original = schedules.commutation_llr
+    original = engine.commutation_llr
 
     def counted(*args, **kwargs):
         nonlocal calls
         calls += 1
         return original(*args, **kwargs)
 
-    monkeypatch.setattr(schedules, "commutation_llr", counted)
+    monkeypatch.setattr(engine, "commutation_llr", counted)
     result = QbpFloodingSchedule(session, transforms=transforms).sweep().result
     np.testing.assert_array_equal(result.c2v, expected)
     assert calls == len(session._labels)

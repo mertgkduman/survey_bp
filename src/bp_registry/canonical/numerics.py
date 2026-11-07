@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 import math
+from bp_registry.check_numerics import stabilized_log_ratio
 import numbers
 
 import numpy as np
@@ -60,7 +61,23 @@ class BinaryNumericalProfileV2(NumericalProfile):
 
 
 BINARY_SPA_F64_V2 = BinaryNumericalProfileV2()
-DEFAULT_BINARY_SPA_F64 = BINARY_SPA_F64_V2
+@dataclass(frozen=True, slots=True)
+class BinaryNumericalProfileV3(BinaryNumericalProfileV2):
+    """Stable log odds and prior-based boundary decisions."""
+
+    profile_id: str = "binary-spa-flooding-f64-v3"
+    prior_initialization: str = "log1p(-p)-log(p)"
+    initial_candidate: str = "prior_decision; no_initial_shortcut; convergence_reports_candidate_validity"
+    check_stabilization: str = "exact_unity"
+
+    def __post_init__(self) -> None:
+        BinaryNumericalProfileV2.__post_init__(self)
+        if self.check_stabilization != "exact_unity":
+            raise ValueError("plain v3 uses exact_unity; use an explicit flooding policy for other stabilization")
+
+
+BINARY_SPA_F64_V3 = BinaryNumericalProfileV3()
+DEFAULT_BINARY_SPA_F64 = BINARY_SPA_F64_V3
 MIN_SUM_CPU_F64 = NumericalProfile(
     profile_id="binary-min-sum-flooding-f64-v1",
     normalization="min_sum",
@@ -105,7 +122,7 @@ def probability_to_llr(
         raise ValueError("probability must lie strictly between zero and one")
     with np.errstate(over="raise", divide="raise", invalid="raise", under="ignore"):
         try:
-            llr = (np.log((1.0 - values) / values) if isinstance(profile, BinaryNumericalProfileV2)
+            llr = (np.log((1.0 - values) / values) if isinstance(profile, BinaryNumericalProfileV2) and not isinstance(profile, BinaryNumericalProfileV3)
                    else np.log1p(-values) - np.log(values))
         except FloatingPointError as error:
             raise NumericalFailure("nonfinite arithmetic at probability_to_llr_intermediate") from error
@@ -114,7 +131,7 @@ def probability_to_llr(
 
 def prior_llr(error_rate: float, *, profile: NumericalProfile = DEFAULT_BINARY_SPA_F64) -> float:
     """Return the independent bit prior using the selected profile's boundary rule."""
-    if isinstance(profile, BinaryNumericalProfileV2):
+    if isinstance(profile, BinaryNumericalProfileV2) and not isinstance(profile, BinaryNumericalProfileV3):
         if not math.isfinite(error_rate) or not 0.0 < error_rate < 1.0:
             raise ValueError("probability must lie strictly between zero and one")
         return float(finite_saturate(math.log((1.0 - error_rate) / error_rate),
@@ -188,11 +205,7 @@ def check_to_variable(
         for value in vector:
             scalar = float(value)
             product *= (1.0 if scalar > 40.0 else -1.0 if scalar < -40.0 else math.tanh(scalar / 2.0))
-        if product >= 1.0:
-            product = 1.0 - profile.product_epsilon
-        elif product <= -1.0:
-            product = -1.0 + profile.product_epsilon
-        result = math.log1p(product) - math.log1p(-product)
+        result = stabilized_log_ratio(product, profile.product_epsilon)
         checked = float(finite_saturate(result, boundary="check_to_variable_output", profile=profile))
         return checked if profile.check_cap is None else float(np.clip(checked, -profile.check_cap, profile.check_cap))
     message = boxplus(incoming, profile=profile)

@@ -36,7 +36,7 @@ def _gb46() -> tuple[PauliCode, np.ndarray, list[np.ndarray]]:
 
 def test_new_compiled_default_and_explicit_v1_replay() -> None:
     code, priors, syndromes = _gb46()
-    assert CompiledBp4Graph.from_code(code, priors).profile is QBP4_F64_V2
+    assert CompiledBp4Graph.from_code(code, priors).profile.profile_id == "quaternary-bp4-f64-v3"
     old_graph = CompiledBp4Graph.from_code(code, priors, profile=QBP4_F64_V1)
     problem = QuaternaryOriginalProblem("original-compiled-frozen-v1", code, syndromes[0])
     expected = ScalarLlrBp4Kernel(profile=QBP4_F64_V1).new_session(problem, priors).run(max_iterations=8)
