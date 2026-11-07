@@ -1,0 +1,1 @@
+{"independently_checked_cpu_ledger_rows": 2048, "note": "test sets overlap; timing and scientific decoding performance are separate", "source_hashes": "verified", "source_revision": "dfe0306c0731edce5160620e8565effba987a9d1", "tests": {"final": {"passed": 276, "skipped": 0}, "legacy-guards": {"passed": 87, "skipped": 0}, "regression": {"passed": 984, "skipped": 1}}}

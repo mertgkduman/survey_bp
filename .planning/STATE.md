@@ -6,9 +6,9 @@ current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
 stopped_at: Completed 11-16 and 11-20; eight Phase 11 gap plans remain open
-last_updated: "2026-11-07T03:09:22Z"
-last_activity: 2026-11-06
-last_activity_desc: Completed kernel audit spikes 008–011; seven stabilization findings, 398 regression tests passed; behavior freeze not recommended
+last_updated: "2026-11-07T05:29:19Z"
+last_activity: 2026-11-07
+last_activity_desc: Stabilized seven kernel findings; qualified v3 contracts and compiled CPU flooding; exact replay/tests pass, measured 2.78x binary and 2.27x BP4 hot-loop speedups
 state_head: dc39055e6db0c2642e62c81d9716797d794785a5
 progress:
   total_phases: 14
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-06 — completed canonical-kernel audit spikes 008–011; independent/native probes and 398 passing regressions expose stabilization blockers
-Last Activity Description: Kernel audit complete; see .planning/spikes/CANONICAL-KERNEL-AUDIT.md before further HTML work. Production behavior and scientific phase gates remain unchanged.
+Last activity: 2026-11-07 — completed kernel stabilization and bounded compiled CPU qualification; scientific phase gates remain unchanged
+Last Activity Description: See .planning/debug/resolved/kernel-cpu-stabilization.md and docs/kernel-stabilization-and-cpu.md. New v3 contracts, cumulative accounting, compatible CPU batches, preserved historical replay; no HTML or publication-phase advancement.
 
 Progress: 8 of 14 phases complete (57%); 159 of 176 plans complete. Phase 11 has 17 of 25 plans complete; plan 17 is the first open number but depends on source reviews 18 and 19, while plan 20's blocked-target review is complete.
 

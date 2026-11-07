@@ -6,6 +6,8 @@
 
 The core binary and scalar-quaternary message equations are supported by independent small-graph checks and native reference comparisons. The implementation nevertheless has concrete decision, composition, boundary, and evidence defects. Existing tests are not sufficient to establish readiness: all 398 selected regression tests pass while the new probes expose these issues.
 
+**Follow-up (2026-11-07):** The seven findings were addressed in a versioned stabilization pass. See the [resolved debug record](../debug/resolved/kernel-cpu-stabilization.md) and [migration/CPU guide](../../docs/kernel-stabilization-and-cpu.md). This audit's verdict and counterexamples describe the pre-fix revision; they are retained unchanged as historical evidence.
+
 ## Evidence obtained
 
 | Experiment | Executed evidence | Result |

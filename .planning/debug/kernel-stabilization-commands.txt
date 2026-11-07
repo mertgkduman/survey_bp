@@ -1,0 +1,10 @@
+Successful qualification commands (test sets overlap):
+
+OMP_NUM_THREADS=1 NUMBA_NUM_THREADS=4 .venv/bin/python -m pytest -q tests/canonical tests/research --tb=short --junitxml=.planning/debug/kernel-stabilization-regression.xml
+OMP_NUM_THREADS=1 NUMBA_NUM_THREADS=4 .venv/bin/python -m pytest -q tests/canonical/quaternary tests/canonical/test_kernel_stabilization.py tests/canonical/test_v2_defaults.py --tb=short --junitxml=.planning/debug/kernel-stabilization-final.xml
+OMP_NUM_THREADS=1 NUMBA_NUM_THREADS=4 .venv/bin/python -m pytest -q tests/canonical/test_kernel_stabilization.py tests/canonical/test_resolution_policy.py tests/canonical/quaternary/test_policy_flooding_preindex.py --tb=short --junitxml=.planning/debug/kernel-stabilization-legacy-guards.xml
+OMP_NUM_THREADS=1 NUMBA_NUM_THREADS=4 .venv/bin/python scripts/benchmark_kernel_cpu_batch.py --output .planning/debug/kernel-cpu-benchmark-qualified --workers 4
+.venv/bin/python .planning/debug/verify_kernel_stabilization.py
+.venv/bin/python .planning/spikes/verify_kernel_audit.py --source-revision 3aacb2c
+
+The benchmark output directory must not already exist. Use a new output path to repeat the experiment while retaining evidence. Both examples/canonical-v3-default.json and examples/quaternary-v3-default.json were also run and replay-verified in temporary output directories.

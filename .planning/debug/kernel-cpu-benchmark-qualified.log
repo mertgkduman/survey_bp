@@ -1,0 +1,6 @@
+bb72_spa {'1': 1.09, '4': 1.32}
+bb72_q8_nms_oms {'1': 1.18, '4': 1.36}
+gb46_spa {'1': 1.06, '4': 1.28}
+gb46_q8_nms_oms {'1': 1.04, '4': 1.22}
+canonical compiled optimization 2.776830654010788
+quaternary compiled optimization 2.2653475819865774

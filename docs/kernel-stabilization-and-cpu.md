@@ -84,3 +84,28 @@ OMP_NUM_THREADS=1 NUMBA_NUM_THREADS=4 .venv/bin/python \
 ```
 
 It retains inputs, per-shot ledgers, source hashes, versions, first-call overhead, repeated warm timings, and exact output comparisons. Binary single-shot timing uses the existing bound-prior API. A separate comparison loads the pinned pre-fix compiled implementation and compares both backends under frozen v2 settings, so numerical migration is not confused with a speed improvement. Results are local development measurements, not HPC allocation guarantees or statistical decoder-performance evidence.
+
+### Saved measurements (2026-11-07)
+
+At revision `dfe0306`, 256 matched observations per case, 20-iteration caps and five warm repeats gave:
+
+| Comparison | Binary SPA / BB72 | BP4 SPA / GB46 |
+|---|---:|---:|
+| Optimized single-shot vs pre-fix compiled, both frozen v2 | 2.78× | 2.27× |
+
+| Corrected profile/policy | One-thread batch vs optimized single-shot | Four-thread batch vs optimized single-shot |
+|---|---:|---:|
+| BB72 SPA | 1.09× | 1.32× |
+| BB72 quantized NMS+OMS | 1.18× | 1.36× |
+| GB46 SPA | 1.06× | 1.28× |
+| GB46 quantized NMS+OMS | 1.04× | 1.22× |
+
+These are separate comparisons, not a combined speedup claim. The shared host was not isolated. First-call timings, individual repetitions, environment details and source hashes are in the [qualified benchmark report](../.planning/debug/kernel-cpu-benchmark-qualified/report.json). Frozen-v2 buffer/output equality and corrected-profile single/batch equality were asserted before accepting timings.
+
+Validation: the broad canonical/research suite passed 984 tests with one skip; 276 affected-path tests passed after the shared-loop refactor; 87 focused tests passed after the final legacy guards. These sets overlap. Both new public examples execute and replay. Independent artifact validation checks 2,048 CPU ledger records against original check matrices, candidate validity, work equations and thread-count equivalence:
+
+```sh
+.venv/bin/python .planning/debug/verify_kernel_stabilization.py
+```
+
+Binary graphs without edges terminate immediately with a prior decision and zero sweeps. Batch ledgers identify this structural terminal as `empty_graph`, separately from a policy's initial convergence shortcut.
