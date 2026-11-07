@@ -1,0 +1,88 @@
+{
+  "adaptation_reasons": [],
+  "assessment_status": "not_assessed",
+  "component_fidelity": {
+    "intervention": "source_backed",
+    "kernel": "source_backed",
+    "schedule": "source_backed"
+  },
+  "component_ids": {
+    "kernel": "scalar-llr-bp4"
+  },
+  "composition": {
+    "adaptation_reasons": [],
+    "component_fidelity": {
+      "intervention": "source_backed",
+      "kernel": "source_backed",
+      "schedule": "source_backed"
+    },
+    "effective_order": [
+      "qbp_scalar_llr",
+      "qbp_flooding",
+      "identity"
+    ],
+    "equations": {
+      "scalar_commutation_c2v": "Delta_m_to_n = (-1)^s_m boxplus_{n_prime != n}(lambda_{n_prime to m})",
+      "three_llr_v2c": "Gamma_n_to_m = Lambda_n + sum_{m_prime != m} commutation(W_m_prime_n, sigma) Delta_m_prime_to_n"
+    },
+    "lifecycle": {
+      "c2v_transform_scope": "scalar_commutation_c2v_after_check_reduction_before_variable_assembly",
+      "kernel_state_owner": "qbp_session",
+      "schedule_freshness": "complete_old_v2c_snapshot_then_complete_commit",
+      "truth_boundary": "decoder_receives_only_original_problem_observation_and_priors"
+    },
+    "procedure_basis": "source_scalar_llr_bp4_v1",
+    "run_fidelity": "source_backed",
+    "semantic_identity": "af0bf61f108310061ddbddaa4c93887f0e350dcb65418a7c597124c63c801ef0",
+    "source_revision": [
+      "lai-kuo-2021-scalar-llr-bp4-v3",
+      "kuo-lai-2020-bp4-serial-v2"
+    ]
+  },
+  "final_row_count": 1,
+  "fixture": "development_fixture",
+  "interpretation_ids": {
+    "schedule": "typed_public_schedule"
+  },
+  "ledger_path": "/tmp/bp-audit-public-f8qbce6s/events.jsonl",
+  "ledger_sha256": "a6cb9590a025e446d7cd2fe7dc9d2ff632449f81269e433392fcd88da8ae5497",
+  "manifest_path": "/tmp/bp-audit-public-f8qbce6s/manifest.json",
+  "manifest_sha256": "1a9e0c28eae51561ea5595502e34e0e0e0cb55a8b818ae4d59209e2953dc235b",
+  "max_iterations": 5,
+  "max_work": 1,
+  "outcome": "invalid_syndrome",
+  "output": "/tmp/bp-audit-public-f8qbce6s",
+  "pauli_encoding": "I=0,X=1,Y=2,Z=3",
+  "relation": "canonical_implemented",
+  "run_fidelity": "source_backed",
+  "run_id": "audit-budget-0",
+  "shot_budget": 1,
+  "source_author_code_identity": "unverified",
+  "statistical_claim": "not_assessed; development fixture, not a source-curve reproduction or performance result",
+  "termination": "work_budget_exhausted",
+  "work": {
+    "belief_assemblies": 0,
+    "bp_calls": 0,
+    "branch_expansions": 0,
+    "branch_prunes": 0,
+    "candidate_checks": 0,
+    "candidate_constructions": 0,
+    "check_to_variable_updates": 0,
+    "convergence_checks": 0,
+    "fallback_calls": 0,
+    "fixation_actions": 0,
+    "intervention_actions": 0,
+    "lifted_coordinates": 0,
+    "order_generation": 0,
+    "order_selection": 0,
+    "original_checks": 0,
+    "priority_maintenance": 0,
+    "ranking_scans": 0,
+    "relay_transfers": 0,
+    "residual_differences": 0,
+    "residual_precomputations": 0,
+    "residual_priority_evaluations": 0,
+    "transformations": 0,
+    "variable_to_check_updates": 0
+  }
+}

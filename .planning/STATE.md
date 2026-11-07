@@ -6,9 +6,9 @@ current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
 stopped_at: Completed 11-16 and 11-20; eight Phase 11 gap plans remain open
-last_updated: "2026-11-06T22:28:15Z"
+last_updated: "2026-11-07T03:09:22Z"
 last_activity: 2026-11-06
-last_activity_desc: Refined v2 evidence views, composable Q-BPGD, circuit sweeps and per-point budgets; 144 tests and 22 browser checks passed
+last_activity_desc: Completed kernel audit spikes 008–011; seven stabilization findings, 398 regression tests passed; behavior freeze not recommended
 state_head: dc39055e6db0c2642e62c81d9716797d794785a5
 progress:
   total_phases: 14
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-06 — refined v2 evidence views, composable Q-BPGD, circuit sweeps and per-point stopping; 144 tests and 22 browser checks passed
-Last Activity Description: Delivered independent research-interface product slice; scientific phase gates remain unchanged
+Last activity: 2026-11-06 — completed canonical-kernel audit spikes 008–011; independent/native probes and 398 passing regressions expose stabilization blockers
+Last Activity Description: Kernel audit complete; see .planning/spikes/CANONICAL-KERNEL-AUDIT.md before further HTML work. Production behavior and scientific phase gates remain unchanged.
 
 Progress: 8 of 14 phases complete (57%); 159 of 176 plans complete. Phase 11 has 17 of 25 plans complete; plan 17 is the first open number but depends on source reviews 18 and 19, while plan 20's blocked-target review is complete.
 
@@ -337,6 +337,8 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 No requested decoding regime or named policy family is deferred beyond the first journal milestone. The user deferred Phase 5's pending human notebook/HTML review while moving to Phase 11; Phase 5 is not marked complete. Phase 7 remains paused. The cancelled comprehensive Phase 4 CSS evaluation/factorial is deferred from Phase 4; Phase 8 supplied bounded campaign infrastructure and Phase 9 completed exploratory CSS controls. Source-faithful CSS publication assessments remain pending exact author evidence. Relay circuit-curve assessment remains in Phase 13.
 
 ## Session Continuity
+
+Latest audit: `.planning/spikes/CANONICAL-KERNEL-AUDIT.md` (2026-11-06). User-approved spikes 008–011 are complete. Stabilize the recorded decision, capped-work, composition, and backend-boundary findings before further HTML work; the audit changed no production decoder behavior.
 
 **Resume file:** None
 

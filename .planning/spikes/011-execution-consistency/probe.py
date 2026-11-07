@@ -133,6 +133,15 @@ def public_evidence(a,schema):
             (bundle/'input.json').write_text(json.dumps(data,indent=2)+'\n')
             for file in Path(tmp).iterdir():
                 if file.is_file(): (bundle/file.name).write_bytes(file.read_bytes())
+            # Preserve the original receipt, then relocate only filesystem metadata
+            # so the retained bundle can be replayed after the temp directory closes.
+            receipt_path=bundle/'result.json'
+            (bundle/'original-result.json').write_bytes(receipt_path.read_bytes())
+            receipt=json.loads(receipt_path.read_text())
+            receipt['manifest_path']=str((bundle/'manifest.json').resolve())
+            receipt['output']=str(bundle.resolve())
+            receipt_path.write_text(json.dumps(receipt,indent=2,sort_keys=True)+'\n')
+            a.events[-1]['retained_bundle_replay']=verify_quaternary_run(bundle)
             break
     else: raise AssertionError('no capped public fixture found')
 

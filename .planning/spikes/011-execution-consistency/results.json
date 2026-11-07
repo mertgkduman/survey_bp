@@ -1,7 +1,7 @@
 {
   "schema": "canonical_kernel_audit_v1",
-  "timestamp_utc": "2026-11-07T03:06:03.842714+00:00",
-  "git_head": "7064272e6484c5df37e581a487e3bdd576b6bed2",
+  "timestamp_utc": "2026-11-07T03:10:52.074941+00:00",
+  "git_head": "1bdcf436712f99cfc0a698ae60d4465dbb803ae9",
   "packages": {
     "numpy": "2.2.6",
     "scipy": "1.17.1",
@@ -706,13 +706,13 @@
           "adaptation_reasons": [],
           "semantic_identity": "af0bf61f108310061ddbddaa4c93887f0e350dcb65418a7c597124c63c801ef0"
         },
-        "output": "/tmp/bp-audit-public-m3gm0ect",
+        "output": "/tmp/bp-audit-public-f8qbce6s",
         "final_row_count": 1,
         "termination": "work_budget_exhausted",
         "outcome": "invalid_syndrome",
         "ledger_sha256": "a6cb9590a025e446d7cd2fe7dc9d2ff632449f81269e433392fcd88da8ae5497",
-        "manifest_path": "/tmp/bp-audit-public-m3gm0ect/manifest.json",
-        "ledger_path": "/tmp/bp-audit-public-m3gm0ect/events.jsonl",
+        "manifest_path": "/tmp/bp-audit-public-f8qbce6s/manifest.json",
+        "ledger_path": "/tmp/bp-audit-public-f8qbce6s/events.jsonl",
         "statistical_claim": "not_assessed; development fixture, not a source-curve reproduction or performance result",
         "run_fidelity": "source_backed",
         "component_fidelity": {
@@ -819,7 +819,52 @@
           "adaptation_reasons": [],
           "semantic_identity": "af0bf61f108310061ddbddaa4c93887f0e350dcb65418a7c597124c63c801ef0"
         },
-        "output": "/tmp/bp-audit-public-m3gm0ect",
+        "output": "/tmp/bp-audit-public-f8qbce6s",
+        "final_row_count": 1,
+        "shot_id": 0,
+        "verified": true
+      },
+      "retained_bundle_replay": {
+        "run_id": "audit-budget-0",
+        "manifest_sha256": "1a9e0c28eae51561ea5595502e34e0e0e0cb55a8b818ae4d59209e2953dc235b",
+        "shot_budget": 1,
+        "pauli_encoding": "I=0,X=1,Y=2,Z=3",
+        "max_iterations": 5,
+        "max_work": 1,
+        "relation": "canonical_implemented",
+        "fixture": "development_fixture",
+        "assessment_status": "not_assessed",
+        "composition": {
+          "component_fidelity": {
+            "kernel": "source_backed",
+            "schedule": "source_backed",
+            "intervention": "source_backed"
+          },
+          "run_fidelity": "source_backed",
+          "procedure_basis": "source_scalar_llr_bp4_v1",
+          "effective_order": [
+            "qbp_scalar_llr",
+            "qbp_flooding",
+            "identity"
+          ],
+          "equations": {
+            "scalar_commutation_c2v": "Delta_m_to_n = (-1)^s_m boxplus_{n_prime != n}(lambda_{n_prime to m})",
+            "three_llr_v2c": "Gamma_n_to_m = Lambda_n + sum_{m_prime != m} commutation(W_m_prime_n, sigma) Delta_m_prime_to_n"
+          },
+          "source_revision": [
+            "lai-kuo-2021-scalar-llr-bp4-v3",
+            "kuo-lai-2020-bp4-serial-v2"
+          ],
+          "lifecycle": {
+            "kernel_state_owner": "qbp_session",
+            "schedule_freshness": "complete_old_v2c_snapshot_then_complete_commit",
+            "c2v_transform_scope": "scalar_commutation_c2v_after_check_reduction_before_variable_assembly",
+            "truth_boundary": "decoder_receives_only_original_problem_observation_and_priors"
+          },
+          "adaptation_reasons": [],
+          "semantic_identity": "af0bf61f108310061ddbddaa4c93887f0e350dcb65418a7c597124c63c801ef0"
+        },
+        "output": "/hpc/group/pfisterlab/mg551/storage/survey_bp/.planning/spikes/011-execution-consistency/quaternary_experiment_v2-budget-counterexample",
         "final_row_count": 1,
         "shot_id": 0,
         "verified": true
@@ -984,13 +1029,13 @@
           "semantic_identity": "7cc4b6600887bdc8a5b74014a6133e1e099f70524a65ee0ffeaaec8b9639d907"
         },
         "numerical_profile": "quaternary-bp4-f64-v2",
-        "output": "/tmp/bp-audit-public-q_8znrja",
+        "output": "/tmp/bp-audit-public-ccwsqw8z",
         "final_row_count": 1,
         "termination": "work_budget_exhausted",
         "outcome": "invalid_syndrome",
         "ledger_sha256": "05052e2493d9d7f1f40f2ef99dfe10d1c983428e3573b522271ce9a3361ac27e",
-        "manifest_path": "/tmp/bp-audit-public-q_8znrja/manifest.json",
-        "ledger_path": "/tmp/bp-audit-public-q_8znrja/events.jsonl",
+        "manifest_path": "/tmp/bp-audit-public-ccwsqw8z/manifest.json",
+        "ledger_path": "/tmp/bp-audit-public-ccwsqw8z/events.jsonl",
         "statistical_claim": "not_assessed; development fixture, not a source-curve reproduction or performance result",
         "run_fidelity": "canonical_adaptation",
         "component_fidelity": {
@@ -1105,7 +1150,58 @@
           "semantic_identity": "7cc4b6600887bdc8a5b74014a6133e1e099f70524a65ee0ffeaaec8b9639d907"
         },
         "numerical_profile": "quaternary-bp4-f64-v2",
-        "output": "/tmp/bp-audit-public-q_8znrja",
+        "output": "/tmp/bp-audit-public-ccwsqw8z",
+        "final_row_count": 1,
+        "shot_id": 0,
+        "verified": true
+      },
+      "retained_bundle_replay": {
+        "run_id": "audit-budget-0",
+        "manifest_sha256": "ccc0f4737eb99253ff54611ad978695d178117740571a79afc7020daca076a5b",
+        "shot_budget": 1,
+        "pauli_encoding": "I=0,X=1,Y=2,Z=3",
+        "max_iterations": 5,
+        "max_work": 1,
+        "relation": "canonical_implemented",
+        "fixture": "development_fixture",
+        "assessment_status": "not_assessed",
+        "composition": {
+          "component_fidelity": {
+            "kernel": "canonical_adaptation",
+            "schedule": "source_backed",
+            "intervention": "source_backed"
+          },
+          "run_fidelity": "canonical_adaptation",
+          "procedure_basis": "canonical_scalar_llr_bp4_f64_v2",
+          "effective_order": [
+            "qbp_scalar_llr",
+            "qbp_flooding",
+            "identity"
+          ],
+          "equations": {
+            "scalar_commutation_c2v": "Delta_m_to_n = (-1)^s_m boxplus_{n_prime != n}(lambda_{n_prime to m})",
+            "three_llr_v2c": "Gamma_n_to_m = Lambda_n + sum_{m_prime != m} commutation(W_m_prime_n, sigma) Delta_m_prime_to_n",
+            "numerical_check": "2atanh(clamp_unit((-1)^s product tanh(lambda/2), 1e-10))",
+            "numerical_v2c": "0.1 old_v2c + 0.9 fresh_extrinsic_v2c"
+          },
+          "source_revision": [
+            "lai-kuo-2021-scalar-llr-bp4-v3",
+            "kuo-lai-2020-bp4-serial-v2"
+          ],
+          "lifecycle": {
+            "kernel_state_owner": "qbp_session",
+            "schedule_freshness": "complete_old_v2c_snapshot_then_complete_commit",
+            "c2v_transform_scope": "scalar_commutation_c2v_after_check_reduction_before_variable_assembly",
+            "truth_boundary": "decoder_receives_only_original_problem_observation_and_priors",
+            "numerical_profile": "quaternary-bp4-f64-v2"
+          },
+          "adaptation_reasons": [
+            "canonical_float64_v2_numerical_profile"
+          ],
+          "semantic_identity": "7cc4b6600887bdc8a5b74014a6133e1e099f70524a65ee0ffeaaec8b9639d907"
+        },
+        "numerical_profile": "quaternary-bp4-f64-v2",
+        "output": "/hpc/group/pfisterlab/mg551/storage/survey_bp/.planning/spikes/011-execution-consistency/quaternary_experiment_v3-budget-counterexample",
         "final_row_count": 1,
         "shot_id": 0,
         "verified": true

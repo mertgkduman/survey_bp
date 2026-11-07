@@ -51,15 +51,15 @@
   "interpretation_ids": {
     "schedule": "typed_public_schedule"
   },
-  "ledger_path": "/tmp/bp-audit-public-q_8znrja/events.jsonl",
+  "ledger_path": "/tmp/bp-audit-public-ccwsqw8z/events.jsonl",
   "ledger_sha256": "05052e2493d9d7f1f40f2ef99dfe10d1c983428e3573b522271ce9a3361ac27e",
-  "manifest_path": "/tmp/bp-audit-public-q_8znrja/manifest.json",
+  "manifest_path": "/hpc/group/pfisterlab/mg551/storage/survey_bp/.planning/spikes/011-execution-consistency/quaternary_experiment_v3-budget-counterexample/manifest.json",
   "manifest_sha256": "ccc0f4737eb99253ff54611ad978695d178117740571a79afc7020daca076a5b",
   "max_iterations": 5,
   "max_work": 1,
   "numerical_profile": "quaternary-bp4-f64-v2",
   "outcome": "invalid_syndrome",
-  "output": "/tmp/bp-audit-public-q_8znrja",
+  "output": "/hpc/group/pfisterlab/mg551/storage/survey_bp/.planning/spikes/011-execution-consistency/quaternary_experiment_v3-budget-counterexample",
   "pauli_encoding": "I=0,X=1,Y=2,Z=3",
   "relation": "canonical_implemented",
   "run_fidelity": "canonical_adaptation",

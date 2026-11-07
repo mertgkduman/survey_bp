@@ -42,6 +42,8 @@ OMP_NUM_THREADS=1 PYTHONPATH=src:.planning/spikes .venv/bin/python .planning/spi
 
 `results.json` retains exact arrays, priors, graph matrices, profile names, counters, numerical deltas, source hashes, and environment versions. The `quaternary_experiment_v2-budget-counterexample/` and `quaternary_experiment_v3-budget-counterexample/` directories preserve the actual input, normalized manifest, event ledger, and result. Their run IDs are deterministic diagnostic fixture IDs, not publication samples.
 
+Each bundle retains the original temporary-path receipt as `original-result.json`. In `result.json`, only filesystem location metadata is relocated to the retained bundle; manifest and ledger bytes/hashes are unchanged. The probe verifies both the original run and the retained bundle. Rerunning `probe.py` refreshes the paths for the current checkout.
+
 ## Investigation Trail
 
 1. Compared 192 complete scalar/compiled sweeps across twelve random small graphs, both numerical versions, and both binary/Pauli families. Matched C2V, V2C, beliefs and Pauli marginals within 2e-11; maximum observed absolute error was 4.44e-16. This checks buffers, not an assertion of all terminal control-flow equivalence.
