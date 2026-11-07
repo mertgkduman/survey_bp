@@ -22,7 +22,7 @@ The project contracts are the authority for policy ownership. For an external ar
 | Approach | Strength | Limitation | Chosen use |
 |---|---|---|---|
 | Existing per-policy tests | Broad lifecycle and mechanism coverage | Can miss interactions with changed numerical defaults | Run 238 existing tests |
-| Identity and sensitivity probes | Detect silent composition changes | Do not prove arbitrary combinations | New 12 grouped probes |
+| Identity and sensitivity probes | Detect silent composition changes | Do not prove arbitrary combinations | New 14 grouped probes |
 | Source call-path review | Exposes duplicated recurrence ownership | Must support defects with execution | Locate failed metamorphic paths |
 
 ## How to Run
@@ -35,7 +35,7 @@ The regression file list is preserved in `regression.xml` and summarized below. 
 
 ## What to Expect
 
-New probes: 12 grouped checks, 9 pass, 3 findings. Existing regression selection: **238 passed in 17.13 s**. Passing regressions do not override the newly demonstrated composition failures.
+New probes: 14 grouped checks, 11 pass, 3 findings. Existing regression selection: **238 passed in 17.13 s**. Passing regressions do not override the newly demonstrated composition failures.
 
 ## Observability
 
@@ -44,7 +44,7 @@ New probes: 12 grouped checks, 9 pass, 3 findings. Existing regression selection
 ## Investigation Trail
 
 1. Used an identity C2V normalization (divide by 1) as a metamorphic test. Frozen BP4 v1 preserves all buffers. BP4 v2 preserves first-sweep C2V and beliefs but changes V2C: `QbpFloodingSchedule._transformed_sweep` does not apply `profile.v2c_damping`, while `QbpSession.sweep` does. Subsequent sweeps can therefore diverge merely by adding an identity transform.
-2. Compared serial BP4 with damping 0 and 0.6. Its V2C outputs are identical: the serial implementation also omits damping. The resolver nevertheless declares the v2 damping equation for these admitted compositions. This is a concrete execution/evidence defect, not merely an unsupported feature.
+2. Compared serial BP4 with damping 0 and 0.6. Its V2C outputs are identical: the serial implementation also omits damping. The lower-level resolver nevertheless declares the v2 damping equation for these admitted compositions. The public `QuaternaryExperimentV3` validator correctly rejects both transformed and serial v2, confirmed with two additional probes. This limits exposure to direct lower-level composition; public support must not be widened until the execution/resolver mismatch is fixed.
 3. Verified normalization/offset order is observable: on -3, normalization by 2 then offset .75 yields -.75; reverse order yields -1.125. Order must remain part of evidence.
 4. Verified independent session state, unchanged original checks, foreign memory-commit rejection, and rejection of binary schedule/transform names and undefined adaptive MBP4 in the quaternary resolver.
 5. Direct `BinarySpaKernel(update_rule=MinSumUpdate())` accepts a v1 min-sum primitive with the default SPA-v2 numerical profile. The check rule clips at 25 while surrounding v2 state is unclipped and damped. This may be an explicitly intended adaptation, but the low-level constructor does not require that identity or reject the ambiguity. The public closed registry is a separate boundary.
@@ -65,6 +65,6 @@ New probes: 12 grouped checks, 9 pass, 3 findings. Existing regression selection
 
 ## Results
 
-**PARTIAL.** The policy architecture is substantial and covers the requested categories, but it is not ready to freeze as universally composable. Identity-transform invariance and declared damping sensitivity fail in actual admitted v2 paths.
+**PARTIAL.** The policy architecture is substantial and covers the requested categories, but it is not ready to freeze as universally composable. Identity-transform invariance and declared damping sensitivity fail in lower-level v2 paths; the public manifest guard correctly prevents those compositions.
 
 Stabilization should centralize the ordered update stages shared by plain/transformed/serial paths, with explicit operands and freshness rather than one generic callback that can mutate everything. Add admission constraints per kernel/profile/schedule, and require each implementation backend to pass the same semantic fixtures. Keep source-specific algorithm names and adapted compositions distinct. New policies should supply equations, owned state, read/write operands, commit boundary, reset/clone behavior, and work charges without duplicating the entire BP sweep.

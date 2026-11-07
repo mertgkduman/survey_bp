@@ -64,4 +64,18 @@ if __name__=='__main__':
     a.record('kernel_rejects_conflicting_update_and_numerical_profile',False,
              kernel_profile=mixed.profile.profile_id,update_profile=mixed.update_rule.profile.profile_id,
              interpretation='Direct constructor accepts SPA v2 profile with separately clipped v1 min-sum primitive; public closed registry may prevent it.')
+    import json
+    from audit_support import ROOT
+    from bp_registry.manifests import parse_manifest
+    for kind in ('transform','serial'):
+        data=json.loads((ROOT/'data/manifests/quaternary-five-qubit-tracer.json').read_text())
+        data['schema_version']='quaternary_experiment_v3'
+        data['composition']=composition().model_dump(mode='json')
+        if kind=='transform':
+            data['composition']['transforms']=[{'kind':'qbp_c2v_normalization','binding_id':'t','config':{'alpha_c':1.}}]
+        else: data['composition']['schedule']['kind']='qbp_variable_serial'
+        try:
+            parse_manifest(data); rejected=False; reason='accepted'
+        except ValueError as exc: rejected=True; reason=str(exc)
+        a.record('public_v3_blocks_unqualified_'+kind,rejected,reason=reason)
     a.finish()

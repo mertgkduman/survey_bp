@@ -1,7 +1,7 @@
 {
   "schema": "canonical_kernel_audit_v1",
-  "timestamp_utc": "2026-11-07T03:01:51.507123+00:00",
-  "git_head": "087d03c87d1b3c6f32881d64989d96f26be871ee",
+  "timestamp_utc": "2026-11-07T03:05:29.195787+00:00",
+  "git_head": "7064272e6484c5df37e581a487e3bdd576b6bed2",
   "packages": {
     "numpy": "2.2.6",
     "scipy": "1.17.1",
@@ -120,8 +120,8 @@
     "src/bp_registry/study.py": "4fd642c1f2121894434e6c2ffcd1245490bd797f831c456ab57144890d56ae34",
     "src/bp_registry/study_cli.py": "ff0388b37895dcc4701b829e4506e08fb9575a268c31520f928194e270fac80a"
   },
-  "checks": 12,
-  "passed": 9,
+  "checks": 14,
+  "passed": 11,
   "failed": 3,
   "events": [
     {
@@ -192,6 +192,16 @@
       "kernel_profile": "binary-spa-flooding-f64-v2",
       "update_profile": "binary-min-sum-flooding-f64-v1",
       "interpretation": "Direct constructor accepts SPA v2 profile with separately clipped v1 min-sum primitive; public closed registry may prevent it."
+    },
+    {
+      "name": "public_v3_blocks_unqualified_transform",
+      "passed": true,
+      "reason": "1 validation error for QuaternaryExperimentV3\n  Value error, quaternary float64 v2 requires plain flooding BP4 [type=value_error, input_value={'schema_version': 'quate...es': [], 'config': {}}}}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error"
+    },
+    {
+      "name": "public_v3_blocks_unqualified_serial",
+      "passed": true,
+      "reason": "1 validation error for QuaternaryExperimentV3\n  Value error, quaternary float64 v2 requires plain flooding BP4 [type=value_error, input_value={'schema_version': 'quate...es': [], 'config': {}}}}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error"
     }
   ]
 }
