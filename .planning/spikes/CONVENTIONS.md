@@ -38,3 +38,5 @@ The project `.venv` supplies the pinned versions in `pyproject.toml`; no new dep
 - Compare CPU throughput on identical policy, input and stopping contracts; separate first-call/JIT costs from warm timing and retain matching shot ledgers.
 
 - Audit admitted numerical controls across every accepting schedule/controller, and include initial-convergence and zero-iteration returns when checking state validation. Validate normalized execution-dtype state, not only pre-conversion input.
+
+- Record CPU affinity and physical-core topology with benchmarks. If an unchanged control shifts with the candidate, retain the first measurement and alternate already-warmed isolated revisions before attributing the shift to code. Logical workers on sibling hardware threads do not establish multicore scaling.

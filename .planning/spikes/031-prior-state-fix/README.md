@@ -23,5 +23,5 @@ Baseline 729157f; historical evidence is retained unchanged.
 ## Run
 `.venv/bin/python -m pytest tests/canonical/test_freeze_fixes.py tests/canonical/test_boundary_fixes.py tests/canonical/test_kernel_contract_admission.py -q`
 
-## Investigation Trail
+## Performance and contract
 Validation occurs once at binding/construction, outside decode loops. Post-cast checks replace overflow warnings with an explicit ValueError rather than silently storing infinity. No frozen numerical equations or profile identities changed.

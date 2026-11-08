@@ -1,0 +1,65 @@
+ 
+================================================================================
+ Parallel Accelerator Optimizing:  Function _binary_batch, 
+/hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/cpu_batch.py (20)
+  
+================================================================================
+
+
+Parallel loop listing for  Function _binary_batch, /hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/cpu_batch.py (20) 
+--------------------------------------------------------------------------------------------------------|loop #ID
+@njit(cache=True, parallel=True)                                                                        | 
+def _binary_batch(row_ptr, variables, n, syndromes, prior, limit, cap, epsilon,                         | 
+                  damping, use_policy, fmt, scale, all_state, rule, old, fresh,                         | 
+                  alpha, beta, shortcut, band):                                                         | 
+    count = len(syndromes)                                                                              | 
+    candidates = np.empty((count, n), dtype=np.uint8)                                                   | 
+    iterations = np.empty(count, dtype=np.int64)                                                        | 
+    converged = np.empty(count, dtype=np.bool_)                                                         | 
+    for shot in prange(count):--------------------------------------------------------------------------| #0
+        if use_policy:                                                                                  | 
+            c, ok, it = binary_policy(row_ptr, variables, n, syndromes[shot], prior, limit,             | 
+                fmt, scale, all_state, rule, old, fresh, alpha, beta, shortcut, band, epsilon, True)    | 
+        else:                                                                                           | 
+            c, ok, it = binary_decode(row_ptr, variables, n, syndromes[shot], prior, limit,             | 
+                                     cap, epsilon, damping, True)                                       | 
+        candidates[shot] = c                                                                            | 
+        iterations[shot], converged[shot] = it, ok                                                      | 
+    return candidates, iterations, converged                                                            | 
+------------------------------ After Optimisation ------------------------------
+Parallel structure is already optimal.
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+ 
+ 
+================================================================================
+ Parallel Accelerator Optimizing:  Function _pauli_batch, 
+/hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/cpu_batch.py (59)
+  
+================================================================================
+
+
+Parallel loop listing for  Function _pauli_batch, /hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/cpu_batch.py (59) 
+-------------------------------------------------------------------------------------------------|loop #ID
+@njit(cache=True, parallel=True)                                                                 | 
+def _pauli_batch(row_ptr, variable_ptr, variable_edges, variables, labels, priors,               | 
+                 syndromes, limit, cap, epsilon, damping, stop, use_policy,                      | 
+                 fmt, scale, scope, rule, old, fresh, alpha, beta, decision, shortcut, band):    | 
+    count = len(syndromes)                                                                       | 
+    candidates = np.empty((count, len(priors)), dtype=np.uint8)                                  | 
+    iterations = np.empty(count, dtype=np.int64)                                                 | 
+    converged = np.empty(count, dtype=np.bool_)                                                  | 
+    failures = np.empty(count, dtype=np.bool_)                                                   | 
+    for shot in prange(count):-------------------------------------------------------------------| #1
+        c, it, ok, failed = _pauli_shot(                                                         | 
+            row_ptr, variable_ptr, variable_edges, variables, labels, priors,                    | 
+            syndromes[shot], limit, cap, epsilon, damping, stop, use_policy,                     | 
+            fmt, scale, scope, rule, old, fresh, alpha, beta, decision, shortcut, band)          | 
+        candidates[shot] = c                                                                     | 
+        iterations[shot], converged[shot], failures[shot] = it, ok, failed                       | 
+    return candidates, iterations, converged, failures                                           | 
+------------------------------ After Optimisation ------------------------------
+Parallel structure is already optimal.
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+ 

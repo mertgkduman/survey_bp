@@ -1,0 +1,69 @@
+{
+  "baseline": "729157f",
+  "current": "fb1d3299613f0d537690eb2e09ddd1e2148c63ec",
+  "affinity": [
+    56,
+    120
+  ],
+  "methodology": "15 paired warm repetitions; persistent isolated processes alternate measurement order; one measuring process at a time; cold measurements/ledgers/diagnostics retained from initial matching source runs",
+  "cases": {
+    "binary_bb72": {
+      "exact_results_preserved": true,
+      "workers": {
+        "1": {
+          "baseline_batch_seconds": 0.13800733722746372,
+          "current_batch_seconds": 0.13761545065790415,
+          "throughput_ratio": 1.002847693101945,
+          "paired_throughput_ratio_median": 1.0020724487602157,
+          "current_speedup_vs_single": 1.032323856238753,
+          "shots_per_second": 3720.512468274888
+        },
+        "2": {
+          "baseline_batch_seconds": 0.09539957903325558,
+          "current_batch_seconds": 0.0961786350235343,
+          "throughput_ratio": 0.991899905939733,
+          "paired_throughput_ratio_median": 1.0032042720206655,
+          "current_speedup_vs_single": 1.4803800287714783,
+          "shots_per_second": 5323.42759776864
+        },
+        "4": {
+          "baseline_batch_seconds": 0.09588162880390882,
+          "current_batch_seconds": 0.09612802974879742,
+          "throughput_ratio": 0.9974367419624381,
+          "paired_throughput_ratio_median": 0.9960625067927487,
+          "current_speedup_vs_single": 1.4748823944996645,
+          "shots_per_second": 5326.230042766535
+        }
+      }
+    },
+    "pauli_gb46": {
+      "exact_results_preserved": true,
+      "workers": {
+        "1": {
+          "baseline_batch_seconds": 0.2404287550598383,
+          "current_batch_seconds": 0.24095503147691488,
+          "throughput_ratio": 0.9978158728877715,
+          "paired_throughput_ratio_median": 1.0011400159169301,
+          "current_speedup_vs_single": 1.0261109258747452,
+          "shots_per_second": 2124.877811688498
+        },
+        "2": {
+          "baseline_batch_seconds": 0.16917432937771082,
+          "current_batch_seconds": 0.169479557313025,
+          "throughput_ratio": 0.9981990280116768,
+          "paired_throughput_ratio_median": 0.9984420638335809,
+          "current_speedup_vs_single": 1.4557407985125002,
+          "shots_per_second": 3021.0133193488778
+        },
+        "4": {
+          "baseline_batch_seconds": 0.16798426397144794,
+          "current_batch_seconds": 0.16888353321701288,
+          "throughput_ratio": 0.9946752106115083,
+          "paired_throughput_ratio_median": 0.9909446840745693,
+          "current_speedup_vs_single": 1.4540009424315226,
+          "shots_per_second": 3031.675085469034
+        }
+      }
+    }
+  }
+}
