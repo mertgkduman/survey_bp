@@ -6,9 +6,9 @@ current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
 stopped_at: Completed 11-16 and 11-20; eight Phase 11 gap plans remain open
-last_updated: "2026-11-08T02:55:15Z"
+last_updated: "2026-11-08T03:37:51Z"
 last_activity: 2026-11-07
-last_activity_desc: Fixed V3-A01–A03 in order; preserved study aliases and historical replay; 1162 tests pass, one existing skip; 18 independent checks pass
+last_activity_desc: Completed boundary spikes 019–022; quantified exact-SPA limitation and found alternate-construction, binary-serial admission and compiled v1-cap gaps; production unchanged
 state_head: dc39055e6db0c2642e62c81d9716797d794785a5
 progress:
   total_phases: 14
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-07 — completed spikes 016–018 contract fixes and qualification; scientific phase gates remain unchanged
-Last Activity Description: See .planning/spikes/KERNEL-V3-FIXES.md. Scalar admission, fixed profile evidence and complete public summary verification are corrected. Historical study labels/aliases and decoder arithmetic are preserved; 1162 regression tests and 18 independent checks pass. No HTML or publication-phase advancement.
+Last activity: 2026-11-07 — completed expanded kernel boundary audit; freeze remains pending explicit numerical decision and configuration closure
+Last Activity Description: See .planning/spikes/CANONICAL-KERNEL-BOUNDARY-AUDIT.md. 840 CPU ledger rows and 183 selected regressions pass; 15 grouped probes retain five failed assertions covering one known numerical limitation and three new configuration/backend findings. Prior fixes and historical evidence remain intact; no production or HTML changes.
 
 Progress: 8 of 14 phases complete (57%); 159 of 176 plans complete. Phase 11 has 17 of 25 plans complete; plan 17 is the first open number but depends on source reviews 18 and 19, while plan 20's blocked-target review is complete.
 
@@ -338,7 +338,7 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Latest audit and fixes: `.planning/spikes/KERNEL-V3-FIXES.md`. Spikes 016–018 resolve V3-A01–A03 in the recommended order. Spikes 008–015 remain historical evidence. Existing v2 study labels and undamped aliases are preserved with validated numerical fields. The exact-unity approximation remains an explicit numerical choice; no silent default migration.
+Latest audit: `.planning/spikes/CANONICAL-KERNEL-BOUNDARY-AUDIT.md` (spikes 019–022). Prior V3-A01–A03 fixes remain documented in KERNEL-V3-FIXES.md. Resolve the numerical default explicitly and close B01–B03 through shared construction/compatibility validation and parameter/backend qualification before a full freeze claim. Production behavior and phase gates are unchanged by this audit.
 
 **Resume file:** None
 

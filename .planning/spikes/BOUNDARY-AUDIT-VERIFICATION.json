@@ -1,0 +1,10 @@
+{
+  "production_unchanged": true,
+  "prior_spikes_unchanged": true,
+  "grouped_checks": 15,
+  "passed": 10,
+  "retained_failed_assertions": 5,
+  "independently_rechecked_ledger_rows": 840,
+  "ledger_sha256": "fda30adcc2e3fce4f6e7c108f6a70dc9f4a6b9fd22e47a0ac5d816f4d8afb9b8",
+  "selected_regressions_passed": 183
+}
