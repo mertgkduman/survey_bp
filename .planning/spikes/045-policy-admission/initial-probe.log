@@ -1,0 +1,16 @@
+{"checks": 3, "passed": 1, "failed": 2}
+FINDING: identity_memory_and_nested_ownership 
+Arrays are not equal
+
+Mismatched elements: 2 / 16 (12.5%)
+Max absolute difference among violations: 1
+Max relative difference among violations: inf
+ ACTUAL: array([[0, 1, 1, 0],
+       [1, 0, 1, 0],
+       [0, 0, 0, 0],
+       [0, 0, 1, 0]], dtype=uint8)
+ DESIRED: array([[0, 1, 0, 0],
+       [0, 0, 1, 0],
+       [0, 0, 0, 0],
+       [0, 0, 1, 0]], dtype=uint8)
+FINDING: controller_specific_nondefault_controls 8 non-default controller controls admitted without an execution operand

@@ -1,0 +1,50 @@
+[
+  {
+    "controller": "single",
+    "ignored_control": "solution_limit",
+    "nondefault_value": 2,
+    "identical_shot_and_attempt_evidence": true
+  },
+  {
+    "controller": "single",
+    "ignored_control": "relay_alpha",
+    "nondefault_value": 0.25,
+    "identical_shot_and_attempt_evidence": true
+  },
+  {
+    "controller": "guided",
+    "ignored_control": "solution_limit",
+    "nondefault_value": 2,
+    "identical_shot_and_attempt_evidence": true
+  },
+  {
+    "controller": "guided",
+    "ignored_control": "relay_alpha",
+    "nondefault_value": 0.25,
+    "identical_shot_and_attempt_evidence": true
+  },
+  {
+    "controller": "beam",
+    "ignored_control": "solution_limit",
+    "nondefault_value": 2,
+    "identical_shot_and_attempt_evidence": true
+  },
+  {
+    "controller": "beam",
+    "ignored_control": "relay_alpha",
+    "nondefault_value": 0.25,
+    "identical_shot_and_attempt_evidence": true
+  },
+  {
+    "controller": "single",
+    "ignored_control": "bias",
+    "nondefault_value": 2.0,
+    "identical_shot_and_attempt_evidence": true
+  },
+  {
+    "controller": "relay",
+    "ignored_control": "bias",
+    "nondefault_value": 2.0,
+    "identical_shot_and_attempt_evidence": true
+  }
+]

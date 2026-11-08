@@ -1,0 +1,2542 @@
+[
+  {
+    "rule": "spa",
+    "controller": "single",
+    "memory_index": 0,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "single",
+    "memory_index": 0,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "spa",
+    "controller": "single",
+    "memory_index": 0,
+    "backend": "compiled",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "spa",
+    "controller": "single",
+    "memory_index": 1,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "single",
+    "memory_index": 1,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "single",
+    "memory_index": 1,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "single",
+    "memory_index": 2,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "single",
+    "memory_index": 2,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "single",
+    "memory_index": 2,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "single",
+    "memory_index": 3,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "single",
+    "memory_index": 3,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "single",
+    "memory_index": 3,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "single",
+    "memory_index": 4,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "single",
+    "memory_index": 4,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "single",
+    "memory_index": 4,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "single",
+    "memory_index": 5,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "single",
+    "memory_index": 5,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "single",
+    "memory_index": 5,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "single",
+    "memory_index": 6,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "single",
+    "memory_index": 6,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "single",
+    "memory_index": 6,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "relay",
+    "memory_index": 0,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "relay",
+    "memory_index": 0,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "relay",
+    "memory_index": 0,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "relay",
+    "memory_index": 1,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "relay",
+    "memory_index": 1,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "relay",
+    "memory_index": 1,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "relay",
+    "memory_index": 2,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "relay",
+    "memory_index": 2,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "relay",
+    "memory_index": 2,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "relay",
+    "memory_index": 3,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "relay",
+    "memory_index": 3,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "relay",
+    "memory_index": 3,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "relay",
+    "memory_index": 4,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "relay",
+    "memory_index": 4,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "relay",
+    "memory_index": 4,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "relay",
+    "memory_index": 5,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "relay",
+    "memory_index": 5,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "relay",
+    "memory_index": 5,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "relay",
+    "memory_index": 6,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "relay",
+    "memory_index": 6,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "relay",
+    "memory_index": 6,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "guided",
+    "memory_index": 0,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "guided",
+    "memory_index": 0,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "spa",
+    "controller": "guided",
+    "memory_index": 0,
+    "backend": "compiled",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "spa",
+    "controller": "guided",
+    "memory_index": 1,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "guided",
+    "memory_index": 1,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "guided",
+    "memory_index": 1,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "guided",
+    "memory_index": 2,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "guided",
+    "memory_index": 2,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "guided",
+    "memory_index": 2,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "guided",
+    "memory_index": 3,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "guided",
+    "memory_index": 3,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "guided",
+    "memory_index": 3,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "guided",
+    "memory_index": 4,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "guided",
+    "memory_index": 4,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "guided",
+    "memory_index": 4,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "guided",
+    "memory_index": 5,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "guided",
+    "memory_index": 5,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "guided",
+    "memory_index": 5,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "guided",
+    "memory_index": 6,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "guided",
+    "memory_index": 6,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "guided",
+    "memory_index": 6,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "beam",
+    "memory_index": 0,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "beam",
+    "memory_index": 0,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "spa",
+    "controller": "beam",
+    "memory_index": 0,
+    "backend": "compiled",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "spa",
+    "controller": "beam",
+    "memory_index": 1,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "beam",
+    "memory_index": 1,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "beam",
+    "memory_index": 1,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "beam",
+    "memory_index": 2,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "beam",
+    "memory_index": 2,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "beam",
+    "memory_index": 2,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "beam",
+    "memory_index": 3,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "beam",
+    "memory_index": 3,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "beam",
+    "memory_index": 3,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "beam",
+    "memory_index": 4,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "beam",
+    "memory_index": 4,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "beam",
+    "memory_index": 4,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "beam",
+    "memory_index": 5,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "beam",
+    "memory_index": 5,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "beam",
+    "memory_index": 5,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "spa",
+    "controller": "beam",
+    "memory_index": 6,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "beam",
+    "memory_index": 6,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "spa",
+    "controller": "beam",
+    "memory_index": 6,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "single",
+    "memory_index": 0,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "single",
+    "memory_index": 0,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "single",
+    "memory_index": 0,
+    "backend": "compiled",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "single",
+    "memory_index": 1,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "single",
+    "memory_index": 1,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "single",
+    "memory_index": 1,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "single",
+    "memory_index": 2,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "single",
+    "memory_index": 2,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "single",
+    "memory_index": 2,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "single",
+    "memory_index": 3,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "single",
+    "memory_index": 3,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "single",
+    "memory_index": 3,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "single",
+    "memory_index": 4,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "single",
+    "memory_index": 4,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "single",
+    "memory_index": 4,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "single",
+    "memory_index": 5,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "single",
+    "memory_index": 5,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "single",
+    "memory_index": 5,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "single",
+    "memory_index": 6,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "single",
+    "memory_index": 6,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "single",
+    "memory_index": 6,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "relay",
+    "memory_index": 0,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "relay",
+    "memory_index": 0,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "relay",
+    "memory_index": 0,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "relay",
+    "memory_index": 1,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "relay",
+    "memory_index": 1,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "relay",
+    "memory_index": 1,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "relay",
+    "memory_index": 2,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "relay",
+    "memory_index": 2,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "relay",
+    "memory_index": 2,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "relay",
+    "memory_index": 3,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "relay",
+    "memory_index": 3,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "relay",
+    "memory_index": 3,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "relay",
+    "memory_index": 4,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "relay",
+    "memory_index": 4,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "relay",
+    "memory_index": 4,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "relay",
+    "memory_index": 5,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "relay",
+    "memory_index": 5,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "relay",
+    "memory_index": 5,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "relay",
+    "memory_index": 6,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "relay",
+    "memory_index": 6,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "relay",
+    "memory_index": 6,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "guided",
+    "memory_index": 0,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "guided",
+    "memory_index": 0,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "guided",
+    "memory_index": 0,
+    "backend": "compiled",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "guided",
+    "memory_index": 1,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "guided",
+    "memory_index": 1,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "guided",
+    "memory_index": 1,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "guided",
+    "memory_index": 2,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "guided",
+    "memory_index": 2,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "guided",
+    "memory_index": 2,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "guided",
+    "memory_index": 3,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "guided",
+    "memory_index": 3,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "guided",
+    "memory_index": 3,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "guided",
+    "memory_index": 4,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "guided",
+    "memory_index": 4,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "guided",
+    "memory_index": 4,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "guided",
+    "memory_index": 5,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "guided",
+    "memory_index": 5,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "guided",
+    "memory_index": 5,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "guided",
+    "memory_index": 6,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "guided",
+    "memory_index": 6,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "guided",
+    "memory_index": 6,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "beam",
+    "memory_index": 0,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "beam",
+    "memory_index": 0,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "beam",
+    "memory_index": 0,
+    "backend": "compiled",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "beam",
+    "memory_index": 1,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "beam",
+    "memory_index": 1,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "beam",
+    "memory_index": 1,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "beam",
+    "memory_index": 2,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "beam",
+    "memory_index": 2,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "beam",
+    "memory_index": 2,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "beam",
+    "memory_index": 3,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "beam",
+    "memory_index": 3,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "beam",
+    "memory_index": 3,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "beam",
+    "memory_index": 4,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "beam",
+    "memory_index": 4,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "beam",
+    "memory_index": 4,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "beam",
+    "memory_index": 5,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "beam",
+    "memory_index": 5,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "beam",
+    "memory_index": 5,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "min_sum",
+    "controller": "beam",
+    "memory_index": 6,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "beam",
+    "memory_index": 6,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "min_sum",
+    "controller": "beam",
+    "memory_index": 6,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "single",
+    "memory_index": 0,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "single",
+    "memory_index": 0,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "single",
+    "memory_index": 0,
+    "backend": "compiled",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "single",
+    "memory_index": 1,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "single",
+    "memory_index": 1,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "single",
+    "memory_index": 1,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "single",
+    "memory_index": 2,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "single",
+    "memory_index": 2,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "single",
+    "memory_index": 2,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "single",
+    "memory_index": 3,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "single",
+    "memory_index": 3,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "single",
+    "memory_index": 3,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "single",
+    "memory_index": 4,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "single",
+    "memory_index": 4,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "single",
+    "memory_index": 4,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "single",
+    "memory_index": 5,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "single",
+    "memory_index": 5,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "single",
+    "memory_index": 5,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "single",
+    "memory_index": 6,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "single",
+    "memory_index": 6,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "single",
+    "memory_index": 6,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "relay",
+    "memory_index": 0,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "relay",
+    "memory_index": 0,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "relay",
+    "memory_index": 0,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "relay",
+    "memory_index": 1,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "relay",
+    "memory_index": 1,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "relay",
+    "memory_index": 1,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "relay",
+    "memory_index": 2,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "relay",
+    "memory_index": 2,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "relay",
+    "memory_index": 2,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "relay",
+    "memory_index": 3,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "relay",
+    "memory_index": 3,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "relay",
+    "memory_index": 3,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "relay",
+    "memory_index": 4,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "relay",
+    "memory_index": 4,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "relay",
+    "memory_index": 4,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "relay",
+    "memory_index": 5,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "relay",
+    "memory_index": 5,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "relay",
+    "memory_index": 5,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "relay",
+    "memory_index": 6,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "relay",
+    "memory_index": 6,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "relay",
+    "memory_index": 6,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "guided",
+    "memory_index": 0,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "guided",
+    "memory_index": 0,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "guided",
+    "memory_index": 0,
+    "backend": "compiled",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "guided",
+    "memory_index": 1,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "guided",
+    "memory_index": 1,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "guided",
+    "memory_index": 1,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "guided",
+    "memory_index": 2,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "guided",
+    "memory_index": 2,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "guided",
+    "memory_index": 2,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "guided",
+    "memory_index": 3,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "guided",
+    "memory_index": 3,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "guided",
+    "memory_index": 3,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "guided",
+    "memory_index": 4,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "guided",
+    "memory_index": 4,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "guided",
+    "memory_index": 4,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "guided",
+    "memory_index": 5,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "guided",
+    "memory_index": 5,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "guided",
+    "memory_index": 5,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "guided",
+    "memory_index": 6,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "guided",
+    "memory_index": 6,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "guided",
+    "memory_index": 6,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "beam",
+    "memory_index": 0,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "beam",
+    "memory_index": 0,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "beam",
+    "memory_index": 0,
+    "backend": "compiled",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "beam",
+    "memory_index": 1,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "beam",
+    "memory_index": 1,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "beam",
+    "memory_index": 1,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "beam",
+    "memory_index": 2,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "beam",
+    "memory_index": 2,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "beam",
+    "memory_index": 2,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "beam",
+    "memory_index": 3,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "beam",
+    "memory_index": 3,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "beam",
+    "memory_index": 3,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "beam",
+    "memory_index": 4,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "beam",
+    "memory_index": 4,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "beam",
+    "memory_index": 4,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "beam",
+    "memory_index": 5,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "beam",
+    "memory_index": 5,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "beam",
+    "memory_index": 5,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "beam",
+    "memory_index": 6,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "beam",
+    "memory_index": 6,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "normalized_min_sum",
+    "controller": "beam",
+    "memory_index": 6,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "single",
+    "memory_index": 0,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "single",
+    "memory_index": 0,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "single",
+    "memory_index": 0,
+    "backend": "compiled",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "single",
+    "memory_index": 1,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "single",
+    "memory_index": 1,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "single",
+    "memory_index": 1,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "single",
+    "memory_index": 2,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "single",
+    "memory_index": 2,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "single",
+    "memory_index": 2,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "single",
+    "memory_index": 3,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "single",
+    "memory_index": 3,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "single",
+    "memory_index": 3,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "single",
+    "memory_index": 4,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "single",
+    "memory_index": 4,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "single",
+    "memory_index": 4,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "single",
+    "memory_index": 5,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "single",
+    "memory_index": 5,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "single",
+    "memory_index": 5,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "single",
+    "memory_index": 6,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "single",
+    "memory_index": 6,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "single",
+    "memory_index": 6,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "relay",
+    "memory_index": 0,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "relay",
+    "memory_index": 0,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "relay",
+    "memory_index": 0,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "relay",
+    "memory_index": 1,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "relay",
+    "memory_index": 1,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "relay",
+    "memory_index": 1,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "relay",
+    "memory_index": 2,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "relay",
+    "memory_index": 2,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "relay",
+    "memory_index": 2,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "relay",
+    "memory_index": 3,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "relay",
+    "memory_index": 3,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "relay",
+    "memory_index": 3,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "relay",
+    "memory_index": 4,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "relay",
+    "memory_index": 4,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "relay",
+    "memory_index": 4,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "relay",
+    "memory_index": 5,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "relay",
+    "memory_index": 5,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "relay",
+    "memory_index": 5,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "relay",
+    "memory_index": 6,
+    "backend": "scalar",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "relay",
+    "memory_index": 6,
+    "backend": "auto",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "relay",
+    "memory_index": 6,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "guided",
+    "memory_index": 0,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "guided",
+    "memory_index": 0,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "guided",
+    "memory_index": 0,
+    "backend": "compiled",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "guided",
+    "memory_index": 1,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "guided",
+    "memory_index": 1,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "guided",
+    "memory_index": 1,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "guided",
+    "memory_index": 2,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "guided",
+    "memory_index": 2,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "guided",
+    "memory_index": 2,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "guided",
+    "memory_index": 3,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "guided",
+    "memory_index": 3,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "guided",
+    "memory_index": 3,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "guided",
+    "memory_index": 4,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "guided",
+    "memory_index": 4,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "guided",
+    "memory_index": 4,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "guided",
+    "memory_index": 5,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "guided",
+    "memory_index": 5,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "guided",
+    "memory_index": 5,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "guided",
+    "memory_index": 6,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "guided",
+    "memory_index": 6,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "guided",
+    "memory_index": 6,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "beam",
+    "memory_index": 0,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "beam",
+    "memory_index": 0,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "beam",
+    "memory_index": 0,
+    "backend": "compiled",
+    "accepted": true,
+    "execution_backend": "numba-cpu"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "beam",
+    "memory_index": 1,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "beam",
+    "memory_index": 1,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "beam",
+    "memory_index": 1,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "beam",
+    "memory_index": 2,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "beam",
+    "memory_index": 2,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "beam",
+    "memory_index": 2,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "beam",
+    "memory_index": 3,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "beam",
+    "memory_index": 3,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "beam",
+    "memory_index": 3,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "beam",
+    "memory_index": 4,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "beam",
+    "memory_index": 4,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "beam",
+    "memory_index": 4,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "beam",
+    "memory_index": 5,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "beam",
+    "memory_index": 5,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "beam",
+    "memory_index": 5,
+    "backend": "compiled",
+    "accepted": false
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "beam",
+    "memory_index": 6,
+    "backend": "scalar",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "beam",
+    "memory_index": 6,
+    "backend": "auto",
+    "accepted": true,
+    "execution_backend": "canonical-python"
+  },
+  {
+    "rule": "offset_min_sum",
+    "controller": "beam",
+    "memory_index": 6,
+    "backend": "compiled",
+    "accepted": false
+  }
+]
