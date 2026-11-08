@@ -29,6 +29,8 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 - Preserve frozen profile identities and existing evidence. This audit produces reproducible findings and a prioritized stabilization contract before any behavior migration.
 - Reuse prior numerical evidence without treating curve proximity as an algebraic proof.
 
+- Continue the approved four-part audit order on stabilized v3 as spikes 012–015, preserving prior evidence and testing new boundaries before a freeze decision.
+
 ## Spikes
 
 | # | Idea | Name | Type | Validates | Verdict | Tags |
@@ -44,3 +46,7 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 | 009 | canonical-kernel-audit | Open-source cross-check | comparison | Given pinned upstream implementations and aligned settings, when matched inputs run, then agreement or discrepancies are explained | PARTIAL | upstream, provenance |
 | 010 | canonical-kernel-audit | Policy extensibility | standard | Given supported policy compositions, when exercised, then order, state isolation, and compatibility are explicit | PARTIAL | policies, architecture |
 | 011 | canonical-kernel-audit | Execution consistency | comparison | Given identical profiles and observations, when public, scalar, and compiled paths run, then behavior and evidence agree | PARTIAL | replay, accounting, backends |
+| 012 | canonical-kernel-audit | V3 mathematical audit | standard | Given stabilized v3, when independently checked across priors, ties and numerical boundaries, then its declared mathematics holds | VALIDATED | mathematics, v3 |
+| 013 | canonical-kernel-audit | V3 upstream audit | comparison | Given pinned upstream sources and explicit alignment, when current kernels run matched cases, then every discrepancy has evidence | PENDING | upstream, v3 |
+| 014 | canonical-kernel-audit | V3 policy audit | standard | Given accepted compositions, when profile, lifecycle and numerical boundaries are varied, then execution matches the declared policy | PENDING | policies, admission |
+| 015 | canonical-kernel-audit | V3 execution audit | comparison | Given the same contract and observation, when scalar, compiled, batch and public paths execute, then outputs and evidence remain consistent | PENDING | backends, work |
