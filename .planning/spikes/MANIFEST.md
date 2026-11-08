@@ -66,4 +66,4 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 | 023 | canonical-kernel-audit | Construction admission | standard | Given audited counterexamples, when corrected, then accepted construction paths enforce one contract | VALIDATED | fixes |
 | 024 | canonical-kernel-audit | Local damping | standard | Given audited counterexamples, when corrected, then local schedule updates honor their active numerical profile | VALIDATED | fixes |
 | 025 | canonical-kernel-audit | BP4 active cap | standard | Given audited counterexamples, when corrected, then compiled legacy BP4 honors the selected saturation | VALIDATED | fixes |
-| 026 | canonical-kernel-audit | Stable SPA qualification | standard | Given audited counterexamples, when corrected, then a new stable log-domain policy agrees with independent exact inference | IN_PROGRESS | fixes |
+| 026 | canonical-kernel-audit | Stable SPA qualification | standard | Given audited counterexamples, when corrected, then a new stable log-domain policy agrees with independent exact inference | VALIDATED | fixes |

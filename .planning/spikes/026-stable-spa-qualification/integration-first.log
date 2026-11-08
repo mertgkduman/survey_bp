@@ -1,0 +1,602 @@
+........................................................................ [  5%]
+........................................................................ [ 10%]
+........................................................................ [ 15%]
+........................................................................ [ 21%]
+........................................................................ [ 26%]
+........................................................................ [ 31%]
+........................................................................ [ 36%]
+........................................................................ [ 42%]
+........................................................................ [ 47%]
+........................................................................ [ 52%]
+.............................F.......................................... [ 57%]
+...s......F...F......................................................... [ 63%]
+........................................................................ [ 68%]
+FF.FFF...F..................................F........................... [ 73%]
+........................................................................ [ 78%]
+........................................................................ [ 84%]
+........................................................................ [ 89%]
+........................................................................ [ 94%]
+........................................................................ [100%]
+=================================== FAILURES ===================================
+_ test_calibration_ledger_audit_binds_real_relay_terminal_and_rejects_tampering _
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-216/test_calibration_ledger_audit_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb02a9f77a0>
+
+    def test_calibration_ledger_audit_binds_real_relay_terminal_and_rejects_tampering(tmp_path, monkeypatch):
+        from bp_registry.canonical.contracts import CanonicalManifestV4
+        from bp_registry.canonical.execution import run_canonical_structural_shot
+        from bp_registry.css import fixture_code
+        from bp_registry.ledger import read_canonical_events
+        from bp_registry.sampling import DecoderObservation, HiddenTruth
+    
+        run_id = "calibration-audit-fixture"
+        policies = {
+            "update": {"kind": "binary_spa", "binding_id": "update", "state_lifetime": "message"},
+            "schedule": {"kind": "flooding", "binding_id": "schedule", "state_lifetime": "iteration"},
+            "state_memory": {"kind": "identity", "binding_id": "memory", "state_lifetime": "leg"},
+            "intervention": {"kind": "identity", "binding_id": "intervention", "state_lifetime": "search"},
+            "stopping": {"kind": "syndrome_or_budget", "binding_id": "stopping", "state_lifetime": "iteration"},
+            "selection": {"kind": "stable_first", "binding_id": "selection", "state_lifetime": "attempt"},
+            "postprocessing": {"kind": "identity", "binding_id": "post", "state_lifetime": "attempt"},
+        }
+        manifest = CanonicalManifestV4.model_validate({
+            "schema_version": 4, "run_id": run_id, "numerical_profile": "cpu-float64-spa-v1",
+            "max_iterations": 2, "error_rate": 0.1, "policies": policies,
+            "memory_bindings": [{"binding_id": "relay-prior", "kind": "affine_prior",
+                                 "target": "prior", "order": 0, "alpha": 0.5, "state_lifetime": "leg"}],
+            "relay": {"total_leg_limit": 1, "legs": [{"max_iterations": 2}]},
+        })
+        code = fixture_code()
+        hidden = np.asarray([1, 0, 0], dtype=np.uint8)
+        calibration_dir = tmp_path / "calibration"
+        cell = {"configuration_id": "fixture-cell", "code_id": "fixture-code",
+                "preset_key": "canonical_default"}
+        cell_root = calibration_dir / "runs" / "fixture-code" / "canonical_default" / audit.pilot._digest("fixture-cell")[:16]
+        run_dir = cell_root / "run"
+        run_dir.mkdir(parents=True)
+        (cell_root / "manifest.json").write_text(json.dumps({"run_id": run_id}), encoding="utf-8")
+>       run_canonical_structural_shot(
+            manifest, code=code, observation=DecoderObservation("Z", code.hz @ hidden % 2),
+            hidden_truth=HiddenTruth(hidden, np.zeros(3, dtype=np.uint8)), shot_id=0,
+            ledger_path=run_dir / "events.jsonl", sample_seed_identity="fixture-sample", context={},
+        )
+
+tests/canonical/test_phase4_calibration_ledgers.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/canonical/execution.py:1259: in run_canonical_structural_shot
+    return _run_relay_structural_shot(
+src/bp_registry/canonical/execution.py:772: in _run_relay_structural_shot
+    run = controller.run(
+src/bp_registry/canonical/relay.py:526: in run
+    schedule = FloodingSchedule(edge_table, kernel=prior_kernel, profile=kernel.profile)  # type: ignore[attr-defined]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <bp_registry.canonical.schedules.FloodingSchedule object at 0x7fb03133c9e0>
+edge_table = EdgeTable(check_count=1, variable_count=3, edges=((0, 2),))
+
+    def __init__(self, edge_table: EdgeTable, *, kernel: _FloodingKernel, profile: NumericalProfile | None = None) -> None:
+        self.edge_table = edge_table
+        self.kernel = kernel
+        self.profile = kernel.profile if profile is None else profile
+>       if self.profile != kernel.profile:
+                           ^^^^^^^^^^^^^^
+E       AttributeError: '_PriorVectorKernel' object has no attribute 'profile'
+
+src/bp_registry/canonical/schedules.py:122: AttributeError
+_____________ test_public_verify_executes_phase4_relay_through_cli _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-216/test_public_verify_executes_ph0')
+
+    def test_public_verify_executes_phase4_relay_through_cli(tmp_path):
+        """The public V4 path retains relay controls through preflight, run, and verification."""
+        import os
+        import subprocess
+        import sys
+    
+        manifest = Path("data/manifests/phase4-memory-relay-bb144.json")
+        output = tmp_path / "relay-public"
+        environment = {**os.environ, "OMP_NUM_THREADS": "1", "PYTHONPATH": str(Path("src").resolve())}
+        for arguments in (
+            ["preflight", str(manifest)],
+            ["canonical", str(manifest), "--output", str(output)],
+            ["verify-run", str(output)],
+        ):
+            completed = subprocess.run([sys.executable, "-m", "bp_registry.cli", *arguments], text=True, capture_output=True, env=environment)
+>           assert completed.returncode == 0, completed.stderr or completed.stdout
+E           AssertionError: Traceback (most recent call last):
+E               File "<frozen runpy>", line 198, in _run_module_as_main
+E               File "<frozen runpy>", line 88, in _run_code
+E               File "/hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/cli.py", line 597, in <module>
+E                 main()
+E               File "/hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/cli.py", line 567, in main
+E                 _dump(run_quaternary(args.manifest, args.output, shot_id=args.shot) if isinstance(preflight(args.manifest).manifest, QuaternaryExperimentV1) else run_canonical(args.manifest, args.output, shot_id=args.shot))
+E                                                                                                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/cli.py", line 279, in run_canonical
+E                 run_canonical_one(manifest_path, shot_id=shot_id, ledger_path=ledger_path)
+E               File "/hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/runner.py", line 1412, in run_canonical_one
+E                 return run_canonical_structural_shot(
+E                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/canonical/execution.py", line 1259, in run_canonical_structural_shot
+E                 return _run_relay_structural_shot(
+E                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/canonical/execution.py", line 772, in _run_relay_structural_shot
+E                 run = controller.run(
+E                       ^^^^^^^^^^^^^^^
+E               File "/hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/canonical/relay.py", line 526, in run
+E                 schedule = FloodingSchedule(edge_table, kernel=prior_kernel, profile=kernel.profile)  # type: ignore[attr-defined]
+E                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "/hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/canonical/schedules.py", line 122, in __init__
+E                 if self.profile != kernel.profile:
+E                                    ^^^^^^^^^^^^^^
+E             AttributeError: '_PriorVectorKernel' object has no attribute 'profile'
+E             
+E           assert 1 == 0
+E            +  where 1 = CompletedProcess(args=['/hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python', '-m', 'bp_registry.cli', 'can...\n                       ^^^^^^^^^^^^^^\nAttributeError: \'_PriorVectorKernel\' object has no attribute \'profile\'\n').returncode
+
+tests/canonical/test_phase4_evidence.py:365: AssertionError
+______ test_benchmark_per_shot_public_identity_matches_native_observation ______
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-216/test_benchmark_per_shot_public0')
+
+    def test_benchmark_per_shot_public_identity_matches_native_observation(tmp_path):
+        """Selected-shot canonical evidence and native input share one physical observation."""
+        runner = _phase4_runner_module()
+        base = json.loads(Path("data/manifests/phase4-memory-relay-bb144.json").read_text(encoding="utf-8"))
+        manifest = runner._benchmark_manifest(base, arm="canonical_relay_31")
+        manifest_path = tmp_path / "manifest.json"
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        shot_id = 7
+    
+        native_observation = runner._json_command(Path("."), "canonical-observation", str(manifest_path), "--shot", str(shot_id))
+>       runner._json_command(Path("."), "canonical", str(manifest_path), "--output", str(tmp_path / "run"), "--shot", str(shot_id))
+
+tests/canonical/test_phase4_evidence.py:459: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+repository_root = PosixPath('.'), timeout_seconds = 900
+arguments = ('canonical', '/tmp/pytest-of-mg551/pytest-216/test_benchmark_per_shot_public0/manifest.json', '--output', '/tmp/pytest-of-mg551/pytest-216/test_benchmark_per_shot_public0/run', '--shot', '7')
+completed = CompletedProcess(args=['/hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python', '-m', 'bp_registry.cli', 'can...\n                       ^^^^^^^^^^^^^^\nAttributeError: \'_PriorVectorKernel\' object has no attribute \'profile\'\n')
+
+    def _json_command(repository_root: Path, *arguments: str, timeout_seconds: float = 900) -> dict[str, Any]:
+        """Invoke the public CLI only; no canonical execution internals are imported here."""
+        completed = subprocess.run(
+            [sys.executable, "-m", "bp_registry.cli", *arguments], cwd=repository_root,
+            text=True, capture_output=True, timeout=timeout_seconds,
+            env={**os.environ, "PYTHONPATH": str(repository_root / "src"), "OMP_NUM_THREADS": "1"},
+        )
+        if completed.returncode:
+>           raise RuntimeError(f"public CLI {' '.join(arguments)} failed: {completed.stderr or completed.stdout}")
+E           RuntimeError: public CLI canonical /tmp/pytest-of-mg551/pytest-216/test_benchmark_per_shot_public0/manifest.json --output /tmp/pytest-of-mg551/pytest-216/test_benchmark_per_shot_public0/run --shot 7 failed: Traceback (most recent call last):
+E             File "<frozen runpy>", line 198, in _run_module_as_main
+E             File "<frozen runpy>", line 88, in _run_code
+E             File "/hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/cli.py", line 597, in <module>
+E               main()
+E             File "/hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/cli.py", line 567, in main
+E               _dump(run_quaternary(args.manifest, args.output, shot_id=args.shot) if isinstance(preflight(args.manifest).manifest, QuaternaryExperimentV1) else run_canonical(args.manifest, args.output, shot_id=args.shot))
+E                                                                                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/cli.py", line 276, in run_canonical
+E               run_canonical_one(manifest_path, shot_id=shot_id, ledger_path=ledger_path)
+E             File "/hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/runner.py", line 1412, in run_canonical_one
+E               return run_canonical_structural_shot(
+E                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/canonical/execution.py", line 1259, in run_canonical_structural_shot
+E               return _run_relay_structural_shot(
+E                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/canonical/execution.py", line 772, in _run_relay_structural_shot
+E               run = controller.run(
+E                     ^^^^^^^^^^^^^^^
+E             File "/hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/canonical/relay.py", line 526, in run
+E               schedule = FloodingSchedule(edge_table, kernel=prior_kernel, profile=kernel.profile)  # type: ignore[attr-defined]
+E                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/canonical/schedules.py", line 122, in __init__
+E               if self.profile != kernel.profile:
+E                                  ^^^^^^^^^^^^^^
+E           AttributeError: '_PriorVectorKernel' object has no attribute 'profile'
+
+scripts/run_phase4_pilots.py:1061: RuntimeError
+_ test_tracer_two_leg_relay_is_public_truth_blind_and_transfers_only_posterior _
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-216/test_tracer_two_leg_relay_is_p0')
+
+    def test_tracer_two_leg_relay_is_public_truth_blind_and_transfers_only_posterior(tmp_path):
+        """The persisted Relay composition reaches the structural engine and freezes selection before truth."""
+        from bp_registry.canonical.contracts import CanonicalManifestV4
+        from bp_registry.canonical.execution import run_canonical_structural_shot
+        from bp_registry.css import fixture_code
+        from bp_registry.sampling import DecoderObservation, HiddenTruth
+    
+        code = fixture_code()
+        hidden_x = np.asarray([1, 0, 0], dtype=np.uint8)
+        observation = DecoderObservation("Z", code.hz @ hidden_x % 2)
+        manifest = CanonicalManifestV4.model_validate({
+            "schema_version": 4,
+            "run_id": "phase4-relay-tracer",
+            "numerical_profile": "cpu-float64-spa-v1",
+            "max_iterations": 4,
+            "error_rate": 0.1,
+            "policies": _policies(),
+            "memory_bindings": [{
+                "binding_id": "relay-prior", "kind": "affine_prior", "target": "prior",
+                "order": 0, "alpha": 0.5, "state_lifetime": "leg",
+            }],
+            "relay": {"total_leg_limit": 2, "legs": [{"max_iterations": 4}, {"max_iterations": 4}]},
+        })
+    
+>       result = run_canonical_structural_shot(
+            manifest, code=code, observation=observation,
+            hidden_truth=HiddenTruth(hidden_x, np.zeros(3, dtype=np.uint8)), shot_id=0,
+            ledger_path=tmp_path / "events.jsonl", sample_seed_identity="sample-0", context={"tracer": True},
+        )
+
+tests/canonical/test_relay.py:148: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/canonical/execution.py:1259: in run_canonical_structural_shot
+    return _run_relay_structural_shot(
+src/bp_registry/canonical/execution.py:772: in _run_relay_structural_shot
+    run = controller.run(
+src/bp_registry/canonical/relay.py:526: in run
+    schedule = FloodingSchedule(edge_table, kernel=prior_kernel, profile=kernel.profile)  # type: ignore[attr-defined]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <bp_registry.canonical.schedules.FloodingSchedule object at 0x7fb0317012e0>
+edge_table = EdgeTable(check_count=1, variable_count=3, edges=((0, 2),))
+
+    def __init__(self, edge_table: EdgeTable, *, kernel: _FloodingKernel, profile: NumericalProfile | None = None) -> None:
+        self.edge_table = edge_table
+        self.kernel = kernel
+        self.profile = kernel.profile if profile is None else profile
+>       if self.profile != kernel.profile:
+                           ^^^^^^^^^^^^^^
+E       AttributeError: '_PriorVectorKernel' object has no attribute 'profile'
+
+src/bp_registry/canonical/schedules.py:122: AttributeError
+_ test_prevalidated_relay_reconstruction_matches_path_validation_and_rejects_tampering _
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-216/test_prevalidated_relay_recons0')
+
+    def test_prevalidated_relay_reconstruction_matches_path_validation_and_rejects_tampering(tmp_path):
+        """Inventory reuse keeps the path verifier's per-shot proof intact."""
+        from copy import deepcopy
+    
+        from bp_registry.canonical.contracts import CanonicalManifestV4
+        from bp_registry.canonical.execution import run_canonical_structural_shot
+        from bp_registry.canonical.verification import (
+            CanonicalStructuralVerificationError, reconstruct_phase4_shot, validate_phase4_shot,
+        )
+        from bp_registry.css import fixture_code
+        from bp_registry.ledger import read_canonical_events
+        from bp_registry.sampling import DecoderObservation, HiddenTruth
+    
+        code = fixture_code()
+        hidden_x = np.asarray([1, 0, 0], dtype=np.uint8)
+        path = tmp_path / "inventory-relay.jsonl"
+        manifest = CanonicalManifestV4.model_validate({
+            "schema_version": 4, "run_id": "inventory-relay", "numerical_profile": "cpu-float64-spa-v1",
+            "max_iterations": 2, "error_rate": 0.1, "policies": _policies(),
+            "memory_bindings": [{"binding_id": "relay-prior", "kind": "affine_prior", "target": "prior",
+                                  "order": 0, "alpha": 0.5, "state_lifetime": "leg"}],
+            "relay": {"total_leg_limit": 1, "legs": [{"max_iterations": 2}]},
+        })
+>       run_canonical_structural_shot(
+            manifest, code=code, observation=DecoderObservation("Z", code.hz @ hidden_x % 2),
+            hidden_truth=HiddenTruth(hidden_x, np.zeros(3, dtype=np.uint8)), shot_id=0,
+            ledger_path=path, sample_seed_identity="inventory-sample", context={},
+        )
+
+tests/canonical/test_relay.py:189: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/canonical/execution.py:1259: in run_canonical_structural_shot
+    return _run_relay_structural_shot(
+src/bp_registry/canonical/execution.py:772: in _run_relay_structural_shot
+    run = controller.run(
+src/bp_registry/canonical/relay.py:526: in run
+    schedule = FloodingSchedule(edge_table, kernel=prior_kernel, profile=kernel.profile)  # type: ignore[attr-defined]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <bp_registry.canonical.schedules.FloodingSchedule object at 0x7fb0310db680>
+edge_table = EdgeTable(check_count=1, variable_count=3, edges=((0, 2),))
+
+    def __init__(self, edge_table: EdgeTable, *, kernel: _FloodingKernel, profile: NumericalProfile | None = None) -> None:
+        self.edge_table = edge_table
+        self.kernel = kernel
+        self.profile = kernel.profile if profile is None else profile
+>       if self.profile != kernel.profile:
+                           ^^^^^^^^^^^^^^
+E       AttributeError: '_PriorVectorKernel' object has no attribute 'profile'
+
+src/bp_registry/canonical/schedules.py:122: AttributeError
+_ test_three_leg_relay_emits_committed_per_leg_leaves_and_replays_idempotently _
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-216/test_three_leg_relay_emits_com0')
+
+    def test_three_leg_relay_emits_committed_per_leg_leaves_and_replays_idempotently(tmp_path):
+        """Six committed sweeps stay on their own legs through the durable ledger."""
+        from bp_registry.canonical.budgets import WorkVector
+        from bp_registry.canonical.execution import run_canonical_structural_shot
+        from bp_registry.canonical.verification import validate_phase4_shot
+        from bp_registry.ledger import read_canonical_events
+        from bp_registry.sampling import DecoderObservation, HiddenTruth
+    
+        path = tmp_path / "three-leg.jsonl"
+        code = _impossible_syndrome_code()
+        kwargs = {
+            "code": code, "observation": DecoderObservation("Z", np.ones(1, dtype=np.uint8)),
+            "hidden_truth": HiddenTruth(np.zeros(3, dtype=np.uint8), np.zeros(3, dtype=np.uint8)),
+            "shot_id": 0, "ledger_path": path, "sample_seed_identity": "three-leg-sample", "context": {},
+            "execution_controls": _relay_controls(belief_assemblies=100),
+        }
+>       first = run_canonical_structural_shot(_three_leg_manifest("relay-three-leg"), **kwargs)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/canonical/test_relay.py:296: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/canonical/execution.py:1259: in run_canonical_structural_shot
+    return _run_relay_structural_shot(
+src/bp_registry/canonical/execution.py:772: in _run_relay_structural_shot
+    run = controller.run(
+src/bp_registry/canonical/relay.py:526: in run
+    schedule = FloodingSchedule(edge_table, kernel=prior_kernel, profile=kernel.profile)  # type: ignore[attr-defined]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <bp_registry.canonical.schedules.FloodingSchedule object at 0x7fb02b564d40>
+edge_table = EdgeTable(check_count=1, variable_count=3, edges=())
+
+    def __init__(self, edge_table: EdgeTable, *, kernel: _FloodingKernel, profile: NumericalProfile | None = None) -> None:
+        self.edge_table = edge_table
+        self.kernel = kernel
+        self.profile = kernel.profile if profile is None else profile
+>       if self.profile != kernel.profile:
+                           ^^^^^^^^^^^^^^
+E       AttributeError: '_PriorVectorKernel' object has no attribute 'profile'
+
+src/bp_registry/canonical/schedules.py:122: AttributeError
+_ test_budget_exhaustion_retains_partial_final_leg_work_with_exact_leaf_total __
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-216/test_budget_exhaustion_retains0')
+
+    def test_budget_exhaustion_retains_partial_final_leg_work_with_exact_leaf_total(tmp_path):
+        """A rejected second sweep leaves the first committed sweep on the final leg."""
+        from bp_registry.canonical.execution import run_canonical_structural_shot
+        from bp_registry.canonical.verification import validate_phase4_shot
+        from bp_registry.ledger import read_canonical_events
+        from bp_registry.sampling import DecoderObservation, HiddenTruth
+    
+        path = tmp_path / "partial-leg.jsonl"
+>       result = run_canonical_structural_shot(
+            _three_leg_manifest("relay-partial-leg"), code=_impossible_syndrome_code(),
+            observation=DecoderObservation("Z", np.ones(1, dtype=np.uint8)),
+            hidden_truth=HiddenTruth(np.zeros(3, dtype=np.uint8), np.zeros(3, dtype=np.uint8)),
+            shot_id=0, ledger_path=path, sample_seed_identity="partial-leg-sample", context={},
+            execution_controls=_relay_controls(belief_assemblies=12),
+        )
+
+tests/canonical/test_relay.py:321: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/canonical/execution.py:1259: in run_canonical_structural_shot
+    return _run_relay_structural_shot(
+src/bp_registry/canonical/execution.py:772: in _run_relay_structural_shot
+    run = controller.run(
+src/bp_registry/canonical/relay.py:526: in run
+    schedule = FloodingSchedule(edge_table, kernel=prior_kernel, profile=kernel.profile)  # type: ignore[attr-defined]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <bp_registry.canonical.schedules.FloodingSchedule object at 0x7fb031701fd0>
+edge_table = EdgeTable(check_count=1, variable_count=3, edges=())
+
+    def __init__(self, edge_table: EdgeTable, *, kernel: _FloodingKernel, profile: NumericalProfile | None = None) -> None:
+        self.edge_table = edge_table
+        self.kernel = kernel
+        self.profile = kernel.profile if profile is None else profile
+>       if self.profile != kernel.profile:
+                           ^^^^^^^^^^^^^^
+E       AttributeError: '_PriorVectorKernel' object has no attribute 'profile'
+
+src/bp_registry/canonical/schedules.py:122: AttributeError
+_ test_active_memory_tuning_is_seeded_per_leg_and_retains_actual_application_facts _
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-216/test_active_memory_tuning_is_s0')
+
+    def test_active_memory_tuning_is_seeded_per_leg_and_retains_actual_application_facts(tmp_path):
+        """The controlled mode uses gamma0 first, then un-clipped seeded vectors."""
+        from bp_registry.canonical.contracts import CanonicalManifestV4
+        from bp_registry.canonical.execution import run_canonical_structural_shot
+        from bp_registry.ledger import read_canonical_events
+        from bp_registry.sampling import DecoderObservation, HiddenTruth
+    
+        raw = _three_leg_manifest("relay-active-memory").model_dump(mode="json")
+        raw["relay"].update({
+            "legs": [{"max_iterations": 2}, {"max_iterations": 2}, {"max_iterations": 2}],
+            "first_leg_iteration_limit": 2,
+            "later_leg_iteration_limit": 2,
+            "later_leg_memory": "disordered",
+            "fidelity_status": "controlled_component_adaptation",
+            "memory_tuning": {
+                "semantics": "relay_v022_dynamic_affine_prior_css_adaptation",
+                "first_leg_gamma": 0.25,
+                "later_leg_center": 1.0,
+                "later_leg_width": 4.0,
+                "seed_identity": "phase4-controlled-relay-memory-v1",
+            },
+        })
+        manifest = CanonicalManifestV4.model_validate(raw)
+        path = tmp_path / "active-memory.jsonl"
+>       result = run_canonical_structural_shot(
+            manifest, code=_impossible_syndrome_code(),
+            observation=DecoderObservation("Z", np.ones(1, dtype=np.uint8)),
+            hidden_truth=HiddenTruth(np.zeros(3, dtype=np.uint8), np.zeros(3, dtype=np.uint8)),
+            shot_id=0, ledger_path=path, sample_seed_identity="active-memory-sample", context={},
+            execution_controls=_relay_controls(belief_assemblies=100),
+        )
+
+tests/canonical/test_relay.py:361: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/canonical/execution.py:1259: in run_canonical_structural_shot
+    return _run_relay_structural_shot(
+src/bp_registry/canonical/execution.py:772: in _run_relay_structural_shot
+    run = controller.run(
+src/bp_registry/canonical/relay.py:526: in run
+    schedule = FloodingSchedule(edge_table, kernel=prior_kernel, profile=kernel.profile)  # type: ignore[attr-defined]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <bp_registry.canonical.schedules.FloodingSchedule object at 0x7fb0316ae240>
+edge_table = EdgeTable(check_count=1, variable_count=3, edges=())
+
+    def __init__(self, edge_table: EdgeTable, *, kernel: _FloodingKernel, profile: NumericalProfile | None = None) -> None:
+        self.edge_table = edge_table
+        self.kernel = kernel
+        self.profile = kernel.profile if profile is None else profile
+>       if self.profile != kernel.profile:
+                           ^^^^^^^^^^^^^^
+E       AttributeError: '_PriorVectorKernel' object has no attribute 'profile'
+
+src/bp_registry/canonical/schedules.py:122: AttributeError
+__ test_active_memory_changes_each_sweep_without_rebuilding_the_leg_schedule ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb0319e7230>
+
+    def test_active_memory_changes_each_sweep_without_rebuilding_the_leg_schedule(monkeypatch):
+        """Dynamic Relay memory updates the prior operand, not schedule topology."""
+        import bp_registry.canonical.relay as relay_module
+        from bp_registry.canonical.budgets import BudgetTree
+        from bp_registry.canonical.contracts import MemoryBindingV4, RelayLegSpec, RelayMemoryTuningV4
+        from bp_registry.canonical.numerics import REFERENCE_CPU_F64
+        from bp_registry.canonical.schedules import EdgeTable
+    
+        class Kernel:
+            profile = REFERENCE_CPU_F64
+    
+            def prior(self, _error_rate):
+                return 2.0
+    
+            def check_message(self, *_args, **_kwargs):
+                return 1.0
+    
+            def variable_message(self, belief, check_message):
+                return belief - check_message
+    
+            def candidate_from_beliefs(self, beliefs):
+                return np.zeros(beliefs.size, dtype=np.uint8)
+    
+        original = relay_module.FloodingSchedule
+        constructed: list[object] = []
+        observed_priors: list[np.ndarray] = []
+    
+        class ObservingSchedule(original):
+            def __init__(self, *args, **kwargs):
+                constructed.append(self)
+                super().__init__(*args, **kwargs)
+    
+            def sweep(self, *args, **kwargs):
+                observed_priors.append(np.array(self.kernel._prior, copy=True))
+                return super().sweep(*args, **kwargs)
+    
+        monkeypatch.setattr(relay_module, "FloodingSchedule", ObservingSchedule)
+        controller = relay_module.RelayController(
+            memory_bindings=(MemoryBindingV4(
+                binding_id="relay-prior", kind="affine_prior", target="prior", order=0,
+                alpha=0.875, state_lifetime="leg",
+            ),),
+            numerical_profile="cpu-float64-spa-v1",
+            memory_tuning=RelayMemoryTuningV4(
+                semantics="relay_v022_dynamic_affine_prior_css_adaptation",
+                first_leg_gamma=0.5, later_leg_center=0.0, later_leg_width=0.0,
+                seed_identity="schedule-reuse-fixture",
+            ),
+        )
+        table = EdgeTable.from_edges(1, 3, [(0, 0), (0, 1), (0, 2)])
+>       run = controller.run(
+            edge_table=table, check_matrix=np.ones((1, 3), dtype=np.uint8),
+            syndrome=np.ones(1, dtype=np.uint8), kernel=Kernel(), error_rate=0.1,
+            legs=(RelayLegSpec(max_iterations=2), RelayLegSpec(max_iterations=2)),
+            budgets=BudgetTree(limits=()), scope="attempt", lineage_prefix="active-schedule",
+            solution_limit=2, sample_seed_identity="active-schedule-sample",
+        )
+
+tests/canonical/test_relay.py:539: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/canonical/relay.py:526: in run
+    schedule = FloodingSchedule(edge_table, kernel=prior_kernel, profile=kernel.profile)  # type: ignore[attr-defined]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/canonical/test_relay.py:519: in __init__
+    super().__init__(*args, **kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_relay.test_active_memory_changes_each_sweep_without_rebuilding_the_leg_schedule.<locals>.ObservingSchedule object at 0x7fb031b33bc0>
+edge_table = EdgeTable(check_count=1, variable_count=3, edges=((0, 0), (0, 1), (0, 2)))
+
+    def __init__(self, edge_table: EdgeTable, *, kernel: _FloodingKernel, profile: NumericalProfile | None = None) -> None:
+        self.edge_table = edge_table
+        self.kernel = kernel
+        self.profile = kernel.profile if profile is None else profile
+>       if self.profile != kernel.profile:
+                           ^^^^^^^^^^^^^^
+E       AttributeError: '_PriorVectorKernel' object has no attribute 'profile'
+
+src/bp_registry/canonical/schedules.py:122: AttributeError
+___ test_relay_inside_sweep_crossing_latches_before_later_leg_or_projection ____
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-216/test_relay_inside_sweep_crossi0')
+
+    def test_relay_inside_sweep_crossing_latches_before_later_leg_or_projection(tmp_path) -> None:
+        from bp_registry.canonical.execution import run_canonical_structural_shot
+        from bp_registry.css import fixture_code
+        from bp_registry.ledger import CanonicalResourceInterruption
+        from bp_registry.runner import CanonicalRuntimeGuardV1
+        from bp_registry.sampling import DecoderObservation, HiddenTruth
+    
+        code = fixture_code()
+        hidden_x = np.asarray([1, 0, 0], dtype=np.uint8)
+        ticks = iter((10, 11, 14))
+        guard = CanonicalRuntimeGuardV1(_authorization(deadline_ns=12), clock_ns=lambda: next(ticks))
+        path = tmp_path / "relay.jsonl"
+    
+        with pytest.raises(CanonicalResourceInterruption):
+>           run_canonical_structural_shot(
+                _relay_manifest(), code=code, observation=DecoderObservation("Z", code.hz @ hidden_x % 2),
+                hidden_truth=HiddenTruth(hidden_x, np.zeros(code.n, dtype=np.uint8)), shot_id=0,
+                ledger_path=path, sample_seed_identity="relay-seed", context={}, execution_controls=_work_controls(),
+                resource_guard=guard,
+            )
+
+tests/canonical/test_resource_boundaries.py:207: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/canonical/execution.py:1259: in run_canonical_structural_shot
+    return _run_relay_structural_shot(
+src/bp_registry/canonical/execution.py:772: in _run_relay_structural_shot
+    run = controller.run(
+src/bp_registry/canonical/relay.py:526: in run
+    schedule = FloodingSchedule(edge_table, kernel=prior_kernel, profile=kernel.profile)  # type: ignore[attr-defined]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <bp_registry.canonical.schedules.FloodingSchedule object at 0x7fb0312fcce0>
+edge_table = EdgeTable(check_count=1, variable_count=3, edges=((0, 2),))
+
+    def __init__(self, edge_table: EdgeTable, *, kernel: _FloodingKernel, profile: NumericalProfile | None = None) -> None:
+        self.edge_table = edge_table
+        self.kernel = kernel
+        self.profile = kernel.profile if profile is None else profile
+>       if self.profile != kernel.profile:
+                           ^^^^^^^^^^^^^^
+E       AttributeError: '_PriorVectorKernel' object has no attribute 'profile'
+
+src/bp_registry/canonical/schedules.py:122: AttributeError
+=========================== short test summary info ============================
+FAILED tests/canonical/test_phase4_calibration_ledgers.py::test_calibration_ledger_audit_binds_real_relay_terminal_and_rejects_tampering
+FAILED tests/canonical/test_phase4_evidence.py::test_public_verify_executes_phase4_relay_through_cli
+FAILED tests/canonical/test_phase4_evidence.py::test_benchmark_per_shot_public_identity_matches_native_observation
+FAILED tests/canonical/test_relay.py::test_tracer_two_leg_relay_is_public_truth_blind_and_transfers_only_posterior
+FAILED tests/canonical/test_relay.py::test_prevalidated_relay_reconstruction_matches_path_validation_and_rejects_tampering
+FAILED tests/canonical/test_relay.py::test_three_leg_relay_emits_committed_per_leg_leaves_and_replays_idempotently
+FAILED tests/canonical/test_relay.py::test_budget_exhaustion_retains_partial_final_leg_work_with_exact_leaf_total
+FAILED tests/canonical/test_relay.py::test_active_memory_tuning_is_seeded_per_leg_and_retains_actual_application_facts
+FAILED tests/canonical/test_relay.py::test_active_memory_changes_each_sweep_without_rebuilding_the_leg_schedule
+FAILED tests/canonical/test_resource_boundaries.py::test_relay_inside_sweep_crossing_latches_before_later_leg_or_projection
+10 failed, 1357 passed, 1 skipped in 223.11s (0:03:43)

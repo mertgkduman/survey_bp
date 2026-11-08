@@ -6,10 +6,10 @@ current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
 stopped_at: Completed 11-16 and 11-20; eight Phase 11 gap plans remain open
-last_updated: "2026-11-08T03:37:51Z"
+last_updated: "2026-11-08T04:02:20Z"
 last_activity: 2026-11-07
-last_activity_desc: Completed boundary spikes 019–022; quantified exact-SPA limitation and found alternate-construction, binary-serial admission and compiled v1-cap gaps; production unchanged
-state_head: dc39055e6db0c2642e62c81d9716797d794785a5
+last_activity_desc: Fixed B01–B03 in order; qualified opt-in stable SPA and CPU batches; 1368 tests passed with one existing skip
+state_head: be7286ec919488dced1330dbb5913b1a3d23bf15
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-07 — completed expanded kernel boundary audit; freeze remains pending explicit numerical decision and configuration closure
-Last Activity Description: See .planning/spikes/CANONICAL-KERNEL-BOUNDARY-AUDIT.md. 840 CPU ledger rows and 183 selected regressions pass; 15 grouped probes retain five failed assertions covering one known numerical limitation and three new configuration/backend findings. Prior fixes and historical evidence remain intact; no production or HTML changes.
+Last activity: 2026-11-07 — completed boundary fixes 023–026 and stable SPA CPU qualification
+Last Activity Description: See .planning/spikes/CANONICAL-KERNEL-BOUNDARY-FIXES.md. All B01–B03 fixes pass; fresh-cache regression: 1368 passed, one existing skip; 14 independent probes and 1680 CPU control rows pass. Opt-in stable SPA supports binary/Pauli flooding with qualified resolution policies; 2048 benchmark rows retain matched single/batch behavior. Public profile defaults, historical evidence and publication gates remain unchanged.
 
 Progress: 8 of 14 phases complete (57%); 159 of 176 plans complete. Phase 11 has 17 of 25 plans complete; plan 17 is the first open number but depends on source reviews 18 and 19, while plan 20's blocked-target review is complete.
 

@@ -30,3 +30,9 @@ Kernel audit probes and their small deterministic evidence bundles live directly
 ## Tools and libraries
 
 The project `.venv` supplies the pinned versions in `pyproject.toml`; no new dependency was installed for this spike.
+
+## Constructor and performance qualification
+
+- Enforce compiled graph contracts in construction itself, including dataclass replacement; validate and own CSR buffers before bounds-unchecked native execution.
+- Keep failed integration evidence, then rerun relevant regressions against the final source. Use a fresh Numba cache when changing shared compiled helpers.
+- Compare CPU throughput on identical policy, input and stopping contracts; separate first-call/JIT costs from warm timing and retain matching shot ledgers.
