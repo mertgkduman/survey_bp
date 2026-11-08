@@ -6,6 +6,7 @@ import pytest
 import stim
 
 from bp_registry.batch_records import encode_records
+from bp_registry.canonical.numerics import NumericalFailure
 from bp_registry.circuit import CircuitPolicy, PolicyBpSinterDecoder
 from bp_registry.circuit.policies import CircuitBatchResult
 
@@ -75,3 +76,39 @@ def test_result_empty_batch_keeps_declared_column_ranks():
     assert replace(result, faults=np.empty((0, 1), np.int16)).faults.shape == (0, 1)
     with pytest.raises(ValueError, match="circuit result"):
         replace(result, faults=np.empty(0, np.uint8))
+
+
+@pytest.mark.parametrize("backend", ["scalar", "compiled", "auto"])
+@pytest.mark.parametrize("dem", ["error(0.1) D0 L0", "error(0.1) D0 L0\nerror(0.2) D0"])
+def test_nms_overflow_fails_before_saturation(backend, dem):
+    compiled = PolicyBpSinterDecoder(CircuitPolicy(rule="normalized_min_sum", parameter=1e308,
+        backend=backend, max_iterations=1)).compile_decoder_for_dem(dem=stim.DetectorErrorModel(dem))
+    with pytest.raises(NumericalFailure, match="normalized_min_sum_output"):
+        compiled.decode_detailed(np.array([[1]], np.uint8))
+
+
+@pytest.mark.parametrize("backend", ["compiled", "auto"])
+@pytest.mark.parametrize("parameter", [.8, 1e305])
+def test_nms_finite_values_keep_scalar_behavior(backend, parameter):
+    config = dict(rule="normalized_min_sum", parameter=parameter, max_iterations=2)
+    scalar = decoder(backend="scalar", **config).decode_detailed(np.array([[1]], np.uint8))
+    compiled = decoder(backend=backend, **config).decode_detailed(np.array([[1]], np.uint8))
+    assert scalar.ledger[1:] == compiled.ledger[1:]
+
+
+@pytest.mark.parametrize("backend", ["scalar", "compiled", "auto"])
+@pytest.mark.parametrize("syndrome,limit", [(0, 1), (1, 0)])
+def test_nms_unexecuted_overflow_preserves_initial_stopping(backend, syndrome, limit):
+    result = decoder(rule="normalized_min_sum", parameter=1e308, backend=backend,
+                     max_iterations=limit).decode_detailed(np.array([[syndrome]], np.uint8))
+    assert result.iterations.tolist() == [0]
+    assert result.faults.tolist() == [[0]]
+    assert result.converged.tolist() == [syndrome == 0]
+
+
+def test_packed_overflow_does_not_publish_success_ledger(tmp_path):
+    compiled = PolicyBpSinterDecoder(CircuitPolicy(rule="normalized_min_sum", parameter=1e308),
+        ledger_directory=str(tmp_path)).compile_decoder_for_dem(dem=stim.DetectorErrorModel("error(0.1) D0 L0"))
+    with pytest.raises(NumericalFailure, match="normalized_min_sum_output"):
+        compiled.decode_shots_bit_packed(bit_packed_detection_event_data=np.array([[1]], np.uint8))
+    assert not list(tmp_path.glob("*.jsonl"))

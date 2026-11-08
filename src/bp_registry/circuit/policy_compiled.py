@@ -3,6 +3,7 @@ import math
 import numpy as np
 from numba import njit
 from bp_registry.canonical.compiled import _candidate_matches, _v2_sweep_into, _clip
+from bp_registry.canonical.numerics import NumericalFailure
 from bp_registry.check_numerics import minsum_summary
 
 
@@ -31,6 +32,8 @@ def decode_attempt(rows, variables, prior, syndrome, max_iterations, rule, param
                     magnitude = 25.0 if stop - start == 1 else second if e == minimum else first
                     if rule == 2:
                         magnitude *= parameter
+                        if not math.isfinite(magnitude):
+                            raise NumericalFailure("nonfinite arithmetic at normalized_min_sum_output")
                     elif rule == 3:
                         magnitude = max(0.0, magnitude - parameter)
                     message = -magnitude if (int(syndrome[check]) + negatives - int(old[e] < 0)) % 2 else magnitude
