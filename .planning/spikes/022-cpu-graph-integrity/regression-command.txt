@@ -1,0 +1,1 @@
+OMP_NUM_THREADS=1 NUMBA_NUM_THREADS=4 .venv/bin/python -m pytest -q tests/canonical/test_kernel_contract_admission.py tests/canonical/test_schedule_semantics.py tests/canonical/quaternary/test_compiled_bp4.py --junitxml=.planning/spikes/022-cpu-graph-integrity/regression.xml
