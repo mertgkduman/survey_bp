@@ -14,6 +14,7 @@ import numpy as np
 from numba import njit
 
 from bp_registry.css import CssCode
+from bp_registry.compiled_contracts import csr_pointer, integer_vector, immutable_array
 from bp_registry.resolution import BpFloodingPolicy, DEFAULT_BP4_MIN_SUM, round_message
 
 from .algebra import Pauli
@@ -593,6 +594,41 @@ class CompiledBp4Graph:
     prior_llrs: np.ndarray
     profile: QuaternaryNumericalProfile = DEFAULT_QBP4_F64
     policy: BpFloodingPolicy | None = None
+
+    def __post_init__(self):
+        profile, policy = self.profile, self.policy
+        if not isinstance(profile, QuaternaryNumericalProfile):
+            raise ValueError("invalid compiled BP4 numerical profile")
+        if policy is not None and not isinstance(policy, BpFloodingPolicy):
+            raise ValueError("compiled BP4 policy must be a BpFloodingPolicy")
+        if policy is not None and not isinstance(profile, QuaternaryNumericalProfileV2):
+            raise ValueError("resolved BP4 flooding policy requires unbounded v2 numerical coordinates")
+        if isinstance(profile, QuaternaryNumericalProfileV2) and profile.check_rule != "tanh_product":
+            raise ValueError("compiled v2 BP4 currently supports tanh_product checks")
+        variables = integer_vector(self.variables, "variables")
+        labels = integer_vector(self.labels, "labels")
+        count = len(variables)
+        rows = csr_pointer(self.row_ptr, count, "row_ptr")
+        pointers = csr_pointer(self.variable_ptr, count, "variable_ptr")
+        edges = integer_vector(self.variable_edges, "variable_edges")
+        priors = np.asarray(self.prior_llrs)
+        n = len(pointers) - 1
+        if priors.shape != (n, 3) or not np.issubdtype(priors.dtype, np.number) or np.iscomplexobj(priors) or not np.all(np.isfinite(priors)):
+            raise ValueError("prior_llrs must contain three finite real LLRs per variable")
+        if len(labels) != count or np.any((labels < 1) | (labels > 3)):
+            raise ValueError("labels must contain one nonidentity Pauli per edge")
+        if np.any((variables < 0) | (variables >= n)) or len(edges) != count or not np.array_equal(np.sort(edges), np.arange(count)):
+            raise ValueError("compiled BP4 edge indexes are out of bounds or duplicated")
+        for start, stop in zip(rows[:-1], rows[1:]):
+            if start == stop or np.any(variables[start+1:stop] <= variables[start:stop-1]):
+                raise ValueError("BP4 rows require distinct variables in canonical order")
+        expected_ptr = np.concatenate(([0], np.cumsum(np.bincount(variables.astype(np.int64), minlength=n))))
+        if not np.array_equal(pointers, expected_ptr) or not np.array_equal(edges, np.argsort(variables, kind="stable")):
+            raise ValueError("variable CSR does not match check CSR")
+        for name, array, dtype in (("row_ptr", rows, np.int64), ("variable_ptr", pointers, np.int64),
+                ("variable_edges", edges, np.int64), ("variables", variables, np.int64),
+                ("labels", labels, np.uint8), ("prior_llrs", priors, np.float64)):
+            object.__setattr__(self, name, immutable_array(array, dtype))
 
     @property
     def effective_numerics(self) -> dict[str, object]:

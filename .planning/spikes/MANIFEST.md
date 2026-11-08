@@ -35,6 +35,8 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 
 - Continue post-fix verification in the approved mathematical, upstream, policy, execution order; target boundary and alternate-entry gaps as spikes 019–022 without changing production behavior.
 
+- Fix B01 → B02 → B03, then qualify a separately versioned stable SPA policy; retain historical versions and evidence.
+
 ## Spikes
 
 | # | Idea | Name | Type | Validates | Verdict | Tags |
@@ -61,3 +63,7 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 | 020 | canonical-kernel-audit | Upstream numerical envelope | standard | Given aligned boundary inputs, when pinned native implementations run, then discrepancies and safeguards are explained | VALIDATED | boundary-audit |
 | 021 | canonical-kernel-audit | Policy entry-point closure | standard | Given alternate constructors and composed updates, when admitted, then execution matches declared semantics | PARTIAL | boundary-audit |
 | 022 | canonical-kernel-audit | CPU boundary and graph integrity | standard | Given qualified graphs and bounded observations, when execution is batched or state reused, then validity, work and graph identity agree | PARTIAL | boundary-audit |
+| 023 | canonical-kernel-audit | Construction admission | standard | Given audited counterexamples, when corrected, then accepted construction paths enforce one contract | VALIDATED | fixes |
+| 024 | canonical-kernel-audit | Local damping | standard | Given audited counterexamples, when corrected, then local schedule updates honor their active numerical profile | IN_PROGRESS | fixes |
+| 025 | canonical-kernel-audit | BP4 active cap | standard | Given audited counterexamples, when corrected, then compiled legacy BP4 honors the selected saturation | IN_PROGRESS | fixes |
+| 026 | canonical-kernel-audit | Stable SPA qualification | standard | Given audited counterexamples, when corrected, then a new stable log-domain policy agrees with independent exact inference | IN_PROGRESS | fixes |

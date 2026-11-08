@@ -119,6 +119,8 @@ class FloodingSchedule:
         self.edge_table = edge_table
         self.kernel = kernel
         self.profile = kernel.profile if profile is None else profile
+        if self.profile != kernel.profile:
+            raise ValueError("schedule profile must agree with the kernel profile")
         self._check_edges = tuple(
             tuple(index for index, (check, _variable) in enumerate(edge_table.edges) if check == current)
             for current in range(edge_table.check_count)

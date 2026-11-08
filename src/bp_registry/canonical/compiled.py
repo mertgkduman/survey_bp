@@ -15,6 +15,7 @@ import numpy as np
 from numba import njit
 
 from bp_registry.resolution import BpFloodingPolicy, round_message
+from bp_registry.compiled_contracts import csr_pointer, integer_vector, immutable_array
 
 from .kernel import KernelResult
 from .numerics import (
@@ -369,6 +370,37 @@ class CompiledBinaryFlooding:
     rule: str
     numerical_profile: NumericalProfile = DEFAULT_BINARY_SPA_F64
     policy: BpFloodingPolicy | None = None
+
+    def __post_init__(self):
+        if not isinstance(self.table, EdgeTable):
+            raise ValueError("compiled binary graph requires an EdgeTable")
+        table = EdgeTable.from_edges(self.table.check_count, self.table.variable_count, self.table.edges)
+        if table != self.table:
+            raise ValueError("compiled binary edges must use canonical order")
+        selected, policy, rule = self.numerical_profile, self.policy, self.rule
+        if not isinstance(selected, NumericalProfile) or rule not in {"spa", "min_sum"}:
+            raise ValueError("invalid compiled binary profile or rule")
+        if policy is not None:
+            if not isinstance(policy, BpFloodingPolicy):
+                raise ValueError("binary flooding policy must be a BpFloodingPolicy")
+            if policy.check_rule != ("sum_product" if rule == "spa" else "min_sum"):
+                raise ValueError("binary check rule conflicts with explicit policy")
+            if not isinstance(selected, BinaryNumericalProfileV2) and not (rule == "min_sum" and selected == MIN_SUM_CPU_F64):
+                raise ValueError("resolved binary policy requires unbounded v2 prior coordinates")
+        elif rule == "min_sum" and selected != MIN_SUM_CPU_F64:
+            raise ValueError("compiled min-sum requires its v1 numerical profile")
+        elif rule == "spa" and selected.normalization == "min_sum":
+            raise ValueError("compiled SPA requires an SPA numerical profile")
+        row_ptr = csr_pointer(self.row_ptr, table.edge_count, "row_ptr")
+        variables = integer_vector(self.variables, "variables")
+        expected_ptr = np.zeros(table.check_count + 1, dtype=np.int64)
+        for check, _ in table.edges:
+            expected_ptr[check + 1] += 1
+        np.cumsum(expected_ptr, out=expected_ptr)
+        if not np.array_equal(row_ptr, expected_ptr) or not np.array_equal(variables, [v for _, v in table.edges]):
+            raise ValueError("compiled CSR buffers disagree with the canonical edge table")
+        object.__setattr__(self, "row_ptr", immutable_array(row_ptr, np.int64))
+        object.__setattr__(self, "variables", immutable_array(variables, np.int64))
 
     @property
     def effective_numerics(self) -> dict[str, object]:
