@@ -37,6 +37,8 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 
 - Fix B01 → B02 → B03, then qualify a separately versioned stable SPA policy; retain historical versions and evidence.
 
+- Continue post-fix freeze assessment in the approved mathematical, upstream, policy and execution order; preserve production behavior and prior evidence while probing newly exposed boundaries.
+
 ## Spikes
 
 | # | Idea | Name | Type | Validates | Verdict | Tags |
@@ -67,3 +69,7 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 | 024 | canonical-kernel-audit | Local damping | standard | Given audited counterexamples, when corrected, then local schedule updates honor their active numerical profile | VALIDATED | fixes |
 | 025 | canonical-kernel-audit | BP4 active cap | standard | Given audited counterexamples, when corrected, then compiled legacy BP4 honors the selected saturation | VALIDATED | fixes |
 | 026 | canonical-kernel-audit | Stable SPA qualification | standard | Given audited counterexamples, when corrected, then a new stable log-domain policy agrees with independent exact inference | VALIDATED | fixes |
+| 027 | canonical-kernel-audit | Stable SPA stress audit | standard | Given corrected kernels, when audited, then independent multi-check inference, mixed-scale messages and finite-state failure boundaries | PARTIAL | freeze-audit |
+| 028 | canonical-kernel-audit | Stable upstream audit | standard | Given corrected kernels, when audited, then native and canonical comparisons use explicit mathematical and numerical alignment | IN_PROGRESS | freeze-audit |
+| 029 | canonical-kernel-audit | Schedule policy closure | standard | Given corrected kernels, when audited, then all advertised numerical controls remain active or are explicitly rejected across schedules | IN_PROGRESS | freeze-audit |
+| 030 | canonical-kernel-audit | Freeze execution audit | standard | Given corrected kernels, when audited, then construction, public reachability, CPU execution and evidence agree across supported policy boundaries | IN_PROGRESS | freeze-audit |

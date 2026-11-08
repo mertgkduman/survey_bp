@@ -1,0 +1,2 @@
+{"checks": 4, "passed": 3, "failed": 1}
+FINDING: C01_finite_inputs_cannot_return_nonfinite_BP4_state 
