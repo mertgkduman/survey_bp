@@ -782,7 +782,7 @@ class CompiledBp4Graph:
         else:
             c2v, v2c, beliefs, marginals, candidate, _ = _sweep(
                 self.row_ptr, self.variable_ptr, self.variable_edges, self.variables,
-                self.labels, old, self.prior_llrs, s, QBP4_F64_V1.saturation,
+                self.labels, old, self.prior_llrs, s, self.profile.saturation,
             )
         converged = _candidate_matches(self.row_ptr, self.variables, self.labels, candidate, s)
         for array in (c2v, v2c, beliefs, marginals, candidate):
@@ -820,7 +820,7 @@ class CompiledBp4Graph:
         else:
             candidate, iterations, converged = _decode(
                 self.row_ptr, self.variable_ptr, self.variable_edges, self.variables, self.labels,
-                self.prior_llrs, s, QBP4_F64_V1.saturation, max_iterations, stop_on_convergence,
+                self.prior_llrs, s, self.profile.saturation, max_iterations, stop_on_convergence,
             )
         candidate.setflags(write=False)
         return CompiledBp4Result(candidate, int(iterations), bool(converged))

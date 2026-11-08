@@ -1,0 +1,231 @@
+FFF..FFF..F....                                                          [100%]
+=================================== FAILURES ===================================
+_________ test_compiled_bp4_respects_active_legacy_cap[syndrome0-0.1] __________
+
+cap = 0.1, syndrome = [0, 0]
+
+    @pytest.mark.parametrize('cap', [.1,1.,5.,25.,40.])
+    @pytest.mark.parametrize('syndrome', [[0,0],[1,0],[1,1]])
+    def test_compiled_bp4_respects_active_legacy_cap(cap,syndrome):
+        s=np.array(syndrome,dtype=np.uint8); code=PauliCode(checks=H)
+        priors=np.tile([.97,.01,.01,.01],(3,1)); profile=replace(QBP4_F64_V1,saturation=cap)
+        kernel=ScalarLlrBp4Kernel(profile=profile)
+        problem=QuaternaryOriginalProblem('original-cap-regression',code,s)
+        session=kernel.new_session(problem,priors)
+        graph=CompiledBp4Graph.from_code(code,priors,profile=profile)
+        old=graph.initial_v2c()
+        for _ in range(4):
+            expected=session.sweep(stop_on_convergence=False); actual=graph.sweep(old,s)
+            for field in ('c2v','v2c','beliefs','marginals'):
+>               np.testing.assert_allclose(getattr(actual,field),getattr(expected,field),atol=2e-12,rtol=0)
+E               AssertionError: 
+E               Not equal to tolerance rtol=0, atol=2e-12
+E               
+E               Mismatched elements: 4 / 4 (100%)
+E               Max absolute difference among violations: 0.05124948
+E               Max relative difference among violations: inf
+E                ACTUAL: array([0.051249, 0.051249, 0.051249, 0.051249])
+E                DESIRED: array([0., 0., 0., 0.])
+
+tests/canonical/test_boundary_fixes.py:110: AssertionError
+_________ test_compiled_bp4_respects_active_legacy_cap[syndrome0-1.0] __________
+
+cap = 1.0, syndrome = [0, 0]
+
+    @pytest.mark.parametrize('cap', [.1,1.,5.,25.,40.])
+    @pytest.mark.parametrize('syndrome', [[0,0],[1,0],[1,1]])
+    def test_compiled_bp4_respects_active_legacy_cap(cap,syndrome):
+        s=np.array(syndrome,dtype=np.uint8); code=PauliCode(checks=H)
+        priors=np.tile([.97,.01,.01,.01],(3,1)); profile=replace(QBP4_F64_V1,saturation=cap)
+        kernel=ScalarLlrBp4Kernel(profile=profile)
+        problem=QuaternaryOriginalProblem('original-cap-regression',code,s)
+        session=kernel.new_session(problem,priors)
+        graph=CompiledBp4Graph.from_code(code,priors,profile=profile)
+        old=graph.initial_v2c()
+        for _ in range(4):
+            expected=session.sweep(stop_on_convergence=False); actual=graph.sweep(old,s)
+            for field in ('c2v','v2c','beliefs','marginals'):
+>               np.testing.assert_allclose(getattr(actual,field),getattr(expected,field),atol=2e-12,rtol=0)
+E               AssertionError: 
+E               Not equal to tolerance rtol=0, atol=2e-12
+E               
+E               Mismatched elements: 8 / 12 (66.7%)
+E               Max absolute difference among violations: 1.24022901
+E               Max relative difference among violations: 3.26474434
+E                ACTUAL: array([[1.      , 1.      , 1.      ],
+E                      [1.      , 1.620115, 1.620115],
+E                      [1.      , 1.620115, 1.620115],
+E                      [1.      , 1.      , 1.      ]])
+E                DESIRED: array([[1.      , 0.379885, 0.379885],
+E                      [1.      , 0.379885, 0.379885],
+E                      [1.      , 0.379885, 0.379885],
+E                      [1.      , 0.379885, 0.379885]])
+
+tests/canonical/test_boundary_fixes.py:110: AssertionError
+_________ test_compiled_bp4_respects_active_legacy_cap[syndrome0-5.0] __________
+
+cap = 5.0, syndrome = [0, 0]
+
+    @pytest.mark.parametrize('cap', [.1,1.,5.,25.,40.])
+    @pytest.mark.parametrize('syndrome', [[0,0],[1,0],[1,1]])
+    def test_compiled_bp4_respects_active_legacy_cap(cap,syndrome):
+        s=np.array(syndrome,dtype=np.uint8); code=PauliCode(checks=H)
+        priors=np.tile([.97,.01,.01,.01],(3,1)); profile=replace(QBP4_F64_V1,saturation=cap)
+        kernel=ScalarLlrBp4Kernel(profile=profile)
+        problem=QuaternaryOriginalProblem('original-cap-regression',code,s)
+        session=kernel.new_session(problem,priors)
+        graph=CompiledBp4Graph.from_code(code,priors,profile=profile)
+        old=graph.initial_v2c()
+        for _ in range(4):
+            expected=session.sweep(stop_on_convergence=False); actual=graph.sweep(old,s)
+            for field in ('c2v','v2c','beliefs','marginals'):
+>               np.testing.assert_allclose(getattr(actual,field),getattr(expected,field),atol=2e-12,rtol=0)
+E               AssertionError: 
+E               Not equal to tolerance rtol=0, atol=2e-12
+E               
+E               Mismatched elements: 8 / 12 (66.7%)
+E               Max absolute difference among violations: 7.35835157
+E               Max relative difference among violations: 6.64003461
+E                ACTUAL: array([[4.574711, 4.574711, 4.574711],
+E                      [4.574711, 8.466531, 8.466531],
+E                      [4.574711, 8.466531, 8.466531],
+E                      [4.574711, 4.574711, 4.574711]])
+E                DESIRED: array([[4.574711, 1.10818 , 1.10818 ],
+E                      [4.574711, 1.10818 , 1.10818 ],
+E                      [4.574711, 1.10818 , 1.10818 ],
+E                      [4.574711, 1.10818 , 1.10818 ]])
+
+tests/canonical/test_boundary_fixes.py:110: AssertionError
+_________ test_compiled_bp4_respects_active_legacy_cap[syndrome1-0.1] __________
+
+cap = 0.1, syndrome = [1, 0]
+
+    @pytest.mark.parametrize('cap', [.1,1.,5.,25.,40.])
+    @pytest.mark.parametrize('syndrome', [[0,0],[1,0],[1,1]])
+    def test_compiled_bp4_respects_active_legacy_cap(cap,syndrome):
+        s=np.array(syndrome,dtype=np.uint8); code=PauliCode(checks=H)
+        priors=np.tile([.97,.01,.01,.01],(3,1)); profile=replace(QBP4_F64_V1,saturation=cap)
+        kernel=ScalarLlrBp4Kernel(profile=profile)
+        problem=QuaternaryOriginalProblem('original-cap-regression',code,s)
+        session=kernel.new_session(problem,priors)
+        graph=CompiledBp4Graph.from_code(code,priors,profile=profile)
+        old=graph.initial_v2c()
+        for _ in range(4):
+            expected=session.sweep(stop_on_convergence=False); actual=graph.sweep(old,s)
+            for field in ('c2v','v2c','beliefs','marginals'):
+>               np.testing.assert_allclose(getattr(actual,field),getattr(expected,field),atol=2e-12,rtol=0)
+E               AssertionError: 
+E               Not equal to tolerance rtol=0, atol=2e-12
+E               
+E               Mismatched elements: 4 / 4 (100%)
+E               Max absolute difference among violations: 0.05124948
+E               Max relative difference among violations: inf
+E                ACTUAL: array([-0.051249, -0.051249,  0.051249,  0.051249])
+E                DESIRED: array([-0., -0.,  0.,  0.])
+
+tests/canonical/test_boundary_fixes.py:110: AssertionError
+_________ test_compiled_bp4_respects_active_legacy_cap[syndrome1-1.0] __________
+
+cap = 1.0, syndrome = [1, 0]
+
+    @pytest.mark.parametrize('cap', [.1,1.,5.,25.,40.])
+    @pytest.mark.parametrize('syndrome', [[0,0],[1,0],[1,1]])
+    def test_compiled_bp4_respects_active_legacy_cap(cap,syndrome):
+        s=np.array(syndrome,dtype=np.uint8); code=PauliCode(checks=H)
+        priors=np.tile([.97,.01,.01,.01],(3,1)); profile=replace(QBP4_F64_V1,saturation=cap)
+        kernel=ScalarLlrBp4Kernel(profile=profile)
+        problem=QuaternaryOriginalProblem('original-cap-regression',code,s)
+        session=kernel.new_session(problem,priors)
+        graph=CompiledBp4Graph.from_code(code,priors,profile=profile)
+        old=graph.initial_v2c()
+        for _ in range(4):
+            expected=session.sweep(stop_on_convergence=False); actual=graph.sweep(old,s)
+            for field in ('c2v','v2c','beliefs','marginals'):
+>               np.testing.assert_allclose(getattr(actual,field),getattr(expected,field),atol=2e-12,rtol=0)
+E               AssertionError: 
+E               Not equal to tolerance rtol=0, atol=2e-12
+E               
+E               Mismatched elements: 4 / 12 (33.3%)
+E               Max absolute difference among violations: 0.62011451
+E               Max relative difference among violations: 1.63237217
+E                ACTUAL: array([[1.      , 1.      , 1.      ],
+E                      [1.      , 1.620115, 1.620115],
+E                      [1.      , 0.379885, 0.379885],
+E                      [1.      , 1.      , 1.      ]])
+E                DESIRED: array([[1.      , 1.      , 1.      ],
+E                      [1.      , 1.      , 1.      ],
+E                      [1.      , 0.379885, 0.379885],
+E                      [1.      , 0.379885, 0.379885]])
+
+tests/canonical/test_boundary_fixes.py:110: AssertionError
+_________ test_compiled_bp4_respects_active_legacy_cap[syndrome1-5.0] __________
+
+cap = 5.0, syndrome = [1, 0]
+
+    @pytest.mark.parametrize('cap', [.1,1.,5.,25.,40.])
+    @pytest.mark.parametrize('syndrome', [[0,0],[1,0],[1,1]])
+    def test_compiled_bp4_respects_active_legacy_cap(cap,syndrome):
+        s=np.array(syndrome,dtype=np.uint8); code=PauliCode(checks=H)
+        priors=np.tile([.97,.01,.01,.01],(3,1)); profile=replace(QBP4_F64_V1,saturation=cap)
+        kernel=ScalarLlrBp4Kernel(profile=profile)
+        problem=QuaternaryOriginalProblem('original-cap-regression',code,s)
+        session=kernel.new_session(problem,priors)
+        graph=CompiledBp4Graph.from_code(code,priors,profile=profile)
+        old=graph.initial_v2c()
+        for _ in range(4):
+            expected=session.sweep(stop_on_convergence=False); actual=graph.sweep(old,s)
+            for field in ('c2v','v2c','beliefs','marginals'):
+>               np.testing.assert_allclose(getattr(actual,field),getattr(expected,field),atol=2e-12,rtol=0)
+E               AssertionError: 
+E               Not equal to tolerance rtol=0, atol=2e-12
+E               
+E               Mismatched elements: 4 / 12 (33.3%)
+E               Max absolute difference among violations: 3.46653128
+E               Max relative difference among violations: 3.128131
+E                ACTUAL: array([[4.574711, 4.574711, 4.574711],
+E                      [4.574711, 8.466531, 8.466531],
+E                      [4.574711, 0.682891, 0.682891],
+E                      [4.574711, 4.574711, 4.574711]])
+E                DESIRED: array([[4.574711, 4.574711, 4.574711],
+E                      [4.574711, 5.      , 5.      ],
+E                      [4.574711, 0.682891, 0.682891],
+E                      [4.574711, 1.10818 , 1.10818 ]])
+
+tests/canonical/test_boundary_fixes.py:110: AssertionError
+_________ test_compiled_bp4_respects_active_legacy_cap[syndrome2-0.1] __________
+
+cap = 0.1, syndrome = [1, 1]
+
+    @pytest.mark.parametrize('cap', [.1,1.,5.,25.,40.])
+    @pytest.mark.parametrize('syndrome', [[0,0],[1,0],[1,1]])
+    def test_compiled_bp4_respects_active_legacy_cap(cap,syndrome):
+        s=np.array(syndrome,dtype=np.uint8); code=PauliCode(checks=H)
+        priors=np.tile([.97,.01,.01,.01],(3,1)); profile=replace(QBP4_F64_V1,saturation=cap)
+        kernel=ScalarLlrBp4Kernel(profile=profile)
+        problem=QuaternaryOriginalProblem('original-cap-regression',code,s)
+        session=kernel.new_session(problem,priors)
+        graph=CompiledBp4Graph.from_code(code,priors,profile=profile)
+        old=graph.initial_v2c()
+        for _ in range(4):
+            expected=session.sweep(stop_on_convergence=False); actual=graph.sweep(old,s)
+            for field in ('c2v','v2c','beliefs','marginals'):
+>               np.testing.assert_allclose(getattr(actual,field),getattr(expected,field),atol=2e-12,rtol=0)
+E               AssertionError: 
+E               Not equal to tolerance rtol=0, atol=2e-12
+E               
+E               Mismatched elements: 4 / 4 (100%)
+E               Max absolute difference among violations: 0.05124948
+E               Max relative difference among violations: inf
+E                ACTUAL: array([-0.051249, -0.051249, -0.051249, -0.051249])
+E                DESIRED: array([-0., -0., -0., -0.])
+
+tests/canonical/test_boundary_fixes.py:110: AssertionError
+=========================== short test summary info ============================
+FAILED tests/canonical/test_boundary_fixes.py::test_compiled_bp4_respects_active_legacy_cap[syndrome0-0.1]
+FAILED tests/canonical/test_boundary_fixes.py::test_compiled_bp4_respects_active_legacy_cap[syndrome0-1.0]
+FAILED tests/canonical/test_boundary_fixes.py::test_compiled_bp4_respects_active_legacy_cap[syndrome0-5.0]
+FAILED tests/canonical/test_boundary_fixes.py::test_compiled_bp4_respects_active_legacy_cap[syndrome1-0.1]
+FAILED tests/canonical/test_boundary_fixes.py::test_compiled_bp4_respects_active_legacy_cap[syndrome1-1.0]
+FAILED tests/canonical/test_boundary_fixes.py::test_compiled_bp4_respects_active_legacy_cap[syndrome1-5.0]
+FAILED tests/canonical/test_boundary_fixes.py::test_compiled_bp4_respects_active_legacy_cap[syndrome2-0.1]
+7 failed, 8 passed, 27 deselected in 5.13s

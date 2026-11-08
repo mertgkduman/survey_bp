@@ -89,3 +89,29 @@ def test_local_entry_clipping_uses_active_v1_cap(kind):
     schedule.execute_local_step(executor,old,syndrome,error_rate=.2,
         progress=ScheduleProgress(iteration=0,local_steps=0,cursor=(0,)),is_converged=lambda _:False)
     assert np.max(np.abs(old))<=1.
+
+from bp_registry.quaternary.kernel import ScalarLlrBp4Kernel
+from bp_registry.quaternary.numerics import QBP4_F64_V1
+from bp_registry.quaternary.problems import QuaternaryOriginalProblem
+
+@pytest.mark.parametrize('cap', [.1,1.,5.,25.,40.])
+@pytest.mark.parametrize('syndrome', [[0,0],[1,0],[1,1]])
+def test_compiled_bp4_respects_active_legacy_cap(cap,syndrome):
+    s=np.array(syndrome,dtype=np.uint8); code=PauliCode(checks=H)
+    priors=np.tile([.97,.01,.01,.01],(3,1)); profile=replace(QBP4_F64_V1,saturation=cap)
+    kernel=ScalarLlrBp4Kernel(profile=profile)
+    problem=QuaternaryOriginalProblem('original-cap-regression',code,s)
+    session=kernel.new_session(problem,priors)
+    graph=CompiledBp4Graph.from_code(code,priors,profile=profile)
+    old=graph.initial_v2c()
+    for _ in range(4):
+        expected=session.sweep(stop_on_convergence=False); actual=graph.sweep(old,s)
+        for field in ('c2v','v2c','beliefs','marginals'):
+            np.testing.assert_allclose(getattr(actual,field),getattr(expected,field),atol=2e-12,rtol=0)
+        np.testing.assert_array_equal(actual.candidate,expected.candidate)
+        old=actual.v2c
+    for limit in (0,1,4):
+        expected=kernel.new_session(problem,priors).run(max_iterations=limit)
+        actual=graph.run(s,max_iterations=limit)
+        np.testing.assert_array_equal(actual.candidate,expected.candidate)
+        assert (actual.iterations,actual.converged)==(expected.iteration,expected.converged)
