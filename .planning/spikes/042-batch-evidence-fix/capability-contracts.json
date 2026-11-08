@@ -1,0 +1,111 @@
+{
+  "schema": "canonical-capability-evidence-map-v1",
+  "source_head": "7b763d2",
+  "purpose": "pre-HTML contract and evidence lookup; runtime admission remains authoritative",
+  "axes": [
+    "regime",
+    "family",
+    "prior_representation",
+    "update_rule",
+    "assignment_shape",
+    "numerical_version",
+    "schedule",
+    "memory",
+    "controller",
+    "backend"
+  ],
+  "admission_authorities": [
+    "src/bp_registry/manifests.py",
+    "src/bp_registry/canonical/compatibility.py",
+    "src/bp_registry/canonical/compiled.py",
+    "src/bp_registry/quaternary/compiled.py",
+    "src/bp_registry/circuit/dem.py",
+    "src/bp_registry/circuit/sinter_adapter.py",
+    "src/bp_registry/canonical/kernel.py",
+    "src/bp_registry/canonical/schedules.py",
+    "src/bp_registry/canonical/group_shuffled.py",
+    "src/bp_registry/canonical/updates.py",
+    "src/bp_registry/resolution.py"
+  ],
+  "human_contract": "docs/canonical-kernel-contracts.md",
+  "compiled_tested_configurations": {
+    "artifact": "grid/matrix.json",
+    "count": 432,
+    "coverage": "explicit matrix only; no arbitrary controller cross-product"
+  },
+  "versions": {
+    "scalar_update_context": {
+      "current": "source-iteration-v2",
+      "historical": "legacy-zero-v1",
+      "baseline_source": "6f68961"
+    },
+    "cpu_batch_evidence": {
+      "current": "numba-cpu-batch-v2",
+      "historical_readable": "numba-cpu-batch-v1"
+    },
+    "numerical_profiles": "unchanged",
+    "public_manifest_defaults": "unchanged"
+  },
+  "closure": [
+    {
+      "finding": "D03",
+      "order": 1,
+      "commit": "630a934",
+      "tests": "tests/circuit/test_admission.py",
+      "boundary": "all circuit construction routes before native entry"
+    },
+    {
+      "finding": "D04",
+      "order": 2,
+      "commit": "69498ab",
+      "tests": "tests/canonical/test_model_ownership.py",
+      "boundary": "original/model and audited derived/history/session state"
+    },
+    {
+      "finding": "D01",
+      "order": 3,
+      "commit": "c3e24bb",
+      "tests": "tests/canonical/test_update_context.py",
+      "boundary": "standalone/local indexed rules; explicit group rejection",
+      "integration_followup_commit": "7b763d2",
+      "integration_followup": "preserve historical plain-SPA profiles; 59 guarded-route/context/group tests passed"
+    },
+    {
+      "finding": "D02",
+      "order": 4,
+      "commit": "b19d094",
+      "tests": "tests/canonical/test_committed_posterior.py",
+      "boundary": "committed serial posterior and atomic denial"
+    },
+    {
+      "finding": "D05",
+      "order": 5,
+      "commit": "502176b",
+      "tests": "tests/canonical/test_batch_evidence.py",
+      "boundary": "immutable batch result, atomic export and stored replay"
+    }
+  ],
+  "ui_rule": "Use existing preflight/constructors for availability; display context/numerical/evidence versions and assessment separately. This evidence map is not an admission override.",
+  "exclusions": [
+    "compiled indexed NMS/OMS arrays",
+    "arbitrary compiled callbacks/controllers",
+    "zero-mass joint Pauli priors",
+    "stable-policy-v3 circuit integration",
+    "unqualified higher-order memory/controller combinations",
+    "published-curve qualification",
+    "physical-multicore scaling claim"
+  ],
+  "admission_source_sha256": {
+    "src/bp_registry/manifests.py": "e4c4d2d73f37151bc1d6ff8c99c033471694cd9a37b2263f2bf1943425ed824c",
+    "src/bp_registry/canonical/compatibility.py": "cd78d596aebc89b76079e8bd2efb993cd60977217f33b926317dbbf79dab76a2",
+    "src/bp_registry/canonical/compiled.py": "59d0ff3e917bde882f37380388fff98283bd900290af41ef630e4e0cc9ea124a",
+    "src/bp_registry/quaternary/compiled.py": "5ca0850e10f19ecb1e3c1e20b4b6fdaa9ed2a499375a41ce4ddbb754f5608e9b",
+    "src/bp_registry/circuit/dem.py": "aa5c4cbc1430301828c468c877c42e18424182b2517b9b8e743f9bae26932be0",
+    "src/bp_registry/circuit/sinter_adapter.py": "304d1ef8c550be0797f810c16d1d0059906529d83dd0d8d620899661e2f5dca7",
+    "src/bp_registry/canonical/kernel.py": "1fe94ecd88959367a503be24a8ba1b9102f178f20928a971b2dd98ebf0cec262",
+    "src/bp_registry/canonical/schedules.py": "a1bd8c1b4bb1957e30fb638bf39111ba2dd861f372c432fca710713c4e3d4742",
+    "src/bp_registry/canonical/group_shuffled.py": "22a0ad38a2df0480852984f900dd9a046e79a02e42e9b7f58c61b5b210e4582b",
+    "src/bp_registry/canonical/updates.py": "50a39cb916055e37719e2a2ba987a127ec535c54f0f4020b99ad5a46a649276b",
+    "src/bp_registry/resolution.py": "81d0a70c6b9ac370cc1f45d3e9a031d503d9765ec3aad5f3301b4e2f9ade8ab3"
+  }
+}

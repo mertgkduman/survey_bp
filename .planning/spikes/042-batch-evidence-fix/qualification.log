@@ -1,0 +1,10 @@
+exact_tree_inference True
+graph_covariance True
+deterministic_domain_exclusion True
+native_heterogeneous_alignment True
+compiled_policy_grid True
+DEM_affine_parity_projection True
+factory_validation_control True
+compiled_graph_ownership_control True
+unmodified_batch_ledger_control True
+{"checks": 32, "passed": 32, "failed": 0}

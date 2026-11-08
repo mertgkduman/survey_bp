@@ -15,7 +15,7 @@ kind = 'nms', entry = 'standalone'
             AtomicFloodingExecutor(FloodingSchedule(TABLE, kernel=kernel), BudgetTree(limits=()), scope="attempt").run_attempt(np.ones(4), S, error_rate=.2, max_iterations=3)
 >       assert {c["source_iteration"] for c in rule.calls} == {0, 1, 2}
 E       assert {0} == {0, 1, 2}
-E         
+E
 E         Extra items in the right set:
 E         1
 E         2
@@ -37,7 +37,7 @@ kind = 'oms', entry = 'standalone'
             AtomicFloodingExecutor(FloodingSchedule(TABLE, kernel=kernel), BudgetTree(limits=()), scope="attempt").run_attempt(np.ones(4), S, error_rate=.2, max_iterations=3)
 >       assert {c["source_iteration"] for c in rule.calls} == {0, 1, 2}
 E       assert {0} == {0, 1, 2}
-E         
+E
 E         Extra items in the right set:
 E         1
 E         2
@@ -61,7 +61,7 @@ cursor = 0
 >       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
 E       AssertionError: assert ([{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}] and {0} == {1}
 E        +  where [{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}] = <test_update_context.RecordingRule object at 0x7f910f481160>.calls
-E         
+E
 E         Extra items in the left set:
 E         0
 E         Extra items in the right set:
@@ -86,7 +86,7 @@ cursor = 0
 >       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
 E       AssertionError: assert ([{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}] and {0} == {1}
 E        +  where [{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}] = <test_update_context.RecordingRule object at 0x7f910f4819a0>.calls
-E         
+E
 E         Extra items in the left set:
 E         0
 E         Extra items in the right set:
@@ -112,7 +112,7 @@ cursor = 0
 >       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
 E       AssertionError: assert ([{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}] and {0} == {1}
 E        +  where [{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}] = <test_update_context.RecordingRule object at 0x7f910f4824b0>.calls
-E         
+E
 E         Extra items in the left set:
 E         0
 E         Extra items in the right set:
@@ -138,7 +138,7 @@ cursor = 0
 >       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
 E       AssertionError: assert ([{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}] and {0} == {1}
 E        +  where [{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}] = <test_update_context.RecordingRule object at 0x7f910f482e40>.calls
-E         
+E
 E         Extra items in the left set:
 E         0
 E         Extra items in the right set:
@@ -164,7 +164,7 @@ cursor = 0
 >       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
 E       AssertionError: assert ([{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}] and {0} == {1}
 E        +  where [{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}] = <test_update_context.RecordingRule object at 0x7f910f483aa0>.calls
-E         
+E
 E         Extra items in the left set:
 E         0
 E         Extra items in the right set:
@@ -190,7 +190,7 @@ cursor = 0
 >       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
 E       AssertionError: assert ([{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}] and {0} == {1}
 E        +  where [{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}] = <test_update_context.RecordingRule object at 0x7f910f4c52b0>.calls
-E         
+E
 E         Extra items in the left set:
 E         0
 E         Extra items in the right set:
@@ -215,7 +215,7 @@ cursor = 1
 >       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
 E       AssertionError: assert ([{'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] and {0} == {1}
 E        +  where [{'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] = <test_update_context.RecordingRule object at 0x7f910f4c73b0>.calls
-E         
+E
 E         Extra items in the left set:
 E         0
 E         Extra items in the right set:
@@ -240,7 +240,7 @@ cursor = 1
 >       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
 E       AssertionError: assert ([{'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] and {0} == {1}
 E        +  where [{'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] = <test_update_context.RecordingRule object at 0x7f910f4c7c50>.calls
-E         
+E
 E         Extra items in the left set:
 E         0
 E         Extra items in the right set:
@@ -266,7 +266,7 @@ cursor = 1
 >       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
 E       AssertionError: assert ([{'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] and {0} == {1}
 E        +  where [{'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] = <test_update_context.RecordingRule object at 0x7f910f4c5280>.calls
-E         
+E
 E         Extra items in the left set:
 E         0
 E         Extra items in the right set:
@@ -292,7 +292,7 @@ cursor = 1
 >       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
 E       AssertionError: assert ([{'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] and {0} == {1}
 E        +  where [{'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] = <test_update_context.RecordingRule object at 0x7f910f4c63c0>.calls
-E         
+E
 E         Extra items in the left set:
 E         0
 E         Extra items in the right set:
@@ -318,7 +318,7 @@ cursor = 1
 >       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
 E       AssertionError: assert ([{'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] and {0} == {1}
 E        +  where [{'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] = <test_update_context.RecordingRule object at 0x7f910f447da0>.calls
-E         
+E
 E         Extra items in the left set:
 E         0
 E         Extra items in the right set:
@@ -344,7 +344,7 @@ cursor = 1
 >       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
 E       AssertionError: assert ([{'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] and {0} == {1}
 E        +  where [{'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] = <test_update_context.RecordingRule object at 0x7f910f4c72c0>.calls
-E         
+E
 E         Extra items in the left set:
 E         0
 E         Extra items in the right set:

@@ -91,9 +91,9 @@ mode = 'prior'
         assert result.admitted and len(seen) == 1
         assert len(calls) == int(mode in ("field", "both", "noop"))
 >       np.testing.assert_array_equal(result.posterior, seen[0])
-E       AssertionError: 
+E       AssertionError:
 E       Arrays are not equal
-E       
+E
 E       Mismatched elements: 2 / 2 (100%)
 E       Max absolute difference among violations: 3.38629436
 E       Max relative difference among violations: 0.52274113
@@ -128,9 +128,9 @@ mode = 'prior'
         assert result.admitted and len(seen) == 1
         assert len(calls) == int(mode in ("field", "both", "noop"))
 >       np.testing.assert_array_equal(result.posterior, seen[0])
-E       AssertionError: 
+E       AssertionError:
 E       Arrays are not equal
-E       
+E
 E       Mismatched elements: 2 / 2 (100%)
 E       Max absolute difference among violations: 3.38629436
 E       Max relative difference among violations: 0.84657359
@@ -165,9 +165,9 @@ mode = 'field'
         assert result.admitted and len(seen) == 1
         assert len(calls) == int(mode in ("field", "both", "noop"))
 >       np.testing.assert_array_equal(result.posterior, seen[0])
-E       AssertionError: 
+E       AssertionError:
 E       Arrays are not equal
-E       
+E
 E       Mismatched elements: 2 / 2 (100%)
 E       Max absolute difference among violations: 8.
 E       Max relative difference among violations: 1.73396411
@@ -202,9 +202,9 @@ mode = 'field'
         assert result.admitted and len(seen) == 1
         assert len(calls) == int(mode in ("field", "both", "noop"))
 >       np.testing.assert_array_equal(result.posterior, seen[0])
-E       AssertionError: 
+E       AssertionError:
 E       Arrays are not equal
-E       
+E
 E       Mismatched elements: 2 / 2 (100%)
 E       Max absolute difference among violations: 8.
 E       Max relative difference among violations: 13.03556541
@@ -239,9 +239,9 @@ mode = 'both'
         assert result.admitted and len(seen) == 1
         assert len(calls) == int(mode in ("field", "both", "noop"))
 >       np.testing.assert_array_equal(result.posterior, seen[0])
-E       AssertionError: 
+E       AssertionError:
 E       Arrays are not equal
-E       
+E
 E       Mismatched elements: 2 / 2 (100%)
 E       Max absolute difference among violations: 11.38629436
 E       Max relative difference among violations: 1.4232868
@@ -276,9 +276,9 @@ mode = 'both'
         assert result.admitted and len(seen) == 1
         assert len(calls) == int(mode in ("field", "both", "noop"))
 >       np.testing.assert_array_equal(result.posterior, seen[0])
-E       AssertionError: 
+E       AssertionError:
 E       Arrays are not equal
-E       
+E
 E       Mismatched elements: 2 / 2 (100%)
 E       Max absolute difference among violations: 11.38629436
 E       Max relative difference among violations: 2.84657359

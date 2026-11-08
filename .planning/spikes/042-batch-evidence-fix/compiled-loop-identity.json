@@ -1,0 +1,12 @@
+{
+  "baseline": "6f68961",
+  "compiled_loops_unchanged": true,
+  "source_or_ast_sha256": {
+    "src/bp_registry/canonical/compiled.py": "59d0ff3e917bde882f37380388fff98283bd900290af41ef630e4e0cc9ea124a",
+    "src/bp_registry/quaternary/compiled.py": "5ca0850e10f19ecb1e3c1e20b4b6fdaa9ed2a499375a41ce4ddbb754f5608e9b",
+    "src/bp_registry/circuit/compiled.py": "27773e2342073549087f2422d944c845ccdc72ac0bcdd5a25fc9c6bc39e5b108",
+    "src/bp_registry/cpu_batch.py:_binary_batch": "2e3f182297f92549311a411cd203cbd067e58b5ba3a26ccc7b603943eae03797",
+    "src/bp_registry/cpu_batch.py:_pauli_shot": "faf8308349c3e532e9c86083eff8f0e91f7683c52f45ab9b07ef7483fd0cf032",
+    "src/bp_registry/cpu_batch.py:_pauli_batch": "ff1a329b89c60e3c493ea0304a0eb871e1589c61d46c6c8488371181d82f7225"
+  }
+}

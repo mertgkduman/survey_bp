@@ -1,0 +1,63 @@
+{
+  "baseline": "6f68961",
+  "current": "502176b7e71e274738a6a77f2fa29f67b34bfb87",
+  "affinity": [
+    56,
+    120
+  ],
+  "methodology": "same input replay, sequential baseline/current processes, fresh compile caches; nine warm repetitions, medians; shared host timing is descriptive, not a statistical performance guarantee",
+  "cases": {
+    "binary_bb72": {
+      "exact_results_preserved": true,
+      "workers": {
+        "1": {
+          "baseline_batch_seconds": 0.12761662527918816,
+          "current_batch_seconds": 0.12734856642782688,
+          "throughput_ratio": 1.002104922410047,
+          "current_speedup_vs_single": 1.0449388787358431,
+          "shots_per_second": 4020.461434013623
+        },
+        "2": {
+          "baseline_batch_seconds": 0.0896744430065155,
+          "current_batch_seconds": 0.09050160739570856,
+          "throughput_ratio": 0.9908602243319683,
+          "current_speedup_vs_single": 1.4656618872761378,
+          "shots_per_second": 5657.358081623181
+        },
+        "4": {
+          "baseline_batch_seconds": 0.09032182767987251,
+          "current_batch_seconds": 0.09007815457880497,
+          "throughput_ratio": 1.0027051298087415,
+          "current_speedup_vs_single": 1.481485355944864,
+          "shots_per_second": 5683.953033829931
+        }
+      }
+    },
+    "pauli_gb46": {
+      "exact_results_preserved": true,
+      "workers": {
+        "1": {
+          "baseline_batch_seconds": 0.22490091063082218,
+          "current_batch_seconds": 0.22598119731992483,
+          "throughput_ratio": 0.9952195726816454,
+          "current_speedup_vs_single": 1.0212807111089484,
+          "shots_per_second": 2265.6752246301016
+        },
+        "2": {
+          "baseline_batch_seconds": 0.15821371227502823,
+          "current_batch_seconds": 0.15952987782657146,
+          "throughput_ratio": 0.9917497238167883,
+          "current_speedup_vs_single": 1.440818798091248,
+          "shots_per_second": 3209.4301517400195
+        },
+        "4": {
+          "baseline_batch_seconds": 0.15750014316290617,
+          "current_batch_seconds": 0.1593120750039816,
+          "throughput_ratio": 0.9886265253840292,
+          "current_speedup_vs_single": 1.4449631304302646,
+          "shots_per_second": 3213.8179104578476
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,7 @@
 # Stabilized kernel contracts and compiled CPU execution
 
+See [canonical execution contracts](canonical-kernel-contracts.md) for corrected admission, ownership, iteration context, batch evidence and historical replay.
+
 The audit in `.planning/spikes/CANONICAL-KERNEL-AUDIT.md` is historical evidence against revision `3aacb2c`. Its counterexamples remain unchanged. This migration addresses the seven findings without reinterpreting historical numerical profiles or claiming new paper-curve reproduction.
 
 ## Corrected contracts

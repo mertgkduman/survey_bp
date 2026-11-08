@@ -1,5 +1,7 @@
 # Canonical CSS engine: a checked development tutorial and contract reference
 
+See [canonical execution contracts](canonical-kernel-contracts.md) for corrected admission, ownership, iteration context, batch evidence and historical replay.
+
 This guide runs the project-owned binary CSS sum-product implementation.  It is
 not an adapter to a native decoder, a source-faithful reproduction, or a
 statistical result.  The checked fixture is explicitly labelled

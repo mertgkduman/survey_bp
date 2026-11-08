@@ -298,9 +298,9 @@ ____________________ test_constructor_owns_callers_buffers _____________________
         owned = cpu_batch.CpuBatchResult(*arrays, result.evidence_json)
         arrays[0][:] ^= 1
 >       np.testing.assert_array_equal(owned.candidates, result.candidates)
-E       AssertionError: 
+E       AssertionError:
 E       Arrays are not equal
-E       
+E
 E       Mismatched elements: 9 / 9 (100%)
 E       Max absolute difference among violations: 1
 E       Max relative difference among violations: 1.
@@ -691,10 +691,10 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8ad0ba3aa0>
             result.write_ledger(path)
 >       assert path.read_text() == "existing evidence\n"
 E       assert '{"assessment...orkers": 1}\n' == 'existing evidence\n'
-E         
+E
 E         - existing evidence
 E         + {"assessment_status": "not_assessed", "backend": "numba-cpu-batch-v1", "candidate": [0, 0, 0], "candidate_valid": true, "edge_count": 4, "event": "cpu_batch_decode", "family": "binary", "fastmath": false, "graph_prior_sha256": "b4e282b18d86b7463801d88fc2ce8385f717b4ac1bbfd0a75f3ff27251052c0e", "iterations": 0, "max_iterations": 3, "numerics": {"alpha": 1.0, "beta": 0.0, "binary_prior": "log1p(-p)-log(p)", "check_clipping": "none_before_resolution", "check_reduction": "prefix_suffix_boxplus", "check_rule": "sum_product", "check_stabilization": "log_domain", "...
-E         
+E
 E         ...Full output truncated (1 line hidden), use '-vv' to show
 
 tests/canonical/test_batch_evidence.py:121: AssertionError

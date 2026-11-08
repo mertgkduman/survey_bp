@@ -1,5 +1,7 @@
 # Circuit BP integration: pinned fixtures and CPU baseline
 
+See [canonical execution contracts](canonical-kernel-contracts.md) for corrected admission, ownership, iteration context, batch evidence and historical replay.
+
 ## Source and scope
 
 The [Relay-BP v0.2.2 fixture archive](../data/circuits/relay-v0.2.2/README.md) contains 672 exact `.stim` files from upstream commit `14cb31a18f9b9d7d099791b793e35b8a2951f8f3`, with per-file hashes. The four directly usable representatives cover bivariate bicycle, rotated surface, and color memory circuits. They are source circuit fixtures, not yet selected and qualified paper-curve experiments.

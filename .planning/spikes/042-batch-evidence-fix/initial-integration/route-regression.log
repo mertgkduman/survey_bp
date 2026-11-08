@@ -12,7 +12,7 @@ tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-236/test_strict_guarded_local_
             run_canonical_materialized_one,
         )
         from bp_registry.sampling import sample_shot
-    
+
         for ordinal, path in enumerate((
             Path("data/manifests/phase3-hsu-group-pilot.json"),
             _phase5_guided(tmp_path, damped=True),
@@ -42,8 +42,8 @@ tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-236/test_strict_guarded_local_
                 runtime_authorization=authorization,
             )
 
-tests/canonical/test_resource_profiles.py:162: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/canonical/test_resource_profiles.py:162:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 src/bp_registry/runner.py:1367: in run_canonical_materialized_one
     result = run_canonical_structural_shot(
 src/bp_registry/canonical/execution.py:1308: in run_canonical_structural_shot
@@ -51,7 +51,7 @@ src/bp_registry/canonical/execution.py:1308: in run_canonical_structural_shot
 src/bp_registry/canonical/execution.py:561: in _local_schedule_for_manifest
     return HsuGroupSchedule(edge_table, kernel=kernel, root_identity=policy.root_identity, attempt_identity=attempt_identity), None
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = <bp_registry.canonical.group_shuffled.HsuGroupSchedule object at 0x7f571ce26720>
 edge_table = EdgeTable(check_count=72, variable_count=144, edges=((0, 3), (0, 60), (0, 66), (0, 76), (0, 77), (0, 126), (1, 4), (1,...), (70, 64), (70, 67), (70, 124), (70, 140), (70, 141), (71, 59), (71, 65), (71, 68), (71, 125), (71, 141), (71, 142)))

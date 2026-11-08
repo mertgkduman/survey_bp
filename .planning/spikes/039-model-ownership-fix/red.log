@@ -12,8 +12,8 @@ field = 'hx'
         np.testing.assert_array_equal(getattr(original,field),np.ones_like(getattr(original,field)))
 >       assert_immutable(getattr(original,field))
 
-tests/canonical/test_model_ownership.py:29: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/canonical/test_model_ownership.py:29:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 array = array([[1, 1]], dtype=uint8)
 
@@ -34,8 +34,8 @@ field = 'hz'
         np.testing.assert_array_equal(getattr(original,field),np.ones_like(getattr(original,field)))
 >       assert_immutable(getattr(original,field))
 
-tests/canonical/test_model_ownership.py:29: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/canonical/test_model_ownership.py:29:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 array = array([[1, 1]], dtype=uint8)
 
@@ -56,8 +56,8 @@ field = 'syndrome'
         np.testing.assert_array_equal(getattr(original,field),np.ones_like(getattr(original,field)))
 >       assert_immutable(getattr(original,field))
 
-tests/canonical/test_model_ownership.py:29: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/canonical/test_model_ownership.py:29:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 array = array([1], dtype=uint8)
 
@@ -78,8 +78,8 @@ field = 'checks'
         assert code.semantic_sha256==digest
 >       assert_immutable(getattr(code,field))
 
-tests/canonical/test_model_ownership.py:40: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/canonical/test_model_ownership.py:40:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 array = array([[1, 1]], dtype=uint8)
 
@@ -100,8 +100,8 @@ field = 'logical_x'
         assert code.semantic_sha256==digest
 >       assert_immutable(getattr(code,field))
 
-tests/canonical/test_model_ownership.py:40: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/canonical/test_model_ownership.py:40:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 array = array([[1, 0]], dtype=uint8)
 
@@ -122,8 +122,8 @@ field = 'logical_z'
         assert code.semantic_sha256==digest
 >       assert_immutable(getattr(code,field))
 
-tests/canonical/test_model_ownership.py:40: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/canonical/test_model_ownership.py:40:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 array = array([[3, 3]], dtype=uint8)
 
@@ -138,8 +138,8 @@ __________________ test_quaternary_original_syndrome_identity __________________
         original=QuaternaryOriginalProblem('original-test',PauliCode(checks=np.array([[1,1]],dtype=np.uint8)),np.array([1],dtype=np.uint8))
 >       assert_immutable(original.syndrome)
 
-tests/canonical/test_model_ownership.py:45: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/canonical/test_model_ownership.py:45:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 array = array([1], dtype=uint8)
 
@@ -165,8 +165,8 @@ ______________ test_policy_history_and_session_snapshot_ownership ______________
         state=V2CDamping('damping-test',.5).initial_state(np.array([1.,2.]))
 >       assert_immutable(state.v2c)
 
-tests/canonical/test_model_ownership.py:64: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/canonical/test_model_ownership.py:64:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 array = array([1., 2.])
 

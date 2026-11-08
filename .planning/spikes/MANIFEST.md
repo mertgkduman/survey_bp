@@ -91,3 +91,5 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 | 040 | canonical-kernel-audit | D01 correction | standard | Fix and qualify the admitted contract boundary | VALIDATED | completeness, fixes |
 | 041 | canonical-kernel-audit | D02 correction | standard | Fix and qualify the admitted contract boundary | VALIDATED | completeness, fixes |
 | 042 | canonical-kernel-audit | D05 correction | standard | Fix and qualify the admitted contract boundary | VALIDATED | completeness, fixes |
+
+Ordered closure of D03 → D04 → D01 → D02 → D05: [correction report](CANONICAL-KERNEL-COMPLETENESS-FIXES.md), [combined verification](042-batch-evidence-fix/verification.json), and [execution contracts](../../docs/canonical-kernel-contracts.md). Historical 034–037 verdicts remain as originally observed.
