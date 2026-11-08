@@ -156,3 +156,16 @@ def test_result_replacement_cannot_keep_stale_evidence():
     result = decoder.decode_detailed(np.zeros((1, 2), np.uint8))
     with pytest.raises(ValueError, match="ledger"):
         replace(result, predictions=result.predictions ^ 1)
+
+
+def test_input_snapshot_survives_caller_mutation_during_execution():
+    decoder = PolicyBpSinterDecoder().compile_decoder_for_dem(dem=stim.DetectorErrorModel(DEM))
+    events = np.array([[1, 0], [0, 1]], np.uint8)
+    expected = decoder.decode_detailed(events)
+    original = decoder._shot
+    def mutate_then_decode(*args):
+        events[:] = 0
+        return original(*args)
+    decoder._shot = mutate_then_decode
+    actual = decoder.decode_detailed(events)
+    assert actual.ledger_json == expected.ledger_json

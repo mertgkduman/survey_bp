@@ -231,7 +231,7 @@ class CompiledPolicyBpDecoder(sinter.CompiledDecoder):
                 not (events.dtype == np.bool_ or np.issubdtype(events.dtype, np.integer)) or
                 np.any((events != 0) & (events != 1))):
             raise ValueError("detection_events must be a binary shot-by-detector matrix")
-        events = np.ascontiguousarray(events, dtype=np.uint8)
+        events = np.array(events, dtype=np.uint8, order="C", copy=True)
         policy, kernel = self.policy, self.policy.kernel()
         faults = np.empty((len(events), self.model.table.variable_count), dtype=np.uint8)
         predictions = np.empty((len(events), len(self.model.observable_bias)), dtype=np.uint8)
