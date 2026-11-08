@@ -25,3 +25,6 @@ Started from boundary audit at 02d165e; historical evidence is retained unchange
 
 ## Investigation Trail
 The factory-only guard was insufficient. Shared dataclass post-init admission closes direct construction and replacement. BP4 cross-index validation uses a stable index sort rather than scanning all edges once per variable. Raw caller buffers are copied into immutable bytes-backed arrays so caller mutation cannot alter a compiled graph.
+
+## Integration follow-up
+The broader suite exposed ten Relay-path failures because its prior-vector adapter delegated all numerical methods but omitted a `profile` property. The adapter now exposes its underlying kernel profile, so it obeys the same consistency check; no bypass was introduced. All 19 focused Relay, calibration-ledger and adapter tests pass. The first broad run and subsequent clean-cache qualification are retained under spike 026.

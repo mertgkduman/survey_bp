@@ -115,3 +115,13 @@ def test_compiled_bp4_respects_active_legacy_cap(cap,syndrome):
         actual=graph.run(s,max_iterations=limit)
         np.testing.assert_array_equal(actual.candidate,expected.candidate)
         assert (actual.iterations,actual.converged)==(expected.iteration,expected.converged)
+
+
+def test_relay_prior_adapter_exposes_delegated_profile_for_shared_admission():
+    from bp_registry.canonical.relay import _PriorVectorKernel
+    kernel=BinarySpaKernel(profile=REFERENCE_CPU_F64)
+    adapter=_PriorVectorKernel(kernel,np.full(3,.5))
+    assert adapter.profile is kernel.profile
+    FloodingSchedule(EdgeTable.from_check_matrix(H),kernel=adapter,profile=kernel.profile)
+    with pytest.raises(ValueError):
+        FloodingSchedule(EdgeTable.from_check_matrix(H),kernel=adapter,profile=BINARY_SPA_F64_V3)

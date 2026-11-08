@@ -273,6 +273,10 @@ class _PriorVectorKernel:
         self._kernel = kernel
         self.set_prior(prior)
 
+    @property
+    def profile(self):
+        return self._kernel.profile
+
     def set_prior(self, prior: np.ndarray) -> None:
         """Replace only the current sweep's finite effective-prior vector."""
         values = np.asarray(prior, dtype=np.float64)
