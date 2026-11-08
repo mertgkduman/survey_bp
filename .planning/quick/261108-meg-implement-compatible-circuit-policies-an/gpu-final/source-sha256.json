@@ -1,0 +1,6 @@
+{
+  "src/bp_registry/gpu.py": "a5fd63d02bda6c0cefec1f52af69500a3bea8b36b7a7b82c70756775e6bd7e45",
+  "src/bp_registry/cuda_kernels.py": "d2e94a1c48e66c5224e0801a41ce729cbfa8b8998b3ed471d76088dd2b9424b2",
+  "src/bp_registry/batch_records.py": "a9bb94bfdf7ebdabfb17a4886671753df7ef82060cb0c9c3406fe3e6cd404c5a",
+  "/hpc/group/pfisterlab/mg551/storage/survey_bp/.planning/quick/261108-meg-implement-compatible-circuit-policies-an/gpu-qualify.py": "c48109ab888c441ebb3c4a1c746163ba7ad2d4c81d850b2a5c9dc6c97b7adcbf"
+}

@@ -1,6 +1,6 @@
 ---
 quick_id: 261108-meg
-status: executing
+status: complete
 baseline: 2f29881
 scope: user-requested implementation of items 2 and 3; release packaging explicitly excluded
 ---

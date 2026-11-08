@@ -1,0 +1,7 @@
+CUDA 12.8
+name, driver_version, memory.total [MiB]
+NVIDIA H200, 615.71.09, 143771 MiB
+/hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numba/cuda/dispatcher.py:536: NumbaPerformanceWarning: Grid size 1 will likely result in GPU under-utilization due to low occupancy.
+  warn(NumbaPerformanceWarning(msg))
+available True NVVM /usr/local/cuda/nvvm/lib64/libnvvm.so.4.0.0
+[1. 2. 3. 4.]

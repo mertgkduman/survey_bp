@@ -1,0 +1,1781 @@
+...................................................FFF.........FFFFFFFFF [ 64%]
+F.FFFF...FFFFF..FFFFFF..................                                 [100%]
+=================================== FAILURES ===================================
+_ test_trace_off_and_absent_assignment_preserve_frozen_public_identities[data/manifests/canonical-three-qubit-development.json-f62e836f89c84f98593eb82339615c76793c233467cdf8c8c40c655e3697137b-sha256:2a81bf50b948b06a0a6e14c008d58b0399031d0a5732b49ffea2c5172414564b] _
+
+path = 'data/manifests/canonical-three-qubit-development.json'
+manifest_sha256 = 'f62e836f89c84f98593eb82339615c76793c233467cdf8c8c40c655e3697137b'
+execution_identity = 'sha256:2a81bf50b948b06a0a6e14c008d58b0399031d0a5732b49ffea2c5172414564b'
+
+    @pytest.mark.parametrize(("path", "manifest_sha256", "execution_identity"), [
+        (
+            "data/manifests/canonical-three-qubit-development.json",
+            "f62e836f89c84f98593eb82339615c76793c233467cdf8c8c40c655e3697137b",
+            "sha256:2a81bf50b948b06a0a6e14c008d58b0399031d0a5732b49ffea2c5172414564b",
+        ),
+        (
+            "data/manifests/phase3-hsu-group-pilot.json",
+            "b58133f1707f9226fe1d6fd6eadf2a9c866448cbc4aea9825b190556a5230d1d",
+            "sha256:02a376bd9f16a40cc66e1c9e3125e7e600e2361c615f93cdca632c38f601b5e1",
+        ),
+        # This frozen Relay fixture predates ordinary-memory assignments and
+        # enabled trace sidecars; its terminal identity is public evidence.
+        (
+            "data/manifests/phase4-memory-relay-b1.json",
+            "dd127331caec00e2ff72ec9e681c8b29e153fc2f08387a5d53e9f99123e77a12",
+            "sha256:8447ab3c2c47d86fec8fd4f91a2d8b9d4cbd89cbb88782f3bb4677c8955fbe6f",
+        ),
+    ])
+    def test_trace_off_and_absent_assignment_preserve_frozen_public_identities(path, manifest_sha256, execution_identity):
+        """New optional controls must not reidentify recorded V2/V3/Relay work."""
+        manifest = parse_manifest(ROOT / path)
+>       context = canonical_public_shot_context(ROOT / path, shot_id=0)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/canonical/test_memory_execution.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/runner.py:1251: in canonical_public_shot_context
+    return canonical_public_manifest_context(manifest_path).shot_context(shot_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/runner.py:1224: in canonical_public_manifest_context
+    resolved = (preflight(manifest_path) if manifest_bytes is None
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+_ test_trace_off_and_absent_assignment_preserve_frozen_public_identities[data/manifests/phase3-hsu-group-pilot.json-b58133f1707f9226fe1d6fd6eadf2a9c866448cbc4aea9825b190556a5230d1d-sha256:02a376bd9f16a40cc66e1c9e3125e7e600e2361c615f93cdca632c38f601b5e1] _
+
+path = 'data/manifests/phase3-hsu-group-pilot.json'
+manifest_sha256 = 'b58133f1707f9226fe1d6fd6eadf2a9c866448cbc4aea9825b190556a5230d1d'
+execution_identity = 'sha256:02a376bd9f16a40cc66e1c9e3125e7e600e2361c615f93cdca632c38f601b5e1'
+
+    @pytest.mark.parametrize(("path", "manifest_sha256", "execution_identity"), [
+        (
+            "data/manifests/canonical-three-qubit-development.json",
+            "f62e836f89c84f98593eb82339615c76793c233467cdf8c8c40c655e3697137b",
+            "sha256:2a81bf50b948b06a0a6e14c008d58b0399031d0a5732b49ffea2c5172414564b",
+        ),
+        (
+            "data/manifests/phase3-hsu-group-pilot.json",
+            "b58133f1707f9226fe1d6fd6eadf2a9c866448cbc4aea9825b190556a5230d1d",
+            "sha256:02a376bd9f16a40cc66e1c9e3125e7e600e2361c615f93cdca632c38f601b5e1",
+        ),
+        # This frozen Relay fixture predates ordinary-memory assignments and
+        # enabled trace sidecars; its terminal identity is public evidence.
+        (
+            "data/manifests/phase4-memory-relay-b1.json",
+            "dd127331caec00e2ff72ec9e681c8b29e153fc2f08387a5d53e9f99123e77a12",
+            "sha256:8447ab3c2c47d86fec8fd4f91a2d8b9d4cbd89cbb88782f3bb4677c8955fbe6f",
+        ),
+    ])
+    def test_trace_off_and_absent_assignment_preserve_frozen_public_identities(path, manifest_sha256, execution_identity):
+        """New optional controls must not reidentify recorded V2/V3/Relay work."""
+        manifest = parse_manifest(ROOT / path)
+>       context = canonical_public_shot_context(ROOT / path, shot_id=0)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/canonical/test_memory_execution.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/runner.py:1251: in canonical_public_shot_context
+    return canonical_public_manifest_context(manifest_path).shot_context(shot_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/runner.py:1224: in canonical_public_manifest_context
+    resolved = (preflight(manifest_path) if manifest_bytes is None
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+_ test_trace_off_and_absent_assignment_preserve_frozen_public_identities[data/manifests/phase4-memory-relay-b1.json-dd127331caec00e2ff72ec9e681c8b29e153fc2f08387a5d53e9f99123e77a12-sha256:8447ab3c2c47d86fec8fd4f91a2d8b9d4cbd89cbb88782f3bb4677c8955fbe6f] _
+
+path = 'data/manifests/phase4-memory-relay-b1.json'
+manifest_sha256 = 'dd127331caec00e2ff72ec9e681c8b29e153fc2f08387a5d53e9f99123e77a12'
+execution_identity = 'sha256:8447ab3c2c47d86fec8fd4f91a2d8b9d4cbd89cbb88782f3bb4677c8955fbe6f'
+
+    @pytest.mark.parametrize(("path", "manifest_sha256", "execution_identity"), [
+        (
+            "data/manifests/canonical-three-qubit-development.json",
+            "f62e836f89c84f98593eb82339615c76793c233467cdf8c8c40c655e3697137b",
+            "sha256:2a81bf50b948b06a0a6e14c008d58b0399031d0a5732b49ffea2c5172414564b",
+        ),
+        (
+            "data/manifests/phase3-hsu-group-pilot.json",
+            "b58133f1707f9226fe1d6fd6eadf2a9c866448cbc4aea9825b190556a5230d1d",
+            "sha256:02a376bd9f16a40cc66e1c9e3125e7e600e2361c615f93cdca632c38f601b5e1",
+        ),
+        # This frozen Relay fixture predates ordinary-memory assignments and
+        # enabled trace sidecars; its terminal identity is public evidence.
+        (
+            "data/manifests/phase4-memory-relay-b1.json",
+            "dd127331caec00e2ff72ec9e681c8b29e153fc2f08387a5d53e9f99123e77a12",
+            "sha256:8447ab3c2c47d86fec8fd4f91a2d8b9d4cbd89cbb88782f3bb4677c8955fbe6f",
+        ),
+    ])
+    def test_trace_off_and_absent_assignment_preserve_frozen_public_identities(path, manifest_sha256, execution_identity):
+        """New optional controls must not reidentify recorded V2/V3/Relay work."""
+        manifest = parse_manifest(ROOT / path)
+>       context = canonical_public_shot_context(ROOT / path, shot_id=0)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/canonical/test_memory_execution.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/runner.py:1251: in canonical_public_shot_context
+    return canonical_public_manifest_context(manifest_path).shot_context(shot_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/runner.py:1224: in canonical_public_manifest_context
+    resolved = (preflight(manifest_path) if manifest_bytes is None
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+_____ test_public_memory_changes_behavior_and_preserves_invalid_candidate ______
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_public_memory_changes_beh0')
+
+    def test_public_memory_changes_behavior_and_preserves_invalid_candidate(tmp_path):
+        from bp_registry.cli import run_canonical, verify_run
+        from bp_registry.ledger import read_canonical_events
+        baseline_path = public_manifest(tmp_path, memory=False)
+        memory_path = public_manifest(tmp_path)
+        baseline, output = tmp_path / "baseline", tmp_path / "memory"
+>       run_canonical(baseline_path, baseline)
+
+tests/canonical/test_memory_execution.py:214: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/cli.py:270: in run_canonical
+    report = preflight_canonical(manifest_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/runner.py:790: in preflight_canonical
+    resolved = preflight(manifest_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+_ test_public_budget_replay_distinguishes_no_proposal_from_invalid_proposal[cap0-0-None] _
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_public_budget_replay_dist0')
+cap = {'bp_calls': 0}, count = 0, diagnostic = None
+
+    @pytest.mark.parametrize("cap,count,diagnostic", [
+        ({"bp_calls": 0}, 0, None),
+        ({"check_to_variable_updates": 0}, 0, None),
+        ({"check_to_variable_updates": 1}, 1, [0, 0, 0]),
+    ])
+    def test_public_budget_replay_distinguishes_no_proposal_from_invalid_proposal(tmp_path, cap, count, diagnostic):
+        from bp_registry.cli import run_canonical, verify_run
+        from bp_registry.ledger import read_canonical_events
+        path = public_manifest(tmp_path, iterations=3, cap=cap)
+        output = tmp_path / "output"
+>       run_canonical(path, output)
+
+tests/canonical/test_memory_execution.py:236: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/cli.py:270: in run_canonical
+    report = preflight_canonical(manifest_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/runner.py:790: in preflight_canonical
+    resolved = preflight(manifest_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+_ test_public_budget_replay_distinguishes_no_proposal_from_invalid_proposal[cap1-0-None] _
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_public_budget_replay_dist1')
+cap = {'check_to_variable_updates': 0}, count = 0, diagnostic = None
+
+    @pytest.mark.parametrize("cap,count,diagnostic", [
+        ({"bp_calls": 0}, 0, None),
+        ({"check_to_variable_updates": 0}, 0, None),
+        ({"check_to_variable_updates": 1}, 1, [0, 0, 0]),
+    ])
+    def test_public_budget_replay_distinguishes_no_proposal_from_invalid_proposal(tmp_path, cap, count, diagnostic):
+        from bp_registry.cli import run_canonical, verify_run
+        from bp_registry.ledger import read_canonical_events
+        path = public_manifest(tmp_path, iterations=3, cap=cap)
+        output = tmp_path / "output"
+>       run_canonical(path, output)
+
+tests/canonical/test_memory_execution.py:236: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/cli.py:270: in run_canonical
+    report = preflight_canonical(manifest_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/runner.py:790: in preflight_canonical
+    resolved = preflight(manifest_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+_ test_public_budget_replay_distinguishes_no_proposal_from_invalid_proposal[cap2-1-diagnostic2] _
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_public_budget_replay_dist2')
+cap = {'check_to_variable_updates': 1}, count = 1, diagnostic = [0, 0, 0]
+
+    @pytest.mark.parametrize("cap,count,diagnostic", [
+        ({"bp_calls": 0}, 0, None),
+        ({"check_to_variable_updates": 0}, 0, None),
+        ({"check_to_variable_updates": 1}, 1, [0, 0, 0]),
+    ])
+    def test_public_budget_replay_distinguishes_no_proposal_from_invalid_proposal(tmp_path, cap, count, diagnostic):
+        from bp_registry.cli import run_canonical, verify_run
+        from bp_registry.ledger import read_canonical_events
+        path = public_manifest(tmp_path, iterations=3, cap=cap)
+        output = tmp_path / "output"
+>       run_canonical(path, output)
+
+tests/canonical/test_memory_execution.py:236: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/cli.py:270: in run_canonical
+    report = preflight_canonical(manifest_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/runner.py:790: in preflight_canonical
+    resolved = preflight(manifest_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+_____ test_semantic_replay_rejects_rehashed_memory_claims[history_sha256] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_semantic_replay_rejects_r0')
+field = 'history_sha256'
+
+    @pytest.mark.parametrize("field", ["history_sha256", "committed_iterations", "memory_element_updates", "diagnostic_candidate"])
+    def test_semantic_replay_rejects_rehashed_memory_claims(tmp_path, field):
+        from bp_registry.cli import run_canonical
+        from bp_registry.ledger import read_canonical_events, _canonical_event_id
+        from bp_registry.runner import canonical_public_shot_context
+        from bp_registry.canonical.verification import validate_canonical_shot
+        path = public_manifest(tmp_path)
+        output = tmp_path / "output"
+>       run_canonical(path, output)
+
+tests/canonical/test_memory_execution.py:255: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/cli.py:270: in run_canonical
+    report = preflight_canonical(manifest_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/runner.py:790: in preflight_canonical
+    resolved = preflight(manifest_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+__ test_semantic_replay_rejects_rehashed_memory_claims[committed_iterations] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_semantic_replay_rejects_r1')
+field = 'committed_iterations'
+
+    @pytest.mark.parametrize("field", ["history_sha256", "committed_iterations", "memory_element_updates", "diagnostic_candidate"])
+    def test_semantic_replay_rejects_rehashed_memory_claims(tmp_path, field):
+        from bp_registry.cli import run_canonical
+        from bp_registry.ledger import read_canonical_events, _canonical_event_id
+        from bp_registry.runner import canonical_public_shot_context
+        from bp_registry.canonical.verification import validate_canonical_shot
+        path = public_manifest(tmp_path)
+        output = tmp_path / "output"
+>       run_canonical(path, output)
+
+tests/canonical/test_memory_execution.py:255: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/cli.py:270: in run_canonical
+    report = preflight_canonical(manifest_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/runner.py:790: in preflight_canonical
+    resolved = preflight(manifest_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+_ test_semantic_replay_rejects_rehashed_memory_claims[memory_element_updates] __
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_semantic_replay_rejects_r2')
+field = 'memory_element_updates'
+
+    @pytest.mark.parametrize("field", ["history_sha256", "committed_iterations", "memory_element_updates", "diagnostic_candidate"])
+    def test_semantic_replay_rejects_rehashed_memory_claims(tmp_path, field):
+        from bp_registry.cli import run_canonical
+        from bp_registry.ledger import read_canonical_events, _canonical_event_id
+        from bp_registry.runner import canonical_public_shot_context
+        from bp_registry.canonical.verification import validate_canonical_shot
+        path = public_manifest(tmp_path)
+        output = tmp_path / "output"
+>       run_canonical(path, output)
+
+tests/canonical/test_memory_execution.py:255: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/cli.py:270: in run_canonical
+    report = preflight_canonical(manifest_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/runner.py:790: in preflight_canonical
+    resolved = preflight(manifest_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+__ test_semantic_replay_rejects_rehashed_memory_claims[diagnostic_candidate] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_semantic_replay_rejects_r3')
+field = 'diagnostic_candidate'
+
+    @pytest.mark.parametrize("field", ["history_sha256", "committed_iterations", "memory_element_updates", "diagnostic_candidate"])
+    def test_semantic_replay_rejects_rehashed_memory_claims(tmp_path, field):
+        from bp_registry.cli import run_canonical
+        from bp_registry.ledger import read_canonical_events, _canonical_event_id
+        from bp_registry.runner import canonical_public_shot_context
+        from bp_registry.canonical.verification import validate_canonical_shot
+        path = public_manifest(tmp_path)
+        output = tmp_path / "output"
+>       run_canonical(path, output)
+
+tests/canonical/test_memory_execution.py:255: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/cli.py:270: in run_canonical
+    report = preflight_canonical(manifest_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/runner.py:790: in preflight_canonical
+    resolved = preflight(manifest_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+__ test_numerical_failure_retains_and_replays_only_committed_memory_prefix[0] __
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_numerical_failure_retains0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc171cb32f0>
+failed_iteration = 0
+
+    @pytest.mark.parametrize("failed_iteration", [0, 1])
+    def test_numerical_failure_retains_and_replays_only_committed_memory_prefix(tmp_path, monkeypatch, failed_iteration):
+        from bp_registry.cli import run_canonical, verify_run
+        from bp_registry.canonical.memory_execution import MemoryFloodingSchedule
+        from bp_registry.canonical.numerics import NumericalFailure
+        from bp_registry.ledger import read_canonical_events
+        path = public_manifest(tmp_path, iterations=3)
+        output = tmp_path / "output"
+        original = MemoryFloodingSchedule.sweep
+    
+        def failing(self, *args, **kwargs):
+            if kwargs.get("source_iteration", 0) == failed_iteration:
+                raise NumericalFailure("injected numerical failure")
+            return original(self, *args, **kwargs)
+    
+        monkeypatch.setattr(MemoryFloodingSchedule, "sweep", failing)
+>       run_canonical(path, output)
+
+tests/canonical/test_memory_execution.py:287: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/cli.py:270: in run_canonical
+    report = preflight_canonical(manifest_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/runner.py:790: in preflight_canonical
+    resolved = preflight(manifest_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+__ test_numerical_failure_retains_and_replays_only_committed_memory_prefix[1] __
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_numerical_failure_retains1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc171a7f260>
+failed_iteration = 1
+
+    @pytest.mark.parametrize("failed_iteration", [0, 1])
+    def test_numerical_failure_retains_and_replays_only_committed_memory_prefix(tmp_path, monkeypatch, failed_iteration):
+        from bp_registry.cli import run_canonical, verify_run
+        from bp_registry.canonical.memory_execution import MemoryFloodingSchedule
+        from bp_registry.canonical.numerics import NumericalFailure
+        from bp_registry.ledger import read_canonical_events
+        path = public_manifest(tmp_path, iterations=3)
+        output = tmp_path / "output"
+        original = MemoryFloodingSchedule.sweep
+    
+        def failing(self, *args, **kwargs):
+            if kwargs.get("source_iteration", 0) == failed_iteration:
+                raise NumericalFailure("injected numerical failure")
+            return original(self, *args, **kwargs)
+    
+        monkeypatch.setattr(MemoryFloodingSchedule, "sweep", failing)
+>       run_canonical(path, output)
+
+tests/canonical/test_memory_execution.py:287: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/cli.py:270: in run_canonical
+    report = preflight_canonical(manifest_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/runner.py:790: in preflight_canonical
+    resolved = preflight(manifest_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+____ test_public_memory_preserves_min_sum_assignment_dispatch[min_sum-None] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_public_memory_preserves_m0')
+kind = 'min_sum', assignment = None
+
+    @pytest.mark.parametrize("kind,assignment", [
+        ("min_sum", None),
+        ("normalized_min_sum", {"shape": "scalar", "value": 0.8}),
+        ("normalized_min_sum", {"shape": "source_iteration", "values": [0.2, 0.5, 0.8]}),
+        ("offset_min_sum", {"shape": "source_iteration", "values": [0.0, 5.0, 10.0]}),
+    ])
+    def test_public_memory_preserves_min_sum_assignment_dispatch(tmp_path, kind, assignment):
+        from bp_registry.cli import run_canonical, verify_run
+        path = public_manifest(tmp_path, iterations=3)
+        value = json.loads(path.read_text())
+        value["numerical_profile"] = "cpu-float64-min-sum-v1"
+        value["policies"]["update"]["kind"] = kind
+        if assignment:
+            value["policies"]["update"]["parameter_assignment"] = assignment
+        path.write_text(json.dumps(value))
+        output = tmp_path / "output"
+>       assert run_canonical(path, output)["final_row_count"] == 1
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/canonical/test_memory_execution.py:326: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/cli.py:270: in run_canonical
+    report = preflight_canonical(manifest_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/runner.py:790: in preflight_canonical
+    resolved = preflight(manifest_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+_ test_public_memory_preserves_min_sum_assignment_dispatch[normalized_min_sum-assignment1] _
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_public_memory_preserves_m1')
+kind = 'normalized_min_sum', assignment = {'shape': 'scalar', 'value': 0.8}
+
+    @pytest.mark.parametrize("kind,assignment", [
+        ("min_sum", None),
+        ("normalized_min_sum", {"shape": "scalar", "value": 0.8}),
+        ("normalized_min_sum", {"shape": "source_iteration", "values": [0.2, 0.5, 0.8]}),
+        ("offset_min_sum", {"shape": "source_iteration", "values": [0.0, 5.0, 10.0]}),
+    ])
+    def test_public_memory_preserves_min_sum_assignment_dispatch(tmp_path, kind, assignment):
+        from bp_registry.cli import run_canonical, verify_run
+        path = public_manifest(tmp_path, iterations=3)
+        value = json.loads(path.read_text())
+        value["numerical_profile"] = "cpu-float64-min-sum-v1"
+        value["policies"]["update"]["kind"] = kind
+        if assignment:
+            value["policies"]["update"]["parameter_assignment"] = assignment
+        path.write_text(json.dumps(value))
+        output = tmp_path / "output"
+>       assert run_canonical(path, output)["final_row_count"] == 1
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/canonical/test_memory_execution.py:326: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/cli.py:270: in run_canonical
+    report = preflight_canonical(manifest_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/runner.py:790: in preflight_canonical
+    resolved = preflight(manifest_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+_ test_public_memory_preserves_min_sum_assignment_dispatch[normalized_min_sum-assignment2] _
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_public_memory_preserves_m2')
+kind = 'normalized_min_sum'
+assignment = {'shape': 'source_iteration', 'values': [0.2, 0.5, 0.8]}
+
+    @pytest.mark.parametrize("kind,assignment", [
+        ("min_sum", None),
+        ("normalized_min_sum", {"shape": "scalar", "value": 0.8}),
+        ("normalized_min_sum", {"shape": "source_iteration", "values": [0.2, 0.5, 0.8]}),
+        ("offset_min_sum", {"shape": "source_iteration", "values": [0.0, 5.0, 10.0]}),
+    ])
+    def test_public_memory_preserves_min_sum_assignment_dispatch(tmp_path, kind, assignment):
+        from bp_registry.cli import run_canonical, verify_run
+        path = public_manifest(tmp_path, iterations=3)
+        value = json.loads(path.read_text())
+        value["numerical_profile"] = "cpu-float64-min-sum-v1"
+        value["policies"]["update"]["kind"] = kind
+        if assignment:
+            value["policies"]["update"]["parameter_assignment"] = assignment
+        path.write_text(json.dumps(value))
+        output = tmp_path / "output"
+>       assert run_canonical(path, output)["final_row_count"] == 1
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/canonical/test_memory_execution.py:326: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/cli.py:270: in run_canonical
+    report = preflight_canonical(manifest_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/runner.py:790: in preflight_canonical
+    resolved = preflight(manifest_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+_ test_public_memory_preserves_min_sum_assignment_dispatch[offset_min_sum-assignment3] _
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_public_memory_preserves_m3')
+kind = 'offset_min_sum'
+assignment = {'shape': 'source_iteration', 'values': [0.0, 5.0, 10.0]}
+
+    @pytest.mark.parametrize("kind,assignment", [
+        ("min_sum", None),
+        ("normalized_min_sum", {"shape": "scalar", "value": 0.8}),
+        ("normalized_min_sum", {"shape": "source_iteration", "values": [0.2, 0.5, 0.8]}),
+        ("offset_min_sum", {"shape": "source_iteration", "values": [0.0, 5.0, 10.0]}),
+    ])
+    def test_public_memory_preserves_min_sum_assignment_dispatch(tmp_path, kind, assignment):
+        from bp_registry.cli import run_canonical, verify_run
+        path = public_manifest(tmp_path, iterations=3)
+        value = json.loads(path.read_text())
+        value["numerical_profile"] = "cpu-float64-min-sum-v1"
+        value["policies"]["update"]["kind"] = kind
+        if assignment:
+            value["policies"]["update"]["parameter_assignment"] = assignment
+        path.write_text(json.dumps(value))
+        output = tmp_path / "output"
+>       assert run_canonical(path, output)["final_row_count"] == 1
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/canonical/test_memory_execution.py:326: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/cli.py:270: in run_canonical
+    report = preflight_canonical(manifest_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/runner.py:790: in preflight_canonical
+    resolved = preflight(manifest_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+_______ test_public_disordered_affine_prior_records_assignment_evidence ________
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_public_disordered_affine_0')
+
+    def test_public_disordered_affine_prior_records_assignment_evidence(tmp_path):
+        from bp_registry.cli import run_canonical, verify_run
+        from bp_registry.ledger import read_canonical_events
+    
+        path = public_manifest(tmp_path, iterations=2)
+        value = json.loads(path.read_text())
+        value["memory"] = composition(
+            "affine_prior", {"alpha": 0.5}, assignment={
+                "mode": "uniform", "low": 0.1, "high": 0.9,
+                "root_seed_identity": "b" * 64,
+            },
+        ).model_dump(mode="json")
+        path.write_text(json.dumps(value))
+        output = tmp_path / "disordered-public"
+>       assert run_canonical(path, output)["final_row_count"] == 1
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/canonical/test_memory_execution.py:422: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/cli.py:270: in run_canonical
+    report = preflight_canonical(manifest_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/runner.py:790: in preflight_canonical
+    resolved = preflight(manifest_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+_ test_public_v3_source_iteration_updates_advance_and_replay[normalized_min_sum-NormalizedMinSumUpdate-values0] _
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_public_v3_source_iteratio0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc171a83650>
+kind = 'normalized_min_sum', rule_name = 'NormalizedMinSumUpdate'
+values = [0.0, 1.0]
+
+    @pytest.mark.parametrize(
+        ("kind", "rule_name", "values"),
+        [
+            ("normalized_min_sum", "NormalizedMinSumUpdate", [0.0, 1.0]),
+            ("offset_min_sum", "OffsetMinSumUpdate", [100.0, 0.0]),
+        ],
+    )
+    def test_public_v3_source_iteration_updates_advance_and_replay(tmp_path, monkeypatch, kind, rule_name, values):
+        """Both V3 min-sum variants receive their declared sweep index."""
+        from bp_registry.cli import run_canonical, verify_run
+        from bp_registry.canonical import updates
+    
+        update_type = getattr(updates, rule_name)
+        original = update_type.check_to_variable
+        observed: list[int] = []
+    
+        def observed_update(self, incoming, *, syndrome, check_index=0, edge_index=0, source_iteration=0):
+            observed.append(source_iteration)
+            return original(
+                self, incoming, syndrome=syndrome, check_index=check_index,
+                edge_index=edge_index, source_iteration=source_iteration,
+            )
+    
+        monkeypatch.setattr(update_type, "check_to_variable", observed_update)
+        path = public_v3_source_iteration_manifest(tmp_path, kind=kind, values=values)
+        output = tmp_path / kind
+>       assert run_canonical(path, output)["final_row_count"] == 1
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/canonical/test_memory_execution.py:457: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/cli.py:270: in run_canonical
+    report = preflight_canonical(manifest_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/runner.py:790: in preflight_canonical
+    resolved = preflight(manifest_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+_ test_public_v3_source_iteration_updates_advance_and_replay[offset_min_sum-OffsetMinSumUpdate-values1] _
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_public_v3_source_iteratio1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc171a823f0>
+kind = 'offset_min_sum', rule_name = 'OffsetMinSumUpdate', values = [100.0, 0.0]
+
+    @pytest.mark.parametrize(
+        ("kind", "rule_name", "values"),
+        [
+            ("normalized_min_sum", "NormalizedMinSumUpdate", [0.0, 1.0]),
+            ("offset_min_sum", "OffsetMinSumUpdate", [100.0, 0.0]),
+        ],
+    )
+    def test_public_v3_source_iteration_updates_advance_and_replay(tmp_path, monkeypatch, kind, rule_name, values):
+        """Both V3 min-sum variants receive their declared sweep index."""
+        from bp_registry.cli import run_canonical, verify_run
+        from bp_registry.canonical import updates
+    
+        update_type = getattr(updates, rule_name)
+        original = update_type.check_to_variable
+        observed: list[int] = []
+    
+        def observed_update(self, incoming, *, syndrome, check_index=0, edge_index=0, source_iteration=0):
+            observed.append(source_iteration)
+            return original(
+                self, incoming, syndrome=syndrome, check_index=check_index,
+                edge_index=edge_index, source_iteration=source_iteration,
+            )
+    
+        monkeypatch.setattr(update_type, "check_to_variable", observed_update)
+        path = public_v3_source_iteration_manifest(tmp_path, kind=kind, values=values)
+        output = tmp_path / kind
+>       assert run_canonical(path, output)["final_row_count"] == 1
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/canonical/test_memory_execution.py:457: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/cli.py:270: in run_canonical
+    report = preflight_canonical(manifest_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/runner.py:790: in preflight_canonical
+    resolved = preflight(manifest_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+_ test_public_v3_short_source_iteration_assignment_rejects_before_artifact_loading[normalized_min_sum] _
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_public_v3_short_source_it0')
+kind = 'normalized_min_sum'
+
+    @pytest.mark.parametrize("kind", ["normalized_min_sum", "offset_min_sum"])
+    def test_public_v3_short_source_iteration_assignment_rejects_before_artifact_loading(tmp_path, kind):
+        from bp_registry.runner import preflight_canonical
+    
+        path = public_v3_source_iteration_manifest(tmp_path, kind=kind, values=[0.5])
+        value = json.loads(path.read_text())
+        value["artifact"]["root"] = str(tmp_path / "intentionally-missing-artifact-root")
+        path.write_text(json.dumps(value), encoding="utf-8")
+        with pytest.raises(ValueError, match="declare every attempted"):
+>           preflight_canonical(path)
+
+tests/canonical/test_memory_execution.py:471: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/runner.py:790: in preflight_canonical
+    resolved = preflight(manifest_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_public_v3_short_source_it0')
+kind = 'normalized_min_sum'
+
+    @pytest.mark.parametrize("kind", ["normalized_min_sum", "offset_min_sum"])
+    def test_public_v3_short_source_iteration_assignment_rejects_before_artifact_loading(tmp_path, kind):
+        from bp_registry.runner import preflight_canonical
+    
+        path = public_v3_source_iteration_manifest(tmp_path, kind=kind, values=[0.5])
+        value = json.loads(path.read_text())
+        value["artifact"]["root"] = str(tmp_path / "intentionally-missing-artifact-root")
+        path.write_text(json.dumps(value), encoding="utf-8")
+>       with pytest.raises(ValueError, match="declare every attempted"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'declare every attempted'
+E         Actual message: 'OMP_NUM_THREADS does not match the canonical manifest requirement'
+
+tests/canonical/test_memory_execution.py:470: AssertionError
+_ test_public_v3_short_source_iteration_assignment_rejects_before_artifact_loading[offset_min_sum] _
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_public_v3_short_source_it1')
+kind = 'offset_min_sum'
+
+    @pytest.mark.parametrize("kind", ["normalized_min_sum", "offset_min_sum"])
+    def test_public_v3_short_source_iteration_assignment_rejects_before_artifact_loading(tmp_path, kind):
+        from bp_registry.runner import preflight_canonical
+    
+        path = public_v3_source_iteration_manifest(tmp_path, kind=kind, values=[0.5])
+        value = json.loads(path.read_text())
+        value["artifact"]["root"] = str(tmp_path / "intentionally-missing-artifact-root")
+        path.write_text(json.dumps(value), encoding="utf-8")
+        with pytest.raises(ValueError, match="declare every attempted"):
+>           preflight_canonical(path)
+
+tests/canonical/test_memory_execution.py:471: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/runner.py:790: in preflight_canonical
+    resolved = preflight(manifest_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_public_v3_short_source_it1')
+kind = 'offset_min_sum'
+
+    @pytest.mark.parametrize("kind", ["normalized_min_sum", "offset_min_sum"])
+    def test_public_v3_short_source_iteration_assignment_rejects_before_artifact_loading(tmp_path, kind):
+        from bp_registry.runner import preflight_canonical
+    
+        path = public_v3_source_iteration_manifest(tmp_path, kind=kind, values=[0.5])
+        value = json.loads(path.read_text())
+        value["artifact"]["root"] = str(tmp_path / "intentionally-missing-artifact-root")
+        path.write_text(json.dumps(value), encoding="utf-8")
+>       with pytest.raises(ValueError, match="declare every attempted"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'declare every attempted'
+E         Actual message: 'OMP_NUM_THREADS does not match the canonical manifest requirement'
+
+tests/canonical/test_memory_execution.py:470: AssertionError
+_ test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading[local-target_boundary_unsupported] _
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_unimplemented_or_ambiguou0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc171a86900>
+case = 'local', message = 'target_boundary_unsupported'
+
+    @pytest.mark.parametrize("case,message", [
+        ("local", "target_boundary_unsupported"),
+        ("retained", "execution_lifecycle_unimplemented"),
+        ("ordinary_leg", "execution_lifecycle_unimplemented"),
+        ("order", "execution_order_requires"),
+        ("pdprime_after_prior", "pdprime_requires_fixed_prior"),
+        ("short_offset", "execution_update_assignment_shorter"),
+        ("beta", "requires exactly"),
+    ])
+    def test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading(tmp_path, monkeypatch, case, message):
+        from bp_registry import manifests
+        path = public_manifest(tmp_path, iterations=3)
+        value = json.loads(path.read_text())
+        binding = value["memory"]["bindings"][0]
+        if case == "local":
+            value["policies"]["schedule"]["kind"] = "check_node_serial"
+            value["memory"] = composition("affine_prior", {"alpha": 0.5}).model_dump(mode="json")
+            value["memory"]["bindings"][0]["advance_boundary"] = "local_update"
+        elif case == "retained":
+            binding["retain_history"] = True
+        elif case == "ordinary_leg":
+            binding["state_lifetime"] = "leg"
+            binding["refresh_boundary"] = "leg_start"
+        elif case in {"order", "pdprime_after_prior"}:
+            first = composition("v2c_damping" if case == "order" else "affine_prior", {"gamma": 0.5} if case == "order" else {"alpha": 0.5}, binding_id="first").model_dump(mode="json")["bindings"][0]
+            second = composition("affine_prior" if case == "order" else "pdprime_delta_mix", {"alpha": 0.5} if case == "order" else {"gamma": 0.5}, binding_id="second").model_dump(mode="json")["bindings"][0]
+            second["order"] = 1
+            value["memory"]["bindings"] = [first, second]
+        elif case == "short_offset":
+            value["numerical_profile"] = "cpu-float64-min-sum-v1"
+            value["policies"]["update"]["kind"] = "offset_min_sum"
+            value["policies"]["update"]["parameter_assignment"] = {"shape": "source_iteration", "values": [0.5]}
+        else:
+            binding["parameters"] = {"beta": 0.5}
+        path.write_text(json.dumps(value))
+        monkeypatch.setattr(manifests, "load_artifact", lambda *args, **kwargs: pytest.fail("invalid memory must reject before input loading"))
+        with pytest.raises(ValueError, match=message):
+>           manifests.preflight(path)
+
+tests/canonical/test_memory_execution.py:523: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_unimplemented_or_ambiguou0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc171a86900>
+case = 'local', message = 'target_boundary_unsupported'
+
+    @pytest.mark.parametrize("case,message", [
+        ("local", "target_boundary_unsupported"),
+        ("retained", "execution_lifecycle_unimplemented"),
+        ("ordinary_leg", "execution_lifecycle_unimplemented"),
+        ("order", "execution_order_requires"),
+        ("pdprime_after_prior", "pdprime_requires_fixed_prior"),
+        ("short_offset", "execution_update_assignment_shorter"),
+        ("beta", "requires exactly"),
+    ])
+    def test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading(tmp_path, monkeypatch, case, message):
+        from bp_registry import manifests
+        path = public_manifest(tmp_path, iterations=3)
+        value = json.loads(path.read_text())
+        binding = value["memory"]["bindings"][0]
+        if case == "local":
+            value["policies"]["schedule"]["kind"] = "check_node_serial"
+            value["memory"] = composition("affine_prior", {"alpha": 0.5}).model_dump(mode="json")
+            value["memory"]["bindings"][0]["advance_boundary"] = "local_update"
+        elif case == "retained":
+            binding["retain_history"] = True
+        elif case == "ordinary_leg":
+            binding["state_lifetime"] = "leg"
+            binding["refresh_boundary"] = "leg_start"
+        elif case in {"order", "pdprime_after_prior"}:
+            first = composition("v2c_damping" if case == "order" else "affine_prior", {"gamma": 0.5} if case == "order" else {"alpha": 0.5}, binding_id="first").model_dump(mode="json")["bindings"][0]
+            second = composition("affine_prior" if case == "order" else "pdprime_delta_mix", {"alpha": 0.5} if case == "order" else {"gamma": 0.5}, binding_id="second").model_dump(mode="json")["bindings"][0]
+            second["order"] = 1
+            value["memory"]["bindings"] = [first, second]
+        elif case == "short_offset":
+            value["numerical_profile"] = "cpu-float64-min-sum-v1"
+            value["policies"]["update"]["kind"] = "offset_min_sum"
+            value["policies"]["update"]["parameter_assignment"] = {"shape": "source_iteration", "values": [0.5]}
+        else:
+            binding["parameters"] = {"beta": 0.5}
+        path.write_text(json.dumps(value))
+        monkeypatch.setattr(manifests, "load_artifact", lambda *args, **kwargs: pytest.fail("invalid memory must reject before input loading"))
+>       with pytest.raises(ValueError, match=message):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'target_boundary_unsupported'
+E         Actual message: 'OMP_NUM_THREADS does not match the canonical manifest requirement'
+
+tests/canonical/test_memory_execution.py:522: AssertionError
+_ test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading[retained-execution_lifecycle_unimplemented] _
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_unimplemented_or_ambiguou1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc171a84950>
+case = 'retained', message = 'execution_lifecycle_unimplemented'
+
+    @pytest.mark.parametrize("case,message", [
+        ("local", "target_boundary_unsupported"),
+        ("retained", "execution_lifecycle_unimplemented"),
+        ("ordinary_leg", "execution_lifecycle_unimplemented"),
+        ("order", "execution_order_requires"),
+        ("pdprime_after_prior", "pdprime_requires_fixed_prior"),
+        ("short_offset", "execution_update_assignment_shorter"),
+        ("beta", "requires exactly"),
+    ])
+    def test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading(tmp_path, monkeypatch, case, message):
+        from bp_registry import manifests
+        path = public_manifest(tmp_path, iterations=3)
+        value = json.loads(path.read_text())
+        binding = value["memory"]["bindings"][0]
+        if case == "local":
+            value["policies"]["schedule"]["kind"] = "check_node_serial"
+            value["memory"] = composition("affine_prior", {"alpha": 0.5}).model_dump(mode="json")
+            value["memory"]["bindings"][0]["advance_boundary"] = "local_update"
+        elif case == "retained":
+            binding["retain_history"] = True
+        elif case == "ordinary_leg":
+            binding["state_lifetime"] = "leg"
+            binding["refresh_boundary"] = "leg_start"
+        elif case in {"order", "pdprime_after_prior"}:
+            first = composition("v2c_damping" if case == "order" else "affine_prior", {"gamma": 0.5} if case == "order" else {"alpha": 0.5}, binding_id="first").model_dump(mode="json")["bindings"][0]
+            second = composition("affine_prior" if case == "order" else "pdprime_delta_mix", {"alpha": 0.5} if case == "order" else {"gamma": 0.5}, binding_id="second").model_dump(mode="json")["bindings"][0]
+            second["order"] = 1
+            value["memory"]["bindings"] = [first, second]
+        elif case == "short_offset":
+            value["numerical_profile"] = "cpu-float64-min-sum-v1"
+            value["policies"]["update"]["kind"] = "offset_min_sum"
+            value["policies"]["update"]["parameter_assignment"] = {"shape": "source_iteration", "values": [0.5]}
+        else:
+            binding["parameters"] = {"beta": 0.5}
+        path.write_text(json.dumps(value))
+        monkeypatch.setattr(manifests, "load_artifact", lambda *args, **kwargs: pytest.fail("invalid memory must reject before input loading"))
+        with pytest.raises(ValueError, match=message):
+>           manifests.preflight(path)
+
+tests/canonical/test_memory_execution.py:523: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_unimplemented_or_ambiguou1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc171a84950>
+case = 'retained', message = 'execution_lifecycle_unimplemented'
+
+    @pytest.mark.parametrize("case,message", [
+        ("local", "target_boundary_unsupported"),
+        ("retained", "execution_lifecycle_unimplemented"),
+        ("ordinary_leg", "execution_lifecycle_unimplemented"),
+        ("order", "execution_order_requires"),
+        ("pdprime_after_prior", "pdprime_requires_fixed_prior"),
+        ("short_offset", "execution_update_assignment_shorter"),
+        ("beta", "requires exactly"),
+    ])
+    def test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading(tmp_path, monkeypatch, case, message):
+        from bp_registry import manifests
+        path = public_manifest(tmp_path, iterations=3)
+        value = json.loads(path.read_text())
+        binding = value["memory"]["bindings"][0]
+        if case == "local":
+            value["policies"]["schedule"]["kind"] = "check_node_serial"
+            value["memory"] = composition("affine_prior", {"alpha": 0.5}).model_dump(mode="json")
+            value["memory"]["bindings"][0]["advance_boundary"] = "local_update"
+        elif case == "retained":
+            binding["retain_history"] = True
+        elif case == "ordinary_leg":
+            binding["state_lifetime"] = "leg"
+            binding["refresh_boundary"] = "leg_start"
+        elif case in {"order", "pdprime_after_prior"}:
+            first = composition("v2c_damping" if case == "order" else "affine_prior", {"gamma": 0.5} if case == "order" else {"alpha": 0.5}, binding_id="first").model_dump(mode="json")["bindings"][0]
+            second = composition("affine_prior" if case == "order" else "pdprime_delta_mix", {"alpha": 0.5} if case == "order" else {"gamma": 0.5}, binding_id="second").model_dump(mode="json")["bindings"][0]
+            second["order"] = 1
+            value["memory"]["bindings"] = [first, second]
+        elif case == "short_offset":
+            value["numerical_profile"] = "cpu-float64-min-sum-v1"
+            value["policies"]["update"]["kind"] = "offset_min_sum"
+            value["policies"]["update"]["parameter_assignment"] = {"shape": "source_iteration", "values": [0.5]}
+        else:
+            binding["parameters"] = {"beta": 0.5}
+        path.write_text(json.dumps(value))
+        monkeypatch.setattr(manifests, "load_artifact", lambda *args, **kwargs: pytest.fail("invalid memory must reject before input loading"))
+>       with pytest.raises(ValueError, match=message):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'execution_lifecycle_unimplemented'
+E         Actual message: 'OMP_NUM_THREADS does not match the canonical manifest requirement'
+
+tests/canonical/test_memory_execution.py:522: AssertionError
+_ test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading[ordinary_leg-execution_lifecycle_unimplemented] _
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_unimplemented_or_ambiguou2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc171a85ac0>
+case = 'ordinary_leg', message = 'execution_lifecycle_unimplemented'
+
+    @pytest.mark.parametrize("case,message", [
+        ("local", "target_boundary_unsupported"),
+        ("retained", "execution_lifecycle_unimplemented"),
+        ("ordinary_leg", "execution_lifecycle_unimplemented"),
+        ("order", "execution_order_requires"),
+        ("pdprime_after_prior", "pdprime_requires_fixed_prior"),
+        ("short_offset", "execution_update_assignment_shorter"),
+        ("beta", "requires exactly"),
+    ])
+    def test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading(tmp_path, monkeypatch, case, message):
+        from bp_registry import manifests
+        path = public_manifest(tmp_path, iterations=3)
+        value = json.loads(path.read_text())
+        binding = value["memory"]["bindings"][0]
+        if case == "local":
+            value["policies"]["schedule"]["kind"] = "check_node_serial"
+            value["memory"] = composition("affine_prior", {"alpha": 0.5}).model_dump(mode="json")
+            value["memory"]["bindings"][0]["advance_boundary"] = "local_update"
+        elif case == "retained":
+            binding["retain_history"] = True
+        elif case == "ordinary_leg":
+            binding["state_lifetime"] = "leg"
+            binding["refresh_boundary"] = "leg_start"
+        elif case in {"order", "pdprime_after_prior"}:
+            first = composition("v2c_damping" if case == "order" else "affine_prior", {"gamma": 0.5} if case == "order" else {"alpha": 0.5}, binding_id="first").model_dump(mode="json")["bindings"][0]
+            second = composition("affine_prior" if case == "order" else "pdprime_delta_mix", {"alpha": 0.5} if case == "order" else {"gamma": 0.5}, binding_id="second").model_dump(mode="json")["bindings"][0]
+            second["order"] = 1
+            value["memory"]["bindings"] = [first, second]
+        elif case == "short_offset":
+            value["numerical_profile"] = "cpu-float64-min-sum-v1"
+            value["policies"]["update"]["kind"] = "offset_min_sum"
+            value["policies"]["update"]["parameter_assignment"] = {"shape": "source_iteration", "values": [0.5]}
+        else:
+            binding["parameters"] = {"beta": 0.5}
+        path.write_text(json.dumps(value))
+        monkeypatch.setattr(manifests, "load_artifact", lambda *args, **kwargs: pytest.fail("invalid memory must reject before input loading"))
+        with pytest.raises(ValueError, match=message):
+>           manifests.preflight(path)
+
+tests/canonical/test_memory_execution.py:523: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_unimplemented_or_ambiguou2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc171a85ac0>
+case = 'ordinary_leg', message = 'execution_lifecycle_unimplemented'
+
+    @pytest.mark.parametrize("case,message", [
+        ("local", "target_boundary_unsupported"),
+        ("retained", "execution_lifecycle_unimplemented"),
+        ("ordinary_leg", "execution_lifecycle_unimplemented"),
+        ("order", "execution_order_requires"),
+        ("pdprime_after_prior", "pdprime_requires_fixed_prior"),
+        ("short_offset", "execution_update_assignment_shorter"),
+        ("beta", "requires exactly"),
+    ])
+    def test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading(tmp_path, monkeypatch, case, message):
+        from bp_registry import manifests
+        path = public_manifest(tmp_path, iterations=3)
+        value = json.loads(path.read_text())
+        binding = value["memory"]["bindings"][0]
+        if case == "local":
+            value["policies"]["schedule"]["kind"] = "check_node_serial"
+            value["memory"] = composition("affine_prior", {"alpha": 0.5}).model_dump(mode="json")
+            value["memory"]["bindings"][0]["advance_boundary"] = "local_update"
+        elif case == "retained":
+            binding["retain_history"] = True
+        elif case == "ordinary_leg":
+            binding["state_lifetime"] = "leg"
+            binding["refresh_boundary"] = "leg_start"
+        elif case in {"order", "pdprime_after_prior"}:
+            first = composition("v2c_damping" if case == "order" else "affine_prior", {"gamma": 0.5} if case == "order" else {"alpha": 0.5}, binding_id="first").model_dump(mode="json")["bindings"][0]
+            second = composition("affine_prior" if case == "order" else "pdprime_delta_mix", {"alpha": 0.5} if case == "order" else {"gamma": 0.5}, binding_id="second").model_dump(mode="json")["bindings"][0]
+            second["order"] = 1
+            value["memory"]["bindings"] = [first, second]
+        elif case == "short_offset":
+            value["numerical_profile"] = "cpu-float64-min-sum-v1"
+            value["policies"]["update"]["kind"] = "offset_min_sum"
+            value["policies"]["update"]["parameter_assignment"] = {"shape": "source_iteration", "values": [0.5]}
+        else:
+            binding["parameters"] = {"beta": 0.5}
+        path.write_text(json.dumps(value))
+        monkeypatch.setattr(manifests, "load_artifact", lambda *args, **kwargs: pytest.fail("invalid memory must reject before input loading"))
+>       with pytest.raises(ValueError, match=message):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'execution_lifecycle_unimplemented'
+E         Actual message: 'OMP_NUM_THREADS does not match the canonical manifest requirement'
+
+tests/canonical/test_memory_execution.py:522: AssertionError
+_ test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading[order-execution_order_requires] _
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_unimplemented_or_ambiguou3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc171a81af0>
+case = 'order', message = 'execution_order_requires'
+
+    @pytest.mark.parametrize("case,message", [
+        ("local", "target_boundary_unsupported"),
+        ("retained", "execution_lifecycle_unimplemented"),
+        ("ordinary_leg", "execution_lifecycle_unimplemented"),
+        ("order", "execution_order_requires"),
+        ("pdprime_after_prior", "pdprime_requires_fixed_prior"),
+        ("short_offset", "execution_update_assignment_shorter"),
+        ("beta", "requires exactly"),
+    ])
+    def test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading(tmp_path, monkeypatch, case, message):
+        from bp_registry import manifests
+        path = public_manifest(tmp_path, iterations=3)
+        value = json.loads(path.read_text())
+        binding = value["memory"]["bindings"][0]
+        if case == "local":
+            value["policies"]["schedule"]["kind"] = "check_node_serial"
+            value["memory"] = composition("affine_prior", {"alpha": 0.5}).model_dump(mode="json")
+            value["memory"]["bindings"][0]["advance_boundary"] = "local_update"
+        elif case == "retained":
+            binding["retain_history"] = True
+        elif case == "ordinary_leg":
+            binding["state_lifetime"] = "leg"
+            binding["refresh_boundary"] = "leg_start"
+        elif case in {"order", "pdprime_after_prior"}:
+            first = composition("v2c_damping" if case == "order" else "affine_prior", {"gamma": 0.5} if case == "order" else {"alpha": 0.5}, binding_id="first").model_dump(mode="json")["bindings"][0]
+            second = composition("affine_prior" if case == "order" else "pdprime_delta_mix", {"alpha": 0.5} if case == "order" else {"gamma": 0.5}, binding_id="second").model_dump(mode="json")["bindings"][0]
+            second["order"] = 1
+            value["memory"]["bindings"] = [first, second]
+        elif case == "short_offset":
+            value["numerical_profile"] = "cpu-float64-min-sum-v1"
+            value["policies"]["update"]["kind"] = "offset_min_sum"
+            value["policies"]["update"]["parameter_assignment"] = {"shape": "source_iteration", "values": [0.5]}
+        else:
+            binding["parameters"] = {"beta": 0.5}
+        path.write_text(json.dumps(value))
+        monkeypatch.setattr(manifests, "load_artifact", lambda *args, **kwargs: pytest.fail("invalid memory must reject before input loading"))
+        with pytest.raises(ValueError, match=message):
+>           manifests.preflight(path)
+
+tests/canonical/test_memory_execution.py:523: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_unimplemented_or_ambiguou3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc171a81af0>
+case = 'order', message = 'execution_order_requires'
+
+    @pytest.mark.parametrize("case,message", [
+        ("local", "target_boundary_unsupported"),
+        ("retained", "execution_lifecycle_unimplemented"),
+        ("ordinary_leg", "execution_lifecycle_unimplemented"),
+        ("order", "execution_order_requires"),
+        ("pdprime_after_prior", "pdprime_requires_fixed_prior"),
+        ("short_offset", "execution_update_assignment_shorter"),
+        ("beta", "requires exactly"),
+    ])
+    def test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading(tmp_path, monkeypatch, case, message):
+        from bp_registry import manifests
+        path = public_manifest(tmp_path, iterations=3)
+        value = json.loads(path.read_text())
+        binding = value["memory"]["bindings"][0]
+        if case == "local":
+            value["policies"]["schedule"]["kind"] = "check_node_serial"
+            value["memory"] = composition("affine_prior", {"alpha": 0.5}).model_dump(mode="json")
+            value["memory"]["bindings"][0]["advance_boundary"] = "local_update"
+        elif case == "retained":
+            binding["retain_history"] = True
+        elif case == "ordinary_leg":
+            binding["state_lifetime"] = "leg"
+            binding["refresh_boundary"] = "leg_start"
+        elif case in {"order", "pdprime_after_prior"}:
+            first = composition("v2c_damping" if case == "order" else "affine_prior", {"gamma": 0.5} if case == "order" else {"alpha": 0.5}, binding_id="first").model_dump(mode="json")["bindings"][0]
+            second = composition("affine_prior" if case == "order" else "pdprime_delta_mix", {"alpha": 0.5} if case == "order" else {"gamma": 0.5}, binding_id="second").model_dump(mode="json")["bindings"][0]
+            second["order"] = 1
+            value["memory"]["bindings"] = [first, second]
+        elif case == "short_offset":
+            value["numerical_profile"] = "cpu-float64-min-sum-v1"
+            value["policies"]["update"]["kind"] = "offset_min_sum"
+            value["policies"]["update"]["parameter_assignment"] = {"shape": "source_iteration", "values": [0.5]}
+        else:
+            binding["parameters"] = {"beta": 0.5}
+        path.write_text(json.dumps(value))
+        monkeypatch.setattr(manifests, "load_artifact", lambda *args, **kwargs: pytest.fail("invalid memory must reject before input loading"))
+>       with pytest.raises(ValueError, match=message):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'execution_order_requires'
+E         Actual message: 'OMP_NUM_THREADS does not match the canonical manifest requirement'
+
+tests/canonical/test_memory_execution.py:522: AssertionError
+_ test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading[pdprime_after_prior-pdprime_requires_fixed_prior] _
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_unimplemented_or_ambiguou4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc171a8d4c0>
+case = 'pdprime_after_prior', message = 'pdprime_requires_fixed_prior'
+
+    @pytest.mark.parametrize("case,message", [
+        ("local", "target_boundary_unsupported"),
+        ("retained", "execution_lifecycle_unimplemented"),
+        ("ordinary_leg", "execution_lifecycle_unimplemented"),
+        ("order", "execution_order_requires"),
+        ("pdprime_after_prior", "pdprime_requires_fixed_prior"),
+        ("short_offset", "execution_update_assignment_shorter"),
+        ("beta", "requires exactly"),
+    ])
+    def test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading(tmp_path, monkeypatch, case, message):
+        from bp_registry import manifests
+        path = public_manifest(tmp_path, iterations=3)
+        value = json.loads(path.read_text())
+        binding = value["memory"]["bindings"][0]
+        if case == "local":
+            value["policies"]["schedule"]["kind"] = "check_node_serial"
+            value["memory"] = composition("affine_prior", {"alpha": 0.5}).model_dump(mode="json")
+            value["memory"]["bindings"][0]["advance_boundary"] = "local_update"
+        elif case == "retained":
+            binding["retain_history"] = True
+        elif case == "ordinary_leg":
+            binding["state_lifetime"] = "leg"
+            binding["refresh_boundary"] = "leg_start"
+        elif case in {"order", "pdprime_after_prior"}:
+            first = composition("v2c_damping" if case == "order" else "affine_prior", {"gamma": 0.5} if case == "order" else {"alpha": 0.5}, binding_id="first").model_dump(mode="json")["bindings"][0]
+            second = composition("affine_prior" if case == "order" else "pdprime_delta_mix", {"alpha": 0.5} if case == "order" else {"gamma": 0.5}, binding_id="second").model_dump(mode="json")["bindings"][0]
+            second["order"] = 1
+            value["memory"]["bindings"] = [first, second]
+        elif case == "short_offset":
+            value["numerical_profile"] = "cpu-float64-min-sum-v1"
+            value["policies"]["update"]["kind"] = "offset_min_sum"
+            value["policies"]["update"]["parameter_assignment"] = {"shape": "source_iteration", "values": [0.5]}
+        else:
+            binding["parameters"] = {"beta": 0.5}
+        path.write_text(json.dumps(value))
+        monkeypatch.setattr(manifests, "load_artifact", lambda *args, **kwargs: pytest.fail("invalid memory must reject before input loading"))
+        with pytest.raises(ValueError, match=message):
+>           manifests.preflight(path)
+
+tests/canonical/test_memory_execution.py:523: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_unimplemented_or_ambiguou4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc171a8d4c0>
+case = 'pdprime_after_prior', message = 'pdprime_requires_fixed_prior'
+
+    @pytest.mark.parametrize("case,message", [
+        ("local", "target_boundary_unsupported"),
+        ("retained", "execution_lifecycle_unimplemented"),
+        ("ordinary_leg", "execution_lifecycle_unimplemented"),
+        ("order", "execution_order_requires"),
+        ("pdprime_after_prior", "pdprime_requires_fixed_prior"),
+        ("short_offset", "execution_update_assignment_shorter"),
+        ("beta", "requires exactly"),
+    ])
+    def test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading(tmp_path, monkeypatch, case, message):
+        from bp_registry import manifests
+        path = public_manifest(tmp_path, iterations=3)
+        value = json.loads(path.read_text())
+        binding = value["memory"]["bindings"][0]
+        if case == "local":
+            value["policies"]["schedule"]["kind"] = "check_node_serial"
+            value["memory"] = composition("affine_prior", {"alpha": 0.5}).model_dump(mode="json")
+            value["memory"]["bindings"][0]["advance_boundary"] = "local_update"
+        elif case == "retained":
+            binding["retain_history"] = True
+        elif case == "ordinary_leg":
+            binding["state_lifetime"] = "leg"
+            binding["refresh_boundary"] = "leg_start"
+        elif case in {"order", "pdprime_after_prior"}:
+            first = composition("v2c_damping" if case == "order" else "affine_prior", {"gamma": 0.5} if case == "order" else {"alpha": 0.5}, binding_id="first").model_dump(mode="json")["bindings"][0]
+            second = composition("affine_prior" if case == "order" else "pdprime_delta_mix", {"alpha": 0.5} if case == "order" else {"gamma": 0.5}, binding_id="second").model_dump(mode="json")["bindings"][0]
+            second["order"] = 1
+            value["memory"]["bindings"] = [first, second]
+        elif case == "short_offset":
+            value["numerical_profile"] = "cpu-float64-min-sum-v1"
+            value["policies"]["update"]["kind"] = "offset_min_sum"
+            value["policies"]["update"]["parameter_assignment"] = {"shape": "source_iteration", "values": [0.5]}
+        else:
+            binding["parameters"] = {"beta": 0.5}
+        path.write_text(json.dumps(value))
+        monkeypatch.setattr(manifests, "load_artifact", lambda *args, **kwargs: pytest.fail("invalid memory must reject before input loading"))
+>       with pytest.raises(ValueError, match=message):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'pdprime_requires_fixed_prior'
+E         Actual message: 'OMP_NUM_THREADS does not match the canonical manifest requirement'
+
+tests/canonical/test_memory_execution.py:522: AssertionError
+_ test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading[short_offset-execution_update_assignment_shorter] _
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_unimplemented_or_ambiguou5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc171a8f1d0>
+case = 'short_offset', message = 'execution_update_assignment_shorter'
+
+    @pytest.mark.parametrize("case,message", [
+        ("local", "target_boundary_unsupported"),
+        ("retained", "execution_lifecycle_unimplemented"),
+        ("ordinary_leg", "execution_lifecycle_unimplemented"),
+        ("order", "execution_order_requires"),
+        ("pdprime_after_prior", "pdprime_requires_fixed_prior"),
+        ("short_offset", "execution_update_assignment_shorter"),
+        ("beta", "requires exactly"),
+    ])
+    def test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading(tmp_path, monkeypatch, case, message):
+        from bp_registry import manifests
+        path = public_manifest(tmp_path, iterations=3)
+        value = json.loads(path.read_text())
+        binding = value["memory"]["bindings"][0]
+        if case == "local":
+            value["policies"]["schedule"]["kind"] = "check_node_serial"
+            value["memory"] = composition("affine_prior", {"alpha": 0.5}).model_dump(mode="json")
+            value["memory"]["bindings"][0]["advance_boundary"] = "local_update"
+        elif case == "retained":
+            binding["retain_history"] = True
+        elif case == "ordinary_leg":
+            binding["state_lifetime"] = "leg"
+            binding["refresh_boundary"] = "leg_start"
+        elif case in {"order", "pdprime_after_prior"}:
+            first = composition("v2c_damping" if case == "order" else "affine_prior", {"gamma": 0.5} if case == "order" else {"alpha": 0.5}, binding_id="first").model_dump(mode="json")["bindings"][0]
+            second = composition("affine_prior" if case == "order" else "pdprime_delta_mix", {"alpha": 0.5} if case == "order" else {"gamma": 0.5}, binding_id="second").model_dump(mode="json")["bindings"][0]
+            second["order"] = 1
+            value["memory"]["bindings"] = [first, second]
+        elif case == "short_offset":
+            value["numerical_profile"] = "cpu-float64-min-sum-v1"
+            value["policies"]["update"]["kind"] = "offset_min_sum"
+            value["policies"]["update"]["parameter_assignment"] = {"shape": "source_iteration", "values": [0.5]}
+        else:
+            binding["parameters"] = {"beta": 0.5}
+        path.write_text(json.dumps(value))
+        monkeypatch.setattr(manifests, "load_artifact", lambda *args, **kwargs: pytest.fail("invalid memory must reject before input loading"))
+        with pytest.raises(ValueError, match=message):
+>           manifests.preflight(path)
+
+tests/canonical/test_memory_execution.py:523: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/manifests.py:1172: in preflight
+    _verify_canonical_environment(manifest.environment)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+environment = CanonicalEnvironmentV2(python='3.12.2', numpy='2.2.6', scipy='1.17.1', backend='cpu', omp_num_threads=1)
+
+    def _verify_canonical_environment(environment: CanonicalEnvironmentV2) -> None:
+        actual = _actual_canonical_environment()
+        expected = environment.model_dump(exclude={"omp_num_threads"})
+        actual = {key: actual[key] for key in expected}
+        if actual != expected:
+            raise ValueError("canonical manifest environment does not match this execution environment")
+        if os.environ.get("OMP_NUM_THREADS") != str(environment.omp_num_threads):
+>           raise ValueError("OMP_NUM_THREADS does not match the canonical manifest requirement")
+E           ValueError: OMP_NUM_THREADS does not match the canonical manifest requirement
+
+src/bp_registry/manifests.py:1088: ValueError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-239/test_unimplemented_or_ambiguou5')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc171a8f1d0>
+case = 'short_offset', message = 'execution_update_assignment_shorter'
+
+    @pytest.mark.parametrize("case,message", [
+        ("local", "target_boundary_unsupported"),
+        ("retained", "execution_lifecycle_unimplemented"),
+        ("ordinary_leg", "execution_lifecycle_unimplemented"),
+        ("order", "execution_order_requires"),
+        ("pdprime_after_prior", "pdprime_requires_fixed_prior"),
+        ("short_offset", "execution_update_assignment_shorter"),
+        ("beta", "requires exactly"),
+    ])
+    def test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading(tmp_path, monkeypatch, case, message):
+        from bp_registry import manifests
+        path = public_manifest(tmp_path, iterations=3)
+        value = json.loads(path.read_text())
+        binding = value["memory"]["bindings"][0]
+        if case == "local":
+            value["policies"]["schedule"]["kind"] = "check_node_serial"
+            value["memory"] = composition("affine_prior", {"alpha": 0.5}).model_dump(mode="json")
+            value["memory"]["bindings"][0]["advance_boundary"] = "local_update"
+        elif case == "retained":
+            binding["retain_history"] = True
+        elif case == "ordinary_leg":
+            binding["state_lifetime"] = "leg"
+            binding["refresh_boundary"] = "leg_start"
+        elif case in {"order", "pdprime_after_prior"}:
+            first = composition("v2c_damping" if case == "order" else "affine_prior", {"gamma": 0.5} if case == "order" else {"alpha": 0.5}, binding_id="first").model_dump(mode="json")["bindings"][0]
+            second = composition("affine_prior" if case == "order" else "pdprime_delta_mix", {"alpha": 0.5} if case == "order" else {"gamma": 0.5}, binding_id="second").model_dump(mode="json")["bindings"][0]
+            second["order"] = 1
+            value["memory"]["bindings"] = [first, second]
+        elif case == "short_offset":
+            value["numerical_profile"] = "cpu-float64-min-sum-v1"
+            value["policies"]["update"]["kind"] = "offset_min_sum"
+            value["policies"]["update"]["parameter_assignment"] = {"shape": "source_iteration", "values": [0.5]}
+        else:
+            binding["parameters"] = {"beta": 0.5}
+        path.write_text(json.dumps(value))
+        monkeypatch.setattr(manifests, "load_artifact", lambda *args, **kwargs: pytest.fail("invalid memory must reject before input loading"))
+>       with pytest.raises(ValueError, match=message):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'execution_update_assignment_shorter'
+E         Actual message: 'OMP_NUM_THREADS does not match the canonical manifest requirement'
+
+tests/canonical/test_memory_execution.py:522: AssertionError
+=========================== short test summary info ============================
+FAILED tests/canonical/test_memory_execution.py::test_trace_off_and_absent_assignment_preserve_frozen_public_identities[data/manifests/canonical-three-qubit-development.json-f62e836f89c84f98593eb82339615c76793c233467cdf8c8c40c655e3697137b-sha256:2a81bf50b948b06a0a6e14c008d58b0399031d0a5732b49ffea2c5172414564b]
+FAILED tests/canonical/test_memory_execution.py::test_trace_off_and_absent_assignment_preserve_frozen_public_identities[data/manifests/phase3-hsu-group-pilot.json-b58133f1707f9226fe1d6fd6eadf2a9c866448cbc4aea9825b190556a5230d1d-sha256:02a376bd9f16a40cc66e1c9e3125e7e600e2361c615f93cdca632c38f601b5e1]
+FAILED tests/canonical/test_memory_execution.py::test_trace_off_and_absent_assignment_preserve_frozen_public_identities[data/manifests/phase4-memory-relay-b1.json-dd127331caec00e2ff72ec9e681c8b29e153fc2f08387a5d53e9f99123e77a12-sha256:8447ab3c2c47d86fec8fd4f91a2d8b9d4cbd89cbb88782f3bb4677c8955fbe6f]
+FAILED tests/canonical/test_memory_execution.py::test_public_memory_changes_behavior_and_preserves_invalid_candidate
+FAILED tests/canonical/test_memory_execution.py::test_public_budget_replay_distinguishes_no_proposal_from_invalid_proposal[cap0-0-None]
+FAILED tests/canonical/test_memory_execution.py::test_public_budget_replay_distinguishes_no_proposal_from_invalid_proposal[cap1-0-None]
+FAILED tests/canonical/test_memory_execution.py::test_public_budget_replay_distinguishes_no_proposal_from_invalid_proposal[cap2-1-diagnostic2]
+FAILED tests/canonical/test_memory_execution.py::test_semantic_replay_rejects_rehashed_memory_claims[history_sha256]
+FAILED tests/canonical/test_memory_execution.py::test_semantic_replay_rejects_rehashed_memory_claims[committed_iterations]
+FAILED tests/canonical/test_memory_execution.py::test_semantic_replay_rejects_rehashed_memory_claims[memory_element_updates]
+FAILED tests/canonical/test_memory_execution.py::test_semantic_replay_rejects_rehashed_memory_claims[diagnostic_candidate]
+FAILED tests/canonical/test_memory_execution.py::test_numerical_failure_retains_and_replays_only_committed_memory_prefix[0]
+FAILED tests/canonical/test_memory_execution.py::test_numerical_failure_retains_and_replays_only_committed_memory_prefix[1]
+FAILED tests/canonical/test_memory_execution.py::test_public_memory_preserves_min_sum_assignment_dispatch[min_sum-None]
+FAILED tests/canonical/test_memory_execution.py::test_public_memory_preserves_min_sum_assignment_dispatch[normalized_min_sum-assignment1]
+FAILED tests/canonical/test_memory_execution.py::test_public_memory_preserves_min_sum_assignment_dispatch[normalized_min_sum-assignment2]
+FAILED tests/canonical/test_memory_execution.py::test_public_memory_preserves_min_sum_assignment_dispatch[offset_min_sum-assignment3]
+FAILED tests/canonical/test_memory_execution.py::test_public_disordered_affine_prior_records_assignment_evidence
+FAILED tests/canonical/test_memory_execution.py::test_public_v3_source_iteration_updates_advance_and_replay[normalized_min_sum-NormalizedMinSumUpdate-values0]
+FAILED tests/canonical/test_memory_execution.py::test_public_v3_source_iteration_updates_advance_and_replay[offset_min_sum-OffsetMinSumUpdate-values1]
+FAILED tests/canonical/test_memory_execution.py::test_public_v3_short_source_iteration_assignment_rejects_before_artifact_loading[normalized_min_sum]
+FAILED tests/canonical/test_memory_execution.py::test_public_v3_short_source_iteration_assignment_rejects_before_artifact_loading[offset_min_sum]
+FAILED tests/canonical/test_memory_execution.py::test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading[local-target_boundary_unsupported]
+FAILED tests/canonical/test_memory_execution.py::test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading[retained-execution_lifecycle_unimplemented]
+FAILED tests/canonical/test_memory_execution.py::test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading[ordinary_leg-execution_lifecycle_unimplemented]
+FAILED tests/canonical/test_memory_execution.py::test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading[order-execution_order_requires]
+FAILED tests/canonical/test_memory_execution.py::test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading[pdprime_after_prior-pdprime_requires_fixed_prior]
+FAILED tests/canonical/test_memory_execution.py::test_unimplemented_or_ambiguous_bindings_reject_before_artifact_loading[short_offset-execution_update_assignment_shorter]
+28 failed, 84 passed in 5.15s

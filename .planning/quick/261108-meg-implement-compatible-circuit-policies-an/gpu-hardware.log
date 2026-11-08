@@ -1,0 +1,25 @@
+CUDA 12.8
+name, driver_version, memory.total [MiB]
+NVIDIA H200, 615.71.09, 143771 MiB
+.................                                                        [100%]
+=============================== warnings summary ===============================
+tests/canonical/test_gpu_flooding.py::test_cpu_gpu_candidate_stopping_and_ledger_parity[policy0-binary]
+  /hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numba/cuda/dispatcher.py:536: NumbaPerformanceWarning: Grid size 3 will likely result in GPU under-utilization due to low occupancy.
+    warn(NumbaPerformanceWarning(msg))
+
+tests/canonical/test_gpu_flooding.py::test_zero_steps_empty_batch_fixed_stopping_and_chunking[binary]
+  /hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numba/cuda/dispatcher.py:536: NumbaPerformanceWarning: Grid size 2 will likely result in GPU under-utilization due to low occupancy.
+    warn(NumbaPerformanceWarning(msg))
+
+tests/canonical/test_gpu_flooding.py::test_zero_steps_empty_batch_fixed_stopping_and_chunking[pauli]
+  /hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numba/cuda/dispatcher.py:536: NumbaPerformanceWarning: Grid size 1 will likely result in GPU under-utilization due to low occupancy.
+    warn(NumbaPerformanceWarning(msg))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+17 passed, 3 warnings in 22.09s
+/hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numba/cuda/dispatcher.py:536: NumbaPerformanceWarning: Grid size 2 will likely result in GPU under-utilization due to low occupancy.
+  warn(NumbaPerformanceWarning(msg))
+{"family": "binary", "policy": "spa", "shots": 1024, "max_iterations": 20, "cpu_workers": 1, "cpu_first_call_seconds": 4.899938234128058, "gpu_first_call_seconds": 1.9283147412352264, "cpu_warm_seconds": [1.8379263989627361, 1.8371667433530092, 1.8362266751937568], "gpu_warm_seconds": [0.5388162350282073, 0.5334585537202656, 0.5321230837143958], "end_to_end_speedup": 3.443879061533205, "gpu_runtime": {"backend": "numba-cuda-f64-v1", "compute_capability": [9, 0], "cuda_runtime": [13, 4], "device": "NVIDIA H200", "numba": "0.64.0", "numpy": "2.2.6", "python": "3.12.2"}, "gpu_last_compute_transfer_seconds": 0.005351209081709385, "parity": "all_candidates_iterations_convergence_exact", "stored_cpu_replay": {"verified": true, "shots": 1024, "reference": "canonical-compiled-cpu"}}
+{"family": "binary", "policy": "nms", "shots": 1024, "max_iterations": 20, "cpu_workers": 1, "cpu_first_call_seconds": 1.6364694661460817, "gpu_first_call_seconds": 0.002487728837877512, "cpu_warm_seconds": [0.3189363060519099, 0.31817058799788356, 0.3183997399173677], "gpu_warm_seconds": [0.5365304290316999, 0.5262167491018772, 0.5196958910673857], "end_to_end_speedup": 0.6050733665562676, "gpu_runtime": {"backend": "numba-cuda-f64-v1", "compute_capability": [9, 0], "cuda_runtime": [13, 4], "device": "NVIDIA H200", "numba": "0.64.0", "numpy": "2.2.6", "python": "3.12.2"}, "gpu_last_compute_transfer_seconds": 0.0027846437878906727, "parity": "all_candidates_iterations_convergence_exact", "stored_cpu_replay": {"verified": true, "shots": 1024, "reference": "canonical-compiled-cpu"}}
+{"family": "pauli", "policy": "spa", "shots": 1024, "max_iterations": 20, "cpu_workers": 1, "cpu_first_call_seconds": 3.9294383437372744, "gpu_first_call_seconds": 0.0025219381786882877, "cpu_warm_seconds": [0.6924460371956229, 0.6922396877780557, 0.692960362881422], "gpu_warm_seconds": [0.08050214825198054, 0.07875281991437078, 0.07733511598780751], "end_to_end_speedup": 8.792650700616573, "gpu_runtime": {"backend": "numba-cuda-f64-v1", "compute_capability": [9, 0], "cuda_runtime": [13, 4], "device": "NVIDIA H200", "numba": "0.64.0", "numpy": "2.2.6", "python": "3.12.2"}, "gpu_last_compute_transfer_seconds": 0.003104870207607746, "parity": "all_candidates_iterations_convergence_exact", "stored_cpu_replay": {"verified": true, "shots": 1024, "reference": "canonical-compiled-cpu"}}
+{"family": "pauli", "policy": "nms", "shots": 1024, "max_iterations": 20, "cpu_workers": 1, "cpu_first_call_seconds": 2.905802550725639, "gpu_first_call_seconds": 0.001673748716711998, "cpu_warm_seconds": [0.2582429237663746, 0.25864688493311405, 0.25795339001342654], "gpu_warm_seconds": [0.07878953032195568, 0.0765041708946228, 0.07637559995055199], "end_to_end_speedup": 3.3755404541548404, "gpu_runtime": {"backend": "numba-cuda-f64-v1", "compute_capability": [9, 0], "cuda_runtime": [13, 4], "device": "NVIDIA H200", "numba": "0.64.0", "numpy": "2.2.6", "python": "3.12.2"}, "gpu_last_compute_transfer_seconds": 0.0017571053467690945, "parity": "all_candidates_iterations_convergence_exact", "stored_cpu_replay": {"verified": true, "shots": 1024, "reference": "canonical-compiled-cpu"}}

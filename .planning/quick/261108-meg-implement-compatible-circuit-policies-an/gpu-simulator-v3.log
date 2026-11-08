@@ -1,0 +1,8 @@
+.................                                                        [100%]
+=============================== warnings summary ===============================
+tests/canonical/test_gpu_flooding.py::test_numerical_failure_rejects_entire_batch
+  /hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/cuda_kernels.py:116: RuntimeWarning: overflow encountered in scalar multiply
+    value = alpha * max(0.0, magnitude - beta)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+17 passed, 1 warning in 21.53s

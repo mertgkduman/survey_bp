@@ -6,6 +6,10 @@ The [qualification receipts](../.planning/spikes/042-batch-evidence-fix/README.m
 separate mathematical checks, upstream comparisons, policy coverage, regression
 tests and CPU timing. Historical spikes 008–037 retain their original results.
 
+The subsequent [circuit-policy and CUDA implementation](circuit-policies-and-gpu.md)
+adds explicit opt-in execution paths. It preserves the legacy contracts below
+and keeps publication studies separate from backend qualification.
+
 ## Capability and admission map
 
 Resolve a configuration by regime, mathematical family, prior representation,
@@ -22,6 +26,8 @@ their accepted configurations, identities, exclusions and evidence status.
 | Joint-Pauli scalar BP | Positive I/X/Y/Z prior rows; family-specific update and memory contracts | Qualified flooding/serial schedules and C2V transforms | Quaternary problem/kernel/schedule constructors and compatibility resolver | Separate family semantics; zero-mass priors and generic q-ary updates remain outside this contract |
 | Joint-Pauli compiled flooding | Positive heterogeneous joint priors; corrected profile v3 or policy v2/v3 | Fixed flooding and declared policy | `CompiledBp4Graph`, `pauli_batch` | Single/batch parity across the 432 configuration matrix; no universal memory/controller composition |
 | Circuit independent-fault BP | Per-mechanism binary LLRs; deterministic effects as affine biases; legacy SPA/MS | Flooding; detector/observable projection | `DemBinaryModel`, `CompiledCanonicalBpDecoder` | Direct/factory/replacement admission validated; stable policy v3 is not part of this circuit loop |
+| Circuit policy BP | Heterogeneous fault priors; canonical SPA/MS/NMS/OMS | Ordered ordinary memory, Relay, bounded finite-prior guided/beam adaptations | `CircuitPolicy`, `PolicyBpSinterDecoder`; compiled ordinary attempts and scalar memory/Relay | Explicit circuit-policy-v1; packed Sinter, per-batch ledgers, original detector validation; no universal paper-equivalence claim |
+| CUDA flooding | Binary scalar channel or joint-Pauli priors; explicit float64 stable SPA v3 / MS v2, scalar alpha/beta | Flooding, damping, independent-shot batching | `CudaFlooding` over validated compiled graphs | CUDA hardware/simulator identity is explicit; no arbitrary memory, controllers, reduced precision or silent CPU fallback |
 | Conventional residual | Source-qualified scalar SPA | Huang–Ueng cache lifecycle; undamped | Residual constructor and manifest compatibility | Damping, arbitrary memory and compiled stable-policy residual are excluded |
 | Hsu overlapping groups | Plain SPA, preserving historical profile selection | Size-two, overlap-one source groups; dedicated RNG; D-09 local stopping | `HsuGroupSchedule`, manifest preflight | Update-rule overlays reject at construction |
 | Randomized traversal | Admitted base layered/node-serial rule | Declared order refresh; canonical IDs and source iteration preserved | `RandomizedTraversalPlan` plus base schedule | Order generation does not change assignment indexing |

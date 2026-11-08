@@ -6,10 +6,10 @@ current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
 stopped_at: Completed 11-16 and 11-20; eight Phase 11 gap plans remain open
-last_updated: "2026-11-08T20:29:40.150259+00:00"
+last_updated: "2026-11-08T21:52:06.332119+00:00"
 last_activity: 2026-11-08
-last_activity_desc: Closed D03, D04, D01, D02 and D05 in order; full suite 2251 passed and one skip; audit 32/32; qualified CPU throughput preserved
-state_head: 7b763d2
+last_activity_desc: Implemented circuit-policy Sinter decoding and binary/Pauli CUDA flooding; full regression 2285 passed; H200 20/20; release packaging skipped
+state_head: dc43249
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-08 — completed the ordered canonical-kernel corrections and combined qualification
-Last Activity Description: See .planning/spikes/CANONICAL-KERNEL-COMPLETENESS-FIXES.md and docs/canonical-kernel-contracts.md. D03 → D04 → D01 → D02 → D05 are corrected, with a Hsu historical-profile integration follow-up. All 19 formerly failing audit invariants now pass (32/32 groups). Full repository suite: 2251 passed, one existing skip, 25 baseline fork warnings. The 432 compiled configurations, 216 native comparisons, 192 exact-tree cases and 100 graph-covariance checks pass. Stored replay verifies 2592 grid and 6144 CPU benchmark rows. Paired CPU throughput remains within 0.7% of baseline; compiled arithmetic is unchanged. All 234 historical spike files 008–037 are byte-identical. Legacy replay, public manifest defaults, publication gates and phase position are preserved.
+Last activity: 2026-11-08 — completed quick task 261108-meg: circuit policies and CUDA execution
+Last Activity Description: Circuit-policy-v1 supports heterogeneous DEM priors, canonical updates/memory/Relay and bounded guided/beam adaptations, with compiled ordinary CPU attempts and Sinter ledgers. CUDA supports explicit float64 stable SPA and MS/NMS/OMS flooding for binary and joint-Pauli code capacity. Full regression: 2285 passed, 17 skipped, 25 baseline warnings; final circuit checks 34/34 and H200 checks 20/20. All 4096 final GPU benchmark shots match CPU decisions, stopping and convergence, with stored CPU replay. Warm GPU decoding is 38.1–123.6x faster than two CPU workers on the tested batches, excluding JSON export; compiled circuit timing improves 46.2x on its bounded fixture. See quick/261108-meg-implement-compatible-circuit-policies-an/SUMMARY.md and docs/circuit-policies-and-gpu.md. Release packaging is skipped, and publication gates/phase position are unchanged.
 
 Progress: 8 of 14 phases complete (57%); 159 of 176 plans complete. Phase 11 has 17 of 25 plans complete; plan 17 is the first open number but depends on source reviews 18 and 19, while plan 20's blocked-target review is complete.
 
@@ -276,6 +276,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261108-meg | Implement compatible circuit policies and binary/Pauli CUDA execution | 2026-11-08 | 90ecfbc, dc43249 | Verified: 2285 regression passes; 34 circuit and 20 H200 checks; 4096 exact GPU/CPU shots | [261108-meg-implement-compatible-circuit-policies-an](./quick/261108-meg-implement-compatible-circuit-policies-an/) |
 | 261102-okz | Consolidate research branches onto main and preserve recovery/evidence | 2026-11-02 | 22f881f | 1,514 passed, 1 skipped; main only; archived 28 original refs and retained three evidence worktrees | [261102-okz-consolidate-research-branches-into-main-](./quick/261102-okz-consolidate-research-branches-into-main-/) |
 | 261102-jnd | Add B1/C2 depolarizing plain BP/QBP and four-code comparison at T=100 | 2026-11-02 | b204164 | Verified 381,309 fresh paired samples; all 14 points and 28 arm estimates ≥100 failures | [261102-jnd-extend-plain-binary-bp-and-qbp-compariso](./quick/261102-jnd-extend-plain-binary-bp-and-qbp-compariso/) |
 | 261102-i0p | Add plain BP A5/B2 and plain QBP B1/C2 at T=100 | 2026-11-02 | a95a898 | Verified all 28 code/rate cells; 1,583,664 paired samples, all main arms ≥100 failures | [261102-i0p-add-missing-plain-bp-a5-b2-and-plain-qbp](./quick/261102-i0p-add-missing-plain-bp-a5-b2-and-plain-qbp/) |
@@ -338,12 +339,12 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Latest audit: `.planning/spikes/CANONICAL-KERNEL-BOUNDARY-AUDIT.md` (spikes 019–022). Prior V3-A01–A03 fixes remain documented in KERNEL-V3-FIXES.md. Resolve the numerical default explicitly and close B01–B03 through shared construction/compatibility validation and parameter/backend qualification before a full freeze claim. Production behavior and phase gates are unchanged by this audit.
+Latest kernel work: ordered D03/D04/D01/D02/D05 corrections and the 32/32 completeness qualification are recorded in .planning/spikes/CANONICAL-KERNEL-COMPLETENESS-FIXES.md. Quick task 261108-meg adds qualified circuit-policy and GPU execution; see docs/circuit-policies-and-gpu.md. Preserve the explicit backend/policy admission boundaries and outstanding publication gates.
 
 **Resume file:** None
 
-Last session: 2026-10-15T00:15:40.413Z
-Stopped at: Completed 11-14-PLAN.md
+Last session: 2026-11-08T21:52:06.332119+00:00
+Stopped at: Completed quick task 261108-meg; Phase 11 scientific gap plans remain open
 Next command: $gsd-execute-phase 11; Phase 5 human review remains open and Phase 7 stays paused.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.

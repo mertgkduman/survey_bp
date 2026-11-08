@@ -1,0 +1,24 @@
+{
+  "shots": 4,
+  "max_iterations": 3,
+  "detectors": 54,
+  "faults": 1818,
+  "edges": 8874,
+  "times_seconds": {
+    "scalar": [
+      2.2964378790929914,
+      2.2871496831066906
+    ],
+    "compiled": [
+      0.049696358386427164,
+      0.0494664590805769
+    ]
+  },
+  "parity": "faults_observables_iterations_exact",
+  "speedup": 46.222845208334746,
+  "replay": {
+    "verified": true,
+    "shots": 4,
+    "model_sha256": "dc49b37b55074571aebeba7e7ad0c034be6b07f1f0d0d445c0e1ebf33ea48d99"
+  }
+}
