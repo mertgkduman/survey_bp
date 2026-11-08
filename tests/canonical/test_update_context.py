@@ -114,6 +114,15 @@ def test_source_qualified_group_schedule_rejects_unqualified_update_compositions
         HsuGroupSchedule(TABLE, kernel=BinarySpaKernel(update_rule=make_rule(kind)), root_identity="a" * 64, attempt_identity="attempt")
 
 
+@pytest.mark.parametrize("historical", (False, True))
+def test_group_context_admission_preserves_plain_spa_profile_selection(historical):
+    from bp_registry.canonical.numerics import REFERENCE_CPU_F64, DEFAULT_BINARY_SPA_F64
+    profile = REFERENCE_CPU_F64 if historical else DEFAULT_BINARY_SPA_F64
+    kernel = BinarySpaKernel(profile=profile)
+    schedule = HsuGroupSchedule(TABLE, kernel=kernel, root_identity="a" * 64, attempt_identity="attempt")
+    assert schedule.kernel.profile == profile
+
+
 @pytest.mark.parametrize("cls", LOCAL)
 def test_randomized_order_preserves_iteration_and_canonical_edge_ids(cls):
     from bp_registry.canonical.schedules import RandomizedTraversalPlan

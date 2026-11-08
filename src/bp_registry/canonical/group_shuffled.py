@@ -14,7 +14,7 @@ import numbers
 
 import numpy as np
 
-from .numerics import DEFAULT_BINARY_SPA_F64, finite_saturate
+from .numerics import finite_saturate
 from .schedules import EdgeTable, ScheduledLocalStepResult, _binary_syndrome
 
 
@@ -104,8 +104,8 @@ class HsuGroupSchedule:
             raise ValueError("Hsu schedule requires a canonical EdgeTable")
         if not isinstance(attempt_identity, str) or not attempt_identity:
             raise ValueError("Hsu schedule requires an attempt identity")
-        if getattr(kernel, "update_rule", None) is not None or getattr(kernel, "profile", None) != DEFAULT_BINARY_SPA_F64:
-            raise ValueError("Hsu source-qualified groups require plain SPA with the default numerical profile")
+        if getattr(kernel, "update_rule", None) is not None:
+            raise ValueError("Hsu source-qualified groups require plain SPA without an update-rule overlay")
         self.edge_table = edge_table
         self.kernel = kernel
         self.plan = HsuGroupPlan(edge_table.check_count, root_identity)
