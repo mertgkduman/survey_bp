@@ -1,65 +1,64 @@
- 
+
 ================================================================================
  Parallel Accelerator Optimizing:  Function _binary_batch, /tmp/bp-freeze-cpu-
-jf9mj0zy/src/bp_registry/cpu_batch.py (20)  
+jf9mj0zy/src/bp_registry/cpu_batch.py (20)
 ================================================================================
 
 
-Parallel loop listing for  Function _binary_batch, /tmp/bp-freeze-cpu-jf9mj0zy/src/bp_registry/cpu_batch.py (20) 
+Parallel loop listing for  Function _binary_batch, /tmp/bp-freeze-cpu-jf9mj0zy/src/bp_registry/cpu_batch.py (20)
 --------------------------------------------------------------------------------------------------------|loop #ID
-@njit(cache=True, parallel=True)                                                                        | 
-def _binary_batch(row_ptr, variables, n, syndromes, prior, limit, cap, epsilon,                         | 
-                  damping, use_policy, fmt, scale, all_state, rule, old, fresh,                         | 
-                  alpha, beta, shortcut, band):                                                         | 
-    count = len(syndromes)                                                                              | 
-    candidates = np.empty((count, n), dtype=np.uint8)                                                   | 
-    iterations = np.empty(count, dtype=np.int64)                                                        | 
-    converged = np.empty(count, dtype=np.bool_)                                                         | 
+@njit(cache=True, parallel=True)                                                                        |
+def _binary_batch(row_ptr, variables, n, syndromes, prior, limit, cap, epsilon,                         |
+                  damping, use_policy, fmt, scale, all_state, rule, old, fresh,                         |
+                  alpha, beta, shortcut, band):                                                         |
+    count = len(syndromes)                                                                              |
+    candidates = np.empty((count, n), dtype=np.uint8)                                                   |
+    iterations = np.empty(count, dtype=np.int64)                                                        |
+    converged = np.empty(count, dtype=np.bool_)                                                         |
     for shot in prange(count):--------------------------------------------------------------------------| #0
-        if use_policy:                                                                                  | 
-            c, ok, it = binary_policy(row_ptr, variables, n, syndromes[shot], prior, limit,             | 
-                fmt, scale, all_state, rule, old, fresh, alpha, beta, shortcut, band, epsilon, True)    | 
-        else:                                                                                           | 
-            c, ok, it = binary_decode(row_ptr, variables, n, syndromes[shot], prior, limit,             | 
-                                     cap, epsilon, damping, True)                                       | 
-        candidates[shot] = c                                                                            | 
-        iterations[shot], converged[shot] = it, ok                                                      | 
-    return candidates, iterations, converged                                                            | 
+        if use_policy:                                                                                  |
+            c, ok, it = binary_policy(row_ptr, variables, n, syndromes[shot], prior, limit,             |
+                fmt, scale, all_state, rule, old, fresh, alpha, beta, shortcut, band, epsilon, True)    |
+        else:                                                                                           |
+            c, ok, it = binary_decode(row_ptr, variables, n, syndromes[shot], prior, limit,             |
+                                     cap, epsilon, damping, True)                                       |
+        candidates[shot] = c                                                                            |
+        iterations[shot], converged[shot] = it, ok                                                      |
+    return candidates, iterations, converged                                                            |
 ------------------------------ After Optimisation ------------------------------
 Parallel structure is already optimal.
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
- 
- 
+
+
 ================================================================================
  Parallel Accelerator Optimizing:  Function _pauli_batch, /tmp/bp-freeze-cpu-
-jf9mj0zy/src/bp_registry/cpu_batch.py (40)  
+jf9mj0zy/src/bp_registry/cpu_batch.py (40)
 ================================================================================
 
 
-Parallel loop listing for  Function _pauli_batch, /tmp/bp-freeze-cpu-jf9mj0zy/src/bp_registry/cpu_batch.py (40) 
+Parallel loop listing for  Function _pauli_batch, /tmp/bp-freeze-cpu-jf9mj0zy/src/bp_registry/cpu_batch.py (40)
 --------------------------------------------------------------------------------------------------|loop #ID
-@njit(cache=True, parallel=True)                                                                  | 
-def _pauli_batch(row_ptr, variable_ptr, variable_edges, variables, labels, priors,                | 
-                 syndromes, limit, cap, epsilon, damping, stop, use_policy,                       | 
-                 fmt, scale, scope, rule, old, fresh, alpha, beta, decision, shortcut, band):     | 
-    count = len(syndromes)                                                                        | 
-    candidates = np.empty((count, len(priors)), dtype=np.uint8)                                   | 
-    iterations = np.empty(count, dtype=np.int64)                                                  | 
-    converged = np.empty(count, dtype=np.bool_)                                                   | 
+@njit(cache=True, parallel=True)                                                                  |
+def _pauli_batch(row_ptr, variable_ptr, variable_edges, variables, labels, priors,                |
+                 syndromes, limit, cap, epsilon, damping, stop, use_policy,                       |
+                 fmt, scale, scope, rule, old, fresh, alpha, beta, decision, shortcut, band):     |
+    count = len(syndromes)                                                                        |
+    candidates = np.empty((count, len(priors)), dtype=np.uint8)                                   |
+    iterations = np.empty(count, dtype=np.int64)                                                  |
+    converged = np.empty(count, dtype=np.bool_)                                                   |
     for shot in prange(count):--------------------------------------------------------------------| #1
-        if use_policy:                                                                            | 
-            c, it, ok = pauli_policy(row_ptr, variable_ptr, variable_edges, variables, labels,    | 
-                priors, syndromes[shot], limit, fmt, scale, scope, rule, old, fresh,              | 
-                alpha, beta, decision, shortcut, stop, band, epsilon, True)                       | 
-        else:                                                                                     | 
-            c, it, ok = pauli_decode(row_ptr, variable_ptr, variable_edges, variables, labels,    | 
-                priors, syndromes[shot], limit, cap, epsilon, damping, stop, True)                | 
-        candidates[shot] = c                                                                      | 
-        iterations[shot], converged[shot] = it, ok                                                | 
-    return candidates, iterations, converged                                                      | 
+        if use_policy:                                                                            |
+            c, it, ok = pauli_policy(row_ptr, variable_ptr, variable_edges, variables, labels,    |
+                priors, syndromes[shot], limit, fmt, scale, scope, rule, old, fresh,              |
+                alpha, beta, decision, shortcut, stop, band, epsilon, True)                       |
+        else:                                                                                     |
+            c, it, ok = pauli_decode(row_ptr, variable_ptr, variable_edges, variables, labels,    |
+                priors, syndromes[shot], limit, cap, epsilon, damping, stop, True)                |
+        candidates[shot] = c                                                                      |
+        iterations[shot], converged[shot] = it, ok                                                |
+    return candidates, iterations, converged                                                      |
 ------------------------------ After Optimisation ------------------------------
 Parallel structure is already optimal.
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
- 

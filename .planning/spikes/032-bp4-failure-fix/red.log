@@ -22,13 +22,13 @@ hashed = b'\xdf\xbc\xfd\xd3\x9f\xcb&\xf4\xd0\xc6\x80\x95D\x87\xb8\xc0\xb5;\xb8\x
 
     def _numba_unpickle(address, bytedata, hashed):
         """Used by `numba_unpickle` from _helperlib.c
-    
+
         Parameters
         ----------
         address : int
         bytedata : bytes
         hashed : bytes
-    
+
         Returns
         -------
         obj : object
@@ -39,15 +39,15 @@ hashed = b'\xdf\xbc\xfd\xd3\x9f\xcb&\xf4\xd0\xc6\x80\x95D\x87\xb8\xc0\xb5;\xb8\x
 >           obj = _unpickled_memo[key]
                   ^^^^^^^^^^^^^^^^^^^^
 
-/hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numba/core/serialize.py:46: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numba/core/serialize.py:46:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 /hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numba/core/serialize.py:46: in _numba_unpickle
     obj = _unpickled_memo[key]
           ^^^^^^^^^^^^^^^^^^^^
 /hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numba/core/serialize.py:46: in _numba_unpickle
     obj = _unpickled_memo[key]
           ^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 >   raise ValueError("nonfinite BP message or coefficient")
 E   ValueError: nonfinite BP message or coefficient
@@ -72,15 +72,15 @@ scope = 'all_messages'
             with pytest.raises(ValueError,match='BP4.*failed'):
 >               graph.run_batch(np.array([syndrome,syndrome]),max_iterations=1,workers=workers)
 
-tests/canonical/test_freeze_fixes.py:67: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/canonical/test_freeze_fixes.py:67:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 src/bp_registry/quaternary/compiled.py:800: in run_batch
     return pauli_batch(self, syndromes, max_iterations=max_iterations, workers=workers, stop_on_convergence=stop_on_convergence)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 src/bp_registry/cpu_batch.py:168: in pauli_batch
     return _execute(_pauli_batch,args,graph,s,workers,max_iterations,stop_on_convergence,graph.prior_llrs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 function = CPUDispatcher(<function _pauli_batch at 0x7f526a3da340>)
 args = (array([0, 2, 4, 6]), array([0, 3, 6]), array([0, 2, 4, 1, 3, 5]), array([0, 1, 0, 1, 0, 1]), array([1, 1, 1, 1, 1, 1], dtype=uint8), array([[1.e+308, 1.e+308, 1.e+308],
@@ -109,13 +109,13 @@ hashed = b'\xdf\xbc\xfd\xd3\x9f\xcb&\xf4\xd0\xc6\x80\x95D\x87\xb8\xc0\xb5;\xb8\x
 
     def _numba_unpickle(address, bytedata, hashed):
         """Used by `numba_unpickle` from _helperlib.c
-    
+
         Parameters
         ----------
         address : int
         bytedata : bytes
         hashed : bytes
-    
+
         Returns
         -------
         obj : object
@@ -126,15 +126,15 @@ hashed = b'\xdf\xbc\xfd\xd3\x9f\xcb&\xf4\xd0\xc6\x80\x95D\x87\xb8\xc0\xb5;\xb8\x
 >           obj = _unpickled_memo[key]
                   ^^^^^^^^^^^^^^^^^^^^
 
-/hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numba/core/serialize.py:46: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numba/core/serialize.py:46:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 /hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numba/core/serialize.py:46: in _numba_unpickle
     obj = _unpickled_memo[key]
           ^^^^^^^^^^^^^^^^^^^^
 /hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numba/core/serialize.py:46: in _numba_unpickle
     obj = _unpickled_memo[key]
           ^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 >   raise ValueError("nonfinite BP message or coefficient")
 E   ValueError: nonfinite BP message or coefficient
@@ -159,15 +159,15 @@ scope = 'all_state'
             with pytest.raises(ValueError,match='BP4.*failed'):
 >               graph.run_batch(np.array([syndrome,syndrome]),max_iterations=1,workers=workers)
 
-tests/canonical/test_freeze_fixes.py:67: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/canonical/test_freeze_fixes.py:67:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 src/bp_registry/quaternary/compiled.py:800: in run_batch
     return pauli_batch(self, syndromes, max_iterations=max_iterations, workers=workers, stop_on_convergence=stop_on_convergence)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 src/bp_registry/cpu_batch.py:168: in pauli_batch
     return _execute(_pauli_batch,args,graph,s,workers,max_iterations,stop_on_convergence,graph.prior_llrs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 function = CPUDispatcher(<function _pauli_batch at 0x7f526a3da340>)
 args = (array([0, 2, 4, 6]), array([0, 3, 6]), array([0, 2, 4, 1, 3, 5]), array([0, 1, 0, 1, 0, 1]), array([1, 1, 1, 1, 1, 1], dtype=uint8), array([[1.e+308, 1.e+308, 1.e+308],

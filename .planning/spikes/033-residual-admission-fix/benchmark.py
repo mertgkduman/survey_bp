@@ -84,6 +84,8 @@ def main():
     with (OUT / 'parallel-diagnostics.txt').open('w') as handle, redirect_stdout(handle):
         _binary_batch.parallel_diagnostics(level=1)
         _pauli_batch.parallel_diagnostics(level=1)
+    diagnostics = OUT / 'parallel-diagnostics.txt'
+    diagnostics.write_text('\n'.join(line.rstrip() for line in diagnostics.read_text().splitlines()).rstrip()+'\n')
     report['threading_layer'] = numba.threading_layer()
     (OUT / 'benchmark.json').write_text(json.dumps(report, indent=2)+'\n')
 
