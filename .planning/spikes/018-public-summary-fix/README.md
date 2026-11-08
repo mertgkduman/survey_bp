@@ -35,3 +35,7 @@ OMP_NUM_THREADS=1 NUMBA_NUM_THREADS=4 .venv/bin/python -m pytest -q tests/canoni
 ```
 
 `red.log`, `green.log`, and `green.xml` retain the before/after evidence. The final combined qualification script and evidence are stored here after all three fixes.
+
+The first broad run reported 1 failure, 1,159 passes and one skip: profile validation rejected an existing undamped reproduction alias. `regression-first.*` retain that evidence. Spike 017 records the compatibility fix; `regression.*` and the latest `results.json` describe the final source. `results-first.json` retains the preceding successful bounded qualification.
+
+Final broad rerun: **1,162 passed, one existing notebook-related skip, zero failures**. Final independent qualification: **18 passed, zero failed**, bound to source revision `a42a1d6`. The integrity verifier confirms unchanged historical spikes and compiled arithmetic functions.

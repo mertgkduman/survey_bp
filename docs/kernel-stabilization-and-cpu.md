@@ -33,6 +33,22 @@ To verify archived audit source hashes after migration:
 .venv/bin/python .planning/spikes/verify_kernel_audit.py --source-revision 3aacb2c
 ```
 
+## Profile admission and public receipt verification
+
+Follow-up spikes 016–018 close V3-A01–A03 from the v3 audit. Plain scalar and compiled SPA reject a min-sum profile without an explicit min-sum rule, including changed-saturation variants. Use `BinarySpaKernel(update_rule=MinSumUpdate())` for scalar min-sum.
+
+Numerical profiles validate fixed descriptive fields at construction: precision, tie rules, encoding and reserved profile identities cannot relabel existing arithmetic. V1 saturation and v2/v3 cap, epsilon and damping remain configurable; the Pauli scalar check-rule choice remains available. Named profile serialization is unchanged. Non-reserved study labels remain supported with complete validated numerical evidence; the two existing v2-undamped aliases enforce their recorded settings. Use the explicit resolution policy for supported quantization, not a fabricated `dtype` field.
+
+Public quaternary verification now compares every deterministic summary field against replay, including nested provenance, omitted or extra claims, and JSON value types. Output/ledger/manifest locations are excluded from that comparison so bundles can be moved; manifest content and ledger identity are still checked. Historical accounting remains explicitly selected and replayable. The decoder is replayed once, and temporary files are removed on comparison failure.
+
+These checks run during construction or verification; compiled message-loop bodies are unchanged. The original timing artifacts remain historical measurements, not a new performance claim. Current source and post-fix qualification are checked with:
+
+```sh
+PYTHONPATH=src .venv/bin/python .planning/spikes/018-public-summary-fix/verify_fixes.py
+```
+
+See [the fix report](../.planning/spikes/KERNEL-V3-FIXES.md) for regression evidence and the unchanged exact-unity approximation.
+
 ## CPU support
 
 | Composition | Single-shot compiled | CPU batch |
@@ -102,7 +118,7 @@ At revision `dfe0306`, 256 matched observations per case, 20-iteration caps and 
 
 These are separate comparisons, not a combined speedup claim. The shared host was not isolated. First-call timings, individual repetitions, environment details and source hashes are in the [qualified benchmark report](../.planning/debug/kernel-cpu-benchmark-qualified/report.json). Frozen-v2 buffer/output equality and corrected-profile single/batch equality were asserted before accepting timings.
 
-Validation: the broad canonical/research suite passed 984 tests with one skip; 276 affected-path tests passed after the shared-loop refactor; 87 focused tests passed after the final legacy guards. These sets overlap. Both new public examples execute and replay. Independent artifact validation checks 2,048 CPU ledger records against original check matrices, candidate validity, work equations and thread-count equivalence:
+Historical stabilization validation: the broad canonical/research suite passed 984 tests with one skip; 276 affected-path tests passed after the shared-loop refactor; 87 focused tests passed after the final legacy guards. These sets overlap. Both new public examples execute and replay. At the original stabilized source revision `dfe0306`, independent artifact validation checks 2,048 CPU ledger records against original check matrices, candidate validity, work equations and thread-count equivalence (this verifier deliberately rejects a changed source hash; use `verify_fixes.py` above for the current contract fixes):
 
 ```sh
 .venv/bin/python .planning/debug/verify_kernel_stabilization.py

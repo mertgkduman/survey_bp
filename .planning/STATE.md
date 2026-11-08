@@ -6,9 +6,9 @@ current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
 stopped_at: Completed 11-16 and 11-20; eight Phase 11 gap plans remain open
-last_updated: "2026-11-08T02:33:34Z"
+last_updated: "2026-11-08T02:55:15Z"
 last_activity: 2026-11-07
-last_activity_desc: Completed follow-up spikes 012–015; mathematics/upstream checks pass, three API/evidence gaps prevent contract freeze; production unchanged
+last_activity_desc: Fixed V3-A01–A03 in order; preserved study aliases and historical replay; 1162 tests pass, one existing skip; 18 independent checks pass
 state_head: dc39055e6db0c2642e62c81d9716797d794785a5
 progress:
   total_phases: 14
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-07 — completed follow-up v3 audit in approved order; scientific phase gates remain unchanged
-Last Activity Description: See .planning/spikes/CANONICAL-KERNEL-V3-AUDIT.md. Independent mathematics and pinned upstream checks pass; scalar profile admission, descriptive profile metadata, and public result-summary verification need tightening. 163 selected regressions pass; production behavior unchanged; no HTML or publication-phase advancement.
+Last activity: 2026-11-07 — completed spikes 016–018 contract fixes and qualification; scientific phase gates remain unchanged
+Last Activity Description: See .planning/spikes/KERNEL-V3-FIXES.md. Scalar admission, fixed profile evidence and complete public summary verification are corrected. Historical study labels/aliases and decoder arithmetic are preserved; 1162 regression tests and 18 independent checks pass. No HTML or publication-phase advancement.
 
 Progress: 8 of 14 phases complete (57%); 159 of 176 plans complete. Phase 11 has 17 of 25 plans complete; plan 17 is the first open number but depends on source reviews 18 and 19, while plan 20's blocked-target review is complete.
 
@@ -338,7 +338,7 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Latest audit: `.planning/spikes/CANONICAL-KERNEL-V3-AUDIT.md` (2026-11-07 local). Follow-up spikes 012–015 are complete in the approved order. Earlier seven findings were stabilized; new V3-A01–A03 need admission/evidence fixes before a freeze. The exact-unity approximation remains an explicit numerical decision. This follow-up changed no production decoder behavior.
+Latest audit and fixes: `.planning/spikes/KERNEL-V3-FIXES.md`. Spikes 016–018 resolve V3-A01–A03 in the recommended order. Spikes 008–015 remain historical evidence. Existing v2 study labels and undamped aliases are preserved with validated numerical fields. The exact-unity approximation remains an explicit numerical choice; no silent default migration.
 
 **Resume file:** None
 

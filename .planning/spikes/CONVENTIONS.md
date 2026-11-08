@@ -25,6 +25,8 @@ Kernel audit probes and their small deterministic evidence bundles live directly
 - Test identity policies, parameter sensitivity, initial candidates, budget-denial boundaries, and cumulative work independently of deterministic replay.
 - Diagnostic probe exit success means the experiment ran. Publish failed invariant counts and counterexamples separately from passing regression-suite counts.
 
+- Keep pre-fix audit evidence immutable. Record fixes in a new numbered spike with failing regression evidence, passing regression evidence, and a source-hashed post-fix qualification.
+
 ## Tools and libraries
 
 The project `.venv` supplies the pinned versions in `pyproject.toml`; no new dependency was installed for this spike.

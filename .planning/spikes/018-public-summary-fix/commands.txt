@@ -1,0 +1,6 @@
+# Final broad suite (focused and broad selections overlap):
+OMP_NUM_THREADS=1 NUMBA_NUM_THREADS=4 .venv/bin/python -m pytest -q tests/canonical tests/research --tb=short --junitxml=.planning/spikes/018-public-summary-fix/regression.xml
+# Independent requalification; writes new evidence only in spike 018:
+OMP_NUM_THREADS=1 NUMBA_NUM_THREADS=4 PYTHONPATH=src:.planning/spikes .venv/bin/python .planning/spikes/018-public-summary-fix/qualify.py
+# Source/evidence integrity and unchanged hot-loop checks:
+PYTHONPATH=src .venv/bin/python .planning/spikes/018-public-summary-fix/verify_fixes.py

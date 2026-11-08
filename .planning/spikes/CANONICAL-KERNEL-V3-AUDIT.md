@@ -1,4 +1,5 @@
 # Canonical kernel v3: follow-up audit before HTML
+**Follow-up:** V3-A01–A03 were fixed in order by spikes 016–018. See [fixes and current qualification](KERNEL-V3-FIXES.md). The findings and freeze assessment below describe the pre-fix revision and are retained as historical evidence.
 
 **Decision: retain the kernel architecture, but do not freeze the extension/evidence contract yet.** The tested default mathematics and qualified CPU paths pass. Three reproducible contract gaps remain. This audit changed no production behavior and does not advance any scientific/publication phase gate.
 

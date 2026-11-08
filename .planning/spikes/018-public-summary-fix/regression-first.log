@@ -1,0 +1,37 @@
+........................................................................ [  6%]
+........................................................................ [ 12%]
+........................................................................ [ 18%]
+........................................................................ [ 24%]
+........................................................................ [ 31%]
+........................................................................ [ 37%]
+........................................................................ [ 43%]
+........................................................................ [ 49%]
+........................................................................ [ 55%]
+........................................................................ [ 62%]
+...............................s........................................ [ 68%]
+........................................................................ [ 74%]
+........................................................................ [ 80%]
+........................................................................ [ 86%]
+................................................F....................... [ 93%]
+........................................................................ [ 99%]
+.........                                                                [100%]
+=================================== FAILURES ===================================
+____________ test_decoder_files_bind_four_undamped_vanilla_profiles ____________
+tests/canonical/test_yao_vanilla_reproduction.py:74: in test_decoder_files_bind_four_undamped_vanilla_profiles
+    graphs = study["_graphs"](code, .08)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+data/reproductions/yao-2312-10950-vanilla/run.py:76: in _graphs
+    bp4_v2 = replace(bp4_base, profile=replace(
+/hpc/home/mg551/miniconda3/lib/python3.12/dataclasses.py:1579: in replace
+    return obj.__class__(**changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+<string>:22: in __init__
+    ???
+src/bp_registry/quaternary/numerics.py:76: in __post_init__
+    validate_fixed_fields(self, QuaternaryNumericalProfileV2,
+src/bp_registry/profile_contracts.py:21: in validate_fixed_fields
+    raise ValueError(f"{contract.__name__}.{field.name} is fixed by its executable contract")
+E   ValueError: QuaternaryNumericalProfileV2.profile_id is fixed by its executable contract
+=========================== short test summary info ============================
+FAILED tests/canonical/test_yao_vanilla_reproduction.py::test_decoder_files_bind_four_undamped_vanilla_profiles
+1 failed, 1159 passed, 1 skipped in 186.10s (0:03:06)

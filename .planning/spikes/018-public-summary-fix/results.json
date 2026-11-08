@@ -1,0 +1,4278 @@
+{
+  "schema": "canonical_kernel_audit_v1",
+  "timestamp_utc": "2026-11-08T02:52:02.403529+00:00",
+  "git_head": "a42a1d6567d2eaa659490df07c9b397767d6cbbe",
+  "packages": {
+    "numpy": "2.2.6",
+    "scipy": "1.17.1",
+    "numba": "0.64.0",
+    "ldpc": "2.4.1",
+    "pytest": "9.0.3"
+  },
+  "source_hashes": {
+    "src/bp_registry/__init__.py": "f312f38f4c9f0824a4f4ab832c860ddd2266e5cd5cf2cc10d4876686e398a7fc",
+    "src/bp_registry/artifacts.py": "f849d5bf59cf3c49c9ad3b3d81c5f0d0dd29ccb849ed326bfa4358c8143772ad",
+    "src/bp_registry/campaigns/__init__.py": "bb3d3939805963336ae467ba0f988a664ca06eb76b9aab04aa96d38fd9bf6b52",
+    "src/bp_registry/campaigns/cli.py": "571bdaf6753f5aa57128af8c32d81384f03205fb260cc5fe68c635e14f569309",
+    "src/bp_registry/campaigns/contracts.py": "a4091708ade57fe1c24f7929f9ff4a9f93ae5b5c5a4045a29d8a65d6bc4f86c0",
+    "src/bp_registry/campaigns/controlled.py": "0ea291786adc1c88ef34aefbc624496fd35f810df9de406693e1834715ab62a2",
+    "src/bp_registry/campaigns/controlled_evaluation.py": "3c2f9d97ae03c557ffd7130dec28fe88c3180bdd10562aecc8f01963607597c2",
+    "src/bp_registry/campaigns/controlled_execution.py": "b006ba91f2fef29989117ea569c29e56f27efe20749003c3071e61f6bb7e6a92",
+    "src/bp_registry/campaigns/controlled_mbbp.py": "9bd40a128f336dd88e8a8551dad40467e412afeb020de1824b62561cfd5107bd",
+    "src/bp_registry/campaigns/controlled_public.py": "538de11a1fabd7099cf1bd7acf72c7ae61952834730f3370f8320f394c042cfe",
+    "src/bp_registry/campaigns/evidence_index.py": "5532e42609c0260c03cb43364bcef1fd1afdc3f5b2dac0302f8835e0ef0d71b4",
+    "src/bp_registry/campaigns/execution.py": "949f04173205e22e1c0a0d0ca4523f2effb68c2a8ad9d3a43d42e85b5a526bda",
+    "src/bp_registry/campaigns/failure_count_public.py": "c28e947a6499c9488f1b3ce31c4d5c1a0eb6d5e2067f29ff236336c02e727ec9",
+    "src/bp_registry/campaigns/identity.py": "eda2a12280ffddf49bf6d6f1c090e186fc4a7160236b346e017c8fcc96521283",
+    "src/bp_registry/campaigns/planning.py": "8c4686ec46058b215f256d946dcc1712940c6a7bd4996ee5f848d030cf3e4b78",
+    "src/bp_registry/campaigns/profiling_gate.py": "b83168ea7466ad57d0099ee2b77552658a40adf99ec5d25e51a70b96bb95c27e",
+    "src/bp_registry/campaigns/reporting.py": "533ad48ab13a06e7627167e4b3581b9bdc14d7644bfc588c5c0f70ce0c31ba5e",
+    "src/bp_registry/campaigns/shards.py": "6e4bc42ddbc1ceb65c2e898b91679d1e19aadb9b6988aad8fee9b4fa348c3092",
+    "src/bp_registry/campaigns/sizing.py": "3c51415a7d014b9f142b277db293aad935bd56428eb71b5ae54da4d926b720d2",
+    "src/bp_registry/campaigns/slurm.py": "f707b1a72c516bc140577eebb8119ac906d1b491159fb1f9a9d7b3ee58556f85",
+    "src/bp_registry/campaigns/statistics.py": "a3850ca77391db2b09fa2621edb611f2203c3d9d90d137c114d388c8148c5613",
+    "src/bp_registry/campaigns/targets.py": "237c67462a805d3a789d6d4985f7149abc5a85eeacc670a6c7e72fd84668cd93",
+    "src/bp_registry/canonical/__init__.py": "c855385918c15ff4f3b57972bbc0a75b13f5160e52ae984675f090486b638de0",
+    "src/bp_registry/canonical/budgets.py": "96c06120b08322d562957c3488447dc0012f57baf7ea314f88951dd9f575e5d3",
+    "src/bp_registry/canonical/candidate_selection.py": "66f734580f7e65036c4522f818755b334ef513d92deca94d57b8c8b6c5a50703",
+    "src/bp_registry/canonical/cluster_schedule.py": "bbd852238bbc308fdca26a44ff377a6213ebd091e2cde291314ce5c3b347e2f7",
+    "src/bp_registry/canonical/compatibility.py": "cd78d596aebc89b76079e8bd2efb993cd60977217f33b926317dbbf79dab76a2",
+    "src/bp_registry/canonical/compiled.py": "931d0b2e9a7f44d57b5474040a4864fdbef7227f2c363e1de2c1fd76c5a04073",
+    "src/bp_registry/canonical/contracts.py": "a6829fa7e6bf12e25a9ec249db089e456c897b897cc71fb04902f9bfe97c60cc",
+    "src/bp_registry/canonical/execution.py": "d8d370bff7dc7ea54a4fc80984cbb85fa4f7f1f03ec247d29f35819dbf12a790",
+    "src/bp_registry/canonical/fair_legs.py": "69561f97580b189afa14cbb1637f4a986c8e2afbf374815b788556a4e40b086f",
+    "src/bp_registry/canonical/group_shuffled.py": "b78dab37f15f33a7ef2a003b61ce30b35f2c7260b56712d77d5107ac8aff2618",
+    "src/bp_registry/canonical/guided_decimation.py": "97a2e5ad6c8a9b43022ecefc14be82780de15776d1a27d8a686196e5a6f99108",
+    "src/bp_registry/canonical/impulse.py": "9e1ecbfdc9ec44c912b86c05b2d306ada03cc30cb1b0c697edba4f81692069eb",
+    "src/bp_registry/canonical/intervention_session.py": "2f85ff97ba7c8b755de10302799a1ff6395c26f5ff6097358eb55b7558803a2a",
+    "src/bp_registry/canonical/interventions.py": "04406f4315dbf7a5dca0ea6e5cb2eaf9662e2a3c419b55c4064386ef53e79277",
+    "src/bp_registry/canonical/kernel.py": "05e0366d8fb9736f8da27edb701d04b91d96e85fc6442bd1de2fbe78fd88d4d1",
+    "src/bp_registry/canonical/lineage.py": "416bcefd5a3b99fa13917a13341c7a615ef8b3e390e7c461ccc34cc9a3f2a6d4",
+    "src/bp_registry/canonical/list_selection.py": "f6130231994f710d3061c9924cbe786d506e9ddc786c657e4be52ce196c1e46e",
+    "src/bp_registry/canonical/mbbp.py": "11f723da6edc044164c387c1027dc88fef36ad83f8cb360055fa9e6496507031",
+    "src/bp_registry/canonical/memory.py": "83acda303d5b359a66b5e305068126c935e7cff165f2ae711b4c014e5685dd4f",
+    "src/bp_registry/canonical/memory_execution.py": "27b089a87f898fbc827cc5c7ef4d57d0f5af52c0e75c499cb5525a21b3441f8f",
+    "src/bp_registry/canonical/metrics.py": "1ab39dd0a40c543c4bab9b8334f77b71fc9ee4c713e7622e46fc285a5ded437f",
+    "src/bp_registry/canonical/numerics.py": "7e0c176f5dfcbf9e5bf5ddfa8c932bd36f506de7894bd8a114ddcd8edaf8fd85",
+    "src/bp_registry/canonical/phase5.py": "7c4199a7604d1b54b040f52ffd75197fc40eddf9ff975d665b3a0ecd0dce8e69",
+    "src/bp_registry/canonical/phase6.py": "1364954dc0b9d7a97a86721a1a8f9c42578a9c520fe9902230e2d1e706727b4b",
+    "src/bp_registry/canonical/phase7.py": "15db4084da7e917a82dd46393f8343988f588af8f04a97e89aed57c004b61a9c",
+    "src/bp_registry/canonical/postprocessing/__init__.py": "bb088d3f5765e4e3eb52336d817ba3f16fe3062232f0a26e53b20965e4ea1018",
+    "src/bp_registry/canonical/postprocessing/otf.py": "d528624f8c330fc5cf8a8add01cd4df4b7667cc1a69c7187ee2d76d2fff4a75e",
+    "src/bp_registry/canonical/postprocessing/si.py": "f9a0b08fb6887dc40b8cf81f56ab329a1300cc78dbd5264dcb7d5275f0306aa0",
+    "src/bp_registry/canonical/postprocessing/work.py": "f907aabc5ed54d68a086b3e24748e3e032db783db6712f245586eaa66e8fbf51",
+    "src/bp_registry/canonical/problems.py": "55875037eca74f5cf9950e6b2c447735f8eec3cf4bcdc82f1dab2ab65d3c74a3",
+    "src/bp_registry/canonical/profiling.py": "b2e81b36d84bc55fe59d7eef45de5695701a2a20be7fdc8fcc852d694f5d050d",
+    "src/bp_registry/canonical/relay.py": "ab570765dc8bbff5737d4f8768b7d221da603203a31cffed4b9a1bac75cd6be1",
+    "src/bp_registry/canonical/residual.py": "8cdfd4ad03d23eacd55e85dc571f101998f50b02b0e1c3fcc0fe080c691933ef",
+    "src/bp_registry/canonical/restarting.py": "6bf190f9768bc04d104452cc9b9534c2923d205e04f6fb2820e7429023c9dba4",
+    "src/bp_registry/canonical/schedules.py": "66343a795d55d62353e4659604b559e4b922ecd745ec8119dd22d4d7825b88d0",
+    "src/bp_registry/canonical/tracing.py": "cf4bba36430cb6aff9cbdc19d9af8a9d83a6d38bad9a603d64d8f227c1bf328d",
+    "src/bp_registry/canonical/transformations.py": "3ac549b14f1d088c24a23cdb219c23d7ba656b2b12ad1a35f5d398ddfd7c4c94",
+    "src/bp_registry/canonical/updates.py": "50a39cb916055e37719e2a2ba987a127ec535c54f0f4020b99ad5a46a649276b",
+    "src/bp_registry/canonical/verification.py": "6ee3e424e85a11a02529c027fb67f2cdc712c196c32164a6b63e913f8c5ab8e1",
+    "src/bp_registry/check_numerics.py": "7940224739b29be013267f89de76ecbad20c6f7f87231aca2053bb8517d726f2",
+    "src/bp_registry/circuit/__init__.py": "4d861b050ef2d072cd8a7d86d3b7c3c3d7021d3959d29bd0f7f5f8ccdf16b60d",
+    "src/bp_registry/circuit/compiled.py": "27773e2342073549087f2422d944c845ccdc72ac0bcdd5a25fc9c6bc39e5b108",
+    "src/bp_registry/circuit/dem.py": "76e26a1b0a1e2969f6e61a9b28008e267d2c810ea376ade96da1999a84e9e86d",
+    "src/bp_registry/circuit/sinter_adapter.py": "a5e4bff190d66f32253508e398921b8ab5d4b4e511aa9751329e3636ccf76322",
+    "src/bp_registry/cli.py": "7eb03d112353b0bb3ccf201262bcd12fc3ac109021a1809e8259b3c367c8656a",
+    "src/bp_registry/code_constructions.py": "d541281fc93cc26906fe3baa968070ac90a9056b370f94250029b9cacb00f004",
+    "src/bp_registry/cpu_batch.py": "5217d1642f2d0fd1f4df0847c1166e1bb9892c51c1fb583d205f3c0f6b1ffe52",
+    "src/bp_registry/css.py": "898da0ba65a326c4eec887d17f32d6d745d7b50840b1f850deafc0bbc5b2c41a",
+    "src/bp_registry/evaluator.py": "d5185ccfc8cc0656ac70fb9d5d02a187327ded7284477972ed9f83dc0f8952f9",
+    "src/bp_registry/evidence.py": "72220bc2ae626f29240ee8be6531f5023d7ce40c7a984a4be205dff87ba3fbb6",
+    "src/bp_registry/ledger.py": "8468e482a9bb1be340599b16ed86b7b4d8990fe083bac9507f081fcc6fb0eca7",
+    "src/bp_registry/literature.py": "bc8e1d32a3fbf196230ae6bdb3fbe1f69213bc204a562ea58e6765aafa63a168",
+    "src/bp_registry/manifests.py": "e4c4d2d73f37151bc1d6ff8c99c033471694cd9a37b2263f2bf1943425ed824c",
+    "src/bp_registry/native/relay_v022.py": "45d63ee4feaaaadb26847a00107b0f93dc5b8596f151f2a5808f7209f25e561c",
+    "src/bp_registry/phase4_analysis.py": "09479a819bda4b9f6e33ad4315f15e6c0343b29a2d0f600fe9bba6ab6d107d9e",
+    "src/bp_registry/phase5_analysis.py": "2b0cb595867cc18dd9f67e245685b7b2fb51fb28ce7643ea77decd68386a0803",
+    "src/bp_registry/profile_contracts.py": "4021a27cbad2a424ea55c445eb133fd1d8ee1409c66284c52175bdf0db94a59c",
+    "src/bp_registry/quaternary/__init__.py": "af168b0eddcc8ddf63ca8938f6af922ae8d9a7960db3e0f05e30ccfd3c450c39",
+    "src/bp_registry/quaternary/algebra.py": "5d103d96908f1dd35f115fe081b7d76f2d82d26ea209537313c192d911f72f5c",
+    "src/bp_registry/quaternary/asced.py": "a75258680acdc1a109141b2e94e6bfea46caa2e907f9a8763bd6fc9582e658eb",
+    "src/bp_registry/quaternary/asced_overcomplete.py": "b4b2ac8d43c3957a7c3aba72cf7267f63e34ed78e9addaaa1dba958dea282eb8",
+    "src/bp_registry/quaternary/compatibility.py": "ebd13252642dc9f0c5bbb416844298fd0caaa900da34eb6be9d1c985c25612a9",
+    "src/bp_registry/quaternary/compiled.py": "931d96f4fce3bb954392ac7d1d0be39f60142b379c48bfef04121cbce1fe1022",
+    "src/bp_registry/quaternary/contracts.py": "4d5877d31e357c08a37bf72c09b1f03d8250054e748587551b038ccb9f043134",
+    "src/bp_registry/quaternary/evaluator.py": "bac072ceaae64bab3de14801f872e0465786e8c5411d9186e056d506b53c3f78",
+    "src/bp_registry/quaternary/execution.py": "ca6fa19efef1112c30dd1aaca843129e137a0335ab2ec1a9e889316873fa2a69",
+    "src/bp_registry/quaternary/kernel.py": "af20c697eef520a82a4e49654eb3034bebaa9b08fecc9466c48f3bb2c1949df8",
+    "src/bp_registry/quaternary/mbp4.py": "b932d8cd9ced4c2ad7f2e31c20defe673391026e11f9f621b7952a1654165cf3",
+    "src/bp_registry/quaternary/native_asced.py": "ee57709cf67fed333cc977b34306d6d5500553ad98dab180a18d66ae8c20f481",
+    "src/bp_registry/quaternary/numerics.py": "d3368e2dd8a15f2e78d67d345f346204361df51e685127a2cbd8870a0036b199",
+    "src/bp_registry/quaternary/problems.py": "ec90099067b5d1a632b195819bcc849239e311ca5f63637d328f26260e239aea",
+    "src/bp_registry/quaternary/qbpgd.py": "a8f3909412befa121d5b6c5a02dfe393ea77078fabfa03c78a2770d2b0dfc6e8",
+    "src/bp_registry/quaternary/sampling.py": "02612d98d186058de092b5ca0eb4d54c47ac56dff103854df5826dd0819d3d3d",
+    "src/bp_registry/quaternary/schedules.py": "47e105d756ebf84c841bb34cb8e345d00ca0d3f0f57762a358e913b09115d062",
+    "src/bp_registry/reference.py": "d901779a3a5e04a684059a6e658aace2307db0c779ea452877a0981598c04bdf",
+    "src/bp_registry/research/__init__.py": "c98e330e30604e8ab1556667d0e113605c3e0f5a78a4b70ddb6af63e175b5001",
+    "src/bp_registry/research/catalog.py": "1c381bb61bd5b6073c6fbfd799cef6ba0c725a1b6a9d39f3e6548939af7fec9f",
+    "src/bp_registry/research/catalog_model.py": "01587f1212c0910e86662279770fb3363d5a1b439d68b7fd451b733e661880ee",
+    "src/bp_registry/research/cli.py": "dd0121fcc303c534767bd82b02c8b89e9fcf78152dc481b5201938233b6cca5d",
+    "src/bp_registry/research/contracts.py": "00999e6729464f60edb20b5c5b65ed1f8a472e4b101a3f59ca69f34ad8ce8171",
+    "src/bp_registry/research/evidence.py": "5394b23d70d35e82262345f970d60c8f51b7d9a7400537c4dca40de58c8409f8",
+    "src/bp_registry/research/export.py": "1bee7fbca6079d951f6e9380ad201ed211ff984d92c3c37c7f3f8725a5ba097e",
+    "src/bp_registry/research/inputs.py": "b511918a6ac600da15eb94faa6071f7d3f8d1b9f2edc6918de46c37265ca50a3",
+    "src/bp_registry/research/results.py": "225f2888b7fda0e9f8ad0aa2e1a1f71701a425cb48895b6b3e0ded233e0fd21e",
+    "src/bp_registry/research/runner.py": "a04972ec3b034a65d04c967b1f7dbe4700d97bd5f9c210c1f3ef1dc4517810e0",
+    "src/bp_registry/resolution.py": "adf50055b1eba7bd093937bb4eb1e4b595a32fea135da4a54404bbbeeb49b038",
+    "src/bp_registry/runner.py": "37df629e842f6615cff96567504d6cda87bfbad3e543b2c2faa113ea1eef105a",
+    "src/bp_registry/sampling.py": "774b81c9d6fc7d89130c6bfc0833e363cc9be1a8033d3902140c0d5a9c706b2f",
+    "src/bp_registry/study.py": "4fd642c1f2121894434e6c2ffcd1245490bd797f831c456ab57144890d56ae34",
+    "src/bp_registry/study_cli.py": "ff0388b37895dcc4701b829e4506e08fb9575a268c31520f928194e270fac80a"
+  },
+  "checks": 18,
+  "passed": 18,
+  "failed": 0,
+  "events": [
+    {
+      "name": "V3-A01_fixed",
+      "passed": true,
+      "details": {
+        "rejected_constructors": 4
+      }
+    },
+    {
+      "name": "V3-A02_fixed",
+      "passed": true,
+      "details": {
+        "rejected_misleading_profiles": 3,
+        "exhaustive_fixed_fields": "tests/canonical/test_kernel_contract_admission.py"
+      }
+    },
+    {
+      "name": "binary_probability_oracle",
+      "passed": true,
+      "details": {
+        "sweeps": 384,
+        "exact_tree_cases": 8,
+        "max_probability_error": 4.440892098500626e-16,
+        "nonuniform_priors": true,
+        "isolated_variables": true
+      }
+    },
+    {
+      "name": "pauli_probability_oracle",
+      "passed": true,
+      "details": {
+        "sweeps": 384,
+        "exact_tree_cases": 8,
+        "max_probability_error": 2.220446049250313e-16,
+        "nonuniform_priors": true,
+        "isolated_variables": true
+      }
+    },
+    {
+      "name": "MAP_equality_patterns",
+      "passed": true,
+      "details": {
+        "cases": 216,
+        "decision": "MAP with I<X<Y<Z ties"
+      }
+    },
+    {
+      "name": "finite_priors",
+      "passed": true,
+      "details": {
+        "probabilities": 1003,
+        "max_log_odds_error": 0.0
+      }
+    },
+    {
+      "name": "float16_boundaries",
+      "passed": true,
+      "details": {
+        "cases": 253945,
+        "reference": "NumPy float16 conversion after finite saturation"
+      }
+    },
+    {
+      "name": "unchanged_exact_unity_approximation",
+      "passed": true,
+      "details": {
+        "rows": [
+          {
+            "input": 0.0,
+            "output": 0.0,
+            "exact_SPA": 0.0,
+            "error": 0.0
+          },
+          {
+            "input": 1.0,
+            "output": 1.0,
+            "exact_SPA": 1.0,
+            "error": 0.0
+          },
+          {
+            "input": 20.0,
+            "output": 19.999999991040745,
+            "exact_SPA": 20.0,
+            "error": -8.959254671481176e-09
+          },
+          {
+            "input": 30.0,
+            "output": 29.99983361167515,
+            "exact_SPA": 30.0,
+            "error": -0.00016638832484972
+          },
+          {
+            "input": 38.0,
+            "output": 37.42994775023705,
+            "exact_SPA": 38.0,
+            "error": -0.5700522497629521
+          },
+          {
+            "input": 40.0,
+            "output": 23.718998027710036,
+            "exact_SPA": 40.0,
+            "error": -16.281001972289964
+          },
+          {
+            "input": 100.0,
+            "output": 23.718998027710036,
+            "exact_SPA": 100.0,
+            "error": -76.28100197228997
+          }
+        ],
+        "interpretation": "known declared exact-unity adaptation; not exact SPA over all finite inputs"
+      }
+    },
+    {
+      "name": "native_ldpc",
+      "passed": true,
+      "details": {
+        "version": "2.4.1",
+        "module": "/hpc/home/mg551/miniconda3/lib/python3.12/site-packages/ldpc",
+        "binary_sha256": {
+          "bp_decoder/_bp_decoder.cpython-312-x86_64-linux-gnu.so": "5d23a3f25228e4fe3d8d2f677cc4576116e2c8bae7fe195fdd0966d830c864e4"
+        },
+        "cases": 180,
+        "max_posterior_error": 1.7763568394002505e-15,
+        "tie_discrepancies": [
+          {
+            "rule": "product_sum",
+            "p": 0.071,
+            "cap": 1,
+            "syndrome": [
+              0,
+              1
+            ],
+            "indices": [
+              2
+            ],
+            "canonical_llr": [
+              4.440892098500626e-16
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "product_sum",
+            "p": 0.071,
+            "cap": 2,
+            "syndrome": [
+              0,
+              1
+            ],
+            "indices": [
+              2
+            ],
+            "canonical_llr": [
+              4.440892098500626e-16
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "product_sum",
+            "p": 0.071,
+            "cap": 5,
+            "syndrome": [
+              0,
+              1
+            ],
+            "indices": [
+              2
+            ],
+            "canonical_llr": [
+              4.440892098500626e-16
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "product_sum",
+            "p": 0.283,
+            "cap": 1,
+            "syndrome": [
+              0,
+              1
+            ],
+            "indices": [
+              2
+            ],
+            "canonical_llr": [
+              1.1102230246251565e-16
+            ],
+            "native_llr": [
+              -2.220446049250313e-16
+            ]
+          },
+          {
+            "rule": "product_sum",
+            "p": 0.283,
+            "cap": 2,
+            "syndrome": [
+              0,
+              1
+            ],
+            "indices": [
+              2
+            ],
+            "canonical_llr": [
+              1.1102230246251565e-16
+            ],
+            "native_llr": [
+              -2.220446049250313e-16
+            ]
+          },
+          {
+            "rule": "product_sum",
+            "p": 0.283,
+            "cap": 5,
+            "syndrome": [
+              0,
+              1
+            ],
+            "indices": [
+              2
+            ],
+            "canonical_llr": [
+              1.1102230246251565e-16
+            ],
+            "native_llr": [
+              -2.220446049250313e-16
+            ]
+          },
+          {
+            "rule": "product_sum",
+            "p": 0.071,
+            "cap": 1,
+            "syndrome": [
+              1,
+              0
+            ],
+            "indices": [
+              0
+            ],
+            "canonical_llr": [
+              4.440892098500626e-16
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "product_sum",
+            "p": 0.071,
+            "cap": 2,
+            "syndrome": [
+              1,
+              0
+            ],
+            "indices": [
+              0
+            ],
+            "canonical_llr": [
+              4.440892098500626e-16
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "product_sum",
+            "p": 0.071,
+            "cap": 5,
+            "syndrome": [
+              1,
+              0
+            ],
+            "indices": [
+              0
+            ],
+            "canonical_llr": [
+              4.440892098500626e-16
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "product_sum",
+            "p": 0.283,
+            "cap": 1,
+            "syndrome": [
+              1,
+              0
+            ],
+            "indices": [
+              0
+            ],
+            "canonical_llr": [
+              1.1102230246251565e-16
+            ],
+            "native_llr": [
+              -2.220446049250313e-16
+            ]
+          },
+          {
+            "rule": "product_sum",
+            "p": 0.283,
+            "cap": 2,
+            "syndrome": [
+              1,
+              0
+            ],
+            "indices": [
+              0
+            ],
+            "canonical_llr": [
+              1.1102230246251565e-16
+            ],
+            "native_llr": [
+              -2.220446049250313e-16
+            ]
+          },
+          {
+            "rule": "product_sum",
+            "p": 0.283,
+            "cap": 5,
+            "syndrome": [
+              1,
+              0
+            ],
+            "indices": [
+              0
+            ],
+            "canonical_llr": [
+              1.1102230246251565e-16
+            ],
+            "native_llr": [
+              -2.220446049250313e-16
+            ]
+          },
+          {
+            "rule": "product_sum",
+            "p": 0.071,
+            "cap": 1,
+            "syndrome": [
+              1,
+              1
+            ],
+            "indices": [
+              0,
+              2
+            ],
+            "canonical_llr": [
+              4.440892098500626e-16,
+              4.440892098500626e-16
+            ],
+            "native_llr": [
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "rule": "product_sum",
+            "p": 0.283,
+            "cap": 1,
+            "syndrome": [
+              1,
+              1
+            ],
+            "indices": [
+              0,
+              2
+            ],
+            "canonical_llr": [
+              1.1102230246251565e-16,
+              1.1102230246251565e-16
+            ],
+            "native_llr": [
+              -2.220446049250313e-16,
+              -2.220446049250313e-16
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.071,
+            "cap": 2,
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "indices": [
+              3
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.137,
+            "cap": 2,
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "indices": [
+              3
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.283,
+            "cap": 2,
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "indices": [
+              3
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.071,
+            "cap": 1,
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.071,
+            "cap": 2,
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.071,
+            "cap": 5,
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.137,
+            "cap": 1,
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.137,
+            "cap": 2,
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.137,
+            "cap": 5,
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.283,
+            "cap": 1,
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.283,
+            "cap": 2,
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.283,
+            "cap": 5,
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.071,
+            "cap": 1,
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.137,
+            "cap": 1,
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.283,
+            "cap": 1,
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.071,
+            "cap": 2,
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "indices": [
+              1
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.137,
+            "cap": 2,
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "indices": [
+              1
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.283,
+            "cap": 2,
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "indices": [
+              1
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.071,
+            "cap": 1,
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.137,
+            "cap": 1,
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.283,
+            "cap": 1,
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.071,
+            "cap": 1,
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.071,
+            "cap": 2,
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.071,
+            "cap": 5,
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.137,
+            "cap": 1,
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.137,
+            "cap": 2,
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.137,
+            "cap": 5,
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.283,
+            "cap": 1,
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.283,
+            "cap": 2,
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.283,
+            "cap": 5,
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "indices": [
+              4
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.071,
+            "cap": 1,
+            "syndrome": [
+              0,
+              1
+            ],
+            "indices": [
+              2
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.071,
+            "cap": 2,
+            "syndrome": [
+              0,
+              1
+            ],
+            "indices": [
+              2
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.071,
+            "cap": 5,
+            "syndrome": [
+              0,
+              1
+            ],
+            "indices": [
+              2
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.137,
+            "cap": 1,
+            "syndrome": [
+              0,
+              1
+            ],
+            "indices": [
+              2
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.137,
+            "cap": 2,
+            "syndrome": [
+              0,
+              1
+            ],
+            "indices": [
+              2
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.137,
+            "cap": 5,
+            "syndrome": [
+              0,
+              1
+            ],
+            "indices": [
+              2
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.283,
+            "cap": 1,
+            "syndrome": [
+              0,
+              1
+            ],
+            "indices": [
+              2
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.283,
+            "cap": 2,
+            "syndrome": [
+              0,
+              1
+            ],
+            "indices": [
+              2
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.283,
+            "cap": 5,
+            "syndrome": [
+              0,
+              1
+            ],
+            "indices": [
+              2
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.071,
+            "cap": 1,
+            "syndrome": [
+              1,
+              0
+            ],
+            "indices": [
+              0
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.071,
+            "cap": 2,
+            "syndrome": [
+              1,
+              0
+            ],
+            "indices": [
+              0
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.071,
+            "cap": 5,
+            "syndrome": [
+              1,
+              0
+            ],
+            "indices": [
+              0
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.137,
+            "cap": 1,
+            "syndrome": [
+              1,
+              0
+            ],
+            "indices": [
+              0
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.137,
+            "cap": 2,
+            "syndrome": [
+              1,
+              0
+            ],
+            "indices": [
+              0
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.137,
+            "cap": 5,
+            "syndrome": [
+              1,
+              0
+            ],
+            "indices": [
+              0
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.283,
+            "cap": 1,
+            "syndrome": [
+              1,
+              0
+            ],
+            "indices": [
+              0
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.283,
+            "cap": 2,
+            "syndrome": [
+              1,
+              0
+            ],
+            "indices": [
+              0
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.283,
+            "cap": 5,
+            "syndrome": [
+              1,
+              0
+            ],
+            "indices": [
+              0
+            ],
+            "canonical_llr": [
+              0.0
+            ],
+            "native_llr": [
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.071,
+            "cap": 1,
+            "syndrome": [
+              1,
+              1
+            ],
+            "indices": [
+              0,
+              2
+            ],
+            "canonical_llr": [
+              0.0,
+              0.0
+            ],
+            "native_llr": [
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.137,
+            "cap": 1,
+            "syndrome": [
+              1,
+              1
+            ],
+            "indices": [
+              0,
+              2
+            ],
+            "canonical_llr": [
+              0.0,
+              0.0
+            ],
+            "native_llr": [
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "rule": "minimum_sum",
+            "p": 0.283,
+            "cap": 1,
+            "syndrome": [
+              1,
+              1
+            ],
+            "indices": [
+              0,
+              2
+            ],
+            "canonical_llr": [
+              0.0,
+              0.0
+            ],
+            "native_llr": [
+              0.0,
+              0.0
+            ]
+          }
+        ],
+        "unexplained": [],
+        "alignment": "parallel; explicit syndrome input; min-sum alpha=1; SPA v3 damping=0; no saturation reached"
+      }
+    },
+    {
+      "name": "native_normalized_min_sum",
+      "passed": true,
+      "details": {
+        "cases": 84,
+        "max_posterior_error": 8.881784197001252e-16,
+        "tie_coordinates": 24,
+        "normalizations": [
+          0.75,
+          1.0
+        ],
+        "alignment": "new policy v2, float64, damping=0, compare actual native terminal iteration"
+      }
+    },
+    {
+      "name": "native_Relay",
+      "passed": true,
+      "details": {
+        "identity": {
+          "commit": "14cb31a18f9b9d7d099791b793e35b8a2951f8f3",
+          "root": "/tmp/survey-bp-relay-v022-source",
+          "sha256": {
+            "crates/relay_bp/src/bp/min_sum.rs": "8ad84611d08a73249215fa63cf051a42038077388629b917b24cd79e1084512a",
+            "crates/relay_bp/src/bp/relay.rs": "cd476d5871b46662aa3f524c2d6c484fb9ff9005a99db263bb92416a3b2a05dc"
+          },
+          "binary_sha256": {
+            "/tmp/survey-bp-relay-v022-package/relay_bp/_relay_bp.cpython-312-x86_64-linux-gnu.so": "76071ce83ea9c5d0bdafc630cd8c416953caa7bd5a8a9a9e839cf5cf3e099f91"
+          }
+        },
+        "cases": 189,
+        "comparisons": [
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.071,
+            "gamma": null,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.071,
+            "gamma": null,
+            "cap": 3,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.071,
+            "gamma": null,
+            "cap": 7,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.2,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.2,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.2,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.6,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.6,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.6,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.137,
+            "gamma": null,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.137,
+            "gamma": null,
+            "cap": 3,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.137,
+            "gamma": null,
+            "cap": 7,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.2,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.2,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.2,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.6,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.6,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.6,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.283,
+            "gamma": null,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.283,
+            "gamma": null,
+            "cap": 3,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.283,
+            "gamma": null,
+            "cap": 7,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.2,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.2,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.2,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.6,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.6,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              0,
+              0,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.6,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.071,
+            "gamma": null,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.071,
+            "gamma": null,
+            "cap": 3,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.071,
+            "gamma": null,
+            "cap": 7,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.071,
+            "gamma": 0.2,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.071,
+            "gamma": 0.2,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.071,
+            "gamma": 0.2,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.071,
+            "gamma": 0.6,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.071,
+            "gamma": 0.6,
+            "cap": 3,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.071,
+            "gamma": 0.6,
+            "cap": 7,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.137,
+            "gamma": null,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.137,
+            "gamma": null,
+            "cap": 3,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.137,
+            "gamma": null,
+            "cap": 7,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.137,
+            "gamma": 0.2,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.137,
+            "gamma": 0.2,
+            "cap": 3,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.137,
+            "gamma": 0.2,
+            "cap": 7,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.137,
+            "gamma": 0.6,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.137,
+            "gamma": 0.6,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.137,
+            "gamma": 0.6,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.283,
+            "gamma": null,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.283,
+            "gamma": null,
+            "cap": 3,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.283,
+            "gamma": null,
+            "cap": 7,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.283,
+            "gamma": 0.2,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.283,
+            "gamma": 0.2,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.283,
+            "gamma": 0.2,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.283,
+            "gamma": 0.6,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.283,
+            "gamma": 0.6,
+            "cap": 3,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              0
+            ],
+            "p": 0.283,
+            "gamma": 0.6,
+            "cap": 7,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.071,
+            "gamma": null,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.071,
+            "gamma": null,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.071,
+            "gamma": null,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.2,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.2,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.2,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.6,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.6,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.6,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.137,
+            "gamma": null,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.137,
+            "gamma": null,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.137,
+            "gamma": null,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.2,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.2,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.2,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.6,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.6,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.6,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.283,
+            "gamma": null,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.283,
+            "gamma": null,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.283,
+            "gamma": null,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.2,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.2,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.2,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.6,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.6,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              0,
+              1,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.6,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.071,
+            "gamma": null,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.071,
+            "gamma": null,
+            "cap": 3,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.071,
+            "gamma": null,
+            "cap": 7,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.071,
+            "gamma": 0.2,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.071,
+            "gamma": 0.2,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.071,
+            "gamma": 0.2,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.071,
+            "gamma": 0.6,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.071,
+            "gamma": 0.6,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.071,
+            "gamma": 0.6,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.137,
+            "gamma": null,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.137,
+            "gamma": null,
+            "cap": 3,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.137,
+            "gamma": null,
+            "cap": 7,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.137,
+            "gamma": 0.2,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.137,
+            "gamma": 0.2,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.137,
+            "gamma": 0.2,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.137,
+            "gamma": 0.6,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.137,
+            "gamma": 0.6,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.137,
+            "gamma": 0.6,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.283,
+            "gamma": null,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.283,
+            "gamma": null,
+            "cap": 3,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.283,
+            "gamma": null,
+            "cap": 7,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.283,
+            "gamma": 0.2,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.283,
+            "gamma": 0.2,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.283,
+            "gamma": 0.2,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.283,
+            "gamma": 0.6,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.283,
+            "gamma": 0.6,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              0
+            ],
+            "p": 0.283,
+            "gamma": 0.6,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.071,
+            "gamma": null,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.071,
+            "gamma": null,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.071,
+            "gamma": null,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.2,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.2,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.2,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.6,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.6,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.6,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.137,
+            "gamma": null,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.137,
+            "gamma": null,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.137,
+            "gamma": null,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.2,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.2,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.2,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.6,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.6,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.6,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.283,
+            "gamma": null,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.283,
+            "gamma": null,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.283,
+            "gamma": null,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.2,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.2,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.2,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.6,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.6,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              1,
+              0,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.6,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.071,
+            "gamma": null,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.071,
+            "gamma": null,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.071,
+            "gamma": null,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.071,
+            "gamma": 0.2,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.071,
+            "gamma": 0.2,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.071,
+            "gamma": 0.2,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.071,
+            "gamma": 0.6,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.071,
+            "gamma": 0.6,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.071,
+            "gamma": 0.6,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.137,
+            "gamma": null,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.137,
+            "gamma": null,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.137,
+            "gamma": null,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.137,
+            "gamma": 0.2,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.137,
+            "gamma": 0.2,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.137,
+            "gamma": 0.2,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.137,
+            "gamma": 0.6,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.137,
+            "gamma": 0.6,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.137,
+            "gamma": 0.6,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.283,
+            "gamma": null,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.283,
+            "gamma": null,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.283,
+            "gamma": null,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.283,
+            "gamma": 0.2,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.283,
+            "gamma": 0.2,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.283,
+            "gamma": 0.2,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.283,
+            "gamma": 0.6,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.283,
+            "gamma": 0.6,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              0
+            ],
+            "p": 0.283,
+            "gamma": 0.6,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 2
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.071,
+            "gamma": null,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.071,
+            "gamma": null,
+            "cap": 3,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.071,
+            "gamma": null,
+            "cap": 7,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.2,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.2,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.2,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.6,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.6,
+            "cap": 3,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.071,
+            "gamma": 0.6,
+            "cap": 7,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.137,
+            "gamma": null,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.137,
+            "gamma": null,
+            "cap": 3,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.137,
+            "gamma": null,
+            "cap": 7,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.2,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.2,
+            "cap": 3,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.2,
+            "cap": 7,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.6,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.6,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.137,
+            "gamma": 0.6,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.283,
+            "gamma": null,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.283,
+            "gamma": null,
+            "cap": 3,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.283,
+            "gamma": null,
+            "cap": 7,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.2,
+            "cap": 1,
+            "tie_differences": [],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.2,
+            "cap": 3,
+            "tie_differences": [],
+            "iterations": 3
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.2,
+            "cap": 7,
+            "tie_differences": [],
+            "iterations": 7
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.6,
+            "cap": 1,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.6,
+            "cap": 3,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          },
+          {
+            "syndrome": [
+              1,
+              1,
+              1
+            ],
+            "p": 0.283,
+            "gamma": 0.6,
+            "cap": 7,
+            "tie_differences": [
+              4
+            ],
+            "iterations": 1
+          }
+        ],
+        "scope": "Native F64 min-sum inner BP with affine prior memory, caps 1/3/7, clip 25; not a full Relay restart equivalence claim"
+      }
+    },
+    {
+      "name": "native_aSCED_decision_classification",
+      "passed": true,
+      "details": {
+        "native_proof": {
+          "identity": {
+            "commit": "816772071486615dfc7d71d1e15df597edc58a26",
+            "root": "/tmp/phase10-asced-native/source/quantum_asced",
+            "sha256": {
+              "src/Decoder/BP/BP4_Decoder.cpp": "5d689fb7de0654efdc9d46563ef6633fc3178e5806227a67a48111b10f511809"
+            }
+          },
+          "source_functions_sha256": [
+            "f044c3b2f329d06a3803cecb029737166dfcd1b37b5dfeee4ec6e9ab67a06c59",
+            "2cf465793893aec511a5923e2d960eb289945322e6be6d5702d3be2c296eb1f5"
+          ],
+          "cases": 29,
+          "nonmaximal_decisions": [
+            {
+              "llrs": [
+                -2.0,
+                0.0,
+                -2.0
+              ],
+              "selected": 2
+            },
+            {
+              "llrs": [
+                -2.0,
+                2.0,
+                -2.0
+              ],
+              "selected": 2
+            },
+            {
+              "llrs": [
+                0.0,
+                2.0,
+                0.0
+              ],
+              "selected": 2
+            }
+          ],
+          "scope": "unchanged extracted native C++ functions; not full aSCED simulation or matched-shot reproduction"
+        },
+        "v3_differences": [
+          {
+            "llrs": [
+              -2.0,
+              -2.0,
+              -2.0
+            ],
+            "source": 2,
+            "generic": 1,
+            "source_is_MAP": true
+          },
+          {
+            "llrs": [
+              -2.0,
+              -2.0,
+              0.0
+            ],
+            "source": 2,
+            "generic": 1,
+            "source_is_MAP": true
+          },
+          {
+            "llrs": [
+              -2.0,
+              -2.0,
+              2.0
+            ],
+            "source": 2,
+            "generic": 1,
+            "source_is_MAP": true
+          },
+          {
+            "llrs": [
+              -2.0,
+              0.0,
+              -2.0
+            ],
+            "source": 2,
+            "generic": 1,
+            "source_is_MAP": false
+          },
+          {
+            "llrs": [
+              -2.0,
+              2.0,
+              -2.0
+            ],
+            "source": 2,
+            "generic": 1,
+            "source_is_MAP": false
+          },
+          {
+            "llrs": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "source": 2,
+            "generic": 0,
+            "source_is_MAP": true
+          },
+          {
+            "llrs": [
+              0.0,
+              0.0,
+              2.0
+            ],
+            "source": 2,
+            "generic": 0,
+            "source_is_MAP": true
+          },
+          {
+            "llrs": [
+              0.0,
+              2.0,
+              0.0
+            ],
+            "source": 2,
+            "generic": 0,
+            "source_is_MAP": false
+          },
+          {
+            "llrs": [
+              0.0,
+              2.0,
+              2.0
+            ],
+            "source": 1,
+            "generic": 0,
+            "source_is_MAP": true
+          },
+          {
+            "llrs": [
+              2.0,
+              0.0,
+              0.0
+            ],
+            "source": 2,
+            "generic": 0,
+            "source_is_MAP": true
+          },
+          {
+            "llrs": [
+              2.0,
+              0.0,
+              2.0
+            ],
+            "source": 2,
+            "generic": 0,
+            "source_is_MAP": true
+          },
+          {
+            "llrs": [
+              2.0,
+              2.0,
+              0.0
+            ],
+            "source": 3,
+            "generic": 0,
+            "source_is_MAP": true
+          }
+        ],
+        "interpretation": "generic v3 differs intentionally at source ties/nonmaximal fallthroughs"
+      }
+    },
+    {
+      "name": "native_aSCED_zero_check_classification",
+      "passed": true,
+      "details": {
+        "identity": {
+          "commit": "816772071486615dfc7d71d1e15df597edc58a26",
+          "root": "/tmp/phase10-asced-native/source/quantum_asced",
+          "sha256": {
+            "src/Decoder/BP/BP_CN_Processing/BP_SPA.cpp": "27c85a79bde8f77ca9f089f61a60aca26621601911fd3ff4dcb3a2164d176127",
+            "include/Utility.h": "698368cee2a5b0e6427e2d83d6b238044b3656335cea2a90af5b2157739be0ca"
+          }
+        },
+        "function_sha256": "24e2619b49737b9cfacec8dc7eb471b156321dd11976cb5a9ae93b010c24c641",
+        "rows": [
+          {
+            "input": [
+              0.0,
+              1.0,
+              2.0
+            ],
+            "native": [
+              "nan",
+              0.0,
+              0.0
+            ],
+            "canonical": [
+              0.735325664055519,
+              0.0,
+              0.0
+            ],
+            "native_nonfinite": 1
+          },
+          {
+            "input": [
+              0.0,
+              0.0,
+              2.0
+            ],
+            "native": [
+              "nan",
+              "nan",
+              0.0
+            ],
+            "canonical": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "native_nonfinite": 2
+          },
+          {
+            "input": [
+              1.0,
+              -2.0,
+              3.0
+            ],
+            "native": [
+              -1.6934536609708946,
+              0.8912219168748371,
+              -0.735325664055519
+            ],
+            "canonical": [
+              -1.6934536609708952,
+              0.8912219168748371,
+              -0.735325664055519
+            ],
+            "native_nonfinite": 0
+          },
+          {
+            "input": [
+              40.0,
+              40.0,
+              40.0
+            ],
+            "native": [
+              23.718998027710036,
+              23.718998027710036,
+              23.718998027710036
+            ],
+            "canonical": [
+              23.718998027710036,
+              23.718998027710036,
+              23.718998027710036
+            ],
+            "native_nonfinite": 0
+          },
+          {
+            "input": [
+              -40.0,
+              -40.0,
+              0.0
+            ],
+            "native": [
+              -0.0,
+              -0.0,
+              "nan"
+            ],
+            "canonical": [
+              -0.0,
+              -0.0,
+              23.718998027710036
+            ],
+            "native_nonfinite": 1
+          }
+        ],
+        "scope": "unchanged extracted check-update function, not complete aSCED execution",
+        "interpretation": "upstream total-product division has zero/zero cases; canonical explicit exclusion remains finite"
+      }
+    },
+    {
+      "name": "policy_metamorphisms",
+      "passed": true,
+      "details": {
+        "identity_comparisons": 16,
+        "serial_damping_observable": true,
+        "transform_order_observable": true,
+        "state_isolation": true,
+        "incompatible_rejections": [
+          {
+            "schedule": "layered"
+          },
+          {
+            "transforms": [
+              "normalized_min_sum"
+            ]
+          },
+          {
+            "intervention": "ambp4"
+          }
+        ]
+      }
+    },
+    {
+      "name": "full_buffer_differentials",
+      "passed": true,
+      "details": {
+        "seed": 110611,
+        "sweeps": 192,
+        "max_absolute_error": 4.440892098500626e-16
+      }
+    },
+    {
+      "name": "untampered_public_v4_replays",
+      "passed": true,
+      "work": {
+        "check_to_variable_updates": 16,
+        "variable_to_check_updates": 16,
+        "belief_assemblies": 5,
+        "candidate_constructions": 1,
+        "convergence_checks": 1,
+        "order_generation": 0,
+        "order_selection": 0,
+        "residual_precomputations": 0,
+        "residual_differences": 0,
+        "priority_maintenance": 0,
+        "residual_priority_evaluations": 0,
+        "bp_calls": 1,
+        "candidate_checks": 5,
+        "intervention_actions": 0,
+        "branch_expansions": 0,
+        "branch_prunes": 0,
+        "relay_transfers": 0,
+        "fallback_calls": 0,
+        "fixation_actions": 0,
+        "transformations": 0,
+        "lifted_coordinates": 0,
+        "original_checks": 0,
+        "ranking_scans": 0
+      },
+      "committed_sweeps": 1
+    },
+    {
+      "name": "V3-A03_public_verification_rejects_false_summary_fields",
+      "passed": true,
+      "counterexamples": [
+        {
+          "field": "termination",
+          "original": "work_budget_exhausted",
+          "replacement": "fabricated_terminal",
+          "accepted_as_verified": false,
+          "rejection": "quaternary result summary differs from deterministic replay"
+        },
+        {
+          "field": "outcome",
+          "original": "invalid_syndrome",
+          "replacement": "fabricated_outcome",
+          "accepted_as_verified": false,
+          "rejection": "quaternary result summary differs from deterministic replay"
+        },
+        {
+          "field": "numerical_profile",
+          "original": "quaternary-bp4-f64-v3",
+          "replacement": "fabricated_profile",
+          "accepted_as_verified": false,
+          "rejection": "quaternary result summary differs from deterministic replay"
+        },
+        {
+          "field": "run_fidelity",
+          "original": "canonical_adaptation",
+          "replacement": "fabricated_fidelity",
+          "accepted_as_verified": false,
+          "rejection": "quaternary result summary differs from deterministic replay"
+        }
+      ],
+      "scope": "result.json summaries; unchanged ledger remains byte-identical and correct"
+    },
+    {
+      "name": "public_work_tamper_rejected",
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "production_source_hashes": "verified",
+  "historical_spikes": "008-015 unchanged",
+  "qualification_revision": "a42a1d6567d2eaa659490df07c9b397767d6cbbe",
+  "grouped_checks_passed": 18,
+  "suites": {
+    "admission": {
+      "tests": 76,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "profiles": {
+      "tests": 247,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "profile_compatibility": {
+      "tests": 159,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "summaries": {
+      "tests": 125,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "regression": {
+      "tests": 1163,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    }
+  },
+  "test_sets_overlap": true,
+  "compiled_hot_functions": "unchanged",
+  "unchanged_execution_modules": [
+    "src/bp_registry/quaternary/compiled.py",
+    "src/bp_registry/cpu_batch.py",
+    "src/bp_registry/check_numerics.py",
+    "src/bp_registry/resolution.py"
+  ],
+  "new_performance_claim": false
+}
