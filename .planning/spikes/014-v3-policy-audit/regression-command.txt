@@ -1,0 +1,1 @@
+OMP_NUM_THREADS=1 NUMBA_NUM_THREADS=4 .venv/bin/python -m pytest -q tests/canonical/test_memory_policies.py tests/canonical/test_memory_composition.py tests/canonical/test_resolution_policy.py tests/canonical/quaternary/test_schedules.py tests/canonical/quaternary/test_mbp4.py --junitxml=.planning/spikes/014-v3-policy-audit/regression.xml
