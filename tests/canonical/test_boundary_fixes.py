@@ -53,3 +53,39 @@ def test_graph_takes_immutable_ownership_of_raw_buffers(family):
     assert graph.variables[0] == 0
     with pytest.raises(ValueError):
         graph.variables.setflags(write=True)
+
+from bp_registry.canonical.numerics import BINARY_SPA_F64_V3, REFERENCE_CPU_F64
+from bp_registry.canonical.schedules import CheckNodeSerialSchedule, VariableNodeSerialSchedule, LayeredSchedule
+from bp_registry.canonical.execution import CanonicalLocalStepExecutor, ScheduleProgress
+from bp_registry.canonical.budgets import BudgetTree
+
+@pytest.mark.parametrize('kind', [CheckNodeSerialSchedule, VariableNodeSerialSchedule, LayeredSchedule])
+@pytest.mark.parametrize('damping', [0., .1, .6])
+def test_local_damping_matches_independent_degree_two_recurrence(kind, damping):
+    # Degree-two checks send precisely the other incoming LLR, with syndrome sign.
+    old=np.array([.3,-.6,1.2,.9]); syndrome=np.array([1,0],dtype=np.uint8)
+    kernel=BinarySpaKernel(profile=replace(BINARY_SPA_F64_V3,v2c_damping=damping))
+    kwargs={'partitions':((0,),(1,)), 'provenance':'explicit'} if kind is LayeredSchedule else {}
+    schedule=kind(EdgeTable.from_check_matrix(H),kernel=kernel,**kwargs)
+    selected=[0] if kind is VariableNodeSerialSchedule else [0,1,2]
+    c2v=np.array([.6,0.,0.,0.]) if kind is VariableNodeSerialSchedule else np.array([.6,-.3,0.,0.])
+    beliefs=np.full(3,np.log(4.))
+    for edge, variable in enumerate([0,1,1,2]): beliefs[variable]+=c2v[edge]
+    expected=old.copy()
+    for edge in selected:
+        expected[edge]=damping*old[edge]+(1-damping)*(beliefs[[0,1,1,2][edge]]-c2v[edge])
+    executor=CanonicalLocalStepExecutor(BudgetTree(limits=(),parents={}),scope='attempt')
+    schedule.execute_local_step(executor,old,syndrome,error_rate=.2,
+        progress=ScheduleProgress(iteration=0,local_steps=0,cursor=(0,)),is_converged=lambda _:False)
+    np.testing.assert_allclose(old,expected,rtol=0,atol=2e-14)
+
+@pytest.mark.parametrize('kind', [CheckNodeSerialSchedule, VariableNodeSerialSchedule, LayeredSchedule])
+def test_local_entry_clipping_uses_active_v1_cap(kind):
+    kernel=BinarySpaKernel(profile=replace(REFERENCE_CPU_F64,saturation=1.))
+    kwargs={'partitions':((0,),(1,)), 'provenance':'explicit'} if kind is LayeredSchedule else {}
+    schedule=kind(EdgeTable.from_check_matrix(H),kernel=kernel,**kwargs)
+    old=np.full(4,20.); syndrome=np.array([1,0],dtype=np.uint8)
+    executor=CanonicalLocalStepExecutor(BudgetTree(limits=(),parents={}),scope='attempt')
+    schedule.execute_local_step(executor,old,syndrome,error_rate=.2,
+        progress=ScheduleProgress(iteration=0,local_steps=0,cursor=(0,)),is_converged=lambda _:False)
+    assert np.max(np.abs(old))<=1.

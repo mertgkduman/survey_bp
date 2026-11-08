@@ -1,0 +1,278 @@
+...FFFFFFFFF                                                             [100%]
+=================================== FAILURES ===================================
+_ test_local_damping_matches_independent_degree_two_recurrence[0.1-CheckNodeSerialSchedule] _
+
+kind = <class 'bp_registry.canonical.schedules.CheckNodeSerialSchedule'>
+damping = 0.1
+
+    @pytest.mark.parametrize('kind', [CheckNodeSerialSchedule, VariableNodeSerialSchedule, LayeredSchedule])
+    @pytest.mark.parametrize('damping', [0., .1, .6])
+    def test_local_damping_matches_independent_degree_two_recurrence(kind, damping):
+        # Degree-two checks send precisely the other incoming LLR, with syndrome sign.
+        old=np.array([.3,-.6,1.2,.9]); syndrome=np.array([1,0],dtype=np.uint8)
+        kernel=BinarySpaKernel(profile=replace(BINARY_SPA_F64_V3,v2c_damping=damping))
+        kwargs={'partitions':((0,),(1,)), 'provenance':'explicit'} if kind is LayeredSchedule else {}
+        schedule=kind(EdgeTable.from_check_matrix(H),kernel=kernel,**kwargs)
+        selected=[0] if kind is VariableNodeSerialSchedule else [0,1,2]
+        c2v=np.array([.6,0.,0.,0.]) if kind is VariableNodeSerialSchedule else np.array([.6,-.3,0.,0.])
+        beliefs=np.full(3,np.log(4.))
+        for edge, variable in enumerate([0,1,1,2]): beliefs[variable]+=c2v[edge]
+        expected=old.copy()
+        for edge in selected:
+            expected[edge]=damping*old[edge]+(1-damping)*(beliefs[[0,1,1,2][edge]]-c2v[edge])
+        executor=CanonicalLocalStepExecutor(BudgetTree(limits=(),parents={}),scope='attempt')
+        schedule.execute_local_step(executor,old,syndrome,error_rate=.2,
+            progress=ScheduleProgress(iteration=0,local_steps=0,cursor=(0,)),is_converged=lambda _:False)
+>       np.testing.assert_allclose(old,expected,rtol=0,atol=2e-14)
+E       AssertionError: 
+E       Not equal to tolerance rtol=0, atol=2e-14
+E       
+E       Mismatched elements: 3 / 4 (75%)
+E       Max absolute difference among violations: 0.19862944
+E       Max relative difference among violations: 0.16724367
+E        ACTUAL: array([1.386294, 1.386294, 1.086294, 0.9     ])
+E        DESIRED: array([1.277665, 1.187665, 1.097665, 0.9     ])
+
+tests/canonical/test_boundary_fixes.py:80: AssertionError
+_ test_local_damping_matches_independent_degree_two_recurrence[0.1-VariableNodeSerialSchedule] _
+
+kind = <class 'bp_registry.canonical.schedules.VariableNodeSerialSchedule'>
+damping = 0.1
+
+    @pytest.mark.parametrize('kind', [CheckNodeSerialSchedule, VariableNodeSerialSchedule, LayeredSchedule])
+    @pytest.mark.parametrize('damping', [0., .1, .6])
+    def test_local_damping_matches_independent_degree_two_recurrence(kind, damping):
+        # Degree-two checks send precisely the other incoming LLR, with syndrome sign.
+        old=np.array([.3,-.6,1.2,.9]); syndrome=np.array([1,0],dtype=np.uint8)
+        kernel=BinarySpaKernel(profile=replace(BINARY_SPA_F64_V3,v2c_damping=damping))
+        kwargs={'partitions':((0,),(1,)), 'provenance':'explicit'} if kind is LayeredSchedule else {}
+        schedule=kind(EdgeTable.from_check_matrix(H),kernel=kernel,**kwargs)
+        selected=[0] if kind is VariableNodeSerialSchedule else [0,1,2]
+        c2v=np.array([.6,0.,0.,0.]) if kind is VariableNodeSerialSchedule else np.array([.6,-.3,0.,0.])
+        beliefs=np.full(3,np.log(4.))
+        for edge, variable in enumerate([0,1,1,2]): beliefs[variable]+=c2v[edge]
+        expected=old.copy()
+        for edge in selected:
+            expected[edge]=damping*old[edge]+(1-damping)*(beliefs[[0,1,1,2][edge]]-c2v[edge])
+        executor=CanonicalLocalStepExecutor(BudgetTree(limits=(),parents={}),scope='attempt')
+        schedule.execute_local_step(executor,old,syndrome,error_rate=.2,
+            progress=ScheduleProgress(iteration=0,local_steps=0,cursor=(0,)),is_converged=lambda _:False)
+>       np.testing.assert_allclose(old,expected,rtol=0,atol=2e-14)
+E       AssertionError: 
+E       Not equal to tolerance rtol=0, atol=2e-14
+E       
+E       Mismatched elements: 1 / 4 (25%)
+E       Max absolute difference among violations: 0.10862944
+E       Max relative difference among violations: 0.08502185
+E        ACTUAL: array([ 1.386294, -0.6     ,  1.2     ,  0.9     ])
+E        DESIRED: array([ 1.277665, -0.6     ,  1.2     ,  0.9     ])
+
+tests/canonical/test_boundary_fixes.py:80: AssertionError
+_ test_local_damping_matches_independent_degree_two_recurrence[0.1-LayeredSchedule] _
+
+kind = <class 'bp_registry.canonical.schedules.LayeredSchedule'>, damping = 0.1
+
+    @pytest.mark.parametrize('kind', [CheckNodeSerialSchedule, VariableNodeSerialSchedule, LayeredSchedule])
+    @pytest.mark.parametrize('damping', [0., .1, .6])
+    def test_local_damping_matches_independent_degree_two_recurrence(kind, damping):
+        # Degree-two checks send precisely the other incoming LLR, with syndrome sign.
+        old=np.array([.3,-.6,1.2,.9]); syndrome=np.array([1,0],dtype=np.uint8)
+        kernel=BinarySpaKernel(profile=replace(BINARY_SPA_F64_V3,v2c_damping=damping))
+        kwargs={'partitions':((0,),(1,)), 'provenance':'explicit'} if kind is LayeredSchedule else {}
+        schedule=kind(EdgeTable.from_check_matrix(H),kernel=kernel,**kwargs)
+        selected=[0] if kind is VariableNodeSerialSchedule else [0,1,2]
+        c2v=np.array([.6,0.,0.,0.]) if kind is VariableNodeSerialSchedule else np.array([.6,-.3,0.,0.])
+        beliefs=np.full(3,np.log(4.))
+        for edge, variable in enumerate([0,1,1,2]): beliefs[variable]+=c2v[edge]
+        expected=old.copy()
+        for edge in selected:
+            expected[edge]=damping*old[edge]+(1-damping)*(beliefs[[0,1,1,2][edge]]-c2v[edge])
+        executor=CanonicalLocalStepExecutor(BudgetTree(limits=(),parents={}),scope='attempt')
+        schedule.execute_local_step(executor,old,syndrome,error_rate=.2,
+            progress=ScheduleProgress(iteration=0,local_steps=0,cursor=(0,)),is_converged=lambda _:False)
+>       np.testing.assert_allclose(old,expected,rtol=0,atol=2e-14)
+E       AssertionError: 
+E       Not equal to tolerance rtol=0, atol=2e-14
+E       
+E       Mismatched elements: 3 / 4 (75%)
+E       Max absolute difference among violations: 0.19862944
+E       Max relative difference among violations: 0.16724367
+E        ACTUAL: array([1.386294, 1.386294, 1.086294, 0.9     ])
+E        DESIRED: array([1.277665, 1.187665, 1.097665, 0.9     ])
+
+tests/canonical/test_boundary_fixes.py:80: AssertionError
+_ test_local_damping_matches_independent_degree_two_recurrence[0.6-CheckNodeSerialSchedule] _
+
+kind = <class 'bp_registry.canonical.schedules.CheckNodeSerialSchedule'>
+damping = 0.6
+
+    @pytest.mark.parametrize('kind', [CheckNodeSerialSchedule, VariableNodeSerialSchedule, LayeredSchedule])
+    @pytest.mark.parametrize('damping', [0., .1, .6])
+    def test_local_damping_matches_independent_degree_two_recurrence(kind, damping):
+        # Degree-two checks send precisely the other incoming LLR, with syndrome sign.
+        old=np.array([.3,-.6,1.2,.9]); syndrome=np.array([1,0],dtype=np.uint8)
+        kernel=BinarySpaKernel(profile=replace(BINARY_SPA_F64_V3,v2c_damping=damping))
+        kwargs={'partitions':((0,),(1,)), 'provenance':'explicit'} if kind is LayeredSchedule else {}
+        schedule=kind(EdgeTable.from_check_matrix(H),kernel=kernel,**kwargs)
+        selected=[0] if kind is VariableNodeSerialSchedule else [0,1,2]
+        c2v=np.array([.6,0.,0.,0.]) if kind is VariableNodeSerialSchedule else np.array([.6,-.3,0.,0.])
+        beliefs=np.full(3,np.log(4.))
+        for edge, variable in enumerate([0,1,1,2]): beliefs[variable]+=c2v[edge]
+        expected=old.copy()
+        for edge in selected:
+            expected[edge]=damping*old[edge]+(1-damping)*(beliefs[[0,1,1,2][edge]]-c2v[edge])
+        executor=CanonicalLocalStepExecutor(BudgetTree(limits=(),parents={}),scope='attempt')
+        schedule.execute_local_step(executor,old,syndrome,error_rate=.2,
+            progress=ScheduleProgress(iteration=0,local_steps=0,cursor=(0,)),is_converged=lambda _:False)
+>       np.testing.assert_allclose(old,expected,rtol=0,atol=2e-14)
+E       AssertionError: 
+E       Not equal to tolerance rtol=0, atol=2e-14
+E       
+E       Mismatched elements: 3 / 4 (75%)
+E       Max absolute difference among violations: 1.19177662
+E       Max relative difference among violations: 6.12682725
+E        ACTUAL: array([1.386294, 1.386294, 1.086294, 0.9     ])
+E        DESIRED: array([0.734518, 0.194518, 1.154518, 0.9     ])
+
+tests/canonical/test_boundary_fixes.py:80: AssertionError
+_ test_local_damping_matches_independent_degree_two_recurrence[0.6-VariableNodeSerialSchedule] _
+
+kind = <class 'bp_registry.canonical.schedules.VariableNodeSerialSchedule'>
+damping = 0.6
+
+    @pytest.mark.parametrize('kind', [CheckNodeSerialSchedule, VariableNodeSerialSchedule, LayeredSchedule])
+    @pytest.mark.parametrize('damping', [0., .1, .6])
+    def test_local_damping_matches_independent_degree_two_recurrence(kind, damping):
+        # Degree-two checks send precisely the other incoming LLR, with syndrome sign.
+        old=np.array([.3,-.6,1.2,.9]); syndrome=np.array([1,0],dtype=np.uint8)
+        kernel=BinarySpaKernel(profile=replace(BINARY_SPA_F64_V3,v2c_damping=damping))
+        kwargs={'partitions':((0,),(1,)), 'provenance':'explicit'} if kind is LayeredSchedule else {}
+        schedule=kind(EdgeTable.from_check_matrix(H),kernel=kernel,**kwargs)
+        selected=[0] if kind is VariableNodeSerialSchedule else [0,1,2]
+        c2v=np.array([.6,0.,0.,0.]) if kind is VariableNodeSerialSchedule else np.array([.6,-.3,0.,0.])
+        beliefs=np.full(3,np.log(4.))
+        for edge, variable in enumerate([0,1,1,2]): beliefs[variable]+=c2v[edge]
+        expected=old.copy()
+        for edge in selected:
+            expected[edge]=damping*old[edge]+(1-damping)*(beliefs[[0,1,1,2][edge]]-c2v[edge])
+        executor=CanonicalLocalStepExecutor(BudgetTree(limits=(),parents={}),scope='attempt')
+        schedule.execute_local_step(executor,old,syndrome,error_rate=.2,
+            progress=ScheduleProgress(iteration=0,local_steps=0,cursor=(0,)),is_converged=lambda _:False)
+>       np.testing.assert_allclose(old,expected,rtol=0,atol=2e-14)
+E       AssertionError: 
+E       Not equal to tolerance rtol=0, atol=2e-14
+E       
+E       Mismatched elements: 1 / 4 (25%)
+E       Max absolute difference among violations: 0.65177662
+E       Max relative difference among violations: 0.88735313
+E        ACTUAL: array([ 1.386294, -0.6     ,  1.2     ,  0.9     ])
+E        DESIRED: array([ 0.734518, -0.6     ,  1.2     ,  0.9     ])
+
+tests/canonical/test_boundary_fixes.py:80: AssertionError
+_ test_local_damping_matches_independent_degree_two_recurrence[0.6-LayeredSchedule] _
+
+kind = <class 'bp_registry.canonical.schedules.LayeredSchedule'>, damping = 0.6
+
+    @pytest.mark.parametrize('kind', [CheckNodeSerialSchedule, VariableNodeSerialSchedule, LayeredSchedule])
+    @pytest.mark.parametrize('damping', [0., .1, .6])
+    def test_local_damping_matches_independent_degree_two_recurrence(kind, damping):
+        # Degree-two checks send precisely the other incoming LLR, with syndrome sign.
+        old=np.array([.3,-.6,1.2,.9]); syndrome=np.array([1,0],dtype=np.uint8)
+        kernel=BinarySpaKernel(profile=replace(BINARY_SPA_F64_V3,v2c_damping=damping))
+        kwargs={'partitions':((0,),(1,)), 'provenance':'explicit'} if kind is LayeredSchedule else {}
+        schedule=kind(EdgeTable.from_check_matrix(H),kernel=kernel,**kwargs)
+        selected=[0] if kind is VariableNodeSerialSchedule else [0,1,2]
+        c2v=np.array([.6,0.,0.,0.]) if kind is VariableNodeSerialSchedule else np.array([.6,-.3,0.,0.])
+        beliefs=np.full(3,np.log(4.))
+        for edge, variable in enumerate([0,1,1,2]): beliefs[variable]+=c2v[edge]
+        expected=old.copy()
+        for edge in selected:
+            expected[edge]=damping*old[edge]+(1-damping)*(beliefs[[0,1,1,2][edge]]-c2v[edge])
+        executor=CanonicalLocalStepExecutor(BudgetTree(limits=(),parents={}),scope='attempt')
+        schedule.execute_local_step(executor,old,syndrome,error_rate=.2,
+            progress=ScheduleProgress(iteration=0,local_steps=0,cursor=(0,)),is_converged=lambda _:False)
+>       np.testing.assert_allclose(old,expected,rtol=0,atol=2e-14)
+E       AssertionError: 
+E       Not equal to tolerance rtol=0, atol=2e-14
+E       
+E       Mismatched elements: 3 / 4 (75%)
+E       Max absolute difference among violations: 1.19177662
+E       Max relative difference among violations: 6.12682725
+E        ACTUAL: array([1.386294, 1.386294, 1.086294, 0.9     ])
+E        DESIRED: array([0.734518, 0.194518, 1.154518, 0.9     ])
+
+tests/canonical/test_boundary_fixes.py:80: AssertionError
+____ test_local_entry_clipping_uses_active_v1_cap[CheckNodeSerialSchedule] _____
+
+kind = <class 'bp_registry.canonical.schedules.CheckNodeSerialSchedule'>
+
+    @pytest.mark.parametrize('kind', [CheckNodeSerialSchedule, VariableNodeSerialSchedule, LayeredSchedule])
+    def test_local_entry_clipping_uses_active_v1_cap(kind):
+        kernel=BinarySpaKernel(profile=replace(REFERENCE_CPU_F64,saturation=1.))
+        kwargs={'partitions':((0,),(1,)), 'provenance':'explicit'} if kind is LayeredSchedule else {}
+        schedule=kind(EdgeTable.from_check_matrix(H),kernel=kernel,**kwargs)
+        old=np.full(4,20.); syndrome=np.array([1,0],dtype=np.uint8)
+        executor=CanonicalLocalStepExecutor(BudgetTree(limits=(),parents={}),scope='attempt')
+        schedule.execute_local_step(executor,old,syndrome,error_rate=.2,
+            progress=ScheduleProgress(iteration=0,local_steps=0,cursor=(0,)),is_converged=lambda _:False)
+>       assert np.max(np.abs(old))<=1.
+E       AssertionError: assert np.float64(20.0) <= 1.0
+E        +  where np.float64(20.0) = <function max at 0x7f26433732f0>(array([ 1.,  1.,  0., 20.]))
+E        +    where <function max at 0x7f26433732f0> = np.max
+E        +    and   array([ 1.,  1.,  0., 20.]) = <ufunc 'absolute'>(array([ 1.,  1.,  0., 20.]))
+E        +      where <ufunc 'absolute'> = np.abs
+
+tests/canonical/test_boundary_fixes.py:91: AssertionError
+___ test_local_entry_clipping_uses_active_v1_cap[VariableNodeSerialSchedule] ___
+
+kind = <class 'bp_registry.canonical.schedules.VariableNodeSerialSchedule'>
+
+    @pytest.mark.parametrize('kind', [CheckNodeSerialSchedule, VariableNodeSerialSchedule, LayeredSchedule])
+    def test_local_entry_clipping_uses_active_v1_cap(kind):
+        kernel=BinarySpaKernel(profile=replace(REFERENCE_CPU_F64,saturation=1.))
+        kwargs={'partitions':((0,),(1,)), 'provenance':'explicit'} if kind is LayeredSchedule else {}
+        schedule=kind(EdgeTable.from_check_matrix(H),kernel=kernel,**kwargs)
+        old=np.full(4,20.); syndrome=np.array([1,0],dtype=np.uint8)
+        executor=CanonicalLocalStepExecutor(BudgetTree(limits=(),parents={}),scope='attempt')
+        schedule.execute_local_step(executor,old,syndrome,error_rate=.2,
+            progress=ScheduleProgress(iteration=0,local_steps=0,cursor=(0,)),is_converged=lambda _:False)
+>       assert np.max(np.abs(old))<=1.
+E       AssertionError: assert np.float64(20.0) <= 1.0
+E        +  where np.float64(20.0) = <function max at 0x7f26433732f0>(array([ 1., 20., 20., 20.]))
+E        +    where <function max at 0x7f26433732f0> = np.max
+E        +    and   array([ 1., 20., 20., 20.]) = <ufunc 'absolute'>(array([ 1., 20., 20., 20.]))
+E        +      where <ufunc 'absolute'> = np.abs
+
+tests/canonical/test_boundary_fixes.py:91: AssertionError
+________ test_local_entry_clipping_uses_active_v1_cap[LayeredSchedule] _________
+
+kind = <class 'bp_registry.canonical.schedules.LayeredSchedule'>
+
+    @pytest.mark.parametrize('kind', [CheckNodeSerialSchedule, VariableNodeSerialSchedule, LayeredSchedule])
+    def test_local_entry_clipping_uses_active_v1_cap(kind):
+        kernel=BinarySpaKernel(profile=replace(REFERENCE_CPU_F64,saturation=1.))
+        kwargs={'partitions':((0,),(1,)), 'provenance':'explicit'} if kind is LayeredSchedule else {}
+        schedule=kind(EdgeTable.from_check_matrix(H),kernel=kernel,**kwargs)
+        old=np.full(4,20.); syndrome=np.array([1,0],dtype=np.uint8)
+        executor=CanonicalLocalStepExecutor(BudgetTree(limits=(),parents={}),scope='attempt')
+        schedule.execute_local_step(executor,old,syndrome,error_rate=.2,
+            progress=ScheduleProgress(iteration=0,local_steps=0,cursor=(0,)),is_converged=lambda _:False)
+>       assert np.max(np.abs(old))<=1.
+E       AssertionError: assert np.float64(20.0) <= 1.0
+E        +  where np.float64(20.0) = <function max at 0x7f26433732f0>(array([ 1.,  1.,  0., 20.]))
+E        +    where <function max at 0x7f26433732f0> = np.max
+E        +    and   array([ 1.,  1.,  0., 20.]) = <ufunc 'absolute'>(array([ 1.,  1.,  0., 20.]))
+E        +      where <ufunc 'absolute'> = np.abs
+
+tests/canonical/test_boundary_fixes.py:91: AssertionError
+=========================== short test summary info ============================
+FAILED tests/canonical/test_boundary_fixes.py::test_local_damping_matches_independent_degree_two_recurrence[0.1-CheckNodeSerialSchedule]
+FAILED tests/canonical/test_boundary_fixes.py::test_local_damping_matches_independent_degree_two_recurrence[0.1-VariableNodeSerialSchedule]
+FAILED tests/canonical/test_boundary_fixes.py::test_local_damping_matches_independent_degree_two_recurrence[0.1-LayeredSchedule]
+FAILED tests/canonical/test_boundary_fixes.py::test_local_damping_matches_independent_degree_two_recurrence[0.6-CheckNodeSerialSchedule]
+FAILED tests/canonical/test_boundary_fixes.py::test_local_damping_matches_independent_degree_two_recurrence[0.6-VariableNodeSerialSchedule]
+FAILED tests/canonical/test_boundary_fixes.py::test_local_damping_matches_independent_degree_two_recurrence[0.6-LayeredSchedule]
+FAILED tests/canonical/test_boundary_fixes.py::test_local_entry_clipping_uses_active_v1_cap[CheckNodeSerialSchedule]
+FAILED tests/canonical/test_boundary_fixes.py::test_local_entry_clipping_uses_active_v1_cap[VariableNodeSerialSchedule]
+FAILED tests/canonical/test_boundary_fixes.py::test_local_entry_clipping_uses_active_v1_cap[LayeredSchedule]
+9 failed, 3 passed, 15 deselected in 1.54s

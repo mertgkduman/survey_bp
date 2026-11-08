@@ -18,7 +18,7 @@ Reuses the independent oracles and pinned primary-source investigation in spikes
 Started from boundary audit at 02d165e; historical evidence is retained unchanged.
 
 ## Results
-15 regression cases failed before the fix. All 174 construction/profile/compiled BP4 tests passed after it. Constructors now enforce semantic admission, canonical CSR consistency and immutable buffer ownership, including dataclass replacement. Conflicting flooding/kernel profiles are rejected. Validation occurs once at graph construction; decoding arithmetic is unchanged.
+15 regression cases failed before the fix. All 175 construction/profile/compiled BP4 tests passed after it. Constructors now enforce semantic admission, canonical CSR consistency and immutable buffer ownership, including dataclass replacement. Conflicting flooding/kernel profiles are rejected. Validation occurs once at graph construction; decoding arithmetic is unchanged.
 
 ## How to Run
 `.venv/bin/python -m pytest tests/canonical/test_boundary_fixes.py tests/canonical/test_kernel_contract_admission.py tests/canonical/quaternary/test_compiled_bp4.py -q`
