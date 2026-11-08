@@ -33,6 +33,8 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 
 - Fix V3-A01, V3-A02, then V3-A03 in that order as explicitly requested; preserve numerical execution and historical audit evidence.
 
+- Continue post-fix verification in the approved mathematical, upstream, policy, execution order; target boundary and alternate-entry gaps as spikes 019–022 without changing production behavior.
+
 ## Spikes
 
 | # | Idea | Name | Type | Validates | Verdict | Tags |
@@ -55,3 +57,7 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 | 016 | canonical-kernel-audit | Scalar admission fix | standard | Given a min-sum profile without its update rule, when constructed, then scalar and compiled APIs reject ambiguity | VALIDATED | fixes, contracts |
 | 017 | canonical-kernel-audit | Profile evidence fix | standard | Given a numerical profile, when admitted, then fixed semantic fields describe execution and supported knobs remain usable | VALIDATED | fixes, contracts |
 | 018 | canonical-kernel-audit | Public summary fix | standard | Given replayable evidence, when result claims are altered, then verification rejects inconsistent summaries | VALIDATED | fixes, contracts |
+| 019 | canonical-kernel-audit | Numerical envelope | standard | Given finite messages across scales and degrees, when independently evaluated, then error and adaptation boundaries are explicit | PARTIAL | boundary-audit |
+| 020 | canonical-kernel-audit | Upstream numerical envelope | standard | Given aligned boundary inputs, when pinned native implementations run, then discrepancies and safeguards are explained | PENDING | boundary-audit |
+| 021 | canonical-kernel-audit | Policy entry-point closure | standard | Given alternate constructors and composed updates, when admitted, then execution matches declared semantics | PENDING | boundary-audit |
+| 022 | canonical-kernel-audit | CPU boundary and graph integrity | standard | Given qualified graphs and bounded observations, when execution is batched or state reused, then validity, work and graph identity agree | PENDING | boundary-audit |
