@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import math
-from bp_registry.check_numerics import stabilized_log_ratio, minsum_summary, tanh_factors, stable_check_extrinsics
+from bp_registry.check_numerics import stabilized_log_ratio, minsum_summary, tanh_factors, stable_check_extrinsics, finite_state
 
 import numpy as np
 from numba import njit
@@ -170,6 +170,9 @@ def _normalize_marginals(beliefs: np.ndarray, marginals: np.ndarray) -> None:
     weights = np.empty(4, dtype=np.float64)
     for variable in range(len(beliefs)):
         x, y, z = beliefs[variable, 0], beliefs[variable, 1], beliefs[variable, 2]
+        finite_state(x)
+        finite_state(y)
+        finite_state(z)
         weights[0], weights[1], weights[2], weights[3] = 0.0, -x, -y, -z
         maximum = max(weights[0], weights[1], weights[2], weights[3])
         total = 0.0
@@ -361,7 +364,7 @@ def _policy_sweep_into(
                 edge = variable_edges[position]
                 if _anticommutes(labels[edge], state):
                     value += c2v[edge]
-            beliefs[variable, state - 1] = round_message(value, format_code, scale) if scope == 2 else value
+            beliefs[variable, state - 1] = round_message(value, format_code, scale) if scope == 2 else finite_state(value)
         x, y, z = beliefs[variable, 0], beliefs[variable, 1], beliefs[variable, 2]
         if hard_decision == 2:
             candidate[variable] = _map_pauli(x, y, z)
@@ -388,8 +391,10 @@ def _policy_sweep_into(
                 proposal -= c2v[edge]
             if scope >= 1:
                 proposal = round_message(proposal, format_code, scale)
+            else:
+                proposal = finite_state(proposal)
             value = old_weight * old_v2c[edge, state - 1] + fresh_weight * proposal
-            new_v2c[edge, state - 1] = round_message(value, format_code, scale) if scope >= 1 else value
+            new_v2c[edge, state - 1] = round_message(value, format_code, scale) if scope >= 1 else finite_state(value)
 
 
 @njit(cache=True)

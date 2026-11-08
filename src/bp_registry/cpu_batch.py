@@ -37,6 +37,25 @@ def _binary_batch(row_ptr, variables, n, syndromes, prior, limit, cap, epsilon,
     return candidates, iterations, converged
 
 
+@njit(cache=True, inline="never")
+def _pauli_shot(row_ptr, variable_ptr, variable_edges, variables, labels, priors,
+                 syndrome, limit, cap, epsilon, damping, stop, use_policy,
+                 fmt, scale, scope, rule, old, fresh, alpha, beta, decision, shortcut, band):
+    # Keep exception exits outside prange so independent shots remain parallel.
+    try:
+        if use_policy:
+            c, it, ok = pauli_policy(row_ptr, variable_ptr, variable_edges, variables, labels,
+                priors, syndrome, limit, fmt, scale, scope, rule, old, fresh,
+                alpha, beta, decision, shortcut, stop, band, epsilon, True)
+        else:
+            c, it, ok = pauli_decode(row_ptr, variable_ptr, variable_edges, variables, labels,
+                priors, syndrome, limit, cap, epsilon, damping, stop, True)
+        return c, it, ok, False
+    except Exception:
+        # Numba cannot carry exception instances out of a parallel worker.
+        return np.zeros(len(priors), dtype=np.uint8), 0, False, True
+
+
 @njit(cache=True, parallel=True)
 def _pauli_batch(row_ptr, variable_ptr, variable_edges, variables, labels, priors,
                  syndromes, limit, cap, epsilon, damping, stop, use_policy,
@@ -45,17 +64,15 @@ def _pauli_batch(row_ptr, variable_ptr, variable_edges, variables, labels, prior
     candidates = np.empty((count, len(priors)), dtype=np.uint8)
     iterations = np.empty(count, dtype=np.int64)
     converged = np.empty(count, dtype=np.bool_)
+    failures = np.empty(count, dtype=np.bool_)
     for shot in prange(count):
-        if use_policy:
-            c, it, ok = pauli_policy(row_ptr, variable_ptr, variable_edges, variables, labels,
-                priors, syndromes[shot], limit, fmt, scale, scope, rule, old, fresh,
-                alpha, beta, decision, shortcut, stop, band, epsilon, True)
-        else:
-            c, it, ok = pauli_decode(row_ptr, variable_ptr, variable_edges, variables, labels,
-                priors, syndromes[shot], limit, cap, epsilon, damping, stop, True)
+        c, it, ok, failed = _pauli_shot(
+            row_ptr, variable_ptr, variable_edges, variables, labels, priors,
+            syndromes[shot], limit, cap, epsilon, damping, stop, use_policy,
+            fmt, scale, scope, rule, old, fresh, alpha, beta, decision, shortcut, band)
         candidates[shot] = c
-        iterations[shot], converged[shot] = it, ok
-    return candidates, iterations, converged
+        iterations[shot], converged[shot], failures[shot] = it, ok, failed
+    return candidates, iterations, converged, failures
 
 
 @dataclass(frozen=True)
@@ -121,6 +138,11 @@ def _execute(function, args, graph, s, workers, limit, stop, prior):
         arrays = function(*args)
     finally:
         set_num_threads(previous)
+    if len(arrays) == 4:
+        failures = np.flatnonzero(arrays[3])
+        if len(failures):
+            raise ValueError(f"compiled BP4 execution failed for shot indices {failures.tolist()}; no batch result")
+        arrays = arrays[:3]
     for array in (*arrays, s):
         array.setflags(write=False)
     identity = sha256(str(arrays[0].shape[1]).encode())

@@ -1,0 +1,246 @@
+FFFFFFF.                                                                 [100%]
+=================================== FAILURES ===================================
+____ test_bp4_overflow_rejected_across_sweep_single_and_batch[scalar_edges] ____
+
+scope = 'scalar_edges'
+
+    @pytest.mark.parametrize('scope',['scalar_edges','all_messages','all_state'])
+    def test_bp4_overflow_rejected_across_sweep_single_and_batch(scope):
+        policy=replace(STABLE_SPA_F64,damping=0.,zero_syndrome_shortcut=False,resolution=ResolutionPolicy('float64',scope=scope))
+        graph=CompiledBp4Graph.from_code(PauliCode(checks=np.ones((3,2),dtype=np.uint8)),np.tile([.7,.1,.1,.1],(2,1)),policy=policy)
+        graph=replace(graph,prior_llrs=np.full((2,3),1e308));syndrome=np.ones(3,dtype=np.uint8)
+        old=graph.initial_v2c();snapshot=old.copy();prior=graph.prior_llrs.copy();threads=get_num_threads()
+>       with pytest.raises(ValueError,match='nonfinite'):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:61: Failed
+____ test_bp4_overflow_rejected_across_sweep_single_and_batch[all_messages] ____
+
+address = 139991944352544
+bytedata = b'\x80\x04\x95\x15\x00\x00\x00\x00\x00\x00\x00\x8c\x05numpy\x94\x8c\x07ndarray\x94\x93\x94.'
+hashed = b'\xdf\xbc\xfd\xd3\x9f\xcb&\xf4\xd0\xc6\x80\x95D\x87\xb8\xc0\xb5;\xb8\xa3'
+
+    def _numba_unpickle(address, bytedata, hashed):
+        """Used by `numba_unpickle` from _helperlib.c
+    
+        Parameters
+        ----------
+        address : int
+        bytedata : bytes
+        hashed : bytes
+    
+        Returns
+        -------
+        obj : object
+            unpickled object
+        """
+        key = (address, hashed)
+        try:
+>           obj = _unpickled_memo[key]
+                  ^^^^^^^^^^^^^^^^^^^^
+
+/hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numba/core/serialize.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numba/core/serialize.py:46: in _numba_unpickle
+    obj = _unpickled_memo[key]
+          ^^^^^^^^^^^^^^^^^^^^
+/hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numba/core/serialize.py:46: in _numba_unpickle
+    obj = _unpickled_memo[key]
+          ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   raise ValueError("nonfinite BP message or coefficient")
+E   ValueError: nonfinite BP message or coefficient
+
+src/bp_registry/resolution.py:33: ValueError
+
+The above exception was the direct cause of the following exception:
+
+scope = 'all_messages'
+
+    @pytest.mark.parametrize('scope',['scalar_edges','all_messages','all_state'])
+    def test_bp4_overflow_rejected_across_sweep_single_and_batch(scope):
+        policy=replace(STABLE_SPA_F64,damping=0.,zero_syndrome_shortcut=False,resolution=ResolutionPolicy('float64',scope=scope))
+        graph=CompiledBp4Graph.from_code(PauliCode(checks=np.ones((3,2),dtype=np.uint8)),np.tile([.7,.1,.1,.1],(2,1)),policy=policy)
+        graph=replace(graph,prior_llrs=np.full((2,3),1e308));syndrome=np.ones(3,dtype=np.uint8)
+        old=graph.initial_v2c();snapshot=old.copy();prior=graph.prior_llrs.copy();threads=get_num_threads()
+        with pytest.raises(ValueError,match='nonfinite'):
+            graph.sweep(old,syndrome)
+        with pytest.raises(ValueError,match='nonfinite'):
+            graph.run(syndrome,max_iterations=1)
+        for workers in (1,2):
+            with pytest.raises(ValueError,match='BP4.*failed'):
+>               graph.run_batch(np.array([syndrome,syndrome]),max_iterations=1,workers=workers)
+
+tests/canonical/test_freeze_fixes.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/quaternary/compiled.py:800: in run_batch
+    return pauli_batch(self, syndromes, max_iterations=max_iterations, workers=workers, stop_on_convergence=stop_on_convergence)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/cpu_batch.py:168: in pauli_batch
+    return _execute(_pauli_batch,args,graph,s,workers,max_iterations,stop_on_convergence,graph.prior_llrs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+function = CPUDispatcher(<function _pauli_batch at 0x7f526a3da340>)
+args = (array([0, 2, 4, 6]), array([0, 3, 6]), array([0, 2, 4, 1, 3, 5]), array([0, 1, 0, 1, 0, 1]), array([1, 1, 1, 1, 1, 1], dtype=uint8), array([[1.e+308, 1.e+308, 1.e+308],
+       [1.e+308, 1.e+308, 1.e+308]]), ...)
+graph = CompiledBp4Graph(row_ptr=array([0, 2, 4, 6]), variable_ptr=array([0, 3, 6]), variable_edges=array([0, 2, 4, 1, 3, 5]),...ero_syndrome_shortcut=False, version='bp-flooding-policy-v3', check_stabilization='log_domain', product_epsilon=1e-10))
+s = array([[1, 1, 1],
+       [1, 1, 1]], dtype=uint8), workers = 1, limit = 1
+stop = True
+prior = array([[1.e+308, 1.e+308, 1.e+308],
+       [1.e+308, 1.e+308, 1.e+308]])
+
+    def _execute(function, args, graph, s, workers, limit, stop, prior):
+        previous = get_num_threads()
+        try:
+            set_num_threads(workers)
+>           arrays = function(*args)
+                     ^^^^^^^^^^^^^^^
+E           SystemError: CPUDispatcher(<function _pauli_batch at 0x7f526a3da340>) returned a result with an exception set
+
+src/bp_registry/cpu_batch.py:121: SystemError
+_____ test_bp4_overflow_rejected_across_sweep_single_and_batch[all_state] ______
+
+address = 139991944352544
+bytedata = b'\x80\x04\x95\x15\x00\x00\x00\x00\x00\x00\x00\x8c\x05numpy\x94\x8c\x07ndarray\x94\x93\x94.'
+hashed = b'\xdf\xbc\xfd\xd3\x9f\xcb&\xf4\xd0\xc6\x80\x95D\x87\xb8\xc0\xb5;\xb8\xa3'
+
+    def _numba_unpickle(address, bytedata, hashed):
+        """Used by `numba_unpickle` from _helperlib.c
+    
+        Parameters
+        ----------
+        address : int
+        bytedata : bytes
+        hashed : bytes
+    
+        Returns
+        -------
+        obj : object
+            unpickled object
+        """
+        key = (address, hashed)
+        try:
+>           obj = _unpickled_memo[key]
+                  ^^^^^^^^^^^^^^^^^^^^
+
+/hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numba/core/serialize.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numba/core/serialize.py:46: in _numba_unpickle
+    obj = _unpickled_memo[key]
+          ^^^^^^^^^^^^^^^^^^^^
+/hpc/home/mg551/miniconda3/lib/python3.12/site-packages/numba/core/serialize.py:46: in _numba_unpickle
+    obj = _unpickled_memo[key]
+          ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   raise ValueError("nonfinite BP message or coefficient")
+E   ValueError: nonfinite BP message or coefficient
+
+src/bp_registry/resolution.py:33: ValueError
+
+The above exception was the direct cause of the following exception:
+
+scope = 'all_state'
+
+    @pytest.mark.parametrize('scope',['scalar_edges','all_messages','all_state'])
+    def test_bp4_overflow_rejected_across_sweep_single_and_batch(scope):
+        policy=replace(STABLE_SPA_F64,damping=0.,zero_syndrome_shortcut=False,resolution=ResolutionPolicy('float64',scope=scope))
+        graph=CompiledBp4Graph.from_code(PauliCode(checks=np.ones((3,2),dtype=np.uint8)),np.tile([.7,.1,.1,.1],(2,1)),policy=policy)
+        graph=replace(graph,prior_llrs=np.full((2,3),1e308));syndrome=np.ones(3,dtype=np.uint8)
+        old=graph.initial_v2c();snapshot=old.copy();prior=graph.prior_llrs.copy();threads=get_num_threads()
+        with pytest.raises(ValueError,match='nonfinite'):
+            graph.sweep(old,syndrome)
+        with pytest.raises(ValueError,match='nonfinite'):
+            graph.run(syndrome,max_iterations=1)
+        for workers in (1,2):
+            with pytest.raises(ValueError,match='BP4.*failed'):
+>               graph.run_batch(np.array([syndrome,syndrome]),max_iterations=1,workers=workers)
+
+tests/canonical/test_freeze_fixes.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/bp_registry/quaternary/compiled.py:800: in run_batch
+    return pauli_batch(self, syndromes, max_iterations=max_iterations, workers=workers, stop_on_convergence=stop_on_convergence)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/bp_registry/cpu_batch.py:168: in pauli_batch
+    return _execute(_pauli_batch,args,graph,s,workers,max_iterations,stop_on_convergence,graph.prior_llrs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+function = CPUDispatcher(<function _pauli_batch at 0x7f526a3da340>)
+args = (array([0, 2, 4, 6]), array([0, 3, 6]), array([0, 2, 4, 1, 3, 5]), array([0, 1, 0, 1, 0, 1]), array([1, 1, 1, 1, 1, 1], dtype=uint8), array([[1.e+308, 1.e+308, 1.e+308],
+       [1.e+308, 1.e+308, 1.e+308]]), ...)
+graph = CompiledBp4Graph(row_ptr=array([0, 2, 4, 6]), variable_ptr=array([0, 3, 6]), variable_edges=array([0, 2, 4, 1, 3, 5]),...ero_syndrome_shortcut=False, version='bp-flooding-policy-v3', check_stabilization='log_domain', product_epsilon=1e-10))
+s = array([[1, 1, 1],
+       [1, 1, 1]], dtype=uint8), workers = 1, limit = 1
+stop = True
+prior = array([[1.e+308, 1.e+308, 1.e+308],
+       [1.e+308, 1.e+308, 1.e+308]])
+
+    def _execute(function, args, graph, s, workers, limit, stop, prior):
+        previous = get_num_threads()
+        try:
+            set_num_threads(workers)
+>           arrays = function(*args)
+                     ^^^^^^^^^^^^^^^
+E           SystemError: CPUDispatcher(<function _pauli_batch at 0x7f526a3da340>) returned a result with an exception set
+
+src/bp_registry/cpu_batch.py:121: SystemError
+____________ test_bp4_batch_failure_has_no_partial_result_or_ledger ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-221/test_bp4_batch_failure_has_no_0')
+
+    def test_bp4_batch_failure_has_no_partial_result_or_ledger(tmp_path):
+        policy=replace(STABLE_SPA_F64,damping=0.,resolution=ResolutionPolicy('float64',scope='scalar_edges'))
+        graph=CompiledBp4Graph.from_code(PauliCode(checks=np.ones((3,2),dtype=np.uint8)),np.tile([.7,.1,.1,.1],(2,1)),policy=policy)
+        graph=replace(graph,prior_llrs=np.full((2,3),1e308))
+        # First row converges initially; only the second row overflows.
+        path=tmp_path/'events.jsonl';path.write_text('retained ledger\n')
+>       with pytest.raises(ValueError,match=r'indices \[1\]'):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:79: Failed
+__________ test_marginal_normalization_rejects_nonfinite_beliefs[nan] __________
+
+bad = nan
+
+    @pytest.mark.parametrize('bad',[np.nan,np.inf,-np.inf])
+    def test_marginal_normalization_rejects_nonfinite_beliefs(bad):
+        from bp_registry.quaternary.compiled import _normalize_marginals
+>       with pytest.raises(ValueError,match='nonfinite'):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:86: Failed
+__________ test_marginal_normalization_rejects_nonfinite_beliefs[inf] __________
+
+bad = inf
+
+    @pytest.mark.parametrize('bad',[np.nan,np.inf,-np.inf])
+    def test_marginal_normalization_rejects_nonfinite_beliefs(bad):
+        from bp_registry.quaternary.compiled import _normalize_marginals
+>       with pytest.raises(ValueError,match='nonfinite'):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:86: Failed
+_________ test_marginal_normalization_rejects_nonfinite_beliefs[-inf] __________
+
+bad = -inf
+
+    @pytest.mark.parametrize('bad',[np.nan,np.inf,-np.inf])
+    def test_marginal_normalization_rejects_nonfinite_beliefs(bad):
+        from bp_registry.quaternary.compiled import _normalize_marginals
+>       with pytest.raises(ValueError,match='nonfinite'):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:86: Failed
+=========================== short test summary info ============================
+FAILED tests/canonical/test_freeze_fixes.py::test_bp4_overflow_rejected_across_sweep_single_and_batch[scalar_edges]
+FAILED tests/canonical/test_freeze_fixes.py::test_bp4_overflow_rejected_across_sweep_single_and_batch[all_messages]
+FAILED tests/canonical/test_freeze_fixes.py::test_bp4_overflow_rejected_across_sweep_single_and_batch[all_state]
+FAILED tests/canonical/test_freeze_fixes.py::test_bp4_batch_failure_has_no_partial_result_or_ledger
+FAILED tests/canonical/test_freeze_fixes.py::test_marginal_normalization_rejects_nonfinite_beliefs[nan]
+FAILED tests/canonical/test_freeze_fixes.py::test_marginal_normalization_rejects_nonfinite_beliefs[inf]
+FAILED tests/canonical/test_freeze_fixes.py::test_marginal_normalization_rejects_nonfinite_beliefs[-inf]
+7 failed, 1 passed, 28 deselected in 2.71s

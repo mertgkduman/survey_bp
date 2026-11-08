@@ -76,5 +76,5 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 | 029 | canonical-kernel-audit | Schedule policy closure | standard | Given corrected kernels, when audited, then all advertised numerical controls remain active or are explicitly rejected across schedules | PARTIAL | freeze-audit |
 | 030 | canonical-kernel-audit | Freeze execution audit | standard | Given corrected kernels, when audited, then construction, public reachability, CPU execution and evidence agree across supported policy boundaries | PARTIAL | freeze-audit |
 | 031 | canonical-kernel-audit | prior-state-fix | standard | Given an admitted configuration, when executed, then normalized stored priors are finite before shortcuts | VALIDATED | fixes |
-| 032 | canonical-kernel-audit | bp4-failure-fix | standard | Given an admitted configuration, when executed, then all BP4 scopes fail consistently on nonfinite state | IN_PROGRESS | fixes |
+| 032 | canonical-kernel-audit | bp4-failure-fix | standard | Given an admitted configuration, when executed, then all BP4 scopes fail consistently on nonfinite state | VALIDATED | fixes |
 | 033 | canonical-kernel-audit | residual-admission-fix | standard | Given an admitted configuration, when executed, then conventional residual scheduling rejects incompatible damping | IN_PROGRESS | fixes |

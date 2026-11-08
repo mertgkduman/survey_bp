@@ -90,3 +90,11 @@ def stable_check_extrinsics(values, row_ptr, syndrome, epsilon, output):
             message = unary if stop - start == 1 else stable_boxplus(prefix[edge], suffix)
             output[edge] = -message if syndrome[check] else message
             suffix = stable_boxplus(values[edge], suffix)
+
+
+@register_jitable
+def finite_state(value: float) -> float:
+    """Reject nonfinite live state independently of message rounding scope."""
+    if not math.isfinite(value):
+        raise ValueError("nonfinite BP state")
+    return value
