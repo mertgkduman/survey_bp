@@ -11,6 +11,7 @@ from __future__ import annotations
 from enum import IntEnum
 
 import numpy as np
+from bp_registry.compiled_contracts import immutable_snapshot
 
 
 class Pauli(IntEnum):
@@ -23,14 +24,13 @@ class Pauli(IntEnum):
 
 
 _SYMPLECTIC = np.asarray(((0, 0), (1, 0), (1, 1), (0, 1)), dtype=np.uint8)
-_SYMPLECTIC.setflags(write=False)
+_SYMPLECTIC = immutable_snapshot(_SYMPLECTIC)
 _FROM_SYMPLECTIC = np.asarray(((Pauli.I, Pauli.Z), (Pauli.X, Pauli.Y)), dtype=np.uint8)
-_FROM_SYMPLECTIC.setflags(write=False)
+_FROM_SYMPLECTIC = immutable_snapshot(_FROM_SYMPLECTIC)
 
 
 def _readonly(value: np.ndarray) -> np.ndarray:
-    result = np.array(value, copy=True)
-    result.setflags(write=False)
+    result = immutable_snapshot(value)
     return result
 
 

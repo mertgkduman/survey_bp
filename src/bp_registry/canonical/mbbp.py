@@ -15,6 +15,7 @@ import math
 from typing import Callable, Literal
 
 import numpy as np
+from bp_registry.compiled_contracts import immutable_snapshot
 
 from .budgets import BudgetLimit, BudgetTree, WorkVector
 from .candidate_selection import CandidateOrigin, FrequencyOverWeightScore, FrozenCandidateSelection, freeze_candidate_list
@@ -31,8 +32,7 @@ def _readonly_binary(value: object, *, ndim: int, name: str) -> np.ndarray:
     array = np.asarray(value)
     if array.ndim != ndim or not np.issubdtype(array.dtype, np.integer) or np.any((array != 0) & (array != 1)):
         raise ValueError(f"{name} must be a binary integer array with {ndim} dimensions")
-    copied = np.array(array, dtype=np.uint8, copy=True)
-    copied.setflags(write=False)
+    copied = immutable_snapshot(array, dtype=np.uint8)
     return copied
 
 

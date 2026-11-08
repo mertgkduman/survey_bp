@@ -7,6 +7,7 @@ from hashlib import sha256
 import json
 
 import numpy as np
+from bp_registry.compiled_contracts import immutable_snapshot
 
 from .lineage import LineageEdge, LineageId, stable_lineage_id
 from .problems import OriginalProblem, WorkingProblem
@@ -16,8 +17,7 @@ def _bits(value: object, *, length: int, name: str) -> np.ndarray:
     array = np.asarray(value)
     if array.shape != (length,) or not np.issubdtype(array.dtype, np.integer) or np.any((array != 0) & (array != 1)):
         raise ValueError(f"{name} must be a binary vector of length {length}")
-    result = np.array(array, dtype=np.uint8, copy=True)
-    result.setflags(write=False)
+    result = immutable_snapshot(array, dtype=np.uint8)
     return result
 
 
@@ -197,7 +197,7 @@ def lift_candidate(working: WorkingProblem, certificate: LiftMap, candidate: np.
         raise ValueError("unknown lift mode")
     working_valid = bool(np.array_equal((working.check_matrix.astype(np.int64) @ y.astype(np.int64)) % 2, working.syndrome))
     original_valid = bool(np.array_equal((original.hz.astype(np.int64) @ full.astype(np.int64)) % 2, original.syndrome))
-    full.setflags(write=False)
+    full = immutable_snapshot(full)
     reason = None if working_valid and original_valid else (
         "contradictory_empty_check" if working.check_matrix.shape[1] == 0 and not working_valid
         else "working_syndrome_invalid" if not working_valid else "original_syndrome_invalid"

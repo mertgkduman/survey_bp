@@ -10,6 +10,7 @@ from hashlib import sha256
 from typing import Any, Mapping
 
 import numpy as np
+from bp_registry.compiled_contracts import immutable_snapshot
 
 from .contracts import MemoryCompositionSpec
 from .memory import (
@@ -154,8 +155,7 @@ class MemoryFloodingSchedule(FloodingSchedule):
         self._assignments = tuple(assignments)
 
     def _bounded(self, value: np.ndarray, name: str) -> np.ndarray:
-        array = np.array(finite_saturate(value, boundary=name, profile=self.profile), copy=True)
-        array.setflags(write=False)
+        array = immutable_snapshot(finite_saturate(value, boundary=name, profile=self.profile))
         return array
 
     def initialize(self, error_rate: float) -> np.ndarray:
@@ -502,7 +502,7 @@ class LocalMemoryExecution:
         )
         self._assignment_evidence = tuple(None for _ in self.memory.bindings)
         self._base_prior = np.array(beliefs, copy=True)
-        self._base_prior.setflags(write=False)
+        self._base_prior = immutable_snapshot(self._base_prior)
         self._active_prior = None
         self._pending_prior_proposals = None
         self._source_iterations = 0
@@ -689,15 +689,14 @@ class LocalMemoryExecution:
         array = np.asarray(finite_saturate(value, boundary=boundary, profile=self._profile), dtype=np.float64)
         if array.shape != (length,) or not np.all(np.isfinite(array)):
             raise ValueError(f"{boundary} must be a finite canonical vector")
-        copied = np.array(array, copy=True)
-        copied.setflags(write=False)
+        copied = immutable_snapshot(array)
         return copied
 
     def _per_variable_c2v(self, c2v: np.ndarray) -> np.ndarray:
         values = self._bounded(c2v, "local_memory_fresh_c2v", self.edge_table.edge_count)
         reduced = np.zeros((1, self.edge_table.variable_count), dtype=np.float64)
         np.add.at(reduced[0], np.asarray([variable for _check, variable in self.edge_table.edges], dtype=np.intp), values)
-        reduced.setflags(write=False)
+        reduced = immutable_snapshot(reduced)
         return reduced
 
     def observe_candidate(self, *, origin: Mapping[str, object], candidate: np.ndarray | None) -> None:

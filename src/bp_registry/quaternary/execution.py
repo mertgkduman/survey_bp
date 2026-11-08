@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 import numpy as np
+from bp_registry.compiled_contracts import immutable_snapshot
 
 from ..canonical.numerics import boxplus
 from ..canonical.budgets import BudgetLimit, BudgetTree
@@ -51,8 +52,7 @@ def _readonly(value: object, *, shape: tuple[int, ...], name: str, values: set[i
         raise ValueError(f"{name} has an invalid shape")
     if values is not None and np.any(~np.isin(result, tuple(values))):
         raise ValueError(f"{name} contains invalid values")
-    copy = np.array(result, dtype=np.uint8, copy=True)
-    copy.setflags(write=False)
+    copy = immutable_snapshot(result, dtype=np.uint8)
     return copy
 
 
@@ -102,7 +102,7 @@ def syndrome_for(problem: TracerPauliProblem, error: np.ndarray) -> np.ndarray:
         for qubit, label in enumerate(problem.checks[check]):
             parity ^= int(not _commutes(int(label), int(candidate[qubit])))
         answer[check] = parity
-    answer.setflags(write=False)
+    answer = immutable_snapshot(answer)
     return answer
 
 
@@ -119,7 +119,7 @@ def _sample(channel: np.ndarray, *, seed_identity: str) -> np.ndarray:
     seed = int.from_bytes(sha256(seed_identity.encode("utf-8")).digest()[:16], "big")
     rng = np.random.Generator(np.random.PCG64(seed))
     values = np.asarray([rng.choice(4, p=row) for row in channel], dtype=np.uint8)
-    values.setflags(write=False)
+    values = immutable_snapshot(values)
     return values
 
 

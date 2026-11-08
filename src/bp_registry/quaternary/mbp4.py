@@ -16,6 +16,7 @@ import math
 import numbers
 
 import numpy as np
+from bp_registry.compiled_contracts import immutable_snapshot
 
 from ..canonical.budgets import BudgetTree, WorkVector
 from .algebra import Pauli, anticommutes
@@ -30,8 +31,7 @@ _SOURCE_REVISION = "kuo-lai-2023-arxiv-2104.13659v2"
 
 
 def _readonly(value: object, *, dtype: np.dtype | type) -> np.ndarray:
-    result = np.array(value, dtype=dtype, copy=True)
-    result.setflags(write=False)
+    result = immutable_snapshot(value, dtype=dtype)
     return result
 
 

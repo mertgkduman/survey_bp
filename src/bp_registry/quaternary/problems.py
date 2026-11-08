@@ -8,6 +8,7 @@ import json
 from typing import Literal
 
 import numpy as np
+from bp_registry.compiled_contracts import immutable_snapshot
 
 from ..canonical.lineage import LineageEdge, LineageId
 from ..code_constructions import derive_css_logicals
@@ -24,8 +25,7 @@ def _readonly(value: object, *, name: str, ndim: int) -> np.ndarray:
         raise ValueError(f"{name} must be a {ndim}D integer Pauli array")
     if np.any((array < Pauli.I) | (array > Pauli.Z)):
         raise ValueError(f"{name} must use I=0, X=1, Y=2, Z=3 labels")
-    copied = np.array(array, dtype=np.uint8, copy=True)
-    copied.setflags(write=False)
+    copied = immutable_snapshot(array, dtype=np.uint8)
     return copied
 
 
@@ -33,8 +33,7 @@ def _binary(value: object, *, name: str, length: int) -> np.ndarray:
     array = np.asarray(value)
     if array.shape != (length,) or not np.issubdtype(array.dtype, np.integer) or np.any((array != 0) & (array != 1)):
         raise ValueError(f"{name} must be a binary vector matching the ordered checks")
-    copied = np.array(array, dtype=np.uint8, copy=True)
-    copied.setflags(write=False)
+    copied = immutable_snapshot(array, dtype=np.uint8)
     return copied
 
 

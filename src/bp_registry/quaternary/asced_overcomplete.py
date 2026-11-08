@@ -15,6 +15,7 @@ import json
 from typing import Literal
 
 import numpy as np
+from bp_registry.compiled_contracts import immutable_snapshot
 
 from ..css import gf2_rank
 from .asced import QualifiedAscedBatch, _verify_qualified_batch
@@ -36,8 +37,7 @@ def _binary_matrix(value: object, *, name: str) -> np.ndarray:
     array = np.asarray(value)
     if array.ndim != 2 or not np.issubdtype(array.dtype, np.integer) or np.any((array != 0) & (array != 1)):
         raise ValueError(f"{name} must be a two-dimensional binary integer matrix")
-    result = np.array(array, dtype=np.uint8, copy=True)
-    result.setflags(write=False)
+    result = immutable_snapshot(array, dtype=np.uint8)
     return result
 
 
@@ -45,8 +45,7 @@ def _binary_vector(value: object, *, name: str, length: int) -> np.ndarray:
     array = np.asarray(value)
     if array.shape != (length,) or not np.issubdtype(array.dtype, np.integer) or np.any((array != 0) & (array != 1)):
         raise ValueError(f"{name} must be a binary vector of length {length}")
-    result = np.array(array, dtype=np.uint8, copy=True)
-    result.setflags(write=False)
+    result = immutable_snapshot(array, dtype=np.uint8)
     return result
 
 
@@ -90,10 +89,9 @@ def _pauli_support_matrix(value: object, *, row_map: tuple[tuple[str, str, int],
     for row, (role, _origin, _index) in zip(raw, row_map):
         if np.any((row != 0) & (row != expected_value[role])):
             raise ValueError("constructed H_ext row Pauli type disagrees with its typed row map")
-    copied = np.array(raw, dtype=np.uint8, copy=True)
-    copied.setflags(write=False)
+    copied = immutable_snapshot(raw, dtype=np.uint8)
     support = np.asarray(copied != 0, dtype=np.uint8)
-    support.setflags(write=False)
+    support = immutable_snapshot(support)
     return copied, support
 
 
@@ -224,7 +222,7 @@ def map_overcomplete_syndrome(overcomplete: AscedOvercompleteMap, z_ext: object)
         raise ValueError("pinned source comparison maps cannot be applied in canonical execution")
     syndrome = _binary_vector(z_ext, name="z_ext", length=overcomplete.h_ext.shape[0])
     mapped = np.asarray((overcomplete.mapping.astype(np.int64) @ syndrome.astype(np.int64)) % 2, dtype=np.uint8)
-    mapped.setflags(write=False)
+    mapped = immutable_snapshot(mapped)
     return mapped
 
 
@@ -252,7 +250,7 @@ def assemble_extended_syndrome(
         for value, name, length in zip((s_x, g_x, s_z, g_z), ("s_X", "g_X", "s_Z", "g_Z"), groups)
     )
     result = np.concatenate(parts).astype(np.uint8, copy=False)
-    result.setflags(write=False)
+    result = immutable_snapshot(result)
     return result
 
 

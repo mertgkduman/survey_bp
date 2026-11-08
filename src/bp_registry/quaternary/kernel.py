@@ -9,6 +9,7 @@ import json
 import numbers
 
 import numpy as np
+from bp_registry.compiled_contracts import immutable_snapshot
 
 from ..canonical.budgets import BudgetTree, WorkVector
 from .algebra import Pauli, anticommutes
@@ -28,8 +29,7 @@ from .problems import QuaternaryOriginalProblem
 
 
 def _readonly(value: object, *, dtype: np.dtype | type) -> np.ndarray:
-    result = np.array(value, dtype=dtype, copy=True)
-    result.setflags(write=False)
+    result = immutable_snapshot(value, dtype=dtype)
     return result
 
 
@@ -39,8 +39,7 @@ def _priors(value: object, *, n: int) -> np.ndarray:
         raise ValueError("priors must be finite strictly positive (n, 4) I/X/Y/Z probabilities")
     if not np.allclose(probabilities.sum(axis=1), 1.0, atol=1e-12, rtol=0.0):
         raise ValueError("every quaternary prior must sum to one")
-    result = np.array(probabilities, dtype=np.float64, copy=True)
-    result.setflags(write=False)
+    result = immutable_snapshot(probabilities, dtype=np.float64)
     return result
 
 
@@ -245,7 +244,7 @@ class QbpSession:
         replacement = _priors(np.asarray(probabilities, dtype=np.float64)[None, :], n=1)[0]
         updated = np.array(self.priors, dtype=np.float64, copy=True)
         updated[int(variable)] = replacement
-        updated.setflags(write=False)
+        updated = immutable_snapshot(updated)
         self.priors = updated
         self._prior_llrs = np.asarray([self.kernel.prior_llrs(row) for row in self.priors], dtype=np.float64)
 

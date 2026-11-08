@@ -39,3 +39,15 @@ def finite_float64_scalar(value, name):
     if not math.isfinite(normalized):
         raise ValueError(f'{name} must be representable as finite float64')
     return normalized
+
+
+def immutable_snapshot(value, dtype=None):
+    """Copy validated numeric state into immutable storage, preserving its values.
+
+    Validation belongs to the caller; unlike immutable_array this helper does
+    not introduce new numerical admission rules for historical state objects.
+    """
+    array = np.asarray(value, dtype=dtype, order='C')
+    if array.dtype.hasobject:
+        raise ValueError('immutable snapshots require non-object storage')
+    return np.frombuffer(array.tobytes(), dtype=array.dtype).reshape(array.shape)

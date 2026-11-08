@@ -16,6 +16,7 @@ from math import comb
 from typing import Literal, Mapping
 
 import numpy as np
+from bp_registry.compiled_contracts import immutable_snapshot
 
 from ..canonical.budgets import WorkVector
 from ..css import CssCode, gf2_rank, semantic_sha256
@@ -52,8 +53,7 @@ def _readonly_binary(value: object, *, name: str, ndim: int) -> np.ndarray:
     array = np.asarray(value)
     if array.ndim != ndim or not np.issubdtype(array.dtype, np.integer) or np.any((array != 0) & (array != 1)):
         raise ValueError(f"{name} must be a {ndim}D binary integer array")
-    result = np.array(array, dtype=np.uint8, copy=True)
-    result.setflags(write=False)
+    result = immutable_snapshot(array, dtype=np.uint8)
     return result
 
 
@@ -61,8 +61,7 @@ def _readonly_pauli(value: object, *, name: str) -> np.ndarray:
     array = np.asarray(value)
     if array.ndim != 2 or not np.issubdtype(array.dtype, np.integer) or np.any((array < 0) | (array > 3)):
         raise ValueError(f"{name} must be a two-dimensional I/X/Y/Z array")
-    result = np.array(array, dtype=np.uint8, copy=True)
-    result.setflags(write=False)
+    result = immutable_snapshot(array, dtype=np.uint8)
     return result
 
 
@@ -478,7 +477,7 @@ def _path_syndrome(original: QuaternaryOriginalProblem, batch: AscedBatch, bits:
     g_x = np.asarray(bits[:x_splitters], dtype=np.uint8)
     g_z = np.asarray(bits[x_splitters:], dtype=np.uint8)
     result = np.concatenate((original.syndrome[:x_rows], g_x, original.syndrome[x_rows:x_rows + z_rows], g_z))
-    result.setflags(write=False)
+    result = immutable_snapshot(result)
     return result
 
 

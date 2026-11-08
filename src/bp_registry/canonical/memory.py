@@ -10,14 +10,14 @@ from threading import RLock
 from typing import Any, Literal
 
 import numpy as np
+from bp_registry.compiled_contracts import immutable_snapshot
 
 
 def _finite_vector(value: np.ndarray | tuple[float, ...], *, name: str) -> np.ndarray:
     vector = np.asarray(value, dtype=np.float64)
     if vector.ndim != 1 or vector.size == 0 or not np.all(np.isfinite(vector)):
         raise ValueError(f"{name} must be a nonempty finite float64 vector")
-    copied = np.array(vector, dtype=np.float64, copy=True)
-    copied.setflags(write=False)
+    copied = immutable_snapshot(vector, dtype=np.float64)
     return copied
 
 
@@ -25,8 +25,7 @@ def _finite_matrix(value: np.ndarray, *, name: str) -> np.ndarray:
     matrix = np.asarray(value, dtype=np.float64)
     if matrix.ndim != 2 or matrix.shape[0] == 0 or matrix.shape[1] == 0 or not np.all(np.isfinite(matrix)):
         raise ValueError(f"{name} must be a nonempty finite float64 matrix")
-    copied = np.array(matrix, dtype=np.float64, copy=True)
-    copied.setflags(write=False)
+    copied = immutable_snapshot(matrix, dtype=np.float64)
     return copied
 
 

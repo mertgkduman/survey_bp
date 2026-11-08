@@ -14,3 +14,5 @@ Prefilled from CANONICAL-KERNEL-COMPLETENESS-AUDIT.md at 6f68961. Eight D01 cont
 
 ## Resolution contract
 Preserve historical spikes 008–037. Separate functional commits in the approved order. Retain failing/passing tests in new spikes 038–042. Keep numerical profile identities, public manifest defaults, phase position and publication gates unchanged. Explicitly name corrected iteration-context execution and retain historical replay support.
+
+D03 committed 630a934: all circuit construction paths validated; 50 circuit checks passed. D04 ownership closure: 340 focused checks passed. Next: D01 context propagation and replay semantics.

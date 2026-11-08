@@ -12,6 +12,7 @@ from types import MappingProxyType
 from typing import Callable, Iterator, Literal, Mapping
 
 import numpy as np
+from bp_registry.compiled_contracts import immutable_snapshot
 
 from .budgets import BudgetTree, WallClockLimit, WorkVector
 from .contracts import FinitePriorBiasAction
@@ -63,8 +64,7 @@ def _frozen_f64(value: np.ndarray, length: int, name: str) -> np.ndarray:
     array = np.asarray(value, dtype=np.float64)
     if array.shape != (length,) or not np.all(np.isfinite(array)):
         raise ValueError(f"{name} must be a finite float64 vector of length {length}")
-    copied = np.array(array, copy=True)
-    copied.setflags(write=False)
+    copied = immutable_snapshot(array)
     return copied
 
 
@@ -144,7 +144,7 @@ class BpSession:
         if bits.shape != (edge_table.check_count,) or not np.issubdtype(bits.dtype, np.integer) or np.any((bits != 0) & (bits != 1)):
             raise ValueError("session syndrome must match the graph and be binary")
         self.syndrome = np.array(bits, dtype=np.uint8, copy=True)
-        self.syndrome.setflags(write=False)
+        self.syndrome = immutable_snapshot(self.syndrome)
         self.error_rate = error_rate
         if kernel is not None and not isinstance(kernel, BinarySpaKernel):
             raise ValueError("intervention session kernel must be a canonical binary kernel")
@@ -196,8 +196,7 @@ class BpSession:
         c = np.asarray(candidate)
         if c.shape != (n,) or not np.issubdtype(c.dtype, np.integer) or np.any((c != 0) & (c != 1)):
             raise ValueError("candidate must be a binary original-coordinate vector")
-        c = np.array(c, dtype=np.uint8, copy=True)
-        c.setflags(write=False)
+        c = immutable_snapshot(c, dtype=np.uint8)
         if pending_sign_target is not None and (type(pending_sign_target) is not int or not 0 <= pending_sign_target < n):
             raise ValueError("pending sign target must be a valid variable")
         prior_identity = sha256(p.tobytes()).hexdigest()

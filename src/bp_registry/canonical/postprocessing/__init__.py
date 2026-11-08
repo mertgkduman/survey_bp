@@ -8,6 +8,7 @@ from types import MappingProxyType
 from typing import Literal, Protocol
 
 import numpy as np
+from bp_registry.compiled_contracts import immutable_snapshot
 
 from ..problems import WorkingProblem
 from ..budgets import WorkVector
@@ -36,8 +37,7 @@ def _readonly_binary(value: np.ndarray, *, length: int, name: str) -> np.ndarray
     array = np.asarray(value)
     if array.shape != (length,) or not np.issubdtype(array.dtype, np.integer) or np.any((array != 0) & (array != 1)):
         raise ValueError(f"{name} must be a binary vector with the original column length")
-    copied = np.array(array, dtype=np.uint8, copy=True)
-    copied.setflags(write=False)
+    copied = immutable_snapshot(array, dtype=np.uint8)
     return copied
 
 
@@ -45,8 +45,7 @@ def _readonly_llr(value: np.ndarray, *, length: int) -> np.ndarray:
     array = np.asarray(value, dtype=np.float64)
     if array.shape != (length,) or not np.all(np.isfinite(array)):
         raise ValueError("posterior_llr must be finite and have the original column length")
-    copied = np.array(array, copy=True)
-    copied.setflags(write=False)
+    copied = immutable_snapshot(array)
     return copied
 
 

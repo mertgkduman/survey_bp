@@ -1,0 +1,17 @@
+{
+  "canonical/problems.py": 1,
+  "canonical/transformations.py": 2,
+  "canonical/mbbp.py": 1,
+  "canonical/postprocessing/__init__.py": 2,
+  "canonical/intervention_session.py": 3,
+  "canonical/memory.py": 2,
+  "canonical/memory_execution.py": 4,
+  "quaternary/problems.py": 2,
+  "quaternary/asced.py": 3,
+  "quaternary/asced_overcomplete.py": 6,
+  "quaternary/kernel.py": 3,
+  "quaternary/mbp4.py": 1,
+  "quaternary/execution.py": 3,
+  "quaternary/sampling.py": 4,
+  "quaternary/algebra.py": 3
+}

@@ -1,0 +1,188 @@
+FFFFFFF......FF                                                          [100%]
+=================================== FAILURES ===================================
+________________ test_binary_original_owns_immutable_state[hx] _________________
+
+field = 'hx'
+
+    @pytest.mark.parametrize('field',['hx','hz','syndrome'])
+    def test_binary_original_owns_immutable_state(field):
+        h=np.ones((1,2),dtype=np.uint8);s=np.ones(1,dtype=np.uint8)
+        original=OriginalProblem('original-a',h,h,s)
+        h[:]=0;s[:]=0
+        np.testing.assert_array_equal(getattr(original,field),np.ones_like(getattr(original,field)))
+>       assert_immutable(getattr(original,field))
+
+tests/canonical/test_model_ownership.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+array = array([[1, 1]], dtype=uint8)
+
+    def assert_immutable(array):
+>       with pytest.raises(ValueError):array.setflags(write=True)
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_model_ownership.py:15: Failed
+________________ test_binary_original_owns_immutable_state[hz] _________________
+
+field = 'hz'
+
+    @pytest.mark.parametrize('field',['hx','hz','syndrome'])
+    def test_binary_original_owns_immutable_state(field):
+        h=np.ones((1,2),dtype=np.uint8);s=np.ones(1,dtype=np.uint8)
+        original=OriginalProblem('original-a',h,h,s)
+        h[:]=0;s[:]=0
+        np.testing.assert_array_equal(getattr(original,field),np.ones_like(getattr(original,field)))
+>       assert_immutable(getattr(original,field))
+
+tests/canonical/test_model_ownership.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+array = array([[1, 1]], dtype=uint8)
+
+    def assert_immutable(array):
+>       with pytest.raises(ValueError):array.setflags(write=True)
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_model_ownership.py:15: Failed
+_____________ test_binary_original_owns_immutable_state[syndrome] ______________
+
+field = 'syndrome'
+
+    @pytest.mark.parametrize('field',['hx','hz','syndrome'])
+    def test_binary_original_owns_immutable_state(field):
+        h=np.ones((1,2),dtype=np.uint8);s=np.ones(1,dtype=np.uint8)
+        original=OriginalProblem('original-a',h,h,s)
+        h[:]=0;s[:]=0
+        np.testing.assert_array_equal(getattr(original,field),np.ones_like(getattr(original,field)))
+>       assert_immutable(getattr(original,field))
+
+tests/canonical/test_model_ownership.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+array = array([1], dtype=uint8)
+
+    def assert_immutable(array):
+>       with pytest.raises(ValueError):array.setflags(write=True)
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_model_ownership.py:15: Failed
+______________ test_pauli_code_identity_and_logical_maps[checks] _______________
+
+field = 'checks'
+
+    @pytest.mark.parametrize('field',['checks','logical_x','logical_z'])
+    def test_pauli_code_identity_and_logical_maps(field):
+        h=np.array([[1,1]],dtype=np.uint8);x=np.array([[1,0]],dtype=np.uint8);z=np.array([[3,3]],dtype=np.uint8)
+        code=PauliCode(checks=h,logical_x=x,logical_z=z);digest=code.semantic_sha256
+        h[:]=0;x[:]=0;z[:]=0
+        assert code.semantic_sha256==digest
+>       assert_immutable(getattr(code,field))
+
+tests/canonical/test_model_ownership.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+array = array([[1, 1]], dtype=uint8)
+
+    def assert_immutable(array):
+>       with pytest.raises(ValueError):array.setflags(write=True)
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_model_ownership.py:15: Failed
+_____________ test_pauli_code_identity_and_logical_maps[logical_x] _____________
+
+field = 'logical_x'
+
+    @pytest.mark.parametrize('field',['checks','logical_x','logical_z'])
+    def test_pauli_code_identity_and_logical_maps(field):
+        h=np.array([[1,1]],dtype=np.uint8);x=np.array([[1,0]],dtype=np.uint8);z=np.array([[3,3]],dtype=np.uint8)
+        code=PauliCode(checks=h,logical_x=x,logical_z=z);digest=code.semantic_sha256
+        h[:]=0;x[:]=0;z[:]=0
+        assert code.semantic_sha256==digest
+>       assert_immutable(getattr(code,field))
+
+tests/canonical/test_model_ownership.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+array = array([[1, 0]], dtype=uint8)
+
+    def assert_immutable(array):
+>       with pytest.raises(ValueError):array.setflags(write=True)
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_model_ownership.py:15: Failed
+_____________ test_pauli_code_identity_and_logical_maps[logical_z] _____________
+
+field = 'logical_z'
+
+    @pytest.mark.parametrize('field',['checks','logical_x','logical_z'])
+    def test_pauli_code_identity_and_logical_maps(field):
+        h=np.array([[1,1]],dtype=np.uint8);x=np.array([[1,0]],dtype=np.uint8);z=np.array([[3,3]],dtype=np.uint8)
+        code=PauliCode(checks=h,logical_x=x,logical_z=z);digest=code.semantic_sha256
+        h[:]=0;x[:]=0;z[:]=0
+        assert code.semantic_sha256==digest
+>       assert_immutable(getattr(code,field))
+
+tests/canonical/test_model_ownership.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+array = array([[3, 3]], dtype=uint8)
+
+    def assert_immutable(array):
+>       with pytest.raises(ValueError):array.setflags(write=True)
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_model_ownership.py:15: Failed
+__________________ test_quaternary_original_syndrome_identity __________________
+
+    def test_quaternary_original_syndrome_identity():
+        original=QuaternaryOriginalProblem('original-test',PauliCode(checks=np.array([[1,1]],dtype=np.uint8)),np.array([1],dtype=np.uint8))
+>       assert_immutable(original.syndrome)
+
+tests/canonical/test_model_ownership.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+array = array([1], dtype=uint8)
+
+    def assert_immutable(array):
+>       with pytest.raises(ValueError):array.setflags(write=True)
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_model_ownership.py:15: Failed
+______ test_dem_execution_identity_distinguishes_valid_prior_replacement _______
+
+    def test_dem_execution_identity_distinguishes_valid_prior_replacement():
+        model=DemBinaryModel.from_dem(stim.DetectorErrorModel('error(.1) L0'))
+        modified=replace(model,prior_llrs=-model.prior_llrs)
+        assert modified.dem_sha256==model.dem_sha256
+>       assert modified.execution_sha256!=model.execution_sha256
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'DemBinaryModel' object has no attribute 'execution_sha256'
+
+tests/canonical/test_model_ownership.py:58: AttributeError
+______________ test_policy_history_and_session_snapshot_ownership ______________
+
+    def test_policy_history_and_session_snapshot_ownership():
+        state=V2CDamping('damping-test',.5).initial_state(np.array([1.,2.]))
+>       assert_immutable(state.v2c)
+
+tests/canonical/test_model_ownership.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+array = array([1., 2.])
+
+    def assert_immutable(array):
+>       with pytest.raises(ValueError):array.setflags(write=True)
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_model_ownership.py:15: Failed
+=========================== short test summary info ============================
+FAILED tests/canonical/test_model_ownership.py::test_binary_original_owns_immutable_state[hx]
+FAILED tests/canonical/test_model_ownership.py::test_binary_original_owns_immutable_state[hz]
+FAILED tests/canonical/test_model_ownership.py::test_binary_original_owns_immutable_state[syndrome]
+FAILED tests/canonical/test_model_ownership.py::test_pauli_code_identity_and_logical_maps[checks]
+FAILED tests/canonical/test_model_ownership.py::test_pauli_code_identity_and_logical_maps[logical_x]
+FAILED tests/canonical/test_model_ownership.py::test_pauli_code_identity_and_logical_maps[logical_z]
+FAILED tests/canonical/test_model_ownership.py::test_quaternary_original_syndrome_identity
+FAILED tests/canonical/test_model_ownership.py::test_dem_execution_identity_distinguishes_valid_prior_replacement
+FAILED tests/canonical/test_model_ownership.py::test_policy_history_and_session_snapshot_ownership
+9 failed, 6 passed in 1.59s

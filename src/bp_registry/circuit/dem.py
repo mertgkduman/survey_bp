@@ -69,6 +69,19 @@ class DemBinaryModel:
         ):
             object.__setattr__(self, name, immutable_array(value, dtype))
 
+    @property
+    def execution_sha256(self) -> str:
+        """Bind validated execution bytes separately from the source DEM digest."""
+        identity = sha256(b"dem-binary-execution-v1")
+        identity.update(self.dem_sha256.encode())
+        identity.update(self.table.graph_sha256.encode())
+        identity.update(str(self.source_error_count).encode())
+        for value in (self.row_ptr, self.variables, self.observable_matrix, self.prior_llrs,
+                      self.syndrome_bias, self.observable_bias):
+            identity.update(str((value.shape, value.dtype.str)).encode())
+            identity.update(value.tobytes())
+        return identity.hexdigest()
+
     @classmethod
     def from_dem(cls, dem: stim.DetectorErrorModel) -> "DemBinaryModel":
         if not isinstance(dem, stim.DetectorErrorModel):

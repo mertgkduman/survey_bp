@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import numpy as np
+from bp_registry.compiled_contracts import immutable_snapshot
 
 from .lineage import LineageEdge, LineageId
 
@@ -12,8 +13,7 @@ def _readonly_binary(value: np.ndarray, *, ndim: int, name: str) -> np.ndarray:
     array = np.asarray(value)
     if array.ndim != ndim or not np.issubdtype(array.dtype, np.integer) or np.any((array != 0) & (array != 1)):
         raise ValueError(f"{name} must be a binary integer array with {ndim} dimensions")
-    copied = np.array(array, dtype=np.uint8, copy=True)
-    copied.setflags(write=False)
+    copied = immutable_snapshot(array, dtype=np.uint8)
     return copied
 
 

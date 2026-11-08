@@ -18,6 +18,7 @@ from types import MappingProxyType
 from typing import Literal
 
 import numpy as np
+from bp_registry.compiled_contracts import immutable_snapshot
 
 from .algebra import Pauli, to_symplectic
 from .problems import QuaternaryOriginalProblem
@@ -28,8 +29,7 @@ ROW_SUM_TOLERANCE = 1e-12
 
 
 def _readonly_f64(value: object) -> np.ndarray:
-    result = np.array(value, dtype=np.float64, copy=True)
-    result.setflags(write=False)
+    result = immutable_snapshot(value, dtype=np.float64)
     return result
 
 
@@ -275,11 +275,11 @@ class PauliHiddenTruth:
         supplied_z = np.asarray(self.z)
         if supplied_x.shape != labels.shape or supplied_z.shape != labels.shape or not np.array_equal(supplied_x, expected_x) or not np.array_equal(supplied_z, expected_z):
             raise ValueError("hidden symplectic bits must derive from the categorical Pauli values")
-        labels.setflags(write=False)
+        labels = immutable_snapshot(labels)
         frozen_x = np.array(expected_x, dtype=np.uint8, copy=True)
         frozen_z = np.array(expected_z, dtype=np.uint8, copy=True)
-        frozen_x.setflags(write=False)
-        frozen_z.setflags(write=False)
+        frozen_x = immutable_snapshot(frozen_x)
+        frozen_z = immutable_snapshot(frozen_z)
         object.__setattr__(self, "paulis", labels)
         object.__setattr__(self, "x", frozen_x)
         object.__setattr__(self, "z", frozen_z)
