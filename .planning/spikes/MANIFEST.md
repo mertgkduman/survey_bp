@@ -41,6 +41,8 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 
 - Fix C03 → C01 → C02 as approved; preserve historical evidence and source-scoped residual behavior, qualify finite-state failure handling and CPU throughput.
 
+- Broaden the approved four-part audit to comprehension and completeness: explicit capability coverage, independent mathematical checks, upstream correspondence, and circuit/evidence boundaries before HTML. Preserve prior evidence and production behavior.
+
 ## Spikes
 
 | # | Idea | Name | Type | Validates | Verdict | Tags |
@@ -78,3 +80,7 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 | 031 | canonical-kernel-audit | prior-state-fix | standard | Given an admitted configuration, when executed, then normalized stored priors are finite before shortcuts | VALIDATED | fixes |
 | 032 | canonical-kernel-audit | bp4-failure-fix | standard | Given an admitted configuration, when executed, then all BP4 scopes fail consistently on nonfinite state | VALIDATED | fixes |
 | 033 | canonical-kernel-audit | residual-admission-fix | standard | Given an admitted configuration, when executed, then conventional residual scheduling rejects incompatible damping | VALIDATED | fixes |
+| 034 | canonical-kernel-audit | Mathematical contract completeness | standard | Explicit contract coverage with executable evidence and exclusions | VALIDATED | completeness |
+| 035 | canonical-kernel-audit | Upstream interface and algorithm comparison | standard | Explicit contract coverage with executable evidence and exclusions | VALIDATED | completeness |
+| 036 | canonical-kernel-audit | Policy composition and capability coverage | standard | Explicit contract coverage with executable evidence and exclusions | PARTIAL | completeness |
+| 037 | canonical-kernel-audit | Execution, circuit and evidence closure | standard | Explicit contract coverage with executable evidence and exclusions | PARTIAL | completeness |

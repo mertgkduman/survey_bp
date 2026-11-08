@@ -1,0 +1,10 @@
+{"checks": 13, "passed": 4, "failed": 9}
+FINDING: D03_circuit_compiled_negative_limit
+FINDING: D03_circuit_compiled_unknown_rule
+FINDING: D03_circuit_compiled_unknown_tie
+FINDING: D03_DEM_model_nonfinite_prior
+FINDING: D03_DEM_model_bad_CSR
+FINDING: D04_immutable_binary_original
+FINDING: D04_immutable_Pauli_code
+FINDING: D04_DEM_identity_binds_execution
+FINDING: D05_batch_evidence_matches_returned_candidate

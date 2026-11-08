@@ -1,0 +1,2 @@
+{"checks": 1, "passed": 0, "failed": 1}
+FINDING: compiled_policy_grid binary check rule conflicts with explicit policy

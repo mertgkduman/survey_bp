@@ -1,0 +1,11 @@
+{"checks": 14, "passed": 4, "failed": 10}
+FINDING: D01_nms_standalone_iteration_context
+FINDING: D01_nms_LayeredSchedule_iteration_context
+FINDING: D01_nms_CheckNodeSerialSchedule_iteration_context
+FINDING: D01_nms_VariableNodeSerialSchedule_iteration_context
+FINDING: D01_oms_standalone_iteration_context
+FINDING: D01_oms_LayeredSchedule_iteration_context
+FINDING: D01_oms_CheckNodeSerialSchedule_iteration_context
+FINDING: D01_oms_VariableNodeSerialSchedule_iteration_context
+FINDING: D02_CheckNodeSerialSchedule_reported_posterior
+FINDING: D02_VariableNodeSerialSchedule_reported_posterior

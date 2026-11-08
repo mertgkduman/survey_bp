@@ -6,10 +6,10 @@ current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
 stopped_at: Completed 11-16 and 11-20; eight Phase 11 gap plans remain open
-last_updated: "2026-11-08T15:04:08.867065Z"
+last_updated: "2026-11-08T19:05:05.734827Z"
 last_activity: 2026-11-08
-last_activity_desc: Fixed freeze findings C03 → C01 → C02; 1412 regressions and 18 oracle groups pass; CPU qualification retained
-state_head: fb1d3299613f0d537690eb2e09ddd1e2148c63ec
+last_activity_desc: Completed completeness audit 034–037; five contract findings, 432 compiled configurations verified, full suite 2109 passed and one skip; freeze remains partial
+state_head: 4cce08e
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-08 — closed C03 → C01 → C02 in spikes 031–033
-Last Activity Description: See .planning/spikes/CANONICAL-KERNEL-FREEZE-FIXES.md. Normalized priors are checked before shortcuts; BP4 nonfinite state fails consistently with parallel batch status propagation; conventional residual BP rejects incompatible damping. 1412 regressions pass with one existing skip, and all 18 independent oracle/admission groups pass. Historical spikes 008–030 remain unchanged. Matched CPU replay and throughput evidence are retained in spike 033. Public stable-policy exposure remains a versioned decision; publication gates and phase position remain unchanged.
+Last activity: 2026-11-08 — completed comprehension/completeness audit; D03 → D04 → D01 → D02 → D05 remain before unconditional freeze
+Last Activity Description: See .planning/spikes/CANONICAL-KERNEL-COMPLETENESS-AUDIT.md and capability map. Expanded exact inference and 216 native comparisons pass; 432 compiled configurations match single/batch outputs. 32 grouped checks retain 19 failed invariants covering five new findings in update context, posterior reporting, circuit admission, model ownership and CPU evidence. Full repository suite: 2109 passed, one existing skip, 25 fork warnings. Production/test sources and historical spikes 008–033 are unchanged. Public stable-policy exposure, publication gates and phase position remain unchanged.
 
 Progress: 8 of 14 phases complete (57%); 159 of 176 plans complete. Phase 11 has 17 of 25 plans complete; plan 17 is the first open number but depends on source reviews 18 and 19, while plan 20's blocked-target review is complete.
 
