@@ -401,7 +401,7 @@ class CompiledBinaryFlooding:
             raise ValueError("resolved binary policy requires unbounded v2 prior coordinates")
         if rule == "min_sum" and selected != MIN_SUM_CPU_F64 and policy is None:
             raise ValueError("compiled min-sum requires its v1 numerical profile")
-        if rule == "spa" and selected == MIN_SUM_CPU_F64 and policy is None:
+        if rule == "spa" and selected.normalization == "min_sum" and policy is None:
             raise ValueError("compiled SPA requires an SPA numerical profile")
         return cls(table, row_ptr, variables, rule, selected, policy)
 

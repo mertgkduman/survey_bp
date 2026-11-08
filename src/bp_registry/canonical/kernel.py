@@ -34,6 +34,8 @@ class BinarySpaKernel:
         selected = (getattr(update_rule, "profile", None) if update_rule is not None else DEFAULT_BINARY_SPA_F64) if profile is None else profile
         if not isinstance(selected, NumericalProfile):
             raise ValueError("update rule requires an explicit numerical profile")
+        if update_rule is None and selected.normalization == "min_sum":
+            raise ValueError("plain SPA requires an SPA numerical profile; supply an explicit min-sum update rule")
         if update_rule is not None and getattr(update_rule, "profile", None) != selected:
             raise ValueError("update rule and kernel numerical profiles must agree")
         self.profile = selected

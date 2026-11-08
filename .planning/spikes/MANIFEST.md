@@ -31,6 +31,8 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 
 - Continue the approved four-part audit order on stabilized v3 as spikes 012–015, preserving prior evidence and testing new boundaries before a freeze decision.
 
+- Fix V3-A01, V3-A02, then V3-A03 in that order as explicitly requested; preserve numerical execution and historical audit evidence.
+
 ## Spikes
 
 | # | Idea | Name | Type | Validates | Verdict | Tags |
@@ -50,3 +52,6 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 | 013 | canonical-kernel-audit | V3 upstream audit | comparison | Given pinned upstream sources and explicit alignment, when current kernels run matched cases, then every discrepancy has evidence | VALIDATED | upstream, v3 |
 | 014 | canonical-kernel-audit | V3 policy audit | standard | Given accepted compositions, when profile, lifecycle and numerical boundaries are varied, then execution matches the declared policy | PARTIAL | policies, admission |
 | 015 | canonical-kernel-audit | V3 execution audit | comparison | Given the same contract and observation, when scalar, compiled, batch and public paths execute, then outputs and evidence remain consistent | PARTIAL | backends, work |
+| 016 | canonical-kernel-audit | Scalar admission fix | standard | Given a min-sum profile without its update rule, when constructed, then scalar and compiled APIs reject ambiguity | VALIDATED | fixes, contracts |
+| 017 | canonical-kernel-audit | Profile evidence fix | standard | Given a numerical profile, when admitted, then fixed semantic fields describe execution and supported knobs remain usable | PENDING | fixes, contracts |
+| 018 | canonical-kernel-audit | Public summary fix | standard | Given replayable evidence, when result claims are altered, then verification rejects inconsistent summaries | PENDING | fixes, contracts |

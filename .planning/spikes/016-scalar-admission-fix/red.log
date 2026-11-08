@@ -1,0 +1,26 @@
+FF.                                                                      [100%]
+=================================== FAILURES ===================================
+______ test_plain_spa_rejects_min_sum_profile_in_both_backends[profile0] _______
+
+profile = NumericalProfile(profile_id='binary-min-sum-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natu... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+
+    @pytest.mark.parametrize('profile', [MIN_SUM_CPU_F64, replace(MIN_SUM_CPU_F64, saturation=20.)])
+    def test_plain_spa_rejects_min_sum_profile_in_both_backends(profile):
+>       with pytest.raises(ValueError, match='SPA.*profile'):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:14: Failed
+______ test_plain_spa_rejects_min_sum_profile_in_both_backends[profile1] _______
+
+profile = NumericalProfile(profile_id='binary-min-sum-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natu... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+
+    @pytest.mark.parametrize('profile', [MIN_SUM_CPU_F64, replace(MIN_SUM_CPU_F64, saturation=20.)])
+    def test_plain_spa_rejects_min_sum_profile_in_both_backends(profile):
+>       with pytest.raises(ValueError, match='SPA.*profile'):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:14: Failed
+=========================== short test summary info ============================
+FAILED tests/canonical/test_kernel_contract_admission.py::test_plain_spa_rejects_min_sum_profile_in_both_backends[profile0]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_plain_spa_rejects_min_sum_profile_in_both_backends[profile1]
+2 failed, 1 passed in 1.27s
