@@ -2,6 +2,14 @@
 from dataclasses import fields
 import math
 import numbers
+import re
+
+
+def _custom_label(value) -> bool:
+    """Study labels are evidence identifiers, not alternative implementations."""
+    return (isinstance(value, str) and re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.:-]*", value) is not None
+            and not value.startswith(("binary-spa-flooding-f64-", "binary-min-sum-flooding-f64-",
+                                      "quaternary-bp4-f64-")))
 
 
 def validate_fixed_fields(profile, contract, *, parameters=(), overrides=None) -> None:
@@ -17,6 +25,8 @@ def validate_fixed_fields(profile, contract, *, parameters=(), overrides=None) -
             continue
         expected = overrides.get(field.name, field.default)
         actual = getattr(profile, field.name)
+        if field.name == "profile_id" and _custom_label(actual):
+            continue
         if type(actual) is not type(expected) or actual != expected:
             raise ValueError(f"{contract.__name__}.{field.name} is fixed by its executable contract")
 

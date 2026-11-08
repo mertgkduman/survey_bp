@@ -35,3 +35,9 @@ OMP_NUM_THREADS=1 NUMBA_NUM_THREADS=4 .venv/bin/python -m pytest -q tests/canoni
 ```
 
 `frozen-profiles.json` was captured before the fix. `red.log`, `green.log`, and `green.xml` preserve evidence; prior audit failures remain historical records.
+
+## Broad-suite compatibility follow-up
+
+The first broad run exposed one existing caller outside `src/`: the vanilla reproduction study uses two reserved `*-v2-undamped` identities. Further caller inspection found custom labels in tuning/cross-code studies. Those labels are used as evidence identifiers and do not choose arithmetic. The validator now preserves non-reserved study labels while fixing executable descriptive fields; reserved family/version identities cannot be substituted. The two historical undamped aliases enforce their exact recorded zero damping, no cap and default epsilon.
+
+The follow-up admission/vanilla-study suite passes **159 tests** (`alias-regression.xml`). Existing reproduction scripts and saved results were not edited. The first broad failure is retained under spike 018, followed by a complete rerun. This refines the earlier profile-identity restriction: custom labels are allowed, but consumers must use the complete validated numerical evidence, not infer semantics from a study label.

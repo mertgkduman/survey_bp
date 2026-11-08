@@ -45,7 +45,7 @@ def parameters(profile):
 
 @pytest.mark.parametrize('profile,field', [
     pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
-    for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile) | {'profile_id'}
 ])
 def test_fixed_profile_evidence_cannot_be_changed(profile, field):
     value = getattr(profile, field)
@@ -88,3 +88,28 @@ def test_profile_parameters_reject_invalid_numeric_values(profile, value):
     for field in parameters(profile) - {'check_rule'}:
         with pytest.raises(ValueError):
             replace(profile, **{field: value})
+
+
+@pytest.mark.parametrize('profile', [BINARY_SPA_F64_V2, QBP4_F64_V2], ids=lambda p: p.profile_id)
+def test_historical_undamped_alias_has_exact_recorded_parameters(profile):
+    alias = profile.profile_id + '-undamped'
+    preserved = replace(profile, profile_id=alias, v2c_damping=0.)
+    assert preserved.as_evidence() == {**profile.as_evidence(), 'profile_id': alias, 'v2c_damping': 0.}
+    for changes in ({'v2c_damping': .1}, {'check_cap': 17.}, {'product_epsilon': 1e-7}, {'dtype': 'float32'}):
+        with pytest.raises(ValueError):
+            replace(preserved, **changes)
+
+
+@pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+def test_custom_study_labels_preserve_semantics_and_reserved_identities(profile):
+    if profile == MIN_SUM_CPU_F64:
+        # A custom min-sum label is bound to its explicit normalization marker.
+        custom = replace(profile, profile_id='study-minsum')
+    else:
+        custom = replace(profile, profile_id='study-tuning-arm-1')
+    assert {k: v for k, v in custom.as_evidence().items() if k != 'profile_id'} == {
+        k: v for k, v in profile.as_evidence().items() if k != 'profile_id'}
+    other = QBP4_F64_V3.profile_id if profile != QBP4_F64_V3 else BINARY_SPA_F64_V3.profile_id
+    for bad in ('', 'contains spaces', other):
+        with pytest.raises(ValueError):
+            replace(profile, profile_id=bad)

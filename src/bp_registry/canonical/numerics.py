@@ -33,7 +33,7 @@ class NumericalProfile:
 
     def __post_init__(self) -> None:
         overrides = ({"profile_id": "binary-min-sum-flooding-f64-v1", "normalization": "min_sum"}
-                     if self.profile_id == "binary-min-sum-flooding-f64-v1" else {})
+                     if self.normalization == "min_sum" else {})
         validate_fixed_fields(self, NumericalProfile, parameters={"saturation"}, overrides=overrides)
         if not finite_real(self.saturation) or self.saturation <= 0:
             raise ValueError("saturation must be finite and positive")
@@ -60,8 +60,13 @@ class BinaryNumericalProfileV2(NumericalProfile):
     saturation_boundary: str = "legacy_saturation_field_inactive; optional_final_check_cap_and_product_unity_safeguard"
 
     def __post_init__(self) -> None:
-        validate_fixed_fields(self, BinaryNumericalProfileV2,
-                              parameters={"check_cap", "product_epsilon", "v2c_damping"})
+        if self.profile_id == "binary-spa-flooding-f64-v2-undamped":
+            # Frozen identity used by the existing vanilla reproduction study.
+            validate_fixed_fields(self, BinaryNumericalProfileV2,
+                                  overrides={"profile_id": self.profile_id, "v2c_damping": 0.0})
+        else:
+            validate_fixed_fields(self, BinaryNumericalProfileV2,
+                                  parameters={"check_cap", "product_epsilon", "v2c_damping"})
         self._validate_parameters()
 
     def _validate_parameters(self) -> None:

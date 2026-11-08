@@ -73,8 +73,13 @@ class QuaternaryNumericalProfileV2(QuaternaryNumericalProfile):
     v2c_damping: float = 0.1
 
     def __post_init__(self) -> None:
-        validate_fixed_fields(self, QuaternaryNumericalProfileV2,
-                              parameters={"check_rule", "check_cap", "product_epsilon", "v2c_damping"})
+        if self.profile_id == "quaternary-bp4-f64-v2-undamped":
+            # Frozen identity used by the existing vanilla reproduction study.
+            validate_fixed_fields(self, QuaternaryNumericalProfileV2,
+                                  overrides={"profile_id": self.profile_id, "v2c_damping": 0.0})
+        else:
+            validate_fixed_fields(self, QuaternaryNumericalProfileV2,
+                                  parameters={"check_rule", "check_cap", "product_epsilon", "v2c_damping"})
         self._validate_parameters()
 
     def _validate_parameters(self) -> None:
