@@ -1,0 +1,364 @@
+FFFFFFFFFF..                                                             [100%]
+=================================== FAILURES ===================================
+_ test_reported_posterior_is_the_committed_decision_input[ordinary-CheckNodeSerialSchedule] _
+
+cls = <class 'bp_registry.canonical.schedules.CheckNodeSerialSchedule'>
+mode = 'ordinary'
+
+    @pytest.mark.parametrize("cls", (CheckNodeSerialSchedule, VariableNodeSerialSchedule))
+    @pytest.mark.parametrize("mode", ("ordinary", "prior", "field", "both", "noop"))
+    def test_reported_posterior_is_the_committed_decision_input(cls, mode):
+        kernel = BinarySpaKernel()
+        table = EdgeTable.from_check_matrix(np.ones((2, 2), dtype=np.uint8))
+        schedule = cls(table, kernel=kernel)
+        seen, calls = [], []
+        original_decision = kernel.candidate_from_beliefs
+        def decision(beliefs):
+            seen.append(beliefs.copy())
+            return original_decision(beliefs)
+        kernel.candidate_from_beliefs = decision
+        def transform(beliefs, _c2v):
+            calls.append(1)
+            return beliefs if mode == "noop" else beliefs + np.array([-8., 3.])
+        result = schedule.execute_local_step(CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt"), np.array([1., 2., 3., 4.]), np.array([0, 0]),
+            error_rate=.2, progress=ScheduleProgress(0, 0, (0,)), is_converged=lambda _: False,
+            prior_llrs=np.array([-2., 4.]) if mode in ("prior", "both") else None,
+            transform_beliefs=transform if mode in ("field", "both", "noop") else None)
+        assert result.admitted and len(seen) == 1
+        assert len(calls) == int(mode in ("field", "both", "noop"))
+        np.testing.assert_array_equal(result.posterior, seen[0])
+        np.testing.assert_array_equal(result.candidate, original_decision(result.posterior))
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_committed_posterior.py:33: Failed
+_ test_reported_posterior_is_the_committed_decision_input[ordinary-VariableNodeSerialSchedule] _
+
+cls = <class 'bp_registry.canonical.schedules.VariableNodeSerialSchedule'>
+mode = 'ordinary'
+
+    @pytest.mark.parametrize("cls", (CheckNodeSerialSchedule, VariableNodeSerialSchedule))
+    @pytest.mark.parametrize("mode", ("ordinary", "prior", "field", "both", "noop"))
+    def test_reported_posterior_is_the_committed_decision_input(cls, mode):
+        kernel = BinarySpaKernel()
+        table = EdgeTable.from_check_matrix(np.ones((2, 2), dtype=np.uint8))
+        schedule = cls(table, kernel=kernel)
+        seen, calls = [], []
+        original_decision = kernel.candidate_from_beliefs
+        def decision(beliefs):
+            seen.append(beliefs.copy())
+            return original_decision(beliefs)
+        kernel.candidate_from_beliefs = decision
+        def transform(beliefs, _c2v):
+            calls.append(1)
+            return beliefs if mode == "noop" else beliefs + np.array([-8., 3.])
+        result = schedule.execute_local_step(CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt"), np.array([1., 2., 3., 4.]), np.array([0, 0]),
+            error_rate=.2, progress=ScheduleProgress(0, 0, (0,)), is_converged=lambda _: False,
+            prior_llrs=np.array([-2., 4.]) if mode in ("prior", "both") else None,
+            transform_beliefs=transform if mode in ("field", "both", "noop") else None)
+        assert result.admitted and len(seen) == 1
+        assert len(calls) == int(mode in ("field", "both", "noop"))
+        np.testing.assert_array_equal(result.posterior, seen[0])
+        np.testing.assert_array_equal(result.candidate, original_decision(result.posterior))
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_committed_posterior.py:33: Failed
+_ test_reported_posterior_is_the_committed_decision_input[prior-CheckNodeSerialSchedule] _
+
+cls = <class 'bp_registry.canonical.schedules.CheckNodeSerialSchedule'>
+mode = 'prior'
+
+    @pytest.mark.parametrize("cls", (CheckNodeSerialSchedule, VariableNodeSerialSchedule))
+    @pytest.mark.parametrize("mode", ("ordinary", "prior", "field", "both", "noop"))
+    def test_reported_posterior_is_the_committed_decision_input(cls, mode):
+        kernel = BinarySpaKernel()
+        table = EdgeTable.from_check_matrix(np.ones((2, 2), dtype=np.uint8))
+        schedule = cls(table, kernel=kernel)
+        seen, calls = [], []
+        original_decision = kernel.candidate_from_beliefs
+        def decision(beliefs):
+            seen.append(beliefs.copy())
+            return original_decision(beliefs)
+        kernel.candidate_from_beliefs = decision
+        def transform(beliefs, _c2v):
+            calls.append(1)
+            return beliefs if mode == "noop" else beliefs + np.array([-8., 3.])
+        result = schedule.execute_local_step(CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt"), np.array([1., 2., 3., 4.]), np.array([0, 0]),
+            error_rate=.2, progress=ScheduleProgress(0, 0, (0,)), is_converged=lambda _: False,
+            prior_llrs=np.array([-2., 4.]) if mode in ("prior", "both") else None,
+            transform_beliefs=transform if mode in ("field", "both", "noop") else None)
+        assert result.admitted and len(seen) == 1
+        assert len(calls) == int(mode in ("field", "both", "noop"))
+>       np.testing.assert_array_equal(result.posterior, seen[0])
+E       AssertionError: 
+E       Arrays are not equal
+E       
+E       Mismatched elements: 2 / 2 (100%)
+E       Max absolute difference among violations: 3.38629436
+E       Max relative difference among violations: 0.52274113
+E        ACTUAL: array([3.386294, 2.386294])
+E        DESIRED: array([0., 5.])
+
+tests/canonical/test_committed_posterior.py:31: AssertionError
+_ test_reported_posterior_is_the_committed_decision_input[prior-VariableNodeSerialSchedule] _
+
+cls = <class 'bp_registry.canonical.schedules.VariableNodeSerialSchedule'>
+mode = 'prior'
+
+    @pytest.mark.parametrize("cls", (CheckNodeSerialSchedule, VariableNodeSerialSchedule))
+    @pytest.mark.parametrize("mode", ("ordinary", "prior", "field", "both", "noop"))
+    def test_reported_posterior_is_the_committed_decision_input(cls, mode):
+        kernel = BinarySpaKernel()
+        table = EdgeTable.from_check_matrix(np.ones((2, 2), dtype=np.uint8))
+        schedule = cls(table, kernel=kernel)
+        seen, calls = [], []
+        original_decision = kernel.candidate_from_beliefs
+        def decision(beliefs):
+            seen.append(beliefs.copy())
+            return original_decision(beliefs)
+        kernel.candidate_from_beliefs = decision
+        def transform(beliefs, _c2v):
+            calls.append(1)
+            return beliefs if mode == "noop" else beliefs + np.array([-8., 3.])
+        result = schedule.execute_local_step(CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt"), np.array([1., 2., 3., 4.]), np.array([0, 0]),
+            error_rate=.2, progress=ScheduleProgress(0, 0, (0,)), is_converged=lambda _: False,
+            prior_llrs=np.array([-2., 4.]) if mode in ("prior", "both") else None,
+            transform_beliefs=transform if mode in ("field", "both", "noop") else None)
+        assert result.admitted and len(seen) == 1
+        assert len(calls) == int(mode in ("field", "both", "noop"))
+>       np.testing.assert_array_equal(result.posterior, seen[0])
+E       AssertionError: 
+E       Arrays are not equal
+E       
+E       Mismatched elements: 2 / 2 (100%)
+E       Max absolute difference among violations: 3.38629436
+E       Max relative difference among violations: 0.84657359
+E        ACTUAL: array([7.386294, 1.386294])
+E        DESIRED: array([4., 4.])
+
+tests/canonical/test_committed_posterior.py:31: AssertionError
+_ test_reported_posterior_is_the_committed_decision_input[field-CheckNodeSerialSchedule] _
+
+cls = <class 'bp_registry.canonical.schedules.CheckNodeSerialSchedule'>
+mode = 'field'
+
+    @pytest.mark.parametrize("cls", (CheckNodeSerialSchedule, VariableNodeSerialSchedule))
+    @pytest.mark.parametrize("mode", ("ordinary", "prior", "field", "both", "noop"))
+    def test_reported_posterior_is_the_committed_decision_input(cls, mode):
+        kernel = BinarySpaKernel()
+        table = EdgeTable.from_check_matrix(np.ones((2, 2), dtype=np.uint8))
+        schedule = cls(table, kernel=kernel)
+        seen, calls = [], []
+        original_decision = kernel.candidate_from_beliefs
+        def decision(beliefs):
+            seen.append(beliefs.copy())
+            return original_decision(beliefs)
+        kernel.candidate_from_beliefs = decision
+        def transform(beliefs, _c2v):
+            calls.append(1)
+            return beliefs if mode == "noop" else beliefs + np.array([-8., 3.])
+        result = schedule.execute_local_step(CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt"), np.array([1., 2., 3., 4.]), np.array([0, 0]),
+            error_rate=.2, progress=ScheduleProgress(0, 0, (0,)), is_converged=lambda _: False,
+            prior_llrs=np.array([-2., 4.]) if mode in ("prior", "both") else None,
+            transform_beliefs=transform if mode in ("field", "both", "noop") else None)
+        assert result.admitted and len(seen) == 1
+        assert len(calls) == int(mode in ("field", "both", "noop"))
+>       np.testing.assert_array_equal(result.posterior, seen[0])
+E       AssertionError: 
+E       Arrays are not equal
+E       
+E       Mismatched elements: 2 / 2 (100%)
+E       Max absolute difference among violations: 8.
+E       Max relative difference among violations: 1.73396411
+E        ACTUAL: array([3.386294, 2.386294])
+E        DESIRED: array([-4.613706,  5.386294])
+
+tests/canonical/test_committed_posterior.py:31: AssertionError
+_ test_reported_posterior_is_the_committed_decision_input[field-VariableNodeSerialSchedule] _
+
+cls = <class 'bp_registry.canonical.schedules.VariableNodeSerialSchedule'>
+mode = 'field'
+
+    @pytest.mark.parametrize("cls", (CheckNodeSerialSchedule, VariableNodeSerialSchedule))
+    @pytest.mark.parametrize("mode", ("ordinary", "prior", "field", "both", "noop"))
+    def test_reported_posterior_is_the_committed_decision_input(cls, mode):
+        kernel = BinarySpaKernel()
+        table = EdgeTable.from_check_matrix(np.ones((2, 2), dtype=np.uint8))
+        schedule = cls(table, kernel=kernel)
+        seen, calls = [], []
+        original_decision = kernel.candidate_from_beliefs
+        def decision(beliefs):
+            seen.append(beliefs.copy())
+            return original_decision(beliefs)
+        kernel.candidate_from_beliefs = decision
+        def transform(beliefs, _c2v):
+            calls.append(1)
+            return beliefs if mode == "noop" else beliefs + np.array([-8., 3.])
+        result = schedule.execute_local_step(CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt"), np.array([1., 2., 3., 4.]), np.array([0, 0]),
+            error_rate=.2, progress=ScheduleProgress(0, 0, (0,)), is_converged=lambda _: False,
+            prior_llrs=np.array([-2., 4.]) if mode in ("prior", "both") else None,
+            transform_beliefs=transform if mode in ("field", "both", "noop") else None)
+        assert result.admitted and len(seen) == 1
+        assert len(calls) == int(mode in ("field", "both", "noop"))
+>       np.testing.assert_array_equal(result.posterior, seen[0])
+E       AssertionError: 
+E       Arrays are not equal
+E       
+E       Mismatched elements: 2 / 2 (100%)
+E       Max absolute difference among violations: 8.
+E       Max relative difference among violations: 13.03556541
+E        ACTUAL: array([7.386294, 1.386294])
+E        DESIRED: array([-0.613706,  4.386294])
+
+tests/canonical/test_committed_posterior.py:31: AssertionError
+_ test_reported_posterior_is_the_committed_decision_input[both-CheckNodeSerialSchedule] _
+
+cls = <class 'bp_registry.canonical.schedules.CheckNodeSerialSchedule'>
+mode = 'both'
+
+    @pytest.mark.parametrize("cls", (CheckNodeSerialSchedule, VariableNodeSerialSchedule))
+    @pytest.mark.parametrize("mode", ("ordinary", "prior", "field", "both", "noop"))
+    def test_reported_posterior_is_the_committed_decision_input(cls, mode):
+        kernel = BinarySpaKernel()
+        table = EdgeTable.from_check_matrix(np.ones((2, 2), dtype=np.uint8))
+        schedule = cls(table, kernel=kernel)
+        seen, calls = [], []
+        original_decision = kernel.candidate_from_beliefs
+        def decision(beliefs):
+            seen.append(beliefs.copy())
+            return original_decision(beliefs)
+        kernel.candidate_from_beliefs = decision
+        def transform(beliefs, _c2v):
+            calls.append(1)
+            return beliefs if mode == "noop" else beliefs + np.array([-8., 3.])
+        result = schedule.execute_local_step(CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt"), np.array([1., 2., 3., 4.]), np.array([0, 0]),
+            error_rate=.2, progress=ScheduleProgress(0, 0, (0,)), is_converged=lambda _: False,
+            prior_llrs=np.array([-2., 4.]) if mode in ("prior", "both") else None,
+            transform_beliefs=transform if mode in ("field", "both", "noop") else None)
+        assert result.admitted and len(seen) == 1
+        assert len(calls) == int(mode in ("field", "both", "noop"))
+>       np.testing.assert_array_equal(result.posterior, seen[0])
+E       AssertionError: 
+E       Arrays are not equal
+E       
+E       Mismatched elements: 2 / 2 (100%)
+E       Max absolute difference among violations: 11.38629436
+E       Max relative difference among violations: 1.4232868
+E        ACTUAL: array([3.386294, 2.386294])
+E        DESIRED: array([-8.,  8.])
+
+tests/canonical/test_committed_posterior.py:31: AssertionError
+_ test_reported_posterior_is_the_committed_decision_input[both-VariableNodeSerialSchedule] _
+
+cls = <class 'bp_registry.canonical.schedules.VariableNodeSerialSchedule'>
+mode = 'both'
+
+    @pytest.mark.parametrize("cls", (CheckNodeSerialSchedule, VariableNodeSerialSchedule))
+    @pytest.mark.parametrize("mode", ("ordinary", "prior", "field", "both", "noop"))
+    def test_reported_posterior_is_the_committed_decision_input(cls, mode):
+        kernel = BinarySpaKernel()
+        table = EdgeTable.from_check_matrix(np.ones((2, 2), dtype=np.uint8))
+        schedule = cls(table, kernel=kernel)
+        seen, calls = [], []
+        original_decision = kernel.candidate_from_beliefs
+        def decision(beliefs):
+            seen.append(beliefs.copy())
+            return original_decision(beliefs)
+        kernel.candidate_from_beliefs = decision
+        def transform(beliefs, _c2v):
+            calls.append(1)
+            return beliefs if mode == "noop" else beliefs + np.array([-8., 3.])
+        result = schedule.execute_local_step(CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt"), np.array([1., 2., 3., 4.]), np.array([0, 0]),
+            error_rate=.2, progress=ScheduleProgress(0, 0, (0,)), is_converged=lambda _: False,
+            prior_llrs=np.array([-2., 4.]) if mode in ("prior", "both") else None,
+            transform_beliefs=transform if mode in ("field", "both", "noop") else None)
+        assert result.admitted and len(seen) == 1
+        assert len(calls) == int(mode in ("field", "both", "noop"))
+>       np.testing.assert_array_equal(result.posterior, seen[0])
+E       AssertionError: 
+E       Arrays are not equal
+E       
+E       Mismatched elements: 2 / 2 (100%)
+E       Max absolute difference among violations: 11.38629436
+E       Max relative difference among violations: 2.84657359
+E        ACTUAL: array([7.386294, 1.386294])
+E        DESIRED: array([-4.,  7.])
+
+tests/canonical/test_committed_posterior.py:31: AssertionError
+_ test_reported_posterior_is_the_committed_decision_input[noop-CheckNodeSerialSchedule] _
+
+cls = <class 'bp_registry.canonical.schedules.CheckNodeSerialSchedule'>
+mode = 'noop'
+
+    @pytest.mark.parametrize("cls", (CheckNodeSerialSchedule, VariableNodeSerialSchedule))
+    @pytest.mark.parametrize("mode", ("ordinary", "prior", "field", "both", "noop"))
+    def test_reported_posterior_is_the_committed_decision_input(cls, mode):
+        kernel = BinarySpaKernel()
+        table = EdgeTable.from_check_matrix(np.ones((2, 2), dtype=np.uint8))
+        schedule = cls(table, kernel=kernel)
+        seen, calls = [], []
+        original_decision = kernel.candidate_from_beliefs
+        def decision(beliefs):
+            seen.append(beliefs.copy())
+            return original_decision(beliefs)
+        kernel.candidate_from_beliefs = decision
+        def transform(beliefs, _c2v):
+            calls.append(1)
+            return beliefs if mode == "noop" else beliefs + np.array([-8., 3.])
+        result = schedule.execute_local_step(CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt"), np.array([1., 2., 3., 4.]), np.array([0, 0]),
+            error_rate=.2, progress=ScheduleProgress(0, 0, (0,)), is_converged=lambda _: False,
+            prior_llrs=np.array([-2., 4.]) if mode in ("prior", "both") else None,
+            transform_beliefs=transform if mode in ("field", "both", "noop") else None)
+        assert result.admitted and len(seen) == 1
+        assert len(calls) == int(mode in ("field", "both", "noop"))
+        np.testing.assert_array_equal(result.posterior, seen[0])
+        np.testing.assert_array_equal(result.candidate, original_decision(result.posterior))
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_committed_posterior.py:33: Failed
+_ test_reported_posterior_is_the_committed_decision_input[noop-VariableNodeSerialSchedule] _
+
+cls = <class 'bp_registry.canonical.schedules.VariableNodeSerialSchedule'>
+mode = 'noop'
+
+    @pytest.mark.parametrize("cls", (CheckNodeSerialSchedule, VariableNodeSerialSchedule))
+    @pytest.mark.parametrize("mode", ("ordinary", "prior", "field", "both", "noop"))
+    def test_reported_posterior_is_the_committed_decision_input(cls, mode):
+        kernel = BinarySpaKernel()
+        table = EdgeTable.from_check_matrix(np.ones((2, 2), dtype=np.uint8))
+        schedule = cls(table, kernel=kernel)
+        seen, calls = [], []
+        original_decision = kernel.candidate_from_beliefs
+        def decision(beliefs):
+            seen.append(beliefs.copy())
+            return original_decision(beliefs)
+        kernel.candidate_from_beliefs = decision
+        def transform(beliefs, _c2v):
+            calls.append(1)
+            return beliefs if mode == "noop" else beliefs + np.array([-8., 3.])
+        result = schedule.execute_local_step(CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt"), np.array([1., 2., 3., 4.]), np.array([0, 0]),
+            error_rate=.2, progress=ScheduleProgress(0, 0, (0,)), is_converged=lambda _: False,
+            prior_llrs=np.array([-2., 4.]) if mode in ("prior", "both") else None,
+            transform_beliefs=transform if mode in ("field", "both", "noop") else None)
+        assert result.admitted and len(seen) == 1
+        assert len(calls) == int(mode in ("field", "both", "noop"))
+        np.testing.assert_array_equal(result.posterior, seen[0])
+        np.testing.assert_array_equal(result.candidate, original_decision(result.posterior))
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_committed_posterior.py:33: Failed
+=========================== short test summary info ============================
+FAILED tests/canonical/test_committed_posterior.py::test_reported_posterior_is_the_committed_decision_input[ordinary-CheckNodeSerialSchedule]
+FAILED tests/canonical/test_committed_posterior.py::test_reported_posterior_is_the_committed_decision_input[ordinary-VariableNodeSerialSchedule]
+FAILED tests/canonical/test_committed_posterior.py::test_reported_posterior_is_the_committed_decision_input[prior-CheckNodeSerialSchedule]
+FAILED tests/canonical/test_committed_posterior.py::test_reported_posterior_is_the_committed_decision_input[prior-VariableNodeSerialSchedule]
+FAILED tests/canonical/test_committed_posterior.py::test_reported_posterior_is_the_committed_decision_input[field-CheckNodeSerialSchedule]
+FAILED tests/canonical/test_committed_posterior.py::test_reported_posterior_is_the_committed_decision_input[field-VariableNodeSerialSchedule]
+FAILED tests/canonical/test_committed_posterior.py::test_reported_posterior_is_the_committed_decision_input[both-CheckNodeSerialSchedule]
+FAILED tests/canonical/test_committed_posterior.py::test_reported_posterior_is_the_committed_decision_input[both-VariableNodeSerialSchedule]
+FAILED tests/canonical/test_committed_posterior.py::test_reported_posterior_is_the_committed_decision_input[noop-CheckNodeSerialSchedule]
+FAILED tests/canonical/test_committed_posterior.py::test_reported_posterior_is_the_committed_decision_input[noop-VariableNodeSerialSchedule]
+10 failed, 2 passed in 1.31s

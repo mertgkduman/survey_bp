@@ -89,5 +89,5 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 | 038 | canonical-kernel-audit | D03 correction | standard | Fix and qualify the admitted contract boundary | VALIDATED | completeness, fixes |
 | 039 | canonical-kernel-audit | D04 correction | standard | Fix and qualify the admitted contract boundary | VALIDATED | completeness, fixes |
 | 040 | canonical-kernel-audit | D01 correction | standard | Fix and qualify the admitted contract boundary | VALIDATED | completeness, fixes |
-| 041 | canonical-kernel-audit | D02 correction | standard | Fix and qualify the admitted contract boundary | IN_PROGRESS | completeness, fixes |
+| 041 | canonical-kernel-audit | D02 correction | standard | Fix and qualify the admitted contract boundary | VALIDATED | completeness, fixes |
 | 042 | canonical-kernel-audit | D05 correction | standard | Fix and qualify the admitted contract boundary | IN_PROGRESS | completeness, fixes |

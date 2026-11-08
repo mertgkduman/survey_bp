@@ -11,6 +11,8 @@ from typing import Any, Callable, Protocol
 
 import numpy as np
 
+from bp_registry.compiled_contracts import immutable_snapshot
+
 from .update_context import context_version, source_iteration as resolve_source_iteration
 
 from .numerics import BinaryNumericalProfileV2, NumericalProfile, finite_saturate
@@ -573,7 +575,7 @@ class _NodeSerialSchedule:
         prior_llrs: np.ndarray | None = None,
         transform_beliefs: Callable[[np.ndarray, np.ndarray], np.ndarray] | None = None,
         transform_v2c: Callable[[np.ndarray], np.ndarray] | None = None,
-    ) -> tuple[np.ndarray, np.ndarray, Any, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray, Any, np.ndarray, np.ndarray]:
         raise NotImplementedError
 
     def _proposed_work(self, unit_index: int) -> Any:
@@ -623,7 +625,7 @@ class _NodeSerialSchedule:
         proposal = self.propose_local_step(messages, syndrome, error_rate=error_rate, progress=progress)
 
         def compute() -> np.ndarray:
-            updated, candidate, _visibility, next_c2v = self._compute_unit(
+            updated, candidate, _visibility, next_c2v, posterior = self._compute_unit(
                 messages,
                 _binary_syndrome(self.edge_table, syndrome),
                 error_rate=error_rate,
@@ -636,12 +638,7 @@ class _NodeSerialSchedule:
             candidate.setflags(write=False)
             candidate_box.append(candidate)
             c2v_box.append(next_c2v)
-            posterior = self.kernel.assemble_beliefs(
-                self.edge_table.variable_count, self._edge_variables, next_c2v, self.kernel.prior(error_rate),
-            )
-            posterior = np.array(posterior, dtype=np.float64, copy=True)
-            posterior.setflags(write=False)
-            posterior_box.append(posterior)
+            posterior_box.append(immutable_snapshot(posterior))
             return updated
 
         result = executor.execute(
@@ -701,7 +698,7 @@ class CheckNodeSerialSchedule(_NodeSerialSchedule):
         prior_llrs: np.ndarray | None = None,
         transform_beliefs: Callable[[np.ndarray, np.ndarray], np.ndarray] | None = None,
         transform_v2c: Callable[[np.ndarray], np.ndarray] | None = None,
-    ) -> tuple[np.ndarray, np.ndarray, Any, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray, Any, np.ndarray, np.ndarray]:
         entry = finite_saturate(messages, boundary="check_serial_entry_v2c", profile=self.kernel.profile)
         if entry.ndim != 1 or entry.shape != (self.edge_table.edge_count,):
             raise ValueError("serial messages must have exactly one value per canonical edge")
@@ -726,7 +723,7 @@ class CheckNodeSerialSchedule(_NodeSerialSchedule):
             updated = finite_saturate(transform_v2c(updated), boundary="check_serial_memory_v2c", profile=self.kernel.profile)
         return (
             finite_saturate(updated, boundary="check_serial_complete_v2c", profile=self.kernel.profile),
-            np.array(candidate, dtype=np.uint8, copy=True), self.evidence(), c2v,
+            np.array(candidate, dtype=np.uint8, copy=True), self.evidence(), c2v, beliefs,
         )
 
 
@@ -765,7 +762,7 @@ class VariableNodeSerialSchedule(_NodeSerialSchedule):
         prior_llrs: np.ndarray | None = None,
         transform_beliefs: Callable[[np.ndarray, np.ndarray], np.ndarray] | None = None,
         transform_v2c: Callable[[np.ndarray], np.ndarray] | None = None,
-    ) -> tuple[np.ndarray, np.ndarray, Any, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray, Any, np.ndarray, np.ndarray]:
         entry = finite_saturate(messages, boundary="variable_serial_entry_v2c", profile=self.kernel.profile)
         if entry.ndim != 1 or entry.shape != (self.edge_table.edge_count,):
             raise ValueError("serial messages must have exactly one value per canonical edge")
@@ -787,7 +784,7 @@ class VariableNodeSerialSchedule(_NodeSerialSchedule):
             updated = finite_saturate(transform_v2c(updated), boundary="variable_serial_memory_v2c", profile=self.kernel.profile)
         return (
             finite_saturate(updated, boundary="variable_serial_complete_v2c", profile=self.kernel.profile),
-            np.array(candidate, dtype=np.uint8, copy=True), self.evidence(), c2v,
+            np.array(candidate, dtype=np.uint8, copy=True), self.evidence(), c2v, beliefs,
         )
 
 
