@@ -1,0 +1,1 @@
+OMP_NUM_THREADS=1 NUMBA_NUM_THREADS=4 .venv/bin/python -m pytest -q tests/canonical/test_kernel_stabilization.py tests/canonical/test_work_accounting.py tests/canonical/quaternary/test_compiled_bp4.py tests/canonical/quaternary/test_public_execution.py --junitxml=.planning/spikes/015-v3-execution-audit/regression.xml
