@@ -1,0 +1,1942 @@
+...FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.FFFFFFFFFFFF.FF.FFFFFFFFFFFFFFFFFFFFF [ 49%]
+FFFFFFFFFFFFFFFFFFFFFFFF...............FF..F..FF..F..FF..F..FFFFFFFFFFFF [ 98%]
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v1:profile_id] _
+
+profile = NumericalProfile(profile_id='binary-spa-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natural_... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+field = 'profile_id'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v1:backend] _
+
+profile = NumericalProfile(profile_id='binary-spa-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natural_... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+field = 'backend'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v1:dtype] _
+
+profile = NumericalProfile(profile_id='binary-spa-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natural_... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+field = 'dtype'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v1:llr_encoding] _
+
+profile = NumericalProfile(profile_id='binary-spa-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natural_... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+field = 'llr_encoding'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v1:syndrome_convention] _
+
+profile = NumericalProfile(profile_id='binary-spa-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natural_... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+field = 'syndrome_convention'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v1:prior_initialization] _
+
+profile = NumericalProfile(profile_id='binary-spa-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natural_... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+field = 'prior_initialization'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v1:normalization] _
+
+profile = NumericalProfile(profile_id='binary-spa-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natural_... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+field = 'normalization'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v1:degree_one_rule] _
+
+profile = NumericalProfile(profile_id='binary-spa-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natural_... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+field = 'degree_one_rule'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v1:exact_zero_decision] _
+
+profile = NumericalProfile(profile_id='binary-spa-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natural_... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+field = 'exact_zero_decision'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v1:tie_break] _
+
+profile = NumericalProfile(profile_id='binary-spa-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natural_... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+field = 'tie_break'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-min-sum-flooding-f64-v1:profile_id] _
+
+profile = NumericalProfile(profile_id='binary-min-sum-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natu... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+field = 'profile_id'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-min-sum-flooding-f64-v1:backend] _
+
+profile = NumericalProfile(profile_id='binary-min-sum-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natu... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+field = 'backend'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-min-sum-flooding-f64-v1:dtype] _
+
+profile = NumericalProfile(profile_id='binary-min-sum-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natu... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+field = 'dtype'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-min-sum-flooding-f64-v1:llr_encoding] _
+
+profile = NumericalProfile(profile_id='binary-min-sum-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natu... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+field = 'llr_encoding'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-min-sum-flooding-f64-v1:syndrome_convention] _
+
+profile = NumericalProfile(profile_id='binary-min-sum-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natu... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+field = 'syndrome_convention'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-min-sum-flooding-f64-v1:prior_initialization] _
+
+profile = NumericalProfile(profile_id='binary-min-sum-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natu... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+field = 'prior_initialization'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-min-sum-flooding-f64-v1:normalization] _
+
+profile = NumericalProfile(profile_id='binary-min-sum-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natu... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+field = 'normalization'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-min-sum-flooding-f64-v1:degree_one_rule] _
+
+profile = NumericalProfile(profile_id='binary-min-sum-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natu... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+field = 'degree_one_rule'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-min-sum-flooding-f64-v1:exact_zero_decision] _
+
+profile = NumericalProfile(profile_id='binary-min-sum-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natu... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+field = 'exact_zero_decision'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-min-sum-flooding-f64-v1:tie_break] _
+
+profile = NumericalProfile(profile_id='binary-min-sum-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natu... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+field = 'tie_break'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:profile_id] _
+
+profile = BinaryNumericalProfileV2(profile_id='binary-spa-flooding-f64-v2', backend='cpu-numpy', dtype='float64', llr_encoding='...ping=0.1, saturation_boundary='legacy_saturation_field_inactive; optional_final_check_cap_and_product_unity_safeguard')
+field = 'profile_id'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:backend] _
+
+profile = BinaryNumericalProfileV2(profile_id='binary-spa-flooding-f64-v2', backend='cpu-numpy', dtype='float64', llr_encoding='...ping=0.1, saturation_boundary='legacy_saturation_field_inactive; optional_final_check_cap_and_product_unity_safeguard')
+field = 'backend'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:dtype] _
+
+profile = BinaryNumericalProfileV2(profile_id='binary-spa-flooding-f64-v2', backend='cpu-numpy', dtype='float64', llr_encoding='...ping=0.1, saturation_boundary='legacy_saturation_field_inactive; optional_final_check_cap_and_product_unity_safeguard')
+field = 'dtype'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:llr_encoding] _
+
+profile = BinaryNumericalProfileV2(profile_id='binary-spa-flooding-f64-v2', backend='cpu-numpy', dtype='float64', llr_encoding='...ping=0.1, saturation_boundary='legacy_saturation_field_inactive; optional_final_check_cap_and_product_unity_safeguard')
+field = 'llr_encoding'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:syndrome_convention] _
+
+profile = BinaryNumericalProfileV2(profile_id='binary-spa-flooding-f64-v2', backend='cpu-numpy', dtype='float64', llr_encoding='...ping=0.1, saturation_boundary='legacy_saturation_field_inactive; optional_final_check_cap_and_product_unity_safeguard')
+field = 'syndrome_convention'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:saturation] _
+
+profile = BinaryNumericalProfileV2(profile_id='binary-spa-flooding-f64-v2', backend='cpu-numpy', dtype='float64', llr_encoding='...ping=0.1, saturation_boundary='legacy_saturation_field_inactive; optional_final_check_cap_and_product_unity_safeguard')
+field = 'saturation'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:prior_initialization] _
+
+profile = BinaryNumericalProfileV2(profile_id='binary-spa-flooding-f64-v2', backend='cpu-numpy', dtype='float64', llr_encoding='...ping=0.1, saturation_boundary='legacy_saturation_field_inactive; optional_final_check_cap_and_product_unity_safeguard')
+field = 'prior_initialization'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:normalization] _
+
+profile = BinaryNumericalProfileV2(profile_id='binary-spa-flooding-f64-v2', backend='cpu-numpy', dtype='float64', llr_encoding='...ping=0.1, saturation_boundary='legacy_saturation_field_inactive; optional_final_check_cap_and_product_unity_safeguard')
+field = 'normalization'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:degree_one_rule] _
+
+profile = BinaryNumericalProfileV2(profile_id='binary-spa-flooding-f64-v2', backend='cpu-numpy', dtype='float64', llr_encoding='...ping=0.1, saturation_boundary='legacy_saturation_field_inactive; optional_final_check_cap_and_product_unity_safeguard')
+field = 'degree_one_rule'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:exact_zero_decision] _
+
+profile = BinaryNumericalProfileV2(profile_id='binary-spa-flooding-f64-v2', backend='cpu-numpy', dtype='float64', llr_encoding='...ping=0.1, saturation_boundary='legacy_saturation_field_inactive; optional_final_check_cap_and_product_unity_safeguard')
+field = 'exact_zero_decision'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:tie_break] _
+
+profile = BinaryNumericalProfileV2(profile_id='binary-spa-flooding-f64-v2', backend='cpu-numpy', dtype='float64', llr_encoding='...ping=0.1, saturation_boundary='legacy_saturation_field_inactive; optional_final_check_cap_and_product_unity_safeguard')
+field = 'tie_break'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:saturation_boundary] _
+
+profile = BinaryNumericalProfileV2(profile_id='binary-spa-flooding-f64-v2', backend='cpu-numpy', dtype='float64', llr_encoding='...ping=0.1, saturation_boundary='legacy_saturation_field_inactive; optional_final_check_cap_and_product_unity_safeguard')
+field = 'saturation_boundary'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:profile_id] _
+
+profile = BinaryNumericalProfileV3(profile_id='binary-spa-flooding-f64-v3', backend='cpu-numpy', dtype='float64', llr_encoding='...idate='prior_decision; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'profile_id'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:backend] _
+
+profile = BinaryNumericalProfileV3(profile_id='binary-spa-flooding-f64-v3', backend='cpu-numpy', dtype='float64', llr_encoding='...idate='prior_decision; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'backend'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:dtype] _
+
+profile = BinaryNumericalProfileV3(profile_id='binary-spa-flooding-f64-v3', backend='cpu-numpy', dtype='float64', llr_encoding='...idate='prior_decision; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'dtype'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:llr_encoding] _
+
+profile = BinaryNumericalProfileV3(profile_id='binary-spa-flooding-f64-v3', backend='cpu-numpy', dtype='float64', llr_encoding='...idate='prior_decision; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'llr_encoding'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:syndrome_convention] _
+
+profile = BinaryNumericalProfileV3(profile_id='binary-spa-flooding-f64-v3', backend='cpu-numpy', dtype='float64', llr_encoding='...idate='prior_decision; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'syndrome_convention'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:saturation] _
+
+profile = BinaryNumericalProfileV3(profile_id='binary-spa-flooding-f64-v3', backend='cpu-numpy', dtype='float64', llr_encoding='...idate='prior_decision; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'saturation'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:prior_initialization] _
+
+profile = BinaryNumericalProfileV3(profile_id='binary-spa-flooding-f64-v3', backend='cpu-numpy', dtype='float64', llr_encoding='...idate='prior_decision; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'prior_initialization'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:normalization] _
+
+profile = BinaryNumericalProfileV3(profile_id='binary-spa-flooding-f64-v3', backend='cpu-numpy', dtype='float64', llr_encoding='...idate='prior_decision; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'normalization'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:degree_one_rule] _
+
+profile = BinaryNumericalProfileV3(profile_id='binary-spa-flooding-f64-v3', backend='cpu-numpy', dtype='float64', llr_encoding='...idate='prior_decision; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'degree_one_rule'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:exact_zero_decision] _
+
+profile = BinaryNumericalProfileV3(profile_id='binary-spa-flooding-f64-v3', backend='cpu-numpy', dtype='float64', llr_encoding='...idate='prior_decision; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'exact_zero_decision'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:tie_break] _
+
+profile = BinaryNumericalProfileV3(profile_id='binary-spa-flooding-f64-v3', backend='cpu-numpy', dtype='float64', llr_encoding='...idate='prior_decision; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'tie_break'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:saturation_boundary] _
+
+profile = BinaryNumericalProfileV3(profile_id='binary-spa-flooding-f64-v3', backend='cpu-numpy', dtype='float64', llr_encoding='...idate='prior_decision; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'saturation_boundary'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:initial_candidate] _
+
+profile = BinaryNumericalProfileV3(profile_id='binary-spa-flooding-f64-v3', backend='cpu-numpy', dtype='float64', llr_encoding='...idate='prior_decision; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'initial_candidate'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:profile_id] _
+
+profile = QuaternaryNumericalProfile(profile_id='quaternary-bp4-f64-v1', backend='cpu-numpy', dtype='float64', llr_orientation='...ut_and_raise_terminal_numerical_failure', oracle_gate='vector_and_exact_tree_fixtures_required_before_public_manifest')
+field = 'profile_id'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:backend] _
+
+profile = QuaternaryNumericalProfile(profile_id='quaternary-bp4-f64-v1', backend='cpu-numpy', dtype='float64', llr_orientation='...ut_and_raise_terminal_numerical_failure', oracle_gate='vector_and_exact_tree_fixtures_required_before_public_manifest')
+field = 'backend'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+__ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:dtype] __
+
+profile = QuaternaryNumericalProfile(profile_id='quaternary-bp4-f64-v1', backend='cpu-numpy', dtype='float64', llr_orientation='...ut_and_raise_terminal_numerical_failure', oracle_gate='vector_and_exact_tree_fixtures_required_before_public_manifest')
+field = 'dtype'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:llr_orientation] _
+
+profile = QuaternaryNumericalProfile(profile_id='quaternary-bp4-f64-v1', backend='cpu-numpy', dtype='float64', llr_orientation='...ut_and_raise_terminal_numerical_failure', oracle_gate='vector_and_exact_tree_fixtures_required_before_public_manifest')
+field = 'llr_orientation'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:pauli_order] _
+
+profile = QuaternaryNumericalProfile(profile_id='quaternary-bp4-f64-v1', backend='cpu-numpy', dtype='float64', llr_orientation='...ut_and_raise_terminal_numerical_failure', oracle_gate='vector_and_exact_tree_fixtures_required_before_public_manifest')
+field = 'pauli_order'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:message_representation] _
+
+profile = QuaternaryNumericalProfile(profile_id='quaternary-bp4-f64-v1', backend='cpu-numpy', dtype='float64', llr_orientation='...ut_and_raise_terminal_numerical_failure', oracle_gate='vector_and_exact_tree_fixtures_required_before_public_manifest')
+field = 'message_representation'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:saturation_boundary] _
+
+profile = QuaternaryNumericalProfile(profile_id='quaternary-bp4-f64-v1', backend='cpu-numpy', dtype='float64', llr_orientation='...ut_and_raise_terminal_numerical_failure', oracle_gate='vector_and_exact_tree_fixtures_required_before_public_manifest')
+field = 'saturation_boundary'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:reduction_order] _
+
+profile = QuaternaryNumericalProfile(profile_id='quaternary-bp4-f64-v1', backend='cpu-numpy', dtype='float64', llr_orientation='...ut_and_raise_terminal_numerical_failure', oracle_gate='vector_and_exact_tree_fixtures_required_before_public_manifest')
+field = 'reduction_order'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:normalization] _
+
+profile = QuaternaryNumericalProfile(profile_id='quaternary-bp4-f64-v1', backend='cpu-numpy', dtype='float64', llr_orientation='...ut_and_raise_terminal_numerical_failure', oracle_gate='vector_and_exact_tree_fixtures_required_before_public_manifest')
+field = 'normalization'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:candidate_tie_break] _
+
+profile = QuaternaryNumericalProfile(profile_id='quaternary-bp4-f64-v1', backend='cpu-numpy', dtype='float64', llr_orientation='...ut_and_raise_terminal_numerical_failure', oracle_gate='vector_and_exact_tree_fixtures_required_before_public_manifest')
+field = 'candidate_tie_break'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:zero_rule] _
+
+profile = QuaternaryNumericalProfile(profile_id='quaternary-bp4-f64-v1', backend='cpu-numpy', dtype='float64', llr_orientation='...ut_and_raise_terminal_numerical_failure', oracle_gate='vector_and_exact_tree_fixtures_required_before_public_manifest')
+field = 'zero_rule'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:smoothing_requirement] _
+
+profile = QuaternaryNumericalProfile(profile_id='quaternary-bp4-f64-v1', backend='cpu-numpy', dtype='float64', llr_orientation='...ut_and_raise_terminal_numerical_failure', oracle_gate='vector_and_exact_tree_fixtures_required_before_public_manifest')
+field = 'smoothing_requirement'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:nonfinite_policy] _
+
+profile = QuaternaryNumericalProfile(profile_id='quaternary-bp4-f64-v1', backend='cpu-numpy', dtype='float64', llr_orientation='...ut_and_raise_terminal_numerical_failure', oracle_gate='vector_and_exact_tree_fixtures_required_before_public_manifest')
+field = 'nonfinite_policy'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:oracle_gate] _
+
+profile = QuaternaryNumericalProfile(profile_id='quaternary-bp4-f64-v1', backend='cpu-numpy', dtype='float64', llr_orientation='...ut_and_raise_terminal_numerical_failure', oracle_gate='vector_and_exact_tree_fixtures_required_before_public_manifest')
+field = 'oracle_gate'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:profile_id] _
+
+profile = QuaternaryNumericalProfileV2(profile_id='quaternary-bp4-f64-v2', backend='cpu-numpy', dtype='float64', llr_orientation...es_required_before_public_manifest', check_rule='tanh_product', check_cap=None, product_epsilon=1e-10, v2c_damping=0.1)
+field = 'profile_id'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:backend] _
+
+profile = QuaternaryNumericalProfileV2(profile_id='quaternary-bp4-f64-v2', backend='cpu-numpy', dtype='float64', llr_orientation...es_required_before_public_manifest', check_rule='tanh_product', check_cap=None, product_epsilon=1e-10, v2c_damping=0.1)
+field = 'backend'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+__ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:dtype] __
+
+profile = QuaternaryNumericalProfileV2(profile_id='quaternary-bp4-f64-v2', backend='cpu-numpy', dtype='float64', llr_orientation...es_required_before_public_manifest', check_rule='tanh_product', check_cap=None, product_epsilon=1e-10, v2c_damping=0.1)
+field = 'dtype'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:llr_orientation] _
+
+profile = QuaternaryNumericalProfileV2(profile_id='quaternary-bp4-f64-v2', backend='cpu-numpy', dtype='float64', llr_orientation...es_required_before_public_manifest', check_rule='tanh_product', check_cap=None, product_epsilon=1e-10, v2c_damping=0.1)
+field = 'llr_orientation'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:pauli_order] _
+
+profile = QuaternaryNumericalProfileV2(profile_id='quaternary-bp4-f64-v2', backend='cpu-numpy', dtype='float64', llr_orientation...es_required_before_public_manifest', check_rule='tanh_product', check_cap=None, product_epsilon=1e-10, v2c_damping=0.1)
+field = 'pauli_order'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:message_representation] _
+
+profile = QuaternaryNumericalProfileV2(profile_id='quaternary-bp4-f64-v2', backend='cpu-numpy', dtype='float64', llr_orientation...es_required_before_public_manifest', check_rule='tanh_product', check_cap=None, product_epsilon=1e-10, v2c_damping=0.1)
+field = 'message_representation'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:saturation] _
+
+profile = QuaternaryNumericalProfileV2(profile_id='quaternary-bp4-f64-v2', backend='cpu-numpy', dtype='float64', llr_orientation...es_required_before_public_manifest', check_rule='tanh_product', check_cap=None, product_epsilon=1e-10, v2c_damping=0.1)
+field = 'saturation'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:saturation_boundary] _
+
+profile = QuaternaryNumericalProfileV2(profile_id='quaternary-bp4-f64-v2', backend='cpu-numpy', dtype='float64', llr_orientation...es_required_before_public_manifest', check_rule='tanh_product', check_cap=None, product_epsilon=1e-10, v2c_damping=0.1)
+field = 'saturation_boundary'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:reduction_order] _
+
+profile = QuaternaryNumericalProfileV2(profile_id='quaternary-bp4-f64-v2', backend='cpu-numpy', dtype='float64', llr_orientation...es_required_before_public_manifest', check_rule='tanh_product', check_cap=None, product_epsilon=1e-10, v2c_damping=0.1)
+field = 'reduction_order'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:normalization] _
+
+profile = QuaternaryNumericalProfileV2(profile_id='quaternary-bp4-f64-v2', backend='cpu-numpy', dtype='float64', llr_orientation...es_required_before_public_manifest', check_rule='tanh_product', check_cap=None, product_epsilon=1e-10, v2c_damping=0.1)
+field = 'normalization'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:candidate_tie_break] _
+
+profile = QuaternaryNumericalProfileV2(profile_id='quaternary-bp4-f64-v2', backend='cpu-numpy', dtype='float64', llr_orientation...es_required_before_public_manifest', check_rule='tanh_product', check_cap=None, product_epsilon=1e-10, v2c_damping=0.1)
+field = 'candidate_tie_break'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:zero_rule] _
+
+profile = QuaternaryNumericalProfileV2(profile_id='quaternary-bp4-f64-v2', backend='cpu-numpy', dtype='float64', llr_orientation...es_required_before_public_manifest', check_rule='tanh_product', check_cap=None, product_epsilon=1e-10, v2c_damping=0.1)
+field = 'zero_rule'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:smoothing_requirement] _
+
+profile = QuaternaryNumericalProfileV2(profile_id='quaternary-bp4-f64-v2', backend='cpu-numpy', dtype='float64', llr_orientation...es_required_before_public_manifest', check_rule='tanh_product', check_cap=None, product_epsilon=1e-10, v2c_damping=0.1)
+field = 'smoothing_requirement'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:nonfinite_policy] _
+
+profile = QuaternaryNumericalProfileV2(profile_id='quaternary-bp4-f64-v2', backend='cpu-numpy', dtype='float64', llr_orientation...es_required_before_public_manifest', check_rule='tanh_product', check_cap=None, product_epsilon=1e-10, v2c_damping=0.1)
+field = 'nonfinite_policy'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:oracle_gate] _
+
+profile = QuaternaryNumericalProfileV2(profile_id='quaternary-bp4-f64-v2', backend='cpu-numpy', dtype='float64', llr_orientation...es_required_before_public_manifest', check_rule='tanh_product', check_cap=None, product_epsilon=1e-10, v2c_damping=0.1)
+field = 'oracle_gate'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:profile_id] _
+
+profile = QuaternaryNumericalProfileV3(profile_id='quaternary-bp4-f64-v3', backend='cpu-numpy', dtype='float64', llr_orientation..._candidate='prior_MAP; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'profile_id'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:backend] _
+
+profile = QuaternaryNumericalProfileV3(profile_id='quaternary-bp4-f64-v3', backend='cpu-numpy', dtype='float64', llr_orientation..._candidate='prior_MAP; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'backend'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+__ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:dtype] __
+
+profile = QuaternaryNumericalProfileV3(profile_id='quaternary-bp4-f64-v3', backend='cpu-numpy', dtype='float64', llr_orientation..._candidate='prior_MAP; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'dtype'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:llr_orientation] _
+
+profile = QuaternaryNumericalProfileV3(profile_id='quaternary-bp4-f64-v3', backend='cpu-numpy', dtype='float64', llr_orientation..._candidate='prior_MAP; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'llr_orientation'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:pauli_order] _
+
+profile = QuaternaryNumericalProfileV3(profile_id='quaternary-bp4-f64-v3', backend='cpu-numpy', dtype='float64', llr_orientation..._candidate='prior_MAP; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'pauli_order'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:message_representation] _
+
+profile = QuaternaryNumericalProfileV3(profile_id='quaternary-bp4-f64-v3', backend='cpu-numpy', dtype='float64', llr_orientation..._candidate='prior_MAP; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'message_representation'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:saturation] _
+
+profile = QuaternaryNumericalProfileV3(profile_id='quaternary-bp4-f64-v3', backend='cpu-numpy', dtype='float64', llr_orientation..._candidate='prior_MAP; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'saturation'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:saturation_boundary] _
+
+profile = QuaternaryNumericalProfileV3(profile_id='quaternary-bp4-f64-v3', backend='cpu-numpy', dtype='float64', llr_orientation..._candidate='prior_MAP; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'saturation_boundary'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:reduction_order] _
+
+profile = QuaternaryNumericalProfileV3(profile_id='quaternary-bp4-f64-v3', backend='cpu-numpy', dtype='float64', llr_orientation..._candidate='prior_MAP; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'reduction_order'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:normalization] _
+
+profile = QuaternaryNumericalProfileV3(profile_id='quaternary-bp4-f64-v3', backend='cpu-numpy', dtype='float64', llr_orientation..._candidate='prior_MAP; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'normalization'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:candidate_tie_break] _
+
+profile = QuaternaryNumericalProfileV3(profile_id='quaternary-bp4-f64-v3', backend='cpu-numpy', dtype='float64', llr_orientation..._candidate='prior_MAP; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'candidate_tie_break'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:zero_rule] _
+
+profile = QuaternaryNumericalProfileV3(profile_id='quaternary-bp4-f64-v3', backend='cpu-numpy', dtype='float64', llr_orientation..._candidate='prior_MAP; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'zero_rule'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:smoothing_requirement] _
+
+profile = QuaternaryNumericalProfileV3(profile_id='quaternary-bp4-f64-v3', backend='cpu-numpy', dtype='float64', llr_orientation..._candidate='prior_MAP; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'smoothing_requirement'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:nonfinite_policy] _
+
+profile = QuaternaryNumericalProfileV3(profile_id='quaternary-bp4-f64-v3', backend='cpu-numpy', dtype='float64', llr_orientation..._candidate='prior_MAP; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'nonfinite_policy'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:oracle_gate] _
+
+profile = QuaternaryNumericalProfileV3(profile_id='quaternary-bp4-f64-v3', backend='cpu-numpy', dtype='float64', llr_orientation..._candidate='prior_MAP; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'oracle_gate'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:initial_candidate] _
+
+profile = QuaternaryNumericalProfileV3(profile_id='quaternary-bp4-f64-v3', backend='cpu-numpy', dtype='float64', llr_orientation..._candidate='prior_MAP; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+field = 'initial_candidate'
+
+    @pytest.mark.parametrize('profile,field', [
+        pytest.param(profile, f.name, id=f'{profile.profile_id}:{f.name}')
+        for profile in PROFILES for f in fields(profile) if f.name not in parameters(profile)
+    ])
+    def test_fixed_profile_evidence_cannot_be_changed(profile, field):
+        value = getattr(profile, field)
+        changed = 'unsupported_semantics' if isinstance(value, str) else value + 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:53: Failed
+_ test_profile_parameters_reject_invalid_numeric_values[nan-binary-spa-flooding-f64-v1] _
+
+profile = NumericalProfile(profile_id='binary-spa-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natural_... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+value = nan
+
+    @pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), -1., True, 'invalid'])
+    def test_profile_parameters_reject_invalid_numeric_values(profile, value):
+        for field in parameters(profile) - {'check_rule'}:
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:79: Failed
+_ test_profile_parameters_reject_invalid_numeric_values[nan-binary-min-sum-flooding-f64-v1] _
+
+profile = NumericalProfile(profile_id='binary-min-sum-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natu... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+value = nan
+
+    @pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), -1., True, 'invalid'])
+    def test_profile_parameters_reject_invalid_numeric_values(profile, value):
+        for field in parameters(profile) - {'check_rule'}:
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:79: Failed
+_ test_profile_parameters_reject_invalid_numeric_values[nan-quaternary-bp4-f64-v1] _
+
+profile = QuaternaryNumericalProfile(profile_id='quaternary-bp4-f64-v1', backend='cpu-numpy', dtype='float64', llr_orientation='...ut_and_raise_terminal_numerical_failure', oracle_gate='vector_and_exact_tree_fixtures_required_before_public_manifest')
+value = nan
+
+    @pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), -1., True, 'invalid'])
+    def test_profile_parameters_reject_invalid_numeric_values(profile, value):
+        for field in parameters(profile) - {'check_rule'}:
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:79: Failed
+_ test_profile_parameters_reject_invalid_numeric_values[inf-binary-spa-flooding-f64-v1] _
+
+profile = NumericalProfile(profile_id='binary-spa-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natural_... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+value = inf
+
+    @pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), -1., True, 'invalid'])
+    def test_profile_parameters_reject_invalid_numeric_values(profile, value):
+        for field in parameters(profile) - {'check_rule'}:
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:79: Failed
+_ test_profile_parameters_reject_invalid_numeric_values[inf-binary-min-sum-flooding-f64-v1] _
+
+profile = NumericalProfile(profile_id='binary-min-sum-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natu... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+value = inf
+
+    @pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), -1., True, 'invalid'])
+    def test_profile_parameters_reject_invalid_numeric_values(profile, value):
+        for field in parameters(profile) - {'check_rule'}:
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:79: Failed
+_ test_profile_parameters_reject_invalid_numeric_values[inf-quaternary-bp4-f64-v1] _
+
+profile = QuaternaryNumericalProfile(profile_id='quaternary-bp4-f64-v1', backend='cpu-numpy', dtype='float64', llr_orientation='...ut_and_raise_terminal_numerical_failure', oracle_gate='vector_and_exact_tree_fixtures_required_before_public_manifest')
+value = inf
+
+    @pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), -1., True, 'invalid'])
+    def test_profile_parameters_reject_invalid_numeric_values(profile, value):
+        for field in parameters(profile) - {'check_rule'}:
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:79: Failed
+_ test_profile_parameters_reject_invalid_numeric_values[-1.0-binary-spa-flooding-f64-v1] _
+
+profile = NumericalProfile(profile_id='binary-spa-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natural_... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+value = -1.0
+
+    @pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), -1., True, 'invalid'])
+    def test_profile_parameters_reject_invalid_numeric_values(profile, value):
+        for field in parameters(profile) - {'check_rule'}:
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:79: Failed
+_ test_profile_parameters_reject_invalid_numeric_values[-1.0-binary-min-sum-flooding-f64-v1] _
+
+profile = NumericalProfile(profile_id='binary-min-sum-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natu... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+value = -1.0
+
+    @pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), -1., True, 'invalid'])
+    def test_profile_parameters_reject_invalid_numeric_values(profile, value):
+        for field in parameters(profile) - {'check_rule'}:
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:79: Failed
+_ test_profile_parameters_reject_invalid_numeric_values[-1.0-quaternary-bp4-f64-v1] _
+
+profile = QuaternaryNumericalProfile(profile_id='quaternary-bp4-f64-v1', backend='cpu-numpy', dtype='float64', llr_orientation='...ut_and_raise_terminal_numerical_failure', oracle_gate='vector_and_exact_tree_fixtures_required_before_public_manifest')
+value = -1.0
+
+    @pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), -1., True, 'invalid'])
+    def test_profile_parameters_reject_invalid_numeric_values(profile, value):
+        for field in parameters(profile) - {'check_rule'}:
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:79: Failed
+_ test_profile_parameters_reject_invalid_numeric_values[True-binary-spa-flooding-f64-v1] _
+
+profile = NumericalProfile(profile_id='binary-spa-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natural_... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+value = True
+
+    @pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), -1., True, 'invalid'])
+    def test_profile_parameters_reject_invalid_numeric_values(profile, value):
+        for field in parameters(profile) - {'check_rule'}:
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:79: Failed
+_ test_profile_parameters_reject_invalid_numeric_values[True-binary-min-sum-flooding-f64-v1] _
+
+profile = NumericalProfile(profile_id='binary-min-sum-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natu... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+value = True
+
+    @pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), -1., True, 'invalid'])
+    def test_profile_parameters_reject_invalid_numeric_values(profile, value):
+        for field in parameters(profile) - {'check_rule'}:
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:79: Failed
+_ test_profile_parameters_reject_invalid_numeric_values[True-binary-spa-flooding-f64-v2] _
+
+profile = BinaryNumericalProfileV2(profile_id='binary-spa-flooding-f64-v2', backend='cpu-numpy', dtype='float64', llr_encoding='...ping=0.1, saturation_boundary='legacy_saturation_field_inactive; optional_final_check_cap_and_product_unity_safeguard')
+value = True
+
+    @pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), -1., True, 'invalid'])
+    def test_profile_parameters_reject_invalid_numeric_values(profile, value):
+        for field in parameters(profile) - {'check_rule'}:
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:79: Failed
+_ test_profile_parameters_reject_invalid_numeric_values[True-binary-spa-flooding-f64-v3] _
+
+profile = BinaryNumericalProfileV3(profile_id='binary-spa-flooding-f64-v3', backend='cpu-numpy', dtype='float64', llr_encoding='...idate='prior_decision; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+value = True
+
+    @pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), -1., True, 'invalid'])
+    def test_profile_parameters_reject_invalid_numeric_values(profile, value):
+        for field in parameters(profile) - {'check_rule'}:
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:79: Failed
+_ test_profile_parameters_reject_invalid_numeric_values[True-quaternary-bp4-f64-v1] _
+
+profile = QuaternaryNumericalProfile(profile_id='quaternary-bp4-f64-v1', backend='cpu-numpy', dtype='float64', llr_orientation='...ut_and_raise_terminal_numerical_failure', oracle_gate='vector_and_exact_tree_fixtures_required_before_public_manifest')
+value = True
+
+    @pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), -1., True, 'invalid'])
+    def test_profile_parameters_reject_invalid_numeric_values(profile, value):
+        for field in parameters(profile) - {'check_rule'}:
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:79: Failed
+_ test_profile_parameters_reject_invalid_numeric_values[True-quaternary-bp4-f64-v2] _
+
+profile = QuaternaryNumericalProfileV2(profile_id='quaternary-bp4-f64-v2', backend='cpu-numpy', dtype='float64', llr_orientation...es_required_before_public_manifest', check_rule='tanh_product', check_cap=None, product_epsilon=1e-10, v2c_damping=0.1)
+value = True
+
+    @pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), -1., True, 'invalid'])
+    def test_profile_parameters_reject_invalid_numeric_values(profile, value):
+        for field in parameters(profile) - {'check_rule'}:
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:79: Failed
+_ test_profile_parameters_reject_invalid_numeric_values[True-quaternary-bp4-f64-v3] _
+
+profile = QuaternaryNumericalProfileV3(profile_id='quaternary-bp4-f64-v3', backend='cpu-numpy', dtype='float64', llr_orientation..._candidate='prior_MAP; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+value = True
+
+    @pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), -1., True, 'invalid'])
+    def test_profile_parameters_reject_invalid_numeric_values(profile, value):
+        for field in parameters(profile) - {'check_rule'}:
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:79: Failed
+_ test_profile_parameters_reject_invalid_numeric_values[invalid-binary-spa-flooding-f64-v1] _
+
+profile = NumericalProfile(profile_id='binary-spa-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natural_... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+value = 'invalid'
+
+    @pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), -1., True, 'invalid'])
+    def test_profile_parameters_reject_invalid_numeric_values(profile, value):
+        for field in parameters(profile) - {'check_rule'}:
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:79: Failed
+_ test_profile_parameters_reject_invalid_numeric_values[invalid-binary-min-sum-flooding-f64-v1] _
+
+profile = NumericalProfile(profile_id='binary-min-sum-flooding-f64-v1', backend='cpu-numpy', dtype='float64', llr_encoding='natu... degree_one_rule='positive_saturation_before_syndrome_sign', exact_zero_decision=0, tie_break='ascending_canonical_id')
+value = 'invalid'
+
+    @pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), -1., True, 'invalid'])
+    def test_profile_parameters_reject_invalid_numeric_values(profile, value):
+        for field in parameters(profile) - {'check_rule'}:
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:79: Failed
+_ test_profile_parameters_reject_invalid_numeric_values[invalid-binary-spa-flooding-f64-v2] _
+
+profile = BinaryNumericalProfileV2(profile_id='binary-spa-flooding-f64-v2', backend='cpu-numpy', dtype='float64', llr_encoding='...ping=0.1, saturation_boundary='legacy_saturation_field_inactive; optional_final_check_cap_and_product_unity_safeguard')
+value = 'invalid'
+
+    @pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), -1., True, 'invalid'])
+    def test_profile_parameters_reject_invalid_numeric_values(profile, value):
+        for field in parameters(profile) - {'check_rule'}:
+            with pytest.raises(ValueError):
+>               replace(profile, **{field: value})
+
+tests/canonical/test_kernel_contract_admission.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/hpc/home/mg551/miniconda3/lib/python3.12/dataclasses.py:1579: in replace
+    return obj.__class__(**changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+<string>:19: in __init__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = BinaryNumericalProfileV2(profile_id='binary-spa-flooding-f64-v2', backend='cpu-numpy', dtype='float64', llr_encoding='...ping=0.1, saturation_boundary='legacy_saturation_field_inactive; optional_final_check_cap_and_product_unity_safeguard')
+
+    def __post_init__(self) -> None:
+        if self.check_rule != "tanh_product" or not (
+>           (self.check_cap is None or math.isfinite(self.check_cap) and self.check_cap > 0)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            and 0 < self.product_epsilon < .5 and 1.0 - self.product_epsilon < 1.0
+            and 0 <= self.v2c_damping < 1
+        ):
+E       TypeError: must be real number, not str
+
+src/bp_registry/canonical/numerics.py:56: TypeError
+_ test_profile_parameters_reject_invalid_numeric_values[invalid-binary-spa-flooding-f64-v3] _
+
+profile = BinaryNumericalProfileV3(profile_id='binary-spa-flooding-f64-v3', backend='cpu-numpy', dtype='float64', llr_encoding='...idate='prior_decision; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+value = 'invalid'
+
+    @pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), -1., True, 'invalid'])
+    def test_profile_parameters_reject_invalid_numeric_values(profile, value):
+        for field in parameters(profile) - {'check_rule'}:
+            with pytest.raises(ValueError):
+>               replace(profile, **{field: value})
+
+tests/canonical/test_kernel_contract_admission.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/hpc/home/mg551/miniconda3/lib/python3.12/dataclasses.py:1579: in replace
+    return obj.__class__(**changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+<string>:21: in __init__
+    ???
+src/bp_registry/canonical/numerics.py:74: in __post_init__
+    BinaryNumericalProfileV2.__post_init__(self)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = BinaryNumericalProfileV3(profile_id='binary-spa-flooding-f64-v3', backend='cpu-numpy', dtype='float64', llr_encoding='...idate='prior_decision; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+
+    def __post_init__(self) -> None:
+        if self.check_rule != "tanh_product" or not (
+>           (self.check_cap is None or math.isfinite(self.check_cap) and self.check_cap > 0)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            and 0 < self.product_epsilon < .5 and 1.0 - self.product_epsilon < 1.0
+            and 0 <= self.v2c_damping < 1
+        ):
+E       TypeError: must be real number, not str
+
+src/bp_registry/canonical/numerics.py:56: TypeError
+_ test_profile_parameters_reject_invalid_numeric_values[invalid-quaternary-bp4-f64-v1] _
+
+profile = QuaternaryNumericalProfile(profile_id='quaternary-bp4-f64-v1', backend='cpu-numpy', dtype='float64', llr_orientation='...ut_and_raise_terminal_numerical_failure', oracle_gate='vector_and_exact_tree_fixtures_required_before_public_manifest')
+value = 'invalid'
+
+    @pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), -1., True, 'invalid'])
+    def test_profile_parameters_reject_invalid_numeric_values(profile, value):
+        for field in parameters(profile) - {'check_rule'}:
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_kernel_contract_admission.py:79: Failed
+_ test_profile_parameters_reject_invalid_numeric_values[invalid-quaternary-bp4-f64-v2] _
+
+profile = QuaternaryNumericalProfileV2(profile_id='quaternary-bp4-f64-v2', backend='cpu-numpy', dtype='float64', llr_orientation...es_required_before_public_manifest', check_rule='tanh_product', check_cap=None, product_epsilon=1e-10, v2c_damping=0.1)
+value = 'invalid'
+
+    @pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), -1., True, 'invalid'])
+    def test_profile_parameters_reject_invalid_numeric_values(profile, value):
+        for field in parameters(profile) - {'check_rule'}:
+            with pytest.raises(ValueError):
+>               replace(profile, **{field: value})
+
+tests/canonical/test_kernel_contract_admission.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/hpc/home/mg551/miniconda3/lib/python3.12/dataclasses.py:1579: in replace
+    return obj.__class__(**changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+<string>:22: in __init__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = QuaternaryNumericalProfileV2(profile_id='quaternary-bp4-f64-v2', backend='cpu-numpy', dtype='float64', llr_orientation...quired_before_public_manifest', check_rule='tanh_product', check_cap='invalid', product_epsilon=1e-10, v2c_damping=0.1)
+
+    def __post_init__(self) -> None:
+        if self.check_rule not in ("tanh_product", "boxplus"):
+            raise ValueError("v2 check rule must be tanh_product or boxplus")
+>       if not ((self.check_cap is None or math.isfinite(self.check_cap) and self.check_cap > 0)
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                and 0 < self.product_epsilon < .5 and 1.0 - self.product_epsilon < 1.0
+                and 0 <= self.v2c_damping < 1):
+E               TypeError: must be real number, not str
+
+src/bp_registry/quaternary/numerics.py:72: TypeError
+_ test_profile_parameters_reject_invalid_numeric_values[invalid-quaternary-bp4-f64-v3] _
+
+profile = QuaternaryNumericalProfileV3(profile_id='quaternary-bp4-f64-v3', backend='cpu-numpy', dtype='float64', llr_orientation..._candidate='prior_MAP; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+value = 'invalid'
+
+    @pytest.mark.parametrize('profile', PROFILES, ids=lambda p: p.profile_id)
+    @pytest.mark.parametrize('value', [float('nan'), float('inf'), -1., True, 'invalid'])
+    def test_profile_parameters_reject_invalid_numeric_values(profile, value):
+        for field in parameters(profile) - {'check_rule'}:
+            with pytest.raises(ValueError):
+>               replace(profile, **{field: value})
+
+tests/canonical/test_kernel_contract_admission.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/hpc/home/mg551/miniconda3/lib/python3.12/dataclasses.py:1579: in replace
+    return obj.__class__(**changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+<string>:24: in __init__
+    ???
+src/bp_registry/quaternary/numerics.py:89: in __post_init__
+    QuaternaryNumericalProfileV2.__post_init__(self)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = QuaternaryNumericalProfileV3(profile_id='quaternary-bp4-f64-v3', backend='cpu-numpy', dtype='float64', llr_orientation..._candidate='prior_MAP; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+
+    def __post_init__(self) -> None:
+        if self.check_rule not in ("tanh_product", "boxplus"):
+            raise ValueError("v2 check rule must be tanh_product or boxplus")
+>       if not ((self.check_cap is None or math.isfinite(self.check_cap) and self.check_cap > 0)
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                and 0 < self.product_epsilon < .5 and 1.0 - self.product_epsilon < 1.0
+                and 0 <= self.v2c_damping < 1):
+E               TypeError: must be real number, not str
+
+src/bp_registry/quaternary/numerics.py:72: TypeError
+=========================== short test summary info ============================
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v1:profile_id]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v1:backend]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v1:dtype]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v1:llr_encoding]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v1:syndrome_convention]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v1:prior_initialization]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v1:normalization]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v1:degree_one_rule]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v1:exact_zero_decision]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v1:tie_break]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-min-sum-flooding-f64-v1:profile_id]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-min-sum-flooding-f64-v1:backend]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-min-sum-flooding-f64-v1:dtype]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-min-sum-flooding-f64-v1:llr_encoding]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-min-sum-flooding-f64-v1:syndrome_convention]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-min-sum-flooding-f64-v1:prior_initialization]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-min-sum-flooding-f64-v1:normalization]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-min-sum-flooding-f64-v1:degree_one_rule]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-min-sum-flooding-f64-v1:exact_zero_decision]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-min-sum-flooding-f64-v1:tie_break]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:profile_id]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:backend]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:dtype]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:llr_encoding]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:syndrome_convention]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:saturation]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:prior_initialization]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:normalization]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:degree_one_rule]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:exact_zero_decision]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:tie_break]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v2:saturation_boundary]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:profile_id]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:backend]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:dtype]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:llr_encoding]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:syndrome_convention]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:saturation]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:prior_initialization]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:normalization]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:degree_one_rule]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:exact_zero_decision]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:tie_break]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:saturation_boundary]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[binary-spa-flooding-f64-v3:initial_candidate]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:profile_id]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:backend]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:dtype]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:llr_orientation]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:pauli_order]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:message_representation]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:saturation_boundary]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:reduction_order]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:normalization]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:candidate_tie_break]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:zero_rule]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:smoothing_requirement]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:nonfinite_policy]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v1:oracle_gate]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:profile_id]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:backend]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:dtype]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:llr_orientation]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:pauli_order]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:message_representation]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:saturation]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:saturation_boundary]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:reduction_order]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:normalization]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:candidate_tie_break]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:zero_rule]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:smoothing_requirement]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:nonfinite_policy]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v2:oracle_gate]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:profile_id]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:backend]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:dtype]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:llr_orientation]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:pauli_order]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:message_representation]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:saturation]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:saturation_boundary]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:reduction_order]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:normalization]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:candidate_tie_break]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:zero_rule]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:smoothing_requirement]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:nonfinite_policy]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:oracle_gate]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_fixed_profile_evidence_cannot_be_changed[quaternary-bp4-f64-v3:initial_candidate]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_profile_parameters_reject_invalid_numeric_values[nan-binary-spa-flooding-f64-v1]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_profile_parameters_reject_invalid_numeric_values[nan-binary-min-sum-flooding-f64-v1]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_profile_parameters_reject_invalid_numeric_values[nan-quaternary-bp4-f64-v1]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_profile_parameters_reject_invalid_numeric_values[inf-binary-spa-flooding-f64-v1]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_profile_parameters_reject_invalid_numeric_values[inf-binary-min-sum-flooding-f64-v1]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_profile_parameters_reject_invalid_numeric_values[inf-quaternary-bp4-f64-v1]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_profile_parameters_reject_invalid_numeric_values[-1.0-binary-spa-flooding-f64-v1]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_profile_parameters_reject_invalid_numeric_values[-1.0-binary-min-sum-flooding-f64-v1]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_profile_parameters_reject_invalid_numeric_values[-1.0-quaternary-bp4-f64-v1]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_profile_parameters_reject_invalid_numeric_values[True-binary-spa-flooding-f64-v1]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_profile_parameters_reject_invalid_numeric_values[True-binary-min-sum-flooding-f64-v1]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_profile_parameters_reject_invalid_numeric_values[True-binary-spa-flooding-f64-v2]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_profile_parameters_reject_invalid_numeric_values[True-binary-spa-flooding-f64-v3]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_profile_parameters_reject_invalid_numeric_values[True-quaternary-bp4-f64-v1]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_profile_parameters_reject_invalid_numeric_values[True-quaternary-bp4-f64-v2]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_profile_parameters_reject_invalid_numeric_values[True-quaternary-bp4-f64-v3]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_profile_parameters_reject_invalid_numeric_values[invalid-binary-spa-flooding-f64-v1]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_profile_parameters_reject_invalid_numeric_values[invalid-binary-min-sum-flooding-f64-v1]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_profile_parameters_reject_invalid_numeric_values[invalid-binary-spa-flooding-f64-v2]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_profile_parameters_reject_invalid_numeric_values[invalid-binary-spa-flooding-f64-v3]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_profile_parameters_reject_invalid_numeric_values[invalid-quaternary-bp4-f64-v1]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_profile_parameters_reject_invalid_numeric_values[invalid-quaternary-bp4-f64-v2]
+FAILED tests/canonical/test_kernel_contract_admission.py::test_profile_parameters_reject_invalid_numeric_values[invalid-quaternary-bp4-f64-v3]
+113 failed, 33 passed in 1.59s

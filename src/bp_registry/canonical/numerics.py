@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 import math
 from bp_registry.check_numerics import stabilized_log_ratio
+from bp_registry.profile_contracts import finite_real, validate_fixed_fields
 import numbers
 
 import numpy as np
@@ -30,6 +31,13 @@ class NumericalProfile:
     exact_zero_decision: int = 0
     tie_break: str = "ascending_canonical_id"
 
+    def __post_init__(self) -> None:
+        overrides = ({"profile_id": "binary-min-sum-flooding-f64-v1", "normalization": "min_sum"}
+                     if self.profile_id == "binary-min-sum-flooding-f64-v1" else {})
+        validate_fixed_fields(self, NumericalProfile, parameters={"saturation"}, overrides=overrides)
+        if not finite_real(self.saturation) or self.saturation <= 0:
+            raise ValueError("saturation must be finite and positive")
+
     def as_evidence(self) -> dict[str, str | float | int | None]:
         """Return the complete resolved profile for manifests and ledgers."""
         return asdict(self)
@@ -52,10 +60,15 @@ class BinaryNumericalProfileV2(NumericalProfile):
     saturation_boundary: str = "legacy_saturation_field_inactive; optional_final_check_cap_and_product_unity_safeguard"
 
     def __post_init__(self) -> None:
+        validate_fixed_fields(self, BinaryNumericalProfileV2,
+                              parameters={"check_cap", "product_epsilon", "v2c_damping"})
+        self._validate_parameters()
+
+    def _validate_parameters(self) -> None:
         if self.check_rule != "tanh_product" or not (
-            (self.check_cap is None or math.isfinite(self.check_cap) and self.check_cap > 0)
-            and 0 < self.product_epsilon < .5 and 1.0 - self.product_epsilon < 1.0
-            and 0 <= self.v2c_damping < 1
+            (self.check_cap is None or finite_real(self.check_cap) and self.check_cap > 0)
+            and finite_real(self.product_epsilon) and 0 < self.product_epsilon < .5 and 1.0 - self.product_epsilon < 1.0
+            and finite_real(self.v2c_damping) and 0 <= self.v2c_damping < 1
         ):
             raise ValueError("invalid binary SPA v2 numerical profile")
 
@@ -71,9 +84,9 @@ class BinaryNumericalProfileV3(BinaryNumericalProfileV2):
     check_stabilization: str = "exact_unity"
 
     def __post_init__(self) -> None:
-        BinaryNumericalProfileV2.__post_init__(self)
-        if self.check_stabilization != "exact_unity":
-            raise ValueError("plain v3 uses exact_unity; use an explicit flooding policy for other stabilization")
+        validate_fixed_fields(self, BinaryNumericalProfileV3,
+                              parameters={"check_cap", "product_epsilon", "v2c_damping"})
+        self._validate_parameters()
 
 
 BINARY_SPA_F64_V3 = BinaryNumericalProfileV3()

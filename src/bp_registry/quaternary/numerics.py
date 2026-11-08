@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 import math
 from bp_registry.check_numerics import stabilized_log_ratio
+from bp_registry.profile_contracts import finite_real, validate_fixed_fields
 import numbers
 
 import numpy as np
@@ -41,6 +42,11 @@ class QuaternaryNumericalProfile:
     nonfinite_policy: str = "reject_input_and_raise_terminal_numerical_failure"
     oracle_gate: str = "vector_and_exact_tree_fixtures_required_before_public_manifest"
 
+    def __post_init__(self) -> None:
+        validate_fixed_fields(self, QuaternaryNumericalProfile, parameters={"saturation"})
+        if not finite_real(self.saturation) or self.saturation <= 0:
+            raise ValueError("saturation must be finite and positive")
+
     def as_evidence(self) -> dict[str, str | float | None]:
         """Return the complete immutable numerical contract for durable evidence."""
         return asdict(self)
@@ -67,11 +73,16 @@ class QuaternaryNumericalProfileV2(QuaternaryNumericalProfile):
     v2c_damping: float = 0.1
 
     def __post_init__(self) -> None:
+        validate_fixed_fields(self, QuaternaryNumericalProfileV2,
+                              parameters={"check_rule", "check_cap", "product_epsilon", "v2c_damping"})
+        self._validate_parameters()
+
+    def _validate_parameters(self) -> None:
         if self.check_rule not in ("tanh_product", "boxplus"):
             raise ValueError("v2 check rule must be tanh_product or boxplus")
-        if not ((self.check_cap is None or math.isfinite(self.check_cap) and self.check_cap > 0)
-                and 0 < self.product_epsilon < .5 and 1.0 - self.product_epsilon < 1.0
-                and 0 <= self.v2c_damping < 1):
+        if not ((self.check_cap is None or finite_real(self.check_cap) and self.check_cap > 0)
+                and finite_real(self.product_epsilon) and 0 < self.product_epsilon < .5 and 1.0 - self.product_epsilon < 1.0
+                and finite_real(self.v2c_damping) and 0 <= self.v2c_damping < 1):
             raise ValueError("invalid v2 check cap, product epsilon, or damping")
 
 
@@ -86,9 +97,9 @@ class QuaternaryNumericalProfileV3(QuaternaryNumericalProfileV2):
     check_stabilization: str = "exact_unity"
 
     def __post_init__(self) -> None:
-        QuaternaryNumericalProfileV2.__post_init__(self)
-        if self.check_stabilization != "exact_unity":
-            raise ValueError("plain v3 uses exact_unity; use an explicit flooding policy for other stabilization")
+        validate_fixed_fields(self, QuaternaryNumericalProfileV3,
+                              parameters={"check_rule", "check_cap", "product_epsilon", "v2c_damping"})
+        self._validate_parameters()
 
 
 QBP4_F64_V3 = QuaternaryNumericalProfileV3()
