@@ -1,0 +1,277 @@
+FFFFFFFFFFFFFFFF..FF..FFF...                                             [100%]
+=================================== FAILURES ===================================
+_____ test_bound_prior_rejects_invalid_state_before_shortcuts[direct-nan] ______
+
+prior = nan, construction = 'direct'
+
+    @pytest.mark.parametrize('prior',[np.nan,np.inf,-np.inf,np.longdouble('1e400'),True,'0.2',1j,[.2]])
+    @pytest.mark.parametrize('construction',['direct','replace'])
+    def test_bound_prior_rejects_invalid_state_before_shortcuts(prior,construction):
+        graph=binary()
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:21: Failed
+_____ test_bound_prior_rejects_invalid_state_before_shortcuts[direct-inf] ______
+
+prior = inf, construction = 'direct'
+
+    @pytest.mark.parametrize('prior',[np.nan,np.inf,-np.inf,np.longdouble('1e400'),True,'0.2',1j,[.2]])
+    @pytest.mark.parametrize('construction',['direct','replace'])
+    def test_bound_prior_rejects_invalid_state_before_shortcuts(prior,construction):
+        graph=binary()
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:21: Failed
+_____ test_bound_prior_rejects_invalid_state_before_shortcuts[direct--inf] _____
+
+prior = -inf, construction = 'direct'
+
+    @pytest.mark.parametrize('prior',[np.nan,np.inf,-np.inf,np.longdouble('1e400'),True,'0.2',1j,[.2]])
+    @pytest.mark.parametrize('construction',['direct','replace'])
+    def test_bound_prior_rejects_invalid_state_before_shortcuts(prior,construction):
+        graph=binary()
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:21: Failed
+____ test_bound_prior_rejects_invalid_state_before_shortcuts[direct-prior3] ____
+
+prior = np.longdouble('1e+400'), construction = 'direct'
+
+    @pytest.mark.parametrize('prior',[np.nan,np.inf,-np.inf,np.longdouble('1e400'),True,'0.2',1j,[.2]])
+    @pytest.mark.parametrize('construction',['direct','replace'])
+    def test_bound_prior_rejects_invalid_state_before_shortcuts(prior,construction):
+        graph=binary()
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:21: Failed
+_____ test_bound_prior_rejects_invalid_state_before_shortcuts[direct-True] _____
+
+prior = True, construction = 'direct'
+
+    @pytest.mark.parametrize('prior',[np.nan,np.inf,-np.inf,np.longdouble('1e400'),True,'0.2',1j,[.2]])
+    @pytest.mark.parametrize('construction',['direct','replace'])
+    def test_bound_prior_rejects_invalid_state_before_shortcuts(prior,construction):
+        graph=binary()
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:21: Failed
+_____ test_bound_prior_rejects_invalid_state_before_shortcuts[direct-0.2] ______
+
+prior = '0.2', construction = 'direct'
+
+    @pytest.mark.parametrize('prior',[np.nan,np.inf,-np.inf,np.longdouble('1e400'),True,'0.2',1j,[.2]])
+    @pytest.mark.parametrize('construction',['direct','replace'])
+    def test_bound_prior_rejects_invalid_state_before_shortcuts(prior,construction):
+        graph=binary()
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:21: Failed
+______ test_bound_prior_rejects_invalid_state_before_shortcuts[direct-1j] ______
+
+prior = 1j, construction = 'direct'
+
+    @pytest.mark.parametrize('prior',[np.nan,np.inf,-np.inf,np.longdouble('1e400'),True,'0.2',1j,[.2]])
+    @pytest.mark.parametrize('construction',['direct','replace'])
+    def test_bound_prior_rejects_invalid_state_before_shortcuts(prior,construction):
+        graph=binary()
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:21: Failed
+____ test_bound_prior_rejects_invalid_state_before_shortcuts[direct-prior7] ____
+
+prior = [0.2], construction = 'direct'
+
+    @pytest.mark.parametrize('prior',[np.nan,np.inf,-np.inf,np.longdouble('1e400'),True,'0.2',1j,[.2]])
+    @pytest.mark.parametrize('construction',['direct','replace'])
+    def test_bound_prior_rejects_invalid_state_before_shortcuts(prior,construction):
+        graph=binary()
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:21: Failed
+_____ test_bound_prior_rejects_invalid_state_before_shortcuts[replace-nan] _____
+
+prior = nan, construction = 'replace'
+
+    @pytest.mark.parametrize('prior',[np.nan,np.inf,-np.inf,np.longdouble('1e400'),True,'0.2',1j,[.2]])
+    @pytest.mark.parametrize('construction',['direct','replace'])
+    def test_bound_prior_rejects_invalid_state_before_shortcuts(prior,construction):
+        graph=binary()
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:21: Failed
+_____ test_bound_prior_rejects_invalid_state_before_shortcuts[replace-inf] _____
+
+prior = inf, construction = 'replace'
+
+    @pytest.mark.parametrize('prior',[np.nan,np.inf,-np.inf,np.longdouble('1e400'),True,'0.2',1j,[.2]])
+    @pytest.mark.parametrize('construction',['direct','replace'])
+    def test_bound_prior_rejects_invalid_state_before_shortcuts(prior,construction):
+        graph=binary()
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:21: Failed
+____ test_bound_prior_rejects_invalid_state_before_shortcuts[replace--inf] _____
+
+prior = -inf, construction = 'replace'
+
+    @pytest.mark.parametrize('prior',[np.nan,np.inf,-np.inf,np.longdouble('1e400'),True,'0.2',1j,[.2]])
+    @pytest.mark.parametrize('construction',['direct','replace'])
+    def test_bound_prior_rejects_invalid_state_before_shortcuts(prior,construction):
+        graph=binary()
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:21: Failed
+___ test_bound_prior_rejects_invalid_state_before_shortcuts[replace-prior3] ____
+
+prior = np.longdouble('1e+400'), construction = 'replace'
+
+    @pytest.mark.parametrize('prior',[np.nan,np.inf,-np.inf,np.longdouble('1e400'),True,'0.2',1j,[.2]])
+    @pytest.mark.parametrize('construction',['direct','replace'])
+    def test_bound_prior_rejects_invalid_state_before_shortcuts(prior,construction):
+        graph=binary()
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:21: Failed
+____ test_bound_prior_rejects_invalid_state_before_shortcuts[replace-True] _____
+
+prior = True, construction = 'replace'
+
+    @pytest.mark.parametrize('prior',[np.nan,np.inf,-np.inf,np.longdouble('1e400'),True,'0.2',1j,[.2]])
+    @pytest.mark.parametrize('construction',['direct','replace'])
+    def test_bound_prior_rejects_invalid_state_before_shortcuts(prior,construction):
+        graph=binary()
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:21: Failed
+_____ test_bound_prior_rejects_invalid_state_before_shortcuts[replace-0.2] _____
+
+prior = '0.2', construction = 'replace'
+
+    @pytest.mark.parametrize('prior',[np.nan,np.inf,-np.inf,np.longdouble('1e400'),True,'0.2',1j,[.2]])
+    @pytest.mark.parametrize('construction',['direct','replace'])
+    def test_bound_prior_rejects_invalid_state_before_shortcuts(prior,construction):
+        graph=binary()
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:21: Failed
+_____ test_bound_prior_rejects_invalid_state_before_shortcuts[replace-1j] ______
+
+prior = 1j, construction = 'replace'
+
+    @pytest.mark.parametrize('prior',[np.nan,np.inf,-np.inf,np.longdouble('1e400'),True,'0.2',1j,[.2]])
+    @pytest.mark.parametrize('construction',['direct','replace'])
+    def test_bound_prior_rejects_invalid_state_before_shortcuts(prior,construction):
+        graph=binary()
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:21: Failed
+___ test_bound_prior_rejects_invalid_state_before_shortcuts[replace-prior7] ____
+
+prior = [0.2], construction = 'replace'
+
+    @pytest.mark.parametrize('prior',[np.nan,np.inf,-np.inf,np.longdouble('1e400'),True,'0.2',1j,[.2]])
+    @pytest.mark.parametrize('construction',['direct','replace'])
+    def test_bound_prior_rejects_invalid_state_before_shortcuts(prior,construction):
+        graph=binary()
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:21: Failed
+____________ test_bound_prior_normalizes_finite_values_once[prior2] ____________
+
+prior = np.float32(0.5)
+
+    @pytest.mark.parametrize('prior',[0.,-.2,np.float32(.5),np.nextafter(0.,1.),1e308,-1e308])
+    def test_bound_prior_normalizes_finite_values_once(prior):
+        bound=BoundBinaryFlooding(binary(),prior)
+>       assert type(bound.prior) is float
+E       AssertionError: assert <class 'numpy.float32'> is float
+E        +  where <class 'numpy.float32'> = type(np.float32(0.5))
+E        +    where np.float32(0.5) = BoundBinaryFlooding(graph=CompiledBinaryFlooding(table=EdgeTable(check_count=1, variable_count=2, edges=((0, 0), (0, 1...rue, version='bp-flooding-policy-v3', check_stabilization='log_domain', product_epsilon=1e-10)), prior=np.float32(0.5)).prior
+
+tests/canonical/test_freeze_fixes.py:28: AssertionError
+____________ test_bound_prior_normalizes_finite_values_once[5e-324] ____________
+
+prior = np.float64(5e-324)
+
+    @pytest.mark.parametrize('prior',[0.,-.2,np.float32(.5),np.nextafter(0.,1.),1e308,-1e308])
+    def test_bound_prior_normalizes_finite_values_once(prior):
+        bound=BoundBinaryFlooding(binary(),prior)
+>       assert type(bound.prior) is float
+E       AssertionError: assert <class 'numpy.float64'> is float
+E        +  where <class 'numpy.float64'> = type(np.float64(5e-324))
+E        +    where np.float64(5e-324) = BoundBinaryFlooding(graph=CompiledBinaryFlooding(table=EdgeTable(check_count=1, variable_count=2, edges=((0, 0), (0, 1..., version='bp-flooding-policy-v3', check_stabilization='log_domain', product_epsilon=1e-10)), prior=np.float64(5e-324)).prior
+
+tests/canonical/test_freeze_fixes.py:28: AssertionError
+___________________ test_bound_prior_requires_compiled_graph ___________________
+
+    def test_bound_prior_requires_compiled_graph():
+>       with pytest.raises(ValueError):BoundBinaryFlooding(object(),.2)
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:36: Failed
+___________ test_pauli_stored_prior_is_validated_in_float64[value0] ____________
+
+value = np.longdouble('1e+400')
+
+    @pytest.mark.parametrize('value',[np.longdouble('1e400'),np.longdouble('-1e400'),np.longdouble('nan'),np.longdouble('inf')])
+    def test_pauli_stored_prior_is_validated_in_float64(value):
+>       with pytest.raises(ValueError):replace(pauli(),prior_llrs=np.full((2,3),value,dtype=np.longdouble))
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:40: Failed
+___________ test_pauli_stored_prior_is_validated_in_float64[value1] ____________
+
+value = np.longdouble('-1e+400')
+
+    @pytest.mark.parametrize('value',[np.longdouble('1e400'),np.longdouble('-1e400'),np.longdouble('nan'),np.longdouble('inf')])
+    def test_pauli_stored_prior_is_validated_in_float64(value):
+>       with pytest.raises(ValueError):replace(pauli(),prior_llrs=np.full((2,3),value,dtype=np.longdouble))
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_freeze_fixes.py:40: Failed
+=============================== warnings summary ===============================
+tests/canonical/test_freeze_fixes.py::test_pauli_stored_prior_is_validated_in_float64[value0]
+tests/canonical/test_freeze_fixes.py::test_pauli_stored_prior_is_validated_in_float64[value1]
+  /hpc/group/pfisterlab/mg551/storage/survey_bp/src/bp_registry/compiled_contracts.py:22: RuntimeWarning: overflow encountered in cast
+    array = np.asarray(value, dtype=dtype, order='C')
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/canonical/test_freeze_fixes.py::test_bound_prior_rejects_invalid_state_before_shortcuts[direct-nan]
+FAILED tests/canonical/test_freeze_fixes.py::test_bound_prior_rejects_invalid_state_before_shortcuts[direct-inf]
+FAILED tests/canonical/test_freeze_fixes.py::test_bound_prior_rejects_invalid_state_before_shortcuts[direct--inf]
+FAILED tests/canonical/test_freeze_fixes.py::test_bound_prior_rejects_invalid_state_before_shortcuts[direct-prior3]
+FAILED tests/canonical/test_freeze_fixes.py::test_bound_prior_rejects_invalid_state_before_shortcuts[direct-True]
+FAILED tests/canonical/test_freeze_fixes.py::test_bound_prior_rejects_invalid_state_before_shortcuts[direct-0.2]
+FAILED tests/canonical/test_freeze_fixes.py::test_bound_prior_rejects_invalid_state_before_shortcuts[direct-1j]
+FAILED tests/canonical/test_freeze_fixes.py::test_bound_prior_rejects_invalid_state_before_shortcuts[direct-prior7]
+FAILED tests/canonical/test_freeze_fixes.py::test_bound_prior_rejects_invalid_state_before_shortcuts[replace-nan]
+FAILED tests/canonical/test_freeze_fixes.py::test_bound_prior_rejects_invalid_state_before_shortcuts[replace-inf]
+FAILED tests/canonical/test_freeze_fixes.py::test_bound_prior_rejects_invalid_state_before_shortcuts[replace--inf]
+FAILED tests/canonical/test_freeze_fixes.py::test_bound_prior_rejects_invalid_state_before_shortcuts[replace-prior3]
+FAILED tests/canonical/test_freeze_fixes.py::test_bound_prior_rejects_invalid_state_before_shortcuts[replace-True]
+FAILED tests/canonical/test_freeze_fixes.py::test_bound_prior_rejects_invalid_state_before_shortcuts[replace-0.2]
+FAILED tests/canonical/test_freeze_fixes.py::test_bound_prior_rejects_invalid_state_before_shortcuts[replace-1j]
+FAILED tests/canonical/test_freeze_fixes.py::test_bound_prior_rejects_invalid_state_before_shortcuts[replace-prior7]
+FAILED tests/canonical/test_freeze_fixes.py::test_bound_prior_normalizes_finite_values_once[prior2]
+FAILED tests/canonical/test_freeze_fixes.py::test_bound_prior_normalizes_finite_values_once[5e-324]
+FAILED tests/canonical/test_freeze_fixes.py::test_bound_prior_requires_compiled_graph
+FAILED tests/canonical/test_freeze_fixes.py::test_pauli_stored_prior_is_validated_in_float64[value0]
+FAILED tests/canonical/test_freeze_fixes.py::test_pauli_stored_prior_is_validated_in_float64[value1]
+21 failed, 7 passed, 2 warnings in 3.46s

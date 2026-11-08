@@ -15,7 +15,7 @@ import numpy as np
 from numba import njit
 
 from bp_registry.resolution import BpFloodingPolicy, round_message
-from bp_registry.compiled_contracts import csr_pointer, integer_vector, immutable_array
+from bp_registry.compiled_contracts import csr_pointer, integer_vector, immutable_array, finite_float64_scalar
 
 from .kernel import KernelResult
 from .numerics import (
@@ -589,6 +589,11 @@ class BoundBinaryFlooding:
 
     graph: CompiledBinaryFlooding
     prior: float
+
+    def __post_init__(self):
+        if not isinstance(self.graph, CompiledBinaryFlooding):
+            raise ValueError("bound binary state requires a CompiledBinaryFlooding graph")
+        object.__setattr__(self, "prior", finite_float64_scalar(self.prior, "bound prior"))
 
     def run(self, syndrome: np.ndarray, *, max_iterations: int) -> KernelResult:
         s = self.graph._syndrome(syndrome)
