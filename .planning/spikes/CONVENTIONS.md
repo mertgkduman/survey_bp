@@ -39,4 +39,8 @@ The project `.venv` supplies the pinned versions in `pyproject.toml`; no new dep
 
 - Audit admitted numerical controls across every accepting schedule/controller, and include initial-convergence and zero-iteration returns when checking state validation. Validate normalized execution-dtype state, not only pre-conversion input.
 
+- Check controller-specific controls for a real execution operand before exposing them in sweeps or HTML. Distinct recorded configurations alone do not establish distinct implemented policies.
+- Name the operand weighted by each memory coefficient in identity tests; V2C gamma weights the fresh message, whereas other gamma parameters can weight history. Preserve and explain incorrect probe assumptions separately from production findings.
+- Carry prior hardware qualification only with matching source identities and explicit timing scope. Fresh CPU validation of stored GPU records is not a new hardware run; distinguish decode/transfer/result binding from JIT and JSON export costs.
+
 - Record CPU affinity and physical-core topology with benchmarks. If an unchanged control shifts with the candidate, retain the first measurement and alternate already-warmed isolated revisions before attributing the shift to code. Logical workers on sibling hardware threads do not establish multicore scaling.
