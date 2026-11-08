@@ -139,8 +139,14 @@ class FloodingSchedule:
                 indices.setflags(write=False)
         self._edge_variables = tuple(variable for _check, variable in edge_table.edges)
 
-    def initialize(self, error_rate: float) -> np.ndarray:
+    def initialize(self, error_rate: float, *, prior_llrs: np.ndarray | None = None) -> np.ndarray:
         """Create the initial variable-to-check snapshot from the declared prior."""
+        if prior_llrs is not None:
+            prior = np.asarray(prior_llrs, dtype=np.float64)
+            if prior.shape != (self.edge_table.variable_count,) or not np.all(np.isfinite(prior)):
+                raise ValueError("prior_llrs must have one finite value per variable")
+            return finite_saturate(prior[np.asarray(self._edge_variables, dtype=np.intp)],
+                                   boundary="flooding_initial_prior", profile=self.profile)
         return np.full(self.edge_table.edge_count, self.kernel.prior(error_rate), dtype=np.float64)
 
     def sweep(

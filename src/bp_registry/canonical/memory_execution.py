@@ -158,12 +158,13 @@ class MemoryFloodingSchedule(FloodingSchedule):
         array = immutable_snapshot(finite_saturate(value, boundary=name, profile=self.profile))
         return array
 
-    def initialize(self, error_rate: float) -> np.ndarray:
+    def initialize(self, error_rate: float, *, prior_llrs: np.ndarray | None = None) -> np.ndarray:
         # A new lifetime invalidates every uncommitted proposal from the old
         # attempt, even when both have revision zero and the same channel.
         self._owner = object()
-        messages = super().initialize(error_rate)
-        prior = self._bounded(np.full(self.edge_table.variable_count, self.kernel.prior(error_rate)), "memory_initial_prior")
+        messages = super().initialize(error_rate, prior_llrs=prior_llrs)
+        prior = self._bounded(np.full(self.edge_table.variable_count, self.kernel.prior(error_rate))
+                              if prior_llrs is None else np.asarray(prior_llrs, dtype=np.float64), "memory_initial_prior")
         histories = []
         for binding, policy in zip(self.memory.bindings, self._policies, strict=True):
             if binding.kind == "affine_prior":

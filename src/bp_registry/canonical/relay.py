@@ -389,6 +389,7 @@ class RelayController:
         solution_limit: int | None = None, transfer: Literal["posterior_only", "disabled"] | None = None,
         sample_seed_identity: str | None = None,
         boundary_observer: Callable[[str, WorkVector | None, str | None], None] | None = None,
+        prior_llrs: np.ndarray | None = None,
     ) -> RelayRunResult:
         if not math.isfinite(error_rate) or not 0.0 < error_rate < 1.0:
             raise ValueError("Relay requires a finite error rate strictly between zero and one")
@@ -406,6 +407,10 @@ class RelayController:
         if self.memory_tuning is not None and (not isinstance(sample_seed_identity, str) or not sample_seed_identity):
             raise ValueError("active Relay memory tuning requires a public sample seed identity")
         base_prior = np.full(edge_table.variable_count, kernel.prior(error_rate), dtype=np.float64)  # type: ignore[attr-defined]
+        if prior_llrs is not None:
+            base_prior = np.array(prior_llrs, dtype=np.float64, copy=True)
+            if base_prior.shape != (edge_table.variable_count,) or not np.all(np.isfinite(base_prior)):
+                raise ValueError("Relay prior_llrs must have one finite value per variable")
         previous: PosteriorTransferV2 | None = None
         leg_results: list[RelayLegResult] = []
         transfers: list[PosteriorTransferV2] = []
