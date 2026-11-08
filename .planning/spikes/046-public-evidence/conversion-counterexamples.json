@@ -1,0 +1,84 @@
+[
+  {
+    "field": "faults",
+    "input": [
+      [
+        256
+      ]
+    ],
+    "stored_array": [
+      [
+        0
+      ]
+    ],
+    "bound_ledger": [
+      [
+        256
+      ]
+    ],
+    "array_ledger_agree": false,
+    "independent_replay_rejected": true
+  },
+  {
+    "field": "predictions",
+    "input": [
+      [
+        256
+      ]
+    ],
+    "stored_array": [
+      [
+        0
+      ]
+    ],
+    "bound_ledger": [
+      [
+        256
+      ]
+    ],
+    "array_ledger_agree": false,
+    "independent_replay_rejected": true
+  },
+  {
+    "field": "converged",
+    "input": [
+      2
+    ],
+    "stored_array": [
+      true
+    ],
+    "bound_ledger": [
+      2
+    ],
+    "array_ledger_agree": false,
+    "independent_replay_rejected": true
+  },
+  {
+    "field": "iterations",
+    "input": [
+      1.5
+    ],
+    "stored_array": [
+      1
+    ],
+    "bound_ledger": [
+      1.5
+    ],
+    "array_ledger_agree": false,
+    "independent_replay_rejected": true
+  },
+  {
+    "field": "iterations",
+    "input": [
+      -1
+    ],
+    "stored_array": [
+      -1
+    ],
+    "bound_ledger": [
+      -1
+    ],
+    "array_ledger_agree": true,
+    "independent_replay_rejected": true
+  }
+]

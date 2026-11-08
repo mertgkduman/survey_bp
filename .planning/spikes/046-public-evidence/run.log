@@ -1,0 +1,2 @@
+{"checks": 3, "passed": 2, "failed": 1}
+FINDING: circuit_execution_dtype_admission 5 invalid result values admitted; 4 diverge after casting

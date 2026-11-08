@@ -96,6 +96,11 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 | 043 | canonical-kernel-audit | Circuit and CUDA mathematical contracts | standard | Given admitted new paths, when checked against independent factor calculations, then messages, decisions and failure semantics agree | PARTIAL | mathematics, circuit, cuda |
 | 044 | canonical-kernel-audit | New-path upstream correspondence | comparison | Given aligned pinned references, when matched inputs execute, then numerical and controller differences are explained | VALIDATED | upstream, circuit |
 | 045 | canonical-kernel-audit | Policy composition and admission | standard | Given a declared policy, when executed or rejected, then every effective control and state lifetime has a defined meaning | PARTIAL | policies, admission |
-| 046 | canonical-kernel-audit | Evidence and public-use readiness | standard | Given outputs from new paths, when exported and replayed, then input/output/work identities and public workflows remain trustworthy | PENDING | evidence, readiness |
+| 046 | canonical-kernel-audit | Evidence and public-use readiness | standard | Given outputs from new paths, when exported and replayed, then input/output/work identities and public workflows remain trustworthy | PARTIAL | evidence, readiness |
 
 Ordered closure of D03 → D04 → D01 → D02 → D05: [correction report](CANONICAL-KERNEL-COMPLETENESS-FIXES.md), [combined verification](042-batch-evidence-fix/verification.json), and [execution contracts](../../docs/canonical-kernel-contracts.md). Historical 034–037 verdicts remain as originally observed.
+
+Post-extension audit 043–046: [circuit/CUDA audit](CANONICAL-KERNEL-CIRCUIT-CUDA-AUDIT.md).
+Ordinary-domain mathematics and matched upstream execution pass. Three bounded
+contract findings remain, with suggested closure E03 → E01 → E02. This audit
+changes no production behavior or publication gates.
