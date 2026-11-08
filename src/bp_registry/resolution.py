@@ -150,16 +150,21 @@ class BpFloodingPolicy:
         if self.version == "bp-flooding-policy-v1":
             if self.check_stabilization is not None or self.product_epsilon is not None or self.hard_decision == "map_pauli":
                 raise ValueError("new numerical choices require bp-flooding-policy-v2")
-        elif self.version == "bp-flooding-policy-v2":
-            if (self.check_stabilization not in {"exact_unity", "epsilon_band"}
+        elif self.version in {"bp-flooding-policy-v2", "bp-flooding-policy-v3"}:
+            allowed = {"log_domain"} if self.version == "bp-flooding-policy-v3" else {"exact_unity", "epsilon_band"}
+            if self.version == "bp-flooding-policy-v3" and self.check_rule != "sum_product":
+                raise ValueError("v3 log-domain SPA requires sum_product")
+            if (self.check_stabilization not in allowed
                     or type(self.product_epsilon) not in {int, float}
                     or not 0 < self.product_epsilon < .5 or not 1.0 - self.product_epsilon < 1.0):
-                raise ValueError("v2 requires explicit check stabilization and representable epsilon")
+                raise ValueError("v2/v3 requires explicit check stabilization and representable epsilon")
         else:
             raise ValueError("unknown BP flooding policy version")
 
     @property
-    def stabilization_args(self) -> tuple[bool, float]:
+    def stabilization_args(self) -> tuple[bool | int, float]:
+        if self.version == "bp-flooding-policy-v3":
+            return (2, self.product_epsilon)
         return (self.check_stabilization != "exact_unity", 1e-10 if self.product_epsilon is None else self.product_epsilon)
 
     @property
@@ -181,6 +186,13 @@ class BpFloodingPolicy:
             "coefficient_orientation": "old_weight=damping; fresh_weight=1-damping",
             "min_sum_degree_one_float_magnitude": 23.7189981105,
         }
+        if self.version == "bp-flooding-policy-v3":
+            contract.pop("min_sum_degree_one_float_magnitude")
+            contract.update(check_reduction="prefix_suffix_boxplus",
+                            reduction_order="canonical_prefix_forward_suffix_reverse",
+                            unary_check="finite_log((2-epsilon)/epsilon)",
+                            check_clipping="none_before_resolution",
+                            product_epsilon_scope="unary_checks_only")
         return {**self.as_spec(), **contract, "effective_coefficients": dict(zip(
             ("old_weight", "fresh_weight", "alpha", "beta"), self.coefficients, strict=True,
         ))}
@@ -196,7 +208,7 @@ class BpFloodingPolicy:
     def from_spec(cls, value: Mapping[str, object]) -> "BpFloodingPolicy":
         required = {"check_rule", "resolution", "damping", "alpha", "beta",
                     "hard_decision", "zero_syndrome_shortcut", "version"}
-        if isinstance(value, Mapping) and value.get("version") == "bp-flooding-policy-v2":
+        if isinstance(value, Mapping) and value.get("version") in {"bp-flooding-policy-v2", "bp-flooding-policy-v3"}:
             required |= {"check_stabilization", "product_epsilon"}
         if not isinstance(value, Mapping) or set(value) != required:
             raise ValueError("BP flooding spec requires all declared policy fields")
@@ -210,6 +222,11 @@ class BpFloodingPolicy:
 
 
 DEFAULT_BP4_MIN_SUM = BpFloodingPolicy()
+STABLE_SPA_F64 = BpFloodingPolicy(
+    check_rule="sum_product", resolution=ResolutionPolicy("float64"),
+    damping=0.1, hard_decision="map_pauli", version="bp-flooding-policy-v3",
+    check_stabilization="log_domain", product_epsilon=1e-10,
+)
 
 
-__all__ = ["BpFloodingPolicy", "DEFAULT_BP4_MIN_SUM", "ResolutionPolicy", "round_message"]
+__all__ = ["BpFloodingPolicy", "DEFAULT_BP4_MIN_SUM", "STABLE_SPA_F64", "ResolutionPolicy", "round_message"]

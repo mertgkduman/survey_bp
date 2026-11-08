@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import math
-from bp_registry.check_numerics import stabilized_log_ratio, minsum_summary, tanh_factors
+from bp_registry.check_numerics import stabilized_log_ratio, minsum_summary, tanh_factors, stable_check_extrinsics
 
 import numpy as np
 from numba import njit
@@ -302,13 +302,18 @@ def _policy_sweep_into(row_ptr, variables, n, old, syndrome, prior,
     edge_count = len(variables)
     fixed_bound = ((2 ** ((8 if format_code == 3 else 16 if format_code == 4 else 32) - 1) - 1) / scale
                    if format_code >= 3 else math.inf)
-    check_values = old if check_rule == 1 else tanh_factors(old)
+    check_values = old if check_rule == 1 or clamp_band == 2 else tanh_factors(old)
+    # Legacy booleans retain their meaning; mode 2 selects stable SPA.
+    if clamp_band == 2:
+        stable_check_extrinsics(old, row_ptr, syndrome, epsilon, c2v)
     for check in range(len(row_ptr) - 1):
         start, stop = row_ptr[check], row_ptr[check + 1]
         if check_rule == 1:
             first, second, minimum_edge, negative_count = minsum_summary(old, start, stop)
         for edge in range(start, stop):
-            if check_rule == 1:
+            if clamp_band == 2:
+                message = c2v[edge]
+            elif check_rule == 1:
                 magnitude = min(fixed_bound, second if edge == minimum_edge else first)
                 negatives = int(syndrome[check]) + negative_count - int(old[edge] < 0.0)
                 if stop - start == 1 and format_code < 3:
@@ -451,14 +456,14 @@ class CompiledBinaryFlooding:
         s = self._syndrome(syndrome)
         if not math.isfinite(error_rate) or not 0.0 < error_rate < 1.0:
             raise ValueError("error_rate must be finite and between zero and one")
-        return s, ((math.log1p(-error_rate) - math.log(error_rate) if self.policy.version == "bp-flooding-policy-v2" else math.log((1.0 - error_rate) / error_rate)) if self.policy is not None
+        return s, ((math.log1p(-error_rate) - math.log(error_rate) if self.policy.version != "bp-flooding-policy-v1" else math.log((1.0 - error_rate) / error_rate)) if self.policy is not None
                    else prior_llr(error_rate, profile=self.profile))
 
     def bind_error_rate(self, error_rate: float) -> "BoundBinaryFlooding":
         """Resolve a fixed prior once for a same-parameter shot batch."""
         if not math.isfinite(error_rate) or not 0.0 < error_rate < 1.0:
             raise ValueError("error_rate must be finite and between zero and one")
-        prior = ((math.log1p(-error_rate) - math.log(error_rate) if self.policy.version == "bp-flooding-policy-v2" else math.log((1.0 - error_rate) / error_rate)) if self.policy is not None
+        prior = ((math.log1p(-error_rate) - math.log(error_rate) if self.policy.version != "bp-flooding-policy-v1" else math.log((1.0 - error_rate) / error_rate)) if self.policy is not None
                  else prior_llr(error_rate, profile=self.profile))
         return BoundBinaryFlooding(self, prior)
 
@@ -519,7 +524,7 @@ class CompiledBinaryFlooding:
                 self.row_ptr, self.variables, self.table.variable_count, s, prior,
                 max_iterations, resolution.format_code, resolution.fixed_scale,
                 resolution.scope == "all_state", 1 if self.rule == "min_sum" else 0,
-                *policy.coefficients, policy.zero_syndrome_shortcut, *policy.stabilization_args, policy.version == "bp-flooding-policy-v2",
+                *policy.coefficients, policy.zero_syndrome_shortcut, *policy.stabilization_args, policy.version != "bp-flooding-policy-v1",
             )
         elif isinstance(self.profile, BinaryNumericalProfileV2):
             candidate, converged, iterations = _decode_v2(
@@ -597,7 +602,7 @@ class BoundBinaryFlooding:
                 s, self.prior, max_iterations, resolution.format_code,
                 resolution.fixed_scale, resolution.scope == "all_state",
                 1 if self.graph.rule == "min_sum" else 0,
-                *policy.coefficients, policy.zero_syndrome_shortcut, *policy.stabilization_args, policy.version == "bp-flooding-policy-v2",
+                *policy.coefficients, policy.zero_syndrome_shortcut, *policy.stabilization_args, policy.version != "bp-flooding-policy-v1",
             )
         elif isinstance(self.graph.profile, BinaryNumericalProfileV2):
             candidate, converged, iterations = _decode_v2(

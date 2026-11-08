@@ -98,8 +98,8 @@ def _request(graph, syndromes, limit, workers):
     if (s.ndim != 2 or s.shape[1] != len(graph.row_ptr)-1 or not np.issubdtype(s.dtype,np.integer)
             or np.any((s != 0) & (s != 1))):
         raise ValueError('syndromes must be a binary integer matrix with one row per shot')
-    if graph.policy is not None and graph.policy.version != 'bp-flooding-policy-v2':
-        raise ValueError('CPU batches require an explicit v2 flooding policy')
+    if graph.policy is not None and graph.policy.version not in {'bp-flooding-policy-v2', 'bp-flooding-policy-v3'}:
+        raise ValueError('CPU batches require an explicit v2/v3 flooding policy')
     s = np.array(s, dtype=np.uint8, order='C', copy=True)
     return s
 

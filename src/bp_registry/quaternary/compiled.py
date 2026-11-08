@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import math
-from bp_registry.check_numerics import stabilized_log_ratio, minsum_summary, tanh_factors
+from bp_registry.check_numerics import stabilized_log_ratio, minsum_summary, tanh_factors, stable_check_extrinsics
 
 import numpy as np
 from numba import njit
@@ -328,13 +328,18 @@ def _policy_sweep_into(
         comm[edge] = round_message(projected, format_code, scale)
     fixed_bound = ((2 ** ((8 if format_code == 3 else 16 if format_code == 4 else 32) - 1) - 1) / scale
                    if format_code >= 3 else math.inf)
-    check_values = comm if check_rule == 1 else tanh_factors(comm)
+    check_values = comm if check_rule == 1 or clamp_band == 2 else tanh_factors(comm)
+    # Legacy booleans retain their meaning; mode 2 selects stable SPA.
+    if clamp_band == 2:
+        stable_check_extrinsics(comm, row_ptr, syndrome, epsilon, c2v)
     for check in range(len(row_ptr) - 1):
         start, stop = row_ptr[check], row_ptr[check + 1]
         if check_rule == 1:
             first, second, minimum_edge, negative_count = minsum_summary(comm, start, stop)
         for edge in range(start, stop):
-            if check_rule == 1:
+            if clamp_band == 2:
+                message = c2v[edge]
+            elif check_rule == 1:
                 magnitude = min(fixed_bound, second if edge == minimum_edge else first)
                 negatives = int(syndrome[check]) + negative_count - int(comm[edge] < 0.0)
                 if stop - start == 1 and format_code < 3:
@@ -809,7 +814,7 @@ class CompiledBp4Graph:
                 1 if policy.check_rule == "min_sum" else 0,
                 *policy.coefficients,
                 policy.decision_code,
-                policy.zero_syndrome_shortcut, stop_on_convergence, *policy.stabilization_args, policy.version == "bp-flooding-policy-v2",
+                policy.zero_syndrome_shortcut, stop_on_convergence, *policy.stabilization_args, policy.version != "bp-flooding-policy-v1",
             )
         elif isinstance(self.profile, QuaternaryNumericalProfileV2):
             candidate, iterations, converged = _decode_v2(
