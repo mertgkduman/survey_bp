@@ -94,7 +94,7 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 | 041 | canonical-kernel-audit | D02 correction | standard | Fix and qualify the admitted contract boundary | VALIDATED | completeness, fixes |
 | 042 | canonical-kernel-audit | D05 correction | standard | Fix and qualify the admitted contract boundary | VALIDATED | completeness, fixes |
 | 043 | canonical-kernel-audit | Circuit and CUDA mathematical contracts | standard | Given admitted new paths, when checked against independent factor calculations, then messages, decisions and failure semantics agree | PARTIAL | mathematics, circuit, cuda |
-| 044 | canonical-kernel-audit | New-path upstream correspondence | comparison | Given aligned pinned references, when matched inputs execute, then numerical and controller differences are explained | PENDING | upstream, circuit |
+| 044 | canonical-kernel-audit | New-path upstream correspondence | comparison | Given aligned pinned references, when matched inputs execute, then numerical and controller differences are explained | VALIDATED | upstream, circuit |
 | 045 | canonical-kernel-audit | Policy composition and admission | standard | Given a declared policy, when executed or rejected, then every effective control and state lifetime has a defined meaning | PENDING | policies, admission |
 | 046 | canonical-kernel-audit | Evidence and public-use readiness | standard | Given outputs from new paths, when exported and replayed, then input/output/work identities and public workflows remain trustworthy | PENDING | evidence, readiness |
 
