@@ -9,13 +9,21 @@ import numpy as np
 import pytest
 
 
+def _undamped_kernel():
+    from dataclasses import replace
+    from bp_registry.canonical.kernel import BinarySpaKernel
+    from bp_registry.canonical.numerics import BINARY_SPA_F64_V3
+
+    return BinarySpaKernel(profile=replace(BINARY_SPA_F64_V3, v2c_damping=0.0))
+
+
 def _irregular_fixture():
     from bp_registry.canonical.kernel import BinarySpaKernel
     from bp_registry.canonical.schedules import EdgeTable
 
     # c0 has degree three, while the other checks make dependency cones irregular.
     table = EdgeTable.from_edges(3, 5, [(0, 0), (0, 1), (0, 2), (1, 0), (1, 3), (2, 1), (2, 4)])
-    return table, BinarySpaKernel(), np.asarray([2.0, 3.0, 4.0, 1.5, 1.0, 2.5, 0.5]), np.zeros(7), np.zeros(3, dtype=np.uint8)
+    return table, _undamped_kernel(), np.asarray([2.0, 3.0, 4.0, 1.5, 1.0, 2.5, 0.5]), np.zeros(7), np.zeros(3, dtype=np.uint8)
 
 
 def _reference_lifecycle_step(table, kernel, v2c, c2v, cache, syndrome, *, error_rate):
@@ -80,7 +88,7 @@ def test_tracer_initializes_full_pool_selects_first_tie_and_reserves_one_local_u
 
     residual = _residual_module()
     table = EdgeTable.from_edges(2, 2, [(1, 1), (0, 1), (1, 0), (0, 0)])
-    schedule = residual.SyndromeResidualSchedule(table, kernel=BinarySpaKernel())
+    schedule = residual.SyndromeResidualSchedule(table, kernel=_undamped_kernel())
     v2c = np.asarray([1.0, 1.0, 1.0, 1.0])
     c2v = np.asarray([0.0, 0.0, 0.0, 0.0])
     setup_tree = BudgetTree(limits=())
@@ -120,7 +128,7 @@ def test_setup_budget_denial_precedes_all_full_pool_residual_calculation():
 
     residual = _residual_module()
     table = EdgeTable.from_edges(1, 2, [(0, 0), (0, 1)])
-    schedule = residual.SyndromeResidualSchedule(table, kernel=BinarySpaKernel())
+    schedule = residual.SyndromeResidualSchedule(table, kernel=_undamped_kernel())
     v2c = np.asarray([1.0, 2.0])
     c2v = np.asarray([0.0, 0.0])
     tree = BudgetTree(limits=(BudgetLimit("attempt", "residual_priority_evaluations", 0),))
@@ -214,7 +222,7 @@ def test_small_irregular_graphs_match_the_independent_source_lifecycle_oracle(ed
     v2c = rng.uniform(0.2, 4.0, size=table.edge_count)
     c2v = rng.uniform(-1.0, 1.0, size=table.edge_count)
     syndrome = np.asarray([0, 1, 0], dtype=np.uint8)
-    kernel = BinarySpaKernel()
+    kernel = _undamped_kernel()
     schedule = residual.SyndromeResidualSchedule(table, kernel=kernel)
     cache = schedule.initialize(v2c, c2v, syndrome, error_rate=0.1)
     selected, expected_v2c, expected_c2v, expected_cache = _reference_lifecycle_step(

@@ -1,0 +1,74 @@
+FFFFF...                                                                 [100%]
+=================================== FAILURES ===================================
+_______ test_residual_rejects_ignored_damping_before_state_exists[None] ________
+
+profile = None
+
+    @pytest.mark.parametrize('profile', [None, BINARY_SPA_F64_V2, BINARY_SPA_F64_V3,
+        replace(BINARY_SPA_F64_V2, v2c_damping=.6),
+        replace(BINARY_SPA_F64_V3, v2c_damping=.6)])
+    def test_residual_rejects_ignored_damping_before_state_exists(profile):
+        kernel = BinarySpaKernel() if profile is None else BinarySpaKernel(profile=profile)
+>       with pytest.raises(ValueError, match='undamped'):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_residual_admission.py:24: Failed
+_____ test_residual_rejects_ignored_damping_before_state_exists[profile1] ______
+
+profile = BinaryNumericalProfileV2(profile_id='binary-spa-flooding-f64-v2', backend='cpu-numpy', dtype='float64', llr_encoding='...ping=0.1, saturation_boundary='legacy_saturation_field_inactive; optional_final_check_cap_and_product_unity_safeguard')
+
+    @pytest.mark.parametrize('profile', [None, BINARY_SPA_F64_V2, BINARY_SPA_F64_V3,
+        replace(BINARY_SPA_F64_V2, v2c_damping=.6),
+        replace(BINARY_SPA_F64_V3, v2c_damping=.6)])
+    def test_residual_rejects_ignored_damping_before_state_exists(profile):
+        kernel = BinarySpaKernel() if profile is None else BinarySpaKernel(profile=profile)
+>       with pytest.raises(ValueError, match='undamped'):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_residual_admission.py:24: Failed
+_____ test_residual_rejects_ignored_damping_before_state_exists[profile2] ______
+
+profile = BinaryNumericalProfileV3(profile_id='binary-spa-flooding-f64-v3', backend='cpu-numpy', dtype='float64', llr_encoding='...idate='prior_decision; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+
+    @pytest.mark.parametrize('profile', [None, BINARY_SPA_F64_V2, BINARY_SPA_F64_V3,
+        replace(BINARY_SPA_F64_V2, v2c_damping=.6),
+        replace(BINARY_SPA_F64_V3, v2c_damping=.6)])
+    def test_residual_rejects_ignored_damping_before_state_exists(profile):
+        kernel = BinarySpaKernel() if profile is None else BinarySpaKernel(profile=profile)
+>       with pytest.raises(ValueError, match='undamped'):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_residual_admission.py:24: Failed
+_____ test_residual_rejects_ignored_damping_before_state_exists[profile3] ______
+
+profile = BinaryNumericalProfileV2(profile_id='binary-spa-flooding-f64-v2', backend='cpu-numpy', dtype='float64', llr_encoding='...ping=0.6, saturation_boundary='legacy_saturation_field_inactive; optional_final_check_cap_and_product_unity_safeguard')
+
+    @pytest.mark.parametrize('profile', [None, BINARY_SPA_F64_V2, BINARY_SPA_F64_V3,
+        replace(BINARY_SPA_F64_V2, v2c_damping=.6),
+        replace(BINARY_SPA_F64_V3, v2c_damping=.6)])
+    def test_residual_rejects_ignored_damping_before_state_exists(profile):
+        kernel = BinarySpaKernel() if profile is None else BinarySpaKernel(profile=profile)
+>       with pytest.raises(ValueError, match='undamped'):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_residual_admission.py:24: Failed
+_____ test_residual_rejects_ignored_damping_before_state_exists[profile4] ______
+
+profile = BinaryNumericalProfileV3(profile_id='binary-spa-flooding-f64-v3', backend='cpu-numpy', dtype='float64', llr_encoding='...idate='prior_decision; no_initial_shortcut; convergence_reports_candidate_validity', check_stabilization='exact_unity')
+
+    @pytest.mark.parametrize('profile', [None, BINARY_SPA_F64_V2, BINARY_SPA_F64_V3,
+        replace(BINARY_SPA_F64_V2, v2c_damping=.6),
+        replace(BINARY_SPA_F64_V3, v2c_damping=.6)])
+    def test_residual_rejects_ignored_damping_before_state_exists(profile):
+        kernel = BinarySpaKernel() if profile is None else BinarySpaKernel(profile=profile)
+>       with pytest.raises(ValueError, match='undamped'):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_residual_admission.py:24: Failed
+=========================== short test summary info ============================
+FAILED tests/canonical/test_residual_admission.py::test_residual_rejects_ignored_damping_before_state_exists[None]
+FAILED tests/canonical/test_residual_admission.py::test_residual_rejects_ignored_damping_before_state_exists[profile1]
+FAILED tests/canonical/test_residual_admission.py::test_residual_rejects_ignored_damping_before_state_exists[profile2]
+FAILED tests/canonical/test_residual_admission.py::test_residual_rejects_ignored_damping_before_state_exists[profile3]
+FAILED tests/canonical/test_residual_admission.py::test_residual_rejects_ignored_damping_before_state_exists[profile4]
+5 failed, 3 passed in 1.12s

@@ -138,6 +138,8 @@ class SyndromeResidualSchedule:
             raise ValueError("sRBP requires an EdgeTable and BinarySpaKernel")
         if kernel.update_rule is not None:
             raise ValueError("conventional sRBP commits SPA messages; a non-SPA kernel is not admitted")
+        if getattr(kernel.profile, "v2c_damping", 0.0) != 0.0:
+            raise ValueError("conventional sRBP requires an undamped numerical profile")
         if edge_table.edge_count == 0:
             raise ValueError("conventional sRBP requires a nonempty full C2V edge pool")
         self.edge_table = edge_table
