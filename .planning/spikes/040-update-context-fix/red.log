@@ -1,0 +1,500 @@
+FF..FFFFFFFFFFFFFFFFFFFFF                                                [100%]
+=================================== FAILURES ===================================
+_______________ test_flooding_source_iterations[standalone-nms] ________________
+
+kind = 'nms', entry = 'standalone'
+
+    @pytest.mark.parametrize("kind", ("nms", "oms"))
+    @pytest.mark.parametrize("entry", ("standalone", "atomic"))
+    def test_flooding_source_iterations(kind, entry):
+        rule = RecordingRule(make_rule(kind))
+        kernel = BinarySpaKernel(update_rule=rule)
+        if entry == "standalone":
+            kernel.run(H, S, error_rate=.2, max_iterations=3)
+        else:
+            AtomicFloodingExecutor(FloodingSchedule(TABLE, kernel=kernel), BudgetTree(limits=()), scope="attempt").run_attempt(np.ones(4), S, error_rate=.2, max_iterations=3)
+>       assert {c["source_iteration"] for c in rule.calls} == {0, 1, 2}
+E       assert {0} == {0, 1, 2}
+E         
+E         Extra items in the right set:
+E         1
+E         2
+E         Use -v to get more diff
+
+tests/canonical/test_update_context.py:49: AssertionError
+_______________ test_flooding_source_iterations[standalone-oms] ________________
+
+kind = 'oms', entry = 'standalone'
+
+    @pytest.mark.parametrize("kind", ("nms", "oms"))
+    @pytest.mark.parametrize("entry", ("standalone", "atomic"))
+    def test_flooding_source_iterations(kind, entry):
+        rule = RecordingRule(make_rule(kind))
+        kernel = BinarySpaKernel(update_rule=rule)
+        if entry == "standalone":
+            kernel.run(H, S, error_rate=.2, max_iterations=3)
+        else:
+            AtomicFloodingExecutor(FloodingSchedule(TABLE, kernel=kernel), BudgetTree(limits=()), scope="attempt").run_attempt(np.ones(4), S, error_rate=.2, max_iterations=3)
+>       assert {c["source_iteration"] for c in rule.calls} == {0, 1, 2}
+E       assert {0} == {0, 1, 2}
+E         
+E         Extra items in the right set:
+E         1
+E         2
+E         Use -v to get more diff
+
+tests/canonical/test_update_context.py:49: AssertionError
+_______ test_local_context_and_actual_arithmetic[0-LayeredSchedule-nms] ________
+
+kind = 'nms', cls = <class 'bp_registry.canonical.schedules.LayeredSchedule'>
+cursor = 0
+
+    @pytest.mark.parametrize("kind", ("nms", "oms"))
+    @pytest.mark.parametrize("cls", LOCAL)
+    @pytest.mark.parametrize("cursor", (0, 1))
+    def test_local_context_and_actual_arithmetic(kind, cls, cursor):
+        rule = RecordingRule(make_rule(kind))
+        schedule = make_schedule(cls, BinarySpaKernel(update_rule=rule))
+        original = np.array([1., 2., 3., 4.])
+        schedule.execute_local_step(CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt"), original.copy(), S, error_rate=.2,
+            progress=ScheduleProgress(1, 77, (cursor,)), is_converged=lambda _: False)
+>       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
+E       AssertionError: assert ([{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}] and {0} == {1}
+E        +  where [{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}] = <test_update_context.RecordingRule object at 0x7f910f481160>.calls
+E         
+E         Extra items in the left set:
+E         0
+E         Extra items in the right set:
+E         1
+E         Use -v to get more diff)
+
+tests/canonical/test_update_context.py:61: AssertionError
+_______ test_local_context_and_actual_arithmetic[0-LayeredSchedule-oms] ________
+
+kind = 'oms', cls = <class 'bp_registry.canonical.schedules.LayeredSchedule'>
+cursor = 0
+
+    @pytest.mark.parametrize("kind", ("nms", "oms"))
+    @pytest.mark.parametrize("cls", LOCAL)
+    @pytest.mark.parametrize("cursor", (0, 1))
+    def test_local_context_and_actual_arithmetic(kind, cls, cursor):
+        rule = RecordingRule(make_rule(kind))
+        schedule = make_schedule(cls, BinarySpaKernel(update_rule=rule))
+        original = np.array([1., 2., 3., 4.])
+        schedule.execute_local_step(CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt"), original.copy(), S, error_rate=.2,
+            progress=ScheduleProgress(1, 77, (cursor,)), is_converged=lambda _: False)
+>       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
+E       AssertionError: assert ([{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}] and {0} == {1}
+E        +  where [{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}] = <test_update_context.RecordingRule object at 0x7f910f4819a0>.calls
+E         
+E         Extra items in the left set:
+E         0
+E         Extra items in the right set:
+E         1
+E         Use -v to get more diff)
+
+tests/canonical/test_update_context.py:61: AssertionError
+___ test_local_context_and_actual_arithmetic[0-CheckNodeSerialSchedule-nms] ____
+
+kind = 'nms'
+cls = <class 'bp_registry.canonical.schedules.CheckNodeSerialSchedule'>
+cursor = 0
+
+    @pytest.mark.parametrize("kind", ("nms", "oms"))
+    @pytest.mark.parametrize("cls", LOCAL)
+    @pytest.mark.parametrize("cursor", (0, 1))
+    def test_local_context_and_actual_arithmetic(kind, cls, cursor):
+        rule = RecordingRule(make_rule(kind))
+        schedule = make_schedule(cls, BinarySpaKernel(update_rule=rule))
+        original = np.array([1., 2., 3., 4.])
+        schedule.execute_local_step(CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt"), original.copy(), S, error_rate=.2,
+            progress=ScheduleProgress(1, 77, (cursor,)), is_converged=lambda _: False)
+>       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
+E       AssertionError: assert ([{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}] and {0} == {1}
+E        +  where [{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}] = <test_update_context.RecordingRule object at 0x7f910f4824b0>.calls
+E         
+E         Extra items in the left set:
+E         0
+E         Extra items in the right set:
+E         1
+E         Use -v to get more diff)
+
+tests/canonical/test_update_context.py:61: AssertionError
+___ test_local_context_and_actual_arithmetic[0-CheckNodeSerialSchedule-oms] ____
+
+kind = 'oms'
+cls = <class 'bp_registry.canonical.schedules.CheckNodeSerialSchedule'>
+cursor = 0
+
+    @pytest.mark.parametrize("kind", ("nms", "oms"))
+    @pytest.mark.parametrize("cls", LOCAL)
+    @pytest.mark.parametrize("cursor", (0, 1))
+    def test_local_context_and_actual_arithmetic(kind, cls, cursor):
+        rule = RecordingRule(make_rule(kind))
+        schedule = make_schedule(cls, BinarySpaKernel(update_rule=rule))
+        original = np.array([1., 2., 3., 4.])
+        schedule.execute_local_step(CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt"), original.copy(), S, error_rate=.2,
+            progress=ScheduleProgress(1, 77, (cursor,)), is_converged=lambda _: False)
+>       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
+E       AssertionError: assert ([{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}] and {0} == {1}
+E        +  where [{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}] = <test_update_context.RecordingRule object at 0x7f910f482e40>.calls
+E         
+E         Extra items in the left set:
+E         0
+E         Extra items in the right set:
+E         1
+E         Use -v to get more diff)
+
+tests/canonical/test_update_context.py:61: AssertionError
+__ test_local_context_and_actual_arithmetic[0-VariableNodeSerialSchedule-nms] __
+
+kind = 'nms'
+cls = <class 'bp_registry.canonical.schedules.VariableNodeSerialSchedule'>
+cursor = 0
+
+    @pytest.mark.parametrize("kind", ("nms", "oms"))
+    @pytest.mark.parametrize("cls", LOCAL)
+    @pytest.mark.parametrize("cursor", (0, 1))
+    def test_local_context_and_actual_arithmetic(kind, cls, cursor):
+        rule = RecordingRule(make_rule(kind))
+        schedule = make_schedule(cls, BinarySpaKernel(update_rule=rule))
+        original = np.array([1., 2., 3., 4.])
+        schedule.execute_local_step(CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt"), original.copy(), S, error_rate=.2,
+            progress=ScheduleProgress(1, 77, (cursor,)), is_converged=lambda _: False)
+>       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
+E       AssertionError: assert ([{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}] and {0} == {1}
+E        +  where [{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}] = <test_update_context.RecordingRule object at 0x7f910f483aa0>.calls
+E         
+E         Extra items in the left set:
+E         0
+E         Extra items in the right set:
+E         1
+E         Use -v to get more diff)
+
+tests/canonical/test_update_context.py:61: AssertionError
+__ test_local_context_and_actual_arithmetic[0-VariableNodeSerialSchedule-oms] __
+
+kind = 'oms'
+cls = <class 'bp_registry.canonical.schedules.VariableNodeSerialSchedule'>
+cursor = 0
+
+    @pytest.mark.parametrize("kind", ("nms", "oms"))
+    @pytest.mark.parametrize("cls", LOCAL)
+    @pytest.mark.parametrize("cursor", (0, 1))
+    def test_local_context_and_actual_arithmetic(kind, cls, cursor):
+        rule = RecordingRule(make_rule(kind))
+        schedule = make_schedule(cls, BinarySpaKernel(update_rule=rule))
+        original = np.array([1., 2., 3., 4.])
+        schedule.execute_local_step(CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt"), original.copy(), S, error_rate=.2,
+            progress=ScheduleProgress(1, 77, (cursor,)), is_converged=lambda _: False)
+>       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
+E       AssertionError: assert ([{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}] and {0} == {1}
+E        +  where [{'check_index': 0, 'edge_index': 0, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}] = <test_update_context.RecordingRule object at 0x7f910f4c52b0>.calls
+E         
+E         Extra items in the left set:
+E         0
+E         Extra items in the right set:
+E         1
+E         Use -v to get more diff)
+
+tests/canonical/test_update_context.py:61: AssertionError
+_______ test_local_context_and_actual_arithmetic[1-LayeredSchedule-nms] ________
+
+kind = 'nms', cls = <class 'bp_registry.canonical.schedules.LayeredSchedule'>
+cursor = 1
+
+    @pytest.mark.parametrize("kind", ("nms", "oms"))
+    @pytest.mark.parametrize("cls", LOCAL)
+    @pytest.mark.parametrize("cursor", (0, 1))
+    def test_local_context_and_actual_arithmetic(kind, cls, cursor):
+        rule = RecordingRule(make_rule(kind))
+        schedule = make_schedule(cls, BinarySpaKernel(update_rule=rule))
+        original = np.array([1., 2., 3., 4.])
+        schedule.execute_local_step(CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt"), original.copy(), S, error_rate=.2,
+            progress=ScheduleProgress(1, 77, (cursor,)), is_converged=lambda _: False)
+>       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
+E       AssertionError: assert ([{'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] and {0} == {1}
+E        +  where [{'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] = <test_update_context.RecordingRule object at 0x7f910f4c73b0>.calls
+E         
+E         Extra items in the left set:
+E         0
+E         Extra items in the right set:
+E         1
+E         Use -v to get more diff)
+
+tests/canonical/test_update_context.py:61: AssertionError
+_______ test_local_context_and_actual_arithmetic[1-LayeredSchedule-oms] ________
+
+kind = 'oms', cls = <class 'bp_registry.canonical.schedules.LayeredSchedule'>
+cursor = 1
+
+    @pytest.mark.parametrize("kind", ("nms", "oms"))
+    @pytest.mark.parametrize("cls", LOCAL)
+    @pytest.mark.parametrize("cursor", (0, 1))
+    def test_local_context_and_actual_arithmetic(kind, cls, cursor):
+        rule = RecordingRule(make_rule(kind))
+        schedule = make_schedule(cls, BinarySpaKernel(update_rule=rule))
+        original = np.array([1., 2., 3., 4.])
+        schedule.execute_local_step(CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt"), original.copy(), S, error_rate=.2,
+            progress=ScheduleProgress(1, 77, (cursor,)), is_converged=lambda _: False)
+>       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
+E       AssertionError: assert ([{'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] and {0} == {1}
+E        +  where [{'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] = <test_update_context.RecordingRule object at 0x7f910f4c7c50>.calls
+E         
+E         Extra items in the left set:
+E         0
+E         Extra items in the right set:
+E         1
+E         Use -v to get more diff)
+
+tests/canonical/test_update_context.py:61: AssertionError
+___ test_local_context_and_actual_arithmetic[1-CheckNodeSerialSchedule-nms] ____
+
+kind = 'nms'
+cls = <class 'bp_registry.canonical.schedules.CheckNodeSerialSchedule'>
+cursor = 1
+
+    @pytest.mark.parametrize("kind", ("nms", "oms"))
+    @pytest.mark.parametrize("cls", LOCAL)
+    @pytest.mark.parametrize("cursor", (0, 1))
+    def test_local_context_and_actual_arithmetic(kind, cls, cursor):
+        rule = RecordingRule(make_rule(kind))
+        schedule = make_schedule(cls, BinarySpaKernel(update_rule=rule))
+        original = np.array([1., 2., 3., 4.])
+        schedule.execute_local_step(CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt"), original.copy(), S, error_rate=.2,
+            progress=ScheduleProgress(1, 77, (cursor,)), is_converged=lambda _: False)
+>       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
+E       AssertionError: assert ([{'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] and {0} == {1}
+E        +  where [{'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] = <test_update_context.RecordingRule object at 0x7f910f4c5280>.calls
+E         
+E         Extra items in the left set:
+E         0
+E         Extra items in the right set:
+E         1
+E         Use -v to get more diff)
+
+tests/canonical/test_update_context.py:61: AssertionError
+___ test_local_context_and_actual_arithmetic[1-CheckNodeSerialSchedule-oms] ____
+
+kind = 'oms'
+cls = <class 'bp_registry.canonical.schedules.CheckNodeSerialSchedule'>
+cursor = 1
+
+    @pytest.mark.parametrize("kind", ("nms", "oms"))
+    @pytest.mark.parametrize("cls", LOCAL)
+    @pytest.mark.parametrize("cursor", (0, 1))
+    def test_local_context_and_actual_arithmetic(kind, cls, cursor):
+        rule = RecordingRule(make_rule(kind))
+        schedule = make_schedule(cls, BinarySpaKernel(update_rule=rule))
+        original = np.array([1., 2., 3., 4.])
+        schedule.execute_local_step(CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt"), original.copy(), S, error_rate=.2,
+            progress=ScheduleProgress(1, 77, (cursor,)), is_converged=lambda _: False)
+>       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
+E       AssertionError: assert ([{'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] and {0} == {1}
+E        +  where [{'check_index': 1, 'edge_index': 2, 'source_iteration': 0, 'syndrome': 1}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] = <test_update_context.RecordingRule object at 0x7f910f4c63c0>.calls
+E         
+E         Extra items in the left set:
+E         0
+E         Extra items in the right set:
+E         1
+E         Use -v to get more diff)
+
+tests/canonical/test_update_context.py:61: AssertionError
+__ test_local_context_and_actual_arithmetic[1-VariableNodeSerialSchedule-nms] __
+
+kind = 'nms'
+cls = <class 'bp_registry.canonical.schedules.VariableNodeSerialSchedule'>
+cursor = 1
+
+    @pytest.mark.parametrize("kind", ("nms", "oms"))
+    @pytest.mark.parametrize("cls", LOCAL)
+    @pytest.mark.parametrize("cursor", (0, 1))
+    def test_local_context_and_actual_arithmetic(kind, cls, cursor):
+        rule = RecordingRule(make_rule(kind))
+        schedule = make_schedule(cls, BinarySpaKernel(update_rule=rule))
+        original = np.array([1., 2., 3., 4.])
+        schedule.execute_local_step(CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt"), original.copy(), S, error_rate=.2,
+            progress=ScheduleProgress(1, 77, (cursor,)), is_converged=lambda _: False)
+>       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
+E       AssertionError: assert ([{'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] and {0} == {1}
+E        +  where [{'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] = <test_update_context.RecordingRule object at 0x7f910f447da0>.calls
+E         
+E         Extra items in the left set:
+E         0
+E         Extra items in the right set:
+E         1
+E         Use -v to get more diff)
+
+tests/canonical/test_update_context.py:61: AssertionError
+__ test_local_context_and_actual_arithmetic[1-VariableNodeSerialSchedule-oms] __
+
+kind = 'oms'
+cls = <class 'bp_registry.canonical.schedules.VariableNodeSerialSchedule'>
+cursor = 1
+
+    @pytest.mark.parametrize("kind", ("nms", "oms"))
+    @pytest.mark.parametrize("cls", LOCAL)
+    @pytest.mark.parametrize("cursor", (0, 1))
+    def test_local_context_and_actual_arithmetic(kind, cls, cursor):
+        rule = RecordingRule(make_rule(kind))
+        schedule = make_schedule(cls, BinarySpaKernel(update_rule=rule))
+        original = np.array([1., 2., 3., 4.])
+        schedule.execute_local_step(CanonicalLocalStepExecutor(BudgetTree(limits=()), scope="attempt"), original.copy(), S, error_rate=.2,
+            progress=ScheduleProgress(1, 77, (cursor,)), is_converged=lambda _: False)
+>       assert rule.calls and {c["source_iteration"] for c in rule.calls} == {1}
+E       AssertionError: assert ([{'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] and {0} == {1}
+E        +  where [{'check_index': 0, 'edge_index': 1, 'source_iteration': 0, 'syndrome': 0}, {'check_index': 1, 'edge_index': 3, 'source_iteration': 0, 'syndrome': 1}] = <test_update_context.RecordingRule object at 0x7f910f4c72c0>.calls
+E         
+E         Extra items in the left set:
+E         0
+E         Extra items in the right set:
+E         1
+E         Use -v to get more diff)
+
+tests/canonical/test_update_context.py:61: AssertionError
+____ test_exhausted_assignment_and_denied_step_are_atomic[LayeredSchedule] _____
+
+cls = <class 'bp_registry.canonical.schedules.LayeredSchedule'>
+
+    @pytest.mark.parametrize("cls", LOCAL)
+    def test_exhausted_assignment_and_denied_step_are_atomic(cls):
+        rule = RecordingRule(make_rule("nms"))
+        schedule = make_schedule(cls, BinarySpaKernel(update_rule=rule))
+        messages = np.array([1., 2., 3., 4.])
+        before = messages.copy()
+        tree = BudgetTree(limits=(BudgetLimit("attempt", "convergence_checks", 0),))
+        result = schedule.execute_local_step(CanonicalLocalStepExecutor(tree, scope="attempt"), messages, S, error_rate=.2,
+            progress=ScheduleProgress(3, 9, (0,)), is_converged=lambda _: False)
+        assert not result.admitted and not rule.calls
+        tree = BudgetTree(limits=())
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_update_context.py:81: Failed
+_ test_exhausted_assignment_and_denied_step_are_atomic[CheckNodeSerialSchedule] _
+
+cls = <class 'bp_registry.canonical.schedules.CheckNodeSerialSchedule'>
+
+    @pytest.mark.parametrize("cls", LOCAL)
+    def test_exhausted_assignment_and_denied_step_are_atomic(cls):
+        rule = RecordingRule(make_rule("nms"))
+        schedule = make_schedule(cls, BinarySpaKernel(update_rule=rule))
+        messages = np.array([1., 2., 3., 4.])
+        before = messages.copy()
+        tree = BudgetTree(limits=(BudgetLimit("attempt", "convergence_checks", 0),))
+        result = schedule.execute_local_step(CanonicalLocalStepExecutor(tree, scope="attempt"), messages, S, error_rate=.2,
+            progress=ScheduleProgress(3, 9, (0,)), is_converged=lambda _: False)
+        assert not result.admitted and not rule.calls
+        tree = BudgetTree(limits=())
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_update_context.py:81: Failed
+_ test_exhausted_assignment_and_denied_step_are_atomic[VariableNodeSerialSchedule] _
+
+cls = <class 'bp_registry.canonical.schedules.VariableNodeSerialSchedule'>
+
+    @pytest.mark.parametrize("cls", LOCAL)
+    def test_exhausted_assignment_and_denied_step_are_atomic(cls):
+        rule = RecordingRule(make_rule("nms"))
+        schedule = make_schedule(cls, BinarySpaKernel(update_rule=rule))
+        messages = np.array([1., 2., 3., 4.])
+        before = messages.copy()
+        tree = BudgetTree(limits=(BudgetLimit("attempt", "convergence_checks", 0),))
+        result = schedule.execute_local_step(CanonicalLocalStepExecutor(tree, scope="attempt"), messages, S, error_rate=.2,
+            progress=ScheduleProgress(3, 9, (0,)), is_converged=lambda _: False)
+        assert not result.admitted and not rule.calls
+        tree = BudgetTree(limits=())
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_update_context.py:81: Failed
+_________________ test_explicit_legacy_replay[LayeredSchedule] _________________
+
+cls = <class 'bp_registry.canonical.schedules.LayeredSchedule'>
+
+    @pytest.mark.parametrize("cls", LOCAL)
+    def test_explicit_legacy_replay(cls):
+        rule = RecordingRule(make_rule("nms"))
+>       kernel = BinarySpaKernel(update_rule=rule, update_context_version="legacy-zero-v1")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BinarySpaKernel.__init__() got an unexpected keyword argument 'update_context_version'
+
+tests/canonical/test_update_context.py:92: TypeError
+_____________ test_explicit_legacy_replay[CheckNodeSerialSchedule] _____________
+
+cls = <class 'bp_registry.canonical.schedules.CheckNodeSerialSchedule'>
+
+    @pytest.mark.parametrize("cls", LOCAL)
+    def test_explicit_legacy_replay(cls):
+        rule = RecordingRule(make_rule("nms"))
+>       kernel = BinarySpaKernel(update_rule=rule, update_context_version="legacy-zero-v1")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BinarySpaKernel.__init__() got an unexpected keyword argument 'update_context_version'
+
+tests/canonical/test_update_context.py:92: TypeError
+___________ test_explicit_legacy_replay[VariableNodeSerialSchedule] ____________
+
+cls = <class 'bp_registry.canonical.schedules.VariableNodeSerialSchedule'>
+
+    @pytest.mark.parametrize("cls", LOCAL)
+    def test_explicit_legacy_replay(cls):
+        rule = RecordingRule(make_rule("nms"))
+>       kernel = BinarySpaKernel(update_rule=rule, update_context_version="legacy-zero-v1")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: BinarySpaKernel.__init__() got an unexpected keyword argument 'update_context_version'
+
+tests/canonical/test_update_context.py:92: TypeError
+____________________ test_unknown_context_version_rejected _____________________
+
+    def test_unknown_context_version_rejected():
+        with pytest.raises(ValueError, match="context"):
+>           BinarySpaKernel(update_context_version="guess")
+E           TypeError: BinarySpaKernel.__init__() got an unexpected keyword argument 'update_context_version'
+
+tests/canonical/test_update_context.py:108: TypeError
+_ test_source_qualified_group_schedule_rejects_unqualified_update_compositions[nms] _
+
+kind = 'nms'
+
+    @pytest.mark.parametrize("kind", ("nms", "oms"))
+    def test_source_qualified_group_schedule_rejects_unqualified_update_compositions(kind):
+>       with pytest.raises(ValueError, match="plain SPA"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_update_context.py:113: Failed
+_ test_source_qualified_group_schedule_rejects_unqualified_update_compositions[oms] _
+
+kind = 'oms'
+
+    @pytest.mark.parametrize("kind", ("nms", "oms"))
+    def test_source_qualified_group_schedule_rejects_unqualified_update_compositions(kind):
+>       with pytest.raises(ValueError, match="plain SPA"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_update_context.py:113: Failed
+=========================== short test summary info ============================
+FAILED tests/canonical/test_update_context.py::test_flooding_source_iterations[standalone-nms]
+FAILED tests/canonical/test_update_context.py::test_flooding_source_iterations[standalone-oms]
+FAILED tests/canonical/test_update_context.py::test_local_context_and_actual_arithmetic[0-LayeredSchedule-nms]
+FAILED tests/canonical/test_update_context.py::test_local_context_and_actual_arithmetic[0-LayeredSchedule-oms]
+FAILED tests/canonical/test_update_context.py::test_local_context_and_actual_arithmetic[0-CheckNodeSerialSchedule-nms]
+FAILED tests/canonical/test_update_context.py::test_local_context_and_actual_arithmetic[0-CheckNodeSerialSchedule-oms]
+FAILED tests/canonical/test_update_context.py::test_local_context_and_actual_arithmetic[0-VariableNodeSerialSchedule-nms]
+FAILED tests/canonical/test_update_context.py::test_local_context_and_actual_arithmetic[0-VariableNodeSerialSchedule-oms]
+FAILED tests/canonical/test_update_context.py::test_local_context_and_actual_arithmetic[1-LayeredSchedule-nms]
+FAILED tests/canonical/test_update_context.py::test_local_context_and_actual_arithmetic[1-LayeredSchedule-oms]
+FAILED tests/canonical/test_update_context.py::test_local_context_and_actual_arithmetic[1-CheckNodeSerialSchedule-nms]
+FAILED tests/canonical/test_update_context.py::test_local_context_and_actual_arithmetic[1-CheckNodeSerialSchedule-oms]
+FAILED tests/canonical/test_update_context.py::test_local_context_and_actual_arithmetic[1-VariableNodeSerialSchedule-nms]
+FAILED tests/canonical/test_update_context.py::test_local_context_and_actual_arithmetic[1-VariableNodeSerialSchedule-oms]
+FAILED tests/canonical/test_update_context.py::test_exhausted_assignment_and_denied_step_are_atomic[LayeredSchedule]
+FAILED tests/canonical/test_update_context.py::test_exhausted_assignment_and_denied_step_are_atomic[CheckNodeSerialSchedule]
+FAILED tests/canonical/test_update_context.py::test_exhausted_assignment_and_denied_step_are_atomic[VariableNodeSerialSchedule]
+FAILED tests/canonical/test_update_context.py::test_explicit_legacy_replay[LayeredSchedule]
+FAILED tests/canonical/test_update_context.py::test_explicit_legacy_replay[CheckNodeSerialSchedule]
+FAILED tests/canonical/test_update_context.py::test_explicit_legacy_replay[VariableNodeSerialSchedule]
+FAILED tests/canonical/test_update_context.py::test_unknown_context_version_rejected
+FAILED tests/canonical/test_update_context.py::test_source_qualified_group_schedule_rejects_unqualified_update_compositions[nms]
+FAILED tests/canonical/test_update_context.py::test_source_qualified_group_schedule_rejects_unqualified_update_compositions[oms]
+23 failed, 2 passed in 1.40s

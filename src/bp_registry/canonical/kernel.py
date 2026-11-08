@@ -11,6 +11,7 @@ from .numerics import (
     check_to_variable, finite_saturate, hard_decision, prior_llr,
 )
 from .updates import CheckUpdateRule
+from .update_context import SOURCE_ITERATION_V2, validate_context_version, source_iteration
 
 
 def _binary(value: np.ndarray, name: str, *, ndim: int) -> np.ndarray:
@@ -25,12 +26,13 @@ class KernelResult:
     candidate: np.ndarray
     converged: bool
     iterations: int
+    update_context_version: str = SOURCE_ITERATION_V2
 
 
 class BinarySpaKernel:
     """No native adapter: deterministic float64 LLR SPA with flooding updates."""
 
-    def __init__(self, *, profile: NumericalProfile | None = None, update_rule: CheckUpdateRule | None = None) -> None:
+    def __init__(self, *, profile: NumericalProfile | None = None, update_rule: CheckUpdateRule | None = None, update_context_version: str = SOURCE_ITERATION_V2) -> None:
         selected = (getattr(update_rule, "profile", None) if update_rule is not None else DEFAULT_BINARY_SPA_F64) if profile is None else profile
         if not isinstance(selected, NumericalProfile):
             raise ValueError("update rule requires an explicit numerical profile")
@@ -38,6 +40,7 @@ class BinarySpaKernel:
             raise ValueError("plain SPA requires an SPA numerical profile; supply an explicit min-sum update rule")
         if update_rule is not None and getattr(update_rule, "profile", None) != selected:
             raise ValueError("update rule and kernel numerical profiles must agree")
+        self.update_context_version = validate_context_version(update_context_version)
         self.profile = selected
         self.update_rule = update_rule
 
@@ -100,11 +103,11 @@ class BinarySpaKernel:
         v2c = schedule.initialize(error_rate)
         candidate = self.candidate_from_beliefs(np.full(table.variable_count, self.prior(error_rate), dtype=np.float64))
         if table.edge_count == 0:
-            return KernelResult(candidate, bool(np.array_equal((h.astype(np.int64) @ candidate) % 2, s)), 0)
+            return KernelResult(candidate, bool(np.array_equal((h.astype(np.int64) @ candidate) % 2, s)), 0, self.update_context_version)
         for iteration in range(1, max_iterations + 1):
-            sweep = schedule.sweep(v2c, s, error_rate=error_rate)
+            sweep = schedule.sweep(v2c, s, error_rate=error_rate, source_iteration=source_iteration(self, iteration - 1))
             candidate = sweep.candidate
             if np.array_equal((h.astype(np.int64) @ candidate) % 2, s):
-                return KernelResult(candidate, True, iteration)
+                return KernelResult(candidate, True, iteration, self.update_context_version)
             v2c = sweep.new_v2c
-        return KernelResult(candidate, bool(np.array_equal((h.astype(np.int64) @ candidate) % 2, s)) if isinstance(self.profile, BinaryNumericalProfileV3) else False, max_iterations)
+        return KernelResult(candidate, bool(np.array_equal((h.astype(np.int64) @ candidate) % 2, s)) if isinstance(self.profile, BinaryNumericalProfileV3) else False, max_iterations, self.update_context_version)
