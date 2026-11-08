@@ -1,0 +1,756 @@
+FFFFFFFFFFFFFFFFFFFFFFFFF.F                                              [100%]
+=================================== FAILURES ===================================
+_ test_result_rejects_invalid_execution_values_before_conversion[direct-faults-faults-value0] _
+
+field = 'faults', key = 'faults', value = array([[256]]), construct = 'direct'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_ test_result_rejects_invalid_execution_values_before_conversion[direct-predictions-prediction-value1] _
+
+field = 'predictions', key = 'prediction', value = array([[-1]])
+construct = 'direct'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_ test_result_rejects_invalid_execution_values_before_conversion[direct-predictions-prediction-value2] _
+
+field = 'predictions', key = 'prediction', value = array([[256]])
+construct = 'direct'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_ test_result_rejects_invalid_execution_values_before_conversion[direct-faults-faults-value3] _
+
+field = 'faults', key = 'faults', value = array([[0.5]]), construct = 'direct'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_ test_result_rejects_invalid_execution_values_before_conversion[direct-converged-converged-value4] _
+
+field = 'converged', key = 'converged', value = array([2]), construct = 'direct'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_ test_result_rejects_invalid_execution_values_before_conversion[direct-iterations-iterations-value5] _
+
+field = 'iterations', key = 'iterations', value = array([1.5])
+construct = 'direct'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_ test_result_rejects_invalid_execution_values_before_conversion[direct-iterations-iterations-value6] _
+
+field = 'iterations', key = 'iterations', value = array([-1])
+construct = 'direct'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_ test_result_rejects_invalid_execution_values_before_conversion[direct-iterations-iterations-value7] _
+
+field = 'iterations', key = 'iterations'
+value = array([9223372036854775808], dtype=uint64), construct = 'direct'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_ test_result_rejects_invalid_execution_values_before_conversion[direct-iterations-iterations-value8] _
+
+field = 'iterations', key = 'iterations', value = array([ True])
+construct = 'direct'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_ test_result_rejects_invalid_execution_values_before_conversion[direct-faults-faults-value9] _
+
+field = 'faults', key = 'faults', value = array([0]), construct = 'direct'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_ test_result_rejects_invalid_execution_values_before_conversion[direct-converged-converged-value10] _
+
+field = 'converged', key = 'converged', value = array([[ True]])
+construct = 'direct'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_ test_result_rejects_invalid_execution_values_before_conversion[direct-iterations-iterations-value11] _
+
+field = 'iterations', key = 'iterations', value = array([[0]])
+construct = 'direct'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_ test_result_rejects_invalid_execution_values_before_conversion[replace-faults-faults-value0] _
+
+field = 'faults', key = 'faults', value = array([[256]]), construct = 'replace'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_ test_result_rejects_invalid_execution_values_before_conversion[replace-predictions-prediction-value1] _
+
+field = 'predictions', key = 'prediction', value = array([[-1]])
+construct = 'replace'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_ test_result_rejects_invalid_execution_values_before_conversion[replace-predictions-prediction-value2] _
+
+field = 'predictions', key = 'prediction', value = array([[256]])
+construct = 'replace'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_ test_result_rejects_invalid_execution_values_before_conversion[replace-faults-faults-value3] _
+
+field = 'faults', key = 'faults', value = array([[0.5]]), construct = 'replace'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_ test_result_rejects_invalid_execution_values_before_conversion[replace-converged-converged-value4] _
+
+field = 'converged', key = 'converged', value = array([2])
+construct = 'replace'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_ test_result_rejects_invalid_execution_values_before_conversion[replace-iterations-iterations-value5] _
+
+field = 'iterations', key = 'iterations', value = array([1.5])
+construct = 'replace'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_ test_result_rejects_invalid_execution_values_before_conversion[replace-iterations-iterations-value6] _
+
+field = 'iterations', key = 'iterations', value = array([-1])
+construct = 'replace'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_ test_result_rejects_invalid_execution_values_before_conversion[replace-iterations-iterations-value7] _
+
+field = 'iterations', key = 'iterations'
+value = array([9223372036854775808], dtype=uint64), construct = 'replace'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_ test_result_rejects_invalid_execution_values_before_conversion[replace-iterations-iterations-value8] _
+
+field = 'iterations', key = 'iterations', value = array([ True])
+construct = 'replace'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_ test_result_rejects_invalid_execution_values_before_conversion[replace-faults-faults-value9] _
+
+field = 'faults', key = 'faults', value = array([0]), construct = 'replace'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_ test_result_rejects_invalid_execution_values_before_conversion[replace-converged-converged-value10] _
+
+field = 'converged', key = 'converged', value = array([[ True]])
+construct = 'replace'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_ test_result_rejects_invalid_execution_values_before_conversion[replace-iterations-iterations-value11] _
+
+field = 'iterations', key = 'iterations', value = array([[0]])
+construct = 'replace'
+
+    @pytest.mark.parametrize("field,key,value", [
+        ("faults", "faults", np.array([[256]])),
+        ("predictions", "prediction", np.array([[-1]])),
+        ("predictions", "prediction", np.array([[256]])),
+        ("faults", "faults", np.array([[.5]])),
+        ("converged", "converged", np.array([2])),
+        ("iterations", "iterations", np.array([1.5])),
+        ("iterations", "iterations", np.array([-1])),
+        ("iterations", "iterations", np.array([2**63], dtype=np.uint64)),
+        ("iterations", "iterations", np.array([True])),
+        ("faults", "faults", np.array([0])),
+        ("converged", "converged", np.array([[True]])),
+        ("iterations", "iterations", np.array([[0]])),
+    ])
+    @pytest.mark.parametrize("construct", ["direct", "replace"])
+    def test_result_rejects_invalid_execution_values_before_conversion(field, key, value, construct):
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        records = result.ledger
+        records[1][key] = value.tolist()[0]
+        changes = {field: value, "ledger_json": encode_records(records)}
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:38: Failed
+_______________ test_result_rejects_scalar_column_as_value_error _______________
+
+    def test_result_rejects_scalar_column_as_value_error():
+        result = decoder().decode_detailed(np.array([[0]], np.uint8))
+        with pytest.raises(ValueError, match="circuit result"):
+>           replace(result, iterations=np.array(0))
+
+tests/circuit/test_policy_contract_fixes.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/hpc/home/mg551/miniconda3/lib/python3.12/dataclasses.py:1579: in replace
+    return obj.__class__(**changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+<string>:8: in __init__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = CircuitBatchResult(predictions=array([[0]], dtype=uint8), faults=array([[0]], dtype=uint8), converged=array([ True]), ...rmination":"bounded_search"},"converged":true,"detectors":[0],"faults":[0],"iterations":0,"prediction":[0],"shot":0}]')
+
+    def __post_init__(self):
+        records = validate_records(self.ledger_json, "circuit-policy-ledger-v1")
+        for name, key in (("predictions", "prediction"), ("faults", "faults"),
+                          ("converged", "converged"), ("iterations", "iterations")):
+            value = np.asarray(getattr(self, name))
+>           if value.shape[0] != len(records) - 1 or value.tolist() != [row[key] for row in records[1:]]:
+               ^^^^^^^^^^^^^^
+E           IndexError: tuple index out of range
+
+src/bp_registry/circuit/policies.py:90: IndexError
+_____________ test_result_empty_batch_keeps_declared_column_ranks ______________
+
+    def test_result_empty_batch_keeps_declared_column_ranks():
+        result = decoder().decode_detailed(np.zeros((0, 1), np.uint8))
+        assert replace(result, faults=np.empty((0, 1), np.int16)).faults.shape == (0, 1)
+>       with pytest.raises(ValueError, match="circuit result"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:76: Failed
+=========================== short test summary info ============================
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[direct-faults-faults-value0]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[direct-predictions-prediction-value1]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[direct-predictions-prediction-value2]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[direct-faults-faults-value3]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[direct-converged-converged-value4]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[direct-iterations-iterations-value5]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[direct-iterations-iterations-value6]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[direct-iterations-iterations-value7]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[direct-iterations-iterations-value8]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[direct-faults-faults-value9]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[direct-converged-converged-value10]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[direct-iterations-iterations-value11]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[replace-faults-faults-value0]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[replace-predictions-prediction-value1]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[replace-predictions-prediction-value2]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[replace-faults-faults-value3]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[replace-converged-converged-value4]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[replace-iterations-iterations-value5]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[replace-iterations-iterations-value6]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[replace-iterations-iterations-value7]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[replace-iterations-iterations-value8]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[replace-faults-faults-value9]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[replace-converged-converged-value10]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_invalid_execution_values_before_conversion[replace-iterations-iterations-value11]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_rejects_scalar_column_as_value_error
+FAILED tests/circuit/test_policy_contract_fixes.py::test_result_empty_batch_keeps_declared_column_ranks
+26 failed, 1 passed in 2.78s

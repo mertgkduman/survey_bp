@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Completed audit spikes 043–046; E03/E01/E02 contract findings remain; eight Phase 11 gap plans remain open
-last_updated: "2026-11-08T22:42:16+00:00"
+stopped_at: Closed E03/E01/E02 in order; pre-HTML kernel audit fixes complete; eight Phase 11 gap plans remain open
+last_updated: "2026-11-08T22:55:45+00:00"
 last_activity: 2026-11-08
-last_activity_desc: Audited new circuit/CUDA paths; ordinary mathematics and upstream agreement pass; three bounded circuit contract findings; 120 focused regressions pass
-state_head: af51b17
+last_activity_desc: Fixed E03 result admission, E01 NMS overflow and E02 inactive controls; 257 regressions and 12 audit groups pass; ordinary outputs unchanged
+state_head: 5855049
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-08 — completed canonical audit spikes 043–046 on production baseline b598ad1
-Last Activity Description: Independent circuit mathematics (1152 comparisons), native ldpc agreement (360 cases), CUDA-simulator tree oracles (8), policy admission/execution (336 configurations) and memory identities (24) support the implemented capabilities. Three bounded findings remain: E03 public result conversion/binding, E01 extreme NMS failure parity, E02 inactive controller controls; recommended closure E03 → E01 → E02 before freezing the new interface for HTML. Fresh focused regression: 120 passed. Existing source-matched H200 20/20 and 4096-shot qualification, plus the 2285-pass full suite, are retained evidence. No production source or historical result changed. See spikes/CANONICAL-KERNEL-CIRCUIT-CUDA-AUDIT.md. Release packaging stays skipped and publication gates/phase position are unchanged.
+Last activity: 2026-11-08 — completed quick task 261108-oq5 and fix records 047–049
+Last Activity Description: Closed E03 → E01 → E02: circuit results validate before lossless conversion, compiled NMS rejects overflow before clipping, and non-default inactive controller controls are rejected. Final affected regression: 257 passed; independent requalification: 12/12 groups pass. All 1152 factor cases, 360 native cases and 336 policy-matrix configurations retain their ordinary-domain receipts exactly; 32 additional ordinary output ledgers and both 64-shot timing ledgers are byte-identical. Only two circuit policy modules changed; CPU code-capacity/GPU implementation and historical evidence remain unchanged. All bounded pre-HTML audit findings are closed; see spikes/CANONICAL-KERNEL-CIRCUIT-CUDA-FIXES.md and quick/261108-oq5-fix-circuit-contract-findings-e03-e01-e0/SUMMARY.md. Release packaging stays skipped and publication gates/phase position are unchanged.
 
 Progress: 8 of 14 phases complete (57%); 159 of 176 plans complete. Phase 11 has 17 of 25 plans complete; plan 17 is the first open number but depends on source reviews 18 and 19, while plan 20's blocked-target review is complete.
 
@@ -122,7 +122,7 @@ Phase 02 P10–P16 gap-closure metrics are recorded in their individual summarie
 
 Full decisions are in PROJECT.md; workflow choices are in config.json.
 
-- Post-extension audit 043–046 supports ordinary BP mathematics and practical policy breadth without a kernel redesign. Close three bounded circuit contract findings E03 → E01 → E02 before freezing the interface; use versioned extensions for future policies instead of reopening an unbounded audit. Preserve source-scoped reproduction claims and explicit backend subsets.
+- Post-extension audit 043–046 supports ordinary BP mathematics and practical policy breadth without a kernel redesign. Its three bounded circuit contract findings were closed E03 → E01 → E02 in quick task 261108-oq5 / spikes 047–049. Use versioned extensions for future policies instead of reopening an unbounded audit. Preserve source-scoped reproduction claims and explicit backend subsets.
 
 - First journal milestone includes CSS code-capacity → correlated quaternary code-capacity → circuit level; none is deferred beyond the paper.
 - Canonical engines are defined per compatible kernel family. BP modifications are primary; OSD/LSD is optional additional processing for nonconvergence.
@@ -256,7 +256,7 @@ None outside the roadmap.
 
 ### Blockers/Concerns
 
-- Latest kernel audit: E03 permits invalid manually constructed circuit result values before dtype conversion; E01 masks extreme finite NMS overflow in compiled/auto execution; E02 admits non-default controller fields without operands. Normal generated outputs and aligned mathematical/upstream checks pass. Independent replay rejects the E03 examples. These are small pre-HTML contract fixes, not demonstrated errors in existing ordinary-domain results; see spikes/CANONICAL-KERNEL-CIRCUIT-CUDA-AUDIT.md.
+- Latest kernel audit findings E03/E01/E02 are closed with 257 regression passes and 12/12 audit groups. No remaining blocker from this bounded audit prevents HTML over the documented compatible subset. Scientific publication gates below remain separate; see spikes/CANONICAL-KERNEL-CIRCUIT-CUDA-FIXES.md.
 
 - [Phase 11] Eight gap plans remain open: 11-18 aSCED Figure 2 review and user-deferred 11-19 Q-BPGD Figure 7 review gate 11-17 policy replay and 11-21 resource qualification; 11-22 authorization, 11-23/24 campaigns, and 11-25 final verification depend on those outcomes. Completed 11-20 retains the MBP4 Figure 6 mechanism-only, zero-shot target. The current preserve-deny decision remains in force; no controlled effect or source-curve reproduction is established.
 - [Phase 09] Exact author experiment artifacts, source settings, and executable native assessments are still unverified; EVAL-01/02 remain pending. The Yao B1 adaptation is cap censored. Site resource ceilings and scheduler accounting remain unavailable, so publication dispatch is denied.
@@ -280,6 +280,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261108-oq5 | Fix circuit findings E03 → E01 → E02 in order | 2026-11-08 | d6e8756, 02d890a, 5855049 | Verified: 257 tests; 12/12 audit groups; unchanged ordinary ledgers | [261108-oq5-fix-circuit-contract-findings-e03-e01-e0](./quick/261108-oq5-fix-circuit-contract-findings-e03-e01-e0/) |
 | 261108-meg | Implement compatible circuit policies and binary/Pauli CUDA execution | 2026-11-08 | 90ecfbc, dc43249 | Verified: 2285 regression passes; 34 circuit and 20 H200 checks; 4096 exact GPU/CPU shots | [261108-meg-implement-compatible-circuit-policies-an](./quick/261108-meg-implement-compatible-circuit-policies-an/) |
 | 261102-okz | Consolidate research branches onto main and preserve recovery/evidence | 2026-11-02 | 22f881f | 1,514 passed, 1 skipped; main only; archived 28 original refs and retained three evidence worktrees | [261102-okz-consolidate-research-branches-into-main-](./quick/261102-okz-consolidate-research-branches-into-main-/) |
 | 261102-jnd | Add B1/C2 depolarizing plain BP/QBP and four-code comparison at T=100 | 2026-11-02 | b204164 | Verified 381,309 fresh paired samples; all 14 points and 28 arm estimates ≥100 failures | [261102-jnd-extend-plain-binary-bp-and-qbp-compariso](./quick/261102-jnd-extend-plain-binary-bp-and-qbp-compariso/) |
@@ -343,13 +344,13 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Latest kernel work: audit spikes 043–046 assess the circuit-policy/CUDA additions on b598ad1; see .planning/spikes/CANONICAL-KERNEL-CIRCUIT-CUDA-AUDIT.md. Suggested bounded closure is E03 → E01 → E02, with retained counterexamples and targeted regression criteria. Earlier D03/D04/D01/D02/D05 corrections and quick task 261108-meg qualification remain valid in their stated scopes. Preserve explicit backend/policy admission boundaries and outstanding publication gates.
+Latest kernel work: quick task 261108-oq5 closes E03 → E01 → E02 in separate commits, recorded as spikes 047–049. See .planning/spikes/CANONICAL-KERNEL-CIRCUIT-CUDA-FIXES.md. All 257 affected tests and 12 audit groups pass; valid output ledgers and prior audit receipts remain unchanged. Earlier D corrections and CPU/GPU qualification remain valid in their stated scopes. Preserve explicit backend/policy admission boundaries and outstanding publication gates.
 
 **Resume file:** None
 
-Last session: 2026-11-08T22:42:16+00:00
-Stopped at: Completed audit spikes 043–046; production behavior unchanged; three bounded contract fixes recommended
-Next step: Resolve E03 → E01 → E02 through GSD before HTML interface freeze. Phase 11 scientific gap plans remain open; Phase 5 human review remains open and Phase 7 stays paused.
+Last session: 2026-11-08T22:55:45+00:00
+Stopped at: Completed and qualified all three circuit contract fixes; bounded pre-HTML work complete
+Next step: HTML can use the documented admitted policy subset. Phase 11 scientific gap plans remain open; Phase 5 human review remains open and Phase 7 stays paused.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
 Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md`.

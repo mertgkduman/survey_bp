@@ -97,10 +97,14 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 | 044 | canonical-kernel-audit | New-path upstream correspondence | comparison | Given aligned pinned references, when matched inputs execute, then numerical and controller differences are explained | VALIDATED | upstream, circuit |
 | 045 | canonical-kernel-audit | Policy composition and admission | standard | Given a declared policy, when executed or rejected, then every effective control and state lifetime has a defined meaning | PARTIAL | policies, admission |
 | 046 | canonical-kernel-audit | Evidence and public-use readiness | standard | Given outputs from new paths, when exported and replayed, then input/output/work identities and public workflows remain trustworthy | PARTIAL | evidence, readiness |
+| 047 | canonical-kernel-audit | E03 circuit result admission fix | standard | Invalid result values fail before conversion and valid immutable evidence remains replayable | VALIDATED | circuit, fixes |
+| 048 | canonical-kernel-audit | E01 circuit numerical failure fix | standard | Scalar and compiled NMS fail consistently before overflow can be clipped | VALIDATED | circuit, fixes |
+| 049 | canonical-kernel-audit | E02 circuit controller admission fix | standard | Non-default inactive controls are rejected and active settings retain their meaning | VALIDATED | circuit, fixes |
 
 Ordered closure of D03 → D04 → D01 → D02 → D05: [correction report](CANONICAL-KERNEL-COMPLETENESS-FIXES.md), [combined verification](042-batch-evidence-fix/verification.json), and [execution contracts](../../docs/canonical-kernel-contracts.md). Historical 034–037 verdicts remain as originally observed.
 
 Post-extension audit 043–046: [circuit/CUDA audit](CANONICAL-KERNEL-CIRCUIT-CUDA-AUDIT.md).
-Ordinary-domain mathematics and matched upstream execution pass. Three bounded
-contract findings remain, with suggested closure E03 → E01 → E02. This audit
-changes no production behavior or publication gates.
+Ordinary-domain mathematics and matched upstream execution passed. The three
+bounded contract findings were subsequently closed in order E03 → E01 → E02 by
+047–049; see [closure report](CANONICAL-KERNEL-CIRCUIT-CUDA-FIXES.md). Historical
+043–046 verdicts remain unchanged. Publication gates are unchanged.

@@ -1,0 +1,243 @@
+{
+  "git_head": "3e2381b4c672d866878608d89c762af98e79371d",
+  "cpu_affinity": [
+    56,
+    120
+  ],
+  "output_identities": [
+    {
+      "rule": "spa",
+      "controller": "single",
+      "dem": 0,
+      "ledger_sha256": "44bcfc4099fd8187aa2361923eb23399c4325e62aeeb3ac4e287a3b5bcc886ff"
+    },
+    {
+      "rule": "spa",
+      "controller": "single",
+      "dem": 1,
+      "ledger_sha256": "ec6fe52999d9009ef6749621e3071541269d28d80dab66478a9561d554193a4c"
+    },
+    {
+      "rule": "spa",
+      "controller": "relay",
+      "dem": 0,
+      "ledger_sha256": "b32db08d241b1f0dc2d76499fab3f4fa503974c53d0fd469407f3d4396247138"
+    },
+    {
+      "rule": "spa",
+      "controller": "relay",
+      "dem": 1,
+      "ledger_sha256": "6b09193fec22d4b33e40c4c16b7f47051f1a1617fe68da7318e197e68c942f18"
+    },
+    {
+      "rule": "spa",
+      "controller": "guided",
+      "dem": 0,
+      "ledger_sha256": "2b68791fb0df173c4eff77558b7934285b6e3f8123c154d115d711c1f2000e65"
+    },
+    {
+      "rule": "spa",
+      "controller": "guided",
+      "dem": 1,
+      "ledger_sha256": "a8856a67707ae2839f7ee787e4b909ba13885980ecfae6e01cab17b84e564040"
+    },
+    {
+      "rule": "spa",
+      "controller": "beam",
+      "dem": 0,
+      "ledger_sha256": "cc9a343a87c945ca280df2b92d8df2b5e9f4fc7269a4dfe91bf15ae438a77b0b"
+    },
+    {
+      "rule": "spa",
+      "controller": "beam",
+      "dem": 1,
+      "ledger_sha256": "1384016f1c847895d0f8857c7a1aed7e655db8a3edfad8fa7532d3e3131ef5b1"
+    },
+    {
+      "rule": "min_sum",
+      "controller": "single",
+      "dem": 0,
+      "ledger_sha256": "b1f7d1bd265641d62412b4114f15f553051ec1b28a17dfdc76bf3fcb3c9d5341"
+    },
+    {
+      "rule": "min_sum",
+      "controller": "single",
+      "dem": 1,
+      "ledger_sha256": "f86fa1540b69fba5c4467e7bd7a4eeec66b131dd503deb8d53d41a61f2a7c248"
+    },
+    {
+      "rule": "min_sum",
+      "controller": "relay",
+      "dem": 0,
+      "ledger_sha256": "56ea50309106b13a55c1bc1eb7518c177c7cdb4e9f937b4ab8bd0123f0e26e2e"
+    },
+    {
+      "rule": "min_sum",
+      "controller": "relay",
+      "dem": 1,
+      "ledger_sha256": "d567306e8eae9786b25adbb3fe21613fe1dbb256153abe73f97e15f56a5de50a"
+    },
+    {
+      "rule": "min_sum",
+      "controller": "guided",
+      "dem": 0,
+      "ledger_sha256": "92ba85ccc2dfd1a5ac313a3ec6146fcbe13b03cfc7c9e1944fd06eb702c720f5"
+    },
+    {
+      "rule": "min_sum",
+      "controller": "guided",
+      "dem": 1,
+      "ledger_sha256": "c435f2352fb70bbfd36095e4f8981d107c0a70323431e765d1561faf465f0ca8"
+    },
+    {
+      "rule": "min_sum",
+      "controller": "beam",
+      "dem": 0,
+      "ledger_sha256": "ddca677f312e8094c5761066623889c7e42e551cfeb7918f06e5beaae89f2016"
+    },
+    {
+      "rule": "min_sum",
+      "controller": "beam",
+      "dem": 1,
+      "ledger_sha256": "7e4ddae7476d5f4fa4bce34b808d7ee1a97e87937eb4be973178620342404571"
+    },
+    {
+      "rule": "normalized_min_sum",
+      "controller": "single",
+      "dem": 0,
+      "ledger_sha256": "3d88fe0ee65d83ead016aae4ada5b3e0e473887efb7b00b2a7d36a2187ea6a0b"
+    },
+    {
+      "rule": "normalized_min_sum",
+      "controller": "single",
+      "dem": 1,
+      "ledger_sha256": "fb9138e66c783ea4f4eb6a715cce390de2324fd121eac4cee73ccac949167797"
+    },
+    {
+      "rule": "normalized_min_sum",
+      "controller": "relay",
+      "dem": 0,
+      "ledger_sha256": "593d1badba8b369857815045c00b06a75466ddb049c0f093b479bdf285f688f0"
+    },
+    {
+      "rule": "normalized_min_sum",
+      "controller": "relay",
+      "dem": 1,
+      "ledger_sha256": "e5e38eca9d846c1ba48025c20b4b6dd5fae413340436d7897ce3188037871e7d"
+    },
+    {
+      "rule": "normalized_min_sum",
+      "controller": "guided",
+      "dem": 0,
+      "ledger_sha256": "c13e7e6bb5bdbe6b0e3399861e93e9ae6077dc1acdf21ee5c3bdc6986e5a58a4"
+    },
+    {
+      "rule": "normalized_min_sum",
+      "controller": "guided",
+      "dem": 1,
+      "ledger_sha256": "0502885f8dfafeb568b82d1223598769ba1cbc46fb2c18e6ec1aaf127b5e6257"
+    },
+    {
+      "rule": "normalized_min_sum",
+      "controller": "beam",
+      "dem": 0,
+      "ledger_sha256": "d98091eb468affc18406e9c9bc9a6c318ed5f917278ba9a5ed212f3242d5c14c"
+    },
+    {
+      "rule": "normalized_min_sum",
+      "controller": "beam",
+      "dem": 1,
+      "ledger_sha256": "06063e40ae0f59216ad826562148cf14781b8be1158f929fb0ca00fe7bb94cdf"
+    },
+    {
+      "rule": "offset_min_sum",
+      "controller": "single",
+      "dem": 0,
+      "ledger_sha256": "e16c2d373e8c38d25c543a1b4c52361537261e5a50f446e1370d048822a76add"
+    },
+    {
+      "rule": "offset_min_sum",
+      "controller": "single",
+      "dem": 1,
+      "ledger_sha256": "0f7e203e0dc008f54b10152b5e890c222f00c0c4e2681c0c7ef4d9442ae0c522"
+    },
+    {
+      "rule": "offset_min_sum",
+      "controller": "relay",
+      "dem": 0,
+      "ledger_sha256": "b60791c502a4cc2a6280006dfb9fea7938e55dcd532cd8f79179b0849b98d86a"
+    },
+    {
+      "rule": "offset_min_sum",
+      "controller": "relay",
+      "dem": 1,
+      "ledger_sha256": "625cdb32e24f14524308dcb2c8a818a8b88e9448c4c32d9dc901376a30d4462b"
+    },
+    {
+      "rule": "offset_min_sum",
+      "controller": "guided",
+      "dem": 0,
+      "ledger_sha256": "aae2a8a977b55a570340fd0b65e0d70921ff0e2e505dd923fe95cfe2109b985b"
+    },
+    {
+      "rule": "offset_min_sum",
+      "controller": "guided",
+      "dem": 1,
+      "ledger_sha256": "ee565a501123ad0f3665070133d2e6f931719cbe74c2cc65d6057dc879370a95"
+    },
+    {
+      "rule": "offset_min_sum",
+      "controller": "beam",
+      "dem": 0,
+      "ledger_sha256": "0a5e9e6f45a71f7081485ad0867129a31baa93babe92ef47918a219712491b00"
+    },
+    {
+      "rule": "offset_min_sum",
+      "controller": "beam",
+      "dem": 1,
+      "ledger_sha256": "655ef8f1725bbda98794d13ca5a6146bf5741f12c2ef6fa16ffe7ce7bcbc583a"
+    }
+  ],
+  "timing": [
+    {
+      "rule": "spa",
+      "shots": 64,
+      "max_iterations": 8,
+      "first_call_seconds": 0.06068817339837551,
+      "warm_seconds": [
+        0.06460125837475061,
+        0.06448726169764996,
+        0.06453517265617847,
+        0.059379661455750465,
+        0.0657050721347332,
+        0.07501029130071402,
+        0.0693288054317236,
+        0.0703454352915287,
+        0.07254081591963768
+      ],
+      "median_seconds": 0.0657050721347332,
+      "ledger_sha256": "5b19937ba00758e73c14cf8d4e47a1b347bfe004838650e140ea1f4f08299e65",
+      "scope": "decode plus per-shot ledger encoding and immutable result binding; excludes disk export"
+    },
+    {
+      "rule": "normalized_min_sum",
+      "shots": 64,
+      "max_iterations": 8,
+      "first_call_seconds": 0.06607814785093069,
+      "warm_seconds": [
+        0.06964872404932976,
+        0.06672511249780655,
+        0.04819627199321985,
+        0.03700980078428984,
+        0.03361978568136692,
+        0.03370243404060602,
+        0.03396036010235548,
+        0.03824335243552923,
+        0.03572844620794058
+      ],
+      "median_seconds": 0.03700980078428984,
+      "ledger_sha256": "5ef5ca087faac0a6c8d31e65e425bcc10d5cce6ccc404ad707aea3bee9c4f529",
+      "scope": "decode plus per-shot ledger encoding and immutable result binding; excludes disk export"
+    }
+  ]
+}

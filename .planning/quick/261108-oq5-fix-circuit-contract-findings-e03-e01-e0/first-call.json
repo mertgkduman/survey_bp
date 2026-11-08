@@ -1,0 +1,13 @@
+{
+  "fresh_numba_cache": true,
+  "first_decode_including_compilation_seconds": 3.0600988240912557,
+  "warm_decode_seconds": [
+    0.0007335413247346878,
+    0.0005753077566623688,
+    0.000589270144701004,
+    0.0005692308768630028,
+    0.00059500802308321
+  ],
+  "shots": 4,
+  "scope": "small fixture; first call includes JIT, execution and result encoding; not a throughput comparison"
+}

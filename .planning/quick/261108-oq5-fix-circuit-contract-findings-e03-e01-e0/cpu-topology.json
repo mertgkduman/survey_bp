@@ -1,0 +1,645 @@
+{
+   "cpus": [
+      {
+         "cpu": "0",
+         "core": "0",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "1",
+         "core": "1",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "2",
+         "core": "2",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "3",
+         "core": "3",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "4",
+         "core": "4",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "5",
+         "core": "5",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "6",
+         "core": "6",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "7",
+         "core": "7",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "8",
+         "core": "8",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "9",
+         "core": "9",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "10",
+         "core": "10",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "11",
+         "core": "11",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "12",
+         "core": "12",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "13",
+         "core": "13",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "14",
+         "core": "14",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "15",
+         "core": "15",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "16",
+         "core": "16",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "17",
+         "core": "17",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "18",
+         "core": "18",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "19",
+         "core": "19",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "20",
+         "core": "20",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "21",
+         "core": "21",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "22",
+         "core": "22",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "23",
+         "core": "23",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "24",
+         "core": "24",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "25",
+         "core": "25",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "26",
+         "core": "26",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "27",
+         "core": "27",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "28",
+         "core": "28",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "29",
+         "core": "29",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "30",
+         "core": "30",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "31",
+         "core": "31",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "32",
+         "core": "32",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "33",
+         "core": "33",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "34",
+         "core": "34",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "35",
+         "core": "35",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "36",
+         "core": "36",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "37",
+         "core": "37",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "38",
+         "core": "38",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "39",
+         "core": "39",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "40",
+         "core": "40",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "41",
+         "core": "41",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "42",
+         "core": "42",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "43",
+         "core": "43",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "44",
+         "core": "44",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "45",
+         "core": "45",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "46",
+         "core": "46",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "47",
+         "core": "47",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "48",
+         "core": "48",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "49",
+         "core": "49",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "50",
+         "core": "50",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "51",
+         "core": "51",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "52",
+         "core": "52",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "53",
+         "core": "53",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "54",
+         "core": "54",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "55",
+         "core": "55",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "56",
+         "core": "56",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "57",
+         "core": "57",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "58",
+         "core": "58",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "59",
+         "core": "59",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "60",
+         "core": "60",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "61",
+         "core": "61",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "62",
+         "core": "62",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "63",
+         "core": "63",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "64",
+         "core": "0",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "65",
+         "core": "1",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "66",
+         "core": "2",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "67",
+         "core": "3",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "68",
+         "core": "4",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "69",
+         "core": "5",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "70",
+         "core": "6",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "71",
+         "core": "7",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "72",
+         "core": "8",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "73",
+         "core": "9",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "74",
+         "core": "10",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "75",
+         "core": "11",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "76",
+         "core": "12",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "77",
+         "core": "13",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "78",
+         "core": "14",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "79",
+         "core": "15",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "80",
+         "core": "16",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "81",
+         "core": "17",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "82",
+         "core": "18",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "83",
+         "core": "19",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "84",
+         "core": "20",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "85",
+         "core": "21",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "86",
+         "core": "22",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "87",
+         "core": "23",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "88",
+         "core": "24",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "89",
+         "core": "25",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "90",
+         "core": "26",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "91",
+         "core": "27",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "92",
+         "core": "28",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "93",
+         "core": "29",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "94",
+         "core": "30",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "95",
+         "core": "31",
+         "socket": "0",
+         "online": "yes"
+      },{
+         "cpu": "96",
+         "core": "32",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "97",
+         "core": "33",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "98",
+         "core": "34",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "99",
+         "core": "35",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "100",
+         "core": "36",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "101",
+         "core": "37",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "102",
+         "core": "38",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "103",
+         "core": "39",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "104",
+         "core": "40",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "105",
+         "core": "41",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "106",
+         "core": "42",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "107",
+         "core": "43",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "108",
+         "core": "44",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "109",
+         "core": "45",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "110",
+         "core": "46",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "111",
+         "core": "47",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "112",
+         "core": "48",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "113",
+         "core": "49",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "114",
+         "core": "50",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "115",
+         "core": "51",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "116",
+         "core": "52",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "117",
+         "core": "53",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "118",
+         "core": "54",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "119",
+         "core": "55",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "120",
+         "core": "56",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "121",
+         "core": "57",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "122",
+         "core": "58",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "123",
+         "core": "59",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "124",
+         "core": "60",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "125",
+         "core": "61",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "126",
+         "core": "62",
+         "socket": "1",
+         "online": "yes"
+      },{
+         "cpu": "127",
+         "core": "63",
+         "socket": "1",
+         "online": "yes"
+      }
+   ]
+}

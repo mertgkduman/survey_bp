@@ -1,0 +1,72 @@
+.FF.FF..........F                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_nms_overflow_fails_before_saturation[error(0.1) D0 L0-compiled] _____
+
+backend = 'compiled', dem = 'error(0.1) D0 L0'
+
+    @pytest.mark.parametrize("backend", ["scalar", "compiled", "auto"])
+    @pytest.mark.parametrize("dem", ["error(0.1) D0 L0", "error(0.1) D0 L0\nerror(0.2) D0"])
+    def test_nms_overflow_fails_before_saturation(backend, dem):
+        compiled = PolicyBpSinterDecoder(CircuitPolicy(rule="normalized_min_sum", parameter=1e308,
+            backend=backend, max_iterations=1)).compile_decoder_for_dem(dem=stim.DetectorErrorModel(dem))
+>       with pytest.raises(NumericalFailure, match="normalized_min_sum_output"):
+E       Failed: DID NOT RAISE <class 'bp_registry.canonical.numerics.NumericalFailure'>
+
+tests/circuit/test_policy_contract_fixes.py:86: Failed
+_______ test_nms_overflow_fails_before_saturation[error(0.1) D0 L0-auto] _______
+
+backend = 'auto', dem = 'error(0.1) D0 L0'
+
+    @pytest.mark.parametrize("backend", ["scalar", "compiled", "auto"])
+    @pytest.mark.parametrize("dem", ["error(0.1) D0 L0", "error(0.1) D0 L0\nerror(0.2) D0"])
+    def test_nms_overflow_fails_before_saturation(backend, dem):
+        compiled = PolicyBpSinterDecoder(CircuitPolicy(rule="normalized_min_sum", parameter=1e308,
+            backend=backend, max_iterations=1)).compile_decoder_for_dem(dem=stim.DetectorErrorModel(dem))
+>       with pytest.raises(NumericalFailure, match="normalized_min_sum_output"):
+E       Failed: DID NOT RAISE <class 'bp_registry.canonical.numerics.NumericalFailure'>
+
+tests/circuit/test_policy_contract_fixes.py:86: Failed
+_ test_nms_overflow_fails_before_saturation[error(0.1) D0 L0\nerror(0.2) D0-compiled] _
+
+backend = 'compiled', dem = 'error(0.1) D0 L0\nerror(0.2) D0'
+
+    @pytest.mark.parametrize("backend", ["scalar", "compiled", "auto"])
+    @pytest.mark.parametrize("dem", ["error(0.1) D0 L0", "error(0.1) D0 L0\nerror(0.2) D0"])
+    def test_nms_overflow_fails_before_saturation(backend, dem):
+        compiled = PolicyBpSinterDecoder(CircuitPolicy(rule="normalized_min_sum", parameter=1e308,
+            backend=backend, max_iterations=1)).compile_decoder_for_dem(dem=stim.DetectorErrorModel(dem))
+>       with pytest.raises(NumericalFailure, match="normalized_min_sum_output"):
+E       Failed: DID NOT RAISE <class 'bp_registry.canonical.numerics.NumericalFailure'>
+
+tests/circuit/test_policy_contract_fixes.py:86: Failed
+_ test_nms_overflow_fails_before_saturation[error(0.1) D0 L0\nerror(0.2) D0-auto] _
+
+backend = 'auto', dem = 'error(0.1) D0 L0\nerror(0.2) D0'
+
+    @pytest.mark.parametrize("backend", ["scalar", "compiled", "auto"])
+    @pytest.mark.parametrize("dem", ["error(0.1) D0 L0", "error(0.1) D0 L0\nerror(0.2) D0"])
+    def test_nms_overflow_fails_before_saturation(backend, dem):
+        compiled = PolicyBpSinterDecoder(CircuitPolicy(rule="normalized_min_sum", parameter=1e308,
+            backend=backend, max_iterations=1)).compile_decoder_for_dem(dem=stim.DetectorErrorModel(dem))
+>       with pytest.raises(NumericalFailure, match="normalized_min_sum_output"):
+E       Failed: DID NOT RAISE <class 'bp_registry.canonical.numerics.NumericalFailure'>
+
+tests/circuit/test_policy_contract_fixes.py:86: Failed
+_____________ test_packed_overflow_does_not_publish_success_ledger _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-251/test_packed_overflow_does_not_0')
+
+    def test_packed_overflow_does_not_publish_success_ledger(tmp_path):
+        compiled = PolicyBpSinterDecoder(CircuitPolicy(rule="normalized_min_sum", parameter=1e308),
+            ledger_directory=str(tmp_path)).compile_decoder_for_dem(dem=stim.DetectorErrorModel("error(0.1) D0 L0"))
+>       with pytest.raises(NumericalFailure, match="normalized_min_sum_output"):
+E       Failed: DID NOT RAISE <class 'bp_registry.canonical.numerics.NumericalFailure'>
+
+tests/circuit/test_policy_contract_fixes.py:112: Failed
+=========================== short test summary info ============================
+FAILED tests/circuit/test_policy_contract_fixes.py::test_nms_overflow_fails_before_saturation[error(0.1) D0 L0-compiled]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_nms_overflow_fails_before_saturation[error(0.1) D0 L0-auto]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_nms_overflow_fails_before_saturation[error(0.1) D0 L0\nerror(0.2) D0-compiled]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_nms_overflow_fails_before_saturation[error(0.1) D0 L0\nerror(0.2) D0-auto]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_packed_overflow_does_not_publish_success_ledger
+5 failed, 12 passed, 27 deselected in 2.92s

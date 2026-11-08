@@ -1,0 +1,17 @@
+{
+  "scalar": {
+    "returned": false,
+    "exception": "NumericalFailure",
+    "message": "nonfinite arithmetic at normalized_min_sum_output"
+  },
+  "compiled": {
+    "returned": false,
+    "exception": "NumericalFailure",
+    "message": "nonfinite arithmetic at normalized_min_sum_output"
+  },
+  "auto": {
+    "returned": false,
+    "exception": "NumericalFailure",
+    "message": "nonfinite arithmetic at normalized_min_sum_output"
+  }
+}

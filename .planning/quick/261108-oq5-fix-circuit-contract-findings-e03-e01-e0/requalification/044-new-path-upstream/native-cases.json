@@ -1,0 +1,9722 @@
+[
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 3.3306690738754696e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      1,
+      1,
+      0,
+      0
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      1,
+      1,
+      0,
+      0
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 3,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 3,
+    "converged": false,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 6,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 6,
+    "converged": false,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 3,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 3,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 6,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 6,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 0,
+    "rates": [
+      0.1971619712829045,
+      0.22270033316355717,
+      0.436864493414606,
+      0.14063088675839142,
+      0.16241384669111786
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      1,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      1,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      1,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      1,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      1,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 1,
+    "rates": [
+      0.11150080467995296,
+      0.3174166916509218,
+      0.07376538068807764,
+      0.34110039307597817,
+      0.18258899951601698
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      1,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 3,
+    "converged": false,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 3,
+    "converged": false,
+    "max_posterior_error": 5.551115123125783e-17
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 6,
+    "converged": false,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 2,
+    "rates": [
+      0.2515134836130012,
+      0.1444407650711785,
+      0.10921536815441156,
+      0.4160551496174787,
+      0.14922391715065855
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 6,
+    "converged": false,
+    "max_posterior_error": 5.551115123125783e-17
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 5.551115123125783e-17
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 5.551115123125783e-17
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 3,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 5.551115123125783e-17
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 3,
+    "converged": false,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 6,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 5.551115123125783e-17
+  },
+  {
+    "sample": 3,
+    "rates": [
+      0.40647339363647694,
+      0.12512844274777776,
+      0.3156808615833874,
+      0.41393302671978693,
+      0.4378714282558862
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 6,
+    "converged": false,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 5.551115123125783e-17
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 5.551115123125783e-17
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 5.551115123125783e-17
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 5.551115123125783e-17
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 5.551115123125783e-17
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 5.551115123125783e-17
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 4,
+    "rates": [
+      0.36249876007515747,
+      0.1562162702290207,
+      0.2552255519413027,
+      0.41142532495740225,
+      0.055985516975825794
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.3322676295501878e-15
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 6.661338147750939e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 8.881784197001252e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 8.881784197001252e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 8.881784197001252e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 8.881784197001252e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 8.881784197001252e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 8.881784197001252e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 8.881784197001252e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 8.881784197001252e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 8.881784197001252e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 5,
+    "rates": [
+      0.18187170254033594,
+      0.055426172869822043,
+      0.056286091874675495,
+      0.3661499426133684,
+      0.17265029040452445
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 3,
+    "converged": false,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 6,
+    "converged": false,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 3,
+    "converged": false,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 3,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 6,
+    "converged": false,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 6,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 6,
+    "rates": [
+      0.17445219379068477,
+      0.19622169141502657,
+      0.26926142142492504,
+      0.09232172104368086,
+      0.1688946208886322
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 3.3306690738754696e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.7755575615628914e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 3.3306690738754696e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      1,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 3,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 3,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 6,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 6,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 3,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 3,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 6,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 7,
+    "rates": [
+      0.4185628737366318,
+      0.23635429197828361,
+      0.27219156039172143,
+      0.27596610299366764,
+      0.31189770832202923
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 6,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      1,
+      0,
+      1,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 3,
+    "converged": false,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 3,
+    "converged": false,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 6,
+    "converged": false,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 8,
+    "rates": [
+      0.27924051318984583,
+      0.04087453028863515,
+      0.2699409166559474,
+      0.03551498491847256,
+      0.41468027524769757
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 6,
+    "converged": false,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 8.881784197001252e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.7763568394002505e-15
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 8.881784197001252e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 8.881784197001252e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 8.881784197001252e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 8.881784197001252e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 8.881784197001252e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 3,
+    "converged": false,
+    "max_posterior_error": 8.881784197001252e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 3,
+    "converged": false,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 6,
+    "converged": false,
+    "max_posterior_error": 8.881784197001252e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 9,
+    "rates": [
+      0.08678948896576508,
+      0.3691028185425401,
+      0.050099631136003936,
+      0.054784615304565534,
+      0.13189432713661192
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 6,
+    "converged": false,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 0.0
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 10,
+    "rates": [
+      0.09037799561981374,
+      0.4459099548186727,
+      0.10258095468893452,
+      0.06315695354875292,
+      0.3695773455064204
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "spa",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 1.6653345369377348e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 1.6653345369377348e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      1
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      1
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "min_sum",
+    "alpha": 1.0,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 4.440892098500626e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 5.551115123125783e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 3,
+    "converged": false,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 5.551115123125783e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 6,
+    "converged": false,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.8,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": false,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 1,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 3,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 3,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      0,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "iterations": 2,
+    "converged": true,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      1,
+      0
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "iterations": 6,
+    "converged": false,
+    "max_posterior_error": 2.220446049250313e-16
+  },
+  {
+    "sample": 11,
+    "rates": [
+      0.22846501821058532,
+      0.21297705628643215,
+      0.3694828141462838,
+      0.07760316796272718,
+      0.38952043684545334
+    ],
+    "syndrome": [
+      1,
+      1
+    ],
+    "rule": "normalized_min_sum",
+    "alpha": 0.55,
+    "cap": 6,
+    "candidate": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "iterations": 1,
+    "converged": true,
+    "max_posterior_error": 1.1102230246251565e-16
+  }
+]

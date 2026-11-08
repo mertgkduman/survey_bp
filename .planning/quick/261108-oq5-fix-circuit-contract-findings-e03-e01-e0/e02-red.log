@@ -1,0 +1,124 @@
+FFFFFFFF.......                                                          [100%]
+=================================== FAILURES ===================================
+_ test_inactive_nondefault_controller_controls_are_rejected[single-solution_limit-2] _
+
+controller = 'single', field = 'solution_limit', value = 2
+
+    @pytest.mark.parametrize("controller,field,value", [
+        (controller, field, value)
+        for controller in ("single", "guided", "beam")
+        for field, value in (("solution_limit", 2), ("relay_alpha", .25))
+    ] + [(controller, "bias", 2.) for controller in ("single", "relay")])
+    def test_inactive_nondefault_controller_controls_are_rejected(controller, field, value):
+>       with pytest.raises(ValueError, match=field):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:123: Failed
+_ test_inactive_nondefault_controller_controls_are_rejected[single-relay_alpha-0.25] _
+
+controller = 'single', field = 'relay_alpha', value = 0.25
+
+    @pytest.mark.parametrize("controller,field,value", [
+        (controller, field, value)
+        for controller in ("single", "guided", "beam")
+        for field, value in (("solution_limit", 2), ("relay_alpha", .25))
+    ] + [(controller, "bias", 2.) for controller in ("single", "relay")])
+    def test_inactive_nondefault_controller_controls_are_rejected(controller, field, value):
+>       with pytest.raises(ValueError, match=field):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:123: Failed
+_ test_inactive_nondefault_controller_controls_are_rejected[guided-solution_limit-2] _
+
+controller = 'guided', field = 'solution_limit', value = 2
+
+    @pytest.mark.parametrize("controller,field,value", [
+        (controller, field, value)
+        for controller in ("single", "guided", "beam")
+        for field, value in (("solution_limit", 2), ("relay_alpha", .25))
+    ] + [(controller, "bias", 2.) for controller in ("single", "relay")])
+    def test_inactive_nondefault_controller_controls_are_rejected(controller, field, value):
+>       with pytest.raises(ValueError, match=field):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:123: Failed
+_ test_inactive_nondefault_controller_controls_are_rejected[guided-relay_alpha-0.25] _
+
+controller = 'guided', field = 'relay_alpha', value = 0.25
+
+    @pytest.mark.parametrize("controller,field,value", [
+        (controller, field, value)
+        for controller in ("single", "guided", "beam")
+        for field, value in (("solution_limit", 2), ("relay_alpha", .25))
+    ] + [(controller, "bias", 2.) for controller in ("single", "relay")])
+    def test_inactive_nondefault_controller_controls_are_rejected(controller, field, value):
+>       with pytest.raises(ValueError, match=field):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:123: Failed
+_ test_inactive_nondefault_controller_controls_are_rejected[beam-solution_limit-2] _
+
+controller = 'beam', field = 'solution_limit', value = 2
+
+    @pytest.mark.parametrize("controller,field,value", [
+        (controller, field, value)
+        for controller in ("single", "guided", "beam")
+        for field, value in (("solution_limit", 2), ("relay_alpha", .25))
+    ] + [(controller, "bias", 2.) for controller in ("single", "relay")])
+    def test_inactive_nondefault_controller_controls_are_rejected(controller, field, value):
+>       with pytest.raises(ValueError, match=field):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:123: Failed
+_ test_inactive_nondefault_controller_controls_are_rejected[beam-relay_alpha-0.25] _
+
+controller = 'beam', field = 'relay_alpha', value = 0.25
+
+    @pytest.mark.parametrize("controller,field,value", [
+        (controller, field, value)
+        for controller in ("single", "guided", "beam")
+        for field, value in (("solution_limit", 2), ("relay_alpha", .25))
+    ] + [(controller, "bias", 2.) for controller in ("single", "relay")])
+    def test_inactive_nondefault_controller_controls_are_rejected(controller, field, value):
+>       with pytest.raises(ValueError, match=field):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:123: Failed
+__ test_inactive_nondefault_controller_controls_are_rejected[single-bias-2.0] __
+
+controller = 'single', field = 'bias', value = 2.0
+
+    @pytest.mark.parametrize("controller,field,value", [
+        (controller, field, value)
+        for controller in ("single", "guided", "beam")
+        for field, value in (("solution_limit", 2), ("relay_alpha", .25))
+    ] + [(controller, "bias", 2.) for controller in ("single", "relay")])
+    def test_inactive_nondefault_controller_controls_are_rejected(controller, field, value):
+>       with pytest.raises(ValueError, match=field):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:123: Failed
+__ test_inactive_nondefault_controller_controls_are_rejected[relay-bias-2.0] ___
+
+controller = 'relay', field = 'bias', value = 2.0
+
+    @pytest.mark.parametrize("controller,field,value", [
+        (controller, field, value)
+        for controller in ("single", "guided", "beam")
+        for field, value in (("solution_limit", 2), ("relay_alpha", .25))
+    ] + [(controller, "bias", 2.) for controller in ("single", "relay")])
+    def test_inactive_nondefault_controller_controls_are_rejected(controller, field, value):
+>       with pytest.raises(ValueError, match=field):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/circuit/test_policy_contract_fixes.py:123: Failed
+=========================== short test summary info ============================
+FAILED tests/circuit/test_policy_contract_fixes.py::test_inactive_nondefault_controller_controls_are_rejected[single-solution_limit-2]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_inactive_nondefault_controller_controls_are_rejected[single-relay_alpha-0.25]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_inactive_nondefault_controller_controls_are_rejected[guided-solution_limit-2]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_inactive_nondefault_controller_controls_are_rejected[guided-relay_alpha-0.25]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_inactive_nondefault_controller_controls_are_rejected[beam-solution_limit-2]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_inactive_nondefault_controller_controls_are_rejected[beam-relay_alpha-0.25]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_inactive_nondefault_controller_controls_are_rejected[single-bias-2.0]
+FAILED tests/circuit/test_policy_contract_fixes.py::test_inactive_nondefault_controller_controls_are_rejected[relay-bias-2.0]
+8 failed, 7 passed, 44 deselected in 2.35s
