@@ -37,6 +37,16 @@ the existing declared composition order. Relay and ordinary memory composition
 cannot be combined through this interface. Serial schedules, arbitrary callbacks,
 hard reductions, OSD/LSD and Pauli memory policies are not admitted.
 
+Controller-specific non-default fields are rejected when they have no execution
+operand: `solution_limit` and `relay_alpha` apply only to Relay, `bias` applies
+only to guided/beam, and `beam_width` applies only to beam. Shared default values
+remain accepted and retain the same serialized policy identity. Interfaces and
+parameter sweeps should expose these fields only for their active controllers.
+
+Both scalar and compiled NMS reject nonfinite intermediate messages before
+saturation, raising `NumericalFailure`. Finite coefficients remain admitted;
+initial convergence and zero-iteration returns do not execute unused updates.
+
 Ordinary attempts use Numba CPU compilation when `backend="auto"` (the default).
 Memory and Relay use the inspectable canonical Python implementation.
 `backend="scalar"` explicitly requests the oracle; `backend="compiled"` rejects
@@ -80,6 +90,10 @@ model/configuration/input identity, selected faults and observables, every
 attempt/leg, posterior, stopping and work. Manual detailed calls return their
 ledger without writing automatically. Exclusive atomic publication protects
 existing evidence. Replay requires the original compiled DEM/configuration.
+Direct `CircuitBatchResult` construction requires binary integer/boolean matrices,
+boolean convergence, and nonnegative integer iterations representable as int64.
+Arrays are validated before lossless conversion and immutable ledger binding;
+floating-point columns and overflowing integer conversions are rejected.
 When resuming Sinter statistics, retain a policy-specific decoder key as above
 or equivalent task metadata; reusing one name for changed policies can mix
 scientifically different runs.

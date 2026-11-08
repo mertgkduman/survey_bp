@@ -112,3 +112,48 @@ def test_packed_overflow_does_not_publish_success_ledger(tmp_path):
     with pytest.raises(NumericalFailure, match="normalized_min_sum_output"):
         compiled.decode_shots_bit_packed(bit_packed_detection_event_data=np.array([[1]], np.uint8))
     assert not list(tmp_path.glob("*.jsonl"))
+
+
+@pytest.mark.parametrize("controller,field,value", [
+    (controller, field, value)
+    for controller in ("single", "guided", "beam")
+    for field, value in (("solution_limit", 2), ("relay_alpha", .25))
+] + [(controller, "bias", 2.) for controller in ("single", "relay")])
+def test_inactive_nondefault_controller_controls_are_rejected(controller, field, value):
+    with pytest.raises(ValueError, match=field):
+        CircuitPolicy(controller=controller, **{field: value})
+    # Public factories must also revalidate a model_copy bypass.
+    bypass = CircuitPolicy(controller=controller).model_copy(update={field: value})
+    with pytest.raises(ValueError, match=field):
+        PolicyBpSinterDecoder(bypass)
+
+
+@pytest.mark.parametrize("controller", ["single", "relay", "guided", "beam"])
+def test_shared_default_controller_fields_keep_policy_identity(controller):
+    implicit = CircuitPolicy(controller=controller)
+    explicit = CircuitPolicy(controller=controller, solution_limit=1, relay_alpha=.5, bias=20.)
+    assert implicit.model_dump_json() == explicit.model_dump_json()
+
+
+@pytest.mark.parametrize("controller", ["guided", "beam"])
+def test_active_search_bias_changes_attempt_priors(controller):
+    dem = stim.DetectorErrorModel("error(0.1) D0 D1\nerror(0.2) D0 D1 L0")
+    attempts = []
+    for bias in (2., 4.):
+        compiled = PolicyBpSinterDecoder(CircuitPolicy(controller=controller, bias=bias,
+            max_attempts=3, max_iterations=2)).compile_decoder_for_dem(dem=dem)
+        result = compiled.decode_detailed(np.array([[1, 0]], np.uint8))
+        child = result.ledger[1]["attempts"][1]
+        assert abs(child["prior"][child["fixed"][0]]) == bias
+        attempts.append(child["prior"])
+    assert attempts[0] != attempts[1]
+
+
+def test_active_relay_controls_keep_their_operands():
+    counts = []
+    for limit in (1, 2):
+        result = decoder(controller="relay", relay_alpha=.25, solution_limit=limit,
+                         max_attempts=3).decode_detailed(np.array([[1]], np.uint8))
+        counts.append(len(result.ledger[1]["attempts"]))
+        assert result.ledger[1]["control"]["termination"] == "solution_limit"
+    assert counts == [1, 2]

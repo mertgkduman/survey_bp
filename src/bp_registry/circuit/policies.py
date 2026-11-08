@@ -62,6 +62,12 @@ class CircuitPolicy(BaseModel):
             raise ValueError("single controller requires max_attempts=1")
         if self.controller != "beam" and self.beam_width != 1:
             raise ValueError("beam_width applies only to beam search")
+        if self.controller != "relay" and self.solution_limit != 1:
+            raise ValueError("solution_limit applies only to Relay")
+        if self.controller != "relay" and self.relay_alpha != 0.5:
+            raise ValueError("relay_alpha applies only to Relay")
+        if self.controller not in {"guided", "beam"} and self.bias != 20.0:
+            raise ValueError("bias applies only to guided or beam search")
         if self.rule in {"spa", "min_sum"} and self.parameter != 1.0:
             raise ValueError("parameter applies only to normalized or offset min-sum")
         return self
