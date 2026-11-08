@@ -1,0 +1,4 @@
+{"checks": 5, "passed": 2, "failed": 3}
+FINDING: C03_bound_prior_validated_before_initial_shortcut 
+FINDING: C03_stored_float64_priors_validated_after_conversion 
+FINDING: C01_overflow_is_reported_in_full_decode_and_batch 

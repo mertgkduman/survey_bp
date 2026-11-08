@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/hpc/group/pfisterlab/mg551/storage/survey_bp/.planning/spikes/030-freeze-execution-audit/probe.py", line 99, in <module>
+    a=Audit(HERE);prior_admission(a);overflow_execution(a);a.probe('CPU_input_isolation_and_empty_batches',cpu_isolation)
+                                     ^^^^^^^^^^^^^^^^^^^^^
+  File "/hpc/group/pfisterlab/mg551/storage/survey_bp/.planning/spikes/030-freeze-execution-audit/probe.py", line 43, in overflow_execution
+    sweep=graph.sweep(graph.initial_v2c(),s);assert not np.all(np.isfinite(sweep.beliefs))
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
