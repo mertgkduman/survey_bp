@@ -1,0 +1,344 @@
+FFFFFFFFFFFFFFF...FF                                                     [100%]
+=================================== FAILURES ===================================
+________ test_audited_summary_counterexamples_are_rejected[termination] ________
+
+field = 'termination'
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-209/test_audited_summary_counterex0')
+
+    @pytest.mark.parametrize('field', ['termination', 'outcome', 'numerical_profile', 'run_fidelity'])
+    def test_audited_summary_counterexamples_are_rejected(field, tmp_path):
+        result = run_quaternary(fixture(4), tmp_path)
+        result[field] = 'fabricated_claim'
+        write_result(tmp_path, result)
+>       with pytest.raises(ValueError, match='summary.*differs'):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/quaternary/test_summary_verification.py:33: Failed
+__________ test_audited_summary_counterexamples_are_rejected[outcome] __________
+
+field = 'outcome'
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-209/test_audited_summary_counterex1')
+
+    @pytest.mark.parametrize('field', ['termination', 'outcome', 'numerical_profile', 'run_fidelity'])
+    def test_audited_summary_counterexamples_are_rejected(field, tmp_path):
+        result = run_quaternary(fixture(4), tmp_path)
+        result[field] = 'fabricated_claim'
+        write_result(tmp_path, result)
+>       with pytest.raises(ValueError, match='summary.*differs'):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/quaternary/test_summary_verification.py:33: Failed
+_____ test_audited_summary_counterexamples_are_rejected[numerical_profile] _____
+
+field = 'numerical_profile'
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-209/test_audited_summary_counterex2')
+
+    @pytest.mark.parametrize('field', ['termination', 'outcome', 'numerical_profile', 'run_fidelity'])
+    def test_audited_summary_counterexamples_are_rejected(field, tmp_path):
+        result = run_quaternary(fixture(4), tmp_path)
+        result[field] = 'fabricated_claim'
+        write_result(tmp_path, result)
+>       with pytest.raises(ValueError, match='summary.*differs'):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/quaternary/test_summary_verification.py:33: Failed
+_______ test_audited_summary_counterexamples_are_rejected[run_fidelity] ________
+
+field = 'run_fidelity'
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-209/test_audited_summary_counterex3')
+
+    @pytest.mark.parametrize('field', ['termination', 'outcome', 'numerical_profile', 'run_fidelity'])
+    def test_audited_summary_counterexamples_are_rejected(field, tmp_path):
+        result = run_quaternary(fixture(4), tmp_path)
+        result[field] = 'fabricated_claim'
+        write_result(tmp_path, result)
+>       with pytest.raises(ValueError, match='summary.*differs'):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/quaternary/test_summary_verification.py:33: Failed
+_________ test_every_deterministic_summary_field_is_verified[alter-1] __________
+
+schema = 1, operation = 'alter'
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-209/test_every_deterministic_summa0')
+
+    @pytest.mark.parametrize('schema', [1, 2, 3, 4])
+    @pytest.mark.parametrize('operation', ['alter', 'omit'])
+    def test_every_deterministic_summary_field_is_verified(schema, operation, tmp_path):
+        original = run_quaternary(fixture(schema), tmp_path)
+        assert verify_quaternary_run(tmp_path)['verified']
+        for field in original.keys() - LOCATIONS:
+            changed = deepcopy(original)
+            if operation == 'omit':
+                del changed[field]
+            else:
+                changed[field] = 'fabricated_claim'
+            write_result(tmp_path, changed)
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/quaternary/test_summary_verification.py:50: Failed
+_________ test_every_deterministic_summary_field_is_verified[alter-2] __________
+
+schema = 2, operation = 'alter'
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-209/test_every_deterministic_summa1')
+
+    @pytest.mark.parametrize('schema', [1, 2, 3, 4])
+    @pytest.mark.parametrize('operation', ['alter', 'omit'])
+    def test_every_deterministic_summary_field_is_verified(schema, operation, tmp_path):
+        original = run_quaternary(fixture(schema), tmp_path)
+        assert verify_quaternary_run(tmp_path)['verified']
+        for field in original.keys() - LOCATIONS:
+            changed = deepcopy(original)
+            if operation == 'omit':
+                del changed[field]
+            else:
+                changed[field] = 'fabricated_claim'
+            write_result(tmp_path, changed)
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/quaternary/test_summary_verification.py:50: Failed
+_________ test_every_deterministic_summary_field_is_verified[alter-3] __________
+
+schema = 3, operation = 'alter'
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-209/test_every_deterministic_summa2')
+
+    @pytest.mark.parametrize('schema', [1, 2, 3, 4])
+    @pytest.mark.parametrize('operation', ['alter', 'omit'])
+    def test_every_deterministic_summary_field_is_verified(schema, operation, tmp_path):
+        original = run_quaternary(fixture(schema), tmp_path)
+        assert verify_quaternary_run(tmp_path)['verified']
+        for field in original.keys() - LOCATIONS:
+            changed = deepcopy(original)
+            if operation == 'omit':
+                del changed[field]
+            else:
+                changed[field] = 'fabricated_claim'
+            write_result(tmp_path, changed)
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/quaternary/test_summary_verification.py:50: Failed
+_________ test_every_deterministic_summary_field_is_verified[alter-4] __________
+
+schema = 4, operation = 'alter'
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-209/test_every_deterministic_summa3')
+
+    @pytest.mark.parametrize('schema', [1, 2, 3, 4])
+    @pytest.mark.parametrize('operation', ['alter', 'omit'])
+    def test_every_deterministic_summary_field_is_verified(schema, operation, tmp_path):
+        original = run_quaternary(fixture(schema), tmp_path)
+        assert verify_quaternary_run(tmp_path)['verified']
+        for field in original.keys() - LOCATIONS:
+            changed = deepcopy(original)
+            if operation == 'omit':
+                del changed[field]
+            else:
+                changed[field] = 'fabricated_claim'
+            write_result(tmp_path, changed)
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/quaternary/test_summary_verification.py:50: Failed
+__________ test_every_deterministic_summary_field_is_verified[omit-1] __________
+
+schema = 1, operation = 'omit'
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-209/test_every_deterministic_summa4')
+
+    @pytest.mark.parametrize('schema', [1, 2, 3, 4])
+    @pytest.mark.parametrize('operation', ['alter', 'omit'])
+    def test_every_deterministic_summary_field_is_verified(schema, operation, tmp_path):
+        original = run_quaternary(fixture(schema), tmp_path)
+        assert verify_quaternary_run(tmp_path)['verified']
+        for field in original.keys() - LOCATIONS:
+            changed = deepcopy(original)
+            if operation == 'omit':
+                del changed[field]
+            else:
+                changed[field] = 'fabricated_claim'
+            write_result(tmp_path, changed)
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/quaternary/test_summary_verification.py:50: Failed
+__________ test_every_deterministic_summary_field_is_verified[omit-2] __________
+
+schema = 2, operation = 'omit'
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-209/test_every_deterministic_summa5')
+
+    @pytest.mark.parametrize('schema', [1, 2, 3, 4])
+    @pytest.mark.parametrize('operation', ['alter', 'omit'])
+    def test_every_deterministic_summary_field_is_verified(schema, operation, tmp_path):
+        original = run_quaternary(fixture(schema), tmp_path)
+        assert verify_quaternary_run(tmp_path)['verified']
+        for field in original.keys() - LOCATIONS:
+            changed = deepcopy(original)
+            if operation == 'omit':
+                del changed[field]
+            else:
+                changed[field] = 'fabricated_claim'
+            write_result(tmp_path, changed)
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/quaternary/test_summary_verification.py:50: Failed
+__________ test_every_deterministic_summary_field_is_verified[omit-3] __________
+
+schema = 3, operation = 'omit'
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-209/test_every_deterministic_summa6')
+
+    @pytest.mark.parametrize('schema', [1, 2, 3, 4])
+    @pytest.mark.parametrize('operation', ['alter', 'omit'])
+    def test_every_deterministic_summary_field_is_verified(schema, operation, tmp_path):
+        original = run_quaternary(fixture(schema), tmp_path)
+        assert verify_quaternary_run(tmp_path)['verified']
+        for field in original.keys() - LOCATIONS:
+            changed = deepcopy(original)
+            if operation == 'omit':
+                del changed[field]
+            else:
+                changed[field] = 'fabricated_claim'
+            write_result(tmp_path, changed)
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/quaternary/test_summary_verification.py:50: Failed
+__________ test_every_deterministic_summary_field_is_verified[omit-4] __________
+
+schema = 4, operation = 'omit'
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-209/test_every_deterministic_summa7')
+
+    @pytest.mark.parametrize('schema', [1, 2, 3, 4])
+    @pytest.mark.parametrize('operation', ['alter', 'omit'])
+    def test_every_deterministic_summary_field_is_verified(schema, operation, tmp_path):
+        original = run_quaternary(fixture(schema), tmp_path)
+        assert verify_quaternary_run(tmp_path)['verified']
+        for field in original.keys() - LOCATIONS:
+            changed = deepcopy(original)
+            if operation == 'omit':
+                del changed[field]
+            else:
+                changed[field] = 'fabricated_claim'
+            write_result(tmp_path, changed)
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/quaternary/test_summary_verification.py:50: Failed
+__ test_summary_shape_nested_values_types_and_accounting_are_verified[extra] ___
+
+change = 'extra'
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-209/test_summary_shape_nested_valu0')
+
+    @pytest.mark.parametrize('change', ['extra', 'nested', 'type', 'downgrade'])
+    def test_summary_shape_nested_values_types_and_accounting_are_verified(change, tmp_path):
+        result = run_quaternary(fixture(4), tmp_path)
+        if change == 'extra':
+            result['claimed_source_reproduction'] = True
+        elif change == 'nested':
+            result['component_fidelity']['kernel'] = 'fabricated_fidelity'
+        elif change == 'type':
+            result['final_row_count'] = True  # Python equality considers True == 1.
+        else:
+            del result['work_accounting_version']
+        write_result(tmp_path, result)
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/quaternary/test_summary_verification.py:67: Failed
+__ test_summary_shape_nested_values_types_and_accounting_are_verified[nested] __
+
+change = 'nested'
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-209/test_summary_shape_nested_valu1')
+
+    @pytest.mark.parametrize('change', ['extra', 'nested', 'type', 'downgrade'])
+    def test_summary_shape_nested_values_types_and_accounting_are_verified(change, tmp_path):
+        result = run_quaternary(fixture(4), tmp_path)
+        if change == 'extra':
+            result['claimed_source_reproduction'] = True
+        elif change == 'nested':
+            result['component_fidelity']['kernel'] = 'fabricated_fidelity'
+        elif change == 'type':
+            result['final_row_count'] = True  # Python equality considers True == 1.
+        else:
+            del result['work_accounting_version']
+        write_result(tmp_path, result)
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/quaternary/test_summary_verification.py:67: Failed
+___ test_summary_shape_nested_values_types_and_accounting_are_verified[type] ___
+
+change = 'type'
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-209/test_summary_shape_nested_valu2')
+
+    @pytest.mark.parametrize('change', ['extra', 'nested', 'type', 'downgrade'])
+    def test_summary_shape_nested_values_types_and_accounting_are_verified(change, tmp_path):
+        result = run_quaternary(fixture(4), tmp_path)
+        if change == 'extra':
+            result['claimed_source_reproduction'] = True
+        elif change == 'nested':
+            result['component_fidelity']['kernel'] = 'fabricated_fidelity'
+        elif change == 'type':
+            result['final_row_count'] = True  # Python equality considers True == 1.
+        else:
+            del result['work_accounting_version']
+        write_result(tmp_path, result)
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/quaternary/test_summary_verification.py:67: Failed
+____ test_historical_receipts_still_replay_and_reject_summary_tampering[2] _____
+
+schema = 2
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-209/test_historical_receipts_still0')
+
+    @pytest.mark.parametrize('schema', [2, 3])
+    def test_historical_receipts_still_replay_and_reject_summary_tampering(schema, tmp_path):
+        historical = SOURCE.parent.parent / f'quaternary_experiment_v{schema}-budget-counterexample'
+        shutil.copytree(historical, tmp_path / 'copy')
+        copied = tmp_path / 'copy'
+        assert verify_quaternary_run(copied)['verified']
+        result = json.loads((copied / 'result.json').read_text())
+        result['outcome'] = 'fabricated_claim'
+        write_result(copied, result)
+>       with pytest.raises(ValueError, match='summary.*differs'):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/quaternary/test_summary_verification.py:93: Failed
+____ test_historical_receipts_still_replay_and_reject_summary_tampering[3] _____
+
+schema = 3
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-209/test_historical_receipts_still1')
+
+    @pytest.mark.parametrize('schema', [2, 3])
+    def test_historical_receipts_still_replay_and_reject_summary_tampering(schema, tmp_path):
+        historical = SOURCE.parent.parent / f'quaternary_experiment_v{schema}-budget-counterexample'
+        shutil.copytree(historical, tmp_path / 'copy')
+        copied = tmp_path / 'copy'
+        assert verify_quaternary_run(copied)['verified']
+        result = json.loads((copied / 'result.json').read_text())
+        result['outcome'] = 'fabricated_claim'
+        write_result(copied, result)
+>       with pytest.raises(ValueError, match='summary.*differs'):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/quaternary/test_summary_verification.py:93: Failed
+=========================== short test summary info ============================
+FAILED tests/canonical/quaternary/test_summary_verification.py::test_audited_summary_counterexamples_are_rejected[termination]
+FAILED tests/canonical/quaternary/test_summary_verification.py::test_audited_summary_counterexamples_are_rejected[outcome]
+FAILED tests/canonical/quaternary/test_summary_verification.py::test_audited_summary_counterexamples_are_rejected[numerical_profile]
+FAILED tests/canonical/quaternary/test_summary_verification.py::test_audited_summary_counterexamples_are_rejected[run_fidelity]
+FAILED tests/canonical/quaternary/test_summary_verification.py::test_every_deterministic_summary_field_is_verified[alter-1]
+FAILED tests/canonical/quaternary/test_summary_verification.py::test_every_deterministic_summary_field_is_verified[alter-2]
+FAILED tests/canonical/quaternary/test_summary_verification.py::test_every_deterministic_summary_field_is_verified[alter-3]
+FAILED tests/canonical/quaternary/test_summary_verification.py::test_every_deterministic_summary_field_is_verified[alter-4]
+FAILED tests/canonical/quaternary/test_summary_verification.py::test_every_deterministic_summary_field_is_verified[omit-1]
+FAILED tests/canonical/quaternary/test_summary_verification.py::test_every_deterministic_summary_field_is_verified[omit-2]
+FAILED tests/canonical/quaternary/test_summary_verification.py::test_every_deterministic_summary_field_is_verified[omit-3]
+FAILED tests/canonical/quaternary/test_summary_verification.py::test_every_deterministic_summary_field_is_verified[omit-4]
+FAILED tests/canonical/quaternary/test_summary_verification.py::test_summary_shape_nested_values_types_and_accounting_are_verified[extra]
+FAILED tests/canonical/quaternary/test_summary_verification.py::test_summary_shape_nested_values_types_and_accounting_are_verified[nested]
+FAILED tests/canonical/quaternary/test_summary_verification.py::test_summary_shape_nested_values_types_and_accounting_are_verified[type]
+FAILED tests/canonical/quaternary/test_summary_verification.py::test_historical_receipts_still_replay_and_reject_summary_tampering[2]
+FAILED tests/canonical/quaternary/test_summary_verification.py::test_historical_receipts_still_replay_and_reject_summary_tampering[3]
+17 failed, 3 passed in 1.90s

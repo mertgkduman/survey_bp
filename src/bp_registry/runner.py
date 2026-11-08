@@ -40,7 +40,7 @@ from .manifests import (
     validate_executable_canonical_baseline,
 )
 from . import evaluator, sampling
-from .quaternary.execution import TracerPauliProblem, _css_from_public_problem, run_quaternary_asced, run_quaternary_mbp4, run_quaternary_qbpgd, run_quaternary_scalar, run_quaternary_tracer, verify_quaternary_tracer
+from .quaternary.execution import TracerPauliProblem, _css_from_public_problem, run_quaternary_asced, run_quaternary_mbp4, run_quaternary_qbpgd, run_quaternary_scalar, run_quaternary_tracer
 from .quaternary.compatibility import resolve_quaternary_composition
 
 
@@ -958,35 +958,51 @@ def run_quaternary(manifest_path: str | Path, output: str | Path, *, shot_id: in
     return public
 
 
+def _quaternary_summary_claims(result: dict[str, Any]) -> str:
+    """Canonical, type-sensitive claims, excluding relocatable file locations.
+
+    The manifest location is resolved separately and its identity verified.
+    Output/ledger paths are informational; replay uses the requested directory.
+    Compare the complete remaining key set so omitted and extra claims fail too.
+    """
+    return json.dumps({key: value for key, value in result.items()
+                       if key not in {"output", "ledger_path", "manifest_path"}},
+                      sort_keys=True, allow_nan=False)
+
+
 def verify_quaternary_run(output: str | Path) -> dict[str, Any]:
-    """Verify result identity and exact replay for a joint-Pauli tracer output."""
+    """Verify ledger identity, deterministic summary claims and exact replay."""
     output_path = Path(output)
     result = json.loads((output_path / "result.json").read_text(encoding="utf-8"))
-    if result.get("assessment_status") != "not_assessed" or result.get("statistical_claim", "").find("not_assessed") < 0:
+    if (not isinstance(result, dict) or result.get("assessment_status") != "not_assessed"
+            or not isinstance(result.get("statistical_claim"), str)
+            or "not_assessed" not in result["statistical_claim"]):
         raise ValueError("quaternary result must remain not_assessed")
     manifest_path = Path(result["manifest_path"])
     report = preflight_quaternary(manifest_path)
     if result.get("manifest_sha256") != report["manifest_sha256"] or result.get("ledger_sha256") != sha256((output_path / "events.jsonl").read_bytes()).hexdigest():
         raise ValueError("quaternary result identity differs from immutable evidence")
     manifest = preflight(manifest_path).manifest
+    version = result.get("work_accounting_version")
+    if version not in (None, "cumulative-v2"):
+        raise ValueError("unknown work accounting version")
+    with TemporaryDirectory(prefix="qbp-replay-", dir=output_path) as temporary:
+        scratch = Path(temporary)
+        replay_result = run_quaternary(manifest_path, scratch, shot_id=0, _legacy_accounting=version is None)
+        if version == "cumulative-v2" and any(result.get(key) != replay_result.get(key)
+                for key in ("work", "committed_sweeps")):
+            raise ValueError("cumulative result work differs from committed replay")
+        if _quaternary_summary_claims(result) != _quaternary_summary_claims(replay_result):
+            raise ValueError("quaternary result summary differs from deterministic replay")
+        expected = (scratch / "events.jsonl").read_bytes()
+    actual = (output_path / "events.jsonl").read_bytes()
+    if actual != expected:
+        raise ValueError("quaternary public ledger differs from deterministic replay")
+    replay = {"run_id": manifest.run_id, "shot_id": 0, "verified": True}
     if isinstance(manifest, QuaternaryExperimentV2):
-        version = result.get("work_accounting_version")
-        if version not in (None, "cumulative-v2"):
-            raise ValueError("unknown work accounting version")
-        with TemporaryDirectory(prefix="qbp-replay-", dir=output_path) as temporary:
-            scratch = Path(temporary)
-            replay_result = run_quaternary(manifest_path, scratch, shot_id=0, _legacy_accounting=version is None)
-            if version == "cumulative-v2" and any(result.get(key) != replay_result.get(key)
-                    for key in ("work", "committed_sweeps")):
-                raise ValueError("cumulative result work differs from committed replay")
-            expected = (scratch / "events.jsonl").read_bytes()
-        actual = (output_path / "events.jsonl").read_bytes()
-        if actual != expected:
-            raise ValueError("quaternary public ledger differs from deterministic replay")
-        replay = {"run_id": manifest.run_id, "shot_id": 0, "verified": True,
-                  "work_accounting_verified": version == "cumulative-v2"}
+        replay["work_accounting_verified"] = version == "cumulative-v2"
     else:
-        replay = verify_quaternary_tracer(manifest, output_path, shot_id=0)
+        replay["termination"] = replay_result["termination"]
     return {**report, "output": str(output_path), "final_row_count": 1, **replay}
 
 
