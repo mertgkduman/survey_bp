@@ -36,3 +36,5 @@ The project `.venv` supplies the pinned versions in `pyproject.toml`; no new dep
 - Enforce compiled graph contracts in construction itself, including dataclass replacement; validate and own CSR buffers before bounds-unchecked native execution.
 - Keep failed integration evidence, then rerun relevant regressions against the final source. Use a fresh Numba cache when changing shared compiled helpers.
 - Compare CPU throughput on identical policy, input and stopping contracts; separate first-call/JIT costs from warm timing and retain matching shot ledgers.
+
+- Audit admitted numerical controls across every accepting schedule/controller, and include initial-convergence and zero-iteration returns when checking state validation. Validate normalized execution-dtype state, not only pre-conversion input.
