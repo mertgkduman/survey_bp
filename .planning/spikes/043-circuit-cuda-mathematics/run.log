@@ -1,0 +1,2 @@
+{"checks": 4, "passed": 3, "failed": 1}
+FINDING: finite_intermediate_failure_parity {'scalar': {'returned': False, 'exception': 'NumericalFailure', 'message': 'nonfinite arithmetic at normalized_min_sum_output'}, 'compiled': {'returned': True, 'candidate': [[1]], 'converged': [True]}, 'auto': {'returned': True, 'candidate': [[1]], 'converged': [True]}}

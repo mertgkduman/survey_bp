@@ -1,0 +1,29 @@
+{
+  "scalar": {
+    "returned": false,
+    "exception": "NumericalFailure",
+    "message": "nonfinite arithmetic at normalized_min_sum_output"
+  },
+  "compiled": {
+    "returned": true,
+    "candidate": [
+      [
+        1
+      ]
+    ],
+    "converged": [
+      true
+    ]
+  },
+  "auto": {
+    "returned": true,
+    "candidate": [
+      [
+        1
+      ]
+    ],
+    "converged": [
+      true
+    ]
+  }
+}
