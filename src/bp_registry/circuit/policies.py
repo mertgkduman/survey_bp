@@ -84,14 +84,30 @@ class CircuitBatchResult:
 
     def __post_init__(self):
         records = validate_records(self.ledger_json, "circuit-policy-ledger-v1")
-        for name, key in (("predictions", "prediction"), ("faults", "faults"),
-                          ("converged", "converged"), ("iterations", "iterations")):
+        normalized = {}
+        for name, key, dtype, rank in (("predictions", "prediction", np.uint8, 2),
+                                      ("faults", "faults", np.uint8, 2),
+                                      ("converged", "converged", np.bool_, 1),
+                                      ("iterations", "iterations", np.int64, 1)):
             value = np.asarray(getattr(self, name))
-            if value.shape[0] != len(records) - 1 or value.tolist() != [row[key] for row in records[1:]]:
+            if value.ndim != rank or value.shape[0] != len(records) - 1:
+                raise ValueError(f"circuit result {name} has invalid dimensions")
+            if name in {"predictions", "faults"}:
+                valid = (value.dtype.kind in "biu" and not np.any((value != 0) & (value != 1)))
+            elif name == "converged":
+                valid = value.dtype == np.bool_
+            else:
+                valid = (value.dtype.kind in "iu" and not np.any(value < 0)
+                         and not np.any(value > np.iinfo(np.int64).max))
+            if not valid:
+                raise ValueError(f"circuit result {name} has invalid execution values")
+            # Conversion is now lossless. Bind the owned execution state, not
+            # caller values that could wrap or truncate when stored.
+            normalized[name] = immutable_array(value, dtype)
+            if normalized[name].tolist() != [row[key] for row in records[1:]]:
                 raise ValueError("circuit result arrays disagree with bound ledger")
-        for name, dtype in (("predictions", np.uint8), ("faults", np.uint8),
-                            ("converged", np.bool_), ("iterations", np.int64)):
-            object.__setattr__(self, name, immutable_array(getattr(self, name), dtype))
+        for name, value in normalized.items():
+            object.__setattr__(self, name, value)
 
     @property
     def ledger(self):
