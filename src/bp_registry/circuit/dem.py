@@ -5,11 +5,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from hashlib import sha256
 import math
+import re
 
 import numpy as np
 import stim
 
 from bp_registry.canonical.schedules import EdgeTable
+from bp_registry.compiled_contracts import csr_pointer, integer_vector, immutable_array
 
 
 @dataclass(frozen=True, slots=True)
@@ -30,6 +32,42 @@ class DemBinaryModel:
     syndrome_bias: np.ndarray
     observable_bias: np.ndarray
     source_error_count: int
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.dem_sha256, str) or re.fullmatch(r"[0-9a-f]{64}", self.dem_sha256) is None:
+            raise ValueError("DEM source identity must be a SHA256 digest")
+        if not isinstance(self.table, EdgeTable):
+            raise ValueError("DEM model requires a canonical EdgeTable")
+        table = EdgeTable.from_edges(self.table.check_count, self.table.variable_count, self.table.edges)
+        if table != self.table:
+            raise ValueError("DEM table must have canonical ordered edges")
+        m, n = table.check_count, table.variable_count
+        variables = integer_vector(self.variables, "DEM variables")
+        ptr = csr_pointer(self.row_ptr, len(variables), "DEM row_ptr")
+        if len(ptr) != m + 1 or np.any(variables < 0) or np.any(variables >= n):
+            raise ValueError("DEM CSR dimensions or variable indices are invalid")
+        edges = tuple((c, int(variables[e])) for c in range(m) for e in range(int(ptr[c]), int(ptr[c+1])))
+        if edges != table.edges:
+            raise ValueError("DEM CSR must agree with the canonical edge table")
+        prior = np.asarray(self.prior_llrs)
+        if (prior.shape != (n,) or not (np.issubdtype(prior.dtype, np.integer) or np.issubdtype(prior.dtype, np.floating))):
+            raise ValueError("DEM priors must be a real vector with one value per fault")
+        observables = np.asarray(self.observable_matrix)
+        syndrome_bias, observable_bias = np.asarray(self.syndrome_bias), np.asarray(self.observable_bias)
+        if observables.ndim != 2 or observables.shape[1] != n or syndrome_bias.shape != (m,) or observable_bias.shape != (observables.shape[0],):
+            raise ValueError("DEM observable or bias dimensions disagree")
+        for value in (observables, syndrome_bias, observable_bias):
+            if not (np.issubdtype(value.dtype, np.integer) or value.dtype == np.bool_) or np.any((value != 0) & (value != 1)):
+                raise ValueError("DEM observable matrices and biases must be binary")
+        if type(self.source_error_count) is not int or self.source_error_count < n:
+            raise ValueError("DEM source_error_count must include every retained fault")
+        object.__setattr__(self, "table", table)
+        for name, value, dtype in (
+            ("row_ptr", ptr, np.int64), ("variables", variables, np.int64),
+            ("prior_llrs", prior, np.float64), ("observable_matrix", observables, np.uint8),
+            ("syndrome_bias", syndrome_bias, np.uint8), ("observable_bias", observable_bias, np.uint8),
+        ):
+            object.__setattr__(self, name, immutable_array(value, dtype))
 
     @classmethod
     def from_dem(cls, dem: stim.DetectorErrorModel) -> "DemBinaryModel":

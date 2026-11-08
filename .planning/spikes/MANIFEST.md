@@ -43,6 +43,8 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 
 - Broaden the approved four-part audit to comprehension and completeness: explicit capability coverage, independent mathematical checks, upstream correspondence, and circuit/evidence boundaries before HTML. Preserve prior evidence and production behavior.
 
+- Fix completeness findings D03 → D04 → D01 → D02 → D05 in the approved order; retain all historical evidence, explicit replay/version boundaries, and qualify CPU performance.
+
 ## Spikes
 
 | # | Idea | Name | Type | Validates | Verdict | Tags |
@@ -84,3 +86,8 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 | 035 | canonical-kernel-audit | Upstream interface and algorithm comparison | standard | Explicit contract coverage with executable evidence and exclusions | VALIDATED | completeness |
 | 036 | canonical-kernel-audit | Policy composition and capability coverage | standard | Explicit contract coverage with executable evidence and exclusions | PARTIAL | completeness |
 | 037 | canonical-kernel-audit | Execution, circuit and evidence closure | standard | Explicit contract coverage with executable evidence and exclusions | PARTIAL | completeness |
+| 038 | canonical-kernel-audit | D03 correction | standard | Fix and qualify the admitted contract boundary | VALIDATED | completeness, fixes |
+| 039 | canonical-kernel-audit | D04 correction | standard | Fix and qualify the admitted contract boundary | IN_PROGRESS | completeness, fixes |
+| 040 | canonical-kernel-audit | D01 correction | standard | Fix and qualify the admitted contract boundary | IN_PROGRESS | completeness, fixes |
+| 041 | canonical-kernel-audit | D02 correction | standard | Fix and qualify the admitted contract boundary | IN_PROGRESS | completeness, fixes |
+| 042 | canonical-kernel-audit | D05 correction | standard | Fix and qualify the admitted contract boundary | IN_PROGRESS | completeness, fixes |

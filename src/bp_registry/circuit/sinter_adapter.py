@@ -13,6 +13,15 @@ from .compiled import _decode_batch
 from .dem import DemBinaryModel
 
 
+def _validate_settings(max_iterations: int, rule: str, tie_break: str) -> None:
+    if type(max_iterations) is not int or not 0 <= max_iterations <= np.iinfo(np.int64).max:
+        raise ValueError("max_iterations must be a nonnegative int64-range integer")
+    if type(rule) is not str or rule not in {"spa", "min_sum"}:
+        raise ValueError("rule must be spa or min_sum")
+    if type(tie_break) is not str or tie_break not in {"zero", "one"}:
+        raise ValueError("tie_break must be zero or one")
+
+
 @dataclass(frozen=True, slots=True)
 class CanonicalBpSinterDecoder(sinter.Decoder):
     """Plain flooding BP on an exact independent-mechanism DEM projection."""
@@ -22,12 +31,7 @@ class CanonicalBpSinterDecoder(sinter.Decoder):
     tie_break: str = "zero"
 
     def __post_init__(self) -> None:
-        if type(self.max_iterations) is not int or self.max_iterations < 0:
-            raise ValueError("max_iterations must be a nonnegative integer")
-        if self.rule not in {"spa", "min_sum"}:
-            raise ValueError("rule must be spa or min_sum")
-        if self.tie_break not in {"zero", "one"}:
-            raise ValueError("tie_break must be zero or one")
+        _validate_settings(self.max_iterations, self.rule, self.tie_break)
 
     def compile_decoder_for_dem(self, *, dem: stim.DetectorErrorModel) -> "CompiledCanonicalBpDecoder":
         return CompiledCanonicalBpDecoder(DemBinaryModel.from_dem(dem), self.max_iterations, self.rule, self.tie_break)
@@ -39,6 +43,11 @@ class CompiledCanonicalBpDecoder(sinter.CompiledDecoder):
     max_iterations: int
     rule: str
     tie_break: str
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.model, DemBinaryModel):
+            raise ValueError("compiled circuit decoder requires a validated DEM model")
+        _validate_settings(self.max_iterations, self.rule, self.tie_break)
 
     def decode_shots_bit_packed(self, *, bit_packed_detection_event_data: np.ndarray) -> np.ndarray:
         packed = np.asarray(bit_packed_detection_event_data)
