@@ -1,0 +1,736 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                       [100%]
+=================================== FAILURES ===================================
+_____________ test_batch_arrays_cannot_reenable_writes[candidates] _____________
+
+field = 'candidates'
+
+    @pytest.mark.parametrize("field", ("candidates", "iterations", "converged", "syndromes"))
+    def test_batch_arrays_cannot_reenable_writes(field):
+        _, result, _ = execute()
+        value = getattr(result, field)
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_batch_evidence.py:29: Failed
+_____________ test_batch_arrays_cannot_reenable_writes[iterations] _____________
+
+field = 'iterations'
+
+    @pytest.mark.parametrize("field", ("candidates", "iterations", "converged", "syndromes"))
+    def test_batch_arrays_cannot_reenable_writes(field):
+        _, result, _ = execute()
+        value = getattr(result, field)
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_batch_evidence.py:29: Failed
+_____________ test_batch_arrays_cannot_reenable_writes[converged] ______________
+
+field = 'converged'
+
+    @pytest.mark.parametrize("field", ("candidates", "iterations", "converged", "syndromes"))
+    def test_batch_arrays_cannot_reenable_writes(field):
+        _, result, _ = execute()
+        value = getattr(result, field)
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_batch_evidence.py:29: Failed
+_____________ test_batch_arrays_cannot_reenable_writes[syndromes] ______________
+
+field = 'syndromes'
+
+    @pytest.mark.parametrize("field", ("candidates", "iterations", "converged", "syndromes"))
+    def test_batch_arrays_cannot_reenable_writes(field):
+        _, result, _ = execute()
+        value = getattr(result, field)
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_batch_evidence.py:29: Failed
+___________ test_replacement_cannot_keep_stale_evidence[candidates] ____________
+
+field = 'candidates'
+
+    @pytest.mark.parametrize("field", ("candidates", "iterations", "converged", "syndromes", "evidence_json"))
+    def test_replacement_cannot_keep_stale_evidence(field):
+        _, result, _ = execute()
+        if field == "evidence_json":
+            evidence = json.loads(result.evidence_json)
+            evidence["max_iterations"] += 1
+            value = json.dumps(evidence)
+        else:
+            value = getattr(result, field).copy()
+            value.flat[-1] = not value.flat[-1] if value.dtype == bool else int(value.flat[-1]) ^ 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_batch_evidence.py:49: Failed
+___________ test_replacement_cannot_keep_stale_evidence[iterations] ____________
+
+field = 'iterations'
+
+    @pytest.mark.parametrize("field", ("candidates", "iterations", "converged", "syndromes", "evidence_json"))
+    def test_replacement_cannot_keep_stale_evidence(field):
+        _, result, _ = execute()
+        if field == "evidence_json":
+            evidence = json.loads(result.evidence_json)
+            evidence["max_iterations"] += 1
+            value = json.dumps(evidence)
+        else:
+            value = getattr(result, field).copy()
+            value.flat[-1] = not value.flat[-1] if value.dtype == bool else int(value.flat[-1]) ^ 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_batch_evidence.py:49: Failed
+____________ test_replacement_cannot_keep_stale_evidence[converged] ____________
+
+field = 'converged'
+
+    @pytest.mark.parametrize("field", ("candidates", "iterations", "converged", "syndromes", "evidence_json"))
+    def test_replacement_cannot_keep_stale_evidence(field):
+        _, result, _ = execute()
+        if field == "evidence_json":
+            evidence = json.loads(result.evidence_json)
+            evidence["max_iterations"] += 1
+            value = json.dumps(evidence)
+        else:
+            value = getattr(result, field).copy()
+            value.flat[-1] = not value.flat[-1] if value.dtype == bool else int(value.flat[-1]) ^ 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_batch_evidence.py:49: Failed
+____________ test_replacement_cannot_keep_stale_evidence[syndromes] ____________
+
+field = 'syndromes'
+
+    @pytest.mark.parametrize("field", ("candidates", "iterations", "converged", "syndromes", "evidence_json"))
+    def test_replacement_cannot_keep_stale_evidence(field):
+        _, result, _ = execute()
+        if field == "evidence_json":
+            evidence = json.loads(result.evidence_json)
+            evidence["max_iterations"] += 1
+            value = json.dumps(evidence)
+        else:
+            value = getattr(result, field).copy()
+            value.flat[-1] = not value.flat[-1] if value.dtype == bool else int(value.flat[-1]) ^ 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_batch_evidence.py:49: Failed
+__________ test_replacement_cannot_keep_stale_evidence[evidence_json] __________
+
+field = 'evidence_json'
+
+    @pytest.mark.parametrize("field", ("candidates", "iterations", "converged", "syndromes", "evidence_json"))
+    def test_replacement_cannot_keep_stale_evidence(field):
+        _, result, _ = execute()
+        if field == "evidence_json":
+            evidence = json.loads(result.evidence_json)
+            evidence["max_iterations"] += 1
+            value = json.dumps(evidence)
+        else:
+            value = getattr(result, field).copy()
+            value.flat[-1] = not value.flat[-1] if value.dtype == bool else int(value.flat[-1]) ^ 1
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_batch_evidence.py:49: Failed
+_______________ test_direct_result_admission[candidates-value0] ________________
+
+field = 'candidates', value = array([[0, 0, 0]], dtype=uint8)
+
+    @pytest.mark.parametrize("field,value", [
+        ("candidates", np.zeros((1, 3), dtype=np.uint8)),
+        ("candidates", np.full((3, 3), 2, dtype=np.uint8)),
+        ("iterations", np.array([0., 1., 2.])),
+        ("iterations", np.array([0, -1, 2])),
+        ("converged", np.array([0, 1, 0])),
+        ("syndromes", np.zeros((3, 1), dtype=np.uint8)),
+        ("evidence_json", "{}"),
+    ])
+    def test_direct_result_admission(field, value):
+        _, result, _ = execute()
+        fields = {name: getattr(result, name) for name in ("candidates", "iterations", "converged", "syndromes", "evidence_json")}
+        fields[field] = value
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_batch_evidence.py:66: Failed
+_______________ test_direct_result_admission[candidates-value1] ________________
+
+field = 'candidates'
+value = array([[2, 2, 2],
+       [2, 2, 2],
+       [2, 2, 2]], dtype=uint8)
+
+    @pytest.mark.parametrize("field,value", [
+        ("candidates", np.zeros((1, 3), dtype=np.uint8)),
+        ("candidates", np.full((3, 3), 2, dtype=np.uint8)),
+        ("iterations", np.array([0., 1., 2.])),
+        ("iterations", np.array([0, -1, 2])),
+        ("converged", np.array([0, 1, 0])),
+        ("syndromes", np.zeros((3, 1), dtype=np.uint8)),
+        ("evidence_json", "{}"),
+    ])
+    def test_direct_result_admission(field, value):
+        _, result, _ = execute()
+        fields = {name: getattr(result, name) for name in ("candidates", "iterations", "converged", "syndromes", "evidence_json")}
+        fields[field] = value
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_batch_evidence.py:66: Failed
+_______________ test_direct_result_admission[iterations-value2] ________________
+
+field = 'iterations', value = array([0., 1., 2.])
+
+    @pytest.mark.parametrize("field,value", [
+        ("candidates", np.zeros((1, 3), dtype=np.uint8)),
+        ("candidates", np.full((3, 3), 2, dtype=np.uint8)),
+        ("iterations", np.array([0., 1., 2.])),
+        ("iterations", np.array([0, -1, 2])),
+        ("converged", np.array([0, 1, 0])),
+        ("syndromes", np.zeros((3, 1), dtype=np.uint8)),
+        ("evidence_json", "{}"),
+    ])
+    def test_direct_result_admission(field, value):
+        _, result, _ = execute()
+        fields = {name: getattr(result, name) for name in ("candidates", "iterations", "converged", "syndromes", "evidence_json")}
+        fields[field] = value
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_batch_evidence.py:66: Failed
+_______________ test_direct_result_admission[iterations-value3] ________________
+
+field = 'iterations', value = array([ 0, -1,  2])
+
+    @pytest.mark.parametrize("field,value", [
+        ("candidates", np.zeros((1, 3), dtype=np.uint8)),
+        ("candidates", np.full((3, 3), 2, dtype=np.uint8)),
+        ("iterations", np.array([0., 1., 2.])),
+        ("iterations", np.array([0, -1, 2])),
+        ("converged", np.array([0, 1, 0])),
+        ("syndromes", np.zeros((3, 1), dtype=np.uint8)),
+        ("evidence_json", "{}"),
+    ])
+    def test_direct_result_admission(field, value):
+        _, result, _ = execute()
+        fields = {name: getattr(result, name) for name in ("candidates", "iterations", "converged", "syndromes", "evidence_json")}
+        fields[field] = value
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_batch_evidence.py:66: Failed
+________________ test_direct_result_admission[converged-value4] ________________
+
+field = 'converged', value = array([0, 1, 0])
+
+    @pytest.mark.parametrize("field,value", [
+        ("candidates", np.zeros((1, 3), dtype=np.uint8)),
+        ("candidates", np.full((3, 3), 2, dtype=np.uint8)),
+        ("iterations", np.array([0., 1., 2.])),
+        ("iterations", np.array([0, -1, 2])),
+        ("converged", np.array([0, 1, 0])),
+        ("syndromes", np.zeros((3, 1), dtype=np.uint8)),
+        ("evidence_json", "{}"),
+    ])
+    def test_direct_result_admission(field, value):
+        _, result, _ = execute()
+        fields = {name: getattr(result, name) for name in ("candidates", "iterations", "converged", "syndromes", "evidence_json")}
+        fields[field] = value
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_batch_evidence.py:66: Failed
+________________ test_direct_result_admission[syndromes-value5] ________________
+
+field = 'syndromes', value = array([[0],
+       [0],
+       [0]], dtype=uint8)
+
+    @pytest.mark.parametrize("field,value", [
+        ("candidates", np.zeros((1, 3), dtype=np.uint8)),
+        ("candidates", np.full((3, 3), 2, dtype=np.uint8)),
+        ("iterations", np.array([0., 1., 2.])),
+        ("iterations", np.array([0, -1, 2])),
+        ("converged", np.array([0, 1, 0])),
+        ("syndromes", np.zeros((3, 1), dtype=np.uint8)),
+        ("evidence_json", "{}"),
+    ])
+    def test_direct_result_admission(field, value):
+        _, result, _ = execute()
+        fields = {name: getattr(result, name) for name in ("candidates", "iterations", "converged", "syndromes", "evidence_json")}
+        fields[field] = value
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_batch_evidence.py:66: Failed
+________________ test_direct_result_admission[evidence_json-{}] ________________
+
+field = 'evidence_json', value = '{}'
+
+    @pytest.mark.parametrize("field,value", [
+        ("candidates", np.zeros((1, 3), dtype=np.uint8)),
+        ("candidates", np.full((3, 3), 2, dtype=np.uint8)),
+        ("iterations", np.array([0., 1., 2.])),
+        ("iterations", np.array([0, -1, 2])),
+        ("converged", np.array([0, 1, 0])),
+        ("syndromes", np.zeros((3, 1), dtype=np.uint8)),
+        ("evidence_json", "{}"),
+    ])
+    def test_direct_result_admission(field, value):
+        _, result, _ = execute()
+        fields = {name: getattr(result, name) for name in ("candidates", "iterations", "converged", "syndromes", "evidence_json")}
+        fields[field] = value
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_batch_evidence.py:66: Failed
+____________________ test_constructor_owns_callers_buffers _____________________
+
+    def test_constructor_owns_callers_buffers():
+        _, result, _ = execute()
+        arrays = [getattr(result, name).copy() for name in ("candidates", "iterations", "converged", "syndromes")]
+        owned = cpu_batch.CpuBatchResult(*arrays, result.evidence_json)
+        arrays[0][:] ^= 1
+>       np.testing.assert_array_equal(owned.candidates, result.candidates)
+E       AssertionError: 
+E       Arrays are not equal
+E       
+E       Mismatched elements: 9 / 9 (100%)
+E       Max absolute difference among violations: 1
+E       Max relative difference among violations: 1.
+E        ACTUAL: array([[1, 1, 1],
+E              [0, 1, 1],
+E              [1, 0, 1]], dtype=uint8)
+E        DESIRED: array([[0, 0, 0],
+E              [1, 0, 0],
+E              [0, 1, 0]], dtype=uint8)
+
+tests/canonical/test_batch_evidence.py:75: AssertionError
+_ test_stored_ledger_replays_candidate_validity_and_work[0-True-False-binary] __
+
+family = 'binary', limit = 0, stop = True, empty = False
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-232/test_stored_ledger_replays_can0')
+
+    @pytest.mark.parametrize("family", ("binary", "pauli"))
+    @pytest.mark.parametrize("limit,stop,empty", ((0, True, False), (3, True, False), (3, False, False), (3, True, True)))
+    def test_stored_ledger_replays_candidate_validity_and_work(family, limit, stop, empty, tmp_path):
+        graph, result, kwargs = execute(family, limit, stop, empty)
+        path = tmp_path / "events.jsonl"
+        result.write_ledger(path)
+>       assert cpu_batch.verify_cpu_batch_ledger(path, graph, **kwargs)["shots"] == len(result.candidates)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'bp_registry.cpu_batch' has no attribute 'verify_cpu_batch_ledger'
+
+tests/canonical/test_batch_evidence.py:84: AttributeError
+__ test_stored_ledger_replays_candidate_validity_and_work[0-True-False-pauli] __
+
+family = 'pauli', limit = 0, stop = True, empty = False
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-232/test_stored_ledger_replays_can1')
+
+    @pytest.mark.parametrize("family", ("binary", "pauli"))
+    @pytest.mark.parametrize("limit,stop,empty", ((0, True, False), (3, True, False), (3, False, False), (3, True, True)))
+    def test_stored_ledger_replays_candidate_validity_and_work(family, limit, stop, empty, tmp_path):
+        graph, result, kwargs = execute(family, limit, stop, empty)
+        path = tmp_path / "events.jsonl"
+        result.write_ledger(path)
+>       assert cpu_batch.verify_cpu_batch_ledger(path, graph, **kwargs)["shots"] == len(result.candidates)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'bp_registry.cpu_batch' has no attribute 'verify_cpu_batch_ledger'
+
+tests/canonical/test_batch_evidence.py:84: AttributeError
+_ test_stored_ledger_replays_candidate_validity_and_work[3-True-False-binary] __
+
+family = 'binary', limit = 3, stop = True, empty = False
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-232/test_stored_ledger_replays_can2')
+
+    @pytest.mark.parametrize("family", ("binary", "pauli"))
+    @pytest.mark.parametrize("limit,stop,empty", ((0, True, False), (3, True, False), (3, False, False), (3, True, True)))
+    def test_stored_ledger_replays_candidate_validity_and_work(family, limit, stop, empty, tmp_path):
+        graph, result, kwargs = execute(family, limit, stop, empty)
+        path = tmp_path / "events.jsonl"
+        result.write_ledger(path)
+>       assert cpu_batch.verify_cpu_batch_ledger(path, graph, **kwargs)["shots"] == len(result.candidates)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'bp_registry.cpu_batch' has no attribute 'verify_cpu_batch_ledger'
+
+tests/canonical/test_batch_evidence.py:84: AttributeError
+__ test_stored_ledger_replays_candidate_validity_and_work[3-True-False-pauli] __
+
+family = 'pauli', limit = 3, stop = True, empty = False
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-232/test_stored_ledger_replays_can3')
+
+    @pytest.mark.parametrize("family", ("binary", "pauli"))
+    @pytest.mark.parametrize("limit,stop,empty", ((0, True, False), (3, True, False), (3, False, False), (3, True, True)))
+    def test_stored_ledger_replays_candidate_validity_and_work(family, limit, stop, empty, tmp_path):
+        graph, result, kwargs = execute(family, limit, stop, empty)
+        path = tmp_path / "events.jsonl"
+        result.write_ledger(path)
+>       assert cpu_batch.verify_cpu_batch_ledger(path, graph, **kwargs)["shots"] == len(result.candidates)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'bp_registry.cpu_batch' has no attribute 'verify_cpu_batch_ledger'
+
+tests/canonical/test_batch_evidence.py:84: AttributeError
+_ test_stored_ledger_replays_candidate_validity_and_work[3-False-False-binary] _
+
+family = 'binary', limit = 3, stop = False, empty = False
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-232/test_stored_ledger_replays_can4')
+
+    @pytest.mark.parametrize("family", ("binary", "pauli"))
+    @pytest.mark.parametrize("limit,stop,empty", ((0, True, False), (3, True, False), (3, False, False), (3, True, True)))
+    def test_stored_ledger_replays_candidate_validity_and_work(family, limit, stop, empty, tmp_path):
+        graph, result, kwargs = execute(family, limit, stop, empty)
+        path = tmp_path / "events.jsonl"
+        result.write_ledger(path)
+>       assert cpu_batch.verify_cpu_batch_ledger(path, graph, **kwargs)["shots"] == len(result.candidates)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'bp_registry.cpu_batch' has no attribute 'verify_cpu_batch_ledger'
+
+tests/canonical/test_batch_evidence.py:84: AttributeError
+_ test_stored_ledger_replays_candidate_validity_and_work[3-False-False-pauli] __
+
+family = 'pauli', limit = 3, stop = False, empty = False
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-232/test_stored_ledger_replays_can5')
+
+    @pytest.mark.parametrize("family", ("binary", "pauli"))
+    @pytest.mark.parametrize("limit,stop,empty", ((0, True, False), (3, True, False), (3, False, False), (3, True, True)))
+    def test_stored_ledger_replays_candidate_validity_and_work(family, limit, stop, empty, tmp_path):
+        graph, result, kwargs = execute(family, limit, stop, empty)
+        path = tmp_path / "events.jsonl"
+        result.write_ledger(path)
+>       assert cpu_batch.verify_cpu_batch_ledger(path, graph, **kwargs)["shots"] == len(result.candidates)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'bp_registry.cpu_batch' has no attribute 'verify_cpu_batch_ledger'
+
+tests/canonical/test_batch_evidence.py:84: AttributeError
+__ test_stored_ledger_replays_candidate_validity_and_work[3-True-True-binary] __
+
+family = 'binary', limit = 3, stop = True, empty = True
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-232/test_stored_ledger_replays_can6')
+
+    @pytest.mark.parametrize("family", ("binary", "pauli"))
+    @pytest.mark.parametrize("limit,stop,empty", ((0, True, False), (3, True, False), (3, False, False), (3, True, True)))
+    def test_stored_ledger_replays_candidate_validity_and_work(family, limit, stop, empty, tmp_path):
+        graph, result, kwargs = execute(family, limit, stop, empty)
+        path = tmp_path / "events.jsonl"
+        result.write_ledger(path)
+>       assert cpu_batch.verify_cpu_batch_ledger(path, graph, **kwargs)["shots"] == len(result.candidates)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'bp_registry.cpu_batch' has no attribute 'verify_cpu_batch_ledger'
+
+tests/canonical/test_batch_evidence.py:84: AttributeError
+__ test_stored_ledger_replays_candidate_validity_and_work[3-True-True-pauli] ___
+
+family = 'pauli', limit = 3, stop = True, empty = True
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-232/test_stored_ledger_replays_can7')
+
+    @pytest.mark.parametrize("family", ("binary", "pauli"))
+    @pytest.mark.parametrize("limit,stop,empty", ((0, True, False), (3, True, False), (3, False, False), (3, True, True)))
+    def test_stored_ledger_replays_candidate_validity_and_work(family, limit, stop, empty, tmp_path):
+        graph, result, kwargs = execute(family, limit, stop, empty)
+        path = tmp_path / "events.jsonl"
+        result.write_ledger(path)
+>       assert cpu_batch.verify_cpu_batch_ledger(path, graph, **kwargs)["shots"] == len(result.candidates)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'bp_registry.cpu_batch' has no attribute 'verify_cpu_batch_ledger'
+
+tests/canonical/test_batch_evidence.py:84: AttributeError
+_________________ test_stored_tampering_is_detected[candidate] _________________
+
+field = 'candidate'
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-232/test_stored_tampering_is_detec0')
+
+    @pytest.mark.parametrize("field", ("candidate", "candidate_valid", "iterations", "syndrome", "work", "shot_index", "graph_prior_sha256", "termination"))
+    def test_stored_tampering_is_detected(field, tmp_path):
+        graph, result, kwargs = execute()
+        path = tmp_path / "events.jsonl"
+        result.write_ledger(path)
+        rows = [json.loads(line) for line in path.read_text().splitlines()]
+        row = rows[-1]
+        if field in ("candidate", "syndrome"):
+            row[field][0] ^= 1
+        elif field == "work":
+            row[field]["bp_calls"] += 1
+        elif field == "candidate_valid":
+            row[field] = not row[field]
+        elif field in ("iterations", "shot_index"):
+            row[field] += 1
+        else:
+            row[field] = "forged"
+        path.write_text("".join(json.dumps(row) + "\n" for row in rows))
+        with pytest.raises(ValueError):
+>           cpu_batch.verify_cpu_batch_ledger(path, graph, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'bp_registry.cpu_batch' has no attribute 'verify_cpu_batch_ledger'
+
+tests/canonical/test_batch_evidence.py:106: AttributeError
+______________ test_stored_tampering_is_detected[candidate_valid] ______________
+
+field = 'candidate_valid'
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-232/test_stored_tampering_is_detec1')
+
+    @pytest.mark.parametrize("field", ("candidate", "candidate_valid", "iterations", "syndrome", "work", "shot_index", "graph_prior_sha256", "termination"))
+    def test_stored_tampering_is_detected(field, tmp_path):
+        graph, result, kwargs = execute()
+        path = tmp_path / "events.jsonl"
+        result.write_ledger(path)
+        rows = [json.loads(line) for line in path.read_text().splitlines()]
+        row = rows[-1]
+        if field in ("candidate", "syndrome"):
+            row[field][0] ^= 1
+        elif field == "work":
+            row[field]["bp_calls"] += 1
+        elif field == "candidate_valid":
+            row[field] = not row[field]
+        elif field in ("iterations", "shot_index"):
+            row[field] += 1
+        else:
+            row[field] = "forged"
+        path.write_text("".join(json.dumps(row) + "\n" for row in rows))
+        with pytest.raises(ValueError):
+>           cpu_batch.verify_cpu_batch_ledger(path, graph, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'bp_registry.cpu_batch' has no attribute 'verify_cpu_batch_ledger'
+
+tests/canonical/test_batch_evidence.py:106: AttributeError
+________________ test_stored_tampering_is_detected[iterations] _________________
+
+field = 'iterations'
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-232/test_stored_tampering_is_detec2')
+
+    @pytest.mark.parametrize("field", ("candidate", "candidate_valid", "iterations", "syndrome", "work", "shot_index", "graph_prior_sha256", "termination"))
+    def test_stored_tampering_is_detected(field, tmp_path):
+        graph, result, kwargs = execute()
+        path = tmp_path / "events.jsonl"
+        result.write_ledger(path)
+        rows = [json.loads(line) for line in path.read_text().splitlines()]
+        row = rows[-1]
+        if field in ("candidate", "syndrome"):
+            row[field][0] ^= 1
+        elif field == "work":
+            row[field]["bp_calls"] += 1
+        elif field == "candidate_valid":
+            row[field] = not row[field]
+        elif field in ("iterations", "shot_index"):
+            row[field] += 1
+        else:
+            row[field] = "forged"
+        path.write_text("".join(json.dumps(row) + "\n" for row in rows))
+        with pytest.raises(ValueError):
+>           cpu_batch.verify_cpu_batch_ledger(path, graph, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'bp_registry.cpu_batch' has no attribute 'verify_cpu_batch_ledger'
+
+tests/canonical/test_batch_evidence.py:106: AttributeError
+_________________ test_stored_tampering_is_detected[syndrome] __________________
+
+field = 'syndrome'
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-232/test_stored_tampering_is_detec3')
+
+    @pytest.mark.parametrize("field", ("candidate", "candidate_valid", "iterations", "syndrome", "work", "shot_index", "graph_prior_sha256", "termination"))
+    def test_stored_tampering_is_detected(field, tmp_path):
+        graph, result, kwargs = execute()
+        path = tmp_path / "events.jsonl"
+        result.write_ledger(path)
+        rows = [json.loads(line) for line in path.read_text().splitlines()]
+        row = rows[-1]
+        if field in ("candidate", "syndrome"):
+            row[field][0] ^= 1
+        elif field == "work":
+            row[field]["bp_calls"] += 1
+        elif field == "candidate_valid":
+            row[field] = not row[field]
+        elif field in ("iterations", "shot_index"):
+            row[field] += 1
+        else:
+            row[field] = "forged"
+        path.write_text("".join(json.dumps(row) + "\n" for row in rows))
+        with pytest.raises(ValueError):
+>           cpu_batch.verify_cpu_batch_ledger(path, graph, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'bp_registry.cpu_batch' has no attribute 'verify_cpu_batch_ledger'
+
+tests/canonical/test_batch_evidence.py:106: AttributeError
+___________________ test_stored_tampering_is_detected[work] ____________________
+
+field = 'work'
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-232/test_stored_tampering_is_detec4')
+
+    @pytest.mark.parametrize("field", ("candidate", "candidate_valid", "iterations", "syndrome", "work", "shot_index", "graph_prior_sha256", "termination"))
+    def test_stored_tampering_is_detected(field, tmp_path):
+        graph, result, kwargs = execute()
+        path = tmp_path / "events.jsonl"
+        result.write_ledger(path)
+        rows = [json.loads(line) for line in path.read_text().splitlines()]
+        row = rows[-1]
+        if field in ("candidate", "syndrome"):
+            row[field][0] ^= 1
+        elif field == "work":
+            row[field]["bp_calls"] += 1
+        elif field == "candidate_valid":
+            row[field] = not row[field]
+        elif field in ("iterations", "shot_index"):
+            row[field] += 1
+        else:
+            row[field] = "forged"
+        path.write_text("".join(json.dumps(row) + "\n" for row in rows))
+        with pytest.raises(ValueError):
+>           cpu_batch.verify_cpu_batch_ledger(path, graph, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'bp_registry.cpu_batch' has no attribute 'verify_cpu_batch_ledger'
+
+tests/canonical/test_batch_evidence.py:106: AttributeError
+________________ test_stored_tampering_is_detected[shot_index] _________________
+
+field = 'shot_index'
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-232/test_stored_tampering_is_detec5')
+
+    @pytest.mark.parametrize("field", ("candidate", "candidate_valid", "iterations", "syndrome", "work", "shot_index", "graph_prior_sha256", "termination"))
+    def test_stored_tampering_is_detected(field, tmp_path):
+        graph, result, kwargs = execute()
+        path = tmp_path / "events.jsonl"
+        result.write_ledger(path)
+        rows = [json.loads(line) for line in path.read_text().splitlines()]
+        row = rows[-1]
+        if field in ("candidate", "syndrome"):
+            row[field][0] ^= 1
+        elif field == "work":
+            row[field]["bp_calls"] += 1
+        elif field == "candidate_valid":
+            row[field] = not row[field]
+        elif field in ("iterations", "shot_index"):
+            row[field] += 1
+        else:
+            row[field] = "forged"
+        path.write_text("".join(json.dumps(row) + "\n" for row in rows))
+        with pytest.raises(ValueError):
+>           cpu_batch.verify_cpu_batch_ledger(path, graph, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'bp_registry.cpu_batch' has no attribute 'verify_cpu_batch_ledger'
+
+tests/canonical/test_batch_evidence.py:106: AttributeError
+____________ test_stored_tampering_is_detected[graph_prior_sha256] _____________
+
+field = 'graph_prior_sha256'
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-232/test_stored_tampering_is_detec6')
+
+    @pytest.mark.parametrize("field", ("candidate", "candidate_valid", "iterations", "syndrome", "work", "shot_index", "graph_prior_sha256", "termination"))
+    def test_stored_tampering_is_detected(field, tmp_path):
+        graph, result, kwargs = execute()
+        path = tmp_path / "events.jsonl"
+        result.write_ledger(path)
+        rows = [json.loads(line) for line in path.read_text().splitlines()]
+        row = rows[-1]
+        if field in ("candidate", "syndrome"):
+            row[field][0] ^= 1
+        elif field == "work":
+            row[field]["bp_calls"] += 1
+        elif field == "candidate_valid":
+            row[field] = not row[field]
+        elif field in ("iterations", "shot_index"):
+            row[field] += 1
+        else:
+            row[field] = "forged"
+        path.write_text("".join(json.dumps(row) + "\n" for row in rows))
+        with pytest.raises(ValueError):
+>           cpu_batch.verify_cpu_batch_ledger(path, graph, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'bp_registry.cpu_batch' has no attribute 'verify_cpu_batch_ledger'
+
+tests/canonical/test_batch_evidence.py:106: AttributeError
+________________ test_stored_tampering_is_detected[termination] ________________
+
+field = 'termination'
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-232/test_stored_tampering_is_detec7')
+
+    @pytest.mark.parametrize("field", ("candidate", "candidate_valid", "iterations", "syndrome", "work", "shot_index", "graph_prior_sha256", "termination"))
+    def test_stored_tampering_is_detected(field, tmp_path):
+        graph, result, kwargs = execute()
+        path = tmp_path / "events.jsonl"
+        result.write_ledger(path)
+        rows = [json.loads(line) for line in path.read_text().splitlines()]
+        row = rows[-1]
+        if field in ("candidate", "syndrome"):
+            row[field][0] ^= 1
+        elif field == "work":
+            row[field]["bp_calls"] += 1
+        elif field == "candidate_valid":
+            row[field] = not row[field]
+        elif field in ("iterations", "shot_index"):
+            row[field] += 1
+        else:
+            row[field] = "forged"
+        path.write_text("".join(json.dumps(row) + "\n" for row in rows))
+        with pytest.raises(ValueError):
+>           cpu_batch.verify_cpu_batch_ledger(path, graph, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'bp_registry.cpu_batch' has no attribute 'verify_cpu_batch_ledger'
+
+tests/canonical/test_batch_evidence.py:106: AttributeError
+_____________ test_failed_export_leaves_existing_ledger_unchanged ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-mg551/pytest-232/test_failed_export_leaves_exis0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8ad0ba3aa0>
+
+    def test_failed_export_leaves_existing_ledger_unchanged(tmp_path, monkeypatch):
+        _, result, _ = execute()
+        path = tmp_path / "events.jsonl"
+        path.write_text("existing evidence\n")
+        original = cpu_batch.json.dumps
+        def fail_row(value, **kwargs):
+            if value.get("shot_index") == 1:
+                raise ValueError("injected serialization failure")
+            return original(value, **kwargs)
+        monkeypatch.setattr(cpu_batch.json, "dumps", fail_row)
+        with pytest.raises(ValueError, match="injected"):
+            result.write_ledger(path)
+>       assert path.read_text() == "existing evidence\n"
+E       assert '{"assessment...orkers": 1}\n' == 'existing evidence\n'
+E         
+E         - existing evidence
+E         + {"assessment_status": "not_assessed", "backend": "numba-cpu-batch-v1", "candidate": [0, 0, 0], "candidate_valid": true, "edge_count": 4, "event": "cpu_batch_decode", "family": "binary", "fastmath": false, "graph_prior_sha256": "b4e282b18d86b7463801d88fc2ce8385f717b4ac1bbfd0a75f3ff27251052c0e", "iterations": 0, "max_iterations": 3, "numerics": {"alpha": 1.0, "beta": 0.0, "binary_prior": "log1p(-p)-log(p)", "check_clipping": "none_before_resolution", "check_reduction": "prefix_suffix_boxplus", "check_rule": "sum_product", "check_stabilization": "log_domain", "...
+E         
+E         ...Full output truncated (1 line hidden), use '-vv' to show
+
+tests/canonical/test_batch_evidence.py:121: AssertionError
+=========================== short test summary info ============================
+FAILED tests/canonical/test_batch_evidence.py::test_batch_arrays_cannot_reenable_writes[candidates]
+FAILED tests/canonical/test_batch_evidence.py::test_batch_arrays_cannot_reenable_writes[iterations]
+FAILED tests/canonical/test_batch_evidence.py::test_batch_arrays_cannot_reenable_writes[converged]
+FAILED tests/canonical/test_batch_evidence.py::test_batch_arrays_cannot_reenable_writes[syndromes]
+FAILED tests/canonical/test_batch_evidence.py::test_replacement_cannot_keep_stale_evidence[candidates]
+FAILED tests/canonical/test_batch_evidence.py::test_replacement_cannot_keep_stale_evidence[iterations]
+FAILED tests/canonical/test_batch_evidence.py::test_replacement_cannot_keep_stale_evidence[converged]
+FAILED tests/canonical/test_batch_evidence.py::test_replacement_cannot_keep_stale_evidence[syndromes]
+FAILED tests/canonical/test_batch_evidence.py::test_replacement_cannot_keep_stale_evidence[evidence_json]
+FAILED tests/canonical/test_batch_evidence.py::test_direct_result_admission[candidates-value0]
+FAILED tests/canonical/test_batch_evidence.py::test_direct_result_admission[candidates-value1]
+FAILED tests/canonical/test_batch_evidence.py::test_direct_result_admission[iterations-value2]
+FAILED tests/canonical/test_batch_evidence.py::test_direct_result_admission[iterations-value3]
+FAILED tests/canonical/test_batch_evidence.py::test_direct_result_admission[converged-value4]
+FAILED tests/canonical/test_batch_evidence.py::test_direct_result_admission[syndromes-value5]
+FAILED tests/canonical/test_batch_evidence.py::test_direct_result_admission[evidence_json-{}]
+FAILED tests/canonical/test_batch_evidence.py::test_constructor_owns_callers_buffers
+FAILED tests/canonical/test_batch_evidence.py::test_stored_ledger_replays_candidate_validity_and_work[0-True-False-binary]
+FAILED tests/canonical/test_batch_evidence.py::test_stored_ledger_replays_candidate_validity_and_work[0-True-False-pauli]
+FAILED tests/canonical/test_batch_evidence.py::test_stored_ledger_replays_candidate_validity_and_work[3-True-False-binary]
+FAILED tests/canonical/test_batch_evidence.py::test_stored_ledger_replays_candidate_validity_and_work[3-True-False-pauli]
+FAILED tests/canonical/test_batch_evidence.py::test_stored_ledger_replays_candidate_validity_and_work[3-False-False-binary]
+FAILED tests/canonical/test_batch_evidence.py::test_stored_ledger_replays_candidate_validity_and_work[3-False-False-pauli]
+FAILED tests/canonical/test_batch_evidence.py::test_stored_ledger_replays_candidate_validity_and_work[3-True-True-binary]
+FAILED tests/canonical/test_batch_evidence.py::test_stored_ledger_replays_candidate_validity_and_work[3-True-True-pauli]
+FAILED tests/canonical/test_batch_evidence.py::test_stored_tampering_is_detected[candidate]
+FAILED tests/canonical/test_batch_evidence.py::test_stored_tampering_is_detected[candidate_valid]
+FAILED tests/canonical/test_batch_evidence.py::test_stored_tampering_is_detected[iterations]
+FAILED tests/canonical/test_batch_evidence.py::test_stored_tampering_is_detected[syndrome]
+FAILED tests/canonical/test_batch_evidence.py::test_stored_tampering_is_detected[work]
+FAILED tests/canonical/test_batch_evidence.py::test_stored_tampering_is_detected[shot_index]
+FAILED tests/canonical/test_batch_evidence.py::test_stored_tampering_is_detected[graph_prior_sha256]
+FAILED tests/canonical/test_batch_evidence.py::test_stored_tampering_is_detected[termination]
+FAILED tests/canonical/test_batch_evidence.py::test_failed_export_leaves_existing_ledger_unchanged
+34 failed in 2.79s
