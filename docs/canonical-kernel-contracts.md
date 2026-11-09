@@ -10,6 +10,13 @@ The subsequent [circuit-policy and CUDA implementation](circuit-policies-and-gpu
 adds explicit opt-in execution paths. It preserves the legacy contracts below
 and keeps publication studies separate from backend qualification.
 
+The opt-in [shared policy decoder](shared-policy-support.md) now carries the
+existing compatible binary schedules, memory, interventions and ensembles across
+CPU code-capacity and Stim/Sinter fault graphs, with heterogeneous priors and
+existing compiled precision policies. Its executable inventory records the
+separate Pauli counterparts and GPU exclusions; older interfaces below retain
+their frozen behavior.
+
 ## Capability and admission map
 
 Resolve a configuration by regime, mathematical family, prior representation,

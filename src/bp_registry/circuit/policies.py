@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 from hashlib import sha256
 import json
 from pathlib import Path
-from typing import Literal
+from typing import ClassVar, Literal
 from uuid import uuid4
 
 import numpy as np
@@ -82,6 +82,7 @@ class CircuitPolicy(BaseModel):
 
 @dataclass(frozen=True)
 class CircuitBatchResult:
+    ledger_schema: ClassVar[str] = "circuit-policy-ledger-v1"
     predictions: np.ndarray
     faults: np.ndarray
     converged: np.ndarray
@@ -89,7 +90,7 @@ class CircuitBatchResult:
     ledger_json: str
 
     def __post_init__(self):
-        records = validate_records(self.ledger_json, "circuit-policy-ledger-v1")
+        records = validate_records(self.ledger_json, self.ledger_schema)
         normalized = {}
         for name, key, dtype, rank in (("predictions", "prediction", np.uint8, 2),
                                       ("faults", "faults", np.uint8, 2),
@@ -120,7 +121,7 @@ class CircuitBatchResult:
         return json.loads(self.ledger_json)
 
     def write_ledger(self, path: str | Path):
-        write_records(path, self.ledger_json, "circuit-policy-ledger-v1")
+        write_records(path, self.ledger_json, self.ledger_schema)
 
 
 @dataclass(frozen=True)
