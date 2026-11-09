@@ -1,0 +1,80 @@
+{
+  "schema": "shared-policy-audit-verification-v1",
+  "production_baseline": "d031436",
+  "source_unchanged": true,
+  "receipts": {
+    "050-shared-mathematics": {
+      "checks": 3,
+      "passed": 3,
+      "failed": 0,
+      "source_hashes_verified": 123,
+      "sha256": "c18964ec01ac24920de0d382a96f5b8969bce951ba92cd8473fa281ca350c5b4"
+    },
+    "051-shared-upstream": {
+      "checks": 2,
+      "passed": 2,
+      "failed": 0,
+      "source_hashes_verified": 123,
+      "sha256": "4c97fddad5933c5fdc705a50b4f917cd7250c25abfdea2e0f60f492eaa7c270f"
+    },
+    "052-shared-policy-closure": {
+      "checks": 4,
+      "passed": 3,
+      "failed": 1,
+      "source_hashes_verified": 123,
+      "sha256": "b9e3a2eedf0b13b704b29ccefa75827c1a1498fab1ff3e71993a2c7c160dc306"
+    },
+    "053-shared-evidence": {
+      "checks": 3,
+      "passed": 2,
+      "failed": 1,
+      "source_hashes_verified": 123,
+      "sha256": "e2d59912338197c2860eecea98a656b8d517388799ba92b5d2ca42f662f8259e"
+    }
+  },
+  "evidence_sha256": {
+    "050-shared-mathematics/README.md": "c48fdaeb07bcb8954f680d84d0339867eb3e2fa1aefe613019b0d0a946094e46",
+    "050-shared-mathematics/ordinary-cases.json": "27ff1bad4abb07cae1b4ca6682697171884db7fa50314528632fba89bce81960",
+    "050-shared-mathematics/precision-cases.json": "a24995acc29492662a4c230336b7a7b45889205c455c79b2628c128e5a72576e",
+    "050-shared-mathematics/probe.py": "ae0036db53e2baedb5824cdb98d641cbd9b6170ac1570d1398d8aac7732b2f52",
+    "050-shared-mathematics/results.json": "c18964ec01ac24920de0d382a96f5b8969bce951ba92cd8473fa281ca350c5b4",
+    "050-shared-mathematics/run.log": "e18ed7c00dd5a2e43a54ea6190e3e31bdd18ee4caa0d5933c34778d9a1eb31f3",
+    "051-shared-upstream/README.md": "c8a1eac38e28874f1b1b26339538501db2a096d72047f3e5bdddefdab9c97371",
+    "051-shared-upstream/initial-results.json": "7f80a4cafcee35f1dcf4669179624a341e50e76786cc75fa85934f90752c579b",
+    "051-shared-upstream/initial-run.log": "ada20bf25eddc32e6052a28c92419fcb60387097d4551d6d1e19468093941b1e",
+    "051-shared-upstream/ldpc-cases.json": "6f289c0027bc468a4baa9b507a8231251b4fcc178a886b39ec672ac02a0d5fc2",
+    "051-shared-upstream/probe.py": "fc32d034210fe2de171b6857ca9548ec54a63ef889d456637c050c1792b57c7e",
+    "051-shared-upstream/relay-cases.json": "ff3f2267dd1c4866b0a00d5acee2dca3a01080a4a78f1489fcb3954bb93a8bab",
+    "051-shared-upstream/results.json": "4c97fddad5933c5fdc705a50b4f917cd7250c25abfdea2e0f60f492eaa7c270f",
+    "051-shared-upstream/run.log": "70b35620a7a67faf773d08c2f5199ecadb72e457bd51492eea46bb0200aebbd9",
+    "052-shared-policy-closure/README.md": "d959b02c5ad69757154ef4550380729de11ddfb0bfd9267293ede24dc0f3873c",
+    "052-shared-policy-closure/capabilities.json": "fe0eab6dc4a8e801553787a604ad3369ac9c6585723549870422f59b19e79e5d",
+    "052-shared-policy-closure/controllers.json": "2ab54899641f6ee7d21037450dfd9c5e3a5350d4459ea14793d277884de28bf1",
+    "052-shared-policy-closure/fixed-prior-counterexample.json": "b422f7ab9232c28257df8947ad390c69832f70b8d85e17a1745d1d9224d3b85b",
+    "052-shared-policy-closure/matrix.json": "92408d5763649ce3154a286f0571f4ec3bb488821877fd5f501f16477612fb4a",
+    "052-shared-policy-closure/probe.py": "5ecf8975e8e30223e2e2cedea83386a5f2c1d48a443336287b3b33b42e34721e",
+    "052-shared-policy-closure/randomized-boundaries.json": "5be9dced7d228c89f01a9b4b7ba33de4fb10ded23387bdefab2995706f7ffba0",
+    "052-shared-policy-closure/results.json": "b9e3a2eedf0b13b704b29ccefa75827c1a1498fab1ff3e71993a2c7c160dc306",
+    "052-shared-policy-closure/run.log": "541094f19d8bef8b0cf90a4541b2ea5424331988fda431c8bdd1187b3bba4749",
+    "053-shared-evidence/README.md": "cc9f98c5c481b2ac39f7d6bd8a2ec2526094737a333253d71afe22ac458dc7da",
+    "053-shared-evidence/affine-ledger.jsonl": "179c4d8daa2f1316b5f37a431c0a4e53f26a3a9d9dee43821eb16af7fa36dd76",
+    "053-shared-evidence/carried-qualification.json": "6a0bc43aa11408cd4545a05a13b2f928e189758882fc8ceabd964e4a2c7e8cb9",
+    "053-shared-evidence/chunking-None.jsonl": "765fb017f944894c264d3b3b92c1ea7132b40948f0f2a62478a4def9b60cb1d6",
+    "053-shared-evidence/chunking-attempt.jsonl": "8daf860491447f784bfe0e047905c9f48a0d16ba480caa50bf20d9ae0cb0d7aa",
+    "053-shared-evidence/chunking-configuration.jsonl": "57b0c8313d3b62e0b403fa32cad7cff2d73af650125b53239ceb27a965e18fef",
+    "053-shared-evidence/chunking-counterexample.json": "7aa567415a8578a643ae8f32ac7978733334280adc8c4cf3ef214d35ebf22541",
+    "053-shared-evidence/chunking-sweep.jsonl": "21283cb82946499079e49ee7959c85bc32081099770f408002476500c86a64ad",
+    "053-shared-evidence/probe.py": "4033e6fc1ea0c8dc9d5196cef1aaae3f34d19b5785e8a841b2f2b00c208b963d",
+    "053-shared-evidence/regression.log": "0b00e49309a522d1614228e342fda76169a9d51faa9472a0fa1a75b5763225f2",
+    "053-shared-evidence/result-impact.json": "51f0c273efa1355f29d6993943b938a44e3f8dc3247a058909f1d6a59ab9c8f2",
+    "053-shared-evidence/results.json": "e2d59912338197c2860eecea98a656b8d517388799ba92b5d2ca42f662f8259e",
+    "053-shared-evidence/run.log": "87f57a26f8dbd7aacd1d00820a546d46c136a5dd21e624e7dec6aff424e31f02"
+  },
+  "fresh_regression_passed": 290,
+  "open_findings": [
+    "F01",
+    "F02"
+  ],
+  "overall": "PARTIAL: audit completed; two material contract findings remain open",
+  "distinction": "Verification success validates evidence integrity, not the failed production invariants."
+}

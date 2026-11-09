@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Expanded compatible CPU and Sinter policies with source-defined counterparts only; Phase 11 publication gaps remain open
-last_updated: "2026-11-09T00:44:27+00:00"
-last_activity: 2026-11-08
-last_activity_desc: Shared CPU/Sinter policies qualified; 2462 broad and 387 final affected tests pass; 82 legacy receipts unchanged
-state_head: c512723
+stopped_at: Shared policy audit complete; fix F01 local memory admission then F02 Sinter random identity before full interface freeze
+last_updated: "2026-11-09T02:44:40+00:00"
+last_activity: 2026-11-09
+last_activity_desc: Audit 050-053 supports mathematics and breadth; two composition/identity findings remain; 290 focused tests pass
+state_head: 9ca544c
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-08 — completed quick task 261108-qcu, compatible policy expansion
-Last Activity Description: Added opt-in shared binary CPU/Stim-Sinter execution with heterogeneous priors, six schedules, five memory policies, nine controllers, indexed/generated coefficients and existing compiled precision policies. The user chose existing/source-defined counterparts only; no generic Pauli adaptations or new GPU paths were introduced. Broad regression: 2462 passed, 20 skipped; final affected rerun: 387 passed, including 125 new cases. All 24 real Sinter worker shot ledgers replay, and 82 complete legacy receipts are byte-identical to frozen baseline 872f7e1. See quick/261108-qcu-expand-existing-compatible-policies-acro/SUMMARY.md and docs/shared-policy-support.md. Historical campaigns, release-packaging scope and publication gates remain unchanged.
+Last activity: 2026-11-09 — completed shared policy audit 050–053
+Last Activity Description: Audited shared policy expansion at production baseline d031436 without changing decoder behavior. 2,880 independent factor/precision comparisons and 1,188 aligned ldpc/Relay comparisons pass; a 432-configuration matrix admits 200 and rejects 232 as expected; nine controllers pass 216 original-problem checks. Fresh focused regression: 290 passed. Two material findings remain: F01 local affine-prior + fixed-prior PD-prime admission silently discards the changed prior; F02 batch-local Sinter shot identity changes randomized predictions under chunking. Recommended correction order F01 → F02, with versioned identity and historical replay. See spikes/CANONICAL-KERNEL-SHARED-POLICY-AUDIT.md. Prior full regression, 82 legacy receipts, 24 Sinter smoke shots and H200 qualification are carried only after source/evidence hash checks. No blanket experiment rerun is indicated; publication gates remain unchanged.
 
 Progress: 8 of 14 phases complete (57%); 159 of 176 plans complete. Phase 11 has 17 of 25 plans complete; plan 17 is the first open number but depends on source reviews 18 and 19, while plan 20's blocked-target review is complete.
 
@@ -119,6 +119,8 @@ Phase 02 P10–P16 gap-closure metrics are recorded in their individual summarie
 ## Accumulated Context
 
 ### Decisions
+
+- Shared-policy audit 050–053 found no core mathematical redesign need. Close F01 (local fixed-prior memory admission) then F02 (transport-independent Sinter random identity) before freezing the entire expanded interface. Keep source-defined counterparts, explicit backend exclusions and old receipt replay. Do not treat internally replayable evidence alone as proof of correct composition or transport independence.
 
 Full decisions are in PROJECT.md; workflow choices are in config.json.
 
@@ -258,6 +260,8 @@ None outside the roadmap.
 
 ### Blockers/Concerns
 
+- Full shared-policy interface freeze awaits F01/F02 from spikes 050–053; see the consolidated shared-policy audit. This is separate from existing scientific/publication gates.
+
 - Latest kernel audit findings E03/E01/E02 are closed with 257 regression passes and 12/12 audit groups. No remaining blocker from this bounded audit prevents HTML over the documented compatible subset. Scientific publication gates below remain separate; see spikes/CANONICAL-KERNEL-CIRCUIT-CUDA-FIXES.md.
 
 - [Phase 11] Eight gap plans remain open: 11-18 aSCED Figure 2 review and user-deferred 11-19 Q-BPGD Figure 7 review gate 11-17 policy replay and 11-21 resource qualification; 11-22 authorization, 11-23/24 campaigns, and 11-25 final verification depend on those outcomes. Completed 11-20 retains the MBP4 Figure 6 mechanism-only, zero-shot target. The current preserve-deny decision remains in force; no controlled effect or source-curve reproduction is established.
@@ -347,13 +351,13 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Latest kernel work: quick task 261108-qcu expands compatible binary policies through shared CPU/Sinter execution, with source-defined counterparts only. Commits 7f888a1 and c512723; see its SUMMARY.md, qualification.json and docs/shared-policy-support.md. Broad regression passed 2462 tests with 20 skips; final affected coverage passed 387, including 125 new cases. All 24 real Sinter shot ledgers replay and 82 legacy receipts remain byte-identical. Previous E03/E01/E02 fixes and GPU/Pauli qualification retain their stated scopes. Preserve explicit family/backend admission and outstanding publication gates.
+Latest kernel work: completed audit 050–053 of the compatible shared policy expansion. See spikes/CANONICAL-KERNEL-SHARED-POLICY-AUDIT.md and SHARED-POLICY-AUDIT-VERIFICATION.json. Independent mathematics and aligned native execution pass, broad policy coverage is supported, and 290 focused regressions pass. F01 and F02 remain open, with counterexamples and correction scope retained. Production source remains d031436/c512723; no historical result was changed. Prior full suite, legacy parity, Sinter smoke and GPU receipts were hash-verified rather than relabelled as fresh runs.
 
 **Resume file:** None
 
-Last session: 2026-11-09T00:44:27+00:00
-Stopped at: Compatible policy expansion implemented and qualified; historical interfaces and results preserved
-Next step: HTML can consume the executable capability inventory and shared-policy interfaces. Phase 11 scientific gap plans remain open; Phase 5 human review remains open and Phase 7 stays paused.
+Last session: 2026-11-09T02:44:40+00:00
+Stopped at: Audit complete; two material composition/reproducibility corrections remain before full interface freeze
+Next step: Correct F01 → F02 with targeted regressions, old-ledger replay and explicit new identity versioning; then HTML can consume the qualified inventory. No blanket experiment rerun. Phase 11 scientific gaps and Phase 5 human review remain open; Phase 7 stays paused.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
 Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md`.

@@ -1,0 +1,52 @@
+{
+  "shared_receipt_sha256": "71fc89d28c0a7d30a5cdae7f2ec95f553e392039f1ebf1282a2c7993e169ae83",
+  "gpu_ledgers": [
+    {
+      "path": ".planning/quick/261108-meg-implement-compatible-circuit-policies-an/gpu-final/gpu-binary-spa.jsonl",
+      "sha256": "bfd12bac9af4f26f812aefd523ff9130db5394426c4b186d009075500562a1c3",
+      "shots": 1024
+    },
+    {
+      "path": ".planning/quick/261108-meg-implement-compatible-circuit-policies-an/gpu-final/gpu-binary-nms.jsonl",
+      "sha256": "4a15c9bbf43d1f496f81586a5d070260bfbdd51062010938f575d13acbf37f97",
+      "shots": 1024
+    },
+    {
+      "path": ".planning/quick/261108-meg-implement-compatible-circuit-policies-an/gpu-final/gpu-pauli-spa.jsonl",
+      "sha256": "797ce5e0cf4f2cb25d52ee7ee70f5d885fa5c08f3ef5276bd30d96ab85ec42e8",
+      "shots": 1024
+    },
+    {
+      "path": ".planning/quick/261108-meg-implement-compatible-circuit-policies-an/gpu-final/gpu-pauli-nms.jsonl",
+      "sha256": "db98a26f7430a05f89f4824df32356686636216262cadc96f898169a0557cf5a",
+      "shots": 1024
+    }
+  ],
+  "prior_full_tests": {
+    "final_affected": {
+      "log": "final-targeted.log",
+      "passed": 387
+    },
+    "full": {
+      "log": "full-regression-qualified.log",
+      "passed": 2462,
+      "skipped": 20
+    },
+    "new_cases": 125,
+    "note": "Suites overlap. Full regression ran during implementation; the final affected rerun covers all subsequent production edits."
+  },
+  "legacy": {
+    "baseline": "872f7e1",
+    "byte_identical": true,
+    "receipts": 82
+  },
+  "sinter": {
+    "interpretation": "API/ledger qualification only; no curve or decoder ranking claim",
+    "source": "real Sinter collect worker",
+    "verified_shots": {
+      "impulse": 8,
+      "precision": 8,
+      "serial": 8
+    }
+  }
+}

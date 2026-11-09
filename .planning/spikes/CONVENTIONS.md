@@ -44,3 +44,6 @@ The project `.venv` supplies the pinned versions in `pyproject.toml`; no new dep
 - Carry prior hardware qualification only with matching source identities and explicit timing scope. Fresh CPU validation of stored GPU records is not a new hardware run; distinguish decode/transfer/result binding from JIT and JSON export costs.
 
 - Record CPU affinity and physical-core topology with benchmarks. If an unchanged control shifts with the candidate, retain the first measurement and alternate already-warmed isolated revisions before attributing the shift to code. Logical workers on sibling hardware threads do not establish multicore scaling.
+
+- Test stochastic policy identities across batch chunking and decoder instances. Replay of one batch cannot prove independence from transport order; batch-local indexes must not silently define the scientific randomization contract.
+- For composed memory policies, test operand liveness as well as candidate equality: an upstream transformed prior or field must be consumed by the next policy, or the combination must be rejected.

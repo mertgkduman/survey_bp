@@ -1,0 +1,22 @@
+{
+  "scope": "git-tracked files only",
+  "roots": [
+    "data",
+    "manifests",
+    "experiments",
+    "from_dr_pfister_presentetations"
+  ],
+  "shared_schema_matches": [],
+  "pdprime_files": [
+    "data/evidence/phase4-factorial-execution-supplement-v1.json",
+    "data/evidence/phase4-pilot-design.json",
+    "data/manifests/schema-canonical-v4.json"
+  ],
+  "exact_affine_pdprime_bindings": [],
+  "matched_file_sha256": {
+    "data/evidence/phase4-factorial-execution-supplement-v1.json": "f695716a812889d8f6ad9476fbf570587f320ba9f7cbe26758d3ee2172d07343",
+    "data/evidence/phase4-pilot-design.json": "b2475581b97b745c8a444c5f1167613a5ca275d72bfd3ce7ef7bde302a52f08d",
+    "data/manifests/schema-canonical-v4.json": "98bc13f17e4081640697a46458f7112e6a31d1c5069267a66b338ff327ced534"
+  },
+  "limitations": "Untracked/private campaigns are not exhaustively scanned. No production or experiment result was changed. No claim that all historical data was scientifically revalidated."
+}

@@ -1,0 +1,2 @@
+{"checks": 3, "passed": 2, "failed": 1}
+FINDING: Sinter_transport_batch_identity Sinter batch partition changes randomized predictions for the identical inputs, policy and seed; batch-local circuit:index is part of the random key. Both differing predictions satisfy the original detectors.
