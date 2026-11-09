@@ -84,6 +84,42 @@ def test_local_pdprime_uses_matched_c2v_statistic_and_momentum_keeps_distinct_hi
     assert len(set(evidence["history_sha256"].values())) == 3
 
 
+@pytest.mark.parametrize("schedule", ["layered", "check_node_serial", "variable_node_serial"])
+@pytest.mark.parametrize("disordered", [False, True])
+def test_local_pdprime_rejects_changing_prior_before_execution(schedule, disordered):
+    from bp_registry.canonical.compatibility import validate_memory_compatibility
+    from bp_registry.canonical.memory_execution import validate_single_attempt_memory, LocalMemoryExecution
+    from bp_registry.canonical.policy_decoder import BinaryPolicy
+
+    assignment = (dict(mode="uniform", low=.2, high=.8, root_seed_identity="f" * 64,
+                       refresh_boundary="source_iteration", rng_algorithm="numpy.PCG64")
+                  if disordered else None)
+    memory = _composition("affine_prior", "pdprime_delta_mix", assignment=assignment)
+    decision = validate_memory_compatibility(memory, update_rule="binary_spa", schedule=schedule)
+    assert not decision.admitted and "pdprime_requires_fixed_prior" in decision.reason
+    for construct in (
+        lambda: validate_single_attempt_memory(memory, schedule=schedule),
+        lambda: LocalMemoryExecution(EdgeTable.from_edges(1, 2, [(0, 0), (0, 1)]), memory=memory),
+        lambda: BinaryPolicy(schedule=schedule, memory=memory,
+                             partitions=((0,),) if schedule == "layered" else None),
+    ):
+        with pytest.raises(ValueError, match="pdprime_requires_fixed_prior"):
+            construct()
+
+
+@pytest.mark.parametrize("schedule", ["layered", "check_node_serial", "variable_node_serial"])
+def test_local_fixed_prior_pdprime_still_executes_and_replays(schedule):
+    from bp_registry.canonical.policy_decoder import BinaryPolicy, BinaryPolicyDecoder
+
+    decoder = BinaryPolicyDecoder(np.ones((2, 3), dtype=np.uint8), BinaryPolicy(
+        schedule=schedule, memory=_composition("pdprime_delta_mix", "posterior_momentum", "v2c_damping"),
+        max_iterations=3, partitions=((0,), (1,)) if schedule == "layered" else None))
+    result = decoder.decode([0, 1], prior_llrs=[.8, -1.3, 2.])
+    assert not result.converged
+    assert result.ledger["execution"]["memory"]["committed_local_updates"] > 0
+    assert decoder.verify_ledger(result.ledger_json)
+
+
 def test_local_saturates_pdprime_history_before_the_next_unit_and_trace(tmp_path):
     from bp_registry.canonical.memory_execution import LocalMemoryExecution
     from bp_registry.canonical.tracing import TracePlan, TraceSink
@@ -426,22 +462,22 @@ def test_public_local_affine_trace_observes_only_completed_source_histories(tmp_
     assert all(any(record["kind"] == "memory_source_iteration" for record in document["records"]) for document in documents)
 
 
-def test_local_pdprime_numerical_failure_discards_uncommitted_histories(tmp_path, monkeypatch):
-    from bp_registry.canonical.memory import PDPrimeDeltaMix
+def test_local_field_numerical_failure_discards_uncommitted_prior_histories(tmp_path, monkeypatch):
+    from bp_registry.canonical.memory import PDBPFieldMix
     from bp_registry.canonical.numerics import NumericalFailure
     from bp_registry.cli import run_canonical, verify_run
     from bp_registry.ledger import read_canonical_events
 
-    original = PDPrimeDeltaMix.propose
+    original = PDBPFieldMix.propose
 
     def fail(*_args, **_kwargs):
-        raise NumericalFailure("local-pdprime-injected")
+        raise NumericalFailure("local-pdbp-injected")
 
-    monkeypatch.setattr(PDPrimeDeltaMix, "propose", fail)
+    monkeypatch.setattr(PDBPFieldMix, "propose", fail)
     path = _public_local_trace_manifest(tmp_path, trace=False)
     manifest = json.loads(path.read_text())
     manifest["memory"] = _composition(
-        "affine_prior", "pdprime_delta_mix",
+        "affine_prior", "pdbp_field_mix",
         assignment={
             "mode": "uniform", "low": 0.2, "high": 0.8,
             "root_seed_identity": "f" * 64, "refresh_boundary": "source_iteration",
@@ -456,7 +492,7 @@ def test_local_pdprime_numerical_failure_discards_uncommitted_histories(tmp_path
     assert all(data["memory_execution"]["committed_local_updates"] == 0 for data in terminals)
     assert all(data["memory_execution"]["committed_source_iterations"] == 0 for data in terminals)
     assert all("assignment_evidence" not in data["memory_execution"] for data in terminals)
-    monkeypatch.setattr(PDPrimeDeltaMix, "propose", original)
+    monkeypatch.setattr(PDBPFieldMix, "propose", original)
 
 
 def test_public_v3_local_numerical_failure_replays_its_empty_schedule_prefix(tmp_path, monkeypatch):

@@ -51,12 +51,11 @@ def validate_single_attempt_memory(
                     or binding.refresh_boundary.value != "attempt_start"
                     or binding.retain_history):
                 raise ValueError(f"memory.local_lifecycle_unimplemented:{binding.binding_id}")
-        field_index = 0
-        for binding in memory.bindings:
-            if binding.kind == "pdprime_delta_mix" and field_index != 0:
+        for index, binding in enumerate(memory.bindings):
+            # PD-prime consumes old field and C2V deltas, not a fresh field
+            # containing an upstream changed prior. Match flooding admission.
+            if binding.kind == "pdprime_delta_mix" and index != 0:
                 raise ValueError("memory.pdprime_requires_fixed_prior_and_first_field_position")
-            if binding.target in {"belief", "posterior"}:
-                field_index += 1
         return
     if schedule != "flooding":
         raise ValueError(f"memory.execution_schedule_unimplemented:{schedule}")

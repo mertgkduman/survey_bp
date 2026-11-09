@@ -53,12 +53,16 @@ def validate_memory_compatibility(
         operands = _LOCAL_OPERANDS
     else:
         return MemoryCompatibilityDecision(False, f"memory.schedule_unsupported:{schedule}")
-    for binding in composition.bindings:
+    for index, binding in enumerate(composition.bindings):
         operand = (binding.kind, binding.target, binding.advance_boundary.value)
         if operand not in operands:
             return MemoryCompatibilityDecision(
                 False,
                 f"memory.target_boundary_unsupported:{binding.target}:{binding.advance_boundary.value}:{schedule}",
                 binding.binding_id,
+            )
+        if binding.kind == "pdprime_delta_mix" and index != 0:
+            return MemoryCompatibilityDecision(
+                False, "memory.pdprime_requires_fixed_prior_and_first_field_position", binding.binding_id,
             )
     return MemoryCompatibilityDecision(True)
