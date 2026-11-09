@@ -1,0 +1,714 @@
+{
+  "schema": "research-active-view-audit-v1",
+  "basis": "Projected v2 evidence after retirement, validity and evidence semantics; points are projected measurement rows. Full retained catalog is unchanged.",
+  "before": {
+    "curves": 105,
+    "points": 361,
+    "distinct_rates_summed_per_curve": 361,
+    "codes": 7,
+    "circuits": 3
+  },
+  "after": {
+    "curves": 63,
+    "points": 319,
+    "distinct_rates_summed_per_curve": 319,
+    "codes": 6,
+    "circuits": 0
+  },
+  "removed_curves": [
+    {
+      "curve_id": "curve-d86b0b9f",
+      "code_id": "bb72",
+      "label": "BeamSearch, γ = 1, I₀ = 20, I₊ = 5, w = 2, R = 4, noise = X-only, precision = float64",
+      "rates": [
+        0.08
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-c58843734271f04d"
+      ],
+      "dataset_ids": [
+        "bb72-fair-beam-relay-v2"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-9ae37d4d",
+      "code_id": "bb72",
+      "label": "BeamSearch, γ = 1, I₀ = 20, I₊ = 10, w = 2, R = 4, noise = X-only, precision = float64",
+      "rates": [
+        0.05
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-c5625c04745bd87a"
+      ],
+      "dataset_ids": [
+        "bb72-fair-beam-relay-v2"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-245ea4d5",
+      "code_id": "beamsearch-bb144-memory-z-p005",
+      "label": "Detector BP, MS, T = 8, precision = float64",
+      "rates": [
+        0.005
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-a0bd29ea27ce6845"
+      ],
+      "dataset_ids": [
+        "circuit-cpu-profile-beamsearch"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-ac18d25f",
+      "code_id": "relay-bb144-memory-z",
+      "label": "Detector BP, MS, T = 8, precision = float64",
+      "rates": [
+        0.005
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-1d8506f5952de811"
+      ],
+      "dataset_ids": [
+        "circuit-cpu-profile-relay"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-76a554ec",
+      "code_id": "relay-surface-d3",
+      "label": "Detector BP, MS, T = 8, precision = float64",
+      "rates": [
+        0.005
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-fb8e54ddd5f4a136"
+      ],
+      "dataset_ids": [
+        "circuit-cpu-profile-relay"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-9d05175",
+      "code_id": "double-gross",
+      "label": "Q-BP, SP, d = 0.1, c = none, T = 1000, p₀ = p, noise = depolarizing, precision = float64, separate evidence",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-530473c46d39b386"
+      ],
+      "dataset_ids": [
+        "pfister-presentation-full-v2-curves"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-eea87e2e",
+      "code_id": "a5",
+      "label": "Q-BP, SP, d = 0.2, c = none, T = 10000, p₀ = 0.005, noise = depolarizing, precision = float64",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-a76aa5cd6f042661"
+      ],
+      "dataset_ids": [
+        "yao-bp4-tuning-fairness-p006"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-9c9df4be",
+      "code_id": "a5",
+      "label": "Q-BP, SP, d = 0.2, c = none, T = 100, p₀ = 0.005, noise = depolarizing, precision = float64",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-5438ee73966ae050"
+      ],
+      "dataset_ids": [
+        "yao-bp4-tuning-fairness-p006"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-efe2cff1",
+      "code_id": "a5",
+      "label": "Q-BP, SP, d = 0, c = none, T = 100, p₀ = 0.06, noise = depolarizing, precision = float64",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-2174a302f8bbdf3b"
+      ],
+      "dataset_ids": [
+        "yao-bp4-tuning-fairness-p006"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-919dc80b",
+      "code_id": "a5",
+      "label": "Q-BP, SP, d = 0, c = none, T = 3000, p₀ = 0.06, noise = depolarizing, precision = float64",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-88acbad335d4c03e"
+      ],
+      "dataset_ids": [
+        "yao-bp4-tuning-fairness-p006"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-35229bdc",
+      "code_id": "b2",
+      "label": "Q-BP, SP, d = 0.1, c = none, T = 5000, p₀ = 0.15, noise = depolarizing, precision = float64, separate evidence",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-67dc9795745cfc97"
+      ],
+      "dataset_ids": [
+        "yao-bp4-tuning-fairness-p006"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-20044b6e",
+      "code_id": "b2",
+      "label": "Q-BP, SP, d = 0.1, c = none, T = 100, p₀ = 0.15, noise = depolarizing, precision = float64",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-2b917eb88276c54a"
+      ],
+      "dataset_ids": [
+        "yao-bp4-tuning-fairness-p006"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-74da7aff",
+      "code_id": "b2",
+      "label": "Q-BP, SP, d = 0, c = none, T = 100, p₀ = 0.06, noise = depolarizing, precision = float64",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-f05e26b281d68c60"
+      ],
+      "dataset_ids": [
+        "yao-bp4-tuning-fairness-p006"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-49de055f",
+      "code_id": "b2",
+      "label": "Q-BP, SP, d = 0, c = none, T = 2400, p₀ = 0.06, noise = depolarizing, precision = float64",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-2a6d7a5cdd30809f"
+      ],
+      "dataset_ids": [
+        "yao-bp4-tuning-fairness-p006"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-49095aec",
+      "code_id": "a5",
+      "label": "Q-BP, SP, d = 0.1, c = none, T = 10000, p₀ = 0.045, noise = depolarizing, precision = float64",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-c5e9c20cd8392be2"
+      ],
+      "dataset_ids": [
+        "yao-bp4-tuning-selected-validation"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-a142e903",
+      "code_id": "a5",
+      "label": "Q-BP, SP, d = 0.1, c = none, T = 10000, p₀ = 0.06, noise = depolarizing, precision = float64",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-dc123337c4677011"
+      ],
+      "dataset_ids": [
+        "yao-bp4-tuning-selected-validation"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-3fea7f8f",
+      "code_id": "a5",
+      "label": "Q-BP, SP, d = 0.1, c = none, T = 10000, p₀ = 0.075, noise = depolarizing, precision = float64",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-0dd4ed72148bd617"
+      ],
+      "dataset_ids": [
+        "yao-bp4-tuning-selected-validation"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-801de430",
+      "code_id": "a5",
+      "label": "Q-BP, SP, d = 0.2, c = none, T = 10000, p₀ = 0.06, noise = depolarizing, precision = float64",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-3758270f35566bef"
+      ],
+      "dataset_ids": [
+        "yao-bp4-tuning-selected-validation"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-c1d3f5b5",
+      "code_id": "a5",
+      "label": "Q-BP, SP, d = 0.3, c = none, T = 10000, p₀ = 0.06, noise = depolarizing, precision = float64",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-da5203999c010a40"
+      ],
+      "dataset_ids": [
+        "yao-bp4-tuning-selected-validation"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-ec11bd23",
+      "code_id": "b2",
+      "label": "Q-BP, SP, d = 0.05, c = none, T = 5000, p₀ = 0.15, noise = depolarizing, precision = float64",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-7846c12013feeff2"
+      ],
+      "dataset_ids": [
+        "yao-bp4-tuning-selected-validation"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-6579944",
+      "code_id": "b2",
+      "label": "Q-BP, SP, d = 0.15, c = none, T = 5000, p₀ = 0.15, noise = depolarizing, precision = float64",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-1a9167f4a420c10c"
+      ],
+      "dataset_ids": [
+        "yao-bp4-tuning-selected-validation"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-4a94853a",
+      "code_id": "b2",
+      "label": "Q-BP, SP, d = 0.1, c = none, T = 5000, p₀ = 0.14, noise = depolarizing, precision = float64",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-3860784f874f2e36"
+      ],
+      "dataset_ids": [
+        "yao-bp4-tuning-selected-validation"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-6b7a8e27",
+      "code_id": "b2",
+      "label": "Q-BP, SP, d = 0.1, c = none, T = 5000, p₀ = 0.15, noise = depolarizing, precision = float64, separate evidence",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-21cfbb25bb9be61b"
+      ],
+      "dataset_ids": [
+        "yao-bp4-tuning-selected-validation"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-5a96b1d4",
+      "code_id": "b2",
+      "label": "Q-BP, SP, d = 0.1, c = none, T = 5000, p₀ = 0.16, noise = depolarizing, precision = float64",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-f2fd3935e024a990"
+      ],
+      "dataset_ids": [
+        "yao-bp4-tuning-selected-validation"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-9eab7a5e",
+      "code_id": "b2",
+      "label": "Q-BP, SP, d = 0.1, c = none, T = 5000, p₀ = 0.18, noise = depolarizing, precision = float64",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-8320377e318a0847"
+      ],
+      "dataset_ids": [
+        "yao-bp4-tuning-selected-validation"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-11608638",
+      "code_id": "b2",
+      "label": "Q-BP, SP, d = 0.2, c = none, T = 5000, p₀ = 0.15, noise = depolarizing, precision = float64",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-db089b06056a353d"
+      ],
+      "dataset_ids": [
+        "yao-bp4-tuning-selected-validation"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-a10ed677",
+      "code_id": "b1",
+      "label": "BPGD, SP, d = 0, Tᵣ = 100, R = n, order = random, cᵥ = 25, p₀ = p, noise = X-only, precision = float64, importance-weighted estimate",
+      "rates": [
+        0.04
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-29fb936b8c5dcbdc"
+      ],
+      "dataset_ids": [
+        "yao-non-osd-results"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-b546d989",
+      "code_id": "b1",
+      "label": "BPGD, SP, d = 0, Tᵣ = 100, R = n, cᵥ = 25, p₀ = p, noise = X-only, precision = float64, pilot",
+      "rates": [
+        0.04
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-8689d03d73df86ab",
+        "series-e12316533ddd7279"
+      ],
+      "dataset_ids": [
+        "yao-non-osd-results"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-b71d7687",
+      "code_id": "b1",
+      "label": "BPGD, SP, d = 0, Tᵣ = 100, R = 10, cᵥ = 25, p₀ = p, noise = X-only, precision = float64, importance-weighted estimate",
+      "rates": [
+        0.04
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-4bcafba47c2ae31b"
+      ],
+      "dataset_ids": [
+        "yao-non-osd-results"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-b1908e55",
+      "code_id": "b1",
+      "label": "BPGD, SP, d = 0, Tᵣ = 100, R = 882, cᵥ = 25, p₀ = p, noise = X-only, precision = float64, pilot",
+      "rates": [
+        0.04
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-d1ceac2d49a84ce4"
+      ],
+      "dataset_ids": [
+        "yao-non-osd-results"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-8dbe669e",
+      "code_id": "b1",
+      "label": "BPGD, SP, d = 0, Tᵣ = 10, R = n, cᵥ = 25, p₀ = p, noise = X-only, precision = float64, importance-weighted estimate",
+      "rates": [
+        0.04
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-b28857248cd14efa",
+        "series-c204f0ca80189618"
+      ],
+      "dataset_ids": [
+        "yao-non-osd-results"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-4465a78c",
+      "code_id": "b1",
+      "label": "BPGD, SP, d = 0, Tᵣ = 1, R = n, cᵥ = 25, p₀ = p, noise = X-only, precision = float64, importance-weighted estimate",
+      "rates": [
+        0.04
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-ac2f88f6762216b5"
+      ],
+      "dataset_ids": [
+        "yao-non-osd-results"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-f3b4c478",
+      "code_id": "b1",
+      "label": "BPGD, SP, d = 0, Tᵣ = 70, R = n, cᵥ = 25, p₀ = p, noise = X-only, precision = float64, importance-weighted estimate",
+      "rates": [
+        0.04
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-8af3148207d02dc0"
+      ],
+      "dataset_ids": [
+        "yao-non-osd-results"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-bf3b9c82",
+      "code_id": "c2",
+      "label": "BPGD, SP, d = 0, Tᵣ = 10, R = n, cᵥ = 25, p₀ = p, noise = X-only, precision = float64, importance-weighted estimate",
+      "rates": [
+        0.04
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-d61cc1a3f4db2245"
+      ],
+      "dataset_ids": [
+        "yao-non-osd-results"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-12932e58",
+      "code_id": "a5",
+      "label": "Q-BPGD, SP, d = 0, c = none, p₀ = 0.06, Tᵣ = 10, R = n, ε = 1e-10, noise = depolarizing, precision = float64, separate evidence",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-4fa0a99fac19c2a8"
+      ],
+      "dataset_ids": [
+        "yao-tuned-qbpgd-p006"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-251c85a0",
+      "code_id": "a5",
+      "label": "Q-BPGD, SP, d = 0.2, c = none, p₀ = 0.005, Tᵣ = 10, R = n, ε = 1e-10, noise = depolarizing, precision = float64, separate evidence",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-8acdedcf29c87b02"
+      ],
+      "dataset_ids": [
+        "yao-tuned-qbpgd-p006"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-e486699a",
+      "code_id": "b2",
+      "label": "Q-BPGD, SP, d = 0, c = none, p₀ = 0.06, Tᵣ = 10, R = n, ε = 1e-10, noise = depolarizing, precision = float64, separate evidence",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-ffe09720f8f70845"
+      ],
+      "dataset_ids": [
+        "yao-tuned-qbpgd-p006"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-ba20703a",
+      "code_id": "b2",
+      "label": "Q-BPGD, SP, d = 0.1, c = none, p₀ = 0.15, Tᵣ = 10, R = n, ε = 1e-10, noise = depolarizing, precision = float64, separate evidence",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-902a5d4f8714949e"
+      ],
+      "dataset_ids": [
+        "yao-tuned-qbpgd-p006"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-6b4186c5",
+      "code_id": "a5",
+      "label": "Q-BPGD, SP, d = 0, c = none, p₀ = 0.06, Tᵣ = 10, R = n, ε = 1e-10, noise = depolarizing, precision = float64, pilot",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-e64ee6799bb16b93"
+      ],
+      "dataset_ids": [
+        "yao-tuned-qbpgd-p006-pilot-n1000"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-707bcdd",
+      "code_id": "a5",
+      "label": "Q-BPGD, SP, d = 0.2, c = none, p₀ = 0.005, Tᵣ = 10, R = n, ε = 1e-10, noise = depolarizing, precision = float64, pilot",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-84c846ad42df03ea"
+      ],
+      "dataset_ids": [
+        "yao-tuned-qbpgd-p006-pilot-n1000"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-ffe3527b",
+      "code_id": "b2",
+      "label": "Q-BPGD, SP, d = 0, c = none, p₀ = 0.06, Tᵣ = 10, R = n, ε = 1e-10, noise = depolarizing, precision = float64, pilot",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-d77a329e6706b07a"
+      ],
+      "dataset_ids": [
+        "yao-tuned-qbpgd-p006-pilot-n1000"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    },
+    {
+      "curve_id": "curve-1be48a1b",
+      "code_id": "b2",
+      "label": "Q-BPGD, SP, d = 0.1, c = none, p₀ = 0.15, Tᵣ = 10, R = n, ε = 1e-10, noise = depolarizing, precision = float64, pilot",
+      "rates": [
+        0.06
+      ],
+      "point_count": 1,
+      "source_series_ids": [
+        "series-b013eb17b0dc1cd3"
+      ],
+      "dataset_ids": [
+        "yao-tuned-qbpgd-p006-pilot-n1000"
+      ],
+      "reason": "fewer_than_two_distinct_measured_error_rates"
+    }
+  ],
+  "removed_codes": [
+    {
+      "code_id": "gb46",
+      "label": "GB46"
+    }
+  ],
+  "removed_circuits": [
+    {
+      "circuit_id": "relay-surface-d3",
+      "label": "RelayBP rotated surface-code d=3 memory X"
+    },
+    {
+      "circuit_id": "relay-bb144-memory-z",
+      "label": "RelayBP BB144 memory Z"
+    },
+    {
+      "circuit_id": "beamsearch-bb144-memory-z-p005",
+      "label": "BeamSearch BB144 memory Z p=0.005"
+    }
+  ]
+}

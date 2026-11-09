@@ -1,0 +1,22 @@
+{
+  "imports": [
+    {
+      "retained_path": ".git/research-revision-browser-final/composed policy package/results",
+      "rows": 1,
+      "before": "63 measured result curves \u00b7 v2",
+      "after": "63 measured result curves \u00b7 v2",
+      "feedback": "Verified and added to this browser\u2019s results database. Use import-results to add it to the shared repository catalog."
+    },
+    {
+      "retained_path": ".git/research-revision-browser-final/circuit sweep package/results",
+      "rows": 2,
+      "before": "63 measured result curves \u00b7 v2",
+      "after": "64 measured result curves \u00b7 v2",
+      "feedback": "Verified and added to this browser\u2019s results database. Use import-results to add it to the shared repository catalog."
+    }
+  ],
+  "reload_curves": 64,
+  "errors": [],
+  "simulations": 0,
+  "note": "Reused prior browser qualification results unchanged; no worker or simulation was invoked."
+}
