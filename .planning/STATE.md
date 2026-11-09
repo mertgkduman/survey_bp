@@ -262,7 +262,7 @@ None outside the roadmap.
 
 - Full shared-policy interface freeze awaits F01/F02 from spikes 050–053; see the consolidated shared-policy audit. This is separate from existing scientific/publication gates.
 
-- Latest kernel audit findings E03/E01/E02 are closed with 257 regression passes and 12/12 audit groups. No remaining blocker from this bounded audit prevents HTML over the documented compatible subset. Scientific publication gates below remain separate; see spikes/CANONICAL-KERNEL-CIRCUIT-CUDA-FIXES.md.
+- Prior circuit/CUDA audit findings E03/E01/E02 are closed with 257 regression passes and 12/12 audit groups. Those corrections remain qualified; the newer shared-policy findings F01/F02 above govern the expanded-interface freeze. Scientific publication gates below remain separate; see spikes/CANONICAL-KERNEL-CIRCUIT-CUDA-FIXES.md.
 
 - [Phase 11] Eight gap plans remain open: 11-18 aSCED Figure 2 review and user-deferred 11-19 Q-BPGD Figure 7 review gate 11-17 policy replay and 11-21 resource qualification; 11-22 authorization, 11-23/24 campaigns, and 11-25 final verification depend on those outcomes. Completed 11-20 retains the MBP4 Figure 6 mechanism-only, zero-shot target. The current preserve-deny decision remains in force; no controlled effect or source-curve reproduction is established.
 - [Phase 09] Exact author experiment artifacts, source settings, and executable native assessments are still unverified; EVAL-01/02 remain pending. The Yao B1 adaptation is cap censored. Site resource ceilings and scheduler accounting remain unavailable, so publication dispatch is denied.
