@@ -76,7 +76,8 @@ def test_cpu_circuit_same_execution_and_reset(policy, tmp_path):
     batch = decoder.decode_detailed(events)
     cpu = BinaryPolicyDecoder(np.ones((2, 2), dtype=np.uint8), policy)
     for i, event in enumerate(events):
-        result = cpu.decode(event, prior_llrs=decoder.model.prior_llrs, shot_identity=f"circuit:{i}")
+        result = cpu.decode(event, prior_llrs=decoder.model.prior_llrs,
+                            shot_identity=batch.ledger[i + 1]["binary_execution"]["shot_identity"])
         assert result.ledger == batch.ledger[i + 1]["binary_execution"]
         assert result.converged == np.array_equal((cpu.h @ result.candidate) % 2, event)
         assert cpu.verify_ledger(result.ledger_json)
@@ -329,3 +330,161 @@ def test_source_controls_cannot_be_silently_inactive_or_ambiguously_ordered():
     options["memory_bindings"][0]["order"] = 1
     with pytest.raises(ValueError, match="contiguous"):
         BinaryPolicy(controller="relay", options=options)
+
+
+def chunking_fixture():
+    h = np.array([[1,1,0,0,0,0,0,0], [0,1,0,0,0,1,1,0],
+                  [1,0,0,1,0,0,1,0], [0,0,1,1,1,0,0,1]], dtype=np.uint8)
+    rates = [.1686279273722417, .2151861424206105, .23636213203981687, .13467950863149117,
+             .1601663007877624, .2939527271376381, .2398796318588651, .23689172971836636]
+    dem = stim.DetectorErrorModel("\n".join(f"error({p}) " +
+        " ".join(f"D{c}" for c in np.flatnonzero(h[:, v])) + f" L{v}" for v, p in enumerate(rates)))
+    return dem, np.tile(np.array([0, 1, 1, 1], dtype=np.uint8), (8, 1))
+
+
+@pytest.mark.parametrize("scope", ["attempt", "sweep"])
+def test_sinter_randomized_counterexample_is_independent_of_batch_partition(scope):
+    dem, events = chunking_fixture()
+    decoder = SharedPolicySinterDecoder(BinaryPolicy(schedule="variable_node_serial", randomized=scope,
+        rule="min_sum", max_iterations=5)).compile_decoder_for_dem(dem=dem)
+    packed = np.packbits(events, axis=1, bitorder="little")
+    together = decoder.decode_shots_bit_packed(bit_packed_detection_event_data=packed)
+    separated = np.vstack([decoder.decode_shots_bit_packed(bit_packed_detection_event_data=row[None]) for row in packed])
+    np.testing.assert_array_equal(together, separated)
+    assert decoder.decode_detailed(events).converged.all()
+
+
+def identity_policies():
+    h = np.array([[1, 1, 1, 0], [0, 1, 0, 1]], dtype=np.uint8)
+    table = EdgeTable.from_check_matrix(h)
+    from bp_registry.canonical.updates import ParameterGeneratorSpec, ParameterRefreshPlan
+    for schedule in ("layered", "check_node_serial", "variable_node_serial"):
+        for scope in ("configuration", "attempt", "sweep"):
+            yield BinaryPolicy(schedule=schedule, randomized=scope, max_iterations=3,
+                               partitions=((0,), (1,)) if schedule == "layered" else None)
+    yield BinaryPolicy(schedule="group_shuffled", max_iterations=3)
+    for scope in ("configuration", "attempt", "source_iteration"):
+        yield BinaryPolicy(rule="normalized_min_sum", max_iterations=3,
+            parameter_refresh=ParameterRefreshPlan(scope=scope, generator=ParameterGeneratorSpec(
+                shape="edge", graph_sha256=table.graph_sha256, distribution="uniform",
+                low=.2, high=.9, root_seed_identity="a" * 64)))
+    for schedule in ("flooding", "check_node_serial"):
+        spec = memory("affine_prior", local=schedule != "flooding").model_dump(mode="json")
+        spec["bindings"][0]["assignment"] = dict(mode="uniform", low=.2, high=.8, root_seed_identity="b" * 64)
+        yield BinaryPolicy(schedule=schedule, max_iterations=3, memory=MemoryCompositionSpec.model_validate(spec))
+    for kind, options in CONTROLLERS.items():
+        yield BinaryPolicy(controller=kind, options=options)
+    yield BinaryPolicy(controller="relay", options=dict(CONTROLLERS["relay"], memory_tuning=dict(
+        semantics="relay_v022_dynamic_affine_prior_css_adaptation", first_leg_gamma=.1,
+        later_leg_center=.2, later_leg_width=.9, seed_identity="source-relay")))
+
+
+@pytest.mark.parametrize("policy", list(identity_policies()))
+def test_all_identity_consumers_preserve_execution_across_transport(policy):
+    import pickle
+    from concurrent.futures import ThreadPoolExecutor
+
+    dem = stim.DetectorErrorModel("error(0.1) D0 L0\nerror(0.7) D0 D1 L1\nerror(0.2) D0\nerror(0.3) D1")
+    events = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [0, 1], [1, 0]], dtype=np.uint8)
+    factory = SharedPolicySinterDecoder(policy)
+    decoder = factory.compile_decoder_for_dem(dem=dem)
+    fresh = pickle.loads(pickle.dumps(factory)).compile_decoder_for_dem(dem=dem)
+    batch = decoder.decode_detailed(events)
+    assert batch.ledger[0]["schema"] == "circuit-shared-policy-ledger-v2"
+    assert batch.ledger[0]["random_identity"]["version"] == "observation-v2"
+    expected = [row["binary_execution"] for row in batch.ledger[1:]]
+    for i, event in enumerate(events):
+        single = fresh.decode_detailed(event[None])
+        assert single.ledger[1]["binary_execution"] == expected[i]
+        np.testing.assert_array_equal(single.predictions[0], batch.predictions[i])
+    permutation = [5, 3, 0, 4, 2, 1]
+    reordered = fresh.decode_detailed(events[permutation])
+    assert [row["binary_execution"] for row in reordered.ledger[1:]] == [expected[i] for i in permutation]
+    # Concurrent calls share only immutable graph/configuration, not RNG state.
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        concurrent = list(pool.map(lambda event: decoder.decode_detailed(event[None]), events))
+    assert [result.ledger[1]["binary_execution"] for result in concurrent] == expected
+    assert expected[1] == expected[4] and expected[2] == expected[5]
+
+
+@pytest.mark.parametrize("scope", ["attempt", "sweep"])
+def test_shared_v1_ledgers_replay_without_changing_historical_bytes(scope, tmp_path):
+    from pathlib import Path
+    dem, events = chunking_fixture()
+    policy = BinaryPolicy(schedule="variable_node_serial", randomized=scope, rule="min_sum", max_iterations=5)
+    fixture = Path(__file__).parents[1] / "circuit" / "fixtures" / f"shared-v1-{scope}.jsonl"
+    historical = fixture.read_bytes()
+    current = SharedPolicySinterDecoder(policy).compile_decoder_for_dem(dem=dem)
+    assert current.verify_ledger(fixture)["verified"]
+    legacy = SharedPolicySinterDecoder(policy, identity_version="batch-index-v1").compile_decoder_for_dem(dem=dem)
+    result = legacy.decode_detailed(events)
+    assert result.ledger == [json.loads(line) for line in historical.decode().splitlines()]
+    out = tmp_path / "legacy.jsonl"
+    result.write_ledger(out)
+    assert out.read_bytes() == historical == fixture.read_bytes()
+
+
+def test_v2_identity_binds_policy_model_and_normalized_observation(tmp_path):
+    from hashlib import sha256
+    from bp_registry.canonical.policy_decoder import canonical_json
+    from bp_registry.batch_records import encode_records, write_records
+
+    policy = BinaryPolicy(schedule="variable_node_serial", randomized="attempt", max_iterations=2)
+    dem = stim.DetectorErrorModel("error(0.1) D0 L0\nerror(0.2) D8 L1")
+    decoder = SharedPolicySinterDecoder(policy).compile_decoder_for_dem(dem=dem)
+    events = np.zeros((2, 9), dtype=np.uint8); events[1, 8] = 1
+    batch = decoder.decode_detailed(events)
+    meta = batch.ledger[0]["random_identity"]
+    context = dict(domain="circuit-observation-v2", model_sha256=decoder.model.execution_sha256,
+                   policy=policy.model_dump(mode="json"))
+    digest = sha256(canonical_json(context).encode()).digest()
+    assert meta["context_sha256"] == digest.hex()
+    for i, row in enumerate(batch.ledger[1:]):
+        assert row["binary_execution"]["shot_identity"] == "circuit-observation-v2:" + sha256(digest + events[i].tobytes()).hexdigest()
+    assert batch.ledger[1]["binary_execution"]["shot_identity"] != batch.ledger[2]["binary_execution"]["shot_identity"]
+    changed_policy = BinaryPolicy.model_validate_json(policy.model_copy(update={"seed": "other"}).model_dump_json())
+    changed = SharedPolicySinterDecoder(changed_policy).compile_decoder_for_dem(dem=dem).decode_detailed(events)
+    assert changed.ledger[0]["random_identity"] != meta
+    changed_model = SharedPolicySinterDecoder(policy).compile_decoder_for_dem(
+        dem=stim.DetectorErrorModel("error(0.1) D0 L1\nerror(0.2) D8 L0")).decode_detailed(events)
+    assert changed_model.ledger[0]["random_identity"] != meta
+    packed = np.packbits(events, axis=1, bitorder="little")
+    clean = decoder.decode_shots_bit_packed(bit_packed_detection_event_data=packed)
+    packed[:, 1] |= 0xfe  # Padding bits are not detector observations.
+    np.testing.assert_array_equal(clean, decoder.decode_shots_bit_packed(bit_packed_detection_event_data=packed))
+    for mutation in ("version", "context_sha256"):
+        records = batch.ledger
+        records[0]["random_identity"][mutation] = "incorrect"
+        path = tmp_path / f"tampered-{mutation}.jsonl"
+        write_records(path, encode_records(records), batch.ledger_schema)
+        with pytest.raises(ValueError, match="replay"):
+            decoder.verify_ledger(path)
+    empty = decoder.decode_detailed(np.empty((0, 9), dtype=np.uint8))
+    path = tmp_path / "empty.jsonl"; empty.write_ledger(path)
+    assert decoder.verify_ledger(path)["shots"] == 0
+
+
+@pytest.mark.parametrize("version", ["unknown", None, 2, True])
+def test_unknown_shared_identity_versions_rejected_at_construction(version):
+    from bp_registry.circuit.shared_policies import SharedCompiledPolicyDecoder
+    from bp_registry.circuit import DemBinaryModel
+    with pytest.raises(ValueError, match="identity"):
+        SharedPolicySinterDecoder(identity_version=version)
+    with pytest.raises(ValueError, match="identity"):
+        SharedCompiledPolicyDecoder(DemBinaryModel.from_dem(stim.DetectorErrorModel("error(0.1) D0")),
+                                    BinaryPolicy(), identity_version=version)
+
+
+@pytest.mark.parametrize("schema", ["circuit-shared-policy-ledger-v999", "circuit-shared-policy-ledger-v1"])
+def test_shared_ledger_rejects_unknown_schema_and_identity_downgrade(schema, tmp_path):
+    from bp_registry.batch_records import encode_records, write_records
+
+    decoder = SharedPolicySinterDecoder().compile_decoder_for_dem(
+        dem=stim.DetectorErrorModel("error(0.1) D0 L0"))
+    records = decoder.decode_detailed(np.array([[1]], dtype=np.uint8)).ledger
+    records[0]["schema"] = schema
+    records[0].pop("random_identity")
+    path = tmp_path / "changed-schema.jsonl"
+    write_records(path, encode_records(records), schema)
+    with pytest.raises(ValueError, match="schema|replay"):
+        decoder.verify_ledger(path)

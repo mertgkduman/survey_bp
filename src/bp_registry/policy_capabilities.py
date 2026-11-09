@@ -11,7 +11,7 @@ def capability_inventory():
     from bp_registry.canonical.policy_decoder import BinaryPolicy
     shared = lambda field: list(get_args(BinaryPolicy.model_fields[field].annotation))
     return {
-        "version": "policy-capabilities-v1",
+        "version": "policy-capabilities-v2",
         "scope": "existing_or_source_defined_counterparts_only",
         "admission": "BinaryPolicy plus BinaryPolicyDecoder graph admission; existing Pauli and GPU constructors",
         "shared_binary_and_circuit": {
@@ -27,6 +27,14 @@ def capability_inventory():
             "message_formats": ["float16", "float32", "float64", "int8", "int16", "int32"],
             "precision_note": "message rounding with float64 arithmetic; no native low-bit speed claim",
             "qualification": "shared existing binary equations; source controller qualifications are retained; no circuit curve reproduction claim",
+            "circuit_identity": {
+                "default": "observation-v2",
+                "ledger_schema": "circuit-shared-policy-ledger-v2",
+                "key": "versioned model/policy context plus normalized detector bytes",
+                "repeated_observations": "same model, policy and observation use the same random stream",
+                "historical_replay": "batch-index-v1; circuit-shared-policy-ledger-v1",
+                "independent_trials": "CPU accepts explicit shot_identity; Sinter transport supplies no global trial ID",
+            },
         },
         "pauli": {
             "entry_points": ["quaternary.kernel", "quaternary.schedules", "quaternary.compiled", "quaternary.mbp4", "quaternary.qbpgd", "quaternary.asced"],
@@ -45,6 +53,7 @@ def capability_inventory():
         },
         "required_operands_and_exclusions": {
             "layered": "explicit conflict-free partition covering all original checks",
+            "pdprime": "fixed prior and first field position; preceding affine-prior or field transforms are rejected on flooding and local schedules",
             "residual": "nonempty edge pool, undamped SPA, existing residual lifecycle",
             "group_shuffled": "at least two checks, source size-two overlap-one groups and SPA",
             "restart_belief": "explicit source exact-distance declaration or existing B1-only mechanism; no inferred circuit distance",

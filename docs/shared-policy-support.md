@@ -4,7 +4,9 @@
 binary schedules and controllers. The first accepts a parity-check matrix or
 an `EdgeTable`; the second obtains that graph and heterogeneous fault priors from
 a Stim detector error model. Both expose replayable detailed results. The new
-contracts are `binary-policy-v1` and `circuit-shared-policy-ledger-v1`.
+contracts are `binary-policy-v1` and `circuit-shared-policy-ledger-v2`.
+The shared circuit adapter defaults to `identity_version="observation-v2"`;
+historical shared-v1 ledgers remain replayable with their recorded identities.
 Historical manifests and `CircuitPolicy` / `PolicyBpSinterDecoder` retain their
 existing defaults and meanings.
 
@@ -44,7 +46,8 @@ cpu = BinaryPolicyDecoder(h, policy)
 result = cpu.decode([1, 1], prior_llrs=[2.0, 1.0, 3.0])
 assert cpu.verify_ledger(result.ledger_json)
 
-# Supply this decoder in sinter.collect(custom_decoders={"shared": decoder}, ...).
+# Use a new Sinter decoder name/metadata when changing identity or policy.
+# Example: custom_decoders={"shared-observation-v2": decoder}.
 decoder = SharedPolicySinterDecoder(policy, ledger_directory="shot-ledgers")
 compiled = decoder.compile_decoder_for_dem(dem=stim_dem)
 batch = compiled.decode_detailed(detection_events)
@@ -57,6 +60,34 @@ CPU decoding takes exactly one of `error_rate` (uniform binary channel) or
 the DEM's per-mechanism priors. Deterministic detector and observable biases,
 whole-mechanism semantics for `^` separators, and little-endian Sinter packing
 are preserved. No controller receives sampled faults or logical truth.
+
+## Random identity and historical replay
+
+The Sinter adapter derives a context digest from the domain
+`circuit-observation-v2`, the DEM execution identity (including graph, priors and
+observable mapping), and the complete binary policy. A shot's identity is
+`circuit-observation-v2:` followed by SHA-256 of that digest's 32 bytes concatenated
+with the normalized uint8 detector row. Padding bits in packed input are excluded.
+The policy includes its declared seeds. The ledger records the identity version,
+context digest and each binary execution identity.
+
+This is a deterministic randomized decoder: identical model, policy and detector
+observations use identical random choices. Batch size, row position, call order,
+worker placement and restarting a decoder instance do not change those choices.
+To average independent random decoder replicas for the same observation, use
+distinct declared policy seeds; the CPU API also accepts explicit `shot_identity`
+values. Sinter's packed decoder API supplies no global trial IDs. The adapter
+does not pretend that a batch-local index is a stable trial identity.
+
+`verify_ledger(path)` recognizes shared-v1 and shared-v2 schemas and replays the
+recorded identity semantics, regardless of the verifier's configured default.
+For explicit historical execution use
+`SharedPolicySinterDecoder(policy, identity_version="batch-index-v1")`. That mode
+retains the old batch-dependent behavior and produces the original v1 schema.
+New runs should use observation-v2. Include the identity version and full policy
+in Sinter task metadata, and use a distinct decoder name/resume dataset when
+migrating; Sinter's task identity does not inspect arbitrary custom decoder code.
+Historical ledgers are retained, not relabelled as v2.
 
 For a source controller, supply its existing controls in `options`. The
 controller owns its update rule, schedule and iteration limits:
@@ -120,6 +151,13 @@ states the unit and carries source-traversal/work evidence. These counts are not
 interchangeable performance measures.
 
 ## Required operands and remaining exclusions
+
+PD-prime's implemented recurrence requires a fixed channel prior and the first
+field-transform position. A preceding affine-prior or field transform is rejected
+on flooding and every local schedule. Affine-prior memory can still be combined
+with compatible fresh-field transforms such as PDBP. Historical records using the
+now-rejected combination require their pinned source revision for replay; they
+must not be interpreted as an effective combined decoder.
 
 Layered scheduling needs a conflict-free partition of the graph. Hsu grouping
 needs at least two checks; residual scheduling needs a nonempty edge pool and

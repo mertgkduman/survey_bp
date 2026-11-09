@@ -17,6 +17,12 @@ existing compiled precision policies. Its executable inventory records the
 separate Pauli counterparts and GPU exclusions; older interfaces below retain
 their frozen behavior.
 
+The F01/F02 corrections reject changing-prior PD-prime compositions on local
+schedules and give new shared Sinter execution a versioned, observation-based
+random identity. Shared-v2 predictions and per-shot execution are independent of
+batch partition and ordering; shared-v1 evidence replays with its historical
+batch-index identity. See [identity semantics and migration](shared-policy-support.md#random-identity-and-historical-replay).
+
 ## Capability and admission map
 
 Resolve a configuration by regime, mathematical family, prior representation,
