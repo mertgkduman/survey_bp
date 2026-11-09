@@ -24,8 +24,10 @@ def verify(output, url):
         assert not any(x.endswith(':binary_v1') or x.endswith(':bp4_v1') for x in options)
         checks.append('Parameter-based decoder labels; retired canonical clipping absent from selectors')
         picker=card.locator('.curve-picker input')
+        displayed_id=card.locator('.curve-list input:checked').first.get_attribute('data-curve')
         picker.focus()
         assert card.locator('[role=option]').count()>1
+        assert card.locator(f'[role=option][data-curve="{displayed_id}"]').count()==0
         picker.fill('q-bp')
         assert all(t.lower().startswith('q-bp') for t in card.locator('[role=option]').all_text_contents())
         page.keyboard.press('ArrowDown')
@@ -37,7 +39,12 @@ def verify(output, url):
         assert card.locator(f'.curve-group[data-decoder="{chosen}"]').count()==1
         assert card.locator('.curve-group').count()==2
         assert picker.get_attribute('aria-expanded')=='false'
-        checks.append('Focus opens available curves; case-insensitive prefix search and keyboard selection add a curve')
+        picker.focus()
+        shown_ids=set(card.locator('.curve-list input:checked').evaluate_all('xs=>xs.map(x=>x.dataset.curve)'))
+        offered_ids=set(card.locator('[role=option]').evaluate_all('xs=>xs.map(x=>x.dataset.curve)'))
+        assert shown_ids.isdisjoint(offered_ids)
+        page.keyboard.press('Escape')
+        checks.append('Picker excludes displayed curves initially and after keyboard addition; prefix search remains functional')
         # A second independently selected curve keeps both the plot and details visible.
         groups=card.locator('.curve-group')
         first_decoder=groups.first.get_attribute('data-decoder')
@@ -71,9 +78,39 @@ def verify(output, url):
         hidden_label.locator('input').check()
         assert card.locator('tbody tr').count()==before_rows
         checks.append('Run settings and CSV include only enabled curves; legend restores a hidden curve')
+        # Hidden curves are addable and are restored without duplicate entries.
+        hidden_label.locator('input').uncheck()
+        picker.focus()
+        hidden_option=card.locator(f'[role=option][data-curve="{hidden_id}"]')
+        assert hidden_option.count()==1
+        hidden_option.click()
+        assert card.locator(f'.curve-list input[data-curve="{hidden_id}"]:checked').count()==1
+        assert card.locator('.curve-list input').count()==2
+        assert card.locator('tbody tr').count()==before_rows
+        checks.append('Mouse addition restores a hidden curve without duplicate legend/table entries')
+        card.locator('select[data-select="decoder"]').select_option('')
+        picker.focus()
+        assert card.locator('[role=option]').count()==0
+        assert 'All available curves are already displayed.' in card.locator('[role=listbox]').inner_text()
+        page.keyboard.press('ArrowDown')
+        page.keyboard.press('Enter')
+        assert picker.get_attribute('aria-activedescendant') is None
+        page.keyboard.press('Escape')
+        # A hidden curve is the sole choice even in compare-all mode.
+        card.locator(f'.curve-list input[data-curve="{hidden_id}"]').uncheck()
+        picker.focus()
+        assert card.locator('[role=option]').count()==1
+        page.keyboard.press('ArrowDown')
+        page.keyboard.press('Enter')
+        assert card.locator(f'.curve-list input[data-curve="{hidden_id}"]:checked').count()==1
+        checks.append('Compare-all has an honest empty picker; hiding makes only that curve addable and keyboard restoration works')
         page.locator('#add-plot').click()
         second=page.locator('[data-plot]').nth(1)
         assert card.bounding_box()['x']<second.bounding_box()['x']
+        second.locator('select[data-select="input"]').select_option('a5')
+        second.locator('.curve-picker input').focus()
+        assert second.locator('[role=option]').count()>0
+        page.keyboard.press('Escape')
         second_state=second.locator('select[data-select="input"]').input_value()
         card.locator('select[data-select="input"]').select_option('b1')
         assert second.locator('select[data-select="input"]').input_value()==second_state

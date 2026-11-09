@@ -59,7 +59,8 @@ load();''')
             assert card.locator('tbody tr').count() == sum(len(s['points']) for s in expected)
             assert card.locator('.curve-list input').count() == len(expected)
             card.locator('.curve-picker input').focus()
-            assert card.locator('[role=option]').count() == len(expected)
+            assert card.locator('[role=option]').count() == 0
+            assert 'All available curves are already displayed.' in card.locator('[role=listbox]').inner_text()
             page.keyboard.press('Escape')
             with page.expect_download() as d:
                 card.get_by_role('button', name='Download run settings').click()
@@ -84,6 +85,8 @@ load();''')
         page.screenshot(path=str(output / 'results.png'))
 
         # Leave both curve and saved-decoder selections active before removal.
+        first_curve=card.locator('[data-select=decoder] option').evaluate_all("xs=>xs.find(x=>x.value).value")
+        card.locator('[data-select=decoder]').select_option(first_curve)
         card.locator('.curve-picker input').focus()
         page.keyboard.press('ArrowDown')
         page.keyboard.press('Enter')

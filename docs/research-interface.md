@@ -43,8 +43,10 @@ named BP4 in implementation identities; Q-BPGD adds guided decimation to this
 kernel. Display names do not rename saved implementation identifiers. Parameter
 keys explain coefficients, priors, numerical resolution, and controller budgets.
 
-Use **Add a decoder / curve** to add curves. Focusing lists available choices;
-typing filters by the beginning of the name. Arrow keys and Enter select, and
+Use **Add a decoder / curve** to add curves. Focusing lists curves that are not
+already displayed on that plot. Hidden curves can be restored through the picker
+or Show curves. When all are displayed, the picker explains that no choices remain.
+Typing filters by the beginning of the name. Arrow keys and Enter select, and
 Escape dismisses. The builder offers the same interaction as **Search for a
 decoder**, including undamped BP and Q-BP baselines. Click a plotted curve or
 use its keyboard control to hide it; Show curves restores it. Hover/focus its
