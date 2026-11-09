@@ -12,7 +12,7 @@ pytestmark = pytest.mark.skipif(shutil.which("node") is None, reason="curve proj
 
 
 def project(catalog):
-    script = """require('./web/research/curve-projection.js');const input=JSON.parse(process.argv[1]);const display=new Map(input.result_series.map(s=>[s.series_id,{label:'Q-BP, SP, T = 10',algorithm:'Q-BP',rule:'SP',precision:'float64',parameters:[],retired:null}]));console.log(JSON.stringify(ResearchCurves.project(input,display)));"""
+    script = """require('./web/research/curve-projection.js');const input=JSON.parse(process.argv[1]);const display=new Map(input.result_series.map(s=>[s.series_id,{label:'Q-BP, SP, T = 10',algorithm:'Q-BP',rule:'SP',precision:'float64',parameters:[],retired:null}]));console.log(JSON.stringify(ResearchCurves.projectEvidence(input,display)));"""
     return json.loads(subprocess.check_output(["node", "-e", script, json.dumps(catalog)], cwd=ROOT, text=True))
 
 
@@ -111,3 +111,125 @@ def test_adding_a_cohort_preserves_the_curve_view_identity():
     after = project(catalog([first, row("b", seed=2, evidence="b.json")]))[0]
     assert before["curve_id"] == after["curve_id"]
     assert after["projection"]["source_series_ids"] == ["a", "b"]
+
+
+def active_view(value):
+    script = """require('./web/research/decoder-display.js');require('./web/research/curve-projection.js');const c=JSON.parse(require('fs').readFileSync(0,'utf8'));const v=ResearchCurves.active(c,DecoderDisplay.labels(c));console.log(JSON.stringify({...v,decoderIds:[...v.decoderIds]}));"""
+    return json.loads(subprocess.check_output(["node", "-e", script], input=json.dumps(value), cwd=ROOT, text=True))
+
+
+def with_rates(record, rates=(.06, .08)):
+    from copy import deepcopy
+    result = deepcopy(record)
+    result['points'] = [{**deepcopy(record['points'][0]), 'x': p} for p in rates]
+    return result
+
+
+def test_active_single_rate_cohorts_do_not_qualify_even_if_pooled():
+    for pool in (False, True):
+        c = catalog([row('a', seed=1, evidence='a.json', pool=pool),
+                     row('b', seed=2, evidence='b.json', pool=pool)],
+                    [{'decoder_id': id, 'configuration': {'effective_policy': {'kernel': 'same'}}} for id in ('a', 'b')])
+        assert active_view(c)['curves'] == []
+
+
+def test_active_filters_after_validity_retirement_and_source_exclusion():
+    measured = with_rates(row('a', seed=1, evidence='a.json'))
+    for status in ('pending', 'unmeasured', 'source_only'):
+        measured['points'][1]['status'] = status
+        assert active_view(catalog([measured]))['curves'] == []
+    measured['points'][1]['status'] = 'complete'
+    measured['points'][1]['y'] = None
+    assert active_view(catalog([measured]))['curves'] == []
+    measured['points'][1]['y'] = .1
+    measured['points'][1]['x'] = None
+    assert active_view(catalog([measured]))['curves'] == []
+    measured = with_rates(row('a', seed=1, evidence='a.json'))
+    c = catalog([measured])
+    c['datasets'][0]['evidence_status'] = 'source_transcription'
+    assert active_view(c)['curves'] == []
+    c = catalog([measured], [{'decoder_id': 'a', 'configuration': {'effective_policy': {
+        'schema': 'vanilla-bp-decoder-v1', 'family': 'bp4', 'numerical_profile': 'quaternary-bp4-f64-v1',
+        'max_iterations': 10, 'damping_old': 0, 'check_cap': 25}}}])
+    assert active_view(c)['curves'] == []
+
+
+def test_active_zero_failure_bounds_count_as_measured_rates_and_raw_catalog_is_unchanged():
+    from copy import deepcopy
+    c = catalog([with_rates(row('a', seed=1, evidence='a.json', failures=0))])
+    c['codes'] = [{'code_id': 'a5'}, {'code_id': 'empty'}]
+    c['circuits'] = [{'circuit_id': 'empty-circuit'}]
+    before = deepcopy(c)
+    view = active_view(c)
+    assert len(view['curves']) == 1
+    assert [p['y'] for p in view['curves'][0]['points']] == [0, 0]
+    assert view['codes'] == [{'code_id': 'a5'}]
+    assert view['circuits'] == []
+    assert view['decoderIds'] == ['a']
+    assert c == before
+
+
+@pytest.mark.parametrize('difference', ['channel', 'kernel', 'role', 'evaluator'])
+def test_active_incompatible_single_rate_evidence_cannot_create_a_curve(difference):
+    a, b = row('a', seed=1, evidence='a.json'), row('b', seed=2, evidence='b.json')
+    b['points'][0]['x'] = .08
+    decoders = [{'decoder_id': id, 'configuration': {'effective_policy': {'kernel': 'same'}}} for id in ('a', 'b')]
+    if difference == 'channel':
+        b['channel_kind'] = 'x_only'
+    elif difference == 'kernel':
+        decoders[1]['configuration']['effective_policy']['kernel'] = 'other'
+    elif difference == 'role':
+        b['points'][0]['metadata']['cohort_kind'] = 'pilot'
+    else:
+        b['points'][0]['metadata']['denominator_definition'] = 'other evaluator'
+    assert active_view(catalog([a, b], decoders))['curves'] == []
+
+
+def test_active_compatible_projection_can_qualify_across_source_records():
+    a, b = row('a', seed=1, evidence='a.json'), row('b', seed=2, evidence='b.json')
+    b['points'][0]['x'] = .08
+    c = catalog([a, b], [{'decoder_id': id, 'configuration': {'effective_policy': {'kernel': 'same'}}} for id in ('a', 'b')])
+    view = active_view(c)
+    assert len(view['curves']) == 1
+    assert set(view['decoderIds']) == {'a', 'b'}
+    assert len(view['curves'][0]['provenance_members']) == 2
+
+
+@pytest.mark.parametrize('identifier', ['three-qubit', 'project-three-qubit-css-fixture'])
+def test_active_fixture_cannot_return_through_imported_evidence(identifier):
+    record = with_rates(row('a', seed=1, evidence='a.json'))
+    record['code_id'] = identifier
+    c = catalog([record])
+    c['codes'] = [{'code_id': identifier}]
+    assert active_view(c)['curves'] == []
+    assert active_view(c)['codes'] == []
+
+
+@pytest.mark.parametrize('semantics', ['circuit_setting_index', 'decoder_prior_probability'])
+def test_settings_or_prior_sweeps_are_not_multiple_measured_error_rates(semantics):
+    record = with_rates(row('a', seed=1, evidence='a.json'))
+    for point in record['points']:
+        point['metadata']['x_semantics'] = semantics
+    assert active_view(catalog([record]))['curves'] == []
+
+
+def test_rebuilt_catalog_uses_same_active_view_as_browser_and_preserves_retained_evidence():
+    from bp_registry.research.catalog import build_catalog
+    c = build_catalog(ROOT)
+    view = active_view(c)
+    assert len(view['curves']) == 63
+    assert sum(len(s['points']) for s in view['curves']) == 319
+    assert {code['code_id'] for code in view['codes']} == {'a5', 'b2', 'b1', 'c2', 'double-gross', 'bb72'}
+    assert view['circuits'] == []
+    assert len(c['codes']) == 7 and len(c['circuits']) == 3
+    assert any(s['code_id'] == 'relay-surface-d3' for s in c['result_series'])
+    assert all(len({p['x'] for p in s['points']}) >= 2 for s in view['curves'])
+
+
+def test_nonphysical_coordinates_cannot_join_a_physical_curve():
+    record = with_rates(row('a', seed=1, evidence='a.json'))
+    record['points'].append({**record['points'][0], 'x': .1,
+                             'metadata': {**record['points'][0]['metadata'], 'x_semantics': 'decoder_prior_probability'}})
+    curves = active_view(catalog([record]))['curves']
+    assert len(curves) == 1
+    assert [p['x'] for p in curves[0]['points']] == [.06, .08]

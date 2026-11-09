@@ -42,7 +42,7 @@ const pathList=p=>text(p?.metadata?.source_evidence_path||p?.metadata?.summary_p
 const member=(series,point)=>({series_id:series.series_id,decoder_id:series.decoder_id,dataset_id:series.dataset_id,label:series.label,seed:point?.metadata?.seed??null,evidence_paths:pathList(point),asset_paths:(series.assets||[]).map(a=>a.path).filter(Boolean)});
 const role=p=>p?.metadata?.cohort_kind||p?.metadata?.sampling_method||p?.metadata?.estimator||p?.metadata?.source_point_type||'fixed_iid';
 const evaluator=p=>p?.metadata?.denominator_definition||'retained_terminal_outcome';
-const viewKey=(series,p)=>[series.code_id,series.channel_kind||'unknown',series.display_identity||series.label,series.implementation_identity||'unknown_implementation',role(p),evaluator(p)].join('\u001f');
+const viewKey=(series,p)=>[series.code_id,series.channel_kind||'unknown',series.display_identity||series.label,series.implementation_identity||'unknown_implementation',role(p),evaluator(p),...(p.x_semantics&&p.x_semantics!=='physical_error_probability'?[p.x_semantics]:[])].join('\u001f');
 const pointKey=(series,p)=>[viewKey(series,p),p.x].join('\u001f');
 const evidenceKey=(series,p,index)=>{const paths=pathList(p);return paths.length?[pointKey(series,p),p.n,p.failures,p.y,paths.join(';')].join('\u001e'):`unbound:${series.series_id}:${index}`;};
 const canPool=entries=>entries.length>1&&new Set(entries.map(({point})=>point.metadata?.seed)).size===entries.length&&new Set(entries.map(({point})=>pathList(point).join(';'))).size===entries.length&&entries.every(({series,point})=>series.implementation_identity!=='unknown_implementation'&&known(point.n)&&known(point.failures)&&role(point)==='fixed_iid'&&point.metadata?.seed!=null&&pathList(point).length&&point.metadata?.overlap_status!=='shared'&&point.metadata?.pooling_contract==='independent_fixed_iid_disjoint_v1');
@@ -55,7 +55,7 @@ function pooled(entries){
  const p={...primary.point,n,failures,y:failures/n,ci_low,ci_high,mean_work:weighted('mean_work'),mean_seconds:weighted('mean_seconds'),type_i:sumCounter('type_i'),type_ii:sumCounter('type_ii'),metadata:{...primary.point.metadata,projection_members:entries.length,uncertainty_method:'wilson_score_95_percent_pooled_fixed_iid'}};
  return {point:p,method:'pooled_independent_fixed_iid'};
 }
-function project(catalog,displayMap){
+function projectEvidence(catalog,displayMap){
  const candidates=[];
  const decoders=new Map((catalog.decoders||[]).map(d=>[d.decoder_id,d]));
  const visibleDatasets=new Set((catalog.datasets||[]).filter(d=>!['source_transcription','published_source_values'].includes(d.evidence_status)).map(d=>d.dataset_id));
@@ -64,8 +64,8 @@ function project(catalog,displayMap){
   const display=displayMap?.get?.(source.series_id)||{};
   if(display.retired)continue;
   const identity=[display.algorithm||'',display.rule||'',display.precision||'',...(display.parameters||[]).filter(p=>!['N','set'].includes(p.symbol)).map(p=>p.text)].join('\u001f');
-  const series={...source,label:display.label||source.label,display_identity:identity,implementation_identity:implementationIdentity(source,decoders),channel_kind:source.channel_kind||'unknown',evidence:source.evidence_status};
-  for(const [index,raw] of (source.points||[]).entries())if(known(raw.y)&&!/^pending|unmeasured|source_only/i.test(raw.status||''))candidates.push({series,point:{...raw,metadata:raw.metadata||{},...(raw.metadata||{})},index});
+  const series={...source,label:display.label||source.label,display_identity:identity,implementation_identity:implementationIdentity(source,decoders),channel_kind:source.channel_kind||'unknown',evidence:source.evidence_status||(catalog.datasets||[]).find(d=>d.dataset_id===source.dataset_id)?.evidence_status};
+  for(const [index,raw] of (source.points||[]).entries())if(known(raw.x)&&known(raw.y)&&!/^pending|unmeasured|source_only/i.test(raw.status||''))candidates.push({series,point:{...raw,metadata:raw.metadata||{},...(raw.metadata||{})},index});
  }
  const grouped=new Map();
  for(const entry of candidates){const key=pointKey(entry.series,entry.point);if(!grouped.has(key))grouped.set(key,[]);grouped.get(key).push(entry);}
@@ -105,5 +105,17 @@ function project(catalog,displayMap){
  for(const items of labelGroups.values())if(items.length>1)for(const item of items)item.label+=`, ${roleLabel(item.points[0]||{})}`;
  return projected;
 }
-globalThis.ResearchCurves={project};
+// This is the sole public v2 eligibility boundary. Retained catalog records
+// remain untouched, including single-rate evidence and unmeasured inputs.
+const hiddenInputs=new Set(['three-qubit','project-three-qubit-css-fixture']);
+const measuredRate=p=>!['decoder_prior_probability','circuit_setting_index'].includes(p.x_semantics)&&known(p.x);
+function project(catalog,displayMap){
+ return projectEvidence(catalog,displayMap).filter(s=>!hiddenInputs.has(s.code_id)&&!hiddenInputs.has(s.circuit_id)&&new Set(s.points.filter(measuredRate).map(p=>p.x)).size>=2);
+}
+function active(catalog,displayMap){
+ const curves=project(catalog,displayMap),inputs=new Set(curves.flatMap(s=>[s.code_id,s.circuit_id]).filter(Boolean));
+ const decoderIds=new Set(curves.flatMap(s=>s.provenance_members.map(m=>m.decoder_id)));
+ return {curves,codes:(catalog.codes||[]).filter(c=>inputs.has(c.code_id)&&!hiddenInputs.has(c.code_id)),circuits:(catalog.circuits||[]).filter(c=>inputs.has(c.circuit_id)&&!hiddenInputs.has(c.circuit_id)),decoderIds};
+}
+globalThis.ResearchCurves={project,active,projectEvidence};
 })();

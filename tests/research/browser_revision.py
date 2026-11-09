@@ -32,10 +32,9 @@ def verify(root: Path, output: Path, url: str):
         assert card.locator('.axis-note .katex').count() == 1
         assert 'bit-flip probability' in card.locator('svg').text_content()
         assert 'depolarizing (X, Y, Z: p/3 each)' in card.locator('tbody').inner_text()
-        card.locator('select[data-select="input"]').select_option('relay-surface-d3')
-        assert card.locator('tbody tr').count() > 0
-        assert 'observable' in card.locator('tbody').inner_text().lower()
-        checks.append('Q-BP names, comma separators, hidden public fixture, conditional bit-flip axis and retained circuit measurements')
+        assert card.locator('select[data-select="input"] option[value="relay-surface-d3"]').count() == 0
+        assert page.locator('#build-circuit option').count() == 1
+        checks.append('Q-BP names, comma separators, hidden public fixture, conditional bit-flip axis and hidden single-rate circuits')
 
         page.locator('[data-nav="builder"]').click()
         search = page.locator('#decoder-search input')

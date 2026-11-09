@@ -18,7 +18,22 @@ includes its original experiment context; selecting only an algorithm name would
 not identify prior, cap, precision, or sampling cohort. Add plot creates independent
 selections, curves, tables, CSV exports, and configuration receipts. Only locally
 measured points appear in v2: source transcriptions and unmeasured coordinates
-remain in v1/the source catalog. Importance estimates keep their declared
+remain in v1/the source catalog. After retirement, measurement validity and
+evidence projection, a displayed curve must have measurements at **two or more
+distinct error rates**. Repeated cohorts at the same rate count as one rate;
+valid zero-failure upper bounds count as measurements. Circuit setting indices
+and decoder-prior sweeps alone do not establish an error-rate curve. Incompatible
+channels, kernels, sampling roles and evaluators remain separate.
+
+This single active view supplies plots, curve selectors, availability, tables,
+exports and saved decoder choices. Codes and registered circuits without a
+remaining curve are absent from public selectors, including the builder.
+Custom parity-check matrices and custom Stim inputs remain available, even
+when the active result view is empty. Refreshes reconcile removed selections
+and clear stale registered-input bytes. New-experiment BP/Q-BP baseline presets
+remain available; they do not claim measured performance.
+
+Importance estimates keep their declared
 estimator and raw proposal-count semantics. Work/runtime units are not silently
 normalized across incompatible methods or machines.
 
@@ -55,11 +70,12 @@ retain original members, seeds, specifications, and evidence paths.
 The active interface excludes retired globally clipped code-capacity float64 v1
 curves and superseded Q8 Q-BP state-clipping curves. Frozen identities and the
 v1 archive remain unchanged. Corrected scalar-edge Q8 min-sum, binary OMS,
-study-specific caps, and the pinned circuit adapter remain valid choices. The
-retained circuit CPU profile is a local mechanism/performance measurement,
-not a paper-curve reproduction. Its previous omission was a catalog gap; the
-older native-comparison report repeats its samples and is provenance only.
-The internal three-qubit fixture is absent from the public catalog.
+study-specific caps, and the pinned circuit adapter retain their execution
+support. The three retained circuit CPU profiles each measure only p=0.005,
+so they are hidden under the multi-rate display rule. They remain local
+mechanism/performance evidence in the retained catalog, with no paper-curve
+reproduction claim. The internal three-qubit fixture is excluded from public
+choices, including when an imported catalog references its registered aliases.
 
 The builder composes supported numerical policies with guided decimation.
 Q-BPGD uses the actual persistent-message kernel between rounds; SP/MS,
@@ -109,7 +125,9 @@ cannot change a displayed result. In Getting started, select these output files 
 - `events.jsonl`, `summary.json`, and `summary.csv`.
 
 The browser verifies hashes and summary/ledger counts before adding a local
-catalog overlay. Entries survive reload in browser storage. A naked catalog
+catalog overlay. The same eligibility projection runs after import and reload:
+a one-rate result is retained but does not add a curve or public input choice.
+Entries survive reload in browser storage. A naked catalog
 entry, partial run, modified bytes, or conflicting identity is rejected. Browser
 uploads are limited to 100 MB and browser-storage quota; use the CLI for larger
 runs. Browser-local import does not write to the repository or a remote server.
@@ -145,7 +163,10 @@ python3.12 -m venv .venv
 ```
 
 Open **http://127.0.0.1:8765/web/research/**. The command rebuilds the static
-catalog before serving. `--no-build` serves its checked-in snapshot. The preview
+catalog before serving. The generated catalog deliberately preserves all
+retained evidence; `ResearchCurves.active` applies v2 display eligibility after
+browser overlays merge. Rebuilding does not prune source records or modify v1.
+`--no-build` serves the checked-in snapshot. The preview
 serves tracked repository assets and the interface; it disables directory
 listings and private configuration paths. When running on a remote HPC host,
 forward port 8765 over the SSH connection to open it on your computer.

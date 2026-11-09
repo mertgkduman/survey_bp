@@ -50,10 +50,9 @@ def verify(root: Path, output: Path, url: str):
         assert 'Observed value' in csv_path.read_text() and 'source_transcription' not in csv_path.read_text()
         page.screenshot(path=str(output/'results-desktop.png'))
         checks.append("Independent side-by-side code/decoder selections, real plot/table/CSV, keyboard point inspection")
-        first.locator('select[data-select="input"]').select_option('relay-surface-d3')
-        assert first.locator('tbody tr').count() > 0
-        assert 'circuit' in first.inner_text().lower()
-        checks.append("Retained circuit CPU measurements are registered with honest observable and performance semantics")
+        assert first.locator('select[data-select="input"] option[value="relay-surface-d3"]').count() == 0
+        assert page.locator('#build-circuit option').count() == 1
+        checks.append("Single-rate circuit CPU measurements remain retained but have no active public choices")
         page.locator('[data-nav="builder"]').click()
         page.locator('#build-shots').fill('8')
         page.locator('#build-rates').fill('0.4')
@@ -98,9 +97,9 @@ def verify(root: Path, output: Path, url: str):
         page.locator('[data-nav="results"]').click()
         imported = json.loads((package/'results/catalog-entry.json').read_text())
         first = page.locator('[data-plot]').first
-        first.locator('select[data-select="input"]').select_option(imported['codes'][0]['code_id'])
-        assert str(summary['rows'][0]['n']) in first.inner_text()
-        checks.append("Hash-checked output upload persists in the browser and becomes a selectable measured curve")
+        assert imported['codes'][0]['code_id'] not in first.locator('select[data-select="input"] option').evaluate_all('xs=>xs.map(x=>x.value)')
+        assert page.evaluate("JSON.parse(localStorage.getItem('bp-research-v2-results')).length") == 1
+        checks.append("Hash-checked singleton upload persists without adding a public input or curve")
         checks.append("Unbound catalog metadata is ignored and cannot alter measured points")
         altered=output/'altered-bound';altered.mkdir()
         wrong_summary=json.loads((package/'results/summary.json').read_text())

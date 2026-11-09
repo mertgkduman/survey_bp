@@ -54,6 +54,12 @@ def _write_code_matrix_previews(root: Path, destination: Path, catalog: dict[str
 
 
 def build_interface(repository: str | Path | None = None) -> dict[str, Any]:
+    """Rebuild retained evidence, leaving v2 eligibility to ResearchCurves.active.
+
+    The browser applies its shared projection after merging imported results;
+    pruning here would discard provenance and prevent later cohorts from being
+    evaluated under the same rules. The archived v1 snapshot is never rebuilt.
+    """
     from .catalog import build_catalog
     from .contracts import interface_contract
     from .export import package_template
