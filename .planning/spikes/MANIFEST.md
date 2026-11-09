@@ -47,6 +47,8 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 
 - Continue the approved four-part audit on b598ad1, targeting the new circuit-policy and CUDA paths as spikes 043–046. Reuse qualified unchanged mathematics, preserve historical receipts, and distinguish practical scientific risks from optional hardening. Release packaging remains outside scope.
 
+- Audit the shared binary CPU/Sinter expansion at d031436 in the approved four-part order as 050–053. Preserve the existing/source-defined counterpart boundary and assess practically material defects before HTML.
+
 ## Spikes
 
 | # | Idea | Name | Type | Validates | Verdict | Tags |
@@ -108,3 +110,8 @@ Ordinary-domain mathematics and matched upstream execution passed. The three
 bounded contract findings were subsequently closed in order E03 → E01 → E02 by
 047–049; see [closure report](CANONICAL-KERNEL-CIRCUIT-CUDA-FIXES.md). Historical
 043–046 verdicts remain unchanged. Publication gates are unchanged.
+
+| 050 | canonical-kernel-audit | Shared policy mathematical contracts | standard | Given heterogeneous signed priors, when ordinary and precision policies execute, then independent factors reproduce candidates, beliefs and stopping. | VALIDATED | shared-policies, completeness |
+| 051 | canonical-kernel-audit | Shared policy upstream correspondence | standard | Given aligned native implementations, when shared execution runs, then agreement and source-specific differences are explicit. | PENDING | shared-policies, completeness |
+| 052 | canonical-kernel-audit | Shared policy composition closure | standard | Given accepted policies, when combined and reused, then operands, state lifetime, admission and source semantics remain coherent. | PENDING | shared-policies, completeness |
+| 053 | canonical-kernel-audit | Shared execution and evidence closure | standard | Given the same decoding problem, when public transports and replay execute, then outputs and evidence preserve their declared identities. | PENDING | shared-policies, completeness |
