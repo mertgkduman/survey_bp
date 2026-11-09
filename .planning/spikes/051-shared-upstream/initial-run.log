@@ -1,0 +1,4 @@
+{"checks": 2, "passed": 1, "failed": 1}
+FINDING: shared_native_ldpc 1 validation error for BinaryPolicy
+  Value error, binary vector flooding requires a v2/v3 min_llr policy [type=value_error, input_value={'flooding_policy': BpFlo...d', 'max_iterations': 1}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/value_error

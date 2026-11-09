@@ -112,6 +112,6 @@ bounded contract findings were subsequently closed in order E03 → E01 → E02 
 043–046 verdicts remain unchanged. Publication gates are unchanged.
 
 | 050 | canonical-kernel-audit | Shared policy mathematical contracts | standard | Given heterogeneous signed priors, when ordinary and precision policies execute, then independent factors reproduce candidates, beliefs and stopping. | VALIDATED | shared-policies, completeness |
-| 051 | canonical-kernel-audit | Shared policy upstream correspondence | standard | Given aligned native implementations, when shared execution runs, then agreement and source-specific differences are explicit. | PENDING | shared-policies, completeness |
+| 051 | canonical-kernel-audit | Shared policy upstream correspondence | standard | Given aligned native implementations, when shared execution runs, then agreement and source-specific differences are explicit. | VALIDATED | shared-policies, completeness |
 | 052 | canonical-kernel-audit | Shared policy composition closure | standard | Given accepted policies, when combined and reused, then operands, state lifetime, admission and source semantics remain coherent. | PENDING | shared-policies, completeness |
 | 053 | canonical-kernel-audit | Shared execution and evidence closure | standard | Given the same decoding problem, when public transports and replay execute, then outputs and evidence preserve their declared identities. | PENDING | shared-policies, completeness |
