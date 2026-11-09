@@ -1,0 +1,16 @@
+{
+  "shots": 12,
+  "checks": 64,
+  "variables": 128,
+  "edges": 320,
+  "max_iterations": 10,
+  "seconds": {
+    "compiled": 0.017058301717042923,
+    "scalar": 0.950277803465724
+  },
+  "scalar_over_compiled": 55.70764424434485,
+  "agreement": "exact candidates, iterations and convergence",
+  "includes": "decoding and complete detailed result/ledger serialization",
+  "excludes": "JIT warmup, graph construction and file I/O",
+  "interpretation": "bounded local engineering timing; not a publication scaling result"
+}

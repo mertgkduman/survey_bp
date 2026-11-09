@@ -1,0 +1,9 @@
+{
+  "verified_shots": {
+    "serial": 8,
+    "impulse": 8,
+    "precision": 8
+  },
+  "source": "real Sinter collect worker",
+  "interpretation": "API/ledger qualification only; no curve or decoder ranking claim"
+}

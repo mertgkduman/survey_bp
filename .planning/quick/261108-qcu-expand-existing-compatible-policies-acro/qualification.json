@@ -1,0 +1,114 @@
+{
+  "baseline": "872f7e1",
+  "environment": {
+    "python": "3.12.2",
+    "required_omp_num_threads": "1"
+  },
+  "evidence_sha256": {
+    "final-targeted.log": "5f1ba4e62317060e0d7c7b67a3f2f9483e521549fd73fe3a9d4467c571560e9b",
+    "full-regression-qualified.log": "46e61c9e6c4a78e051dfe940f5d5d17d5d4ff2af617c52b8510099daa3803631",
+    "full-regression.log": "9654f4624b280cf9e313da5bb12342eda6653563f5a020124626f8f04d9c847b",
+    "legacy-baseline.json": "0573b922df43723aa4095091167525ad9aee7aba00d3f9bdf20b70dd436e9002",
+    "legacy-current.json": "0573b922df43723aa4095091167525ad9aee7aba00d3f9bdf20b70dd436e9002",
+    "legacy-parity.json": "4930eaaae15a4a03017381d3f1e8405a27f56b0739e97417926f4b75fb75e3a7",
+    "regression.log": "a5055e46158a66288dec99578ecd586f6ff2573a7b6bbb4ec47d137ff9edc8be",
+    "shared-tests.log": "e9e8ffce17ae826ab4239c399dc163f9ca2d450e94dbf9279be6aa30ab6dc074",
+    "sinter-smoke.log": "05f6ba0e01f3b4f8848101c451724261b97c1185a86c2bd11031a318a2f04a99",
+    "sinter-smoke/circuit.stim": "53894800999bd235cb81ec1166f84041180b43f19ac06ade25877599d1256578",
+    "sinter-smoke/impulse/2cc85fea1f551cd9f1c8893dd8b9d181bc0e13892f58d72164aa522b02698b63-1a9d4cccf64c4cad83db98e8c8f11e26.jsonl": "307ab5af6ad719ee1673db2324625fae976b6a4011a1049905f67eee7849b3ef",
+    "sinter-smoke/impulse/2cc85fea1f551cd9f1c8893dd8b9d181bc0e13892f58d72164aa522b02698b63-1d1865a633194eabbf1518e85980834d.jsonl": "c30c9bde3f7b9f578d00e5765f1cc3abb8c905ee1d50c461159bf3c5ddf9093b",
+    "sinter-smoke/impulse/2cc85fea1f551cd9f1c8893dd8b9d181bc0e13892f58d72164aa522b02698b63-6808e6bed7d845aebf0a25ea34ae7e8e.jsonl": "1fd8f3e6633f5153da0d26b299d3a19259f6d99742bb2a1726117f1970f01589",
+    "sinter-smoke/policies.json": "5b03c59074e4e33d049fb3603b79ce2f9a0b6e27a3ff5e50395095c42ea128f2",
+    "sinter-smoke/precision/2cc85fea1f551cd9f1c8893dd8b9d181bc0e13892f58d72164aa522b02698b63-02abb176aff24001ae1d4f227092b76f.jsonl": "733d8484c42984709861b7a217ea76add31d7fbc3f3742a17c5eaafd05c8c67f",
+    "sinter-smoke/precision/2cc85fea1f551cd9f1c8893dd8b9d181bc0e13892f58d72164aa522b02698b63-18963710931145a6b92b39511a035281.jsonl": "7c9b716abc06e5c46db61946627cadbb157aee20ff5228651fb266cea15e71da",
+    "sinter-smoke/precision/2cc85fea1f551cd9f1c8893dd8b9d181bc0e13892f58d72164aa522b02698b63-d79f169a94394e229c58f86eaed15237.jsonl": "29ddc81445b04836e0cbce6f533d3cea3fad9072d4f7f1635e09024df3e5008a",
+    "sinter-smoke/precision/2cc85fea1f551cd9f1c8893dd8b9d181bc0e13892f58d72164aa522b02698b63-e836cfbee0414bb1bf9de77beb123306.jsonl": "29ddc81445b04836e0cbce6f533d3cea3fad9072d4f7f1635e09024df3e5008a",
+    "sinter-smoke/results.csv": "1287e28bf7d20b00f3082f919e944421406c5dc192c82b853b96b13ca13c1930",
+    "sinter-smoke/serial/2cc85fea1f551cd9f1c8893dd8b9d181bc0e13892f58d72164aa522b02698b63-7fd9b82c3f3043389fc31b822d5a82ff.jsonl": "8be65ca8bc3347e7f0b63bccded68e6c99ab60ca18bf81c297a50b0957729e21",
+    "sinter-smoke/serial/2cc85fea1f551cd9f1c8893dd8b9d181bc0e13892f58d72164aa522b02698b63-dbfe9ba2ecd545b8bf50b6cb4ad7971c.jsonl": "16b57944d36882dfcdd791262b77c79d492d84ecafd42be4f5b113f1dd803a26",
+    "sinter-smoke/serial/2cc85fea1f551cd9f1c8893dd8b9d181bc0e13892f58d72164aa522b02698b63-ddaa557896584f37b752048174bf3049.jsonl": "5db6e1f66fddcf244d466672549451ad8cc7b4888b0a64a089b6ac3523981365",
+    "sinter-smoke/verification.json": "4b5f4ba1d1f04145b11fd64f3f2d3e14babba33e9e15e08dc5fc6a1875558d68",
+    "timing-compiled-warmup.json": "c66f22d8826761a4d9b4ad12d0840d125bb2b98ef812cefc85fa821a80c77d29",
+    "timing-compiled.jsonl": "edf246e44b43eec366f76ac82faddbdbc636c64c38b5a4980bfc85a13db3fff5",
+    "timing-scalar-warmup.json": "d0811a1249afb2b939269d9c803381e9e0d6d13e745d851589d5c3effa38959a",
+    "timing-scalar.jsonl": "8bf80c77afcf1b2fbeb6d8d1dce7167baa27169e7204f1b4b7967948e2035374",
+    "timing.json": "d0159a3ce0cf746f4f80b392042d76d37ac4c7c1ac5769593f215ff704250b4f"
+  },
+  "implementation_commit": "c512723137aa5fbf4f55f0ee5cd4142868cf795c",
+  "initial_environment_failure": "The first broad invocation omitted OMP_NUM_THREADS=1 and was interrupted after manifest admission failures. Its full-regression.log is retained.",
+  "legacy": {
+    "baseline": "872f7e1",
+    "byte_identical": true,
+    "receipts": 82
+  },
+  "log_normalization": {
+    "operation": "trailing whitespace removed; diagnostic content unchanged",
+    "original_sha256": {
+      "full-regression.log": "eb072dfa6f1cbf118113419bb3b5b5f4873b6e7ebade6e7b48ea3bc69f1bd6a8"
+    }
+  },
+  "schema": "kernel-policy-expansion-qualification-v1",
+  "scope_limits": [
+    "No new cross-family Pauli adaptations",
+    "GPU retains previously qualified subset",
+    "No historical campaign rerun or publication-gate promotion",
+    "Release packaging remains outside this task"
+  ],
+  "sinter": {
+    "interpretation": "API/ledger qualification only; no curve or decoder ranking claim",
+    "source": "real Sinter collect worker",
+    "verified_shots": {
+      "impulse": 8,
+      "precision": 8,
+      "serial": 8
+    }
+  },
+  "source_sha256": {
+    "src/bp_registry/canonical/fair_legs.py": "7f16dbf05f87e57ebac1cadfbc487740aa7cd031ab73b490840bc084ba4bf5aa",
+    "src/bp_registry/canonical/group_shuffled.py": "5186f0c5a15b799324dc8947775022673bb97a78dd8fda3b933b251bf2a2872f",
+    "src/bp_registry/canonical/impulse.py": "38b2c75c014e3b4bbacc19790932934ccff1ddc5aff57e206cf6870d51b6d5ea",
+    "src/bp_registry/canonical/intervention_session.py": "13005b691cca6fac424709b729d371ad726159e919df8794a808f31506e3fbcd",
+    "src/bp_registry/canonical/interventions.py": "67792c04eef0b1d121d174bf324e0749d885b495d6c434bdf33a9f09dd838e3a",
+    "src/bp_registry/canonical/mbbp.py": "23921c2b2c8dcdc4e7f7ed789bf5b86645ad645a621dfeb9da537c0c9e91446c",
+    "src/bp_registry/canonical/policy_decoder.py": "899e179afb07c46abf803b0e35bc0a1564dd444d35ddf2e0cc8dcf401b15f0fb",
+    "src/bp_registry/canonical/residual.py": "bb560f29e22bbb31a526b69035dbcfe3223ae32375f696818056f5e4012ad963",
+    "src/bp_registry/canonical/restarting.py": "2f811c9ddf9497a341276aed412e340585b054064fb0d08c14576d8d13f4fd44",
+    "src/bp_registry/canonical/vector_flooding.py": "e8120e17df271fe67eb20405ec7c60121b9711f9531fb61c285120b8a66e225d",
+    "src/bp_registry/circuit/__init__.py": "27e7119fe85c76ce7575e9d57557116ca2ac3c299351a30d09d549bb84c298f2",
+    "src/bp_registry/circuit/policies.py": "c89c7e0e21514f1acd4098069505dacff9fa91ed3a4950f1f7a571c29ce2c010",
+    "src/bp_registry/circuit/shared_policies.py": "d2f5ef653dc8f028db120dcf6c7637800d90e812c5bb63cfb1f9e7aa795dbd13",
+    "src/bp_registry/policy_capabilities.py": "b821b70f52987af489a8c3a7e048220976258f2f69b7ab45a353eda9ee2cf873"
+  },
+  "status": "complete",
+  "tests": {
+    "final_affected": {
+      "log": "final-targeted.log",
+      "passed": 387
+    },
+    "full": {
+      "log": "full-regression-qualified.log",
+      "passed": 2462,
+      "skipped": 20
+    },
+    "new_cases": 125,
+    "note": "Suites overlap. Full regression ran during implementation; the final affected rerun covers all subsequent production edits."
+  },
+  "timing": {
+    "agreement": "exact candidates, iterations and convergence",
+    "checks": 64,
+    "edges": 320,
+    "excludes": "JIT warmup, graph construction and file I/O",
+    "includes": "decoding and complete detailed result/ledger serialization",
+    "interpretation": "bounded local engineering timing; not a publication scaling result",
+    "max_iterations": 10,
+    "scalar_over_compiled": 55.70764424434485,
+    "seconds": {
+      "compiled": 0.017058301717042923,
+      "scalar": 0.950277803465724
+    },
+    "shots": 12,
+    "variables": 128
+  },
+  "timing_context": "Local engineering timing while repository regression was also running; not an isolated scaling result.",
+  "user_scope": "Use only existing/source-defined counterparts"
+}

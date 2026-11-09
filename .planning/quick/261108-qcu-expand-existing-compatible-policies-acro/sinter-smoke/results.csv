@@ -1,0 +1,4 @@
+     shots,    errors,  discards, seconds,decoder,strong_id,json_metadata,custom_counts
+         8,         0,         0,   0.312,serial,331aca2751af9b5f4d90852d1f083f640bcb660d093744f01650bbef1b1dc19b,"{""qualification"":""development_smoke""}",
+         8,         0,         0,    1.23,impulse,187351f478b45bf15a4770a4a76b531807963eca3ed4086a0211af3072925ff0,"{""qualification"":""development_smoke""}",
+         8,         0,         0,   0.582,precision,319108984f8efe9be372dc5a4fbd8b0d6fe98f54d14609dbd0ce7b1c86ef3ab4,"{""qualification"":""development_smoke""}",

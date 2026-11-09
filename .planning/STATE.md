@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Closed E03/E01/E02 in order; pre-HTML kernel audit fixes complete; eight Phase 11 gap plans remain open
-last_updated: "2026-11-08T22:55:45+00:00"
+stopped_at: Expanded compatible CPU and Sinter policies with source-defined counterparts only; Phase 11 publication gaps remain open
+last_updated: "2026-11-09T00:44:27+00:00"
 last_activity: 2026-11-08
-last_activity_desc: Fixed E03 result admission, E01 NMS overflow and E02 inactive controls; 257 regressions and 12 audit groups pass; ordinary outputs unchanged
-state_head: 5855049
+last_activity_desc: Shared CPU/Sinter policies qualified; 2462 broad and 387 final affected tests pass; 82 legacy receipts unchanged
+state_head: c512723
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-08 — completed quick task 261108-oq5 and fix records 047–049
-Last Activity Description: Closed E03 → E01 → E02: circuit results validate before lossless conversion, compiled NMS rejects overflow before clipping, and non-default inactive controller controls are rejected. Final affected regression: 257 passed; independent requalification: 12/12 groups pass. All 1152 factor cases, 360 native cases and 336 policy-matrix configurations retain their ordinary-domain receipts exactly; 32 additional ordinary output ledgers and both 64-shot timing ledgers are byte-identical. Only two circuit policy modules changed; CPU code-capacity/GPU implementation and historical evidence remain unchanged. All bounded pre-HTML audit findings are closed; see spikes/CANONICAL-KERNEL-CIRCUIT-CUDA-FIXES.md and quick/261108-oq5-fix-circuit-contract-findings-e03-e01-e0/SUMMARY.md. Release packaging stays skipped and publication gates/phase position are unchanged.
+Last activity: 2026-11-08 — completed quick task 261108-qcu, compatible policy expansion
+Last Activity Description: Added opt-in shared binary CPU/Stim-Sinter execution with heterogeneous priors, six schedules, five memory policies, nine controllers, indexed/generated coefficients and existing compiled precision policies. The user chose existing/source-defined counterparts only; no generic Pauli adaptations or new GPU paths were introduced. Broad regression: 2462 passed, 20 skipped; final affected rerun: 387 passed, including 125 new cases. All 24 real Sinter worker shot ledgers replay, and 82 complete legacy receipts are byte-identical to frozen baseline 872f7e1. See quick/261108-qcu-expand-existing-compatible-policies-acro/SUMMARY.md and docs/shared-policy-support.md. Historical campaigns, release-packaging scope and publication gates remain unchanged.
 
 Progress: 8 of 14 phases complete (57%); 159 of 176 plans complete. Phase 11 has 17 of 25 plans complete; plan 17 is the first open number but depends on source reviews 18 and 19, while plan 20's blocked-target review is complete.
 
@@ -121,6 +121,8 @@ Phase 02 P10–P16 gap-closure metrics are recorded in their individual summarie
 ### Decisions
 
 Full decisions are in PROJECT.md; workflow choices are in config.json.
+
+- Policy expansion uses only existing/source-defined counterparts, per explicit user choice. `binary-policy-v1` shares compatible binary execution across CPU and circuit fault graphs. Preserve separate named Pauli equations and the qualified GPU subset; expose genuine operand/source/implementation exclusions in the capability inventory.
 
 - Post-extension audit 043–046 supports ordinary BP mathematics and practical policy breadth without a kernel redesign. Its three bounded circuit contract findings were closed E03 → E01 → E02 in quick task 261108-oq5 / spikes 047–049. Use versioned extensions for future policies instead of reopening an unbounded audit. Preserve source-scoped reproduction claims and explicit backend subsets.
 
@@ -280,6 +282,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261108-qcu | Expand compatible policies across CPU and Stim/Sinter kernels | 2026-11-08 | 7f888a1, c512723 | Verified: 2462 broad / 387 affected passes; 24 Sinter shots; 82 identical legacy receipts | [261108-qcu-expand-existing-compatible-policies-acro](./quick/261108-qcu-expand-existing-compatible-policies-acro/) |
 | 261108-oq5 | Fix circuit findings E03 → E01 → E02 in order | 2026-11-08 | d6e8756, 02d890a, 5855049 | Verified: 257 tests; 12/12 audit groups; unchanged ordinary ledgers | [261108-oq5-fix-circuit-contract-findings-e03-e01-e0](./quick/261108-oq5-fix-circuit-contract-findings-e03-e01-e0/) |
 | 261108-meg | Implement compatible circuit policies and binary/Pauli CUDA execution | 2026-11-08 | 90ecfbc, dc43249 | Verified: 2285 regression passes; 34 circuit and 20 H200 checks; 4096 exact GPU/CPU shots | [261108-meg-implement-compatible-circuit-policies-an](./quick/261108-meg-implement-compatible-circuit-policies-an/) |
 | 261102-okz | Consolidate research branches onto main and preserve recovery/evidence | 2026-11-02 | 22f881f | 1,514 passed, 1 skipped; main only; archived 28 original refs and retained three evidence worktrees | [261102-okz-consolidate-research-branches-into-main-](./quick/261102-okz-consolidate-research-branches-into-main-/) |
@@ -344,13 +347,13 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Latest kernel work: quick task 261108-oq5 closes E03 → E01 → E02 in separate commits, recorded as spikes 047–049. See .planning/spikes/CANONICAL-KERNEL-CIRCUIT-CUDA-FIXES.md. All 257 affected tests and 12 audit groups pass; valid output ledgers and prior audit receipts remain unchanged. Earlier D corrections and CPU/GPU qualification remain valid in their stated scopes. Preserve explicit backend/policy admission boundaries and outstanding publication gates.
+Latest kernel work: quick task 261108-qcu expands compatible binary policies through shared CPU/Sinter execution, with source-defined counterparts only. Commits 7f888a1 and c512723; see its SUMMARY.md, qualification.json and docs/shared-policy-support.md. Broad regression passed 2462 tests with 20 skips; final affected coverage passed 387, including 125 new cases. All 24 real Sinter shot ledgers replay and 82 legacy receipts remain byte-identical. Previous E03/E01/E02 fixes and GPU/Pauli qualification retain their stated scopes. Preserve explicit family/backend admission and outstanding publication gates.
 
 **Resume file:** None
 
-Last session: 2026-11-08T22:55:45+00:00
-Stopped at: Completed and qualified all three circuit contract fixes; bounded pre-HTML work complete
-Next step: HTML can use the documented admitted policy subset. Phase 11 scientific gap plans remain open; Phase 5 human review remains open and Phase 7 stays paused.
+Last session: 2026-11-09T00:44:27+00:00
+Stopped at: Compatible policy expansion implemented and qualified; historical interfaces and results preserved
+Next step: HTML can consume the executable capability inventory and shared-policy interfaces. Phase 11 scientific gap plans remain open; Phase 5 human review remains open and Phase 7 stays paused.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
 Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md`.
