@@ -1,0 +1,7 @@
+{
+  "operation": "trailing whitespace removed; diagnostic content unchanged",
+  "original_sha256": {
+    "f02-red.log": "40a8f617d8a5a973cb8c52fb45b61033ed6d79e7636f542e34509fea9c84fcd0",
+    "f01-red.log": "05f322bb5b9e626c265044157d9835854fe52037da387db142ec71c553f1c682"
+  }
+}

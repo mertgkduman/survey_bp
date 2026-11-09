@@ -22,6 +22,9 @@ schedules and give new shared Sinter execution a versioned, observation-based
 random identity. Shared-v2 predictions and per-shot execution are independent of
 batch partition and ordering; shared-v1 evidence replays with its historical
 batch-index identity. See [identity semantics and migration](shared-policy-support.md#random-identity-and-historical-replay).
+The [closure and result-impact report](../.planning/spikes/CANONICAL-KERNEL-SHARED-POLICY-FIXES.md)
+records the passing regression, historical replay and preserved campaign inventory
+for HTML integration.
 
 ## Capability and admission map
 

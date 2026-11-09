@@ -1,0 +1,152 @@
+{
+  "admission": "BinaryPolicy plus BinaryPolicyDecoder graph admission; existing Pauli and GPU constructors",
+  "gpu": {
+    "entry_point": "gpu.CudaFlooding",
+    "excluded": [
+      "serial_and_residual_schedules",
+      "branching_controllers",
+      "general_memory_histories",
+      "generated_or_indexed_assignments",
+      "non_float64_message_formats",
+      "shared_sinter_transport"
+    ],
+    "existing": [
+      "binary_flooding",
+      "pauli_flooding",
+      "float64_spa_v3",
+      "ms_nms_oms",
+      "damping",
+      "shot_batching"
+    ],
+    "reason": "retain the hardware-qualified subset; no new GPU implementation or implicit host fallback"
+  },
+  "pauli": {
+    "binary_ports": "excluded unless a separately defined Pauli recurrence already exists; no new adaptations",
+    "circuit_boundary": "a DEM exposes binary fault mechanisms, not joint Pauli variables or CSS splitter operands",
+    "entry_points": [
+      "quaternary.kernel",
+      "quaternary.schedules",
+      "quaternary.compiled",
+      "quaternary.mbp4",
+      "quaternary.qbpgd",
+      "quaternary.asced"
+    ],
+    "existing_counterparts": [
+      "scalar_llr_bp4",
+      "compiled_flooding_spa_ms_nms_oms",
+      "six_message_formats",
+      "flooding",
+      "variable_serial",
+      "c2v_normalization",
+      "c2v_offset",
+      "fixed_alpha_mbp4",
+      "qbpgd",
+      "css_asced",
+      "css_asced_overcomplete"
+    ]
+  },
+  "required_operands_and_exclusions": {
+    "adaptive_mbp4": "no complete source contract in the implemented registry",
+    "cluster_learned": "artifact admission exists, but no trained scheduling executor is implemented; not advertised as runnable",
+    "group_shuffled": "at least two checks, source size-two overlap-one groups and SPA",
+    "layered": "explicit conflict-free partition covering all original checks",
+    "mbbp": "declared original-row transforms; member evidence retains canonical-adaptation qualification",
+    "osd_lsd": "optional separate postprocessors/native references, not BP kernel policies",
+    "otf": "existing CSS optional adaptation remains available; source circuit procedure is explicitly blocked in postprocessing/otf.py",
+    "pdprime": "fixed prior and first field position; preceding affine-prior or field transforms are rejected on flooding and local schedules",
+    "residual": "nonempty edge pool, undamped SPA, existing residual lifecycle",
+    "restart_belief": "explicit source exact-distance declaration or existing B1-only mechanism; no inferred circuit distance",
+    "si": "existing CSS-only optional adaptation requires opposite stabilizer support; no defined DEM counterpart"
+  },
+  "scope": "existing_or_source_defined_counterparts_only",
+  "shared_binary_and_circuit": {
+    "assignment_shapes": [
+      "scalar",
+      "source_iteration",
+      "check",
+      "edge"
+    ],
+    "circuit_identity": {
+      "default": "observation-v2",
+      "historical_replay": "batch-index-v1; circuit-shared-policy-ledger-v1",
+      "independent_trials": "CPU accepts explicit shot_identity; Sinter transport supplies no global trial ID",
+      "key": "versioned model/policy context plus normalized detector bytes",
+      "ledger_schema": "circuit-shared-policy-ledger-v2",
+      "repeated_observations": "same model, policy and observation use the same random stream"
+    },
+    "compiled": [
+      "ordinary_scalar_parameter_flooding",
+      "explicit_bp_flooding_policy_v2_v3"
+    ],
+    "controllers": [
+      "single",
+      "guided_decimation",
+      "impulse",
+      "freezing",
+      "syndrome_flip",
+      "sign_flip",
+      "restart_belief",
+      "mbbp",
+      "beam",
+      "relay"
+    ],
+    "damped_interventions": [
+      "guided_decimation",
+      "impulse_exact_shortening",
+      "freezing",
+      "syndrome_flip",
+      "sign_flip",
+      "restart_belief"
+    ],
+    "ensemble_selection": [
+      "mbbp_frequency_over_weight",
+      "mbbp_coordinate_majority_declared_tie"
+    ],
+    "entry_points": [
+      "canonical.policy_decoder.BinaryPolicyDecoder",
+      "circuit.SharedPolicySinterDecoder"
+    ],
+    "generated_assignment_refresh": [
+      "configuration",
+      "attempt",
+      "source_iteration"
+    ],
+    "memory": [
+      "affine_prior",
+      "v2c_damping",
+      "pdbp_field_mix",
+      "pdprime_delta_mix",
+      "posterior_momentum"
+    ],
+    "message_formats": [
+      "float16",
+      "float32",
+      "float64",
+      "int8",
+      "int16",
+      "int32"
+    ],
+    "precision_note": "message rounding with float64 arithmetic; no native low-bit speed claim",
+    "qualification": "shared existing binary equations; source controller qualifications are retained; no circuit curve reproduction claim",
+    "randomized_traversal": [
+      "layered",
+      "check_node_serial",
+      "variable_node_serial"
+    ],
+    "schedules": [
+      "flooding",
+      "layered",
+      "check_node_serial",
+      "variable_node_serial",
+      "group_shuffled",
+      "residual"
+    ],
+    "updates": [
+      "spa",
+      "min_sum",
+      "normalized_min_sum",
+      "offset_min_sum"
+    ]
+  },
+  "version": "policy-capabilities-v2"
+}

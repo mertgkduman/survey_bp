@@ -1,0 +1,2 @@
+82 complete legacy receipts
+{"legacy": {"receipts": 82, "byte_identical": true, "baseline": "872f7e1", "sha256": "0573b922df43723aa4095091167525ad9aee7aba00d3f9bdf20b70dd436e9002"}, "shared_v1": {"ledgers": 15, "shots": 58, "exact_replay": true}, "tests": {"f01-admission-final.log": {"passed": 38, "skipped": 0}, "kernel-regression.log": {"passed": 1712, "skipped": 20}, "f02-final.log": {"passed": 161, "skipped": 0}}, "affected_campaigns": 0}

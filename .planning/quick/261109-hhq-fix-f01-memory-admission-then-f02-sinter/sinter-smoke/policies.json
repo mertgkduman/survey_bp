@@ -1,0 +1,97 @@
+{
+  "serial-observation-v2": {
+    "version": "binary-policy-v1",
+    "backend": "auto",
+    "rule": "spa",
+    "parameter": {
+      "shape": "scalar",
+      "value": 1.0,
+      "values": null,
+      "graph_sha256": null
+    },
+    "parameter_refresh": null,
+    "flooding_policy": null,
+    "max_iterations": 4,
+    "schedule": "check_node_serial",
+    "partitions": null,
+    "randomized": "attempt",
+    "seed": "binary-policy-v1",
+    "memory": null,
+    "controller": "single",
+    "options": {},
+    "damping_gamma": null,
+    "vote_tie_bit": null
+  },
+  "group-observation-v2": {
+    "version": "binary-policy-v1",
+    "backend": "auto",
+    "rule": "spa",
+    "parameter": {
+      "shape": "scalar",
+      "value": 1.0,
+      "values": null,
+      "graph_sha256": null
+    },
+    "parameter_refresh": null,
+    "flooding_policy": null,
+    "max_iterations": 4,
+    "schedule": "group_shuffled",
+    "partitions": null,
+    "randomized": null,
+    "seed": "binary-policy-v1",
+    "memory": null,
+    "controller": "single",
+    "options": {},
+    "damping_gamma": null,
+    "vote_tie_bit": null
+  },
+  "memory-observation-v2": {
+    "version": "binary-policy-v1",
+    "backend": "auto",
+    "rule": "spa",
+    "parameter": {
+      "shape": "scalar",
+      "value": 1.0,
+      "values": null,
+      "graph_sha256": null
+    },
+    "parameter_refresh": null,
+    "flooding_policy": null,
+    "max_iterations": 4,
+    "schedule": "check_node_serial",
+    "partitions": null,
+    "randomized": null,
+    "seed": "binary-policy-v1",
+    "memory": {
+      "bindings": [
+        {
+          "binding_id": "prior",
+          "kind": "affine_prior",
+          "target": "prior",
+          "parameters": {
+            "alpha": 0.5
+          },
+          "order": 0,
+          "history_owner": "history:prior",
+          "state_lifetime": "attempt",
+          "advance_boundary": "source_iteration",
+          "refresh_boundary": "attempt_start",
+          "source_status": "canonical_adaptation",
+          "retain_history": false,
+          "assignment": {
+            "mode": "uniform",
+            "low": 0.2,
+            "high": 0.8,
+            "root_seed_identity": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "refresh_boundary": "source_iteration",
+            "rng_algorithm": "numpy.PCG64"
+          }
+        }
+      ]
+    },
+    "controller": "single",
+    "options": {},
+    "damping_gamma": null,
+    "vote_tie_bit": null
+  }
+}

@@ -1,0 +1,60 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_sinter_randomized_counterexample_is_independent_of_batch_partition[attempt] _
+
+scope = 'attempt'
+
+    @pytest.mark.parametrize("scope", ["attempt", "sweep"])
+    def test_sinter_randomized_counterexample_is_independent_of_batch_partition(scope):
+        dem, events = chunking_fixture()
+        decoder = SharedPolicySinterDecoder(BinaryPolicy(schedule="variable_node_serial", randomized=scope,
+            rule="min_sum", max_iterations=5)).compile_decoder_for_dem(dem=dem)
+        packed = np.packbits(events, axis=1, bitorder="little")
+        together = decoder.decode_shots_bit_packed(bit_packed_detection_event_data=packed)
+        separated = np.vstack([decoder.decode_shots_bit_packed(bit_packed_detection_event_data=row[None]) for row in packed])
+>       np.testing.assert_array_equal(together, separated)
+E       AssertionError:
+E       Arrays are not equal
+E
+E       Mismatched elements: 1 / 8 (12.5%)
+E       Max absolute difference among violations: 104
+E       Max relative difference among violations: 0.54166667
+E        ACTUAL: array([[192],
+E              [192],
+E              [192],...
+E        DESIRED: array([[192],
+E              [192],
+E              [192],...
+
+tests/canonical/test_shared_policy_decoder.py:352: AssertionError
+_ test_sinter_randomized_counterexample_is_independent_of_batch_partition[sweep] _
+
+scope = 'sweep'
+
+    @pytest.mark.parametrize("scope", ["attempt", "sweep"])
+    def test_sinter_randomized_counterexample_is_independent_of_batch_partition(scope):
+        dem, events = chunking_fixture()
+        decoder = SharedPolicySinterDecoder(BinaryPolicy(schedule="variable_node_serial", randomized=scope,
+            rule="min_sum", max_iterations=5)).compile_decoder_for_dem(dem=dem)
+        packed = np.packbits(events, axis=1, bitorder="little")
+        together = decoder.decode_shots_bit_packed(bit_packed_detection_event_data=packed)
+        separated = np.vstack([decoder.decode_shots_bit_packed(bit_packed_detection_event_data=row[None]) for row in packed])
+>       np.testing.assert_array_equal(together, separated)
+E       AssertionError:
+E       Arrays are not equal
+E
+E       Mismatched elements: 1 / 8 (12.5%)
+E       Max absolute difference among violations: 104
+E       Max relative difference among violations: 0.54166667
+E        ACTUAL: array([[192],
+E              [192],
+E              [ 40],...
+E        DESIRED: array([[192],
+E              [192],
+E              [192],...
+
+tests/canonical/test_shared_policy_decoder.py:352: AssertionError
+=========================== short test summary info ============================
+FAILED tests/canonical/test_shared_policy_decoder.py::test_sinter_randomized_counterexample_is_independent_of_batch_partition[attempt]
+FAILED tests/canonical/test_shared_policy_decoder.py::test_sinter_randomized_counterexample_is_independent_of_batch_partition[sweep]
+2 failed, 157 deselected in 3.50s

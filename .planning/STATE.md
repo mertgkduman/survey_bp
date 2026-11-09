@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Shared policy audit complete; fix F01 local memory admission then F02 Sinter random identity before full interface freeze
-last_updated: "2026-11-09T02:44:40+00:00"
+stopped_at: F01 and F02 fixed and qualified; HTML may consume the supported inventory and preserved result qualifications
+last_updated: "2026-11-09T17:47:36+00:00"
 last_activity: 2026-11-09
-last_activity_desc: Audit 050-053 supports mathematics and breadth; two composition/identity findings remain; 290 focused tests pass
-state_head: 9ca544c
+last_activity_desc: F01 then F02 closed; 1712 kernel tests pass; legacy and shared-v1 replay preserved; no affected tracked campaign found
+state_head: 78f1c1c
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-09 — completed shared policy audit 050–053
-Last Activity Description: Audited shared policy expansion at production baseline d031436 without changing decoder behavior. 2,880 independent factor/precision comparisons and 1,188 aligned ldpc/Relay comparisons pass; a 432-configuration matrix admits 200 and rejects 232 as expected; nine controllers pass 216 original-problem checks. Fresh focused regression: 290 passed. Two material findings remain: F01 local affine-prior + fixed-prior PD-prime admission silently discards the changed prior; F02 batch-local Sinter shot identity changes randomized predictions under chunking. Recommended correction order F01 → F02, with versioned identity and historical replay. See spikes/CANONICAL-KERNEL-SHARED-POLICY-AUDIT.md. Prior full regression, 82 legacy receipts, 24 Sinter smoke shots and H200 qualification are carried only after source/evidence hash checks. No blanket experiment rerun is indicated; publication gates remain unchanged.
+Last activity: 2026-11-09 — closed shared policy findings F01 → F02
+Last Activity Description: Quick task 261109-hhq rejects invalid changing-prior PD-prime compositions and gives new shared Sinter execution observation-v2 identity with exact shared-v1 replay. Final production regression: 1,712 passed, 20 skipped; final shared decoder tests: 161 passed (overlapping suites). Real Sinter worker: 24 verified v2 shots; earlier shared-v1: 15 ledgers / 58 shots replayed; 82 legacy receipts byte-identical. Scanned and hashed 3,839 tracked data/experiment files without finding an affected campaign; all remain unchanged. Prior mathematics, upstream and GPU evidence is carried by source/evidence hashes. HTML can consume the qualified inventory; scientific publication gates remain unchanged. See spikes/CANONICAL-KERNEL-SHARED-POLICY-FIXES.md.
 
 Progress: 8 of 14 phases complete (57%); 159 of 176 plans complete. Phase 11 has 17 of 25 plans complete; plan 17 is the first open number but depends on source reviews 18 and 19, while plan 20's blocked-target review is complete.
 
@@ -120,7 +120,7 @@ Phase 02 P10–P16 gap-closure metrics are recorded in their individual summarie
 
 ### Decisions
 
-- Shared-policy audit 050–053 found no core mathematical redesign need. Close F01 (local fixed-prior memory admission) then F02 (transport-independent Sinter random identity) before freezing the entire expanded interface. Keep source-defined counterparts, explicit backend exclusions and old receipt replay. Do not treat internally replayable evidence alone as proof of correct composition or transport independence.
+- Shared-policy audit 050–053 required no core mathematical redesign. F01 and F02 are closed in quick task 261109-hhq. Freeze the qualified interface with observation-v2 for new shared Sinter execution and explicit historical v1 replay. Repeated identical observations share randomness under the same policy/model; independent replicas require distinct seeds. Keep source-defined counterparts, explicit backend exclusions, old receipts and scientific result qualifications.
 
 Full decisions are in PROJECT.md; workflow choices are in config.json.
 
@@ -260,9 +260,9 @@ None outside the roadmap.
 
 ### Blockers/Concerns
 
-- Full shared-policy interface freeze awaits F01/F02 from spikes 050–053; see the consolidated shared-policy audit. This is separate from existing scientific/publication gates.
+- F01/F02 are closed and qualified; no open correction from audit 050–053 blocks HTML integration over the documented supported subset. See spikes/CANONICAL-KERNEL-SHARED-POLICY-FIXES.md. Existing scientific/publication gates remain separate.
 
-- Prior circuit/CUDA audit findings E03/E01/E02 are closed with 257 regression passes and 12/12 audit groups. Those corrections remain qualified; the newer shared-policy findings F01/F02 above govern the expanded-interface freeze. Scientific publication gates below remain separate; see spikes/CANONICAL-KERNEL-CIRCUIT-CUDA-FIXES.md.
+- Prior circuit/CUDA audit findings E03/E01/E02 remain closed with 257 regression passes and 12/12 audit groups. Shared-policy F01/F02 are now closed as well. Scientific publication gates below remain separate; see spikes/CANONICAL-KERNEL-CIRCUIT-CUDA-FIXES.md and CANONICAL-KERNEL-SHARED-POLICY-FIXES.md.
 
 - [Phase 11] Eight gap plans remain open: 11-18 aSCED Figure 2 review and user-deferred 11-19 Q-BPGD Figure 7 review gate 11-17 policy replay and 11-21 resource qualification; 11-22 authorization, 11-23/24 campaigns, and 11-25 final verification depend on those outcomes. Completed 11-20 retains the MBP4 Figure 6 mechanism-only, zero-shot target. The current preserve-deny decision remains in force; no controlled effect or source-curve reproduction is established.
 - [Phase 09] Exact author experiment artifacts, source settings, and executable native assessments are still unverified; EVAL-01/02 remain pending. The Yao B1 adaptation is cap censored. Site resource ceilings and scheduler accounting remain unavailable, so publication dispatch is denied.
@@ -286,6 +286,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261109-hhq | Fix shared-policy findings F01 → F02 and qualify result preservation | 2026-11-09 | fd5c3d0, 78f1c1c | Verified: 1712 kernel / 161 final shared passes; 24 Sinter v2 shots; 82 identical legacy receipts; 58 shared-v1 shots replayed | [261109-hhq-fix-f01-memory-admission-then-f02-sinter](./quick/261109-hhq-fix-f01-memory-admission-then-f02-sinter/) |
 | 261108-qcu | Expand compatible policies across CPU and Stim/Sinter kernels | 2026-11-08 | 7f888a1, c512723 | Verified: 2462 broad / 387 affected passes; 24 Sinter shots; 82 identical legacy receipts | [261108-qcu-expand-existing-compatible-policies-acro](./quick/261108-qcu-expand-existing-compatible-policies-acro/) |
 | 261108-oq5 | Fix circuit findings E03 → E01 → E02 in order | 2026-11-08 | d6e8756, 02d890a, 5855049 | Verified: 257 tests; 12/12 audit groups; unchanged ordinary ledgers | [261108-oq5-fix-circuit-contract-findings-e03-e01-e0](./quick/261108-oq5-fix-circuit-contract-findings-e03-e01-e0/) |
 | 261108-meg | Implement compatible circuit policies and binary/Pauli CUDA execution | 2026-11-08 | 90ecfbc, dc43249 | Verified: 2285 regression passes; 34 circuit and 20 H200 checks; 4096 exact GPU/CPU shots | [261108-meg-implement-compatible-circuit-policies-an](./quick/261108-meg-implement-compatible-circuit-policies-an/) |
@@ -351,13 +352,13 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Latest kernel work: completed audit 050–053 of the compatible shared policy expansion. See spikes/CANONICAL-KERNEL-SHARED-POLICY-AUDIT.md and SHARED-POLICY-AUDIT-VERIFICATION.json. Independent mathematics and aligned native execution pass, broad policy coverage is supported, and 290 focused regressions pass. F01 and F02 remain open, with counterexamples and correction scope retained. Production source remains d031436/c512723; no historical result was changed. Prior full suite, legacy parity, Sinter smoke and GPU receipts were hash-verified rather than relabelled as fresh runs.
+Latest kernel work: completed F01 → F02 corrections and qualification in quick task 261109-hhq, implementation 78f1c1c. See spikes/CANONICAL-KERNEL-SHARED-POLICY-FIXES.md and quick/261109-hhq-fix-f01-memory-admission-then-f02-sinter/qualification.json. Kernel regression: 1,712 passed / 20 skipped; final shared suite: 161 passed. Exact legacy/shared-v1 replay and real Sinter v2 worker execution pass. All 3,839 tracked result/data files are preserved, with no affected campaign found. Pauli/GPU source and prior qualification remain unchanged; prior evidence is not relabelled as fresh execution.
 
 **Resume file:** None
 
 Last session: 2026-11-09T02:44:40+00:00
 Stopped at: Audit complete; two material composition/reproducibility corrections remain before full interface freeze
-Next step: Correct F01 → F02 with targeted regressions, old-ledger replay and explicit new identity versioning; then HTML can consume the qualified inventory. No blanket experiment rerun. Phase 11 scientific gaps and Phase 5 human review remain open; Phase 7 stays paused.
+Next step: HTML can consume policy-capabilities-v2 and existing result manifests, preserving identity versions and scientific qualification labels. No blanket experiment rerun is indicated by F01/F02. Phase 11 scientific gaps and Phase 5 human review remain open; Phase 7 stays paused.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
 Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md`.

@@ -115,4 +115,4 @@ bounded contract findings were subsequently closed in order E03 → E01 → E02 
 047–049; see [closure report](CANONICAL-KERNEL-CIRCUIT-CUDA-FIXES.md). Historical
 043–046 verdicts remain unchanged. Publication gates are unchanged.
 
-Shared-policy audit 050–053: [consolidated report](CANONICAL-KERNEL-SHARED-POLICY-AUDIT.md). Independent mathematics and aligned native execution pass. F01 local fixed-prior composition admission and F02 Sinter batch-dependent random identity remain open; production behavior and historical evidence are unchanged.
+Shared-policy audit 050–053: [consolidated report](CANONICAL-KERNEL-SHARED-POLICY-AUDIT.md). Independent mathematics and aligned native execution pass. F01 local fixed-prior composition admission and F02 Sinter batch-dependent random identity were subsequently closed in that order by quick task 261109-hhq; see the [correction and result-impact report](CANONICAL-KERNEL-SHARED-POLICY-FIXES.md). Historical 050–053 verdicts and campaign evidence remain unchanged.

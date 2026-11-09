@@ -1,0 +1,16 @@
+{
+  "aligned_upstream_cases_carried": 1188,
+  "changed_source_files": [
+    "src/bp_registry/canonical/compatibility.py",
+    "src/bp_registry/canonical/memory_execution.py",
+    "src/bp_registry/circuit/shared_policies.py",
+    "src/bp_registry/policy_capabilities.py"
+  ],
+  "gpu_hardware_shots_carried": 4096,
+  "independent_mathematics_cases_carried": 2880,
+  "interpretation": "Existing mathematical/native/hardware evidence carried after source and evidence hash checks; not fresh hardware execution",
+  "new_gpu_execution": false,
+  "pauli_and_gpu_source_unchanged": true,
+  "prior_evidence_files": 28,
+  "unchanged_source_files": 119
+}

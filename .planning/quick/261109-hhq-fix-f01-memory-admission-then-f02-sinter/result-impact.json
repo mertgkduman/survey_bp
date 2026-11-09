@@ -1,0 +1,24 @@
+{
+  "affected_campaigns_found": 0,
+  "identity_migration": "New randomized shared Sinter results use observation-v2; do not append to a v1 experiment identity",
+  "limitation": "Untracked/private campaigns are not exhaustively scanned or scientifically revalidated; publication gates are unchanged",
+  "matches": {
+    "SharedPolicySinterDecoder": [],
+    "circuit-shared-policy-ledger": [],
+    "pdprime_delta_mix": [
+      "data/evidence/phase4-factorial-execution-supplement-v1.json",
+      "data/evidence/phase4-pilot-design.json",
+      "data/manifests/schema-canonical-v4.json"
+    ]
+  },
+  "roots": [
+    "data",
+    "manifests",
+    "experiments",
+    "from_dr_pfister_presentetations"
+  ],
+  "scope": "git-tracked files in declared roots",
+  "selective_rerun": "none identified in tracked campaigns; old audit counterexamples remain historical evidence",
+  "tracked_files": 3839,
+  "unchanged_since_baseline": "82311bd"
+}

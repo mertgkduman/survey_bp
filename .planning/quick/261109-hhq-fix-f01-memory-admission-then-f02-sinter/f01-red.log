@@ -1,0 +1,154 @@
+FFFFFF...                                                                [100%]
+=================================== FAILURES ===================================
+__ test_local_pdprime_rejects_changing_prior_before_execution[False-layered] ___
+
+schedule = 'layered', disordered = False
+
+    @pytest.mark.parametrize("schedule", ["layered", "check_node_serial", "variable_node_serial"])
+    @pytest.mark.parametrize("disordered", [False, True])
+    def test_local_pdprime_rejects_changing_prior_before_execution(schedule, disordered):
+        from bp_registry.canonical.memory_execution import validate_single_attempt_memory, LocalMemoryExecution
+        from bp_registry.canonical.policy_decoder import BinaryPolicy
+
+        assignment = (dict(mode="uniform", low=.2, high=.8, root_seed_identity="f" * 64,
+                           refresh_boundary="source_iteration", rng_algorithm="numpy.PCG64")
+                      if disordered else None)
+        memory = _composition("affine_prior", "pdprime_delta_mix", assignment=assignment)
+        for construct in (
+            lambda: validate_single_attempt_memory(memory, schedule=schedule),
+            lambda: LocalMemoryExecution(EdgeTable.from_edges(1, 2, [(0, 0), (0, 1)]), memory=memory),
+            lambda: BinaryPolicy(schedule=schedule, memory=memory,
+                                 partitions=((0,),) if schedule == "layered" else None),
+        ):
+>           with pytest.raises(ValueError, match="pdprime_requires_fixed_prior"):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_local_memory_execution.py:103: Failed
+_ test_local_pdprime_rejects_changing_prior_before_execution[False-check_node_serial] _
+
+schedule = 'check_node_serial', disordered = False
+
+    @pytest.mark.parametrize("schedule", ["layered", "check_node_serial", "variable_node_serial"])
+    @pytest.mark.parametrize("disordered", [False, True])
+    def test_local_pdprime_rejects_changing_prior_before_execution(schedule, disordered):
+        from bp_registry.canonical.memory_execution import validate_single_attempt_memory, LocalMemoryExecution
+        from bp_registry.canonical.policy_decoder import BinaryPolicy
+
+        assignment = (dict(mode="uniform", low=.2, high=.8, root_seed_identity="f" * 64,
+                           refresh_boundary="source_iteration", rng_algorithm="numpy.PCG64")
+                      if disordered else None)
+        memory = _composition("affine_prior", "pdprime_delta_mix", assignment=assignment)
+        for construct in (
+            lambda: validate_single_attempt_memory(memory, schedule=schedule),
+            lambda: LocalMemoryExecution(EdgeTable.from_edges(1, 2, [(0, 0), (0, 1)]), memory=memory),
+            lambda: BinaryPolicy(schedule=schedule, memory=memory,
+                                 partitions=((0,),) if schedule == "layered" else None),
+        ):
+>           with pytest.raises(ValueError, match="pdprime_requires_fixed_prior"):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_local_memory_execution.py:103: Failed
+_ test_local_pdprime_rejects_changing_prior_before_execution[False-variable_node_serial] _
+
+schedule = 'variable_node_serial', disordered = False
+
+    @pytest.mark.parametrize("schedule", ["layered", "check_node_serial", "variable_node_serial"])
+    @pytest.mark.parametrize("disordered", [False, True])
+    def test_local_pdprime_rejects_changing_prior_before_execution(schedule, disordered):
+        from bp_registry.canonical.memory_execution import validate_single_attempt_memory, LocalMemoryExecution
+        from bp_registry.canonical.policy_decoder import BinaryPolicy
+
+        assignment = (dict(mode="uniform", low=.2, high=.8, root_seed_identity="f" * 64,
+                           refresh_boundary="source_iteration", rng_algorithm="numpy.PCG64")
+                      if disordered else None)
+        memory = _composition("affine_prior", "pdprime_delta_mix", assignment=assignment)
+        for construct in (
+            lambda: validate_single_attempt_memory(memory, schedule=schedule),
+            lambda: LocalMemoryExecution(EdgeTable.from_edges(1, 2, [(0, 0), (0, 1)]), memory=memory),
+            lambda: BinaryPolicy(schedule=schedule, memory=memory,
+                                 partitions=((0,),) if schedule == "layered" else None),
+        ):
+>           with pytest.raises(ValueError, match="pdprime_requires_fixed_prior"):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_local_memory_execution.py:103: Failed
+___ test_local_pdprime_rejects_changing_prior_before_execution[True-layered] ___
+
+schedule = 'layered', disordered = True
+
+    @pytest.mark.parametrize("schedule", ["layered", "check_node_serial", "variable_node_serial"])
+    @pytest.mark.parametrize("disordered", [False, True])
+    def test_local_pdprime_rejects_changing_prior_before_execution(schedule, disordered):
+        from bp_registry.canonical.memory_execution import validate_single_attempt_memory, LocalMemoryExecution
+        from bp_registry.canonical.policy_decoder import BinaryPolicy
+
+        assignment = (dict(mode="uniform", low=.2, high=.8, root_seed_identity="f" * 64,
+                           refresh_boundary="source_iteration", rng_algorithm="numpy.PCG64")
+                      if disordered else None)
+        memory = _composition("affine_prior", "pdprime_delta_mix", assignment=assignment)
+        for construct in (
+            lambda: validate_single_attempt_memory(memory, schedule=schedule),
+            lambda: LocalMemoryExecution(EdgeTable.from_edges(1, 2, [(0, 0), (0, 1)]), memory=memory),
+            lambda: BinaryPolicy(schedule=schedule, memory=memory,
+                                 partitions=((0,),) if schedule == "layered" else None),
+        ):
+>           with pytest.raises(ValueError, match="pdprime_requires_fixed_prior"):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_local_memory_execution.py:103: Failed
+_ test_local_pdprime_rejects_changing_prior_before_execution[True-check_node_serial] _
+
+schedule = 'check_node_serial', disordered = True
+
+    @pytest.mark.parametrize("schedule", ["layered", "check_node_serial", "variable_node_serial"])
+    @pytest.mark.parametrize("disordered", [False, True])
+    def test_local_pdprime_rejects_changing_prior_before_execution(schedule, disordered):
+        from bp_registry.canonical.memory_execution import validate_single_attempt_memory, LocalMemoryExecution
+        from bp_registry.canonical.policy_decoder import BinaryPolicy
+
+        assignment = (dict(mode="uniform", low=.2, high=.8, root_seed_identity="f" * 64,
+                           refresh_boundary="source_iteration", rng_algorithm="numpy.PCG64")
+                      if disordered else None)
+        memory = _composition("affine_prior", "pdprime_delta_mix", assignment=assignment)
+        for construct in (
+            lambda: validate_single_attempt_memory(memory, schedule=schedule),
+            lambda: LocalMemoryExecution(EdgeTable.from_edges(1, 2, [(0, 0), (0, 1)]), memory=memory),
+            lambda: BinaryPolicy(schedule=schedule, memory=memory,
+                                 partitions=((0,),) if schedule == "layered" else None),
+        ):
+>           with pytest.raises(ValueError, match="pdprime_requires_fixed_prior"):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_local_memory_execution.py:103: Failed
+_ test_local_pdprime_rejects_changing_prior_before_execution[True-variable_node_serial] _
+
+schedule = 'variable_node_serial', disordered = True
+
+    @pytest.mark.parametrize("schedule", ["layered", "check_node_serial", "variable_node_serial"])
+    @pytest.mark.parametrize("disordered", [False, True])
+    def test_local_pdprime_rejects_changing_prior_before_execution(schedule, disordered):
+        from bp_registry.canonical.memory_execution import validate_single_attempt_memory, LocalMemoryExecution
+        from bp_registry.canonical.policy_decoder import BinaryPolicy
+
+        assignment = (dict(mode="uniform", low=.2, high=.8, root_seed_identity="f" * 64,
+                           refresh_boundary="source_iteration", rng_algorithm="numpy.PCG64")
+                      if disordered else None)
+        memory = _composition("affine_prior", "pdprime_delta_mix", assignment=assignment)
+        for construct in (
+            lambda: validate_single_attempt_memory(memory, schedule=schedule),
+            lambda: LocalMemoryExecution(EdgeTable.from_edges(1, 2, [(0, 0), (0, 1)]), memory=memory),
+            lambda: BinaryPolicy(schedule=schedule, memory=memory,
+                                 partitions=((0,),) if schedule == "layered" else None),
+        ):
+>           with pytest.raises(ValueError, match="pdprime_requires_fixed_prior"):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/canonical/test_local_memory_execution.py:103: Failed
+=========================== short test summary info ============================
+FAILED tests/canonical/test_local_memory_execution.py::test_local_pdprime_rejects_changing_prior_before_execution[False-layered]
+FAILED tests/canonical/test_local_memory_execution.py::test_local_pdprime_rejects_changing_prior_before_execution[False-check_node_serial]
+FAILED tests/canonical/test_local_memory_execution.py::test_local_pdprime_rejects_changing_prior_before_execution[False-variable_node_serial]
+FAILED tests/canonical/test_local_memory_execution.py::test_local_pdprime_rejects_changing_prior_before_execution[True-layered]
+FAILED tests/canonical/test_local_memory_execution.py::test_local_pdprime_rejects_changing_prior_before_execution[True-check_node_serial]
+FAILED tests/canonical/test_local_memory_execution.py::test_local_pdprime_rejects_changing_prior_before_execution[True-variable_node_serial]
+6 failed, 3 passed, 22 deselected in 3.90s

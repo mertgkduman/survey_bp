@@ -1,0 +1,92 @@
+[
+  {
+    "path": ".planning/quick/261108-qcu-expand-existing-compatible-policies-acro/sinter-smoke/impulse/2cc85fea1f551cd9f1c8893dd8b9d181bc0e13892f58d72164aa522b02698b63-1a9d4cccf64c4cad83db98e8c8f11e26.jsonl",
+    "sha256": "307ab5af6ad719ee1673db2324625fae976b6a4011a1049905f67eee7849b3ef",
+    "shots": 1,
+    "verified": true
+  },
+  {
+    "path": ".planning/quick/261108-qcu-expand-existing-compatible-policies-acro/sinter-smoke/impulse/2cc85fea1f551cd9f1c8893dd8b9d181bc0e13892f58d72164aa522b02698b63-1d1865a633194eabbf1518e85980834d.jsonl",
+    "sha256": "c30c9bde3f7b9f578d00e5765f1cc3abb8c905ee1d50c461159bf3c5ddf9093b",
+    "shots": 3,
+    "verified": true
+  },
+  {
+    "path": ".planning/quick/261108-qcu-expand-existing-compatible-policies-acro/sinter-smoke/impulse/2cc85fea1f551cd9f1c8893dd8b9d181bc0e13892f58d72164aa522b02698b63-6808e6bed7d845aebf0a25ea34ae7e8e.jsonl",
+    "sha256": "1fd8f3e6633f5153da0d26b299d3a19259f6d99742bb2a1726117f1970f01589",
+    "shots": 4,
+    "verified": true
+  },
+  {
+    "path": ".planning/quick/261108-qcu-expand-existing-compatible-policies-acro/sinter-smoke/precision/2cc85fea1f551cd9f1c8893dd8b9d181bc0e13892f58d72164aa522b02698b63-02abb176aff24001ae1d4f227092b76f.jsonl",
+    "sha256": "733d8484c42984709861b7a217ea76add31d7fbc3f3742a17c5eaafd05c8c67f",
+    "shots": 2,
+    "verified": true
+  },
+  {
+    "path": ".planning/quick/261108-qcu-expand-existing-compatible-policies-acro/sinter-smoke/precision/2cc85fea1f551cd9f1c8893dd8b9d181bc0e13892f58d72164aa522b02698b63-18963710931145a6b92b39511a035281.jsonl",
+    "sha256": "7c9b716abc06e5c46db61946627cadbb157aee20ff5228651fb266cea15e71da",
+    "shots": 4,
+    "verified": true
+  },
+  {
+    "path": ".planning/quick/261108-qcu-expand-existing-compatible-policies-acro/sinter-smoke/precision/2cc85fea1f551cd9f1c8893dd8b9d181bc0e13892f58d72164aa522b02698b63-d79f169a94394e229c58f86eaed15237.jsonl",
+    "sha256": "29ddc81445b04836e0cbce6f533d3cea3fad9072d4f7f1635e09024df3e5008a",
+    "shots": 1,
+    "verified": true
+  },
+  {
+    "path": ".planning/quick/261108-qcu-expand-existing-compatible-policies-acro/sinter-smoke/precision/2cc85fea1f551cd9f1c8893dd8b9d181bc0e13892f58d72164aa522b02698b63-e836cfbee0414bb1bf9de77beb123306.jsonl",
+    "sha256": "29ddc81445b04836e0cbce6f533d3cea3fad9072d4f7f1635e09024df3e5008a",
+    "shots": 1,
+    "verified": true
+  },
+  {
+    "path": ".planning/quick/261108-qcu-expand-existing-compatible-policies-acro/sinter-smoke/serial/2cc85fea1f551cd9f1c8893dd8b9d181bc0e13892f58d72164aa522b02698b63-7fd9b82c3f3043389fc31b822d5a82ff.jsonl",
+    "sha256": "8be65ca8bc3347e7f0b63bccded68e6c99ab60ca18bf81c297a50b0957729e21",
+    "shots": 3,
+    "verified": true
+  },
+  {
+    "path": ".planning/quick/261108-qcu-expand-existing-compatible-policies-acro/sinter-smoke/serial/2cc85fea1f551cd9f1c8893dd8b9d181bc0e13892f58d72164aa522b02698b63-dbfe9ba2ecd545b8bf50b6cb4ad7971c.jsonl",
+    "sha256": "16b57944d36882dfcdd791262b77c79d492d84ecafd42be4f5b113f1dd803a26",
+    "shots": 1,
+    "verified": true
+  },
+  {
+    "path": ".planning/quick/261108-qcu-expand-existing-compatible-policies-acro/sinter-smoke/serial/2cc85fea1f551cd9f1c8893dd8b9d181bc0e13892f58d72164aa522b02698b63-ddaa557896584f37b752048174bf3049.jsonl",
+    "sha256": "5db6e1f66fddcf244d466672549451ad8cc7b4888b0a64a089b6ac3523981365",
+    "shots": 4,
+    "verified": true
+  },
+  {
+    "path": ".planning/spikes/053-shared-evidence/chunking-None.jsonl",
+    "sha256": "765fb017f944894c264d3b3b92c1ea7132b40948f0f2a62478a4def9b60cb1d6",
+    "shots": 8,
+    "verified": true
+  },
+  {
+    "path": ".planning/spikes/053-shared-evidence/chunking-attempt.jsonl",
+    "sha256": "8daf860491447f784bfe0e047905c9f48a0d16ba480caa50bf20d9ae0cb0d7aa",
+    "shots": 8,
+    "verified": true
+  },
+  {
+    "path": ".planning/spikes/053-shared-evidence/chunking-configuration.jsonl",
+    "sha256": "57b0c8313d3b62e0b403fa32cad7cff2d73af650125b53239ceb27a965e18fef",
+    "shots": 8,
+    "verified": true
+  },
+  {
+    "path": ".planning/spikes/053-shared-evidence/chunking-sweep.jsonl",
+    "sha256": "21283cb82946499079e49ee7959c85bc32081099770f408002476500c86a64ad",
+    "shots": 8,
+    "verified": true
+  },
+  {
+    "path": ".planning/spikes/053-shared-evidence/affine-ledger.jsonl",
+    "sha256": "179c4d8daa2f1316b5f37a431c0a4e53f26a3a9d9dee43821eb16af7fa36dd76",
+    "shots": 2,
+    "verified": true
+  }
+]

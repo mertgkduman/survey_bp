@@ -1,0 +1,10 @@
+{
+  "verified_shots": {
+    "serial-observation-v2": 8,
+    "group-observation-v2": 8,
+    "memory-observation-v2": 8
+  },
+  "source": "real Sinter collect worker",
+  "per_shot_rebatching": "exact binary execution",
+  "interpretation": "API/ledger qualification only; no curve or decoder ranking claim"
+}

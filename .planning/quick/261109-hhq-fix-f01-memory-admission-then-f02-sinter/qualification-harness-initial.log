@@ -1,0 +1,17 @@
+82 complete legacy receipts
+Traceback (most recent call last):
+  File "/hpc/group/pfisterlab/mg551/storage/survey_bp/.planning/quick/261109-hhq-fix-f01-memory-admission-then-f02-sinter/qualify.py", line 156, in <module>
+    main()
+  File "/hpc/group/pfisterlab/mg551/storage/survey_bp/.planning/quick/261109-hhq-fix-f01-memory-admission-then-f02-sinter/qualify.py", line 131, in main
+    shared = replay_shared_history()
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/hpc/group/pfisterlab/mg551/storage/survey_bp/.planning/quick/261109-hhq-fix-f01-memory-admission-then-f02-sinter/qualify.py", line 53, in replay_shared_history
+    decoder = SharedPolicySinterDecoder(BinaryPolicy.model_validate(header["policy"])).compile_decoder_for_dem(dem=model)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/lib/python3.12/site-packages/pydantic/main.py", line 732, in model_validate
+    return cls.__pydantic_validator__.validate_python(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for BinaryPolicy
+flooding_policy
+  Input should be an instance of BpFloodingPolicy [type=dataclass_exact_type, input_value={'alpha': 0.875, 'beta': ...yndrome_shortcut': True}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/dataclass_exact_type
