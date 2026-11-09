@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Active v2 multi-rate view and empty-input cleanup complete; scientific Phase 11 gaps unchanged
-last_updated: "2026-11-09T21:16:24+00:00"
+stopped_at: Add-curve picker excludes displayed curves; browser verification passed
+last_updated: "2026-11-09T21:35:15+00:00"
 last_activity: 2026-11-09
-last_activity_desc: Active v2 now shows 63 multi-rate curves and 319 points; 118 tests and browser workflows pass; raw evidence and v1 preserved
-state_head: 7eeddf7
+last_activity_desc: Fixed per-plot add picker; displayed curves excluded, hidden curves restore without duplicates; 16 browser workflow groups pass
+state_head: 1e6b825
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,8 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-09 — completed quick task 261109-mcf: multi-rate results and public input cleanup
-Last Activity Description: Quick task 261109-mcf centrally filters active v2 curves to at least two distinct measured error rates and derives public input/saved choices from that view. Counts: 105→63 curves, 361→319 points, 7→6 codes, 3→0 registered circuits. Verified with 118 research tests, 14 browser workflow groups and real retained-result imports. Empty/default/import selection handling passes; raw catalog, evidence and v1 bytes are preserved. Implementation: `7eeddf7`.
+Last activity: 2026-11-09 — completed quick task 261109-mzx: exclude displayed curves from add picker
+Last Activity Description: Quick task 261109-mzx filters each add-curve picker by visible curve identity before prefix matching. Hidden curves restore without duplicate entries; compare-all has an explicit empty state. Verified with 16 browser workflow groups and JS syntax/diff checks. Implementation: `1e6b825`.
+
+Prior interface activity: Quick task 261109-mcf centrally filters active v2 curves to at least two distinct measured error rates and derives public input/saved choices from that view. Counts: 105→63 curves, 361→319 points, 7→6 codes, 3→0 registered circuits. Verified with 118 research tests, 14 browser workflow groups and real retained-result imports. Empty/default/import selection handling passes; raw catalog, evidence and v1 bytes are preserved. Implementation: `7eeddf7`.
 
 Prior kernel activity: Quick task 261109-hhq rejects invalid changing-prior PD-prime compositions and gives new shared Sinter execution observation-v2 identity with exact shared-v1 replay. Final production regression: 1,712 passed, 20 skipped; final shared decoder tests: 161 passed (overlapping suites). Real Sinter worker: 24 verified v2 shots; earlier shared-v1: 15 ledgers / 58 shots replayed; 82 legacy receipts byte-identical. Scanned and hashed 3,839 tracked data/experiment files without finding an affected campaign; all remain unchanged. Prior mathematics, upstream and GPU evidence is carried by source/evidence hashes. HTML can consume the qualified inventory; scientific publication gates remain unchanged. See spikes/CANONICAL-KERNEL-SHARED-POLICY-FIXES.md.
 
@@ -288,6 +290,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261109-mzx | Exclude already displayed curves from each plot add picker | 2026-11-09 | 1e6b825 | Verified: 16 browser groups; keyboard/mouse restoration, empty and independent plot states | [261109-mzx-exclude-already-displayed-curves-from-ea](./quick/261109-mzx-exclude-already-displayed-curves-from-ea/) |
 | 261109-mcf | Filter active research curves to multiple measured rates and hide inputs without results | 2026-11-09 | 7eeddf7 | Verified: 118 tests; 14 browser groups; retained imports; 105→63 curves, 361→319 points | [261109-mcf-filter-active-research-curves-to-multipl](./quick/261109-mcf-filter-active-research-curves-to-multipl/) |
 | 261109-hhq | Fix shared-policy findings F01 → F02 and qualify result preservation | 2026-11-09 | fd5c3d0, 78f1c1c | Verified: 1712 kernel / 161 final shared passes; 24 Sinter v2 shots; 82 identical legacy receipts; 58 shared-v1 shots replayed | [261109-hhq-fix-f01-memory-admission-then-f02-sinter](./quick/261109-hhq-fix-f01-memory-admission-then-f02-sinter/) |
 | 261108-qcu | Expand compatible policies across CPU and Stim/Sinter kernels | 2026-11-08 | 7f888a1, c512723 | Verified: 2462 broad / 387 affected passes; 24 Sinter shots; 82 identical legacy receipts | [261108-qcu-expand-existing-compatible-policies-acro](./quick/261108-qcu-expand-existing-compatible-policies-acro/) |
@@ -355,14 +358,16 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
+Latest picker fix: quick task 261109-mzx, implementation `1e6b825`. Add a decoder / curve lists only curves not currently displayed on that plot. Hidden curves can be restored without duplication; all-displayed empty state and independent plot state pass Chromium checks (16 workflow groups total).
+
 Latest interface work: quick task 261109-mcf, implementation `7eeddf7`. Active v2 uses a single multi-rate projection for all results and public input choices: 63 curves / 319 points / 6 codes / 0 registered circuits. Empty/default/import states and stale selections are verified. Full retained catalog and archived v1 are unchanged. See the quick summary, verification and explicit removal audit. Scientific phase progress and gates remain unchanged.
 
 Latest kernel work: completed F01 → F02 corrections and qualification in quick task 261109-hhq, implementation 78f1c1c. See spikes/CANONICAL-KERNEL-SHARED-POLICY-FIXES.md and quick/261109-hhq-fix-f01-memory-admission-then-f02-sinter/qualification.json. Kernel regression: 1,712 passed / 20 skipped; final shared suite: 161 passed. Exact legacy/shared-v1 replay and real Sinter v2 worker execution pass. All 3,839 tracked result/data files are preserved, with no affected campaign found. Pauli/GPU source and prior qualification remain unchanged; prior evidence is not relabelled as fresh execution.
 
 **Resume file:** None
 
-Last session: 2026-11-09T21:16:45+00:00
-Stopped at: Requested active v2 curve/input cleanup complete and verified; kernel corrections remain qualified
+Last session: 2026-11-09T21:35:15+00:00
+Stopped at: Requested active v2 cleanup and add-curve picker fix complete and verified
 Next step: Requested display/catalog cleanup is complete; resume the existing Phase 11 scientific work when directed. Preserve identity versions and qualification labels. Phase 11 scientific gaps and Phase 5 human review remain open; Phase 7 stays paused.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.

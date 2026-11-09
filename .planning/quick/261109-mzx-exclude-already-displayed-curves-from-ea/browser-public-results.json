@@ -1,0 +1,13 @@
+{
+  "checks": [
+    "63 curves / 319 rows; all public input and saved-decoder lists use the active view; GB46 and all three singleton circuits absent",
+    "Every remaining code: picker, legend, plotted collection, table, settings receipt and CSV agree",
+    "Empty active view clears plot/decoder/input state and stale matrices; reset, custom matrix and custom Stim still validate",
+    "Missing default A5/B2 inputs fall back to a displayed input in both DOM and experiment/plot state",
+    "Import refresh hides singleton, admits multi-rate circuit and updates availability; hiding the selected circuit clears its Stim bytes and download validation",
+    "Saved imports reapply eligibility after reload; internal three-qubit fixture remains hidden even with two rates",
+    "Empty mobile layout fits; archived v1 still loads its retained catalog"
+  ],
+  "errors": [],
+  "simulations": 0
+}

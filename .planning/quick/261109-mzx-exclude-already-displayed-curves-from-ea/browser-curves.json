@@ -1,0 +1,14 @@
+{
+  "checks": [
+    "Parameter-based decoder labels; retired canonical clipping absent from selectors",
+    "Picker excludes displayed curves initially and after keyboard addition; prefix search remains functional",
+    "Curve click/keyboard toggle updates table and reproduction details; hidden-curve preview is faint and does not add rows",
+    "Run settings and CSV include only enabled curves; legend restores a hidden curve",
+    "Mouse addition restores a hidden curve without duplicate legend/table entries",
+    "Compare-all has an honest empty picker; hiding makes only that curve addable and keyboard restoration works",
+    "Plot states remain independent; corrected Q8 remains available while retired BP4 state clipping is removed",
+    "Saved-specification names share the same parameter labels and retirement filtering",
+    "Mobile layout, no-match state, Escape dismissal and accessible combobox state work"
+  ],
+  "errors": []
+}
