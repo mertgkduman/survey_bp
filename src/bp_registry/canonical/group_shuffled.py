@@ -182,7 +182,7 @@ class HsuGroupSchedule:
             order_selection=1,
         )
 
-    def _compute_group(self, messages: np.ndarray, syndrome: np.ndarray, *, error_rate: float, group: tuple[int, int]) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def _compute_group(self, messages: np.ndarray, syndrome: np.ndarray, *, error_rate: float, group: tuple[int, int], prior_llrs: np.ndarray | None = None) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         entry = finite_saturate(messages, boundary="hsu_group_entry_v2c")
         if entry.shape != (self.edge_table.edge_count,):
             raise ValueError("Hsu messages must have one value per canonical edge")
@@ -197,7 +197,8 @@ class HsuGroupSchedule:
                 group_edges.append(edge_index)
         next_c2v = finite_saturate(next_c2v, boundary="hsu_group_complete_c2v")
         beliefs = self.kernel.assemble_beliefs(
-            self.edge_table.variable_count, self._edge_variables, next_c2v, self.kernel.prior(error_rate),
+            self.edge_table.variable_count, self._edge_variables, next_c2v,
+            self.kernel.prior(error_rate) if prior_llrs is None else prior_llrs,
         )
         candidate = np.array(self.kernel.candidate_from_beliefs(beliefs), dtype=np.uint8, copy=True)
         updated = np.array(snapshot, dtype=np.float64, copy=True)
@@ -210,6 +211,7 @@ class HsuGroupSchedule:
     def execute_local_step(
         self, executor: object, messages: np.ndarray, syndrome: np.ndarray, *,
         error_rate: float, progress: object, is_converged: object,
+        prior_llrs: np.ndarray | None = None,
     ) -> ScheduledLocalStepResult:
         from .execution import LocalStepProposal, ScheduleProgress
 
@@ -220,7 +222,7 @@ class HsuGroupSchedule:
         c2v_box: list[np.ndarray] = []
 
         def compute() -> np.ndarray:
-            updated, candidate, c2v = self._compute_group(messages, bits, error_rate=error_rate, group=group)
+            updated, candidate, c2v = self._compute_group(messages, bits, error_rate=error_rate, group=group, prior_llrs=prior_llrs)
             candidate_box.append(candidate)
             c2v_box.append(c2v)
             return updated

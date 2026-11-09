@@ -274,6 +274,7 @@ class MbbpController:
     def _member(
         self, *, original: OriginalProblem, system: AugmentedBasisSystem, tree: BudgetTree, scope: str,
         error_rate: float,
+        prior_llrs: np.ndarray | None = None,
         boundary_observer: Callable[[str, WorkVector | None, str | None], None] | None = None,
     ) -> MbbpMember:
         table = EdgeTable.from_check_matrix(system.check_matrix)
@@ -285,16 +286,22 @@ class MbbpController:
         # These objects are intentionally created inside the member boundary.
         # Neither serial C2V state nor V2C messages can cross member identities.
         schedule = CheckNodeSerialSchedule(table, kernel=kernel)
-        messages = np.full(table.edge_count, kernel.prior(error_rate), dtype=np.float64)
+        from .numerics import finite_saturate
+        messages = (np.full(table.edge_count, kernel.prior(error_rate), dtype=np.float64) if prior_llrs is None else
+                    finite_saturate(prior_llrs[np.array([v for _, v in table.edges], dtype=np.intp)],
+                                    boundary="mbbp_initial_prior", profile=kernel.profile))
         executor = CanonicalLocalStepExecutor(tree, scope=scope)
         lineage_id = stable_lineage_id("member", {
             "basis_identity": system.content_identity, "member_id": system.member_id,
             "local_ordinal": system.local_ordinal,
         })
-        initial_identity = _identity("member-state", {
+        initial_material = {
             "basis_identity": system.content_identity, "lineage_id": lineage_id.value,
             "alpha": self.spec.alpha, "schedule": "check_node_serial",
-        })
+        }
+        if prior_llrs is not None:
+            initial_material["prior_sha256"] = sha256(prior_llrs.tobytes()).hexdigest()
+        initial_identity = _identity("member-state", initial_material)
         progress = ScheduleProgress(iteration=0, local_steps=0, cursor=(0,))
         terminal_candidate: tuple[int, ...] | None = None
         terminal_posterior: tuple[float, ...] | None = None
@@ -306,6 +313,7 @@ class MbbpController:
                 step = schedule.execute_local_step(
                     executor, messages, system.syndrome, error_rate=error_rate, progress=progress,
                     is_converged=lambda candidate: self._valid(system.check_matrix, system.syndrome, tuple(candidate.tolist())),
+                    prior_llrs=prior_llrs,
                 )
                 if boundary_observer is not None:
                     boundary_observer(
@@ -363,6 +371,7 @@ class MbbpController:
 
     def run(
         self, original: OriginalProblem, *, error_rate: float, completion_order: tuple[str, ...] | None = None,
+        prior_llrs: np.ndarray | None = None,
         boundary_observer: Callable[[str, WorkVector | None, str | None], None] | None = None,
     ) -> MbbpResult:
         """Execute declared members in any supplied completion order, then freeze order."""
@@ -370,6 +379,9 @@ class MbbpController:
             raise ValueError("MBBP run requires an immutable OriginalProblem")
         if not math.isfinite(error_rate) or not 0.0 < error_rate < 0.5:
             raise ValueError("MBBP error_rate must lie in (0, 0.5)")
+        if prior_llrs is not None:
+            from .intervention_session import _frozen_f64
+            prior_llrs = _frozen_f64(prior_llrs, original.hz.shape[1], "prior_llrs")
         systems = {basis.member_id: basis.augment(original) for basis in self.spec.bases}
         declared_ids = tuple(basis.member_id for basis in self.spec.bases)
         order = declared_ids if completion_order is None else tuple(completion_order)
@@ -388,6 +400,7 @@ class MbbpController:
             attempted.append(self._member(
                 original=original, system=systems[member_id], tree=tree, scope=scopes[member_id],
                 error_rate=error_rate, boundary_observer=boundary_observer,
+                prior_llrs=prior_llrs,
             ))
             if boundary_observer is not None:
                 boundary_observer(f"mbbp:{member_id}:after_member", None, None)

@@ -212,6 +212,7 @@ class RestartController:
         self, original: OriginalProblem, *, error_rate: float, budgets: BudgetTree,
         wall_clock: WallClockLimit | None = None,
         damping_gamma: float | None = None,
+        prior_llrs: np.ndarray | None = None,
     ) -> RestartResult:
         if not isinstance(original, OriginalProblem):
             raise ValueError("restart requires an immutable original CSS problem")
@@ -223,6 +224,7 @@ class RestartController:
         root = BpSession(
             EdgeTable.from_check_matrix(original.hz), original.syndrome,
             error_rate=error_rate, owner_identity=root_owner, damping_gamma=damping_gamma,
+            prior_llrs=prior_llrs,
         )
         initial = root.state.digest
         root_valid = False
@@ -390,6 +392,8 @@ class RestartController:
                     budgets=budgets, leaf_id=reset_leaf,
                     edge_table=EdgeTable.from_check_matrix(shortened.check_matrix),
                     syndrome=shortened.syndrome, wall_clock=wall_clock,
+                    prior_llrs=(None if root.initial_prior_llrs is None else
+                                root.initial_prior_llrs[list(shortened.column_map)]),
                 )
             except ValueError as error_value:
                 if "denied by count budget" not in str(error_value) and "wall-clock deadline" not in str(error_value):
@@ -570,12 +574,14 @@ class RestartController:
 def reconstruct_restart_result(
     spec: RestartSpec | Mapping[str, object], original: OriginalProblem,
     error_rate: float, expected: RestartResult, *, budget_limits: tuple[BudgetLimit, ...] = (),
+    prior_llrs: np.ndarray | None = None,
 ) -> RestartResult:
     """Independently regenerate root, branches, residual algebra, selection, and leaves."""
     if not isinstance(expected, RestartResult):
         raise ValueError("restart replay requires typed evidence")
     rebuilt = RestartController(spec).run(
         original, error_rate=error_rate, budgets=BudgetTree(limits=budget_limits, parents={}),
+        prior_llrs=prior_llrs,
     )
     if rebuilt != expected:
         raise ValueError("restart replay disagrees with residual transitions or work")

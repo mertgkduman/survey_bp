@@ -138,6 +138,7 @@ class BpSession:
         owner_identity: str | None = None, kernel: BinarySpaKernel | None = None,
         damping_gamma: float | None = None,
         v2c_clip: float | None = None,
+        prior_llrs: np.ndarray | None = None,
     ) -> None:
         self.edge_table = edge_table
         bits = np.asarray(syndrome)
@@ -148,7 +149,7 @@ class BpSession:
         self.error_rate = error_rate
         if kernel is not None and not isinstance(kernel, BinarySpaKernel):
             raise ValueError("intervention session kernel must be a canonical binary kernel")
-        from .numerics import REFERENCE_CPU_F64
+        from .numerics import REFERENCE_CPU_F64, finite_saturate
         self.kernel = kernel or BinarySpaKernel(profile=REFERENCE_CPU_F64)
         self.schedule = FloodingSchedule(edge_table, kernel=self.kernel)
         if v2c_clip is not None and (
@@ -163,18 +164,29 @@ class BpSession:
         self._owner = object()
         if owner_identity is not None and (not isinstance(owner_identity, str) or not owner_identity):
             raise ValueError("owner identity must be a nonempty string")
+        self._initial_prior_llrs = (None if prior_llrs is None else
+                                   _frozen_f64(finite_saturate(prior_llrs, boundary="session_initial_prior", profile=self.kernel.profile),
+                                               edge_table.variable_count, "prior_llrs"))
+        identity_material = [edge_table.graph_sha256, self.syndrome.tolist(), error_rate]
+        if self._initial_prior_llrs is not None:
+            identity_material.append(self._initial_prior_llrs.tolist())
         self.owner_identity = owner_identity or "session-" + sha256(json.dumps(
-            [edge_table.graph_sha256, self.syndrome.tolist(), error_rate],
+            identity_material,
             separators=(",", ":"), allow_nan=False,
         ).encode()).hexdigest()[:20]
-        prior = np.full(edge_table.variable_count, self.kernel.prior(error_rate), dtype=np.float64)
-        v2c = self.schedule.initialize(error_rate)
+        prior = (np.full(edge_table.variable_count, self.kernel.prior(error_rate), dtype=np.float64)
+                 if self._initial_prior_llrs is None else self._initial_prior_llrs)
+        v2c = self.schedule.initialize(error_rate, prior_llrs=self._initial_prior_llrs)
         self._damping_state: V2CDampingState | None = (
             None if self._damping_policy is None else self._damping_policy.initial_state(v2c)
         )
         posterior = np.array(prior, copy=True)
         candidate = self.kernel.candidate_from_beliefs(posterior)
         self._state = self._make_state(prior, v2c, posterior, candidate, (), 0, 0)
+
+    @property
+    def initial_prior_llrs(self) -> np.ndarray | None:
+        return self._initial_prior_llrs
 
     @property
     def state(self) -> BpSessionState:
@@ -402,6 +414,7 @@ class BpSession:
     def reset_fresh(
         self, *, budgets: BudgetTree, leaf_id: str, edge_table: EdgeTable | None = None,
         syndrome: np.ndarray | None = None, error_rate: float | None = None,
+        prior_llrs: np.ndarray | None = None,
         preserve: tuple[str, ...] = (), owner_identity: str | None = None,
         wall_clock: WallClockLimit | None = None,
     ) -> "BpSession":
@@ -409,12 +422,19 @@ class BpSession:
         table = self.edge_table if edge_table is None else edge_table
         next_syndrome = self.syndrome if syndrome is None else syndrome
         next_rate = self.error_rate if error_rate is None else error_rate
+        next_prior = self._initial_prior_llrs if prior_llrs is None else _frozen_f64(
+            prior_llrs, table.variable_count, "prior_llrs",
+        )
+        if (self._initial_prior_llrs is not None and prior_llrs is None
+                and table.graph_sha256 != self.edge_table.graph_sha256):
+            raise ValueError("a changed graph requires explicitly mapped prior_llrs")
         preserve_set = frozenset(preserve)
         complete = frozenset({"v2c", "c2v", "posterior", "candidate"})
         if preserve_set and (
             preserve_set != complete or table.graph_sha256 != self.edge_table.graph_sha256
             or not np.array_equal(next_syndrome, self.syndrome)
             or next_rate != self.error_rate
+            or not np.array_equal(next_prior, self._initial_prior_llrs)
             or (owner_identity is not None and owner_identity != self.state.owner_identity)
         ):
             raise ValueError("incompatible graph, coordinate, prior, dtype, or owner for preserved BP state")
@@ -432,6 +452,7 @@ class BpSession:
             child = type(self)(
                 table, next_syndrome, error_rate=next_rate, owner_identity=branch_owner,
                 kernel=self.kernel, damping_gamma=self.damping_gamma, v2c_clip=self.v2c_clip,
+                prior_llrs=next_prior,
             )
             if preserve_set:
                 if self._damping_state is not None:

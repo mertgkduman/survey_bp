@@ -175,10 +175,14 @@ class FreezingController:
         self, original: OriginalProblem, *, error_rate: float, budgets: BudgetTree,
         wall_clock: WallClockLimit | None = None,
         damping_gamma: float | None = None,
+        prior_llrs: np.ndarray | None = None,
     ) -> FreezingResult:
+        if prior_llrs is not None:
+            from .intervention_session import _frozen_f64
+            prior_llrs = _frozen_f64(prior_llrs, original.hz.shape[1], "prior_llrs")
         root = _owner("freezing", original, self.spec.root_seed, error_rate)
         table = EdgeTable.from_check_matrix(original.hz)
-        baseline = BpSession(table, original.syndrome, error_rate=error_rate, owner_identity=root + ":baseline", damping_gamma=damping_gamma)
+        baseline = BpSession(table, original.syndrome, error_rate=error_rate, owner_identity=root + ":baseline", damping_gamma=damping_gamma, prior_llrs=prior_llrs)
         baseline_valid = False
         baseline_term = "failed_period"
         for index in range(self.spec.period_sweeps):
@@ -271,6 +275,7 @@ class FreezingController:
                 session = BpSession(
                     EdgeTable.from_check_matrix(working.check_matrix), working.syndrome,
                     error_rate=error_rate, owner_identity=owner, damping_gamma=damping_gamma,
+                    prior_llrs=None if prior_llrs is None else np.asarray(prior_llrs)[list(working.column_map)],
                 )
                 initial = session.state.digest
                 sweep_leaves: list[str] = []
@@ -457,7 +462,11 @@ class SyndromeFlipController:
         wall_clock: WallClockLimit | None = None,
         damping_gamma: float | None = None,
         kernel: BinarySpaKernel | None = None,
+        prior_llrs: np.ndarray | None = None,
     ) -> SyndromeFlipResult:
+        if prior_llrs is not None:
+            from .intervention_session import _frozen_f64
+            prior_llrs = _frozen_f64(prior_llrs, original.hz.shape[1], "prior_llrs")
         root = _owner("syndrome-flip", original, self.spec.root_seed, error_rate)
         n = original.hz.shape[1]
         stream = decoder_stream_identity(root, "bpsf", "test_vector_order", 0, "test_selection")
@@ -465,6 +474,7 @@ class SyndromeFlipController:
             EdgeTable.from_check_matrix(original.hz), original.syndrome,
             error_rate=error_rate, owner_identity=root + ":baseline", damping_gamma=damping_gamma,
             kernel=kernel,
+            prior_llrs=prior_llrs,
         )
         counts = np.zeros(n, dtype=np.int64)
         # BP-SF Algorithm 1 initializes the prior hard decision to the all-zero
@@ -566,6 +576,7 @@ class SyndromeFlipController:
                         EdgeTable.from_check_matrix(working.check_matrix), working.syndrome,
                         error_rate=error_rate, owner_identity=owner, damping_gamma=damping_gamma,
                         kernel=kernel,
+                        prior_llrs=prior_llrs,
                     )
                     initial = session.state.digest
                     sweep_leaves: list[str] = []
@@ -687,7 +698,11 @@ class SignFlipController:
         self, original: OriginalProblem, *, error_rate: float, budgets: BudgetTree,
         wall_clock: WallClockLimit | None = None,
         damping_gamma: float | None = None,
+        prior_llrs: np.ndarray | None = None,
     ) -> SignFlipResult:
+        if prior_llrs is not None:
+            from .intervention_session import _frozen_f64
+            prior_llrs = _frozen_f64(prior_llrs, original.hz.shape[1], "prior_llrs")
         root = _owner("sign-flip", original, f"alpha:{self.spec.alpha}", error_rate)
         assignment = ParameterAssignment(shape="scalar", value=float(self.spec.alpha))
         kernel = BinarySpaKernel(
@@ -696,6 +711,7 @@ class SignFlipController:
         session = BpSession(
             EdgeTable.from_check_matrix(original.hz), original.syndrome,
             error_rate=error_rate, owner_identity=root, kernel=kernel, damping_gamma=damping_gamma,
+            prior_llrs=prior_llrs,
         )
         trigger = "failed_normalized_min_sum_trunk"
         termination = "no_proposal"
@@ -822,11 +838,13 @@ def reconstruct_freezing_result(
     spec: FreezingSpec | Mapping[str, object], original: OriginalProblem,
     error_rate: float, expected: FreezingResult,
     *, budget_limits: tuple[BudgetLimit, ...] = (),
+    prior_llrs: np.ndarray | None = None,
 ) -> FreezingResult:
     if not isinstance(expected, FreezingResult):
         raise ValueError("freezing replay requires typed evidence")
     rebuilt = FreezingController(spec).run(
         original, error_rate=error_rate, budgets=BudgetTree(limits=budget_limits, parents={}),
+        prior_llrs=prior_llrs,
     )
     if rebuilt != expected:
         raise ValueError("freezing replay disagrees with target, release, or work")
@@ -837,11 +855,13 @@ def reconstruct_syndrome_flip_result(
     spec: SyndromeFlipSpec | Mapping[str, object], original: OriginalProblem,
     error_rate: float, expected: SyndromeFlipResult,
     *, budget_limits: tuple[BudgetLimit, ...] = (),
+    prior_llrs: np.ndarray | None = None,
 ) -> SyndromeFlipResult:
     if not isinstance(expected, SyndromeFlipResult):
         raise ValueError("syndrome-flip replay requires typed evidence")
     rebuilt = SyndromeFlipController(spec).run(
         original, error_rate=error_rate, budgets=BudgetTree(limits=budget_limits, parents={}),
+        prior_llrs=prior_llrs,
     )
     if rebuilt != expected:
         raise ValueError("syndrome-flip replay disagrees with test, lift, or work")
@@ -852,11 +872,13 @@ def reconstruct_sign_flip_result(
     spec: SignFlipSpec | Mapping[str, object], original: OriginalProblem,
     error_rate: float, expected: SignFlipResult,
     *, budget_limits: tuple[BudgetLimit, ...] = (),
+    prior_llrs: np.ndarray | None = None,
 ) -> SignFlipResult:
     if not isinstance(expected, SignFlipResult):
         raise ValueError("sign-flip replay requires typed evidence")
     rebuilt = SignFlipController(spec).run(
         original, error_rate=error_rate, budgets=BudgetTree(limits=budget_limits, parents={}),
+        prior_llrs=prior_llrs,
     )
     if rebuilt != expected:
         raise ValueError("sign-flip replay disagrees with target, session state, or work")

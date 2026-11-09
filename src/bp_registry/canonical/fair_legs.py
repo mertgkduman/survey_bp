@@ -158,7 +158,7 @@ class FairLegResult:
 class FairLegController:
     """Run two source-informed extensions after one identical initial BP stage."""
 
-    def __init__(self, check_matrix: np.ndarray, syndrome: np.ndarray, *, error_rate: float, config: FairLegConfig):
+    def __init__(self, check_matrix: np.ndarray, syndrome: np.ndarray, *, error_rate: float, config: FairLegConfig, prior_llrs: np.ndarray | None = None):
         h = np.asarray(check_matrix)
         s = np.asarray(syndrome)
         if (h.ndim != 2 or h.shape[0] == 0 or h.shape[1] == 0 or not np.issubdtype(h.dtype, np.integer)
@@ -175,6 +175,10 @@ class FairLegController:
         self.config = config
         self.kernel = BinarySpaKernel(profile=MIN_SUM_CPU_F64, update_rule=MinSumUpdate())
         self.channel_prior = self.kernel.prior(error_rate)
+        from .intervention_session import _frozen_f64
+        self.channel_priors = (np.full(h.shape[1], self.channel_prior) if prior_llrs is None else
+                               _frozen_f64(prior_llrs, h.shape[1], "prior_llrs"))
+        self._explicit_priors = prior_llrs is not None
         self._initial: BPSegment | None = None
 
     def _valid(self, candidate: np.ndarray) -> bool:
@@ -203,7 +207,8 @@ class FairLegController:
                 target ^= self.h[:, index].astype(np.int64)
         local_s = target.astype(np.uint8)
         table = EdgeTable.from_check_matrix(local_h)
-        start = (np.full(len(unmasked), self.channel_prior, dtype=np.float64)
+        local_prior = self.channel_priors[list(unmasked)]
+        start = (local_prior.copy()
                  if start_posterior is None else np.asarray(start_posterior, dtype=np.float64)[list(unmasked)])
         if start.shape != (len(unmasked),) or not np.all(np.isfinite(start)):
             raise ValueError("warm-start posterior is incompatible or nonfinite")
@@ -215,7 +220,7 @@ class FairLegController:
         if len(inherited) != (0 if warm_messages is None else len(warm_messages)):
             raise ValueError("warm-start edge identity is duplicated")
         messages = np.asarray([
-            inherited.get((check, unmasked[local]), self.channel_prior)
+            inherited.get((check, unmasked[local]), local_prior[local])
             for check, local in table.edges
         ], dtype=np.float64)
         if not np.all(np.isfinite(messages)):
@@ -237,10 +242,10 @@ class FairLegController:
                 converged = self._valid(candidate)
                 break
             if local_gamma is None:
-                prior = np.full(len(unmasked), self.channel_prior, dtype=np.float64)
+                prior = local_prior.copy()
             else:
                 prior = finite_saturate(
-                    (1.0 - local_gamma) * self.channel_prior + local_gamma * posterior,
+                    (1.0 - local_gamma) * local_prior + local_gamma * posterior,
                     boundary="relay_dynamic_affine_prior", profile=MIN_SUM_CPU_F64,
                 )
             proposals = []
@@ -320,7 +325,9 @@ class FairLegController:
 
     def _select(self, segments: list[BPSegment]) -> BPSegment | None:
         valid = [segment for segment in segments if segment.converged and self._valid(segment.candidate)]
-        return min(enumerate(valid), key=lambda item: (float(np.sum(item[1].candidate)) * self.channel_prior, item[0]))[1] if valid else None
+        return min(enumerate(valid), key=lambda item: (
+            float(np.dot(item[1].candidate, self.channel_priors)) if self._explicit_priors else
+            float(np.sum(item[1].candidate)) * self.channel_prior, item[0]))[1] if valid else None
 
     def _early(self, mode: Mode, initial: BPSegment) -> FairLegResult | None:
         if initial.converged:
@@ -450,7 +457,7 @@ class FairLegController:
                              None if selected is None else selected.stage_id, reason, initial.work, extra)
 
     def _lift_posterior(self, parent: BPSegment) -> np.ndarray:
-        posterior = np.full(self.h.shape[1], self.channel_prior, dtype=np.float64)
+        posterior = self.channel_priors.copy()
         posterior[list(parent.unmasked)] = parent.posterior
         return posterior
 

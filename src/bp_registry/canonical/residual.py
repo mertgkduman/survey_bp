@@ -247,9 +247,13 @@ class SyndromeResidualSchedule:
 
     def propose_local_step(
         self, v2c: np.ndarray, c2v: np.ndarray, cache: ResidualCache, syndrome: np.ndarray, *, error_rate: float,
+        prior_llrs: np.ndarray | None = None,
     ) -> ResidualProposal:
         """Create the complete reserve-before-mutation local proposal."""
         state_v2c, state_c2v, bits = self._validate_state(v2c, c2v, syndrome)
+        from .intervention_session import _frozen_f64
+        prior = (self.kernel.prior(error_rate) if prior_llrs is None else
+                 _frozen_f64(prior_llrs, self.edge_table.variable_count, "prior_llrs"))
         selection = self._select(cache)
         invalidated = self._invalidation_indices(selection)
         selected_check, selected_variable = selection.edge
@@ -272,7 +276,7 @@ class SyndromeResidualSchedule:
             # This is the source-mandated SPA commit, intentionally not the MS prediction.
             next_c2v[selection.index] = self.kernel.check_message(incoming, int(bits[selected_check]))
             beliefs = self.kernel.assemble_beliefs(
-                self.edge_table.variable_count, self._edge_variables, next_c2v, self.kernel.prior(error_rate),
+                self.edge_table.variable_count, self._edge_variables, next_c2v, prior,
             )
             candidate = self.kernel.candidate_from_beliefs(beliefs)
             for index in self._variable_edges[selected_variable]:

@@ -166,8 +166,9 @@ class _ForcedBitSession(BpSession):
     def __init__(
         self, table: EdgeTable, syndrome: np.ndarray, *, error_rate: float,
         owner_identity: str, target: int, forced_value: Literal[0, 1], v2c_clip: float | None,
+        prior_llrs: np.ndarray | None = None,
     ) -> None:
-        super().__init__(table, syndrome, error_rate=error_rate, owner_identity=owner_identity, v2c_clip=v2c_clip)
+        super().__init__(table, syndrome, error_rate=error_rate, owner_identity=owner_identity, v2c_clip=v2c_clip, prior_llrs=prior_llrs)
         self.target = target
         self.forced_value = forced_value
         self._forced_llr = 25.0 if forced_value == 0 else -25.0
@@ -261,6 +262,7 @@ class ImpulseController:
         self, original: OriginalProblem, *, error_rate: float, budgets: BudgetTree,
         owner_identity: str | None = None, wall_clock: WallClockLimit | None = None,
         damping_gamma: float | None = None,
+        prior_llrs: np.ndarray | None = None,
     ) -> ImpulseResult:
         if not isinstance(original, OriginalProblem):
             raise ValueError("impulse requires an immutable original problem")
@@ -269,6 +271,9 @@ class ImpulseController:
         if damping_gamma is not None and self.spec.v2c_clip is not None:
             raise ValueError("v2c clip cannot be combined with damping")
         n = original.hz.shape[1]
+        if prior_llrs is not None:
+            from .intervention_session import _frozen_f64
+            prior_llrs = _frozen_f64(prior_llrs, n, "prior_llrs")
         root = owner_identity or "impulse-" + sha256(json.dumps(
             [original.lineage_id, original.hz.tolist(), original.syndrome.tolist(), error_rate, asdict(self.spec)],
             sort_keys=True, separators=(",", ":"), allow_nan=False,
@@ -279,6 +284,7 @@ class ImpulseController:
             EdgeTable.from_check_matrix(original.hz), original.syndrome,
             error_rate=error_rate, owner_identity=f"{root}:baseline", damping_gamma=damping_gamma,
             v2c_clip=self.spec.v2c_clip,
+            prior_llrs=prior_llrs,
         )
         initial_digest = baseline.state.digest
         if wall_clock is not None and wall_clock.check("candidate_selection_boundary", scope="attempt") is not None:
@@ -357,7 +363,7 @@ class ImpulseController:
             selected_candidate = None
             for attempt_order, target in enumerate(order[:self.spec.attempt_cap]):
                 row = self._attempt(original, error_rate, budgets, root, attempt_order, target,
-                                    wall_clock=wall_clock, damping_gamma=damping_gamma)
+                                    wall_clock=wall_clock, damping_gamma=damping_gamma, prior_llrs=prior_llrs)
                 attempts.append(row)
                 if row.termination == "count_budget_exhausted":
                     termination = "count_budget_exhausted"
@@ -405,6 +411,7 @@ class ImpulseController:
         self, original: OriginalProblem, error_rate: float, budgets: BudgetTree,
         root: str, order: int, target: int, *, wall_clock: WallClockLimit | None = None,
         damping_gamma: float | None = None,
+        prior_llrs: np.ndarray | None = None,
     ) -> ImpulseAttempt:
         mode = self.spec.realization
         owner = f"{root}:attempt:{order}:target:{target}"
@@ -426,6 +433,7 @@ class ImpulseController:
                 session: BpSession = BpSession(
                     table, working.syndrome, error_rate=error_rate, owner_identity=owner,
                     damping_gamma=damping_gamma, v2c_clip=self.spec.v2c_clip,
+                    prior_llrs=None if prior_llrs is None else np.asarray(prior_llrs)[list(working.column_map)],
                 )
                 working_id = working.lineage_id
                 lift_digest = certificate.digest
@@ -434,6 +442,7 @@ class ImpulseController:
                 session = _ForcedBitSession(
                     table, original.syndrome, error_rate=error_rate, owner_identity=owner,
                     target=target, forced_value=self.spec.effective_forced_value, v2c_clip=self.spec.v2c_clip,
+                    prior_llrs=prior_llrs,
                 )
                 working_id = "identity:" + original.lineage_id + f":forced:{target}:value:{self.spec.effective_forced_value}"
                 lift_digest = None
@@ -558,6 +567,7 @@ def _clip_boundary(clip: float | None) -> Literal["post_v2c_construction_pre_sta
 def reconstruct_impulse_result(
     spec: ImpulseSpec | Mapping[str, object], original: OriginalProblem,
     error_rate: float, expected: ImpulseResult, *, budget_limits: tuple[BudgetLimit, ...] = (),
+    prior_llrs: np.ndarray | None = None,
 ) -> ImpulseResult:
     """Reexecute bounded attempts; reject semantically altered branches or work."""
     if not isinstance(expected, ImpulseResult):
@@ -565,6 +575,7 @@ def reconstruct_impulse_result(
     rebuilt = ImpulseController(spec).run(
         original, error_rate=error_rate, budgets=BudgetTree(limits=budget_limits, parents={}),
         owner_identity=expected.root_owner,
+        prior_llrs=prior_llrs,
     )
     if rebuilt != expected:
         raise ValueError("impulse replay disagrees with attempt, selection, or leaf work evidence")
