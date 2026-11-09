@@ -103,6 +103,11 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 | 048 | canonical-kernel-audit | E01 circuit numerical failure fix | standard | Scalar and compiled NMS fail consistently before overflow can be clipped | VALIDATED | circuit, fixes |
 | 049 | canonical-kernel-audit | E02 circuit controller admission fix | standard | Non-default inactive controls are rejected and active settings retain their meaning | VALIDATED | circuit, fixes |
 
+| 050 | canonical-kernel-audit | Shared policy mathematical contracts | standard | Given heterogeneous signed priors, when ordinary and precision policies execute, then independent factors reproduce candidates, beliefs and stopping. | VALIDATED | shared-policies, completeness |
+| 051 | canonical-kernel-audit | Shared policy upstream correspondence | standard | Given aligned native implementations, when shared execution runs, then agreement and source-specific differences are explicit. | VALIDATED | shared-policies, completeness |
+| 052 | canonical-kernel-audit | Shared policy composition closure | standard | Given accepted policies, when combined and reused, then operands, state lifetime, admission and source semantics remain coherent. | PARTIAL | shared-policies, completeness |
+| 053 | canonical-kernel-audit | Shared execution and evidence closure | standard | Given the same decoding problem, when public transports and replay execute, then outputs and evidence preserve their declared identities. | PENDING | shared-policies, completeness |
+
 Ordered closure of D03 → D04 → D01 → D02 → D05: [correction report](CANONICAL-KERNEL-COMPLETENESS-FIXES.md), [combined verification](042-batch-evidence-fix/verification.json), and [execution contracts](../../docs/canonical-kernel-contracts.md). Historical 034–037 verdicts remain as originally observed.
 
 Post-extension audit 043–046: [circuit/CUDA audit](CANONICAL-KERNEL-CIRCUIT-CUDA-AUDIT.md).
@@ -110,8 +115,3 @@ Ordinary-domain mathematics and matched upstream execution passed. The three
 bounded contract findings were subsequently closed in order E03 → E01 → E02 by
 047–049; see [closure report](CANONICAL-KERNEL-CIRCUIT-CUDA-FIXES.md). Historical
 043–046 verdicts remain unchanged. Publication gates are unchanged.
-
-| 050 | canonical-kernel-audit | Shared policy mathematical contracts | standard | Given heterogeneous signed priors, when ordinary and precision policies execute, then independent factors reproduce candidates, beliefs and stopping. | VALIDATED | shared-policies, completeness |
-| 051 | canonical-kernel-audit | Shared policy upstream correspondence | standard | Given aligned native implementations, when shared execution runs, then agreement and source-specific differences are explicit. | VALIDATED | shared-policies, completeness |
-| 052 | canonical-kernel-audit | Shared policy composition closure | standard | Given accepted policies, when combined and reused, then operands, state lifetime, admission and source semantics remain coherent. | PENDING | shared-policies, completeness |
-| 053 | canonical-kernel-audit | Shared execution and evidence closure | standard | Given the same decoding problem, when public transports and replay execute, then outputs and evidence preserve their declared identities. | PENDING | shared-policies, completeness |

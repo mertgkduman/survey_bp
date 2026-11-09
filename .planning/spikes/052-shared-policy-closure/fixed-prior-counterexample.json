@@ -1,0 +1,1049 @@
+[
+  {
+    "schedule": "layered",
+    "runs": [
+      {
+        "alpha": 0.0,
+        "candidate": [
+          0,
+          1,
+          0
+        ],
+        "observations": [
+          {
+            "fresh": [
+              -0.1330332099852014,
+              -0.7042496410500598,
+              1.5585574610003516
+            ],
+            "output": [
+              0.3334833950073993,
+              -1.00212482052503,
+              1.7792787305001758
+            ]
+          },
+          {
+            "fresh": [
+              0.575358987189561,
+              -0.9750741295357171,
+              1.7372921435116377
+            ],
+            "output": [
+              0.6876794935947805,
+              -1.1375370647678587,
+              1.8686460717558189
+            ]
+          },
+          {
+            "fresh": [
+              0.2175949946766791,
+              -0.366892871267834,
+              1.1891871097627615
+            ],
+            "output": [
+              0.5087974973383396,
+              -0.8334464356339171,
+              1.5945935548813808
+            ]
+          },
+          {
+            "fresh": [
+              -0.1297193747782845,
+              0.013617479542751415,
+              0.9592428690028351
+            ],
+            "output": [
+              0.33514031261085775,
+              -0.6431912602286243,
+              1.4796214345014174
+            ]
+          },
+          {
+            "fresh": [
+              -0.2825635858863184,
+              0.10706465632334408,
+              0.8664163564906756
+            ],
+            "output": [
+              0.2587182070568408,
+              -0.5964676718383279,
+              1.4332081782453376
+            ]
+          },
+          {
+            "fresh": [
+              -0.20673237197651972,
+              0.05813401579035205,
+              0.8848832948660049
+            ],
+            "output": [
+              0.29663381401174016,
+              -0.620932992104824,
+              1.4424416474330024
+            ]
+          },
+          {
+            "fresh": [
+              -0.2557097677755007,
+              0.13571064185567083,
+              0.8130983062788223
+            ],
+            "output": [
+              0.2721451161122497,
+              -0.5821446790721646,
+              1.406549153139411
+            ]
+          },
+          {
+            "fresh": [
+              -0.30131225559815333,
+              0.1748333475090685,
+              0.7953234032605749
+            ],
+            "output": [
+              0.24934387220092336,
+              -0.5625833262454658,
+              1.3976617016302872
+            ]
+          }
+        ],
+        "memory": {
+          "bindings": [
+            {
+              "advance_boundary": "source_iteration",
+              "binding_id": "affine",
+              "history_owner": "affine-history",
+              "kind": "affine_prior",
+              "order": 0,
+              "parameters": {
+                "alpha": 0.0
+              },
+              "refresh_boundary": "attempt_start",
+              "retain_history": false,
+              "source_status": "canonical_adaptation",
+              "state_lifetime": "attempt",
+              "target": "prior"
+            },
+            {
+              "advance_boundary": "local_update",
+              "binding_id": "delta",
+              "history_owner": "delta-history",
+              "kind": "pdprime_delta_mix",
+              "order": 1,
+              "parameters": {
+                "gamma": 0.5
+              },
+              "refresh_boundary": "attempt_start",
+              "retain_history": false,
+              "source_status": "canonical_adaptation",
+              "state_lifetime": "attempt",
+              "target": "belief"
+            }
+          ],
+          "commit_boundary": "admitted_local_units_and_complete_source_traversal",
+          "committed_local_updates": 8,
+          "committed_source_iterations": 4,
+          "history_sha256": {
+            "affine": "112355419f22ab57d808ec6a954af9351200d5310bef91fbe5918ed1f501f526",
+            "delta": "ee4062faab590310e09ab057d16157436035652c5566a39a8f71ef85d4c20b70"
+          },
+          "memory_c2v_reduction_additions": 48,
+          "memory_element_updates": {
+            "affine": 12,
+            "delta": 48
+          },
+          "mode": "ordered_attempt_local_update_with_source_prior",
+          "operand_order": "source_iteration_prior_then_complete_fresh_belief_then_affected_fresh_v2c",
+          "schema_version": 1
+        }
+      },
+      {
+        "alpha": 0.9,
+        "candidate": [
+          0,
+          1,
+          0
+        ],
+        "observations": [
+          {
+            "fresh": [
+              -0.1330332099852014,
+              -0.7042496410500598,
+              1.5585574610003516
+            ],
+            "output": [
+              0.3334833950073993,
+              -1.00212482052503,
+              1.7792787305001758
+            ]
+          },
+          {
+            "fresh": [
+              0.575358987189561,
+              -0.9750741295357171,
+              1.7372921435116377
+            ],
+            "output": [
+              0.6876794935947805,
+              -1.1375370647678587,
+              1.8686460717558189
+            ]
+          },
+          {
+            "fresh": [
+              0.11650653891198148,
+              -0.22067622955890676,
+              1.0709685743429984
+            ],
+            "output": [
+              0.5087974973383396,
+              -0.8334464356339171,
+              1.5945935548813808
+            ]
+          },
+          {
+            "fresh": [
+              -0.2308078305429821,
+              0.15983412125167865,
+              0.8410243335830718
+            ],
+            "output": [
+              0.33514031261085775,
+              -0.6431912602286243,
+              1.4796214345014174
+            ]
+          },
+          {
+            "fresh": [
+              -0.7009373045365466,
+              0.6981925221175822,
+              0.39807564754195124
+            ],
+            "output": [
+              0.2587182070568408,
+              -0.5964676718383279,
+              1.4332081782453376
+            ]
+          },
+          {
+            "fresh": [
+              -0.6251060906267478,
+              0.6492618815845902,
+              0.41654258591728055
+            ],
+            "output": [
+              0.29663381401174016,
+              -0.620932992104824,
+              1.4424416474330024
+            ]
+          },
+          {
+            "fresh": [
+              -0.7087393351649345,
+              0.7468709489613292,
+              0.3112957889685245
+            ],
+            "output": [
+              0.2721451161122497,
+              -0.5821446790721646,
+              1.406549153139411
+            ]
+          },
+          {
+            "fresh": [
+              -0.7543418229875871,
+              0.7859936546147269,
+              0.29352088595027714
+            ],
+            "output": [
+              0.24934387220092336,
+              -0.5625833262454658,
+              1.3976617016302872
+            ]
+          }
+        ],
+        "memory": {
+          "bindings": [
+            {
+              "advance_boundary": "source_iteration",
+              "binding_id": "affine",
+              "history_owner": "affine-history",
+              "kind": "affine_prior",
+              "order": 0,
+              "parameters": {
+                "alpha": 0.9
+              },
+              "refresh_boundary": "attempt_start",
+              "retain_history": false,
+              "source_status": "canonical_adaptation",
+              "state_lifetime": "attempt",
+              "target": "prior"
+            },
+            {
+              "advance_boundary": "local_update",
+              "binding_id": "delta",
+              "history_owner": "delta-history",
+              "kind": "pdprime_delta_mix",
+              "order": 1,
+              "parameters": {
+                "gamma": 0.5
+              },
+              "refresh_boundary": "attempt_start",
+              "retain_history": false,
+              "source_status": "canonical_adaptation",
+              "state_lifetime": "attempt",
+              "target": "belief"
+            }
+          ],
+          "commit_boundary": "admitted_local_units_and_complete_source_traversal",
+          "committed_local_updates": 8,
+          "committed_source_iterations": 4,
+          "history_sha256": {
+            "affine": "112355419f22ab57d808ec6a954af9351200d5310bef91fbe5918ed1f501f526",
+            "delta": "ee4062faab590310e09ab057d16157436035652c5566a39a8f71ef85d4c20b70"
+          },
+          "memory_c2v_reduction_additions": 48,
+          "memory_element_updates": {
+            "affine": 12,
+            "delta": 48
+          },
+          "mode": "ordered_attempt_local_update_with_source_prior",
+          "operand_order": "source_iteration_prior_then_complete_fresh_belief_then_affected_fresh_v2c",
+          "schema_version": 1
+        }
+      }
+    ],
+    "fresh_changed": true,
+    "all_outputs_identical": true
+  },
+  {
+    "schedule": "check_node_serial",
+    "runs": [
+      {
+        "alpha": 0.0,
+        "candidate": [
+          0,
+          1,
+          0
+        ],
+        "observations": [
+          {
+            "fresh": [
+              -0.1330332099852014,
+              -0.7042496410500598,
+              1.5585574610003516
+            ],
+            "output": [
+              0.3334833950073993,
+              -1.00212482052503,
+              1.7792787305001758
+            ]
+          },
+          {
+            "fresh": [
+              0.575358987189561,
+              -0.9750741295357171,
+              1.7372921435116377
+            ],
+            "output": [
+              0.6876794935947805,
+              -1.1375370647678587,
+              1.8686460717558189
+            ]
+          },
+          {
+            "fresh": [
+              0.2175949946766791,
+              -0.366892871267834,
+              1.1891871097627615
+            ],
+            "output": [
+              0.5087974973383396,
+              -0.8334464356339171,
+              1.5945935548813808
+            ]
+          },
+          {
+            "fresh": [
+              -0.1297193747782845,
+              0.013617479542751415,
+              0.9592428690028351
+            ],
+            "output": [
+              0.33514031261085775,
+              -0.6431912602286243,
+              1.4796214345014174
+            ]
+          },
+          {
+            "fresh": [
+              -0.2825635858863184,
+              0.10706465632334408,
+              0.8664163564906756
+            ],
+            "output": [
+              0.2587182070568408,
+              -0.5964676718383279,
+              1.4332081782453376
+            ]
+          },
+          {
+            "fresh": [
+              -0.20673237197651972,
+              0.05813401579035205,
+              0.8848832948660049
+            ],
+            "output": [
+              0.29663381401174016,
+              -0.620932992104824,
+              1.4424416474330024
+            ]
+          },
+          {
+            "fresh": [
+              -0.2557097677755007,
+              0.13571064185567083,
+              0.8130983062788223
+            ],
+            "output": [
+              0.2721451161122497,
+              -0.5821446790721646,
+              1.406549153139411
+            ]
+          },
+          {
+            "fresh": [
+              -0.30131225559815333,
+              0.1748333475090685,
+              0.7953234032605749
+            ],
+            "output": [
+              0.24934387220092336,
+              -0.5625833262454658,
+              1.3976617016302872
+            ]
+          }
+        ],
+        "memory": {
+          "bindings": [
+            {
+              "advance_boundary": "source_iteration",
+              "binding_id": "affine",
+              "history_owner": "affine-history",
+              "kind": "affine_prior",
+              "order": 0,
+              "parameters": {
+                "alpha": 0.0
+              },
+              "refresh_boundary": "attempt_start",
+              "retain_history": false,
+              "source_status": "canonical_adaptation",
+              "state_lifetime": "attempt",
+              "target": "prior"
+            },
+            {
+              "advance_boundary": "local_update",
+              "binding_id": "delta",
+              "history_owner": "delta-history",
+              "kind": "pdprime_delta_mix",
+              "order": 1,
+              "parameters": {
+                "gamma": 0.5
+              },
+              "refresh_boundary": "attempt_start",
+              "retain_history": false,
+              "source_status": "canonical_adaptation",
+              "state_lifetime": "attempt",
+              "target": "belief"
+            }
+          ],
+          "commit_boundary": "admitted_local_units_and_complete_source_traversal",
+          "committed_local_updates": 8,
+          "committed_source_iterations": 4,
+          "history_sha256": {
+            "affine": "112355419f22ab57d808ec6a954af9351200d5310bef91fbe5918ed1f501f526",
+            "delta": "ee4062faab590310e09ab057d16157436035652c5566a39a8f71ef85d4c20b70"
+          },
+          "memory_c2v_reduction_additions": 48,
+          "memory_element_updates": {
+            "affine": 12,
+            "delta": 48
+          },
+          "mode": "ordered_attempt_local_update_with_source_prior",
+          "operand_order": "source_iteration_prior_then_complete_fresh_belief_then_affected_fresh_v2c",
+          "schema_version": 1
+        }
+      },
+      {
+        "alpha": 0.9,
+        "candidate": [
+          0,
+          1,
+          0
+        ],
+        "observations": [
+          {
+            "fresh": [
+              -0.1330332099852014,
+              -0.7042496410500598,
+              1.5585574610003516
+            ],
+            "output": [
+              0.3334833950073993,
+              -1.00212482052503,
+              1.7792787305001758
+            ]
+          },
+          {
+            "fresh": [
+              0.575358987189561,
+              -0.9750741295357171,
+              1.7372921435116377
+            ],
+            "output": [
+              0.6876794935947805,
+              -1.1375370647678587,
+              1.8686460717558189
+            ]
+          },
+          {
+            "fresh": [
+              0.11650653891198148,
+              -0.22067622955890676,
+              1.0709685743429984
+            ],
+            "output": [
+              0.5087974973383396,
+              -0.8334464356339171,
+              1.5945935548813808
+            ]
+          },
+          {
+            "fresh": [
+              -0.2308078305429821,
+              0.15983412125167865,
+              0.8410243335830718
+            ],
+            "output": [
+              0.33514031261085775,
+              -0.6431912602286243,
+              1.4796214345014174
+            ]
+          },
+          {
+            "fresh": [
+              -0.7009373045365466,
+              0.6981925221175822,
+              0.39807564754195124
+            ],
+            "output": [
+              0.2587182070568408,
+              -0.5964676718383279,
+              1.4332081782453376
+            ]
+          },
+          {
+            "fresh": [
+              -0.6251060906267478,
+              0.6492618815845902,
+              0.41654258591728055
+            ],
+            "output": [
+              0.29663381401174016,
+              -0.620932992104824,
+              1.4424416474330024
+            ]
+          },
+          {
+            "fresh": [
+              -0.7087393351649345,
+              0.7468709489613292,
+              0.3112957889685245
+            ],
+            "output": [
+              0.2721451161122497,
+              -0.5821446790721646,
+              1.406549153139411
+            ]
+          },
+          {
+            "fresh": [
+              -0.7543418229875871,
+              0.7859936546147269,
+              0.29352088595027714
+            ],
+            "output": [
+              0.24934387220092336,
+              -0.5625833262454658,
+              1.3976617016302872
+            ]
+          }
+        ],
+        "memory": {
+          "bindings": [
+            {
+              "advance_boundary": "source_iteration",
+              "binding_id": "affine",
+              "history_owner": "affine-history",
+              "kind": "affine_prior",
+              "order": 0,
+              "parameters": {
+                "alpha": 0.9
+              },
+              "refresh_boundary": "attempt_start",
+              "retain_history": false,
+              "source_status": "canonical_adaptation",
+              "state_lifetime": "attempt",
+              "target": "prior"
+            },
+            {
+              "advance_boundary": "local_update",
+              "binding_id": "delta",
+              "history_owner": "delta-history",
+              "kind": "pdprime_delta_mix",
+              "order": 1,
+              "parameters": {
+                "gamma": 0.5
+              },
+              "refresh_boundary": "attempt_start",
+              "retain_history": false,
+              "source_status": "canonical_adaptation",
+              "state_lifetime": "attempt",
+              "target": "belief"
+            }
+          ],
+          "commit_boundary": "admitted_local_units_and_complete_source_traversal",
+          "committed_local_updates": 8,
+          "committed_source_iterations": 4,
+          "history_sha256": {
+            "affine": "112355419f22ab57d808ec6a954af9351200d5310bef91fbe5918ed1f501f526",
+            "delta": "ee4062faab590310e09ab057d16157436035652c5566a39a8f71ef85d4c20b70"
+          },
+          "memory_c2v_reduction_additions": 48,
+          "memory_element_updates": {
+            "affine": 12,
+            "delta": 48
+          },
+          "mode": "ordered_attempt_local_update_with_source_prior",
+          "operand_order": "source_iteration_prior_then_complete_fresh_belief_then_affected_fresh_v2c",
+          "schema_version": 1
+        }
+      }
+    ],
+    "fresh_changed": true,
+    "all_outputs_identical": true
+  },
+  {
+    "schedule": "variable_node_serial",
+    "runs": [
+      {
+        "alpha": 0.0,
+        "candidate": [
+          0,
+          1,
+          0
+        ],
+        "observations": [
+          {
+            "fresh": [
+              0.8,
+              -1.3,
+              2.0
+            ],
+            "output": [
+              0.8,
+              -1.3,
+              2.0
+            ]
+          },
+          {
+            "fresh": [
+              0.8,
+              -0.13324260805329288,
+              2.0
+            ],
+            "output": [
+              0.8,
+              -0.7166213040266465,
+              2.0
+            ]
+          },
+          {
+            "fresh": [
+              0.8,
+              -0.13324260805329288,
+              0.9307289146161218
+            ],
+            "output": [
+              0.8,
+              -0.7166213040266465,
+              1.4653644573080609
+            ]
+          },
+          {
+            "fresh": [
+              -0.09705139838511867,
+              -0.13324260805329288,
+              0.9307289146161218
+            ],
+            "output": [
+              0.3514743008074407,
+              -0.7166213040266465,
+              1.4653644573080609
+            ]
+          },
+          {
+            "fresh": [
+              -0.09705139838511867,
+              0.14937404914420316,
+              0.9307289146161218
+            ],
+            "output": [
+              0.3514743008074407,
+              -0.5753129754278985,
+              1.4653644573080609
+            ]
+          },
+          {
+            "fresh": [
+              -0.09705139838511867,
+              0.14937404914420316,
+              0.7963992172794934
+            ],
+            "output": [
+              0.3514743008074407,
+              -0.5753129754278985,
+              1.3981996086397466
+            ]
+          },
+          {
+            "fresh": [
+              -0.29311731752120385,
+              0.14937404914420316,
+              0.7963992172794934
+            ],
+            "output": [
+              0.2534413412393981,
+              -0.5753129754278985,
+              1.3981996086397466
+            ]
+          },
+          {
+            "fresh": [
+              -0.29311731752120385,
+              0.19254200235501934,
+              0.7963992172794934
+            ],
+            "output": [
+              0.2534413412393981,
+              -0.5537289988224904,
+              1.3981996086397466
+            ]
+          },
+          {
+            "fresh": [
+              -0.29311731752120385,
+              0.19254200235501934,
+              0.7727743799666958
+            ],
+            "output": [
+              0.2534413412393981,
+              -0.5537289988224904,
+              1.3863871899833478
+            ]
+          },
+          {
+            "fresh": [
+              -0.33207237468762474,
+              0.19254200235501934,
+              0.7727743799666958
+            ],
+            "output": [
+              0.2339638126561876,
+              -0.5537289988224904,
+              1.3863871899833478
+            ]
+          },
+          {
+            "fresh": [
+              -0.33207237468762474,
+              0.2006141403969369,
+              0.7727743799666958
+            ],
+            "output": [
+              0.2339638126561876,
+              -0.5496929298015316,
+              1.3863871899833478
+            ]
+          },
+          {
+            "fresh": [
+              -0.33207237468762474,
+              0.2006141403969369,
+              0.7682151608013018
+            ],
+            "output": [
+              0.2339638126561876,
+              -0.5496929298015316,
+              1.3841075804006508
+            ]
+          }
+        ],
+        "memory": {
+          "bindings": [
+            {
+              "advance_boundary": "source_iteration",
+              "binding_id": "affine",
+              "history_owner": "affine-history",
+              "kind": "affine_prior",
+              "order": 0,
+              "parameters": {
+                "alpha": 0.0
+              },
+              "refresh_boundary": "attempt_start",
+              "retain_history": false,
+              "source_status": "canonical_adaptation",
+              "state_lifetime": "attempt",
+              "target": "prior"
+            },
+            {
+              "advance_boundary": "local_update",
+              "binding_id": "delta",
+              "history_owner": "delta-history",
+              "kind": "pdprime_delta_mix",
+              "order": 1,
+              "parameters": {
+                "gamma": 0.5
+              },
+              "refresh_boundary": "attempt_start",
+              "retain_history": false,
+              "source_status": "canonical_adaptation",
+              "state_lifetime": "attempt",
+              "target": "belief"
+            }
+          ],
+          "commit_boundary": "admitted_local_units_and_complete_source_traversal",
+          "committed_local_updates": 12,
+          "committed_source_iterations": 4,
+          "history_sha256": {
+            "affine": "90f93ca42e7678c1cac71efa3dac4f41d09e92d13cb1eaca2488dc23a1ec7a54",
+            "delta": "ed3328b38dfac8b91332a5d60157fb56601a6bdef0cabbed12edd04dac8e62d3"
+          },
+          "memory_c2v_reduction_additions": 72,
+          "memory_element_updates": {
+            "affine": 12,
+            "delta": 72
+          },
+          "mode": "ordered_attempt_local_update_with_source_prior",
+          "operand_order": "source_iteration_prior_then_complete_fresh_belief_then_affected_fresh_v2c",
+          "schema_version": 1
+        }
+      },
+      {
+        "alpha": 0.9,
+        "candidate": [
+          0,
+          1,
+          0
+        ],
+        "observations": [
+          {
+            "fresh": [
+              0.8,
+              -1.3,
+              2.0
+            ],
+            "output": [
+              0.8,
+              -1.3,
+              2.0
+            ]
+          },
+          {
+            "fresh": [
+              0.8,
+              -0.13324260805329288,
+              2.0
+            ],
+            "output": [
+              0.8,
+              -0.7166213040266465,
+              2.0
+            ]
+          },
+          {
+            "fresh": [
+              0.8,
+              -0.13324260805329288,
+              0.9307289146161218
+            ],
+            "output": [
+              0.8,
+              -0.7166213040266465,
+              1.4653644573080609
+            ]
+          },
+          {
+            "fresh": [
+              -0.09705139838511867,
+              0.3917982183227253,
+              0.4495569261933766
+            ],
+            "output": [
+              0.3514743008074407,
+              -0.7166213040266465,
+              1.4653644573080609
+            ]
+          },
+          {
+            "fresh": [
+              -0.09705139838511867,
+              0.6744148755202214,
+              0.4495569261933766
+            ],
+            "output": [
+              0.3514743008074407,
+              -0.5753129754278985,
+              1.4653644573080609
+            ]
+          },
+          {
+            "fresh": [
+              -0.09705139838511867,
+              0.6744148755202214,
+              0.3152272288567482
+            ],
+            "output": [
+              0.3514743008074407,
+              -0.5753129754278985,
+              1.3981996086397466
+            ]
+          },
+          {
+            "fresh": [
+              -0.6967904467945072,
+              0.8015923712590945,
+              0.2547788650552654
+            ],
+            "output": [
+              0.2534413412393981,
+              -0.5753129754278985,
+              1.3981996086397466
+            ]
+          },
+          {
+            "fresh": [
+              -0.6967904467945072,
+              0.8447603244699107,
+              0.2547788650552654
+            ],
+            "output": [
+              0.2534413412393981,
+              -0.5537289988224904,
+              1.3981996086397466
+            ]
+          },
+          {
+            "fresh": [
+              -0.6967904467945072,
+              0.8447603244699107,
+              0.23115402774246785
+            ],
+            "output": [
+              0.2534413412393981,
+              -0.5537289988224904,
+              1.3863871899833478
+            ]
+          },
+          {
+            "fresh": [
+              -0.8239751675721664,
+              0.8641859034147781,
+              0.22052285095170887
+            ],
+            "output": [
+              0.2339638126561876,
+              -0.5537289988224904,
+              1.3863871899833478
+            ]
+          },
+          {
+            "fresh": [
+              -0.8239751675721664,
+              0.8722580414566956,
+              0.22052285095170887
+            ],
+            "output": [
+              0.2339638126561876,
+              -0.5496929298015316,
+              1.3863871899833478
+            ]
+          },
+          {
+            "fresh": [
+              -0.8239751675721664,
+              0.8722580414566956,
+              0.21596363178631484
+            ],
+            "output": [
+              0.2339638126561876,
+              -0.5496929298015316,
+              1.3841075804006508
+            ]
+          }
+        ],
+        "memory": {
+          "bindings": [
+            {
+              "advance_boundary": "source_iteration",
+              "binding_id": "affine",
+              "history_owner": "affine-history",
+              "kind": "affine_prior",
+              "order": 0,
+              "parameters": {
+                "alpha": 0.9
+              },
+              "refresh_boundary": "attempt_start",
+              "retain_history": false,
+              "source_status": "canonical_adaptation",
+              "state_lifetime": "attempt",
+              "target": "prior"
+            },
+            {
+              "advance_boundary": "local_update",
+              "binding_id": "delta",
+              "history_owner": "delta-history",
+              "kind": "pdprime_delta_mix",
+              "order": 1,
+              "parameters": {
+                "gamma": 0.5
+              },
+              "refresh_boundary": "attempt_start",
+              "retain_history": false,
+              "source_status": "canonical_adaptation",
+              "state_lifetime": "attempt",
+              "target": "belief"
+            }
+          ],
+          "commit_boundary": "admitted_local_units_and_complete_source_traversal",
+          "committed_local_updates": 12,
+          "committed_source_iterations": 4,
+          "history_sha256": {
+            "affine": "90f93ca42e7678c1cac71efa3dac4f41d09e92d13cb1eaca2488dc23a1ec7a54",
+            "delta": "ed3328b38dfac8b91332a5d60157fb56601a6bdef0cabbed12edd04dac8e62d3"
+          },
+          "memory_c2v_reduction_additions": 72,
+          "memory_element_updates": {
+            "affine": 12,
+            "delta": 72
+          },
+          "mode": "ordered_attempt_local_update_with_source_prior",
+          "operand_order": "source_iteration_prior_then_complete_fresh_belief_then_affected_fresh_v2c",
+          "schema_version": 1
+        }
+      }
+    ],
+    "fresh_changed": true,
+    "all_outputs_identical": true
+  }
+]

@@ -1,0 +1,2 @@
+{"checks": 4, "passed": 3, "failed": 1}
+FINDING: local_fixed_prior_composition_admission Local schedules admit affine prior before fixed-prior PD-prime; PD-prime discards its changed operand. Flooding already rejects this composition. See fixed-prior-counterexample.json.
