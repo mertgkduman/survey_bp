@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Literature spikes 054-055 complete; citation screen is bounded and twelve standalone BP baseline comparisons are source-verified
-last_updated: "2026-11-10T21:02:46+00:00"
+stopped_at: Results plots label log decades with superscripts and refit to visible curves
+last_updated: "2026-11-10T22:51:46+00:00"
 last_activity: 2026-11-10
-last_activity_desc: Verified twelve cited QLDPC standalone BP baseline papers; dated OpenAlex snapshot and primary evidence saved; no simulations or phase advancement
-state_head: 7b8e702
+last_activity_desc: Formatted logarithmic axis labels and fitted both axes to visible curves. Passed 17 browser workflow checks and five plot-coordinate tests.
+state_head: 8d35f04
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,8 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-10 — completed literature spikes 054-055 for cited BP baseline papers
-Last Activity Description: Spikes 054-055 screened citation prominence and independently verified primary-paper BP baseline evidence. Saved twelve direct standalone-BP comparisons, two code benchmarks, two related hybrids and one specialized min-sum hardware study. OpenAlex counts are a dated single-record snapshot, with duplicate/edition caveats; global top-N completeness is not established. See `.planning/spikes/055-bp-baseline-source-check/PAPERS.md`. No simulation, kernel, UI or phase-status change.
+Last activity: 2026-11-10 — completed quick task 261110-oou for results plot axes
+Last Activity Description: Quick task 261110-oou adds superscript labels for powers of ten and lighter logarithmic gridlines. Visible curves and confidence intervals determine the plot limits. Chromium verified matching axes after hiding curves or selecting a decoder directly. Implementation `8d35f04`.
+
+Prior literature activity: Spikes 054-055 screened citation prominence and independently verified primary-paper BP baseline evidence. Saved twelve direct standalone-BP comparisons, two code benchmarks, two related hybrids and one specialized min-sum hardware study. OpenAlex counts are a dated single-record snapshot, with duplicate/edition caveats; global top-N completeness is not established. See `.planning/spikes/055-bp-baseline-source-check/PAPERS.md`. No simulation, kernel, UI or phase-status change.
 
 Prior builder activity: Quick task 261110-lsd adds Request experiment results beside package download. Validation enables it; edits and invalid state clear it. The action prepares an exact downloadable portable specification and a SHA-256-bound GitHub issue draft for the user to review and submit. Verified with 12 browser workflow groups; no issue submissions or simulations. Implementation: `7b8e702`.
 
@@ -294,6 +296,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261110-oou | Format log axis powers and rescale plots to visible curves | 2026-11-10 | 8d35f04 | Verified with 17 browser workflow checks and five plot-coordinate tests | [261110-oou-format-log-axis-powers-and-rescale-plots](./quick/261110-oou-format-log-axis-powers-and-rescale-plots/) |
 | 261110-lsd | Add validated Request experiment results action and GitHub request draft | 2026-11-10 | 7b8e702 | Verified: 12 browser groups; exact specs/hash, invalidation, long inputs, mobile | [261110-lsd-add-a-validated-request-experiment-resul](./quick/261110-lsd-add-a-validated-request-experiment-resul/) |
 | 261109-mzx | Exclude already displayed curves from each plot add picker | 2026-11-09 | 1e6b825 | Verified: 16 browser groups; keyboard/mouse restoration, empty and independent plot states | [261109-mzx-exclude-already-displayed-curves-from-ea](./quick/261109-mzx-exclude-already-displayed-curves-from-ea/) |
 | 261109-mcf | Filter active research curves to multiple measured rates and hide inputs without results | 2026-11-09 | 7eeddf7 | Verified: 118 tests; 14 browser groups; retained imports; 105→63 curves, 361→319 points | [261109-mcf-filter-active-research-curves-to-multipl](./quick/261109-mcf-filter-active-research-curves-to-multipl/) |
@@ -375,8 +378,8 @@ Latest kernel work: completed F01 → F02 corrections and qualification in quick
 
 **Resume file:** None
 
-Last session: 2026-11-10T21:02:46+00:00
-Stopped at: Cited BP baseline paper shortlist verified and saved; active UI work remains complete
+Last session: 2026-11-10T22:51:46+00:00
+Stopped at: Results plot axes and curve visibility verified in Chromium
 Next step: Requested builder request action and display/catalog cleanup are complete; resume the existing Phase 11 scientific work when directed. Preserve identity versions and qualification labels. Phase 11 scientific gaps and Phase 5 human review remain open; Phase 7 stays paused.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
