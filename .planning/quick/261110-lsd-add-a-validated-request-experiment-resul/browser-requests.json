@@ -1,0 +1,12 @@
+{
+  "checks": [
+    "Validated request action, focused review panel, GitHub draft navigation, exact embedded matrices/hash, and byte-identical package specification",
+    "Edits and invalid configurations clear/disable requests; delayed matrix materialization cannot resurrect a stale draft",
+    "Long custom Stim stays complete in the downloadable specification while the GitHub draft URL stays short",
+    "Exact custom JSON requests preserve every field; return-to-builder reset invalidates the request",
+    "Input fetch failures leave no stale request link; successful request panel fits mobile width"
+  ],
+  "errors": [],
+  "issues_submitted": 0,
+  "simulations": 0
+}

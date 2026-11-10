@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Add-curve picker excludes displayed curves; browser verification passed
-last_updated: "2026-11-09T21:35:15+00:00"
-last_activity: 2026-11-09
-last_activity_desc: Fixed per-plot add picker; displayed curves excluded, hidden curves restore without duplicates; 16 browser workflow groups pass
-state_head: 1e6b825
+stopped_at: Validated experiment request action complete; browser verification passed
+last_updated: "2026-11-10T20:46:49+00:00"
+last_activity: 2026-11-10
+last_activity_desc: Added Request experiment results with exact specification and GitHub draft; 12 browser groups pass; no issues submitted or simulations run
+state_head: 7b8e702
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,8 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-09 — completed quick task 261109-mzx: exclude displayed curves from add picker
-Last Activity Description: Quick task 261109-mzx filters each add-curve picker by visible curve identity before prefix matching. Hidden curves restore without duplicate entries; compare-all has an explicit empty state. Verified with 16 browser workflow groups and JS syntax/diff checks. Implementation: `1e6b825`.
+Last activity: 2026-11-10 — completed quick task 261110-lsd: validated experiment result requests
+Last Activity Description: Quick task 261110-lsd adds Request experiment results beside package download. Validation enables it; edits and invalid state clear it. The action prepares an exact downloadable portable specification and a SHA-256-bound GitHub issue draft for the user to review and submit. Verified with 12 browser workflow groups; no issue submissions or simulations. Implementation: `7b8e702`.
+
+Prior picker activity: Quick task 261109-mzx filters each add-curve picker by visible curve identity before prefix matching. Hidden curves restore without duplicate entries; compare-all has an explicit empty state. Verified with 16 browser workflow groups and JS syntax/diff checks. Implementation: `1e6b825`.
 
 Prior interface activity: Quick task 261109-mcf centrally filters active v2 curves to at least two distinct measured error rates and derives public input/saved choices from that view. Counts: 105→63 curves, 361→319 points, 7→6 codes, 3→0 registered circuits. Verified with 118 research tests, 14 browser workflow groups and real retained-result imports. Empty/default/import selection handling passes; raw catalog, evidence and v1 bytes are preserved. Implementation: `7eeddf7`.
 
@@ -290,6 +292,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261110-lsd | Add validated Request experiment results action and GitHub request draft | 2026-11-10 | 7b8e702 | Verified: 12 browser groups; exact specs/hash, invalidation, long inputs, mobile | [261110-lsd-add-a-validated-request-experiment-resul](./quick/261110-lsd-add-a-validated-request-experiment-resul/) |
 | 261109-mzx | Exclude already displayed curves from each plot add picker | 2026-11-09 | 1e6b825 | Verified: 16 browser groups; keyboard/mouse restoration, empty and independent plot states | [261109-mzx-exclude-already-displayed-curves-from-ea](./quick/261109-mzx-exclude-already-displayed-curves-from-ea/) |
 | 261109-mcf | Filter active research curves to multiple measured rates and hide inputs without results | 2026-11-09 | 7eeddf7 | Verified: 118 tests; 14 browser groups; retained imports; 105→63 curves, 361→319 points | [261109-mcf-filter-active-research-curves-to-multipl](./quick/261109-mcf-filter-active-research-curves-to-multipl/) |
 | 261109-hhq | Fix shared-policy findings F01 → F02 and qualify result preservation | 2026-11-09 | fd5c3d0, 78f1c1c | Verified: 1712 kernel / 161 final shared passes; 24 Sinter v2 shots; 82 identical legacy receipts; 58 shared-v1 shots replayed | [261109-hhq-fix-f01-memory-admission-then-f02-sinter](./quick/261109-hhq-fix-f01-memory-admission-then-f02-sinter/) |
@@ -358,6 +361,8 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
+Latest builder action: quick task 261110-lsd, implementation `7b8e702`. Request experiment results enables after validation, prepares a complete portable JSON and prefilled GitHub issue, and invalidates on configuration changes. User review/attachment/submission remains on GitHub; no backend job was launched. Twelve browser workflow groups passed.
+
 Latest picker fix: quick task 261109-mzx, implementation `1e6b825`. Add a decoder / curve lists only curves not currently displayed on that plot. Hidden curves can be restored without duplication; all-displayed empty state and independent plot state pass Chromium checks (16 workflow groups total).
 
 Latest interface work: quick task 261109-mcf, implementation `7eeddf7`. Active v2 uses a single multi-rate projection for all results and public input choices: 63 curves / 319 points / 6 codes / 0 registered circuits. Empty/default/import states and stale selections are verified. Full retained catalog and archived v1 are unchanged. See the quick summary, verification and explicit removal audit. Scientific phase progress and gates remain unchanged.
@@ -366,9 +371,9 @@ Latest kernel work: completed F01 → F02 corrections and qualification in quick
 
 **Resume file:** None
 
-Last session: 2026-11-09T21:35:15+00:00
-Stopped at: Requested active v2 cleanup and add-curve picker fix complete and verified
-Next step: Requested display/catalog cleanup is complete; resume the existing Phase 11 scientific work when directed. Preserve identity versions and qualification labels. Phase 11 scientific gaps and Phase 5 human review remain open; Phase 7 stays paused.
+Last session: 2026-11-10T20:46:49+00:00
+Stopped at: Validated result-request action and previous active v2 fixes complete and verified
+Next step: Requested builder request action and display/catalog cleanup are complete; resume the existing Phase 11 scientific work when directed. Preserve identity versions and qualification labels. Phase 11 scientific gaps and Phase 5 human review remain open; Phase 7 stays paused.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
 Latest execution report: `.planning/phases/04-memory-policies-and-relay-bp/04-EXECUTION-CONTINUATION-20260927-RESUMED.md`.
