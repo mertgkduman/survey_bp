@@ -115,6 +115,18 @@ records denominators and stopping reasons but reports no fixed-N confidence
 interval (`unavailable_optional_stopping`). Old specifications keep their
 first-target stopping behavior and remain importable.
 
+### Request experiment results
+
+After **Validate configuration** succeeds, **Request experiment results** becomes
+available beside **Download experiment package**. It prepares a GitHub issue
+for review with a SHA-256 fingerprint of the complete portable specification.
+Download the request specification and attach it to the issue, then submit on
+GitHub to send the request. Matrices and Stim text stay complete in the attached
+JSON instead of being truncated into an issue URL. GitHub sign-in may be needed.
+
+Any builder edit, reset, input refresh or failed validation invalidates the
+prepared request. Preparing a request does not submit a job or create results.
+
 ### Upload results
 
 A completed portable run emits derived `catalog-entry.json` alongside its

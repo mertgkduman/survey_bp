@@ -116,7 +116,13 @@ OBSERVABLE_INCLUDE(0) rec[-1]</textarea></label><label>Or upload .stim<input id=
 <label>First shot index<input id="build-start" type="number" min="0" value="0"></label>
 </div><div id="point-budgets" hidden></div><p id="stopping-help" class="small muted">Budgets apply independently to each rate. Empty fields mean no limit; each point needs at least one limit or target.</p></fieldset>
 <p id="builder-feedback" role="status" aria-live="polite"></p>
-<div class="actions"><button id="validate-spec" type="button">Validate configuration</button><button id="download-package" type="button" disabled>Download experiment package</button><button id="download-json" class="secondary" type="button" disabled>Download JSON</button></div>
+<div class="actions"><button id="validate-spec" type="button">Validate configuration</button><button id="download-package" type="button" disabled>Download experiment package</button><button id="request-results" type="button" class="secondary" aria-controls="experiment-request" aria-expanded="false" disabled>Request experiment results</button><button id="download-json" class="secondary" type="button" disabled>Download JSON</button></div>
+<section id="experiment-request" class="request-panel" aria-labelledby="request-heading" hidden>
+<h3 id="request-heading" tabindex="-1">Prepare your experiment request</h3>
+<p>Download the validated specification, then attach it to the GitHub issue. Review and submit the issue on GitHub to send your request.</p>
+<div class="actions"><button id="download-request" type="button" class="secondary" disabled>Download request specification</button><a id="open-request" target="_blank" rel="noopener noreferrer">Open request on GitHub ↗</a></div>
+<p id="request-summary" class="small muted"></p>
+</section>
 <details><summary>Exact configuration / custom JSON</summary><pre id="spec-preview" tabindex="0"></pre><label>Import a complete specification<textarea id="custom-spec" rows="8" spellcheck="false"></textarea></label><div class="actions"><button id="apply-spec" type="button" class="secondary">Use this JSON</button><button id="reset-spec" type="button" class="secondary">Return to visual builder</button></div></details>
 </form>
 </section>

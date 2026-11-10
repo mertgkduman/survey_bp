@@ -49,3 +49,7 @@ label { display:grid; gap:.35rem; font-weight:600; font-size:.83rem; min-width:0
 .axis-note { text-align:center; padding:.3rem; }
 .bound-error-bar { stroke-width:1.5; stroke-dasharray:3 2; }
 textarea[readonly] { background:#f7faf9; }
+
+.request-panel { border:1px solid var(--line); border-radius:7px; padding:1rem; margin:1rem 0; background:white; }
+.request-panel .actions { align-items:center; }
+#request-summary { overflow-wrap:anywhere; }
