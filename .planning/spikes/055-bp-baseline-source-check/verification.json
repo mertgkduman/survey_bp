@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "papers": 17,
+  "classifications": {
+    "hybrid_only": 2,
+    "code_benchmark": 2,
+    "direct_baseline": 12,
+    "specialized_min_sum": 1
+  },
+  "citations_match_snapshot": true,
+  "csv_matches_json": true,
+  "primary_source_interpretation": "manually checked at recorded evidence locations; not inferred by this consistency checker",
+  "network_requests": 0,
+  "simulations": 0
+}

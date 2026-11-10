@@ -47,3 +47,9 @@ The project `.venv` supplies the pinned versions in `pyproject.toml`; no new dep
 
 - Test stochastic policy identities across batch chunking and decoder instances. Replay of one batch cannot prove independence from transport order; batch-local indexes must not silently define the scientific randomization contract.
 - For composed memory policies, test operand liveness as well as candidate equality: an upstream transformed prior or field must be consumed by the next policy, or the combination must be rejected.
+
+## Literature and citation screening
+
+- Keep a dated, single-provider citation snapshot and stable publication IDs; inspect journal/preprint duplicates without adding their counts as though disjoint.
+- Verify decoder-baseline eligibility in primary methods/results independently from bibliographic prominence. Distinguish standalone BP comparisons, BP-based code benchmarks and BP-plus-postprocessing hybrids.
+- Literature inclusion identifies a source to extract, not a qualified reproduction manifest or permission to launch experiments.

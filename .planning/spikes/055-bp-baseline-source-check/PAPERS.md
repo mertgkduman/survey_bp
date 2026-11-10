@@ -1,0 +1,56 @@
+# Citation-prioritized QLDPC papers with a BP baseline
+
+Checked 10 November 2026. Citation counts are OpenAlex counts for the selected publication record, not merged Google Scholar totals. This is a verified shortlist, not a claim to an exhaustive global ranking. Treat surface/toric codes as QLDPC; distinguish binary CSS and quaternary Pauli kernels.
+
+## Direct standalone-BP comparisons
+
+| Paper | Authors; year | OpenAlex citations | BP variant | Explicit baseline evidence |
+|---|---|---:|---|---|
+| [Degenerate Quantum LDPC Codes With Good Finite Length Performance](https://arxiv.org/html/1904.02703) | Pavel Panteleev; Gleb Kalachev; 2021 | [337](https://api.openalex.org/works/W2926023653) | Normalized min-sum (quaternary), layered scheduling | Fig. 1 and simulation settings preceding it: Standalone BP compared with BP-OSD-0 on generalized bicycle, generalized HGP, HGP and cubic codes. The inspected v3 specifies normalization 0.625 and 32 iterations. |
+| [Decoding across the quantum low-density parity-check code landscape](https://arxiv.org/html/2005.07016) | Joschka Roffe; David R. White; Simon Burton; Earl T. Campbell; 2020 | [289](https://api.openalex.org/works/W3025282692) | Variable-scaled min-sum (binary CSS) | Fig. 3; Sec. VI; Appendix C: Plain BP versus BP+OSD-CS on toric codes, with explicit scaling conventions in Appendix C. |
+| [On the iterative decoding of sparse quantum codes](https://arxiv.org/html/0801.1241) | David Poulin; Yeojin Chung; 2008 | [165](https://api.openalex.org/works/W1850344377) | Sum-product, Pauli/quaternary syndrome BP | Sec. III; Secs. V-VI: Ordinary BP is the comparator for freezing, perturbation and collision heuristics on bicycle codes under depolarizing noise. |
+| [Fifteen Years of Quantum LDPC Coding and Improved Decoding Strategies](https://www.southampton.ac.uk/~sxn/paper/20151124access.pdf) | Zunaira Babar; Panagiotis Botsinis; Dimitrios Alanis; Soon Xin Ng; Lajos Hanzo; 2015 | [117](https://api.openalex.org/works/W2215279005) | Sum-product, binary and non-binary | Sec. IV; Sec. V; Sec. VII A; Fig. 16 (PDF p. 21): Survey plus original supernode/modified non-binary decoding study: Fig. 16 benchmarks binary and standard non-binary BP against modified decoders on the 800-qubit bicycle code. |
+| [Neural Belief-Propagation Decoders for Quantum Error-Correcting Codes](https://arxiv.org/html/1811.07835) | Ye-Hua Liu; David Poulin; 2019 | [110](https://api.openalex.org/works/W2901383498) | Sum-product, log-domain | Eqs. (1)-(2); numerical results; Figs. 2-4: Untrained BP compared with trained neural BP on toric, bicycle and hypergraph-product codes. |
+| [Trapping Sets of Quantum LDPC Codes](https://arxiv.org/html/2012.15297) | Nithin Raveendran; Bane Vasic; 2021 | [76](https://api.openalex.org/works/W3116662363) | Min-sum; flooding BP also studied | Sec. 5.1 and Fig. 9; Sec. 5.2.1 and Fig. 10: Fig. 10 compares flooding/parallel with layered min-sum on A1 [[254,28]]; Fig. 9 uses flooding BP to benchmark code design. |
+| [Toward a Union-Find Decoder for Quantum LDPC Codes](https://arxiv.org/html/2103.08049) | Nicolas Delfosse; Vivien Londe; Michael E. Beverland; 2022 | [70](https://api.openalex.org/works/W3137563282) | Sum-product-type BP in log-domain | Sec. 8 and Fig. 4; Appendix Algorithm 2: BP is compared directly with Union-Find on a 3600-qubit 4D hyperbolic code. The appendix defines the particular iterative BP variant. |
+| [Exploiting degeneracy in belief propagation decoding of quantum codes](https://arxiv.org/html/2104.13659) | Kao-Yueh Kuo; Ching-Yi Lai; 2022 | [65](https://api.openalex.org/works/W3159435673) | Quaternary sum-product BP4 | Sec. IV; published article Fig. 5; bicycle and GHP comparisons: Conventional BP4 compared with memory BP and adaptive memory BP across bicycle, HGP, surface and toric codes. |
+| [Refined Belief Propagation Decoding of Sparse-Graph Quantum Codes](https://arxiv.org/html/2002.06502) | Kao-Yueh Kuo; Ching-Yi Lai; 2020 | [53](https://api.openalex.org/works/W3005760425) | Sum-product, conventional BP4/BP2 and scalar-message BP4 | Fig. 8; Sec. IV normalization studies: Parallel BP baselines compared with serial and normalized scalar-message BP; includes a [[129,28]] HGP code and bicycle examples. |
+| [Enhanced Feedback Iterative Decoding of Sparse Quantum Codes](https://arxiv.org/html/0912.4546) | Yun-Jiang Wang; Barry C. Sanders; Bao-Ming Bai; Xin-Mei Wang; 2012 | [49](https://api.openalex.org/works/W2156987111) | Sum-product, non-binary syndrome BP | Sec. V; Figs. 4-11; Sec. VI: Standard BP and Poulin-Chung perturbation compared with enhanced-feedback BP; ordinary and entanglement-assisted sparse quantum examples are distinguished. |
+| [Belief Propagation Decoding of Quantum LDPC Codes with Guided Decimation](https://arxiv.org/html/2312.10950v2) | Hanwen Yao; Waleed Abu Laban; Christian Hager; Alexandre Graell i Amat; Henry D. Pfister; 2024 | [46](https://api.openalex.org/works/W4401693145) | Binary sum-product BP and quaternary Q-BP | Figs. 2-5 and 7-8; Secs. 3.2, 4.4-4.5 and 6: Plain binary BP versus BPGD on B1/C2; ordinary Q-BP versus Q-BPGD on A5/B2. BP-OSD and BP-SI are separately configured comparison arms. |
+| [Modified belief propagation decoders for quantum low-density parity-check codes](https://arxiv.org/html/1903.07404) | Alex Rigby; J. C. Olivier; Peter Jarvis; 2019 | [42](https://api.openalex.org/works/W2962973842) | Sum-product, GF(2)/GF(4) and supernode formulations | Sec. II equations; Figs. 3-4 and 7-8; Sec. IV: Standard binary/quaternary BP compared with augmented graphs, adjusted priors and combined decoders on bicycle and other sparse quantum codes. |
+
+## Foundational BP code benchmarks
+
+- [Sparse-Graph Codes for Quantum Error Correction](https://arxiv.org/html/quant-ph/0304161) — David J. C. MacKay; Graeme Mitchison; Paul L. McFadden; 2004; [OpenAlex: 403](https://api.openalex.org/works/W2119314900). Plain sum-product. Foundational sparse-graph/bicycle code benchmarking with plain SPA; a code-construction performance study rather than a proposed-decoder-versus-BP experiment.
+- [Quantum Quasi-Cyclic LDPC Codes](https://arxiv.org/html/quant-ph/0701020) — Manabu Hagiwara; Hideki Imai; 2007; [OpenAlex: 91](https://api.openalex.org/works/W1975088395). Syndrome sum-product. QC quantum code constructions evaluated under syndrome SPA, with code benchmarks rather than a new decoder comparison.
+
+## Related hybrid papers, outside the standalone-BP list
+
+- [High-threshold and low-overhead fault-tolerant quantum memory](https://www.nature.com/articles/s41586-024-07107-7) — Sergey Bravyi; Andrew W. Cross; Jay M. Gambetta; Dmitri Maslov; Patrick Rall; Theodore J. Yoder; 2024; [OpenAlex: 711](https://api.openalex.org/works/W4393234688). BP plus ordered statistics decoding. Highly cited circuit-level BB-memory benchmark uses BP-OSD; keep separate from a standalone BP baseline.
+- [Combining hard and soft decoders for hypergraph product codes](https://arxiv.org/html/2004.11199) — Antoine Grospellier; Lucien Groues; Anirudh Krishna; Anthony Leverrier; 2021; [OpenAlex: 65](https://api.openalex.org/works/W3019236876). Sum-product BP plus small-set-flip. Important BP+SSF hybrid paper, with SSF as the principal benchmark. Do not infer that use of BP as a component establishes a separately reported ordinary-BP performance curve.
+
+## Additional explicit min-sum hardware comparison
+
+- [Syndrome-Based Min-Sum vs OSD-0 Decoders: FPGA Implementation and Analysis for Quantum LDPC Codes](https://riunet.upv.es/entities/publication/9694720f-fdc5-4c43-a9d7-906dfdd8ec94) — Javier Valls; Francisco Garcia-Herrero; Nithin Raveendran; Bane Vasic; 2021; [OpenAlex: 36](https://api.openalex.org/works/W3204926734). Min-sum and min-sum plus OSD-0. Additional explicit min-sum versus OSD-0 hardware comparison, outside the main citation-prioritized twelve.
+
+## Identity and interpretation limits
+
+- **High-threshold and low-overhead fault-tolerant quantum memory:** Published Nature 627, 778-782 (2024).
+- **Sparse-Graph Codes for Quantum Error Correction:** Preprint 2003; published IEEE Trans. Inf. Theory 50, 2315-2330 (2004).
+- **Degenerate Quantum LDPC Codes With Good Finite Length Performance:** Preprint 2019; published in Quantum 5, 585 (2021).
+- **Decoding across the quantum low-density parity-check code landscape:** Published Phys. Rev. Research 2, 043423 (2020).
+- **On the iterative decoding of sparse quantum codes:** Published Quantum Information and Computation 8, 987-1000 (2008). OpenAlex displays a shortened DOI different from the publisher-form QIC8.10-8; source identity is cross-checked by title/authors/year and arXiv. Other preprint/index records are not added.
+- **Fifteen Years of Quantum LDPC Coding and Improved Decoding Strategies:** Published IEEE Access 3, 2492-2519 (2015). Full primary PDF inspected, not included merely because it reviews BP.
+- **Neural Belief-Propagation Decoders for Quantum Error-Correcting Codes:** Published Phys. Rev. Lett. 122, 200501 (2019).
+- **Quantum Quasi-Cyclic LDPC Codes:** Counted ISIT 2007 record; inspected arXiv v4 is an extended 2010 version. A separate non-DOI record is not added.
+- **Trapping Sets of Quantum LDPC Codes:** Published Quantum 5, 562 (2021); distinct paper from the related FPGA min-sum study.
+- **Toward a Union-Find Decoder for Quantum LDPC Codes:** Preprint 2021; published IEEE Trans. Inf. Theory 68, 3187-3199 (2022). Classifying as sum-product-type follows its tanh/product/atanh check updates; numerical conventions require separate reproduction review.
+- **Combining hard and soft decoders for hypergraph product codes:** Published Quantum 5, 432 (2021); separate duplicate record is not added.
+- **Exploiting degeneracy in belief propagation decoding of quantum codes:** Published npj Quantum Information 8, 111 (2022); inspected arXiv v2 is dated 2023. Published primary: https://doi.org/10.1038/s41534-022-00623-2.
+- **Refined Belief Propagation Decoding of Sparse-Graph Quantum Codes:** Published IEEE J. Sel. Areas Inf. Theory 1(2), 487-498 (2020); not the separate scalar-message conference paper.
+- **Enhanced Feedback Iterative Decoding of Sparse Quantum Codes:** Preprint 2009; published IEEE Trans. Inf. Theory 58, 1231-1241 (2012). Repository-like duplicate indexed as 2016 is not added.
+- **Belief Propagation Decoding of Quantum LDPC Codes with Guided Decimation:** Preprint 2023; counted OpenAlex record is the ISIT 2024 publication. Baseline details are checked in the fuller arXiv v2, not asserted to be identical to every conference-version detail.
+- **Modified belief propagation decoders for quantum low-density parity-check codes:** Published Phys. Rev. A 100, 012330 (2019).
+- **Syndrome-Based Min-Sum vs OSD-0 Decoders: FPGA Implementation and Analysis for Quantum LDPC Codes:** Published IEEE Access 9, 138734-138743 (2021).
+
+No curve reproduction, algorithm correctness certification, parameter sufficiency claim, kernel changes, new simulations or publication-campaign authorization follows from inclusion. Verify exact source version, matrices, channel, update rule/schedule, caps, stopping, work budget and logical-failure denominator before adding a reproduction manifest. Min-sum normalization is not interchangeable with V2C damping.

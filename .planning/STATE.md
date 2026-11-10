@@ -5,10 +5,10 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Validated experiment request action complete; browser verification passed
-last_updated: "2026-11-10T20:46:49+00:00"
+stopped_at: Literature spikes 054-055 complete; citation screen is bounded and twelve standalone BP baseline comparisons are source-verified
+last_updated: "2026-11-10T21:02:46+00:00"
 last_activity: 2026-11-10
-last_activity_desc: Added Request experiment results with exact specification and GitHub draft; 12 browser groups pass; no issues submitted or simulations run
+last_activity_desc: Verified twelve cited QLDPC standalone BP baseline papers; dated OpenAlex snapshot and primary evidence saved; no simulations or phase advancement
 state_head: 7b8e702
 progress:
   total_phases: 14
@@ -34,8 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-10 — completed quick task 261110-lsd: validated experiment result requests
-Last Activity Description: Quick task 261110-lsd adds Request experiment results beside package download. Validation enables it; edits and invalid state clear it. The action prepares an exact downloadable portable specification and a SHA-256-bound GitHub issue draft for the user to review and submit. Verified with 12 browser workflow groups; no issue submissions or simulations. Implementation: `7b8e702`.
+Last activity: 2026-11-10 — completed literature spikes 054-055 for cited BP baseline papers
+Last Activity Description: Spikes 054-055 screened citation prominence and independently verified primary-paper BP baseline evidence. Saved twelve direct standalone-BP comparisons, two code benchmarks, two related hybrids and one specialized min-sum hardware study. OpenAlex counts are a dated single-record snapshot, with duplicate/edition caveats; global top-N completeness is not established. See `.planning/spikes/055-bp-baseline-source-check/PAPERS.md`. No simulation, kernel, UI or phase-status change.
+
+Prior builder activity: Quick task 261110-lsd adds Request experiment results beside package download. Validation enables it; edits and invalid state clear it. The action prepares an exact downloadable portable specification and a SHA-256-bound GitHub issue draft for the user to review and submit. Verified with 12 browser workflow groups; no issue submissions or simulations. Implementation: `7b8e702`.
 
 Prior picker activity: Quick task 261109-mzx filters each add-curve picker by visible curve identity before prefix matching. Hidden curves restore without duplicate entries; compare-all has an explicit empty state. Verified with 16 browser workflow groups and JS syntax/diff checks. Implementation: `1e6b825`.
 
@@ -361,6 +363,8 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
+Latest literature research: spikes 054 (PARTIAL: bounded citation screening, not an exhaustive global ranking) and 055 (VALIDATED: explicit baseline evidence in the screened sources). Twelve direct BP baseline papers are listed with min-sum/SPA families and evidence locations; foundational code benchmarks and BP+OSD/BP+SSF hybrids are separate. JSON/CSV and an offline consistency verifier accompany the report. This source list does not certify reproduction settings or authorize simulations. Scientific phase progress is unchanged.
+
 Latest builder action: quick task 261110-lsd, implementation `7b8e702`. Request experiment results enables after validation, prepares a complete portable JSON and prefilled GitHub issue, and invalidates on configuration changes. User review/attachment/submission remains on GitHub; no backend job was launched. Twelve browser workflow groups passed.
 
 Latest picker fix: quick task 261109-mzx, implementation `1e6b825`. Add a decoder / curve lists only curves not currently displayed on that plot. Hidden curves can be restored without duplication; all-displayed empty state and independent plot state pass Chromium checks (16 workflow groups total).
@@ -371,8 +375,8 @@ Latest kernel work: completed F01 → F02 corrections and qualification in quick
 
 **Resume file:** None
 
-Last session: 2026-11-10T20:46:49+00:00
-Stopped at: Validated result-request action and previous active v2 fixes complete and verified
+Last session: 2026-11-10T21:02:46+00:00
+Stopped at: Cited BP baseline paper shortlist verified and saved; active UI work remains complete
 Next step: Requested builder request action and display/catalog cleanup are complete; resume the existing Phase 11 scientific work when directed. Preserve identity versions and qualification labels. Phase 11 scientific gaps and Phase 5 human review remain open; Phase 7 stays paused.
 
 Design continuation: `.planning/phases/05-guided-and-perturbative-bp-interventions/05-DESIGN-TASKS.md`.
