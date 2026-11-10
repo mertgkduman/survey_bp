@@ -29,6 +29,7 @@ label { display:grid; gap:.35rem; font-weight:600; font-size:.83rem; min-width:0
 .curve-list label { padding:.35rem .4rem; border-radius:4px; line-height:1.65; overflow-wrap:anywhere; cursor:pointer; }
 .curve-list label:hover,.curve-list label:focus-within { background:#edf4f1; }
 .curve-swatch { width:1.3rem; height:3px; flex-shrink:0; display:inline-block; }
+.chart .grid-minor { stroke:#edf2f0; stroke-width:.8; }
 .curve-group { transition:opacity .12s ease; }
 .curve-hit,.chart .line { cursor:pointer; pointer-events:stroke; }
 .curve-hit:focus-visible { stroke:#d6952840; outline:none; }

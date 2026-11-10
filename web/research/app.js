@@ -73,23 +73,100 @@ function renderCards(){
 }
 function svg(tag,attrs={},value){const n=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const[k,v]of Object.entries(attrs))n.setAttribute(k,v);if(value!=null)n.textContent=value;return n;}
 function drawPlot(card,box){
- const figure=el('figure',{class:'chart'}),chart=svg('svg',{viewBox:'0 0 640 310',role:'group','aria-label':`Measured results for plot ${card.id}`}),caption=el('figcaption',{},visible(card).length?'Click a curve to hide it; use Show curves to restore it. Hover a name to preview.':'All curves are hidden. Hover or focus a curve name for a faint preview.');figure.append(chart,caption);box.append(figure);
- const axisMode=ResearchPlot.axis(selected(card),card.axis||'auto'),plotX=(s,p)=>ResearchPlot.coordinate(s,p,axisMode);
- const all=selected(card).flatMap(s=>s.points.map(p=>({s,p}))),activeUnits=[...new Set(points(card).map(x=>x.p.work_unit))];
- const rows=all.filter(({p})=>known(p.x)&&known(plotValue(card,p))&&(card.metric!=='rate'||plotValue(card,p)>0)&&(card.metric!=='work'||activeUnits.length!==1||p.work_unit===activeUnits[0]));
- if(!rows.length){caption.textContent='No plottable observations for this selection.';return;}
- let xmin=Math.min(...rows.map(x=>plotX(x.s,x.p))),xmax=Math.max(...rows.map(x=>plotX(x.s,x.p)));if(xmin===xmax){xmin-=.005;xmax+=.005;}
- const log=card.metric==='rate';let values=rows.map(x=>plotValue(card,x.p));if(log)values=rows.flatMap(x=>[plotValue(card,x.p),x.p.ci_low,x.p.ci_high].filter(v=>known(v)&&v>0));let ymin=Math.min(...values),ymax=Math.max(...values);if(log){ymin=Math.floor(Math.log10(ymin));ymax=Math.ceil(Math.log10(ymax));}if(ymin===ymax){ymin=log?ymin-1:0;ymax=ymax||1;}
- const X=x=>64+(x-xmin)/(xmax-xmin)*555,Y=y=>258-((log?Math.log10(y):y)-ymin)/(ymax-ymin)*235;
- for(let i=0;i<=4;i++){const x=xmin+(xmax-xmin)*i/4;chart.append(svg('line',{x1:X(x),x2:X(x),y1:23,y2:258,class:'grid'}),svg('text',{x:X(x),y:279,'text-anchor':'middle'},fmt(x)));const yy=ymin+(ymax-ymin)*i/4;chart.append(svg('line',{x1:64,x2:619,y1:258-i*235/4,y2:258-i*235/4,class:'grid'}),svg('text',{x:56,y:262-i*235/4,'text-anchor':'end'},log?`10^${Number(yy.toFixed(1))}`:fmt(yy)));}
- for(const s of selected(card)){
-  const ps=rows.filter(x=>x.s.series_id===s.series_id).map(x=>x.p).sort((a,b)=>a.x-b.x);if(!ps.length)continue;
-  const color=colorFor(card,s),hidden=card.hidden.has(s.series_id),group=svg('g',{class:'curve-group','data-curve':s.series_id,'data-decoder':s.decoder_id,'data-visible':String(!hidden),opacity:hidden?'0':'1','aria-hidden':String(hidden),'pointer-events':hidden?'none':'auto'});
+ const curves=selected(card);
+ const shown=curves.filter(s=>!card.hidden.has(s.series_id));
+ const scaleCurves=shown.length?shown:curves;
+ const figure=el('figure',{class:'chart'});
+ const chart=svg('svg',{viewBox:'0 0 640 310',role:'group','aria-label':`Measured results for plot ${card.id}`});
+ const caption=el('figcaption',{},shown.length
+  ?'Click a curve to hide it; use Show curves to restore it. Hover a name to preview.'
+  :'All curves are hidden. Hover or focus a curve name for a faint preview.');
+ figure.append(chart,caption);
+ box.append(figure);
+
+ const log=card.metric==='rate';
+ const axisMode=ResearchPlot.axis(scaleCurves,card.axis||'auto');
+ const plotX=(s,p)=>ResearchPlot.coordinate(s,p,axisMode);
+ const all=curves.flatMap(s=>s.points.map(p=>({s,p})));
+ const scalePoints=all.filter(({s})=>!shown.length||!card.hidden.has(s.series_id));
+ const activeUnits=new Set(scalePoints.filter(({p})=>known(p.mean_work)).map(({p})=>p.work_unit));
+ const rows=all.filter(({p})=>{
+  const y=plotValue(card,p);
+  return known(p.x)&&known(y)&&(!log||y>0)
+   &&(card.metric!=='work'||activeUnits.size!==1||activeUnits.has(p.work_unit));
+ });
+ const scaleRows=rows.filter(({s})=>!shown.length||!card.hidden.has(s.series_id));
+ if(!scaleRows.length){caption.textContent='No plottable observations for this selection.';return;}
+
+ const coordinates=scaleRows.map(({s,p})=>plotX(s,p));
+ let xmin=Math.min(...coordinates),xmax=Math.max(...coordinates);
+ if(xmin===xmax){xmin-=.005;xmax+=.005;}
+ const values=log
+  ?scaleRows.flatMap(({p})=>[plotValue(card,p),p.ci_low,p.ci_high].filter(v=>known(v)&&v>0))
+  :scaleRows.map(({p})=>plotValue(card,p));
+ let ymin=Math.min(...values),ymax=Math.max(...values);
+ if(log){
+  ymin=Math.floor(Math.log10(ymin));
+  ymax=Math.ceil(Math.log10(ymax));
+  if(ymin===ymax)ymin--;
+ }else if(ymin===ymax){
+  ymin=0;
+  ymax=ymax||1;
+ }
+ const left=64,right=619,top=23,bottom=258;
+ const X=x=>left+(x-xmin)/(xmax-xmin)*(right-left);
+ const axisY=y=>bottom-(y-ymin)/(ymax-ymin)*(bottom-top);
+ const Y=y=>axisY(log?Math.log10(y):y);
+ const horizontalGrid=(position,style='grid')=>{
+  const y=axisY(position);
+  chart.append(svg('line',{x1:left,x2:right,y1:y,y2:y,class:style}));
+ };
+ for(let i=0;i<=4;i++){
+  const x=xmin+(xmax-xmin)*i/4;
+  chart.append(svg('line',{x1:X(x),x2:X(x),y1:top,y2:bottom,class:'grid'}),
+   svg('text',{x:X(x),y:279,'text-anchor':'middle',class:'x-tick'},fmt(x)));
+ }
+ if(log){
+  for(let exponent=ymin;exponent<=ymax;exponent++){
+   horizontalGrid(exponent);
+   const label=svg('text',{x:left-8,y:axisY(exponent)+4,'text-anchor':'end',class:'y-tick',
+    'aria-label':`10 to the power ${exponent}`},'10');
+   label.append(svg('tspan',{'baseline-shift':'super','font-size':'75%'},String(exponent).replace('-','−')));
+   chart.append(label);
+   if(exponent===ymax)break;
+   for(let multiplier=2;multiplier<=9;multiplier++){
+    horizontalGrid(exponent+Math.log10(multiplier),'grid grid-minor');
+   }
+  }
+ }else{
+  for(let i=0;i<=4;i++){
+   const y=ymin+(ymax-ymin)*i/4;
+   horizontalGrid(y);
+   chart.append(svg('text',{x:left-8,y:axisY(y)+4,'text-anchor':'end',class:'y-tick'},fmt(y)));
+  }
+ }
+
+ // A hidden curve may extend beyond the axes fitted to the displayed curves.
+ const clipId=`plot-area-${card.id}`;
+ const clip=svg('clipPath',{id:clipId});
+ clip.append(svg('rect',{x:left,y:top,width:right-left,height:bottom-top}));
+ const defs=svg('defs');
+ defs.append(clip);
+ chart.append(defs);
+ for(const s of curves){
+  const ps=rows.filter(row=>row.s===s).map(row=>row.p).sort((a,b)=>a.x-b.x);
+  if(!ps.length)continue;
+  const color=colorFor(card,s),hidden=card.hidden.has(s.series_id);
+  const group=svg('g',{class:'curve-group','data-curve':s.series_id,'data-decoder':s.decoder_id,
+   'data-visible':String(!hidden),opacity:hidden?'0':'1','aria-hidden':String(hidden),
+   'pointer-events':hidden?'none':'auto'});
+  if(hidden)group.setAttribute('clip-path',`url(#${clipId})`);
   const path=ResearchPlot.linePath(ps,p=>X(plotX(s,p)),p=>Y(plotValue(card,p)),p=>log&&bound(p)),line=svg('path',{d:path,stroke:color,class:'line'}),hit=svg('path',{d:path,stroke:'transparent','stroke-width':14,fill:'none',class:'curve-hit',tabindex:hidden?'-1':'0',role:'button','aria-label':`Hide curve: ${s.label}`,'aria-pressed':String(!hidden)});
   line.onclick=hit.onclick=()=>toggleCurve(card,s);hit.onkeydown=e=>{if(['Enter',' '].includes(e.key)){e.preventDefault();toggleCurve(card,s);}};hit.append(svg('title',{},`Click to hide: ${s.label}`));group.append(line,hit);
   for(const p of ps){const x=X(plotX(s,p)),y=Y(plotValue(card,p));
-   if(log&&known(p.ci_high)&&known(p.ci_low)){
-    const lower=bound(p)?258:Y(Math.max(p.ci_low,10**ymin)),upper=Y(p.ci_high);
+   if(log&&known(p.ci_high)&&p.ci_high>0&&known(p.ci_low)){
+    const lower=bound(p)||p.ci_low<=0?bottom:axisY(Math.max(Math.log10(p.ci_low),ymin));
+    const upper=Y(p.ci_high);
     group.append(svg('line',{class:bound(p)?'bound-error-bar':'error-bar',x1:x,x2:x,y1:lower,y2:upper,stroke:color}),svg('line',{x1:x-4,x2:x+4,y1:upper,y2:upper,stroke:color}));
     if(!bound(p))group.append(svg('line',{x1:x-4,x2:x+4,y1:lower,y2:lower,stroke:color}));
    }
@@ -98,9 +175,9 @@ function drawPlot(card,box){
   }
   chart.append(group);
  }
- const axisKinds=new Set(rows.map(x=>x.p.x_semantics||'physical_error_probability'));const xlabel=axisMode==='bit_flip'?'Component bit-flip probability p_bit flip':axisKinds.size>1?'Probability p / p₀ (see run settings)':axisKinds.has('circuit_setting_index')?'Circuit setting index':axisKinds.has('decoder_prior_probability')?'Decoder prior probability p₀':'Physical error probability p';
+ const axisKinds=new Set(scaleRows.map(({p})=>p.x_semantics||'physical_error_probability'));const xlabel=axisMode==='bit_flip'?'Component bit-flip probability p_bit flip':axisKinds.size>1?'Probability p / p₀ (see run settings)':axisKinds.has('circuit_setting_index')?'Circuit setting index':axisKinds.has('decoder_prior_probability')?'Decoder prior probability p₀':'Physical error probability p';
  if(axisMode==='bit_flip'){const note=el('div',{class:'axis-note small'});katex.render('p_{\\mathrm{bit\\ flip}}=\\frac{2}{3}p_{\\mathrm{depolarizing}}',note,{throwOnError:true});figure.append(note,el('p',{class:'small muted'},'Depolarizing coordinates are converted automatically; X-only coordinates are unchanged. Depolarizing noise has X, Y, Z each with probability p/3. The channels remain distinct.'));}
- if(rows.some(({p})=>bound(p)))figure.append(el('p',{class:'small muted'},'Zero failures: the error bar runs from zero to the reported upper confidence limit. Zero is below the logarithmic plot; these bounds are not joined by a curve.'));
+ if(log&&scaleRows.some(({p})=>bound(p)))figure.append(el('p',{class:'small muted'},'Zero failures: the error bar runs from zero to the reported upper confidence limit. Zero is below the logarithmic plot; these bounds are not joined by a curve.'));
  chart.append(svg('text',{x:340,y:304,'text-anchor':'middle'},xlabel),svg('text',{x:16,y:144,transform:'rotate(-90 16 144)','text-anchor':'middle'},log?'Failure probability · log scale':card.metric==='time'?'Decoding time · s':'Mean work'));
 }
 const headers=['Series','Noise','Metric','Observed value','Samples','Failures','Type I / II','CI','Work','Time','Evidence','Availability'];

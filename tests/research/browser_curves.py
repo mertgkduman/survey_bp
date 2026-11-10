@@ -119,6 +119,44 @@ def verify(output, url):
         assert any('pfister-presentation-ms-both-changes' in x for x in code_options)
         page.screenshot(path=str(output/'desktop.png'))
         checks.append('Plot states remain independent; corrected Q8 remains available while retired BP4 state clipping is removed')
+        decoder = card.locator('select[data-select="decoder"]')
+        target = decoder.locator('option[data-decoder="pfister-presentation-full-v2-curves:b1:binary_tuned_spa_v2"]').get_attribute('value')
+        decoder.select_option(target)
+
+        def axis_ticks():
+            return (card.locator('.x-tick').all_text_contents(), card.locator('.y-tick').all_text_contents())
+
+        single_axes = axis_ticks()
+        exponents = [int(label.replace('−', '-')) for label in card.locator('.y-tick tspan').all_text_contents()]
+        assert {-1, -2, -3, -4}.issubset(exponents)
+        assert exponents == list(range(min(exponents), max(exponents)+1))
+        assert card.locator('.y-tick tspan[baseline-shift="super"]').count() == len(exponents)
+        assert card.locator('.grid-minor').count() == 8 * (len(exponents)-1)
+        assert card.locator('.y-tick').first.evaluate('''n=>{
+            const base=n.getExtentOfChar(0), exponent=n.querySelector('tspan').getExtentOfChar(0);
+            return exponent.y+exponent.height < base.y+base.height;
+        }''')
+        card.locator('.chart svg').screenshot(path=str(output/'log-axis.png'))
+
+        decoder.select_option('')
+        all_axes = axis_ticks()
+        assert all_axes[0] != single_axes[0] and all_axes[1] != single_axes[1]
+        assert card.locator('.axis-note').count() == 1
+        curve_ids = card.locator('.curve-list input').evaluate_all('xs=>xs.map(x=>x.dataset.curve)')
+        for curve_id in curve_ids:
+            if curve_id != target:
+                card.locator(f'.curve-list input[data-curve="{curve_id}"]').uncheck()
+        assert axis_ticks() == single_axes
+        assert card.locator('.axis-note').count() == 0
+        assert card.locator('.curve-group[data-visible="false"][clip-path]').count() > 0
+        active_curve = card.locator(f'.curve-list input[data-curve="{target}"]')
+        active_curve.uncheck()
+        assert axis_ticks() == all_axes
+        assert 'All curves are hidden' in card.locator('figcaption').inner_text()
+        assert card.get_by_role('button', name='Export visible table').is_disabled()
+        active_curve.check()
+        assert axis_ticks() == single_axes
+        checks.append('Powers have raised exponents and minor log grids. Hiding curves fits both axes and restores the appropriate channel scale.')
         page.locator('[data-nav="builder"]').click()
         saved=page.locator('#build-preset option').all_text_contents()[1:]
         assert saved and all(' = ' in name for name in saved)
