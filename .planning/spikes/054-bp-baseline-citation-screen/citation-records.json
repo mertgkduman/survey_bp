@@ -1,0 +1,3227 @@
+{
+  "metadata": {
+    "retrieved_at_utc": "2026-11-10T21:00:09+00:00",
+    "provider": "OpenAlex",
+    "metric": "cited_by_count on one selected publication record; no summed journal/preprint duplicates",
+    "scope": "Bounded citation-prioritized shortlist. Not an exhaustive global top-N ranking or a completed systematic mapping study.",
+    "paper_count": 17
+  },
+  "records": [
+    {
+      "id": "https://openalex.org/W2926023653",
+      "title": "Degenerate Quantum LDPC Codes With Good Finite Length Performance",
+      "doi": "https://doi.org/10.22331/q-2021-11-22-585",
+      "publication_year": 2021,
+      "cited_by_count": 337,
+      "authorships": [
+        {
+          "author_position": "first",
+          "author": {
+            "id": "https://openalex.org/A5069571756",
+            "display_name": "Pavel Panteleev",
+            "orcid": "https://orcid.org/0000-0002-6772-7867",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-6772-7867"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I19880235",
+              "display_name": "Lomonosov Moscow State University",
+              "ror": "https://ror.org/010pmpe69",
+              "country_code": "RU",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I19880235"
+              ]
+            }
+          ],
+          "countries": [
+            "RU"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Pavel Panteleev",
+          "raw_affiliation_strings": [
+            "Faculty of Mechanics and Mathematics, Moscow State University, GSP-1, Leninskie Gory, Moscow, 119991, Russian Federation"
+          ],
+          "raw_orcid": "https://orcid.org/0000-0002-6772-7867",
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Faculty of Mechanics and Mathematics, Moscow State University, GSP-1, Leninskie Gory, Moscow, 119991, Russian Federation",
+              "institution_ids": [
+                "https://openalex.org/I19880235"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "last",
+          "author": {
+            "id": "https://openalex.org/A5080313215",
+            "display_name": "Gleb Vyacheslavovich Kalachev",
+            "orcid": "https://orcid.org/0000-0003-2695-3179",
+            "observed_orcids": [
+              "https://orcid.org/0000-0003-2695-3179"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I19880235",
+              "display_name": "Lomonosov Moscow State University",
+              "ror": "https://ror.org/010pmpe69",
+              "country_code": "RU",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I19880235"
+              ]
+            }
+          ],
+          "countries": [
+            "RU"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Gleb Kalachev",
+          "raw_affiliation_strings": [
+            "Faculty of Mechanics and Mathematics, Moscow State University, GSP-1, Leninskie Gory, Moscow, 119991, Russian Federation"
+          ],
+          "raw_orcid": "https://orcid.org/0000-0003-2695-3179",
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Faculty of Mechanics and Mathematics, Moscow State University, GSP-1, Leninskie Gory, Moscow, 119991, Russian Federation",
+              "institution_ids": [
+                "https://openalex.org/I19880235"
+              ]
+            }
+          ]
+        }
+      ],
+      "primary_location": {
+        "id": "doi:10.22331/q-2021-11-22-585",
+        "doi": "https://doi.org/10.22331/q-2021-11-22-585",
+        "is_oa": true,
+        "landing_page_url": "https://doi.org/10.22331/q-2021-11-22-585",
+        "pdf_url": "https://quantum-journal.org/papers/q-2021-11-22-585/pdf/",
+        "source": {
+          "id": "https://openalex.org/S4210226432",
+          "display_name": "Quantum",
+          "issn_l": "2521-327X",
+          "issn": [
+            "2521-327X"
+          ],
+          "is_oa": true,
+          "is_in_doaj": true,
+          "is_core": true,
+          "listed_in": [
+            "cwts-core",
+            "doaj",
+            "dongbi-a",
+            "jufo-2",
+            "norway-1",
+            "oarl",
+            "poland-140",
+            "russia-white-list-1"
+          ],
+          "host_organization": "https://openalex.org/P4310317900",
+          "host_organization_name": "Verein zur F\u00f6rderung des Open Access Publizierens in den Quantenwissenschaften",
+          "host_organization_lineage": [
+            "https://openalex.org/P4310317900"
+          ],
+          "host_organization_lineage_names": [
+            "Verein zur F\u00f6rderung des Open Access Publizierens in den Quantenwissenschaften"
+          ],
+          "type": "journal"
+        },
+        "license": "cc-by",
+        "license_id": "https://openalex.org/licenses/cc-by",
+        "version": "publishedVersion",
+        "is_accepted": true,
+        "is_published": true,
+        "raw_source_name": "Quantum",
+        "raw_type": "journal-article"
+      }
+    },
+    {
+      "id": "https://openalex.org/W3025282692",
+      "title": "Decoding across the quantum low-density parity-check code landscape",
+      "doi": "https://doi.org/10.1103/physrevresearch.2.043423",
+      "publication_year": 2020,
+      "cited_by_count": 289,
+      "authorships": [
+        {
+          "author_position": "first",
+          "author": {
+            "id": "https://openalex.org/A5027437078",
+            "display_name": "Joschka Roffe",
+            "orcid": "https://orcid.org/0000-0001-9202-1156",
+            "observed_orcids": [
+              "https://orcid.org/0000-0001-9202-1156"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I91136226",
+              "display_name": "University of Sheffield",
+              "ror": "https://ror.org/05krs5044",
+              "country_code": "GB",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I91136226"
+              ]
+            }
+          ],
+          "countries": [
+            "GB"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Joschka Roffe",
+          "raw_affiliation_strings": [
+            "Department of Physics & Astronomy, University of Sheffield, Sheffield S10 2TN, United Kingdom"
+          ],
+          "raw_orcid": "https://orcid.org/0000-0001-9202-1156",
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Department of Physics & Astronomy, University of Sheffield, Sheffield S10 2TN, United Kingdom",
+              "institution_ids": [
+                "https://openalex.org/I91136226"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5046817648",
+            "display_name": "David R. White",
+            "orcid": "https://orcid.org/0000-0001-6317-4348",
+            "observed_orcids": [
+              "https://orcid.org/0000-0001-6317-4348"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I91136226",
+              "display_name": "University of Sheffield",
+              "ror": "https://ror.org/05krs5044",
+              "country_code": "GB",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I91136226"
+              ]
+            }
+          ],
+          "countries": [
+            "GB"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "David R. White",
+          "raw_affiliation_strings": [
+            "Department of Physics & Astronomy, University of Sheffield, Sheffield S10 2TN, United Kingdom"
+          ],
+          "raw_orcid": "https://orcid.org/0000-0001-6317-4348",
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Department of Physics & Astronomy, University of Sheffield, Sheffield S10 2TN, United Kingdom",
+              "institution_ids": [
+                "https://openalex.org/I91136226"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5039059742",
+            "display_name": "Simon Burton",
+            "orcid": "https://orcid.org/0000-0002-8932-3492",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-8932-3492"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I45129253",
+              "display_name": "University College London",
+              "ror": "https://ror.org/02jx3x895",
+              "country_code": "GB",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I124357947",
+                "https://openalex.org/I45129253"
+              ]
+            }
+          ],
+          "countries": [
+            "GB"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Simon Burton",
+          "raw_affiliation_strings": [
+            "Department of Physics & Astronomy, University College London, London WC1E 6BT, United Kingdom"
+          ],
+          "raw_orcid": "https://orcid.org/0000-0002-8932-3492",
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Department of Physics & Astronomy, University College London, London WC1E 6BT, United Kingdom",
+              "institution_ids": [
+                "https://openalex.org/I45129253"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "last",
+          "author": {
+            "id": "https://openalex.org/A5018132307",
+            "display_name": "Earl T. Campbell",
+            "orcid": "https://orcid.org/0000-0002-5627-0021",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-5627-0021",
+              "https://orcid.org/0000-0002-3903-2734"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I91136226",
+              "display_name": "University of Sheffield",
+              "ror": "https://ror.org/05krs5044",
+              "country_code": "GB",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I91136226"
+              ]
+            }
+          ],
+          "countries": [
+            "GB"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Earl Campbell",
+          "raw_affiliation_strings": [
+            "Department of Physics & Astronomy, University of Sheffield, Sheffield S10 2TN, United Kingdom"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Department of Physics & Astronomy, University of Sheffield, Sheffield S10 2TN, United Kingdom",
+              "institution_ids": [
+                "https://openalex.org/I91136226"
+              ]
+            }
+          ]
+        }
+      ],
+      "primary_location": {
+        "id": "doi:10.1103/physrevresearch.2.043423",
+        "doi": "https://doi.org/10.1103/physrevresearch.2.043423",
+        "is_oa": true,
+        "landing_page_url": "https://doi.org/10.1103/physrevresearch.2.043423",
+        "pdf_url": "http://link.aps.org/pdf/10.1103/PhysRevResearch.2.043423",
+        "source": {
+          "id": "https://openalex.org/S4210240247",
+          "display_name": "Physical Review Research",
+          "issn_l": "2643-1564",
+          "issn": [
+            "2643-1564"
+          ],
+          "is_oa": true,
+          "is_in_doaj": true,
+          "is_core": true,
+          "listed_in": [
+            "cwts-core",
+            "doaj",
+            "dongbi-b",
+            "jufo-1",
+            "norway-1",
+            "oarl",
+            "poland-20",
+            "russia-white-list-1",
+            "vabb-shw"
+          ],
+          "host_organization": "https://openalex.org/P4310320261",
+          "host_organization_name": "American Physical Society",
+          "host_organization_lineage": [
+            "https://openalex.org/P4310320261"
+          ],
+          "host_organization_lineage_names": [
+            "American Physical Society"
+          ],
+          "type": "journal"
+        },
+        "license": "cc-by",
+        "license_id": "https://openalex.org/licenses/cc-by",
+        "version": "publishedVersion",
+        "is_accepted": true,
+        "is_published": true,
+        "raw_source_name": "Physical Review Research",
+        "raw_type": "journal-article"
+      }
+    },
+    {
+      "id": "https://openalex.org/W1850344377",
+      "title": "On the iterative decoding of sparse quantum codes",
+      "doi": "https://doi.org/10.26421/qic.10-8",
+      "publication_year": 2008,
+      "cited_by_count": 165,
+      "authorships": [
+        {
+          "author_position": "first",
+          "author": {
+            "id": "https://openalex.org/A5110289759",
+            "display_name": "David Poulin",
+            "orcid": null,
+            "observed_orcids": []
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I122411786",
+              "display_name": "California Institute of Technology",
+              "ror": "https://ror.org/05dxps055",
+              "country_code": "US",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I122411786"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I135117807",
+              "display_name": "Universit\u00e9 de Sherbrooke",
+              "ror": "https://ror.org/00kybxq39",
+              "country_code": "CA",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I135117807"
+              ]
+            }
+          ],
+          "countries": [
+            "CA",
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "D. Poulin",
+          "raw_affiliation_strings": [
+            "D\u00e9partement de Physique, Universit\u00e9 de Sherbrooke, QC, Canada and Center for the Physics of Information, California Institute of Technology, Pasadena, CA#TAB#"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "D\u00e9partement de Physique, Universit\u00e9 de Sherbrooke, QC, Canada and Center for the Physics of Information, California Institute of Technology, Pasadena, CA#TAB#",
+              "institution_ids": [
+                "https://openalex.org/I122411786",
+                "https://openalex.org/I135117807"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "last",
+          "author": {
+            "id": "https://openalex.org/A5000305926",
+            "display_name": "Yeojin Chung",
+            "orcid": "https://orcid.org/0000-0003-4117-2880",
+            "observed_orcids": [
+              "https://orcid.org/0000-0003-4117-2880"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I178169726",
+              "display_name": "Southern Methodist University",
+              "ror": "https://ror.org/042tdr378",
+              "country_code": "US",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I178169726"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Y. Chung",
+          "raw_affiliation_strings": [
+            "Department of Mathematics, Southern Methodist University, Dallas, TX"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Department of Mathematics, Southern Methodist University, Dallas, TX",
+              "institution_ids": [
+                "https://openalex.org/I178169726"
+              ]
+            }
+          ]
+        }
+      ],
+      "primary_location": {
+        "id": "doi:10.26421/qic.10-8",
+        "doi": "https://doi.org/10.26421/qic.10-8",
+        "is_oa": false,
+        "landing_page_url": "https://doi.org/10.26421/qic.10-8",
+        "pdf_url": null,
+        "source": {
+          "id": "https://openalex.org/S41034432",
+          "display_name": "Quantum Information and Computation",
+          "issn_l": "1533-7146",
+          "issn": [
+            "1533-7146"
+          ],
+          "is_oa": false,
+          "is_in_doaj": false,
+          "is_core": true,
+          "listed_in": [
+            "cwts-core",
+            "dongbi-c",
+            "jufo-1",
+            "norway-1",
+            "poland-100",
+            "russia-white-list-2",
+            "vabb-shw"
+          ],
+          "host_organization": "https://openalex.org/P4310322612",
+          "host_organization_name": "Rinton Press",
+          "host_organization_lineage": [
+            "https://openalex.org/P4310322612"
+          ],
+          "host_organization_lineage_names": [
+            "Rinton Press"
+          ],
+          "type": "journal"
+        },
+        "license": null,
+        "license_id": null,
+        "version": "publishedVersion",
+        "is_accepted": true,
+        "is_published": true,
+        "raw_source_name": "Quantum Information and Computation",
+        "raw_type": "journal-article"
+      }
+    },
+    {
+      "id": "https://openalex.org/W2215279005",
+      "title": "Fifteen Years of Quantum LDPC Coding and Improved Decoding Strategies",
+      "doi": "https://doi.org/10.1109/access.2015.2503267",
+      "publication_year": 2015,
+      "cited_by_count": 117,
+      "authorships": [
+        {
+          "author_position": "first",
+          "author": {
+            "id": "https://openalex.org/A5004429018",
+            "display_name": "Zunaira Babar",
+            "orcid": "https://orcid.org/0000-0002-7498-4474",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-7498-4474"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I43439940",
+              "display_name": "University of Southampton",
+              "ror": "https://ror.org/01ryk1543",
+              "country_code": "GB",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I43439940"
+              ]
+            }
+          ],
+          "countries": [
+            "GB"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Zunaira Babar",
+          "raw_affiliation_strings": [
+            "School of Electronics and Computer Science, University of Southampton, Southampton, U.K"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "School of Electronics and Computer Science, University of Southampton, Southampton, U.K",
+              "institution_ids": [
+                "https://openalex.org/I43439940"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5037415893",
+            "display_name": "Panagiotis Botsinis",
+            "orcid": "https://orcid.org/0000-0002-6345-6131",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-6345-6131"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I43439940",
+              "display_name": "University of Southampton",
+              "ror": "https://ror.org/01ryk1543",
+              "country_code": "GB",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I43439940"
+              ]
+            }
+          ],
+          "countries": [
+            "GB"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Panagiotis Botsinis",
+          "raw_affiliation_strings": [
+            "School of Electronics and Computer Science, University of Southampton, Southampton, U.K"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "School of Electronics and Computer Science, University of Southampton, Southampton, U.K",
+              "institution_ids": [
+                "https://openalex.org/I43439940"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5053032369",
+            "display_name": "Dimitrios Alanis",
+            "orcid": "https://orcid.org/0000-0002-6654-1702",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-6654-1702"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I43439940",
+              "display_name": "University of Southampton",
+              "ror": "https://ror.org/01ryk1543",
+              "country_code": "GB",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I43439940"
+              ]
+            }
+          ],
+          "countries": [
+            "GB"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Dimitrios Alanis",
+          "raw_affiliation_strings": [
+            "School of Electronics and Computer Science, University of Southampton, Southampton, U.K"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "School of Electronics and Computer Science, University of Southampton, Southampton, U.K",
+              "institution_ids": [
+                "https://openalex.org/I43439940"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5041481409",
+            "display_name": "Soon Xin Ng",
+            "orcid": "https://orcid.org/0000-0002-0930-7194",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-0930-7194"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I43439940",
+              "display_name": "University of Southampton",
+              "ror": "https://ror.org/01ryk1543",
+              "country_code": "GB",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I43439940"
+              ]
+            }
+          ],
+          "countries": [
+            "GB"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Soon Xin Ng",
+          "raw_affiliation_strings": [
+            "School of Electronics and Computer Science, University of Southampton, Southampton, U.K"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "School of Electronics and Computer Science, University of Southampton, Southampton, U.K",
+              "institution_ids": [
+                "https://openalex.org/I43439940"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "last",
+          "author": {
+            "id": "https://openalex.org/A5091122305",
+            "display_name": "Lajos Hanzo",
+            "orcid": "https://orcid.org/0000-0002-2636-5214",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-2636-5214"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I43439940",
+              "display_name": "University of Southampton",
+              "ror": "https://ror.org/01ryk1543",
+              "country_code": "GB",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I43439940"
+              ]
+            }
+          ],
+          "countries": [
+            "GB"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Lajos Hanzo",
+          "raw_affiliation_strings": [
+            "School of Electronics and Computer Science, University of Southampton, Southampton, U.K"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "School of Electronics and Computer Science, University of Southampton, Southampton, U.K",
+              "institution_ids": [
+                "https://openalex.org/I43439940"
+              ]
+            }
+          ]
+        }
+      ],
+      "primary_location": {
+        "id": "doi:10.1109/access.2015.2503267",
+        "doi": "https://doi.org/10.1109/access.2015.2503267",
+        "is_oa": true,
+        "landing_page_url": "https://doi.org/10.1109/access.2015.2503267",
+        "pdf_url": "https://ieeexplore.ieee.org/ielx7/6287639/7042252/07336474.pdf",
+        "source": {
+          "id": "https://openalex.org/S2485537415",
+          "display_name": "IEEE Access",
+          "issn_l": "2169-3536",
+          "issn": [
+            "2169-3536"
+          ],
+          "is_oa": true,
+          "is_in_doaj": true,
+          "is_core": true,
+          "listed_in": [
+            "anvur-scientific",
+            "cwts-core",
+            "doaj",
+            "jufo-1",
+            "ki-jl-1",
+            "norway-1",
+            "oarl",
+            "poland-100",
+            "russia-white-list-1",
+            "vabb-shw"
+          ],
+          "host_organization": "https://openalex.org/P4310319808",
+          "host_organization_name": "Institute of Electrical and Electronics Engineers",
+          "host_organization_lineage": [
+            "https://openalex.org/P4310319808"
+          ],
+          "host_organization_lineage_names": [
+            "Institute of Electrical and Electronics Engineers"
+          ],
+          "type": "journal"
+        },
+        "license": null,
+        "license_id": null,
+        "version": "publishedVersion",
+        "is_accepted": true,
+        "is_published": true,
+        "raw_source_name": "IEEE Access",
+        "raw_type": "journal-article"
+      }
+    },
+    {
+      "id": "https://openalex.org/W2901383498",
+      "title": "Neural Belief-Propagation Decoders for Quantum Error-Correcting Codes",
+      "doi": "https://doi.org/10.1103/physrevlett.122.200501",
+      "publication_year": 2019,
+      "cited_by_count": 110,
+      "authorships": [
+        {
+          "author_position": "first",
+          "author": {
+            "id": "https://openalex.org/A5024258783",
+            "display_name": "Ye-Hua Liu",
+            "orcid": "https://orcid.org/0000-0002-1002-399X",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-1002-399X"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I135117807",
+              "display_name": "Universit\u00e9 de Sherbrooke",
+              "ror": "https://ror.org/00kybxq39",
+              "country_code": "CA",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I135117807"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I4405263214",
+              "display_name": "Institut quantique",
+              "ror": "https://ror.org/04140qr77",
+              "country_code": "CA",
+              "type": "facility",
+              "lineage": [
+                "https://openalex.org/I135117807",
+                "https://openalex.org/I4405263214"
+              ]
+            }
+          ],
+          "countries": [
+            "CA"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Ye-Hua Liu",
+          "raw_affiliation_strings": [
+            "D\u00e9partement de Physique & Institut Quantique, Universit\u00e9 de Sherbrooke, J1K 2R1 Sherbrooke, Qu\u00e9bec, Canada"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "D\u00e9partement de Physique & Institut Quantique, Universit\u00e9 de Sherbrooke, J1K 2R1 Sherbrooke, Qu\u00e9bec, Canada",
+              "institution_ids": [
+                "https://openalex.org/I135117807",
+                "https://openalex.org/I4405263214"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "last",
+          "author": {
+            "id": "https://openalex.org/A5110289759",
+            "display_name": "David Poulin",
+            "orcid": null,
+            "observed_orcids": []
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I109736498",
+              "display_name": "Canadian Institute for Advanced Research",
+              "ror": "https://ror.org/01sdtdd95",
+              "country_code": "CA",
+              "type": "facility",
+              "lineage": [
+                "https://openalex.org/I109736498"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I135117807",
+              "display_name": "Universit\u00e9 de Sherbrooke",
+              "ror": "https://ror.org/00kybxq39",
+              "country_code": "CA",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I135117807"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I4405263214",
+              "display_name": "Institut quantique",
+              "ror": "https://ror.org/04140qr77",
+              "country_code": "CA",
+              "type": "facility",
+              "lineage": [
+                "https://openalex.org/I135117807",
+                "https://openalex.org/I4405263214"
+              ]
+            }
+          ],
+          "countries": [
+            "CA"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "David Poulin",
+          "raw_affiliation_strings": [
+            "Canadian Institute for Advanced Research, M5G 1Z8 Toronto, Ontario, Canada",
+            "D\u00e9partement de Physique & Institut Quantique, Universit\u00e9 de Sherbrooke, J1K 2R1 Sherbrooke, Qu\u00e9bec, Canada"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Canadian Institute for Advanced Research, M5G 1Z8 Toronto, Ontario, Canada",
+              "institution_ids": [
+                "https://openalex.org/I109736498"
+              ]
+            },
+            {
+              "raw_affiliation_string": "D\u00e9partement de Physique & Institut Quantique, Universit\u00e9 de Sherbrooke, J1K 2R1 Sherbrooke, Qu\u00e9bec, Canada",
+              "institution_ids": [
+                "https://openalex.org/I135117807",
+                "https://openalex.org/I4405263214"
+              ]
+            }
+          ]
+        }
+      ],
+      "primary_location": {
+        "id": "doi:10.1103/physrevlett.122.200501",
+        "doi": "https://doi.org/10.1103/physrevlett.122.200501",
+        "is_oa": false,
+        "landing_page_url": "https://doi.org/10.1103/physrevlett.122.200501",
+        "pdf_url": null,
+        "source": {
+          "id": "https://openalex.org/S24807848",
+          "display_name": "Physical Review Letters",
+          "issn_l": "0031-9007",
+          "issn": [
+            "0031-9007",
+            "1079-7114",
+            "1092-0145"
+          ],
+          "is_oa": false,
+          "is_in_doaj": false,
+          "is_core": true,
+          "listed_in": [
+            "anvur-scientific",
+            "cwts-core",
+            "dongbi-a",
+            "jufo-3",
+            "ki-jl-2",
+            "medline",
+            "norway-2",
+            "poland-200",
+            "russia-white-list-1",
+            "vabb-shw"
+          ],
+          "host_organization": "https://openalex.org/P4310320261",
+          "host_organization_name": "American Physical Society",
+          "host_organization_lineage": [
+            "https://openalex.org/P4310320261"
+          ],
+          "host_organization_lineage_names": [
+            "American Physical Society"
+          ],
+          "type": "journal"
+        },
+        "license": null,
+        "license_id": null,
+        "version": "publishedVersion",
+        "is_accepted": true,
+        "is_published": true,
+        "raw_source_name": "Physical Review Letters",
+        "raw_type": "journal-article"
+      }
+    },
+    {
+      "id": "https://openalex.org/W3116662363",
+      "title": "Trapping Sets of Quantum LDPC Codes",
+      "doi": "https://doi.org/10.22331/q-2021-10-14-562",
+      "publication_year": 2021,
+      "cited_by_count": 76,
+      "authorships": [
+        {
+          "author_position": "first",
+          "author": {
+            "id": "https://openalex.org/A5059122162",
+            "display_name": "Nithin Raveendran",
+            "orcid": "https://orcid.org/0000-0002-1024-8099",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-1024-8099"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I138006243",
+              "display_name": "University of Arizona",
+              "ror": "https://ror.org/03m2x1q45",
+              "country_code": "US",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I138006243"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Nithin Raveendran",
+          "raw_affiliation_strings": [
+            "Department of Electrical and Computer Engineering, University of Arizona, Tucson, AZ 85721, USA",
+            "University of Arizona"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Department of Electrical and Computer Engineering, University of Arizona, Tucson, AZ 85721, USA",
+              "institution_ids": [
+                "https://openalex.org/I138006243"
+              ]
+            },
+            {
+              "raw_affiliation_string": "University of Arizona",
+              "institution_ids": [
+                "https://openalex.org/I138006243"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "last",
+          "author": {
+            "id": "https://openalex.org/A5040676835",
+            "display_name": "Bane V. Vasic",
+            "orcid": "https://orcid.org/0000-0003-2365-4106",
+            "observed_orcids": [
+              "https://orcid.org/0000-0003-2365-4106"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I138006243",
+              "display_name": "University of Arizona",
+              "ror": "https://ror.org/03m2x1q45",
+              "country_code": "US",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I138006243"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Bane Vasi\u0107",
+          "raw_affiliation_strings": [
+            "Department of Electrical and Computer Engineering, University of Arizona, Tucson, AZ 85721, USA",
+            "University of Arizona"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Department of Electrical and Computer Engineering, University of Arizona, Tucson, AZ 85721, USA",
+              "institution_ids": [
+                "https://openalex.org/I138006243"
+              ]
+            },
+            {
+              "raw_affiliation_string": "University of Arizona",
+              "institution_ids": [
+                "https://openalex.org/I138006243"
+              ]
+            }
+          ]
+        }
+      ],
+      "primary_location": null
+    },
+    {
+      "id": "https://openalex.org/W3137563282",
+      "title": "Toward a Union-Find Decoder for Quantum LDPC Codes",
+      "doi": "https://doi.org/10.1109/tit.2022.3143452",
+      "publication_year": 2022,
+      "cited_by_count": 70,
+      "authorships": [
+        {
+          "author_position": "first",
+          "author": {
+            "id": "https://openalex.org/A5034652805",
+            "display_name": "Nicolas Delfosse",
+            "orcid": "https://orcid.org/0000-0002-3949-981X",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-3949-981X"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I1290206253",
+              "display_name": "Microsoft (United States)",
+              "ror": "https://ror.org/00d0nc645",
+              "country_code": "US",
+              "type": "company",
+              "lineage": [
+                "https://openalex.org/I1290206253"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Nicolas Delfosse",
+          "raw_affiliation_strings": [
+            "Microsoft Quantum, Redmond, WA, USA"
+          ],
+          "raw_orcid": "https://orcid.org/0000-0002-3949-981X",
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Microsoft Quantum, Redmond, WA, USA",
+              "institution_ids": [
+                "https://openalex.org/I1290206253"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5029286279",
+            "display_name": "Vivien Londe",
+            "orcid": "https://orcid.org/0000-0003-3254-1349",
+            "observed_orcids": [
+              "https://orcid.org/0000-0003-3254-1349"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I4210161634",
+              "display_name": "Microsoft (France)",
+              "ror": "https://ror.org/0521n7n83",
+              "country_code": "FR",
+              "type": "company",
+              "lineage": [
+                "https://openalex.org/I1290206253",
+                "https://openalex.org/I4210161634"
+              ]
+            }
+          ],
+          "countries": [
+            "FR"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Vivien Londe",
+          "raw_affiliation_strings": [
+            "Microsoft, Paris, France"
+          ],
+          "raw_orcid": "https://orcid.org/0000-0003-3254-1349",
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Microsoft, Paris, France",
+              "institution_ids": [
+                "https://openalex.org/I4210161634"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "last",
+          "author": {
+            "id": "https://openalex.org/A5055526635",
+            "display_name": "Michael E. Beverland",
+            "orcid": "https://orcid.org/0000-0003-0954-4509",
+            "observed_orcids": [
+              "https://orcid.org/0000-0003-0954-4509"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I1290206253",
+              "display_name": "Microsoft (United States)",
+              "ror": "https://ror.org/00d0nc645",
+              "country_code": "US",
+              "type": "company",
+              "lineage": [
+                "https://openalex.org/I1290206253"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Michael E. Beverland",
+          "raw_affiliation_strings": [
+            "Microsoft Quantum, Redmond, WA, USA"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Microsoft Quantum, Redmond, WA, USA",
+              "institution_ids": [
+                "https://openalex.org/I1290206253"
+              ]
+            }
+          ]
+        }
+      ],
+      "primary_location": {
+        "id": "doi:10.1109/tit.2022.3143452",
+        "doi": "https://doi.org/10.1109/tit.2022.3143452",
+        "is_oa": false,
+        "landing_page_url": "https://doi.org/10.1109/tit.2022.3143452",
+        "pdf_url": null,
+        "source": {
+          "id": "https://openalex.org/S4502562",
+          "display_name": "IEEE Transactions on Information Theory",
+          "issn_l": "0018-9448",
+          "issn": [
+            "0018-9448",
+            "1557-9654"
+          ],
+          "is_oa": false,
+          "is_in_doaj": false,
+          "is_core": true,
+          "listed_in": [
+            "anvur-class-a",
+            "anvur-scientific",
+            "ccf-a",
+            "cwts-core",
+            "dongbi-a",
+            "jufo-3",
+            "norway-2",
+            "poland-200",
+            "russia-white-list-1"
+          ],
+          "host_organization": "https://openalex.org/P4310319808",
+          "host_organization_name": "Institute of Electrical and Electronics Engineers",
+          "host_organization_lineage": [
+            "https://openalex.org/P4310319808"
+          ],
+          "host_organization_lineage_names": [
+            "Institute of Electrical and Electronics Engineers"
+          ],
+          "type": "journal"
+        },
+        "license": null,
+        "license_id": null,
+        "version": "publishedVersion",
+        "is_accepted": true,
+        "is_published": true,
+        "raw_source_name": "IEEE Transactions on Information Theory",
+        "raw_type": "journal-article"
+      }
+    },
+    {
+      "id": "https://openalex.org/W3159435673",
+      "title": "Exploiting degeneracy in belief propagation decoding of quantum codes",
+      "doi": "https://doi.org/10.1038/s41534-022-00623-2",
+      "publication_year": 2022,
+      "cited_by_count": 65,
+      "authorships": [
+        {
+          "author_position": "first",
+          "author": {
+            "id": "https://openalex.org/A5068690467",
+            "display_name": "Kao-Yueh Kuo",
+            "orcid": "https://orcid.org/0000-0002-1390-5197",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-1390-5197"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I148366613",
+              "display_name": "National Yang Ming Chiao Tung University",
+              "ror": "https://ror.org/00se2k293",
+              "country_code": "TW",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I148366613"
+              ]
+            }
+          ],
+          "countries": [
+            "TW"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Kao-Yueh Kuo",
+          "raw_affiliation_strings": [
+            "Institute of Communications Engineering, National Yang Ming Chiao Tung University, Hsinchu, 300093, Taiwan"
+          ],
+          "raw_orcid": "https://orcid.org/0000-0002-1390-5197",
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Institute of Communications Engineering, National Yang Ming Chiao Tung University, Hsinchu, 300093, Taiwan",
+              "institution_ids": [
+                "https://openalex.org/I148366613"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "last",
+          "author": {
+            "id": "https://openalex.org/A5016730083",
+            "display_name": "Ching\u2013Yi Lai",
+            "orcid": "https://orcid.org/0000-0003-1970-8167",
+            "observed_orcids": [
+              "https://orcid.org/0000-0003-1970-8167"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I148366613",
+              "display_name": "National Yang Ming Chiao Tung University",
+              "ror": "https://ror.org/00se2k293",
+              "country_code": "TW",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I148366613"
+              ]
+            }
+          ],
+          "countries": [
+            "TW"
+          ],
+          "is_corresponding": true,
+          "raw_author_name": "Ching-Yi Lai",
+          "raw_affiliation_strings": [
+            "Institute of Communications Engineering, National Yang Ming Chiao Tung University, Hsinchu, 300093, Taiwan"
+          ],
+          "raw_orcid": "https://orcid.org/0000-0003-1970-8167",
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Institute of Communications Engineering, National Yang Ming Chiao Tung University, Hsinchu, 300093, Taiwan",
+              "institution_ids": [
+                "https://openalex.org/I148366613"
+              ]
+            }
+          ]
+        }
+      ],
+      "primary_location": {
+        "id": "doi:10.1038/s41534-022-00623-2",
+        "doi": "https://doi.org/10.1038/s41534-022-00623-2",
+        "is_oa": true,
+        "landing_page_url": "https://doi.org/10.1038/s41534-022-00623-2",
+        "pdf_url": "https://www.nature.com/articles/s41534-022-00623-2.pdf",
+        "source": {
+          "id": "https://openalex.org/S2738600312",
+          "display_name": "npj Quantum Information",
+          "issn_l": "2056-6387",
+          "issn": [
+            "2056-6387"
+          ],
+          "is_oa": true,
+          "is_in_doaj": true,
+          "is_core": true,
+          "listed_in": [
+            "cwts-core",
+            "doaj",
+            "dongbi-a",
+            "jufo-3",
+            "norway-1",
+            "oarl",
+            "poland-200",
+            "russia-white-list-1"
+          ],
+          "host_organization": "https://openalex.org/P4310319908",
+          "host_organization_name": "Nature Portfolio",
+          "host_organization_lineage": [
+            "https://openalex.org/P4310319908",
+            "https://openalex.org/P4310319965"
+          ],
+          "host_organization_lineage_names": [
+            "Nature Portfolio",
+            "Springer Nature"
+          ],
+          "type": "journal"
+        },
+        "license": "cc-by",
+        "license_id": "https://openalex.org/licenses/cc-by",
+        "version": "publishedVersion",
+        "is_accepted": true,
+        "is_published": true,
+        "raw_source_name": "npj Quantum Information",
+        "raw_type": "journal-article"
+      }
+    },
+    {
+      "id": "https://openalex.org/W3005760425",
+      "title": "Refined Belief Propagation Decoding of Sparse-Graph Quantum Codes",
+      "doi": "https://doi.org/10.1109/jsait.2020.3011758",
+      "publication_year": 2020,
+      "cited_by_count": 53,
+      "authorships": [
+        {
+          "author_position": "first",
+          "author": {
+            "id": "https://openalex.org/A5068690467",
+            "display_name": "Kao-Yueh Kuo",
+            "orcid": "https://orcid.org/0000-0002-1390-5197",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-1390-5197"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I148366613",
+              "display_name": "National Yang Ming Chiao Tung University",
+              "ror": "https://ror.org/00se2k293",
+              "country_code": "TW",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I148366613"
+              ]
+            }
+          ],
+          "countries": [
+            "TW"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Kao-Yueh Kuo",
+          "raw_affiliation_strings": [
+            "Institute of Communications Engineering, National Chiao Tung University, Hsinchu, Taiwan"
+          ],
+          "raw_orcid": "https://orcid.org/0000-0002-1390-5197",
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Institute of Communications Engineering, National Chiao Tung University, Hsinchu, Taiwan",
+              "institution_ids": [
+                "https://openalex.org/I148366613"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "last",
+          "author": {
+            "id": "https://openalex.org/A5016730083",
+            "display_name": "Ching\u2013Yi Lai",
+            "orcid": "https://orcid.org/0000-0003-1970-8167",
+            "observed_orcids": [
+              "https://orcid.org/0000-0003-1970-8167"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I148366613",
+              "display_name": "National Yang Ming Chiao Tung University",
+              "ror": "https://ror.org/00se2k293",
+              "country_code": "TW",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I148366613"
+              ]
+            }
+          ],
+          "countries": [
+            "TW"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Ching-Yi Lai",
+          "raw_affiliation_strings": [
+            "Institute of Communications Engineering, National Chiao Tung University, Hsinchu, Taiwan"
+          ],
+          "raw_orcid": "https://orcid.org/0000-0003-1970-8167",
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Institute of Communications Engineering, National Chiao Tung University, Hsinchu, Taiwan",
+              "institution_ids": [
+                "https://openalex.org/I148366613"
+              ]
+            }
+          ]
+        }
+      ],
+      "primary_location": {
+        "id": "doi:10.1109/jsait.2020.3011758",
+        "doi": "https://doi.org/10.1109/jsait.2020.3011758",
+        "is_oa": false,
+        "landing_page_url": "https://doi.org/10.1109/jsait.2020.3011758",
+        "pdf_url": null,
+        "source": {
+          "id": "https://openalex.org/S4210211895",
+          "display_name": "IEEE Journal on Selected Areas in Information Theory",
+          "issn_l": "2641-8770",
+          "issn": [
+            "2641-8770"
+          ],
+          "is_oa": false,
+          "is_in_doaj": false,
+          "is_core": true,
+          "listed_in": [
+            "cwts-core",
+            "dongbi-b",
+            "jufo-1",
+            "norway-1"
+          ],
+          "host_organization": "https://openalex.org/P4310319808",
+          "host_organization_name": "Institute of Electrical and Electronics Engineers",
+          "host_organization_lineage": [
+            "https://openalex.org/P4310319808"
+          ],
+          "host_organization_lineage_names": [
+            "Institute of Electrical and Electronics Engineers"
+          ],
+          "type": "journal"
+        },
+        "license": null,
+        "license_id": null,
+        "version": "publishedVersion",
+        "is_accepted": true,
+        "is_published": true,
+        "raw_source_name": "IEEE Journal on Selected Areas in Information Theory",
+        "raw_type": "journal-article"
+      }
+    },
+    {
+      "id": "https://openalex.org/W2156987111",
+      "title": "Enhanced Feedback Iterative Decoding of Sparse Quantum Codes",
+      "doi": "https://doi.org/10.1109/tit.2011.2169534",
+      "publication_year": 2012,
+      "cited_by_count": 49,
+      "authorships": [
+        {
+          "author_position": "first",
+          "author": {
+            "id": null,
+            "display_name": "Yun-Jiang Wang",
+            "orcid": null,
+            "observed_orcids": []
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I149594827",
+              "display_name": "Xidian University",
+              "ror": "https://ror.org/05s92vm98",
+              "country_code": "CN",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I149594827"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I168635309",
+              "display_name": "University of Calgary",
+              "ror": "https://ror.org/03yjb2x39",
+              "country_code": "CA",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I168635309"
+              ]
+            }
+          ],
+          "countries": [
+            "CA",
+            "CN"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Yun-Jiang Wang",
+          "raw_affiliation_strings": [
+            "Institute for Quantum Information Science, University of Calgary, Calgary, AB, Canada",
+            "State Key Laboratory of Integrated Services Networks, Xidian University, Xi'an, Shaanxi, China"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Institute for Quantum Information Science, University of Calgary, Calgary, AB, Canada",
+              "institution_ids": [
+                "https://openalex.org/I168635309"
+              ]
+            },
+            {
+              "raw_affiliation_string": "State Key Laboratory of Integrated Services Networks, Xidian University, Xi'an, Shaanxi, China",
+              "institution_ids": [
+                "https://openalex.org/I149594827"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5017203711",
+            "display_name": "Barry C. Sanders",
+            "orcid": "https://orcid.org/0000-0002-8326-8912",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-8326-8912"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I168635309",
+              "display_name": "University of Calgary",
+              "ror": "https://ror.org/03yjb2x39",
+              "country_code": "CA",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I168635309"
+              ]
+            }
+          ],
+          "countries": [
+            "CA"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Barry C. Sanders",
+          "raw_affiliation_strings": [
+            "Institute for Quantum Information Science, University of Calgary, Calgary, AB, Canada"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Institute for Quantum Information Science, University of Calgary, Calgary, AB, Canada",
+              "institution_ids": [
+                "https://openalex.org/I168635309"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": null,
+            "display_name": "Bao-Ming Bai",
+            "orcid": null,
+            "observed_orcids": []
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I149594827",
+              "display_name": "Xidian University",
+              "ror": "https://ror.org/05s92vm98",
+              "country_code": "CN",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I149594827"
+              ]
+            }
+          ],
+          "countries": [
+            "CN"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Bao-Ming Bai",
+          "raw_affiliation_strings": [
+            "State Key Laboratory of Integrated Services Networks, Xidian University, Xi'an, Shaanxi, China"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "State Key Laboratory of Integrated Services Networks, Xidian University, Xi'an, Shaanxi, China",
+              "institution_ids": [
+                "https://openalex.org/I149594827"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "last",
+          "author": {
+            "id": null,
+            "display_name": "Xin-Mei Wang",
+            "orcid": null,
+            "observed_orcids": []
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I149594827",
+              "display_name": "Xidian University",
+              "ror": "https://ror.org/05s92vm98",
+              "country_code": "CN",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I149594827"
+              ]
+            }
+          ],
+          "countries": [
+            "CN"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Xin-Mei Wang",
+          "raw_affiliation_strings": [
+            "State Key Laboratory of Integrated Services Networks, Xidian University, Xi'an, Shaanxi, China"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "State Key Laboratory of Integrated Services Networks, Xidian University, Xi'an, Shaanxi, China",
+              "institution_ids": [
+                "https://openalex.org/I149594827"
+              ]
+            }
+          ]
+        }
+      ],
+      "primary_location": {
+        "id": "doi:10.1109/tit.2011.2169534",
+        "doi": "https://doi.org/10.1109/tit.2011.2169534",
+        "is_oa": false,
+        "landing_page_url": "https://doi.org/10.1109/tit.2011.2169534",
+        "pdf_url": null,
+        "source": {
+          "id": "https://openalex.org/S4502562",
+          "display_name": "IEEE Transactions on Information Theory",
+          "issn_l": "0018-9448",
+          "issn": [
+            "0018-9448",
+            "1557-9654"
+          ],
+          "is_oa": false,
+          "is_in_doaj": false,
+          "is_core": true,
+          "listed_in": [
+            "anvur-class-a",
+            "anvur-scientific",
+            "ccf-a",
+            "cwts-core",
+            "dongbi-a",
+            "jufo-3",
+            "norway-2",
+            "poland-200",
+            "russia-white-list-1"
+          ],
+          "host_organization": "https://openalex.org/P4310319808",
+          "host_organization_name": "Institute of Electrical and Electronics Engineers",
+          "host_organization_lineage": [
+            "https://openalex.org/P4310319808"
+          ],
+          "host_organization_lineage_names": [
+            "Institute of Electrical and Electronics Engineers"
+          ],
+          "type": "journal"
+        },
+        "license": null,
+        "license_id": null,
+        "version": "publishedVersion",
+        "is_accepted": true,
+        "is_published": true,
+        "raw_source_name": "IEEE Transactions on Information Theory",
+        "raw_type": "journal-article"
+      }
+    },
+    {
+      "id": "https://openalex.org/W4401693145",
+      "title": "Belief Propagation Decoding of Quantum LDPC Codes with Guided Decimation",
+      "doi": "https://doi.org/10.1109/isit57864.2024.10619083",
+      "publication_year": 2024,
+      "cited_by_count": 46,
+      "authorships": [
+        {
+          "author_position": "first",
+          "author": {
+            "id": "https://openalex.org/A5010924440",
+            "display_name": "Hanwen Yao",
+            "orcid": null,
+            "observed_orcids": []
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I170897317",
+              "display_name": "Duke University",
+              "ror": "https://ror.org/00py81415",
+              "country_code": "US",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I170897317"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Hanwen Yao",
+          "raw_affiliation_strings": [
+            "Duke University,Duke Quantum Center,Durham,NC,USA"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Duke University,Duke Quantum Center,Durham,NC,USA",
+              "institution_ids": [
+                "https://openalex.org/I170897317"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5084721361",
+            "display_name": "Waleed Abu Laban",
+            "orcid": null,
+            "observed_orcids": []
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I66862912",
+              "display_name": "Chalmers University of Technology",
+              "ror": "https://ror.org/040wg7k59",
+              "country_code": "SE",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I66862912"
+              ]
+            }
+          ],
+          "countries": [
+            "SE"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Waleed Abu Laban",
+          "raw_affiliation_strings": [
+            "Chalmers University of Technology,Department of Electrical Engineering,Gothenburg,Sweden"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Chalmers University of Technology,Department of Electrical Engineering,Gothenburg,Sweden",
+              "institution_ids": [
+                "https://openalex.org/I66862912"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5017892747",
+            "display_name": "Christian H\u00e4ger",
+            "orcid": "https://orcid.org/0000-0002-5155-8018",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-5155-8018"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I66862912",
+              "display_name": "Chalmers University of Technology",
+              "ror": "https://ror.org/040wg7k59",
+              "country_code": "SE",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I66862912"
+              ]
+            }
+          ],
+          "countries": [
+            "SE"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Christian H\u00e4ger",
+          "raw_affiliation_strings": [
+            "Chalmers University of Technology,Department of Electrical Engineering,Gothenburg,Sweden"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Chalmers University of Technology,Department of Electrical Engineering,Gothenburg,Sweden",
+              "institution_ids": [
+                "https://openalex.org/I66862912"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5014522913",
+            "display_name": "Alexandre Graell i Amat",
+            "orcid": "https://orcid.org/0000-0002-5725-869X",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-5725-869X"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I66862912",
+              "display_name": "Chalmers University of Technology",
+              "ror": "https://ror.org/040wg7k59",
+              "country_code": "SE",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I66862912"
+              ]
+            }
+          ],
+          "countries": [
+            "SE"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Alexandre Graell i Amat",
+          "raw_affiliation_strings": [
+            "Chalmers University of Technology,Department of Electrical Engineering,Gothenburg,Sweden"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Chalmers University of Technology,Department of Electrical Engineering,Gothenburg,Sweden",
+              "institution_ids": [
+                "https://openalex.org/I66862912"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "last",
+          "author": {
+            "id": "https://openalex.org/A5034044119",
+            "display_name": "Henry D. Pfister",
+            "orcid": "https://orcid.org/0000-0001-5521-4397",
+            "observed_orcids": [
+              "https://orcid.org/0000-0001-5521-4397"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I170897317",
+              "display_name": "Duke University",
+              "ror": "https://ror.org/00py81415",
+              "country_code": "US",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I170897317"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Henry D. Pfister",
+          "raw_affiliation_strings": [
+            "Duke University,Duke Quantum Center,Durham,NC,USA"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Duke University,Duke Quantum Center,Durham,NC,USA",
+              "institution_ids": [
+                "https://openalex.org/I170897317"
+              ]
+            }
+          ]
+        }
+      ],
+      "primary_location": {
+        "id": "doi:10.1109/isit57864.2024.10619083",
+        "doi": "https://doi.org/10.1109/isit57864.2024.10619083",
+        "is_oa": false,
+        "landing_page_url": "https://doi.org/10.1109/isit57864.2024.10619083",
+        "pdf_url": null,
+        "source": {
+          "id": "https://openalex.org/S4363604560",
+          "display_name": "IEEE International Symposium on Information Theory (ISIT)",
+          "issn_l": null,
+          "issn": null,
+          "is_oa": false,
+          "is_in_doaj": false,
+          "is_core": false,
+          "listed_in": [],
+          "host_organization": null,
+          "host_organization_name": null,
+          "host_organization_lineage": [],
+          "host_organization_lineage_names": [],
+          "type": "conference"
+        },
+        "license": null,
+        "license_id": null,
+        "version": "publishedVersion",
+        "is_accepted": true,
+        "is_published": true,
+        "raw_source_name": "2024 IEEE International Symposium on Information Theory (ISIT)",
+        "raw_type": "proceedings-article"
+      }
+    },
+    {
+      "id": "https://openalex.org/W2962973842",
+      "title": "Modified belief propagation decoders for quantum low-density parity-check codes",
+      "doi": "https://doi.org/10.1103/physreva.100.012330",
+      "publication_year": 2019,
+      "cited_by_count": 42,
+      "authorships": [
+        {
+          "author_position": "first",
+          "author": {
+            "id": "https://openalex.org/A5023035131",
+            "display_name": "Alex Rigby",
+            "orcid": "https://orcid.org/0000-0001-6041-8538",
+            "observed_orcids": [
+              "https://orcid.org/0000-0001-6041-8538"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I129801699",
+              "display_name": "University of Tasmania",
+              "ror": "https://ror.org/01nfmeh72",
+              "country_code": "AU",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I129801699"
+              ]
+            }
+          ],
+          "countries": [
+            "AU"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Alex Rigby",
+          "raw_affiliation_strings": [
+            "College of Sciences and Engineering, University of Tasmania, Hobart, Tasmania 7005, Australia"
+          ],
+          "raw_orcid": "https://orcid.org/0000-0001-6041-8538",
+          "affiliations": [
+            {
+              "raw_affiliation_string": "College of Sciences and Engineering, University of Tasmania, Hobart, Tasmania 7005, Australia",
+              "institution_ids": [
+                "https://openalex.org/I129801699"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5102816133",
+            "display_name": "Jan Corne Olivier",
+            "orcid": "https://orcid.org/0000-0002-7703-6357",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-7703-6357"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I129801699",
+              "display_name": "University of Tasmania",
+              "ror": "https://ror.org/01nfmeh72",
+              "country_code": "AU",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I129801699"
+              ]
+            }
+          ],
+          "countries": [
+            "AU"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "J. C. Olivier",
+          "raw_affiliation_strings": [
+            "College of Sciences and Engineering, University of Tasmania, Hobart, Tasmania 7005, Australia"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "College of Sciences and Engineering, University of Tasmania, Hobart, Tasmania 7005, Australia",
+              "institution_ids": [
+                "https://openalex.org/I129801699"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "last",
+          "author": {
+            "id": "https://openalex.org/A5009628379",
+            "display_name": "Peter Jarvis",
+            "orcid": "https://orcid.org/0000-0002-5330-6789",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-5330-6789"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I129801699",
+              "display_name": "University of Tasmania",
+              "ror": "https://ror.org/01nfmeh72",
+              "country_code": "AU",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I129801699"
+              ]
+            }
+          ],
+          "countries": [
+            "AU"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Peter Jarvis",
+          "raw_affiliation_strings": [
+            "College of Sciences and Engineering, University of Tasmania, Hobart, Tasmania 7005, Australia"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "College of Sciences and Engineering, University of Tasmania, Hobart, Tasmania 7005, Australia",
+              "institution_ids": [
+                "https://openalex.org/I129801699"
+              ]
+            }
+          ]
+        }
+      ],
+      "primary_location": {
+        "id": "doi:10.1103/physreva.100.012330",
+        "doi": "https://doi.org/10.1103/physreva.100.012330",
+        "is_oa": true,
+        "landing_page_url": "https://doi.org/10.1103/physreva.100.012330",
+        "pdf_url": "http://link.aps.org/pdf/10.1103/PhysRevA.100.012330",
+        "source": {
+          "id": "https://openalex.org/S164566984",
+          "display_name": "Physical Review A",
+          "issn_l": "0556-2791",
+          "issn": [
+            "0556-2791",
+            "1050-2947",
+            "1094-1622",
+            "1538-4446",
+            "2469-9926",
+            "2469-9934",
+            "2469-9942"
+          ],
+          "is_oa": false,
+          "is_in_doaj": false,
+          "is_core": true,
+          "listed_in": [
+            "anvur-scientific",
+            "cwts-core",
+            "dongbi-a",
+            "jufo-2",
+            "ki-jl-1",
+            "norway-2",
+            "poland-100",
+            "poland-70",
+            "russia-white-list-1",
+            "vabb-shw"
+          ],
+          "host_organization": "https://openalex.org/P4310320261",
+          "host_organization_name": "American Physical Society",
+          "host_organization_lineage": [
+            "https://openalex.org/P4310320261"
+          ],
+          "host_organization_lineage_names": [
+            "American Physical Society"
+          ],
+          "type": "journal"
+        },
+        "license": "cc-by",
+        "license_id": "https://openalex.org/licenses/cc-by",
+        "version": "publishedVersion",
+        "is_accepted": true,
+        "is_published": true,
+        "raw_source_name": "Physical Review A",
+        "raw_type": "journal-article"
+      }
+    },
+    {
+      "id": "https://openalex.org/W2119314900",
+      "title": "Sparse-Graph Codes for Quantum Error Correction",
+      "doi": "https://doi.org/10.1109/tit.2004.834737",
+      "publication_year": 2004,
+      "cited_by_count": 403,
+      "authorships": [
+        {
+          "author_position": "first",
+          "author": {
+            "id": "https://openalex.org/A5053054196",
+            "display_name": "David Mackay",
+            "orcid": "https://orcid.org/0000-0002-5271-2996",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-5271-2996"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I241749",
+              "display_name": "University of Cambridge",
+              "ror": "https://ror.org/013meh722",
+              "country_code": "GB",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I241749"
+              ]
+            }
+          ],
+          "countries": [
+            "GB"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "D.J.C. MacKay",
+          "raw_affiliation_strings": [
+            "Department of Physics, Cavendish Laboratory, Cambridge, UK",
+            "Dept. of Phys., Cavendish Lab., Cambridge, UK"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Department of Physics, Cavendish Laboratory, Cambridge, UK",
+              "institution_ids": [
+                "https://openalex.org/I241749"
+              ]
+            },
+            {
+              "raw_affiliation_string": "Dept. of Phys., Cavendish Lab., Cambridge, UK",
+              "institution_ids": [
+                "https://openalex.org/I241749"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5076702701",
+            "display_name": "Graeme Mitchison",
+            "orcid": "https://orcid.org/0000-0001-6304-9758",
+            "observed_orcids": [
+              "https://orcid.org/0000-0001-6304-9758"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I170203145",
+              "display_name": "MRC Laboratory of Molecular Biology",
+              "ror": "https://ror.org/00tw3jy02",
+              "country_code": "GB",
+              "type": "facility",
+              "lineage": [
+                "https://openalex.org/I170203145",
+                "https://openalex.org/I4210087105",
+                "https://openalex.org/I90344618"
+              ]
+            }
+          ],
+          "countries": [
+            "GB"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "G. Mitchison",
+          "raw_affiliation_strings": [
+            "M.R.C. Laboratory of Molecular Biology, Cambridge, UK"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "M.R.C. Laboratory of Molecular Biology, Cambridge, UK",
+              "institution_ids": [
+                "https://openalex.org/I170203145"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "last",
+          "author": {
+            "id": "https://openalex.org/A5074254752",
+            "display_name": "Paul L. McFadden",
+            "orcid": "https://orcid.org/0000-0002-7501-3899",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-7501-3899",
+              "https://orcid.org/0000-0003-0445-7625"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I241749",
+              "display_name": "University of Cambridge",
+              "ror": "https://ror.org/013meh722",
+              "country_code": "GB",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I241749"
+              ]
+            }
+          ],
+          "countries": [
+            "GB"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "P.L. McFadden",
+          "raw_affiliation_strings": [
+            "Department of Applied Maths and Theoretical Physics, Cambridge, UK"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Department of Applied Maths and Theoretical Physics, Cambridge, UK",
+              "institution_ids": [
+                "https://openalex.org/I241749"
+              ]
+            }
+          ]
+        }
+      ],
+      "primary_location": {
+        "id": "doi:10.1109/tit.2004.834737",
+        "doi": "https://doi.org/10.1109/tit.2004.834737",
+        "is_oa": false,
+        "landing_page_url": "https://doi.org/10.1109/tit.2004.834737",
+        "pdf_url": null,
+        "source": {
+          "id": "https://openalex.org/S4502562",
+          "display_name": "IEEE Transactions on Information Theory",
+          "issn_l": "0018-9448",
+          "issn": [
+            "0018-9448",
+            "1557-9654"
+          ],
+          "is_oa": false,
+          "is_in_doaj": false,
+          "is_core": true,
+          "listed_in": [
+            "anvur-class-a",
+            "anvur-scientific",
+            "ccf-a",
+            "cwts-core",
+            "dongbi-a",
+            "jufo-3",
+            "norway-2",
+            "poland-200",
+            "russia-white-list-1"
+          ],
+          "host_organization": "https://openalex.org/P4310319808",
+          "host_organization_name": "Institute of Electrical and Electronics Engineers",
+          "host_organization_lineage": [
+            "https://openalex.org/P4310319808"
+          ],
+          "host_organization_lineage_names": [
+            "Institute of Electrical and Electronics Engineers"
+          ],
+          "type": "journal"
+        },
+        "license": null,
+        "license_id": null,
+        "version": "publishedVersion",
+        "is_accepted": true,
+        "is_published": true,
+        "raw_source_name": "IEEE Transactions on Information Theory",
+        "raw_type": "journal-article"
+      }
+    },
+    {
+      "id": "https://openalex.org/W1975088395",
+      "title": "Quantum Quasi-Cyclic LDPC Codes",
+      "doi": "https://doi.org/10.1109/isit.2007.4557323",
+      "publication_year": 2007,
+      "cited_by_count": 91,
+      "authorships": [
+        {
+          "author_position": "first",
+          "author": {
+            "id": null,
+            "display_name": "Manabu Hagiwara",
+            "orcid": null,
+            "observed_orcids": []
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I73613424",
+              "display_name": "National Institute of Advanced Industrial Science and Technology",
+              "ror": "https://ror.org/01703db54",
+              "country_code": "JP",
+              "type": "government",
+              "lineage": [
+                "https://openalex.org/I73613424"
+              ]
+            }
+          ],
+          "countries": [
+            "JP"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Manabu Hagiwara",
+          "raw_affiliation_strings": [
+            "Research Center for Information Security, National Institute for Advanced Industrial Science and Technology, Chiyoda, Tokyo, Japan"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Research Center for Information Security, National Institute for Advanced Industrial Science and Technology, Chiyoda, Tokyo, Japan",
+              "institution_ids": [
+                "https://openalex.org/I73613424"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "last",
+          "author": {
+            "id": null,
+            "display_name": "Hideki Imai",
+            "orcid": null,
+            "observed_orcids": []
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I96679780",
+              "display_name": "Chuo University",
+              "ror": "https://ror.org/03qvqb743",
+              "country_code": "JP",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I96679780"
+              ]
+            }
+          ],
+          "countries": [
+            "JP"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Hideki Imai",
+          "raw_affiliation_strings": [
+            "RCIS and Chuo University, Bunkyo, Tokyo, Japan"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "RCIS and Chuo University, Bunkyo, Tokyo, Japan",
+              "institution_ids": [
+                "https://openalex.org/I96679780"
+              ]
+            }
+          ]
+        }
+      ],
+      "primary_location": {
+        "id": "doi:10.1109/isit.2007.4557323",
+        "doi": "https://doi.org/10.1109/isit.2007.4557323",
+        "is_oa": false,
+        "landing_page_url": "https://doi.org/10.1109/isit.2007.4557323",
+        "pdf_url": null,
+        "source": {
+          "id": "https://openalex.org/S4363604560",
+          "display_name": "IEEE International Symposium on Information Theory (ISIT)",
+          "issn_l": null,
+          "issn": null,
+          "is_oa": false,
+          "is_in_doaj": false,
+          "is_core": false,
+          "listed_in": [],
+          "host_organization": null,
+          "host_organization_name": null,
+          "host_organization_lineage": [],
+          "host_organization_lineage_names": [],
+          "type": "conference"
+        },
+        "license": null,
+        "license_id": null,
+        "version": "publishedVersion",
+        "is_accepted": true,
+        "is_published": true,
+        "raw_source_name": "2007 IEEE International Symposium on Information Theory",
+        "raw_type": "proceedings-article"
+      }
+    },
+    {
+      "id": "https://openalex.org/W4393234688",
+      "title": "High-threshold and low-overhead fault-tolerant quantum memory",
+      "doi": "https://doi.org/10.1038/s41586-024-07107-7",
+      "publication_year": 2024,
+      "cited_by_count": 711,
+      "authorships": [
+        {
+          "author_position": "first",
+          "author": {
+            "id": "https://openalex.org/A5021754799",
+            "display_name": "Sergey B. Bravyi",
+            "orcid": "https://orcid.org/0000-0002-4032-470X",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-4032-470X"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I1341412227",
+              "display_name": "IBM (United States)",
+              "ror": "https://ror.org/05hh8d621",
+              "country_code": "US",
+              "type": "company",
+              "lineage": [
+                "https://openalex.org/I1341412227"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I4210114115",
+              "display_name": "IBM Research - Thomas J. Watson Research Center",
+              "ror": "https://ror.org/0265w5591",
+              "country_code": "US",
+              "type": "facility",
+              "lineage": [
+                "https://openalex.org/I1341412227",
+                "https://openalex.org/I4210114115"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Sergey Bravyi",
+          "raw_affiliation_strings": [
+            "IBM Quantum, IBM T.J. Watson Research Center, Yorktown Heights, NY, USA"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "IBM Quantum, IBM T.J. Watson Research Center, Yorktown Heights, NY, USA",
+              "institution_ids": [
+                "https://openalex.org/I1341412227",
+                "https://openalex.org/I4210114115"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5064909614",
+            "display_name": "Andrew W. Cross",
+            "orcid": "https://orcid.org/0000-0001-9786-8196",
+            "observed_orcids": [
+              "https://orcid.org/0000-0001-9786-8196"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I1341412227",
+              "display_name": "IBM (United States)",
+              "ror": "https://ror.org/05hh8d621",
+              "country_code": "US",
+              "type": "company",
+              "lineage": [
+                "https://openalex.org/I1341412227"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I4210114115",
+              "display_name": "IBM Research - Thomas J. Watson Research Center",
+              "ror": "https://ror.org/0265w5591",
+              "country_code": "US",
+              "type": "facility",
+              "lineage": [
+                "https://openalex.org/I1341412227",
+                "https://openalex.org/I4210114115"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Andrew W. Cross",
+          "raw_affiliation_strings": [
+            "IBM Quantum, IBM T.J. Watson Research Center, Yorktown Heights, NY, USA"
+          ],
+          "raw_orcid": "https://orcid.org/0000-0001-9786-8196",
+          "affiliations": [
+            {
+              "raw_affiliation_string": "IBM Quantum, IBM T.J. Watson Research Center, Yorktown Heights, NY, USA",
+              "institution_ids": [
+                "https://openalex.org/I1341412227",
+                "https://openalex.org/I4210114115"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5030701195",
+            "display_name": "Jay Gambetta",
+            "orcid": "https://orcid.org/0000-0002-4620-0978",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-4620-0978"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I1341412227",
+              "display_name": "IBM (United States)",
+              "ror": "https://ror.org/05hh8d621",
+              "country_code": "US",
+              "type": "company",
+              "lineage": [
+                "https://openalex.org/I1341412227"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I4210114115",
+              "display_name": "IBM Research - Thomas J. Watson Research Center",
+              "ror": "https://ror.org/0265w5591",
+              "country_code": "US",
+              "type": "facility",
+              "lineage": [
+                "https://openalex.org/I1341412227",
+                "https://openalex.org/I4210114115"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Jay M. Gambetta",
+          "raw_affiliation_strings": [
+            "IBM Quantum, IBM T.J. Watson Research Center, Yorktown Heights, NY, USA"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "IBM Quantum, IBM T.J. Watson Research Center, Yorktown Heights, NY, USA",
+              "institution_ids": [
+                "https://openalex.org/I1341412227",
+                "https://openalex.org/I4210114115"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": null,
+            "display_name": "Dmitri Maslov",
+            "orcid": "https://orcid.org/0000-0001-7381-4556",
+            "observed_orcids": [
+              "https://orcid.org/0000-0001-7381-4556"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I1341412227",
+              "display_name": "IBM (United States)",
+              "ror": "https://ror.org/05hh8d621",
+              "country_code": "US",
+              "type": "company",
+              "lineage": [
+                "https://openalex.org/I1341412227"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I4210114115",
+              "display_name": "IBM Research - Thomas J. Watson Research Center",
+              "ror": "https://ror.org/0265w5591",
+              "country_code": "US",
+              "type": "facility",
+              "lineage": [
+                "https://openalex.org/I1341412227",
+                "https://openalex.org/I4210114115"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": true,
+          "raw_author_name": "Dmitri Maslov",
+          "raw_affiliation_strings": [
+            "IBM Quantum, IBM T.J. Watson Research Center, Yorktown Heights, NY, USA. dmitri.maslov@ibm.com",
+            "IBM Quantum, IBM T.J. Watson Research Center, Yorktown Heights, NY, USA"
+          ],
+          "raw_orcid": "https://orcid.org/0000-0001-7381-4556",
+          "affiliations": [
+            {
+              "raw_affiliation_string": "IBM Quantum, IBM T.J. Watson Research Center, Yorktown Heights, NY, USA. dmitri.maslov@ibm.com",
+              "institution_ids": [
+                "https://openalex.org/I1341412227",
+                "https://openalex.org/I4210114115"
+              ]
+            },
+            {
+              "raw_affiliation_string": "IBM Quantum, IBM T.J. Watson Research Center, Yorktown Heights, NY, USA",
+              "institution_ids": [
+                "https://openalex.org/I1341412227",
+                "https://openalex.org/I4210114115"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5065493775",
+            "display_name": "Patrick Rall",
+            "orcid": null,
+            "observed_orcids": []
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I1341412227",
+              "display_name": "IBM (United States)",
+              "ror": "https://ror.org/05hh8d621",
+              "country_code": "US",
+              "type": "company",
+              "lineage": [
+                "https://openalex.org/I1341412227"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I63966007",
+              "display_name": "Massachusetts Institute of Technology",
+              "ror": "https://ror.org/042nb2s44",
+              "country_code": "US",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I63966007"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Patrick Rall",
+          "raw_affiliation_strings": [
+            "IBM Quantum, MIT-IBM Watson AI Laboratory, Cambridge, MA, USA"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "IBM Quantum, MIT-IBM Watson AI Laboratory, Cambridge, MA, USA",
+              "institution_ids": [
+                "https://openalex.org/I1341412227",
+                "https://openalex.org/I63966007"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "last",
+          "author": {
+            "id": "https://openalex.org/A5002718143",
+            "display_name": "Theodore J. Yoder",
+            "orcid": "https://orcid.org/0000-0001-9614-2836",
+            "observed_orcids": [
+              "https://orcid.org/0000-0001-9614-2836"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I1341412227",
+              "display_name": "IBM (United States)",
+              "ror": "https://ror.org/05hh8d621",
+              "country_code": "US",
+              "type": "company",
+              "lineage": [
+                "https://openalex.org/I1341412227"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I4210114115",
+              "display_name": "IBM Research - Thomas J. Watson Research Center",
+              "ror": "https://ror.org/0265w5591",
+              "country_code": "US",
+              "type": "facility",
+              "lineage": [
+                "https://openalex.org/I1341412227",
+                "https://openalex.org/I4210114115"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Theodore J. Yoder",
+          "raw_affiliation_strings": [
+            "IBM Quantum, IBM T.J. Watson Research Center, Yorktown Heights, NY, USA"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "IBM Quantum, IBM T.J. Watson Research Center, Yorktown Heights, NY, USA",
+              "institution_ids": [
+                "https://openalex.org/I1341412227",
+                "https://openalex.org/I4210114115"
+              ]
+            }
+          ]
+        }
+      ],
+      "primary_location": {
+        "id": "doi:10.1038/s41586-024-07107-7",
+        "doi": "https://doi.org/10.1038/s41586-024-07107-7",
+        "is_oa": true,
+        "landing_page_url": "https://doi.org/10.1038/s41586-024-07107-7",
+        "pdf_url": "https://www.nature.com/articles/s41586-024-07107-7.pdf",
+        "source": {
+          "id": "https://openalex.org/S137773608",
+          "display_name": "Nature",
+          "issn_l": "0028-0836",
+          "issn": [
+            "0028-0836",
+            "1476-4687"
+          ],
+          "is_oa": false,
+          "is_in_doaj": false,
+          "is_core": true,
+          "listed_in": [
+            "anvur-class-a",
+            "anvur-scientific",
+            "cwts-core",
+            "dongbi-a",
+            "doyens",
+            "erih-plus",
+            "jufo-3",
+            "ki-jl-3",
+            "medline",
+            "norway-2",
+            "poland-200",
+            "russia-white-list-1",
+            "vabb-shw"
+          ],
+          "host_organization": "https://openalex.org/P4310319908",
+          "host_organization_name": "Nature Portfolio",
+          "host_organization_lineage": [
+            "https://openalex.org/P4310319908",
+            "https://openalex.org/P4310319965"
+          ],
+          "host_organization_lineage_names": [
+            "Nature Portfolio",
+            "Springer Nature"
+          ],
+          "type": "journal"
+        },
+        "license": "cc-by",
+        "license_id": "https://openalex.org/licenses/cc-by",
+        "version": "publishedVersion",
+        "is_accepted": true,
+        "is_published": true,
+        "raw_source_name": "Nature",
+        "raw_type": "journal-article"
+      }
+    },
+    {
+      "id": "https://openalex.org/W3019236876",
+      "title": "Combining hard and soft decoders for hypergraph product codes",
+      "doi": "https://doi.org/10.22331/q-2021-04-15-432",
+      "publication_year": 2021,
+      "cited_by_count": 65,
+      "authorships": [
+        {
+          "author_position": "first",
+          "author": {
+            "id": null,
+            "display_name": "Antoine Grospellier",
+            "orcid": null,
+            "observed_orcids": []
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I1326498283",
+              "display_name": "Institut national de recherche en sciences et technologies du num\u00e9rique",
+              "ror": "https://ror.org/02kvxyf05",
+              "country_code": "FR",
+              "type": "government",
+              "lineage": [
+                "https://openalex.org/I1326498283"
+              ]
+            }
+          ],
+          "countries": [
+            "FR"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Antoine Grospellier",
+          "raw_affiliation_strings": [
+            "Inria, 2 Rue Simone IFF, CS 42112, 75589 Paris Cedex 12, France"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Inria, 2 Rue Simone IFF, CS 42112, 75589 Paris Cedex 12, France",
+              "institution_ids": [
+                "https://openalex.org/I1326498283"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": null,
+            "display_name": "Lucien Grou\u00e8s",
+            "orcid": null,
+            "observed_orcids": []
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I1326498283",
+              "display_name": "Institut national de recherche en sciences et technologies du num\u00e9rique",
+              "ror": "https://ror.org/02kvxyf05",
+              "country_code": "FR",
+              "type": "government",
+              "lineage": [
+                "https://openalex.org/I1326498283"
+              ]
+            }
+          ],
+          "countries": [
+            "FR"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Lucien Grou\u00e8s",
+          "raw_affiliation_strings": [
+            "Inria, 2 Rue Simone IFF, CS 42112, 75589 Paris Cedex 12, France"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Inria, 2 Rue Simone IFF, CS 42112, 75589 Paris Cedex 12, France",
+              "institution_ids": [
+                "https://openalex.org/I1326498283"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5102780229",
+            "display_name": "Anirudh Krishna",
+            "orcid": "https://orcid.org/0000-0002-2027-6448",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-2027-6448"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I135117807",
+              "display_name": "Universit\u00e9 de Sherbrooke",
+              "ror": "https://ror.org/00kybxq39",
+              "country_code": "CA",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I135117807"
+              ]
+            }
+          ],
+          "countries": [
+            "CA"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Anirudh Krishna",
+          "raw_affiliation_strings": [
+            "Universit\u00e9 de Sherbrooke, 2500 Boulevard de l'Universit\u00e9, Sherbrooke, QC J1K 2R1, Canada"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Universit\u00e9 de Sherbrooke, 2500 Boulevard de l'Universit\u00e9, Sherbrooke, QC J1K 2R1, Canada",
+              "institution_ids": [
+                "https://openalex.org/I135117807"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "last",
+          "author": {
+            "id": "https://openalex.org/A5040575794",
+            "display_name": "Anthony Leverrier",
+            "orcid": "https://orcid.org/0000-0002-6707-1458",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-6707-1458"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I1326498283",
+              "display_name": "Institut national de recherche en sciences et technologies du num\u00e9rique",
+              "ror": "https://ror.org/02kvxyf05",
+              "country_code": "FR",
+              "type": "government",
+              "lineage": [
+                "https://openalex.org/I1326498283"
+              ]
+            }
+          ],
+          "countries": [
+            "FR"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Anthony Leverrier",
+          "raw_affiliation_strings": [
+            "Inria, 2 Rue Simone IFF, CS 42112, 75589 Paris Cedex 12, France"
+          ],
+          "raw_orcid": null,
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Inria, 2 Rue Simone IFF, CS 42112, 75589 Paris Cedex 12, France",
+              "institution_ids": [
+                "https://openalex.org/I1326498283"
+              ]
+            }
+          ]
+        }
+      ],
+      "primary_location": {
+        "id": "doi:10.22331/q-2021-04-15-432",
+        "doi": "https://doi.org/10.22331/q-2021-04-15-432",
+        "is_oa": true,
+        "landing_page_url": "https://doi.org/10.22331/q-2021-04-15-432",
+        "pdf_url": "https://quantum-journal.org/papers/q-2021-04-15-432/pdf/",
+        "source": {
+          "id": "https://openalex.org/S4210226432",
+          "display_name": "Quantum",
+          "issn_l": "2521-327X",
+          "issn": [
+            "2521-327X"
+          ],
+          "is_oa": true,
+          "is_in_doaj": true,
+          "is_core": true,
+          "listed_in": [
+            "cwts-core",
+            "doaj",
+            "dongbi-a",
+            "jufo-2",
+            "norway-1",
+            "oarl",
+            "poland-140",
+            "russia-white-list-1"
+          ],
+          "host_organization": "https://openalex.org/P4310317900",
+          "host_organization_name": "Verein zur F\u00f6rderung des Open Access Publizierens in den Quantenwissenschaften",
+          "host_organization_lineage": [
+            "https://openalex.org/P4310317900"
+          ],
+          "host_organization_lineage_names": [
+            "Verein zur F\u00f6rderung des Open Access Publizierens in den Quantenwissenschaften"
+          ],
+          "type": "journal"
+        },
+        "license": "cc-by",
+        "license_id": "https://openalex.org/licenses/cc-by",
+        "version": "publishedVersion",
+        "is_accepted": true,
+        "is_published": true,
+        "raw_source_name": "Quantum",
+        "raw_type": "journal-article"
+      }
+    },
+    {
+      "id": "https://openalex.org/W3204926734",
+      "title": "Syndrome-Based Min-Sum vs OSD-0 Decoders: FPGA Implementation and Analysis for Quantum LDPC Codes",
+      "doi": "https://doi.org/10.1109/access.2021.3118544",
+      "publication_year": 2021,
+      "cited_by_count": 36,
+      "authorships": [
+        {
+          "author_position": "first",
+          "author": {
+            "id": "https://openalex.org/A5005437595",
+            "display_name": "Javier Valls",
+            "orcid": "https://orcid.org/0000-0002-9390-5022",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-9390-5022"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I60053951",
+              "display_name": "Universitat Polit\u00e8cnica de Val\u00e8ncia",
+              "ror": "https://ror.org/01460j859",
+              "country_code": "ES",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I60053951"
+              ]
+            }
+          ],
+          "countries": [
+            "ES"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Javier Valls",
+          "raw_affiliation_strings": [
+            "Instituto de Telecomunicaciones y Aplicaciones Multimedia, Universitat Politecnica de Valencia, Valencia, Spain. (e-mail: jvalls@eln.upv.es)",
+            "Instituto de Telecomunicaciones y Aplicaciones Multimedia, Universitat Politecnica de Valencia, Valencia, Spain"
+          ],
+          "raw_orcid": "https://orcid.org/0000-0002-9390-5022",
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Instituto de Telecomunicaciones y Aplicaciones Multimedia, Universitat Politecnica de Valencia, Valencia, Spain. (e-mail: jvalls@eln.upv.es)",
+              "institution_ids": [
+                "https://openalex.org/I60053951"
+              ]
+            },
+            {
+              "raw_affiliation_string": "Instituto de Telecomunicaciones y Aplicaciones Multimedia, Universitat Politecnica de Valencia, Valencia, Spain",
+              "institution_ids": [
+                "https://openalex.org/I60053951"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5088891897",
+            "display_name": "Francisco Garc\u00eda-Herrero",
+            "orcid": "https://orcid.org/0000-0001-6719-9681",
+            "observed_orcids": [
+              "https://orcid.org/0000-0001-6719-9681"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I3020445194",
+              "display_name": "Universidad Nebrija",
+              "ror": "https://ror.org/03tzyrt94",
+              "country_code": "ES",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I3020445194"
+              ]
+            }
+          ],
+          "countries": [
+            "ES"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Francisco Garcia-Herrero",
+          "raw_affiliation_strings": [
+            "ARIES Research Center, Universidad Nebrija, C/ Pirineos, 55 E-28040 Madrid, Spain"
+          ],
+          "raw_orcid": "https://orcid.org/0000-0001-6719-9681",
+          "affiliations": [
+            {
+              "raw_affiliation_string": "ARIES Research Center, Universidad Nebrija, C/ Pirineos, 55 E-28040 Madrid, Spain",
+              "institution_ids": [
+                "https://openalex.org/I3020445194"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5059122162",
+            "display_name": "Nithin Raveendran",
+            "orcid": "https://orcid.org/0000-0002-1024-8099",
+            "observed_orcids": [
+              "https://orcid.org/0000-0002-1024-8099"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I138006243",
+              "display_name": "University of Arizona",
+              "ror": "https://ror.org/03m2x1q45",
+              "country_code": "US",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I138006243"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Nithin Raveendran",
+          "raw_affiliation_strings": [
+            "University of Arizona, Tucson, AZ 85721, USA"
+          ],
+          "raw_orcid": "https://orcid.org/0000-0002-1024-8099",
+          "affiliations": [
+            {
+              "raw_affiliation_string": "University of Arizona, Tucson, AZ 85721, USA",
+              "institution_ids": [
+                "https://openalex.org/I138006243"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "last",
+          "author": {
+            "id": "https://openalex.org/A5040676835",
+            "display_name": "Bane V. Vasic",
+            "orcid": "https://orcid.org/0000-0003-2365-4106",
+            "observed_orcids": [
+              "https://orcid.org/0000-0003-2365-4106"
+            ]
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I138006243",
+              "display_name": "University of Arizona",
+              "ror": "https://ror.org/03m2x1q45",
+              "country_code": "US",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I138006243"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Bane Vasic",
+          "raw_affiliation_strings": [
+            "University of Arizona, Tucson, AZ 85721, USA"
+          ],
+          "raw_orcid": "https://orcid.org/0000-0003-2365-4106",
+          "affiliations": [
+            {
+              "raw_affiliation_string": "University of Arizona, Tucson, AZ 85721, USA",
+              "institution_ids": [
+                "https://openalex.org/I138006243"
+              ]
+            }
+          ]
+        }
+      ],
+      "primary_location": {
+        "id": "doi:10.1109/access.2021.3118544",
+        "doi": "https://doi.org/10.1109/access.2021.3118544",
+        "is_oa": true,
+        "landing_page_url": "https://doi.org/10.1109/access.2021.3118544",
+        "pdf_url": "https://ieeexplore.ieee.org/ielx7/6287639/6514899/09562513.pdf",
+        "source": {
+          "id": "https://openalex.org/S2485537415",
+          "display_name": "IEEE Access",
+          "issn_l": "2169-3536",
+          "issn": [
+            "2169-3536"
+          ],
+          "is_oa": true,
+          "is_in_doaj": true,
+          "is_core": true,
+          "listed_in": [
+            "anvur-scientific",
+            "cwts-core",
+            "doaj",
+            "jufo-1",
+            "ki-jl-1",
+            "norway-1",
+            "oarl",
+            "poland-100",
+            "russia-white-list-1",
+            "vabb-shw"
+          ],
+          "host_organization": "https://openalex.org/P4310319808",
+          "host_organization_name": "Institute of Electrical and Electronics Engineers",
+          "host_organization_lineage": [
+            "https://openalex.org/P4310319808"
+          ],
+          "host_organization_lineage_names": [
+            "Institute of Electrical and Electronics Engineers"
+          ],
+          "type": "journal"
+        },
+        "license": "cc-by",
+        "license_id": "https://openalex.org/licenses/cc-by",
+        "version": "publishedVersion",
+        "is_accepted": true,
+        "is_published": true,
+        "raw_source_name": "IEEE Access",
+        "raw_type": "journal-article"
+      }
+    }
+  ]
+}

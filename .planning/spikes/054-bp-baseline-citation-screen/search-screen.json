@@ -1,0 +1,890 @@
+{
+  "metadata": {
+    "retrieved_at_utc": "2026-11-10T21:00:09+00:00",
+    "provider": "OpenAlex",
+    "metric": "cited_by_count on one selected publication record; no summed journal/preprint duplicates",
+    "scope": "Bounded citation-prioritized shortlist. Not an exhaustive global top-N ranking or a completed systematic mapping study.",
+    "paper_count": 17
+  },
+  "title_searches": [
+    {
+      "query": "Sparse-Graph Codes for Quantum Error Correction",
+      "url": "https://api.openalex.org/works?filter=title.search%3ASparse-Graph+Codes+for+Quantum+Error+Correction&per-page=8&sort=cited_by_count%3Adesc&select=id%2Cdoi%2Ctitle%2Cpublication_year%2Ccited_by_count%2Cauthorships%2Cprimary_location",
+      "results": [
+        {
+          "id": "https://openalex.org/W2119314900",
+          "title": "Sparse-Graph Codes for Quantum Error Correction",
+          "publication_year": 2004,
+          "cited_by_count": 403,
+          "doi": "https://doi.org/10.1109/tit.2004.834737"
+        }
+      ],
+      "error": null
+    },
+    {
+      "query": "Neural Belief-Propagation Decoders for Quantum Error-Correcting Codes",
+      "url": "https://api.openalex.org/works?filter=title.search%3ANeural+Belief-Propagation+Decoders+for+Quantum+Error-Correcting+Codes&per-page=8&sort=cited_by_count%3Adesc&select=id%2Cdoi%2Ctitle%2Cpublication_year%2Ccited_by_count%2Cauthorships%2Cprimary_location",
+      "results": [
+        {
+          "id": "https://openalex.org/W2901383498",
+          "title": "Neural Belief-Propagation Decoders for Quantum Error-Correcting Codes",
+          "publication_year": 2019,
+          "cited_by_count": 110,
+          "doi": "https://doi.org/10.1103/physrevlett.122.200501"
+        }
+      ],
+      "error": null
+    },
+    {
+      "query": "On the iterative decoding of sparse quantum codes",
+      "url": "https://api.openalex.org/works?filter=title.search%3AOn+the+iterative+decoding+of+sparse+quantum+codes&per-page=8&sort=cited_by_count%3Adesc&select=id%2Cdoi%2Ctitle%2Cpublication_year%2Ccited_by_count%2Cauthorships%2Cprimary_location",
+      "results": [
+        {
+          "id": "https://openalex.org/W1850344377",
+          "title": "On the iterative decoding of sparse quantum codes",
+          "publication_year": 2008,
+          "cited_by_count": 165,
+          "doi": "https://doi.org/10.26421/qic.10-8"
+        },
+        {
+          "id": "https://openalex.org/W4394669246",
+          "title": "On the iterative decoding of sparse quantum codes",
+          "publication_year": 2008,
+          "cited_by_count": 68,
+          "doi": "https://doi.org/10.48550/arxiv.0801.1241"
+        },
+        {
+          "id": "https://openalex.org/W2156987111",
+          "title": "Enhanced Feedback Iterative Decoding of Sparse Quantum Codes",
+          "publication_year": 2012,
+          "cited_by_count": 49,
+          "doi": "https://doi.org/10.1109/tit.2011.2169534"
+        },
+        {
+          "id": "https://openalex.org/W3100642416",
+          "title": "Enhanced Feedback Iterative Decoding of Sparse Quantum Codes",
+          "publication_year": 2016,
+          "cited_by_count": 38,
+          "doi": null
+        },
+        {
+          "id": "https://openalex.org/W3090308648",
+          "title": "On the iterative decoding of sparse quantum codes",
+          "publication_year": 2008,
+          "cited_by_count": 8,
+          "doi": "https://doi.org/10.5555/2016985.2016993"
+        },
+        {
+          "id": "https://openalex.org/W1763070547",
+          "title": "Feedback iterative decoding of sparse quantum codes",
+          "publication_year": 2010,
+          "cited_by_count": 2,
+          "doi": "https://doi.org/10.7498/aps.59.7591"
+        },
+        {
+          "id": "https://openalex.org/W36375598",
+          "title": "Jointly-check iterative decoding algorithm for quantum sparse graph codes",
+          "publication_year": 2010,
+          "cited_by_count": 1,
+          "doi": "https://doi.org/10.1088/1674-1056/19/8/080307"
+        }
+      ],
+      "error": null
+    },
+    {
+      "query": "Decoding across the quantum low-density parity-check code landscape",
+      "url": "https://api.openalex.org/works?filter=title.search%3ADecoding+across+the+quantum+low-density+parity-check+code+landscape&per-page=8&sort=cited_by_count%3Adesc&select=id%2Cdoi%2Ctitle%2Cpublication_year%2Ccited_by_count%2Cauthorships%2Cprimary_location",
+      "results": [
+        {
+          "id": "https://openalex.org/W3025282692",
+          "title": "Decoding across the quantum low-density parity-check code landscape",
+          "publication_year": 2020,
+          "cited_by_count": 289,
+          "doi": "https://doi.org/10.1103/physrevresearch.2.043423"
+        }
+      ],
+      "error": null
+    },
+    {
+      "query": "Modified belief propagation decoders for quantum low-density parity-check codes",
+      "url": "https://api.openalex.org/works?filter=title.search%3AModified+belief+propagation+decoders+for+quantum+low-density+parity-check+codes&per-page=8&sort=cited_by_count%3Adesc&select=id%2Cdoi%2Ctitle%2Cpublication_year%2Ccited_by_count%2Cauthorships%2Cprimary_location",
+      "results": [
+        {
+          "id": "https://openalex.org/W2962973842",
+          "title": "Modified belief propagation decoders for quantum low-density parity-check codes",
+          "publication_year": 2019,
+          "cited_by_count": 42,
+          "doi": "https://doi.org/10.1103/physreva.100.012330"
+        }
+      ],
+      "error": null
+    },
+    {
+      "query": "Degenerate Quantum LDPC Codes With Good Finite Length Performance",
+      "url": "https://api.openalex.org/works?filter=title.search%3ADegenerate+Quantum+LDPC+Codes+With+Good+Finite+Length+Performance&per-page=8&sort=cited_by_count%3Adesc&select=id%2Cdoi%2Ctitle%2Cpublication_year%2Ccited_by_count%2Cauthorships%2Cprimary_location",
+      "results": [
+        {
+          "id": "https://openalex.org/W2926023653",
+          "title": "Degenerate Quantum LDPC Codes With Good Finite Length Performance",
+          "publication_year": 2021,
+          "cited_by_count": 337,
+          "doi": "https://doi.org/10.22331/q-2021-11-22-585"
+        }
+      ],
+      "error": null
+    },
+    {
+      "query": "Refined Belief Propagation Decoding of Sparse-Graph Quantum Codes",
+      "url": "https://api.openalex.org/works?filter=title.search%3ARefined+Belief+Propagation+Decoding+of+Sparse-Graph+Quantum+Codes&per-page=8&sort=cited_by_count%3Adesc&select=id%2Cdoi%2Ctitle%2Cpublication_year%2Ccited_by_count%2Cauthorships%2Cprimary_location",
+      "results": [
+        {
+          "id": "https://openalex.org/W3005760425",
+          "title": "Refined Belief Propagation Decoding of Sparse-Graph Quantum Codes",
+          "publication_year": 2020,
+          "cited_by_count": 53,
+          "doi": "https://doi.org/10.1109/jsait.2020.3011758"
+        }
+      ],
+      "error": null
+    },
+    {
+      "query": "Enhanced Feedback Iterative Decoding of Sparse Quantum Codes",
+      "url": "https://api.openalex.org/works?filter=title.search%3AEnhanced+Feedback+Iterative+Decoding+of+Sparse+Quantum+Codes&per-page=8&sort=cited_by_count%3Adesc&select=id%2Cdoi%2Ctitle%2Cpublication_year%2Ccited_by_count%2Cauthorships%2Cprimary_location",
+      "results": [
+        {
+          "id": "https://openalex.org/W2156987111",
+          "title": "Enhanced Feedback Iterative Decoding of Sparse Quantum Codes",
+          "publication_year": 2012,
+          "cited_by_count": 49,
+          "doi": "https://doi.org/10.1109/tit.2011.2169534"
+        },
+        {
+          "id": "https://openalex.org/W3100642416",
+          "title": "Enhanced Feedback Iterative Decoding of Sparse Quantum Codes",
+          "publication_year": 2016,
+          "cited_by_count": 38,
+          "doi": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "query": "Exploiting degeneracy in belief propagation decoding of quantum codes",
+      "url": "https://api.openalex.org/works?filter=title.search%3AExploiting+degeneracy+in+belief+propagation+decoding+of+quantum+codes&per-page=8&sort=cited_by_count%3Adesc&select=id%2Cdoi%2Ctitle%2Cpublication_year%2Ccited_by_count%2Cauthorships%2Cprimary_location",
+      "results": [
+        {
+          "id": "https://openalex.org/W3159435673",
+          "title": "Exploiting degeneracy in belief propagation decoding of quantum codes",
+          "publication_year": 2022,
+          "cited_by_count": 65,
+          "doi": "https://doi.org/10.1038/s41534-022-00623-2"
+        }
+      ],
+      "error": null
+    },
+    {
+      "query": "Sparse-graph quantum error-correcting codes",
+      "url": "https://api.openalex.org/works?filter=title.search%3ASparse-graph+quantum+error-correcting+codes&per-page=8&sort=cited_by_count%3Adesc&select=id%2Cdoi%2Ctitle%2Cpublication_year%2Ccited_by_count%2Cauthorships%2Cprimary_location",
+      "results": [],
+      "error": null
+    },
+    {
+      "query": "Belief Propagation Decoding of Quantum LDPC Codes with Guided Decimation",
+      "url": "https://api.openalex.org/works?filter=title.search%3ABelief+Propagation+Decoding+of+Quantum+LDPC+Codes+with+Guided+Decimation&per-page=8&sort=cited_by_count%3Adesc&select=id%2Cdoi%2Ctitle%2Cpublication_year%2Ccited_by_count%2Cauthorships%2Cprimary_location",
+      "results": [
+        {
+          "id": "https://openalex.org/W4401693145",
+          "title": "Belief Propagation Decoding of Quantum LDPC Codes with Guided Decimation",
+          "publication_year": 2024,
+          "cited_by_count": 46,
+          "doi": "https://doi.org/10.1109/isit57864.2024.10619083"
+        },
+        {
+          "id": "https://openalex.org/W4404037736",
+          "title": "Erasure Decoding for Quantum LDPC Codes via Belief Propagation with Guided Decimation",
+          "publication_year": 2024,
+          "cited_by_count": 16,
+          "doi": "https://doi.org/10.1109/allerton63246.2024.10735275"
+        }
+      ],
+      "error": null
+    },
+    {
+      "query": "High-threshold and low-overhead fault-tolerant quantum memory",
+      "url": "https://api.openalex.org/works?filter=title.search%3AHigh-threshold+and+low-overhead+fault-tolerant+quantum+memory&per-page=8&sort=cited_by_count%3Adesc&select=id%2Cdoi%2Ctitle%2Cpublication_year%2Ccited_by_count%2Cauthorships%2Cprimary_location",
+      "results": [
+        {
+          "id": "https://openalex.org/W4393234688",
+          "title": "High-threshold and low-overhead fault-tolerant quantum memory",
+          "publication_year": 2024,
+          "cited_by_count": 711,
+          "doi": "https://doi.org/10.1038/s41586-024-07107-7"
+        },
+        {
+          "id": "https://openalex.org/W4399911865",
+          "title": "High-Threshold, Low-Overhead and Single-Shot Decodable Fault-Tolerant Quantum Memory",
+          "publication_year": 2026,
+          "cited_by_count": 37,
+          "doi": "https://doi.org/10.1103/67xf-zdjb"
+        }
+      ],
+      "error": null
+    },
+    {
+      "query": "Quantum LDPC codes with linear time decoding",
+      "url": "https://api.openalex.org/works?filter=title.search%3AQuantum+LDPC+codes+with+linear+time+decoding&per-page=8&sort=cited_by_count%3Adesc&select=id%2Cdoi%2Ctitle%2Cpublication_year%2Ccited_by_count%2Cauthorships%2Cprimary_location",
+      "results": [
+        {
+          "id": "https://openalex.org/W4376639540",
+          "title": "Good Quantum LDPC Codes with Linear Time Decoders",
+          "publication_year": 2023,
+          "cited_by_count": 169,
+          "doi": "https://doi.org/10.1145/3564246.3585101"
+        },
+        {
+          "id": "https://openalex.org/W4226039785",
+          "title": "Good quantum LDPC codes with linear time decoder from lossless expanders",
+          "publication_year": 2022,
+          "cited_by_count": 68,
+          "doi": "https://doi.org/10.48550/arxiv.2203.03581"
+        },
+        {
+          "id": "https://openalex.org/W4402954767",
+          "title": "An almost-linear time decoding algorithm for quantum LDPC codes under circuit-level noise",
+          "publication_year": 2026,
+          "cited_by_count": 37,
+          "doi": "https://doi.org/10.1038/s41534-026-01292-1"
+        },
+        {
+          "id": "https://openalex.org/W7215043624",
+          "title": "Explicit Capacity-Achieving Quantum LDPC Codes List Decodable in Near-linear Time",
+          "publication_year": 2026,
+          "cited_by_count": 0,
+          "doi": "https://doi.org/10.48550/arxiv.2609.40313"
+        }
+      ],
+      "error": null
+    },
+    {
+      "query": "Quantum error correction beyond the bounded distance decoding limit",
+      "url": "https://api.openalex.org/works?filter=title.search%3AQuantum+error+correction+beyond+the+bounded+distance+decoding+limit&per-page=4&sort=cited_by_count%3Adesc&select=id%2Cdoi%2Ctitle%2Cpublication_year%2Ccited_by_count%2Cauthorships%2Cprimary_location",
+      "results": [
+        {
+          "id": "https://openalex.org/W2008801563",
+          "title": "Quantum Error Correction Beyond the Bounded Distance Decoding Limit",
+          "publication_year": 2011,
+          "cited_by_count": 50,
+          "doi": "https://doi.org/10.1109/tit.2011.2167593"
+        },
+        {
+          "id": "https://openalex.org/W3105260535",
+          "title": "1 Quantum Error Correction beyond the Bounded Distance Decoding Limit",
+          "publication_year": 2016,
+          "cited_by_count": 42,
+          "doi": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "query": "Combining hard and soft decoders for hypergraph product codes",
+      "url": "https://api.openalex.org/works?filter=title.search%3ACombining+hard+and+soft+decoders+for+hypergraph+product+codes&per-page=4&sort=cited_by_count%3Adesc&select=id%2Cdoi%2Ctitle%2Cpublication_year%2Ccited_by_count%2Cauthorships%2Cprimary_location",
+      "results": [
+        {
+          "id": "https://openalex.org/W3019236876",
+          "title": "Combining hard and soft decoders for hypergraph product codes",
+          "publication_year": 2021,
+          "cited_by_count": 65,
+          "doi": "https://doi.org/10.22331/q-2021-04-15-432"
+        },
+        {
+          "id": "https://openalex.org/W3154995459",
+          "title": "Combining Hard and Soft Decoders for Hypergraph Product Codes",
+          "publication_year": 2019,
+          "cited_by_count": 13,
+          "doi": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "query": "Quantum quasi-cyclic LDPC codes",
+      "url": "https://api.openalex.org/works?filter=title.search%3AQuantum+quasi-cyclic+LDPC+codes&per-page=4&sort=cited_by_count%3Adesc&select=id%2Cdoi%2Ctitle%2Cpublication_year%2Ccited_by_count%2Cauthorships%2Cprimary_location",
+      "results": [
+        {
+          "id": "https://openalex.org/W2593901293",
+          "title": "Quasi-cyclic multi-edge LDPC codes for long-distance quantum cryptography",
+          "publication_year": 2018,
+          "cited_by_count": 161,
+          "doi": "https://doi.org/10.1038/s41534-018-0070-6"
+        },
+        {
+          "id": "https://openalex.org/W1975088395",
+          "title": "Quantum Quasi-Cyclic LDPC Codes",
+          "publication_year": 2007,
+          "cited_by_count": 91,
+          "doi": "https://doi.org/10.1109/isit.2007.4557323"
+        },
+        {
+          "id": "https://openalex.org/W3103386480",
+          "title": "Quantum Quasi-Cyclic LDPC Codes",
+          "publication_year": 2007,
+          "cited_by_count": 73,
+          "doi": null
+        },
+        {
+          "id": "https://openalex.org/W2117184753",
+          "title": "Spatially coupled quasi-cyclic quantum LDPC codes",
+          "publication_year": 2011,
+          "cited_by_count": 61,
+          "doi": "https://doi.org/10.1109/isit.2011.6034208"
+        }
+      ],
+      "error": null
+    },
+    {
+      "query": "Efficient decoding of topological color codes",
+      "url": "https://api.openalex.org/works?filter=title.search%3AEfficient+decoding+of+topological+color+codes&per-page=4&sort=cited_by_count%3Adesc&select=id%2Cdoi%2Ctitle%2Cpublication_year%2Ccited_by_count%2Cauthorships%2Cprimary_location",
+      "results": [
+        {
+          "id": "https://openalex.org/W2012700932",
+          "title": "Efficient decoding of topological color codes",
+          "publication_year": 2012,
+          "cited_by_count": 58,
+          "doi": "https://doi.org/10.1103/physreva.85.022317"
+        },
+        {
+          "id": "https://openalex.org/W2611818851",
+          "title": "Efficient fault-tolerant decoding of topological color codes",
+          "publication_year": 2014,
+          "cited_by_count": 47,
+          "doi": "https://doi.org/10.48550/arxiv.1402.3037"
+        },
+        {
+          "id": "https://openalex.org/W4413159345",
+          "title": "Resource-Efficient Decoding of Topological Color Codes via Neural-Guided Union-Find Optimization",
+          "publication_year": 2025,
+          "cited_by_count": 1,
+          "doi": "https://doi.org/10.3390/app15168937"
+        }
+      ],
+      "error": null
+    },
+    {
+      "query": "A class of quantum LDPC codes",
+      "url": "https://api.openalex.org/works?filter=title.search%3AA+class+of+quantum+LDPC+codes&per-page=4&sort=cited_by_count%3Adesc&select=id%2Cdoi%2Ctitle%2Cpublication_year%2Ccited_by_count%2Cauthorships%2Cprimary_location",
+      "results": [
+        {
+          "id": "https://openalex.org/W1632544105",
+          "title": "Constructions and performance of classes of quantum LDPC codes",
+          "publication_year": 2005,
+          "cited_by_count": 73,
+          "doi": "https://doi.org/10.48550/arxiv.quant-ph/0502086"
+        },
+        {
+          "id": "https://openalex.org/W203264050",
+          "title": "A Class of Quantum LDPC Codes Constructed From Finite Geometries",
+          "publication_year": 2008,
+          "cited_by_count": 54,
+          "doi": "https://doi.org/10.1109/glocom.2008.ecp.217"
+        },
+        {
+          "id": "https://openalex.org/W2103532256",
+          "title": "A class of quantum LDPC codes: construction and performances under iterative decoding",
+          "publication_year": 2007,
+          "cited_by_count": 52,
+          "doi": "https://doi.org/10.1109/isit.2007.4557324"
+        },
+        {
+          "id": "https://openalex.org/W1990978148",
+          "title": "A novel construction of quantum ldpc codes based on cyclic classes of lines in euclidean geometries",
+          "publication_year": 2012,
+          "cited_by_count": 3,
+          "doi": "https://doi.org/10.1007/s11767-012-0817-8"
+        }
+      ],
+      "error": null
+    },
+    {
+      "query": "Quantum error correction with low-density parity-check codes",
+      "url": "https://api.openalex.org/works?filter=title.search%3AQuantum+error+correction+with+low-density+parity-check+codes&per-page=4&sort=cited_by_count%3Adesc&select=id%2Cdoi%2Ctitle%2Cpublication_year%2Ccited_by_count%2Cauthorships%2Cprimary_location",
+      "results": [
+        {
+          "id": "https://openalex.org/W4414596309",
+          "title": "Nonlocal resources for error correction in quantum low-density parity-check codes",
+          "publication_year": 2025,
+          "cited_by_count": 6,
+          "doi": "https://doi.org/10.1103/x1rk-yg29"
+        },
+        {
+          "id": "https://openalex.org/W4415367698",
+          "title": "Efficient Mitigation of Error Floors in Quantum Error Correction Using Non-Binary Low-Density Parity-Check Codes",
+          "publication_year": 2025,
+          "cited_by_count": 6,
+          "doi": "https://doi.org/10.1109/isit63088.2025.11195217"
+        },
+        {
+          "id": "https://openalex.org/W2735556584",
+          "title": "New methods of error correction in quantum cryptography using low-density parity-check codes",
+          "publication_year": 2017,
+          "cited_by_count": 6,
+          "doi": "https://doi.org/10.4213/mvk225"
+        },
+        {
+          "id": "https://openalex.org/W4413745825",
+          "title": "High-efficiency quantum-key-distribution error-correction algorithm based on the Gilbert-Elliott model and the low-density parity-check code",
+          "publication_year": 2025,
+          "cited_by_count": 0,
+          "doi": "https://doi.org/10.1103/xnb7-cghn"
+        }
+      ],
+      "error": null
+    },
+    {
+      "query": "Efficient decoding of sparse quantum codes",
+      "url": "https://api.openalex.org/works?filter=title.search%3AEfficient+decoding+of+sparse+quantum+codes&per-page=4&sort=cited_by_count%3Adesc&select=id%2Cdoi%2Ctitle%2Cpublication_year%2Ccited_by_count%2Cauthorships%2Cprimary_location",
+      "results": [
+        {
+          "id": "https://openalex.org/W7161700733",
+          "title": "Sparse Mamba Decoder for Quantum Error Correction: Efficient Defect-Centric Processing of Surface Code Syndromes",
+          "publication_year": 2026,
+          "cited_by_count": 1,
+          "doi": "https://doi.org/10.21203/rs.3.rs-11311743/v1"
+        }
+      ],
+      "error": null
+    },
+    {
+      "query": "Quantum low-density parity-check codes with positive rate and minimum distance proportional to the square root of the blocklength",
+      "url": "https://api.openalex.org/works?filter=title.search%3AQuantum+low-density+parity-check+codes+with+positive+rate+and+minimum+distance+proportional+to+the+square+root+of+the+blocklength&per-page=4&sort=cited_by_count%3Adesc&select=id%2Cdoi%2Ctitle%2Cpublication_year%2Ccited_by_count%2Cauthorships%2Cprimary_location",
+      "results": [],
+      "error": null
+    }
+  ],
+  "broad_screen": {
+    "url": "https://api.openalex.org/works?filter=title.search%3Aquantum%2Cabstract.search%3Abelief+propagation&per-page=60&sort=cited_by_count%3Adesc&select=id%2Cdoi%2Ctitle%2Cpublication_year%2Ccited_by_count",
+    "returned": 60,
+    "results": [
+      {
+        "id": "https://openalex.org/W1968495841",
+        "doi": "https://doi.org/10.1103/physreva.88.052130",
+        "title": "Towards a formulation of quantum theory as a causally neutral theory of Bayesian inference",
+        "publication_year": 2013,
+        "cited_by_count": 338
+      },
+      {
+        "id": "https://openalex.org/W2926023653",
+        "doi": "https://doi.org/10.22331/q-2021-11-22-585",
+        "title": "Degenerate Quantum LDPC Codes With Good Finite Length Performance",
+        "publication_year": 2021,
+        "cited_by_count": 337
+      },
+      {
+        "id": "https://openalex.org/W3025282692",
+        "doi": "https://doi.org/10.1103/physrevresearch.2.043423",
+        "title": "Decoding across the quantum low-density parity-check code landscape",
+        "publication_year": 2020,
+        "cited_by_count": 289
+      },
+      {
+        "id": "https://openalex.org/W2147590609",
+        "doi": "https://doi.org/10.1103/physrevlett.104.050504",
+        "title": "Fast Decoders for Topological Quantum Codes",
+        "publication_year": 2010,
+        "cited_by_count": 266
+      },
+      {
+        "id": "https://openalex.org/W4390959369",
+        "doi": "https://doi.org/10.1126/sciadv.adk4321",
+        "title": "Fast and converged classical simulations of evidence for the utility of quantum computing before fault tolerance",
+        "publication_year": 2024,
+        "cited_by_count": 199
+      },
+      {
+        "id": "https://openalex.org/W1850344377",
+        "doi": "https://doi.org/10.26421/qic.10-8",
+        "title": "On the iterative decoding of sparse quantum codes",
+        "publication_year": 2008,
+        "cited_by_count": 165
+      },
+      {
+        "id": "https://openalex.org/W2164790530",
+        "doi": "https://doi.org/10.1016/j.aop.2007.10.001",
+        "title": "Quantum Graphical Models and Belief Propagation",
+        "publication_year": 2007,
+        "cited_by_count": 157
+      },
+      {
+        "id": "https://openalex.org/W2525508010",
+        "doi": "https://doi.org/10.1007/s00220-018-3150-8",
+        "title": "Finite Correlation Length Implies Efficient Preparation of Quantum Thermal States",
+        "publication_year": 2018,
+        "cited_by_count": 120
+      },
+      {
+        "id": "https://openalex.org/W2215279005",
+        "doi": "https://doi.org/10.1109/access.2015.2503267",
+        "title": "Fifteen Years of Quantum LDPC Coding and Improved Decoding Strategies",
+        "publication_year": 2015,
+        "cited_by_count": 117
+      },
+      {
+        "id": "https://openalex.org/W1514195450",
+        "doi": "https://doi.org/10.1103/physrevb.76.201102",
+        "title": "Quantum belief propagation: An algorithm for thermal quantum systems",
+        "publication_year": 2007,
+        "cited_by_count": 116
+      },
+      {
+        "id": "https://openalex.org/W2901383498",
+        "doi": "https://doi.org/10.1103/physrevlett.122.200501",
+        "title": "Neural Belief-Propagation Decoders for Quantum Error-Correcting Codes",
+        "publication_year": 2019,
+        "cited_by_count": 110
+      },
+      {
+        "id": "https://openalex.org/W3106413073",
+        "doi": null,
+        "title": "Quantum graphical models and belief propagation",
+        "publication_year": 2008,
+        "cited_by_count": 98
+      },
+      {
+        "id": "https://openalex.org/W3035347013",
+        "doi": "https://doi.org/10.1063/5.0016140",
+        "title": "Coherent Ising machines\u2014Quantum optics and neural network Perspectives",
+        "publication_year": 2020,
+        "cited_by_count": 95
+      },
+      {
+        "id": "https://openalex.org/W7161983052",
+        "doi": "https://doi.org/10.1126/science.adx2728",
+        "title": "Dynamics of disordered quantum systems with two- and three-dimensional tensor networks",
+        "publication_year": 2026,
+        "cited_by_count": 78
+      },
+      {
+        "id": "https://openalex.org/W3137563282",
+        "doi": "https://doi.org/10.1109/tit.2022.3143452",
+        "title": "Toward a Union-Find Decoder for Quantum LDPC Codes",
+        "publication_year": 2022,
+        "cited_by_count": 70
+      },
+      {
+        "id": "https://openalex.org/W2767621655",
+        "doi": "https://doi.org/10.1038/s41598-018-28703-4",
+        "title": "High speed error correction for continuous-variable quantum key distribution with multi-edge type LDPC code",
+        "publication_year": 2018,
+        "cited_by_count": 68
+      },
+      {
+        "id": "https://openalex.org/W4394669246",
+        "doi": "https://doi.org/10.48550/arxiv.0801.1241",
+        "title": "On the iterative decoding of sparse quantum codes",
+        "publication_year": 2008,
+        "cited_by_count": 68
+      },
+      {
+        "id": "https://openalex.org/W3159435673",
+        "doi": "https://doi.org/10.1038/s41534-022-00623-2",
+        "title": "Exploiting degeneracy in belief propagation decoding of quantum codes",
+        "publication_year": 2022,
+        "cited_by_count": 65
+      },
+      {
+        "id": "https://openalex.org/W2158054471",
+        "doi": "https://doi.org/10.1103/physrevlett.102.240501",
+        "title": "Supersonic Quantum Communication",
+        "publication_year": 2009,
+        "cited_by_count": 63
+      },
+      {
+        "id": "https://openalex.org/W2074194762",
+        "doi": "https://doi.org/10.1103/physrevlett.106.080403",
+        "title": "Markov Entropy Decomposition: A Variational Dual for Quantum Belief Propagation",
+        "publication_year": 2011,
+        "cited_by_count": 60
+      },
+      {
+        "id": "https://openalex.org/W4376862099",
+        "doi": "https://doi.org/10.22331/q-2023-05-15-1005",
+        "title": "Bias-tailored quantum LDPC codes",
+        "publication_year": 2023,
+        "cited_by_count": 55
+      },
+      {
+        "id": "https://openalex.org/W1990843814",
+        "doi": "https://doi.org/10.1109/cig.2010.5592866",
+        "title": "A renormalization group decoding algorithm for topological quantum codes",
+        "publication_year": 2010,
+        "cited_by_count": 55
+      },
+      {
+        "id": "https://openalex.org/W3005760425",
+        "doi": "https://doi.org/10.1109/jsait.2020.3011758",
+        "title": "Refined Belief Propagation Decoding of Sparse-Graph Quantum Codes",
+        "publication_year": 2020,
+        "cited_by_count": 53
+      },
+      {
+        "id": "https://openalex.org/W2156987111",
+        "doi": "https://doi.org/10.1109/tit.2011.2169534",
+        "title": "Enhanced Feedback Iterative Decoding of Sparse Quantum Codes",
+        "publication_year": 2012,
+        "cited_by_count": 49
+      },
+      {
+        "id": "https://openalex.org/W4401693145",
+        "doi": "https://doi.org/10.1109/isit57864.2024.10619083",
+        "title": "Belief Propagation Decoding of Quantum LDPC Codes with Guided Decimation",
+        "publication_year": 2024,
+        "cited_by_count": 46
+      },
+      {
+        "id": "https://openalex.org/W2962973842",
+        "doi": "https://doi.org/10.1103/physreva.100.012330",
+        "title": "Modified belief propagation decoders for quantum low-density parity-check codes",
+        "publication_year": 2019,
+        "cited_by_count": 42
+      },
+      {
+        "id": "https://openalex.org/W3100642416",
+        "doi": null,
+        "title": "Enhanced Feedback Iterative Decoding of Sparse Quantum Codes",
+        "publication_year": 2016,
+        "cited_by_count": 38
+      },
+      {
+        "id": "https://openalex.org/W4402954767",
+        "doi": "https://doi.org/10.1038/s41534-026-01292-1",
+        "title": "An almost-linear time decoding algorithm for quantum LDPC codes under circuit-level noise",
+        "publication_year": 2026,
+        "cited_by_count": 37
+      },
+      {
+        "id": "https://openalex.org/W3204926734",
+        "doi": "https://doi.org/10.1109/access.2021.3118544",
+        "title": "Syndrome-Based Min-Sum vs OSD-0 Decoders: FPGA Implementation and Analysis for Quantum LDPC Codes",
+        "publication_year": 2021,
+        "cited_by_count": 36
+      },
+      {
+        "id": "https://openalex.org/W3045419395",
+        "doi": "https://doi.org/10.1145/3372224.3419207",
+        "title": "Towards quantum belief propagation for LDPC decoding in wireless networks",
+        "publication_year": 2020,
+        "cited_by_count": 36
+      },
+      {
+        "id": "https://openalex.org/W4415085803",
+        "doi": "https://doi.org/10.48550/arxiv.2503.01738",
+        "title": "Automorphism Ensemble Decoding of Quantum LDPC Codes",
+        "publication_year": 2025,
+        "cited_by_count": 35
+      },
+      {
+        "id": "https://openalex.org/W4384807899",
+        "doi": "https://doi.org/10.48550/arxiv.2307.09025",
+        "title": "qecGPT: decoding Quantum Error-correcting Codes with Generative Pre-trained Transformers",
+        "publication_year": 2023,
+        "cited_by_count": 34
+      },
+      {
+        "id": "https://openalex.org/W2342732318",
+        "doi": "https://doi.org/10.1103/physreva.93.052325",
+        "title": "Error correction for encoded quantum annealing",
+        "publication_year": 2016,
+        "cited_by_count": 34
+      },
+      {
+        "id": "https://openalex.org/W4320011870",
+        "doi": "https://doi.org/10.48550/arxiv.2206.04701",
+        "title": "Efficient tensor network simulation of quantum many-body physics on sparse graphs",
+        "publication_year": 2022,
+        "cited_by_count": 32
+      },
+      {
+        "id": "https://openalex.org/W7124147359",
+        "doi": "https://doi.org/10.22331/q-2026-09-09-2205",
+        "title": "Breaking the Orthogonality Barrier in Quantum LDPC Codes",
+        "publication_year": 2026,
+        "cited_by_count": 30
+      },
+      {
+        "id": "https://openalex.org/W2482757003",
+        "doi": "https://doi.org/10.1088/1367-2630/aa7c78",
+        "title": "Belief propagation decoding of quantum channels by passing quantum messages",
+        "publication_year": 2017,
+        "cited_by_count": 29
+      },
+      {
+        "id": "https://openalex.org/W7105851300",
+        "doi": "https://doi.org/10.1103/7jzt-xhn6",
+        "title": "Simulating quantum dynamics in two-dimensional lattices with tensor network influence functional belief propagation",
+        "publication_year": 2025,
+        "cited_by_count": 28
+      },
+      {
+        "id": "https://openalex.org/W3161189278",
+        "doi": "https://doi.org/10.1038/s41534-021-00422-1",
+        "title": "Belief propagation with quantum messages for quantum-enhanced classical communications",
+        "publication_year": 2021,
+        "cited_by_count": 28
+      },
+      {
+        "id": "https://openalex.org/W3145038023",
+        "doi": "https://doi.org/10.1109/tqe.2021.3113936",
+        "title": "Log-Domain Decoding of Quantum LDPC Codes Over Binary Finite Fields",
+        "publication_year": 2021,
+        "cited_by_count": 28
+      },
+      {
+        "id": "https://openalex.org/W7162470895",
+        "doi": "https://doi.org/10.1103/6k5x-ztqt",
+        "title": "Beam Search Decoder for Quantum Low-Density Parity-Check Codes",
+        "publication_year": 2026,
+        "cited_by_count": 27
+      },
+      {
+        "id": "https://openalex.org/W3134990394",
+        "doi": "https://doi.org/10.1103/physreva.103.032603",
+        "title": "Virtual channel of multidimensional reconciliation in a continuous-variable quantum key distribution",
+        "publication_year": 2021,
+        "cited_by_count": 26
+      },
+      {
+        "id": "https://openalex.org/W2038914601",
+        "doi": "https://doi.org/10.1103/physreva.77.052318",
+        "title": "Belief propagation algorithm for computing correlation functions in finite-temperature quantum many-body systems on loopy graphs",
+        "publication_year": 2008,
+        "cited_by_count": 26
+      },
+      {
+        "id": "https://openalex.org/W4408326043",
+        "doi": "https://doi.org/10.1109/globecom52923.2024.10901425",
+        "title": "Decoding Quantum LDPC Codes Using Graph Neural Networks",
+        "publication_year": 2024,
+        "cited_by_count": 25
+      },
+      {
+        "id": "https://openalex.org/W4405083077",
+        "doi": "https://doi.org/10.48550/arxiv.2412.02885",
+        "title": "SymBreak: Mitigating Quantum Degeneracy Issues in QLDPC Code Decoders by Breaking Symmetry",
+        "publication_year": 2024,
+        "cited_by_count": 25
+      },
+      {
+        "id": "https://openalex.org/W4312240958",
+        "doi": "https://doi.org/10.1109/qce53715.2022.00047",
+        "title": "Soft Syndrome Decoding of Quantum LDPC Codes for Joint Correction of Data and Syndrome Errors",
+        "publication_year": 2022,
+        "cited_by_count": 25
+      },
+      {
+        "id": "https://openalex.org/W4378212931",
+        "doi": "https://doi.org/10.1103/physrevapplied.19.054084",
+        "title": "Non-Gaussian Reconciliation for Continuous-Variable Quantum Key Distribution",
+        "publication_year": 2023,
+        "cited_by_count": 22
+      },
+      {
+        "id": "https://openalex.org/W4389857315",
+        "doi": "https://doi.org/10.1007/978-981-99-8730-6_7",
+        "title": "SCA-LDPC: A Code-Based Framework for Key-Recovery Side-Channel Attacks on Post-quantum Encryption Schemes",
+        "publication_year": 2023,
+        "cited_by_count": 22
+      },
+      {
+        "id": "https://openalex.org/W4401693677",
+        "doi": "https://doi.org/10.1109/isit57864.2024.10619589",
+        "title": "Graph Neural Networks for Enhanced Decoding of Quantum LDPC Codes",
+        "publication_year": 2024,
+        "cited_by_count": 21
+      },
+      {
+        "id": "https://openalex.org/W1969530915",
+        "doi": "https://doi.org/10.1103/physrevb.81.054106",
+        "title": "Coarse-grained belief propagation for simulation of interacting quantum systems at all temperatures",
+        "publication_year": 2010,
+        "cited_by_count": 21
+      },
+      {
+        "id": "https://openalex.org/W4415367105",
+        "doi": "https://doi.org/10.1109/isit63088.2025.11195509",
+        "title": "Enhanced Min-Sum Decoding of Quantum Codes with Iteration Dynamics Memory",
+        "publication_year": 2025,
+        "cited_by_count": 20
+      },
+      {
+        "id": "https://openalex.org/W2952736688",
+        "doi": "https://doi.org/10.48550/arxiv.1006.1362",
+        "title": "A renormalization group decoding algorithm for topological quantum codes",
+        "publication_year": 2010,
+        "cited_by_count": 20
+      },
+      {
+        "id": "https://openalex.org/W2097789473",
+        "doi": "https://doi.org/10.1103/physrevlett.98.083604",
+        "title": "Observation of Quantum Destructive Interference in Inelastic Two-Wave Mixing",
+        "publication_year": 2007,
+        "cited_by_count": 20
+      },
+      {
+        "id": "https://openalex.org/W4415062507",
+        "doi": "https://doi.org/10.48550/arxiv.2503.21374",
+        "title": "Generative Decoding for Quantum Error-correcting Codes",
+        "publication_year": 2025,
+        "cited_by_count": 18
+      },
+      {
+        "id": "https://openalex.org/W4292756708",
+        "doi": "https://doi.org/10.22331/q-2022-08-23-784",
+        "title": "Quantum message-passing algorithm for optimal and efficient decoding",
+        "publication_year": 2022,
+        "cited_by_count": 18
+      },
+      {
+        "id": "https://openalex.org/W7168347039",
+        "doi": "https://doi.org/10.1109/mbits.2026.3713965",
+        "title": "Quantum Low-Density Parity-Check Codes",
+        "publication_year": 2025,
+        "cited_by_count": 17
+      },
+      {
+        "id": "https://openalex.org/W4409718174",
+        "doi": "https://doi.org/10.48550/arxiv.2504.02235",
+        "title": "Clustering of Conditional Mutual Information via Quantum Belief-Propagation Channels",
+        "publication_year": 2025,
+        "cited_by_count": 17
+      },
+      {
+        "id": "https://openalex.org/W4404037736",
+        "doi": "https://doi.org/10.1109/allerton63246.2024.10735275",
+        "title": "Erasure Decoding for Quantum LDPC Codes via Belief Propagation with Guided Decimation",
+        "publication_year": 2024,
+        "cited_by_count": 16
+      },
+      {
+        "id": "https://openalex.org/W3126410719",
+        "doi": "https://doi.org/10.1109/isit45174.2021.9518018",
+        "title": "Decoding of Quantum Data-Syndrome Codes via Belief Propagation",
+        "publication_year": 2021,
+        "cited_by_count": 16
+      },
+      {
+        "id": "https://openalex.org/W2726511032",
+        "doi": "https://doi.org/10.1109/tit.2018.2842180",
+        "title": "Bounds on Information Combining With Quantum Side Information",
+        "publication_year": 2018,
+        "cited_by_count": 16
+      },
+      {
+        "id": "https://openalex.org/W4417065192",
+        "doi": "https://doi.org/10.1088/2058-9565/ae65d8",
+        "title": "Towards solving industrial integer linear programs with decoded quantum interferometry",
+        "publication_year": 2026,
+        "cited_by_count": 14
+      }
+    ]
+  }
+}

@@ -49,6 +49,17 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 
 - Audit the shared binary CPU/Sinter expansion at d031436 in the approved four-part order as 050–053. Preserve the existing/source-defined counterpart boundary and assess practically material defects before HTML.
 
+### cited-bp-baselines
+
+Identify highly cited QLDPC papers that actually evaluate a sum-product or min-sum BP baseline, and retain citation provenance and primary-paper evidence so they can guide the literature registry.
+
+**Requirements:**
+
+- Accept either sum-product or min-sum BP as requested by the user.
+- Keep direct standalone-BP comparisons, BP-decoded code benchmarks, and BP-plus-postprocessing hybrids visibly distinct.
+- Use a dated single-provider citation snapshot without summing duplicate editions; do not claim exhaustive global ranking from a bounded screen.
+- Provide paper links, update family and evidence locations; do not run simulations or alter kernel/evidence qualification.
+
 ## Spikes
 
 | # | Idea | Name | Type | Validates | Verdict | Tags |
@@ -106,6 +117,8 @@ Audit the binary and quaternary canonical kernels before further HTML work, usin
 | 051 | canonical-kernel-audit | Shared policy upstream correspondence | standard | Given aligned native implementations, when shared execution runs, then agreement and source-specific differences are explicit. | VALIDATED | shared-policies, completeness |
 | 052 | canonical-kernel-audit | Shared policy composition closure | standard | Given accepted policies, when combined and reused, then operands, state lifetime, admission and source semantics remain coherent. | PARTIAL | shared-policies, completeness |
 | 053 | canonical-kernel-audit | Shared execution and evidence closure | standard | Given the same decoding problem, when public transports and replay execute, then outputs and evidence preserve their declared identities. | PARTIAL | shared-policies, completeness |
+| 054 | cited-bp-baselines | Citation screen | standard | Given candidate papers, resolve one-provider publication identities and dated citation counts without adding duplicate editions. | PARTIAL | literature, citations |
+| 055 | cited-bp-baselines | Primary BP baseline evidence | standard | Given citation-prioritized papers, verify explicit standalone BP comparisons and separate code benchmarks and hybrids. | VALIDATED | literature, baseline, min-sum, sum-product |
 
 Ordered closure of D03 → D04 → D01 → D02 → D05: [correction report](CANONICAL-KERNEL-COMPLETENESS-FIXES.md), [combined verification](042-batch-evidence-fix/verification.json), and [execution contracts](../../docs/canonical-kernel-contracts.md). Historical 034–037 verdicts remain as originally observed.
 
