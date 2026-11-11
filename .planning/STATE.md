@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Results plots label log decades with superscripts and refit to visible curves
-last_updated: "2026-11-10T22:51:46+00:00"
+stopped_at: B1/C2 direct BPGD and matched Q-BP campaign running on Slurm
+last_updated: "2026-11-11T01:52:28+00:00"
 last_activity: 2026-11-10
-last_activity_desc: Formatted logarithmic axis labels and fitted both axes to visible curves. Passed 17 browser workflow checks and five plot-coordinate tests.
-state_head: 8d35f04
+last_activity_desc: Dispatched 77 B1/C2 points and registered audited terminal measurements in the workbench. The remaining points and dependent collection job are active.
+state_head: 25c6c1f
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,8 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-10 — completed quick task 261110-oou for results plot axes
-Last Activity Description: Quick task 261110-oou adds superscript labels for powers of ten and lighter logarithmic gridlines. Visible curves and confidence intervals determine the plot limits. Chromium verified matching axes after hiding curves or selecting a decoder directly. Implementation `8d35f04`.
+Last activity: 2026-11-10 — quick task 261110-sic running B1/C2 decoder sweeps
+Last Activity Description: Frozen 77-point campaign uses direct IID sampling, 20 block failures or 100 million shots per point, and Q-BP marginal-matched depolarizing rates. Slurm arrays 61550993–61550995 and collector 61550996 are tracked in the [quick task summary](./quick/261110-sic-complete-b1-and-c2-bpgd-and-matched-q-bp/261110-sic-SUMMARY.md). Verified measurements enter the active v2 workbench while superseded bounded BPGD cohorts remain archived. Implementation `25c6c1f`.
+
+Prior plot activity: Quick task 261110-oou adds superscript labels for powers of ten and lighter logarithmic gridlines. Visible curves and confidence intervals determine the plot limits. Chromium verified matching axes after hiding curves or selecting a decoder directly. Implementation `8d35f04`.
 
 Prior literature activity: Spikes 054-055 screened citation prominence and independently verified primary-paper BP baseline evidence. Saved twelve direct standalone-BP comparisons, two code benchmarks, two related hybrids and one specialized min-sum hardware study. OpenAlex counts are a dated single-record snapshot, with duplicate/edition caveats; global top-N completeness is not established. See `.planning/spikes/055-bp-baseline-source-check/PAPERS.md`. No simulation, kernel, UI or phase-status change.
 
