@@ -70,3 +70,19 @@ def test_binary_marginal_prior_and_joint_prior_have_distinct_symbols():
         if 'yao-non-osd-results:' in d['decoder_id'] and ':qbp' in d['decoder_id']:
             assert d['configuration']['settings_status']=='inherited_vanilla_policy_file'
             assert d['configuration']['source_path'].endswith('vanilla/decoders/bp4_v2.json')
+
+
+def test_completion_decoder_labels_show_the_frozen_round_and_iteration_caps():
+    script = """require('./web/research/decoder-display.js');
+const plan=require('./data/reproductions/yao-2312-10950-bpgd-completion/plan.json');
+console.log(JSON.stringify(Object.fromEntries(Object.entries(plan.arms).map(([id, settings]) =>
+  [id, DecoderDisplay.describe({configuration:{effective_configuration:settings}}).label]))));"""
+    labels = json.loads(subprocess.check_output(["node", "-e", script], cwd=ROOT, text=True))
+    assert "BPGD, SP" in labels["b1:bpgd_t100_r882"]
+    assert "Tᵣ = 100, R = 882" in labels["b1:bpgd_t100_r882"]
+    assert "Tᵣ = 10, R = 1922" in labels["c2:bpgd_t10_r1922"]
+    assert "noise = X-only" in labels["c2:bpgd_t10_r1922"]
+    for code, limit in (("b1", 88200), ("c2", 19220)):
+        label = labels[f"{code}:qbp"]
+        assert label.startswith("Q-BP, SP") and f"T = {limit}" in label
+        assert "d = 0.1" in label and "noise = depolarizing" in label

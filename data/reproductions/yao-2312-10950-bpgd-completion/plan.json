@@ -1,0 +1,268 @@
+{
+  "arms": {
+    "b1:bpgd_t100_r10": {
+      "binary_paper_v2c_cap": 25.0,
+      "check_rule": "sum_product",
+      "controller": {
+        "iterations_per_round": 100,
+        "order": "most_reliable",
+        "round_limit": 10
+      },
+      "damping_old": 0.0,
+      "family": "bpgd",
+      "max_iterations": 1000,
+      "message_resolution": "float64",
+      "noise_model": "x_only",
+      "numerical_profile": "yao-binary-spa-v2c-cap25",
+      "prior": "p",
+      "product_epsilon": 1e-10,
+      "source_figures": [
+        6
+      ]
+    },
+    "b1:bpgd_t100_r2": {
+      "binary_paper_v2c_cap": 25.0,
+      "check_rule": "sum_product",
+      "controller": {
+        "iterations_per_round": 100,
+        "order": "most_reliable",
+        "round_limit": 2
+      },
+      "damping_old": 0.0,
+      "family": "bpgd",
+      "max_iterations": 200,
+      "message_resolution": "float64",
+      "noise_model": "x_only",
+      "numerical_profile": "yao-binary-spa-v2c-cap25",
+      "prior": "p",
+      "product_epsilon": 1e-10,
+      "source_figures": [
+        6
+      ]
+    },
+    "b1:bpgd_t100_r5": {
+      "binary_paper_v2c_cap": 25.0,
+      "check_rule": "sum_product",
+      "controller": {
+        "iterations_per_round": 100,
+        "order": "most_reliable",
+        "round_limit": 5
+      },
+      "damping_old": 0.0,
+      "family": "bpgd",
+      "max_iterations": 500,
+      "message_resolution": "float64",
+      "noise_model": "x_only",
+      "numerical_profile": "yao-binary-spa-v2c-cap25",
+      "prior": "p",
+      "product_epsilon": 1e-10,
+      "source_figures": [
+        6
+      ]
+    },
+    "b1:bpgd_t100_r50": {
+      "binary_paper_v2c_cap": 25.0,
+      "check_rule": "sum_product",
+      "controller": {
+        "iterations_per_round": 100,
+        "order": "most_reliable",
+        "round_limit": 50
+      },
+      "damping_old": 0.0,
+      "family": "bpgd",
+      "max_iterations": 5000,
+      "message_resolution": "float64",
+      "noise_model": "x_only",
+      "numerical_profile": "yao-binary-spa-v2c-cap25",
+      "prior": "p",
+      "product_epsilon": 1e-10,
+      "source_figures": [
+        6
+      ]
+    },
+    "b1:bpgd_t100_r882": {
+      "binary_paper_v2c_cap": 25.0,
+      "check_rule": "sum_product",
+      "controller": {
+        "iterations_per_round": 100,
+        "order": "most_reliable",
+        "round_limit": 882
+      },
+      "damping_old": 0.0,
+      "family": "bpgd",
+      "max_iterations": 88200,
+      "message_resolution": "float64",
+      "noise_model": "x_only",
+      "numerical_profile": "yao-binary-spa-v2c-cap25",
+      "prior": "p",
+      "product_epsilon": 1e-10,
+      "source_figures": [
+        3,
+        6
+      ]
+    },
+    "b1:bpgd_t10_r882": {
+      "binary_paper_v2c_cap": 25.0,
+      "check_rule": "sum_product",
+      "controller": {
+        "iterations_per_round": 10,
+        "order": "most_reliable",
+        "round_limit": 882
+      },
+      "damping_old": 0.0,
+      "family": "bpgd",
+      "max_iterations": 8820,
+      "message_resolution": "float64",
+      "noise_model": "x_only",
+      "numerical_profile": "yao-binary-spa-v2c-cap25",
+      "prior": "p",
+      "product_epsilon": 1e-10,
+      "source_figures": [
+        3
+      ]
+    },
+    "b1:bpgd_t1_r882": {
+      "binary_paper_v2c_cap": 25.0,
+      "check_rule": "sum_product",
+      "controller": {
+        "iterations_per_round": 1,
+        "order": "most_reliable",
+        "round_limit": 882
+      },
+      "damping_old": 0.0,
+      "family": "bpgd",
+      "max_iterations": 882,
+      "message_resolution": "float64",
+      "noise_model": "x_only",
+      "numerical_profile": "yao-binary-spa-v2c-cap25",
+      "prior": "p",
+      "product_epsilon": 1e-10,
+      "source_figures": [
+        3
+      ]
+    },
+    "b1:bpgd_t70_r882": {
+      "binary_paper_v2c_cap": 25.0,
+      "check_rule": "sum_product",
+      "controller": {
+        "iterations_per_round": 70,
+        "order": "most_reliable",
+        "round_limit": 882
+      },
+      "damping_old": 0.0,
+      "family": "bpgd",
+      "max_iterations": 61740,
+      "message_resolution": "float64",
+      "noise_model": "x_only",
+      "numerical_profile": "yao-binary-spa-v2c-cap25",
+      "prior": "p",
+      "product_epsilon": 1e-10,
+      "source_figures": [
+        3
+      ]
+    },
+    "b1:qbp": {
+      "check_cap": null,
+      "check_rule": "sum_product",
+      "family": "bp4",
+      "max_iterations": 88200,
+      "message_resolution": "float64",
+      "noise_model": "depolarizing",
+      "numerical_profile": "quaternary-bp4-f64-v2",
+      "prior": "p",
+      "product_epsilon": 1e-10,
+      "source_figures": [],
+      "v2c_damping": 0.1
+    },
+    "c2:bpgd_t10_r1922": {
+      "binary_paper_v2c_cap": 25.0,
+      "check_rule": "sum_product",
+      "controller": {
+        "iterations_per_round": 10,
+        "order": "most_reliable",
+        "round_limit": 1922
+      },
+      "damping_old": 0.0,
+      "family": "bpgd",
+      "max_iterations": 19220,
+      "message_resolution": "float64",
+      "noise_model": "x_only",
+      "numerical_profile": "yao-binary-spa-v2c-cap25",
+      "prior": "p",
+      "product_epsilon": 1e-10,
+      "source_figures": [
+        5
+      ]
+    },
+    "c2:qbp": {
+      "check_cap": null,
+      "check_rule": "sum_product",
+      "family": "bp4",
+      "max_iterations": 19220,
+      "message_resolution": "float64",
+      "noise_model": "depolarizing",
+      "numerical_profile": "quaternary-bp4-f64-v2",
+      "prior": "p",
+      "product_epsilon": 1e-10,
+      "source_figures": [],
+      "v2c_damping": 0.1
+    }
+  },
+  "codes": {
+    "b1": "ea1200028ace4a446dc04fe40c9eb9607903b31e3772c2921835ed6e20430548",
+    "c2": "a3ea36c9b1a588b133e24dd9ff27fd4964c495cc8a9ae4c875c36b635ac0903b"
+  },
+  "implementation_sha256": {
+    "data/reproductions/yao-2312-10950-bpgd-completion/run.py": "9039e5987330d873090d4346fd906bd7b957f8d1bf000645e9b34e412f96b855",
+    "data/reproductions/yao-2312-10950-non-osd/codes.json": "68e644bf28d8c217ed07bfddf44cd1ff03ce2f3a6de4076407d63bd57d252cac",
+    "data/reproductions/yao-2312-10950-non-osd/run_point.py": "89bbc5a825d545dd890ef59a5ed1f7642c1458615fb9b810dae587824d0fee78",
+    "data/reproductions/yao-2312-10950-non-osd/source_points.json": "f42c214770997ae514a4fb0347b52776cb93a8fa800483a4a2215905711aada9",
+    "src/bp_registry/canonical/compiled.py": "59d0ff3e917bde882f37380388fff98283bd900290af41ef630e4e0cc9ea124a",
+    "src/bp_registry/canonical/numerics.py": "7e0c176f5dfcbf9e5bf5ddfa8c932bd36f506de7894bd8a114ddcd8edaf8fd85",
+    "src/bp_registry/code_constructions.py": "d541281fc93cc26906fe3baa968070ac90a9056b370f94250029b9cacb00f004",
+    "src/bp_registry/quaternary/compiled.py": "5ca0850e10f19ecb1e3c1e20b4b6fdaa9ed2a499375a41ce4ddbb754f5608e9b",
+    "src/bp_registry/quaternary/numerics.py": "d3368e2dd8a15f2e78d67d345f346204361df51e685127a2cbd8870a0036b199"
+  },
+  "matched_rates": [
+    {
+      "depolarizing": 0.06,
+      "x_only": 0.04
+    },
+    {
+      "depolarizing": 0.075,
+      "x_only": 0.05
+    },
+    {
+      "depolarizing": 0.09,
+      "x_only": 0.06
+    },
+    {
+      "depolarizing": 0.105,
+      "x_only": 0.07
+    },
+    {
+      "depolarizing": 0.12,
+      "x_only": 0.08
+    },
+    {
+      "depolarizing": 0.135,
+      "x_only": 0.09
+    },
+    {
+      "depolarizing": 0.15,
+      "x_only": 0.1
+    }
+  ],
+  "paper": "https://arxiv.org/html/2312.10950v2",
+  "sampler": "PCG64 SeedSequence(seed, physical_p * 100000, shot); shared across BPGD arms at each rate",
+  "schema": "yao-bpgd-completion-plan-v1",
+  "seed": 2026111077,
+  "stop": {
+    "failure_events": [
+      "type_i",
+      "type_ii"
+    ],
+    "max_shots": 100000000,
+    "target_block_failures": 20
+  }
+}

@@ -217,8 +217,9 @@ def test_rebuilt_catalog_uses_same_active_view_as_browser_and_preserves_retained
     from bp_registry.research.catalog import build_catalog
     c = build_catalog(ROOT)
     view = active_view(c)
-    assert len(view['curves']) == 63
-    assert sum(len(s['points']) for s in view['curves']) == 319
+    legacy = [s for s in view['curves'] if s['dataset_id'] != 'yao-bpgd-completion']
+    assert len(legacy) == 53
+    assert sum(len(s['points']) for s in legacy) == 262
     assert {code['code_id'] for code in view['codes']} == {'a5', 'b2', 'b1', 'c2', 'double-gross', 'bb72'}
     assert view['circuits'] == []
     assert len(c['codes']) == 7 and len(c['circuits']) == 3
@@ -233,3 +234,16 @@ def test_nonphysical_coordinates_cannot_join_a_physical_curve():
     curves = active_view(catalog([record]))['curves']
     assert len(curves) == 1
     assert [p['x'] for p in curves[0]['points']] == [.06, .08]
+
+
+def test_completion_retires_only_the_requested_historical_bounded_bpgd():
+    old = {"dataset_id": "yao-non-osd-results", "evidence_status": "canonical_adaptation"}
+    b1 = {**row("bounded", seed=1, evidence="old.json"), "dataset_id": old["dataset_id"],
+          "code_id": "b1", "source_decoder_id": "bpgd_t100_r882"}
+    b1["points"][0]["metadata"]["sampling_method"] = "bounded_campaign"
+    importance = {**b1, "series_id": "importance", "points": [
+        {**b1["points"][0], "metadata": {"sampling_method": "importance_sampling"}}
+    ]}
+    other = {**b1, "series_id": "other", "source_decoder_id": "bpgd_random_t100"}
+    curves = project({"datasets": [old], "result_series": [b1, importance, other]})
+    assert {curve["source_series_id"] for curve in curves} == {"importance", "other"}

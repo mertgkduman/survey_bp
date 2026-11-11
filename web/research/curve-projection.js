@@ -23,7 +23,7 @@ const compact=value=>{
  if(value&&typeof value==='object'){const out={};for(const [key,item] of Object.entries(value)){const child=compact(item);if(child!==undefined)out[key]=child;}return Object.keys(out).length?out:undefined;}
  return value===undefined?undefined:value;
 };
-const kernelFields=['kernel','family','variant','rule','check_rule','numerical_profile','message_resolution','resolution','damping_old','damping_gamma','check_cap','binary_paper_v2c_cap','qbp_check_cap','product_epsilon','prior','candidate','hard_decision','stop','zero_syndrome_shortcut','max_iterations','max_iterations_per_binary_decode','alpha','beta','min_sum','messages','v2c','policy','qbpgd','controller','common_controls','profile_controls','arm_policy','tie_break'];
+const kernelFields=['kernel','family','variant','rule','check_rule','numerical_profile','message_resolution','resolution','damping_old','v2c_damping','damping_gamma','check_cap','binary_paper_v2c_cap','qbp_check_cap','product_epsilon','prior','candidate','hard_decision','stop','zero_syndrome_shortcut','max_iterations','max_iterations_per_binary_decode','alpha','beta','min_sum','messages','v2c','policy','qbpgd','controller','common_controls','profile_controls','arm_policy','tie_break'];
 const pickKernel=value=>{
  if(!value||typeof value!=='object')return undefined;
  const profile={};for(const key of kernelFields)if(own(value,key))profile[key]=value[key];
@@ -55,6 +55,13 @@ function pooled(entries){
  const p={...primary.point,n,failures,y:failures/n,ci_low,ci_high,mean_work:weighted('mean_work'),mean_seconds:weighted('mean_seconds'),type_i:sumCounter('type_i'),type_ii:sumCounter('type_ii'),metadata:{...primary.point.metadata,projection_members:entries.length,uncertainty_method:'wilson_score_95_percent_pooled_fixed_iid'}};
  return {point:p,method:'pooled_independent_fixed_iid'};
 }
+// The direct completion campaign supersedes these older bounded BPGD
+// cohorts in the workbench. Their original catalog records remain available.
+const replacedB1Arms=new Set(['bpgd_t1','bpgd_t10','bpgd_t70','bpgd_t100','bpgd_t100_r2','bpgd_t100_r5','bpgd_t100_r10','bpgd_t100_r50','bpgd_t100_r882']);
+const supersededBpgd=series=>series.dataset_id==='yao-non-osd-results'
+ && (series.code_id==='b1'&&replacedB1Arms.has(series.source_decoder_id)
+     ||series.code_id==='c2'&&series.source_decoder_id==='bpgd_t10');
+const retiredBounded=(series,point)=>supersededBpgd(series)&&role(point)==='bounded_campaign';
 function projectEvidence(catalog,displayMap){
  const candidates=[];
  const decoders=new Map((catalog.decoders||[]).map(d=>[d.decoder_id,d]));
@@ -65,7 +72,7 @@ function projectEvidence(catalog,displayMap){
   if(display.retired)continue;
   const identity=[display.algorithm||'',display.rule||'',display.precision||'',...(display.parameters||[]).filter(p=>!['N','set'].includes(p.symbol)).map(p=>p.text)].join('\u001f');
   const series={...source,label:display.label||source.label,display_identity:identity,implementation_identity:implementationIdentity(source,decoders),channel_kind:source.channel_kind||'unknown',evidence:source.evidence_status||(catalog.datasets||[]).find(d=>d.dataset_id===source.dataset_id)?.evidence_status};
-  for(const [index,raw] of (source.points||[]).entries())if(known(raw.x)&&known(raw.y)&&!/^pending|unmeasured|source_only/i.test(raw.status||''))candidates.push({series,point:{...raw,metadata:raw.metadata||{},...(raw.metadata||{})},index});
+  for(const [index,raw] of (source.points||[]).entries())if(!retiredBounded(source,raw)&&known(raw.x)&&known(raw.y)&&!/^pending|unmeasured|source_only/i.test(raw.status||''))candidates.push({series,point:{...raw,metadata:raw.metadata||{},...(raw.metadata||{})},index});
  }
  const grouped=new Map();
  for(const entry of candidates){const key=pointKey(entry.series,entry.point);if(!grouped.has(key))grouped.set(key,[]);grouped.get(key).push(entry);}
@@ -102,7 +109,10 @@ function projectEvidence(catalog,displayMap){
  const labelGroups=new Map();
  for(const item of projected){const key=[item.code_id,item.channel_kind,item.label,item.implementation_identity].join('\u001f');if(!labelGroups.has(key))labelGroups.set(key,[]);labelGroups.get(key).push(item);}
  const roleLabel=point=>({pilot:'pilot',bounded_campaign:'bounded campaign',importance_sampling:'importance-weighted estimate',mixture_importance:'importance-weighted estimate'})[role(point)]||(/weighted/i.test(evaluator(point))?'weighted estimate':'separate evidence');
- for(const items of labelGroups.values())if(items.length>1)for(const item of items)item.label+=`, ${roleLabel(item.points[0]||{})}`;
+ for(const items of labelGroups.values())for(const item of items){
+  const point=item.points[0]||{};
+  if(items.length>1||supersededBpgd(item)&&point.metadata?.estimator==='mixture_importance')item.label+=`, ${roleLabel(point)}`;
+ }
  return projected;
 }
 // This is the sole public v2 eligibility boundary. Retained catalog records

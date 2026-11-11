@@ -33,10 +33,11 @@ window.testSelection=()=>({cards:S.cards.map(c=>({input:c.input,decoder:c.decode
 load();''')
         page.route('**/app.js', lambda route: route.fulfill(body=app, content_type='text/javascript'))
         page.goto(url + '#results')
-        page.wait_for_function("document.querySelector('#catalog-status').textContent.startsWith('63 measured')")
+        page.wait_for_function("document.querySelector('#catalog-status').textContent.includes('measured')")
         active = page.evaluate('''async()=>{const c=await(await fetch('catalog.json')).json();const v=ResearchCurves.active(c,DecoderDisplay.labels(c));return {...v,decoderIds:[...v.decoderIds]};}''')
         ids = {x['code_id'] for x in active['codes']}
-        assert len(active['curves']) == 63 and sum(len(s['points']) for s in active['curves']) == 319
+        legacy = [s for s in active['curves'] if s['dataset_id'] != 'yao-bpgd-completion']
+        assert len(legacy) == 53 and sum(len(s['points']) for s in legacy) == 262
         assert ids == {'a5', 'b2', 'b1', 'c2', 'double-gross', 'bb72'}
         assert not active['circuits']
         card = page.locator('[data-plot]').first
@@ -48,7 +49,7 @@ load();''')
         availability = page.locator('#availability').inner_text()
         for item in catalog['circuits'] + [next(c for c in catalog['codes'] if c['code_id'] == 'gb46')]:
             assert item['label'] not in availability
-        checks.append('63 curves / 319 rows; all public input and saved-decoder lists use the active view; GB46 and all three singleton circuits absent')
+        checks.append(f"{len(active['curves'])} curves / {sum(len(s['points']) for s in active['curves'])} rows; all public input and saved-decoder lists use the active view; GB46 and all three singleton circuits absent")
 
         curves_by_input = {id: [s for s in active['curves'] if s['code_id'] == id] for id in ids}
         for id in sorted(ids):

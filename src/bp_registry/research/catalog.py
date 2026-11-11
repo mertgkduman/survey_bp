@@ -231,6 +231,67 @@ def _cross_code_dataset(repository: Path) -> tuple[dict[str, Any], dict[str, Any
           "configuration": _read_json(repository / "data/reproductions/yao-2312-10950-cross-code/decoders.json")}
 
 
+_YAO_COMPLETION = "data/reproductions/yao-2312-10950-bpgd-completion"
+_YAO_COMPLETION_DATASET = "yao-bpgd-completion"
+
+
+def _yao_completion_dataset(repository: Path) -> tuple[dict[str, Any], list[dict[str, Any]], dict[str, Any]]:
+    plan_path = f"{_YAO_COMPLETION}/plan.json"
+    plan_file = repository / plan_path
+    paths = [f"{_YAO_COMPLETION}/verified.json", f"{_YAO_COMPLETION}/results/verified.json"]
+    candidates = [(path, _read_json(repository / path)) for path in paths if (repository / path).exists()]
+    if not candidates:
+        return {}, [], {}
+    plan_digest = sha256(plan_file.read_bytes()).hexdigest()
+    for _, candidate in candidates:
+        if (candidate["schema"] != "yao-bpgd-completion-verification-v1"
+                or candidate["plan_sha256"] != plan_digest):
+            raise ValueError("Yao completion verification does not match the frozen plan")
+    # Prefer the portable snapshot on ties. The HPC collector may have verified
+    # additional points after the latest snapshot was committed.
+    path, receipt = max(candidates, key=lambda item: len(item[1]["points"]))
+    plan = _read_json(plan_file)
+    rows = receipt["points"]
+    points = []
+    for row in rows:
+        n, failures = row["shots"], row["failures"]
+        settings = plan["arms"][f'{row["code"]}:{row["arm"]}']
+        counts = row["counts"]
+        p = row["physical_p"]
+        points.append(_point(
+            x=p, y=row["rate"], n=n, failures=failures,
+            ci_low=row["ci95_low"], ci_high=row["ci95_high"],
+            status="upper_bound" if failures == 0 else "complete",
+            type_i=counts["type_i"], type_ii=counts["type_ii"],
+            mean_work=row["iterations"] / n, work_unit="iterations",
+            mean_seconds=row["decode_ns"] / n / 1e9,
+            metadata={
+                "channel": settings["noise_model"], "matched_x_rate": row["matched_x_rate"],
+                "sampling_method": "iid_failure_target_or_shot_cap",
+                "stop_reason": row["stop_reason"],
+                "target_failures": plan["stop"]["target_block_failures"],
+                "max_shots": plan["stop"]["max_shots"],
+                "seed": plan["seed"], "source_targets": row["source_targets"],
+                "source_evidence_path": f'{_YAO_COMPLETION}/results/{row["id"]}/summary.json',
+                "summary_sha256": row["summary_sha256"], "ledger_sha256": row["ledger_sha256"],
+                "uncertainty_method": ("exact_negative_binomial_interval"
+                                       if row["stop_reason"] == "target_block_failures"
+                                       else "exact_binomial_interval_at_shot_cap"),
+                "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            },
+        ))
+    dataset = _dataset(
+        _YAO_COMPLETION_DATASET, label="B1/C2 direct BPGD and matched-marginal Q-BP",
+        paper_id="yao-2312-10950-v2", evidence_status="source_informed_canonical_adaptation",
+        source_path=path, points=points,
+        assets=[_asset(repository, plan_path, label="Frozen decoder settings and campaign", kind="json"),
+                _asset(repository, path, label="Verified terminal results", kind="json")],
+        caveat="BPGD uses X-only noise. Q-BP uses joint depolarizing noise at 1.5 times the bit-flip rate. "
+               "The X marginals match and the underlying channels differ. Sweep caps specify iterations per shot.",
+    )
+    return dataset, rows, plan["arms"]
+
+
 def _non_osd_dataset(repository: Path) -> tuple[dict[str, Any], list[dict[str, str]]]:
     path = "data/reproductions/yao-2312-10950-non-osd/results/comparison.csv"
     rows = _csv_rows(repository / path)
@@ -709,6 +770,7 @@ def build_catalog(repository: Path) -> dict[str, Any]:
     cross_code, _ = _cross_code_dataset(repository)
     qbpgd_datasets, qbpgd_series = _qbpgd_datasets(repository)
     non_osd, non_osd_rows = _non_osd_dataset(repository)
+    completion, completion_rows, completion_arms = _yao_completion_dataset(repository)
     full_v2, full_v2_rows = _local_curve_dataset(
         repository, dataset_id="pfister-presentation-full-v2-curves", label="Presentation local float64 v2 curves",
         path="from_dr_pfister_presentetations/results/full_v2_curves/comparison.csv", decoder_field="arm", rate_field="ler",
@@ -752,6 +814,19 @@ def build_catalog(repository: Path) -> dict[str, Any]:
         {"experiment_id": "yao-qbpgd-tuned", "dataset_id": "yao-tuned-qbpgd-p006", "paper_ids": ["yao-2312-10950-v2"], "evidence_status": "canonical_adaptation", "reproduction_recipe": {"kind": "source_command", "study_path": "data/reproductions/yao-2312-10950-bp4-tuned-qbpgd-p006/README.md", "decoder_path": "data/reproductions/yao-2312-10950-bp4-tuned-qbpgd-p006/decoders/a5.json", "commands": ["PYTHONPATH=src python data/reproductions/yao-2312-10950-bp4-tuned-qbpgd-p006/run.py --code a5 --shots 10000 --seed 20261030 --output NEW_DIRECTORY"], "budget_note": "The runner refuses overwrite; command is a compute-bearing exact recipe, not a browser action."}},
         {"experiment_id": "yao-qbpgd-tuned-pilot-n1000", "dataset_id": "yao-tuned-qbpgd-p006-pilot-n1000", "paper_ids": ["yao-2312-10950-v2"], "evidence_status": "canonical_adaptation", "reproduction_recipe": {"kind": "retained_result_only", "study_path": "data/reproductions/yao-2312-10950-bp4-tuned-qbpgd-p006/results", "decoder_path": "data/reproductions/yao-2312-10950-bp4-tuned-qbpgd-p006/decoders/a5.json", "commands": [], "bounded_extension_commands": ["OMP_NUM_THREADS=1 PYTHONPATH=src .venv/bin/python data/reproductions/yao-2312-10950-bp4-tuned-qbpgd-p006/run.py --code a5 --shots 1000 --seed 20261110 --output /path/to/new/a5-pilot-result"], "original_instruction_path": "data/reproductions/yao-2312-10950-bp4-tuned-qbpgd-p006/README.md", "budget_note": "Exploratory 1,000-shot cohort retained for provenance. Do not pool it with or present it as the 10,000-shot confirmation run; the fresh-seed extension is a distinct result and is never pooled."}},
     ]
+    if completion:
+        datasets.append(completion)
+        experiments.append({
+            "experiment_id": _YAO_COMPLETION_DATASET, "dataset_id": _YAO_COMPLETION_DATASET,
+            "paper_ids": ["yao-2312-10950-v2"], "evidence_status": completion["evidence_status"],
+            "reproduction_recipe": {
+                "kind": "source_command", "study_path": f"{_YAO_COMPLETION}/plan.json",
+                "decoder_path": f"{_YAO_COMPLETION}/plan.json",
+                "commands": [f"PYTHONPATH=src .venv/bin/python {_YAO_COMPLETION}/run.py --collect"],
+                "original_instruction_path": f"{_YAO_COMPLETION}/README.md",
+                "budget_note": "Collection verifies retained terminal ledgers. Point execution follows the frozen plan.",
+            },
+        })
     by_id = {dataset["dataset_id"]: dataset for dataset in datasets}
     series: list[dict[str, Any]] = []
     series += _grouped_series("pfister-presentation-source-curves", by_id["pfister-presentation-source-curves"]["points"],
@@ -781,6 +856,11 @@ def build_catalog(repository: Path) -> dict[str, Any]:
                               code_field="code", decoder_field="decoder_id", label_prefix="Presentation min-sum")
     series += _grouped_series("yao-cross-code-depolarizing", depolarizing["points"], depolarizing_rows,
                               code_field="code", decoder_field="decoder", label_prefix="Cross-code depolarizing")
+    if completion:
+        for item in _grouped_series(_YAO_COMPLETION_DATASET, completion["points"], completion_rows,
+                                    code_field="code", decoder_field="arm", label_prefix="Direct completion"):
+            item["channel_kind"] = completion_arms[f'{item["code_id"]}:{item["decoder_id"]}']["noise_model"]
+            series.append(item)
     series.extend(qbpgd_series)
     series.extend(bb72_series)
     series.extend(circuit_series)
@@ -813,6 +893,8 @@ def build_catalog(repository: Path) -> dict[str, Any]:
         if dataset_id in {"yao-cross-code-plain-baselines", "yao-cross-code-depolarizing"}:
             root = "data/reproductions/yao-2312-10950-cross-code"
             return (f"{root}/decoders.json" if dataset_id.endswith("baselines") else f"{root}/depolarizing/decoders.json", "exact_study_policy_file")
+        if dataset_id == _YAO_COMPLETION_DATASET:
+            return (f"{_YAO_COMPLETION}/plan.json", "exact_campaign_arm")
         if dataset_id == "yao-non-osd-results":
             if arm_id == "qbp":
                 # assess.prior_qbp_runs / verified_qbp_followups inherit the
@@ -900,7 +982,9 @@ def build_catalog(repository: Path) -> dict[str, Any]:
                                          "settings_status": setting_status}
         if "series_scope" in item:
             configuration["identity_scope"] = item["series_scope"]
-        exact_configuration = effective_configuration(item["dataset_id"], raw_arm)
+        exact_configuration = (completion_arms[f"{raw_code}:{raw_arm}"]
+                               if item["dataset_id"] == _YAO_COMPLETION_DATASET
+                               else effective_configuration(item["dataset_id"], raw_arm))
         if exact_configuration is not None:
             configuration["effective_configuration"] = exact_configuration
         candidate_source = repository / source
