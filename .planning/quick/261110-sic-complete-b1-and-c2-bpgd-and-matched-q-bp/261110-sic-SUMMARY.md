@@ -5,6 +5,7 @@ date: 2026-11-10
 implementation_commit: 25c6c1f
 verification: passed
 completed_date: 2026-11-11
+final_data_commit: a84413f
 ---
 
 # B1 and C2 direct decoder sweeps

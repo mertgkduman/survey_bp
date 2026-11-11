@@ -33,5 +33,5 @@ columns, CSV parity, incomplete counters, curve visibility, empty results,
 stale selections, custom input validation, and mobile layout. The final work
 chart and table were visually inspected.
 
-The B1/C2 campaign in quick task 261110-sic continues independently. Its
-collector uses the same catalog adapters for subsequently verified points.
+The final B1/C2 collector in quick task 261110-sic used the same catalog
+adapters. All 77 verified campaign points include both work metrics.
