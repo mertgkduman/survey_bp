@@ -26,12 +26,15 @@ catalog. Jobs can resume the same frozen shot stream from the last committed
 compressed checkpoint. The dispatch receipt and raw evidence are in
 `data/reproductions/yao-2312-10950-bpgd-completion/results/`.
 
-The first audited snapshot verified 30/77 terminal points and added six
-multi-rate replacement curves. The workbench hides superseded B1/C2 bounded
+The committed snapshot verifies 42/77 terminal points, each with exactly
+20 block failures. It adds eight multi-rate curves, including the first C2
+BPGD and Q-BP results. At the latest scheduler check, 47 point jobs had
+completed and 30 were running. The workbench hides superseded B1/C2 bounded
 BPGD cohorts. The historical measurements, matrix references, and archived v1
 remain available. The public projection changed from 63 curves and 319 points
 to 53 curves and 262 points before adding the replacement measurements.
-Six public codes and zero public circuits remain.
+With the new snapshot, the active workbench has 61 curves and 304 points
+across six public codes and zero public circuits.
 
 Verification covered 124 research and campaign tests, four real-decoder
 checkpoint and replay cases across both codes and channels, and 17 Chromium

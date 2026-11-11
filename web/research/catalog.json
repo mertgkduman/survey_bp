@@ -14232,7 +14232,7 @@
           "label": "Verified terminal results",
           "local_storage_path": null,
           "path": "data/reproductions/yao-2312-10950-bpgd-completion/verified.json",
-          "sha256": "7e5b31dd117d15bbfceabb181ece67f4dc62671b8aa3ae19dc0e4fcf76bd8ec0",
+          "sha256": "b791fbcf67f97be91bb88e022457de89f5782d846c0760850e0d383e19baf314",
           "url": "data/reproductions/yao-2312-10950-bpgd-completion/verified.json"
         }
       ],
@@ -14242,6 +14242,41 @@
       "label": "B1/C2 direct BPGD and matched-marginal Q-BP",
       "paper_id": "yao-2312-10950-v2",
       "points": [
+        {
+          "ci_high": 0.0015754432295547601,
+          "ci_low": 0.0006489309612054124,
+          "failures": 20,
+          "mean_seconds": 0.04177301352079239,
+          "mean_work": 114.49360029741356,
+          "metadata": {
+            "channel": "x_only",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "5c1d7159572182e4148dccc532da7afe0a7e3985606d6a0b0487b804b0abe377",
+            "matched_x_rate": 0.05,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/b1-bpgd_t100_r10-p050/summary.json",
+            "source_targets": [
+              {
+                "block_failure_rate": 0.00094,
+                "figure": 6
+              }
+            ],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "8ebc23fd5c8a1d0d23b91efbbed9a5bcaf12e774da42cb7a1f18f9133a2e1d89",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 18829,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.05,
+          "y": 0.0010621913006532476
+        },
         {
           "ci_high": 0.020234381250382755,
           "ci_low": 0.008375517841616682,
@@ -15013,6 +15048,76 @@
           "y": 0.8
         },
         {
+          "ci_high": 0.007686064508938401,
+          "ci_low": 0.003170976696068806,
+          "failures": 20,
+          "mean_seconds": 0.06566301098106846,
+          "mean_work": 126.58454356846472,
+          "metadata": {
+            "channel": "x_only",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "51d1ece48c511c4ce7fc5be6b970a70913e38137ece5c384e9a477c21daf0d67",
+            "matched_x_rate": 0.06,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/b1-bpgd_t10_r882-p060/summary.json",
+            "source_targets": [
+              {
+                "block_failure_rate": 0.003891,
+                "figure": 3
+              }
+            ],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "520c949bba1542fc4c54b5a3fd93f6988302f3b5a48b1367f1779007b07c83b6",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 3856,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.005186721991701245
+        },
+        {
+          "ci_high": 0.053422788426848465,
+          "ci_low": 0.022309909366527554,
+          "failures": 20,
+          "mean_seconds": 0.3133420389292196,
+          "mean_work": 582.9582577132486,
+          "metadata": {
+            "channel": "x_only",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "73cc65d21bc57f4dd30ae44b14fdde1db64be854c45c091eca161dc435e2b2f0",
+            "matched_x_rate": 0.07,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/b1-bpgd_t10_r882-p070/summary.json",
+            "source_targets": [
+              {
+                "block_failure_rate": 0.038801,
+                "figure": 3
+              }
+            ],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "a78fd0fd12df1a44f4fb2077edcd8937bc75fd0fdde46efc6a3b9f663cb8a473",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 551,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 19,
+          "type_ii": 1,
+          "work_unit": "iterations",
+          "x": 0.07,
+          "y": 0.036297640653357534
+        },
+        {
           "ci_high": 0.28069795797361247,
           "ci_low": 0.1253537450775481,
           "failures": 20,
@@ -15116,6 +15221,76 @@
           "work_unit": "iterations",
           "x": 0.1,
           "y": 0.7407407407407407
+        },
+        {
+          "ci_high": 3.8487723918484835e-05,
+          "ci_low": 1.5846889771247912e-05,
+          "failures": 20,
+          "mean_seconds": 0.009890601225151216,
+          "mean_work": 18.58737496967881,
+          "metadata": {
+            "channel": "x_only",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "da9164d8639b79fd8d377d49f25a798ca01f365212070b7c014e666328619ae6",
+            "matched_x_rate": 0.04,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/b1-bpgd_t1_r882-p040/summary.json",
+            "source_targets": [
+              {
+                "block_failure_rate": 2.9e-05,
+                "figure": 3
+              }
+            ],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "c0db37fbb48923d8d6a22cea24dc7dc4584cdea13afffd4efb2242689160e70c",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 770913,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 19,
+          "type_ii": 1,
+          "work_unit": "iterations",
+          "x": 0.04,
+          "y": 2.5943264674483372e-05
+        },
+        {
+          "ci_high": 0.0004503271099383766,
+          "ci_low": 0.00018543704109842015,
+          "failures": 20,
+          "mean_seconds": 0.02033823154610446,
+          "mean_work": 31.56752121184524,
+          "metadata": {
+            "channel": "x_only",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "b4c94dc4f68f85ec1a2d72638dd8d1022a29c732d49fe859c72e1bf40d4733f7",
+            "matched_x_rate": 0.05,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/b1-bpgd_t1_r882-p050/summary.json",
+            "source_targets": [
+              {
+                "block_failure_rate": 0.000391,
+                "figure": 3
+              }
+            ],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "1af6b03358b49bfe4b68a831dfb5f80c3ca77c668ef4ff9869344e9cbe775a1e",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 65883,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.05,
+          "y": 0.0003035684470956089
         },
         {
           "ci_high": 0.010847196548730256,
@@ -15291,6 +15466,231 @@
           "work_unit": "iterations",
           "x": 0.1,
           "y": 0.7407407407407407
+        },
+        {
+          "ci_high": 0.053519139398743094,
+          "ci_low": 0.02235072838534017,
+          "failures": 20,
+          "mean_seconds": 0.45659668632727274,
+          "mean_work": 780.4181818181818,
+          "metadata": {
+            "channel": "x_only",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "bb7b50c087a505b3cb9329d3e37fa621c17f47cd88745e5c285a4f08de56995e",
+            "matched_x_rate": 0.07,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/c2-bpgd_t10_r1922-p070/summary.json",
+            "source_targets": [
+              {
+                "block_failure_rate": 0.035,
+                "figure": 5
+              }
+            ],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "935a16798ea804eacb86ed265d61fccd6b81790f8006a6fd14c5d4bf7d8eca9f",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 550,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 5,
+          "type_ii": 15,
+          "work_unit": "iterations",
+          "x": 0.07,
+          "y": 0.03636363636363636
+        },
+        {
+          "ci_high": 0.2521734175167066,
+          "ci_low": 0.11159283044630941,
+          "failures": 20,
+          "mean_seconds": 2.5331672775309735,
+          "mean_work": 4128.3185840707965,
+          "metadata": {
+            "channel": "x_only",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "f546ba3427e9ef87bdb9dd5fdadedc5163379b88246b309a4acff156e550161b",
+            "matched_x_rate": 0.08,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/c2-bpgd_t10_r1922-p080/summary.json",
+            "source_targets": [
+              {
+                "block_failure_rate": 0.209,
+                "figure": 5
+              }
+            ],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "9875b8768c923117f56f7b99eff0e481dbfd268960ddaa756ccd193fc001cf80",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 113,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 12,
+          "type_ii": 8,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.17699115044247787
+        },
+        {
+          "ci_high": 0.9709441488712534,
+          "ci_low": 0.6641108624628791,
+          "failures": 20,
+          "mean_seconds": 19.19135185352174,
+          "mean_work": 16731.739130434784,
+          "metadata": {
+            "channel": "x_only",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "5ab6953a593afe6ebe54b5d1c3cd185b27d3601be4e1c22e36d74fb1001a1367",
+            "matched_x_rate": 0.1,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/c2-bpgd_t10_r1922-p100/summary.json",
+            "source_targets": [
+              {
+                "block_failure_rate": 0.925,
+                "figure": 5
+              }
+            ],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "f889ce67353ff1e4524b8bcb5a86b1fae8f6ea95fcc11714c9a9b94a5493b3b5",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 23,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.8695652173913043
+        },
+        {
+          "ci_high": 0.0067937995995267855,
+          "ci_low": 0.0028022078540808843,
+          "failures": 20,
+          "mean_seconds": 0.030698430237222095,
+          "mean_work": 23.8748567499427,
+          "metadata": {
+            "channel": "depolarizing",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "97e376b0a893f49a6989352c34678bd1a7e08e0cb97f432d3281fea7b1e7e8b0",
+            "matched_x_rate": 0.07,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/c2-qbp-p105/summary.json",
+            "source_targets": [],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "f73e26cbb5aad2a212072845a3438f71849b11090c88933aa5c5cd490ccf1d27",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 4363,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 1,
+          "type_ii": 19,
+          "work_unit": "iterations",
+          "x": 0.105,
+          "y": 0.0045840018336007335
+        },
+        {
+          "ci_high": 0.03480961913280157,
+          "ci_low": 0.014464408241664738,
+          "failures": 20,
+          "mean_seconds": 0.20227578636556603,
+          "mean_work": 154.64740566037736,
+          "metadata": {
+            "channel": "depolarizing",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "b82a13426a0ed2140f0f4b0dfb59c01f7752592ebdbda0a0d14a896a13af5b2e",
+            "matched_x_rate": 0.08,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/c2-qbp-p120/summary.json",
+            "source_targets": [],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "0000ca1225df386d7eb5ea7b6dd134b445d0d110a58d611d0faf8991458e6809",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 848,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 5,
+          "type_ii": 15,
+          "work_unit": "iterations",
+          "x": 0.12,
+          "y": 0.02358490566037736
+        },
+        {
+          "ci_high": 0.14028458494276633,
+          "ci_low": 0.06002081689272114,
+          "failures": 20,
+          "mean_seconds": 1.018095832642512,
+          "mean_work": 864.3768115942029,
+          "metadata": {
+            "channel": "depolarizing",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "21ba8105bc634ab21093b5aa756fa2794a49327acf10b436164a2afd59dd5177",
+            "matched_x_rate": 0.09,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/c2-qbp-p135/summary.json",
+            "source_targets": [],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "3cc683c8aeaa001f47a0dda180d966a067c8c405b9aebed0f8c9d97e058b3cfd",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 207,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 7,
+          "type_ii": 13,
+          "work_unit": "iterations",
+          "x": 0.135,
+          "y": 0.0966183574879227
+        },
+        {
+          "ci_high": 0.5677275924379808,
+          "ci_low": 0.282579006783499,
+          "failures": 20,
+          "mean_seconds": 8.06969473187234,
+          "mean_work": 6223.170212765957,
+          "metadata": {
+            "channel": "depolarizing",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "c6f31c3e42a58d10f8620e5fcc8e0472c6bbea708e028239aa1c720c3fc886a6",
+            "matched_x_rate": 0.1,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/c2-qbp-p150/summary.json",
+            "source_targets": [],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "1559f3dfd31d6f55dc40705501f4c8dc64d493b9dff288656d143bb89dae6a0b",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 47,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 14,
+          "type_ii": 6,
+          "work_unit": "iterations",
+          "x": 0.15,
+          "y": 0.425531914893617
         }
       ],
       "source_path": "data/reproductions/yao-2312-10950-bpgd-completion/verified.json"
@@ -18823,6 +19223,77 @@
         "kind": "decoder_source",
         "label": "Exact configuration source",
         "local_storage_path": null,
+        "path": "data/reproductions/yao-2312-10950-bpgd-completion/plan.json",
+        "sha256": "cdff8cb3782d1d48a0d450ded44a66cd3047e458c5ef4e63636784891c1ea2f5",
+        "url": "data/reproductions/yao-2312-10950-bpgd-completion/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "binary_paper_v2c_cap": 25.0,
+          "check_rule": "sum_product",
+          "controller": {
+            "iterations_per_round": 10,
+            "order": "most_reliable",
+            "round_limit": 1922
+          },
+          "damping_old": 0.0,
+          "family": "bpgd",
+          "max_iterations": 19220,
+          "message_resolution": "float64",
+          "noise_model": "x_only",
+          "numerical_profile": "yao-binary-spa-v2c-cap25",
+          "prior": "p",
+          "product_epsilon": 1e-10,
+          "source_figures": [
+            5
+          ]
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_arm_id": "bpgd_t10_r1922",
+        "source_path": "data/reproductions/yao-2312-10950-bpgd-completion/plan.json"
+      },
+      "decoder_id": "yao-bpgd-completion:c2:bpgd_t10_r1922",
+      "evidence_status": "source_informed_canonical_adaptation",
+      "label": "Direct completion: c2 / bpgd_t10_r1922"
+    },
+    {
+      "asset": {
+        "availability": "tracked",
+        "kind": "decoder_source",
+        "label": "Exact configuration source",
+        "local_storage_path": null,
+        "path": "data/reproductions/yao-2312-10950-bpgd-completion/plan.json",
+        "sha256": "cdff8cb3782d1d48a0d450ded44a66cd3047e458c5ef4e63636784891c1ea2f5",
+        "url": "data/reproductions/yao-2312-10950-bpgd-completion/plan.json"
+      },
+      "configuration": {
+        "effective_configuration": {
+          "check_cap": null,
+          "check_rule": "sum_product",
+          "family": "bp4",
+          "max_iterations": 19220,
+          "message_resolution": "float64",
+          "noise_model": "depolarizing",
+          "numerical_profile": "quaternary-bp4-f64-v2",
+          "prior": "p",
+          "product_epsilon": 1e-10,
+          "source_figures": [],
+          "v2c_damping": 0.1
+        },
+        "settings_status": "exact_campaign_arm",
+        "source_arm_id": "qbp",
+        "source_path": "data/reproductions/yao-2312-10950-bpgd-completion/plan.json"
+      },
+      "decoder_id": "yao-bpgd-completion:c2:qbp",
+      "evidence_status": "source_informed_canonical_adaptation",
+      "label": "Direct completion: c2 / qbp"
+    },
+    {
+      "asset": {
+        "availability": "tracked",
+        "kind": "decoder_source",
+        "label": "Exact configuration source",
+        "local_storage_path": null,
         "path": "data/reproductions/yao-2312-10950-bp4-tuned-qbpgd-p006/decoders/a5.json",
         "sha256": "c0279a872093b710d9de615dcccd347ae6a427e0da99fbfcd4f1ef5a1aec888c",
         "url": "data/reproductions/yao-2312-10950-bp4-tuned-qbpgd-p006/decoders/a5.json"
@@ -20379,7 +20850,8 @@
     },
     {
       "code_ids": [
-        "b1"
+        "b1",
+        "c2"
       ],
       "dataset_id": "yao-bpgd-completion",
       "dataset_ids": [
@@ -20391,7 +20863,9 @@
         "yao-bpgd-completion:b1:bpgd_t100_r5",
         "yao-bpgd-completion:b1:bpgd_t100_r50",
         "yao-bpgd-completion:b1:bpgd_t10_r882",
-        "yao-bpgd-completion:b1:bpgd_t1_r882"
+        "yao-bpgd-completion:b1:bpgd_t1_r882",
+        "yao-bpgd-completion:c2:bpgd_t10_r1922",
+        "yao-bpgd-completion:c2:qbp"
       ],
       "description": "BPGD uses X-only noise. Q-BP uses joint depolarizing noise at 1.5 times the bit-flip rate. The X marginals match and the underlying channels differ. Sweep caps specify iterations per shot.",
       "evidence_status": "source_informed_canonical_adaptation",
@@ -25791,6 +26265,41 @@
       "label": "Direct completion: b1 / bpgd_t100_r10",
       "points": [
         {
+          "ci_high": 0.0015754432295547601,
+          "ci_low": 0.0006489309612054124,
+          "failures": 20,
+          "mean_seconds": 0.04177301352079239,
+          "mean_work": 114.49360029741356,
+          "metadata": {
+            "channel": "x_only",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "5c1d7159572182e4148dccc532da7afe0a7e3985606d6a0b0487b804b0abe377",
+            "matched_x_rate": 0.05,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/b1-bpgd_t100_r10-p050/summary.json",
+            "source_targets": [
+              {
+                "block_failure_rate": 0.00094,
+                "figure": 6
+              }
+            ],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "8ebc23fd5c8a1d0d23b91efbbed9a5bcaf12e774da42cb7a1f18f9133a2e1d89",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 18829,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.05,
+          "y": 0.0010621913006532476
+        },
+        {
           "ci_high": 0.020234381250382755,
           "ci_low": 0.008375517841616682,
           "failures": 20,
@@ -26609,6 +27118,76 @@
       "label": "Direct completion: b1 / bpgd_t10_r882",
       "points": [
         {
+          "ci_high": 0.007686064508938401,
+          "ci_low": 0.003170976696068806,
+          "failures": 20,
+          "mean_seconds": 0.06566301098106846,
+          "mean_work": 126.58454356846472,
+          "metadata": {
+            "channel": "x_only",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "51d1ece48c511c4ce7fc5be6b970a70913e38137ece5c384e9a477c21daf0d67",
+            "matched_x_rate": 0.06,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/b1-bpgd_t10_r882-p060/summary.json",
+            "source_targets": [
+              {
+                "block_failure_rate": 0.003891,
+                "figure": 3
+              }
+            ],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "520c949bba1542fc4c54b5a3fd93f6988302f3b5a48b1367f1779007b07c83b6",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 3856,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.06,
+          "y": 0.005186721991701245
+        },
+        {
+          "ci_high": 0.053422788426848465,
+          "ci_low": 0.022309909366527554,
+          "failures": 20,
+          "mean_seconds": 0.3133420389292196,
+          "mean_work": 582.9582577132486,
+          "metadata": {
+            "channel": "x_only",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "73cc65d21bc57f4dd30ae44b14fdde1db64be854c45c091eca161dc435e2b2f0",
+            "matched_x_rate": 0.07,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/b1-bpgd_t10_r882-p070/summary.json",
+            "source_targets": [
+              {
+                "block_failure_rate": 0.038801,
+                "figure": 3
+              }
+            ],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "a78fd0fd12df1a44f4fb2077edcd8937bc75fd0fdde46efc6a3b9f663cb8a473",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 551,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 19,
+          "type_ii": 1,
+          "work_unit": "iterations",
+          "x": 0.07,
+          "y": 0.036297640653357534
+        },
+        {
           "ci_high": 0.28069795797361247,
           "ci_low": 0.1253537450775481,
           "failures": 20,
@@ -26725,6 +27304,76 @@
       "decoder_id": "yao-bpgd-completion:b1:bpgd_t1_r882",
       "label": "Direct completion: b1 / bpgd_t1_r882",
       "points": [
+        {
+          "ci_high": 3.8487723918484835e-05,
+          "ci_low": 1.5846889771247912e-05,
+          "failures": 20,
+          "mean_seconds": 0.009890601225151216,
+          "mean_work": 18.58737496967881,
+          "metadata": {
+            "channel": "x_only",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "da9164d8639b79fd8d377d49f25a798ca01f365212070b7c014e666328619ae6",
+            "matched_x_rate": 0.04,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/b1-bpgd_t1_r882-p040/summary.json",
+            "source_targets": [
+              {
+                "block_failure_rate": 2.9e-05,
+                "figure": 3
+              }
+            ],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "c0db37fbb48923d8d6a22cea24dc7dc4584cdea13afffd4efb2242689160e70c",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 770913,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 19,
+          "type_ii": 1,
+          "work_unit": "iterations",
+          "x": 0.04,
+          "y": 2.5943264674483372e-05
+        },
+        {
+          "ci_high": 0.0004503271099383766,
+          "ci_low": 0.00018543704109842015,
+          "failures": 20,
+          "mean_seconds": 0.02033823154610446,
+          "mean_work": 31.56752121184524,
+          "metadata": {
+            "channel": "x_only",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "b4c94dc4f68f85ec1a2d72638dd8d1022a29c732d49fe859c72e1bf40d4733f7",
+            "matched_x_rate": 0.05,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/b1-bpgd_t1_r882-p050/summary.json",
+            "source_targets": [
+              {
+                "block_failure_rate": 0.000391,
+                "figure": 3
+              }
+            ],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "1af6b03358b49bfe4b68a831dfb5f80c3ca77c668ef4ff9869344e9cbe775a1e",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 65883,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.05,
+          "y": 0.0003035684470956089
+        },
         {
           "ci_high": 0.010847196548730256,
           "ci_low": 0.004478847851601364,
@@ -26904,6 +27553,255 @@
       "series_id": "series-685d72198a975450",
       "source_code_label": "b1",
       "source_decoder_id": "bpgd_t1_r882"
+    },
+    {
+      "channel_kind": "x_only",
+      "code_id": "c2",
+      "dataset_id": "yao-bpgd-completion",
+      "decoder_id": "yao-bpgd-completion:c2:bpgd_t10_r1922",
+      "label": "Direct completion: c2 / bpgd_t10_r1922",
+      "points": [
+        {
+          "ci_high": 0.053519139398743094,
+          "ci_low": 0.02235072838534017,
+          "failures": 20,
+          "mean_seconds": 0.45659668632727274,
+          "mean_work": 780.4181818181818,
+          "metadata": {
+            "channel": "x_only",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "bb7b50c087a505b3cb9329d3e37fa621c17f47cd88745e5c285a4f08de56995e",
+            "matched_x_rate": 0.07,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/c2-bpgd_t10_r1922-p070/summary.json",
+            "source_targets": [
+              {
+                "block_failure_rate": 0.035,
+                "figure": 5
+              }
+            ],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "935a16798ea804eacb86ed265d61fccd6b81790f8006a6fd14c5d4bf7d8eca9f",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 550,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 5,
+          "type_ii": 15,
+          "work_unit": "iterations",
+          "x": 0.07,
+          "y": 0.03636363636363636
+        },
+        {
+          "ci_high": 0.2521734175167066,
+          "ci_low": 0.11159283044630941,
+          "failures": 20,
+          "mean_seconds": 2.5331672775309735,
+          "mean_work": 4128.3185840707965,
+          "metadata": {
+            "channel": "x_only",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "f546ba3427e9ef87bdb9dd5fdadedc5163379b88246b309a4acff156e550161b",
+            "matched_x_rate": 0.08,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/c2-bpgd_t10_r1922-p080/summary.json",
+            "source_targets": [
+              {
+                "block_failure_rate": 0.209,
+                "figure": 5
+              }
+            ],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "9875b8768c923117f56f7b99eff0e481dbfd268960ddaa756ccd193fc001cf80",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 113,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 12,
+          "type_ii": 8,
+          "work_unit": "iterations",
+          "x": 0.08,
+          "y": 0.17699115044247787
+        },
+        {
+          "ci_high": 0.9709441488712534,
+          "ci_low": 0.6641108624628791,
+          "failures": 20,
+          "mean_seconds": 19.19135185352174,
+          "mean_work": 16731.739130434784,
+          "metadata": {
+            "channel": "x_only",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "5ab6953a593afe6ebe54b5d1c3cd185b27d3601be4e1c22e36d74fb1001a1367",
+            "matched_x_rate": 0.1,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/c2-bpgd_t10_r1922-p100/summary.json",
+            "source_targets": [
+              {
+                "block_failure_rate": 0.925,
+                "figure": 5
+              }
+            ],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "f889ce67353ff1e4524b8bcb5a86b1fae8f6ea95fcc11714c9a9b94a5493b3b5",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 23,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 20,
+          "type_ii": 0,
+          "work_unit": "iterations",
+          "x": 0.1,
+          "y": 0.8695652173913043
+        }
+      ],
+      "series_id": "series-626810f6c4756ae0",
+      "source_code_label": "c2",
+      "source_decoder_id": "bpgd_t10_r1922"
+    },
+    {
+      "channel_kind": "depolarizing",
+      "code_id": "c2",
+      "dataset_id": "yao-bpgd-completion",
+      "decoder_id": "yao-bpgd-completion:c2:qbp",
+      "label": "Direct completion: c2 / qbp",
+      "points": [
+        {
+          "ci_high": 0.0067937995995267855,
+          "ci_low": 0.0028022078540808843,
+          "failures": 20,
+          "mean_seconds": 0.030698430237222095,
+          "mean_work": 23.8748567499427,
+          "metadata": {
+            "channel": "depolarizing",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "97e376b0a893f49a6989352c34678bd1a7e08e0cb97f432d3281fea7b1e7e8b0",
+            "matched_x_rate": 0.07,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/c2-qbp-p105/summary.json",
+            "source_targets": [],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "f73e26cbb5aad2a212072845a3438f71849b11090c88933aa5c5cd490ccf1d27",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 4363,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 1,
+          "type_ii": 19,
+          "work_unit": "iterations",
+          "x": 0.105,
+          "y": 0.0045840018336007335
+        },
+        {
+          "ci_high": 0.03480961913280157,
+          "ci_low": 0.014464408241664738,
+          "failures": 20,
+          "mean_seconds": 0.20227578636556603,
+          "mean_work": 154.64740566037736,
+          "metadata": {
+            "channel": "depolarizing",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "b82a13426a0ed2140f0f4b0dfb59c01f7752592ebdbda0a0d14a896a13af5b2e",
+            "matched_x_rate": 0.08,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/c2-qbp-p120/summary.json",
+            "source_targets": [],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "0000ca1225df386d7eb5ea7b6dd134b445d0d110a58d611d0faf8991458e6809",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 848,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 5,
+          "type_ii": 15,
+          "work_unit": "iterations",
+          "x": 0.12,
+          "y": 0.02358490566037736
+        },
+        {
+          "ci_high": 0.14028458494276633,
+          "ci_low": 0.06002081689272114,
+          "failures": 20,
+          "mean_seconds": 1.018095832642512,
+          "mean_work": 864.3768115942029,
+          "metadata": {
+            "channel": "depolarizing",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "21ba8105bc634ab21093b5aa756fa2794a49327acf10b436164a2afd59dd5177",
+            "matched_x_rate": 0.09,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/c2-qbp-p135/summary.json",
+            "source_targets": [],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "3cc683c8aeaa001f47a0dda180d966a067c8c405b9aebed0f8c9d97e058b3cfd",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 207,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 7,
+          "type_ii": 13,
+          "work_unit": "iterations",
+          "x": 0.135,
+          "y": 0.0966183574879227
+        },
+        {
+          "ci_high": 0.5677275924379808,
+          "ci_low": 0.282579006783499,
+          "failures": 20,
+          "mean_seconds": 8.06969473187234,
+          "mean_work": 6223.170212765957,
+          "metadata": {
+            "channel": "depolarizing",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or nontrivial logical residual",
+            "ledger_sha256": "c6f31c3e42a58d10f8620e5fcc8e0472c6bbea708e028239aa1c720c3fc886a6",
+            "matched_x_rate": 0.1,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111077,
+            "source_evidence_path": "data/reproductions/yao-2312-10950-bpgd-completion/results/c2-qbp-p150/summary.json",
+            "source_targets": [],
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "1559f3dfd31d6f55dc40705501f4c8dc64d493b9dff288656d143bb89dae6a0b",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 47,
+          "source_value": null,
+          "status": "complete",
+          "type_i": 14,
+          "type_ii": 6,
+          "work_unit": "iterations",
+          "x": 0.15,
+          "y": 0.425531914893617
+        }
+      ],
+      "series_id": "series-495bc07572cab8d6",
+      "source_code_label": "c2",
+      "source_decoder_id": "qbp"
     },
     {
       "channel_kind": "depolarizing",
