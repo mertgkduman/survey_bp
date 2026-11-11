@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import json
 import csv
+import shutil
+import subprocess
 from hashlib import sha256
 from pathlib import Path
 from types import SimpleNamespace
@@ -161,6 +163,34 @@ def test_normalized_import_validates_ledger_and_refuses_collision(tmp_path: Path
     assert entry["schema"] == "research-catalog-extension-v1"
     assert entry["import_manifest"]["result_file_hashes"]
     assert entry["decoders"][0]["configuration"]["experiment"] == specimen()
+    point = entry["result_series"][0]["points"][0]
+    events = [json.loads(line) for line in (result / "events.jsonl").read_text().splitlines()]
+    expected_edges = sum(2 * (event["iterations"]["x"] + 2 * event["iterations"]["z"]) for event in events) / len(events)
+    assert point["mean_directed_edge_updates"] == pytest.approx(expected_edges)
+    assert point["mean_iterations"] == point["mean_work"]
+    assert point["iteration_unit"] == "component sweeps"
+    if shutil.which("node"):
+        script = """
+const fs=require('fs'),path=require('path');
+global.window=globalThis;
+require('./web/research/contract-ui.js');
+require('./web/research/result-import.js');
+const root=process.argv[1];
+const names=['result-manifest.json','run-manifest.json','status.json','requested-spec.json',
+ 'effective-spec.json','events.jsonl','summary.json','summary.csv'];
+const files=names.map(name=>{
+ const bytes=fs.readFileSync(path.join(root,name));
+ return {name,size:bytes.length,text:async()=>bytes.toString(),
+  arrayBuffer:async()=>Uint8Array.from(bytes).buffer};
+});
+ResearchImport.read(files,require('./web/research/contract.json')).then(({entry})=>{
+ console.log(JSON.stringify(entry.result_series[0].points[0]));
+}).catch(error=>{console.error(error);process.exit(1);});
+"""
+        browser_point = json.loads(subprocess.check_output(
+            ["node", "-e", script, str(result)], text=True, cwd=Path(__file__).resolve().parents[2]))
+        for field in ("mean_iterations", "mean_directed_edge_updates", "iteration_unit"):
+            assert browser_point[field] == point[field]
     assert (result / "catalog-entry.json").is_file()
     root = tmp_path / "repository"
     (root / "research/catalog").mkdir(parents=True)

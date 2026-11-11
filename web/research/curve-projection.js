@@ -46,13 +46,22 @@ const viewKey=(series,p)=>[series.code_id,series.channel_kind||'unknown',series.
 const pointKey=(series,p)=>[viewKey(series,p),p.x].join('\u001f');
 const evidenceKey=(series,p,index)=>{const paths=pathList(p);return paths.length?[pointKey(series,p),p.n,p.failures,p.y,paths.join(';')].join('\u001e'):`unbound:${series.series_id}:${index}`;};
 const canPool=entries=>entries.length>1&&new Set(entries.map(({point})=>point.metadata?.seed)).size===entries.length&&new Set(entries.map(({point})=>pathList(point).join(';'))).size===entries.length&&entries.every(({series,point})=>series.implementation_identity!=='unknown_implementation'&&known(point.n)&&known(point.failures)&&role(point)==='fixed_iid'&&point.metadata?.seed!=null&&pathList(point).length&&point.metadata?.overlap_status!=='shared'&&point.metadata?.pooling_contract==='independent_fixed_iid_disjoint_v1');
+const iterationUnits=new Set(['iterations','BP4 iterations','BP4 sweeps','circuit DEM-BP sweeps','binary_component_sweeps','bp4_joint_sweeps','circuit_dem_bp_sweeps']);
+function workFields(point){
+ const mean_iterations=known(point.mean_iterations)?point.mean_iterations:iterationUnits.has(point.work_unit)?point.mean_work:null;
+ const mean_directed_edge_updates=known(point.mean_directed_edge_updates)?point.mean_directed_edge_updates:point.work_unit==='directed edge updates'?point.mean_work:null;
+ return {...point,mean_iterations,mean_directed_edge_updates,
+  iteration_unit:point.iteration_unit||(point.work_unit==='binary_component_sweeps'?'component sweeps':'sweeps')};
+}
 const wilson=(failures,n)=>{const z=1.959963984540054,r=failures/n,d=1+z*z/n,c=(r+z*z/(2*n))/d,h=z*Math.sqrt(r*(1-r)/n+z*z/(4*n*n))/d;return [Math.max(0,c-h),Math.min(1,c+h)];};
 function pooled(entries){
  const n=entries.reduce((total,{point})=>total+point.n,0),failures=entries.reduce((total,{point})=>total+point.failures,0);
  const primary=entries[0],[ci_low,ci_high]=wilson(failures,n),sameUnit=new Set(entries.map(({point})=>point.work_unit)).size===1;
- const weighted=field=>sameUnit&&entries.every(({point})=>known(point[field]))?entries.reduce((sum,{point})=>sum+point[field]*point.n,0)/n:null;
+ const weighted=(field,compatible=sameUnit)=>compatible&&entries.every(({point})=>known(point[field]))?entries.reduce((sum,{point})=>sum+point[field]*point.n,0)/n:null;
  const sumCounter=field=>entries.every(({point})=>known(point[field]))?entries.reduce((sum,{point})=>sum+point[field],0):null;
- const p={...primary.point,n,failures,y:failures/n,ci_low,ci_high,mean_work:weighted('mean_work'),mean_seconds:weighted('mean_seconds'),type_i:sumCounter('type_i'),type_ii:sumCounter('type_ii'),metadata:{...primary.point.metadata,projection_members:entries.length,uncertainty_method:'wilson_score_95_percent_pooled_fixed_iid'}};
+ const p={...primary.point,n,failures,y:failures/n,ci_low,ci_high,mean_work:weighted('mean_work'),mean_seconds:weighted('mean_seconds'),
+  mean_iterations:weighted('mean_iterations',new Set(entries.map(({point})=>point.iteration_unit)).size===1),
+  mean_directed_edge_updates:weighted('mean_directed_edge_updates',true),type_i:sumCounter('type_i'),type_ii:sumCounter('type_ii'),metadata:{...primary.point.metadata,projection_members:entries.length,uncertainty_method:'wilson_score_95_percent_pooled_fixed_iid'}};
  return {point:p,method:'pooled_independent_fixed_iid'};
 }
 // The direct completion campaign supersedes these older bounded BPGD
@@ -72,7 +81,7 @@ function projectEvidence(catalog,displayMap){
   if(display.retired)continue;
   const identity=[display.algorithm||'',display.rule||'',display.precision||'',...(display.parameters||[]).filter(p=>!['N','set'].includes(p.symbol)).map(p=>p.text)].join('\u001f');
   const series={...source,label:display.label||source.label,display_identity:identity,implementation_identity:implementationIdentity(source,decoders),channel_kind:source.channel_kind||'unknown',evidence:source.evidence_status||(catalog.datasets||[]).find(d=>d.dataset_id===source.dataset_id)?.evidence_status};
-  for(const [index,raw] of (source.points||[]).entries())if(!retiredBounded(source,raw)&&known(raw.x)&&known(raw.y)&&!/^pending|unmeasured|source_only/i.test(raw.status||''))candidates.push({series,point:{...raw,metadata:raw.metadata||{},...(raw.metadata||{})},index});
+  for(const [index,raw] of (source.points||[]).entries())if(!retiredBounded(source,raw)&&known(raw.x)&&known(raw.y)&&!/^pending|unmeasured|source_only/i.test(raw.status||''))candidates.push({series,point:workFields({...raw,metadata:raw.metadata||{},...(raw.metadata||{})}),index});
  }
  const grouped=new Map();
  for(const entry of candidates){const key=pointKey(entry.series,entry.point);if(!grouped.has(key))grouped.set(key,[]);grouped.get(key).push(entry);}

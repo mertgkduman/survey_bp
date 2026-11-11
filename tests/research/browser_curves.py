@@ -164,6 +164,59 @@ def verify(output, url):
         values=page.locator('#build-preset option').evaluate_all('nodes=>nodes.map(n=>n.dataset.decoder||n.value)')
         assert not any(x.endswith(':bp4_v1') or x.endswith(':binary_v1') for x in values)
         checks.append('Saved-specification names share the same parameter labels and retirement filtering')
+        page.locator('[data-nav="results"]').click()
+        work_curves=page.evaluate('''async()=>{
+          const c=await(await fetch('catalog.json')).json();
+          return ResearchCurves.active(c,DecoderDisplay.labels(c)).curves.filter(s=>
+            s.code_id==='b1'&&(s.dataset_id==='yao-bpgd-completion'&&s.source_decoder_id==='bpgd_t100_r10'
+            ||s.dataset_id==='yao-cross-code-depolarizing'&&s.source_decoder_id==='binary_v2'));
+        }''')
+        assert len(work_curves)==2
+        for curve in work_curves:
+            card.locator('[data-select=input]').select_option('b1')
+            card.locator('[data-select=decoder]').select_option(curve['curve_id'])
+            headings=card.locator('thead th').all_text_contents()
+            iterations=headings.index('Mean iterations / shot')
+            directed=headings.index('Mean directed edge updates / shot')
+            assert directed==iterations+1
+            expected=curve['points'][0]
+            cells=card.locator('tbody tr').first.locator('td').all_text_contents()
+            for column,key in [(iterations,'mean_iterations'),(directed,'mean_directed_edge_updates')]:
+                assert abs(float(cells[column].split()[0])-expected[key])<=abs(expected[key])*5e-5+1e-8
+            metric=card.locator('select[aria-label="Metric for plot 1"]')
+            for value,label in [('iterations','Mean iterations / shot'),('edge_updates','Mean directed edge updates / shot')]:
+                metric.select_option(value)
+                assert label in card.locator('svg').text_content()
+                assert card.locator('.point').count()==len(curve['points'])
+                ylabel=card.locator('svg text[transform]').bounding_box()
+                tick_left=min(tick.bounding_box()['x'] for tick in card.locator('svg .y-tick').all())
+                assert ylabel['x']+ylabel['width']<tick_left
+            with page.expect_download() as download:
+                card.get_by_role('button',name='Export visible table').click()
+            path=output/(curve['source_decoder_id']+'-work.csv')
+            download.value.save_as(path)
+            with path.open(newline='') as stream:
+                rows=list(csv.DictReader(stream))
+            assert rows[0]['Mean iterations / shot']==cells[iterations]
+            assert rows[0]['Mean directed edge updates / shot']==cells[directed]
+        card.locator('.table-wrap').evaluate('node=>{node.scrollLeft=node.querySelector(".work-average").offsetLeft-node.querySelector("table").offsetLeft;}')
+        page.screenshot(path=str(output/'work-metrics.png'))
+        partial=page.evaluate('''async()=>{
+          const c=await(await fetch('catalog.json')).json();
+          return ResearchCurves.active(c,DecoderDisplay.labels(c)).curves.find(s=>s.dataset_id==='bb72-fair-beam-relay-v2');
+        }''')
+        card.locator('[data-select=input]').select_option('bb72')
+        card.locator('[data-select=decoder]').select_option(partial['curve_id'])
+        headings=card.locator('thead th').all_text_contents()
+        cells=card.locator('tbody tr').first.locator('td').all_text_contents()
+        assert cells[headings.index('Mean iterations / shot')]=='Unavailable'
+        assert cells[headings.index('Mean directed edge updates / shot')]=='Unavailable'
+        assert 'C2V updates' in cells[headings.index('Other recorded work / shot')]
+        metric=card.locator('select[aria-label="Metric for plot 1"]')
+        assert 'iterations' not in metric.locator('option').evaluate_all('xs=>xs.map(x=>x.value)')
+        assert 'edge_updates' not in metric.locator('option').evaluate_all('xs=>xs.map(x=>x.value)')
+        metric.select_option('work')
+        checks.append('Historical separate-binary and new BPGD curves expose adjacent per-shot iteration and directed-update averages, both plot metrics and matching CSV columns')
         page.set_viewport_size({'width':390,'height':844})
         page.locator('[data-nav="results"]').click()
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1')

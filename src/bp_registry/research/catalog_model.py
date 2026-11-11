@@ -56,7 +56,7 @@ def validate_catalog(catalog: dict[str, Any]) -> dict[str, Any]:
             if value not in indexes[kind]:
                 raise ValueError(f"result series has an unresolved {kind} relationship: {value}")
         for point in series["points"]:
-            for field in ("x", "y", "n", "failures", "ci_low", "ci_high", "mean_work", "mean_seconds"):
+            for field in ("x", "y", "n", "failures", "ci_low", "ci_high", "mean_work", "mean_seconds", "mean_iterations", "mean_directed_edge_updates"):
                 value = point.get(field)
                 if value is not None and (isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value)):
                     raise ValueError(f"nonfinite/nonnumeric result value {field} in {key}")

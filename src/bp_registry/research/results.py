@@ -63,6 +63,29 @@ def _events(path: Path, row_count: int) -> Iterator[dict[str, Any]]:
         raise ValueError("invalid events.jsonl") from error
 
 
+def _work_columns(root: Path, spec: dict[str, Any], rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    binary = spec["decoder"]["family"] == "binary_css"
+    result = [{"mean_iterations": row["mean_iterations"], "mean_directed_edge_updates": None,
+               "iteration_unit": "component sweeps" if binary else "sweeps"} for row in rows]
+    code = spec["problem"].get("code", {})
+    if code.get("kind") != "embedded_css":
+        return result
+    hx, hz = (sum(sum(row) for row in code[key]) for key in ("hx", "hz"))
+    if not binary or hx == hz:
+        edges = hz if binary else hx + hz
+        for metrics in result:
+            metrics["mean_directed_edge_updates"] = 2 * edges * metrics["mean_iterations"]
+        return result
+    # Unequal X/Z graphs require the retained component counters.
+    totals = [0] * len(rows)
+    for event in _events(root / "events.jsonl", len(rows)):
+        counts = event["iterations"]
+        totals[event["rate_index"]] += 2 * (hz * counts["x"] + hx * counts["z"])
+    for metrics, row, total in zip(result, rows, totals, strict=True):
+        metrics["mean_directed_edge_updates"] = total / row["n"]
+    return result
+
+
 def _finite_duration(value: object, name: str, *, allow_none: bool = False) -> None:
     if value is None and allow_none:
         return
@@ -317,11 +340,13 @@ def normalize_result_directory(result_dir: str | Path) -> dict[str, Any]:
     short = experiment_id[:16]
     paper_id, code_id, decoder_id, dataset_id = (f"local-run-{short}", f"local-input-{input_hash[:16]}", f"local-decoder-{short}", f"local-dataset-{short}")
     kind = spec["problem"]["kind"]
+    work_columns = _work_columns(root, spec, summary["rows"])
     x_semantics = "physical_circuit_noise_probability" if kind == "circuit" and any("physical_p" in point for point in spec["rate_points"]) else "circuit_setting_index" if kind == "circuit" else ("decoder_prior_probability" if spec["channel"]["kind"] == "explicit" else "physical_error_probability")
     points = [{"x": row.get("p") if x_semantics == "physical_circuit_noise_probability" else row["rate_index"] if kind == "circuit" else (row.get("decoder_p0") if x_semantics == "decoder_prior_probability" else row.get("p")),
                "y": row.get("ler") if row.get("ler") is not None else row.get("failure_rate"),
                "n": row["n"], "failures": row["failures"], "ci_low": row.get("ci_low"), "ci_high": row.get("ci_high"),
                "mean_work": row.get("mean_iterations"), "mean_seconds": row.get("mean_decode_seconds"),
+               **work_columns[row["rate_index"]],
                "work_unit": row.get("work_unit"), "type_i": row.get("type_i"), "type_ii": row.get("type_ii"),
                "status": row.get("ci_status"), "ci_method": row.get("ci_method"), "denominator": row.get("n"),
                "sampling_mode": row.get("sampling_mode"), "sampling_termination_reason": row.get("sampling_termination_reason"),

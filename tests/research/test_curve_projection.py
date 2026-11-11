@@ -247,3 +247,19 @@ def test_completion_retires_only_the_requested_historical_bounded_bpgd():
     other = {**b1, "series_id": "other", "source_decoder_id": "bpgd_random_t100"}
     curves = project({"datasets": [old], "result_series": [b1, importance, other]})
     assert {curve["source_series_id"] for curve in curves} == {"importance", "other"}
+
+
+def test_pooled_work_averages_use_shot_weights_and_preserve_missing_counters():
+    first = row("a", seed=1, evidence="a.json", pool=True)
+    second = row("b", seed=2, evidence="b.json", shots=30, pool=True)
+    first["points"][0].update(mean_iterations=2, mean_directed_edge_updates=20)
+    second["points"][0].update(mean_iterations=6, mean_directed_edge_updates=60)
+    decoders = [{"decoder_id": id, "configuration": {"effective_policy": {"kernel": "same"}}}
+                for id in ("a", "b")]
+    point = project(catalog([first, second], decoders))[0]["points"][0]
+    assert point["mean_iterations"] == 5
+    assert point["mean_directed_edge_updates"] == 50
+    second["points"][0]["mean_directed_edge_updates"] = None
+    point = project(catalog([first, second], decoders))[0]["points"][0]
+    assert point["mean_directed_edge_updates"] is None
+    assert point["mean_iterations"] == 5

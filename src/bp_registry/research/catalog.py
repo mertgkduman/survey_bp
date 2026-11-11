@@ -20,6 +20,7 @@ from typing import Any
 _POINT_KEYS = (
     "x", "y", "n", "failures", "ci_low", "ci_high", "status", "mean_work",
     "work_unit", "mean_seconds", "type_i", "type_ii", "source_value",
+    "mean_iterations", "mean_directed_edge_updates", "iteration_unit",
 )
 
 
@@ -72,6 +73,33 @@ def _point(**values: Any) -> dict[str, Any]:
     if "metadata" in values:
         point["metadata"] = values["metadata"]
     return point
+
+
+@lru_cache(maxsize=16)
+def _css_edge_counts(repository: Path, code_id: str) -> tuple[int, int]:
+    from .contracts import _repository_value
+
+    code = _repository_value(repository, code_id)
+    return int(code.hx.sum()), int(code.hz.sum())
+
+
+def _iteration_work(repository: Path, code_id: str, mean: float | None, *,
+                    joint: bool, components: int = 1,
+                    directed: float | None = None) -> dict[str, Any]:
+    """Report actual sweeps across all components and both message directions.
+
+    Separate binary means supplied here already sum the X and Z sweeps.
+    Their edge work can be recovered from that sum when the two graphs have
+    equal sizes. Otherwise a retained directed-update counter is required.
+    """
+    if mean is not None and directed is None:
+        hx, hz = _css_edge_counts(repository, code_id)
+        if joint:
+            directed = 2 * (hx + hz) * mean
+        elif components == 1 or hx == hz:
+            directed = 2 * hz * mean
+    return {"mean_iterations": mean, "mean_directed_edge_updates": directed,
+            "iteration_unit": "component sweeps" if components == 2 else "sweeps"}
 
 
 def _csv_rows(path: Path) -> list[dict[str, str]]:
@@ -129,6 +157,8 @@ def _presentation_datasets(repository: Path) -> tuple[list[dict[str, Any]], list
                failures=_integer(row["local_failures"]), ci_low=_number(row["local_95_exact_two_sided_low"]),
                ci_high=_number(row["local_95_exact_two_sided_high"]), status="pilot_adaptation",
                mean_work=_number(row["mean_bp4_equivalent_work"]), work_unit="BP4-equivalent iterations",
+               **_iteration_work(repository, row["code"], _number(row["mean_bp4_equivalent_work"]) * (2 if row["decoder"].startswith("binary") else 1),
+                                 joint=not row["decoder"].startswith("binary"), components=2 if row["decoder"].startswith("binary") else 1),
                type_i=_integer(row["invalid_syndrome"]), source_value=_number(row["reported_ler_or_upper"]))
         for row in _csv_rows(repository / pilot_path)
     ]
@@ -152,6 +182,9 @@ def _vanilla_dataset(repository: Path) -> tuple[dict[str, Any], list[dict[str, A
                failures=_integer(row["failures"]), ci_low=_number(row["ci95_low"]), ci_high=_number(row["ci95_high"]),
                status="complete" if row["complete"] == "True" else "incomplete",
                mean_work=_number(row["mean_bp4_equivalent_iterations"]), work_unit="BP4-equivalent iterations",
+               **_iteration_work(repository, row["code"], (_number(row["mean_bp4_equivalent_iterations"]) * (2 if row["arm"].startswith("binary") else 1)
+                                                         if _number(row["mean_bp4_equivalent_iterations"]) is not None else None),
+                                 joint=not row["arm"].startswith("binary"), components=2 if row["arm"].startswith("binary") else 1),
                mean_seconds=(_number(row["mean_decode_ms"]) or 0.0) / 1000,
                type_i=_integer(row["type_i"]), type_ii=_integer(row["type_ii"]),
                source_value=_number(row["source_qbp_rate"]))
@@ -182,6 +215,7 @@ def _tuning_dataset(repository: Path) -> tuple[dict[str, Any], list[dict[str, An
         _point(x=0.06, y=_number(row["ler"]), n=_integer(row["shots"]), failures=_integer(row["failures"]),
                ci_low=_number(row["ci90_lower"]), ci_high=_number(row["ci90_upper"]), status="complete",
                mean_work=_number(row["mean_iterations"]), work_unit="BP4 iterations",
+               **_iteration_work(repository, row["code"], _number(row["mean_iterations"]), joint=True),
                mean_seconds=(_number(row["mean_decode_ms"]) or 0.0) / 1000,
                type_i=_integer(row["type_i"]), type_ii=_integer(row["type_ii"]),
                metadata={"confidence_level": 0.90, "uncertainty_method": "two_sided_exact_binomial_interval",
@@ -210,6 +244,9 @@ def _cross_code_dataset(repository: Path) -> tuple[dict[str, Any], dict[str, Any
         _point(x=_number(row["p"]), y=_number(row["rate"]), n=_integer(row["shots"]), failures=_integer(row["failures"]),
                ci_low=_number(row["ci95_low"]), ci_high=_number(row["ci95_high"]), status="complete",
                mean_work=_number(row["mean_directed_edge_updates"]), work_unit="directed edge updates",
+               **_iteration_work(repository, row["code"], _number(row["mean_iterations_per_component"]) * (2 if row["decoder"].startswith("binary") and row["channel"] == "depolarizing" else 1),
+                                 joint=row["decoder"].startswith("qbp"), components=2 if row["decoder"].startswith("binary") and row["channel"] == "depolarizing" else 1,
+                                 directed=_number(row["mean_directed_edge_updates"])),
                mean_seconds=(_number(row["mean_decode_ms"]) or 0.0) / 1000,
                type_i=_integer(row["type_i"]), type_ii=_integer(row["type_ii"]),
                metadata={"channel": row["channel"], "maximum_iterations": _integer(row["T"]),
@@ -264,6 +301,7 @@ def _yao_completion_dataset(repository: Path) -> tuple[dict[str, Any], list[dict
             status="upper_bound" if failures == 0 else "complete",
             type_i=counts["type_i"], type_ii=counts["type_ii"],
             mean_work=row["iterations"] / n, work_unit="iterations",
+            **_iteration_work(repository, row["code"], row["iterations"] / n, joint=settings["family"] == "bp4"),
             mean_seconds=row["decode_ns"] / n / 1e9,
             metadata={
                 "channel": settings["noise_model"], "matched_x_rate": row["matched_x_rate"],
@@ -305,6 +343,7 @@ def _non_osd_dataset(repository: Path) -> tuple[dict[str, Any], list[dict[str, s
             failures=None if is_importance else _integer(row["failures"]),
             ci_low=_number(row["ci95_low"]), ci_high=_number(row["ci95_high"]), status=row["assessment"],
             mean_work=_number(row["mean_iterations"]), work_unit="iterations",
+            **_iteration_work(repository, row["code"], _number(row["mean_iterations"]), joint=row["code"] in {"a5", "b2"}),
             mean_seconds=(None if _number(row["mean_decode_ms"]) is None else _number(row["mean_decode_ms"]) / 1000),
             type_i=None if is_importance else _integer(row["type_i"]),
             type_ii=None if is_importance else _integer(row["type_ii"]), source_value=_number(row["published_rate"]),
@@ -385,6 +424,7 @@ def _qbpgd_datasets(repository: Path) -> tuple[list[dict[str, Any]], list[dict[s
             point = _point(
                 x=0.06, y=failures / shots, n=shots, failures=failures, status="complete",
                 mean_work=values["iterations"] / shots, work_unit="BP4 sweeps",
+                **_iteration_work(repository, summary["code"], values["iterations"] / shots, joint=True),
                 mean_seconds=values["elapsed_ns"] / shots / 1e9,
                 type_i=values["type_i"], type_ii=values["type_ii"],
                 metadata={"cohort_kind": specification["cohort_kind"], "summary_path": relative_summary,
@@ -456,10 +496,14 @@ def _bb72_datasets(repository: Path) -> tuple[list[dict[str, Any]], list[dict[st
     for rate, rows in bpsf["summaries"].items():
         for configuration, row in rows.items():
             runtime = row.get("runtime", {})
-            work = row.get("mean_work_vector", {}).get("check_to_variable_updates")
+            vector = row.get("mean_work_vector", {})
+            work = vector.get("check_to_variable_updates")
+            v2c = vector.get("variable_to_check_updates")
             bpsf_points.append(_point(x=int(rate[1:]) / 1000, y=row["failure_rate"], n=row["shots"], failures=row["failures"],
                                       ci_low=row["failure_interval_95"][0], ci_high=row["failure_interval_95"][1], status="complete",
-                                      mean_work=work, work_unit="C2V updates", mean_seconds=(runtime["mean_ns"] / 1e9 if runtime.get("mean_ns") is not None else None),
+                                      mean_work=work, work_unit="C2V updates",
+                                      mean_directed_edge_updates=work + v2c if work is not None and v2c is not None else None,
+                                      mean_seconds=(runtime["mean_ns"] / 1e9 if runtime.get("mean_ns") is not None else None),
                                       metadata={"uncertainty_method": "two_sided_95_percent_binomial_interval", "denominator_definition": "all terminal matched evaluation shots",
                                                 "runtime_scope": runtime.get("scope"), "runtime_method": runtime.get("method"),
                                                 "runtime_available_shots": runtime.get("available_shots"),
@@ -499,6 +543,8 @@ def _local_curve_dataset(repository: Path, *, dataset_id: str, label: str, path:
     points = [_point(x=_number(row["p"]), y=_number(row[rate_field]), n=_integer(row[shots_field]),
                      failures=_integer(row[failures_field]), ci_low=_number(row[lower_field]), ci_high=_number(row[upper_field]),
                      status=status, mean_work=_number(row[work_field]), work_unit="BP4 iterations",
+                     **_iteration_work(repository, row["code"], _number(row[work_field]) * (2 if row[decoder_field].startswith("binary") else 1),
+                                       joint=not row[decoder_field].startswith("binary"), components=2 if row[decoder_field].startswith("binary") else 1),
                      mean_seconds=_number(row.get("mean_elapsed_seconds")), type_i=_integer(row.get("type_i")),
                      type_ii=_integer(row.get("type_ii")), source_value=_number(row.get("source_rate_or_bound") or row.get("source_ler")),
                      metadata={"source_point_type": row.get("source_point_type", "observed"),
@@ -720,6 +766,8 @@ def _circuit_profile_datasets(repository: Path) -> tuple[list[dict[str, Any]], l
                 x=0.005, y=failures / shots, n=shots, failures=failures,
                 ci_low=low, ci_high=high, status="complete",
                 mean_work=float(record["canonical_mean_sweeps"]), work_unit="circuit DEM-BP sweeps",
+                mean_iterations=float(record["canonical_mean_sweeps"]), iteration_unit="sweeps",
+                mean_directed_edge_updates=2 * record["parity_edges"] * float(record["canonical_mean_sweeps"]),
                 mean_seconds=float(record["canonical_decode_seconds"]) / shots,
                 metadata={
                     "channel": "embedded_circuit", "physical_rate": 0.005,
@@ -786,6 +834,9 @@ def build_catalog(repository: Path) -> dict[str, Any]:
     depolarizing_points = [_point(x=_number(row["p"]), y=_number(row["rate"]), n=_integer(row["shots"]), failures=_integer(row["failures"]),
                                   ci_low=_number(row["ci95_low"]), ci_high=_number(row["ci95_high"]), status="complete",
                                   mean_work=_number(row["mean_directed_edge_updates"]), work_unit="directed edge updates",
+                                  **_iteration_work(repository, row["code"], _number(row["mean_iterations_per_component"]) * (2 if row["decoder"].startswith("binary") else 1),
+                                                    joint=row["decoder"].startswith("qbp"), components=2 if row["decoder"].startswith("binary") else 1,
+                                                    directed=_number(row["mean_directed_edge_updates"])),
                                   mean_seconds=(_number(row["mean_decode_ms"]) or 0) / 1000,
                                   type_i=_integer(row["type_i"]), type_ii=_integer(row["type_ii"]),
                                   metadata={"channel": row["channel"], "maximum_iterations": _integer(row["T"]),
@@ -801,7 +852,7 @@ def build_catalog(repository: Path) -> dict[str, Any]:
                             caveat="Common depolarizing channel but no new source curve is claimed for missing arms.")
     tuning_validation_path = "data/reproductions/yao-2312-10950-bp4-tuning-p006/results/joint_final_results.csv"
     tuning_validation_rows = _csv_rows(repository / tuning_validation_path)
-    tuning_validation = _dataset("yao-bp4-tuning-selected-validation", label="A5/B2 selected BP4 validation", paper_id="yao-2312-10950-v2", evidence_status="canonical_tuning_validation", source_path=tuning_validation_path, points=[_point(x=.06, y=_number(r["ler"]), n=_integer(r["shots"]), failures=_integer(r["failures"]), ci_low=_number(r["ci90_lower"]), ci_high=_number(r["ci90_upper"]), status="complete", mean_work=_number(r["mean_iterations"]), work_unit="BP4 iterations", mean_seconds=(_number(r["mean_decode_ms"]) or 0)/1000, type_i=_integer(r["type_i"]), type_ii=_integer(r["type_ii"]), metadata={"confidence_level": 0.90, "uncertainty_method": "two_sided_exact_binomial_interval", "denominator_definition": "fixed validation-shot cohort"}) for r in tuning_validation_rows], assets=[_asset(repository, tuning_validation_path, label="Joint selected validation", kind="csv"), _asset(repository, "data/reproductions/yao-2312-10950-bp4-tuning-p006/results/joint_final_results.json", label="Joint validation receipt", kind="json")], caveat="Selection/validation evidence is distinct from equal-work fairness.")
+    tuning_validation = _dataset("yao-bp4-tuning-selected-validation", label="A5/B2 selected BP4 validation", paper_id="yao-2312-10950-v2", evidence_status="canonical_tuning_validation", source_path=tuning_validation_path, points=[_point(x=.06, y=_number(r["ler"]), n=_integer(r["shots"]), failures=_integer(r["failures"]), ci_low=_number(r["ci90_lower"]), ci_high=_number(r["ci90_upper"]), status="complete", mean_work=_number(r["mean_iterations"]), work_unit="BP4 iterations", **_iteration_work(repository, r["code"], _number(r["mean_iterations"]), joint=True), mean_seconds=(_number(r["mean_decode_ms"]) or 0)/1000, type_i=_integer(r["type_i"]), type_ii=_integer(r["type_ii"]), metadata={"confidence_level": 0.90, "uncertainty_method": "two_sided_exact_binomial_interval", "denominator_definition": "fixed validation-shot cohort"}) for r in tuning_validation_rows], assets=[_asset(repository, tuning_validation_path, label="Joint selected validation", kind="csv"), _asset(repository, "data/reproductions/yao-2312-10950-bp4-tuning-p006/results/joint_final_results.json", label="Joint validation receipt", kind="json")], caveat="Selection/validation evidence is distinct from equal-work fairness.")
     circuit_datasets, circuit_series, _ = _circuit_profile_datasets(repository)
     datasets.extend([vanilla, tuning, tuning_validation, cross_code, non_osd, *qbpgd_datasets, full_v2, ms_curves, depolarizing, *circuit_datasets])
     bb72_datasets, bb72_series, _ = _bb72_datasets(repository)

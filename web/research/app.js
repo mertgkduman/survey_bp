@@ -24,7 +24,11 @@ const curveForDecoder=id=>series().find(s=>evidenceMembers(s).some(m=>m.decoder_
 function selected(card){return series().filter(s=>(s.code_id===card.input||s.circuit_id===card.input)&&(card.chosen?card.chosen.has(curveIdentity(s)):!card.decoder||curveIdentity(s)===card.decoder));}
 function points(card){return selected(card).filter(s=>!card.hidden.has(s.series_id)).flatMap(s=>s.points.map(p=>({s,p})));}
 function bound(p){return ResearchPlot.upperBound(p);}
-function value(card,p){return card.metric==='work'?p.mean_work:card.metric==='time'?p.mean_seconds:p.y;}
+const metricFields={rate:'y',iterations:'mean_iterations',edge_updates:'mean_directed_edge_updates',work:'mean_work',time:'mean_seconds'};
+const metricNames={iterations:'Mean iterations / shot',edge_updates:'Mean directed edge updates / shot',time:'Mean decoding time · s',work:'Mean work / shot'};
+const namedWorkUnits=new Set(['iterations','BP4 iterations','BP4 sweeps','circuit DEM-BP sweeps','binary_component_sweeps','bp4_joint_sweeps','circuit_dem_bp_sweeps','directed edge updates']);
+const otherWork=p=>known(p.mean_work)&&!namedWorkUnits.has(p.work_unit);
+function value(card,p){return p[metricFields[card.metric]];}
 function plotValue(card,p){return card.metric==='rate'&&bound(p)&&p.y===0?p.ci_high:value(card,p);}
 function addPlot(){const card={id:S.cards.length?Math.max(...S.cards.map(c=>c.id))+1:1,input:S.cards.length?'b2':'a5',decoder:'',hidden:new Set(),metric:'rate'};const initial=series().find(s=>s.code_id===card.input&&s.source_decoder_id==='bp4_v2'&&s.dataset_id==='yao-vanilla-a5-b2');card.decoder=initial?curveIdentity(initial):curveIdentity(series().find(s=>s.code_id===card.input)||{})||'';S.cards.push(card);renderCards();}
 function inputChoices(){const view=activeView();return [...new Map([...view.codes.map(x=>[x.code_id,x.label]),...view.circuits.map(x=>[x.circuit_id,`${x.label} · circuit`])]).entries()];}
@@ -64,7 +68,17 @@ function renderCards(){
   box.append(curvePicker(card));
   const curves=el('fieldset',{class:'curves'});curves.append(el('legend',{},'Show curves'));const list=el('div',{class:'curve-list'});
   for(const s of choices){const color=colorFor(card,s),label=el('label',{style:`color:${color}`,title:s.label}),cb=el('input',{type:'checkbox','aria-label':s.label,'data-curve':s.series_id});cb.checked=!card.hidden.has(s.series_id);cb.onchange=()=>toggleCurve(card,s);const swatch=el('span',{class:'curve-swatch','aria-hidden':'true',style:`background:${color}`});label.append(cb,swatch,document.createTextNode(s.label));label.onmouseenter=()=>previewCurve(card,s,true);label.onmouseleave=()=>previewCurve(card,s,false);label.onfocusin=()=>previewCurve(card,s,true);label.onfocusout=()=>previewCurve(card,s,false);list.append(label);}curves.append(list);box.append(curves,parameterKey(card));
-  const metricLabel=el('label',{class:'metric'},'Metric'),metric=el('select',{'aria-label':`Metric for plot ${card.id}`});const visiblePoints=points(card),basis=visiblePoints.length?visiblePoints:choices.flatMap(s=>s.points.map(p=>({s,p}))),units=[...new Set(basis.filter(x=>known(x.p.mean_work)).map(x=>x.p.work_unit))];const metricChoices=[['rate','Logical / observable failure rate']];if(units.length===1)metricChoices.push(['work',`Mean work · ${units[0]}`]);if(basis.some(x=>known(x.p.mean_seconds)))metricChoices.push(['time','Mean decoding time · s']);if(!metricChoices.some(x=>x[0]===card.metric))card.metric='rate';options(metric,metricChoices,card.metric);metric.onchange=()=>{card.metric=metric.value;renderCards();};metricLabel.append(metric);box.append(metricLabel);
+  const metricLabel=el('label',{class:'metric'},'Metric'),metric=el('select',{'aria-label':`Metric for plot ${card.id}`});
+  const visiblePoints=points(card),basis=visiblePoints.length?visiblePoints:choices.flatMap(s=>s.points.map(p=>({s,p})));
+  const units=[...new Set(basis.filter(({p})=>otherWork(p)).map(({p})=>p.work_unit))];
+  const metricChoices=[['rate','Logical / observable failure rate']];
+  for(const id of ['iterations','edge_updates'])if(basis.some(({p})=>known(p[metricFields[id]])))metricChoices.push([id,metricNames[id]]);
+  if(units.length===1)metricChoices.push(['work',`Mean work · ${units[0]}`]);
+  if(basis.some(({p})=>known(p.mean_seconds)))metricChoices.push(['time',metricNames.time]);
+  if(!metricChoices.some(x=>x[0]===card.metric))card.metric='rate';
+  options(metric,metricChoices,card.metric);
+  metric.onchange=()=>{card.metric=metric.value;renderCards();};
+  metricLabel.append(metric);box.append(metricLabel);
   drawPlot(card,box);drawTable(card,box);
   const actions=el('div',{class:'actions'}),csv=el('button',{type:'button',class:'secondary'},'Export visible table');csv.disabled=!visiblePoints.length;csv.onclick=()=>exportTable(card);actions.append(csv);
   const receipt=el('button',{type:'button',class:'secondary'},'Download run settings');receipt.disabled=!visible(card).length;receipt.onclick=()=>{const shown=visible(card);save(`plot-${card.id}-settings.json`,JSON.stringify({schema:'research-plot-receipt-v2',axis:{mode:ResearchPlot.axis(shown,card.axis||'auto'),depolarizing_to_bit_flip_factor:2/3},series:shown,decoders:[...new Set(shown.flatMap(s=>evidenceMembers(s).map(m=>m.decoder_id)))].map(id=>record('decoders',id)),experiments:S.catalog.experiments.filter(e=>e.dataset_ids?.some(id=>shown.some(s=>evidenceMembers(s).some(m=>m.dataset_id===id))))},null,2)+'\n');};actions.append(receipt);
@@ -113,7 +127,7 @@ function drawPlot(card,box){
   ymin=0;
   ymax=ymax||1;
  }
- const left=64,right=619,top=23,bottom=258;
+ const left=log?64:96,right=619,top=23,bottom=258;
  const X=x=>left+(x-xmin)/(xmax-xmin)*(right-left);
  const axisY=y=>bottom-(y-ymin)/(ymax-ymin)*(bottom-top);
  const Y=y=>axisY(log?Math.log10(y):y);
@@ -142,7 +156,8 @@ function drawPlot(card,box){
   for(let i=0;i<=4;i++){
    const y=ymin+(ymax-ymin)*i/4;
    horizontalGrid(y);
-   chart.append(svg('text',{x:left-8,y:axisY(y)+4,'text-anchor':'end',class:'y-tick'},fmt(y)));
+   const label=Math.abs(y)>=1e5?y.toExponential(2):fmt(y);
+   chart.append(svg('text',{x:left-8,y:axisY(y)+4,'text-anchor':'end',class:'y-tick'},label));
   }
  }
 
@@ -178,12 +193,50 @@ function drawPlot(card,box){
  const axisKinds=new Set(scaleRows.map(({p})=>p.x_semantics||'physical_error_probability'));const xlabel=axisMode==='bit_flip'?'Component bit-flip probability p_bit flip':axisKinds.size>1?'Probability p / p₀ (see run settings)':axisKinds.has('circuit_setting_index')?'Circuit setting index':axisKinds.has('decoder_prior_probability')?'Decoder prior probability p₀':'Physical error probability p';
  if(axisMode==='bit_flip'){const note=el('div',{class:'axis-note small'});katex.render('p_{\\mathrm{bit\\ flip}}=\\frac{2}{3}p_{\\mathrm{depolarizing}}',note,{throwOnError:true});figure.append(note,el('p',{class:'small muted'},'Depolarizing coordinates are converted automatically; X-only coordinates are unchanged. Depolarizing noise has X, Y, Z each with probability p/3. The channels remain distinct.'));}
  if(log&&scaleRows.some(({p})=>bound(p)))figure.append(el('p',{class:'small muted'},'Zero failures: the error bar runs from zero to the reported upper confidence limit. Zero is below the logarithmic plot; these bounds are not joined by a curve.'));
- chart.append(svg('text',{x:340,y:304,'text-anchor':'middle'},xlabel),svg('text',{x:16,y:144,transform:'rotate(-90 16 144)','text-anchor':'middle'},log?'Failure probability · log scale':card.metric==='time'?'Decoding time · s':'Mean work'));
+ chart.append(svg('text',{x:340,y:304,'text-anchor':'middle'},xlabel),svg('text',{x:16,y:144,transform:'rotate(-90 16 144)','text-anchor':'middle'},log?'Failure probability · log scale':metricNames[card.metric]));
 }
-const headers=['Series','Noise','Metric','Observed value','Samples','Failures','Type I / II','CI','Work','Time','Evidence','Availability'];
-function tableRows(card){return points(card).map(({s,p})=>{const weighted=/importance|weighted/i.test(p.estimator||p.sampling_method||'');const ci=known(p.ci_low)&&known(p.ci_high)?`[${fmt(p.ci_low)}, ${fmt(p.ci_high)}]`:'Unavailable';return[s.label,p.x_semantics==='circuit_setting_index'?(p.setting_label||'Embedded circuit noise'):p.x_semantics==='decoder_prior_probability'?'Explicit Pauli table; p₀ = '+fmt(p.x):known(p.x)?`p = ${fmt(p.x)}, ${ResearchPlot.channel(s,p)==='depolarizing'?'depolarizing (X, Y, Z: p/3 each)':ResearchPlot.channel(s,p)==='x_only'?'X-only':'circuit noise'}`:'Unavailable',card.metric==='rate'?(p.estimator||p.metric||(ResearchPlot.channel(s,p)==='embedded_circuit'?'Observable failure rate':'Block failure rate')):card.metric,(bound(p)&&card.metric==='rate'?'≤ ':'')+fmt(plotValue(card,p)),weighted?`${count(p.raw_samples)} raw draws`:count(p.n),weighted?`${count(p.raw_failures)} raw events`:count(p.failures),`${count(p.type_i)} / ${count(p.type_ii)}`,`${ci}${known(p.confidence_level)?' · '+100*p.confidence_level+'%':''} · ${p.uncertainty_method||p.ci_method||'method not reported'}`,known(p.mean_work)?`${fmt(p.mean_work)} ${p.work_unit||'unit not reported'}`:'Unavailable',known(p.mean_seconds)?`${fmt(p.mean_seconds)} s · ${p.runtime_scope||'see run details'}`:'Unavailable',`${s.evidence} · ${p.status||''}`,weighted?'Weighted estimate; proposal counts':p.raw_asset?.availability||'Retained summary'];});}
-function drawTable(card,box){const wrap=el('div',{class:'table-wrap',tabindex:'0','aria-label':`Results table for plot ${card.id}`}),table=el('table'),head=el('thead'),tr=el('tr');headers.forEach(h=>tr.append(el('th',{scope:'col'},h)));head.append(tr);table.append(head);const body=el('tbody');for(const row of tableRows(card)){const tr=el('tr');row.forEach(cell=>tr.append(el('td',{},cell)));body.append(tr);}table.append(body);wrap.append(table);box.append(wrap);}
-function exportTable(card){const csv=[headers,...tableRows(card)].map(row=>row.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\n')+'\n';save(`plot-${card.id}-results.csv`,csv,'text/csv');}
+const tableStart=['Series','Noise','Metric','Observed value','Samples','Failures','Type I / II','CI',metricNames.iterations,metricNames.edge_updates];
+const showOtherWork=card=>points(card).some(({p})=>otherWork(p));
+function headers(card){return [...tableStart,...(showOtherWork(card)?['Other recorded work / shot']:[]),'Time','Evidence','Availability'];}
+function tableRows(card){
+ const includeOther=showOtherWork(card);
+ return points(card).map(({s,p})=>{
+  const weighted=/importance|weighted/i.test(p.estimator||p.sampling_method||'');
+  const ci=known(p.ci_low)&&known(p.ci_high)?`[${fmt(p.ci_low)}, ${fmt(p.ci_high)}]`:'Unavailable';
+  const noise=p.x_semantics==='circuit_setting_index'?(p.setting_label||'Embedded circuit noise')
+   :p.x_semantics==='decoder_prior_probability'?'Explicit Pauli table; p₀ = '+fmt(p.x)
+   :known(p.x)?`p = ${fmt(p.x)}, ${ResearchPlot.channel(s,p)==='depolarizing'?'depolarizing (X, Y, Z: p/3 each)':ResearchPlot.channel(s,p)==='x_only'?'X-only':'circuit noise'}`:'Unavailable';
+  const metric=card.metric==='rate'?(p.estimator||p.metric||(ResearchPlot.channel(s,p)==='embedded_circuit'?'Observable failure rate':'Block failure rate')):metricNames[card.metric];
+  return [
+   s.label,noise,metric,(bound(p)&&card.metric==='rate'?'≤ ':'')+fmt(plotValue(card,p)),
+   weighted?`${count(p.raw_samples)} raw draws`:count(p.n),weighted?`${count(p.raw_failures)} raw events`:count(p.failures),
+   `${count(p.type_i)} / ${count(p.type_ii)}`,
+   `${ci}${known(p.confidence_level)?' · '+100*p.confidence_level+'%':''} · ${p.uncertainty_method||p.ci_method||'method not reported'}`,
+   known(p.mean_iterations)?`${fmt(p.mean_iterations)} ${p.iteration_unit||'sweeps'}`:'Unavailable',
+   fmt(p.mean_directed_edge_updates),
+   ...(includeOther?[otherWork(p)?`${fmt(p.mean_work)} ${p.work_unit}`:'Unavailable']:[]),
+   known(p.mean_seconds)?`${fmt(p.mean_seconds)} s · ${p.runtime_scope||'see run details'}`:'Unavailable',
+   `${s.evidence} · ${p.status||''}`,weighted?'Weighted estimate; proposal counts':p.raw_asset?.availability||'Retained summary',
+  ];
+ });
+}
+function drawTable(card,box){
+ const wrap=el('div',{class:'table-wrap',tabindex:'0','aria-label':`Results table for plot ${card.id}`}),table=el('table'),head=el('thead'),tr=el('tr');
+ const definitions={
+  [metricNames.iterations]:'Executed sweeps summed across decoder components and rounds, averaged over all sampled shots.',
+  [metricNames.edge_updates]:'Variable-to-check plus check-to-variable updates, averaged over all sampled shots.',
+ };
+ for(const heading of headers(card))tr.append(el('th',{scope:'col',...(definitions[heading]?{title:definitions[heading],class:'work-average'}:{})},heading));
+ head.append(tr);table.append(head);
+ const body=el('tbody');
+ for(const row of tableRows(card)){
+  const tr=el('tr');
+  row.forEach((cell,index)=>tr.append(el('td',index===8||index===9?{class:'work-average'}:{},cell)));
+  body.append(tr);
+ }
+ table.append(body);wrap.append(table);box.append(wrap);
+}
+function exportTable(card){const csv=[headers(card),...tableRows(card)].map(row=>row.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\n')+'\n';save(`plot-${card.id}-results.csv`,csv,'text/csv');}
 function evidenceMembers(s){return s.provenance_members?.length?s.provenance_members:[{series_id:s.series_id,decoder_id:s.decoder_id,dataset_id:s.dataset_id,label:s.label}];}
 function runDetails(card,box){const details=el('details',{class:'run-details'});details.append(el('summary',{},'Run details and reproduction'));details.open=card.detailsOpen===true;details.ontoggle=()=>{card.detailsOpen=details.open;};const members=visible(card);if(!members.length)details.append(el('p',{class:'muted'},'No visible curves. Enable a curve to inspect its run details.'));
  for(const s of members){const section=el('div');section.append(el('h4',{},s.label));if(s.projection)section.append(el('p',{class:'small'},s.projection.rationale||`Evidence view: ${s.projection.method}.`));

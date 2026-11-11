@@ -54,3 +54,5 @@ textarea[readonly] { background:#f7faf9; }
 .request-panel { border:1px solid var(--line); border-radius:7px; padding:1rem; margin:1rem 0; background:white; }
 .request-panel .actions { align-items:center; }
 #request-summary { overflow-wrap:anywhere; }
+
+.table-wrap .work-average { width:8rem; min-width:8rem; max-width:8rem; white-space:normal; }
