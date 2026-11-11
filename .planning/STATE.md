@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: B1/C2 direct BPGD and matched Q-BP campaign running on Slurm
-last_updated: "2026-11-11T01:56:29+00:00"
-last_activity: 2026-11-10
-last_activity_desc: Dispatched 77 B1/C2 points and registered 42 audited terminal measurements. The remaining points and dependent collection job are active.
-state_head: 25c6c1f
+stopped_at: Displayed adjacent iteration and directed edge work metrics while the B1 campaign continues
+last_updated: "2026-11-11T16:07:29+00:00"
+last_activity: 2026-11-11
+last_activity_desc: Added adjacent per-shot iteration and directed edge work columns and plot metrics. Verified 124 research tests and 18 browser workflow checks.
+state_head: 324b53a
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,8 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-10 — quick task 261110-sic running B1/C2 decoder sweeps
-Last Activity Description: Frozen 77-point campaign uses direct IID sampling, 20 block failures or 100 million shots per point, and Q-BP marginal-matched depolarizing rates. Slurm arrays 61550993–61550995 and collector 61550996 are tracked in the [quick task summary](./quick/261110-sic-complete-b1-and-c2-bpgd-and-matched-q-bp/261110-sic-SUMMARY.md). Verified measurements enter the active v2 workbench while superseded bounded BPGD cohorts remain archived. Implementation `25c6c1f`.
+Last activity: 2026-11-11 — completed quick task 261111-f0q for adjacent work metrics
+Last Activity Description: Results tables and CSV exports display mean iterations and mean directed edge updates per shot in adjacent columns, with both quantities selectable for plots. Historical component means, exact graph sizes, imported component counters, and sample-weighted pooling preserve the work definitions. Passed 124 research tests and 18 Chromium workflow checks. Implementation `324b53a`.
+
+Campaign in progress: Frozen 77-point campaign uses direct IID sampling, 20 block failures or 100 million shots per point, and Q-BP marginal-matched depolarizing rates. Slurm arrays 61550993–61550995 and collector 61550996 are tracked in the [quick task summary](./quick/261110-sic-complete-b1-and-c2-bpgd-and-matched-q-bp/261110-sic-SUMMARY.md). Verified measurements enter the active v2 workbench while superseded bounded BPGD cohorts remain archived. Implementation `25c6c1f`.
 
 Prior plot activity: Quick task 261110-oou adds superscript labels for powers of ten and lighter logarithmic gridlines. Visible curves and confidence intervals determine the plot limits. Chromium verified matching axes after hiding curves or selecting a decoder directly. Implementation `8d35f04`.
 
@@ -298,6 +300,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261111-f0q | Display mean iterations and directed edge updates together | 2026-11-11 | 324b53a | Verified with 124 research tests and 18 browser workflow checks | [261111-f0q-display-mean-iterations-and-directed-edg](./quick/261111-f0q-display-mean-iterations-and-directed-edg/) |
 | 261110-oou | Format log axis powers and rescale plots to visible curves | 2026-11-10 | 8d35f04 | Verified with 17 browser workflow checks and five plot-coordinate tests | [261110-oou-format-log-axis-powers-and-rescale-plots](./quick/261110-oou-format-log-axis-powers-and-rescale-plots/) |
 | 261110-lsd | Add validated Request experiment results action and GitHub request draft | 2026-11-10 | 7b8e702 | Verified: 12 browser groups; exact specs/hash, invalidation, long inputs, mobile | [261110-lsd-add-a-validated-request-experiment-resul](./quick/261110-lsd-add-a-validated-request-experiment-resul/) |
 | 261109-mzx | Exclude already displayed curves from each plot add picker | 2026-11-09 | 1e6b825 | Verified: 16 browser groups; keyboard/mouse restoration, empty and independent plot states | [261109-mzx-exclude-already-displayed-curves-from-ea](./quick/261109-mzx-exclude-already-displayed-curves-from-ea/) |
