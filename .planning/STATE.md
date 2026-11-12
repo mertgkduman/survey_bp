@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: MacKay Construction U campaign dispatched; 22/42 points audited and published; remaining Slurm tasks running
-last_updated: "2026-11-12T18:24:42+00:00"
+stopped_at: Published-rate MacKay campaign running; 19/30 points audited and old interval retired publicly
+last_updated: "2026-11-12T20:04:24+00:00"
 last_activity: 2026-11-12
-last_activity_desc: Constructed and qualified MacKay unicycle codes and three BP arms. Array 61698133 is running with dependent collector 61698134. Audited snapshot 22/42 points; 136 tests and 22 browser groups pass.
-state_head: 8e234a4
+last_activity_desc: Corrected MacKay rates to .010/.013/.020/.030/.040; arrays 61703094-61703096 running, collector 61703097 dependent. Audited 19/30 points; 149 tests and 26 browser groups pass.
+state_head: fdbb98b
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,10 +34,12 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-12 — quick task 261112-i4d foundational MacKay Construction U campaign
-Last Activity Description: MacKay et al. (2004) Construction U [[74,18]] and [[274,110]] inputs and ordinary binary SP, two-hypothesis unicycle SP, and Q-BP are implemented and dispatched. Array 61698133 and dependent collector 61698134 continue the 42-point frozen campaign. The audited snapshot contains 22 points, 1,697 shots and 440 block failures. Three complete [[74,18]] curves are displayed; [[274,110]] remains hidden with one verified rate. Active view: 67 curves, 360 points, 7 codes, 0 circuits. Passed 136 tests, 50 final focused checks and 22 Chromium workflow groups. Implementation `8e234a4`; campaign completion remains pending.
+Last activity: 2026-11-12 — quick task 261112-k9m corrects MacKay simulations to the published error rates
+Last Activity Description: The frozen MacKay campaign now uses binary rates .010, .013, .020, .030, .040 and matched Q-BP depolarizing rates .015, .0195, .030, .045, .060. Arrays 61703094–61703096 are running with dependent collector 61703097. The audited paper-rate snapshot contains 19/30 points, 111,834 shots and 380 block failures. Active view: 68 curves, 357 points, 8 codes, 0 circuits. The old .04–.10 dataset is historical and centrally retired from public views. Exact branch pruning and both work averages are explicit; kernels and old plans are unchanged. Passed 149 tests, 63 final focused checks and 26 browser workflow groups. Implementation `fdbb98b`; full campaign completion remains pending.
 
-Running campaign: See the [MacKay unicycle task summary](./quick/261112-i4d-construct-mackay-2004-unicycle-codes-and/261112-i4d-SUMMARY.md). Retain 20 block failures or 100 million shots per rate, 88,200 total sweeps per shot, and both work averages. Source construction/decoder mechanisms are distinguished from the controlled noise and budget settings; no paper-curve agreement is claimed.
+Running campaign: See the [paper-rate task summary](./quick/261112-k9m-run-mackay-bp-campaign-at-the-five-publi/261112-k9m-SUMMARY.md). Source-plot coordinates and the exact five rates are pinned. Retain 20 block failures or 100 million shots per rate and the 88,200 total-sweep ceiling. Classical errors are recorded separately from quantum failures. No full-curve agreement is claimed.
+
+Completed historical MacKay campaign: Array 61698133 and collector 61698134 completed with exit 0:0. All 42 points, 2,366 shots and 840 block failures are audited. These controlled wide-grid results remain preserved; the subsequent paper-grid correction retires them from public v2 views.
 
 Completed campaign: The frozen BPGD/Q-BP design and the verified result snapshot are recorded in the [quick task summary](./quick/261110-sic-complete-b1-and-c2-bpgd-and-matched-q-bp/261110-sic-SUMMARY.md). Slurm arrays 61550993–61550995 and final collector 61550996 are complete.
 
@@ -304,7 +306,8 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
-| 261112-i4d | Construct and run foundational MacKay unicycle BP campaign | 2026-11-12 | 8e234a4 | Implementation verified (136 tests / 22 browser groups); campaign running, 22/42 audited points | [261112-i4d-construct-mackay-2004-unicycle-codes-and](./quick/261112-i4d-construct-mackay-2004-unicycle-codes-and/) |
+| 261112-k9m | Run MacKay at the five published error rates | 2026-11-12 | fdbb98b | Verified setup (149 tests / 26 browser groups); 19/30 audited points; campaign running | [261112-k9m-run-mackay-bp-campaign-at-the-five-publi](./quick/261112-k9m-run-mackay-bp-campaign-at-the-five-publi/) |
+| 261112-i4d | Construct and run foundational MacKay unicycle BP campaign | 2026-11-12 | 8e234a4, fdbb98b | Complete: 42/42 audited points; old grid preserved as historical evidence | [261112-i4d-construct-mackay-2004-unicycle-codes-and](./quick/261112-i4d-construct-mackay-2004-unicycle-codes-and/) |
 | 261110-sic | Complete B1/C2 BPGD and matched-marginal Q-BP sweeps | 2026-11-11 | 25c6c1f, a84413f | Verified 77/77 points and 40,459,752 shots, with 40 final tests and 18 browser checks | [261110-sic-complete-b1-and-c2-bpgd-and-matched-q-bp](./quick/261110-sic-complete-b1-and-c2-bpgd-and-matched-q-bp/) |
 | 261111-f0q | Display mean iterations and directed edge updates together | 2026-11-11 | 324b53a | Verified with 124 research tests and 18 browser workflow checks | [261111-f0q-display-mean-iterations-and-directed-edg](./quick/261111-f0q-display-mean-iterations-and-directed-edg/) |
 | 261110-oou | Format log axis powers and rescale plots to visible curves | 2026-11-10 | 8d35f04 | Verified with 17 browser workflow checks and five plot-coordinate tests | [261110-oou-format-log-axis-powers-and-rescale-plots](./quick/261110-oou-format-log-axis-powers-and-rescale-plots/) |
@@ -377,7 +380,7 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Latest campaign: quick task 261112-i4d, implementation `8e234a4`. MacKay Construction U array 61698133 is running; dependent collector 61698134 audits and publishes terminal results. Snapshot: 22/42 audited points, 1,697 shots, 440 failures. Full campaign completion has not been asserted. See the quick summary and campaign README for safe resume/collection commands.
+Latest campaign: quick task 261112-k9m, implementation `fdbb98b`. Paper-rate arrays 61703094–61703096 are running, collector 61703097 dependent. Snapshot: 19/30 audited points, 111,834 shots, 380 failures. The previous wide-grid campaign is fully audited (42/42) and publicly retired, with all evidence preserved. Full paper-rate completion has not been asserted. See the quick summary and campaign README for exact rates and safe resume/collection commands.
 
 Latest literature research: spikes 054 (PARTIAL: bounded citation screening, not an exhaustive global ranking) and 055 (VALIDATED: explicit baseline evidence in the screened sources). Twelve direct BP baseline papers are listed with min-sum/SPA families and evidence locations; foundational code benchmarks and BP+OSD/BP+SSF hybrids are separate. JSON/CSV and an offline consistency verifier accompany the report. This source list does not certify reproduction settings or authorize simulations. Scientific phase progress is unchanged.
 
