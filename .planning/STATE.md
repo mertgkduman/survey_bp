@@ -5,11 +5,11 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Completed and verified all 77 B1/C2 decoder points and refreshed the workbench
-last_updated: "2026-11-11T21:28:08+00:00"
-last_activity: 2026-11-11
-last_activity_desc: Completed 77/77 points and final collector verification. The workbench has 11 complete campaign curves and both work averages. Final refresh passed 40 tests and 18 browser checks.
-state_head: a84413f
+stopped_at: MacKay Construction U campaign dispatched; 22/42 points audited and published; remaining Slurm tasks running
+last_updated: "2026-11-12T18:24:42+00:00"
+last_activity: 2026-11-12
+last_activity_desc: Constructed and qualified MacKay unicycle codes and three BP arms. Array 61698133 is running with dependent collector 61698134. Audited snapshot 22/42 points; 136 tests and 22 browser groups pass.
+state_head: 8e234a4
 progress:
   total_phases: 14
   completed_phases: 8
@@ -34,8 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-11 — completed quick task 261110-sic B1/C2 decoder sweeps
-Last Activity Description: All 77 planned points and collector 61550996 completed successfully. The final receipt verifies 40,459,752 shots and 1,540 block failures. Eleven campaign curves have all seven rates and both per-shot work metrics. The active workbench has 64 curves and 339 points. Final refresh passed 40 focused tests and 18 Chromium workflow checks. Data commit `a84413f`.
+Last activity: 2026-11-12 — quick task 261112-i4d foundational MacKay Construction U campaign
+Last Activity Description: MacKay et al. (2004) Construction U [[74,18]] and [[274,110]] inputs and ordinary binary SP, two-hypothesis unicycle SP, and Q-BP are implemented and dispatched. Array 61698133 and dependent collector 61698134 continue the 42-point frozen campaign. The audited snapshot contains 22 points, 1,697 shots and 440 block failures. Three complete [[74,18]] curves are displayed; [[274,110]] remains hidden with one verified rate. Active view: 67 curves, 360 points, 7 codes, 0 circuits. Passed 136 tests, 50 final focused checks and 22 Chromium workflow groups. Implementation `8e234a4`; campaign completion remains pending.
+
+Running campaign: See the [MacKay unicycle task summary](./quick/261112-i4d-construct-mackay-2004-unicycle-codes-and/261112-i4d-SUMMARY.md). Retain 20 block failures or 100 million shots per rate, 88,200 total sweeps per shot, and both work averages. Source construction/decoder mechanisms are distinguished from the controlled noise and budget settings; no paper-curve agreement is claimed.
 
 Completed campaign: The frozen BPGD/Q-BP design and the verified result snapshot are recorded in the [quick task summary](./quick/261110-sic-complete-b1-and-c2-bpgd-and-matched-q-bp/261110-sic-SUMMARY.md). Slurm arrays 61550993–61550995 and final collector 61550996 are complete.
 
@@ -302,6 +304,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
+| 261112-i4d | Construct and run foundational MacKay unicycle BP campaign | 2026-11-12 | 8e234a4 | Implementation verified (136 tests / 22 browser groups); campaign running, 22/42 audited points | [261112-i4d-construct-mackay-2004-unicycle-codes-and](./quick/261112-i4d-construct-mackay-2004-unicycle-codes-and/) |
 | 261110-sic | Complete B1/C2 BPGD and matched-marginal Q-BP sweeps | 2026-11-11 | 25c6c1f, a84413f | Verified 77/77 points and 40,459,752 shots, with 40 final tests and 18 browser checks | [261110-sic-complete-b1-and-c2-bpgd-and-matched-q-bp](./quick/261110-sic-complete-b1-and-c2-bpgd-and-matched-q-bp/) |
 | 261111-f0q | Display mean iterations and directed edge updates together | 2026-11-11 | 324b53a | Verified with 124 research tests and 18 browser workflow checks | [261111-f0q-display-mean-iterations-and-directed-edg](./quick/261111-f0q-display-mean-iterations-and-directed-edg/) |
 | 261110-oou | Format log axis powers and rescale plots to visible curves | 2026-11-10 | 8d35f04 | Verified with 17 browser workflow checks and five plot-coordinate tests | [261110-oou-format-log-axis-powers-and-rescale-plots](./quick/261110-oou-format-log-axis-powers-and-rescale-plots/) |
@@ -373,6 +376,8 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 No requested decoding regime or named policy family is deferred beyond the first journal milestone. The user deferred Phase 5's pending human notebook/HTML review while moving to Phase 11; Phase 5 is not marked complete. Phase 7 remains paused. The cancelled comprehensive Phase 4 CSS evaluation/factorial is deferred from Phase 4; Phase 8 supplied bounded campaign infrastructure and Phase 9 completed exploratory CSS controls. Source-faithful CSS publication assessments remain pending exact author evidence. Relay circuit-curve assessment remains in Phase 13.
 
 ## Session Continuity
+
+Latest campaign: quick task 261112-i4d, implementation `8e234a4`. MacKay Construction U array 61698133 is running; dependent collector 61698134 audits and publishes terminal results. Snapshot: 22/42 audited points, 1,697 shots, 440 failures. Full campaign completion has not been asserted. See the quick summary and campaign README for safe resume/collection commands.
 
 Latest literature research: spikes 054 (PARTIAL: bounded citation screening, not an exhaustive global ranking) and 055 (VALIDATED: explicit baseline evidence in the screened sources). Twelve direct BP baseline papers are listed with min-sum/SPA families and evidence locations; foundational code benchmarks and BP+OSD/BP+SSF hybrids are separate. JSON/CSV and an offline consistency verifier accompany the report. This source list does not certify reproduction settings or authorize simulations. Scientific phase progress is unchanged.
 
