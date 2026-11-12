@@ -15,12 +15,16 @@ Implementation and dispatch pass. Full Monte Carlo completion remains open.
 | Exact optimization | Independent incidence checks; distance proof; syndrome-only ordering; candidate equivalence and strict-bound/tie tests | Pass |
 | Work and outcomes | Zero skipped work; all executed branch counters; separate quantum/classical failures; no borrowed classical interval | Pass |
 | Ordered parallel execution | Bounded worker batches, exact stopping prefix, serial/parallel equality, corruption checks and resume | Pass |
-| Actual audited data | 19 points / 111,834 shots / 380 failures; digests, counts, stop and endpoint replay | Pass |
+| Actual audited data | 26 points / 119,093 shots / 520 failures; digests, counts, stop and endpoint replay | Pass |
 | Public replacement | Old .04–.10 raw evidence retained but absent from all active views; new rates, selectors, exports and stale state verified | Pass |
 | Regression | 149 tests; 63 final focused checks; 26 browser groups and final actual public rerun | Pass |
 | Preservation | Old plan/runner, kernels, raw historical ledgers and archived v1 unchanged; old full 42-point receipt retained | Pass |
-| Remaining simulations | Arrays 61703094–61703096 active; collector 61703097 dependent | Running |
+| Remaining simulations | Four unicycle-SP points active; collector 61703097 dependent | Running |
 
-Active view: 68 curves, 357 points, eight codes and zero circuits. Raw catalogs
+Active view: 69 curves, 364 points, eight codes and zero circuits. Raw catalogs
 retain both campaign identities. No full paper-curve agreement verdict follows
 from this implementation verification or the partial result snapshot.
+
+Progress refresh: 41 focused checks and seven public browser groups passed.
+See PROGRESS-2026-11-12.md for checked incomplete prefixes and the unchanged
+ledger digest of the safely finalized completed checkpoint.

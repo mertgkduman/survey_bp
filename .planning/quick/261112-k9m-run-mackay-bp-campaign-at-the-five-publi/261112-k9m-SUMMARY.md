@@ -21,14 +21,16 @@ record zero iterations and updates. It has an explicit controller identity and
 is not pooled with the earlier unpruned work records. No canonical kernel or
 old frozen implementation/plan is changed.
 
-Slurm arrays **61703094** (16 CPUs), **61703095** (4 CPUs) and **61703096**
-(1 CPU) are running; dependent collector **61703097** audits and publishes
-terminal evidence. Accepted commands are retained in `dispatch.json`.
+Slurm array **61703094** (16 CPUs) and task **61703096_13** (1 CPU)
+continue the four remaining unicycle-SP points. The ordinary binary and Q-BP
+sweeps are complete on both codes. Dependent collector **61703097** audits
+and publishes terminal evidence. Accepted commands are retained in `dispatch.json`.
 
-Portable audited snapshot: **19/30 points**, **111,834 shots**, **380 quantum
-block failures**, **101,833 certified skipped branches**. Every audited point
-reached 20 failures. All 15 [[74,18]] points, three [[274,110]] ordinary-binary
-points and one [[274,110]] Q-BP point are verified. The remaining campaign is
+Portable audited snapshot: **26/30 points**, **119,093 shots**, **520 quantum
+block failures**, **101,850 certified skipped branches**. Every audited point
+reached 20 failures. All 15 [[74,18]] points, all five [[274,110]] ordinary-binary
+points, all five [[274,110]] Q-BP points and its p=.04 unicycle-SP point are
+verified. The remaining campaign is
 still executing; no full-curve agreement claim is made.
 
 The earlier .04–.10 campaign completed **42/42 points**, **2,366 shots** and
@@ -41,17 +43,19 @@ Counts of active curves / points / codes / circuits:
 
 - Complete old-grid view before retirement: **70 / 381 / 8 / 0**.
 - Existing evidence after retiring the old interval: **64 / 339 / 6 / 0**.
-- Current audited paper-rate snapshot: **68 / 357 / 8 / 0**.
+- Current audited paper-rate snapshot: **69 / 364 / 8 / 0**.
 - Planned complete paper-rate view: **70 / 369 / 8 / 0**, subject to normal
   evidence and two-distinct-rate eligibility checks.
 
-The current view contains five-rate [[74,18]] curves and a three-rate
-[[274,110]] ordinary-binary curve. Its singleton Q-BP result stays hidden.
+The current view contains five-rate [[74,18]] curves and complete ordinary
+binary/Q-BP curves for [[274,110]]. Its singleton unicycle-SP result stays
+hidden until a second error rate completes.
 No old interval is shown or mixed into the new curves. Other historical
 decoders and custom matrix/Stim paths remain available.
 
 Verification: **149 tests passed**, with **63 final focused checks** passing
-after the 19-point refresh. Chromium passed **26 workflow groups** across
+after the initial 19-point refresh. The latest 26-point progress refresh
+passed 41 focused checks and all seven public browser workflow groups. Chromium passed **26 workflow groups** across
 paper-rate and historical-controller overlays, public results and plot/picker
 workflows; the seven public workflow groups passed again on the final actual
 snapshot. Checks include .0195 without rounding, proof prerequisites and
@@ -65,3 +69,7 @@ terminal ledgers, counts, hashes and first/last-shot replay, publishes the new
 portable snapshot and refreshes a clean preview. Inspect actual collector
 status before marking the campaign complete. The README provides safe manual
 collection/publication commands and the proof; do not pool old/new evidence.
+
+Latest results and validated running-prefix diagnostics are recorded in
+[PROGRESS-2026-11-12.md](./PROGRESS-2026-11-12.md), including recovery of one
+already-terminal checkpoint from unnecessary speculative-worker waiting.
