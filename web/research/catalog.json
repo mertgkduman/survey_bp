@@ -20160,7 +20160,7 @@
           "label": "Audited terminal results",
           "local_storage_path": null,
           "path": "data/reproductions/mackay-0304161-paper-rates/verified.json",
-          "sha256": "b2e53c0a8320468d3e8d8cb12b17f76c6ac3f3f510b245b31ce185ee34b1aa25",
+          "sha256": "5742e50c5f6379b0bbb98b7214d7f5d6d9b686fb0e557268dbf3fa239e4db26b",
           "url": "data/reproductions/mackay-0304161-paper-rates/verified.json"
         },
         {
@@ -20567,6 +20567,53 @@
           "work_unit": "iterations",
           "x": 0.06,
           "y": 0.09009009009009009
+        },
+        {
+          "ci_high": 0.06361551501227893,
+          "ci_low": 0.02664002526573439,
+          "failures": 20,
+          "iteration_unit": "branch sweeps",
+          "mean_directed_edge_updates": 183048333.0,
+          "mean_iterations": 19720.785714285714,
+          "mean_seconds": 8.35632889780303,
+          "mean_work": 19720.785714285714,
+          "metadata": {
+            "certified_branches_pruned": 263,
+            "channel": "x_only",
+            "classical_block_error_rate": 0.04329004329004329,
+            "classical_block_errors": 20,
+            "classical_uncertainty": "not inferred from quantum-failure stopping when stabilizer successes occur",
+            "cohort_kind": "paper_rate_validation",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or either nontrivial logical residual",
+            "ledger_sha256": "2f60b0490ee1abb7b15ff5f3931efe444bba204dbf561418bb83a4a1b255cadd",
+            "matched_x_rate": 0.03,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111203,
+            "source_evidence_path": "data/reproductions/mackay-0304161-paper-rates/results/unicycle274-unicycle_sp-p03000/summary.json",
+            "source_target": {
+              "detected_error_approx": 0.022764223914445367,
+              "detected_y_plot": 3142,
+              "p": 0.03,
+              "total_error_approx": 0.048341930691786106,
+              "total_y_plot": 3319,
+              "undetected_error_approx": 0.025535540626942136,
+              "undetected_y_plot": 3169,
+              "x_plot": 4812
+            },
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "0892d09dda4dc4395989344d369de47a8ad26b638907aa2f7b45dd7249008f05",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 462,
+          "source_value": 0.048341930691786106,
+          "status": "complete",
+          "type_i": 7,
+          "type_ii": 13,
+          "work_unit": "iterations",
+          "x": 0.03,
+          "y": 0.04329004329004329
         },
         {
           "ci_high": 0.25005489780887663,
@@ -27449,7 +27496,7 @@
     },
     {
       "path": "data/reproductions/mackay-0304161-paper-rates/catalog.json",
-      "sha256": "84cf7effd06b76df704731429a080e6a51a6bc8fa9502199da1cc6f48f044a04"
+      "sha256": "3d8e3c44d8b2071f49c6eedb9fe1047b6a8db75066e40c89b915a1b1cbe6154a"
     }
   ],
   "limitations": [
@@ -48792,6 +48839,53 @@
       "decoder_id": "mackay-unicycle-paper-rates:unicycle274:unicycle_sp",
       "label": "Unicycle two-hypothesis BP, SP, X-only",
       "points": [
+        {
+          "ci_high": 0.06361551501227893,
+          "ci_low": 0.02664002526573439,
+          "failures": 20,
+          "iteration_unit": "branch sweeps",
+          "mean_directed_edge_updates": 183048333.0,
+          "mean_iterations": 19720.785714285714,
+          "mean_seconds": 8.35632889780303,
+          "mean_work": 19720.785714285714,
+          "metadata": {
+            "certified_branches_pruned": 263,
+            "channel": "x_only",
+            "classical_block_error_rate": 0.04329004329004329,
+            "classical_block_errors": 20,
+            "classical_uncertainty": "not inferred from quantum-failure stopping when stabilizer successes occur",
+            "cohort_kind": "paper_rate_validation",
+            "denominator_definition": "all retained iid shots; syndrome mismatch or either nontrivial logical residual",
+            "ledger_sha256": "2f60b0490ee1abb7b15ff5f3931efe444bba204dbf561418bb83a4a1b255cadd",
+            "matched_x_rate": 0.03,
+            "max_shots": 100000000,
+            "sampling_method": "iid_failure_target_or_shot_cap",
+            "seed": 2026111203,
+            "source_evidence_path": "data/reproductions/mackay-0304161-paper-rates/results/unicycle274-unicycle_sp-p03000/summary.json",
+            "source_target": {
+              "detected_error_approx": 0.022764223914445367,
+              "detected_y_plot": 3142,
+              "p": 0.03,
+              "total_error_approx": 0.048341930691786106,
+              "total_y_plot": 3319,
+              "undetected_error_approx": 0.025535540626942136,
+              "undetected_y_plot": 3169,
+              "x_plot": 4812
+            },
+            "stop_reason": "target_block_failures",
+            "summary_sha256": "0892d09dda4dc4395989344d369de47a8ad26b638907aa2f7b45dd7249008f05",
+            "target_failures": 20,
+            "uncertainty_method": "exact_negative_binomial_interval"
+          },
+          "n": 462,
+          "source_value": 0.048341930691786106,
+          "status": "complete",
+          "type_i": 7,
+          "type_ii": 13,
+          "work_unit": "iterations",
+          "x": 0.03,
+          "y": 0.04329004329004329
+        },
         {
           "ci_high": 0.25005489780887663,
           "ci_low": 0.11058141224374257,
