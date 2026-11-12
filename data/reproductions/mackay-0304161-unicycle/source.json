@@ -1,0 +1,42 @@
+{
+  "campaign_interpretation": "Controlled X-only sweep and matched-marginal depolarizing Q-BP; no claim of source-curve reproduction.",
+  "construction": {
+    "extra_column": "all ones",
+    "keep_redundant_checks": true,
+    "length_273_difference_set": "project generated over GF(4096)/GF(16); exact author ordering unavailable",
+    "lengths": [
+      74,
+      274
+    ]
+  },
+  "decoding": {
+    "source_float_precision": null,
+    "source_iteration_cap": null,
+    "source_numerical_stabilization": null,
+    "source_rule": "sum_product",
+    "unicycle": "condition extra bit on 0 and 1; select maximum-likelihood valid candidate"
+  },
+  "excluded_scope": "Random bicycle and other constructions are not included in this initial deterministic Construction U campaign.",
+  "paper": "https://arxiv.org/abs/quant-ph/0304161v3",
+  "schema": "mackay-unicycle-source-qualification-v1",
+  "source_archive_sha256": "fad6f31421f0ef198009f1f75de482ddaab0e3b1c1c8b25a44344a640359030e",
+  "source_archive_url": "https://arxiv.org/src/quant-ph/0304161v3",
+  "source_metrics": "Published Construction U plots use classical block errors; the campaign evaluates quantum stabilizer equivalence.",
+  "source_sections": {
+    "channel": "5",
+    "construction": "4.6 Construction U",
+    "results": "6.2; extended-version Figure 15"
+  },
+  "tex_member_sha256": {
+    "commands.tex": "322d788690682f77b727fce583ed236632f701d4389b638c583f8b3c8d62a4dd",
+    "djcmsection.tex": "4784d44728d9fc9aa02c57163b4dcb1b1f1b990535d6952782e2fb88abc3384f",
+    "gjmsection.tex": "4c369c32ddb2314053338a1f7cd26735cf12511504f16d0f5517cdc61c0dfac6",
+    "intro.tex": "8c4217f705024e772b4bfc0070a7e934e95d7e62f85f8b4cef1688e6a281d78b",
+    "newcommands1.tex": "9f883aa412518ce948d4b4832666af86bc14370d73851a29cd3e35ed658abdc2",
+    "psfig.tex": "01f962819dd23356522eaab039f6741a62e4fa4a32871ae0f528573ef0300c55",
+    "qeccE.tex": "efd77ca7b99415d463bcfa15706346f2eb4c4067d4231f21b59a9a88f0ca534f",
+    "section2.1.tail.tex": "256da4f2931a3ced299909a127ac7c583f68f70f356fa0440b3391e9381e2822",
+    "section2.3.1.tex": "107e767c54238aa648801449da05034f57ef909a0529ddb139577440f4f3fce4",
+    "section2.3.4.tex": "6cdf0444ee86fd4cf56bdfd2124368b8308ddc6375231b16fac87d8ea53f24d9"
+  }
+}

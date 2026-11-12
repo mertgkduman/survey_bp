@@ -101,5 +101,8 @@
     "data/studies/phase11-bb72-joint-separate.json",
     "data/studies/phase11-gb46-joint-separate.json",
     "data/studies/phase11-policy-comparisons.json"
+  ],
+  "normalized_catalogs": [
+    "data/reproductions/mackay-0304161-unicycle/catalog.json"
   ]
 }

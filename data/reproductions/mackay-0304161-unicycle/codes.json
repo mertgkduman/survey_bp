@@ -1,0 +1,58 @@
+{
+  "unicycle274": {
+    "artifact": "codes/unicycle274.npz",
+    "checks_per_component": 273,
+    "difference_set": [
+      39,
+      59,
+      78,
+      83,
+      89,
+      91,
+      118,
+      125,
+      156,
+      166,
+      178,
+      181,
+      182,
+      199,
+      227,
+      236,
+      250
+    ],
+    "distance_status": "not_independently_computed; source classical constituent distances are not quantum distances",
+    "edges_per_component": 4914,
+    "k": 110,
+    "logical_basis": "project_free_column_order_quotient_basis_paired_XZ",
+    "n": 274,
+    "ordering_status": "project_generated_Singer_set_row_major_circulant",
+    "rank_per_component": 82,
+    "raw_sha256": "1b9db00324dc3e52636deecfb92559005e31a4ed7a2200e8088421f4409ee81c",
+    "semantic_sha256": "d811d419cb23f8aabe91375b35d37525c2010e7a2f357d53843166a3e0f65d24"
+  },
+  "unicycle74": {
+    "artifact": "codes/unicycle74.npz",
+    "checks_per_component": 73,
+    "difference_set": [
+      2,
+      8,
+      15,
+      19,
+      20,
+      34,
+      42,
+      44,
+      72
+    ],
+    "distance_status": "not_independently_computed; source classical constituent distances are not quantum distances",
+    "edges_per_component": 730,
+    "k": 18,
+    "logical_basis": "project_free_column_order_quotient_basis_paired_XZ",
+    "n": 74,
+    "ordering_status": "explicit_source_difference_set_row_major_circulant",
+    "rank_per_component": 28,
+    "raw_sha256": "63d4611d984507a6d58294ba216db5dabf3c72578a934cfcee5a2d52b9332834",
+    "semantic_sha256": "b2cc4e860701b662e8a3137415f9151490e61a1e95ad913a32f607749675ce53"
+  }
+}

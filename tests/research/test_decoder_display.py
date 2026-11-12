@@ -86,3 +86,20 @@ console.log(JSON.stringify(Object.fromEntries(Object.entries(plan.arms).map(([id
         label = labels[f"{code}:qbp"]
         assert label.startswith("Q-BP, SP") and f"T = {limit}" in label
         assert "d = 0.1" in label and "noise = depolarizing" in label
+
+
+def test_unicycle_branch_controller_is_distinct_from_guided_decimation():
+    script = """require('./web/research/decoder-display.js');require('./web/research/curve-projection.js');
+const plan=require('./data/reproductions/mackay-0304161-unicycle/plan.json');
+const decoders=Object.entries(plan.arms).map(([id,settings])=>({decoder_id:id,configuration:{effective_configuration:settings}}));
+const series=decoders.map(d=>({series_id:d.decoder_id,decoder_id:d.decoder_id,dataset_id:'u',code_id:'unicycle74',channel_kind:plan.arms[d.decoder_id].noise_model,
+points:[.04,.05].map(x=>({x,y:.1,n:100,failures:10,ci_low:.04,ci_high:.2,status:'complete',metadata:{denominator_definition:'quantum block failure'}}))}));
+const c={decoders,result_series:series,codes:[{code_id:'unicycle74'}],circuits:[],datasets:[{dataset_id:'u',evidence_status:'controlled_local_baseline'}]};
+const labels=DecoderDisplay.labels(c);console.log(JSON.stringify({labels:Object.fromEntries([...labels].map(([id,d])=>[id,d.label])),active:ResearchCurves.active(c,labels).curves}));"""
+    value = json.loads(subprocess.check_output(['node', '-e', script], cwd=ROOT, text=True))
+    assert len(value['active']) == 3
+    label = value['labels']['unicycle_sp']
+    assert label.startswith('Unicycle BP, SP') and 'Tₕ = 44100' in label and 'H = 2' in label
+    assert 'T = 88200' in label and 'noise = X-only' in label
+    assert value['labels']['binary_sp'].startswith('Binary BP, SP')
+    assert value['labels']['qbp'].startswith('Q-BP, SP')

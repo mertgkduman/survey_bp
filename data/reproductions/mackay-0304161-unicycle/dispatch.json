@@ -1,0 +1,44 @@
+{
+  "collect": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=1",
+      "--mem=4G",
+      "--requeue",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+      "--job-name=mackay-unicycle-audit",
+      "--dependency=afterany:61698133",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-unicycle/results/collect-%j.log",
+      "--wrap=/hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-unicycle/run.py --collect && /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-unicycle/publish.py && /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-unicycle/refresh_catalog.py"
+    ],
+    "id": "61698134"
+  },
+  "points": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--cpus-per-task=1",
+      "--mem=4G",
+      "--requeue",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+      "--job-name=mackay-unicycle",
+      "--array=0-41%42",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-unicycle/results/slurm-%A_%a.log",
+      "--wrap=exec /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-unicycle/run.py --index \"$SLURM_ARRAY_TASK_ID\""
+    ],
+    "id": "61698133"
+  }
+}

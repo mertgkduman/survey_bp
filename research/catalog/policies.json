@@ -472,6 +472,45 @@
       "source_url": "https://arxiv.org/abs/2512.07057v2",
       "source_label": "BeamSearch primary source",
       "source_note": "BeamSearch primary source. The displayed controller equations are the controlled CSS adaptation's transparent abstraction, not a claim that it reproduces every source branch transition."
+    },
+    {
+      "id": "unicycle_extra_bit_hypotheses",
+      "label": "Unicycle extra-bit hypotheses",
+      "category": "candidate selection",
+      "equations": [
+        "C\\widehat e_b=s\\oplus b\\mathbf{1},\\qquad b\\in\\{0,1\\}",
+        "\\widehat e=\\operatorname*{arg\\,max}_{e\\in\\mathcal V}p^{|e|}(1-p)^{n-|e|}",
+        "W_{\\mathrm{iterations}}=T_0+T_1"
+      ],
+      "notation": "C omits the extra all-one column. Each branch fixes that bit to b and runs sum-product on the conditioned syndrome. V contains the full syndrome-valid candidates, including the extra bit. No valid candidate means a block failure.",
+      "parameters": [
+        {
+          "symbol": "iterations_per_branch",
+          "meaning": "44,100 sweeps per hypothesis; both branches count toward the 88,200 total ceiling."
+        },
+        {
+          "symbol": "tie_break",
+          "meaning": "Equal likelihood selects extra bit zero. The prior likelihood includes every physical qubit."
+        }
+      ],
+      "execution_status": "source_command_only",
+      "execution": {
+        "custom_builder": {
+          "status": "unavailable",
+          "scope": "The visual builder cannot execute this candidate-selection wrapper; original run commands preserve it."
+        },
+        "registered_study": {
+          "status": "source_command_campaign",
+          "scope": "The frozen mackay-0304161-unicycle campaign uses existing canonical binary kernels and audited per-branch work."
+        },
+        "circuit": {
+          "status": "unavailable",
+          "scope": "Construction U code-capacity experiment only."
+        }
+      },
+      "source_url": "https://arxiv.org/abs/quant-ph/0304161v3",
+      "source_label": "MacKay et al. Construction U",
+      "source_note": "Source-derived mechanism with controlled noise, iteration ceiling and numerical settings; no paper-curve agreement claim."
     }
   ],
   "code_families": [
@@ -564,6 +603,19 @@
       "circuits": [],
       "availability": "not_registered",
       "notes": "The source-fixture archive contains color-memory circuits, but inputs.json currently registers no color-code input or circuit for the builder."
+    },
+    {
+      "id": "unicycle",
+      "label": "MacKay unicycle (Construction U)",
+      "code_ids": [
+        "unicycle74",
+        "unicycle274"
+      ],
+      "circuit_code_ids": [],
+      "circuits": [],
+      "availability": "registered_css_artifact",
+      "notes": "Frozen [[74,18]] and [[274,110]] CSS inputs. The length-273 difference-set ordering is project generated; logical bases are project derived.",
+      "source_url": "https://arxiv.org/abs/quant-ph/0304161v3"
     }
   ]
 }

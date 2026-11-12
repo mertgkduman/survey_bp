@@ -102,6 +102,30 @@
         "kind": "unsupported",
         "reason": "Indexed parity-check evidence; no portable CSS/logical construction is registered for this custom runner."
       }
+    },
+    {
+      "code_id": "unicycle74",
+      "aliases": [],
+      "label": "MacKay unicycle [[74,18]]",
+      "artifact_path": "data/reproductions/mackay-0304161-unicycle/codes/unicycle74.npz",
+      "asset_label": "Frozen Construction U CSS input",
+      "asset_kind": "code_artifact",
+      "execution": {
+        "kind": "css_artifact",
+        "path": "data/reproductions/mackay-0304161-unicycle/codes/unicycle74.npz"
+      }
+    },
+    {
+      "code_id": "unicycle274",
+      "aliases": [],
+      "label": "MacKay unicycle [[274,110]]",
+      "artifact_path": "data/reproductions/mackay-0304161-unicycle/codes/unicycle274.npz",
+      "asset_label": "Frozen Construction U CSS input",
+      "asset_kind": "code_artifact",
+      "execution": {
+        "kind": "css_artifact",
+        "path": "data/reproductions/mackay-0304161-unicycle/codes/unicycle274.npz"
+      }
     }
   ],
   "circuits": [
