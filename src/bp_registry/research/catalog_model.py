@@ -28,6 +28,10 @@ def validate_catalog(catalog: dict[str, Any]) -> dict[str, Any]:
                 raise ValueError(f"catalog.{kind} has a missing or duplicate {field}: {identifier}")
             index[identifier] = record
         indexes[kind] = index
+    retired = catalog.get("public_retired_dataset_ids", [])
+    if (not isinstance(retired, list) or any(not isinstance(value, str) for value in retired)
+            or len(set(retired)) != len(retired) or set(retired) - indexes["datasets"].keys()):
+        raise ValueError("public retired datasets must name unique retained dataset identities")
     for dataset in catalog["datasets"]:
         for paper in dataset.get("paper_ids", [dataset.get("paper_id")]):
             if paper not in indexes["papers"]:

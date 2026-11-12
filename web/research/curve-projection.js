@@ -74,7 +74,8 @@ const retiredBounded=(series,point)=>supersededBpgd(series)&&role(point)==='boun
 function projectEvidence(catalog,displayMap){
  const candidates=[];
  const decoders=new Map((catalog.decoders||[]).map(d=>[d.decoder_id,d]));
- const visibleDatasets=new Set((catalog.datasets||[]).filter(d=>!['source_transcription','published_source_values'].includes(d.evidence_status)).map(d=>d.dataset_id));
+ const retiredDatasets=new Set(catalog.public_retired_dataset_ids||[]);
+ const visibleDatasets=new Set((catalog.datasets||[]).filter(d=>!retiredDatasets.has(d.dataset_id)&&!['source_transcription','published_source_values'].includes(d.evidence_status)).map(d=>d.dataset_id));
  for(const source of catalog.result_series||[]){
   if(!visibleDatasets.has(source.dataset_id))continue;
   const display=displayMap?.get?.(source.series_id)||{};

@@ -1,0 +1,271 @@
+{
+  "arms": {
+    "binary_sp": {
+      "branch_count": 1,
+      "check_cap": null,
+      "check_rule": "sum_product",
+      "family": "binary_css",
+      "iterations_per_branch": 88200,
+      "max_iterations": 88200,
+      "mechanism": "ordinary_binary_bp",
+      "message_resolution": "float64",
+      "noise_model": "x_only",
+      "numerical_profile": "binary-spa-flooding-f64-v2",
+      "prior": "p",
+      "product_epsilon": 1e-10,
+      "schedule": "flooding",
+      "v2c_damping": 0.0
+    },
+    "qbp": {
+      "branch_count": 1,
+      "check_cap": null,
+      "check_rule": "sum_product",
+      "family": "bp4",
+      "iterations_per_branch": 88200,
+      "max_iterations": 88200,
+      "mechanism": "joint_pauli_bp",
+      "message_resolution": "float64",
+      "noise_model": "depolarizing",
+      "numerical_profile": "quaternary-bp4-f64-v2",
+      "prior": "p",
+      "product_epsilon": 1e-10,
+      "schedule": "flooding",
+      "v2c_damping": 0.1
+    },
+    "unicycle_sp": {
+      "branch_count": 2,
+      "check_cap": null,
+      "check_rule": "sum_product",
+      "controller": {
+        "branch_count": 2,
+        "certified_pruning": "skip_second_if_first_valid_and_twice_weight_below_distance_bound",
+        "distance_bound": "q_plus_2_for_extended_projective_plane_incidence_code",
+        "hypothesis_order": "syndrome_majority_then_other; independent_branch_states",
+        "iterations_per_branch": 44100,
+        "kind": "unicycle_extra_bit_hypotheses",
+        "minimum_distance_bounds": {
+          "unicycle274": 18,
+          "unicycle74": 10
+        },
+        "selection": "valid_maximum_likelihood",
+        "tie_break": "extra_bit_zero",
+        "work_accounting": "executed_branch_sweeps_only; skipped_branch_zero"
+      },
+      "family": "binary_css",
+      "iterations_per_branch": 44100,
+      "max_iterations": 88200,
+      "mechanism": "condition_extra_bit_on_zero_and_one_then_select_valid_maximum_likelihood",
+      "message_resolution": "float64",
+      "noise_model": "x_only",
+      "numerical_profile": "binary-spa-flooding-f64-v2",
+      "prior": "p",
+      "product_epsilon": 1e-10,
+      "schedule": "flooding",
+      "tie_break": "extra_bit_zero",
+      "v2c_damping": 0.0
+    }
+  },
+  "claim_limit": "Paper error-rate grid; length-274 unicycle SP is the direct source comparison. Other arms are controlled comparisons. Classical source block errors and quantum stabilizer equivalence are recorded separately. Numerical conventions and the 88,200 total-sweep ceiling remain controlled settings. Certified pruning preserves the selected candidate and changes executed work; work is not pooled with the original unpruned arm.",
+  "codes": {
+    "unicycle274": {
+      "artifact": "codes/unicycle274.npz",
+      "checks_per_component": 273,
+      "difference_set": [
+        39,
+        59,
+        78,
+        83,
+        89,
+        91,
+        118,
+        125,
+        156,
+        166,
+        178,
+        181,
+        182,
+        199,
+        227,
+        236,
+        250
+      ],
+      "distance_status": "not_independently_computed; source classical constituent distances are not quantum distances",
+      "edges_per_component": 4914,
+      "k": 110,
+      "logical_basis": "project_free_column_order_quotient_basis_paired_XZ",
+      "n": 274,
+      "ordering_status": "project_generated_Singer_set_row_major_circulant",
+      "rank_per_component": 82,
+      "raw_sha256": "1b9db00324dc3e52636deecfb92559005e31a4ed7a2200e8088421f4409ee81c",
+      "semantic_sha256": "d811d419cb23f8aabe91375b35d37525c2010e7a2f357d53843166a3e0f65d24"
+    },
+    "unicycle74": {
+      "artifact": "codes/unicycle74.npz",
+      "checks_per_component": 73,
+      "difference_set": [
+        2,
+        8,
+        15,
+        19,
+        20,
+        34,
+        42,
+        44,
+        72
+      ],
+      "distance_status": "not_independently_computed; source classical constituent distances are not quantum distances",
+      "edges_per_component": 730,
+      "k": 18,
+      "logical_basis": "project_free_column_order_quotient_basis_paired_XZ",
+      "n": 74,
+      "ordering_status": "explicit_source_difference_set_row_major_circulant",
+      "rank_per_component": 28,
+      "raw_sha256": "63d4611d984507a6d58294ba216db5dabf3c72578a934cfcee5a2d52b9332834",
+      "semantic_sha256": "b2cc4e860701b662e8a3137415f9151490e61a1e95ad913a32f607749675ce53"
+    }
+  },
+  "evidence_status": "source_informed_canonical_adaptation",
+  "implementation_sha256": {
+    "data/reproductions/mackay-0304161-paper-rates/run.py": "10cb9983fb2cb1660ecb07668dc54cebc279f2f90d4d543ee40eaceebf83d403",
+    "data/reproductions/mackay-0304161-paper-rates/source_points.json": "d4d0b390943a5654d914a0a801bc7794a8c91615a128aa934dc6f414dae91c35",
+    "data/reproductions/mackay-0304161-unicycle/codes.json": "3e8bfec031c6f3291599669e85fc3369caefa9113d4bc05b11d43d21d8ce7d7b",
+    "data/reproductions/mackay-0304161-unicycle/codes/unicycle274.npz": "1b9db00324dc3e52636deecfb92559005e31a4ed7a2200e8088421f4409ee81c",
+    "data/reproductions/mackay-0304161-unicycle/codes/unicycle74.npz": "63d4611d984507a6d58294ba216db5dabf3c72578a934cfcee5a2d52b9332834",
+    "data/reproductions/mackay-0304161-unicycle/run.py": "73eee81703693e6bafd5b4db076b6f55749407a9340873938dd90940897376d3",
+    "data/reproductions/mackay-0304161-unicycle/source.json": "05a8196bedf8f80e35b15ee95cecfb0c2c8612c7c775ea69b584e941b11a7385",
+    "data/reproductions/yao-2312-10950-bpgd-completion/run.py": "9039e5987330d873090d4346fd906bd7b957f8d1bf000645e9b34e412f96b855",
+    "data/reproductions/yao-2312-10950-non-osd/codes.json": "68e644bf28d8c217ed07bfddf44cd1ff03ce2f3a6de4076407d63bd57d252cac",
+    "data/reproductions/yao-2312-10950-non-osd/run_point.py": "89bbc5a825d545dd890ef59a5ed1f7642c1458615fb9b810dae587824d0fee78",
+    "data/reproductions/yao-2312-10950-non-osd/source_points.json": "f42c214770997ae514a4fb0347b52776cb93a8fa800483a4a2215905711aada9",
+    "src/bp_registry/artifacts.py": "f849d5bf59cf3c49c9ad3b3d81c5f0d0dd29ccb849ed326bfa4358c8143772ad",
+    "src/bp_registry/canonical/compiled.py": "59d0ff3e917bde882f37380388fff98283bd900290af41ef630e4e0cc9ea124a",
+    "src/bp_registry/canonical/kernel.py": "1fe94ecd88959367a503be24a8ba1b9102f178f20928a971b2dd98ebf0cec262",
+    "src/bp_registry/canonical/numerics.py": "7e0c176f5dfcbf9e5bf5ddfa8c932bd36f506de7894bd8a114ddcd8edaf8fd85",
+    "src/bp_registry/canonical/schedules.py": "f562c1507bfa48b4d8c1fff8a54b4285bdc6c3718036a5057b01f98902659015",
+    "src/bp_registry/canonical/update_context.py": "433d652d473bdd20f093a16229ab71d2afa0cb8aa88d673166fdc599efbdfa9e",
+    "src/bp_registry/check_numerics.py": "363da286d3c8e155fca742e8f366c52c3558652e4a3047a8cf82455f2a0bb07e",
+    "src/bp_registry/code_constructions.py": "d541281fc93cc26906fe3baa968070ac90a9056b370f94250029b9cacb00f004",
+    "src/bp_registry/compiled_contracts.py": "0ba497deffa1cd9837ddc1158520cb7328d3cb4eb582fb2e130212597e733abb",
+    "src/bp_registry/css.py": "898da0ba65a326c4eec887d17f32d6d745d7b50840b1f850deafc0bbc5b2c41a",
+    "src/bp_registry/profile_contracts.py": "4021a27cbad2a424ea55c445eb133fd1d8ee1409c66284c52175bdf0db94a59c",
+    "src/bp_registry/quaternary/algebra.py": "32fff80358ea45310e4d7ce6a324c64d8a3e198976482c9a8a248cde960a8a3f",
+    "src/bp_registry/quaternary/compiled.py": "5ca0850e10f19ecb1e3c1e20b4b6fdaa9ed2a499375a41ce4ddbb754f5608e9b",
+    "src/bp_registry/quaternary/kernel.py": "6a13a2d0da70ec9a458d7d3b43a860d474ec6a04c5b1914f7c7a3dd102a8366d",
+    "src/bp_registry/quaternary/numerics.py": "d3368e2dd8a15f2e78d67d345f346204361df51e685127a2cbd8870a0036b199",
+    "src/bp_registry/quaternary/problems.py": "09b3d4302e538996bded44e5d9393211b8aeefc852ff11430c3e66655c5036d2",
+    "src/bp_registry/resolution.py": "81d0a70c6b9ac370cc1f45d3e9a031d503d9765ec3aad5f3301b4e2f9ade8ab3",
+    "src/bp_registry/unicycle.py": "6fcf71dcf87eb70117ca580e994297595b6fbf2bcd582d0846798a3f74f971ac"
+  },
+  "matched_rates": [
+    {
+      "depolarizing": 0.015,
+      "x_only": 0.01
+    },
+    {
+      "depolarizing": 0.0195,
+      "x_only": 0.013
+    },
+    {
+      "depolarizing": 0.03,
+      "x_only": 0.02
+    },
+    {
+      "depolarizing": 0.045,
+      "x_only": 0.03
+    },
+    {
+      "depolarizing": 0.06,
+      "x_only": 0.04
+    }
+  ],
+  "paper": "https://arxiv.org/abs/quant-ph/0304161v3",
+  "parent_plan_sha256": "39129d18d927197f066e9e5de544a6460922be292ce9cfcaacf892cb534de3fa",
+  "sampler": "PCG64 SeedSequence(seed, physical_p * 100000, shot); shared X-only stream across binary arms",
+  "schema": "mackay-paper-rates-plan-v1",
+  "seed": 2026111203,
+  "software": {
+    "numba": "0.64.0",
+    "numpy": "2.2.6",
+    "python": "3.12.2",
+    "scipy": "1.17.1"
+  },
+  "source_plot": {
+    "calibration": {
+      "x_001": 1462,
+      "x_004": 5689,
+      "x_logarithmic": true,
+      "y_1": 4031,
+      "y_1e_minus_6": 784
+    },
+    "figure_member": "figs/BSClDSC.273.82C.ps",
+    "figure_sha256": "6f690b1aa3409b030e01997189de3299288cec386d2d7eb1bcc030b369af93b1",
+    "ordinate_status": "approximated from integer vector-plot coordinates; raw author sample counts unavailable",
+    "paper": "https://arxiv.org/abs/quant-ph/0304161v3",
+    "plot_url": "https://arxiv.org/html/quant-ph/0304161v3/BSClDSC.273.82C.png",
+    "points": {
+      "0.010": {
+        "detected_error_approx": 2.4230076707960674e-06,
+        "detected_y_plot": 992,
+        "p": 0.01,
+        "total_error_approx": 6.6987415854056715e-06,
+        "total_y_plot": 1231,
+        "undetected_error_approx": 4.266975122962334e-06,
+        "undetected_y_plot": 1125,
+        "x_plot": 1462
+      },
+      "0.013": {
+        "detected_error_approx": 3.1656432071852285e-05,
+        "detected_y_plot": 1596,
+        "p": 0.013,
+        "total_error_approx": 7.074690124032609e-05,
+        "total_y_plot": 1785,
+        "undetected_error_approx": 3.916110548076335e-05,
+        "undetected_y_plot": 1646,
+        "x_plot": 2262
+      },
+      "0.020": {
+        "detected_error_approx": 0.0011385699480690684,
+        "detected_y_plot": 2438,
+        "p": 0.02,
+        "total_error_approx": 0.002230085570009857,
+        "total_y_plot": 2596,
+        "undetected_error_approx": 0.0010911416185356107,
+        "undetected_y_plot": 2428,
+        "x_plot": 3576
+      },
+      "0.030": {
+        "detected_error_approx": 0.022764223914445367,
+        "detected_y_plot": 3142,
+        "p": 0.03,
+        "total_error_approx": 0.048341930691786106,
+        "total_y_plot": 3319,
+        "undetected_error_approx": 0.025535540626942136,
+        "undetected_y_plot": 3169,
+        "x_plot": 4812
+      },
+      "0.040": {
+        "detected_error_approx": 0.09922297800034281,
+        "detected_y_plot": 3488,
+        "p": 0.04,
+        "total_error_approx": 0.18078419336055465,
+        "total_y_plot": 3629,
+        "undetected_error_approx": 0.08158507508898437,
+        "undetected_y_plot": 3442,
+        "x_plot": 5689
+      }
+    },
+    "schema": "mackay-unicycle-source-plot-v1",
+    "source_archive_sha256": "fad6f31421f0ef198009f1f75de482ddaab0e3b1c1c8b25a44344a640359030e",
+    "source_channel": "binary symmetric channel",
+    "source_code_length": 274,
+    "source_metric": "classical block error; detected and undetected errors retained"
+  },
+  "stop": {
+    "failure_events": [
+      "type_i",
+      "type_ii"
+    ],
+    "max_shots": 100000000,
+    "target_block_failures": 20
+  }
+}

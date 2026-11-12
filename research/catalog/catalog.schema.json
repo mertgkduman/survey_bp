@@ -14,6 +14,11 @@
     "result_series"
   ],
   "properties": {
+    "public_retired_dataset_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
     "schema_version": {
       "const": 1
     },

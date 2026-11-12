@@ -51,3 +51,14 @@ def test_external_large_data_is_a_storage_declaration_not_a_download(tmp_path):
     assert value["url"] is None
     assert value["availability"] == "external_unverified"
     assert value["checksum_status"] == "declared_unverified"
+
+
+def test_retired_public_datasets_resolve_to_preserved_evidence():
+    base = {kind: [] for kind in ("papers", "decoders", "codes", "circuits", "experiments", "datasets", "result_series")}
+    base['papers'] = [{'paper_id': 'p'}]
+    base['datasets'] = [{'dataset_id': 'd', 'paper_id': 'p'}]
+    valid = {**base, 'public_retired_dataset_ids': ['d']}
+    assert validate_catalog(valid)['datasets'] == base['datasets']
+    for invalid in (['missing'], ['d', 'd'], [{}], 'd'):
+        with pytest.raises(ValueError, match='public retired datasets'):
+            validate_catalog({**base, 'public_retired_dataset_ids': invalid})

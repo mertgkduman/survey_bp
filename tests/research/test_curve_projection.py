@@ -217,15 +217,25 @@ def test_rebuilt_catalog_uses_same_active_view_as_browser_and_preserves_retained
     from bp_registry.research.catalog import build_catalog
     c = build_catalog(ROOT)
     view = active_view(c)
-    legacy = [s for s in view['curves'] if s['dataset_id'] not in {'yao-bpgd-completion', 'mackay-unicycle-bp'}]
+    legacy = [s for s in view['curves'] if s['dataset_id'] not in {'yao-bpgd-completion', 'mackay-unicycle-bp', 'mackay-unicycle-paper-rates'}]
     assert len(legacy) == 53
     assert sum(len(s['points']) for s in legacy) == 262
-    added = {s['code_id'] for s in view['curves'] if s['dataset_id'] == 'mackay-unicycle-bp'}
+    added = {s['code_id'] for s in view['curves'] if s['dataset_id'] in {'mackay-unicycle-bp', 'mackay-unicycle-paper-rates'}}
     assert {code['code_id'] for code in view['codes']} == {'a5', 'b2', 'b1', 'c2', 'double-gross', 'bb72'} | added
     assert view['circuits'] == []
     assert len(c['codes']) == 9 and len(c['circuits']) == 3
     assert any(s['code_id'] == 'relay-surface-d3' for s in c['result_series'])
     assert all(len({p['x'] for p in s['points']}) >= 2 for s in view['curves'])
+
+
+def test_public_dataset_retirement_preserves_raw_evidence_and_hides_all_choices():
+    record = with_rates(row('a', seed=1, evidence='retained.json'))
+    c = catalog([record])
+    c['codes'] = [{'code_id': 'a5'}]
+    c['circuits'] = []
+    c['public_retired_dataset_ids'] = ['d']
+    assert active_view(c)['curves'] == [] and active_view(c)['codes'] == []
+    assert c['result_series'][0] == record
 
 
 def test_nonphysical_coordinates_cannot_join_a_physical_curve():

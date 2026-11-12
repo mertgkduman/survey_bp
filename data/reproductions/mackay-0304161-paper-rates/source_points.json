@@ -1,0 +1,71 @@
+{
+  "calibration": {
+    "x_001": 1462,
+    "x_004": 5689,
+    "x_logarithmic": true,
+    "y_1": 4031,
+    "y_1e_minus_6": 784
+  },
+  "figure_member": "figs/BSClDSC.273.82C.ps",
+  "figure_sha256": "6f690b1aa3409b030e01997189de3299288cec386d2d7eb1bcc030b369af93b1",
+  "ordinate_status": "approximated from integer vector-plot coordinates; raw author sample counts unavailable",
+  "paper": "https://arxiv.org/abs/quant-ph/0304161v3",
+  "plot_url": "https://arxiv.org/html/quant-ph/0304161v3/BSClDSC.273.82C.png",
+  "points": {
+    "0.010": {
+      "detected_error_approx": 2.4230076707960674e-06,
+      "detected_y_plot": 992,
+      "p": 0.01,
+      "total_error_approx": 6.6987415854056715e-06,
+      "total_y_plot": 1231,
+      "undetected_error_approx": 4.266975122962334e-06,
+      "undetected_y_plot": 1125,
+      "x_plot": 1462
+    },
+    "0.013": {
+      "detected_error_approx": 3.1656432071852285e-05,
+      "detected_y_plot": 1596,
+      "p": 0.013,
+      "total_error_approx": 7.074690124032609e-05,
+      "total_y_plot": 1785,
+      "undetected_error_approx": 3.916110548076335e-05,
+      "undetected_y_plot": 1646,
+      "x_plot": 2262
+    },
+    "0.020": {
+      "detected_error_approx": 0.0011385699480690684,
+      "detected_y_plot": 2438,
+      "p": 0.02,
+      "total_error_approx": 0.002230085570009857,
+      "total_y_plot": 2596,
+      "undetected_error_approx": 0.0010911416185356107,
+      "undetected_y_plot": 2428,
+      "x_plot": 3576
+    },
+    "0.030": {
+      "detected_error_approx": 0.022764223914445367,
+      "detected_y_plot": 3142,
+      "p": 0.03,
+      "total_error_approx": 0.048341930691786106,
+      "total_y_plot": 3319,
+      "undetected_error_approx": 0.025535540626942136,
+      "undetected_y_plot": 3169,
+      "x_plot": 4812
+    },
+    "0.040": {
+      "detected_error_approx": 0.09922297800034281,
+      "detected_y_plot": 3488,
+      "p": 0.04,
+      "total_error_approx": 0.18078419336055465,
+      "total_y_plot": 3629,
+      "undetected_error_approx": 0.08158507508898437,
+      "undetected_y_plot": 3442,
+      "x_plot": 5689
+    }
+  },
+  "schema": "mackay-unicycle-source-plot-v1",
+  "source_archive_sha256": "fad6f31421f0ef198009f1f75de482ddaab0e3b1c1c8b25a44344a640359030e",
+  "source_channel": "binary symmetric channel",
+  "source_code_length": 274,
+  "source_metric": "classical block error; detected and undetected errors retained"
+}

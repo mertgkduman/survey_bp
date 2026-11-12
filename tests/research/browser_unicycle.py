@@ -16,7 +16,10 @@ import sys
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[2]
-STUDY = ROOT / "data/reproductions/mackay-0304161-unicycle"
+PAPER_RATES = '--paper-rates' in sys.argv
+STUDY = ROOT / ("data/reproductions/mackay-0304161-paper-rates" if PAPER_RATES else "data/reproductions/mackay-0304161-unicycle")
+DATASET = 'mackay-unicycle-paper-rates' if PAPER_RATES else 'mackay-unicycle-bp'
+SCHEMA = 'mackay-paper-rates-verification-v1' if PAPER_RATES else 'mackay-unicycle-verification-v1'
 sys.path.insert(0, str(STUDY))
 from publish import extension
 from run import PLAN, jobs, load_plan, sha
@@ -26,7 +29,7 @@ def overlay(base):
     plan = load_plan()
     rows = []
     for job in jobs(plan):
-        if job["matched_x_rate"] not in (.04, .05):
+        if job["matched_x_rate"] not in ((.01, .013) if PAPER_RATES else (.04, .05)):
             continue
         rows.append({"id": job["id"], "code": job["code"], "arm": job["arm"],
                      "physical_p": job["physical_p"], "matched_x_rate": job["matched_x_rate"],
@@ -34,15 +37,25 @@ def overlay(base):
                      "counts": {"type_i": 12, "type_ii": 8, "exact_success": 170, "stabilizer_success": 10},
                      "iterations": 400, "directed_edge_updates": 800 * job["graph_edges"],
                      "decode_ns": 200000, "stop_reason": "target_block_failures",
-                     "ledger_sha256": "a" * 64, "summary_sha256": "b" * 64})
-    extra = extension(plan, {"schema": "mackay-unicycle-verification-v1", "plan_sha256": sha(PLAN), "points": rows})
+                     "ledger_sha256": "a" * 64, "summary_sha256": "b" * 64,
+                     "source_target": plan.get('source_plot', {}).get('points', {}).get(f"{job['matched_x_rate']:.3f}")
+                                      if job['code'] == 'unicycle274' and job['arm'] == 'unicycle_sp' else None,
+                     "classical_block_errors": 30, "classical_block_error_rate": .15,
+                     "certified_branches_pruned": 100 if job['arm'] == 'unicycle_sp' else 0})
+    extra = extension(plan, {"schema": SCHEMA, "plan_sha256": sha(PLAN), "points": rows})
     result = deepcopy(base)
+    # This explicitly synthetic overlay tests the original controller; its
+    # source dataset is now historical in the actual public catalog.
+    other = 'mackay-unicycle-bp' if PAPER_RATES else 'mackay-unicycle-paper-rates'
+    result['public_retired_dataset_ids'] = [id for id in result.get('public_retired_dataset_ids', []) if id != DATASET]
+    if other not in result['public_retired_dataset_ids']:
+        result['public_retired_dataset_ids'].append(other)
     keys = {"papers": "paper_id", "datasets": "dataset_id", "experiments": "experiment_id",
             "decoders": "decoder_id", "result_series": "series_id"}
     for kind, field in keys.items():
         ids = {row[field] for row in extra[kind]}
         result[kind] = [row for row in result[kind] if row[field] not in ids
-                        and not (kind == "result_series" and row["dataset_id"] == "mackay-unicycle-bp")] + extra[kind]
+                        and not (kind == "result_series" and row["dataset_id"] == DATASET)] + extra[kind]
     return result
 
 
@@ -63,7 +76,7 @@ load();""")
         page.wait_for_function("document.querySelector('#catalog-status').textContent.includes('measured')")
         single = deepcopy(catalog)
         for series in single["result_series"]:
-            if series["dataset_id"] == "mackay-unicycle-bp":
+            if series["dataset_id"] == DATASET:
                 series["points"] = series["points"][:1]
         page.evaluate("c=>testRefreshCatalog(c)", single)
         for name in ("unicycle74", "unicycle274"):
@@ -83,6 +96,8 @@ load();""")
             for label in ("Unicycle BP, SP", "Binary BP, SP", "Q-BP, SP"):
                 assert label in labels
             assert "Tₕ = 44100" in labels and "H = 2" in labels
+            if PAPER_RATES:
+                assert f"d_min = {18 if name == 'unicycle274' else 10}" in labels
             assert card.locator(".curve-list input").count() == 3
             table = card.locator("table").inner_text()
             assert "Mean iterations / shot" in table and "Mean directed edge updates / shot" in table
@@ -98,6 +113,9 @@ load();""")
             download.value.save_as(target)
             settings = json.loads(target.read_text())
             assert len(settings["series"]) == 3
+            if PAPER_RATES:
+                assert {p['x'] for s in settings['series'] for p in s['points']} == {.010, .013, .015, .0195}
+                assert all(s['dataset_id'] == DATASET for s in settings['series'])
             assert any(d["configuration"]["effective_configuration"].get("controller", {}).get("kind")
                        == "unicycle_extra_bit_hypotheses" for d in settings["decoders"])
         checks.append("Both registered codes show three distinct curves, full branch settings, both work averages and matching exports")
@@ -121,7 +139,7 @@ load();""")
         checks.append("The 110-logical registered matrix validates; removing displayed results clears stale plot/builder inputs and disables requests")
 
         page.evaluate("c=>testRefreshCatalog(c)", catalog)
-        page.locator("#build-preset").select_option("mackay-unicycle-bp:unicycle74:unicycle_sp")
+        page.locator("#build-preset").select_option(f"{DATASET}:unicycle74:unicycle_sp")
         assert "study-specific execution path" in page.locator("#builder-feedback").inner_text()
         page.locator("#validate-spec").click()
         assert page.locator("#download-package").is_disabled()
@@ -140,5 +158,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--url", required=True)
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument('--paper-rates', action='store_true')
     args = parser.parse_args()
     verify(args.output, args.url)

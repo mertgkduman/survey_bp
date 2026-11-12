@@ -1150,6 +1150,7 @@ def build_catalog(repository: Path) -> dict[str, Any]:
     catalog = {"schema_version": 1, "catalog_kind": "retained_research_evidence", "papers": registry["papers"],
             "studies": _study_records(repository, registry), "experiments": experiments, "decoders": decoders,
             "codes": codes, "circuits": circuits, "channels": input_registry(repository)["channels"], "datasets": datasets, "result_series": series,
+            "public_retired_dataset_ids": registry.get("public_retired_dataset_ids", []),
             "limitations": ["Raw per-shot ledgers are never exported as though tracked when a study marks them local_only.", "A source transcription, canonical adaptation, and source-faithful result are distinct evidence statuses."]}
     from .catalog_model import extend_catalog
     return extend_catalog(catalog, registry, repository)

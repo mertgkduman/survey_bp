@@ -103,6 +103,10 @@
     "data/studies/phase11-policy-comparisons.json"
   ],
   "normalized_catalogs": [
-    "data/reproductions/mackay-0304161-unicycle/catalog.json"
+    "data/reproductions/mackay-0304161-unicycle/catalog.json",
+    "data/reproductions/mackay-0304161-paper-rates/catalog.json"
+  ],
+  "public_retired_dataset_ids": [
+    "mackay-unicycle-bp"
   ]
 }

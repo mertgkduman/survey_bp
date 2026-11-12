@@ -1,14 +1,17 @@
 ---
-status: incomplete
+status: complete
 implementation_status: verified
-campaign_status: running
+campaign_status: complete
 implementation_commit: 8e234a4
 ---
 
 # MacKay Construction U campaign
 
-Implemented and dispatched the foundational-paper follow-up. The simulation
-campaign remains running; this summary does not certify all 42 points complete.
+The foundational-paper follow-up completed all 42 points. Array 61698133
+and final collector 61698134 exited COMPLETED (0:0). The final receipt verifies
+2,366 shots and 840 block failures, including full ledgers and endpoint replay.
+The later paper-rate correction (quick task 261112-k9m) retains these results
+as historical evidence and retires the .04–.10 grid from public v2 views.
 
 - Paper: MacKay, Mitchison and McFadden, *Sparse Graph Codes for Quantum
   Error-Correction*, quant-ph/0304161v3 (2004). Primary archive and member
@@ -28,10 +31,11 @@ campaign remains running; this summary does not certify all 42 points complete.
   plots differ; these are controlled results without a paper-curve claim.
 - Slurm: point array **61698133**, dependent audit/publication **61698134**.
   `dispatch.json` records the exact accepted commands; resume is idempotent.
-- Audited portable snapshot: **22/42** terminal points, **1,697** shots and
-  **440** block failures. Every audited point reached 20 failures. All 21
-  [[74,18]] points and one [[274,110]] Q-BP point are verified, including ledger
-  digests, contiguous stopping prefixes and first/last-shot replay.
+- Final audited portable snapshot: **42/42** terminal points, **2,366** shots
+  and **840** block failures. Every point reached 20 failures. Both codes and
+  all six curves have their seven rates. Ledger digests, contiguous stopping
+  prefixes and first/last-shot replay passed. The earlier 22-point snapshot
+  contained 1,697 shots and 440 failures.
 
 The active workbench changes from **64 curves / 339 points / 6 codes / 0
 circuits** to **67 curves / 360 points / 7 codes / 0 circuits**. Three complete
@@ -56,9 +60,8 @@ Existing kernels, prior campaigns, raw historical data and the archived v1
 interface are unchanged. The data-only normalized catalog extension lets
 future rebuilds use the same central active-view rules.
 
-Remaining work is automated: the array continues to each terminal condition;
-collector 61698134 checks all available terminal ledgers, publishes the final
-portable snapshot and refreshes the preview when the catalog has no concurrent
-edits. Verify the collector's actual status before recording completion. Use
-the README's collect/publish/build commands for an intermediate refresh; never
-infer a final result from a running job or pool these points with other studies.
+Final collection completed successfully. Before the subsequent paper-rate
+retirement, the complete wide-grid view had 70 curves, 381 points, eight codes
+and zero circuits. This campaign is scientifically complete under its frozen
+controlled settings; it does not establish full agreement with the paper's
+curve because its grid overlapped that curve only at p=.04.

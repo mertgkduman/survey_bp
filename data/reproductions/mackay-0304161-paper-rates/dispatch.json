@@ -1,0 +1,86 @@
+{
+  "collect": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--requeue",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+      "--job-name=mackay-paper-audit",
+      "--cpus-per-task=1",
+      "--mem=4G",
+      "--dependency=afterany:61703094:61703095:61703096",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-paper-rates/results/collect-%j.log",
+      "--wrap=/hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-paper-rates/run.py --collect && /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-paper-rates/publish.py && /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-paper-rates/refresh_catalog.py"
+    ],
+    "id": "61703097"
+  },
+  "workers_1": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--requeue",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+      "--job-name=mackay-paper-1c",
+      "--cpus-per-task=1",
+      "--mem=4G",
+      "--array=3,4,8,9,13,14,18,19,23,24,28,29%14",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-paper-rates/results/slurm-%A_%a.log",
+      "--wrap=exec /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-paper-rates/run.py --index \"$SLURM_ARRAY_TASK_ID\""
+    ],
+    "id": "61703096"
+  },
+  "workers_16": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--requeue",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+      "--job-name=mackay-paper-16c",
+      "--cpus-per-task=16",
+      "--mem=8G",
+      "--array=10,11,12%4",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-paper-rates/results/slurm-%A_%a.log",
+      "--wrap=exec /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-paper-rates/run.py --index \"$SLURM_ARRAY_TASK_ID\""
+    ],
+    "id": "61703094"
+  },
+  "workers_4": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--requeue",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+      "--job-name=mackay-paper-4c",
+      "--cpus-per-task=4",
+      "--mem=6G",
+      "--array=0,1,2,5,6,7,15,16,17,20,21,22,25,26,27%12",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-paper-rates/results/slurm-%A_%a.log",
+      "--wrap=exec /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-paper-rates/run.py --index \"$SLURM_ARRAY_TASK_ID\""
+    ],
+    "id": "61703095"
+  }
+}
