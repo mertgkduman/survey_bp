@@ -21,15 +21,15 @@ record zero iterations and updates. It has an explicit controller identity and
 is not pooled with the earlier unpruned work records. No canonical kernel or
 old frozen implementation/plan is changed.
 
-Slurm array **61703094** (16 CPUs) continues the two remaining
-unicycle-SP points (.010 and .013). Task **61703096_13** completed during the latest check. The ordinary binary and Q-BP
+Slurm array **61703094** (16 CPUs) continues the remaining
+unicycle-SP point (.010). Task **61703094_11** (.013) completed with exit 0:0 and its full ledger and endpoints passed audit. The ordinary binary and Q-BP
 sweeps are complete on both codes. Dependent collector **61703097** audits
 and publishes terminal evidence. Accepted commands are retained in `dispatch.json`.
 
-Portable audited snapshot: **28/30 points**, **130,711 shots**, **560 quantum
-block failures**, **112,157 certified skipped branches**. Every audited point
+Portable audited snapshot: **29/30 points**, **599,227 shots**, **580 quantum
+block failures**, **575,727 certified skipped branches**. Every audited point
 reached 20 failures. All 15 [[74,18]] points, all five [[274,110]] ordinary-binary
-points, all five [[274,110]] Q-BP points and its p=.02/.03/.04 unicycle-SP points are
+points, all five [[274,110]] Q-BP points and its p=.013/.02/.03/.04 unicycle-SP points are
 verified. The remaining campaign is
 still executing; no full-curve agreement claim is made.
 
@@ -43,18 +43,18 @@ Counts of active curves / points / codes / circuits:
 
 - Complete old-grid view before retirement: **70 / 381 / 8 / 0**.
 - Existing evidence after retiring the old interval: **64 / 339 / 6 / 0**.
-- Current audited paper-rate snapshot: **70 / 367 / 8 / 0**.
+- Current audited paper-rate snapshot: **70 / 368 / 8 / 0**.
 - Planned complete paper-rate view: **70 / 369 / 8 / 0**, subject to normal
   evidence and two-distinct-rate eligibility checks.
 
 The current view contains five-rate [[74,18]] curves and complete ordinary
-binary/Q-BP curves for [[274,110]]. Its three-point unicycle-SP curve now
-qualifies for public display; two lower-rate points remain running.
+binary/Q-BP curves for [[274,110]]. Its four-point unicycle-SP curve
+qualifies for public display; only p=.010 remains running.
 No old interval is shown or mixed into the new curves. Other historical
 decoders and custom matrix/Stim paths remain available.
 
 Verification: **149 tests passed**, with **63 final focused checks** passing
-after the initial 19-point refresh. The latest 28-point progress refresh
+after the initial 19-point refresh. The latest 29-point progress refresh
 passed 41 focused checks and all seven public browser workflow groups. Chromium passed **26 workflow groups** across
 paper-rate and historical-controller overlays, public results and plot/picker
 workflows; the seven public workflow groups passed again on the final actual
@@ -75,6 +75,9 @@ Latest results and validated running-prefix diagnostics are recorded in
 already-terminal checkpoint from unnecessary speculative-worker waiting.
 
 The completed .020/.030/.040 source points each contain the paper's
-approximate ordinate in their individual 95% intervals. The incomplete low-rate
-measurements are currently lower, mainly through fewer Type I errors; no full
-curve agreement is established. See the latest diagnostic snapshot in PROGRESS.
+approximate ordinate in their individual 95% intervals. At .013 the measured
+20/468,516 = 4.2688e-5 has interval [2.6075e-5, 6.3329e-5], below the paper's
+approximate 7.0747e-5. Both quantum and classical counts are 20 (four Type I,
+sixteen Type II, zero stabilizer successes). The difference is mainly in
+detected/Type I errors. Source iteration and numerical settings remain
+unresolved; no full-curve agreement is established. See PROGRESS for diagnostics.
