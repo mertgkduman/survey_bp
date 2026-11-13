@@ -5,10 +5,10 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Roffe all218 workers completed on one CPU each; final audit running, MacKay rare point continues
-last_updated: "2026-11-13T22:41:48+00:00"
+stopped_at: Roffe218/218 audited and published;109 BP paper points consistent pointwise, MacKay rare point continues
+last_updated: "2026-11-13T23:15:59+00:00"
 last_activity: 2026-11-13
-last_activity_desc: User scheduling override launches all218 Roffe points with one CPU each (array61785159). All workers completed0:0; complete audit61785160 running. MacKay remains active and its continuation reuses existing Roffe receipts.
+last_activity_desc: Quick261113-p1r verifies complete Roffe audit and comparison. All109 ordinary-BP paper values lie in pointwise95% intervals;20-failure precision and canonical-adaptation limits retained. Public88 curves/637 points/12 codes; MacKay continues separately.
 state_head: fdbb98b
 progress:
   total_phases: 14
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-13 — quick261113-oan launches Roffe218 one-CPU points; workers complete, audit running
-Last Activity Description: User requested a CPU for every Roffe point. Quick261113-oan (implementation b121812) adds execution-only launch_all.py with218 one-CPU slots and unchanged frozen science. Array61785159 is accepted; all218 workers completed0:0 with AllocCPUS1. Collector61785160 now performs the complete ledger audit/publication. The rare MacKay four-CPU worker remains running, and its existing continuation was preserved. Shared lock/receipt keys prevent duplicates; running the original frozen submitter after dispatch left its receipt byte-identical. Seven targeted tests and Slurm preflight passed. Original Roffe40-pin plan and older active plans retain their hashes; no canonical or frozen scientific file changed. Scientific agreement is not claimed from dispatch or worker completion. Isolated controls remain20/20 audited; length74 requested paper ordinates remain unavailable in inspected versions.
+Last activity: 2026-11-13 — quick261113-p1r assesses and verifies completed Roffe source curves
+Last Activity Description: Roffe collector61785160 completed0:0 and fully audited/published218 points (9,816 decoder shots/4,360 failures). Quick261113-p1r independently checks source coordinates, counts, work, stopping intervals and receipt hashes: all109 ordinary-BP paper values lie inside pointwise95% intervals; maximum point-estimate deviation22.3%. Four-panel overlay and complete tables are in the Roffe study. Agreement is scoped to current20-failure precision and X-only ordinary BP, with no simultaneous curve/native numerical identity or BP-OSD claim.109 Q-BP/depolarizing points remain separate. Source archive re-extraction and frozen40-pin plan pass. Passed54 catalog checks and12 browser groups; public88 curves/637 points/12 codes/0 circuits. All157 prior raw series/points unchanged, no canonical/frozen/v1 edits. Roffe is complete; MacKay's separate rare point remains running. Phase11 gates unchanged.
 
 Completed campaign: See the [paper-rate task summary](./quick/261112-k9m-run-mackay-bp-campaign-at-the-five-publi/261112-k9m-SUMMARY.md). Source-plot coordinates and the exact five rates are pinned. The retained historical curves used 20 block failures or 100 million shots per rate and the 88,200 total-sweep ceiling; the new inferred-budget campaign is recorded above. Classical errors are recorded separately from quantum failures. No full-curve agreement is claimed.
 
@@ -306,7 +306,8 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
-| 261113-oan | Launch Roffe with one CPU for each of218 points | 2026-11-13 | b121812 | Dispatch verified;218 workers complete, final audit running | [261113-oan](./quick/261113-oan-launch-all-218-roffe-points-concurrently/) |
+| 261113-p1r | Assess completed Roffe curves and verify publication | 2026-11-13 | efc3e6a | Complete;109/109 source points consistent pointwise | [261113-p1r](./quick/261113-p1r-assess-completed-roffe-figure-3-results-/) |
+| 261113-oan | Launch Roffe with one CPU for each of218 points | 2026-11-13 | b121812 | Complete218-point audit/publication; see p1r assessment | [261113-oan](./quick/261113-oan-launch-all-218-roffe-points-concurrently/) |
 | 261113-mmo | Isolate undamped Q-BP under matched noise; verify length74 source ordinates | 2026-11-13 | bd08a80 | Complete controls; five paper ordinates unavailable, summary extracted | [261113-mmo](./quick/261113-mmo-add-independent-undamped-q-bp-and-matche/) |
 | 261113-hk2 | Infer short MacKay cap, retain long curves, replace oversized damping | 2026-11-13 | 1b040da | T100 baseline published; confirmation 39/40, continuation via mmo controls | [261113-hk2-replace-oversized-mackay-damping-ceiling](./quick/261113-hk2-replace-oversized-mackay-damping-ceiling/) |
 | 261113-ggu | Tune MacKay BP/Q-BP damping; then reproduce early BP-OSD paper regular BP | 2026-11-13 | ad689b0 | Setup verified; Superseded: oversized damping canceled; continuation moved to hk2 | [261113-ggu-tune-mackay-bp-and-q-bp-damping-and-repr](./quick/261113-ggu-tune-mackay-bp-and-q-bp-damping-and-repr/) |

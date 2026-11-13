@@ -1,7 +1,7 @@
 ---
 status: complete
 implementation_status: verified
-campaign_status: workers_complete_audit_running
+campaign_status: audited_published
 implementation_commit: b121812
 ---
 
@@ -35,3 +35,10 @@ not claim audited scientific completion, curve agreement or publication.
 
 This quick dispatch task is complete. Scientific collection/publication remains
 running at this snapshot; counts and status are in launch-status.json.
+
+
+Completed-audit follow-up: collector61785160 completed0:0 and published all218
+points. See quick261113-p1r for the independent source assessment and full
+browser verification. All109 ordinary-BP source ordinates are inside our
+pointwise95% intervals at20-failure precision; no simultaneous reproduction or
+BP-OSD claim is made. The earlier audit-running statements are historical.
