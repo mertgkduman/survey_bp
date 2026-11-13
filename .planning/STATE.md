@@ -5,10 +5,10 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: T100 confirmation 38 of 40 points audited; two rare Q-BP points running, then Roffe T=n
-last_updated: "2026-11-13T19:20:30+00:00"
+stopped_at: T100 confirmation 39 of 40 points audited; p=.015 Q-BP running, then Roffe T=n
+last_updated: "2026-11-13T20:58:59+00:00"
 last_activity: 2026-11-13
-last_activity_desc: Audited all 38 completed T100 confirmation points (5,842,388 shots / 760 failures). Two low-noise length-274 Q-BP points remain running; Roffe T=n awaits complete confirmation. Old curves and raw evidence preserved.
+last_activity_desc: T100 confirmation 39/40 audited (12,619,245 shots / 780 failures). New p=.0195 Q-BP LER 2.95122e-6, mean iterations 1.07916; p=.015 remains running. Roffe T=n awaits complete confirmation.
 state_head: fdbb98b
 progress:
   total_phases: 14
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-13 — quick 261113-hk2 confirmation results checked; 38/40 audited, two rare Q-BP points continue
-Last Activity Description: Checked independent T100 damping confirmation with a full audit of all 38 terminal points: 5,842,388 shots / 760 failures, exact hashes/counts/work and endpoint replay passed. Two length-274 selected Q-BP points (depolarizing p=.015/.0195) are still running toward 20 failures or 100 million shots. Damping shows substantial low-rate gains, with nonuniform work tradeoffs; detailed original/selected comparisons and live counters are in hk2 RESULTS-CHECK and confirmation/progress.json. Roffe remains undispatched until the complete confirmation audit succeeds. All four frozen study plans pass their pins. Prior baseline 30/30 and training 140/140 audits are retained, historical 88,200 curves remain displayed, oversized damping remains canceled, and public catalogs are unchanged during this check. No new simulations or canonical-kernel changes.
+Last activity: 2026-11-13 — quick 261113-hk2 confirmation 39/40 audited; one rare Q-BP point continues
+Last Activity Description: T100 independent confirmation has 39/40 points audited, totaling 12,619,245 decoder shots / 780 failures. The newly terminal length-274 Q-BP d=.95 at depolarizing p=.0195 passed full-ledger/count/work and endpoint replay checks: 20 failures / 6,776,857 shots, LER 2.95122e-6, mean iterations 1.07916 (original damping .1: LER .0204082, mean iterations 3.05714). Prior 38 audits were reused after receipt/plan/manifest/summary hash checks. Only p=.015 remains live (0 failures / 9,274,432 shots at 2026-11-13T20:58:59+00:00); it continues to 20 failures or 100 million shots. Roffe waits for the full confirmation audit. Detailed per-rate results and current progress receipt are in quick hk2. Old curves, frozen damping choices, raw evidence and public catalogs are preserved; no new runs or kernel changes during this check.
 
 Completed campaign: See the [paper-rate task summary](./quick/261112-k9m-run-mackay-bp-campaign-at-the-five-publi/261112-k9m-SUMMARY.md). Source-plot coordinates and the exact five rates are pinned. The retained historical curves used 20 block failures or 100 million shots per rate and the 88,200 total-sweep ceiling; the new inferred-budget campaign is recorded above. Classical errors are recorded separately from quantum failures. No full-curve agreement is claimed.
 
@@ -306,7 +306,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
-| 261113-hk2 | Infer short MacKay cap, retain long curves, replace oversized damping | 2026-11-13 | 1b040da | T100 baseline published; confirmation 38/40 audited, then Roffe | [261113-hk2-replace-oversized-mackay-damping-ceiling](./quick/261113-hk2-replace-oversized-mackay-damping-ceiling/) |
+| 261113-hk2 | Infer short MacKay cap, retain long curves, replace oversized damping | 2026-11-13 | 1b040da | T100 baseline published; confirmation 39/40 audited, then Roffe | [261113-hk2-replace-oversized-mackay-damping-ceiling](./quick/261113-hk2-replace-oversized-mackay-damping-ceiling/) |
 | 261113-ggu | Tune MacKay BP/Q-BP damping; then reproduce early BP-OSD paper regular BP | 2026-11-13 | ad689b0 | Setup verified; Superseded: oversized damping canceled; continuation moved to hk2 | [261113-ggu-tune-mackay-bp-and-q-bp-damping-and-repr](./quick/261113-ggu-tune-mackay-bp-and-q-bp-damping-and-repr/) |
 | 261112-k9m | Run MacKay at the five published error rates | 2026-11-12 | fdbb98b | Complete; 30/30 audited points; lower-rate source discrepancy retained | [261112-k9m-run-mackay-bp-campaign-at-the-five-publi](./quick/261112-k9m-run-mackay-bp-campaign-at-the-five-publi/) |
 | 261112-i4d | Construct and run foundational MacKay unicycle BP campaign | 2026-11-12 | 8e234a4, fdbb98b | Complete: 42/42 audited points; old grid preserved as historical evidence | [261112-i4d-construct-mackay-2004-unicycle-codes-and](./quick/261112-i4d-construct-mackay-2004-unicycle-codes-and/) |
@@ -382,7 +382,7 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Latest campaign: quick 261113-hk2, implementation `1b040da`. Old 88200 damping is canceled. Curve alignment favors inferred T=100, with 50 also plausible; no historical cap is asserted. Fresh baseline and training are audited; confirmation has 38/40 terminal points audited, with two rare Q-BP points running before the unchanged Roffe T=n study. The old 30-point long-budget MacKay results and displayed curves stay intact. See the hk2 summary for frozen plans, retrospective caveats, tests and accepted commands.
+Latest campaign: quick 261113-hk2, implementation `1b040da`. Old 88200 damping is canceled. Curve alignment favors inferred T=100, with 50 also plausible; no historical cap is asserted. Fresh baseline and training are audited; confirmation has 39/40 terminal points audited, with one rare Q-BP point running before the unchanged Roffe T=n study. The old 30-point long-budget MacKay results and displayed curves stay intact. See the hk2 summary for frozen plans, retrospective caveats, tests and accepted commands.
 
 Latest literature research: spikes 054 (PARTIAL: bounded citation screening, not an exhaustive global ranking) and 055 (VALIDATED: explicit baseline evidence in the screened sources). Twelve direct BP baseline papers are listed with min-sum/SPA families and evidence locations; foundational code benchmarks and BP+OSD/BP+SSF hybrids are separate. JSON/CSV and an offline consistency verifier accompany the report. This source list does not certify reproduction settings or authorize simulations. Scientific phase progress is unchanged.
 

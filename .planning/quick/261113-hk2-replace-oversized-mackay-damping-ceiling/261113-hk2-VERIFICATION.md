@@ -66,3 +66,13 @@ New baseline/tuning/confirmation and Roffe frozen plans still verify all
 162/242/338/450. All 38 completed workers exited 0:0, two are running, and the
 advance waits on their array. No job error signatures or active old oversized
 damping were found. Public catalogs and raw evidence are unchanged by this check.
+
+
+Latest delta audit (2026-11-13T20:58:59+00:00): previous 38-point receipt checksum and plan identity
+verified; all 38 prior summary/manifest hashes and frozen job identities match.
+New p=.0195 point passes full-ledger/outcome/work/manifest/summary checks and
+first/last replay. Portable receipt now has 39/40 points, 12,619,245 decoder
+shots / 780 failures. Independently checked rate=20/6,776,857 and directed-edge
+updates=2*9,828*7,313,281. New worker 61773602_11 completed 0:0; only index 10 and
+dependent advance 61773603 remain running/pending. This check does not repeat
+all old raw-ledger reads or claim a complete campaign audit.

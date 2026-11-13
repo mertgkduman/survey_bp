@@ -1,9 +1,10 @@
 {
   "advance": "61773603",
   "array": "61773602",
-  "audited_terminal_failures": 760,
-  "audited_terminal_points": 38,
-  "audited_terminal_shots": 5842388,
+  "audit_method": "Reused 38 prior full-ledger audits after receipt/plan/manifest/summary hash checks; newly completed p=.0195 passed full-ledger/count/work validation and endpoint replay.",
+  "audited_terminal_failures": 780,
+  "audited_terminal_points": 39,
+  "audited_terminal_shots": 12619245,
   "claim_limit": "Partial independent confirmation at inferred T100. Live zero failures is not a terminal zero LER. No simultaneous superiority or source-reproduction claim.",
   "live_points": [
     {
@@ -11,23 +12,15 @@
       "id": "selected-unicycle274-qbp_d095-p01500",
       "physical_p": 0.015,
       "scope": "live committed-shot log counters, not terminal audited evidence",
-      "shots": 2980864,
-      "status": "running"
-    },
-    {
-      "failures": 9,
-      "id": "selected-unicycle274-qbp_d095-p01950",
-      "physical_p": 0.0195,
-      "scope": "live committed-shot log counters, not terminal audited evidence",
-      "shots": 2714048,
+      "shots": 9274432,
       "status": "running"
     }
   ],
   "next_study": "roffe-2005-07016-bp",
   "next_study_status": "not_dispatched; waits for complete confirmation audit",
-  "observed_at": "2026-11-13T19:20:30+00:00",
+  "observed_at": "2026-11-13T20:58:59+00:00",
   "planned_points": 40,
   "schema": "research-campaign-progress-v1",
   "status": "incomplete",
-  "verified_sha256": "5e07912b71ce548206e530d11212bde9509cea1b96d71b2670ca58d3fa2549ce"
+  "verified_sha256": "71c42b99afaa6a5c7e07e60249501b4e2bd7640e737623fd67259d9a0cc0ef8b"
 }

@@ -121,3 +121,16 @@ per-rate original/selected LER and work are in 261113-hk2-RESULTS-CHECK.md.
 Partial confirmation results are audited separately and await the planned
 complete audit before catalog publication. No new runs or kernel/UI changes
 were made during this check.
+
+
+Later status check (2026-11-13T20:58:59+00:00): **39/40 confirmation points are audited**,
+**12,619,245 completed decoder shots / 780 failures**. Newly completed length-274
+Q-BP d=.95 at depolarizing p=.0195: 20 failures / 6,776,857 shots,
+LER 2.95122e-6 (pointwise 95% [1.80268e-6, 4.37826e-6]), mean iterations
+1.07916 versus original damping .1 LER .0204082 / mean iterations 3.05714.
+Only p=.015 remains live (0 failures / 9,274,432 shots at the recorded snapshot).
+Its zero-failure snapshot is not a final LER. Incremental audit reuses the
+previous 38 verified points after hash checks and fully validates the new
+point's retained ledger and endpoint replay. Roffe remains unsubmitted and
+awaits the unchanged complete-confirmation gate. No new simulation dispatch,
+canonical change or public-catalog refresh was performed during this check.

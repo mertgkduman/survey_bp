@@ -1,8 +1,8 @@
 # T100 damping confirmation results check
 
-Observed at 2026-11-13T19:18:32+00:00. Continuing GSD quick 261113-hk2.
+Observed at 2026-11-13T20:58:59+00:00. Continuing GSD quick 261113-hk2.
 
-**38 of 40 terminal points**; 5,842,388 completed shots / 760 block failures. The full-ledger audit of these 38 terminal points passed, including immutable pins, ledger/count/work totals, manifest and summary hashes, and first/last scientific replay. The campaign remains incomplete until both live points finish and the complete audit succeeds.
+**39 of 40 terminal points**; 12,619,245 completed decoder shots / 780 block failures. All 39 points have passed full-ledger audit. This check reused the previous 38 audits after verifying receipt/plan/manifest/summary hashes, and fully audited the newly completed p=.0195 point, including outcome/work totals and first/last scientific replay. The campaign remains incomplete until the last live point finishes and the complete audit succeeds.
 
 All comparisons below use the independent confirmation seed 2026111323, the same 100-iteration ceiling, and the original versus previously frozen selected damping. These are measured point estimates, with 20 failures per completed point; they do not by themselves establish superiority across the full grid. Binary BP uses X-only noise; Q-BP uses depolarizing noise with matched marginal rate, so compare damping within each row.
 
@@ -16,7 +16,7 @@ Means are actual executed iterations per retained shot. Directed-edge update mea
 | 274 | BP (SP, X-only) | 0.03 | 0 → 0.85 | 0.0766284 → 0.0421053 | 8.241 → 4.236 |
 | 274 | BP (SP, X-only) | 0.04 | 0 → 0.85 | 0.350877 → 0.307692 | 26.54 → 21.98 |
 | 274 | Q-BP (SP, depolarizing) | 0.015 | 0.1 → 0.95 | 0.0135135 → running | 2.341 → running |
-| 274 | Q-BP (SP, depolarizing) | 0.0195 | 0.1 → 0.95 | 0.0204082 → running | 3.057 → running |
+| 274 | Q-BP (SP, depolarizing) | 0.0195 | 0.1 → 0.95 | 0.0204082 → 2.95122e-06 | 3.057 → 1.079 |
 | 274 | Q-BP (SP, depolarizing) | 0.03 | 0.1 → 0.95 | 0.0201816 → 0.000139112 | 3.257 → 1.58 |
 | 274 | Q-BP (SP, depolarizing) | 0.045 | 0.1 → 0.95 | 0.0222965 → 0.00825764 | 3.749 → 5.03 |
 | 274 | Q-BP (SP, depolarizing) | 0.06 | 0.1 → 0.95 | 0.0909091 → 0.0909091 | 7.109 → 16.2 |
@@ -31,10 +31,10 @@ Means are actual executed iterations per retained shot. Directed-edge update mea
 | 74 | Q-BP (SP, depolarizing) | 0.045 | 0.1 → 0.95 | 0.0790514 → 0.0131926 | 7.126 → 2.003 |
 | 74 | Q-BP (SP, depolarizing) | 0.06 | 0.1 → 0.95 | 0.0757576 → 0.0297619 | 5.356 → 3.708 |
 
-Two length-274 selected Q-BP points (depolarizing p=.015 and .0195) remain running. Live counters at 2026-11-13T19:20:30+00:00: p=0.015: 0 failures / 2,980,864 shots; p=0.0195: 9 failures / 2,714,048 shots. These ongoing counts have no terminal LER or transferred stopping interval. Both continue to 20 failures or 100 million shots.
+One length-274 selected Q-BP point (depolarizing p=.015) remains running. Live counters at 2026-11-13T20:58:59+00:00: 0 failures / 9,274,432 shots. These ongoing counts have no terminal LER or transferred stopping interval. The point continues to 20 failures or 100 million shots. The completed p=.0195 point has 20 failures / 6,776,857 shots, LER 2.95122e-6 with pointwise stopping-aware 95% interval [1.80268e-6, 4.37826e-6], and 1.07916 mean iterations (21,211.876 mean directed-edge updates per shot). Its observed LER is about 6,915 times lower than the original damping holdout; this is a within-point descriptive ratio, not a simultaneous full-curve claim.
 
 At length 274, depolarizing p=.060, the observed LER is .09091 for both damping values, but mean iterations increase from 7.109 to 16.2. Thus the frozen global damping choice is not uniformly faster or better at every rate. At p=.045, LER decreases while mean iterations increase. Do not silently change the frozen tuning choice using this holdout data.
 
 Roffe remains unsubmitted and waits for all 40 confirmation points and the successful complete audit. Its frozen 218-point design still uses paper T=n (162/242/338/450), source min-sum settings and code-specific paper grids; its 40 implementation pins pass. No 88,200-iteration damping is active and no old curves were altered.
 
-The 38-point portable audit receipt and timestamped progress snapshot are stored in `data/reproductions/mackay-0304161-damping-t100/confirmation/verified.json` and `progress.json`. No new simulations were started during this check. Partial holdout curves are held for the planned complete audit; the public view remains 76 curves / 399 points / 8 codes / 0 circuits.
+The 39-point portable audit receipt and timestamped progress snapshot are stored in `data/reproductions/mackay-0304161-damping-t100/confirmation/verified.json` and `progress.json`. No new simulations were started during this check. Partial holdout curves are held for the planned complete audit; the public view remains 76 curves / 399 points / 8 codes / 0 circuits.
