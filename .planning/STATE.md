@@ -5,10 +5,10 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: MacKay complete; damping array 61769653 running with audited confirmation then Roffe BP/Q-BP pipeline
-last_updated: "2026-11-13T17:24:31+00:00"
+stopped_at: Canceled oversized damping; inferred T100 baseline running, followed by T100 tuning/confirmation and Roffe T=n
+last_updated: "2026-11-13T18:31:52+00:00"
 last_activity: 2026-11-13
-last_activity_desc: Completed 30/30 MacKay audit; froze and started 140-point LER-first BP/Q-BP damping grid, independent confirmation and subsequent Roffe Figure 3 study. Passed regression, qualification and 12 browser groups.
+last_activity_desc: User correction cancels all 88200 damping. Retrospective alignment favors inferred 100 per hypothesis; new independent BP/Q-BP T100 baseline and tuning chain frozen, arrays 61772607–61772609 running with audit 61772610. Old curves preserved.
 state_head: fdbb98b
 progress:
   total_phases: 14
@@ -34,8 +34,8 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-13 — quick 261113-ggu damping/early BP-OSD extension running; MacKay complete
-Last Activity Description: MacKay final 30/30 points are verified (6,403,005 shots / 600 failures); two low-rate source discrepancies remain. Implementation ad689b0 freezes 140 damping tuning points for ordinary SP/Q-BP at T=88,200, LER-first selection with a guarded speed tie, independent 20-failure/100M confirmation, then Roffe 2020 Figure 3 regular min-sum BP plus Q-BP at the paper rates and T=n. Array 61769653 is running (16 active tasks, two terminal summaries), advance job 61769654 is dependent. No tuning winner or new-paper result is claimed. Public counts stay 70/369/8/0; four pending toric inputs stay hidden. Scientific phase gates and kernels are unchanged.
+Last activity: 2026-11-13 — quick 261113-hk2 inferred short-budget correction dispatched; old damping canceled
+Last Activity Description: The user rejected 88200 for MacKay reproduction/tuning and authorized inferring a cap from alignment. Old damping array 61769653 and advance 61769654 are canceled, with partial/complete evidence and displayed curves preserved. Eleven-cutoff retrospective analysis favors 100 per hypothesis; author cap remains unverified. Implementation 1b040da freezes fresh ordinary BP/Q-BP T=100 and source unicycle 100 per hypothesis (200 total), 30 baseline points, then T100 damping/independent confirmation, then unchanged Roffe T=n. Arrays 61772607–61772609 and audit 61772610 are accepted; latest observed 29 terminal baseline summaries and p=.010 still running. Passed 156 regression checks, 43 final focused checks and 11 browser groups. Scientific gates and kernels are unchanged.
 
 Completed campaign: See the [paper-rate task summary](./quick/261112-k9m-run-mackay-bp-campaign-at-the-five-publi/261112-k9m-SUMMARY.md). Source-plot coordinates and the exact five rates are pinned. Retain 20 block failures or 100 million shots per rate and the 88,200 total-sweep ceiling. Classical errors are recorded separately from quantum failures. No full-curve agreement is claimed.
 
@@ -306,7 +306,8 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
-| 261113-ggu | Tune MacKay BP/Q-BP damping; then reproduce early BP-OSD paper regular BP | 2026-11-13 | ad689b0 | Setup verified; 140-point tuning running; confirmation then Roffe automatic | [261113-ggu-tune-mackay-bp-and-q-bp-damping-and-repr](./quick/261113-ggu-tune-mackay-bp-and-q-bp-damping-and-repr/) |
+| 261113-hk2 | Infer short MacKay cap, retain long curves, replace oversized damping | 2026-11-13 | 1b040da | Inferred T100 baseline running; then T100 tuning/confirmation and Roffe | [261113-hk2-replace-oversized-mackay-damping-ceiling](./quick/261113-hk2-replace-oversized-mackay-damping-ceiling/) |
+| 261113-ggu | Tune MacKay BP/Q-BP damping; then reproduce early BP-OSD paper regular BP | 2026-11-13 | ad689b0 | Setup verified; Superseded: oversized damping canceled; continuation moved to hk2 | [261113-ggu-tune-mackay-bp-and-q-bp-damping-and-repr](./quick/261113-ggu-tune-mackay-bp-and-q-bp-damping-and-repr/) |
 | 261112-k9m | Run MacKay at the five published error rates | 2026-11-12 | fdbb98b | Complete; 30/30 audited points; lower-rate source discrepancy retained | [261112-k9m-run-mackay-bp-campaign-at-the-five-publi](./quick/261112-k9m-run-mackay-bp-campaign-at-the-five-publi/) |
 | 261112-i4d | Construct and run foundational MacKay unicycle BP campaign | 2026-11-12 | 8e234a4, fdbb98b | Complete: 42/42 audited points; old grid preserved as historical evidence | [261112-i4d-construct-mackay-2004-unicycle-codes-and](./quick/261112-i4d-construct-mackay-2004-unicycle-codes-and/) |
 | 261110-sic | Complete B1/C2 BPGD and matched-marginal Q-BP sweeps | 2026-11-11 | 25c6c1f, a84413f | Verified 77/77 points and 40,459,752 shots, with 40 final tests and 18 browser checks | [261110-sic-complete-b1-and-c2-bpgd-and-matched-q-bp](./quick/261110-sic-complete-b1-and-c2-bpgd-and-matched-q-bp/) |
@@ -381,7 +382,7 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Latest campaign: quick 261113-ggu, implementation `ad689b0`. Tuning array 61769653 (140 paired fixed-N points, max 16 CPUs) is running (16 active, two complete); advance job 61769654 requires a complete audit, freezes fresh confirmation, then its successful audit submits the frozen Roffe Figure 3 BP/Q-BP study. LER is primary and speed ties need a paired uncertainty guard. MacKay quick 261112-k9m is complete (30/30, 6,403,005 shots, 600 failures); two low-rate source discrepancies are retained. New study kernels are unchanged. See the quick summary for immutable plans, tests and job receipts. No damping selection/confirmation or Roffe result is claimed yet.
+Latest campaign: quick 261113-hk2, implementation `1b040da`. Old 88200 damping is canceled. Curve alignment favors inferred T=100, with 50 also plausible; no historical cap is asserted. Fresh baseline arrays 61772607–61772609 and audit 61772610 precede T100 tuning/confirmation and the unchanged Roffe T=n study. The old 30-point long-budget MacKay results and displayed curves stay intact. See the hk2 summary for frozen plans, retrospective caveats, tests and accepted commands.
 
 Latest literature research: spikes 054 (PARTIAL: bounded citation screening, not an exhaustive global ranking) and 055 (VALIDATED: explicit baseline evidence in the screened sources). Twelve direct BP baseline papers are listed with min-sum/SPA families and evidence locations; foundational code benchmarks and BP+OSD/BP+SSF hybrids are separate. JSON/CSV and an offline consistency verifier accompany the report. This source list does not certify reproduction settings or authorize simulations. Scientific phase progress is unchanged.
 

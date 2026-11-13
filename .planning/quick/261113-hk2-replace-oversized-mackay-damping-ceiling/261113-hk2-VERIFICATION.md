@@ -1,7 +1,7 @@
 ---
 status: passed
 scope: cancellation, preservation, inference, implementation and scheduler preflight
-campaign_status: awaiting_dispatch
+campaign_status: running
 ---
 
 # Verification
@@ -33,3 +33,9 @@ campaign_status: awaiting_dispatch
 
 Remaining: fresh baseline and T100 tuning/holdout results, then Roffe measurements
 and scientific assessment. Do not claim those results from setup checks.
+
+Dispatch accepted: baseline arrays 61772607–61772609 and dependent audit/advance
+61772610. The latest checkpoint check saw 29 terminal summaries, with p=.010
+length-274 unicycle still active; final audit remains pending. New tuning is
+frozen at T=100 and starts only after that audit. No old large-budget damping
+has been restarted.
