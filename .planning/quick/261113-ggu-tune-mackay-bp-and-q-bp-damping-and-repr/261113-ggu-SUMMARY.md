@@ -1,7 +1,7 @@
 ---
 status: incomplete
 implementation_status: verified
-campaign_status: queued
+campaign_status: running
 implementation_commit: ad689b0
 ---
 
@@ -44,8 +44,8 @@ Both load and scheduler preflight passed before dispatch. Code/kernel settings
 cannot change through a modified plan. Confirmation is frozen after selection
 and before its sampling; tuning also pins the next study's implementation/plan.
 
-Slurm tuning array **61769653**, indices 0–139, max 16 one-CPU tasks, is queued
-for priority. Dependent advance/audit **61769654** is pending on afterok. Accepted
+Slurm tuning array **61769653**, indices 0–139, max 16 one-CPU tasks, has started
+(16 tasks running, two completed in the latest check). Dependent advance/audit **61769654** is pending on afterok. Accepted
 commands are in `data/reproductions/mackay-0304161-damping/dispatch.json`.
 That job requires all tuning ledgers, verifies them and endpoint replays, writes
 an immutable selection, freezes confirmation, and submits its array (at most
@@ -74,3 +74,9 @@ Remaining work is Monte Carlo execution, automatic audits/selection/confirmation
 then the Roffe measurements and statistical assessment. Static refresh preserves
 local edits, saving a full replacement snapshot under results/catalog.json when
 needed. Inspect receipts and scheduler states before calling any stage complete.
+
+Latest scheduler check: two 1,024-shot tuning summaries exist (both length-274
+binary SP with d=.1, at .013/.020). These are uncollected tuning observations,
+not selected settings or independent validation. The remaining grid and all
+confirmation/new-paper measurements remain open. No early stopping of the grid
+or publication of training results is performed.

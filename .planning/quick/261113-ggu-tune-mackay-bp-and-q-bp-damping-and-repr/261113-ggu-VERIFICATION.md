@@ -1,7 +1,7 @@
 ---
 status: passed
 scope: implementation, qualification, frozen designs and scheduler preflight
-campaign_status: queued
+campaign_status: running
 ---
 
 # Verification
@@ -36,3 +36,7 @@ Production dispatch accepted: tuning array 61769653 and dependent audit/advance
 No tuning result, damping winner, holdout result or Roffe point is claimed yet.
 Tuning/Roffe frozen plans load successfully (34/40 pins). New input setup leaves
 public counts unchanged at 70/369/8/0. Raw results/lock files remain local.
+
+Subsequent live check: 16 tuning tasks RUNNING and two COMPLETED; no failed
+task observed. Two terminal training summaries exist, not yet a complete grid
+audit. The dependent advance job remains pending.
