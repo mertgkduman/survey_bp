@@ -447,6 +447,118 @@
         "sha256": "f5c08906120bd8d08672b009f9234748f18b308383cd2c18e15516aa1d16dd6f",
         "url": "web/research/inputs/unicycle274.json"
       }
+    },
+    {
+      "aliases": [],
+      "artifact_path": "data/reproductions/roffe-2005-07016-bp/codes/toric11.npz",
+      "asset": {
+        "availability": "tracked",
+        "kind": "code_artifact",
+        "label": "Frozen source-constructed ring-HGP CSS input",
+        "local_storage_path": null,
+        "path": "data/reproductions/roffe-2005-07016-bp/codes/toric11.npz",
+        "sha256": "8621eca35d2f09398b4c9603b18507a57222230bb3ef7852615fee38a8129edc",
+        "url": "data/reproductions/roffe-2005-07016-bp/codes/toric11.npz"
+      },
+      "asset_kind": "code_artifact",
+      "asset_label": "Frozen source-constructed ring-HGP CSS input",
+      "code_id": "toric11",
+      "execution": {
+        "kind": "css_artifact",
+        "path": "data/reproductions/roffe-2005-07016-bp/codes/toric11.npz"
+      },
+      "label": "Roffe toric [[242,2,11]]",
+      "matrix_asset": {
+        "availability": "tracked",
+        "kind": "css_matrix_preview",
+        "path": "web/research/inputs/toric11.json",
+        "sha256": "af59dfde1ee342c2572d67f0e058eff211983a4d3ac387db533ea3ee707b2fe9",
+        "url": "web/research/inputs/toric11.json"
+      }
+    },
+    {
+      "aliases": [],
+      "artifact_path": "data/reproductions/roffe-2005-07016-bp/codes/toric13.npz",
+      "asset": {
+        "availability": "tracked",
+        "kind": "code_artifact",
+        "label": "Frozen source-constructed ring-HGP CSS input",
+        "local_storage_path": null,
+        "path": "data/reproductions/roffe-2005-07016-bp/codes/toric13.npz",
+        "sha256": "08495098bbb1d6e2198a9fc7c4840a8c90599b53cbf73e1df3d509f830678e83",
+        "url": "data/reproductions/roffe-2005-07016-bp/codes/toric13.npz"
+      },
+      "asset_kind": "code_artifact",
+      "asset_label": "Frozen source-constructed ring-HGP CSS input",
+      "code_id": "toric13",
+      "execution": {
+        "kind": "css_artifact",
+        "path": "data/reproductions/roffe-2005-07016-bp/codes/toric13.npz"
+      },
+      "label": "Roffe toric [[338,2,13]]",
+      "matrix_asset": {
+        "availability": "tracked",
+        "kind": "css_matrix_preview",
+        "path": "web/research/inputs/toric13.json",
+        "sha256": "afa334f740ad599cf199052a7855611eb33fa866f0e06a5c83a7146844510779",
+        "url": "web/research/inputs/toric13.json"
+      }
+    },
+    {
+      "aliases": [],
+      "artifact_path": "data/reproductions/roffe-2005-07016-bp/codes/toric15.npz",
+      "asset": {
+        "availability": "tracked",
+        "kind": "code_artifact",
+        "label": "Frozen source-constructed ring-HGP CSS input",
+        "local_storage_path": null,
+        "path": "data/reproductions/roffe-2005-07016-bp/codes/toric15.npz",
+        "sha256": "0ea160892a22bfb817bfcd58295e43a236fc33e8c9d0f0a0f3690e60d47f6824",
+        "url": "data/reproductions/roffe-2005-07016-bp/codes/toric15.npz"
+      },
+      "asset_kind": "code_artifact",
+      "asset_label": "Frozen source-constructed ring-HGP CSS input",
+      "code_id": "toric15",
+      "execution": {
+        "kind": "css_artifact",
+        "path": "data/reproductions/roffe-2005-07016-bp/codes/toric15.npz"
+      },
+      "label": "Roffe toric [[450,2,15]]",
+      "matrix_asset": {
+        "availability": "tracked",
+        "kind": "css_matrix_preview",
+        "path": "web/research/inputs/toric15.json",
+        "sha256": "c487b252ec5f7292b472984cf0d9333e2936d26cd04c2d1c8ea383e173a9021d",
+        "url": "web/research/inputs/toric15.json"
+      }
+    },
+    {
+      "aliases": [],
+      "artifact_path": "data/reproductions/roffe-2005-07016-bp/codes/toric9.npz",
+      "asset": {
+        "availability": "tracked",
+        "kind": "code_artifact",
+        "label": "Frozen source-constructed ring-HGP CSS input",
+        "local_storage_path": null,
+        "path": "data/reproductions/roffe-2005-07016-bp/codes/toric9.npz",
+        "sha256": "c39af0c389fa25cc4b462e7534f2aa6bc1c01cb82cc4b2569aa96248d7dd0800",
+        "url": "data/reproductions/roffe-2005-07016-bp/codes/toric9.npz"
+      },
+      "asset_kind": "code_artifact",
+      "asset_label": "Frozen source-constructed ring-HGP CSS input",
+      "code_id": "toric9",
+      "execution": {
+        "kind": "css_artifact",
+        "path": "data/reproductions/roffe-2005-07016-bp/codes/toric9.npz"
+      },
+      "label": "Roffe toric [[162,2,9]]",
+      "matrix_asset": {
+        "availability": "tracked",
+        "kind": "css_matrix_preview",
+        "path": "web/research/inputs/toric9.json",
+        "sha256": "50de91c71c1b4437c69a29d045bc44848c6c1334553f224260dff3cf8726b6b2",
+        "url": "web/research/inputs/toric9.json"
+      }
     }
   ],
   "datasets": [
@@ -27638,6 +27750,14 @@
     {
       "path": "data/reproductions/mackay-0304161-paper-rates/catalog.json",
       "sha256": "2c2d8074585afc106405fc137aaa465ede1bf28d0cd21371022f69622a45a574"
+    },
+    {
+      "path": "data/reproductions/mackay-0304161-damping/confirmation/catalog.json",
+      "sha256": "7bf8c353d6259d95496be1d823e426024358157ec8750ec74c446bf3b1684c79"
+    },
+    {
+      "path": "data/reproductions/roffe-2005-07016-bp/catalog.json",
+      "sha256": "7bf8c353d6259d95496be1d823e426024358157ec8750ec74c446bf3b1684c79"
     }
   ],
   "limitations": [

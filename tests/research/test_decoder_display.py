@@ -103,3 +103,9 @@ const labels=DecoderDisplay.labels(c);console.log(JSON.stringify({labels:Object.
     assert 'T = 88200' in label and 'noise = X-only' in label
     assert value['labels']['binary_sp'].startswith('Binary BP, SP')
     assert value['labels']['qbp'].startswith('Q-BP, SP')
+
+
+def test_source_iteration_dependent_min_sum_scale_is_explicit():
+    script="""require('./web/research/decoder-display.js');console.log(JSON.stringify(DecoderDisplay.describe({configuration:{effective_configuration:{family:'binary_css',check_rule:'min_sum',message_resolution:'float64',v2c_damping:0,max_iterations:162,alpha_schedule:'1-2**(-iteration)',prior:'p',noise_model:'x_only'}}})));"""
+    value=json.loads(subprocess.check_output(['node','-e',script],cwd=ROOT,text=True))
+    assert 'αₜ = 1 − 2⁻ᵗ' in value['label'] and 'T = 162' in value['label']

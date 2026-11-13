@@ -1,0 +1,54 @@
+{
+  "toric11": {
+    "artifact": "data/reproductions/roffe-2005-07016-bp/codes/toric11.npz",
+    "d": 11,
+    "edges_per_component": 484,
+    "k": 2,
+    "label": "Roffe toric [[242,2,11]]",
+    "logical_basis": "project free-column quotient basis, paired XZ",
+    "n": 242,
+    "ordering_status": "source Eq. (4): ring R=I+cyclic-shift, row-major symmetric HGP; redundant checks retained",
+    "rank_per_component": 120,
+    "raw_sha256": "8621eca35d2f09398b4c9603b18507a57222230bb3ef7852615fee38a8129edc",
+    "semantic_sha256": "659da6a71241ef91930c240b91364dab077898533805ff5ac4c13b6afe0e0025"
+  },
+  "toric13": {
+    "artifact": "data/reproductions/roffe-2005-07016-bp/codes/toric13.npz",
+    "d": 13,
+    "edges_per_component": 676,
+    "k": 2,
+    "label": "Roffe toric [[338,2,13]]",
+    "logical_basis": "project free-column quotient basis, paired XZ",
+    "n": 338,
+    "ordering_status": "source Eq. (4): ring R=I+cyclic-shift, row-major symmetric HGP; redundant checks retained",
+    "rank_per_component": 168,
+    "raw_sha256": "08495098bbb1d6e2198a9fc7c4840a8c90599b53cbf73e1df3d509f830678e83",
+    "semantic_sha256": "eab388fbc8a949bf2178fd7558f847b042e9c324bcf6b06fa94fe3de1380830b"
+  },
+  "toric15": {
+    "artifact": "data/reproductions/roffe-2005-07016-bp/codes/toric15.npz",
+    "d": 15,
+    "edges_per_component": 900,
+    "k": 2,
+    "label": "Roffe toric [[450,2,15]]",
+    "logical_basis": "project free-column quotient basis, paired XZ",
+    "n": 450,
+    "ordering_status": "source Eq. (4): ring R=I+cyclic-shift, row-major symmetric HGP; redundant checks retained",
+    "rank_per_component": 224,
+    "raw_sha256": "0ea160892a22bfb817bfcd58295e43a236fc33e8c9d0f0a0f3690e60d47f6824",
+    "semantic_sha256": "3c29fa57c053d1c2a4d1d929b67cfd422e2fd54b3197e959173b247f22d162ba"
+  },
+  "toric9": {
+    "artifact": "data/reproductions/roffe-2005-07016-bp/codes/toric9.npz",
+    "d": 9,
+    "edges_per_component": 324,
+    "k": 2,
+    "label": "Roffe toric [[162,2,9]]",
+    "logical_basis": "project free-column quotient basis, paired XZ",
+    "n": 162,
+    "ordering_status": "source Eq. (4): ring R=I+cyclic-shift, row-major symmetric HGP; redundant checks retained",
+    "rank_per_component": 80,
+    "raw_sha256": "c39af0c389fa25cc4b462e7534f2aa6bc1c01cb82cc4b2569aa96248d7dd0800",
+    "semantic_sha256": "35b4719bc60d007ea060ef1b8cfbc55e8a291adca10c3df400b9d64afdb3a8a4"
+  }
+}

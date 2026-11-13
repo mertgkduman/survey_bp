@@ -217,13 +217,14 @@ def test_rebuilt_catalog_uses_same_active_view_as_browser_and_preserves_retained
     from bp_registry.research.catalog import build_catalog
     c = build_catalog(ROOT)
     view = active_view(c)
-    legacy = [s for s in view['curves'] if s['dataset_id'] not in {'yao-bpgd-completion', 'mackay-unicycle-bp', 'mackay-unicycle-paper-rates'}]
+    legacy = [s for s in view['curves'] if s['dataset_id'] not in {'yao-bpgd-completion', 'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp'}]
     assert len(legacy) == 53
     assert sum(len(s['points']) for s in legacy) == 262
-    added = {s['code_id'] for s in view['curves'] if s['dataset_id'] in {'mackay-unicycle-bp', 'mackay-unicycle-paper-rates'}}
+    added = {s['code_id'] for s in view['curves'] if s['dataset_id'] in {'mackay-unicycle-bp', 'mackay-unicycle-paper-rates', 'mackay-damping-confirmation', 'roffe-2020-figure3-canonical-bp'}}
     assert {code['code_id'] for code in view['codes']} == {'a5', 'b2', 'b1', 'c2', 'double-gross', 'bb72'} | added
     assert view['circuits'] == []
-    assert len(c['codes']) == 9 and len(c['circuits']) == 3
+    from bp_registry.research.inputs import input_registry
+    assert len(c['codes']) == len(input_registry(ROOT)['codes']) and len(c['circuits']) == 3
     assert any(s['code_id'] == 'relay-surface-d3' for s in c['result_series'])
     assert all(len({p['x'] for p in s['points']}) >= 2 for s in view['curves'])
 
@@ -274,3 +275,16 @@ def test_pooled_work_averages_use_shot_weights_and_preserve_missing_counters():
     point = project(catalog([first, second], decoders))[0]["points"][0]
     assert point["mean_directed_edge_updates"] is None
     assert point["mean_iterations"] == 5
+
+
+def test_variable_min_sum_schedule_cannot_supply_points_to_a_constant_scale_curve():
+    # Same concise labels cannot override incompatible effective sweep schedules.
+    curves = project(catalog(
+        [row('variable', seed=1, evidence='variable.json'), row('constant', seed=2, evidence='constant.json')],
+        [
+            {'decoder_id': 'variable', 'configuration': {'effective_configuration': {'family': 'binary_css', 'check_rule': 'min_sum', 'alpha_schedule': '1-2**(-iteration)', 'first_iteration': 1}}},
+            {'decoder_id': 'constant', 'configuration': {'effective_configuration': {'family': 'binary_css', 'check_rule': 'min_sum', 'alpha_schedule': 'constant', 'first_iteration': 1}}},
+        ],
+    ))
+    assert len(curves) == 2
+    assert all(len(curve['points']) == 1 for curve in curves)

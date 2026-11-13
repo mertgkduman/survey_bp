@@ -104,7 +104,9 @@
   ],
   "normalized_catalogs": [
     "data/reproductions/mackay-0304161-unicycle/catalog.json",
-    "data/reproductions/mackay-0304161-paper-rates/catalog.json"
+    "data/reproductions/mackay-0304161-paper-rates/catalog.json",
+    "data/reproductions/mackay-0304161-damping/confirmation/catalog.json",
+    "data/reproductions/roffe-2005-07016-bp/catalog.json"
   ],
   "public_retired_dataset_ids": [
     "mackay-unicycle-bp"

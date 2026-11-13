@@ -1,0 +1,15 @@
+{
+  "paper": "https://arxiv.org/abs/2005.07016v2",
+  "title": "Decoding Across the Quantum LDPC Code Landscape",
+  "authors": ["Joschka Roffe", "David R. White", "Simon Burton", "Earl T. Campbell"],
+  "history": "2020 study of BP+OSD; cites Panteleev and Kalachev arXiv:1904.02703 (2019) as the original quantum BP-OSD proposal.",
+  "scope": "Figure 3 regular BP curves only; BP+OSD-CS curves provide paper context but no OSD execution is requested.",
+  "codes": "Toric [[162,2,9]], [[242,2,11]], [[338,2,13]], [[450,2,15]]. Symmetric HGP of closed-loop repetition checks, source Eq. (4); all redundant checks retained.",
+  "algorithm": "Appendix C Algorithm 1: flooding min-sum, alpha_t=1-2^(-t), t starts at 1, no damping. Section V sets maximum iterations to code block length n.",
+  "channel": "Section VI: binary X-only code-capacity experiment, p is X probability; symmetric independent X/Z components allow one species to be simulated.",
+  "metric": "Block failure including nonconvergence and nontrivial logical residual. Both logical generators are tested. This is not a per-logical-qubit error probability.",
+  "rates": "Every retained dashed-BP vector-plot vertex, cross-checked against its vertical error bar. Per-distance grids differ; no interpolation or invented points.",
+  "qbp": "Additional canonical joint-Pauli min-sum with the same alpha schedule and T=n ceiling, depolarizing probability 1.5 times the source X rate. This is a controlled comparison with a different joint noise model.",
+  "qualification": "Source-matched rule, schedule, rate grid and iteration budget; project row-major ring-HGP ordering and paired logical basis. Source author raw matrices, samples and floating-point conventions were not supplied. Statistical agreement remains to be assessed.",
+  "primary_sources": ["https://arxiv.org/html/2005.07016v2", "https://arxiv.org/src/2005.07016v2", "https://github.com/quantumgizmos/bp_osd", "https://arxiv.org/abs/1904.02703"]
+}

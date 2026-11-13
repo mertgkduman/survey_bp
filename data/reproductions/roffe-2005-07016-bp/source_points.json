@@ -1,0 +1,681 @@
+{
+  "coordinate_status": "approximate ordinates from original vector figure; author sample counts unavailable",
+  "curves": {
+    "11": [
+      {
+        "block_ler_approx": 0.06553286834614931,
+        "p": 0.01,
+        "x_inches": 0.869111,
+        "y_inches": 2.445514
+      },
+      {
+        "block_ler_approx": 0.22415175820535796,
+        "p": 0.02,
+        "x_inches": 1.524569,
+        "y_inches": 2.567866
+      },
+      {
+        "block_ler_approx": 0.4155033422918876,
+        "p": 0.03,
+        "x_inches": 1.907988,
+        "y_inches": 2.629269
+      },
+      {
+        "block_ler_approx": 0.5936944617164118,
+        "p": 0.04,
+        "x_inches": 2.180028,
+        "y_inches": 2.664775
+      },
+      {
+        "block_ler_approx": 0.7355022745293188,
+        "p": 0.05,
+        "x_inches": 2.391038,
+        "y_inches": 2.686085
+      },
+      {
+        "block_ler_approx": 0.8379484056013935,
+        "p": 0.06,
+        "x_inches": 2.563446,
+        "y_inches": 2.699059
+      },
+      {
+        "block_ler_approx": 0.9056669116754571,
+        "p": 0.07,
+        "x_inches": 2.709215,
+        "y_inches": 2.706791
+      },
+      {
+        "block_ler_approx": 0.9474849527494775,
+        "p": 0.08,
+        "x_inches": 2.835486,
+        "y_inches": 2.711282
+      },
+      {
+        "block_ler_approx": 0.9714580393548005,
+        "p": 0.09,
+        "x_inches": 2.946865,
+        "y_inches": 2.713768
+      },
+      {
+        "block_ler_approx": 0.9736672604797408,
+        "p": 0.091,
+        "x_inches": 2.957314,
+        "y_inches": 2.713994
+      },
+      {
+        "block_ler_approx": 0.9748913319548882,
+        "p": 0.092,
+        "x_inches": 2.967649,
+        "y_inches": 2.714119
+      },
+      {
+        "block_ler_approx": 0.9767745035981831,
+        "p": 0.093,
+        "x_inches": 2.977872,
+        "y_inches": 2.714311
+      },
+      {
+        "block_ler_approx": 0.9783170918637185,
+        "p": 0.094,
+        "x_inches": 2.987985,
+        "y_inches": 2.714468
+      },
+      {
+        "block_ler_approx": 0.9795174728842225,
+        "p": 0.095,
+        "x_inches": 2.997992,
+        "y_inches": 2.71459
+      },
+      {
+        "block_ler_approx": 0.9807981883450878,
+        "p": 0.096,
+        "x_inches": 3.007894,
+        "y_inches": 2.71472
+      },
+      {
+        "block_ler_approx": 0.9819029166871883,
+        "p": 0.097,
+        "x_inches": 3.017693,
+        "y_inches": 2.714832
+      },
+      {
+        "block_ler_approx": 0.9832065155111466,
+        "p": 0.098,
+        "x_inches": 3.027392,
+        "y_inches": 2.714964
+      },
+      {
+        "block_ler_approx": 0.9841358908129948,
+        "p": 0.099,
+        "x_inches": 3.036993,
+        "y_inches": 2.715058
+      },
+      {
+        "block_ler_approx": 0.9851453557325777,
+        "p": 0.1,
+        "x_inches": 3.046496,
+        "y_inches": 2.71516
+      },
+      {
+        "block_ler_approx": 0.9861261207097846,
+        "p": 0.101,
+        "x_inches": 3.055906,
+        "y_inches": 2.715259
+      },
+      {
+        "block_ler_approx": 0.9869392107584342,
+        "p": 0.102,
+        "x_inches": 3.065222,
+        "y_inches": 2.715341
+      },
+      {
+        "block_ler_approx": 0.9878721143879707,
+        "p": 0.103,
+        "x_inches": 3.074448,
+        "y_inches": 2.715435
+      },
+      {
+        "block_ler_approx": 0.9893825056162023,
+        "p": 0.105,
+        "x_inches": 3.092634,
+        "y_inches": 2.715587
+      },
+      {
+        "block_ler_approx": 0.9900390522330276,
+        "p": 0.106,
+        "x_inches": 3.101597,
+        "y_inches": 2.715653
+      },
+      {
+        "block_ler_approx": 0.9907159498878527,
+        "p": 0.107,
+        "x_inches": 3.110476,
+        "y_inches": 2.715721
+      },
+      {
+        "block_ler_approx": 0.9913235606831721,
+        "p": 0.108,
+        "x_inches": 3.119273,
+        "y_inches": 2.715782
+      },
+      {
+        "block_ler_approx": 0.9919016345875211,
+        "p": 0.109,
+        "x_inches": 3.127988,
+        "y_inches": 2.71584
+      },
+      {
+        "block_ler_approx": 0.992200770591141,
+        "p": 0.11,
+        "x_inches": 3.136624,
+        "y_inches": 2.71587
+      }
+    ],
+    "13": [
+      {
+        "block_ler_approx": 0.09034575955276175,
+        "p": 0.01,
+        "x_inches": 0.869111,
+        "y_inches": 2.47746
+      },
+      {
+        "block_ler_approx": 0.2984248593864388,
+        "p": 0.02,
+        "x_inches": 1.524569,
+        "y_inches": 2.59634
+      },
+      {
+        "block_ler_approx": 0.5276405213711574,
+        "p": 0.03,
+        "x_inches": 1.907988,
+        "y_inches": 2.65304
+      },
+      {
+        "block_ler_approx": 0.7152784424732423,
+        "p": 0.04,
+        "x_inches": 2.180028,
+        "y_inches": 2.683311
+      },
+      {
+        "block_ler_approx": 0.844696425758181,
+        "p": 0.05,
+        "x_inches": 2.391038,
+        "y_inches": 2.699857
+      },
+      {
+        "block_ler_approx": 0.9215990322936434,
+        "p": 0.06,
+        "x_inches": 2.563446,
+        "y_inches": 2.708526
+      },
+      {
+        "block_ler_approx": 0.9633971337935971,
+        "p": 0.07,
+        "x_inches": 2.709215,
+        "y_inches": 2.712939
+      },
+      {
+        "block_ler_approx": 0.9838391862687912,
+        "p": 0.08,
+        "x_inches": 2.835486,
+        "y_inches": 2.715028
+      },
+      {
+        "block_ler_approx": 0.9932185079589627,
+        "p": 0.09,
+        "x_inches": 2.946865,
+        "y_inches": 2.715972
+      },
+      {
+        "block_ler_approx": 0.9937577326564823,
+        "p": 0.091,
+        "x_inches": 2.957314,
+        "y_inches": 2.716026
+      },
+      {
+        "block_ler_approx": 0.9944071877096496,
+        "p": 0.092,
+        "x_inches": 2.967649,
+        "y_inches": 2.716091
+      },
+      {
+        "block_ler_approx": 0.9947470717162937,
+        "p": 0.093,
+        "x_inches": 2.977872,
+        "y_inches": 2.716125
+      },
+      {
+        "block_ler_approx": 0.9952871262808799,
+        "p": 0.094,
+        "x_inches": 2.987985,
+        "y_inches": 2.716179
+      },
+      {
+        "block_ler_approx": 0.9956773480239668,
+        "p": 0.095,
+        "x_inches": 2.997992,
+        "y_inches": 2.716218
+      },
+      {
+        "block_ler_approx": 0.9961077698486068,
+        "p": 0.096,
+        "x_inches": 3.007894,
+        "y_inches": 2.716261
+      },
+      {
+        "block_ler_approx": 0.9966285285289058,
+        "p": 0.098,
+        "x_inches": 3.027392,
+        "y_inches": 2.716313
+      },
+      {
+        "block_ler_approx": 0.997069383127849,
+        "p": 0.099,
+        "x_inches": 3.036993,
+        "y_inches": 2.716357
+      },
+      {
+        "block_ler_approx": 0.997299907455823,
+        "p": 0.1,
+        "x_inches": 3.046496,
+        "y_inches": 2.71638
+      },
+      {
+        "block_ler_approx": 0.9975806177060715,
+        "p": 0.101,
+        "x_inches": 3.055906,
+        "y_inches": 2.716408
+      },
+      {
+        "block_ler_approx": 0.9977611160170716,
+        "p": 0.102,
+        "x_inches": 3.065222,
+        "y_inches": 2.716426
+      },
+      {
+        "block_ler_approx": 0.9979817694157083,
+        "p": 0.103,
+        "x_inches": 3.074448,
+        "y_inches": 2.716448
+      },
+      {
+        "block_ler_approx": 0.9981723729837587,
+        "p": 0.104,
+        "x_inches": 3.083585,
+        "y_inches": 2.716467
+      },
+      {
+        "block_ler_approx": 0.9982626715898104,
+        "p": 0.105,
+        "x_inches": 3.092634,
+        "y_inches": 2.716476
+      },
+      {
+        "block_ler_approx": 0.9984232226152848,
+        "p": 0.106,
+        "x_inches": 3.101597,
+        "y_inches": 2.716492
+      },
+      {
+        "block_ler_approx": 0.998563725944123,
+        "p": 0.107,
+        "x_inches": 3.110476,
+        "y_inches": 2.716506
+      },
+      {
+        "block_ler_approx": 0.9986942110251792,
+        "p": 0.108,
+        "x_inches": 3.119273,
+        "y_inches": 2.716519
+      },
+      {
+        "block_ler_approx": 0.9987945957669837,
+        "p": 0.109,
+        "x_inches": 3.127988,
+        "y_inches": 2.716529
+      },
+      {
+        "block_ler_approx": 0.9989351513573952,
+        "p": 0.11,
+        "x_inches": 3.136624,
+        "y_inches": 2.716543
+      }
+    ],
+    "15": [
+      {
+        "block_ler_approx": 0.11819311852185366,
+        "p": 0.01,
+        "x_inches": 0.869111,
+        "y_inches": 2.504191
+      },
+      {
+        "block_ler_approx": 0.3762508985289493,
+        "p": 0.02,
+        "x_inches": 1.524569,
+        "y_inches": 2.619396
+      },
+      {
+        "block_ler_approx": 0.6314242745136835,
+        "p": 0.03,
+        "x_inches": 1.907988,
+        "y_inches": 2.670905
+      },
+      {
+        "block_ler_approx": 0.8119561607126745,
+        "p": 0.04,
+        "x_inches": 2.180028,
+        "y_inches": 2.695924
+      },
+      {
+        "block_ler_approx": 0.9159750474046486,
+        "p": 0.05,
+        "x_inches": 2.391038,
+        "y_inches": 2.707917
+      },
+      {
+        "block_ler_approx": 0.966325901605824,
+        "p": 0.06,
+        "x_inches": 2.563446,
+        "y_inches": 2.713241
+      },
+      {
+        "block_ler_approx": 0.9877926840151711,
+        "p": 0.07,
+        "x_inches": 2.709215,
+        "y_inches": 2.715427
+      },
+      {
+        "block_ler_approx": 0.9960476998211157,
+        "p": 0.08,
+        "x_inches": 2.835486,
+        "y_inches": 2.716255
+      },
+      {
+        "block_ler_approx": 0.9987745180114352,
+        "p": 0.09,
+        "x_inches": 2.946865,
+        "y_inches": 2.716527
+      },
+      {
+        "block_ler_approx": 0.9988548314553312,
+        "p": 0.091,
+        "x_inches": 2.957314,
+        "y_inches": 2.716535
+      },
+      {
+        "block_ler_approx": 0.9990556433206796,
+        "p": 0.092,
+        "x_inches": 2.967649,
+        "y_inches": 2.716555
+      },
+      {
+        "block_ler_approx": 0.999095810538087,
+        "p": 0.093,
+        "x_inches": 2.977872,
+        "y_inches": 2.716559
+      },
+      {
+        "block_ler_approx": 0.9991861926819385,
+        "p": 0.094,
+        "x_inches": 2.987985,
+        "y_inches": 2.716568
+      },
+      {
+        "block_ler_approx": 0.9994071612341726,
+        "p": 0.096,
+        "x_inches": 3.007894,
+        "y_inches": 2.71659
+      },
+      {
+        "block_ler_approx": 0.9994573881744012,
+        "p": 0.097,
+        "x_inches": 3.017693,
+        "y_inches": 2.716595
+      },
+      {
+        "block_ler_approx": 0.9995478030279905,
+        "p": 0.098,
+        "x_inches": 3.027392,
+        "y_inches": 2.716604
+      },
+      {
+        "block_ler_approx": 0.9995678963284209,
+        "p": 0.099,
+        "x_inches": 3.036993,
+        "y_inches": 2.716606
+      },
+      {
+        "block_ler_approx": 0.9996382260608683,
+        "p": 0.1,
+        "x_inches": 3.046496,
+        "y_inches": 2.716613
+      },
+      {
+        "block_ler_approx": 0.9996683688895724,
+        "p": 0.101,
+        "x_inches": 3.055906,
+        "y_inches": 2.716616
+      },
+      {
+        "block_ler_approx": 0.9996985126271958,
+        "p": 0.102,
+        "x_inches": 3.065222,
+        "y_inches": 2.716619
+      },
+      {
+        "block_ler_approx": 0.9997487542097939,
+        "p": 0.103,
+        "x_inches": 3.074448,
+        "y_inches": 2.716624
+      },
+      {
+        "block_ler_approx": 0.9997688515498235,
+        "p": 0.104,
+        "x_inches": 3.083585,
+        "y_inches": 2.716626
+      },
+      {
+        "block_ler_approx": 0.9998090474418955,
+        "p": 0.105,
+        "x_inches": 3.092634,
+        "y_inches": 2.71663
+      },
+      {
+        "block_ler_approx": 0.9998492449500553,
+        "p": 0.106,
+        "x_inches": 3.101597,
+        "y_inches": 2.716634
+      },
+      {
+        "block_ler_approx": 0.9998391954215029,
+        "p": 0.107,
+        "x_inches": 3.110476,
+        "y_inches": 2.716633
+      },
+      {
+        "block_ler_approx": 0.9998793941417679,
+        "p": 0.108,
+        "x_inches": 3.119273,
+        "y_inches": 2.716637
+      },
+      {
+        "block_ler_approx": 0.9998994941079679,
+        "p": 0.109,
+        "x_inches": 3.127988,
+        "y_inches": 2.716639
+      },
+      {
+        "block_ler_approx": 0.9998894440743634,
+        "p": 0.11,
+        "x_inches": 3.136624,
+        "y_inches": 2.716638
+      }
+    ],
+    "9": [
+      {
+        "block_ler_approx": 0.044341278743843714,
+        "p": 0.01,
+        "x_inches": 0.869111,
+        "y_inches": 2.406649
+      },
+      {
+        "block_ler_approx": 0.1563005115822941,
+        "p": 0.02,
+        "x_inches": 1.524569,
+        "y_inches": 2.531995
+      },
+      {
+        "block_ler_approx": 0.30162738646826653,
+        "p": 0.03,
+        "x_inches": 1.907988,
+        "y_inches": 2.597402
+      },
+      {
+        "block_ler_approx": 0.45273042063247426,
+        "p": 0.04,
+        "x_inches": 2.180028,
+        "y_inches": 2.637806
+      },
+      {
+        "block_ler_approx": 0.5897038893935926,
+        "p": 0.05,
+        "x_inches": 2.391038,
+        "y_inches": 2.664104
+      },
+      {
+        "block_ler_approx": 0.7042921188788798,
+        "p": 0.06,
+        "x_inches": 2.563446,
+        "y_inches": 2.681771
+      },
+      {
+        "block_ler_approx": 0.7945182735119215,
+        "p": 0.07,
+        "x_inches": 2.709215,
+        "y_inches": 2.693764
+      },
+      {
+        "block_ler_approx": 0.8601523093683351,
+        "p": 0.08,
+        "x_inches": 2.835486,
+        "y_inches": 2.701661
+      },
+      {
+        "block_ler_approx": 0.9075349389517001,
+        "p": 0.09,
+        "x_inches": 2.946865,
+        "y_inches": 2.706996
+      },
+      {
+        "block_ler_approx": 0.9114474443026566,
+        "p": 0.091,
+        "x_inches": 2.957314,
+        "y_inches": 2.707424
+      },
+      {
+        "block_ler_approx": 0.918574977843835,
+        "p": 0.093,
+        "x_inches": 2.977872,
+        "y_inches": 2.708199
+      },
+      {
+        "block_ler_approx": 0.922331106126116,
+        "p": 0.094,
+        "x_inches": 2.987985,
+        "y_inches": 2.708605
+      },
+      {
+        "block_ler_approx": 0.9253396237339796,
+        "p": 0.095,
+        "x_inches": 2.997992,
+        "y_inches": 2.708929
+      },
+      {
+        "block_ler_approx": 0.9374250365849229,
+        "p": 0.099,
+        "x_inches": 3.036993,
+        "y_inches": 2.71022
+      },
+      {
+        "block_ler_approx": 0.9398685519149397,
+        "p": 0.1,
+        "x_inches": 3.046496,
+        "y_inches": 2.710479
+      },
+      {
+        "block_ler_approx": 0.9424889359620002,
+        "p": 0.101,
+        "x_inches": 3.055906,
+        "y_inches": 2.710756
+      },
+      {
+        "block_ler_approx": 0.9450881277855288,
+        "p": 0.102,
+        "x_inches": 3.065222,
+        "y_inches": 2.71103
+      },
+      {
+        "block_ler_approx": 0.9473897249291143,
+        "p": 0.103,
+        "x_inches": 3.074448,
+        "y_inches": 2.711272
+      },
+      {
+        "block_ler_approx": 0.949563299705351,
+        "p": 0.104,
+        "x_inches": 3.083585,
+        "y_inches": 2.7115
+      },
+      {
+        "block_ler_approx": 0.9518853627903485,
+        "p": 0.105,
+        "x_inches": 3.092634,
+        "y_inches": 2.711743
+      },
+      {
+        "block_ler_approx": 0.953877482281696,
+        "p": 0.106,
+        "x_inches": 3.101597,
+        "y_inches": 2.711951
+      },
+      {
+        "block_ler_approx": 0.9556912443678243,
+        "p": 0.107,
+        "x_inches": 3.110476,
+        "y_inches": 2.71214
+      },
+      {
+        "block_ler_approx": 0.9576335755296055,
+        "p": 0.108,
+        "x_inches": 3.119273,
+        "y_inches": 2.712342
+      },
+      {
+        "block_ler_approx": 0.9596377249639291,
+        "p": 0.109,
+        "x_inches": 3.127988,
+        "y_inches": 2.71255
+      },
+      {
+        "block_ler_approx": 0.9614044591848252,
+        "p": 0.11,
+        "x_inches": 3.136624,
+        "y_inches": 2.712733
+      }
+    ]
+  },
+  "figure_member": "toric_threshold.pgf",
+  "figure_sha256": "547fb722746f75e26bd1913c9a67b45ca7d29df9b48f7ed4d2554eaefbe63733",
+  "paper": "https://arxiv.org/abs/2005.07016v2",
+  "schema": "roffe-figure3-source-points-v1",
+  "source_archive_sha256": "e68595d13a330c067e280a473354d7254816bea8be2746ae4a5ab46557a23ef4",
+  "source_url": "https://arxiv.org/src/2005.07016v2",
+  "x_log10_calibration": {
+    "p_001_x": 0.869111,
+    "p_01_x": 3.046496
+  },
+  "y_log10_calibration": {
+    "inches_per_two_decades": 0.458176,
+    "rate_1_y": 2.716649
+  }
+}

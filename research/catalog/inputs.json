@@ -126,6 +126,54 @@
         "kind": "css_artifact",
         "path": "data/reproductions/mackay-0304161-unicycle/codes/unicycle274.npz"
       }
+    },
+    {
+      "code_id": "toric11",
+      "aliases": [],
+      "label": "Roffe toric [[242,2,11]]",
+      "artifact_path": "data/reproductions/roffe-2005-07016-bp/codes/toric11.npz",
+      "asset_label": "Frozen source-constructed ring-HGP CSS input",
+      "asset_kind": "code_artifact",
+      "execution": {
+        "kind": "css_artifact",
+        "path": "data/reproductions/roffe-2005-07016-bp/codes/toric11.npz"
+      }
+    },
+    {
+      "code_id": "toric13",
+      "aliases": [],
+      "label": "Roffe toric [[338,2,13]]",
+      "artifact_path": "data/reproductions/roffe-2005-07016-bp/codes/toric13.npz",
+      "asset_label": "Frozen source-constructed ring-HGP CSS input",
+      "asset_kind": "code_artifact",
+      "execution": {
+        "kind": "css_artifact",
+        "path": "data/reproductions/roffe-2005-07016-bp/codes/toric13.npz"
+      }
+    },
+    {
+      "code_id": "toric15",
+      "aliases": [],
+      "label": "Roffe toric [[450,2,15]]",
+      "artifact_path": "data/reproductions/roffe-2005-07016-bp/codes/toric15.npz",
+      "asset_label": "Frozen source-constructed ring-HGP CSS input",
+      "asset_kind": "code_artifact",
+      "execution": {
+        "kind": "css_artifact",
+        "path": "data/reproductions/roffe-2005-07016-bp/codes/toric15.npz"
+      }
+    },
+    {
+      "code_id": "toric9",
+      "aliases": [],
+      "label": "Roffe toric [[162,2,9]]",
+      "artifact_path": "data/reproductions/roffe-2005-07016-bp/codes/toric9.npz",
+      "asset_label": "Frozen source-constructed ring-HGP CSS input",
+      "asset_kind": "code_artifact",
+      "execution": {
+        "kind": "css_artifact",
+        "path": "data/reproductions/roffe-2005-07016-bp/codes/toric9.npz"
+      }
     }
   ],
   "circuits": [

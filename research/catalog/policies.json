@@ -616,6 +616,21 @@
       "availability": "registered_css_artifact",
       "notes": "Frozen [[74,18]] and [[274,110]] CSS inputs. The length-273 difference-set ordering is project generated; logical bases are project derived.",
       "source_url": "https://arxiv.org/abs/quant-ph/0304161v3"
+    },
+    {
+      "id": "toric",
+      "label": "Toric (ring hypergraph product)",
+      "code_ids": [
+        "toric9",
+        "toric11",
+        "toric13",
+        "toric15"
+      ],
+      "circuit_code_ids": [],
+      "circuits": [],
+      "availability": "registered_css_artifact",
+      "notes": "Figure 3 source constructions from Roffe 2020; row-major ring-HGP ordering and project-derived paired logicals. Public choices require measured multi-rate evidence.",
+      "source_url": "https://arxiv.org/abs/2005.07016v2"
     }
   ]
 }

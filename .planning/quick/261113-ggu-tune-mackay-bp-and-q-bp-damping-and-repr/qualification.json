@@ -1,0 +1,10 @@
+{
+  "plan_sha256": "ad6aeaeca509022283d1ecde7aad7ae9234c63e3152da35cd8c01890ad7f6191",
+  "points": 6,
+  "receipt_sha256": "87d14bac8663c81581062ee329666f41120f6a8ad841b900a939ee8d10e26a66",
+  "schema": "bp-study-runtime-qualification-v1",
+  "scientific_scope": "development qualification, not curve evidence",
+  "serial_parallel_scientific_records": "identical for binary SP and Q-BP",
+  "shots": 528,
+  "terminal_audit": "all counts, work, manifests, digests and endpoint replays passed"
+}

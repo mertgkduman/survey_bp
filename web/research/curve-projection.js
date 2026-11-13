@@ -23,7 +23,7 @@ const compact=value=>{
  if(value&&typeof value==='object'){const out={};for(const [key,item] of Object.entries(value)){const child=compact(item);if(child!==undefined)out[key]=child;}return Object.keys(out).length?out:undefined;}
  return value===undefined?undefined:value;
 };
-const kernelFields=['kernel','family','variant','rule','check_rule','numerical_profile','message_resolution','resolution','damping_old','v2c_damping','damping_gamma','check_cap','binary_paper_v2c_cap','qbp_check_cap','product_epsilon','prior','candidate','hard_decision','stop','zero_syndrome_shortcut','max_iterations','max_iterations_per_binary_decode','alpha','beta','min_sum','messages','v2c','policy','qbpgd','controller','common_controls','profile_controls','arm_policy','tie_break'];
+const kernelFields=['kernel','family','variant','rule','check_rule','numerical_profile','message_resolution','resolution','damping_old','v2c_damping','damping_gamma','check_cap','binary_paper_v2c_cap','qbp_check_cap','product_epsilon','prior','candidate','hard_decision','stop','zero_syndrome_shortcut','max_iterations','max_iterations_per_binary_decode','alpha','alpha_schedule','first_iteration','beta','min_sum','messages','v2c','policy','qbpgd','controller','common_controls','profile_controls','arm_policy','tie_break'];
 const pickKernel=value=>{
  if(!value||typeof value!=='object')return undefined;
  const profile={};for(const key of kernelFields)if(own(value,key))profile[key]=value[key];
