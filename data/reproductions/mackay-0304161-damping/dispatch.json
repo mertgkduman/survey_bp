@@ -1,0 +1,44 @@
+{
+  "advance": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--requeue",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+      "--job-name=bp-damp-advance",
+      "--cpus-per-task=1",
+      "--mem=4G",
+      "--dependency=afterok:61769653",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-damping/results/advance-%j.log",
+      "--wrap=/hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-damping/run.py --stage tuning --advance"
+    ],
+    "id": "61769654"
+  },
+  "array": {
+    "argv": [
+      "sbatch",
+      "--parsable",
+      "--partition=common,scavenger",
+      "--account=pfisterlab",
+      "--nodes=1",
+      "--ntasks=1",
+      "--requeue",
+      "--time=4-00:00:00",
+      "--chdir=/hpc/group/pfisterlab/mg551/storage/survey_bp",
+      "--export=ALL,PYTHONPATH=/hpc/group/pfisterlab/mg551/storage/survey_bp/src,OMP_NUM_THREADS=1,OPENBLAS_NUM_THREADS=1,MKL_NUM_THREADS=1",
+      "--job-name=bp-damp-tuning",
+      "--cpus-per-task=1",
+      "--mem=4G",
+      "--array=0-139%16",
+      "--output=/hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-damping/results/slurm-%A_%a.log",
+      "--wrap=exec /hpc/group/pfisterlab/mg551/storage/survey_bp/.venv/bin/python /hpc/group/pfisterlab/mg551/storage/survey_bp/data/reproductions/mackay-0304161-damping/run.py --stage tuning --index \"$SLURM_ARRAY_TASK_ID\""
+    ],
+    "id": "61769653"
+  }
+}

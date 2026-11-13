@@ -1,7 +1,7 @@
 ---
 status: passed
 scope: implementation, qualification, frozen designs and scheduler preflight
-campaign_status: awaiting_dispatch
+campaign_status: queued
 ---
 
 # Verification
@@ -30,3 +30,9 @@ campaign_status: awaiting_dispatch
 Campaign results and automatic stage advancement remain to be inspected after
 submission. Do not mark tuning, independent confirmation or Roffe reproduction
 complete from these implementation checks.
+
+Production dispatch accepted: tuning array 61769653 and dependent audit/advance
+61769654. The array is queued for priority; the advance job is dependency-pending.
+No tuning result, damping winner, holdout result or Roffe point is claimed yet.
+Tuning/Roffe frozen plans load successfully (34/40 pins). New input setup leaves
+public counts unchanged at 70/369/8/0. Raw results/lock files remain local.
