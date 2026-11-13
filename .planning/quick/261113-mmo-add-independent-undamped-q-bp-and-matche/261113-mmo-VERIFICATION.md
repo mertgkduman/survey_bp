@@ -25,3 +25,5 @@
 Scope: new controls and source evidence are verified. Earlier rare confirmation
 and subsequent Roffe measurements remain ongoing/pending and are not inferred
 from these checks. Missing requested paper ordinates remain a source limitation.
+
+CSV artifact line endings normalized to LF;80 rows and provenance SHA256 rechecked.

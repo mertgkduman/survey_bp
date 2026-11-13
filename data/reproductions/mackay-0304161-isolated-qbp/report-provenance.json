@@ -1,7 +1,7 @@
 {
   "claim_scope": "Descriptive matched-channel method/damping comparisons, original-paper classical curve separately; missing source ordinates remain unavailable.",
-  "csv_sha256": "b339c58b1e27ba6ac4baac5ba3e6d2e9dcae2254c7c7a5083dde90c42184531d",
-  "observed_at": "2026-11-13T21:37:16+00:00",
+  "csv_sha256": "27ee90b35ac392f7e049598db2e7a56e868041c512421759eb0d476491d40e12",
+  "observed_at": "2026-11-13T21:42:25+00:00",
   "rows": 80,
   "source_receipts": {
     "data/reproductions/mackay-0304161-damping-t100/confirmation/verified.json": "71c42b99afaa6a5c7e07e60249501b4e2bd7640e737623fd67259d9a0cc0ef8b",

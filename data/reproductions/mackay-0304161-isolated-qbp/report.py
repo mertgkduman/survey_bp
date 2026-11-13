@@ -52,7 +52,7 @@ def main():
              'evidence_path':'data/reproductions/mackay-0304161-isolated-qbp/paper-evidence.json'})
     fields=list(dict.fromkeys(k for r in records for k in r))
     with (HERE/'results-table.csv').open('w',newline='') as f:
-        writer=csv.DictWriter(f,fieldnames=fields);writer.writeheader();writer.writerows(records)
+        writer=csv.DictWriter(f,fieldnames=fields,lineterminator='\n');writer.writeheader();writer.writerows(records)
     def value(code,arm,p):
         r=next(r for r in records if r['code']==code and r['arm']==arm and r['physical_p']==p)
         return 'Running' if r['status']=='running' else f'{r["error_rate"]:.4g}'

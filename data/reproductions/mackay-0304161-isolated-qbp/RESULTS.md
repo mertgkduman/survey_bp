@@ -1,6 +1,6 @@
 # MacKay Construction-U: isolated decoder and damping results
 
-Snapshot: 2026-11-13T21:37:16+00:00. Descriptive point estimates from audited receipts; no new sampling or decoding.
+Snapshot: 2026-11-13T21:42:25+00:00. Descriptive point estimates from audited receipts; no new sampling or decoding.
 
 These matched-channel tables use identical depolarizing Pauli samples and the independent confirmation seed2026111323. All four methods have a100-full-graph-round ceiling; separate BP uses matched marginal priors2p/3 and Q-BP uses the joint prior p. Both X/Z logical residuals and nonconvergence count toward quantum block failure. Each complete point stopped at20 failures. The20 new d=0 points are fully audited; the existing damping confirmation has39/40 audited points.
 
