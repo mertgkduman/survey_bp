@@ -1,7 +1,7 @@
 ---
-status: incomplete
+status: complete
 implementation_status: verified
-campaign_status: running
+campaign_status: complete
 implementation_commit: fdbb98b
 ---
 
@@ -21,17 +21,11 @@ record zero iterations and updates. It has an explicit controller identity and
 is not pooled with the earlier unpruned work records. No canonical kernel or
 old frozen implementation/plan is changed.
 
-Slurm array **61703094** (16 CPUs) continues the remaining
-unicycle-SP point (.010). Task **61703094_11** (.013) completed with exit 0:0 and its full ledger and endpoints passed audit. The ordinary binary and Q-BP
-sweeps are complete on both codes. Dependent collector **61703097** audits
-and publishes terminal evidence. Accepted commands are retained in `dispatch.json`.
-
-Portable audited snapshot: **29/30 points**, **599,227 shots**, **580 quantum
-block failures**, **575,727 certified skipped branches**. Every audited point
-reached 20 failures. All 15 [[74,18]] points, all five [[274,110]] ordinary-binary
-points, all five [[274,110]] Q-BP points and its p=.013/.02/.03/.04 unicycle-SP points are
-verified. The remaining campaign is
-still executing; no full-curve agreement claim is made.
+All arrays **61703094–61703096** and collector **61703097** completed with
+exit 0:0. The collector audited and published all **30/30 points**, **6,403,005
+shots**, **600 quantum block failures** and **6,367,969 certified skipped branches**.
+Every point reached 20 failures. The previous 29 audited records are unchanged;
+the final .010 point's summary matches the collector receipt and frozen pins.
 
 The earlier .04–.10 campaign completed **42/42 points**, **2,366 shots** and
 **840 failures**; its array and collector exited COMPLETED (0:0). Its complete
@@ -43,13 +37,13 @@ Counts of active curves / points / codes / circuits:
 
 - Complete old-grid view before retirement: **70 / 381 / 8 / 0**.
 - Existing evidence after retiring the old interval: **64 / 339 / 6 / 0**.
-- Current audited paper-rate snapshot: **70 / 368 / 8 / 0**.
+- Current audited paper-rate snapshot: **70 / 369 / 8 / 0**.
 - Planned complete paper-rate view: **70 / 369 / 8 / 0**, subject to normal
   evidence and two-distinct-rate eligibility checks.
 
 The current view contains five-rate [[74,18]] curves and complete ordinary
-binary/Q-BP curves for [[274,110]]. Its four-point unicycle-SP curve
-qualifies for public display; only p=.010 remains running.
+binary/Q-BP curves for [[274,110]]. Its five-point unicycle-SP curve
+qualifies for public display; all simulations are complete.
 No old interval is shown or mixed into the new curves. Other historical
 decoders and custom matrix/Stim paths remain available.
 
@@ -64,11 +58,9 @@ resume, work counters, full input/selector/export consistency, empty states,
 stale selections, mobile and archived v1. All 29 new and 27 old frozen file
 hashes match. JavaScript syntax and Git whitespace checks pass.
 
-Remaining work is automated. The dependent collector verifies complete
-terminal ledgers, counts, hashes and first/last-shot replay, publishes the new
-portable snapshot and refreshes a clean preview. Inspect actual collector
-status before marking the campaign complete. The README provides safe manual
-collection/publication commands and the proof; do not pool old/new evidence.
+The final collector verified every complete ledger, counts, work, hashes and
+endpoint replay and refreshed the workbench. Final evidence is in verified.json;
+old/new controllers and sampling roles remain separate.
 
 Latest results and validated running-prefix diagnostics are recorded in
 [PROGRESS-2026-11-12.md](./PROGRESS-2026-11-12.md), including recovery of one
@@ -81,3 +73,10 @@ approximate 7.0747e-5. Both quantum and classical counts are 20 (four Type I,
 sixteen Type II, zero stabilizer successes). The difference is mainly in
 detected/Type I errors. Source iteration and numerical settings remain
 unresolved; no full-curve agreement is established. See PROGRESS for diagnostics.
+
+The final .010 rate is 20/5,803,778 = 3.4460e-6, with pointwise 95% interval
+[2.1049e-6, 5.1123e-6], below the source approximate 6.6987e-6. It has one
+Type I and nineteen Type II failures and no stabilizer successes. The two lowest
+rates are below their source ordinates; the other three are consistent within
+individual intervals. Full source-curve agreement is not established. See
+PROGRESS-2026-11-13.md for the final audit status.

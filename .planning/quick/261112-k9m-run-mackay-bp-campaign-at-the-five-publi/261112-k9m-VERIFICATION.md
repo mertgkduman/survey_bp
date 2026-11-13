@@ -1,12 +1,12 @@
 ---
 status: passed
 scope: implementation, dispatch and partial audited publication
-campaign_status: running
+campaign_status: complete
 ---
 
 # Verification
 
-Implementation and dispatch pass. Full Monte Carlo completion remains open.
+Implementation and dispatch pass. All 30 Monte Carlo points and the final collector completed 0:0.
 
 | Check | Evidence | Result |
 | --- | --- | --- |
@@ -15,14 +15,14 @@ Implementation and dispatch pass. Full Monte Carlo completion remains open.
 | Exact optimization | Independent incidence checks; distance proof; syndrome-only ordering; candidate equivalence and strict-bound/tie tests | Pass |
 | Work and outcomes | Zero skipped work; all executed branch counters; separate quantum/classical failures; no borrowed classical interval | Pass |
 | Ordered parallel execution | Bounded worker batches, exact stopping prefix, serial/parallel equality, corruption checks and resume | Pass |
-| Actual audited data | 29 points / 599,227 shots / 580 failures; digests, counts, stop and endpoint replay | Pass |
+| Actual audited data | 30 points / 6,403,005 shots / 600 failures; digests, counts, stop and endpoint replay | Pass |
 | Public replacement | Old .04–.10 raw evidence retained but absent from all active views; new rates, selectors, exports and stale state verified | Pass |
 | Regression | 149 tests; 63 final focused checks; 26 browser groups and final actual public rerun | Pass |
 | Preservation | Old plan/runner, kernels, raw historical ledgers and archived v1 unchanged; old full 42-point receipt retained | Pass |
-| Remaining simulations | One unicycle-SP point (.010) active; collector 61703097 dependent | Running |
-| Source comparison | .020/.030/.040 approximate source values inside pointwise 95% intervals; .013 source value above its interval | Partial agreement; discrepancy retained |
+| Remaining simulations | All arrays and collector completed 0:0 | Complete |
+| Source comparison | .020/.030/.040 approximate source values inside pointwise 95% intervals; .010 and .013 source values above their intervals | Partial agreement; discrepancy retained |
 
-Active view: 70 curves, 368 points, eight codes and zero circuits. Raw catalogs
+Active view: 70 curves, 369 points, eight codes and zero circuits. Raw catalogs
 retain both campaign identities. No full paper-curve agreement verdict follows
 from this implementation verification or the partial result snapshot.
 

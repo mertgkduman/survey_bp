@@ -5,10 +5,10 @@ current_phase: 11
 current_phase_name: Quaternary Reproduction and Comparisons
 current_plan: 17
 status: executing
-stopped_at: Published 29/30 audited MacKay paper-rate points; p=.010 still running; p=.013 source ordinate above local interval
-last_updated: "2026-11-12T22:41:03+00:00"
-last_activity: 2026-11-12
-last_activity_desc: Audited and published 29/30 paper-rate points. Both ordinary BP and Q-BP sweeps are complete; one length-274 unicycle-SP rate continues. Refreshed workbench passed 41 focused checks and seven public browser groups. The newly terminal .013 source point is lower than the paper ordinate, which is above its pointwise 95% interval.
+stopped_at: Published 30/30 audited MacKay paper-rate points; MacKay complete; damping and early BP-OSD baseline extension started
+last_updated: "2026-11-13T16:56:14+00:00"
+last_activity: 2026-11-13
+last_activity_desc: Audited and published 30/30 paper-rate points. Both ordinary BP and Q-BP sweeps are complete; all arrays and the final collector completed 0:0. Refreshed workbench passed 41 focused checks and seven public browser groups. The newly terminal .013 source point is lower than the paper ordinate, which is above its pointwise 95% interval.
 state_head: fdbb98b
 progress:
   total_phases: 14
@@ -34,10 +34,10 @@ Total Phases: 14
 Current Plan: 17
 Total Plans in Phase: 25
 Status: Executing Phase 11
-Last activity: 2026-11-12 — refreshed quick task 261112-k9m results to 29/30 audited points
-Last Activity Description: The frozen MacKay campaign now uses binary rates .010, .013, .020, .030, .040 and matched Q-BP depolarizing rates .015, .0195, .030, .045, .060. Ordinary BP and Q-BP sweeps are complete; array 61703094 continues the final length-274 unicycle-SP rate (.010). Collector 61703097 remains dependent. The audited paper-rate snapshot contains 29/30 points, 599,227 shots and 580 block failures. Active view: 70 curves, 368 points, 8 codes, 0 circuits. The old .04–.10 dataset is historical and centrally retired from public views. Exact branch pruning and both work averages are explicit; kernels and old plans are unchanged. Passed 149 tests, 63 final focused checks and 26 browser workflow groups. Implementation `fdbb98b`; full campaign completion remains pending. The .013 point passed full ledger/replay audit; its approximate paper ordinate is above its pointwise 95% interval.
+Last activity: 2026-11-13 — refreshed quick task 261112-k9m results to 30/30 audited points
+Last Activity Description: The frozen MacKay campaign now uses binary rates .010, .013, .020, .030, .040 and matched Q-BP depolarizing rates .015, .0195, .030, .045, .060. Ordinary BP and Q-BP sweeps are complete; all arrays and final collector 61703097 completed 0:0. The audited paper-rate snapshot contains 30/30 points, 6,403,005 shots and 600 block failures. Active view: 70 curves, 369 points, 8 codes, 0 circuits. The old .04–.10 dataset is historical and centrally retired from public views. Exact branch pruning and both work averages are explicit; kernels and old plans are unchanged. Passed 149 tests, 63 final focused checks and 26 browser workflow groups. Implementation `fdbb98b`; full campaign is complete; full source-curve agreement is not established. The .013 point passed full ledger/replay audit; its approximate paper ordinate is above its pointwise 95% interval.
 
-Running campaign: See the [paper-rate task summary](./quick/261112-k9m-run-mackay-bp-campaign-at-the-five-publi/261112-k9m-SUMMARY.md). Source-plot coordinates and the exact five rates are pinned. Retain 20 block failures or 100 million shots per rate and the 88,200 total-sweep ceiling. Classical errors are recorded separately from quantum failures. No full-curve agreement is claimed.
+Completed campaign: See the [paper-rate task summary](./quick/261112-k9m-run-mackay-bp-campaign-at-the-five-publi/261112-k9m-SUMMARY.md). Source-plot coordinates and the exact five rates are pinned. Retain 20 block failures or 100 million shots per rate and the 88,200 total-sweep ceiling. Classical errors are recorded separately from quantum failures. No full-curve agreement is claimed.
 
 Completed historical MacKay campaign: Array 61698133 and collector 61698134 completed with exit 0:0. All 42 points, 2,366 shots and 840 block failures are audited. These controlled wide-grid results remain preserved; the subsequent paper-grid correction retires them from public v2 views.
 
@@ -306,7 +306,7 @@ Phase 2 is complete (16/16 plans; 5/5 goal criteria; clean review; 46/46 securit
 
 | # | Description | Date | Commit | Status | Directory |
 |---|-------------|------|--------|--------|-----------|
-| 261112-k9m | Run MacKay at the five published error rates | 2026-11-12 | fdbb98b | Verified setup (149 tests / 26 browser groups); 29/30 audited points; campaign running | [261112-k9m-run-mackay-bp-campaign-at-the-five-publi](./quick/261112-k9m-run-mackay-bp-campaign-at-the-five-publi/) |
+| 261112-k9m | Run MacKay at the five published error rates | 2026-11-12 | fdbb98b | Complete; 30/30 audited points; lower-rate source discrepancy retained | [261112-k9m-run-mackay-bp-campaign-at-the-five-publi](./quick/261112-k9m-run-mackay-bp-campaign-at-the-five-publi/) |
 | 261112-i4d | Construct and run foundational MacKay unicycle BP campaign | 2026-11-12 | 8e234a4, fdbb98b | Complete: 42/42 audited points; old grid preserved as historical evidence | [261112-i4d-construct-mackay-2004-unicycle-codes-and](./quick/261112-i4d-construct-mackay-2004-unicycle-codes-and/) |
 | 261110-sic | Complete B1/C2 BPGD and matched-marginal Q-BP sweeps | 2026-11-11 | 25c6c1f, a84413f | Verified 77/77 points and 40,459,752 shots, with 40 final tests and 18 browser checks | [261110-sic-complete-b1-and-c2-bpgd-and-matched-q-bp](./quick/261110-sic-complete-b1-and-c2-bpgd-and-matched-q-bp/) |
 | 261111-f0q | Display mean iterations and directed edge updates together | 2026-11-11 | 324b53a | Verified with 124 research tests and 18 browser workflow checks | [261111-f0q-display-mean-iterations-and-directed-edg](./quick/261111-f0q-display-mean-iterations-and-directed-edg/) |
@@ -380,7 +380,7 @@ No requested decoding regime or named policy family is deferred beyond the first
 
 ## Session Continuity
 
-Latest campaign: quick task 261112-k9m, implementation `fdbb98b`. Array 61703094 continues the final unicycle-SP point (.010); ordinary BP and Q-BP are complete. Collector 61703097 is dependent. Snapshot: 29/30 audited points, 599,227 shots, 580 failures. The previous wide-grid campaign is fully audited (42/42) and publicly retired, with all evidence preserved. Only the length-274 unicycle-SP rate .010 remains. The completed .013 rate is below the approximate paper ordinate, which is above its pointwise 95% interval; .020/.030/.040 remain consistent. Full-curve agreement is not established. Latest progress validation passed 41 focused tests and seven public browser groups. See PROGRESS-2026-11-12.md for incomplete prefixes and checkpoint recovery. See the quick summary and campaign README for exact rates and safe resume/collection commands.
+Latest campaign: quick task 261112-k9m, implementation `fdbb98b`. All MacKay arrays and collector 61703097 completed 0:0. Snapshot: 30/30 audited points, 6,403,005 shots, 600 failures. The previous wide-grid campaign is fully audited (42/42) and publicly retired, with all evidence preserved. All 30 points are terminal. The completed .010 and .013 rates are below the approximate paper ordinate, which is above its pointwise 95% interval; .020/.030/.040 remain consistent. Full-curve agreement is not established. Latest progress validation passed 41 focused tests and seven public browser groups. See PROGRESS-2026-11-12.md for incomplete prefixes and checkpoint recovery. See the quick summary and campaign README for exact rates and safe resume/collection commands.
 
 Latest literature research: spikes 054 (PARTIAL: bounded citation screening, not an exhaustive global ranking) and 055 (VALIDATED: explicit baseline evidence in the screened sources). Twelve direct BP baseline papers are listed with min-sum/SPA families and evidence locations; foundational code benchmarks and BP+OSD/BP+SSF hybrids are separate. JSON/CSV and an offline consistency verifier accompany the report. This source list does not certify reproduction settings or authorize simulations. Scientific phase progress is unchanged.
 
