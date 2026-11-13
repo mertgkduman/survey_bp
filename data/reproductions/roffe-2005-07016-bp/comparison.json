@@ -1,0 +1,988 @@
+{
+  "schema": "canonical-bp-study-comparison-v1",
+  "scope": "Pointwise descriptive assessment; no simultaneous source-reproduction or decoder-superiority claim.",
+  "source_points": [
+    {
+      "ci95_high": 0.10110875261791002,
+      "ci95_low": 0.042781121281999845,
+      "id": "toric11-binary_ms-p01000",
+      "p": 0.01,
+      "rate": 0.06920415224913495,
+      "source_approx": 0.06553286834614931,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.2587491121769975,
+      "ci95_low": 0.1147413937582979,
+      "id": "toric11-binary_ms-p02000",
+      "p": 0.02,
+      "rate": 0.18181818181818182,
+      "source_approx": 0.22415175820535796,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.6387198647359378,
+      "ci95_low": 0.32877903577127376,
+      "id": "toric11-binary_ms-p03000",
+      "p": 0.03,
+      "rate": 0.4878048780487805,
+      "source_approx": 0.4155033422918876,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.7815004015014309,
+      "ci95_low": 0.43692245509692657,
+      "id": "toric11-binary_ms-p04000",
+      "p": 0.04,
+      "rate": 0.625,
+      "source_approx": 0.5936944617164118,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.8206163507648881,
+      "ci95_low": 0.47187995521011944,
+      "id": "toric11-binary_ms-p05000",
+      "p": 0.05,
+      "rate": 0.6666666666666666,
+      "source_approx": 0.7355022745293188,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9504923546942066,
+      "ci95_low": 0.6261582865113173,
+      "id": "toric11-binary_ms-p06000",
+      "p": 0.06,
+      "rate": 0.8333333333333334,
+      "source_approx": 0.8379484056013935,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9709441488712534,
+      "ci95_low": 0.6641108624628791,
+      "id": "toric11-binary_ms-p07000",
+      "p": 0.07,
+      "rate": 0.8695652173913043,
+      "source_approx": 0.9056669116754571,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9882506821155542,
+      "ci95_low": 0.7083872584460664,
+      "id": "toric11-binary_ms-p08000",
+      "p": 0.08,
+      "rate": 0.9090909090909091,
+      "source_approx": 0.9474849527494775,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric11-binary_ms-p09000",
+      "p": 0.09,
+      "rate": 1.0,
+      "source_approx": 0.9714580393548005,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric11-binary_ms-p09100",
+      "p": 0.091,
+      "rate": 1.0,
+      "source_approx": 0.9736672604797408,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9987349105020502,
+      "ci95_low": 0.761840090063179,
+      "id": "toric11-binary_ms-p09200",
+      "p": 0.092,
+      "rate": 0.9523809523809523,
+      "source_approx": 0.9748913319548882,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric11-binary_ms-p09300",
+      "p": 0.093,
+      "rate": 1.0,
+      "source_approx": 0.9767745035981831,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9987349105020502,
+      "ci95_low": 0.761840090063179,
+      "id": "toric11-binary_ms-p09400",
+      "p": 0.094,
+      "rate": 0.9523809523809523,
+      "source_approx": 0.9783170918637185,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric11-binary_ms-p09500",
+      "p": 0.095,
+      "rate": 1.0,
+      "source_approx": 0.9795174728842225,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9987349105020502,
+      "ci95_low": 0.761840090063179,
+      "id": "toric11-binary_ms-p09600",
+      "p": 0.096,
+      "rate": 0.9523809523809523,
+      "source_approx": 0.9807981883450878,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric11-binary_ms-p09700",
+      "p": 0.097,
+      "rate": 1.0,
+      "source_approx": 0.9819029166871883,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric11-binary_ms-p09800",
+      "p": 0.098,
+      "rate": 1.0,
+      "source_approx": 0.9832065155111466,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric11-binary_ms-p09900",
+      "p": 0.099,
+      "rate": 1.0,
+      "source_approx": 0.9841358908129948,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric11-binary_ms-p10000",
+      "p": 0.1,
+      "rate": 1.0,
+      "source_approx": 0.9851453557325777,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric11-binary_ms-p10100",
+      "p": 0.101,
+      "rate": 1.0,
+      "source_approx": 0.9861261207097846,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9987349105020502,
+      "ci95_low": 0.761840090063179,
+      "id": "toric11-binary_ms-p10200",
+      "p": 0.102,
+      "rate": 0.9523809523809523,
+      "source_approx": 0.9869392107584342,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric11-binary_ms-p10300",
+      "p": 0.103,
+      "rate": 1.0,
+      "source_approx": 0.9878721143879707,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric11-binary_ms-p10500",
+      "p": 0.105,
+      "rate": 1.0,
+      "source_approx": 0.9893825056162023,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9987349105020502,
+      "ci95_low": 0.761840090063179,
+      "id": "toric11-binary_ms-p10600",
+      "p": 0.106,
+      "rate": 0.9523809523809523,
+      "source_approx": 0.9900390522330276,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric11-binary_ms-p10700",
+      "p": 0.107,
+      "rate": 1.0,
+      "source_approx": 0.9907159498878527,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9987349105020502,
+      "ci95_low": 0.761840090063179,
+      "id": "toric11-binary_ms-p10800",
+      "p": 0.108,
+      "rate": 0.9523809523809523,
+      "source_approx": 0.9913235606831721,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric11-binary_ms-p10900",
+      "p": 0.109,
+      "rate": 1.0,
+      "source_approx": 0.9919016345875211,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9987349105020502,
+      "ci95_low": 0.761840090063179,
+      "id": "toric11-binary_ms-p11000",
+      "p": 0.11,
+      "rate": 0.9523809523809523,
+      "source_approx": 0.992200770591141,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.13704748934667615,
+      "ci95_low": 0.058581243731330994,
+      "id": "toric13-binary_ms-p01000",
+      "p": 0.01,
+      "rate": 0.09433962264150944,
+      "source_approx": 0.09034575955276175,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.36255589054950893,
+      "ci95_low": 0.16643339001862884,
+      "id": "toric13-binary_ms-p02000",
+      "p": 0.02,
+      "rate": 0.2597402597402597,
+      "source_approx": 0.2984248593864388,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.8007013749879655,
+      "ci95_low": 0.4536956019506384,
+      "id": "toric13-binary_ms-p03000",
+      "p": 0.03,
+      "rate": 0.6451612903225806,
+      "source_approx": 0.5276405213711574,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.8206163507648881,
+      "ci95_low": 0.47187995521011944,
+      "id": "toric13-binary_ms-p04000",
+      "p": 0.04,
+      "rate": 0.6666666666666666,
+      "source_approx": 0.7152784424732423,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9882506821155542,
+      "ci95_low": 0.7083872584460664,
+      "id": "toric13-binary_ms-p05000",
+      "p": 0.05,
+      "rate": 0.9090909090909091,
+      "source_approx": 0.844696425758181,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric13-binary_ms-p06000",
+      "p": 0.06,
+      "rate": 1.0,
+      "source_approx": 0.9215990322936434,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9987349105020502,
+      "ci95_low": 0.761840090063179,
+      "id": "toric13-binary_ms-p07000",
+      "p": 0.07,
+      "rate": 0.9523809523809523,
+      "source_approx": 0.9633971337935971,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric13-binary_ms-p08000",
+      "p": 0.08,
+      "rate": 1.0,
+      "source_approx": 0.9838391862687912,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric13-binary_ms-p09000",
+      "p": 0.09,
+      "rate": 1.0,
+      "source_approx": 0.9932185079589627,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric13-binary_ms-p09100",
+      "p": 0.091,
+      "rate": 1.0,
+      "source_approx": 0.9937577326564823,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric13-binary_ms-p09200",
+      "p": 0.092,
+      "rate": 1.0,
+      "source_approx": 0.9944071877096496,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric13-binary_ms-p09300",
+      "p": 0.093,
+      "rate": 1.0,
+      "source_approx": 0.9947470717162937,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric13-binary_ms-p09400",
+      "p": 0.094,
+      "rate": 1.0,
+      "source_approx": 0.9952871262808799,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric13-binary_ms-p09500",
+      "p": 0.095,
+      "rate": 1.0,
+      "source_approx": 0.9956773480239668,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric13-binary_ms-p09600",
+      "p": 0.096,
+      "rate": 1.0,
+      "source_approx": 0.9961077698486068,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric13-binary_ms-p09800",
+      "p": 0.098,
+      "rate": 1.0,
+      "source_approx": 0.9966285285289058,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric13-binary_ms-p09900",
+      "p": 0.099,
+      "rate": 1.0,
+      "source_approx": 0.997069383127849,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric13-binary_ms-p10000",
+      "p": 0.1,
+      "rate": 1.0,
+      "source_approx": 0.997299907455823,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9987349105020502,
+      "ci95_low": 0.761840090063179,
+      "id": "toric13-binary_ms-p10100",
+      "p": 0.101,
+      "rate": 0.9523809523809523,
+      "source_approx": 0.9975806177060715,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric13-binary_ms-p10200",
+      "p": 0.102,
+      "rate": 1.0,
+      "source_approx": 0.9977611160170716,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric13-binary_ms-p10300",
+      "p": 0.103,
+      "rate": 1.0,
+      "source_approx": 0.9979817694157083,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric13-binary_ms-p10400",
+      "p": 0.104,
+      "rate": 1.0,
+      "source_approx": 0.9981723729837587,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric13-binary_ms-p10500",
+      "p": 0.105,
+      "rate": 1.0,
+      "source_approx": 0.9982626715898104,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric13-binary_ms-p10600",
+      "p": 0.106,
+      "rate": 1.0,
+      "source_approx": 0.9984232226152848,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric13-binary_ms-p10700",
+      "p": 0.107,
+      "rate": 1.0,
+      "source_approx": 0.998563725944123,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric13-binary_ms-p10800",
+      "p": 0.108,
+      "rate": 1.0,
+      "source_approx": 0.9986942110251792,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric13-binary_ms-p10900",
+      "p": 0.109,
+      "rate": 1.0,
+      "source_approx": 0.9987945957669837,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric13-binary_ms-p11000",
+      "p": 0.11,
+      "rate": 1.0,
+      "source_approx": 0.9989351513573952,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.19195235960413748,
+      "ci95_low": 0.08338380663952641,
+      "id": "toric15-binary_ms-p01000",
+      "p": 0.01,
+      "rate": 0.13333333333333333,
+      "source_approx": 0.11819311852185366,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.4706475575190316,
+      "ci95_low": 0.22490093436633676,
+      "id": "toric15-binary_ms-p02000",
+      "p": 0.02,
+      "rate": 0.3448275862068966,
+      "source_approx": 0.3762508985289493,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.7815004015014309,
+      "ci95_low": 0.43692245509692657,
+      "id": "toric15-binary_ms-p03000",
+      "p": 0.03,
+      "rate": 0.625,
+      "source_approx": 0.6314242745136835,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.928681382801945,
+      "ci95_low": 0.5929625677213226,
+      "id": "toric15-binary_ms-p04000",
+      "p": 0.04,
+      "rate": 0.8,
+      "source_approx": 0.8119561607126745,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9882506821155542,
+      "ci95_low": 0.7083872584460664,
+      "id": "toric15-binary_ms-p05000",
+      "p": 0.05,
+      "rate": 0.9090909090909091,
+      "source_approx": 0.9159750474046486,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric15-binary_ms-p06000",
+      "p": 0.06,
+      "rate": 1.0,
+      "source_approx": 0.966325901605824,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9987349105020502,
+      "ci95_low": 0.761840090063179,
+      "id": "toric15-binary_ms-p07000",
+      "p": 0.07,
+      "rate": 0.9523809523809523,
+      "source_approx": 0.9877926840151711,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric15-binary_ms-p08000",
+      "p": 0.08,
+      "rate": 1.0,
+      "source_approx": 0.9960476998211157,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric15-binary_ms-p09000",
+      "p": 0.09,
+      "rate": 1.0,
+      "source_approx": 0.9987745180114352,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric15-binary_ms-p09100",
+      "p": 0.091,
+      "rate": 1.0,
+      "source_approx": 0.9988548314553312,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric15-binary_ms-p09200",
+      "p": 0.092,
+      "rate": 1.0,
+      "source_approx": 0.9990556433206796,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric15-binary_ms-p09300",
+      "p": 0.093,
+      "rate": 1.0,
+      "source_approx": 0.999095810538087,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric15-binary_ms-p09400",
+      "p": 0.094,
+      "rate": 1.0,
+      "source_approx": 0.9991861926819385,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric15-binary_ms-p09600",
+      "p": 0.096,
+      "rate": 1.0,
+      "source_approx": 0.9994071612341726,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric15-binary_ms-p09700",
+      "p": 0.097,
+      "rate": 1.0,
+      "source_approx": 0.9994573881744012,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric15-binary_ms-p09800",
+      "p": 0.098,
+      "rate": 1.0,
+      "source_approx": 0.9995478030279905,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric15-binary_ms-p09900",
+      "p": 0.099,
+      "rate": 1.0,
+      "source_approx": 0.9995678963284209,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric15-binary_ms-p10000",
+      "p": 0.1,
+      "rate": 1.0,
+      "source_approx": 0.9996382260608683,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric15-binary_ms-p10100",
+      "p": 0.101,
+      "rate": 1.0,
+      "source_approx": 0.9996683688895724,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric15-binary_ms-p10200",
+      "p": 0.102,
+      "rate": 1.0,
+      "source_approx": 0.9996985126271958,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric15-binary_ms-p10300",
+      "p": 0.103,
+      "rate": 1.0,
+      "source_approx": 0.9997487542097939,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric15-binary_ms-p10400",
+      "p": 0.104,
+      "rate": 1.0,
+      "source_approx": 0.9997688515498235,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric15-binary_ms-p10500",
+      "p": 0.105,
+      "rate": 1.0,
+      "source_approx": 0.9998090474418955,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric15-binary_ms-p10600",
+      "p": 0.106,
+      "rate": 1.0,
+      "source_approx": 0.9998492449500553,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric15-binary_ms-p10700",
+      "p": 0.107,
+      "rate": 1.0,
+      "source_approx": 0.9998391954215029,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric15-binary_ms-p10800",
+      "p": 0.108,
+      "rate": 1.0,
+      "source_approx": 0.9998793941417679,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric15-binary_ms-p10900",
+      "p": 0.109,
+      "rate": 1.0,
+      "source_approx": 0.9998994941079679,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric15-binary_ms-p11000",
+      "p": 0.11,
+      "rate": 1.0,
+      "source_approx": 0.9998894440743634,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.05294619039467142,
+      "ci95_low": 0.022108030566278476,
+      "id": "toric9-binary_ms-p01000",
+      "p": 0.01,
+      "rate": 0.03597122302158273,
+      "source_approx": 0.044341278743843714,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.2680670299396932,
+      "ci95_low": 0.11922711657943703,
+      "id": "toric9-binary_ms-p02000",
+      "p": 0.02,
+      "rate": 0.18867924528301888,
+      "source_approx": 0.1563005115822941,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.37156485488821084,
+      "ci95_low": 0.1711105391444591,
+      "id": "toric9-binary_ms-p03000",
+      "p": 0.03,
+      "rate": 0.26666666666666666,
+      "source_approx": 0.30162738646826653,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.6959494112837337,
+      "ci95_low": 0.3692195701065401,
+      "id": "toric9-binary_ms-p04000",
+      "p": 0.04,
+      "rate": 0.5405405405405406,
+      "source_approx": 0.45273042063247426,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.8206163507648881,
+      "ci95_low": 0.47187995521011944,
+      "id": "toric9-binary_ms-p05000",
+      "p": 0.05,
+      "rate": 0.6666666666666666,
+      "source_approx": 0.5897038893935926,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.8007013749879655,
+      "ci95_low": 0.4536956019506384,
+      "id": "toric9-binary_ms-p06000",
+      "p": 0.06,
+      "rate": 0.6451612903225806,
+      "source_approx": 0.7042921188788798,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.8624734460594208,
+      "ci95_low": 0.5133316845510592,
+      "id": "toric9-binary_ms-p07000",
+      "p": 0.07,
+      "rate": 0.7142857142857143,
+      "source_approx": 0.7945182735119215,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9504923546942066,
+      "ci95_low": 0.6261582865113173,
+      "id": "toric9-binary_ms-p08000",
+      "p": 0.08,
+      "rate": 0.8333333333333334,
+      "source_approx": 0.8601523093683351,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9504923546942066,
+      "ci95_low": 0.6261582865113173,
+      "id": "toric9-binary_ms-p09000",
+      "p": 0.09,
+      "rate": 0.8333333333333334,
+      "source_approx": 0.9075349389517001,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9709441488712534,
+      "ci95_low": 0.6641108624628791,
+      "id": "toric9-binary_ms-p09100",
+      "p": 0.091,
+      "rate": 0.8695652173913043,
+      "source_approx": 0.9114474443026566,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9709441488712534,
+      "ci95_low": 0.6641108624628791,
+      "id": "toric9-binary_ms-p09300",
+      "p": 0.093,
+      "rate": 0.8695652173913043,
+      "source_approx": 0.918574977843835,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9882506821155542,
+      "ci95_low": 0.7083872584460664,
+      "id": "toric9-binary_ms-p09400",
+      "p": 0.094,
+      "rate": 0.9090909090909091,
+      "source_approx": 0.922331106126116,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9987349105020502,
+      "ci95_low": 0.761840090063179,
+      "id": "toric9-binary_ms-p09500",
+      "p": 0.095,
+      "rate": 0.9523809523809523,
+      "source_approx": 0.9253396237339796,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9987349105020502,
+      "ci95_low": 0.761840090063179,
+      "id": "toric9-binary_ms-p09900",
+      "p": 0.099,
+      "rate": 0.9523809523809523,
+      "source_approx": 0.9374250365849229,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric9-binary_ms-p10000",
+      "p": 0.1,
+      "rate": 1.0,
+      "source_approx": 0.9398685519149397,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric9-binary_ms-p10100",
+      "p": 0.101,
+      "rate": 1.0,
+      "source_approx": 0.9424889359620002,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9882506821155542,
+      "ci95_low": 0.7083872584460664,
+      "id": "toric9-binary_ms-p10200",
+      "p": 0.102,
+      "rate": 0.9090909090909091,
+      "source_approx": 0.9450881277855288,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9709441488712534,
+      "ci95_low": 0.6641108624628791,
+      "id": "toric9-binary_ms-p10300",
+      "p": 0.103,
+      "rate": 0.8695652173913043,
+      "source_approx": 0.9473897249291143,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 1.0,
+      "ci95_low": 0.8315665290169146,
+      "id": "toric9-binary_ms-p10400",
+      "p": 0.104,
+      "rate": 1.0,
+      "source_approx": 0.949563299705351,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9987349105020502,
+      "ci95_low": 0.761840090063179,
+      "id": "toric9-binary_ms-p10500",
+      "p": 0.105,
+      "rate": 0.9523809523809523,
+      "source_approx": 0.9518853627903485,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9709441488712534,
+      "ci95_low": 0.6641108624628791,
+      "id": "toric9-binary_ms-p10600",
+      "p": 0.106,
+      "rate": 0.8695652173913043,
+      "source_approx": 0.953877482281696,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9882506821155542,
+      "ci95_low": 0.7083872584460664,
+      "id": "toric9-binary_ms-p10700",
+      "p": 0.107,
+      "rate": 0.9090909090909091,
+      "source_approx": 0.9556912443678243,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9987349105020502,
+      "ci95_low": 0.761840090063179,
+      "id": "toric9-binary_ms-p10800",
+      "p": 0.108,
+      "rate": 0.9523809523809523,
+      "source_approx": 0.9576335755296055,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9987349105020502,
+      "ci95_low": 0.761840090063179,
+      "id": "toric9-binary_ms-p10900",
+      "p": 0.109,
+      "rate": 0.9523809523809523,
+      "source_approx": 0.9596377249639291,
+      "source_inside_pointwise_interval": true
+    },
+    {
+      "ci95_high": 0.9987349105020502,
+      "ci95_low": 0.761840090063179,
+      "id": "toric9-binary_ms-p11000",
+      "p": 0.11,
+      "rate": 0.9523809523809523,
+      "source_approx": 0.9614044591848252,
+      "source_inside_pointwise_interval": true
+    }
+  ],
+  "verified_sha256": "20e0feff53ee5ebe63a9b281ab052c20bec182403db223e47abddc2e173b02fe"
+}

@@ -26,6 +26,7 @@ def overlay(base):
             points=deepcopy(template['points'][:2])
             for p,j in zip(points,jobs,strict=True):
                 p.update(x=j['physical_p'],y=.1,n=100,failures=10,ci_low=.05,ci_high=.2,mean_iterations=4,mean_directed_edge_updates=8*j['graph_edges'])
+                p['metadata'].update(cohort_kind='test_fixture',source_evidence_path=f'test-fixture-{identifier}-{j["physical_p"]}')
             series={**deepcopy(template),'series_id':identifier,'dataset_id':'browser-roffe-only','code_id':code,
                     'decoder_id':identifier,'source_decoder_id':arm,'points':points,
                     'channel_kind':jobs[0]['decoder']['noise_model']}
@@ -35,7 +36,10 @@ def overlay(base):
 
 def verify(url,output):
     output.mkdir(parents=True,exist_ok=False);checks=[];errors=[]
-    catalog=json.loads((ROOT/'web/research/catalog.json').read_text());future=overlay(catalog)
+    catalog=json.loads((ROOT/'web/research/catalog.json').read_text())
+    # Isolate this synthetic eligibility fixture even after real publication.
+    catalog['result_series']=[s for s in catalog['result_series'] if s['dataset_id']!='roffe-2020-figure3-canonical-bp']
+    future=overlay(catalog)
     with sync_playwright() as p:
         browser=p.chromium.launch();page=browser.new_page(accept_downloads=True,viewport={'width':1512,'height':1100})
         page.on('pageerror',lambda e:errors.append(str(e)))
@@ -44,6 +48,7 @@ window.testRefreshCatalog=c=>{S.catalog=c;fillSavedChoices();renderCards();avail
 window.testSelection=()=>({cards:S.cards.map(c=>({input:c.input,decoder:c.decoder})),spec:S.spec});
 load();''')
         page.route('**/app.js',lambda route:route.fulfill(body=app,content_type='text/javascript'))
+        page.route('**/catalog.json',lambda route:route.fulfill(body=json.dumps(catalog),content_type='application/json'))
         page.goto(url+'#results');page.wait_for_function("document.querySelector('#catalog-status').textContent.includes('measured')")
         assert not page.locator('[data-select=input] option[value=toric9]').count()
         assert not page.locator('#build-code option[value=toric9]').count()

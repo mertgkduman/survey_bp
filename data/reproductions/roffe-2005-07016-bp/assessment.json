@@ -1,0 +1,54 @@
+{
+  "claim": "Pointwise consistency at the current 20-failure precision; not a simultaneous curve test or source-faithful numerical identity. Author counts and exact row/numerical conventions unavailable. Q-BP is a different depolarizing experiment; no OSD was run.",
+  "failures": 4360,
+  "maximum_absolute_relative_point_difference": 0.22272885457323666,
+  "observed_at": "2026-11-13T23:10:23+00:00",
+  "paper_comparable_points": 109,
+  "per_code": {
+    "toric11": {
+      "distance": 11,
+      "inside_pointwise_ci": 28,
+      "maximum_point_ratio": 1.1740095166457207,
+      "median_point_ratio": 1.0100512433806976,
+      "minimum_point_ratio": 0.8111387716691832,
+      "n": 242,
+      "points": 28
+    },
+    "toric13": {
+      "distance": 13,
+      "inside_pointwise_ci": 28,
+      "maximum_point_ratio": 1.2227288545732367,
+      "median_point_ratio": 1.0028233167066363,
+      "minimum_point_ratio": 0.8703707200341333,
+      "n": 338,
+      "points": 28
+    },
+    "toric15": {
+      "distance": 15,
+      "inside_pointwise_ci": 28,
+      "maximum_point_ratio": 1.128097261505798,
+      "median_point_ratio": 1.000316659710479,
+      "minimum_point_ratio": 0.9164830902865341,
+      "n": 450,
+      "points": 28
+    },
+    "toric9": {
+      "distance": 9,
+      "inside_pointwise_ci": 25,
+      "maximum_point_ratio": 1.2071569272099085,
+      "median_point_ratio": 0.9856448547086121,
+      "minimum_point_ratio": 0.81123558094447,
+      "n": 162,
+      "points": 25
+    }
+  },
+  "points": 218,
+  "schema": "roffe-descriptive-source-assessment-v1",
+  "shots": 9816,
+  "source_hashes": {
+    "plan.json": "eb16126dfa9eef45bb24eeddd70c5b287259e376b52a1531efcbf6126da9dcc3",
+    "source_points.json": "5966c842a485cd76368879c024750442221de80323cc21de4e5f4460ffa97b4f",
+    "verified.json": "20e0feff53ee5ebe63a9b281ab052c20bec182403db223e47abddc2e173b02fe"
+  },
+  "source_values_inside_pointwise_intervals": 109
+}
